@@ -2,7 +2,7 @@ delete point_to01
 create point_to01 point_to01.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty ABORT_ON_USER_ERROR TRUE
 

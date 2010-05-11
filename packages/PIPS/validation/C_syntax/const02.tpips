@@ -1,7 +1,7 @@
 delete const02
 create const02 const02.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

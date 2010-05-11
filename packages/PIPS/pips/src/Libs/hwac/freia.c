@@ -60,7 +60,7 @@ static string helper_file_name(string func_name)
 static bool freia_skip_op_p(const statement s)
 {
   call c = freia_statement_to_call(s);
-  string called = c? entity_user_name(call_function(c)): "";
+  const char* called = c? entity_user_name(call_function(c)): "";
   // ??? what about freia_common_check* ?
   return same_string_p(called, "freia_common_create_data")
     ||   same_string_p(called, "freia_common_destruct_data");
@@ -69,14 +69,14 @@ static bool freia_skip_op_p(const statement s)
 static bool is_alloc(const statement s)
 {
   call c = freia_statement_to_call(s);
-  string called = c? entity_user_name(call_function(c)): "";
+  const char* called = c? entity_user_name(call_function(c)): "";
   return same_string_p(called, "freia_common_create_data");
 }
 
 static bool is_dealloc(const statement s)
 {
   call c = freia_statement_to_call(s);
-  string called = c? entity_user_name(call_function(c)): "";
+  const char* called = c? entity_user_name(call_function(c)): "";
   return same_string_p(called, "freia_common_destruct_data");
 }
 

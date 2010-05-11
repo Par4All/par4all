@@ -62,6 +62,9 @@
 #define PRETTYPRINT_FORTRAN_EXT ".pp.f"
 #define PREDICAT_C_EXT ".pre.c"
 #define PRETTYPRINT_C_EXT ".pp.c"
+#define PRETTYPRINT_F95_EXT ".pp.f90"
+#define PREDICAT_F95_EXT ".pre.f90"
+
 
 #define WP65_BANK_EXT ".bank"
 #define WP65_COMPUTE_EXT ".wp65"

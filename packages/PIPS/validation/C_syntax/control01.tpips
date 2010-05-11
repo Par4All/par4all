@@ -2,7 +2,7 @@ delete control01
 create control01 control01.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE

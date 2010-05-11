@@ -1,7 +1,7 @@
 delete forloop02
 create forloop02 forloop02.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 # for to do loop conversion has been improved
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE

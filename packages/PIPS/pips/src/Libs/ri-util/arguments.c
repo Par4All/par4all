@@ -46,7 +46,7 @@
 #include "constants.h"
 #include "preprocessor.h"
 
-void print_homogeneous_arguments(list args, string variable_name(entity))
+void print_homogeneous_arguments(list args, const char* variable_name(entity))
 {
     if(ENDP(args))
 	(void) fprintf(stderr, "(nil)\n");

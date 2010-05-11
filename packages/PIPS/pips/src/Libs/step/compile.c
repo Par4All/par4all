@@ -261,7 +261,7 @@ statement build_assigne_region0(int nb,region reg,entity array_region)
     }
   
   d=0; // nb: gen_nth numerote les elements a partir de 0 d'ou l'initialisation a 0
-  MAP(EXPRESSION, exp,
+  FOREACH(EXPRESSION, exp,reference_indices(effect_any_reference(reg)))
       {
 	dimension dim_d;
 	
@@ -285,8 +285,7 @@ statement build_assigne_region0(int nb,region reg,entity array_region)
 			 make_assign_statement(make_expression(make_syntax_reference(ref),normalized_undefined),
 					       copy_expression(dimension_upper(dim_d))),
 			 FALSE);
-      },
-      reference_indices(effect_any_reference(reg)));
+      }
 
   pips_debug(1, "body = %p\n", body);
   return body;
@@ -431,7 +430,7 @@ string step_find_new_module_name(entity original, string suffix)
   int id=0;
   entity e;
   string newname;
-  string original_name=entity_user_name(original);
+  const char* original_name=entity_user_name(original);
   pips_debug(1,"original_name = %s\n", original_name);
    
   newname=strdup(concatenate(original_name,suffix,NULL));

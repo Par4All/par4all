@@ -1,0 +1,36 @@
+setenv WKS kernel_load_store02
+delete $WKS
+
+shell cp $WKS.c /tmp/$WKS.c
+# Instrument the source for include tracking:
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS /tmp/$WKS.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+apply PRIVATIZE_MODULE
+
+apply COARSE_GRAIN_PARALLELIZATION
+
+apply GPU_IFY
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT[%ALL]
+
+# Recover crudely the headers:
+shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WKS.database/Src/$WKS.c
+shell grep '//pips_begin' $WKS.database/Src/$WKS.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/$WKS.c ; done
+echo [after unsplit and recovering]
+shell cat $WKS.database/Src/$WKS.c
+close
+#delete $WKS
+quit

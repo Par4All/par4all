@@ -41,6 +41,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "properties.h"
 
 /* CATCH/TRY/UNCATCH/THROW stuff is here. */
 #include "linear.h"
@@ -66,10 +67,6 @@ void reset_pips_current_computation(void)
     free(current_module), current_module = NULL;
     free(current_phase), current_phase = NULL;
 }
-
-/* FI: grah, qu'est-ce que c'est que cette heresie? misc ne devait pas
-   dependre de NewGen! */
-extern bool get_bool_property(const char*);
 
 #define INPUT_BUFFER_LENGTH 256 /*error caught by terminal at 257th character*/
 
@@ -354,7 +351,7 @@ default_user_error(const char * calling_function_name,
    else {
       static int user_error_called = 0;
 
-      if (user_error_called > 2) {
+      if (user_error_called > get_int_property("MAXIMUM_USER_ERROR")) {
          (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
          exit(1);
       }

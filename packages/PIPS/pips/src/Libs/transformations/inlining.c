@@ -1374,7 +1374,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	 */
 	gen_free_list(code_declarations(EntityCode(new_fun)));
 	code_declarations(EntityCode(new_fun))=NIL;
-/*
+
+    /* we need to free them now, otherwise recompilation fails */
     FOREACH(PARAMETER,p,formal_parameters) {
         entity e = dummy_identifier(parameter_dummy(p));
         if(entity_variable_p(e)) {
@@ -1382,7 +1383,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
             entity_type(e)=type_undefined;
         }
     }
-*/
 
     /* and return the replacement statement */
     instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));

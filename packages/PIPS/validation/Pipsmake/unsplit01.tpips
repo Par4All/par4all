@@ -2,7 +2,7 @@ delete unsplit01
 create unsplit01 unsplit01.src/foo.c \
 	unsplit01.src/bar.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

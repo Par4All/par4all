@@ -3,7 +3,7 @@ delete $WKS
 create $WKS $WKS.c
 setproperty ABORT_ON_USER_ERROR TRUE
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 display PRINTED_FILE[%ALLFUNC]
 apply SIMPLE_XPATH_TEST[%ALLFUNC]

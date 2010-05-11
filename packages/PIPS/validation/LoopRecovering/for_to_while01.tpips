@@ -6,7 +6,7 @@ create for_to_while01 for_to_while01.c
 activate C_PARSER
 
 echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_BLOCKS TRUE
 echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

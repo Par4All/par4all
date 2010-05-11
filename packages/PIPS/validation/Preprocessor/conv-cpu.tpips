@@ -2,7 +2,7 @@ delete conv-cpu
 setproperty ABORT_ON_USER_ERROR TRUE
 create conv-cpu conv-cpu.c
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 #display PARSED_PRINTED_FILE[%ALL]
 #display PRINTED_FILE[%ALL]

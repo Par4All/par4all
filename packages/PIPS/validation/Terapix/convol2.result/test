@@ -138,8 +138,8 @@ l99993:
    for(i_t = 0; i_t <= 4; i_t += 1)
       for(j_t = 0; j_t <= 101; j_t += 1)
 
-         for(i = 1+126*i_t; i <= 126+126*i_t; i += 1)
-            for(j = 1+5*j_t; j <= 5+5*j_t; j += 1) {
+         for(i = 126*i_t+1; i <= 126*i_t+126; i += 1)
+            for(j = 5*j_t+1; j <= 5*j_t+5; j += 1) {
                {
                   int ki, kj;
                   __scalar__0 = 0.;
@@ -149,7 +149,7 @@ l99996:
                      for(kj = 0; kj <= 2; kj += 1)
                         
                         
-                        __scalar__0 = __scalar__0+image[-1+ki+i][-1+kj+j]*kernel[ki][kj];
+                        __scalar__0 = __scalar__0+image[ki+i-1][kj+j-1]*kernel[ki][kj];
                   __scalar__0 = __scalar__0/9;
                }
                if (i>=1&&i<=510) 

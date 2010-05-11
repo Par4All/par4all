@@ -6,7 +6,7 @@ create pointer01 pointer01.c
 #setenv PRETTYPRINT_DEBUG_LEVEL 7
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

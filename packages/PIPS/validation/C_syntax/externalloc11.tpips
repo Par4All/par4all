@@ -2,7 +2,7 @@ delete externalloc11
 create externalloc11 externalloc11/bar.c externalloc11/foo.c externalloc11/foobar.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 

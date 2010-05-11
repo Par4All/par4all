@@ -705,7 +705,7 @@ list lis;
 /* J'ai ameliore la fonction make_new_scalar_variable_with_prefix  */
 /* afin de l'etendre  a des tableau   */
 
-entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list dimensions)
+entity make_new_array_variable_with_prefix(const char* prefix, entity module,basic b,list dimensions)
 {
   string module_name = module_local_name(module);
   entity e;

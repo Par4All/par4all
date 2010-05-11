@@ -487,12 +487,12 @@ entity_list_text_format(
     string continuation,
     text t,
     list /* of entity */ le,
-    string (*var_name)(entity))
+    const char* (*var_name)(entity))
 {
   if (le)
   {
     int j=0, len = gen_length(le);
-    char ** provi = (char **) malloc(sizeof(char *) * len);
+    const char ** provi = (const char **) malloc(sizeof(char *) * len);
     bool some_previous = false;
 
     FOREACH(entity, e, le)

@@ -9,7 +9,7 @@ create reparse01 reparse01.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7

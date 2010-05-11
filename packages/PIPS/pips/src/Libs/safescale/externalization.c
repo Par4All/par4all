@@ -32,7 +32,6 @@ static char vcid[] = "$Id$";
 
 #include "safescale.h"
 #include "preprocessor.h"
-extern bool prettyprint_is_fortran;
 
 
 /**
@@ -615,7 +614,8 @@ static entity create_module_with_statement(statement stat, string new_module_nam
     print_statement(stat);
   }
   
-  add_new_module(new_module_name, new_module, stat, prettyprint_is_fortran);
+  add_new_module(new_module_name, new_module, stat,
+		 prettyprint_language_is_fortran_p ());
   
   pips_debug(5, "[END] create_module_with_statement\n");
 

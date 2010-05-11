@@ -2,7 +2,7 @@ delete inline01
 create inline01 inline01.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo

@@ -1,0 +1,1 @@
+pips_c2openmp jacobi02.c | grep -v 'The parallelized code is in pips_c2openmp'

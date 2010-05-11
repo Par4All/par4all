@@ -1,7 +1,7 @@
 delete unsigned02
 create unsigned02 unsigned02.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION

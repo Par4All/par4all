@@ -1,7 +1,7 @@
 delete main_hello_world
 create main_hello_world main_hello_world.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 

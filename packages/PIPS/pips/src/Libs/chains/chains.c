@@ -1147,10 +1147,16 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     }
   }
   FOREACH(EFFECT, fout, effect_outs) {
-    entity eout = effect_entity( fout );
+    ifdebug(2) {
+      print_effect(fin);
+      fprintf(stderr," -> ");
+      print_effect(fout);
+      fprintf(stderr,"\n");
+    }
 
     if ( effects_may_conflict_p( fin, fout ) && ( *which )( fin, fout ) ) {
       entity ein = effect_entity( fin );
+      entity eout = effect_entity( fout );
       type tin = ultimate_type( entity_type(ein) );
       type tout = ultimate_type( entity_type(eout) );
       reference rin = effect_any_reference(fin);

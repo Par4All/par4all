@@ -124,102 +124,140 @@ gener_DOSEQ(
     return(state_lhyp);
 }
 
-/* void interchange(cons *lls)
+/* Implementation of the loops interchange method. The outer most loop
+ * is exchanged with the inner most one. The legality of the
+ * transformation is not checked against the data dependencies nor
+ * against the control flow nor against the local declarations.
  *
- * Implementation of the loops interchange method. The outer most loop
- * is exchanged with the inner most one.
+ * "lls" is the list of nested loops. The user loop selection is used to
+ * build lls, a list of loop statements. The innermost loop is first
+ * in lls and the outermost loop is last in lls.
  *
- * "lls" is the list of nested loops. The user selection loop is used to
- * build lls
+ * If the innermost and outermost loops have the same loop label, the
+ * code generation is OK.
+ *
+ * If neither the innermost nor the outermost loop has a loop label,
+ * the code generation is OK.
+ *
+ * If both loops have different non-empty labels, the innermost label
+ * must be preserved in case it is the target of a goto. And the
+ * outermost loop label, if any, has to be moved inside the nested
+ * loop body. So the initial innermost loop must be made labelless.
+ *
+ * Note: the initial outermost loop label cannot be the target of a
+ * goto because the loop nest would not be a loop nest after
+ * controlization.
  *
  * FI: should be replaced by interchange_two_loops(lls, 1, n)
+ * FI: used to be called "interchange()"
  */
 
-statement
-interchange(list lls,__attribute__((unused)) bool (*unused)(loop))
+statement interchange_inner_outermost_loops(list lls,
+				__attribute__((unused)) bool (*unused)(loop))
 {
-    Psysteme sci;			/* sc initial */
-    Psysteme scn;			/* sc nouveau */
-    Psysteme sc_row_echelon;
-    Psysteme sc_newbase;
-    Pbase base_oldindex = NULL;
-    Pbase base_newindex = NULL;
-    matrice A;
-    matrice G;
-    matrice AG;
-    int n ;				/* number of index */
-    int m ;				/* number of constraints */
-    statement s_lhyp;
-    Pvecteur *pvg;
-    Pbase pb; 
-    expression lower, upper;
-    Pvecteur pv1, pv2;
-    loop l;
+  Psysteme sci;			/* sc initial */
+  Psysteme scn;			/* sc nouveau */
+  Psysteme sc_row_echelon;
+  Psysteme sc_newbase;
+  Pbase base_oldindex = NULL;
+  Pbase base_newindex = NULL;
+  matrice A;
+  matrice G;
+  matrice AG;
+  int n ;				/* number of indices */
+  int m ;				/* number of constraints */
+  statement s_lhyp;
+  Pvecteur *pvg;
+  Pbase pb;
+  expression lower, upper;
+  Pvecteur pv1, pv2;
+  loop l;
+  /* Initially, the outermost loop. Stays the outermost loop.  */
+  loop oml =
+    instruction_loop(statement_instruction(STATEMENT(CAR(gen_last(lls)))));
+  /* The initial outermost loop label */
+  entity omll = loop_label(oml);
+  /* Initially, the innermost loop. Stays the innermost loop. */
+  loop iml =
+    instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
+  /* The initial innermost loop label */
+  entity imll = loop_label(iml);
 
-    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
-    debug(8," interchange","begin:\n");
+  debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
+  pips_debug(8,"begin:\n");
 
-    /* make the  system "sc" of constraints of iteration space */
-    sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-   
-    /* create the  matrix A of coefficients of  index in (Psysteme)sci */
-    n = base_dimension(base_oldindex);
-    m = sci->nb_ineq;
-    A = matrice_new(m,n);
-    sys_matrice_index(sci, base_oldindex, A, n, m);
+  /* make the  system "sc" of constraints of iteration space */
+  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
 
-    /* computation of the matrix of basis change  for loops interchange */
-    G = matrice_new(n,n);
-    matrice_identite(G,n,0);
-    matrice_swap_columns(G,n,n,1,n);
+  /* create the  matrix A of coefficients of  index in (Psysteme)sci */
+  n = base_dimension(base_oldindex);
+  m = sci->nb_ineq;
+  A = matrice_new(m,n);
+  sys_matrice_index(sci, base_oldindex, A, n, m);
 
-    /* the new matrice of constraints AG = A * G */
-    AG = matrice_new(m,n);
-    matrice_multiply(A,G,AG,m,n,n);
+  /* computation of the matrix of basis change  for loops interchange */
+  G = matrice_new(n,n);
+  matrice_identite(G,n,0);
+  matrice_swap_columns(G,n,n,1,n);
 
-    /* create the new system of constraintes (Psysteme scn) with 
-       AG and sci */
-    scn = sc_dup(sci);
-    matrice_index_sys(scn,base_oldindex,AG,n,m);
+  /* the new matrice of constraints AG = A * G */
+  AG = matrice_new(m,n);
+  matrice_multiply(A,G,AG,m,n,n);
 
-    /* computation of the new iteration space in the new basis G */
-    sc_row_echelon = new_loop_bound(scn,base_oldindex);
+  /* create the new system of constraintes (Psysteme scn) with
+     AG and sci */
+  scn = sc_dup(sci);
+  matrice_index_sys(scn,base_oldindex,AG,n,m);
 
-    /* change of basis for index */
-    change_of_base_index(base_oldindex,&base_newindex);
-    sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),
-				   base_oldindex,base_newindex);
-   
-    /* generation of interchange  code */
-    /*  generation of bounds */
-    for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
-	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
-    }
- 
-    /* loop body generation */
-    pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
-    scanning_base_to_vect(G,n,base_newindex,pvg);
-    pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);   
+  /* computation of the new iteration space in the new basis G */
+  sc_row_echelon = new_loop_bound(scn,base_oldindex);
 
-    l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
-    lower = range_upper(loop_range(l));
-    upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
+  /* change of basis for index */
+  change_of_base_index(base_oldindex,&base_newindex);
+  sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),
+				 base_oldindex,base_newindex);
+
+  /* generation of interchange  code */
+  /*  generation of bounds */
+  for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
+    make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
+  }
+
+  /* loop body generation */
+  pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
+  scanning_base_to_vect(G,n,base_newindex,pvg);
+  pv1 = sc_row_echelon->inegalites->succ->vecteur;
+  pv2 = vect_change_base(pv1,base_oldindex,pvg);
+
+  l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
+  lower = range_upper(loop_range(l));
+  upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
 
 
-    s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
+  s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
 
-    debug(8," interchange","end\n");
-    debug_off();
+  /* Fix labels. Should this be made part of gener_DOSEQ? */
+  if(!entity_empty_label_p(omll) && omll!=imll) {
+    /* A corresponding continue should be added to the loop nest
+       body, the body of the initial innermost loop , iml */
+    statement nlb = loop_body(iml);
+    /* The initial continue statement is assumed lost when lls is
+       built and transformed. */
+    statement cs = make_continue_statement(omll);
+    append_a_statement(nlb, cs);
+    /* get rid of the innermost loop label? */
+    //loop_label(iml) = entity_empty_label();
+  }
 
-    return s_lhyp;
+  pips_debug(8,"end\n");
+  debug_off();
+
+  return s_lhyp;
 }
 
-statement
-interchange_two_loops(
-    list lls,
-    int n1,
-    int n2)
+/* See comments for interchange_inner_outermost_loops(). Continue
+   statements for loop labels are not fixed. */
+statement interchange_two_loops(list lls, int n1, int n2)
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */
@@ -234,17 +272,17 @@ interchange_two_loops(
     int m ;				/* number of constraints */
     statement s_lhyp;
     Pvecteur *pvg;
-    Pbase pb; 
+    Pbase pb;
     expression lower, upper;
     Pvecteur pv1, pv2;
     loop l;
 
     debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
-    debug(8,"interchange_two_loops","\n begin: n1=%d, n2=%d\n", n1, n2);
+    pips_debug(8,"\n begin: n1=%d, n2=%d\n", n1, n2);
 
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-   
+
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
     m = sci->nb_ineq;
@@ -260,8 +298,8 @@ interchange_two_loops(
     AG = matrice_new(m,n);
     matrice_multiply(A,G,AG,m,n,n);
 
-    /* create the new system of constraintes (Psysteme scn) with 
-       AG and sci */
+    /* create the new system of constraintes (Psysteme scn) with AG
+       and sci */
     scn = sc_dup(sci);
     matrice_index_sys(scn,base_oldindex,AG,n,m);
 
@@ -273,18 +311,18 @@ interchange_two_loops(
     sc_newbase =
 	sc_change_baseindex(sc_dup(sc_row_echelon),
 			    base_oldindex,base_newindex);
-   
+
     /* generation of interchange  code */
     /*  generation of bounds */
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
 	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
     }
- 
+
     /* loop body generation */
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
     scanning_base_to_vect(G,n,base_newindex,pvg);
     pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);   
+    pv2 = vect_change_base(pv1,base_oldindex,pvg);
 
     l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
     lower = range_upper(loop_range(l));
@@ -293,7 +331,7 @@ interchange_two_loops(
 
     s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
 
-    debug(8, "interchange_two_loops", "end\n");
+    pips_debug(8, "end\n");
     debug_off();
 
     return s_lhyp;

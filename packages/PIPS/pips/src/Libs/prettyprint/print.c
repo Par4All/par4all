@@ -115,7 +115,6 @@ bool print_code_or_source(string mod_name)
 	    DBR_GRAPH_PRINTED_FILE
 		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
     string file_ext = string_undefined;
-    int pff = get_bool_property("PRETTYPRINT_FREE_FORM");
 
     /* FI: This test could be moved up in pipsmake? */
     if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
@@ -125,13 +124,9 @@ bool print_code_or_source(string mod_name)
       return false;
     }
 
-    /* Implies PRETTYPRINT_FREE_FORM = true */
-    if(get_bool_property("PRETTYPRINT_C_CODE")) {
-      set_bool_property("PRETTYPRINT_FREE_FORM", TRUE);
-    }
+    string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
 
-    if(!get_bool_property("PRETTYPRINT_C_CODE")
-       && fortran_language_module_p(module)) {
+    if((strcmp (lang, "F77") == 0) && fortran_language_module_p(module)) {
       file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
@@ -139,11 +134,18 @@ bool print_code_or_source(string mod_name)
 		GRAPH_FILE_EXT : "",
 		NULL));
     }
-    else if(get_bool_property("PRETTYPRINT_C_CODE")
-	    || c_language_module_p(module)) {
+    else if((strcmp (lang, "C") == 0) || c_language_module_p(module)) {
       file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_C_EXT : PREDICAT_C_EXT,
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+		GRAPH_FILE_EXT : "",
+		NULL));
+    }
+    else if(strcmp (lang, "F95") == 0) {
+      file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_F95_EXT : PREDICAT_F95_EXT,
 		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 		GRAPH_FILE_EXT : "",
 		NULL));
@@ -181,8 +183,6 @@ bool print_code_or_source(string mod_name)
        parallel code prettyprint: */
     set_string_property("PRETTYPRINT_PARALLEL", pp);
     free(pp);
-    /* Restore the previous PRETTYPRINT_FREE_FORM property */
-    set_bool_property("PRETTYPRINT_FREE_FORM", pff);
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -227,9 +227,22 @@ static bool print_parallelized_code_common(
 
     close_prettyprint();
 
-    success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				  prettyprint_is_fortran?
-				  PARALLEL_FORTRAN_EXT : PARALLEL_C_EXT, r);
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
+				    PARALLEL_FORTRAN_EXT, r);
+      break;
+    case is_language_c:
+      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
+				    PARALLEL_C_EXT, r);
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
 
     end_attachment_prettyprint();
 

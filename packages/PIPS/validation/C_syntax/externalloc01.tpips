@@ -2,7 +2,7 @@ delete externalloc01
 create externalloc01 externalloc01.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 

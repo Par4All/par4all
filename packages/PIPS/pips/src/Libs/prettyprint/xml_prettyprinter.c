@@ -1377,7 +1377,7 @@ static void xml_reference(int taskNumber __attribute__ ((unused)), reference r, 
 		      string_buffer result)
 {
 
- string varname = entity_user_name(reference_variable(r));
+ const char* varname = entity_user_name(reference_variable(r));
  string_buffer_append
    (result,
     concatenate(SPACE, QUOTE, XML_ARRAY_PREFIX, varname, QUOTE, SPACE, "accessMode =", QUOTE,
@@ -1920,7 +1920,7 @@ boolean vect_zero_p(Pvecteur v) {
 	   (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && value_zero_p(vect_coeff(TCST, v))));
 }
 
-static void type_and_size_of_var(entity var, char ** datatype, int *size)
+static void type_and_size_of_var(entity var, const char ** datatype, int *size)
 {
   // type t = ultimate_type(entity_type(var));
   type t = entity_type(var);
@@ -2627,7 +2627,7 @@ static void find_memory_comment_on_array(statement s)
     array_location_string = result;
 }
 
-static string memory_for_array_p(string sa)
+static string memory_for_array_p(const char* sa)
 {
   statement stat = get_current_module_statement();
   string result=NULL;
@@ -2651,7 +2651,7 @@ static string memory_for_array_p(string sa)
 
 static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 {
-  string datatype ="";;
+  const char* datatype ="";;
   list ld, ldim = variable_dimensions(type_variable(entity_type(var)));
   int i,j, size =0;
   int nb_dim = (int) gen_length(ldim);
@@ -3380,7 +3380,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
     string string_needs = "";
 
     boolean assign_func = ENTITY_ASSIGN_P(func);
-    string n= assign_func ? "LocalAssignment" : entity_user_name(func);
+    const char* n= assign_func ? "LocalAssignment" : entity_user_name(func);
 
     if (!assign_func || array_in_effect_list(effects_list)) {
 

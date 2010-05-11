@@ -3,7 +3,7 @@ delete array_declarators
 create array_declarators array_declarators.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

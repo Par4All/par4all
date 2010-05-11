@@ -136,7 +136,7 @@ last_comma_or_clopar(string s)
 void
 add_to_current_line(
     string buffer,       /* current line being processed */
-    string append,       /* string to add to this line */
+    const char* append,       /* string to add to this line */
     string continuation, /* prefix when breaking a line */
     text txt             /* where to append completed lines */)
 {
@@ -213,7 +213,8 @@ add_to_current_line(
 	    int coupure = MAX_LINE_LENGTH-2 -lbuffer;
 	    char tmp2[2*MAX_LINE_LENGTH];
 	    strcpy(tmp2,append+coupure);
-	    append[coupure]='\0';
+        /*SG: warning: I removed the const modifier here */
+	    ((char*)append)[coupure]='\0';
 	    
 	    add_to_current_line(buffer,append,continuation,txt);
 	    add_to_current_line(buffer,tmp2,continuation,txt);

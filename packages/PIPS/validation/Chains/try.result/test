@@ -1,7 +1,6 @@
 
 First dependence graph
 
-0 0
 43 45 R W <K9> - <K9> levels()
 43 44 W R <K8> - <K8> levels()
 42 45 W W <K9> - <K9> levels()

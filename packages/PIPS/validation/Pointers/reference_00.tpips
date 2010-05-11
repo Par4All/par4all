@@ -1,6 +1,6 @@
 delete reference_00
 create reference_00 reference_00.c
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 activate C_PARSER
 display PRINTED_FILE[reference_00]

@@ -247,10 +247,10 @@ void activate_language(language l)
 {
   if(language_fortran_p(l)) {
     /* Usual properties for Fortran */
-    set_bool_property("PRETTYPRINT_C_CODE", FALSE);
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", TRUE);
     set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", FALSE);
     set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", FALSE);
+    set_string_property("PRETTYPRINT_LANGUAGE", "F77");
 
     if(!active_phase_p("PARSER"))
       activate("PARSER");
@@ -259,18 +259,18 @@ void activate_language(language l)
   } else if(language_fortran95_p(l)) {
     /* Usual properties for Fortran 90/95 */
     set_bool_property("PRETTYPRINT_FREE_FORM", TRUE);
-    set_bool_property("PRETTYPRINT_C_CODE", FALSE);
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", FALSE);
     set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", FALSE);
+    set_string_property("PRETTYPRINT_LANGUAGE", "F95");
 
   } else if(language_c_p(l)) {
     /* Usual properties for C */
     set_bool_property("PRETTYPRINT_FREE_FORM", TRUE);
-    set_bool_property("PRETTYPRINT_C_CODE", TRUE);
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", TRUE);
     set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", TRUE);
+    set_string_property("PRETTYPRINT_LANGUAGE", "C");
 
     if(!active_phase_p("C_PARSER"))
       activate("C_PARSER");

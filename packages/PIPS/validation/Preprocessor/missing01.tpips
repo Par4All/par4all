@@ -3,7 +3,7 @@ delete missing01
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv SHELL /bin/bash
 set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 create missing01 missing01.c
 

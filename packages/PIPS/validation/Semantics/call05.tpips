@@ -5,7 +5,7 @@ create call05 call05.c
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
 activate C_PARSER
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 # We want here to analyze for loops directly

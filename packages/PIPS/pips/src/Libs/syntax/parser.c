@@ -72,6 +72,7 @@ entity DynamicArea = entity_undefined;
 entity StaticArea = entity_undefined;
 entity HeapArea = entity_undefined;
 entity StackArea = entity_undefined;
+entity AllocatableArea = entity_undefined;
 
 /* Indicates where the current instruction (in fact statement) starts and
    ends in the input file and gives its label. Temporary versions of these

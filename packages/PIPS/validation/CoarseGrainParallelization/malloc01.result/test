@@ -1,0 +1,67 @@
+Select some options to deal with the C Language:
+Parse as C:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Prettyprint the source as C, of course
+Select the most precise analysis:
+int main(int argc, char *argv[])
+{
+   int i, j;
+   float *a[64];
+
+   for (i = 0;i<64;i++) {
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);
+      for (j = 0;j<64;j++)
+         a[i][j] = 0.;
+   }
+
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+   float *a[64];
+
+   for(i = 0; i <= 63; i += 1) {
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);
+      for(j = 0; j <= 63; j += 1)
+         a[i][j] = 0.;
+   }
+
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+   float *a[64];
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1) {
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);
+#pragma omp parallel for
+      for(j = 0; j <= 63; j += 1)
+         a[i][j] = 0.;
+   }
+
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+   float *a[64];
+
+
+#pragma omp parallel for
+   for(i = 0; i <= 63; i += 1)
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for
+      for(j = 0; j <= 63; j += 1)
+         a[i][j] = 0.;
+
+   return 0;
+}

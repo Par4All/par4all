@@ -226,7 +226,7 @@ static text stub_text(entity module, bool is_fortran)
 	sentence bs = make_sentence(is_sentence_unformatted,
 				    make_unformatted(string_undefined, 0, 0,
 						     CONS(STRING, strdup("{}"), NIL)));
-	string name = entity_user_name(module);
+	const char* name = entity_user_name(module);
 	type t = entity_type(module);
 	/* FI: I do not know what to use to initialize pdl usefully */
 	list pdl = NIL; // each type supporting entity is declared independently
@@ -268,7 +268,8 @@ static text compilation_unit_text(entity cu, entity module)
     list pdl = NIL; // Let's hope it works; else pdl should contain
 		    // each type to declare except for the module
 
-    pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
+    pips_assert("We must be in a C prettyprinter environment",
+		prettyprint_language_is_c_p ());
 
     if (type_undefined_p(t))
 	pips_user_error("undefined type for %s\n", entity_name(module));
@@ -308,7 +309,7 @@ static text compilation_unit_text(entity cu, entity module)
     pips_assert("Each entity appears only once", gen_once_p(nsel));
 
     FOREACH(ENTITY, se, nsel) {
-      string n = entity_user_name(se);
+      const char* n = entity_user_name(se);
 
       /* Do not declare dummy structures, unions and enumerations,
 	 which must be part of another declaration, either a typedef
@@ -445,6 +446,8 @@ add_new_module_from_text(string module_name,
       DB_PUT_FILE_RESOURCE(res, cun, init_name);
       DB_PUT_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(src_name));
     }
+    else if(!is_fortran)
+        AddEntityToModuleCompilationUnit(m,module_name_to_entity(compilation_unit_name));
 
     free(file_name), free(dir_name), free(full_name), free(finit_name);
     return success_p;
