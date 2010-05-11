@@ -2251,7 +2251,7 @@ results. This property also affects the computation of regions.
 CONSTANT_PATH_EFFECTS TRUE
 \end{PipsProp}
 
-Property \PipsPropRef{USER_EFFECTS_ON_STDIOS} is used to control the
+Property \PipsPropRef{USER_EFFECTS_ON_STD_FILES} is used to control the
 way the user uses {\tt stdout}, {\tt stdin} and {\tt stderr}. The
 default case ({\tt FALSE}) means that the user does not modify these
 global variables. When set to {\tt TRUE}, they are considered as user
@@ -4685,6 +4685,16 @@ default) value is {\tt TRUE}.
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
 ALIASING_INSIDE_DATA_STRUCTURE TRUE
 \end{PipsProp}
+
+Property \PipsPropRef{ALIASING_ACROSS_IO_STREAMS} can be set to {\tt
+  FALSE} to specify that two io streams (two variables declared as
+{\tt FILE *}) cannot be aliased, neither the locations to which they
+point. The safe and default value is {\tt TRUE}
+\begin{PipsProp}{ALIASING_ACROSS_IO_STREAMS}
+ALIASING_ACROSS_IO_STREAMS TRUE
+\end{PipsProp}
+
+
 
 The following string property defines the lattice of maximal elements
 to use when precise information is lost. Three values are possible:

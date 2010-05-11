@@ -326,8 +326,8 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 
   ifdebug(1) {
     if(statement_loop_p(st)) {
-      pips_debug(1, "Trying to privatize %s in loop statement %td with local(s) ",
-		 entity_local_name( e ), statement_number( st )) ;
+      pips_debug(1, "Trying to privatize %s in loop statement %td (ordering %03zd) with local(s) ",
+		 entity_local_name( e ), statement_number( st ), statement_ordering(st)) ;
       print_arguments(loop_locals(statement_loop(st)));
     }
     else {
@@ -463,6 +463,15 @@ bool privatize_module(char *mod_name)
     debug_on("PRIVATIZE_DEBUG_LEVEL");
     set_ordering_to_statement(mod_stat);
 
+    /* Set the prettyprint language for debug */
+    value mv = entity_initial(module);
+    if(value_code_p(mv)) {
+      code c = value_code(mv);
+      set_prettyprint_language_from_property(language_tag(code_language(c)));
+    } else {
+      /* Should never arise */
+      set_prettyprint_language_from_property(is_language_fortran);
+    }
 
     /* Build maximal lists of private variables in loop locals */
     /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
