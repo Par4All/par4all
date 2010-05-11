@@ -185,6 +185,12 @@ static list words_dimension(dimension obj, list pdl)
   int up, i;
   switch ( language_tag (get_prettyprint_language ()) ) {
     case is_language_fortran95:
+      /* Not asterisk for unbound dimension in F95*/
+      if(unbounded_dimension_p(obj)) {
+        pc = CHAIN_SWORD(pc,":");
+        break;
+      }
+      /* If dimension are bounded, fallback on plain old F77 style */
     case is_language_fortran:
       pc = words_expression( dimension_lower(obj), pdl );
       pc = CHAIN_SWORD(pc,":");
@@ -246,54 +252,54 @@ static list words_dimension(dimension obj, list pdl)
  * It is in the standard that dimensions cannot be declared twice in a
  * single module. BC.
  */
-list words_declaration(
-    entity e,
-    bool prettyprint_common_variable_dimensions_p,
-    list pdl)
-{
-    list pl = NIL;
-    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+list words_declaration(entity e,
+                       bool prettyprint_common_variable_dimensions_p,
+                       list pdl) {
+  list pl = NIL;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-    pl = CHAIN_SWORD(pl, entity_user_name(e));
+  /* UGLY (temporary) HACK FOR ALLOCATABLE */
+  if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
+    pips_assert("Allocatable are handled in Fortran95 only...",
+                get_prettyprint_language_tag() == is_language_fortran95);
 
-    if (type_variable_p(entity_type(e)))
-    {
-	if (prettyprint_common_variable_dimensions_p ||
-	    !(variable_in_common_p(e) || variable_static_p(e)))
-	{
-	    if (variable_dimensions(type_variable(entity_type(e))) != NIL)
-	    {
-		list dims = variable_dimensions(type_variable(entity_type(e)));
+    pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
+  }
 
-		if ((language_tag (get_prettyprint_language ()) == is_language_fortran) ||
-		    (language_tag (get_prettyprint_language ()) == is_language_fortran95))
-		  {
-		    pl = CHAIN_SWORD(pl, "(");
-		    MAPL(pd,
-		    {
-		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
-		    }, dims);
-		    pl = CHAIN_SWORD(pl, ")");
-		  }
-		else if (language_tag (get_prettyprint_language ()) == is_language_c)
-		  {
-		    MAPL(pd,
-		    {
-		      pl = CHAIN_SWORD(pl, "[");
-		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-		      pl = CHAIN_SWORD(pl, "]");
-		    }, dims);
-		  }
-		else
-		  {
-		    pips_internal_error("This case should have been handled before");
-		  }
-	    }
-	}
+  pl = CHAIN_SWORD(pl, entity_user_name(e));
+
+
+
+  if (type_variable_p(entity_type(e))) {
+    if (prettyprint_common_variable_dimensions_p || !(variable_in_common_p(e)
+        || variable_static_p(e))) {
+      if (variable_dimensions(type_variable(entity_type(e))) != NIL) {
+        list dims = variable_dimensions(type_variable(entity_type(e)));
+
+        if ((get_prettyprint_language_tag() == is_language_fortran)
+            || (get_prettyprint_language_tag() == is_language_fortran95)) {
+          pl = CHAIN_SWORD(pl, "(");
+          MAPL(pd,
+              {
+                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
+              }, dims);
+          pl = CHAIN_SWORD(pl, ")");
+        } else if (get_prettyprint_language_tag() == is_language_c) {
+          MAPL(pd,
+              {
+                pl = CHAIN_SWORD(pl, "[");
+                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                pl = CHAIN_SWORD(pl, "]");
+              }, dims);
+        } else {
+          pips_internal_error("This case should have been handled before");
+        }
+      }
     }
-    attach_declaration_to_words(pl, e);
-    return(pl);
+  }
+  attach_declaration_to_words(pl, e);
+  return (pl);
 }
 
 /* what about simple DOUBLE PRECISION, REAL, INTEGER... */

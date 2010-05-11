@@ -431,6 +431,9 @@ expression reference_ith_index(reference ref, int i)
 }
 
 /* functions for areas */
+bool allocatable_area_p(entity aire) {
+  return same_string_p(module_local_name(aire), ALLOCATABLE_AREA_LOCAL_NAME);
+}
 
 bool dynamic_area_p(entity aire)
 {

@@ -85,6 +85,7 @@
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"
 #define HEAP_AREA_LOCAL_NAME            "*HEAP*"
 #define STACK_AREA_LOCAL_NAME           "*STACK*"
+#define ALLOCATABLE_AREA_LOCAL_NAME "*ALLOCATABLE*"
 /* The set of all memory areas. FI: this macro is now obsolete and
    should be removed when a new version of alias-classes is
    introduced. Too bad ri-util/effects.c is going to depend on
