@@ -1,0 +1,40 @@
+
+Initial code
+
+
+      SUBROUTINE ARRAY
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER N
+      PARAMETER (N=10)
+      INTEGER A(N),B(N)
+      CALL AA0(N, A)                                                    0008
+      CALL AA1(N, A)                                                    0009
+      CALL AB(N, A, B)                                                  0010
+      PRINT *, B                                                        0011
+      END
+
+Code before inlining
+
+      PROGRAM TEST
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      CALL SCALAR                                                       0004
+      CALL ARRAY                                                        0005
+      END
+
+Code after inlining
+
+      PROGRAM TEST
+      INTEGER*4 N
+      PARAMETER (N = 10)
+      INTEGER B(1:N), A(1:N)
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      CALL SCALAR                                                       0007
+      CALL AA0(N, A)                                                    0008
+      CALL AA1(N, A)                                                    0009
+      CALL AB(N, A, B)                                                  0010
+      PRINT *, B                                                        0011
+99999 CONTINUE                                                          0013
+      END

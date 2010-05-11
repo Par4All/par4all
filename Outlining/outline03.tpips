@@ -1,5 +1,6 @@
-delete outline03
-create outline03 outline03.c
+setenv WS="outline03"
+delete $WS
+create $WS $WS.c
 
 display PARSED_PRINTED_FILE[main]
 display PRINTED_FILE[main]
@@ -25,5 +26,5 @@ echo All the kernel loops should be //
 display PRINTED_FILE[%ALLFUNC]
 
 close
-delete outline03
+delete $WS
 quit

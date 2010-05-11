@@ -1,4 +1,4 @@
-setenv WS="outline04"
+setenv WS="outline13"
 delete $WS
 create $WS $WS.c
 
@@ -26,6 +26,7 @@ display PRINTED_FILE[main]
 
 setproperty OUTLINE_LABEL "init_kernel"
 setproperty OUTLINE_MODULE_NAME "init_kernel"
+setproperty OUTLINE_SMART_REFERENCE_COMPUTATION TRUE
 apply OUTLINE[main]
 display PRINTED_FILE[%ALLFUNC]
 
