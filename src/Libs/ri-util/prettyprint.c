@@ -2360,7 +2360,7 @@ sentence_tail(entity e)
           break;
         case is_type_variable: {
           list pdl = NIL;
-          pc = CHAIN_SWORD(pc," FUNCTION ");
+          pc = CHAIN_SWORD(pc,"FUNCTION ");
           break;
         }
         case is_type_unknown:
