@@ -134,13 +134,16 @@ cat <<EOF > $P4A_RC_SH
 # Minimum Par4All rc file for sh-compatible shells
 
 # P4A source root.
-export P4A_ROOT=$P4A_ROOT
+export P4A_ROOT='$P4A_ROOT'
 
 # Path to the P4A installation.
 export P4A_DIST=\$P4A_ROOT/run
 
 # Location of the P4A_accel files.
 export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
+export P4A_ACCEL=\$P4A_ACCEL_DIR
+
+export P4A_ETC=\$P4A_DIST/etc
 
 unset NEWGEN_ROOT
 unset LINEAR_ROOT
@@ -151,15 +154,13 @@ unset PIPS_ROOT
 
 # Fix PATH.
 export PATH=\$P4A_DIST/bin:\$PATH
-export P4A_ETC=\$P4A_DIST/etc
 
-# Update library search paths.
+# Update libraries search paths.
 export LD_LIBRARY_PATH=\$P4A_DIST/lib:\$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=\$P4A_DIST/lib/pkgconfig:\$PKG_CONFIG_PATH
 
 # PIPS Python bindings (PyPS).
 export PYTHONPATH=\$(echo \$P4A_DIST/lib/python*/site-packages/pips):/usr/share/pyshared:\$PYTHONPATH
-
 EOF
 
 # Find the Fortran compiler:
