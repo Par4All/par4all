@@ -8255,8 +8255,13 @@ outline      > MODULE.code
         > PROGRAM.entities
         < PROGRAM.entities
         < MODULE.proper_effects
+        < MODULE.regions
         < MODULE.code
 \end{PipsMake}
+
+The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used if you want to limit the amount of entities passed
+through reference calls.
+With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]| entity, without it it is passed as an \lstinline|int| or  \lstinline|int*| depending on the read/write effect.
 
 The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
 the user is prompted if not set.
@@ -8275,6 +8280,9 @@ OUTLINE_LABEL ""
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_ALLOW_GLOBALS}
 OUTLINE_ALLOW_GLOBALS FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_SMART_REFERENCE_COMPUTATION}
+OUTLINE_SMART_REFERENCE_COMPUTATION FALSE
 \end{PipsProp}
 
 \subsection{Cloning}
