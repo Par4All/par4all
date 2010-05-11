@@ -101,15 +101,15 @@ static void html_print_entity_name( entity e ) {
 static void html_print_ram( ram r ) {
   begin_block( "ram", true );
 
-  begin_block( "Function", false );
+  begin_block( "Function", true);
   html_print_entity_name( ram_function( r ) );
-  end_block( "Function", false );
+  end_block( "Function", true );
 
   html_output( NL, false );
 
-  begin_block( "Section", false );
+  begin_block( "Section", true );
   html_print_entity_name( ram_section( r ) );
-  end_block( "Section", false );
+  end_block( "Section", true );
 
   string buf;
   pips_assert("Asprintf !",
@@ -334,52 +334,56 @@ static void html_print_functional( functional f ) {
 
 static void html_print_type( type t ) {
   begin_block( "type", true );
-  switch ( type_tag( t ) ) {
-    case is_type_statement:
-      html_output( "Statement (unit ?) ", true );
-      break;
-    case is_type_area:
-      html_print_area( type_area( t ) );
-      break;
-    case is_type_variable:
-      html_print_variable( type_variable( t ) );
-      break;
-    case is_type_functional:
-      html_print_functional( type_functional( t ) );
-      break;
-    case is_type_varargs:
-      html_output( "VarArgs", true );
-      html_print_type( type_varargs( t ) );
-      break;
-    case is_type_unknown:
-      html_output( "Unknown", true );
-      break;
-    case is_type_void:
-      html_output( "Void", true );
-      break;
-    case is_type_struct:
-      html_output( "Struct", true );
-      FOREACH(entity, e, type_struct( t ) )
-      {
-        html_print_entity_name( e );
-      }
-      break;
-    case is_type_union:
-      html_output( "Union", true );
-      FOREACH(entity, e, type_union( t ) )
-      {
-        html_print_entity_name( e );
-      }
-      break;
-    case is_type_enum:
-      html_output( "Enum", true );
-      FOREACH(entity, e, type_enum( t ) )
-      {
-        html_print_entity_name( e );
-      }
-      break;
-    default:
-      break;
+  if( t == type_undefined ) {
+    html_output( "*undefined*", true );
+  } else {
+  switch(type_tag( t )) {
+      case is_type_statement:
+        html_output("Statement (unit ?) ", true);
+        break;
+      case is_type_area:
+        html_print_area(type_area( t ));
+        break;
+      case is_type_variable:
+        html_print_variable(type_variable( t ));
+        break;
+      case is_type_functional:
+        html_print_functional(type_functional( t ));
+        break;
+      case is_type_varargs:
+        html_output("VarArgs", true);
+        html_print_type(type_varargs( t ));
+        break;
+      case is_type_unknown:
+        html_output("Unknown", true);
+        break;
+      case is_type_void:
+        html_output("Void", true);
+        break;
+      case is_type_struct:
+        html_output("Struct", true);
+        FOREACH(entity, e, type_struct( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      case is_type_union:
+        html_output("Union", true);
+        FOREACH(entity, e, type_union( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      case is_type_enum:
+        html_output("Enum", true);
+        FOREACH(entity, e, type_enum( t ) )
+        {
+          html_print_entity_name(e);
+        }
+        break;
+      default:
+        break;
+    }
   }
   end_block( "type", true );
 }
