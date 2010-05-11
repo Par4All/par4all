@@ -74,7 +74,7 @@ sub X {
 our $TMP_BASE = "/var/tmp/p4a$$";
 our $TMP_DIST = "$TMP_BASE$DIST_PREFIX";
 our $TMP_ACCEL = "$TMP_BASE$ACCEL_PREFIX";
-our $DEBIAN_DIR = "$RealBin/DEBIAN";
+our $DEBIAN_DIR = "$RealBin/pack/DEBIAN";
 our $TMP_DEBIAN_DIR = "$TMP_BASE/DEBIAN";
 chomp(our $ARCH = `uname -m`);
 if ($ARCH eq "x86_64") {
