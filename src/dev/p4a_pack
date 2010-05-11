@@ -94,15 +94,21 @@ if ($ARCH eq "x86_64") {
 }
 print STDERR BOLD WHITE "Arch: $ARCH\n";
 
-chomp(our $VERSION = `cat $ENV{'P4A_ROOT'}/VERSION 2>/dev/null`);
-unless ($VERSION) {
-        die "Missing/invalid version file: $ENV{'P4A_ROOT'}/VERSION";
-}
-unless ($VERSION =~ /^\d+(\.\d+)?(\.\d+)?$/) {
-        die "Invalid version string: $VERSION";
+our $VERSION;
+our $GIT_REV = get_file_revision($ENV{'P4A_ROOT'});
+if ($GIT_REV =~ /^\d+\.\d+(\.\d+)?-/) {
+	$VERSION = $GIT_REV;
+} else {
+	chomp($VERSION = `cat $RealBin/pack/VERSION 2>/dev/null`);
+	unless ($VERSION) {
+        	die "Missing/invalid version file";
+	}
+	unless ($VERSION =~ /^\d+\.\d+(\.\d+)?$/) {
+        	die "Invalid version string in version file: $VERSION";
+	}
+	$VERSION .= "-$GIT_REV";
 }
 
-$VERSION .= '-' . get_file_revision($ENV{'P4A_ROOT'});
 print STDERR BOLD WHITE "Version: $VERSION\n";
 
 X("mkdir -p $TMP_DIST");
@@ -165,18 +171,19 @@ sub get_file_revision {
         chomp(my $tag = `git describe --tags 2>/dev/null`);
         if ($tag) {
                 $short_rev = $tag;
-        } else {
-                $short_rev .= "+notag";
-                $notag = 1;
         }
-        my $dirty = 0;
+	#else {
+        #        $short_rev .= "+notag";
+        #        $notag = 1;
+        #}
+        #my $dirty = 0;
         if (git_file_is_dirty($f)) {
                 $short_rev .= "+dirty";
-                $dirty = 1;
+        #        $dirty = 1;
         }
-        if (our $INTERNAL || $dirty || $notag) {
-                $short_rev .= "+internal";
-        }
+        #if ($dirty || $notag) {
+        #        $short_rev .= "+internal";
+        #}
         return $short_rev;
 }
 
