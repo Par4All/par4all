@@ -82,15 +82,15 @@ printf
   "total: $count\n" .
   " * passed: $passed\n" .
   " * not passed: $not_passed\n" .
-  " - failed: $failed\n" .
-  " - changed: $changed\n" .
+  " - failed: $failed (core dumps, timout...)\n" .
+  " - changed: $changed (modified output)\n" .
   "warned: $warned\n" .
-  " * skipped: $skipped\n" .
-  " * missing: $missing\n" .
-  " * multi-script: $scripts\n" .
-  " * multi-source: $sources\n" .
-  " * orphan: $orphan\n" .
-  "broken directory: $broken\n" .
+  " * skipped: $skipped (source without validation scripts)\n" .
+  " * missing: $missing (empty result directory)\n" .
+  " * multi-script: $scripts (more than one validation script)\n" .
+  " * multi-source: $sources (source files for test with different suffixes)\n" .
+  " * orphan: $orphan (result avaible without source nor script)\n" .
+  "broken directory: $broken (directory without makefile)\n" .
   "success: %5.1f%%\n" .
   "\n",
   $passed*100.0/$count;
