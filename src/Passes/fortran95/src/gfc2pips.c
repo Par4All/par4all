@@ -3648,7 +3648,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       list lci = NULL;
 
       /* lci will be set in reverse order, so we have to put data first */
+
+      /* Get the datas in reverse order */
+      list datas = NIL;
       for (c = c->block->next; c; c = c->next) {
+        datas = gen_cons( c, datas);
+      }
+      FOREACH( CHUNKP, _c, datas) {
+        gfc_code *c = (gfc_code *)_c;
         if (c->expr) {
           lci = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr),lci);
         } else {
@@ -3671,6 +3678,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
             MakeCharacterConstantExpression( "IOLIST=" ),
             lci);
       }
+
 
       if (dt->format_expr) { //if no format ; it is standard
         fmt = gfc2pips_expr2expression(dt->format_expr);
