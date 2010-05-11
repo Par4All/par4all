@@ -75,8 +75,8 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 {
 	string emn_l = entity_module_name(loop_index(l));
 	string emn_o = entity_module_name(thecouple->old);
-	string eun_l = entity_user_name(loop_index(l));
-	string eun_o = entity_user_name(thecouple->old);
+	const char * eun_l = entity_user_name(loop_index(l));
+	const char * eun_o = entity_user_name(thecouple->old);
 	if( same_string_p(emn_l,emn_o) && same_string_p(eun_l,eun_o))
 	{
 		loop_index(l) = thecouple->new;

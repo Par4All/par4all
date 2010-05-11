@@ -501,6 +501,11 @@ bool fortran_language_module_p(entity m)
   return x_language_module_p(m, is_language_fortran);
 }
 
+bool fortran95_language_module_p(entity m)
+{
+  return x_language_module_p(m, is_language_fortran95);
+}
+
 /*
  *  that is all
  */

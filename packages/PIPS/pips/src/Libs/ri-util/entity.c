@@ -218,7 +218,7 @@ entity make_label(string strg)
 
 /* This function returns a new label */
 entity make_new_label(module_name)
-char * module_name;
+const char * module_name;
 {
   /* FI: do labels have to be declared?*/
   /* FI: it's crazy; the name is usually derived from the entity
@@ -347,10 +347,10 @@ string entity_global_name(entity e)
 
    @return pointer to the the user name (not newly allocated!)
 */
-string entity_user_name(entity e)
+const char * entity_user_name(entity e)
 {
   string gn = entity_name(e);
-  string un = global_name_to_user_name(gn);
+  const char* un = global_name_to_user_name(gn);
   return un;
 }
 
@@ -1107,8 +1107,8 @@ entity find_or_create_entity(string full_name)
    parenthesis or CALL keyword in a function or subroutine call.
    See SafeFindOrCreateEntity().
 */
-entity FindOrCreateEntity(string package /* package name */,
-			  string name /* entity name */)
+entity FindOrCreateEntity(const char* package /* package name */,
+			  const char* name /* entity name */)
 {
   entity e = entity_undefined;
 
@@ -1124,7 +1124,7 @@ entity FindOrCreateEntity(string package /* package name */,
 
    @return the entity
 */
-entity FindOrCreateTopLevelEntity(string name)
+entity FindOrCreateTopLevelEntity(const char* name)
 {
   return FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
 }
@@ -2072,7 +2072,7 @@ bool entities_p(list el)
 
 entity operator_neutral_element(entity op)
 {
-    string en = entity_user_name(op);
+    const char * en = entity_user_name(op);
 
     const char * one_neutral []= {
         MULTIPLY_OPERATOR_NAME,

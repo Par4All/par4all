@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
 
 % lang
 \usepackage[utf8]{inputenc}
@@ -16,8 +16,20 @@
 framerule=2mm,framexleftmargin=5mm, frame=leftline, rulecolor=\color{freeblue}, breaklines=true, backgroundcolor=\color{thingray}
 }
 
-\usepackage{url}
-\usepackage{acronym}
+% For the smileys :-)
+\usepackage{wasysym}
+
+\makeatletter
+
+% Test for a TeX4ht command:
+\@ifundefined{HCode}{%
+  % We are generating PDF, so allow to break down URL which is nicer
+  % instead of ugly line overflows:
+  \usepackage{breakurl}}{%
+  % else we are generating HTML with TeX4ht, use plain url:
+  \usepackage{url}}
+
+\usepackage{acronym,xspace}
 
 \usepackage{tikz}
 
@@ -149,6 +161,12 @@ framerule=2mm,framexleftmargin=5mm, frame=leftline, rulecolor=\color{freeblue}, 
 \newcommand{\cmd}[1]{\textbf{`}\texttt{#1}\textbf{`}}
 \newcommand{\dir}[1]{\diricon\texttt{#1}}
 
+\newcommand{\PipsDevGuidePDF}{\url{http://www.cri.ensmp.fr/pips/developer_guide.htdoc/developer_guide.pdf}\xspace}
+\newcommand{\PipsDevGuideHTDOC}{\url{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}\xspace}
+% The PDF is indeed into the dev guide directory...
+\newcommand{\PipsAutotoolsGuidePDF}{\url{http://www.cri.ensmp.fr/pips/developer_guide.htdoc/auto_pips.pdf}\xspace}
+\newcommand{\PipsAutotoolsGuideHTDOC}{\url{http://www.cri.ensmp.fr/pips/auto_pips.htdoc}\xspace}
+
 \title{Autotools for \PIPS{}}
 
 \author{Serge \textsc{Guelton}}
@@ -159,15 +177,24 @@ framerule=2mm,framexleftmargin=5mm, frame=leftline, rulecolor=\color{freeblue}, 
 \maketitle
 
 \begin{abstract}
-This documents describes the new build infrastructure of \PIPS{},
- based on the famous \texttt{autotools} suite.
+This document describes the new build infrastructure of \PIPS{},
+ based on the famous \texttt{autotools} suite and completes the \PIPS{}
+ developer guide.
+
 It describes
 \begin{itemize}
 \item the meaning of each involved file~\ref{sec:structure};
 \item maintenance processes~\ref{sec:maintain} for \PIPS{} developers;
 \item installation process~\ref{sec:install} for \PIPS{} users and developers.
 \end{itemize}
+
+This new infrastructure allows better portability and quite faster
+(re)compiling taking full advantage from some caching and multicore
+processors.
 \end{abstract}
+
+You can get a printable version of this document on\\
+\PipsAutotoolsGuidePDF{} and a HTML version on \PipsAutotoolsGuideHTDOC
 
 %%%
 \section{Introduction}
@@ -176,7 +203,7 @@ Building a large software like \PIPS{} is quite complicated:
 \begin{enumerate}
 \item several source languages;
 \item many tools involved;
-\item unusual head file generations.
+\item unusual automatic header file generations.
 \end{enumerate}
 
 If you want to ensure a good level of portability,
@@ -186,13 +213,34 @@ If you want to ensure a good level of maintainability,
 you have to rely on external, asserted tools.
 
 As \PIPS{} targets \texttt{*nix} based systems and is written mainly in \texttt{C},
-\texttt{autotools} appear as a \textit{de facto} standard.
+\texttt{autotools} appear as a \emph{de facto} standard.
 It is especially known for enforcing good portability between \texttt{MacOs}, \texttt{Linux} and \texttt{BSD}.
 Through \autoconf{}, it separate configuration step from build step.
 Through \gnulib{}, it ensures portability of non-standard \texttt{C} functions.
 
-As of now, \PIPS{} Compiles on  \texttt{Linux}, \texttt{BSD} and \texttt{MacOs} Operating Systems.
+As of now, \PIPS{} compiles on  \texttt{Linux}, \texttt{BSD} and \texttt{MacOs} Operating Systems.
 It can be compiled using either \texttt{gcc} or \texttt{icc}.
+
+You should notice that indeed \PIPS{} has currently 2 different build
+process that lives in parallel\footnote{Of course it is logical for a
+  parallelizer to have 2 build infrastructures that can be used
+  indifferently in parallel! \smiley{} It is also useful for
+  fault-tolerance.}, the \texttt{GNU-make}-based traditional infrastructure
+and this new one based on \texttt{autotools}. In this way we can develop
+and improve the new build infrastructure without hurting traditional
+users.
+
+Besides better portability support, the \texttt{autotools}-based build
+infrastructure is quite faster that the old one and can exploit available
+multiprocessors for example on \texttt{GNU-make} when using the
+\texttt{--jobs=...} option to specify the number of \texttt{make} process
+to use.
+
+The nasty side effect of having 2 build methods is that, when adding new
+stuff in \PIPS{}, you should declare them in both build infrastructures to
+avoid having different contents in \PIPS{} according to the build
+infrastructure used. So refer to the companion of this guide too, the
+\PIPS{} Developer Guide \PipsDevGuidePDF or \PipsDevGuideHTDOC.
 
 %%%
 \section{Infrastructure Organization}
@@ -205,12 +253,13 @@ In this section, we describe the configuration files used by the several tools i
 \autoconf{} manages the configuration of the build process.
 Involved files are
 \begin{description}
-\item[\file{configure.ac}] central place for configuration. Running \cmd{autoreconf -vi} will produce a \file{configure} script from it.
-\item[\dir{makes/m4}] auxiliary directory where \texttt{m4} configuration macros are stored. It is read by \cmd{autoreconf}.
-\item[\file{Makefile.am}] top-level \file{Makefile.am} contains a macro variable definition \texttt{ACLOCAL\_AMFLAGS} where \cmd{autoreconf} will find its additional \texttt{m4} sources.
+\item[\file{configure.ac}:] central place for configuration. Running \cmd{autoreconf -vi} will produce a \file{configure} script from it.
+\item[\dir{makes/m4}:] auxiliary directory where \texttt{m4} configuration macros are stored. It is read by \cmd{autoreconf}.
+\item[\file{Makefile.am}:] top-level \file{Makefile.am} contains a macro variable definition \texttt{ACLOCAL\_AMFLAGS} where \cmd{autoreconf} will find its additional \texttt{m4} sources.
 Running \cmd{autoreconf -vi} will produce a \file{Makefile.in} for each \file{Makefile.am}
-\item[\file{configure}] is the portable configuration script generated by \cmd{autoreconf}. Running it will turn each \file{Makefile.in} into a regular \file{Makefile}.
-\item[\file{config.status}] is a script generated by configuration step, that memorize configuration parameters.
+\item[\file{configure}:] is the portable configuration script generated by \cmd{autoreconf}. Running it will turn each \file{Makefile.in} into a regular \file{Makefile}.
+\item[\file{config.status}:] is a script generated by configuration step,
+  that memorizes configuration parameters.
 \end{description}
 
 For in-depth documentation of \autoconf{}, feel free to read \url{http://www.gnu.org/software/autoconf/manual}.
@@ -220,7 +269,7 @@ For in-depth documentation of \autoconf{}, feel free to read \url{http://www.gnu
 \automake{} manages the set of makefiles involved in the build process.
 
 Each \file{Makefile.am} in source repository describes the build process for this repository.
-It follows the \cmd{make} syntax, without support for \texttt{GNU-make} extensions for the sake of portability.
+It follows the \cmd{make} syntax, without needing \texttt{GNU-make} extensions for the sake of portability.
 
 For in-depth documentation of \automake{}, feel free to read \url{http://www.gnu.org/software/automake/manual}.
 
@@ -280,7 +329,7 @@ include_HEADERS=!pips.h!
 \automake{} provides a fine grain control over what gets installed and distributed.
 
 
-\subsection{Adding a \texttt{tex} file in an existing \PIPS{} directory}
+\subsection{Adding a \TeX{} file in an existing \PIPS{} directory}
 Let us assume you want to add the file \file{pips.tex} into library \dir{src/Libs/ri-util}.
 You will have to modify \file{src/Libs/ri-util/Makefile.am}
 
@@ -297,11 +346,12 @@ doc_DATA=!pips.pdf!
 endif
 \end{lstlisting}
 
-In addition to this, you have to supply \automake{} rules to build pdf from tex files, using the directive
+In addition to this, you have to supply \automake{} rules to build
+\textsc{pdf} from \TeX{} files, using the directive
 \begin{lstlisting}
 include $(top_srcdir)/makes/latex.mk
 \end{lstlisting}
-If it is not already there.
+if it is not already there.
 
 
 \subsection{Adding a library}
@@ -343,15 +393,27 @@ Where
 \section{Installation Processes}
 \label{sec:install}
 
-For short:
+For short for \PIPS{}
 \begin{lstlisting}
 wget http://ridee.enstb.org/pips/get-pips4u.sh
 chmod u+x get-pips4u.sh
 ./get-pips4u.sh --help
 \end{lstlisting}
 
+In some cases, \PIPS{} may be included in another distribution and you may
+build \PIPS{} differently. For example in Par4All, where only this
+\texttt{autotools} build method is used, this is done by the Par4All
+installation process and you do not need to care about the previous
+installation script.
+
 %%%
 \begin{acronym}
 \end{acronym}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End:
+

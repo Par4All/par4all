@@ -95,7 +95,7 @@ static string entity_full_name(entity e)
 /* Specific handling of references appearing in points_to */
 list points_to_words_reference(reference r)
 {
-  extern string entity_minimal_user_name(entity);
+  extern const char* entity_minimal_user_name(entity);
 
   // Normal implementation, used for validation:
   return words_any_reference(r,NIL, entity_minimal_user_name);
@@ -165,7 +165,7 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
   entity v2si = reference_variable(r2si);
 
   // FI: memory leak? generation of a new string?
-  extern string entity_minimal_user_name(entity);
+  extern const char* entity_minimal_user_name(entity);
 
   i = strcmp(entity_minimal_user_name(v1so), entity_minimal_user_name(v2so));
   if(i==0) {

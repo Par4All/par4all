@@ -46,12 +46,13 @@
 
 #include "transformations.h"
 
-bool
-loop_interchange(string module_name)
+bool loop_interchange(string module_name)
 {
-    bool return_status = FALSE;
+  bool return_status = FALSE;
 
-    return_status = interactive_loop_transformation(module_name, interchange);
-    
-    return return_status;
+  return_status =
+    interactive_loop_transformation(module_name,
+				    interchange_inner_outermost_loops);
+
+  return return_status;
 }

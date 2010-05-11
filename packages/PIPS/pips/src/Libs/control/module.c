@@ -106,6 +106,16 @@ bool controlizer(string module_name)
 
   statement module_stat, parsed_mod_stat;
 
+  // generate pragma string or expression using the correct language:
+  value mv = entity_initial(module_name_to_entity(module_name));
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    set_prettyprint_language_from_property(language_tag(code_language(c)));
+  } else {
+    /* Should never arise */
+    set_prettyprint_language_from_property(is_language_fortran);
+  }
+
   set_current_module_entity(m);
 
   parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);

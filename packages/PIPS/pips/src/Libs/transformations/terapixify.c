@@ -1058,7 +1058,7 @@ bool  entity_used_in_loop_bound_p(entity e)
 #define TERAPIX_MASK_PREFIX "ma"
 #define TERAPIX_REGISTER_PREFIX "re"
 
-static bool terapix_renamed_p(string s, string prefix)
+static bool terapix_renamed_p(const char* s, const char* prefix)
 {
     string found = strstr(s,prefix);
     if(found)

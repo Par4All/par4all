@@ -1,3 +1,4 @@
+
 %module SWIG_MODULE_NAME
 // This tells SWIG to treat char ** as a special case
 %typemap(in) char ** {
@@ -27,6 +28,21 @@
 %typemap(freearg) char ** {
   free((char *) $1);
 }
+
+// Language independent exception handler
+%include exception.i
+// this take care of various exception
+%exception {
+    CATCH(any_exception_error)
+    {
+        SWIG_exception(SWIG_UnknownError,"pips user error");
+    }
+    TRY {
+        $action
+    }
+}
+
+        
 
 extern char* activate(char* );
 extern int delete_workspace(char* );

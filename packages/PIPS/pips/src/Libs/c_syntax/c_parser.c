@@ -48,8 +48,6 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 
-extern bool prettyprint_is_fortran;
-
 string compilation_unit_name;
 
 list CalledModules = NIL;
@@ -218,7 +216,7 @@ extern void c_parse();
 void CParserError(char *msg)
 {
   entity mod = get_current_module_entity();
-  string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
+  const char * mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
   extern void c_reset_lex(void);
   extern int c_lineno;
 
@@ -347,7 +345,7 @@ static bool actual_c_parser(string module_name,
     /* FI: not clean, but useful for debugging statement */
     ifdebug(1)
     {
-      prettyprint_is_fortran = FALSE;
+      set_prettyprint_is_fortran_p (FALSE);
     }
 
     /* Predefined type(s): __builtin_va_list */

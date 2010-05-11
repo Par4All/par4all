@@ -48,6 +48,24 @@
 #include "syntax.h"
 #include "resources.h"
 
+static bool unique_entity_name_p(const char * name, entity in_module)
+{
+    /* first recover a user_name from global_name */
+    const char *user_name=strchr(name,BLOCK_SEP_CHAR)?global_name_to_user_name(name):name;
+    /* first check in entity declaration, where all entities are added
+     * At least AddEntityToDeclarations keep this information up to date
+     */ 
+    FOREACH(ENTITY,e,entity_declarations(in_module))
+    {
+        if(same_string_p(entity_user_name(e),user_name))
+            return false;
+    }
+    /* everything seems ok, do a last check with gen_fin_tabulated */
+    return gen_chunk_undefined_p(
+            gen_find_tabulated(concatenate(entity_module_name(in_module), MODULE_SEP_STRING, user_name, NULL),entity_domain)
+            );
+}
+
 /* See also macro entity_variable_p()... */
 bool variable_entity_p(entity e)
 {
@@ -254,8 +272,8 @@ entity make_stderr_variable()
  */
 entity
 make_scalar_entity(name, module_name, base)
-string name;
-string module_name;
+const char* name;
+const char* module_name;
 basic base;
 {
   string full_name;
@@ -342,9 +360,9 @@ reset_unique_variable_numbers()
    later before use.
 */
 entity
-generate_variable_with_unique_name_to_module(string seed_name,
-					     string prefix,
-					     string suffix,
+generate_variable_with_unique_name_to_module(const char * seed_name,
+					     const char * prefix,
+					     const char * suffix,
 					     entity module) {
   const string format = fortran_module_p(module) ?
     "%s "MODULE_SEP_STRING "%s%s%s":
@@ -360,11 +378,8 @@ generate_variable_with_unique_name_to_module(string seed_name,
 
   /* First try a basic name without numeric suffix: */
   asprintf(&variable_name, format, module_name, prefix, seed_name, suffix);
-  while(gen_find_tabulated(concatenate(module_name,
-				       MODULE_SEP_STRING,
-				       variable_name,
-				       NULL),
-			   entity_domain) != entity_undefined) {
+  while(!unique_entity_name_p(variable_name,module))
+  {
     /* Free the old name since it was already used: */
     free(variable_name);
     /* And try a new one with a number suffix: */
@@ -402,7 +417,7 @@ clone_variable_with_unique_name(entity old_variable,
 				string prefix,
 				string suffix,
 				entity module) {
-  string seed_name = entity_user_name(old_variable);
+  const char * seed_name = entity_user_name(old_variable);
   entity new_variable = generate_variable_with_unique_name_to_module(seed_name,
 								     prefix,
 								     suffix,
@@ -428,7 +443,7 @@ clone_variable_with_unique_name(entity old_variable,
 
    @return the variable entity.
 */
-entity make_new_scalar_variable_with_prefix(string prefix,
+entity make_new_scalar_variable_with_prefix(const char* prefix,
 					    entity module,
 					    basic b)
 {
@@ -506,11 +521,7 @@ entity make_new_scalar_variable_with_prefix(string prefix,
     else
       asprintf(&variable_name, format, prefix, number++);
   }
-  while(gen_find_tabulated(concatenate(module_name,
-				       MODULE_SEP_STRING,
-				       variable_name,
-				       NULL),
-			   entity_domain) != entity_undefined);
+  while(!unique_entity_name_p(variable_name,module));
 
   pips_debug(9, "var %s, tag %d\n", variable_name, basic_tag(b));
 
@@ -546,22 +557,13 @@ make_new_module_variable(entity module,int d)
   num++;}
 
   name1 = strdup(name);
-  full_name=strdup(concatenate(module_local_name(module),
-			       MODULE_SEP_STRING,
-			       name1,
-			       NULL));
-  while ((ent1 = gen_find_tabulated(full_name,entity_domain))
-	 != entity_undefined) {
+  while(!unique_entity_name_p(name1,module))
+  {
     free(name1);
-    free(full_name);
     name[0] = 'X';
     (void) sprintf(&name[1],"%d",num);
     num++;
     name1 = strdup(name);
-    full_name=strdup(concatenate(module_local_name(module),
-				 MODULE_SEP_STRING,
-				 name1,
-				 NULL));
   }
   ent1 = make_scalar_integer_entity(name1,
 				    module_local_name(module));
@@ -781,42 +783,42 @@ find_or_create_typed_entity(
    "module_name" */
 entity
 make_scalar_integer_entity(name, module_name)
-char *name;
-char *module_name;
+const char *name;
+const char *module_name;
 {
-  string full_name;
-  entity e, f, a ;
-  basic b ;
+    string full_name;
+    entity e, f, a ;
+    basic b ;
 
-  debug(8,"make_scalar_integer_entity", "begin name=%s, module_name=%s\n",
-	name, module_name);
+    debug(8,"make_scalar_integer_entity", "begin name=%s, module_name=%s\n",
+            name, module_name);
 
-  full_name = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
-  hash_warn_on_redefinition();
-  e = make_entity(strdup(full_name),
-		  type_undefined,
-		  storage_undefined,
-		  value_undefined);
+    full_name = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
+    hash_warn_on_redefinition();
+    e = make_entity(strdup(full_name),
+            type_undefined,
+            storage_undefined,
+            value_undefined);
 
-  b = make_basic(is_basic_int, (void*) 4);
+    b = make_basic(is_basic_int, (void*) 4);
 
-  entity_type(e) = (type) MakeTypeVariable(b, NIL);
+    entity_type(e) = (type) MakeTypeVariable(b, NIL);
 
-  f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
-  pips_assert("make_scalar_integer_entity", !entity_undefined_p(f) && !entity_undefined_p(a));
+    f = local_name_to_top_level_entity(module_name);
+    a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+    pips_assert("make_scalar_integer_entity", !entity_undefined_p(f) && !entity_undefined_p(a));
 
-  entity_storage(e) = make_storage(is_storage_ram,
-				   (make_ram(f, a,
-					     add_any_variable_to_area(a, e,fortran_module_p(f)),
-					     NIL)));
+    entity_storage(e) = make_storage(is_storage_ram,
+            (make_ram(f, a,
+                      add_any_variable_to_area(a, e,fortran_module_p(f)),
+                      NIL)));
 
-  entity_initial(e) = make_value(is_value_constant,
-				 make_constant_litteral());
+    entity_initial(e) = make_value(is_value_constant,
+            make_constant_litteral());
 
-  debug(8,"make_scalar_integer_entity", "end\n");
+    debug(8,"make_scalar_integer_entity", "end\n");
 
-  return(e);
+    return(e);
 }
 
 
@@ -1405,8 +1407,8 @@ bool actual_label_replacement_p(expression eap)
   bool replacement_p = FALSE;
   if (expression_call_p(eap))
     {
-      string ls = entity_user_name(call_function(syntax_call(expression_syntax(eap))));
-      string p = ls+1;
+      const char * ls = entity_user_name(call_function(syntax_call(expression_syntax(eap))));
+      const char * p = ls+1;
 
       replacement_p = (strlen(ls) >= 4
 		       && *ls=='"' && *(ls+1)=='*' && *(ls+strlen(ls)-1)=='"');
@@ -1428,10 +1430,9 @@ bool call_contains_alternate_returns_p(call c)
 {
   bool contains_p = FALSE;
 
-  MAP(EXPRESSION, arg, {
+  FOREACH(EXPRESSION, arg, call_arguments(c))
     if((contains_p = actual_label_replacement_p(arg)))
       break;
-  }, call_arguments(c));
 
   return contains_p;
 }
@@ -1446,11 +1447,12 @@ entity make_new_index_entity(entity old_index, string suffix)
   entity new_index;
   string old_name;
   char *new_name=NULL;
+  entity module = module_name_to_entity(entity_module_name(old_index));
 
   old_name = entity_name(old_index);
 
   /* add a terminal suffix till a new name is found. */
-  for (asprintf(&new_name, "%s%s", old_name, suffix); gen_find_tabulated(new_name, entity_domain)!=entity_undefined; old_name = new_name) {
+  for (asprintf(&new_name, "%s%s", old_name, suffix); !unique_entity_name_p(global_name_to_user_name(new_name),module); old_name = new_name) {
       char *tmp = new_name;
       asprintf(&new_name, "%s%s", old_name, suffix);
       free(tmp);
@@ -1468,7 +1470,7 @@ entity make_new_index_entity(entity old_index, string suffix)
 
 bool implicit_c_variable_p(entity v)
 {
-  string vn = entity_user_name(v);
+  const char * vn = entity_user_name(v);
 
 
   //  return string_equal_p(vn, IMPLICIT_VARIABLE_NAME_1)

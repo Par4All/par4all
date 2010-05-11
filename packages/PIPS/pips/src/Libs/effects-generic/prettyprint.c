@@ -364,8 +364,17 @@ print_source_or_code_effects_engine(
 {
     char *file_name, *file_resource_name;
     bool success = TRUE;
+    entity e_module = module_name_to_entity(module_name);
 
-    prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
+    /* Set the prettyprint language */
+    value mv = entity_initial(e_module);
+    if(value_code_p(mv)) {
+      code c = value_code(mv);
+      set_prettyprint_language_from_property(language_tag(code_language(c)));
+    } else {
+      /* Should never arise */
+      set_prettyprint_language_from_property(is_language_fortran);
+    }
 
     file_name =
       strdup(concatenate(file_suffix,
@@ -374,8 +383,7 @@ print_source_or_code_effects_engine(
 			 GRAPH_FILE_EXT : "",
 
 			 /* To exploit the language sensitive prettyprint ability of the display */
-			 c_module_p(module_name_to_entity(module_name))? ".c" : ".f",
-
+			 c_module_p(e_module)? ".c" : ".f",
 			 NULL));
     file_resource_name = 
 	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
@@ -423,9 +431,28 @@ list /* of string */ effect_words_reference(reference obj)
   begin_attachment = STRING(CAR(pc));
 
   if (reference_indices(obj) != NIL) {
-    string beg = prettyprint_is_fortran? "(" : "[";
-    string mid = prettyprint_is_fortran? "," : "][";
-    string end = prettyprint_is_fortran? ")" : "]";
+    string beg = string_undefined;
+    string mid = string_undefined;
+    string end = string_undefined;
+
+    switch (language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+      beg = "(";
+      mid = ",";
+      end = ")";
+      break;
+    case is_language_c:
+      beg = "[";
+      mid = "][";
+      end = "]";
+      break;
+    case is_language_fortran95:
+      pips_assert ("Need to update F95 case", FALSE);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
 
     pc = CHAIN_SWORD(pc,beg);
     for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
@@ -437,7 +464,6 @@ list /* of string */ effect_words_reference(reference obj)
 	  {
 	    // add a '.' to disambiguate field names from variable names 
 	    pc = CHAIN_SWORD(pc, ".");
-	    
 	  }
 	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
 	if (CDR(pi) != NIL)

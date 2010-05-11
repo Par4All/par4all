@@ -190,7 +190,7 @@ void init_c_areas()
 void init_c_implicit_variables(entity m)
 {
   /* Function name variable __function__ and __FUNCTION__ */
-  string mn = entity_user_name(m);
+  const char * mn = entity_user_name(m);
   string bs = "0`"; // first local scope in a module: should be
 		    // returned by a function to stay consistent in
 		    // case of change
@@ -198,7 +198,7 @@ void init_c_implicit_variables(entity m)
   string fn2 = strdup(concatenate(bs, IMPLICIT_VARIABLE_NAME_2, NULL));
   entity func_name1 = FindOrCreateEntity(mn, fn1);
   entity func_name2 = FindOrCreateEntity(mn, fn2);
-  string name = entity_user_name(m);
+  const char * name = entity_user_name(m);
   string cn = strdup(concatenate("\"", mn, "\"", NULL));
   /* cn can probably be freed after this call */
   entity fn = make_C_constant_entity(cn,
@@ -343,7 +343,7 @@ expression MakeFunctionExpression(expression e, list le)
 	    AddToCalledModules(ent);
 	  else {
 	    /* Must be a pointer to a function */
-	    string eun = entity_user_name(ent);
+	    const char * eun = entity_user_name(ent);
 	    pips_user_warning("Call to an unknown function via function pointer \"\%s\"\n",
 			      eun);
 	  }
@@ -419,7 +419,7 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
       case is_basic_derived:
 	{
 	  entity de = basic_derived(b);
-	  string name = entity_user_name(de);
+	  const char * name = entity_user_name(de);
       string id = strdup(concatenate(name,MEMBER_SEP_STRING,m,NULL));
 	  expression exp = IdentifierToExpression(id);
       free(id);
@@ -1345,7 +1345,7 @@ entity RenameFunctionEntity(entity oe)
   if(!typedef_entity_p(oe) && !empty_string_p(sn)) {
     if(strchr(oen, MODULE_SEP)!=NULL) {
       //string mn = entity_module_name(ne);
-      string ln = entity_user_name(ne);
+      const char * ln = entity_user_name(ne);
       value voe = entity_initial(oe);
       stack s = get_from_entity_type_stack_table(oe);
       stack ns = stack_copy(s);
@@ -1776,7 +1776,7 @@ void UseFormalArguments(entity f)
        symbol table?) and replace them by equivalent regular formal parameters */
     for(cd = formals; !ENDP(cd); POP(cd)) {
       entity p = ENTITY(CAR(cd));
-      string pn = entity_user_name(p);
+      const char * pn = entity_user_name(p);
       entity new_p = entity_undefined;
       //storage ps = entity_storage(p);
       //formal pfs = storage_formal(ps);
@@ -2011,7 +2011,7 @@ void SubstituteDummyParameters(entity f, list el)
     entity v = ENTITY(CAR(cel));
     if(dummy_parameter_entity_p(v)) {
       string mn = entity_local_name(f);
-      string ln = entity_user_name(v);
+      const char * ln = entity_user_name(v);
       entity nv = FindOrCreateEntity(mn, ln);
       stack s = get_from_entity_type_stack_table(v);
       /* The copy could be avoided by substituting v->s with nv->s */
@@ -2085,7 +2085,7 @@ void UpdateEntity2(entity f,
   for(cl = dl; !ENDP(cl); POP(cl)) {
     entity v = ENTITY(CAR(cl));
     if(dummy_parameter_entity_p(v)) {
-      string ln = entity_user_name(v);
+      const char * ln = entity_user_name(v);
       string mn = entity_local_name(f);
       entity fp = global_name_to_entity(mn, ln);
       if(entity_undefined_p(fp)) {
@@ -2957,7 +2957,7 @@ list MakeParameterList(list l1, list l2, stack FunctionStack)
   list l = NIL;
   int offset = 1;
   entity function = stack_head(FunctionStack);
-  MAP(STRING, s,
+  FOREACH(STRING, s,l1)
   {
     parameter p = FindParameterEntity(s,offset,l2);
     if (parameter_undefined_p(p))
@@ -2975,15 +2975,15 @@ list MakeParameterList(list l1, list l2, stack FunctionStack)
       }
     l = gen_nconc(l,CONS(PARAMETER,p,NIL));
     offset++;
-  },l1);
+  }
   return l;
 }
 
 parameter FindParameterEntity(string s, int offset, list l)
 {
-  MAP(ENTITY,e,
+  FOREACH(ENTITY,e,l)
   {
-    string name = entity_user_name(e);
+    const char* name = entity_user_name(e);
     if (strcmp(name,s)==0)
       {
 	type t = entity_type(e);
@@ -3004,7 +3004,7 @@ parameter FindParameterEntity(string s, int offset, list l)
 	  }
 	return make_parameter(t,m,make_dummy_identifier(e)); // FI: Could be entity_undefined
       }
-  },l);
+  }
   return parameter_undefined;
 }
 
