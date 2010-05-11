@@ -677,23 +677,22 @@ statement loop_test(statement sl)
   else
     lab = label_local_name(loop_label(l));
 
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-    cs = strdup(concatenate(prev_comm,
-			    "C     DO loop ",
-			    lab,
-			    " with exit had to be desugared\n",
-			    NULL));
-    break;
-  case is_language_c:
-    cs = prev_comm;
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+  switch(language_tag (get_prettyprint_language ())) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      cs = strdup(concatenate(prev_comm,
+                              get_prettyprint_comment(),
+                              "     DO loop ",
+                              lab,
+                              " with exit had to be desugared\n",
+                              NULL));
+      break;
+    case is_language_c:
+      cs = prev_comm;
+      break;
+    default:
+      pips_internal_error("This language is not handled !");
+      break;
   }
 
   ts = make_statement(entity_empty_label(),

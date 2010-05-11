@@ -264,6 +264,16 @@ void reset_prettyprint_is_fortran()
   set_prettyprint_language_tag (is_language_c);
 }
 
+string get_prettyprint_comment() {
+  switch(get_prettyprint_language_tag()) {
+    case is_language_c: return "//";
+    case is_language_fortran: return "C";
+    case is_language_fortran95: return "!";
+  }
+
+}
+
+
 static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);
 static list words_subscript(subscript s, list pdl);
