@@ -2,7 +2,7 @@ Package: par4all
 Version: $VERSION$
 Section: unknown 
 Priority: optional
-Architecture: amd64
+Architecture: $ARCH$
 Essential: no
 Depends: libc6 (>= 2.7), python, libncurses5, libreadline5 
 Pre-Depends: 
