@@ -167,6 +167,7 @@ skipped:
 	  fi ; \
 	done >> $(RESULTS)
 
+# test RESULT directory without any script
 orphan:
 	for base in $(sort $(F.list)) ; do \
 	  test -f $$base.tpips -o \
@@ -178,21 +179,25 @@ orphan:
 	  echo "orphan: $$base" ; \
 	done >> $(RESULTS)
 
+# test case with multiple scripts... one is randomly (?) chosen
 multi-script:
 	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-script: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
+# test case with multiple sources (c/f/F...)
 multi-source:
 	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
+# all possible inconsistencies
 inconsistencies: skipped orphan multi-source multi-script
 
 # what about nothing?
+# source files without corresponding result directory
 missing:
 	@echo "# checking for missing (?) result directories"
 	@ n=0; \
