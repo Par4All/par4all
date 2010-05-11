@@ -75,6 +75,10 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+echo
+echo Warning: assume that there is no aliasing between IO streams 
+echo (FILE * variables)
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
 
 EOF
 }
