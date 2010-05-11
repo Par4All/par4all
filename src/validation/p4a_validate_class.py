@@ -214,7 +214,7 @@ class ValidationClass:
 				print ('%s not accessible' % (directory_test))
 
 		f.close()
-		print('%s failed in %s test'%(nb_failed,nb_test))
+		print('%s failed in %s tests'%(nb_failed,nb_test))
 
 ###### Validate all tests (done by "default" file) ######
   def valid_pips(self):
@@ -248,14 +248,75 @@ class ValidationClass:
 							if (status != "succeeded"):
 								nb_failed = nb_failed+1
 
-		print('%s failed in %s test'%(nb_failed,nb_test))
+		print('%s failed in %s tests'%(nb_failed,nb_test))
 		default_file.close()
 
+###### Diff between p4a and pips options ######
+  def diff(self):
+		# Read default file to build a file with all tests
+		default_file = open(self.par4ll_validation_dir+"defaults")
+
+		default_test_file = open('diff.txt','w')
+		default_test_file.close()
+	
+		nb_test = 0
+
+		# Parse all tests done by pips and build a file with all tests
+		for line in default_file:
+				if (not re.match('#',line)):
+					line  = line.strip('\n')
+					directory_test = self.par4ll_validation_dir + line
+
+					# Find tests
+					for file_test in os.listdir(directory_test):
+						(root, ext) = os.path.splitext(file_test)
+
+						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
+							# default_test depends of par4all_validation.txt
+							default_test = line+'/'+os.path.basename(root)
+							default_test_bis = line+'\ '+os.path.basename(root)
+							find = 'no'
+				
+							nb_test = nb_test+1
+							
+							# Test is find. Check that it is present into par4all_validation.txt
+							if os.path.isfile('par4all_validation.txt'):
+								par4all = open("par4all_validation.txt")
+								for line_p4a in par4all:
+									(root_p4a, ext_p4a) = os.path.splitext(line_p4a)
+
+									if (default_test == root_p4a.strip('\n')):
+										# Test is found
+										find = 'yes'
+										nb_test = nb_test - 1
+									elif (default_test_bis.replace(" ","")== root_p4a.strip('\n')):
+										# Test is found
+										find = 'yes'
+										nb_test = nb_test - 1
+										default_test = default_test_bis.replace(" ","")
+
+								par4all.close()
+
+								if (find != 'yes'):
+									default_test_h = open('diff.txt','a')
+									default_test_h.write(default_test+'\n')
+									default_test_h.close()
+						
+							# None par4all_validation.txt file
+							else:
+								default_test_h = open('diff.txt','a')
+								default_test_h.write(default_test+'\n')
+								default_test_h.close()
+
+		print('%s tests are not done by --p4a options'%(nb_test))
+
+###################### Main -- Options #################################
 def main():
 	usage = "usage: python %prog [options]"
 	parser = optparse.OptionParser(usage=usage)
 	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate tests which are done by default file (in packages/PIPS/validation)")
 	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are done by par4all_validation.txt (which must be previously created in src/validation)")
+	parser.add_option("--diff", action="store_true", dest="diff", help = "Show test that it's not done by p4a options")
 	(options, args) = parser.parse_args()
 
 	if options.pips:
@@ -265,6 +326,10 @@ def main():
 	elif options.par4all:
 		vc = ValidationClass().valid_par4all()
 		print('Result of the tests are in p4a_log.txt')
+
+	elif options.diff:
+		vc = ValidationClass().diff()
+		print('Tests which are not done by --p4a options are into p4a_log.txt file')
 	
 	else:
 		output = commands.getoutput("python p4a_validate_class.py -h")
