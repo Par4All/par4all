@@ -6,7 +6,7 @@ create varargs03 varargs03.c
 
 setenv PIPS_CPP="cpp -C"
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 
 echo
 echo Proper pointer effects

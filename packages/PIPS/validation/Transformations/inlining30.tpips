@@ -9,12 +9,17 @@ echo
 display PRINTED_FILE[ARRAY]
 
 echo
+echo Code before inlining
+echo
+
+display PRINTED_FILE[TEST]
+
+echo
 echo Code after inlining
 echo
 
 apply INLINING[ARRAY]
-display PRINTED_FILE[ARRAY]
-
+display PRINTED_FILE[TEST]
 
 close
 delete inlining30

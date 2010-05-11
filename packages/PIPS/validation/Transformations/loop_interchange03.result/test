@@ -1,0 +1,54 @@
+
+Source code before loop interchange
+
+! Bug: make sure that label 200 and 300 are properly regenerated.
+
+!Non-Unit Stride Memory Access
+
+      PROGRAM LOOP_INTERCHANGE03
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER NUM
+      PARAMETER(NUM=5000)
+      INTEGER  I,J
+      REAL     A(1:NUM,1:NUM), B(1:NUM,1:NUM), C(1:NUM,1:NUM)
+
+      A = 0                                                             0014
+      B = 0                                                             0015
+      C = 0                                                             0016
+
+      DO 300 I = 1, NUM                                                 0018
+         DO 200 J = 1, NUM                                              0019
+            C(J,I) = C(J,I)+A(J,I)*B(J,I)                               0020
+200         CONTINUE                                                    0021
+300      CONTINUE                                                       0022
+
+      END
+
+Source code after loop interchange
+
+! Bug: make sure that label 200 and 300 are properly regenerated.
+
+!Non-Unit Stride Memory Access
+
+      PROGRAM LOOP_INTERCHANGE03
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+      INTEGER NUM
+      PARAMETER(NUM=5000)
+      INTEGER  I,J
+      REAL     A(1:NUM,1:NUM), B(1:NUM,1:NUM), C(1:NUM,1:NUM)
+
+      A = 0                                                             0014
+      B = 0                                                             0015
+      C = 0                                                             0016
+
+      DO 300 Ip = 1, 5000                                               0018
+         DO 200 Jp = 1, 5000                                            0019
+            C(Ip,Jp) = C(Ip,Jp)+A(Ip,Jp)*B(Ip,Jp)                       0020
+200         CONTINUE                                                    0021
+300         CONTINUE
+
+      END

@@ -1,7 +1,7 @@
 delete one_liner_01
 create one_liner_01 one_liner_01.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 activate C_PARSER
 

@@ -7,7 +7,7 @@ setproprety ABORT_ON_USER_ERROR TRUE
 create for04 for04.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:

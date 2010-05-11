@@ -30,6 +30,8 @@ kernel:
 }
 int K = 12;
 extern void foo(int bar[256][256]);
+//PIPS generated variable
+void kernel(int i, int bar[256][256]);
 
 unsplit
 

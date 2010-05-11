@@ -36,6 +36,8 @@ struct a {
    struct b {int jedi;} the;
 };
 extern int foo(int c);
+//PIPS generated variable
+void kernel(int c, struct a of);
 
 unsplit
 

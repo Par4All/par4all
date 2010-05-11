@@ -4,7 +4,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create decl37 decl37.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv C_SYNTAX_DEBUG_LEVEL 7

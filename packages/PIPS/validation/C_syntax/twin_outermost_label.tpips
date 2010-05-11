@@ -7,7 +7,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create miam twin_outermost_label.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # For debugging

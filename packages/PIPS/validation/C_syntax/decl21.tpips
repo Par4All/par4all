@@ -6,7 +6,7 @@ create decl21 decl21.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 #setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 

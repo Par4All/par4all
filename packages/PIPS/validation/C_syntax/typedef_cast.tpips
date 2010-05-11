@@ -3,7 +3,7 @@ create typedef_cast typedef_cast.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER

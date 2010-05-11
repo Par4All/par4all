@@ -6,7 +6,7 @@ create func_array01 func_array01.c
 
 #SELECT C LANGUAGE
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 #echo If possible, transform simple for-loops into do-loop a la

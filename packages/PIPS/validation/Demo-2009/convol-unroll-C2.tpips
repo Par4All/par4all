@@ -2,7 +2,7 @@ delete convol2-sg1-C
 create convol2-sg1-C convol-unroll.c external.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE

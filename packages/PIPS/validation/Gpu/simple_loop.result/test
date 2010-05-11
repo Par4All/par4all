@@ -128,6 +128,8 @@ enum {N=10000};
 double a[N], b[N], c[N];
 
 extern int main();
+//PIPS generated variable
+void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N]);
 void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable

@@ -6,7 +6,7 @@ create effects_decl02 effects_decl02.c
 setenv PIPS_CPP="cpp -C"
 activate C_PARSER
 #echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
 #echo Select the most precise analysis:

@@ -2,7 +2,7 @@ delete externalloc12
 create externalloc12 externalloc12/bar.c externalloc12/foo.c
 
 
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER
