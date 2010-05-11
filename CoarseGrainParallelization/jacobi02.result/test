@@ -10,6 +10,9 @@ Compute the intraprocedural preconditions at the same time as
 transformers and use them to improve the accuracy of expression
 and statement transformers:
 Try to restructure the code for more precision:
+
+Warning: assume that there is no aliasing between IO streams 
+(FILE * variables)
 Privatize scalar variables on all the modules of the program:
 Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
@@ -77,14 +80,14 @@ void iteration(float_t space[501][501], float_t save[501][501])
         could use also a flip-flop dimension instead... */
 #pragma omp parallel for private(j)
    for(i = 1; i <= 499; i += 1)
-#pragma omp parallel for
+#pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
 #pragma omp parallel for private(j)
    for(i = 1; i <= 499; i += 1)
-#pragma omp parallel for
+#pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
