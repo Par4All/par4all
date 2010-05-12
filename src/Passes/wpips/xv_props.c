@@ -43,7 +43,6 @@ char vcid_xv_props[] = "%A% ($Date: 2002/03/15 07:55:53 $, ) version $Revision$,
 #include "linear.h"
 #include "ri.h"
 #include "top-level.h"
-#include "makefile.h"
 #include "database.h"
 
 #include "misc.h"

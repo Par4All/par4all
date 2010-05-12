@@ -51,7 +51,6 @@ char vcid_xv_edit2[] = "%A% ($Date: 1998/04/16 14:45:19 $, ) version $Revision$,
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "makefile.h"
 #include "database.h"
 
 #include "misc.h"

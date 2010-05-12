@@ -46,14 +46,12 @@ typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
 
-#include "reductions_private.h"
 #include "reductions.h"
 #include "sac.h"
 
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
-#include "locality.h"
 #include "callgraph.h"
 
 #include "control.h"

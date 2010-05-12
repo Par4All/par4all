@@ -62,7 +62,6 @@ char vcid_scheduling_sccdfg[] = "$Id$";
 
 #include "complexity_ri.h"
 #include "database.h"
-#include "makefile.h"
 #include "parser_private.h"
 #include "property.h"
 #include "reduction.h"

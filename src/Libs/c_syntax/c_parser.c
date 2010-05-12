@@ -43,7 +43,6 @@
 
 #include "resources.h"
 #include "database.h"
-#include "makefile.h"
 
 #include "pipsdbm.h"
 #include "pipsmake.h"

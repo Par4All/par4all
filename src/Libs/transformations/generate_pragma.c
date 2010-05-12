@@ -47,7 +47,6 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "reductions_private.h"
 #include "reductions.h"
 #include "properties.h"
 

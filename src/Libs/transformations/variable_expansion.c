@@ -51,13 +51,9 @@
 #include "resources.h"
 #include "effects-simple.h"
 #include "effects-generic.h"
-#include "reductions_private.h"
 #include "reductions.h"
 #include "transformations.h"
 #include "control.h"
-// { should not be there
-#include "locality.h"
-// }
 
 /* bool scalar_expansion(char *module_name) 
  * input    : the name of the current module

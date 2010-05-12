@@ -50,7 +50,6 @@
 #include "ri-util.h"
 #include "top-level.h"
 #include "database.h"
-#include "makefile.h"
 #include "pipsmake.h"
 #include "pipsdbm.h"
 #include "wpips.h"

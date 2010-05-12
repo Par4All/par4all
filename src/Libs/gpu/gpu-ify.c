@@ -19,7 +19,7 @@
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
-#include "transformations.h"
+#include "accel-util.h"
 #include "resources.h"
 #include "properties.h"
 #include "bootstrap.h"
