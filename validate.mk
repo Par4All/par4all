@@ -15,6 +15,7 @@ TIMEOUT	= 600
 # this can be modified to generate separate files
 # see "validate-out" and "validate-test" targets
 TEST	= test
+DIFF	= svn diff
 
 # prefix of tests to be run, default is all
 PREFIX	=
@@ -66,17 +67,21 @@ OK	= status=$$? ; \
 	     echo "timeout: $(SUBDIR)/$*" ; \
 	  elif [ "$$status" != 0 ] ; then \
 	     echo "failed: $(SUBDIR)/$*" ; \
-	  elif [ $$(svn diff $@ | wc -l) -ne 0 ] ; then \
-	     echo "changed: $(SUBDIR)/$*" ; \
 	  else \
-	     echo "passed: $(SUBDIR)/$*" ; \
+	     $(DIFF) $*.result/test > $*.diff ; \
+	     if [ -s $*.diff ] ; then \
+	        echo "changed: $(SUBDIR)/$*" ; \
+	     else \
+	        $(RM) $*.err $*.diff ; \
+	        echo "passed: $(SUBDIR)/$*" ; \
+	     fi ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
 clean: clean-validate
 
 clean-validate:
-	$(RM) *~ *.o *.s *.tmp *.result/out out err a.out
+	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
 	$(RM) -r *.database $(RESULTS)
 
 validate:
@@ -103,33 +108,33 @@ unvalidate:
 # generate "out" files
 # ??? does not work because of "svn diff"?
 validate-out:
-	$(MAKE) TEST=out validate-dir
+	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh validate-dir
 
 # generate "test" files
 validate-test:
 	$(MAKE) TEST=test validate-dir
 
-# validate depending on prefix?
+# hack: validate depending on prefix?
 validate-%:
 	$(MAKE) F.result="$(wildcard $**.result)" validate-dir
 
 # generate missing "test" files
 test: $(F.valid)
 
-# shell script
+# (shell) script
 %.result/$(TEST): %.test
-	$(PF) ; ./$< | $(FLT)  > $@ ; $(OK)
+	$(PF) ; ./$< 2> $*.err | $(FLT) > $@ ; $(OK)
 
 # tpips scripts
 %.result/$(TEST): %.tpips
-	$(PF) ; $(TPIPS) $< | $(FLT) > $@ ; $(OK)
+	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.tpips2
 	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $@ ; $(OK)
 
-# python scripts
+# python scripts (could be a .test)
 %.result/$(TEST): %.py
-	$(PF) ; python $< | $(FLT) > $@ ; $(OK)
+	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
 
 # default_tpips
 # FILE could be $<
@@ -137,30 +142,30 @@ test: $(F.valid)
 DFTPIPS	= default_tpips
 %.result/$(TEST): %.c $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.f $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.F $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 # default_test relies on FILE WSPACE NAME
 # Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
 %.result/$(TEST): %.c $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.f $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.F $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	| $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $@ ; $(OK)
 
 # detect skipped stuff
 skipped:
