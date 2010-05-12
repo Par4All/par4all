@@ -23,23 +23,26 @@ PREFIX	=
 F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
 F.F	= $(wildcard *.F)
-#F.f95	= $(wildcard *.f95)
+F.f90	= $(wildcard *.f90)
+F.f95	= $(wildcard *.f95)
 
 # all source files
-F.src	= $(F.c) $(F.f) $(F.F)
+F.src	= $(F.c) $(F.f) $(F.F) $(F.f90) $(F.f95)
 
 # all potential result directories
-F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) $(F.F:%.F=%.result)
+F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) \
+	$(F.F:%.F=%.result) $(F.f90:%.f90=%.result) $(F.f95:%.f95=%.result)
 
 # actual result directory
 F.result= $(wildcard $(PREFIX)*.result)
 
 # validation scripts
-F.tpips	= $(wildcard *.tpips) $(wildcard *.tpips2)
+F.tpips	= $(wildcard *.tpips)
+F.tpips2= $(wildcard *.tpips2)
 F.test	= $(wildcard *.test)
 F.py	= $(wildcard *.py)
 
-F.exe	= $(F.tpips) $(F.test) $(F.py)
+F.exe	= $(F.tpips) $(F.tpips2) $(F.test) $(F.py)
 
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
@@ -57,6 +60,7 @@ SHELL	= /bin/bash
 PF	= set -o pipefail ; export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT)
 
 # extract validation result for summary
+# 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 255 ] ; then \
 	     echo "timeout: $(SUBDIR)/$*" ; \
