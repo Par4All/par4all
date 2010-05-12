@@ -4349,8 +4349,10 @@ text text_named_module(
     //entity cu = module_entity_to_compilation_unit_entity(module);
     switch (language_tag (get_prettyprint_language ())) {
     case is_language_fortran:
-    case is_language_fortran95:
       MERGE_TEXTS(r, text_statement(module, 0, stat, NIL));
+      break;
+    case is_language_fortran95:
+      MERGE_TEXTS(r, text_statement(module, INDENTATION, stat, NIL));
       break;
     case is_language_c:
       MERGE_TEXTS(r,

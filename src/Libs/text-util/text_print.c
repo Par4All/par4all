@@ -147,8 +147,13 @@ void print_sentence(FILE * fd, sentence s) {
 
       switch(lang) {
         case is_language_fortran:
-        case is_language_fortran95:
           fprintf_sentence(fd, "%-5s ", label);
+          break;
+        case is_language_fortran95:
+          // Check that the label is non empty
+          if(*label!='\0') {
+            fprintf_sentence(fd, "%-5s ", label);
+          }
           break;
         case is_language_c:
           /* C prettyprinter: a label cannot begin with a number

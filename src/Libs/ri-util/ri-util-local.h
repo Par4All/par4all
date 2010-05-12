@@ -1213,6 +1213,16 @@
 
 #define LABEL_SIZE 5
 #define INDENTATION (get_int_property("PRETTYPRINT_INDENTATION"))
+#define INDENT_A_LIST_OF_WORDS(list_of_words) { \
+  if(list_of_words) { \
+    list blanks = NIL; \
+    for(int i=0; i<INDENTATION; i++) { \
+      blanks = CHAIN_SWORD(blanks, " "); \
+    } \
+    list_of_words = gen_nconc(blanks,list_of_words); \
+  } \
+}
+
 /* In C, the module name may include file names, the compilation unit name and the user name of the function. It goes well beyond the 36 of Fortan (check the standard)*/
 #define MAXIMAL_MODULE_NAME_SIZE 100
 
