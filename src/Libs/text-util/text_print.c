@@ -133,7 +133,7 @@ void print_sentence(FILE * fd, sentence s) {
       max_line_size = MAX_END_COLUMN_F95;
     } else if(lang==is_language_fortran ) {
       max_line_size =MAX_END_COLUMN_F77;
-    } else if(lang==is_language_fortran ) {
+    } else {
       max_line_size = MAX_END_COLUMN_DEFAULT;
     }
 
