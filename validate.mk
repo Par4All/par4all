@@ -16,6 +16,9 @@ TIMEOUT	= 600
 # see "validate-out" and "validate-test" targets
 TEST	= test
 
+# prefix of tests to be run, default is all
+PREFIX	=
+
 # source files
 F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
@@ -29,7 +32,7 @@ F.src	= $(F.c) $(F.f) $(F.F)
 F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) $(F.F:%.F=%.result)
 
 # actual result directory
-F.result= $(wildcard *.result)
+F.result= $(wildcard $(PREFIX)*.result)
 
 # validation scripts
 F.tpips	= $(wildcard *.tpips) $(wildcard *.tpips2)
