@@ -40,7 +40,6 @@ pypips.h:pypips.c Makefile
 	echo '#include "linear.h"' >> pypips.h
 	echo '#include "genC.h"' >> pypips.h
 	echo '#include "ri.h"' >> pypips.h
-	echo '#include "makefile.h"' >> pypips.h
 	echo '#include "text.h"' >> pypips.h
 	echo '#include "pipsmake.h"' >> pypips.h
 	echo '#include "top-level.h"' >> pypips.h
