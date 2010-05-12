@@ -45,6 +45,7 @@
 #include "text.h"
 #include "newgen.h"
 #include "cloning.h"
+#include "ri.h"
 
 /*  special characters
  */
@@ -1820,6 +1821,12 @@ the variable is unsigned, signed or not */
 #define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 #define hash_contains_p(htp, key) (hash_get(htp, key) != HASH_UNDEFINED_VALUE)
 
+enum range_to_expression_mode{
+    range_to_distance,
+    range_to_nbiter
+} ;
+#define range_to_distance_p(e) ((e) == range_to_distance)
+#define range_to_nbiter_p(e) ((e) == range_to_nbiter)
 
 /* that is all for ri-util-local.h
  */

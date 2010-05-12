@@ -44,9 +44,3 @@ enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
 #define dma_deallocate_p(e) ((e) == dma_deallocate )
 
 
-enum range_to_expression_mode{
-    range_to_distance,
-    range_to_nbiter
-} ;
-#define range_to_distance_p(e) ((e) == range_to_distance)
-#define range_to_nbiter_p(e) ((e) == range_to_nbiter)

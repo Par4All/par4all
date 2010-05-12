@@ -21,6 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "reductions_private.h"
 /* shorthands for REDUCTION:
  */
 #define reduction_variable(r) reference_variable(reduction_reference(r))

@@ -21,5 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "makefile.h"
 typedef bool (*pipsmake_callback_handler_type)(void);
 
