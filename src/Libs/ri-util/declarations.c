@@ -1828,6 +1828,10 @@ static text text_entity_declaration(entity module,
   attach_declaration_type_to_words(ph8, "INTEGER*8");
   ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi1, INDENTATION);
   attach_declaration_type_to_words(pi1, "INTEGER*1");
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi2, INDENTATION);
+  attach_declaration_type_to_words(pi2, "INTEGER*2");
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi4, INDENTATION);
+  attach_declaration_type_to_words(pi4, "INTEGER");
   ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi8, INDENTATION);
   attach_declaration_type_to_words(pi8, "INTEGER*8");
   ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pf4, INDENTATION);
