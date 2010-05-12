@@ -48,7 +48,7 @@ SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
 FLT	= sed -e 's,$(here),$$VDIR,g'
 #OK	= exit 0
-RESULTS	= failed
+RESULTS	= RESULTS
 
 SHELL	= /bin/bash
 PF	= set -o pipefail ; export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT)
