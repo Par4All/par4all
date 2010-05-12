@@ -89,7 +89,7 @@ printf
   "total: $count\n" .
   " * passed: $passed\n" .
   " * not passed: $not_passed\n" .
-  " - failed: $failed (core dumps, timout...)\n" .
+  " - failed: $failed (voluntary and unvoluntary core dumps)\n" .
   " - changed: $changed (modified output)\n" .
   " - timeout: $timeout (time was out)\n" .
   "warnings: $warned\n" .
