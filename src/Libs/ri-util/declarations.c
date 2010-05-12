@@ -1719,12 +1719,12 @@ static text text_entity_declaration(entity module,
 	      switch (basic_float(b))
 		{
 		case 4:
-		  pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
+		  pf4 = f77_f95_style_management (pf4, "REAL*4 ", space_p);
 		  pf4 = gen_nconc(pf4, words_declaration(e, pp_dim, pdl));
 		  break;
 		case 8:
 		default:
-		  pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
+		  pf8 = f77_f95_style_management (pf8, "REAL*8 ", space_p);
 		  pf8 = gen_nconc(pf8, words_declaration(e, pp_dim, pdl));
 		  break;
 		}
@@ -1734,12 +1734,12 @@ static text text_entity_declaration(entity module,
 	      switch (basic_complex(b))
 		{
 		case 8:
-		  pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
+		  pc8 = f77_f95_style_management (pc8, "COMPLEX*8 ", space_p);
 		  pc8 = gen_nconc(pc8, words_declaration(e, pp_dim, pdl));
 		  break;
 		case 16:
 		default:
-		  pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
+		  pc16 = f77_f95_style_management (pc16, "COMPLEX*16 ", space_p);
 		  pc16 = gen_nconc(pc16, words_declaration(e, pp_dim, pdl));
 		  break;
 		}
@@ -1764,7 +1764,7 @@ static text text_entity_declaration(entity module,
 
 		    if (i==1)
 		      {
-			ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
+			ps = f77_f95_style_management (ps, "CHARACTER ", space_p);
 			ps = gen_nconc(ps, words_declaration(e, pp_dim, pdl));
 		      }
 		    else
