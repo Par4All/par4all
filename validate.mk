@@ -55,7 +55,7 @@ PF	= set -o pipefail ; export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT)
 
 # extract validation result for summary
 OK	= status=$$? ; \
-	  if [ "$$status" -eq 134 ] ; then \
+	  if [ "$$status" -eq 255 ] ; then \
 	     echo "timeout: $(SUBDIR)/$*" ; \
 	  elif [ "$$status" != 0 ] ; then \
 	     echo "failed: $(SUBDIR)/$*" ; \
