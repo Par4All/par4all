@@ -53,6 +53,8 @@ Crough
 Top-level
 Demo-2009
 Gpu
+Inlining
+AcceleratorUtils
 # should be added?
 # AliasChecking
 # ArrayBoundCheck
