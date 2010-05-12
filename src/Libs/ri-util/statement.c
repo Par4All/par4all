@@ -3286,7 +3286,7 @@ void entity_clean_declarations(entity module,statement s)
  * structure used by find_statements_with_label_walker
  */
 struct fswl {
-    list l; ///< list of statement matching condition
+    statement st; ///< statement matching condition
     entity key; ///< used for the condition
 };
 
@@ -3304,7 +3304,7 @@ static bool find_statements_with_label_walker(statement s, struct fswl *p)
   if( same_entity_p(statement_label(s),p->key) ||
       (statement_loop_p(s)&& same_entity_p(loop_label(statement_loop(s)),p->key)) )
     {
-      p->l=CONS(STATEMENT,s,p->l);
+      p->st=s;
       gen_recurse_stop(NULL);
     }
   return true;
@@ -3316,14 +3316,21 @@ static bool find_statements_with_label_walker(statement s, struct fswl *p)
  * @param s statement to search into
  * @param label label of the searched statement
  *
- * @return list containing a unique element
- * a list is returned for coherence with the other find_satements functions
+ * @return statement found or statement_undefined
  */
-list find_statements_with_label(statement s, entity label)
+statement find_statement_from_label(statement s, entity label)
 {
-  struct fswl p = {  NIL, label };
+  struct fswl p = {  statement_undefined , label };
   gen_context_recurse(s,&p,statement_domain,find_statements_with_label_walker,gen_null);
-  return p.l;
+  return p.st;
+}
+statement find_statement_from_label_name(statement s, const char *module_name ,const char * label_name)
+{
+    entity label = find_label_entity(module_name,label_name);
+    if(entity_undefined_p(label))
+        return statement_undefined;
+    else
+        return find_statement_from_label(s,label);
 }
 
 static bool find_statements_interactively_walker(statement s, list *l)

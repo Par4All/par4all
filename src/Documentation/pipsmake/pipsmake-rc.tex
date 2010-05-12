@@ -5182,6 +5182,38 @@ KERNELIZE_HOST_CALL_NAME ""
 OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
 
+\begin{PipsPass}{group_constants}
+Gather all constants from a module and put them in a single array.
+Relevant for Terapix code generation, and maybe for other accelerators as well
+\end{PipsPass}
+\begin{PipsMake}
+group_constants > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.regions
+\end{PipsMake}
+
+You may want to group constants only for a particular statement, in that case use \PipsPropRef{GROUP_CONSTANTS_STATEMENT_LABEL}
+\begin{PipsProp}{GROUP_CONSTANTS_STATEMENT_LABEL}
+GROUP_CONSTANTS_STATEMENT_LABEL ""
+\end{PipsProp}
+
+The way variables are grouped is control by \PipsPropRef{GROUP_CONSTANTS_LAYOUT},
+the only relevant value as of now is \texttt{"terapix"}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_LAYOUT}
+GROUP_CONSTANTS_LAYOUT ""
+\end{PipsProp}
+
+The name of the variable holding constants can be set using \PipsPropRef{GROUP_CONSTANTS_HOLDER}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_HOLDER}
+GROUP_CONSTANTS_HOLDER "caillou"
+\end{PipsProp}
+
+
+
+
 \begin{PipsPass}{normalize_microcode}
 Perform various checks on a Terapix microcode to make sure it can be
 synthesized.

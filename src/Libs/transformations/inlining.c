@@ -1664,22 +1664,15 @@ outline(char* module_name)
     /* retrieve statement to outline */
     list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),OUTLINE_PRAGMA) ;
     if(ENDP(statements_to_outline)) {
-        if( empty_string_p(get_string_property("OUTLINE_LABEL")) ) {
+        string label_name = get_string_property("OUTLINE_LABEL");
+        if( empty_string_p(label_name) ) {
             statements_to_outline=find_statements_interactively(get_current_module_statement());
         }
         else  {
-            string stmt_label=get_string_property("OUTLINE_LABEL");
-            entity stmt_label_entity = find_label_entity(module_name,stmt_label);
-            if(entity_undefined_p(stmt_label_entity))
-                pips_user_error("label %s not found\n", stmt_label);
-            statements_to_outline = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
-            if(gen_length(statements_to_outline) == 1 &&
-                    statement_loop_p(STATEMENT(CAR(statements_to_outline))) &&
-                    get_bool_property("OUTLINE_LOOP_STATEMENT"))
-            {
-                statement ss = STATEMENT(CAR(statements_to_outline));
-                gen_list_patch(statements_to_outline,ss,loop_body(statement_loop(ss)));
-            }
+            statement statement_to_outline = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),label_name);
+            if(statement_loop_p(statement_to_outline) && get_bool_property("OUTLINE_LOOP_STATEMENT"))
+                statement_to_outline=loop_body(statement_loop(statement_to_outline));
+            statements_to_outline=make_statement_list(statement_to_outline);
         }
     }
 

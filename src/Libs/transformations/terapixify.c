@@ -964,12 +964,7 @@ isolate_statement(string module_name)
     set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
-    entity stmt_label_entity = find_label_entity(module_name,stmt_label);
-    if(entity_undefined_p(stmt_label_entity))
-        pips_user_error("label %s not found\n", stmt_label);
-    list statements_to_isolate = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
-    statement statement_to_isolate = STATEMENT(CAR(statements_to_isolate));
-    gen_free_list(statements_to_isolate);
+    statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
     do_isolate_statement(statement_to_isolate);
 
 
@@ -1360,6 +1355,56 @@ array_to_pointer_conversion_mode get_array_to_pointer_conversion_mode()
     else pips_user_error("bad value %s for property ARRAY_TO_POINTER_CONVERT_PARAMETERS\n",mode);
     return NO_CONVERSION;
 }
+static expression reference_flatten_indices(reference ref)
+{
+    expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
+
+    /* iterate on the dimensions & indices to create the index expression */
+    list dims = variable_dimensions(type_variable(entity_type(reference_variable(ref))));
+    list indices = reference_indices(ref);
+    POP(indices);
+    if(!ENDP(dims)) POP(dims); // the first dimension is unused
+    FOREACH(DIMENSION,dim,dims)
+    {
+        expression dimension_size = make_op_exp(
+                PLUS_OPERATOR_NAME,
+                make_op_exp(
+                    MINUS_OPERATOR_NAME,
+                    copy_expression(dimension_upper(dim)),
+                    copy_expression(dimension_lower(dim))
+                    ),
+                make_expression_1());
+
+        if( !ENDP(indices) ) { /* there may be more dimensions than indices */
+            expression index_expression = EXPRESSION(CAR(indices));
+            address_computation = make_op_exp(
+                    PLUS_OPERATOR_NAME,
+                    index_expression,
+                    make_op_exp(
+                        MULTIPLY_OPERATOR_NAME,
+                        dimension_size,address_computation
+                        )
+                    );
+            POP(indices);
+        }
+        else {
+            address_computation = make_op_exp(
+                    MULTIPLY_OPERATOR_NAME,
+                    dimension_size,address_computation
+                    );
+        }
+    }
+
+    /* there may be more indices than dimensions */
+    FOREACH(EXPRESSION,e,indices)
+    {
+        address_computation = make_op_exp(
+                PLUS_OPERATOR_NAME,
+                address_computation,e
+                );
+    }
+    return address_computation ;
+}
 
 
 /**
@@ -1396,7 +1441,6 @@ bool expression_array_to_pointer(expression exp, bool in_init)
             reference ref_without_indices = make_reference(reference_variable(ref),NIL);
 
             expression base_ref = reference_to_expression(ref_without_indices);
-            expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
             /* create a pointer if needed */
             if( !get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY"))
             {
@@ -1423,51 +1467,7 @@ bool expression_array_to_pointer(expression exp, bool in_init)
                             normalized_undefined);
                 }
             }
-
-            /* iterate on the dimensions & indices to create the index expression */
-            list dims = variable_dimensions(type_variable(entity_type(reference_variable(ref))));
-            list indices = reference_indices(ref);
-            POP(indices);
-            if(!ENDP(dims)) POP(dims); // the first dimension is unused
-            FOREACH(DIMENSION,dim,dims)
-            {
-                expression dimension_size = make_op_exp(
-                        PLUS_OPERATOR_NAME,
-                        make_op_exp(
-                            MINUS_OPERATOR_NAME,
-                            copy_expression(dimension_upper(dim)),
-                            copy_expression(dimension_lower(dim))
-                            ),
-                        make_expression_1());
-
-                if( !ENDP(indices) ) { /* there may be more dimensions than indices */
-                    expression index_expression = EXPRESSION(CAR(indices));
-                    address_computation = make_op_exp(
-                            PLUS_OPERATOR_NAME,
-                            index_expression,
-                            make_op_exp(
-                                MULTIPLY_OPERATOR_NAME,
-                                dimension_size,address_computation
-                                )
-                            );
-                    POP(indices);
-                }
-                else {
-                    address_computation = make_op_exp(
-                            MULTIPLY_OPERATOR_NAME,
-                            dimension_size,address_computation
-                            );
-                }
-            }
-
-            /* there may be more indices than dimensions */
-            FOREACH(EXPRESSION,e,indices)
-            {
-                address_computation = make_op_exp(
-                        PLUS_OPERATOR_NAME,
-                        address_computation,e
-                        );
-            }
+            expression address_computation = reference_flatten_indices(ref);
 
             /* we now either add the DEREFERENCING_OPERATOR, or the [] */
             syntax new_syntax = syntax_undefined;
@@ -1738,5 +1738,249 @@ generate_two_addresses_code(char *module_name)
     /*postlude*/
     reset_current_module_entity();
     reset_current_module_statement();
+    return true;
+}
+
+static void do_group_constant_entity(expression exp, set constants)
+{
+    if(expression_call_p(exp))
+    {
+        call c = expression_call(exp);
+        if (call_constant_p(c))
+            set_add_element(constants,constants,call_function(c));
+    }
+}
+
+static void do_group_statement_constant(statement st, set constants)
+{
+    list regions = load_rw_effects_list(st);
+    list read_regions = regions_read_regions(regions);
+    list write_regions = regions_write_regions(regions);
+    set written_entities = set_make(set_pointer);
+
+    FOREACH(REGION,reg,write_regions)
+    {
+        reference ref = region_any_reference(reg);
+        entity var = reference_variable(ref);
+        set_add_element(written_entities,written_entities,var);
+    }
+    FOREACH(REGION,reg,read_regions)
+    {
+        reference ref = region_any_reference(reg);
+        entity var = reference_variable(ref);
+        if(!set_belong_p(written_entities,var))
+        {
+            bool found_not_constant_constraint = false;
+            Psysteme sc = sc_dup(region_system(reg));
+            sc_transform_eg_in_ineg(sc);
+            FOREACH(EXPRESSION,index,reference_indices(ref))
+            {
+                Variable phi = expression_to_entity(index);
+                for(Pcontrainte iter = sc_inegalites(sc);iter;iter=contrainte_succ(iter))
+                {
+                    Pvecteur cvect = contrainte_vecteur(iter);
+                    Value phi_coeff = vect_coeff(phi,cvect);
+                    /* we have found the right vector, now check for other vectors */
+                    if(phi_coeff != VALUE_ZERO )
+                    {
+                        Pvecteur other_vects = vect_del_var(cvect,phi);
+                        found_not_constant_constraint|=vect_size(other_vects)!=1 || VARIABLE_DEFINED_P(other_vects->var);
+                        vect_rm(other_vects);
+                    }
+                }
+            }
+            if(!found_not_constant_constraint)
+                set_add_element(constants,constants,var);
+        }
+    }
+    set_free(written_entities);
+}
+
+typedef enum {
+    TERAPIX_GROUPING,
+    GROUPING_UNDEFINED
+} grouping_layout;
+
+static grouping_layout get_grouping_layout()
+{
+    string layout = get_string_property("GROUP_CONSTANTS_LAYOUT");
+    if(same_string_p(layout,"terapix")) return TERAPIX_GROUPING;
+    return GROUPING_UNDEFINED;
+}
+
+static void* do_group_basics_maximum_reduce(void *v,const list l)
+{
+    return basic_maximum((basic)v,entity_basic(ENTITY(CAR(l))));
+}
+
+static basic do_group_basics_maximum(list entities)
+{
+    return (basic)gen_reduce(entity_basic(ENTITY(CAR(entities))),do_group_basics_maximum_reduce,CDR(entities));
+}
+
+static void *do_group_count_elements_reduce(void * v, const list l)
+{
+    entity e = ENTITY(CAR(l));
+    if( (entity_variable_p(e) && entity_scalar_p(e)) || entity_constant_p(e))
+        return  make_op_exp(PLUS_OPERATOR_NAME,(expression)v,int_to_expression(1));
+    else
+        return make_op_exp(PLUS_OPERATOR_NAME,(expression)v,SizeOfDimensions(variable_dimensions(type_variable(ultimate_type(entity_type(e))))));
+}
+
+static expression do_group_count_elements(list entities)
+{
+    return (expression)gen_reduce(int_to_expression(0),do_group_count_elements_reduce,entities);
+}
+
+static entity constant_holder;
+static bool do_grouping_filter_out_self(expression exp)
+{
+    if(expression_reference_p(exp))
+    {
+        reference ref = expression_reference(exp);
+        return !same_entity_p(reference_variable(ref),constant_holder);
+    }
+    return true;
+}
+
+typedef struct {
+    entity old;
+    entity new;
+    expression offset;
+} grouping_context;
+
+static void do_grouping_replace_reference_by_expression_walker(expression exp,grouping_context *ctxt)
+{
+    if(expression_reference_p(exp))
+    {
+        reference ref = expression_reference(exp);
+        if(same_entity_p(reference_variable(ref),ctxt->old))
+        {
+            /* compute new index */
+            expression current_index = reference_flatten_indices(ref);
+            /* perform substitution */
+            reference_variable(ref)=ctxt->new;
+            gen_full_free_list(reference_indices(ref));
+            reference_indices(ref)=make_expression_list(make_op_exp(PLUS_OPERATOR_NAME,current_index,ctxt->offset));
+        }
+    }
+}
+
+static void do_grouping_replace_reference_by_expression(void *in,entity old,entity new,expression offset)
+{
+    grouping_context ctxt = { old,new,offset };
+    gen_context_recurse(in,&ctxt,expression_domain,do_grouping_filter_out_self,do_grouping_replace_reference_by_expression_walker);
+}
+
+static void do_group_constants_terapix(statement in,set constants)
+{
+    list lconstants = set_to_sorted_list(constants,(gen_cmp_func_t)compare_entities);
+    basic max = do_group_basics_maximum(lconstants);
+    if(!basic_undefined_p(max))
+    {
+        expression size = do_group_count_elements(lconstants);
+        constant_holder = make_new_array_variable_with_prefix(
+                get_string_property("GROUP_CONSTANTS_HOLDER"),
+                get_current_module_entity(),
+                basic_overloaded_p(max)?make_basic_int(DEFAULT_INTEGER_TYPE_SIZE):copy_basic(max),
+                CONS(DIMENSION,make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,size,int_to_expression(1))),NIL)
+                );
+
+        /* it may not be possible to initialize statically the array, so use loop initialization
+         * to be more general
+         */
+        list initializations_holder_seq = NIL;
+        AddLocalEntityToDeclarations(constant_holder,get_current_module_entity(),in);
+        expression index = int_to_expression(0);
+
+        FOREACH(ENTITY,econstant,lconstants)
+        {
+            if((entity_variable_p(econstant) && entity_scalar_p(econstant)) || entity_constant_p(econstant))
+            {
+                expression new_constant_exp = reference_to_expression(make_reference(constant_holder,make_expression_list(copy_expression(index))));
+                initializations_holder_seq=CONS(STATEMENT,
+                        make_assign_statement(
+                            new_constant_exp,
+                            entity_to_expression(econstant)
+                            ),
+                        initializations_holder_seq);
+                replace_entity_by_expression_with_filter(in,econstant,new_constant_exp,do_grouping_filter_out_self);
+                index=make_op_exp(PLUS_OPERATOR_NAME,index,int_to_expression(1));
+            }
+            else {
+                list indices = NIL;
+                reference lhs = make_reference(constant_holder,NIL);// the indices will be set later
+                reference rhs = make_reference(econstant,NIL);// the indices will be set later I told you
+                statement body = make_assign_statement(reference_to_expression(lhs),reference_to_expression(rhs));
+                list dimensions = gen_copy_seq(variable_dimensions(type_variable(ultimate_type(entity_type(econstant)))));
+                dimensions=gen_nreverse(dimensions);
+                FOREACH(DIMENSION,dim,dimensions)
+                {
+                    entity lindex = make_new_scalar_variable_with_prefix("z",get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+                    AddLocalEntityToDeclarations(lindex,get_current_module_entity(),in);
+                    loop l = make_loop(lindex,dimension_to_range(dim),body,entity_empty_label(),make_execution_sequential(),NIL);
+                    body=instruction_to_statement(make_instruction_loop(l));
+                    indices=CONS(EXPRESSION,entity_to_expression(lindex),indices);
+                }
+                reference_indices(rhs)=indices;
+                reference_indices(lhs)=make_expression_list(make_op_exp(PLUS_OPERATOR_NAME,copy_expression(index),reference_flatten_indices(rhs)));
+                initializations_holder_seq=CONS(STATEMENT,body,initializations_holder_seq);
+                do_grouping_replace_reference_by_expression(in,econstant,constant_holder,index);
+                index=make_op_exp(PLUS_OPERATOR_NAME,index,SizeOfDimensions(dimensions));
+                gen_free_list(dimensions);
+            }
+        }
+        insert_statement(in,make_block_statement(gen_nreverse(initializations_holder_seq)),true);
+    }
+    gen_free_list(lconstants);
+}
+
+
+
+static void do_group_constants(statement in,set constants)
+{
+    /* as of now, put everything in an array, no matter of the real type, yes it is horrible,
+     * but it matches my needs for terapix, where everythin as the same type
+     * later on, you may want to use a structure to pass parameters*/
+    switch(get_grouping_layout()) {
+        case TERAPIX_GROUPING:
+            return do_group_constants_terapix(in,constants);
+        case GROUPING_UNDEFINED:
+            pips_user_error("no valid grouping layout given\n");
+    }
+}
+
+bool
+group_constants(const char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS,module_name,true) );
+
+    set/*of entities*/ constants=set_make(set_pointer);;
+
+    /* gather statement constants */
+    statement constant_statement = find_statement_from_label_name(get_current_module_statement(),module_name,get_string_property("GROUP_CONSTANTS_STATEMENT_LABEL"));
+    if(statement_undefined_p(constant_statement))  constant_statement=get_current_module_statement();
+    do_group_statement_constant(constant_statement,constants);
+
+    /* gather constants */
+    gen_context_multi_recurse(constant_statement,constants,
+            reference_domain,gen_false,gen_null,
+            expression_domain,gen_true,do_group_constant_entity,NULL);
+
+    /* pack all constants and perform replacment */
+    do_group_constants(constant_statement,constants);
+
+    set_free(constants);
+
+    /* validate */
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_rw_effects();
     return true;
 }
