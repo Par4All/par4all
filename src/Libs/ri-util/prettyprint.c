@@ -1212,7 +1212,7 @@ static list words_nullary_op_fortran(call obj,
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
     pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
   else if (same_string_p(fname,OMP_FOR_FUNCTION_NAME))
-    pc = CHAIN_SWORD(pc, "DO");
+    pc = CHAIN_SWORD(pc, "do");
   else
     pc = CHAIN_SWORD(pc, fname);
 
