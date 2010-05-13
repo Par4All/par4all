@@ -1,4 +1,4 @@
-#! #!/usr/bin/env python
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
@@ -10,7 +10,9 @@ Ronan.Keryell@hpc-project.com
 """
 
 # Load IPython:
-import IPython.Shell
+from IPython.Shell import IPShellEmbed
+import IPython.ipapi
+
 import sys
 
 # Load PyPS:
@@ -18,6 +20,40 @@ from pyps import *
 
 # Inject line arguments to set the default prompt to something with iPyPS:
 sys.argv[1:1] = [ '-prompt_in1', 'iPyPS [\#]: ']
-print sys.argv
+#print sys.argv
 
-IPython.Shell.start().mainloop()
+banner = """Wellcome to iPyPS, the interactive Python PIPS environment shell
+
+?         -> Introduction and overview of IPython's features.
+%quickref -> Quick reference.
+help      -> Python's own help system.
+object?   -> Details about 'object'. ?object also works, ?? prints more.
+
+workspace -> the method to start with a PIPS workspace,
+              a program database to work on;
+module    -> to manipulate a PIPS module (a function, a procedure);
+modules   -> to manipulate a set of PIPS modules.
+%load     -> laod and execute a PyPS file
+"""
+
+# Create an embedded shell to inherit pyps current namespace into the
+# interactive one. I guess there is a more direct way...
+ipshell = IPShellEmbed(banner = banner)
+
+def load_pyps(self, filename):
+    "Load and execute a PyPS file"
+
+    try:
+        exec(open(filename).read())
+    # To avoid crashing iPython if something goes wrong:
+    except Exception, e:
+        # Display the error message:
+        print e
+
+# Add a new magic function:
+ip = IPython.ipapi.get()
+
+ip.expose_magic('load', load_pyps)
+
+# Call the iPython shell it-self:
+ipshell()
