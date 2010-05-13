@@ -374,6 +374,12 @@ add_new_module_from_text(string module_name,
       return FALSE;
     }
 
+    if(is_fortran) {
+      set_prettyprint_language_tag(is_language_fortran);
+    } else {
+      set_prettyprint_language_tag(is_language_c);
+    }
+
     // Build the coresponding compilation unit for C code
     if(string_undefined_p(compilation_unit_name) ) {
       // Function defined in pipsmake
@@ -496,8 +502,12 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
   }
 
   /* Builds a stub code text for the missing module */
-  if(!is_fortran)
+  if(is_fortran) {
     set_prettyprint_language_tag(is_language_fortran);
+  } else {
+    set_prettyprint_language_tag(is_language_c);
+  }
+
   stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
 				  stub,
