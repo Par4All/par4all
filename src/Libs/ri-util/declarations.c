@@ -2041,7 +2041,7 @@ list words_dimensions(list dims, list pdl)
 
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
-    case is_language_fortran95:
+    case is_language_fortran95: {
       pc = CHAIN_SWORD(pc, "(");
       string spacer = "";
       FOREACH(dimension,d,dims) {
@@ -2051,13 +2051,15 @@ list words_dimensions(list dims, list pdl)
       }
       pc = CHAIN_SWORD(pc, ")");
       break;
-    case is_language_c:
+    }
+    case is_language_c: {
       FOREACH(dimension,d,dims) {
         pc = CHAIN_SWORD(pc, "[");
         pc = gen_nconc(pc, words_dimension(d, pdl));
         pc = CHAIN_SWORD(pc, "]");
       }
       break;
+    }
     default:
       pips_internal_error("Language unknown !");
       break;
