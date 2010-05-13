@@ -2,7 +2,7 @@
 Transformers for "FIR"
 
 
-C  T(FIR) {FIR==0}
+//  T(FIR) {FIR==0}
 
 int FIR()
 {

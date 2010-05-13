@@ -2,7 +2,7 @@
 Transformers for "foo"
 
 
-C  T(foo) {s<=foo+1, foo<=s+1}
+//  T(foo) {s<=foo+1, foo<=s+1}
 
 int foo(int s)
 {

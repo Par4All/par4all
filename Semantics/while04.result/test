@@ -2,7 +2,7 @@
 Transformers for "while04"
 
 
-C  T(while04) {2n==while04+1, 2<=n}
+//  T(while04) {2n==while04+1, 2<=n}
 
 int while04(int n)
 {

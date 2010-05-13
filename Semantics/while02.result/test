@@ -2,7 +2,7 @@
 Transformers for "while02"
 
 
-C  T(while02) {1<=while02}
+//  T(while02) {1<=while02}
 
 int while02()
 {
