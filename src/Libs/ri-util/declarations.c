@@ -320,12 +320,12 @@ list words_basic(basic obj, list pdl)
         switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
-            if(basic_int(obj)==4) {
+/*            if(basic_int(obj)==4) {
               pc = CHAIN_SWORD(pc,"INTEGER");
-            } else {
+            } else { */
               pc = CHAIN_SWORD(pc,"INTEGER*");
               pc = CHAIN_IWORD(pc,basic_int(obj));
-            }
+//            }
             break;
           case is_language_c:
             switch ( basic_int(obj) ) {

@@ -258,6 +258,18 @@ string get_comment_sentinel() {
 }
 
 
+/* @brief Start a single line comment with continuation (blank spaces)
+ * @return a string containing the begin of a comment line, language dependent
+ */
+string get_comment_continuation() {
+  switch(get_prettyprint_language_tag()) {
+    case is_language_c: return "//    ";
+    case is_language_fortran: return "C    ";
+    case is_language_fortran95: return "!    ";
+  }
+}
+
+
 unsigned int get_prettyprint_indentation() {
   if(prettyprint_language_is_fortran_p()) {
     return 0;
@@ -409,19 +421,19 @@ static bool mark_block(unformatted *t_beg,
         // Fortran case: comments at the begin of the line
         pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
         pend = CHAIN_SWORD (NIL, "END BLOCK");
-        *t_beg = make_unformatted(strdup(PIPS_COMMENT_SENTINEL),
+        *t_beg = make_unformatted(strdup(get_comment_sentinel()),
                                   n,
                                   margin,
                                   pbeg);
-        *t_end = make_unformatted(strdup(PIPS_COMMENT_SENTINEL),
+        *t_end = make_unformatted(strdup(get_comment_sentinel()),
                                   n,
                                   margin,
                                   pend);
         break;
       case is_language_c:
         // C case: comments alligned with blocks:
-        pbeg = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
-        pend = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
+        pbeg = CHAIN_SWORD(NIL, strdup(get_comment_sentinel()));
+        pend = CHAIN_SWORD(NIL, strdup(get_comment_sentinel()));
         pbeg = CHAIN_SWORD (pbeg, " BEGIN BLOCK");
         pend = CHAIN_SWORD (pend, " END BLOCK");
         *t_beg = make_unformatted(NULL, n, margin, pbeg);
@@ -3069,11 +3081,11 @@ init_text_statement(
 	if (!(instruction_block_p(statement_instruction(obj)) &&
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
 	  if (so != STATEMENT_ORDERING_UNDEFINED)
-	    asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
+	    asprintf(&buffer, "%s (%d,%d)\n", get_comment_sentinel(),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 	  else
 	    asprintf(&buffer, "%s (statement ordering unavailable)\n",
-		     PIPS_COMMENT_SENTINEL);
+	             get_comment_sentinel());
 	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						buffer));
 	}

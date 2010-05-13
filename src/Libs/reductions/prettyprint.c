@@ -169,7 +169,7 @@ static text text_reductions(__attribute__((unused)) entity module, __attribute__
 	words_predicate_to_commentary
 	    (words_reductions(note_for_statement(s),
 			      load_printed_reductions(s)),
-	     PIPS_COMMENT_SENTINEL):
+			          get_comment_sentinel()):
 		make_text(NIL);
 
     debug_off();
@@ -228,7 +228,7 @@ print_any_reductions(
 	    db_get_memory_resource(summary_name, module_name, TRUE);
 	text p =
 	    words_predicate_to_commentary(words_reductions("summary ", rs),
-					  PIPS_COMMENT_SENTINEL);
+	                                  get_comment_sentinel());
 	MERGE_TEXTS(p, t);
 	t=p;
     }

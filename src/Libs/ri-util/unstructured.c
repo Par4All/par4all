@@ -106,7 +106,7 @@ text_unstructured(entity module,
 
 	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
 	    list pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
-	    unformatted unf = make_unformatted(strdup (PIPS_COMMENT_SENTINEL), num, margin, pbeg);
+	    unformatted unf = make_unformatted(strdup(get_comment_sentinel()), num, margin, pbeg);
 
 	    ADD_SENTENCE_TO_TEXT(r, 
 				 make_sentence(is_sentence_unformatted, unf));
@@ -133,7 +133,7 @@ text_unstructured(entity module,
 
 	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
 	    list pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
-	    unformatted unf = make_unformatted(strdup (PIPS_COMMENT_SENTINEL), num, margin, pend);
+	    unformatted unf = make_unformatted(strdup(get_comment_sentinel()), num, margin, pend);
 	    ADD_SENTENCE_TO_TEXT(r, 
 				 make_sentence(is_sentence_unformatted, unf));
 	}

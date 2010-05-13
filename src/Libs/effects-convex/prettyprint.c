@@ -114,8 +114,8 @@ text_region(effect reg)
 {
     text t_reg;
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_prefix = foresys?
-	FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
+    string str_prefix = foresys ? FORESYS_CONTINUATION_PREFIX
+                              : get_comment_continuation();
     char line_buffer[MAX_LINE_LENGTH];
     reference r;
     action ac;
@@ -138,7 +138,7 @@ text_region(effect reg)
     /* PREFIX
      */
     t_reg = make_text(NIL);
-    strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: PIPS_COMMENT_PREFIX);
+    strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: get_comment_sentinel());
     if (!foresys) append("  <");
 
     /* REFERENCE
