@@ -198,6 +198,11 @@ class ValidationClass:
 			# delete .f, .c and .tpips of the file name
 			(root, ext) = os.path.splitext(line)
 
+			# In case of the test is written like Directory_test\test.f instead os Directory_test/test.f
+			if (root.find('\\') != -1):
+				root = root.replace('\\','/')
+				line = line.replace('\\','/')
+
 			# split to have: link to folder of the test and name of the test
 			directory=root.split("/")
 			directory_test = self.par4ll_validation_dir + directory[0]
