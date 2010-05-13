@@ -13,11 +13,11 @@ w = workspace([ program + ".c",
 	      verboseon=True)
 
 w.set_property(ABORT_ON_USER_ERROR = True,
-	       PRETTYPRINT_C_CODE = True,
 	       PRETTYPRINT_STATEMENT_NUMBER = True,
 	       FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
 	       MUST_REGIONS = True)
 
+#	       MUST_REGIONS = True
 
 # Skip module name of P4A runtime:
 skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
