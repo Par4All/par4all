@@ -33,6 +33,7 @@ PY_TARGET=pyps.py $(PYTHON_MODULE).py pipscc.py pii.py
 
 BIN_TARGET=pipscc
 
+INSTALL_EXE = ipyps
 
 DYNLIB_OBJECTS=the_$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
 
