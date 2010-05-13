@@ -246,7 +246,10 @@ void set_prettyprint_language_tag (enum language_utype lang) {
 }
 
 
-string get_prettyprint_comment() {
+/* @brief Start a single line comment
+ * @return a string containing the begin of a comment line, language dependent
+ */
+string get_comment_sentinel() {
   switch(get_prettyprint_language_tag()) {
     case is_language_c: return "//";
     case is_language_fortran: return "C";
@@ -402,6 +405,7 @@ static bool mark_block(unformatted *t_beg,
     // Here we need to generate block markers for later use:
     switch(get_prettyprint_language_tag()) {
       case is_language_fortran:
+      case is_language_fortran95:
         // Fortran case: comments at the begin of the line
         pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
         pend = CHAIN_SWORD (NIL, "END BLOCK");
@@ -423,11 +427,8 @@ static bool mark_block(unformatted *t_beg,
         *t_beg = make_unformatted(NULL, n, margin, pbeg);
         *t_end = make_unformatted(NULL, n, margin, pend);
         break;
-      case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
-        break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
   }
@@ -612,7 +613,7 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
         break;
       }
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
     }
   }
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
@@ -677,7 +678,7 @@ text generate_alternate_return_targets()
           str_continue = C_CONTINUE_FUNCTION_NAME;
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
       unformatted u1 =
@@ -729,7 +730,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           return (CHAIN_SWORD(pc, entity_user_name(f)));
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -762,7 +763,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           // no warning in C
           break;
         case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
+          pips_internal_error("Need to update F95 case");
           break;
         default:
           pips_internal_error("Language unknown !");
@@ -1456,7 +1457,7 @@ words_io_inst(call obj,
           pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
           break;
         case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
+          pips_internal_error("Need to update F95 case");
           break;
         default:
           pips_internal_error("Language unknown !");
@@ -2959,6 +2960,7 @@ static text text_whileloop(entity module,
   if(evaluation_before_p(eval)) {
     switch(get_prettyprint_language_tag()) {
       case is_language_fortran:
+      case is_language_fortran95:
         /* LOOP prologue.
          */
         pc = CHAIN_SWORD(NIL, "DO " );
@@ -3010,11 +3012,8 @@ static text text_whileloop(entity module,
             ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
         }
         break;
-      case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
-        break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
   } else {
@@ -3094,16 +3093,14 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
 
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       pc = CHAIN_SWORD(pc, strdup("IF ("));
       break;
     case is_language_c:
       pc = CHAIN_SWORD(pc, strdup("if ("));
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
 
@@ -3114,6 +3111,7 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
   text t = text_undefined;
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       ti = statement_instruction(tb);
       c = instruction_call(ti);
       pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
@@ -3132,11 +3130,8 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
       text_sentences(t) = NIL;
       free_text(t);
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
 
@@ -3164,6 +3159,7 @@ static text text_block_if(entity module,
 
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       pc = CHAIN_SWORD(pc, "IF (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
       pc = CHAIN_SWORD(pc, ") THEN");
@@ -3176,11 +3172,8 @@ static text text_block_if(entity module,
       } else
         pc = CHAIN_SWORD(pc, ") {");
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
 
@@ -3209,6 +3202,7 @@ static text text_block_if(entity module,
     else_branch_p = TRUE;
     switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
+      case is_language_fortran95:
         ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
         break;
       case is_language_c:
@@ -3220,11 +3214,8 @@ static text text_block_if(entity module,
           ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
         }
         break;
-      case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
-        break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
@@ -3232,6 +3223,7 @@ static text text_block_if(entity module,
   }
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")));
       break;
     case is_language_c:
@@ -3239,11 +3231,8 @@ static text text_block_if(entity module,
           && !one_liner_false_statement))
         ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
       break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
 
@@ -3289,7 +3278,7 @@ static text text_io_block_if(entity module,
         str = strdup(C_CONTINUE_FUNCTION_NAME);
         break;
       case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
+        pips_internal_error("Need to update F95 case");
         break;
       default:
         pips_internal_error("Language unknown !");
@@ -4021,6 +4010,7 @@ text text_statement_enclosed(entity module,
       text ct = text_undefined;
       switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
+        case is_language_fortran95:
           ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
                   strdup(comments)));
           break;
@@ -4028,11 +4018,8 @@ text text_statement_enclosed(entity module,
           ct = C_comment_to_text(nmargin, comments);
           MERGE_TEXTS(r, ct);
           break;
-        case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
-          break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -4044,6 +4031,7 @@ text text_statement_enclosed(entity module,
       text ct = text_undefined;
       switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
+        case is_language_fortran95:
           ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
                   strdup(comments)));
           break;
@@ -4052,11 +4040,8 @@ text text_statement_enclosed(entity module,
           MERGE_TEXTS(r, ct);
           MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
           break;
-        case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
-          break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -4204,7 +4189,7 @@ find_last_statement(statement s)
         /* No warning needed for C, is it right for C ?*/
         break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
       last = statement_undefined;
@@ -4315,7 +4300,7 @@ text text_named_module(
       }
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
 
@@ -4341,7 +4326,7 @@ text text_named_module(
                 stat, NIL));
         break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
   }
@@ -4582,16 +4567,14 @@ static list words_subscript(subscript s, list pdl)
     if(!first) {
       switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
+        case is_language_fortran95:
           pc = CHAIN_SWORD(pc, ",");
           break;
         case is_language_c:
           pc = CHAIN_SWORD(pc,"][");
           break;
-        case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
-          break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }

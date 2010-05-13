@@ -157,10 +157,10 @@ static void pragma_str_for (loop l, statement stmt) {
         tmp = strchr(str, 'o');
         break;
       case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
+        pips_internal_error("Need to update F95 case");
         break;
       default:
-        pips_assert ("This case should have been handled before", FALSE);
+        pips_internal_error("Language unknown !");
         break;
     }
     // insert the pragma as a string to the current statement

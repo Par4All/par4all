@@ -241,10 +241,13 @@ static bool print_parallelized_code_common(
                                    r);
       break;
     case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_FORTRAN95_EXT,
+                                   r);
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
     }
 

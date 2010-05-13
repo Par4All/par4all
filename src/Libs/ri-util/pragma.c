@@ -201,19 +201,17 @@ pragma_to_string (pragma p) {
     break;
   }
   if (s != string_undefined) {
-    switch (get_prettyprint_language_tag()) {
-    case is_language_fortran:
-      s = strdup(concatenate (FORTRAN_PRAGMA_HEADER, s, NULL));
-      break;
-    case is_language_c:
-      s = strdup(concatenate (C_PRAGMA_HEADER, " ", s, NULL));
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        s = strdup(concatenate(FORTRAN_PRAGMA_HEADER, s, NULL));
+        break;
+      case is_language_c:
+        s = strdup(concatenate(C_PRAGMA_HEADER, " ", s, NULL));
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
   }
   return s;

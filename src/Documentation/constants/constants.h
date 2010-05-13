@@ -52,8 +52,10 @@
 #define PARALLEL_CODE_EXT ".parcode"
 
 #define SEQUENTIAL_FORTRAN_EXT ".f"
+#define SEQUENTIAL_FORTRAN95_EXT ".f"
 #define SEQUENTIAL_C_EXT ".c"
 #define PARALLEL_FORTRAN_EXT ".par.f"
+#define PARALLEL_FORTRAN95_EXT ".par.f95"
 #define PARALLEL_C_EXT ".par.c"
 
 /* Suffixes for code and parsed_code. No idea why the word PREDICAT

@@ -61,10 +61,10 @@ static void add_loop_parallel_threshold (pragma pr) {
           op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
           break;
         case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
+          pips_internal_error("Need to update F95 case");
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
       int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");

@@ -132,7 +132,7 @@ static list words_parameters(entity e, list pdl)
            */
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
       pc = gen_nconc( pc, words_type( t, pdl ) );
@@ -166,7 +166,7 @@ static list words_parameters(entity e, list pdl)
           break;
         }
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -239,7 +239,7 @@ static list words_dimension(dimension obj, list pdl)
       }
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
   return(pc);
@@ -297,7 +297,7 @@ list words_declaration(entity e,
             ;
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
         }
       }
     }
@@ -320,8 +320,12 @@ list words_basic(basic obj, list pdl)
         switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
-            pc = CHAIN_SWORD(pc,"INTEGER*");
-            pc = CHAIN_IWORD(pc,basic_int(obj));
+            if(basic_int(obj)==4) {
+              pc = CHAIN_SWORD(pc,"INTEGER");
+            } else {
+              pc = CHAIN_SWORD(pc,"INTEGER*");
+              pc = CHAIN_IWORD(pc,basic_int(obj));
+            }
             break;
           case is_language_c:
             switch ( basic_int(obj) ) {
@@ -373,7 +377,7 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -396,7 +400,7 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -414,7 +418,7 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -432,7 +436,7 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -463,7 +467,7 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -481,7 +485,7 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -602,7 +606,7 @@ sentence sentence_head(entity e, list pdl)
           pc = CHAIN_SWORD(pc,"void ");
           break;
         default:
-          pips_internal_error("This case should have been handled before");
+          pips_internal_error("Language unknown !");
           break;
       }
       break;
@@ -618,7 +622,7 @@ sentence sentence_head(entity e, list pdl)
           pc = CHAIN_SWORD(pc," ");
           break;
         default:
-          pips_internal_error("This case should have been handled before");
+          pips_internal_error("Language unknown !");
           break;
       }
       break;
@@ -2034,25 +2038,29 @@ list words_dimensions(list dims, list pdl)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  if(prettyprint_language_is_fortran_p()) {
-    pc = CHAIN_SWORD(pc, "(");
-    MAPL(pd,
-        {
-          pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd)), pdl));
-          if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-        }, dims);
-    pc = CHAIN_SWORD(pc, ")");
-  } else if(prettyprint_language_is_c_p()) {
-    MAP(DIMENSION,d,
-        {
-          pc = CHAIN_SWORD(pc, "[");
-          pc = gen_nconc(pc, words_dimension(d, pdl));
-          pc = CHAIN_SWORD(pc, "]");
-        }, dims);
-  } else if(prettyprint_language_is_fortran95_p()) {
-    pips_assert ("Need to update F95 case", FALSE);
-  } else {
-    pips_assert ("This case should have been handled before", FALSE);
+
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, "(");
+      string spacer = "";
+      FOREACH(dimension,d,dims) {
+        pc = CHAIN_SWORD(pc, spacer);
+        pc = gen_nconc(pc, words_dimension(d, pdl));
+        spacer = space_p ? ", " : ",";
+      }
+      pc = CHAIN_SWORD(pc, ")");
+      break;
+    case is_language_c:
+      FOREACH(dimension,d,dims) {
+        pc = CHAIN_SWORD(pc, "[");
+        pc = gen_nconc(pc, words_dimension(d, pdl));
+        pc = CHAIN_SWORD(pc, "]");
+      }
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
   return pc;
 }
