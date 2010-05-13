@@ -203,7 +203,7 @@ void print_sentence(FILE * fd, sentence s) {
           /* if the string fits on one line:
            * use the 88 algorithm to break as few
            * syntactic constructs as possible */
-          else if ((int)strlen(w) < max_line_size - 2 - 7 - em) {
+          else if ((int)strlen(w) < max_line_size - 7 - em) {
               /* Complete current line with the statement
                line number, if it is significative: */
               if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {

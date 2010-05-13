@@ -252,7 +252,15 @@ string get_prettyprint_comment() {
     case is_language_fortran: return "C";
     case is_language_fortran95: return "!";
   }
+}
 
+
+unsigned int get_prettyprint_indentation() {
+  if(prettyprint_language_is_fortran_p()) {
+    return 0;
+  } else {
+    return INDENTATION;
+  }
 }
 
 
@@ -4320,10 +4328,11 @@ text text_named_module(
     //entity cu = module_entity_to_compilation_unit_entity(module);
     switch(get_prettyprint_language_tag()) {
       case is_language_fortran:
-        MERGE_TEXTS(r, text_statement(module, 0, stat, NIL));
-        break;
       case is_language_fortran95:
-        MERGE_TEXTS(r, text_statement(module, INDENTATION, stat, NIL));
+        MERGE_TEXTS(r, text_statement(module,
+                                      get_prettyprint_indentation(),
+                                      stat,
+                                      NIL));
         break;
       case is_language_c:
         MERGE_TEXTS(r,
