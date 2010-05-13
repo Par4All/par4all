@@ -497,7 +497,7 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
 
   /* Builds a stub code text for the missing module */
   if(!is_fortran)
-     reset_prettyprint_is_fortran();
+    set_prettyprint_language_tag(is_language_fortran);
   stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
 				  stub,

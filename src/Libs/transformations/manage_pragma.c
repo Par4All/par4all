@@ -53,19 +53,19 @@ static void add_loop_parallel_threshold (pragma pr) {
       loop l = instruction_loop (inst);
       entity index = loop_index (l);
       entity op = entity_undefined;
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
-	break;
-      case is_language_c:
-	op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+          op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
+          break;
+        case is_language_c:
+          op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
+          break;
+        case is_language_fortran95:
+          pips_assert ("Need to update F95 case", FALSE);
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
       }
       int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
       list args_if =  gen_expression_cons (int_expr (threshold), NIL);

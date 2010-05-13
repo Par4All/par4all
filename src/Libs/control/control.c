@@ -677,7 +677,7 @@ statement loop_test(statement sl)
   else
     lab = label_local_name(loop_label(l));
 
-  switch(language_tag (get_prettyprint_language ())) {
+  switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       cs = strdup(concatenate(prev_comm,

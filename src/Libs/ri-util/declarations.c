@@ -120,7 +120,7 @@ static list words_parameters(entity e, list pdl)
     } else if ( entity_undefined_p(param) ) {
       parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
       type t = parameter_type(p);
-      switch ( language_tag (get_prettyprint_language ()) ) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           pips_user_warning("%dth parameter out of %d parameters not found for "
@@ -142,7 +142,7 @@ static list words_parameters(entity e, list pdl)
       //  pc = gen_nconc(pc, strdup(pn));
       //}
     } else {
-      switch ( language_tag (get_prettyprint_language ()) ) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           /*
@@ -183,7 +183,7 @@ static list words_dimension(dimension obj, list pdl)
   expression e1 = expression_undefined;
   expression e2 = expression_undefined;
   int up, i;
-  switch ( language_tag (get_prettyprint_language ()) ) {
+  switch(get_prettyprint_language_tag()) {
     case is_language_fortran95:
       /* Not asterisk for unbound dimension in F95*/
       if(unbounded_dimension_p(obj)) {
@@ -259,8 +259,7 @@ list words_declaration(entity e,
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* UGLY (temporary) HACK FOR ALLOCATABLE */
-  if (is_language_fortran95 == get_prettyprint_language_tag( )
-      && storage_ram_p(entity_storage(e))) {
+  if(prettyprint_language_is_fortran95_p() && storage_ram_p(entity_storage(e))) {
     if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
       pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
     }
@@ -276,24 +275,29 @@ list words_declaration(entity e,
       if (variable_dimensions(type_variable(entity_type(e))) != NIL) {
         list dims = variable_dimensions(type_variable(entity_type(e)));
 
-        if ((get_prettyprint_language_tag() == is_language_fortran)
-            || (get_prettyprint_language_tag() == is_language_fortran95)) {
-          pl = CHAIN_SWORD(pl, "(");
-          MAPL(pd,
-              {
-                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-                if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
-              }, dims);
-          pl = CHAIN_SWORD(pl, ")");
-        } else if (get_prettyprint_language_tag() == is_language_c) {
-          MAPL(pd,
-              {
-                pl = CHAIN_SWORD(pl, "[");
-                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-                pl = CHAIN_SWORD(pl, "]");
-              }, dims);
-        } else {
-          pips_internal_error("This case should have been handled before");
+        switch(get_prettyprint_language_tag()) {
+          case is_language_fortran:
+          case is_language_fortran95:
+            pl = CHAIN_SWORD(pl, "(");
+            MAPL(pd,
+                {
+                  pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                  if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
+                }, dims)
+            ;
+            pl = CHAIN_SWORD(pl, ")");
+            break;
+          case is_language_c:
+            MAPL(pd,
+                {
+                  pl = CHAIN_SWORD(pl, "[");
+                  pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                  pl = CHAIN_SWORD(pl, "]");
+                }, dims)
+            ;
+            break;
+          default:
+            pips_internal_error("This case should have been handled before");
         }
       }
     }
@@ -313,7 +317,7 @@ list words_basic(basic obj, list pdl)
   } else {
     switch ( basic_tag(obj) ) {
       case is_basic_int: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc,"INTEGER*");
@@ -375,7 +379,7 @@ list words_basic(basic obj, list pdl)
         break;
       }
       case is_basic_float: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc,"REAL*");
@@ -398,7 +402,7 @@ list words_basic(basic obj, list pdl)
         break;
       }
       case is_basic_logical: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"LOGICAL*");
             pc = CHAIN_IWORD(pc,basic_logical(obj));
@@ -417,7 +421,7 @@ list words_basic(basic obj, list pdl)
       }
       case is_basic_overloaded: {
         /* should be a user error? Or simply bootstrap.c is not accurate? */
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"OVERLOADED");
             break;
@@ -434,7 +438,7 @@ list words_basic(basic obj, list pdl)
         break;
       }
       case is_basic_complex: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc,"COMPLEX*");
@@ -465,7 +469,7 @@ list words_basic(basic obj, list pdl)
         break;
       }
       case is_basic_string: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"CHARACTER*");
             pc = gen_nconc( pc, words_value( basic_string(obj) ) );
@@ -580,7 +584,7 @@ sentence sentence_head(entity e, list pdl)
 
   switch(type_tag(tr)) {
     case is_type_void:
-      switch(language_tag (get_prettyprint_language ())) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           if (entity_main_module_p(e))
@@ -605,7 +609,7 @@ sentence sentence_head(entity e, list pdl)
     case is_type_variable: {
       list pdl = NIL;
       pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr)), pdl));
-      switch(language_tag (get_prettyprint_language ())) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           pc = CHAIN_SWORD(pc," FUNCTION ");
@@ -637,8 +641,8 @@ sentence sentence_head(entity e, list pdl)
     pc = gen_nconc(pc, args);
     pc = CHAIN_SWORD(pc, ")");
   } else if (type_variable_p(tr)
-      || ((language_tag (get_prettyprint_language ()) == is_language_c)
-          && (type_unknown_p(tr) || type_void_p(tr)))) {
+              || (prettyprint_language_is_c_p()
+                  && (type_unknown_p(tr) || type_void_p(tr)))) {
     pc = CHAIN_SWORD(pc, "()");
   }
 
@@ -2030,33 +2034,26 @@ list words_dimensions(list dims, list pdl)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  if (language_tag (get_prettyprint_language ()) == is_language_fortran)
-    {
-      pc = CHAIN_SWORD(pc, "(");
-      MAPL(pd,
-      {
-	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd)), pdl));
-	if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-      }, dims);
-      pc = CHAIN_SWORD(pc, ")");
-    }
-  else if (language_tag (get_prettyprint_language ()) == is_language_c)
-    {
-      MAP(DIMENSION,d,
-      {
-	pc = CHAIN_SWORD(pc, "[");
-	pc = gen_nconc(pc, words_dimension(d, pdl));
-	pc = CHAIN_SWORD(pc, "]");
-      }, dims);
-    }
-  else if (language_tag (get_prettyprint_language ()) == is_language_fortran95)
-    {
-      pips_assert ("Need to update F95 case", FALSE);
-    }
-  else
-    {
-      pips_assert ("This case should have been handled before", FALSE);
-    }
+  if(prettyprint_language_is_fortran_p()) {
+    pc = CHAIN_SWORD(pc, "(");
+    MAPL(pd,
+        {
+          pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd)), pdl));
+          if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+        }, dims);
+    pc = CHAIN_SWORD(pc, ")");
+  } else if(prettyprint_language_is_c_p()) {
+    MAP(DIMENSION,d,
+        {
+          pc = CHAIN_SWORD(pc, "[");
+          pc = gen_nconc(pc, words_dimension(d, pdl));
+          pc = CHAIN_SWORD(pc, "]");
+        }, dims);
+  } else if(prettyprint_language_is_fortran95_p()) {
+    pips_assert ("Need to update F95 case", FALSE);
+  } else {
+    pips_assert ("This case should have been handled before", FALSE);
+  }
   return pc;
 }
 

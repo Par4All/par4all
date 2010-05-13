@@ -132,16 +132,17 @@ list pragma_omp_parallel_for_as_exprs (void) {
  *  @param p, the pragma to be closed
  *
  */
-string close_pragma (pragma p) {
+string close_pragma(pragma p) {
   string result = string_undefined;
-  if (language_tag (get_prettyprint_language ()) == is_language_fortran)
-    {
-      if (pragma_entity_p (p))
-	result=directive_to_string(load_global_directives(pragma_entity(p)),true);
-      else
-	result = strdup(concatenate (FORTRAN_PRAGMA_HEADER, "omp end parallel do",
-				     NULL));
-    }
+  if(prettyprint_language_is_fortran_p()) {
+    if(pragma_entity_p (p))
+      result = directive_to_string(load_global_directives(pragma_entity(p)),
+                                   true);
+    else
+      result = strdup(concatenate(FORTRAN_PRAGMA_HEADER,
+                                  "omp end parallel do",
+                                  NULL));
+  }
   return result;
 }
 
@@ -170,7 +171,7 @@ pragma_to_string (pragma p) {
       flg = TRUE;
       l_str = words_expression(e, NIL);
       //      l_str = gen_nreverse (l_str);
-      if (language_tag (get_prettyprint_language ()) == is_language_fortran) {
+      if (prettyprint_language_is_fortran_p()) {
 	// In fortran line size can not be more than 72
 	FOREACH (STRING, str, l_str) {
 	  pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH - 7);
@@ -200,7 +201,7 @@ pragma_to_string (pragma p) {
     break;
   }
   if (s != string_undefined) {
-    switch (language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
       s = strdup(concatenate (FORTRAN_PRAGMA_HEADER, s, NULL));
       break;

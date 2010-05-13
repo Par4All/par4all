@@ -29,7 +29,7 @@
 #define PIPS_COMMENT_SENTINEL 		(get_prettyprint_comment())
 #define PIPS_COMMENT_PREFIX   		PIPS_COMMENT_SENTINEL
 /* #define PIPS_COMMENT_CONTINUATION 	PIPS_COMMENT_SENTINEL "    " */
-#define PIPS_COMMENT_CONTINUATION 	(get_prettyprint_is_fortran ()? "C    " : "//    ")
+#define PIPS_COMMENT_CONTINUATION 	(prettyprint_language_is_fortran_p ()? "C    " : "//    ")
 
 #define FORESYS_CONTINUATION_PREFIX "C$&" "    "
 

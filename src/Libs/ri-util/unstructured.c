@@ -516,7 +516,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
       if (strcmp(l, label_local_name(statement_to_label(control_statement(c))))
           != 0) {
         list pc = NIL;
-        switch(language_tag (get_prettyprint_language ())) {
+        switch (get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc, "CONTINUE");
@@ -607,7 +607,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
           ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
                   strdup(comments)));
         }
-        switch(language_tag (get_prettyprint_language ())) {
+        switch (get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(NIL, "IF (");
@@ -633,7 +633,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
               /* succ2 must be reached by GOTO */
               l = control_to_label_name(succ2, labels);
               pips_assert("Must be labelled", l!= string_undefined);
-              switch(language_tag (get_prettyprint_language ())) {
+              switch (get_prettyprint_language_tag()) {
                 case is_language_fortran:
                 case is_language_fortran95:
                   ADD_SENTENCE_TO_TEXT(r1,
@@ -665,7 +665,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
               ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
                       margin+INDENTATION,
                       l, 0));
-              switch(language_tag (get_prettyprint_language ())) {
+              switch (get_prettyprint_language_tag()) {
                 case is_language_fortran:
                 case is_language_fortran95:
                   ADD_SENTENCE_TO_TEXT(r1,
@@ -696,7 +696,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
           ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
                   margin+INDENTATION,
                   l, 0));
-          switch(language_tag (get_prettyprint_language ())) {
+          switch (get_prettyprint_language_tag()) {
             case is_language_fortran:
             case is_language_fortran95:
               ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
@@ -720,7 +720,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
           pc = CHAIN_SWORD(pc, ") ");
           pc = gen_nconc(pc, words_goto_label(l));
         } else {
-          switch(language_tag (get_prettyprint_language ())) {
+          switch (get_prettyprint_language_tag()) {
             case is_language_fortran:
             case is_language_fortran95:
               pc = CHAIN_SWORD(pc, ") THEN");
@@ -752,7 +752,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
         ADD_SENTENCE_TO_TEXT(r, s);
         MERGE_TEXTS(r, r1);
         if (!no_endif) {
-          switch(language_tag (get_prettyprint_language ())) {
+          switch (get_prettyprint_language_tag()) {
             case is_language_fortran:
             case is_language_fortran95:
               ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ENDIF"));

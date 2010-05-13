@@ -309,7 +309,7 @@ void print_sentence(FILE * fd, sentence s) {
      * the used language : C or fortran
      */
     size_t column_start = 0;
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
         /* fortran case right the line number on the right where characters
          are ignored by a f77 parser*/
@@ -335,7 +335,7 @@ void print_sentence(FILE * fd, sentence s) {
       for (size_t i = col; i <= column_start; i++) {
         putc_sentence(' ', fd);
       }
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
           fprintf_sentence(fd, "%04d", n);
           break;

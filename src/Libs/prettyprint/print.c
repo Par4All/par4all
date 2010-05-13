@@ -227,14 +227,18 @@ static bool print_parallelized_code_common(
 
     close_prettyprint();
 
-    switch (language_tag (get_prettyprint_language ())) {
+    switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
-      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				    PARALLEL_FORTRAN_EXT, r);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_FORTRAN_EXT,
+                                   r);
       break;
     case is_language_c:
-      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				    PARALLEL_C_EXT, r);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_C_EXT,
+                                   r);
       break;
     case is_language_fortran95:
       pips_assert ("Need to update F95 case", FALSE);
