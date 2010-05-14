@@ -1,0 +1,11 @@
+PROGRAM MAIN
+   INTEGER :: B, A
+   A = 99
+   IF (A.EQ.1.OR.A.EQ.2.OR.A.EQ.3.OR.A.EQ.4) THEN
+      B = 1
+   ELSEIF (A.EQ.5) THEN
+      B = 2
+   ELSE
+      B = 3
+   ENDIF
+END PROGRAM MAIN
