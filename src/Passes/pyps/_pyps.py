@@ -8,7 +8,7 @@ from string import split, upper, join
 pypips.atinit()
 
 class loop:
-	"""a loop represent a doloop of  module"""
+	"""a loop represent a do-loop of a module"""
 
 	def __init__(self,module,label):
 		"""[[internal]] bind a loop to its module"""
@@ -32,8 +32,9 @@ class loop:
 
 
 class module:
-	"""a module represents a function, it is the basic element of pyps
-		you can select modules from the workspace and apply transformations to them"""
+	"""a module represents a function or a procedure, it is the basic
+	element of PyPS you can select modules from the workspace
+	and apply transformations to them"""
 
 	def __init__(self,ws,name,source=""):
 		"""[[internal]] bind a module to its workspace"""
@@ -61,7 +62,7 @@ class module:
 		"""return module code as a string"""
 		self.apply("print_code")
 		rcfile=self.show("printed_file")
-		return file(self._ws.dir()+rcfile).readlines()
+		return file(self._ws.directory()+rcfile).readlines()
 
 	def loops(self, label=""):
 		"""return desired loop if label given, an iterator over loops otherwise"""
@@ -89,7 +90,7 @@ class module:
 
 class modules:
 	"""high level representation of a module set,
-	its only purpose is to dispatch maethod calls on contained modules"""
+	its only purpose is to dispatch method calls on contained modules"""
 	def __init__(self,modules):
 		self._modules=modules
 		self._ws= modules[0]._ws if modules else None
@@ -150,8 +151,8 @@ class workspace:
 	def info(self,topic):
 		return split(pypips.info(topic))
 
-	def dir(self):
-		"""retreive workspace datadir"""
+	def directory(self):
+		"""retrieve workspace database directory"""
 		return self._name+".database/"
 
 	def _set_property(self,props):
@@ -167,17 +168,17 @@ class workspace:
 			pypips.set_property(upper(prop),val)
 
 	def set_property(self,**props):
-		"""set multpiple properties at once"""
+		"""set multiple properties at once"""
 		self._set_property(props)
 
 	def save(self,indir="",with_prefix=""):
-		"""save worksapce back into source aither in directory indir or with the prefix with_prefix"""
+		"""save workspace back into source either in directory indir or with the prefix with_prefix"""
 		pypips.apply("UNSPLIT","%ALL")
 		saved=[]
 		if indir:
 			if not os.path.exists(indir):
 				os.makedirs(indir)
-			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory") 
+			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory")
 			for s in os.listdir(self.dir()+"Src"):
 				cp=os.path.join(indir,s)
 				shutil.copy(os.path.join(self.dir(),"Src",s),cp)
@@ -191,7 +192,7 @@ class workspace:
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-		if not os.path.isdir(outdir): raise ValueError("'" + indir + "' is not a directory") 
+		if not os.path.isdir(outdir): raise ValueError("'" + indir + "' is not a directory")
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
 		if link:
@@ -214,20 +215,34 @@ class workspace:
 
 	def filter(self,matching=lambda x:True):
 		"""create an object containing current listing of all modules,
-		filterd by the filter argument"""
+		filtered by the filter argument"""
 		self._build_module_list()
 		the_modules=[m for m in self._modules.values() if matching(m)]
 		return modules(the_modules)
 
+
+	# Create an all method that is in fact the execution of filter
+	# with the default fitering rule: True
 	all=property(filter)
+
+
+	@staticmethod
+	def delete(name):
+		"""Delete a workspace by name
+
+		It is a static method of the class since an open workspace
+		cannot be deleted without creating havoc..."""
+		pypips.delete_workspace(name)
+
 
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
 		try :
 			pypips.quit()
-			pypips.delete_workspace(self._name)
+			workspace.delete(self._name)
 		except RuntimeError:
 			pass
+
 
 	def _build_module_list(self):
 		for m in self.info("modules"):

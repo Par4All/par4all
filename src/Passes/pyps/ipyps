@@ -33,7 +33,7 @@ workspace -> the method to start with a PIPS workspace,
               a program database to work on;
 module    -> to manipulate a PIPS module (a function, a procedure);
 modules   -> to manipulate a set of PIPS modules.
-%load     -> laod and execute a PyPS file
+%load     -> load and execute a PyPS file
 """
 
 # Create an embedded shell to inherit pyps current namespace into the
