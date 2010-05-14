@@ -878,12 +878,13 @@ const char *module_name;
 */
 bool entity_scalar_p(entity e)
 {
+  bool return_value = FALSE;
+
   type t = ultimate_type(entity_type(e));
-
-  // hmmm... some hpfc validations end here:-(
-  pips_assert("e is a variable", type_variable_p(t));
-
-  return ENDP(variable_dimensions(type_variable(t)));
+  if(type_variable_p(t)) {
+    return_value = ENDP(variable_dimensions(type_variable(t)));
+  }
+  return return_value;
 }
 
 /* for variables (like I), not constants (like 1)!
