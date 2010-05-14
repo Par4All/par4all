@@ -9,5 +9,18 @@ PROGRAM MAIN
    PRINT *, I
 END PROGRAM MAIN
 
-"compile sources produced by pips"
+Unsplit result
 
+!!
+!! file for empty02.f90
+!!
+SUBROUTINE EMPTY02(I)
+   INTEGER :: I
+   I = 1
+END SUBROUTINE EMPTY02
+PROGRAM MAIN
+   INTEGER :: I
+   I = 4
+   CALL EMPTY02(I)
+   PRINT *, I
+END PROGRAM MAIN
