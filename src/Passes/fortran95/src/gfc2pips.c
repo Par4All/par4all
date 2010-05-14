@@ -576,8 +576,8 @@ void gfc2pips_namespace(gfc_namespace* ns) {
    *
    * But well... try it anyway !
    */
-  //gfc2pips_computeAdresses();
-  ComputeAddresses();
+  gfc2pips_computeAdresses();
+  //ComputeAddresses();
 
   //compute equivalences
   //gfc2pips_computeEquiv(ns->equiv);
@@ -2658,7 +2658,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       } else {
         return_instruction = MakeNullaryCallInst(e);
       }
-
+      break;
     }
     case EXEC_PAUSE: {
       gfc2pips_debug(5, "Translation of PAUSE\n");
