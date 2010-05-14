@@ -1,0 +1,20 @@
+Write PArsed code in ./use.database/FOO!/PARSED_CODE 
+Writing ./use.database/FOO!.f90
+
+
+Source of the module
+
+MODULE FOO!
+   INTEGER :: TOTO
+
+Source for "use"
+
+PROGRAM USE
+   USE foo
+   INTEGER :: TATA
+   TOTO = 4
+   TATA = 5
+END PROGRAM USE
+
+"compile sources produced by pips"
+
