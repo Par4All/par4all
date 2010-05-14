@@ -86,7 +86,7 @@
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"
 #define HEAP_AREA_LOCAL_NAME            "*HEAP*"
 #define STACK_AREA_LOCAL_NAME           "*STACK*"
-#define ALLOCATABLE_AREA_LOCAL_NAME "*ALLOCATABLE*"
+#define ALLOCATABLE_AREA_LOCAL_NAME     "*ALLOCATABLE*"
 /* The set of all memory areas. FI: this macro is now obsolete and
    should be removed when a new version of alias-classes is
    introduced. Too bad ri-util/effects.c is going to depend on
@@ -1191,6 +1191,15 @@
                                      ENTITY_DIVIDE_P(e) )
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
+
+
+/*
+ * Fortran 95 Allocatable
+ */
+#define ALLOCATABLE_PREFIX "__pips_allocatable__"
+#define ENTITY_ALLOCATABLE_P(e) \
+  strncmp(e, ALLOCATABLE_PREFIX, strlen(ALLOCATABLE_PREFIX))
+
 
 /* classification of basics */
 
