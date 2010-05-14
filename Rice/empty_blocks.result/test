@@ -25,17 +25,17 @@ int main(int argc, char **argv)
 
    int i, j = 100;
 
-//  P() {j==100}
+//  P(i,j) {j==100}
 
    for(i = 0; i <= 99; i += 1)
       ;
 
-//  P(i) {i==100, j==100}
+//  P(i,j) {i==100, j==100}
 
    for(i = 0; i <= 99; i += 1)
       ;
 
-//  P(i) {i==100, j==100}
+//  P(i,j) {i==100, j==100}
 
    //on attends qqch différent de "inconnu"
    j = i;
