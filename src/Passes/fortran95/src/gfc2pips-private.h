@@ -10,8 +10,6 @@
 #include "genC.h"
 #include "gfc2pips.h"
 
-/*typedef void * Pvecteur;
-typedef void * Psysteme; */
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -19,34 +17,8 @@ typedef void * Psysteme; */
 
 #include "parser_private.h"
 #include "syntax.h"
-/*
-typedef void gfc_namespace;
-typedef void gfc_symtree;
-typedef void gfc_symbol;
-typedef void gfc_code;
-typedef void gfc_char_t;
-typedef void gfc_array_ref;
-typedef void gfc_expr;
-typedef void gfc_case;
-typedef void gfc_actual_arglist;
-typedef void locus;
 
-*/
-/*
-#define GFC2PIPS_DEBUG_LEVEL 10
-#ifdef GFC2PIPS_DEBUG_LEVEL
-#define gfc2pips_debug(level,...) { \
-  if ( GFC2PIPS_DEBUG_LEVEL >= (level) ) fprintf (stderr, __VA_ARGS__); \
-}
-#define ifdebug(level) if(GFC2PIPS_DEBUG_LEVEL >= (level) )
-#else
-#define ifdebug(level) if( false )
-#define gfc2pips_debug(level,format, ...)
-#endif
 
-#define pips_user_error(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
-#define pips_user_warning(...) { fprintf(stderr, __VA_ARGS__); }
-*/
 #define gfc2pips_debug pips_debug
 
 //an enum to know what kind of main entity we are dealing with
@@ -54,6 +26,11 @@ typedef enum gfc2pips_main_entity_type {
   MET_PROG, MET_SUB, MET_FUNC, MET_MOD, MET_BLOCK, MET_MODULE
 } gfc2pips_main_entity_type;
 
+
+/* Store the list of callees */
+extern list gfc_module_callees;
+
+void gfc2pips_add_to_callees(entity e);
 
 
 /**
@@ -145,7 +122,7 @@ entity gfc2pips_check_entity_module_exists(char *s);
 entity gfc2pips_check_entity_block_data_exists(char *s);
 entity gfc2pips_check_entity_exists(const char *s);
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
-entity gfc2pips_symbol2entity2(gfc_symbol* sym);
+entity gfc2pips_symbol2top_entity(gfc_symbol* sym);
 entity gfc2pips_char2entity(char*p, char* s);
 char* gfc2pips_get_safe_name(const char* str);
 
@@ -238,7 +215,6 @@ void gfc2pips_push_loop(gfc_code *c);
 void gfc2pips_pop_loop(void);
 
 list gen_union(list a, list b);
-list gen_intersection(list a, list b);
 
 #endif /* GFC_2_PIPS */
 

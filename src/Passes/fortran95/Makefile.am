@@ -22,7 +22,7 @@
 
 bin_PROGRAMS=gfc2pips
 gfc2pips_SOURCES = 
-dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src/gfc2pips.c src/gfc2pips.h src/gfc2pips_stubs.c
+dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src/gfc2pips.c src/gfc2pips.h src/gfc2pips-stubs.c src/gfc2pips-util.c
 
 
 include Makefile.mk

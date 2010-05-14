@@ -24,7 +24,7 @@
 
 # Gfc2pips source files
 GFC2PIPS_SRC.d = src
-GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips_stubs.c
+GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips-stubs.c
 #VERSION USED
 PIPS_GFC2PIPS_GCC_VERSION = 4.4.3
 BUILD.d	= build/$(PIPS_GFC2PIPS_GCC_VERSION)

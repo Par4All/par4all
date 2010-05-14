@@ -31,11 +31,13 @@ LIBS_PIPS =  $(PIPSLIBS_LIBS)/ri-util/.libs/libri-util.a \
 	$(PIPSLIBS_LIBS)/misc/.libs/libmisc.a \
 	$(PIPSLIBS_LIBS)/newgen/.libs/libnewgen.a
 
+GFC2PIPS_OBJS = fortran/gfc2pips.o fortran/gfc2pips-util.o fortran/gfc2pips-stubs.o
+
 # The compiler itself is called f951.
-f951$(exeext): $(F95_OBJS) $(LIBS_PIPS) fortran/gfc2pips.o \
+f951$(exeext): $(F95_OBJS) $(LIBS_PIPS) $(GFC2PIPS_OBJS) \
 		$(BACKEND) $(LIBDEPS) attribs.o
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
-		$(F95_OBJS) $(BACKEND) $(LIBS) fortran/gfc2pips.o $(LIBS_PIPS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)  attribs.o $(BACKENDLIBS) -lgmp -lmpfr
+		$(F95_OBJS) $(BACKEND) $(LIBS) $(GFC2PIPS_OBJS) $(LIBS_PIPS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)  attribs.o $(BACKENDLIBS) -lgmp -lmpfr
 
 #INCLUDES += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
 PIPS_INC_PRE   = -I../../../../../Documentation/newgen/ 
@@ -48,7 +50,17 @@ PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/newgen/
 PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/constants/
 PIPS_INC_POST += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 
 
-fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
+
+
+fortran/gfc2pips-stubs.o: fortran/gfc2pips-stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
+	$(CC) $(PIPS_INC_PRE) -std=c99 -g -c $(ALL_CPPFLAGS) $(PIPS_INC_POST) -DBASEVER=$(BASEVER_s)  \
+		$< $(OUTPUT_OPTION)
+
+fortran/gfc2pips-util.o: fortran/gfc2pips-util.c fortran/gfc2pips.h fortran/gfc2pips-private.h
+	$(CC) $(PIPS_INC_PRE) -std=c99 -g -c $(ALL_CPPFLAGS) $(PIPS_INC_POST) -DBASEVER=$(BASEVER_s)  \
+		$< $(OUTPUT_OPTION)
+
+fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips.h fortran/gfc2pips-private.h
 	$(CC) $(PIPS_INC_PRE) -std=c99 -g -c $(ALL_CPPFLAGS) $(PIPS_INC_POST) -DBASEVER=$(BASEVER_s)  \
 		$< $(OUTPUT_OPTION)
 
