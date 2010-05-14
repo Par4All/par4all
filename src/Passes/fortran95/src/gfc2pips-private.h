@@ -19,6 +19,18 @@
 #include "syntax.h"
 
 
+/* We have here to HACK GCC include that prevent use of these function */
+#undef toupper
+#undef fgetc
+#undef fputc
+#undef fread
+#undef asprintf
+int asprintf(char **strp, const char *fmt, ...);
+
+
+
+
+
 #define gfc2pips_debug pips_debug
 
 //an enum to know what kind of main entity we are dealing with
@@ -31,7 +43,9 @@ typedef enum gfc2pips_main_entity_type {
 extern list gfc_module_callees;
 
 void gfc2pips_add_to_callees(entity e);
-
+void pips_init();
+list get_use_entities_list(struct gfc_namespace *ns);
+void save_entities();
 
 /**
  * @brief put the given char table to upper case
