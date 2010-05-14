@@ -1,0 +1,13 @@
+SUBROUTINE EMPTY02(I)
+   INTEGER :: I
+   I = 1
+END SUBROUTINE EMPTY02
+PROGRAM MAIN
+   INTEGER :: I
+   I = 4
+   CALL EMPTY02(I)
+   PRINT *, I
+END PROGRAM MAIN
+
+"compile sources produced by pips"
+
