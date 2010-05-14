@@ -130,7 +130,8 @@ static void* do_group_basics_maximum_reduce(void *v,const list l)
 
 static basic do_group_basics_maximum(list entities)
 {
-    return (basic)gen_reduce(entity_basic(ENTITY(CAR(entities))),do_group_basics_maximum_reduce,CDR(entities));
+    if(ENDP(entities)) return basic_undefined;
+    else return (basic)gen_reduce(entity_basic(ENTITY(CAR(entities))),do_group_basics_maximum_reduce,CDR(entities));
 }
 
 static void *do_group_count_elements_reduce(void * v, const list l)
@@ -147,9 +148,16 @@ static expression do_group_count_elements(list entities)
     return (expression)gen_reduce(int_to_expression(0),do_group_count_elements_reduce,entities);
 }
 
+static bool group_constant_range_filter(range r, set constants)
+{
+    return !get_bool_property("GROUP_CONSTANTS_SKIP_LOOP_RANGE");
+}
+
 static entity constant_holder;
 static bool do_grouping_filter_out_self(expression exp)
 {
+    if(gen_get_ancestor(range_domain,exp) && get_bool_property("GROUP_CONSTANTS_SKIP_LOOP_RANGE") )
+        return false;
     if(expression_reference_p(exp))
     {
         reference ref = expression_reference(exp);
@@ -157,6 +165,7 @@ static bool do_grouping_filter_out_self(expression exp)
     }
     return true;
 }
+
 
 typedef struct {
     entity old;
@@ -282,6 +291,7 @@ group_constants(const char *module_name)
 
     /* gather constants */
     gen_context_multi_recurse(constant_statement,constants,
+            range_domain,group_constant_range_filter,gen_null,
             reference_domain,gen_false,gen_null,
             expression_domain,gen_true,do_group_constant_entity,NULL);
 
