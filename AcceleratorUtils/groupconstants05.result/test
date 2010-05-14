@@ -1,0 +1,31 @@
+orginal files
+int main()
+{
+   int a[2][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}}, b = 3, i;
+ou_est_charlie:
+   for(i = 0; i <= 3; i += 1)
+      a[0][i] = 1;
+   printf("%d", a[0][1]);
+   return 0;
+}
+after constant grouping
+int main()
+{
+   int a[2][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}}, b = 3, i;
+   {
+      //PIPS generated variable
+      int caillou[3];
+      caillou[0] = 0;
+      caillou[1] = 1;
+      caillou[2] = 3;
+
+ou_est_charlie:
+      for(i = caillou[0]; i <= caillou[2]; i += caillou[1])
+         a[caillou[0]][i] = caillou[1];
+   }
+   printf("%d", a[0][1]);
+   return 0;
+}
+test resulting code
+ok
+

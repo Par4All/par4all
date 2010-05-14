@@ -50,16 +50,19 @@ if __name__ == "__main__":
 	print "tidy the code just in case of"
 	m.partial_eval()
 	m.display()
+
 	
 	print "tiling"
 	for l in m.loops():
 		if l.loops():
 				l.loop_tiling(matrix="128 0,0 8")
-	print "isolation"
+	print "group constants and isolate"
 	kernels=[]
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
+				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+				m.display()
 				kernels+=[l2.label]
 				m.isolate_statement(label=l2.label)
 	m.display()
