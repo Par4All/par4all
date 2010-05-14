@@ -1,28 +1,28 @@
 /*
 
-  $Id$
+ $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2010 MINES ParisTech
 
-  This file is part of PIPS.
+ This file is part of PIPS.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  any later version.
+ PIPS is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.
+ PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+ See the GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
+ */
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 /* **
  * This is the Fortran95 pips parser aka gfc2pips
@@ -75,7 +75,6 @@
 
 #include <stdio.h>
 
-
 // globals defined somewhere in pips...
 // Temporary HACK, waiting for PIPS to be modified : these have to be moved
 int Nbrdo;
@@ -112,8 +111,6 @@ list gfc2pips_format2 = NULL;//list of labels for above
 static int gfc2pips_last_created_label = 95000;
 static int gfc2pips_last_created_label_step = 2;
 
-
-
 entity gfc2pips_main_entity = entity_undefined;
 
 /**
@@ -135,8 +132,6 @@ void gfc2pips_namespace(gfc_namespace* ns) {
   message_assert( "No namespace to dump.", ns );
   message_assert( "No symtree root.", ns->sym_root );
   message_assert( "No symbol for the root.", ns->sym_root->n.sym );
-
-  //  printf( "PIPS ENTITIES : %s\n", gfc_option.gfc2pips_entities );
 
   /* pips main initialization */
   pips_init();
@@ -268,7 +263,6 @@ void gfc2pips_namespace(gfc_namespace* ns) {
   /*
    * FIXME : outline all the following common stuff
    */
-
   gfc2pips_debug(2, "%zu explicit common(s) founded\n",gen_length(commons));
 
   /*
@@ -283,10 +277,10 @@ void gfc2pips_namespace(gfc_namespace* ns) {
 
     // Check if the common exist first
     string common_global_name = concatenate(TOP_LEVEL_MODULE_NAME,
-        MODULE_SEP_STRING
-        COMMON_PREFIX,
-        str2upper(strdup(st->name)),
-        NULL);
+                                            MODULE_SEP_STRING
+                                            COMMON_PREFIX,
+                                            str2upper(strdup(st->name)),
+                                            NULL);
     entity com = gen_find_tabulated(common_global_name, entity_domain);
     if(com == entity_undefined) {
       com = make_new_common((char *)str2upper((char *)st->name),
@@ -531,10 +525,6 @@ void gfc2pips_namespace(gfc_namespace* ns) {
                 entity_local_name(ent));
     }
   }
-
-  //sort by alphabetic order
-  //gen_sort_list(complete_list_of_entities,(gen_cmp_func_t)compare_entities);
-
 
   entity_initial(gfc2pips_main_entity)
       = make_value_code(make_code(gen_union(list_of_extern_entities,
@@ -1710,7 +1700,7 @@ entity gfc2pips_symbol2top_entity(gfc_symbol* s) {
     free(name);
     return e;
   }
-  e = FindOrCreateEntity(strdup(TOP_LEVEL_MODULE_NAME), str2upper((name)));
+  e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str2upper(name));
   if(entity_initial(e) == value_undefined)
     entity_initial(e) = make_value_unknown();
   if(entity_type(e) == type_undefined)
@@ -2533,8 +2523,7 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence) {
      * PARSED_PRINTED_FILE is okay, but not PRINTED_FILE so we have to find out why
      */
   }
-  //CONS(STATEMENT, make_return_statement(FindOrCreateEntity(CurrentPackage,"TEST")),list_of_statements);
-  return make_instruction_block(list_of_statements);//make a sequence <=> make_instruction_sequence(make_sequence(list_of_statements));
+  return make_instruction_block(list_of_statements);
 }
 
 /**
@@ -2544,48 +2533,35 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence) {
  * never call this function except in gfc2pips_code2instruction or in recursive mode
  */
 instruction gfc2pips_code2instruction_(gfc_code* c) {
+  instruction return_instruction = instruction_undefined;
+
   //do we have a label ?
   //if(c->here){}
-  //debug(5,"gfc2pips_code2instruction","Start function\n");
+
+  gfc2pips_debug(8,"Start\n");
   switch(c->op) {
-    case EXEC_NOP://an instruction without anything => continue statement
+    /* an instruction without anything => continue statement*/
+    case EXEC_NOP:
     case EXEC_CONTINUE:
       gfc2pips_debug(5, "Translation of CONTINUE\n");
-      return make_instruction_call(make_call(CreateIntrinsic(CONTINUE_FUNCTION_NAME),
-                                             NULL));
+
+      return_instruction = make_continue_instruction();
       break;
-      /*	    case EXEC_ENTRY:
-       fprintf (dumpfile, "ENTRY %s", c->ext.entry->sym->name);
-       break;
-       */
     case EXEC_INIT_ASSIGN:
     case EXEC_ASSIGN: {
-
-      //if(c->expr->expr_type==EXPR_FUNCTION)
-      /*call _call_ = make_call(
-       entity_intrinsic(ASSIGN_OPERATOR_NAME),
-       CONS(EXPRESSION, gfc2pips_expr2expression(c->expr), CONS(EXPRESSION, gfc2pips_expr2expression(c->expr2), NIL))
-       );
-       instruction i = make_instruction(is_instruction_call, _call_);
+      /* Beware, left hand side of assignment cannot be a TOP-LEVEL entity
+       * If it is an assignment to a function, some complications are to be
+       * expected
        */
-      instruction i =
-          make_assign_instruction( //useless assert in make_assign_instruction ? check if it has an impact on the PIPS analyses !
-                                  gfc2pips_expr2expression(c->expr),//beware, cannot be a TOP-LEVEL entity IF it is an assignment to a function, some complications are to be expected
-                                  gfc2pips_expr2expression(c->expr2));
-      //fprintf(stderr,"bouh !\n");
-      return i;
-    }
+      expression left_hand_side = gfc2pips_expr2expression(c->expr);
+      expression right_hand_side = gfc2pips_expr2expression(c->expr2);
+      return_instruction = make_assign_instruction(left_hand_side,
+                                                   right_hand_side);
       break;
-
-      /*case EXEC_LABEL_ASSIGN:
-       fputs ("LABEL ASSIGN ", dumpfile);
-       show_expr (c->expr);
-       fprintf (dumpfile, " %d", c->label->value);
-       break;
-
-       */
+    }
     case EXEC_POINTER_ASSIGN: {
       gfc2pips_debug(5, "Translation of assign POINTER ASSIGN\n");
+
       list list_of_arguments = CONS( EXPRESSION,
           gfc2pips_expr2expression( c->expr2 ),
           NIL );
@@ -2594,46 +2570,45 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       call call_ = make_call(e, list_of_arguments);
       expression ex = make_expression(make_syntax_call(call_),
                                       normalized_undefined);
-      return make_assign_instruction(gfc2pips_expr2expression(c->expr), ex);
-    }
+      return_instruction
+          = make_assign_instruction(gfc2pips_expr2expression(c->expr), ex);
       break;
+    }
     case EXEC_GOTO: {
       gfc2pips_debug(5, "Translation of GOTO\n");
-      instruction
-          i =
-              make_instruction_goto(make_continue_statement(gfc2pips_code2get_label2(c)));
-      return i;
-    }
+      entity lbl = gfc2pips_code2get_label2(c);
+      return_instruction = make_instruction_goto(make_continue_statement(lbl));
       break;
-
+    }
     case EXEC_CALL:
     case EXEC_ASSIGN_CALL: {
-      gfc2pips_debug(5, "Translation of %s\n",c->op==EXEC_CALL?"CALL":"ASSIGN_CALL");
-      entity called_function = entity_undefined;
-      //char * str = NULL;
+      gfc2pips_debug(5,"Translation of %s\n",
+          c->op==EXEC_CALL?"CALL":"ASSIGN_CALL");
+
       gfc_symbol* symbol = NULL;
+
+      /* Get the symbol that represent the function called */
       if(c->resolved_sym) {
         symbol = c->resolved_sym;
       } else if(c->symtree) {
         symbol = c->symtree->n.sym;
       } else {
-        //erreur
         pips_user_error( "We do not have a symbol to call!!\n" );
-        return instruction_undefined;
       }
-      list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
-      /*str = symbol->name;
-       if(strncmp_("_gfortran_", str, strlen("_gfortran_") )==0){
-       str = str2upper(strdup("exit"));
-       }*/
 
-      //called_function = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str2upper(strdup(str)) );
-      called_function = gfc2pips_symbol2entity(symbol);
+      /* Convert symbol in a pips entity */
+      entity called_function = gfc2pips_symbol2entity(symbol);
+
+      /* Get the arglist for the call */
+      list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
+
+      /* Fix the storage */
       if(entity_storage(called_function) == storage_undefined) {
-        gfc2pips_debug(1,"Storage rom !! %s %d\n",entity_name(called_function),__LINE__);
+        gfc2pips_debug(1,"Storage rom !! %s\n",entity_name(called_function));
         entity_storage(called_function) = make_storage_rom();
       }
 
+      /* Fix the initial value (intrinsic only) */
       if(entity_initial(called_function) == value_undefined) {
         entity_initial(called_function) = make_value(is_value_intrinsic,
                                                      called_function);
@@ -2642,16 +2617,17 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
             gfc2pips_get_safe_name( symbol->name ));
       }
 
+      /* Fix the type of the function */
       if(entity_type(called_function) == type_undefined) {
         gfc2pips_debug(2,"Type is undefined %s\n",entity_name(called_function));
-        //invent list of parameters
+        /* invent list of parameters */
         list param_of_call = gen_copy_seq(list_of_arguments);
         list param_of_call_p = param_of_call;
-        //need to translate list_of_arguments in sthg
+        /* need to translate list_of_arguments in sthg */
         while(param_of_call_p) {
           entity _new =
               (entity)gen_copy_tree((gen_chunk *)param_of_call_p->car.e);
-          entity_name(_new) = "toto";
+          entity_name(_new) = "toto"; // hum....
           gfc2pips_debug(2,
               "%s - %s",
               entity_name((entity)param_of_call_p->car.e),
@@ -2660,91 +2636,68 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
           POP( param_of_call_p );
         }
 
+        pips_user_warning("Type is undefined for function '%s',"
+            " thus we make it 'overloaded'\n",
+            gfc2pips_get_safe_name( symbol->name ));
+
         entity_type(called_function)
             = make_type_functional(make_functional(NULL, MakeOverloadedResult()));
-      } else {
-        //fprintf(stderr,"type is already defined ? %s %d\n",entity_name(called_function), gen_length(functional_parameters(type_functional(entity_type(called_function)))));
       }
 
-      /*if(type_functional_p(entity_type(called_function)) && strcmp(symbol->name, symbol->ns->proc_name->name)!=0 ){
-       //check list of parameters;
-       list check_sub_parameters = functional_parameters(type_functional(entity_type(called_function)));
-       if( check_sub_parameters==NULL ){
-       //on récupère les types des paramètres pour changer la liste des paramètres
-       }
-       }*/
-
+      /* make the call now */
       call call_ = make_call(called_function, list_of_arguments);
 
+      /* add to callees */
       gfc2pips_add_to_callees(called_function);
 
-      /*
-       set_alternate_returns();
-       $$ = MakeCallInst(
-       <entity: called function>,
-       parameters
-       );
-       reset_alternate_returns();
-
-       */
-      return make_instruction_call(call_);
-    }
+      return_instruction = make_instruction_call(call_);
       break;
-      /*		if (c->resolved_sym)
-       fprintf (dumpfile, "CALL %s ", c->resolved_sym->name);
-       else if (c->symtree)
-       fprintf (dumpfile, "CALL %s ", c->symtree->name);
-       else
-       fputs ("CALL ?? ", dumpfile);
-
-       show_actual_arglist (c->ext.actual);
-       break;
-       */
+    }
     case EXEC_COMPCALL: {
-      //Function (or subroutine) call of a procedure pointer component or type-bound procedure
-      gfc2pips_debug(5, "Translation of COMPCALL\n");
-      /*
-       fputs ("CALL ", dumpfile);
-       //show_compcall (c->expr);
-       fprintf (dumpfile, "%s", p->symtree->n.sym->name);
-       show_ref (p->ref);
-       fprintf (dumpfile, "%s", p->value.compcall.name);
-       show_actual_arglist (p->value.compcall.actual);
+      /* Function (or subroutine) call of a procedure pointer component or
+       * type-bound procedure
        */
-    }
+      gfc2pips_debug(5, "Translation of COMPCALL\n");
       break;
-
-    case EXEC_RETURN: {//we shouldn't even dump that for main entities
+    }
+    case EXEC_RETURN: {
+      //we shouldn't even dump that for main entities
       gfc2pips_debug(5, "Translation of RETURN\n");
-      //return instruction_undefined;
-      expression e = expression_undefined;
+      entity e = CreateIntrinsic(RETURN_FUNCTION_NAME);
 
-      return make_instruction_call(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),
-                                             c->expr ? CONS( EXPRESSION,
-                                                        gfc2pips_expr2expression( c->expr ),
-                                                        NULL )
-                                                     : NULL));
-      //return MakeReturn(e);//Syntax !
+      if(c->expr) {
+        expression args =  gfc2pips_expr2expression( c->expr );
+        return_instruction = MakeUnaryCallInst(e, args);
+      } else {
+        return_instruction = MakeNullaryCallInst(e);
+      }
+
     }
-
-    case EXEC_PAUSE:
+    case EXEC_PAUSE: {
       gfc2pips_debug(5, "Translation of PAUSE\n");
-      return make_instruction_call(make_call(CreateIntrinsic(PAUSE_FUNCTION_NAME),
-                                             c->expr ? CONS( EXPRESSION,
-                                                        gfc2pips_expr2expression( c->expr ),
-                                                        NULL )
-                                                     : NULL));
-      break;
+      entity e = CreateIntrinsic(PAUSE_FUNCTION_NAME);
 
-    case EXEC_STOP:
+      list args = NULL;
+      if(c->expr) {
+        expression args =  gfc2pips_expr2expression( c->expr );
+        return_instruction = MakeUnaryCallInst(e, args);
+      } else {
+        return_instruction = MakeNullaryCallInst(e);
+      }
+      break;
+    }
+    case EXEC_STOP: {
       gfc2pips_debug(5, "Translation of STOP\n");
-      return make_instruction_call(make_call(CreateIntrinsic(STOP_FUNCTION_NAME),
-                                             c->expr ? CONS( EXPRESSION,
-                                                        gfc2pips_expr2expression( c->expr ),
-                                                        NULL )
-                                                     : NULL));
-      break;
+      entity e = CreateIntrinsic(STOP_FUNCTION_NAME);
 
+      if(c->expr) {
+        expression args =  gfc2pips_expr2expression( c->expr );
+        return_instruction = MakeUnaryCallInst(e, args);
+      } else {
+        return_instruction = MakeNullaryCallInst(e);
+      }
+      break;
+    }
     case EXEC_ARITHMETIC_IF: {
       gfc2pips_debug(5, "Translation of ARITHMETIC IF\n");
       expression e = gfc2pips_expr2expression(c->expr);
@@ -2758,11 +2711,18 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
           MakeBinaryCall(CreateIntrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
                          e,
                          MakeIntegerConstantExpression("0"));
-      //we handle the labels doubled because it will never be checked afterwards to combine/fuse
+      /*
+       * we handle the labels doubled because it will never be checked
+       * afterwards to combine/fuse
+       */
       if(c->label->value == c->label2->value) {
         if(c->label->value == c->label3->value) {
-          //goto only
-          return make_instruction_goto(make_continue_statement(gfc2pips_code2get_label2(c)));
+          /* WTF ? Same destination whatever the result of the test is ?
+           * let's put a goto !
+           */
+          entity lbl = gfc2pips_code2get_label2(c);
+          statement continue_stmt = make_continue_statement(lbl);
+          return_instruction = make_instruction_goto(continue_stmt);
         } else {
           //.LE. / .GT.
           statement
@@ -2771,7 +2731,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
           statement
               s3 =
                   instruction_to_statement(make_instruction_goto(make_continue_statement(gfc2pips_code2get_label4(c))));
-          return make_instruction_test(make_test(e3, s2, s3));
+          return_instruction = make_instruction_test(make_test(e3, s2, s3));
         }
       } else if(c->label2->value == c->label3->value) {
         //.LT. / .GE.
@@ -2781,7 +2741,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         statement
             s3 =
                 instruction_to_statement(make_instruction_goto(make_continue_statement(gfc2pips_code2get_label3(c))));
-        return make_instruction_test(make_test(e1, s2, s3));
+        return_instruction = make_instruction_test(make_test(e1, s2, s3));
       } else {
         statement
             s1 =
@@ -2792,211 +2752,84 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         statement
             s3 =
                 instruction_to_statement(make_instruction_goto(make_continue_statement(gfc2pips_code2get_label4(c))));
-        statement
-            s = instruction_to_statement(make_instruction_test(make_test(e2,
-                                                                         s2,
-                                                                         s3)));
-        return make_instruction_test(make_test(e1, s1, s));
+        statement s =
+            instruction_to_statement(make_instruction_test(make_test(e2,
+                        s2,
+                        s3)));
+        return_instruction = make_instruction_test(make_test(e1, s1, s));
       }
-    }
       break;
+    }
 
     case EXEC_IF: {
       gfc2pips_debug(5, "Translation of IF\n");
-      if(!c->block) {
-        return make_instruction_block(NULL);
-      }
-      //next est le code pointé par la sortie IF
-      //block est le code pointé par la sortie ELSE
-      gfc_code* d = c->block;//fprintf(stderr,"%d %d %d %d\n",d, d?d->expr:d,c,c->expr);
-      //gfc2pips_code2get_label(c);gfc2pips_code2get_label(c->next);gfc2pips_code2get_label(d);gfc2pips_code2get_label(d->next);
-
-      if(!d->expr) {
-        fprintf(stderr, "No condition ???\n");
-        //we are at the last ELSE statement for an ELSE IF
+      /*
+       * IF - ELSE IF - ELSE IF - .... - ELSE
+       * is handled with a chain list.
+       * next is the current "IF" (or ELSEIF or ELSE) and
+       * block is the next test (if any)
+       *
+       * We handled this chain list recursively
+       *
+       */
+      gfc_code* d = c->block;
+      if(!d) {
+        /* WTF ? */
+        return_instruction = make_instruction_block(NULL);
+      } else if(!d->expr) {
+        /* No test in an if ? we are at the last ELSE statement for an ELSE IF
+         */
         if(d->next) {
-          return gfc2pips_code2instruction(d->next, true);
+          return_instruction = gfc2pips_code2instruction(d->next, true);
         } else {
-          return make_instruction_block(NULL);
+          return_instruction = make_instruction_block(NULL);
         }
-      }
-      expression e = gfc2pips_expr2expression(d->expr);
-      //transformer ce petit bout en une boucle ou une fonction récursive pour dump les elsif
-      if(e == expression_undefined) {
-        fprintf(stderr,
-                "An error occured: impossible to translate a IF expression condition\n");
-        return make_instruction_block(NULL);
-      }
-      statement s_if = statement_undefined;
-      statement s_else = statement_undefined;
-      //IF
-      if(d->next) {
+      } else if(!d->next) {
+        return_instruction = make_instruction_block(NULL);
+      } else {
+        /* Let's produce an IF statement */
+
+        expression e = gfc2pips_expr2expression(d->expr);
+        statement s_if = statement_undefined;
+        statement s_else = statement_undefined;
+
+        /* Recursive call */
         instruction s_if_i = gfc2pips_code2instruction(d->next, false);
-        message_assert( "s_if_i is defined\n", s_if_i != instruction_undefined );
+
+        message_assert( "Can't produce if instruction !\n",
+            s_if_i != instruction_undefined );
+
         s_if = instruction_to_statement(s_if_i);
         statement_label(s_if) = gfc2pips_code2get_label(d->next);
-        //ELSE + ?
+
+        /* Handle else */
         if(d->block) {
-          //s_else = instruction_to_statement(gfc2pips_code2instruction(d->block,false));
-          //ELSE IF
-          if(d->block->expr) {
-            //fprintf(stderr,"d->block->expr %d\n",d->block->expr);
+          instruction s_else_i;
+          if(d->block->expr) { /* this is an ELSE IF */
+            /* Recursive call */
             instruction ins = gfc2pips_code2instruction_(d);
-            if(ins != instruction_undefined) {
-              s_else = instruction_to_statement(ins);
-              statement_label(s_else) = gfc2pips_code2get_label(d);
-            }
-            //ELSE
-          } else {
-            //fprintf(stderr,"d->block %d\n",d->block);
-            instruction s_else_i = gfc2pips_code2instruction(d->block->next,
-                                                             false);
-            message_assert( "s_else_i is defined\n", s_else_i
-                !=instruction_undefined );
-            s_else = instruction_to_statement(s_else_i);//no condition therefore we are in the last ELSE statement
-            statement_label(s_else) = gfc2pips_code2get_label(d->block->next);
+          } else {/* No condition therefore we are in the last ELSE statement */
+            /* Recursive call */
+            s_else_i = gfc2pips_code2instruction(d->block->next, false);
           }
+          message_assert( "s_else_i is defined\n", s_else_i !=instruction_undefined );
+          s_else = instruction_to_statement(s_else_i);
+          statement_label(s_else) = gfc2pips_code2get_label(d->block->next);
+        } else {
+          s_else = make_empty_block_statement();
         }
-      } else {
-        return make_instruction_block(NULL);
-      }
-      if(s_if == statement_undefined || statement_instruction(s_if)
-          ==instruction_undefined) {
-        s_if = make_empty_block_statement();
-        statement_label(s_if) = gfc2pips_code2get_label(d->next);
-      }
-      if(s_else == statement_undefined || statement_instruction(s_else)
-          ==instruction_undefined) {
-        s_else = make_empty_block_statement();
-        if(d && d->block) {
-          if(d->block->expr) {
-            statement_label(s_else) = gfc2pips_code2get_label(d);
-          } else {
-            statement_label(s_else) = gfc2pips_code2get_label(d->block->next);
-          }
-        }
-      }
-      return test_to_instruction(make_test(e, s_if, s_else));
 
-      //IF ( expr ){ next } block
-      //block= ELSE IF ( expr ){ next } block
-      //block = ELSE { next }
-    }
+        return_instruction = test_to_instruction(make_test(e, s_if, s_else));
+
+      }
       break;
-
-      //we HAVE TO create a list of instructions so we shouldn't put it here but in gfc2pips_code2instruction() (done)
-      /*		case EXEC_SELECT:{//it is a switch or several elseif
-       gfc2pips_debug(5, "Translation of SELECT into IF\n");
-       list list_of_instructions_p = NULL, list_of_instructions = NULL;
-       gfc_case *cp;
-       gfc_code *d = c->block;
-
-       expression tested_variable = gfc2pips_expr2expression(c->expr);
-
-       for (; d; d = d->block){
-       //create a function with low/high returning a test in one go
-       expression test_expr;
-       for (cp = d->ext.case_list; cp; cp = cp->next){
-       test_expr = gfc2pips_buildCaseTest(tested_variable,cp);
-       //transform add a list of OR to follow the list as in gfc
-       }
-
-       instruction s_if = gfc2pips_code2instruction(d->next,false);
-       //boucle//s_if = instruction_to_statement(gfc2pips_code2instruction(d->next,false));
-       instruction select_case = test_to_instruction(
-       make_test(
-       test_expr,
-       s_if,
-       instruction_undefined
-       )
-       );
-       list_of_instructions = gen_nconc(list_of_instructions, CONS(INSTRUCTION, select_case, NULL));
-       }
-
-       return make_instruction_block(list_of_instructions);
-       }break;
-       */
-      /* FIXME Not implemented in vanilla pips, have to merge RR Branch (Mehdi)
-       case EXEC_WHERE:{//do not pass the controlizer but is all right
-       gfc2pips_debug(5, "Translation of WHERE\n");
-       message_assert("block to dump\n",c->block);
-       gfc_code* d = c->block;
-       where w = make_where(
-       d->expr ? gfc2pips_expr2expression(d->expr) : expression_undefined,
-       instruction_to_statement(gfc2pips_code2instruction(d->next,true)),
-       where_undefined
-       );
-       where parcour = w;
-       for (d = d->block; d; d = d->block){
-       gfc2pips_debug(5, "Translation of ELSEWHERE\n");
-       where_elsewhere(parcour) = make_where(
-       d->expr ? gfc2pips_expr2expression(d->expr) : expression_undefined,
-       instruction_to_statement(gfc2pips_code2instruction(d->next,true)),
-       where_undefined
-       );
-       parcour = where_elsewhere(parcour);
-       }
-       return make_instruction(is_instruction_where, w);
-       }break;
-       */
-      /* FIXME Not implemented in vanilla pips, have to merge RR Branch (Mehdi)
-       case EXEC_FORALL: {
-       gfc2pips_debug(5, "Translation of FORALL\n");
-
-       /*
-       Dump implementation assuming the following equivalence is true
-       (but it's not according to Ronan)
-
-       FORALL (X=1:100:3,y=2:20,z=3:4, c(z)>0)
-       a(x,y,z)=c(z)
-       END FORALL
-       <=>
-       DO X=1:100:3
-       DO Y=2:20
-       DO Z=3:4
-       IF(c(z)>0)
-       a(x,y,z)=c(z)
-       ENDIF
-       ENDDO
-       ENDDO
-       ENDDO
-       */
-      /* FIXME
-       // forall = index:entity* x ranges:range* x test:expression x body:statement ;
-       list list_of_indexes = NULL;
-       list list_of_ranges = NULL;
-       gfc_forall_iterator *fa;
-
-       instruction forall_instructions =
-       gfc2pips_code2instruction( c->block->next, true );
-       for ( fa = c->ext.forall_iterator; fa; fa = fa->next ) {
-       list_of_indexes
-       = CONS(ENTITY, gfc2pips_expr2entity(fa->var), list_of_indexes );
-       list_of_ranges = CONS(RANGE,
-       make_range(
-       gfc2pips_expr2expression(fa->start),
-       gfc2pips_expr2expression(fa->end),
-       gfc2pips_expr2expression(fa->stride)
-       ),
-       list_of_ranges
-       );
-       }
-       if ( list_of_indexes != NULL ) {
-       //add a IF also
-       return (instruction) make_instruction_forall( make_forall( list_of_indexes,
-       list_of_ranges,
-       c->expr ? gfc2pips_expr2expression( c->expr )
-       : expression_undefined,
-       instruction_to_statement(forall_instructions) ) );
-       } else {
-       pips_user_error( "No iterator for FORALL\n" );
-       }
-       }
-       break;*/
-
+    }
     case EXEC_DO: {
       gfc2pips_debug(5, "Translation of DO\n");
+      //      /* keep trace of enclosing loops *
       gfc2pips_push_loop(c);
+
+      /* recursive call, get loop body */
       instruction do_i = gfc2pips_code2instruction(c->block->next, true);
       message_assert( "first instruction defined", do_i
           !=instruction_undefined );
@@ -3008,55 +2841,68 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
        * add to s a continue statement at the end to make
        * cycle/continue statements
        */
-      list list_of_instructions =
-          sequence_statements(instruction_sequence(statement_instruction(s)));
-      list_of_instructions = gen_nreverse(list_of_instructions);
-      /*      list_of_instructions
-       = gen_cons( make_continue_statement( gfc2pips_int2label( gfc2pips_last_created_label ) ),
-       list_of_instructions );
-       gfc2pips_last_created_label -= gfc2pips_last_created_label_step;*/
-      list_of_instructions = gen_nreverse(list_of_instructions);
-      sequence_statements(instruction_sequence(statement_instruction(s)))
-          = list_of_instructions;
+      /*
+       list list_of_instructions =
+       sequence_statements(instruction_sequence(statement_instruction(s)));
+       entity lbl = gfc2pips_int2label( gfc2pips_last_created_label );
+       list_of_instructions = gen_nconc(list_of_instructions,
+       CONS(STATEMENT,
+       make_continue_statement( lbl ),
+       NULL)
+       );
+       gfc2pips_last_created_label -= gfc2pips_last_created_label_step;
+       sequence_statements(instruction_sequence(statement_instruction(s)))
+       = list_of_instructions;
+       */
 
-      //statement_label(s)=gfc2pips_code2get_label(c->block->next);//should'nt be any label here, if any, put on first instruction, and if no instruction is there no need to really dump the loop ?
-      pips_loop
-          w =
-              make_loop(gfc2pips_expr2entity(c->ext.iterator->var),//variable incremented
-                        make_range(gfc2pips_expr2expression(c->ext.iterator->start),
-                                   gfc2pips_expr2expression(c->ext.iterator->end),
-                                   gfc2pips_expr2expression(c->ext.iterator->step)),//lower, upper, increment
-                        s,
-                        gfc2pips_code2get_label2(c),
-                        make_execution_sequential(),//sequential/parallel //beware gfc parameters to say it is a parallel or a sequential loop
-                        NULL);
+      range r = make_range(gfc2pips_expr2expression(c->ext.iterator->start),
+                           gfc2pips_expr2expression(c->ext.iterator->end),
+                           gfc2pips_expr2expression(c->ext.iterator->step));//lower, upper, increment
+
+      entity loop_index = gfc2pips_expr2entity(c->ext.iterator->var);
+
+      // Fixme : what about parallel loop ? Check gfc...
+      pips_loop w = make_loop(loop_index,
+                              r,
+                              s,
+                              gfc2pips_code2get_label2(c),
+                              make_execution_sequential(),
+                              NULL);
       gfc2pips_pop_loop();
-      return make_instruction_loop(w);
+      return_instruction = make_instruction_loop(w);
 
-    }
       break;
-
+    }
     case EXEC_DO_WHILE: {
       gfc2pips_debug(5, "Translation of DO WHILE\n");
+      /* keep trace of enclosing loops */
       gfc2pips_push_loop(c);
+
+      /* Get body (recursive call) */
       instruction do_i = gfc2pips_code2instruction(c->block->next, true);
-      message_assert( "first instruction defined", do_i
-          !=instruction_undefined );
+      message_assert( "first instruction defined",
+                      do_i!=instruction_undefined );
       statement s = instruction_to_statement(do_i);
 
-      //add to s a continue statement at the end to make cycle/continue statements
-      list list_of_instructions =
-          sequence_statements(instruction_sequence(statement_instruction(s)));
-
-      //TODO: check if there is a CYCLE in the loop, check there isn't already a continue at the end of the list
-      list_of_instructions = gen_nreverse(list_of_instructions);
-      list_of_instructions
-          = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label)),
-                     list_of_instructions);
-      gfc2pips_last_created_label -= gfc2pips_last_created_label_step;
-      list_of_instructions = gen_nreverse(list_of_instructions);
-      sequence_statements(instruction_sequence(statement_instruction(s)))
-          = list_of_instructions;
+      /*
+       * it would be perfect if we knew there is a EXIT or a CYCLE in the loop,
+       * do not add if already one (then how to stock the label ?)
+       * add to s a continue statement at the end to make
+       * cycle/continue statements
+       */
+      /*
+       list list_of_instructions =
+       sequence_statements(instruction_sequence(statement_instruction(s)));
+       entity lbl = gfc2pips_int2label( gfc2pips_last_created_label );
+       list_of_instructions = gen_nconc(list_of_instructions,
+       CONS(STATEMENT,
+       make_continue_statement( lbl ),
+       NULL)
+       );
+       gfc2pips_last_created_label -= gfc2pips_last_created_label_step;
+       sequence_statements(instruction_sequence(statement_instruction(s)))
+       = list_of_instructions;
+       */
 
       statement_label(s) = gfc2pips_code2get_label(c->block->next);
       whileloop w = make_whileloop(gfc2pips_expr2expression(c->expr),
@@ -3064,102 +2910,50 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
                                    gfc2pips_code2get_label2(c),
                                    make_evaluation_before());
       gfc2pips_pop_loop();
-      return make_instruction_whileloop(w);
-    }
+      return_instruction = make_instruction_whileloop(w);
       break;
-
+    }
     case EXEC_CYCLE: {
       gfc2pips_debug(5, "Translation of CYCLE\n");
       gfc_code* loop_c = gfc2pips_get_last_loop();
       entity label = entity_undefined;
-      if(true) {
-        //label = gfc2pips_code2get_label2(loop_c->block->next->label);
-        label = gfc2pips_int2label(gfc2pips_last_created_label);
-      } else {
-        int num = gfc2pips_get_num_of_gfc_code(loop_c->block->next);
-        fprintf(stderr, "%zu\n", gen_length(gfc2pips_list_of_loops));
-        string lab;
-        asprintf(&lab,
-                 "%s%s%s1%d",
-                 CurrentPackage,
-                 MODULE_SEP_STRING,
-                 LABEL_PREFIX,
-                 num);
-        fprintf(stderr, "%s", lab);
-        label = make_label(lab);
-        free(lab);
-      }
-      instruction i = make_instruction_goto(make_continue_statement(label));
-      return i;
-    }
+      label = gfc2pips_int2label(gfc2pips_last_created_label);
+      return_instruction = make_instruction_goto(make_continue_statement(label));
       break;
-    case EXEC_EXIT: {
+    }
+    case EXEC_EXIT: { // FIXME : is the following really an exit ?
       gfc2pips_debug(5, "Translation of EXIT\n");
       gfc_code* loop_c = gfc2pips_get_last_loop();
       entity label = entity_undefined;
-      if(true) {//loop_c->block->next->label){
-        //label = gfc2pips_code2get_label2(loop_c->block->next->label);
-        label = gfc2pips_int2label(gfc2pips_last_created_label - 1);
-      } else {
-        int num = gfc2pips_get_num_of_gfc_code(loop_c->block->next);
-        fprintf(stderr, "%zu\n", gen_length(gfc2pips_list_of_loops));
-        string lab;
-        asprintf(&lab,
-                 "%s%s%s1%d",
-                 CurrentPackage,
-                 MODULE_SEP_STRING,
-                 LABEL_PREFIX,
-                 num);
-        fprintf(stderr, "%s", lab);
-        label = make_label(lab);
-        free(lab);
-      }
-      instruction i = make_instruction_goto(make_continue_statement(label));
-      return i;
-      /*	      fputs ("EXIT", dumpfile);
-       if (c->symtree)
-       fprintf (dumpfile, " %s", c->symtree->n.sym->name);
-       break;
-       */
-    }
+      label = gfc2pips_int2label(gfc2pips_last_created_label - 1);
+      return_instruction = make_instruction_goto(make_continue_statement(label));
       break;
-
+    }
     case EXEC_ALLOCATE:
     case EXEC_DEALLOCATE: {
-      gfc2pips_debug(5, "Translation of %s\n",c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
+      gfc2pips_debug(5, "Translation of %s\n",
+                     c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
       list lci = NULL;
       gfc_alloc *a;
-      /*
-       entity
-       e =
-       FindOrCreateEntity( strdup( TOP_LEVEL_MODULE_NAME ),
-       str2upper( strdup( c->op == EXEC_ALLOCATE ? "allocate"
-       : "deallocate" ) ) );
-       entity_initial(e) = make_value( is_value_intrinsic, e );
-
-       pips_user_warning("Force to be an intrinsic : %s\n",
-       gfc2pips_get_safe_name( entity_name( e)));
-
-       entity_type(e)
-       = make_type_functional( make_functional( NIL, MakeOverloadedResult( ) ) );
-       */
 
       entity e =
           CreateIntrinsic(c->op == EXEC_ALLOCATE ? ALLOCATE_FUNCTION_NAME
                                                  : DEALLOCATE_FUNCTION_NAME);
 
-      //some problem inducted by the prettyprinter output become DEALLOCATE (variable, STAT=, I)
+      /* some problem inducted by the prettyprinter output become :
+       * DEALLOCATE(variable, STAT=, I)
+       * (note STAT= without nothing else)
+       */
       if(c->expr) {
         gfc2pips_debug(5,"Handling STAT=\n");
         lci = gfc2pips_exprIO("STAT=", c->expr, NULL);
       }
       for (a = c->ext.alloc_list; a; a = a->next) {
-        lci = CONS( EXPRESSION, gfc2pips_expr2expression( a->expr ), lci );//DATA_LIST_FUNCTION_NAME, IO_LIST_STRING_NAME, or sthg else ?
-        //show_expr (a->expr);
+        lci = CONS( EXPRESSION, gfc2pips_expr2expression( a->expr ), lci );
       }
-      return make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
-    }
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
       break;
+    }
     case EXEC_OPEN: {
       gfc2pips_debug(5, "Translation of OPEN\n");
 
@@ -3211,17 +3005,15 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       if(o->unit)
         lci = gfc2pips_exprIO("UNIT=", o->unit, lci);
 
-      return make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
 
-    }
       break;
-
+    }
     case EXEC_CLOSE: {
       gfc2pips_debug(5, "Translation of CLOSE\n");
 
       entity e = CreateIntrinsic(CLOSE_FUNCTION_NAME);
 
-      call call_ = make_call(e, NULL);
       list lci = NULL;
       gfc_close * o = c->ext.close;
 
@@ -3235,10 +3027,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("IOMSG=", o->iomsg, lci);
       if(o->unit)
         lci = gfc2pips_exprIO("UNIT=", o->unit, lci);
-      return make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
-    }
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
       break;
-
+    }
     case EXEC_BACKSPACE:
     case EXEC_ENDFILE:
     case EXEC_REWIND:
@@ -3257,7 +3048,6 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
 
       entity e = CreateIntrinsic((string)str);
 
-      call call_ = make_call(e, NULL);
       gfc_filepos *fp;
       fp = c->ext.filepos;
 
@@ -3270,16 +3060,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("UNIT=", fp->iomsg, lci);
       if(fp->unit)
         lci = gfc2pips_exprIO("UNIT=", fp->unit, lci);
-      return make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
-    }
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
       break;
-
+    }
     case EXEC_INQUIRE: {
       gfc2pips_debug(5, "Translation of INQUIRE\n");
 
       entity e = CreateIntrinsic(INQUIRE_FUNCTION_NAME);
 
-      call call_ = make_call(e, NULL);
       list lci = NULL;
       gfc_inquire *i = c->ext.inquire;
 
@@ -3353,16 +3141,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("FILE=", i->file, lci);
       if(i->unit)
         lci = gfc2pips_exprIO("UNIT=", i->unit, lci);
-      return make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
-    }
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
       break;
-
-      /*	    case EXEC_IOLENGTH:
-       fputs ("IOLENGTH ", dumpfile);
-       show_expr (c->expr);
-       goto show_dt_code;
-       break;
-       */
+    }
     case EXEC_READ:
     case EXEC_WRITE: {
       gfc2pips_debug(5, "Translation of %s\n",c->op==EXEC_WRITE?"PRINT":"READ");
@@ -3407,7 +3188,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
           } else if(instruction_call_p(i)) {
             lci = CONS(EXPRESSION,call_to_expression(instruction_call(i)),lci);
           } else {
-            pips_user_warning("We don't know how to handle op : %d \n", c->op);
+            if(c->op != EXEC_DT_END) {
+              pips_user_warning("We don't know how to handle op : %d\n", c->op);
+            }
             continue;
           }
         }
@@ -3569,14 +3352,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         }
       }
 
-      return make_instruction_call(make_call(e, lci));
+      return_instruction = make_instruction_call(make_call(e, lci));
 
     }
       break;
     case EXEC_TRANSFER: {
       // FIXME, chained transfert ? c->block->next not null ?
       expression transfered = gfc2pips_expr2expression(c->expr);
-      return make_instruction_expression(transfered);
+      return_instruction = make_instruction_expression(transfered);
       break;
     }
     case EXEC_DT_END:
@@ -3605,12 +3388,26 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
     case EXEC_OMP_WORKSHARE:
       pips_user_warning("OpenMP is not supported !!\n");
       break;
+    case EXEC_ENTRY:
+      pips_user_warning( "Don't know What to do with entry ! (%s)\n",
+          c->ext.entry->sym->name );
+      break;
+    case EXEC_LABEL_ASSIGN:
+      pips_user_warning( "Don't know What to do with Label-assign ! (%d)\n",
+          c->label->value);
+      break;
+    case EXEC_IOLENGTH:
+      pips_user_warning( "Don't know What to do with IOLENGTH !\n");
+       break;
     default:
       pips_user_warning( "not yet dumpable %d\n", (int) c->op );
   }
 
-  //return instruction_undefined;
-  return make_instruction_block(NULL);;
+  if(return_instruction == instruction_undefined) {
+    return_instruction = make_instruction_block(NULL);
+  }
+
+  return return_instruction;
 }
 
 expression gfc2pips_buildCaseTest(gfc_expr *test, gfc_case *cp) {
@@ -3708,10 +3505,9 @@ list gfc2pips_dumpSELECT(gfc_code *c) {
         // Default case
         default_stmt = make_stmt_of_instr(s_if);
       } else {
-        casetest
-            = make_stmt_of_instr(test_to_instruction(make_test(test_expr,
-                                                               make_stmt_of_instr(s_if),
-                                                               make_empty_block_statement())));
+        casetest = make_stmt_of_instr(test_to_instruction(make_test(test_expr,
+                make_stmt_of_instr(s_if),
+                make_empty_block_statement())));
         if(current_case != NULL) {
           free_statement(test_false(statement_test(current_case)));
           test_false(statement_test(current_case)) = casetest;
