@@ -3,6 +3,7 @@
  $Id$
 
  Copyright 1989-2010 MINES ParisTech
+ Copyright 2009-2010 HPC-Project
 
  This file is part of PIPS.
 
@@ -21,9 +22,11 @@
  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
  */
+
 #ifdef HAVE_CONFIG_H
 #include "pips_config.h"
 #endif
+
 /* **
  * This is the Fortran95 pips parser aka gfc2pips
  *
