@@ -1379,7 +1379,7 @@ entity RenameFunctionEntity(entity oe)
 
       /* We assume oe is not already part of a declaration list since
 	 its formal parameters have been taken care of */
-      free_entity(oe);
+      gen_clear_tabulated_element((gen_chunkp)oe);
     }
   }
   return ne;
