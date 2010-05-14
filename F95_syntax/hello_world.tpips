@@ -1,8 +1,8 @@
-delete main01
+delete hello_world
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create main01 main01.f90
+create hello_world hello_world.f90
 
 display PRINTED_FILE[%ALL]
 
@@ -11,7 +11,7 @@ apply UNSPLIT[%ALL]
 echo
 echo "compile sources produced by pips"
 echo
-shell gcc -c -o main01.database/Src/main01.o main01.database/Src/main01.f90
+shell gcc -c -o hello_world.database/Src/hello_world.o hello_world.database/Src/hello_world.f90
 
 close
 quit
