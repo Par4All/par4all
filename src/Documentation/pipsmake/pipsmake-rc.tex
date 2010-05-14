@@ -8173,13 +8173,12 @@ call sites of the inlined function are inlined.
 \begin{PipsMake}
 
 inlining      > CALLERS.parsed_code
-		! MODULE.split_Initializations
+		! MODULE.split_initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
 		< MODULE.code
         < MODULE.cumulated_effects
-        < MODULE.callers
 \end{PipsMake}
 
 \begin{PipsPass}{inlining_simple}

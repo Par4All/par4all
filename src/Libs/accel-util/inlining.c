@@ -330,7 +330,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         set inlined_referenced_entities = get_referenced_entities(expanded);
         list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
         set_free(inlined_referenced_entities);
-        //list new_externs = NIL;
+
         FOREACH(ENTITY,ref_ent,lire)
         {
             if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
@@ -449,23 +449,11 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             {
                 /* create new variable to receive computation result */
                 pips_assert("returned value is a variable", type_variable_p(treturn));
-                do {
                     returned_entity(p)= make_new_scalar_variable_with_prefix(
                             "_return",
                             get_current_module_entity(),
                             copy_basic(variable_basic(type_variable(treturn)))
                             );
-                    /* make_new_scalar_variable does not ensure the entity is not defined in enclosing statement, we check this */
-                    FOREACH(ENTITY,ent,statement_declarations(expanded))
-                    {
-                        if(same_string_p(entity_user_name(ent),entity_user_name(returned_entity(p))))
-                        {
-                            returned_entity(p)=entity_undefined;
-                            break;
-                        }
-                    }
-                } while(entity_undefined_p(returned_entity(p)));
-
                 AddEntityToCurrentModule(returned_entity(p));
 
                 /* do the replacement */
