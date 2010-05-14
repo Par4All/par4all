@@ -129,7 +129,7 @@ C (0,7)
 C        END BLOCK
       ENDDO
 
-C  P(I,J,N) {I==3, J==3, N==0}
+C  P(I,J,N) {I==4, J==4, N==0}
 
 C (0,8)
 

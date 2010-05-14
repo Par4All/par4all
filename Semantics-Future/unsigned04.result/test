@@ -68,7 +68,7 @@ int main(void)
 
    ui = i;
 
-//  P(i,ui) {i==-1, ui==4294967295}
+//  P(i,ui) {i==-1, ui==-1}
 
 
    fprintf(stderr, "ui = %u\n", ui);
@@ -130,7 +130,7 @@ int main(void)
 
    ui = i;
 
-//  P(i,ui) {i==-1, ui==4294967295}
+//  P(i,ui) {i==-1, ui==-1}
 
 
    fprintf(stderr, "ui = %u\n", ui);
