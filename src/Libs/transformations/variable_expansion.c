@@ -70,9 +70,10 @@ typedef struct  {
     list loop_replacement ;
     list loop_dimensions ;
     entity expanded_variable ;
+    entity expanded_variable_replacment ;
     list processed_variables ;
 } scalar_expansion_context;
-#define DEFAULT_SCALAR_EXPANSION_CONTEXT { NIL,NIL,NIL,entity_undefined,NIL }
+#define DEFAULT_SCALAR_EXPANSION_CONTEXT { NIL,NIL,NIL,entity_undefined,entity_undefined,NIL }
 
 static bool perform_reference_expansion(reference r,scalar_expansion_context *ctxt)
 {
@@ -85,6 +86,7 @@ static bool perform_reference_expansion(reference r,scalar_expansion_context *ct
 
     pips_debug(9, "for variable %s\n", entity_local_name(v));
 
+    reference_variable(r) = ctxt->expanded_variable_replacment;
     reference_indices(r) = gen_copy_seq(ctxt->loop_replacement);
 
     ifdebug(9) {
@@ -106,7 +108,7 @@ perform_reference_expansion_in_loop(instruction i,scalar_expansion_context *ctxt
         range r = loop_range(l);
         if(same_entity_p(loop_index(l),ctxt->expanded_variable) ) 
         {
-            expression new_ref = make_ref_expr(ctxt->expanded_variable,gen_copy_seq(ctxt->loop_replacement));
+            expression new_ref = make_ref_expr(ctxt->expanded_variable_replacment,gen_copy_seq(ctxt->loop_replacement));
             /* we have to convert the do-loop into a for-loop */
             forloop new_loop = make_forloop(
                     expression_undefined,
@@ -194,8 +196,10 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
         expression eli = EXPRESSION(CAR(gen_last(ctxt->loop_indices)));
         expression elr = EXPRESSION(CAR(gen_last(ctxt->loop_replacement)));
         if(same_entity_p(i,reference_variable(expression_reference(eli)))) {
+            statement parent = (statement)gen_get_ancestor(statement_domain,l);
             dimension d = DIMENSION(CAR(gen_last(ctxt->loop_dimensions)));
             list evl = NIL;
+            list new_entities = NIL;
 
             ifdebug(9) {
                 pips_debug(9, "Going up, local variables: ");
@@ -211,27 +215,26 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
                     type t = entity_type(lv);
                     variable v = type_variable(t);
                     list dims = variable_dimensions(v);
-                    statement bs = loop_body(l);
-
                     pips_assert("Scalar expansion", ENDP(dims) );
+                    /* create a new entity to hold the private */
+                    entity new_entity = make_new_array_variable_with_prefix(
+                            entity_user_name(lv),
+                            get_current_module_entity(),
+                            copy_basic(entity_basic(lv)),
+                            gen_full_copy_list(ctxt->loop_dimensions));
 
                     evl = CONS(ENTITY, lv, evl);
-
-                    pips_debug(9, "Update type of %s\n", entity_local_name(lv));
-
-                    /* Update its type */
-                    variable_dimensions(v) = gen_full_copy_list(ctxt->loop_dimensions);
-
-                    /* print_type(); */
+                    new_entities = CONS(ENTITY, new_entity, new_entities);
 
                     /* Update its references in the loop body */
-
                     pips_debug(9, "Expand references to %s\n", entity_local_name(lv));
                     ctxt->expanded_variable = lv;
-                    gen_context_multi_recurse(bs,ctxt, reference_domain, perform_reference_expansion, gen_null,
+                    ctxt->expanded_variable_replacment = new_entity;
+                    gen_context_multi_recurse(parent,ctxt, reference_domain, perform_reference_expansion, gen_null,
                             instruction_domain,gen_true,perform_reference_expansion_in_loop,
                             0);
                     ctxt->expanded_variable = entity_undefined;
+                    ctxt->expanded_variable_replacment = entity_undefined;
                 }
             }
 
@@ -245,13 +248,16 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
             gen_remove(&ctxt->loop_replacement, (void *) elr);
             gen_remove(&ctxt->loop_dimensions, (void *) d);
             free_dimension(d);
+            /* add new entities to statement */
+            FOREACH(ENTITY,new_entity,new_entities) 
+                AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),parent);
+            gen_free_list(new_entities);
         }
     }
 }
 
 static bool scalar_expansion(char *module_name)
 {
-    pips_user_warning("\nExperimental phase: on-going debugging!\n");
     /* prelude */
     set_current_module_entity(module_name_to_entity(module_name) );
     set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
