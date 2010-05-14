@@ -885,10 +885,31 @@ transformer statement_to_postcondition(
 
    I do not remember if the standard prohibits this or not, but it may
    well forbid such expressions or state that the result is undefined.
+
+   But you can also have:
+
+   int a[i++][foo(i)];
+
+   or
+
+   int a[i++][j=foo(i)];
+
+   and the intermediate steps are overlooked by
+   declaration_to_transformer() but can be checked with a proper
+   process_dimensions() function.
+
+   This function can be called from ri_to_preconditions.c to propagate
+   preconditions or from interprocedural.c to compute summary
+   preconditions. In the second case, the necessary side effects are
+   provided by the two functional parameters.
 */
-transformer propagate_preconditions_in_declarations(list dl,
-						    transformer pre,
-						    void (*process)(expression, transformer))
+transformer propagate_preconditions_in_declarations
+(list dl,
+ transformer pre,
+ void (*process_initial_expression)(expression, transformer)
+ // FI: ongoing implementation
+ //, transformer (*process_dimensions)(entity, transformer),
+)
 {
   //entity v = entity_undefined;
   //transformer btf = transformer_undefined;
@@ -904,11 +925,13 @@ transformer propagate_preconditions_in_declarations(list dl,
     entity v = ENTITY(CAR(l));
     expression ie = variable_initial_expression(v);
     transformer stf = declaration_to_transformer(v, pre);
+    // FI: ongoing implementation
+    //transformer stf = (*process_dimensions)(v, pre);
     transformer btf = transformer_dup(stf);
     transformer next_pre = transformer_undefined;
 
     if(!expression_undefined_p(ie)) {
-      (*process)(ie, pre);
+      (*process_initial_expression)(ie, pre);
       free_expression(ie);
     }
 
@@ -919,7 +942,7 @@ transformer propagate_preconditions_in_declarations(list dl,
       v = ENTITY(CAR(l));
       ie = variable_initial_expression(v);
       if(!expression_undefined_p(ie)) {
-	(*process)(ie, post);
+	(*process_initial_expression)(ie, post);
 	free_expression(ie);
       }
 
