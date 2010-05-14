@@ -2954,5 +2954,6 @@ bool brace_expression_p(expression e)
 boolean reference_scalar_p(reference r)
 {
     assert(!reference_undefined_p(r) && r!=NULL && reference_variable(r)!=NULL);
-    return (reference_indices(r) == NIL);
+    return (reference_indices(r) == NIL
+        && entity_scalar_p(reference_variable(r)));
 }
