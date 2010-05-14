@@ -104,8 +104,6 @@ char *CurrentPackage;
 
 int global_current_offset = 0;
 
-list gfc2pips_list_of_declared_code = NULL;
-list gfc2pips_list_of_loops = NULL;
 
 list gfc2pips_format = NULL;//list of expression format
 list gfc2pips_format2 = NULL;//list of labels for above
@@ -571,10 +569,15 @@ void gfc2pips_namespace(gfc_namespace* ns) {
 
   //  SetChains( ); // ??????????
 
-  /* using ComputeAddresses() point a problem : entities in *STATIC*
+  /*
+   * RR said :
+   * using ComputeAddresses() point a problem : entities in *STATIC*
    * are computed two times, however we have to use it !
+   *
+   * But well... try it anyway !
    */
-  gfc2pips_computeAdresses();
+  //gfc2pips_computeAdresses();
+  ComputeAddresses();
 
   //compute equivalences
   //gfc2pips_computeEquiv(ns->equiv);
@@ -851,53 +854,32 @@ list gfc2pips_args(gfc_namespace* ns) {
   if(ns && ns->proc_name) {
 
     current = gfc2pips_getSymtreeByName(ns->proc_name->name, ns->sym_root);
-    //découper ce bout pour en faire une sous-fonction appelable pour n'importe quel gfc_symtree ?
     if(current && current->n.sym) {
       if(current->n.sym->formal) {
         //we have a pb with alternate returns
         formal = current->n.sym->formal;
         if(formal) {
           if(formal->sym) {
-            e
-                = gfc2pips_symbol2entity(gfc2pips_getSymtreeByName(formal->sym->name,
-                                                                   ns->sym_root)->n.sym);
+            gfc_symtree* sym = gfc2pips_getSymtreeByName(formal->sym->name,
+                                                         ns->sym_root);
+            e = gfc2pips_symbol2entity(sym->n.sym);
           } else {
-            return NULL;//alternate returns are obsolete in F90 (and since we only want it)
-            uses_alternate_return(true);
-            e
-                = generate_pseudo_formal_variable_for_formal_label(CurrentPackage,
-                                                                   get_current_number_of_alternate_returns());
-            if(entity_type(e) == type_undefined) {
-              entity_type(e)
-                  = make_type_variable(make_variable(make_basic_overloaded(),
-                                                     NULL,
-                                                     NULL));
-            }
+            //alternate returns are obsolete in F90 (and since we only want it)
+            return NULL;
           }
-          args_list = args_list_p = CONS( ENTITY, e, NULL );//fprintf(stderr,"%s\n",formal->sym->name);
-
+          args_list = args_list_p = CONS( ENTITY, e, NULL );
 
           formal = formal->next;
           while(formal) {
             gfc2pips_debug(9,"alt return %s\n", formal->sym?"no":"yes");
             if(formal->sym) {
-              e
-                  = gfc2pips_symbol2entity(gfc2pips_getSymtreeByName(formal->sym->name,
-                                                                     ns->sym_root)->n.sym);
+              gfc_symtree* sym = gfc2pips_getSymtreeByName(formal->sym->name,
+                                                           ns->sym_root);
+              e = gfc2pips_symbol2entity(sym->n.sym);
               CDR( args_list) = CONS( ENTITY, e, NULL );
               args_list = CDR( args_list );
             } else {
               return args_list_p;
-              //return args_list_p;//alternate returns are obsolete in F90 (and since we only want it)
-              /*uses_alternate_return(true);
-               e = generate_pseudo_formal_variable_for_formal_label(
-               CurrentPackage,
-               get_current_number_of_alternate_returns()
-               );
-               if(entity_type(e)==type_undefined)
-               entity_type(e) = type_alt_return;
-               CDR(args_list) = CONS(ENTITY, e, NULL );
-               args_list = CDR(args_list);*/
             }
             formal = formal->next;
           }
@@ -907,6 +889,7 @@ list gfc2pips_args(gfc_namespace* ns) {
   }
   return args_list_p;
 }
+
 
 /**
  * @brief replace a list of entities by a list of parameters to those entities
@@ -927,6 +910,7 @@ void gfc2pips_generate_parameters_list(list parameters) {
     POP( parameters );
   }
 }
+
 
 /**
  * @brief Look for a specific symbol in a tree
@@ -2669,7 +2653,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       entity e = CreateIntrinsic(RETURN_FUNCTION_NAME);
 
       if(c->expr) {
-        expression args =  gfc2pips_expr2expression( c->expr );
+        expression args = gfc2pips_expr2expression(c->expr);
         return_instruction = MakeUnaryCallInst(e, args);
       } else {
         return_instruction = MakeNullaryCallInst(e);
@@ -2682,7 +2666,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
 
       list args = NULL;
       if(c->expr) {
-        expression args =  gfc2pips_expr2expression( c->expr );
+        expression args = gfc2pips_expr2expression(c->expr);
         return_instruction = MakeUnaryCallInst(e, args);
       } else {
         return_instruction = MakeNullaryCallInst(e);
@@ -2694,7 +2678,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       entity e = CreateIntrinsic(STOP_FUNCTION_NAME);
 
       if(c->expr) {
-        expression args =  gfc2pips_expr2expression( c->expr );
+        expression args = gfc2pips_expr2expression(c->expr);
         return_instruction = MakeUnaryCallInst(e, args);
       } else {
         return_instruction = MakeNullaryCallInst(e);
@@ -2884,7 +2868,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       /* Get body (recursive call) */
       instruction do_i = gfc2pips_code2instruction(c->block->next, true);
       message_assert( "first instruction defined",
-                      do_i!=instruction_undefined );
+          do_i!=instruction_undefined );
       statement s = instruction_to_statement(do_i);
 
       /*
@@ -2921,7 +2905,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       gfc_code* loop_c = gfc2pips_get_last_loop();
       entity label = entity_undefined;
       label = gfc2pips_int2label(gfc2pips_last_created_label);
-      return_instruction = make_instruction_goto(make_continue_statement(label));
+      return_instruction
+          = make_instruction_goto(make_continue_statement(label));
       break;
     }
     case EXEC_EXIT: { // FIXME : is the following really an exit ?
@@ -2929,13 +2914,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       gfc_code* loop_c = gfc2pips_get_last_loop();
       entity label = entity_undefined;
       label = gfc2pips_int2label(gfc2pips_last_created_label - 1);
-      return_instruction = make_instruction_goto(make_continue_statement(label));
+      return_instruction
+          = make_instruction_goto(make_continue_statement(label));
       break;
     }
     case EXEC_ALLOCATE:
     case EXEC_DEALLOCATE: {
       gfc2pips_debug(5, "Translation of %s\n",
-                     c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
+          c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
       list lci = NULL;
       gfc_alloc *a;
 
@@ -2954,7 +2940,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       for (a = c->ext.alloc_list; a; a = a->next) {
         lci = CONS( EXPRESSION, gfc2pips_expr2expression( a->expr ), lci );
       }
-      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci,
+                                                                        NULL)));
       break;
     }
     case EXEC_OPEN: {
@@ -3008,7 +2995,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       if(o->unit)
         lci = gfc2pips_exprIO("UNIT=", o->unit, lci);
 
-      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci,
+                                                                        NULL)));
 
       break;
     }
@@ -3030,7 +3018,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("IOMSG=", o->iomsg, lci);
       if(o->unit)
         lci = gfc2pips_exprIO("UNIT=", o->unit, lci);
-      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci,
+                                                                        NULL)));
       break;
     }
     case EXEC_BACKSPACE:
@@ -3063,7 +3052,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("UNIT=", fp->iomsg, lci);
       if(fp->unit)
         lci = gfc2pips_exprIO("UNIT=", fp->unit, lci);
-      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci,
+                                                                        NULL)));
       break;
     }
     case EXEC_INQUIRE: {
@@ -3144,7 +3134,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
         lci = gfc2pips_exprIO("FILE=", i->file, lci);
       if(i->unit)
         lci = gfc2pips_exprIO("UNIT=", i->unit, lci);
-      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci, NULL)));
+      return_instruction = make_instruction_call(make_call(e, gen_nconc(lci,
+                                                                        NULL)));
       break;
     }
     case EXEC_READ:
@@ -3401,7 +3392,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       break;
     case EXEC_IOLENGTH:
       pips_user_warning( "Don't know What to do with IOLENGTH !\n");
-       break;
+      break;
     default:
       pips_user_warning( "not yet dumpable %d\n", (int) c->op );
   }
@@ -4559,246 +4550,4 @@ void gfc2pips_shiftAdressesOfArea(entity _area,
       gfc2pips_debug(9,"%s shifted of %d\n",entity_name(e),personnal_shift);
     }
   }
-}
-
-//we need to copy the content of the locus
-void gfc2pips_push_comment(locus l, unsigned long num, char s) {
-  printf("gfc2pips_push_comment \n");
-  if(gfc2pips_comments_stack) {
-    if(gfc2pips_check_already_done(l)) {
-      return;
-    }
-    gfc2pips_comments_stack->next = malloc(sizeof(struct _gfc2pips_comments_));
-    gfc2pips_comments_stack->next->prev = gfc2pips_comments_stack;
-    gfc2pips_comments_stack->next->next = NULL;
-
-    gfc2pips_comments_stack = gfc2pips_comments_stack->next;
-  } else {
-    gfc2pips_comments_stack = malloc(sizeof(struct _gfc2pips_comments_));
-    gfc2pips_comments_stack->prev = NULL;
-    gfc2pips_comments_stack->next = NULL;
-    gfc2pips_comments_stack_ = gfc2pips_comments_stack;
-  }
-  //fprintf(stderr,"push comments %d\n",l.lb->location);
-
-  gfc2pips_comments_stack->l = l;
-  gfc2pips_comments_stack->num = num;
-  gfc2pips_comments_stack->gfc = NULL;
-  gfc2pips_comments_stack->done = false;
-
-  gfc2pips_comments_stack->s = gfc2pips_gfc_char_t2string2(l.nextc);
-  gfc2pips_comments_stack->s[strlen(gfc2pips_comments_stack->s) - 2] = '\0';
-  strrcpy(gfc2pips_comments_stack->s + 1, gfc2pips_comments_stack->s);
-  *gfc2pips_comments_stack->s = s;
-  printf("gfc2pips_push_comment : '%s'\n", gfc2pips_comments_stack->s);
-}
-
-bool gfc2pips_check_already_done(locus l) {
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  while(retour) {
-    if(retour->l.nextc == l.nextc)
-      return true;
-    retour = retour->prev;
-  }
-  return false;
-}
-
-unsigned long gfc2pips_get_num_of_gfc_code(gfc_code *c) {
-  unsigned long retour = 0;
-  gfc2pips_comments curr = gfc2pips_comments_stack_;
-  while(curr) {
-    if(curr->gfc == c) {
-      return retour + 1;
-    }
-    curr = curr->next;
-    retour++;
-  }
-  if(retour)
-    return retour + 1;
-  return retour;// 0
-}
-string gfc2pips_get_comment_of_code(gfc_code *c) {
-  gfc2pips_comments retour = gfc2pips_comments_stack_;
-  char *a, *b;
-  while(retour) {
-    if(retour->gfc == c) {
-      a = retour->s;
-      retour = retour->next;
-      while(retour && retour->gfc == c) {
-        if(a && retour->s) {
-          b = (char*)malloc(sizeof(char) * (strlen(a) + strlen(retour->s) + 2));
-          strcpy(b, a);
-          strcpy(b + strlen(b), "\n");
-          strcpy(b + strlen(b), retour->s);
-          free(a);
-          a = b;
-        } else if(retour->s) {
-          a = retour->s;
-        }
-        retour = retour->next;
-      }
-      if(a) {
-        b = (char*)malloc(sizeof(char) * (strlen(a) + 2));
-        strcpy(b, a);
-        strcpy(b + strlen(b), "\n");
-        free(a);
-        return b;
-      } else {
-        return empty_comments;
-      }
-    }
-    retour = retour->next;
-  }
-  return empty_comments;
-}
-
-gfc2pips_comments gfc2pips_pop_comment(void) {
-  if(gfc2pips_comments_stack) {
-    gfc2pips_comments retour = gfc2pips_comments_stack;
-    gfc2pips_comments_stack = gfc2pips_comments_stack->prev;
-    if(gfc2pips_comments_stack) {
-      gfc2pips_comments_stack->next = NULL;
-    } else {
-      gfc2pips_comments_stack_ = NULL;
-    }
-    return retour;
-  } else {
-    return NULL;
-  }
-}
-
-//changer en juste un numéro, sans que ce soit "done"
-//puis faire une étape similaire qui assigne un statement à la première plage non "done" et la met à "done"
-void gfc2pips_set_last_comments_done(unsigned long nb) {
-  //printf("gfc2pips_set_last_comments_done\n");
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  while(retour) {
-    if(retour->done)
-      return;
-    retour->num = nb;
-    retour->done = true;
-    retour = retour->prev;
-  }
-}
-void gfc2pips_assign_num_to_last_comments(unsigned long nb) {
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  while(retour) {
-    if(retour->done || retour->num)
-      return;
-    retour->num = nb;
-    retour = retour->prev;
-  }
-}
-void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c) {
-  gfc2pips_comments retour = gfc2pips_comments_stack_;
-  if(c) {
-    while(retour && retour->done) {
-      retour = retour->next;
-    }
-    if(retour) {
-      unsigned long num_plage = retour->num;
-      while(retour && retour->num == num_plage) {
-        retour->gfc = c;
-        retour->done = true;
-        retour = retour->next;
-      }
-    }
-  }
-}
-
-void gfc2pips_replace_comments_num(unsigned long old, unsigned long new) {
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  bool if_changed = false;
-  //fprintf(stderr,"gfc2pips_replace_comments_num: replace %d by %d\n", old, new );
-  while(retour) {
-    if(retour->num == old) {
-      if_changed = true;
-      retour->num = new;
-    }
-    retour = retour->prev;
-  }
-  //if(if_changed) gfc2pips_nb_of_statements--;
-}
-
-void gfc2pips_assign_gfc_code_to_num_comments(gfc_code *c, unsigned long num) {
-  gfc2pips_comments retour = gfc2pips_comments_stack_;
-  while(retour) {
-    if(retour->num == num)
-      retour->gfc = c;
-    retour = retour->next;
-  }
-}
-bool gfc2pips_comment_num_exists(unsigned long num) {
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  //fprintf(stderr,"gfc2pips_comment_num_exists: %d\n", num );
-  while(retour) {
-    if(retour->num == num)
-      return true;
-    retour = retour->prev;
-  }
-  return false;
-}
-
-void gfc2pips_pop_not_done_comments(void) {
-  while(gfc2pips_comments_stack && gfc2pips_comments_stack->done == false) {
-    gfc2pips_pop_comment();
-  }
-}
-
-/**
- *  \brief We assign a gfc_code depending to a list of comments if any
- *  depending on the number of the statement
- */
-void gfc2pips_shift_comments(void) {
-  /*
-   *
-   */
-  gfc2pips_comments retour = gfc2pips_comments_stack;
-  list l = gen_nreverse(gfc2pips_list_of_declared_code);
-  while(retour) {
-
-    list curr = gen_nthcdr(retour->num, l);
-    if(curr) {
-      retour->gfc = (gfc_code*)curr->car.e;
-    }
-    retour = retour->prev;
-  }
-  return;
-}
-
-void gfc2pips_push_last_code(gfc_code *c) {
-  if(gfc2pips_list_of_declared_code == NULL)
-    gfc2pips_list_of_declared_code = gen_cons(NULL, NULL);
-  //gfc2pips_list_of_declared_code =
-  gfc2pips_list_of_declared_code = gen_cons(c, gfc2pips_list_of_declared_code);
-}
-
-gfc_code* gfc2pips_get_last_loop(void) {
-  if(gfc2pips_list_of_loops)
-    return gfc2pips_list_of_loops->car.e;
-  return NULL;
-}
-void gfc2pips_push_loop(gfc_code *c) {
-  gfc2pips_list_of_loops = gen_cons(c, gfc2pips_list_of_loops);
-}
-void gfc2pips_pop_loop(void) {
-  POP( gfc2pips_list_of_loops );
-}
-
-/**
- * @brief generate an union of unique elements taken from A and B
- */
-list gen_union(list a, list b) {
-  list c = NULL;
-  while(a) {
-    if(!gen_in_list_p(CHUNK( CAR( a ) ), c))
-      c = gen_cons(CHUNK( CAR( a ) ), c);
-    POP( a );
-  }
-  while(b) {
-    if(!gen_in_list_p(CHUNK( CAR( b ) ), c))
-      c = gen_cons(CHUNK( CAR( b ) ), c);
-    POP( b );
-  }
-  return c;
 }

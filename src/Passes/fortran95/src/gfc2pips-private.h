@@ -67,6 +67,11 @@ typedef enum gfc2pips_main_entity_type {
 /* Store the list of callees */
 extern list gfc_module_callees;
 
+
+extern list gfc2pips_list_of_declared_code;
+extern list gfc2pips_list_of_loops;
+
+
 void gfc2pips_add_to_callees(entity e);
 void pips_init();
 list get_use_entities_list(struct gfc_namespace *ns);

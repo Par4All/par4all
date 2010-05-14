@@ -35,6 +35,29 @@
 #include <stdio.h>
 
 list gfc_module_callees = NULL;
+list gfc2pips_list_of_declared_code = NULL;
+list gfc2pips_list_of_loops = NULL;
+
+
+
+/**
+ * @brief generate an union of unique elements taken from A and B
+ */
+list gen_union(list a, list b) {
+  list c = NULL;
+  while(a) {
+    if(!gen_in_list_p(CHUNK( CAR( a ) ), c))
+      c = gen_cons(CHUNK( CAR( a ) ), c);
+    POP( a );
+  }
+  while(b) {
+    if(!gen_in_list_p(CHUNK( CAR( b ) ), c))
+      c = gen_cons(CHUNK( CAR( b ) ), c);
+    POP( b );
+  }
+  return c;
+}
+
 
 /**
  * @brief Add an entity to the list of callees
@@ -314,4 +337,17 @@ list get_use_entities_list(struct gfc_namespace *ns) {
     }
   }
   return use_entities;
+}
+
+
+gfc_code* gfc2pips_get_last_loop(void) {
+  if(gfc2pips_list_of_loops)
+    return gfc2pips_list_of_loops->car.e;
+  return NULL;
+}
+void gfc2pips_push_loop(gfc_code *c) {
+  gfc2pips_list_of_loops = gen_cons(c, gfc2pips_list_of_loops);
+}
+void gfc2pips_pop_loop(void) {
+  POP( gfc2pips_list_of_loops );
 }
