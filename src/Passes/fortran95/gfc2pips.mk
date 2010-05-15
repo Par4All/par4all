@@ -42,4 +42,6 @@ LIBS_PIPS =  $(LIBS_PIPS_DIR)/libri-util.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libcontrainte.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libarithmetique.a
 
+PIPS_INC_POST += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
+
 
