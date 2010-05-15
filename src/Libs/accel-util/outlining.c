@@ -220,9 +220,10 @@ static void do_outliner_smart_replacment(reference r, ocontext_t * ctxt)
         list indices = reference_indices(r);
         while (nb_dims--) POP(indices); 
         indices=gen_full_copy_list(indices);
+        expression parent = (expression)gen_get_ancestor(expression_domain,r);
+        unnormalize_expression(parent);
         if(basic_pointer_p(entity_basic(ctxt->new))) /*sg:may cause issues if basic_pointer_p(old) ? */
         {
-            expression parent = (expression)gen_get_ancestor(expression_domain,r);
             pips_assert("parent exist",parent);
             free_syntax(expression_syntax(parent));
             if(!ENDP(indices))

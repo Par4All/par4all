@@ -231,7 +231,14 @@ bool expression_array_to_pointer(expression exp, bool in_init)
         gen_free_list(subscript_indices(s));
         subscript_indices(s)=NIL;
         free_syntax(expression_syntax(exp));
-        expression_syntax(exp)=make_syntax_call(c);
+        expression_syntax(exp)=make_syntax_call(
+                make_call(
+                    entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                    make_expression_list(
+                        call_to_expression(c)
+                        )
+                    )
+                );
 
 
     }

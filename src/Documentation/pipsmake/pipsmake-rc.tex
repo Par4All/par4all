@@ -5228,6 +5228,19 @@ normalize_microcode				> MODULE.code
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
+\begin{PipsPass}{terapix_remove_divide}
+ converts divide operator into multiply operator using formula
+  $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
+\end{PipsPass}
+\begin{PipsMake}
+terapix_remove_divide > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+Use this property for accuracy of divide to multiply conversion.
+\begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
+TERAPIX_REMOVE_DIVIDE_ACCURACY 4
+\end{PipsProp}
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}

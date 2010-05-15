@@ -300,6 +300,7 @@ bool normalize_microcode( char * module_name)
             expression_domain,can_terapixify_expression_p,gen_null,
             NULL);
 
+
     /* now, try to guess the goal of the parameters
      * - parameters are 16 bits signed integers (TODO)
      * - read-only arrays might be mask, but can also be images (depend of their size ?)
@@ -318,7 +319,8 @@ bool normalize_microcode( char * module_name)
             if(formal_parameter_p(e))
             {
                 variable v = type_variable(entity_type(e));
-                if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
+                basic vb = variable_basic(v);
+                if( basic_pointer_p(vb) ) /* it's a pointer */
                 {
                     string prefix = NULL;
                     bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
@@ -330,26 +332,16 @@ bool normalize_microcode( char * module_name)
                     }
                     else /* cannot tell if it's a kernel or an image*/
                     {
-                        int array_size=1;
-                        FOREACH(DIMENSION,d,variable_dimensions(v))
-                        {
-                            int d_size;
-                            expression sod = SizeOfDimension(d);
-                            if(expression_integer_value(sod,&d_size)) {
-                                array_size*=d_size;
-                            }
-                            else {
-                                array_size=-1;
-                                break;
-                            }
-                        }
-                        if( array_size > 0 && 56 >= array_size ) {
-                            printf("%s seems a mask\n",entity_user_name(e));
-                            prefix = TERAPIX_MASK_PREFIX;
-                        }
-                        else {
+                        type t =ultimate_type(basic_pointer(vb));
+                        vb=variable_basic(type_variable(t));
+                        /* beacause of the way we build data, images are int** and masks are int* */
+                        if( basic_pointer_p(vb) ) {
                             printf("%s seems an image\n",entity_user_name(e));
                             prefix = TERAPIX_IMAGE_PREFIX;
+                        }
+                        else {
+                            printf("%s seems a mask\n",entity_user_name(e));
+                            prefix = TERAPIX_MASK_PREFIX;
                         }
                         terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                     }
@@ -467,3 +459,57 @@ generate_two_addresses_code(char *module_name)
     return true;
 }
 
+static void do_terapix_remove_divide(call c)
+{
+    entity op = call_function(c);
+    if(ENTITY_DIVIDE_P(op))
+    {
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        if(extended_expression_constant_p(rhs))
+        {
+        int accuracy = get_int_property("TERAPIX_REMOVE_DIVIDE_ACCURACY");
+
+        gen_free_list(call_arguments(c));
+        call_function(c)=entity_intrinsic(RIGHT_SHIFT_OPERATOR_NAME);
+
+        call_arguments(c)=make_expression_list(
+                MakeBinaryCall(
+                    entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                    lhs,
+                    MakeBinaryCall(
+                        entity_intrinsic(LEFT_SHIFT_OPERATOR_NAME),
+                        MakeBinaryCall(
+                            entity_intrinsic(DIVIDE_OPERATOR_NAME),
+                            int_to_expression(1),
+                            rhs),
+                        int_to_expression(accuracy)
+                        )
+                    ),
+                int_to_expression(accuracy)
+                );
+        }
+        else
+            pips_user_error("terapix cannot handle division by a non-consatnt variable\n");
+    }
+}
+bool
+terapix_remove_divide(const char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* converts divide operator into multiply operator:
+     * a/cste = a* (1/b) ~= a * ( 128 / cste ) / 128
+     */
+    gen_recurse(get_current_module_statement(),call_domain,gen_true,do_terapix_remove_divide);
+
+    /* validate */
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+}
