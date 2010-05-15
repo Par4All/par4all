@@ -1129,7 +1129,21 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 		}
 		else if(type_variable_p(pt) && !apply_p) {
                     free_basic(rb);
-                    rb = copy_basic(variable_basic(type_variable(pt)));
+                    variable v = type_variable(pt);
+                    if(ENDP(variable_dimensions(v)))
+                        rb = copy_basic(variable_basic(v));
+                    else {
+                        /* consider int a[12][13] is of type int (*)[13]*/
+                        rb = make_basic_pointer(
+                                make_type_variable(
+                                    make_variable(
+                                        copy_basic(variable_basic(v)),
+                                        gen_full_copy_list(CDR(variable_dimensions(v))),
+                                        gen_full_copy_list(variable_qualifiers(v))
+                                        )
+                                    )
+                                );
+                    }
                 }
                 else if(type_functional_p(pt)) {
                     if(apply_p) {
