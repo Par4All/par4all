@@ -67,11 +67,11 @@ patch : $(PATCHED)
 
 # local stuff
 unbuild: 
-	$(RM) -rf $(ROOT)/bin/gfc2pips build
+	$(RM) -rf $(ROOT)/bin/gfc2pips build $(SRC.d)
 clean: local-clean unbuild
 
 local-clean:
-	$(RM) -rf $(SRC.d)  $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE)
+	$(RM) -rf $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE)
 
 $(SRC.d)/.dir:
 	mkdir -p $(SRC.d)
