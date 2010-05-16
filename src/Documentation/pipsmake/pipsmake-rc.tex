@@ -8198,6 +8198,11 @@ inlining      > CALLERS.parsed_code
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+Use following property to control how generated variables are initialized
+\begin{PipsProp}{INLINING_USE_INITIALIZATION_LIST}
+INLINING_USE_INITIALIZATION_LIST TRUE
+\end{PipsProp}
+
 \begin{PipsPass}{inlining_simple}
 Same as inlining but always simulate the by-copy argument passing
 \end{PipsPass}
@@ -8242,6 +8247,8 @@ INLINING_PURGE_LABELS TRUE
   sites to a given module in other modules, unfolding inlines
   recursively all call sites in a given module, thus unfolding the
   content of the module. An unfolded source code does not contain
+  any call anymore.
+  If you run it recursievly, you should set \PipsPropRef{INLINING_USE_INITIALIZATION_LIST} to false.
 \end{PipsPass}
 \begin{PipsMake}
 

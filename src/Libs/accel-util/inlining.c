@@ -388,11 +388,13 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 }
                 else
                 {
-                    /*sg: unsafe*/
+                    /*sg: unsafe
+                     * sg: iam unsure this is ,still needed */
                     bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
                     new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
                     if(regenerate)
                     {
+                        pips_user_warning("regenerating entity, should this happen ?\n");
                         entity_storage(new)=copy_storage(entity_storage(e));
                         entity_initial(new)=copy_value(entity_initial(e));
                         entity_type(new)=copy_type(entity_type(e));
@@ -508,7 +510,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 }
 
                 /* fix value */
-                entity_initial(new) = make_value_expression( copy_expression( from ) );
+                if(get_bool_property("INLINING_USE_INITIALIZATION_LIST"))
+                    entity_initial(new) = make_value_expression( copy_expression( from ) );
+                else
+                    insert_statement(declaration_holder,make_assign_statement(entity_to_expression(new),copy_expression(from)),false);
 
 
                 /* add the entity to our list */
