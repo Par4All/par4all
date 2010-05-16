@@ -510,6 +510,16 @@ static void html_print_reference(reference r) {
   end_block("reference", cr);
 }
 
+
+static void html_print_subscript(subscript s) {
+  begin_block("subscript", false);
+  html_print_expression(subscript_array( s ), true);
+  FOREACH(expression, e, subscript_indices( s ) ) {
+    html_print_expression(e, true);
+  }
+  end_block("subscript", false);
+}
+
 static void html_print_expression(expression e, bool cr) {
   begin_block("expression", cr);
   begin_block("syntax", false);
@@ -524,6 +534,9 @@ static void html_print_expression(expression e, bool cr) {
       break;
     case is_syntax_reference:
       html_print_reference(syntax_reference( s ));
+      break;
+    case is_syntax_subscript:
+      html_print_subscript(syntax_subscript( s ));
       break;
       /* add cast, sizeof here FIXME*/
     default:
