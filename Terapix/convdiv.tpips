@@ -1,0 +1,11 @@
+setproperty ABOT_ON_USER_ERROR TRUE
+setenv WS convdiv
+delete $WS
+create $WS $WS.c
+
+display PRINTED_FILE[%ALLFUNC]
+apply TERAPIX_REMOVE_DIVIDE[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS

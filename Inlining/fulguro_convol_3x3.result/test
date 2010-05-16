@@ -1,0 +1,3258 @@
+void dataExchange(int *x, int *y)
+{
+   int t = *x;
+   *x = *y;
+   *y = t;
+}
+FLGR_Ret flgr1d_clear_all(FLGR_Data1D *data)
+{
+   if (data==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1407, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   memset(data->array, 0, data->length*data->bps*data->spp/8+32);
+   return FLGR_RET_OK;
+}
+void flgr1d_copy_fgUINT16_fgUINT16(FLGR_Data1D *datdest, FLGR_Data1D *datsrc)
+{
+   memcpy(datdest->array, datsrc->array, datdest->bps*datdest->length*datdest->spp/8);
+}
+FLGR_Data1D * flgr1d_create_fgUINT16(int length, int spp, FLGR_Shape shape)
+{
+   FLGR_Data1D *dat;
+   if (length<0) {
+      fprintf(stderr, "Negative length!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1604, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   if (spp<1) {
+      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1604, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   dat = (FLGR_Data1D *) flgr_malloc(sizeof(FLGR_Data1D));
+   dat->dim = 1;
+   dat->size_struct = sizeof(FLGR_Data1D);
+   dat->bps = flgr_get_bps_from_type(FLGR_UINT16);
+   dat->ref2d = -1;
+   dat->shape = shape;
+   dat->spp = spp;
+   dat->length = length;
+   dat->array_phantom = flgr_malloc(length*dat->bps*spp/8+64);
+   dat->array = dat->array_phantom+32;
+   dat->type = FLGR_UINT16;
+   return dat;
+}
+FLGR_Ret flgr1d_destroy(FLGR_Data1D *dat)
+{
+   if (dat==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1552, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   flgr_free(dat->array_phantom);
+   flgr_free(dat);
+
+   return FLGR_RET_OK;
+}
+void flgr1d_import_raw_fgUINT16(FLGR_Data1D *datdest, void *raw)
+{
+   FLGR_Data1D datsrc[1];
+   
+   
+   datsrc->bps = datdest->bps;
+   datsrc->spp = datdest->spp;
+   datsrc->length = datdest->length;
+   datsrc->array = (fgUINT16 *) raw;
+   if (raw!=(void *) 0) 
+      memcpy(datdest->array, datsrc->array, datdest->bps*datdest->length*datdest->spp/8);
+}
+void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
+{
+   FLGR_Vector *vec = flgr_vector_create(nhb->spp, nhb->type);
+   int i, j;
+   int w = nhb->size_x;
+   int h = nhb->size_y;
+   flgr_vector_populate_from_scalar_fgUINT16(vec, 0);
+   for(j = w/2+1; j <= w-1; j += 1)
+      flgr2d_set_data_vector_fgUINT16(nhb, h/2, j, vec);
+   for(i = h/2+1; i <= h-1; i += 1)
+      for(j = 0; j <= w-1; j += 1)
+         flgr2d_set_data_vector_fgUINT16(nhb, i, j, vec);
+   flgr_vector_destroy(vec);
+   return;
+}
+FLGR_Ret flgr2d_clear_all(FLGR_Data2D *data)
+{
+   int i;
+   //PIPS generated variable
+   FLGR_Data1D **P_0;
+   if (data==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1420, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   
+   
+   for(i = 0; i <= data->size_y-1; i += 1) {
+      P_0 = data->row;
+      flgr1d_clear_all(P_0[i]);
+   }
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb)
+{
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK) 
+      return ret;
+
+   if (datdest->type==FLGR_UINT16)
+
+      flgr2d_convolution_fgUINT16(datdest, datsrc, nhb);
+}
+void flgr2d_convolution_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb)
+{
+
+   flgr2d_raster_slide_window_fgUINT16(datdest, datsrc, nhb, FLGR_NHB_NO_SYM, flgr2d_get_nhb_convolution_fgUINT16);
+}
+FLGR_Ret flgr2d_copy(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   int error = 0;
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||datsrc==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1345, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_size(datsrc, datdest))!=FLGR_RET_OK) {
+
+      fprintf(stderr, "src and dest dat have different size !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1350, __FUNCTION__);
+      flgr_backtrace_print();
+      return ret;
+   }
+   
+   /*
+     if(datsrc->type==FLGR_UINT8) {
+       FLGR_MACRO_COPY2D_SRC_FIX_TYPE(fgUINT8,fgBIT,fgUINT8,fgUINT16,fgUINT32,
+   				   fgINT8,fgINT16,fgINT32,fgFLOAT32,fgFLOAT64);
+   
+     }else*/
+   if (datsrc->type==FLGR_UINT16)
+      flgr2d_copy_fgUINT16_fgUINT16(datdest, datsrc);
+   else
+      error = 1;
+
+   if (error==1) {
+      fprintf(stderr, "dest data type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1395, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_TYPE_UNKNOWN;
+   }
+
+   return FLGR_RET_OK;
+}
+void flgr2d_copy_fgUINT16_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   int i;
+   FLGR_Data1D **dest = datdest->row;
+   FLGR_Data1D **src = datsrc->row;
+   for(i = 0; i <= datsrc->size_y-1; i += 1)
+      flgr1d_copy_fgUINT16_fgUINT16(dest[i], src[i]);
+   return;
+}
+FLGR_Data2D * flgr2d_create(int size_y, int size_x, int spp, FLGR_Type type, FLGR_Shape shape, FLGR_Connexity connexity)
+{
+   
+   
+   if (type==FLGR_UINT16) 
+      return flgr2d_create_fgUINT16(size_y, size_x, spp, shape, connexity);
+   fprintf(stderr, "Type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1615, __FUNCTION__);
+   flgr_backtrace_print();
+   return (void *) 0;
+}
+FLGR_Data2D * flgr2d_create_fgUINT16(int size_y, int size_x, int spp, FLGR_Shape shape, FLGR_Connexity connexity)
+{
+   int i;
+   FLGR_Data2D *dat;
+   //PIPS generated variable
+   FLGR_Data1D **P_1, **P_2;
+   //PIPS generated variable
+   void **P_3;
+   //PIPS generated variable
+   FLGR_Data1D **P_4;
+   if (size_y<0) {
+      fprintf(stderr, "Number of rows is negative !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   if (size_x<0) {
+      fprintf(stderr, "Number of columns is negative !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   if (spp<1) {
+      fprintf(stderr, "Sample Per Pixel (spp) must be > 0 !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1608, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   dat = (FLGR_Data2D *) flgr_malloc(sizeof(FLGR_Data2D));
+   dat->row = (FLGR_Data1D **) flgr_malloc((size_y+16)*sizeof(FLGR_Data1D *));
+   dat->array = flgr_malloc((size_y+16)*sizeof(fgUINT16 *));
+   dat->dim = 2;
+   dat->size_struct = sizeof(FLGR_Data2D);
+   dat->bps = flgr_get_bps_from_type(FLGR_UINT16);
+   dat->spp = spp;
+   dat->shape = shape;
+   dat->connexity = connexity;
+   dat->size_y = size_y;
+   dat->size_x = size_x;
+   dat->type = FLGR_UINT16;
+   dat->link_overlap = -1;
+   dat->link_position = -1;
+   dat->link_number = -1;
+   for(i = 0; i <= size_y+16-1; i += 1) {
+      P_1 = dat->row;
+      P_1[i] = flgr1d_create_fgUINT16(size_x, spp, FLGR_NO_SHAPE);
+      P_2 = dat->row;
+      P_2[i]->ref2d = i;
+      P_4 = dat->row;
+      P_3 = dat->array;
+      P_3[i] = (dat->row)[i]->array;
+   }
+   return dat;
+}
+FLGR_Data2D * flgr2d_create_from(FLGR_Data2D *datsrc)
+{
+   if (datsrc==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1327, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   return flgr2d_create(datsrc->size_y, datsrc->size_x, datsrc->spp, datsrc->type, datsrc->shape, datsrc->connexity);
+}
+FLGR_NhbBox2D * flgr2d_create_neighbor_box(FLGR_Data2D *data)
+{
+   FLGR_NhbBox2D *tmp;
+   int sizeMax;
+   int typeSize, k;
+   //PIPS generated variable
+   int **P_5, **P_6;
+   //PIPS generated variable
+   void **P_7;
+   //PIPS generated variable
+   void **P_8;
+   //PIPS generated variable
+   int *P_9;
+   if (data==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1676, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+
+   typeSize = flgr_get_sizeof(data->type);
+   sizeMax = data->size_x*data->size_y;
+
+   if (typeSize<1) 
+      return (void *) 0;
+   if (data->spp<1) 
+      return (void *) 0;
+   
+   
+   
+   tmp = flgr_malloc(sizeof(FLGR_NhbBox2D));
+
+   tmp->type = data->type;
+   tmp->spp = data->spp;
+
+   tmp->center_data_val = flgr_vector_create(data->spp, data->type);
+   tmp->center_nhb_val = flgr_vector_create(data->spp, data->type);
+   tmp->center_coord_y = 0;
+   tmp->center_coord_x = 0;
+   tmp->nhb_size_y = data->size_y;
+   tmp->nhb_size_x = data->size_x;
+
+   tmp->list_coord_x = (int **) flgr_malloc(sizeof(int *)*data->spp);
+   tmp->list_coord_y = (int **) flgr_malloc(sizeof(int *)*data->spp);
+   tmp->list_data_val = (void **) flgr_malloc(sizeof(void *)*data->spp);
+   tmp->list_nhb_val = (void **) flgr_malloc(sizeof(void *)*data->spp);
+
+   tmp->size = (int *) flgr_malloc(sizeof(int)*data->spp);
+
+   for(k = 0; k <= data->spp-1; k += 1) {
+      P_5 = tmp->list_coord_y;
+      P_5[k] = flgr_malloc(sizeof(int)*sizeMax);
+      P_6 = tmp->list_coord_x;
+      P_6[k] = flgr_malloc(sizeof(int)*sizeMax);
+      P_7 = tmp->list_data_val;
+      P_7[k] = flgr_malloc(flgr_get_sizeof(tmp->type)*sizeMax);
+      P_8 = tmp->list_nhb_val;
+      P_8[k] = flgr_malloc(flgr_get_sizeof(tmp->type)*sizeMax);
+      P_9 = tmp->size;
+      P_9[k] = 0;
+   }
+   
+   
+   return tmp;
+}
+FLGR_Data2D * flgr2d_create_neighborhood(int size_y, int size_x, int spp, FLGR_Type type, FLGR_Shape shape, FLGR_Connexity connexity)
+{
+   FLGR_Data2D *nhb;
+   if (size_x%2==0) {
+      
+      
+      
+      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1626, __FUNCTION__, size_x, size_x+1);
+      flgr_backtrace_print();
+      size_x++;
+   }
+   if (size_y%2==0) {
+      fprintf(stderr, "Warning NhbWidth(%d) is even! Changing to the next odd value (%d) \n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1630, __FUNCTION__, size_y, size_y+1);
+      flgr_backtrace_print();
+      size_y++;
+   }
+   if (connexity!=FLGR_4_CONNEX&&connexity!=FLGR_6_CONNEX&&connexity!=FLGR_8_CONNEX) {
+      fprintf(stderr, "bad connexity : %d\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1635, __FUNCTION__, connexity);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+   if ((nhb = flgr2d_create(size_y, size_x, spp, type, shape, connexity))==(void *) 0) 
+      return (void *) 0;
+
+   if (flgr2d_fill_neighborhood(nhb, shape, size_x, size_y)!=FLGR_RET_OK) {
+      flgr2d_destroy(nhb);
+      return (void *) 0;
+   }
+
+   return nhb;
+}
+FLGR_Data2D * flgr2d_create_neighborhood_from(FLGR_Data2D *nhbsrc)
+{
+   if (nhbsrc==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1596, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+
+   return flgr2d_create_neighborhood(nhbsrc->size_y, nhbsrc->size_x, nhbsrc->spp, nhbsrc->type, nhbsrc->shape, nhbsrc->connexity);
+}
+FLGR_Data2D * flgr2d_create_pixmap(int size_y, int size_x, int spp, FLGR_Type type)
+{
+   
+   
+   return flgr2d_create(size_y, size_x, spp, type, FLGR_NO_SHAPE, FLGR_NO_CONNEX);
+}
+int flgr2d_data_is_connexity(FLGR_Data2D *data, FLGR_Connexity connexity)
+{
+   if (data==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1246, __FUNCTION__);
+      flgr_backtrace_print();
+      return 0;
+   }
+   return data->connexity==connexity;
+}
+FLGR_Ret flgr2d_destroy(FLGR_Data2D *dat)
+{
+   int i;
+   //PIPS generated variable
+   FLGR_Data1D **P_10;
+   if (dat==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1567, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   if (dat->link_overlap>-1) {
+      fprintf(stderr, "Destroying a linked data, branching to flgr2d_destroy_link\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1572, __FUNCTION__);
+      flgr_backtrace_print();
+      return flgr2d_destroy_link(dat);
+   }
+
+   for(i = 0; i <= dat->size_y+16-1; i += 1) {
+      P_10 = dat->row;
+      flgr1d_destroy(P_10[i]);
+   }
+
+   flgr_free(dat->array);
+   flgr_free(dat->row);
+   flgr_free(dat);
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_destroy_link(FLGR_Data2D *dat)
+{
+   int k;
+   //PIPS generated variable
+   FLGR_Data1D **P_11, **P_12, **P_13, **P_14, **P_15;
+   if (dat==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1510, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   if (dat->link_overlap==-1) {
+      fprintf(stderr, "Destroying a non-linked data, branching to flgr2d_destroy\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1515, __FUNCTION__);
+      flgr_backtrace_print();
+      return flgr2d_destroy(dat);
+   }
+
+   if (dat->link_position==0)
+      for(k = dat->size_y-dat->link_overlap; k <= dat->size_y+16-1; k += 1) {
+         P_11 = dat->row;
+         flgr1d_destroy(P_11[k]);
+      }
+   else if (dat->link_position==dat->link_number-1) {
+      for(k = 0; k <= dat->link_overlap-1; k += 1) {
+         P_12 = dat->row;
+         flgr1d_destroy(P_12[k]);
+      }
+
+      for(k = dat->size_y; k <= dat->size_y+16-1; k += 1) {
+         P_13 = dat->row;
+         flgr1d_destroy(P_13[k]);
+      }
+   }
+   else {
+      for(k = 0; k <= dat->link_overlap-1; k += 1) {
+         P_14 = dat->row;
+         flgr1d_destroy(P_14[k]);
+      }
+      for(k = dat->size_y-dat->link_overlap; k <= dat->size_y+16-1; k += 1) {
+         P_15 = dat->row;
+         flgr1d_destroy(P_15[k]);
+      }
+   }
+
+   flgr_free(dat->array);
+   flgr_free(dat->row);
+   flgr_free(dat);
+
+   return FLGR_RET_OK;
+}
+void flgr2d_destroy_neighbor_box(FLGR_NhbBox2D *extr)
+{
+   int k;
+   //PIPS generated variable
+   void **P_16;
+   //PIPS generated variable
+   void **P_17;
+   //PIPS generated variable
+   int **P_18, **P_19;
+   if (extr==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1481, __FUNCTION__);
+      flgr_backtrace_print();
+      return;
+   }
+
+   for(k = 0; k <= extr->spp-1; k += 1) {
+      P_16 = extr->list_data_val;
+      flgr_free(P_16[k]);
+      P_17 = extr->list_nhb_val;
+      flgr_free(P_17[k]);
+      P_18 = extr->list_coord_x;
+      flgr_free(P_18[k]);
+      P_19 = extr->list_coord_y;
+      flgr_free(P_19[k]);
+   }
+   
+   
+   flgr_vector_destroy(extr->center_data_val);
+   flgr_vector_destroy(extr->center_nhb_val);
+
+   flgr_free(extr->list_coord_x);
+   flgr_free(extr->list_coord_y);
+   flgr_free(extr->list_data_val);
+   flgr_free(extr->list_nhb_val);
+   flgr_free(extr->size);
+
+   flgr_free(extr);
+}
+void flgr2d_draw_disc_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int radius, FLGR_Vector *color)
+{
+   int d, y, x;
+   d = 3-2*radius;
+   x = 0;
+   y = radius;
+   while (y>=x) {
+      flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy-y, 2*x+1, color);
+      flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy+y, 2*x+1, color);
+      flgr2d_draw_horizontal_line_fgUINT16(dat, cx-y, cy-x, 2*y+1, color);
+      flgr2d_draw_horizontal_line_fgUINT16(dat, cx-y, cy+x, 2*y+1, color);
+      if (d<0)
+         d = d+4*x+6;
+      else {
+         d = d+4*(x-y)+10;
+         y--;
+      }
+      x++;
+   }
+   return;
+}
+void flgr2d_draw_filled_ellipse_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int a, int b, FLGR_Vector *color)
+{
+   int x = 0, y = b;
+   unsigned int width = 1;
+   long a2 = (long) a*a, b2 = (long) b*b;
+   long crit1 = -(a2/4+a%2+b2);
+   long crit2 = -(b2/4+b%2+a2);
+   long crit3 = -(b2/4+b%2);
+   long t = -(a2*y);
+   long dxt = 2*b2*x, dyt = -(2*a2*y);
+   long d2xt = 2*b2, d2yt = 2*a2;
+   while (y>=0&&x<=a) 
+      if (t+b2*x<=crit1||t+a2*y<=crit3) {
+         x++, dxt += d2xt, t += dxt;
+         width += 2;
+      }
+      else if (t-a2*y>crit2) {
+         flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy-y, width, color);
+         if (y!=0) 
+            flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy+y, width, color);
+         y--, dyt += d2yt, t += dyt;
+      }
+      else {
+         flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy-y, width, color);
+         if (y!=0) 
+            flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy+y, width, color);
+         x++, dxt += d2xt, t += dxt;
+         y--, dyt += d2yt, t += dyt;
+         width += 2;
+      }
+   if (b==0) 
+      flgr2d_draw_horizontal_line_fgUINT16(dat, cx-a, cy, 2*a+1, color);
+   return;
+}
+void flgr2d_draw_filled_rectangle_fgUINT16(FLGR_Data2D *dat, int x, int y, int size_x, int size_y, FLGR_Vector *color)
+{
+   int i;
+   for(i = y; i <= y+size_y-1; i += 1)
+      flgr2d_draw_horizontal_line_fgUINT16(dat, x, i, size_x, color);
+   return;
+}
+void flgr2d_draw_horizontal_line_fgUINT16(FLGR_Data2D *dat, int x, int y, int size_x, FLGR_Vector *color)
+{
+   int i;
+   for(i = x; i <= x+size_x-1; i += 1)
+      flgr2d_draw_point_fgUINT16(dat, i, y, color);
+   return;
+}
+void flgr2d_draw_line_fgUINT16(FLGR_Data2D *dat, int x1, int y1, int x2, int y2, FLGR_Vector *color)
+{
+   int d, dx, dy, aincr, bincr, xincr, yincr, x, y;
+   if (abs(x2-x1)<abs(y2-y1)) {
+      if (y1>y2) {
+         dataExchange(&x1, &x2);
+         dataExchange(&y1, &y2);
+      }
+      xincr = x2>x1?1:-1;
+      dy = y2-y1;
+      dx = abs(x2-x1);
+      d = 2*dx-dy;
+      aincr = 2*(dx-dy);
+      bincr = 2*dx;
+      x = x1;
+      y = y1;
+      flgr2d_draw_point_fgUINT16(dat, x, y, color);
+      for(y = y1+1; y <= y2; y += 1) {
+         if (d>=0) {
+            x += xincr;
+            d += aincr;
+         }
+         else
+            d += bincr;
+         flgr2d_draw_point_fgUINT16(dat, x, y, color);
+      }
+   }
+   else {
+      if (x1>x2) {
+         dataExchange(&x1, &x2);
+         dataExchange(&y1, &y2);
+      }
+      yincr = y2>y1?1:-1;
+      dx = x2-x1;
+      dy = abs(y2-y1);
+      d = 2*dy-dx;
+      aincr = 2*(dy-dx);
+      bincr = 2*dy;
+      x = x1;
+      y = y1;
+      flgr2d_draw_point_fgUINT16(dat, x, y, color);
+      for(x = x1+1; x <= x2; x += 1) {
+         if (d>=0) {
+            y += yincr;
+            d += aincr;
+         }
+         else
+            d += bincr;
+         flgr2d_draw_point_fgUINT16(dat, x, y, color);
+      }
+   }
+   return;
+}
+void flgr2d_draw_point_fgUINT16(FLGR_Data2D *dat, int x, int y, FLGR_Vector *color)
+{
+   if (y<0) 
+      return;
+   if (x<0) 
+      return;
+   if (y>=dat->size_y) 
+      return;
+   if (x>=dat->size_x) 
+      return;
+   flgr2d_set_data_vector_fgUINT16(dat, y, x, color);
+   return;
+}
+void flgr2d_draw_vertical_line_fgUINT16(FLGR_Data2D *dat, int x, int y, int size_y, FLGR_Vector *color)
+{
+   int i;
+   for(i = y; i <= y+size_y-1; i += 1)
+      flgr2d_draw_point_fgUINT16(dat, x, i, color);
+   return;
+}
+FLGR_Ret flgr2d_fill_neighborhood(FLGR_Data2D *nhb, FLGR_Shape shape, int width, int height)
+{
+   if (nhb==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1434, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   if (nhb->shape!=shape) {
+      fprintf(stderr, "given shape does not correspond to FLGR_Data2D shape\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1439, __FUNCTION__);
+      flgr_backtrace_print();
+   }
+
+   if (width>nhb->size_x) {
+      fprintf(stderr, "width too high\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1443, __FUNCTION__);
+      flgr_backtrace_print();
+      width = nhb->size_x;
+   }
+
+   if (width<0) {
+      fprintf(stderr, "width < 0\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1448, __FUNCTION__);
+      flgr_backtrace_print();
+      width = 0;
+   }
+
+   if (width%2==0) 
+      width++;
+
+   if (height>nhb->size_y) {
+      fprintf(stderr, "height too high\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1457, __FUNCTION__);
+      flgr_backtrace_print();
+      height = nhb->size_y;
+   }
+
+   if (height<0) {
+      fprintf(stderr, "height < 0\n""WARNING: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1462, __FUNCTION__);
+      flgr_backtrace_print();
+      height = 0;
+   }
+
+   if (height%2==0) 
+      height++;
+   
+   
+   
+   flgr2d_fill_neighborhood_fgUINT16(nhb, shape, width, height);
+}
+void flgr2d_fill_neighborhood_fgUINT16(FLGR_Data2D *nhb, FLGR_Shape shape, int width, int height)
+{
+   FLGR_Vector *vec1 = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Data2D *tmp = flgr2d_create_from(nhb);
+   int h = nhb->size_y;
+   int w = nhb->size_x;
+   int size = height<width?height:width;
+   double size_square = (double) size/2/(1+sqrt(2));
+   double size_square2 = floor(size_square);
+   int nbsqr = (int) size_square-size_square2<0.5f?size_square2:size_square2+1;
+   int i;
+   flgr2d_clear_all(nhb);
+   flgr_vector_populate_from_scalar_fgUINT16(vec1, 1);
+   if (shape==FLGR_HEX) {
+      flgr2d_set_data_vector_fgUINT16(nhb, h/2, w/2, vec1);
+      for(i = 0; i <= size/2-1; i += 1)
+         flgr2d_native_dilate_6_connexity_fgUINT16(nhb);
+      if (size/2%2==1) {
+         flgr2d_fill_nhb_even_rows_fgUINT16(tmp, nhb);
+         flgr2d_copy(nhb, tmp);
+      }
+   }
+   else if (shape==FLGR_RECT)
+      flgr2d_draw_filled_rectangle_fgUINT16(nhb, w/2-width/2, h/2-height/2, width, height, vec1);
+   else if (shape==FLGR_DIAMOND) {
+      flgr2d_set_data_vector_fgUINT16(nhb, h/2, w/2, vec1);
+      for(i = 0; i <= size/2-1; i += 1)
+         flgr2d_native_dilate_4_connexity_fgUINT16(nhb);
+   }
+   else if (shape==FLGR_OCTAGON) {
+      flgr2d_set_data_vector_fgUINT16(nhb, h/2, w/2, vec1);
+      for(i = 0; i <= size/2-nbsqr-1; i += 1)
+         flgr2d_native_dilate_4_connexity_fgUINT16(nhb);
+      for(i = 0; i <= nbsqr-1; i += 1)
+         flgr2d_native_dilate_8_connexity_fgUINT16(nhb);
+   }
+   else if (shape==FLGR_DISC)
+      flgr2d_draw_disc_fgUINT16(nhb, w/2, h/2, size/2, vec1);
+   else if (shape==FLGR_ELLIPSE)
+      flgr2d_draw_filled_ellipse_fgUINT16(nhb, w/2, h/2, width/2, height/2, vec1);
+   else if (shape==FLGR_SLASH)
+      flgr2d_draw_line_fgUINT16(nhb, w/2-width/2, height-1+h/2-height/2, width-1+w/2-width/2, h/2-height/2, vec1);
+   else if (shape==FLGR_BSLASH)
+      flgr2d_draw_line_fgUINT16(nhb, w/2-width/2, h/2-height/2, width-1+w/2-width/2, height-1+h/2-height/2, vec1);
+   else if (shape==FLGR_CROSS) {
+      flgr2d_draw_vertical_line_fgUINT16(nhb, w/2, h/2-height/2, height, vec1);
+      flgr2d_draw_horizontal_line_fgUINT16(nhb, w/2-width/2, h/2, width, vec1);
+   }
+   else if (shape==FLGR_CROSSX) {
+      flgr2d_draw_line_fgUINT16(nhb, w/2-width/2, height-1+h/2-height/2, width-1+w/2-width/2, h/2-height/2, vec1);
+      flgr2d_draw_line_fgUINT16(nhb, w/2-width/2, h/2-height/2, width-1+w/2-width/2, height-1+h/2-height/2, vec1);
+   }
+   flgr_vector_destroy(vec1);
+   flgr2d_destroy(tmp);
+   return;
+}
+FLGR_Ret flgr2d_fill_nhb_even_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   FLGR_Ret ret;
+   if (datsrc==(void *) 0||datdest==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1232, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
+   if (ret!=FLGR_RET_OK) 
+      return ret;
+
+   flgr2d_fill_nhb_even_rows_fgUINT16(datdest, datsrc);
+}
+void flgr2d_fill_nhb_even_rows_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   int mid = datsrc->size_y/2;
+   int h = datsrc->size_y;
+   int w = datsrc->size_x;
+   int i, j;
+   FLGR_Vector *tmp = flgr_vector_create(datsrc->spp, datsrc->type);
+   for(i = mid; i >= 0; i += -2)
+      for(j = 0; j <= w-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+   for(i = mid-1; i >= 0; i += -2) {
+      for(j = 0; j <= w-1-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j+1, tmp);
+      }
+      flgr2d_get_data_vector_fgUINT16(datsrc, i, w-1, tmp);
+      flgr2d_set_data_vector_fgUINT16(datdest, i, 0, tmp);
+   }
+   for(i = mid+1; i <= h-1; i += 2) {
+      for(j = 0; j <= w-1-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j+1, tmp);
+      }
+      flgr2d_get_data_vector_fgUINT16(datsrc, i, w-1, tmp);
+      flgr2d_set_data_vector_fgUINT16(datdest, i, 0, tmp);
+   }
+   for(i = mid+2; i <= h-1; i += 2)
+      for(j = 0; j <= w-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+   flgr_vector_destroy(tmp);
+   return;
+}
+FLGR_Ret flgr2d_fill_nhb_odd_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   FLGR_Ret ret;
+   if (datsrc==(void *) 0||datdest==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1216, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
+   if (ret!=FLGR_RET_OK) 
+      return ret;
+
+   flgr2d_fill_nhb_odd_rows_fgUINT16(datdest, datsrc);
+}
+void flgr2d_fill_nhb_odd_rows_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   int mid = datsrc->size_y/2;
+   int h = datsrc->size_y;
+   int w = datsrc->size_x;
+   int i, j;
+   FLGR_Vector *tmp = flgr_vector_create(datsrc->spp, datsrc->type);
+   for(i = mid; i >= 0; i += -2)
+      for(j = 0; j <= w-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+   for(i = mid-1; i >= 0; i += -2) {
+      for(j = 0; j <= w-1-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j+1, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+      flgr2d_get_data_vector_fgUINT16(datsrc, i, 0, tmp);
+      flgr2d_set_data_vector_fgUINT16(datdest, i, w-1, tmp);
+   }
+   for(i = mid+1; i <= h-1; i += 2) {
+      for(j = 0; j <= w-1-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j+1, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+      flgr2d_get_data_vector_fgUINT16(datsrc, i, 0, tmp);
+      flgr2d_set_data_vector_fgUINT16(datdest, i, w-1, tmp);
+   }
+   for(i = mid+2; i <= h-1; i += 2)
+      for(j = 0; j <= w-1; j += 1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, tmp);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, j, tmp);
+      }
+   flgr_vector_destroy(tmp);
+   return;
+}
+FLGR_Ret flgr2d_fill_nhbs_for_6_connexity(FLGR_Data2D *nhbEven, FLGR_Data2D *nhbOdd, FLGR_Data2D *nhb, int SYM)
+{
+   FLGR_Ret ret;
+   if (nhb==(void *) 0||nhbOdd==(void *) 0||nhbEven==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1258, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhbOdd, __FUNCTION__))!=FLGR_RET_OK) 
+      return ret;
+   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhb, __FUNCTION__))!=FLGR_RET_OK) 
+      return ret;
+
+   if (SYM==FLGR_NHB_SYM)
+      if (flgr2d_data_is_connexity(nhb, FLGR_6_CONNEX)==1) {
+
+         flgr2d_mirror_horizontal(nhbOdd, nhb);
+         flgr2d_mirror_vertical_hmorph(nhbOdd);
+         flgr2d_fill_nhb_even_rows(nhbEven, nhbOdd);
+      }
+      else {
+         flgr2d_mirror_horizontal(nhbEven, nhb);
+         flgr2d_mirror_vertical_hmorph(nhbEven);
+         flgr2d_copy(nhbOdd, nhbEven);
+      }
+   else if (flgr2d_data_is_connexity(nhb, FLGR_6_CONNEX)==1) {
+      flgr2d_copy(nhbEven, nhb);
+      flgr2d_fill_nhb_odd_rows(nhbOdd, nhbEven);
+   }
+   else {
+      flgr2d_copy(nhbEven, nhb);
+      flgr2d_copy(nhbOdd, nhb);
+   }
+
+   return FLGR_RET_OK;
+}
+void flgr2d_get_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+   fgUINT16 *array_s;
+   fgUINT16 *array_d = (fgUINT16 *) vct->array;
+   //PIPS generated variable
+   void **P_20;
+   row = flgr_normalize_coordinate(row, dat->size_y);
+   col = flgr_normalize_coordinate(col, dat->size_x);
+   P_20 = dat->array;
+   array_s = (fgUINT16 *) P_20[row];
+   flgr_get_data_array_vector_fgUINT16(array_d, array_s, vct->spp, col);
+}
+void flgr2d_get_data_vector_no_norm_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+   fgUINT16 *array_s = (fgUINT16 *) (dat->array)[row];
+   fgUINT16 *array_d = (fgUINT16 *) vct->array;
+   flgr_get_data_array_vector_fgUINT16(array_d, array_s, vct->spp, col);
+}
+void flgr2d_get_neighborhood_fgUINT16(FLGR_NhbBox2D *extr, FLGR_Data2D *dat, FLGR_Data2D *nhb, int row, int col)
+{
+   int i, j, m;
+   int k, l, n;
+   int nbrow, nbcol;
+   int startrow, stoprow;
+   int startcol, stopcol;
+   int nhbsize_xdiv2;
+   int nhbsize_ydiv2;
+   int spp = dat->spp;
+   fgUINT16 **pnhb = (fgUINT16 **) nhb->array;
+   fgUINT16 **pdat = (fgUINT16 **) dat->array;
+   fgUINT16 *list_data;
+   fgUINT16 *list_nhb;
+   int *list_coord_x;
+   int *list_coord_y;
+   int *size = extr->size;
+   fgUINT16 nhb_val, data_val;
+   //PIPS generated variable
+   void **P_21;
+   //PIPS generated variable
+   void **P_22;
+   //PIPS generated variable
+   void **P_23;
+   //PIPS generated variable
+   void **P_24;
+   //PIPS generated variable
+   int **P_25, **P_26;
+   nhbsize_xdiv2 = nhb->size_x>>1;
+   nhbsize_ydiv2 = nhb->size_y>>1;
+   nbrow = dat->size_y;
+   nbcol = dat->size_x;
+   extr->center_coord_y = row;
+   extr->center_coord_x = col;
+   startrow = row-nhbsize_ydiv2;
+   startrow = startrow<0?0:startrow;
+   stoprow = row+nhbsize_ydiv2;
+   stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+   startcol = col-nhbsize_xdiv2;
+   startcol = startcol<0?0:startcol;
+   stopcol = col+nhbsize_xdiv2;
+   stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+   P_21 = dat->array;
+   flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr->center_data_val->array, (fgUINT16 *) P_21[row], spp, col);
+   P_22 = nhb->array;
+   flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr->center_nhb_val->array, (fgUINT16 *) P_22[nhbsize_ydiv2], spp, nhbsize_xdiv2);
+   for(n = 0; n <= spp-1; n += 1) {
+      P_23 = extr->list_data_val;
+      list_data = (fgUINT16 *) P_23[n];
+      P_24 = extr->list_nhb_val;
+      list_nhb = (fgUINT16 *) P_24[n];
+      P_25 = extr->list_coord_x;
+      list_coord_x = (int *) P_25[n];
+      P_26 = extr->list_coord_y;
+      list_coord_y = (int *) P_26[n];
+      m = 0;
+      k = startrow-row+nhbsize_ydiv2;
+      for(i = startrow; i <= stoprow; i += 1) {
+         l = startcol-col+nhbsize_xdiv2;
+         for(j = startcol; j <= stopcol; j += 1) {
+            nhb_val = flgr2d_get_data_array_fgUINT16(pnhb, k, l*spp+n);
+            if (nhb_val!=0) {
+               data_val = flgr2d_get_data_array_fgUINT16(pdat, i, j*spp+n);
+               list_coord_x[m] = l;
+               list_coord_y[m] = k;
+               list_data[m] = data_val;
+               list_nhb[m] = nhb_val;
+               m++;
+            }
+            l++;
+         }
+         k++;
+      }
+      size[n] = m;
+   }
+   return;
+}
+void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr)
+{
+   int i, k;
+   int spp = extr->spp;
+   fgUINT16 *presult = (fgUINT16 *) result->array;
+   fgUINT16 *list_data_val;
+   fgUINT16 *list_nhb_val;
+   int *size = extr->size;
+   fgFLOAT64 a, b, sum;
+   fgFLOAT64 tmp;
+   //PIPS generated variable
+   void **P_27;
+   //PIPS generated variable
+   void **P_28;
+   for(k = 0; k <= spp-1; k += 1) {
+      P_27 = extr->list_data_val;
+      list_data_val = (fgUINT16 *) P_27[k];
+      P_28 = extr->list_nhb_val;
+      list_nhb_val = (fgUINT16 *) P_28[k];
+      tmp = 0;
+      sum = 0;
+      for(i = 0; i <= size[k]-1; i += 1) {
+         a = (fgFLOAT64) list_data_val[i];
+         b = (fgFLOAT64) list_nhb_val[i];
+         tmp = tmp+a*b;
+         sum = sum+fabs(b);
+      }
+      if (sum!=0) 
+         flgr_set_array_fgUINT16(presult, k, (fgUINT16) tmp/sum);
+   }
+   return;
+}
+void flgr2d_import_raw_fgUINT16(FLGR_Data2D *datdest, void *raw)
+{
+   FLGR_Data1D **dest = datdest->row;
+   int spp = datdest->spp;
+   int size = datdest->size_x*sizeof(fgUINT16)*spp;
+   int i;
+   for(i = 0; i <= datdest->size_y-1; i += 1) {
+      flgr1d_import_raw_fgUINT16(dest[i], raw);
+      raw += size;
+   }
+   return;
+}
+FLGR_Ret flgr2d_import_raw_ptr(FLGR_Data2D *datdest, void *raw)
+{
+   if (datdest==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1197, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   flgr2d_import_raw_fgUINT16(datdest, raw);
+}
+FLGR_Ret flgr2d_is_data_same_attributes(FLGR_Data2D *data1, FLGR_Data2D *data2, const char *callingFunction)
+{
+   FLGR_Ret ret;
+   if (data1==(void *) 0||data2==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1146, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr_is_data_type_valid(data1->type))!=FLGR_RET_OK) {
+
+      fprintf(stderr, "ERROR: Function %s: unknown type\r\n", callingFunction);
+      flgr_backtrace_print();
+      return ret;
+   }
+   if ((ret = flgr_is_data_type_valid(data2->type))!=FLGR_RET_OK) {
+
+      fprintf(stderr, "ERROR: Function %s: unknown type\r\n", callingFunction);
+      flgr_backtrace_print();
+      return ret;
+   }
+   if ((ret = flgr2d_is_data_same_type(data1, data2))!=FLGR_RET_OK) {
+
+      fprintf(stderr, "ERROR: Function %s: source and destination have a different type\r\n", callingFunction);
+      flgr_backtrace_print();
+      return ret;
+   }
+   if ((ret = flgr2d_is_data_same_spp(data1, data2))!=FLGR_RET_OK) {
+
+      fprintf(stderr, "ERROR: Function %s: source and destination have a different vector size(spp)\r\n", callingFunction);
+      flgr_backtrace_print();
+      return ret;
+   }
+   if (data1->size_y!=data2->size_y||data1->size_x!=data2->size_x) {
+      fprintf(stderr, "ERROR: Function %s: source and destination have a different size\r\n", callingFunction);
+      flgr_backtrace_print();
+      return FLGR_RET_SIZE_ERROR;
+   }
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_is_data_same_size(FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   if (data1==(void *) 0||data2==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1130, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if (data1->size_y!=data2->size_y||data1->size_x!=data2->size_x) 
+      return FLGR_RET_SIZE_ERROR;
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_is_data_same_spp(FLGR_Data2D *dat1, FLGR_Data2D *dat2)
+{
+   if (dat1==(void *) 0||dat2==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1113, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   
+   
+   if (dat1->spp<0) 
+      return FLGR_RET_VECTOR_SIZE_DIFFERENT;
+   if (dat2->spp<0) 
+      return FLGR_RET_VECTOR_SIZE_DIFFERENT;
+
+   if (dat1->spp!=dat2->spp) 
+      return FLGR_RET_VECTOR_SIZE_DIFFERENT;
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_is_data_same_type(FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Ret ret;
+   if (data1==(void *) 0||data2==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1095, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr_is_data_type_valid(data1->type))!=FLGR_RET_OK) 
+      return ret;
+   if ((ret = flgr_is_data_type_valid(data2->type))!=FLGR_RET_OK) 
+      return ret;
+
+   if (data1->type!=data2->type) 
+      return FLGR_RET_TYPE_DIFFERENT;
+
+   return FLGR_RET_OK;
+}
+FLGR_Ret flgr2d_mirror_horizontal(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||datsrc==(void *) 0) {
+      fprintf(stderr, "Null objects\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1079, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
+   if (ret!=FLGR_RET_OK) 
+      return ret;
+
+   flgr2d_mirror_horizontal_fgUINT16(datdest, datsrc);
+}
+void flgr2d_mirror_horizontal_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
+{
+   FLGR_Vector *vec1;
+   int i, j, k;
+   vec1 = flgr_vector_create(datsrc->spp, datsrc->type);
+   for(i = 0; i <= datsrc->size_y-1; i += 1) {
+      j = 0;
+      for(k = datsrc->size_x-1; k >= 0; k += -1) {
+         flgr2d_get_data_vector_fgUINT16(datsrc, i, j, vec1);
+         flgr2d_set_data_vector_fgUINT16(datdest, i, k, vec1);
+         j++;
+      }
+   }
+   flgr_vector_destroy(vec1);
+   return;
+}
+FLGR_Ret flgr2d_mirror_vertical_hmorph(FLGR_Data2D *dat)
+{
+   FLGR_Data1D *row_tmp;
+   void *tmp;
+   int i, j;
+   //PIPS generated variable
+   void **P_29;
+   //PIPS generated variable
+   void **P_30;
+   //PIPS generated variable
+   void **P_31;
+   //PIPS generated variable
+   void **P_32;
+   //PIPS generated variable
+   FLGR_Data1D **P_33, **P_34, **P_35, **P_36, **P_37, **P_38;
+   if (dat==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1042, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   j = dat->size_y-1;
+
+   for(i = 0; i <= dat->size_y/2-1; i += 1) {
+      P_29 = dat->array;
+      tmp = P_29[i];
+      P_31 = dat->array;
+      P_30 = dat->array;
+      P_30[i] = (dat->array)[j];
+      P_32 = dat->array;
+      P_32[j] = tmp;
+
+
+      P_33 = dat->row;
+
+      row_tmp = P_33[i];
+      P_35 = dat->row;
+      P_34 = dat->row;
+      P_34[i] = (dat->row)[j];
+      P_36 = dat->row;
+      P_36[j] = row_tmp;
+
+
+      P_37 = dat->row;
+
+      P_37[i]->ref2d = i;
+      P_38 = dat->row;
+      P_38[j]->ref2d = j;
+      j--;
+   }
+
+   return FLGR_RET_OK;
+}
+void flgr2d_native_dilate_4_connexity_fgUINT16(FLGR_Data2D *nhb)
+{
+   FLGR_Data2D *nhbcopy;
+   fgUINT16 **seodd;
+   fgUINT16 **seeven;
+   fgUINT16 **se;
+   int i, j;
+   int k, l;
+   int m, n;
+   fgUINT16 valse;
+   FLGR_Vector *vecPixValue = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecPixMax = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecSeValue = flgr_vector_create(nhb->spp, nhb->type);
+   nhbcopy = flgr2d_create_from(nhb);
+   flgr2d_copy(nhbcopy, nhb);
+   seodd = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seodd[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seeven[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 2, 0);
+   for(i = 0; i <= nhb->size_y-1; i += 1)
+      for(j = 0; j <= nhb->size_x-1; j += 1) {
+         flgr_vector_populate_from_scalar_fgUINT16(vecPixMax, 0);
+         m = 0;
+         for(k = i-1; k <= i+1; k += 1) {
+            if (k>=0&&k<nhb->size_y) {
+               n = 0;
+               for(l = j-1; l <= j+1; l += 1) {
+                  if (l>=0&&l<nhb->size_x) {
+                     se = i%2==1?seodd:seeven;
+                     valse = flgr2d_get_data_array_fgUINT16(se, m, n);
+                     flgr_vector_populate_from_scalar_fgUINT16(vecSeValue, valse);
+                     flgr2d_get_data_vector_no_norm_fgUINT16(nhbcopy, k, l, vecPixValue);
+                     flgr_vector_mult_fgUINT16(vecPixValue, vecPixValue, vecSeValue);
+                     flgr_vector_sup_fgUINT16(vecPixMax, vecPixMax, vecPixValue);
+                  }
+                  n++;
+               }
+            }
+            m++;
+         }
+         flgr2d_set_data_vector_fgUINT16(nhb, i, j, vecPixMax);
+      }
+   flgr_vector_destroy(vecPixValue);
+   flgr_vector_destroy(vecPixMax);
+   flgr_vector_destroy(vecSeValue);
+   flgr2d_destroy(nhbcopy);
+   flgr_free(seodd[0]);
+   flgr_free(seodd[1]);
+   flgr_free(seodd[2]);
+   flgr_free(seodd);
+   flgr_free(seeven[0]);
+   flgr_free(seeven[1]);
+   flgr_free(seeven[2]);
+   flgr_free(seeven);
+   return;
+}
+void flgr2d_native_dilate_6_connexity_fgUINT16(FLGR_Data2D *nhb)
+{
+   FLGR_Data2D *nhbcopy;
+   fgUINT16 **seodd;
+   fgUINT16 **seeven;
+   fgUINT16 **se;
+   int i, j;
+   int k, l;
+   int m, n;
+   fgUINT16 valse;
+   FLGR_Vector *vecPixValue = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecPixMax = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecSeValue = flgr_vector_create(nhb->spp, nhb->type);
+   nhbcopy = flgr2d_create_from(nhb);
+   flgr2d_copy(nhbcopy, nhb);
+   seodd = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seodd[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seeven[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 2, 1);
+   for(i = 0; i <= nhb->size_y-1; i += 1)
+      for(j = 0; j <= nhb->size_x-1; j += 1) {
+         flgr_vector_populate_from_scalar_fgUINT16(vecPixMax, 0);
+         m = 0;
+         for(k = i-1; k <= i+1; k += 1) {
+            if (k>=0&&k<nhb->size_y) {
+               n = 0;
+               for(l = j-1; l <= j+1; l += 1) {
+                  if (l>=0&&l<nhb->size_x) {
+                     se = i%2==1?seodd:seeven;
+                     valse = flgr2d_get_data_array_fgUINT16(se, m, n);
+                     flgr_vector_populate_from_scalar_fgUINT16(vecSeValue, valse);
+                     flgr2d_get_data_vector_no_norm_fgUINT16(nhbcopy, k, l, vecPixValue);
+                     flgr_vector_mult_fgUINT16(vecPixValue, vecPixValue, vecSeValue);
+                     flgr_vector_sup_fgUINT16(vecPixMax, vecPixMax, vecPixValue);
+                  }
+                  n++;
+               }
+            }
+            m++;
+         }
+         flgr2d_set_data_vector_fgUINT16(nhb, i, j, vecPixMax);
+      }
+   flgr_vector_destroy(vecPixValue);
+   flgr_vector_destroy(vecPixMax);
+   flgr_vector_destroy(vecSeValue);
+   flgr2d_destroy(nhbcopy);
+   flgr_free(seodd[0]);
+   flgr_free(seodd[1]);
+   flgr_free(seodd[2]);
+   flgr_free(seodd);
+   flgr_free(seeven[0]);
+   flgr_free(seeven[1]);
+   flgr_free(seeven[2]);
+   flgr_free(seeven);
+   return;
+}
+void flgr2d_native_dilate_8_connexity_fgUINT16(FLGR_Data2D *nhb)
+{
+   FLGR_Data2D *nhbcopy;
+   fgUINT16 **seodd;
+   fgUINT16 **seeven;
+   fgUINT16 **se;
+   int i, j;
+   int k, l;
+   int m, n;
+   fgUINT16 valse;
+   FLGR_Vector *vecPixValue = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecPixMax = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecSeValue = flgr_vector_create(nhb->spp, nhb->type);
+   nhbcopy = flgr2d_create_from(nhb);
+   flgr2d_copy(nhbcopy, nhb);
+   seodd = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seodd[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seeven[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 2, 1);
+   for(i = 0; i <= nhb->size_y-1; i += 1)
+      for(j = 0; j <= nhb->size_x-1; j += 1) {
+         flgr_vector_populate_from_scalar_fgUINT16(vecPixMax, 0);
+         m = 0;
+         for(k = i-1; k <= i+1; k += 1) {
+            if (k>=0&&k<nhb->size_y) {
+               n = 0;
+               for(l = j-1; l <= j+1; l += 1) {
+                  if (l>=0&&l<nhb->size_x) {
+                     se = i%2==1?seodd:seeven;
+                     valse = flgr2d_get_data_array_fgUINT16(se, m, n);
+                     flgr_vector_populate_from_scalar_fgUINT16(vecSeValue, valse);
+                     flgr2d_get_data_vector_no_norm_fgUINT16(nhbcopy, k, l, vecPixValue);
+                     flgr_vector_mult_fgUINT16(vecPixValue, vecPixValue, vecSeValue);
+                     flgr_vector_sup_fgUINT16(vecPixMax, vecPixMax, vecPixValue);
+                  }
+                  n++;
+               }
+            }
+            m++;
+         }
+         flgr2d_set_data_vector_fgUINT16(nhb, i, j, vecPixMax);
+      }
+   flgr_vector_destroy(vecPixValue);
+   flgr_vector_destroy(vecPixMax);
+   flgr_vector_destroy(vecSeValue);
+   flgr2d_destroy(nhbcopy);
+   flgr_free(seodd[0]);
+   flgr_free(seodd[1]);
+   flgr_free(seodd[2]);
+   flgr_free(seodd);
+   flgr_free(seeven[0]);
+   flgr_free(seeven[1]);
+   flgr_free(seeven[2]);
+   flgr_free(seeven);
+   return;
+}
+void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *nhb, int nhb_sym, const FLGR_ComputeNhb2D computeNhb)
+{
+   int i, j, w, h, spp = imgsrc->spp;
+   fgUINT16 *vector_array;
+   fgUINT16 *data_array;
+   FLGR_Vector *result;
+   FLGR_Data2D *nhbEven, *nhbOdd, *nhbrs;
+   FLGR_NhbBox2D *extr;
+   //PIPS generated variable
+   void **P_39;
+   w = imgsrc->size_x;
+   h = imgsrc->size_y;
+   result = flgr_vector_create(imgsrc->spp, imgsrc->type);
+   vector_array = (fgUINT16 *) result->array;
+   extr = flgr2d_create_neighbor_box(nhb);
+   nhbEven = flgr2d_create_neighborhood_from(nhb);
+   nhbOdd = flgr2d_create_neighborhood_from(nhb);
+   flgr2d_fill_nhbs_for_6_connexity(nhbEven, nhbOdd, nhb, nhb_sym);
+   if (imgdest==imgsrc) {
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbOdd);
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbEven);
+   }
+   for(i = 0; i <= h-1; i += 1) {
+      P_39 = imgdest->array;
+      data_array = (fgUINT16 *) P_39[i];
+      for(j = 0; j <= w-1; j += 1) {
+         nhbrs = i%2==1?nhbOdd:nhbEven;
+         flgr2d_get_neighborhood_fgUINT16(extr, imgsrc, nhbrs, i, j);
+         (*computeNhb)(result,extr);
+         flgr_set_data_array_vector_fgUINT16(data_array, vector_array, spp, j);
+      }
+   }
+   flgr2d_destroy(nhbOdd);
+   flgr2d_destroy(nhbEven);
+   flgr2d_destroy_neighbor_box(extr);
+   flgr_vector_destroy(result);
+   return;
+}
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
+   flgr_set_data_array_vector_fgUINT16(array_d, array_s, vct->spp, col);
+}
+void flgr_backtrace_print(void)
+{
+   return;
+}
+void flgr_free(void *ptr)
+{
+   
+   
+   free(ptr);
+}
+int flgr_get_bps_from_type(FLGR_Type type)
+{
+
+
+   if (type==FLGR_BIT) goto switch_1_case_FLGR_BIT;
+   if (type==FLGR_UINT8) goto switch_1_case_FLGR_UINT8;
+   if (type==FLGR_UINT16) goto switch_1_case_FLGR_UINT16;
+   if (type==FLGR_UINT32) goto switch_1_case_FLGR_UINT32;
+   if (type==FLGR_UINT64) goto switch_1_case_FLGR_UINT64;
+   if (type==FLGR_INT8) goto switch_1_case_FLGR_INT8;
+   if (type==FLGR_INT16) goto switch_1_case_FLGR_INT16;
+   if (type==FLGR_INT32) goto switch_1_case_FLGR_INT32;
+   if (type==FLGR_INT64) goto switch_1_case_FLGR_INT64;
+   if (type==FLGR_FLOAT32) goto switch_1_case_FLGR_FLOAT32;
+   if (type==FLGR_FLOAT64) {
+   }
+   else {
+      goto switch_1_default;
+   }
+switch_1_case_FLGR_FLOAT64:   ;
+   return sizeof(fgFLOAT64)<<3;
+switch_1_case_FLGR_FLOAT32:   ;
+   return sizeof(fgFLOAT32)<<3;
+switch_1_case_FLGR_INT64:   ;
+   return sizeof(fgINT64)<<3;
+switch_1_case_FLGR_INT32:   ;
+   return sizeof(fgINT32)<<3;
+switch_1_case_FLGR_INT16:   ;
+   return sizeof(fgINT16)<<3;
+switch_1_case_FLGR_INT8:   ;
+   return sizeof(fgINT8)<<3;
+switch_1_case_FLGR_UINT64:   ;
+   return sizeof(fgUINT64)<<3;
+switch_1_case_FLGR_UINT32:   ;
+   return sizeof(fgUINT32)<<3;
+switch_1_case_FLGR_UINT16:   ;
+   return sizeof(fgUINT16)<<3;
+switch_1_case_FLGR_UINT8:   ;
+   return sizeof(fgUINT8)<<3;
+switch_1_case_FLGR_BIT:   ;
+   return 1;
+switch_1_default:   ;
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+int flgr_get_sizeof(FLGR_Type type)
+{
+
+
+   if (type==FLGR_BIT) goto switch_1_case_FLGR_BIT;
+   if (type==FLGR_UINT8) goto switch_1_case_FLGR_UINT8;
+   if (type==FLGR_UINT16) goto switch_1_case_FLGR_UINT16;
+   if (type==FLGR_UINT32) goto switch_1_case_FLGR_UINT32;
+   if (type==FLGR_UINT64) goto switch_1_case_FLGR_UINT64;
+   if (type==FLGR_INT8) goto switch_1_case_FLGR_INT8;
+   if (type==FLGR_INT16) goto switch_1_case_FLGR_INT16;
+   if (type==FLGR_INT32) goto switch_1_case_FLGR_INT32;
+   if (type==FLGR_INT64) goto switch_1_case_FLGR_INT64;
+   if (type==FLGR_FLOAT32) goto switch_1_case_FLGR_FLOAT32;
+   if (type==FLGR_FLOAT64) {
+   }
+   else {
+      goto switch_1_default;
+   }
+switch_1_case_FLGR_FLOAT64:   ;
+   return sizeof(fgFLOAT64);
+switch_1_case_FLGR_FLOAT32:   ;
+   return sizeof(fgFLOAT32);
+switch_1_case_FLGR_INT64:   ;
+   return sizeof(fgINT64);
+switch_1_case_FLGR_INT32:   ;
+   return sizeof(fgINT32);
+switch_1_case_FLGR_INT16:   ;
+   return sizeof(fgINT16);
+switch_1_case_FLGR_INT8:   ;
+   return sizeof(fgINT8);
+switch_1_case_FLGR_UINT64:   ;
+   return sizeof(fgUINT64);
+switch_1_case_FLGR_UINT32:   ;
+   return sizeof(fgUINT32);
+switch_1_case_FLGR_UINT16:   ;
+   return sizeof(fgUINT16);
+switch_1_case_FLGR_UINT8:   ;
+   return sizeof(fgUINT8);
+switch_1_case_FLGR_BIT:   ;
+   return sizeof(fgBIT);
+switch_1_default:   ;
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+FLGR_Type flgr_get_type_from_string(char *type)
+{
+   
+   
+   if (strcmp(type, "fgBIT")==0) 
+      return FLGR_BIT;
+   if (strcmp(type, "fgUINT8")==0) 
+      return FLGR_UINT8;
+   if (strcmp(type, "fgUINT16")==0) 
+      return FLGR_UINT16;
+   if (strcmp(type, "fgUINT32")==0) 
+      return FLGR_UINT32;
+   if (strcmp(type, "fgUINT64")==0) 
+      return FLGR_UINT64;
+   if (strcmp(type, "fgINT8")==0) 
+      return FLGR_INT8;
+   if (strcmp(type, "fgINT16")==0) 
+      return FLGR_INT16;
+   if (strcmp(type, "fgINT32")==0) 
+      return FLGR_INT32;
+   if (strcmp(type, "fgINT64")==0) 
+      return FLGR_INT64;
+   if (strcmp(type, "fgFLOAT32")==0) 
+      return FLGR_FLOAT32;
+   if (strcmp(type, "fgFLOAT64")==0) 
+      return FLGR_FLOAT64;
+
+   fprintf(stderr, "Unknown type %s\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 977, __FUNCTION__, type);
+   flgr_backtrace_print();
+   return FLGR_UINT8;
+}
+FLGR_Ret flgr_is_data_type_valid(FLGR_Type type)
+{
+   
+   
+   if (type==FLGR_UINT8)
+      return FLGR_RET_OK;
+   else if (type==FLGR_UINT16)
+      return FLGR_RET_OK;
+   else if (type==FLGR_UINT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT8)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT16)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_FLOAT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_FLOAT64)
+      return FLGR_RET_OK;
+   else if (type==FLGR_BIT)
+      return FLGR_RET_OK;
+   else
+      return FLGR_RET_TYPE_UNKNOWN;
+}
+FLGR_Ret flgr_is_vector_type_valid(FLGR_Type type)
+{
+   
+   
+   if (type==FLGR_UINT8)
+      return FLGR_RET_OK;
+   else if (type==FLGR_UINT16)
+      return FLGR_RET_OK;
+   else if (type==FLGR_UINT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_UINT64)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT8)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT16)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_INT64)
+      return FLGR_RET_OK;
+   else if (type==FLGR_FLOAT32)
+      return FLGR_RET_OK;
+   else if (type==FLGR_FLOAT64)
+      return FLGR_RET_OK;
+   else if (type==FLGR_BIT)
+      return FLGR_RET_OK;
+   else
+      return FLGR_RET_TYPE_UNKNOWN;
+}
+void * flgr_malloc(size_t size)
+{
+   void *tmp = malloc(size);
+   if (tmp==(void *) 0) {
+      
+      
+      
+      fprintf(stderr, "Could not allocate data, returning NULL pointer !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 804, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+
+   return tmp;
+}
+int flgr_normalize_coordinate(int axis_coord, int axis_length)
+{
+   int axis_true = -(1*axis_coord)-1;
+   int axis_false;
+   int axis_test;
+   axis_coord = axis_coord<0?axis_true:axis_coord;
+   axis_test = axis_coord/axis_length%2;
+   axis_true = axis_length-axis_coord%axis_length-1;
+   axis_false = axis_coord%axis_length;
+   axis_coord = axis_coord>=axis_length&&axis_test?axis_true:axis_coord;
+   axis_coord = axis_coord>=axis_length&&!axis_test?axis_false:axis_coord;
+   
+   /*   if(axis_coord<0) { */
+   /*     axis_coord=-1*axis_coord-1; */
+   /*   } */
+   
+   /*   if( axis_coord >= axis_length ) { */
+   /*     if( ((axis_coord/axis_length)%2) == 1 ) */
+   /*       axis_coord = axis_length - (axis_coord%axis_length) - 1; */
+   /*     else */
+   /*       axis_coord = axis_coord%axis_length; */
+   /*   } */
+   
+   return axis_coord;
+}
+FLGR_Vector * flgr_vector_create(int spp, FLGR_Type type)
+{
+   FLGR_Vector *vct;
+   
+   
+   
+   if (flgr_is_vector_type_valid(type)!=FLGR_RET_OK) {
+      fprintf(stderr, "unknwon type\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 885, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+
+   if (spp<1) {
+      fprintf(stderr, "Sample Per Pixel (spp) cannot be < 1\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 890, __FUNCTION__);
+      flgr_backtrace_print();
+      return (void *) 0;
+   }
+
+   vct = flgr_malloc(sizeof(FLGR_Vector));
+
+   vct->bps = flgr_get_bps_from_type(type);
+   vct->spp = spp;
+   vct->type = type;
+
+   vct->array = flgr_malloc(spp*vct->bps/8+16);
+   if (vct->array==(void *) 0) {
+
+      fprintf(stderr, "Allocation error !\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 903, __FUNCTION__);
+      flgr_backtrace_print();
+      flgr_free(vct);
+      return (void *) 0;
+   }
+
+   return vct;
+}
+FLGR_Ret flgr_vector_destroy(FLGR_Vector *vct)
+{
+   if (vct==(void *) 0) {
+      
+      
+      fprintf(stderr, "Null object\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 835, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if (vct->array==(void *) 0) {
+
+      fprintf(stderr, "Vector array is null\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 840, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+   flgr_free(vct->array);
+
+   flgr_free(vct);
+   
+   
+   
+   return FLGR_RET_OK;
+}
+void flgr_vector_mult_fgUINT16(FLGR_Vector *vctdest, FLGR_Vector *vct1, FLGR_Vector *vct2)
+{
+   int k;
+   int spp = vctdest->spp;
+   fgUINT16 *p1 = (fgUINT16 *) vct1->array;
+   fgUINT16 *p2 = (fgUINT16 *) vct2->array;
+   fgUINT16 *pdest = (fgUINT16 *) vctdest->array;
+   fgUINT16 a1, a2;
+   for(k = 0; k <= spp-1; k += 1) {
+      a1 = flgr_get_array_fgUINT16(p1, k);
+      a2 = flgr_get_array_fgUINT16(p2, k);
+      flgr_set_array_fgUINT16(pdest, k, flgr_defop_mult_fgUINT16(a1, a2));
+   }
+   return;
+}
+void flgr_vector_populate_from_scalar_fgUINT16(FLGR_Vector *vctdest, fgUINT16 scalar)
+{
+   int k;
+   fgUINT16 *vctar = (fgUINT16 *) vctdest->array;
+   for(k = 0; k <= vctdest->spp-1; k += 1)
+      flgr_set_array_fgUINT16(vctar, k, scalar);
+   return;
+}
+void flgr_vector_sup_fgUINT16(FLGR_Vector *vctdest, FLGR_Vector *vct1, FLGR_Vector *vct2)
+{
+   int k;
+   int spp = vctdest->spp;
+   fgUINT16 *p1 = (fgUINT16 *) vct1->array;
+   fgUINT16 *p2 = (fgUINT16 *) vct2->array;
+   fgUINT16 *pdest = (fgUINT16 *) vctdest->array;
+   fgUINT16 a1, a2;
+   for(k = 0; k <= spp-1; k += 1) {
+      a1 = flgr_get_array_fgUINT16(p1, k);
+      a2 = flgr_get_array_fgUINT16(p2, k);
+      flgr_set_array_fgUINT16(pdest, k, flgr_defop_sup_fgUINT16(a1, a2));
+   }
+   return;
+}
+static fgBIT flgr1d_get_data_array_fgBIT(fgBIT *array, int pos)
+{
+   return flgr_get_array_fgBIT(array, pos);
+}
+static fgFLOAT32 flgr1d_get_data_array_fgFLOAT32(fgFLOAT32 *array, int pos)
+{
+   return flgr_get_array_fgFLOAT32(array, pos);
+}
+static fgFLOAT64 flgr1d_get_data_array_fgFLOAT64(fgFLOAT64 *array, int pos)
+{
+   return flgr_get_array_fgFLOAT64(array, pos);
+}
+static fgINT16 flgr1d_get_data_array_fgINT16(fgINT16 *array, int pos)
+{
+   return flgr_get_array_fgINT16(array, pos);
+}
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+   return flgr_get_array_fgINT32(array, pos);
+}
+static fgINT64 flgr1d_get_data_array_fgINT64(fgINT64 *array, int pos)
+{
+   return flgr_get_array_fgINT64(array, pos);
+}
+static fgINT8 flgr1d_get_data_array_fgINT8(fgINT8 *array, int pos)
+{
+   return flgr_get_array_fgINT8(array, pos);
+}
+static fgUINT16 flgr1d_get_data_array_fgUINT16(fgUINT16 *array, int pos)
+{
+   return flgr_get_array_fgUINT16(array, pos);
+}
+static fgUINT32 flgr1d_get_data_array_fgUINT32(fgUINT32 *array, int pos)
+{
+   return flgr_get_array_fgUINT32(array, pos);
+}
+static fgUINT64 flgr1d_get_data_array_fgUINT64(fgUINT64 *array, int pos)
+{
+   return flgr_get_array_fgUINT64(array, pos);
+}
+static fgUINT8 flgr1d_get_data_array_fgUINT8(fgUINT8 *array, int pos)
+{
+   return flgr_get_array_fgUINT8(array, pos);
+}
+static void flgr1d_set_data_array_fgBIT(fgBIT *array, int pos, fgBIT value)
+{
+   flgr_set_array_fgBIT(array, pos, value);
+}
+static void flgr1d_set_data_array_fgFLOAT32(fgFLOAT32 *array, int pos, fgFLOAT32 value)
+{
+   flgr_set_array_fgFLOAT32(array, pos, value);
+}
+static void flgr1d_set_data_array_fgFLOAT64(fgFLOAT64 *array, int pos, fgFLOAT64 value)
+{
+   flgr_set_array_fgFLOAT64(array, pos, value);
+}
+static void flgr1d_set_data_array_fgINT16(fgINT16 *array, int pos, fgINT16 value)
+{
+   flgr_set_array_fgINT16(array, pos, value);
+}
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   flgr_set_array_fgINT32(array, pos, value);
+}
+static void flgr1d_set_data_array_fgINT64(fgINT64 *array, int pos, fgINT64 value)
+{
+   flgr_set_array_fgINT64(array, pos, value);
+}
+static void flgr1d_set_data_array_fgINT8(fgINT8 *array, int pos, fgINT8 value)
+{
+   flgr_set_array_fgINT8(array, pos, value);
+}
+static void flgr1d_set_data_array_fgUINT16(fgUINT16 *array, int pos, fgUINT16 value)
+{
+   flgr_set_array_fgUINT16(array, pos, value);
+}
+static void flgr1d_set_data_array_fgUINT32(fgUINT32 *array, int pos, fgUINT32 value)
+{
+   flgr_set_array_fgUINT32(array, pos, value);
+}
+static void flgr1d_set_data_array_fgUINT64(fgUINT64 *array, int pos, fgUINT64 value)
+{
+   flgr_set_array_fgUINT64(array, pos, value);
+}
+static void flgr1d_set_data_array_fgUINT8(fgUINT8 *array, int pos, fgUINT8 value)
+{
+   flgr_set_array_fgUINT8(array, pos, value);
+}
+static fgBIT flgr2d_get_data_array_fgBIT(fgBIT **array, int row, int col)
+{
+   return flgr_get_array_fgBIT(array[row], col);
+}
+static fgFLOAT32 flgr2d_get_data_array_fgFLOAT32(fgFLOAT32 **array, int row, int col)
+{
+   return flgr_get_array_fgFLOAT32(array[row], col);
+}
+static fgFLOAT64 flgr2d_get_data_array_fgFLOAT64(fgFLOAT64 **array, int row, int col)
+{
+   return flgr_get_array_fgFLOAT64(array[row], col);
+}
+static fgINT16 flgr2d_get_data_array_fgINT16(fgINT16 **array, int row, int col)
+{
+   return flgr_get_array_fgINT16(array[row], col);
+}
+static fgINT32 flgr2d_get_data_array_fgINT32(fgINT32 **array, int row, int col)
+{
+   return flgr_get_array_fgINT32(array[row], col);
+}
+static fgINT8 flgr2d_get_data_array_fgINT8(fgINT8 **array, int row, int col)
+{
+   return flgr_get_array_fgINT8(array[row], col);
+}
+static fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16 **array, int row, int col)
+{
+   return flgr_get_array_fgUINT16(array[row], col);
+}
+static fgUINT32 flgr2d_get_data_array_fgUINT32(fgUINT32 **array, int row, int col)
+{
+   return flgr_get_array_fgUINT32(array[row], col);
+}
+static fgUINT8 flgr2d_get_data_array_fgUINT8(fgUINT8 **array, int row, int col)
+{
+   return flgr_get_array_fgUINT8(array[row], col);
+}
+static void flgr2d_set_data_array_fgBIT(fgBIT **array, int row, int col, fgBIT value)
+{
+   flgr_set_array_fgBIT(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgFLOAT32(fgFLOAT32 **array, int row, int col, fgFLOAT32 value)
+{
+   flgr_set_array_fgFLOAT32(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgFLOAT64(fgFLOAT64 **array, int row, int col, fgFLOAT64 value)
+{
+   flgr_set_array_fgFLOAT64(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgINT16(fgINT16 **array, int row, int col, fgINT16 value)
+{
+   flgr_set_array_fgINT16(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgINT32(fgINT32 **array, int row, int col, fgINT32 value)
+{
+   flgr_set_array_fgINT32(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgINT8(fgINT8 **array, int row, int col, fgINT8 value)
+{
+   flgr_set_array_fgINT8(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgUINT16(fgUINT16 **array, int row, int col, fgUINT16 value)
+{
+   flgr_set_array_fgUINT16(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgUINT32(fgUINT32 **array, int row, int col, fgUINT32 value)
+{
+   flgr_set_array_fgUINT32(array[row], col, value);
+}
+static void flgr2d_set_data_array_fgUINT8(fgUINT8 **array, int row, int col, fgUINT8 value)
+{
+   flgr_set_array_fgUINT8(array[row], col, value);
+}
+static fgUINT16 flgr_defop_mult_fgUINT16(fgUINT16 a, fgUINT16 b)
+{
+   return a*b;
+}
+static fgUINT16 flgr_defop_sup_fgUINT16(fgUINT16 a, fgUINT16 b)
+{
+   return a<b?b:a;
+}
+static fgBIT flgr_get_array_fgBIT(fgBIT *array, int pos)
+{
+   fgBIT val;
+   fgBIT mask = 0;
+   int vectorbps = sizeof(fgBIT)<<3;
+   int vectorSelect;
+   int pixinVector;
+   int nbdec;
+
+   vectorSelect = pos/vectorbps;
+   pixinVector = pos%vectorbps;
+
+   nbdec = vectorbps-((fgBIT) 1)-pixinVector;
+   mask = (fgBIT) 1<<nbdec;
+
+   val = array[vectorSelect];
+   val &= mask;
+   val = val>>nbdec;
+   return val;
+}
+static fgFLOAT32 flgr_get_array_fgFLOAT32(fgFLOAT32 *array, int pos)
+{
+   return array[pos];
+}
+static fgFLOAT64 flgr_get_array_fgFLOAT64(fgFLOAT64 *array, int pos)
+{
+   return array[pos];
+}
+static fgINT16 flgr_get_array_fgINT16(fgINT16 *array, int pos)
+{
+   return array[pos];
+}
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+   return array[pos];
+}
+static fgINT64 flgr_get_array_fgINT64(fgINT64 *array, int pos)
+{
+   return array[pos];
+}
+static fgINT8 flgr_get_array_fgINT8(fgINT8 *array, int pos)
+{
+   return array[pos];
+}
+static fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos)
+{
+   return array[pos];
+}
+static fgUINT32 flgr_get_array_fgUINT32(fgUINT32 *array, int pos)
+{
+   return array[pos];
+}
+static fgUINT64 flgr_get_array_fgUINT64(fgUINT64 *array, int pos)
+{
+   return array[pos];
+}
+static fgUINT8 flgr_get_array_fgUINT8(fgUINT8 *array, int pos)
+{
+   return array[pos];
+}
+static void flgr_get_data_array_vector_fgBIT(fgBIT *vector_array, fgBIT *data_array, int spp, int pos)
+{
+   register fgBIT val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgBIT(data_array, i);
+      flgr_set_array_fgBIT(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgFLOAT32(fgFLOAT32 *vector_array, fgFLOAT32 *data_array, int spp, int pos)
+{
+   register fgFLOAT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgFLOAT32(data_array, i);
+      flgr_set_array_fgFLOAT32(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgFLOAT64(fgFLOAT64 *vector_array, fgFLOAT64 *data_array, int spp, int pos)
+{
+   register fgFLOAT64 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgFLOAT64(data_array, i);
+      flgr_set_array_fgFLOAT64(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgINT16(fgINT16 *vector_array, fgINT16 *data_array, int spp, int pos)
+{
+   register fgINT16 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT16(data_array, i);
+      flgr_set_array_fgINT16(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgINT32(fgINT32 *vector_array, fgINT32 *data_array, int spp, int pos)
+{
+   register fgINT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT32(data_array, i);
+      flgr_set_array_fgINT32(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgINT8(fgINT8 *vector_array, fgINT8 *data_array, int spp, int pos)
+{
+   register fgINT8 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT8(data_array, i);
+      flgr_set_array_fgINT8(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos)
+{
+   register fgUINT16 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT16(data_array, i);
+      flgr_set_array_fgUINT16(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgUINT32(fgUINT32 *vector_array, fgUINT32 *data_array, int spp, int pos)
+{
+   register fgUINT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT32(data_array, i);
+      flgr_set_array_fgUINT32(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_get_data_array_vector_fgUINT8(fgUINT8 *vector_array, fgUINT8 *data_array, int spp, int pos)
+{
+   register fgUINT8 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT8(data_array, i);
+      flgr_set_array_fgUINT8(vector_array, k, val);
+      i++;
+   }
+}
+static void flgr_set_array_fgBIT(fgBIT *array, int pos, fgBIT value)
+{
+   fgBIT val;
+   fgBIT mask = 0;
+   int vectorbps = sizeof(fgBIT)<<3;
+   int vectorSelect;
+   int pixinVector;
+   int nbdec;
+
+   vectorSelect = pos/vectorbps;
+   pixinVector = pos%vectorbps;
+
+   nbdec = vectorbps-((fgBIT) 1)-pixinVector;
+   mask = (fgBIT) 1<<nbdec;
+
+   val = array[vectorSelect];
+   val &= ~mask;
+   value = (value&(fgBIT) 1)<<nbdec;
+   val |= value;
+
+   array[vectorSelect] = val;
+}
+static void flgr_set_array_fgFLOAT32(fgFLOAT32 *array, int pos, fgFLOAT32 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgFLOAT64(fgFLOAT64 *array, int pos, fgFLOAT64 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgINT16(fgINT16 *array, int pos, fgINT16 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgINT64(fgINT64 *array, int pos, fgINT64 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgINT8(fgINT8 *array, int pos, fgINT8 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgUINT16(fgUINT16 *array, int pos, fgUINT16 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgUINT32(fgUINT32 *array, int pos, fgUINT32 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgUINT64(fgUINT64 *array, int pos, fgUINT64 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_array_fgUINT8(fgUINT8 *array, int pos, fgUINT8 value)
+{
+   array[pos] = value;
+}
+static void flgr_set_data_array_vector_fgBIT(fgBIT *data_array, fgBIT *vector_array, int spp, int pos)
+{
+   register fgBIT val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgBIT(vector_array, k);
+      flgr_set_array_fgBIT(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgFLOAT32(fgFLOAT32 *data_array, fgFLOAT32 *vector_array, int spp, int pos)
+{
+   register fgFLOAT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgFLOAT32(vector_array, k);
+      flgr_set_array_fgFLOAT32(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgFLOAT64(fgFLOAT64 *data_array, fgFLOAT64 *vector_array, int spp, int pos)
+{
+   register fgFLOAT64 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgFLOAT64(vector_array, k);
+      flgr_set_array_fgFLOAT64(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgINT16(fgINT16 *data_array, fgINT16 *vector_array, int spp, int pos)
+{
+   register fgINT16 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT16(vector_array, k);
+      flgr_set_array_fgINT16(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgINT32(fgINT32 *data_array, fgINT32 *vector_array, int spp, int pos)
+{
+   register fgINT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT32(vector_array, k);
+      flgr_set_array_fgINT32(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgINT8(fgINT8 *data_array, fgINT8 *vector_array, int spp, int pos)
+{
+   register fgINT8 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgINT8(vector_array, k);
+      flgr_set_array_fgINT8(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_array, int spp, int pos)
+{
+   register fgUINT16 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT16(vector_array, k);
+      flgr_set_array_fgUINT16(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgUINT32(fgUINT32 *data_array, fgUINT32 *vector_array, int spp, int pos)
+{
+   register fgUINT32 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT32(vector_array, k);
+      flgr_set_array_fgUINT32(data_array, i, val);
+      i++;
+   }
+}
+static void flgr_set_data_array_vector_fgUINT8(fgUINT8 *data_array, fgUINT8 *vector_array, int spp, int pos)
+{
+   register fgUINT8 val;
+   register int i, k;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      val = flgr_get_array_fgUINT8(vector_array, k);
+      flgr_set_array_fgUINT8(data_array, i, val);
+      i++;
+   }
+}
+int main(int argc, char *argv[])
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   fgUINT16 rawsrc[] = {105, 115, 28, 41, 41, 48, 54, 57, 62, 70, 72, 76, 75, 76, 76, 78, 75, 77, 78, 76, 75, 79, 77, 76, 77, 73, 71, 64, 62, 55, 50, 44, 42, 32, 123, 112, 100, 88, 82, 73, 73, 76, 76, 81, 85, 86, 90, 90, 93, 92, 91, 96, 96, 100, 96, 98, 98, 97, 102, 99, 98, 96, 99, 102, 98, 93, 100, 99, 94, 96, 94, 90, 88, 87, 88, 88, 85, 87, 35, 5};
+   
+   
+   
+   
+   
+   
+   
+   
+   fgUINT16 rawref[] = {92, 78, 68, 56, 60, 62, 64, 67, 70, 71, 87, 78, 71, 63, 65, 65, 66, 66, 66, 67, 66, 65, 64, 72, 80, 87, 82, 77, 72, 71, 66, 65, 64, 74, 82, 90, 86, 82, 77, 76, 71, 71, 71, 81, 90, 98, 95, 93, 90, 90, 88, 89, 91, 92, 93, 93, 94, 95, 95, 96, 94, 94, 94, 94, 94, 93, 93, 88, 79, 71, 94, 94, 93, 93, 92, 92, 92, 83, 69, 57};
+
+   FLGR_Data2D *imgsrc, *imgref, *img, *nhb;
+   FLGR_Ret ret;
+
+   imgsrc = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
+   imgref = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
+   img = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
+   
+   
+   nhb = flgr2d_create_neighborhood(3, 3, 1, flgr_get_type_from_string("fgUINT16"), FLGR_RECT, FLGR_8_CONNEX);
+
+   flgr2d_import_raw_ptr(imgsrc, rawsrc);
+   flgr2d_import_raw_ptr(imgref, rawref);
+   
+   
+   ret = flgr2d_convolution(img, imgsrc, nhb);
+   
+   /*check_and_display_data2d(imgref,img,ret);				*/
+   
+   flgr2d_destroy(imgsrc);
+   flgr2d_destroy(imgref);
+   flgr2d_destroy(img);
+   flgr2d_destroy(nhb);
+
+   return 1;
+}
+FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb)
+{
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
+      fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null objects!\n", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK) 
+      return ret;
+
+   if (datdest->type==FLGR_UINT16) {
+      {
+         //PIPS generated variable
+         FLGR_Data2D *datdest0, *datsrc0, *nhb0;
+         datdest0 = datdest;
+         datsrc0 = datsrc;
+         nhb0 = nhb;
+
+         flgr2d_raster_slide_window_fgUINT16(datdest0, datsrc0, nhb0, FLGR_NHB_NO_SYM, flgr2d_get_nhb_convolution_fgUINT16);
+      }
+   }
+}
+static fgUINT16 flgr_get_array_fgUINT16(fgUINT16 *array, int pos)
+{
+   return array[pos];
+}
+void flgr2d_native_dilate_4_connexity_fgUINT16(FLGR_Data2D *nhb)
+{
+   FLGR_Data2D *nhbcopy;
+   fgUINT16 **seodd;
+   fgUINT16 **seeven;
+   fgUINT16 **se;
+   int i, j;
+   int k, l;
+   int m, n;
+   fgUINT16 valse;
+   FLGR_Vector *vecPixValue = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecPixMax = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vecSeValue = flgr_vector_create(nhb->spp, nhb->type);
+   nhbcopy = flgr2d_create_from(nhb);
+   flgr2d_copy(nhbcopy, nhb);
+   seodd = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seodd[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seodd[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven = (fgUINT16 **) flgr_malloc(sizeof(fgUINT16 *)*3);
+   seeven[0] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[1] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   seeven[2] = (fgUINT16 *) flgr_malloc(sizeof(fgUINT16)*3);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 0, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seodd, 2, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 0, 2, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 0, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 1, 2, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 0, 0);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 1, 1);
+   flgr2d_set_data_array_fgUINT16(seeven, 2, 2, 0);
+   for(i = 0; i <= nhb->size_y-1; i += 1)
+      for(j = 0; j <= nhb->size_x-1; j += 1) {
+         flgr_vector_populate_from_scalar_fgUINT16(vecPixMax, 0);
+         m = 0;
+         for(k = i-1; k <= i+1; k += 1) {
+            if (k>=0&&k<nhb->size_y) {
+               n = 0;
+               for(l = j-1; l <= j+1; l += 1) {
+                  if (l>=0&&l<nhb->size_x) {
+                     se = i%2==1?seodd:seeven;
+                     valse = flgr2d_get_data_array_fgUINT16(se, m, n);
+                     flgr_vector_populate_from_scalar_fgUINT16(vecSeValue, valse);
+                     flgr2d_get_data_vector_no_norm_fgUINT16(nhbcopy, k, l, vecPixValue);
+                     flgr_vector_mult_fgUINT16(vecPixValue, vecPixValue, vecSeValue);
+                     flgr_vector_sup_fgUINT16(vecPixMax, vecPixMax, vecPixValue);
+                  }
+                  n++;
+               }
+            }
+            m++;
+         }
+         flgr2d_set_data_vector_fgUINT16(nhb, i, j, vecPixMax);
+      }
+   flgr_vector_destroy(vecPixValue);
+   flgr_vector_destroy(vecPixMax);
+   flgr_vector_destroy(vecSeValue);
+   flgr2d_destroy(nhbcopy);
+   flgr_free(seodd[0]);
+   flgr_free(seodd[1]);
+   flgr_free(seodd[2]);
+   flgr_free(seodd);
+   flgr_free(seeven[0]);
+   flgr_free(seeven[1]);
+   flgr_free(seeven[2]);
+   flgr_free(seeven);
+   return;
+}
+void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *nhb, int nhb_sym, const FLGR_ComputeNhb2D computeNhb)
+{
+   int i, j, w, h, spp = imgsrc->spp;
+   fgUINT16 *vector_array;
+   fgUINT16 *data_array;
+   FLGR_Vector *result;
+   FLGR_Data2D *nhbEven, *nhbOdd, *nhbrs;
+   FLGR_NhbBox2D *extr;
+   //PIPS generated variable
+   void **P_39;
+   //PIPS generated variable
+   unsigned short _return0, _return1, _return2;
+   w = imgsrc->size_x;
+   h = imgsrc->size_y;
+   result = flgr_vector_create(imgsrc->spp, imgsrc->type);
+   vector_array = (fgUINT16 *) result->array;
+   extr = flgr2d_create_neighbor_box(nhb);
+   nhbEven = flgr2d_create_neighborhood_from(nhb);
+   nhbOdd = flgr2d_create_neighborhood_from(nhb);
+   flgr2d_fill_nhbs_for_6_connexity(nhbEven, nhbOdd, nhb, nhb_sym);
+   if (imgdest==imgsrc) {
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbOdd);
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbEven);
+   }
+   for(i = 0; i <= h-1; i += 1) {
+      P_39 = imgdest->array;
+      data_array = (fgUINT16 *) P_39[i];
+      for(j = 0; j <= w-1; j += 1) {
+         nhbrs = i%2==1?nhbOdd:nhbEven;
+         {
+            //PIPS generated variable
+            FLGR_NhbBox2D *extr0;
+            //PIPS generated variable
+            FLGR_Data2D *dat0, *nhb0;
+            //PIPS generated variable
+            int row0, col0;
+            extr0 = extr;
+            dat0 = imgsrc;
+            nhb0 = nhbrs;
+            row0 = i;
+            col0 = j;
+            {
+               int i, j, m;
+               int k, l, n;
+               int nbrow, nbcol;
+               int startrow, stoprow;
+               int startcol, stopcol;
+               int nhbsize_xdiv2;
+               int nhbsize_ydiv2;
+               int spp;
+               fgUINT16 **pnhb;
+               fgUINT16 **pdat;
+               fgUINT16 *list_data;
+               fgUINT16 *list_nhb;
+               int *list_coord_x;
+               int *list_coord_y;
+               int *size;
+               fgUINT16 nhb_val, data_val;
+               //PIPS generated variable
+               void **P_21;
+               //PIPS generated variable
+               void **P_22;
+               //PIPS generated variable
+               void **P_23;
+               //PIPS generated variable
+               void **P_24;
+               //PIPS generated variable
+               int **P_25, **P_26;
+               spp = dat0->spp;
+               pnhb = (fgUINT16 **) nhb0->array;
+               pdat = (fgUINT16 **) dat0->array;
+               size = extr0->size;
+               nhbsize_xdiv2 = nhb0->size_x>>1;
+               nhbsize_ydiv2 = nhb0->size_y>>1;
+               nbrow = dat0->size_y;
+               nbcol = dat0->size_x;
+               extr0->center_coord_y = row0;
+               extr0->center_coord_x = col0;
+               startrow = row0-nhbsize_ydiv2;
+               startrow = startrow<0?0:startrow;
+               stoprow = row0+nhbsize_ydiv2;
+               stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+               startcol = col0-nhbsize_xdiv2;
+               startcol = startcol<0?0:startcol;
+               stopcol = col0+nhbsize_xdiv2;
+               stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+               P_21 = dat0->array;
+               flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr0->center_data_val->array, (fgUINT16 *) P_21[row0], spp, col0);
+               P_22 = nhb0->array;
+               flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr0->center_nhb_val->array, (fgUINT16 *) P_22[nhbsize_ydiv2], spp, nhbsize_xdiv2);
+               for(n = 0; n <= spp-1; n += 1) {
+                  P_23 = extr0->list_data_val;
+                  list_data = (fgUINT16 *) P_23[n];
+                  P_24 = extr0->list_nhb_val;
+                  list_nhb = (fgUINT16 *) P_24[n];
+                  P_25 = extr0->list_coord_x;
+                  list_coord_x = (int *) P_25[n];
+                  P_26 = extr0->list_coord_y;
+                  list_coord_y = (int *) P_26[n];
+                  m = 0;
+                  k = startrow-row0+nhbsize_ydiv2;
+                  for(i = startrow; i <= stoprow; i += 1) {
+                     l = startcol-col0+nhbsize_xdiv2;
+                     for(j = startcol; j <= stopcol; j += 1) {
+                        {
+                           //PIPS generated variable
+                           int I_2;
+                           I_2 = l*spp+n;
+                           {
+                              //PIPS generated variable
+                              unsigned short _return0;
+                              {
+                                 //PIPS generated variable
+                                 fgUINT16 *P_40;
+                                 P_40 = pnhb[k];
+                                 _return0 = P_40[I_2];
+                              }
+                              _return1 = _return0;
+                           }
+                        }
+                        nhb_val = _return1;
+                        if (nhb_val!=0) {
+                           {
+                              //PIPS generated variable
+                              int I_3;
+                              I_3 = j*spp+n;
+                              {
+                                 //PIPS generated variable
+                                 unsigned short _return0;
+                                 {
+                                    //PIPS generated variable
+                                    fgUINT16 *P_40;
+                                    P_40 = pdat[i];
+                                    _return0 = P_40[I_3];
+                                 }
+                                 _return2 = _return0;
+                              }
+                           }
+                           data_val = _return2;
+                           list_coord_x[m] = l;
+                           list_coord_y[m] = k;
+                           list_data[m] = data_val;
+                           list_nhb[m] = nhb_val;
+                           m++;
+                        }
+                        l++;
+                     }
+                     k++;
+                  }
+                  size[n] = m;
+               }
+            }
+         }
+         (*computeNhb)(result,extr);
+         {
+            //PIPS generated variable
+            fgUINT16 *data_array0, *vector_array0;
+            //PIPS generated variable
+            int spp0, pos0;
+            data_array0 = data_array;
+            vector_array0 = vector_array;
+            spp0 = spp;
+            pos0 = j;
+            {
+               register fgUINT16 val;
+               register int i, k;
+               i = pos0*spp0;
+
+               for(k = 0; k <= spp0-1; k += 1) {
+                  _return0 = vector_array0[k];
+                  val = _return0;
+                  {
+                     //PIPS generated variable
+                     fgUINT16 *array0;
+                     //PIPS generated variable
+                     int pos1;
+                     //PIPS generated variable
+                     fgUINT16 value0;
+                     array0 = data_array0;
+                     pos1 = i;
+                     value0 = val;
+                     array0[pos1] = value0;
+                  }
+                  i++;
+               }
+            }
+         }
+      }
+   }
+   flgr2d_destroy(nhbOdd);
+   flgr2d_destroy(nhbEven);
+   flgr2d_destroy_neighbor_box(extr);
+   flgr_vector_destroy(result);
+   return;
+}
+void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *nhb, int nhb_sym, const FLGR_ComputeNhb2D computeNhb)
+{
+   int i, j, w, h, spp = imgsrc->spp;
+   fgUINT16 *vector_array;
+   fgUINT16 *data_array;
+   FLGR_Vector *result;
+   FLGR_Data2D *nhbEven, *nhbOdd, *nhbrs;
+   FLGR_NhbBox2D *extr;
+   //PIPS generated variable
+   void **P_39;
+   //PIPS generated variable
+   unsigned short _return0, _return1, _return2;
+   w = imgsrc->size_x;
+   h = imgsrc->size_y;
+   result = flgr_vector_create(imgsrc->spp, imgsrc->type);
+   vector_array = (fgUINT16 *) result->array;
+   extr = flgr2d_create_neighbor_box(nhb);
+   nhbEven = flgr2d_create_neighborhood_from(nhb);
+   nhbOdd = flgr2d_create_neighborhood_from(nhb);
+   flgr2d_fill_nhbs_for_6_connexity(nhbEven, nhbOdd, nhb, nhb_sym);
+   if (imgdest==imgsrc) {
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbOdd);
+      flgr2d_apply_raster_scan_method_fgUINT16(nhbEven);
+   }
+   for(i = 0; i <= h-1; i += 1) {
+      P_39 = imgdest->array;
+      data_array = (fgUINT16 *) P_39[i];
+      for(j = 0; j <= w-1; j += 1) {
+         nhbrs = i%2==1?nhbOdd:nhbEven;
+         {
+            //PIPS generated variable
+            FLGR_NhbBox2D *extr0;
+            //PIPS generated variable
+            FLGR_Data2D *dat0, *nhb0;
+            //PIPS generated variable
+            int row0, col0;
+            extr0 = extr;
+            dat0 = imgsrc;
+            nhb0 = nhbrs;
+            row0 = i;
+            col0 = j;
+            {
+               int i, j, m;
+               int k, l, n;
+               int nbrow, nbcol;
+               int startrow, stoprow;
+               int startcol, stopcol;
+               int nhbsize_xdiv2;
+               int nhbsize_ydiv2;
+               int spp;
+               fgUINT16 **pnhb;
+               fgUINT16 **pdat;
+               fgUINT16 *list_data;
+               fgUINT16 *list_nhb;
+               int *list_coord_x;
+               int *list_coord_y;
+               int *size;
+               fgUINT16 nhb_val, data_val;
+               //PIPS generated variable
+               void **P_21;
+               //PIPS generated variable
+               void **P_22;
+               //PIPS generated variable
+               void **P_23;
+               //PIPS generated variable
+               void **P_24;
+               //PIPS generated variable
+               int **P_25, **P_26;
+               spp = dat0->spp;
+               pnhb = (fgUINT16 **) nhb0->array;
+               pdat = (fgUINT16 **) dat0->array;
+               size = extr0->size;
+               nhbsize_xdiv2 = nhb0->size_x>>1;
+               nhbsize_ydiv2 = nhb0->size_y>>1;
+               nbrow = dat0->size_y;
+               nbcol = dat0->size_x;
+               extr0->center_coord_y = row0;
+               extr0->center_coord_x = col0;
+               startrow = row0-nhbsize_ydiv2;
+               startrow = startrow<0?0:startrow;
+               stoprow = row0+nhbsize_ydiv2;
+               stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+               startcol = col0-nhbsize_xdiv2;
+               startcol = startcol<0?0:startcol;
+               stopcol = col0+nhbsize_xdiv2;
+               stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+               P_21 = dat0->array;
+               {
+                  //PIPS generated variable
+                  fgUINT16 *vector_array1, *data_array1;
+                  //PIPS generated variable
+                  int spp1, pos2;
+                  vector_array1 = (fgUINT16 *) extr0->center_data_val->array;
+                  data_array1 = (fgUINT16 *) P_21[row0];
+                  spp1 = spp;
+                  pos2 = col0;
+                  {
+                     register fgUINT16 val;
+                     register int i, k;
+                     //PIPS generated variable
+                     unsigned short _return0;
+                     i = pos2*spp1;
+
+                     for(k = 0; k <= spp1-1; k += 1) {
+                        _return0 = data_array1[i];
+                        val = _return0;
+                        {
+                           //PIPS generated variable
+                           fgUINT16 *array0;
+                           //PIPS generated variable
+                           int pos0;
+                           //PIPS generated variable
+                           fgUINT16 value0;
+                           array0 = vector_array1;
+                           pos0 = k;
+                           value0 = val;
+                           array0[pos0] = value0;
+                        }
+                        i++;
+                     }
+                  }
+               }
+               P_22 = nhb0->array;
+               {
+                  //PIPS generated variable
+                  fgUINT16 *vector_array2, *data_array2;
+                  //PIPS generated variable
+                  int spp2, pos3;
+                  vector_array2 = (fgUINT16 *) extr0->center_nhb_val->array;
+                  data_array2 = (fgUINT16 *) P_22[nhbsize_ydiv2];
+                  spp2 = spp;
+                  pos3 = nhbsize_xdiv2;
+                  {
+                     register fgUINT16 val;
+                     register int i, k;
+                     //PIPS generated variable
+                     unsigned short _return0;
+                     i = pos3*spp2;
+
+                     for(k = 0; k <= spp2-1; k += 1) {
+                        _return0 = data_array2[i];
+                        val = _return0;
+                        {
+                           //PIPS generated variable
+                           fgUINT16 *array0;
+                           //PIPS generated variable
+                           int pos0;
+                           //PIPS generated variable
+                           fgUINT16 value0;
+                           array0 = vector_array2;
+                           pos0 = k;
+                           value0 = val;
+                           array0[pos0] = value0;
+                        }
+                        i++;
+                     }
+                  }
+               }
+               for(n = 0; n <= spp-1; n += 1) {
+                  P_23 = extr0->list_data_val;
+                  list_data = (fgUINT16 *) P_23[n];
+                  P_24 = extr0->list_nhb_val;
+                  list_nhb = (fgUINT16 *) P_24[n];
+                  P_25 = extr0->list_coord_x;
+                  list_coord_x = (int *) P_25[n];
+                  P_26 = extr0->list_coord_y;
+                  list_coord_y = (int *) P_26[n];
+                  m = 0;
+                  k = startrow-row0+nhbsize_ydiv2;
+                  for(i = startrow; i <= stoprow; i += 1) {
+                     l = startcol-col0+nhbsize_xdiv2;
+                     for(j = startcol; j <= stopcol; j += 1) {
+                        {
+                           //PIPS generated variable
+                           int I_2;
+                           I_2 = l*spp+n;
+                           {
+                              //PIPS generated variable
+                              unsigned short _return0;
+                              {
+                                 //PIPS generated variable
+                                 fgUINT16 *P_40;
+                                 P_40 = pnhb[k];
+                                 _return0 = P_40[I_2];
+                              }
+                              _return1 = _return0;
+                           }
+                        }
+                        nhb_val = _return1;
+                        if (nhb_val!=0) {
+                           {
+                              //PIPS generated variable
+                              int I_3;
+                              I_3 = j*spp+n;
+                              {
+                                 //PIPS generated variable
+                                 unsigned short _return0;
+                                 {
+                                    //PIPS generated variable
+                                    fgUINT16 *P_40;
+                                    P_40 = pdat[i];
+                                    _return0 = P_40[I_3];
+                                 }
+                                 _return2 = _return0;
+                              }
+                           }
+                           data_val = _return2;
+                           list_coord_x[m] = l;
+                           list_coord_y[m] = k;
+                           list_data[m] = data_val;
+                           list_nhb[m] = nhb_val;
+                           m++;
+                        }
+                        l++;
+                     }
+                     k++;
+                  }
+                  size[n] = m;
+               }
+            }
+         }
+         (*computeNhb)(result,extr);
+         {
+            //PIPS generated variable
+            fgUINT16 *data_array0, *vector_array0;
+            //PIPS generated variable
+            int spp0, pos0;
+            data_array0 = data_array;
+            vector_array0 = vector_array;
+            spp0 = spp;
+            pos0 = j;
+            {
+               register fgUINT16 val;
+               register int i, k;
+               i = pos0*spp0;
+
+               for(k = 0; k <= spp0-1; k += 1) {
+                  _return0 = vector_array0[k];
+                  val = _return0;
+                  {
+                     //PIPS generated variable
+                     fgUINT16 *array0;
+                     //PIPS generated variable
+                     int pos1;
+                     //PIPS generated variable
+                     fgUINT16 value0;
+                     array0 = data_array0;
+                     pos1 = i;
+                     value0 = val;
+                     array0[pos1] = value0;
+                  }
+                  i++;
+               }
+            }
+         }
+      }
+   }
+   flgr2d_destroy(nhbOdd);
+   flgr2d_destroy(nhbEven);
+   flgr2d_destroy_neighbor_box(extr);
+   flgr_vector_destroy(result);
+   return;
+}
+void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr)
+{
+   int i, k;
+   int spp = extr->spp;
+   fgUINT16 *presult = (fgUINT16 *) result->array;
+   fgUINT16 *list_data_val;
+   fgUINT16 *list_nhb_val;
+   int *size = extr->size;
+   fgFLOAT64 a, b, sum;
+   fgFLOAT64 tmp;
+   //PIPS generated variable
+   void **P_27;
+   //PIPS generated variable
+   void **P_28;
+   for(k = 0; k <= spp-1; k += 1) {
+      P_27 = extr->list_data_val;
+      list_data_val = (fgUINT16 *) P_27[k];
+      P_28 = extr->list_nhb_val;
+      list_nhb_val = (fgUINT16 *) P_28[k];
+      tmp = 0;
+      sum = 0;
+      for(i = 0; i <= size[k]-1; i += 1) {
+         a = (fgFLOAT64) list_data_val[i];
+         b = (fgFLOAT64) list_nhb_val[i];
+         tmp = tmp+a*b;
+         sum = sum+fabs(b);
+      }
+      if (sum!=0) {
+         {
+            //PIPS generated variable
+            fgUINT16 *array0;
+            //PIPS generated variable
+            int pos0;
+            //PIPS generated variable
+            fgUINT16 value0;
+            array0 = presult;
+            pos0 = k;
+            value0 = (fgUINT16) tmp/sum;
+            array0[pos0] = value0;
+         }
+      }
+   }
+   return;
+}
+FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb)
+{
+   FLGR_Ret ret;
+   if (datdest==(void *) 0||datsrc==(void *) 0||nhb==(void *) 0) {
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1744, __FUNCTION__);
+      flgr_backtrace_print();
+      return FLGR_RET_NULL_OBJECT;
+   }
+   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK) 
+      return ret;
+
+   if (datdest->type==FLGR_UINT16) {
+      {
+         //PIPS generated variable
+         FLGR_Data2D *datdest0, *datsrc0, *nhb0;
+         datdest0 = datdest;
+         datsrc0 = datsrc;
+         nhb0 = nhb;
+         {
+            //PIPS generated variable
+            FLGR_Data2D *imgdest0, *imgsrc0, *nhb1;
+            //PIPS generated variable
+            int nhb_sym0;
+            //PIPS generated variable
+            FLGR_ComputeNhb2D computeNhb0;
+            imgdest0 = datdest0;
+            imgsrc0 = datsrc0;
+            nhb1 = nhb0;
+            nhb_sym0 = FLGR_NHB_NO_SYM;
+            computeNhb0 = flgr2d_get_nhb_convolution_fgUINT16;
+            {
+               int i, j, w, h, spp;
+               fgUINT16 *vector_array;
+               fgUINT16 *data_array;
+               FLGR_Vector *result;
+               FLGR_Data2D *nhbEven, *nhbOdd, *nhbrs;
+               FLGR_NhbBox2D *extr;
+               //PIPS generated variable
+               void **P_39;
+               //PIPS generated variable
+               unsigned short _return0, _return1, _return2;
+               spp = imgsrc0->spp;
+               w = imgsrc0->size_x;
+               h = imgsrc0->size_y;
+               result = flgr_vector_create(imgsrc0->spp, imgsrc0->type);
+               vector_array = (fgUINT16 *) result->array;
+               extr = flgr2d_create_neighbor_box(nhb1);
+               nhbEven = flgr2d_create_neighborhood_from(nhb1);
+               nhbOdd = flgr2d_create_neighborhood_from(nhb1);
+               flgr2d_fill_nhbs_for_6_connexity(nhbEven, nhbOdd, nhb1, nhb_sym0);
+               if (imgdest0==imgsrc0) {
+                  flgr2d_apply_raster_scan_method_fgUINT16(nhbOdd);
+                  flgr2d_apply_raster_scan_method_fgUINT16(nhbEven);
+               }
+               for(i = 0; i <= h-1; i += 1) {
+                  P_39 = imgdest0->array;
+                  data_array = (fgUINT16 *) P_39[i];
+                  for(j = 0; j <= w-1; j += 1) {
+                     nhbrs = i%2==1?nhbOdd:nhbEven;
+                     {
+                        //PIPS generated variable
+                        FLGR_NhbBox2D *extr0;
+                        //PIPS generated variable
+                        FLGR_Data2D *dat0, *nhb0;
+                        //PIPS generated variable
+                        int row0, col0;
+                        extr0 = extr;
+                        dat0 = imgsrc0;
+                        nhb0 = nhbrs;
+                        row0 = i;
+                        col0 = j;
+                        {
+                           int i, j, m;
+                           int k, l, n;
+                           int nbrow, nbcol;
+                           int startrow, stoprow;
+                           int startcol, stopcol;
+                           int nhbsize_xdiv2;
+                           int nhbsize_ydiv2;
+                           int spp;
+                           fgUINT16 **pnhb;
+                           fgUINT16 **pdat;
+                           fgUINT16 *list_data;
+                           fgUINT16 *list_nhb;
+                           int *list_coord_x;
+                           int *list_coord_y;
+                           int *size;
+                           fgUINT16 nhb_val, data_val;
+                           //PIPS generated variable
+                           void **P_21;
+                           //PIPS generated variable
+                           void **P_22;
+                           //PIPS generated variable
+                           void **P_23;
+                           //PIPS generated variable
+                           void **P_24;
+                           //PIPS generated variable
+                           int **P_25, **P_26;
+                           spp = dat0->spp;
+                           pnhb = (fgUINT16 **) nhb0->array;
+                           pdat = (fgUINT16 **) dat0->array;
+                           size = extr0->size;
+                           nhbsize_xdiv2 = nhb0->size_x>>1;
+                           nhbsize_ydiv2 = nhb0->size_y>>1;
+                           nbrow = dat0->size_y;
+                           nbcol = dat0->size_x;
+                           extr0->center_coord_y = row0;
+                           extr0->center_coord_x = col0;
+                           startrow = row0-nhbsize_ydiv2;
+                           startrow = startrow<0?0:startrow;
+                           stoprow = row0+nhbsize_ydiv2;
+                           stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+                           startcol = col0-nhbsize_xdiv2;
+                           startcol = startcol<0?0:startcol;
+                           stopcol = col0+nhbsize_xdiv2;
+                           stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+                           P_21 = dat0->array;
+                           {
+                              //PIPS generated variable
+                              fgUINT16 *vector_array1, *data_array1;
+                              //PIPS generated variable
+                              int spp1, pos2;
+                              vector_array1 = (fgUINT16 *) extr0->center_data_val->array;
+                              data_array1 = (fgUINT16 *) P_21[row0];
+                              spp1 = spp;
+                              pos2 = col0;
+                              {
+                                 register fgUINT16 val;
+                                 register int i, k;
+                                 //PIPS generated variable
+                                 unsigned short _return0;
+                                 i = pos2*spp1;
+
+                                 for(k = 0; k <= spp1-1; k += 1) {
+                                    _return0 = data_array1[i];
+                                    val = _return0;
+                                    {
+                                       //PIPS generated variable
+                                       fgUINT16 *array0;
+                                       //PIPS generated variable
+                                       int pos0;
+                                       //PIPS generated variable
+                                       fgUINT16 value0;
+                                       array0 = vector_array1;
+                                       pos0 = k;
+                                       value0 = val;
+                                       array0[pos0] = value0;
+                                    }
+                                    i++;
+                                 }
+                              }
+                           }
+                           P_22 = nhb0->array;
+                           {
+                              //PIPS generated variable
+                              fgUINT16 *vector_array2, *data_array2;
+                              //PIPS generated variable
+                              int spp2, pos3;
+                              vector_array2 = (fgUINT16 *) extr0->center_nhb_val->array;
+                              data_array2 = (fgUINT16 *) P_22[nhbsize_ydiv2];
+                              spp2 = spp;
+                              pos3 = nhbsize_xdiv2;
+                              {
+                                 register fgUINT16 val;
+                                 register int i, k;
+                                 //PIPS generated variable
+                                 unsigned short _return0;
+                                 i = pos3*spp2;
+
+                                 for(k = 0; k <= spp2-1; k += 1) {
+                                    _return0 = data_array2[i];
+                                    val = _return0;
+                                    {
+                                       //PIPS generated variable
+                                       fgUINT16 *array0;
+                                       //PIPS generated variable
+                                       int pos0;
+                                       //PIPS generated variable
+                                       fgUINT16 value0;
+                                       array0 = vector_array2;
+                                       pos0 = k;
+                                       value0 = val;
+                                       array0[pos0] = value0;
+                                    }
+                                    i++;
+                                 }
+                              }
+                           }
+                           for(n = 0; n <= spp-1; n += 1) {
+                              P_23 = extr0->list_data_val;
+                              list_data = (fgUINT16 *) P_23[n];
+                              P_24 = extr0->list_nhb_val;
+                              list_nhb = (fgUINT16 *) P_24[n];
+                              P_25 = extr0->list_coord_x;
+                              list_coord_x = (int *) P_25[n];
+                              P_26 = extr0->list_coord_y;
+                              list_coord_y = (int *) P_26[n];
+                              m = 0;
+                              k = startrow-row0+nhbsize_ydiv2;
+                              for(i = startrow; i <= stoprow; i += 1) {
+                                 l = startcol-col0+nhbsize_xdiv2;
+                                 for(j = startcol; j <= stopcol; j += 1) {
+                                    {
+                                       //PIPS generated variable
+                                       int I_2;
+                                       I_2 = l*spp+n;
+                                       {
+                                          //PIPS generated variable
+                                          unsigned short _return0;
+                                          {
+                                          //PIPS generated variable
+                                          fgUINT16 *P_40;
+                                          P_40 = pnhb[k];
+                                          _return0 = P_40[I_2];
+                                          }
+                                          _return1 = _return0;
+                                       }
+                                    }
+                                    nhb_val = _return1;
+                                    if (nhb_val!=0) {
+                                       {
+                                          //PIPS generated variable
+                                          int I_3;
+                                          I_3 = j*spp+n;
+                                          {
+                                          //PIPS generated variable
+                                          unsigned short _return0;
+                                          {
+                                          //PIPS generated variable
+                                          fgUINT16 *P_40;
+                                          P_40 = pdat[i];
+                                          _return0 = P_40[I_3];
+                                          }
+                                          _return2 = _return0;
+                                          }
+                                       }
+                                       data_val = _return2;
+                                       list_coord_x[m] = l;
+                                       list_coord_y[m] = k;
+                                       list_data[m] = data_val;
+                                       list_nhb[m] = nhb_val;
+                                       m++;
+                                    }
+                                    l++;
+                                 }
+                                 k++;
+                              }
+                              size[n] = m;
+                           }
+                        }
+                     }
+                     (*computeNhb0)(result,extr);
+                     {
+                        //PIPS generated variable
+                        fgUINT16 *data_array0, *vector_array0;
+                        //PIPS generated variable
+                        int spp0, pos0;
+                        data_array0 = data_array;
+                        vector_array0 = vector_array;
+                        spp0 = spp;
+                        pos0 = j;
+                        {
+                           register fgUINT16 val;
+                           register int i, k;
+                           i = pos0*spp0;
+
+                           for(k = 0; k <= spp0-1; k += 1) {
+                              _return0 = vector_array0[k];
+                              val = _return0;
+                              {
+                                 //PIPS generated variable
+                                 fgUINT16 *array0;
+                                 //PIPS generated variable
+                                 int pos1;
+                                 //PIPS generated variable
+                                 fgUINT16 value0;
+                                 array0 = data_array0;
+                                 pos1 = i;
+                                 value0 = val;
+                                 array0[pos1] = value0;
+                              }
+                              i++;
+                           }
+                        }
+                     }
+                  }
+               }
+               flgr2d_destroy(nhbOdd);
+               flgr2d_destroy(nhbEven);
+               flgr2d_destroy_neighbor_box(extr);
+               flgr_vector_destroy(result);
+            }
+         }
+      }
+   }
+}

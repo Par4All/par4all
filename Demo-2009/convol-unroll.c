@@ -1,3 +1,4 @@
+#include <stdio.h>
 //     goal: show effect of cloning, partial evaluation and loop unrolling
 //     and reduction parallelization for a Power architecture
 //     kernel_size must be odd

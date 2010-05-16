@@ -1,0 +1,25 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS inlining31
+delete $WS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create $WS $WS.c
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+# inline
+apply INLINING[foo1]
+display PRINTED_FILE[$WS]
+
+apply UNSPLIT[$WS]
+close
+

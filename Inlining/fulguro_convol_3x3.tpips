@@ -6,9 +6,10 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 create fulguro_convol_3x3 fulguro_convol_3x3.c
 
 setproperty C89_CODE_GENERATION TRUE
+setproperty INLINING_USE_INITIALIZATION_LIST FALSE
 
 apply SIMPLIFY_SUBSCRIPTS[%ALL]
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
 display PRINTED_FILE[flgr2d_convolution]
