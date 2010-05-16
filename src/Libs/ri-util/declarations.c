@@ -1809,6 +1809,11 @@ static text text_entity_declaration(entity module,
             pips_internal_error("unexpected value\n");
           break;
         }
+        case is_basic_derived: {
+          pips_user_warning("We got an allocatable but we don't know how to"
+              " prettyprint it !\n");
+          break;
+        }
         default:
           pips_internal_error("unexpected basic tag (%d)\n",
               basic_tag(b));

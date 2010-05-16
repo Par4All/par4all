@@ -104,7 +104,6 @@ char *CurrentPackage;
 
 int global_current_offset = 0;
 
-
 list gfc2pips_format = NULL;//list of expression format
 list gfc2pips_format2 = NULL;//list of labels for above
 
@@ -890,7 +889,6 @@ list gfc2pips_args(gfc_namespace* ns) {
   return args_list_p;
 }
 
-
 /**
  * @brief replace a list of entities by a list of parameters to those entities
  */
@@ -910,7 +908,6 @@ void gfc2pips_generate_parameters_list(list parameters) {
     POP( parameters );
   }
 }
-
 
 /**
  * @brief Look for a specific symbol in a tree
@@ -1271,6 +1268,10 @@ list gfc2pips_get_list_of_dimensions(gfc_symtree *st) {
 list gfc2pips_get_list_of_dimensions2(gfc_symbol *s) {
   list list_of_dimensions = NULL;
   int i = 0, j = 0;
+
+  pips_assert("Allocatable should have been handled before !",
+      !s->attr.allocatable);
+
   if(s && s->attr.dimension) {
     gfc_array_spec *as = s->as;
     const char *c;
@@ -1293,21 +1294,12 @@ list gfc2pips_get_list_of_dimensions2(gfc_symbol *s) {
         case AS_DEFERRED://beware allocatable !!!
           c = strdup("AS_DEFERRED");
           i = as->rank - 1;
-          if(s->attr.allocatable) {
-            do {
-              list_of_dimensions
-                  = gen_cons(make_dimension(MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)),
-                                            MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
-                             list_of_dimensions);
-            } while(--i >= j);
-          } else {
-            do {
-              list_of_dimensions
-                  = gen_cons(make_dimension(MakeIntegerConstantExpression("1"),
-                                            MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
-                             list_of_dimensions);
-            } while(--i >= j);
-          }
+          do {
+            list_of_dimensions
+                = gen_cons(make_dimension(MakeIntegerConstantExpression("1"),
+                                          MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
+                           list_of_dimensions);
+          } while(--i >= j);
           break;
           //AS_ASSUMED_...  means information come from a dummy argument and the property is inherited from the call
         case AS_ASSUMED_SIZE://means only the last set of dimensions is unknown
@@ -1618,21 +1610,28 @@ entity gfc2pips_symbol2entity(gfc_symbol* s) {
   } else {
     gfc2pips_debug(9, "create entity %s\n",str2upper( ( name ) ));
     if(s->ts.type == BT_DERIVED) {
-      pips_user_error( "User-defined variables are not implemented yet\n" );
-      //there is still a problem in the check of consistency of the domain names
-      // FIXME
-      e
-          = FindOrCreateEntity(CurrentPackage,
-                               str2upper(strdup(concatenate((string)s->ts.derived->name,
-                                                            MEMBER_SEP_STRING,//make pips crash when verify the names
-                                                            name,
-                                                            NULL))));
-      if(entity_initial(e) == value_undefined)
-        entity_initial(e) = make_value_unknown();
-      if(entity_type(e) == type_undefined)
-        entity_type(e)
-            = MakeTypeVariable(make_basic_derived((entity)str2upper(strdup(s->ts.derived->name))),
-                               gfc2pips_get_list_of_dimensions2(s));
+      if(s->attr.allocatable) {
+        /* Allocatable handling : we convert it to a structure */
+        e
+            = find_or_create_allocatable_struct(gfc2pips_getbasic(s),
+                                                s->as->rank);
+      } else {
+        pips_user_error( "User-defined variables are not implemented yet\n" );
+        //there is still a problem in the check of consistency of the domain names
+        // FIXME
+        e
+            = FindOrCreateEntity(CurrentPackage,
+                                 str2upper(strdup(concatenate((string)s->ts.derived->name,
+                                                              MEMBER_SEP_STRING,//make pips crash when verify the names
+                                                              name,
+                                                              NULL))));
+        if(entity_initial(e) == value_undefined)
+          entity_initial(e) = make_value_unknown();
+        if(entity_type(e) == type_undefined)
+          entity_type(e)
+              = MakeTypeVariable(make_basic_derived((entity)str2upper(strdup(s->ts.derived->name))),
+                                 gfc2pips_get_list_of_dimensions2(s));
+      }
     } else {
       string location = strdup(CurrentPackage);
       if(s->attr.use_assoc) {
@@ -1901,74 +1900,71 @@ char* gfc2pips_gfc_char_t2string2(gfc_char_t *c) {
 }
 
 /**
+ *
+ */
+basic gfc2pips_getbasic(gfc_symbol *s) {
+  basic b = basic_undefined;
+  if(s->attr.allocatable) {
+    /* Allocatable handling : we convert it to a structure */
+    entity e = find_or_create_allocatable_struct(b, s->as->rank);
+    b = make_basic_derived(e);
+  } else if(s->attr.pointer) {
+    b = make_basic_pointer(type_undefined);
+  } else {
+    switch(s->ts.type) {
+      case BT_INTEGER:
+        b = make_basic_int(gfc2pips_symbol2size(s));
+        break;
+      case BT_REAL:
+        b = make_basic_float(gfc2pips_symbol2size(s));
+        break;
+      case BT_COMPLEX:
+        b = make_basic_complex(2 * gfc2pips_symbol2size(s));
+        break;
+      case BT_LOGICAL:
+        b = make_basic_logical(gfc2pips_symbol2size(s));
+        break;
+      case BT_CHARACTER:
+        b = make_basic_string(0);
+        break;
+      case BT_UNKNOWN:
+        gfc2pips_debug( 5, "Type unknown\n" );
+        b = basic_undefined;
+        break;
+      case BT_DERIVED:
+        pips_user_error( "User-def types are not implemented yet\n" );
+        b = basic_undefined;
+        break;
+      case BT_PROCEDURE:
+      case BT_HOLLERITH:
+      case BT_VOID:
+      default:
+        pips_user_error( "An error occurred in the type to type translation: impossible to translate the symbol.\n" );
+        b = basic_undefined;
+        //return make_type_unknown();
+    }
+  }
+  if(b != basic_undefined)
+    gfc2pips_debug(5, "Basic type is : %d\n",basic_tag(b));
+  else
+    gfc2pips_debug(5, "Basic type is undefined\n");
+  return b;
+}
+
+/**
  * @brief try to create the PIPS type that would be associated by the PIPS default parser
  */
 type gfc2pips_symbol2type(gfc_symbol *s) {
   //beware the size of strings
-
-  enum basic_utype ut;
-  if(s->attr.pointer) {
-    ut = is_basic_pointer;
-    //retake the following code in this block to create the correct information
-    return MakeTypeVariable(make_basic(ut, (void *)(_int)((ut
-        == is_basic_complex ? 2 : 1) * gfc2pips_symbol2size(s))// * gfc2pips_symbol2sizeArray(s))
-                            ),
-                            gfc2pips_get_list_of_dimensions2(s));
-
+  basic b = gfc2pips_getbasic(s);
+  if(b == basic_undefined) {
+    return type_undefined;
   }
-  switch(s->ts.type) {
-    case BT_INTEGER:
-      ut = is_basic_int;
-      break;
-    case BT_REAL:
-      ut = is_basic_float;
-      break;
-    case BT_COMPLEX:
-      ut = is_basic_complex;
-      break;
-    case BT_LOGICAL:
-      ut = is_basic_logical;
-      break;
-    case BT_CHARACTER:
-      ut = is_basic_string;
-      break;
-    case BT_UNKNOWN:
-      gfc2pips_debug( 5, "Type unknown\n" );
-      return make_type_unknown();
-      break;
-    case BT_DERIVED: {
-      pips_user_error( "User-def types are not implemented yet\n" );
-      return type_undefined;
-    }
-    case BT_PROCEDURE:
-    case BT_HOLLERITH:
-    case BT_VOID:
-    default:
-      pips_user_error( "An error occurred in the type to type translation: impossible to translate the symbol.\n" );
-      return type_undefined;
-      //return make_type_unknown();
-  }
-  gfc2pips_debug(5, "Basic type is : %d\n",(int)ut);
-  //variable_dimensions(type_variable(entity_type( (entity)CAR(variables) ))) = gfc2pips_get_list_of_dimensions(current_symtree)
-  if(ut != is_basic_string) {
-    return MakeTypeVariable(make_basic(ut, (void*)(_int)((ut
-        == is_basic_complex ? 2 : 1) * gfc2pips_symbol2size(s))// * gfc2pips_symbol2sizeArray(s))
-                            ),
-                            gfc2pips_get_list_of_dimensions2(s));
+
+  if(basic_derived_p(b)) {
+    return MakeTypeVariable(b, NULL);
   } else {
-    if(s) {
-      if(s->ts.cl && s->ts.cl->length) {
-        return MakeTypeVariable(make_basic(ut, (void*)make_value_constant(
-                                //don't use litteral, it's a trap !
-                                make_constant_int(gfc2pips_symbol2size(s))//it is here we have to specify the length of the character symbol
-                                           )),
-                                gfc2pips_get_list_of_dimensions2(s));
-      } else {
-        //CHARACTER * (*) texte
-        return MakeTypeVariable(make_basic(ut, make_value_unknown()), NULL//gfc2pips_get_list_of_dimensions2(s)
-        );
-      }
-    }
+    return MakeTypeVariable(b, gfc2pips_get_list_of_dimensions2(s));
   }
   gfc2pips_debug( 5, "WARNING: no type\n" );
   return type_undefined;
@@ -4390,7 +4386,7 @@ void gfc2pips_computeAdressesHeap(void) {
 int gfc2pips_computeAdressesOfArea(entity _area) {
   //compute each and every addresses of the entities in this area. Doesn't handle equivalences.
   if(!_area || _area == entity_undefined || entity_type(_area)
-      ==type_undefined || !type_area_p(entity_type(_area))) {
+      == type_undefined || !type_area_p(entity_type(_area))) {
     pips_user_warning( "Impossible to compute the given object as an area\n" );
     return 0;
   }

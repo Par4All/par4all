@@ -76,6 +76,7 @@ void gfc2pips_add_to_callees(entity e);
 void pips_init();
 list get_use_entities_list(struct gfc_namespace *ns);
 void save_entities();
+basic gfc2pips_getbasic(gfc_symbol *s);
 
 /**
  * @brief put the given char table to upper case
