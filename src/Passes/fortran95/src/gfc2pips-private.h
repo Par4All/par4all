@@ -197,7 +197,7 @@ int gfc2pips_symbol2sizeArray(gfc_symbol *s);
 
 list gfc2pips_array_ref2indices(gfc_array_ref *ar);
 bool gfc2pips_there_is_a_range(gfc_array_ref *ar);
-expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar);
+list gfc2pips_mkRangeExpression(gfc_array_ref *ar);
 
 
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);

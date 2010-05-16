@@ -1904,11 +1904,7 @@ char* gfc2pips_gfc_char_t2string2(gfc_char_t *c) {
  */
 basic gfc2pips_getbasic(gfc_symbol *s) {
   basic b = basic_undefined;
-  if(s->attr.allocatable) {
-    /* Allocatable handling : we convert it to a structure */
-    entity e = find_or_create_allocatable_struct(b, s->as->rank);
-    b = make_basic_derived(e);
-  } else if(s->attr.pointer) {
+  if(s->attr.pointer) {
     b = make_basic_pointer(type_undefined);
   } else {
     switch(s->ts.type) {
@@ -1944,6 +1940,13 @@ basic gfc2pips_getbasic(gfc_symbol *s) {
         //return make_type_unknown();
     }
   }
+
+  if(s->attr.allocatable) {
+    /* Allocatable handling : we convert it to a structure */
+    entity e = find_or_create_allocatable_struct(b, s->as->rank);
+    b = make_basic_derived(e);
+  }
+
   if(b != basic_undefined)
     gfc2pips_debug(5, "Basic type is : %d\n",basic_tag(b));
   else
@@ -2122,11 +2125,12 @@ bool gfc2pips_there_is_a_range(gfc_array_ref *ar) {
 }
 
 /**
- * @brief Create an expression similar to the substring implementation, but with a couple of parameters(min-max) for each indice
+ * @brief Create an expression similar to the substring implementation,
+ * but with a couple of parameters(min-max) for each indice
  * @param ent the entity refered by the indices
  * @param ar the gfc structure containing the information
  */
-expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar) {
+list gfc2pips_mkRangeExpression(gfc_array_ref *ar) {
   list lexpr = NULL;
   int i;
   for (i = 0; ar->start[i]; i++) {
@@ -2144,9 +2148,7 @@ expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar) {
           = CONS( EXPRESSION, gfc2pips_expr2expression( ar->start[i] ), lexpr );
     }
   }
-  return make_expression(make_syntax_reference(make_reference(ent,
-                                                              gen_nreverse(lexpr))),
-                         normalized_undefined);
+  return gen_nreverse(lexpr);
 }
 
 //this is to know if we have to add a continue statement just after the loop statement for (exit/break)
@@ -4008,7 +4010,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
       //use ri-util only functions
       //add array recognition (multi-dimension variable)
       //créer une liste de tous les indices et la balancer en deuxième arg  gen_nconc($1, CONS(EXPRESSION, $3, NIL))
-      list ref_list = NULL;
+      list args_list = NULL;
       syntax s = syntax_undefined;
 
       entity ent_ref;
@@ -4050,75 +4052,70 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
       //entity_initial(ent_ref) = make_value_unknown();
 
       if(expr->ref) {
-        /*//assign statement
-         $$ = MakeAssignInst(
-         CheckLeftHandSide(
-         MakeAtom(
-         string,
-         list<expression>,
-         expression_undefined,
-         expression_undefined,
-         TRUE
-         )
-         ),
-         [second membre de l'expression]
-         );
-         */
-        //revoir : pourquoi une boucle ?decl_tableau
         gfc_ref *r = expr->ref;
         while(r) {
-          //fprintf(stderr,"^^^^^^^^^^^^^^^^^^^^^\n");
-          if(r->type == REF_ARRAY) {
-            gfc2pips_debug(9,"ref array\n");
-            if(r->u.ar.type == AR_FULL) {
-              //a=b  where a and b are full array, we are handling one of the expressions
-              return make_expression(make_syntax_reference(make_reference(ent_ref,
-                                                                          NULL)),
-                                     normalized_undefined);
-            } else if(gfc2pips_there_is_a_range(&r->u.ar)) {
-              gfc2pips_debug(9,"We have a range\n");
-              /*
-               * here we have something like x( a:b ) or y( c:d , e:f )
-               * it is not implemented in PIPS at all, to emulate the substring syntax,
-               * we create a list where each pair of expression represent end/start values
-               */
-              return gfc2pips_mkRangeExpression(ent_ref, &r->u.ar);
-            }
-            ref_list = gfc2pips_array_ref2indices(&r->u.ar);
-            break;
-            /*}else if(r->type==REF_COMPONENT){
-             fprintf (dumpfile, " %% %s", p->u.c.component->name);
-             */} else if(r->type == REF_SUBSTRING) {
-            gfc2pips_debug(9,"ref substring\n");
-            expression ref =
-                make_expression(make_syntax_reference(make_reference(ent_ref,
-                                                                     NULL)),
-                                normalized_undefined);
+          switch(r->type) {
+            case REF_ARRAY: {
+              gfc2pips_debug(9,"ref array : %s\n",entity_name(ent_ref));
 
-            entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
-            list
-                lexpr =
-                    CONS( EXPRESSION,
-                        ref,
-                        CONS( EXPRESSION,
-                            gfc2pips_expr2expression( r->u.ss.start ),
-                            CONS( EXPRESSION,
-                                r->u.ss.end ? gfc2pips_expr2expression( r->u.ss.end )
-                                : MakeNullaryCall( CreateIntrinsic( UNBOUNDED_DIMENSION_NAME ) ),
-                                NULL ) ) );
-            s = make_syntax_call(make_call(substr, lexpr));
-            return make_expression(s, normalized_undefined);
-          } else {
-            fprintf(stderr, "Unable to understand the ref %d\n", (int)r->type);
+              if(r->u.ar.type != AR_FULL) {
+                if(gfc2pips_there_is_a_range(&r->u.ar)) {
+                  gfc2pips_debug(9,"We have a range\n");
+                  /*
+                   * here we have something like x( a:b ) or y( c:d , e:f )
+                   * it is not implemented in PIPS at all, to emulate the substring syntax,
+                   * we create a list where each pair of expression represent end/start values
+                   */
+                  args_list = gfc2pips_mkRangeExpression(&r->u.ar);
+                } else {
+                  args_list = gfc2pips_array_ref2indices(&r->u.ar);
+                }
+              }
+              break;
+            }
+            case REF_SUBSTRING: {
+              gfc2pips_debug(9,"ref substring\n");
+              expression ref =
+                  make_expression(make_syntax_reference(make_reference(ent_ref,
+                                                                       NULL)),
+                                  normalized_undefined);
+
+              entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
+              list
+                  lexpr =
+                      CONS( EXPRESSION,
+                          ref,
+                          CONS( EXPRESSION,
+                              gfc2pips_expr2expression( r->u.ss.start ),
+                              CONS( EXPRESSION,
+                                  r->u.ss.end ? gfc2pips_expr2expression( r->u.ss.end )
+                                  : MakeNullaryCall( CreateIntrinsic( UNBOUNDED_DIMENSION_NAME ) ),
+                                  NULL ) ) );
+              s = make_syntax_call(make_call(substr, lexpr));
+            }
+            default: {
+              fprintf(stderr, "Unable to understand the ref %d\n", (int)r->type);
+              r = r->next;
+              continue;
+            }
           }
-          r = r->next;
+          break;
         }
       }
-      s = make_syntax_reference(make_reference(ent_ref, ref_list));
 
+      if(syntax_undefined_p(s)) {
+        if(entity_allocatable_p(ent_ref)) {
+          expression allocatable_data = get_allocatable_data_expr(ent_ref);
+          s
+              = make_syntax_subscript(make_subscript(allocatable_data,
+                                                     args_list));
+        } else {
+          s = make_syntax_reference(make_reference(ent_ref, args_list));
+        }
+      }
       return make_expression(s, normalized_undefined);
-    }
       break;
+    }
     case EXPR_CONSTANT:
       gfc2pips_debug(5, "cst %lu %lu\n",(_int)expr, (_int)expr->ts.type);
       switch(expr->ts.type) {

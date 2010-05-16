@@ -67,27 +67,65 @@
  */
 
 /**
+ * Check if an entity is an allocatable
+ */
+bool entity_allocatable_p(entity e) {
+  type t = entity_type(e);
+  if(!type_variable_p(t)) {
+    return FALSE;
+  }
+  variable v = type_variable(t);
+  if(!basic_derived_p(variable_basic(v))) {
+    return FALSE;
+  }
+  entity allocatable_struct = basic_derived(variable_basic(v));
+
+  if(strncmp(entity_local_name(allocatable_struct),
+             STRUCT_PREFIX ALLOCATABLE_PREFIX,
+             strlen(STRUCT_PREFIX ALLOCATABLE_PREFIX)) != 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * @brief
+ */
+expression get_allocatable_data_expr(entity e) {
+  pips_assert("Entity isn't an allocatable", entity_allocatable_p(e));
+
+  // Get the data field inside the allocatable struct
+  variable v = type_variable(entity_type(e));
+  entity allocatable_struct = basic_derived(variable_basic(v));
+  entity data_field = CAR(type_struct(entity_type(allocatable_struct))).e;
+
+  // Construct the expression e.data
+  return MakeBinaryCall(CreateIntrinsic(FIELD_OPERATOR_NAME),
+                        make_expression_from_entity(e),
+                        make_expression_from_entity(data_field));
+
+}
+
+/**
  * @brief Helper for creating an allocatable structure. Here we create the
  * field corresponding to the data array.
  */
 static entity make_data_field(basic b, const char *struct_name, list dimensions) {
-  entity data;
-  string name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
-                                   MODULE_SEP_STRING,
-                                   struct_name,
-                                   MEMBER_SEP_STRING,
-                                   "data",
-                                   NULL));
+  string name = concatenate(TOP_LEVEL_MODULE_NAME,
+                            MODULE_SEP_STRING,
+                            struct_name,
+                            MEMBER_SEP_STRING,
+                            "data",
+                            NULL);
 
   pips_assert("Trying to create data for an already existing struct ?",
       gen_find_tabulated( name, entity_domain ) == entity_undefined );
 
-  type type = make_type_variable(make_variable(b, dimensions, NULL));
-
-  storage rom = make_storage_rom();
-  value initial = make_value_unknown();
-
-  data = make_entity(name, type, rom, initial);
+  entity data = find_or_create_entity(name);
+  entity_type(data) = make_type_variable(make_variable(b, dimensions, NULL));
+  entity_storage(data) = make_storage_rom();
+  entity_initial(data) = make_value_unknown();
 
   return data;
 }
@@ -137,7 +175,8 @@ entity find_or_create_allocatable_struct(basic b, int ndim) {
   string prefixed_name = strdup(concatenate(STRUCT_PREFIX, name, NULL));
 
   // Let's try to localize the structure
-  entity struct_entity = FindEntity(TOP_LEVEL_MODULE_NAME, name);
+  entity struct_entity = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+                                               prefixed_name);
 
   // Localization failed, let's create it
   if(struct_entity == entity_undefined) {
