@@ -11,6 +11,8 @@ void decl30(void)
  double foo();
  double (*x)[];
  double z;
- x = malloc(10);
+ extern void * mymalloc(int);
+
+ x = (double (*)[]) mymalloc(10);
  z = foo(&(*x)[0]);
 }
