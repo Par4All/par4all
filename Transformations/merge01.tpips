@@ -1,0 +1,39 @@
+#
+delete merge01
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create merge01 merge01.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+setproperty NESTED_PARALLELISM_THRESHOLD 1
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE(main)
+apply MANAGE_NESTED_PARALLELISM(main)
+apply OMPIFY_CODE(main)
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c merge01.database/Src/merge01.c
+shell rm *.o
+
+close
+delete merge01
+quit
+# EOF
