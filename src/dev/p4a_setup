@@ -86,9 +86,7 @@ fi
 # Where everything is built:
 P4A_BUILD=$P4A_ROOT/build
 # Where things are installed
-if [[ -z $P4A_INSTALL_PREFIX ]]; then
-	P4A_INSTALL_PREFIX=$P4A_ROOT/run
-fi
+P4A_INSTALL_PREFIX=$P4A_ROOT/run
 
 P4A_ETC=$P4A_INSTALL_PREFIX/etc
 mkdir -p $P4A_ETC
@@ -135,48 +133,34 @@ mkdir -p  $P4A_ETC
 cat <<EOF > $P4A_RC_SH
 # Minimum Par4All rc file for sh-compatible shells
 
-export P4A_ROOT=$P4A_ROOT
+# P4A source root.
+export P4A_ROOT='$P4A_ROOT'
 
-# default architecture
-#export PIPS_ARCH=$PIPS_ARCH
-# software roots
-#export EXTERN_ROOT=$P4A_BUILD
-#export NEWGEN_ROOT=$P4A_BUILD
-#export NEWGEN_ROOT=$PIPS_DIR/newgen
-unset NEWGEN_ROOT
-#export LINEAR_ROOT=$P4A_BUILD
-#export LINEAR_ROOT=$PIPS_DIR/linear
-unset LINEAR_ROOT
-#export PIPS_ROOT=$P4A_BUILD
-#export PIPS_ROOT=$PIPS_DIR/pips
-# Hack to have access to makefiles...
-#export ROOT=$P4A_ROOT/packages/PIPS
-# For pyps:
-#export PIPS_NO_PYPS=1
-#export PYTHONPATH=$P4A_BUILD/lib
+# Path to the P4A installation.
+export P4A_DIST=\$P4A_ROOT/run
 
-#export INSTALL_DIR=$P4A_BUILD
-
-# Mainly to avoid the non working libraries.make:
-#unset WITH_DYNAMIC_LIBRARIES
-
-# fix path
-#PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
-PATH=\$PATH:\$P4A_ROOT/run/bin
-export P4A_ETC=\$P4A_ROOT/run/etc
-
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$P4A_ROOT/run/lib
-export PKG_CONFIG_PATH=\$P4A_ROOT/run/lib/pkgconfig
-
-PYTHONPATH_=\$(echo \$P4A_ROOT/run/lib/python*/site-packages/pips)
-export PYTHONPATH=\$PYTHONPATH_:/usr/share/pyshared
-
-# Temporary place for P4A_accel
+# Location of the P4A_accel files.
 export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
+export P4A_ACCEL=\$P4A_ACCEL_DIR
 
-# Some hack to have p4a_recover_includes working. Directory to move
-# somewhere else later...
-#export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
+export P4A_ETC=\$P4A_DIST/etc
+
+unset NEWGEN_ROOT
+unset LINEAR_ROOT
+unset PIPS_ROOT
+#export NEWGEN_ROOT=\$P4A_ROOT/packages/PIPS/newgen
+#export LINEAR_ROOT=\$P4A_ROOT/packages/PIPS/linear
+#export PIPS_ROOT=\$P4A_ROOT/packages/PIPS/pips
+
+# Fix PATH.
+export PATH=\$P4A_DIST/bin:\$PATH
+
+# Update libraries search paths.
+export LD_LIBRARY_PATH=\$P4A_DIST/lib:\$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=\$P4A_DIST/lib/pkgconfig:\$PKG_CONFIG_PATH
+
+# PIPS Python bindings (PyPS).
+export PYTHONPATH=\$(echo \$P4A_DIST/lib/python*/site-packages/pips):/usr/share/pyshared:\$PYTHONPATH
 EOF
 
 # Find the Fortran compiler:
