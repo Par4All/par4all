@@ -239,6 +239,7 @@ void set_prettyprint_language (language lang) {
    @param lang, the language to be used to set the prettyprint_language
    variable
  **/
+
 void set_prettyprint_language_tag (enum language_utype lang) {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
@@ -277,7 +278,6 @@ unsigned int get_prettyprint_indentation() {
     return INDENTATION;
   }
 }
-
 
 static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);

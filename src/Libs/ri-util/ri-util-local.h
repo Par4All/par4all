@@ -86,7 +86,7 @@
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"
 #define HEAP_AREA_LOCAL_NAME            "*HEAP*"
 #define STACK_AREA_LOCAL_NAME           "*STACK*"
-#define ALLOCATABLE_AREA_LOCAL_NAME     "*ALLOCATABLE*"
+#define ALLOCATABLE_AREA_LOCAL_NAME "*ALLOCATABLE*"
 /* The set of all memory areas. FI: this macro is now obsolete and
    should be removed when a new version of alias-classes is
    introduced. Too bad ri-util/effects.c is going to depend on
@@ -938,12 +938,12 @@
 #define ENTITY_IAND_P(e)                 ENTITY_NAME_P(e, "IAND")
 
 /* OMP entity test */
-#define ENTITY_OMP_IF_P                 ENTITY_NAME_P(e,OMP_IF_FUNCTION_NAME)
-#define ENTITY_OMP_OMP_P                ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
-#define ENTITY_OMP_FOR_P                ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
-#define ENTITY_OMP_PRIVATE_P            ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)
-#define ENTITY_OMP_PARALLEL_P           ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
-#define ENTITY_OMP_REDUCTION_P          ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
+#define ENTITY_OMP_IF_P(e)               ENTITY_NAME_P(e,OMP_IF_FUNCTION_NAME)
+#define ENTITY_OMP_OMP_P(e)              ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
+#define ENTITY_OMP_FOR_P(e)              ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
+#define ENTITY_OMP_PRIVATE_P(e)          ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)
+#define ENTITY_OMP_PARALLEL_P(e)         ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
+#define ENTITY_OMP_REDUCTION_P(e)        ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
 
 /*io functions: C library and system io.Amira Mensi*/
 
@@ -1191,15 +1191,6 @@
                                      ENTITY_DIVIDE_P(e) )
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
-
-
-/*
- * Fortran 95 Allocatable
- */
-#define ALLOCATABLE_PREFIX "__pips_allocatable__"
-#define ENTITY_ALLOCATABLE_P(e) \
-  strncmp(e, ALLOCATABLE_PREFIX, strlen(ALLOCATABLE_PREFIX))
-
 
 /* classification of basics */
 
@@ -1849,3 +1840,9 @@ enum range_to_expression_mode{
 
 /* that is all for ri-util-local.h
  */
+
+typedef enum {
+  IGNORE_IF_POLICY,
+  AND_IF_POLICY,
+  OR_IF_POLICY
+} if_clause_policy;

@@ -2145,3 +2145,33 @@ commutative_call_p(call c)
     }
     return commut_p;
 }
+
+/**
+ * @brief build a list of expression from a list of entities
+ * @return the list of expression
+ * @param l_ent, the list of entities
+ **/
+list entities_to_expressions(list l_ent) {
+  list l_exp = NIL;
+  for(; !ENDP(l_ent); POP(l_ent)) {
+    entity ent = ENTITY(CAR(l_ent));
+    l_exp = gen_nconc(l_exp,
+		      CONS(EXPRESSION,
+			   make_expression(make_syntax(is_syntax_reference,
+						       make_reference(ent,
+								      NIL)),
+					   normalized_undefined),
+			   NIL));
+  }
+  return(l_exp);
+
+  /*PIER My implementation*/
+  /*   FOREACH (ENTITY, e, args_ent) { */
+  /*     reference ref = make_reference (e, NULL); */
+  /*     syntax s = make_syntax_reference (ref); */
+  /*     expression expr = make_expression (s, normalized_undefined); */
+  /*     // append the new expr to the list */
+  /*     args_expr = gen_expression_cons (expr, args_expr); */
+  /*   } */
+
+}

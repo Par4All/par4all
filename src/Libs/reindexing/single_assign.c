@@ -345,28 +345,6 @@ fprintf(stdout, "]\n");
 
 /* ========================================================================= */
 /*
- * list entities_to_expressions(list l_ent)
- */
-list entities_to_expressions(l_ent)
-list l_ent;
-{
-  list l_exp = NIL;
-  for(; !ENDP(l_ent); POP(l_ent)) {
-    entity ent = ENTITY(CAR(l_ent));
-    l_exp = gen_nconc(l_exp,
-		      CONS(EXPRESSION,
-			   make_expression(make_syntax(is_syntax_reference,
-						       make_reference(ent,
-								      NIL)),
-					   normalized_undefined),
-			   NIL));
-  }
-  return(l_exp);
-}
-
-
-/* ========================================================================= */
-/*
  * void lhs_subs_in_ins(instruction ins, string SA, int n, list subscripts)
  * 
  * Substitutes to the lhs (left Hand Side) reference of "ins" the array

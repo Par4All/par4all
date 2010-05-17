@@ -186,7 +186,7 @@ static void generate_str_omp_pragma_loop (loop l) {
 }
 
 //////////////////////////////////////////////////////////////
-// the phase function name
+// the phases function name
 
 bool ompify_code (const string module_name) {
   // Use this module name and this environment variable to set

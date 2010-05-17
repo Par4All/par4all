@@ -54,8 +54,107 @@ static const string FORTRAN_OMP_CONTINUATION = "\n!$omp& ";
 
 
 
+/*****************************************************Local static function
+ */
+static bool is_expression_omp_private_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return (ENTITY_OMP_PRIVATE_P (ent));
+}
+
+static bool is_expression_omp_if_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return (ENTITY_OMP_IF_P (ent));
+}
+
+static if_clause_policy get_if_clause_policy (void) {
+  if_clause_policy result = IGNORE_IF_POLICY;
+  string prop = get_string_property ("OMP_IF_MERGE_POLICY");
+  if (strcmp (prop, "ignore") == 0) {
+    result = IGNORE_IF_POLICY;
+  }
+  else if (strcmp (prop, "or") == 0) {
+    result = OR_IF_POLICY;
+  }
+  else if (strcmp (prop, "and") == 0) {
+    result = AND_IF_POLICY;
+  }
+  return result;
+}
+
+// merge all if conditions
+static expression merge_conditions (list l_cond, if_clause_policy policy) {
+  expression result = expression_undefined;
+  entity op = entity_undefined;
+  switch (policy) {
+  case IGNORE_IF_POLICY:
+    break;
+  case AND_IF_POLICY:
+    switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      op = CreateIntrinsic(AND_OPERATOR_NAME);
+      break;
+    case is_language_c:
+      op = CreateIntrinsic(C_AND_OPERATOR_NAME);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
+    break;
+  case OR_IF_POLICY:
+    switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      op = CreateIntrinsic(OR_OPERATOR_NAME);
+      break;
+    case is_language_c:
+      op = CreateIntrinsic(C_OR_OPERATOR_NAME);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
+    }
+    break;
+  default:
+    pips_assert ("update switch case", FALSE);
+    break;
+  }
+  // now we have a list of condition and an operator -> merge them
+  result = expressions_to_operation (l_cond, op);
+  return result;
+}
+
+
 /***************************************************PRAGMA AS EXPRESSION PART
  */
+
+/**
+   @brief build the expression to be put in the if clause. This functions
+   takes care of the output language.
+   @return the condition compared to the threshold as an expression
+   @param cond, the condition to be compared to the threshold
+**/
+expression pragma_build_if_condition (expression cond) {
+  entity op = entity_undefined;
+  switch(get_prettyprint_language_tag()) {
+  case is_language_fortran:
+  case is_language_fortran95:
+    op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
+    break;
+  case is_language_c:
+    op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
+    break;
+  default:
+    pips_assert ("This case should have been handled before", FALSE);
+    break;
+  }
+  int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
+  list args_if =  gen_expression_cons (int_expr (threshold), NIL);
+  args_if = gen_expression_cons (cond, args_if);
+  call c = make_call (op, args_if);
+  return call_to_expression (c);
+}
 
 /** @return "if (cond)" as an expression
  *  @param arg, the condition to be evaluted by the if clause
@@ -70,23 +169,23 @@ expression pragma_if_as_expr (expression arg) {
 }
 
 /** @return "private (x,y)" as an expression
- *  @param arg, the private variables as a list of entities
+ *  @param args_expr, the private variables as a list of expression
  */
-expression pragma_private_as_expr (list args_ent) {
-  // build the privates variable as a list of expression
-  list args_expr = NIL;
-  FOREACH (ENTITY, e, args_ent) {
-    reference ref = make_reference (e, NULL);
-    syntax s = make_syntax_reference (ref);
-    expression expr = make_expression (s, normalized_undefined);
-    // append the new expr to the list
-    args_expr = gen_expression_cons (expr, args_expr);
-  }
+expression pragma_private_as_expr_with_args (list args_expr) {
   entity omp = CreateIntrinsic(OMP_PRIVATE_FUNCTION_NAME);
   call c = make_call (omp, args_expr);
   syntax s = make_syntax_call (c);
   expression expr_omp = make_expression (s, normalized_undefined);
   return expr_omp;
+}
+
+/** @return "private (x,y)" as an expression
+ *  @param arg, the private variables as a list of entities
+ */
+expression pragma_private_as_expr (list args_ent) {
+  // build the privates variable as a list of expression
+  list args_expr = entities_to_expressions (args_ent);
+  return pragma_private_as_expr_with_args (args_expr);
 }
 
 /** @return "omp parallel" as a list of expression
@@ -123,6 +222,64 @@ list pragma_omp_parallel_for_as_exprs (void) {
   list result = pragma_omp_parallel_as_exprs ();
   result = gen_expression_cons (expr_for, result);
 
+  return result;
+}
+
+/**
+   @brief merge omp pragma.
+   @return the merged pragma as a list of expression
+   @param l_pragma, the list of pragma to merge. The pragama as to be
+   a list of expression.
+**/
+list pragma_omp_merge_expr (list l_pragma) {
+  // The "omp parallel for" as a list of expression
+  list result = pragma_omp_parallel_for_as_exprs ();
+  // The list of the variables of the private clauses
+  list priv_var = NIL;
+  // The list of condition of the if clauses
+  list if_cond = NIL;
+  // Get the if clause policy
+  if_clause_policy policy = get_if_clause_policy ();
+
+  // look into each pragma for private and if clauses
+  FOREACH (PRAGMA, p, l_pragma) {
+    pips_assert ("Can only merge a list of pragma as expression",
+		 pragma_expression_p (p));
+    FOREACH (EXPRESSION, e, pragma_expression (p)) {
+      // get the arguments that are either the private variables or the
+      // if condition
+      call c = expression_call (e);
+      list args = call_arguments (c);
+      // bind the args to the right list
+      if (is_expression_omp_private_p (e)) {
+	priv_var = gen_nconc (priv_var, args);
+      }
+      else if (is_expression_omp_if_p (e)) {
+	// if clause : check the policy
+	switch (policy) {
+	case IGNORE_IF_POLICY:
+	  // do nothing
+	  break;
+	case AND_IF_POLICY:
+	case OR_IF_POLICY:
+	  if_cond = gen_nconc (if_cond, args);
+	  break;
+	}
+      }
+    }
+  }
+  // build the private clause
+  expression priv = pragma_private_as_expr_with_args (priv_var);
+  // append the private clause to the omp parallel for
+  result = gen_expression_cons (priv, result);
+  if (policy != IGNORE_IF_POLICY) {
+    // merge the if condition
+    expression expr_if = merge_conditions (if_cond, policy);
+    // encapsulate the condition into the if clause
+    expr_if = pragma_if_as_expr (expr_if);
+    // append the if clause to the omp parallel for
+    result = gen_expression_cons (expr_if, result);
+  }
   return result;
 }
 
@@ -301,5 +458,3 @@ void add_pragma_entity_to_statement(statement st, entity en)
   el = gen_extension_cons(e, el);
   extensions_extension(es) = el;
 }
-
-

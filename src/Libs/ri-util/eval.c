@@ -604,7 +604,7 @@ expression_negative_integer_value_p(expression e) {
   return expression_integer_value(e, &v) && (v < 0);
 }
 
-/** 
+/**
  * computes the distance between the lower bound and the upper bound of the range
  * @param r range to analyse
  * @param mode wether we compute the distance or count the number of iterations
