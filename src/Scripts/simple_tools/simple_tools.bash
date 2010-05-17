@@ -43,10 +43,6 @@ function display_end () {
 function select_c_language () {
     cat <<EOF
 echo Select some options to deal with the C Language:
-echo Parse as C:
-activate C_PARSER
-echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_C_CODE TRUE
 echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
