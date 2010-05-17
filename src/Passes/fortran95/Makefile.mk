@@ -67,11 +67,11 @@ patch : $(PATCHED)
 
 # local stuff
 unbuild: 
-	$(RM) -rf $(ROOT)/bin/gfc2pips build $(SRC.d)
+	$(RM) -rf $(ROOT)/bin/gfc2pips build
 clean: local-clean unbuild
 
 local-clean:
-	$(RM) -rf $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE)
+	$(RM) -rf $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(SRC.d)
 
 $(SRC.d)/.dir:
 	mkdir -p $(SRC.d)
@@ -120,13 +120,13 @@ untar: $(SRC.d)/.untar
 $(SRC.d)/.untar: $(SRC.d)/.untar-core $(SRC.d)/.untar-fortran
 	touch $(SRC.d)/.untar
 
-$(SRC.d)/.untar-core: $(SRC.d)/.md5-check-core
+$(SRC.d)/.untar-core: $(SRC.d)/.md5-check-core patch-$(PIPS_GFC2PIPS_GCC_VERSION).diff
 	@echo "**** Unpacking GCC-core ****"
 	tar -xjf $(DL.d)/$(GCC_CORE_ARCHIVE)
 	$(RM) $(PATCHED)
 	@touch $(SRC.d)/.untar-core
 
-$(SRC.d)/.untar-fortran: $(SRC.d)/.md5-check-fortran
+$(SRC.d)/.untar-fortran: $(SRC.d)/.md5-check-fortran patch-$(PIPS_GFC2PIPS_GCC_VERSION).diff
 	@echo "**** Unpacking GCC-fortran ****"
 	tar -xjf $(DL.d)/$(GCC_FORTRAN_ARCHIVE)
 	$(RM) $(PATCHED)
