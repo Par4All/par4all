@@ -653,6 +653,10 @@ void gfc2pips_namespace(gfc_namespace* ns) {
   char * unsplit_modname = NULL; // Will be followed by a ! for module
   save_entities();
 
+  /*
+   * FIXME : The following still need many many cleaning !
+   */
+
   // We don't produce output for module
   if(bloc_token == MET_MODULE) {
     pips_user_warning("Modules are ignored : %s\n", full_name);
@@ -1608,29 +1612,17 @@ entity gfc2pips_symbol2entity(gfc_symbol* s) {
     free(module_name);
     module = true;
   } else {
-    gfc2pips_debug(9, "create entity %s\n",str2upper( ( name ) ));
+    gfc2pips_debug(9, "Try to resolve entity %s\n",str2upper( ( name ) ));
     if(s->ts.type == BT_DERIVED) {
       if(s->attr.allocatable) {
         /* Allocatable handling : we convert it to a structure */
-        e
-            = find_or_create_allocatable_struct(gfc2pips_getbasic(s),
-                                                s->as->rank);
+        e = find_or_create_allocatable_struct(gfc2pips_getbasic(s),
+                                              name,
+                                              s->as->rank);
+        // FIXME This is bad, we have the entity TYPE only. */
       } else {
         pips_user_error( "User-defined variables are not implemented yet\n" );
         //there is still a problem in the check of consistency of the domain names
-        // FIXME
-        e
-            = FindOrCreateEntity(CurrentPackage,
-                                 str2upper(strdup(concatenate((string)s->ts.derived->name,
-                                                              MEMBER_SEP_STRING,//make pips crash when verify the names
-                                                              name,
-                                                              NULL))));
-        if(entity_initial(e) == value_undefined)
-          entity_initial(e) = make_value_unknown();
-        if(entity_type(e) == type_undefined)
-          entity_type(e)
-              = MakeTypeVariable(make_basic_derived((entity)str2upper(strdup(s->ts.derived->name))),
-                                 gfc2pips_get_list_of_dimensions2(s));
       }
     } else {
       string location = strdup(CurrentPackage);
@@ -1943,7 +1935,8 @@ basic gfc2pips_getbasic(gfc_symbol *s) {
 
   if(s->attr.allocatable) {
     /* Allocatable handling : we convert it to a structure */
-    entity e = find_or_create_allocatable_struct(b, s->as->rank);
+    char* name = str2upper(gfc2pips_get_safe_name(s->name));
+    entity e = find_or_create_allocatable_struct(b, name, s->as->rank);
     b = make_basic_derived(e);
   }
 
@@ -3875,32 +3868,20 @@ entity gfc2pips_code2get_label4(gfc_code *c) {
  * for the moment only care about (a+b)*c   + - * / ** // .AND. .OR. .EQV. .NEQV. .NOT.
  */
 expression gfc2pips_expr2expression(gfc_expr *expr) {
-  //GFC
-  //p->value.op.op opérateur de l'expression
-  //p->value.op.op1 premier membre de l'expression
-  //p->value.op.op2 second membre de l'expression
-
-  //PIPS
-  //expression => sous_expression | TK_LPAR sous_expression TK_RPAR
-  //MakeFortranBinaryCall(CreateIntrinsic("+"), expression 1, expression 2);
-  expression e = expression_undefined;
   message_assert( "Expr can't be null !\n", expr );
-  if(!expr->symtree) {
-    //fprintf(stderr,"No symtree\n");
-  } else if(!expr->symtree->n.sym) {
-    //fprintf(stderr,"No symbol\n");
-  } else if(!expr->symtree->n.sym->name) {
-    //fprintf(stderr,"No name\n");
-  } else {
-    //fprintf(stderr,"gfc2pips_expr2expression: dumping %s\n",expr->symtree->n.sym->name);
-  }
+  /*
+   * In GFC
+   * p->value.op.op is the expression operator
+   * p->value.op.op1 is the first argument
+   * p->value.op.op2 is the second one
+   */
 
-  //fprintf(stderr,"type: %d\n",expr->expr_type);
-  //fprintf(stderr,"kind: %d\n",expr->ts.kind);
+  /* This is the expression that will be returned */
+  expression returned_expr = expression_undefined;
   switch(expr->expr_type) {
     case EXPR_OP: {
-      const char *c;
-      gfc2pips_debug(5, "op\n");
+      gfc2pips_debug(5, "Op : this is an (intrinsic) call)\n");
+      const char *c = NULL;
       switch(expr->value.op.op) {
         // FIXME Replace all by PIPS #define like MULTIPLY_OPERATOR_NAME
         case INTRINSIC_UPLUS:
@@ -3966,108 +3947,112 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
           break;
 
         case INTRINSIC_PARENTHESES:
-          return gfc2pips_expr2expression(expr->value.op.op1);
+          returned_expr = gfc2pips_expr2expression(expr->value.op.op1);
           break;
         default:
           pips_user_warning( "intrinsic not yet recognized: %d\n",
               (int) expr->value.op.op );
-          c = "";
           break;
       }
-      //c = gfc_op2string(expr->value.op.op);
-      if(strlen(c) > 0) {
+
+      if(c) {
         gfc2pips_debug(6, "intrinsic recognized: %s\n",c);
-        expression e1 = gfc2pips_expr2expression(expr->value.op.op1);//fprintf(stderr,"toto\n");
+        /* Get 1st arg with a recursive call */
+        expression e1 = gfc2pips_expr2expression(expr->value.op.op1);
+
+        /* Assertion */
         if(!e1 || e1 == expression_undefined) {
-          pips_user_error( "intrinsic( (string)%s ) : 1st arg is null or undefined\n", c);
+          pips_user_error( "intrinsic( (string)%s ) : 1st arg "
+              "is null or undefined\n", c);
         }
         if(expr->value.op.op2 == NULL) {
+          /* Unary call */
           switch(expr->value.op.op) {
             case INTRINSIC_UMINUS:
-              return MakeFortranUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
-                                          e1);
+              returned_expr
+                  = MakeFortranUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
+                                         e1);
             case INTRINSIC_UPLUS:
-              return e1;
+              returned_expr = e1;
             case INTRINSIC_NOT:
-              return MakeFortranUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME),
-                                          e1);
+              returned_expr
+                  = MakeFortranUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME), e1);
             default:
               pips_user_error( "No second expression member for intrinsic %s\n",
                   c );
           }
-        }
-        expression e2 = gfc2pips_expr2expression(expr->value.op.op2);
-        if(!e2 || e2 == expression_undefined) {
-          pips_user_error( "intrinsic( (string)%s ) : 2nd arg is null or undefined\n", c);
         } else {
-          return MakeBinaryCall(CreateIntrinsic((string)c), e1, e2);
+          /* Recursive call, get second expression member */
+          expression e2 = gfc2pips_expr2expression(expr->value.op.op2);
+
+          /* Assertion */
+          if(!e2 || e2 == expression_undefined) {
+            pips_user_error( "intrinsic( (string)%s ) : 2nd arg is null or undefined\n", c);
+          }
+          returned_expr = MakeBinaryCall(CreateIntrinsic((string)c), e1, e2);
         }
       }
-    }
       break;
+    }
     case EXPR_VARIABLE: {
-      gfc2pips_debug(5, "var\n");
-      //use ri-util only functions
-      //add array recognition (multi-dimension variable)
-      //créer une liste de tous les indices et la balancer en deuxième arg  gen_nconc($1, CONS(EXPRESSION, $3, NIL))
+      gfc2pips_debug(5, "Variable\n");
+
+      /* Entity corresponding to the Gfortran variable */
+      entity ent_ref = gfc2pips_symbol2entity(expr->symtree->n.sym);
+
+      /* Args list is in use for array reference */
       list args_list = NULL;
       syntax s = syntax_undefined;
 
-      entity ent_ref;
-      if(expr->symtree->n.sym->ns && expr->symtree->n.sym->ns->proc_name
-          && expr->symtree->n.sym->ns->proc_name == expr->symtree->n.sym) {
-        ent_ref
-            = FindOrCreateEntity(CurrentPackage,
-                                 (string)str2upper(strdup(expr->symtree->n.sym->name)));
-        entity_type(ent_ref)
-
-            = copy_type(functional_result( type_functional(entity_type(gfc2pips_main_entity)) ));
-      } else {
-        ent_ref = gfc2pips_symbol2entity(expr->symtree->n.sym);
-      }
-
-      //entity ent_ref = FindOrCreateEntity(CurrentPackage, str2upper(strdup(expr->symtree->n.sym->name)));
-      //entity_type(ent_ref) = gfc2pips_symbol2type(expr->symtree->n.sym);
       if(strcmp(CurrentPackage, entity_name(ent_ref)) == 0) {
         gfc2pips_debug(9,"Variable %s is put in return storage\n",entity_name(ent_ref));
         entity_storage(ent_ref) = make_storage_return(ent_ref);
-      } else {
-        if(entity_storage(ent_ref) == storage_undefined) {
-          gfc2pips_debug(1,"Storage RAM !! %s %d\n",entity_name(ent_ref),__LINE__);
-          //          entity_storage(ent_ref) = make_storage_rom( );//fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
-          int dynamicOffset = area_size(type_area(entity_type(DynamicArea)));
-          entity_storage(ent_ref)
-              = make_storage_ram(make_ram(get_current_module_entity(),
-                                          DynamicArea,
-                                          dynamicOffset,
-                                          NIL));
-          area_size(type_area(entity_type(DynamicArea)))
-              += area_size(type_area(entity_type(ent_ref)));
-          list layout = area_layout(type_area(entity_type(DynamicArea)));
-          area_layout(type_area(entity_type(DynamicArea)))
-              = gen_nconc(layout, CONS(entity,ent_ref,NULL));
+        entity_type(ent_ref)
+            = copy_type(functional_result( type_functional(entity_type(gfc2pips_main_entity)) ));
+      } else if(entity_storage(ent_ref) == storage_undefined) {
+        gfc2pips_debug(1,"Undefined storage ! Let's put in RAM !! %s\n",
+            entity_name(ent_ref));
 
-        }
+        int dynamicOffset = area_size(type_area(entity_type(DynamicArea)));
+        entity_storage(ent_ref)
+            = make_storage_ram(make_ram(get_current_module_entity(),
+                                        DynamicArea,
+                                        dynamicOffset,
+                                        NIL));
+        area_size(type_area(entity_type(DynamicArea)))
+            += area_size(type_area(entity_type(ent_ref)));
+        list layout = area_layout(type_area(entity_type(DynamicArea)));
+        area_layout(type_area(entity_type(DynamicArea)))
+            = gen_nconc(layout, CONS(entity,ent_ref,NULL));
+
       }
-      //entity_initial(ent_ref) = make_value_unknown();
 
       if(expr->ref) {
         gfc_ref *r = expr->ref;
+        /*
+         * We have an array reference, get the indices !
+         *
+         * I'm not sure a loop is useful here...
+         */
         while(r) {
           switch(r->type) {
             case REF_ARRAY: {
+              /* It an array ! */
               gfc2pips_debug(9,"ref array : %s\n",entity_name(ent_ref));
 
               if(r->u.ar.type != AR_FULL) {
+                /* We have some part of the arrayn, let's figure out which one*/
                 if(gfc2pips_there_is_a_range(&r->u.ar)) {
                   gfc2pips_debug(9,"We have a range\n");
                   /*
                    * here we have something like x( a:b ) or y( c:d , e:f )
-                   * it is not implemented in PIPS at all, to emulate the substring syntax,
-                   * we create a list where each pair of expression represent end/start values
+                   * it is not implemented in PIPS at all, to emulate the
+                   * substring syntax, we create a list where each pair of
+                   * expression represent end/start values
                    */
                   args_list = gfc2pips_mkRangeExpression(&r->u.ar);
                 } else {
+                  /* No range, it's a single element access */
                   args_list = gfc2pips_array_ref2indices(&r->u.ar);
                 }
               }
@@ -4080,21 +4065,40 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
                                                                        NULL)),
                                   normalized_undefined);
 
+              /* This is the full list for the call,
+               * we put element beginning with the latest
+               */
+              list lexpr;
+
+              /* Firstly, the upper bound */
+              expression upper;
+              if(r->u.ss.end) {
+                /* We have an upper bound */
+                upper = gfc2pips_expr2expression(r->u.ss.end);
+              } else {
+                upper
+                    = MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
+              }
+              lexpr = CONS( EXPRESSION,upper ,NULL );
+
+              /* Now the lower bound */
+              lexpr
+                  = CONS( EXPRESSION,gfc2pips_expr2expression( r->u.ss.start ),
+                      lexpr
+                  );
+
+              /* And the string */
+              lexpr = CONS( EXPRESSION,ref,lexpr);
+
+              /* substring operator */
               entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
-              list
-                  lexpr =
-                      CONS( EXPRESSION,
-                          ref,
-                          CONS( EXPRESSION,
-                              gfc2pips_expr2expression( r->u.ss.start ),
-                              CONS( EXPRESSION,
-                                  r->u.ss.end ? gfc2pips_expr2expression( r->u.ss.end )
-                                  : MakeNullaryCall( CreateIntrinsic( UNBOUNDED_DIMENSION_NAME ) ),
-                                  NULL ) ) );
+
+              /* finally the call is created */
               s = make_syntax_call(make_call(substr, lexpr));
             }
             default: {
-              fprintf(stderr, "Unable to understand the ref %d\n", (int)r->type);
+              pips_user_warning("Unable to understand the ref %d\n",
+                  (int)r->type);
               r = r->next;
               continue;
             }
@@ -4104,57 +4108,66 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
       }
 
       if(syntax_undefined_p(s)) {
+        /*
+         * It doesn't seem to be a substring, it an array or a scalar
+         */
         if(entity_allocatable_p(ent_ref)) {
+          /* Allocatable array array encapsulated in a structure, we have
+           * to produce a subscript
+           */
           expression allocatable_data = get_allocatable_data_expr(ent_ref);
-          s
-              = make_syntax_subscript(make_subscript(allocatable_data,
-                                                     args_list));
+          subscript sub = make_subscript(allocatable_data, args_list);
+          s = make_syntax_subscript(sub);
         } else {
           s = make_syntax_reference(make_reference(ent_ref, args_list));
         }
       }
-      return make_expression(s, normalized_undefined);
+      returned_expr = make_expression(s, normalized_undefined);
       break;
     }
-    case EXPR_CONSTANT:
-      gfc2pips_debug(5, "cst %lu %lu\n",(_int)expr, (_int)expr->ts.type);
+    case EXPR_CONSTANT: {
+      gfc2pips_debug(5, "Constant expression : %lu %lu\n",(_int)expr,
+          (_int)expr->ts.type);
       switch(expr->ts.type) {
         case BT_INTEGER:
-          e = gfc2pips_int2expression(mpz_get_si(expr->value.integer));
+          returned_expr = gfc2pips_int2expression(gfc2pips_expr2int(expr));
           break;
         case BT_LOGICAL:
-          e = gfc2pips_logical2expression(expr->value.logical);
+          returned_expr = gfc2pips_logical2expression(expr->value.logical);
           break;
-        case BT_REAL:
-          //convertir le real en qqch de correct au niveau sortie
-          e = gfc2pips_real2expression(mpfr_get_d(expr->value.real,
-                                                  GFC_RND_MODE));
+        case BT_REAL: {
+          /* we have to use gmp/mpfr function to get the value */
+          double value = mpfr_get_d(expr->value.real, GFC_RND_MODE);
+          returned_expr = gfc2pips_real2expression(value);
           break;
+        }
         case BT_CHARACTER: {
           char *char_expr =
               gfc2pips_gfc_char_t2string(expr->value.character.string,
                                          expr->value.character.length);
-          e = MakeCharacterConstantExpression(char_expr);
-          //free(char_expr);
+          returned_expr = MakeCharacterConstantExpression(char_expr);
         }
           break;
-        case BT_COMPLEX:
-          e
-              = MakeComplexConstantExpression(gfc2pips_real2expression(mpfr_get_d(expr->value.complex.r,
-                                                                                  GFC_RND_MODE)),
-                                              gfc2pips_real2expression(mpfr_get_d(expr->value.complex.i,
-                                                                                  GFC_RND_MODE)));
+        case BT_COMPLEX: {
+          expression real, image;
+          real = gfc2pips_real2expression(mpfr_get_d(expr->value.complex.r,
+                                                     GFC_RND_MODE));
+          image = gfc2pips_real2expression(mpfr_get_d(expr->value.complex.i,
+                                                      GFC_RND_MODE));
+          returned_expr = MakeComplexConstantExpression(real, image);
           break;
+        }
         case BT_HOLLERITH:
+          pips_user_error( "Hollerith not implemented\n");
+          break;
         default:
           pips_user_warning( "type not implemented %d\n", (int) expr->ts.type );
           break;
 
       }
-      //if(expr->ref)
-      return e;
       break;
-    case EXPR_FUNCTION:
+    }
+    case EXPR_FUNCTION: {
       gfc2pips_debug(5, "func\n");
 
       /*
@@ -4164,10 +4177,10 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
        */
       if(strncmp(expr->symtree->n.sym->name, "__convert_", strlen("__convert_"))
           == 0) {
-        if(expr->value.function.actual->expr) {
-          gfc2pips_debug(6, "expression not null for implicit cast !\n");
-          //show_expr(expr->value.function.actual->expr);
-          return gfc2pips_expr2expression(expr->value.function.actual->expr);
+        /* Recursive call on implicit cast argument */
+        gfc_expr *arg = expr->value.function.actual->expr;
+        if(arg) {
+          returned_expr = gfc2pips_expr2expression(arg);
         } else {
           pips_user_error( "expression null while trying to handle %s\n",
               expr->value.function.name );
@@ -4181,6 +4194,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
             || strncmp(expr->value.function.name,
                        "_gfortran_",
                        strlen("_gfortran_")) == 0) {
+          /* FIXME : should we really modify GFC IR ???? */
           expr->value.function.name = expr->symtree->n.sym->name;
         }
 
@@ -4233,30 +4247,38 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
         }
         call call_ = make_call(e, list_of_arguments);
 
-        return make_expression(make_syntax_call(call_), normalized_undefined);
+        returned_expr = make_expression(make_syntax_call(call_),
+                                        normalized_undefined);
       }
       break;
+    }
     case EXPR_STRUCTURE:
-      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_STRUCTURE not yet implemented\n" );
+      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_STRUCTURE not "
+          "yet implemented\n" );
     case EXPR_SUBSTRING:
-      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_SUBSTRING not yet implemented\n" );
+      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_SUBSTRING not "
+          "yet implemented\n" );
     case EXPR_NULL:
-      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_NULL not yet implemented\n" );
+      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_NULL not yet "
+          "implemented\n" );
     case EXPR_ARRAY:
-      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_ARRAY not yet implemented\n" );
+      pips_user_error( "gfc2pips_expr2expression: dump of EXPR_ARRAY not yet "
+          "implemented\n" );
     default:
-      pips_user_error( "gfc2pips_expr2expression: dump not yet implemented, type of gfc_expr not recognized %d\n",
+      pips_user_error( "gfc2pips_expr2expression: dump not yet implemented, "
+          "type of gfc_expr not recognized %d\n",
           (int) expr->expr_type );
       break;
   }
-  return expression_undefined;
+  return returned_expr;
 }
 
 /*
- * int gfc2pips_expr2int(gfc_expr *expr)
+ * @brief convert an expression to an integer
  *
  * we assume we have an expression representing an integer, and we translate it
- * this function consider everything is all right: i.e. the expression represent an integer
+ * this function consider everything is all right: i.e. the expression represent
+ * an integer
  */
 int gfc2pips_expr2int(gfc_expr *expr) {
   return mpz_get_si(expr->value.integer);

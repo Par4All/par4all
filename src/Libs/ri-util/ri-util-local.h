@@ -1192,6 +1192,17 @@
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
 
+/*
+ * Fortran 95 Allocatable
+ */
+#define ALLOCATABLE_PREFIX "__pips_allocatable__"
+#define ALLOCATABLE_LBOUND_PREFIX "__pips__allocatable__lbound__"
+#define ALLOCATABLE_UBOUND_PREFIX "__pips__allocatable__ubound__"
+#define ENTITY_ALLOCATABLE_BOUND_P(e) \
+  (strncmp(entity_user_name(e), ALLOCATABLE_LBOUND_PREFIX, strlen(ALLOCATABLE_LBOUND_PREFIX)) == 0 \
+   || strncmp(entity_user_name(e), ALLOCATABLE_UBOUND_PREFIX, strlen(ALLOCATABLE_UBOUND_PREFIX)) == 0 )
+
+
 /* classification of basics */
 
 #define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))

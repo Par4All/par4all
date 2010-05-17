@@ -258,16 +258,7 @@ list words_declaration(entity e,
   list pl = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  /* UGLY (temporary) HACK FOR ALLOCATABLE */
-  if(prettyprint_language_is_fortran95_p() && storage_ram_p(entity_storage(e))) {
-    if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
-      pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
-    }
-  }
-
   pl = CHAIN_SWORD(pl, entity_user_name(e));
-
-
 
   if (type_variable_p(entity_type(e))) {
     if (prettyprint_common_variable_dimensions_p || !(variable_in_common_p(e)
@@ -1531,30 +1522,57 @@ void check_fortran_declaration_dependencies(list ldecl)
 
 /********************************************************** ALL DECLARATIONS */
 /**
-   @brief do some specific prettyprinting choise according to the fortran
-   version
+ * @brief This handle the fact that a Fortran95 declaration use "::" as a
+ * separator between type and variable name. It also adds an "allocatable"
+ * modifier if requested. Finally it add a "," between each variable if there
+ * more than one to declare.
  **/
-static list f77_f95_style_management (list prev, string str, bool space_p) {
-  list result = NIL;
+static list f77_f95_style_management(list prev,
+                                     string str,
+                                     bool allocatable_pass_p,
+                                     bool space_p) {
+  list result = prev;
   if (prev == NIL) {
-    result = CHAIN_SWORD(prev, str);
+    result = CHAIN_SWORD(result, str);
+    if(allocatable_pass_p) {
+      result = CHAIN_SWORD(result, ", ALLOCATABLE ");
+    }
     if (prettyprint_language_is_fortran95_p ()) {
       result = CHAIN_SWORD(result, ":: ");
     }
   }
   else {
-    result = CHAIN_SWORD(prev, space_p? ", " : ",");
+    result = CHAIN_SWORD(result, space_p? ", " : ",");
   }
   return result;
 }
 
+
+/* @brief This function compute the list of declaration at the begining of
+ * a module. It's intended to be used with Fortran or Fortran95 only
+ *
+ * @param ldecl is the list of entity to be prettyprinted
+ * @param force_common will force the prettyprint of common in include
+ * @param
+ * @param pdl is ???
+ * @return the text of module declarations
+ */
 static text text_entity_declaration(entity module,
 				    list /* of entity */ ldecl,
 				    bool force_common,
 				    list pdl)
 {
+  /*
+   * allocatable_pass indicate if we want to prettyprint allocatable or non
+   * allocatable entity, this is set to true during a second recursive pass.
+   */
+  static bool allocatable_pass_p = FALSE;
+  list allocatable_list = NULL;
+
   string how_common = get_string_property("PRETTYPRINT_COMMONS");
   bool print_commons = !same_string_p(how_common, "none");
+  /* prettyprint common in include if possible... */
+  bool pp_cinc = same_string_p(how_common, "include") && !force_common;
   list before = NIL, area_decl = NIL, pi1 = NIL, pi2 = NIL, pi4 = NIL, pi8 =
       NIL, ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL, pf4 = NIL, pf8 = NIL,
       pl = NIL, pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL, uses = NIL;
@@ -1562,7 +1580,7 @@ static text text_entity_declaration(entity module,
   list * pph = NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL);
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
-  bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  bool pp_in_type = FALSE, pp_in_common = FALSE;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose
    at least an order on parameters. Fortunately here, PARAMETER are
@@ -1600,9 +1618,6 @@ static text text_entity_declaration(entity module,
         " unexpected value\n", pp_var_dim);
   }
 
-  /* prettyprint common in include if possible...
-   */
-  pp_cinc = same_string_p(how_common, "include") && !force_common;
 
 
   FOREACH(ENTITY, e,ldecl) {
@@ -1703,7 +1718,8 @@ static text text_entity_declaration(entity module,
               default:
                 pips_internal_error("Unexpected integer size");
             }
-            *ppi = f77_f95_style_management (*ppi, s, space_p);
+
+            *ppi = f77_f95_style_management (*ppi, s, allocatable_pass_p, space_p);
             *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim, pdl));
           } else {
             string s = string_undefined;
@@ -1728,7 +1744,7 @@ static text text_entity_declaration(entity module,
               default:
                 pips_internal_error("Unexpected integer size");
             }
-            *pph = f77_f95_style_management (*pph, s, space_p);
+            *pph = f77_f95_style_management (*pph, s, allocatable_pass_p, space_p);
             *pph = gen_nconc(*pph, words_declaration(e, pp_dim, pdl));
           }
           break;
@@ -1736,12 +1752,12 @@ static text text_entity_declaration(entity module,
           pips_debug(7, "is a float\n");
           switch(basic_float(b)) {
             case 4:
-              pf4 = f77_f95_style_management(pf4, "REAL*4 ", space_p);
+              pf4 = f77_f95_style_management(pf4, "REAL*4 ", allocatable_pass_p, space_p);
               pf4 = gen_nconc(pf4, words_declaration(e, pp_dim, pdl));
               break;
             case 8:
             default:
-              pf8 = f77_f95_style_management(pf8, "REAL*8 ", space_p);
+              pf8 = f77_f95_style_management(pf8, "REAL*8 ", allocatable_pass_p, space_p);
               pf8 = gen_nconc(pf8, words_declaration(e, pp_dim, pdl));
               break;
           }
@@ -1750,12 +1766,12 @@ static text text_entity_declaration(entity module,
           pips_debug(7, "is a complex\n");
           switch(basic_complex(b)) {
             case 8:
-              pc8 = f77_f95_style_management(pc8, "COMPLEX*8 ", space_p);
+              pc8 = f77_f95_style_management(pc8, "COMPLEX*8 ", allocatable_pass_p, space_p);
               pc8 = gen_nconc(pc8, words_declaration(e, pp_dim, pdl));
               break;
             case 16:
             default:
-              pc16 = f77_f95_style_management(pc16, "COMPLEX*16 ", space_p);
+              pc16 = f77_f95_style_management(pc16, "COMPLEX*16 ", allocatable_pass_p, space_p);
               pc16 = gen_nconc(pc16, words_declaration(e, pp_dim, pdl));
               break;
           }
@@ -1777,7 +1793,7 @@ static text text_entity_declaration(entity module,
             int i = constant_int(value_constant(v));
 
             if (i == 1) {
-              ps = f77_f95_style_management(ps, "CHARACTER ", space_p);
+              ps = f77_f95_style_management(ps, "CHARACTER ", allocatable_pass_p, space_p);
               ps = gen_nconc(ps, words_declaration(e, pp_dim, pdl));
             } else {
               list chars = NIL;
@@ -1810,8 +1826,12 @@ static text text_entity_declaration(entity module,
           break;
         }
         case is_basic_derived: {
-          pips_user_warning("We got an allocatable but we don't know how to"
-              " prettyprint it !\n");
+          if(allocatable_pass_p) {
+            pips_internal_error("We got an allocatable but we are inside"
+                "allocatable pass !! This should be impossible...\n");
+          }
+          // Chains the entity to be declared, aka the array inside allocatable
+          allocatable_list = CONS(entity,get_allocatable_data_entity(e),allocatable_list);
           break;
         }
         default:
@@ -1882,6 +1902,13 @@ static text text_entity_declaration(entity module,
    */
 
   /* gen_free_list(sorted_ldecl); */
+
+  if(!allocatable_pass_p && !ENDP(allocatable_list)) {
+    /* We have to do a recursive call to get the allocatable declarations */
+    allocatable_pass_p = TRUE;
+    MERGE_TEXTS(r,text_entity_declaration(module,allocatable_list,force_common,pdl));
+    allocatable_pass_p = FALSE;
+  }
 
   return r;
 }

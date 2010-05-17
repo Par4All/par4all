@@ -578,58 +578,65 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
   string begin_attachment;
   entity e = reference_variable(obj);
 
-  /* entity_user_name() returns a shorter result than
-     entity_minimal_user_name() because the second one avoids
-     ambiguity.*/
-  //pc = CHAIN_SWORD(pc, entity_minimal_user_name(e));
-  pc = CHAIN_SWORD(pc, (*enf)(e));
 
-  begin_attachment = STRING(CAR(pc));
+  if(!ENTITY_ALLOCATABLE_BOUND_P(e)) {
+    /* We don't want to print these special entity, they are there for
+     * internal purpose only
+     */
 
-  if ( reference_indices(obj) != NIL ) {
-    switch (get_prettyprint_language_tag()) {
-      case is_language_fortran95:
-      case is_language_fortran: {
-        int count = 0;
-        pc = CHAIN_SWORD(pc,"(");
-        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-          syntax ssubscript = expression_syntax(subscript);
-          if ( count > 0 )
-            pc = CHAIN_SWORD(pc,",");
-          else
-            count++;
-          if ( syntax_range_p(ssubscript) ) {
-            pc = gen_nconc( pc,
-                            words_subscript_range( syntax_range(ssubscript),
-                                                   pdl ) );
-          } else {
-            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+    /* Print the entity first */
+    pc = CHAIN_SWORD(pc, (*enf)(e));
+
+    begin_attachment = STRING(CAR(pc));
+
+    /* Let's print the indices now */
+    if(reference_indices(obj) != NIL) {
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran95:
+        case is_language_fortran: {
+          int count = 0;
+          pc = CHAIN_SWORD(pc,"(");
+          FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+            syntax ssubscript = expression_syntax(subscript);
+            if(count > 0)
+              pc = CHAIN_SWORD(pc,",");
+            else
+              count++;
+            if(syntax_range_p(ssubscript)) {
+              pc = gen_nconc(pc,
+                             words_subscript_range(syntax_range(ssubscript),
+                                                   pdl));
+            } else {
+              pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+            }
           }
+          pc = CHAIN_SWORD(pc,")");
+          break;
         }
-        pc = CHAIN_SWORD(pc,")");
-        break;
-      }
-      case is_language_c: {
-        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-          syntax ssubscript = expression_syntax(subscript);
-          pc = CHAIN_SWORD(pc, "[");
-          if ( syntax_range_p(ssubscript) ) {
-            pc = gen_nconc( pc,
-                            words_subscript_range( syntax_range(ssubscript),
-                                                   pdl ) );
-          } else {
-            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+        case is_language_c: {
+          FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+            syntax ssubscript = expression_syntax(subscript);
+            pc = CHAIN_SWORD(pc, "[");
+            if(syntax_range_p(ssubscript)) {
+              pc = gen_nconc(pc,
+                             words_subscript_range(syntax_range(ssubscript),
+                                                   pdl));
+            } else {
+              pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+            }
+            pc = CHAIN_SWORD(pc, "]");
           }
-          pc = CHAIN_SWORD(pc, "]");
+          break;
         }
-        break;
+        default:
+          pips_internal_error("Language unknown !");
       }
-      default:
-        pips_internal_error("Language unknown !");
     }
+    attach_reference_to_word_list(begin_attachment,
+                                  STRING(CAR(gen_last(pc))),
+                                  obj);
   }
-  attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				obj);
+
 
   return(pc);
 }
@@ -1955,14 +1962,24 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
 			      prec<MINIMAL_ARITHMETIC_PRECEDENCE, pdl);
   }
 
-  /* Use precedence to generate or not parentheses, unless parentheses are always required */
-  if(prec < precedence ||  !precedence_p)
+  /* Use precedence to generate or not parentheses,
+   * unless parentheses are always required */
+  if(prec < precedence ||  !precedence_p) {
     pc = CHAIN_SWORD(pc, "(");
-  pc = gen_nconc(pc, we1);
-  pc = CHAIN_SWORD(pc, strdup(fun));
-  pc = gen_nconc(pc, we2);
-  if(prec < precedence || !precedence_p)
+  }
+
+  if(prettyprint_language_is_fortran95_p()
+      && strcmp(fun, FIELD_OPERATOR_NAME) == 0) {
+    pc = gen_nconc(pc, we1);
+  } else {
+    pc = gen_nconc(pc, we1);
+    pc = CHAIN_SWORD(pc, strdup(fun));
+    pc = gen_nconc(pc, we2);
+  }
+
+  if(prec < precedence || !precedence_p) {
     pc = CHAIN_SWORD(pc, ")");
+  }
 
   return(pc);
 }
@@ -4571,10 +4588,36 @@ static list words_subscript(subscript s, list pdl)
   expression a = subscript_array(s);
   list lexp = subscript_indices(s);
   bool first = TRUE;
-  /* Parentheses must be added for array expression like __ctype+1 in (__ctype+1)[*np]*/
-  pc = CHAIN_SWORD(pc,"(");
-  pc = gen_nconc(pc, words_expression(a, pdl));
-  pc = CHAIN_SWORD(pc,")[");
+
+  /* Parentheses must be added for array expression
+   * like __ctype+1 in (__ctype+1)[*np]
+   */
+
+  /* Here we differentiate the indices parenthesis syntax */
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+      pips_internal_error("We don't know how to prettyprint a subscript in "
+          "Fortran, aborting");
+    case is_language_fortran95: {
+      bool allocatable_p = expression_allocatable_data_access_p(a);
+      pips_assert("We don't know how to prettyprint a subscript in Fortran95 "
+          "and it's not an allocatable",
+          allocatable_p );
+      pc = gen_nconc(pc, words_expression(a, pdl));
+      pc = CHAIN_SWORD(pc,"(");
+      break;
+    }
+    case is_language_c:
+      pc = CHAIN_SWORD(pc,"(");
+      pc = gen_nconc(pc, words_expression(a, pdl));
+      pc = CHAIN_SWORD(pc,")[");
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
+
+  /* Print now the indices list */
   FOREACH(expression,exp,lexp) {
     if(!first) {
       switch(get_prettyprint_language_tag()) {
@@ -4593,7 +4636,22 @@ static list words_subscript(subscript s, list pdl)
     pc = gen_nconc(pc, words_expression(exp, pdl));
     first = FALSE;
   }
-  pc = CHAIN_SWORD(pc,"]");
+
+  /* Here we differentiate the indices syntax */
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      pc = CHAIN_SWORD(pc,")");
+      break;
+    case is_language_c:
+      pc = CHAIN_SWORD(pc,"]");
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
+
+
   return pc;
 }
 
