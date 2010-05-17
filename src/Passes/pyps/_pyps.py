@@ -3,6 +3,7 @@ import pypips
 import os
 import tempfile
 import shutil
+import re
 from string import split, upper, join
 
 pypips.atinit()
@@ -53,9 +54,12 @@ class module:
 		"""apply transformation phase"""
 		pypips.apply(upper(phase),self._name)
 
-	def display(self,rc="printed_file",With="PRINT_CODE"):
-		"""display a given resource rc"""
+
+	def display(self,rc="printed_file",With="PRINT_CODE", **props):
+		"""display a given resource rc of the module, with the
+		ability to change the properties"""
 		self._ws.activate(With)
+		self._ws._set_property(self._update_props("display", props))
 		return pypips.display(upper(rc),self._name)
 
 	def code(self):
@@ -73,7 +77,7 @@ class module:
 			return map(lambda l:loop(self,l),str.split(loops," "))
 
 	def _update_props(self,passe,props):
-		"""[[internal]] change a property dictionnary by appending the passe name to the property when needed """
+		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
 		for name,val in props.iteritems():
 			if upper(name) not in self._all_properties:
 				del props[upper(name)]
@@ -95,9 +99,12 @@ class modules:
 		self._modules=modules
 		self._ws= modules[0]._ws if modules else None
 
-	def display(self,rc="printed_file", With="PRINT_CODE"):
-		"""display all modules"""
-		map(lambda m:m.display(rc, With),self._modules)
+
+	def display(self,rc="printed_file", With="PRINT_CODE", **props):
+		"""display all modules by default with the code and some
+		eventual property setting"""
+		map(lambda m:m.display(rc, With, **props),self._modules)
+
 
 	def loops(self):
 		""" return a list of all program loops"""
@@ -140,7 +147,7 @@ class workspace:
 
 
 	def __getitem__(self,module_name):
-		"""retreive a module of the module from its name"""
+		"""retrieve a module of the module from its name"""
 		self._build_module_list()
 		return self._modules[module_name]
 
@@ -217,14 +224,35 @@ class workspace:
 		"""create an object containing current listing of all modules,
 		filtered by the filter argument"""
 		self._build_module_list()
+		#print self._modules.values()
 		the_modules=[m for m in self._modules.values() if matching(m)]
 		return modules(the_modules)
 
 
-	# Create an all method that is in fact the execution of filter
-	# with the default fitering rule: True
-	all=property(filter)
+	# Create an "all" pseudo-variable that is in fact the execution of
+	# filter with the default filtering rule: True
+	all = property(filter)
 
+
+	# A regex matching compilation unit names ending with a "!":
+	re_compilation_units = re.compile("^.*!$")
+
+	# Get the list of compilation units:
+	def filter_compilation_units(self):
+		return self.filter(lambda m: workspace.re_compilation_units.match(m.name))
+
+	# Transform it in a pseudo-variable:
+	compilation_units = property(filter_compilation_units)
+
+
+	# A real function is a module that is not a compilation unit:
+	def filter_all_functions(self):
+		return self.filter(lambda m: not workspace.re_compilation_units.match(m.name))
+
+	# Transform it in a pseudo-variable.  We should ask PIPS top-level
+	# for it instead of recomputing it here, but it is so simple this
+	# way...
+	all_functions = property(filter_all_functions)
 
 	@staticmethod
 	def delete(name):
