@@ -513,10 +513,14 @@ static void html_print_reference(reference r) {
 
 static void html_print_subscript(subscript s) {
   begin_block("subscript", false);
+  begin_block("array", false);
   html_print_expression(subscript_array( s ), false);
+  end_block("array", false);
+  begin_block("indices", false);
   FOREACH(expression, e, subscript_indices( s ) ) {
     html_print_expression(e, false);
   }
+  end_block("indices", false);
   end_block("subscript", false);
 }
 
