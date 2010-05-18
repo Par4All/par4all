@@ -1899,21 +1899,22 @@ basic gfc2pips_getbasic(gfc_symbol *s) {
   if(s->attr.pointer) {
     b = make_basic_pointer(type_undefined);
   } else {
+    int size = gfc2pips_symbol2size(s);
     switch(s->ts.type) {
       case BT_INTEGER:
-        b = make_basic_int(gfc2pips_symbol2size(s));
+        b = make_basic_int(size);
         break;
       case BT_REAL:
-        b = make_basic_float(gfc2pips_symbol2size(s));
+        b = make_basic_float(size);
         break;
       case BT_COMPLEX:
-        b = make_basic_complex(2 * gfc2pips_symbol2size(s));
+        b = make_basic_complex(2 * size);
         break;
       case BT_LOGICAL:
-        b = make_basic_logical(gfc2pips_symbol2size(s));
+        b = make_basic_logical(size);
         break;
       case BT_CHARACTER:
-        b = make_basic_string(0);
+        b = make_basic_string(make_value_constant(make_constant_int(size)));
         break;
       case BT_UNKNOWN:
         gfc2pips_debug( 5, "Type unknown\n" );
