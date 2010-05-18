@@ -250,7 +250,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
   // about the type... See get_symbol_table() and isolate the code
   // used to prettyprint the type. Too bad it uses the buffer type...
   pips_debug(8, "New abstract location entity \"%s\" found or created"
-	     " with type \"%s\"", entity_name(e), type_to_string(t));
+	     " with type \"%s\"\n", entity_name(e), type_to_string(t));
 
   return e;
 }

@@ -1609,6 +1609,37 @@ bool get_use_points_to()
   return use_points_to;
 }
 
+static bool FILE_star_effect_reference(reference ref)
+{
+  bool res = false;
+  type t = basic_concrete_type(entity_type(reference_variable(ref)));
+  pips_debug(8, "begin with type %s\n",
+	     words_to_string(words_type(t,NIL)));
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (basic_pointer_p(b))
+	{
+	  t = basic_pointer(b);
+	   if (type_variable_p(t))
+	     {
+		basic b = variable_basic(type_variable(t));
+		if (basic_derived_p(b))
+		  {
+		    entity te = basic_derived(b);
+		    if (same_string_p(entity_user_name(te), "_IO_FILE"))
+		      {
+			res = true;		  
+		      }
+		  }
+	     }
+	}
+    }
+  pips_debug(8, "end with : %s\n", res? "true":"false");
+			
+  return res;
+}
+
 
 /**
    @param l_pointer_eff is a list of effects that may involve access paths dereferencing pointers.
@@ -1686,13 +1717,16 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	  effect eff = EFFECT(CAR(l));
 	  reference ref = effect_any_reference(eff);
       
-	  if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
+	  if (io_effect_p(eff)|| malloc_effect_p(eff) 
+	      || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff))
+	      || (!get_bool_property("ALIASING_ACROSS_IO_STREAMS") && FILE_star_effect_reference(ref)))
 	    {
 	      lkeep = CONS(EFFECT, eff, lkeep);
 	    }
 	  else 
-	    if (!(read_dereferencing_p && write_dereferencing_p) && effect_reference_dereferencing_p(ref, &exact_p))
-	      {
+	    if (!(read_dereferencing_p && write_dereferencing_p) 
+		&& effect_reference_dereferencing_p(ref, &exact_p))
+	      {		
 		if (effect_read_p(eff)) read_dereferencing_p = true;
 		    else write_dereferencing_p = true;
 	      }

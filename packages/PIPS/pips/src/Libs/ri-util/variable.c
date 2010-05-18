@@ -61,9 +61,11 @@ static bool unique_entity_name_p(const char * name, entity in_module)
             return false;
     }
     /* everything seems ok, do a last check with gen_fin_tabulated */
-    return gen_chunk_undefined_p(
-            gen_find_tabulated(concatenate(entity_module_name(in_module), MODULE_SEP_STRING, user_name, NULL),entity_domain)
-            );
+    if(strstr(name,MODULE_SEP_STRING))
+        return gen_chunk_undefined_p(gen_find_tabulated(name,entity_domain));
+    else
+        return gen_chunk_undefined_p(gen_find_tabulated(concatenate(entity_module_name(in_module), MODULE_SEP_STRING,name,NULL),entity_domain));
+
 }
 
 /* See also macro entity_variable_p()... */

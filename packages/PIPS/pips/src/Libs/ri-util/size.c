@@ -512,6 +512,20 @@ SizeOfDimension(dimension d)
                 ;
 }
 
+static void *do_sizeofdimension_reduction(void *v, const list l)
+{
+    return make_op_exp(MULTIPLY_OPERATOR_NAME,
+            (expression)v,
+            SizeOfDimension(DIMENSION(CAR(l))));
+}
+
+/** computes the product of all dimensions in @p dims*/
+expression
+SizeOfDimensions(list dims)
+{
+    return (expression)gen_reduce(int_to_expression(1),do_sizeofdimension_reduction,dims);
+}
+
 
 /* FI: I do not understand the "Value" cast */
 
