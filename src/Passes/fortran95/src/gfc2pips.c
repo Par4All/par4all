@@ -2783,10 +2783,10 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
 
         /* Handle else */
         if(d->block) {
-          instruction s_else_i;
+          instruction s_else_i = instruction_undefined;
           if(d->block->expr) { /* this is an ELSE IF */
             /* Recursive call */
-            instruction ins = gfc2pips_code2instruction_(d);
+            s_else_i = gfc2pips_code2instruction_(d);
           } else {/* No condition therefore we are in the last ELSE statement */
             /* Recursive call */
             s_else_i = gfc2pips_code2instruction(d->block->next, false);
