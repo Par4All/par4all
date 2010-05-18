@@ -1802,14 +1802,16 @@ static text text_entity_declaration(entity module,
               chars = CHAIN_SWORD(chars, " ");
               chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
               attach_declaration_size_type_to_words(chars, "CHARACTER", i);
-              ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+              ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(t_chars, chars,
+                                                get_prettyprint_indentation());
             }
           } else if (value_unknown_p(v)) {
             list chars = NIL;
             chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
             chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
             attach_declaration_type_to_words(chars, "CHARACTER*(*)");
-            ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+            ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(t_chars, chars,
+                                              get_prettyprint_indentation());
           } else if (value_symbolic_p(v)) {
             list chars = NIL;
             symbolic s = value_symbolic(v);
