@@ -42,18 +42,6 @@ LIBS_PIPS =  $(LIBS_PIPS_DIR)/libri-util.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libcontrainte.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libarithmetique.a
 
-
-# The compiler itself is called f951.
-f951$(exeext): $(F95_OBJS) $(LIBS_PIPS) fortran/gfc2pips.o \
-		$(BACKEND) $(LIBDEPS) attribs.o
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
-		$(F95_OBJS) $(BACKEND) $(LIBS) fortran/gfc2pips.o $(LIBS_PIPS) attribs.o $(BACKENDLIBS) -lgmp -lmpfr
-
-INCLUDES += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
-
-fortran/gfc2pips.o: fortran/gfc2pips.c fortran/gfc2pips_stubs.c fortran/gfc2pips.h fortran/gfc2pips-private.h
-	$(CC) -std=c99 -g -c $(ALL_CPPFLAGS) -DBASEVER=$(BASEVER_s) \
-		$< $(OUTPUT_OPTION)
-  
+PIPS_INC_POST += -I$(NEWGEN_ROOT)/include/ -I$(PIPS_ROOT)/include/ -I $(LINEAR_ROOT)/include/
 
 

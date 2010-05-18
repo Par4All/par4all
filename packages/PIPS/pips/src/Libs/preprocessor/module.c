@@ -42,7 +42,9 @@
 
 #include "resources.h"
 #include "phases.h"
+#include "control.h"
 #include "preprocessor.h"
+
 
 /* High-level functions about modules, using pipsdbm and ri-util and
    some global variables assumed properly set
@@ -410,6 +412,7 @@ AddEntityToCompilationUnit(entity e, entity cu)
     }
     AddLocalEntityToDeclarations(e,cu,s);
     if( c_module_p(cu) ) {
+        module_reorder(s);
         db_put_or_update_memory_resource(DBR_CODE,cum,s,TRUE);
         db_touch_resource(DBR_CODE,cum);
     }
@@ -419,6 +422,12 @@ AddEntityToModuleCompilationUnit(entity e, entity module)
 {
     entity cu = module_entity_to_compilation_unit_entity(module);
     AddEntityToCompilationUnit(e,cu);
+}
+
+static bool recompile_module_removable_entity_p(gen_chunkp obj)
+{
+    entity e = (entity)obj;
+    return same_string_p(entity_module_name(e),get_current_module_name()) && !entity_area_p(e) && !entity_label_p(e) ;
 }
 
 /* build a textual representation of the modified module and update db
@@ -451,9 +460,8 @@ recompile_module(char* module)
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
         {
-            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) && !entity_label_p(e) )
+            if( recompile_module_removable_entity_p((gen_chunkp)e))
                 gen_clear_tabulated_element((gen_chunk*)e);
-
             else
                 p = CONS(ENTITY,e,p);
         }

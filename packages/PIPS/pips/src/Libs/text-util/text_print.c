@@ -147,8 +147,13 @@ void print_sentence(FILE * fd, sentence s) {
 
       switch(lang) {
         case is_language_fortran:
-        case is_language_fortran95:
           fprintf_sentence(fd, "%-5s ", label);
+          break;
+        case is_language_fortran95:
+          // Check that the label is non empty
+          if(*label!='\0') {
+            fprintf_sentence(fd, "%-5s ", label);
+          }
           break;
         case is_language_c:
           /* C prettyprinter: a label cannot begin with a number
@@ -188,7 +193,13 @@ void print_sentence(FILE * fd, sentence s) {
         case is_language_c:
           col += fprintf_sentence(fd, "%s", w);
           break;
-        default: {
+        case is_language_fortran:
+        case is_language_fortran95: {
+          int max_space_on_a_line = max_line_size - em;
+          if(lang==is_language_fortran) {
+            max_space_on_a_line -= 7;
+          }
+
 
           /* if the string fits on the current line: no problem */
           if (col + strlen(w) <= max_line_size - 2) {
@@ -198,7 +209,7 @@ void print_sentence(FILE * fd, sentence s) {
           /* if the string fits on one line:
            * use the 88 algorithm to break as few
            * syntactic constructs as possible */
-          else if ((int)strlen(w) < max_line_size - 2 - 7 - em) {
+          else if ((int)strlen(w) < max_space_on_a_line) {
               /* Complete current line with the statement
                line number, if it is significative: */
               if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
@@ -293,18 +304,22 @@ void print_sentence(FILE * fd, sentence s) {
               col += ncar;
             }
           }
+          break;
         }
+        default:
+          pips_internal_error("Language unknown !");
+          break;
       }
     }
 
     pips_debug(9, "line completed, col=%d\n", col);
-    pips_assert("not too many columns", col <= max_line_size - 2);
+    pips_assert("not too many columns", col <= max_line_size + 1);
 
     /* statement line number starts at different column depending on
      * the used language : C or fortran
      */
     size_t column_start = 0;
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
         /* fortran case right the line number on the right where characters
          are ignored by a f77 parser*/
@@ -330,7 +345,7 @@ void print_sentence(FILE * fd, sentence s) {
       for (size_t i = col; i <= column_start; i++) {
         putc_sentence(' ', fd);
       }
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
           fprintf_sentence(fd, "%04d", n);
           break;

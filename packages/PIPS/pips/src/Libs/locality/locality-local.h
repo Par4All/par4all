@@ -21,7 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#include "genC.h"    
 
 /* cette structure contient une pile. La tete de cette pile contient le statement courant */
 /* depth represente  la profondeur des nids */ 

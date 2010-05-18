@@ -604,6 +604,22 @@ expression_negative_integer_value_p(expression e) {
   return expression_integer_value(e, &v) && (v < 0);
 }
 
+/**
+ * computes the distance between the lower bound and the upper bound of the range
+ * @param r range to analyse
+ * @param mode wether we compute the distance or count the number of iterations
+ * @return appropriate distance or count
+ */
+expression range_to_expression(range r,enum range_to_expression_mode mode)
+{
+    expression distance =  make_op_exp(PLUS_OPERATOR_NAME,
+            copy_expression(range_upper(r)),
+            make_op_exp(MINUS_OPERATOR_NAME,
+                make_expression_1(),
+                copy_expression(range_lower(r))));
+    if( range_to_nbiter_p(mode) ) distance = make_op_exp(DIVIDE_OPERATOR_NAME,distance,copy_expression(range_increment(r)));
+    return distance;
+}
 
 /* The range count only can be evaluated if the three range expressions
  * are constant and if the increment is non zero. On failure, a zero

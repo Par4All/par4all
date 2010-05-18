@@ -58,7 +58,7 @@
 
 static string continuation = string_undefined;
 #define CONTINUATION (string_undefined_p(continuation)? \
- strdup(concatenate(PIPS_COMMENT_CONTINUATION, "                              ", NULL)) \
+ strdup(concatenate(get_comment_continuation(), "                              ", NULL)) \
  : continuation)
 
 /* new definitions for action interpretation
@@ -247,10 +247,10 @@ simple_effects_to_text(
     /* These four buffers are used to build the current line of prettyprint
      for a given type of effect. */
   
-    r[0] = '\0'; strcat(r, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifread, may_end, NULL));
-    R[0] = '\0'; strcat(R, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifread, must_end, NULL));
-    w[0] = '\0'; strcat(w, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifwrite, may_end, NULL));
-    W[0] = '\0'; strcat(W, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifwrite, must_end, NULL));
+    r[0] = '\0'; strcat(r, concatenate(get_comment_sentinel(), may_be, ifread, may_end, NULL));
+    R[0] = '\0'; strcat(R, concatenate(get_comment_sentinel(), must_be, ifread, must_end, NULL));
+    w[0] = '\0'; strcat(w, concatenate(get_comment_sentinel(), may_be, ifwrite, may_end, NULL));
+    W[0] = '\0'; strcat(W, concatenate(get_comment_sentinel(), must_be, ifwrite, must_end, NULL));
 
     /* These four "texts" are used to build all the text of prettyprint
        for a given type of effect. Each sentence contains one line. */

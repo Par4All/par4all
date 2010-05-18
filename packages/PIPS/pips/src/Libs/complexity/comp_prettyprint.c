@@ -117,7 +117,7 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 	else
 	    pips_error("text_complexity", "Never occur!");
 
-	asprintf(&s, "%s    %*s%s %s\n", PIPS_COMMENT_SENTINEL, nblanks, "", r, it);
+	asprintf(&s, "%s    %*s%s %s\n", get_comment_sentinel(), nblanks, "", r, it);
 
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      s));

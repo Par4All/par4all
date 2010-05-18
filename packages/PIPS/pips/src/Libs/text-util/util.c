@@ -41,7 +41,7 @@
 #include "misc.h"
 #include "properties.h"
 
-#define CONTINUATION PIPS_COMMENT_CONTINUATION "                              "
+
 char *
 i2a(int i)
 {

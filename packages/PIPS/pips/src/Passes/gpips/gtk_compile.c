@@ -33,7 +33,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
-#include "makefile.h"
 #include "phases.h"
 #include "database.h"
 #include "pipsdbm.h"

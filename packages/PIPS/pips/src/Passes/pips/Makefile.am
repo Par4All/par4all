@@ -10,8 +10,6 @@ revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
 AM_CPPFLAGS=\
-	$(LINEARLIBS_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants \
 	-I../../Documentation/pipsmake \
 	-I../../Documentation/newgen \
@@ -22,6 +20,8 @@ AM_CPPFLAGS=\
 	-I../../Libs/pipsmake\
 	-I../../Libs/pipsdbm\
 	-I../../Libs/properties\
+	$(LINEARLIBS_CFLAGS)\
+	$(NEWGENLIBS_CFLAGS)\
 	-DNEWGEN_REV='"unknown"' \
 	-DUTC_DATE='"unknown"' \
 	-DLINEAR_REV='"unknown"' \

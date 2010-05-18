@@ -12,8 +12,9 @@
 #include "properties.h"
 #include "control.h"
 #include "resources.h"
-#include "transformations.h"
 #include "effects-generic.h"
+#include "transformations.h"
+#include "accel-util.h"
 
 #if 0
 static void remove_guard(test t)

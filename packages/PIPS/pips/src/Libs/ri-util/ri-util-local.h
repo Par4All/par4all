@@ -45,6 +45,7 @@
 #include "text.h"
 #include "newgen.h"
 #include "cloning.h"
+#include "ri.h"
 
 /*  special characters
  */
@@ -937,12 +938,12 @@
 #define ENTITY_IAND_P(e)                 ENTITY_NAME_P(e, "IAND")
 
 /* OMP entity test */
-#define ENTITY_OMP_IF_P                 ENTITY_NAME_P(e,OMP_IF_FUNCTION_NAME)
-#define ENTITY_OMP_OMP_P                ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
-#define ENTITY_OMP_FOR_P                ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
-#define ENTITY_OMP_PRIVATE_P            ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)
-#define ENTITY_OMP_PARALLEL_P           ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
-#define ENTITY_OMP_REDUCTION_P          ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
+#define ENTITY_OMP_IF_P(e)               ENTITY_NAME_P(e,OMP_IF_FUNCTION_NAME)
+#define ENTITY_OMP_OMP_P(e)              ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
+#define ENTITY_OMP_FOR_P(e)              ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
+#define ENTITY_OMP_PRIVATE_P(e)          ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)
+#define ENTITY_OMP_PARALLEL_P(e)         ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
+#define ENTITY_OMP_REDUCTION_P(e)        ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
 
 /*io functions: C library and system io.Amira Mensi*/
 
@@ -1191,6 +1192,17 @@
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
 
+/*
+ * Fortran 95 Allocatable
+ */
+#define ALLOCATABLE_PREFIX "__pips_allocatable__"
+#define ALLOCATABLE_LBOUND_PREFIX "__pips__allocatable__lbound__"
+#define ALLOCATABLE_UBOUND_PREFIX "__pips__allocatable__ubound__"
+#define ENTITY_ALLOCATABLE_BOUND_P(e) \
+  (strncmp(entity_user_name(e), ALLOCATABLE_LBOUND_PREFIX, strlen(ALLOCATABLE_LBOUND_PREFIX)) == 0 \
+   || strncmp(entity_user_name(e), ALLOCATABLE_UBOUND_PREFIX, strlen(ALLOCATABLE_UBOUND_PREFIX)) == 0 )
+
+
 /* classification of basics */
 
 #define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))
@@ -1212,6 +1224,16 @@
 
 #define LABEL_SIZE 5
 #define INDENTATION (get_int_property("PRETTYPRINT_INDENTATION"))
+#define INDENT_A_LIST_OF_WORDS(list_of_words) { \
+  if(list_of_words) { \
+    list blanks = NIL; \
+    for(int i=0; i<INDENTATION; i++) { \
+      blanks = CHAIN_SWORD(blanks, " "); \
+    } \
+    list_of_words = gen_nconc(blanks,list_of_words); \
+  } \
+}
+
 /* In C, the module name may include file names, the compilation unit name and the user name of the function. It goes well beyond the 36 of Fortan (check the standard)*/
 #define MAXIMAL_MODULE_NAME_SIZE 100
 
@@ -1820,6 +1842,18 @@ the variable is unsigned, signed or not */
 #define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 #define hash_contains_p(htp, key) (hash_get(htp, key) != HASH_UNDEFINED_VALUE)
 
+enum range_to_expression_mode{
+    range_to_distance,
+    range_to_nbiter
+} ;
+#define range_to_distance_p(e) ((e) == range_to_distance)
+#define range_to_nbiter_p(e) ((e) == range_to_nbiter)
 
 /* that is all for ri-util-local.h
  */
+
+typedef enum {
+  IGNORE_IF_POLICY,
+  AND_IF_POLICY,
+  OR_IF_POLICY
+} if_clause_policy;

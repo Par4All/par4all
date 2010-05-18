@@ -52,8 +52,10 @@
 #define PARALLEL_CODE_EXT ".parcode"
 
 #define SEQUENTIAL_FORTRAN_EXT ".f"
+#define SEQUENTIAL_FORTRAN95_EXT ".f90"
 #define SEQUENTIAL_C_EXT ".c"
 #define PARALLEL_FORTRAN_EXT ".par.f"
+#define PARALLEL_FORTRAN95_EXT ".par.f90"
 #define PARALLEL_C_EXT ".par.c"
 
 /* Suffixes for code and parsed_code. No idea why the word PREDICAT
@@ -62,8 +64,8 @@
 #define PRETTYPRINT_FORTRAN_EXT ".pp.f"
 #define PREDICAT_C_EXT ".pre.c"
 #define PRETTYPRINT_C_EXT ".pp.c"
-#define PRETTYPRINT_F95_EXT ".pp.f90"
 #define PREDICAT_F95_EXT ".pre.f90"
+#define PRETTYPRINT_F95_EXT ".pp.f90"
 
 
 #define WP65_BANK_EXT ".bank"

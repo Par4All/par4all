@@ -12,7 +12,6 @@ License.
 #include "defines-local.h"
 #include "step_private.h"
 #include "preprocessor.h"
-#include "makefile.h"
 #include "pipsmake.h"
 #include <strings.h>
 #include <string.h>

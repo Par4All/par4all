@@ -39,24 +39,24 @@
 #include "conversion.h"
 
 /* Psysteme loop_iteration_domaine_to_sc(cons *lls , Pbase *baseindex)
- * transform the   iteration domain of the nested loops (contained  lls)
- * in a  system of constraints (sc)
- * New loop indices are added at the head of the list  baseindex.
- * The field base of sc contains all the system  variables. Variables are 
+ * transform the iteration domain of the nested loops (contained lls)
+ * in a system of constraints (sc)
+ *
+ * New loop indices are added at the head of the list baseindex.  The
+ * field base of sc contains all the system variables. Variables are
  * not in a specific order.
  *
  * CA: Ajout du cas ou l'increment de boucle est different de 1 le 1/9/91
- */  
+ */
 
-Psysteme loop_iteration_domaine_to_sc(lls, baseindex)
-cons *lls;
-Pbase *baseindex;
+Psysteme loop_iteration_domaine_to_sc(list lls,
+				      Pbase *baseindex)
 {
-    Psysteme sc;  
+    Psysteme sc;
 
     debug_on("CONVERSION_DEBUG_LEVEL");
 
-    debug(8,"loop_iteration_domaine_to_sc", "begin\n");
+    pips_debug(8, "begin\n");
 
     sc = sc_new();
     for (; lls != NIL; lls = CDR(lls)){

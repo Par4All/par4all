@@ -1,4 +1,29 @@
 /*
+
+ $Id$
+
+ Copyright 1989-2010 MINES ParisTech
+ Copyright 2009-2010 HPC-Project
+
+ This file is part of PIPS.
+
+ PIPS is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ any later version.
+
+ PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.
+
+ See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+ */
+
+/*
 * includes for newgen
 * a link to the newgen binary file is missing
 */
@@ -10,8 +35,6 @@
 #include "genC.h"
 #include "gfc2pips.h"
 
-/*typedef void * Pvecteur;
-typedef void * Psysteme; */
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -19,34 +42,20 @@ typedef void * Psysteme; */
 
 #include "parser_private.h"
 #include "syntax.h"
-/*
-typedef void gfc_namespace;
-typedef void gfc_symtree;
-typedef void gfc_symbol;
-typedef void gfc_code;
-typedef void gfc_char_t;
-typedef void gfc_array_ref;
-typedef void gfc_expr;
-typedef void gfc_case;
-typedef void gfc_actual_arglist;
-typedef void locus;
 
-*/
-/*
-#define GFC2PIPS_DEBUG_LEVEL 10
-#ifdef GFC2PIPS_DEBUG_LEVEL
-#define gfc2pips_debug(level,...) { \
-  if ( GFC2PIPS_DEBUG_LEVEL >= (level) ) fprintf (stderr, __VA_ARGS__); \
-}
-#define ifdebug(level) if(GFC2PIPS_DEBUG_LEVEL >= (level) )
-#else
-#define ifdebug(level) if( false )
-#define gfc2pips_debug(level,format, ...)
-#endif
 
-#define pips_user_error(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
-#define pips_user_warning(...) { fprintf(stderr, __VA_ARGS__); }
-*/
+/* We have here to HACK GCC include that prevent use of these function */
+#undef toupper
+#undef fgetc
+#undef fputc
+#undef fread
+#undef asprintf
+int asprintf(char **strp, const char *fmt, ...);
+
+
+
+
+
 #define gfc2pips_debug pips_debug
 
 //an enum to know what kind of main entity we are dealing with
@@ -55,6 +64,19 @@ typedef enum gfc2pips_main_entity_type {
 } gfc2pips_main_entity_type;
 
 
+/* Store the list of callees */
+extern list gfc_module_callees;
+
+
+extern list gfc2pips_list_of_declared_code;
+extern list gfc2pips_list_of_loops;
+
+
+void gfc2pips_add_to_callees(entity e);
+void pips_init();
+list get_use_entities_list(struct gfc_namespace *ns);
+void save_entities();
+basic gfc2pips_getbasic(gfc_symbol *s);
 
 /**
  * @brief put the given char table to upper case
@@ -145,7 +167,7 @@ entity gfc2pips_check_entity_module_exists(char *s);
 entity gfc2pips_check_entity_block_data_exists(char *s);
 entity gfc2pips_check_entity_exists(const char *s);
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
-entity gfc2pips_symbol2entity2(gfc_symbol* sym);
+entity gfc2pips_symbol2top_entity(gfc_symbol* sym);
 entity gfc2pips_char2entity(char*p, char* s);
 char* gfc2pips_get_safe_name(const char* str);
 
@@ -175,7 +197,7 @@ int gfc2pips_symbol2sizeArray(gfc_symbol *s);
 
 list gfc2pips_array_ref2indices(gfc_array_ref *ar);
 bool gfc2pips_there_is_a_range(gfc_array_ref *ar);
-expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar);
+list gfc2pips_mkRangeExpression(gfc_array_ref *ar);
 
 
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);
@@ -238,7 +260,6 @@ void gfc2pips_push_loop(gfc_code *c);
 void gfc2pips_pop_loop(void);
 
 list gen_union(list a, list b);
-list gen_intersection(list a, list b);
 
 #endif /* GFC_2_PIPS */
 

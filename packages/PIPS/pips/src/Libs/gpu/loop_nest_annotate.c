@@ -2,7 +2,7 @@
 
   $Id:loop_nest_annotate.c 15433 2009-09-22 06:49:48Z creusillet $
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 2009-2010 HPC Project
 
   This file is part of PIPS.
 
@@ -25,7 +25,7 @@
     #include "pips_config.h"
 #endif
 
-/* loop nests transformation phase for par4all :
+/* Loop nests transformation phase for par4all :
 
    gpu_loop_nest_annotate takes a module that is of the form :
 
@@ -114,7 +114,7 @@ static bool loop_push(loop l)
 
 static void loop_annotate(loop l)
 {
-  /* the first time we enter this function is when we reach the innermost 
+  /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
   if (inner_reached == FALSE)
@@ -125,8 +125,8 @@ static void loop_annotate(loop l)
       /* We are at the innermost loop nest level */
       inner_reached = TRUE;
 
-      /* first we add a guard to the loop body statement 
-	 using the enclosing loops upperbounds.
+      /* First we add a guard to the loop body statement using the
+	 enclosing loops upperbounds.
       */
       FOREACH(LOOP, c_loop, l_enclosing_loops)
 	{
@@ -136,31 +136,32 @@ static void loop_annotate(loop l)
 	  expression c_upper = range_upper(c_range);
 	  expression c_number_iter_exp = expression_undefined;
 	  expression c_guard;
-	  
-	  c_guard = 
+
+	  c_guard =
 	    MakeBinaryCall(entity_intrinsic(C_LESS_OR_EQUAL_OPERATOR_NAME),
-			   reference_to_expression(make_reference(c_index, 
-								  NIL)), 
+			   reference_to_expression(make_reference(c_index,
+								  NIL)),
 			   copy_expression(c_upper));
 
 	  if (expression_undefined_p(guard_exp))
 	    guard_exp = c_guard;
 	  else
 	    guard_exp = MakeBinaryCall(entity_intrinsic(C_AND_OPERATOR_NAME),
-				       guard_exp, 
+				       guard_exp,
 				       c_guard);
-	  /* keep the number of iterations for the generation of 
-	     the outermost comment */
-	  c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME, 
-					   c_upper, 
+	  /* Keep the number of iterations for the generation of the
+	     outermost comment */
+	  c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME,
+					   c_upper,
 					   c_lower);
-	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME, 
+	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
 					   c_number_iter_exp,
 					   make_integer_constant_expression(1));
-	  l_number_iter_exp = gen_nconc(l_number_iter_exp, 
-				     CONS(EXPRESSION, c_number_iter_exp, NIL));
+	  l_number_iter_exp =
+	    gen_nconc(l_number_iter_exp,
+		      CONS(EXPRESSION, c_number_iter_exp, NIL));
 	}
-      
+
       /* FI: how about an expression_to_string() */
       pips_debug(2, "guard expression : %s\n",
 		 words_to_string(words_expression(guard_exp, NIL)));
@@ -174,9 +175,10 @@ static void loop_annotate(loop l)
       loop_body(l) = guard_s;
 
     }
-  
-  /* we are now on our way back in the recusrsion; we do nothing, unless 
-     we are at the uppermost level. Then we add the outermost comment : 
+
+
+  /* We are now on our way back in the recursion; we do nothing, unless
+     we are at the uppermost level. Then we add the outermost comment :
      // Loop nest P4A begin, xD(upper_bound,..)
   */
   if (gen_length(l_enclosing_loops) == 1)
@@ -186,47 +188,33 @@ static void loop_annotate(loop l)
       string outer_s;
       asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , loop_nest_depth);
 
-      FOREACH(EXPRESSION, upper_exp, l_number_iter_exp)
-	{
-        string buf,
-	  buf1=words_to_string(words_expression(upper_exp, NIL));
+      FOREACH(EXPRESSION, upper_exp, l_number_iter_exp) {
+        string buf;
+	string buf1 = words_to_string(words_expression(upper_exp, NIL));
         asprintf(&buf,"%s%s",outer_s,buf1);
-        free(outer_s);free(buf1);
+        free(outer_s);
+	free(buf1);
         outer_s=buf;
-	  loop_nest_depth --;	  
-	  if (loop_nest_depth > 0)
-      {
+	loop_nest_depth --;
+	if (loop_nest_depth > 0) {
           asprintf(&buf,"%s"COMMA,outer_s);
           free(outer_s);
           outer_s=buf;
-      }
 	}
+      }
 
       asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
       free(outer_s);
 
-      /* clean up things for another loop nest */
+      /* Clean up things for another loop nest */
       inner_reached = FALSE;
       loop_nest_depth = 0;
       gen_free_list(l_number_iter_exp);
       l_number_iter_exp = NIL;
     }
-  
+
   POP(l_enclosing_loops);
   return;
-}
-
-
-static bool stmt_push(statement s)
-{
-  pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
-  return(TRUE);
-}
-
-static void stmt_pop(statement s)
-{
-    pips_debug(1, "End statement%03zd :\n", statement_ordering(s));
-
 }
 
 
@@ -254,20 +242,14 @@ static void stmt_pop(statement s)
  */
 bool gpu_loop_nest_annotate(char *module_name)
 {
-    /* prelude */
-  statement module_statement = 
-    PIPS_PHASE_PRELUDE(module_name,
-		       "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
-    
-  /* Compute the loops normalization of the module. */
-  gen_multi_recurse(module_statement, 
-		    statement_domain, stmt_push, stmt_pop,
-		    loop_domain, loop_push, loop_annotate,
-		    NULL); 
+  // Use this module name and this environment variable to set
+  statement module_statement =
+    PIPS_PHASE_PRELUDE(module_name, "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
 
-  /* postlude */
+  /* Annotate the loop nests of the module. */
+  gen_recurse(module_statement, loop_domain, loop_push, loop_annotate);
+
+  // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
-  
-  return true;
+  // The macro above does a "return TRUE" indeed.
 }
-

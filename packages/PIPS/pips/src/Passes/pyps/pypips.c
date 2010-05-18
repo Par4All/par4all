@@ -3,6 +3,8 @@
   $Id$
 
   Copyright 1989-2010 MINES ParisTech
+  Copyright 2009-2010 TÉLÉCOM Bretagne
+  Copyright 2009-2010 HPC Project
 
   This file is part of PIPS.
 
@@ -32,7 +34,6 @@
 
 #include "ri.h"
 #include "database.h"
-#include "makefile.h"
 
 #include "misc.h"
 
@@ -70,9 +71,9 @@ void create(char* workspace_name, char ** filenames)
             ("Workspace %s already exists. Delete it!\n", workspace_name);
     else if (db_get_current_workspace_name()) {
         pips_user_error("Close current workspace %s before "
-                "creating another!\n", 
+                "creating another one!\n",
                 db_get_current_workspace_name());
-    } 
+    }
     else
     {
         if (db_create_workspace(workspace_name))
@@ -80,7 +81,7 @@ void create(char* workspace_name, char ** filenames)
             if (!create_workspace(filename_list))
             {
                 db_close_workspace(false);
-                pips_user_error("Could not create workspace %s\n", 
+                pips_user_error("Could not create workspace %s\n",
                         workspace_name);
             }
         }
@@ -132,7 +133,7 @@ char* info(char * about)
             sinfo_size+=strlen(m)+1;
         }
         sinfo=(char*)calloc(1+sinfo_size,sizeof(char));
-        if(!sinfo) fprintf(stderr,"not enough meory to hold all module names\n");
+        if(!sinfo) fprintf(stderr,"not enough memory to hold all module names\n");
         else {
             for(i=0; i<n; i++)
             {

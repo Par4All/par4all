@@ -97,7 +97,7 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
     return is_equal; 
 }
 
-#define continuation PIPS_COMMENT_CONTINUATION
+#define continuation get_comment_continuation()
 #define append(s) add_to_current_line(crt_line, s, continuation, txt)
 
 /* text text_continuation(transformer tran) 
@@ -119,7 +119,7 @@ text_continuation(transformer cont, bool is_must)
     char crt_line[MAX_LINE_LENGTH];
 
     crt_line[0] = '\0'; 
-    append(PIPS_COMMENT_PREFIX);
+    append(get_comment_sentinel());
     append(" ");
 
     if(cont != (transformer) HASH_UNDEFINED_VALUE ) 
