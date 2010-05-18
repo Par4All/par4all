@@ -365,7 +365,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
                                                     string_undefined,
                                                     make_sequence(NIL),
                                                     NIL,
-                                                    make_language_fortran()));
+                                                    make_language_fortran95()));
     AddEntityToDeclarations(com, get_current_module_entity());
     int offset_common = stack_offset;
     unnamed_commons_p = unnamed_commons;
@@ -533,7 +533,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
                                   make_sequence(NIL),
                                   gen_union(list_of_extern_entities,
                                             list_of_subroutines),
-                                  make_language_fortran()));
+                                  make_language_fortran95()));
 
   gfc2pips_debug(2, "main entity creation finished\n");
 
@@ -3973,11 +3973,14 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
               returned_expr
                   = MakeFortranUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
                                          e1);
+              break;
             case INTRINSIC_UPLUS:
               returned_expr = e1;
+              break;
             case INTRINSIC_NOT:
               returned_expr
                   = MakeFortranUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME), e1);
+              break;
             default:
               pips_user_error( "No second expression member for intrinsic %s\n",
                   c );
