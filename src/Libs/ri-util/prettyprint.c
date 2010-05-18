@@ -1470,13 +1470,11 @@ words_io_inst(call obj,
     {
       switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
+        case is_language_fortran95:
           pc = CHAIN_SWORD(pc, "READ *, ");
           break;
         case is_language_c:
           pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
-          break;
-        case is_language_fortran95:
-          pips_internal_error("Need to update F95 case");
           break;
         default:
           pips_internal_error("Language unknown !");
