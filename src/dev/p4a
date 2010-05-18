@@ -5,7 +5,7 @@
 Par4All Frontend Script
 '''
 
-import string, sys, os, re, optparse, shutil
+import string, sys, os, re, optparse
 from p4a_util import *
 from p4a_processor import *
 from p4a_builder import *
@@ -171,9 +171,9 @@ def main():
 	
 	# Remove database unless otherwise specified.
 	if not options.keep_database:
-		database_dir = os.path.abspath(processor.workspace.dir())
+		database_dir = os.path.abspath(processor.workspace.directory())
 		debug("removing " + database_dir)
-		shutil.rmtree(database_dir)
+		rmtree(database_dir, can_fail = 1)
 	
 	# Build requested binaries.
 	if len(options.output_file):
@@ -194,6 +194,8 @@ def main():
 		
 		if options.debug:
 			cflags = "-g " + cflags
+		
+		cflags += " -Wall -fno-strict-aliasing"
 		
 		cc = options.cc
 		ld = options.ld
@@ -218,10 +220,10 @@ def main():
 			if options.openmp:
 				cflags = "-fopenmp " + cflags
 			if not options.nofast:
-				cflags = "-O3 " + cflags
+				cflags = "-O2 " + cflags
 		
-		info("cflags: " + cflags)
-		info("ldflags: " + ldflags)
+		#info("cflags: " + cflags)
+		#info("ldflags: " + ldflags)
 		
 		for output_file in options.output_file:
 			output_file = os.path.abspath(output_file)

@@ -5,10 +5,12 @@
 Par4All Processing Class (convenience wrapper around pyps.workspace)
 '''
 
-import sys, os, re
+import sys, os, re, shutil
 from p4a_util import *
 import pyps
-	
+
+
+
 class p4a_processor():
 
 	files = []
@@ -17,20 +19,44 @@ class p4a_processor():
 
 	def __init__(self, workspace = None, project_name = "", cppflags = "", verbose = False,
 		files = [], filter_include = None, filter_exclude = None, accel = False):
-
 		if workspace:
 			self.workspace = workspace
 		else:
-			# This is because pyps.workspace.__init__ will test for empty strings...
-			if project_name == None:
-				project_name = ""
-			if cppflags == None:
+			# This is because pyps.workspace.__init__ will test for empty strings
+			if cppflags is None:
 				cppflags = ""
-
+			
+			if not project_name:
+				while True:
+					project_name = gen_name()
+					database_dir = os.path.join(os.getcwd(), project_name + ".database")
+					if not os.path.exists(database_dir):
+						break
+			
+			fortran = None
 			for file in files:
+				if fortran is None:
+					(base, ext) = os.path.splitext(file)
+					if ext == ".f":
+						fortran = True
+					else:
+						fortran = False
 				if not os.path.exists(file):
 					raise p4a_error("file does not exist: " + file)
-
+			
+			if accel:
+				accel_stubs_name = None
+				if fortran:
+					accel_stubs_name = "p4a_stubs.f"
+				else:
+					accel_stubs_name = "p4a_stubs.c"
+				accel_stubs = os.path.join(os.environ["P4A_ACCEL_DIR"], accel_stubs_name)
+				(base, ext) = os.path.splitext(os.path.basename(accel_stubs))
+				output_accel_stubs = os.path.join(os.getcwd(), base + "_" + project_name + ext)
+				debug("copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
+				shutil.copyfile(accel_stubs, output_accel_stubs)
+				files += [ output_accel_stubs ]
+			
 			self.files = files
 			
 			# Create the PyPS workspace.
@@ -41,9 +67,6 @@ class p4a_processor():
 		for module in self.workspace:
 			module.prepend_comment(PREPEND_COMMENT = "/*\n * module " + module.name + "\n */\n")
 				#+ " read on " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n")
-
-		if accel:
-			files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
 		
 		# Skip module name of P4A runtime.
 		# Also filter out modules based on --include-modules and --exclude-modules.
@@ -68,7 +91,7 @@ class p4a_processor():
 
 		all_modules.privatize_module()
 
-	def filter_modules(self, filter_include = None, filter_exclude = None):
+	def filter_modules(self, filter_include = None, filter_exclude = None, other_filter = lambda x: True):
 		filter_include_re = None
 		if filter_include:
 			filter_include_re = re.compile(filter_include)
@@ -77,7 +100,8 @@ class p4a_processor():
 			filter_exclude_re = re.compile(filter_exclude)
 		filter = (lambda module: self.main_filter(module)
 			and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
-			and (filter_include_re == None or filter_include_re.match(module.name)))
+			and (filter_include_re == None or filter_include_re.match(module.name))
+			and other_filter(module.name))
 		return self.workspace.filter(filter)
 
 	def parallelize(self, fine = False, filter_include = None, filter_exclude = None):
@@ -95,7 +119,7 @@ class p4a_processor():
 		# Isolate kernels by using the fact that all the generated kernels have
 		# their name beginning with "p4a_":
 		kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
-		kernel_launchers = workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+		kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
 		# Add communication around all the call site of the kernels:
 		kernel_launchers.kernel_load_store()
@@ -105,24 +129,31 @@ class p4a_processor():
 		# local functions if they are in the same file as the caller (by inlining
 		# them, by the way... :-) )
 		kernel_filter_re = re.compile("p4a_kernel_\\d+$")
-		kernels = workspace.filter(lambda m: kernel_filter_re.match(m.name))
+		kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 		kernels.inlining()
 
 		# Display the wrappers to see the work done:
 		kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
-		kernel_wrappers = workspace.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
+		kernel_wrappers = self.workspace.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
 
 	def ompify(self, filter_include = None, filter_exclude = None):
 		self.filter_modules(filter_include, filter_exclude).ompify_code()
 
 	def save(self, in_dir = None, prefix = "p4a_"):
 		output_files = []
-		self.workspace.save(in_dir, prefix)
+		# save() was broken someday so DIY.
+		#self.workspace.all.unsplit()
+		self.workspace.all.unsplit()
 		for file in self.files:
 			(dir, name) = os.path.split(file)
+			pips_file = os.path.join(self.workspace.directory(), "Src", name)
 			if in_dir:
 				dir = in_dir
-			output_file = os.path.join(dir, prefix + name)
+			if name[0:len(prefix)] != prefix:
+				name = prefix + name
+			output_file = os.path.join(dir, name)
+			shutil.copyfile(pips_file, output_file)
+			debug("copied output file: " + output_file)
 			output_files += [ output_file ]
 		return output_files
 

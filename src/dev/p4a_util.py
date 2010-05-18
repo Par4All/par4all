@@ -5,7 +5,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os
+import string, sys, random, logging, os, gc
 import term
 
 # Global variables.
@@ -70,6 +70,24 @@ def run(cmd, can_fail = 0):
 def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):
 	'''Generates a random name / password'''
 	return prefix + "".join(random.choice(chars) for x in range(length))
+
+def rmtree(dir, can_fail = 0):
+	'''Removes a directory recursively, because sometimes shutil.rmtree() does not want to'''
+	(base, ext) = os.path.splitext(dir)
+	if ext != ".database" and ext != ".build":
+		raise p4a_error("Cannot remove unknown directory: " + dir)
+	try:
+		for root, dirs, files in os.walk(dir, topdown = False):
+			for name in files:
+				os.remove(os.path.join(root, name))
+			for name in dirs:
+				os.rmdir(os.path.join(root, name))
+		os.rmdir(dir)
+	except Exception as e:
+		if can_fail:
+			warn("could not remove directory " + dir + ": " + repr(e))
+		else:
+			raise e
 
 if __name__ == "__main__":
 	print(__doc__)
