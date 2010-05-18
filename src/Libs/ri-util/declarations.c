@@ -723,7 +723,7 @@ static sentence sentence_area(entity e, entity module, bool pp_dimensions, list 
     }
 
     return make_sentence(is_sentence_unformatted,
-			 make_unformatted(NULL, 0, 0, pc));
+			 make_unformatted(NULL, 0, get_prettyprint_indentation(), pc));
 }
 
 static sentence sentence_basic_declaration(entity e)
@@ -738,7 +738,7 @@ static sentence sentence_basic_declaration(entity e)
   decl = CHAIN_SWORD(decl, entity_local_name(e));
 
   return(make_sentence(is_sentence_unformatted,
-		       make_unformatted(NULL, 0, 0, decl)));
+		       make_unformatted(NULL, 0, get_prettyprint_indentation(), decl)));
 }
 
 
@@ -771,7 +771,7 @@ static sentence sentence_external(entity f)
   pc = CHAIN_SWORD(pc, entity_local_name(f));
 
   return(make_sentence(is_sentence_unformatted,
-		       make_unformatted(NULL, 0, 0, pc)));
+		       make_unformatted(NULL, 0, get_prettyprint_indentation(), pc)));
 }
 
 static sentence sentence_symbolic(entity f, list pdl)
@@ -787,7 +787,7 @@ static sentence sentence_symbolic(entity f, list pdl)
   pc = CHAIN_SWORD(pc, ")");
 
   return(make_sentence(is_sentence_unformatted,
-		       make_unformatted(NULL, 0, 0, pc)));
+		       make_unformatted(NULL, 0, get_prettyprint_indentation(), pc)));
 }
 
 /* why is it assumed that the constant is an int ???
@@ -812,7 +812,7 @@ static sentence sentence_data(entity e)
   pc = CHAIN_SWORD(pc, "/");
 
   return(make_sentence(is_sentence_unformatted,
-		       make_unformatted(NULL, 0, 0, pc)));
+		       make_unformatted(NULL, 0, get_prettyprint_indentation(), pc)));
 }
 
 /********************************************************************* TEXT */
@@ -1321,7 +1321,7 @@ static sentence sentence_data_statement(statement is, list pdl)
   unformatted u =
     make_unformatted
     (NULL,
-     STATEMENT_NUMBER_UNDEFINED, 0,
+     STATEMENT_NUMBER_UNDEFINED, get_prettyprint_indentation(),
      CONS(STRING, strdup("DATA "), NIL));
   sentence s = make_sentence(is_sentence_unformatted, u);
   list wl = unformatted_words(u);
