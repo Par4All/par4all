@@ -52,22 +52,16 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = f.read()
     f.close()
 
+    # Where we will rewrite the result:
+    dest_file_name = os.path.join(dir_name, file_base_name)
 
-    # Remove a boggy output from the outliner:
-    content = re.sub("//PIPS generated variable\nstruct {\n   float re;\n   float im;\n};", "", content)
+    # Remove a buggy output from the outliner:
+#16    content = re.sub("//PIPS generated variable\nstruct {\n   float re;\n   float im;\n};", "", content)
 
 #    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]\\);\n))",
 #                     "\\1P4A_accel_kernel_wrapper void p4a_kernel_wrapper_\\2", content)
-    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]*\\);\n))",
-                     "\\1void p4a_kernel_wrapper_\\2", content)
-
-    ## Change
-    ##    // To be assigned to a call to P4A_vp_1: j
-    ## into
-    ##     // Index has been replaced by P4A_vp_1
-    ##    j = P4A_vp_1;
-    content = re.sub("( *)// To be assigned to a call to (P4A_vp_[0-9]+): ([^\n]+)",
-                     "\\1// Index has been replaced by \\2:\n\\1\\3 = \\2;", content)
+#16    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]*\\);\n))",
+#16                     "\\1void p4a_kernel_wrapper_\\2", content)
 
     # Insert a
     # #include <p4a_accel.h>
@@ -105,8 +99,17 @@ def patch_to_use_p4a_methods(file_name, dir_name):
 #   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
-    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);",
+    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);",
                      "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);", content)
+
+    # Get the virtual processor coordinates:
+    ## Change
+    ##    // To be assigned to a call to P4A_vp_1: j
+    ## into
+    ##     // Index has been replaced by P4A_vp_1
+    ##    j = P4A_vp_1;
+    content = re.sub("( *)// To be assigned to a call to (P4A_vp_[0-9]+): ([^\n]+)",
+                     "\\1// Index has been replaced by \\2:\n\\1\\3 = \\2;", content)
 
     # Add missing declarations of the p4a_kernel_launcher (outliner or
     # prettyprinter bug?)
@@ -134,12 +137,12 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     if verbose:
         print content,
 
-    dest_file_name = os.path.join(dir_name, file_base_name)
     if verbose:
         print 'Rewrite the content to', dest_file_name
     f = open(dest_file_name, 'w')
     f.write(content)
     f.close()
+
     # Save a .cu version too just in case :-)
     dest_file_name = re.sub("\\.c$", ".cu", dest_file_name)
     f = open(dest_file_name, 'w')
