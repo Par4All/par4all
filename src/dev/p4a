@@ -1,63 +1,18 @@
 #!/usr/bin/env python
-
 # -*- coding: utf-8 -*-
 
-"""
-Par4All Frontend Script
-"""
+'''
+Par4All Frontend/Helper Script
+'''
 
-import sys, os, re, optparse, subprocess, string, random, shutil, logging, time, pyps
-
-verbosity = 0
-logger = None
-
-def gen_name(length = 4, chars = string.letters + string.digits):
-	"Generates a random name / password"
-	return "P4A" + "".join(random.choice(chars) for x in range(length))
-
-def rmdir(dir):
-	"Removes a known directory recursively"
-	(base, ext) = os.path.splitext(dir)
-	if ext != ".database" and ext != ".build":
-		sys.stderr.write("Cannot remove unknown directory: " + dir)
-		sys.exit(123)
-	for root, dirs, files in os.walk(dir, topdown = False):
-		for name in files:
-			os.remove(os.path.join(root, name))
-		for name in dirs:
-			os.rmdir(os.path.join(root, name))
-	os.removedirs(dir)
-
-def debug(msg):
-	if verbosity >= 3:
-		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
-	if logger:
-		logger.debug(msg)
-
-def info(msg):
-	if verbosity >= 2:
-		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
-	if logger:
-		logger.info(msg)
-
-def warn(msg):
-	if verbosity >= 1:
-		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
-	if logger:
-		logger.warn(msg)
-
-def error(msg):
-	sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
-	if logger:
-		logger.error(msg)
-
-def critical(msg):
-	sys.stderr.write(sys.argv[0] + ": " + msg.rstrip() + "\n");
-	if logger:
-		logger.critical(msg)
+import string, sys, os, re, optparse, shutil
+#import optparse, subprocess, string, random, shutil, time, pyps
+#import p4a_config
+from p4a_util import *
+from p4a_processor import *
 
 def main():
-	"The function called when this program is executed by its own"
+	'''The function called when this program is executed by its own'''
 
 	global verbosity
 
@@ -182,7 +137,7 @@ def main():
 	debug_group = optparse.OptionGroup(parser, "Debugging, Reporting and Internal Options")
 
 	debug_group.add_option("-v", "--verbose", action = "count",
-						   dest = "verbosity", default = 0,
+						   dest = "verbosity", default = verbosity,
 						   help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
 
 	debug_group.add_option("-r", "--report", action = "count",
@@ -206,152 +161,32 @@ def main():
 
 	# Preliminary check.
 	if not os.path.exists(os.environ["P4A_ROOT"]) or not os.path.exists(os.environ["P4A_ACCEL_DIR"]):
-		error("Invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
-		sys.exit(1)
+		die("invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
 
 	# Check options.
 	if len(args) == 0:
-		error("Missing input files")
-		sys.exit(1)
+		die("missing input files")
 	if options.remove_after and options.keep_after:
-		error("Cannot --remove-after and --keep-after at the same time")
-		sys.exit(1)
+		die("cannot --remove-after and --keep-after at the same time")
 	if options.simple and (options.cuda or options.openmp):
-		error("Cannot combine --simple with --cuda and/or --openmp")
-		sys.exit(1)
-
-	# Run ourselves (to filter PIPS/PyPS output) unless --here is specified.
-	if not options.here:
-		report = ""
-		full_report = ""
-		sys.argv.insert(1, "--here")
-		sys.argv.insert(1, "--nocommand")
-		debug(repr(sys.argv))
-		proc = subprocess.Popen(sys.argv, shell = False,
-			stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-		#space_re = re.compile(r"^\s*$")
-		module_re = re.compile(r"  Module +(\S+)")
-		made_re = re.compile(r"(\S+) made for (\S+)")
-		script_re = re.compile("(" + sys.argv[0] + r": .+?(\n|\Z))")
-		script_run_re = re.compile(sys.argv[0] + r": Running: (.+?)(\n|\Z)")
-		run = []
-		while True:
-			try:
-				stdout_value, stderr_value = proc.communicate()
-				sys.stdout.write(stdout_value)
-				for line in stderr_value.rstrip().split("\n"):
-					m = made_re.match(line)
-					if m:
-						module = m.group(2)
-						module = module.rstrip(".")
-						report += module + ": " + m.group(1) + " done\n"
-					m = module_re.match(line)
-					if m:
-						report += m.group(1) + ": new module\n"
-					if script_re.match(line):
-						m = script_run_re.match(line)
-						if m:
-							run.append(m.group(1))
-						else:
-							sys.stderr.write(line + "\n")
-					else:
-						full_report += line + "\n"
-			except:
-				#print "EXCEPTION: " + repr(sys.exc_info())
-				break
-		if options.report == 1:
-			sys.stdout.write(report)
-		elif options.report > 1:
-			sys.stdout.write(full_report)
-		for r in run:
-			error("Running: " + r)
-			os.system(r)
-		if proc.returncode != None:
-			sys.exit(proc.returncode)
-		else:
-			sys.exit(255)
-
+		die("cannot combine --simple with --cuda and/or --openmp")
+	
 	# Set up defaults.
 	if not options.simple and not options.cuda and not options.openmp:
-		info("Defaulting to --openmp")
+		info("defaulting to --openmp")
 		options.openmp = True
 	if options.cuda and not options.accel:
-		info("Enabling --accel")
+		info("enabling --accel")
 		options.accel = True
 
 	files = []
-
 	# Make all paths absolute.
 	for file in args:
-		files.append(os.path.abspath(file))
+		abs_file = os.path.abspath(file)
+		files.append(abs_file)
+		info("input file: " + abs_file)
 
-	# If --accel, then add the P4A stubs to the file list.
-	if options.accel:
-		files.append(os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c"))
-
-	# Preliminary check: input files must exist.
-	for file in files:
-		if not os.path.exists(file):
-			error("Input file '" + file + "' does not exist")
-			sys.exit(2)
-
-	# Determine the database directory.
-	database_dir = ""
-	project = options.project
-	if project == None:
-		while True:
-			project = gen_name()
-			database_dir = os.path.join(os.getcwd(), project + ".database")
-			if not os.path.exists(database_dir):
-				break
-		info("Database directory: " + database_dir)
-	else:
-		database_dir = os.path.join(os.getcwd(), project + ".database")
-		if os.path.exists(database_dir):
-			if options.remove_first:
-				info("Removing existing database directory: " + database_dir)
-				rmdir(database_dir)
-			else:
-				error("Database already exists: " + database_dir)
-				sys.exit(2)
-
-	# Decide once and for all if we are going to remove the database directory at the end.
-	remove_after = (options.project == None and not options.keep_after) or options.remove_after;
-	if remove_after:
-		info("Setting --copy automatically since database will be erased")
-		options.copy = True
-
-	# Make up the expected output file paths.
-	# Check if they already exist and act accordingly.
-	output_files = {}
-	final_output_files = {}
-	for file in files:
-		output_file = os.path.join(database_dir, "Src", os.path.basename(file))
-		if file not in output_files:
-			output_files[file] = []
-		output_files[file].append(output_file)
-		final_output_file = output_file
-		if options.copy:
-			(base, ext) = os.path.splitext(os.path.basename(file))
-			if base[0:3] == "p4a":
-				final_output_file = os.path.join(os.getcwd(), base + ext)
-			else:
-				final_output_file = os.path.join(os.getcwd(), base + "_p4a" + ext)
-		if file not in final_output_files:
-			final_output_files[file] = []
-		final_output_files[file].append(final_output_file)
-		if os.path.exists(output_file):
-			info("Removing " + output_file)
-			os.remove(output_file)
-		if options.copy and os.path.exists(final_output_file):
-			if options.remove_first:
-				info("Removing " + final_output_file)
-				os.remove(final_output_file)
-			else:
-				warn("Output file " + final_output_file + " already exists, will be lost")
-				os.remove(final_output_file)
-		info(file + " -> " + output_file + " (" + final_output_file + ")")
-
+	# Generate C preprocessor flags.
 	cppflags = ""
 	for i in options.cppflags:
 		cppflags += i + " "
@@ -362,227 +197,18 @@ def main():
 	for i in options.undefines:
 		cppflags += "-U" + i + " "
 	info("CPP flags: " + cppflags)
-
-	# Create the PyPS workspace.
-	workspace = pyps.workspace(files, name = project, activates = [], verboseon = True, cppflags = cppflags)
-	workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-						   PRETTYPRINT_SEQUENTIAL_STYLE = "do")
-
-	# Skip module name of P4A runtime.
-	# Also filter out modules based on --include-modules and --exclude-modules.
-	skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
-	filter_include_re = None
-	if options.filter_include:
-		filter_include_re = re.compile(options.filter_include)
-	filter_exclude_re = None
-	if options.filter_exclude:
-		filter_exclude_re = re.compile(options.filter_exclude)
-	all_modules = workspace.filter(lambda module:
-		not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
-		and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
-		and (filter_include_re == None or filter_include_re.match(module.name)))
-
-	# Not sure about that.
-	all_modules.loop_normalize(
-			# Loop normalize for the C language and GPU friendly
-			LOOP_NORMALIZE_ONE_INCREMENT = True,
-			LOOP_NORMALIZE_LOWER_BOUND = 0,
-			# It is legal in the following by construction:
-			LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True)
-
-	all_modules.privatize_module()
-
-	# Here comes the parallelization!
-	if options.fine:
-		all_modules.internalize_parallel_code()
-	else:
-		all_modules.coarse_grain_parallelization()
-
+	
+	processor = p4a_processor(files = files, project_name = options.project, verbose = (verbosity != 0), cppflags = cppflags, 
+		filter_include = options.filter_include, filter_exclude = options.filter_exclude, accel = options.accel)
+	
+	processor.parallelize(options.fine)
+	
 	if options.cuda:
-		all_modules.gpu_ify()
-
-		# Isolate kernels by using the fact that all the generated kernels have
-		# their name beginning with "p4a_":
-		kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
-		kernel_launchers = workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
-
-		# Add communication around all the call site of the kernels:
-		kernel_launchers.kernel_load_store()
-		kernel_launchers.gpu_loop_nest_annotate()
-
-		# Inline back the kernel into the wrapper, since CUDA can only deal with
-		# local functions if they are in the same file as the caller (by inlining
-		# them, by the way... :-) )
-		kernel_filter_re = re.compile("p4a_kernel_\\d+$")
-		kernels = workspace.filter(lambda m: kernel_filter_re.match(m.name))
-		kernels.inlining()
-
-		# Display the wrappers to see the work done:
-		kernel_wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
-		kernel_wrappers = workspace.filter(lambda m: kernel_wrapper_filter_re.match(m.name))
-
+		processor.gpuify()
 	if options.openmp:
-		all_modules.ompify_code()
+		processor.ompify()
 
-	for module in workspace:
-		module.prepend_comment(PREPEND_COMMENT = "// Module: " + module.name
-			+ " -- Generated on " + time.strftime("%Y-%m-%d %H:%M:%S")
-			+ " by " + " ".join(sys.argv) + "\n")
-
-	# Build the output source files (UNSPLIT operation).
-	workspace.all.unsplit()
-
-	# Copy the output files to their final location.
-	for file in files:
-		for i in range(len(output_files[file])):
-			if os.path.exists(output_files[file][i]):
-				if options.copy:
-					info("Copying " + output_files[file][i] + " to " + final_output_files[file][i])
-					shutil.copyfile(output_files[file][i], final_output_files[file][i])
-				warn(final_output_files[file][i] + " created")
-			else:
-				error("Expected output file for " + file + " not found: " + output_files[file][i])
-				error("You might want to re-run with -rr to display full PIPS output")
-				remove_after = False
-				options.cmake = False
-				options.build = False
-
-	if not options.output_file:
-		options.output_file = os.path.join(os.getcwd(), project)
-	cc = ""
-	if options.cc:
-		cc = options.cc
-	else:
-		if options.cuda:
-			cc = "nvcc"
-		else:
-			cc = "gcc"
-	cflags = cppflags + " " + options.cflags
-	if options.openmp:
-		cflags += " -fopenmp"
-	ldflags = options.ldflags + " "
-	for l in options.lib_dirs:
-		ldflags += "-L" + l + " "
-	for l in options.libs:
-		ldflags += "-l" + l + " "
-	all_output_files = []
-	for file in files:
-		for f in final_output_files[file]:
-			all_output_files.append(f)
-	all_output_files += options.extra_files
-	if options.build and not options.cmake:
-		info("Compiling using cc=[" + cc + "] cflags=[" + cflags + "] ldflags=[" + ldflags + "] output_file=" + options.output_file)
-		v = ""
-		if verbosity >= 3:
-			v = "-v -Wall "
-		cmd = ""
-		if options.link:
-			cmd = cc + " " + v + cflags + " " + ldflags + " -o " + options.output_file + " " + " ".join(all_output_files)
-		else:
-			cmd = cc + " -c " + v + cflags + " -o " + options.output_file + " " + " ".join(all_output_files)
-		error("Running: " + cmd)
-		if not options.nocommand:
-			os.system(cmd)
-		#workspace.compile(CC = cc, CFLAGS = cflags, LDFLAGS = ldflags, outfile = options.output_file,
-		#	link = options.link, extrafiles = options.extra_files)
-
-	# Remove the database directory if requested.
-	if remove_after:
-		info("Removing database directory: " + database_dir)
-		rmdir(database_dir)
-
-	# Generate a CMakeLists.txt and build if requested.
-	if options.cmake:
-		if not (options.exe or options.shared or options.static):
-			options.exe = True
-		cmakefile = os.path.join(os.getcwd(), "CMakeLists.txt")
-		if os.path.exists(cmakefile):
-			cmakefile_backup = os.path.join(os.getcwd(), "CMakeLists.txt.old")
-			warn("Moving existing " + cmakefile + " out of the way (" + cmakefile_backup + ")")
-			shutil.move(cmakefile, cmakefile_backup)
-		info("Generating " + cmakefile)
-		if len(options.libs) == 0:
-			options.libs = [ '""' ]
-		subst_dict = dict(time = time.strftime("%Y-%m-%d %H:%M:%S"), script = " ".join(sys.argv),
-			project = project, PROJECT = string.upper(project), source_files = "\n    ".join(all_output_files),
-			include_dirs = " ".join(options.include_dirs), lib_dirs = " ".join(options.lib_dirs), libs = " ".join(options.libs),
-			output_dir = os.path.dirname(cmakefile), cflags = cflags, cc = cc)
-
-		cmakelist = string.Template("""# Generated on $time by $script
-
-cmake_minimum_required(VERSION 2.6)
-
-if(MSVC)
-    message(FATAL_ERROR "MSVC not supported yet")
-endif()
-
-set(CMAKE_C_COMPILER $cc)
-
-set(OUTPUT_DIR $output_dir)
-set(LIBRARY_OUTPUT_PATH $${OUTPUT_DIR})
-set(CMAKE_BINARY_DIR $${OUTPUT_DIR})
-set(EXECUTABLE_OUTPUT_PATH $${OUTPUT_DIR})
-set(RUNTIME_OUTPUT_DIRECTORY $${OUTPUT_DIR})
-set(ARCHIVE_OUTPUT_DIRECTORY $${OUTPUT_DIR})
-
-set(${PROJECT}_INCLUDE_DIR "./")
-set(${PROJECT}_HEADER_FILES
-#    $${${PROJECT}_HEADER_FILES}/header.h
-#    Add headers here
-)
-
-set(${PROJECT}_SOURCE_FILES
-    $source_files
-)
-
-source_group("Header Files" FILES $${${PROJECT}_HEADER_FILES})
-source_group("Source Files" FILES $${${PROJECT}_SOURCE_FILES})
-
-include_directories($include_dirs)
-link_directories($lib_dirs)
-
-set(CMAKE_C_FLAGS "$cflags")
-""").substitute(subst_dict)
-
-		if options.shared:
-			cmakelist += string.Template("""
-add_library(${project}d SHARED $${${PROJECT}_SOURCE_FILES})
-target_link_libraries(${project}d $libs)
-set_target_properties(${project}d PROPERTIES DEFINE_SYMBOL "COMPILING_SHARED_LIBRARY")
-set_property(TARGET ${project}d PROPERTY LINK_INTERFACE_LIBRARIES "")
-""").substitute(subst_dict)
-
-		if options.static:
-			cmakelist += string.Template("""
-add_library(${project}s STATIC $${${PROJECT}_SOURCE_FILES})
-""").substitute(subst_dict)
-
-		if options.exe:
-			cmakelist += string.Template("""
-add_executable(${project} $${${PROJECT}_SOURCE_FILES})
-target_link_libraries(${project} $libs)
-""").substitute(subst_dict)
-
-		#print cmakelist
-		f = open(cmakefile, "w")
-		f.write(cmakelist)
-		f.close()
-		if options.build:
-			build_dir = os.path.join(os.getcwd(), project + ".build")
-			#if os.path.exists(build_dir):
-			#	info("Removing existing build dir: " + build_dir)
-			#	rmdir(build_dir)
-			cmd = "mkdir -p " + build_dir + " && cd " + build_dir + " && cmake "
-			if options.generator:
-				cmd += "-G \"" + options.generator + "\" "
-			if verbosity >= 3:
-				cmd += "--debug-output "
-			cmd += ".. && make"
-			if verbosity >= 2:
-				cmd += " VERBOSE=1"
-			error("Running: " + cmd)
-			if not options.nocommand:
-				os.system(cmd)
+	processor.save()
 
 if __name__ == "__main__":
 	main()
