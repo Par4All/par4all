@@ -417,6 +417,12 @@ To push the official version, just use a:
 p4a_git --branch-action git push origin p4a\$suffix
 \end{verbatim}
 
+If you want to pull all different \Apfa branches that may have been
+changed by others:
+\begin{verbatim}
+p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+\end{verbatim}
+
 An example to set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before you can use them:
 \begin{verbatim}
