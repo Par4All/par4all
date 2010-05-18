@@ -664,9 +664,12 @@ def recover_header_simple(file_name, output_file_name):
                     print('End of header used:', header)
                 # It is the end of the statement, revert in normal mode:
                 header = None
+                # Throw away the pending text:
+                l.lexer.content = ""
             else:
-                # Just skip:
-                pass
+                # Just wait for the future end of statement:
+                # Just in case we are in a weird file:
+                l.lexer.content = ""
         else:
             # Normal content & output:
             l.lexer.content += tok.value
