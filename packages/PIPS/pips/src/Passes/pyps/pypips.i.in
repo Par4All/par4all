@@ -39,6 +39,8 @@
     }
     TRY {
         $action
+        if((void*)$symname != (void*)atinit) // this is because atinit creates the exception handler, so it had no exception handler when calling throw
+            UNCATCH(any_exception_error);
     }
 }
 

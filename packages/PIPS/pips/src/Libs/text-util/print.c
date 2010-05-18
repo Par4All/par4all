@@ -82,12 +82,10 @@ sentence s;
 	if (label != (char *) NULL) {
 	    fprintf(fd, "%-5s ", label);
 	}
-	else {
+	else if(prettyprint_language_is_fortran_p())
 	    fputs("      ", fd);
 	}
 
-	/* FI: do not indent too much (9 June 1995)*/
-	em = em > 42 ? 42 : em;
 
 	for (i = 0; i < em; i++) 
 	    putc(' ', fd);

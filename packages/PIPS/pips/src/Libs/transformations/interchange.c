@@ -236,15 +236,24 @@ statement interchange_inner_outermost_loops(list lls,
 
   s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
 
-  /* Fix labels. Should this be made part of gener_DOSEQ? */
-  if(!entity_empty_label_p(omll) && omll!=imll) {
+  /* Fix Fortran loop labels. Should this be made part of gener_DOSEQ? */
+  if(!c_language_module_p(get_current_module_entity())
+     && (!entity_empty_label_p(omll) || gen_length(lls)>2)
+     && omll!=imll) {
     /* A corresponding continue should be added to the loop nest
        body, the body of the initial innermost loop , iml */
     statement nlb = loop_body(iml);
-    /* The initial continue statement is assumed lost when lls is
+    /* The initial continue statements are assumed lost when lls is
        built and transformed. */
-    statement cs = make_continue_statement(omll);
-    append_a_statement(nlb, cs);
+    list lll = CONS(ENTITY, imll, NIL); // loop label list
+    FOREACH(STATEMENT, ls, CDR(lls)) {
+      entity ll = loop_label(statement_loop(ls));
+      if(!entity_empty_label_p(ll) && !gen_in_list_p(ll, lll)) {
+	statement cs = make_continue_statement(ll);
+	append_a_statement(nlb, cs);
+	lll = CONS(ENTITY, ll, lll);
+      }
+    }
     /* get rid of the innermost loop label? */
     //loop_label(iml) = entity_empty_label();
   }

@@ -175,6 +175,17 @@ void replace_entity_by_expression_expression_walker(expression e, struct param *
             unnormalize_expression(e);
         }
     }
+    else if(expression_call_p(e))
+    {
+        call c = expression_call(e);
+        if(call_constant_p(c) && same_entity_p(p->ent,call_function(c)))
+        {
+            unnormalize_expression(e);
+            free_syntax(expression_syntax(e));
+            expression_syntax(e)=copy_syntax(expression_syntax(p->exp));
+        }
+
+    }
 }
 
 static
@@ -199,6 +210,16 @@ void replace_entity_by_expression_loop_walker(loop l, struct param *p)
 {
     replace_entity_by_expression_entity_walker(loop_index(l),p);
 }
+void
+replace_entity_by_expression_with_filter(void* s, entity ent, expression exp,bool (*filter)(expression))
+{
+    struct param p = { ent, exp};
+    gen_context_multi_recurse(s,&p,
+            expression_domain,filter,replace_entity_by_expression_expression_walker,
+            statement_domain,gen_true,replace_entity_by_expression_declarations_walker,
+			loop_domain,gen_true, replace_entity_by_expression_loop_walker,
+            NULL);
+}
 
 /** 
  * replace all reference to entity @a ent by expression @e exp
@@ -207,12 +228,7 @@ void replace_entity_by_expression_loop_walker(loop l, struct param *p)
 void
 replace_entity_by_expression(void* s, entity ent, expression exp)
 {
-    struct param p = { ent, exp };
-    gen_context_multi_recurse(s,&p,
-            expression_domain,gen_true,replace_entity_by_expression_expression_walker,
-            statement_domain,gen_true,replace_entity_by_expression_declarations_walker,
-			loop_domain,gen_true, replace_entity_by_expression_loop_walker,
-            NULL);
+    replace_entity_by_expression_with_filter(s,ent,exp,(bool(*)(expression))gen_true);
 }
 void
 replace_entities_by_expression(void* s, hash_table ht)

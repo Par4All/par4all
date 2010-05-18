@@ -2251,7 +2251,7 @@ results. This property also affects the computation of regions.
 CONSTANT_PATH_EFFECTS TRUE
 \end{PipsProp}
 
-Property \PipsPropRef{USER_EFFECTS_ON_STDIOS} is used to control the
+Property \PipsPropRef{USER_EFFECTS_ON_STD_FILES} is used to control the
 way the user uses {\tt stdout}, {\tt stdin} and {\tt stderr}. The
 default case ({\tt FALSE}) means that the user does not modify these
 global variables. When set to {\tt TRUE}, they are considered as user
@@ -4686,6 +4686,16 @@ default) value is {\tt TRUE}.
 ALIASING_INSIDE_DATA_STRUCTURE TRUE
 \end{PipsProp}
 
+Property \PipsPropRef{ALIASING_ACROSS_IO_STREAMS} can be set to {\tt
+  FALSE} to specify that two io streams (two variables declared as
+{\tt FILE *}) cannot be aliased, neither the locations to which they
+point. The safe and default value is {\tt TRUE}
+\begin{PipsProp}{ALIASING_ACROSS_IO_STREAMS}
+ALIASING_ACROSS_IO_STREAMS TRUE
+\end{PipsProp}
+
+
+
 The following string property defines the lattice of maximal elements
 to use when precise information is lost. Three values are possible:
 "unique", "function" and "area". The first value is the default
@@ -5171,6 +5181,38 @@ KERNELIZE_HOST_CALL_NAME ""
 \begin{PipsProp}{OUTLINE_LOOP_STATEMENT}
 OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
+
+\begin{PipsPass}{group_constants}
+Gather all constants from a module and put them in a single array.
+Relevant for Terapix code generation, and maybe for other accelerators as well
+\end{PipsPass}
+\begin{PipsMake}
+group_constants > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.regions
+\end{PipsMake}
+
+You may want to group constants only for a particular statement, in that case use \PipsPropRef{GROUP_CONSTANTS_STATEMENT_LABEL}
+\begin{PipsProp}{GROUP_CONSTANTS_STATEMENT_LABEL}
+GROUP_CONSTANTS_STATEMENT_LABEL ""
+\end{PipsProp}
+
+The way variables are grouped is control by \PipsPropRef{GROUP_CONSTANTS_LAYOUT},
+the only relevant value as of now is \texttt{"terapix"}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_LAYOUT}
+GROUP_CONSTANTS_LAYOUT ""
+\end{PipsProp}
+
+The name of the variable holding constants can be set using \PipsPropRef{GROUP_CONSTANTS_HOLDER}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_HOLDER}
+GROUP_CONSTANTS_HOLDER "caillou"
+\end{PipsProp}
+
+
+
 
 \begin{PipsPass}{normalize_microcode}
 Perform various checks on a Terapix microcode to make sure it can be
@@ -8254,9 +8296,14 @@ outline      > MODULE.code
 		! MODULE.privatize_module
         > PROGRAM.entities
         < PROGRAM.entities
-        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.regions
         < MODULE.code
 \end{PipsMake}
+
+The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used if you want to limit the amount of entities passed
+through reference calls.
+With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]| entity, without it it is passed as an \lstinline|int| or  \lstinline|int*| depending on the read/write effect.
 
 The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
 the user is prompted if not set.
@@ -8275,6 +8322,9 @@ OUTLINE_LABEL ""
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_ALLOW_GLOBALS}
 OUTLINE_ALLOW_GLOBALS FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_SMART_REFERENCE_COMPUTATION}
+OUTLINE_SMART_REFERENCE_COMPUTATION FALSE
 \end{PipsProp}
 
 \subsection{Cloning}

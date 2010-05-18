@@ -507,6 +507,7 @@ do
 done
 
 # sort final result
+pips_validation_summary.pl $summary.tmp >> $summary
 sort -k 2 $summary.tmp >> $summary
 rm -f $summary.tmp
 

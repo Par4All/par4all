@@ -389,6 +389,34 @@ Where
 \item add \texttt{src/Libs/mylib/Makefile} to the \texttt{AC\_CONFIG\_FILES(...)} macro function parameters in \file{configure.ac};
 \end{enumerate}
 
+\subsection{Adding a program check}
+
+For uncommon build, one may need to depend on an extra program.
+Then comes the distribution issue: how can we assert the program is installed on user/developers machines ?
+First you have to ask yourself: Is the new feature that depends on this program critical or not ?
+If not, you will add an optional dependency.
+Otherwise it is a mandatory dependency.
+
+You will basically add your check by filling a call to macro function \texttt{AX\_CHECK\_PROG(\textit{prog\_name})}
+in \file{configure.ac}.
+This will perform the check for the program, trying to find it in current \texttt{\$PATH} or
+in env variable \texttt{\$\{\textit{PROG\_NAME}\}}.
+
+The macro variable \texttt{\$(\textit{PROG\_NAME})} will be available in your \file{Makefile.am}.
+
+The last step is to attach the result of the check to a dependency.
+That way, the configure will fail or not depending on the result of the check.
+To do so, you will use the macro function \texttt{AX\_DEPENDS(\textit{feature},\textit{list-of-dependencies})}.
+If you have a mandatory dependency, add the name of the program to the 
+\lstinline|AX_DEPENDS([minimum],[...])| line.
+Otherwise, add it to the optional \texttt{AX\_DEPENDS(...)} of your choice.
+To fully understand usage of \texttt{AX\_DEPENDS(...)}, please read section on passes\ref{sec:passes}.
+
+\subsection{Adding a pass}
+\label{sec:passes}
+2bedone
+
+
 %%%
 \section{Installation Processes}
 \label{sec:install}
