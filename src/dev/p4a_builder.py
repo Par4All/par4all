@@ -13,12 +13,6 @@ class p4a_builder():
 		cflags = "", ldflags = "", 
 		extra = [], extra_obj = [], 
 		cc = None, ld = None, ar = None):
-		if not cc:
-			cc = "gcc"
-		if not ld:
-			ld = "ld"
-		if not ar:
-			ar = "ar"
 		(base, ext) = os.path.splitext(output_file)
 		flags = ""
 		if ext == ".o":

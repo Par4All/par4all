@@ -15,14 +15,17 @@ class p4a_processor():
 	workspace = None
 	main_filter = None
 
-	def __init__(self, workspace = None, project_name = None, cppflags = None, verbose = False,
+	def __init__(self, workspace = None, project_name = "", cppflags = "", verbose = False,
 		files = [], filter_include = None, filter_exclude = None, accel = False):
 
 		if workspace:
 			self.workspace = workspace
 		else:
-			if not project_name:
-				project_name = gen_name()
+			# This is because pyps.workspace.__init__ will test for empty strings...
+			if project_name == None:
+				project_name = ""
+			if cppflags == None:
+				cppflags = ""
 
 			for file in files:
 				if not os.path.exists(file):

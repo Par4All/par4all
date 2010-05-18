@@ -23,9 +23,6 @@ def main():
 	main_group.add_option("--keep-database", "--keep", "-k", action = "store_true", default = False,
 		help = "Keep database directory after processing.")
 
-	main_group.add_option("--remove-first", "--remove", "-r", action = "store_true", default = False,
-		help = "Remove existing database and output files if they already exists.")
-
 	main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
 		help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
 
