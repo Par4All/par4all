@@ -66,7 +66,9 @@ vpath %.c $(P4A_ACCEL_DIR)
 
 default:
 	echo "This the content of the file README.txt:"
-	less README.txt
+	# Use more and not less because when quitting, the displayed text
+	# remains displayed...
+	more README.txt
 
 demo_% : run_% run_%_omp run_%_p4a_omp run_%_p4a_cuda ;
 
@@ -124,4 +126,5 @@ run_jacob%:
 
 # Run PIPS
 %.database : %.c
-	tpips $*.tpips
+	#tpips $*.tpips
+	python $*.py

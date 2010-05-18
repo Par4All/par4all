@@ -6,7 +6,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create $WKS $WKS.c $P4A_ACCEL_DIR/p4a_stubs.c
 
 activate C_PARSER
-setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
@@ -49,11 +48,14 @@ display PRINTED_FILE[%ALLFUNC]
 #setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_ACCEL_FREE"
 #setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
 #setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
+
+# Only apply communication generation at the level of "compute" to
+# factorized out communications. SHould be automated too...
 apply KERNEL_LOAD_STORE[compute,p4a_kernel_launcher_2]
 display PRINTED_FILE[%ALLFUNC]
 
 # Need pyps for automate this
-apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
 #display PRINTED_FILE[p4a_kernel_launcher_2]
 #apply UNSPLIT
 #quit
@@ -61,12 +63,12 @@ apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_ker
 # Inline back the kernel since CUDA can only deal with local functions if
 # they are in the same file as the caller (by inlining them, by the
 # way... :-) )
-apply INLINING[p4a_kernel_0,p4a_kernel_1,p4a_kernel_2,p4a_kernel_3,p4a_kernel_4]
+apply INLINING[p4a_kernel_2,p4a_kernel_3,p4a_kernel_4]
 
 # Instead, do a global loop normalization above:
-#apply LOOP_NORMALIZE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
+#apply LOOP_NORMALIZE[p4a_kernel_2,p4a_kernel_3,p4a_kernel_4]
 #apply USE_DEF_ELIMINATION[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
-#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+#display PRINTED_FILE[,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
 
 #apply SUPPRESS_DEAD_CODE
 #display PRINTED_FILE

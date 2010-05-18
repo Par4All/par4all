@@ -1,0 +1,281 @@
+#!/usr/bin/env perl
+
+###########################################################
+#
+# Simple script to build the .deb or .rpm package for P4A.
+#
+# Run with no arguments to get help about usage.
+#
+### Configuration
+
+# P4A final install prefix for files in $ENV{'P4A_DIST'}:
+our $DIST_PREFIX = "/usr/local/p4a";
+
+# P4A final install prefix for accel files ($ENV{'P4A_ACCEL_DIR'}):
+our $ACCEL_PREFIX = "/usr/local/p4a/src/p4a_accel";
+
+###########################################################
+
+use strict;
+use warnings;
+use sigtrap qw(die normal-signals); # Make sure END {} blocks are called even when dying/signaling.
+use FindBin qw($Bin $RealBin);
+use lib "$RealBin/../lib";
+use Cwd qw(cwd abs_path);
+use YAML qw(LoadFile);
+
+# A little trick to color the die/warn calls.
+use Term::ANSIColor qw(:constants);
+$Term::ANSIColor::AUTORESET = 1;
+$SIG{'__DIE__'} = sub {
+	my $msg = shift;
+	chomp $msg;
+	CORE::die(RED . "$0: " . $msg . RESET . "\n");
+};
+$SIG{'__WARN__'} = sub {
+        my $msg = shift;
+        chomp $msg;
+        CORE::warn(YELLOW . "$0: " . $msg . RESET . "\n");
+};
+
+# Check that the P4A environment has been properly set.
+# We will rely on files in P4A_DIST to build the package.
+unless ($ENV{'P4A_ROOT'} && $ENV{'P4A_DIST'} && $ENV{'P4A_ACCEL_DIR'}) {
+	die "Did you source par4all-rc.sh?";
+}
+
+# Display usage.
+if (!@ARGV || grep { /^-h|--help$/ } @ARGV) {
+	print STDERR BOLD WHITE "Usage: $0 [--deb|--rpm] [--keep]\n"; 
+	print STDERR "Specify --keep if you want the temporary directory to remain when script exits\n";
+	exit;
+}
+
+# Parse opts.
+our %OPTS;
+for (@ARGV) {
+	/^--(deb)$/ and $OPTS{$1} = 1, next;
+	/^--(rpm)$/ and $OPTS{$1} = 1, next;
+	/^--(keep)$/ and $OPTS{$1} = 1, next;
+	die "Unknown option: $_";
+}
+
+# Check opts.
+unless ($OPTS{'deb'} || $OPTS{'rpm'}) {
+	die "Please specify --deb or --rpm";
+}
+if ($OPTS{'deb'} && $OPTS{'rpm'}) {
+	die "Cannot build --deb and --rpm at the same time";
+}
+
+# This routine is a wrapper around system() that dies automatically.
+sub X {
+	my $cmd = shift;
+	return unless $cmd;
+	print MAGENTA $cmd, "\n";
+	my $ret = system $cmd;
+	$ret and die "Command failed with code $ret: $cmd";
+}
+
+# Declare general variables.
+# By convention I name all my package-scoped (our) variables uppercase.
+our $TMP_BASE = "/var/tmp/p4a$$";
+our $TMP_DIST = "$TMP_BASE$DIST_PREFIX";
+our $TMP_ACCEL = "$TMP_BASE$ACCEL_PREFIX";
+our $DEBIAN_DIR = "$RealBin/pack/DEBIAN";
+our $TMP_DEBIAN_DIR = "$TMP_BASE/DEBIAN";
+
+# Determine package arch.
+chomp(our $ARCH = `uname -m`);
+if ($ARCH eq "x86_64") {
+	if ($OPTS{'deb'}) {
+		$ARCH = "amd64";
+	} elsif ($OPTS{'rpm'}) {
+		die "TODO";
+	}
+} elsif ($ARCH) {
+	if ($OPTS{'deb'}) {
+		$ARCH = "i386";
+        } elsif ($OPTS{'rpm'}) {
+		die "TODO";
+        }	
+} else {
+	die "uname -m did not return anything!?";
+}
+print STDERR BOLD WHITE "Arch: $ARCH\n";
+
+# Make out a version string based on the Git current revision and tag.
+our $VERSION;
+our $GIT_REV = get_file_revision($ENV{'P4A_ROOT'});
+if ($GIT_REV =~ /^\d+\.\d+(\.\d+)?-/) {
+	$VERSION = $GIT_REV;
+} else {
+	chomp($VERSION = `cat $RealBin/pack/VERSION 2>/dev/null`);
+	unless ($VERSION) {
+        	die "Missing/invalid version file";
+	}
+	unless ($VERSION =~ /^\d+\.\d+(\.\d+)?$/) {
+        	die "Invalid version string in version file: $VERSION";
+	}
+	$VERSION .= "-$GIT_REV";
+}
+
+print STDERR BOLD WHITE "Version: $VERSION\n";
+
+# Next we create a temporary tree with a copy of the files.
+X("mkdir -p $TMP_DIST");
+X("cp -a $ENV{'P4A_DIST'}/* $TMP_DIST/");
+
+# Copy the accelerator source files.
+# XXX: Is it necessary to copy everything? Might change soon ...
+X("mkdir -p $TMP_ACCEL");
+X("cp -a $ENV{'P4A_ACCEL_DIR'}/* $TMP_ACCEL/");
+
+# Substitute some things in the control file after having copied it in the temp tree.
+if ($OPTS{'deb'}) {
+        X("cp -a $DEBIAN_DIR $TMP_BASE/");
+        my $control = read_file("$TMP_DEBIAN_DIR/control");
+        $control =~ s/\$VERSION\$/$VERSION/g;
+        $control =~ s/\$ARCH\$/$ARCH/g;
+        write_file("$TMP_DEBIAN_DIR/control", $control);
+}
+
+# Fix up paths in files.
+for my $file ("$TMP_DEBIAN_DIR/postinst", "$TMP_DIST/etc/par4all-rc.sh", "$TMP_DIST/etc/par4all-rc.csh") {
+	next unless -e $file;
+	my @lines;
+	for (split /\n/, read_file($file)) {
+		/(export|setenv) LD_LIBRARY_PATH/ and next;
+		s,(export\s+|setenv\s+)(P4A_ROOT|P4A_DIST)([ =]+).+$,$1$2$3'$DIST_PREFIX',;
+		s,(export\s+|setenv\s+)(P4A_ACCEL_DIR)([ =]+).+$,$1$2$3'$ACCEL_PREFIX',;
+		push @lines, $_;
+	}
+	write_file($file, join("\n", @lines));
+}
+
+# Create the package!
+if ($OPTS{'deb'}) {
+	my $control = LoadFile("$TMP_DEBIAN_DIR/control");
+	my $name = $control->{'Package'};
+	X("fakeroot dpkg-deb --build $TMP_BASE ${name}_${VERSION}_${ARCH}.deb");
+} elsif ($OPTS{'rpm'}) {
+	die "TODO";
+}
+
+# Clean up after ourselves.
+END {
+	if ($TMP_BASE && -d $TMP_BASE) {
+		if (!$OPTS{'keep'}) {
+			warn "Removing $TMP_BASE\n";
+		} else {
+			warn "NOT Removing $TMP_BASE\n";
+		}
+	}
+}
+
+###########################################################
+#
+# Utility routines.
+#
+
+sub date {
+	chomp(my $date = `date -u +%Y%m%d-%H%M%S`);
+#	chomp(my $date = `date -u +%Y%m%d`);
+	return $date;
+}
+
+sub get_file_revision {
+        my $f = shift;
+        $f = abs_path($f);
+        my $dir = -d $f ? $f : path_remove_filespec($f);
+        chomp(my $short_rev = `cd $dir && git log --abbrev-commit --pretty=oneline -n 1 2>/dev/null`);
+        $short_rev and ($short_rev) = split /\s+/, $short_rev;
+	$short_rev or return date();
+        my $notag = 0;
+        chomp(my $tag = `git describe --tags 2>/dev/null`);
+        if ($tag) {
+                $short_rev = $tag;
+        }
+	#else {
+        #        $short_rev .= "+notag";
+        #        $notag = 1;
+        #}
+        #my $dirty = 0;
+        if (git_file_is_dirty($f)) {
+                $short_rev .= "+dirty";
+        #        $dirty = 1;
+        }
+        #if ($dirty || $notag) {
+        #        $short_rev .= "+internal";
+        #}
+        return $short_rev;
+}
+
+sub git_file_is_dirty {
+        my $f = shift;
+        $f = abs_path($f);
+        my $dir = -d $f ? $f : path_remove_filespec($f);
+        my $status = join '', `cd $dir && git status 2>&1`;
+        if ($status =~ /Changes to be committed:/
+                || $status =~ /Changed but not updated:/) {
+                return 1;
+        }
+        return 0;
+}
+
+sub canon_path {
+        my $p = shift;
+        $p =~ s:/\./:/:g; # /./ -> /
+        $p =~ s:/{2,}:/:g; # // -> /
+        $p =~ s:/$::; # Remove trailing "/"
+        my @p;
+        for (split m,/,, $p) {
+                if ($_ eq '..') {
+                        pop @p if @p;
+                } else {
+                        push @p, $_;
+                }
+        }
+        return join '/', @p;
+}
+
+sub path_remove_extension {
+        my $p = shift;
+        return $p unless $p;
+        $p =~ s/\.(.+?)$//;
+        return wantarray ? ($p, $1) : $p;
+}
+
+sub path_remove_filespec {
+        my $p = shift;
+        return $p unless $p;
+        my @a = split /\/+/, $p;
+        my $f = pop @a;
+        $p = join '/', @a;
+        return wantarray ? ($p, $f) : $p;
+}
+
+sub path_get_filename {
+        my $p = shift;
+        return $p unless $p;
+        my @a = split /\//, $p;
+        return pop @a;
+}
+
+sub read_file {
+        my $f = shift;
+        open F, $f or die "Could not open '$f' for reading. Reason: $!";
+        local $/ = undef;
+        my $buf = <F>;
+        close F;
+        return $buf;
+}
+
+sub write_file {
+        my $f = shift;
+        open F, '>', $f or die "Could not open '$f' for writing. Reason: $!";
+        print F @_;
+        close F;
+	return 0;
+}
+
