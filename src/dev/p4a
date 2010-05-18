@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Par4All Frontend/Helper Script
+Par4All Frontend Script
 '''
 
 import string, sys, os, re, optparse, shutil
@@ -32,6 +32,22 @@ def main():
 
 	parser.add_option_group(main_group)
 	
+	cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+
+	cpp_group.add_option("-I", dest="include_dirs", action = "append", metavar = "DIR", default = [],
+		help = "Add an include search directory. Same as the compiler -I option. Several are allowed.")
+
+	cpp_group.add_option("-D", dest="defines", action = "append", metavar = "NAME[=VALUE]", default = [],
+		help = "Add a preprocessor define. Same as passing the preprocessor a -D option. Several are allowed.")
+
+	cpp_group.add_option("-U", dest="undefines", action = "append", metavar = "NAME", default = [],
+		help = "Remove a preprocessor define. Same as passing the preprocessor a -U option. Several are allowed.")
+
+	cpp_group.add_option("--cppflags", action = "append", metavar = "FLAGS", default = [],
+		help = "Add additional flags for the C preprocessor. Several are allowed.")
+
+	parser.add_option_group(cpp_group)
+	
 	proc_group = optparse.OptionGroup(parser, "Processing Options")
 
 	proc_group.add_option("--accel", "-A", action = "store_true", default = False,
@@ -57,21 +73,40 @@ def main():
 
 	parser.add_option_group(proc_group)
 
-	cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+	compile_group = optparse.OptionGroup(parser, "Compilation Options")
 
-	cpp_group.add_option("-I", dest="include_dirs", action = "append", metavar = "DIR", default = [],
-		help = "Add an include search directory. Same as the compiler -I option.")
+	compile_group.add_option("--output-file", "-o", action = "append", metavar = "FILE", default = [],
+		help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so files or have no extension in which case an executable will be built.")
 
-	cpp_group.add_option("-D", dest="defines", action = "append", metavar = "NAME[=VALUE]", default = [],
-		help = "Add a preprocessor define. Same as passing the preprocessor a -D option.")
+	compile_group.add_option("--cc", metavar = "COMPILER", default = "",
+		help = "C compiler to use (defaults to gcc/nvcc).")
 
-	cpp_group.add_option("-U", dest="undefines", action = "append", metavar = "NAME", default = [],
-		help = "Remove a preprocessor define. Same as passing the preprocessor a -U option.")
+	compile_group.add_option("--cflags", action = "append", metavar = "FLAGS", default = [],
+		help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
 
-	cpp_group.add_option("--cppflags", metavar = "FLAGS", default = "",
-		help = "Add other flags for the C preprocessor.")
+	compile_group.add_option("--extra", action = "append", metavar = "FILE", default = [],
+		help = "Add additional file for compilation. Several are allowed.")
 
-	parser.add_option_group(cpp_group)
+	parser.add_option_group(compile_group)
+
+	link_group = optparse.OptionGroup(parser, "Linking Options")
+
+	compile_group.add_option("--ld", metavar = "LINKER", default = "",
+		help = "Linker to use (defaults to gcc).")
+
+	link_group.add_option("-L", dest = "lib_dirs", action = "append", metavar = "DIR", default = [],
+		help = "Add a library search directory. Same as the linker -L option. Several are allowed.")
+
+	link_group.add_option("-l", dest = "libs", action = "append", metavar = "LIB", default = [],
+		help = "Specify an input library to link against. Same as the linker -l option. Several are allowed.")
+
+	link_group.add_option("--ldflags", action = "append", metavar = "FLAGS", default = [],
+		help = "Specify additional flags to pass to the linker. Several are allowed.")
+
+	link_group.add_option("--extra-obj", action = "append", metavar = "FILE", default = [],
+		help = "Add an additional object file for linking. Several are allowed.")
+
+	parser.add_option_group(link_group)
 
 	(options, args) = parser.parse_args()
 
