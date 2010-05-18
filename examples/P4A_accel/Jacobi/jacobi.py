@@ -1,3 +1,6 @@
+# This is a small example showing how to tweak the communication location
+# to lower the communication between the host and the GPU
+
 from pyps import *
 import re
 
@@ -97,7 +100,10 @@ w.all_functions.display()
 #kernels.display()
 
 # Add communication around all the call site of the kernels:
-kernel_launchers.kernel_load_store()
+# Use a more specific communication location:
+#kernel_launchers.kernel_load_store()
+w["p4a_kernel_launcher_0"].kernel_load_store()
+w["compute"].kernel_load_store()
 kernel_launchers.display()
 
 #kernel_launchers.gpu_loop_nest_annotate()
@@ -120,7 +126,7 @@ kernel_wrappers.display()
 # Instead, do a global loop normalization above:
 #kernels.loop_normalize()
 #kernels.use_def_elimination()
-#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4]
+
 
 #w.all.suppress_dead_code()
 #w["main"].display()
