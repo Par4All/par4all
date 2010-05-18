@@ -40,7 +40,6 @@ char vcid_xv_props[] = "$Id$";
 #include "linear.h"
 #include "ri.h"
 #include "top-level.h"
-#include "makefile.h"
 #include "database.h"
 
 #include "misc.h"

@@ -1,8 +1,15 @@
 /* Make sure that summary preconditions are computed when functions
-   are called from within declarations */
+   are called from within declarations.
 
+   Problem with PIPS preprocessor
+ */
+
+/*
 #include <stdio.h>
 #include <stdlib.h>
+*/
+
+long long atoll(char *);
 
 long long test_intr (char** argv) {
   long long result = 0;

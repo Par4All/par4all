@@ -58,7 +58,8 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 RESULTS	= RESULTS
 
 SHELL	= /bin/bash
-PF	= set -o pipefail ; export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT)
+PF	= set -o pipefail ; \
+	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # extract validation result for summary
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.

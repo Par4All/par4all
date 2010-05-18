@@ -73,7 +73,6 @@
 #include "database.h"
 #include "graph.h"
 #include "dg.h"
-#include "makefile.h"
 #include "paf_ri.h"
 #include "parser_private.h"
 #include "property.h"

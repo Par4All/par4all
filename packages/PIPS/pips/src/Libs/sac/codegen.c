@@ -294,7 +294,8 @@ opcode generate_opcode(string name, list types, float cost)
     }
     opcode_vectorSize(oc)/=elem_size;
     if( opcode_vectorSize(oc) * elem_size !=get_int_property("SAC_SIMD_REGISTER_WIDTH"))
-        pips_user_warning("SAC_SIMD_REGISTER_WIDTH and description of %s leads to partially filled register\n");
+        pips_user_warning("SAC_SIMD_REGISTER_WIDTH and description of %s leads "
+            "to partially filled register\n", name);
     return oc;
 }
 

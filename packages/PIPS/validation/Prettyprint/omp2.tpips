@@ -26,9 +26,9 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 apply PRIVATIZE_MODULE(main)
 
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
-display PRINTED_FILE[main]
+#display PRINTED_FILE[main]
 
-display DG_FILE[main]
+#display DG_FILE[main]
 
 echo // OMP style
 

@@ -47,7 +47,6 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "reductions_private.h"
 #include "reductions.h"
 #include "properties.h"
 
@@ -148,21 +147,21 @@ static void pragma_str_for (loop l, statement stmt) {
   chop_newline (str, FALSE);
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
     string tmp = string_undefined;
-    switch (language_tag (get_prettyprint_language ())) {
-    case is_language_fortran:
-      // for fortran case we need to look at the O of OMP and skip !$
-      tmp = strchr (str, 'O');
-      break;
-    case is_language_c:
-      // for C case we need to look at the o of omp and skip #pragma"
-      tmp = strchr (str, 'o');
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran:
+        // for fortran case we need to look at the O of OMP and skip !$
+        tmp = strchr(str, 'O');
+        break;
+      case is_language_c:
+        // for C case we need to look at the o of omp and skip #pragma"
+        tmp = strchr(str, 'o');
+        break;
+      case is_language_fortran95:
+        pips_internal_error("Need to update F95 case");
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
     // insert the pragma as a string to the current statement
     if ((tmp !=string_undefined) && (tmp != NULL) && (strcmp (tmp, "") != 0)) {
@@ -187,7 +186,7 @@ static void generate_str_omp_pragma_loop (loop l) {
 }
 
 //////////////////////////////////////////////////////////////
-// the phase function name
+// the phases function name
 
 bool ompify_code (const string module_name) {
   // Use this module name and this environment variable to set

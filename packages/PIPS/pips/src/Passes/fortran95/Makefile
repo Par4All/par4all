@@ -1,4 +1,4 @@
-# $Id: Makefile 16070 2010-02-07 10:54:43Z amini $
+# $Id$
 #
 # Copyright 1989-2010 MINES ParisTech
 #

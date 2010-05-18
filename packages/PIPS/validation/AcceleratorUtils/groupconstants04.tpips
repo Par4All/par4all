@@ -1,0 +1,24 @@
+setenv WS="groupconstants04"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+echo orginal files
+display PRINTED_FILE[%ALLFUNC]
+
+echo after constant grouping
+setproperty GROUP_CONSTANTS_LAYOUT "terapix"
+setproperty GROUP_CONSTANTS_STATEMENT_LABEL "ou_est_charlie"
+setproperty GROUP_CONSTANTS_SKIP_LOOP_RANGE TRUE
+apply GROUP_CONSTANTS[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT[%ALL]
+close
+
+shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+
+echo test resulting code
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out` && echo ok ) || echo ko

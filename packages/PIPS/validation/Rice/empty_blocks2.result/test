@@ -59,12 +59,12 @@ int main(int argc, char **argv)
    ;
    ;
 
-//  P() {j==100}
+//  P(i,j) {j==100}
 
    //on attends qqch différent de "inconnu"
    j = i;
 
-//  P(j) {i==j}
+//  P(i,j) {i==j}
 
    return 0;
 }

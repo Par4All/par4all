@@ -48,7 +48,6 @@
 #include "misc.h"
 #include "text-util.h"
 #include "text.h"
-#include "makefile.h"
 
 #include "properties.h"
 #include "pipsmake.h"

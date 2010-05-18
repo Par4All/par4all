@@ -120,7 +120,7 @@ static list words_parameters(entity e, list pdl)
     } else if ( entity_undefined_p(param) ) {
       parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
       type t = parameter_type(p);
-      switch ( language_tag (get_prettyprint_language ()) ) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           pips_user_warning("%dth parameter out of %d parameters not found for "
@@ -132,7 +132,7 @@ static list words_parameters(entity e, list pdl)
            */
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
       pc = gen_nconc( pc, words_type( t, pdl ) );
@@ -142,7 +142,7 @@ static list words_parameters(entity e, list pdl)
       //  pc = gen_nconc(pc, strdup(pn));
       //}
     } else {
-      switch ( language_tag (get_prettyprint_language ()) ) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           /*
@@ -166,7 +166,7 @@ static list words_parameters(entity e, list pdl)
           break;
         }
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -183,7 +183,7 @@ static list words_dimension(dimension obj, list pdl)
   expression e1 = expression_undefined;
   expression e2 = expression_undefined;
   int up, i;
-  switch ( language_tag (get_prettyprint_language ()) ) {
+  switch(get_prettyprint_language_tag()) {
     case is_language_fortran95:
       /* Not asterisk for unbound dimension in F95*/
       if(unbounded_dimension_p(obj)) {
@@ -239,7 +239,7 @@ static list words_dimension(dimension obj, list pdl)
       }
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
   }
   return(pc);
@@ -258,17 +258,7 @@ list words_declaration(entity e,
   list pl = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  /* UGLY (temporary) HACK FOR ALLOCATABLE */
-  if (is_language_fortran95 == get_prettyprint_language_tag( )
-      && storage_ram_p(entity_storage(e))) {
-    if(allocatable_area_p(ram_section(storage_ram(entity_storage(e))))) {
-      pl = CHAIN_SWORD(pl, ", ALLOCATABLE :: ");
-    }
-  }
-
   pl = CHAIN_SWORD(pl, entity_user_name(e));
-
-
 
   if (type_variable_p(entity_type(e))) {
     if (prettyprint_common_variable_dimensions_p || !(variable_in_common_p(e)
@@ -276,24 +266,29 @@ list words_declaration(entity e,
       if (variable_dimensions(type_variable(entity_type(e))) != NIL) {
         list dims = variable_dimensions(type_variable(entity_type(e)));
 
-        if ((get_prettyprint_language_tag() == is_language_fortran)
-            || (get_prettyprint_language_tag() == is_language_fortran95)) {
-          pl = CHAIN_SWORD(pl, "(");
-          MAPL(pd,
-              {
-                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-                if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
-              }, dims);
-          pl = CHAIN_SWORD(pl, ")");
-        } else if (get_prettyprint_language_tag() == is_language_c) {
-          MAPL(pd,
-              {
-                pl = CHAIN_SWORD(pl, "[");
-                pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
-                pl = CHAIN_SWORD(pl, "]");
-              }, dims);
-        } else {
-          pips_internal_error("This case should have been handled before");
+        switch(get_prettyprint_language_tag()) {
+          case is_language_fortran:
+          case is_language_fortran95:
+            pl = CHAIN_SWORD(pl, "(");
+            MAPL(pd,
+                {
+                  pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                  if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
+                }, dims)
+            ;
+            pl = CHAIN_SWORD(pl, ")");
+            break;
+          case is_language_c:
+            MAPL(pd,
+                {
+                  pl = CHAIN_SWORD(pl, "[");
+                  pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd)), pdl));
+                  pl = CHAIN_SWORD(pl, "]");
+                }, dims)
+            ;
+            break;
+          default:
+            pips_internal_error("Language unknown !");
         }
       }
     }
@@ -313,11 +308,15 @@ list words_basic(basic obj, list pdl)
   } else {
     switch ( basic_tag(obj) ) {
       case is_basic_int: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
-            pc = CHAIN_SWORD(pc,"INTEGER*");
-            pc = CHAIN_IWORD(pc,basic_int(obj));
+/*            if(basic_int(obj)==4) {
+              pc = CHAIN_SWORD(pc,"INTEGER");
+            } else { */
+              pc = CHAIN_SWORD(pc,"INTEGER*");
+              pc = CHAIN_IWORD(pc,basic_int(obj));
+//            }
             break;
           case is_language_c:
             switch ( basic_int(obj) ) {
@@ -369,13 +368,13 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
       }
       case is_basic_float: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc,"REAL*");
@@ -392,13 +391,13 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
       }
       case is_basic_logical: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"LOGICAL*");
             pc = CHAIN_IWORD(pc,basic_logical(obj));
@@ -410,14 +409,14 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
       }
       case is_basic_overloaded: {
         /* should be a user error? Or simply bootstrap.c is not accurate? */
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"OVERLOADED");
             break;
@@ -428,13 +427,13 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
       }
       case is_basic_complex: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             pc = CHAIN_SWORD(pc,"COMPLEX*");
@@ -459,13 +458,13 @@ list words_basic(basic obj, list pdl)
             }
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
       }
       case is_basic_string: {
-        switch ( language_tag (get_prettyprint_language ()) ) {
+        switch(get_prettyprint_language_tag()) {
           case is_language_fortran:
             pc = CHAIN_SWORD(pc,"CHARACTER*");
             pc = gen_nconc( pc, words_value( basic_string(obj) ) );
@@ -477,7 +476,7 @@ list words_basic(basic obj, list pdl)
             pips_internal_error("Need to update F95 case");
             break;
           default:
-            pips_internal_error("This case should have been handled before");
+            pips_internal_error("Language unknown !");
             break;
         }
         break;
@@ -580,7 +579,7 @@ sentence sentence_head(entity e, list pdl)
 
   switch(type_tag(tr)) {
     case is_type_void:
-      switch(language_tag (get_prettyprint_language ())) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           if (entity_main_module_p(e))
@@ -598,14 +597,14 @@ sentence sentence_head(entity e, list pdl)
           pc = CHAIN_SWORD(pc,"void ");
           break;
         default:
-          pips_internal_error("This case should have been handled before");
+          pips_internal_error("Language unknown !");
           break;
       }
       break;
     case is_type_variable: {
       list pdl = NIL;
       pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr)), pdl));
-      switch(language_tag (get_prettyprint_language ())) {
+      switch(get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           pc = CHAIN_SWORD(pc," FUNCTION ");
@@ -614,7 +613,7 @@ sentence sentence_head(entity e, list pdl)
           pc = CHAIN_SWORD(pc," ");
           break;
         default:
-          pips_internal_error("This case should have been handled before");
+          pips_internal_error("Language unknown !");
           break;
       }
       break;
@@ -637,8 +636,8 @@ sentence sentence_head(entity e, list pdl)
     pc = gen_nconc(pc, args);
     pc = CHAIN_SWORD(pc, ")");
   } else if (type_variable_p(tr)
-      || ((language_tag (get_prettyprint_language ()) == is_language_c)
-          && (type_unknown_p(tr) || type_void_p(tr)))) {
+              || (prettyprint_language_is_c_p()
+                  && (type_unknown_p(tr) || type_void_p(tr)))) {
     pc = CHAIN_SWORD(pc, "()");
   }
 
@@ -742,14 +741,26 @@ static sentence sentence_basic_declaration(entity e)
 		       make_unformatted(NULL, 0, 0, decl)));
 }
 
+
+/**
+ * @brief Create a sentence for a USE directive
+ *
+ * @description Use directive is handled by copying the string directly in the
+ * name of the entity during the parsing. So we juste get the local name and put
+ * it in a sentence.
+ *
+ * @return a sentence with correct indentation containing the whole use
+ * directive in one word.
+ */
 static sentence sentence_f95use_declaration( entity e ) {
   list decl = NIL;
+
   decl = CHAIN_SWORD(decl, entity_local_name(e));
 
-  return ( make_sentence( is_sentence_unformatted, make_unformatted( NULL,
-                                                                     0,
-                                                                     0,
-                                                                     decl ) ) );
+  return (make_sentence(is_sentence_unformatted, make_unformatted(NULL,
+                                                                  0,
+                                                                  INDENTATION,
+                                                                  decl)));
 }
 
 static sentence sentence_external(entity f)
@@ -806,10 +817,11 @@ static sentence sentence_data(entity e)
 
 /********************************************************************* TEXT */
 
-#define ADD_WORD_LIST_TO_TEXT(t, l)\
+#define ADD_WORD_LIST_TO_TEXT(t, l) ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(t, l, 0)
+#define ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(t, l, m)\
   if (!ENDP(l)) ADD_SENTENCE_TO_TEXT(t,\
-				     make_sentence(is_sentence_unformatted, \
-						   make_unformatted(NULL, 0, 0, l)));
+             make_sentence(is_sentence_unformatted, \
+               make_unformatted(NULL, 0, m, l)));
 
 /* if the common is declared similarly in all routines, generate
  * "include 'COMMON.h'", and the file is put in Src. otherwise
@@ -1510,347 +1522,362 @@ void check_fortran_declaration_dependencies(list ldecl)
 
 /********************************************************** ALL DECLARATIONS */
 /**
-   @brief do some specific prettyprinting choise according to the fortran
-   version
+ * @brief This handle the fact that a Fortran95 declaration use "::" as a
+ * separator between type and variable name. It also adds an "allocatable"
+ * modifier if requested. Finally it add a "," between each variable if there
+ * more than one to declare.
  **/
-static list f77_f95_style_management (list prev, string str, bool space_p) {
-  list result = NIL;
+static list f77_f95_style_management(list prev,
+                                     string str,
+                                     bool allocatable_pass_p,
+                                     bool space_p) {
+  list result = prev;
   if (prev == NIL) {
-    result = CHAIN_SWORD(prev, str);
+    result = CHAIN_SWORD(result, str);
+    if(allocatable_pass_p) {
+      result = CHAIN_SWORD(result, ", ALLOCATABLE ");
+    }
     if (prettyprint_language_is_fortran95_p ()) {
       result = CHAIN_SWORD(result, ":: ");
     }
   }
   else {
-    result = CHAIN_SWORD(prev, space_p? ", " : ",");
+    result = CHAIN_SWORD(result, space_p? ", " : ",");
   }
   return result;
 }
 
+
+/* @brief This function compute the list of declaration at the begining of
+ * a module. It's intended to be used with Fortran or Fortran95 only
+ *
+ * @param ldecl is the list of entity to be prettyprinted
+ * @param force_common will force the prettyprint of common in include
+ * @param
+ * @param pdl is ???
+ * @return the text of module declarations
+ */
 static text text_entity_declaration(entity module,
 				    list /* of entity */ ldecl,
 				    bool force_common,
 				    list pdl)
 {
+  /*
+   * allocatable_pass indicate if we want to prettyprint allocatable or non
+   * allocatable entity, this is set to true during a second recursive pass.
+   */
+  static bool allocatable_pass_p = FALSE;
+  list allocatable_list = NULL;
+
   string how_common = get_string_property("PRETTYPRINT_COMMONS");
   bool print_commons = !same_string_p(how_common, "none");
-  list before = NIL, area_decl = NIL,
-    pi1 = NIL, pi2 = NIL, pi4 = NIL, pi8 = NIL,
-    ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL,
-    pf4 = NIL, pf8 = NIL,
-    pl = NIL,
-    pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL, uses = NIL;
-  list * ppi=NULL;
-  list * pph=NULL;
+  /* prettyprint common in include if possible... */
+  bool pp_cinc = same_string_p(how_common, "include") && !force_common;
+  list before = NIL, area_decl = NIL, pi1 = NIL, pi2 = NIL, pi4 = NIL, pi8 =
+      NIL, ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL, pf4 = NIL, pf8 = NIL,
+      pl = NIL, pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL, uses = NIL;
+  list * ppi = NULL;
+  list * pph = NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL);
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
-  bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  bool pp_in_type = FALSE, pp_in_common = FALSE;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose
-     at least an order on parameters. Fortunately here, PARAMETER are
-     mostly integers, defined from other integer parameters... I assume
-     that PIPS would fail with an ENTRY referencing an integer array
-     dimensionned with a real parameter. But real parameters are not
-     really well processed by PIPS anyway... Also we are in trouble if
-     arrays or functions are used dimension other arrays
+   at least an order on parameters. Fortunately here, PARAMETER are
+   mostly integers, defined from other integer parameters... I assume
+   that PIPS would fail with an ENTRY referencing an integer array
+   dimensionned with a real parameter. But real parameters are not
+   really well processed by PIPS anyway... Also we are in trouble if
+   arrays or functions are used dimension other arrays
 
-     list sorted_ldecl = gen_copy_seq(ldecl);
+   list sorted_ldecl = gen_copy_seq(ldecl);
 
-     gen_sort_list(sorted_ldecl, compare_entities); */
+   gen_sort_list(sorted_ldecl, compare_entities); */
 
   check_fortran_declaration_dependencies(ldecl);
 
+
+  /*
+   * Deals with indentation
+   */
+  list indentation_words = NIL;
+  if( prettyprint_language_is_fortran95_p() ) {
+    for(int i=0; i<INDENTATION; i++) {
+      indentation_words = CHAIN_SWORD(indentation_words, " ");
+    }
+  }
+
   /* where to put the dimension information.
    */
-  if (same_string_p(pp_var_dim, "type"))
+  if (same_string_p(pp_var_dim, "type")) {
     pp_in_type = TRUE, pp_in_common = FALSE;
-  else if (same_string_p(pp_var_dim, "common"))
+  } else if (same_string_p(pp_var_dim, "common")) {
     pp_in_type = FALSE, pp_in_common = TRUE;
-  else
+  } else {
     pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
-			" unexpected value\n", pp_var_dim);
+        " unexpected value\n", pp_var_dim);
+  }
 
-  /* prettyprint common in include if possible...
-   */
-  pp_cinc = same_string_p(how_common, "include") && !force_common;
 
-  FOREACH(ENTITY, e,ldecl)
-    {
-      type te = entity_type(e);
-      bool func = type_functional_p(te) && storage_rom_p(entity_storage(e));
-      value v = entity_initial(e);
-      bool param = func && value_symbolic_p(v);
-      bool external =     /* subroutines won't be declared */
-	(func &&
-	 (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
-	 !(type_void_p(functional_result(type_functional(te))) ||
-	   (type_variable_p(functional_result(type_functional(te))) &&
-	    basic_overloaded_p(variable_basic(type_variable
-					      (functional_result(type_functional(te))))))));
-      bool area_p = type_area_p(te);
-      bool var = type_variable_p(te);
-      bool in_ram = storage_ram_p(entity_storage(e));
-      bool in_common = in_ram &&
-	!entity_special_area_p(ram_section(storage_ram(entity_storage(e))));
-      bool skip_it = same_string_p(entity_local_name(e),
-				   entity_local_name(module));
 
-      pips_debug(3, "entity name is %s\n", entity_name(e));
+  FOREACH(ENTITY, e,ldecl) {
+    type te = entity_type(e);
+    bool func = type_functional_p(te) && storage_rom_p(entity_storage(e));
+    value v = entity_initial(e);
+    bool param = func && value_symbolic_p(v);
+    bool external = /* subroutines won't be declared */
+          (func
+        && (value_code_p(v) || value_unknown_p(v) /* not parsed callee */)
+        && !(type_void_p(functional_result(type_functional(te)))
+            || (type_variable_p(functional_result(type_functional(te)))
+                && basic_overloaded_p(variable_basic(type_variable
+                        (functional_result(type_functional(te))))))));
+    bool area_p = type_area_p(te);
+    bool var = type_variable_p(te);
+    bool in_ram = storage_ram_p(entity_storage(e));
+    bool in_common = in_ram
+        && !entity_special_area_p(ram_section(storage_ram(entity_storage(e))));
+    bool skip_it = same_string_p(entity_local_name(e),
+        entity_local_name(module));
 
-      /* Do not declare variables used to replace formal labels */
-      if(storage_formal_p(entity_storage(e))
-	 && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
-	 && formal_label_replacement_p(e))
-	continue;
+    pips_debug(3, "entity name is %s\n", entity_name(e));
 
-      if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc)
-	{
-	  area_decl =
-	    CONS(SENTENCE,
-		 make_sentence(is_sentence_formatted,
-			       common_hook(module, e)),
-		 area_decl);
-	}
+    /* Do not declare variables used to replace formal labels */
+    if (storage_formal_p(entity_storage(e))
+        && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
+        && formal_label_replacement_p(e))
+      continue;
 
-      if (skip_it)
-	{
-	  pips_debug(5, "skipping function %s\n", entity_name(e));
-	} else if ( entity_f95use_p(e) ) {
-	uses = CONS(SENTENCE, sentence_f95use_declaration(e), uses);
-      }
-      else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
-	{
-	  pips_debug(5, "skipping entity %s\n", entity_name(e));
-	}
-      else if (param)
-	{
-	  /*        PARAMETER
-	   */
-	  pips_debug(7, "considered as a parameter\n");
-	  lparam = CONS(ENTITY, e, lparam);
-	}
-      else if (external)
-	{
-	  /*        EXTERNAL
-	   */
-	  pips_debug(7, "considered as an external\n");
-	  before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	  before = CONS(SENTENCE, sentence_external(e), before);
-	}
-      else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
-	{
-	  /*            AREAS: COMMONS and SAVEs
-	   */
-	  pips_debug(7, "considered as a regular common\n");
-	  if (pp_cinc && !entity_special_area_p(e))
-	    {
-	      text t = text_area_included(e, module);
-	      MERGE_TEXTS(t_area, t);
-	    }
-	  else
-	    area_decl = CONS(SENTENCE,
-			     sentence_area(e, module, pp_in_common, pdl),
-			     area_decl);
-	}
-      else if (var && !(in_common && pp_cinc))
-	{
-	  basic b = variable_basic(type_variable(te));
-	  bool pp_dim = pp_in_type || variable_static_p(e);
-
-	  pips_debug(7, "is a variable...\n");
-
-	  switch (basic_tag(b))
-	    {
-	    case is_basic_int:
-	      /* simple integers are moved ahead... */
-
-	      pips_debug(7, "is an integer\n");
-	      if (variable_dimensions(type_variable(te)))
-		{
-		  string s = string_undefined;
-		  switch (basic_int(b))
-		    {
-		    case 4: ppi = &pi4;
-		      s = "INTEGER ";
-		      break;
-		    case 2: ppi = &pi2;
-		      s = "INTEGER*2 ";
-		      break;
-		    case 8: ppi = &pi8;
-		      s = "INTEGER*8 ";
-		      break;
-		    case 1: ppi = &pi1;
-		      s = "INTEGER*1 ";
-		      break;
-
-		    default: pips_internal_error("Unexpected integer size");
-		    }
-//		  *ppi = f77_f95_style_management (*ppi, s, space_p);
-      *ppi = CHAIN_SWORD(*ppi, *ppi==NULL ? s : (space_p? ", " : ","));
-		  *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim, pdl));
-		}
-	      else
-		{
-		  string s = string_undefined;
-
-		  switch (basic_int(b))
-		    {
-		    case 4: pph = &ph4;
-		      s = "INTEGER ";
-		      break;
-		    case 2: pph = &ph2;
-		      s = "INTEGER*2 ";
-		      break;
-		    case 8: pph = &ph8;
-		      s = "INTEGER*8 ";
-		      break;
-		    case 1: pph = &ph1;
-		      s = "INTEGER*1 ";
-		      break;
-		    default: pips_internal_error("Unexpected integer size");
-		    }
-//		  *pph = f77_f95_style_management (*pph, s, space_p);
-      *pph = CHAIN_SWORD(*pph, *pph==NULL ? s : (space_p? ", " : ","));
-		  *pph = gen_nconc(*pph, words_declaration(e, pp_dim, pdl));
-		}
-	      break;
-	    case is_basic_float:
-	      pips_debug(7, "is a float\n");
-	      switch (basic_float(b))
-		{
-		case 4:
-		  pf4 = f77_f95_style_management (pf4, "REAL*4 ", space_p);
-		  pf4 = gen_nconc(pf4, words_declaration(e, pp_dim, pdl));
-		  break;
-		case 8:
-		default:
-		  pf8 = f77_f95_style_management (pf8, "REAL*8 ", space_p);
-		  pf8 = gen_nconc(pf8, words_declaration(e, pp_dim, pdl));
-		  break;
-		}
-	      break;
-	    case is_basic_complex:
-	      pips_debug(7, "is a complex\n");
-	      switch (basic_complex(b))
-		{
-		case 8:
-		  pc8 = f77_f95_style_management (pc8, "COMPLEX*8 ", space_p);
-		  pc8 = gen_nconc(pc8, words_declaration(e, pp_dim, pdl));
-		  break;
-		case 16:
-		default:
-		  pc16 = f77_f95_style_management (pc16, "COMPLEX*16 ", space_p);
-		  pc16 = gen_nconc(pc16, words_declaration(e, pp_dim, pdl));
-		  break;
-		}
-	      break;
-	    case is_basic_logical:
-	      pips_debug(7, "is a logical\n");
-	      pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
-	      pl = gen_nconc(pl, words_declaration(e, pp_dim, pdl));
-	      break;
-	    case is_basic_overloaded:
-	      /* nothing! some in hpfc I guess...
-	       */
-	      break;
-	    case is_basic_string:
-	      {
-		value v = basic_string(b);
-		pips_debug(7, "is a string\n");
-
-		if (value_constant_p(v) && constant_int_p(value_constant(v)))
-		  {
-		    int i = constant_int(value_constant(v));
-
-		    if (i==1)
-		      {
-			ps = f77_f95_style_management (ps, "CHARACTER ", space_p);
-			ps = gen_nconc(ps, words_declaration(e, pp_dim, pdl));
-		      }
-		    else
-		      {
-			list chars=NIL;
-			chars = CHAIN_SWORD(chars, "CHARACTER*");
-			chars = CHAIN_IWORD(chars, i);
-			chars = CHAIN_SWORD(chars, " ");
-			chars = gen_nconc(chars,
-					  words_declaration(e, pp_dim, pdl));
-			attach_declaration_size_type_to_words
-			  (chars, "CHARACTER", i);
-			ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		      }
-		  }
-		else if (value_unknown_p(v))
-		  {
-		    list chars=NIL;
-		    chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
-		    chars = gen_nconc(chars,
-				      words_declaration(e, pp_dim, pdl));
-		    attach_declaration_type_to_words
-		      (chars, "CHARACTER*(*)");
-		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		  }
-		else if (value_symbolic_p(v))
-		  {
-		    list chars = NIL;
-		    symbolic s = value_symbolic(v);
-		    chars = CHAIN_SWORD(chars, "CHARACTER*(");
-		    chars = gen_nconc(chars,
-				      words_expression(symbolic_expression(s), pdl));
-		    chars = CHAIN_SWORD(chars, ") ");
-		    chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
-
-		    attach_declaration_type_to_words
-		      (chars, "CHARACTER*(*)");
-		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		  }
-		else
-		  pips_internal_error("unexpected value\n");
-		break;
-	      }
-	    default:
-	      pips_internal_error("unexpected basic tag (%d)\n",
-				  basic_tag(b));
-	    }
-	}
+    if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc) {
+      area_decl = CONS(SENTENCE,
+          make_sentence(is_sentence_formatted,
+              common_hook(module, e)),
+          area_decl);
     }
+
+    if (skip_it) {
+      pips_debug(5, "skipping function %s\n", entity_name(e));
+    } else if (entity_f95use_p(e)) {
+      uses = CONS(SENTENCE, sentence_f95use_declaration(e), uses);
+    } else if (!print_commons && (area_p || (var && in_common && pp_cinc))) {
+      pips_debug(5, "skipping entity %s\n", entity_name(e));
+    } else if (param) {
+      /*        PARAMETER
+       */
+      pips_debug(7, "considered as a parameter\n");
+      lparam = CONS(ENTITY, e, lparam);
+    } else if (external) {
+      /*        EXTERNAL
+       */
+      pips_debug(7, "considered as an external\n");
+      before = CONS(SENTENCE, sentence_basic_declaration(e), before);
+      before = CONS(SENTENCE, sentence_external(e), before);
+    } else if (area_p && !dynamic_area_p(e) && !heap_area_p(e)
+        && !stack_area_p(e) && !empty_static_area_p(e)) {
+      /*            AREAS: COMMONS and SAVEs
+       */
+      pips_debug(7, "considered as a regular common\n");
+      if (pp_cinc && !entity_special_area_p(e)) {
+        text t = text_area_included(e, module);
+        MERGE_TEXTS(t_area, t);
+      } else
+        area_decl = CONS(SENTENCE,
+            sentence_area(e, module, pp_in_common, pdl),
+            area_decl);
+    } else if (var && !(in_common && pp_cinc)) {
+      basic b = variable_basic(type_variable(te));
+      bool pp_dim = pp_in_type || variable_static_p(e);
+
+      pips_debug(7, "is a variable...\n");
+
+      switch(basic_tag(b)) {
+        case is_basic_int:
+          /* simple integers are moved ahead... */
+
+          pips_debug(7, "is an integer\n");
+          if (variable_dimensions(type_variable(te))) {
+            string s = string_undefined;
+            switch(basic_int(b)) {
+              case 4:
+                ppi = &pi4;
+                s = "INTEGER ";
+                break;
+              case 2:
+                ppi = &pi2;
+                s = "INTEGER*2 ";
+                break;
+              case 8:
+                ppi = &pi8;
+                s = "INTEGER*8 ";
+                break;
+              case 1:
+                ppi = &pi1;
+                s = "INTEGER*1 ";
+                break;
+
+              default:
+                pips_internal_error("Unexpected integer size");
+            }
+
+            *ppi = f77_f95_style_management (*ppi, s, allocatable_pass_p, space_p);
+            *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim, pdl));
+          } else {
+            string s = string_undefined;
+
+            switch(basic_int(b)) {
+              case 4:
+                pph = &ph4;
+                s = "INTEGER ";
+                break;
+              case 2:
+                pph = &ph2;
+                s = "INTEGER*2 ";
+                break;
+              case 8:
+                pph = &ph8;
+                s = "INTEGER*8 ";
+                break;
+              case 1:
+                pph = &ph1;
+                s = "INTEGER*1 ";
+                break;
+              default:
+                pips_internal_error("Unexpected integer size");
+            }
+            *pph = f77_f95_style_management (*pph, s, allocatable_pass_p, space_p);
+            *pph = gen_nconc(*pph, words_declaration(e, pp_dim, pdl));
+          }
+          break;
+        case is_basic_float:
+          pips_debug(7, "is a float\n");
+          switch(basic_float(b)) {
+            case 4:
+              pf4 = f77_f95_style_management(pf4, "REAL*4 ", allocatable_pass_p, space_p);
+              pf4 = gen_nconc(pf4, words_declaration(e, pp_dim, pdl));
+              break;
+            case 8:
+            default:
+              pf8 = f77_f95_style_management(pf8, "REAL*8 ", allocatable_pass_p, space_p);
+              pf8 = gen_nconc(pf8, words_declaration(e, pp_dim, pdl));
+              break;
+          }
+          break;
+        case is_basic_complex:
+          pips_debug(7, "is a complex\n");
+          switch(basic_complex(b)) {
+            case 8:
+              pc8 = f77_f95_style_management(pc8, "COMPLEX*8 ", allocatable_pass_p, space_p);
+              pc8 = gen_nconc(pc8, words_declaration(e, pp_dim, pdl));
+              break;
+            case 16:
+            default:
+              pc16 = f77_f95_style_management(pc16, "COMPLEX*16 ", allocatable_pass_p, space_p);
+              pc16 = gen_nconc(pc16, words_declaration(e, pp_dim, pdl));
+              break;
+          }
+          break;
+        case is_basic_logical:
+          pips_debug(7, "is a logical\n");
+          pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
+          pl = gen_nconc(pl, words_declaration(e, pp_dim, pdl));
+          break;
+        case is_basic_overloaded:
+          /* nothing! some in hpfc I guess...
+           */
+          break;
+        case is_basic_string: {
+          value v = basic_string(b);
+          pips_debug(7, "is a string\n");
+
+          if (value_constant_p(v) && constant_int_p(value_constant(v))) {
+            int i = constant_int(value_constant(v));
+
+            if (i == 1) {
+              ps = f77_f95_style_management(ps, "CHARACTER ", allocatable_pass_p, space_p);
+              ps = gen_nconc(ps, words_declaration(e, pp_dim, pdl));
+            } else {
+              list chars = NIL;
+              chars = CHAIN_SWORD(chars, "CHARACTER*");
+              chars = CHAIN_IWORD(chars, i);
+              chars = CHAIN_SWORD(chars, " ");
+              chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
+              attach_declaration_size_type_to_words(chars, "CHARACTER", i);
+              ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+            }
+          } else if (value_unknown_p(v)) {
+            list chars = NIL;
+            chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+            chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
+            attach_declaration_type_to_words(chars, "CHARACTER*(*)");
+            ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+          } else if (value_symbolic_p(v)) {
+            list chars = NIL;
+            symbolic s = value_symbolic(v);
+            chars = CHAIN_SWORD(chars, "CHARACTER*(");
+            chars = gen_nconc(chars, words_expression(symbolic_expression(s),
+                                                      pdl));
+            chars = CHAIN_SWORD(chars, ") ");
+            chars = gen_nconc(chars, words_declaration(e, pp_dim, pdl));
+
+            attach_declaration_type_to_words(chars, "CHARACTER*(*)");
+            ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+          } else
+            pips_internal_error("unexpected value\n");
+          break;
+        }
+        case is_basic_derived: {
+          if(allocatable_pass_p) {
+            pips_internal_error("We got an allocatable but we are inside"
+                "allocatable pass !! This should be impossible...\n");
+          }
+          // Chains the entity to be declared, aka the array inside allocatable
+          allocatable_list = CONS(entity,get_allocatable_data_entity(e),allocatable_list);
+          break;
+        }
+        default:
+          pips_internal_error("unexpected basic tag (%d)\n",
+              basic_tag(b));
+      }
+    }
+  }
+
 
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
    */
-  r = make_text( uses );
-  MERGE_TEXTS(r, make_text( gen_nreverse( before ) ));
+  r = make_text(uses);
+  ADD_WORD_LIST_TO_TEXT(r, gen_nreverse( before ) );
 
   MERGE_TEXTS(r, text_of_parameters(lparam));
   gen_free_list(lparam), lparam = NIL;
 
-  ADD_WORD_LIST_TO_TEXT(r, ph1);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, ph1, get_prettyprint_indentation());
   attach_declaration_type_to_words(ph1, "INTEGER*1");
-  ADD_WORD_LIST_TO_TEXT(r, ph2);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, ph2, get_prettyprint_indentation());
   attach_declaration_type_to_words(ph2, "INTEGER*2");
-  ADD_WORD_LIST_TO_TEXT(r, ph4);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, ph4, get_prettyprint_indentation());
   attach_declaration_type_to_words(ph4, "INTEGER");
-  ADD_WORD_LIST_TO_TEXT(r, ph8);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, ph8, get_prettyprint_indentation());
   attach_declaration_type_to_words(ph8, "INTEGER*8");
-  ADD_WORD_LIST_TO_TEXT(r, pi1);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi1, get_prettyprint_indentation());
   attach_declaration_type_to_words(pi1, "INTEGER*1");
-  ADD_WORD_LIST_TO_TEXT(r, pi2);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi2, get_prettyprint_indentation());
   attach_declaration_type_to_words(pi2, "INTEGER*2");
-  ADD_WORD_LIST_TO_TEXT(r, pi4);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi4, get_prettyprint_indentation());
   attach_declaration_type_to_words(pi4, "INTEGER");
-  ADD_WORD_LIST_TO_TEXT(r, pi8);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pi8, get_prettyprint_indentation());
   attach_declaration_type_to_words(pi8, "INTEGER*8");
-  ADD_WORD_LIST_TO_TEXT(r, pf4);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pf4, get_prettyprint_indentation());
   attach_declaration_type_to_words(pf4, "REAL*4");
-  ADD_WORD_LIST_TO_TEXT(r, pf8);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pf8, get_prettyprint_indentation());
   attach_declaration_type_to_words(pf8, "REAL*8");
-  ADD_WORD_LIST_TO_TEXT(r, pl);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pl, get_prettyprint_indentation());
   attach_declaration_type_to_words(pl, "LOGICAL");
-  ADD_WORD_LIST_TO_TEXT(r, pc8);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pc8, get_prettyprint_indentation());
   attach_declaration_type_to_words(pc8, "COMPLEX*8");
-  ADD_WORD_LIST_TO_TEXT(r, pc16);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, pc16, get_prettyprint_indentation());
   attach_declaration_type_to_words(pc16, "COMPLEX*16");
-  ADD_WORD_LIST_TO_TEXT(r, ps);
+  ADD_WORD_LIST_TO_TEXT_WITH_MARGIN(r, ps, get_prettyprint_indentation());
   attach_declaration_type_to_words(ps, "CHARACTER");
   MERGE_TEXTS(r, t_chars);
 
@@ -1861,20 +1888,27 @@ static text text_entity_declaration(entity module,
 
   /* and EQUIVALENCE statements... - BC
    */
-  MERGE_TEXTS(r, text_equivalences(module, /* sorted_ */ ldecl,
-				   pp_cinc || !print_commons));
+  MERGE_TEXTS(r, text_equivalences(module, /* sorted_ */ldecl,
+          pp_cinc || !print_commons));
 
   /* what about DATA statements! FC
    */
   /* More general way with with call to text_initializations(module) in
-     text_named_module() */
+   text_named_module() */
   /*
-    if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
-    MERGE_TEXTS(r, text_data(module, ldecl));
-    }
-  */
+   if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
+   MERGE_TEXTS(r, text_data(module, ldecl));
+   }
+   */
 
   /* gen_free_list(sorted_ldecl); */
+
+  if(!allocatable_pass_p && !ENDP(allocatable_list)) {
+    /* We have to do a recursive call to get the allocatable declarations */
+    allocatable_pass_p = TRUE;
+    MERGE_TEXTS(r,text_entity_declaration(module,allocatable_list,force_common,pdl));
+    allocatable_pass_p = FALSE;
+  }
 
   return r;
 }
@@ -2036,33 +2070,32 @@ list words_dimensions(list dims, list pdl)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  if (language_tag (get_prettyprint_language ()) == is_language_fortran)
-    {
+
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95: {
       pc = CHAIN_SWORD(pc, "(");
-      MAPL(pd,
-      {
-	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd)), pdl));
-	if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-      }, dims);
+      string spacer = "";
+      FOREACH(dimension,d,dims) {
+        pc = CHAIN_SWORD(pc, spacer);
+        pc = gen_nconc(pc, words_dimension(d, pdl));
+        spacer = space_p ? ", " : ",";
+      }
       pc = CHAIN_SWORD(pc, ")");
+      break;
     }
-  else if (language_tag (get_prettyprint_language ()) == is_language_c)
-    {
-      MAP(DIMENSION,d,
-      {
-	pc = CHAIN_SWORD(pc, "[");
-	pc = gen_nconc(pc, words_dimension(d, pdl));
-	pc = CHAIN_SWORD(pc, "]");
-      }, dims);
+    case is_language_c: {
+      FOREACH(dimension,d,dims) {
+        pc = CHAIN_SWORD(pc, "[");
+        pc = gen_nconc(pc, words_dimension(d, pdl));
+        pc = CHAIN_SWORD(pc, "]");
+      }
+      break;
     }
-  else if (language_tag (get_prettyprint_language ()) == is_language_fortran95)
-    {
-      pips_assert ("Need to update F95 case", FALSE);
-    }
-  else
-    {
-      pips_assert ("This case should have been handled before", FALSE);
-    }
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
   return pc;
 }
 

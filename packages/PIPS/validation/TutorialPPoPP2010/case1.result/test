@@ -85,21 +85,19 @@ int main()
    for(i = 1; i <= 10; i += 1)
 //               <must be written>: j
       for(j = 1; j <= 10; j += 1)
-//               <may be read    >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <must be read   >: TOP-LEVEL:stderr a[i][j] i j
+//               <may be read    >: stderr[0]
+//               <may be written >: stderr[0]
+//               <must be read   >: stderr __IO_EFFECTS:LUNS[2] 
+//                                  a[i][j] i j
+//               <must be written>: __IO_EFFECTS:LUNS[2]
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
 Cumulated effetcs for "main"
 
-//               <may be read    >: TOP-LEVEL:stderr 
-//                                  TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
+//               <may be read    >: stderr stderr[0] 
+//                                  __IO_EFFECTS:LUNS[2]
+//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2]
 int main()
 {
    float a[10][10], b[10][10], h;
@@ -121,25 +119,20 @@ int main()
 //               <may be written >: a[*][*]
 //               <must be read   >: h
    func1(10, 10, a, b, h);
-//               <may be read    >: TOP-LEVEL:stderr 
-//                                  TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*] a[*][*] i j
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*] j
+//               <may be read    >: stderr stderr[0] 
+//                                  __IO_EFFECTS:LUNS[2] a[*][*] i j
+//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2] j
 //               <must be written>: i
    for(i = 1; i <= 10; i += 1)
-//               <may be read    >: TOP-LEVEL:stderr 
-//                                  TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*] a[*][*] i j
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
+//               <may be read    >: stderr stderr[0] 
+//                                  __IO_EFFECTS:LUNS[2] a[*][*] i j
+//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2]
 //               <must be written>: j
       for(j = 1; j <= 10; j += 1)
-//               <may be read    >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*] a[*][*]
-//               <may be written >: TOP-LEVEL:stderr[*] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <must be read   >: TOP-LEVEL:stderr i j
+//               <may be read    >: stderr[0] a[*][*]
+//               <may be written >: stderr[0]
+//               <must be read   >: stderr __IO_EFFECTS:LUNS[2] i j
+//               <must be written>: __IO_EFFECTS:LUNS[2]
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
@@ -148,9 +141,9 @@ Transformers for "main"
 //  T() {}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
-//  T() {}
+//  T(x) {}
    float x;
-//  T() {}
+//  T(i,j) {}
    int i, j;
 //  T(i,j,x) {1<=i}
    for(i = 1; i <= n; i += 1)
@@ -165,9 +158,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 //  T() {}
 int main()
 {
-//  T() {}
+//  T(h) {}
    float a[10][10], b[10][10], h;
-//  T() {}
+//  T(i,j) {}
    int i, j;
 //  T(i,j) {1<=i}
    for(i = 1; i <= 10; i += 1)
@@ -194,15 +187,15 @@ int main()
 {
 //  P() {}
    float a[10][10], b[10][10], h;
-//  P() {}
+//  P(h) {}
    int i, j;
-//  P() {}
+//  P(h,i,j) {}
    for(i = 1; i <= 10; i += 1)
-//  P(i,j) {1<=i, i<=10}
+//  P(h,i,j) {1<=i, i<=10}
       for(j = 1; j <= 10; j += 1)
-//  P(i,j) {1<=i, i<=10, 1<=j, j<=10}
+//  P(h,i,j) {1<=i, i<=10, 1<=j, j<=10}
          b[i][j] = 1.0;
-//  P(i,j) {i==11, j==11}
+//  P(h,i,j) {i==11, j==11}
    h = 2.0;
 //  P(h,i,j) {2.0==h, i==11, j==11}
    func1(10, 10, a, b, h);
@@ -218,9 +211,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
 //  P() {2.0==h, m==10, n==10}
    float x;
-//  P() {2.0==h, m==10, n==10}
+//  P(x) {2.0==h, m==10, n==10}
    int i, j;
-//  P() {2.0==h, m==10, n==10}
+//  P(i,j,x) {2.0==h, m==10, n==10}
    for(i = 1; i <= n; i += 1)
 //  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
       for(j = 1; j <= m; j += 1) {
@@ -235,9 +228,9 @@ Printed files with regions
 
 
 //  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 //  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -245,31 +238,31 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 //  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
-//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//    n==10, 1<=i, i<=n}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//    n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, m==10,
-//    n==10, 1<=i, i<=10, 1<=j, j<=10}>
-//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, m==10,
-//    n==10, 1<=i, i<=10, 1<=j, j<=10}>
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//    1<=i, i<=10, 1<=j, j<=10}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
       }
 }
 
 //  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -277,26 +270,26 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
-//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=n}>
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//    n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h,
-//    m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
       }
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{*SEMANTICS*:o#0==11}>
-//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, *SEMANTICS*:o#1==11}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0, *SEMANTICS*:o#1==11}>
+//  <stderr-IN-EXACT-{}>
 
 int main()
 {
@@ -311,35 +304,35 @@ int main()
 
    func1(10, 10, a, b, h);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, *SEMANTICS*:o#1==11,
+//    2.0==h, j==11}>
 //  <a[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, j==11}>
-//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{*SEMANTICS*:o#0==11,
-//    TOP-LEVEL:2.0==h, j==11}>
-//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+//    *SEMANTICS*:o#1==11, 2.0==h, j==11}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0, *SEMANTICS*:o#1==11, 2.0==h,
+//    j==11}>
+//  <stderr-IN-EXACT-{}>
 
    for(i = 1; i <= 10; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10,
-//    TOP-LEVEL:2.0==h, 1<=i, i<=10}>
-//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=10}>
-//  <TOP-LEVEL:stderr-IN-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2.0, 1<=i,
+//    i<=10}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <stderr-IN-EXACT-{}>
 
       for(j = 1; j <= 10; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, TOP-LEVEL:2.0==h, 1<=i,
-//    i<=10, 1<=j, j<=10}>
-//  <TOP-LEVEL:stderr-IN-EXACT-{}>
-//  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=10,
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, h==2.0, 1<=i, i<=10,
 //    1<=j, j<=10}>
+//  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10}>
+//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -347,19 +340,18 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10}>
+//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
-//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, m==10, n==10, 1<=i,
-//    i<=n}>
+//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{i==PHI1, PHI2==j, *SEMANTICS*:o#0==11,
-//    TOP-LEVEL:2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{i==PHI1, PHI2==j, *SEMANTICS*:o#1==11,
+//    2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
       }
@@ -385,19 +377,18 @@ int main()
    h = 2.0;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#0==11, TOP-LEVEL:2.0==h, j==11}>
+//    *SEMANTICS*:o#1==11, 2.0==h, j==11}>
 
    func1(10, 10, a, b, h);
    for(i = 1; i <= 10; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{1<=i, i<=10}>
-//  <TOP-LEVEL:stderr[PHI1]-OUT-MAY-{TOP-LEVEL:2.0==h, 1<=i, i<=9}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=i, i<=10}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0, 1<=i, i<=10}>
 
       for(j = 1; j <= 10; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{1<=j, j<=10}>
-//  <TOP-LEVEL:stderr[PHI1]-OUT-MAY-{TOP-LEVEL:2.0==h, 1<=i, i+j<=19,
-//    i<=10, 1<=j, j<=10}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=j, j<=10}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0, 1<=j, j<=10}>
 
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
@@ -447,15 +438,15 @@ int main()
 {
 //  P() {}
    float a[10][10], b[10][10], h;
-//  P() {}
+//  P(h) {}
    int i, j;
-//  P() {}
+//  P(h,i,j) {}
    for(i = 1; i <= 10; i += 1)
-//  P(i,j) {1<=i, i<=10}
+//  P(h,i,j) {1<=i, i<=10}
       for(j = 1; j <= 10; j += 1)
-//  P(i,j) {1<=i, i<=10, 1<=j, j<=10}
+//  P(h,i,j) {1<=i, i<=10, 1<=j, j<=10}
          b[i][j] = 1.0;
-//  P(i,j) {i==11, j==11}
+//  P(h,i,j) {i==11, j==11}
    h = 2.0;
 //  P(h,i,j) {2.0==h, i==11, j==11}
    func1(10, 10, a, b, h);
@@ -471,9 +462,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
 //  P() {2.0==h, m==10, n==10}
    float x;
-//  P() {2.0==h, m==10, n==10}
+//  P(x) {2.0==h, m==10, n==10}
    int i, j;
-//  P() {2.0==h, m==10, n==10}
+//  P(i,j,x) {2.0==h, m==10, n==10}
    for(i = 1; i <= 10; i += 1)
 //  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
       for(j = 1; j <= 10; j += 1) {

@@ -2,7 +2,7 @@
 Transformers for "while06"
 
 
-C  T(while06) {while06==10}
+//  T(while06) {while06==10}
 
 int while06()
 {

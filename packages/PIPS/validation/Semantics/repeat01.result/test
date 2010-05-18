@@ -2,7 +2,7 @@
 Transformers for "repeat01"
 
 
-C  T(repeat01) {16<=repeat01}
+//  T(repeat01) {16<=repeat01}
 
 int repeat01()
 {

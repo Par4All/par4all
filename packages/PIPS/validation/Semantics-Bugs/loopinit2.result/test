@@ -1,0 +1,175 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+      PROGRAM LOOPINIT2
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+
+C  T(I,J,N) {I==3, J==3, N==0}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {J==2}
+
+C (0,2)
+
+      J = 2                                                             0016
+
+C  T(N) {J==2, N==0}
+
+C (0,3)
+
+      N = 0                                                             0018
+
+C  T(I,J) {J#init==1, N==0, 2<=I}
+
+C (0,4)
+
+      DO I = INC(J), N                                                  0020
+
+C  T(J) {N==0, I<=0}
+
+C (0,5)
+C        BEGIN BLOCK
+
+C  T(J) {N==0, I<=0}
+
+C (0,6)
+         T(I) = 0.                                                      0021
+
+C  T(J) {J==J#init+2, N==0, I<=0}
+
+C (0,7)
+         J = J+2                                                        0022
+C        END BLOCK
+      ENDDO
+
+C  T() {I==3, J==3, N==0}
+
+C (0,8)
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0026
+
+C     END BLOCK
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+      PROGRAM LOOPINIT2
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      J = 2                                                             0016
+
+C  P(J) {J==2}
+
+C (0,3)
+
+      N = 0                                                             0018
+
+C  P(J,N) {J==2, N==0}
+
+C (0,4)
+
+      DO I = INC(J), N                                                  0020
+
+C  P() {0==-1}
+
+C (0,5)
+C        BEGIN BLOCK
+
+C  P() {0==-1}
+
+C (0,6)
+         T(I) = 0.                                                      0021
+
+C  P() {0==-1}
+
+C (0,7)
+         J = J+2                                                        0022
+C        END BLOCK
+      ENDDO
+
+C  P(I,J,N) {I==4, J==4, N==0}
+
+C (0,8)
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0026
+
+C     END BLOCK
+      END
+
+AFTER DEAD CODE ELIMINATION
+
+      PROGRAM LOOPINIT2
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      J = 2                                                             0016
+C (0,3)
+
+      N = 0                                                             0018
+C (0,4)
+
+      I = INC(J)
+C (0,5)
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0026
+
+C     END BLOCK
+      END

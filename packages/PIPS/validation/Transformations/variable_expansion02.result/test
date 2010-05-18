@@ -28,12 +28,18 @@ Code after variable_expansion
 
 int foo(int c[10])
 {
-   int i, j[9+1], k[9+1];
+   int i, j, k;
    for(i = 0; i <= 9; i += 1) {
-      j[i] = i;
-      for (;j[i]<=9;j[i] += 1) {
-         k[i] = k[i]+1;
-         c[j[i]] = k[i];
+      j = i;
+      {
+         //PIPS generated variable
+         int I_0, k[10][-j+9+1];
+         I_0 = j;
+
+         for(j = j; j <= 9; j += 1) {
+            k[i][-I_0+j] = k[i][-I_0+j]+1;
+            c[j] = k[i][-I_0+j];
+         }
       }
    }
    return c[10];

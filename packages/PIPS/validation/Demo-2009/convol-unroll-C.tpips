@@ -39,58 +39,58 @@ display PRINTED_FILE[convol]
 #l400
 #128 0
 #0 128
+setproperty STRIP_MINE_KIND 0
+setproperty LOOP_LABEL "l400"
+setproperty STRIP_MINE_FACTOR 128
 apply STRIP_MINE[convol]
-l400
-0
-128
-#apply LOOP_NORMALIZE[convol]
-#apply PARTIAL_EVAL[convol]
-#apply SUPPRESS_DEAD_CODE[convol]
+apply LOOP_NORMALIZE[convol]
+apply PARTIAL_EVAL[convol]
+apply SUPPRESS_DEAD_CODE[convol]
 #activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[convol]
-##
-##echo
-##echo After double unrolling
-##echo
-##apply FULL_UNROLL[convol]
-##l100
-##apply FULL_UNROLL[convol]
-##l200
-##
-##apply PARTIAL_EVAL
-##apply USE_DEF_ELIMINATION
-##display PRINTED_FILE[convol]
-##
-###apply DECLARATIONS_PRIVATIZER[convol]
-##apply PRIVATIZE_MODULE[convol]
-##display PRINTED_FILE[convol]
-##echo
-##echo After atomization
-##echo
-##setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-##apply SIMD_ATOMIZER[convol]
-##display PRINTED_FILE[convol]
-##
-### should be applied but fails
-##apply SCALARIZATION
-##display PRINTED_FILE[convol]
-##
-### probably useless for terapix microcode
-###apply INVARIANT_CODE_MOTION
-##
-###echo
-###echo detect // loops
-###echo
-###
-###activate PRINT_PARALLELIZEDOMP_CODE
-###display PARALLELPRINTED_FILE[convol]
-##
-##
-###apply PRIVATIZE_MODULE[convol]
-###display PARALLELPRINTED_FILE[convol]
-##
-###apply VARIABLE_EXPANSION[convol]
-###display PARALLELPRINTED_FILE[convol]
-##close
-##quit
+
+echo
+echo After double unrolling
+echo
+setproperty LOOP_LABEL "l100"
+apply FULL_UNROLL[convol]
+setproperty LOOP_LABEL "l200"
+apply FULL_UNROLL[convol]
+
+apply PARTIAL_EVAL
+#apply USE_DEF_ELIMINATION
+display PRINTED_FILE[convol]
+
+#apply DECLARATIONS_PRIVATIZER[convol]
+#apply PRIVATIZE_MODULE[convol]
+#display PRINTED_FILE[convol]
+#echo
+#echo After atomization
+#echo
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER[convol]
+#display PRINTED_FILE[convol]
+#
+## should be applied but fails
+#apply SCALARIZATION
+#display PRINTED_FILE[convol]
+
+# probably useless for terapix microcode
+#apply INVARIANT_CODE_MOTION
+
+#echo
+#echo detect // loops
+#echo
+#
+#activate PRINT_PARALLELIZEDOMP_CODE
+#display PARALLELPRINTED_FILE[convol]
+
+
+#apply PRIVATIZE_MODULE[convol]
+#display PARALLELPRINTED_FILE[convol]
+
+#apply VARIABLE_EXPANSION[convol]
+#display PARALLELPRINTED_FILE[convol]
+close
+quit
 ### EOF

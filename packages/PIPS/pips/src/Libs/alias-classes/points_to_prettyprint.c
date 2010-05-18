@@ -241,10 +241,10 @@ text text_points_to(entity module,int margin, statement s)
     words_predicate_to_commentary
     (words_points_to_list(PT_TO_DECO,
 			  load_printed_points_to_list(s)),
-     PIPS_COMMENT_SENTINEL)
+			      get_comment_sentinel())
     :words_predicate_to_commentary
     (CONS(STRING,PT_TO_DECO, CONS(STRING, strdup("{}"), NIL)),
-     PIPS_COMMENT_SENTINEL);
+        get_comment_sentinel());
   return t;
 }
 
@@ -294,7 +294,7 @@ bool print_code_points_to(string module_name,
 						      module_name,
 						      TRUE));
   // FI: should be language neutral...
-  st = words_predicate_to_commentary(wl, PIPS_COMMENT_SENTINEL);
+  st = words_predicate_to_commentary(wl, get_comment_sentinel());
   t = text_code_points_to(get_current_module_statement());
   // print_text(stderr,t);
   //st = text_code_summary_points_to(get_current_module_statement());

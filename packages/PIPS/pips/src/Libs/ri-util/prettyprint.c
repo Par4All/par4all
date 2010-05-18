@@ -147,47 +147,59 @@ extern string compilation_unit_of_module(string);
 /* The prettyprint language */
 static language prettyprint_language = language_undefined;
 
+
 /**
-   @return the prettyprint language as a newgen language object
- **/
+ * @brief please avoid using this function directly, use predicate instead
+ * (see below)
+ * @return the prettyprint language as a newgen language object
+ */
 language get_prettyprint_language () {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
   return prettyprint_language;
 }
 
+
 /**
-   @return the prettyprint language as a language_utype
+ * @return the prettyprint language as a language_utype
  **/
 enum language_utype get_prettyprint_language_tag () {
   return language_tag (get_prettyprint_language ());
 }
 
+
 /**
-   @return true if the language is f77
+ * @return true if the language is f77
  **/
 bool prettyprint_language_is_fortran_p () {
   return (get_prettyprint_language_tag () == is_language_fortran?TRUE:FALSE);
 }
 
+
 /**
-   @return true if the language is f95
+ * @return true if the language is f95
  **/
 bool prettyprint_language_is_fortran95_p () {
   return (get_prettyprint_language_tag () == is_language_fortran95?TRUE:FALSE);
 }
 
+
 /**
-   @return true if the language is C
+ * @return true if the language is C
  **/
 bool prettyprint_language_is_c_p () {
   return (get_prettyprint_language_tag () == is_language_c?TRUE:FALSE);
 }
 
+
 /**
-   @brief set the prettyprint language according to the property
-   PRETTYPRINT_LANGUAGE
- **/
+ * @brief set the prettyprint language according to the property
+ * PRETTYPRINT_LANGUAGE
+ * @description If the property PRETTYPRINT_LANGUAGE is set to the special
+ * value "native" then the language passed in arg is used, usually it's the
+ * module native language. The user can set "F77", "F95", or "C" to force the
+ * prettyprint of a language.
+ */
 void set_prettyprint_language_from_property( enum language_utype native ) {
   if (prettyprint_language == language_undefined) {
     prettyprint_language = make_language_fortran ();
@@ -209,10 +221,11 @@ void set_prettyprint_language_from_property( enum language_utype native ) {
   }
 }
 
+
 /**
    @brief set the prettyprint language from a newgen language object
    @param lang, the language to be used to set the prettyprint_language
-   variable
+   variable, content is copied so caller may free if it was malloced
  **/
 void set_prettyprint_language (language lang) {
   if (prettyprint_language == language_undefined)
@@ -220,59 +233,51 @@ void set_prettyprint_language (language lang) {
   *prettyprint_language = *lang;
 }
 
+
 /**
    @brief set the prettyprint language from a language_utype argument
    @param lang, the language to be used to set the prettyprint_language
    variable
  **/
+
 void set_prettyprint_language_tag (enum language_utype lang) {
   if (prettyprint_language == language_undefined)
     prettyprint_language = make_language_fortran ();
   language_tag (prettyprint_language) = lang;
 }
 
-/*===================== Variables and Function prototypes for C ===========*/
 
-/* old functions to keep compatibility with the new pretyprint_language
-    variable. Those functions shoul be removed soon
-*/
-
-/** Get the status of the Fortran prettyprint flag */
-bool get_prettyprint_is_fortran()
-{
-  return (language_tag (get_prettyprint_language ()) == is_language_fortran);
-}
-
-/** Select if the prettyprint is done in Fortran or not */
-void set_prettyprint_is_fortran_p(bool is_fortran_p)
-{
-  if (is_fortran_p)
-    set_prettyprint_language_tag (is_language_fortran);
-  else
-    set_prettyprint_language_tag (is_language_c);
-}
-
-/** Select Fortran prettyprint */
-void set_prettyprint_is_fortran()
-{
-  set_prettyprint_language_tag (is_language_fortran);
-}
-
-/** Deselect Fortran prettyprint */
-void reset_prettyprint_is_fortran()
-{
-  set_prettyprint_language_tag (is_language_c);
-}
-
-string get_prettyprint_comment() {
+/* @brief Start a single line comment
+ * @return a string containing the begin of a comment line, language dependent
+ */
+string get_comment_sentinel() {
   switch(get_prettyprint_language_tag()) {
     case is_language_c: return "//";
     case is_language_fortran: return "C";
     case is_language_fortran95: return "!";
   }
-
 }
 
+
+/* @brief Start a single line comment with continuation (blank spaces)
+ * @return a string containing the begin of a comment line, language dependent
+ */
+string get_comment_continuation() {
+  switch(get_prettyprint_language_tag()) {
+    case is_language_c: return "//    ";
+    case is_language_fortran: return "C    ";
+    case is_language_fortran95: return "!    ";
+  }
+}
+
+
+unsigned int get_prettyprint_indentation() {
+  if(prettyprint_language_is_fortran_p()) {
+    return 0;
+  } else {
+    return INDENTATION;
+  }
+}
 
 static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);
@@ -287,10 +292,8 @@ static bool precedence_p = TRUE;
 
 /******************************************************************* STYLES */
 
-static bool
-pp_style_p(string s)
-{
-    return same_string_p(get_string_property(PRETTYPRINT_PARALLEL), s);
+static bool pp_style_p(string s) {
+  return same_string_p(get_string_property(PRETTYPRINT_PARALLEL), s);
 }
 
 #define pp_hpf_style_p() 	pp_style_p("hpf")
@@ -305,32 +308,36 @@ pp_style_p(string s)
 /********************************************************************* MISC */
 
 text empty_text(entity __attribute__ ((unused)) e,
-		int __attribute__ ((unused)) m,
-		statement __attribute__ ((unused)) s) {
+                int __attribute__ ((unused)) m,
+                statement __attribute__ ((unused)) s) {
   return make_text(NIL);
 }
 
 static text (*text_statement_hook)(entity, int, statement) = empty_text;
 
-void init_prettyprint( hook )
-text (*hook)(entity, int, statement) ;
-{
-    /* checks that the prettyprint hook was actually reset...
-     */
-    pips_assert("prettyprint hook not set", text_statement_hook==empty_text);
-    text_statement_hook = hook ;
+
+/**
+ * @brief checks that the prettyprint hook was actually reset...
+ */
+void init_prettyprint(text(*hook)(entity, int, statement)) {
+  pips_assert("prettyprint hook not set", text_statement_hook==empty_text);
+  text_statement_hook = hook;
 }
 
-/* because some prettyprint functions may be used for debug, so
+
+/**
+ * @brief because some prettyprint functions may be used for debug, so
  * the last hook set by somebody may have stayed there although
  * being non sense...
  */
-void close_prettyprint()
-{
-    text_statement_hook = empty_text;
+void close_prettyprint() {
+  text_statement_hook = empty_text;
 }
 
-/* Can this statement be printed on one line, without enclosing braces? */
+
+/**
+ * @brief Can this statement be printed on one line, without enclosing braces?
+ */
 bool one_liner_p(statement s)
 {
   instruction i = statement_instruction(s);
@@ -366,13 +373,16 @@ bool one_liner_p(statement s)
   return yes;
 }
 
+
+
 /***************************************************local variables handling */
 
 static text local_var;
 static bool local_flg = false;
 
-/* This function either appends the declaration to the text given as a
-   parameter or return a new text with the declaration
+/**
+ *  @brief This function either appends the declaration to the text given as a
+ *  parameter or return a new text with the declaration
 */
 static text insert_locals (text r) {
   if (local_flg == true) {
@@ -387,45 +397,51 @@ static text insert_locals (text r) {
   return r;
 }
 
-/* This function returns true if BLOCK boundary markers are required.
 
-   The function also creates the maker when needed.  */
+/**
+ * @brief This function returns true if BLOCK boundary markers are required.
+ * The function also creates the maker when needed.
+ */
 static bool mark_block(unformatted *t_beg,
-		       unformatted *t_end,
-		       int n,
-		       int margin) {
+                       unformatted *t_end,
+                       int n,
+                       int margin) {
   bool result = false;
-  if (!get_bool_property("PRETTYPRINT_FOR_FORESYS")
+  if(!get_bool_property("PRETTYPRINT_FOR_FORESYS")
       && (get_bool_property("PRETTYPRINT_ALL_EFFECTS")
-	  || get_bool_property("PRETTYPRINT_BLOCKS")))
+          || get_bool_property("PRETTYPRINT_BLOCKS")))
     result = true;
-  if (result == true) {
+  if(result == true) {
     list pbeg = NIL;
     list pend = NIL;
     // Here we need to generate block markers for later use:
-    switch (language_tag (get_prettyprint_language ())) {
-    case is_language_fortran:
-      // Fortran case: comments at the begin of the line
-      pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
-      pend = CHAIN_SWORD (NIL, "END BLOCK");
-      *t_beg = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pbeg);
-      *t_end = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pend);
-      break;
-    case is_language_c:
-      // C case: comments alligned with blocks:
-      pbeg = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
-      pend = CHAIN_SWORD(NIL, strdup(PIPS_COMMENT_SENTINEL));
-      pbeg = CHAIN_SWORD (pbeg, " BEGIN BLOCK");
-      pend = CHAIN_SWORD (pend, " END BLOCK");
-      *t_beg = make_unformatted(NULL, n, margin, pbeg);
-      *t_end = make_unformatted(NULL, n, margin, pend);
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        // Fortran case: comments at the begin of the line
+        pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
+        pend = CHAIN_SWORD (NIL, "END BLOCK");
+        *t_beg = make_unformatted(strdup(get_comment_sentinel()),
+                                  n,
+                                  margin,
+                                  pbeg);
+        *t_end = make_unformatted(strdup(get_comment_sentinel()),
+                                  n,
+                                  margin,
+                                  pend);
+        break;
+      case is_language_c:
+        // C case: comments alligned with blocks:
+        pbeg = CHAIN_SWORD(NIL, strdup(get_comment_sentinel()));
+        pend = CHAIN_SWORD(NIL, strdup(get_comment_sentinel()));
+        pbeg = CHAIN_SWORD (pbeg, " BEGIN BLOCK");
+        pend = CHAIN_SWORD (pend, " END BLOCK");
+        *t_beg = make_unformatted(NULL, n, margin, pbeg);
+        *t_end = make_unformatted(NULL, n, margin, pend);
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
   }
   return result;
@@ -436,11 +452,10 @@ static bool mark_block(unformatted *t_beg,
 static int words_intrinsic_precedence(call);
 static int intrinsic_precedence(string);
 
-/* exported for craft
+/**
+ * @brief exported for craft
  */
-list
-words_loop_range(range obj, list pdl)
-{
+list words_loop_range(range obj, list pdl) {
     list pc;
     call c = syntax_call(expression_syntax(range_increment(obj)));
 
@@ -457,11 +472,12 @@ words_loop_range(range obj, list pdl)
 }
 
 
-/* Output a Fortan-like do-loop range as a C-like for-loop index part.
-   Assume that the increment is an integer so we can generate the good
-   condition. Since the do-loops are recognized in C program part only
-   with this assumptions, it is a good assumption.
-*/
+/**
+ * @brief Output a Fortan-like do-loop range as a C-like for-loop index part.
+ * @description Assume that the increment is an integer so we can generate the
+ * good condition. Since the do-loops are recognized in C program part only
+ * with this assumptions, it is a good assumption.
+ */
 list C_loop_range(range obj, entity i, list pdl)
 {
     list pc;
@@ -497,9 +513,11 @@ list C_loop_range(range obj, entity i, list pdl)
     return(pc);
 }
 
-list /* of string */
-words_range(range obj, list pdl)
-{
+
+/**
+ * @return a list of string
+ */
+list words_range(range obj, list pdl) {
     list pc = NIL ;
 
     /* if undefined I print a star, why not!? */
@@ -522,15 +540,14 @@ words_range(range obj, list pdl)
     return pc;
 }
 
+
 /* FI: array constructor R433, p. 37 in Fortran 90 standard, can
    be used anywhere in arithmetic expressions whereas the triplet
    notation is restricted to subscript expressions. The triplet
    notation is used to define array sections (see R619, p. 64).
 */
-
 list /* of string */
-words_subscript_range(range obj, list pdl)
-{
+words_subscript_range(range obj, list pdl) {
     list pc = NIL ;
 
     /* if undefined I print a star, why not!? */
@@ -561,58 +578,65 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
   string begin_attachment;
   entity e = reference_variable(obj);
 
-  /* entity_user_name() returns a shorter result than
-     entity_minimal_user_name() because the second one avoids
-     ambiguity.*/
-  //pc = CHAIN_SWORD(pc, entity_minimal_user_name(e));
-  pc = CHAIN_SWORD(pc, (*enf)(e));
 
-  begin_attachment = STRING(CAR(pc));
+  if(!ENTITY_ALLOCATABLE_BOUND_P(e)) {
+    /* We don't want to print these special entity, they are there for
+     * internal purpose only
+     */
 
-  if ( reference_indices(obj) != NIL ) {
-    switch ( language_tag (get_prettyprint_language ()) ) {
-      case is_language_fortran95:
-      case is_language_fortran: {
-        int count = 0;
-        pc = CHAIN_SWORD(pc,"(");
-        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-          syntax ssubscript = expression_syntax(subscript);
-          if ( count > 0 )
-            pc = CHAIN_SWORD(pc,",");
-          else
-            count++;
-          if ( syntax_range_p(ssubscript) ) {
-            pc = gen_nconc( pc,
-                            words_subscript_range( syntax_range(ssubscript),
-                                                   pdl ) );
-          } else {
-            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+    /* Print the entity first */
+    pc = CHAIN_SWORD(pc, (*enf)(e));
+
+    begin_attachment = STRING(CAR(pc));
+
+    /* Let's print the indices now */
+    if(reference_indices(obj) != NIL) {
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran95:
+        case is_language_fortran: {
+          int count = 0;
+          pc = CHAIN_SWORD(pc,"(");
+          FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+            syntax ssubscript = expression_syntax(subscript);
+            if(count > 0)
+              pc = CHAIN_SWORD(pc,",");
+            else
+              count++;
+            if(syntax_range_p(ssubscript)) {
+              pc = gen_nconc(pc,
+                             words_subscript_range(syntax_range(ssubscript),
+                                                   pdl));
+            } else {
+              pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+            }
           }
+          pc = CHAIN_SWORD(pc,")");
+          break;
         }
-        pc = CHAIN_SWORD(pc,")");
-        break;
-      }
-      case is_language_c: {
-        FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
-          syntax ssubscript = expression_syntax(subscript);
-          pc = CHAIN_SWORD(pc, "[");
-          if ( syntax_range_p(ssubscript) ) {
-            pc = gen_nconc( pc,
-                            words_subscript_range( syntax_range(ssubscript),
-                                                   pdl ) );
-          } else {
-            pc = gen_nconc( pc, words_subexpression( subscript, 0, TRUE, pdl ) );
+        case is_language_c: {
+          FOREACH(EXPRESSION, subscript, reference_indices(obj)) {
+            syntax ssubscript = expression_syntax(subscript);
+            pc = CHAIN_SWORD(pc, "[");
+            if(syntax_range_p(ssubscript)) {
+              pc = gen_nconc(pc,
+                             words_subscript_range(syntax_range(ssubscript),
+                                                   pdl));
+            } else {
+              pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+            }
+            pc = CHAIN_SWORD(pc, "]");
           }
-          pc = CHAIN_SWORD(pc, "]");
+          break;
         }
-        break;
+        default:
+          pips_internal_error("Language unknown !");
       }
-      default:
-        pips_assert ("This case should have been handled before", FALSE);
     }
+    attach_reference_to_word_list(begin_attachment,
+                                  STRING(CAR(gen_last(pc))),
+                                  obj);
   }
-  attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				obj);
+
 
   return(pc);
 }
@@ -664,7 +688,7 @@ text generate_alternate_return_targets()
     FOREACH(entity, le, set_of_labels_required_for_alternate_returns) {
       sentence s1 = sentence_undefined;
       string str_continue = string_undefined;
-      switch ( language_tag (get_prettyprint_language ()) ) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran95:
         case is_language_fortran:
           str_continue = CONTINUE_FUNCTION_NAME;
@@ -673,7 +697,7 @@ text generate_alternate_return_targets()
           str_continue = C_CONTINUE_FUNCTION_NAME;
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
       unformatted u1 =
@@ -712,7 +736,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
     if (type_statement_p(t))
       return (CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
     if (value_constant_p(i) || value_symbolic_p(i)) {
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           return (CHAIN_SWORD(pc, entity_user_name(f)));
@@ -725,7 +749,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           return (CHAIN_SWORD(pc, entity_user_name(f)));
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error("Language unknown !");
           break;
       }
     }
@@ -736,7 +760,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
 
   if (function_p) {
     if (is_a_subroutine) {
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
         case is_language_fortran95:
           pc = CHAIN_SWORD(pc, "CALL ");
@@ -749,7 +773,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           break;
       }
     } else {
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
           pips_user_warning("subroutine '%s' used as a function.\n",
               entity_name(f));
@@ -758,7 +782,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
           // no warning in C
           break;
         case is_language_fortran95:
-          pips_assert ("Need to update F95 case", FALSE);
+          pips_internal_error("Need to update F95 case");
           break;
         default:
           pips_internal_error("Language unknown !");
@@ -766,7 +790,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
       }
     }
   } else if (is_a_subroutine) {
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
         pips_user_warning("function '%s' used as a subroutine.\n",
@@ -878,7 +902,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
     pc = CHAIN_SWORD(pc, ")");
   }
   else if(!type_void_p(functional_result(type_functional(t))) ||
-	  !is_a_subroutine || (language_tag (get_prettyprint_language ()) == is_language_c)) {
+	  !is_a_subroutine || prettyprint_language_is_c_p()) {
     pc = CHAIN_SWORD(pc, "()");
   }
 
@@ -938,7 +962,7 @@ words_assign_op(call obj,
   pc = CHAIN_SWORD(pc, fun);
   pc = CHAIN_SWORD(pc," ");
   expression exp = expression_undefined;
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       exp = EXPRESSION(CAR(CDR(args)));
@@ -1065,7 +1089,7 @@ static string renamed_op_handling (string name) {
     result = "!=";
   else  if ( strcmp(result,C_MODULO_OPERATOR_NAME) == 0 )
     result = "%";
-  else if (language_tag (get_prettyprint_language ()) == is_language_c) {
+  else if (prettyprint_language_is_c_p()) {
     if(strcasecmp(result, GREATER_THAN_OPERATOR_NAME)==0)
       result=C_GREATER_THAN_OPERATOR_NAME;
     else if(strcasecmp(result, LESS_THAN_OPERATOR_NAME)==0)
@@ -1208,7 +1232,7 @@ static list words_nullary_op_fortran(call obj,
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
     pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
   else if (same_string_p(fname,OMP_FOR_FUNCTION_NAME))
-    pc = CHAIN_SWORD(pc, "DO");
+    pc = CHAIN_SWORD(pc, "do");
   else
     pc = CHAIN_SWORD(pc, fname);
 
@@ -1239,7 +1263,7 @@ static list words_nullary_op(call obj,
                              bool __attribute__ ((unused)) leftmost,
                              list pdl) {
   list result = NIL;
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       result = words_nullary_op_fortran(obj, precedence, leftmost, pdl);
@@ -1376,111 +1400,101 @@ words_io_inst(call obj,
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* AP: I try to convert WRITE to PRINT. Three conditions must be
-     fullfilled. The first, and obvious, one, is that the function has
-     to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
-     "UNIT" has to be equal either to "*" or "6".  In such case,
-     "WRITE(*,*)" is replaced by "PRINT *,". */
+   fullfilled. The first, and obvious, one, is that the function has
+   to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
+   "UNIT" has to be equal either to "*" or "6".  In such case,
+   "WRITE(*,*)" is replaced by "PRINT *,". */
   /* GO: Not anymore for UNIT=6 leave it ... */
-  while ((pio_write != NIL) && (!iolist_reached)) {
+  while((pio_write != NIL) && (!iolist_reached)) {
     syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
     call c;
     expression arg = EXPRESSION(CAR(CDR(pio_write)));
 
-    if (! syntax_call_p(s)) {
+    if(!syntax_call_p(s)) {
       pips_internal_error("call expected");
     }
 
     c = syntax_call(s);
-    if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
+    if(strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
       /* Avoid to use words_expression(arg) because it set some
-	 attachments and unit_words may not be used
-	 later... RK. */
+       attachments and unit_words may not be used
+       later... RK. */
       entity f;
       /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
       good_fmt = syntax_call_p(expression_syntax(arg))
-	&& value_intrinsic_p(entity_initial(f =
-					    call_function(syntax_call(expression_syntax(arg)))))
-	&& (strcmp(entity_local_name(f),
-		   LIST_DIRECTED_FORMAT_NAME)==0);
+          && value_intrinsic_p(entity_initial(f =
+                  call_function(syntax_call(expression_syntax(arg)))))
+          && (strcmp(entity_local_name(f), LIST_DIRECTED_FORMAT_NAME) == 0);
       pio_write = CDR(CDR(pio_write));
       /* To display the format later: */
       fmt_arg = arg;
-    }
-    else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
+    } else if(strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
       /* Avoid to use words_expression(arg) because it set some
-	 attachments and unit_words may not be used
-	 later... RK. */
+       attachments and unit_words may not be used
+       later... RK. */
       entity f;
       /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
       good_unit = syntax_call_p(expression_syntax(arg))
-	&& value_intrinsic_p(entity_initial(f =
-					    call_function(syntax_call(expression_syntax(arg)))))
-	&& (strcmp(entity_local_name(f),
-		   LIST_DIRECTED_FORMAT_NAME)==0);
+          && value_intrinsic_p(entity_initial(f =
+                  call_function(syntax_call(expression_syntax(arg)))))
+          && (strcmp(entity_local_name(f), LIST_DIRECTED_FORMAT_NAME) == 0);
       /* To display the unit later: */
       unit_arg = arg;
       pio_write = CDR(CDR(pio_write));
-    }
-    else if (strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME) == 0) {
+    } else if(strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME)
+        == 0) {
       iolist_reached = TRUE;
       pio_write = CDR(pio_write);
-    }
-    else {
+    } else {
       complex_io_control_list = TRUE;
       pio_write = CDR(CDR(pio_write));
     }
   }
 
-  if (good_fmt && good_unit && same_string_p(called, "WRITE"))
+  if(good_fmt && good_unit && same_string_p(called, "WRITE")) {
+    /* WRITE (*,*) -> PRINT * */
+
+    if(pio_write != NIL) /* WRITE (*,*) pio -> PRINT *, pio */
     {
-      /* WRITE (*,*) -> PRINT * */
-
-      if (pio_write != NIL)	/* WRITE (*,*) pio -> PRINT *, pio */
-	{
-	  pc = CHAIN_SWORD(pc, "PRINT *, ");
-	}
-      else			/* WRITE (*,*)  -> PRINT *  */
-	{
-	  pc = CHAIN_SWORD(pc, "PRINT * ");
-	}
-
-      pcio = pio_write;
-    }
-  else if (good_fmt && good_unit && same_string_p(called, "READ"))
+      pc = CHAIN_SWORD(pc, "PRINT *, ");
+    } else /* WRITE (*,*)  -> PRINT *  */
     {
-      /* READ (*,*) -> READ * */
-
-      if (pio_write != NIL )	/* READ (*,*) pio -> READ *, pio */
-	{
-	  switch (language_tag (get_prettyprint_language ())) {
-	  case is_language_fortran:
-	    pc = CHAIN_SWORD(pc, "READ *, ");
-	    break;
-	  case is_language_c:
-	    pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
-	    break;
-	  case is_language_fortran95:
-	    pips_assert ("Need to update F95 case", FALSE);
-	    break;
-	  default:
-      pips_internal_error("Language unknown !");
-	    break;
-	  }
-	}
-      else			/* READ (*,*)  -> READ *  */
-	{
-	  pc = CHAIN_SWORD(pc, "READ * ");
-	}
-      pcio = pio_write;
+      pc = CHAIN_SWORD(pc, "PRINT * ");
     }
-  else if (!complex_io_control_list) {
+
+    pcio = pio_write;
+  } else if(good_fmt && good_unit && same_string_p(called, "READ")) {
+    /* READ (*,*) -> READ * */
+
+    if(pio_write != NIL) /* READ (*,*) pio -> READ *, pio */
+    {
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+          pc = CHAIN_SWORD(pc, "READ *, ");
+          break;
+        case is_language_c:
+          pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
+          break;
+        case is_language_fortran95:
+          pips_internal_error("Need to update F95 case");
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
+      }
+    } else /* READ (*,*)  -> READ *  */
+    {
+      pc = CHAIN_SWORD(pc, "READ * ");
+    }
+    pcio = pio_write;
+  } else if(!complex_io_control_list) {
     list unit_words = words_expression(unit_arg, pdl);
     pips_assert("A unit must be defined", !ENDP(unit_words));
     pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
     pc = CHAIN_SWORD(pc, " (");
     pc = gen_nconc(pc, unit_words);
 
-    if (!expression_undefined_p(fmt_arg)) {
+    if(!expression_undefined_p(fmt_arg)) {
       /* There is a FORMAT: */
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
       pc = gen_nconc(pc, words_expression(fmt_arg, pdl));
@@ -1488,36 +1502,35 @@ words_io_inst(call obj,
 
     pc = CHAIN_SWORD(pc, ") ");
     pcio = pio_write;
-  }
-  else {
+  } else {
     pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
     pc = CHAIN_SWORD(pc, " (");
     /* FI: missing argument; I use "precedence" because I've no clue;
-       see LZ */
+     see LZ */
     pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost, pdl));
     pc = CHAIN_SWORD(pc, ") ");
     /*
-       free_words(fmt_words);
-    */
+     free_words(fmt_words);
+     */
   }
 
   /* because the "IOLIST=" keyword is embedded in the list
-     and because the first IOLIST= has already been skipped,
-     only odd elements are printed */
+   and because the first IOLIST= has already been skipped,
+   only odd elements are printed */
   MAPL(pp, {
-      pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp)), pdl));
-    if (CDR(pp) != NIL) {
-      POP(pp);
-      if(pp==NIL)
-	pips_internal_error("missing element in IO list");
-      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-    }
-  }, pcio);
+        pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp)), pdl));
+        if (CDR(pp) != NIL) {
+          POP(pp);
+          if(pp==NIL)
+          pips_internal_error("missing element in IO list");
+          pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+        }
+      }, pcio);
 
-  if(language_tag (get_prettyprint_language ()) == is_language_c)
+  if(prettyprint_language_is_c_p())
     pc = CHAIN_SWORD(pc, ") ");
 
-  return(pc) ;
+  return (pc);
 }
 
 
@@ -1604,7 +1617,7 @@ words_prefix_unary_op(call obj,
 
 	 But we do not want this in a lhs and espcially with a double dereferencing. */
     fun = "*";
-  else if(language_tag (get_prettyprint_language ()) == is_language_c){
+  else if(prettyprint_language_is_c_p()){
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
 	if(strcasecmp(fun, UNARY_PLUS_OPERATOR_NAME)==0) {
@@ -1710,22 +1723,22 @@ words_goto_label(string tlabel)
   if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
     pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
   } else {
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
         pc = CHAIN_SWORD(pc, strdup("GOTO "));
+        pc = CHAIN_SWORD(pc, tlabel);
         break;
       case is_language_c:
         /* In C, a label cannot begin with a number so "l" is added for this case*/
         pc = CHAIN_SWORD(pc, strdup((isdigit(tlabel[0])?"goto l":"goto ")));
+        pc = CHAIN_SWORD(pc, tlabel);
+        pc = CHAIN_SWORD(pc, C_CONTINUE_FUNCTION_NAME);
         break;
       default:
         pips_internal_error("Language unknown !");
         break;
     }
-    pc = CHAIN_SWORD(pc, tlabel);
-    if (language_tag (get_prettyprint_language ()) == is_language_c)
-      pc = CHAIN_SWORD(pc, C_CONTINUE_FUNCTION_NAME);
   }
   return pc;
 }
@@ -1949,14 +1962,24 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
 			      prec<MINIMAL_ARITHMETIC_PRECEDENCE, pdl);
   }
 
-  /* Use precedence to generate or not parentheses, unless parentheses are always required */
-  if(prec < precedence ||  !precedence_p)
+  /* Use precedence to generate or not parentheses,
+   * unless parentheses are always required */
+  if(prec < precedence ||  !precedence_p) {
     pc = CHAIN_SWORD(pc, "(");
-  pc = gen_nconc(pc, we1);
-  pc = CHAIN_SWORD(pc, strdup(fun));
-  pc = gen_nconc(pc, we2);
-  if(prec < precedence || !precedence_p)
+  }
+
+  if(prettyprint_language_is_fortran95_p()
+      && strcmp(fun, FIELD_OPERATOR_NAME) == 0) {
+    pc = gen_nconc(pc, we1);
+  } else {
+    pc = gen_nconc(pc, we1);
+    pc = CHAIN_SWORD(pc, strdup(fun));
+    pc = gen_nconc(pc, we2);
+  }
+
+  if(prec < precedence || !precedence_p) {
     pc = CHAIN_SWORD(pc, ")");
+  }
 
   return(pc);
 }
@@ -2560,7 +2583,7 @@ loop_private_variables(loop obj, list pdl)
     if (hpf_private) {
     private = "NEW(";
     } else if (omp_private) {
-      switch(language_tag (get_prettyprint_language ())) {
+      switch (get_prettyprint_language_tag()) {
         case is_language_fortran:
         private = "PRIVATE(";
           break;
@@ -2597,9 +2620,10 @@ marged(
     int len = strlen(prefix), i;
     string result = (string) malloc(strlen(prefix)+margin+1);
     strcpy(result, prefix);
-    if(language_tag (get_prettyprint_language ()) == is_language_fortran) {
-      for (i=len; margin-->0;)
-	result[i++] = ' '; result[i]='\0';
+    if(prettyprint_language_is_fortran_p()) {
+      for (i=len; margin-->0;) {
+        result[i++] = ' '; result[i]='\0';
+      }
     }
     return result;
 }
@@ -2633,7 +2657,7 @@ static text text_directive(loop obj, /* the loop we're interested in */
     if (l) {
       add_to_current_line(buffer, dir, cont, t);
       if (is_omp) {
-        switch(language_tag (get_prettyprint_language ())) {
+        switch (get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             add_to_current_line(buffer, "DO ", cont, t);
@@ -2689,22 +2713,30 @@ text_omp_directive(loop l, int m)
   list pdl = NIL; // pdl is useless in Fortran
   text t = text_undefined;
 
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-  case is_language_fortran95:
-    t = text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
-		       OMP_PARALLELDO, pdl);
-    break;
-  case is_language_c:
-    // text_directive function takes care of private variables
-    // More should be done to take care of shared variables, reductions
-    // and other specific omp clause like lastprivate, copyin ...
-    t = text_directive(l, m, OMP_C_DIRECTIVE, OMP_C_CONTINUATION,
-		       OMP_C_PARALLELDO, pdl);
-    break;
-  default:
-    pips_internal_error("Language unknown !");
-    break;
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      t = text_directive(l,
+                         m,
+                         "\n" OMP_DIRECTIVE,
+                         OMP_CONTINUATION,
+                         OMP_PARALLELDO,
+                         pdl);
+      break;
+    case is_language_c:
+      // text_directive function takes care of private variables
+      // More should be done to take care of shared variables, reductions
+      // and other specific omp clause like lastprivate, copyin ...
+      t = text_directive(l,
+                         m,
+                         OMP_C_DIRECTIVE,
+                         OMP_C_CONTINUATION,
+                         OMP_C_PARALLELDO,
+                         pdl);
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
   return t;
 }
@@ -2744,7 +2776,7 @@ text text_loop_default(entity module,
 
   /* LOOP prologue.
    */
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
@@ -2764,7 +2796,7 @@ text text_loop_default(entity module,
   pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
   pc = CHAIN_SWORD(pc, " = ");
 
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       pc = gen_nconc(pc, words_loop_range(loop_range(obj), pdl));
@@ -2828,7 +2860,7 @@ text text_loop_default(entity module,
 
   /* LOOP postlogue
    */
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       if (structured_do || doall_loop_p || do_enddo_p || pp_cray_style_p()
@@ -2927,119 +2959,110 @@ text text_loop(
   return r;
 }
 
-static text text_whileloop(
-    entity module,
-    string label,
-    int margin,
-    whileloop obj,
-    int n,
-    list pdl)
-{
-    list pc = NIL;
-    sentence first_sentence;
-    unformatted u;
-    text r = make_text(NIL);
-    statement body = whileloop_body( obj ) ;
-    entity the_label = whileloop_label(obj);
-    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = entity_empty_label_p(the_label);
-    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+static text text_whileloop(entity module,
+                           string label,
+                           int margin,
+                           whileloop obj,
+                           int n,
+                           list pdl) {
+  list pc = NIL;
+  sentence first_sentence;
+  unformatted u;
+  text r = make_text(NIL);
+  statement body = whileloop_body( obj );
+  entity the_label = whileloop_label(obj);
+  string do_label = entity_local_name(the_label) + strlen(LABEL_PREFIX);
+  bool structured_do = entity_empty_label_p(the_label);
+  bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
-    evaluation eval = whileloop_evaluation(obj);
+  evaluation eval = whileloop_evaluation(obj);
 
-    /* Show the initial label of the loop to name it...
-     * FI: I believe this is useless for while loops since they cannot
-     * be parallelized.
-     */
-    if(!structured_do && do_enddo_p)
-    {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
+  /* Show the initial label of the loop to name it...
+   * FI: I believe this is useless for while loops since they cannot
+   * be parallelized.
+   */
+  if(!structured_do && do_enddo_p) {
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+            strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
+  }
+
+  if(evaluation_before_p(eval)) {
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        /* LOOP prologue.
+         */
+        pc = CHAIN_SWORD(NIL, "DO " );
+
+        if(!structured_do && !do_enddo_p) {
+          pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
+        }
+        pc = CHAIN_SWORD(pc, "WHILE (");
+        pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+        pc = CHAIN_SWORD(pc, ")");
+        u = make_unformatted(strdup(label), n, margin, pc);
+        ADD_SENTENCE_TO_TEXT(r, first_sentence =
+            make_sentence(is_sentence_unformatted, u));
+
+        /* loop BODY
+         */
+        MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
+
+        /* LOOP postlogue
+         */
+        if(structured_do) {
+          ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
+        }
+        break;
+      case is_language_c:
+        if(one_liner_p(body)) {
+          pc = CHAIN_SWORD(NIL,"while (");
+          pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+          pc = CHAIN_SWORD(pc,") ");
+          u = make_unformatted(strdup(label), n, margin, pc);
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+          MERGE_TEXTS(r, text_statement_enclosed(module,
+                  margin+INDENTATION,
+                  body,
+                  !one_liner_p(body),
+                  !one_liner_p(body),
+                  pdl));
+
+          //if (structured_do)
+          //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+        } else {
+          pc = CHAIN_SWORD(NIL,"while (");
+          pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+          pc = CHAIN_SWORD(pc,") {");
+          u = make_unformatted(strdup(label), n, margin, pc);
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+          MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
+          if(structured_do)
+            ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+        }
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
+  } else {
+    pips_assert ("Only C language is managed here",
+                 prettyprint_language_is_c_p());
+    /* C do { s; } while (cond); loop*/
+    pc = CHAIN_SWORD(NIL,"do {");
+    u = make_unformatted(strdup(label), n, margin, pc);
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+    pc = CHAIN_SWORD(NIL,"while (");
+    pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+    pc = CHAIN_SWORD(pc, ");");
+    u = make_unformatted(NULL, n, margin, pc);
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+  }
 
-    if (evaluation_before_p(eval))
-      {
-	switch (language_tag (get_prettyprint_language ())) {
-	case is_language_fortran:
-	  /* LOOP prologue.
-	   */
-	  pc = CHAIN_SWORD(NIL, "DO " );
-
-	  if(!structured_do && !do_enddo_p) {
-	    pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
-	  }
-	  pc = CHAIN_SWORD(pc, "WHILE (");
-	  pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	  pc = CHAIN_SWORD(pc, ")");
-	  u = make_unformatted(strdup(label), n, margin, pc) ;
-	  ADD_SENTENCE_TO_TEXT(r, first_sentence =
-			       make_sentence(is_sentence_unformatted, u));
-
-	  /* loop BODY
-	   */
-	  MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
-
-	  /* LOOP postlogue
-	   */
-	  if (structured_do) {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
-	  }
-	  break;
-	case is_language_c:
-	  if(one_liner_p(body)) {
-	    pc = CHAIN_SWORD(NIL,"while (");
-	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	    pc = CHAIN_SWORD(pc,") ");
-	    u = make_unformatted(strdup(label), n, margin, pc) ;
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	    MERGE_TEXTS(r, text_statement_enclosed(module,
-						   margin+INDENTATION,
-						   body,
-						   !one_liner_p(body),
-						   !one_liner_p(body),
-						   pdl));
-
-	    //if (structured_do)
-	    //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	  }
-	  else {
-	    pc = CHAIN_SWORD(NIL,"while (");
-	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	    pc = CHAIN_SWORD(pc,") {");
-	    u = make_unformatted(strdup(label), n, margin, pc) ;
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
-	    if (structured_do)
-	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	  }
-	  break;
-	case is_language_fortran95:
-	  pips_assert ("Need to update F95 case", FALSE);
-	  break;
-	default:
-	  pips_assert ("This case should have been handled before", FALSE);
-	  break;
-	}
-      }
-    else
-      {
-	pips_assert ("Only C language is managed here",
-		     language_tag (get_prettyprint_language ()) == is_language_c);
-	/* C do { s; } while (cond); loop*/
-	pc = CHAIN_SWORD(NIL,"do {");
-	u = make_unformatted(strdup(label), n, margin, pc) ;
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	pc = CHAIN_SWORD(NIL,"while (");
-	pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	pc = CHAIN_SWORD(pc, ");");
-	u = make_unformatted(NULL, n, margin, pc) ;
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-      }
-
-    /* attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj); */
-    return r;
+  /* attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj); */
+  return r;
 }
 
 /* exported for unstructured.c
@@ -3075,11 +3098,11 @@ init_text_statement(
 	if (!(instruction_block_p(statement_instruction(obj)) &&
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
 	  if (so != STATEMENT_ORDERING_UNDEFINED)
-	    asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
+	    asprintf(&buffer, "%s (%d,%d)\n", get_comment_sentinel(),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 	  else
 	    asprintf(&buffer, "%s (statement ordering unavailable)\n",
-		     PIPS_COMMENT_SENTINEL);
+	             get_comment_sentinel());
 	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						buffer));
 	}
@@ -3087,32 +3110,27 @@ init_text_statement(
     return( r ) ;
 }
 
-static text
-text_logical_if(
-    entity __attribute__ ((unused)) module,
-    string label,
-    int margin,
-    test obj,
-    int n,
-    list pdl)
-{
+static text text_logical_if(entity __attribute__ ((unused)) module,
+                            string label,
+                            int margin,
+                            test obj,
+                            int n,
+                            list pdl) {
   text r = make_text(NIL);
   list pc = NIL;
   statement tb = test_true(obj);
 
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-    pc = CHAIN_SWORD(pc, strdup("IF ("));
-    break;
-  case is_language_c:
-    pc = CHAIN_SWORD(pc, strdup("if ("));
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, strdup("IF ("));
+      break;
+    case is_language_c:
+      pc = CHAIN_SWORD(pc, strdup("if ("));
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
 
   pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
@@ -3120,60 +3138,57 @@ text_logical_if(
   instruction ti = instruction_undefined;
   call c = call_undefined;
   text t = text_undefined;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-    ti = statement_instruction(tb);
-    c = instruction_call(ti);
-    pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
-    ADD_SENTENCE_TO_TEXT(r,
-			 make_sentence(is_sentence_unformatted,
-				       make_unformatted(strdup(label), n,
-							margin, pc)));
-    break;
-  case is_language_c:
-    t = text_statement(module, margin+INDENTATION, tb, pdl);
-    ADD_SENTENCE_TO_TEXT(r,
-			 make_sentence(is_sentence_unformatted,
-				       make_unformatted(strdup(label), n,
-							margin, pc)));
-    text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
-    text_sentences(t) = NIL;
-    free_text(t);
-    break;
-  case is_language_fortran95:
-    pips_assert ("Need to update F95 case", FALSE);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+  switch (get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      ti = statement_instruction(tb);
+      c = instruction_call(ti);
+      pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
+      ADD_SENTENCE_TO_TEXT(r,
+          make_sentence(is_sentence_unformatted,
+              make_unformatted(strdup(label), n,
+                  margin, pc)));
+      break;
+    case is_language_c:
+      t = text_statement(module, margin + INDENTATION, tb, pdl);
+      ADD_SENTENCE_TO_TEXT(r,
+          make_sentence(is_sentence_unformatted,
+              make_unformatted(strdup(label), n,
+                  margin, pc)));
+      text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
+      text_sentences(t) = NIL;
+      free_text(t);
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
 
-  ifdebug(8){
-    fprintf(stderr,"logical_if=================================\n");
-    print_text(stderr,r);
-    fprintf(stderr,"==============================\n");
+  ifdebug(8) {
+    fprintf(stderr, "logical_if=================================\n");
+    print_text(stderr, r);
+    fprintf(stderr, "==============================\n");
   }
-  return(r);
+  return (r);
 }
 
-static text
-text_block_if(
-    entity module,
-    string label,
-    int margin,
-    test obj,
-    int n,
-    list pdl)
-{
-    text r = make_text(NIL);
-    list pc = NIL;
-    statement test_false_obj;
-    bool one_liner_true_statement = one_liner_p(test_true(obj));
-    bool one_liner_false_statement = one_liner_p(test_false(obj));
-    bool else_branch_p = FALSE; /* The else branch must be printed */
 
-    switch (language_tag (get_prettyprint_language ())) {
+static text text_block_if(entity module,
+                          string label,
+                          int margin,
+                          test obj,
+                          int n,
+                          list pdl) {
+  text r = make_text(NIL);
+  list pc = NIL;
+  statement test_false_obj;
+  bool one_liner_true_statement = one_liner_p(test_true(obj));
+  bool one_liner_false_statement = one_liner_p(test_false(obj));
+  bool else_branch_p = FALSE; /* The else branch must be printed */
+
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       pc = CHAIN_SWORD(pc, "IF (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
       pc = CHAIN_SWORD(pc, ") THEN");
@@ -3181,96 +3196,82 @@ text_block_if(
     case is_language_c:
       pc = CHAIN_SWORD(pc, "if (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-      if(one_liner_true_statement){
-	pc = CHAIN_SWORD(pc, ")");
-      }
-      else
-	pc = CHAIN_SWORD(pc, ") {");
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
+      if(one_liner_true_statement) {
+        pc = CHAIN_SWORD(pc, ")");
+      } else
+        pc = CHAIN_SWORD(pc, ") {");
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
+  }
+
+  ADD_SENTENCE_TO_TEXT(r,
+      make_sentence(is_sentence_unformatted,
+          make_unformatted(strdup(label), n,
+              margin, pc)));
+  MERGE_TEXTS(r, text_statement_enclosed(module,
+          margin+INDENTATION,
+          test_true(obj),
+          !one_liner_true_statement,
+          !one_liner_true_statement,
+          pdl));
+
+  test_false_obj = test_false(obj);
+  if(statement_undefined_p(test_false_obj)) {
+    pips_error("text_test", "undefined statement\n");
+  }
+  if(!statement_with_empty_comment_p(test_false_obj)
+      || (!empty_statement_p(test_false_obj)
+          && !continue_statement_p(test_false_obj))
+      || (empty_statement_p(test_false_obj)
+          && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
+      || (continue_statement_p(test_false_obj)
+          && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
+    else_branch_p = TRUE;
+    switch (get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+        break;
+      case is_language_c:
+        if(!one_liner_true_statement)
+          ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+        if(one_liner_false_statement) {
+          ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
+        } else {
+          ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
+        }
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
-
-
-    ADD_SENTENCE_TO_TEXT(r,
-			 make_sentence(is_sentence_unformatted,
-				       make_unformatted(strdup(label), n,
-							margin, pc)));
-    MERGE_TEXTS(r, text_statement_enclosed(module,
-					   margin+INDENTATION,
-					   test_true(obj),
-					   !one_liner_true_statement,
-					   !one_liner_true_statement,
-					   pdl));
-
-    test_false_obj = test_false(obj);
-    if(statement_undefined_p(test_false_obj)){
-	pips_error("text_test","undefined statement\n");
-    }
-    if (!statement_with_empty_comment_p(test_false_obj)
-	||
-	(!empty_statement_p(test_false_obj)
-	 && !continue_statement_p(test_false_obj))
-	||
-	(empty_statement_p(test_false_obj)
-	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
-	||
-	(continue_statement_p(test_false_obj)
-	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
-      {
-	else_branch_p = TRUE;
-	switch (language_tag (get_prettyprint_language ())) {
-	case is_language_fortran:
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	  break;
-	case is_language_c:
-	  if(!one_liner_true_statement)
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	  if(one_liner_false_statement) {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
-	  }
-	  else {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
-	  }
-	  break;
-	case is_language_fortran95:
-	  pips_assert ("Need to update F95 case", FALSE);
-	  break;
-	default:
-	  pips_assert ("This case should have been handled before", FALSE);
-	  break;
-	}
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
-				      test_false_obj, pdl));
-      }
-    switch (language_tag (get_prettyprint_language ())) {
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
+            test_false_obj, pdl));
+  }
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
+    case is_language_fortran95:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")));
       break;
     case is_language_c:
-      if((!else_branch_p && !one_liner_true_statement)
-	 || (else_branch_p && !one_liner_false_statement))
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
+      if((!else_branch_p && !one_liner_true_statement) || (else_branch_p
+          && !one_liner_false_statement))
+        ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
-    }
+  }
 
-    ifdebug(8){
-      fprintf(stderr,"text_block_if=================================\n");
-      print_text(stderr,r);
-      fprintf(stderr,"==============================\n");
-    }
+  ifdebug(8) {
+    fprintf(stderr, "text_block_if=================================\n");
+    print_text(stderr, r);
+    fprintf(stderr, "==============================\n");
+  }
 
-    return(r);
+  return (r);
 }
 
 
@@ -3298,7 +3299,7 @@ static text text_io_block_if(entity module,
     MERGE_TEXTS(r, text_statement(module, margin,
             test_true(obj), pdl));
     string str = string_undefined;
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
         str = strdup(CONTINUE_FUNCTION_NAME);
         break;
@@ -3306,7 +3307,7 @@ static text text_io_block_if(entity module,
         str = strdup(C_CONTINUE_FUNCTION_NAME);
         break;
       case is_language_fortran95:
-        pips_assert ("Need to update F95 case", FALSE);
+        pips_internal_error("Need to update F95 case");
         break;
       default:
         pips_internal_error("Language unknown !");
@@ -3336,7 +3337,7 @@ static text text_block_ifthen(entity module,
   list pc = NIL;
   statement tb = test_true(obj);
 
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       pc = CHAIN_SWORD(pc, "IF (");
@@ -3363,7 +3364,7 @@ static text text_block_ifthen(entity module,
           !one_liner_p(tb),
           !one_liner_p(tb),
           pdl));
-  if ((language_tag (get_prettyprint_language ()) == is_language_c)
+  if (prettyprint_language_is_c_p()
       && !one_liner_p(tb))
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
   return (r);
@@ -3383,7 +3384,7 @@ static text text_block_else(entity module,
       && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
       || (continue_statement_p(stmt)
           && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
         ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ELSE"));
@@ -3425,7 +3426,7 @@ static text text_block_elseif(entity module,
   statement tb = test_true(obj);
   statement fb = test_false(obj);
 
-  switch(language_tag (get_prettyprint_language ())) {
+  switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       pc = CHAIN_SWORD(pc, strdup("ELSEIF ("));
@@ -3454,7 +3455,7 @@ static text text_block_elseif(entity module,
           !one_liner_p(tb),
           pdl));
 
-  if ((language_tag (get_prettyprint_language ()) == is_language_c)
+  if (prettyprint_language_is_c_p()
       && !one_liner_p(tb)) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, strdup("}")));
   }
@@ -3509,7 +3510,7 @@ static text text_test(entity module,
             label_local_name(statement_label(fb)),
             margin, statement_test(fb), n, pdl));
 
-    switch(language_tag (get_prettyprint_language ())) {
+    switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
         ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
@@ -3591,13 +3592,13 @@ static text text_instruction(entity module,
        caller, text_statement_enclosed(); but apparently not in
        Fortran. Also, the source code may be in Fortran, but the
        user wants it prettyprinted as C. */
-      if ((language_tag (get_prettyprint_language ()) == is_language_fortran) /* fortran_module_p(module)*/
+      if (prettyprint_language_is_fortran_p()
       && instruction_continue_p(obj) && empty_string_p(label)
           && !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
         pips_debug(5, "useless Fortran CONTINUE not printed\n");
         r = make_text(NIL);
       } else {
-        switch(language_tag (get_prettyprint_language ())) {
+        switch (get_prettyprint_language_tag()) {
           case is_language_fortran:
           case is_language_fortran95:
             u = make_unformatted(strdup(label),
@@ -3929,7 +3930,7 @@ text text_statement_enclosed(entity module,
    */
   list dl = statement_declarations(stmt);
 
-  if (!ENDP(dl) && (language_tag (get_prettyprint_language ()) == is_language_c)) {
+  if (!ENDP(dl) && prettyprint_language_is_c_p()) {
     if(statement_block_p(stmt)) {
       if(!braces_p) {
 	braces_added = TRUE;
@@ -3997,7 +3998,7 @@ text text_statement_enclosed(entity module,
 	string cs = statement_comments(stmt);
 	entity l = statement_label(stmt);
 
-	if((language_tag (get_prettyprint_language ()) == is_language_c)
+	if(prettyprint_language_is_c_p()
 	   && (braces_p || drop_continue_p)
 	   && empty_label_p(entity_local_name(l))
 	   && instruction_continue_p(i)) {
@@ -4036,21 +4037,19 @@ text text_statement_enclosed(entity module,
     MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     if (! empty_comments_p(comments)) {
       text ct = text_undefined;
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-					      strdup(comments)));
-	break;
-      case is_language_c:
-	ct = C_comment_to_text(nmargin, comments);
-	MERGE_TEXTS(r, ct);
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+                  strdup(comments)));
+          break;
+        case is_language_c:
+          ct = C_comment_to_text(nmargin, comments);
+          MERGE_TEXTS(r, ct);
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
       }
     }
     MERGE_TEXTS(r, temp);
@@ -4059,25 +4058,23 @@ text text_statement_enclosed(entity module,
     /* Preserve comments and empty C instruction */
     if (! empty_comments_p(comments)) {
       text ct = text_undefined;
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-					      strdup(comments)));
-	break;
-      case is_language_c:
-	ct = C_comment_to_text(nmargin, comments);
-	MERGE_TEXTS(r, ct);
-	MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+      switch (get_prettyprint_language_tag()) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+                  strdup(comments)));
+          break;
+        case is_language_c:
+          ct = C_comment_to_text(nmargin, comments);
+          MERGE_TEXTS(r, ct);
+          MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
       }
     }
-    else if((language_tag (get_prettyprint_language ()) == is_language_c) &&
+    else if(prettyprint_language_is_c_p() &&
 	    !braces_p && !braces_added &&ENDP(dl)) {
       // Because C braces can be eliminated and hence semi-colon
       // may be mandatory in a test branch or in a loop body.
@@ -4212,18 +4209,18 @@ find_last_statement(statement s)
     if(!(statement_undefined_p(last)
 	 || !statement_sequence_p(s)
 	 || return_statement_p(last))) {
-      switch (language_tag (get_prettyprint_language ())) {
+      switch(get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
-	  pips_user_warning("Last statement is not a RETURN!\n");
-	  break;
+        pips_user_warning("Last statement is not a RETURN!\n");
+        break;
       case is_language_c:
-	/* No warning needed for C, is it right for C ?*/
-	break;
+        /* No warning needed for C, is it right for C ?*/
+        break;
       default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
-      }
+        pips_internal_error("Language unknown !");
+        break;
+    }
       last = statement_undefined;
     }
 
@@ -4285,59 +4282,55 @@ text text_named_module(
 
   precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
   list l = NIL;
-  switch (language_tag (get_prettyprint_language ())) {
-  case is_language_fortran:
-  case is_language_fortran95:
-    if ( strcmp(s,"") == 0
-	 || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
-      {
-	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
-	  /* Add the original header comments if any: */
-	  ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      if(strcmp(s, "") == 0
+          || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS")) {
+        if(get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+          /* Add the original header comments if any: */
+          ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 
-	ADD_SENTENCE_TO_TEXT(r,
-			     attach_head_to_sentence(sentence_head(name, NIL), module));
-	if (head_hook)
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-						head_hook(module)));
+        ADD_SENTENCE_TO_TEXT(r,
+            attach_head_to_sentence(sentence_head(name, NIL), module));
+        if(head_hook)
+          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+                  head_hook(module)));
 
-	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
-	  /* Add the original header comments if any: */
-	  ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
+        if(get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+          /* Add the original header comments if any: */
+          ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
 
-	MERGE_TEXTS(r, text_declaration(module));
-	MERGE_TEXTS(r, text_initializations(module));
+        MERGE_TEXTS(r, text_declaration(module));
+        MERGE_TEXTS(r, text_initializations(module));
+      } else {
+        ADD_SENTENCE_TO_TEXT(r,
+            attach_head_to_sentence(make_sentence(is_sentence_formatted,
+                    strdup(s)),
+                module));
       }
-    else
-      {
-	ADD_SENTENCE_TO_TEXT(r,
-			     attach_head_to_sentence(make_sentence(is_sentence_formatted,
-								   strdup(s)),
-						     module));
-      }
-    break;
-  case is_language_c:
+      break;
+    case is_language_c:
       /* C prettyprinter */
       pips_debug(3,"Prettyprint function %s\n",entity_name(name));
-      if (!compilation_unit_p(entity_name(name)))
-	{
-	  //entity cu = module_entity_to_compilation_unit_entity(module);
-	  //list pdl = code_declarations(value_code(entity_initial(cu))));
-	  /* Print function header if the current module is not a compilation unit*/
-	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name, NIL), module));
-	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
-	  /* get the declarations for Fortran codes prettyrinted as C,
-	     as the declarations are not located in the module
-	     statement. A.Mensi */
-	  if(ENDP(statement_declarations(stat)) && fortran_module_p(module)) {
-	    l = code_declarations(value_code(entity_initial(module)));
-	    MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION, NIL));
-	  }
-	}
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+      if(!compilation_unit_p(entity_name(name))) {
+        //entity cu = module_entity_to_compilation_unit_entity(module);
+        //list pdl = code_declarations(value_code(entity_initial(cu))));
+        /* Print function header if the current module is not a compilation unit*/
+        ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name, NIL), module));
+        ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
+        /* get the declarations for Fortran codes prettyrinted as C,
+         as the declarations are not located in the module
+         statement. A.Mensi */
+        if(ENDP(statement_declarations(stat)) && fortran_module_p(module)) {
+          l = code_declarations(value_code(entity_initial(module)));
+          MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION, NIL));
+        }
+      }
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
   }
 
   set_alternate_return_set();
@@ -4347,20 +4340,23 @@ text text_named_module(
     /* FI: This function should not be used here because it is part of
        the preprocessor library... */
     //entity cu = module_entity_to_compilation_unit_entity(module);
-    switch (language_tag (get_prettyprint_language ())) {
-    case is_language_fortran:
-    case is_language_fortran95:
-      MERGE_TEXTS(r, text_statement(module, 0, stat, NIL));
-      break;
-    case is_language_c:
-      MERGE_TEXTS(r,
-		  text_statement(module,
-				 (compilation_unit_p(entity_name(name)))?0:INDENTATION,
-				 stat, NIL));
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        MERGE_TEXTS(r, text_statement(module,
+                                      get_prettyprint_indentation(),
+                                      stat,
+                                      NIL));
+        break;
+      case is_language_c:
+        MERGE_TEXTS(r,
+            text_statement(module,
+                (compilation_unit_p(entity_name(name)))?0:INDENTATION,
+                stat, NIL));
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
   }
 
@@ -4368,11 +4364,11 @@ text text_named_module(
   reset_alternate_return_set();
   MERGE_TEXTS(r, ral);
 
-  if (!compilation_unit_p(entity_name(name)) || (language_tag (get_prettyprint_language ()) == is_language_fortran))
-    {
-      /* No need to print TAIL (}) if the current module is a C compilation unit*/
-      ADD_SENTENCE_TO_TEXT(r, sentence_tail(module));
-    }
+  if(!compilation_unit_p(entity_name(name))
+      || prettyprint_language_is_fortran_p()) {
+    /* No need to print TAIL (}) if the current module is a C compilation unit*/
+    ADD_SENTENCE_TO_TEXT(r, sentence_tail(module));
+  }
 
   if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
     reset_last_statement();
@@ -4381,11 +4377,9 @@ text text_named_module(
   return(r);
 }
 
-text text_module(
-    entity module,
-    statement stat)
-{
-    return text_named_module(module, module, stat);
+
+text text_module(entity module, statement stat) {
+  return text_named_module(module, module, stat);
 }
 
 text text_graph(), text_control() ;
@@ -4594,32 +4588,79 @@ static list words_subscript(subscript s, list pdl)
   expression a = subscript_array(s);
   list lexp = subscript_indices(s);
   bool first = TRUE;
-  /* Parentheses must be added for array expression like __ctype+1 in (__ctype+1)[*np]*/
-  pc = CHAIN_SWORD(pc,"(");
-  pc = gen_nconc(pc, words_expression(a, pdl));
-  pc = CHAIN_SWORD(pc,")[");
-  MAP(EXPRESSION,exp,
-  {
-    if (!first) {
-      switch (language_tag (get_prettyprint_language ())) {
-      case is_language_fortran:
-	pc = CHAIN_SWORD(pc, ",");
-	break;
-      case is_language_c:
-	pc = CHAIN_SWORD(pc,"][");
-	break;
-      case is_language_fortran95:
-	pips_assert ("Need to update F95 case", FALSE);
-	break;
-      default:
-	pips_assert ("This case should have been handled before", FALSE);
-	break;
+
+  /* Parentheses must be added for array expression
+   * like __ctype+1 in (__ctype+1)[*np]
+   */
+
+  /* Here we differentiate the indices parenthesis syntax */
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+      pips_internal_error("We don't know how to prettyprint a subscript in "
+          "Fortran, aborting");
+    case is_language_fortran95: {
+      bool allocatable_p = expression_allocatable_data_access_p(a);
+      pips_assert("We don't know how to prettyprint a subscript in Fortran95 "
+          "and it's not an allocatable",
+          allocatable_p );
+      pc = gen_nconc(pc, words_expression(a, pdl));
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"(");
+      }
+      break;
+    }
+    case is_language_c:
+      pc = CHAIN_SWORD(pc,"(");
+      pc = gen_nconc(pc, words_expression(a, pdl));
+      pc = CHAIN_SWORD(pc,")");
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"[");
+      }
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
+
+  /* Print now the indices list */
+  FOREACH(expression,exp,lexp) {
+    if(!first) {
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          pc = CHAIN_SWORD(pc, ",");
+          break;
+        case is_language_c:
+          pc = CHAIN_SWORD(pc,"][");
+          break;
+        default:
+          pips_internal_error("Language unknown !");
+          break;
       }
     }
     pc = gen_nconc(pc, words_expression(exp, pdl));
     first = FALSE;
-  },lexp);
-  pc = CHAIN_SWORD(pc,"]");
+  }
+
+  /* Here we differentiate the indices syntax */
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,")");
+      }
+      break;
+    case is_language_c:
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"]");
+      }
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
+
+
   return pc;
 }
 

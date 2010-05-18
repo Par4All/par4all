@@ -46,7 +46,6 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "makefile.h"
 #include "database.h"
 
 #include "misc.h"

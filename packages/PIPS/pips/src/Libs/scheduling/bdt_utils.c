@@ -54,7 +54,6 @@
 #include "complexity_ri.h"
 #include "database.h"
 #include "dg.h"
-#include "makefile.h"
 #include "parser_private.h"
 #include "property.h"
 #include "reduction.h"

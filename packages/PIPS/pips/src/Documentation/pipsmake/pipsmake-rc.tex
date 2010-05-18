@@ -5021,6 +5021,30 @@ internalize_parallel_code             > MODULE.code
         < MODULE.parallelized_code
 \end{PipsMake}
 
+\subsection{Manage Parallel Loops}
+\label{sec:manage-parallel-loops}
+
+\begin{PipsPass}{manage_nested_parallelism}
+The following transformation works on the parallel information available
+in the sequential code. The transformation will limit the number of nested
+parallel loops to a given value.
+It might be interesting to use the phase
+internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
+manage\_nested\_parallelism in order to maximize the number of parallel
+information available.
+\end{PipsPass}
+
+\begin{PipsMake}
+manage_nested_parallelism          > MODULE.code
+        < MODULE.code
+\end{PipsMake}
+
+PIPS relies on the property NESTED\_PARALLELISM\_THRESHOLD to determine the
+number of nested parallelism to generate.
+\begin{PipsProp}{OMP_MERGE_POLICY}
+NESTED_PARALLELISM_THRESHOLD 0
+\end{PipsProp}
+
 
 \subsection{Allen \& Kennedy's Parallelization Algorithm}
 \label{subsubsection-allen-kennedy-parallelization-algorithm}
@@ -5211,6 +5235,10 @@ The name of the variable holding constants can be set using \PipsPropRef{GROUP_C
 GROUP_CONSTANTS_HOLDER "caillou"
 \end{PipsProp}
 
+You may want to skip loop bounds from the grouping
+\begin{PipsProp}{GROUP_CONSTANTS_SKIP_LOOP_RANGE}
+GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
+\end{PipsProp}
 
 
 
@@ -5224,6 +5252,19 @@ normalize_microcode				> MODULE.code
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
+\begin{PipsPass}{terapix_remove_divide}
+ converts divide operator into multiply operator using formula
+  $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
+\end{PipsPass}
+\begin{PipsMake}
+terapix_remove_divide > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+Use this property for accuracy of divide to multiply conversion.
+\begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
+TERAPIX_REMOVE_DIVIDE_ACCURACY 4
+\end{PipsProp}
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
@@ -8173,14 +8214,18 @@ call sites of the inlined function are inlined.
 \begin{PipsMake}
 
 inlining      > CALLERS.parsed_code
-		! MODULE.split_Initializations
+		! MODULE.split_initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
 		< MODULE.code
         < MODULE.cumulated_effects
-        < MODULE.callers
 \end{PipsMake}
+
+Use following property to control how generated variables are initialized
+\begin{PipsProp}{INLINING_USE_INITIALIZATION_LIST}
+INLINING_USE_INITIALIZATION_LIST TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{inlining_simple}
 Same as inlining but always simulate the by-copy argument passing
@@ -8226,6 +8271,8 @@ INLINING_PURGE_LABELS TRUE
   sites to a given module in other modules, unfolding inlines
   recursively all call sites in a given module, thus unfolding the
   content of the module. An unfolded source code does not contain
+  any call anymore.
+  If you run it recursievly, you should set \PipsPropRef{INLINING_USE_INITIALIZATION_LIST} to false.
 \end{PipsPass}
 \begin{PipsMake}
 
@@ -9479,9 +9526,52 @@ omp_loop_parallel_threshold_set             > MODULE.code
 \end{PipsMake}
 
 The OMP\_LOOP\_PARALLEL\_THRESHOLD\_VALUE property , is used as a parameter by the
-PIPS phase OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET.
-\begin{PipsProp}{OMP_LOOP_PARALLEL_THRESHOLD_VALUE} 
+PIPS phase OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. The number of iteration of the
+parallel loop will be compared to that value in an omp if clause. The OpenMP
+run time will decide dynamicaly to parallelize the loop if the number of
+iteration is above this threshold.
+\begin{PipsProp}{OMP_LOOP_PARALLEL_THRESHOLD_VALUE}
 OMP_LOOP_PARALLEL_THRESHOLD_VALUE 0
+\end{PipsProp}
+
+The OMP\_IF\_CLAUSE\_RECURSIVE property , is used as a parameter by the
+PIPS phase OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. If set to TRUE the number
+of iterations of the inner loops will be used to test if the threshold is
+reached. Otherwise only the nunber of iteration of the processed loop will be
+used.
+\begin{PipsProp}{OMP_LOOP_PARALLEL_THRESHOLD_VALUE}
+OMP_IF_CLAUSE_RECURSIVE TRUE
+\end{PipsProp}
+
+\begin{PipsPass}{omp_merge_pragma}
+Compiler tends to produce many parallel loops whcih is genrally not optimal for
+performance. The following transformation merges nested omp pragma in a unique
+omp pragma.
+\end{PipsPass}
+
+\begin{PipsMake}
+omp_merge_pragma             > MODULE.code
+        < MODULE.cumulated_reductions
+        < MODULE.code
+\end{PipsMake}
+
+PIPS merges the omp pragma on the inner or outer loop depending on the property
+OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|
+\begin{PipsProp}{OMP_MERGE_POLICY}
+OMP_MERGE_POLICY "outer"
+\end{PipsProp}
+
+The merging of the if clause of the omp pragma follows its own rule.
+This clause can be ignore without changing the output of the program,
+it only changee the program perfomances.
+Then three policies are offered to manage the if clause merging. The if clause
+can simply be ignored. Or the if clauses can be merged alltogether using the
+boolean opertaion \verb|or| or \verb|and|. When ignored, the if clause can be
+later regenrated using the appropriated PIPS phase :
+OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. To summarize, rmenber that the property
+can be set to \verb|ignore| \verb|or| or \verb|and|
+\begin{PipsProp}{OMP_IF_MERGE_POLICY}
+OMP_IF_MERGE_POLICY "ignore"
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PRETTYPRINT

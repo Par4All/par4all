@@ -117,11 +117,12 @@ diff -cr gcc/fortran/Make-lang.in gcc.patched/gcc/fortran/Make-lang.in
   
   gt-fortran-trans.h    : s-gtype; @true
   #
---- 95,101 ----
+--- 95,102 ----
   	cp gfortran$(exeext) gfortran-cross$(exeext)
   
   # The compiler itself is called f951.
 ! include ../../../$(pipssrcdir)/gfc2pips$(GFC2PIPS-AUTOTOOL-MAKEFILE).mk
+! include ../../../$(pipssrcdir)/gfc2pips-common.mk
   
   gt-fortran-trans.h    : s-gtype; @true
   #

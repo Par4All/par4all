@@ -217,6 +217,7 @@ AC_CONFIG_FILES([Makefile
                  src/Libs/to_begin_with/Makefile
                  src/Libs/top-level/Makefile
                  src/Libs/transformations/Makefile
+                 src/Libs/accel-util/Makefile
                  src/Libs/transformer/Makefile
                  src/Libs/static_controlize/Makefile
                  src/Libs/paf-util/Makefile

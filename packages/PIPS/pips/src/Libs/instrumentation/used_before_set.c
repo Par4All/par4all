@@ -34,7 +34,6 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "makefile.h"
 #include "misc.h"
 #include "control.h"
 #include "properties.h"
@@ -183,7 +182,7 @@ static void display_used_before_set_statistics()
 	   number_of_processed_modules);
 }
 
-static list entities_to_expressions(list l_ent)
+static list entities_to_expressions2(list l_ent)
 {
   list l_exp = NIL;
   MAP(ENTITY,ent,
@@ -391,7 +390,7 @@ static void initialize_array_variable(entity ent)
   int n = gen_length(dims);
   list l_phi = phi_entities_list(1,n);
   /* Attention, this analysis uses PHI entities, static variables of region => init_regions*/
-  reference ref = make_reference(ent,entities_to_expressions(l_phi));
+  reference ref = make_reference(ent,entities_to_expressions2(l_phi));
   expression exp = reference_to_expression(ref);
   statement smt = make_assign_statement(exp,make_special_value(ent));  
   Psysteme row_echelon = entity_declaration_sc(ent);
@@ -491,7 +490,7 @@ static void verify_array_variable(entity ent, region reg)
   list dims = variable_dimensions(type_variable(entity_type(ent)));
   int n = gen_length(dims);
   list l_phi = phi_entities_list(1,n);
-  reference ref = make_reference(ent,entities_to_expressions(l_phi));
+  reference ref = make_reference(ent,entities_to_expressions2(l_phi));
   expression exp = reference_to_expression(ref);
   Pbase phi_variables = entity_list_to_base(l_phi);
   Psysteme ps = region_system(reg);

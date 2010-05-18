@@ -34,228 +34,261 @@ void threshold(float data[128], float val)
 {
    int i;
    //PIPS generated variable
-   int I_0[128];
-   for(i = 0; i <= 127; i += 1) {
-      I_0[i] = data[i]>val;
-      data[i] = I_0[i]?val:data[i];
-      ;
-   }
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0] = data[LU_IND0]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
-   }
-   i = 128;
-   ;
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0] = data[LU_IND0]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
-   }
-   i = 128;
-   ;
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0] = data[LU_IND0]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
-   }
-   i = 128;
-   ;
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0] = data[LU_IND0]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-      //c SIMD_COMMENT_0
-      I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-      //c SIMD_COMMENT_1
-      data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
-   }
-   i = 128;
-   ;
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-      //PIPS:SAC generated int vector(s)
-      int v4si_vec0[4];
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec1[4], v4sf_vec2[4];
-      //SAC generated temporary array
-      float aligned[4] = {val, val, val, val};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //PIPS:SAC generated int vector(s)
-      int v4si_vec4[4];
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec5[4];
-      SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
-      SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
-      SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
-      SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-      SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
-   }
-   i = 128;
-   ;
-}
-void threshold(float data[128], float val)
-{
-   int i;
-   //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
+   int I_0;
    {
-      //SAC generated temporary array
-      float aligned[4] = {val, val, val, val};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec2[4];
-      SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
+      //PIPS generated variable
+      int I_0[128];
+
+      for(i = 0; i <= 127; i += 1) {
+         I_0[i] = data[i]>val;
+         data[i] = I_0[i]?val:data[i];
+         ;
+      }
+   }
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0] = data[LU_IND0]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+1] = data[LU_IND0+1]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+2] = data[LU_IND0+2]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+3] = data[LU_IND0+3]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
+      }
+      i = 128;
+   }
+   ;
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0] = data[LU_IND0]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+1] = data[LU_IND0+1]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+2] = data[LU_IND0+2]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+3] = data[LU_IND0+3]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
+      }
+      i = 128;
+   }
+   ;
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0] = data[LU_IND0]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+1] = data[LU_IND0+1]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+2] = data[LU_IND0+2]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+3] = data[LU_IND0+3]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
+      }
+      i = 128;
+   }
+   ;
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0] = data[LU_IND0]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+1] = data[LU_IND0+1]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+2] = data[LU_IND0+2]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
+         //c SIMD_COMMENT_0
+         I_0[LU_IND0+3] = data[LU_IND0+3]>val;
+         //c SIMD_COMMENT_1
+         data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
+      }
+      i = 128;
+   }
+   ;
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
       for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
          //PIPS:SAC generated int vector(s)
          int v4si_vec0[4];
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4];
+         float v4sf_vec1[4], v4sf_vec2[4];
+         //SAC generated temporary array
+         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
          float v4sf_vec3[4];
          //PIPS:SAC generated int vector(s)
          int v4si_vec4[4];
          //PIPS:SAC generated float vector(s)
          float v4sf_vec5[4];
+         SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
          SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
          SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
          SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
       }
+      i = 128;
    }
-   i = 128;
    ;
 }
 void threshold(float data[128], float val)
 {
    int i;
    //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
+   int I_0, LU_NUB0, LU_IB0, LU_IND0;
    {
-      //SAC generated temporary array
-      float aligned[4] = {val, val, val, val};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec2[4];
-      SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
-      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //PIPS:SAC generated int vector(s)
-         int v4si_vec0[4];
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      {
+         //SAC generated temporary array
+         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec3[4];
-         //PIPS:SAC generated int vector(s)
-         int v4si_vec4[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec5[4];
-         SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
-         SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-         SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
-         SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         float v4sf_vec2[4];
+         SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
+         for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec0[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec1[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec3[4];
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec4[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec5[4];
+            SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
+            SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
+            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
+            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         }
       }
+      i = 128;
    }
-   i = 128;
+   ;
+}
+void threshold(float data[128], float val)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   {
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      {
+         //SAC generated temporary array
+         float aligned[4] = {val, val, val, val};
+         //PIPS:SAC generated float vector(s)
+         float v4sf_vec2[4];
+         SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
+         for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec0[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec1[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec3[4];
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec4[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec5[4];
+            SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
+            SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
+            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
+            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         }
+      }
+      i = 128;
+   }
    ;
 }
 
@@ -265,35 +298,39 @@ void threshold(float data[128], float val)
 {
    int i;
    //PIPS generated variable
-   int I_0[128], LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 128;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    {
-      //SAC generated temporary array
-      float aligned[4] = {val, val, val, val};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec2[4];
-      SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
-      for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //PIPS:SAC generated int vector(s)
-         int v4si_vec0[4];
+      //PIPS generated variable
+      int I_0[128];
+      LU_NUB0 = 128;
+      LU_IB0 = 0;
+      LU_IND0 = 0;
+      {
+         //SAC generated temporary array
+         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec3[4];
-         //PIPS:SAC generated int vector(s)
-         int v4si_vec4[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec5[4];
-         SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
-         SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-         SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
-         SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         float v4sf_vec2[4];
+         SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
+         for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec0[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec1[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec3[4];
+            //PIPS:SAC generated int vector(s)
+            int v4si_vec4[4];
+            //PIPS:SAC generated float vector(s)
+            float v4sf_vec5[4];
+            SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
+            SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
+            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
+            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         }
       }
+      i = 128;
    }
-   i = 128;
    ;
 }
 seq-ok

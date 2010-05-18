@@ -39,8 +39,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-/* #include <stdlib.h> in genC.h */
-	
+
 #include "genC.h"
 #include "misc.h"
 

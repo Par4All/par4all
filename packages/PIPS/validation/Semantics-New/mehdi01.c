@@ -1,3 +1,5 @@
+/* FI: I do not remember why Mehdi submitted this case */
+
 int SIZE=10;
 
 void mehdi01()

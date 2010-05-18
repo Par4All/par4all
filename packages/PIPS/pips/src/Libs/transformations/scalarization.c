@@ -34,7 +34,6 @@
 #include "linear.h"
 #include "ri.h"
 #include "database.h"
-#include "makefile.h"
 #include "ri-util.h"
 #include "control.h"
 #include "constants.h"

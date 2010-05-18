@@ -39,8 +39,8 @@ Dependence graph for module "INDUC2"
 	07 --> 07 with conflicts
 		from <A(J)-W-MUST> to <A(J)-W-MUST> at levels  1
 	07 --> 07 with conflicts
-		from <A(J-1)-R-MUST> to <A(J)-W-MUST> at levels  1
-	07 --> 07 with conflicts
 		from <A(J)-R-MUST> to <A(J)-W-MUST> at levels  1
+	07 --> 07 with conflicts
+		from <A(J-1)-R-MUST> to <A(J)-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************

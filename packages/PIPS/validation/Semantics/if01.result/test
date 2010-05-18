@@ -2,7 +2,7 @@
 Transformers for "if01"
 
 
-C  T(if01) {0<=if01+1, if01<=1}
+//  T(if01) {0<=if01+1, if01<=1}
 
 int if01()
 {
