@@ -6,7 +6,9 @@ void decl30(void)
    double foo(double *);
    double (*x)[];
    double z;
-   x = malloc(10);
+   void *mymalloc(int);
+
+   x = (double (*)[]) mymalloc(10);
    z = foo(&(*x)[0]);
 }
 
@@ -20,6 +22,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "double * -> double"
+	Declared entity "TOP-LEVEL:mymalloc" with type "functional" "int -> void *"
 	Declared entity "decl30!:*STATIC*" with type "area" with size 0
 	Declared entity "decl30:*DYNAMIC*" with type "area" with size 30
 	Declared entity "decl30:*HEAP*" with type "area" with size 0

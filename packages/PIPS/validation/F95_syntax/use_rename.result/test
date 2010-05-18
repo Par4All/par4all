@@ -1,0 +1,14 @@
+Write PArsed code in ./use_rename.database/FOO!/PARSED_CODE 
+Writing ./use_rename.database/FOO!.f90
+
+MODULE FOO!
+   INTEGER :: TOTO
+PROGRAM USE
+   USE foo, titi => toto
+   INTEGER :: TOTO
+   TOTO = 4
+   TITI = 5
+END PROGRAM USE
+
+"compile sources produced by pips"
+

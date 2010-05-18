@@ -79,8 +79,8 @@ Chains
 	28 --> 28 with conflicts
 		from <e1[.x][PHI2]-W-MUST> to <e1[.x][PHI2]-W-MUST>
 	25 --> 29 with conflicts
-		from <e1[.next]-W-MUST> to <e1[.next]-R-MUST>
 		from <e1[.next]-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
+		from <e1[.next]-W-MUST> to <e1[.next]-R-MUST>
 
 ****************** End of Dependence Graph ******************
 

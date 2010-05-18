@@ -1,8 +1,8 @@
 INTEGER*4 FUNCTION ADD2(A, B)
-INTEGER A, B
-ADD2 = A+B
-return
-END
+   INTEGER :: A, B
+   ADD2 = A+B
+   RETURN
+END FUNCTION ADD2
 
 "compile sources produced by pips"
 

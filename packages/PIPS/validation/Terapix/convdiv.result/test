@@ -1,0 +1,9 @@
+int xiparet(int a)
+{
+   return a/12;
+}
+int xiparet(int a)
+{
+   return a*(1/12<<4)>>4;
+}
+

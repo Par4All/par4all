@@ -2,7 +2,7 @@
 TRANSFORMERS
 
 
-C  T(main) {103<=main}
+//  T(main) {103<=main}
 
 int main()
 {

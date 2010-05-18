@@ -1,0 +1,42 @@
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(int argc, char **argv)
+{
+
+//  T(i) {i==1}
+
+   int i = 1;
+
+//  T(i) {i==i#init+1}
+
+   long long size[i++];
+
+//  T(main) {}
+
+   return (int) size[0];
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(int argc, char **argv)
+{
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   long long size[i++];
+
+//  P(i) {i==2}
+
+   return (int) size[0];
+}

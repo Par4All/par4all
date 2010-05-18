@@ -1,0 +1,87 @@
+
+Initial code
+
+int foo1(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int bla(int);                                                        /*0003*/
+// (0,3)
+   return bla(3);                                                       /*0004*/
+   // END BLOCK
+}
+int foo2(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int bla(int);                                                        /*0009*/
+// (0,3)
+   return bla(7);                                                       /*0010*/
+   // END BLOCK
+}
+int inlining31(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int i1, i2;                                                          /*0015*/
+// (0,3)
+   i1 = foo1();                                                         /*0016*/
+// (0,4)
+   i2 = foo2();                                                         /*0017*/
+// (0,5)
+   return i1+i2;                                                        /*0018*/
+   // END BLOCK
+}
+int inlining31(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+// (0,2)
+   int i1, i2;                                                          /*0006*/
+   /*0015*/
+   //PIPS generated variable
+   // (statement ordering unavailable)
+// (0,3)
+   int _return0;                                                        /*0009*/
+   {
+// (0,4)
+      // BEGIN BLOCK
+      // (0,1)
+      // BEGIN BLOCK
+      // (0,2)
+// (0,5)
+      int bla(int f1);                                                  /*0018*/
+// (0,6)
+      /*0003*/
+      // (statement ordering unavailable)
+      // BEGIN BLOCK
+      // (statement ordering unavailable)
+      _return0 = bla(3);                                                /*0022*/
+// (0,7)
+      // (statement ordering unavailable)
+      // END BLOCK
+      // (statement ordering unavailable)
+      ;
+      // END BLOCK
+   }
+// (0,8)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0032*/
+// (0,9)
+   // END BLOCK
+   // (0,4)
+   i2 = foo2();                                                         /*0035*/
+// (0,10)
+   /*0017*/
+   // (0,5)
+   return i1+i2;                                                        /*0037*/
+   // END BLOCK
+}
+

@@ -340,5 +340,6 @@ c     of the image
 200         CONTINUE
             NEW_IMAGE(Jp,Ip) = NEW_IMAGE(Jp,Ip)/9
 300         CONTINUE
+400         CONTINUE
 
       END

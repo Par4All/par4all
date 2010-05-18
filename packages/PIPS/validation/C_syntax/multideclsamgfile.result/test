@@ -11,7 +11,7 @@ Splitting file    ./multideclsamgfile.database/Tmp/bar.cpp_processed.c
   Module         bar!
 Workspace multideclsamgfile created and opened.
 Module foo! selected
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined

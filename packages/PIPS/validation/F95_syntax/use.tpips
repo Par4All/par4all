@@ -4,8 +4,20 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create use foo.f90 use.f90
 
-display PRINTED_FILE[%ALL]
+echo
+echo Source of the module
+echo 
+display PRINTED_FILE[FOO!]
 
+echo 
+echo Source for "use"
+echo
+display PRINTED_FILE[USE]
+
+
+#echo
+#echo Try the unsplit
+#echo
 apply UNSPLIT[%ALL]
 
 echo

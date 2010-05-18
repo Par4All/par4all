@@ -13,7 +13,8 @@ echo // OMP style
 apply PRECONDITIONS_INTER_FULL(%ALL)
 
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
-display PRINTED_FILE(%ALL)
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(%ALLFUNC)
 
 close
 delete atoll

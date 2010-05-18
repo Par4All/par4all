@@ -5,6 +5,13 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 display PRINTED_FILE[%ALL]
 
+apply UNSPLIT[%ALL]
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o write.database/Src/write.o write.database/Src/write.f90
+
 close
 delete write
 quit

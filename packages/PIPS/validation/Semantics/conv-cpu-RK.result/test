@@ -11,12 +11,12 @@ and statement transformers:
 Try to restructure the code for more precision:
 Check transformers for "conv_cpu"
 
-C  T() {}
+//  T() {}
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;
 
@@ -57,6 +57,120 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 }
 Check preconditions for "conv_cpu"
 
+Cumulated effects for "conv_cpu"
+
+//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
+//                                  a21 a22 c
+//               <may be written >: c[*]
+//               <must be read   >: n
+void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
+{
+   int i, j;
+//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
+//                                  a21 a22 c i j
+//               <may be written >: c[*] j
+//               <must be read   >: n
+//               <must be written>: i
+   for(i = 0; i <= n-1; i += 1) {
+//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
+//                                  a21 a22 c i j
+//               <may be written >: c[*]
+//               <must be read   >: n
+//               <must be written>: j
+      for(j = 0; j <= n-1; j += 1) {
+//               <must be read   >: i j n
+//               <must be written>: idx
+         int idx = i*n+j;
+
+//               <must be read   >: i
+//               <must be written>: right
+         _Bool right = i>0;
+//               <must be read   >: i n
+//               <must be written>: left
+         _Bool left = i<n-1;
+//               <must be read   >: j
+//               <must be written>: top
+         _Bool top = j>0;
+//               <must be read   >: j n
+//               <must be written>: bottom
+         _Bool bottom = j<n-1;
+//               <may be read    >: a[*] a00 a01 a02 a10 a12 a20 a21 
+//                                  a22
+//               <may be written >: c[*]
+//               <must be read   >: a a11 bottom c idx left n right 
+//                                  top
+         c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
+      }
+   }
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+   int n = 10000;
+
+//  P(n) {n==10000}
+
+   int loops = 10;
+
+
+//  P(loops,n) {loops==10, n==10000}
+
+   int numBytes = n*n*sizeof(float);
+
+//  P(loops,n,numBytes) {loops==10, n==10000}
+
+   float *h_A = (float *) malloc(numBytes);
+
+//  P(loops,n,numBytes) {loops==10, n==10000}
+
+   float *h_C = (float *) malloc(numBytes);
+
+//  P(loops,n,numBytes) {loops==10, n==10000}
+
+   int i, j;
+
+//  P(i,j,loops,n,numBytes) {loops==10, n==10000}
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  P(i,j,loops,n,numBytes) {loops==10, n==10000, 0<=i, i<=9999}
+
+      for(j = 0; j <= n-1; j += 1) {
+
+//  P(i,j,loops,n,numBytes) {loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}
+
+         h_A[i*n+j] = 1;
+
+//  P(i,j,loops,n,numBytes) {loops==10, n==10000, 0<=i, i<=9999, 0<=j,
+//    j<=9999}
+
+         h_C[i*n+j] = 0;
+      }
+
+//  P(i,j,loops,n,numBytes) {i==10000, j==10000, loops==10, n==10000}
+
+   
+   
+   for(i = 0; i <= loops-1; i += 1)
+
+//  P(i,j,loops,n,numBytes) {j==10000, loops==10, n==10000, 0<=i,
+//    i<=9}
+
+      conv_cpu(h_A, h_C, n, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+}
+
+Preconditions for "conv_cpu"
+
+
 //  P() {n==10000}
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
@@ -66,7 +180,7 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
    int i, j;
 
-//  P() {n==10000}
+//  P(i,j) {n==10000}
 
    for(i = 0; i <= n-1; i += 1) {
 
@@ -79,28 +193,28 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
          int idx = i*n+j;
 
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
-//    j<=9999}
+//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
+//    0<=j, j<=9999}
 
          _Bool right = i>0;
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
-//    j<=9999}
+//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
+//    0<=j, j<=9999}
 
          _Bool left = i<n-1;
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
-//    j<=9999}
+//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
+//    0<=j, j<=9999}
 
          _Bool top = j>0;
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
-//    j<=9999}
+//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
+//    0<=j, j<=9999}
 
          _Bool bottom = j<n-1;
 
-//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000, 0<=j,
-//    j<=9999}
+//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
+//    0<=j, j<=9999}
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }

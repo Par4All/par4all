@@ -2,7 +2,7 @@
 Transformers for "if06"
 
 
-C  T(if06) {0<=if06+1, if06<=1}
+//  T(if06) {0<=if06+1, if06<=1}
 
 int if06()
 {

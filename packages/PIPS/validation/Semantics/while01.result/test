@@ -2,7 +2,7 @@
 Transformers for "while01"
 
 
-C  T(while01) {while01==16}
+//  T(while01) {while01==16}
 
 int while01()
 {

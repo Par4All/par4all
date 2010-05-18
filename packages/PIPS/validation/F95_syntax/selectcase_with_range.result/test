@@ -1,0 +1,17 @@
+PROGRAM MAIN
+   INTEGER :: B, A
+   A = 99
+   IF (A.LE.-10.OR.A.GE.10) THEN
+      B = 1
+   ELSEIF (A.GE.-5.AND.A.LE.-3.OR.A.GE.6.AND.A.LE.9) THEN
+      B = 2
+   ELSEIF (A.GE.-2.AND.A.LE.2) THEN
+      B = 3
+   ELSEIF (A.EQ.3.OR.A.EQ.5) THEN
+      B = 4
+   ELSEIF (A.EQ.4) THEN
+      B = 5
+   ELSE
+      B = 6
+   ENDIF
+END PROGRAM MAIN
