@@ -1,0 +1,25 @@
+Creating allocatable struct for dim 1
+// OMP style
+PROGRAM OPENMP01
+   INTEGER :: J, IERR, I
+   INTEGER , ALLOCATABLE :: B(:)
+   I = 0
+   J = 0
+   ALLOCATE (B(100), STAT=IERR) 
+!$omp parallel do
+   DO I = 1, 100
+      B(I) = 0
+   ENDDO
+!$omp parallel do private(I)
+   DO J = 1, 100
+      DO I = 1, 100
+         B(J) = B(J)+I
+      ENDDO
+   ENDDO
+   DO I = 1, 100
+!$omp parallel do
+      DO J = 1, 100
+         B(J) = B(J)+I
+      ENDDO
+   ENDDO
+END PROGRAM OPENMP01
