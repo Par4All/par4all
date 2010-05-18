@@ -37,7 +37,8 @@ libtransformations_la_SOURCES=\
 		manage_pragma.c \
 		scalarization.c \
 		flatten_code.c \
-		induction_substitution.c
+		induction_substitution.c \
+		nest_parallelization.c
 
 
 include $(srcdir)/../pipslibs_includes.mk
