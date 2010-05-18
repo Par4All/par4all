@@ -41,7 +41,7 @@ validate=validate
 unvalidate=
 # The default options for the validation:
 vopt="VOPT=--archive --diff"
-mopt=
+mopt=''
 
 # where to do it by default
 target=~/PIPS
@@ -80,17 +80,17 @@ do
     -pv|--parallel-validate)
       validate=new-validate
       unvalidate=parallel-unvalidate
-      mopt='-j 8' ;;
+      mopt="$mopt -j 8" ;;
     -mv|--mail-validate)
       validate=mail-validate
       unvalidate=parallel-unvalidate
-      mopt='-j 8' ;;
+      mopt="$mopt -j 8" ;;
     -nv|--no-validate) valids= ;;
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
     --add-validation=*) valids="$valids ${opt#*=}" ;;
     -wto|--with-timeout) vopt="$vopt -T 1000" ;;
-    -T|--timeout) vopt="$vopt -T $1" ; shift ;;
+    -T|--timeout) vopt="$vopt -T $1" ; mopt="$mopt TIMEOUT=$1" ; shift ;;
     --timeout=*) vopt="$vopt -T ${opt#*=}" ;;
     # help
     -h|--help) err 'display help message' 0 ;;

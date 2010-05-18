@@ -5,6 +5,7 @@
 # further summarize detailed summary
 
 my $failed = 0;
+my $timeout = 0;
 my $changed = 0;
 my $passed = 0;
 my $skipped = 0;
@@ -15,6 +16,7 @@ my $orphan = 0;
 my $broken = 0;
 
 my %failed = ();
+my %timeout = ();
 my %changed = ();
 my %passed = ();
 my %skipped = ();
@@ -27,7 +29,12 @@ my %dir = ();
 
 while (<>)
 {
-  if (/^failed: ([-\w]+)/) {
+  if (/^timeout: ([-\w]+)/) {
+    $timeout++;
+    $timeout{$1}++;
+    $dir{$1} = 1;
+  }
+  elsif (/^failed: ([-\w]+)/) {
     $failed++;
     $failed{$1}++;
     $dir{$1} = 1;
@@ -74,17 +81,18 @@ while (<>)
   }
 }
 
-my $count = $failed + $changed + $passed;
-my $not_passed = $failed + $changed;
+my $count = $timeout + $failed + $changed + $passed;
+my $not_passed = $failed + $changed + $timeout;
 my $warned = $skipped + $orphan + $missing + $scripts + $sources;
 
 printf
   "total: $count\n" .
   " * passed: $passed\n" .
   " * not passed: $not_passed\n" .
-  " - failed: $failed (core dumps, timout...)\n" .
+  " - failed: $failed (voluntary and unvoluntary core dumps)\n" .
   " - changed: $changed (modified output)\n" .
-  "warned: $warned\n" .
+  " - timeout: $timeout (time was out)\n" .
+  "warnings: $warned\n" .
   " * skipped: $skipped (source without validation scripts)\n" .
   " * missing: $missing (empty result directory)\n" .
   " * multi-script: $scripts (more than one validation script)\n" .
@@ -102,8 +110,9 @@ for my $dir (sort keys %dir)
   $failed{$dir} = 0 unless exists $failed{$dir};
   $changed{$dir} = 0 unless exists $changed{$dir};
   $passed{$dir} = 0 unless exists $passed{$dir};
-  my $failures = $failed{$dir} + $changed{$dir};
-  my $dircount = $passed{$dir} + $failed{$dir} + $changed{$dir};
+  $timeout{$dir} = 0 unless exists $timeout{$dir};
+  my $failures = $failed{$dir} + $changed{$dir} + $timeout{$dir};
+  my $dircount = $passed{$dir} + $failures;
   my $success_rate = $passed{$dir}*100.0/$dircount;
   printf "%-28s %4d  %4d  %5.1f%%\n", $dir, $dircount, $failures, $success_rate;
 }

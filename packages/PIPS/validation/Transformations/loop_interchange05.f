@@ -2,7 +2,7 @@
 
 !     Non-Unit Stride Memory Access
 
-      program loop_interchange03
+      program loop_interchange05
 
       implicit none
       integer NUM

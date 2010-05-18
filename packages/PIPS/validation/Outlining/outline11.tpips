@@ -1,0 +1,26 @@
+setenv WS="outline11"
+delete $WS
+create $WS $WS.c
+
+display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+
+setproperty OUTLINE_LABEL "compute_kernel"
+setproperty OUTLINE_MODULE_NAME "compute_kernel"
+setproperty OUTLINE_SMART_REFERENCE_COMPUTATION TRUE
+apply OUTLINE[main]
+
+setproperty OUTLINE_LABEL "init_kernel"
+setproperty OUTLINE_MODULE_NAME "init_kernel"
+
+apply OUTLINE[main]
+
+echo All the kernel parameters should be passed correctly
+display PRINTED_FILE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS
+quit

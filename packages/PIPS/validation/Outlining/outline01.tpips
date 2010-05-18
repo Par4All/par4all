@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete outline01
-create outline01 outline01.c
+setenv WS="outline01"
+delete $WS
+create $WS $WS.c
 
 echo
 echo Initial code
@@ -28,5 +29,5 @@ echo
 apply UNSPLIT
 
 close
-delete outline01
+delete $WS
 quit

@@ -1,0 +1,146 @@
+int main(int argc, char *argv[])
+{
+   int i, j;
+
+   for (i = 0;i<64;i++)
+      for (j = 0;j<64;j++) {
+init_kernel:         imagein_re[i][j] = 2*i;
+         imagein_im[i][j] = 3*j;
+      }
+
+   for (i = 0;i<64;i++)
+      for (j = 0;j<64;j++)
+compute_kernel:         imagein_re[i][j] = 1+imagein_im[i][j];
+
+   for (i = 0;i<64;i++) {
+      printf("Line %d:\n");
+      for (j = 0;j<64;j++)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
+   }
+
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+init_kernel:         imagein_re[i][j] = 2*i;
+         imagein_im[i][j] = 3*j;
+      }
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1)
+compute_kernel:         imagein_re[i][j] = 1+imagein_im[i][j];
+
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
+   }
+
+   return 0;
+}
+All the kernel loops should be //
+int main(int argc, char *argv[])
+{
+   int i, j;
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1) {
+init_kernel:         imagein_re[i][j] = 2*i;
+         imagein_im[i][j] = 3*j;
+      }
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)
+compute_kernel:         imagein_re[i][j] = 1+imagein_im[i][j];
+
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
+   }
+
+   return 0;
+}
+The kernels should be parallel. Unfotunately, current OUTLINE version relies on reparsing the code, so parallelism information is lost...
+void compute_kernel(float imagein_im, float *imagein_re0)
+{
+compute_kernel:   *imagein_re0 = 1+imagein_im;
+}
+void init_kernel(float *imagein_re0, int i)
+{
+init_kernel:   *imagein_re0 = 2*i;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1) {
+init_kernel:         init_kernel(&imagein_re[i][j], i);
+         imagein_im[i][j] = 3*j;
+      }
+
+#pragma omp parallel for 
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)
+compute_kernel:         compute_kernel(imagein_im[i][j], &imagein_re[i][j]);
+
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
+   }
+
+   return 0;
+}
+All the kernel loops should be //
+void compute_kernel(float imagein_im, float *imagein_re0)
+{
+compute_kernel:   *imagein_re0 = 1+imagein_im;
+}
+void init_kernel(float *imagein_re0, int i)
+{
+init_kernel:   *imagein_re0 = 2*i;
+}
+int main(int argc, char *argv[])
+{
+   int i, j;
+
+#pragma omp parallel for 
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1) {
+init_kernel:         init_kernel(&imagein_re[i][j], i);
+         imagein_im[i][j] = 3*j;
+      }
+
+#pragma omp parallel for 
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)
+compute_kernel:         compute_kernel(imagein_im[i][j], &imagein_re[i][j]);
+
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
+   }
+
+   return 0;
+}

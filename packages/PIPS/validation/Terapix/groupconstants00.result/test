@@ -1,0 +1,21 @@
+orginal files
+int main()
+{
+   printf("%d", 1+2);
+   return 0;
+}
+after constant grouping
+int main()
+{
+   //PIPS generated variable
+   int caillou[4];
+   caillou[0] = "%d";
+   caillou[1] = 0;
+   caillou[2] = 1;
+   caillou[3] = 2;
+   printf(caillou[0], caillou[2]+caillou[3]);
+   return caillou[1];
+}
+test resulting code
+ok
+

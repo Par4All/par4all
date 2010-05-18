@@ -19,8 +19,8 @@ def microcode_normalizer(ws,module):
 	module.display()
 	#module.partial_eval()
 	#module.display()
-	module.common_subexpression_elimination()
-	module.display()
+	#module.common_subexpression_elimination()
+	#module.display()
 	#module.icm()
 	#module.display()
 	#module.partial_eval()
@@ -29,7 +29,7 @@ def microcode_normalizer(ws,module):
 	#module.display()
 	#module.clean_declarations()
 	#module.display()
-	module.array_to_pointer(convert_parameters="1D",flatten_only=True)
+	module.array_to_pointer(convert_parameters="POINTER",flatten_only=True)
 	module.display()
 	module.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	module.display()
@@ -37,11 +37,11 @@ def microcode_normalizer(ws,module):
 	module.display()
 	module.normalize_microcode()
 	module.display()
-	for p in ["addi","subi","muli","divi","seti"]:
-		module.expression_substitution(pattern=p)
-	module.flatten_code(flatten_code_unroll=False)
-	module.clean_declarations()
-	module.display()
+	#for p in ["addi","subi","muli","divi","seti"]:
+	#	module.expression_substitution(pattern=p)
+	#module.flatten_code(flatten_code_unroll=False)
+	#module.clean_declarations()
+	#module.display()
 
 if __name__ == "__main__":
 	w = workspace(["alphablending.c", "include/load.c", "include/terasm.c"], cppflags="-I.")
@@ -82,17 +82,19 @@ if __name__ == "__main__":
 	for k in kernels:
 		name=seed+str(nb)
 		nb+=1
-		m.outline(module_name=name,label=k)
+		m.outline(module_name=name,label=k,smart_reference_computation=True)
 		launchers+=[w[name]]
 	m.display()
-	for l in launchers:l.display()
+	for l in launchers:l.display(With='PRINT_CODE_REGIONS')
 	
 	print "outlining to microcode"
 	microcodes=[]
 	for l in launchers:
 		theloop=l.loops()[0]
 		name=l.name+"_microcode"
-		l.outline(module_name=name,label=l.loops()[0].loops()[0].label)
+		loop_to_outline=theloop.loops()[0]
+		print "label:" , loop_to_outline.label
+		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
 		mc=w[name]
 		l.display()
 		mc.display()

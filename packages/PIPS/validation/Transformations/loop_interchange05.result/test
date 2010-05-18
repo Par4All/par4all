@@ -5,7 +5,7 @@ Source code before loop interchange
 
 !     Non-Unit Stride Memory Access
 
-      PROGRAM LOOP_INTERCHANGE03
+      PROGRAM LOOP_INTERCHANGE05
 
 ! MIL-STD-1753 Fortran extension not in PIPS
 !       implicit none
@@ -33,7 +33,7 @@ Source code after loop interchange
 
 !     Non-Unit Stride Memory Access
 
-      PROGRAM LOOP_INTERCHANGE03
+      PROGRAM LOOP_INTERCHANGE05
 
 ! MIL-STD-1753 Fortran extension not in PIPS
 !       implicit none
