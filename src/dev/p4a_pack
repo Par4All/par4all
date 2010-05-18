@@ -12,7 +12,7 @@
 our $DIST_PREFIX = "/usr/local/p4a";
 
 # P4A final install prefix for accel files ($ENV{'P4A_ACCEL_DIR'}):
-our $ACCEL_PREFIX = "/usr/local/p4a/src/p4a_accel";
+our $ACCEL_PREFIX = "$DIST_PREFIX/src/p4a_accel";
 
 ###########################################################
 
@@ -46,7 +46,11 @@ unless ($ENV{'P4A_ROOT'} && $ENV{'P4A_DIST'} && $ENV{'P4A_ACCEL_DIR'}) {
 
 # Display usage.
 if (!@ARGV || grep { /^-h|--help$/ } @ARGV) {
-	print STDERR BOLD WHITE "Usage: $0 [--deb|--rpm] [--keep]\n"; 
+	usage();
+}
+
+sub usage {
+	print STDERR BOLD WHITE "Usage: $0 [--deb|--rpm|--tgz] [--keep]\n"; 
 	print STDERR "Specify --keep if you want the temporary directory to remain when script exits\n";
 	exit;
 }
@@ -56,16 +60,14 @@ our %OPTS;
 for (@ARGV) {
 	/^--(deb)$/ and $OPTS{$1} = 1, next;
 	/^--(rpm)$/ and $OPTS{$1} = 1, next;
+	/^--(tgz)$/ and $OPTS{$1} = 1, next;
 	/^--(keep)$/ and $OPTS{$1} = 1, next;
 	die "Unknown option: $_";
 }
 
 # Check opts.
-unless ($OPTS{'deb'} || $OPTS{'rpm'}) {
-	die "Please specify --deb or --rpm";
-}
-if ($OPTS{'deb'} && $OPTS{'rpm'}) {
-	die "Cannot build --deb and --rpm at the same time";
+unless (($OPTS{'deb'} // 0) + ($OPTS{'rpm'} // 0) + ($OPTS{'tgz'} // 0) == 1) {
+	usage();
 }
 
 # This routine is a wrapper around system() that dies automatically.
@@ -154,12 +156,20 @@ for my $file ("$TMP_DEBIAN_DIR/postinst", "$TMP_DIST/etc/par4all-rc.sh", "$TMP_D
 }
 
 # Create the package!
+my $name = "par4all";
+my $filename = "${name}_${VERSION}_${ARCH}";
 if ($OPTS{'deb'}) {
-	my $control = LoadFile("$TMP_DEBIAN_DIR/control");
-	my $name = $control->{'Package'};
-	X("fakeroot dpkg-deb --build $TMP_BASE ${name}_${VERSION}_${ARCH}.deb");
+	# Read the package name from the control file using YAML...
+	# Not really necessary, because package name could be assumed
+	# to be par4all.
+	#my $control = LoadFile("$TMP_DEBIAN_DIR/control");
+	#my $name = $control->{'Package'};
+	X("fakeroot dpkg-deb --build $TMP_BASE $filename.deb");
 } elsif ($OPTS{'rpm'}) {
 	die "TODO";
+} elsif ($OPTS{'tgz'}) {
+	print STDERR BOLD WHITE "Creating $filename.tar.gz ...\n";
+	X("tar cf $filename.tar -C $TMP_DIST . && gzip --best $filename.tar");
 }
 
 # Clean up after ourselves.
@@ -202,7 +212,7 @@ sub get_file_revision {
         #}
         #my $dirty = 0;
         if (git_file_is_dirty($f)) {
-                $short_rev .= "+dirty";
+                $short_rev .= "~dirty";
         #        $dirty = 1;
         }
         #if ($dirty || $notag) {

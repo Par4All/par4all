@@ -5,12 +5,20 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging
+import string, sys, random, logging, os, gc
 import term
 
 # Global variables.
 verbosity = 0
 logger = None
+
+def set_verbosity(level):
+	global verbosity
+	verbosity = level
+
+def get_verbosity():
+	global verbosity
+	return verbosity
 
 # Printing/logging helpers.
 def debug(msg):
@@ -41,17 +49,45 @@ def die(msg, exit_code = 255):
 	error("aborting")
 	sys.exit(exit_code)
 
+class p4a_error(Exception):
+	'''Generic base class for exceptions'''
+	msg = "error"
+	def __init__(self, msg):
+		self.msg = msg
+		error(msg)
+	def __str__(self):
+		return self.msg
+
 def run(cmd, can_fail = 0):
 	'''Runs a command and dies if return code is not zero'''
-	sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
+	if verbosity >= 2:
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
 	ret = os.system(cmd)
 	if ret != 0 and not can_fail:
-		die("command failed with exit code " + ret)
+		raise p4a_error("command failed with exit code " + str(ret))
 	return ret
 
 def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):
 	'''Generates a random name / password'''
 	return prefix + "".join(random.choice(chars) for x in range(length))
+
+def rmtree(dir, can_fail = 0):
+	'''Removes a directory recursively, because sometimes shutil.rmtree() does not want to'''
+	(base, ext) = os.path.splitext(dir)
+	if ext != ".database" and ext != ".build":
+		raise p4a_error("Cannot remove unknown directory: " + dir)
+	try:
+		for root, dirs, files in os.walk(dir, topdown = False):
+			for name in files:
+				os.remove(os.path.join(root, name))
+			for name in dirs:
+				os.rmdir(os.path.join(root, name))
+		os.rmdir(dir)
+	except Exception as e:
+		if can_fail:
+			warn("could not remove directory " + dir + ": " + repr(e))
+		else:
+			raise e
 
 if __name__ == "__main__":
 	print(__doc__)

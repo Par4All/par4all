@@ -28,7 +28,7 @@ class ValidationClass:
 		self.arch=commands.getoutput(self.p4a_root+"/run/makes/arch.sh")
 
 #### Function which run tests and save result on result_log ######
-  def test_par4all(self,directory_test_path,test_file_path,log_file):
+  def test_par4all(self,directory_test_path,test_file_path,log_file,extension_file):
 		# .result directory of the test to compare results
 		test_file_path = test_file_path.strip('\n')
 		(test_name_path, ext) = os.path.splitext(test_file_path)
@@ -166,7 +166,7 @@ class ValidationClass:
 					#status of the test
 					status = 'succeeded'
 
-		self.file_result.write ('%s: %s/%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path)))
+		self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
 		self.file_result.close()
 	
 		# Return to validation Par4All
@@ -207,16 +207,21 @@ class ValidationClass:
 			directory=root.split("/")
 			directory_test = self.par4ll_validation_dir + directory[0]
 			
-			print (('# Considering %s')%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
+			print (('# Considering %s')%(line.strip('\n')))
+
+			ext = ext.strip('\n')
 			
-			if os.path.isdir(directory_test):
-				# Run test
-				nb_test = nb_test+1
-				status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
-				if (status != "succeeded"):
-					nb_failed = nb_failed+1
+			if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
+				if os.path.isdir(directory_test):
+					# Run test
+					nb_test = nb_test+1
+					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt',ext)
+					if (status != "succeeded"):
+						nb_failed = nb_failed+1
+				else:
+					print ('%s not accessible' % (directory_test))
 			else:
-				print ('%s not accessible' % (directory_test))
+				print ("To test %s, use an extension like .c, .f90, .f, .F\n"%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
 
 		f.close()
 		print('%s failed in %s tests'%(nb_failed,nb_test))
@@ -249,7 +254,7 @@ class ValidationClass:
 						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
 							nb_test = nb_test+1
 							file_tested = directory_test + '/' + file_test
-							status = self.test_par4all(directory_test, file_tested,'pips_log.txt')
+							status = self.test_par4all(directory_test, file_tested,'pips_log.txt',ext)
 							if (status != "succeeded"):
 								nb_failed = nb_failed+1
 
@@ -278,8 +283,8 @@ class ValidationClass:
 
 						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
 							# default_test depends of par4all_validation.txt
-							default_test = line+'/'+os.path.basename(root)
-							default_test_bis = line+'\ '+os.path.basename(root)
+							default_test = line+'/'+os.path.basename(file_test)
+							default_test_bis = line+'\ '+os.path.basename(file_test)
 							find = 'no'
 				
 							nb_test = nb_test+1
@@ -288,13 +293,11 @@ class ValidationClass:
 							if os.path.isfile('par4all_validation.txt'):
 								par4all = open("par4all_validation.txt")
 								for line_p4a in par4all:
-									(root_p4a, ext_p4a) = os.path.splitext(line_p4a)
-
-									if (default_test == root_p4a.strip('\n')):
+									if (default_test == line_p4a.strip('\n')):
 										# Test is found
 										find = 'yes'
 										nb_test = nb_test - 1
-									elif (default_test_bis.replace(" ","")== root_p4a.strip('\n')):
+									elif (default_test_bis.replace(" ","")== line_p4a.strip('\n')):
 										# Test is found
 										find = 'yes'
 										nb_test = nb_test - 1
@@ -334,7 +337,7 @@ def main():
 
 	elif options.diff:
 		vc = ValidationClass().diff()
-		print('Tests which are not done by --p4a options are into p4a_log.txt file')
+		print('Tests which are not done by --p4a options are into diff.txt file')
 	
 	else:
 		output = commands.getoutput("python p4a_validate_class.py -h")
