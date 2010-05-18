@@ -254,7 +254,7 @@ class ValidationClass:
 						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
 							nb_test = nb_test+1
 							file_tested = directory_test + '/' + file_test
-							status = self.test_par4all(directory_test, file_tested,'pips_log.txt')
+							status = self.test_par4all(directory_test, file_tested,'pips_log.txt',ext)
 							if (status != "succeeded"):
 								nb_failed = nb_failed+1
 
