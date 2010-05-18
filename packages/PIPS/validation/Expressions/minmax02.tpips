@@ -1,11 +1,18 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS="minmax02"
 delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
+
+echo
+echo Initial source code
+echo
 
 display PRINTED_FILE[%ALLFUNC]
 
-echo "min / max should have disapeared"
+echo
+echo MIN and/or MAX should have disapeared
+echo
+
 apply PARTIAL_EVAL[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 

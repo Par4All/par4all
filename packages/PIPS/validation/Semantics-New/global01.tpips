@@ -1,0 +1,62 @@
+delete global01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create global01 global01.c
+module main
+
+echo
+echo "main" file
+echo
+
+display PRINTED_FILE
+
+echo
+echo "main" file with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo "zero" file with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[zero]
+
+echo
+echo "zero" file with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[zero]
+quit
+echo
+echo "main" file with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+quit
+echo
+echo "main" file with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+#quit
+echo
+echo "main" file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+quit
+echo aftter privatization
+
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
+close
+delete global01
+quit

@@ -8,13 +8,13 @@ int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i1;
-   int i2;
 // (0,2)
-   i1 = foo1();                                                         /*0016*/
+   int i1, i2;                                                          /*0015*/
 // (0,3)
-   i2 = foo2();                                                         /*0017*/
+   i1 = foo1();                                                         /*0016*/
 // (0,4)
+   i2 = foo2();                                                         /*0017*/
+// (0,5)
    return i1+i2;                                                        /*0018*/
    // END BLOCK
 }
@@ -22,18 +22,20 @@ int foo1(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   extern int bla(int);
 // (0,2)
-   return bla(3);                                                       /*0005*/
+   int bla(int);                                                        /*0003*/
+// (0,3)
+   return bla(3);                                                       /*0004*/
    // END BLOCK
 }
 int foo2(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   extern int bla(int);
 // (0,2)
-   return bla(7);                                                       /*0005*/
+   int bla(int);                                                        /*0009*/
+// (0,3)
+   return bla(7);                                                       /*0010*/
    // END BLOCK
 }
  flatten_code14
@@ -45,133 +47,271 @@ int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i1;
-   int i2;
-   int _return0;
-   int _return1;
-   {
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   // (0,2)
 // (0,2)
-      // BEGIN BLOCK
-      extern int bla(int f1);
-// (0,3)
-      // (0,3)
-      // (0,2)
-      // BEGIN BLOCK
-      // (statement ordering unavailable)
-      _return0 = bla(3);                                                /*0017*/
-      // END BLOCK
-   }
-// (0,4)
-   // (0,5)
+   int i1, i2;                                                          /*0009*/
+   /*0006*/
+   /*0015*/
+   //PIPS generated variable
    // (statement ordering unavailable)
-   i1 = _return0;                                                       /*0025*/
+   // (0,3)
+// (0,3)
+   int _return0;                                                        /*0014*/
+   /*0009*/
+   //PIPS generated variable
+   // (statement ordering unavailable)
+// (0,4)
+   int _return1;                                                        /*0017*/
    {
 // (0,5)
       // BEGIN BLOCK
-      extern int bla(int f1);
-// (0,6)
+      // (0,4)
+      // BEGIN BLOCK
+      // (0,1)
+      // BEGIN BLOCK
       // (0,2)
+      // (0,5)
+// (0,6)
+      int bla(int f1);                                                  /*0025*/
+// (0,7)
+      /*0018*/
+      // (0,6)
+      /*0003*/
+      // (statement ordering unavailable)
       // BEGIN BLOCK
       // (statement ordering unavailable)
-      _return1 = bla(7);                                                /*0035*/
+      _return0 = bla(3);                                                /*0031*/
+// (0,8)
+      /*0022*/
+      // (0,7)
       // (statement ordering unavailable)
       // END BLOCK
       // (statement ordering unavailable)
+      ;
       // END BLOCK
    }
+// (0,9)
+   // (0,8)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0042*/
+   {
+// (0,10)
+      // BEGIN BLOCK
+      /*0032*/
+      // (statement ordering unavailable)
+      // BEGIN BLOCK
+      // (statement ordering unavailable)
+      // END BLOCK
+      // (0,4)
+      // (0,1)
+      // BEGIN BLOCK
+      // (0,2)
+// (0,11)
+      int bla(int f1);                                                  /*0057*/
+// (0,12)
+      /*0009*/
+      // (statement ordering unavailable)
+      // BEGIN BLOCK
+      // (statement ordering unavailable)
+      _return1 = bla(7);                                                /*0061*/
+// (0,13)
+      // (statement ordering unavailable)
+      // END BLOCK
+      // (statement ordering unavailable)
+      ;
+      // END BLOCK
+   }
+// (0,14)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0071*/
+// (0,15)
+   // END BLOCK
+   // END BLOCK
+   // (0,10)
+   /*0017*/
+   // (0,5)
+   return i1+i2;                                                        /*0077*/
+   // END BLOCK
+}
+int flatten_code14(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   // (0,2)
+// (0,2)
+   int i1, i2;                                                          /*0009*/
+   /*0006*/
+   /*0015*/
+   //PIPS generated variable
+   // (statement ordering unavailable)
+   // (0,3)
+// (0,3)
+   int _return0;                                                        /*0014*/
+   /*0009*/
+   //PIPS generated variable
+   // (statement ordering unavailable)
+// (0,4)
+   int _return1;                                                        /*0017*/
+// (0,5)
+   // (0,4)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   // (0,5)
+   /*0018*/
+   // (0,6)
+   /*0003*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return0 = bla(3);                                                   /*0031*/
+// (0,6)
+   /*0022*/
+   // (0,7)
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   // (0,8)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0042*/
+// (0,7)
+   /*0032*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (0,4)
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   /*0009*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return1 = bla(7);                                                   /*0061*/
 // (0,8)
    // (statement ordering unavailable)
-   i2 = _return1;                                                       /*0044*/
+   // END BLOCK
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0071*/
 // (0,9)
    // END BLOCK
-   // (0,7)
+   // END BLOCK
+   // (0,10)
    /*0017*/
-   // (0,4)
-   return i1+i2;                                                        /*0049*/
+   // (0,5)
+   return i1+i2;                                                        /*0077*/
    // END BLOCK
 }
 int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i1;
-   int i2;
-   int _return0;
-   int _return1;
-   extern int bla(int f1);
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   // (0,2)
+   // (0,2)
 // (0,2)
-   // (0,3)
-   // (0,2)
-   // BEGIN BLOCK
+   int i1, i2;                                                          /*0049*/
+   /*0009*/
+   /*0006*/
+   /*0015*/
+   //PIPS generated variable
    // (statement ordering unavailable)
-   _return0 = bla(3);                                                   /*0017*/
+   // (0,3)
+   // (0,3)
 // (0,3)
-   // (0,5)
+   int _return0;                                                        /*0056*/
+   /*0014*/
+   /*0009*/
+   //PIPS generated variable
    // (statement ordering unavailable)
-   i1 = _return0;                                                       /*0025*/
-// (0,4)
-   // (0,2)
-   // BEGIN BLOCK
-   // (statement ordering unavailable)
-   _return1 = bla(7);                                                   /*0035*/
-// (0,5)
-   // (statement ordering unavailable)
-   // END BLOCK
-   // (statement ordering unavailable)
-   // (statement ordering unavailable)
-   i2 = _return1;                                                       /*0044*/
-// (0,6)
-   // END BLOCK
-   // (0,7)
-   /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0049*/
-   // END BLOCK
-}
-int flatten_code14(void)
-{
-// (0,1)
-   // BEGIN BLOCK
-   int i1;
-   int i2;
-   int _return0;
-   int _return1;
-   extern int bla(int f1);
-// (0,2)
-   // (0,2)
-   // (0,3)
-   // (0,2)
-   // BEGIN BLOCK
-   // (statement ordering unavailable)
-   _return0 = bla(3);                                                   /*0039*/
-// (0,3)
-   /*0017*/
-   // (0,3)
-   // (0,5)
-   // (statement ordering unavailable)
-   i1 = _return0;                                                       /*0043*/
 // (0,4)
-   /*0025*/
-   // (0,4)
-   // (0,2)
-   // BEGIN BLOCK
-   // (statement ordering unavailable)
-   _return1 = bla(7);                                                   /*0048*/
+   int _return1;                                                        /*0061*/
 // (0,5)
-   /*0035*/
+   /*0017*/
    // (0,5)
-   // (statement ordering unavailable)
-   // END BLOCK
-   // (statement ordering unavailable)
-   // (statement ordering unavailable)
-   i2 = _return1;                                                       /*0054*/
-// (0,6)
-   /*0044*/
+   // (0,4)
+   // BEGIN BLOCK
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   // (0,5)
+   /*0018*/
    // (0,6)
-   // END BLOCK
+   /*0003*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return0 = bla(3);                                                   /*0075*/
+// (0,6)
+   /*0031*/
+   // (0,6)
+   /*0022*/
    // (0,7)
-   /*0017*/
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   // (0,8)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i1 = _return0;                                                       /*0085*/
+// (0,7)
+   /*0042*/
+   // (0,7)
+   /*0032*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   // END BLOCK
    // (0,4)
-   return i1+i2;                                                        /*0060*/
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
+   /*0009*/
+   // (statement ordering unavailable)
+   // BEGIN BLOCK
+   // (statement ordering unavailable)
+   _return1 = bla(7);                                                   /*0100*/
+// (0,8)
+   /*0061*/
+   // (0,8)
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   // END BLOCK
+   // (statement ordering unavailable)
+   i2 = _return1;                                                       /*0107*/
+// (0,9)
+   /*0071*/
+   // (0,9)
+   // END BLOCK
+   // END BLOCK
+   // (0,10)
+   /*0017*/
+   // (0,5)
+   return i1+i2;                                                        /*0114*/
    // END BLOCK
 }

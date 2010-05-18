@@ -13,9 +13,9 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc $WS.database/Src/$WS.c -o out
-shell cc $WS.c -o ref
-shell ( test `./out` = `./ref` && echo "ok" ) || echo "ko"
-shell rm -f out ref
+shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ( test `./$WS.database/Tmp/out` = `./$WS.database/Tmp/ref` && echo "ok" ) || echo "ko"
 
 delete $WS

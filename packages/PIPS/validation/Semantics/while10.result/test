@@ -2,7 +2,7 @@
 Transformers for "while10"
 
 
-C  T() {0==-1}
+//  T() {0==-1}
 
 void while10()
 {

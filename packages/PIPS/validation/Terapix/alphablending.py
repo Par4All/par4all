@@ -13,7 +13,7 @@ def microcode_normalizer(ws,module):
 	#module.if_conversion_init()
 	#module.if_conversion()
 
-	module.loop_normalize(one_increment=True,lower_bound=False)
+	module.loop_normalize(one_increment=True,lower_bound=0,skip_index_side_effect=True)
 	module.display()
 	module.flatten_code(flatten_code_unroll=False)
 	module.display()
@@ -29,7 +29,7 @@ def microcode_normalizer(ws,module):
 	#module.display()
 	#module.clean_declarations()
 	#module.display()
-	module.array_to_pointer(convert_parameters="POINTER",flatten_only=True)
+	module.array_to_pointer(convert_parameters="1D",flatten_only=True)
 	module.display()
 	module.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	module.display()
@@ -50,16 +50,23 @@ if __name__ == "__main__":
 	print "tidy the code just in case of"
 	m.partial_eval()
 	m.display()
+	 
+	print "I have to do this early"
+	m.terapix_remove_divide()
+	m.display()
+
 	
 	print "tiling"
 	for l in m.loops():
 		if l.loops():
 				l.loop_tiling(matrix="128 0,0 8")
-	print "isolation"
+	print "group constants and isolate"
 	kernels=[]
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
+				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+				m.display()
 				kernels+=[l2.label]
 				m.isolate_statement(label=l2.label)
 	m.display()

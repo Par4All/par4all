@@ -1,6 +1,10 @@
+#include <stdio.h>
 //     goal: show effect of cloning, partial evaluation and loop unrolling
 //     and reduction parallelization for a Power architecture
 //     kernel_size must be odd
+
+#include <stdio.h>
+
 #define image_size 512
 #define kernel_size 3
 #define nsteps 20

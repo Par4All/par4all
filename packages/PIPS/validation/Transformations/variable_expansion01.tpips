@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete variable_expansion01
-create variable_expansion01 variable_expansion01.c
+setenv WS variable_expansion01
+delete $WS
+create $WS $WS.c
 
 echo
 echo Initial code
@@ -21,12 +22,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc  variable_expansion01.c -o ve01
-shell cc  variable_expansion01.database/Src/variable_expansion01.c -o variable_expansion01.database/Src/ve
-shell if test `variable_expansion01.database/Src/ve` = `./ve01` ; then echo "ok"; else echo "ko" ; fi
-shell rm -f variable_expansion01.database/Src/ve ve01
+shell cc  $WS.c -o  $WS.database/Tmp/seq
+shell cc  $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell if test `./$WS.database/Tmp/seq` = `./$WS.database/Tmp/out` ; then echo "ok"; else echo "ko" ; fi
 
 close
-delete variable_expansion01
+delete $WS
 quit
 

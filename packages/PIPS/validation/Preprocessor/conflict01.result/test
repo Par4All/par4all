@@ -2,6 +2,25 @@ int main()
 {
    conflict01();
 }
-void conflict01()
+int conflict01()
+{
+}
+/*
+ * file for conflict01.c
+ */
+/* Check PIPS behavior when source file names conflict*/
+
+extern int main();
+int main()
+{
+   conflict01();
+}
+/*
+ * file for conflict01.src_conflict01.c
+ */
+/* Check PIPS behavior when source file names conflict*/
+
+extern int conflict01();
+int conflict01()
 {
 }

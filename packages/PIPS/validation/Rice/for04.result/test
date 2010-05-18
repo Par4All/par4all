@@ -1,6 +1,57 @@
+// DG Before privatization
+
+ **************** Effective Dependence Graph ****************
+
+	39 --> 38 with conflicts
+		from <n-R-MUST> to <n-W-MUST> at levels  1
+	38 --> 39 with conflicts
+		from <n-W-MUST> to <n-R-MUST> at levels  1 2
+	38 --> 38 with conflicts
+		from <n-W-MUST> to <n-W-MUST> at levels  1
+	33 --> 32 with conflicts
+		from <m-R-MUST> to <m-W-MUST> at levels  1
+	32 --> 33 with conflicts
+		from <m-W-MUST> to <m-R-MUST> at levels  1 2
+	32 --> 32 with conflicts
+		from <m-W-MUST> to <m-W-MUST> at levels  1
+	26 --> 25 with conflicts
+		from <l-R-MUST> to <l-W-MUST> at levels  1
+	25 --> 26 with conflicts
+		from <l-W-MUST> to <l-R-MUST> at levels  1 2
+	25 --> 25 with conflicts
+		from <l-W-MUST> to <l-W-MUST> at levels  1
+	19 --> 18 with conflicts
+		from <k-R-MUST> to <k-W-MUST> at levels  1
+	18 --> 19 with conflicts
+		from <k-W-MUST> to <k-R-MUST> at levels  1 2
+	18 --> 18 with conflicts
+		from <k-W-MUST> to <k-W-MUST> at levels  1
+
+****************** End of Dependence Graph ******************
+// DG after privatization
+
+ **************** Effective Dependence Graph ****************
+
+	38 --> 39 with conflicts
+		from <n-W-MUST> to <n-R-MUST> at levels  2
+	32 --> 33 with conflicts
+		from <m-W-MUST> to <m-R-MUST> at levels  2
+	25 --> 26 with conflicts
+		from <l-W-MUST> to <l-R-MUST> at levels  2
+	18 --> 19 with conflicts
+		from <k-W-MUST> to <k-R-MUST> at levels  2
+
+****************** End of Dependence Graph ******************
+//  COARSE_GRAIN_PARALLELIZATION
 void for04()
 {
+   /* Bad use-def chains computation */
    int i, k, l, m = 0, n = 0;
+   /* Correct use-def chains computation: no more than one write
+        effect per statement */
+   //int i,k,l;
+   //int m=0;
+   //int n=0;
    float x[100];
    
    /* k is not initialized before the loop */

@@ -10,6 +10,8 @@ activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+
+
 # If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
@@ -19,6 +21,11 @@ activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 activate REGION_CHAINS
+
+
+echo // DG Before privatization
+display DG_FILE[for04]
+
 
 # Compute the intraprocedural preconditions at the same time as
 # transformers and use them to improve the accuracy of expression
@@ -31,14 +38,23 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
 
+
+
 # Privatize scalar variables
-setenv PRIVATIZE_DEBUG_LEVEL=8
+#setenv PRIVATIZE_DEBUG_LEVEL=8
 apply PRIVATIZE_MODULE[for04]
 #apply ARRAY_PRIVATIZER[for04]
 
-# Ask for the parallelization of "for04"
+
+
+echo // DG after privatization
+
 activate RICE_ALL_DEPENDENCE
 display DG_FILE[for04]
+
+
+# Ask for the parallelization of "for04"
+echo //  COARSE_GRAIN_PARALLELIZATION
 apply COARSE_GRAIN_PARALLELIZATION[for04]
 display PRINTED_FILE[for04]
 

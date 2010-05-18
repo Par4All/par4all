@@ -1,0 +1,13 @@
+PROGRAM MAIN
+   INTEGER :: J, I
+   INTEGER :: B(100:200), A(1:10), C(1:10, 1:10)
+   PRINT *, 'hello world'
+   WRITE (1, *) 'hello world'
+   I = 0
+   PRINT *, I, I
+   PRINT *, (A(I), I = 1, 10), (B(I), I = 100, 110)
+   PRINT *, ((C(I,J), I = 1, 10), J = 1, 10)
+END PROGRAM MAIN
+
+"compile sources produced by pips"
+

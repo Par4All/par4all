@@ -1,21 +1,20 @@
-FUNCTION ADD1(A, B)
-INTEGER A, B
-ADD1 = A+B
-return
-END
-INTEGER FUNCTION ADD2(A, B)
-INTEGER A, B
-ADD2 = A+B
-return ADD2
-END
+INTEGER*4 FUNCTION ADD1(A, B)
+   INTEGER :: A, B
+   ADD1 = A+B
+   RETURN
+END FUNCTION ADD1
+INTEGER*4 FUNCTION ADD2(A, B)
+   INTEGER :: A, B
+   ADD2 = A+B
+   RETURN
+END FUNCTION ADD2
 PROGRAM MAIN
-INTEGER A, C, B
-A = 10
-B = 20
-C = ADD1(A, B)
-C = ADD2(A, B)
-END
+   INTEGER :: A, C, B
+   A = 10
+   B = 20
+   C = ADD1(A, B)
+   C = ADD2(A, B)
+END PROGRAM MAIN
 
 "compile sources produced by pips"
-
 

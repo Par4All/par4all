@@ -1,7 +1,7 @@
 
 Source code with transformers
 
-C  T(clone02) {n<=clone02+1, clone02<=n+1}
+//  T(clone02) {n<=clone02+1, clone02<=n+1}
 int clone02(int n, int s)
 {
 //  T(r) {n==r}
@@ -24,7 +24,7 @@ int main()
 {
 //  P() {}
    int i = 1;
-//  P() {i==1}
+//  P(i) {i==1}
    i = clone02(i, -1);
 //  P(i) {0<=i, i<=2}
    i = clone02(i, 1);
@@ -227,7 +227,7 @@ int main()
 {
 //  P() {}
    int i = 1;
-//  P() {i==1}
+//  P(i) {i==1}
    i = clone02_0(i, -1);
 //  P(i) {i==0}
    i = clone02_1(i, 1);

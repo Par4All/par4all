@@ -1,19 +1,13 @@
 delete convol2-sg1-C
-create convol2-sg1-C convol-unroll.c external.c
+create convol2-sg1-C convol-unroll.c include/p4a_stubs.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 # for scalarization
 #
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 activate MUST_REGIONS
 
-activate C_PARSER
-module main
 module convol
 
 echo
@@ -44,8 +38,11 @@ echo after paralellization
 echo
 
 setproperty LOOP_LABEL "l400"
-setproperty OUTLINE_MODULE_NAME "microcode"
-apply TERAPIXIFY[convol]
+setproperty KERNELIZE_KERNEL_NAME "microcode"
+setproperty KERNELIZE_NBNODES 128
+setproperty KERNELIZE_HOST_CALL_NAME "launch_microcode1"
+apply KERNELIZE[convol]
+apply KERNEL_LOAD_STORE[convol]
 
 display PRINTED_FILE[convol]
 
@@ -59,10 +56,10 @@ echo
 echo After double unrolling
 echo
 setproperty LOOP_UNROLL_MERGE TRUE
+setproperty LOOP_LABEL "l100"
 apply FULL_UNROLL[microcode]
-l100
+setproperty LOOP_LABEL "l200"
 apply FULL_UNROLL[microcode]
-l200
 
 echo
 echo after code cleaning
@@ -76,7 +73,8 @@ display PRINTED_FILE[microcode]
 echo
 echo After atomization
 echo
-setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
+#setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
 apply SIMD_ATOMIZER[microcode]
 display PRINTED_FILE[microcode]
 
@@ -85,6 +83,8 @@ display PRINTED_FILE[microcode]
 
 # probably useless for terapix microcode
 #apply INVARIANT_CODE_MOTION
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "1D"
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER[microcode]
 display PRINTED_FILE[microcode]
 apply PARTIAL_EVAL[microcode]

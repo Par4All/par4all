@@ -2,7 +2,7 @@
 Transformers for "while05"
 
 
-C  T(while05) {while05==9}
+//  T(while05) {while05==9}
 
 int while05()
 {

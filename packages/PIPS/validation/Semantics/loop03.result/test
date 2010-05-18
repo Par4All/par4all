@@ -13,7 +13,7 @@ Try to restructure the code for more precision:
 Transformers for "getimage" before privatization
 
 
-C  T() {}
+//  T() {}
 
 void getimage(char *filename)
 {
