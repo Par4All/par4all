@@ -12,6 +12,14 @@ import term
 verbosity = 0
 logger = None
 
+def set_verbosity(level):
+	global verbosity
+	verbosity = level
+
+def get_verbosity():
+	global verbosity
+	return verbosity
+
 # Printing/logging helpers.
 def debug(msg):
 	if verbosity >= 3:
