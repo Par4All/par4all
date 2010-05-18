@@ -34,7 +34,6 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "makefile.h"
 #include "properties.h"
 
 #include "misc.h"

@@ -31,16 +31,16 @@ LIB_CFILES =	\
 		interchange.c \
 		target.c \
 		nest_parallelization.c \
-                coarse_grain_parallelization.c \
+		coarse_grain_parallelization.c \
 		dead_code_elimination.c \
-                trivial_test_elimination.c \
+		trivial_test_elimination.c \
 		privatize.c \
 		array_privatization.c \
 		standardize_structure.c \
 		use_def_elimination.c \
 		declarations.c \
 		clone.c \
-	        transformation_test.c \
+		transformation_test.c \
 		freeze_variables.c \
 		array_resizing_bottom_up.c \
 		array_resizing_top_down.c \
@@ -48,7 +48,6 @@ LIB_CFILES =	\
 		partial_redundancy_elimination.c \
 		variable_expansion.c \
 		internalize_parallel_code.c \
-		inlining.c \
 		expression_substitution.c \
 		index_set_splitting.c \
 		for_loop_recovering.c \
@@ -56,9 +55,8 @@ LIB_CFILES =	\
 		manage_pragma.c \
 		scalarization.c \
 		flatten_code.c \
-		terapixify.c \
 		induction_substitution.c \
-		loop_expansion.c
+		manage_parallel_loops.c
 
 INC_TARGET =    $(TARGET).h
 

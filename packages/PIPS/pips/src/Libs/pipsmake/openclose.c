@@ -48,7 +48,6 @@
 
 #include "genC.h"
 #include "database.h"
-#include "makefile.h"
 #include "linear.h"
 #include "ri.h"
 

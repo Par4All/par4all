@@ -2953,6 +2953,30 @@ bool brace_expression_p(expression e)
 
 boolean reference_scalar_p(reference r)
 {
-    assert(!reference_undefined_p(r) && r!=NULL && reference_variable(r)!=NULL);
-    return (reference_indices(r) == NIL);
+  entity v = reference_variable(r);
+  assert(!reference_undefined_p(r) && r!=NULL && v!=NULL);
+  return (reference_indices(r) == NIL &&  entity_scalar_p(v));
+}
+
+/**
+   @brief take a list of expression and apply a binary operator between all
+   of them and return it as an expression
+   @return the  operations as an expression
+   @param l_exprs, the list of expressions to compute with the operator
+   @param op, the binary operator to apply
+ **/
+expression expressions_to_operation (const list l_exprs, entity op) {
+  expression result = expression_undefined;
+  if ((l_exprs != NIL) && (op != entity_undefined)){
+    list l_src = l_exprs;
+    result = EXPRESSION (CAR (l_src));
+    POP(l_src);
+    FOREACH (EXPRESSION, ex, l_src) {
+      list args =  gen_expression_cons (result, NIL);
+      args = gen_expression_cons (ex, args);
+      call c = make_call (op, args);
+      result = call_to_expression (c);
+    }
+  }
+  return result;
 }

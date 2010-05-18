@@ -1298,10 +1298,25 @@ static bool process_call_for_summary_precondition(call c)
   return TRUE;
 }
 
+/* Update the current_summary_precondition, if necessary, for call
+   located in the dimension declarations. May be useless because of
+   function below... */
+static bool process_statement_for_summary_precondition(statement s)
+{
+  bool ret_p = TRUE;
+  pips_internal_error("Not implemented. Should not be called.\n");
+  if(declaration_statement_p(s)) {
+    /* Look for call sites in the declarations, but see functions below... */
+    list dl = statement_declarations(s);
+    //ret_p = process_call_for_summary_precondition();
+  }
+  return ret_p;
+}
+
 /* This function is called to deal with call sites located in
    initialization expressions carried by declarations. */
 void update_summary_precondition_in_declaration(expression e,
-						       transformer pre)
+						transformer pre)
 {
   current_precondition = pre;
   gen_recurse(e,
@@ -1352,9 +1367,13 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
 
   module_to_value_mappings(caller);
 
+  /* calls hidden in dimension declarations are not caught because
+     entities are not traversed by gen_recurse(). */
   gen_multi_recurse(caller_statement,
 		    statement_domain, memorize_precondition_for_summary_precondition, gen_null,
 		    call_domain, process_call_for_summary_precondition, gen_null,
+		    // FI: to be checked. Should be useless.
+		    //statement_domain, process_declaration_for_summary_precondition, gen_null,
 		    NULL);
 
   free_value_mappings();

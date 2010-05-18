@@ -232,7 +232,7 @@ int CSafeSizeOfArray(entity a)
       pips_user_warning("Varying size for array \"%s\"\n", entity_name(a));
       /* should be a pips_user_error() to avoid useless and dangerous
 	 results */
-      pips_user_warning("Not yet supported properly by PIPS");
+      pips_user_warning("Not yet supported properly by PIPS\n");
   }
 
   return s;

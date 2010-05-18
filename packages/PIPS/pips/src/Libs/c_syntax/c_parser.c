@@ -43,7 +43,6 @@
 
 #include "resources.h"
 #include "database.h"
-#include "makefile.h"
 
 #include "pipsdbm.h"
 #include "pipsmake.h"
@@ -345,7 +344,7 @@ static bool actual_c_parser(string module_name,
     /* FI: not clean, but useful for debugging statement */
     ifdebug(1)
     {
-      set_prettyprint_is_fortran_p (FALSE);
+      set_prettyprint_language_tag(is_language_c);
     }
 
     /* Predefined type(s): __builtin_va_list */

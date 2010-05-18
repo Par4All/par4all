@@ -34,7 +34,6 @@
 #include "ri.h"
 
 #include "database.h"
-#include "makefile.h"
 #include "pipsmake.h"
 
 static pipsmake_callback_handler_type callback =

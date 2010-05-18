@@ -414,13 +414,13 @@ text text_transformer(transformer tran)
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup("\n")));
 
-  str_prefix = foresys? FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
+  str_prefix = foresys? FORESYS_CONTINUATION_PREFIX: get_comment_continuation();
   crt_line[0] = '\0';
 
   if (foresys)
     append(is_transformer? TRAN_FORESYS_PREFIX: PREC_FORESYS_PREFIX);
   else
-    append(PIPS_COMMENT_PREFIX);
+    append(get_comment_sentinel());
 
   if(tran != (transformer) HASH_UNDEFINED_VALUE &&
      tran != (transformer) list_undefined) {

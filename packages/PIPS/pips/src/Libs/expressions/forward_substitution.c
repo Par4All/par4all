@@ -200,7 +200,10 @@ static p_substitution substitution_candidate(statement s, bool only_scalar)
   args = call_arguments(c);
   pips_assert("2 args to =", gen_length(args)==2);
   svar = expression_syntax(EXPRESSION(CAR(args)));
-  pips_assert("assign to a reference", syntax_reference_p(svar));
+
+  if(!syntax_reference_p(svar)) // What about subscripts ?
+    return NULL;
+
   reference ref = syntax_reference(svar);
   
   //if (only_scalar && ENDP(reference_indices(ref))) return NULL; /* SCALAR */

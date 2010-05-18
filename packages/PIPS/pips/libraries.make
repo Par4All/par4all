@@ -61,7 +61,7 @@ endif
 pipslibs.libs	= \
 	top-level pipsmake static_controlize paf-util \
 	wp65 hpfc hyperplane to_begin_with \
-	instrumentation locality expressions transformations hwac \
+	instrumentation locality expressions transformations accel-util hwac \
 	movements bootstrap callgraph icfg chains complexity \
 	conversion prettyprint atomizer syntax c_syntax \
 	effects-simple effects-convex effects-generic alias-classes \

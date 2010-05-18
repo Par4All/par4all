@@ -103,95 +103,100 @@ bool user_view_p()
 
 /* Generic function to prettyprint some sequential or parallel code, or
    even user view for the given module. */
-bool print_code_or_source(string mod_name)
-{
-    bool success = FALSE;
-    text r = make_text(NIL);
-    entity module;
-    statement mod_stat;
-    string pp;
-    string resource_name = strdup
-	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-	    DBR_GRAPH_PRINTED_FILE
-		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
-    string file_ext = string_undefined;
+bool print_code_or_source(string mod_name) {
+  bool success = FALSE;
+  text r = make_text(NIL);
+  entity module;
+  statement mod_stat;
+  string pp;
+  bool print_graph_p = get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH");
+  string resource_name =
+      strdup(print_graph_p ? DBR_GRAPH_PRINTED_FILE
+                           : (is_user_view ? DBR_PARSED_PRINTED_FILE
+                                           : DBR_PRINTED_FILE));
+  string file_ext = string_undefined;
 
-    /* FI: This test could be moved up in pipsmake? */
-    if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
-      /* FI: Should be a pips_internal_error() as pipsmake is here to
-	 avoid this very problem... */
-      pips_user_error("Module \"\%s\"\n not found", mod_name);
-      return false;
-    }
+  /* FI: This test could be moved up in pipsmake? */
+  if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
+    /* FI: Should be a pips_internal_error() as pipsmake is here to
+     avoid this very problem... */
+    pips_user_error("Module \"\%s\"\n not found", mod_name);
+    return false;
+  }
 
-    string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
+  /*
+   * Set the current language
+   */
+  value mv = entity_initial(module);
+  if(value_code_p(mv)) {
+    code c = value_code(mv);
+    set_prettyprint_language_from_property(language_tag(code_language(c)));
+  }
 
-    if((strcmp (lang, "F77") == 0) && fortran_language_module_p(module)) {
-      file_ext =
-	strdup(concatenate
-	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-		GRAPH_FILE_EXT : "",
-		NULL));
-    }
-    else if((strcmp (lang, "C") == 0) || c_language_module_p(module)) {
-      file_ext =
-	strdup(concatenate
-	       (is_user_view? PRETTYPRINT_C_EXT : PREDICAT_C_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-		GRAPH_FILE_EXT : "",
-		NULL));
-    }
-    else if(strcmp (lang, "F95") == 0) {
-      file_ext =
-	strdup(concatenate
-	       (is_user_view? PRETTYPRINT_F95_EXT : PREDICAT_F95_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-		GRAPH_FILE_EXT : "",
-		NULL));
-    }
-    else
-      pips_internal_error("Unknown source language\n");
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+      file_ext = strdup(concatenate(is_user_view ? PRETTYPRINT_FORTRAN_EXT
+                                                 : PREDICAT_FORTRAN_EXT,
+                                    print_graph_p ? GRAPH_FILE_EXT : "",
+                                    NULL));
+      break;
+    case is_language_c:
+      file_ext = strdup(concatenate(is_user_view ? PRETTYPRINT_C_EXT
+                                                 : PREDICAT_C_EXT,
+                                    print_graph_p ? GRAPH_FILE_EXT : "",
+                                    NULL));
+      break;
+    case is_language_fortran95:
+      file_ext = strdup(concatenate(is_user_view ? PRETTYPRINT_F95_EXT
+                                                 : PREDICAT_F95_EXT,
+                                    print_graph_p ? GRAPH_FILE_EXT : "",
+                                    NULL));
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+  }
 
-    set_current_module_entity(module);
+  set_current_module_entity(module);
 
-    /* Since we want to prettyprint with a sequential syntax, save the
-       PRETTYPRINT_PARALLEL property that may select the parallel output
-       style before overriding it: */
-    pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
-    /* Select the default prettyprint style for sequential prettyprint: */
-    set_string_property("PRETTYPRINT_PARALLEL",
-			get_string_property("PRETTYPRINT_SEQUENTIAL_STYLE"));
+  /* Since we want to prettyprint with a sequential syntax, save the
+   PRETTYPRINT_PARALLEL property that may select the parallel output
+   style before overriding it: */
+  pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
+  /* Select the default prettyprint style for sequential prettyprint: */
+  set_string_property("PRETTYPRINT_PARALLEL",
+                      get_string_property("PRETTYPRINT_SEQUENTIAL_STYLE"));
 
-    mod_stat = (statement)
-	db_get_memory_resource(is_user_view?
-			       DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
+  mod_stat = (statement)db_get_memory_resource(is_user_view ? DBR_PARSED_CODE
+                                                            : DBR_CODE,
+                                               mod_name,
+                                               TRUE);
 
-    set_current_module_statement(mod_stat);
+  set_current_module_statement(mod_stat);
 
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
-    begin_attachment_prettyprint();
-    init_prettyprint(empty_text);
-    MERGE_TEXTS(r, text_module(module,mod_stat));
-    success = make_text_resource(mod_name, resource_name, file_ext, r);
-    end_attachment_prettyprint();
+  begin_attachment_prettyprint();
+  init_prettyprint(empty_text);
+  MERGE_TEXTS(r, text_module(module,mod_stat));
+  success = make_text_resource(mod_name, resource_name, file_ext, r);
+  end_attachment_prettyprint();
 
-    debug_off();
+  debug_off();
 
-    /* Restore the previous PRETTYPRINT_PARALLEL property for the next
-       parallel code prettyprint: */
-    set_string_property("PRETTYPRINT_PARALLEL", pp);
-    free(pp);
+  /* Restore the previous PRETTYPRINT_PARALLEL property for the next
+   parallel code prettyprint: */
+  set_string_property("PRETTYPRINT_PARALLEL", pp);
+  free(pp);
 
-    reset_current_module_entity();
-    reset_current_module_statement();
+  reset_current_module_entity();
+  reset_current_module_statement();
 
-    free_text(r);
-    free(resource_name);
-    free(file_ext);
+  free_text(r);
+  free(resource_name);
+  free(file_ext);
 
-    return success;
+  return success;
 }
 
 
@@ -227,20 +232,27 @@ static bool print_parallelized_code_common(
 
     close_prettyprint();
 
-    switch (language_tag (get_prettyprint_language ())) {
+    switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
-      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				    PARALLEL_FORTRAN_EXT, r);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_FORTRAN_EXT,
+                                   r);
       break;
     case is_language_c:
-      success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				    PARALLEL_C_EXT, r);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_C_EXT,
+                                   r);
       break;
     case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
+      success = make_text_resource(mod_name,
+                                   DBR_PARALLELPRINTED_FILE,
+                                   PARALLEL_FORTRAN95_EXT,
+                                   r);
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error("Language unknown !");
       break;
     }
 

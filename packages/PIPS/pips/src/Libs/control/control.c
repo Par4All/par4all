@@ -677,11 +677,11 @@ statement loop_test(statement sl)
   else
     lab = label_local_name(loop_label(l));
 
-  switch(language_tag (get_prettyprint_language ())) {
+  switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       cs = strdup(concatenate(prev_comm,
-                              get_prettyprint_comment(),
+                              get_comment_sentinel(),
                               "     DO loop ",
                               lab,
                               " with exit had to be desugared\n",
@@ -807,61 +807,63 @@ statement whileloop_test(statement sl)
     string cs = string_undefined;
     call c = call_undefined;
 
-    string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
-    if (strcmp (lang, "F77") == 0) {
-      c = make_call(entity_intrinsic(NOT_OPERATOR_NAME),
-		    CONS(EXPRESSION,
-			 copy_expression(whileloop_condition(l)),
-			 NIL));
-    }
-    else if (strcmp (lang, "C") == 0) {
-      c = make_call(entity_intrinsic(C_NOT_OPERATOR_NAME),
-		    CONS(EXPRESSION,
-			 copy_expression(whileloop_condition(l)),
-			 NIL));
-    }
-    else if (strcmp (lang, "F95") == 0) {
-      pips_assert ("Need to update F95 case", FALSE);
-    }
-    else {
-      pips_assert ("Not supported value for the propertty", FALSE);
+    switch (get_prettyprint_language_tag()) {
+      case is_language_fortran:
+        c = make_call(entity_intrinsic(NOT_OPERATOR_NAME),
+          CONS(EXPRESSION,
+         copy_expression(whileloop_condition(l)),
+         NIL));
+        break;
+      case is_language_c:
+        c = make_call(entity_intrinsic(C_NOT_OPERATOR_NAME),
+          CONS(EXPRESSION,
+         copy_expression(whileloop_condition(l)),
+         NIL));
+        break;
+      case is_language_fortran95:
+        pips_internal_error("Need to update F95 case");
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
 
     test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-				       normalized_undefined),
-		       make_plain_continue_statement(),
-		       make_plain_continue_statement());
+                                     normalized_undefined),
+                     make_plain_continue_statement(),
+                     make_plain_continue_statement());
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
     string lab = string_undefined;
 
-    lang = get_string_property ("PRETTYPRINT_LANGUAGE");
-    if (strcmp (lang, "F77") == 0) {
-      if(entity_empty_label_p(whileloop_label(l))) {
-	cs = strdup(concatenate(prev_comm,
-				"C     DO WHILE loop ",
-				"with GO TO exit had to be desugared\n",
-				NULL));
-      }
-      else {
-	lab = label_local_name(whileloop_label(l));
-	cs = strdup(concatenate(prev_comm,
-				"C     DO WHILE loop ",
-				lab,
-				" with GO TO exit had to be desugared\n",
-				NULL));
-      }
+    switch (get_prettyprint_language_tag()) {
+      case is_language_fortran:
+      case is_language_fortran95:
+        if(entity_empty_label_p(whileloop_label(l))) {
+          cs = strdup(concatenate(prev_comm,
+                                  get_comment_sentinel(),
+                                  "     DO WHILE loop ",
+                                  "with GO TO exit had to be desugared\n",
+                                  NULL));
+        } else {
+          lab = label_local_name(whileloop_label(l));
+          cs = strdup(concatenate(prev_comm,
+                                  get_comment_sentinel(),
+                                  "     DO WHILE loop ",
+                                  lab,
+                                  " with GO TO exit had to be desugared\n",
+                                  NULL));
+        }
+        break;
+      case is_language_c:
+        cs = prev_comm;
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
-    else if (strcmp (lang, "C") == 0) {
-      cs = prev_comm;
-    }
-    else if (strcmp (lang, "F95") == 0) {
-      pips_assert ("Need to update F95 case", FALSE);
-    }
-    else {
-      pips_assert ("Not supported value for the propertty", FALSE);
-    }
+
 
     ts = make_statement(entity_empty_label(),
 			statement_number(sl),

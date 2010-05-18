@@ -435,23 +435,21 @@ list /* of string */ effect_words_reference(reference obj)
     string mid = string_undefined;
     string end = string_undefined;
 
-    switch (language_tag (get_prettyprint_language ())) {
-    case is_language_fortran:
-      beg = "(";
-      mid = ",";
-      end = ")";
-      break;
-    case is_language_c:
-      beg = "[";
-      mid = "][";
-      end = "]";
-      break;
-    case is_language_fortran95:
-      pips_assert ("Need to update F95 case", FALSE);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran95:
+      case is_language_fortran:
+        beg = "(";
+        mid = ",";
+        end = ")";
+        break;
+      case is_language_c:
+        beg = "[";
+        mid = "][";
+        end = "]";
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
 
     pc = CHAIN_SWORD(pc,beg);

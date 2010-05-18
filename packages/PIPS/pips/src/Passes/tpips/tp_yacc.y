@@ -81,7 +81,6 @@
 
 #include "ri.h"
 #include "database.h"
-#include "makefile.h"
 
 #include "misc.h"
 

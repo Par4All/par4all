@@ -57,7 +57,7 @@ static bool loop_flt(loop l, context_p context )
   if( ! first_turn ) first_turn = TRUE; 
   return TRUE;
 } 
-void loop_rwt(loop l, context_p context  ) 
+static void loop_rwt(loop l, context_p context  ) 
 {  
   contenu_t contenu;
   int depth;

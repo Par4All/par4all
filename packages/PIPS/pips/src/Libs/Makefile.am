@@ -6,7 +6,7 @@ PIPS_SUBDIRS=\
 	effects-generic effects-simple semantics complexity \
 	continuation reductions effects-convex alias-classes \
 	callgraph icfg ricedg \
-	chains rice hyperplane transformations hwac expressions \
+	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util
 
@@ -40,6 +40,7 @@ libpipslibs_la_LIBADD=\
   	locality/liblocality.la\
   	expressions/libexpressions.la\
   	transformations/libtransformations.la\
+  	accel-util/libaccel-util.la\
   	hwac/libhwac.la\
 	movements/libmovements.la\
   	bootstrap/libbootstrap.la\

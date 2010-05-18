@@ -752,6 +752,45 @@ string safe_type_to_string(type t)
   return list_to_string(words_basic(b, NIL));
 }
 
+/* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
+BC : modified because it was assumed that each dimension was of pointer type which is not
+true when tab is declared int ** tab[10] and the expression is tab[3][4][5].
+*/
+static basic basic_and_indices_to_basic(basic b, list indices,bool ultimate_p)
+{
+    bool finished = false;
+    for(list l_ind = indices ; !ENDP(l_ind) && !finished ; POP(l_ind) )
+    {
+        if(basic_pointer_p(b))
+        {
+            type t = basic_pointer(b);
+            if(type_variable_p(t)) {
+                basic bt =
+                    copy_basic(variable_basic(type_variable(
+                                    ultimate_p?ultimate_type(t):t)));
+                free_basic(b);
+                b=bt;
+            }
+            else if(type_functional_p(t)) {
+                /* The expression can denote a function, because a
+                   function is equivalent to a pointer towards a
+                   function */
+                /* FI: we might as well return a pointer to a
+                   function */
+                ;
+            }
+            else
+                pips_internal_error("Unexpected basic kind\n");
+        }
+        else
+        {
+            /* the basic type is reached. Should I add pips_assert("basic reached, it should be the last index\n", ENDP(CAR(l_ind)))? */
+            finished = true;
+        }
+    }
+    return b;
+}
+
 
 /* basic basic_of_any_expression(expression exp, bool apply_p): Makes
  * a basic of the same basic as the expression "exp" if "apply_p" is
@@ -786,8 +825,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	 expressions which are grouped in one statement. */
       if(!type_undefined_p(vt)) {
 	type exp_type = ultimate_p? ultimate_type(vt) : copy_type(entity_type(v));
-	bool finished = false;
-	list l_ind=NIL, l_dim = NIL;
+	list l_dim = NIL;
 
 	if(apply_p) {
 	  if(!type_functional_p(exp_type))
@@ -830,39 +868,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 				  type_tag(exp_type), type_to_string(exp_type));
 	    }
 	}
-	/* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
-	   BC : modified because it was assumed that each dimension was of pointer type which is not
-	   true when tab is declared int ** tab[10] and the expression is tab[3][4][5].
-	*/
-	for(l_ind = reference_indices(syntax_reference(sy)) ; !ENDP(l_ind) && !finished ; POP(l_ind) )
-	  {
-	    if(basic_pointer_p(b))
-	      {
-              type t = basic_pointer(b);
-	      if(type_variable_p(t)) {
-		  basic bt =
-		    copy_basic(variable_basic(type_variable(
-							    ultimate_p?ultimate_type(t):t)));
-		  free_basic(b);
-		  b=bt;
-		}
-	      else if(type_functional_p(t)) {
-		/* The expression can denote a function, because a
-		   function is equivalent to a pointer towards a
-		   function */
-		/* FI: we might as well return a pointer to a
-		   function */
-		;
-	      }
-	      else
-		pips_internal_error("Unexpected basic kind\n");
-	      }
-	    else
-	      {
-		/* the basic type is reached. Should I add pips_assert("basic reached, it should be the last index\n", ENDP(CAR(l_ind)))? */
-		finished = true;
-	      }
-	  }
+    b = basic_and_indices_to_basic(b,reference_indices(syntax_reference(sy)),ultimate_p);
       }
       break;
     }
@@ -909,6 +915,8 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
   case is_syntax_subscript:
     {
       b = some_basic_of_any_expression(subscript_array(syntax_subscript(sy)), apply_p, ultimate_p);
+      /* depending on the depth of the subscript, we should change the basic */
+      b = basic_and_indices_to_basic(b,subscript_indices(syntax_subscript(sy)),ultimate_p);
       break;
     }
   case is_syntax_application:
@@ -1129,7 +1137,21 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 		}
 		else if(type_variable_p(pt) && !apply_p) {
                     free_basic(rb);
-                    rb = copy_basic(variable_basic(type_variable(pt)));
+                    variable v = type_variable(pt);
+                    if(ENDP(variable_dimensions(v)))
+                        rb = copy_basic(variable_basic(v));
+                    else {
+                        /* consider int a[12][13] is of type int (*)[13]*/
+                        rb = make_basic_pointer(
+                                make_type_variable(
+                                    make_variable(
+                                        copy_basic(variable_basic(v)),
+                                        gen_full_copy_list(CDR(variable_dimensions(v))),
+                                        gen_full_copy_list(variable_qualifiers(v))
+                                        )
+                                    )
+                                );
+                    }
                 }
                 else if(type_functional_p(pt)) {
                     if(apply_p) {

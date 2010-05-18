@@ -56,7 +56,6 @@
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "makefile.h"
 #include "database.h"
 
 #include "bootstrap.h"

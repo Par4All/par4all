@@ -160,6 +160,44 @@ transformer filter_transformer(transformer t, list e)
  * clean.  BC, oct. 94
  */
 
+/* Assumes that entity_has_values_p(v) holds. */
+transformer dimensions_to_transformer(entity v, transformer pre)
+{
+  transformer dt = transformer_identity();
+  type vt = entity_type(v); // Do not use ultimate_type or you'll miss
+			    // the dimensions.
+
+  if(type_variable_p(vt)) {
+    list dl = variable_dimensions(type_variable(vt)); // dimension list
+    if(!ENDP(dl)) { // to save a copy and to simplify debugging
+      transformer cpre = copy_transformer(pre);
+
+      FOREACH(DIMENSION, d, dl) {
+	expression l = dimension_lower(d);
+	expression u = dimension_upper(d);
+	transformer lt = safe_expression_to_transformer(l, cpre);
+	transformer lpre = transformer_apply(lt, pre);
+	transformer lpre_r = transformer_range(lpre);
+	transformer ut = safe_expression_to_transformer(u, lpre_r);
+	transformer upre = transformer_apply(ut, lpre);
+
+	free_transformer(cpre);
+	cpre = transformer_range(upre);
+	free_transformer(upre);
+	free_transformer(lpre);
+	free_transformer(lpre_r);
+
+	dt = transformer_combine(transformer_combine(dt, lt), ut);
+	free_transformer(lt);
+	free_transformer(ut);
+      }
+      free_transformer(cpre);
+    }
+  }
+
+  return dt;
+}
+
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
 /* It is not assumed that entity_has_values_p(v)==TRUE */
@@ -185,8 +223,13 @@ transformer declaration_to_transformer(entity v, transformer pre)
       tf = transformer_identity();
   }
   else {
+    /* Use the dimension expressions and the initial value */
+    transformer dt = dimensions_to_transformer(v, pre);
+    transformer npre = transformer_apply(dt, pre);
     expression ie = variable_initial_expression(v);
-    tf = safe_assigned_expression_to_transformer(v, ie, pre);
+    transformer itf = safe_assigned_expression_to_transformer(v, ie, npre);
+    tf = dt;
+    tf = transformer_combine(tf, itf);
     free_expression(ie);
   }
 
@@ -940,26 +983,38 @@ transformer any_user_call_site_to_transformer(entity f,
 	 arguments is strictly greater than the number of formal
 	 parameters */
       if(gen_length(pl)< gen_length(pc)) {
-	parameter lp = PARAMETER(CAR(gen_last(pl)));
-	type lpt = ultimate_type(parameter_type(lp));
-	if(type_varargs_p(lpt)) {
-	  /* The first actual arguments can be used */
-	  mn = gen_length(pl)-1;
+	if(gen_length(pl)==0) {
+	  /* FI: this case could be processed... */
+	    pips_user_warning("Different numbers of actual and formal parameters"
+			    "(%d and %d) for function \"%s\"\n",
+			    gen_length(pc), gen_length(pl), entity_user_name(f));
+	    mn = -1;
 	}
 	else {
-	  pips_user_error("Different numbers of actual and formal parameters"
-			  "(%d and %d) for function \"%s\"\n",
-			  gen_length(pl), gen_length(pc), entity_user_name(f));
+	  parameter lp = PARAMETER(CAR(gen_last(pl)));
+	  type lpt = ultimate_type(parameter_type(lp));
+	  if(type_varargs_p(lpt)) {
+	    /* The first actual arguments can be used */
+	    mn = gen_length(pl)-1;
+	  }
+	  else {
+	    pips_user_error("Different numbers of actual and formal parameters"
+			    "(%d and %d) for function \"%s\"\n",
+			    gen_length(pc), gen_length(pl), entity_user_name(f));
+	  }
 	}
       }
       else {
 	pips_user_error("Different numbers of actual and formal parameters"
 		      "(%d and %d) for function \"%s\"\n",
-		      gen_length(pl), gen_length(pc), entity_user_name(f));
+		      gen_length(pc), gen_length(pl), entity_user_name(f));
       }
     }
   }
+  else
+    mn = gen_length(pl);
 
+  if(mn>=0) {
   /* Evaluate actual arguments from left to right linking it to a
      functional parameter when possible */
   FOREACH(EXPRESSION,e, pc) {
@@ -983,7 +1038,7 @@ transformer any_user_call_site_to_transformer(entity f,
     if(entity_undefined_p(fpv)) {
       pips_user_error("Cannot find formal parameter %d for function \"%s\"."
 		      " Mismatch between functon declaration and call site."
-		      " Check the source code with gcc.\n",
+		      " Check the source code with flint, gcc or gfortran.\n",
 		      n, entity_user_name(f));
     }
 
@@ -1044,6 +1099,7 @@ transformer any_user_call_site_to_transformer(entity f,
     /* Can we still use the next actual parameter? Maybe not because
        of a vararg. */
     if(n>mn) break;
+  }
   }
 
   gen_free_list(fpvl);

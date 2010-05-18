@@ -26,15 +26,13 @@
 #endif
 #include <stdio.h>
 #include "genC.h"    
-#include "linear.h"
-#include "ri.h"  
 #include "database.h"  
 #include "resources.h"
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "transformations.h"
-#include "locality-local.h"
+#include "locality.h"
 
 #define DEFAULT_INT_PREFIX 	"I_"
 #define DEFAULT_FLOAT_PREFIX 	"F_"
@@ -83,6 +81,20 @@ loop loop1;       /* une copie de l'un des nids de la sequence */
 
 entity first_array;  /* le tableau en entree */
 
+/* J'ai ameliore la fonction make_new_scalar_variable */
+/* afin de l'etendre  a des tableau   */
+static entity make_new_array_variable(int i, int j, entity module,
+                         basic b,list lis)
+{
+  char *buffer;
+  if(j==-1)
+  asprintf(&buffer,"%s%d", "B",i);
+  else 
+    asprintf(&buffer,"%s%d_%d", "B",i,j);
+  entity e = make_new_array_variable_with_prefix(buffer, module, b,lis);
+  free(buffer);
+  return e;
+}
 
 /* Compteurs des suffixes de nouvelles references */
 static int unique_integer_number = 0,
@@ -668,66 +680,6 @@ static Pvecteur buffer_acces(int nid )
 } 
 
 
-/* J'ai ameliore la fonction make_scalar_entity afin de l'etendre  a des tableau   */
-static entity make_array_entity(name, module_name, base,lis)
-string name;
-string module_name;
-basic base;
-list lis;
-{
-  string full_name;
-  entity e, f, a;
-  basic b = base;
-  asprintf(&full_name,"%s"MODULE_SEP_STRING"%s",module_name,name);
-  pips_debug(8, "name %s\n", full_name);
-  int n =0;
-  while(!entity_undefined_p(gen_find_tabulated(full_name, entity_domain)))
-  {
-      free(full_name);
-      asprintf(&full_name,"%s"MODULE_SEP_STRING"%s%d",module_name,name,n++);
-  }
-  e = make_entity(full_name, type_undefined, storage_undefined, value_undefined);
- 
-  entity_type(e) = (type) MakeTypeVariable(b, lis);
-  f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
-  entity_storage(e) = 
-    make_storage(is_storage_ram,
-		 make_ram(f, a,
-			  (basic_tag(base)!=is_basic_overloaded)?
-			  (add_variable_to_area(a, e)):(0),
-			  NIL));
-  entity_initial(e) = make_value_unknown();
-  return(e);
-}
-
-
-/* J'ai ameliore la fonction make_new_scalar_variable_with_prefix  */
-/* afin de l'etendre  a des tableau   */
-
-entity make_new_array_variable_with_prefix(const char* prefix, entity module,basic b,list dimensions)
-{
-  string module_name = module_local_name(module);
-  entity e;
-  e = make_array_entity(prefix, module_name, b, dimensions);
-  AddEntityToDeclarations(e, module);
-  return e;
-}
-
-/* J'ai ameliore la fonction make_new_scalar_variable */
-/* afin de l'etendre  a des tableau   */
-static entity make_new_array_variable(int i, int j, entity module,
-                         basic b,list lis)
-{
-  char *buffer;
-  if(j==-1)
-  asprintf(&buffer,"%s%d", "B",i);
-  else 
-    asprintf(&buffer,"%s%d_%d", "B",i,j);
-  entity e = make_new_array_variable_with_prefix(buffer, module, b,lis);
-  free(buffer);
-  return e;
-}
 
 /* Cette fonction donne le code fusionne avec allocation des tampons */
 static statement fusion_buffer()

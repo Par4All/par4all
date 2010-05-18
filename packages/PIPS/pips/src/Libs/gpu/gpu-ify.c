@@ -19,7 +19,7 @@
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
-#include "transformations.h"
+#include "accel-util.h"
 #include "resources.h"
 #include "properties.h"
 #include "bootstrap.h"
@@ -93,10 +93,9 @@ mark_loop_to_outline(const statement s) {
       for(j = 1; j <= 499; j += 1)
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
-   it generates something like
-   p4a_kernel_launcher_0(save, space);
-
+   it generates something like:
    [...]
+   If the GPU_USE_LAUNCHER property is true, this kind of function is generated:
    void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
    {
      int i;
@@ -107,12 +106,15 @@ mark_loop_to_outline(const statement s) {
          p4a_kernel_wrapper_0(save, space, i, j);
    }
 
+   If the GPU_USE_WRAPPER property is true, this kind of function is generated:
    void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
    {
      i = P4A_pv_0(i);
      j = P4A_pv_1(j);
      p4a_kernel_0(save, space, i, j);
    }
+
+   If the GPU_USE_KERNEL property is true, this kind of function is generated:
    void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int
                      i, int j) {
      save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
@@ -205,6 +207,16 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
 }
 
 
+/* Transform all the parallel loop nests of a module into smaller
+   independent functions suitable for GPU-style accelerators.
+
+   What can be done is more detailed in gpu_ify_statement().  The various
+   functions are generated or not according to different properties.
+
+   @param module_name is the name of the module to work on.
+
+   @return TRUE since it should succeed...
+*/
 bool gpu_ify(const string module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,

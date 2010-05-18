@@ -22,15 +22,6 @@
 
 */
 
-/* is_fortran is declared in ri-util, but it's not the proper location
-   as text-util is supposed to be independent of ri-util. But
-   PIPS_COMMENT_SENTINEL should not be in text-util since it is fully
-   language independent. However, PIPS_COMMENT_CONTINUATION is used in util.c... */
-#define PIPS_COMMENT_SENTINEL 		(get_prettyprint_comment())
-#define PIPS_COMMENT_PREFIX   		PIPS_COMMENT_SENTINEL
-/* #define PIPS_COMMENT_CONTINUATION 	PIPS_COMMENT_SENTINEL "    " */
-#define PIPS_COMMENT_CONTINUATION 	(get_prettyprint_is_fortran ()? "C    " : "//    ")
-
 #define FORESYS_CONTINUATION_PREFIX "C$&" "    "
 
 #define MAKE_SWORD(s) strdup(s)

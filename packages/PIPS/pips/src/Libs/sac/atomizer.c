@@ -129,21 +129,11 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
     if(!basic_undefined_p(bofe)) {
         if (!basic_overloaded_p(bofe))
         {
-            entity newvar; 
-            expression rhs;
-            statement assign;
-            syntax ref;
-
-            newvar = (*create)(get_current_module_entity(), bofe);
-            rhs = make_expression(expression_syntax(e), normalized_undefined);
+            entity newvar = (*create)(get_current_module_entity(), bofe);
+            expression rhs = make_expression(expression_syntax(e), normalized_undefined);
             normalize_all_expressions_of(rhs);
-
-            ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
-
-            assign = make_assign_statement(make_expression(copy_syntax(ref), 
-                        normalized_undefined), 
-                    rhs);
-            expression_syntax(e) = ref;
+            statement assign = make_assign_statement(entity_to_expression(newvar),rhs);
+            expression_syntax(e) = make_syntax_reference( make_reference(newvar, NIL));
 
             return assign;
         }

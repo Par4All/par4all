@@ -31,8 +31,6 @@ completion_list.h :	\
 
 BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h tp_yacc.h
 AM_CPPFLAGS=\
-	$(READLINE_CFLAGS) $(TERMCAP_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\
 	-I../../Documentation/newgen\
@@ -44,6 +42,8 @@ AM_CPPFLAGS=\
 	-I../../Libs/properties\
 	-I../../Libs/top-level\
 	-I../../Libs/preprocessor\
+	$(READLINE_CFLAGS) $(TERMCAP_CFLAGS)\
+	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
 	-DNEWGEN_REV='"unknown"' \
 	-DUTC_DATE='"unknown"' \
 	-DLINEAR_REV='"unknown"' \

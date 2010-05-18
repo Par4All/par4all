@@ -100,9 +100,8 @@ entity_to_callees(entity mod)
 
     callees_list = string_to_callees(module_name);
 
-    MAP(STRING, e,
-	rl = CONS(ENTITY, module_name_to_entity(e), rl),
-	callees_list);
+    FOREACH(STRING, e,callees_list)
+        rl = CONS(ENTITY, module_name_to_entity(e), rl);
 
     return rl;
 }
@@ -156,7 +155,7 @@ callgraph_module_name(
     print_text(fp, r);
     fprintf(fp, " %s\n", module_name);
 
-    MAP(ENTITY, e,
+    FOREACH(ENTITY, e,entity_to_callees(module))
     {
 	string n = module_resource_name(e);
 	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
@@ -165,8 +164,7 @@ callgraph_module_name(
 	safe_append(fp, full, CALLGRAPH_INDENT, TRUE);
 
 	free(full);
-    },
-	entity_to_callees(module));
+    }
 
     free(dir);
 }
@@ -212,10 +210,9 @@ add_call_to_callees(const call c, callees *current_callees) {
        value_unknown_p(entity_initial(called)))) {
     string name = entity_local_name(called);
     // Only add the callee if not already here:
-    MAP(STRING, s,
-	if (same_string_p(name, s))
-	  return,
-	callees_callees(*current_callees));
+    FOREACH(STRING, s, callees_callees(*current_callees))
+        if (same_string_p(name, s))
+            return;
     callees_callees(*current_callees) =
       CONS(STRING, strdup(name), callees_callees(*current_callees));
   }
@@ -257,7 +254,7 @@ static void transitive_positions(set vertices,
     n = 0;
     iter++;
 
-    SET_MAP(v1, {
+    SET_FOREACH(string,v1,vertices) {
       _int cmp = 0; /* current module position */
       string source_module = (string) v1; /* gdb does not access v1 */
       callees c = (callees) hash_get(arcs, (void *) v1);
@@ -279,20 +276,20 @@ static void transitive_positions(set vertices,
 	nvertices++;
       }
       else {
-	MAP(STRING, v2, {
+	FOREACH(STRING, v2,destinations) {
 	  _int p = 0;
 
 	  if((p = (_int) hash_get(position, v2)) == (_int) HASH_UNDEFINED_VALUE)
 	    goto next;
 	  cmp = p+1>cmp? p+1 : cmp;
-	}, destinations);
+	}
 	/* do not know when to perform a put or an update... */
 	hash_put(position, v1, (void *) cmp);
 	n++;
 	nvertices++;
       next: ;
       }
-    }, vertices);
+    }
     pips_debug(1, "Iteration %td completed with %td vertices processed\n"
 	       "(total number of vertices processed: %td)\n",
 	       iter, n, nvertices);
@@ -301,19 +298,19 @@ static void transitive_positions(set vertices,
   /* Check that all vertices are associated to a position... which only is
      true if no recursive cycle exists. */
   ifdebug(7) {
-    SET_MAP(v1, {
-      _int p = (_int)hash_get(position, (void *) v1);
+    SET_FOREACH(string,v1,vertices) {
+      _int p = (_int)hash_get(position,  v1);
       pips_assert("p is defined", p != (_int) HASH_UNDEFINED_VALUE);
-    }, vertices);
+    }
   }
 
   n = 0;
-  SET_MAP(v1, {
-    if(hash_get(position, (void *) v1) == HASH_UNDEFINED_VALUE) {
-      pips_user_warning("Module %s might be part of a recursive call cycle\n", (string) v1);
+  SET_FOREACH(string,v1,vertices) {
+    if(hash_get(position,  v1) == HASH_UNDEFINED_VALUE) {
+      pips_user_warning("Module %s might be part of a recursive call cycle\n", v1);
       n++;
     }
-  }, vertices);
+  }
   if(n!=0)
       pips_user_warning("%td module could not be given a position in the call graph,"
 			" probably because of a recursive call cycle.\n", n);
@@ -411,6 +408,7 @@ bool callgraph(string name)
 	  c =  (callees)
 	    db_get_memory_resource(DBR_CALLEES, module_called, TRUE);
 	  hash_put(module_callees, (void *) module_called, (void *) c);
+      rmake(DBR_CALLERS, module_called);
 	}
 	else {
 	  /* You cannot call pips_user_error() again, as it has just been
