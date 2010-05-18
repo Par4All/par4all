@@ -28,7 +28,7 @@ class ValidationClass:
 		self.arch=commands.getoutput(self.p4a_root+"/run/makes/arch.sh")
 
 #### Function which run tests and save result on result_log ######
-  def test_par4all(self,directory_test_path,test_file_path,log_file):
+  def test_par4all(self,directory_test_path,test_file_path,log_file,extension_file):
 		# .result directory of the test to compare results
 		test_file_path = test_file_path.strip('\n')
 		(test_name_path, ext) = os.path.splitext(test_file_path)
@@ -166,7 +166,7 @@ class ValidationClass:
 					#status of the test
 					status = 'succeeded'
 
-		self.file_result.write ('%s: %s/%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path)))
+		self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
 		self.file_result.close()
 	
 		# Return to validation Par4All
@@ -208,15 +208,20 @@ class ValidationClass:
 			directory_test = self.par4ll_validation_dir + directory[0]
 			
 			print (('# Considering %s')%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
+
+			ext = ext.strip('\n')
 			
-			if os.path.isdir(directory_test):
-				# Run test
-				nb_test = nb_test+1
-				status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
-				if (status != "succeeded"):
-					nb_failed = nb_failed+1
+			if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
+				if os.path.isdir(directory_test):
+					# Run test
+					nb_test = nb_test+1
+					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt',ext)
+					if (status != "succeeded"):
+						nb_failed = nb_failed+1
+				else:
+					print ('%s not accessible' % (directory_test))
 			else:
-				print ('%s not accessible' % (directory_test))
+				print ("To test %s, use an extension like .c, .f90, .f, .F\n"%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
 
 		f.close()
 		print('%s failed in %s tests'%(nb_failed,nb_test))
@@ -304,7 +309,7 @@ class ValidationClass:
 
 								if (find != 'yes'):
 									default_test_h = open('diff.txt','a')
-									default_test_h.write(default_test+'\n')
+									default_test_h.write(default_test+ext+'\n')
 									default_test_h.close()
 						
 							# None par4all_validation.txt file
