@@ -232,7 +232,7 @@ entity find_or_create_allocatable_struct(basic b, string name, int ndim) {
   string struct_name;
   string b_str = STRING(CAR(words_basic(b,NULL)));
   pips_assert("asprintf !",
-      asprintf( &struct_name, ALLOCATABLE_PREFIX "%s_%dD", b_str,ndim));
+      asprintf( &struct_name, ALLOCATABLE_PREFIX"%s_%s_%dD", name, b_str,ndim));
 
   // Here is the internal PIPS name, there is a prefix for struct
   string prefixed_name = strdup(concatenate(STRUCT_PREFIX, struct_name, NULL));

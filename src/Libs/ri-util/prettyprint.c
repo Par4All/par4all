@@ -4604,13 +4604,18 @@ static list words_subscript(subscript s, list pdl)
           "and it's not an allocatable",
           allocatable_p );
       pc = gen_nconc(pc, words_expression(a, pdl));
-      pc = CHAIN_SWORD(pc,"(");
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"(");
+      }
       break;
     }
     case is_language_c:
       pc = CHAIN_SWORD(pc,"(");
       pc = gen_nconc(pc, words_expression(a, pdl));
-      pc = CHAIN_SWORD(pc,")[");
+      pc = CHAIN_SWORD(pc,")");
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"[");
+      }
       break;
     default:
       pips_internal_error("Language unknown !");
@@ -4641,10 +4646,14 @@ static list words_subscript(subscript s, list pdl)
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
-      pc = CHAIN_SWORD(pc,")");
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,")");
+      }
       break;
     case is_language_c:
-      pc = CHAIN_SWORD(pc,"]");
+      if(!ENDP(lexp)) {
+        pc = CHAIN_SWORD(pc,"]");
+      }
       break;
     default:
       pips_internal_error("Language unknown !");
