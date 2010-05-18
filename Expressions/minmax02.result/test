@@ -1,3 +1,16 @@
+
+Initial source code
+
+void main()
+{
+   int al, lo;
+   for(lo = 0; lo <= 9; lo += 1)
+      al = MAX(al, lo);
+   printf("%d\n", al);
+}
+
+MIN and/or MAX should have disapeared
+
 void main()
 {
    int al, lo;
