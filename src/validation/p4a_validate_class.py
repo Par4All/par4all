@@ -207,7 +207,7 @@ class ValidationClass:
 			directory=root.split("/")
 			directory_test = self.par4ll_validation_dir + directory[0]
 			
-			print (('# Considering %s')%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
+			print (('# Considering %s')%(line.strip('\n')))
 
 			ext = ext.strip('\n')
 			
@@ -283,8 +283,8 @@ class ValidationClass:
 
 						if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
 							# default_test depends of par4all_validation.txt
-							default_test = line+'/'+os.path.basename(root)
-							default_test_bis = line+'\ '+os.path.basename(root)
+							default_test = line+'/'+os.path.basename(file_test)
+							default_test_bis = line+'\ '+os.path.basename(file_test)
 							find = 'no'
 				
 							nb_test = nb_test+1
@@ -293,13 +293,11 @@ class ValidationClass:
 							if os.path.isfile('par4all_validation.txt'):
 								par4all = open("par4all_validation.txt")
 								for line_p4a in par4all:
-									(root_p4a, ext_p4a) = os.path.splitext(line_p4a)
-
-									if (default_test == root_p4a.strip('\n')):
+									if (default_test == line_p4a.strip('\n')):
 										# Test is found
 										find = 'yes'
 										nb_test = nb_test - 1
-									elif (default_test_bis.replace(" ","")== root_p4a.strip('\n')):
+									elif (default_test_bis.replace(" ","")== line_p4a.strip('\n')):
 										# Test is found
 										find = 'yes'
 										nb_test = nb_test - 1
@@ -309,7 +307,7 @@ class ValidationClass:
 
 								if (find != 'yes'):
 									default_test_h = open('diff.txt','a')
-									default_test_h.write(default_test+ext+'\n')
+									default_test_h.write(default_test+'\n')
 									default_test_h.close()
 						
 							# None par4all_validation.txt file
@@ -339,7 +337,7 @@ def main():
 
 	elif options.diff:
 		vc = ValidationClass().diff()
-		print('Tests which are not done by --p4a options are into p4a_log.txt file')
+		print('Tests which are not done by --p4a options are into diff.txt file')
 	
 	else:
 		output = commands.getoutput("python p4a_validate_class.py -h")
