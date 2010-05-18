@@ -32,3 +32,5 @@ l99998:
 }
 extern void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3]);
 extern void convol(int n, int a[n][n], int b[n][n], int kernel[3][3]);
+//PIPS generated variable
+void convol_outlined(int n, int i, int a[n][n], int b[n][n], int kernel[3][3]);

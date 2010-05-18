@@ -1,5 +1,6 @@
-delete outline04
-create outline04 outline04.c
+setenv WS="outline04"
+delete $WS
+create $WS $WS.c
 
 echo Select the most precise analysis:
 activate MUST_REGIONS
@@ -34,5 +35,5 @@ echo The loop nest of init_kernel should be parallel:
 display PRINTED_FILE[%ALLFUNC]
 
 close
-delete outline04
+delete $WS
 quit

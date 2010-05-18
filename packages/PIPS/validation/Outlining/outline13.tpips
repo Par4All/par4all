@@ -1,0 +1,40 @@
+setenv WS="outline13"
+delete $WS
+create $WS $WS.c
+
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+#activate REGION_CHAINS
+
+# To validate also the debug level :-)
+#setenv COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL 5
+
+display PARSED_PRINTED_FILE[main]
+activate PRINT_CODE_INV_REGIONS
+display PRINTED_FILE[main]
+
+apply PRIVATIZE_MODULE[main]
+display PRINTED_FILE[main]
+
+apply COARSE_GRAIN_PARALLELIZATION[main]
+
+echo The first loop nest must be parallel:
+display PRINTED_FILE[main]
+
+setproperty OUTLINE_LABEL "init_kernel"
+setproperty OUTLINE_MODULE_NAME "init_kernel"
+setproperty OUTLINE_SMART_REFERENCE_COMPUTATION TRUE
+apply OUTLINE[main]
+display PRINTED_FILE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
+echo The loop nest of init_kernel should be parallel:
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS
+quit

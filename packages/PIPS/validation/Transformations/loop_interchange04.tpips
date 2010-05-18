@@ -24,7 +24,7 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT[%PROGRAM]
-shell (cd loop_interchange04.database/Src; $PIPS_F77 loop_interchange04.f)
+shell $PIPS_F77 loop_interchange04.database/Src/loop_interchange04.f -o loop_interchange04.database/out
 
 close
 quit

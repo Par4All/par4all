@@ -10,6 +10,9 @@ Compute the intraprocedural preconditions at the same time as
 transformers and use them to improve the accuracy of expression
 and statement transformers:
 Try to restructure the code for more precision:
+
+Warning: assume that there is no aliasing between IO streams 
+(FILE * variables)
 Privatize scalar variables on all the modules of the program:
 Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
