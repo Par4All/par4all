@@ -1537,146 +1537,153 @@ type intrinsic_call_to_type(call c)
 
   entity f = call_function(c);
   list args = call_arguments(c);
-
-  type rt = functional_result(type_functional(entity_type(f)));
-  basic rb = variable_basic(type_variable(rt));
-
   type t = type_undefined; /* the result */
+  type rt = functional_result(type_functional(entity_type(f)));
 
-  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
-	     module_local_name(f),
-	     words_to_string(words_type(rt, NIL)));
-
-  if(basic_overloaded_p(rb))
-    {
-
-      if (ENDP(args))
-	{
-	  /* I don't know the type since there is no arguments !
-	     Bug encountered with a FMT=* in a PRINT.
-	     RK, 21/02/1994 : */
-	  /* leave it overloaded */
-	  t = copy_type(rt);
-	}
-      else if(ENTITY_ADDRESS_OF_P(f))
-	{
-	  expression e = EXPRESSION(CAR(args));
-	  t = expression_to_type(e);
-	  t = make_type(is_type_variable,
-			make_variable( make_basic(is_basic_pointer,t),
-				       NIL, NIL ));
-
-	}
-      else if(ENTITY_DEREFERENCING_P(f))
-	{
-	  expression e = EXPRESSION(CAR(args));
-	  type ct = expression_to_type(e);
-
-	  if (type_variable_p(ct))
-	    {
-	      variable cv = type_variable(ct);
-	      basic cb = variable_basic(cv);
-	      list cd = variable_dimensions(cv);
-
-	      if(basic_pointer_p(cb))
-		{
-		  t = copy_type(ultimate_type(basic_pointer(cb)));
-		  pips_assert("The pointed type is consistent",
-			      type_consistent_p(t));
-		  free_type(ct);
-		}
-	      else if(basic_string_p(cb))
-		{
-		  t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
-		}
-	      else
-		{
-		  pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
-
-		  variable_dimensions(cv) = CDR(cd);
-		  cd->cdr = NIL;
-		  gen_full_free_list(cd);
-		  t = ct;
-		}
-	    }
-	  else
-	    {
-	      pips_internal_error("dereferencing of a non-variable : not handled yet\n");
-	    }
-	}
-      else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f))
-	{
-	  expression e1 = EXPRESSION(CAR(args));
-	  expression e2 = EXPRESSION(CAR(CDR(args)));
-
-	  pips_assert("Two arguments for POINT_TO or FIELD \n",
-		      gen_length(args)==2);
-
-	  ifdebug(8)
-	    {
-	      pips_debug(8, "Point to case, e1 = ");
-	      print_expression(e1);
-	      pips_debug(8, " and e2 = ");
-	      print_expression(e2);
-	      pips_debug(8, "\n");
-	    }
-	  t = expression_to_type(e2);
-	}
-      else if(ENTITY_BRACE_INTRINSIC_P(f))
-	{
-	  /* We should reconstruct a struct type or an array type... */
-	  t = make_type(is_type_variable, make_variable(make_basic_overloaded(),
-						       NIL,NIL));
-	}
-      else if(ENTITY_ASSIGN_P(f))
-	{
-	  /* returns the type of the left hand side */
-	  t = expression_to_type(EXPRESSION(CAR(args)));
-	}
-      else if(ENTITY_COMMA_P(f))
-	{
-	  /* The value returned is the value of the last expression in the list. */
-
-	  t = expression_to_type(EXPRESSION(CAR(gen_last(args))));
-	}
-      else if( ENTITY_CONDITIONAL_P(f))
-	{
-	  /* let us assume that the two last arguments have the same
-	   type : basic_maximum does not preserve types enough
-	  (see Effects/lhs01.c, expression *(i>2?&i:&j) ). BC.
-	  */
-	  t = expression_to_type(EXPRESSION(CAR(CDR(args))));
-	}
-      else
-	{
-
-	  type ct = expression_to_type(EXPRESSION(CAR(args)));
-
-	  MAP(EXPRESSION, arg, {
-	      type nt = expression_to_type(arg);
-	      basic nb = variable_basic(type_variable(nt));
-	      basic cb = variable_basic(type_variable(ct));
-
-	      /* re-use an existing function. we do not take into
-		 account variable dimensions here. It may not be correct.
-		 but it's not worse than the previously existing version
-		 of expression_to_type
-	      */
-	      basic b = basic_maximum(cb, nb);
-
-	      free_type(ct);
-	      free_type(nt);
-	      ct = make_type(is_type_variable, make_variable(b, NIL, NIL));
-
-	    }, CDR(args));
-	  t = ct;
-	}
-    }
-  else {
+  if(type_void_p(rt)) {
     t = copy_type(rt);
   }
+  else if(type_variable_p(rt)) {
+    basic rb = variable_basic(type_variable(rt));
 
-  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
+    pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
+	       module_local_name(f),
+	       words_to_string(words_type(rt, NIL)));
+
+    if(basic_overloaded_p(rb))
+      {
+
+	if (ENDP(args))
+	  {
+	    /* I don't know the type since there is no arguments !
+	       Bug encountered with a FMT=* in a PRINT.
+	       RK, 21/02/1994 : */
+	    /* leave it overloaded */
+	    t = copy_type(rt);
+	  }
+	else if(ENTITY_ADDRESS_OF_P(f))
+	  {
+	    expression e = EXPRESSION(CAR(args));
+	    t = expression_to_type(e);
+	    t = make_type(is_type_variable,
+			  make_variable( make_basic(is_basic_pointer,t),
+					 NIL, NIL ));
+
+	  }
+	else if(ENTITY_DEREFERENCING_P(f))
+	  {
+	    expression e = EXPRESSION(CAR(args));
+	    type ct = expression_to_type(e);
+
+	    if (type_variable_p(ct))
+	      {
+		variable cv = type_variable(ct);
+		basic cb = variable_basic(cv);
+		list cd = variable_dimensions(cv);
+
+		if(basic_pointer_p(cb))
+		  {
+		    t = copy_type(ultimate_type(basic_pointer(cb)));
+		    pips_assert("The pointed type is consistent",
+				type_consistent_p(t));
+		    free_type(ct);
+		  }
+		else if(basic_string_p(cb))
+		  {
+		    t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
+		  }
+		else
+		  {
+		    pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
+
+		    variable_dimensions(cv) = CDR(cd);
+		    cd->cdr = NIL;
+		    gen_full_free_list(cd);
+		    t = ct;
+		  }
+	      }
+	    else
+	      {
+		pips_internal_error("dereferencing of a non-variable : not handled yet\n");
+	      }
+	  }
+	else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f))
+	  {
+	    expression e1 = EXPRESSION(CAR(args));
+	    expression e2 = EXPRESSION(CAR(CDR(args)));
+
+	    pips_assert("Two arguments for POINT_TO or FIELD \n",
+			gen_length(args)==2);
+
+	    ifdebug(8)
+	      {
+		pips_debug(8, "Point to case, e1 = ");
+		print_expression(e1);
+		pips_debug(8, " and e2 = ");
+		print_expression(e2);
+		pips_debug(8, "\n");
+	      }
+	    t = expression_to_type(e2);
+	  }
+	else if(ENTITY_BRACE_INTRINSIC_P(f))
+	  {
+	    /* We should reconstruct a struct type or an array type... */
+	    t = make_type(is_type_variable, make_variable(make_basic_overloaded(),
+							  NIL,NIL));
+	  }
+	else if(ENTITY_ASSIGN_P(f))
+	  {
+	    /* returns the type of the left hand side */
+	    t = expression_to_type(EXPRESSION(CAR(args)));
+	  }
+	else if(ENTITY_COMMA_P(f))
+	  {
+	    /* The value returned is the value of the last expression in the list. */
+
+	    t = expression_to_type(EXPRESSION(CAR(gen_last(args))));
+	  }
+	else if( ENTITY_CONDITIONAL_P(f))
+	  {
+	    /* let us assume that the two last arguments have the same
+	       type : basic_maximum does not preserve types enough
+	       (see Effects/lhs01.c, expression *(i>2?&i:&j) ). BC.
+	    */
+	    t = expression_to_type(EXPRESSION(CAR(CDR(args))));
+	  }
+	else
+	  {
+
+	    type ct = expression_to_type(EXPRESSION(CAR(args)));
+
+	    MAP(EXPRESSION, arg, {
+		type nt = expression_to_type(arg);
+		basic nb = variable_basic(type_variable(nt));
+		basic cb = variable_basic(type_variable(ct));
+
+		/* re-use an existing function. we do not take into
+		   account variable dimensions here. It may not be correct.
+		   but it's not worse than the previously existing version
+		   of expression_to_type
+		*/
+		basic b = basic_maximum(cb, nb);
+
+		free_type(ct);
+		free_type(nt);
+		ct = make_type(is_type_variable, make_variable(b, NIL, NIL));
+
+	      }, CDR(args));
+	    t = ct;
+	  }
+      }
+    else {
+      t = copy_type(rt);
+    }
+  }
+  else
+    pips_internal_error("Unexpected return type.\n");
+
+  pips_debug(7, "Intrinsic call to intrinsic \"%s\" "
+	     "with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
 	     words_to_string(words_type(t, NIL)));
 
