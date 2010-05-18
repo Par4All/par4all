@@ -1,0 +1,25 @@
+orginal files
+int main()
+{
+   int a = 0, b = 3;
+there:   printf("%d", a+b);
+   return a;
+}
+after constant grouping
+int main()
+{
+   int a = 0, b = 3;
+   {
+      //PIPS generated variable
+      int caillou[3];
+      caillou[0] = "%d";
+      caillou[1] = a;
+      caillou[2] = b;
+
+there:      printf(caillou[0], caillou[1]+caillou[2]);
+   }
+   return a;
+}
+test resulting code
+ok
+

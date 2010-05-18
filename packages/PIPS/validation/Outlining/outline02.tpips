@@ -1,5 +1,6 @@
-delete outline02
-create outline02 outline02.c
+setenv WS="outline02"
+delete $WS
+create $WS $WS.c
 
 display PARSED_PRINTED_FILE[main]
 display PRINTED_FILE[main]
@@ -19,5 +20,5 @@ apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 
 close
-delete outline02
+delete $WS
 quit

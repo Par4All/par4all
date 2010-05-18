@@ -36,7 +36,7 @@ LoopRecovering
 OpenMP
 Outlining
 # ngspice_bug:
-Step
+#Step # out as not maintained, 0% success, 2010-05-11 FC
 SC95
 Flint
 Bootstrap

@@ -1,5 +1,5 @@
-// Define complex number
 #include<stdio.h>
+// Define complex number
 typedef struct {
     float re;
     float im;
