@@ -38,6 +38,7 @@ libri_util_la_SOURCES=	contrainte_to_text.c \
 		convex_hull.c \
 		clean.c \
 		clone_statement.c \
+		allocatable.c \
 		replace.c
 
 include $(srcdir)/../pipslibs_includes.mk
