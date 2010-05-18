@@ -5,7 +5,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging
+import string, sys, random, logging, os
 import term
 
 # Global variables.
@@ -49,12 +49,22 @@ def die(msg, exit_code = 255):
 	error("aborting")
 	sys.exit(exit_code)
 
+class p4a_error(Exception):
+	'''Generic base class for exceptions'''
+	msg = "error"
+	def __init__(self, msg):
+		self.msg = msg
+		error(msg)
+	def __str__(self):
+		return self.msg
+
 def run(cmd, can_fail = 0):
 	'''Runs a command and dies if return code is not zero'''
-	sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
+	if verbosity >= 2:
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
 	ret = os.system(cmd)
 	if ret != 0 and not can_fail:
-		die("command failed with exit code " + ret)
+		raise p4a_error("command failed with exit code " + str(ret))
 	return ret
 
 def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):

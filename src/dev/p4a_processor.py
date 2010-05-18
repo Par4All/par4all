@@ -11,6 +11,7 @@ import pyps
 	
 class p4a_processor():
 
+	files = []
 	workspace = None
 	main_filter = None
 
@@ -25,8 +26,10 @@ class p4a_processor():
 
 			for file in files:
 				if not os.path.exists(file):
-					die("file '" + file + "' does not exist")
+					raise p4a_error("file does not exist: " + file)
 
+			self.files = files
+			
 			# Create the PyPS workspace.
 			self.workspace = pyps.workspace(files, name = project_name, activates = [], verboseon = verbose, cppflags = cppflags)
 			self.workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
@@ -109,8 +112,16 @@ class p4a_processor():
 	def ompify(self, filter_include = None, filter_exclude = None):
 		self.filter_modules(filter_include, filter_exclude).ompify_code()
 
-	def save(self, in_dir = "", prefix = "p4a_"):
+	def save(self, in_dir = None, prefix = "p4a_"):
+		output_files = []
 		self.workspace.save(in_dir, prefix)
+		for file in self.files:
+			(dir, name) = os.path.split(file)
+			if in_dir:
+				dir = in_dir
+			output_file = os.path.join(dir, prefix + name)
+			output_files += [ output_file ]
+		return output_files
 
 if __name__ == "__main__":
 	print(__doc__)
