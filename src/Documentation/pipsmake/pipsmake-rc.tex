@@ -5148,6 +5148,14 @@ KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
 \end{PipsProp}
 
+Due to the current limitation of the effects, PIPS provides this property to
+force the load of any array that is writed in the kernel. This actually
+fixes the problem of partially writed array. A better solution using the region
+is under implementation.
+\begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
+KERNEL_LOAD_STORE_FORCE_LOAD FALSE
+\end{PipsProp}
+
 
 \begin{PipsPass}{kernelize}
 Split a parallel loop with a local index into three parts: a host side
