@@ -24,19 +24,19 @@ def get_verbosity():
 
 # Printing/logging helpers.
 def debug(msg):
-	if verbosity >= 3:
+	if verbosity >= 2:
 		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip("\n") + "\n");
 	if logger:
 		logger.debug(msg)
 
 def info(msg):
-	if verbosity >= 2:
+	if verbosity >= 1:
 		sys.stderr.write(sys.argv[0] + ": " + term.escape("white") + msg.rstrip("\n") + term.escape() + "\n");
 	if logger:
 		logger.info(msg)
 
 def warn(msg):
-	if verbosity >= 1:
+	if verbosity >= 0:
 		sys.stderr.write(sys.argv[0] + ": " + term.escape("yellow") + msg.rstrip("\n") + term.escape() + "\n");
 	if logger:
 		logger.warn(msg)
@@ -62,7 +62,7 @@ class p4a_error(Exception):
 
 def run(cmd, can_fail = 0):
 	'''Runs a command and dies if return code is not zero'''
-	if verbosity >= 2:
+	if verbosity >= 0:
 		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
 	ret = os.system(cmd)
 	if ret != 0 and not can_fail:
@@ -96,11 +96,16 @@ def change_file_ext(file, new_ext):
 	(base, ext) = os.path.splitext(file)
 	return base + new_ext
 
+def get_machine_arch():
+	'''Returns current machine architecture'''
+	(sysname, nodename, release, version, machine) = os.uname()
+	return machine
+
 if __name__ == "__main__":
 	print(__doc__)
 	print("This module is not directly executable")
 
-# What? People still use emacs? :-)
+# Some Emacs stuff:
 ### Local Variables:
 ### mode: python
 ### mode: flyspell

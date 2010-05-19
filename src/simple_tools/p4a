@@ -41,6 +41,9 @@ def main():
 
 	cpp_group.add_option("--cppflags", action = "append", metavar = "FLAGS", default = [],
 		help = "Add additional flags for the C preprocessor. Several are allowed.")
+	
+	cpp_group.add_option("--arch", "-m", metavar = "32|64", default = None,
+		help = "Specify target architecture (and compilation target).")
 
 	parser.add_option_group(cpp_group)
 	
@@ -67,6 +70,9 @@ def main():
 	proc_group.add_option("--exclude-modules", metavar = "REGEXP", default = None,
 		help = "Exclude the modules matching the regular expression from the parallelization.")
 
+	proc_group.add_option("--noprocess", action = "store_true", default = False,
+		help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
+
 	parser.add_option_group(proc_group)
 
 	compile_group = optparse.OptionGroup(parser, "Compilation Options")
@@ -75,8 +81,11 @@ def main():
 		help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so, .a files or have no extension in which case an executable will be built.")
 
 	compile_group.add_option("--cc", metavar = "COMPILER", default = None,
-		help = "C compiler to use (defaults to gcc/nvcc).")
-
+		help = "C compiler to use (defaults to gcc).")
+	
+	compile_group.add_option("--nvcc", metavar = "COMPILER", default = None,
+		help = "NVCC compiler to use (defaults to nvcc). Note that the NVCC compiler is used only to transform .cu files into .cpp files, not compiling the final binary.")
+	
 	compile_group.add_option("--icc", action = "store_true", default = False,
 		help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
 
@@ -89,8 +98,11 @@ def main():
 	compile_group.add_option("--cflags", action = "append", metavar = "FLAGS", default = [],
 		help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
 
+	compile_group.add_option("--nvccflags", action = "append", metavar = "FLAGS", default = [],
+		help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
+
 	compile_group.add_option("--extra", action = "append", metavar = "FILE", default = [],
-		help = "Add additional file for compilation. Several are allowed.")
+		help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
 
 	parser.add_option_group(compile_group)
 
@@ -139,99 +151,79 @@ def main():
 		options.nofast = True
 
 	files = []
+	other_files = []
 	# Make all paths absolute.
 	for file in args:
 		abs_file = os.path.abspath(file)
-		files.append(abs_file)
-		debug("input file: " + abs_file)
+		(base, ext) = os.path.splitext(file)
+		if ext == ".c" or ext == ".f":
+			files.append(abs_file)
+			debug("input file: " + abs_file)
+		elif ext == ".cpp" or ext == ".cxx" or ext == ".cu":
+			other_files.append(abs_file)
+			info("file format not supported by parallelizer, will not be parallelized: " + abs_file)
+		elif ext == ".h" or ext == ".hpp":
+			info("ignoring header file: " + abs_file)
+		else:
+			die("file format not supported: " + abs_file)
 
-	cppflags = ""
-	
 	# Make up C preprocessor flags.
-	for flags in options.cppflags:
-		cppflags += flags.strip() + " "
+	cppflags = options.cppflags
 	for include_dir in options.include_dirs:
-		cppflags += "-I" + include_dir.strip() + " "
+		cppflags += [ "-I" + include_dir ]
 	for define in options.defines:
-		cppflags += "-D" + define.strip() + " "
+		cppflags += [ "-D" + define ]
 	for undefine in options.undefines:
-		cppflags += "-U" + undefine.strip() + " "
-	cppflags = cppflags.strip()
-	info("cppflags: " + cppflags)
+		cppflags += [ "-U" + undefine ]
+	info("cppflags: " + " ".join(cppflags))
 	
-	# Process.
-	processor = p4a_processor(files = files, project_name = options.project_name, verbose = (verbosity != 0), cppflags = cppflags, 
-		filter_include = options.include_modules, filter_exclude = options.exclude_modules, accel = options.accel)
-	processor.parallelize(options.fine)
-	if options.cuda:
-		processor.gpuify()
-	if options.openmp:
-		processor.ompify()
-	processor_output_files = processor.save()
+	# Process (or not).
+	processor_output_files = []
+	if options.noprocess:
+		warn("bypassing processor")
+		processor_output_files = files
+	elif len(files) == 0:
+		warn("no supported file to process")
+	else:
+		processor = p4a_processor(files = files, project_name = options.project_name, verbose = (verbosity != 0), cppflags = " ".join(cppflags), 
+			filter_include = options.include_modules, filter_exclude = options.exclude_modules, accel = options.accel)
+		processor.parallelize(options.fine)
+		if options.cuda:
+			processor.gpuify()
+		if options.openmp:
+			processor.ompify()
+		processor_output_files = processor.save()
+		# Remove database unless otherwise specified.
+		if not options.keep_database:
+			database_dir = os.path.abspath(processor.workspace.directory())
+			debug("removing " + database_dir)
+			rmtree(database_dir, can_fail = 1)
 	
-	# Remove database unless otherwise specified.
-	if not options.keep_database:
-		database_dir = os.path.abspath(processor.workspace.directory())
-		debug("removing " + database_dir)
-		rmtree(database_dir, can_fail = 1)
+	if len(options.output_file) == 0:
+		# Build not requested.
+		return 0
+	
+	all_buildable_files = processor_output_files + other_files + options.extra
+	if len(all_buildable_files) == 0:
+		die("no buildable input files")
 	
 	# Build requested binaries.
-	if len(options.output_file):
-		cflags = ""
-		ldflags = ""
-		if cppflags:
-			cflags = cppflags + " "
-		for flags in options.cflags:
-			cflags += flags.strip() + " "
-		cflags = cflags.strip()
-		for lib_dir in options.lib_dirs:
-			ldflags += "-L" + lib_dir.strip() + " "
-		for lib in options.libs:
-			ldflags += "-l" + lib.strip() + " "
-		for flags in options.ldflags:
-			ldflags += flags.strip() + " "
-		ldflags.strip()
-		
-		if options.debug:
-			cflags = "-g " + cflags
-		
-		cflags += " -Wall -fno-strict-aliasing"
-		
-		cc = options.cc
-		ld = options.ld
-		ar = options.ar
-		if options.icc:
-			if run("which icc", can_fail = 1):
-				die("icc is not available -- have you source'd iccvars.sh or iccvars_intel64.sh yet?")
-			cc = "icc"
-			ld = "xild"
-			ar = "xiar"
-			if options.openmp:
-				cflags = "-openmp " + cflags
-			if not options.nofast:
-				cflags = "-fast " + cflags
-		else:
-			if not cc:
-				cc = "gcc"
-			if not ld:
-				ld = "ld"
-			if not ar:
-				ar = "ar"
-			if options.openmp:
-				cflags = "-fopenmp " + cflags
-			if not options.nofast:
-				cflags = "-O2 " + cflags
-		
-		#info("cflags: " + cflags)
-		#info("ldflags: " + ldflags)
-		
-		for output_file in options.output_file:
-			output_file = os.path.abspath(output_file)
-			info("building " + output_file)
-			builder = p4a_builder(files = processor_output_files, output_file = output_file, 
-				cflags = cflags, ldflags = ldflags, 
-				extra = options.extra, extra_obj = options.extra_obj, 
-				cc = cc, ld = ld, ar = ar)
+	ldflags = options.ldflags
+	for lib_dir in options.lib_dirs:
+		ldflags += [ "-L" + lib_dir ]
+	for lib in options.libs:
+		ldflags += [ "-l" + lib ]
+	for output_file in options.output_file:
+		output_file = os.path.abspath(output_file)
+		info("building " + output_file)
+		builder = p4a_builder(files = all_buildable_files, output_file = output_file, 
+			cppflags = cppflags, cflags = options.cflags, ldflags = ldflags, nvccflags = options.nvccflags,
+			extra_obj = options.extra_obj, 
+			cc = options.cc, ld = options.ld, ar = options.ar, nvcc = options.nvcc,
+			debug = options.debug, optimize = not options.nofast, 
+			openmp = options.openmp, icc = options.icc, arch = options.arch)
+
+	return 0
 
 if __name__ == "__main__":
 	main()

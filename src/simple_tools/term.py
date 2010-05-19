@@ -73,7 +73,7 @@ if __name__ == "__main__":
 	print(__doc__)
 	print("This module is not directly executable")
 
-# What? People still use emacs? :-)
+# Some Emacs stuff:
 ### Local Variables:
 ### mode: python
 ### mode: flyspell
