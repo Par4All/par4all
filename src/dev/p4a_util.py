@@ -13,10 +13,12 @@ verbosity = 0
 logger = None
 
 def set_verbosity(level):
+	'''Sets global verbosity level'''
 	global verbosity
 	verbosity = level
 
 def get_verbosity():
+	'''Returns global verbosity level'''
 	global verbosity
 	return verbosity
 
@@ -68,11 +70,11 @@ def run(cmd, can_fail = 0):
 	return ret
 
 def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):
-	'''Generates a random name / password'''
+	'''Generates a random name or password'''
 	return prefix + "".join(random.choice(chars) for x in range(length))
 
 def rmtree(dir, can_fail = 0):
-	'''Removes a directory recursively, because sometimes shutil.rmtree() does not want to'''
+	'''Removes a directory recursively, alternative to shutil.rmtree()'''
 	(base, ext) = os.path.splitext(dir)
 	if ext != ".database" and ext != ".build":
 		raise p4a_error("Cannot remove unknown directory: " + dir)
@@ -88,6 +90,11 @@ def rmtree(dir, can_fail = 0):
 			warn("could not remove directory " + dir + ": " + repr(e))
 		else:
 			raise e
+
+def change_file_ext(file, new_ext):
+	'''Changes the extension for the given file path'''
+	(base, ext) = os.path.splitext(file)
+	return base + new_ext
 
 if __name__ == "__main__":
 	print(__doc__)
