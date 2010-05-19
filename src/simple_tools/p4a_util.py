@@ -48,7 +48,7 @@ def error(msg):
 
 def die(msg, exit_code = 255):
 	error(msg)
-	error("aborting")
+	#error("aborting")
 	sys.exit(exit_code)
 
 class p4a_error(Exception):
