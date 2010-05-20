@@ -1,3 +1,4 @@
+# this example shows how precodition are computed for min operators
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS "empty_region"
 delete $WS
