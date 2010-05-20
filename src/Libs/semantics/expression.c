@@ -2739,11 +2739,11 @@ transformer any_conditional_to_transformer(entity v,
   transformer ttf = condition_to_transformer(cond, pre, TRUE);
   transformer t_pre = transformer_apply(ttf, pre);
   transformer t_pre_r = transformer_range(t_pre);
-  transformer tet = any_expression_to_transformer(v, te, t_pre_r, TRUE);
+  transformer tet = safe_any_expression_to_transformer(v, te, t_pre_r, TRUE);
   transformer ftf = condition_to_transformer(cond, pre, FALSE);
   transformer f_pre = transformer_apply(ftf, pre);
   transformer f_pre_r = transformer_range(f_pre);
-  transformer fet = any_expression_to_transformer(v, fe, f_pre_r, TRUE);
+  transformer fet = safe_any_expression_to_transformer(v, fe, f_pre_r, TRUE);
 
   ttf = transformer_combine(ttf, tet);
   ftf = transformer_combine(ftf, fet);
