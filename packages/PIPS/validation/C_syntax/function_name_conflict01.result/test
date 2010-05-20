@@ -6,6 +6,7 @@ Warnings for "rand"
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_LANGUAGE redefined
 C_PARSER[rand] (UpdateEntity) Intrinsic rand redefined.
 This is not supported by PIPS. Please rename "rand"
 C_PARSER[rand] (CParserError) 

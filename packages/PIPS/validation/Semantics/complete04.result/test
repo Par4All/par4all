@@ -148,6 +148,7 @@ void complete04()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_LANGUAGE redefined
 unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
 unknown[unknown] (parse_properties) property FOR_TO_DO_LOOP_IN_CONTROLIZER redefined
 unknown[unknown] (parse_properties) property FOR_TO_WHILE_LOOP_IN_CONTROLIZER redefined
