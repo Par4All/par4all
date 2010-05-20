@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete array_to_pointer03
-create array_to_pointer03 array_to_pointer01.c
+setenv WS "array_to_pointer03"
+delete $WS
+create $WS $WS.c
 
 echo
 echo Initial code
@@ -29,12 +30,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc array_to_pointer01.c -o array_to_pointer
-shell gcc array_to_pointer03.database/Src/array_to_pointer01.c  -o array_to_pointer03.database/Src/array_to_pointer
-shell if test `array_to_pointer03.database/Src/array_to_pointer` = `./array_to_pointer`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf array_to_pointer03.database/Src/array_to_pointer array_to_pointer
+shell cc $WS.c -o  $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
 
 close
-delete array_to_pointer03
+delete $WS
 quit
 
