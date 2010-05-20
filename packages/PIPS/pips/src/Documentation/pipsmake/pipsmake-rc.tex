@@ -5148,6 +5148,14 @@ KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
 \end{PipsProp}
 
+Due to the current limitation of the effects, PIPS provides this property to
+force the load of any array that is writed in the kernel. This actually
+fixes the problem of partially writed array. A better solution using the region
+is under implementation.
+\begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
+KERNEL_LOAD_STORE_FORCE_LOAD FALSE
+\end{PipsProp}
+
 
 \begin{PipsPass}{kernelize}
 Split a parallel loop with a local index into three parts: a host side
@@ -10391,22 +10399,13 @@ print_code_points_to_list      > MODULE.printed_file
 \subsubsection{Language}
 \index{PRETTYPRINT\_C\_CODE}
 
-PIPS can handle several languages. By default the PrettyPrinter uses
-the native language as an output but it is also possible to prettyprint
-Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
-are: \texttt{native F95 F77 C}.
-
-\begin{PipsProp}{PRETTYPRINT_LANGUAGE}
-PRETTYPRINT_LANGUAGE "F77"
-\end{PipsProp}
-
 PIPS can handle many different languages. By default the PrettyPrinter uses
 the native language as an output but it is also possible to prettyprint
 Fortran code as C code. Possible values for the PRETTYPRINT\_LANGUAGE property
 are: \texttt{native F95 F77 C}.
 
 \begin{PipsProp}{PRETTYPRINT_LANGUAGE}
-PRETTYPRINT_LANGUAGE "F77"
+PRETTYPRINT_LANGUAGE "native"
 \end{PipsProp}
 
 \subsubsection{Layout}

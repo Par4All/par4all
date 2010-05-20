@@ -11,5 +11,8 @@ sh cat intro_example03.database/Src/intro_example03.f
 
 close
 # cleanup
-delete intro_example03
+
+# DO NOT COMMENT OUT! Workspace files are left behind on purpose.
+#delete intro_example03
+
 quit

@@ -418,6 +418,53 @@ static void html_print_type(type t) {
   end_block("type", true);
 }
 
+static void html_print_constant(constant c) {
+  begin_block("constant", false);
+  if(!c || c == constant_undefined) {
+    html_output("undefined", false);
+  } else {
+    switch(constant_tag( c )) {
+      case is_constant_int: {
+        string buf;
+        pips_assert("Asprintf !",
+            asprintf( &buf, "int : %d", (int) constant_int( c ) ) > 0 );
+        html_output(buf, true);
+        free(buf);
+        break;
+      }
+      case is_constant_float: {
+        string buf;
+        pips_assert("Asprintf !",
+            asprintf( &buf, "float : %f", (float) constant_float( c ) ) > 0 );
+        html_output(buf, true);
+        free(buf);
+        break;
+      }
+      case is_constant_logical: {
+        string buf;
+        pips_assert("Asprintf !",
+            asprintf( &buf, "Logical : %d", (int) constant_logical( c ) ) > 0 );
+        html_output(buf, true);
+        free(buf);
+        break;
+      }
+      case is_constant_litteral:
+        html_output("litteral", false);
+        break;
+      case is_constant_call:
+        html_print_entity_name(constant_call(c));
+        break;
+      case is_constant_unknown:
+        begin_block("unknown", false);
+        break;
+      default:
+        html_output("error", false);
+        break;
+    }
+  }
+  end_block("constant", false);
+}
+
 static void html_print_value(value v) {
   begin_block("value", false);
   if(!v || v == value_undefined) {
@@ -425,13 +472,13 @@ static void html_print_value(value v) {
   } else {
     switch(value_tag( v )) {
       case is_value_code:
-        html_print_code(value_code( v ));
+        html_print_code(value_code(v));
         break;
       case is_value_symbolic:
         html_output("symbolic", false);
         break;
       case is_value_constant:
-        html_output("constant", false);
+        html_print_constant(value_constant(v));
         break;
       case is_value_intrinsic:
         html_output("intrinsic", false);
@@ -451,6 +498,7 @@ static void html_print_value(value v) {
   }
   end_block("value", false);
 }
+
 void html_print_entity_full(entity e) {
   begin_block("entity", true);
   html_output(entity_name( e ), true);
@@ -509,7 +557,6 @@ static void html_print_reference(reference r) {
 
   end_block("reference", cr);
 }
-
 
 static void html_print_subscript(subscript s) {
   begin_block("subscript", false);

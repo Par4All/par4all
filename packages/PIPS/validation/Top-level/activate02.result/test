@@ -18,6 +18,6 @@ INITIAL_PRECONDITION[activate01] (add_or_kill_equivalenced_variables) storage re
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning activate01 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[activate01] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[activate01] (any_expression_to_transformer) Implicit type coercion between INTEGER*4 variable and REAL*8 expression may reduce semantic analysis accuracy.
+TRANSFORMERS_INTER_FULL[activate01] (any_expression_to_transformer) Implicit type coercion between int variable and double expression may reduce semantic analysis accuracy.
 Apply 'type_checker' to explicit all type coercions.
 PRECONDITIONS_INTRA[activate01] (add_or_kill_equivalenced_variables) storage return

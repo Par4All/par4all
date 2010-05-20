@@ -1657,6 +1657,9 @@ integer_call_expression_to_transformer(
     // is_internal is dropped...
     tf = any_expressions_to_transformer(e, args, pre);
   }
+  else if(ENTITY_CONDITIONAL_P(f)) {
+    tf = any_conditional_to_transformer(e, args, pre);
+  }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
       tf = user_function_call_to_transformer(e, expr, pre);
@@ -2684,6 +2687,79 @@ transformer condition_to_transformer(
   free_basic(eb);
   free_transformer(safe_pre);
 
+  return tf;
+}
+
+/* FI: not too smart to start with the special case with no value
+   returned, just side-effects... */
+transformer conditional_to_transformer(expression cond,
+				       expression te,
+				       expression fe,
+				       transformer pre,
+				       list ef)
+{
+  transformer tf = transformer_undefined;
+  transformer ttf = condition_to_transformer(cond, pre, TRUE);
+  transformer t_pre = transformer_apply(ttf, pre);
+  transformer t_pre_r = transformer_range(t_pre);
+  transformer tet = safe_expression_to_transformer(te, t_pre_r);
+  transformer ftf = condition_to_transformer(cond, pre, FALSE);
+  transformer f_pre = transformer_apply(ftf, pre);
+  transformer f_pre_r = transformer_range(f_pre);
+  transformer fet = safe_expression_to_transformer(fe, f_pre_r);
+
+  ttf = transformer_combine(ttf, tet);
+  ftf = transformer_combine(ftf, fet);
+  tf = transformer_convex_hull(ttf, ftf);
+
+  free_transformer(ttf);
+  free_transformer(ftf);
+  free_transformer(tet);
+  free_transformer(fet);
+  free_transformer(t_pre_r);
+  free_transformer(f_pre_r);
+  free_transformer(t_pre);
+  free_transformer(f_pre);
+
+  if(transformer_undefined_p(tf))
+    tf = effects_to_transformer(ef);
+  return tf;
+}
+
+/* Take care of the returned value. About a cut-and-paste of previous
+   function, conditional_to_transformer(). */
+transformer any_conditional_to_transformer(entity v,
+					   list args,
+					   transformer pre)
+{
+  expression cond = EXPRESSION(CAR(args));
+  expression te = EXPRESSION(CAR(CDR(args)));
+  expression fe = EXPRESSION(CAR(CDR(CDR(args))));
+  transformer tf = transformer_undefined;
+  transformer ttf = condition_to_transformer(cond, pre, TRUE);
+  transformer t_pre = transformer_apply(ttf, pre);
+  transformer t_pre_r = transformer_range(t_pre);
+  transformer tet = any_expression_to_transformer(v, te, t_pre_r, TRUE);
+  transformer ftf = condition_to_transformer(cond, pre, FALSE);
+  transformer f_pre = transformer_apply(ftf, pre);
+  transformer f_pre_r = transformer_range(f_pre);
+  transformer fet = any_expression_to_transformer(v, fe, f_pre_r, TRUE);
+
+  ttf = transformer_combine(ttf, tet);
+  ftf = transformer_combine(ftf, fet);
+  tf = transformer_convex_hull(ttf, ftf);
+
+  free_transformer(ttf);
+  free_transformer(ftf);
+  free_transformer(tet);
+  free_transformer(fet);
+  free_transformer(t_pre_r);
+  free_transformer(f_pre_r);
+  free_transformer(t_pre);
+  free_transformer(f_pre);
+
+  //if(transformer_undefined_p(tf))
+  //  tf = effects_to_transformer(ef);
   return tf;
 }
 

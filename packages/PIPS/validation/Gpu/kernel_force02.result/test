@@ -1,0 +1,48 @@
+void P4A_accel_free(void *dest)
+{
+   free(dest);
+}
+void P4A_accel_malloc(void **dest, size_t n)
+{
+   *dest = malloc(n);
+}
+void * P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n)
+{
+   size_t i;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) host_address)[i] = ((const char *) accel_address)[i];
+   return host_address;
+}
+void * P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n)
+{
+   size_t i;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) accel_address)[i] = ((const char *) host_address)[i];
+   return accel_address;
+}
+int main()
+{
+
+   int a[100] = {0};
+   int b[100] = {1};
+   //PIPS generated variable
+   int (*P_0)[100], (*P_1)[100];
+   P4A_accel_malloc(&P_1, sizeof(int[100])-1+1);
+   P4A_accel_malloc(&P_0, sizeof(int[100])-1+1);
+   P4A_copy_to_accel(a, *P_1, sizeof(int[100])-1+1);
+
+   myKernel(*P_1, *P_0);
+   P4A_copy_from_accel(b, *P_0, sizeof(int[100])-1+1);
+   P4A_accel_free(*P_1);
+   P4A_accel_free(*P_0);
+
+   return 0;
+}
+void myKernel(int a[100], int b[100])
+{
+   int i;
+   for(i = 50; i <= 99; i += 1)
+      b[i] = a[i];
+}

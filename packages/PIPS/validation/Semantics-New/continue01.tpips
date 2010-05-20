@@ -1,4 +1,7 @@
 delete continue01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create continue01 continue01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9

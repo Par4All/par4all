@@ -45,8 +45,8 @@
 
       REAL*8 U,V,W,FI2,ALF,THT,A1,MU,RO,US,VS,WS,ROS
 
-!$omp parallel do private(A1, ALF, FI2, IP1, MU, RO, ROS, THT, U
-!$omp& , US, V, VS, W, WS)
+!$omp parallel do private(WS, W, VS, V, US, U, THT, ROS, RO, MU, 
+!$omp& IP1, FI2, ALF, A1)
       DO I = 1, NX
          IP1 = MOD(I, NX+1-ISH)+ISH
          ROS = Q(1,IP1,JP1,KP1)
