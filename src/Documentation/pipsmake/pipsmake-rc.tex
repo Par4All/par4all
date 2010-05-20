@@ -5092,7 +5092,8 @@ rice_data_dependence            > MODULE.parallelized_code
 
 \subsubsection{Isolate Statement}
 \begin{PipsPass}{isolate_statement}
-Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory
+Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory.
+Transfer are generated using either loops or \PipsPropRef{ISOLATE_STATEMENT_LOAD_FUNCTION} and \PipsPropRef{ISOLATE_STATEMENT_STORE_FUNCTION}
 \end{PipsPass}
 \begin{PipsMake}
 isolate_statement > MODULE.code
@@ -5104,6 +5105,15 @@ isolate_statement > MODULE.code
 \begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
 ISOLATE_STATEMENT_LABEL ""
 \end{PipsProp}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_LOAD_FUNCTION}
+ISOLATE_STATEMENT_LOAD_FUNCTION ""
+\end{PipsProp}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_STORE_FUNCTION}
+ISOLATE_STATEMENT_STORE_FUNCTION ""
+\end{PipsProp}
+
 
 \subsubsection{kernelize}
 
