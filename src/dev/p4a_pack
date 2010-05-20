@@ -22,7 +22,7 @@ use sigtrap qw(die normal-signals); # Make sure END {} blocks are called even wh
 use FindBin qw($Bin $RealBin);
 use lib "$RealBin/../lib";
 use Cwd qw(cwd abs_path);
-use YAML qw(LoadFile);
+#use YAML qw(LoadFile);
 
 # A little trick to color the die/warn calls.
 use Term::ANSIColor qw(:constants);
