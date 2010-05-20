@@ -91,6 +91,7 @@ c     of the image
                   NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KJp-2,J+KIp   0022
      &            -2)*KERNEL(KJp,KIp)                                   0022
 100               CONTINUE                                              0025
+200               CONTINUE
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0027
 300         CONTINUE                                                    0028
 400      CONTINUE                                                       0029
@@ -124,6 +125,7 @@ c     of the image
                      NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KJp-2,J+   0022
      &               KIp-2)*KERNEL(KJp,KIp)                             0022
 100                  CONTINUE                                           0025
+200                  CONTINUE
                NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                        0027
 300            CONTINUE                                                 0028
             ENDDO
