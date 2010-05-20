@@ -351,11 +351,60 @@ reduce_array_declaration_dimension(statement s)
     }
 }
 
+static void gather_call_sites(call c, list * sites)
+{
+    if(same_entity_p(call_function(c),get_current_module_entity()))
+        *sites=CONS(CALL,c,*sites);
+}
+
+static list callers_to_call_sites(list callers_statement)
+{
+    list call_sites = NIL;
+    FOREACH(STATEMENT,caller_statement,callers_statement)
+        gen_context_recurse(caller_statement,&call_sites,call_domain,gen_true,gather_call_sites);
+    return call_sites;
+}
+static list callers_to_statements(list callers)
+{
+    list statements = NIL;
+    FOREACH(STRING,caller_name,callers)
+    {
+        statement caller_statement=(statement) db_get_memory_resource(DBR_CODE,caller_name,true);
+        statements=CONS(STATEMENT,caller_statement,statements);
+    }
+    return statements;
+}
+static void array_to_pointer_fix_call_site(expression exp)
+{
+    if(expression_reference_p(exp)) /* this only partial */
+    {
+        reference r = expression_reference(exp);
+        entity e = reference_variable(r);
+        list dims = variable_dimensions(type_variable(entity_type(e)));
+        list iter=reference_indices(r);
+        list new_indices = NIL;
+        FOREACH(DIMENSION,d,dims)
+        {
+            if(ENDP(iter))
+                new_indices=CONS(EXPRESSION,int_to_expression(0),new_indices);
+            else
+                POP(iter);
+        }
+        reference_indices(r) = gen_nconc(reference_indices(r),gen_nreverse(new_indices));
+        unnormalize_expression(exp);
+        expression_syntax(exp)=make_syntax_call(
+                make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),make_expression_list(make_expression( expression_syntax(exp), normalized_undefined))));
+    }
+}
+
 bool array_to_pointer(char *module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_name, true));
+    list callers_statement = callers_to_statements(callers);
+    list call_sites = callers_to_call_sites(callers_statement);
 
     /* run transformation */
     if(!c_module_p(get_current_module_entity()))
@@ -373,19 +422,42 @@ bool array_to_pointer(char *module_name)
          * tricky : signature must be changed in two places !
          */
         {
+            /* we may have to change the call sites, prepare iterators over call sites arguments here */
+            list call_site_args = NIL;
+            FOREACH(CALL,c,call_sites)
+                call_site_args=CONS(LIST,call_arguments(c),call_site_args);
+
             FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
             {
                 if(formal_parameter_p(e))
+                {
+                    /* manage conversion */
                     make_pointer_entity_from_reference_entity(e);
+                }
             }
+
             FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity()))))
             {
                 dummy d = parameter_dummy(p);
                 if(dummy_identifier_p(d))
+                {
+                    /* manage call site substitution */
+                    for(list iter = call_site_args; !ENDP(iter);POP(iter))
+                    {
+                        list* args = (list*)REFCAR(iter);
+                        if(get_array_to_pointer_conversion_mode() == POINTER && entity_array_p(dummy_identifier(d)))
+                        {
+                            expression arg = EXPRESSION(CAR(*args));
+                            array_to_pointer_fix_call_site(arg);
+                        }
+                        POP(*args);
+                    }
                     make_pointer_entity_from_reference_entity(dummy_identifier(d));
+                }
                 type t = parameter_type(p);
                 make_pointer_from_all_variable(t);
             }
+            gen_free_list(call_site_args);
         }
 
     }
@@ -393,6 +465,12 @@ bool array_to_pointer(char *module_name)
     /* validate */
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+    /* also validate callers */
+    FOREACH(STATEMENT,caller_statement,callers_statement)
+    {
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(callers)),caller_statement);
+        POP(callers);
+    }
 
     /*postlude*/
     reset_current_module_entity();
