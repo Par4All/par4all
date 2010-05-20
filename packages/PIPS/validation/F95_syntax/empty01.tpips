@@ -6,6 +6,7 @@ create empty01 empty01.f90
 
 apply INTERPROCEDURAL_SUMMARY_PRECONDITION(%ALL)
 
+display PRINTED_FILE[%ALL]
 apply UNSPLIT[%ALL]
 
 echo

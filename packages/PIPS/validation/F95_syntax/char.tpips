@@ -1,0 +1,8 @@
+delete char
+create char  char.f90 
+
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%ALL]
+
+close
+quit

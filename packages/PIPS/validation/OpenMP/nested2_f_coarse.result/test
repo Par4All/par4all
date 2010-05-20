@@ -7,7 +7,7 @@ Open MP version
       PARAMETER (SIZE=100)
       REAL ARRAY(SIZE,SIZE)
       REAL ARRAY2(SIZE,SIZE,SIZE)
-!$omp parallel do private(K, J)
+!$omp parallel do private(J, K)
 
       DO I = 1, SIZE                                                    0008
          DO J = 1, SIZE                                                 0009
@@ -19,7 +19,7 @@ Open MP version
          ENDDO
       ENDDO
 !$omp end parallel do
-!$omp parallel do private(K, J)
+!$omp parallel do private(J, K)
 
       DO I = 1, SIZE                                                    0016
 !$omp parallel do private(K)

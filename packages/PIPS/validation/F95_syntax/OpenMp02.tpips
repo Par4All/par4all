@@ -1,8 +1,8 @@
-delete OpenMp01
+delete OpenMp02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create OpenMp01 OpenMp01.f90
+create OpenMp02 OpenMp02.f90
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -24,9 +24,9 @@ apply OMPIFY_CODE
 display PRINTED_FILE(%ALL)
 
 apply UNSPLIT (%ALL)
-shell gcc -fopenmp -c OpenMp01.database/Src/OpenMp01.f90 -o OpenMp01.database/Src/OpenMp01.o
+shell gcc -fopenmp -c OpenMp02.database/Src/OpenMp02.f90 -o OpenMp02.database/Src/OpenMp02.o
 
 close
-delete OpenMp01
+delete OpenMp02
 quit
 # EOF

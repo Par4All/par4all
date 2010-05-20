@@ -1,8 +1,8 @@
-delete continue01
+delete assert01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create continue01 continue01.c
+create assert01 assert01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
@@ -30,15 +30,16 @@ echo Source code with transformers
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[continue01]
-quit
+display PRINTED_FILE[main]
+
 echo
 echo Source code with preconditions
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[continue01]
+display PRINTED_FILE[main]
 quit
+
 apply UNSPLIT[%PROGRAM]
 
 close
@@ -47,7 +48,7 @@ echo
 echo Warnings
 echo
 
-shell cat continue01.database/Warnings
+shell cat assert01.database/Warnings
 
 quit
 

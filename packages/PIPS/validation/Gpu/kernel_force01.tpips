@@ -1,0 +1,36 @@
+setenv WKS kernel_force01
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c include/p4a_stubs.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+# If we do this here, the side effect at the end of a loop on the index
+# break paramemstorellelization. It would require to apply USE_DEF_ELIM...
+
+setproperty KERNEL_LOAD_STORE_FORCE_LOAD TRUE
+
+apply KERNEL_LOAD_STORE[myKernel]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+close
+delete $WKS
+quit
