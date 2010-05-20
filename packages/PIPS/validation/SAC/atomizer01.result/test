@@ -11,8 +11,11 @@ atomized code
 int main()
 {
    int a[2] = {0, 1}, (*b)[2], *c;
+   //PIPS generated variable
+   int I_0;
    b = &a;
-   a[0] = a[1]+(*b)[1]+1;
+   I_0 = a[1]+(*b)[1];
+   a[0] = I_0+1;
    printf("%d", a[0]);
    return 0;
 }

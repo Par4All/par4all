@@ -1,0 +1,9 @@
+Creating allocatable struct for dim 1
+PROGRAM MAIN
+   INTEGER :: IERR
+   INTEGER , ALLOCATABLE :: A(:)
+   ALLOCATE (A(100), STAT=IERR) 
+END PROGRAM MAIN
+
+"compile sources produced by pips"
+

@@ -32,8 +32,8 @@
       PARAMETER (N=10)
       REAL A(N)
 
-!$omp parallel do private(I, IM1, IM2, IP1, IP2, JM1, JM2, JP1, 
-!$omp& JP2, L, T1, T2)
+!$omp parallel do private(T2, T1, L, JP2, JP1, JM2, JM1, IP2, IP1
+!$omp& , IM2, IM1, I)
       DO J = 1, N
          T2 = J+1
          T1 = T2+1
