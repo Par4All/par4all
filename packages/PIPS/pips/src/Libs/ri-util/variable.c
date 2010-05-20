@@ -127,7 +127,10 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
             gen_remove(&statement_declarations(s), e);
         if(statement_block_p(s))
         {
-            FOREACH(STATEMENT,stat,statement_block(s))
+            // iterate over a copy becuase FOREACH does not
+            // support inplace modification
+            list theblock = gen_copy_seq(statement_block(s));
+            FOREACH(STATEMENT,stat,theblock)
             {
                 bool decl_stat = declaration_statement_p(stat);
                 RemoveLocalEntityFromDeclarations(e,module,stat);
@@ -138,6 +141,7 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
                     free_statement(stat);
                 }
             }
+            gen_free_list(theblock);
         }
     }
 

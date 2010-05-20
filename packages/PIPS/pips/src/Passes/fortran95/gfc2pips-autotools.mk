@@ -37,6 +37,7 @@ PIPS_INC_POST += -I../../../../../Libs/ri-util/
 PIPS_INC_POST += -I../../../../../Libs/syntax/
 PIPS_INC_POST += -I../../../../../Libs/misc/
 PIPS_INC_POST += -I../../../../../Libs/newgen/
+PIPS_INC_POST += -I../../../../../Libs/text-util/
 PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/newgen/
 PIPS_INC_POST += -I../../../$(pipssrcdir)/../../Documentation/constants/
 PIPS_INC_POST += $(LINEARLIBS_CFLAGS) $(NEWGENLIBS_CFLAGS) 

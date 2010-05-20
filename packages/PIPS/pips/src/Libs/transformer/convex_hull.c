@@ -218,7 +218,7 @@ transformer transformer_convex_hull(transformer t1, transformer t2)
 /* I removed this because I do not want to port the polyedre library
  * to use "Value". If you want this function, do the port! FC 07/96
  */
-/* 
+/*
 transformer transformer_fast_convex_hull(t1, t2)
 transformer t1;
 transformer t2;

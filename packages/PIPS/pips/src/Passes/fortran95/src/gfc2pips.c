@@ -365,7 +365,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
                                                     string_undefined,
                                                     make_sequence(NIL),
                                                     NIL,
-                                                    make_language_fortran()));
+                                                    make_language_fortran95()));
     AddEntityToDeclarations(com, get_current_module_entity());
     int offset_common = stack_offset;
     unnamed_commons_p = unnamed_commons;
@@ -533,7 +533,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
                                   make_sequence(NIL),
                                   gen_union(list_of_extern_entities,
                                             list_of_subroutines),
-                                  make_language_fortran()));
+                                  make_language_fortran95()));
 
   gfc2pips_debug(2, "main entity creation finished\n");
 
@@ -1899,21 +1899,22 @@ basic gfc2pips_getbasic(gfc_symbol *s) {
   if(s->attr.pointer) {
     b = make_basic_pointer(type_undefined);
   } else {
+    int size = gfc2pips_symbol2size(s);
     switch(s->ts.type) {
       case BT_INTEGER:
-        b = make_basic_int(gfc2pips_symbol2size(s));
+        b = make_basic_int(size);
         break;
       case BT_REAL:
-        b = make_basic_float(gfc2pips_symbol2size(s));
+        b = make_basic_float(size);
         break;
       case BT_COMPLEX:
-        b = make_basic_complex(2 * gfc2pips_symbol2size(s));
+        b = make_basic_complex(2 * size);
         break;
       case BT_LOGICAL:
-        b = make_basic_logical(gfc2pips_symbol2size(s));
+        b = make_basic_logical(size);
         break;
       case BT_CHARACTER:
-        b = make_basic_string(0);
+        b = make_basic_string(make_value_constant(make_constant_int(size)));
         break;
       case BT_UNKNOWN:
         gfc2pips_debug( 5, "Type unknown\n" );
@@ -2782,10 +2783,10 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
 
         /* Handle else */
         if(d->block) {
-          instruction s_else_i;
+          instruction s_else_i = instruction_undefined;
           if(d->block->expr) { /* this is an ELSE IF */
             /* Recursive call */
-            instruction ins = gfc2pips_code2instruction_(d);
+            s_else_i = gfc2pips_code2instruction_(d);
           } else {/* No condition therefore we are in the last ELSE statement */
             /* Recursive call */
             s_else_i = gfc2pips_code2instruction(d->block->next, false);
@@ -3972,11 +3973,14 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
               returned_expr
                   = MakeFortranUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
                                          e1);
+              break;
             case INTRINSIC_UPLUS:
               returned_expr = e1;
+              break;
             case INTRINSIC_NOT:
               returned_expr
                   = MakeFortranUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME), e1);
+              break;
             default:
               pips_user_error( "No second expression member for intrinsic %s\n",
                   c );
