@@ -214,6 +214,7 @@ class p4a_processor():
 		self.workspace.all.unsplit()
 		for file in self.files:
 			if file in self.accel_files:
+				os.remove(file)
 				continue
 			(dir, name) = os.path.split(file)
 			pips_file = os.path.join(self.workspace.directory(), "Src", name)
@@ -239,7 +240,7 @@ if __name__ == "__main__":
 	print(__doc__)
 	print("This module is not directly executable")
 
-# What? People still use emacs? :-)
+# Some Emacs stuff:
 ### Local Variables:
 ### mode: python
 ### mode: flyspell
