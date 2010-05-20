@@ -82,8 +82,6 @@ void effects_call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 Cumulated effects for "main"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
    int a;
@@ -149,10 +147,6 @@ void effects_call02(int i, int j, int y[10], int *q[10], tf_t *p)
 }
 
 Pointer Regions for "main"
-
-
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 int main()
 {
