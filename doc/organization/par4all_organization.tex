@@ -429,6 +429,12 @@ To push the official version, just use a:
 p4a_git --branch-action git push origin p4a\$suffix
 \end{verbatim}
 
+If you want to pull all different \Apfa branches that may have been
+changed by others:
+\begin{verbatim}
+p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+\end{verbatim}
+
 An example to set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before you can use them:
 \begin{verbatim}
@@ -708,9 +714,25 @@ these branches).
 \label{sec:setup}
 
 The installation has been tested on Ubuntu/Linux 9.10 and you need to have
-at least these packages installed:
-\marginpar{À compléter par Mickael \& Claire !}
-
+at least these packages installed to compile and run:
+\begin{description}
+\item[\texttt{cproto}]
+\item[\texttt{flex}]
+\item[\texttt{bison}]
+\item[\texttt{emacs}]
+\item[\texttt{tk8.5}]
+\item[\texttt{texlive-latex-extra}]
+\item[\texttt{sun-java6-jdk}]
+\item[\texttt{tex4ht}]
+\item[\texttt{automake}]
+\item[\texttt{libtool}]
+\item[\texttt{libreadline5-dev}]
+\item[\texttt{python2.6-dev}]
+\item[\texttt{swig}]
+\item[\texttt{libgmp3-dev}]
+\item[\texttt{libmpfr-dev}]
+\item[\texttt{gfortran}]
+\end{description}
 
 There are scripts to ease the developer and user life.
 
@@ -906,6 +928,8 @@ Currently, 3 options are available:
 
 \item[\texttt{--p4a}:] Validate tests which are done by \verb|par4all_validation.txt| (which must be previously created in src/validation)
 
+\item[\texttt{--diff}:] This command make a diff between tests done by --pips and --p4a options. The list of the tests which are not done by --p4a options are into diff.txt
+
 \item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
 \end{description}
 
@@ -920,11 +944,11 @@ python p4a_validate_class.py --p4a
 
 To use the option --p4a, a  \verb|par4all_validation.txt| must be previously created. This file lists all tests that the validation will do.
 Syntax to add a new test is: \verb|directory_test/name_test|
+Be careful when adding a test to \verb|par4all_validation.txt|, put the correct extension (.c, .f, .F, .F90). Don't use .tpips, .tpips2, etc extensions.
 
-Example of a \verb|par4all_validation.txt| with 3 tests:
+Example of a \verb|par4all_validation.txt| with 2 tests:
 \begin{verbatim}
 Syntax\alias.f
-Syntax\allocatable.tpips
 Syntax\altret01.f
 \end{verbatim}
 

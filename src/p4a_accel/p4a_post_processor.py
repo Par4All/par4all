@@ -55,19 +55,9 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # Where we will rewrite the result:
     dest_file_name = os.path.join(dir_name, file_base_name)
 
-    # Remove a buggy output from the outliner:
-#16    content = re.sub("//PIPS generated variable\nstruct {\n   float re;\n   float im;\n};", "", content)
-
-#    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]\\);\n))",
-#                     "\\1P4A_accel_kernel_wrapper void p4a_kernel_wrapper_\\2", content)
-#16    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]*\\);\n))",
-#16                     "\\1void p4a_kernel_wrapper_\\2", content)
-
-    # Insert a
-    # #include <p4a_accel.h>
-    # #include <math.h>
-    content = re.sub("^",
-                     "#include <p4a_accel.h>\n#include <math.h>\n", content)
+    # Clean-up headers and inject standard header injection:
+    content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
+                     "\\1#include <p4a_accel.h>\n#include <stdio.h>\n#include <math.h>\n", content)
 
     # Compatibility
     content = re.sub("// Prepend here P4A_init_accel\n",
@@ -117,22 +107,6 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ### content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
     ###                 insert_kernel_launcher_declaration, content)
 
-
-    # Clean-up headers and inject standard header injection:
-    content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*extern void funlockfile\\(FILE \\*__stream\\);",
-                     "\\1#include <stdio.h>\n", content)
-
-    # Remove #include <math.h> stuff since it has already be included
-    # above and CUDA does not cope with multiple inclusions:
-    content = re.sub("(?s)\ntypedef union {\n.*extern int matherr\\(struct exception \\*__exc\\);",
-                     "", content)
-
-    # Remove a weird parasitic type definition:
-    content = re.sub("typedef unsigned int size_t;\n",
-                     "", content)
-
-    content = re.sub("(?s)typedef int wchar_t;\n.*?\nextern int getloadavg\\(double __loadavg\\[\\], int __nelem\\);\n",
-                     "#include <stdlib.h>\n", content)
 
     if verbose:
         print content,
