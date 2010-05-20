@@ -67,7 +67,6 @@ echo
 display PRINTED_FILE[microcode]
 apply PARTIAL_EVAL[microcode]
 apply SUPPRESS_DEAD_CODE[microcode]
-apply USE_DEF_ELIMINATION
 display PRINTED_FILE[microcode]
 
 echo
@@ -83,10 +82,11 @@ display PRINTED_FILE[microcode]
 
 # probably useless for terapix microcode
 #apply INVARIANT_CODE_MOTION
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "1D"
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
 setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER[microcode]
 display PRINTED_FILE[microcode]
+display PRINTED_FILE[launch_microcode1]
 apply PARTIAL_EVAL[microcode]
 display PRINTED_FILE[microcode]
 
