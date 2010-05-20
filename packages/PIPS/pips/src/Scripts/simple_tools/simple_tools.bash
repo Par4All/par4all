@@ -47,7 +47,7 @@ echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
-echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+echo Desugaring other for-loops into plain while-loops for the time we improve semantics ameliorations in PIPS:
 apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
 
 EOF
@@ -72,10 +72,10 @@ echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 echo
-echo Warning: assume that there is no aliasing between IO streams 
-echo (FILE * variables)
+echo "Warning: assume that there is no aliasing between IO streams (FILE * variables)"
 setproperty ALIASING_ACROSS_IO_STREAMS FALSE
-
+echo "Warning: this is a work in progress. Assume no weird aliasing"
+setproperty CONSTANT_PATH_EFFECTS FALSE
 EOF
 }
 

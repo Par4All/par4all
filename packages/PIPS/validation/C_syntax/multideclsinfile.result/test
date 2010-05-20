@@ -8,6 +8,7 @@ Splitting file    ./multideclsinfile.database/Tmp/multideclsinfile.cpp_processed
 Workspace multideclsinfile created and opened.
 Module multideclsinfile! selected
 setproperty PRETTYPRINT_LANGUAGE "C"
+user warning in parse_properties: property PRETTYPRINT_LANGUAGE redefined
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
