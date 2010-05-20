@@ -1,0 +1,50 @@
+Select some options to deal with the C Language:
+Do not display original number lines as comment:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+
+Warning: assume that there is no aliasing between IO streams 
+(FILE * variables)
+int main()
+{
+   double z;
+   unsigned char c;
+
+   z = 2.0;
+   c = z>1.0?255:255*z;
+   
+   
+   return 0;
+}
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   double z;
+
+//  T(c) {}
+
+   unsigned char c;
+
+//  T() {}
+
+
+   z = 2.0;
+
+//  T(c) {}
+
+   c = z>1.0?255:255*z;
+
+//  T(main) {main==0}
+
+   
+   
+   return 0;
+}
