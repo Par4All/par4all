@@ -5,6 +5,7 @@ Initial source code
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_LANGUAGE redefined
 unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 C_PARSER[loop_tiling02] (NormalizeReference) Reference to function "n" cannot be normalized.
 Is it an undeclared variable?
