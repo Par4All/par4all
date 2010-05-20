@@ -717,7 +717,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 				  else
 				    {
 				      pips_debug(8, "there is no inital_value\n");
-				      if (!get_constant_paths_p())
+				      if (get_constant_paths_p())
 					{ 
 					  pips_debug(8, "-> anywhere effect \n");
 					  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), NIL), l_eff);
