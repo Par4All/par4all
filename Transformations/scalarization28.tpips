@@ -1,0 +1,17 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "scalarization28"
+delete $WS
+create $WS $WS.c 
+
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY TRUE
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+
+apply SCALARIZATION
+display PRINTED_FILE
+
+close
+delete $WS
+quit
