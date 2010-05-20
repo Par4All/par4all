@@ -12,8 +12,7 @@ workspace.delete(program)
 w = workspace([ program + ".c",
 		os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_stubs.c") ],
 	      name = program,
-	      activates = [ "C_PARSER",
-			    "TRANSFORMERS_INTER_FULL",
+	      activates = [ "TRANSFORMERS_INTER_FULL",
 			    "INTERPROCEDURAL_SUMMARY_PRECONDITION",
 			    "PRECONDITIONS_INTER_FULL" ],
 	      verboseon=True)
@@ -79,8 +78,8 @@ kernel_launchers.gpu_loop_nest_annotate()
 # Some output:
 kernel_launchers.display()
 
-# Unfortunately this information is lost by the current outliner, so
-# rebuid it... :-(
+# Unfortunately the information about parallelization and privatization is
+# lost by the current outliner, so rebuid it... :-(
 kernel_launchers.privatize_module()
 kernel_launchers.coarse_grain_parallelization()
 
@@ -100,8 +99,8 @@ w.all_functions.display()
 #kernels.display()
 
 # Add communication around all the call site of the kernels:
-# Use a more specific communication location:
 #kernel_launchers.kernel_load_store()
+# Use a more specific communication location instead of the generic line above:
 w["p4a_kernel_launcher_0"].kernel_load_store()
 w["compute"].kernel_load_store()
 kernel_launchers.display()
