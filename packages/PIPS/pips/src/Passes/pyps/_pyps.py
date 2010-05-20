@@ -186,14 +186,14 @@ class workspace:
 			if not os.path.exists(indir):
 				os.makedirs(indir)
 			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory")
-			for s in os.listdir(self.dir()+"Src"):
+			for s in os.listdir(self.directory()+"Src"):
 				cp=os.path.join(indir,s)
-				shutil.copy(os.path.join(self.dir(),"Src",s),cp)
+				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
 				saved+=[cp]
 		else:
-			for s in os.listdir(self.dir()+"Src"):
+			for s in os.listdir(self.directory()+"Src"):
 				cp=with_prefix+s
-				shutil.copy(os.path.join(self.dir(),"Src",s),cp)
+				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
 				saved+=[cp]
 		return saved
 

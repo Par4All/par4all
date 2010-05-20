@@ -537,10 +537,27 @@ transformer intrinsic_to_transformer(entity e,
  else if(ENTITY_C_RETURN_P(e)) {
    tf = c_return_to_transformer(e, pc, ef, pre);
   }
-  else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
+  else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)
+	  || ENTITY_ASSERT_FAIL_SYSTEM_P(e))
     tf = transformer_empty();
   else if(ENTITY_COMMA_P(e)) {
     tf = expressions_to_transformer(pc, pre);
+  }
+  else if(ENTITY_CONDITIONAL_P(e)) {
+    /* FI: this may happen, for instance with the macro definition of
+       assert() or because the programmer writes "i>1? (i = 2): (i =
+       3);" instead of "i = i>1? 2 : 3;" */
+    expression cond = EXPRESSION(CAR(pc));
+    expression e1 = EXPRESSION(CAR(CDR(pc)));
+    expression e2 = EXPRESSION(CAR(CDR(CDR(pc))));
+    tf = conditional_to_transformer(cond, e1, e2, pre, ef);
+  }
+  else if(ENTITY_ASSERT_SYSTEM_P(e)) {
+    /* FI: the condition should be evaluated and considered TRUE on
+       exit, but this is sometimes captured by a macro definition and the code
+       below is then useless */
+    expression cond = EXPRESSION(CAR(pc));
+    tf = condition_to_transformer(cond, pre, TRUE);
   }
   else
     tf = effects_to_transformer(ef);
@@ -1036,8 +1053,12 @@ transformer any_user_call_site_to_transformer(entity f,
     transformer ctf = transformer_undefined;
 
     if(entity_undefined_p(fpv)) {
+      /* FI: we could accept a number of actual parameters greater
+	 than the number of formal parameters and move on by ignoring
+	 expression e?!? Side effects in e should be taken into
+	 account anyway... */
       pips_user_error("Cannot find formal parameter %d for function \"%s\"."
-		      " Mismatch between functon declaration and call site."
+		      " Mismatch between function declaration and call site."
 		      " Check the source code with flint, gcc or gfortran.\n",
 		      n, entity_user_name(f));
     }

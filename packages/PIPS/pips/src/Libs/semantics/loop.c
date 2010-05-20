@@ -2105,16 +2105,15 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
     return post;
 }
 
-transformer loop_to_postcondition(
-    transformer pre,
-    loop l,
-    transformer tf)
+transformer loop_to_postcondition(transformer pre,
+				  loop l,
+				  transformer tf)
 {
   transformer post = transformer_undefined;
   statement s = loop_body(l);
   range r = loop_range(l);
 
-  debug(8,"loop_to_postcondition","begin\n");
+  pips_debug(8,"begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
     pips_internal_error("Halbwachs not implemented\n");

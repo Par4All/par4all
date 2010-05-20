@@ -219,12 +219,22 @@ statement effects_to_dma(statement stat,
   list effects = NIL;
 
   FOREACH(EFFECT,e,rw_effects) {
+
+
     if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
 	&& action_read_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
     else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
 	     && action_write_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
+
+    /*Little hack to avoid effects weaknesses*/
+    if(get_bool_property("KERNEL_LOAD_STORE_FORCE_LOAD")
+       &&(dma_load_p(s) && action_write_p(effect_action(e)))){
+	effect hack = copy_effect(e);
+	effect_action(hack) = make_action_read();
+	effects=CONS(EFFECT,hack,effects);
+      }
   }
 
   list statements = NIL;
@@ -478,6 +488,7 @@ kernel_load_store_generator(statement s, string module_name)
 bool kernel_load_store(char *module_name) {
   /* generate a load stores on each caller */
   {
+    debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
     callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
     FOREACH(STRING,caller_name,callees_callees(callers)) {
       /* prelude */
@@ -508,7 +519,8 @@ bool kernel_load_store(char *module_name) {
       callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
     db_put_or_update_memory_resource(DBR_KERNELS,"",kernels,true);
   }
-
+  
+  debug_off();
 
   return true;
 }

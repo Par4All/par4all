@@ -488,7 +488,7 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
 
   if(c_language_module_p(m))
     tf = c_data_to_prec_for_variables(m, le);
-  else if(fortran_language_module_p(m))
+  else if(fortran_language_module_p(m) || fortran95_language_module_p(m))
     tf = fortran_data_to_prec_for_variables(m, le);
   else
     pips_internal_error("Unexpected language");
