@@ -20,6 +20,36 @@ p4a_recover_includes --init
 To recover #include in some PIPS output.c, use:
 p4a_recover_includes output.c
 
+How it works:
+
+There are indeed 2 different methods that can be used:
+
+- The simple method just analyzes the output of the preprocessor before
+  feeding PIPS and adds a marker comments before and after a standard
+  inclusion. This is done with --simple -E option.
+
+  In simple cases, these markers are found again in the PIPS output and if
+  we assume that the declarations are in the same order, we replace what
+  is between 2 markers by the respective #include
+
+  This is what is done by using then this program on the PIPS output with
+  the --simple option
+
+- The more complex method inserts a marker before every statement from a
+  standard #include before feeding PIPS.
+
+  After PIPS digestion, most of the marker comments are still attached to
+  the declarations, but not for structures, typedef, unions... In complex
+  cases (outlining, restructuring...) the code is reorganized to that
+  unmarked elements that come from standard includes may be outside the
+  markers from the simple method. So we need some learning to recognize
+  the pieces that come from every standard include files. This should be
+  done by the --init option once at the Par4All installation.
+
+  Then, calling this program on the PIPS output without the --simple
+  option replace each fragment from a standard include files with the
+  respective #include at the place the first place a fragment appeared.
+
 Ronan.Keryell@hpc-project.com
 """
 
@@ -30,9 +60,12 @@ import ply.lex as lex
 
 #from pyps import *
 
+# Debugging mode:
 verbose = False
 #verbose = True
 
+# To select if we use a simple method:
+simple_method = False
 
 # The #include files we want to analyse:
 # I use on the GNU libc'Appendix B Summary of Library Facilities' a
@@ -577,6 +610,10 @@ def postpreprocess_simple(output_string):
                     include_stack.append(file_name)
                     if verbose:
                         print('Including', file_name, len(include_stack))
+                    if simple_method and len(include_stack) == 1:
+                        # In the case of the simple method, just mark
+                        # begin of #include that are at the top-level:
+                        print('/* P4A include start ' + file_name + ' */')
                     #print(include_stack)
                 if m.group(3) == "2":
                     returning_from = include_stack.pop()
@@ -584,6 +621,10 @@ def postpreprocess_simple(output_string):
                         print('Returning from',
                               returning_from,
                               len(include_stack))
+                    if simple_method and len(include_stack) == 0:
+                        # In the case of the simple method, just mark
+                        # the end of #include that are at the top-level:
+                        print('/* P4A include stop here */')
         elif include_stack:
             # We are in an inclusion, so decorate only full statements:
             if tok.type == 'comment':
@@ -593,12 +634,17 @@ def postpreprocess_simple(output_string):
                 # Keep the content
                 l.lexer.content += tok.value
                 if tok.type == 'SEMICOLON' and l.lexer.level == 0:
-                    # The end of a construction, output a comment,
-                    # followed by the construction
-                    print('\n/* P4A include tracking:', include_stack[0], '*/')
-                    # Remove leading \n:
-                    content = re.sub('^\s+', '', l.lexer.content)
-                    print(content, end = '')
+                    content = l.lexer.content
+                    if not simple_method:
+                        # If not using the simple method, we mark each
+                        # statement:
+                        # The end of a construction, output a comment,
+                        # followed by the construction
+                        print('\n/* P4A include tracking:',
+                              include_stack[0], '*/')
+                        # Remove leading \n and spaces:
+                        content = re.sub('^\s+', '', content)
+                        print(content, end = '')
                     l.lexer.content = ""
         else:
             # No special processing:
@@ -769,7 +815,7 @@ def preprocess(option, opt_str, value, parser):
 
 
 def main():
-    global verbose
+    global verbose, simple_method
 
     parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
                                    version = "$Id")
@@ -781,6 +827,10 @@ def main():
     parser.add_option("-E",  "--preprocessor",
                      action = "callback", callback = preprocess,
                       help = "Use this program as a preprocessor. It follows the PIPS_CPP_FLAGS environment variable but not PIPS_CPP since often the later is used to call this program. It must be the last option of this program before all the other options and parameters to be passed to CPP. This option override the -i/--init and -o/--output options. The arguments passed to the CPP are the PIPS default options, the content of the PIPS_CPP_FLAGS environment variable and the trailing arguments of this programm.")
+
+    parser.add_option("-s",  "--simple",
+                      action = "store_true", dest="simple", default = False,
+                      help = "Use a simple method that should work for simple case and that avoid previous learning of the standard include files")
 
     parser.add_option("-o",  "--output", dest="output_file_name",
                       help = "When used in default postprocessor mode, it sets the name of the file used to output the recovered includes instead of overriding the input file",
@@ -801,6 +851,7 @@ def main():
     (options, args) = parser.parse_args()
 
     verbose = options.verbose
+    simple_method = options.simple
 
     if options.init:
         init_headers()
@@ -819,3 +870,10 @@ def main():
 # If this programm is independent it is executed:
 if __name__ == "__main__":
     main()
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:
