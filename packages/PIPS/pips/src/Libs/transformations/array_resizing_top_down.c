@@ -169,16 +169,6 @@ static void display_array_resizing_top_down_statistics()
 	   ,number_of_processed_modules); 
 }
 
-bool array_entity_p(entity e)
-{
-  if (entity_variable_p(e))
-    {
-      variable var = type_variable(entity_type(e));
-      if (!ENDP(variable_dimensions(var)))  return TRUE;
-    }
-  return FALSE;
-}
-
 bool array_argument_p(expression e)
 {
   if (expression_reference_p(e))
