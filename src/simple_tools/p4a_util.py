@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Authors:
+# - Grégoire Péan <gregoire.pean@hpc-project.com>
+#
 
 '''
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, re
+import string, sys, random, logging, os, re, datetime, shutil
 import term
 
 # Global variables.
@@ -25,24 +29,24 @@ def get_verbosity():
 # Printing/logging helpers.
 def debug(msg):
 	if verbosity >= 2:
-		sys.stderr.write(sys.argv[0] + ": " + msg.rstrip("\n") + "\n");
+		sys.stderr.write(sys.argv[0] + ": " + str(msg).rstrip("\n") + "\n");
 	if logger:
 		logger.debug(msg)
 
 def info(msg):
 	if verbosity >= 1:
-		sys.stderr.write(sys.argv[0] + ": " + term.escape("white") + msg.rstrip("\n") + term.escape() + "\n");
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("white") + str(msg).rstrip("\n") + term.escape() + "\n");
 	if logger:
 		logger.info(msg)
 
 def warn(msg):
 	if verbosity >= 0:
-		sys.stderr.write(sys.argv[0] + ": " + term.escape("yellow") + msg.rstrip("\n") + term.escape() + "\n");
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("yellow") + str(msg).rstrip("\n") + term.escape() + "\n");
 	if logger:
 		logger.warn(msg)
 
 def error(msg):
-	sys.stderr.write(sys.argv[0] + ": " + term.escape("red") + msg.rstrip("\n") + term.escape() + "\n");
+	sys.stderr.write(sys.argv[0] + ": " + term.escape("red") + str(msg).rstrip("\n") + term.escape() + "\n");
 	if logger:
 		logger.error(msg)
 
@@ -101,49 +105,6 @@ def get_machine_arch():
 	(sysname, nodename, release, version, machine) = os.uname()
 	return machine
 
-# XXX: Not really cross-platform. Should use Git extension for Python instead.
-def git_is_dirty(file_or_directory):
-	'''Returns True if the Git repository in which the file_or_directory lies has uncommited changes, 
-	False otherwise or if the file_or_directory is not versioned in a Git repository.'''
-	if not os.path.isdir(file_or_directory):
-		(file_or_directory, name) = os.path.split(file_or_directory)
-		if not os.path.isdir(file_or_directory):
-			return False
-	output = os.popen("cd " + file_or_directory + " && git status 2>&1").read()
-	if re.search("Changes to be committed:", output) or re.search("Changed but not updated:", output):
-		return True
-	return False
-
-# XXX: Not really cross-platform. Should use Git extension for Python instead.
-def git_get_revision(file_or_directory):
-	'''Returns the current revision for the Git repository in which the file_or_directory lies.'''
-	if not os.path.isdir(file_or_directory):
-		(file_or_directory, name) = os.path.split(file_or_directory)
-		if not os.path.isdir(file_or_directory):
-			return None
-	output = os.popen("cd " + file_or_directory + " && git log --abbrev-commit --pretty=oneline -n 1 2>/dev/null").read().strip()
-	if not output:
-		return None
-	short_rev = output.split(" ")[0]
-	if not short_rev:
-		return None
-	#tag = os.popen("cd " + file_or_directory + " && git describe --tags 2>/dev/null").read().strip()
-	if git_is_dirty(file_or_directory):
-		short_rev += "~dirty"
-	return short_rev
-
-# XXX: Not really cross-platform. Should use Git extension for Python instead.
-def git_get_tag(file_or_directory):
-	'''Returns the current tag for the Git repository in which the file_or_directory lies.'''
-	if not os.path.isdir(file_or_directory):
-		(file_or_directory, name) = os.path.split(file_or_directory)
-		if not os.path.isdir(file_or_directory):
-			return None
-	tag = os.popen("cd " + file_or_directory + " && git describe --tags 2>/dev/null").read().strip()
-	if tag:
-		return tag
-	return None
-
 def slurp(file):
 	'''Slurp file contents.'''
 	f = open(file)
@@ -169,6 +130,20 @@ def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext
 			shutil.move(output_file, base)
 			output_file = base
 	return output_file
+
+def file_lastmod(file):
+	'''Returns file's last modification date/time.'''
+	return datetime.datetime.fromtimestamp(os.path.getmtime(file))
+
+def sh2csh(file, output_file = None):
+	if not output_file:
+		output_file = change_file_ext(file, ".csh")
+	content = slurp(file)
+	# XXX: probably more to filter out (if ... else etc.)
+	content = re.sub("export\s+(\S+?)\s*=\s*(.+?)(\n?)(;?)", "setenv \\1 \\2\\3\\4", content)
+	content = re.sub("(\S+?)\s*=\s*(.+?)(\n?)(;?)", "set \\1=\\2\\3\\4", content)
+	content += "\n\nrehash\n";
+	dump(output_file, content)
 
 if __name__ == "__main__":
 	print(__doc__)

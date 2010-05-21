@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Authors:
+# - Grégoire Péan <gregoire.pean@hpc-project.com>
+#
 
 '''
 Par4All Frontend Script
@@ -9,11 +13,12 @@ import string, sys, os, re, optparse
 from p4a_util import *
 from p4a_processor import *
 from p4a_builder import *
+from git import *
 
 def main():
 	'''The function called when this program is executed by its own'''
 
-	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = "$Id")
+	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
 
 	main_group = optparse.OptionGroup(parser, "General Options")
 
