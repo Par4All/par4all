@@ -1,0 +1,19 @@
+Release notes for Par4All 0.2
+
+To compile and to run the CUDA output, you should have the following
+environment variable set:
+
+- CUDA_DIR to the directory where CUDA has been installed (default to
+  /usr/local/cuda)
+
+- CUDA_SDK_DIR to where the CUDA SDK has been installed (default to
+  $HOME/NVIDIA_GPU_Computing_SDK)
+
+For support : support at par4all dot org
+
+
+
+%%% Local Variables:
+%%% ispell-local-dictionary: "american"
+%%% End:
+

@@ -123,7 +123,7 @@ cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $P4A_INSTALL_PREFIX/bi
 # Install Par4All accelerator run time:
 cp $P4A_ROOT/src/p4a_accel/p4a_post_processor.py $P4A_INSTALL_PREFIX/bin
 mkdir -p $P4A_INSTALL_PREFIX/share/p4a_accel
-cp $P4A_ROOT/src/p4a_accel/*.{h,c,f,mk} $P4A_INSTALL_PREFIX/share/p4a_accel
+cp -a $P4A_ROOT/src/p4a_accel/*.{h,c,cu,f,mk} $P4A_INSTALL_PREFIX/share/p4a_accel
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh

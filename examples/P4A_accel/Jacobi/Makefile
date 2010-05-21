@@ -1,6 +1,5 @@
 # A GNU makefile to run a demo of Par4All
 
-#TARGETS= jacobi fresnel
 TARGETS= jacobi
 
 OPENMP= -fopenmp
@@ -9,27 +8,20 @@ CFLAGS= -O3 -std=c99
 LDLIBS= -lm
 DEMO_EDITOR=gedit
 
-# This can be overriden by P4A_ACCEL_DIR, CUDA_DIR and CUDA_SDK
-# environment variables:
-P4A_ACCEL_DIR=$(P4A_ROOT)/src/p4a_accel
-export P4A_ACCEL_DIR
+# This can be overriden by CUDA_DIR and CUDA_SDK environment variables:
 CUDA_DIR=/usr/local/cuda
 CUDA_SDK_DIR=$(HOME)/NVIDIA_GPU_Computing_SDK
 
-# To use old includes from Ubuntu 9.04:
-PIPS_CPP_FLAGS=-I$(P4A_ACCEL_DIR)/include
-export PIPS_CPP_FLAGS
-
-# -g -DP4A_DEBUG
-P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR)  -I$(P4A_ACCEL_DIR)/include -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc
+# For debugging, add -g -DP4A_DEBUG
+P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc
 
 NVCC=$(CUDA_DIR)/bin/nvcc
 # GT200
 #CUDA_ARCHITECTURE= -arch=sm_13
 # G92
 CUDA_ARCHITECTURE= -arch=sm_11
-CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -I$(P4A_ACCEL_DIR)/include -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc -DUNIX -O2
-CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/src/../lib -L$(CUDA_SDK_DIR)/C/common/lib/linux -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/lib -L$(CUDA_SDK_DIR)/C/common/lib/linux
+CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc -DUNIX -O2
+CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/lib -L$(CUDA_SDK_DIR)/C/common/lib/linux
 CUDA_LIBS= -lcudart -lcutil_x86_64
 LD_LIBRARY_PATH=$(CUDA_DIR)/lib64
 export LD_LIBRARY_PATH
