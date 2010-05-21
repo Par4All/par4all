@@ -40,8 +40,6 @@ void point_to04()
 
 Cumulated pointer effects for "point_to04"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void point_to04()
 {
    struct s {

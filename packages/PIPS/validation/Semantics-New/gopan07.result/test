@@ -2,7 +2,7 @@
 TRANSFORMERS
 
 
-//  T(main) {103<=main}
+//  T() {}
 
 int main()
 {
@@ -21,11 +21,7 @@ int main()
 
    y = 0;
 
-//  T(z) {x==0, y==0, z==0}
-
-   z = 0;
-
-//  T() {x==0, y==0, z==0}
+//  T() {x==0, y==0}
 
 
    while (y>=0) {
@@ -57,21 +53,20 @@ int main()
 
          x++;
       }
-
-//  T(z) {x==z, y==-1, 52<=x}
-
-      z = x;
    }
 
-//  T(main) {main==x, main==z, y==-1, 103<=main}
+//  T() {y==-1, 103<=x}
 
-   /*
-     if(x==103)
-       printf("property  verified\n");
-     else
-       printf("property not found\n");
-     */
-   return z;
+   if (x==103)
+
+//  T() {x==103, y==-1}
+
+      printf("property  verified\n");
+   else
+
+//  T() {y==-1, 104<=x}
+
+      printf("property not found\n");
 }
 
 PRECONDITIONS
@@ -98,51 +93,70 @@ int main()
 
 //  P(k,x,y,z) {x==0, y==0}
 
-   z = 0;
-
-//  P(k,x,y,z) {x==0, y==0, z==0}
-
 
    while (y>=0) {
 
-//  P(k,x,y,z) {x==0, y==0, z==0}
+//  P(k,x,y,z) {x==0, y==0}
 
       while (y>=0&&x<=50) {
 
-//  P(k,x,y,z) {x==y, z==0, 0<=x, x<=50}
+//  P(k,x,y,z) {x==y, 0<=x, x<=50}
 
          x++;
 
-//  P(k,x,y,z) {x==y+1, z==0, 1<=x, x<=51}
+//  P(k,x,y,z) {x==y+1, 1<=x, x<=51}
 
          y++;
       }
 
-//  P(k,x,y,z) {x==51, y==51, z==0}
+//  P(k,x,y,z) {x==51, y==51}
 
       while (y>=0&&x>50) {
 
-//  P(k,x,y,z) {x+y==102, z==0, 51<=x, x<=102}
+//  P(k,x,y,z) {x+y==102, 51<=x, x<=102}
 
          y--;
 
-//  P(k,x,y,z) {x+y==101, z==0, 51<=x, x<=102}
+//  P(k,x,y,z) {x+y==101, 51<=x, x<=102}
 
          x++;
       }
-
-//  P(k,x,y,z) {x==103, y==-1, z==0}
-
-      z = x;
    }
 
-//  P(k,x,y,z) {x==103, y==-1, z==103}
+//  P(k,x,y,z) {x==103, y==-1}
 
-   /*
-     if(x==103)
-       printf("property  verified\n");
-     else
-       printf("property not found\n");
-     */
-   return z;
+   if (x==103)
+
+//  P(k,x,y,z) {x==103, y==-1}
+
+      printf("property  verified\n");
+   else
+
+//  P() {0==-1}
+
+      printf("property not found\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x, y, z, k;
+
+   x = 0;
+   y = 0;
+
+   while (y>=0) {
+      while (y>=0&&x<=50) {
+         x++;
+         y++;
+      }
+      while (y>=0&&x>50) {
+         y--;
+         x++;
+      }
+   }
+   printf("property  verified\n");
+   ;
 }

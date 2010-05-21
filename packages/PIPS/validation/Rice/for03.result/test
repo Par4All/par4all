@@ -34,10 +34,6 @@ void for03(int n)
 
 Check the regions
 
-
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
 void for03(int n)
 {
    int j;
