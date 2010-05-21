@@ -1,0 +1,21 @@
+delete declaration03
+
+create declaration03 declaration03.c
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+quit
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete declaration03
+quit

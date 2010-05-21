@@ -1,0 +1,25 @@
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(int argc, char **argv)
+{
+
+//  T(i) {i==1}
+
+   int i = 1;
+
+//  T(j) {}
+
+   int j;
+
+//  T(i,j) {i==i#init+1, i==j-20}
+
+   long long size[i++][j = foo(i)];
+
+//  T(main) {}
+
+   return (int) size[0][0];
+}
