@@ -1,29 +1,28 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS "array_to_pointer02"
+setenv WS "array_to_pointer06"
 delete $WS
 create $WS $WS.c
 
 echo
 echo Initial code
 echo
-module duck
 
-display PRINTED_FILE
+display PRINTED_FILE[duck]
 
 echo
 echo Code after array conversion
 echo
 
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
-apply ARRAY_TO_POINTER
-display PRINTED_FILE
+apply ARRAY_TO_POINTER[duck]
+display PRINTED_FILE[%ALLFUNC]
 
-echo
-echo Code after partial eval
-echo
-
-apply PARTIAL_EVAL
-display PRINTED_FILE
+#echo
+#echo Code after partial eval
+#echo
+#
+#apply PARTIAL_EVAL[duck]
+#display PRINTED_FILE[duck]
 
 echo
 echo Unsplit resulting code

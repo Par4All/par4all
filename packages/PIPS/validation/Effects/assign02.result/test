@@ -38,9 +38,7 @@ s_t make_s(int i, float x)
 
 Cumulated pointer effects for "make_s"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i x
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 s_t make_s(int i, float x)
 {
@@ -66,8 +64,6 @@ void assign02()
 {
    s_t s;
    int j;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
 //                                  s[.entier] s[.reel]
@@ -76,7 +72,6 @@ void assign02()
 //               <must be written>: s[.entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
    
@@ -90,15 +85,12 @@ void assign02()
 Cumulated pointer effects for "assign02"
 
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 void assign02()
 {
    s_t s;
    int j;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
 //                                  s[.entier] s[.reel]
@@ -107,7 +99,6 @@ void assign02()
 //               <must be written>: s[.entier]
    s.entier = 4;
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
    

@@ -1,0 +1,34 @@
+delete implicit_type_coercion1
+create implicit_type_coercion1 implicit_type_coercion1.c
+module main
+echo Select some options to deal with the C Language:
+echo Do not display original number lines as comment:
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+echo Compute the intraprocedural preconditions at the same time as
+echo   transformers and use them to improve the accuracy of expression
+echo   and statement transformers:
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+echo Try to restructure the code for more precision:
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+echo
+echo Warning: assume that there is no aliasing between IO streams 
+echo (FILE * variables)
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setenv SEMANTICS_DEBUG_LEVEL 0
+module main
+display PRINTED_FILE
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+close
+quit
+delete implicit_type_coercion1
+# EOF

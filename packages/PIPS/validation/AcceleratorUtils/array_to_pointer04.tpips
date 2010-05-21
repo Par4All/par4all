@@ -1,6 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete array_to_pointer04
-create array_to_pointer04 array_to_pointer04.c
+setenv WS "array_to_pointer04"
+delete $WS
+create $WS $WS.c
 
 echo
 echo Initial code
@@ -30,10 +31,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c array_to_pointer04.database/Src/array_to_pointer04.c  -o array_to_pointer04.o
-shell rm -rf array_to_pointer04.o
+shell cc -c $WS.c -o  $WS.database/Tmp/ref.o
+shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/out.o
 
 close
-delete array_to_pointer04
+delete $WS
 quit
 

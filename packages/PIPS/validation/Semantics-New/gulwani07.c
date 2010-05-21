@@ -11,22 +11,18 @@ int main()
 
   int x,y,z;
 
-  x=1;
-  y=0;
-  z=0;
+  x=0;
+  y=50;
 
   while(x<100)
     {
-      while ( x<=50)
+      while ( x<50)
 	x++;
-      while (x<=100 && x>50){
+      while (x<100 && x>=50){
 	x++; y++;
       }
-
-      z=y;
     }
-
-
-  if (x ==101 && y==50) printf("property  verified\n");
-
+  
+  if (x ==100 && y==100) printf("property  verified\n");
+  
 }
