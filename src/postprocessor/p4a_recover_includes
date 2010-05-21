@@ -332,7 +332,7 @@ class SimpleC99Lexer_simple:
         return t
 
     # C99 comments, taken from pips/src/Libs/c_syntax/clex.l:
-    t_comment = r'(/\*([^*]|(\*+[^/*]))*\*+/\w*)|(//(\\\n|[^\n])*\n?)'
+    t_comment = r'(/\*([^*]|(\*+[^/*]))*\*+/\s*)|(//(\\\n|[^\n])*\n?)'
 
 
     # C99 string:
@@ -583,7 +583,7 @@ def postpreprocess(output_string):
     l.lexer.content = ""
 
 
-#/usr/include/
+# To parse the # pragma from gcc/cpp:
 parse_line_pragma_re = re.compile(r'\# (\d+) "([^"]+)" (\d) ?(\d)? ?(\d)?\n')
 include_stack = []
 
@@ -594,6 +594,14 @@ def postpreprocess_simple(output_string):
     l.build()
     # Give the lexer some input:
     l.lexer.input(output_string)
+
+    def flush_lexer_output(content):
+        """Print l.lexer.content and content
+        and reset l.lexer.content
+       """
+        print(l.lexer.content + content, end = '')
+        l.lexer.content = ""
+
 
     # Tokenize:
     for tok in l.lexer:
@@ -613,7 +621,8 @@ def postpreprocess_simple(output_string):
                     if simple_method and len(include_stack) == 1:
                         # In the case of the simple method, just mark
                         # begin of #include that are at the top-level:
-                        print('/* P4A include start ' + file_name + ' */')
+                        flush_lexer_output('/* P4A include "'
+                                           + file_name + '" starts here */\n')
                     #print(include_stack)
                 if m.group(3) == "2":
                     returning_from = include_stack.pop()
@@ -624,55 +633,69 @@ def postpreprocess_simple(output_string):
                     if simple_method and len(include_stack) == 0:
                         # In the case of the simple method, just mark
                         # the end of #include that are at the top-level:
-                        print('/* P4A include stop here */')
-        elif include_stack:
+                        flush_lexer_output('/* P4A include "'
+                                           + returning_from
+                                           + '" stops here */\n')
+        elif include_stack and not simple_method:
             # We are in an inclusion, so decorate only full statements:
             if tok.type == 'comment':
-                # Remove comments
+                # Remove them since the comments are now include markers
+                # we generate:
                 pass
             else:
                 # Keep the content
                 l.lexer.content += tok.value
                 if tok.type == 'SEMICOLON' and l.lexer.level == 0:
-                    content = l.lexer.content
-                    if not simple_method:
-                        # If not using the simple method, we mark each
-                        # statement:
-                        # The end of a construction, output a comment,
-                        # followed by the construction
-                        print('\n/* P4A include tracking:',
-                              include_stack[0], '*/')
-                        # Remove leading \n and spaces:
-                        content = re.sub('^\s+', '', content)
-                        print(content, end = '')
-                    l.lexer.content = ""
+                    # If not using the simple method, we mark each
+                    # statement:
+                    # The end of a construction, output a comment,
+                    # followed by the construction
+                    print('\n/* P4A include tracking:',
+                          include_stack[0], '*/')
+                    flush_lexer_output("")
         else:
             # No special processing:
             # Keep the content and print it:
-            l.lexer.content += tok.value
-            print(l.lexer.content, end = '')
-            # Reset the content buffer:
-            l.lexer.content = ""
+            flush_lexer_output(tok.value)
 
-    # Flush the output
-    print(l.lexer.content, end = '')
-    # For later use of the lexer, if any, throw away useless characters:
-    l.lexer.content = ""
+    # Flush the remaining output if any:
+    flush_lexer_output("")
 
 
-# To get pseudo-comments as /* P4A include tracking: /usr/include/stdio.h */
-parse_pseudo_comment_re = re.compile(r'^/\* P4A include tracking: /usr/include/(.*) \*/$')
 def recover_header_simple(file_name, output_file_name):
     """Replace CPP-inlined stuff from previous #include <something.h> by
     the #include <something.h> itself"""
-
-    # To store the set of found headers:
-    found_headers = set()
 
     f = open(file_name)
     # slurp all the file in a string:
     content = f.read()
     f.close()
+
+    # Create the output file:
+
+    # By default, override the input file:
+    if not output_file_name:
+        output_file_name = file_name
+    output = open(output_file_name, mode='w')
+
+    def flush_lexer_output(content):
+        """Print to output l.lexer.content and content and reset
+        l.lexer.content
+       """
+        print(l.lexer.content + content, end = '', file = output)
+        l.lexer.content = ""
+
+
+    if simple_method:
+        content = re.sub(r'/\* P4A include "/usr/include/([^"]+)" starts here \*/.+?/\* P4A include "/usr/include/\1" stops here \*/',
+                r'#include <\1>', content, 0, re.DOTALL)
+
+        print(content, file = output)
+        print('on ', output_file_name)
+        return
+
+    # To store the set of found headers:
+    found_headers = set()
 
     # Build the lexer:
     l = SimpleC99Lexer_simple()
@@ -681,7 +704,7 @@ def recover_header_simple(file_name, output_file_name):
     # Give the lexer some input:
     l.lexer.input(content)
 
-    # The current header use encountered, used also as a FSM:
+    # The current header encountered, used also as a FSM:
     header = None
 
     # Tokenize:
@@ -698,10 +721,7 @@ def recover_header_simple(file_name, output_file_name):
                 found_headers.add(header)
             else:
                 # Normal comment
-                l.lexer.content += tok.value
-                print(l.lexer.content, end = '')
-                # Reset the content buffer:
-                l.lexer.content = ""
+                flush_lexer_output(tok.value)
         elif header:
             # We are skipping up to the end of the statement since it will
             # be replaced later by a #include:
@@ -786,25 +806,23 @@ def postpreprocess(output_string):
     l.lexer.content = ""
 
 
-def preprocess(option, opt_str, value, parser):
-    """Call the preprocessor on the given argument and postprocess a little bit the output to add comments to better track standard file inclusion.
+def preprocess(args):
+    """Call the preprocessor with the given argument and postprocess a
+    little bit the output to add comments to better track standard file
+    inclusion.
 
     This is an optparse-callback to be able to get trailing arguments"""
-
-    #print (option, opt_str, value, parser, parser.rargs)
-
+    #print (args)
     # Pick the default values from
     # pips/src/Libs/preprocessor/preprocessor-local.h:
     cpp_args = " -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ "
     # Add other options from the PIPS_CPP_FLAGS environment variable if defined:
     if 'PIPS_CPP_FLAGS' in os.environ:
         cpp_args += os.environ['PIPS_CPP_FLAGS'] + " "
-    # Addded the trailing arguments of this program as files to
+    # Addded the trailing arguments of this program as options or files to
     # preprocess, if any:
-    cpp_args += " ".join(parser.rargs)
+    cpp_args += " ".join(args)
     # Mark all the arguments as having been consumed:
-    del parser.rargs[:]
-    # Rely on the shell to easily use the CPP parameters:
     output_string = subprocess.check_output("cpp" + cpp_args, shell=True)
     if verbose:
         print('The output before', output_string)
@@ -812,6 +830,23 @@ def preprocess(option, opt_str, value, parser):
     # Transform the byte array into string before
     #postpreprocess(output_string.decode())
     postpreprocess_simple(output_string.decode())
+
+
+def record_preprocess_options(option, opt_str, value, parser):
+    """Notice to call the preprocessor on the given argument and
+    postprocess a little bit the output to add comments to better track
+    standard file inclusion.
+
+    This is an optparse-callback to be able to get trailing arguments"""
+
+    # print (option, opt_str, value, parser, parser.rargs)
+
+    # Add all the remaining parser arguments into
+    # parser.options. Duplicate parser.rargs since we delete its elements
+    # the line after and they are lost then:
+    setattr(parser.values, "preprocessor_args", list(parser.rargs))
+    # Mark all the arguments as having been consumed:
+    del parser.rargs[:]
 
 
 def main():
@@ -825,7 +860,7 @@ def main():
                      help = "Initialize from PIPS exersizing the #include tables that will be used in the postprocessor")
 
     parser.add_option("-E",  "--preprocessor",
-                     action = "callback", callback = preprocess,
+                     action = "callback", callback = record_preprocess_options,
                       help = "Use this program as a preprocessor. It follows the PIPS_CPP_FLAGS environment variable but not PIPS_CPP since often the later is used to call this program. It must be the last option of this program before all the other options and parameters to be passed to CPP. This option override the -i/--init and -o/--output options. The arguments passed to the CPP are the PIPS default options, the content of the PIPS_CPP_FLAGS environment variable and the trailing arguments of this programm.")
 
     parser.add_option("-s",  "--simple",
@@ -854,8 +889,12 @@ def main():
     simple_method = options.simple
 
     if options.init:
+        # Asked for initialize the include recovering database:
         init_headers()
         save_header_information()
+    elif getattr(options, "preprocessor_args", None):
+        # Use this tool as a specific preprocessor:
+        preprocess(options.preprocessor_args)
     else:
         if args:
             # If there are still args, this program is used as a #include
