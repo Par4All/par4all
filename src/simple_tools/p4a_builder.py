@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Authors:
+# - Grégoire Péan <gregoire.pean@hpc-project.com>
+#
 
 '''
 Par4All Builder Class
