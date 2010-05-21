@@ -8,7 +8,7 @@ Ronan.Keryell@hpc-project.com
 
 #import string, re, sys, os, types, optparse
 
-import sys, re, os, optparse
+import sys, re, os, optparse, subprocess
 
 verbose = False
 
@@ -46,20 +46,29 @@ def patch_to_use_p4a_methods(file_name, dir_name):
         return
 
     print 'Patching', file_name, 'to directory', dir_name
-    # Parse the PIPS output:
-    f = open(file_name)
+    # Where we will rewrite the result:
+    dest_file_name = os.path.join(dir_name, file_base_name)
+
+    # Recover the standard #include from file_name to dest_file_name:
+    subprocess.call([ 'p4a_recover_includes', '--simple',
+                      '--output', dest_file_name, file_name ])
+
+    # Read the PIPS output with #include that will be written later:
+    f = open(dest_file_name)
     # slurp all the file in a string:
     content = f.read()
     f.close()
 
-    # Where we will rewrite the result:
-    dest_file_name = os.path.join(dir_name, file_base_name)
+    # Inject P4A accel header definitions:
+    content = """/* Use the Par4All accelerator run time: */
+#include <p4a_accel.h>
+""" + content
 
     # Clean-up headers and inject standard header injection:
-    content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
-                     "\\1#include <p4a_accel.h>\n#include <stdio.h>\n#include <math.h>\n", content)
+    ## content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
+    ##                  "\\1#include <p4a_accel.h>\n#include <stdio.h>\n#include <math.h>\n", content)
 
-    # Compatibility
+    # Inject run time initialization:
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 

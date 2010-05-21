@@ -120,6 +120,10 @@ cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
 cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $P4A_INSTALL_PREFIX/bin
+# Install Par4All accelerator run time:
+cp $P4A_ROOT/src/p4a_accel/p4a_post_processor.py $P4A_INSTALL_PREFIX/bin
+mkdir -p $P4A_INSTALL_PREFIX/share/p4a_accel
+cp $P4A_ROOT/src/p4a_accel/*.{h,c,f,mk} $P4A_INSTALL_PREFIX/share/p4a_accel
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
@@ -140,8 +144,7 @@ export P4A_ROOT='$P4A_ROOT'
 export P4A_DIST=\$P4A_ROOT/run
 
 # Location of the P4A_accel files.
-export P4A_ACCEL_DIR=\$P4A_ROOT/src/p4a_accel
-export P4A_ACCEL=\$P4A_ACCEL_DIR
+export P4A_ACCEL_DIR=\$P4A_DIST/share/p4a_accel
 
 export P4A_ETC=\$P4A_DIST/etc
 
