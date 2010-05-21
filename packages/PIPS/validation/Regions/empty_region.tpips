@@ -1,0 +1,11 @@
+# this example shows how precodition are computed for min operators
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "empty_region"
+delete $WS
+create $WS $WS.c
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS

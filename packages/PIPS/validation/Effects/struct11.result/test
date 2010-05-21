@@ -125,11 +125,10 @@ s_with_array foo2(s_with_array s)
 //               <must be read   >: s_loc[.n]
    return s_loc;
 }
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//               <may be read    >: stdout stdout[0] 
 //                                  _MALLOC_EFFECTS:_MALLOC_ 
 //                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  _MALLOC_EFFECTS:_MALLOC_ 
+//               <may be written >: stdout[0] _MALLOC_EFFECTS:_MALLOC_
 //                                  __IO_EFFECTS:LUNS[1]
 int main()
 {
@@ -277,12 +276,13 @@ s_with_array foo2(s_with_array s)
    return s_loc;
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 int main()
 {

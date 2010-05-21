@@ -130,10 +130,11 @@ void foo(int *p)
 Regions for "main"
 
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 int main()
 {
