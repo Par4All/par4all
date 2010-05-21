@@ -17,14 +17,14 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-export P4A_DIST=placeholder
+P4A_DIST=$DIST
 
-case "$1" in
+case "$$1" in
     configure)
 
         DISPLAY_NOTE=1
-        if [ ! -d $P4A_DIST ]; then
-            echo "ERROR: P4A_DIST=$P4A_DIST is not a valid directory"
+        if [ ! -d $$P4A_DIST ]; then
+            echo "ERROR: P4A_DIST=$$P4A_DIST is not a valid directory"
             exit 1
         fi
         
@@ -33,39 +33,39 @@ case "$1" in
         echo
 
         if [ -d /etc/profile.d ]; then
-            ln -sf $P4A_DIST/etc/par4all-rc.* /etc/profile.d/
+            ln -sf $$P4A_DIST/etc/par4all-rc.* /etc/profile.d/
         else
             DISPLAY_NOTE=0
             echo "WARNING: No /etc/profile.d directory present on your system."
             echo "You will need to manually set the P4A environment using:"
             echo
-            echo "    source $P4A_DIST/etc/par4all-rc.sh"
+            echo "    source $$P4A_DIST/etc/par4all-rc.sh"
             echo "Or:"
-            echo "    source $P4A_DIST/etc/par4all-rc.csh"
+            echo "    source $$P4A_DIST/etc/par4all-rc.csh"
             echo
             echo "Depending on your shell family."
         fi
 
         if [ -d /etc/ld.so.conf.d ]; then
-            echo $P4A_DIST/lib > /etc/ld.so.conf.d/par4all.conf
+            echo $$P4A_DIST/lib > /etc/ld.so.conf.d/par4all.conf
             /sbin/ldconfig
         else
             echo
             echo "WARNING: No /etc/ld.so.conf.d directory present on your system."
             echo "The library search path will not be automatically updated."
-            echo "You will need to set LD_LIBRARY_PATH to $P4A_DIST/lib manually."
+            echo "You will need to set LD_LIBRARY_PATH to $$P4A_DIST/lib manually."
             echo
         fi
 
-        if [ $DISPLAY_NOTE = 1 ]; then
+        if [ $$DISPLAY_NOTE = 1 ]; then
 	    echo "PLEASE NOTE: You need to open a new shell session for PATH and  "
             echo "other environment settings to be taken into account.            "
             echo "Alternatively, you can run the following command now so that you"
             echo "do not have to open a new shell session:"
             echo 
-            echo "    source $P4A_DIST/etc/par4all-rc.sh"
+            echo "    source $$P4A_DIST/etc/par4all-rc.sh"
             echo "Or:"
-            echo "    source $P4A_DIST/etc/par4all-rc.csh"
+            echo "    source $$P4A_DIST/etc/par4all-rc.csh"
             echo
             echo "Depending on your shell family."
         fi
@@ -80,7 +80,7 @@ case "$1" in
     ;;
 
     *)
-        echo "postinst called with unknown argument \`$1'" >&2
+        echo "postinst called with unknown argument \`$$1'" >&2
         exit 1
     ;;
 esac

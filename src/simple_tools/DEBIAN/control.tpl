@@ -1,8 +1,8 @@
-Package: par4all
-Version: $VERSION$
+Package: $NAME
+Version: $VERSION
 Section: unknown 
 Priority: optional
-Architecture: $ARCH$
+Architecture: $ARCH
 Essential: no
 Depends: libc6 (>= 2.7), python, libncurses5, libreadline5 
 Pre-Depends: 

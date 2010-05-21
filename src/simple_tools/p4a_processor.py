@@ -145,9 +145,7 @@ class p4a_processor():
 		
 		info("post-processing " + file)
 		
-		f = open(file)
-		content = f.read()
-		f.close()
+		content = slurp(file)
 		
 		###
 		# To catch stuff like
@@ -203,9 +201,8 @@ class p4a_processor():
 		if not dest_file:
 			dest_file = file
 		debug("writing to " + dest_file)
-		f = open(dest_file, 'w')
-		f.write(content)
-		f.close()
+		
+		dump(dest_file, content)
 		
 		return global_sub_count
 	

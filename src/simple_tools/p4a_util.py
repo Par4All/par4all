@@ -5,7 +5,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, gc
+import string, sys, random, logging, os, re
 import term
 
 # Global variables.
@@ -75,9 +75,9 @@ def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits)
 
 def rmtree(dir, can_fail = 0):
 	'''Removes a directory recursively, alternative to shutil.rmtree()'''
-	(base, ext) = os.path.splitext(dir)
-	if ext != ".database" and ext != ".build":
-		raise p4a_error("Cannot remove unknown directory: " + dir)
+	#(base, ext) = os.path.splitext(dir)
+	#if ext != ".database" and ext != ".build":
+	#	raise p4a_error("Cannot remove unknown directory: " + dir)
 	try:
 		for root, dirs, files in os.walk(dir, topdown = False):
 			for name in files:
@@ -100,6 +100,75 @@ def get_machine_arch():
 	'''Returns current machine architecture'''
 	(sysname, nodename, release, version, machine) = os.uname()
 	return machine
+
+# XXX: Not really cross-platform. Should use Git extension for Python instead.
+def git_is_dirty(file_or_directory):
+	'''Returns True if the Git repository in which the file_or_directory lies has uncommited changes, 
+	False otherwise or if the file_or_directory is not versioned in a Git repository.'''
+	if not os.path.isdir(file_or_directory):
+		(file_or_directory, name) = os.path.split(file_or_directory)
+		if not os.path.isdir(file_or_directory):
+			return False
+	output = os.popen("cd " + file_or_directory + " && git status 2>&1").read()
+	if re.search("Changes to be committed:", output) or re.search("Changed but not updated:", output):
+		return True
+	return False
+
+# XXX: Not really cross-platform. Should use Git extension for Python instead.
+def git_get_revision(file_or_directory):
+	'''Returns the current revision for the Git repository in which the file_or_directory lies.'''
+	if not os.path.isdir(file_or_directory):
+		(file_or_directory, name) = os.path.split(file_or_directory)
+		if not os.path.isdir(file_or_directory):
+			return None
+	output = os.popen("cd " + file_or_directory + " && git log --abbrev-commit --pretty=oneline -n 1 2>/dev/null").read().strip()
+	if not output:
+		return None
+	short_rev = output.split(" ")[0]
+	if not short_rev:
+		return None
+	#tag = os.popen("cd " + file_or_directory + " && git describe --tags 2>/dev/null").read().strip()
+	if git_is_dirty(file_or_directory):
+		short_rev += "~dirty"
+	return short_rev
+
+# XXX: Not really cross-platform. Should use Git extension for Python instead.
+def git_get_tag(file_or_directory):
+	'''Returns the current tag for the Git repository in which the file_or_directory lies.'''
+	if not os.path.isdir(file_or_directory):
+		(file_or_directory, name) = os.path.split(file_or_directory)
+		if not os.path.isdir(file_or_directory):
+			return None
+	tag = os.popen("cd " + file_or_directory + " && git describe --tags 2>/dev/null").read().strip()
+	if tag:
+		return tag
+	return None
+
+def slurp(file):
+	'''Slurp file contents.'''
+	f = open(file)
+	content = f.read()
+	f.close()
+	return content
+	
+def dump(file, content):
+	'''Dump contents to file.'''
+	f = open(file, "w")
+	f.write(content)
+	f.close()
+
+def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext = True):
+	'''Substitute keys with values from map in template designated by template_file.'''
+	content = string.Template(slurp(template_file)).substitute(map)
+	if not output_file:
+		output_file = template_file
+	dump(output_file, content)
+	if trim_tpl_ext:
+		(base, ext) = os.path.splitext(output_file)
+		if ext == ".tpl":
+			shutil.move(output_file, base)
+			output_file = base
+	return output_file
 
 if __name__ == "__main__":
 	print(__doc__)
