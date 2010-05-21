@@ -717,18 +717,14 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 				  else
 				    {
 				      pips_debug(8, "there is no inital_value\n");
-				      /* if there is no initial value, we must generate an anywhere effect, 
-					 except when property EFFECTS_POINTER_MODIFICATION_CHECKING is false 
-					 in which case we just drop the effect
-				      */
-				      /* if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))
-					 { */
+				      if (get_constant_paths_p())
+					{ 
 					  pips_debug(8, "-> anywhere effect \n");
 					  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), NIL), l_eff);
 					  l_eff = clean_anywhere_effects(l_tmp);
 					  gen_full_free_list(l_tmp);
-					  /* }*/
-					
+					}
+				      
 				    }
 				}
 			    } /* if( !ENP(reference_indices(eff_ref))) */

@@ -558,6 +558,10 @@ bool entity_array_p(entity e)
     }
   return FALSE;
 }
+bool array_entity_p(entity e)
+{
+    return entity_array_p(e);
+}
 
 
 /* e is the field of a structure */

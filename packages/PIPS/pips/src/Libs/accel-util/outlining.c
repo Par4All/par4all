@@ -225,7 +225,7 @@ static void do_outliner_smart_replacment(reference r, ocontext_t * ctxt)
         if(basic_pointer_p(entity_basic(ctxt->new))) /*sg:may cause issues if basic_pointer_p(old) ? */
         {
             pips_assert("parent exist",parent);
-            free_syntax(expression_syntax(parent));
+            //free_syntax(expression_syntax(parent)); /* sg a small leak is better than a crash :) */
             if(!ENDP(indices))
                 expression_syntax(parent)=
                     make_syntax_subscript(
