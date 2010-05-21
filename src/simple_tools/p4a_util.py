@@ -9,7 +9,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, re, datetime, shutil
+import string, sys, random, logging, os, re, datetime, shutil, subprocess
 import term
 
 # Global variables.
@@ -64,14 +64,48 @@ class p4a_error(Exception):
 	def __str__(self):
 		return self.msg
 
-def run(cmd, can_fail = 0):
-	'''Runs a command and dies if return code is not zero'''
+def run(cmd_list, can_fail = False):
+	'''Runs a command and dies if return code is not zero.
+	NB: cmd_list must be a list with each argument to the program being an element of the list.'''
 	if verbosity >= 0:
-		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + cmd + term.escape() + "\n");
-	ret = os.system(cmd)
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + " ".join(cmd_list) + term.escape() + "\n");
+	ret = os.system(" ".join(cmd_list))
 	if ret != 0 and not can_fail:
 		raise p4a_error("command failed with exit code " + str(ret))
 	return ret
+
+def run2(cmd_list, can_fail = False, force_locale = "C"):
+	'''Runs a command and dies if return code is not zero.
+	Returns the final stdout and stderr output as a list.
+	NB: cmd_list must be a list with each argument to the program being an element of the list.'''
+	if verbosity >= 1:
+		sys.stderr.write(sys.argv[0] + ": " + term.escape("magenta") + " ".join(cmd_list) + term.escape() + "\n");
+	old_locale = ""
+	if force_locale is not None:
+		if "LC_ALL" in os.environ:
+			old_locale = os.environ["LC_ALL"]
+		os.environ["LC_ALL"] = force_locale
+	process = subprocess.Popen(cmd_list, shell = False, bufsize = 256, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+	out = ""
+	err = ""
+	while True:
+		try:
+			new_out, new_err = process.communicate()
+			out += new_out
+			err += new_err
+		except:
+			break
+	ret = process.wait()
+	if old_locale:
+		os.environ["LC_ALL"] = old_locale
+	if ret != 0 and not can_fail:
+		error(err)
+		raise p4a_error("command failed with exit code " + str(ret))
+	return [ out, err, ret ]
+
+# Not portable!
+def which(cmd):
+	return run2([ "which", cmd ], can_fail = True)[0]
 
 def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):
 	'''Generates a random name or password'''
@@ -82,6 +116,7 @@ def rmtree(dir, can_fail = 0):
 	#(base, ext) = os.path.splitext(dir)
 	#if ext != ".database" and ext != ".build":
 	#	raise p4a_error("Cannot remove unknown directory: " + dir)
+	debug("removing tree " + dir)
 	try:
 		for root, dirs, files in os.walk(dir, topdown = False):
 			for name in files:
@@ -89,9 +124,9 @@ def rmtree(dir, can_fail = 0):
 			for name in dirs:
 				os.rmdir(os.path.join(root, name))
 		os.rmdir(dir)
-	except Exception as e:
+	except:
 		if can_fail:
-			warn("could not remove directory " + dir + ": " + repr(e))
+			warn("could not remove directory " + dir + ": " + str(sys.exc_info()))
 		else:
 			raise e
 
@@ -119,16 +154,21 @@ def dump(file, content):
 	f.close()
 
 def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext = True):
-	'''Substitute keys with values from map in template designated by template_file.'''
+	'''Substitute keys with values from map in template designated by template_file.
+	output_file can be empty, in which case the original template will be overwritten with the substituted file.
+	It can also be a directory, in which case the name of the original template file is kept.'''
 	content = string.Template(slurp(template_file)).substitute(map)
 	if not output_file:
 		output_file = template_file
+	elif os.path.isdir(output_file):
+		output_file = os.path.join(output_file, os.path.split(template_file)[1])
 	dump(output_file, content)
 	if trim_tpl_ext:
 		(base, ext) = os.path.splitext(output_file)
 		if ext == ".tpl":
 			shutil.move(output_file, base)
 			output_file = base
+	debug("template " + template_file + " subsituted to " + output_file)
 	return output_file
 
 def file_lastmod(file):

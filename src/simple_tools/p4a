@@ -30,7 +30,7 @@ def main():
 
 	main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
 		help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
-
+	
 	parser.add_option_group(main_group)
 	
 	cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
@@ -46,9 +46,6 @@ def main():
 
 	cpp_group.add_option("--cppflags", action = "append", metavar = "FLAGS", default = [],
 		help = "Add additional flags for the C preprocessor. Several are allowed.")
-	
-	cpp_group.add_option("--arch", "-m", metavar = "32|64", default = None,
-		help = "Specify target architecture (and compilation target).")
 
 	parser.add_option_group(cpp_group)
 	
@@ -89,7 +86,7 @@ def main():
 		help = "C compiler to use (defaults to gcc).")
 	
 	compile_group.add_option("--nvcc", metavar = "COMPILER", default = None,
-		help = "NVCC compiler to use (defaults to nvcc). Note that the NVCC compiler is used only to transform .cu files into .cpp files, not compiling the final binary.")
+		help = "NVCC compiler to use (defaults to nvcc). Note that the NVCC compiler is used only to transform .cu files into .cpp files, but not for compiling the final binary.")
 	
 	compile_group.add_option("--icc", action = "store_true", default = False,
 		help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
@@ -109,6 +106,9 @@ def main():
 	compile_group.add_option("--extra", action = "append", metavar = "FILE", default = [],
 		help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
 
+	cpp_group.add_option("--arch", "-m", metavar = "32|64", default = None,
+		help = "Specify compilation target architecture (defaults to current native architecture).")
+	
 	parser.add_option_group(compile_group)
 
 	link_group = optparse.OptionGroup(parser, "Linking Options")
@@ -201,7 +201,6 @@ def main():
 		# Remove database unless otherwise specified.
 		if not options.keep_database:
 			database_dir = os.path.abspath(processor.workspace.directory())
-			debug("removing " + database_dir)
 			rmtree(database_dir, can_fail = 1)
 	
 	if len(options.output_file) == 0:

@@ -4,10 +4,10 @@ Section: unknown
 Priority: optional
 Architecture: $ARCH
 Essential: no
-Depends: libc6 (>= 2.7), python, libncurses5, libreadline5 
+Depends: libc6, libncurses5, libreadline5, python, python-ply, libmcrypt4, build-essential, gfortran, fort77
 Pre-Depends: 
-Recommends:   
-Suggests:  
+Recommends: git-core
+Suggests: 
 Installed-Size: 
 Maintainer: par4all@hpc-project.com
 Conflicts: 
