@@ -119,6 +119,9 @@ FALSE			{ return(TFALSE); }
 			}
 %%
 
+/* pips_user_error() is not always used: because the catch may not be set? The
+ * control flow is not interrupted by error() as it is by pips_user_error().
+ */
 #define error(f, s)  fprintf(stderr, "[property] " f, s), abort()
 
 int yywrap(void)
@@ -171,29 +174,28 @@ static void parse_properties(void)
 	string n;
 
 	if (tok != TIDENT) {
-	    pips_user_error(
-		    "ident expected, got %d for -%s-.\n", tok, yytext);
+	    pips_user_error("ident expected, got %d for -%s-.\n",
+			    tok, yytext);
 	    return;
 	}
 
 	n = strdup(yytext);
 
 	if (update_property && property_undefined_p(get_property(n, TRUE))) {
-	    pips_user_error(
-		    "Unknown property %s to update\n", n);
+	    pips_user_error("Unknown property %s to update\n", n);
 	    return;
 	}
 
 	switch (tok = yylex())
 	{
 	case TTRUE:
-	    pr = make_property(is_property_bool, (void*) TRUE);
+	    pr = make_property_bool(TRUE);
 	    break;
 	case TFALSE:
-	    pr = make_property(is_property_bool, (void*) FALSE);
+	    pr = make_property_bool(FALSE);
 	    break;
 	case TNUMB:
-	    pr = make_property(is_property_int, (void*) atol(yytext));
+	    pr = make_property_int(atol(yytext));
  	    break;
 	case TSTRING: {
 	    /* GO: We need to free(s) so the skeep now
@@ -201,17 +203,16 @@ static void parse_properties(void)
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
-                pips_user_error(
-			"bad string : %s\n", yytext);
+                pips_user_error("bad string : %s\n", yytext);
 		return;
 	    }
             *q = '\0';
-	    pr = make_property(is_property_string, s);
+	    pr = make_property_string(s);
 	    break;
 	}
 	default:
-	    pips_user_error(
-		    "bad value for property %s: %s\n", n, yytext);
+	    pips_user_error("bad value for property %s: %s\n",
+                            n, yytext);
 	    return;
 	}
 
