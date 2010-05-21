@@ -1,0 +1,17 @@
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(int argc, char **argv)
+{
+
+//  T(argc) {argc==argc#init+1}
+
+   long long size[argc++][foo(argc)];
+
+//  T(main) {}
+
+   return (int) size[0][0];
+}
