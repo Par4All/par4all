@@ -1,0 +1,38 @@
+
+Source code with transformers
+
+
+//  T(continue01) {continue01==5}
+
+int continue01()
+{
+   /* Compute transformers for continue statement used to represent
+        declarations */
+
+//  T(0`i) {0`i==2}
+
+   int i = 2;                                                           /*0005*/
+
+//  T(k) {0`i==2}
+
+   int k;                                                               /*0006*/
+   {
+
+//  T(j) {0`i==2, j==2}
+
+      int j = i;                                                        /*0008*/
+
+//  T(0`1`i) {0`1`i==3, 0`i==2, j==2}
+
+      int i = 3;                                                        /*0009*/
+
+//  T(k) {0`1`i==3, 0`i==2, j==2, k==5}
+
+
+      k = i+j;                                                          /*0011*/
+   }
+
+//  T(continue01) {0`i==2, continue01==5, k==5}
+
+   return k;                                                            /*0013*/
+}
