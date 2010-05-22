@@ -2406,6 +2406,7 @@ transformer whileloop_to_postcondition(
   transformer post = transformer_undefined;
   statement s = whileloop_body(l);
   expression c = whileloop_condition(l);
+  transformer c_t = condition_to_transformer(c, pre, FALSE);
 
   pips_debug(8, "begin\n");
 
@@ -2420,13 +2421,16 @@ transformer whileloop_to_postcondition(
     /* propagate an impossible precondition in the loop body */
     (void) statement_to_postcondition(transformer_empty(), s);
     /* do not add the exit condition since it is redundant with pre */
-    post = transformer_dup(pre);
+    post = transformer_apply(c_t, pre);
   }
   else { /* The loop may be entered at least once. */
     transformer pre_next = transformer_dup(pre);
     transformer pre_init =
       precondition_add_condition_information(transformer_dup(pre),
 					     c, pre, TRUE);
+    // FI: this should work but is not compatible with the following
+    //codex
+    //transformer pre_init = transformer_apply(c_t, pre);
     transformer preb = transformer_undefined; // body precondition
     transformer postb = transformer_undefined; // body postcondition
     transformer tb = load_statement_transformer(s); // body transformer
@@ -2467,7 +2471,7 @@ transformer whileloop_to_postcondition(
        * Halbwachs car example).
        *
        * The second way is more likely to suffer from non-convexity as
-       * it uses may more steps.
+       * it uses many more steps.
        *
        * Also, note that precondition_add_condition_information() is
        * more geared towards Fortran as it assumes no side effects in
@@ -2529,6 +2533,7 @@ transformer whileloop_to_postcondition(
       transformer_free(post_al);
     }
   }
+  free_transformer(c_t);
 
   ifdebug(8) {
     pips_debug(8, "resultat post =");
