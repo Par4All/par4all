@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i) {i==-1}
+
+   int i = -1;
+
+//  T() {0==-1}
+
+
+   while (i++>0) 
+      ;
+
+//  T() {i==0}
+
+   printf("%d\n", i);
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = -1;
+
+//  P(i) {i==-1}
+
+
+   while (i++>0) 
+      ;
+
+//  P(i) {i==0}
+
+   printf("%d\n", i);
+}

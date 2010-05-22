@@ -1,0 +1,78 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0}
+
+   int a[20];
+
+//  T(n) {i==0}
+
+   int n;
+
+//  T(n) {i==0}
+
+
+   scanf("%d", &n);
+
+//  T(i) {i#init==0, 1<=i, i<=n+1, 0<=n}
+
+
+   while (i++<=n) 
+
+//  T() {1<=i, i<=n+1}
+
+      a[i] = i;
+
+//  T() {1<=i, n+2<=i}
+
+   printf("%d\n", i);
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int a[20];
+
+//  P(i) {i==0}
+
+   int n;
+
+//  P(i,n) {i==0}
+
+
+   scanf("%d", &n);
+
+//  P(i,n) {i==0}
+
+
+   while (i++<=n) 
+
+//  P(i,n) {1<=i, i<=n+1}
+
+      a[i] = i;
+
+//  P(i,n) {1<=i, n+2<=i}
+
+   printf("%d\n", i);
+}
