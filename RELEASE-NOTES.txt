@@ -1,19 +1,97 @@
-Release notes for Par4All 0.2
+Release notes for Par4All 0.2, 2010/05/22
+=========================================
+
+Par4All is an open-source environment to do source-to-source
+transformations on C and Fortran programs for parallelizing, optimizing,
+instrumenting, reverse-engineering, etc. on various targets.
+
+Introduction:
+-------------
+
+More documentation and information on http://par4all.org
+
+This is the first public version of Par4All that parallelize C programs to
+OpenMP and CUDA, and Fortran programs to OpenMP.
+
+For support : support at par4all dot org
+
+This release presents basic features of Par4All. If you need more complex
+transformations , parallelizations and optimizations, you may contact HPC
+Project for business support.
+
+The main user interface in Par4All is the command-line interface ``p4a`` to
+invoke parallelization, but also back-end compilation or automatic
+``CMakeFile`` generation.
+
+But the other commands from the PIPS project included in Par4All are also
+available: ``tpips`` and ``ipyps``. Of course, it is reserved for quite more
+advised users. For more information, look at http://pips4u.org
+
+
+Fortran:
+--------
+
+The support for Fortran95 is not included in this release since it was not
+mature enough at this release time, so only Fortran 77 with some
+extensions is currently accepted.
+
+
+C:
+--
+
+Full C99 support is almost complete but right now there are nevertheless
+few known limitations :
+
+- variables in functions can only be defined at the beginning of a block,
+  before any normal statement (like in C89)
+
+- for a similar reason, loop index variable can not be declared directly
+  in the loop such according the C99 syntax as in::
+
+    {
+      [...]
+      for(int i = 0; i < N; i++) {
+        [...]
+      }
+      [...]
+    }
+
+  but should be replaced with the C89 syntax as::
+
+    {
+      int i;
+      [...]
+      for(i = 0; i < N; i++) {
+        [...]
+      }
+      [...]
+    }
+
+
+Cuda:
+-----
 
 To compile and to run the CUDA output, you should have the following
 environment variable set:
 
-- CUDA_DIR to the directory where CUDA has been installed (default to
-  /usr/local/cuda)
+- ``CUDA_DIR`` to the directory where CUDA has been installed (default to
+  ``/usr/local/cuda``)
 
-- CUDA_SDK_DIR to where the CUDA SDK has been installed (default to
-  $HOME/NVIDIA_GPU_Computing_SDK)
+- ``CUDA_SDK_DIR`` to where the CUDA SDK has been installed (default to
+  ``$HOME/NVIDIA_GPU_Computing_SDK``)
 
-For support : support at par4all dot org
+SIMD and multimedia extensions:
+------------------------------
+
+The SIMD (SSE) output is not included in this release yet since it was not
+ready at release time but should be in the 2010/09 release.
 
 
+
+This text is typeset according to the reStructuredText Markup
+Specification. For more information:
+http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
 
 %%% Local Variables:
 %%% ispell-local-dictionary: "american"
 %%% End:
-
