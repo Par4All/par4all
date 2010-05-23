@@ -10,19 +10,19 @@
 
 # Par4All source root. Might point to P4A_DIST if 
 # sources are not installed.
-setenv P4A_ROOT '$ROOT'
+setenv P4A_ROOT '$root'
 
 # Path to the Par4All installation.
-setenv P4A_DIST '$DIST'
+setenv P4A_DIST '$dist'
 
 # Location of the Par4All_accelerator files.
-setenv P4A_ACCEL_DIR $$P4A_ROOT/src/p4a_accel
+setenv P4A_ACCEL_DIR '$accel'
 
 # Location of the Par4All configuration files.
 setenv P4A_ETC $$P4A_DIST/etc
 
 # The Fortran compiler to use.
-setenv PIPS_F77 gfortran
+setenv PIPS_F77 $fortran
 
 # Update PATH.
 setenv PATH $$P4A_DIST/bin:$$PATH
@@ -31,6 +31,6 @@ setenv PATH $$P4A_DIST/bin:$$PATH
 setenv PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig:$$PKG_CONFIG_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-setenv PYTHONPATH $$(echo $$P4A_DIST/lib/python*/site-packages/pips):$$PYTHONPATH
+setenv PYTHONPATH $$P4A_DIST/lib:$$(echo $$P4A_DIST/lib/python*/site-packages/pips):$$PYTHONPATH
 
 rehash

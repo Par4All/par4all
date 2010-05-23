@@ -10,19 +10,19 @@
 
 # Par4All source root. Might point to P4A_DIST if 
 # sources are not installed.
-export P4A_ROOT='$ROOT'
+export P4A_ROOT='$root'
 
 # Path to the Par4All installation.
-export P4A_DIST='$DIST'
+export P4A_DIST='$dist'
 
 # Location of the Par4All_accelerator files.
-export P4A_ACCEL_DIR=$$P4A_ROOT/src/p4a_accel
+export P4A_ACCEL_DIR='$accel'
 
 # Location of the Par4All configuration files.
 export P4A_ETC=$$P4A_DIST/etc
 
 # The Fortran compiler to use.
-export PIPS_F77=gfortran
+export PIPS_F77=$fortran
 
 # Update PATH.
 append_PATH () { if ! echo $$PATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PATH=$$1:$$PATH; fi }
@@ -36,5 +36,6 @@ unset append_PKG_CONFIG_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
 append_PYTHONPATH () { if ! echo $$PYTHONPATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PKG_CONFIG_PATH=$$1:$$PYTHONPATH; fi }
+append_PYTHONPATH $$P4A_DIST/lib
 append_PYTHONPATH $$(echo $$P4A_DIST/lib/python*/site-packages/pips)
 unset append_PYTHONPATH
