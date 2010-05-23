@@ -6,9 +6,10 @@
 main()
 {
   int i = -1;
+  int a[20];
 
   while(i++>0) {
-    ;
+    a[i] = i;
   }
   printf("%d\n", i);
 }

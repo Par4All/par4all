@@ -1,0 +1,208 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(x) {}
+
+   int x;
+
+//  T(new,old) {}
+
+   int new, old;
+
+//  T(k,y,z) {}
+
+   int y, z, k;
+
+//  T(x) {x==0}
+
+   x = 0;
+
+//  T(y) {x==0, y==0}
+
+   y = 0;
+
+//  T(z) {x==0, y==0, z==0}
+
+   z = 0;
+
+//  T(new) {new==0, x==0, y==0, z==0}
+
+   new = 0;
+
+//  T(old) {new==0, old==1, x==0, y==0, z==0}
+
+   old = 1;
+
+//  T(new,old,x,y,z) {new#init==0, old#init==1, y+z==x, x#init==0,
+//    y#init==0, z#init==0, x<=9, y<=x, 0<=y}
+
+
+   while (x<10) {
+
+//  T(y,z) {y+z==y#init+z#init+1, x<=9, y#init<=y, y<=y#init+1}
+
+      if (new==0)
+
+//  T(y) {new==0, y==y#init+1, x<=9}
+
+         y++;
+      else
+
+//  T(z) {z==z#init+1, x<=9}
+
+         z++;
+
+//  T(new) {new+new#init==1, x<=9}
+
+      new = 1-new;
+
+//  T(old) {old+old#init==1, x<=9}
+
+      old = 1-old;
+
+//  T(x) {x==x#init+1, x<=10}
+
+      x++;
+   }
+
+//  T() {x==10, y+z==10, 0<=y, y<=10}
+
+   if (new==1&&old==0||new==0&&old==1)
+
+//  T() {new+old==1, x==10, y+z==10, 0<=new, new<=1, 0<=y, y<=10}
+
+      printf("property  verified\n");
+   else
+
+//  T() {x==10, y+z==10, 0<=y, y<=10}
+
+      printf("property not found\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x;
+
+//  P(x) {}
+
+   int new, old;
+
+//  P(new,old,x) {}
+
+   int y, z, k;
+
+//  P(k,new,old,x,y,z) {}
+
+   x = 0;
+
+//  P(k,new,old,x,y,z) {x==0}
+
+   y = 0;
+
+//  P(k,new,old,x,y,z) {x==0, y==0}
+
+   z = 0;
+
+//  P(k,new,old,x,y,z) {x==0, y==0, z==0}
+
+   new = 0;
+
+//  P(k,new,old,x,y,z) {new==0, x==0, y==0, z==0}
+
+   old = 1;
+
+//  P(k,new,old,x,y,z) {new==0, old==1, x==0, y==0, z==0}
+
+
+   while (x<10) {
+
+//  P(k,new,old,x,y,z) {new+old==1, y+z==x, 0<=new, new<=1, new<=x,
+//    x<=9, y<=x, 0<=y}
+
+      if (new==0)
+
+//  P(k,new,old,x,y,z) {new==0, old==1, y+z==x, 0<=x, x<=9, y<=x,
+//    0<=y}
+
+         y++;
+      else
+
+//  P(k,new,old,x,y,z) {new==1, old==0, y+z==x, 1<=x, x<=9, y<=x,
+//    0<=y}
+
+         z++;
+
+//  P(k,new,old,x,y,z) {new+old==1, y+z==x+1, 0<=new, new<=1, new<=x,
+//    z<=new+x, new<=z, x<=9}
+
+      new = 1-new;
+
+//  P(k,new,old,x,y,z) {new==old, y+z==x+1, 0<=new, new<=1, 1<=new+x,
+//    new+z<=x+1, 1<=new+z, x<=9}
+
+      old = 1-old;
+
+//  P(k,new,old,x,y,z) {new+old==1, y+z==x+1, 0<=new, new<=1,
+//    1<=new+x, new+z<=x+1, 1<=new+z, x<=9}
+
+      x++;
+   }
+
+//  P(k,new,old,x,y,z) {new+old==1, x==10, y+z==10, 0<=new, new<=1,
+//    y<=new+9, new<=y}
+
+   if (new==1&&old==0||new==0&&old==1)
+
+//  P(k,new,old,x,y,z) {new+old==1, x==10, y+z==10, 0<=new, new<=1,
+//    y<=new+9, new<=y}
+
+      printf("property  verified\n");
+   else
+
+//  P() {0==-1}
+
+      printf("property not found\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x;
+   int new, old;
+   int y, z, k;
+   x = 0;
+   y = 0;
+   z = 0;
+   new = 0;
+   old = 1;
+
+   while (x<10) {
+      if (new==0)
+         y++;
+      else
+         z++;
+      new = 1-new;
+      old = 1-old;
+      x++;
+   }
+   printf("property  verified\n");
+   ;
+}

@@ -1,0 +1,42 @@
+delete periodic4d
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create periodic4d periodic4d.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_K_FIX_POINT 2
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+
+echo
+echo AFTER DEAD CODE ELIMINATION
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+# delete periodic4d
+quit
