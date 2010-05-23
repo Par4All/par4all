@@ -12,9 +12,6 @@ Git Repositories Manipulation Class
 import sys, os, string
 from p4a_util import *
 
-git_bin = "/usr/bin/git"
-svnversion_bin = "/usr/bin/svnversion"
-
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
 
@@ -31,9 +28,9 @@ class git():
 		#debug("is_valid_git_dir("+ dir +") = " + str(result))
 		return result
 	
-	def __init__(self, any_file_inside_target_repos, _git_ext = ".git"):
+	def __init__(self, any_file_inside_target_repos, git_ext = ".git"):
 		'''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
-		self._git_ext = _git_ext
+		self._git_ext = git_ext
 		git_dir = os.path.abspath(os.path.realpath(os.path.expanduser(any_file_inside_target_repos)))
 		while True:
 			if not os.path.isdir(git_dir):
@@ -82,10 +79,7 @@ class git():
 			old_work_tree = os.environ["GIT_WORK_TREE"]
 		os.environ["GIT_DIR"] = self._git_dir
 		os.environ["GIT_WORK_TREE"] = self._dir
-		old_cwd = os.getcwd()
-		os.chdir(self._dir)
-		output = run2([ git_bin ] + git_command, can_fail = can_fail)[0].strip()
-		os.chdir(old_cwd)
+		output = run2([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir)[0].strip()
 		os.environ["GIT_DIR"] = old_git_dir
 		os.environ["GIT_WORK_TREE"] = old_work_tree
 		return output
@@ -127,30 +121,6 @@ class git():
 	def dir(self):
 		'''Returns the absolute path for the working tree directory.'''
 		return self._dir
-
-# XXX: should move this in a p4a specific location
-def guess_file_revision(file):
-	'''Make up a revision string for the given file. If it is in a Git repository, use the Git revision, otherwise try with svnversion.
-	If file is not versioned, fall back on last modification date.'''
-	revision = git(file).current_revision(file)
-	if not revision:
-		revision = run2([ svnversion_bin, file ], can_fail = True)[0].strip()
-		
-	## P4A stuff
-	if not revision:
-		version_file = os.path.join(script_dir, "p4a_version")
-		if os.path.exists(version_file):
-			revision = re.sub("\s+", "", slurp(version_file))
-	##
-	
-	if not revision:
-		# Make up a version based on file last modification date.
-		try:
-			revision = file_lastmod(os.path.abspath(os.path.realpath(os.path.expanduser(file)))).strftime("%Y%m%dT%H%M%S") + "~unknown"
-		except:
-			revision = "unknown"
-	return revision
-
 
 if __name__ == "__main__":
 	print(__doc__)
