@@ -1,0 +1,157 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(x) {}
+
+   int x;
+
+//  T(new,old) {}
+
+   int new, old;
+
+//  T(x) {x==0}
+
+   //int y,z,k;
+   x = 0;
+
+//  T(new) {new==0, x==0}
+
+   //y=0;
+   //z=0;
+   new = 0;
+
+//  T(old) {new==0, old==1, x==0}
+
+   old = 1;
+
+//  T(new,old,x) {new#init==0, old#init==1, x#init==0, 0<=x, x<=9}
+
+
+   while (x<10) {
+
+//  T(new) {new+new#init==1, x<=9}
+
+      //if (new==0) y++;
+      //else z++;
+      new = 1-new;
+
+//  T(old) {old+old#init==1, x<=9}
+
+      old = 1-old;
+
+//  T(x) {x==x#init+1, x<=10}
+
+      x++;
+   }
+
+//  T() {x==10}
+
+   if (new==1&&old==0||new==0&&old==1)
+
+//  T() {new+old==1, x==10, 0<=new, new<=1}
+
+      printf("property  verified\n");
+   else
+
+//  T() {x==10}
+
+      printf("property not found\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x;
+
+//  P(x) {}
+
+   int new, old;
+
+//  P(new,old,x) {}
+
+   //int y,z,k;
+   x = 0;
+
+//  P(new,old,x) {x==0}
+
+   //y=0;
+   //z=0;
+   new = 0;
+
+//  P(new,old,x) {new==0, x==0}
+
+   old = 1;
+
+//  P(new,old,x) {new==0, old==1, x==0}
+
+
+   while (x<10) {
+
+//  P(new,old,x) {new+old==1, 0<=new, new<=1, new<=x, x<=9}
+
+      //if (new==0) y++;
+      //else z++;
+      new = 1-new;
+
+//  P(new,old,x) {new==old, 0<=new, new<=1, 1<=new+x, x<=9}
+
+      old = 1-old;
+
+//  P(new,old,x) {new+old==1, 0<=new, new<=1, 1<=new+x, x<=9}
+
+      x++;
+   }
+
+//  P(new,old,x) {new+old==1, x==10, 0<=new, new<=1}
+
+   if (new==1&&old==0||new==0&&old==1)
+
+//  P(new,old,x) {new+old==1, x==10, 0<=new, new<=1}
+
+      printf("property  verified\n");
+   else
+
+//  P() {0==-1}
+
+      printf("property not found\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x;
+   int new, old;
+   //int y,z,k;
+   x = 0;
+   //y=0;
+   //z=0;
+   new = 0;
+   old = 1;
+
+   while (x<10) {
+      //if (new==0) y++;
+      //else z++;
+      new = 1-new;
+      old = 1-old;
+      x++;
+   }
+   printf("property  verified\n");
+   ;
+}

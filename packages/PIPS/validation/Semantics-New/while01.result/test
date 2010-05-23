@@ -1,0 +1,60 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i) {i==-1}
+
+   int i = -1;
+
+//  T() {i==-1}
+
+   int a[20];
+
+//  T() {0==-1}
+
+
+   while (i++>0) 
+
+//  T() {0==-1}
+
+      a[i] = i;
+
+//  T() {i==0}
+
+   printf("%d\n", i);
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = -1;
+
+//  P(i) {i==-1}
+
+   int a[20];
+
+//  P(i) {i==-1}
+
+
+   while (i++>0) 
+
+//  P() {0==-1}
+
+      a[i] = i;
+
+//  P(i) {i==0}
+
+   printf("%d\n", i);
+}
