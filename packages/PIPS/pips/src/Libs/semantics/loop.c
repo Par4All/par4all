@@ -92,7 +92,7 @@
  * a repeat loop and t_next may include the incrementation (t_inc) and
  * the looping condition (for loop) or just the looping condition
  * (while loop). When no incrementation occurs, t_inc is t_identity
- * and 
+ * and
  *
  * t_next = t_continue. Elsewhere:
  *
@@ -150,12 +150,18 @@
  *
  * A new transformer is allocated. None of the arguments are modified.
  */
-transformer any_loop_to_transformer(transformer t_init,
-				    transformer t_enter,
-				    transformer t_next,
-				    statement body,
-				    list __attribute__ ((unused)) lel, // loop effect list
-				    transformer post_init)
+/* k is the periodicity sought. The normal standard default value is
+   1. If k == 1, the body transformer is computed first and the loop
+   transformer is derived from it. If k>1, the body transformer is
+   retrieved and the loop transformer is based on the assumption that
+   the number of iterations executed is always a multiple of k. */
+transformer any_loop_to_k_transformer(transformer t_init,
+				      transformer t_enter,
+				      transformer t_next,
+				      statement body,
+				      list __attribute__ ((unused)) lel, // loop effect list
+				      transformer post_init,
+				      int k)
 {
   transformer t_body = transformer_undefined; // Body transformer
   transformer t_fbody = transformer_undefined; // t_body; t_next
@@ -176,6 +182,8 @@ transformer any_loop_to_transformer(transformer t_init,
   transformer post_loop_plus = transformer_undefined;
   transformer post_loop = transformer_undefined;
   transformer t_next_star = transformer_undefined;
+  transformer t_fbody_k = transformer_undefined;
+  int ck; // used to unroll k-1 times the loop body
 
   ifdebug(8) {
     fprintf(stderr, "t_init:\n");
@@ -208,13 +216,20 @@ transformer any_loop_to_transformer(transformer t_init,
   /* Compute the body transformer */
   // statement_to_transformer() allocated a new transformer which is not the stored transformer
   //t_body = transformer_dup(statement_to_transformer(body, pre_body));
-  t_body = statement_to_transformer(body, pre_body);
-  
+  if(k==1)
+    t_body = statement_to_transformer(body, pre_body);
+  else
+    t_body = copy_transformer(load_statement_transformer(body));
+
   /* Complete the body transformer with t_next (t_body is modified by side effects into t_fbody) */
   t_fbody = transformer_combine(t_body, t_next);
 
   /* Compute the fix point */
-  t_fbody_star = (* transformer_fix_point_operator)(t_fbody);
+  t_fbody_k = copy_transformer(t_fbody);
+  for(ck=2; ck<=k; ck++)
+    t_fbody_k = transformer_combine(t_fbody_k, t_fbody);
+  t_fbody_star = (* transformer_fix_point_operator)(t_fbody_k);
+  free_transformer(t_fbody_k);
 
   /* Compute t_body_star = t_init ; t_enter */
   t_body_star = transformer_combine(transformer_dup(t_init), t_enter);
@@ -227,6 +242,14 @@ transformer any_loop_to_transformer(transformer t_init,
   post_loop_plus = transformer_apply(t_fbody, post_loop_star);
   post_loop = transformer_range(post_loop_plus);
   npre_iteration = transformer_convex_hull(enter_condition, post_loop);
+  if(k==2) { // Should be a loop over k
+    transformer post_loop_plus_plus =  transformer_apply(t_fbody, post_loop_plus);
+    transformer old_npre_iteration = npre_iteration;
+    post_loop = transformer_range(post_loop_plus_plus);
+    npre_iteration = transformer_convex_hull(npre_iteration, post_loop);
+    free_transformer(post_loop_plus_plus);
+    free_transformer(old_npre_iteration);
+  }
   t_body_star = transformer_combine(t_body_star, npre_iteration);
 
   /* Any transformer or other data structure to free? */
@@ -253,6 +276,15 @@ transformer any_loop_to_transformer(transformer t_init,
   }
 
   return t_body_star;
+}
+transformer any_loop_to_transformer(transformer t_init,
+				    transformer t_enter,
+				    transformer t_next,
+				    statement body,
+				    list __attribute__ ((unused)) lel, // loop effect list
+				    transformer post_init)
+{
+  return any_loop_to_k_transformer(t_init, t_enter, t_next, body, lel, post_init, 1);
 }
 
 transformer forloop_to_transformer(forloop fl,
@@ -319,6 +351,39 @@ transformer new_whileloop_to_transformer(whileloop wl,
   transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
 
   t_body_star = any_loop_to_transformer(t_init, t_enter, t_continue, body_s, wlel, pre);
+
+  /* Let's clean up the memory */
+
+  free_transformer(p_continue);
+
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+
+  return t_body_star;
+}
+
+transformer new_whileloop_to_k_transformer(whileloop wl,
+					   transformer pre,
+					   list wlel, /* effects of
+							 whileloop wl
+					   */
+					   int k) // unrolling
+{
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  transformer t_body_star = transformer_undefined;
+  statement body_s = whileloop_body(wl);
+
+  /* Deal with initialization expression */
+  transformer t_init = transformer_identity();
+
+  /* Deal with condition expression */
+  expression cond_e = whileloop_condition(wl);
+  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  /* An effort could be made to compute the precondition for t_continue. */
+  transformer p_continue = transformer_identity();
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+
+  t_body_star = any_loop_to_k_transformer(t_init, t_enter, t_continue, body_s, wlel, pre, k);
 
   /* Let's clean up the memory */
 
@@ -1832,7 +1897,7 @@ transformer standard_whileloop_to_transformer(whileloop l,
       if(*transformer_fix_point_operator==transformer_equality_fix_point) {
 	Psysteme fsc = predicate_system(transformer_relation(ftf));
 	Psysteme sc = SC_UNDEFINED;
-	    
+
 	/* Dirty looking fix for a fix point computation error:
 	 * sometimes, the basis is restricted to a subset of
 	 * the integer scalar variables. Should be useless with proper
@@ -1897,6 +1962,23 @@ transformer whileloop_to_transformer(whileloop l,
     t = new_whileloop_to_transformer(l, pre, e);
   else
     t = repeatloop_to_transformer(l, pre, e);
+  return t;
+}
+
+transformer whileloop_to_k_transformer(whileloop l,
+				       transformer pre,
+				       list e, /* effects of whileloop
+						  l */
+				       int k) // number of iterations
+{
+  transformer t = transformer_undefined;
+  evaluation lt = whileloop_evaluation(l);
+
+  if(evaluation_before_p(lt))
+    t = new_whileloop_to_k_transformer(l, pre, e, k);
+  else
+    pips_internal_error("repeatloop_to_k_transformer() not implemented.\n");
+    //t = repeatloop_to_k_transformer(l, pre, e);
   return t;
 }
 
@@ -2359,7 +2441,7 @@ transformer loop_to_total_precondition(
     free_transformer(ltf);
 
     if(non_empty_range_wrt_precondition_p(r, context)) {
-      /* The loop is always entered */ 
+      /* The loop is always entered */
       t_pre = t_pre_al;
 
       pips_debug(8, "The loop certainly is executed\n");
@@ -2367,7 +2449,7 @@ transformer loop_to_total_precondition(
     else /* The loop may be skipped or entered */ {
 
       pips_debug(8, "The loop may be executed or not\n");
-      
+
       /* skipped case computed here too */
       t_pre_ne = transformer_inverse_apply(tf_init, t_post);
       t_pre_ne = transformer_to_domain(t_pre_ne);
@@ -2415,36 +2497,79 @@ transformer whileloop_to_postcondition(
   }
 
   if(false_condition_wrt_precondition_p(c, pre)) {
+    transformer c_t = condition_to_transformer(c, pre, FALSE);
     pips_debug(8, "The loop is never executed\n");
 
     /* propagate an impossible precondition in the loop body */
     (void) statement_to_postcondition(transformer_empty(), s);
-    /* do not add the exit condition since it is redundant with pre */
-    post = transformer_dup(pre);
+    /* do not add the exit condition since it is redundant with pre,
+       but take care of side effects in the condition c */
+    /* transformer_apply() generates a lot of warnings */
+    post = transformer_combine(copy_transformer(pre), c_t);
+    //post = transformer_apply(c_t, pre);
+    free_transformer(c_t);
   }
   else { /* The loop may be entered at least once. */
     transformer pre_next = transformer_dup(pre);
     transformer pre_init =
       precondition_add_condition_information(transformer_dup(pre),
 					     c, pre, TRUE);
+    // FI: this should work but is not compatible with the following
+    //code; by definition, tf also include the side effect of pre
+    //transformer pre_init = transformer_apply(c_t, pre);
     transformer preb = transformer_undefined; // body precondition
     transformer postb = transformer_undefined; // body postcondition
     transformer tb = load_statement_transformer(s); // body transformer
+    int k = get_int_property("SEMANTICS_K_FIX_POINT");
 
     pips_debug(8, "The loop may be executed and preconditions must"
 	       " be propagated in the loop body\n");
 
-    /* Apply the loop fix point transformer T* to obtain the set of stores
-     * for any number of iteration, including 0. Instead, use T+ and a
-     * convex hull with the precondition for the first iteration, which
-     * preserves more information when the fixpoint is not precise.  */
-    pre_next = transformer_combine(pre_next, tf);
-    pre_next = precondition_add_condition_information(pre_next, c,
-						      pre_next, TRUE);
-    pre_next = transformer_combine(pre_next, tb);
-    pre_next = precondition_add_condition_information(pre_next, c,
-						      pre_next, TRUE);
-    preb = transformer_convex_hull(pre_init, pre_next);
+    if(k==1) {
+      /* The loop fix point transformer T* could be used to obtain the
+       * set of stores for any number of iterations, including
+       * 0. Instead, use T+ and a convex hull with the precondition for
+       * the first iteration, which preserves more information when the
+       * fixpoint is not precise.  */
+      pre_next = transformer_combine(pre_next, tf);
+      pre_next = precondition_add_condition_information(pre_next, c,
+							pre_next, TRUE);
+      pre_next = transformer_combine(pre_next, tb);
+      pre_next = precondition_add_condition_information(pre_next, c,
+							pre_next, TRUE);
+      preb = transformer_convex_hull(pre_init, pre_next);
+    }
+    else if (k==2) {
+      /* We need the loop effects to recompute the unrolled
+	 transformer. Let's use NIL to start with... disaster.
+	 Let's use the body effects and hope for no side effects in
+	 loop condition.
+      */
+      list bel = load_cumulated_rw_effects_list(s); // Should be lel
+      transformer tf2 = whileloop_to_k_transformer(l, pre, bel, 2);
+      transformer pre_next2 = transformer_undefined;
+      pre_next = transformer_combine(pre_next, tf2);
+      pre_next = precondition_add_condition_information(pre_next, c,
+							pre_next, TRUE);
+      pre_next = transformer_combine(pre_next, tb);
+      pre_next = precondition_add_condition_information(pre_next, c,
+							pre_next, TRUE);
+      preb = transformer_convex_hull(pre_init, pre_next);
+
+      /* FI: since pre_next is no longer useful, pre_next2 could be
+	 avoided. It just makes debugging easier. */
+      pre_next2 = copy_transformer(pre_next);
+      pre_next2 = precondition_add_condition_information(pre_next2, c,
+							 pre_next2, TRUE);
+      pre_next2 = transformer_combine(pre_next2, tb);
+      pre_next2 = precondition_add_condition_information(pre_next2, c,
+							 pre_next2, TRUE);
+      preb = transformer_convex_hull(preb, pre_next2);
+      free_transformer(tf2);
+      free_transformer(pre_next2);
+    }
+    else
+      pips_user_error("Unexpected value %d for k.\n", k);
 
     /* propagate preconditions in the loop body and get its postcondition */
 
@@ -2467,7 +2592,7 @@ transformer whileloop_to_postcondition(
        * Halbwachs car example).
        *
        * The second way is more likely to suffer from non-convexity as
-       * it uses may more steps.
+       * it uses many more steps.
        *
        * Also, note that precondition_add_condition_information() is
        * more geared towards Fortran as it assumes no side effects in

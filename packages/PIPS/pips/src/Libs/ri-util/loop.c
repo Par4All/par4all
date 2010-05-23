@@ -42,6 +42,10 @@
 #include "properties.h"
 #include "ri-util.h"
 
+/* @defgroup loop Methods dealing with loops
+
+   @{
+*/
 extern int Nbrdo;
 
 DEFINE_CURRENT_MAPPING(enclosing_loops, list)
@@ -373,6 +377,28 @@ void sort_all_loop_locals(statement s)
 }
 
 
+/* Test if a loop is parallel
+
+   @param l is the loop to test
+
+   @return TRUE if the loop has a parallel execution mode
+*/
+bool loop_parallel_p(loop l) {
+  return execution_parallel_p(loop_execution(l));
+}
+
+
+/* Test if a loop is sequential
+
+   @param l is the loop to test
+
+   @return TRUE if the loop has a sequential execution mode
+*/
+bool loop_sequential_p(loop l) {
+  return execution_sequential_p(loop_execution(l));
+}
+
+
 /* Test if a statement is a parallel loop.
 
    It tests the parallel status of the loop but should test extensions
@@ -382,14 +408,14 @@ void sort_all_loop_locals(statement s)
    to get the pragma for the loop.
    instruction with a loop in it.
 
-   @return TRUE if the statement is a parallel loop.
+   @return TRUE only if the statement is a parallel loop.
 */
 bool parallel_loop_statement_p(statement s) {
   if (statement_loop_p(s)) {
     instruction i = statement_instruction(s);
     loop l = instruction_loop(i);
 
-    return execution_parallel_p(loop_execution(l));
+    return loop_parallel_p(l);
   }
   return FALSE;
 }
@@ -616,10 +642,10 @@ static int nseq, npar;
 
 static void loop_update_statistics(loop l)
 {
-    if (execution_parallel_p(loop_execution(l)))
-	npar++;
-    else
-	nseq++;
+  if (loop_parallel_p(l))
+    npar++;
+  else
+    nseq++;
 }
 
 
@@ -683,3 +709,5 @@ list copy_loops(list ll)
 
   return nll;
 }
+
+/* @} */
