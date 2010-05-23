@@ -1,6 +1,8 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
+
 \usepackage{url}
+
 \usepackage{alltt}
 \usepackage{../libs/tex/abbrev_reactive}
 \let\OldRightarrow=\Rightarrow
@@ -12,6 +14,10 @@
 \let\Sun\UnTrucIndefini%
 \RequirePackage[weather]{ifsym}
 
+
+\newcommand{\LINK}[1]{\url{#1}\xspace}
+\newcommand{\PfaOrganizationPDF}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.pdf}}
+\newcommand{\PfaAllOrganizationHTDOC}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.htdoc}}
 
 \sloppy
 
@@ -29,6 +35,12 @@
 \maketitle
 
 \tableofcontents{}
+
+\bigskip{}
+
+You can get this document in PDF format on \PfaOrganizationPDF and in HTML
+on \PfaAllOrganizationHTDOC.
+
 
 \section{Introduction}
 \label{sec:introduction}
@@ -74,7 +86,10 @@ If you want to download \Apfa from the \Agit and compile it, try:
   src/dev/p4a_setup
 \end{alltt}%$
 Everything is built into \verb|$P4A_ROOT/build| and installed into
-\verb|$P4A_ROOT/run|.
+\verb|$P4A_ROOT/run| by default. If you want to change the install
+location, you can export the \verb|INSTALL_PREFIX| variable to the
+installation directory you want (have a look to
+\S~\ref{sec:making-distributions} for example).
 
 If you want to pull a new version, try
 \begin{verbatim}
@@ -767,6 +782,27 @@ projects or if things go really wrong. There are located in
   external \Agit import. It is no longer used since we switch to the
   \Aautotools version of \Apips;
 \end{itemize}
+
+
+\subsubsection{Making distributions}
+\label{sec:making-distributions}
+
+The \verb|p4a_pack| is used to build compressed \texttt{tar} balls, Debian
+\texttt{.deb} and RedHat \texttt{.rpm} packet files.
+
+The place of where the \Apfa files are looked for is specified according
+to the \verb|P4A_ROOT| variable, but there may be some hard-coded
+locations at configure and build time, so moving the installation
+directory afterwards and changing \verb|P4A_ROOT| to follow the new location may not be enough.
+
+So you should choose the location at build time. To have a distribution
+that build up into for example \texttt{/usr/local/par4all}, you should
+first create a \texttt{/usr/local/par4all} writable by you, set the
+\verb|INSTALL_PREFIX| environment variable to this installation directory
+and do a \verb|p4a_setup|.
+
+Then you can pack this directory into what format you want with
+\verb|p4a_pack|.
 
 
 \section{Examples and demos}
