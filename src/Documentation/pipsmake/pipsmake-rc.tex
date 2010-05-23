@@ -3777,9 +3777,9 @@ This property is used internally and is not user selectable.
 \index{SEMANTICS\_INEQUALITY\_INVARIANT}
 \index{SEMANTICS\_RECOMPUTE\_FIX\_POINTS\_WITH\_PRECONDITIONS}
 
-CPU time and memory space are cheap enough to compute loop fix points for
-{\em transformers}. This property implies \PipsPropRef{SEMANTICS_FLOW_SENSITIVE} and is not
-user-selectable.
+CPU time and memory space are cheap enough to compute loop fix points
+for {\em transformers}. This property implies
+\PipsPropRef{SEMANTICS_FLOW_SENSITIVE} and is not user-selectable.
 
 \begin{PipsProp}{SEMANTICS_FIX_POINT}
 SEMANTICS_FIX_POINT FALSE
@@ -3817,8 +3817,19 @@ The default value is the only one which is now seriously maintained.
 SEMANTICS_FIX_POINT_OPERATOR "derivative"
 \end{PipsProp}
 
-The property \texttt{SEMANTICS\_PATTERN\_MATCHING\_FIX\_POINT} has been removed
-and replaced by option {\em pattern} of the previous property.
+The next property is experimental and its default value is 1. It is
+used to unroll while loops virtually, i.e. at the semantics equation
+level, to cope with periodic behaviors such as flip-flops. It is
+effective only for standard while loops and the only possible value
+other than 1 is 2.
+
+\begin{PipsProp}{SEMANTICS_K_FIX_POINT}
+SEMANTICS_K_FIX_POINT 1
+\end{PipsProp}
+
+The next property \texttt{SEMANTICS\_PATTERN\_MATCHING\_FIX\_POINT}
+has been removed and replaced by option {\em pattern} of the previous
+property.
 
 This property was defined to select one of Cousot-Halbwachs's heuristics
 and to compute fix points with inequalities and equalities for loops.
