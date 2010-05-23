@@ -4,7 +4,7 @@ Section: unknown
 Priority: optional
 Architecture: $ARCH
 Essential: no
-Depends: libc6, libncurses5, libreadline5, python, python-ply, libmcrypt4, build-essential, gfortran, fort77
+Depends: libc6, libncurses5, libreadline5, python, python-ply, build-essential, gfortran, fort77
 Pre-Depends: 
 Recommends: git-core
 Suggests: 

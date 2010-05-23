@@ -26,168 +26,210 @@ import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
 from p4a_rc import *
 from git import *
+from p4a_version import *
 
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
 
 default_root = ""
-if os.path.split(script_dir)[1] == "bin":
-	default_root = os.path.normpath(os.path.join(script_dir, ".."))
-else:
-	default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
+#if os.path.split(script_dir)[1] == "bin":
+#    default_root = os.path.normpath(os.path.join(script_dir, ".."))
+#else:
+default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
 
-
-def build_package():
-	pass
-	
+def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_flags = [], rebuild = False):
+    if rebuild:
+        info("rebuilding " + package_dir + " in " + build_dir)
+        if os.path.isdir(build_dir):
+            rmtree(build_dir)
+        os.makedirs(build_dir)
+    elif not os.path.isdir(build_dir):
+        info("building " + package_dir + " in " + build_dir)
+        rebuild = True
+        os.makedirs(build_dir)
+    if rebuild:
+        run2([ "autoreconf", "--install" ], working_dir = package_dir)
+        run2([ os.path.join(package_dir, "configure") ] + configure_flags, working_dir = build_dir)
+        run2([ "make" ] + make_flags, working_dir = build_dir)
+    info("installing " + package_dir + " in " + dest_dir)
+    args = [ "make", "install" ]
+    if dest_dir:
+        args += [ "DESTDIR=" + dest_dir ]
+    run2(args + make_flags, working_dir = build_dir)
 
 def main():
-	'''The function called when this program is executed by its own.'''
+    '''The function called when this program is executed by its own.'''
 
-	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
 
-	main_group = optparse.OptionGroup(parser, "General Options")
+    main_group = optparse.OptionGroup(parser, "General Options")
 
-	main_group.add_option("--update", "-u", action = "store_true", default = False,
-		help = "Simply update the external packages (you can see this as a 'git pull' or 'svn update').")
-	
-	main_group.add_option("--build", "-b", action = "store_true", default = False,
-		help = "Simply build the packages, do not update them/check them out.")
+    main_group.add_option("--rebuild", "-R", action = "store_true", default = False,
+        help = "Rebuild the packages completely.")
 
-	main_group.add_option("--install", "-i", action = "store_true", default = False,
-		help = "Install the local scripts and external packages binaries in the destination directory (see --install-dir).")
+    main_group.add_option("--skip-polylib", "--sp", action = "store_true", default = False,
+        help = "Skip building of the polylib library.")
 
-	main_group.add_option("--skip-polylib", "--sp", action = "store_true", default = False,
-		help = "Skip the polylib library in the process or updating and building.")
+    main_group.add_option("--skip-newgen", "--sn", action = "store_true", default = False,
+        help = "Skip building of the newgen library.")
 
-	main_group.add_option("--skip-newgen", "--sn", action = "store_true", default = False,
-		help = "Skip the newgen library in the process or updating and building.")
+    main_group.add_option("--skip-linear", "--sl", action = "store_true", default = False,
+        help = "Skip building of the linear library.")
+    
+    main_group.add_option("--skip-pips", "--sP", action = "store_true", default = False,
+        help = "Skip building of PIPS.")
+    
+    global default_root
+    main_group.add_option("--root", "-r", metavar = "DIR", default = None,
+        help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes: " + default_root)
+    
+    main_group.add_option("--dest-dir", "--dest", "-d", metavar = "DIR", default = None,
+        help = "Specify the installation directory. By default, it is <root>/run.")
+    
+    main_group.add_option("--prefix", "-p", metavar = "DIR", default = "/",
+        help = "Specify the prefix used to configure the packages. By default, it is /.")
+    
+    main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
+        help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+    
+    parser.add_option_group(main_group)
 
-	main_group.add_option("--skip-linear", "--sl", action = "store_true", default = False,
-		help = "Skip the linear library in the process or updating and building.")
-	
-	main_group.add_option("--skip-pips", "--sP", action = "store_true", default = False,
-		help = "Skip PIPS in the process or updating and building.")
-	
-	global default_root
-	main_group.add_option("--root", "-r", metavar = "DIR", default = None,
-		help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes: " + default_root)
-	
-	main_group.add_option("--install-dir", "-I", metavar = "DIR", default = None,
-		help = "Specify the installation directory. By default, it is <root>/run.")
-	
-	main_group.add_option("--prefix", "-p", metavar = "DIR", default = None,
-		help = "Specify the prefix used to configure the packages. By default, it is the same as --install-dir.")
-	
-	main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-		help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
-	
-	parser.add_option_group(main_group)
+    (options, args) = parser.parse_args()
 
-	(options, args) = parser.parse_args()
+    set_verbosity(options.verbose)
+    
+    root = ""
+    if options.root:
+        root = options.root
+    elif "P4A_ROOT" in os.environ:
+        root = os.environ["P4A_ROOT"]
+    else:
+        root = default_root
+    if not os.path.isdir(root):
+        die("invalid root directory: " + root)
+    info("Par4All source tree root: " + root)
+    
+    dest_dir = options.dest_dir
+    if not dest_dir:
+        dest_dir = os.path.join(root, "run")
+    if not os.path.isdir(dest_dir):
+        os.makedirs(dest_dir)
+    debug("dest dir: " + dest_dir)
+    
+    prefix = ""
+    if options.prefix:
+        prefix = options.prefix
+    else:
+        prefix = "/"
+    debug("prefix: " + prefix)
+    
+    build_dir = os.path.join(root, "build")
+    debug("build dir: " + build_dir)
+    
+    nlpmake_src_dir = os.path.join(root, "packages/PIPS/nlpmake")
+    
+    configure_common_flags = [ "--disable-static", "--prefix=" + prefix ]
+    
+    install_dir = dest_dir + prefix
 
-	set_verbosity(options.verbose)
-	
-	if not options.update and not options.build and not options.install:
-		warn("defaulting to --update --build --install")
-	
-	root = ""
-	if options.root:
-		root = options.root
-	elif "P4A_ROOT" in os.environ:
-		root = os.environ["P4A_ROOT"]
-	else:
-		root = default_root
-	if not os.path.isdir(root):
-		die("invalid root directory: " + root)
-	info("Par4All source root (P4A_ROOT): " + root)
-	
-	install_dir = ""
-	if options.install_dir:
-		install_dir = options.install_dir
-	else:
-		install_dir = os.path.join(root, "run")
-	if not os.path.isdir(install_dir):
-		debug("create install dir: " + install_dir)
-		os.makedirs(install_dir)
-	info("install dir: " + install_dir)
-	
-	prefix = ""
-	if options.prefix:
-		prefix = options.prefix
-	else:
-		prefix = install_dir
-	info("prefix: " + install_dir)
-	if prefix != install_dir:
-		warn("prefix and install dir are different, make sure the final installation directory is " + prefix)
-	
-	build_dir = os.path.join(root, "build")
-	info("build dir: " + build_dir)
-	
-	pips_src_dir = os.path.join(root, "packages/PIPS/pips")
-	info("pips src dir: " + pips_src_dir)
-	
-	nlpmake_src_dir = os.path.join(root, "packages/PIPS/nlpmake")
-	info("nplmake src dir: " + nlpmake_src_dir)
-	
-	if options.update:
-		pass
-	
-	
-	if options.build:
-		if os.path.isdir(install_dir):
-			rmtree(build_dir)
-		os.makedirs(build_dir)
-	
-	if options.install:
-		info("creating dirs")
-		install_dir_bin = os.path.join(install_dir, "bin")
-		os.makedirs(install_dir_bin)
-		install_dir_etc = os.path.join(install_dir, "etc")
-		os.makedirs(install_dir_etc)
-		install_dir_lib = os.path.join(install_dir, "lib")
-		os.makedirs(install_dir_lib)
-		install_dir_share = os.path.join(install_dir, "share/p4a_accel")
-		os.makedirs(install_dir_share)
-		install_dir_makes = os.path.join(install_dir, "makes")
-		os.makedirs(install_dir_makes)
-		
-		info("installing scripts")
-		for file in [ "src/dev/p4a_git", "src/dev/p4a_valgrind", 
-			"src/simple_tools/p4a",
-			"src/postprocessor/p4a_recover_includes",
-			"src/validation/p4a_validate", "src/validation/p4a_validation",
-			"src/p4a_accel/p4a_post_processor.py" ]:
-			debug(os.path.join(root, file) + " -> " + install_dir_bin)
-			shutil.copy(os.path.join(root, file), install_dir_bin)
-		for file in [ "src/dev/p4a_git_lib.bash" ]:
-			debug(os.path.join(root, file) + " -> " + install_dir_etc)
-			shutil.copy(os.path.join(root, file), install_dir_etc)
-		
-		info("installing accel files")
-		debug(run2([ "cp", "-av", os.path.join(root, "src/p4a_accel/*.{h,c,cu,f,mk}"), install_dir_share ])[0])
-		
-		info("copying python libs")
-		debug(run2([ "cp", "-av", os.path.join(root, "src/simple_tools/*.{py,tpl}"), install_dir_lib ])[0])
-		
-		info("installing pips scripts")
-		# Stuff still lacking from PIPS install:
-		debug(run2([ "cp", "-av", os.path.join(pips_dir, "src/Scripts/validation/pips*"), install_dir_bin ])[0])
-		debug(run2([ "cp", "-av", os.path.join(pips_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])[0])
-		
-		info("fix validation")
-		debug(run2([ "cp", "-av", os.path.join(nlpmake_src_dir, "makes/{arch.sh,version.sh}"), install_dir_makes ])[0])
-		
-		info("writing shell rc files")
-		# XXX: fortran
-		p4a_write_rc(install_dir_etc, dict(root = root, dist = install_dir, accel = os.path.join(root, "src/p4a_accel"), fortran = "gfortran"))		
-		
-		info("writing version file")
-		dump(os.path.join(install_dir, "lib", "p4a_version"), guess_file_revision(root))
-		
+    old_path = add_to_path(os.path.join(install_dir, "bin"))
+    old_ld_path = add_to_path(os.path.join(install_dir, "lib"), var = "LD_LIBRARY_PATH")
+    old_lib_path = add_to_path(os.path.join(install_dir, "lib"), var = "LIBRARY_PATH")
+    old_pkg_path = add_to_path(os.path.join(install_dir, "lib/pkgconfig"), var = "PKG_CONFIG_PATH")
+    old_inc_path = add_to_path(os.path.join(install_dir, "include"), var = "C_INCLUDE_PATH")
+
+    if not options.skip_polylib:
+        build_package(package_dir = os.path.join(root, "packages/polylib"), build_dir = os.path.join(build_dir, "polylib"),
+            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    if not options.skip_newgen:
+        run2([ "ln", "-sfv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/newgen/makes") ])
+        build_package(package_dir = os.path.join(root, "packages/PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
+            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    if not options.skip_linear:
+        run2([ "ln", "-sfv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/linear/makes") ])
+        build_package(package_dir = os.path.join(root, "packages/PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
+            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    if not options.skip_pips:
+        run2([ "ln", "-sfv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/pips/makes") ])
+        
+        fortran = os.path.join(build_dir, "pips/src/Passes/fortran95")
+        if not os.path.isdir(fortran):
+            os.makedirs(fortran)
+        # Copy with a rsync instead of simply symlinking the
+        # source directory because the Fortran95 parser build
+        # patches the sources and that would mark the files as
+        # touched in the git repositiry (if any). Use --delete so
+        # that if this setup is run again, the .files are removed
+        # to relauch the patch:
+        run2([ "rsync", "-av", "--delete", os.path.join(root, "packages/pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        # To cheat the Makefile process that would like to
+        # download the sources from the Internet:
+        run2([ "touch", os.path.join(fortran, "{gcc-4.4.3.md5,gcc-core-4.4.3.tar.bz2,gcc-fortran-4.4.3.tar.bz2}") ])
+        run2([ "touch", os.path.join(fortran, "gcc-4.4.3/{.dir,.md5-check-core,.md5-check-fortran,.untar-core,.untar-fortran,.untar}") ])
+        
+        build_package(package_dir = os.path.join(root, "packages/PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
+            configure_flags = configure_common_flags + [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ],
+            dest_dir = dest_dir, rebuild = options.rebuild)
+
+    os.environ["PATH"] = old_path
+    os.environ["LIBRARY_PATH"] = old_lib_path
+    os.environ["LD_LIBRARY_PATH"] = old_ld_path
+    os.environ["PKG_CONFIG_PATH"] = old_pkg_path
+    os.environ["C_INCLUDE_PATH"] = old_inc_path
+    
+    info("creating dirs")
+    install_dir_bin = os.path.join(install_dir, "bin")
+    if not os.path.isdir(install_dir_bin):
+        os.makedirs(install_dir_bin)
+    install_dir_etc = os.path.join(install_dir, "etc")
+    if not os.path.isdir(install_dir_etc):
+        os.makedirs(install_dir_etc)
+    install_dir_lib = os.path.join(install_dir, "lib")
+    if not os.path.isdir(install_dir_lib):
+        os.makedirs(install_dir_lib)
+    install_dir_share = os.path.join(install_dir, "share/p4a_accel")
+    if not os.path.isdir(install_dir_share):
+        os.makedirs(install_dir_share)
+    install_dir_makes = os.path.join(install_dir, "makes")
+    if not os.path.isdir(install_dir_makes):
+        os.makedirs(install_dir_makes)
+
+    info("installing scripts")
+    for file in [ "src/dev/p4a_git", "src/dev/p4a_valgrind", 
+        "src/simple_tools/p4a",
+        "src/postprocessor/p4a_recover_includes",
+        "src/validation/p4a_validate", "src/validation/p4a_validation",
+        "src/p4a_accel/p4a_post_processor.py" ]:
+        debug(os.path.join(root, file) + " -> " + install_dir_bin)
+        shutil.copy(os.path.join(root, file), install_dir_bin)
+    for file in [ "src/dev/p4a_git_lib.bash" ]:
+        debug(os.path.join(root, file) + " -> " + install_dir_etc)
+        shutil.copy(os.path.join(root, file), install_dir_etc)
+        
+    info("installing accel files")
+    run2([ "cp", "-av", os.path.join(root, "src/p4a_accel/*.{h,c,cu,f,mk}"), install_dir_share ])
+        
+    info("copying python libs")
+    run2([ "cp", "-av", os.path.join(root, "src/simple_tools/*.{py,tpl}"), install_dir_lib ])
+        
+    info("installing pips scripts")
+    # Stuff still lacking from PIPS install:
+    run2([ "cp", "-av", os.path.join(pips_dir, "src/Scripts/validation/pips*"), install_dir_bin ])
+    run2([ "cp", "-av", os.path.join(pips_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+        
+    info("fix validation")
+    run2([ "cp", "-av", os.path.join(nlpmake_src_dir, "makes/{arch.sh,version.sh}"), install_dir_makes ])
+        
+    info("writing shell rc files")
+    # XXX: fortran
+    p4a_write_rc(install_dir_etc, dict(root = root, dist = install_dir, accel = os.path.join(root, "src/p4a_accel"), fortran = "gfortran"))        
+        
+    info("writing version file")
+    dump(os.path.join(install_dir, "lib", "p4a_version"), guess_file_revision(root))
+        
 
 if __name__ == "__main__":
-	main()
+    main()
 
 # Some Emacs stuff:
 ### Local Variables:

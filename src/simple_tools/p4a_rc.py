@@ -19,13 +19,13 @@ rc_sh_template_file = os.path.join(script_dir, "par4all-rc.sh.tpl")
 rc_csh_template_file = os.path.join(script_dir, "par4all-rc.csh.tpl")
 
 def p4a_write_rc(dir, subs_map):
-	global rc_sh_template_file, rc_csh_template_file
-	subs_template_file(rc_sh_template_file, subs_map, dir)
-	subs_template_file(rc_csh_template_file, subs_map, dir)
+    global rc_sh_template_file, rc_csh_template_file
+    subs_template_file(rc_sh_template_file, subs_map, dir)
+    subs_template_file(rc_csh_template_file, subs_map, dir)
 
 if __name__ == "__main__":
-	print(__doc__)
-	print("This module is not directly executable")
+    print(__doc__)
+    print("This module is not directly executable")
 
 # Some Emacs stuff:
 ### Local Variables:
