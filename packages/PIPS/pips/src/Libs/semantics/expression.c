@@ -1061,9 +1061,9 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
   }
 
   ifdebug(8) {
-    debug(8, "modulo_to_transformer", "result:\n");
+    pips_debug(8, "result:\n");
     dump_transformer(tf);
-    debug(8, "modulo_to_transformer", "end\n");
+    pips_debug(8, "end\n");
   }
 
   return tf;

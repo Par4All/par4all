@@ -60,7 +60,8 @@ kernel2:
 }
 
 for further generation of CUDA code.
- */
+}
+*/
 
 /* Ansi includes	*/
 #include <stdio.h>
@@ -99,19 +100,34 @@ for further generation of CUDA code.
 #define CLOSEPAREN    ")"
 
 
-static list l_enclosing_loops = NIL;
-static list l_number_iter_exp = NIL;
-static int loop_nest_depth = 0;
-static bool inner_reached = FALSE;
+/* In modern PIPS programming, all this should be passed through a context
+   instead of having this global variable. This should allow some PIPS
+   parallelization some days... */
+static list l_enclosing_loops;
+static list l_number_iter_exp;
+static int loop_nest_depth;
+/* True only when we reached the inner loop: */
+static bool inner_reached;
 
 
+/* Push a loop that match the criterion for annotation */
 static bool loop_push(loop l)
 {
+  /* In the mode when we just annotate parallel outer loop nests, just
+     stop when we encounter a sequential loop: */
+  if (get_bool_property("GPU_LOOP_NEST_ANNOTATE_PARALLEL")
+      && loop_sequential_p(l))
+    // Stop recursion:
+    return FALSE;
+
   l_enclosing_loops = gen_nconc(l_enclosing_loops, CONS(LOOP, l, NIL));
   loop_nest_depth++;
+  // Go on recursing:
   return TRUE;
 }
 
+
+/* Do the real annotation work on previously marked loops bottom-up */
 static void loop_annotate(loop l)
 {
   /* The first time we enter this function is when we reach the innermost
@@ -126,7 +142,7 @@ static void loop_annotate(loop l)
       inner_reached = TRUE;
 
       /* First we add a guard to the loop body statement using the
-	 enclosing loops upperbounds.
+	 enclosing loops upper bounds.
       */
       FOREACH(LOOP, c_loop, l_enclosing_loops)
 	{
@@ -205,12 +221,6 @@ static void loop_annotate(loop l)
 
       asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
       free(outer_s);
-
-      /* Clean up things for another loop nest */
-      inner_reached = FALSE;
-      loop_nest_depth = 0;
-      gen_free_list(l_number_iter_exp);
-      l_number_iter_exp = NIL;
     }
 
   POP(l_enclosing_loops);
@@ -246,8 +256,18 @@ bool gpu_loop_nest_annotate(char *module_name)
   statement module_statement =
     PIPS_PHASE_PRELUDE(module_name, "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
 
+  /* Initialize some state variables: */
+  l_enclosing_loops = NIL;
+  l_number_iter_exp = NIL;
+  loop_nest_depth = 0;
+  /* True only when we reached the inner loop: */
+  inner_reached = FALSE;
+
   /* Annotate the loop nests of the module. */
   gen_recurse(module_statement, loop_domain, loop_push, loop_annotate);
+
+  /* Clean up things: */
+  gen_free_list(l_number_iter_exp);
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);

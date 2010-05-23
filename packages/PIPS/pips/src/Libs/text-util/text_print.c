@@ -99,7 +99,12 @@ fprintf_sentence(FILE * fd,
 
 #define MAX_END_COLUMN_F77      (72)
 #define MAX_END_COLUMN_F95     (132)
-#define MAX_END_COLUMN_DEFAULT (999) /* I think it'll never be used */
+/* Define a huge line size value because the previous one (999) was too
+   small for PIPS generated declarations after the outliner. Do not use
+   INT_MAX because there are some assertions such as
+   (... < MAX_END_COLUMN_DEFAULT + 1).
+   So (INT_MAX/2) is a rough approximation. :-) */
+#define MAX_END_COLUMN_DEFAULT (INT_MAX/2)
 #define MAX_START_COLUMN 	      (42)
 #define C_STATEMENT_LINE_COLUMN (71)
 #define C_STATEMENT_LINE_STEP   (15)
