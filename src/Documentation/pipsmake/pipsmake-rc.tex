@@ -6494,11 +6494,18 @@ Annotates loop nests with comments and guards for further generation of CUDA cal
 \end{PipsPass}
 
 \begin{PipsMake}
+alias gpu_loop_nest_annotate 'Decorate loop nests with iteration spaces and add iteration clamping'
+
 gpu_loop_nest_annotate	        > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 
 \end{PipsMake}
+
+To annotate only outer parallel loop nests, set the following variable to true:
+\begin{PipsProp}{GPU_LOOP_NEST_ANNOTATE_PARALLEL}
+GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
+\end{PipsProp}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
