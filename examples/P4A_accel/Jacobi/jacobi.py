@@ -101,17 +101,17 @@ mn.display()
 kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
 kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
+# Unfortunately the information about parallelization and privatization is
+# lost by the current outliner, so rebuid it... :-(
+kernel_launchers.privatize_module()
+kernel_launchers.coarse_grain_parallelization()
+
 # Add iteration space decoration and insert iteration clamping into the
-# launchers:
+# launchers onto the outer parallel loop nests:
 kernel_launchers.gpu_loop_nest_annotate()
 
 # Some verification output:
-kernel_launchers.display()
-
-# Unfortunately the information about parallelization and privatization is
-# lost by the current outliner, so rebuild it... :-(
-kernel_launchers.privatize_module()
-kernel_launchers.coarse_grain_parallelization()
+#kernel_launchers.display()
 
 # End to generate the wrappers and kernel contents, but not the launchers
 # that have already been generated:

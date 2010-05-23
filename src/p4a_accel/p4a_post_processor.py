@@ -75,7 +75,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:
     content = re.sub(", (p4a_kernel[^0-9]+[0-9]+\\()",
-                     ";\n   void \\1", content)
+                     ";\nvoid \\1", content)
 
     # Add accelerator attributes on accelerated parts:
     content = re.sub("(void p4a_kernel_wrapper_[0-9]+[^\n]+)",
