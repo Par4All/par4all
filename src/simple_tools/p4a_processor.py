@@ -54,6 +54,11 @@ class p4a_processor():
 
             if accel:
                 # Why all that stuff ? Why not using them directly?
+                # Because initially stubs.c/f were not removed because there was no post-processing.
+                # And since the default behaviour of save() is to copy processed files to the original
+                # source directory (with a prefix), this would have put the processed stubs in src/p4a_accel
+                # for every project... So we copy the stubs to the current directory with a modified name
+                # which includes the project name to prevent filename collision.
                 accel_stubs_name = None
                 if self.fortran:
                     accel_stubs_name = "p4a_stubs.f"
@@ -103,9 +108,12 @@ class p4a_processor():
                     CONSTANT_PATH_EFFECTS = False
                     )
 
-            # Useful ?
-            self.workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-                                        PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+            # Useful? 
+            #self.workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True)
+
+            # Prevents automatic addition of OpenMP directives when unsplitting.
+            # We will add them manually using ompify if requested.
+            self.workspace.set_property(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
         # Useless to add redundant information:
         #for module in self.workspace:
@@ -129,8 +137,6 @@ class p4a_processor():
         self.main_filter = (lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_include_re == None or filter_include_re.match(module.name)))
-        # Select the interesting modules:
-        all_modules = self.workspace.filter(self.main_filter)
 
 
     def filter_modules(self, filter_include = None, filter_exclude = None, other_filter = lambda x: True):
@@ -144,6 +150,7 @@ class p4a_processor():
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_include_re == None or filter_include_re.match(module.name))
             and other_filter(module.name))
+        # Select the interesting modules:
         return self.workspace.filter(filter)
 
 

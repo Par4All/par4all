@@ -14,6 +14,7 @@ import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
 from p4a_rc import *
 from git import *
+from p4a_version import *
 
 default_install_prefix = "usr/local/par4all" # NO beginning slash please.
 package_name = "par4all"
@@ -24,166 +25,166 @@ debian_dir = os.path.join(script_dir, "DEBIAN")
 auto_remove_temp_dirs_on_break = []
 
 def create_dist(dist_dir, install_prefix, revision):
-	'''Creates a temporary directory and copy the whole installation directory (dist_dir), under the prefix designated by install_prefix.
-	Also writes updated rc files (shell scripts for setting the environment), and a version file.
-	Returns a list with the temporary directory created and the full path of the temporary directory and the appended install_prefix.'''
-	global auto_remove_temp_dirs_on_break
-	temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_")
-	auto_remove_temp_dirs_on_break += temp_dir
-	temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
-	os.makedirs(os.path.split(temp_dir_with_prefix)[0])
-	info("copying " + dist_dir + " to " + temp_dir_with_prefix)
-	shutil.copytree(dist_dir, temp_dir_with_prefix)
-	abs_prefix = "/" + install_prefix
-	# XXX: gfortran or not??
-	p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
-		dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
-	# XXX: version file path hard coded in 3 different scripts
-	dump(os.path.join(temp_dir_with_prefix, "lib", "p4a_version"), revision)
-	return [ temp_dir, temp_dir_with_prefix ]
+    '''Creates a temporary directory and copy the whole installation directory (dist_dir), under the prefix designated by install_prefix.
+    Also writes updated rc files (shell scripts for setting the environment), and a version file.
+    Returns a list with the temporary directory created and the full path of the temporary directory and the appended install_prefix.'''
+    global auto_remove_temp_dirs_on_break
+    temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_")
+    auto_remove_temp_dirs_on_break += temp_dir
+    temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
+    os.makedirs(os.path.split(temp_dir_with_prefix)[0])
+    info("copying " + dist_dir + " to " + temp_dir_with_prefix)
+    shutil.copytree(dist_dir, temp_dir_with_prefix)
+    abs_prefix = "/" + install_prefix
+    # XXX: gfortran or not??
+    p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
+        dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
+    # XXX: version file path hard coded in 3 different scripts
+    dump(os.path.join(temp_dir_with_prefix, "lib", "p4a_version"), revision)
+    return [ temp_dir, temp_dir_with_prefix ]
 
 def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-	'''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
-	and substitute some values in files in this DEBIAN directory. No modification of the
-	distribution is made.'''
-	global debian_dir, package_name
-	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
-	temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
-	info("copying " + debian_dir + " to " + temp_debian_dir)
-	shutil.copytree(debian_dir, temp_debian_dir)
-	control_file = os.path.join(temp_debian_dir, "control.tpl")
-	if not arch:
-		arch = get_machine_arch()
-		if arch == "x86_64":
-			arch = "amd64"
-	subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
-	info("adjusting values in " + control_file)
-	subs_template_file(control_file, subs_map)
-	postinst_file = os.path.join(temp_debian_dir, "postinst.tpl")
-	info("adjusting values in " + postinst_file)
-	subs_template_file(postinst_file, subs_map)
-	package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
-	run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
-	if keep_temp:
-		warn("temporary directory was " + temp_dir)
-	else:
-		rmtree(temp_dir, can_fail = 1)
+    '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
+    and substitute some values in files in this DEBIAN directory. No modification of the
+    distribution is made.'''
+    global debian_dir, package_name
+    (temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
+    temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
+    info("copying " + debian_dir + " to " + temp_debian_dir)
+    shutil.copytree(debian_dir, temp_debian_dir)
+    control_file = os.path.join(temp_debian_dir, "control.tpl")
+    if not arch:
+        arch = get_machine_arch()
+        if arch == "x86_64":
+            arch = "amd64"
+    subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
+    info("adjusting values in " + control_file)
+    subs_template_file(control_file, subs_map)
+    postinst_file = os.path.join(temp_debian_dir, "postinst.tpl")
+    info("adjusting values in " + postinst_file)
+    subs_template_file(postinst_file, subs_map)
+    package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
+    run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
+    if keep_temp:
+        warn("temporary directory was " + temp_dir)
+    else:
+        rmtree(temp_dir, can_fail = 1)
 
 def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-	'''Creates a simple .tar.gz package.'''
-	global package_name
-	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
-	if not arch:
-		arch = get_machine_arch()
-	package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
-	if os.path.exists(package_file_name):
-		os.remove(package_file_name)
-	run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
-	if keep_temp:
-		warn("temporary directory was " + temp_dir)
-	else:
-		rmtree(temp_dir, can_fail = 1)
+    '''Creates a simple .tar.gz package.'''
+    global package_name
+    (temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
+    if not arch:
+        arch = get_machine_arch()
+    package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
+    if os.path.exists(package_file_name):
+        os.remove(package_file_name)
+    run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
+    if keep_temp:
+        warn("temporary directory was " + temp_dir)
+    else:
+        rmtree(temp_dir, can_fail = 1)
 
 def main():
-	'''The function called when this program is executed by its own'''
+    '''The function called when this program is executed by its own'''
 
-	parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
 
-	main_group = optparse.OptionGroup(parser, "General Options")
+    main_group = optparse.OptionGroup(parser, "General Options")
 
-	main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
-		help = "Directory where the distribution is currently installed. Defaults to environment variable P4A_DIST or P4A_ROOT/run if it does not exist.")
+    main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
+        help = "Directory where the distribution is currently installed. Defaults to environment variable P4A_DIST or P4A_ROOT/run if it does not exist.")
 
-	main_group.add_option("--src", "-s", action = "store_true", default = False,
-		help = "[TODO] Create a source package instead of a binary package.")
-	
-	main_group.add_option("--deb", "-D", action = "store_true", default = False,
-		help = "Build a .deb package.")
-	
-	main_group.add_option("--rpm", "-R", action = "store_true", default = False,
-		help = "[TODO] Build a .rpm package.")
-	
-	main_group.add_option("--tgz", "-T", action = "store_true", default = False,
-		help = "Build a .tar.gz package.")
-	
-	main_group.add_option("--arch", metavar = "ARCH", default = None,
-		help = "Specify the package architecture manually. By default, the current machine architecture is specified.")
-	
-	main_group.add_option("--revision", "-r", metavar = "REVISION",
-		help = "Specify package version. Current Git revision will be automatically appended.")
-	
-	global default_install_prefix
-	main_group.add_option("--prefix", "-p", metavar = "DIR", default = default_install_prefix,
-		help = "Specify the installation prefix. Default is: " + default_install_prefix)
-		
-	main_group.add_option("--keep", "-k", action = "store_true", default = False,
-		help = "Do not remove temporary directories after script execution.")
-	
-	main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-		help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
-	
-	parser.add_option_group(main_group)
+    main_group.add_option("--src", "-s", action = "store_true", default = False,
+        help = "[TODO] Create a source package instead of a binary package.")
+    
+    main_group.add_option("--deb", "-D", action = "store_true", default = False,
+        help = "Build a .deb package.")
+    
+    main_group.add_option("--rpm", "-R", action = "store_true", default = False,
+        help = "[TODO] Build a .rpm package.")
+    
+    main_group.add_option("--tgz", "-T", action = "store_true", default = False,
+        help = "Build a .tar.gz package.")
+    
+    main_group.add_option("--arch", metavar = "ARCH", default = None,
+        help = "Specify the package architecture manually. By default, the current machine architecture is specified.")
+    
+    main_group.add_option("--revision", "-r", metavar = "REVISION",
+        help = "Specify package version. Current Git revision will be automatically appended.")
+    
+    global default_install_prefix
+    main_group.add_option("--prefix", "-p", metavar = "DIR", default = default_install_prefix,
+        help = "Specify the installation prefix. Default is: " + default_install_prefix)
+        
+    main_group.add_option("--keep", "-k", action = "store_true", default = False,
+        help = "Do not remove temporary directories after script execution.")
+    
+    main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
+        help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+    
+    parser.add_option_group(main_group)
 
-	(options, args) = parser.parse_args()
+    (options, args) = parser.parse_args()
 
-	set_verbosity(options.verbose)
-	
-	if options.src:
-		die("--src is TODO")
-	if options.rpm:
-		die("--rpm is TODO")
-	
-	if not options.deb and not options.rpm and not options.tgz:
-		die("please specify --deb, --rpm or --tgz")
+    set_verbosity(options.verbose)
+    
+    if options.src:
+        die("--src is TODO")
+    if options.rpm:
+        die("--rpm is TODO")
+    
+    if not options.deb and not options.rpm and not options.tgz:
+        die("please specify --deb, --rpm or --tgz")
 
-	dir = options.dir
-	if not dir:
-		if "P4A_DIST" in os.environ:
-			dir = os.environ["P4A_DIST"]
-		elif "P4A_ROOT" in os.environ:
-			dir = os.path.join(os.environ["P4A_ROOT"], "run")
-		else:
-			die("please specify --dir")
-	dir = os.path.abspath(os.path.expanduser(dir))
-	warn("taking dist from " + dir)
-	if not os.path.isdir(dir):
-		die("invalid dist directory: " + dir)
+    dir = options.dir
+    if not dir:
+        if "P4A_DIST" in os.environ:
+            dir = os.environ["P4A_DIST"]
+        elif "P4A_ROOT" in os.environ:
+            dir = os.path.join(os.environ["P4A_ROOT"], "run")
+        else:
+            die("please specify --dir")
+    dir = os.path.abspath(os.path.expanduser(dir))
+    warn("taking dist from " + dir)
+    if not os.path.isdir(dir):
+        die("invalid dist directory: " + dir)
 
-	if not options.revision:
-		die("please use --revision to specify the package version/revision")
-	tmp = options.revision.split("-")
-	if len(tmp) > 2:
-		die("invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
-	if not re.match("\d\.\d(\.\d)?", tmp[0]):
-		die("revision must begin with a version string, e.g. 1.2.3 or 0.2")
-	for i in range(len(tmp)):
-		tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
-	revision = "-".join(tmp)
-	if not revision:
-		die("invalid characters in revision")
-	git_revision = git(dir).current_revision()
-	if git_revision:
-		revision += "~" + git_revision
-	
-	try:
-		if options.deb:
-			create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-				keep_temp = options.keep, arch = options.arch)
-		if options.tgz:
-			create_tgz(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-				keep_temp = options.keep, arch = options.arch)
-	except KeyboardInterrupt:
-		if not options.keep:
-			global auto_remove_temp_dirs_on_break
-			for dir in auto_remove_temp_dirs_on_break:
-				if os.path.isdir(dir):
-					warn("removing " + dir)
-					rmtree(dir, can_fail = 1)
-	
-	return 0
+    if not options.revision:
+        die("please use --revision to specify the package version/revision")
+    tmp = options.revision.split("-")
+    if len(tmp) > 2:
+        die("invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
+    if not re.match("\d\.\d(\.\d)?", tmp[0]):
+        die("revision must begin with a version string, e.g. 1.2.3 or 0.2")
+    for i in range(len(tmp)):
+        tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
+    revision = "-".join(tmp)
+    if not revision:
+        die("invalid characters in revision")
+    git_revision = git(dir).current_revision()
+    if git_revision:
+        revision += "~" + git_revision
+    
+    try:
+        if options.deb:
+            create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
+                keep_temp = options.keep, arch = options.arch)
+        if options.tgz:
+            create_tgz(dist_dir = dir, install_prefix = options.prefix, revision = revision,
+                keep_temp = options.keep, arch = options.arch)
+    except KeyboardInterrupt:
+        if not options.keep:
+            global auto_remove_temp_dirs_on_break
+            for dir in auto_remove_temp_dirs_on_break:
+                if os.path.isdir(dir):
+                    warn("removing " + dir)
+                    rmtree(dir, can_fail = 1)
+    
+    return 0
 
 if __name__ == "__main__":
-	main()
+    main()
 
 # Some Emacs stuff:
 ### Local Variables:
