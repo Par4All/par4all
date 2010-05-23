@@ -26,6 +26,15 @@ w.set_property(
 	# Useless to go on if something went wrong:
 	ABORT_ON_USER_ERROR = True,
 	PRETTYPRINT_STATEMENT_NUMBER = True,
+	# Compute the intraprocedural preconditions at the same time as
+	# transformers and use them to improve the accuracy of expression
+	# and statement transformers:
+	SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+	# Use the more precise fix point operator to cope with while loops:
+	SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+	# Try to restructure the code for more precision:
+	UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
+	UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
 	# Simplify for loops into Fortran do-loops internally for better
 	# precision of analysis:
 	FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
@@ -42,8 +51,9 @@ w.set_property(
 # For verbosity, show what we've parsed:
 w.all_functions.display(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
-# Skip the modules of P4A runtime, they are just here so that PIPS has a
-# global view of what is going on, not to be parallelized :-)
+# Skip the compilation units and the modules of P4A runtime, they are just
+# here so that PIPS has a global view of what is going on, not to be
+# parallelized :-)
 skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
 def is_not_p4a_runtime(module):
 	#print module.name
@@ -99,7 +109,7 @@ kernel_launchers.gpu_loop_nest_annotate()
 kernel_launchers.display()
 
 # Unfortunately the information about parallelization and privatization is
-# lost by the current outliner, so rebuid it... :-(
+# lost by the current outliner, so rebuild it... :-(
 kernel_launchers.privatize_module()
 kernel_launchers.coarse_grain_parallelization()
 
@@ -111,7 +121,7 @@ kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False)
 w.all_functions.display()
 #w.compilation_units.display()
 
-# Add communication around all the call site of the kernels:
+# Add communication around all the call sites of the kernels:
 #kernel_launchers.kernel_load_store()
 # Use a more specific communication location instead of the generic line above:
 w["p4a_kernel_launcher_0"].kernel_load_store()
