@@ -86,7 +86,10 @@ If you want to download \Apfa from the \Agit and compile it, try:
   src/dev/p4a_setup
 \end{alltt}%$
 Everything is built into \verb|$P4A_ROOT/build| and installed into
-\verb|$P4A_ROOT/run|.
+\verb|$P4A_ROOT/run| by default. If you want to change the install
+location, you can export the \verb|INSTALL_PREFIX| variable to the
+installation directory you want (have a look to
+\S~\ref{sec:making-distributions} for example).
 
 If you want to pull a new version, try
 \begin{verbatim}
@@ -161,7 +164,8 @@ location of the sources of \texttt{\emph{package}}, for example
 set (for example to a working copy of the \Apips{} \Asvn), you should be
 able to compile with only the \texttt{p4a-own} branch. For the \Apips
 packages, you should have the links to \texttt{nlpmake/makes} to have them
-to compile.
+to compile. Have a look to \S~\ref{sec:comp-from-sourc} for more
+information on this.
 
 You can change the options passed to \texttt{configure} for a package by
 setting the \texttt{P4A\_\emph{PACKAGE}\_CONFIGURE\_OPTIONS} environment
@@ -524,7 +528,7 @@ the workflow chosen in \Apfa.
 \subsection{PIPS work-flow}
 \label{sec:pips-workflow}
 
-\subsubsection{Compilation from sources outside of Par4All }
+\subsubsection{Compilation from sources outside of Par4All}
 \label{sec:comp-from-sourc}
 
 Before digging into details, the most important thing when developing some
@@ -713,26 +717,19 @@ these branches).
 \subsection{Setting and running the infrastructure up}
 \label{sec:setup}
 
-The installation has been tested on Ubuntu/Linux 9.10 and you need to have
-at least these packages installed to compile and run:
-\begin{description}
-\item[\texttt{cproto}]
-\item[\texttt{flex}]
-\item[\texttt{bison}]
-\item[\texttt{emacs}]
-\item[\texttt{tk8.5}]
-\item[\texttt{texlive-latex-extra}]
-\item[\texttt{sun-java6-jdk}]
-\item[\texttt{tex4ht}]
-\item[\texttt{automake}]
-\item[\texttt{libtool}]
-\item[\texttt{libreadline5-dev}]
-\item[\texttt{python2.6-dev}]
-\item[\texttt{swig}]
-\item[\texttt{libgmp3-dev}]
-\item[\texttt{libmpfr-dev}]
-\item[\texttt{gfortran}]
-\end{description}
+\subsubsection{Packages needed to build and run Par4All}
+\label{sec:pack-need-build}
+
+The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
+Debian/unstable and you need to have at least these packages installed to
+compile and run:
+\begin{quote}
+  \texttt{cproto}, \texttt{flex}, \texttt{bison},
+  \texttt{texlive-latex-extra}, \texttt{tex4ht}, \texttt{automake},
+  \texttt{libtool}, \texttt{libreadline5-dev}, \texttt{python2.6-dev},
+  \texttt{swig}, \texttt{python-ply}, \texttt{libgmp3-dev},
+  \texttt{libmpfr-dev}, \texttt{gfortran}
+\end{quote}
 
 There are scripts to ease the developer and user life.
 
@@ -785,6 +782,27 @@ projects or if things go really wrong. There are located in
   external \Agit import. It is no longer used since we switch to the
   \Aautotools version of \Apips;
 \end{itemize}
+
+
+\subsubsection{Making distributions}
+\label{sec:making-distributions}
+
+The \verb|p4a_pack| is used to build compressed \texttt{tar} balls, Debian
+\texttt{.deb} and RedHat \texttt{.rpm} packet files.
+
+The place of where the \Apfa files are looked for is specified according
+to the \verb|P4A_ROOT| variable, but there may be some hard-coded
+locations at configure and build time, so moving the installation
+directory afterwards and changing \verb|P4A_ROOT| to follow the new location may not be enough.
+
+So you should choose the location at build time. To have a distribution
+that build up into for example \texttt{/usr/local/par4all}, you should
+first create a \texttt{/usr/local/par4all} writable by you, set the
+\verb|INSTALL_PREFIX| environment variable to this installation directory
+and do a \verb|p4a_setup|.
+
+Then you can pack this directory into what format you want with
+\verb|p4a_pack|.
 
 
 \section{Examples and demos}
@@ -917,18 +935,25 @@ p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
 then if you are happy with it you can commit with 'Agit or revert back to
 previous state with \Agit.
 
+
 \subsection{Validation script}
 \label{sec:validation_script}
 
-It is possible to select different options to test with the python script \verb|p4a_validate_class.py|
+It is possible to select different options to test with the python script
+\verb|p4a_validate_class.py|
+
 Currently, 3 options are available:
-
 \begin{description}
-\item[\texttt{--pips}:] Validate tests which are done by default file (in packages/PIPS/validation)
+\item[\texttt{--pips}:] validate tests which are done by default file (in
+  \texttt{packages/PIPS/validation})
 
-\item[\texttt{--p4a}:] Validate tests which are done by \verb|par4all_validation.txt| (which must be previously created in src/validation)
+\item[\texttt{--p4a}:] validate tests which are done by
+  \verb|par4all_validation.txt| (which must be previously created in
+  \texttt{src/validation})
 
-\item[\texttt{--diff}:] This command make a diff between tests done by --pips and --p4a options. The list of the tests which are not done by --p4a options are into diff.txt
+\item[\texttt{--diff}:] this command make a diff between tests done by
+  \texttt{--pips} and \texttt{--p4a} options. The list of the tests which
+  are not done by \texttt{--p4a} options are into \texttt{diff.txt}
 
 \item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
 \end{description}
@@ -942,15 +967,20 @@ or
 python p4a_validate_class.py --p4a
 \end{verbatim}
 
-To use the option --p4a, a  \verb|par4all_validation.txt| must be previously created. This file lists all tests that the validation will do.
-Syntax to add a new test is: \verb|directory_test/name_test|
-Be careful when adding a test to \verb|par4all_validation.txt|, put the correct extension (.c, .f, .F, .F90). Don't use .tpips, .tpips2, etc extensions.
+To use the option \texttt{--p4a}, a \verb|par4all_validation.txt| must be
+previously created. This file lists all tests that the validation will do.
+Syntax to add a new test is: \verb|directory_test/name_test|.
+
+Be careful when adding a test to \verb|par4all_validation.txt|, put the
+correct extension (\texttt{.c}, \texttt{.f}, \texttt{.F},
+\texttt{.F90}). Don't use \texttt{.tpips}, \texttt{.tpips2}... extensions.
 
 Example of a \verb|par4all_validation.txt| with 2 tests:
 \begin{verbatim}
-Syntax\alias.f
-Syntax\altret01.f
+Syntax/alias.f
+Syntax/altret01.f
 \end{verbatim}
+
 
 \section{Branches}
 \label{sec:branches}

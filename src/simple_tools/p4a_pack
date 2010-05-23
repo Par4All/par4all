@@ -12,44 +12,46 @@ Allows you to create .deb, .tgz or .rpm packages of Par4all.
 
 import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
+from p4a_rc import *
 from git import *
 
 default_install_prefix = "usr/local/par4all" # NO beginning slash please.
 package_name = "par4all"
-script_dir = os.path.split(os.path.abspath(__file__))[0]
-debian_dir = os.path.join(script_dir, "DEBIAN")
-rc_sh_template_file = os.path.join(script_dir, "par4all-rc.sh.tpl")
-rc_sh_file = "etc/par4all-rc.sh" # NO beginning slash please.
-rc_csh_template_file = os.path.join(script_dir, "par4all-rc.csh.tpl")
-rc_csh_file = "etc/par4all-rc.csh" # NO beginning slash please.
 
-def create_dist(dist_dir, install_prefix):
+actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
+script_dir = os.path.split(actual_script)[0]
+debian_dir = os.path.join(script_dir, "DEBIAN")
+auto_remove_temp_dirs_on_break = []
+
+def create_dist(dist_dir, install_prefix, revision):
+	'''Creates a temporary directory and copy the whole installation directory (dist_dir), under the prefix designated by install_prefix.
+	Also writes updated rc files (shell scripts for setting the environment), and a version file.
+	Returns a list with the temporary directory created and the full path of the temporary directory and the appended install_prefix.'''
+	global auto_remove_temp_dirs_on_break
 	temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_")
+	auto_remove_temp_dirs_on_break += temp_dir
 	temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
 	os.makedirs(os.path.split(temp_dir_with_prefix)[0])
 	info("copying " + dist_dir + " to " + temp_dir_with_prefix)
 	shutil.copytree(dist_dir, temp_dir_with_prefix)
-	
-	# Fix the environment shell scripts.
-	global rc_sh_template_file, rc_sh_file, rc_csh_template_file, rc_csh_file
-	subs_map = dict(ROOT = "/" + install_prefix, DIST = "/" + install_prefix)
-	rc_sh_file = os.path.join(temp_dir_with_prefix, rc_sh_file)
-	info("adjusting values in " + rc_sh_template_file + " -> " + rc_sh_file)
-	subs_template_file(rc_sh_template_file, subs_map, rc_sh_file)
-	rc_csh_file = os.path.join(temp_dir_with_prefix, rc_csh_file)
-	info("adjusting values in " + rc_csh_template_file + " -> " + rc_csh_file)
-	subs_template_file(rc_csh_template_file, subs_map, rc_csh_file)
-	
+	abs_prefix = "/" + install_prefix
+	# XXX: gfortran or not??
+	p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
+		dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
+	# XXX: version file path hard coded in 3 different scripts
+	dump(os.path.join(temp_dir_with_prefix, "lib", "p4a_version"), revision)
 	return [ temp_dir, temp_dir_with_prefix ]
 
 def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix)
-	global debian_dir
+	'''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
+	and substitute some values in files in this DEBIAN directory. No modification of the
+	distribution is made.'''
+	global debian_dir, package_name
+	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
 	temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
 	info("copying " + debian_dir + " to " + temp_debian_dir)
 	shutil.copytree(debian_dir, temp_debian_dir)
 	control_file = os.path.join(temp_debian_dir, "control.tpl")
-	global package_name
 	if not arch:
 		arch = get_machine_arch()
 		if arch == "x86_64":
@@ -61,27 +63,25 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
 	info("adjusting values in " + postinst_file)
 	subs_template_file(postinst_file, subs_map)
 	package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
-	run(" ".join([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ]))
+	run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
 	if keep_temp:
 		warn("temporary directory was " + temp_dir)
 	else:
-		debug("removing " + temp_dir)
 		rmtree(temp_dir, can_fail = 1)
 
 def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix)
-	temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
+	'''Creates a simple .tar.gz package.'''
+	global package_name
+	(temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
 	if not arch:
 		arch = get_machine_arch()
-	global package_name
 	package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
 	if os.path.exists(package_file_name):
 		os.remove(package_file_name)
-	run(" ".join([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ]))
+	run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
 	if keep_temp:
 		warn("temporary directory was " + temp_dir)
 	else:
-		debug("removing " + temp_dir)
 		rmtree(temp_dir, can_fail = 1)
 
 def main():
@@ -92,7 +92,7 @@ def main():
 	main_group = optparse.OptionGroup(parser, "General Options")
 
 	main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
-		help = "Directory where the distribution is currently installed. Defaults to environment variable $P4A_DIST or $P4A_ROOT/run if it does not exist.")
+		help = "Directory where the distribution is currently installed. Defaults to environment variable P4A_DIST or P4A_ROOT/run if it does not exist.")
 
 	main_group.add_option("--src", "-s", action = "store_true", default = False,
 		help = "[TODO] Create a source package instead of a binary package.")
@@ -165,12 +165,20 @@ def main():
 	if git_revision:
 		revision += "~" + git_revision
 	
-	if options.deb:
-		create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-			keep_temp = options.keep, arch = options.arch)
-	if options.tgz:
-		create_tgz(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-			keep_temp = options.keep, arch = options.arch)
+	try:
+		if options.deb:
+			create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
+				keep_temp = options.keep, arch = options.arch)
+		if options.tgz:
+			create_tgz(dist_dir = dir, install_prefix = options.prefix, revision = revision,
+				keep_temp = options.keep, arch = options.arch)
+	except KeyboardInterrupt:
+		if not options.keep:
+			global auto_remove_temp_dirs_on_break
+			for dir in auto_remove_temp_dirs_on_break:
+				if os.path.isdir(dir):
+					warn("removing " + dir)
+					rmtree(dir, can_fail = 1)
 	
 	return 0
 

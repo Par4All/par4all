@@ -12,7 +12,9 @@ Par4All Builder Class
 import sys, os, re, shutil
 from p4a_util import *
 
-class p4a_builder():
+class p4a_build():
+	'''Par4All builder class. For now everything is in the ctor. But the class should have methods some day.'''
+	
 	def __init__(self, files, output_file, 
 		cppflags = [], cflags = [], ldflags = [], nvccflags = [],
 		extra_obj = [], 
@@ -25,7 +27,7 @@ class p4a_builder():
 			nvcc = "nvcc"
 		
 		if icc:
-			if run("which icc", can_fail = 1):
+			if run([ "which icc" ], can_fail = 1):
 				raise p4a_error("icc is not available -- have you source'd iccvars.sh or iccvars_intel64.sh yet?")
 			cc = "icc"
 			ld = "xild"
@@ -114,7 +116,7 @@ class p4a_builder():
 		for file in files:
 			(b, e) = os.path.splitext(file)
 			if e == ".cu":
-				run(" ".join([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ file ]))
+				run([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ file ])
 				compile_files += [ file + ".cpp" ]
 				cuda = True
 				cxx = True
@@ -141,7 +143,7 @@ class p4a_builder():
 		
 		for file in compile_files:
 			obj_file = change_file_ext(file, ".o")
-			run(" ".join([ cc, "-c" ] + cppflags + arch_flags + cflags + [ "-o", obj_file, file ]))
+			run([ cc, "-c" ] + cppflags + arch_flags + cflags + [ "-o", obj_file, file ])
 			obj_files += [ obj_file ]
 		
 		if ext == ".o":
@@ -166,7 +168,7 @@ class p4a_builder():
 			cppflags += cuda_cppflags
 			ldflags += cuda_ldflags
 		
-		run(" ".join([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files))
+		run([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files)
 		#if cxx:
 		#ldflags += [ "-L`gcc -print-file-name=` /usr/lib/crt1.o /usr/lib/crti.o " ] #"-lstdc++" ]
 		#run(" ".join([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files + ["/usr/lib/crtn.o -limf -lsvml -lm -lipgo -ldecimal -lgcc -lgcc_eh -lirc -lc -lgcc -lgcc_eh -lirc_s -ldl -lc"]))
