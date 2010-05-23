@@ -85,7 +85,8 @@ fi
 
 # Where everything is built:
 P4A_BUILD=$P4A_ROOT/build
-# Where things are installed
+# Where things are installed by default, but can be changed by setting the
+# INSTALL_PREFIX variable
 P4A_INSTALL_PREFIX=$P4A_ROOT/run
 
 P4A_ETC=$P4A_INSTALL_PREFIX/etc
@@ -96,6 +97,9 @@ if test -z "$INSTALL_PREFIX" ; then
     INSTALL_PREFIX=$P4A_INSTALL_PREFIX
 fi
 mkdir -p $INSTALL_PREFIX
+
+P4A_ETC=$INSTALL_PREFIX/etc
+mkdir -p $P4A_ETC
 
 # Default flags for the configure script:
 PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
@@ -114,16 +118,22 @@ fi
 cd $P4A_ROOT
 
 echo Installing Par4All scripts...
-# Install Par4All scripts:
-mkdir -p $P4A_INSTALL_PREFIX/bin
-cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $P4A_INSTALL_PREFIX/bin
+
+# All this could be better be implemented with a git archive --format=tar
+# HEAD that could be piped into a tar with the correct options that would
+# extract only what is needed...
+mkdir -p $INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/dev/{p4a_git,p4a_setup,p4a_valgrind} $INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
-cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $P4A_INSTALL_PREFIX/bin
-cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $P4A_INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $INSTALL_PREFIX/bin
+cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $INSTALL_PREFIX/bin
+cp -a $P4A_ROOT/RELEASE-NOTES.txt $INSTALL_PREFIX
+# Install the examples. Mmmh, I hope $P4A_ROOT/examples is in a clean state...:
+cp -a $P4A_ROOT/examples $INSTALL_PREFIX
 # Install Par4All accelerator run time:
-cp $P4A_ROOT/src/p4a_accel/p4a_post_processor.py $P4A_INSTALL_PREFIX/bin
-mkdir -p $P4A_INSTALL_PREFIX/share/p4a_accel
-cp -a $P4A_ROOT/src/p4a_accel/*.{h,c,cu,f,mk} $P4A_INSTALL_PREFIX/share/p4a_accel
+cp $P4A_ROOT/src/p4a_accel/p4a_post_processor.py $INSTALL_PREFIX/bin
+mkdir -p $INSTALL_PREFIX/share/p4a_accel
+cp $P4A_ROOT/src/p4a_accel/*.{h,c,f,mk} $INSTALL_PREFIX/share/p4a_accel
 
 # The config files to source later:
 P4A_RC_SH=$P4A_ETC/par4all-rc.sh
@@ -137,11 +147,11 @@ mkdir -p  $P4A_ETC
 cat <<EOF > $P4A_RC_SH
 # Minimum Par4All rc file for sh-compatible shells
 
-# P4A source root.
-export P4A_ROOT='$P4A_ROOT'
+# P4A source root for information:
+export P4A_ROOT=$P4A_ROOT
 
 # Path to the P4A installation.
-export P4A_DIST=\$P4A_ROOT/run
+export P4A_DIST=$INSTALL_PREFIX
 
 # Location of the P4A_accel files.
 export P4A_ACCEL_DIR=\$P4A_DIST/share/p4a_accel
@@ -181,12 +191,12 @@ $P4A_PIPS_SRC/src/Scripts/env/sh2csh.pl < $P4A_RC_SH > $P4A_RC_CSH
 
 echo Installing some lacking PIPS scripts...
 # Stuff still lacking from PIPS install:
-cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $P4A_INSTALL_PREFIX/bin
-cp $P4A_PIPS_SRC/src/Scripts/misc/logfile_to_tpips $P4A_INSTALL_PREFIX/bin
+cp $P4A_PIPS_SRC/src/Scripts/validation/pips* $INSTALL_PREFIX/bin
+cp $P4A_PIPS_SRC/src/Scripts/misc/logfile_to_tpips $INSTALL_PREFIX/bin
 
 # To have the validation running:
-mkdir -p  $P4A_INSTALL_PREFIX/makes
-cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $P4A_INSTALL_PREFIX/makes
+mkdir -p  $INSTALL_PREFIX/makes
+cp $P4A_NLPMAKE_SRC/makes/{arch.sh,version.sh} $INSTALL_PREFIX/makes
 
 PIPS_COMPONENTS="linear newgen pips"
 #PIPS_DIR=$P4A_ROOT/packages/PIPS
