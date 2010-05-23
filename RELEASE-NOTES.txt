@@ -67,12 +67,23 @@ few known limitations :
       [...]
     }
 
+- you should avoid heavy use of pointers to enable a good
+  parallelization. The point-to analysis is still on-going in PIPS
+
+- there are still issues in the part that analyzes the control graph (the
+  PIPS ``controlizer``). For example, right now we cannot deal with a
+  different hierarchy between the control graph and the variable
+  scoping. For example if you have a block with a variable declaration
+  within and a ``goto`` to/from outside, it may probably fail. This
+  happens also if you have break or continue in loops with some local
+  variables since those are internally represented with ``goto``.
+
 
 Cuda:
 -----
 
 To compile and to run the CUDA output, you should have the following
-environment variable set:
+environment variables set:
 
 - ``CUDA_DIR`` to the directory where CUDA has been installed (default to
   ``/usr/local/cuda``)
