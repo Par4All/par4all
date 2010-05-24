@@ -171,21 +171,21 @@ def main():
 
     # Preliminary check.
     if not os.path.exists(os.environ["P4A_ROOT"]) or not os.path.exists(os.environ["P4A_ACCEL_DIR"]):
-        die("invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
+        die("Invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
 
     # Check options and set up defaults.
     if len(args) == 0:
-        die("missing input files")
+        die("Missing input files")
 
     if options.simple and (options.cuda or options.openmp):
-        die("cannot combine --simple with --cuda and/or --openmp")
+        die("Cannot combine --simple with --cuda and/or --openmp")
 
     if not options.simple and not options.cuda and not options.openmp:
-        info("defaulting to --openmp")
+        info("Defaulting to --openmp")
         options.openmp = True
 
     if options.cuda and not options.accel:
-        info("enabling --accel")
+        info("Enabling --accel")
         options.accel = True
 
     if options.debug:
@@ -199,14 +199,14 @@ def main():
         (base, ext) = os.path.splitext(file)
         if ext == ".c" or ext == ".f":
             files.append(abs_file)
-            debug("input file: " + abs_file)
+            debug("Input file: " + abs_file)
         elif ext == ".cpp" or ext == ".cxx" or ext == ".cu":
             other_files.append(abs_file)
-            info("file format not supported by parallelizer, will not be parallelized: " + abs_file)
+            info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
         elif ext == ".h" or ext == ".hpp":
-            info("ignoring header file: " + abs_file)
+            info("Ignoring header file: " + abs_file)
         else:
-            die("file format not supported: " + abs_file)
+            die("File format not supported: " + abs_file)
 
     # Make up C preprocessor flags.
     cppflags = options.cppflags
@@ -216,15 +216,15 @@ def main():
         cppflags += [ "-D" + define ]
     for undefine in options.undefines:
         cppflags += [ "-U" + undefine ]
-    info("cppflags: " + " ".join(cppflags))
+    info("CPP flags: " + " ".join(cppflags))
 
     # Process (or not).
     processor_output_files = []
     if options.noprocess:
-        warn("bypassing processor")
+        warn("Bypassing processor")
         processor_output_files = files
     elif len(files) == 0:
-        warn("no supported file to process")
+        warn("No supported files to process!")
     else:
         # Create a workspace with PIPS:
         processor = p4a_processor(files = files,
@@ -260,7 +260,7 @@ def main():
 
     all_buildable_files = processor_output_files + other_files + options.extra
     if len(all_buildable_files) == 0:
-        die("no buildable input files")
+        die("No buildable input files")
 
     # Build requested binaries.
     ldflags = options.ldflags
@@ -270,7 +270,7 @@ def main():
         ldflags += [ "-l" + lib ]
     for output_file in options.output_file:
         output_file = os.path.abspath(output_file)
-        info("building " + output_file)
+        info("Building " + output_file)
         builder = p4a_builder(files = all_buildable_files,
                               output_file = output_file,
                               cppflags = cppflags,
