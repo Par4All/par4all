@@ -90,6 +90,7 @@ void create(char* workspace_name, char ** filenames)
                     ", check rights!\n");
         }
     }
+    gen_array_free(filename_list);
 }
 
 void quit()
@@ -162,6 +163,19 @@ char* info(char * about)
 void apply(char * phasename, char * target)
 {
     safe_apply(phasename,target);
+}
+
+void capply(char * phasename, char ** targets)
+{
+    /* create the array of arguments */
+    gen_array_t target_list = gen_array_make(0);
+    while(*targets)
+    {
+        gen_array_append(target_list,*targets);
+        targets++;
+    }
+    safe_concurrent_apply(phasename,target_list);
+    gen_array_free(target_list);
 }
 
 void display(char *rname, char *mname)
