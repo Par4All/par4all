@@ -240,6 +240,8 @@ class p4a_processor():
         self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
 
     def ompify(self, filter_include = None, filter_exclude = None):
+        """Add OpenMP #pragma from internal representation"""
+        
         self.filter_modules(filter_include, filter_exclude).ompify_code()
 
 
@@ -314,7 +316,12 @@ class p4a_processor():
         """Final post-processing and save the files of the workspace"""
 
         output_files = []
-        self.workspace.all.unsplit()
+
+        # Regenerate the sources file in the workspace. Do not generate
+        # OpenMP-style output since we have already added OpenMP
+        # decorations:
+        self.workspace.all.unsplit(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+
         for file in self.files:
             if file in self.accel_files:
                 os.remove(file)
