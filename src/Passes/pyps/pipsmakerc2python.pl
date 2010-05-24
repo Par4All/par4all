@@ -93,6 +93,7 @@ sub print_python_method {
 		$self="self._module";
 	}
 	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and (not $generator eq "-loop") ) ) {
+		if($generator eq "-modules" ) { $extraparams="$extraparams concurrent=True,"; }
     	print <<EOF
 
 	def $name(self,$extraparams **props):
@@ -113,7 +114,11 @@ EOF
     		print <<EOF
 		for m in self._modules:
 			m._ws._set_property(m._update_props("$name", props))
-			m.apply("$name")
+		if concurrent:
+			m.capply("$name")
+		else:
+			for m in self._modules:
+				m.apply("$name")
 
 EOF
 			;

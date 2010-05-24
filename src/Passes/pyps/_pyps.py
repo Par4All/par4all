@@ -54,7 +54,6 @@ class module:
 		"""apply transformation phase"""
 		pypips.apply(upper(phase),self._name)
 
-
 	def display(self,rc="printed_file",With="PRINT_CODE", **props):
 		"""display a given resource rc of the module, with the
 		ability to change the properties"""
@@ -109,6 +108,10 @@ class modules:
 	def loops(self):
 		""" return a list of all program loops"""
 		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
+
+	def capply(self,phase):
+		""" concurrently apply a phase to all contained modules"""
+		pyps.capply(self._modules,upper(phase))
 
 ### modules_methods /!\ do not touch this line /!\
 
