@@ -115,7 +115,7 @@ EOF
 		for m in self._modules:
 			m._ws._set_property(m._update_props("$name", props))
 		if concurrent:
-			m.capply("$name")
+			self.capply("$name")
 		else:
 			for m in self._modules:
 				m.apply("$name")

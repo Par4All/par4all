@@ -111,7 +111,7 @@ class modules:
 
 	def capply(self,phase):
 		""" concurrently apply a phase to all contained modules"""
-		pyps.capply(self._modules,upper(phase))
+		pypips.capply(upper(phase),map(lambda m:m.name,self._modules))
 
 ### modules_methods /!\ do not touch this line /!\
 
