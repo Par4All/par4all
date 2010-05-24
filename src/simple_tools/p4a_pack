@@ -33,14 +33,14 @@ def create_dist(dist_dir, install_prefix, revision):
     auto_remove_temp_dirs_on_break += temp_dir
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
-    info("copying " + dist_dir + " to " + temp_dir_with_prefix)
+    info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
     shutil.copytree(dist_dir, temp_dir_with_prefix)
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
         dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
     # XXX: version file path hard coded in 3 different scripts
-    dump(os.path.join(temp_dir_with_prefix, "lib", "p4a_version"), revision)
+    dump(get_version_file_path(temp_dir_with_prefix), revision)
     return [ temp_dir, temp_dir_with_prefix ]
 
 def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
@@ -50,7 +50,7 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     global debian_dir, package_name
     (temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
     temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
-    info("copying " + debian_dir + " to " + temp_debian_dir)
+    info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
     control_file = os.path.join(temp_debian_dir, "control.tpl")
     if not arch:
@@ -58,15 +58,15 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
         if arch == "x86_64":
             arch = "amd64"
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
-    info("adjusting values in " + control_file)
+    info("Adjusting values in " + control_file)
     subs_template_file(control_file, subs_map)
     postinst_file = os.path.join(temp_debian_dir, "postinst.tpl")
-    info("adjusting values in " + postinst_file)
+    info("Adjusting values in " + postinst_file)
     subs_template_file(postinst_file, subs_map)
     package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
     run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
     if keep_temp:
-        warn("temporary directory was " + temp_dir)
+        warn("Temporary directory was " + temp_dir)
     else:
         rmtree(temp_dir, can_fail = 1)
 
@@ -81,7 +81,7 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
         os.remove(package_file_name)
     run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
     if keep_temp:
-        warn("temporary directory was " + temp_dir)
+        warn("Temporary directory was " + temp_dir)
     else:
         rmtree(temp_dir, can_fail = 1)
 
@@ -135,7 +135,7 @@ def main():
         die("--rpm is TODO")
     
     if not options.deb and not options.rpm and not options.tgz:
-        die("please specify --deb, --rpm or --tgz")
+        die("Please specify --deb, --rpm or --tgz")
 
     dir = options.dir
     if not dir:
@@ -146,22 +146,22 @@ def main():
         else:
             die("please specify --dir")
     dir = os.path.abspath(os.path.expanduser(dir))
-    warn("taking dist from " + dir)
+    warn("Taking dist from " + dir)
     if not os.path.isdir(dir):
-        die("invalid dist directory: " + dir)
+        die("Invalid dist directory: " + dir)
 
     if not options.revision:
-        die("please use --revision to specify the package version/revision")
+        die("Please use --revision to specify the package version/revision")
     tmp = options.revision.split("-")
     if len(tmp) > 2:
-        die("invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
+        die("Invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
     if not re.match("\d\.\d(\.\d)?", tmp[0]):
-        die("revision must begin with a version string, e.g. 1.2.3 or 0.2")
+        die("Revision must begin with a version string, e.g. 1.2.3 or 0.2")
     for i in range(len(tmp)):
         tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
     revision = "-".join(tmp)
     if not revision:
-        die("invalid characters in revision")
+        die("Invalid characters in revision")
     git_revision = git(dir).current_revision()
     if git_revision:
         revision += "~" + git_revision
@@ -178,7 +178,7 @@ def main():
             global auto_remove_temp_dirs_on_break
             for dir in auto_remove_temp_dirs_on_break:
                 if os.path.isdir(dir):
-                    warn("removing " + dir)
+                    warn("Removing " + dir)
                     rmtree(dir, can_fail = 1)
     
     return 0

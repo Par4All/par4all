@@ -27,7 +27,7 @@ class p4a_build():
             nvcc = "nvcc"
         
         if icc:
-            if run([ "which icc" ], can_fail = 1):
+            if not which("icc"):
                 raise p4a_error("icc is not available -- have you source'd iccvars.sh or iccvars_intel64.sh yet?")
             cc = "icc"
             ld = "xild"
@@ -81,7 +81,7 @@ class p4a_build():
                 arch_flags = [ "-m64" ]
                 lib_arch_suffix = "_x86_64"
             else:
-                raise p4a_error("unsupported architecture: " + arch)
+                raise p4a_error("Unsupported architecture: " + arch)
         
         cuda_cppflags = []
         cuda_ldflags = []
@@ -116,7 +116,7 @@ class p4a_build():
         for file in files:
             (b, e) = os.path.splitext(file)
             if e == ".cu":
-                run([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ file ])
+                run2([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ file ])
                 compile_files += [ file + ".cpp" ]
                 cuda = True
                 cxx = True
@@ -129,11 +129,11 @@ class p4a_build():
                 final_files += [ file ]
                 final_command = "gfortran"
             else:
-                raise p4a_error("unsupported extension for input file: " + file)
+                raise p4a_error("Unsupported extension for input file: " + file)
         
         if cuda:
             if ext == ".a":
-                raise p4a_error("cannot build a shared library when using cuda")
+                raise p4a_error("Cannot build a shared library when using cuda")
         
         if cuda and ext == "" and icc:
             pass
@@ -143,7 +143,7 @@ class p4a_build():
         
         for file in compile_files:
             obj_file = change_file_ext(file, ".o")
-            run([ cc, "-c" ] + cppflags + arch_flags + cflags + [ "-o", obj_file, file ])
+            run2([ cc, "-c" ] + cppflags + arch_flags + cflags + [ "-o", obj_file, file ])
             obj_files += [ obj_file ]
         
         if ext == ".o":
@@ -162,13 +162,13 @@ class p4a_build():
         elif ext == "":
             pass
         else:
-            raise p4a_error("unsupported extension for output file: " + output_file)
+            raise p4a_error("Unsupported extension for output file: " + output_file)
         
         if cuda:
             cppflags += cuda_cppflags
             ldflags += cuda_ldflags
         
-        run([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files)
+        run2([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files)
         #if cxx:
         #ldflags += [ "-L`gcc -print-file-name=` /usr/lib/crt1.o /usr/lib/crti.o " ] #"-lstdc++" ]
         #run(" ".join([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files + ["/usr/lib/crtn.o -limf -lsvml -lm -lipgo -ldecimal -lgcc -lgcc_eh -lirc -lc -lgcc -lgcc_eh -lirc_s -ldl -lc"]))

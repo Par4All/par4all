@@ -79,7 +79,7 @@ class git():
 			old_work_tree = os.environ["GIT_WORK_TREE"]
 		os.environ["GIT_DIR"] = self._git_dir
 		os.environ["GIT_WORK_TREE"] = self._dir
-		output = run2([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir)[0].strip()
+		output = run2([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir, capture = True)[0].strip()
 		os.environ["GIT_DIR"] = old_git_dir
 		os.environ["GIT_WORK_TREE"] = old_work_tree
 		return output
