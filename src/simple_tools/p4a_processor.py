@@ -3,6 +3,7 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - Ronan Keryell
 #
 
 '''
@@ -14,39 +15,68 @@ from p4a_util import *
 import pyps
 
 class p4a_processor():
+    """Process program files with PIPS and other tools"""
 
+    # If the main language is Fortran, set to True:
     fortran = None
+
     workspace = None
+
     main_filter = None
+
+    # The project name:
+    project_name = None
+
+    # The full name of the directory that store the workspace database:
+    database_dir = None
+
+    # Set to True to try to do some #include tracking and recovering
+    recover_includes = None
+
     files = []
     accel_files = []
 
-    def __init__(self, workspace = None, project_name = "", cppflags = "", verbose = False,
-        files = [], filter_include = None, filter_exclude = None, accel = False):
+    def __init__(self, workspace = None, project_name = "", cppflags = "",
+                 verbose = False, files = [], filter_include = None,
+                 filter_exclude = None, accel = False, recover_includes = True):
+
+        self.recover_includes = recover_includes
 
         if workspace:
             self.workspace = workspace
         else:
-            # This is because pyps.workspace.__init__ will test for empty strings
+            # This is because pyps.workspace.__init__ will test for empty
+            # strings
             if cppflags is None:
                 cppflags = ""
+
+            if self.recover_includes:
+                # Use a special preprocessor to track #include by a
+                # man-in-the-middle attack :-) :
+                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
 
             if not project_name:
                 # Try some names until there is no database with this name:
                 while True:
-                    project_name = gen_name()
-                    database_dir = os.path.join(os.getcwd(),
-                                                project_name + ".database")
-                    if not os.path.exists(database_dir):
+                    self.project_name = gen_name()
+                    self.database_dir = os.path.join(os.getcwd(),
+                                                self.project_name + ".database")
+                    if not os.path.exists(self.database_dir):
                         break
+            else:
+                self.project_name = project_name
 
             for file in files:
                 if self.fortran is None:
                     (base, ext) = os.path.splitext(file)
+                    # Track the language for an eventual later compilation
+                    # by a back-end target compiler. The first file type
+                    # select the type for all the workspace:
                     if ext == ".f":
                         self.fortran = True
                     else:
                         self.fortran = False
+
                 if not os.path.exists(file):
                     raise p4a_error("file does not exist: " + file)
 
@@ -67,7 +97,7 @@ class p4a_processor():
                 accel_stubs = os.path.join(os.environ["P4A_ACCEL_DIR"],
                                            accel_stubs_name)
                 (base, ext) = os.path.splitext(os.path.basename(accel_stubs))
-                output_accel_stubs = os.path.join(os.getcwd(), base + "_" + project_name + ext)
+                output_accel_stubs = os.path.join(os.getcwd(), base + "_" + self.project_name + ext)
                 debug("copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
                 shutil.copyfile(accel_stubs, output_accel_stubs)
                 self.files += [ output_accel_stubs ]
@@ -78,7 +108,7 @@ class p4a_processor():
 
             # Create the PyPS workspace.
             self.workspace = pyps.workspace(self.files,
-                                            name = project_name,
+                                            name = self.project_name,
                                             activates = [],
                                             verboseon = verbose,
                                             cppflags = cppflags)
@@ -281,6 +311,8 @@ class p4a_processor():
 
 
     def save(self, in_dir = None, prefix = "p4a_"):
+        """Final post-processing and save the files of the workspace"""
+
         output_files = []
         self.workspace.all.unsplit()
         for file in self.files:
@@ -289,6 +321,13 @@ class p4a_processor():
                 continue
             (dir, name) = os.path.split(file)
             pips_file = os.path.join(self.workspace.directory(), "Src", name)
+
+            # Recover the includes in the given file only if the flag has
+            # been previously set and this is a C program:
+            if self.recover_includes and c_file_p(file):
+                subprocess.call([ 'p4a_recover_includes',
+                                  '--simple', pips_file ])
+
             if in_dir:
                 dir = in_dir
             if name[0:len(prefix)] != prefix:
