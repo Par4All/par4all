@@ -82,43 +82,32 @@ class p4a_processor():
                                             activates = [],
                                             verboseon = verbose,
                                             cppflags = cppflags)
-            self.workspace.w.set_property(
-                    # Compute the intraprocedural preconditions at the
-                    # same time as transformers and use them to improve
-                    # the accuracy of expression and statement
-                    # transformers:
-                    SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
-                    # Use the more precise fix point operator to cope with
-                    # while loops:
-                    SEMANTICS_FIX_POINT_OPERATOR = "derivative",
-                    # Try to restructure the code for more precision:
-                    UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
-                    UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
-                    # Simplify for loops into Fortran do-loops internally
-                    # for better precision of analysis:
-                    FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-                    # Regions are a must! :-) Ask for most precise
-                    # regions:
-                    MUST_REGIONS = True,
-                    # Warning: assume that there is no aliasing between IO
-                    # streams ('FILE *' variables):
-                    ALIASING_ACROSS_IO_STREAMS = False,
-                    # Warning: this is a work in progress. Assume no weird
-                    # aliasing
-                    CONSTANT_PATH_EFFECTS = False
-                    )
-
-            # Useful? 
-            #self.workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True)
-
-            # Prevents automatic addition of OpenMP directives when unsplitting.
-            # We will add them manually using ompify if requested.
-            self.workspace.set_property(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
-
-        # Useless to add redundant information:
-        #for module in self.workspace:
-           #module.prepend_comment(PREPEND_COMMENT = "/*\n * module " + module.name + "\n */\n")
-                #+ " read on " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n")
+            self.workspace.set_property(
+                # Compute the intraprocedural preconditions at the same
+                # time as transformers and use them to improve the
+                # accuracy of expression and statement transformers:
+                SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+                # Use the more precise fix point operator to cope with
+                # while loops:
+                SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+                # Try to restructure the code for more precision:
+                UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
+                UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+                # Simplify for loops into Fortran do-loops internally for
+                # better precision of analysis:
+                FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+                # Regions are a must! :-) Ask for most precise regions:
+                MUST_REGIONS = True,
+                # Warning: assume that there is no aliasing between IO
+                # streams ('FILE *' variables):
+                ALIASING_ACROSS_IO_STREAMS = False,
+                # Warning: this is a work in progress. Assume no weird
+                # aliasing
+                CONSTANT_PATH_EFFECTS = False,
+                # Prevents automatic addition of OpenMP directives when
+                # unslitting.  We will add them manually using ompify if
+                # requested.
+                PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
