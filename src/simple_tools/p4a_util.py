@@ -66,7 +66,7 @@ class p4a_error(Exception):
 	msg = "error"
 	def __init__(self, msg):
 		self.msg = msg
-		error(msg)
+		#error(msg)
 	def __str__(self):
 		return self.msg
 
@@ -196,16 +196,16 @@ def get_file_ext(file):
 
 def file_add_suffix(file, suffix):
 	'''Adds a suffix to the given file (before its extension).'''
-	(base, ext) = os.path.splitext(file_name)
+	(base, ext) = os.path.splitext(file)
 	return base + suffix + ext
 
-def fortran_file_p(file_name):
+def fortran_file_p(file):
 	'''Tests if a file has a Fortran name.'''
-	return get_file_extension(file_name) == '.f'
+	return get_file_extension(file) == '.f'
 
-def c_file_p(file_name):
+def c_file_p(file):
 	'''Tests if a file has a C name.'''
-	return get_file_extension(file_name) == '.c'
+	return get_file_extension(file) == '.c'
 
 def get_machine_arch():
 	'''Returns current machine architecture'''
@@ -267,7 +267,7 @@ def add_to_path(new_value, var = "PATH", after = False):
 	if var in os.environ:
 		for v in os.environ[var].split(os.pathsep):
 			if v != new_value:
-				values += [ v ] 
+				values += [ v ]
 	old_values = values
 	if after:
 		values += [ new_value ]

@@ -170,13 +170,9 @@ def main():
     if not revision:
         die("Invalid characters in revision")
     
-    git_revision = ""
-    try:
-        git_revision = p4a_git(dir).current_revision()
-    except:
-        pass
+    git_revision = guess_file_revision(dir)
     if git_revision:
-        revision += "~" + git_revision
+        revision += "~" + git_revision.replace("~exported", "")
     
     try:
         if options.deb:
