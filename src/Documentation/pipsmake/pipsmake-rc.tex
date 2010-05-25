@@ -4682,19 +4682,22 @@ of pointer type. When it is set to {\tt TRUE}, two formal parameters or a
 formal one and a global pointer or two global pointers can be
 aliased. If it is turned to {\tt FALSE}, such pointers are assumed to be
 unaliased for intraprocedural analysis and generally for root
-module(i.e. modules without callers).
+module(i.e. modules without callers). The default value is {\tt
+  FALSE}. It is the only value currently implemented.
 \begin{PipsProp}{ALIASING_ACROSS_FORMAL_PARAMETERS}
-ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
+ALIASING_ACROSS_FORMAL_PARAMETERS FALSE
 \end{PipsProp}
 
 The nest property specifies that one data structure can recursively
 contain two pointers pointing to the same location. If it is turned to
 {\tt FALSE}, it is assumed that two different not included memory
-access paths cannot point to the same memory locations. The safe (and
-default) value is {\tt TRUE}.
+access paths cannot point to the same memory locations. The safe value
+is {\tt TRUE}, but parallelization is hindered. Often, the user can
+guarantee that data structures do not exhibit any
+sharing. Optimistically, {\tt FALSE} is the default value.
 
 \begin{PipsProp}{ALIASING_INSIDE_DATA_STRUCTURE}
-ALIASING_INSIDE_DATA_STRUCTURE TRUE
+ALIASING_INSIDE_DATA_STRUCTURE FALSE
 \end{PipsProp}
 
 Property \PipsPropRef{ALIASING_ACROSS_IO_STREAMS} can be set to {\tt
