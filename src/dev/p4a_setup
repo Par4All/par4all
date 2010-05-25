@@ -129,6 +129,10 @@ cp $P4A_ROOT/src/dev/p4a_git_lib.bash $P4A_ETC
 cp $P4A_ROOT/src/postprocessor/p4a_recover_includes $INSTALL_PREFIX/bin
 cp $P4A_ROOT/src/validation/{p4a_validate,p4a_validation} $INSTALL_PREFIX/bin
 cp -a $P4A_ROOT/RELEASE-NOTES.txt $INSTALL_PREFIX
+# Install the simple_tools but not (yet) the new p4a_setup:
+# Warning, the installation of the Python script is done at end because we
+# do not know here where its location is!!!
+
 # Install the examples. Mmmh, I hope $P4A_ROOT/examples is in a clean
 # state...:
 cp -a $P4A_ROOT/examples $INSTALL_PREFIX
@@ -175,7 +179,8 @@ export LD_LIBRARY_PATH=\$P4A_DIST/lib:\$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=\$P4A_DIST/lib/pkgconfig:\$PKG_CONFIG_PATH
 
 # PIPS Python bindings (PyPS).
-export PYTHONPATH=\$(echo \$P4A_DIST/lib/python*/site-packages/pips):/usr/share/pyshared:\$PYTHONPATH
+# Get the last directory where the Python stuff is installed:
+export PYTHONPATH=\`ls -d \$P4A_DIST/lib/python*/site-packages/pips | tail -1\`:/usr/share/pyshared:\$PYTHONPATH
 EOF
 
 # Find the Fortran compiler:
@@ -322,6 +327,15 @@ PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=
 add_link_to_make_infrastructure pips
 #build_package pips packages/PIPS/pips "$compilation_targets" "--enable-tpips --enable-pyps --enable-hpfc --enable-fortran95"
 build_package pips packages/PIPS/pips "$compilation_targets" "--enable-tpips --enable-pyps --enable-hpfc"
+
+
+
+# Get the last directory where to install the Python stuff:
+P4A_PYTHON_DIR=`ls -d $INSTALL_PREFIX/lib/python*/site-packages/pips | tail -1`
+# Install the simple_tools but not (yet) the new p4a_setup:
+cp -a $P4A_ROOT/src/simple_tools/*.py $P4A_PYTHON_DIR
+cp -a $P4A_ROOT/src/simple_tools/{p4a,p4a_pack} $INSTALL_PREFIX/bin
+
 
 cat << EOF
 ============================================
