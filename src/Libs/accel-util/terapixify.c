@@ -132,7 +132,7 @@ bool  entity_used_in_loop_bound_p(entity e)
 #define TERAPIX_MASK_PREFIX "ma"
 #define TERAPIX_REGISTER_PREFIX "re"
 
-static bool terapix_renamed_p(const char* s, const char* prefix)
+static bool terapix_renamed_local_p(const char* s, const char* prefix)
 {
     string found = strstr(s,prefix);
     if(found)
@@ -143,12 +143,20 @@ static bool terapix_renamed_p(const char* s, const char* prefix)
     }
     return false;
 }
+static bool terapix_renamed_p(const char *s)
+{
+    return terapix_renamed_local_p(s,TERAPIX_PTRARG_PREFIX) || 
+        terapix_renamed_local_p(s,TERAPIX_LOOPARG_PREFIX) ||
+        terapix_renamed_local_p(s,TERAPIX_IMAGE_PREFIX) ||
+        terapix_renamed_local_p(s,TERAPIX_MASK_PREFIX) ||
+        terapix_renamed_local_p(s,TERAPIX_REGISTER_PREFIX);
+}
 
 static
-entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
+void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
 {
     /* change parameter name and generate an assignment */
-    if(arg_prefix && !terapix_renamed_p(entity_user_name(e),arg_prefix) ) {
+    if(arg_prefix && !terapix_renamed_p(entity_user_name(e)) ) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%u",entity_module_name(e),arg_prefix,(*arg_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
@@ -171,20 +179,17 @@ entity terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,str
         statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
         insert_statement(get_current_module_statement(),ass,true);
 #endif
-        return ne;
     }
 
     /* to respect terapix asm, we also have to change the name of variable e */
-    if(ass_prefix && !terapix_renamed_p(entity_user_name(e),ass_prefix)) {
+    if(ass_prefix && !terapix_renamed_p(entity_user_name(e))) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%u",entity_module_name(e),ass_prefix,(*ass_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
         AddEntityToCurrentModule(ne);
         free(new_name);
         replace_entity(get_current_module_statement(),e,ne);
-        return ne;
     }
-    return e;
 }
 
 static
@@ -323,6 +328,7 @@ bool normalize_microcode( char * module_name)
                 if( basic_pointer_p(vb) ) /* it's a pointer */
                 {
                     string prefix = NULL;
+#if 0 /* anywhere effects trouble this analysis */
                     bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
                     if( parameter_written ) /* it's an image */
                     {
@@ -331,6 +337,7 @@ bool normalize_microcode( char * module_name)
                         terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                     }
                     else /* cannot tell if it's a kernel or an image*/
+#endif
                     {
                         type t =ultimate_type(basic_pointer(vb));
                         vb=variable_basic(type_variable(t));
@@ -384,7 +391,7 @@ bool normalize_microcode( char * module_name)
         };
         gen_context_recurse(get_current_module_statement(),&p,statement_domain,gen_true,terapix_loop_handler);
     }
-    
+
 
     /* validate */
     module_reorder(get_current_module_statement());
@@ -490,7 +497,7 @@ static void do_terapix_remove_divide(call c)
                 );
         }
         else
-            pips_user_error("terapix cannot handle division by a non-consatnt variable\n");
+            pips_user_error("terapix cannot handle division by a non-constant variable\n");
     }
 }
 bool
