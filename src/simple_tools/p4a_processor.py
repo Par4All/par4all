@@ -268,37 +268,56 @@ class p4a_processor():
         # decorations:
         self.workspace.all.unsplit(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
+        # For all the registered files from the workspace:
         for file in self.files:
             if file in self.accel_files:
                 os.remove(file)
                 continue
             (dir, name) = os.path.split(file)
+            # Where the file does dwell in the .database workspace:
             pips_file = os.path.join(self.workspace.directory(), "Src", name)
 
             # Recover the includes in the given file only if the flag has
-            # been previously set and this is a C program:
-            if self.recover_includes and c_file_p(file):
+            # been previously set and this is a C program. Do not do it
+            # twice in accel mode since it is already done in
+            # p4a_post_processor.py:
+            if self.recover_includes and c_file_p(file) and not self.accel:
                 subprocess.call([ 'p4a_recover_includes',
                                   '--simple', pips_file ])
 
-            # TO FINISH FROM HERE
+            # Update the destination directory if one was given:
             if in_dir:
                 dir = in_dir
-            # Prepend a prefix if not already here:
+
+            # The following should be optional
+            # Prepend a prefix if not already here (a string method could
+            # be do this more elegantly...):
             if name[0:len(prefix)] != prefix:
-                name = prefix + name
-            output_file = os.path.join(dir, name)
-            copy = True
-            if len(self.accel_files):
-                self.accel_post(pips_file, output_file)
-                if self.accel and not self.fortran:
-                    cu_file = change_file_ext(output_file, ".cu")
-                    shutil.move(output_file, cu_file)
-                    output_file = cu_file
-                    copy = False
-            if copy:
-                print (pips_file, output_file)
-                shutil.copyfile(pips_file, output_file)
+                output_name = prefix + name
+            else:
+                output_name = name
+
+            # The final destination
+            output_file = os.path.join(dir, output_name)
+
+            if self.accel and c_file_p(file):
+                # We generate code for P4A Accel, so first post process
+                # the output:
+                self.accel_post(pips_file,
+                                os.path.join(self.workspace.directory(), "P4A"))
+                # Where the P4A output file does dwell in the .database
+                # workspace:
+                p4a_file = os.path.join(self.workspace.directory(), "P4A", name)
+                # Update the normal location then:
+                pips_file = p4a_file
+                # To have the nVidia compiler to be happy, we need to have
+                # a .cu version of the .c file
+                cu_file = change_file_ext(output_file, ".cu")
+                shutil.copyfile(pips_file, cu_file)
+
+            # Copy the PIPS production to its destination:
+            shutil.copyfile(pips_file, output_file)
+
             output_files += [ output_file ]
         return output_files
 
