@@ -13,7 +13,7 @@ Allows you to create .deb, .tgz or .rpm packages of Par4all.
 import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
 from p4a_rc import *
-from git import *
+from p4a_git import *
 from p4a_version import *
 
 default_install_prefix = "usr/local/par4all" # NO beginning slash please.
@@ -123,11 +123,17 @@ def main():
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
+    main_group.add_option("--nocolor", action = "store_true", default = False,
+        help = "Disable coloring of terminal output.")
+    
     parser.add_option_group(main_group)
 
     (options, args) = parser.parse_args()
 
     set_verbosity(options.verbose)
+    
+    if options.nocolor:
+        p4a_term.disabled = True
     
     if options.src:
         die("--src is TODO")

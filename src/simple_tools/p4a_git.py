@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Authors:
-# - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - GrÃ©goire PÃ©an <gregoire.pean@hpc-project.com>
 #
 
 '''
@@ -16,6 +16,7 @@ actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
 
 class git():
+	'''Git Repositories Manipulation Class'''
 	
 	_git_ext = None
 	_git_dir = None

@@ -31,6 +31,6 @@ setenv PATH $$P4A_DIST/bin:$$PATH
 setenv PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig:$$PKG_CONFIG_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-setenv PYTHONPATH $$P4A_DIST/lib:$$(echo $$P4A_DIST/lib/python*/site-packages/pips):$$PYTHONPATH
+setenv PYTHONPATH $$P4A_DIST/lib:`ls -d $$P4A_DIST/lib/python*/site-packages/pips 2>/dev/null | tail -1`:`ls -d $$P4A_DIST/lib/python*/dist-packages/pips 2>/dev/null | tail -1`:$$PYTHONPATH
 
 rehash

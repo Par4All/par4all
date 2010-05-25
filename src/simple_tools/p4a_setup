@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Authors:
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
 
@@ -25,7 +26,7 @@ For running the binaries, you only need those packages:
 import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
 from p4a_rc import *
-from git import *
+from p4a_git import *
 from p4a_version import *
 
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
@@ -88,7 +89,7 @@ def main():
         help = "Skip building and installing of PIPS.")
         
     main_group.add_option("--skip", "-s", metavar = "PACKAGE", action = "append", default = [],
-        help = "Alias for being able to say -sP (besides --sP), for example.")
+        help = "Alias for being able to say -sP (besides --sP), for example. -sA is also available and means 'skip all', in which case only final installation stages will be performed.")
 
     main_group.add_option("--only", "-o", metavar = "PACKAGE", action = "append", default = [],
         help = "Build only the selected package. Overrides any other option.")
@@ -107,6 +108,9 @@ def main():
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
+    main_group.add_option("--nocolor", action = "store_true", default = False,
+        help = "Disable coloring of terminal output.")
+
     parser.add_option_group(main_group)
 
     (options, args) = parser.parse_args()
@@ -116,6 +120,9 @@ def main():
 
     set_verbosity(options.verbose)
     
+    if options.nocolor:
+        p4a_term.disabled = True
+
     # Check options and exclude packages from
     # processing as requested.
     for s in options.skip:
@@ -126,6 +133,11 @@ def main():
         elif s == "l":
             options.skip_linear = True
         elif s == "P":
+            options.skip_pips = True
+        elif s == "A":
+            options.skip_polylib = True
+            options.skip_newgen = True
+            options.skip_linear = True
             options.skip_pips = True
         else:
             die("Invalid option: -s" + s)
@@ -208,13 +220,13 @@ def main():
     # "install_dir" is the most important variable here.
     # It is dest_dir + safe_prefix.
     install_dir = os.path.normpath(dest_dir + safe_prefix)
-    debug("Install dir: " + install_dir)
+    info("Install dir: " + install_dir)
     # Check that we are not installing in a system or an invalid directory.
     if not install_dir or is_system_dir(install_dir):
-        die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory.")
+        die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
     # Create install_dir it if it does not already exist.
     if os.path.isdir(install_dir):
-        warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen.")
+        warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen")
     else:
         os.makedirs(install_dir)
     
@@ -375,13 +387,21 @@ def main():
 
     # Install a few scripts.
     info("Installing scripts")
-    for file in [ "src/dev/p4a_git", "src/dev/p4a_valgrind", 
+    
+    for file in [ 
+        "src/dev/p4a_git", 
+        "src/dev/p4a_valgrind", 
         "src/simple_tools/p4a",
+        "src/simple_tools/p4a_setup",
+        "src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
-        "src/validation/p4a_validate", "src/validation/p4a_validation",
-        "src/p4a_accel/p4a_post_processor.py" ]:
+        "src/validation/p4a_validate", 
+        "src/validation/p4a_validation",
+        "src/p4a_accel/p4a_post_processor.py"
+        ]:
         debug(os.path.join(root, file) + " -> " + install_dir_bin)
         shutil.copy(os.path.join(root, file), install_dir_bin)
+    
     for file in [ "src/dev/p4a_git_lib.bash" ]:
         debug(os.path.join(root, file) + " -> " + install_dir_etc)
         shutil.copy(os.path.join(root, file), install_dir_etc)
@@ -391,16 +411,25 @@ def main():
     accel_src_dir = os.path.join(root, "src/p4a_accel")
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
-        if ext == ".h" or ext == ".c" or ext == ".f"  or ext == ".mk":
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
             run2([ "cp", "-av", os.path.join(accel_src_dir, file), install_dir_share_accel ])
     
     # Copy python dependencies and templates.
     info("Copying python libs")
+    install_python_lib_dir = ""
+    for file in os.listdir(install_dir_lib):
+        if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
+            install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
+            if not os.path.isdir(install_python_lib_dir):
+                install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
+            break
+    if not install_python_lib_dir:
+        die("Could not determine python lib dir in " + install_dir_lib)
     dir = os.path.join(root, "src/simple_tools")
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
-            run2([ "cp", "-av", os.path.join(dir, file), install_dir_lib ])
+            run2([ "cp", "-av", os.path.join(dir, file), install_python_lib_dir ])
     
     # Install stuff still lacking from PIPS install.
     info("Installing pips scripts")
@@ -425,8 +454,15 @@ def main():
 
     # Write the environment shell scripts.
     info("Writing shell rc files")
+    fortran = ""
+    if which("gfortran"):
+        fortran = "gfortran"
+    elif which("g77"):
+        fortran = "g77"
+    else:
+        fortran = "false"
     p4a_write_rc(install_dir_etc, dict(root = root, dist = install_dir, 
-        accel = accel_src_dir, fortran = "gfortran")) # XXX: fortran
+        accel = accel_src_dir, fortran = fortran))
     
     # Write version file.
     info("Writing version file")

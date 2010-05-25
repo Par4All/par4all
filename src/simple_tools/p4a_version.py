@@ -11,7 +11,7 @@ Guess Par4All Version
 
 import sys, os, string
 from p4a_util import *
-from git import *
+from p4a_git import *
 
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
