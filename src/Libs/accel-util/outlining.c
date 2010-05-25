@@ -418,6 +418,20 @@ static list statements_referenced_entities(list statements)
     set_free(sreferenced_entities);
     return referenced_entities;
 }
+static void outliner_extract_loop_bound(statement sloop, hash_table entity_to_effective_parameter)
+{
+    loop l =statement_loop(sloop);
+    range r = loop_range(l);
+    expression upper = range_upper(r);
+    if(!expression_scalar_p(upper))
+    {
+        basic b = basic_of_expression(upper);
+        if(basic_overloaded_p(b)) { free_basic(b); b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE); }
+        entity holder = make_new_scalar_variable(get_current_module_entity(),b);
+        hash_put(entity_to_effective_parameter,holder,upper);
+        range_upper(r)=entity_to_expression(holder);
+    }
+}
 
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
@@ -451,6 +465,16 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
     else
         entity_to_effective_parameter = hash_table_make(hash_pointer,1);
+    /* pass loop bounds as parameters if required */
+    string loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
+    statement theloop = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),loop_label);
+    if(!statement_undefined_p(theloop) && statement_loop(theloop))
+    {
+        outliner_extract_loop_bound(theloop,entity_to_effective_parameter);
+        /*and recompute referenced entities*/
+        gen_free_list(referenced_entities);
+        referenced_entities = statements_referenced_entities(statements_to_outline);
+    }
 
     /* Retrieve declared entities */
     statements_localize_declarations(statements_to_outline,new_fun,new_body);
