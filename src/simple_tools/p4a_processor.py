@@ -114,6 +114,8 @@ class p4a_processor():
                                             verboseon = verbose,
                                             cppflags = cppflags)
             self.workspace.set_property(
+                # Useless to go on if something goes wrong... :-(
+                ABORT_ON_USER_ERROR = True,
                 # Compute the intraprocedural preconditions at the same
                 # time as transformers and use them to improve the
                 # accuracy of expression and statement transformers:
@@ -235,8 +237,21 @@ class p4a_processor():
         kernel_launchers.kernel_load_store()
         # To be able to inject Par4All accelerator run time initialization
         # later:
-        self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+        if "main" in self.workspace:
+            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+        else:
+            warn('''
+            There is no "main()" function in the given sources.
+            That means the P4A Accel runtime initialization can not be
+            inserted and that the compiled application may not work.
 
+            If you build a P4A executable from partial p4a output, you
+            should add a
+               #include <p4a_accel.h>
+            at the beginning of the .c file containing the main()
+            and add at the beginning of main() a line with:
+               P4A_init_accel;
+            ''')
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
@@ -290,12 +305,8 @@ class p4a_processor():
                 dir = in_dir
 
             # The following should be optional
-            # Prepend a prefix if not already here (a string method could
-            # be do this more elegantly...):
-            if name[0:len(prefix)] != prefix:
-                output_name = prefix + name
-            else:
-                output_name = name
+            # Prepend a prefix to the output files:
+            output_name = prefix + name
 
             # The final destination
             output_file = os.path.join(dir, output_name)
