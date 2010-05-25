@@ -98,6 +98,9 @@ def main():
     main_group.add_option("--root", "-r", metavar = "DIR", default = None,
         help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes: " + default_root)
     
+    main_group.add_option("--packages-dir", "--package-dir", "-P", metavar = "DIR", default = None,
+        help = "Specify the packages location. By default it is <root>/packages.")
+    
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     main_group.add_option("--dest-dir", "--dest", "-d", metavar = "DIR", default = None,
            help = "[IGNORED, BLANK] Specify the staging installation directory.")
@@ -187,6 +190,15 @@ def main():
         die("Invalid root directory: " + root)
     info("Par4All source tree root: " + root)
     
+    # "packages_dir" is where the source packages lie.
+    packages_dir = ""
+    if options.packages_dir:
+        packages_dir = options.packages_dir
+    else:
+        packages_dir = os.path.join(root, "packages")
+    if not os.path.isdir(packages_dir):
+        die("Invalid packages dir: " + packages_dir)
+    
     # "dest_dir" is the staging installation directory.
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     if options.dest_dir:
@@ -235,11 +247,11 @@ def main():
     debug("Build dir: " + build_dir)
     
     # Path for some some source packages.
-    nlpmake_src_dir = os.path.join(root, "packages/PIPS/nlpmake")
+    nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
     debug("nlpmake source package dir: " + nlpmake_src_dir)
     if not os.path.isdir(nlpmake_src_dir):
         die("Missing directory: " + nlpmake_src_dir)
-    pips_src_dir = os.path.join(root, "packages/PIPS/pips")
+    pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
     debug("PIPS source package dir: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir):
         die("Missing directory: " + pips_src_dir)
@@ -261,7 +273,7 @@ def main():
     
     if not options.skip_polylib:
         info("Preparing polylib")
-        build_package(package_dir = os.path.join(root, "packages/polylib"), build_dir = os.path.join(build_dir, "polylib"),
+        build_package(package_dir = os.path.join(packages_dir, "polylib"), build_dir = os.path.join(build_dir, "polylib"),
             configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
     
     ##############################
@@ -281,9 +293,9 @@ def main():
         info("Preparing newgen")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/newgen/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/newgen/makes") ])
-        build_package(package_dir = os.path.join(root, "packages/PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/newgen/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/newgen/makes") ])
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
             configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
     
     ##############################
@@ -299,9 +311,9 @@ def main():
         info("Preparing linear")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/linear/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/linear/makes") ])
-        build_package(package_dir = os.path.join(root, "packages/PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/linear/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/linear/makes") ])
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
             configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
     
     ##############################
@@ -324,8 +336,8 @@ def main():
         info("Preparing pips")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/pips/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/pips/makes") ])
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/pips/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/pips/makes") ])
 
         # Fix the following error:
         # /bin/sed: can't read /lib/libpolylib64.la: No such file or directory
@@ -344,7 +356,7 @@ def main():
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
         # to relauch the patch:
-        run2([ "rsync", "-av", "--delete", os.path.join(root, "packages/pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        run2([ "rsync", "-av", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
         for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
@@ -356,7 +368,7 @@ def main():
             run2([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
         
-        build_package(package_dir = os.path.join(root, "packages/PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
             configure_flags = configure_flags + [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ],
             dest_dir = dest_dir, rebuild = options.rebuild)
 
@@ -466,9 +478,15 @@ def main():
     
     # Write version file.
     info("Writing version file")
-    dump(get_version_file_path(dist_dir = install_dir), guess_file_revision(root))
-    
-    done("All done.")
+    dump(get_version_file_path(dist_dir = install_dir), guess_file_revision(root) + "~exported")
+
+    done("")
+    done("All done. Par4All is ready and has been installed in " + install_dir)
+    done("According to your shell religion, you should source")
+    done("")
+    done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
+    done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
+    done("")
 
 
 if __name__ == "__main__":

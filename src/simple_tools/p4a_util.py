@@ -265,7 +265,7 @@ def add_to_path(new_value, var = "PATH", after = False):
 	Returns the previous whole value for the variable.'''
 	values = []
 	if var in os.environ:
-		for v in os.environ[var].split(":"):
+		for v in os.environ[var].split(os.pathsep):
 			if v != new_value:
 				values += [ v ] 
 	old_values = values
@@ -273,9 +273,9 @@ def add_to_path(new_value, var = "PATH", after = False):
 		values += [ new_value ]
 	else:
 		values = [ new_value ] + values
-	os.environ[var] = ":".join(values)
+	os.environ[var] = os.pathsep.join(values)
 	debug("New " + var + " value: " + os.environ[var])
-	return ":".join(old_values)
+	return os.pathsep.join(old_values)
 
 def quote(s):
 	'''Quote the string if necessary and escape dangerous characters.

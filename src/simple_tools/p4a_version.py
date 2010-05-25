@@ -17,6 +17,7 @@ actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
 
 def get_version_file_path(dist_dir = None):
+    '''Returns the Par4All version file path, if any.'''
     if dist_dir and os.path.isdir(dist_dir):
         return os.path.join(dist_dir, "lib", "p4a_version")
     elif "P4A_DIST" in os.environ and os.path.isdir(os.environ["P4A_DIST"]):
@@ -26,6 +27,11 @@ def get_version_file_path(dist_dir = None):
         return os.path.join(script_dir, "p4a_version")
 
 def guess_file_revision(file):
+    '''Try to guess a revision/version string for a given file.
+    Try locating the Par4All version file first, then try the Git revision,
+    then svnversion, and finally fall back on the last modification date
+    of the given file.'''
+    
     revision = ""
     
     version_file = get_version_file_path()
@@ -33,7 +39,10 @@ def guess_file_revision(file):
         revision = re.sub("\s+", "", slurp(version_file))
 
     if not revision:
-        revision = git(file).current_revision(file)
+        try:
+            revision = p4a_git(file).current_revision(file)
+        except:
+            pass
 
     if not revision:
         revision = run2([ "svnversion", file ], can_fail = True)[0].strip()
@@ -45,6 +54,7 @@ def guess_file_revision(file):
             revision = "unknown"
 
     return revision
+
 
 if __name__ == "__main__":
     print(__doc__)

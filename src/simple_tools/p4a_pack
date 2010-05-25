@@ -166,9 +166,15 @@ def main():
     for i in range(len(tmp)):
         tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
     revision = "-".join(tmp)
+    
     if not revision:
         die("Invalid characters in revision")
-    git_revision = git(dir).current_revision()
+    
+    git_revision = ""
+    try:
+        git_revision = p4a_git(dir).current_revision()
+    except:
+        pass
     if git_revision:
         revision += "~" + git_revision
     
