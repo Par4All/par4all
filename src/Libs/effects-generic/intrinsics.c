@@ -572,6 +572,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MODF_OPERATOR_NAME,                     no_write_effects},
   {POW_OPERATOR_NAME,                      no_write_effects},
   {C_SQRT_OPERATOR_NAME,                   no_write_effects},
+  {C_SQRTF_OPERATOR_NAME,                  no_write_effects},
+  {C_SQRTL_OPERATOR_NAME,                  no_write_effects},
   {CEIL_OPERATOR_NAME,                     no_write_effects},
   {FABS_OPERATOR_NAME,                     no_write_effects},
   {FLOOR_OPERATOR_NAME,                    no_write_effects},
