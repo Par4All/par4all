@@ -3,6 +3,7 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
 
 '''
@@ -13,7 +14,7 @@ import string, sys, os, re, optparse
 from p4a_util import *
 from p4a_processor import *
 from p4a_builder import *
-from git import *
+from p4a_git import *
 from p4a_version import *
 
 def main():
@@ -36,6 +37,9 @@ def main():
     main_group.add_option("--verbose", "-v", action = "count",
                           default = get_verbosity(),
                           help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+
+    main_group.add_option("--nocolor", action = "store_true", default = False,
+                          help = "Disable coloring of terminal output.")
 
     parser.add_option_group(main_group)
 
@@ -168,6 +172,9 @@ def main():
     (options, args) = parser.parse_args()
 
     set_verbosity(options.verbose)
+
+    if options.nocolor:
+        p4a_term.disabled = True
 
     # Preliminary check.
     if not os.path.exists(os.environ["P4A_ROOT"]) or not os.path.exists(os.environ["P4A_ACCEL_DIR"]):

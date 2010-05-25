@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Authors:
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
 
@@ -9,23 +10,23 @@
 
 Par4All setup script.
 
-XXX: on Ubuntu/Debian you need to have these packages installed for building:
+On Ubuntu/Debian you need to have these packages installed for building:
 
-sudo aptitude install libc6 python libncurses5 libreadline5 subversion cproto build-essential bison flex libreadline5-dev libtool autoconf \
-libmcrypt-dev libmcrypt4 cproto indent gfortran fort77 tex4ht texlive-latex-extra swig git-core python-ply \
-automake python-dev libgmp3-dev libmpfr-dev
+    sudo aptitude install libc6 python libncurses5 libreadline5 subversion cproto build-essential bison flex libreadline5-dev libtool autoconf \
+libmcrypt-dev libmcrypt4 cproto indent gfortran tex4ht texlive-latex-extra swig git-core python-ply automake python-dev libgmp3-dev libmpfr-dev
 
-# For non working GUIs...: emacs23 tk8.5 sun-java6-jdk 
+(Optional packages for compiling non working GUIs: emacs23 tk8.5 sun-java6-jdk)
 
-And for running:
-sudo aptitude install libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran fort77
+For running the binaries, you only need those packages:
+
+    sudo aptitude install libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran
 
 '''
 
 import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
 from p4a_rc import *
-from git import *
+from p4a_git import *
 from p4a_version import *
 
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
@@ -34,6 +35,7 @@ script_dir = os.path.split(actual_script)[0]
 def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_flags = [], rebuild = False):
     '''Builds the given package in package_dir using autotools.'''
     if rebuild:
+        # Rebuild requested? Delete existing build directory.
         if os.path.isdir(build_dir):
             warn("Package " + package_dir + " marked for rebuild, removing existing build dir " + build_dir)
             rmtree(build_dir)
@@ -42,15 +44,24 @@ def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_f
         rebuild = True
         os.makedirs(build_dir)
     if rebuild:
+        # Call autoconf to generate the configure utility.
         autoreconf_args = [ "autoreconf", "--install" ] #"--force" ] # Dont use --force or it will no longer compile.
         if get_verbosity() >= 3:
             autoreconf_args += [ "-v" ]
         run2(autoreconf_args, working_dir = package_dir)
+        if dest_dir:
+            configure_flags += [ "DESTDIR=" + dest_dir ]
+        # Call configure to generate the Makefile's.
         run2([ os.path.join(package_dir, "configure") ] + configure_flags, working_dir = build_dir)
+    # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
-    run2([ "make" ] + make_flags, working_dir = build_dir)
-    info("Installing " + package_dir + " in " + quote(dest_dir))
-    run2([ "make", "install", "DESTDIR=" + quote(dest_dir) ] + make_flags, working_dir = build_dir)
+    run2([ "make", "all" ] + make_flags, working_dir = build_dir)
+    # Call make install to install in DESTDIR if requested.
+    if dest_dir:
+        info("Installing " + package_dir + " in " + dest_dir)
+        run2([ "make", "install", "DESTDIR=" + dest_dir ], working_dir = build_dir)
+    else:
+        run2([ "make", "install" ], working_dir = build_dir)
 
 def main():
     '''The function called when this program is executed by its own.'''
@@ -61,44 +72,62 @@ def main():
 
     main_group.add_option("--rebuild", "-R", action = "store_true", default = False,
         help = "Rebuild the packages completely.")
+    
+    main_group.add_option("--clean", "-C", action = "store_true", default = False,
+        help = "Wipe out the installation directory before proceeding. Implies -R and not skipping any package.")
 
     main_group.add_option("--skip-polylib", "--sp", action = "store_true", default = False,
-        help = "Skip building of the polylib library.")
+        help = "Skip building and installing of the polylib library.")
 
     main_group.add_option("--skip-newgen", "--sn", action = "store_true", default = False,
-        help = "Skip building of the newgen library.")
+        help = "Skip building and installing of the newgen library.")
 
     main_group.add_option("--skip-linear", "--sl", action = "store_true", default = False,
-        help = "Skip building of the linear library.")
+        help = "Skip building and installing of the linear library.")
     
     main_group.add_option("--skip-pips", "--sP", action = "store_true", default = False,
-        help = "Skip building of PIPS.")
+        help = "Skip building and installing of PIPS.")
         
     main_group.add_option("--skip", "-s", metavar = "PACKAGE", action = "append", default = [],
-        help = "Alias for being able to say -sP (besides --sP), for example.")
-    
-    main_group.add_option("--only-pips", "--oP", action = "store_true", default = False,
-        help = "Same as -sp -sn -sl.")
+        help = "Alias for being able to say -sP (besides --sP), for example. -sA is also available and means 'skip all', in which case only final installation stages will be performed.")
+
+    main_group.add_option("--only", "-o", metavar = "PACKAGE", action = "append", default = [],
+        help = "Build only the selected package. Overrides any other option.")
 
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     main_group.add_option("--root", "-r", metavar = "DIR", default = None,
         help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes: " + default_root)
     
+    main_group.add_option("--packages-dir", "--package-dir", "-P", metavar = "DIR", default = None,
+        help = "Specify the packages location. By default it is <root>/packages.")
+    
+    # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     main_group.add_option("--dest-dir", "--dest", "-d", metavar = "DIR", default = None,
-        help = "Specify the installation directory. By default, it is <root>/run.")
+           help = "[IGNORED, BLANK] Specify the staging installation directory.")
     
     main_group.add_option("--prefix", "-p", metavar = "DIR", default = None,
-        help = "Specify the prefix used to configure the packages. By default, it is /, which means that everything gets installed right under --dest-dir.")
+        help = "Specify the prefix used to configure the packages.")
     
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
+    main_group.add_option("--nocolor", action = "store_true", default = False,
+        help = "Disable coloring of terminal output.")
+
     parser.add_option_group(main_group)
 
     (options, args) = parser.parse_args()
+    
+    # Since dest_dir option is commented out, set options.dest_dir to None for now.
+    options.dest_dir = None
 
     set_verbosity(options.verbose)
     
+    if options.nocolor:
+        p4a_term.disabled = True
+
+    # Check options and exclude packages from
+    # processing as requested.
     for s in options.skip:
         if s == "p":
             options.skip_polylib = True
@@ -108,18 +137,51 @@ def main():
             options.skip_linear = True
         elif s == "P":
             options.skip_pips = True
+        elif s == "A":
+            options.skip_polylib = True
+            options.skip_newgen = True
+            options.skip_linear = True
+            options.skip_pips = True
         else:
             die("Invalid option: -s" + s)
-    if options.only_pips:
-        options.skip_polylib = True
-        options.skip_newgen = True
-        options.skip_linear = True
+    for s in options.only:
+        if s == "p":
+            options.skip_polylib = False
+            options.skip_newgen = True
+            options.skip_linear = True
+            options.skip_pips = True
+        elif s == "n":
+            options.skip_polylib = True
+            options.skip_newgen = False
+            options.skip_linear = True
+            options.skip_pips = True
+        elif s == "l":
+            options.skip_polylib = True
+            options.skip_newgen = True
+            options.skip_linear = False
+            options.skip_pips = True
+        elif s == "P":
+            options.skip_polylib = True
+            options.skip_newgen = True
+            options.skip_linear = True
+            options.skip_pips = False
+        else:
+            die("Invalid option: -o" + s)
+    if options.clean:
+        options.skip_polylib = False
+        options.skip_newgen = False
+        options.skip_linear = False
         options.skip_pips = False
+        options.rebuild = True
     
+    # Initialize main variables and set defaults.
+    # "root" is the Par4All source root directory.
     root = ""
     if options.root:
         root = options.root
-    elif "P4A_ROOT" in os.environ:
+    # If environment variable P4A_ROOT is defined and 
+    # --root was not specified, pick it up from there.
+    elif "P4A_ROOT" in os.environ and os.environ["P4A_ROOT"]:
         root = os.environ["P4A_ROOT"]
     else:
         root = default_root
@@ -128,20 +190,36 @@ def main():
         die("Invalid root directory: " + root)
     info("Par4All source tree root: " + root)
     
-    dest_dir = options.dest_dir
-    if not dest_dir:
-        dest_dir = os.path.join(root, "run")
-    dest_dir = os.path.abspath(dest_dir)
-    if not os.path.isdir(dest_dir):
-        os.makedirs(dest_dir)
-    debug("Destination dir: " + dest_dir)
+    # "packages_dir" is where the source packages lie.
+    packages_dir = ""
+    if options.packages_dir:
+        packages_dir = options.packages_dir
+    else:
+        packages_dir = os.path.join(root, "packages")
+    if not os.path.isdir(packages_dir):
+        die("Invalid packages dir: " + packages_dir)
     
-    prefix = ""
+    # "dest_dir" is the staging installation directory.
+    # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
+    if options.dest_dir:
+        die("--dest-dir is ignored for now.")
+    dest_dir = "" #options.dest_dir
+    #if not dest_dir:
+    #    dest_dir = os.path.join(root, "run") # By default.
+    if dest_dir:
+        debug("DESTDIR=" + dest_dir)
+        dest_dir = os.path.abspath(dest_dir) # Make it absolute whatsoever.
+    
+    # "prefix" is the installation prefix which is passed
+    # as option --prefix when configure is called for the
+    # various packages.
+    prefix = "/usr/local/par4all" # Default.
     if options.prefix:
         prefix = options.prefix
     if prefix:
-        prefix = os.path.abspath(prefix)
-    # safe_prefix is the same as prefix except that
+        prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
+        
+    # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
     # we prepend /.
     safe_prefix = ""
@@ -151,59 +229,124 @@ def main():
         safe_prefix = prefix
     debug("Prefix: " + quote(prefix) + " (" + safe_prefix + ")")
     
+    # "install_dir" is the most important variable here.
+    # It is dest_dir + safe_prefix.
     install_dir = os.path.normpath(dest_dir + safe_prefix)
-    debug("Install dir: " + install_dir)
+    info("Install dir: " + install_dir)
+    # Check that we are not installing in a system or an invalid directory.
+    if not install_dir or is_system_dir(install_dir):
+        die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
+    # Create install_dir it if it does not already exist.
+    if os.path.isdir(install_dir):
+        warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen")
+    else:
+        os.makedirs(install_dir)
     
+    # Build directory: where the Makefile are generated, where the make commands are issued, etc.
     build_dir = os.path.join(root, "build")
     debug("Build dir: " + build_dir)
     
-    nlpmake_src_dir = os.path.join(root, "packages/PIPS/nlpmake")
-    debug("nlpmake dir: " + nlpmake_src_dir)
+    # Path for some some source packages.
+    nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
+    debug("nlpmake source package dir: " + nlpmake_src_dir)
+    if not os.path.isdir(nlpmake_src_dir):
+        die("Missing directory: " + nlpmake_src_dir)
+    pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
+    debug("PIPS source package dir: " + pips_src_dir)
+    if not os.path.isdir(pips_src_dir):
+        die("Missing directory: " + pips_src_dir)
     
-    pips_src_dir = os.path.join(root, "packages/PIPS/pips")
-    debug("pips dir: " + pips_src_dir)
+    # If we are requested to clean first, remove everything
+    # under install_dir.
+    if options.clean and os.path.isdir(install_dir):
+        warn("Removing everything in " + install_dir + " (--clean)")
+        rmtree(install_dir, remove_top = False)
     
-    old_path = add_to_path(os.path.join(install_dir, "bin"))
-    
-    configure_common_flags = [ "--disable-static", "--prefix=" + quote(prefix), 
-        'CFLAGS="-I' + os.path.join(install_dir, "include") + '"', 
-        'LDFLAGS="-L' + os.path.join(install_dir, "lib") + '"' ]
-    #-Wl,-z,defs 
-    #os.environ["PIPS_COMPONENTS"] = "linear newgen pips"
+    # Initial configure flags.
+    configure_flags = [ 
+        '--disable-static', 
+        '--prefix=' + prefix, 
+        #'--libdir=' + os.path.join(install_dir, "lib"), 
+        ]
 
+    ############################## polylib
+    
     if not options.skip_polylib:
         info("Preparing polylib")
-        build_package(package_dir = os.path.join(root, "packages/polylib"), build_dir = os.path.join(build_dir, "polylib"),
-            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+        build_package(package_dir = os.path.join(packages_dir, "polylib"), build_dir = os.path.join(build_dir, "polylib"),
+            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    
+    ##############################
+    
+    # This was used for testing with DESTDIR...
+    configure_flags += [ 
+        #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
+        #'POLYLIB64_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lpolylib64"',
+        #'CFLAGS="-g -O2 -I' + os.path.join(install_dir, "include") + '"',
+        #'CPPFLAGS="' + '-I' + os.path.join(install_dir, "include") + '"',
+        #'LDFLAGS="-Wl,-z,defs -L' + os.path.join(install_dir, "lib") + '"'
+        ]
+    
+    ############################## newgen
     
     if not options.skip_newgen:
         info("Preparing newgen")
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/newgen/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/newgen/makes") ])
-        build_package(package_dir = os.path.join(root, "packages/PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
-            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
-
-    configure_common_flags += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
-
+        # Make a symlink to the old make infrastructure (and remove any existing one
+        # or a symlink recursion will appear).
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/newgen/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/newgen/makes") ])
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
+            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    
+    ##############################
+    
+    # This was used for testing with DESTDIR...
+    #configure_flags += [ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
+    #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ]
+    configure_flags += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
+    
+    ############################## linear
+    
     if not options.skip_linear:
         info("Preparing linear")
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/linear/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/linear/makes") ])
-        build_package(package_dir = os.path.join(root, "packages/PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
-            configure_flags = configure_common_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+        # Make a symlink to the old make infrastructure (and remove any existing one
+        # or a symlink recursion will appear).
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/linear/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/linear/makes") ])
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
+            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+    
+    ##############################
+    
+    # This was used for testing with DESTDIR...
+    #configure_flags += [ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
+    #    'LINEARLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -llinearlibs"' ]
+    #~ configure_flags += [ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
+        #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ]
+    
+    # Update the PATH. Needed because PIPS relies on utilities built by newgen.
+    add_to_path(os.path.join(install_dir, "bin"))
+    
+    # This was used for testing with DESTDIR...
+    #add_to_path(os.path.join(install_dir, "lib"), var = "LD_LIBRARY_PATH")
+    
+    ############################## pips
     
     if not options.skip_pips:
         info("Preparing pips")
-        run2([ "rm", "-fv", os.path.join(root, "packages/PIPS/pips/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(root, "packages/PIPS/pips/makes") ])
+        # Make a symlink to the old make infrastructure (and remove any existing one
+        # or a symlink recursion will appear).
+        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/pips/makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/pips/makes") ])
 
         # Fix the following error:
         # /bin/sed: can't read /lib/libpolylib64.la: No such file or directory
         # libtool: link: `/lib/libpolylib64.la' is not a valid libtool archive
         # make[5]: *** [libpipslibs.la] Error 1
         # make[5]: Leaving directory `/home/gpean/p4a-foo/build/pips/src/Libs'
-        #run2([ "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
+        #~ run2([ "sudo", "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
 
+        ### FIX for fortran
         fortran = os.path.join(build_dir, "pips/src/Passes/fortran95")
         if not os.path.isdir(fortran):
             os.makedirs(fortran)
@@ -213,7 +356,7 @@ def main():
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
         # to relauch the patch:
-        run2([ "rsync", "-av", "--delete", os.path.join(root, "packages/pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        run2([ "rsync", "-av", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
         for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
@@ -223,13 +366,17 @@ def main():
             os.makedirs(fortran2)
         for file in [ ".dir", ".md5-check-core", ".md5-check-fortran", ".untar-core", ".untar-fortran", ".untar" ]:
             run2([ "touch", os.path.join(fortran2, file) ])
+        ### End of FIX for fortran
         
-        build_package(package_dir = os.path.join(root, "packages/PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
-            configure_flags = configure_common_flags + [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ],
+        build_package(package_dir = os.path.join(packages_dir, "PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
+            configure_flags = configure_flags + [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ],
             dest_dir = dest_dir, rebuild = options.rebuild)
 
-    os.environ["PATH"] = old_path
+    ##############################
     
+    # Proceed with local scripts and libraries installation.
+    
+    # Create directory tree.
     info("Creating dirs")
     install_dir_bin = os.path.join(install_dir, "bin")
     if not os.path.isdir(install_dir_bin):
@@ -250,62 +397,97 @@ def main():
     if not os.path.isdir(install_dir_makes):
         os.makedirs(install_dir_makes)
 
+    # Install a few scripts.
     info("Installing scripts")
     
-    for file in [ "src/dev/p4a_git", "src/dev/p4a_valgrind", 
+    for file in [ 
+        "src/dev/p4a_git", 
+        "src/dev/p4a_valgrind", 
         "src/simple_tools/p4a",
+        "src/simple_tools/p4a_setup",
+        "src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
-        "src/validation/p4a_validate", "src/validation/p4a_validation",
-        "src/p4a_accel/p4a_post_processor.py" ]:
+        "src/validation/p4a_validate", 
+        "src/validation/p4a_validation",
+        "src/p4a_accel/p4a_post_processor.py"
+        ]:
         debug(os.path.join(root, file) + " -> " + install_dir_bin)
         shutil.copy(os.path.join(root, file), install_dir_bin)
     
     for file in [ "src/dev/p4a_git_lib.bash" ]:
         debug(os.path.join(root, file) + " -> " + install_dir_etc)
         shutil.copy(os.path.join(root, file), install_dir_etc)
-        
+    
+    # Install accelerator source.
     info("Installing accel files")
     accel_src_dir = os.path.join(root, "src/p4a_accel")
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
-        if ext == ".h" or ext == ".c" or ext == ".f"  or ext == ".mk":
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
             run2([ "cp", "-av", os.path.join(accel_src_dir, file), install_dir_share_accel ])
     
+    # Copy python dependencies and templates.
     info("Copying python libs")
+    install_python_lib_dir = ""
+    for file in os.listdir(install_dir_lib):
+        if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
+            install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
+            if not os.path.isdir(install_python_lib_dir):
+                install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
+            break
+    if not install_python_lib_dir:
+        die("Could not determine python lib dir in " + install_dir_lib)
     dir = os.path.join(root, "src/simple_tools")
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
-            run2([ "cp", "-av", os.path.join(dir, file), install_dir_lib ])
+            run2([ "cp", "-av", os.path.join(dir, file), install_python_lib_dir ])
     
+    # Install stuff still lacking from PIPS install.
     info("Installing pips scripts")
-    # Stuff still lacking from PIPS install:
     dir = os.path.join(pips_src_dir, "src/Scripts/validation")
     for file in os.listdir(dir):
         if file.startswith("pips"):
             run2([ "cp", "-av", os.path.join(dir, file), install_dir_bin ])
     run2([ "cp", "-av", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
 
+    # Fix validation.
     info("Fixing validation")
     dir = os.path.join(nlpmake_src_dir, "makes")
     for file in os.listdir(dir):
         if file == "arch.sh" or file == "version.sh":
             run2([ "cp", "-av", os.path.join(dir, file), install_dir_makes ])
 
+    # Install various files.
     info("Installing release notes")
     run2([ "cp", "-av", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
-    
     info("Installing examples")
     run2([ "cp", "-av", os.path.join(root, "examples"), install_dir ])
 
+    # Write the environment shell scripts.
     info("Writing shell rc files")
-    # XXX: fortran
+    fortran = ""
+    if which("gfortran"):
+        fortran = "gfortran"
+    elif which("g77"):
+        fortran = "g77"
+    else:
+        fortran = "false"
     p4a_write_rc(install_dir_etc, dict(root = root, dist = install_dir, 
-        accel = accel_src_dir, fortran = "gfortran"))        
+        accel = accel_src_dir, fortran = fortran))
     
+    # Write version file.
     info("Writing version file")
-    dump(get_version_file_path(dist_dir = install_dir), guess_file_revision(root))
-    
+    dump(get_version_file_path(dist_dir = install_dir), guess_file_revision(root) + "~exported")
+
+    done("")
+    done("All done. Par4All is ready and has been installed in " + install_dir)
+    done("According to your shell religion, you should source")
+    done("")
+    done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
+    done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
+    done("")
+
 
 if __name__ == "__main__":
     main()

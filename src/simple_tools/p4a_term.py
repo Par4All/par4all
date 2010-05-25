@@ -6,9 +6,11 @@ Set ANSI Terminal Color and Attributes.
 Originally found on http://code.activestate.com/recipes/574451.
 '''
 
-disabled = 0
-esc = '%s['%chr(27)
-reset = '%s0m'%esc
+# Set to True to disable module (coloring etc.).
+disabled = False
+
+esc = '%s[' % chr(27)
+reset = '%s0m' % esc
 format = '1;%dm'
 fgoffset, bgoffset = 30, 40
 for k, v in dict(

@@ -35,7 +35,7 @@ append_PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig
 unset append_PKG_CONFIG_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-append_PYTHONPATH () { if ! echo $$PYTHONPATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PKG_CONFIG_PATH=$$1:$$PYTHONPATH; fi }
-append_PYTHONPATH $$P4A_DIST/lib
-append_PYTHONPATH $$(echo $$P4A_DIST/lib/python*/site-packages/pips)
+append_PYTHONPATH () { if ! echo $$PYTHONPATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PYTHONPATH=$$1:$$PYTHONPATH; fi }
+append_PYTHONPATH `ls -d $$P4A_DIST/lib/python*/site-packages/pips 2>/dev/null | tail -1`
+append_PYTHONPATH `ls -d $$P4A_DIST/lib/python*/dist-packages/pips 2>/dev/null | tail -1`
 unset append_PYTHONPATH
