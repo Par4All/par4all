@@ -188,6 +188,26 @@ def change_file_ext(file, new_ext):
     (base, ext) = os.path.splitext(file)
     return base + new_ext
 
+
+def get_file_extension(file_name):
+    "Return the extension of the given file"
+
+    (root, ext) = os.path.splitext(file_name)
+    return ext
+
+
+def fortran_file_p(file_name):
+    "Test if a file has a Fortran name"
+
+    return get_file_extension(file_name) == '.f'
+
+
+def c_file_p(file_name):
+    "Test if a file has a C name"
+
+    return get_file_extension(file_name) == '.c'
+
+
 def get_machine_arch():
     '''Returns current machine architecture'''
     (sysname, nodename, release, version, machine) = os.uname()
@@ -199,7 +219,7 @@ def slurp(file):
     content = f.read()
     f.close()
     return content
-    
+
 def dump(file, content):
     '''Dump contents to file.'''
     debug("Writing " + str(len(content)) + " bytes to " + file)

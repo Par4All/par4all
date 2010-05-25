@@ -3,6 +3,7 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - Ronan Keryell
 #
 
 '''
@@ -14,39 +15,69 @@ from p4a_util import *
 import pyps
 
 class p4a_processor():
+    """Process program files with PIPS and other tools"""
 
+    # If the main language is Fortran, set to True:
     fortran = None
+
     workspace = None
+
     main_filter = None
+
+    # The project name:
+    project_name = None
+
+    # The full name of the directory that store the workspace database:
+    database_dir = None
+
+    # Set to True to try to do some #include tracking and recovering
+    recover_includes = None
+
     files = []
     accel_files = []
 
-    def __init__(self, workspace = None, project_name = "", cppflags = "", verbose = False,
-        files = [], filter_include = None, filter_exclude = None, accel = False):
+    def __init__(self, workspace = None, project_name = "", cppflags = "",
+                 verbose = False, files = [], filter_include = None,
+                 filter_exclude = None, accel = False, recover_includes = True):
+
+        self.recover_includes = recover_includes
+        self.accel = accel
 
         if workspace:
             self.workspace = workspace
         else:
-            # This is because pyps.workspace.__init__ will test for empty strings
+            # This is because pyps.workspace.__init__ will test for empty
+            # strings
             if cppflags is None:
                 cppflags = ""
+
+            if self.recover_includes:
+                # Use a special preprocessor to track #include by a
+                # man-in-the-middle attack :-) :
+                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
 
             if not project_name:
                 # Try some names until there is no database with this name:
                 while True:
-                    project_name = gen_name()
-                    database_dir = os.path.join(os.getcwd(),
-                                                project_name + ".database")
-                    if not os.path.exists(database_dir):
+                    self.project_name = gen_name()
+                    self.database_dir = os.path.join(os.getcwd(),
+                                                self.project_name + ".database")
+                    if not os.path.exists(self.database_dir):
                         break
+            else:
+                self.project_name = project_name
 
             for file in files:
                 if self.fortran is None:
                     (base, ext) = os.path.splitext(file)
+                    # Track the language for an eventual later compilation
+                    # by a back-end target compiler. The first file type
+                    # select the type for all the workspace:
                     if ext == ".f":
                         self.fortran = True
                     else:
                         self.fortran = False
+
                 if not os.path.exists(file):
                     raise p4a_error("File does not exist: " + file)
 
@@ -67,7 +98,7 @@ class p4a_processor():
                 accel_stubs = os.path.join(os.environ["P4A_ACCEL_DIR"],
                                            accel_stubs_name)
                 (base, ext) = os.path.splitext(os.path.basename(accel_stubs))
-                output_accel_stubs = os.path.join(os.getcwd(), base + "_" + project_name + ext)
+                output_accel_stubs = os.path.join(os.getcwd(), base + "_" + self.project_name + ext)
                 debug("Copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
                 shutil.copyfile(accel_stubs, output_accel_stubs)
                 self.files += [ output_accel_stubs ]
@@ -78,47 +109,36 @@ class p4a_processor():
 
             # Create the PyPS workspace.
             self.workspace = pyps.workspace(self.files,
-                                            name = project_name,
+                                            name = self.project_name,
                                             activates = [],
                                             verboseon = verbose,
                                             cppflags = cppflags)
-            self.workspace.w.set_property(
-                    # Compute the intraprocedural preconditions at the
-                    # same time as transformers and use them to improve
-                    # the accuracy of expression and statement
-                    # transformers:
-                    SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
-                    # Use the more precise fix point operator to cope with
-                    # while loops:
-                    SEMANTICS_FIX_POINT_OPERATOR = "derivative",
-                    # Try to restructure the code for more precision:
-                    UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
-                    UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
-                    # Simplify for loops into Fortran do-loops internally
-                    # for better precision of analysis:
-                    FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-                    # Regions are a must! :-) Ask for most precise
-                    # regions:
-                    MUST_REGIONS = True,
-                    # Warning: assume that there is no aliasing between IO
-                    # streams ('FILE *' variables):
-                    ALIASING_ACROSS_IO_STREAMS = False,
-                    # Warning: this is a work in progress. Assume no weird
-                    # aliasing
-                    CONSTANT_PATH_EFFECTS = False
-                    )
-
-            # Useful? 
-            #self.workspace.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER = True)
-
-            # Prevents automatic addition of OpenMP directives when unsplitting.
-            # We will add them manually using ompify if requested.
-            self.workspace.set_property(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
-
-        # Useless to add redundant information:
-        #for module in self.workspace:
-           #module.prepend_comment(PREPEND_COMMENT = "/*\n * module " + module.name + "\n */\n")
-                #+ " read on " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n")
+            self.workspace.set_property(
+                # Compute the intraprocedural preconditions at the same
+                # time as transformers and use them to improve the
+                # accuracy of expression and statement transformers:
+                SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+                # Use the more precise fix point operator to cope with
+                # while loops:
+                SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+                # Try to restructure the code for more precision:
+                UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
+                UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+                # Simplify for loops into Fortran do-loops internally for
+                # better precision of analysis:
+                FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+                # Regions are a must! :-) Ask for most precise regions:
+                MUST_REGIONS = True,
+                # Warning: assume that there is no aliasing between IO
+                # streams ('FILE *' variables):
+                ALIASING_ACROSS_IO_STREAMS = False,
+                # Warning: this is a work in progress. Assume no weird
+                # aliasing
+                CONSTANT_PATH_EFFECTS = False,
+                # Prevents automatic addition of OpenMP directives when
+                # unslitting.  We will add them manually using ompify if
+                # requested.
+                PRETTYPRINT_SEQUENTIAL_STYLE = "do")
 
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
@@ -171,8 +191,18 @@ class p4a_processor():
     def gpuify(self, filter_include = None, filter_exclude = None):
         all_modules = self.filter_modules(filter_include, filter_exclude)
 
-        # Normalize all loops:
-        all_modules.loop_normalize(
+        # First, only generate the launchers to work on them later. They are
+        # generated by outlining parallel loops
+        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
+                            GPU_USE_KERNEL = False)
+
+        # Isolate kernels by using the fact that all the generated kernels have
+        # their name beginning with "p4a_":
+        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+        kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+
+        # Normalize all loops in kernels to suit hardware iteration spaces:
+        kernel_launchers.loop_normalize(
             # Loop normalize for the C language and GPU friendly
             LOOP_NORMALIZE_ONE_INCREMENT = True,
             # Arrays start at 0 in C, so the iteration loops:
@@ -180,141 +210,114 @@ class p4a_processor():
             # It is legal in the following by construction (...Hmmm to verify)
             LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True)
 
-        all_modules.parallelize()
-
-        # First, only generate the launchers to work on them later. They are
-        # generated by outlining parallel loops
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
-                            GPU_USE_KERNEL = False)
-
-        # Isolate kernels by using the fact that all the generated kernels
-        # have their name beginning with "p4a_":
-        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
-        kernel_launchers = w.filter(lambda m: kernel_launcher_filter_re.match(m.name))
-
-        # Add iteration space decoration and insert iteration clamping
-        # into the launchers:
-        kernel_launchers.gpu_loop_nest_annotate()
-
-        # Some verification output:
-        #kernel_launchers.display()
-
         # Unfortunately the information about parallelization and
         # privatization is lost by the current outliner, so rebuild
-        # it... :-(
-        kernel_launchers.privatize_module()
-        kernel_launchers.coarse_grain_parallelization()
+        # it... :-( But anyway, since we've normalized the code, we
+        # changed it so it is to be parallelized again...
+        #kernel_launchers.privatize_module()
+        kernel_launchers.capply("privatize_module")
+        #kernel_launchers.coarse_grain_parallelization()
+        kernel_launchers.capply("coarse_grain_parallelization")
+        #kernel_launchers.localize_declaration()
+        # Does not work:
+        #kernel_launchers.omp_merge_pragma()
+
+
+        # Add iteration space decoration and insert iteration clamping
+        # into the launchers onto the outer parallel loop nests:
+        kernel_launchers.gpu_loop_nest_annotate()
 
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False)
 
-        # Some verification output:
-        #w.all_functions.display()
-        #w.compilation_units.display()
-
         # Add communication around all the call site of the kernels:
         kernel_launchers.kernel_load_store()
-        #kernel_launchers.display()
-
-        # To be able to inject Par4All accelerator run time initializationlater:
+        # To be able to inject Par4All accelerator run time initialization
+        # later:
         self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
 
     def ompify(self, filter_include = None, filter_exclude = None):
+        """Add OpenMP #pragma from internal representation"""
+
         self.filter_modules(filter_include, filter_exclude).ompify_code()
 
 
-    def accel_post(self, file, dest_file = None):
+    def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''
 
         info("Post-processing " + file)
 
-        content = slurp(file)
+        args = [ 'p4a_post_processor.py' ]
 
-        ###
-        # To catch stuff like
-        # void p4a_kernel_launcher_1(void *accel_address, void *host_address, size_t n);
-        kernel_launcher_declaration_re = re.compile("void (p4a_kernel_launcher_\\d+)[^;]+")
-        # A mappping kernel_launcher_name -> declaration
-        kernel_launcher_declarations = {}
-        result = kernel_launcher_declaration_re.search(content)
-        if result:
-            kernel_launcher_declarations[result.group(1)] = result.group(0)
-        debug("Kernel launcher declarations: " + repr(kernel_launcher_declarations))
-        ###
+        if dest_dir:
+            args += [ '--dest-dir', dest_dir ]
 
-        global_sub_count = 0
+        args.append(file)
 
-        (content, sub_count) = re.subn("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
-            "\\1#include <p4a_accel.h>\n#include <stdio.h>\n#include <math.h>\n", content)
-        debug("Clean-up headers and inject standard header injection: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn("// Prepend here P4A_init_accel\n",
-            "P4A_init_accel;\n", content)
-        debug("Compatibility: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn(", (p4a_kernel[^0-9]+[0-9]+\\()",
-                ";\n   void \\1", content)
-        debug("Put only one function per line for further replacement: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn("(void p4a_kernel_wrapper_[0-9]+[^\n]+)",
-                "P4A_accel_kernel_wrapper \\1", content)
-        debug("Add accelerator attributes on accelerated parts: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn("(void p4a_kernel_[0-9]+[^\n]+)",
-                "P4A_accel_kernel \\1", content)
-        debug("Add accelerator attributes on accelerated parts: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);",
-                "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);", content)
-        debug("Generate accelerated kernel calls: " + str(sub_count))
-        global_sub_count += sub_count
-
-        (content, sub_count) = re.subn("( *)// To be assigned to a call to (P4A_vp_[0-9]+): ([^\n]+)",
-                 "\\1// Index has been replaced by \\2:\n\\1\\3 = \\2;", content)
-        debug("Get the virtual processor coordinates: " + str(sub_count))
-        global_sub_count += sub_count
-
-        info(str(global_sub_count) + " substitutions made")
-
-        if not dest_file:
-            dest_file = file
-        debug("Writing to " + dest_file)
-
-        dump(dest_file, content)
-
-        return global_sub_count
+        subprocess.call(args)
 
 
     def save(self, in_dir = None, prefix = "p4a_"):
+        """Final post-processing and save the files of the workspace"""
+
         output_files = []
-        self.workspace.all.unsplit()
+
+        # Regenerate the sources file in the workspace. Do not generate
+        # OpenMP-style output since we have already added OpenMP
+        # decorations:
+        self.workspace.all.unsplit(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+
+        # For all the registered files from the workspace:
         for file in self.files:
             if file in self.accel_files:
                 os.remove(file)
                 continue
             (dir, name) = os.path.split(file)
+            # Where the file does dwell in the .database workspace:
             pips_file = os.path.join(self.workspace.directory(), "Src", name)
+
+            # Recover the includes in the given file only if the flag has
+            # been previously set and this is a C program. Do not do it
+            # twice in accel mode since it is already done in
+            # p4a_post_processor.py:
+            if self.recover_includes and c_file_p(file) and not self.accel:
+                subprocess.call([ 'p4a_recover_includes',
+                                  '--simple', pips_file ])
+
+            # Update the destination directory if one was given:
             if in_dir:
                 dir = in_dir
+
+            # The following should be optional
+            # Prepend a prefix if not already here (a string method could
+            # be do this more elegantly...):
             if name[0:len(prefix)] != prefix:
-                name = prefix + name
-            output_file = os.path.join(dir, name)
-            copy = True
-            if len(self.accel_files):
-                sub_count = self.accel_post(pips_file, output_file)
-                if sub_count and not self.fortran:
-                    cu_file = change_file_ext(output_file, ".cu")
-                    shutil.move(output_file, cu_file)
-                    output_file = cu_file
-                    copy = False
-            if copy:
-                shutil.copyfile(pips_file, output_file)
+                output_name = prefix + name
+            else:
+                output_name = name
+
+            # The final destination
+            output_file = os.path.join(dir, output_name)
+
+            if self.accel and c_file_p(file):
+                # We generate code for P4A Accel, so first post process
+                # the output:
+                self.accel_post(pips_file,
+                                os.path.join(self.workspace.directory(), "P4A"))
+                # Where the P4A output file does dwell in the .database
+                # workspace:
+                p4a_file = os.path.join(self.workspace.directory(), "P4A", name)
+                # Update the normal location then:
+                pips_file = p4a_file
+                # To have the nVidia compiler to be happy, we need to have
+                # a .cu version of the .c file
+                cu_file = change_file_ext(output_file, ".cu")
+                shutil.copyfile(pips_file, cu_file)
+
+            # Copy the PIPS production to its destination:
+            shutil.copyfile(pips_file, output_file)
+
             output_files += [ output_file ]
         return output_files
 
