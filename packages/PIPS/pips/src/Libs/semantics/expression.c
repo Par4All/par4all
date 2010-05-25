@@ -2821,13 +2821,14 @@ transformer any_expressions_to_transformer(entity v,
   free_transformer(cpre);
   return tf;
 }
-/* compute integer bounds @p pmax, @p pmin of expression @p exp under precondtiotions @p tr
+
+/* compute integer bounds @p pmax, @p pmin of expression @p exp under precondtions @p tr
  * require value mappings set !
  */
 bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* pmin, intptr_t* pmax)
 {
     bool success;
-    /* create a temproraty value */
+    /* create a temporary value */
     basic bas = basic_of_expression(exp);
     entity var = make_local_temporary_value_entity_with_basic(bas);
     free_basic(bas);
