@@ -74,8 +74,8 @@ CPPFLAGS+=-I$(PYTHON_INCLUDE)
 	$(COMPILE) $< -o $@
 
 clean:
-	rm -f *.o *.tmp *.H the_$(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h \
-	  pypips.i
+	rm -f *.o *.tmp *.H the_$(PYTHON_MODULE)_wrap.c $(PYTHON_MODULE)_wrap.c \
+	  *.pyc $(PYTHON_MODULE).h pypips.i
 	rm -rf build 
 
 distclean: clean
