@@ -1,0 +1,17 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "keep_loop_index"
+delete $WS
+create $WS $WS.c
+
+echo before
+display PRINTED_FILE[%ALLFUNC]
+
+echo after
+setproperty OUTLINE_MODULE_NAME "outlined"
+setproperty OUTLINE_LABEL "there"
+setproperty OUTLINE_LOOP_BOUND_AS_PARAMETER "there"
+apply OUTLINE[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS
