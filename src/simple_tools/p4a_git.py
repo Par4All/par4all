@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Authors:
-# - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - GrÃ©goire PÃ©an <gregoire.pean@hpc-project.com>
 #
 
 '''
@@ -15,7 +15,8 @@ from p4a_util import *
 actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
 script_dir = os.path.split(actual_script)[0]
 
-class git():
+class p4a_git():
+	'''Git Repositories Manipulation Class'''
 	
 	_git_ext = None
 	_git_dir = None
@@ -56,7 +57,7 @@ class git():
 		if self._git_dir:
 			self._dir = os.path.normpath(re.sub(re.escape(self._git_ext) + "$", "", self._git_dir))
 		else:
-			raise p4a_error("git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
+			raise p4a_error("Git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
 		#debug("git dir for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
 	
 	def fix_input_file_path(self, path):
@@ -65,7 +66,7 @@ class git():
 			return ""
 		path = os.path.abspath(os.path.realpath(os.path.expanduser(path)))
 		if path[0:len(self._dir)] != self._dir:
-			raise p4a_error("file is outside repository in " + self._dir + ": " + path)
+			raise p4a_error("File is outside repository in " + self._dir + ": " + path)
 		path = path[len(self._dir) + 1:]
 		return path
 	

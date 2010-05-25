@@ -12,7 +12,7 @@ Par4All Builder Class
 import sys, os, re, shutil
 from p4a_util import *
 
-class p4a_build():
+class p4a_builder():
     '''Par4All builder class. For now everything is in the ctor. But the class should have methods some day.'''
     
     def __init__(self, files, output_file, 
@@ -56,8 +56,10 @@ class p4a_build():
         if openmp:
             if icc:
                 prepend_cflags += [ "-openmp" ]
+                ldflags += [ "-openmp" ]
             else:
                 prepend_cflags += [ "-fopenmp" ]
+                ldflags += [ "-fopenmp" ]
         cflags = prepend_cflags + cflags
         #ldflags = [ "-pie" ] + ldflags
         

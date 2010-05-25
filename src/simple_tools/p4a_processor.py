@@ -84,12 +84,6 @@ class p4a_processor():
             self.files = files
 
             if accel:
-                # Why all that stuff ? Why not using them directly?
-                # Because initially stubs.c/f were not removed because there was no post-processing.
-                # And since the default behaviour of save() is to copy processed files to the original
-                # source directory (with a prefix), this would have put the processed stubs in src/p4a_accel
-                # for every project... So we copy the stubs to the current directory with a modified name
-                # which includes the project name to prevent filename collision.
                 accel_stubs_name = None
                 if self.fortran:
                     accel_stubs_name = "p4a_stubs.f"
@@ -97,12 +91,16 @@ class p4a_processor():
                     accel_stubs_name = "p4a_stubs.c"
                 accel_stubs = os.path.join(os.environ["P4A_ACCEL_DIR"],
                                            accel_stubs_name)
-                (base, ext) = os.path.splitext(os.path.basename(accel_stubs))
-                output_accel_stubs = os.path.join(os.getcwd(), base + "_" + self.project_name + ext)
-                debug("Copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
-                shutil.copyfile(accel_stubs, output_accel_stubs)
-                self.files += [ output_accel_stubs ]
-                self.accel_files += [ output_accel_stubs ]
+                self.files += [ accel_stubs ]
+                self.accel_files += [ accel_stubs ]
+                # Copy the stubs to the current directory with a modified name
+                # which includes the project name to prevent filename collision?
+                #(base, ext) = os.path.splitext(os.path.basename(accel_stubs))
+                #output_accel_stubs = os.path.join(os.getcwd(), base + "_" + self.project_name + ext)
+                #debug("Copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
+                #shutil.copyfile(accel_stubs, output_accel_stubs)
+                #self.files += [ output_accel_stubs ]
+                #self.accel_files += [ output_accel_stubs ]
 
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
@@ -114,6 +112,8 @@ class p4a_processor():
                                             verboseon = verbose,
                                             cppflags = cppflags)
             self.workspace.set_property(
+                # Useless to go on if something goes wrong... :-(
+                ABORT_ON_USER_ERROR = True,
                 # Compute the intraprocedural preconditions at the same
                 # time as transformers and use them to improve the
                 # accuracy of expression and statement transformers:
@@ -235,8 +235,21 @@ class p4a_processor():
         kernel_launchers.kernel_load_store()
         # To be able to inject Par4All accelerator run time initialization
         # later:
-        self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+        if "main" in self.workspace:
+            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+        else:
+            warn('''
+            There is no "main()" function in the given sources.
+            That means the P4A Accel runtime initialization can not be
+            inserted and that the compiled application may not work.
 
+            If you build a P4A executable from partial p4a output, you
+            should add a
+               #include <p4a_accel.h>
+            at the beginning of the .c file containing the main()
+            and add at the beginning of main() a line with:
+               P4A_init_accel;
+            ''')
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
@@ -258,7 +271,7 @@ class p4a_processor():
         subprocess.call(args)
 
 
-    def save(self, in_dir = None, prefix = "p4a_"):
+    def save(self, in_dir = None, prefix = "", suffix = ".p4a"):
         """Final post-processing and save the files of the workspace"""
 
         output_files = []
@@ -289,14 +302,13 @@ class p4a_processor():
             if in_dir:
                 dir = in_dir
 
-            # The following should be optional
-            # Prepend a prefix if not already here (a string method could
-            # be do this more elegantly...):
-            if name[0:len(prefix)] != prefix:
-                output_name = prefix + name
-            else:
-                output_name = name
-
+            if prefix is None:
+                prefix = ""
+            output_name = prefix + name
+            
+            if suffix:
+                output_name = file_add_suffix(output_name, suffix)
+            
             # The final destination
             output_file = os.path.join(dir, output_name)
 
