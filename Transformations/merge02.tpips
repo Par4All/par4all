@@ -25,7 +25,7 @@ setproperty NESTED_PARALLELISM_THRESHOLD 2
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 apply INTERNALIZE_PARALLEL_CODE(main)
-apply MANAGE_NESTED_PARALLELISM(main)
+apply LIMIT_NESTED_PARALLELISM(main)
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
