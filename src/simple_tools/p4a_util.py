@@ -39,6 +39,12 @@ def info(msg):
     if logger:
         logger.info(msg)
 
+def done(msg):
+    if verbosity >= 0:
+        sys.stderr.write(sys.argv[0] + ": " + term.escape("green") + str(msg).rstrip("\n") + term.escape() + "\n");
+    if logger:
+        logger.info(msg)
+
 def warn(msg):
     if verbosity >= 0:
         sys.stderr.write(sys.argv[0] + ": " + term.escape("yellow") + str(msg).rstrip("\n") + term.escape() + "\n");
@@ -75,26 +81,30 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None):
             old_locale = os.environ["LC_ALL"]
         os.environ["LC_ALL"] = force_locale
     old_cwd = ""
+    w = ""
     if working_dir:
         old_cwd = os.getcwd()
         os.chdir(working_dir)
+        w = working_dir
+    else:
+        w = os.getcwd()
     ret = os.system(" ".join(cmd_list))
     if old_cwd:
         os.chdir(old_cwd)
     if old_locale:
         os.environ["LC_ALL"] = old_locale
     if ret != 0 and not can_fail:
-        raise p4a_error("Command failed with exit code " + str(ret))
+        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return ret
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False):
     '''Runs a command and dies if return code is not zero.
     Returns the final stdout and stderr output as a list.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
+    w = os.getcwd()
+    if working_dir:
+        w = working_dir
     if verbosity >= 1:
-        w = os.getcwd()
-        if working_dir:
-            w = working_dir
         sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + term.escape("magenta") + " ".join(cmd_list) + term.escape() + "\n");
     old_locale = ""
     if force_locale is not None:
@@ -113,7 +123,7 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
             process = subprocess.Popen(cmd_list, shell = False, 
                 stdout = redir, stderr = redir, cwd = working_dir, env = os.environ)
     except:
-        raise p4a_error("Command '"+ " ".join(cmd_list)  +"' failed: " + str(sys.exc_info()))
+        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()))
     out = ""
     err = ""
     while True:
@@ -129,22 +139,35 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     if ret != 0 and not can_fail:
         if err:
             error(err)
-        raise p4a_error("Command '"+ " ".join(cmd_list)  +"' failed with exit code " + str(ret))
+        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 # Not portable!
 def which(cmd):
     return run2([ "which", cmd ], can_fail = True, capture = True)[0]
 
-def gen_name(length = 4, prefix = "P4A", chars = string.letters + string.digits):
+def gen_name(length = 4, prefix = "P4A", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password'''
     return prefix + "".join(random.choice(chars) for x in range(length))
 
-def rmtree(dir, can_fail = 0):
+def is_system_dir(dir):
+    '''Returns True if dir is a system directory (any directory which matters to the system).'''
+    for s in [ "/", "/boot", "/etc", "/dev", "/opt", "/sys", "/srv", "/proc", "/usr", "/home",
+        "/var", "/lib", "/lib64", "/sbin", "/bin", "/root", "/tmp",
+        "/var/backups", "/var/cache", "/var/crash", "/var/games", "/var/lib", "/var/local", "/var/lock", "/var/log", "/var/mail", "/var/opt", "/var/run", "/var/spool", "/var/tmp",
+        "/usr/bin", "/usr/etc", "/usr/include", "/usr/lib", "/usr/sbin", "/usr/share", "/usr/src", "/usr/local",
+        "/usr/local/bin", "/usr/local/etc", "/usr/local/games", "/usr/local/include", "/usr/local/lib", "/usr/local/man", "/usr/local/sbin", "/usr/local/share", "/usr/local/src" ]:
+        if dir == s:
+            return True
+    return False
+
+def rmtree(dir, can_fail = 0, remove_top = True):
     '''Removes a directory recursively, alternative to shutil.rmtree()'''
-    #(base, ext) = os.path.splitext(dir)
-    #if ext != ".database" and ext != ".build":
-    #    raise p4a_error("Cannot remove unknown directory: " + dir)
+    dir = os.path.normpath(os.path.realpath(dir))
+    if not dir or not os.path.isdir(dir):
+        raise p4a_error("Not a directory: " + dir)
+    if is_system_dir(dir): # Prevent deletion of major system dirs...
+        raise p4a_error("Will not remove protected directory: " + dir)
     debug("Removing tree: " + dir)
     try:
         for root, dirs, files in os.walk(dir, topdown = False):
@@ -152,7 +175,8 @@ def rmtree(dir, can_fail = 0):
                 os.remove(os.path.join(root, name))
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
-        os.rmdir(dir)
+        if remove_top:
+            os.rmdir(dir)
     except:
         if can_fail:
             warn("Could not remove directory " + dir + ": " + str(sys.exc_info()))
@@ -262,6 +286,12 @@ def quote(s):
         return '"' + s + '"'
     else:
         return s
+
+def env(var):
+    if var in os.environ:
+        return os.environ[var]
+    else:
+        return ""
 
 if __name__ == "__main__":
     print(__doc__)
