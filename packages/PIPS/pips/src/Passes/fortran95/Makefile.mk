@@ -66,15 +66,15 @@ all: install
 patch : $(PATCHED)
 
 # local stuff
-unbuild: 
+unbuild:
 	$(RM) -rf $(ROOT)/bin/gfc2pips build
 clean: local-clean unbuild
 
+# do *NOT* remove downloaded files in clean & unbuild targets.
+# FC 2010-05-25
 local-clean:
-	# do *NOT* remove downloaded files in clean & unbuild targets.
-	# FC 2010-05-25
 	$(RM) -rf $(SRC.d)
-	#$(RM) -f $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(SRC.d)
+#$(RM) -f $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(SRC.d)
 
 $(SRC.d)/.dir:
 	mkdir -p $(SRC.d)
