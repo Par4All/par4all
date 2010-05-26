@@ -2021,128 +2021,76 @@ int gfc2pips_symbol2sizeArray(gfc_symbol *s) {
  */
 list gfc2pips_array_ref2indices(gfc_array_ref *ar) {
   int i;
-  list indices = NULL, indices_p = NULL;
+  list indices = NULL;
 
-  if(!ar->start[0]) {
-    gfc2pips_debug(9,"no indice\n");
-    return NULL;
-  }
-  //expression ex = gfc2pips_mkRangeExpression(ar->start[0],ar->end[0]);
-  //reference_entity(syntax_reference(expression_syntax(ex))) = NULL;
-  //indices_p = CONS( EXPRESSION, gfc2pips_expr2expression(ar->end[0]), indices_p );
-  indices_p = CONS( EXPRESSION, gfc2pips_expr2expression( ar->start[0] ), NIL );
-  //indices_p = CONS( EXPRESSION, gfc2pips_mkRangeExpression(ar->start[0],ar->end[0]), NIL );
-  indices = indices_p;
-  for (i = 1; ar->start[i]; i++) {
-    //indices_p = CONS( EXPRESSION, gfc2pips_expr2expression(ar->end[i]), indices_p );
-    CDR( indices_p) = CONS( EXPRESSION,
-        gfc2pips_expr2expression( ar->start[i] ),
-        NIL );
-    indices_p = CDR( indices_p );
-    //indices_p = CONS( EXPRESSION, gfc2pips_mkRangeExpression(ar->start[i],ar->end[i]), indices_p );
+  switch(ar->type) {
+    case AR_FULL:
+      break;
+    case AR_SECTION:
+      for (i = 0; i < ar->dimen; i++) {
+        /* There are two types of array sections: either the
+         elements are identified by an integer array ('vector'),
+         or by an index range. In the former case we only have to
+         get the start expression which contains the vector, in
+         the latter case we have to print any of lower and upper
+         bound and the stride, if they're present.  */
+
+        if(ar->dimen_type[i] == DIMEN_RANGE) {
+          expression start, end, stride;
+
+          /* Get lower bound */
+          if(ar->start[i]) {
+            start = gfc2pips_expr2expression(ar->start[i]);
+          } else {
+            start = MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
+          }
+
+          /* Get upper bound */
+          if(ar->end[i]) {
+            end = gfc2pips_expr2expression(ar->end[i]);
+          } else {
+            end = MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
+          }
+
+          if(ar->stride[i]) {
+            stride = gfc2pips_expr2expression(ar->stride[i]);
+          } else {
+            stride = MakeIntegerConstantExpression("1");
+          }
+
+          range r = make_range(start, end, stride);
+          expression indice = make_expression(make_syntax(is_syntax_range, r),
+                                              normalized_undefined);
+          indices = CONS( EXPRESSION,indice,indices);
+        } else {
+          indices = CONS( EXPRESSION,
+              gfc2pips_expr2expression( ar->start[i] ),
+              indices);
+        }
+
+      }
+      indices = gen_nreverse(indices);
+      break;
+
+    case AR_ELEMENT:
+      for (i = 0; i < ar->dimen; i++) {
+        if(ar->start[i]) {
+          indices = CONS( EXPRESSION,
+              gfc2pips_expr2expression( ar->start[i] ),
+              indices);
+        }
+      }
+      break;
+
+    case AR_UNKNOWN:
+      pips_user_warning("Ref unknown ?");
+      break;
+
+    default:
+      pips_internal_error ("Unknown array reference");
   }
   gfc2pips_debug(9,"%zu indice(s)\n", gen_length(indices) );
   return indices;
-  /*
-   switch (ar->type)
-   {
-   case AR_FULL:
-   fputs ("FULL", dumpfile);
-   break;
-
-   case AR_SECTION:
-   for (i = 0; i < ar->dimen; i++)
-   {
-   There are two types of array sections: either the
-   elements are identified by an integer array ('vector'),
-   or by an index range. In the former case we only have to
-   print the start expression which contains the vector, in
-   the latter case we have to print any of lower and upper
-   bound and the stride, if they're present.
-
-   if (ar->start[i] != NULL)
-   show_expr (ar->start[i]);
-
-   if (ar->dimen_type[i] == DIMEN_RANGE)
-   {
-   fputc (':', dumpfile);
-
-   if (ar->end[i] != NULL)
-   show_expr (ar->end[i]);
-
-   if (ar->stride[i] != NULL)
-   {
-   fputc (':', dumpfile);
-   show_expr (ar->stride[i]);
-   }
-   }
-
-   if (i != ar->dimen - 1)
-   fputs (" , ", dumpfile);
-   }
-   break;
-
-   case AR_ELEMENT:
-   for (i = 0; i < ar->dimen; i++)
-   {
-   show_expr (ar->start[i]);
-   if (i != ar->dimen - 1)
-   fputs (" , ", dumpfile);
-   }
-   break;
-
-   case AR_UNKNOWN:
-   fputs ("UNKNOWN", dumpfile);
-   break;
-
-   default:
-   gfc_internal_error ("show_array_ref(): Unknown array reference");
-   }
-
-   */
-  return NULL;
-}
-
-/**
- * @brief Test if there is a range:  A( 1, 2, 3:5 )
- * @param ar the gfc structure containing the information about range
- */
-bool gfc2pips_there_is_a_range(gfc_array_ref *ar) {
-  int i;
-  if(!ar || !ar->start || !ar->start[0])
-    return false;
-  for (i = 0; ar->start[i]; i++) {
-    if(ar->end[i])
-      return true;
-  }
-  return false;
-}
-
-/**
- * @brief Create an expression similar to the substring implementation,
- * but with a couple of parameters(min-max) for each indice
- * @param ent the entity refered by the indices
- * @param ar the gfc structure containing the information
- */
-list gfc2pips_mkRangeExpression(gfc_array_ref *ar) {
-  list lexpr = NULL;
-  int i;
-  for (i = 0; ar->start[i]; i++) {
-    if(ar->end[i]) {
-      range r =
-          make_range(gfc2pips_expr2expression(ar->start[i]),
-                     gfc2pips_expr2expression(ar->end[i]),
-                     ar->stride[i] ? gfc2pips_expr2expression(ar->stride[i])
-                                   : MakeIntegerConstantExpression("1"));
-      lexpr = CONS( EXPRESSION, make_expression( make_syntax( is_syntax_range,
-                  r ),
-              normalized_undefined ), lexpr );
-    } else {
-      lexpr
-          = CONS( EXPRESSION, gfc2pips_expr2expression( ar->start[i] ), lexpr );
-    }
-  }
-  return gen_nreverse(lexpr);
 }
 
 //this is to know if we have to add a continue statement just after the loop statement for (exit/break)
@@ -4043,23 +3991,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
             case REF_ARRAY: {
               /* It an array ! */
               gfc2pips_debug(9,"ref array : %s\n",entity_name(ent_ref));
-
-              if(r->u.ar.type != AR_FULL) {
-                /* We have some part of the arrayn, let's figure out which one*/
-                if(gfc2pips_there_is_a_range(&r->u.ar)) {
-                  gfc2pips_debug(9,"We have a range\n");
-                  /*
-                   * here we have something like x( a:b ) or y( c:d , e:f )
-                   * it is not implemented in PIPS at all, to emulate the
-                   * substring syntax, we create a list where each pair of
-                   * expression represent end/start values
-                   */
-                  args_list = gfc2pips_mkRangeExpression(&r->u.ar);
-                } else {
-                  /* No range, it's a single element access */
-                  args_list = gfc2pips_array_ref2indices(&r->u.ar);
-                }
-              }
+              args_list = gfc2pips_array_ref2indices(&r->u.ar);
               break;
             }
             case REF_SUBSTRING: {
@@ -4099,15 +4031,15 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
 
               /* finally the call is created */
               s = make_syntax_call(make_call(substr, lexpr));
+              break;
             }
             default: {
               pips_user_warning("Unable to understand the ref %d\n",
                   (int)r->type);
-              r = r->next;
-              continue;
+              break;
             }
           }
-          break;
+          r = r->next;
         }
       }
 
