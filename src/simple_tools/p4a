@@ -225,6 +225,42 @@ def main():
         cppflags += [ "-U" + undefine ]
     info("CPP flags: " + " ".join(cppflags))
 
+
+    # I've put this things here but indeed it is also partially in p4a_builder
+    if options.accel:
+        if options.cuda:
+            # Tell the run-time we generate CUDA:
+            cppflags.append("-DP4A_ACCEL_CUDA")
+            # Add the run-time
+            other_files.append(os.path.join(os.environ["P4A_ACCEL_DIR"],
+                                            "p4a_accel.cu"))
+            # Where CUDA is installed:
+            if "CUDA_DIR" in os.environ:
+                cuda_dir = os.environ["CUDA_DIR"]
+            else:
+                cuda_dir = "/usr/local/cuda"
+                warn("'CUDA_DIR' environment variable undefined. Using '" +
+                     cuda_dir + "' as default location for CUDA installation")
+
+            # Where the CUDA SDK is installed:
+            if "CUDA_SDK_DIR" in os.environ:
+                cuda_sdk_dir = os.environ["CUDA_SDK_DIR"]
+            else:
+                cuda_sdk_dir = os.path.join(os.environ["HOME"],
+                                            "NVIDIA_GPU_Computing_SDK")
+                warn("'CUDA_SDK_DIR' environment variable undefined. Using '" +
+                     cuda_sdk_dir + "' as default location for CUDA installation")
+                cppflags.append("-I" + cuda_sdk_dir + "/C/common/inc")
+                cppflags.append("-I" + cuda_dir + "/include")
+        else:
+            # It is OpenMP:
+            cppflags.append("-DP4A_ACCEL_OPENMP")
+            # Add the run-time
+            other_files.append(os.path.join(os.environ["P4A_ACCEL_DIR"],
+                                            "p4a_accel.c"))
+        # We will need to look into this directory for the run-time #include:
+        cppflags.append("-I" + os.environ["P4A_ACCEL_DIR"])
+
     # Process (or not).
     processor_output_files = []
     if options.noprocess:
@@ -241,7 +277,8 @@ def main():
                                   recover_includes = not options.skip_recover_includes,
                                   filter_include = options.include_modules,
                                   filter_exclude = options.exclude_modules,
-                                  accel = options.accel)
+                                  accel = options.accel,
+                                  cuda = options.cuda)
 
         # First apply some generic parallelization:
         processor.parallelize(options.fine)
@@ -251,7 +288,6 @@ def main():
 
         if options.openmp:
             processor.ompify()
-
         processor_output_files = processor.save()
 
         # Remove database unless otherwise specified.
@@ -275,6 +311,8 @@ def main():
         ldflags += [ "-L" + lib_dir ]
     for lib in options.libs:
         ldflags += [ "-l" + lib ]
+    print all_buildable_files
+
     for output_file in options.output_file:
         output_file = os.path.abspath(output_file)
         info("Building " + output_file)
