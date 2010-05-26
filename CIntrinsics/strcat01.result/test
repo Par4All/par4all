@@ -1,0 +1,34 @@
+
+Parsed printed file for "strcat01"
+
+int main()
+{
+   char str[80];
+   strcpy(str, "these ");
+   strcat(str, "strings ");
+   strcat(str, "are ");
+   strcat(str, "concatenated.");
+   puts(str);
+   return 0;
+}
+
+Cumulated effetcs for "strcat01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   char str[80];
+   strcpy(str, "these ");
+   strcat(str, "strings ");
+   strcat(str, "are ");
+   strcat(str, "concatenated.");
+//               <may be read    >: stdout[0] str[*]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   puts(str);
+   return 0;
+}

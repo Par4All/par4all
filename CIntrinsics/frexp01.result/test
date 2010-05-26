@@ -1,0 +1,38 @@
+
+Parsed printed file for "frexp01"
+
+int main()
+{
+   double x, significand;
+   int exponent;
+
+   x = 8.0;
+   significand = frexp(x, &exponent);
+   printf("%lf * 2^%d = %f\n", significand, exponent, x);
+   return 0;
+}
+
+Cumulated effetcs for "frexp01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   double x, significand;
+   int exponent;
+//               <must be written>: x
+
+   x = 8.0;
+//               <must be read   >: x
+//               <must be written>: 0`significand
+   significand = frexp(x, &exponent);
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                                  exponent 0`significand x
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%lf * 2^%d = %f\n", significand, exponent, x);
+   return 0;
+}
