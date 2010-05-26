@@ -26,7 +26,7 @@ display PRINTED_FILE(main)
 echo // OMP style
 apply COARSE_GRAIN_PARALLELIZATION(main)
 display PRINTED_FILE(main)
-apply MANAGE_NESTED_PARALLELISM(main)
+apply LIMIT_NESTED_PARALLELISM(main)
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
