@@ -1793,15 +1793,18 @@ void UseFormalArguments(entity f)
 	   such as "foo(n, double a[n])" */
 	/* This only works if the refs list points to the actual
 	   references and not to copies... */
-	MAP(REFERENCE, r, {
+	FOREACH(REFERENCE, r, refs){
 	    entity e = reference_variable(r);
 
-	    if(e==p) {
+        /* sg: this test used to be if e == p, but it missed some cases
+         * because reference_variable may have been generated incorectly before
+         * using a TOP_LEVEL variable instead of the dummy */
+	    if(same_entity_lname_p(e,p)) { 
 	      reference_variable(r) = new_p;
 	      pips_debug(8, "reference %p to \"%s\" changed into reference to \"\%s\"\n",
 			 r, entity_name(p), entity_name(new_p));
 	    }
-	  }, refs);
+	}
 
 	/* A substitution could be performed instead...*/
 	gen_remove(&code_declarations(fc), (void *) p);
