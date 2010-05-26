@@ -2,7 +2,6 @@ delete multideclsamgfile
 create multideclsamgfile multideclsamgfile/foo.c multideclsamgfile/bar.c
 
 
-setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 
