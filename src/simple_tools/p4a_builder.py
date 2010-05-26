@@ -27,7 +27,6 @@ class p4a_builder():
     '''Par4All builder class. For now everything basically is in the constructor. But this class should have methods some day.'''
     
     def __init__(self,
-        project_name,
         files,
         output_file, 
         cppflags = [],
@@ -47,20 +46,16 @@ class p4a_builder():
         build_dir = None
         ):
         
-        # Preliminary checks.
-        if not project_name:
-            raise p4a_error("Missing project_name")
-        
         # Determine build directory.
         if not build_dir:
-            build_dir = os.path.join(os.getcwd(), project_name + ".build")
+            build_dir = os.path.join(os.getcwd(), ".build")
         debug("Build dir: " + build_dir)
         if not os.path.isdir(build_dir):
             os.makedirs(build_dir)
         
         # Get output file extension. 
         # This will be used later to determine compilation behaviour.
-        ext = os.path.splitext(output_file)[1]
+        ext = get_file_ext(output_file)
         
         # Set compiler defaults.
         if not nvcc:
@@ -110,51 +105,28 @@ class p4a_builder():
         cxx = False
         cuda = False
         
-        # Quick hack for linking proper CUDA libs.
         machine_arch = get_machine_arch()
-        lib_arch_suffix = ""
         arch_flags = []
+        m64 = False
         if arch is None:
             if machine_arch == "x86_64":
-                lib_arch_suffix = "_x86_64" # fix for cuda libs ..
+                m64 = True
         else:
             if arch == 32 or arch == "32" or arch == "i386":
                 arch_flags = [ "-m32" ]
-            elif arch == 64 or arch == "64" or arch == "x86_64":
+            elif arch == 64 or arch == "64" or arch == "x86_64" or arch == "amd64":
                 arch_flags = [ "-m64" ]
-                lib_arch_suffix = "_x86_64"
+                m64 = True
             else:
                 raise p4a_error("Unsupported architecture: " + arch)
         
-        # Determine CUDA paths and libs.
-        # XXX: merge with p4a code.
-        cuda_cppflags = []
-        cuda_ldflags = []
-        nvidia_sdk_dir = os.path.expanduser("~/NVIDIA_GPU_Computing_SDK")
-        if "NVIDIA_SDK_DIR" in os.environ:
-            nvidia_sdk_dir = os.environ["NVIDIA_SDK_DIR"]
-        test_cuda_include_dirs = [ "/usr/local/cuda/include", os.path.join(nvidia_sdk_dir, "C/common/inc") ]
-        if "CUDA_INCLUDE_DIRS" in os.environ:
-            test_cuda_include_dirs += os.path.expanduser(os.environ["CUDA_INCLUDE_DIRS"].split(":"))
-        for dir in test_cuda_include_dirs:
-            if os.path.isdir(dir):
-                cuda_cppflags += [ "-I" + dir ]
-        test_cuda_lib_dirs = [ "/usr/local/cuda/lib64", "/usr/local/cuda/lib", 
-            os.path.join(nvidia_sdk_dir, "C/lib"), 
-            os.path.join(nvidia_sdk_dir, "C/common/lib/linux") ]
-        if "CUDA_LIB_DIRS" in os.environ:
-            test_cuda_lib_dirs += os.path.expanduser(os.environ["CUDA_LIB_DIRS"].split(":"))
-        for dir in test_cuda_lib_dirs:
-            if os.path.isdir(dir):
-                cuda_ldflags += [ "-L" + dir ]
-        cuda_ldflags += [ "-Bdynamic -lcudart" ] #, "-Bstatic -lcutil" + lib_arch_suffix ]
-        
-        # Preprocess file list: run CUDA on .cu files.
+        # Preprocess file list:
         for file in files:
-            (b, e) = os.path.splitext(file)
+            e = get_file_ext(file)
             if e == ".cu":
+                # Run CUDA on .cu files to produce a .cpp.
                 cuda_output_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".cu.cpp")
-                run2([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ "-o", cuda_output_file, file ])
+                run2([ nvcc, "--cuda" ] + cppflags + nvccflags + [ "-o", cuda_output_file, file ])
                 compile_files += [ cuda_output_file ]
                 cuda = True
                 cxx = True
@@ -204,13 +176,17 @@ class p4a_builder():
         else:
             raise p4a_error("Unsupported extension for output file: " + output_file)
         
-        # Add necessary flags for CUDA.
+        # Add necessary libraries for CUDA.
         if cuda:
-            cppflags += cuda_cppflags
-            ldflags += cuda_ldflags
+            ldflags += get_cuda_ldflags(m64)
         
         # Run the final compilation step: produce the expected binary file.
         run2([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files)
+        
+        if os.path.exists(output_file):
+            done("Generated " + output_file)
+        else:
+            warn("Expected output file " + output_file + " not found!?")
 
 
 if __name__ == "__main__":
