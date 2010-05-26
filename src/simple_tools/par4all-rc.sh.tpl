@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ###
 ### Par4All Environment
 ### 
@@ -21,21 +19,26 @@ export P4A_ACCEL_DIR='$accel'
 # Location of the Par4All configuration files.
 export P4A_ETC=$$P4A_DIST/etc
 
-# The Fortran compiler to use.
+# The Fortran 77 compiler to use.
 export PIPS_F77=$fortran
 
+prepend_to_path_var () { perl -e "exit unless '$$2'; @p = grep { \$$_ and \$$_ ne '$$2' } split ':', \$$ENV{'$$1'}; print join ':', ('$$2', @p);"; }
+
 # Update PATH.
-append_PATH () { if ! echo $$PATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PATH=$$1:$$PATH; fi }
-append_PATH $$P4A_DIST/bin
-unset append_PATH
+export PATH=$$(prepend_to_path_var PATH $$P4A_DIST/bin)
 
 # Update libraries search paths.
-append_PKG_CONFIG_PATH () { if ! echo $$PKG_CONFIG_PATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PKG_CONFIG_PATH=$$1:$$PKG_CONFIG_PATH; fi }
-append_PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig
-unset append_PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=$$(prepend_to_path_var PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig)
+# If libs path not in ld.so.conf.d, then ldconfig -p should not have it and
+# we must add it to LD_LIBRARY_PATH.
+if [ `ldconfig -p | grep $$P4A_DIST/lib | wc -l` = 0 ]; then
+	export LD_LIBRARY_PATH=$$(prepend_to_path_var LD_LIBRARY_PATH $$P4A_DIST/lib)
+fi
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-append_PYTHONPATH () { if ! echo $$PYTHONPATH | /bin/egrep -q "(^|:)$$1($$|:)"; then PYTHONPATH=$$1:$$PYTHONPATH; fi }
-append_PYTHONPATH `ls -d $$P4A_DIST/lib/python*/site-packages/pips 2>/dev/null | tail -1`
-append_PYTHONPATH `ls -d $$P4A_DIST/lib/python*/dist-packages/pips 2>/dev/null | tail -1`
-unset append_PYTHONPATH
+NEW_PYTHON_PATH=$$(ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1)
+PYTHONPATH=$$(prepend_to_path_var PYTHONPATH /usr/share/pyshared)
+PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
+export PYTHONPATH
+
+unset prepend_to_path_var

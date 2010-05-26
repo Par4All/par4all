@@ -27,9 +27,6 @@ class p4a_processor():
     # The project name:
     project_name = None
 
-    # The full name of the directory that store the workspace database:
-    database_dir = None
-
     # Set to True to try to do some #include tracking and recovering
     recover_includes = None
 
@@ -52,22 +49,16 @@ class p4a_processor():
             # strings
             if cppflags is None:
                 cppflags = ""
+            
+            if not project_name:
+                raise p4a_error("Missing project_name")
+            
+            self.project_name = project_name
 
             if self.recover_includes:
                 # Use a special preprocessor to track #include by a
                 # man-in-the-middle attack :-) :
                 os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
-
-            if not project_name:
-                # Try some names until there is no database with this name:
-                while True:
-                    self.project_name = gen_name()
-                    self.database_dir = os.path.join(os.getcwd(),
-                                                self.project_name + ".database")
-                    if not os.path.exists(self.database_dir):
-                        break
-            else:
-                self.project_name = project_name
 
             for file in files:
                 if self.fortran is None:

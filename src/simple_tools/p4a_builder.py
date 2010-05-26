@@ -12,20 +12,59 @@ Par4All Builder Class
 import sys, os, re, shutil
 from p4a_util import *
 
+def make_safe_intermediate_file_path(input_file, build_dir, change_ext = None):
+    '''Make up a safe intermediate file path.'''
+    intermediate_file = ""
+    while True:
+        intermediate_file = file_add_suffix(os.path.join(build_dir, os.path.split(input_file)[1]), "_" + gen_name(prefix = ""))
+        if change_ext:
+            intermediate_file = change_file_ext(intermediate_file, change_ext)
+        if not os.path.exists(intermediate_file):
+            break
+    return intermediate_file
+
 class p4a_builder():
-    '''Par4All builder class. For now everything is in the ctor. But the class should have methods some day.'''
+    '''Par4All builder class. For now everything basically is in the constructor. But this class should have methods some day.'''
     
-    def __init__(self, files, output_file, 
-        cppflags = [], cflags = [], ldflags = [], nvccflags = [],
+    def __init__(self,
+        project_name,
+        files,
+        output_file, 
+        cppflags = [],
+        cflags = [],
+        ldflags = [],
+        nvccflags = [],
         extra_obj = [], 
-        cc = None, ld = None, ar = None, nvcc = None,
-        debug = False, optimize = True, openmp = False, icc = False, arch = None):
+        cc = None, 
+        ld = None, 
+        ar = None, 
+        nvcc = None,
+        debug_flags = False, 
+        optimize = True, 
+        openmp = False, 
+        icc = False, 
+        arch = None,
+        build_dir = None
+        ):
         
-        (base, ext) = os.path.splitext(output_file)
+        # Preliminary checks.
+        if not project_name:
+            raise p4a_error("Missing project_name")
         
+        # Determine build directory.
+        if not build_dir:
+            build_dir = os.path.join(os.getcwd(), project_name + ".build")
+        debug("Build dir: " + build_dir)
+        if not os.path.isdir(build_dir):
+            os.makedirs(build_dir)
+        
+        # Get output file extension. 
+        # This will be used later to determine compilation behaviour.
+        ext = os.path.splitext(output_file)[1]
+        
+        # Set compiler defaults.
         if not nvcc:
             nvcc = "nvcc"
-        
         if icc:
             if not which("icc"):
                 raise p4a_error("icc is not available -- have you source'd iccvars.sh or iccvars_intel64.sh yet?")
@@ -40,13 +79,13 @@ class p4a_builder():
             if not ar:
                 ar = "ar"
         
+        # Make up the default C flags:
         prepend_cflags = [ "-fno-strict-aliasing", "-fPIC" ]
-        #prepend_cflags += [ "-fPIE" ]
-        if get_verbosity() >= 2:
-            prepend_cflags += [ "-v" ]
+        #if get_verbosity() >= 2:
+        #    prepend_cflags += [ "-v" ]
         if get_verbosity() >= 1:
             prepend_cflags += [ "-Wall" ]
-        if debug:
+        if debug_flags:
             prepend_cflags += [ "-g" ]
         elif optimize:
             if icc:
@@ -60,9 +99,10 @@ class p4a_builder():
             else:
                 prepend_cflags += [ "-fopenmp" ]
                 ldflags += [ "-fopenmp" ]
+        # Prepend our default C flags to the passed C flags:
         cflags = prepend_cflags + cflags
-        #ldflags = [ "-pie" ] + ldflags
         
+        # Initialize some variables.
         compile_files = []
         obj_files = []
         final_files = []
@@ -70,6 +110,7 @@ class p4a_builder():
         cxx = False
         cuda = False
         
+        # Quick hack for linking proper CUDA libs.
         machine_arch = get_machine_arch()
         lib_arch_suffix = ""
         arch_flags = []
@@ -85,26 +126,19 @@ class p4a_builder():
             else:
                 raise p4a_error("Unsupported architecture: " + arch)
         
+        # Determine CUDA paths and libs.
+        # XXX: merge with p4a code.
         cuda_cppflags = []
         cuda_ldflags = []
         nvidia_sdk_dir = os.path.expanduser("~/NVIDIA_GPU_Computing_SDK")
         if "NVIDIA_SDK_DIR" in os.environ:
             nvidia_sdk_dir = os.environ["NVIDIA_SDK_DIR"]
-        
         test_cuda_include_dirs = [ "/usr/local/cuda/include", os.path.join(nvidia_sdk_dir, "C/common/inc") ]
         if "CUDA_INCLUDE_DIRS" in os.environ:
             test_cuda_include_dirs += os.path.expanduser(os.environ["CUDA_INCLUDE_DIRS"].split(":"))
         for dir in test_cuda_include_dirs:
             if os.path.isdir(dir):
                 cuda_cppflags += [ "-I" + dir ]
-        
-        #main_cuda_lib_dir = None
-        #if lib_arch_suffix == "x86_64":
-        #    main_cuda_lib_dir = "/usr/local/cuda/lib64"
-        #else:
-        #    main_cuda_lib_dir = "/usr/local/cuda/lib"
-        # It should be OK to -L both 64bit and 32bit version because the compiler will pick the right libs
-        # for the requested architecture.
         test_cuda_lib_dirs = [ "/usr/local/cuda/lib64", "/usr/local/cuda/lib", 
             os.path.join(nvidia_sdk_dir, "C/lib"), 
             os.path.join(nvidia_sdk_dir, "C/common/lib/linux") ]
@@ -115,11 +149,13 @@ class p4a_builder():
                 cuda_ldflags += [ "-L" + dir ]
         cuda_ldflags += [ "-Bdynamic -lcudart" ] #, "-Bstatic -lcutil" + lib_arch_suffix ]
         
+        # Preprocess file list: run CUDA on .cu files.
         for file in files:
             (b, e) = os.path.splitext(file)
             if e == ".cu":
-                run2([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ file ])
-                compile_files += [ file + ".cpp" ]
+                cuda_output_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".cu.cpp")
+                run2([ nvcc, "--cuda" ] + cppflags + cuda_cppflags + nvccflags + [ "-o", cuda_output_file, file ])
+                compile_files += [ cuda_output_file ]
                 cuda = True
                 cxx = True
             elif e == ".c":
@@ -133,29 +169,31 @@ class p4a_builder():
             else:
                 raise p4a_error("Unsupported extension for input file: " + file)
         
-        if cuda:
-            if ext == ".a":
-                raise p4a_error("Cannot build a shared library when using cuda")
+        # Option checking.
+        if cuda and ext == ".a":
+            raise p4a_error("Cannot build a shared library when using cuda")
         
-        if cuda and ext == "" and icc:
-            pass
-            # Compiling CUDA enabled executable with ICC is tricky ...
-            #ldflags = [ "-pie" ] + ldflags #"-Bdynamic", 
-            #cflags = [ "-fPIE", "-static" ] + cflags
-        
+        # Compile source files as object (.o) files.
         for file in compile_files:
-            obj_file = change_file_ext(file, ".o")
+            obj_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".o")
             run2([ cc, "-c" ] + cppflags + arch_flags + cflags + [ "-o", obj_file, file ])
             obj_files += [ obj_file ]
         
+        # If we were requested to build a .o file... Well check if there are several of them
+        # and warn the user if it is the case.
         if ext == ".o":
-            if len(obj_files) == 1:
+            if len(obj_files) >= 1:
                 shutil.move(obj_files[0], output_file)
-            return
+                if len(obj_files) > 1:
+                    warn("You requested to compile " + ", ".join(compile_files) + " as an object (.o) file, but several have been generated in " + build_dir)
+                return
+            else:
+                raise p4a_error("No object file generated!?")
         
         final_files += obj_files
         final_files += extra_obj
         
+        # Add necesseray flags depending on the requested output file type.
         prefix_flags = []
         if ext == ".a":
             prefix_flags += [ "-static" ]
@@ -166,15 +204,14 @@ class p4a_builder():
         else:
             raise p4a_error("Unsupported extension for output file: " + output_file)
         
+        # Add necessary flags for CUDA.
         if cuda:
             cppflags += cuda_cppflags
             ldflags += cuda_ldflags
         
+        # Run the final compilation step: produce the expected binary file.
         run2([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files)
-        #if cxx:
-        #ldflags += [ "-L`gcc -print-file-name=` /usr/lib/crt1.o /usr/lib/crti.o " ] #"-lstdc++" ]
-        #run(" ".join([ final_command ] + prefix_flags + ldflags + [ "-o", output_file ] + final_files + ["/usr/lib/crtn.o -limf -lsvml -lm -lipgo -ldecimal -lgcc -lgcc_eh -lirc -lc -lgcc -lgcc_eh -lirc_s -ldl -lc"]))
-        
+
 
 if __name__ == "__main__":
     print(__doc__)

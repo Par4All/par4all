@@ -202,13 +202,13 @@ def main():
     other_files = []
     # Make all paths absolute.
     for file in args:
-        abs_file = os.path.abspath(file)
-        (base, ext) = os.path.splitext(file)
+        abs_file = os.path.abspath(os.path.expanduser(file))
+        ext = os.path.splitext(abs_file)[1]
         if ext == ".c" or ext == ".f":
-            files.append(abs_file)
+            files += [ abs_file ]
             debug("Input file: " + abs_file)
         elif ext == ".cpp" or ext == ".cxx" or ext == ".cu":
-            other_files.append(abs_file)
+            other_files += [ abs_file ]
             info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
         elif ext == ".h" or ext == ".hpp":
             info("Ignoring header file: " + abs_file)
@@ -223,8 +223,18 @@ def main():
         cppflags += [ "-D" + define ]
     for undefine in options.undefines:
         cppflags += [ "-U" + undefine ]
-    info("CPP flags: " + " ".join(cppflags))
-
+    if len(cppflags):
+        info("CPP flags: " + " ".join(cppflags))
+    
+    # If no project name is provided, try some random names for which 
+    # you cannot find any resembling files in the current working directory.
+    if not options.project_name:
+        while True:
+            options.project_name = gen_name()
+            found_files = find(".*" + re.escape(options.project_name) + ".*", dir = os.getcwd(), match_dirs = True, match_files = True)
+            if len(found_files) == 0:
+                break
+        info("Generated project name: " + options.project_name)
 
     # I've put this things here but indeed it is also partially in p4a_builder
     if options.accel:
@@ -269,8 +279,9 @@ def main():
     elif len(files) == 0:
         warn("No supported files to process!")
     else:
-        # Create a workspace with PIPS:
-        processor = p4a_processor(files = files,
+        try:
+            # Create a workspace with PIPS:
+            processor = p4a_processor(files = files,
                                   project_name = options.project_name,
                                   verbose = (verbosity != 0),
                                   cppflags = " ".join(cppflags),
@@ -280,26 +291,33 @@ def main():
                                   accel = options.accel,
                                   cuda = options.cuda)
 
-        # First apply some generic parallelization:
-        processor.parallelize(options.fine)
+            # First apply some generic parallelization:
+            processor.parallelize(options.fine)
 
-        if options.cuda:
-            processor.gpuify()
+            if options.cuda:
+                processor.gpuify()
 
-        if options.openmp:
-            processor.ompify()
-        processor_output_files = processor.save()
-
-        # Remove database unless otherwise specified.
-        if not options.keep_database:
-            # To improve later with a workspace.close() and
-            # workspace.delete() some days...
-            database_dir = os.path.abspath(processor.workspace.directory())
-            rmtree(database_dir, can_fail = 1)
+            if options.openmp:
+                processor.ompify()
+            processor_output_files = processor.save()
+            
+            # Remove database unless otherwise specified.
+            if not options.keep_database:
+                # To improve later with a workspace.close() and
+                # workspace.delete() some days... -> Yes because some files are left open
+                # and we cannot remote the database everytime :-(
+                # We should be able to work on an existing database too!
+                database_dir = os.path.abspath(processor.workspace.directory())
+                rmtree(database_dir, can_fail = True)
+            
+        except p4a_error:
+            die("Processing of " + ", ".join(files) + " failed: " + sys.exc_info()[1].msg)
+        #except:
+        #    die("Processing of " + ", ".join(files) + " failed: " + str(sys.exc_info()[1]))
 
     if len(options.output_file) == 0:
         # Build not requested.
-        return 0
+        return
 
     all_buildable_files = processor_output_files + other_files + options.extra
     if len(all_buildable_files) == 0:
@@ -311,12 +329,14 @@ def main():
         ldflags += [ "-L" + lib_dir ]
     for lib in options.libs:
         ldflags += [ "-l" + lib ]
-    print all_buildable_files
+    #~ print all_buildable_files
 
     for output_file in options.output_file:
-        output_file = os.path.abspath(output_file)
+        output_file = os.path.abspath(os.path.expanduser(output_file))
         info("Building " + output_file)
-        builder = p4a_builder(files = all_buildable_files,
+        try:
+            builder = p4a_builder(project_name = options.project_name,
+                              files = all_buildable_files,
                               output_file = output_file,
                               cppflags = cppflags,
                               cflags = options.cflags,
@@ -327,13 +347,16 @@ def main():
                               ld = options.ld,
                               ar = options.ar,
                               nvcc = options.nvcc,
-                              debug = options.debug,
+                              debug_flags = options.debug,
                               optimize = not options.nofast,
                               openmp = options.openmp,
                               icc = options.icc,
                               arch = options.arch)
+        except p4a_error:
+            die("Building of " + output_file + " failed: " + sys.exc_info()[1].msg)
+        #except:
+        #    die("Building of " + output_file + " failed: " + str(sys.exc_info()[1]))
 
-    return 0
 
 if __name__ == "__main__":
     main()
