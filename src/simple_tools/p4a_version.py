@@ -13,7 +13,7 @@ import sys, os, string
 from p4a_util import *
 from p4a_git import *
 
-actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
+actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 def get_version_file_path(dist_dir = None):

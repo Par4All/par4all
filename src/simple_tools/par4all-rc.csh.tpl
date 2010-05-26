@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ###
 ### Par4All Environment
 ### 
@@ -21,7 +19,7 @@ setenv P4A_ACCEL_DIR '$accel'
 # Location of the Par4All configuration files.
 setenv P4A_ETC $$P4A_DIST/etc
 
-# The Fortran compiler to use.
+# The Fortran 77 compiler to use.
 setenv PIPS_F77 $fortran
 
 # Update PATH.
@@ -29,8 +27,9 @@ setenv PATH $$P4A_DIST/bin:$$PATH
 
 # Update libraries search paths.
 setenv PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig:$$PKG_CONFIG_PATH
+setenv LD_LIBRARY_PATH $$P4A_DIST/lib:$$LD_LIBRARY_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-setenv PYTHONPATH `ls -d $$P4A_DIST/lib/python*/site-packages/pips 2>/dev/null | tail -1`:`ls -d $$P4A_DIST/lib/python*/dist-packages/pips 2>/dev/null | tail -1`:$$PYTHONPATH
+setenv PYTHONPATH `ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1`:$$PYTHONPATH
 
 rehash

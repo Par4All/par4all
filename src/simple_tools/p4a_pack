@@ -19,7 +19,7 @@ from p4a_version import *
 default_install_prefix = "usr/local/par4all" # NO beginning slash please.
 package_name = "par4all"
 
-actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
+actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 debian_dir = os.path.join(script_dir, "DEBIAN")
 auto_remove_temp_dirs_on_break = []

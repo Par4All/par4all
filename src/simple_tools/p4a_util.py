@@ -15,8 +15,6 @@ import p4a_term
 # Global variables.
 verbosity = 0
 logger = None
-actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
-script_dir = os.path.split(actual_script)[0]
 
 def set_verbosity(level):
 	'''Sets global verbosity level'''
@@ -199,6 +197,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = 
 	else:
 		dir = os.getcwd()
 	dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
+	debug("Looking for files matching '" + file_re + "' in " + dir)
 	try:
 		for root, dirs, files in os.walk(dir, topdown = False):
 			files_dirs = []
@@ -233,9 +232,18 @@ def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = 
 #				install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
 #			break
 
-def change_file_ext(file, new_ext):
-	'''Changes the extension for the given file path'''
-	return os.path.splitext(file)[0] + new_ext
+def change_file_ext(file, new_ext = None, if_ext = None):
+	'''Changes the extension for the given file path if it matches if_ext.'''
+	(base, ext) = os.path.splitext(file)
+	if new_ext is None:
+		new_ext = ""
+	if if_ext:
+		if ext == if_ext:
+			return base + new_ext
+		else:
+			return file
+	else:
+		return base + new_ext
 
 def get_file_extension(file):
 	'''Returns the extension of the given file.'''

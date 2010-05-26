@@ -29,7 +29,7 @@ from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
 
-actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
+actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_flags = [], rebuild = False):
@@ -238,7 +238,13 @@ def main():
         die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
     # Create install_dir it if it does not already exist.
     if os.path.isdir(install_dir):
-        warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen")
+        if options.clean:
+            # If we are requested to clean first, remove everything
+            # under install_dir.
+            warn("Removing everything in " + install_dir + " (--clean)")
+            rmtree(install_dir, remove_top = False)
+        else:
+            warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen")
     else:
         os.makedirs(install_dir)
     
@@ -255,12 +261,6 @@ def main():
     debug("PIPS source package dir: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir):
         die("Missing directory: " + pips_src_dir)
-    
-    # If we are requested to clean first, remove everything
-    # under install_dir.
-    if options.clean and os.path.isdir(install_dir):
-        warn("Removing everything in " + install_dir + " (--clean)")
-        rmtree(install_dir, remove_top = False)
     
     # Initial configure flags.
     configure_flags = [ 
@@ -473,13 +473,14 @@ def main():
         fortran = "g77"
     else:
         fortran = "false"
-    p4a_write_rc(install_dir_etc, dict(root = root, dist = install_dir, 
-        accel = accel_src_dir, fortran = fortran))
+    p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir, 
+        accel = install_dir_share_accel, fortran = fortran))
     
     # Write version file.
     version = guess_file_revision(root) + "~exported"
-    info("Writing version file")
-    dump(get_version_file_path(dist_dir = install_dir), version)
+    version_file = get_version_file_path(dist_dir = install_dir)
+    info("Writing version file " + version_file)
+    dump(version_file, version)
 
     done("")
     done("All done. Par4All " + version + " is ready and has been installed in " + install_dir)
@@ -488,7 +489,8 @@ def main():
     done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
     done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
     done("")
-
+    done("To begin using this Par4All installation.")
+    done("")
 
 if __name__ == "__main__":
     main()

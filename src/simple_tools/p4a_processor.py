@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Authors:
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
-# - Ronan Keryell
 #
 
 '''
@@ -38,12 +38,10 @@ class p4a_processor():
 
     def __init__(self, workspace = None, project_name = "", cppflags = "",
                  verbose = False, files = [], filter_include = None,
-                 filter_exclude = None, accel = False, cuda = False,
-                 recover_includes = True):
+                 filter_exclude = None, accel = False, recover_includes = True):
 
         self.recover_includes = recover_includes
         self.accel = accel
-        self.cuda = cuda
 
         if workspace:
             self.workspace = workspace
@@ -87,19 +85,21 @@ class p4a_processor():
 
             if accel:
                 accel_stubs_name = None
-                # Analyze this stub file so that PIPS interprocedurality
-                # is happy about the run-time we use:
                 if self.fortran:
                     accel_stubs_name = "p4a_stubs.f"
                 else:
                     accel_stubs_name = "p4a_stubs.c"
-                # The stubs are here in our distribution:
-                accel_stubs = os.path.join(os.environ["P4A_ACCEL_DIR"],
-                                           accel_stubs_name)
-                # Add the stubs file to the list to use in PIPS:
+                accel_stubs = os.path.join(env("P4A_ACCEL_DIR"), accel_stubs_name)
                 self.files += [ accel_stubs ]
-                # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
+                # Copy the stubs to the current directory with a modified name
+                # which includes the project name to prevent filename collision?
+                #(base, ext) = os.path.splitext(os.path.basename(accel_stubs))
+                #output_accel_stubs = os.path.join(os.getcwd(), base + "_" + self.project_name + ext)
+                #debug("Copying accel stubs: " + accel_stubs + " -> " + output_accel_stubs)
+                #shutil.copyfile(accel_stubs, output_accel_stubs)
+                #self.files += [ output_accel_stubs ]
+                #self.accel_files += [ output_accel_stubs ]
 
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
@@ -111,8 +111,6 @@ class p4a_processor():
                                             verboseon = verbose,
                                             cppflags = cppflags)
             self.workspace.set_property(
-                # Useless to go on if something goes wrong... :-(
-                ABORT_ON_USER_ERROR = True,
                 # Compute the intraprocedural preconditions at the same
                 # time as transformers and use them to improve the
                 # accuracy of expression and statement transformers:
@@ -234,21 +232,8 @@ class p4a_processor():
         kernel_launchers.kernel_load_store()
         # To be able to inject Par4All accelerator run time initialization
         # later:
-        if "main" in self.workspace:
-            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
-        else:
-            warn('''
-            There is no "main()" function in the given sources.
-            That means the P4A Accel runtime initialization can not be
-            inserted and that the compiled application may not work.
+        self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
 
-            If you build a P4A executable from partial p4a output, you
-            should add a
-               #include <p4a_accel.h>
-            at the beginning of the .c file containing the main()
-            and add at the beginning of main() a line with:
-               P4A_init_accel;
-            ''')
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
@@ -282,11 +267,12 @@ class p4a_processor():
 
         # For all the registered files from the workspace:
         for file in self.files:
+            
+            # Skip accelerator files.
             if file in self.accel_files:
-                # We do not want to remove the stubs file from the
-                # distribution... :-/
-                #os.remove(file)
+                os.remove(file)
                 continue
+            
             (dir, name) = os.path.split(file)
             # Where the file does dwell in the .database workspace:
             pips_file = os.path.join(self.workspace.directory(), "Src", name)
@@ -306,10 +292,10 @@ class p4a_processor():
             if prefix is None:
                 prefix = ""
             output_name = prefix + name
-
+            
             if suffix:
                 output_name = file_add_suffix(output_name, suffix)
-
+            
             # The final destination
             output_file = os.path.join(dir, output_name)
 
@@ -323,16 +309,16 @@ class p4a_processor():
                 p4a_file = os.path.join(self.workspace.directory(), "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
-                if self.cuda:
-                    # To have the nVidia compiler to be happy, we need to
-                    # have a .cu version of the .c file
-                    output_file = change_file_ext(output_file, ".cu")
+                # To have the nVidia compiler to be happy, we need to have
+                # a .cu version of the .c file
+                cu_file = change_file_ext(output_file, ".cu")
+                shutil.copyfile(pips_file, cu_file)
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
 
-            output_files.append(output_file)
-
+            output_files += [ output_file ]
+        
         return output_files
 
 
