@@ -1,0 +1,89 @@
+
+Parsed printed file for "FindMax"
+
+int FindMax(int amount, ...)
+{
+   int i, val, greater, len;
+   va_list vl;
+   va_start(vl, amount);
+   printf("\n num=%s \n", vl);
+   greater = va_arg(vl, int);
+   for (i = 1;i<amount;i++) {
+      val = va_arg(vl, int);
+      greater = greater>val?greater:val;
+   }
+   va_end(vl);
+   return greater;
+}
+
+Cumulated effetcs for "FindMax"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: amount stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int FindMax(int amount, ...)
+{
+   int i, val, greater, len;
+   va_list vl;
+//               <must be read   >: vl
+//               <must be written>: vl
+   va_start(vl, amount);
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: vl stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("\n num=%s \n", vl);
+//               <must be read   >: vl
+//               <must be written>: greater vl
+   greater = va_arg(vl, int);
+//               <may be read    >: greater val vl
+//               <may be written >: greater val vl
+//               <must be read   >: amount
+//               <must be written>: i
+   for(i = 1; i <= amount-1; i += 1) {
+//               <must be read   >: amount vl
+//               <must be written>: val vl
+      val = va_arg(vl, int);
+//               <must be read   >: amount greater val
+//               <must be written>: greater
+      greater = greater>val?greater:val;
+   }
+//               <may be written >: vl
+//               <must be read   >: vl
+   va_end(vl);
+//               <must be read   >: greater
+   return greater;
+}
+
+Parsed printed file for "main"
+
+int main()
+{
+   int m;
+   m = FindMax(7, 702, 422, 631, 834, 892, 104, 772);
+   printf("The greatest one is: %d\n", m);
+   return 0;
+}
+
+Cumulated effetcs for "main"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   int m;
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1] m
+   m = FindMax(7, 702, 422, 631, 834, 892, 104, 772);
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] m
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("The greatest one is: %d\n", m);
+   return 0;
+}

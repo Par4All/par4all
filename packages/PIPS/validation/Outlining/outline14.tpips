@@ -1,0 +1,34 @@
+setenv WS "outline14"
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE(%ALLFUNC)
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+apply COARSE_GRAIN_PARALLELIZATION[$WS]
+display PRINTED_FILE[$WS]
+setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "here"
+apply OUTLINE[$WS]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/$WS.out
+
+close
+delete $WS
+quit

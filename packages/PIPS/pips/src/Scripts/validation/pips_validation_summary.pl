@@ -4,6 +4,8 @@
 #
 # further summarize detailed summary
 
+use strict;
+
 my $failed = 0;
 my $timeout = 0;
 my $changed = 0;
@@ -97,7 +99,7 @@ printf
   " * missing: $missing (empty result directory)\n" .
   " * multi-script: $scripts (more than one validation script)\n" .
   " * multi-source: $sources (source files for test with different suffixes)\n" .
-  " * orphan: $orphan (result avaible without source nor script)\n" .
+  " * orphan: $orphan (result available without source nor script)\n" .
   "broken directory: $broken (directory without makefile)\n" .
   "success: %5.1f%%\n" .
   "\n",

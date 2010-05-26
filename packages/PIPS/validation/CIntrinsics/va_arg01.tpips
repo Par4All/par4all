@@ -1,0 +1,42 @@
+delete va_arg01
+
+setenv PIPS_CPP="cpp -C"
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create va_arg01 va_arg01.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+echo
+echo Parsed printed file for "FindMax"
+echo
+
+display PARSED_PRINTED_FILE[FindMax]
+
+echo
+echo Cumulated effetcs for "FindMax"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[FindMax]
+
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete va_arg01
+quit
+

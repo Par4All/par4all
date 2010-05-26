@@ -1,0 +1,8 @@
+delete cpp
+create cpp cpp.f90 
+
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%ALL]
+
+close
+quit
