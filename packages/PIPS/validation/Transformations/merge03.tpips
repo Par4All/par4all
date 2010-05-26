@@ -32,7 +32,7 @@ display PARALLELPRINTED_FILE(main)
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply INTERNALIZE_PARALLEL_CODE(main)
 display PRINTED_FILE(main)
-apply MANAGE_NESTED_PARALLELISM(main)
+apply LIMIT_NESTED_PARALLELISM(main)
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
