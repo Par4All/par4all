@@ -1,0 +1,34 @@
+
+Parsed printed file for "strncpy01"
+
+int main()
+{
+   char str1[] = "To be or not to be";
+   char str2[6];
+   strncpy(str2, str1, 5);
+   str2[5] = '\0';
+   puts(str2);
+   return 0;
+}
+
+Cumulated effetcs for "strncpy01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <may be written >: str1[*]
+   char str1[] = "To be or not to be";
+   char str2[6];
+   strncpy(str2, str1, 5);
+//               <must be written>: str2[5]
+   str2[5] = '\0';
+//               <may be read    >: stdout[0] str2[*]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   puts(str2);
+   return 0;
+}

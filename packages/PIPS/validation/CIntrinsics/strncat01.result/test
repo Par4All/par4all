@@ -1,0 +1,34 @@
+
+Parsed printed file for "strncat01"
+
+int main()
+{
+   char str1[20];
+   char str2[20];
+   strcpy(str1, "To be ");
+   strcpy(str2, "or not to be");
+   strncat(str1, str2, 6);
+   puts(str1);
+   return 0;
+}
+
+Cumulated effetcs for "strncat01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+   char str1[20];
+   char str2[20];
+   strcpy(str1, "To be ");
+   strcpy(str2, "or not to be");
+   strncat(str1, str2, 6);
+//               <may be read    >: stdout[0] str1[*]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   puts(str1);
+   return 0;
+}

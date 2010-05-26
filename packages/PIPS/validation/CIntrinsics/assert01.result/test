@@ -1,0 +1,38 @@
+
+Parsed printed file for "assert01"
+
+int main()
+{
+   FILE *datafile;
+   datafile = fopen("file.dat", "r");
+   datafile?(void) 0:__assert_fail("datafile", "./assert01.c", 10, (const char *) 0);
+
+   fclose(datafile);
+
+   return 0;
+}
+
+Cumulated effetcs for "assert01"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[*]
+int main()
+{
+   FILE *datafile;
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be written>: datafile
+   datafile = fopen("file.dat", "r");
+//               <must be read   >: datafile
+   datafile?(void) 0:__assert_fail("datafile", "./assert01.c", 10, (const char *) 0);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
+//                                  __IO_EFFECTS:LUNS[*]
+
+   fclose(datafile);
+
+   return 0;
+}

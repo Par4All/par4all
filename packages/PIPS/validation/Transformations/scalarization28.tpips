@@ -9,8 +9,8 @@ setproperty ARRAY_PRIV_FALSE_DEP_ONLY TRUE
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
 
-apply SCALARIZATION
-display PRINTED_FILE
+apply SCALARIZATION[compute]
+display PRINTED_FILE[compute]
 
 close
 delete $WS
