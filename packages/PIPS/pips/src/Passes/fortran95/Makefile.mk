@@ -71,7 +71,10 @@ unbuild:
 clean: local-clean unbuild
 
 local-clean:
-	$(RM) -rf $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(SRC.d)
+	# do *NOT* remove downloaded files in clean & unbuild targets.
+	# FC 2010-05-25
+	$(RM) -rf $(SRC.d)
+	#$(RM) -f $(GCC_MD5) $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(SRC.d)
 
 $(SRC.d)/.dir:
 	mkdir -p $(SRC.d)

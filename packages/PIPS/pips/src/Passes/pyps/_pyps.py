@@ -154,9 +154,17 @@ class workspace:
 		self._build_module_list()
 		return self._modules[module_name]
 
+
 	def __setitem__(self,i):
 		"""change a module of the module from its name"""
 		return self._modules[i]
+
+
+	def __contains__(self, module_name):
+		"""Test if the workspace contains a given module"""
+		self._build_module_list()
+		return module_name in self._modules
+
 
 	def info(self,topic):
 		return split(pypips.info(topic))
@@ -280,3 +288,10 @@ class workspace:
 			self._modules[m]=module(self,m,self._sources[0])
 
 
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### tab-width: 4
+### End:

@@ -72,7 +72,7 @@ static void  process_loop (loop l) {
 
 /**
 **/
-bool manage_nested_parallelism (const string module_name) {
+bool limit_nested_parallelism (const string module_name) {
 
   // Use this module name and this environment variable to set
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,

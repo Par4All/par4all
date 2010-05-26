@@ -43,15 +43,15 @@ include $(ROOT)/makes/main.mk
 LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
 
 # install hook
-install:pyps-install
-pyps-install:setup.py
+install: pyps-install
+pyps-install: setup.py
 	$(INSTALL) -d $(PY.d)
 	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) || \
 	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) 
 
 # swig stuff
 
-$(PYTHON_MODULE).h:$(PYTHON_MODULE).c
+$(PYTHON_MODULE).h: $(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
 	echo "extern char *activate(char *phase);" >> $@
 	echo "extern int delete_workspace(char *phase);" >> $@
@@ -59,14 +59,11 @@ $(PYTHON_MODULE).h:$(PYTHON_MODULE).c
 $(PYTHON_MODULE).i:$(PYTHON_MODULE).i.in $(PYTHON_MODULE).h
 	sed -e 's/SWIG_MODULE_NAME/$(PYTHON_MODULE)/' $^ > $@
 
-
 $(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).i
 	swig -python $<
 
 the_$(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).h $(PYTHON_MODULE)_wrap.c
 	cat $^ > $@
-
-
 
 $(PYTHON_MODULE).py:$(PYTHON_MODULE).i
 	swig -python $<
@@ -77,18 +74,18 @@ CPPFLAGS+=-I$(PYTHON_INCLUDE)
 	$(COMPILE) $< -o $@
 
 clean:
-	rm -f *.o *.tmp *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
-	rm -rf build
+	rm -f *.o *.tmp *.H the_$(PYTHON_MODULE)_wrap.c $(PYTHON_MODULE)_wrap.c \
+	  *.pyc $(PYTHON_MODULE).h pypips.i
+	rm -rf build 
 
-distclean:clean
+distclean: clean
 	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py *.i
 
 $(ARCH)/pipscc:pipscc.py
 	cp $< $@
 	chmod u+x $@
 
-
-check:sample.py all pipscc.py pii.py
+check: sample.py all pipscc.py pii.py
 	PYTHONPATH=$(PY.d) python -c "import pypips"
 	PYTHONPATH=$(PY.d) python -c "import pyps"
 	PYTHONPATH=$(PY.d) python -c "import pipscc"

@@ -1848,7 +1848,7 @@ static text text_entity_declaration(entity module,
    * hence the reversion.
    */
   r = make_text(uses);
-  ADD_WORD_LIST_TO_TEXT(r, gen_nreverse( before ) );
+  MERGE_TEXTS(r, make_text(gen_nreverse(before)));
 
   MERGE_TEXTS(r, text_of_parameters(lparam));
   gen_free_list(lparam), lparam = NIL;
