@@ -4,6 +4,8 @@
 #
 # further summarize detailed summary
 
+use strict;
+
 my $failed = 0;
 my $timeout = 0;
 my $changed = 0;
