@@ -477,12 +477,13 @@ def main():
         accel = accel_src_dir, fortran = fortran))
     
     # Write version file.
+    version = guess_file_revision(root) + "~exported"
     info("Writing version file")
-    dump(get_version_file_path(dist_dir = install_dir), guess_file_revision(root) + "~exported")
+    dump(get_version_file_path(dist_dir = install_dir), version)
 
     done("")
-    done("All done. Par4All is ready and has been installed in " + install_dir)
-    done("According to your shell religion, you should source")
+    done("All done. Par4All " + version + " is ready and has been installed in " + install_dir)
+    done("According to your shell religion, you should source:")
     done("")
     done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
     done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")

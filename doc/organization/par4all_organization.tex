@@ -717,6 +717,8 @@ these branches).
 \subsection{Setting and running the infrastructure up}
 \label{sec:setup}
 
+There are scripts to ease the developer and user life.
+
 \subsubsection{Packages needed to build and run Par4All}
 \label{sec:pack-need-build}
 
@@ -724,15 +726,19 @@ The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
 Debian/unstable and you need to have at least these packages installed to
 compile and run:
 \begin{quote}
-  \texttt{cproto}, \texttt{flex}, \texttt{bison},
+  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
   \texttt{texlive-latex-extra}, \texttt{tex4ht}, \texttt{automake},
-  \texttt{libtool}, \texttt{libreadline5-dev}, \texttt{python2.6-dev},
-  \texttt{swig}, \texttt{python-ply}, \texttt{libgmp3-dev},
-  \texttt{libmpfr-dev}, \texttt{gfortran}
+  \texttt{libtool}, \texttt{autoconf}, \texttt{libreadline5-dev},
+  \texttt{python-dev}, \texttt{swig}, \texttt{python-ply},
+  \texttt{libgmp3-dev}, \texttt{libmpfr-dev}, \texttt{gfortran},
+  \texttt{subversion}, \texttt{git}
 \end{quote}
 
-There are scripts to ease the developer and user life.
-
+To only run \Apfa, the following packages on Debian or Ubuntu are needed:
+\begin{quote}
+  \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
+  \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
+\end{quote}
 
 \subsubsection{Scripts for an everyday work}
 \label{sec:an-everyday-work}
@@ -1052,11 +1058,58 @@ to specific versions of conceptual branches such as
 After validating, a release is done by making some branch at a given state
 a tag.
 
+\section{Some \protect\Agit tricks useful in \protect\Apfa}
+\label{sec:some-agit-tricks}
+
+\section{You have committed to the wrong branch}
+\label{sec:you-have-comited}
+
+There are (too) many branches in \Apfa, right? It is so easy for example
+to do a commit on the \texttt{p4a} for example instead of the
+\texttt{p4a-own} one. The good new is that since \Agit separate commit and
+publish phase, if you reread what you have done with for example
+\texttt{gitk}, you should figure out what you did wrong before it explode
+to the faces of your colleagues.
+
+Here is an example of a wrong \texttt{p4a} commit and how to get your work
+in a good way before pushing to others.
+
+First create a branch to ease following of what you did wrong:
+\begin{verbatim}
+git checkout -b wrong
+\end{verbatim}
+Go back up to a clean state (here only 1 \verb|^| so only to the previous
+commit):
+\begin{verbatim}
+git branch -f p4a p4a^
+\end{verbatim}
+Move what you did wrong to the branch where it should always have been:
+\begin{verbatim}
+git rebase --onto p4a-own p4a wrong
+\end{verbatim}
+The go to the target branch:
+\begin{verbatim}
+git checkout p4a-own
+\end{verbatim}
+and merge in it your work:
+\begin{verbatim}
+git merge wrong
+\end{verbatim}
+and delete your helping branch:
+\begin{verbatim}
+git branch -d wrong
+\end{verbatim}
+Magic isn't it? \smiley
+
+You can see that your wrong work is still connected to the branch
+\texttt{p4a}, but no longer \emph{in} the branch. It is typical
+representative of all the work done in \Apfa to avoid loosing information.
+
 
 \end{document}
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
 %%% End:

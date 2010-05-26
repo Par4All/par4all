@@ -11,9 +11,11 @@ _HAS_HTLATEX_ = 1
 # common stuff
 ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
-include $(ROOT)/makes/main.mk
 
 default: full-compile phase7
+
+include $(ROOT)/makes/main.mk
+
 
 publish:
 	rsync -av par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
@@ -23,4 +25,4 @@ clean: local-clean
 
 local-clean:
 	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
-		*.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out
+		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out

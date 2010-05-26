@@ -15,6 +15,8 @@ import p4a_term
 # Global variables.
 verbosity = 0
 logger = None
+actual_script = os.path.abspath(os.path.realpath(os.path.expanduser(__file__)))
+script_dir = os.path.split(actual_script)[0]
 
 def set_verbosity(level):
 	'''Sets global verbosity level'''
@@ -163,7 +165,7 @@ def is_system_dir(dir):
 
 def rmtree(dir, can_fail = 0, remove_top = True):
 	'''Removes a directory recursively, alternative to shutil.rmtree()'''
-	dir = os.path.normpath(os.path.realpath(dir))
+	dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
 	if not dir or not os.path.isdir(dir):
 		raise p4a_error("Not a directory: " + dir)
 	if is_system_dir(dir): # Prevent deletion of major system dirs...
@@ -182,6 +184,54 @@ def rmtree(dir, can_fail = 0, remove_top = True):
 			warn("Could not remove directory " + dir + ": " + str(sys.exc_info()))
 		else:
 			raise e
+
+def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = False, 
+	match_whole_path = False, can_fail = True):
+	'''Lookup files matching the regular expression file_re underneath dir.
+	If dir is empty, os.getcwd() will be looked up.	
+	If full_path is true, absolute path names of matching file/dir names will be returned.
+	If match_whole_path is True, whole paths will be tested against file_re.'''
+	matches = []
+	compiled_file_re = re.compile(file_re)
+	if dir:
+		if not os.path.isdir(dir):
+			raise p4a_error("Invalid directory: " + dir)
+	else:
+		dir = os.getcwd()
+	dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
+	try:
+		for root, dirs, files in os.walk(dir, topdown = False):
+			files_dirs = []
+			if match_files:
+				files_dirs += files
+			if match_dirs:
+				files_dirs += dirs
+			for name in files:
+				if compiled_file_re.match(name):
+					if abs_path:
+						matches += [ os.path.join(root, name) ]
+					else:
+						matches += [ os.path.join(root, name)[len(dir):] ]
+	except:
+		if not can_fail:
+			raise e
+	return matches
+
+#def get_python_lib_dir(dist_dir = None):
+#	lib_dir = ""
+#	if dist_dir:
+#		lib_dir = os.path.join(dist_dir, "lib")
+#	else:
+#		global script_dir
+#		return script_dir
+#	python_dir = find(r"python\d\.\d", dir = dist_dir)
+#	
+#	for file in os.listdir(dist_dir):
+#		if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
+#			install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
+#			if not os.path.isdir(install_python_lib_dir):
+#				install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
+#			break
 
 def change_file_ext(file, new_ext):
 	'''Changes the extension for the given file path'''
