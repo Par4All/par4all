@@ -79,9 +79,9 @@ def guess_file_revision(file_dir = None):
         return revision
 
     # Next, try svnversion.
-    revision = run2([ "svnversion", file ], can_fail = True)[0].strip()
-    if revision:
-        return revision
+    #revision = run2([ "svnversion", file ], can_fail = True)[0].strip()
+    #if revision:
+    #    return revision
 
     # Finally, make up a version string based on last file modification date/time.
     try:
