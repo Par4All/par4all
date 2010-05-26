@@ -1,0 +1,55 @@
+
+Parsed printed file for "strcmp01"
+
+int main()
+{
+   char szKey[] = "apple";
+   char szInput[80];
+   do {
+      printf("Guess my favourite fruit? ");
+      gets(szInput);
+   }
+   while (strcmp(szKey, szInput)!=0);
+   puts("Correct answer!");
+   return 0;
+}
+
+Cumulated effetcs for "strcmp01"
+
+//               <may be read    >: stdin stdin[0] stdout[0] 
+//                                  __IO_EFFECTS:LUNS[0]
+//               <may be written >: stdin[0] stdout[0] 
+//                                  __IO_EFFECTS:LUNS[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <may be written >: szKey[*]
+   char szKey[] = "apple";
+   char szInput[80];
+//               <may be read    >: stdin stdin[0] stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: stdin[0] stdout[0] 
+//                                  __IO_EFFECTS:LUNS[0] 
+//                                  __IO_EFFECTS:LUNS[1] szInput[*]
+   do {
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+      printf("Guess my favourite fruit? ");
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0] szInput[*]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+      gets(szInput);
+   }
+   while (strcmp(szKey, szInput)!=0);
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   puts("Correct answer!");
+   return 0;
+}

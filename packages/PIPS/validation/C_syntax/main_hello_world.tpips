@@ -1,22 +1,26 @@
 delete main_hello_world
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create main_hello_world main_hello_world.c
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 
 #setenv C_SYNTAX_DEBUG_LEVEL 7
 
-activate C_PARSER
+#activate C_PARSER
 
 display PARSED_PRINTED_FILE[main_hello_world!]
+
 display PARSED_PRINTED_FILE[main]
 
 apply UNSPLIT
-shell cc -c main_hello_world.database/Src/main_hello_world.c
+shell cc -c main_hello_world.database/Src/main_hello_world.c -o main_hello_world.database/Src/main_hello_world.o
 
 close
 
-delete main_hello_world
+#delete main_hello_world
 
 quit
