@@ -179,7 +179,7 @@ def rmtree(dir, can_fail = 0, remove_top = True):
 			os.rmdir(dir)
 	except:
 		if can_fail:
-			warn("Could not remove directory " + dir + ": " + str(sys.exc_info()))
+			warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
 		else:
 			raise e
 

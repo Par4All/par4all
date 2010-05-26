@@ -37,6 +37,8 @@ fi
 
 # Update Python module search path with PIPS Python bindings (PyPS).
 NEW_PYTHON_PATH=$$(ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1)
-export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
+PYTHONPATH=$$(prepend_to_path_var PYTHONPATH /usr/share/pyshared)
+PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
+export PYTHONPATH
 
 unset prepend_to_path_var
