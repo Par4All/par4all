@@ -120,7 +120,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
                              */
                             // "-x",
                             // "f95",
-                            //"-cpp",
+                            "-cpp",
                             // "-quiet",// "-Werror",
                             /* I don't know what the following stuff is ... */
                             "-fcray-pointer",
@@ -151,12 +151,14 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
 
     // MAIN CALL TO GFC
     char** arg = gfc2pips_args;
-    fprintf( stderr, "execvp : " );
-    while ( *arg ) {
-      fprintf( stderr, " %s", *arg );
-      arg++;
+    ifdebug(1) {
+      fprintf( stderr, "execvp : " );
+      while ( *arg ) {
+        fprintf( stderr, " %s", *arg );
+        arg++;
+      }
+      fprintf( stderr, "\n" );
     }
-    fprintf( stderr, "\n" );
     execvp( "gfc2pips", gfc2pips_args );
     // No return from exec
     pips_user_error("gfc2pips is not installed, did you compile PIPS with"
@@ -175,7 +177,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
 
       // Check the gfc2pips return code
       if ( statut != EXIT_SUCCESS ) {
-        printf("error code %d\n",statut);
+        fprintf(stderr,"error code %d\n",statut);
         return "gfc2pips return an error";
       }
     }
