@@ -62,11 +62,10 @@ class p4a_processor():
 
             for file in files:
                 if self.fortran is None:
-                    (base, ext) = os.path.splitext(file)
                     # Track the language for an eventual later compilation
                     # by a back-end target compiler. The first file type
                     # select the type for all the workspace:
-                    if ext == ".f":
+                    if fortran_file_p(file):
                         self.fortran = True
                     else:
                         self.fortran = False
