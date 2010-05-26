@@ -38,10 +38,12 @@ class p4a_processor():
 
     def __init__(self, workspace = None, project_name = "", cppflags = "",
                  verbose = False, files = [], filter_include = None,
-                 filter_exclude = None, accel = False, recover_includes = True):
+                 filter_exclude = None, accel = False, cuda = False,
+                 recover_includes = True):
 
         self.recover_includes = recover_includes
         self.accel = accel
+        self.cuda = cuda
 
         if workspace:
             self.workspace = workspace
@@ -321,15 +323,16 @@ class p4a_processor():
                 p4a_file = os.path.join(self.workspace.directory(), "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
-                # To have the nVidia compiler to be happy, we need to have
-                # a .cu version of the .c file
-                cu_file = change_file_ext(output_file, ".cu")
-                shutil.copyfile(pips_file, cu_file)
+                if self.cuda:
+                    # To have the nVidia compiler to be happy, we need to
+                    # have a .cu version of the .c file
+                    output_file = change_file_ext(output_file, ".cu")
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
 
-            output_files += [ output_file ]
+            output_files.append(output_file)
+
         return output_files
 
 
