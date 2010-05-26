@@ -197,7 +197,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = 
 	else:
 		dir = os.getcwd()
 	dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
-	debug("Looking for files matching '" + file_re + "' in " + dir)
+	#debug("Looking for files matching '" + file_re + "' in " + dir)
 	try:
 		for root, dirs, files in os.walk(dir, topdown = False):
 			files_dirs = []
@@ -206,11 +206,19 @@ def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = 
 			if match_dirs:
 				files_dirs += dirs
 			for name in files:
-				if compiled_file_re.match(name):
+				whole_path = os.path.join(root, name)
+				matched = False
+				if match_whole_path:
+					if compiled_file_re.match(whole_path):
+						matched = True
+				else:
+					if compiled_file_re.match(name):
+						matched = True
+				if matched:
 					if abs_path:
-						matches += [ os.path.join(root, name) ]
+						matches += [ whole_path ]
 					else:
-						matches += [ os.path.join(root, name)[len(dir):] ]
+						matches += [ whole_path[len(dir):] ]
 	except:
 		if not can_fail:
 			raise e
