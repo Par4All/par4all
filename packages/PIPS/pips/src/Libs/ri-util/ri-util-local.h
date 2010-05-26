@@ -717,6 +717,8 @@
 #define MODF_OPERATOR_NAME "modf"
 #define POW_OPERATOR_NAME "pow"
 #define C_SQRT_OPERATOR_NAME "sqrt"
+#define C_SQRTF_OPERATOR_NAME "sqrtf"
+#define C_SQRTL_OPERATOR_NAME "sqrtl"
 #define CEIL_OPERATOR_NAME "ceil"
 #define FABS_OPERATOR_NAME "fabs"
 #define FLOOR_OPERATOR_NAME "floor"

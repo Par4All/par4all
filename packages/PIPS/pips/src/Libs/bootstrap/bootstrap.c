@@ -4262,6 +4262,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {MODF_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
   {POW_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
   {C_SQRT_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
+  {C_SQRTF_OPERATOR_NAME, 1, real_to_real_type, 0, 0},
   {CEIL_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
   {FABS_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
   {FLOOR_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
