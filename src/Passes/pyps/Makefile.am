@@ -37,7 +37,7 @@ pypips.i:pypips.i.in pypips.h
 	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
 
 pypips.h:pypips.c Makefile
-	$(CPROTO) -evcf2 -E "$(CPROTO_CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c > pypips.h
+	$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c > pypips.h
 	echo "#include <unistd.h>" >> pypips.h
 	echo '#include "linear.h"' >> pypips.h
 	echo '#include "genC.h"' >> pypips.h

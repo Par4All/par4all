@@ -35,6 +35,7 @@ AM_CPPFLAGS=\
 	-I../../Libs/pipsmake\
 	-I../../Libs/top-level\
 	-I../../Libs/properties\
+	-I../../Libs/preprocessor\
 	-I../../Libs/pipsdbm\
 	$(GTKp_2_0_CFLAGS)\
 	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
