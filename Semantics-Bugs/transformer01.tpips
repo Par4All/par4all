@@ -1,0 +1,11 @@
+delete transformer01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create transformer01 transformer01.c
+apply TRANSFORMERS_INTRA_FAST (%ALLFUNC)
+
+close
+delete transformer01
+quit
+# EOF
