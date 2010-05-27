@@ -82,28 +82,36 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None):
         os.environ["LC_ALL"] = force_locale
     old_cwd = ""
     w = ""
-    if working_dir:
-        old_cwd = os.getcwd()
-        os.chdir(working_dir)
-        w = working_dir
-    else:
-        w = os.getcwd()
-    ret = os.system(" ".join(cmd_list))
-    if old_cwd:
-        os.chdir(old_cwd)
+    try:
+        if working_dir:
+            old_cwd = os.getcwd()
+            os.chdir(working_dir)
+            w = working_dir
+        else:
+            w = os.getcwd()
+        ret = os.system(" ".join(cmd_list))
+        if old_cwd:
+            os.chdir(old_cwd)
+    except:
+        if not can_fail:
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
     if old_locale:
         os.environ["LC_ALL"] = old_locale
     if ret != 0 and not can_fail:
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return ret
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False):
     '''Runs a command and dies if return code is not zero.
     Returns the final stdout and stderr output as a list.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    w = os.getcwd()
+    #if cmd_list.__class__.__name__ != "list":
+    #    cmd_list = [ cmd_list ]
+    w = ""
     if working_dir:
         w = working_dir
+    else:
+        w = os.getcwd()
     if verbosity >= 1:
         sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") + " ".join(cmd_list) + p4a_term.escape() + "\n");
     old_locale = ""
@@ -115,7 +123,6 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     if verbosity >= 2 and not capture:
         redir = None
     try:
-        #print repr(os.environ)
         if shell:
             process = subprocess.Popen(" ".join(cmd_list), shell = True, 
                 stdout = redir, stderr = redir, cwd = working_dir, env = os.environ)
@@ -123,7 +130,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
             process = subprocess.Popen(cmd_list, shell = False, 
                 stdout = redir, stderr = redir, cwd = working_dir, env = os.environ)
     except:
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()))
+        if not can_fail:
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
     out = ""
     err = ""
     while True:
@@ -139,7 +147,7 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     if ret != 0 and not can_fail:
         if err:
             error(err)
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 # Not portable!
