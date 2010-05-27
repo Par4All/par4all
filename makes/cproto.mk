@@ -10,8 +10,14 @@
 # not that the time stamp is here to prevent too many runs of cproto ...
 
 CPROTO_STAMP_FILE=.cproto.stamp
-$(CPROTO_STAMP_FILE):$(srcdir)/$(TARGET)-local.h $(SOURCES) $(srcdir)/Makefile.am
+
+# this one ensure there is a minimal header
+$(CPROTO_STAMP_FILE)_init:$(srcdir)/$(TARGET)-local.h $(srcdir)/Makefile.am
 	test -f $(TARGET).h || ( cp $(srcdir)/$(TARGET)-local.h $(TARGET).h && chmod u+w $(TARGET).h && touch -r  $(srcdir)/$(TARGET)-local.h $(TARGET).h )
+	touch $(CPROTO_STAMP_FILE)_init
+
+# this one generate the stamp
+$(CPROTO_STAMP_FILE):$(SOURCES) $(srcdir)/Makefile.am $(CPROTO_STAMP_FILE)_init
 	SOURCES=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
@@ -35,6 +41,6 @@ $(TARGET).h:$(CPROTO_STAMP_FILE)
 	cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
 
 clean-local:
-	rm -f $(TARGET).h $(CPROTO_STAMP_FILE)
+	rm -f $(TARGET).h $(CPROTO_STAMP_FILE) $(CPROTO_STAMP_FILE)_init
 
 EXTRA_DIST=$(TARGET)-local.h
