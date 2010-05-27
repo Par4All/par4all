@@ -1,0 +1,16 @@
+void compute(int count, float input[0][0], float output[1][512])
+{
+   float *output0 = output[0];
+
+   int i;
+
+   for(i = 0; i <= count-1; i += 1)
+      output0[i] = output[0][i];
+
+   for(i = 0; i <= count-1; i += 1) {
+      iRec0[0] = 12+5*iRec0[1];
+      output0[i] = (float) 0.5f*iRec0[0];
+      // post processing
+      iRec0[1] = iRec0[0];
+   }
+}
