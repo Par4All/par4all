@@ -22,3 +22,4 @@ dist_noinst_DATA=xpomp_manual.tex xPOMP_window_explained.eps
 doc_DATA=xpomp_manual.pdf
 xpomp_manual.pdf:xPOMP_window_explained.pdf
 include $(top_srcdir)/makes/latex.mk
+CLEANFILES=xPOMP_window_explained.pdf
