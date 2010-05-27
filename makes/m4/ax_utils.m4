@@ -264,7 +264,6 @@ AC_DEFUN([AX_CHECK_CPROTO],[
 			AX_WITH([cproto])="no"
 			AX_MSG([cproto])="cproto version too low"
 		])
-		AC_PATH_PROG([CPROTO_CPP],[cpp],[$CPP])
 	])
 ])
 
