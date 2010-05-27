@@ -66,6 +66,7 @@ AX_CHECK_HEADERS([inttypes.h memory.h stdint.h stdlib.h string.h strings.h])
 AC_HEADER_STDBOOL
 AC_C_CONST
 AC_TYPE_SIZE_T
+AX_LD_NO_UNDEFINED
 
 # Checks for library functions.
 AC_FUNC_MALLOC
