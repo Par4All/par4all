@@ -11,6 +11,8 @@
 
 CPROTO_STAMP_FILE=.cproto.stamp
 
+cproto_bootstrap:$(CPROTO_STAMP_FILE)_init
+
 # this one ensure there is a minimal header
 $(CPROTO_STAMP_FILE)_init:$(srcdir)/$(TARGET)-local.h $(srcdir)/Makefile.am
 	test -f $(TARGET).h || ( cp $(srcdir)/$(TARGET)-local.h $(TARGET).h && chmod u+w $(TARGET).h && touch -r  $(srcdir)/$(TARGET)-local.h $(TARGET).h )
