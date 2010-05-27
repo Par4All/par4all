@@ -325,6 +325,11 @@ class p4a_processor():
 
         return output_files
 
+    def __del__(self):
+        # Waiting for pyps.workspace.close!
+        if self.workspace:
+            del self.workspace
+
 
 if __name__ == "__main__":
     print(__doc__)
