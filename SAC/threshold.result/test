@@ -254,14 +254,13 @@ void threshold(float data[128], float val)
 }
 void threshold(float data[128], float val)
 {
-   int i;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    {
       //PIPS generated variable
       int I_0[128];
-      LU_NUB0 = 128;
-      LU_IB0 = 0;
+      128;
+      0;
       LU_IND0 = 0;
       {
          //SAC generated temporary array
@@ -287,7 +286,7 @@ void threshold(float data[128], float val)
             SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
          }
       }
-      i = 128;
+      128;
    }
    ;
 }
@@ -296,14 +295,13 @@ simdized code
 
 void threshold(float data[128], float val)
 {
-   int i;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    {
       //PIPS generated variable
       int I_0[128];
-      LU_NUB0 = 128;
-      LU_IB0 = 0;
+      128;
+      0;
       LU_IND0 = 0;
       {
          //SAC generated temporary array
@@ -329,7 +327,7 @@ void threshold(float data[128], float val)
             SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
          }
       }
-      i = 128;
+      128;
    }
    ;
 }

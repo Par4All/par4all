@@ -285,13 +285,11 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int i;
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
    float RED0[1], RED1[4];
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
    {
       //SAC generated temporary array
       float aligned[4] = {0, 0, 0, 0};
@@ -302,8 +300,8 @@ void filtre(float x[100], float y[100], float h[4])
          float v4sf_vec1[4], v4sf_vec2[4];
          //PIPS:SAC generated float vector(s)
          float v4sf_vec3[4], v4sf_vec4[4];
-         LU_NUB00 = 4;
-         LU_IB00 = 0;
+         4;
+         0;
          RED0[0] = 0.000000;
          LU_IND0 = 0;
          y[i] = RED0[0]+y[i];
@@ -319,7 +317,7 @@ void filtre(float x[100], float y[100], float h[4])
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
          SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
          y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
-         k = 4;
+         4;
       }
       SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
    }
@@ -330,13 +328,11 @@ simdized code
 
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int i;
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
    float RED0[1], RED1[4];
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
    {
       //SAC generated temporary array
       float aligned[4] = {0, 0, 0, 0};
@@ -347,8 +343,8 @@ void filtre(float x[100], float y[100], float h[4])
          float v4sf_vec1[4], v4sf_vec2[4];
          //PIPS:SAC generated float vector(s)
          float v4sf_vec3[4], v4sf_vec4[4];
-         LU_NUB00 = 4;
-         LU_IB00 = 0;
+         4;
+         0;
          RED0[0] = 0.000000;
          LU_IND0 = 0;
          y[i] = RED0[0]+y[i];
@@ -364,7 +360,7 @@ void filtre(float x[100], float y[100], float h[4])
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
          SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
          y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
-         k = 4;
+         4;
       }
       SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
    }

@@ -45,7 +45,7 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -73,13 +73,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
-      j = MAX0(LU_NUB0, 0);
    }
    ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -107,13 +106,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
-      j = MAX0(LU_NUB0, 0);
    }
    ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_IB00, LU_NUB00;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -141,13 +139,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
-      j = MAX0(LU_NUB00, 0);
    }
    ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_IB00, LU_NUB00;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -167,13 +164,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
          SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
-      j = MAX0(LU_NUB00, 0);
    }
    ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0, LU_IB00, LU_NUB00;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -193,13 +189,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
          SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
-      j = MAX0(LU_NUB00, 0);
    }
    ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    int LU_IND0, LU_IB00, LU_NUB00;
    for(i = 0; i <= dim1-1; i += 1) {
@@ -219,7 +214,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
          SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
-      j = MAX0(LU_NUB00, 0);
    }
    ;
 }
