@@ -1,0 +1,17 @@
+delete init02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create init02 init02.f90
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o init02.database/Src/init02.o init02.database/Src/init02.f90
+
+close
+quit
