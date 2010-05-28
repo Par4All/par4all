@@ -2647,28 +2647,36 @@ transformer condition_to_transformer(
     free_transformer(ctf);
   }
   else {
-    entity tmpv = make_local_temporary_value_entity_with_basic(eb);
-    tf = safe_any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
-    if(veracity) {
-      /* tmpv != 0 */
-      transformer tf_plus = transformer_add_sign_information(copy_transformer(tf), tmpv, 1);
-      transformer tf_minus = transformer_add_sign_information(copy_transformer(tf), tmpv, -1);
+    /* Make sure you can handle this kind of variable.
 
-      ifdebug(8) {
-	fprintf(stderr, "tf_plus %p:\n", tf_plus);
-	dump_transformer(tf_plus);
-	fprintf(stderr, "tf_minus %p:\n", tf_minus);
-	dump_transformer(tf_minus);
+       This test is added for Semantics-New/transformer01.c which
+       tests a pointer. The underlying bug may still be there when
+       pointers are analyzed by PIPS.
+    */
+    if(analyzable_basic_p(eb)) {
+      entity tmpv = make_local_temporary_value_entity_with_basic(eb);
+      tf = safe_any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+      if(veracity) {
+	/* tmpv != 0 */
+	transformer tf_plus = transformer_add_sign_information(copy_transformer(tf), tmpv, 1);
+	transformer tf_minus = transformer_add_sign_information(copy_transformer(tf), tmpv, -1);
+
+	ifdebug(8) {
+	  fprintf(stderr, "tf_plus %p:\n", tf_plus);
+	  dump_transformer(tf_plus);
+	  fprintf(stderr, "tf_minus %p:\n", tf_minus);
+	  dump_transformer(tf_minus);
+	}
+
+	free_transformer(tf);
+	tf = transformer_convex_hull(tf_plus, tf_minus);
+	free_transformer(tf_plus);
+	free_transformer(tf_minus);
       }
-
-      free_transformer(tf);
-      tf = transformer_convex_hull(tf_plus, tf_minus);
-      free_transformer(tf_plus);
-      free_transformer(tf_minus);
-    }
-    else {
-      /* tmpv==0 */
-      tf = transformer_add_sign_information(tf, tmpv, 0);
+      else {
+	/* tmpv==0 */
+	tf = transformer_add_sign_information(tf, tmpv, 0);
+      }
     }
   }
 
