@@ -7901,6 +7901,10 @@ generate_two_addresses_code > MODULE.code
 			< MODULE.code
 			< PROGRAM.entities
 \end{PipsMake}
+Set following property to false if you want to split dereferencing:
+\begin{PipsProp}{GENERATE_TWO_ADDRESSES_CODE_SKIP_DEREFERENCING}
+GENERATE_TWO_ADDRESSES_CODE_SKIP_DEREFERENCING TRUE
+\end{PipsProp}
 
 %\begin{PipsPass}{iterator_detection}
 %convert array to pointer iterators
@@ -8533,6 +8537,7 @@ alias clean_declarations 'Clean Declarations'
 clean_declarations      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+		< MODULE.cumulated_effects
 \end{PipsMake}
 
 In C, dynamic variables which are allocated and freed but otherwise
@@ -8738,6 +8743,17 @@ scalarization  > MODULE.code
         < MODULE.regions
         < MODULE.in_regions
         < MODULE.out_regions
+\end{PipsMake}
+
+\begin{PipsPass}{CONSTANT_ARRAY_SCALARIZATION}
+Similar to \PipsPassRef{scalarization}, but with a different criterium:
+if the array is only accessed through constant indices, all its references are repalced by
+scalars.
+\end{PipsPass}
+\begin{PipsMake}
+constant_array_scalarization > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
 \end{PipsMake}
 
 
