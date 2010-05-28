@@ -47,6 +47,8 @@ enum {M=64};
 
 
 extern  main(int argc, char *argv[]);
+//PIPS generated variable
+void compute(int M, int *a, int *l, int *m);
 // END BLOCK
 void compute(int M, int *a, int *l, int *m)
 {
