@@ -2142,6 +2142,10 @@ multiply-add operators ( JZ - sept 98) */
     {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
     {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
 
+    /* What is the priority for CAST? 22? */
+
+#define CAST_OPERATOR_PRECEDENCE (22)
+
     {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 21},
     {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
     {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
@@ -2332,7 +2336,8 @@ list words_subexpression(
     list pc;
 
     if ( expression_call_p(obj) )
-      pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost, FALSE, pdl);
+      pc = words_call(syntax_call(expression_syntax(obj)),
+		      precedence, leftmost, FALSE, pdl);
     else if(expression_cast_p(obj)) {
       cast c = expression_cast(obj);
       pc = words_cast(c, precedence, pdl);
@@ -4538,8 +4543,7 @@ static list words_cast(cast obj, int precedence, list pdl)
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, c_words_entity(t, NIL, pdl));
   pc = CHAIN_SWORD(pc, space_p? ") " : ")");
-  /* FI: Should it be a words_subexpression? */
-  pc = gen_nconc(pc, words_expression(exp, pdl));
+  pc = gen_nconc(pc, words_subexpression(exp, CAST_OPERATOR_PRECEDENCE, TRUE, pdl));
   if(get_bool_property("PRETTYPRINT_ALL_PARENTHESES")  || precedence >= 25) {
     pc = CONS(STRING, strdup("("),
 	      gen_nconc(pc,CONS(STRING, strdup(")"), NIL)));
