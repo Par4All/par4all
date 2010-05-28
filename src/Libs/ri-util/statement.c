@@ -3173,7 +3173,7 @@ static void statement_clean_declarations_helper(list declarations, statement stm
     FOREACH(ENTITY,e,decl_cpy)
     {
         /* area and parameters are always used, so are referenced entities */
-        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) /*|| storage_return_p(entity_storage(e))*/);
+        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))));
         else
         {
             /* entities whose declaration has a side effect are always used too */
