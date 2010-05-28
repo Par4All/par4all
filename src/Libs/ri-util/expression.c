@@ -2980,3 +2980,13 @@ expression expressions_to_operation (const list l_exprs, entity op) {
   }
   return result;
 }
+
+/**
+ *  @brief frees expression synatx and repalce it by the new syntax
+ */
+void update_expression_syntax(expression e, syntax s)
+{
+    unnormalize_expression(e);
+    free_syntax(expression_syntax(e));
+    expression_syntax(e)=s;
+}
