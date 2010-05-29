@@ -20,9 +20,9 @@ display PRINTED_FILE[main]
 #apply POINTS_TO_ANALYSIS[main]
 #display PRINTED_FILE[main]
 
-#echo POINTS TO
-#activate PRINT_CODE_POINTS_TO_LIST
-#display PRINTED_FILE[main]
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 
 close

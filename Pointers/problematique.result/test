@@ -1,0 +1,115 @@
+
+PROPER EFFECTS
+
+int main()
+{
+   int *a, *b, *c;
+   int i;
+//               <must be written>: i
+   i = 0;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a
+   /* Allocation dynamiques des tableaux */
+   a = (int *) malloc(20*sizeof(int));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+   b = (int *) malloc(20*sizeof(int));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c
+   c = (int *) malloc(20*sizeof(int));
+//               <must be read   >: b
+//               <must be written>: a
+   /* Creation d'alias entre a et b */
+   a = b;
+//               <must be read   >: c
+//               <must be written>: a
+   
+   /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
+    * entre a et c */
+   a = c;
+//               <must be written>: i
+   
+   /* Initialisation du tableau b */
+   for(i = 0; i <= 19; i += 1)
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: b i
+      b[i] = i;
+//               <must be written>: i
+   
+   /* Initialisation du tableau c */
+   for(i = 0; i <= 19; i += 1)
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: c i
+      c[i] = 1;
+//               <must be written>: i
+   /* Initialisation du tableau a */
+   for(i = 0; i <= 19; i += 1)
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+      a[i] = b[i];
+   return 0;
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   int *a, *b, *c;
+//  points to = {}
+   int i;
+//  points to = {}
+   i = 0;
+//  points to = {}
+   /* Allocation dynamiques des tableaux */
+   a = (int *) malloc(20*sizeof(int));
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   b = (int *) malloc(20*sizeof(int));
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   c = (int *) malloc(20*sizeof(int));
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   /* Creation d'alias entre a et b */
+   a = b;
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   
+   /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
+    * entre a et c */
+   a = c;
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   
+   /* Initialisation du tableau b */
+   for(i = 0; i <= 19; i += 1)
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+      b[i] = i;
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   
+   /* Initialisation du tableau c */
+   for(i = 0; i <= 19; i += 1)
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+      c[i] = 1;
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   /* Initialisation du tableau a */
+   for(i = 0; i <= 19; i += 1)
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+      a[i] = b[i];
+//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+   return 0;
+}

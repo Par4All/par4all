@@ -1,0 +1,38 @@
+
+PROPER EFFECTS
+
+int main()
+{
+   int *p, *q;
+   int i, j;
+//               <must be written>: p
+   p = &i;
+//               <must be written>: q
+   q = &j;
+//               <must be read   >: q
+//               <must be written>: p
+   p = q;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: p
+   *p = 1;
+   return 0;
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   int *p, *q;
+//  points to = {}
+   int i, j;
+//  points to = {}
+   p = &i;
+//  {(p,i,-Exact-)}
+   q = &j;
+//  {(p,i,-Exact-);(q,j,-Exact-)}
+   p = q;
+//  {(p,j,-Exact-);(q,j,-Exact-)}
+   *p = 1;
+//  {(p,j,-Exact-);(q,j,-Exact-)}
+   return 0;
+}

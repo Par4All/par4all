@@ -1,0 +1,40 @@
+
+Proper effects for "main"
+
+int main()
+{
+   int t[100][10][3];                                                   /*0006*/
+   int *pu;                                                             /*0007*/
+//               <must be written>: pu
+
+   pu = t[1][2];                                                        /*0009*/
+   return 0;                                                            /*0010*/
+}
+
+POINTS TO for "main"
+
+//  {}
+int main()
+{
+//  points to = {}
+   int t[100][10][3];                                                   /*0006*/
+//  points to = {}
+   int *pu;                                                             /*0007*/
+//  points to = {}
+
+   pu = t[1][2];                                                        /*0009*/
+//  {(pu,t[1][2][0],-Exact-)}
+   return 0;                                                            /*0010*/
+}
+
+Proper effects using points_to
+
+int main()
+{
+   int t[100][10][3];                                                   /*0006*/
+   int *pu;                                                             /*0007*/
+//               <must be written>: pu
+
+   pu = t[1][2];                                                        /*0009*/
+   return 0;                                                            /*0010*/
+}
