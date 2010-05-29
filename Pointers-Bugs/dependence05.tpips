@@ -1,0 +1,35 @@
+delete dependence05
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create dependence05 dependence05.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+echo
+echo Proper effects for "dependence05"
+echo
+display PRINTED_FILE[dependence05]
+
+activate PRINT_CODE_POINTS_TO_LIST
+
+echo
+echo POINTS TO for "dependence05"
+echo
+display PRINTED_FILE[dependence05]
+
+echo 
+echo Proper effects using points_to
+echo
+module dependence05
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+ 
+
+close
+delete dependence05
