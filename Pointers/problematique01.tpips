@@ -1,0 +1,30 @@
+delete problematique01
+create problematique01 problematique01.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+##TODO: explain
+
+#echo 
+#echo PROPER EFFECTS
+#echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+
+#apply COARSE_GRAIN_PARALLELIZATION[main]
+#display PRINTED_FILE[main]
+
+#apply POINTS_TO_ANALYSIS[main]
+#display PRINTED_FILE[main]
+
+#echo POINTS TO
+#activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[main]
+
+
+close
+delete problematique01
+quit
