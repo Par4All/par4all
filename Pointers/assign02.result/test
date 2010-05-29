@@ -1,7 +1,7 @@
 
 POINTS TO for "make_s"
 
-C  {}
+//  {}
 s_t make_s(int i, float x)
 {
 //  points to = {}
@@ -11,11 +11,11 @@ s_t make_s(int i, float x)
 //  points to = {}
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    p->entier = i;
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    p->reel = x;
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    return *p;
 }
 
