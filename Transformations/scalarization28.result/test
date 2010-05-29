@@ -9,7 +9,7 @@ void compute(int count, float input[0][0], float output[1][512])
 
    for(i = 0; i <= count-1; i += 1) {
       iRec0[0] = 12+5*iRec0[1];
-      output0[i] = (float) 0.5f*iRec0[0];
+      output0[i] = (float) (0.5f*iRec0[0]);
       // post processing
       iRec0[1] = iRec0[0];
    }
@@ -27,7 +27,7 @@ void compute(int count, float input[0][0], float output[1][512])
 
    for(i = 0; i <= count-1; i += 1) {
       iRec00 = 12+5*iRec01;
-      output0[i] = (float) 0.5f*iRec00;
+      output0[i] = (float) (0.5f*iRec00);
       // post processing
       iRec01 = iRec00;
    }

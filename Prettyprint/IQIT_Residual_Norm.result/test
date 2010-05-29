@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
    printf("\n\nTEST OF IQ-IT RESIDUAL 4x4 Block NORM IMPLEMENTATION %s - %s \n\n", "11:17:40", "Oct 20 2008");
 
    qP_i = 28;
-   qP_div_6_i = (int) qP_i/6;
+   qP_div_6_i = (int) (qP_i/6);
    qP_mod_6_i = qP_i-qP_div_6_i*6;
    LeftShift_i = qP_div_6_i;
 
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
    printf("\n\nTEST OF IQ-IT RESIDUAL 4x4 Block NORM IMPLEMENTATION %s - %s \n\n", "11:17:40", "Oct 20 2008");
 
    qP_i = 28;
-   qP_div_6_i = (int) qP_i/6;
+   qP_div_6_i = (int) (qP_i/6);
    qP_mod_6_i = qP_i-qP_div_6_i*6;
    LeftShift_i = qP_div_6_i;
 
