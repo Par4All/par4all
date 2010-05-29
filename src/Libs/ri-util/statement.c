@@ -3174,20 +3174,27 @@ static void statement_clean_declarations_helper(list declarations, statement stm
     {
         /* area and parameters are always used, so are referenced entities */
         if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))));
-        else
+        else if(entity_variable_p(e))
         {
-            /* entities whose declaration has a side effect are always used too */
+            /* entities whose declaration have a side effect are always used too */
             bool has_side_effects_p = false;
             value v = entity_initial(e);
+            list effects = NIL;
             if( value_expression_p(v) )
+                effects = gen_nconc(effects,expression_to_proper_effects(value_expression(v)));
+            /* one should check if dimensions do not have side effects either */
+            FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
             {
-                list effects = expression_to_proper_effects(value_expression(v));
-                FOREACH(EFFECT, eff, effects)
-                {
-                    if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
-                }
-                gen_full_free_list(effects);
+                expression upper = dimension_upper(dim),
+                           lower = dimension_lower(dim);
+                effects=gen_nconc(effects,expression_to_proper_effects(upper));
+                effects=gen_nconc(effects,expression_to_proper_effects(lower));
             }
+            FOREACH(EFFECT, eff, effects)
+            {
+                if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+            }
+            gen_full_free_list(effects);
 
             /* do not keep the declaration, and remove it from any declaration_statement */
             if( !has_side_effects_p ) {

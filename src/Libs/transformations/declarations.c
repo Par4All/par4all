@@ -123,12 +123,14 @@ static void remove_unread_variables(statement s)
         list effects = load_cumulated_rw_effects_list(s);
         FOREACH(ENTITY,e,statement_declarations(s))
         {
-            if(!entity_may_conflict_with_a_formal_parameter_p(e,get_current_module_entity()) && /* it is useless to try to remove formal parameters */
-                    !entity_pointer_p(e) ) /* and we cannot afford removing something that may implies aliasing */
-            {
-                bool entity_read = entity_used_somewhere_p(e,s);
-                if(!entity_read) /* the entity is never read it is disposable */
-                    gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
+            if(entity_variable_p(e)) {
+                if(!entity_may_conflict_with_a_formal_parameter_p(e,get_current_module_entity()) && /* it is useless to try to remove formal parameters */
+                        !entity_pointer_p(e) ) /* and we cannot afford removing something that may implies aliasing */
+                {
+                    bool entity_read = entity_used_somewhere_p(e,s);
+                    if(!entity_read) /* the entity is never read it is disposable */
+                        gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
+                }
             }
         }
     }
