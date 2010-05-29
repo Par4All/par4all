@@ -27,12 +27,8 @@
       SUBROUTINE USELESS(X1)
 ! some useless declarations
 ! some useful declarations
-      COMPLEX*8 NOTCALLED
-      EXTERNAL NOTCALLED
       COMPLEX*8 CALLED
       EXTERNAL CALLED
-      INTEGER*4 N
-      PARAMETER (N = 10)
       INTEGER*4 M
       PARAMETER (M = 10)
       INTEGER J
