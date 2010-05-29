@@ -3173,8 +3173,8 @@ static void statement_clean_declarations_helper(list declarations, statement stm
     FOREACH(ENTITY,e,decl_cpy)
     {
         /* area and parameters are always used, so are referenced entities */
-        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))));
-        else if(entity_variable_p(e))
+        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))) || entity_struct_p(e) || entity_union_p(e) );
+        else
         {
             /* entities whose declaration have a side effect are always used too */
             bool has_side_effects_p = false;
@@ -3183,12 +3183,14 @@ static void statement_clean_declarations_helper(list declarations, statement stm
             if( value_expression_p(v) )
                 effects = gen_nconc(effects,expression_to_proper_effects(value_expression(v)));
             /* one should check if dimensions do not have side effects either */
-            FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
-            {
-                expression upper = dimension_upper(dim),
-                           lower = dimension_lower(dim);
-                effects=gen_nconc(effects,expression_to_proper_effects(upper));
-                effects=gen_nconc(effects,expression_to_proper_effects(lower));
+            if(entity_variable_p(e)) {
+                FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
+                {
+                    expression upper = dimension_upper(dim),
+                               lower = dimension_lower(dim);
+                    effects=gen_nconc(effects,expression_to_proper_effects(upper));
+                    effects=gen_nconc(effects,expression_to_proper_effects(lower));
+                }
             }
             FOREACH(EFFECT, eff, effects)
             {
