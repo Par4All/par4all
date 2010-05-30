@@ -8,7 +8,7 @@
 int main(){
   int ***a1;
   int ***a2;
-  
+
   int ** b3;
   int *c4;
   int **l;
@@ -16,9 +16,9 @@ int main(){
   a1 = (int ***) malloc(sizeof(int**));
   *a1 = (int **) malloc(sizeof(int*));
   **a1 = (int *) malloc(sizeof(int));
-  
+
   ***a1 = 1;
-  
+
   a2 = (int***) malloc(sizeof(int**));
   *a2 = *a1;
 
@@ -28,7 +28,7 @@ int main(){
 
   c4 = (int *) malloc(sizeof(int));
   *c4 = 4;
-  
+
   l = *a2;
   *a1 = b3;
   *l = c4;

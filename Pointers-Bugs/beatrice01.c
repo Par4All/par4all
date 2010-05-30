@@ -28,7 +28,8 @@ float dist( part * p1, part *p2 ) {
   return ( sqrt( dx * dx + dy * dy ) );
 }
 
-int main() {
+int main()
+{
   int i, j, k;
   float x, y;
   syst * my_syst;
@@ -61,13 +62,13 @@ int main() {
       curr_part1 = curr_dom->tab_part[j];
 
       for ( k = j + 1; k < MAX_PART; k++ ) {
-        part * curr_part2;
-        curr_part2 = curr_dom->tab_part[k];
+	part * curr_part2;
+	curr_part2 = curr_dom->tab_part[k];
 
-        if ( dist( curr_part1, curr_part2 ) < MIN_DIST ) {
-          curr_part1->x_new = curr_part1->x - MIN_DIST;
-          curr_part1->y_new = curr_part1->y - MIN_DIST;
-        }
+	if ( dist( curr_part1, curr_part2 ) < MIN_DIST ) {
+	  curr_part1->x_new = curr_part1->x - MIN_DIST;
+	  curr_part1->y_new = curr_part1->y - MIN_DIST;
+	}
       }
     }
   }

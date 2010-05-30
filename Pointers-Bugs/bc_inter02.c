@@ -9,18 +9,18 @@ typedef struct {struct1 * q; } struct2;
 
 
 void foo2(struct2 **pa2, struct1 *b2){
-    
+
   (*pa2)->q = b2;
-  
+
 }
 
 int main() {
   struct2 *p1, *p2;
   struct1 *q1, *q2;
-  
+
   q1 = (struct1 *) malloc(sizeof(struct1));
   q2 = (struct1 *) malloc(sizeof(struct1));
-  
+
   q1->r = 10;
   q2->r = 20;
 
@@ -29,9 +29,9 @@ int main() {
   p1->q = q1;
 
   p2 = p1;
-  
+
   foo2(&p2, q2);
 
   printf("%d\n", p1->q->r);
   return 0;
-} 
+}
