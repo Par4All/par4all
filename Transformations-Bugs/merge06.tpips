@@ -1,11 +1,8 @@
-#
-delete merge05
-
-#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+delete merge06
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create merge05 merge05.c
+create merge06 merge06.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -22,22 +19,17 @@ setproperty PRAGMA_TYPE "expr"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 setproperty NESTED_PARALLELISM_THRESHOLD 2
 
-display PRINTED_FILE(main)
-
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE(main)
-apply COARSE_GRAIN_PARALLELIZATION(main)
-display PRINTED_FILE(main)
+apply INTERNALIZE_PARALLEL_CODE(main)
 apply LIMIT_NESTED_PARALLELISM(main)
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
 apply UNSPLIT
-shell gcc -fopenmp -c merge05.database/Src/merge05.c -o merge05.database/Src/merge05.o
+shell gcc -fopenmp -c merge06.database/Src/merge06.c -o merge06.database/Src/merge06.o
 
 close
-delete merge05
+delete merge06
 quit
 # EOF
