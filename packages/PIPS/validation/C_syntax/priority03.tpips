@@ -1,0 +1,21 @@
+delete priority03
+create priority03 priority03.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_ALL_PARENTHESES FALSE
+
+echo
+echo Parsed printed file for "priority03"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+apply UNSPLIT
+
+shell gcc -o priority03.database/Src/prio priority03.database/Src/priority03.c
+
+close
+delete priority03
+
+quit

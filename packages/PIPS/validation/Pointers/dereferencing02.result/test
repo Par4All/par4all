@@ -55,8 +55,6 @@ void dereferencing02()
 
 Cumulated pointer effects for "dereferencing02"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 void dereferencing02()
 {
 //               <must be written>: x

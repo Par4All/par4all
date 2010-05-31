@@ -13,7 +13,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          for (v = 0;v<Nv;v++)
 
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
 }
@@ -32,7 +32,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          for(v = 0; v <= Nv-1; v += 1)
 
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
 }
@@ -67,7 +67,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
 //               <must be read   >: Nrg Nth Nv PP th
 //               <must be written>: Pow[th][.re]
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
 //               <must be read   >: Nth th
 //               <must be written>: Pow[th][.im]
       Pow[th].im = 0.;
@@ -115,7 +115,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
 //               <may be written >: Pow[*][.re]
 //               <must be read   >: Nrg Nth Nv PP th
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
 //               <may be written >: Pow[*][.im]
 //               <must be read   >: Nth th
       Pow[th].im = 0.;
@@ -415,7 +415,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //    0<=th}>
 //  <th-R-EXACT-{}>
 
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
 
 //  <Nth-R-EXACT-{}>
 //  <Pow[PHI1][.im]-W-EXACT-{PHI1==th, Nrg<=rg, 1+th<=Nth, 0<=rg,

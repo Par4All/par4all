@@ -36,17 +36,17 @@ void call01(int *pi, tf_t *q)
         for call01 */
    pi++;
 //               <must be read   >: q
-//               <must be written>: q[0][1]
+//               <must be written>: q[0][.one]
    q->one = 1;
 //               <must be read   >: q
-//               <must be written>: q[0][2][4]
+//               <must be written>: q[0][.two][4]
    (q->two)[4] = 2;
 }
 
 Cumulated effects for "call01"
 
 //               <must be read   >: pi q
-//               <must be written>: pi[0] q[0][1] q[0][2][4]
+//               <must be written>: pi[0] q[0][.one] q[0][.two][4]
 void call01(int *pi, tf_t *q)
 {
 //               <must be read   >: pi
@@ -58,10 +58,10 @@ void call01(int *pi, tf_t *q)
         for call01 */
    pi++;
 //               <must be read   >: q
-//               <must be written>: q[0][1]
+//               <must be written>: q[0][.one]
    q->one = 1;
 //               <must be read   >: q
-//               <must be written>: q[0][2][4]
+//               <must be written>: q[0][.two][4]
    (q->two)[4] = 2;
 }
 
@@ -71,7 +71,7 @@ int main()
 {
    int i;
    tf_t s;
-//               <must be written>: i s[1] s[2][4]
+//               <must be written>: i s[.one] s[.two][4]
 
    call01(&i, &s);
 }

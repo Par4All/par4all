@@ -49,23 +49,25 @@ int ptr_to_field()
    int i = 0, j = 1;
 //  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    n = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n,*ANY_MODULE*:*HEAP*_b0,
-//   -MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(n,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    m->q = &i;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(n,
-//   *ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][q],i,-Exact-);(n,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    m->p = &j;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
-//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][q],i,
+//   -Exact-);(m[0][p],j,-Exact-);(n,*ANY_MODULE*:*HEAP**ANYWHERE*,
+//   -MAY-)}
    n->q = m->p;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
-//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n[0][1],j,-Exact-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][q],i,
+//   -Exact-);(m[0][p],j,-Exact-);(n,*ANY_MODULE*:*HEAP**ANYWHERE*,
+//   -MAY-);(n[0][q],j,-Exact-)}
    n->p = m->q;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][1],i,-Exact-);(m[0][2],j,
-//   -Exact-);(n,*ANY_MODULE*:*HEAP*_b0,-MAY-);(n[0][2],i,
-//   -Exact-);(n[0][1],j,-Exact-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][q],i,
+//   -Exact-);(m[0][p],j,-Exact-);(n,*ANY_MODULE*:*HEAP**ANYWHERE*,
+//   -MAY-);(n[0][p],i,-Exact-);(n[0][q],j,-Exact-)}
 
    return 0;
    // END BLOCK

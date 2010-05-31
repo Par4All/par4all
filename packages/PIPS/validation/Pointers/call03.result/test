@@ -30,10 +30,10 @@ void call03()
 //               <must be written>: pi
    pi++;
 //               <must be read   >: q
-//               <must be written>: q[0][1]
+//               <must be written>: q[0][.one]
    q->one = 1;
 //               <must be read   >: q
-//               <must be written>: q[0][2][4]
+//               <must be written>: q[0][.two][4]
    (q->two)[4] = 2;
 }
 

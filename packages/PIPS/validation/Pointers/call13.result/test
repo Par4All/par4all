@@ -74,24 +74,24 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 //               <must be written>: k2
                for(k2 = 0; k2 <= nsa-1; k2 += 1) {
 //               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                                  ptrin[i+k1][k2][1] 
-//                                  ptrin[i+j1][j2][1] 
-//                                  ptrin[i+k1][k2][2] 
-//                                  ptrin[i+j1][j2][2]
+//                                  ptrin[i+k1][k2][.im] 
+//                                  ptrin[i+j1][j2][.im] 
+//                                  ptrin[i+k1][k2][.re] 
+//                                  ptrin[i+j1][j2][.re]
 //               <must be written>: R
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
 //               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                                  ptrin[i+k1][k2][1] 
-//                                  ptrin[i+j1][j2][1] 
-//                                  ptrin[i+j1][j2][2] 
-//                                  ptrin[i+k1][k2][2]
+//                                  ptrin[i+k1][k2][.re] 
+//                                  ptrin[i+j1][j2][.im] 
+//                                  ptrin[i+k1][k2][.im] 
+//                                  ptrin[i+j1][j2][.re]
 //               <must be written>: I
                   I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
 //               <must be read   >: R i j1 j2 k1 k2 nrec nsa ntt
-//               <must be written>: ptrout[i][j1][j2][k1][k2][1]
+//               <must be written>: ptrout[i][j1][j2][k1][k2][.re]
                   ptrout[i][j1][j2][k1][k2].re = R;
 //               <must be read   >: I i j1 j2 k1 k2 nrec nsa ntt
-//               <must be written>: ptrout[i][j1][j2][k1][k2][2]
+//               <must be written>: ptrout[i][j1][j2][k1][k2][.im]
                   ptrout[i][j1][j2][k1][k2].im = I;
                }
 }

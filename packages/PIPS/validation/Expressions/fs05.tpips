@@ -1,0 +1,10 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "fs05"
+delete $WS
+create $WS $WS.c
+module main
+display PRINTED_FILE
+apply FORWARD_SUBSTITUTE
+display PRINTED_FILE
+close
+delete $WS

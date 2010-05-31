@@ -1,3 +1,6 @@
+
+PROPER EFFECTS
+
 int main()
 {
    int *i, j, k;

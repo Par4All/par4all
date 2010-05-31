@@ -41,10 +41,10 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //               <must be written>: y[i]
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][.one]
    p->one = 1;
 //               <must be read   >: j p
-//               <must be written>: p[0][2][j]
+//               <must be written>: p[0][.two][j]
    (p->two)[j] = 2.;
 //               <must be read   >: i q[i]
 //               <must be written>: q[i][0]
@@ -54,9 +54,9 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 Cumulated effects for "call02"
 
 //               <may be read    >: q[*]
-//               <may be written >: p[0][2][*] q[*][0] y[*]
+//               <may be written >: p[0][.two][*] q[*][0] y[*]
 //               <must be read   >: i j p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][.one]
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
@@ -69,9 +69,9 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //               <must be read   >: i
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written>: p[0][1]
+//               <must be written>: p[0][.one]
    p->one = 1;
-//               <may be written >: p[0][2][*]
+//               <may be written >: p[0][.two][*]
 //               <must be read   >: j p
    (p->two)[j] = 2.;
 //               <may be read    >: q[*]
@@ -82,8 +82,6 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 Cumulated effects for "main"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
    int a;
@@ -94,9 +92,9 @@ int main()
 //               <must be written>: sp
    tf_t *sp = &s;
 //               <may be read    >: ap[*]
-//               <may be written >: ap[*][0] sp[0][2][*] x[*]
+//               <may be written >: ap[*][0] sp[0][.two][*] x[*]
 //               <must be read   >: a b sp
-//               <must be written>: sp[0][1]
+//               <must be written>: sp[0][.one]
 
    call02(a, b, x, ap, sp);
 }

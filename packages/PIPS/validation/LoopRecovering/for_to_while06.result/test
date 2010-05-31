@@ -1,0 +1,20 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+
+   int l, m, a;
+
+   m = 0;
+   while (m<M) {
+      // BEGIN BLOCK
+      a = 0;
+      l++;
+      // END BLOCK
+   }
+   // END BLOCK
+}

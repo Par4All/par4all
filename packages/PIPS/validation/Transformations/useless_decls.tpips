@@ -3,6 +3,7 @@ delete u
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 setproperty PRETTYPRINT_HEADER_COMMENTS=TRUE
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 create u useless_decls.f
 echo !! before cleaning declarations

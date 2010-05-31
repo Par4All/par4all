@@ -171,7 +171,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[3], F_0, F_1, F_2, F_3, F_4;
+   float RED0[3], F_0, F_1, F_2;
 
 
 
@@ -206,9 +206,8 @@ l100:            ;
             RED0[2] = RED0[2]+F_2;
             kj = 3;
          }
-         F_3 = RED0[0]+new_image[i][j];
-         F_4 = RED0[1]+F_3;
-         new_image[i][j] = RED0[2]+F_4;
+         new_image = RED0[0]+new_image[i][j];
+         new_image[i][j] = RED0[2]+RED0[1]+new_image;
          new_image[i][j] = new_image[i][j]/9;
       }
    ;
@@ -220,7 +219,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+   float RED0[3], F_0, F_1, F_2, F_20, F_10, F_00;
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -253,9 +252,8 @@ l100:            ;
             RED0[2] = RED0[2]+F_20;
             kj = 3;
          }
-         F_30 = RED0[0]+new_image[i][j];
-         F_40 = RED0[1]+F_30;
-         new_image[i][j] = RED0[2]+F_40;
+         new_image = RED0[0]+new_image[i][j];
+         new_image[i][j] = RED0[2]+RED0[1]+new_image;
          new_image[i][j] = new_image[i][j]/9;
       }
    ;
@@ -267,7 +265,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+   float RED0[3], F_0, F_1, F_2, F_20, F_10, F_00;
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
    
@@ -303,9 +301,8 @@ l100:            ;
             SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED0[0]);
             kj = 3;
          }
-         F_30 = RED0[0]+new_image[i][j];
-         F_40 = RED0[1]+F_30;
-         new_image[i][j] = RED0[2]+F_40;
+         new_image = RED0[0]+new_image[i][j];
+         new_image[i][j] = RED0[2]+RED0[1]+new_image;
          new_image[i][j] = new_image[i][j]/9;
       }
    ;
@@ -317,7 +314,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    
    int i, j, ki, kj;
    //PIPS generated variable
-   float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
+   float RED0[3], F_0, F_1, F_2, F_20, F_10, F_00;
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
    
@@ -359,9 +356,8 @@ l100:               ;
             SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
             SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED0[0]);
          }
-         F_30 = RED0[0]+new_image[i][j];
-         F_40 = RED0[1]+F_30;
-         new_image[i][j] = RED0[2]+F_40;
+         new_image = RED0[0]+new_image[i][j];
+         new_image[i][j] = RED0[2]+RED0[1]+new_image;
          new_image[i][j] = new_image[i][j]/9;
       }
    }
@@ -372,9 +368,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //     The convolution kernel is not applied on the outer part
    //     of the image
    
-   int i, j, ki, kj;
+   int i, j, ki;
    //PIPS generated variable
-   float RED0[3], F_40, F_30;
+   float RED0[3];
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -409,14 +405,13 @@ l100:               ;
                SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
                SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
                SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-               kj = 3;
+               3;
             }
             SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
             SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED0[0]);
          }
-         F_30 = RED0[0]+new_image[i][j];
-         F_40 = RED0[1]+F_30;
-         new_image[i][j] = RED0[2]+F_40;
+         new_image = RED0[0]+new_image[i][j];
+         new_image[i][j] = RED0[2]+RED0[1]+new_image;
          new_image[i][j] = new_image[i][j]/9;
       }
    }

@@ -1,0 +1,38 @@
+setenv WS="isolate08"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+module alphablending
+
+echo original code
+apply PARTIAL_EVAL
+display PRINTED_FILE[%ALLFUNC]
+
+echo tiled code
+apply FLAG_LOOPS
+setproperty LOOP_LABEL "l99998"
+setproperty LOOP_TILING_MATRIX "10 0,0 10"
+apply LOOP_TILING
+apply FLAG_LOOPS
+display PRINTED_FILE
+
+echo with r-w regions
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE
+
+echo isolated code
+setproperty ISOLATE_STATEMENT_LABEL "l99996"
+setproperty ISOLATE_STATEMENT_LOAD_FUNCTION "chaaaaaaarge"
+setproperty ISOLATE_STATEMENT_STORE_FUNCTION "retreaaaaaat"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+
+
+apply UNSPLIT
+close
+
+shell cc -c $WS.database/Src/$WS.c -o /dev/null
+
+delete $WS

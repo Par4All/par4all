@@ -47,14 +47,11 @@ float dotprod(float b[200], float c[200])
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
+   int LU_IND0;
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
@@ -74,21 +71,17 @@ float dotprod(float b[200], float c[200])
       //c SIMD_COMMENT_1
       a = a+F_0;
    }
-   i = 1000000;
    return a;
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4];
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -113,21 +106,17 @@ float dotprod(float b[200], float c[200])
       RED0[3] = RED0[3]+F_0;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a;
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4], a0, F_00, F_01, F_02, F_03;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -152,21 +141,17 @@ float dotprod(float b[200], float c[200])
       RED0[3] = RED0[3]+F_00;
    }
    a0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a0;
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4], a0, F_00, F_01, F_02, F_03;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -188,21 +173,17 @@ float dotprod(float b[200], float c[200])
       SIMD_SAVE_V4SF(v4sf_vec3, &RED0[0]);
    }
    a0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a0;
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4], a0, F_00, F_01, F_02, F_03;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -230,19 +211,15 @@ float dotprod(float b[200], float c[200])
       SIMD_SAVE_V4SF(v4sf_vec3, &RED0[0]);
    }
    a0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a0;
 }
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4], a0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -270,7 +247,6 @@ float dotprod(float b[200], float c[200])
       SIMD_SAVE_V4SF(v4sf_vec3, &RED0[0]);
    }
    a0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a0;
 }
 
@@ -278,14 +254,11 @@ simdized code
 
 float dotprod(float b[200], float c[200])
 {
-   int i;
    float a = 0;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
+   int LU_IND0;
    //PIPS generated variable
    float RED0[4], a0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -313,7 +286,6 @@ float dotprod(float b[200], float c[200])
       SIMD_SAVE_V4SF(v4sf_vec3, &RED0[0]);
    }
    a0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
    return a0;
 }
 seq-ok

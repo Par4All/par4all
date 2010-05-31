@@ -694,9 +694,9 @@ void flgr2d_fill_neighborhood_fgUINT16(FLGR_Data2D *nhb, FLGR_Shape shape, int w
    int h = nhb->size_y;
    int w = nhb->size_x;
    int size = height<width?height:width;
-   double size_square = (double) size/2/(1+sqrt(2));
+   double size_square = (double) (size/2)/(1+sqrt(2));
    double size_square2 = floor(size_square);
-   int nbsqr = (int) size_square-size_square2<0.5f?size_square2:size_square2+1;
+   int nbsqr = (int) (size_square-size_square2<0.5f?size_square2:size_square2+1);
    int i;
    flgr2d_clear_all(nhb);
    flgr_vector_populate_from_scalar_fgUINT16(vec1, 1);
@@ -1004,7 +1004,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
          sum = sum+fabs(b);
       }
       if (sum!=0) 
-         flgr_set_array_fgUINT16(presult, k, (fgUINT16) tmp/sum);
+         flgr_set_array_fgUINT16(presult, k, (fgUINT16) (tmp/sum));
    }
    return;
 }
@@ -2953,7 +2953,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
             fgUINT16 value0;
             array0 = presult;
             pos0 = k;
-            value0 = (fgUINT16) tmp/sum;
+            value0 = (fgUINT16) (tmp/sum);
             array0[pos0] = value0;
          }
       }

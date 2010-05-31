@@ -1,12 +1,13 @@
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//               <must be read   >: vct vct[0][3]
+//               <must be read   >: vct vct[0][.array]
 //               <must be written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
-//               <must be read   >: dat dat[0][1] dat[0][1][row] row
+//               <must be read   >: dat dat[0][.array] 
+//                                  dat[0][.array][row] row
 //               <must be written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
-//               <must be read   >: vct vct[0][1]
+//               <must be read   >: vct vct[0][.spp]
 //               <must be written>: I_0
    int I_0 = vct->spp;                                                  /*0017*/
    {
@@ -40,13 +41,14 @@ POINTS TO
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//               <must be read   >: vct vct[0][3]
+//               <must be read   >: vct vct[0][.array]
 //               <must be written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
-//               <must be read   >: dat dat[0][1] dat[0][1][row] row
+//               <must be read   >: dat dat[0][.array] 
+//                                  dat[0][.array][row] row
 //               <must be written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
-//               <must be read   >: vct vct[0][1]
+//               <must be read   >: vct vct[0][.spp]
 //               <must be written>: I_0
    int I_0 = vct->spp;                                                  /*0017*/
    {

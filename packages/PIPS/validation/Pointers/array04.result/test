@@ -13,17 +13,25 @@ int main()
 
    int (*r)[100][10][3];                                                /*0015*/
    int (*ru)[10][3];                                                    /*0016*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
    printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
 //               <must be written>: p
@@ -86,7 +94,7 @@ int main()
    p = &t[1][2];                                                        /*0023*/
 //  {(p,t[1][2],-Exact-)}
    pu = t[1][2];                                                        /*0024*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
    pu = &t[1][2][0];                                                    /*0025*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
 
@@ -94,7 +102,7 @@ int main()
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
    qu = t[1];                                                           /*0028*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1],-Exact-)}
+//   t[1][0],-Exact-)}
    qu = &t[1][0];                                                       /*0029*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-)}
@@ -104,7 +112,7 @@ int main()
 //   t[1][0],-Exact-);(r,t,-Exact-)}
    ru = t;                                                              /*0032*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-);(r,t,-Exact-);(ru,t,-Exact-)}
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
    ru = &t[0];                                                          /*0033*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
