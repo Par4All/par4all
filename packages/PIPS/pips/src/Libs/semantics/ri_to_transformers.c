@@ -334,9 +334,11 @@ transformer declarations_to_transformer(list dl, transformer pre)
       v = ENTITY(CAR(l));
       if(!transformer_undefined_p(next_pre))
 	free_transformer(next_pre);
-      next_pre = post;
+      next_pre = transformer_range(post);
       stf = declaration_to_transformer(v, next_pre);
       post = transformer_safe_apply(stf, next_pre);
+      free_transformer(next_pre);
+      next_pre = transformer_undefined; // FI: works even without this...
       post = transformer_safe_normalize(post, 4);
       btf = transformer_combine(btf, stf);
       btf = transformer_normalize(btf, 4);

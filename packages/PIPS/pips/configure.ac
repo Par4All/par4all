@@ -23,7 +23,7 @@
 AC_PREREQ(2.61)
 AC_INIT([pips],[0.1],[pipsdev@cri.ensmp.fr])
 AC_CONFIG_SRCDIR([src/Passes/pips/pips.c])
-AC_CONFIG_HEADER([pips_config.h])
+AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 AM_INIT_AUTOMAKE([gnu 1.0])
 AM_PROG_CC_C_O
@@ -69,6 +69,11 @@ AC_HEADER_TIME
 AC_STRUCT_TM
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
+AX_LD_NO_UNDEFINED
+
+# we cannot lauch all cproto in // if ulimit -u is too low
+AS_IF([test `ulimit -u` -gt 10000],[ax_use_parallel_cproto=yes],[ax_use_parallel_cproto=no])
+AM_CONDITIONAL([USE_PARALLEL_CPROTO],[test x$ax_use_parallel_cproto = xyes])
 
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
@@ -114,6 +119,14 @@ AX_ARG_ENABLE([tpips],
 			[yes],
 			[
 			 AX_CHECK_PKG([readline], [readline], [readline/readline.h])
+			 # These tests discover differences between readline 4.1 and 4.3, with modified cppflags
+			 ax_cppflags="$CPPFLAGS"
+			 CPPFLAGS="$CPPFLAGS $READLINE_CPPFLAGS"
+			 AC_CHECK_DECLS([rl_completion_matches], , ,[#include <readline/readline.h>])
+			 AC_CHECK_DECLS([rl_filename_completion_function], , ,[#include<readline/readline.h>])
+			 AC_CHECK_TYPES([rl_compentry_func_t], , , [#include <readline/readline.h>])
+			 #reset CPPFLAGS
+			 CPPFLAGS="$ax_cppflags"
 			 AX_CHECK_PKG([termcap],[tgetent],[term.h])
 			 AX_DEPENDS([tpips],[readline termcap])
 			]
@@ -164,7 +177,8 @@ AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc"])
 gl_INIT
 CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/Libs/gnulib"
 
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([pips_config.h
+				 Makefile
                  src/Documentation/Makefile
                  src/Documentation/constants/Makefile
                  src/Documentation/help/Makefile

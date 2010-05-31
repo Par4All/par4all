@@ -19,7 +19,13 @@ pips_includes:Makefile
 	{ for dir in $(PIPS_SUBDIRS) ; do printf -- "-I../$$dir -I$(pips_absolute_top_srcdir)/src/Libs/$$dir " ; done } > $@
 
 cprotoify:Makefile pips_includes
+if USE_PARALLEL_CPROTO
+	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} cproto_bootstrap  & done ; wait
 	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h  & done ; wait
+else
+	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} cproto_bootstrap ; done
+	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h ; done
+endif
 
 
 CLEANFILES=pips_includes
@@ -27,7 +33,7 @@ CLEANFILES=pips_includes
 lib_LTLIBRARIES=libpipslibs.la
 
 libpipslibs_la_SOURCES=
-libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS) -Wl,--no-undefined
+libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS) $(LDFLAGS_NO_UNDEFINED)
 libpipslibs_la_CPPFLAGS=$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 libpipslibs_la_LIBADD=\
 	top-level/libtop-level.la\

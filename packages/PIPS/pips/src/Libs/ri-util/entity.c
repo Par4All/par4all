@@ -548,6 +548,11 @@ bool entity_subroutine_p(entity e)
     !entity_blockdata_p(e) && /* ??? */
     !entity_function_p(e);
 }
+bool entity_pointer_p(entity e)
+{
+    basic b = entity_basic(e);
+    return !basic_undefined_p(b) && basic_pointer_p(b);
+}
 
 bool entity_array_p(entity e)
 {

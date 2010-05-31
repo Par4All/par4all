@@ -171,14 +171,29 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
                 CAR(iter).p=(gen_chunkp)ne;
             }
         }
-#if 1
         /* we now have FIFOx in ne and will generate an assignment from ne to e 
-         * we also have to change the storage for e ...*/
+         * we also have to change the storage for e ...
+         * and for images, add a dereferencing operator
+         */
         free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
         AddEntityToCurrentModule(e);
-        statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
+        expression assigned ;
+        if( ass_prefix && same_string_p(ass_prefix,TERAPIX_IMAGE_PREFIX))
+        {
+            basic bt = entity_basic(e);
+            type new_type = copy_type(basic_pointer(bt));
+            free_type(entity_type(e));
+            entity_type(e) = new_type;
+            assigned= MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(ne));
+            expression pattern = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
+                       substitute = entity_to_expression(e);
+            substitute_expression(get_current_module_statement(),pattern, substitute);
+            free_expression(pattern);free_expression(substitute);
+        }
+        else
+            assigned = entity_to_expression(ne);
+        statement ass = make_assign_statement(entity_to_expression(e),assigned);
         insert_statement(get_current_module_statement(),ass,true);
-#endif
     }
 
     /* to respect terapix asm, we also have to change the name of variable e */
@@ -328,20 +343,9 @@ bool normalize_microcode( char * module_name)
                 if( basic_pointer_p(vb) ) /* it's a pointer */
                 {
                     string prefix = NULL;
-#if 0 /* anywhere effects trouble this analysis */
-                    bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
-                    if( parameter_written ) /* it's an image */
-                    {
-                        printf("%s seems an image\n",entity_user_name(e));
-                        prefix = TERAPIX_IMAGE_PREFIX;
-                        terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
-                    }
-                    else /* cannot tell if it's a kernel or an image*/
-#endif
-                    {
                         type t =ultimate_type(basic_pointer(vb));
                         vb=variable_basic(type_variable(t));
-                        /* beacause of the way we build data, images are int** and masks are int* */
+                        /* because of the way we build data, images are int** and masks are int* */
                         if( basic_pointer_p(vb) ) {
                             printf("%s seems an image\n",entity_user_name(e));
                             prefix = TERAPIX_IMAGE_PREFIX;
@@ -351,7 +355,6 @@ bool normalize_microcode( char * module_name)
                             prefix = TERAPIX_MASK_PREFIX;
                         }
                         terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
-                    }
                 }
                 else if( entity_used_in_loop_bound_p(e) )
                 {
@@ -417,6 +420,25 @@ bool terapixify(__attribute__((unused)) char * module_name)
     return true; /* everything is done in pipsmake-rc */
 }
 
+/** 
+ * 
+ * 
+ * @param e 
+ * 
+ * @return 
+ */
+static bool two_addresses_code_generator_split_p(expression e )
+{
+    if(expression_call_p(e))
+    {
+        call c = expression_call(e);
+        entity op = call_function(c);
+        return ! call_constant_p(c) && (!get_bool_property("GENERATE_TWO_ADDRESSES_CODE_SKIP_DEREFERENCING") || !ENTITY_DEREFERENCING_P(op));
+    }
+    else
+        return false;
+}
+
 static
 void two_addresses_code_generator(statement s)
 {
@@ -428,12 +450,12 @@ void two_addresses_code_generator(statement s)
             list args = call_arguments(c);
             expression lhs = EXPRESSION(CAR(args));
             expression rhs = EXPRESSION(CAR(CDR(args)));
-            if(expression_reference_p(lhs) && expression_call_p(rhs) && !expression_constant_p(rhs)) {
+            if(!two_addresses_code_generator_split_p(lhs) && two_addresses_code_generator_split_p(rhs)) {
                 call parent_call = call_undefined;
                 do {
                     parent_call=expression_call(rhs);
                     rhs=EXPRESSION(CAR(call_arguments(parent_call)));
-                } while(expression_call_p(rhs) && !expression_constant_p(rhs));
+                } while(expression_call_p(rhs) && two_addresses_code_generator_split_p(rhs));
                 if(! expression_equal_p(lhs,rhs) )
                 {
                     /* a=b+c; -> (1) a=b; (2) a=a+c; */
