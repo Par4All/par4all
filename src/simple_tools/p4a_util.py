@@ -316,6 +316,11 @@ def exe_file_p(file):
     ext = get_file_extension(file)
     return ext == ''
 
+def header_file_p(file):
+    '''Tests if a file has an header name.'''
+    ext = get_file_extension(file)
+    return ext == '.h' or ext == '.hpp'
+
 def get_machine_arch():
     '''Returns current machine architecture'''
     (sysname, nodename, release, version, machine) = os.uname()
@@ -420,6 +425,18 @@ def env(var, default = ""):
         return os.environ[var]
     else:
         return default
+
+def relativize(file_dir = None, dirs = [], base = os.getcwd()):
+    '''Make a file or directory relative to the base directory, 
+    if they start with this base directory (this is the difference
+    with os.path.relpath()).'''
+    # Make sure it is absolute first:
+    file_dir = os.path.abspath(os.path.expanduser(file_dir))
+    if file_dir.startswith(base) and len(file_dir) > len(base):
+        file_dir = file_dir[len(base):]
+        if file_dir[0] == os.path.sep:
+            file_dir = file_dir[1:]
+    return file_dir
 
 if __name__ == "__main__":
     print(__doc__)

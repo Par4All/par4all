@@ -73,10 +73,10 @@ def get_cuda_ldflags(m64 = True, cutil = True, cublas = False, cufft = False):
         "-L" + os.path.join(cuda_dir, "lib"),
         "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
         "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
-        "-Bdynamic -lcudart"
+        "-Bdynamic", "-lcudart"
     ]
     if cutil:
-        flags += [ "-Bstatic -lcutil" + lib_arch_suffix ]
+        flags += [ "-Bstatic", "-lcutil" + lib_arch_suffix ]
     if cublas:
         die("TODO")
     if cufft:
@@ -86,6 +86,7 @@ def get_cuda_ldflags(m64 = True, cutil = True, cublas = False, cufft = False):
 class p4a_builder():
     cppflags = []
     cflags = []
+    cxxflags = []
     ldflags = []
     nvccflags = []
     fortranflags = []
@@ -100,7 +101,7 @@ class p4a_builder():
     
     m64 = False
     cudafied = False
-    extra_files = []
+    extra_source_files = []
     
     def cudafy_flags(self):
         if self.cudafied:
@@ -109,16 +110,16 @@ class p4a_builder():
         self.ldflags += get_cuda_ldflags(self.m64)
         
         self.cppflags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
-        self.extra_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
+        self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
 
         self.cudafied = True
     
     def __init__(self,
-        cppflags = [], cflags = [], ldflags = [], nvccflags = [], fortranflags = [],
+        cppflags = [], cflags = [], cxxflags = [], ldflags = [], nvccflags = [], fortranflags = [],
         cpp = None, cc = None, cxx = None, ld = None, ar = None, nvcc = None, fortran = None,
         arch = None,
         openmp = False, accel_openmp = False, icc = False, cuda = False,
-        add_optimization_flags = False, no_default_flags = False
+        add_debug_flags = False, add_optimization_flags = False, no_default_flags = False
     ):
         
         if not nvcc:
@@ -159,10 +160,14 @@ class p4a_builder():
             
             if accel_openmp:
                 cppflags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
-                self.extra_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
-                
+                self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
+        
+        if add_debug_flags:
+            cppflags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
+            cflags = [ "-g" ] + cflags
+        
         if not no_default_flags:
-            cflags = [ "-g", "-Wall", "-fno-strict-aliasing", "-fPIC" ] + cflags
+            cflags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + cflags
         
         m64 = False
         machine_arch = get_machine_arch()
@@ -178,8 +183,12 @@ class p4a_builder():
             else:
                 raise p4a_error("Unsupported architecture: " + arch)
         
+        if cflags and len(cxxflags) == 0:
+            cxxflags = cflags
+        
         self.cppflags = cppflags
         self.cflags = cflags
+        self.cxxflags = cxxflags
         self.ldflags = ldflags
         self.nvccflags = nvccflags
         self.fortranflags = fortranflags
@@ -205,14 +214,14 @@ class p4a_builder():
         run2([ self.cc, "-c" ] + self.cppflags + self.cflags + [ "-o", output_file, file ])
     
     def cpp2o(self, file, output_file):
-        run2([ self.cxx, "-c" ] + self.cppflags + self.cflags + [ "-o", output_file, file ])
+        run2([ self.cxx, "-c" ] + self.cppflags + self.cxxflags + [ "-o", output_file, file ])
 
     def f2o(self, file, output_file):
         run2([ self.fortran, "-c" ] + self.cppflags + self.fortranflags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
         
-        files += self.extra_files
+        files += self.extra_source_files
         
         has_cuda = False
         has_c = False
@@ -261,7 +270,7 @@ class p4a_builder():
         
         # Create output files.
         for output_file in output_files:
-            output_file = os.path.abspath(os.path.expanduser(output_file))
+            #output_file = os.path.abspath(os.path.expanduser(output_file))
             
             more_ldflags = []
             
@@ -292,28 +301,14 @@ class p4a_builder():
                 done("Generated " + output_file)
             else:
                 warn("Expected output file " + output_file + " not found!?")
-        
 
-    def parse_include_dirs(self):
-        dirs = []
-        for opt in self.cppflags:
-            if opt.startswith("-I"):
-                dirs += [ opt[2:].strip() ]
-        return dirs
-    
-    def parse_lib_dirs(self):
-        dirs = []
-        for opt in self.cppflags:
-            if opt.startswith("-L"):
-                dirs += [ opt[2:].strip() ]
-        return dirs
-
-    def cmake_write(self, project_name, files, output_file, extra_obj = [], dir = None):
+    def cmake_write(self, project_name, files, output_files, extra_obj = [], dir = None):
         '''Creates a CMakeLists.txt project file suitable for building the project with CMake.'''
         
         if not project_name:
             project_name = gen_name(prefix = "")
         
+        # Determine the directory where the CMakeLists.txt file should be put.
         if dir:
             dir = os.path.abspath(dir)
         else:
@@ -321,13 +316,42 @@ class p4a_builder():
         if not os.path.isdir(dir):
             os.makedirs(dir)
         cmakelists_file = os.path.join(dir, "CMakeLists.txt")
+
+        # We will try to make all paths relatives to this dir:
+        base_dir = dir
         
-        files += self.extra_files
-        
+        # Make flags CUDA aware if not already the case.
         for file in files:
             if cuda_file_p(file):
                 self.cudafy_flags()
         
+        # Append additional required files such as accel files.
+        files += self.extra_source_files
+        
+        # Make input files relative to the base directory.
+        rel_files = []
+        for file in files:
+            rel_files.append(relativize(file, base_dir))
+        
+        # Split input files between regular source files and .cu files,
+        # add .cu.cpp files to regular source files for each .cu file.
+        cuda_files = []
+        cuda_output_files = []
+        source_files = []
+        header_files = []
+        for file in rel_files:
+            if cuda_file_p(file):
+                cuda_files.append(file)
+                cucpp_file = relativize(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"), base_dir)                
+                cuda_output_files.append(cucpp_file)
+                source_files.append(cucpp_file)
+            elif header_file_p(file):
+                header_files.append(file)
+            else:
+                source_files.append(file)
+        
+        # Create a big dictionary with all the substitutions
+        # possible for the string templates.
         global actual_script
         subs = dict(
             script = actual_script,
@@ -340,15 +364,19 @@ class p4a_builder():
             ar = self.ar,
             nvcc = self.nvcc,
             fortran = self.fortran,
-            cppflags = " ".join(self.cppflags),
+            cppflags_all = " ".join(self.cppflags),
+            cppflags = " ".join([elem for elem in self.cppflags if not elem.startswith("-I")]),
             cflags = " ".join(self.cflags),
-            ldflags = " ".join(self.ldflags),
+            cxxflags = " ".join(self.cxxflags),
+            ldflags_all = " ".join(self.ldflags),
+            ldflags = " ".join([elem for elem in self.ldflags if not (elem.startswith("-L") or elem.startswith("-l") or elem.startswith("-Bdynamic") or elem.startswith("-Bstatic"))]),
             nvccflags = " ".join(self.nvccflags),
             fortranflags = " ".join(self.fortranflags),
-            output_dir = os.path.split(output_file[0])[0],
-            files = "\n    ".join(files),
-            include_dirs = " ".join(self.parse_include_dirs()),
-            lib_dirs = " ".join(self.parse_lib_dirs()),
+            header_files = "\n    ".join(header_files),
+            source_files = "\n    ".join(source_files),
+            include_dirs = " ".join([elem[2:].strip() for elem in self.cppflags if elem.startswith("-I")]),
+            lib_dirs = " ".join([elem[2:].strip() for elem in self.ldflags if elem.startswith("-L")]),
+            libs = " ".join([elem[2:].strip() for elem in self.ldflags if elem.startswith("-l")]),
         )
         
         cmakelists = string.Template("""# Generated on $time by $script
@@ -363,47 +391,95 @@ project("$project")
 
 set(CMAKE_C_COMPILER $cc)
 set(CMAKE_CXX_COMPILER $cxx)
-set(CMAKE_C_FLAGS $cflags)
-
-set(OUTPUT_DIR $output_dir)
-set(LIBRARY_OUTPUT_PATH $${OUTPUT_DIR})
-set(CMAKE_BINARY_DIR $${OUTPUT_DIR})
-set(EXECUTABLE_OUTPUT_PATH $${OUTPUT_DIR})
-set(RUNTIME_OUTPUT_DIRECTORY $${OUTPUT_DIR})
-set(ARCHIVE_OUTPUT_DIRECTORY $${OUTPUT_DIR})
+set(CMAKE_LINKER $ld)
+set(CMAKE_AR $ar)
+set(CMAKE_C_FLAGS "$cflags")
+set(CMAKE_CXX_FLAGS "$cxxflags")
+set(CMAKE_LINKER_FLAGS "$ldflags")
 
 set(${project}_HEADER_FILES
-#    $${${project}_HEADER_FILES}/header.h
-#    Add your headers here.
+    $header_files
 )
 
 set(${project}_SOURCE_FILES
-    $files
+    $source_files
 )
 
 source_group("Header Files" FILES $${${project}_HEADER_FILES})
 source_group("Source Files" FILES $${${project}_SOURCE_FILES})
+source_group("CUDA Source Files" FILES $${${project}_CUDA_FILES})
 
 include_directories($include_dirs)
 link_directories($lib_dirs)
-
-
-
 """).substitute(subs)
 
-        info(cmakelists)
+        for output_file in output_files:
+            output_filename = os.path.split(output_file)[1]
+            output_dir = relativize(os.path.split(output_file)[0], base_dir)
+            subs["output_dir"] = output_dir
+            subs["output_filename"] = output_filename
+            subs["output_filename_noext"] = os.path.splitext(output_filename)[0]
+            if self.cudafied:
+                cmakelists += string.Template("\n# CUDA targets for target $output_filename:\n").substitute(subs)
+                for i in range(len(cuda_files)):
+                    #subs["cuda_target"] = os.path.split(change_file_ext(cuda_files[i], ""))[1]
+                    subs["cuda_in"] = cuda_files[i]
+                    subs["cuda_out"] = cuda_output_files[i]
+                    cmakelists += string.Template("add_custom_command(OUTPUT $cuda_out COMMAND ${nvcc} --cuda ${cppflags_all} ${nvccflags} -o $cuda_out $cuda_in)\n").substitute(subs)
+                    #cmakelists += string.Template("add_dependencies($output_filename $cuda_target)\n").substitute(subs)
+            if exe_file_p(output_filename):
+                cmakelists += string.Template("""
+# Generation of executable target $output_filename:
+set(EXECUTABLE_OUTPUT_PATH $output_dir)
+add_executable($output_filename_noext $${${project}_SOURCE_FILES})
+target_link_libraries($output_filename_noext $libs)
+""").substitute(subs)
+            elif sharedlib_file_p(output_filename):
+                cmakelists += string.Template("""
+# Generation of shared library target $output_filename:
+set(LIBRARY_OUTPUT_PATH $output_dir)
+add_library($output_filename_noext SHARED $${${project}_SOURCE_FILES})
+target_link_libraries($output_filename_noext $libs)
+set_target_properties($output_filename_noext PROPERTIES DEFINE_SYMBOL "COMPILING_SHARED_LIBRARY")
+set_property(TARGET $output_filename_noext PROPERTY LINK_INTERFACE_LIBRARIES "")
+""").substitute(subs)
+            elif lib_file_p(output_filename):
+                cmakelists += string.Template("""
+# Generation of static library target $output_filename:
+set(ARCHIVE_OUTPUT_DIRECTORY $output_dir)
+add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
+""").substitute(subs)
+            else:
+                raise p4a_error("I do not know how to build this file type: " + output_file)
         
-        die("TODO")
+        done("Generated " + cmakelists_file)
+        dump(cmakelists_file, cmakelists)
 
-        #~ if self.cudafied:
-            #~ cmakelist += string.Template("""
-
-#~ """).substitute(subs)
-
-    def cmake_gen(self, build = False):
-        pass
-    
+    def cmake_gen(self, dir = None, gen_dir = None, cmakeflags = [], build = False):
+         # Determine the directory where the CMakeLists.txt file should be found.
+        if dir:
+            dir = os.path.abspath(dir)
+        else:
+            dir = os.getcwd()
+        cmakelists_file = os.path.join(dir, "CMakeLists.txt")
+        if not os.path.exists(cmakelists_file):
+            raise p4a_error("Could not find " + cmakelists_file)
+        debug("Generating from " + cmakelists_file) 
         
+        # Determine generation directory.
+        if not gen_dir:
+            gen_dir = os.path.join(os.getcwd(), ".cmake")
+        debug("Gen dir: " + gen_dir)
+        if not os.path.isdir(gen_dir):
+            os.makedirs(gen_dir)
+        
+        run2([ "cmake", "." ] + cmakeflags, working_dir = dir)
+        if build:
+            makeflags = []
+            if get_verbosity() >= 2:
+                makeflags.append("VERBOSE=1")
+            run2([ "make" ] + makeflags, working_dir = dir)
+
 
 if __name__ == "__main__":
     print(__doc__)
