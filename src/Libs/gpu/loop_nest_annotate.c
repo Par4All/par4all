@@ -104,15 +104,18 @@ for further generation of CUDA code.
 /* In modern PIPS programming, all this should be passed through a context
    instead of having this global variable. This should allow some PIPS
    parallelization some days... */
-static list l_enclosing_loops;
-static list l_number_iter_exp;
-static int loop_nest_depth;
-/* True only when we reached the inner loop: */
-static bool inner_reached;
 
+typedef struct {
+  list l_enclosing_loops;
+  list l_number_iter_exp;
+  int loop_nest_depth;
+/* True only when we reached the inner annotated loop: */
+  bool inner_reached;
+} gpu_lna_context;
+  
 
 /* Push a loop that match the criterion for annotation */
-static bool loop_push(loop l)
+static bool loop_push(loop l, gpu_lna_context * p)
 {
   /* In the mode when we just annotate parallel outer loop nests, just
      stop when we encounter a sequential loop: */
@@ -121,31 +124,31 @@ static bool loop_push(loop l)
     // Stop recursion:
     return FALSE;
 
-  l_enclosing_loops = gen_nconc(l_enclosing_loops, CONS(LOOP, l, NIL));
-  loop_nest_depth++;
+  p->l_enclosing_loops = gen_nconc(p->l_enclosing_loops, CONS(LOOP, l, NIL));
+  p->loop_nest_depth++;
   // Go on recursing:
   return TRUE;
 }
 
 
 /* Do the real annotation work on previously marked loops bottom-up */
-static void loop_annotate(loop l)
+static void loop_annotate(loop l, gpu_lna_context * p)
 {
   /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
-  if (inner_reached == FALSE)
+  if (p->inner_reached == FALSE)
     {
       expression guard_exp = expression_undefined;
       statement guard_s = statement_undefined;
 
       /* We are at the innermost loop nest level */
-      inner_reached = TRUE;
+      p->inner_reached = TRUE;
 
       /* First we add a guard to the loop body statement using the
 	 enclosing loops upper bounds.
       */
-      FOREACH(LOOP, c_loop, l_enclosing_loops)
+      FOREACH(LOOP, c_loop, p->l_enclosing_loops)
 	{
 	  entity c_index = loop_index(c_loop);
 	  range c_range = loop_range(c_loop);
@@ -174,8 +177,8 @@ static void loop_annotate(loop l)
 	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
 					   c_number_iter_exp,
 					   make_integer_constant_expression(1));
-	  l_number_iter_exp =
-	    gen_nconc(l_number_iter_exp,
+	  p->l_number_iter_exp =
+	    gen_nconc(p->l_number_iter_exp,
 		      CONS(EXPRESSION, c_number_iter_exp, NIL));
 	}
 
@@ -198,33 +201,38 @@ static void loop_annotate(loop l)
      we are at the uppermost level. Then we add the outermost comment :
      // Loop nest P4A begin, xD(upper_bound,..)
   */
-  if (gen_length(l_enclosing_loops) == 1)
+  if (gen_length(p->l_enclosing_loops) == 1)
     {
       statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
 #define LOOP_NEST_P4A_BEGIN "// Loop nest P4A begin,"
       string outer_s;
-      asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , loop_nest_depth);
+      (void) asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , p->loop_nest_depth);
 
-      FOREACH(EXPRESSION, upper_exp, l_number_iter_exp) {
+      FOREACH(EXPRESSION, upper_exp, p->l_number_iter_exp) {
         string buf;
 	string buf1 = words_to_string(words_expression(upper_exp, NIL));
-        asprintf(&buf,"%s%s",outer_s,buf1);
+        (void) asprintf(&buf,"%s%s",outer_s,buf1);
         free(outer_s);
 	free(buf1);
         outer_s=buf;
-	loop_nest_depth --;
-	if (loop_nest_depth > 0) {
-          asprintf(&buf,"%s"COMMA,outer_s);
+	p->loop_nest_depth --;
+	if (p->loop_nest_depth > 0) {
+          (void) asprintf(&buf,"%s"COMMA,outer_s);
           free(outer_s);
           outer_s=buf;
 	}
       }
 
-      asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
+      (void) asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
       free(outer_s);
+      /* reset context*/
+      p->inner_reached = FALSE;
+      p->loop_nest_depth = 0; 
+      gen_free_list(p->l_number_iter_exp); 
+      p->l_number_iter_exp = NIL;     
     }
 
-  POP(l_enclosing_loops);
+  POP(p->l_enclosing_loops);
   return;
 }
 
@@ -257,18 +265,18 @@ bool gpu_loop_nest_annotate(char *module_name)
   statement module_statement =
     PIPS_PHASE_PRELUDE(module_name, "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
 
-  /* Initialize some state variables: */
-  l_enclosing_loops = NIL;
-  l_number_iter_exp = NIL;
-  loop_nest_depth = 0;
-  /* True only when we reached the inner loop: */
-  inner_reached = FALSE;
+  /* Initialize context */
+  gpu_lna_context c;
+  c.l_enclosing_loops = NIL;
+  c.l_number_iter_exp = NIL;
+  c.loop_nest_depth = 0;
+  c.inner_reached = FALSE;
 
   /* Annotate the loop nests of the module. */
-  gen_recurse(module_statement, loop_domain, loop_push, loop_annotate);
+  gen_context_recurse(module_statement, &c, loop_domain, loop_push, loop_annotate);
 
-  /* Clean up things: */
-  gen_free_list(l_number_iter_exp);
+  /* Clean up things: (hasn't it been done previously in loop_annotate?) */
+  gen_free_list(c.l_number_iter_exp);
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
