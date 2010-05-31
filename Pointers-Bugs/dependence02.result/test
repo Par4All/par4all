@@ -1,0 +1,49 @@
+
+Proper effects for "dependence02"
+
+void dependence02(int *b)
+{
+   int *a;
+//               <must be read   >: b
+//               <must be written>: a
+
+   a = b;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: a
+   // a and b are aliased, a points_to b[0]
+   
+   *a = 0;
+}
+
+POINTS TO for "dependence02"
+
+//  {(b,_b_1,-Exact-)}
+void dependence02(int *b)
+{
+//  {(b,_b_1,-Exact-)}
+   int *a;
+//  {(b,_b_1,-Exact-)}
+
+   a = b;
+//  {(a,_b_1,-Exact-);(b,_b_1,-Exact-)}
+   // a and b are aliased, a points_to b[0]
+   
+   *a = 0;
+}
+
+Proper effects using points_to
+
+void dependence02(int *b)
+{
+   int *a;
+//               <must be read   >: b
+//               <must be written>: a
+
+   a = b;
+//               <must be read   >: a
+//               <must be written>: _b_1
+   // a and b are aliased, a points_to b[0]
+   
+   *a = 0;
+}
+
