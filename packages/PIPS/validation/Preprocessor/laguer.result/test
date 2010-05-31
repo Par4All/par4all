@@ -157,7 +157,7 @@ void laguer(fcomplex a[], int m, fcomplex *x, float eps, int polish)
       g = Cdiv(d, b);
       g2 = Cmul(g, g);
       h = Csub(g2, RCmul(2.0, Cdiv(f, b)));
-      sq = Csqrt(RCmul((float) m-1, Csub(RCmul((float) m, h), g2)));
+      sq = Csqrt(RCmul((float) (m-1), Csub(RCmul((float) m, h), g2)));
       gp = Cadd(g, sq);
       gm = Csub(g, sq);
       if (Cabs(gp)<Cabs(gm)) 

@@ -5,7 +5,7 @@ int main()
       int *first;
    } x;
    int y[10];
-//               <must be written>: x[1]
+//               <must be written>: x[.first]
 
    x.first = &y[5];
    
@@ -28,7 +28,7 @@ int main()
 //  points to = {}
 
    x.first = &y[5];
-//  {(x[1],y[5],-Exact-)}
+//  {(x[first],y[5],-Exact-)}
    
    
    return 0;

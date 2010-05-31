@@ -16,7 +16,7 @@ echo Result before partial evaluation
 echo
 
 apply UNSPLIT
-shell (cd partial_eval14.database/Src; gcc partial_eval14.c;./a.out)
+shell cc partial_eval14.database/Src/partial_eval14.c -o partial_eval14.database/Tmp/a.out ; ./partial_eval14.database/Tmp/a.out 
 
 apply PARTIAL_EVAL[main]
 
@@ -32,7 +32,8 @@ echo Result after partial evaluation
 echo
 
 apply UNSPLIT
-shell (cd partial_eval14.database/Src; gcc partial_eval14.c;./a.out)
+shell cc partial_eval14.database/Src/partial_eval14.c -o partial_eval14.database/Tmp/a.out ; ./partial_eval14.database/Tmp/a.out 
+
 
 close
 delete partial_eval14

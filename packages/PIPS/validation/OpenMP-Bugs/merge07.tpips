@@ -1,0 +1,47 @@
+#
+delete merge07
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create merge07 merge07.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
+apply PRIVATIZE_MODULE(main)
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE(main)
+
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+echo "before merge_pragma"
+display PRINTED_FILE(main)
+
+apply OMP_MERGE_PRAGMA
+
+echo "after merge_pragma"
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c merge07.database/Src/merge07.c -o merge07.database/Src/merge07.o
+
+close
+delete merge07
+quit
+# EOF

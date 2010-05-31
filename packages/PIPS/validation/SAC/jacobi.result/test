@@ -74,18 +74,16 @@ kernel1:
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_1 = F_0+space[i][LU_IND0];
@@ -131,11 +129,8 @@ kernel1:
 
          save[i][LU_IND0+4] = 0.25*F_2;
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_4 = F_3+save[i][LU_IND1];
@@ -181,17 +176,16 @@ kernel1:
 
          space[i][LU_IND1+4] = 0.25*F_5;
       }
-      j = 63;
    }
    ;
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -201,8 +195,6 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_1 = F_0+space[i][LU_IND0];
@@ -248,11 +240,8 @@ kernel1:
 
          save[i][LU_IND0+4] = 0.25*F_2;
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_4 = F_3+save[i][LU_IND1];
@@ -298,17 +287,16 @@ kernel1:
 
          space[i][LU_IND1+4] = 0.25*F_5;
       }
-      j = 63;
    }
    ;
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    //PIPS generated variable
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    
@@ -319,8 +307,6 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_14 = F_04+space[i][LU_IND0];
@@ -366,11 +352,8 @@ kernel1:
 
          save[i][LU_IND0+4] = 0.25*F_20;
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_44 = F_34+save[i][LU_IND1];
@@ -416,17 +399,16 @@ kernel1:
 
          space[i][LU_IND1+4] = 0.25*F_50;
       }
-      j = 63;
    }
    ;
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    //PIPS generated variable
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    
@@ -437,8 +419,6 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
@@ -477,11 +457,8 @@ kernel1:
          SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
          SIMD_SAVE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
@@ -520,17 +497,16 @@ kernel1:
          SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
          SIMD_SAVE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
       }
-      j = 63;
    }
    ;
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    //PIPS generated variable
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    
@@ -541,8 +517,6 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:   ;
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
@@ -591,11 +565,8 @@ kernel1:   ;
          SIMD_SAVE_V4SF(v4sf_vec3, &aligned0[0]);
          SIMD_SAVE_V4SF(v4sf_vec6, &aligned1[0]);
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
@@ -644,15 +615,14 @@ kernel1:   ;
          SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
          SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
       }
-      j = 63;
    }
    ;
 }
 void compute()
 {
-   int i, j;
+   int i;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   int LU_IND0, LU_IND1;
    //PIPS generated variable
    float F_54, F_44, F_34, F_24, F_14, F_04;
    
@@ -661,10 +631,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   ;
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB0 = 62;
-      LU_IB0 = 2;
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
@@ -713,11 +680,8 @@ kernel1:   ;
          SIMD_SAVE_V4SF(v4sf_vec3, &aligned0[0]);
          SIMD_SAVE_V4SF(v4sf_vec6, &aligned1[0]);
       }
-      j = 63;
    }
    for(i = 1; i <= 62; i += 1) {
-      LU_NUB1 = 62;
-      LU_IB1 = 2;
       for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
@@ -766,7 +730,6 @@ kernel1:   ;
          SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
          SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
       }
-      j = 63;
    }
    ;
 }

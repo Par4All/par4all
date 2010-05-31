@@ -1,0 +1,12 @@
+delete cleandec07
+setproperty ABORT_ON_USER_ERROR TRUE
+create cleandec07 cleandec07.c
+
+display PRINTED_FILE[c_clean_declarations07]
+apply CLEAN_DECLARATIONS[c_clean_declarations07]
+display PRINTED_FILE[c_clean_declarations07]
+
+close
+delete cleandec07
+quit
+

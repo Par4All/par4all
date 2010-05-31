@@ -5,11 +5,11 @@ void init_s(s_t s, int max)
 {
    // BEGIN BLOCK
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[.tab]
 
    s.tab = (float *) malloc(max*sizeof(float));
 //               <must be read   >: max
-//               <must be written>: s[1]
+//               <must be written>: s[.max]
    s.max = max;
    // END BLOCK
 }
@@ -24,7 +24,7 @@ void init_s(s_t s, int max)
 //  points to = {}
 
    s.tab = (float *) malloc(max*sizeof(float));
-//  {(s[2],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(s[tab],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
    s.max = max;
    // END BLOCK
 }

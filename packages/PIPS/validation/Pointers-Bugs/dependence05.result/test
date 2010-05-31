@@ -1,0 +1,126 @@
+
+Proper effects for "dependence05"
+
+int * dependence05()
+{
+   int *a;
+   int *b;
+   int *c;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+
+   b = (int *) malloc(10*sizeof(int));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c
+   c = (int *) malloc(10*sizeof(int));
+//               <must be read   >: b
+//               <must be written>: a
+
+   a = b;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: a
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//               <must be read   >: c
+//               <must be written>: a
+   // write effect on *a may be visible from caller, because b escape
+   
+   a = c;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: a
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ c
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // write effect won't be visible from caller, because c doesn't escape
+   
+   free(c);
+//               <must be read   >: b
+
+   return b;
+}
+
+POINTS TO for "dependence05"
+
+//  {}
+int * dependence05()
+{
+//  points to = {}
+   int *a;
+//  points to = {}
+   int *b;
+//  points to = {}
+   int *c;
+//  points to = {}
+
+   b = (int *) malloc(10*sizeof(int));
+//  {(b,*HEAP*_l_10,-Exact-)}
+   c = (int *) malloc(10*sizeof(int));
+//  {(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,-Exact-)}
+
+   a = b;
+//  {(a,*HEAP*_l_10,-Exact-);(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,
+//   -Exact-)}
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//  {(a,*HEAP*_l_10,-Exact-);(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,
+//   -Exact-)}
+   // write effect on *a may be visible from caller, because b escape
+   
+   a = c;
+//  {(a,*HEAP*_l_11,-Exact-);(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,
+//   -Exact-)}
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//  {(a,*HEAP*_l_11,-Exact-);(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,
+//   -Exact-)}
+   // write effect won't be visible from caller, because c doesn't escape
+   
+   free(c);
+//  {(a,*HEAP*_l_11,-Exact-);(b,*HEAP*_l_10,-Exact-);(c,*HEAP*_l_11,
+//   -Exact-)}
+
+   return b;
+}
+
+Proper effects using points_to
+
+int * dependence05()
+{
+   int *a;
+   int *b;
+   int *c;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+
+   b = (int *) malloc(10*sizeof(int));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c
+   c = (int *) malloc(10*sizeof(int));
+//               <must be read   >: b
+//               <must be written>: a
+
+   a = b;
+//               <must be read   >: a
+//               <must be written>: *HEAP*_l_10
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//               <must be read   >: c
+//               <must be written>: a
+   // write effect on *a may be visible from caller, because b escape
+   
+   a = c;
+//               <must be read   >: a
+//               <must be written>: *HEAP*_l_11
+   // a and b are aliased, a points_to b[0]
+   *a = 0;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ c
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   // write effect won't be visible from caller, because c doesn't escape
+   
+   free(c);
+//               <must be read   >: b
+
+   return b;
+}
+

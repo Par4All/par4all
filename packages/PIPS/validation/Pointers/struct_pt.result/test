@@ -15,10 +15,10 @@ int main()
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m
    m = (my_str *) malloc(sizeof(my_str));
 //               <must be read   >: m
-//               <must be written>: m[0][1]
+//               <must be written>: m[0][.i]
    m->i = 1;
 //               <must be read   >: m
-//               <must be written>: m[0][2]
+//               <must be written>: m[0][.p]
    m->p = &j;
 //               <must be read   >: m
 //               <must be written>: n
@@ -45,14 +45,14 @@ int main()
    j = 2;
 //  points to = {}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    m->i = 1;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
    m->p = &j;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][2],j,-Exact-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][p],j,-Exact-)}
    n = m;
-//  {(m,*ANY_MODULE*:*HEAP*_b0,-MAY-);(m[0][2],j,-Exact-);(n,
-//   *ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(m,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(m[0][p],j,-Exact-);(n,
+//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
 
    return 0;
 }

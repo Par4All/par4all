@@ -43,7 +43,7 @@ ATOM * a_m_serial(int serial)
    int i, n, a_number();
 //               <must be read   >: atomUPDATE
    if (atomUPDATE)
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be read    >: atomNUMBER atomUPDATE first
 //               <may be written >: atomNUMBER atomUPDATE
 //               <must be written>: n
       n = a_number();
@@ -63,14 +63,14 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: first
 //               <must be written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched lastmatched[0][1] 
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
 
    if (serial==lastmatched->serial) 
 //               <must be read   >: lastmatched
       return lastmatched;
-//               <must be read   >: lastmatched lastmatched[0][1] 
-//                                  serial
+//               <must be read   >: lastmatched 
+//                                  lastmatched[0][.serial] serial
    if (serial>lastmatched->serial) 
 //               <must be read   >: lastmatched
 //               <must be written>: ap
@@ -78,7 +78,7 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: n
 //               <must be written>: i
    for(i = 0; i <= n-1; i += 1) {
-//               <must be read   >: ap ap[0][1] n serial
+//               <must be read   >: ap ap[0][.serial] n serial
       if (ap->serial==serial) {
 //               <must be read   >: ap n
 //               <must be written>: lastmatched
@@ -86,13 +86,13 @@ ATOM * a_m_serial(int serial)
 //               <must be read   >: ap n
          return ap;
       }
-//               <must be read   >: ap ap[0][3] n
+//               <must be read   >: ap ap[0][.next] n
       if (ap==ap->next)
 //               <must be read   >: first n
 //               <must be written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][3] n
+//               <must be read   >: ap ap[0][.next] n
 //               <must be written>: ap
          ap = ap->next;
    }

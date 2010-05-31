@@ -1,7 +1,7 @@
 
 POINTS TO
 
-C  {}
+//  {}
 void point_to04()
 {
 //  points to = {}

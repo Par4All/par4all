@@ -5,10 +5,10 @@ int struct01()
       int second;
    } x;
    int y[10];
-//               <must be written>: x[1]
+//               <must be written>: x[.first]
 
    x.first = 1;
-//               <must be written>: x[2]
+//               <must be written>: x[.second]
    x.second = 2;
 //               <must be written>: y[0]
 

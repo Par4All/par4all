@@ -1,7 +1,7 @@
 
 POINTS TO
 
-C  {(p,_p_1,-Exact-)}
+//  {(p,_p_1,-Exact-)}
 void foo(int *p)
 {
 //  {(p,_p_1,-Exact-)}

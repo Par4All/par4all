@@ -1,3 +1,4 @@
+#include <stdio.h>
 void c_clean_declarations03(int x)
 {
     /* Hide the formal parameter */

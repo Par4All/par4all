@@ -1,0 +1,16 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "twoaddress01"
+delete $WS
+create $WS $WS.c
+display PRINTED_FILE[%ALLFUNC]
+setproperty GENERATE_TWO_ADDRESSES_CODE_SKIP_DEREFERENCING TRUE
+apply GENERATE_TWO_ADDRESSES_CODE[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+apply UNSPLIT
+close
+
+shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out` && echo ok ) || echo ko
+delete $WS

@@ -8,7 +8,7 @@ echo
 echo Initial code
 echo
 
-# activate PRINT_CODE_CUMULATED_EFFECTS
+setproperty CONSTANT_PATH_EFFECTS FALSE
 display PRINTED_FILE[main]
 
 echo

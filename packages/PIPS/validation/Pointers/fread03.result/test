@@ -43,8 +43,8 @@ Proper effects for "ReadPGMrow"
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
-//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
-//               <may be written >: file[*] line[*] 
+//               <may be read    >: file[0] __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[0] line[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file width
    fread(&line[0], sizeof(byte), width, file);

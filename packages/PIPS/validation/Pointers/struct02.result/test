@@ -14,20 +14,20 @@ int struct02()
       if (1) {
          // BEGIN BLOCK
 //               <must be read   >: i
-//               <must be written>: x[i][1]
+//               <must be written>: x[i][.first]
          x[i].first = 1;
 //               <must be read   >: i
-//               <must be written>: x[i][2]
+//               <must be written>: x[i][.second]
          x[i].second = 0;
          // END BLOCK
       }
       else {
          // BEGIN BLOCK
 //               <must be read   >: i
-//               <must be written>: x[i][1]
+//               <must be written>: x[i][.first]
          x[i].first = 0;
 //               <must be read   >: i
-//               <must be written>: x[i][2]
+//               <must be written>: x[i][.second]
          x[i].second = 1;
          // END BLOCK
       }

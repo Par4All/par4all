@@ -30,20 +30,24 @@ int main()
    pFile = fopen("myfile.txt", "w");
 //               <must be written>: n
    for(n = 0; n <= 2; n += 1) {
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       puts("please, enter a name: ");
-//               <may be written >: name[*]
-//               <must be read   >: __IO_EFFECTS:LUNS[0]
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0] name[*]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
 //               <must be written>: __IO_EFFECTS:LUNS[0]
       gets(name);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] name[*] 
+//                                  pFile[0]
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[0]
 //               <must be read   >: n pFile
       fprintf(pFile, "Name %d %s\n", n, name);
    }
-//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[0]
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[0]
 //               <must be read   >: pFile
    fclose(pFile);
 }

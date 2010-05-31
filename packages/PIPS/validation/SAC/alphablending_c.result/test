@@ -40,7 +40,6 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
@@ -96,12 +95,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       //c SIMD_COMMENT_4
       result[LU_IND0+3] = F_0+F_3;
    }
-   i = MAX0(LU_NUB0, 0);
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
@@ -157,12 +154,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       //c SIMD_COMMENT_4
       result[LU_IND0+3] = F_0+F_3;
    }
-   i = MAX0(LU_NUB0, 0);
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
@@ -222,12 +217,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       //c SIMD_COMMENT_4
       result[LU_IND0+3] = F_00+F_30;
    }
-   i = MAX0(LU_NUB00, 0);
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
@@ -281,12 +274,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8);
       SIMD_SAVE_V4SF(v4sf_vec11, &result[LU_IND0]);
    }
-   i = MAX0(LU_NUB00, 0);
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
@@ -350,12 +341,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_SAVE_V4SF(v4sf_vec5, &aligned3[0]);
       SIMD_SAVE_V4SF(v4sf_vec8, &aligned4[0]);
    }
-   i = MAX0(LU_NUB00, 0);
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_IND0;
    //PIPS generated variable
@@ -417,7 +406,6 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_SAVE_V4SF(v4sf_vec5, &aligned3[0]);
       SIMD_SAVE_V4SF(v4sf_vec8, &aligned4[0]);
    }
-   i = MAX0(LU_NUB00, 0);
    ;
 }
 
@@ -425,7 +413,6 @@ simdized code
 
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_IND0;
    //PIPS generated variable
@@ -487,6 +474,5 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_SAVE_V4SF(v4sf_vec5, &aligned3[0]);
       SIMD_SAVE_V4SF(v4sf_vec8, &aligned4[0]);
    }
-   i = MAX0(LU_NUB00, 0);
    ;
 }

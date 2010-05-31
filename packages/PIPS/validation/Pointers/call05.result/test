@@ -76,11 +76,15 @@ int main()
 //               <must be read   >: d1 d2
 //               <must be written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1 d2 i j 
-//                                  y[i][j]
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 
+//                                  i j y[i][j]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//               <must be read   >: __IO_EFFECTS:LUNS[1] d1
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }

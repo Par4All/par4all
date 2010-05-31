@@ -1,0 +1,19 @@
+int main()
+{
+   int a = 2, b = 1;
+   int c = &a;
+   c = a>>b;
+   printf("%d", c);
+   return 0;
+}
+int main()
+{
+   int a = 2, b = 1;
+   int c = &a;
+   c = a;
+   c = c>>b;
+   printf("%d", c);
+   return 0;
+}
+ok
+

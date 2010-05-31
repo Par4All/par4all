@@ -1,7 +1,13 @@
-PIPS validation, i.e. non regression tests.
+PIPS validation, i.e. non regression tests, bugs and expected enhancements.
 
 
-Default validation (list of directories in "defaults"):
+xxxx: non-regression test for functionality xxx, may or not use PIPS initial default settings
+xxxx-Bugs: known bugs (corrective maintenance)
+xxxx-Future: new functionalities (evolutive maintenance)
+xxxx-New: non-regression test for functionality xxx, using the current defauolt settings for properties and activates
+
+
+Default validation, i.e. non-regression tests (list of directories in "defaults"):
 
 	sh> make validate
 

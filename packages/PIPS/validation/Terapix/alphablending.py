@@ -29,19 +29,19 @@ def microcode_normalizer(ws,module):
 	#module.display()
 	#module.clean_declarations()
 	#module.display()
-	module.array_to_pointer(convert_parameters="1D",flatten_only=True)
+	module.array_to_pointer(convert_parameters="POINTER",flatten_only=True)
+	module.display()
+	module.normalize_microcode()
 	module.display()
 	module.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	module.display()
 	module.generate_two_addresses_code()
 	module.display()
-	module.normalize_microcode()
+	for p in ["addi","addri","subi","subri","muli","mulri","seti","lshifti","rshifti","psubi","paddi","setpi","prshifti","pseti"]:
+		module.expression_substitution(pattern=p)
+	module.flatten_code(flatten_code_unroll=False)
+	module.clean_declarations()
 	module.display()
-	#for p in ["addi","subi","muli","divi","seti"]:
-	#	module.expression_substitution(pattern=p)
-	#module.flatten_code(flatten_code_unroll=False)
-	#module.clean_declarations()
-	#module.display()
 
 if __name__ == "__main__":
 	w = workspace(["alphablending.c", "include/load.c", "include/terasm.c"], cppflags="-I.")
@@ -49,7 +49,6 @@ if __name__ == "__main__":
 	
 	print "tidy the code just in case of"
 	m.partial_eval()
-	m.display()
 	 
 	print "I have to do this early"
 	m.terapix_remove_divide()
@@ -67,10 +66,10 @@ if __name__ == "__main__":
 			for l2 in l1.loops():
 				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 				m.display()
-				kernels+=[l2.label]
+				kernels+=[l2]
 				m.isolate_statement(label=l2.label)
 	m.display()
-	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
+	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=1)
 	m.display()
 	m.partial_eval(linearize=True)
 	m.display()
@@ -89,7 +88,7 @@ if __name__ == "__main__":
 	for k in kernels:
 		name=seed+str(nb)
 		nb+=1
-		m.outline(module_name=name,label=k,smart_reference_computation=True)
+		m.outline(module_name=name,label=k.label,smart_reference_computation=True,loop_bound_as_parameter=k.loops()[0].label)
 		launchers+=[w[name]]
 	m.display()
 	for l in launchers:l.display(With='PRINT_CODE_REGIONS')

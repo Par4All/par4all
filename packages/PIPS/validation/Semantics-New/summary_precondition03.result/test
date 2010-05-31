@@ -1,5 +1,13 @@
 
-C  T(main) {main==10}
+Call graph for "main"
+
+ main
+     foo
+
+Transformer for "main"
+
+
+//  T(main) {main==10}
 
 int main(int argc, char **argv)
 {
@@ -11,15 +19,22 @@ int main(int argc, char **argv)
 
    int i = 10;
 
-//  T(i,j,k) {i==i#init+1, i==j+1}
+//  T(i,j) {i==i#init+1, i==j+1}
 
-   int j = i++, a[i], k = foo(i);
+   int j = i++, a[i];
+
+//  T(k) {}
+
+   long long k = foo(argv);
 
 //  T(main) {j==main}
 
 
    return j;
 }
+
+Preconditions for "main"
+
 
 //  P() {}
 
@@ -35,13 +50,20 @@ int main(int argc, char **argv)
 
 //  P(i) {i==10}
 
-   int j = i++, a[i], k = foo(i);
+   int j = i++, a[i];
+
+//  P(i,j) {i==11, j==10}
+
+   long long k = foo(argv);
 
 //  P(i,j,k) {i==11, j==10}
 
 
    return j;
 }
+
+Preconditions for "foo"
+
 
 //  P() {}
 
