@@ -1,7 +1,7 @@
-delete bc_inter04
+delete bc_inter04_intra-1
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create bc_inter04 bc_inter04.c
+create bc_inter04_intra-1 bc_inter04_intra-1.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -32,4 +32,4 @@ display PRINTED_FILE
  
 
 close
-delete bc_inter04
+delete bc_inter04_intra-1
