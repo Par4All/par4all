@@ -89,7 +89,7 @@ typedef dg_vertex_label vertex_label;
 typedef struct
 {
     statement source; /* the statement where the definition was found. */
-    reference ref;       /* maybe could be a reference to allow arrays? */
+    reference ref;       /* maybe could be a reference to allow arrays? SG:done*/
     expression val;   /* the result of the substitution. */
 }
     t_substitution, * p_substitution;
@@ -135,14 +135,12 @@ free_substitution(p_substitution subs)
   }
 }
 
-#define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
-
 static bool no_write_effects_on_var(entity var, list le)
 {
     FOREACH(EFFECT, e, le)
         if (effect_write_p(e) && entities_may_conflict_p(effect_variable(e), var))
             return FALSE;
-                   return TRUE;  
+    return TRUE;  
 }
 
 static bool functionnal_on_effects(reference ref, list /* of effect */ le)
@@ -266,43 +264,38 @@ static bool other_cool_enough_for_a_last_substitution(statement s, reference ref
 
 /* do perform the substitution var -> val everywhere in s
  */
-static bool expr_flt(expression e, p_substitution subs)
+static bool perform_substitution_in_expression(expression e, p_substitution subs)
 {
     syntax s = expression_syntax(e);
-    if (!syntax_reference_p(s)) return TRUE;
+    if (syntax_reference_p(s)) {
 
-    reference r = syntax_reference(s);
-    if (reference_equal_p(r,subs->ref)) 
-    {
-        ifdebug(2) {
-            pips_debug(2,"substituing ");
-            print_reference(subs->ref);
-            pips_debug(2," to ");
-            print_reference(r);
-            pips_debug(2,"\n");
+        reference r = syntax_reference(s);
+        if (reference_equal_p(r,subs->ref)) 
+        {
+            ifdebug(2) {
+                pips_debug(2,"substituing %s to %s\n",words_to_string(words_expression(subs->val,NIL)),words_to_string(words_reference(r,NIL)));
+            }
+            /* FI->FC: the syntax may be freed but not always the reference it
+               contains because it can also be used in effects. The bug showed on
+               transformations/Validation/fs01.f, fs02.f, fs04.f. I do not know why the
+               effects are still used after the statement has been updated (?). The bug
+               can be avoided by closing and opening the workspace which generates
+               independent references in statements and in effects. Is there a link with
+               the notion of cell = reference+preference? */
+            expression_syntax(e)=syntax_undefined;
+            update_expression_syntax(e,copy_syntax(expression_syntax(subs->val)));
         }
-        expression_syntax(e) = copy_syntax(expression_syntax(subs->val));
-        /* FI->FC: the syntax may be freed but not always the reference it
-           contains because it can also be used in effects. The bug showed on
-           transformations/Validation/fs01.f, fs02.f, fs04.f. I do not know why the
-           effects are still used after the statement has been updated (?). The bug
-           can be avoided by closing and opening the workspace which generates
-           independent references in statements and in effects. Is there a link with
-           the notion of cell = reference+preference? */
-        /* free_syntax(s); */
-        return true;
-    }
-    else
-    {
-        ifdebug(2) {
-            pips_debug(2,"not substituing ");
-            print_reference(subs->ref);
-            pips_debug(2," to ");
-            print_reference(r);
-            pips_debug(2,"\n");
+        else
+        {
+            ifdebug(2) {
+                pips_debug(2,"not substituing ");
+                print_reference(subs->ref);
+                pips_debug(2," to ");
+                print_reference(r);
+                pips_debug(2,"\n");
+            }
         }
     }
-    return TRUE;
 }
 
 static bool
@@ -325,7 +318,7 @@ perform_substitution(
     void * s /* where to do this */)
 {
     gen_context_multi_recurse(s, subs,
-            expression_domain, expr_flt, gen_null,
+            expression_domain, gen_true, perform_substitution_in_expression,
             call_domain,call_flt,gen_null,
             NULL);
 }
@@ -333,18 +326,13 @@ perform_substitution(
 static void
 perform_substitution_in_assign(p_substitution subs, statement s)
 {
-  instruction i = statement_instruction(s);
-  list args;
-  
-  /* special case */
-  pips_assert("assign call", 
-	      instruction_call_p(i) && 
-	      ENTITY_ASSIGN_P(call_function(instruction_call(i))));
-  
-  args = call_arguments(instruction_call(i));
+    /* special case */
+    pips_assert("assign call", statement_call_p(s));
 
-  perform_substitution(subs, EXPRESSION(CAR(CDR(args))));
-  MAP(EXPRESSION, e, perform_substitution(subs, e), reference_indices(syntax_reference(expression_syntax(EXPRESSION(CAR(args))))));
+    call c = statement_call(s);
+    perform_substitution(subs,binary_call_rhs(c));
+    FOREACH(EXPRESSION, e, reference_indices(expression_reference(binary_call_lhs(c))))
+        perform_substitution(subs, e);
 }
 
 /* whether there are some conflicts between W cumulated in s2
@@ -503,7 +491,7 @@ fs_filter(statement stat, graph dg)
  */
 bool forward_substitute(string module_name)
 {
-    debug_on(DEBUG_NAME);
+    debug_on("FORWARD_SUBSTITUTE_DEBUG_LEVEL");
 
     /* set require resources.
      */

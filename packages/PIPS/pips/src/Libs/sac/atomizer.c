@@ -93,6 +93,7 @@ void patch_constant_size(syntax s, bool* patch_all)
             break;
     };
 }
+static expression current_lhs = expression_undefined;
 
 /* returns the assignment statement if moved, or NULL if not.
  */
@@ -265,6 +266,11 @@ entity sac_make_new_variable(entity module, basic b)
             c_module_p(module)?get_current_module_statement():statement_undefined);
     return e;
 }
+static entity sac_get_current_lhs(entity module, basic b)
+{
+    entity current_entity = expression_to_entity(current_lhs);
+    return entity_undefined_p(current_entity)? sac_make_new_variable(module,b): current_entity;
+}
 
 static
 void simd_do_atomize(expression ce, statement cs)
@@ -280,9 +286,15 @@ void simd_do_atomize(expression ce, statement cs)
 		// Atomize expression only if the call is not a constant
 		if(FUNC_TO_ATOMIZE_P(cc))
 		{
-			// If the current call is not an assign call,
-			// let's atomize the current argument
-			if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
+			/* If the current call is not an assign call,
+			 * let's atomize the current argument
+             * sg: also try to be smart and make reduction appear if any
+             */
+            bool potential_reduction_p = false;
+            FOREACH(EXPRESSION,e,call_arguments(cc))
+                if(same_expression_p(e,current_lhs)) potential_reduction_p = true;
+
+			if( (stat = simd_atomize_this_expression(potential_reduction_p?sac_get_current_lhs:sac_make_new_variable, ce)) )
 				simd_insert_statement(cs, stat);
 		}
 	}
@@ -311,7 +323,8 @@ static void atomize_call_statement(statement cs)
     // For each call argument, the argument is atomized if needed
 	if( ENTITY_ASSIGN_P(call_function(c)) )
 	{
-		expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
+        current_lhs = binary_call_lhs(c);
+		expression rhs = binary_call_rhs(c);
 		if( expression_call_p(rhs) )
 		{
 			FOREACH(EXPRESSION, arg,call_arguments(expression_call(rhs)))

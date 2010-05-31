@@ -52,6 +52,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "prettyprint.h"
+#include "accel-util.h"
 #include "transformations.h"
 
 
@@ -579,4 +580,83 @@ bool scalarization (char * module_name)
 
   return (good_result_p);
 
+}
+
+typedef struct {
+    entity array;
+    bool constant_p;
+} references_constant_param;
+
+static void all_array_references_constant_walker(reference ref, references_constant_param* p)
+{
+    if(same_entity_p(p->array,reference_variable(ref)))
+    {
+        expression offset = reference_offset(ref);
+        p->constant_p&=extended_expression_constant_p(offset) && (!ENDP(reference_indices(ref)));
+        free_expression(offset);
+    }
+}
+
+static bool all_array_references_constant_p(statement in, entity array)
+{
+    references_constant_param p = { array,true};
+    gen_context_recurse(in, &p, reference_domain, gen_true, all_array_references_constant_walker);
+    return p.constant_p;
+}
+
+typedef struct {
+    entity array;
+    hash_table mapping;
+} replace_references_constant_param;
+
+static void replace_constant_array_references_walker(reference ref, replace_references_constant_param *p)
+{
+    if(same_entity_p(p->array,reference_variable(ref)))
+    {
+        /* we know for sure all indices are constant */
+        expression offset = reference_offset(ref);
+        int value;
+        if(!expression_integer_value(offset,&value))
+            pips_internal_error("reference index should be constants\n");
+        /* add one to the value, because 0 seems reserved */
+        entity var = (entity)hash_get(p->mapping,(void*)(1+value));
+        if(var == HASH_UNDEFINED_VALUE)
+        {
+            var = make_new_scalar_variable_with_prefix(entity_user_name(p->array),get_current_module_entity(),basic_of_reference(ref));
+            hash_put(p->mapping,(void*)(1+value),var);
+            AddEntityToCurrentModule(var);
+        }
+        gen_full_free_list(reference_indices(ref));
+        free_expression(offset);
+        reference_indices(ref)=NIL;
+        reference_variable(ref)=var;
+    }
+}
+
+static void replace_constant_array_references(statement in, entity array)
+{
+    replace_references_constant_param p = { array , hash_table_make(hash_int, HASH_DEFAULT_SIZE) };
+    gen_context_recurse(in,&p,reference_domain,gen_true, replace_constant_array_references_walker);
+}
+
+bool constant_array_scalarization(const char * module_name)
+{
+    set_current_module_entity(module_name_to_entity(module_name));
+    set_current_module_statement( (statement)	db_get_memory_resource(DBR_CODE, module_name, true) );
+    set sreferenced_entities = get_referenced_entities(get_current_module_statement());
+    SET_FOREACH(entity,e,sreferenced_entities)
+    {
+        if((entity_array_p(e)||entity_pointer_p(e)) && all_array_references_constant_p(get_current_module_statement(),e))
+        {
+            replace_constant_array_references(get_current_module_statement(),e);
+            if(!same_string_p(entity_module_name(e),module_name))
+                pips_user_warning("changing entity %s from other module, result may be wrong\n",entity_user_name(e));
+        }
+    }
+    set_free(sreferenced_entities);
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
 }
