@@ -4,15 +4,20 @@
 
 /* ensure portability between different versions of readline { */
 #if !HAVE_DECL_RL_COMPLETION_MATCHES
-#define rl_completion_matches completion_matches
+    #define rl_completion_matches completion_matches
 #endif
 
 #if !HAVE_DECL_RL_FILENAME_COMPLETION_FUNCTION
-#define rl_filename_completion_function filename_completion_function
+    #define rl_filename_completion_function filename_completion_function
 #endif
 
 #if !HAVE_RL_COMPENTRY_FUNC_T
-#define rl_compentry_func_t CPFunction
+    #define rl_compentry_func_t CPFunction
+#endif
+
+/* in bsd, there is a bacward compatible mode, we skip it here */
+#if !HAVE_RL_COMPENTRY_FUNC_T || !HAVE_DECL_RL_COMPLETION_MATCHES || !HAVE_DECL_RL_FILENAME_COMPLETION_FUNCTION
+    #define RL_NO_COMPAT
 #endif
 /* } */
 
