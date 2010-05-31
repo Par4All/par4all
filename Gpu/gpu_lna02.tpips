@@ -12,6 +12,7 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 module p4a_kernel_launcher_1
 display PRINTED_FILE
+setproperty GPU_LOOP_NEST_ANNOTATE_PARALLEL FALSE
 apply GPU_LOOP_NEST_ANNOTATE
 
 display PRINTED_FILE
