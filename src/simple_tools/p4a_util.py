@@ -70,60 +70,76 @@ class p4a_error(Exception):
     def __str__(self):
         return self.msg
 
-def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None):
+def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     if verbosity >= 1:
         sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("magenta") + " ".join(cmd_list) + p4a_term.escape() + "\n");
-    old_locale = ""
     if force_locale is not None:
-        if "LC_ALL" in os.environ:
-            old_locale = os.environ["LC_ALL"]
-        os.environ["LC_ALL"] = force_locale
+        extra_env["LC_ALL"] = force_locale
+    prev_env = {}
+    for e in extra_env:
+        if e in os.environ:
+            prev_env[e] = os.environ[e]
+        else:
+            prev_env[e] = ""
+        os.environ[e] = extra_env[e]
     old_cwd = ""
     w = ""
-    if working_dir:
-        old_cwd = os.getcwd()
-        os.chdir(working_dir)
-        w = working_dir
-    else:
-        w = os.getcwd()
-    ret = os.system(" ".join(cmd_list))
-    if old_cwd:
-        os.chdir(old_cwd)
-    if old_locale:
-        os.environ["LC_ALL"] = old_locale
+    try:
+        if working_dir:
+            old_cwd = os.getcwd()
+            os.chdir(working_dir)
+            w = working_dir
+        else:
+            w = os.getcwd()
+        ret = os.system(" ".join(cmd_list))
+        if old_cwd:
+            os.chdir(old_cwd)
+    except:
+        if not can_fail:
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
+    for e in prev_env:
+        if e in os.environ:
+            if len(e):
+                os.environ[e] = prev_env[e]
+            else:
+                del os.environ[e]
     if ret != 0 and not can_fail:
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return ret
 
-def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False):
+def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     Returns the final stdout and stderr output as a list.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    w = os.getcwd()
+    #if cmd_list.__class__.__name__ != "list":
+    #    cmd_list = [ cmd_list ]
+    w = ""
     if working_dir:
         w = working_dir
+    else:
+        w = os.getcwd()
     if verbosity >= 1:
         sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") + " ".join(cmd_list) + p4a_term.escape() + "\n");
-    old_locale = ""
     if force_locale is not None:
-        if "LC_ALL" in os.environ:
-            old_locale = os.environ["LC_ALL"]
-        os.environ["LC_ALL"] = force_locale
+        extra_env["LC_ALL"] = force_locale
+    for e in os.environ:
+        if e not in extra_env:
+            extra_env[e] = os.environ[e]
     redir = subprocess.PIPE
     if verbosity >= 2 and not capture:
         redir = None
     try:
-        #print repr(os.environ)
         if shell:
             process = subprocess.Popen(" ".join(cmd_list), shell = True, 
-                stdout = redir, stderr = redir, cwd = working_dir, env = os.environ)
+                stdout = redir, stderr = redir, cwd = working_dir, env = extra_env)
         else:
             process = subprocess.Popen(cmd_list, shell = False, 
-                stdout = redir, stderr = redir, cwd = working_dir, env = os.environ)
+                stdout = redir, stderr = redir, cwd = working_dir, env = extra_env)
     except:
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()))
+        if not can_fail:
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
     out = ""
     err = ""
     while True:
@@ -134,21 +150,19 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         except:
             break
     ret = process.wait()
-    if old_locale:
-        os.environ["LC_ALL"] = old_locale
     if ret != 0 and not can_fail:
         if err:
             error(err)
-        raise p4a_error("Command '"+ " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 # Not portable!
 def which(cmd):
     return run2([ "which", cmd ], can_fail = True, capture = True)[0]
 
-def gen_name(length = 4, prefix = "P4A", chars = string.ascii_letters + string.digits):
+def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password'''
-    return prefix + "".join(random.choice(chars) for x in range(length))
+    return prefix + "".join(random.choice(chars) for x in range(length)) + suffix
 
 def is_system_dir(dir):
     '''Returns True if dir is a system directory (any directory which matters to the system).'''
@@ -267,11 +281,45 @@ def file_add_suffix(file, suffix):
 
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
-    return get_file_extension(file) == '.f'
+    ext = get_file_extension(file)
+    return ext == '.f' or ext == '.f77' or ext == '.f90' or ext == '.f95'
 
 def c_file_p(file):
     '''Tests if a file has a C name.'''
-    return get_file_extension(file) == '.c'
+    ext = get_file_extension(file)
+    return ext == '.c'
+
+def cxx_file_p(file):
+    '''Tests if a file has a C++ name.'''
+    ext = get_file_extension(file)
+    return ext == '.cpp' or ext == '.cxx'
+def cpp_file_p(file):
+    return cxx_file_p(file)
+
+def cuda_file_p(file):
+    '''Tests if a file has a CUDA name.'''
+    ext = get_file_extension(file)
+    return ext == '.cu'
+
+def sharedlib_file_p(file):
+    '''Tests if a file has a shared library name.'''
+    ext = get_file_extension(file)
+    return ext == '.so'
+
+def lib_file_p(file):
+    '''Tests if a file has a static library name.'''
+    ext = get_file_extension(file)
+    return ext == '.a'
+
+def exe_file_p(file):
+    '''Tests if a file has an executable binary name.'''
+    ext = get_file_extension(file)
+    return ext == ''
+
+def header_file_p(file):
+    '''Tests if a file has an header name.'''
+    ext = get_file_extension(file)
+    return ext == '.h' or ext == '.hpp'
 
 def get_machine_arch():
     '''Returns current machine architecture'''
@@ -378,54 +426,17 @@ def env(var, default = ""):
     else:
         return default
 
-cuda_dir = None
-def get_cuda_dir():
-    global cuda_dir
-    if not cuda_dir:
-        cuda_dir = ""
-        if "CUDA_DIR" in os.environ:
-            cuda_dir = os.path.expanduser(os.environ["CUDA_DIR"])
-        else:
-            cuda_dir = "/usr/local/cuda"
-            warn("CUDA_DIR environment variable undefined. Using '" +
-                cuda_dir + "' as default location for CUDA installation")
-        if not os.path.isdir(cuda_dir):
-            raise p4a_error("CUDA directory not found or invalid (" + cuda_dir + "). Please set the CUDA_DIR environment variable correctly")
-    return cuda_dir
-
-cuda_sdk_dir = None
-def get_cuda_sdk_dir():
-    global cuda_sdk_dir
-    if not cuda_sdk_dir:
-        if "CUDA_SDK_DIR" in os.environ:
-            cuda_sdk_dir = os.path.expanduser(os.environ["CUDA_SDK_DIR"])
-        else:
-            cuda_sdk_dir = os.path.expanduser("~/NVIDIA_GPU_Computing_SDK")
-            warn("CUDA_SDK_DIR environment variable undefined. Using '" +
-                cuda_sdk_dir + "' as default location for CUDA installation")
-        if not os.path.isdir(cuda_sdk_dir):
-            raise p4a_error("CUDA SDK directory not found or invalid (" + cuda_sdk_dir + "). Please set the CUDA_SDK_DIR environment variable correctly")
-    return cuda_sdk_dir
-
-def get_cuda_cppflags():
-    return [
-        "-I" + os.path.join(get_cuda_dir(), "include"),
-        "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
-        ]
-
-def get_cuda_ldflags(m64 = True):
-    cuda_dir = get_cuda_dir()
-    cuda_sdk_dir = get_cuda_sdk_dir()
-    lib_arch_suffix = ""
-    if m64:
-        lib_arch_suffix = "_x86_64"
-    return [
-        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(cuda_dir, "lib"),
-        "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
-        "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
-        "-Bdynamic -lcudart", "-Bstatic -lcutil" + lib_arch_suffix
-        ]
+def relativize(file_dir = None, dirs = [], base = os.getcwd()):
+    '''Make a file or directory relative to the base directory, 
+    if they start with this base directory (this is the difference
+    with os.path.relpath()).'''
+    # Make sure it is absolute first:
+    file_dir = os.path.abspath(os.path.expanduser(file_dir))
+    if file_dir.startswith(base) and len(file_dir) > len(base):
+        file_dir = file_dir[len(base):]
+        if file_dir[0] == os.path.sep:
+            file_dir = file_dir[1:]
+    return file_dir
 
 if __name__ == "__main__":
     print(__doc__)

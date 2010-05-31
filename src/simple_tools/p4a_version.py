@@ -44,9 +44,11 @@ def get_version_file_path(dist_dir = None):
 def guess_file_revision(file_dir = None):
     '''Try to guess a revision/version string for a given file or directory.'''
     
-    # Default to version for this p4a_version.py script.
-    global actual_script
-    if not file_dir:
+    if file_dir:
+        file_dir = os.path.abspath(os.path.realpath(os.path.expanduser(file_dir))) 
+    else:
+        # Default to version for this p4a_version.py script.
+        global actual_script
         file_dir = actual_script
 
     # File is invalid, return gracefully.
@@ -85,7 +87,7 @@ def guess_file_revision(file_dir = None):
 
     # Finally, make up a version string based on last file modification date/time.
     try:
-        revision = file_lastmod(os.path.abspath(os.path.realpath(os.path.expanduser(file)))).strftime("%Y%m%dT%H%M%S") + "~unknown"
+        revision = file_lastmod(file_dir).strftime("%Y%m%dT%H%M%S") + "~unknown"
     except:
         pass
     
