@@ -591,6 +591,9 @@ int basic_type_size(basic b)
       /* pips_error("basic_type_size", "undefined for type string\n"); */
       size = string_type_size(b);
 	break;
+    case is_basic_pointer:
+      size = DEFAULT_POINTER_TYPE_SIZE;
+      break;
     default: size = basic_int(b);
 	pips_error("basic_type_size", "ill. tag %d\n", basic_tag(b));
 	break;

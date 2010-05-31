@@ -17,10 +17,10 @@ int struct03()
    for (i = 0;i<10;i++) {
       // BEGIN BLOCK
 //               <must be read   >: i
-//               <must be written>: x[i][1][1]
+//               <must be written>: x[i][.un][.first]
       x[i].un.first = 1;
 //               <must be read   >: i
-//               <must be written>: x[i][2][2]
+//               <must be written>: x[i][.deux][.second]
       x[i].deux.second = 0;
       // END BLOCK
    }

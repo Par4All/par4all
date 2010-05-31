@@ -2,6 +2,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete scalarization06
 
 setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE

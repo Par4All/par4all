@@ -1,0 +1,137 @@
+
+Proper effects for "exchange"
+
+void exchange(int **p, int **q)
+{
+   int *r;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: r
+
+   r = *p;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   *p = *q;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: q r
+   *q = r;
+}
+
+Proper effects for "main"
+
+int main()
+{
+   int *pa, *pb, a, b;
+//               <must be written>: a
+
+   a = 1;
+//               <must be written>: b
+   b = 2;
+//               <must be written>: pa
+
+   pa = &a;
+//               <must be written>: pb
+   pb = &b;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+
+   exchange(&pa, &pb);
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+   return 0;
+}
+
+POINTS TO for "exchange"
+
+//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
+//   -Exact-);(q,_q_3,-Exact-)}
+void exchange(int **p, int **q)
+{
+//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
+//   -Exact-);(q,_q_3,-Exact-)}
+   int *r;
+//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
+//   -Exact-);(q,_q_3,-Exact-)}
+
+   r = *p;
+//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
+//   -Exact-);(q,_q_3,-Exact-);(r,__p_1_2,-Exact-)}
+   *p = *q;
+//  {(_p_1,__p_1_2,-Exact-);(_p_1,__q_3_4,-Exact-);(_q_3,__q_3_4,
+//   -Exact-);(p,_p_1,-Exact-);(q,_q_3,-Exact-);(r,__p_1_2,-Exact-)}
+   *q = r;
+}
+
+POINTS TO for "main"
+
+//  {}
+int main()
+{
+//  points to = {}
+   int *pa, *pb, a, b;
+//  points to = {}
+
+   a = 1;
+//  points to = {}
+   b = 2;
+//  points to = {}
+
+   pa = &a;
+//  {(pa,a,-Exact-)}
+   pb = &b;
+//  {(pa,a,-Exact-);(pb,b,-Exact-)}
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+//  {(pa,a,-Exact-);(pb,b,-Exact-)}
+
+   exchange(&pa, &pb);
+//  {(pa,a,-Exact-);(pb,b,-Exact-)}
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+//  {(pa,a,-Exact-);(pb,b,-Exact-)}
+   return 0;
+}
+
+Proper effects using points_to
+
+int main()
+{
+   int *pa, *pb, a, b;
+//               <must be written>: a
+
+   a = 1;
+//               <must be written>: b
+   b = 2;
+//               <must be written>: pa
+
+   pa = &a;
+//               <must be written>: pb
+   pb = &b;
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a b pa
+//                                  pb
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+
+   exchange(&pa, &pb);
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a b pa
+//                                  pb
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+   return 0;
+}
+

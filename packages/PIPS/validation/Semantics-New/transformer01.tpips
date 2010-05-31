@@ -1,0 +1,20 @@
+# test on a NULL pointer
+
+delete transformer01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create transformer01 transformer01.c
+apply TRANSFORMERS_INTRA_FAST (%ALLFUNC)
+
+echo
+echo Transformers for "transformer01"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[transformer01]
+
+close
+delete transformer01
+quit
+

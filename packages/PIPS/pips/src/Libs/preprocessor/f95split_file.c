@@ -123,7 +123,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
                             "-cpp",
                             // "-quiet",// "-Werror",
                             /* I don't know what the following stuff is ... */
-                            "-fcray-pointer",
+                            /*"-fcray-pointer",*/
                             "-ffree-form",
                             //"-fdefault-double-8",
                             //"-fdefault-integer-8",

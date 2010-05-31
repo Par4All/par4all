@@ -1,7 +1,7 @@
 
 POINTS TO
 
-C  {}
+//  {}
 int main(int argc, char *argv[])
 {
 //  points to = {}

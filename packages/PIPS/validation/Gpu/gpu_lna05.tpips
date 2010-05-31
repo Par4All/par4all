@@ -1,0 +1,33 @@
+delete gpu_lna05
+create gpu_lna05 gpu_lna05.c
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+
+
+module main
+display PRINTED_FILE
+apply PRIVATIZE_MODULE[main]
+
+apply COARSE_GRAIN_PARALLELIZATION[main]
+display PRINTED_FILE[main]
+
+setproperty GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
+apply GPU_LOOP_NEST_ANNOTATE
+
+display PRINTED_FILE
+
+close
+delete gpu_lna05
+quit

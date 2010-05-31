@@ -54,7 +54,7 @@ libnewgenlibs_la_SOURCES=\
 		string.c \
 		string_buffer.c
 
-libnewgenlibs_la_LDFLAGS=-Wl,--no-undefined
+libnewgenlibs_la_LDFLAGS=$(LDFLAGS_NO_UNDEFINED)
 libnewgenlibs_la_LIBADD=genread/libgenread.la genspec/libgenspec.la ../gnulib/libgnu.la
 
 BUILT_SOURCES=newgen_auto_string.h

@@ -87,6 +87,9 @@ int main(int argc, char **argv)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <x-R-EXACT-{}>
 //  <x[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
 //  <y-R-EXACT-{}>

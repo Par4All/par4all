@@ -121,7 +121,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "COMPUTE_parameters.h"
-      INTEGER IT, TIME, NEW, OLD
+      INTEGER IT, COMPUTE, TIME, NEW, OLD
       REAL*8 AVM, AMIN
       include "ARRAYS_HOST_parameters.h"
       include "ARRAYS_HOST_host.h"
@@ -165,8 +165,8 @@
       PARAMETER (N = 100)
       INTEGER*4 M
       PARAMETER (M = 77)
-      INTEGER I_10, I_11, I_12, I_5, I_6, I_7, I_8, I_9, IT, TIME, 
-     &NEW, OLD
+      INTEGER I_10, I_11, I_12, I_5, I_6, I_7, I_8, I_9, IT, COMPUTE
+     &, TIME, NEW, OLD
       REAL*8 A, AVM, AMIN
       include "ARRAYS_NODE_parameters.h"
       include "ARRAYS_NODE_node.h"

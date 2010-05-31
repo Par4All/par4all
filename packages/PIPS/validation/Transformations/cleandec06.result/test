@@ -1,0 +1,14 @@
+int c_clean_declarations06(int x)
+{
+   int a[x];
+   int b = sizeof(a);
+   int c[b++];
+   return b;
+}
+int c_clean_declarations06(int x)
+{
+   int a[x];
+   int b = sizeof(a);
+   int c[b++];
+   return b;
+}

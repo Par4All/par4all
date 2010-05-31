@@ -1,7 +1,7 @@
 
 POINTS TO for "foo"
 
-C  {(b,_b_1,-Exact-)}
+//  {(b,_b_1,-Exact-)}
 int foo(float (*b)[3])
 {
 //  {(b,_b_1,-Exact-)}

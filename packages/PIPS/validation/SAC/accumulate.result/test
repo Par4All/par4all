@@ -38,7 +38,6 @@ short accumulate(unsigned int n, short a[n], short seed)
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_NUB0, LU_IB0, LU_IND0;
    LU_NUB0 = n;
@@ -63,12 +62,10 @@ short accumulate(unsigned int n, short a[n], short seed)
       //c SIMD_COMMENT_0
       seed = seed+a[LU_IND0+7];
    }
-   i = MAX0(LU_NUB0, 0);
    return seed;
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
@@ -106,12 +103,10 @@ short accumulate(unsigned int n, short a[n], short seed)
       RED1[7] = RED1[7]+a[LU_IND0+7];
    }
    seed = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed;
-   i = MAX0(LU_NUB0, 0);
    return seed;
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
@@ -151,12 +146,10 @@ short accumulate(unsigned int n, short a[n], short seed)
       RED1[7] = RED1[7]+a[LU_IND0+7];
    }
    seed0 = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed;
-   i = MAX0(LU_NUB00, 0);
    return seed0;
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
@@ -186,12 +179,10 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
    }
    seed0 = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+seed+RED1[0];
-   i = MAX0(LU_NUB00, 0);
    return seed0;
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
@@ -225,12 +216,10 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
    }
    seed0 = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+seed+RED1[0];
-   i = MAX0(LU_NUB00, 0);
    return seed0;
 }
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_IND0;
    //PIPS generated variable
@@ -264,7 +253,6 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
    }
    seed0 = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+seed+RED1[0];
-   i = MAX0(LU_NUB00, 0);
    return seed0;
 }
 
@@ -272,7 +260,6 @@ simdized code
 
 short accumulate(unsigned int n, short a[n], short seed)
 {
-   unsigned int i;
    //PIPS generated variable
    unsigned int LU_IND0;
    //PIPS generated variable
@@ -306,7 +293,6 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_SAVE_V8HI(v8hi_vec0, &RED1[0]);
    }
    seed0 = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+seed+RED1[0];
-   i = MAX0(LU_NUB00, 0);
    return seed0;
 }
 ok

@@ -264,7 +264,6 @@ AC_DEFUN([AX_CHECK_CPROTO],[
 			AX_WITH([cproto])="no"
 			AX_MSG([cproto])="cproto version too low"
 		])
-		AC_PATH_PROG([CPROTO_CPP],[cpp],[$CPP])
 	])
 ])
 
@@ -288,3 +287,19 @@ AC_DEFUN([AX_PROG_LEX],[
 		AX_MSG([lex])=""
 	])
 ])
+
+dnl checks how to checks for undefined symbols
+dnl in the linker.
+dnl valid option is made available in LDFLAGS_NO_UNDEFINED
+AC_DEFUN([AX_LD_NO_UNDEFINED],[
+	AC_MSG_CHECKING([how to forbid unresolved references in object files])
+	ax_saved_ldflags="$LDFLAGS"
+	LDFLAGS="$LDFLAGS -Wl,--no-undefined"
+	AC_TRY_LINK([],[void foo(){}],[
+			AC_SUBST([LDFLAGS_NO_UNDEFINED],[-Wl,--no-undefined])
+			AC_MSG_RESULT([found])],
+		[AC_MSG_RESULT([not found])]
+	)
+	LDFLAGS="$ax_saved_ldflags"
+])
+

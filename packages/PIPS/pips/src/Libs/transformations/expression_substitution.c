@@ -82,6 +82,18 @@ bool set_pattern()
 	return true;
 }
 
+static void substitute_expression_walker(expression e, expression * pi )
+{
+    if(same_expression_p(e,pi[0])) 
+        update_expression_syntax(e,copy_syntax(expression_syntax(pi[1])));
+}
+
+void substitute_expression(void *in, expression pattern, expression into)
+{
+    expression arge [] = { pattern, into };
+    gen_context_recurse(in,&arge[0],expression_domain,gen_true, substitute_expression_walker);
+}
+
 static 
 bool replace_expression_similar_to_pattern(expression e)
 {

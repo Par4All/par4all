@@ -231,8 +231,17 @@ discard_statement_and_save_label_and_comment(statement s)
       }
 
     }
+  /* this avoids removing declarations */
+  else if(!ENDP(statement_declarations(s)))
+  {
+      if(statement_block_p(s))
+      {
+          FOREACH(STATEMENT,st,statement_block(s))
+              if(!declaration_statement_p(s)) discard_statement_and_save_label_and_comment(st);
+      }
+  }
   else
-    {
+  {
       /* Discard the old instruction: */
       free_instruction(statement_instruction(s));
       /* And put a new empty one: */
@@ -240,7 +249,7 @@ discard_statement_and_save_label_and_comment(statement s)
 
       /* Since the RI need to have no label on instruction block: */
       fix_sequence_statement_attributes(s);
-    }
+  }
    return false;
 }
 
