@@ -55,7 +55,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_f
         run2([ os.path.join(package_dir, "configure") ] + configure_flags, working_dir = build_dir)
     # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
-    run2([ "make", "all" ] + make_flags, working_dir = build_dir)
+    run2([ "make" ] + make_flags, working_dir = build_dir)
     # Call make install to install in DESTDIR if requested.
     if dest_dir:
         info("Installing " + package_dir + " in " + dest_dir)
@@ -66,7 +66,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_f
 def main():
     '''The function called when this program is executed by its own.'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]", version = guess_file_revision(__file__))
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
@@ -244,7 +244,8 @@ def main():
             warn("Removing everything in " + install_dir + " (--clean)")
             rmtree(install_dir, remove_top = False)
         else:
-            warn("Installation directory " + install_dir + " already exists! You should pass --clean to make sure no file conflicts happen")
+            warn("Installation directory " + install_dir + " already exists; " 
+                + "you should pass --clean to make sure no file conflicts happen")
     else:
         os.makedirs(install_dir)
     
@@ -493,7 +494,12 @@ def main():
     done("")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except p4a_error:
+        error(str(sys.exc_info()[1]))
+        error("To get verbose output from the build, try passing -v, -vv, or -vvv.")
+        error("You can also try running again with --rebuild --clean (-RC) and see if it picks up.")
 
 # Some Emacs stuff:
 ### Local Variables:
