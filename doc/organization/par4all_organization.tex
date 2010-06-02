@@ -956,7 +956,7 @@ previous state with \Agit.
 It is possible to select different options to test with the python script
 \verb|p4a_validate_class.py|
 
-Currently, 3 options are available:
+Currently, available options are:
 \begin{description}
 \item[\texttt{--pips}:] validate tests which are done by default file (in
   \texttt{packages/PIPS/validation})
@@ -970,6 +970,8 @@ Currently, 3 options are available:
   are not done by \texttt{--p4a} options are into \texttt{diff.txt}
 
 \item[\texttt{--dir}:] Validate tests which are done in packages/PIPS/validation/directory\_name. Syntax is ./p4a\_validate\_class.py --dir dir1 dir2 dir3..
+
+\item[\texttt{--test}:] Validate tests which are done in argument. Syntax is ./p4a\_validate\_class.py --test directory\_test/test.f for example
 
 \item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
 \end{description}

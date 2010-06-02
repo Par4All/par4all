@@ -354,6 +354,41 @@ class ValidationClass:
 
 		print('%s failed in %s tests'%(nb_failed,nb_test))
 
+###### Validate all desired tests ################
+  def valid_test(self,arg_test):
+
+		# Create directory for result
+		if (os.path.isdir("RESULT") == True):
+			commands.getstatusoutput("rm -rf RESULT")
+		os.mkdir("RESULT")
+
+		nb_failed = 0
+		nb_test = 0
+
+		#read the tests
+		i = 0
+
+		for i in range(0,len(arg_test)):
+			test_array=arg_test[i].split("/")
+			directory_test = self.par4ll_validation_dir+test_array[len(test_array)-2]
+			file_tested = directory_test+'/'+test_array[len(test_array)-1]
+
+			# Check that directory and test exist
+			if (os.path.isdir(directory_test) != True):
+				print('%s is not a directory into packages/PIPS/validation'%(test_array[len(test_array)-2]))
+			
+			elif (os.path.isfile(file_tested) != True):
+				print('%s is not a file into packages/PIPS/validation/%s'%(test_array[len(test_array)-1],directory_test))
+			
+			else:
+				(root, ext) = os.path.splitext(test_array[len(test_array)-1])
+
+				if(ext == '.c' or ext == '.F' or ext == '.f' or ext == '.f90'):
+					status = self.test_par4all(directory_test, file_tested,'directory_log.txt',ext)
+					print('%s/%s : %s'%(test_array[len(test_array)-2],test_array[len(test_array)-1],status))
+				else:
+					print('%s/%s : Not done (extension must be .c, .F, .f or .f90)'%(test_array[len(test_array)-2],test_array[len(test_array)-1]))
+
 ###################### Main -- Options #################################
 def main():
 	usage = "usage: python %prog [options]"
@@ -362,6 +397,7 @@ def main():
 	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are done by par4all_validation.txt (which must be previously created in src/validation)")
 	parser.add_option("--diff", action="store_true", dest="diff", help = "Show test that it's not done by p4a options")
 	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are done in packages/PIPS/validation/directory_name")
+	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests in argument")
 	(options, args) = parser.parse_args()
 
 	if options.pips:
@@ -383,6 +419,13 @@ def main():
 
 		vc = ValidationClass().valid_dir(args)
 		print('Result of the tests are in directory_log.txt')
+
+	elif options.test:
+		if (len(args) == 0):
+			print("You must enter the name of the tests you want to test")
+			exit()
+
+		vc = ValidationClass().valid_test(args)
 	
 	else:
 		output = commands.getoutput("python p4a_validate_class.py -h")
