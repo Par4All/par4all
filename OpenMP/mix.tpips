@@ -35,8 +35,7 @@ apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
 apply UNSPLIT
-shell gcc -fopenmp -c mix.database/Src/mix.c
-shell rm *.o
+shell gcc -fopenmp -c mix.database/Src/mix.c -o mix.database/Src/mix.o
 
 close
 delete mix

@@ -1,11 +1,11 @@
 #
-delete merge03
+delete merge06
 
 #setenv OMPIFY_CODE_DEBUG_LEVEL 9
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create merge03 merge03.c
+create merge06 merge06.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -15,27 +15,25 @@ create merge03 merge03.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
-#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 5
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
-setproperty OMP_LOOP_PARALLEL_THRESHOLD_VALUE 100
-setproperty OMP_IF_CLAUSE_RECURSIVE FALSE
-setproperty OMP_IF_MERGE_POLICY "or"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
-apply OMP_LOOP_PARALLEL_THRESHOLD_SET
 apply OMP_MERGE_PRAGMA
+
+echo "after merge_pragma"
 display PRINTED_FILE(main)
 
 apply UNSPLIT
-shell gcc -fopenmp -c merge03.database/Src/merge03.c -o merge03.database/Src/merge03.o
+shell gcc -fopenmp -c merge06.database/Src/merge06.c -o merge06.database/Src/merge06.o
 
 close
-delete merge03
+delete merge06
 quit
 # EOF

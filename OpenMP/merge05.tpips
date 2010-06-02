@@ -1,11 +1,11 @@
 #
-delete merge03
+delete merge05
 
 #setenv OMPIFY_CODE_DEBUG_LEVEL 9
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create merge03 merge03.c
+create merge05 merge05.f
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -19,23 +19,22 @@ create merge03 merge03.c
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
-setproperty OMP_LOOP_PARALLEL_THRESHOLD_VALUE 100
-setproperty OMP_IF_CLAUSE_RECURSIVE FALSE
-setproperty OMP_IF_MERGE_POLICY "or"
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
 
-apply PRIVATIZE_MODULE(main)
+apply PRIVATIZE_MODULE
 echo // OMP style
-apply INTERNALIZE_PARALLEL_CODE
+#apply INTERNALIZE_PARALLEL_CODE
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply OMPIFY_CODE
-apply OMP_LOOP_PARALLEL_THRESHOLD_SET
 apply OMP_MERGE_PRAGMA
-display PRINTED_FILE(main)
+display PRINTED_FILE
 
 apply UNSPLIT
-shell gcc -fopenmp -c merge03.database/Src/merge03.c -o merge03.database/Src/merge03.o
+shell gfortran -fopenmp -c merge05.database/Src/merge05.f -o merge05.database/Src/merge05.o
 
 close
-delete merge03
+delete merge05
 quit
 # EOF
