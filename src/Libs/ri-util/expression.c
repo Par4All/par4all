@@ -367,7 +367,7 @@ bool is_expression_reference_to_entity_p(expression e, entity v)
 }
 
 
-/* This function returns TRUE, if there exists an equal expression in the list
+/* This function returns TRUE, if there exists a same expression in the list
  *                       FALSE, otherwise
 */
 bool same_expression_in_list_p(expression e, list le)
@@ -376,6 +376,14 @@ bool same_expression_in_list_p(expression e, list le)
   return FALSE;
 }
 
+/* This function returns TRUE, if there exists an expression equal in the list
+ *                       FALSE, otherwise
+*/
+bool expression_equal_in_list_p(expression e, list le)
+{
+  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return TRUE, le);
+  return FALSE;
+}
 
 bool logical_operator_expression_p(expression e)
 {

@@ -1,5 +1,5 @@
 /*
-  Copyright 1989-2010 MINES ParisTech
+7  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
+#include "control.h"
 
 // The list of outter loop as a list of statements
 static list l_outer = NIL;
@@ -60,6 +61,8 @@ static void build_pragma_list (extensions exts) {
     // if (extension_is_pragma_p ())
     tmp = gen_extension_cons (ext, tmp);
     l_pragma = gen_pragma_cons (extension_pragma (ext), l_pragma);
+    pips_debug (5, "adding pragma : %s for merging\n",
+		pragma_to_string (extension_pragma (ext)));
   }
   // remove the extensions that will be merger at outer level
   gen_list_and_not (&l_exts, tmp);
@@ -71,6 +74,9 @@ static void build_pragma_list (extensions exts) {
 static bool build_outer (loop l) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   list l_exts = extensions_extension (statement_extensions (stmt));
+  pips_debug (5, "processing extensions : %s\n",
+	      extensions_to_string (statement_extensions (stmt), TRUE));
+
   FOREACH (EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
@@ -88,7 +94,6 @@ static bool build_outer (loop l) {
 
 /// @brief merge the omp pragma on the most outer parallel loop
 /// @return void
-/// @param pr, the pragma to process
 static void merge_on_outer () {
   FOREACH (STATEMENT, stmt, l_outer) {
     // collect the pragma
@@ -151,17 +156,11 @@ static void add_loop_parallel_threshold (pragma pr) {
    merge the pragma on the outer loop
 **/
 bool omp_merge_pragma (const string module_name) {
-  debug_on("OPMIFY_CODE_DEBUG_LEVEL");
-  statement mod_stmt = statement_undefined;
-  // Get the code and tell PIPS_DBM we do want to modify it
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  // Use this module name and this environment variable to set
+  statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
+   					  "OPMIFY_CODE_DEBUG_LEVEL");
 
-  // Set the current module entity and the current module statement that are
-  // required to have many things working in PIPS
-  set_current_module_statement(mod_stmt);
-  set_current_module_entity(module_name_to_entity(module_name));
-
-  // generate pragma string or expression using the correct language:
+  /* // generate pragma string or expression using the correct language: */
   value mv = entity_initial(module_name_to_entity(module_name));
   if(value_code_p(mv)) {
     code c = value_code(mv);
@@ -172,6 +171,7 @@ bool omp_merge_pragma (const string module_name) {
   }
 
   // build the list of outer loop with pragma
+  //gen_recurse(mod_stmt, loop_domain, gen_true, gen_identity);
   gen_recurse(mod_stmt, loop_domain, build_outer, gen_identity);
 
   // merge the pragma on the outer loop
@@ -179,14 +179,8 @@ bool omp_merge_pragma (const string module_name) {
   gen_free_list (l_outer);
   l_outer = NIL;
 
-  // Put the new CODE ressource into PIPS
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stmt);
-  // There is no longer a current module:
-  reset_current_module_statement();
-  reset_current_module_entity();
-
-  pips_debug(2, "done for %s\n", module_name);
-  debug_off();
+  //Put back the new statement module
+  PIPS_PHASE_POSTLUDE(mod_stmt);
 
   return TRUE;
 }

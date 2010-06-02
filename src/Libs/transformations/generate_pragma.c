@@ -53,7 +53,6 @@
 
 /////////////////////////////////////////////////////PRAGMA AS EXPRESSION
 
-///
 ///@return the new pragma
 ///@param l, the loop to analyze for omp reduction
 ///@param exprs, the pragma as a list of expression
