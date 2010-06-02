@@ -1,0 +1,19 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete simdizer09
+create simdizer09 simdizer09.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+
+module foo_l
+display PRINTED_FILE 
+
+make DOTDG_FILE
+
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
+apply SIMDIZER
+
+display PRINTED_FILE
+
+close
+delete simdizer09

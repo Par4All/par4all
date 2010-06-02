@@ -17,7 +17,7 @@ echo
 
 display PRINTED_FILE
 
-apply ATOMIZER
+apply SIMD_ATOMIZER
 
 echo
 echo Code after atomizer

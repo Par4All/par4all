@@ -291,7 +291,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
             //1
             I_6 = j*w;
             //3
-            I_7 = I_6+i;
+            I_7 = i+I_6;
             I_8 = dest[I_7];
             current = I_8;
             dest[I_7] = lut[I_8];
@@ -306,7 +306,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
             //1
             I_11 = j*w;
             //4
-            I_12 = I_11+i;
+            I_12 = i+I_11;
             I_13 = dest[I_12];
             current = I_13;
             dest[I_12] = (int) I_13+val>255?255:I_13+val;
@@ -350,7 +350,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
             //1
             I_6 = j*w;
             //3
-            I_7 = I_6+i;
+            I_7 = i+I_6;
             I_8 = dest[I_7];
             current = I_8;
             dest[I_7] = lut[I_8];
@@ -365,7 +365,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
             //1
             I_11 = j*w;
             //4
-            I_12 = I_11+i;
+            I_12 = i+I_11;
             I_13 = dest[I_12];
             current = I_13;
             dest[I_12] = (int) I_13+val>255?255:I_13+val;
@@ -412,7 +412,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          //1
          I_6 = j_0*w;
          //3
-         I_7 = I_6+i_0;
+         I_7 = i_0+I_6;
          I_8 = dest[I_7];
          current_1 = I_8;
          dest[I_7] = lut[I_8];
@@ -423,7 +423,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          //1
          I_11 = j_1*w;
          //4
-         I_12 = I_11+i_1;
+         I_12 = i_1+I_11;
          I_13 = dest[I_12];
          current_3 = I_13;
          dest[I_12] = (int) I_13+val>255?255:I_13+val;

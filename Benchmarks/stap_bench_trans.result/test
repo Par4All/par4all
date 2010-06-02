@@ -231,7 +231,7 @@ void Mat2Plot(int Nth, int Nv, int Nrg, int nbplots, Cplfloat In[Nrg][Nth][Nv], 
          for(th = 0; th <= Nth-1; th += 1) {
             pow = ModSquare(In[rg][th][v]);
             if (pow>1.E-5&&pl<nbplots) {
-               Out[pl].re = (float) 10000*rg+100*v+th;
+               Out[pl].re = (float) (10000*rg+100*v+th);
                Out[pl].im = (float) pow;
                pl++;
             }
@@ -362,11 +362,11 @@ void RecordPlots(char *name, int NbPlots, Cplfloat Plots[NbPlots], float rg_size
       for(pl = 0; pl <= NbPlots-1; pl += 1) {
          Cplfloat PLOT = Plots[pl];
          if (PLOT.im!=0.) {
-            rg = (int) PLOT.re/10000.+.1;
+            rg = (int) (PLOT.re/10000.+.1);
             Distance = rg_size*rg;
-            v = (int) (PLOT.re-10000.*rg)/100.+.1;
+            v = (int) ((PLOT.re-10000.*rg)/100.+.1);
             Velocity = vint2Vfloat_1(v, Nv, Vmax);
-            th = (int) PLOT.re-10000.*rg-100.*v+.1;
+            th = (int) (PLOT.re-10000.*rg-100.*v+.1);
             Angle = thint2THfloat(th, Nth, Beamwidth);
             Angle = 90.-Angle*180./3.141592653589793238;
             fprintf(fp, " %2d:  Distance  %e  (%2d)     Velocity %e  ( %2d)     Angle %e ( %2d) _  Peak  %e\n", pl, Distance, rg, Velocity, v, Angle, th, PLOT.im);
@@ -411,9 +411,9 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
             PLOT = In[raf][pl];
             if (PLOT.im!=0.) {
                float Vmax = lambda/(4*Trec);
-               rg = (int) PLOT.re/10000.+.1;
-               v = (int) (PLOT.re-10000.*rg)/100.+.1;
-               th = (int) PLOT.re-10000.*rg-100.*v+.1;
+               rg = (int) (PLOT.re/10000.+.1);
+               v = (int) ((PLOT.re-10000.*rg)/100.+.1);
+               th = (int) (PLOT.re-10000.*rg-100.*v+.1);
                V = vint2Vfloat(v, Nv, lambda, Trec);
                for(i = -2; i <= 2; i += 1)
                   if (V+2*i*Vmax>-(2*Vmax0)&&V+2*i*Vmax<2*Vmax0) {
@@ -482,7 +482,7 @@ int THfloat2thint(float TH, int Nth, float Beamwidth)
    float Beamwidth_rad = Beamwidth*3.141592653589793238/180.;
    float Thgate = Beamwidth_rad/((float) Nth);
    int th;
-   th = (int) .5+(TH+Beamwidth_rad/2.)/Thgate;
+   th = (int) (.5+(TH+Beamwidth_rad/2.)/Thgate);
    if (th<0) 
       th = 0;
    if (th>Nth) 
@@ -495,9 +495,9 @@ int Vfloat2vint(float V, int Nv, float lambda, float Tr)
    float Vgate = 2.*Vmax/((float) Nv);
    int v;
    if (V>=0.)
-      v = (int) 1.E-5+V/Vgate;
+      v = (int) (1.E-5+V/Vgate);
    else
-      v = (int) 1.E-5+(V+2*Vmax)/Vgate;
+      v = (int) (1.E-5+(V+2*Vmax)/Vgate);
    if (v<0) 
       v = 0;
    if (v>Nv) 
@@ -569,7 +569,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          for(v = 0; v <= Nv-1; v += 1)
 
             PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
-      Pow[th].re = (float) PP/((float) Nv*Nrg);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
 }
