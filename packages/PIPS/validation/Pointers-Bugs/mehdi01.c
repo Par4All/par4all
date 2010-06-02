@@ -22,6 +22,9 @@ struct q_s{
  p = (struct p_s*)malloc(sizeof(struct p_s));
  x = b;
  p->q = x;
+
+
+
  z = &(p->q);
  p->q = b;
  z = &u;

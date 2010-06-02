@@ -1,0 +1,12 @@
+delete preconditions
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+create preconditions preconditions.f90
+
+apply SUMMARY_PRECONDITION[PRECONDITIONS]
+
+
+close
+quit

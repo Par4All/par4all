@@ -5,16 +5,14 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 create generate generate.f90
 
-apply SUMMARY_PRECONDITION(GENERATE)
+apply TRANSFORMERS_INTER_FAST[%ALL]
 
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT[%ALL]
 
-echo
-echo "compile sources produced by pips"
-echo
-shell gcc -c -o generate.database/Src/generate.o  generate.database/Src/generate.f90
+# compile sources produced by pips
+#shell gcc -c -o generate.database/Src/generate.o  generate.database/Src/generate.f90
 
 close
 quit
