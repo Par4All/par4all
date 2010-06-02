@@ -518,54 +518,115 @@ list C_loop_range(range obj, entity i, list pdl)
  * @return a list of string
  */
 list words_range(range obj, list pdl) {
-    list pc = NIL ;
+  list pc = NIL;
 
-    /* if undefined I print a star, why not!? */
-    if (expression_undefined_p(range_lower(obj))) {
-	pc = CONS(STRING, MAKE_SWORD("*"), NIL);
-    }
-    else {
-	call c = syntax_call(expression_syntax(range_increment(obj)));
+  /* if undefined I print a star, why not!? */
+  if(expression_undefined_p(range_lower(obj))) {
+    pc = CONS(STRING, MAKE_SWORD("*"), NIL);
+  } else {
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran: {
+        call c = syntax_call(expression_syntax(range_increment(obj)));
 
-	  pc = CHAIN_SWORD(pc,"(/ (I,I=");
-	  pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
-	  pc = CHAIN_SWORD(pc,",");
-	  pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
-	if(strcmp( entity_local_name(call_function(c)), "1") != 0) {
-	  pc = CHAIN_SWORD(pc,",");
-	  pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
-	}
-	  pc = CHAIN_SWORD(pc,") /)") ;
+        pc = CHAIN_SWORD(pc,"(/ (I,I=");
+        pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        pc = CHAIN_SWORD(pc,",");
+        pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,",");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
+        break;
+      }
+      case is_language_fortran95: {
+        // Print the lower bound if != *
+        if(!unbounded_expression_p(range_lower(obj))) {
+          pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        }
+
+        // Print the upper bound if != *
+        pc = CHAIN_SWORD(pc,":");
+        if(!unbounded_expression_p(range_upper(obj))) {
+          pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        }
+
+        // Print the increment if != 1
+        call c = syntax_call(expression_syntax(range_increment(obj)));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,":");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
+        break;
+      }
+      case is_language_c:
+        pips_internal_error("I don't know how to print a range in C !");
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
-    return pc;
+  }
+  return pc;
 }
 
 
-/* FI: array constructor R433, p. 37 in Fortran 90 standard, can
-   be used anywhere in arithmetic expressions whereas the triplet
-   notation is restricted to subscript expressions. The triplet
-   notation is used to define array sections (see R619, p. 64).
+/**
+ * @description FI: array constructor R433, p. 37 in Fortran 90 standard, can be
+ * used anywhere in arithmetic expressions whereas the triplet notation is
+ * restricted to subscript expressions. The triplet notation is used to define
+ * array sections (see R619, p. 64).
+ *
+ * @return a list of string corresponding to the range
 */
-list /* of string */
-words_subscript_range(range obj, list pdl) {
-    list pc = NIL ;
+list words_subscript_range(range obj, list pdl) {
+  list pc = NIL;
 
-    /* if undefined I print a star, why not!? */
-    if (expression_undefined_p(range_lower(obj))) {
-	pc = CONS(STRING, MAKE_SWORD("*"), NIL);
-    }
-    else {
-	call c = syntax_call(expression_syntax(range_increment(obj)));
+  /* if undefined I print a star, why not!? */
+  if(expression_undefined_p(range_lower(obj))) {
+    pc = CONS(STRING, MAKE_SWORD("*"), NIL);
+  } else {
+    switch(get_prettyprint_language_tag()) {
+      case is_language_fortran: {
+        call c = syntax_call(expression_syntax(range_increment(obj)));
 
-	pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
-	pc = CHAIN_SWORD(pc,":");
-	pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
-	if(strcmp( entity_local_name(call_function(c)), "1") != 0) {
-	    pc = CHAIN_SWORD(pc,":");
-	    pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
-	}
+        pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        pc = CHAIN_SWORD(pc,":");
+        pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,":");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
+        break;
+      }
+      case is_language_fortran95: {
+        // Print the lower bound if != *
+        if(!unbounded_expression_p(range_lower(obj))) {
+          pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        }
+
+        // Print the upper bound if != *
+        pc = CHAIN_SWORD(pc,":");
+        if(!unbounded_expression_p(range_upper(obj))) {
+          pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        }
+
+        // Print the increment if != 1
+        call c = syntax_call(expression_syntax(range_increment(obj)));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,":");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
+        break;
+      }
+      case is_language_c:
+        pips_internal_error("I don't know how to print a range in C !");
+        break;
+      default:
+        pips_internal_error("Language unknown !");
+        break;
     }
-    return pc;
+  }
+  return pc;
 }
 
 /* exported for expression.c
