@@ -35,9 +35,12 @@ if [ `ldconfig -p | grep $$P4A_DIST/lib | wc -l` = 0 ]; then
 	export LD_LIBRARY_PATH=$$(prepend_to_path_var LD_LIBRARY_PATH $$P4A_DIST/lib)
 fi
 
-# Update Python module search path with PIPS Python bindings (PyPS).
-NEW_PYTHON_PATH=$$(ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1)
+# Update the Python module search path so that python 3.1 locates python-ply.
 PYTHONPATH=$$(prepend_to_path_var PYTHONPATH /usr/share/pyshared)
+export PYTHONPATH
+
+# Update the Python module search path for pyps.
+NEW_PYTHON_PATH=$$(ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1)
 PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
 export PYTHONPATH
 
