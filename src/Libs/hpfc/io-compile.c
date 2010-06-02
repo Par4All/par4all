@@ -746,8 +746,8 @@ hpfc_simplify_condition(
     tag move)
 {
     Psysteme
-	true = statement_context(stat, move),
-	cleared = extract_nredund_subsystem(*psc, true);
+	pstrue = statement_context(stat, move),
+	cleared = extract_nredund_subsystem(*psc, pstrue);
 
     *psc = (sc_rm(*psc), cleared);
 }

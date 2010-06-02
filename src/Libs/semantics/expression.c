@@ -2452,6 +2452,9 @@ transformer any_expression_to_transformer(
       if(float_analyzed_p())
 	tf = float_expression_to_transformer(v, expr, pre, is_internal);
       break;
+    case is_basic_pointer:
+      /* case not handleld yet, skip instead of internal_error*/
+      break;
     case is_basic_complex:
       /* PIPS does not represent complex constants: call to CMPLX */
       break;

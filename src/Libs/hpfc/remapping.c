@@ -407,8 +407,8 @@ static statement
 if_different_pe_and_not_twin(
     entity src,      /* source array processor */
     entity lid,      /* process local id variable */
-    statement true,  /* then statement */
-    statement false) /* else statement */
+    statement strue,  /* then statement */
+    statement sfalse) /* else statement */
 {
     expression cond = mylid_ne_lid(lid);
 
@@ -425,7 +425,7 @@ if_different_pe_and_not_twin(
 	cond = and_expression(cond, not_twin);
     }
 
-    return test_to_statement(make_test(cond, true, false));
+    return test_to_statement(make_test(cond, strue, sfalse));
 }
 
 /* builds the diffusion loop.

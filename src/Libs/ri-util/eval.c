@@ -582,12 +582,12 @@ ipow(int vg, int vd)
 bool
 expression_integer_value(expression e, int * pval)
 {
-    bool is_int = FALSE;
+    bool is_int = false;
     value v = EvalExpression(e);
 
     if (value_constant_p(v) && constant_int_p(value_constant(v))) {
         *pval = constant_int(value_constant(v));
-        is_int = TRUE;
+        is_int = true;
     }
 
     free_value(v);

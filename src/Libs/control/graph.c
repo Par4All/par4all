@@ -154,14 +154,14 @@ static void statement_arrows(statement s, /* statement */ list next)
 	test
 	    x = instruction_test(i);
 	statement 
-	    true = test_true(x),
-	    false = test_false(x);
+	    strue = test_true(x),
+	    sfalse = test_false(x);
 	
-	add_arrow_in_ctrl_graph(s, false),
-	statement_arrows(false, next);
+	add_arrow_in_ctrl_graph(s, sfalse),
+	statement_arrows(sfalse, next);
 
-	add_arrow_in_ctrl_graph(s, true), /* true is before false */
-	statement_arrows(true, next);
+	add_arrow_in_ctrl_graph(s, strue), /* true is before false */
+	statement_arrows(strue, next);
 
 	break;
     }

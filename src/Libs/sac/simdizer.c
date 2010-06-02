@@ -754,4 +754,6 @@ bool simdizer_init(const char * module_name)
     reset_current_module_statement();
     reset_current_module_entity();
 
+    return true;
+
 }

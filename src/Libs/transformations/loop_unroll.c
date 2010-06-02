@@ -467,7 +467,7 @@ loop_unroll(statement loop_statement, int rate)
 
 bool loop_fully_unrollable_p(loop l)
 {
-  bool unroll_p = FALSE;
+  bool unroll_p = false;
   range lr = loop_range(l);
   expression lb = range_lower(lr);
   expression ub = range_upper(lr);

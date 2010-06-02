@@ -177,21 +177,23 @@ bool simd_memory_packing(char *mod_name)
         /* second step : look for any array ``vectorized'' in the parameter
          * and modify their type to fit the real array size
          */
-        bool replaced_something = simd_replace_parameters(array_to_vector);
-        if( ( failed = !replaced_something ) )
         {
-            pips_user_warning("I did not find any vectorized array in module parameters :'(\n");
-            goto simd_memory_packing_end;
-        }
-        add_new_module_from_text( mod_name,
-                text_module(get_current_module_entity(),get_current_module_statement()),
-                fortran_module_p(get_current_module_entity()),compilation_unit_of_module(get_current_module_name())
-        );
-        /* update/release resources */
-        hash_table_free(array_to_vector);
+            bool replaced_something = simd_replace_parameters(array_to_vector);
+            if( ( failed = !replaced_something ) )
+            {
+                pips_user_warning("I did not find any vectorized array in module parameters :'(\n");
+                goto simd_memory_packing_end;
+            }
+            add_new_module_from_text( mod_name,
+                    text_module(get_current_module_entity(),get_current_module_statement()),
+                    fortran_module_p(get_current_module_entity()),compilation_unit_of_module(get_current_module_name())
+                    );
+            /* update/release resources */
+            hash_table_free(array_to_vector);
 
-        reset_current_module_statement();
-        reset_current_module_entity();
+            reset_current_module_statement();
+            reset_current_module_entity();
+        }
 
 simd_memory_packing_end:
     return !failed;
