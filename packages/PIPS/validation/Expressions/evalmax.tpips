@@ -1,12 +1,3 @@
-#!/bin/sh
-
-tpips=${tpips_version:-tpips}
-
-# Initialization:
-# rm -f evalmax.result/test
-# tpips >evalmax.result/test <<EOF
-
-$tpips <<EOF
 # MAX0 and MIN0 should be accepted in PARAMETER constant expressions
 
 delete evalmax
@@ -17,5 +8,4 @@ display PRINTED_FILE
 close
 delete evalmax
 quit
-EOF
 

@@ -4,7 +4,7 @@ delete nested2_f_coarse
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create nested2_f_coarse nested2_f.f
+create nested2_f_coarse nested_f.f
 
 setproperty PRAGMA_TYPE "expr"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
@@ -19,7 +19,7 @@ echo
 display PRINTED_FILE(NESTED)
 
 apply UNSPLIT
-shell gfortran -fopenmp -c nested2_f_coarse.database/Src/nested2_f.f
+shell gfortran -fopenmp -c nested2_f_coarse.database/Src/nested_f.f
 shell rm *.o
 
 close
