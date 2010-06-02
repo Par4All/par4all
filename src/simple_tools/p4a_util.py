@@ -74,7 +74,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("magenta") + " ".join(cmd_list) + p4a_term.escape() + "\n");
+        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("magenta") 
+            + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     prev_env = {}
@@ -98,7 +99,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
             os.chdir(old_cwd)
     except:
         if not can_fail:
-            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
+                + str(sys.exc_info()[1]) + " (env = " + repr(os.environ) + ")")
     for e in prev_env:
         if e in os.environ:
             if len(e):
@@ -106,7 +108,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
             else:
                 del os.environ[e]
     if ret != 0 and not can_fail:
-        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
+            + " failed with exit code " + str(ret) + " (env = " + repr(os.environ) + ")")
     return ret
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False, extra_env = {}):
@@ -121,25 +124,27 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     else:
         w = os.getcwd()
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") + " ".join(cmd_list) + p4a_term.escape() + "\n");
+        sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") 
+            + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
-    for e in os.environ:
-        if e not in extra_env:
-            extra_env[e] = os.environ[e]
+    env = os.environ
+    for e in extra_env:
+        env[e] = extra_env[e]    
     redir = subprocess.PIPE
     if verbosity >= 2 and not capture:
         redir = None
     try:
         if shell:
             process = subprocess.Popen(" ".join(cmd_list), shell = True, 
-                stdout = redir, stderr = redir, cwd = working_dir, env = extra_env)
+                stdout = redir, stderr = redir, cwd = working_dir, env = env)
         else:
             process = subprocess.Popen(cmd_list, shell = False, 
-                stdout = redir, stderr = redir, cwd = working_dir, env = extra_env)
+                stdout = redir, stderr = redir, cwd = working_dir, env = env)
     except:
         if not can_fail:
-            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " + str(sys.exc_info()[1]))
+            raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
+                + str(sys.exc_info()[1]) + " (env = " + repr(env) + ")")
     out = ""
     err = ""
     while True:
@@ -153,7 +158,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     if ret != 0 and not can_fail:
         if err:
             error(err)
-        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed with exit code " + str(ret))
+        raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
+            + " failed with exit code " + str(ret) + " (env = " + repr(env) + ")")
     return [ out, err, ret ]
 
 # Not portable!

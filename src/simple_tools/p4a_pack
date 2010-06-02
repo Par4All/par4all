@@ -6,8 +6,7 @@
 #
 
 '''
-Par4All Packing Script
-Allows you to create .deb, .tgz or .rpm packages of Par4all.
+Par4All packing script: allows you to create .deb or .tar.gz packages of Par4all.
 '''
 
 import string, sys, os, re, optparse, tempfile, shutil
@@ -65,6 +64,10 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     subs_template_file(postinst_file, subs_map)
     package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
     run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
+    if os.path.exists(package_file_name):
+        done("Created " + package_file_name)
+    else:
+        warn(package_file_name + " file not created!?")
     if keep_temp:
         warn("Temporary directory was " + temp_dir)
     else:
@@ -80,6 +83,10 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     if os.path.exists(package_file_name):
         os.remove(package_file_name)
     run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
+    if os.path.exists(package_file_name):
+        done("Created " + package_file_name)
+    else:
+        warn(package_file_name + " file not created!?")
     if keep_temp:
         warn("Temporary directory was " + temp_dir)
     else:
@@ -88,12 +95,12 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [<files>]", version = guess_file_revision(__file__))
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz> --revision=0.1-mybuild --dir=/current/install/dir [--prefix=/final/install/dir] [...]", version = guess_file_revision(__file__))
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
     main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
-        help = "Directory where the distribution is currently installed. Defaults to environment variable P4A_DIST or P4A_ROOT/run if it does not exist.")
+        help = "Directory where the distribution to package is currently installed. Defaults to environment variable P4A_DIST if defined.")
 
     main_group.add_option("--src", "-s", action = "store_true", default = False,
         help = "[TODO] Create a source package instead of a binary package.")
@@ -141,16 +148,13 @@ def main():
         die("--rpm is TODO")
     
     if not options.deb and not options.rpm and not options.tgz:
-        die("Please specify --deb, --rpm or --tgz")
+        die("Please specify --deb or --tgz")
 
     dir = options.dir
+    if not dir and "P4A_DIST" in os.environ:
+        dir = os.environ["P4A_DIST"]
     if not dir:
-        if "P4A_DIST" in os.environ:
-            dir = os.environ["P4A_DIST"]
-        elif "P4A_ROOT" in os.environ:
-            dir = os.path.join(os.environ["P4A_ROOT"], "run")
-        else:
-            die("please specify --dir")
+        die("Please specify --dir")
     dir = os.path.abspath(os.path.expanduser(dir))
     warn("Taking dist from " + dir)
     if not os.path.isdir(dir):
@@ -192,7 +196,11 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except p4a_error:
+        error(str(sys.exc_info()[1]))
+        error("To get verbose output, try passing -v, -vv, or -vvv.")
 
 # Some Emacs stuff:
 ### Local Variables:

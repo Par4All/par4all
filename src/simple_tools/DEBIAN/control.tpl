@@ -1,6 +1,6 @@
 Package: $NAME
 Version: $VERSION
-Section: unknown
+Section: devel
 Priority: optional
 Architecture: $ARCH
 Essential: no

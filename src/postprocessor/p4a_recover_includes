@@ -282,7 +282,7 @@ class SimpleC99Lexer:
             print("Found character '%s'" % t.value[0])
         # Keep the caracter as input
         t.lexer.content += t.value[0]
-        # Remove is from the input:
+        # Remove it from the input:
         t.lexer.skip(1)
 
     # A string containing ignored characters (spaces and tabs)
@@ -359,7 +359,7 @@ class SimpleC99Lexer_simple:
             print("Found character '%s'" % t.value[0])
         # Keep the caracter as input
         t.lexer.content += t.value[0]
-        # Remove is from the input:
+        # Remove it from the input:
         t.lexer.skip(1)
 
     # A string containing ignored characters (spaces and tabs)
