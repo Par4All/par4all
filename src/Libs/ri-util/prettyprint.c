@@ -536,6 +536,7 @@ list words_range(range obj, list pdl) {
           pc = CHAIN_SWORD(pc,",");
           pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
         }
+        pc = CHAIN_SWORD(pc,") /)") ;
         break;
       }
       case is_language_fortran95: {
