@@ -56,6 +56,10 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
         arch = get_machine_arch()
         if arch == "x86_64":
             arch = "amd64"
+        elif re.match("i\d86", arch):
+            arch = "i386"
+        else:
+            die("Unknown architecture " + arch + ", use --arch")
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
     info("Adjusting values in " + control_file)
     subs_template_file(control_file, subs_map)
@@ -115,7 +119,7 @@ def main():
         help = "Build a .tar.gz package.")
     
     main_group.add_option("--arch", metavar = "ARCH", default = None,
-        help = "Specify the package architecture manually. By default, the current machine architecture is specified.")
+        help = "Specify the package architecture manually. By default, the current machine architecture is used.")
     
     main_group.add_option("--revision", "-r", metavar = "REVISION",
         help = "Specify package version. Current Git revision will be automatically appended.")
