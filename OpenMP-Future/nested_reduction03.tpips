@@ -1,0 +1,36 @@
+#
+delete nested_reduction03
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested_reduction03 nested_reduction03.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c nested_reduction03.database/Src/nested_reduction03.c -o nested_reduction03.database/Src/nested_reduction03.o
+
+close
+delete nested_reduction03
+quit
+# EOF
