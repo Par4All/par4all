@@ -182,6 +182,10 @@ def main():
     if git_revision:
         revision += "~" + git_revision.replace("~exported", "")
     
+    # Check that fakeroot is available.
+    if not which("fakeroot"):
+        die("fakeroot not found, please install it (sudo aptitude install fakeroot)")
+
     try:
         if options.deb:
             create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
