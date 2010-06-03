@@ -189,10 +189,12 @@ if test $ret -eq 0; then
             -e 's/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/_/g'`
 
 	  if test -z "$SUBST"; then
-      	sed -e '1 i #ifdef HAVE_CONFIG_H\n#include "config.h"\n#endif\n' -e "/^#/!b"  -e "s,$from,$2," \
+      	sed -e '1 i\
+	   	#include "config.h"' -e "/^#/!b"  -e "s,$from,$2," \
           -e "s,$FROM,$TARGET," "$from" >"$target" || ret=$?
 	  else
-      	sed -e '1 i #ifdef HAVE_CONFIG_H\n#include "config.h"\n#endif\n' -e "/^#/!b"  -e "s,$from,$2," \
+      	sed -e '1 i\
+	   	#include "config.h"' -e "/^#/!b"  -e "s,$from,$2," \
           -e "s,$FROM,$TARGET," "$from" | sed $SUBST > "$target" || ret=$?
 	  fi
 
