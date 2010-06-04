@@ -1,6 +1,6 @@
 PIPS_SUBDIRS=\
 	misc newgen properties text-util pipsdbm \
-	top-level ri-util conversion movements \
+	top-level ri-util effects-util conversion movements \
 	comp_sections transformer bootstrap control flint \
 	syntax c_syntax prettyprint \
 	effects-generic effects-simple semantics complexity \
@@ -59,6 +59,7 @@ libpipslibs_la_LIBADD=\
   	atomizer/libatomizer.la\
   	syntax/libsyntax.la\
   	c_syntax/libc_syntax.la\
+	effects-util/libeffects-util.la\
 	effects-simple/libeffects-simple.la\
 	effects-convex/libeffects-convex.la\
    	effects-generic/libeffects-generic.la\

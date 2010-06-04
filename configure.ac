@@ -196,6 +196,7 @@ AC_CONFIG_FILES([pips_config.h
                  src/Libs/continuation/Makefile
                  src/Libs/control/Makefile
                  src/Libs/conversion/Makefile
+                 src/Libs/effects-util/Makefile
                  src/Libs/effects-convex/Makefile
                  src/Libs/effects-generic/Makefile
                  src/Libs/effects-simple/Makefile
