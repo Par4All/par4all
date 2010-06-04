@@ -72,6 +72,7 @@ partial_eval_expression().
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 
 #include "text-util.h"
@@ -79,6 +80,7 @@ partial_eval_expression().
 #include "resources.h"
 #include "control.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "misc.h"
 #include "properties.h"

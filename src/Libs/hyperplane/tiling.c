@@ -58,6 +58,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 #include "text.h"
 
@@ -70,6 +71,7 @@
 
 #include "sparse_sc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "conversion.h"
 

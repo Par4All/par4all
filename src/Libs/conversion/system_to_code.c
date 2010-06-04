@@ -45,7 +45,7 @@
  */
 #include "genC.h"
 #include "ri.h" 
-
+#include "effects.h"
 /* PIPS stuff
  */
 

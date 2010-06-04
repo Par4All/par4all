@@ -37,10 +37,13 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "dg.h"
 typedef dg_arc_label arc_label;

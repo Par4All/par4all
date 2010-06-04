@@ -31,6 +31,8 @@
  */
 
 #include "defines-local.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 

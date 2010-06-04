@@ -118,7 +118,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
-
+#include "effects.h"
 #include "pipsdbm.h"
 
 #include "misc.h"

@@ -67,10 +67,12 @@
 #include "genC.h"
 #include "database.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "resources.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "text-util.h"     /* print_text */
 #include "effects-generic.h"

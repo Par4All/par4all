@@ -47,12 +47,14 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 #include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "control.h"
 #include "pipsdbm.h"
 #include "text-util.h"

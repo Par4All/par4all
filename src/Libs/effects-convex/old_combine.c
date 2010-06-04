@@ -38,6 +38,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 
 #include "boolean.h"
@@ -52,6 +53,7 @@
 
 #include "constants.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "misc.h"
 #include "text.h"

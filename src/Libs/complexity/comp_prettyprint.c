@@ -39,11 +39,13 @@
 #include "genC.h"
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "database.h"     /* useful */
 #include "resources.h"    /* useful  */
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"      /* useful */
 
 #include "matrice.h"      /* useful */

@@ -68,11 +68,13 @@
 /* #include "database.h" */
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 /*
 #include "text.h"
 #include "text-util.h"
 */
 #include "ri-util.h"
+#include "effects-util.h"
 /* #include "constants.h" */
 /* #include "control.h" */
 #include "effects-generic.h"

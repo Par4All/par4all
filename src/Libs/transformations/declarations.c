@@ -41,7 +41,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "misc.h"
@@ -49,6 +51,7 @@
 #include "effects-generic.h"
 #include "alias-classes.h"
 #include "control.h" // for clean_up_sequences
+#include "transformations.h"
 
 static void remove_unread_variable(statement s, entity e)
 {

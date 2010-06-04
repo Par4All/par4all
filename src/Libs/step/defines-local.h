@@ -34,6 +34,7 @@ regroupement de la majorité des includes
 #include "text.h"
 
 #include "ri.h"
+#include "effects.h"
 #include "properties.h"
 
 #include "step_private.h"
@@ -44,6 +45,7 @@ regroupement de la majorité des includes
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "step.h"

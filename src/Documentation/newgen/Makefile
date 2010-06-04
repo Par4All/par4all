@@ -26,6 +26,7 @@ ROOT    = ../../..
 use_pdflatex	= 1
 
 F.tex =	ri.tex \
+        effects.tex \
 	dg.tex \
 	compsec.tex \
 	word_attachment.tex \

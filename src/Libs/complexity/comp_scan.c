@@ -36,10 +36,12 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "database.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"

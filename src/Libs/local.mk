@@ -39,7 +39,7 @@ FWD_DIRS	= \
 	top-level ri-util conversion movements \
 	comp_sections transformer bootstrap control flint \
 	syntax c_syntax prettyprint \
-	effects effects-generic effects-simple semantics complexity \
+	effects-util effects-generic effects-simple semantics complexity \
 	continuation reductions regions effects-convex alias-classes \
 	callgraph icfg ricedg \
 	chains rice hyperplane transformations accel-util hwac expressions \

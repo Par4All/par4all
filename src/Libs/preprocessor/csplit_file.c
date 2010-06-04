@@ -39,7 +39,9 @@
 /* To import FILE_SEP_STRING... */
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "preprocessor.h"
 #include "splitc.h"
 

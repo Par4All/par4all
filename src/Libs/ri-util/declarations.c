@@ -40,6 +40,7 @@
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "effects.h"
 
 #include "pipsdbm.h"
 

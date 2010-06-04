@@ -35,13 +35,21 @@
 #include "genC.h"
 
 #include "ri.h"
+#include "effects.h"
 
 /* #include"mapping.h" */
 #include "misc.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "alias-classes.h"
 
+/* functions for entity */
+entity effect_entity(effect e)
+{
+  return(reference_variable(effect_any_reference(e)));
+}
+
 /* API for reference */
 
 /* Does the set of locations referenced by r depend on a pointer
@@ -181,6 +189,8 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
    return write_effect_on_a_module_argument_found;
 
 }
+
+
 
 /* Anywhere effect: an effect which can be related to any location of any areas */
 

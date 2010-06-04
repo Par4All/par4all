@@ -1,4 +1,4 @@
-# $Id$
+# $Id: Makefile 17253 2010-05-31 08:43:19Z creusillet $
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -19,43 +19,9 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-TARGET	= ri-util
+TARGET	= effects-util
 
-LIB_CFILES =	contrainte_to_text.c \
-		eval.c \
-		size.c \
-		pragma.c \
-		extension.c \
-		util.c \
-		ordering.c \
-		prettyprint.c \
-		declarations.c \
-		unstructured.c \
-		attachment_pretty_print.c \
-		loop.c \
-		fortran90.c \
-		constant.c \
-		bound_generation.c \
-		entity.c \
-		variable.c \
-		instruction.c \
-		statement.c \
-		expression.c \
-		type.c \
-		normalize.c \
-		static.c \
-		arguments.c \
-		module.c \
-		cmfortran.c \
-		craft.c \
-		control.c \
-		hpfc.c \
-		misc_paf_utils.c \
-		convex_hull.c \
-		clean.c \
-		clone_statement.c \
-		allocatable.c \
-		replace.c
+LIB_CFILES =	effects.c 
 
 INC_TARGET =	$(TARGET).h
 

@@ -53,10 +53,12 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "constants.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"

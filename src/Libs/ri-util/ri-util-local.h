@@ -1268,23 +1268,6 @@
 
 #define entity_declarations(e) (code_declarations(entity_code(e)))
 
-#define effect_system(e) \
-        (descriptor_convex_p(effect_descriptor(e))? \
-         descriptor_convex(effect_descriptor(e)) : SC_UNDEFINED)
-
-/* FI: it would be useful to assert cell_preference_p(effect_cell(e)),
-   but I do not know how to do it in such a way that it works both for
-   left hand sides and right hand sides using commas.
-   I definitely remove this one : it is too dangerous.
-*/
-/* #define effect_reference(e)					\
-   preference_reference(cell_preference(effect_cell(e))) */
-#define effect_reference(e) \
-  pips_internal_error("effect_reference not defined anymore \n")
-
-/* FI: cannot be used as a left hand side */
-#define effect_any_reference(e) \
-         (cell_preference_p(effect_cell(e))? preference_reference(cell_preference(effect_cell(e))) : cell_reference(effect_cell(e)))
 
 /* An entity_variable_p(e) may hide a typedef and hence a functional
    type.  In C, use type_variable_p(ultimate_type(entity_type(e))) to
@@ -1308,26 +1291,6 @@
 
 #define call_intrinsic_p(C)                       \
   value_intrinsic_p(entity_initial(call_function(C)))
-
-#define make_preference_simple_effect(reference,action,approximation)\
-    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-		(action), (approximation),	\
-		make_descriptor(is_descriptor_none,UU))
-
-#define make_reference_simple_effect(reference,action,approximation)\
-  make_effect(make_cell(is_cell_reference, (reference)),	    \
-		(action), (approximation),	\
-		make_descriptor(is_descriptor_none,UU))
-
-#define make_simple_effect(reference,action,approximation)\
-    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-		(action), (approximation),	\
-		make_descriptor(is_descriptor_none,UU))
-
-#define make_convex_effect(reference,action,approximation,system)\
-  make_effect(make_cell(is_reference, (reference)),			\
-		(action), (approximation),				\
-		make_descriptor(is_descriptor_convex,system))
 
 
 #define statement_block_p(stat) \

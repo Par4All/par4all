@@ -408,12 +408,6 @@ bool ith_parameter_p(entity f, entity v, int i)
   return(FALSE);
 }
 
-/* functions for effects */
-entity effect_entity(effect e)
-{
-  return(reference_variable(effect_any_reference(e)));
-}
-
 /* functions for references */
 
 /* returns the ith index of an array reference */

@@ -46,6 +46,7 @@
 #include "genC.h"
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "hpf.h"
 #include "hpf_private.h"
@@ -58,6 +59,7 @@
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "hpfc.h"
 
 /* in paf-util.h:

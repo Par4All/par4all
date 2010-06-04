@@ -46,6 +46,7 @@
 #include "genC.h"
 #include "misc.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "matrice.h"
 #include "tiling.h"
@@ -55,6 +56,7 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 #include "graph.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 #include "conversion.h"
 /* #include "generation.h" */

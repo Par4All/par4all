@@ -105,9 +105,11 @@
 /* Pips includes	*/
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "database.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 #include "misc.h"
 #include "control.h"

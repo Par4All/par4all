@@ -31,9 +31,11 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "database.h"
 #include "resources.h"
 #include "pipsdbm.h"

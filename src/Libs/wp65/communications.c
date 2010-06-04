@@ -37,6 +37,7 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "matrice.h"
 #include "tiling.h"
@@ -53,6 +54,7 @@ typedef dg_vertex_label vertex_label;
 #include "properties.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "resources.h"
 #include "pipsdbm.h"

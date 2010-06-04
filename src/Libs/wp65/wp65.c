@@ -42,6 +42,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "dg.h"
 
@@ -59,6 +60,7 @@ typedef dg_vertex_label vertex_label;
 #include "prettyprint.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "transformations.h"

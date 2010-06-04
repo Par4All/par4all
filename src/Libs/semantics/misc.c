@@ -38,7 +38,9 @@
 #include "misc.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "semantics.h"
 
 /* probably to add to the future callgraph library */

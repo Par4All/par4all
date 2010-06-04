@@ -33,6 +33,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "c_syntax.h"
 #include "c_parser_private.h"
@@ -41,6 +42,7 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "text-util.h"
 

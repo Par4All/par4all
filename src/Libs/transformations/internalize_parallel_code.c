@@ -46,6 +46,7 @@
 #include "linear.h"
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
