@@ -83,7 +83,7 @@
 Simple command line interface}
 
 
-%\subtitle{Some experience on some programs from nVidia}
+\subtitle{\LienPDF{http://www.par4all.org}}
 
 \author[\textsc{Keryell} \& \textsc{Péan}]{Ronan \textsc{Keryell} \&
   Grégoire \textsc{Péan}}
@@ -112,8 +112,8 @@ Simple command line interface}
 %\subject{}
 
 
-\date{26/05/2010\\
-  \LienPDF{http://www.par4all.org}}
+%\date{26/05/2010\\
+%  \LienPDF{http://www.par4all.org}}
 
 \newcommand{\Idee}{{\red\Handwash}\xspace}
 %\Stopsign \Laserbeam \Estatically \Attention \Idee
@@ -240,130 +240,7 @@ p4a [\emph{options}] \emph{files}
 \end{frame}
 
 
-\begin{trans}{Main options}
-  \begin{description}
-  \item[\texttt{-p NAME}, \texttt{--project-name=NAME},
-    \texttt{--project=NAME}] Give a name to the PIPS database used to
-    process your files
-
-    Random name by default
-  \item[\texttt{-k}, \texttt{--keep-database}, \texttt{--keep}] by default
-    the \texttt{.database} directory is removed after work, but possible
-    to keep in for later inspection
-  \item[\texttt{-v}, \texttt{--verbose}] Program transformation can be
-    quite verbose with these options. The more used, the more verbose
-    allowed.
-  \end{description}
-\end{trans}
-
-
-\begin{trans}{All options}
-\tiny
-\begin{verbatim}
-Usage: p4a [options] [<files>]
-
- Par4All Frontend Script
-
-Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-
-  General Options:
-    -p NAME, --project-name=NAME, --project=NAME
-                        Name for the project (and for the program database).
-                        If you do not specify the project, a random name will
-                        be used.
-    -k, --keep-database
-                        Keep database directory after processing.
-    -v, --verbose       Run in verbose mode (you can have several -v, such as
-                        -vvv which will display the most debugging
-                        information).
-    --nocolor           Disable coloring of terminal output.
-
-  Preprocessing Options:
-    -I DIR              Add an include search directory. Same as the compiler
-                        -I option. Several are allowed.
-    -D NAME[=VALUE]     Add a preprocessor define. Same as passing the
-                        preprocessor a -D option. Several are allowed.
-    -U NAME             Remove a preprocessor define. Same as passing the
-                        preprocessor a -U option. Several are allowed.
-    --cppflags=FLAGS    Add additional flags for the C preprocessor. Several
-                        are allowed.
-    --skip-recover-includes
-                        By default, try to recover standard #include. To skip
-                        this phase, use this option.
-
-  Processing Options:
-    -A, --accel         Parallelize with output using the Par4All accel run-
-                        time that can execute code for various hardware
-                        accelerators such as GPU or even OpenMP emulation.
-    -C, --cuda          Enable CUDA generation. Implies --accel.
-    -O, --openmp        Parallelize with OpenMP output. If combined with the
-                        --accel option, generate Par4All accel run-time call
-                        with OpenMP implementation instead of native OpenMP
-                        output. If --cuda is not specified, this option is set
-                        by default.
-    -S, --simple        This cancels --openmp and --cuda and does a simple
-                        transformation (no parallelization): simply parse the
-                        code and regenerate it.
-    -F, --fine          Use a fine-grained parallelization algorithm instead
-                        of a coarse-grained one.
-    --include-modules=REGEXP
-                        Process only the modules which names match the regular
-                        expression.
-    --exclude-modules=REGEXP
-                        Exclude the modules matching the regular expression
-                        from the parallelization.
-    -N, --noprocess     Bypass all processing (no parallelizing). This voids
-                        all processing options. Merely useful for testing
-                        compilation/linking option.
-
-  Compilation Options:
-    -o FILE, --output-file=FILE
-                        This enables automatic compilation of binaries. There
-                        can be several of them. Output files can be .o, .so,
-                        .a files or have no extension in which case an
-                        executable will be built.
-    --cc=COMPILER       C compiler to use (defaults to gcc).
-    --nvcc=COMPILER     NVCC compiler to use (defaults to nvcc). Note that the
-                        NVCC compiler is used only to transform .cu files into
-                        .cpp files, but not compiling the final binary.
-    --icc               Automatically switch to Intel's icc/xild/xiar for
-                        --cc/--ld/--ar.
-    --nofast, --notfast
-                        Do not add optimized compilation flags automatically.
-    -g, --debug         Compile in debug mode (same as specifying -g for
-                        --cflags). Implies --nofast.
-    --cflags=FLAGS      Specify flags to pass to the C compiler. Several are
-                        allowed. Note that --cppflags will be automatically
-                        prepended to the actual flags passed to the compiler.
-    --nvccflags=FLAGS   Specify flags to pass to the NVCC compiler. Several
-                        are allowed. Note that --cppflags will be
-                        automatically prepended to the actual flags passed to
-                        the compiler.
-    --extra=FILE        Add additional file for compilation. Several are
-                        allowed. They will not be parallelized and will be
-                        passed as is.
-    -m 32|64, --arch=32|64
-                        Specify compilation target architecture (defaults to
-                        current native architecture).
-    -K, --keep-build-dir
-                        Do not remove build directory after compilation. If an
-                        error occurs, it will not be removed anyways.
-
-  Linking Options:
-    --ld=LINKER         Linker to use (defaults to ld).
-    --ar=ARCHIVER       Archiver to use (defaults to ar).
-    -L DIR              Add a library search directory. Same as the linker -L
-                        option. Several are allowed.
-    -l LIB              Specify an input library to link against. Same as the
-                        linker -l option. Several are allowed.
-    --ldflags=FLAGS     Specify additional flags to pass to the linker.
-                        Several are allowed.
-    --extra-obj=FILE    Add an additional object file for linking. Several are
-                        allowed.
-\end{verbatim}
-\end{trans}
+\include{p4a.help}
 
 
 \begin{trans}{Current limitations for CUDA}
