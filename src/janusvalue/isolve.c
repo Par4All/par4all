@@ -11,6 +11,9 @@
 /*                 Adaption to abstract computation: janusvalue              */
 /*                               CRI-ENSMP                                   */
 /* ========================================================================= */
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 
 #include "arithmetique.h"
 #include <stdio.h>

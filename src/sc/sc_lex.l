@@ -22,6 +22,7 @@
 
 */
 
+%option nounput
 %START COMMENT TEXT
 %{
 /*
