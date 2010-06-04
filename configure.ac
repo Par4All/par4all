@@ -166,17 +166,30 @@ AX_ARG_ENABLE([fortran95],
                           ]
 )
 
-
 # set the optionnal passes dirs there
 AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_fortran95"])
 
-# set the optionnal scripts dirs there
-AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc"])
+
 
 # this takes care of the gnulib stuff, the CPPFLAGS change is mandatory
 gl_INIT
 CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/Libs/gnulib"
 
+# devel mode, sets various compiler flags and so on
+# this must be the last check because it modifies CFLAGS
+AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
+			  [
+			   	# set CFLAGS for more warnings
+			   	CFLAGS="-g -O0 -Wall -Werror"
+				AX_DEPENDS([devel-mode],[])
+			  ],[validation]
+)
+
+# set the optionnal scripts dirs there
+AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
+
+
+# register autoconf translated files here
 AC_CONFIG_FILES([pips_config.h
 				 Makefile
                  src/Documentation/Makefile
@@ -252,6 +265,7 @@ AC_CONFIG_FILES([pips_config.h
                  src/Scripts/simple_tools/Makefile
                  src/Scripts/simple_tools/pips_c2openmp
                  src/Scripts/simple_tools/pips_f2openmp
+                 src/Scripts/validation/Makefile
                  src/Documentation/dev_guide/Makefile
                  src/Documentation/tpips-user-manual/Makefile
 				 src/Documentation/linear/Makefile
@@ -288,7 +302,6 @@ AC_CONFIG_FILES([pips_config.h
 #                 src/Scripts/stats/Makefile
 #                 src/Scripts/step/Makefile
 #                 src/Scripts/stf/Makefile
-#                 src/Scripts/validation/Makefile
                  
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
