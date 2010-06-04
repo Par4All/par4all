@@ -37,6 +37,9 @@
 #include "tpips.h"
 #include "tp_yacc.h"
 
+/* disable echoing unmatched characters */
+#define ECHO ;
+
 /* now get the characters from a string, not from a file */
 #ifndef FLEX_SCANNER
 
