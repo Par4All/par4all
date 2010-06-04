@@ -50,9 +50,11 @@ enum {
 static void (*apply_on_mchoices)( gen_array_t) = NULL;
 static void (*cancel_on_mchoices)(void) = NULL;
 
+#if 0
 static void mchoose_help_notify(GtkWidget * widget __attribute__((unused)), gpointer data  __attribute__((unused))) {
 	display_help("MultipleChoice");
 }
+#endif
 
 static void mchoose_ok_notify(GtkWidget * widget  __attribute__((unused)), gpointer data  __attribute__((unused))) {
 	gen_array_t mchoices_args = gen_array_make(0);

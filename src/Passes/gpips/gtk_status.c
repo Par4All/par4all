@@ -230,7 +230,7 @@ static GtkWidget * create_dir_choose_entry(GtkWidget * vbox) {
 
 static gboolean regenerate_workspace_menu_callback(GtkWidget * w,
 		GdkEventButton * ev, gpointer data) {
-	GtkWidget * new_menu;
+	//GtkWidget * new_menu;
 	GtkWidget * menu = (GtkWidget *) data;
 
 	if (menu != NULL)
@@ -244,7 +244,7 @@ static gboolean regenerate_workspace_menu_callback(GtkWidget * w,
 
 static gboolean regenerate_module_menu_callback(GtkWidget * w,
 		GdkEventButton * ev, gpointer data) {
-	GtkWidget * new_menu;
+	//GtkWidget * new_menu;
 	GtkWidget * menu = (GtkWidget *) data;
 
 	if (menu != NULL)

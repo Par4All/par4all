@@ -123,7 +123,6 @@ static void remove_unread_variables(statement s)
 {
     if(statement_block_p(s))
     {
-        list effects = load_cumulated_rw_effects_list(s);
         FOREACH(ENTITY,e,statement_declarations(s))
         {
             if(entity_variable_p(e)) {

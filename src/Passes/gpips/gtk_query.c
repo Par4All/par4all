@@ -159,7 +159,7 @@ string gpips_user_request(const char * a_printf_format, va_list args) {
 
 void create_query_window() {
 	GtkWidget *help_button, *ok_button;
-	GtkWidget *action_area;
+	//GtkWidget *action_area;
 	GtkWidget *content_area;
 
 	/* seems it has no use. RK, 9/11/93. */

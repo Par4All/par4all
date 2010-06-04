@@ -1270,7 +1270,7 @@ void create_realFifo_proc(statement stat, list lRef)
 {
   list lDone = NIL;
 
-  bool readAndWrite = FALSE;
+  //bool readAndWrite = FALSE;
 
   MAP(REFERENCE, curRef1,
   {

@@ -65,8 +65,6 @@ typedef dg_vertex_label vertex_label;
 #define MAX_PACK 16
 #define VECTOR_POSTFIX "_vec"
 
-static int nbArguments = 0;
-static int nbAllocatedArguments = 0;
 
 static float gSimdCost;
 
@@ -300,7 +298,7 @@ opcode generate_opcode(string name, list types, float cost)
             "to partially filled register\n", name);
     return oc;
 }
-
+#if 0
 static int get_subwordSize_from_vector(entity vec)
 {
     char * name = entity_local_name(vec);
@@ -321,6 +319,7 @@ static int get_subwordSize_from_vector(entity vec)
 
     return 8;
 }
+#endif
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
@@ -1138,7 +1137,7 @@ static simdstatement make_simd_statement(opcodeClass kind, opcode oc, list* args
 
     return ss;
 }
-
+#if 0
 static
 void free_simd_statement_info(simdstatement s)
 {
@@ -1155,6 +1154,7 @@ static int compare_statements(const void * v0, const void * v1)
     if (statement_ordering(s0) < statement_ordering(s1)) return -1;
     return 0;
 }
+#endif
 
 simdstatement make_simd_statements(set opkinds, list statements)
 {
@@ -1274,6 +1274,7 @@ static statement generate_exec_statement(simdstatement ss)
     return make_exec_statement_from_opcode(simdstatement_opcode(ss), args);
 }
 
+#if 0
 static statement make_shuffle_statement(entity dest, entity src, int order)
 {
     list args = gen_make_list(expression_domain,
@@ -1283,6 +1284,7 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
             NULL);
     return make_exec_statement_from_name( "PSHUFW",args);
 }
+#endif
 
 static 
 statement generate_load_statement(simdstatement si, int line)

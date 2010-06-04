@@ -55,7 +55,7 @@
 bool fsm_split_state(string module_name)
 {
   entity module;
-  entity state_variable;
+  //entity state_variable;
 
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

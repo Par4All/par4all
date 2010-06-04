@@ -107,6 +107,7 @@ MakeEntityFunction(string sname)
     return f;
 }
 
+#if 0
 static void print_ref(reference r)
 {
   fprintf(stderr, "reference to %s is %p\n", 
@@ -125,6 +126,7 @@ static void debug_refs(gen_chunk *x)
 		    effect_domain, gen_true, print_eff,
 		    NULL);
 }
+#endif
 
 bool 
 wp65(string input_module_name)

@@ -277,8 +277,8 @@ void full_control_graph(string name)
  */
 
 #ifndef bool_undefined
-#define bool_undefined ((bool) (-15))
-#define bool_undefined_p(b) ((b)==bool_undefined)
+    #define bool_undefined ((bool) (-15))
+    #define bool_undefined_p(b) ((b)==bool_undefined)
 #endif
 
 /* Static data for the travel.

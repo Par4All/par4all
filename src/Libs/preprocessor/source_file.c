@@ -659,6 +659,7 @@ bool dot_c_file_p(string name) {
  * Returns NULL if preprocessing fails.
  */
 
+#if 0
 /* The structure of the string is not checked. Funny results to be expected for strings starting or ending with ':' and containing lots of SPACES*/
 static int colon_number(string s)
 {
@@ -672,6 +673,7 @@ static int colon_number(string s)
 
   return number;
 }
+#endif
 
 int find_eol_coding(string name)
 {

@@ -6,6 +6,9 @@
    points_to_rank   how to compute rank for a points_to element
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,7 +77,7 @@ int points_to_equal_p( const void * vpt1, const void*  vpt2)
   cell c3 = points_to_sink(pt1);
   cell c4 = points_to_sink(pt2);
   bool cmp1 = true, cmp2 = true, cmp3 = false;
-  int rlt=0;
+  //int rlt=0;
   // if (compare_entities_without_scope(&e1_source, &e2_source)== 0)
 
   cmp1 = locations_equal_p(c1,c2);

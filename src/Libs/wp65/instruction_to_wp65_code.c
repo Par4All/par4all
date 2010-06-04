@@ -182,8 +182,8 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
 			      statement_mapping store_map)
 {
 
-    statement mod_stat,cms;
-    entity cme;
+    statement mod_stat/*,cms*/;
+    //entity cme;
     debug_on("WP65_DEBUG_LEVEL");
 
     /* FI: the semantics has been changed: the next two get_xxx() cannot/should not return

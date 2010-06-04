@@ -246,12 +246,12 @@ void copy_between_2_fd_up_to_offset(FILE * source,
    declarations up to the current function definition. */
 void csplit_append_to_compilation_unit(int last_line,
 				       unsigned long long last_offset) {
-  pips_debug(2, "append to compilation unit up-to line %d (from %d) or offset %zd\n",
+  pips_debug(2, "append to compilation unit up-to line %d (from %d) or offset %llu\n",
 	     last_line, current_input_line, last_offset);
 
   if (last_offset != 0) {
     /* We are in the offset mode instead of line mode */
-    pips_debug(2, "copying to compilation unit file up to offset %zd, we are at currently at offset %zd\n",
+    pips_debug(2, "copying to compilation unit file up to offset %llu, we are at currently at offset %lu\n",
 	       last_offset, ftell(splitc_in_append));
     copy_between_2_fd_up_to_offset(splitc_in_append,
 				   compilation_unit_file,

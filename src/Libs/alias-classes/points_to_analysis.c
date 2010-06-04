@@ -2198,7 +2198,7 @@ set basic_ptr_to_field_deref(set pts_to_set __attribute__ ((__unused__)),
 			     expression rhs __attribute__ ((__unused__)))
 {
 	pips_internal_error("<case m->x = *y> not implemented yet \n");
-// return pts_to_set;
+    return NULL;
 }
 
 /* one basic case of Emami: < m->x = y > */
@@ -2917,6 +2917,7 @@ set points_to_general_assignment(statement s,
 				 set pt_cur)
 {
       pips_internal_error("To be implemented!\n");
+      return NULL;
 }
 
 /* compute the points to set associate to a sequence of statements*/

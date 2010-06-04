@@ -348,13 +348,13 @@ string new_label_name(entity module)
     module_name = module_local_name(module) ;
     format = c_module_p(module)?"%s%s%sl%d":"%s%s%s%d";
   }
-  for(asprintf(&name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-	      --init);
-      init >= 0 &&
-	!entity_undefined_p(gen_find_tabulated(name, entity_domain)) ; ) {
+  --init;
+  for(asprintf(&name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,init);
+      init >= 0 && !entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;) {
     free(name);
+    --init;
     asprintf(&name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-	    --init);
+	    init);
     /* loop */
   }
   if(init == 0) {

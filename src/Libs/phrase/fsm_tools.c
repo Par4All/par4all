@@ -89,7 +89,7 @@ entity create_state_variable (string module_name,
   entity module;
   entity new_state_variable;
   string state_variable_name;
-  char *buffer;
+  //char *buffer;
 
   module = module_name_to_entity(module_name);
 

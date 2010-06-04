@@ -116,11 +116,12 @@ void entity_used_in_calls_walker(call c, entity_used_in_calls_p *p)
         }
         /* SG: as a special extension, we allow return call
          * for it is handled elsewhere*/
-        if(p->used)
+        if(p->used) {
             if(ENTITY_RETURN_P(op)||ENTITY_C_RETURN_P(op))
                 p->used=false;
             else
                 gen_recurse_stop(0);
+        }
     }
 }
 

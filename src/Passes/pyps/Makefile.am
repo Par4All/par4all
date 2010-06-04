@@ -50,6 +50,7 @@ pypips.h:pypips.c Makefile
 	echo '#include "top-level.h"' >> pypips.h
 	echo '#include "transformations.h"' >> pypips.h
 	echo "#undef _POSIX_C_SOURCE" >> pypips.h
+	echo "#undef _XOPEN_SOURCE" >> pypips.h
 	echo "#undef assert" >> pypips.h
 	echo "extern char *activate(char *);" >> pypips.h
 	echo "extern char *module_loops(const char*,const char*);" >> pypips.h

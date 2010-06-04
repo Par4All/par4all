@@ -34,6 +34,7 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "control.h"
+#include "transformations.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"

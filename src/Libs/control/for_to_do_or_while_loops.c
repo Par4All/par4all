@@ -36,6 +36,7 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "transformations.h"
 
 
 
@@ -678,7 +679,7 @@ sequence for_to_while_loop_conversion(expression init,
 				      expression cond,
 				      expression incr,
 				      statement body,
-				      __attribute__((unused)) string comments) {
+				      extensions exts) {
   pips_debug(5, "Begin\n");
 
   statement init_st = make_expression_statement(init);
@@ -694,6 +695,10 @@ sequence for_to_while_loop_conversion(expression init,
 					      n_body,
 					      STATEMENT_NUMBER_UNDEFINED,
 					      TRUE);
+  if(!empty_extensions_p(exts)) {
+      free_extensions(statement_extensions(wl_st));
+      statement_extensions(wl_st)=copy_extensions(exts);
+  }
 
   ifdebug(5) {
     pips_debug(5, "Initialization statement:\n");
@@ -733,7 +738,7 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
 					      forloop_condition(f),
 					      forloop_increment(f),
 					      forloop_body(f),
-					      statement_comments(st));
+					      statement_extensions(st));
 
   /* These fields have been re-used, so protect them from memory
      recycling: */

@@ -266,7 +266,7 @@ static bool other_cool_enough_for_a_last_substitution(statement s, reference ref
 
 /* do perform the substitution var -> val everywhere in s
  */
-static bool perform_substitution_in_expression(expression e, p_substitution subs)
+static void perform_substitution_in_expression(expression e, p_substitution subs)
 {
     syntax s = expression_syntax(e);
     if (syntax_reference_p(s)) {

@@ -718,7 +718,7 @@ static string claire_call_from_loopnest(call c, int task_number){
   if(!same_string_p(name, "="))
     pips_user_error("Only assignation allowed here.\n");
   
-  MAP(EXPRESSION, e, {
+  FOREACH(EXPRESSION, e, arguments){
     s = expression_syntax(e);
     switch(syntax_tag(s)){
     case is_syntax_call:{
@@ -743,9 +743,10 @@ static string claire_call_from_loopnest(call c, int task_number){
 	}
       }
     }
+    default:pips_internal_error("unhandled case\n");
     }
     first = FALSE;
-  }, arguments);
+  }
 
   if(!input_provided){
     result = strdup(concatenate("data = list<DATA>(dummyDATA, ", result, first_result, NULL));

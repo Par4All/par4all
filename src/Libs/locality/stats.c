@@ -87,7 +87,7 @@ static void loop_rwt(loop l, context_p context  )
   if ( cpt ==0) {
      statement s= loop_body(l);
      contenu = (contenu_t) hash_get(context->contenu, s);
-     if ( contenu == is_a_no_perf_nes_loop_t){int i=0;
+     if ( contenu == is_a_no_perf_nes_loop_t){
       nbr_interested_loop++;
      };
   };

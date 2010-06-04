@@ -225,8 +225,8 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   type t;
   //statement module_stat;
   list pt_list = NIL;
-  list dcl = NIL;
-  list params = NIL;
+  //list dcl = NIL;
+  //list params = NIL;
   set pts_to_set = set_generic_make(set_private,
 				    points_to_equal_p,points_to_rank);
 

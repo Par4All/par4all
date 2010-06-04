@@ -182,7 +182,6 @@ static void init_statement_equivalence_table(list l,graph dependence_graph)
     /* first extract corresponding vertices */
     FOREACH(VERTEX, a_vertex,graph_vertices(dependence_graph))
     {
-        set succ = set_make(set_pointer);
         statement s = vertex_to_statement(a_vertex);
         if(set_belong_p(statements,s))
             hash_put(counters,a_vertex,(void*)0);
@@ -192,7 +191,6 @@ static void init_statement_equivalence_table(list l,graph dependence_graph)
     {
         FOREACH(SUCCESSOR,su,vertex_successors((vertex)k))
         {
-            statement sus = vertex_to_statement(successor_vertex(su));
             /* do not take into account backward references, or R-R conflicts */
             if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  &&
                     !successor_only_has_rr_conflict_p(su) )

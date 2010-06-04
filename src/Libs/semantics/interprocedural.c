@@ -1300,6 +1300,7 @@ static bool process_call_for_summary_precondition(call c)
   return TRUE;
 }
 
+#if 0
 /* Update the current_summary_precondition, if necessary, for call
    located in the dimension declarations. May be useless because of
    function below... */
@@ -1309,11 +1310,12 @@ static bool process_statement_for_summary_precondition(statement s)
   pips_internal_error("Not implemented. Should not be called.\n");
   if(declaration_statement_p(s)) {
     /* Look for call sites in the declarations, but see functions below... */
-    list dl = statement_declarations(s);
+    //list dl = statement_declarations(s);
     //ret_p = process_call_for_summary_precondition();
   }
   return ret_p;
 }
+#endif
 
 /* This function is called to deal with call sites located in
    initialization expressions carried by declarations. */

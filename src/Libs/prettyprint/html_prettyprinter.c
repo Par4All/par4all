@@ -799,7 +799,6 @@ bool html_prettyprint_symbol_table(const char *module) {
   printf(NL "<li><ul class=\"symbolTable\">" NL);
   begin_block("Symbol table", true);
   list entities = gen_filter_tabulated(gen_true, entity_domain);
-  int i = 0;
   FOREACH(entity, e, entities ) {
     html_print_entity_full(e);
   }

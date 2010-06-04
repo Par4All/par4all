@@ -153,7 +153,7 @@ static_control  sc, sc1, sc2;
 expression	exp, exp1, exp2;
 
 pips_debug(3, "begin STATEMENT\n");
-pips_debug(7, "statement_ordering = %ld \n", statement_ordering(s));
+pips_debug(7, "statement_ordering = %zd \n", statement_ordering(s));
 
 switch(instruction_tag(inst))
   {

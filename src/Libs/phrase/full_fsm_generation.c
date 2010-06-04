@@ -67,7 +67,7 @@ typedef dg_vertex_label vertex_label;
 bool full_fsm_generation(string module_name)
 {
   entity module;
-  entity state_variable;
+  //entity state_variable;
 
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

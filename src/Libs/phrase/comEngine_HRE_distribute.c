@@ -734,6 +734,7 @@ static void loop_enter()
   fill_HRE_module(newStat);
 }
 
+#if 0
 static void create_loop_HRE_module()
 {
   if(glCurLoop == NIL)
@@ -789,6 +790,7 @@ static void create_loop_HRE_module()
 
   fill_HRE_module(newStat);
 }
+#endif
 
 /*
 This function processes the HRE code generation for a

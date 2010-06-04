@@ -26,6 +26,9 @@
  *
  * AM, August 2009.
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -88,11 +91,13 @@ words_fictious_reference(reference obj)
   return(pc);
 }
 
+#if 0
 /* For debugging points-to: use this function in points_to_words_reference() */
 static string entity_full_name(entity e)
 {
   return entity_name(e);
 }
+#endif
 
 /* Specific handling of references appearing in points_to */
 list points_to_words_reference(reference r)

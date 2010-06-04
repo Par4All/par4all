@@ -253,7 +253,7 @@ static struct t_completion_scheme completion_scheme[] =
 { QUIT,		COMP_NONE,       COMP_NONE },
 { "checkpoint", COMP_NONE,       COMP_NONE },
 { HELP,		COMP_HELP_TOPIC, COMP_NONE },
-{ ECHO,		COMP_NONE,       COMP_NONE },
+{ ECHO_N,		COMP_NONE,       COMP_NONE },
 { "open",       COMP_NONE,       COMP_NONE },
 { "create",     COMP_NONE,       COMP_FILENAME },
 { "close",      COMP_NONE,       COMP_NONE },

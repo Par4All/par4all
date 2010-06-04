@@ -97,12 +97,13 @@ static entity make_new_array_variable(int i, int j, entity module,
 }
 
 /* Compteurs des suffixes de nouvelles references */
+/*
 static int unique_integer_number = 0,
   unique_float_number = 0,
   unique_logical_number = 0,
   unique_complex_number = 0,
   unique_string_number = 0;
-
+*/
 /* first_turn permet de detecter le premier retour de la fonction loop_rwt()  */
 /* overflow permet de detecter un debordemebnt dans l'un des nids */
 
@@ -1238,7 +1239,8 @@ int position_one_element(Pmatrix P, int i)
   int j;
   for (j=1;j<=depth;j++)
     if(MATRIX_ELEM(P,i,j)==VALUE_ONE) return j;
-  
+  pips_internal_error("asking for a non existing element");
+  return -1;
 }
 
  
@@ -1251,7 +1253,7 @@ statement Tiling_buffer_allocation ()
   list lis=NULL,lis1=NULL,lis2=NULL;
   instruction ins;
   sequence seq=NULL;
-  statement s,s1,sequenp[nid_nbr],ps1,ps2,*pst1;
+  statement s,s1,sequenp[nid_nbr],ps1,ps2/*,*pst1*/;
   loop ls=NULL;
   cons *lls=NULL;
   Psysteme sci;			/* sc initial */
@@ -1329,7 +1331,7 @@ statement Tiling_buffer_allocation ()
     
   for(i=0;i<=k1-1;i++)
     {
-      statement s1;
+      //statement s1;
       sequence seq;
       instruction ins;
 
@@ -1527,8 +1529,8 @@ statement Tiling_buffer_allocation ()
 	{
 	  entity name;
 	  char buffer[20];  
- 	  expression exp;
-	  reference ref;
+ 	  //expression exp;
+	  //reference ref;
 	  temp[k]=matrix_new(depth,1);
 	  matrix_substract(temp[k],sequen[i].delai, sequen[i-1].delai);
 	  matrix_substract(temp[k], temp[k],sequen[i].st[k]);
@@ -1638,7 +1640,7 @@ statement Tiling_buffer_allocation ()
 		{
 		  int pos;
 		  Pvecteur pv1,pv2;
-		  statement s1,s2;
+		  //statement s1/*,s2*/;
 		  test t;
 		  expression exp1,exp2,exp;
 		  pos=position_one_element(P1,l+1);
@@ -1717,7 +1719,7 @@ statement Tiling_buffer_allocation ()
       Pvecteur pv;
       Pmatrix *temp;
       reference *regi[nid_nbr];
-      int m1;
+      //int m1;
       /* */
 
       expression gauche,droite,expt;
@@ -1754,8 +1756,8 @@ statement Tiling_buffer_allocation ()
 	{
 	  entity name;
 	  char buffer[20];  
- 	  expression exp;
-	  reference ref;
+ 	  //expression exp;
+	  //reference ref;
 	  temp[k]=matrix_new(depth,1);
 	  
 	  matrix_substract(temp[k],sequen[i].delai, sequen[i-1].delai);
@@ -1869,7 +1871,7 @@ statement Tiling_buffer_allocation ()
 	    {
 	      int pos;
 	      Pvecteur pv1,pv2;
-	      statement s1,s2;
+	      //statement s1,s2;
 	      test t;
 	      expression exp1,exp2,exp;
 	      pos=position_one_element(P1,l+1);
@@ -1995,11 +1997,11 @@ statement Tiling_buffer_allocation ()
   /******/
   for (i=k1-1;i>=0;i--)
     {
-      expression e1,e2,e,gauche=NULL,droite=NULL,delai_plus;
+      expression e1,e2,e/*,gauche=NULL,droite=NULL*/,delai_plus;
       test t;
-      call c;
-      int m;
-      Pvecteur pv;
+      //call c;
+      //int m;
+      //Pvecteur pv;
       e1=ge_expression(Pvecteur_to_expression (tiling_indice[0]),
 		       Value_to_expression( value_plus(sequen[i].nd[0].lower,
 						       MATRIX_ELEM( sequen[i].delai,1,1))));

@@ -479,7 +479,7 @@ void apply_on_each_options_frame_button(GtkWidget * widget, gpointer _func) {
 
 void apply_on_each_view_item(void(* function_to_apply_on_each_menu_item)(
 		GtkWidget *), void(* function_to_apply_on_each_panel_item)(GtkWidget *)) {
-	int i;
+	//int i;
 
 	/* Skip the "current_selection_mi" and "close" Menu_items: */
 	gtk_container_foreach(GTK_CONTAINER(view_menu), (GtkCallback)

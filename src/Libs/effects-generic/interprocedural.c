@@ -488,7 +488,7 @@ list generic_c_effects_backward_translation(entity callee,
 list generic_c_effects_forward_translation
 (entity callee, list real_args, list l_eff, transformer context)
 {
-  entity caller = get_current_module_entity();
+  //entity caller = get_current_module_entity();
   int arg_num;
   list l_formal = NIL;
   list l_global = NIL;

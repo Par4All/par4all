@@ -2007,9 +2007,7 @@ void RemoveDummyArguments(entity f, list refs)
 
 void SubstituteDummyParameters(entity f, list el)
 {
-  list cel = el;
-
-  for(cel; !ENDP(cel); POP(cel)) {
+  for(list cel=el; !ENDP(cel); POP(cel)) {
     entity v = ENTITY(CAR(cel));
     if(dummy_parameter_entity_p(v)) {
       string mn = entity_local_name(f);

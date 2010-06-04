@@ -169,7 +169,7 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,predecessors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	asprintf (&temp, "[%p] ",ordering);
+	asprintf (&temp, "[%d] ",ordering);
 	previous_nodes_as_string = strdup (concatenate(previous_nodes_as_string,
 						       temp,
 						       NULL));
@@ -181,7 +181,7 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,successors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	asprintf (&temp, "[%p] ",ordering);
+	asprintf (&temp, "[%d] ",ordering);
 	next_nodes_as_string = strdup (concatenate(next_nodes_as_string,
 						   (temp),
 						   NULL));
@@ -192,7 +192,7 @@ void debug_unstructured (unstructured an_unstructured,
       ordering = statement_ordering(s);
       /*if (ordering > 65535) ordering = ordering >> 16;*/
       ifdebug(debug_level) {
-      asprintf (&title, "CONTROL: %p\n", ordering);
+      asprintf (&title, "CONTROL: %d\n", ordering);
 	pips_debug(debug_level, "%s\n",
 		   strdup(concatenate("\n", line,
 				      "* ", (title),
@@ -334,7 +334,7 @@ entity make_variable_from_name_and_entity (entity cloned_variable,
   string variable_name;
   entity returned_variable = NULL;
   int index = statement_ordering(stat);
-  char *buffer;
+  //char *buffer;
  
   while (returned_variable == NULL) {
    

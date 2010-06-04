@@ -406,6 +406,8 @@ static string c_basic_string(basic b)
 	result = "Basic typedef not handled";
 	break;
       }  
+    default:
+      pips_internal_error("case not handled");
     }
   return strdup(result);
 }

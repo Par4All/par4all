@@ -403,6 +403,7 @@ static statement make_loopStat1(statement stat, entity transferSize,
 			empty_extensions ());
 }
 
+#if 0
 static statement make_init_prev_ind(statement oldBody)
 {
   list lStats = NIL;
@@ -428,6 +429,7 @@ static statement make_init_prev_ind(statement oldBody)
 
   return make_block_statement(lStats);
 }
+#endif
 
 /*
 This function performs a loop tiling operation from the loop statement

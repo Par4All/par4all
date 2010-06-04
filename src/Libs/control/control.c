@@ -1062,7 +1062,7 @@ hash_table used_labels;
                     forloop_condition(l),
                     forloop_increment(l),
                     control_statement(c_body),
-                    statement_comments(st));
+                    statement_extensions(st));
 
             /* These three fields have been re-used or freed by the previous call */
             forloop_initialization(l) = expression_undefined;

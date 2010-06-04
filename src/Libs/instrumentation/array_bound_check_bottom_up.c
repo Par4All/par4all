@@ -1578,7 +1578,7 @@ memset_check_expression(expression args[], int nargs)
 static expression
 strcpy_check_expression(expression args[], int nargs)
 {
-    statement smt;
+    //statement smt;
     expression arg1_size_expr, arg2_size_expr;
     entity arg2ent;
     int arg2size;

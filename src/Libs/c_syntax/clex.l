@@ -52,6 +52,9 @@
 ** 2.0  George Necula 12/12/00: Many extensions
 *)*/
 
+%option nounput
+%option noinput
+
 %{
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"

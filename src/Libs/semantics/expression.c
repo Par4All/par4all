@@ -2541,7 +2541,7 @@ transformer expression_to_transformer(
 				      list el)
 {
   type et = expression_to_type(exp);
-  entity tmpv = entity_undefined;
+  //entity tmpv = entity_undefined;
   transformer tf = transformer_undefined;
 
   if(type_void_p(et)) {
