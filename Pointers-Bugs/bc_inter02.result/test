@@ -66,27 +66,28 @@ int main()
 //  {(q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
 
    p1 = (struct2 *) malloc(sizeof(struct2));
-//  {(p1,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);(q2,
-//   *HEAP*_l_22,-Exact-)}
+//  {(p1,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
+//   (q2,*HEAP*_l_22,-Exact-)}
 
    p1->q = q1;
-//  {(p1[0][q],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p1,*HEAP*_l_27,
-//   -Exact-);(q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
+//  {(p1[0][.q],*HEAP*_l_21,-Exact-);(p1,*HEAP*_l_27,-Exact-);
+//   (q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
 
    p2 = p1;
-//  {(p1[0][q],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p1,*HEAP*_l_27,
-//   -Exact-);(p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);(q2,
-//   *HEAP*_l_22,-Exact-)}
+//  {(p1[0][.q],*HEAP*_l_21,-Exact-);(p1,*HEAP*_l_27,-Exact-);
+//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
+//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_21,-Exact-);}
 
    foo2(&p2, q2);
-//  {(p1[0][q],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p1,*HEAP*_l_27,
-//   -Exact-);(p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);(q2,
-//   *HEAP*_l_22,-Exact-)}
+//  {(p1[0][.q],,*HEAP*_l_22,-Exact-);(p1,*HEAP*_l_27,-Exact-);
+//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
+//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_22,-Exact-)}
 
    printf("%d\n", p1->q->r);
-//  {(p1[0][q],*ANY_MODULE*:*ANYWHERE*,-MAY-);(p1,*HEAP*_l_27,
-//   -Exact-);(p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);(q2,
-//   *HEAP*_l_22,-Exact-)}
+//  {(p1[0][.q],,*HEAP*_l_22,-Exact-);(p1,*HEAP*_l_27,-Exact-);
+//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
+//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_22,-Exact-)}
+
    return 0;
 }
 
@@ -122,14 +123,14 @@ int main()
 //               <must be written>: p2
 
    p2 = p1;
-//               <must be read   >: q2
+//               <must be read   >: p2 q2 
+//               <must be written>: *HEAP*_l_27[.q]
 
    foo2(&p2, q2);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*[.r] 
-//                                  stdout[0] *HEAP*_l_27[.r]
+//               <may be read    >: stdout[0] 
 //               <may be written >: stdout[0]
 //               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  *HEAP*_l_27[.q] p1
+//                                  *HEAP*_l_27[.q] p1 *HEAP*_l_22[.r]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
    printf("%d\n", p1->q->r);
