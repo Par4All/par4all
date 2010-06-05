@@ -1035,6 +1035,23 @@ transformer affine_increment_to_transformer(entity e, Pvecteur a)
     return tf;
 }
 
+/* Modulo and integer division
+ *
+ * Apparently identical in both C and Fortran
+ *
+ *           C    Fortran
+ *  a  b  mod div  mod div
+ *  3  2   1   1    1
+ * -3  2  -1  -1   -1
+ *  3 -2   1  -1    1
+ * -3 -2  -1   1   -1
+ *
+ * FI: only implemented for positive dividends. Same for integer
+ * division, I believe. Side effects are probably ignored.
+ *
+ * FI: to be improved by using expression_to_transformer() and the
+ * precondition pre.
+ */
 static transformer modulo_to_transformer(entity e, /* assumed to be a value */
 					 expression arg1 __attribute__ ((unused)),
 					 expression arg2,

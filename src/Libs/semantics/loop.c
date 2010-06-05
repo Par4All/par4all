@@ -338,7 +338,7 @@ transformer new_whileloop_to_transformer(whileloop wl,
 					 transformer pre,
 					 list wlel) /* effects of whileloop wl */
 {
-  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_continue)* */
   transformer t_body_star = transformer_undefined;
   statement body_s = whileloop_body(wl);
 

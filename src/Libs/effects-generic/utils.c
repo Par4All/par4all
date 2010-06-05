@@ -397,31 +397,46 @@ entity e;
   return conflict_e;
 }
 
-list effects_conflict_with_entities(fx, e)
-cons * fx;
-entity e;
+/* Returns the list of entities used in effect list fx and
+   potentially conflicting with e.
+
+   Of course, abstract location entities do conflict with many
+   entities, possibly of different types.
+
+   if concrete_p==TRUE, ignore abstract location entities.
+ */
+list generic_effects_conflict_with_entities(list fx,
+					    entity e,
+					    bool concrete_p)
 {
-    list lconflict_e = NIL;
-    MAPL(cef, 
-     {
-	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_any_reference(ef));
-	 if(entities_may_conflict_p(e, e_used)) {
-	     lconflict_e = gen_nconc(lconflict_e, 
-				     CONS(ENTITY, e_used, NIL));
-	    
-	 }
-     },
-	 fx);
-    return lconflict_e;
+  list lconflict_e = NIL;
+
+  FOREACH(EFFECT, ef, fx) {
+    entity e_used = reference_variable(effect_any_reference(ef));
+    if(!(entity_abstract_location_p(e_used) && concrete_p)) {
+      if(entities_may_conflict_p(e, e_used)) {
+	lconflict_e = gen_nconc(lconflict_e,
+				CONS(ENTITY, e_used, NIL));
+      }
+    }
+  }
+
+  return lconflict_e;
 }
 
+list effects_conflict_with_entities(list fx, entity e)
+{
+  return generic_effects_conflict_with_entities(fx, e, FALSE);
+}
 
+list concrete_effects_conflict_with_entities(list fx, entity e)
+{
+  return generic_effects_conflict_with_entities(fx, e, TRUE);
+}
 
 /* Return true if a statement has an I/O effect in the effects
    list. */
-bool
-statement_io_effect_p(statement s)
+bool statement_io_effect_p(statement s)
 {
    bool io_effect_found = FALSE;
    list effects_list = load_proper_rw_effects_list(s);
@@ -431,7 +446,7 @@ statement_io_effect_p(statement s)
       FALSE anyway. */
    entity private_io_entity =
       global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
-                            IO_EFFECTS_ARRAY_NAME);
+			    IO_EFFECTS_ARRAY_NAME);
 
    MAP(EFFECT, an_effect,
        {
