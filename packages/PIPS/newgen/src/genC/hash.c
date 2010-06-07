@@ -34,7 +34,9 @@
 	(C) Copyright Ecole des Mines de Paris, 1989
 
 */
-
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
