@@ -1,0 +1,53 @@
+delete paf_insertsort
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create paf_insertsort paf_insertsort.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_K_FIX_POINT 1
+
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[paf_insertsort]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[paf_insertsort]
+
+# complexity is not implemented for for loops...
+
+quit
+
+echo
+echo COMPLEXITY
+echo
+
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE[paf_insertsort]
+quit
+echo
+echo AFTER DEAD CODE ELIMINATION
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+# delete paf_insertsort
+quit
