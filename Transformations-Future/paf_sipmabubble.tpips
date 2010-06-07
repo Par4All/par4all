@@ -1,0 +1,59 @@
+delete paf_sipmabubble
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create paf_sipmabubble paf_sipmabubble.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_K_FIX_POINT 1
+
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[paf_sipmabubble]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[paf_sipmabubble]
+
+# complexity is not implemented accurately for while loops...
+
+# quit
+
+apply RECOVER_FOR_LOOP[paf_sipmabubble]
+apply FOR_LOOP_TO_DO_LOOP[paf_sipmabubble]
+
+activate PRINT_CODE
+display PRINTED_FILE[paf_sipmabubble]
+
+echo
+echo COMPLEXITY
+echo
+
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE[paf_sipmabubble]
+quit
+echo
+echo AFTER DEAD CODE ELIMINATION
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+# delete paf_sipmabubble
+quit
