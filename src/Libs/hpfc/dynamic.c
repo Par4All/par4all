@@ -545,7 +545,7 @@ same_alignment_p(entity e1, entity t1, alignment a1,
 	RETAL("some undefined", b);
     }
 
-    pips_debug(7, "considering %s[dim=%ld] and %s[dim=%ld]\n",
+    pips_debug(7, "considering %s[dim=%"PRIdPTR"] and %s[dim=%"PRIdPTR"]\n",
 	       entity_name(e1), alignment_arraydim(a1),
 	       entity_name(e2), alignment_arraydim(a2));
 
