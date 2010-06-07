@@ -26,6 +26,9 @@
  *
  * AM, August 2009.
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,7 +42,9 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 
 #include "database.h"
@@ -86,11 +91,13 @@ words_fictious_reference(reference obj)
   return(pc);
 }
 
+#if 0
 /* For debugging points-to: use this function in points_to_words_reference() */
 static string entity_full_name(entity e)
 {
   return entity_name(e);
 }
+#endif
 
 /* Specific handling of references appearing in points_to */
 list points_to_words_reference(reference r)
@@ -264,17 +271,15 @@ bool print_code_points_to(string module_name,
 		      string resource_name,
 		      string file_suffix)
 {
-  points_to_list summary_pts_to = (points_to_list)
-    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
+  
   list wl = list_undefined;
   text t, st;
   bool res;
-
+  debug_on("POINTS_TO_DEBUG_LEVEL");
   //init_printed_points_to_list();
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-
+  points_to_list summary_pts_to = (points_to_list)
+    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
   wl = words_points_to_list(SUMMARY_PT_TO_SUFFIX, summary_pts_to);
   pips_debug(1, "considering module %s \n",
 	     module_name);
@@ -282,9 +287,7 @@ bool print_code_points_to(string module_name,
   /*  FI: just for debugging */
   // check_abstract_locations();
 
-  /* set_proper_rw_effects((statement_effects) */
-  /* 		       db_get_memory_resource(DBR_PROPER_EFFECTS, */
-  /* 					      module_name, TRUE)); */
+  //init_printed_points_to_list();
   set_printed_points_to_list((statement_points_to)
 			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE));
   // statement_points_to_consistent_p(get_printed_points_to_list());
@@ -296,15 +299,22 @@ bool print_code_points_to(string module_name,
   // FI: should be language neutral...
   st = words_predicate_to_commentary(wl, get_comment_sentinel());
   t = text_code_points_to(get_current_module_statement());
-  // print_text(stderr,t);
+  //print_text(stderr,t);
   //st = text_code_summary_points_to(get_current_module_statement());
   MERGE_TEXTS(st, t);
-  res= make_text_resource_and_free(module_name, DBR_PRINTED_FILE,
-				   file_suffix, st);
-  reset_printed_points_to_list();
+  //print_text(stderr,t);
+  res= make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, st);
   reset_current_module_entity();
   reset_current_module_statement();
+  reset_printed_points_to_list();
+  
+ 
+  
 
+  //reset_printed_points_to_list();
+  
+ 
+  //free(t);
   debug_off();
   return TRUE;
 }

@@ -60,9 +60,11 @@ enum {
 static void (* apply_on_choice)(const char *);
 static void (* apply_on_cancel)(void);
 
+#if 0
 static void schoose_help_notify(GtkWidget * widget, gpointer data) {
 	display_help("SingleChoice");
 }
+#endif
 
 /* called when the "ok button" is clicked to validate an entry or when you select
  * something with the menu associated to the beforementionned entry. */

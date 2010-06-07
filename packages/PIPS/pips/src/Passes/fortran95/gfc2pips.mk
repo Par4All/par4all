@@ -33,6 +33,7 @@ LIBS_PIPS =  $(LIBS_PIPS_DIR)/libri-util.a \
 	$(LIBS_PIPS_DIR)/libtext-util.a \
 	$(LIBS_PIPS_DIR)/libsyntax.a \
 	$(LIBS_PIPS_DIR)/libalias-classes.a \
+	$(LIBS_PIPS_DIR)/libeffects-util.a \
 	$(LIBS_PIPS_DIR)/libri-util.a \
 	$(LIBS_PIPS_DIR)/libmisc.a \
 	$(LIBS_PIPS_DIR)/libnewgen.a \

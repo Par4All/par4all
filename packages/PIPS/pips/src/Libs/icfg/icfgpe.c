@@ -31,10 +31,12 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "control.h"      /* CONTROL_MAP is defined there */
 #include "text.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "properties.h"  /* get_bool_property */
 #include "misc.h"
 #include "database.h"

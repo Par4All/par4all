@@ -27,11 +27,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "semantics.h"
@@ -63,8 +65,6 @@ typedef dg_vertex_label vertex_label;
 #define MAX_PACK 16
 #define VECTOR_POSTFIX "_vec"
 
-static int nbArguments = 0;
-static int nbAllocatedArguments = 0;
 
 static float gSimdCost;
 
@@ -298,7 +298,7 @@ opcode generate_opcode(string name, list types, float cost)
             "to partially filled register\n", name);
     return oc;
 }
-
+#if 0
 static int get_subwordSize_from_vector(entity vec)
 {
     char * name = entity_local_name(vec);
@@ -319,6 +319,7 @@ static int get_subwordSize_from_vector(entity vec)
 
     return 8;
 }
+#endif
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
@@ -557,11 +558,11 @@ static bool consecutive_expression_p(expression e0, int lastOffset, expression e
     expression distance = distance_between_expression(e0,e1);
     if( !expression_undefined_p(distance) )
     {
-        int idistance;
+        intptr_t idistance;
         NORMALIZE_EXPRESSION(distance);
         if((result=expression_integer_value(distance,&idistance)))
         {
-            pips_debug(3,"distance between %s and %s is %d\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
+            pips_debug(3,"distance between %s and %s is %"PRIdPTR"\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
             result= idistance == ref_offset+ref_offset*lastOffset;
         }
         else {
@@ -1136,7 +1137,7 @@ static simdstatement make_simd_statement(opcodeClass kind, opcode oc, list* args
 
     return ss;
 }
-
+#if 0
 static
 void free_simd_statement_info(simdstatement s)
 {
@@ -1153,6 +1154,7 @@ static int compare_statements(const void * v0, const void * v1)
     if (statement_ordering(s0) < statement_ordering(s1)) return -1;
     return 0;
 }
+#endif
 
 simdstatement make_simd_statements(set opkinds, list statements)
 {
@@ -1272,6 +1274,7 @@ static statement generate_exec_statement(simdstatement ss)
     return make_exec_statement_from_opcode(simdstatement_opcode(ss), args);
 }
 
+#if 0
 static statement make_shuffle_statement(entity dest, entity src, int order)
 {
     list args = gen_make_list(expression_domain,
@@ -1281,6 +1284,7 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
             NULL);
     return make_exec_statement_from_name( "PSHUFW",args);
 }
+#endif
 
 static 
 statement generate_load_statement(simdstatement si, int line)
@@ -1351,7 +1355,7 @@ static int intsort(const void *a, const void*b)
     int B = *(int*)b;
     return A==B?0:A<B?-1:1; }
 
-static void simdstatement_bubblesort_arguments(simdstatement ssi,intptr_t sz, int distances[sz])
+static void simdstatement_bubblesort_arguments(simdstatement ssi,intptr_t sz, intptr_t distances[sz])
 {
     int tmp[sz];
     memcpy(&tmp[0],&distances[0],sizeof(int)*sz);
@@ -1379,7 +1383,7 @@ void simd_optimize_data_layout(simdstatement ssi)
     for(intptr_t i = 0 ; i < simdstatement_nbArgs(ssi) ; i++)
     {
         bool all_comparable = true;
-        int distances[sz];
+        intptr_t distances[sz];
         distances[0]=0;
         for(intptr_t j = 1 ; j < sz ; j++)
         {
@@ -1387,7 +1391,7 @@ void simd_optimize_data_layout(simdstatement ssi)
                     simdstatement_arguments(ssi)[0+sz*i],
                     simdstatement_arguments(ssi)[j+sz*i]
                     );
-            if(!expression_undefined_p(distance) && expression_integer_value(distance,distances+j))
+            if(!expression_undefined_p(distance) && expression_integer_value(distance,&distances[0]+j))
             {
                 free_expression(distance);
             }

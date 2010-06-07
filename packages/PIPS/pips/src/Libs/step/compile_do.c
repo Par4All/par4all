@@ -250,7 +250,7 @@ static statement build_loop_slice(entity mpi_module, entity i, entity max_i, sta
   r = make_range(int_to_expression(1),entity_to_expression(max_i),int_to_expression(1));
   pips_debug(1,"%s\n",entity_module_name(i_i));
 
-  label = make_loop_label((int)NULL,entity_module_name(i_i));
+  label = make_loop_label(0,entity_module_name(i_i));
   
   c = make_continue_statement(label);
   insert_statement(body,c,FALSE);

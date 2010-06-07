@@ -54,7 +54,6 @@
 extern void (*pips_error_handler)();
 extern void (*pips_log_handler)();
 extern void (*pips_warning_handler)();
-extern void set_bool_property();
 
 static char *usage = 
   "Usage: %s [-v] [-f F]* [-m M] [-s S]* [-p P] [-b B] [-(0|1) T]* wspace\n"

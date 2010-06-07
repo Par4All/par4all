@@ -70,7 +70,7 @@ expression lw, up, in ;
 bool left;
 {
     range new_r = copy_range(r);
-    int val = 0;
+    intptr_t val = 0;
     expression new_up = copy_expression(up);
     expression new_lw = copy_expression(lw);
     expression new_in = copy_expression(in);

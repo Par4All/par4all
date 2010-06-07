@@ -42,11 +42,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -114,10 +116,10 @@ void debug_statement (string comments, statement stat, int debug_level)
   ifdebug(debug_level) {
     pips_debug(debug_level,"%s\n",comments);
     print_statement(stat);
-    pips_debug(debug_level,"domain number         = %d\n", statement_domain_number(stat));
+    pips_debug(debug_level,"domain number         = %"PRIdPTR"\n", statement_domain_number(stat));
     pips_debug(debug_level,"entity                = UNDEFINED\n");
-    pips_debug(debug_level,"statement number      = %d\n", statement_number(stat));
-    pips_debug(debug_level,"statement ordering    = %d\n", statement_ordering(stat));
+    pips_debug(debug_level,"statement number      = %"PRIdPTR"\n", statement_number(stat));
+    pips_debug(debug_level,"statement ordering    = %"PRIdPTR"\n", statement_ordering(stat));
     if (statement_with_empty_comment_p(stat)) {
       pips_debug(debug_level,"statement comments   = EMPTY\n");
     }
@@ -135,8 +137,8 @@ void debug_statement (string comments, statement stat, int debug_level)
 void debug_control (string comments, control a_control, int debug_level) {
 
   debug_statement (comments, control_statement(a_control), debug_level);
-  pips_debug(debug_level,"  predecessors          = %d\n", gen_length(control_predecessors(a_control)));
-  pips_debug(debug_level,"  successors            = %d\n", gen_length(control_successors(a_control)));
+  pips_debug(debug_level,"  predecessors          = %zd\n", gen_length(control_predecessors(a_control)));
+  pips_debug(debug_level,"  successors            = %zd\n", gen_length(control_successors(a_control)));
 
 }
 
@@ -167,7 +169,7 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,predecessors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	asprintf (&temp, "[%p] ",ordering);
+	asprintf (&temp, "[%d] ",ordering);
 	previous_nodes_as_string = strdup (concatenate(previous_nodes_as_string,
 						       temp,
 						       NULL));
@@ -179,7 +181,7 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,successors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	asprintf (&temp, "[%p] ",ordering);
+	asprintf (&temp, "[%d] ",ordering);
 	next_nodes_as_string = strdup (concatenate(next_nodes_as_string,
 						   (temp),
 						   NULL));
@@ -190,7 +192,7 @@ void debug_unstructured (unstructured an_unstructured,
       ordering = statement_ordering(s);
       /*if (ordering > 65535) ordering = ordering >> 16;*/
       ifdebug(debug_level) {
-      asprintf (&title, "CONTROL: %p\n", ordering);
+      asprintf (&title, "CONTROL: %d\n", ordering);
 	pips_debug(debug_level, "%s\n",
 		   strdup(concatenate("\n", line,
 				      "* ", (title),
@@ -332,7 +334,7 @@ entity make_variable_from_name_and_entity (entity cloned_variable,
   string variable_name;
   entity returned_variable = NULL;
   int index = statement_ordering(stat);
-  char *buffer;
+  //char *buffer;
  
   while (returned_variable == NULL) {
    

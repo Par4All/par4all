@@ -69,8 +69,10 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "alias_private.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 #include "database.h"
 #include "pipsdbm.h"
@@ -1576,7 +1578,7 @@ memset_check_expression(expression args[], int nargs)
 static expression
 strcpy_check_expression(expression args[], int nargs)
 {
-    statement smt;
+    //statement smt;
     expression arg1_size_expr, arg2_size_expr;
     entity arg2ent;
     int arg2size;
@@ -1669,7 +1671,7 @@ sprintf_check_expression(expression args[], int nargs)
 {
     int k;
     list snprintf_args = NIL;
-    expression dst_size, tmpbuf_expr;
+    expression dst_size=expression_undefined, tmpbuf_expr;
     entity snprintf_ent, tmpbuf_ent;
 
     if (nargs < 2)

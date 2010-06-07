@@ -326,7 +326,7 @@ void build_options_menu_and_panel(GtkWidget * menu_options,
 	int i, j;
 	option_type *all_the_options;
 	makefile m = parse_makefile();
-	int max_item_width = 0;
+	//int max_item_width = 0;
 
 	int number_of_options = 0;
 	hash_table phase_by_made_htp = hash_table_make(hash_string, 0);
@@ -393,7 +393,7 @@ void build_options_menu_and_panel(GtkWidget * menu_options,
 	gtk_box_pack_start(GTK_BOX(frame_vbox), table, TRUE, FALSE, 0);
 	for (i = 0; i < number_of_options; i++) {
 		GtkWidget * sub_menu_option, *sub_menu_option_item;
-		GtkWidget * menu_options_item;
+		//GtkWidget * menu_options_item;
 		GtkWidget * choices_combobox;
 
 		/* Create the sub-menu entry of an option: */
@@ -448,7 +448,7 @@ void build_options_menu_and_panel(GtkWidget * menu_options,
 	/* According to a suggestion from Guillaume Oget, it should be nice
 	 to be able to select a view also from the Option panel: */
 
-	char * option_item_label;
+	//char * option_item_label;
 
 	LabelAndVbox lav;
 	lav.vbox = frame_vbox;

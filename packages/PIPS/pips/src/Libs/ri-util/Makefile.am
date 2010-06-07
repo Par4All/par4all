@@ -29,7 +29,6 @@ libri_util_la_SOURCES=	contrainte_to_text.c \
 		static.c \
 		arguments.c \
 		module.c \
-		effects.c \
 		cmfortran.c \
 		craft.c \
 		control.c \

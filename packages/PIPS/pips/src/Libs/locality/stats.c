@@ -60,7 +60,7 @@ static bool loop_flt(loop l, context_p context )
 static void loop_rwt(loop l, context_p context  ) 
 {  
   contenu_t contenu;
-  int depth;
+  intptr_t depth;
   if (first_turn) {
     depth =1;
     hash_put(context->depth,stack_head(context->statement_stack), 
@@ -75,7 +75,7 @@ static void loop_rwt(loop l, context_p context  )
     contenu = (contenu_t) hash_get(context->contenu, s);
     if (contenu==is_a_no_perf_nes_loop_t)
         contenu=is_a_no_perf_nes_loop;
-    depth= (int) hash_get(context->depth, s); 
+    depth= (intptr_t) hash_get(context->depth, s); 
     depth++;
     hash_put(context->depth,stack_head(context->statement_stack), 
              ( void *) depth); 
@@ -87,7 +87,7 @@ static void loop_rwt(loop l, context_p context  )
   if ( cpt ==0) {
      statement s= loop_body(l);
      contenu = (contenu_t) hash_get(context->contenu, s);
-     if ( contenu == is_a_no_perf_nes_loop_t){int i=0;
+     if ( contenu == is_a_no_perf_nes_loop_t){
       nbr_interested_loop++;
      };
   };
@@ -119,9 +119,9 @@ static void seq_rwt(sequence sq, context_p context)
 {
   
   contenu_t contenu= is_unknown, contenu_loop=is_unknown ;
-  int depth=0;
-  int max=0;
-  int nbr=0;
+  intptr_t depth=0;
+  intptr_t max=0;
+  intptr_t nbr=0;
   bool found=FALSE;
   list l= sequence_statements(sq);
    MAP(STATEMENT, s,
@@ -138,7 +138,7 @@ static void seq_rwt(sequence sq, context_p context)
          found=TRUE; 
      switch ( contenu ){
         case is_a_perf_nes_loop : {nbr++; contenu_loop=contenu;
-          depth = (int ) hash_get(context->depth, s);
+          depth = (intptr_t ) hash_get(context->depth, s);
           (*(nbr_perf_nest_loop_of_depth+depth))++;
           if( depth > max ) max =depth;
           nbr_perfectly_nested_loop++;
@@ -148,7 +148,7 @@ static void seq_rwt(sequence sq, context_p context)
         }
     
         case is_a_no_perf_nes_loop: {nbr++; contenu_loop=contenu;
-           depth = (int ) hash_get(context->depth, s);
+           depth = (intptr_t ) hash_get(context->depth, s);
            (*(nbr_no_perf_nest_loop_of_depth+depth))++;
            nbr_no_perfectly_nested_loop++;
            nbr_nested_loop++;
@@ -157,7 +157,7 @@ static void seq_rwt(sequence sq, context_p context)
            break ;
         }
         case is_a_no_perf_nes_loop_t: { nbr++; contenu_loop=contenu;
-           depth = (int ) hash_get(context->depth, s);
+           depth = (intptr_t ) hash_get(context->depth, s);
            if( depth > max ) max =depth; break ;}   
         default: 
         break;
@@ -219,15 +219,15 @@ static void uns_rwt(unstructured u, context_p context)
   statement s;
   contenu_t contenu;
   control c_in=unstructured_control(u);
-  int max =0;
-  int depth;
+  intptr_t max =0;
+  intptr_t depth;
   CONTROL_MAP(c, 
      {
         s=control_statement(c);
         contenu = (contenu_t) hash_get(context->contenu, s);
         switch ( contenu ){
            case is_a_perf_nes_loop : {      
-              depth = (int ) hash_get(context->depth, s);
+              depth = (intptr_t ) hash_get(context->depth, s);
               (*(nbr_perf_nest_loop_of_depth+depth))++;
                if( depth > max ) max =depth;
                nbr_perfectly_nested_loop++;
@@ -236,7 +236,7 @@ static void uns_rwt(unstructured u, context_p context)
                break;
            }
            case is_a_no_perf_nes_loop: {        
-              depth = (int ) hash_get(context->depth, s);
+              depth = (intptr_t ) hash_get(context->depth, s);
               (*(nbr_no_perf_nest_loop_of_depth+depth))++;
               nbr_no_perfectly_nested_loop++;
               nbr_nested_loop++;
@@ -245,7 +245,7 @@ static void uns_rwt(unstructured u, context_p context)
               break ;
            }
            case is_a_no_perf_nes_loop_t: {     
-              depth = (int ) hash_get(context->depth, s);
+              depth = (intptr_t ) hash_get(context->depth, s);
               if( depth > max ) max =depth; break ;}   
               default: 
           break;
@@ -277,13 +277,13 @@ static void test_rwt(test t, context_p context)
 {
   statement s1=test_true(t);
   statement s2=test_false(t);  
-  int max=0;
-  int depth;
+  intptr_t max=0;
+  intptr_t depth;
   contenu_t contenu1=is_unknown, contenu2=is_unknown,contenu =is_unknown;
   contenu1 = (contenu_t) hash_get(context->contenu, s1);
   switch ( contenu1 ){
      case is_a_perf_nes_loop: {
-       depth= (int) hash_get(context->depth, s1);
+       depth= (intptr_t) hash_get(context->depth, s1);
        (*(nbr_perf_nest_loop_of_depth+depth))++;
        nbr_perfectly_nested_loop++;
        nbr_nested_loop++;
@@ -296,7 +296,7 @@ static void test_rwt(test t, context_p context)
        break;
      };
      case is_a_no_perf_nes_loop :{
-        depth= (int) hash_get(context->depth, s1);
+        depth= (intptr_t) hash_get(context->depth, s1);
         (*(nbr_no_perf_nest_loop_of_depth+depth))++;
 	nbr_no_perfectly_nested_loop++;
         nbr_nested_loop++;
@@ -309,7 +309,7 @@ static void test_rwt(test t, context_p context)
          break;
       };
       case is_a_no_perf_nes_loop_t: {
-        depth= (int) hash_get(context->depth, s1);
+        depth= (intptr_t) hash_get(context->depth, s1);
         max=depth;
         contenu= is_a_no_perf_nes_loop_t;
         hash_put(context->contenu,
@@ -322,7 +322,7 @@ static void test_rwt(test t, context_p context)
   contenu2 = (contenu_t) hash_get(context->contenu, s2);
       switch ( contenu2 ){
          case is_a_perf_nes_loop : {
-           depth= (int) hash_get(context->depth, s2);
+           depth= (intptr_t) hash_get(context->depth, s2);
            (*(nbr_perf_nest_loop_of_depth+depth))++;
            nbr_perfectly_nested_loop++;
            nbr_nested_loop++;
@@ -336,7 +336,7 @@ static void test_rwt(test t, context_p context)
          };
 
          case is_a_no_perf_nes_loop: {
-           depth= (int) hash_get(context->depth, s2);
+           depth= (intptr_t) hash_get(context->depth, s2);
            (*(nbr_no_perf_nest_loop_of_depth+depth))++;
            nbr_no_perfectly_nested_loop++;
            nbr_nested_loop++;
@@ -349,7 +349,7 @@ static void test_rwt(test t, context_p context)
            break;
          };
          case is_a_no_perf_nes_loop_t: {
-           depth= (int) hash_get(context->depth, s2);
+           depth= (intptr_t) hash_get(context->depth, s2);
            if ( depth > max)  max =depth;
 	   contenu= is_a_no_perf_nes_loop_t;
            hash_put(context->contenu,

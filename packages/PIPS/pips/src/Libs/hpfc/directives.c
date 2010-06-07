@@ -592,7 +592,7 @@ one_distribute_directive(
 	    align a;
 	    entity new_array;
 
-	    pips_debug(7, "array 0x%x\n", (unsigned int) array);
+	    pips_debug(7, "array 0x%p\n", array);
 	    pips_debug(7, "alive array %s\n", entity_name(array));
 	    
 	    a = new_align_with_template(load_hpf_alignment(array), new_t);
@@ -720,7 +720,7 @@ HANDLER_PROTOTYPE(independent)
     list /* of entities */ l = expression_list_to_entity_list(args);
     statement s;
 
-    pips_debug(2, "%d index(es)\n", gen_length(l));
+    pips_debug(2, "%zd index(es)\n", gen_length(l));
 
     /*  travels thru the full control graph to find the loops
      *  and tag them as parallel.

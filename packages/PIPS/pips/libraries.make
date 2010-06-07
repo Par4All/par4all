@@ -64,7 +64,7 @@ pipslibs.libs	= \
 	instrumentation locality expressions transformations accel-util hwac \
 	movements bootstrap callgraph icfg chains complexity \
 	conversion prettyprint atomizer syntax c_syntax \
-	effects-simple effects-convex effects-generic alias-classes \
+	effects-util effects-simple effects-convex effects-generic alias-classes \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor ri-util step properties \
 	text-util misc reductions flint sac safescale phrase \

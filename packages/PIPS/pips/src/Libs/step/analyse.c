@@ -128,6 +128,7 @@ static void step_drop_complex_constraints(region reg)
 }
 
 
+#if 0
 /* Recherche des variables et tableaux privatisables  
    
    Calcul de PRIV a partir de LOCAL: variables ecrites non
@@ -198,6 +199,7 @@ static list step_copy_out_regions(list priv_sec,list out_l)
     ifdebug(LOCAL_DEBUG) step_print_region("Region copy_out ", copy_out);
     return copy_out;
 }
+#endif
 
 
 /* Recherche des regions SEND 
@@ -335,6 +337,7 @@ static list step_recv_regions(list send_l, list in_l)
 }
 
 
+#if 0
 /* Recherche des regions USED 
    Si allocation dynamique possible, determination de l'espace memoire a utiliser
    
@@ -349,6 +352,7 @@ static list step_used_regions(list read_l, list write_l)
   ifdebug(LOCAL_DEBUG) step_print_region("Region Used ", used_l);
   return used_l;
 }
+#endif
 
 static step_region_analyse step_analyse_loop_regions(list read_l, list write_l, list in_l, list out_l, list loop_data_l)
 {

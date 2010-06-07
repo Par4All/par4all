@@ -40,11 +40,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "misc.h"
 #include "text.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "properties.h"
 #include "preprocessor.h"
 

@@ -33,8 +33,10 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "control.h"
 #include "constants.h"
 #include "misc.h"
@@ -615,7 +617,7 @@ static void replace_constant_array_references_walker(reference ref, replace_refe
     {
         /* we know for sure all indices are constant */
         expression offset = reference_offset(ref);
-        int value;
+        intptr_t value;
         if(!expression_integer_value(offset,&value))
             pips_internal_error("reference index should be constants\n");
         /* add one to the value, because 0 seems reserved */

@@ -22,6 +22,8 @@
 
 */
 
+%option nounput
+%option noinput
 %start COMMENT TEXT
 
 %{

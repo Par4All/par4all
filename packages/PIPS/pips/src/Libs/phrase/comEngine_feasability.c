@@ -35,11 +35,13 @@ HRE.
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -337,7 +339,7 @@ of the fifo and the reference is stored in the hash_table refToFifo.
 static int find_or_create_fifo_from_ref(reference ref, bool bReadAct,
 					hash_table refToFifo, int inc)
 {
-  int fifoNum = -1;
+  intptr_t fifoNum = -1;
 
   // Goes through the hash_table refToFifo to see if
   // a fifo is already associated with the reference ref.
@@ -346,7 +348,7 @@ static int find_or_create_fifo_from_ref(reference ref, bool bReadAct,
   {
     if(reference_equal_p(curRef, ref))
       {
-	fifoNum = (int)buff;
+	fifoNum = (intptr_t)buff;
 	break;
       }
   }, refToFifo);
@@ -386,7 +388,7 @@ gRefToHREFifo.
  */
 static void compute_fifo_from_ref(reference ref, bool bReadAct, int inc)
 {
-  int fifoNum = 0;
+  intptr_t fifoNum = 0;
 
   fifoNum = find_or_create_fifo_from_ref(ref, bReadAct, gRefToFifo, inc);
 

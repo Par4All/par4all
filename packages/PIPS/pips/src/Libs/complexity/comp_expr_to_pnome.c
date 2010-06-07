@@ -41,8 +41,10 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "misc.h"                 /* useful, pips_error is defined there */
 
@@ -387,6 +389,7 @@ int maximize;
 	else if (streq(name, UNARY_MINUS_OP))
 	    comp = unary_minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
 	break;
+    default:pips_internal_error("not handled case");
     }
     
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {

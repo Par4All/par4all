@@ -55,6 +55,7 @@
 
 /* Pips includes	*/
 #include "ri.h"
+#include "effects.h"
 /* Types arc_label and vertex_label must be defined although they are
    not used */
 typedef void * arc_label;
@@ -64,6 +65,7 @@ typedef void * vertex_label;
 #include "database.h"
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text.h"
 #include "static_controlize.h"
 #include "text-util.h"

@@ -39,11 +39,13 @@
 #include "genC.h"
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "database.h"     /* useful */
 #include "resources.h"    /* useful  */
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"      /* useful */
 
 #include "matrice.h"      /* useful */
@@ -102,7 +104,7 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 	r = words_to_string(pc);
 	nblanks = 65-strlen(r);
 
-	if (nblanks<1) 
+	if (nblanks<1)
 	    nblanks = 1;
 	if ( instruction_block_p(ins) )
 	  it = "(BLOCK)";
@@ -114,6 +116,8 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 	  it = "(STMT)";
 	else if ( instruction_unstructured_p(ins) )
 	  it = "(UNSTR)";
+	else if ( instruction_expression_p(ins) )
+	  it = "(EXPR)";
 	else
 	    pips_error("text_complexity", "Never occur!");
 

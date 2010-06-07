@@ -37,10 +37,13 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "dg.h"
 typedef dg_arc_label arc_label;
@@ -74,7 +77,7 @@ void update_map(statement_mapping m, statement st, reference r)
 	    lt =  gen_nconc(lt, CONS(REFERENCE,r, NIL));
 	    ifdebug(9) 
 		(void) fprintf(stderr,
-			       "ajout de la ref: %s au statement %d\n",
+			       "ajout de la ref: %s au statement %"PRIdPTR"\n",
 			       entity_local_name(reference_variable(r)), 
 			       statement_number(st));    
 	}
@@ -83,7 +86,7 @@ void update_map(statement_mapping m, statement st, reference r)
 	lt= CONS(REFERENCE,r, NIL);
 	ifdebug(9) 
 	    (void) fprintf (stderr,
-		"ajout de la ref: %s au statement %d\n",
+		"ajout de la ref: %s au statement %"PRIdPTR"\n",
 		entity_local_name(reference_variable(r)), 
 		statement_number(st));   
     }

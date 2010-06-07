@@ -21,6 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "effects.h"
 
 /* some useful SHORTHANDS for EFFECT:
  */

@@ -1,3 +1,6 @@
+/* portability header for use with auto pips
+ * it defines various macros depending on configuration found by configure
+ */
 #ifdef HAVE_CONFIG_H
 
 #include "config.h"
@@ -20,5 +23,8 @@
     #define RL_NO_COMPAT
 #endif
 /* } */
+
+/* usefull for portable printf */
+#define __STDC_FORMAT_MACROS
 
 #endif

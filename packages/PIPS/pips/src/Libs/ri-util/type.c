@@ -4081,7 +4081,7 @@ static type subscripted_field_list_to_type(list fl, expression se)
   }
   else {
     /* Must be an integer expression */
-    int n = 0;
+    intptr_t n = 0;
     bool ok = expression_integer_value(se, &n);
 
     if(ok) {

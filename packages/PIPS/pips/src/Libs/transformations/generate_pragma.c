@@ -42,7 +42,9 @@
 #include "text.h"
 #include "text-util.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "control.h"
 #include "database.h"
 #include "pipsdbm.h"
@@ -53,7 +55,6 @@
 
 /////////////////////////////////////////////////////PRAGMA AS EXPRESSION
 
-///
 ///@return the new pragma
 ///@param l, the loop to analyze for omp reduction
 ///@param exprs, the pragma as a list of expression

@@ -114,7 +114,7 @@ int var, val;
     list result = NIL;
 
     if (ENDP(l))
-	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var,
+	return CONS(PVECTOR, (VECTOR) vect_new((Variable) (intptr_t)var,
 					       int_to_value(val)), NIL);
 
     if ((var==0) || (val==0))
@@ -125,8 +125,8 @@ int var, val;
     MAPL(cv,
      {
 	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
-	 pips_debug(9, "size of vector %x is %d\n", (int) v, vect_size(v));
-	 vect_add_elem(&v, (Variable) var, int_to_value(val));
+	 pips_debug(9, "size of vector %p is %d\n", v, vect_size(v));
+	 vect_add_elem(&v, (Variable) (intptr_t) var, int_to_value(val));
 	 result = gen_nconc(result, CONS(PVECTOR, (VECTOR) v, NIL));
      },
 	 l);
@@ -281,7 +281,7 @@ Pvecteur v;
 	int procdim = 0;
 	bool distributed_dim = ith_dim_distributed_p(array, i, &procdim);
 	Value vn = distributed_dim? 
-	    vect_coeff((Variable) procdim, v): VALUE_ZERO;
+	    vect_coeff((Variable) (intptr_t)procdim, v): VALUE_ZERO;
 	int neighbour = VALUE_TO_INT(vn);
 	range r = RANGE(CAR(l));
 
@@ -326,7 +326,7 @@ Pvecteur v;
     for ( ; l!=NIL ; i++, l=CDR(l))
     {
 	range r = RANGE(CAR(l));
-	Value vn = vect_coeff((Variable) i, v);
+	Value vn = vect_coeff((Variable) (intptr_t)i, v);
 	int neighbour = VALUE_TO_INT(vn);
 
 	if (neighbour==0)

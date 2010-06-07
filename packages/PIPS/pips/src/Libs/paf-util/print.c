@@ -572,11 +572,11 @@ quast qu;
       ll  = quast_leaf_leaf_label( qul );
       if (ll != leaf_label_undefined) {
         fprint_indent(fp, quast_depth);
-	fprintf(fp, "Statement source number : %d",
+	fprintf(fp, "Statement source number : %"PRIdPTR,
 		statement_number(ordering_to_statement(leaf_label_statement(ll))));
 
         fprint_indent(fp, quast_depth);
-	fprintf(fp, "Depth : %d", leaf_label_depth(ll));
+	fprintf(fp, "Depth : %"PRIdPTR, leaf_label_depth(ll));
       }
       fprint_indent(fp, quast_depth);
       while (sol != NIL) {

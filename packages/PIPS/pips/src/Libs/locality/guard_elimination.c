@@ -1057,7 +1057,7 @@ statement  free_guards( s)
 	  expression exp1,exp2;
 	  Pvecteur pv;
 	  Value val;
-	  statement s,s1;
+	  statement s/*,s1*/;
 	  pv=vect_dup (pvif2);
 	  val=vect_coeff(indice2,pvif2);
 	  vect_erase_var( &pv,indice2);

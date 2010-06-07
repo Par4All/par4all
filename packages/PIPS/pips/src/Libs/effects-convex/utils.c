@@ -61,9 +61,11 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 #include "misc.h"
 #include "control.h"
@@ -1563,8 +1565,7 @@ effect convex_effect_field_to_rank_conversion(effect input_effect)
 		  expression_syntax(ind) = copy_syntax(expression_syntax(new_ind));
 		  free_expression(new_ind);
 		  /* Then add the constrain PHI_rank == rank into the effect system */
-		  bool dim_linear_p =
-		    sc_add_phi_equation(&region_system(eff), rank_exp, dim, IS_EG, PHI_FIRST);
+          (void)sc_add_phi_equation(&region_system(eff), rank_exp, dim, IS_EG, PHI_FIRST);
 		  free_expression(rank_exp);
 		}
 	    }

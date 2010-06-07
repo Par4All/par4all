@@ -19,6 +19,7 @@
 #
 
 F_c=ri.c \
+	effects.c \
 	dg.c \
 	compsec.c \
 	word_attachment.c \
@@ -53,6 +54,7 @@ F_c=ri.c \
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_h=ri.h \
+	effects.h \
 	dg.h \
 	compsec.h \
 	word_attachment.h \
@@ -87,6 +89,7 @@ F_h=ri.h \
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_tex=ri.tex \
+	effects.tex \
 	dg.tex \
 	compsec.tex \
 	word_attachment.tex \
@@ -121,6 +124,7 @@ F_tex=ri.tex \
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_pdf=ri.pdf \
+	effects.pdf \
 	dg.pdf \
 	compsec.pdf \
 	word_attachment.pdf \

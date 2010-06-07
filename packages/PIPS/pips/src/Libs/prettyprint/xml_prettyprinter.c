@@ -33,6 +33,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "c_syntax.h"
 #include "c_parser_private.h"
@@ -41,6 +42,7 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "text-util.h"
 
@@ -276,8 +278,8 @@ static string xml_dim_string(list ldim, string name)
 	expression elow = dimension_lower(dim);
 	expression eup = dimension_upper(dim);
 	
-	int low;
-	int up;
+	intptr_t low;
+	intptr_t up;
 	nbdim++;
 	if (expression_integer_value(elow, &low)){
 	  if(nbdim != 1)
@@ -736,7 +738,7 @@ static string xml_call_from_loopnest(call c, int task_number){
   if(!same_string_p(name, "="))
     pips_user_error("Only assignation allowed here.\n");
   
-  MAP(EXPRESSION, e, {
+  FOREACH(EXPRESSION, e, arguments){
     s = expression_syntax(e);
     switch(syntax_tag(s)){
     case is_syntax_call:{
@@ -761,9 +763,10 @@ static string xml_call_from_loopnest(call c, int task_number){
 	}
       }
     }
+    default: pips_internal_error("unhandled case");
     }
     first = FALSE;
-  }, arguments);
+  }
 
   if(!input_provided){
     result = strdup(concatenate("data = list<DATA>(dummyDATA, ", result, first_result, NULL));
@@ -1203,8 +1206,8 @@ for(ld = ldecl; !ENDP(ld); ld = CDR(ld)){
 	
 	 for (dim = variable_dimensions(type_variable(entity_type(var))); !ENDP(dim); dim = CDR(dim)) {
 
-	  int low;
-	  int  up;
+	  intptr_t low;
+	  intptr_t  up;
 	  expression elow = dimension_lower(DIMENSION(CAR(dim)));
 	  expression eup = dimension_upper(DIMENSION(CAR(dim)));
 	  if (expression_integer_value(elow, &low) && expression_integer_value(eup, &up)){
@@ -2568,7 +2571,7 @@ boolean  eval_linear_expression(expression exp, Psysteme ps, int *val)
 
 static void xml_Bounds(expression elow, expression eup,Psysteme prec, string_buffer sb_result)
 {
-  int low,up;
+  intptr_t low,up;
   int valr =0;
   /* Print XML Array LOWER BOUND */
   string_buffer_append_word("LowerBound",sb_result);
@@ -2600,7 +2603,7 @@ static void xml_Bounds(expression elow, expression eup,Psysteme prec, string_buf
 static void xml_Bounds_and_Stride(expression elow, expression eup, expression stride,
 				  Psysteme prec, string_buffer sb_result)
 {
-  int inc;
+  intptr_t inc;
   int  valr =0;
   xml_Bounds(elow, eup,prec,sb_result);
   string_buffer_append_word("Stride",sb_result);
@@ -3195,7 +3198,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
   reference ActualRef=reference_undefined;
   syntax sr;
   effect ef = effect_undefined; 
-  int iexp,ith=0;
+  intptr_t iexp,ith=0;
   int rw_ef=0;
   string aan ="";
   int valr  ;

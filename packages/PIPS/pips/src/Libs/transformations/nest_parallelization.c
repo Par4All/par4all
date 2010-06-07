@@ -37,7 +37,9 @@
 #include "misc.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text.h"
 #include "text-util.h"
 #include "database.h"
@@ -160,7 +162,7 @@ static statement tuned_loop_unroll(statement s, int c)
     expression lb = range_lower(lr),
                ub = range_upper(lr),
                inc = range_increment(lr);
-    int lbval, ubval, incval;
+    intptr_t lbval, ubval, incval;
 
     debug(9, "tuned_loop_unroll", "begin\n");
 

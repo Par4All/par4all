@@ -31,6 +31,8 @@
  */
 
 #include "defines-local.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 
@@ -615,7 +617,7 @@ int HpfcExpressionToInt(e)
 expression e;
 {
     normalized n = expression_normalized(e);
-    int val = 0;
+    intptr_t val = 0;
 
     ifdebug(8) print_expression(e);
 

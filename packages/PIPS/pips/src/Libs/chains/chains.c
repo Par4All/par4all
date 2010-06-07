@@ -38,6 +38,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 
 typedef void * arc_label;
 typedef void * vertex_label;
@@ -49,6 +50,7 @@ typedef void * vertex_label;
 #include "properties.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "ricedg.h"
 

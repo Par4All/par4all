@@ -63,10 +63,12 @@ enum {
 	GPIPS_MAX_DIRECTORY_MENU_SIZE = 80
 };
 
+#if 0
 /* Note the pedantic way to avoid the warning about unused file_name. :-) */
 static bool accept_all_file_names(char * file_name __attribute__ ((unused))) {
 	return TRUE;
 }
+#endif
 
 static GtkWidget * directory_gen_pullright(GtkWidget * widget) {
 	GtkWidget * parent_menu;

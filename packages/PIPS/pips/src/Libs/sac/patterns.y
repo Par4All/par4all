@@ -66,8 +66,8 @@ size_t sac_lineno = 0;
 
 
 %union {
-      int tokenId;
-      int typeId;
+      intptr_t tokenId;
+      intptr_t typeId;
       list tokenList;
       list typeList;
 

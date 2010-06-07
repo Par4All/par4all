@@ -54,10 +54,10 @@ extern bool     expression_integer_value();
 
 bool            number_of_elements(ld, the_result)
     list            ld;
-    int            *the_result;
+    intptr_t            *the_result;
 {
     list            pc;
-    int             a_temp_int;
+    intptr_t             a_temp_int;
     bool            ok = TRUE;
 
     (*the_result) = 1;
@@ -75,9 +75,9 @@ bool            number_of_elements(ld, the_result)
 
 bool            size_of_dimension(d, the_int)
     dimension       d;
-    int            *the_int;
+    intptr_t            *the_int;
 {
-    int             upper_dim, lower_dim;
+    intptr_t             upper_dim, lower_dim;
 
     if (expression_integer_value(dimension_upper(d), &upper_dim) &&
 	expression_integer_value(dimension_lower(d), &lower_dim)) {
@@ -102,7 +102,7 @@ control_type_in_expression(enum basic_utype a_basic,
 {
     basic           b;
     list            d;
-    int             n;
+    intptr_t             n;
     bool            ok_dim = FALSE, ok = find_bd_expression(exp, &b, &d);
 
     if (ok)
@@ -163,7 +163,7 @@ bool            find_bd_expression(exp, base, dims)
 	c = syntax_call(s);
 	return (find_bd_call(c, base, dims));
     default:
-	FATAL("find_bd_expression : unexpected tag %td\n", syntax_tag(s));
+	FATAL("find_bd_expression : unexpected tag %u\n", syntax_tag(s));
     }
 
     return (FALSE);

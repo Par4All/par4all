@@ -42,12 +42,14 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 
 #include "constants.h"
 #include "control.h"
 #include "properties.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "misc.h"
 

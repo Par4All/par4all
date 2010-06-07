@@ -50,7 +50,7 @@ entity host_module, node_module;
 
 #define debug_print_control(c, w)\
   fprintf(stderr, \
-	  "%s: ctr %p (stat %p) , %d preds, %d succs\n", w, \
+	  "%s: ctr %p (stat %p) , %zd preds, %zd succs\n", w, \
           c, control_statement(c), \
 	  gen_length(control_predecessors(c)), \
 	  gen_length(control_successors(c))); \

@@ -43,7 +43,9 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 
 #include "misc.h"

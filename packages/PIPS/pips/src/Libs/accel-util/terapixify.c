@@ -34,7 +34,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -158,7 +160,7 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
     /* change parameter name and generate an assignment */
     if(arg_prefix && !terapix_renamed_p(entity_user_name(e)) ) {
         string new_name;
-        asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%u",entity_module_name(e),arg_prefix,(*arg_cnt)++);
+        asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%zd",entity_module_name(e),arg_prefix,(*arg_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
         free(new_name);
 
@@ -199,7 +201,7 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
     /* to respect terapix asm, we also have to change the name of variable e */
     if(ass_prefix && !terapix_renamed_p(entity_user_name(e))) {
         string new_name;
-        asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%u",entity_module_name(e),ass_prefix,(*ass_cnt)++);
+        asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%zd",entity_module_name(e),ass_prefix,(*ass_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
         AddEntityToCurrentModule(ne);
         free(new_name);
@@ -241,7 +243,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             {
                 loop_bound=reference_variable(expression_reference(nb_iter));
                 string new_name;
-                asprintf(&new_name,"%s" MODULE_SEP_STRING TERAPIX_LOOPARG_PREFIX "%u",get_current_module_name(),(*p->cnt)++);
+                asprintf(&new_name,"%s" MODULE_SEP_STRING TERAPIX_LOOPARG_PREFIX "%zd",get_current_module_name(),(*p->cnt)++);
                 entity new_loop_bound=make_entity_copy_with_new_name(loop_bound,new_name,false);
                 for(list iter = code_declarations(value_code(entity_initial(get_current_module_entity())));
                         !ENDP(iter);
@@ -257,7 +259,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             }
             else {
                 string new_name;
-                asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%u",(*p->cnt)++);
+                asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%zd",(*p->cnt)++);
                 loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
                 value v = entity_initial(loop_bound);
                 free_constant(value_constant(v));

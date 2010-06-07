@@ -35,11 +35,13 @@ processes on the HRE
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -425,10 +427,10 @@ statement generate_ind_fifo_stat2(entity oldInd, entity newInd, bool bRead)
 
   string name = NULL;
 
-  int indNum = (int)hash_get(gIndToNum, oldInd);
+  intptr_t indNum = (intptr_t)hash_get(gIndToNum, oldInd);
 
   pips_assert("indNum != HASH_UNDEFINED_VALUE",
-	      indNum != (int)HASH_UNDEFINED_VALUE);
+	      indNum != (intptr_t)HASH_UNDEFINED_VALUE);
 
   if(bRead)
     {
@@ -439,10 +441,10 @@ statement generate_ind_fifo_stat2(entity oldInd, entity newInd, bool bRead)
       name = strdup(WRITE_FIFO);
     }
 
-  int fifoNum = (int)hash_get(gEntToHREFifo, oldInd);
+  intptr_t fifoNum = (intptr_t)hash_get(gEntToHREFifo, oldInd);
 
   pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-	      fifoNum != (int)HASH_UNDEFINED_VALUE);
+	      fifoNum != (intptr_t)HASH_UNDEFINED_VALUE);
 
   newStat =
     make_read_write_fifo_stat(name,
@@ -551,9 +553,9 @@ static void replace_array_ref_with_fifos2(list lRef, statement * newStat)
 printf("replace_array_ref_with_fifos2\n");
   generate_fifo_stats2(lRef, &lReadStats, &lWriteStats);
 printf("replace_array_ref_with_fifos2 1\n");
-  MAP(REFERENCE, curRef,
+  FOREACH(REFERENCE, curRef,lRef)
   {
-    printf("replace_array_ref %d\n", (int)curRef);
+    printf("replace_array_ref %p\n", curRef);
     print_reference(curRef);printf("\n");
 
     entity hreBuffEnt = get_HRE_buff_ent_from_ref(curRef);
@@ -565,7 +567,7 @@ printf("replace_array_ref_with_fifos2 1\n");
 
     comEngine_replace_reference_in_stat(*newStat, curRef, reference_to_expression(hreBuffRef));
 
-  }, lRef);
+  }
 
   lStats = lReadStats;
   if(*newStat != statement_undefined)
@@ -732,6 +734,7 @@ static void loop_enter()
   fill_HRE_module(newStat);
 }
 
+#if 0
 static void create_loop_HRE_module()
 {
   if(glCurLoop == NIL)
@@ -787,6 +790,7 @@ static void create_loop_HRE_module()
 
   fill_HRE_module(newStat);
 }
+#endif
 
 /*
 This function processes the HRE code generation for a

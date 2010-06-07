@@ -32,10 +32,12 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 #include "text-util.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "c_parser_private.h"
 #include "parser_private.h" /* FI: for syntax.h */
 

@@ -344,7 +344,7 @@ check_call_dim(de, dp, c, i)
     call            c;
     int             i;
 {
-    int             n_de, n_dp;
+    intptr_t             n_de, n_dp;
     bool
 	ok_de = number_of_elements(de, &n_de),
 	ok_dp = number_of_elements(dp, &n_dp);
@@ -592,12 +592,12 @@ bool look_at_the_commons(module)
  */
 bool position_in_the_area(the_var, inf, sup)
     entity          the_var;
-    int            *inf, *sup;
+    intptr_t            *inf, *sup;
 {
     basic           base;
     list            dims;
-    int             len_unit = 0;
-    int             nb_of_elements = 0;
+    intptr_t             len_unit = 0;
+    intptr_t             nb_of_elements = 0;
 
     if (!find_bd_type_variable(entity_type(the_var), &base, &dims))
 	return (FALSE);
@@ -687,7 +687,7 @@ entity local, module;
 
     while (!ENDP(llayout)) 
     {
-	int 
+	intptr_t 
 	    common_beginning_offset = -1, 
 	    common_ending_offset = -1, 
 	    other_beginning_offset = -1,
