@@ -127,7 +127,8 @@ class p4a_builder():
         if icc:
             if not which("icc"):
                 raise p4a_error("icc is not available -- have you source'd iccvars.sh or iccvars_intel64.sh yet?")
-            cxx = cc = "icc"
+            cc = "icc"
+            cxx = "icpc"
             ld = "xild"
             ar = "xiar"
         else:
