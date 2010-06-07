@@ -230,6 +230,7 @@ static bool unused_local_variable_p(entity var, set used, string module)
     // keep function auto-declaration for recursion
     && !same_string_p(entity_local_name(var), module)
     && !set_belong_p(used, var)
+    && !formal_parameter_p(var)
     && type_variable_p(ultimate_type(entity_type(var)));
 }
 
