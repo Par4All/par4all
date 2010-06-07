@@ -30,11 +30,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -106,7 +108,7 @@ static entity  make_new_symbolic_entity(string inName)
   return newEnt;
 }
 
-static void give_value_to_symbolic_entity(entity ent, int val)
+static void give_value_to_symbolic_entity(entity ent, intptr_t val)
 {
   constant constVal = make_constant(is_constant_int, (void *)val);
 

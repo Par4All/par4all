@@ -30,10 +30,12 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "misc.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "control.h"
 
 static Psysteme make_context_of_loop(stat)

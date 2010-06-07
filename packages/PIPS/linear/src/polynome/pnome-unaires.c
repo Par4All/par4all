@@ -28,6 +28,9 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 #include <stdio.h>
 #include <boolean.h>
 #include "arithmetique.h"
@@ -80,61 +83,72 @@ int p;
     Ppolynome ppresult, ppacc;
     int i;
 
-    if (POLYNOME_UNDEFINED_P(ppsup)) 
+    if (POLYNOME_UNDEFINED_P(ppsup))
 	return (POLYNOME_UNDEFINED);
-    if (p < 0) 
+    if (p < 0)
 	polynome_error("polynome_sum_of_power", "negative power: %d\n", p);
-    else if (p == 0) 
+    else if (p == 0)
 	ppresult = polynome_dup(ppsup);
     else {
 	if ( polynome_constant_p(ppsup) ) {    /* if the upper bound is constant ... */
 	    double factor, result = 0;
 	    double cste = (double)polynome_TCST(ppsup);
-	    
-	    if (cste<1)
+
+	    if (cste<1) {
+	      /* FI: That means, no iteration is executed whatsoever,
+		 isn't it?
+
+		 Also, polynome_error() does stop the execution and we
+		 are in trouble for PIPS. We should init some exit
+		 function towards pips_internal_error().
+	      */
+	      /*
 		polynome_error("polynome_sum_of_power",
 			       "compute a sum from 1 to %f!\n", (float) cste);
+	      */
+		ppresult = POLYNOME_NUL;
+	    }
 	    /*else if (cste==1)
 		ppresult = POLYNOME_NUL;*/
 	    else {
 		result = intpower(cste, p) * ((double) (cste / (p+1)) + 0.5);
 		factor = ((double) p/2);
-		
+
 		for (i=1; 0<p-2*i+1; i++) {
-		    result += (intpower(cste, p-2*i+1) 
+		    result += (intpower(cste, p-2*i+1)
 			       * ((double) (Bernouilli(i) * factor)));
 		    factor *= - ((double) (p-2*i+1)*(p-2*i)) / ((double) (2*i+1)*(2*i+2));
 		}
 		ppresult = make_polynome((float) result, TCST, VALUE_ONE);
 	    }
-	} 
+	}
 	else {    /* if the upper bound is a non-constant polynomial ... */
 	    float factor;
 	      /*  (ppsup^(p+1)) / (p+1)  */
-	    ppresult = polynome_power_n(ppsup, p+1);        
+	    ppresult = polynome_power_n(ppsup, p+1);
 	    polynome_scalar_mult(&ppresult, (float) 1/(p+1));
 	      /*  1/2 * ppsup^p  */
-	    ppacc = polynome_power_n(ppsup, p);                     
+	    ppacc = polynome_power_n(ppsup, p);
 	    polynome_scalar_mult(&ppacc, (float) 1/2);
 	    polynome_add(&ppresult, ppacc);
 	    polynome_rm(&ppacc);
-	    
-	    factor = ((float) p / 2);  
+
+	    factor = ((float) p / 2);
 	    /* computes factors p(p-1).../(2i!) incrementally */
 
 	    for (i=1; 0 < p-2*i+1; i++) {
 		/* the current term of the remaining of the sum is:     */
 		/* Ti = (1/(2i)!)*(Bi*p*(p-1)* . *(p-2*i+2)*ppsup^(p-2*i+1)) */
-		
+
 		ppacc = polynome_power_n(ppsup, p-2*i+1);
 		polynome_scalar_mult(&ppacc, (float) Bernouilli(i) * factor);
-		
+
 		polynome_add(&ppresult, ppacc);
 		polynome_rm(&ppacc);
-		
+
 		factor *= -((float)(p-2*i+1)*(p-2*i))/((float)(2*i+1)*(2*i+2));
 	    }
-        }	
+       }
     }
     return(ppresult);
 }

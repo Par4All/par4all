@@ -30,11 +30,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -53,7 +55,7 @@
 bool fsm_split_state(string module_name)
 {
   entity module;
-  entity state_variable;
+  //entity state_variable;
 
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

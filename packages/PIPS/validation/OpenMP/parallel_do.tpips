@@ -30,8 +30,7 @@ apply OMPIFY_CODE
 display PRINTED_FILE(PARALLEL_DO)
 
 apply UNSPLIT
-shell gfortran -fopenmp -c parallel_do.database/Src/parallel_do.f
-shell rm *.o
+shell gfortran -fopenmp -c parallel_do.database/Src/parallel_do.f -o parallel_do.database/Src/parallel_do.o
 
 close
 delete parallel_do

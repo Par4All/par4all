@@ -29,6 +29,10 @@
  *  /home/users/pips/C3/Linear/Development/polyedre.dir/test.dir
  */
 
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 extern int fprintf();

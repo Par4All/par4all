@@ -1009,7 +1009,7 @@ statement stat, *pstat;
     },
 	W);
 
-    pips_debug(5, "Wa length is %d (%d), Wrt lenght is %d\n",
+    pips_debug(5, "Wa length is %zd (%zd), Wrt lenght is %zd\n",
 	       gen_length(Wa), gen_length(lWa), gen_length(Wrt));
 
     if (gen_length(Wrt)!=0) 

@@ -595,31 +595,25 @@ entity
 make_new_module_variable(entity module,int d)
 {
 
-  static char name[ 64 ];
-  string name1;
+  string name;
   entity ent1=entity_undefined;
-  string full_name;
   static int num = 1;
-  name[0] = 'X';
   if (d != 0) {
-    (void) sprintf(&name[1],"%d",d);
+    (void)asprintf(&name,"X%d",d);
     num = d;
   }
-  else { (void) sprintf(&name[1],"%d",num);
+  else { (void) asprintf(&name,"X%d",num);
   num++;}
 
-  name1 = strdup(name);
-  while(!unique_entity_name_p(name1,module))
+  while(!unique_entity_name_p(name,module))
   {
-    free(name1);
-    name[0] = 'X';
-    (void) sprintf(&name[1],"%d",num);
+    string tmp = name;
+    (void)asprintf(&name,"X%d",num);
     num++;
-    name1 = strdup(name);
+    free(tmp);
   }
-  ent1 = make_scalar_integer_entity(name1,
+  ent1 = make_scalar_integer_entity(name,
 				    module_local_name(module));
-  free(full_name);
   return ent1;
 }
 

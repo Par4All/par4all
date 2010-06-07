@@ -32,6 +32,9 @@
    Formal parameters are modified in functions which makes the stack
    misleading when debugging with gdb.
 */
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -33,8 +33,10 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "control.h"
 #include "text.h"
 #include "text-util.h"

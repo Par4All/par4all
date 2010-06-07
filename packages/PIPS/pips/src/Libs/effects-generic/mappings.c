@@ -36,6 +36,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 
 /* REFERENCES */

@@ -33,8 +33,7 @@ apply OMP_MERGE_PRAGMA
 display PRINTED_FILE(main)
 
 apply UNSPLIT
-shell gcc -fopenmp -c merge02.database/Src/merge02.c
-shell rm *.o
+shell gcc -fopenmp -c merge02.database/Src/merge02.c -o merge02.database/Src/merge02.o
 
 close
 delete merge02

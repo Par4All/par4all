@@ -36,10 +36,12 @@
 #include "gtk_sizes.h"
 #include "gpips.h"
 
-//#define BOUND(x,lb,ub) \
-//    ((x)<(lb)) ? (lb) :\
-//    ((x)>(ub)) ? (ub) : (x)
-/*#define MAX(a, b) ((a)>(b) ? (a) : (b))*/
+#if 0
+#define BOUND(x,lb,ub) \
+    ((x)<(lb)) ? (lb) :\
+    ((x)>(ub)) ? (ub) : (x)
+#define MAX(a, b) ((a)>(b) ? (a) : (b))
+#endif
 
 //static int display_width, display_height;
 

@@ -36,6 +36,7 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "transformations.h"
 
 
 
@@ -228,6 +229,36 @@ static bool incrementation_expression_to_increment(expression incr,
                                 * pincrement = copy_expression(inc_v);
                                 * is_increasing_p = TRUE;
                                 success = TRUE;
+                            }
+                        }
+                        /* SG: i am duplicating code, next generation of phd will clean it */
+                        else {
+                            inc_v = expression_verbose_reduction_p_and_return_increment(incr,sub_expression_p);
+                            if (inc_v != expression_undefined ) {
+                                inc_v=MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),inc_v);
+                                if(extended_integer_constant_expression_p(inc_v)) {
+                                    int v = expression_to_int(inc_v);
+                                    if (v != 0) {
+                                        * pincrement = inc_v;
+                                        success = true;
+                                        if (v <= 0 ) {
+                                            * is_increasing_p = true;
+                                            pips_debug(5, "Found \"i = i - v\" or \"i = v - i\" with positive increment!\n");
+                                        }
+                                        else {
+                                            * is_increasing_p = false;
+                                            pips_debug(5, "Found \"i = i - v\" or \"i = v - i\" with negative increment!\n");
+                                        }
+                                    }
+                                }
+                                /* SG: we checked the no-write-effect-on-increment earlier, we can go on safely,
+                                 * but we will not know if the increment is positive or not, assume yes ?
+                                 */
+                                else {
+                                    * pincrement = inc_v;
+                                    * is_increasing_p = false;
+                                    success = true;
+                                }
                             }
                         }
                     }
@@ -678,7 +709,7 @@ sequence for_to_while_loop_conversion(expression init,
 				      expression cond,
 				      expression incr,
 				      statement body,
-				      __attribute__((unused)) string comments) {
+				      extensions exts) {
   pips_debug(5, "Begin\n");
 
   statement init_st = make_expression_statement(init);
@@ -694,6 +725,10 @@ sequence for_to_while_loop_conversion(expression init,
 					      n_body,
 					      STATEMENT_NUMBER_UNDEFINED,
 					      TRUE);
+  if(!empty_extensions_p(exts)) {
+      free_extensions(statement_extensions(wl_st));
+      statement_extensions(wl_st)=copy_extensions(exts);
+  }
 
   ifdebug(5) {
     pips_debug(5, "Initialization statement:\n");
@@ -733,7 +768,7 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
 					      forloop_condition(f),
 					      forloop_increment(f),
 					      forloop_body(f),
-					      statement_comments(st));
+					      statement_extensions(st));
 
   /* These fields have been re-used, so protect them from memory
      recycling: */

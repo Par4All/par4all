@@ -15,7 +15,7 @@ create merge06 merge06.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
-#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 5
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
@@ -25,10 +25,6 @@ apply PRIVATIZE_MODULE(main)
 echo // OMP style
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
-
-echo "before merge_pragma"
-display PRINTED_FILE(main)
-
 apply OMP_MERGE_PRAGMA
 
 echo "after merge_pragma"

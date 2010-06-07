@@ -30,7 +30,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -156,7 +158,7 @@ static entity current_mod = entity_undefined;
 static statement module_statement = statement_undefined;
 static int number_of_may_uninitialized_scalar_variables = 0;
 static int number_of_may_uninitialized_array_variables = 0;
-static int number_of_may_uninitialized_array_elements = 0;
+//static int number_of_may_uninitialized_array_elements = 0;
 static int number_of_uninitialized_scalar_variables = 0;
 static int number_of_uninitialized_array_variables = 0;
 static int number_of_added_verifications = 0;

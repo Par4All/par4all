@@ -6630,8 +6630,37 @@ Partial distribution distributes the statements of a loop nest except
 PARTIAL_DISTRIBUTION FALSE
 \end{PipsProp}
 
+\subsection{Statement Insertion}
+\begin{PipsPass}{statement_insertion}
+Check if the statement flagged by \PipsPropRef{STATEMENT_INSERTION_PRAGMA} can be safely inserted in the current control flow.
+\end{PipsPass}
+This pass should be reserved to internal use only, another pass should create and insert a flagged statement and then call this one to verify the validity of the insertion
+\begin{PipsMake}
+statement_insertion > MODULE.code
+    < PROGRAM.entities
+    < MODULE.code
+	< MODULE.regions
+	< MODULE.out_regions
+\end{PipsMake}
+\begin{PipsProp}{STATEMENT_INSERTION_PRAGMA}
+STATEMENT_INSERTION_PRAGMA "pips inserted statement to check"
+\end{PipsProp}
+\begin{PipsProp}{STATEMENT_INSERTION_SUCCESS_PRAGMA}
+STATEMENT_INSERTION_SUCCESS_PRAGMA "pips inserted statement"
+\end{PipsProp}
+\begin{PipsProp}{STATEMENT_INSERTION_FAILURE_PRAGMA}
+STATEMENT_INSERTION_FAILURE_PRAGMA "pips inserted statement to remove"
+\end{PipsProp}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
 \subsection{Loop Expansion}
+Prepare the loop expansion by creating a new statement (that may be invalid) for further processing by \PipsPassRef{statement_insertion}.
+Use \PipsPropRef{STATEMENT_INSERTION_PRAGMA} to identify the created statement.
+
+\begin{PipsMake}
+loop_expansion_init 	> MODULE.code
+    < PROGRAM.entities
+    < MODULE.code
+\end{PipsMake}
 \begin{PipsPass}{loop_expansion}
 Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.
 An offset can be set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the lower bound too.
@@ -9614,7 +9643,6 @@ omp pragma.
 
 \begin{PipsMake}
 omp_merge_pragma             > MODULE.code
-        < MODULE.cumulated_reductions
         < MODULE.code
 \end{PipsMake}
 

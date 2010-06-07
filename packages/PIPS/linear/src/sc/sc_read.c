@@ -51,6 +51,10 @@
   *  - introduction de la notion de base (FI, 3/1/90)
   */
 
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

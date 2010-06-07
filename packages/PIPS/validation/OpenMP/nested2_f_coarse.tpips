@@ -19,8 +19,7 @@ echo
 display PRINTED_FILE(NESTED)
 
 apply UNSPLIT
-shell gfortran -fopenmp -c nested2_f_coarse.database/Src/nested_f.f
-shell rm *.o
+shell gfortran -fopenmp -c nested2_f_coarse.database/Src/nested_f.f -o nested2_f_coarse.database/Src/nested_f.o
 
 close
 delete nested2_f_coarse

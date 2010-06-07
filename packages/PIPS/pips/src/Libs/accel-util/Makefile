@@ -23,6 +23,7 @@ TARGET	= accel-util
 
 LIB_CFILES =group_constants.c \
 		   	isolate_statement.c \
+			statement_insertion.c\
 			loop_expansion.c  \
 			outlining.c\
 			array_to_pointer.c  \

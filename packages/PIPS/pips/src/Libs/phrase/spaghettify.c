@@ -52,11 +52,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -90,10 +92,10 @@ statement spaghettify_statement (statement stat, string module_name)
   ifdebug(2) {
     print_statement(stat);
   }
-  pips_debug(2,"domain number = %d\n", statement_domain_number(stat));
+  pips_debug(2,"domain number = %"PRIdPTR"\n", statement_domain_number(stat));
   pips_debug(2,"entity = UNDEFINED\n");
-  pips_debug(2,"statement number = %d\n", statement_number(stat));
-  pips_debug(2,"statement ordering = %d\n", statement_ordering(stat));
+  pips_debug(2,"statement number = %"PRIdPTR"\n", statement_number(stat));
+  pips_debug(2,"statement ordering = %"PRIdPTR"\n", statement_ordering(stat));
   if (statement_with_empty_comment_p(stat)) {
     pips_debug(2,"statement comments = EMPTY\n");
   }

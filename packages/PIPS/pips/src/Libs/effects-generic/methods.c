@@ -41,7 +41,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "misc.h"
 #include "text-util.h"
 
@@ -224,10 +226,10 @@ generic_effects_reset_all_methods()
     effects_precondition_composition_op = (list_function) UNDEF;
     effects_descriptors_variable_change_func = (list_function) UNDEF;
 
-    effects_loop_normalize_func = (list_function) UNDEF;
-    effects_union_over_range_op = (list_function) UNDEF;
+    effects_loop_normalize_func = (list (*)(list, entity, range, entity* , descriptor ,bool)) UNDEF;
+    effects_union_over_range_op = (list (*)(list, entity, range, descriptor)) UNDEF;
 
-    reference_to_effect_func = (effect_function) UNDEF;
+    reference_to_effect_func = (effect(*)(reference,tag,bool)) UNDEF;
     loop_descriptor_make_func = (descriptor_function) UNDEF;
     vector_to_descriptor_func = (descriptor_function) UNDEF;
 

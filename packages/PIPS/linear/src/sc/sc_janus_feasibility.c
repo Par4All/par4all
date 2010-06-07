@@ -25,6 +25,10 @@
 /* This file provides functions to convert a system 
  * of constraints into format of Janus.
  */ 
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

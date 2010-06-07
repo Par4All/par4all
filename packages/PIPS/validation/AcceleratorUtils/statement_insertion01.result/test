@@ -1,0 +1,15 @@
+int main(int argc, char *argv[])
+{
+#pragma  pips inserted statement to check
+   while (1) 
+      ;
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+#pragma pips inserted statement
+   while (1) 
+      ;
+   return 0;
+}
+

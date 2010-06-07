@@ -40,12 +40,14 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 
 #include "misc.h"
 #include "properties.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -486,7 +488,7 @@ list generic_c_effects_backward_translation(entity callee,
 list generic_c_effects_forward_translation
 (entity callee, list real_args, list l_eff, transformer context)
 {
-  entity caller = get_current_module_entity();
+  //entity caller = get_current_module_entity();
   int arg_num;
   list l_formal = NIL;
   list l_global = NIL;

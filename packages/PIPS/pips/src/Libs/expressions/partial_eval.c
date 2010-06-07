@@ -72,6 +72,7 @@ partial_eval_expression().
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 
 #include "text-util.h"
@@ -79,6 +80,7 @@ partial_eval_expression().
 #include "resources.h"
 #include "control.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "misc.h"
 #include "properties.h"
@@ -1076,8 +1078,33 @@ eformat_t partial_eval_min_or_max_operator(int token,
 					   Psysteme ps,
 					   effects fx)
 {
-  eformat_t ef, ef1, ef2;
+    eformat_t ef;
+    bool ok = false;
+    statement parent = (statement)gen_get_ancestor(statement_domain,*ep1);
+    if(parent)
+    {
+        expression fake = make_op_exp(MINUS_OPERATOR_NAME,*ep1,*ep2);
+        transformer tr = transformer_range(load_statement_precondition(parent));
+        intptr_t lb,ub;
+        if(precondition_minmax_of_expression(fake,tr,&lb,&ub))
+        {
+            if(lb>=0) /* ep1-ep2 >= 0 -> min(ep1,ep2) == ep2 and max(ep1,ep2) == ep1 */
+            {
+                ef= partial_eval_expression_and_copy(*(token==PERFORM_MAXIMUM?ep1:ep2),ps,fx);
+                ef.simpler=true;
+                ok=true;
+            }
+            else if(ub <= 0 ) /* ep1-ep2 <= 0 -> min(ep1,ep2) == ep1 and  max(ep1,ep2) == ep2 */
+            {
+                ef= partial_eval_expression_and_copy(*(token==PERFORM_MAXIMUM?ep2:ep1),ps,fx);
+                ef.simpler=true;
+                ok=true;
+            }
+        }
+    }
 
+    if(!ok) {
+        eformat_t ef1, ef2;
   ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
   ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
@@ -1093,6 +1120,7 @@ eformat_t partial_eval_min_or_max_operator(int token,
     regenerate_expression(&ef2, ep2);
     ef = eformat_undefined;
   }
+    }
 
   return ef;
 }

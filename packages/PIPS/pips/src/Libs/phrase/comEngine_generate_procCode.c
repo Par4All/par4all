@@ -34,11 +34,13 @@ This file contains functions used to generate the MMCDs generation code
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -111,14 +113,14 @@ static list make_mmcd_stats_from_ref(statement stat, list lSupportedRef, hash_ta
 This function return TRUE if the reference whose indices are lRefDim is
 supported and, in this case, the value of the offset is put in retVal.
  */
-static bool get_final_offset(list lRefDim, int offset, int rank, int * retVal)
+static bool get_final_offset(list lRefDim, intptr_t offset, int rank, intptr_t * retVal)
 {
   bool fort_org = get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION");
 
   int i = 0;
   int ind;
 
-  int finalOffset = 1;
+  intptr_t finalOffset = 1;
 
   for(i = 0; i < gen_length(lRefDim); i++)
     {
@@ -217,7 +219,7 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
 
       list lRefDim = variable_dimensions(type_variable(refType));
 
-      int finalOffset;
+      intptr_t finalOffset;
 
       if(!get_final_offset(lRefDim, offset, rank, &finalOffset))
 	{
@@ -317,9 +319,9 @@ bool has_call_stat_inside(statement stat)
 This function returns the real fifo number from the old fifo number
 fifoNum.
  */
-static int get_realFifoNum(int fifoNum)
+static intptr_t get_realFifoNum(intptr_t fifoNum)
 {
-  static int gCurFifoCounter = 1;
+  static intptr_t gCurFifoCounter = 1;
 
   //printf("get_realFifoNum %d\n", fifoNum);
 
@@ -327,18 +329,18 @@ static int get_realFifoNum(int fifoNum)
   // gCurFifoCounter with 1
   if(fifoNum < 0)
     {
-      int newFifoNum = gCurFifoCounter;
+      intptr_t newFifoNum = gCurFifoCounter;
 
       gCurFifoCounter += 1;
 
       return newFifoNum;
     }
 
-  int realFifoNum = (int)hash_get(gRealFifo, (void *)fifoNum);
+  intptr_t realFifoNum = (intptr_t)hash_get(gRealFifo, (void *)fifoNum);
 
   // If no realFifoNum was associated with fifoNum,
   // then create a new realFifoNum
-  if(realFifoNum == (int)HASH_UNDEFINED_VALUE)
+  if(realFifoNum == (intptr_t)HASH_UNDEFINED_VALUE)
     {
       realFifoNum = gCurFifoCounter;
 
@@ -346,7 +348,7 @@ static int get_realFifoNum(int fifoNum)
 
       HASH_MAP(ref1, fifo1,
       {
-	if((int)fifo1 == (int)fifoNum)
+	if((intptr_t)fifo1 == (intptr_t)fifoNum)
 	  {
 	    hash_put(gRefToHREFifo, ref1, (void *)realFifoNum);
 	  }
@@ -354,9 +356,9 @@ static int get_realFifoNum(int fifoNum)
 
       // Get the number of fifo that has to be allocated for this
       // realFifoNum
-      int inc = (int)hash_get(gRefToFifoOff, (void *)fifoNum);
+      intptr_t inc = (intptr_t)hash_get(gRefToFifoOff, (void *)fifoNum);
 
-      if(inc == (int)HASH_UNDEFINED_VALUE)
+      if(inc == (intptr_t)HASH_UNDEFINED_VALUE)
 	{
 	  inc = 1;
 	}
@@ -377,7 +379,7 @@ static entity get_toggleEnt_from_ref(reference curRef, list lToggleEnt)
   pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
 	      fifoNum != HASH_UNDEFINED_VALUE);
 
-  int numOfFifo = (int)hash_get(gRefToFifoOff, fifoNum);
+  intptr_t numOfFifo = (intptr_t)hash_get(gRefToFifoOff, fifoNum);
 
   pips_assert("(numOfFifo == 2) || (numOfFifo == 3)",
 	      (numOfFifo == 2) || (numOfFifo == 3));
@@ -386,7 +388,7 @@ static entity get_toggleEnt_from_ref(reference curRef, list lToggleEnt)
 
   MAP(ENTITY, curEnt,
   {
-    int curInc = (int)hash_get(gToggleToInc, curEnt);
+    intptr_t curInc = (intptr_t)hash_get(gToggleToInc, curEnt);
 
     if(curInc == numOfFifo)
       {
@@ -453,10 +455,10 @@ static statement generate_mmcd_stat_from_ref(reference curRef, int offset,
 
   string name = NULL;
 
-  int fifoNum = (int)hash_get(gRefToFifo, curRef);
+  intptr_t fifoNum = (intptr_t)hash_get(gRefToFifo, curRef);
 
   pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-	      fifoNum != (int)HASH_UNDEFINED_VALUE);
+	      fifoNum != (intptr_t)HASH_UNDEFINED_VALUE);
 
   // Get the fifo number
   int realFifoNum = get_realFifoNum(fifoNum);
@@ -518,15 +520,15 @@ static void generate_mmcd_stats_from_ref(list lRef, hash_table htOffset,
   list lReadDone = NIL;
   list lWriteDone = NIL;
 
-  int offset = 0;
+  intptr_t offset = 0;
 
   MAP(REFERENCE, curRef,
   {
     if(htOffset != NULL)
       {
-	offset = (int)hash_get(htOffset, curRef);
+	offset = (intptr_t)hash_get(htOffset, curRef);
 
-	pips_assert("ref offset undefined", offset != (int) HASH_UNDEFINED_VALUE);
+	pips_assert("ref offset undefined", offset != (intptr_t) HASH_UNDEFINED_VALUE);
       }
     else
       {
@@ -699,8 +701,8 @@ This function creates a fifo associated to entity ent.
  */
 static int alloc_new_slot(entity ent)
 {
-  static int curFifo = -1;
-  static int curInd = 0;
+  static intptr_t curFifo = -1;
+  static intptr_t curInd = 0;
 
   /*if((curFifo == -1) || (curInd == get_int_property("COMENGINE_SIZE_OF_FIFO")))
     {*/
@@ -739,9 +741,9 @@ This function finds or creates a fifo associated to entity ent.
  */
 static int find_or_create_slot(entity ent)
 {
-  int fifoNum = (int)hash_get(gEntToHREFifo, ent);
+  intptr_t fifoNum = (intptr_t)hash_get(gEntToHREFifo, ent);
 
-  if(fifoNum == (int)HASH_UNDEFINED_VALUE)
+  if(fifoNum == (intptr_t)HASH_UNDEFINED_VALUE)
     {
       fifoNum = alloc_new_slot(ent);
     }
@@ -844,8 +846,8 @@ statement make_transStat(statement stat, entity newOuterInd,
 					      copy_expression(bufferSizeExp));
 
   expression rgUpper = range_upper(loop_range(curLoop));
-  int upVal = -1;
-  int rate = -1;
+  intptr_t upVal = -1;
+  intptr_t rate = -1;
   expression_integer_value(rgUpper, &upVal);
   expression_integer_value(bufferSizeExp, &rate);
 
@@ -1268,7 +1270,7 @@ void create_realFifo_proc(statement stat, list lRef)
 {
   list lDone = NIL;
 
-  bool readAndWrite = FALSE;
+  //bool readAndWrite = FALSE;
 
   MAP(REFERENCE, curRef1,
   {
@@ -1327,10 +1329,10 @@ void create_realFifo_proc(statement stat, list lRef)
   {
     printf("create_realFifo_proc it\n");
     print_reference(curRef);printf("\n");
-    int fifoNum = (int)hash_get(gRefToFifo, curRef);
+    intptr_t fifoNum = (intptr_t)hash_get(gRefToFifo, curRef);
 
     pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-		fifoNum != (int)HASH_UNDEFINED_VALUE);
+		fifoNum != (intptr_t)HASH_UNDEFINED_VALUE);
 
     get_realFifoNum(fifoNum);
   }, lRef);

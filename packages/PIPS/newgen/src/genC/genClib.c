@@ -23,6 +23,9 @@
   The file has all the generic functions to manipulate C objects
   implemented by gen_chunks (see genC.c).
 */
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -212,7 +215,7 @@ static void gen_alloc_component(union domain * dp,
     if( IS_INLINABLE( dp->ba.constructand )) {				\
       switch( *dp->ba.constructand->name ) {				\
       case 'u': (cp)->u = va_arg( ap, unit ) ; break ;			\
-      case 'b': (cp)->b = va_arg( ap, bool ) ; break ;			\
+      case 'b': (cp)->b = va_arg( ap, int )/*bool promoted to int when passed as a vararg*/ ; break ;			\
       case 'c': (cp)->c = va_arg( ap, int ) ; break ;			\
       case 'i': (cp)->i = va_arg( ap, int ) ; break ;			\
       case 'f': (cp)->f = va_arg( ap, double ) ; break ;		\

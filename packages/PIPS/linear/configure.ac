@@ -63,6 +63,15 @@ CPPFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VA
 gl_INIT
 CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/gnulib"
 
+# devel mode, sets various compiler flags and so on
+# this must be the last check because it modifies CFLAGS
+AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
+			  [
+			   	# set CFLAGS for more warnings
+			   	CFLAGS="-g -O0 -Wall -Werror"
+			  ]
+)
+
 AC_CONFIG_FILES([Makefile
 				 linearlibs.pc
                  src/Makefile

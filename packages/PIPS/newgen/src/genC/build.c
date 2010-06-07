@@ -26,7 +26,9 @@
   table) and the generation of the specification file.
 
 */
-
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

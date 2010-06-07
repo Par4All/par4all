@@ -34,6 +34,7 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "control.h"
+#include "transformations.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -243,11 +244,12 @@ static void load_hpfc_status() /* SET them */
     set_hpf_reductions(hpfc_status_reductions(chs));
 }
 
+#if 0
 /* never called... memory to be freed by pipsdbm...
  */
 static void close_hpfc_status()
 {
-    int i = (int) close_hpfc_status ; i = i & i ; /* just to avoid a warning */
+    __attribute__((unused)) intptr_t i = (intptr_t) close_hpfc_status ; 
 
     close_entity_status();
     close_data_status();
@@ -260,6 +262,7 @@ static void close_hpfc_status()
     close_computed_remaps();
     close_hpf_reductions();
 }
+#endif
 
 void hpfc_error_handler()
 {

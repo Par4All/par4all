@@ -30,11 +30,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -65,7 +67,7 @@ typedef dg_vertex_label vertex_label;
 bool full_fsm_generation(string module_name)
 {
   entity module;
-  entity state_variable;
+  //entity state_variable;
 
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

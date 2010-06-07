@@ -4,7 +4,6 @@ void papy_boom()
    for(i = 0; i <= 9; i += 1)
       printf("%i", i);
 }
-extern void papy_boom();
 void papy_boom()
 {
    int i = 0;
@@ -12,4 +11,3 @@ void papy_boom()
    for(i = 0; i <= 9; i += 1)
       printf("%i", i);
 }
-extern void papy_boom();

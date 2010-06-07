@@ -130,7 +130,7 @@ void LowlinkCompute(graph g, set region, vertex v, int level)
   sccflags fv = dg_vertex_label_sccflags(dvl);
   statement sv = ordering_to_statement(dg_vertex_label_statement(dvl));
 
-  pips_debug(7, "vertex is %ld (%ld %ld %ld)\n", statement_number(sv), 
+  pips_debug(7, "vertex is %zd (%zd %zd %zd)\n", statement_number(sv), 
 	sccflags_mark(fv), sccflags_lowlink(fv), sccflags_dfnumber(fv));
 
   MARK_OLD(v);
@@ -153,13 +153,13 @@ void LowlinkCompute(graph g, set region, vertex v, int level)
 	statement ss = 
 	  ordering_to_statement(dg_vertex_label_statement(dsl));
 
-	pips_debug(7, "successor before is %ld (%ld %ld %ld)\n",
+	pips_debug(7, "successor before is %zd (%zd %zd %zd)\n",
 	      statement_number(ss), sccflags_mark(fs),
 	      sccflags_lowlink(fs), sccflags_dfnumber(fs));
 
 	if (MARKED_NEW_P(s)) {
 	  LowlinkCompute(g, region, s, level);
-	  pips_debug(7, "successor after is %ld (%ld %ld %ld)\n",
+	  pips_debug(7, "successor after is %zd (%zd %zd %zd)\n",
 		statement_number(ss), sccflags_mark(fs),
 		sccflags_lowlink(fs), sccflags_dfnumber(fs));
 	  sccflags_lowlink(fv) = MIN(sccflags_lowlink(fv),

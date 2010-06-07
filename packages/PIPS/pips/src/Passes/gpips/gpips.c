@@ -102,7 +102,7 @@ static void create_menus() {
  }
  */
 
-static int first_mapping = TRUE;
+//static int first_mapping = TRUE;
 
 //void main_event_proc(window, event)
 //	Xv_Window window;Event *event; {
@@ -123,10 +123,11 @@ void create_main_window() {
 	gtk_widget_show_all(main_frame);
 }
 
+/*
 static unsigned short pips_bits[] = {
 #include "pips.icon"
 		};
-
+*/
 //void create_icon() {
 //	Server_image pips_image;
 //	Icon icon;

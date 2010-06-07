@@ -25,7 +25,7 @@
     #include "pips_config.h"
 #endif
 
-#ifndef lint
+#ifdef lint
 static char vcid[] = "$Id$";
 #endif /* lint */
 
@@ -585,7 +585,7 @@ static entity create_module_with_statement(statement stat, string new_module_nam
 {
   entity new_module;
   //string source_file;
-  text text_code;
+  //text text_code;
   int param_nb = 0;
 
   pips_debug(5, "[BEGIN] create_module_with_statement\n");

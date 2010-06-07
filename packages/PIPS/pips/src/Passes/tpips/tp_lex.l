@@ -1,3 +1,5 @@
+%option nounput
+%option noinput
 %{
 /*
 
@@ -34,6 +36,9 @@
 #include "misc.h"
 #include "tpips.h"
 #include "tp_yacc.h"
+
+/* disable echoing unmatched characters */
+#define ECHO ;
 
 /* now get the characters from a string, not from a file */
 #ifndef FLEX_SCANNER
@@ -194,8 +199,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 	yylval.name=strdup(yytext);
 	RETURN(TK_NAME);
  }
-
-.			{ pips_user_error("unexpected char %c\n", *yytext); }
+.			{pips_user_warning("Unrecognized character %s\n",yytext);}
 
 %%
 

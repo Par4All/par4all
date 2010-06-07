@@ -59,8 +59,10 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "complexity_ri.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "misc.h"
 #include "matrice.h"
 #include "preprocessor.h"

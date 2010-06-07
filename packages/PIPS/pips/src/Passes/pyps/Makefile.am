@@ -37,7 +37,10 @@ pypips.i:pypips.i.in pypips.h
 	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
 
 pypips.h:pypips.c Makefile
-	$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c > pypips.h
+	echo "#ifdef HAVE_CONFIG_H" > pypips.h
+	echo '#include "pips_config.h"' >> pypips.h
+	echo '#endif' >> pypips.h
+	$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c >> pypips.h
 	echo "#include <unistd.h>" >> pypips.h
 	echo '#include "linear.h"' >> pypips.h
 	echo '#include "genC.h"' >> pypips.h
@@ -47,6 +50,7 @@ pypips.h:pypips.c Makefile
 	echo '#include "top-level.h"' >> pypips.h
 	echo '#include "transformations.h"' >> pypips.h
 	echo "#undef _POSIX_C_SOURCE" >> pypips.h
+	echo "#undef _XOPEN_SOURCE" >> pypips.h
 	echo "#undef assert" >> pypips.h
 	echo "extern char *activate(char *);" >> pypips.h
 	echo "extern char *module_loops(const char*,const char*);" >> pypips.h

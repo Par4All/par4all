@@ -99,11 +99,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -235,7 +237,7 @@ static control make_condition_from_loop (loop the_loop,
 {
   statement condition_statement;
   test condition_test;
-  int increment_value;
+  intptr_t increment_value;
   string intrinsic_name;
   expression test_condition;
 

@@ -22,6 +22,7 @@
 
 */
 #include "points_to_private.h"
+#include "effects.h"
 #define SEQUENTIAL_POINTS_TO_SETS_SUFFIX ".pt"
 #define USER_POINTS_TO_SETS_SUFFIX ".upt"
 

@@ -29,11 +29,13 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 #include "pipsdbm.h"
 #include "effects-generic.h"

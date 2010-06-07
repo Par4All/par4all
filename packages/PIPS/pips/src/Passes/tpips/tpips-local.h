@@ -65,7 +65,8 @@ extern void tp_restart(FILE *);
 
 #define QUIT         "quit"
 #define HELP         "help"
-#define ECHO         "echo"
+/* macro ECHO is reserved by flex */
+#define ECHO_N         "echo"
 
 #define skip_blanks(str) \
   while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++

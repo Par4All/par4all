@@ -39,12 +39,14 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 
 #include "misc.h"
 #include "properties.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -90,8 +92,8 @@ effect translate_effect_to_sdfi_effect(effect eff)
 {
   effect ge = (*effect_dup_func)(eff);
   reference ger = effect_any_reference(ge);
-  entity v = reference_variable(ger);
-  type ut = ultimate_type(entity_type(v));
+  //entity v = reference_variable(ger);
+  //type ut = ultimate_type(entity_type(v));
 
   /* FI: I want to change this function and preserve indices when they
      are constant or unbounded. This is needed to extend the effect
@@ -1112,8 +1114,8 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
 	      {
 		expression arg1 = EXPRESSION(CAR(args));
-		syntax s1 = expression_syntax(arg1);
-		reference r1 = syntax_reference(s1);
+		//syntax s1 = expression_syntax(arg1);
+		//reference r1 = syntax_reference(s1);
 		list l_real_arg = NIL;
 		effect eff1;
 		bool anywhere_w_p = false;
@@ -1128,7 +1130,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		  generic_proper_effects_of_complex_address_expression
 		  (arg1, &eff1, true);
 
-		pips_debug(6, "base effect :\n", eff1);
+		pips_debug_effect(6, "base effect :%s\n", eff1);
 
 		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
@@ -1136,7 +1138,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    list eff_ind = reference_indices(eff_ref);
 		    tag eff_act = effect_action_tag(eff);
 		    
-		    pips_debug_effect(6, "current effect :\n", eff);
+		    pips_debug_effect(6, "current effect :%s\n",eff);
 		    
 		    if ((anywhere_r_p && eff_act == is_action_read) || (anywhere_w_p && eff_act == is_action_write))
 		      {
@@ -1358,7 +1360,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	case is_syntax_cast :
 	  {
 	    /* Ignore the cast */
-	    cast c = syntax_cast(real_s);
+	    //cast c = syntax_cast(real_s);
 	    bool read_p = false, write_p = false;
 	    pips_user_warning("Cast in actual parameter -> anywhere effect\n");
 	    FOREACH(EFFECT, eff, l_sum_eff)

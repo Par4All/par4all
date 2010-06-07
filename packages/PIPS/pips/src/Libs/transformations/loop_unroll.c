@@ -36,11 +36,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 #include "database.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 
 #include "boolean.h"
@@ -157,7 +159,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         statement body, stmt;
         instruction block, inst;
         range rg;
-        int lbval, ubval, incval;
+        intptr_t lbval, ubval, incval;
         bool numeric_range_p = FALSE;
         if(get_debug_level()==7) {
             /* Start debug in Newgen */
@@ -467,12 +469,12 @@ loop_unroll(statement loop_statement, int rate)
 
 bool loop_fully_unrollable_p(loop l)
 {
-  bool unroll_p = FALSE;
+  bool unroll_p = false;
   range lr = loop_range(l);
   expression lb = range_lower(lr);
   expression ub = range_upper(lr);
   expression inc = range_increment(lr);
-  int lbval, ubval, incval;
+  intptr_t lbval, ubval, incval;
 
   pips_debug(2, "begin\n");
 
@@ -500,7 +502,7 @@ void full_loop_unroll(statement loop_statement)
     expression rhs_expr, expr;
     statement stmt;
     instruction block;
-    int lbval, ubval, incval;
+    intptr_t lbval, ubval, incval;
     int iter;
 
     pips_debug(2, "begin\n");

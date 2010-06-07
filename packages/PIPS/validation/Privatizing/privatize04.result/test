@@ -11,7 +11,6 @@ void c_est_dommage()
    }
    j = l;
 }
-extern void c_est_dommage();
 void c_est_dommage()
 {
    int i, j, k, l;
@@ -27,4 +26,3 @@ void c_est_dommage()
    }
    j = l;
 }
-extern void c_est_dommage();

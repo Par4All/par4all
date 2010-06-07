@@ -41,7 +41,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "misc.h"
@@ -49,6 +51,7 @@
 #include "effects-generic.h"
 #include "alias-classes.h"
 #include "control.h" // for clean_up_sequences
+#include "transformations.h"
 
 static void remove_unread_variable(statement s, entity e)
 {
@@ -120,7 +123,6 @@ static void remove_unread_variables(statement s)
 {
     if(statement_block_p(s))
     {
-        list effects = load_cumulated_rw_effects_list(s);
         FOREACH(ENTITY,e,statement_declarations(s))
         {
             if(entity_variable_p(e)) {
@@ -228,6 +230,7 @@ static bool unused_local_variable_p(entity var, set used, string module)
     // keep function auto-declaration for recursion
     && !same_string_p(entity_local_name(var), module)
     && !set_belong_p(used, var)
+    && !formal_parameter_p(var)
     && type_variable_p(ultimate_type(entity_type(var)));
 }
 

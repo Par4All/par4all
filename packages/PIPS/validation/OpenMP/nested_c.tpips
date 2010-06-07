@@ -40,8 +40,7 @@ apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
 apply UNSPLIT
-shell gcc -fopenmp -c nested_c.database/Src/nested_c.c
-shell rm *.o
+shell gcc -fopenmp -c nested_c.database/Src/nested_c.c -o nested_c.database/Src/nested_c.o
 
 close
 delete nested_c

@@ -580,14 +580,14 @@ ipow(int vg, int vd)
   returns FALSE otherwise.
 */
 bool
-expression_integer_value(expression e, int * pval)
+expression_integer_value(expression e, intptr_t * pval)
 {
-    bool is_int = FALSE;
+    bool is_int = false;
     value v = EvalExpression(e);
 
     if (value_constant_p(v) && constant_int_p(value_constant(v))) {
         *pval = constant_int(value_constant(v));
-        is_int = TRUE;
+        is_int = true;
     }
 
     free_value(v);
@@ -600,7 +600,7 @@ expression_integer_value(expression e, int * pval)
 */
 bool
 expression_negative_integer_value_p(expression e) {
-  int v;
+  intptr_t v;
   return expression_integer_value(e, &v) && (v < 0);
 }
 
@@ -626,10 +626,10 @@ expression range_to_expression(range r,enum range_to_expression_mode mode)
  * count is returned. See also SizeOfRange().
  */
 bool
-range_count(range r, int * pcount)
+range_count(range r, intptr_t * pcount)
 {
     bool success = FALSE;
-    int l, u, inc;
+    intptr_t l, u, inc;
 
     if(expression_integer_value(range_lower(r), &l)
        && expression_integer_value(range_upper(r), &u)

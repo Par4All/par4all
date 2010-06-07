@@ -167,6 +167,8 @@ void print_sentence(FILE * fd, sentence s) {
           if (strlen(label) > 0)
             fprintf_sentence(fd, isdigit(label[0]) ? "l%s:" : "%s:", label);
           break;
+        default:
+          pips_internal_error("language unknown not handled");
       }
     } else if (lang==is_language_fortran) {
       fprintf_sentence(fd, "      ");

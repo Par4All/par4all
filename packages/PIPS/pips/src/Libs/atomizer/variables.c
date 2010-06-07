@@ -39,6 +39,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "graph.h"
 #include "dg.h"
 

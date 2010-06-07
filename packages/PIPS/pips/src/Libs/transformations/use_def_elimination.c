@@ -32,7 +32,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 #include "misc.h"
 #include "control.h"
@@ -54,6 +56,7 @@ typedef dg_vertex_label vertex_label;
 /* */
 #include "ricedg.h"
 #include "semantics.h"
+#include "preprocessor.h"
 #include "transformations.h"
 
 static graph dependence_graph;
@@ -572,3 +575,299 @@ use_def_elimination(char * module_name)
    /* Should have worked: */
    return TRUE;
 }
+
+/* moved from ri-util/statements.c */
+
+
+/**  @} */
+
+/**
+ * @name declarations updater
+ * @{ */
+
+/**
+ * helper looking in a reference for referenced entities
+ *
+ * @param r reference to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_reference_walker(reference r, set re)
+{
+  entity e = reference_variable(r);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a call for referenced entities
+ *
+ * @param c call to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_call_walker(call c, set re)
+{
+  entity e = call_function(c);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a loop for referenced entities
+ *
+ * @param l loop to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_loop_walker(loop l, set re)
+{
+  entity e = loop_index(l);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+
+/**
+ * helper looking in a list for referenced entities
+ *
+ * @param l list to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_list_walker(list l, set re)
+{
+  FOREACH(ENTITY,e,l)
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+      set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a ram for referenced entities
+ *
+ * @param r ram to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_ram_walker(ram r, set re)
+{
+  statement_clean_declarations_list_walker(ram_shared(r),re);
+}
+
+/**
+ * helper looking in an area for referenced entities
+ *
+ * @param a area to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_area_walker(area a, set re)
+{
+    statement_clean_declarations_list_walker(area_layout(a),re);
+}
+
+/**
+ * helper diving into an entity to find referenced entities
+ *
+ * @param e entity to dive into
+ * @param re set to fill
+ *
+ */
+void entity_get_referenced_entities(entity e, set re)
+{
+  /*if(entity_variable_p(e))*/ {
+    gen_context_multi_recurse(entity_type(e),re,
+			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			      call_domain,gen_true,statement_clean_declarations_call_walker,
+			      NULL
+			      );
+    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+    if( !value_undefined_p(entity_initial(e) ) ) {
+      gen_context_multi_recurse(entity_initial(e),re,
+				call_domain,gen_true,statement_clean_declarations_call_walker,
+				reference_domain,gen_true,statement_clean_declarations_reference_walker,
+				area_domain,gen_true,statement_clean_declarations_area_walker,
+				ram_domain,gen_true,statement_clean_declarations_ram_walker,
+				NULL);
+    }
+  }
+}
+
+/**
+ * helper iterating over statement declaration to find referenced entities
+ *
+ * @param s statement to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_statement_walker(statement s, set re)
+{
+  FOREACH(ENTITY,e,statement_declarations(s))
+    entity_get_referenced_entities(e,re);
+}
+
+
+/**
+ * retrieves the set of entites used in elem
+ * beware that this entites may be formal parameters, functions etc
+ * so please filter this set depending on your need
+ *
+ * @param elem  element to check (any gen_recursifiable type is allowded)
+ *
+ * @return set of referenced entities
+ */
+set get_referenced_entities(void* elem)
+{
+  set referenced_entities = set_make(set_pointer);
+
+  /* if s is an entity it self, add it */
+  if(INSTANCE_OF(entity,(gen_chunkp)elem))
+      set_add_element(referenced_entities,referenced_entities,elem);
+
+  /* gather entities from s*/
+  gen_context_multi_recurse(elem,referenced_entities,
+			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
+			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			    call_domain,gen_true,statement_clean_declarations_call_walker,
+			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
+			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
+			    NULL);
+
+  /* gather all entities referenced by referenced entities */
+  set other_referenced_entities = set_make(set_pointer);
+  SET_FOREACH(entity,e,referenced_entities)
+    {
+      entity_get_referenced_entities(e,other_referenced_entities);
+    }
+
+  /* merge results */
+  set_union(referenced_entities,other_referenced_entities,referenced_entities);
+  set_free(other_referenced_entities);
+
+  return referenced_entities;
+}
+
+/**
+ * remove useless entities from declarations
+ * an entity is flagged useless when no reference is found in stmt
+ * and when it is not used by an entity found in stmt
+ *
+ * @param declarations list of entity to purge
+ * @param stmt statement where entities are used
+ *
+ */
+static void statement_clean_declarations_helper(list declarations, statement stmt)
+{
+    set referenced_entities = get_referenced_entities(stmt);
+    list decl_cpy = gen_copy_seq(declarations);
+
+    /* look for entity that are used in the statement
+     * SG: we need to work on  a copy of the declarations because of
+     * the RemoveLocalEntityFromDeclarations
+     */
+    FOREACH(ENTITY,e,decl_cpy)
+    {
+        /* area and parameters are always used, so are referenced entities */
+        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))) || entity_struct_p(e) || entity_union_p(e) );
+        else
+        {
+            /* entities whose declaration have a side effect are always used too */
+            bool has_side_effects_p = false;
+            value v = entity_initial(e);
+            list effects = NIL;
+            if( value_expression_p(v) )
+                effects = gen_nconc(effects,expression_to_proper_effects(value_expression(v)));
+            /* one should check if dimensions do not have side effects either */
+            if(entity_variable_p(e)) {
+                FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
+                {
+                    expression upper = dimension_upper(dim),
+                               lower = dimension_lower(dim);
+                    effects=gen_nconc(effects,expression_to_proper_effects(upper));
+                    effects=gen_nconc(effects,expression_to_proper_effects(lower));
+                }
+            }
+            FOREACH(EFFECT, eff, effects)
+            {
+                if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+            }
+            gen_full_free_list(effects);
+
+            /* do not keep the declaration, and remove it from any declaration_statement */
+            if( !has_side_effects_p ) {
+                RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),stmt);
+            }
+        }
+    }
+
+    gen_free_list(decl_cpy);
+    set_free(referenced_entities);
+}
+
+/**
+ * check if all entities used in s and module are declared in module
+ * does not work as well as expected on c module because it does not fill the statement declaration
+ * @param module module to check
+ * @param s statement where reference can be found
+ */
+static void entity_generate_missing_declarations(entity module, statement s)
+{
+  /* gather referenced entities */
+  set referenced_entities = get_referenced_entities(s);
+  set ref_tmp = set_make(set_pointer);
+  /* gather all entities referenced by referenced entities */
+  SET_FOREACH(entity,e0,referenced_entities) {
+    entity_get_referenced_entities(e0,ref_tmp);
+  }
+
+  referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
+  set_free(ref_tmp);
+
+  /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
+  list new = NIL;
+  SET_FOREACH(entity,e1,referenced_entities) {
+    if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
+      new=CONS(ENTITY,e1,new);
+  }
+
+  set_free(referenced_entities);
+  sort_list_of_entities(new);
+  entity_declarations(module)=gen_nconc(new,entity_declarations(module));
+}
+
+
+/**
+ * remove all the entity declared in s but never referenced
+ * it's a lower version of use-def-elim !
+ *
+ * @param s statement to check
+ */
+void statement_clean_declarations(statement s)
+{
+    if(statement_block_p(s)) {
+        statement_clean_declarations_helper( statement_declarations(s),s);
+    }
+}
+
+/**
+ * remove all entities declared in module but never used in s
+ *
+ * @param module module to check
+ * @param s statement where entites may be used
+ */
+void entity_clean_declarations(entity module,statement s)
+{
+    entity curr = get_current_module_entity();
+    if( ! same_entity_p(curr,module)) {
+        reset_current_module_entity();
+        set_current_module_entity(module);
+    }
+    else
+        curr=entity_undefined;
+
+    statement_clean_declarations_helper(entity_declarations(module),s);
+    if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
+        entity_generate_missing_declarations(module,s);
+
+    if(!entity_undefined_p(curr)){
+        reset_current_module_entity();
+        set_current_module_entity(curr);
+    }
+
+}
+
+/**  @} */

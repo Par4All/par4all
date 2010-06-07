@@ -31,6 +31,10 @@
 /*
 Matrice's format: A[0]=denominator.stock column to column
 */
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
 #include <stdio.h>
 
 #include "boolean.h"

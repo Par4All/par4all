@@ -69,6 +69,21 @@ typedef int (* hash_equals_t)(const void *, const void *);
     }									\
   }
 
+/* SG: the UNIQUE_NAME code is duplicated from newgen_list.h
+ * should it be put in another header ?
+ */
+#define UNIQUE_NAME_1(prefix, x)   prefix##x
+#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
+#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
+
+#define HASH_FOREACH(key_type,k,value_type, v, h) \
+    register void * UNIQUE_NAME = NULL;\
+    key_type k;\
+    value_type v;\
+    while((UNIQUE_NAME =\
+                 hash_table_scan(h,UNIQUE_NAME,&k,&v)))
+
+
 // hash_put_or_update() uses the warn_on_redefinition
 #define hash_put_or_update(h, k, v)			\
   if (hash_warn_on_redefinition_p())			\

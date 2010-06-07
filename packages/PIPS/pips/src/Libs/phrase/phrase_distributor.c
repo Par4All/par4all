@@ -30,11 +30,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -340,52 +342,51 @@ static list identify_statements_to_distribute (statement module_stat)
   }, statements_containing_begin_tag);
 
   /* */
-  MAP (STATEMENT, s, {
-    statement sequence_statement;
-    string function_name;
-    string end_tag;
-    list potential_end_statement = NIL;
-    sequence_statement = sequence_statement_containing (module_stat,s);
-    ifdebug(5) {
-      pips_debug(5, "Potential externalizable statement contained in a sequence \n");
-      print_statement(s);
-    }
-    function_name = get_externalizable_function_name(s);
-    if (function_name != NULL) {
-      pips_debug(5, "Name: [%s] \n", function_name);
-      end_tag ;
-      asprintf (&end_tag, EXTERNALIZED_CODE_PRAGMA_END,function_name);
-      potential_end_statement
-	= get_statements_with_comments_containing (end_tag,
-						   sequence_statement);
-      if (gen_length(potential_end_statement) == 1) {
-	statement begin_tag_statement = s;
-	statement end_tag_statement 
-	  = STATEMENT(gen_nth(0,potential_end_statement));
-	statement container_of_end_tag_statement
-	  = sequence_statement_containing (sequence_statement, end_tag_statement);
-	if (container_of_end_tag_statement == sequence_statement) {
-	  statement externalized_code
-	    = isolate_code_portion (begin_tag_statement, 
-				    end_tag_statement, 
-				    sequence_statement);
-	  statements_to_distribute 
-	    = CONS (STATEMENT,
-		    externalized_code,
-		    statements_to_distribute);
-	}
-	else {
-	  pips_user_warning("Malformed externalized code portion identified [%s]. End tag found at a bad place!!!. Ignored.\n", function_name);
-	}
+  FOREACH (STATEMENT, s, statements_contained_in_a_sequence){
+      statement sequence_statement;
+      string function_name;
+      string end_tag;
+      list potential_end_statement = NIL;
+      sequence_statement = sequence_statement_containing (module_stat,s);
+      ifdebug(5) {
+          pips_debug(5, "Potential externalizable statement contained in a sequence \n");
+          print_statement(s);
+      }
+      function_name = get_externalizable_function_name(s);
+      if (function_name != NULL) {
+          pips_debug(5, "Name: [%s] \n", function_name);
+          asprintf (&end_tag, EXTERNALIZED_CODE_PRAGMA_END,function_name);
+          potential_end_statement
+              = get_statements_with_comments_containing (end_tag,
+                      sequence_statement);
+          if (gen_length(potential_end_statement) == 1) {
+              statement begin_tag_statement = s;
+              statement end_tag_statement 
+                  = STATEMENT(gen_nth(0,potential_end_statement));
+              statement container_of_end_tag_statement
+                  = sequence_statement_containing (sequence_statement, end_tag_statement);
+              if (container_of_end_tag_statement == sequence_statement) {
+                  statement externalized_code
+                      = isolate_code_portion (begin_tag_statement, 
+                              end_tag_statement, 
+                              sequence_statement);
+                  statements_to_distribute 
+                      = CONS (STATEMENT,
+                              externalized_code,
+                              statements_to_distribute);
+              }
+              else {
+                  pips_user_warning("Malformed externalized code portion identified [%s]. End tag found at a bad place!!!. Ignored.\n", function_name);
+              }
+          }
+          else {
+              pips_user_warning("Malformed externalized code portion identified [%s]. %d end tags found!!!. Ignored.\n", function_name, gen_length(potential_end_statement));
+          }
       }
       else {
-	pips_user_warning("Malformed externalized code portion identified [%s]. %d end tags found!!!. Ignored.\n", function_name, gen_length(potential_end_statement));
+          pips_user_warning("Malformed externalized code portion identified [Unnamed]!!!. Ignored.\n");
       }
-    }
-    else {
-      pips_user_warning("Malformed externalized code portion identified [Unnamed]!!!. Ignored.\n");
-    }
-  }, statements_contained_in_a_sequence);
+  }
 
   return statements_to_distribute;
 }

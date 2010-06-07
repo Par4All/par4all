@@ -5,7 +5,6 @@ void pas_vous()
       for(j = 12; j <= i-1; j += 1)
          printf("%d", j);
 }
-extern void pas_vous();
 void pas_vous()
 {
    int i, j, k;
@@ -15,4 +14,3 @@ void pas_vous()
       for(j = 12; j <= i-1; j += 1)
          printf("%d", j);
 }
-extern void pas_vous();
