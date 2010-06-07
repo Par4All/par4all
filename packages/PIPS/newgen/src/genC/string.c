@@ -40,6 +40,9 @@
   contraire, la chaine resultat est padde avec des caracteres null.
 
 */
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
 
 #include <assert.h>
 #include <stdlib.h>
