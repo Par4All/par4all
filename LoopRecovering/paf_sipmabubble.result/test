@@ -1,0 +1,167 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void paf_sipmabubble(int n, int A[n])
+{
+
+//  T(i) {i==n}
+
+   int i = n;
+
+//  T(i) {i#init==n, 0<=i, 0<=i#init}
+
+   while (i>=0) {
+
+//  T(j) {j==0, 0<=i, 0<=n}
+
+      int j = 0;
+
+//  T(j) {j#init==0, 1<=i, j+1<=i, 0<=n}
+
+      while (j<=i-1) {
+
+//  T() {1<=i, j+1<=i, 0<=n}
+
+         if (A[j]>A[j+1]) {
+
+//  T(tmp) {1<=i, j+1<=i, 0<=n}
+
+            int tmp = A[j];
+
+//  T() {1<=i, j+1<=i, 0<=n}
+
+            A[j] = A[j+1];
+
+//  T() {1<=i, j+1<=i, 0<=n}
+
+            A[j+1] = tmp;
+         }
+
+//  T(j) {j==j#init+1, 1<=i, j<=i, 0<=n}
+
+         j++;
+      }
+
+//  T(i) {i==i#init-1, i==j-1, 0<=i+1, 0<=n}
+
+      i--;
+   }
+
+//  T() {i+1<=0, i<=n}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void paf_sipmabubble(int n, int A[n])
+{
+
+//  P() {}
+
+   int i = n;
+
+//  P(i) {i==n}
+
+   while (i>=0) {
+
+//  P(i) {0<=i, 0<=n}
+
+      int j = 0;
+
+//  P(i,j) {j==0, 0<=i, 0<=n}
+
+      while (j<=i-1) {
+
+//  P(i,j) {1<=i, j+1<=i, 0<=n}
+
+         if (A[j]>A[j+1]) {
+
+//  P(i,j) {1<=i, j+1<=i, 0<=n}
+
+            int tmp = A[j];
+
+//  P(i,j,tmp) {1<=i, j+1<=i, 0<=n}
+
+            A[j] = A[j+1];
+
+//  P(i,j,tmp) {1<=i, j+1<=i, 0<=n}
+
+            A[j+1] = tmp;
+         }
+
+//  P(i,j) {1<=i, j+1<=i, 0<=n}
+
+         j++;
+      }
+
+//  P(i,j) {i==j, 0<=i, 0<=n}
+
+      i--;
+   }
+
+//  P(i) {i+1<=0, i<=n}
+
+   return;
+}
+void paf_sipmabubble(int n, int A[n])
+{
+   int i = n;
+   for(i0 = i; i0 >= 0; i0 += -1) {
+      int j = 0;
+      i = i0;
+      for(j0 = j; j0 <= i-1; j0 += 1) {
+         j = j0;
+         if (A[j]>A[j+1]) {
+            int tmp = A[j];
+            A[j] = A[j+1];
+            A[j+1] = tmp;
+         }
+         j++;
+      }
+      i--;
+   }
+   return;
+}
+
+COMPLEXITY
+
+//                       15.50*i^2 - 15.50*i.j + 24.50*i - 15.50*j + 12 (SUMMARY)
+void paf_sipmabubble(int n, int A[n])
+{
+//                                                                    0 (STMT)
+   int i = n;
+//                       15.50*i^2 - 15.50*i.j + 24.50*i - 15.50*j + 12 (DO)
+   for(i0 = i; i0 >= 0; i0 += -1) {
+//                                                                    0 (STMT)
+      int j = 0;
+//                                                                    2 (STMT)
+      i = i0;
+//                                                15.50*i - 15.50*j + 4 (DO)
+      for(j0 = j; j0 <= i-1; j0 += 1) {
+//                                                                    2 (STMT)
+         j = j0;
+//                                                                10.50 (TEST)
+         if (A[j]>A[j+1]) {
+//                                                                    0 (STMT)
+            int tmp = A[j];
+//                                                                    5 (STMT)
+            A[j] = A[j+1];
+//                                                                    4 (STMT)
+            A[j+1] = tmp;
+         }
+//                                                                    2 (STMT)
+         j++;
+      }
+//                                                                    2 (STMT)
+      i--;
+   }
+//                                                                    0 (STMT)
+   return;
+}
