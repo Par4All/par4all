@@ -1,4 +1,6 @@
 
+%option nounput
+%option noinput
 %START COMMENT TEXT
 %{
 /*

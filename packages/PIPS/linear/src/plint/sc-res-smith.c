@@ -24,6 +24,10 @@
 
  /* Package plint (Programmation Lineaire en nombres entiers, i.e. INTeger) */
 
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
