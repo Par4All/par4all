@@ -13,13 +13,13 @@ Par4All setup script.
 On Ubuntu/Debian you need to have these packages installed for building:
 
     sudo aptitude install libc6 python libncurses5 libreadline5 subversion cproto build-essential bison flex libreadline5-dev libtool autoconf \
-libmcrypt-dev libmcrypt4 cproto indent gfortran tex4ht texlive-latex-extra swig git-core python-ply automake python-dev libgmp3-dev libmpfr-dev
+libmcrypt-dev libmcrypt4 cproto indent gfortran tex4ht texlive-latex-extra swig git-core python-ply automake python-dev libgmp3-dev libmpfr-dev python3.1 fakeroot
 
 (Optional packages for compiling non working GUIs: emacs23 tk8.5 sun-java6-jdk)
 
 For running the binaries, you only need those packages:
 
-    sudo aptitude install libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran
+    sudo aptitude install libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran python3.1
 
 '''
 
@@ -405,8 +405,8 @@ def main():
         "src/dev/p4a_git", 
         "src/dev/p4a_valgrind", 
         "src/simple_tools/p4a",
-        "src/simple_tools/p4a_setup",
-        "src/simple_tools/p4a_pack",
+        #"src/simple_tools/p4a_setup",
+        #"src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
         "src/validation/p4a_validate", 
         "src/validation/p4a_validation",
