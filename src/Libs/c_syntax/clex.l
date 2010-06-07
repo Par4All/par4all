@@ -84,12 +84,12 @@ static int C_line_number = UNDEFINED_C_LINE_NUMBER;
    I guess that it is currently not used since file inclusion is already
    done by the preprocessor... RK
 */
-DEFINE_LOCAL_STACK(line_number, intptr_t)
+DEFINE_LOCAL_STACK(line_number, _int)
 
 /* To track the absolute line number in the file that is parsed
    use the default flex yylineno that is renamed c_lineno here */
 /* Use a stack to survive to file inclusions if any */
-DEFINE_LOCAL_STACK(absolute_line_number, intptr_t)
+DEFINE_LOCAL_STACK(absolute_line_number, _int)
 
 /* Count the number of c in s. */
 unsigned int character_occurences_in_string(string s, char c)
