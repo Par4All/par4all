@@ -66,6 +66,26 @@ static bool is_expression_omp_if_p (expression exp) {
   return (ENTITY_OMP_IF_P (ent));
 }
 
+static bool is_expression_omp_reduction_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return (ENTITY_OMP_REDUCTION_P (ent));
+}
+
+static bool is_expression_omp_omp_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return ENTITY_OMP_OMP_P(ent);
+}
+
+static bool is_expression_omp_for_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return ENTITY_OMP_FOR_P(ent);
+}
+
+static bool is_expression_omp_parallel_p (expression exp) {
+  entity ent = expression_to_entity (exp);
+  return ENTITY_OMP_PARALLEL_P(ent);
+}
+
 static if_clause_policy get_if_clause_policy (void) {
   if_clause_policy result = IGNORE_IF_POLICY;
   string prop = get_string_property ("OMP_IF_MERGE_POLICY");
@@ -229,7 +249,8 @@ list pragma_omp_parallel_for_as_exprs (void) {
    @brief merge omp pragma.
    @return the merged pragma as a list of expression
    @param l_pragma, the list of pragma to merge. The pragama as to be
-   a list of expression.
+   a list of expression ordered. The pragma list has to be ordered
+   from the outer pragma to the inner pragma as in the original loop nest.
 **/
 list pragma_omp_merge_expr (list l_pragma) {
   // The "omp parallel for" as a list of expression
@@ -238,21 +259,31 @@ list pragma_omp_merge_expr (list l_pragma) {
   list priv_var = NIL;
   // The list of condition of the if clauses
   list if_cond = NIL;
+  // The list of reductions
+  list red = NIL;
   // Get the if clause policy
   if_clause_policy policy = get_if_clause_policy ();
+  // the outer flag
+  bool flag = TRUE;
 
-  // look into each pragma for private and if clauses
+  // look into each pragma for private, reduction and if clauses
   FOREACH (PRAGMA, p, l_pragma) {
     pips_assert ("Can only merge a list of pragma as expression",
 		 pragma_expression_p (p));
     FOREACH (EXPRESSION, e, pragma_expression (p)) {
-      // get the arguments that are either the private variables or the
-      // if condition
+      // check each expression and save what need to be saved to generate
+      // the new omp pragma
       call c = expression_call (e);
       list args = call_arguments (c);
       // bind the args to the right list
       if (is_expression_omp_private_p (e)) {
-	priv_var = gen_nconc (priv_var, args);
+	// each private var has to be uniquely declared
+	list add = NIL;
+	FOREACH (EXPRESSION, exp, args) {
+	  if (expression_equal_in_list_p (exp, priv_var) == FALSE)
+	    add = gen_expression_cons (exp, add);
+	}
+	priv_var = gen_nconc (priv_var, add);
       }
       else if (is_expression_omp_if_p (e)) {
 	// if clause : check the policy
@@ -264,16 +295,41 @@ list pragma_omp_merge_expr (list l_pragma) {
 	case OR_IF_POLICY:
 	  if_cond = gen_nconc (if_cond, args);
 	  break;
+	default:
+	  pips_assert ("Should not happend",FALSE);
+	  break;
 	}
       }
+      else if (is_expression_omp_reduction_p (e)) {
+	// Only the reductions clause on the outer loop need to be saved
+	if (flag == TRUE) {
+	  red = gen_expression_cons (e, red);
+	}
+      }
+      else if ( is_expression_omp_omp_p (e) ||
+		is_expression_omp_for_p (e) ||
+		is_expression_omp_parallel_p (e) ) {
+	// nothing to do the omp parallel for will be automaticly generated
+      }
+      else {
+	print_expression (e);
+	pips_assert ("pips cannot merge this pragma clause",FALSE);
+      }
     }
+    flag = FALSE;
   }
-  // build the private clause
-  expression priv = pragma_private_as_expr_with_args (priv_var);
-  // append the private clause to the omp parallel for
-  result = gen_expression_cons (priv, result);
+  // build the private clause if needed
+  if (priv_var != NIL) {
+    expression priv = pragma_private_as_expr_with_args (priv_var);
+    // append the private clause to the omp parallel for
+    result = gen_expression_cons (priv, result);
+  }
+  // append the reduction clauses if any
+  if (red != NIL) {
+    result = gen_nconc (red, result);
+  }
+  // merge the if condition if needed
   if (policy != IGNORE_IF_POLICY) {
-    // merge the if condition
     expression expr_if = merge_conditions (if_cond, policy);
     // encapsulate the condition into the if clause
     expr_if = pragma_if_as_expr (expr_if);
@@ -349,6 +405,8 @@ pragma_to_string (pragma p) {
     s = string_buffer_to_string (sb);
     // Free the buffer with its strings
     string_buffer_free_all(&sb);
+    // restore the list as it was at the begining
+    gen_nreverse (l_expr);
     break;
   case is_pragma_entity:
     return directive_to_string(load_global_directives(pragma_entity(p)),false);
@@ -429,6 +487,11 @@ add_pragma_expr_to_statement(statement st, list l) {
   list el = extensions_extension(es);
   el = gen_extension_cons(e, el);
   extensions_extension(es) = el;
+  ifdebug (5) {
+    string str = pragma_to_string (p);
+    if (str != string_undefined)
+      pips_debug (5, "pragma : %s added\n", str);
+  }
 }
 
 /** @brief  Add an expression to the pragma current expression list.
@@ -443,6 +506,9 @@ add_expr_to_pragma_expr_list (pragma pr, expression ex) {
   list exprs = pragma_expression (pr);
   exprs = gen_expression_cons (ex, exprs);
   pragma_expression (pr) = exprs;
+  string str = pragma_to_string (pr);
+  pips_debug(5, "after: %s", str);
+  free (str);
   return;
 }
 

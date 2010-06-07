@@ -584,7 +584,7 @@ static int implied_do_reference_number(expression e)
   if(lvp>0) {
     expression re = EXPRESSION(CAR(CDR(args)));
     range r = syntax_range(expression_syntax(re));
-    int c = -1;
+    intptr_t c = -1;
 
     ifdebug(2)
       pips_assert("The second argument of an implied do is a range",

@@ -4,6 +4,9 @@
  * @author pierre villalon <pierre.villalon@hpc-project.com>
  * @date 2009-05-24
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include "local-header.h"
 

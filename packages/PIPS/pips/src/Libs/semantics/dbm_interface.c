@@ -55,7 +55,9 @@
 #include "resources.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -496,7 +498,7 @@ static transformer ordinary_summary_precondition(string module_name,
     list lc = callees_callees(callers);
 
     ifdebug(1) {
-      pips_debug(1, "begin for %s with %d callers\n",
+      pips_debug(1, "begin for %s with %zd callers\n",
 		 module_name,
 		 gen_length(lc));
       FOREACH(STRING, caller_name, lc) {

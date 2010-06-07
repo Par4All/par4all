@@ -40,9 +40,11 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "properties.h"
 

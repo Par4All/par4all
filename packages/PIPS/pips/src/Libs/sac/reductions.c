@@ -28,11 +28,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "semantics.h"
@@ -59,9 +61,7 @@ typedef dg_vertex_label vertex_label;
 
 static entity make_float_constant_entity(float c)
 {
-    entity ce;
     char num[32];
-    string cn;
 
     snprintf(num,sizeof(num)/sizeof(*num), "%f", c);
     return MakeConstant(num,is_basic_float);

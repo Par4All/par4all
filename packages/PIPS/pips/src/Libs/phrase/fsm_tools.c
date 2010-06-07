@@ -42,11 +42,13 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "resources.h"
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "text-util.h"
@@ -87,7 +89,7 @@ entity create_state_variable (string module_name,
   entity module;
   entity new_state_variable;
   string state_variable_name;
-  char *buffer;
+  //char *buffer;
 
   module = module_name_to_entity(module_name);
 
@@ -435,7 +437,7 @@ statement make_fsm_transitions_statement (statement stat,
     }
   }, unstructured_entry(nodes_graph), blocs);
 
-  pips_debug(2,"blocs count = %d\n", gen_length(blocs));
+  pips_debug(2,"blocs count = %zd\n", gen_length(blocs));
  
   return returned_statement;
 }
@@ -545,10 +547,10 @@ statement fsmize_statement (statement stat,
   ifdebug(2) {
     print_statement(stat);
   }
-  pips_debug(2,"domain number = %d\n", statement_domain_number(stat));
+  pips_debug(2,"domain number = %"PRIdPTR"\n", statement_domain_number(stat));
   pips_debug(2,"entity = UNDEFINED\n");
-  pips_debug(2,"statement number = %d\n", statement_number(stat));
-  pips_debug(2,"statement ordering = %d\n", statement_ordering(stat));
+  pips_debug(2,"statement number = %"PRIdPTR"\n", statement_number(stat));
+  pips_debug(2,"statement ordering = %"PRIdPTR"\n", statement_ordering(stat));
   if (statement_with_empty_comment_p(stat)) {
     pips_debug(2,"statement comments = EMPTY\n");
   }

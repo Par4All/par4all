@@ -44,12 +44,14 @@
 #include "genC.h"
 
 #include "ri.h"
+#include "effects.h"
 #include "text.h"
 #include "text-util.h"
 #include "constants.h"
 #include "control.h"      /* CONTROL_MAP is defined there */
 #include "properties.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "misc.h"
 #include "database.h"     /* DB_PUT_FILE_RESOURCE is defined there */

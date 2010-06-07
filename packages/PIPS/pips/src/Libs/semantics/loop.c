@@ -34,11 +34,13 @@
 /* #include "database.h" */
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 /*
 #include "text.h"
 #include "text-util.h"
 */
 #include "ri-util.h"
+#include "effects-util.h"
 /* #include "constants.h" */
 /* #include "control.h" */
 #include "effects-generic.h"
@@ -336,7 +338,7 @@ transformer new_whileloop_to_transformer(whileloop wl,
 					 transformer pre,
 					 list wlel) /* effects of whileloop wl */
 {
-  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_continue)* */
   transformer t_body_star = transformer_undefined;
   statement body_s = whileloop_body(wl);
 

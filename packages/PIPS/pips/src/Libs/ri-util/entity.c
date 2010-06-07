@@ -550,7 +550,8 @@ bool entity_subroutine_p(entity e)
 }
 bool entity_pointer_p(entity e)
 {
-    basic b = entity_basic(e);
+    type t = ultimate_type(entity_type(e));
+    basic b  = type_variable_p(t) ? variable_basic(type_variable(t)): basic_undefined;
     return !basic_undefined_p(b) && basic_pointer_p(b);
 }
 
@@ -2085,6 +2086,8 @@ entity operator_neutral_element(entity op)
 
     const char * one_neutral []= {
         MULTIPLY_OPERATOR_NAME,
+        MULTIPLY_UPDATE_OPERATOR_NAME,
+        DIVIDE_UPDATE_OPERATOR_NAME,
         MIN_OPERATOR_NAME,
         AND_OPERATOR_NAME,
         NULL
@@ -2095,6 +2098,7 @@ entity operator_neutral_element(entity op)
     const char * plus_inf_neutral[] = {
         MIN_OPERATOR_NAME ,
         BITWISE_AND_OPERATOR_NAME,
+        BITWISE_AND_UPDATE_OPERATOR_NAME,
         NULL
     };
     for(int i=0;plus_inf_neutral[i];i++)
@@ -2115,7 +2119,10 @@ entity operator_neutral_element(entity op)
 
     const char * zero_neutral [] ={
         PLUS_OPERATOR_NAME,
+        MINUS_UPDATE_OPERATOR_NAME,
+        PLUS_UPDATE_OPERATOR_NAME,
         BITWISE_OR_OPERATOR_NAME,
+        BITWISE_OR_UPDATE_OPERATOR_NAME,
         PLUS_C_OPERATOR_NAME,
         OR_OPERATOR_NAME,
         NULL
@@ -2123,7 +2130,6 @@ entity operator_neutral_element(entity op)
     for(int i=0;zero_neutral[i];i++)
         if(same_string_p(zero_neutral[i],en)) return find_entity_0();
 
-    pips_internal_error("hunhadled case\n");
     return entity_undefined;
 }
 

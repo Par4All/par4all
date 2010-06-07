@@ -39,7 +39,9 @@
 #include "misc.h"
 #include "resources.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 
 #define DV_SUFFIX ".daVinci"

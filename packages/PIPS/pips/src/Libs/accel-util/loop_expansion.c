@@ -6,7 +6,9 @@
 #include "misc.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "properties.h"
@@ -150,7 +152,7 @@ void guard_expanded_statement_if_needed(statement s,expression guard, loop paren
 }
 
 static
-void do_loop_expansion(statement st, int size,int offset)
+void do_loop_expansion(statement st, int size,int offset,bool apply_guard)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -196,7 +198,8 @@ void do_loop_expansion(statement st, int size,int offset)
                     );
 
         /* set the guard on all statement that need it */
-        expression guard = MakeBinaryCall(
+        if(apply_guard) {
+            expression guard = MakeBinaryCall(
                     entity_intrinsic(AND_OPERATOR_NAME),
                     MakeBinaryCall(
                         entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
@@ -211,8 +214,9 @@ void do_loop_expansion(statement st, int size,int offset)
                         )
                     );
 
-        guard_expanded_statement_if_needed(loop_body(l),guard,l);
-        free_expression(guard);
+            guard_expanded_statement_if_needed(loop_body(l),guard,l);
+            free_expression(guard);
+        }
 
         /* update loop fields either by a constant, or by a new entity with appropriate init*/
         range_upper(r)=new_range_upper_value;
@@ -234,13 +238,37 @@ bool loop_expansion(const string module_name)
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
 
     debug_on("LOOP_EXPANSION_DEBUG_LEVEL");
+    /* first case: statement inserted by loop_expansion_init were illegal */
+    list statements_to_clean  = find_statements_with_pragma(get_current_module_statement(),get_string_property("STATEMENT_INSERTION_FAILURE_PRAGMA"));
+    list statements_to_merge  = find_statements_with_pragma(get_current_module_statement(),get_string_property("STATEMENT_INSERTION_SUCCESS_PRAGMA"));
+    /* generate guard if no statement to merge or no statement to clean */
+    bool apply_guard = ENDP(statements_to_merge) && ENDP(statements_to_clean);
 
+    /* remove the test statement */
+    FOREACH(STATEMENT,statement_to_clean,statements_to_clean)
+    {
+        update_statement_instruction(statement_to_clean,make_continue_instruction());
+        free_extensions(statement_extensions(statement_to_clean));
+        statement_extensions(statement_to_clean)=empty_extensions();
+    }
+
+    /* second case: statement inserted by loop_expansion_init were legal */
+    /* remove the test statement and merge */
+    FOREACH(STATEMENT,statement_to_clean,statements_to_merge)
+    {
+        update_statement_instruction(statement_to_clean,make_continue_instruction());
+        free_extensions(statement_extensions(statement_to_clean));
+        statement_extensions(statement_to_clean)=empty_extensions();
+
+    }
+
+    gen_free_list(statements_to_clean);
+    gen_free_list(statements_to_merge);
 
     string lp_label=get_string_property_or_ask(
             "LOOP_LABEL",
             "Which loop do you want to expand?\n(give its label):"
     );
-
     if( !empty_string_p(lp_label) )
     {
         entity lb_entity = find_label_entity(module_name,lp_label);
@@ -253,7 +281,7 @@ bool loop_expansion(const string module_name)
                 if( rate > 0)
                 {
                     /* ok for the ui part, let's do something !*/
-                    do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
+                    do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"),apply_guard);
                     /* commit changes */
                     module_reorder(get_current_module_statement()); ///< we may have add statements
                     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
@@ -273,6 +301,122 @@ bool loop_expansion(const string module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    return true;;
+
+}
+
+/* creates a new statement that perfom the expansion of the loop
+ * this statement is flagged for further processing */
+static
+void do_loop_expansion_init(statement st, int size,int offset)
+{
+    loop l =statement_loop(st);
+    range r = loop_range(l);
+    if(expression_constant_p(range_increment(r)))
+    {
+        /* compute the range of new loop
+         * range lower will be next step of loop
+         */
+
+        /* this gets (e-b)/i , that is the number of iterations in the loop */
+        expression nb_iter = range_to_expression(r,range_to_nbiter);
+        /* this gets the expanded nb_iter */
+        expression expanded_nb_iter = 
+            make_op_exp(MULTIPLY_OPERATOR_NAME,
+                    int_to_expression(size),
+                    make_op_exp(DIVIDE_OPERATOR_NAME,
+                        make_op_exp(PLUS_OPERATOR_NAME,
+                            nb_iter,
+                            make_op_exp(MINUS_OPERATOR_NAME,
+                                int_to_expression(size),
+                                int_to_expression(1)
+                                )
+                            ),
+                        int_to_expression(size)
+                        )
+                    );
+
+        expression new_range_lower = make_op_exp(PLUS_OPERATOR_NAME,copy_expression(range_lower(r)),
+                make_op_exp(MULTIPLY_OPERATOR_NAME,nb_iter,copy_expression(range_increment(r)))
+                );
+        expression new_range_upper = make_op_exp(MINUS_OPERATOR_NAME,
+                make_op_exp(PLUS_OPERATOR_NAME,
+                    copy_expression(range_lower(r)),
+                    make_op_exp(MULTIPLY_OPERATOR_NAME,expanded_nb_iter,copy_expression(range_increment(r)))
+                    ),
+                int_to_expression(1)
+
+                );
+
+        clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),get_current_module_statement());
+        statement inserted_statement = 
+            instruction_to_statement(
+                    make_instruction_loop(
+                        make_loop(
+                            loop_index(l),
+                            make_range(new_range_lower,new_range_upper,copy_expression(range_increment(r))),
+                            clone_statement(loop_body(l),cc),
+                            entity_empty_label(),
+                            make_execution_sequential(),
+                            NIL
+                            )
+                        )
+                );
+        free_clone_context(cc);
+        add_pragma_str_to_statement(inserted_statement,get_string_property("STATEMENT_INSERTION_PRAGMA"),true);
+        insert_statement(st,inserted_statement,false);
+    }
+    else
+        pips_user_warning("cannot expand a loop with non constant increment\n");
+
+}
+/* first step of the loop expansion process:
+ * create a statement to insert and flag it with a pragma
+ */
+bool loop_expansion_init(const char* module_name)
+{
+    set_current_module_entity(module_name_to_entity(module_name));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+
+    debug_on("LOOP_EXPANSION_INIT_DEBUG_LEVEL");
+
+
+    string lp_label=get_string_property_or_ask(
+            "LOOP_LABEL",
+            "Which loop do you want to expand?\n(give its label):"
+    );
+
+    if( !empty_string_p(lp_label) )
+    {
+        entity lb_entity = find_label_entity(module_name,lp_label);
+        if( !entity_undefined_p(lb_entity) )
+        {
+            statement loop_statement = find_loop_from_label(get_current_module_statement(),lb_entity);
+            if(!statement_undefined_p(loop_statement))
+            {
+                int rate = get_int_property("LOOP_EXPANSION_SIZE");
+                if( rate > 0)
+                {
+                    /* ok for the ui part, let's do something !*/
+                    do_loop_expansion_init(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
+                    /* commit changes */
+                    module_reorder(get_current_module_statement()); ///< we may have add statements
+                    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+                }
+                else pips_user_error("Please provide a positive loop expansion size\n");
+            }
+            else pips_user_error("label '%s' is not put on a loop\n",lp_label);
+
+
+        }
+        else pips_user_error("loop label `%s' does not exist\n", lp_label);
+    }
+    else pips_user_error("transformation cancelled \n", lp_label);
+
+    debug_off();
+    reset_current_module_entity();
+    reset_current_module_statement();
     return true;;
 
 }

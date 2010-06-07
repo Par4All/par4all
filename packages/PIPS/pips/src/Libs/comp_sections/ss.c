@@ -1046,7 +1046,8 @@ Ubound(loop Loop, LinExpr Lin)
 simple_section 
 SimpUnion(simple_section S1, simple_section S2)
 {
-  simple_section UnionDad;
+/* SG: i am unsure this is a valid init */
+  simple_section UnionDad = make_simple_section(context_info_undefined,make_dad_struct(NIL,NIL));
   tag Variant;
   size_t i;
   LinExpr Low, Up;

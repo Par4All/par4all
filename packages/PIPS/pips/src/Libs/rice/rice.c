@@ -48,6 +48,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "misc.h"
 

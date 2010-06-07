@@ -32,6 +32,7 @@
 /*{{{  newgen includes*/
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 
 /*}}}*/
@@ -51,6 +52,7 @@
 /* Pips includes 	*/
 #include "ri.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 /*#include "graph.h"*/
 #include "dg.h"

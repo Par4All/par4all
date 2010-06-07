@@ -118,10 +118,6 @@ void remove_entity_type_stack(entity e)
 
 void remove_entity_type_stacks(list el)
 {
-  list ce = list_undefined;
-
-  //for(ce=el; !ENDP(ce); POP(ce)) {
-  //entity e = ENTITY(CAR(ce));
   FOREACH(ENTITY, e, el) {
     remove_entity_type_stack(e);
   }

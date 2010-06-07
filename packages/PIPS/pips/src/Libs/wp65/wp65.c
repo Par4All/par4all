@@ -42,6 +42,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "dg.h"
 
@@ -59,6 +60,7 @@ typedef dg_vertex_label vertex_label;
 #include "prettyprint.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "transformations.h"
@@ -105,6 +107,7 @@ MakeEntityFunction(string sname)
     return f;
 }
 
+#if 0
 static void print_ref(reference r)
 {
   fprintf(stderr, "reference to %s is %p\n", 
@@ -123,6 +126,7 @@ static void debug_refs(gen_chunk *x)
 		    effect_domain, gen_true, print_eff,
 		    NULL);
 }
+#endif
 
 bool 
 wp65(string input_module_name)
@@ -487,7 +491,7 @@ hash_table v_to_esv;
 	 {
 	   print_words(fd, words_reference((reference) r, NIL));
 	     fputs("\t->\t",fd);
-	     fputs(((tag) use_def == is_action_read) ? "use\n" : "def\n", fd);
+	     fputs(((intptr_t) use_def == (intptr_t)is_action_read) ? "use\n" : "def\n", fd);
        },
 	     r_to_ud);
 

@@ -138,8 +138,10 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "alias_private.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"

@@ -46,7 +46,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "constants.h"
 
 #include "misc.h"
@@ -144,7 +146,7 @@ static void add_interprocedural_value_entities(entity e)
 
 static void add_interprocedural_new_value_entity(entity e)
 {
-    pips_debug(8,"add_interprocedural_new_value_entities","for %s\n",
+    pips_debug(8,"add_interprocedural_new_value_entities" "for %s\n",
 	       entity_name(e));
     if(!entity_has_values_p(e)) {
 	entity a = entity_undefined;

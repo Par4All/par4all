@@ -46,6 +46,7 @@
 #include "genC.h"
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 #include "database.h"
 #include "hpf.h"
 #include "hpf_private.h"
@@ -58,6 +59,7 @@
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "hpfc.h"
 
 /* in paf-util.h:
@@ -145,8 +147,8 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define what_stat_debug(level, stat)\
  ifdebug(level) \
- { int so_ = statement_ordering(stat);\
-   pips_debug(level, "statement %p (%d,%d:%d)\n",\
+ { intptr_t so_ = statement_ordering(stat);\
+   pips_debug(level, "statement %p (%"PRIdPTR",%"PRIdPTR":%"PRIdPTR")\n",\
    stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_), \
    statement_number(stat));}
 

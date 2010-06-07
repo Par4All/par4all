@@ -422,7 +422,7 @@ NumberOfElements(basic b, list ld, int * n)
   if(ok) {
     for (pc = ld; pc != NULL && ok; pc = CDR(pc)) {
         expression sod = SizeOfDimension(DIMENSION(CAR(pc)));
-        int s;
+        intptr_t s;
         ok=expression_integer_value(sod,&s);
         free_expression(sod);
         ne *= s;
@@ -455,7 +455,7 @@ int
 SizeOfIthDimension(entity e, int i)
 {
     list pc = NIL;
-    int s = 0;
+    intptr_t s = 0;
 
     if (!type_variable_p(entity_type(e))) {
 	fprintf(stderr, "[SizeOfIthDimension] not a variable\n");
@@ -493,7 +493,7 @@ int
 dimension_size(dimension d)
 {
     expression sod= SizeOfDimension(d);
-    int i;
+    intptr_t i;
     if(expression_integer_value(sod,&i))
         free_expression(sod);
     else
@@ -533,8 +533,8 @@ Value
 ValueSizeOfDimension(dimension d)
 {
     Value dl, du;
-    int l = 0 ;
-    int u = 0;
+    intptr_t l = 0 ;
+    intptr_t u = 0;
     bool ok;
 
     ok = expression_integer_value(dimension_upper(d), &u);

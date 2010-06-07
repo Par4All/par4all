@@ -98,19 +98,19 @@ representation, are described in Section~\ref{external}. They key data
 structures \texttt{entity} (variables and functions), \texttt{code}
 (instructions) and \verb+expression+ are introduced in
 Section~\ref{entity}, \ref{code} and \ref{expression}. The binding of
-Fortran to these data structures is explained. Two additional data
-structures, \verb+effect+ and \verb+transformer+, used for
-interprocedural analyses but not by the internal representation, are
-described in Section~\ref{effects} and in
-Section~\ref{semantics}. Effects are used to represent variables read or
-written by expression, statement and procedure. The \verb+transformer+
-data structure is used to abstract the store transformations performed
-by statement and procedure, as well as preconditions. These two domains
-were part of PIPS initial main thrust, interprocedural parallelization
-and analyses, which explain why they were declared with the internal
-representation. However, separate libraries contain the corresponding
-code, \texttt{effects} and \texttt{regions} for type \texttt{effects}, and
-\texttt{transformers} and \texttt{semantics} for type \texttt{transformer}.
+Fortran to these data structures is explained. An additional data
+structure, \verb+transformer+, used for interprocedural analyses but
+not by the internal representation, is described in
+Section~\ref{semantics}. The \verb+transformer+ data structure is used
+to abstract the store transformations performed by statement and
+procedure, as well as preconditions. This domain was part of PIPS
+initial main thrust, interprocedural parallelization and analyses,
+which explain why it is still declared with the internal
+representation\footnote{It also used to be the case for domain {\tt
+    effect}, but its declaration has been moved in {\tt
+    effects.newgen}}. However, separate libraries
+(\texttt{transformers} and \texttt{semantics}) contain the
+corresponding code.
 
 \begin{comment}
 Après une description rapide des structures de données externes à la
@@ -1682,10 +1682,6 @@ evaluation or loop interchange, should all have their \texttt{normalized}
 field set to \texttt{normalized\_undefined}.
 
 
-\subsection{Mapping between Expressions and effects}
-
-\domain{persistant\_expression\_to\_effects = persistant expression -> effects}
-
 
 \subsection{Abstract Tree of an Expression: Syntax}
 \label{subsection-syntax}
@@ -1723,8 +1719,6 @@ an entity but can be any expression that denotes the address of a function.
 {}
 \domain{Preference = persistant reference}
 {}
-\domain{Cell = reference + preference}
-{}
 
 Type \verb/reference/ is used to represent references to array
 elements\footnote{Scalar variables are represented as 0-dimensional
@@ -1737,7 +1731,7 @@ list of subscript expressions\footnote{The consistency of the array dimension
 and the list length is not checked, but in the parser. That is, there is
 no independent consistency checker.}.
 
-Cells are used in effects to specify memory access paths. See Section~\ref{effects} for more details.
+
 
 \begin{comment}
 Le domaine \verb/reference/ est utilisé pour représenter une
@@ -1837,270 +1831,6 @@ The normalize union may not be general enough. In some cases it would be
 useful to be able to encode pseudo-affine operators such as \verb+/+,
 \verb/mod/, \verb/min/ or \verb/max/ with inequalities.
 
-% \section{Effets des instructions}
-\section{Memory Effects of Statements}
-\label{effects}
-
-Each statement reads and writes several memory locations to retrieve
-stored values and to store new values. Understanding the relationship between
-statements and memory is one of the many keys to restructure and
-parallelize programs. Several analyses provide different approximations
-of the statement effects on memory.
-
-Each program variable is a unique set of memory locations. Effects can
-be expressed as effects on these sets. They are called \emph{atomic}
-effects, because a whole data structure is seen as read or written as
-soon as one element is read or written. Note that indirect effects due
-to pointer uses are related to unknown memory locations.
-
-The memory location representation can be refined for arrays. Certain
-sets of array locations are handled, for instance intervals like
-\verb/A[I:J]/ or even the so-called regular sections or Fortran~90
-triplets, like \verb/A[0:N:2]/, which adds a stride to the concept of
-interval. PIPS is able to handle polyhedral sets, called \emph{array
-regions}. Extension to non-convex sets, intersections of a lattice and a
-polyhedron, is under investigation.
-
-Memory effects are not always perfectly known. It is undecidable in the
-general case. Effects can be labelled as \texttt{MAY} if they might happen,
-\texttt{MUST} if they always happen, and \texttt{EXACT} if the abstract set
-used to represent them is equal to the dynamic set of effects. For
-historical reasons, exact effects are labelled \texttt{MUST} and must
-effects are not computed.
-
-Finally, read and write effects are not precise enough for compound
-statements. It is more interesting to known if the \emph{initial} value
-of a memory location is \emph{used} by a statement, which is called a
-\texttt{IN} effect, or if the memory location only is used for temporary
-storage. In the same way, it is important to know if the value left by a
-statement in a memory location is dead when leaving a statement or if it
-is used later by another statement execution. In the later case, it is
-called an \texttt{OUT} effect.
-
-Note that spurious effects are added in loop bodies to avoid... and/or
-simulate later a control dependence by a data dependence \marginpar{see
-PJ}.  These effects are \verb/read/ effects on the loop bounds
-(variables used in loop bound expressions?).
-
-Note also that \verb/read/ effects of Fortran \verb/DO/ loop indices due
-to the incrementations are ignored because they are never upward
-exposed. This is due to the \emph{compound} nature of the PIPS \verb/DO/
-construct. If it was decomposed into elementary parts, there would be no
-such surprising approximations. Note that read effects which might be due
-to bound or increment expressions as in \verb/DO I = I, 10*I, I/ must be
-preserved.
-
-\subsection{Effects}
-\label{subsection-effects}
-\index{Effects}
-
-The \texttt{effects} domain is a list of individual effects. Each
-effect can only be a read or a write and is related to only one
-entity, most of the time a variable entity\footnote{In Fortran, the
-  entity is always a variable entity.}, but possibly an area entity or
-even an entity representing a set of areas\footnote{Areas and set of
-  areas are used to express imprecise memory effects due to pointer
-  dereferencing.}. Lots of individual effects are linked to each
-statements, especially compound statements like \texttt{blocks},
-\texttt{tests}, \texttt{loops} and \texttt{unstructured}.
-
-Control effects, such as \verb/STOP/ or exception, are not
-computed. PIPS only deals with memory effects. Fortran exceptions like
-overflows or zero divides are considered programm errors and the error
-behaviors are not taken into account in PIPS analyses.
-
-Effects and the types defined in the following subsections are not used to
-represent code, but to store analysis result. These types are declared in
-the \emph{internal representation\/} for historical reasons.
-
-\domain{Effects = effects:effect*}
-
-The next domain can be used to store summary effects of callees.
-
-\domain{entity\_effects = entity->effects}
-{}
-
-The next domain can be used to store a statement to effects mapping.
-Should be used for proper and cumulated effects and references.
-
-\domain{statement\_effects = persistent statement->effects}
-{}
-
-
-\subsection{Effects Classes}
-\label{subsection-effects-classes}
-\index{Effects Classes}
-
-\domain{Effects\_classes = classes:effects*}
-{}
-
-The type \texttt{effects\_classes} is used to store equivalence classes of
-dynamic aliases, i.e. aliases created at call sites. \texttt{Effects\_classes}
-are lists of effects, i.e. lists of lists of regions.
-
-\subsection{Effect}
-\label{subsection-effect}
-\index{Effect}\index{Region}
-
-\domain{Effect = cell x action x approximation x descriptor}
-{}
-\domain{Descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit}
-{}
-
-Type \verb/effect/ is used to represent a read or write access to a
-variable or through a pointer, i.e. to abstract a reference in a
-statement. Statement effects are used to compute array regions,
-transformers and preconditions, to build use-def chains, dependence
-%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
-graphs, Summary Data Flow Information (SDFI), known as summary effects
-at the module level, and as cumulated effects at the statement level,
-and array regions. Proper effects, cumulated effects, summary effects
-and array regions are all of type \verb/effect/ but they are
-distinguished by pipsmake as difference resources. Proper effects,
-cumulated effects and summary effects are called simple effects and
-they do not store information in the last field, \verb/descriptor/.
-
-Field \verb/cell/ specifies which memory locations are accessed. In
-Fortran, variables, scalar or array, are accessed directly. In C, it
-may be a pointer specifying an indirect adressing. A \verb/cell/ is
-either a \verb/reference/ or a persistant\footnote{Persitant is a
-  Newgen attribute carried by a type or by a field. It means that
-  recursive Newgen procedures must stop there. This impacts especially
-  the free and copy functions.} \verb/preference/. Attribute
-\verb/persistant/ is used for so-called \emph{reference} and \emph{simple} 
-effects to keep track of actual program references, that should not be modified or freed. This feature is useful for several program analyses or transformations(see the pipsmake-rc documentation).
-
-
-This persistant attribute is not welcome for more advanced effects,
-such as regions, which use pseudo-references based on \verb/PHI/
-variables. Memory allocation is even more difficult to manage when the
-persistant attribute is declared at the type level and not at the
-object level. This explains why the field \verb/reference/ was moved
-down and accessed now through the field \verb/cell/.
-
-Field \verb/action/ specifies if the memory access is a read or a write,
-for read/write effects, and if the memory value is read from the statement
-store for a \verb/in/ effect or region, and if the memory value written by
-the statement is later read for a \verb/out/ effect or region. So,
-\verb/read/ and \verb/in/ effects and regions have action \verb/read/ while
-\verb/write/ and \verb/out/ effects and regions have action \verb/write/.
-
-
-Field \verb/approximation/ is used to specify if all the memory addresses
-of the reference for simple effects, or of the set of array elements
-defined by the \verb/descriptor/ for array regions, are or not
-accessed for sure. For instance, a conditional is going to generate
-may effects, and a sequence, must effects\footnote{Needless to say,
-  reality is much more complex. This oversimplified statement only is
-  written to support some intuition about may and must and exact
-  information.}.
-
-Simple effects and regions may reference a global variable which is in
-the scope of the callee but not in the scope of the caller or a static
-variable of the callee declared in a \verb/SAVE/ statement. In the first
-case, the effect translation process from the callee to the caller must
-use a unique canonical name for such a variable, although the caller
-does not provide one. In order to define a canonical name, a module
-whose scope the variable belongs to is arbitrarily chosen and its name
-is used to prefix the variable name. There is no known trivial choice
-for this module. Currently, the module name of the first variable in the
-common variable list is used:
-\begin{quote}
- \texttt{ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
-\end{quote}
-Unfortunately, this name depends on the module parsing order. It would
-be much better to use the lexicographic order among callees, assuming
-that callees are known before any analysis is started, which is true,
-and assuming that scopes are known, which is not true because some
-modules may be analyzed before some other ones are parsed (see pipsmake
-in \cite{Trio90}\cite{Baro91}).
-
-Field \verb/reference/ can be used to specify that an effect is limited
-to a sub-array since a \verb/range/ can be used as subscript expression
-of a reference. This facility is used when the cumulated effects of a
-callee are translated into proper effects of the CALL site in the caller
-scope. For regions, field \verb/reference/ defines the accessed variable
-as well as pseudo-variables, known as \verb/PHI/ variables. There is one
-\verb/PHI/ variable per array dimension.
-
-Field \verb/context/ only is used for effects known as \emph{array
-regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
-extended by Béatrice Creusillet in~\cite{Creu96}.
-
-There should not be much strict aliasing between effects in an effect
-list, but this is (was?) not checked and enforced. Some efforts are
-made when translating the summary effects of a callee into the
-caller's frame to avoid this problem.
-
-\subsection{Nature of an Effect}
-\label{subsection-action}
-\index{Action}
-
-\domain{Action = read:unit + write:unit}
-{}
-
-Two kinds of memory effects are used in Bernstein parallelization
-conditions \cite{Bern66} and in other program transformation conditions:
-read and write. \verb/IN/ regions are represented by \verb/read/ effects
-and \verb/OUT/ regions by \verb/write/ effects.
-
-
-\subsection{Approximation of an Effect}
-\label{subsection-approximation}
-\index{Approximation}
-
-\domain{Approximation = may:unit + must:unit + exact:unit}
-{}
-
-It is not always possible to determine statically if a statement guarded
-by control structures such as loops and tests is always executed. Thus,
-it is not possible to know for sure that a variable is read or written
-by such a compound statement. Some executions may always access it, some
-other ones may never access it, and some may access it or not dependeing
-on the statement occurence. Such effects are of the \verb/may/ kind.
-
-\begin{comment}
-La présence de tests et boucles ne permet pas de déterminer en général
-si une variable est effectivement lue ou écrite lors de l'exécution
-d'un \texttt{statement}. Il se peut même que certaines exécutions
-y accèdent et que d'autres n'y fassent pas référence. Les effets
-calculés sont alors de type \texttt{may}.
-\end{comment}
-
-Sometimes, a simple statement, such as an assignment like \texttt{J = 2},
-has a known effect. Here \texttt{J} \verb/must/ be written. Such
-\verb/must/ effects can be used in \emph{use/def chains} analysis to 
-\emph{kill} some scalar variables. A simple effect, proper, cumulated or
-summary, with a \verb/must/ attribute does not mean that the \emph{whole}
-array is read or written, but that at least one of its elements is read
-or written. Such information is not \emph{kill information}. Region
-effects must be used to that effect.
-
-Must effects may be detected for tests and loops. For instance, a
-variable may be read in both test branches, or a loop range may be
-numerically known.
-
-\begin{comment}
-Dans quelques cas particuliers, comme une affectation simple \texttt{I = 2},
-l'effet est certain (\emph{must}). Il peut alors être utilisé dans
-le calcul des \emph{use-def chains} pour effectuer un \emph{kill} sur les
-variables scalaires. Un effet \emph{must} sur un tableau ne signifie pas
-que tout le tableau est lu ou écrit mais qu'au moins un de ses
-éléments l'est.
-\end{comment}
-
-\subsection{Mapping from Statements to Effects}
-
-A different mapping from reachable statements to effect lists is
-computed by each effect analysis. Because NewGen did not offer the 
-\emph{map} type construct, there is no NewGen type for these mappings. They
-are encoded as hash tables and used with primitives provided by the
-NewGen library. They are stored on and read from disk by PIPS
-interprocedural database manager, \emph{pipsdbm}.
-
-For details about effect analyses available see the Effects Section in the
-PIPS phase descriptions).
-%%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
 
 \section{Semantics Analysis}
 \label{semantics}
@@ -2192,7 +1922,7 @@ Section~\ref{subsection-psysteme} for external data type Psysteme). Its
 meaning depends on its use. It may be an invariant predicate, always
 true before a statement execution (\emph{precondition}), or a predicate
 linking two different points of a program (\emph{transformer}). It may
-also define an array region (see Section~\ref{subsection-effect}).
+also define an array region (see {\tt effects.newgen}).
 
 \begin{comment}
 Le domaine \texttt{predicate} définit une relation entre valeurs de

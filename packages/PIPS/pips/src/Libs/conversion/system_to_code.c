@@ -45,11 +45,12 @@
  */
 #include "genC.h"
 #include "ri.h" 
-
+#include "effects.h"
 /* PIPS stuff
  */
 
 #include "ri-util.h" 
+#include "effects-util.h" 
 #include "misc.h" 
 #include "control.h"
 #include "effects-generic.h"

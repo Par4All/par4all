@@ -367,7 +367,7 @@ bool is_expression_reference_to_entity_p(expression e, entity v)
 }
 
 
-/* This function returns TRUE, if there exists an equal expression in the list
+/* This function returns TRUE, if there exists a same expression in the list
  *                       FALSE, otherwise
 */
 bool same_expression_in_list_p(expression e, list le)
@@ -376,6 +376,14 @@ bool same_expression_in_list_p(expression e, list le)
   return FALSE;
 }
 
+/* This function returns TRUE, if there exists an expression equal in the list
+ *                       FALSE, otherwise
+*/
+bool expression_equal_in_list_p(expression e, list le)
+{
+  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return TRUE, le);
+  return FALSE;
+}
 
 bool logical_operator_expression_p(expression e)
 {
@@ -773,7 +781,13 @@ bool assignment_expression_p(expression e) {
  */
 bool add_expression_p(expression e) {
   return operator_expression_p(e, PLUS_OPERATOR_NAME)
-    || operator_expression_p(e, PLUS_C_OPERATOR_NAME);
+    || operator_expression_p(e, PLUS_C_OPERATOR_NAME)
+    ;
+}
+bool sub_expression_p(expression e) {
+  return operator_expression_p(e, MINUS_OPERATOR_NAME)
+    || operator_expression_p(e, MINUS_C_OPERATOR_NAME)
+    ;
 }
 
 
@@ -1819,7 +1833,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   if( ! ENTITY_FIVE_OPERATION_P(op_ent) )
     user_error("make_op_exp", "operation must be : +, -, *, MOD, or /");
 
-  int val1, val2;
+  intptr_t val1, val2;
   if( expression_integer_value(exp1,&val1) && expression_integer_value(exp2,&val2) )
     {
 
@@ -2561,8 +2575,8 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
   }
   else {
     /* */
-    int ib = 0;
-    int nb = 0;
+    intptr_t ib = 0;
+    intptr_t nb = 0;
 
     if(expression_integer_value(e, &ib)) {
       /* The offset might not be plus or minus one, unless we know the
@@ -2715,6 +2729,14 @@ entity expression_to_entity(expression e)
     default:
 	return entity_undefined;
     }
+}
+/* map expression_to_entity on expressions */
+list expressions_to_entities(list expressions)
+{
+    list entities =NIL;
+    FOREACH(EXPRESSION,exp,expressions)
+        entities=CONS(ENTITY,expression_to_entity(exp),entities);
+    return gen_nreverse(entities);
 }
 
 

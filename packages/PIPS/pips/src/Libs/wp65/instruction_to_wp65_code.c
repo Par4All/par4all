@@ -41,6 +41,7 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "dg.h"
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
@@ -54,6 +55,7 @@ typedef dg_vertex_label vertex_label;
 #include "misc.h"
 #include "properties.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "text-util.h"
 #include "resources.h"
@@ -180,8 +182,8 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
 			      statement_mapping store_map)
 {
 
-    statement mod_stat,cms;
-    entity cme;
+    statement mod_stat/*,cms*/;
+    //entity cme;
     debug_on("WP65_DEBUG_LEVEL");
 
     /* FI: the semantics has been changed: the next two get_xxx() cannot/should not return
@@ -290,7 +292,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	    != (list) HASH_UNDEFINED_VALUE) { 
 	    ifdebug(9) { 
 		(void) fprintf(stderr,
-			       "Vars having to be loaded for stat %d:\n",
+			       "Vars having to be loaded for stat %"PRIdPTR":\n",
 			       statement_number(s));
 		reference_list_print(lrefs); }    
 	    include_constant_symbolic_communication(compute_module,lrefs,
@@ -310,7 +312,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	    load_code = FALSE;
 	    ifdebug(9) {
 		(void) fprintf(stderr,
-			       "Vars having to be stored for stat %d:\n",
+			       "Vars having to be stored for stat %"PRIdPTR":\n",
 			       statement_number(s));
 		reference_list_print(lrefs); }
 	    include_constant_symbolic_communication(compute_module,lrefs,
@@ -1009,7 +1011,7 @@ int first_parallel_level,last_parallel_level;
 	for(; !ENDP(lr) && !proper_tag ; POP(lr)) {
 	    reference r = REFERENCE(CAR(lr));
 	    if( reference_in_list_p(r,map) && 
-	       (tag) hash_get(r_to_ud, (char *) r) == use_def) {
+	       (intptr_t) hash_get(r_to_ud, r) == (intptr_t)use_def) {
 		statement mbs;	/* statement for one movement block */
 		statement bmbs;	 /* statement for one bank movement block */
 

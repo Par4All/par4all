@@ -795,7 +795,7 @@ static list mapping_to_domain_list(hash_table h)
 
   return values;
 }
-
+#if 0
 /* Returns the list of entities in the mapping range.
  *
  * Could be more efficient to return a set.
@@ -819,6 +819,7 @@ static list mapping_to_range_list(hash_table h)
 
   return values;
 }
+#endif
 
 /* Return the list of all analyzed variables which are modified in
    the current module. If they are modified, they must have old

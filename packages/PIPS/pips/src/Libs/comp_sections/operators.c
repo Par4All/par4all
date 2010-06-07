@@ -76,7 +76,7 @@ comp_sec
 CompUnion(comp_sec __attribute__ ((unused)) cs1,
 	  comp_sec __attribute__ ((unused)) cs2)
 {
-  comp_sec result;
+  comp_sec result = comp_sec_undefined;
   unsigned int i;
   unsigned int Rank = 0;
   unsigned int NoOfImages = (Rank*Rank)/2;

@@ -35,6 +35,7 @@
 
 #include "text.h"
 #include "ri.h"
+#include "effects.h"
 
 #include "icfg.h"
 
@@ -45,6 +46,7 @@
 #include "text-util.h"
 
 #include "ri-util.h" /* linear.h is included in */
+#include "effects-util.h" 
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"

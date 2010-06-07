@@ -118,7 +118,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
-
+#include "effects.h"
 #include "pipsdbm.h"
 
 #include "misc.h"
@@ -255,6 +255,7 @@ string get_comment_sentinel() {
     case is_language_c: return "//";
     case is_language_fortran: return "C";
     case is_language_fortran95: return "!";
+    default: pips_internal_error("language unknown not handled\n"); return NULL ;
   }
 }
 
@@ -267,6 +268,7 @@ string get_comment_continuation() {
     case is_language_c: return "//    ";
     case is_language_fortran: return "C    ";
     case is_language_fortran95: return "!    ";
+    default: pips_internal_error("language unknown not handled\n"); return NULL ;
   }
 }
 
@@ -536,6 +538,7 @@ list words_range(range obj, list pdl) {
           pc = CHAIN_SWORD(pc,",");
           pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
         }
+        pc = CHAIN_SWORD(pc,") /)") ;
         break;
       }
       case is_language_fortran95: {
@@ -1423,7 +1426,8 @@ words_implied_do(call obj,
 static list
 words_unbounded_dimension(call __attribute__ ((unused)) obj,
 			  int __attribute__ ((unused)) precedence,
-			  bool __attribute__ ((unused)) leftmost)
+			  bool __attribute__ ((unused)) leftmost,
+              list __attribute__ ((unused)) pdl)
 {
     list pc = NIL;
 
@@ -1435,7 +1439,8 @@ words_unbounded_dimension(call __attribute__ ((unused)) obj,
 static list
 words_list_directed(call __attribute__ ((unused)) obj,
 		    int __attribute__ ((unused)) precedence,
-		    bool __attribute__ ((unused)) leftmost)
+		    bool __attribute__ ((unused)) leftmost,
+            list __attribute__ ((unused)) pdl)
 {
     list pc = NIL;
 
@@ -1644,7 +1649,8 @@ static list words_stat_io_inst(call obj,
 static list
 null(call __attribute__ ((unused)) obj,
      int __attribute__ ((unused)) precedence,
-     bool __attribute__ ((unused)) leftmost)
+     bool __attribute__ ((unused)) leftmost,
+     list __attribute__ ((unused)) pdl)
 {
     return(NIL);
 }
@@ -2100,7 +2106,7 @@ static list words_conditional_op(call obj,
 
 static struct intrinsic_handler {
     char * name;
-    list (*f)();
+    list (*f)(call,int,bool,list);
     int prec;
 } tab_intrinsic_handler[] = {
     {POWER_OPERATOR_NAME, words_infix_binary_op, 30},
@@ -2456,7 +2462,6 @@ sentence_tail(entity e)
           }
           break;
         case is_type_variable: {
-          list pdl = NIL;
           pc = CHAIN_SWORD(pc,"FUNCTION ");
           break;
         }

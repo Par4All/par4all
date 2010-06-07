@@ -910,7 +910,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
  *  - pattern matching done this way is just a hack...
  */
 #define XDEBUG(msg) \
-  pips_debug(6, "statement 0x%x: " msg "\n", (unsigned int) s)
+  pips_debug(6, "statement %p: " msg "\n", (void*) s)
 
 static int 
 number_of_non_empty_statements(

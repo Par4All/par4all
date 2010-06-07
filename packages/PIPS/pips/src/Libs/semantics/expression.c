@@ -68,11 +68,13 @@
 /* #include "database.h" */
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 /*
 #include "text.h"
 #include "text-util.h"
 */
 #include "ri-util.h"
+#include "effects-util.h"
 /* #include "constants.h" */
 /* #include "control.h" */
 #include "effects-generic.h"
@@ -1033,6 +1035,23 @@ transformer affine_increment_to_transformer(entity e, Pvecteur a)
     return tf;
 }
 
+/* Modulo and integer division
+ *
+ * Apparently identical in both C and Fortran
+ *
+ *           C    Fortran
+ *  a  b  mod div  mod div
+ *  3  2   1   1    1
+ * -3  2  -1  -1   -1
+ *  3 -2   1  -1    1
+ * -3 -2  -1   1   -1
+ *
+ * FI: only implemented for positive dividends. Same for integer
+ * division, I believe. Side effects are probably ignored.
+ *
+ * FI: to be improved by using expression_to_transformer() and the
+ * precondition pre.
+ */
 static transformer modulo_to_transformer(entity e, /* assumed to be a value */
 					 expression arg1 __attribute__ ((unused)),
 					 expression arg2,
@@ -2452,6 +2471,9 @@ transformer any_expression_to_transformer(
       if(float_analyzed_p())
 	tf = float_expression_to_transformer(v, expr, pre, is_internal);
       break;
+    case is_basic_pointer:
+      /* case not handleld yet, skip instead of internal_error*/
+      break;
     case is_basic_complex:
       /* PIPS does not represent complex constants: call to CMPLX */
       break;
@@ -2536,7 +2558,7 @@ transformer expression_to_transformer(
 				      list el)
 {
   type et = expression_to_type(exp);
-  entity tmpv = entity_undefined;
+  //entity tmpv = entity_undefined;
   transformer tf = transformer_undefined;
 
   if(type_void_p(et)) {

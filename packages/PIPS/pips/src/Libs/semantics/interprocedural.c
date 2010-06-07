@@ -36,7 +36,9 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "database.h"
 #include "pipsdbm.h"
@@ -389,8 +391,9 @@ transformer new_add_formal_to_actual_bindings(call c, transformer pre, entity ca
   return new_pre;
 }
 
-transformer
-precondition_intra_to_inter(entity callee, transformer pre, list le)
+transformer precondition_intra_to_inter(entity callee,
+					transformer pre,
+					list le) // effect list
 {
 #define DEBUG_PRECONDITION_INTRA_TO_INTER 1
   list values = NIL;
@@ -471,7 +474,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
 
   for(ca = values; !ENDP(ca);  POP(ca))    {
     entity e = ENTITY(CAR(ca));
-    list l_callee = (list) effects_conflict_with_entities(le, e);
+    list l_callee = (list) concrete_effects_conflict_with_entities(le, e);
     /* For clarity, all cases are presented */
     if (ENDP(l_callee)) {   /* no conflicts */
       lost_values = arguments_add_entity(lost_values, e);
@@ -531,7 +534,7 @@ precondition_intra_to_inter(entity callee, transformer pre, list le)
 	  }
 	}
 
-	else { /* case 2.2:all entities do not have the same type*/
+	else { /* case 2.2: all entities do not have the same type*/
 	  lost_values = arguments_add_entity(lost_values, e);
 	  pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 		"value %s lost - list of conflicting entities with different types\n",
@@ -1298,6 +1301,7 @@ static bool process_call_for_summary_precondition(call c)
   return TRUE;
 }
 
+#if 0
 /* Update the current_summary_precondition, if necessary, for call
    located in the dimension declarations. May be useless because of
    function below... */
@@ -1307,11 +1311,12 @@ static bool process_statement_for_summary_precondition(statement s)
   pips_internal_error("Not implemented. Should not be called.\n");
   if(declaration_statement_p(s)) {
     /* Look for call sites in the declarations, but see functions below... */
-    list dl = statement_declarations(s);
+    //list dl = statement_declarations(s);
     //ret_p = process_call_for_summary_precondition();
   }
   return ret_p;
 }
+#endif
 
 /* This function is called to deal with call sites located in
    initialization expressions carried by declarations. */

@@ -83,7 +83,7 @@ static void insert_something_in_the_gpips_log_window(char * a_message) {
 
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(log_text_view));
 
-	int new_length;
+	//int new_length;
 	int message_length = strlen(a_message);
 
 	/* insert at the end: */

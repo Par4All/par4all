@@ -1047,8 +1047,8 @@ transformer transformer_derivative_fix_point(transformer tf)
   }
   else {
     //transformer inv_tf = transformer_undefined; /* invariant constraints of tf */
-    /* sc is going to be modified and destroyed and eventually replaced in 
-       fix_tf */
+    /* sc is going to be modified and destroyed and eventually
+       replaced in fix_tf */
     Psysteme sc = predicate_system(transformer_relation(fix_tf));
     Psysteme sc_homo = SC_UNDEFINED;
     /* Do not handle variable which do not appear explicitly in constraints! */
@@ -1078,13 +1078,13 @@ transformer transformer_derivative_fix_point(transformer tf)
 	entity diffv = entity_to_intermediate_value(var);
 	Pvecteur diff = VECTEUR_NUL;
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
-      
-	diff = vect_make(diff, 
-			 (Variable) diffv, VALUE_ONE, 
-			 (Variable) newv,  VALUE_MONE, 
-			 (Variable) oldv, VALUE_ONE, 
+
+	diff = vect_make(diff,
+			 (Variable) diffv, VALUE_ONE,
+			 (Variable) newv,  VALUE_MONE,
+			 (Variable) oldv, VALUE_ONE,
 			 TCST, VALUE_ZERO);
-      
+
 	eq = contrainte_make(diff);
 	sc = sc_equation_add(sc, eq);
       }
@@ -1096,9 +1096,9 @@ transformer transformer_derivative_fix_point(transformer tf)
     }
 
     /* Project all variables but differences */
-  
+
     sc = sc_projection_ofl_along_variables(sc, b);
-  
+
     ifdebug(8) {
       pips_debug(8, "Non-homogeneous constraints on derivatives=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
@@ -1109,19 +1109,19 @@ transformer transformer_derivative_fix_point(transformer tf)
      * integration of all derivatives: all variables are modified by
      * the same number of iterations.
      */
-  
+
     sc_homo = sc_dup(sc);
     sc_homo = sc_projection_ofl(sc_homo, TCST);
-  
+
     ifdebug(8) {
-      pips_debug(8, 
+      pips_debug(8,
 		 "derivative constraints after elimination of constant terms=\n");
       sc_fprint(stderr, sc_homo, (char * (*)(Variable)) external_value_name);
     }
-  
+
     sc = sc_append(sc, sc_homo);
     sc_rm(sc_homo);
-  
+
     ifdebug(8) {
       pips_debug(8, "All constraints on derivatives=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
@@ -1133,12 +1133,12 @@ transformer transformer_derivative_fix_point(transformer tf)
      * or transform it in an inequality if not. The constant term of the
      * inequality must be zero because T* is computed, not T+
      */
-    for(ceq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(ceq); 
+    for(ceq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(ceq);
 	ceq = contrainte_succ(ceq)) {
       Pvecteur eq = vect_dup(contrainte_vecteur(ceq));
       Pcontrainte new_c = contrainte_make(eq);
       Value cst = vect_coeff(TCST, eq);
-    
+
       if(cst == VALUE_ZERO) {
 	/* leave the equation as it is and put it in the equation list */
 	new_c->succ = leq;
@@ -1148,7 +1148,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 	vect_chg_coeff(&(contrainte_vecteur(new_c)), TCST, VALUE_ZERO);
 	new_c->succ = lineq;
 	lineq = new_c;
-      
+
 	if(cst >= VALUE_ONE) {
 	  /* the signs are OK */
 	  ;
@@ -1164,44 +1164,44 @@ transformer transformer_derivative_fix_point(transformer tf)
      * inequality must be zero because T* is conputed, not T+. T+ can be
      * derived from T* as T o T*.
      */
-    for(cineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(cineq); 
+    for(cineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(cineq);
 	cineq = contrainte_succ(cineq)) {
       Value cst = vect_coeff(TCST, contrainte_vecteur(cineq));
-    
+
       if(cst >= VALUE_ZERO) {
 	/* OK for decreasing derivative
 	   (Note: the constant term is in the lhs) */
 	Pvecteur ineq = vect_dup(contrainte_vecteur(cineq));
 	Pcontrainte new_c = CONTRAINTE_UNDEFINED;
-      
+
 	vect_chg_coeff(&ineq, TCST, VALUE_ZERO);
 	new_c = contrainte_make(ineq);
 	new_c->succ = lineq;
 	lineq = new_c;
       }
       else {
-	/* The sign of the derivative is unknown: 
+	/* The sign of the derivative is unknown:
 	   no invariant can be deduced */
 	;
       }
     }
-  
+
     ifdebug(8) {
       pips_debug(8, "First set of equality invariants=\n");
       egalites_fprint(stderr, leq, (char * (*)(Variable)) external_value_name);
       pips_debug(8, "First set of inequality invariants=\n");
       inegalites_fprint(stderr, lineq, (char * (*)(Variable)) external_value_name);
     }
-  
+
     /* sc is not needed anymore, it can be updated with leq and lineq */
-  
+
     sc_rm(sc);
     sc = sc_make(leq, lineq);
-  
-    /* Difference variables must substituted back to differences 
+
+    /* Difference variables must substituted back to differences
      * between old and new values.
      */
-  
+
     ifdebug(8) {
       pips_debug(8, "All invariants on derivatives=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
@@ -1209,7 +1209,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 
     for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
       entity oldv = (entity) vecteur_var(bv);
-    
+
       /* Only generate difference equations if the old value is used */
       if(old_value_entity_p(oldv)) {
 	entity var = value_to_variable(oldv);
@@ -1217,34 +1217,34 @@ transformer transformer_derivative_fix_point(transformer tf)
 	entity diffv = entity_to_intermediate_value(var);
 	Pvecteur diff = VECTEUR_NUL;
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
-      
-	diff = vect_make(diff, 
-			 (Variable) diffv, VALUE_ONE, 
+
+	diff = vect_make(diff,
+			 (Variable) diffv, VALUE_ONE,
 			 (Variable) newv,  VALUE_MONE,
-			 (Variable) oldv, VALUE_ONE, 
+			 (Variable) oldv, VALUE_ONE,
 			 TCST, VALUE_ZERO);
-      
+
 	eq = contrainte_make(diff);
 	sc = sc_equation_add(sc, eq);
 	diffb = base_add_variable(diffb, (Variable) diffv);
       }
     }
-  
+
     ifdebug(8) {
-      pips_debug(8, 
+      pips_debug(8,
 		 "All invariants on derivatives with difference variables=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
-  
+
     /* Project all difference variables */
-  
+
     sc = sc_projection_ofl_along_variables(sc, diffb);
-  
+
     ifdebug(8) {
       pips_debug(8, "All invariants on differences=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
-  
+
     /* The full basis must be used again */
     base_rm(sc_base(sc)), sc_base(sc) = BASE_NULLE;
     sc_base(sc) = ib;
@@ -1262,7 +1262,7 @@ transformer transformer_derivative_fix_point(transformer tf)
     /* Add constraints about invariant variables. This could be avoided if
        implicit equalities were added before the derivative are processed:
        each invariant variable would generate an implicit null
-       difference. 
+       difference.
 
        Such invariant constraints do not exist in general. We have them when
        array references are trusted.
@@ -1271,34 +1271,34 @@ transformer transformer_derivative_fix_point(transformer tf)
        for the initial store.
 
     */
-    /* 
+    /*
        inv_tf = transformer_arguments_projection(transformer_dup(tf));
        fix_tf = transformer_image_intersection(fix_tf, inv_tf);
        free_transformer(inv_tf);
     */
   }
   /* That's all! */
-  
+
   ifdebug(8) {
     pips_debug(8, "fix-point fix_tf=\n");
     fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
     transformer_consistency_p(fix_tf);
     pips_debug(8, "end\n");
   }
-  
+
   return fix_tf;
 }
 
 /* Computation of a fix point: drop all constraints, remember which
- * variables are changed. Except if the transformer is syntactically empty
- * since its fix point is easy to compute. Without normalization,
- * mathematically empty transformers are lost.
- * 
+ * variables are changed. Except if the transformer is syntactically
+ * empty since its fix point is easy to compute. Without
+ * normalization, mathematically empty transformers are lost.
+ *
 */
 transformer transformer_basic_fix_point(transformer tf)
 {
   transformer fix_tf = copy_transformer(tf);
-  
+
   if(!transformer_empty_p(tf)) {
     /* get rid of equalities and inequalities but keep the basis */
     Psysteme sc = predicate_system(transformer_relation(fix_tf));

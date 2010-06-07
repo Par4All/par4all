@@ -226,6 +226,7 @@ char *mod_name;
     statement mod_stat;
     instruction mod_inst;
     entity module;
+    pips_user_warning("this transformation is being obsoleted by SIMD_ATOMIZER\nIt is no longer maintained and is likely to crash soon\n");
 
     debug_on("ATOMIZER_DEBUG_LEVEL");
 
@@ -234,7 +235,10 @@ char *mod_name;
 
     mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
+    
+
     set_current_module_statement(mod_stat);
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
 
     module = local_name_to_top_level_entity(mod_name);
     set_current_module_entity(module);
@@ -280,6 +284,7 @@ char *mod_name;
     /* We save the new CODE. */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
+    reset_cumulated_rw_effects();
     reset_current_module_statement();
     reset_current_module_entity();
 

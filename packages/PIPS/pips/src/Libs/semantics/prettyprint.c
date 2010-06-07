@@ -42,7 +42,9 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "database.h"
 #include "pipsdbm.h"
@@ -70,10 +72,10 @@ static bool is_total_precondition;
 static bool is_user_view;
 static bool is_transformer_filtered;
 static hash_table nts = hash_table_undefined;
-static string non_feasible_system;
+//static string non_feasible_system;
 
 static bool print_code_semantics();
-static text get_semantic_text();
+static text get_semantic_text(string,bool);
 
 bool print_code_transformers(string module_name)
 {

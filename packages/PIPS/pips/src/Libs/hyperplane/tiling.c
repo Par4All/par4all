@@ -58,6 +58,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "misc.h"
 #include "text.h"
 
@@ -70,6 +71,7 @@
 
 #include "sparse_sc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "prettyprint.h"
 #include "conversion.h"
 
@@ -263,7 +265,7 @@ loop_nest_to_offset(list lls)
 	entity ind = loop_index(l);
 	range r = loop_range(l);
 	expression lower = range_lower(r);
-	int val;
+	intptr_t val;
 
 	if(expression_integer_value(lower, &val)) {
 	    vect_chg_coeff(&origin, (Variable) ind, (Value) val);

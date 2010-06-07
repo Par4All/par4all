@@ -32,7 +32,9 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "misc.h"
 #include "properties.h"

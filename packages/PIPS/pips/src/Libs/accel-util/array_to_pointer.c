@@ -32,6 +32,8 @@
 
 #include "genC.h"
 #include "ri-util.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"

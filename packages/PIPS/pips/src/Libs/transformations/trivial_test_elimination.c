@@ -31,7 +31,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "text-util.h"
 #include "database.h"
 #include "misc.h"
@@ -209,23 +211,23 @@ trivial_test_deal_with_unstructured(persistant_statement_to_control m, statement
   expression ncond = MakeInvertExpression(cond);
 
   control c = apply_persistant_statement_to_control(m,s);
-  control true = CONTROL(CAR(control_successors(c)));
+  control ctrue = CONTROL(CAR(control_successors(c)));
   // control false = CONTROL(CAR(CDR(control_successors(c))));
  
   // control tmp = copy_control(false);
-  // false = copy_control(true);
-  // true = copy_control(tmp);
+  // false = copy_control(ctrue);
+  // ctrue = copy_control(tmp);
   // free_control(tmp);
 
   // update_control_lists(c, m);
   // UPDATE_CONTROL(c, s, control_predecessors(c), control_successors(c));
   
-  // statement new_true = control_statement(false);
+  // statement new_ctrue = control_statement(false);
  
   // make new test with control
   // test  new = make_test(copy_expression(ncond),
-  //		 make_continue_statement(statement_label(new_true)),
-  //		 copy_statement(new_true),
+  //		 make_continue_statement(statement_label(new_ctrue)),
+  //		 copy_statement(new_ctrue),
   //             make_block_statement(NIL));
 
 
@@ -235,8 +237,8 @@ trivial_test_deal_with_unstructured(persistant_statement_to_control m, statement
 			copy_statement(test_false(t)),
 			make_block_statement(NIL));
 
-  gen_remove(&control_successors(c), true);
-  gen_remove(&control_predecessors(true), c);
+  gen_remove(&control_successors(c), ctrue);
+  gen_remove(&control_predecessors(ctrue), c);
    
   statement_instruction(s) = make_instruction(is_instruction_test, new);
 
@@ -256,7 +258,7 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
    case is_instruction_test:
    {
      test t ;
-     statement true ;
+     statement strue ;
 
      debug(2, "trivial_test_statement_rewrite", "is_instruction_test\n", "\n");
      ifdebug(9) {
@@ -264,8 +266,8 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
      }
 
      t = instruction_test(i) ;
-     true = test_true(t) ;
-     if (empty_statement_or_continue_p(true)) {
+     strue = test_true(t) ;
+     if (empty_statement_or_continue_p(strue)) {
        pips_debug(8,"The branch TRUE of this test instruction is empty!\n");
        if (bound_persistant_statement_to_control_p(m, s)) {
 	 pips_debug(8, "This instruction is unstructured instruction\n");

@@ -40,6 +40,7 @@
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "effects.h"
 
 #include "pipsdbm.h"
 
@@ -182,7 +183,7 @@ static list words_dimension(dimension obj, list pdl)
   expression eup = expression_undefined;
   expression e1 = expression_undefined;
   expression e2 = expression_undefined;
-  int up, i;
+  intptr_t up, i;
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran95:
       /* Not asterisk for unbound dimension in F95*/

@@ -7,6 +7,9 @@
  * some of which/most should be moved elsewhere, probably in ri-util.
  *
  */
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -15,7 +18,9 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "effects.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "misc.h"
 #include "text-util.h"
 #include "newgen_set.h"
@@ -63,7 +68,7 @@ reference malloc_to_abstract_location(reference lhs,
 {
   reference r = reference_undefined;
   entity e = entity_undefined;
-  string st, s;
+  //string st, s;
   string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
