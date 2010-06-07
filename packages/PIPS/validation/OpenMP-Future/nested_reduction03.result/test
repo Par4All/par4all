@@ -1,0 +1,21 @@
+// OMP style
+int main(void)
+{
+   int k = 0, i = 0, l = 0;
+   int sum = 0, tmp = 0;
+
+#pragma omp parallel for reduction(+:sum) private(k)
+   for(l = 0; l <= size-1; l += 1) {
+      tmp = 0;
+#pragma omp parallel for reduction(+:tmp) private(i)
+      for(k = 0; k <= size-1; k += 1)
+#pragma omp parallel for reduction(+:tmp)
+         for(i = 0; i <= size-1; i += 1)
+            tmp += i+k;
+      sum += tmp;
+   }
+
+   printf("sum is %d", sum);
+
+   return 0;
+}

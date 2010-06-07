@@ -30,9 +30,8 @@ apply UNSPLIT
 
 # I was not very inspired about this... :-)
 shell sed -i -e '1 i #define MIN(a,b) (a < b ? a : b )' $WKS.database/Src/$WKS.c
-shell gcc $WKS.database/Src/*.c  -o $WKS.database/Src/$WKS
-shell cd $WKS.database/Src; ./$WKS  ../../input.pgm; diff output.pgm ../../output-ref.pgm
-#shell rm -rf $WKS.database/Src/kernelize.o
+shell cc $WKS.database/Src/*.c  -o $WKS.database/Src/$WKS
+shell cd $WKS.database/Src &>/dev/null ; ./$WKS  ../../input.pgm; diff output.pgm ../../output-ref.pgm
 
 close
 #delete $WKS

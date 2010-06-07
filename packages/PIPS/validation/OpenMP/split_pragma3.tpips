@@ -30,8 +30,7 @@ apply OMPIFY_CODE
 display PRINTED_FILE(SPLIT_PRAGMA3)
 
 apply UNSPLIT
-shell gfortran -fopenmp -c split_pragma3.database/Src/split_pragma3.f
-shell rm *.o
+shell gfortran -fopenmp -c split_pragma3.database/Src/split_pragma3.f -o split_pragma3.database/Src/split_pragma3.o
 
 close
 delete split_pragma3

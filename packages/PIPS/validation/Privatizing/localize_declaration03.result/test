@@ -48,7 +48,7 @@ void getimage(char *filename)
       }
    }
 }
-void getimage(char *)
+void getimage(char *filename)
 {
    //PIPS generated variable
    int i1;
@@ -63,7 +63,7 @@ void getimage(char *)
       }
    }
 }
-void getimage(char *)
+void getimage(char *filename)
 {
    //PIPS generated variable
    int i1;

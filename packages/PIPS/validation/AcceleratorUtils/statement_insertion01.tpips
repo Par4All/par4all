@@ -1,0 +1,10 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "statement_insertion01"
+delete $WS
+create $WS $WS.c
+#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+display PRINTED_FILE[%ALLFUNC]
+apply STATEMENT_INSERTION[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+close
+delete $WS

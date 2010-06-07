@@ -11,7 +11,6 @@ void c_est_pourtant_magnifique()
       u[0] = a;
    }
 }
-extern void c_est_pourtant_magnifique();
 void c_est_pourtant_magnifique()
 {
    int y, m, c, a;
@@ -27,4 +26,3 @@ void c_est_pourtant_magnifique()
       u[0] = a;
    }
 }
-extern void c_est_pourtant_magnifique();

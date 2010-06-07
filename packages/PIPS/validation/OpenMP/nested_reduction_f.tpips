@@ -12,8 +12,7 @@ apply OMPIFY_CODE(NESTED_REDUCTION)
 display PRINTED_FILE(NESTED_REDUCTION)
 
 apply UNSPLIT
-shell gfortran -fopenmp -c nested_reduction_f.database/Src/nested_reduction_f.f
-shell rm *.o
+shell gfortran -fopenmp -c nested_reduction_f.database/Src/nested_reduction_f.f -o nested_reduction_f.database/Src/nested_reduction_f.o
 
 close
 delete nested_reduction_f
