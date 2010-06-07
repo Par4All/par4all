@@ -1,0 +1,329 @@
+%% To deal with the colors and number of slides per page according to the
+%% \VersionPapier switch :
+\ifx\VersionExpose\UnTrucInexistant%
+% Version élève
+\documentclass[handout,compress,10pt,hyperref={hyperindex},xcolor={svgnames,x11names}]{beamer}
+\usepackage{pgfpages}
+\pgfpagesuselayout{4 on 1}[a4paper,landscape,border shrink=5mm]
+\else
+% Version enseignant
+\documentclass[compress,10pt,hyperref={hyperindex},xcolor={svgnames,x11names}]{beamer}
+\fi
+%\documentclass[11pt,a4]{powersem}
+\usepackage[latin9]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,wasysym,marvosym,soul}
+\usepackage[hyper,procnames]{listings}
+\usepackage{alltt}%verbatim,
+%\usepackage[linkbordercolor={1 1 1},bookmarks=true,colorlinks=false,urlbordercolor={1 1 1},runbordercolor={1 1 1},citebordercolor={1 1 1},bookmarksnumbered=true,hypertexnames=false,hyperindex]{hyperref}
+%usepackage{tabularx}
+
+%\usepackage{beamer_rk}
+\usepackage[LeftSideBar,ShadedBackground]{beamer_rk}
+%\usepackage[WhiteBackground]{beamer_rk}
+
+
+\usepackage{perso2e,bbold2e,getVersion,exemple}
+%\usepackage{beamer_rk,perso2e,bbold2e,LienPDF,example}
+\usepackage{makeidx}
+%\usepackage{multicol,tabularx}
+\usepackage{pst-node}
+
+\usepackage[greek,francais,english]{babel}
+\frenchbsetup{og=«, fg=», ThinColonSpace=true,
+  % ShowOptions,
+  % Évite de casser les références bibliographiques du style harvard avec
+  % des ":" dedans :
+  %AutoSpacePunctuation=false
+}
+% S'arrange pour avoir une virgule qui ne rajoute pas de blanc dans les
+% nombres à virgule :
+%\iffalse
+\DecimalMathComma
+% Même pas besoin pour les ligatures à 2 accents en fait :
+%\languageattribute{greek}{polutoniko}
+
+% Et pour avoir \nombre qui marche :
+\usepackage[autolanguage]{numprint}
+
+\lstset{extendedchars=true, language=C++, basicstyle=\footnotesize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=2, numberfirstline=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\color{orange}\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape}
+% Un peu violent :
+%  index=[1][keywords],indexprocnames=true%\lstloadlanguages{Basic}
+
+%\usepackage{beamerthemesplit}
+%{\usebeamercolor{palette primary}}
+%\setbeamertemplate{sidebar canvas}[vertical shading][top=palette primary.bg,middle=white,bottom=palette primary.bg]
+
+\makeindex
+
+\getRCSDollarsVersion$Revision: 185 $
+
+\usepackage[dvips]{preview}
+\PreviewEnvironment{trans}
+\PreviewEnvironment{frame}
+
+\newcommand{\FigCentreTourne}[1]{\centerline{\includegraphics[width=\vsize,angle=-90]{#1}}}
+\newcommand{\boiteblanc}[1]{\psframebox*[fillcolor=papayawhip]{#1}}
+
+%\DealWithTwoUp
+
+%\newcommand{\reddrawline}{{\red \noindent\leavevmode\hrulefill}}
+
+
+\usetheme{gtc}
+\usecolortheme{gtc}
+
+
+\title[Par4All --- \texttt{p4a}]{Par4All\\
+---\\
+\texttt{p4a}\\
+Simple command line interface}
+
+
+\subtitle{\LienPDF{http://www.par4all.org}}
+
+\author[\textsc{Keryell} \& \textsc{Péan}]{Ronan \textsc{Keryell} \&
+  Grégoire \textsc{Péan}}
+
+\newcommand{\HPCP}[0]{\href{http://hpc-project.com}{HPC Project}}
+
+\newcommand{\TB}[0]{\href{http://hpcas.enstb.org}{Institut TÉLÉCOM/TÉLÉCOM
+    Bretagne/HPCAS}}
+
+\newcommand{\CRI}[0]{\href{http://www.cri.mines-paristech.fr}{Mines ParisTech/CRI}}
+
+\newcommand{\RPI}[0]{\href{http://www.cs.rpi.edu/}{Rensselaer Polytechnic Institute/CS}}
+
+\institute[\HPCP]{\HPCP}
+
+
+%\logo{\href{http://hpc-project.com}{\pgfuseimage{logo-HPC-Project}}\href{http://www.par4all.org}{\pgfuseimage{logo-Par4All}}}
+\pgfdeclareimage[width=0.75cm]{logo-HPC-Project}{Logo_HPC-Project-512x247-crop}
+\pgfdeclareimage[width=0.75cm]{logo-Wild-Systems}{WildSystems-site-logo}
+\pgfdeclareimage[width=0.75cm]{logo-Par4All}{Par4All-logo}
+\logo{\hbox to 0.75cm{\vbox{\href{http://hpc-project.com}{\pgfuseimage{logo-HPC-Project}}\\\href{http://wild-systems.com}{\pgfuseimage{logo-Wild-Systems}}\\\href{http://www.par4all.org}{\pgfuseimage{logo-Par4All}}\vss}}}
+%\logo{\hbox to 0.75cm{\vbox{\href{http://wild-systems.com}{\pgfuseimage{logo-Wild-Systems}}\\\href{http://www.par4all.org}{\pgfuseimage{logo-Par4All}}\vss}}}
+%\logo{\hbox to 0.75cm{\vbox{\pgfuseimage{logo-HPC-Project}\\\pgfuseimage{logo-telecom-bretagne}\\\pgfuseimage{logo-HPCAS}}\hss}}
+
+
+%\subject{}
+
+
+%\date{26/05/2010\\
+%  \LienPDF{http://www.par4all.org}}
+
+\newcommand{\Idee}{{\red\Handwash}\xspace}
+%\Stopsign \Laserbeam \Estatically \Attention \Idee
+%\FilledRainCloud\Coffeecup
+
+\newcommand{\Cnn}{C$_{99}$\xspace}
+
+%% Plan plus petit :
+%\renewcommand{\OutlineFontSize}{\scriptsize}
+% Plan en une colonne :
+\renewcommand{\OutlineColumnNumbers}{1}
+\renewcommand\outlinename{Outline}
+
+
+\begin{document}
+
+%\DealWithColors
+
+\begin{frame}%[plain]
+  \titlepage
+\end{frame}
+
+%\slidepagestyle{CRI}
+
+%\LicenseTrans
+
+%\AtBeginSection[]
+%{
+%}
+%\AtBeginSubsection[]
+%{}
+
+\newcommand{\HPCIN}{%\protect\usebeamercolor{normal text}
+  \textcolor{red}{\st{\textsc{hpc}}}plain computing\xspace}
+
+
+\section*{Introduction}
+
+
+\begin{frame}{Source-to-source compilation}
+  \begin{itemize}
+  \item Multicore (r)evolution
+  \item Huge need of parallel programs
+  \item Some tools are needed to leverage parallel programming
+  \item Par4All based on PIPS source-to-source transformation framework
+  \item Par4All aims at a usable distribution for PIPS
+  \end{itemize}
+  \vavers \texttt{p4a}: simple command line interface
+\end{frame}
+
+
+\begin{frame}{\texttt{p4a} capabilities}
+  \begin{itemize}
+  \item Automatic parallelization with advanced semantics analysis
+  \item C and Fortran input language
+  \item OpenMP code generation (C \& Fortran)
+  \item Code generation for heterogeneous accelerators
+    \begin{itemize}
+    \item CUDA for GPU
+    \end{itemize}
+  \item Source-to-source: capitalize on real value \& surf on best
+    back-ends
+  \item Manage back-end invocation for simplicity
+  \item Makefile generation
+  \end{itemize}
+\end{frame}
+
+
+\begin{trans}{\texttt{p4a} in a nutshell}
+  \begin{BoiteA}{Parallelisation}
+\begin{verbatim}
+p4a matmul.f
+\end{verbatim}
+    generates an OpenMP program in \texttt{matmul.p4a.f}
+  \end{BoiteA}
+  {\tiny
+\begin{lstlisting}
+!$omp parallel do private(I, K, X)
+C multiply the two square matrices of ones
+      DO J = 1, N                                                       0016
+!$omp parallel do private(K, X)
+         DO I = 1, N                                                    0017
+            X = 0                                                       0018
+!$omp parallel do reduction(+:X)
+            DO K = 1, N                                                 0019
+               X = X+A(I,K)*B(K,J)                                      0020
+            ENDDO
+!$omp end parallel do
+            C(I,J) = X                                                  0022
+         ENDDO
+!$omp end parallel do
+      ENDDO
+!$omp end parallel do
+\end{lstlisting}
+  }
+
+  \begin{BoiteB}{Parallelisation with compilation}
+\begin{verbatim}
+p4a matmul.f -o matmul
+\end{verbatim}
+    generates an OpenMP program \texttt{matmul.p4a.f} that is compiled
+    with \texttt{gcc} into \texttt{matmul}
+  \end{BoiteB}
+
+  \begin{BoiteC}{CUDA generation with compilation}
+\begin{verbatim}
+p4a --cuda saxpy.c -o s
+\end{verbatim}
+    generates a CUDA program that is compiled with \texttt{nvcc}
+  \end{BoiteC}
+\end{trans}
+
+\begin{frame}{Parallelization options}
+\begin{alltt}
+p4a [\emph{options}] \emph{files}
+\end{alltt}
+  \begin{itemize}
+  \item \texttt{--openmp} generates OpenMP output. This is the default
+    behaviour
+  \item \texttt{--cuda} generates CUDA output
+  \item \texttt{--accel} \texttt{--openmp} generates OpenMP output that
+    simulates the CUDA behaviour
+  \end{itemize}
+\end{frame}
+
+
+\include{p4a.help}
+
+
+\begin{trans}{Current limitations for CUDA}
+  \begin{itemize}
+  \item Some C99 are not yet managed in kernels by \texttt{nvcc}
+\begin{lstlisting}
+__global__ fct(int n , int array[n]) {
+  [...]
+}
+\end{lstlisting}
+    But PIPS trusts \texttt{nvcc} \smiley{} and generates this code on
+    some examples
+  \item There are limits on the size of blocks of threads and grids of
+    blocks but PIPS may generate some size bigger than what \texttt{nvcc}
+    and its run-time can cope
+  \item No code generation for shared memory
+  \item No communication optimization
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{Do and don't}
+  \begin{itemize}
+  \item Program in clean C99
+  \item Use array with dynamic sizes instead of \texttt{malloc()} spamming
+  \item Do not think that if there are pointers in C you need to use
+    them \smiley{} (same in Fortran95)
+  \item Array linearization is often wicked. There are multidimensional
+    arrays, so use them \smiley
+  \item You can pass multidimensional arrays in C
+\begin{lstlisting}
+int f(size_t n, size_t m, double matrix[n][m]) {
+}
+\end{lstlisting}
+    It was in Fortran 77 but only in C99... \smiley
+  \end{itemize}
+\end{trans}
+
+
+\begin{frame}{Conclusion}
+  \begin{itemize}
+  \item Motto: keep things simple
+  \item Easy way to begin with parallel programming
+  \item Source-to-source
+    \begin{itemize}
+    \item Can be used to give some programming examples
+    \item Good start that can be reworked upon
+    \end{itemize}
+  \item Open Source for community network effect
+  \item For more finer control, possible to directly use \texttt{tpips}
+    and (i)PyPS
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Par4All is currently supported by...}
+  \begin{itemize}
+  \item HPC Project
+  \item Mines ParisTech
+  \item Institut TÉLÉCOM/TÉLÉCOM Bretagne
+  \item Rensselaer Polytechnic Institute
+  \item European ARTEMIS SCALOPES project
+  \item European ARTEMIS SMECY project
+  \item French NSF (ANR) FREIA project
+  \item French NSF (ANR) MediaGPU project
+  \item French Images and Networks research cluster TransMedi@ project
+  \item French System@TIC research cluster OpenGPU project
+    % \item nVidia
+  \end{itemize}
+\end{frame}
+
+
+\section*{Table of content}
+
+\begin{multicols}{2}
+  \tiny
+  \tableofcontents[frametitles]
+  \textbf{You are here!}\hfill\expandafter\the\csname c@page\endcsname
+\end{multicols}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End:
