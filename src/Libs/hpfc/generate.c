@@ -589,14 +589,14 @@ list *lstatp, lw, lr;
 	 lw);
 
 
-    pips_debug(6, "%d statements for computer write:\n", gen_length(lcompw));
+    pips_debug(6, "%zd statements for computer write:\n", gen_length(lcompw));
 
     ifdebug(8)
     {
 	MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), lcompw);
     }
 
-    pips_debug(6, "%d statements for not computer write:\n",
+    pips_debug(6, "%zd statements for not computer write:\n",
 	       gen_length(lnotcompw));
 
     ifdebug(8)

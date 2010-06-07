@@ -147,8 +147,8 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define what_stat_debug(level, stat)\
  ifdebug(level) \
- { int so_ = statement_ordering(stat);\
-   pips_debug(level, "statement %p (%d,%d:%d)\n",\
+ { intptr_t so_ = statement_ordering(stat);\
+   pips_debug(level, "statement %p (%ld,%ld:%ld)\n",\
    stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_), \
    statement_number(stat));}
 

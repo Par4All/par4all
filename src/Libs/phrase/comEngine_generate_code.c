@@ -172,19 +172,19 @@ static void fill_gLoopToToggleEnt(statement stat, list lRef)
   list lDone = NIL;
 
   // Go through the reference list attached to this loop
-  MAP(REFERENCE, curRef,
+  FOREACH(REFERENCE, curRef, lRef)
   {
     // Get the fifo number for the current reference
-    int fifoNum = (int)hash_get(gRefToFifo, curRef);
+    intptr_t fifoNum = (intptr_t)hash_get(gRefToFifo, curRef);
 
     pips_assert("fifoNum != HASH_UNDEFINED_VALUE",
-		fifoNum != (int)HASH_UNDEFINED_VALUE);
+		fifoNum != (intptr_t)HASH_UNDEFINED_VALUE);
 
     // Get the fifo offset for the cureent reference
-    int inc = (int)hash_get(gRefToFifoOff, (void *)fifoNum);
+    intptr_t inc = (intptr_t)hash_get(gRefToFifoOff, (void *)fifoNum);
 
     pips_assert("inc != HASH_UNDEFINED_VALUE",
-		inc != (int)HASH_UNDEFINED_VALUE);
+		inc != (intptr_t)HASH_UNDEFINED_VALUE);
 
     bool bDone = FALSE;
 
@@ -225,7 +225,7 @@ static void fill_gLoopToToggleEnt(statement stat, list lRef)
     // variable
     hash_put(gToggleToInc, toggleEnt, (void *)inc);
 
-  }, lRef);
+  }
 }
 
 /*
@@ -324,7 +324,7 @@ static void add_toggle_inc_statements(statement stat, list lInStats)
 
     lStats = gen_nconc(CONS(STATEMENT, mmcdStat, NIL), lStats);
 
-    int inc = (int)hash_get(gToggleToInc, toggleEnt);
+    intptr_t inc = (intptr_t)hash_get(gToggleToInc, toggleEnt);
 
     statement toggleStat =
       make_toggle_inc_statement(toggleEnt, inc);

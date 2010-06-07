@@ -113,7 +113,7 @@ static void erosion_optimization
 	pips_assert("must be a kernel...", gen_length(iargs)==9);
 	// tell whether kernel element is NULL
 	bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
-	int i = 0;
+	intptr_t i = 0;
 	k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
 	iargs = CDR(iargs);
 	k10 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;

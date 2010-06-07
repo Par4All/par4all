@@ -53,10 +53,10 @@ static statement_mapping
   stat_bool_map = hash_table_undefined;
 
 #define Load(stat) \
-    ((bool) (hash_get(stat_bool_map, (char*) stat)))
+    ((bool) (hash_get(stat_bool_map,  stat)))
 
 #define Store(stat, val) \
-    (hash_put(stat_bool_map, (char*) (stat), (char*) (val)))
+    (hash_put(stat_bool_map,  (void*)stat, (void*) (val)))
 
 /* true if the first statement of a block is a host section marker.
  * looks like a hack. should be managed in directives.c...
@@ -88,7 +88,7 @@ void hpfc_io_util_error_handler()
 
 static void only_io_sequence(sequence q)
 {
-    int is_io;
+    intptr_t is_io;
     if (host_section_p(sequence_statements(q)))
 	is_io=1;
     else
@@ -97,47 +97,47 @@ static void only_io_sequence(sequence q)
 	MAP(STATEMENT, s, is_io = (is_io & Load(s)), sequence_statements(q));
     }
 
-    pips_debug(5, "block %p: %d\n", q, is_io);
+    pips_debug(5, "block %p: %"PRIdPTR"\n", q, is_io);
     Store(current_statement_head(), is_io);
 }
 
 static void only_io_test(test t)
 {
-    int is_io=3;
+    intptr_t is_io=3;
     is_io = (Load(test_true(t)) & Load(test_false(t)));
-    pips_debug(5, "test %p: %d\n", t, is_io);
+    pips_debug(5, "test %p: %"PRIdPTR"\n", t, is_io);
     Store(current_statement_head(), is_io);
 }
 
 static void only_io_loop(loop l)
 {
-    int is_io = Load(loop_body(l));
-    pips_debug(5, "loop %p: %d\n", l, is_io);
+    intptr_t is_io = Load(loop_body(l));
+    pips_debug(5, "loop %p: %"PRIdPTR"\n", l, is_io);
     Store(current_statement_head(), is_io);
 }
 
 static void only_io_call(call c)
 {
     entity f = call_function(c);
-    int is_io = entity_continue_p(f)? 3:
+    intptr_t is_io = entity_continue_p(f)? 3:
                 io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
 		    hpfc_special_io(f) ||    /* declared with FCD */
 			hpfc_io_like_function(f);/* runtime managed */
 
-    pips_debug(5, "call %p (%s): %d\n", c, entity_name(f), is_io);
+    pips_debug(5, "call %p (%s): %"PRIdPTR"\n", c, entity_name(f), is_io);
     Store(current_statement_head(), is_io);
 }
 
 static void only_io_unstructured(unstructured u)
 {
-    int is_io = 3;
+    intptr_t is_io = 3;
     control c = unstructured_control(u);
     list blocks = NIL;
 
     CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), c, blocks);
     gen_free_list(blocks);
-    pips_debug(5, "unstructured %p: %d\n", u, is_io);
-    Store(current_statement_head(), is_io);
+    pips_debug(5, "unstructured %p: %"PRIdPTR"\n", u, is_io);
+    Store(current_statement_head(), (void*)is_io);
 }
 
 static statement_mapping 

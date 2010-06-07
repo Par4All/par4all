@@ -790,7 +790,7 @@ generate_remapping_code(
     {
 	char buffer[128];
 	
-	sprintf(buffer, "! remapping %s[%d]: %s[%d] -> %s[%d]\n",
+	sprintf(buffer, "! remapping %s[%"PRIdPTR"]: %s[%"PRIdPTR"] -> %s[%"PRIdPTR"]\n",
 		entity_local_name(primary), load_hpf_number(primary),
 		entity_local_name(src), load_hpf_number(src),
 		entity_local_name(trg), load_hpf_number(trg));
@@ -1178,7 +1178,7 @@ remapping_file_name(
     module = strdup(entity_module_name(src));
     array  = strdup(entity_local_name(load_primary_entity(src)));
 
-    sprintf(buffer, "%s_%s_%x_%x_node.h", module, array,
+    sprintf(buffer, "%s_%s_%ld_%ld_node.h", module, array,
 	    load_hpf_number(src), load_hpf_number(trg));
 
     free(module);

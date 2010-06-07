@@ -207,7 +207,7 @@ align_check(
     *plvect = NIL;
     *plkind = NIL;
 
-    pips_debug(7, "with references to %s[DIM=%d] and %s[DIM=%d]\n",
+    pips_debug(7, "with references to %s[DIM=%zd] and %s[DIM=%zd]\n",
 	  entity_name(e1), gen_length(li1), entity_name(e2), gen_length(li2));
 
     ne2dim = NumberOfDimension(e2);
@@ -503,7 +503,7 @@ align_check(
 	list l;
 	fprintf(stderr, "[align_check] returning: ");
 	for (l=*plkind; l; POP(l))
-	    fprintf(stderr, "%d, ", INT(CAR(l)));
+	    fprintf(stderr, "%"PRIdPTR", ", INT(CAR(l)));
 	fprintf(stderr, "\n");
     }
 

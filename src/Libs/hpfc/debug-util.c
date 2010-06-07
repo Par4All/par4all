@@ -64,7 +64,7 @@ void print_entity_variable(entity e)
 
 void print_align(align a)
 {
-    (void) fprintf(stderr, "aligned (%d dimensions)\n", 
+    (void) fprintf(stderr, "aligned (%zd dimensions)\n", 
 		   gen_length(align_alignment(a)));
     gen_map((gen_iter_func_t)print_alignment, align_alignment(a));
     (void) fprintf(stderr, "to template %s\n\n",
@@ -74,7 +74,7 @@ void print_align(align a)
 void print_alignment(alignment a)
 {
     (void) fprintf(stderr,
-		   "Alignment: arraydim %d, templatedim %d,\n",
+		   "Alignment: arraydim %"PRIdPTR", templatedim %"PRIdPTR",\n",
 		   alignment_arraydim(a),
 		   alignment_templatedim(a));
     

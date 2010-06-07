@@ -339,7 +339,7 @@ static bool comparable_statements_on_distance_p(statement s0, statement s1)
     {
         expression e1 = EXPRESSION(CAR(iter));
         expression distance = distance_between_expression(e1,e0);
-        int val=0;
+        intptr_t val=0;
         if(!expression_undefined_p(distance))
         {
             (void)expression_integer_value(distance,&val);
@@ -371,7 +371,7 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
     {
         expression e1 = EXPRESSION(CAR(iter));
         expression distance = distance_between_expression(e1,e0);
-        int val=0;
+        intptr_t val=0;
         if(!expression_undefined_p(distance))
         {
             (void)expression_integer_value(distance,&val);
@@ -714,7 +714,7 @@ static void do_simdizer_init(call c)
         if(expression_reference_or_field_p(e0) && expression_reference_or_field_p(e1))
         {
             expression distance = distance_between_expression(e0,e1);
-            int val;
+            intptr_t val;
             if( !expression_undefined_p(distance) && expression_integer_value(distance,&val))
             {
                 free_expression(distance);

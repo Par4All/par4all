@@ -289,7 +289,7 @@ static void regenerate_toggles(statement stat, statement newStat,
   list lIncStats = NIL;
   list lMmcdStats = NIL;
 
-  MAP(ENTITY, oldTog,
+  FOREACH(ENTITY, oldTog,lToggleEnt)
   {
     printf("oldTog\n");
     print_entity_variable(oldTog);
@@ -303,10 +303,10 @@ static void regenerate_toggles(statement stat, statement newStat,
 					make_reference(oldTog, NIL),
 					entity_to_expression(newTog));
 
-    int inc = (int)hash_get(gToggleToInc, oldTog);
+    intptr_t inc = (intptr_t)hash_get(gToggleToInc, oldTog);
 
     pips_assert("inc != HASH_UNDEFINED_VALUE",
-		inc != (int)HASH_UNDEFINED_VALUE);
+		inc != (intptr_t)HASH_UNDEFINED_VALUE);
 
     statement incStat = make_toggle_inc_statement(newTog, inc);
 
@@ -339,7 +339,7 @@ static void regenerate_toggles(statement stat, statement newStat,
 
     glToggleInitStats = gen_nconc(glToggleInitStats, CONS(STATEMENT, initStat, NIL));
 
-  }, lToggleEnt);
+  } 
 
   instruction_block(statement_instruction(tempStat)) = NIL;
 

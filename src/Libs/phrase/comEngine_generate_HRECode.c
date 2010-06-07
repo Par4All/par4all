@@ -99,9 +99,9 @@ expression get_fifo_from_ref(reference ref)
 {
   expression retExp = expression_undefined;
 
-  int fifoNum = (int)hash_get(gRefToHREFifo, ref);
+  intptr_t fifoNum = (intptr_t)hash_get(gRefToHREFifo, ref);
 
-  if(fifoNum != (int)HASH_UNDEFINED_VALUE)
+  if(fifoNum != (intptr_t)HASH_UNDEFINED_VALUE)
     {
       retExp = make_integer_constant_expression(fifoNum);
     }

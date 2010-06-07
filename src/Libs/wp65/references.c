@@ -77,7 +77,7 @@ void update_map(statement_mapping m, statement st, reference r)
 	    lt =  gen_nconc(lt, CONS(REFERENCE,r, NIL));
 	    ifdebug(9) 
 		(void) fprintf(stderr,
-			       "ajout de la ref: %s au statement %d\n",
+			       "ajout de la ref: %s au statement %"PRIdPTR"\n",
 			       entity_local_name(reference_variable(r)), 
 			       statement_number(st));    
 	}
@@ -86,7 +86,7 @@ void update_map(statement_mapping m, statement st, reference r)
 	lt= CONS(REFERENCE,r, NIL);
 	ifdebug(9) 
 	    (void) fprintf (stderr,
-		"ajout de la ref: %s au statement %d\n",
+		"ajout de la ref: %s au statement %"PRIdPTR"\n",
 		entity_local_name(reference_variable(r)), 
 		statement_number(st));   
     }

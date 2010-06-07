@@ -1188,7 +1188,7 @@ dimension MakeDimension(list le)
     {
       /* Take only the first expression of le, do not know why it can be a list ?*/
       expression e = EXPRESSION(CAR(le));
-      int up;
+      intptr_t up;
 
       if (FALSE && expression_integer_value(e,&up))
 	/* use the integer value */ /* If we do this, we cannot restitute the source code */

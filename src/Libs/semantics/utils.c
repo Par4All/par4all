@@ -392,10 +392,10 @@ void integer_expression_and_precondition_to_integer_interval(expression e,
 
   /* If expression e is transformer-wise side-effect free (i.e. the ABSTRACT store is not modified)*/
   if(ENDP(transformer_arguments(et))) {
-    transformer p = transformer_range_intersection(transformer_dup(p), et);
-    Psysteme s = transformer_undefined_p(p) ?
+    transformer tp = transformer_range_intersection(transformer_dup(p), et);
+    Psysteme s = transformer_undefined_p(tp) ?
       sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED) :
-      sc_dup((Psysteme) predicate_system(transformer_relation(p)));
+      sc_dup((Psysteme) predicate_system(transformer_relation(tp)));
     Value lb = VALUE_ZERO, ub = VALUE_ZERO;
 
     if(sc_minmax_of_variable(s, (Variable) tmp, 

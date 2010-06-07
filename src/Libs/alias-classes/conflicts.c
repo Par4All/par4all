@@ -138,8 +138,8 @@ static bool old_effects_conflict_p( effect eff1, effect eff2 ) {
               if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
                 conflict_p = TRUE;
               else {
-                int i1 = -1;
-                int i2 = -1;
+                intptr_t i1 = -1;
+                intptr_t i2 = -1;
                 bool i1_p = FALSE;
                 bool i2_p = FALSE;
 
@@ -209,8 +209,8 @@ bool array_references_may_conflict_p( list sl1, list sl2 ) {
     if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
       conflict_p = TRUE;
     else {
-      int i1 = -1;
-      int i2 = -1;
+      intptr_t i1 = -1;
+      intptr_t i2 = -1;
       bool i1_p = FALSE;
       bool i2_p = FALSE;
 
@@ -279,8 +279,8 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
             conflict_p = FALSE;
           }
         } else {
-          int i1 = -1;
-          int i2 = -1;
+          intptr_t i1 = -1;
+          intptr_t i2 = -1;
           bool i1_p = FALSE;
           bool i2_p = FALSE;
 

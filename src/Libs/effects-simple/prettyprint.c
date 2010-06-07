@@ -116,8 +116,8 @@ compare_effect_reference(effect * e1, effect * e2)
 	if(unbounded_expression_p(e2))
 	  diff = -1;
 	else {
-	  int i1 = 0;
-	  int i2 = 0;
+	  intptr_t i1 = 0;
+	  intptr_t i2 = 0;
 
 	  /* FI: This is not enough as effects are not summarized
 	     right away. It may be impossible to find an integer value

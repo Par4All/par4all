@@ -292,7 +292,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	    != (list) HASH_UNDEFINED_VALUE) { 
 	    ifdebug(9) { 
 		(void) fprintf(stderr,
-			       "Vars having to be loaded for stat %d:\n",
+			       "Vars having to be loaded for stat %"PRIdPTR":\n",
 			       statement_number(s));
 		reference_list_print(lrefs); }    
 	    include_constant_symbolic_communication(compute_module,lrefs,
@@ -312,7 +312,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	    load_code = FALSE;
 	    ifdebug(9) {
 		(void) fprintf(stderr,
-			       "Vars having to be stored for stat %d:\n",
+			       "Vars having to be stored for stat %"PRIdPTR":\n",
 			       statement_number(s));
 		reference_list_print(lrefs); }
 	    include_constant_symbolic_communication(compute_module,lrefs,
@@ -1011,7 +1011,7 @@ int first_parallel_level,last_parallel_level;
 	for(; !ENDP(lr) && !proper_tag ; POP(lr)) {
 	    reference r = REFERENCE(CAR(lr));
 	    if( reference_in_list_p(r,map) && 
-	       (tag) hash_get(r_to_ud, (char *) r) == use_def) {
+	       (intptr_t) hash_get(r_to_ud, r) == (intptr_t)use_def) {
 		statement mbs;	/* statement for one movement block */
 		statement bmbs;	 /* statement for one bank movement block */
 

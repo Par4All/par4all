@@ -151,9 +151,9 @@ tiling tile;
 			first_reference = FALSE;
 		    }
 		    else {
-			hash_put(r_to_ud, (char *) r,
-				 ((char *)(first_reference? 
-					   is_action_write : is_action_read)));
+			hash_put(r_to_ud,  r,
+				 (void*)(intptr_t)(first_reference? 
+					   is_action_write : is_action_read));
 			first_reference = FALSE;
 			if(!reference_conflicting_test_and_update(r, dg, 
 								  v_to_lllv, 
@@ -161,20 +161,20 @@ tiling tile;
 								  r_to_llv,
 								  r_to_ud)) {
 			    entity v = reference_variable(r);
-			    int n;
+			    intptr_t n;
 			    list llv;
 			    (void) find_or_create_emulated_shared_variable(v, memory_module, 
 									   v_to_esv,
 									   bn, ls);
-			    if((n = (int) hash_get(v_to_nlv, (char *) v))
-			       == (int) HASH_UNDEFINED_VALUE)
+			    if((n = (intptr_t) hash_get(v_to_nlv, (char *) v))
+			       == (intptr_t) HASH_UNDEFINED_VALUE)
 				n = 0;
 			    llv = make_new_local_variables(v, compute_module, n, pd, 
 							   v_to_lllv);
-			    hash_put(llv_to_lcr, (char *) llv, 
-				     (char *) CONS(REFERENCE, r, NIL));
-			    hash_put(r_to_llv, (char *) r, (char *) llv);
-			    hash_put(v_to_nlv, (char *) v, (char *) (n+1));
+			    hash_put(llv_to_lcr,  llv, 
+				      CONS(REFERENCE, r, NIL));
+			    hash_put(r_to_llv,  r,  llv);
+			    hash_put(v_to_nlv,  v,  (void*)(n+1));
 			}
 		    }
 		}

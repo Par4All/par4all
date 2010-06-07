@@ -265,7 +265,7 @@ loop_nest_to_offset(list lls)
 	entity ind = loop_index(l);
 	range r = loop_range(l);
 	expression lower = range_lower(r);
-	int val;
+	intptr_t val;
 
 	if(expression_integer_value(lower, &val)) {
 	    vect_chg_coeff(&origin, (Variable) ind, (Value) val);

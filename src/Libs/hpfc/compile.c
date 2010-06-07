@@ -803,7 +803,7 @@ static bool loop_flt(loop l)
 	    int p;
 	    entity n;
 
-	    pips_debug(3, "considering reference to %s[%d]\n", 
+	    pips_debug(3, "considering reference to %s[%zd]\n", 
 		       entity_name(v), gen_length(reference_indices(r)));
 
 	    MAP(EXPRESSION, x,

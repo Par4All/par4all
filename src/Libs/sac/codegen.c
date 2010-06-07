@@ -558,11 +558,11 @@ static bool consecutive_expression_p(expression e0, int lastOffset, expression e
     expression distance = distance_between_expression(e0,e1);
     if( !expression_undefined_p(distance) )
     {
-        int idistance;
+        intptr_t idistance;
         NORMALIZE_EXPRESSION(distance);
         if((result=expression_integer_value(distance,&idistance)))
         {
-            pips_debug(3,"distance between %s and %s is %d\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
+            pips_debug(3,"distance between %s and %s is %"PRIdPTR"\n",words_to_string(words_expression(e0,NIL)),words_to_string(words_expression(e1,NIL)),idistance);
             result= idistance == ref_offset+ref_offset*lastOffset;
         }
         else {
@@ -1355,7 +1355,7 @@ static int intsort(const void *a, const void*b)
     int B = *(int*)b;
     return A==B?0:A<B?-1:1; }
 
-static void simdstatement_bubblesort_arguments(simdstatement ssi,intptr_t sz, int distances[sz])
+static void simdstatement_bubblesort_arguments(simdstatement ssi,intptr_t sz, intptr_t distances[sz])
 {
     int tmp[sz];
     memcpy(&tmp[0],&distances[0],sizeof(int)*sz);
@@ -1383,7 +1383,7 @@ void simd_optimize_data_layout(simdstatement ssi)
     for(intptr_t i = 0 ; i < simdstatement_nbArgs(ssi) ; i++)
     {
         bool all_comparable = true;
-        int distances[sz];
+        intptr_t distances[sz];
         distances[0]=0;
         for(intptr_t j = 1 ; j < sz ; j++)
         {
@@ -1391,7 +1391,7 @@ void simd_optimize_data_layout(simdstatement ssi)
                     simdstatement_arguments(ssi)[0+sz*i],
                     simdstatement_arguments(ssi)[j+sz*i]
                     );
-            if(!expression_undefined_p(distance) && expression_integer_value(distance,distances+j))
+            if(!expression_undefined_p(distance) && expression_integer_value(distance,&distances[0]+j))
             {
                 free_expression(distance);
             }

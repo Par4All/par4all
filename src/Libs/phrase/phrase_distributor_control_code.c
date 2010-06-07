@@ -262,11 +262,11 @@ void declare_common_variables_in_module (entity common, entity module)
   ifdebug(4) {
     pips_debug(4, "Current layout for %s\n", entity_global_name(common));    
     MAP(ENTITY, v, {
-      pips_debug(4, "[%s] offset %d\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
+      pips_debug(4, "[%s] offset %"PRIdPTR"\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
    }, area_layout(type_area(entity_type(common))));
     pips_debug(4, "Primary variables for %s\n", entity_global_name(common));    
     MAP(ENTITY, v, {
-      pips_debug(4, "[%s] offset %d PRIMARY\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
+      pips_debug(4, "[%s] offset %"PRIdPTR" PRIMARY\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
    }, primary_variables);
   }
  
@@ -697,7 +697,7 @@ static statement controlize_distribution (statement module_stat,
 	/* Get the function name */
 	function_name = entity_local_name(f);
 
-	pips_debug(2, "Found %d calls for externalized function %s\n",
+	pips_debug(2, "Found %zd calls for externalized function %s\n",
 		   gen_length((list)calls_for_f),
 		   function_name);
 

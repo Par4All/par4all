@@ -207,9 +207,9 @@ void jpips_done(void)
 	jpips_tag("done");
 }
 
-void jpips_string(const string a_message_format, va_list * some_arguments)
+void jpips_string(const char* a_message_format, va_list *some_arguments)
 {
-	vfprintf(out_to_jpips, a_message_format, * some_arguments);
+	vfprintf(out_to_jpips, a_message_format, *some_arguments);
 	fflush(out_to_jpips);
 }
 
@@ -584,7 +584,7 @@ static string tpips_user_request(const char * fmt, va_list args)
 	if (jpips_is_running)
 	{
 		jpips_tag(BEGIN_RQ);
-		jpips_string((string) fmt, & args);
+		jpips_string( fmt, (va_list*)&args);
 		jpips_printf("\n");
 		jpips_tag(END_RQ);
 	}
@@ -611,19 +611,19 @@ static string tpips_user_request(const char * fmt, va_list args)
 static void tpips_user_error(
 	const char * calling_function_name,
 	const char * a_message_format,
-	va_list *some_arguments)
+	va_list * some_arguments)
 {
 	/* print name of function causing error and
 	 * print out remainder of message
 	 */
 	fprintf(stderr, "user error in %s: ", calling_function_name);
-	vfprintf(stderr, a_message_format, * some_arguments);
+	vfprintf(stderr, a_message_format, *some_arguments);
 
 	if (jpips_is_running)
 	{
 		jpips_tag(BEGIN_UE);
 		jpips_printf("%s\n", calling_function_name);
-		jpips_string((string) a_message_format, some_arguments);
+		jpips_string( a_message_format, some_arguments);
 		jpips_tag(END_UE);
 	}
 

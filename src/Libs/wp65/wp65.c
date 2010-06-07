@@ -491,7 +491,7 @@ hash_table v_to_esv;
 	 {
 	   print_words(fd, words_reference((reference) r, NIL));
 	     fputs("\t->\t",fd);
-	     fputs(((tag) use_def == is_action_read) ? "use\n" : "def\n", fd);
+	     fputs(((intptr_t) use_def == (intptr_t)is_action_read) ? "use\n" : "def\n", fd);
        },
 	     r_to_ud);
 

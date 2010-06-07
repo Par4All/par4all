@@ -156,7 +156,7 @@ static string st_brace_expression_as_string(expression exp)
  */
 static string st_dimension_reference_as_string (dimension dim, expression old_expression) {
 
-  int low, old;
+  intptr_t low, old;
   string slow = NULL;
   string sold = NULL;
   bool low_given_by_expression = FALSE;
@@ -183,13 +183,13 @@ static string st_dimension_reference_as_string (dimension dim, expression old_ex
 
   if (low_given_by_expression) {
     if (old_given_by_expression) {
-      pips_debug(5,"old=%d low=%d\n", old, low);
+      pips_debug(5,"old=%"PRIdPTR" low=%"PRIdPTR"\n", old, low);
       string istr = i2a(old-low);
       result = strdup(concatenate(result, istr, NULL));
       free(istr);
     }
     else {
-      pips_debug(5,"sold=%s low=%d\n", sold, low);
+      pips_debug(5,"sold=%s low=%"PRIdPTR"\n", sold, low);
       string istr = i2a(low);
       result = strdup(concatenate(result, sold,"-",istr, NULL));
       free(istr);
@@ -197,7 +197,7 @@ static string st_dimension_reference_as_string (dimension dim, expression old_ex
     }
   else {
     if (old_given_by_expression) {
-      pips_debug(5,"old=%d slow=%s\n", old, slow);
+      pips_debug(5,"old=%"PRIdPTR" slow=%s\n", old, slow);
       string istr = i2a(old);
       result = strdup(concatenate(result, istr,"-",
 				  OPENBRACE,slow,CLOSEBRACE, NULL));
@@ -221,7 +221,7 @@ static string st_dimension_reference_as_string (dimension dim, expression old_ex
  */
 static string st_dimension_bound_as_string (dimension dim) {
   
-  int low, up;
+  intptr_t low, up;
   string slow = NULL;
   string sup = NULL;
   bool low_given_by_expression = FALSE;
@@ -248,21 +248,21 @@ static string st_dimension_bound_as_string (dimension dim) {
 
   if (low_given_by_expression) {
     if (up_given_by_expression) {
-      pips_debug(5,"up=%d low=%d\n", up, low);
+      pips_debug(5,"up=%"PRIdPTR" low=%"PRIdPTR"\n", up, low);
       string istr = i2a(up-low+1);
       result = strdup(concatenate(result, istr, NULL));
       free(istr);
     }
     else {
       string istr = i2a(low-1);
-      pips_debug(5,"sup=%s low=%d\n", sup, low);
+      pips_debug(5,"sup=%s low=%"PRIdPTR"\n", sup, low);
       result = strdup(concatenate(result, sup,"-",istr, NULL));
       free(istr);
     }
     }
   else {
     if (up_given_by_expression) {
-      pips_debug(5,"up=%d slow=%s\n", up, slow);
+      pips_debug(5,"up=%"PRIdPTR" slow=%s\n", up, slow);
       string istr = i2a(up+1);
       result = strdup(concatenate(result, istr,"-",
 				  OPENBRACE,slow,CLOSEBRACE, NULL));
@@ -532,7 +532,7 @@ static string st_declaration_init(entity var)
       svar = st_entity_local_name(var);
 
       dimensions = gen_length(variable_dimensions(v));
-      pips_debug(4,"Dimensions: %d\n", gen_length(variable_dimensions(v)));
+      pips_debug(4,"Dimensions: %zd\n", gen_length(variable_dimensions(v)));
 
       if (dimensions == 0) {
 
@@ -604,7 +604,7 @@ static string st_declaration_comment(entity var)
       string st = c_basic_string(variable_basic(v));
 
       dimensions = gen_length(variable_dimensions(v));
-      pips_debug(4,"Dimensions: %d\n", gen_length(variable_dimensions(v)));
+      pips_debug(4,"Dimensions: %zd\n", gen_length(variable_dimensions(v)));
 
       if (dimensions == 0) {
 	comment = strdup(concatenate(COMMENT, svar, ",", st, COMMENT, NULL));
@@ -1429,7 +1429,7 @@ static string st_loop(loop l)
   string low = st_expression(range_lower(r));
   string up = st_expression(range_upper(r));
   string inc = st_expression(range_increment(r));
-  int incasint;
+  intptr_t incasint;
 
   initialisation = strdup(concatenate(index, SPACE, SETVALUE, SPACE, low, STSEMICOLON, NULL));
 

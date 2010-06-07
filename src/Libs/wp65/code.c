@@ -1256,7 +1256,7 @@ int last_parallel_level)
 
     for ( lrs = lrefs; lrs != NIL ; lrs = CDR(lrs) ) {
 	r = REFERENCE(CAR(lrefs));
-	if ( (tag) hash_get(r_to_ud,(char *) r) == is_action_write) 
+	if (  (intptr_t)hash_get(r_to_ud, r) == (intptr_t)is_action_write) 
 	    lldr = classify_reference(lldr,r);
     }
 
@@ -1405,7 +1405,7 @@ int first_parallel_level,last_parallel_level;
 
     for (lrs =lrefs ; !ENDP(lrs) ; POP(lrs)) {
 	r = REFERENCE(CAR(lrs));
-  	if ( (tag) hash_get(r_to_ud,(char *) r) == is_action_read) 
+  	if ( (intptr_t) hash_get(r_to_ud, r) == (intptr_t)is_action_read) 
 	    llur = classify_reference(llur,r);
     }
 

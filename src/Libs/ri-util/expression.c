@@ -1833,7 +1833,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   if( ! ENTITY_FIVE_OPERATION_P(op_ent) )
     user_error("make_op_exp", "operation must be : +, -, *, MOD, or /");
 
-  int val1, val2;
+  intptr_t val1, val2;
   if( expression_integer_value(exp1,&val1) && expression_integer_value(exp2,&val2) )
     {
 
@@ -2575,8 +2575,8 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
   }
   else {
     /* */
-    int ib = 0;
-    int nb = 0;
+    intptr_t ib = 0;
+    intptr_t nb = 0;
 
     if(expression_integer_value(e, &ib)) {
       /* The offset might not be plus or minus one, unless we know the

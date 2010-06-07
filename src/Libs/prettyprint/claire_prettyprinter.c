@@ -258,8 +258,8 @@ static string claire_dim_string(list ldim, string name)
 	expression elow = dimension_lower(dim);
 	expression eup = dimension_upper(dim);
 	
-	int low;
-	int up;
+	intptr_t low;
+	intptr_t up;
 	nbdim++;
 	if (expression_integer_value(elow, &low)){
 	  if(nbdim != 1)
@@ -1180,8 +1180,8 @@ claire_declarations(entity module, string_buffer result)
 	comma = FALSE; 
 	for (dim = variable_dimensions(type_variable(entity_type(var))); !ENDP(dim); dim = CDR(dim)) {
 
-	  int low;
-	  int  up;
+	  intptr_t low;
+	  intptr_t  up;
 	  expression elow = dimension_lower(DIMENSION(CAR(dim)));
 	  expression eup = dimension_upper(DIMENSION(CAR(dim)));
 	 if (expression_integer_value(elow, &low) && expression_integer_value(eup, &up)){

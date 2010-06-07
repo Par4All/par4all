@@ -122,7 +122,7 @@ list li, lk, lv;
 	    range rg = loop_index_to_range(index);
 	    Value vs = vect_coeff(TSHIFTV, v), vi = vect_coeff(TCST, v);
 	    int	procdim,
-		shift = VALUE_TO_INT(vs),
+	    	shift = VALUE_TO_INT(vs),
 		ishft = VALUE_TO_INT(vi),
 		n     = DistributionParameterOfArrayDim(array, i, &procdim);
 	    expression dom_lb, dom_ub;
@@ -134,7 +134,7 @@ list li, lk, lv;
 	    {
 		/* neighbour to send to */
 		procv = vect_add(procv, 
-				 vect_new((Variable) procdim, 
+				 vect_new((Variable) (intptr_t)procdim, 
 					  (shift<0)?(VALUE_ONE):(VALUE_MONE)));
 		
 		/* content, on the sender point of view... */
@@ -379,7 +379,7 @@ message m;
 	int procdim;
 	range rcnt = RANGE(CAR(cnt)), rdom = RANGE(CAR(dom));
 	bool distributed = ith_dim_distributed_p(array, i, &procdim);
-	Value vn = distributed? vect_coeff((Variable) procdim, v):  VALUE_ZERO;
+	Value vn = distributed? vect_coeff((Variable) (intptr_t)procdim, v):  VALUE_ZERO;
 	int neighbour = VALUE_TO_INT(vn);
 
 	debug(9, "atomize_one_message", "dimension %d\n", i);
@@ -576,7 +576,7 @@ message m;
     t = VALUE_TO_INT(vt);
     for (i=2 ; i<=NumberOfDimension(processor) ; i++)
     {
-	Value vi = vect_coeff((Variable) i, v);
+	Value vi = vect_coeff((Variable) (intptr_t) i, v);
 	t = t*SizeOfIthDimension(processor, i) + VALUE_TO_INT(vi) ;
     }
 

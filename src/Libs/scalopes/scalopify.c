@@ -51,7 +51,7 @@ bool scalopify (const string module_name) {
   loops_to_outline = NIL;
   gen_recurse (module_statement,
 	       loop_domain, build_loop_list, gen_identity);
-  pips_debug (5, "%d loops to outline found\n", gen_length (loops_to_outline));
+  pips_debug (5, "%zd loops to outline found\n", gen_length (loops_to_outline));
 
   // revert the list and apply outlining
   loops_to_outline = gen_nreverse (loops_to_outline);

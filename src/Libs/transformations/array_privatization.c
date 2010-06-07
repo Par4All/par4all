@@ -318,7 +318,7 @@ static void private_regions_of_module_loops(statement module_stat)
 static bool stmt_filter(s)
 statement s;
 {
-    pips_debug(1, "statement %03d\n", statement_number(s));
+    pips_debug(1, "statement %03zd\n", statement_number(s));
     
     current_stmt_push(s);
     pips_debug(1, "end\n");
@@ -328,7 +328,7 @@ statement s;
 static void private_regions_of_statement(s)
 statement s;
 {
-    pips_debug(1, "statement %03d\n", statement_number(s));
+    pips_debug(1, "statement %03zd\n", statement_number(s));
 
     if (store_as_regions && !bound_private_effects_p(s))
     {
@@ -357,7 +357,7 @@ loop l;
     Psysteme sc_loop_prec;
     Pcontrainte contrainte;
 
-    pips_debug(1, "begin, statement %03d\n", 
+    pips_debug(1, "begin, statement %03zd\n", 
 	       statement_number(current_stmt_head()));
 
 

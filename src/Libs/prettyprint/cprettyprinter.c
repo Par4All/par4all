@@ -316,8 +316,8 @@ static string c_dim_string(list ldim)
         {
             expression elow = dimension_lower(dim);
             expression eup = dimension_upper(dim);
-            int low;
-            int up;
+            intptr_t low;
+            intptr_t up;
             string slow;
             string sup;
 
@@ -931,7 +931,7 @@ static string c_reference(reference r)
       expression e_tmp;
       expression e_lower = dimension_lower(DIMENSION(CAR(l_dim)));
       string s;
-      int itmp;
+      intptr_t itmp;
 
       if( !expression_equal_integer_p(e_lower, 0)) 
 	e_tmp = 

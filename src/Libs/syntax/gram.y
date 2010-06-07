@@ -185,7 +185,7 @@ extern void yyerror(char *);
     int ici; /* to count control specifications in IO statements */
     type CurrentType = type_undefined; /* the type in a type or dimension
 					  or common statement */
-    int CurrentTypeSize; /* number of bytes to store a value of that type */
+    intptr_t CurrentTypeSize; /* number of bytes to store a value of that type */
 
 /* functions for DATA */
 
@@ -1201,8 +1201,8 @@ fortran_type: fortran_basic_type lg_fortran_type
                 if (value_intrinsic_p($2)) /* ??? default! */
                 {
 		    free_value($2);
-		    $2 = make_value(is_value_constant,
-		       make_constant(is_constant_int, (void *) CurrentTypeSize));
+		    $2 = make_value_constant(
+		       make_constant_int( CurrentTypeSize));
 		}
 
 		$$ = CurrentType = MakeFortranType($1, $2);
@@ -1268,9 +1268,7 @@ lg_fortran_type:
 	    }
 	| TK_STAR ival
 	    {
-		    $$ = make_value(is_value_constant, 
-				    make_constant(is_constant_int,
-						  (void *) $2));
+		    $$ = make_value_constant(make_constant_int($2));
 	    }
 	;
 

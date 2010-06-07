@@ -1671,7 +1671,7 @@ sprintf_check_expression(expression args[], int nargs)
 {
     int k;
     list snprintf_args = NIL;
-    expression dst_size, tmpbuf_expr;
+    expression dst_size=expression_undefined, tmpbuf_expr;
     entity snprintf_ent, tmpbuf_ent;
 
     if (nargs < 2)

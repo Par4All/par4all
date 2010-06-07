@@ -617,7 +617,7 @@ static void insert_array_scalar_access_movement(entity compute_module,entity mem
     list ccode ;
     ifdebug(8) {
 	fprintf(stderr,
-		" communication to be inserted at run time stat no %d: ",
+		" communication to be inserted at run time stat no %"PRIdPTR": ",
 		statement_number(stat));
 	reference_list_print(lt); 
    

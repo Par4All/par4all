@@ -486,7 +486,7 @@ put_variables_in_ordered_lists(
 
     gen_remove(&all, (entity) TCST); /* just in case */
 
-    pips_debug(5, "considering %d variables\n", gen_length(all));
+    pips_debug(5, "considering %zd variables\n", gen_length(all));
 
     /* parameters: those variables that are not dummies...
      */
@@ -940,7 +940,7 @@ void io_efficient_compile(
 
   debug_on("HPFC_IO_DEBUG_LEVEL");
   pips_debug(1, "compiling!\n");
-  pips_debug(2, "statement %" _intFMT " (%p), %d arrays\n",
+  pips_debug(2, "statement %" _intFMT " (%p), %zd arrays\n",
 	     statement_number(stat), stat, gen_length(entities));
 
   // quicker for continue and so...

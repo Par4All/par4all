@@ -159,7 +159,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         statement body, stmt;
         instruction block, inst;
         range rg;
-        int lbval, ubval, incval;
+        intptr_t lbval, ubval, incval;
         bool numeric_range_p = FALSE;
         if(get_debug_level()==7) {
             /* Start debug in Newgen */
@@ -474,7 +474,7 @@ bool loop_fully_unrollable_p(loop l)
   expression lb = range_lower(lr);
   expression ub = range_upper(lr);
   expression inc = range_increment(lr);
-  int lbval, ubval, incval;
+  intptr_t lbval, ubval, incval;
 
   pips_debug(2, "begin\n");
 
@@ -502,7 +502,7 @@ void full_loop_unroll(statement loop_statement)
     expression rhs_expr, expr;
     statement stmt;
     instruction block;
-    int lbval, ubval, incval;
+    intptr_t lbval, ubval, incval;
     int iter;
 
     pips_debug(2, "begin\n");

@@ -387,7 +387,7 @@ static bool same_alignment_in_list_p(
     alignment a,
     list /* of alignments */ l)
 {
-    int adim = alignment_arraydim(a),
+    intptr_t adim = alignment_arraydim(a),
         tdim = alignment_templatedim(a);
 
     MAP(ALIGNMENT, b,
@@ -545,7 +545,7 @@ same_alignment_p(entity e1, entity t1, alignment a1,
 	RETAL("some undefined", b);
     }
 
-    pips_debug(7, "considering %s[dim=%d] and %s[dim=%d]\n",
+    pips_debug(7, "considering %s[dim=%ld] and %s[dim=%ld]\n",
 	       entity_name(e1), alignment_arraydim(a1),
 	       entity_name(e2), alignment_arraydim(a2));
 
@@ -1399,9 +1399,9 @@ static void print_control_ordering(control c)
 {
     statement s = control_statement(c);
     int so = statement_ordering(s);
-    fprintf(stderr, "(%d,%d:%d), ", 
+    fprintf(stderr, "(%d:%d:%" PRIdPTR "), ", 
 	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-	    statement_number(s));
+	    statement_ordering(s));
 }
 
 #define elst_ifdef(what, name, s) \

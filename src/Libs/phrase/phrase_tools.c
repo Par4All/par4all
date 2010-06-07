@@ -116,10 +116,10 @@ void debug_statement (string comments, statement stat, int debug_level)
   ifdebug(debug_level) {
     pips_debug(debug_level,"%s\n",comments);
     print_statement(stat);
-    pips_debug(debug_level,"domain number         = %d\n", statement_domain_number(stat));
+    pips_debug(debug_level,"domain number         = %"PRIdPTR"\n", statement_domain_number(stat));
     pips_debug(debug_level,"entity                = UNDEFINED\n");
-    pips_debug(debug_level,"statement number      = %d\n", statement_number(stat));
-    pips_debug(debug_level,"statement ordering    = %d\n", statement_ordering(stat));
+    pips_debug(debug_level,"statement number      = %"PRIdPTR"\n", statement_number(stat));
+    pips_debug(debug_level,"statement ordering    = %"PRIdPTR"\n", statement_ordering(stat));
     if (statement_with_empty_comment_p(stat)) {
       pips_debug(debug_level,"statement comments   = EMPTY\n");
     }
@@ -137,8 +137,8 @@ void debug_statement (string comments, statement stat, int debug_level)
 void debug_control (string comments, control a_control, int debug_level) {
 
   debug_statement (comments, control_statement(a_control), debug_level);
-  pips_debug(debug_level,"  predecessors          = %d\n", gen_length(control_predecessors(a_control)));
-  pips_debug(debug_level,"  successors            = %d\n", gen_length(control_successors(a_control)));
+  pips_debug(debug_level,"  predecessors          = %zd\n", gen_length(control_predecessors(a_control)));
+  pips_debug(debug_level,"  successors            = %zd\n", gen_length(control_successors(a_control)));
 
 }
 

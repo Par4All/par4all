@@ -57,7 +57,7 @@
 
 /* Stuff for SEND_PARAM....(...) and RECEIVE_PARAM....(...)
  * subroutines generation */
-#define VARIABLE_NAME_FORMAT "_%d_%d"
+#define VARIABLE_NAME_FORMAT "_%"PRIdPTR"_%"PRIdPTR
 #define SEND_PARAMETER_MODULE_NAME "SEND_%s_PARAMETER"
 #define RECEIVE_PARAMETER_MODULE_NAME "RECEIVE_%s_PARAMETER"
 #define SEND_ARRAY_PARAM_MODULE_NAME "SEND_%s_%s_PARAMETER"

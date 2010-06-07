@@ -518,11 +518,11 @@ string get_externalized_and_analyzed_function_name(statement stat,
 string variable_to_string (variable var)
 {
   string returned_value;
-  int low, up;
+  intptr_t low, up;
 
   returned_value = basic_to_string(variable_basic(var));
   (strchr(returned_value,'*'))[0] = '\0';
-  MAP (DIMENSION, dim, {
+  FOREACH (DIMENSION, dim, variable_dimensions(var)){
     if ((expression_integer_value(dimension_lower(dim), &low))
 	&& (expression_integer_value(dimension_upper(dim), &up))) {
       char buffer[256];
@@ -532,7 +532,7 @@ string variable_to_string (variable var)
     else {
       returned_value = strdup(concatenate(returned_value,":UNDEFINED",NULL));
     }
-  }, variable_dimensions(var));
+  }
 
   return returned_value;
 }
@@ -558,7 +558,7 @@ void register_scalar_communications (hash_table* ht_communications,
       /* Get the variable type */
       variable var = type_variable(entity_type(region_entity(reg)));
       
-      pips_debug(2, "Variable %s %d \n", basic_to_string(variable_basic(var)), gen_length(variable_dimensions(var)));
+      pips_debug(2, "Variable %s %zd \n", basic_to_string(variable_basic(var)), gen_length(variable_dimensions(var)));
       print_region(reg);
       
       /* Look if this variable is already registered */
