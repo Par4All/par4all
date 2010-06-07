@@ -261,14 +261,14 @@ complexity statement_to_complexity(statement stat,
     }
 
     /* Check and store the complexity in the statement_mapping */
-    complexity_check_and_warn("statement_to_complexity", comp);   
-    pips_assert("statement_to_complexity", complexity_consistent_p(comp));
+    complexity_check_and_warn("statement_to_complexity", comp);
+    pips_assert("comp is consistent", complexity_consistent_p(comp));
 
     /* SET_STATEMENT_MAPPING(get_complexity_map() , stat, (char *) comp); */
     store_statement_complexity(stat, comp);
 
     trace_off();
-    return(comp);    
+    return(comp);
 }
 
 /* The only element available of the statement */
@@ -300,21 +300,28 @@ list effects_list;
 	break;
     case is_instruction_call: {
 	basic callbasic = MAKE_INT_BASIC;          /* dummy parameter */
-	comp = call_to_complexity(instruction_call(instr), 
+	comp = call_to_complexity(instruction_call(instr),
 				  &callbasic, precond, effects_list);
 	break;
     }
     case is_instruction_unstructured:
-	comp = unstructured_to_complexity(instruction_unstructured(instr), 
+	comp = unstructured_to_complexity(instruction_unstructured(instr),
 					  precond, effects_list);
 	break;
-    default: 
+    case is_instruction_expression: { // copied from is_instruction_call
+	basic callbasic = MAKE_INT_BASIC;          /* dummy parameter */
+	comp = expression_to_complexity(instruction_expression(instr),
+					&callbasic,
+					precond, effects_list);
+	break;
+    }
+    default:
 	pips_error("instruction_to_complexity",
 		   "instruction tag %d isn't in 14->19.\n",
 		   (int) instruction_tag(instr));
     }
-    complexity_check_and_warn("instruction_to_complexity", comp);    
-    
+    complexity_check_and_warn("instruction_to_complexity", comp);
+
     trace_off();
     return(comp);
 }
@@ -777,8 +784,8 @@ list effects_list;
 	fprintf(stderr, "argument comp is at %p and value is ", comp);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
     }
-    complexity_check_and_warn("arguments_to_complexity", comp);    
-    
+    complexity_check_and_warn("arguments_to_complexity", comp);
+
     trace_off();
     return(comp);
 }
