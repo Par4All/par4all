@@ -231,6 +231,36 @@ static bool incrementation_expression_to_increment(expression incr,
                                 success = TRUE;
                             }
                         }
+                        /* SG: i am duplicating code, next generation of phd will clean it */
+                        else {
+                            inc_v = expression_verbose_reduction_p_and_return_increment(incr,sub_expression_p);
+                            if (inc_v != expression_undefined ) {
+                                inc_v=MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),inc_v);
+                                if(extended_integer_constant_expression_p(inc_v)) {
+                                    int v = expression_to_int(inc_v);
+                                    if (v != 0) {
+                                        * pincrement = inc_v;
+                                        success = true;
+                                        if (v <= 0 ) {
+                                            * is_increasing_p = true;
+                                            pips_debug(5, "Found \"i = i - v\" or \"i = v - i\" with positive increment!\n");
+                                        }
+                                        else {
+                                            * is_increasing_p = false;
+                                            pips_debug(5, "Found \"i = i - v\" or \"i = v - i\" with negative increment!\n");
+                                        }
+                                    }
+                                }
+                                /* SG: we checked the no-write-effect-on-increment earlier, we can go on safely,
+                                 * but we will not know if the increment is positive or not, assume yes ?
+                                 */
+                                else {
+                                    * pincrement = inc_v;
+                                    * is_increasing_p = false;
+                                    success = true;
+                                }
+                            }
+                        }
                     }
                     }
             }

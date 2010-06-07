@@ -781,7 +781,13 @@ bool assignment_expression_p(expression e) {
  */
 bool add_expression_p(expression e) {
   return operator_expression_p(e, PLUS_OPERATOR_NAME)
-    || operator_expression_p(e, PLUS_C_OPERATOR_NAME);
+    || operator_expression_p(e, PLUS_C_OPERATOR_NAME)
+    ;
+}
+bool sub_expression_p(expression e) {
+  return operator_expression_p(e, MINUS_OPERATOR_NAME)
+    || operator_expression_p(e, MINUS_C_OPERATOR_NAME)
+    ;
 }
 
 
@@ -2723,6 +2729,14 @@ entity expression_to_entity(expression e)
     default:
 	return entity_undefined;
     }
+}
+/* map expression_to_entity on expressions */
+list expressions_to_entities(list expressions)
+{
+    list entities =NIL;
+    FOREACH(EXPRESSION,exp,expressions)
+        entities=CONS(ENTITY,expression_to_entity(exp),entities);
+    return gen_nreverse(entities);
 }
 
 
