@@ -64,7 +64,7 @@ compute:      ;
    printf("Result = %f\n", a);                                          /*0020*/
    return 0;                                                            /*0021*/
 }
-int main(int, char *[])
+int main(int argc, char *argv[])
 {
    float b[N], c[N], a;                                                 /*0006*/
 
@@ -90,7 +90,7 @@ compute:      ;
    printf("Result = %f\n", a);                                          /*0020*/
    return 0;                                                            /*0021*/
 }
-int main(int, char *[])
+int main(int argc, char *argv[])
 {
    float b[N], c[N], a;                                                 /*0006*/
 

@@ -228,5 +228,4 @@ int main(int argc, char *argv[])
 
 Unsplit resulting code
 
-./jacobi03.database/Src
 Input image  : x=64 y=64 grey=255

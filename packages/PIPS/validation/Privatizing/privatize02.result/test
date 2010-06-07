@@ -4,7 +4,6 @@ void j_aime_les_moulinettes_a_fromage()
    for(i = 0; i <= 11; i += 1)
       j++;
 }
-extern void j_aime_les_moulinettes_a_fromage();
 void j_aime_les_moulinettes_a_fromage()
 {
    int i, j = 0;
@@ -12,4 +11,3 @@ void j_aime_les_moulinettes_a_fromage()
    for(i = 0; i <= 11; i += 1)
       j++;
 }
-extern void j_aime_les_moulinettes_a_fromage();

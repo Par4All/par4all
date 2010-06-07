@@ -21,6 +21,14 @@ echo
 display PRINTED_FILE[main]
 
 echo
+echo Cumulated effects for "partial_eval02"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[partial_eval02]
+activate PRINT_CODE
+
+echo
 echo Preconditions "main"
 echo
 

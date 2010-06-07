@@ -30,7 +30,7 @@ int main()
    /* The following code should not prevent the previous loop to be
         parallel: */
    // Should be parallel but for->do here not implemented yet...
-   for (j = 60;j>10;j = j-3)                                            /*0012*/
+   for(j = 60; j >= 11; j += -3)
       a[j] = 2;                                                         /*0013*/
 
    for (i = 2;i<=50;i = 2*i)                                            /*0015*/
@@ -51,7 +51,9 @@ int main()
    /* The following code should not prevent the previous loop to be
         parallel: */
    // Should be parallel but for->do here not implemented yet...
-   for (j = 60;j>10;j = j-3)                                            /*0012*/
+   ;
+#pragma omp parallel for 
+   for(j = 60; j >= 11; j += -3)
       a[j] = 2;                                                         /*0013*/
 
    for (i = 2;i<=50;i = 2*i)                                            /*0015*/
