@@ -230,8 +230,8 @@ EOF
 ])
 
 dnl configure an optionnal feature
-dnl usage AX_ARG_ENABLE(feature-name,help-message,default=[yes|no],configuration-action)
-dnl sets the shell_variable ax_enable_feature-name to FEATURE-NAME if test succeeded
+dnl usage AX_ARG_ENABLE(feature-name,help-message,default=[yes|no],configuration-action,[new-variable-value])
+dnl sets the shell_variable ax_enable_feature-name to FEATURE-NAME or, if given new-variable-value , if test succeeded
 dnl sets the conditionnal WITH_FEATURE-NAME
 dnl and set the disable message for AX_HAS(FEATURE-NAME)
 AC_DEFUN([AX_ARG_ENABLE],[
@@ -246,7 +246,7 @@ AC_DEFUN([AX_ARG_ENABLE],[
 					])
 			]
 		)
-		AS_IF([AX_HAS([$1])],[ax_enable_[]AS_TR_SH($1)=AS_TR_SH($1)])
+		AS_IF([AX_HAS([$1])],[ax_enable_[]AS_TR_SH($1)=m4_if($5,,[AS_TR_SH($1)],[$5])])
 		AM_CONDITIONAL(WITH_[]AX_TR_UP([$1]),[AX_HAS([$1])])
 	]
 )
