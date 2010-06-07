@@ -18,6 +18,8 @@
 #include "union.h"
 
 
+extern int slx_lex();
+extern int slx_error();
 extern char yytext[]; /* dialogue avec l'analyseur lexical */
 extern Psysteme ps_yacc;
 boolean syntax_error;
