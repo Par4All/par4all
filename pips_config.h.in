@@ -1,0 +1,30 @@
+/* portability header for use with auto pips
+ * it defines various macros depending on configuration found by configure
+ */
+#ifdef HAVE_CONFIG_H
+
+#include "config.h"
+
+/* ensure portability between different versions of readline { */
+#if !HAVE_DECL_RL_COMPLETION_MATCHES
+    #define rl_completion_matches completion_matches
+#endif
+
+#if !HAVE_DECL_RL_FILENAME_COMPLETION_FUNCTION
+    #define rl_filename_completion_function filename_completion_function
+#endif
+
+#if !HAVE_RL_COMPENTRY_FUNC_T
+    #define rl_compentry_func_t CPFunction
+#endif
+
+/* in bsd, there is a bacward compatible mode, we skip it here */
+#if !HAVE_RL_COMPENTRY_FUNC_T || !HAVE_DECL_RL_COMPLETION_MATCHES || !HAVE_DECL_RL_FILENAME_COMPLETION_FUNCTION
+    #define RL_NO_COMPAT
+#endif
+/* } */
+
+/* usefull for portable printf */
+#define __STDC_FORMAT_MACROS
+
+#endif
