@@ -8,6 +8,3 @@ END PROGRAM GENERATE
 !
       SUBROUTINE TOTO
       END
-
-"compile sources produced by pips"
-
