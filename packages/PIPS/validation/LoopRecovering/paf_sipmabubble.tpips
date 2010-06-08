@@ -39,6 +39,13 @@ apply FOR_LOOP_TO_DO_LOOP[paf_sipmabubble]
 activate PRINT_CODE
 display PRINTED_FILE[paf_sipmabubble]
 
+# Check that the result is correct C for gcc
+
+apply UNSPLIT
+shell gcc -c paf_sipmabubble.database/Src/paf_sipmabubble.c -o paf_sipmabubble.database/paf_sipmabubble.o
+
+quit
+
 echo
 echo COMPLEXITY
 echo
