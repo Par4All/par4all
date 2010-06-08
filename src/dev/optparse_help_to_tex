@@ -157,7 +157,9 @@ def p_empty(p):
 
 def LaTeX_protect(string):
     "Protect the LaTeX special characters"
-    return re.sub(r'([\\&~#_%$])', r'\\\1', string)
+    s = re.sub(r'([\\&~#_%$])', r'\\\1', string)
+    # Insert an empty group to avoid ligature in -- for some fonts:
+    return re.sub('--', '-{}-', s)
 
 
 def LaTeX_section(level):
@@ -196,6 +198,10 @@ def section_itemize(title, content):
 def block_itemize(title, content):
     """Make a trans or section environment with the content.
     Assume the content is already protected"""
+
+    # Remove some trailing ':':
+    title = title.rstrip(':')
+
     if options.slides:
         return slide_itemize(title, content)
     else:
