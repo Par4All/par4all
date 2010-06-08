@@ -590,7 +590,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 	     where the array is passed ???
 	     2. Filter when using script array_resizing_instrumentation => simpler ??? */
 	  fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
-	  fprintf(instrument_file,new_decl);
+	  fprintf(instrument_file,"%s", new_decl);
 	  fprintf(instrument_file,"%s\n",PREFIX3);
 	  free(file_name), file_name = NULL;
 	  free(new_decl), new_decl = NULL;
@@ -1517,7 +1517,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	     free(old_decl), old_decl = NULL; */
 	  
 	  fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
-	  fprintf(instrument_file,new_decl);
+	  fprintf(instrument_file,"%s", new_decl);
 	  fprintf(instrument_file,"%s\n",PREFIX3);
 	  
 	  /* Insert new declaration and assignments in callers that are called by the main program*/
@@ -1539,7 +1539,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		  current_variable_caller = make_new_integer_scalar_common_variable(pips_variable_name,current_caller,
 										    pips_common);
 		  fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
-		  fprintf(instrument_file, new_decl);
+		  fprintf(instrument_file, "%s", new_decl);
 		  fprintf(instrument_file, "%s\n",PREFIX3);
 
 		  /* insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site*/
