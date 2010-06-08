@@ -157,7 +157,9 @@ def p_empty(p):
 
 def LaTeX_protect(string):
     "Protect the LaTeX special characters"
-    s = re.sub(r'([\\&~#_%$<>])', r'\\\1', string)
+    s = re.sub(r'([\\&~#_%$])', r'\\\1', string)
+    # Protect the '<' and '>'
+    s = re.sub(r'([<>])', r'\\texttt{\1}', s)
     # Insert an empty group to avoid ligature in -- for some fonts:
     return re.sub('--', '-{}-', s)
 
