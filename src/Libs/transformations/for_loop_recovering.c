@@ -268,6 +268,7 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 					       get_current_module_entity(),
 					       // Should use ultimate type?
 					       entity_basic(rv));
+    AddEntityToCurrentModule(new_index);
 	//\domain{Forloop = initialization:expression x condition:expression x increment:expression x body:statement}
 
 
