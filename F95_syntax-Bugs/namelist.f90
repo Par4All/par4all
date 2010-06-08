@@ -6,4 +6,5 @@
       x=x+1
       n=n+1
       write (*, nml=struct)
+      return
       end
