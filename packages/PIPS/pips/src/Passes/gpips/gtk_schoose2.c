@@ -70,7 +70,7 @@ static void schoose_help_notify(GtkWidget * widget, gpointer data) {
  * something with the menu associated to the beforementionned entry. */
 static void schoose_ok_notify(GtkWidget * widget, gpointer data) {
 	GtkTreeIter iter;
-	GtkTreeModel ** model;
+	GtkTreeModel ** model = NULL;
 	gchar * gc_choice;
 
 	GtkTreeSelection * selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(

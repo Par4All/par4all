@@ -7,7 +7,7 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
    int i;
 
    i = size;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+   return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 Initial code for "main"
@@ -31,6 +31,25 @@ int main()
    printf("%d\n", partial_eval02(riri, fifi, size, loulou));
 
    return 0;
+}
+
+Cumulated effects for "partial_eval02"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: size
+//               <must be written>: riri[2]
+int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   int i;
+//               <must be read   >: size
+//               <must be written>: i
+
+   i = size;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 Preconditions "main"
@@ -101,27 +120,27 @@ int main()
 Preconditions "partial_eval02"
 
 
-//  P() {}
+//  P() {size==2}
 
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
 
-//  P() {}
+//  P() {size==2}
 
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
-//  P() {}
+//  P() {size==2}
 
    int i;
 
-//  P(i) {}
+//  P(i) {size==2}
 
 
    i = size;
 
-//  P(i) {i==size}
+//  P(i) {i==2, size==2}
 
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+   return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 Code after partial evaluation for "partial_eval02"
@@ -132,7 +151,7 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
    int i;
 
    i = 2;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
+   return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3);
 }
 
 Code after partial evaluation for "main"
@@ -166,7 +185,7 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
    int i;
 
    i = 2;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
+   return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3);
 }
 
 Unsplit resulting code

@@ -1,5 +1,5 @@
 %%
-%% $Id: ri.tex 17253 2010-05-31 08:43:19Z creusillet $
+%% $Id: effects.tex 17253 2010-05-31 08:43:19Z creusillet $
 %%
 %% Copyright 1989-2010 MINES ParisTech
 %% Copyright 2009-2010 HPC Project
@@ -33,6 +33,7 @@
 \fi
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage[nofancy]{svninfo}
+\usepackage{array}
 
 %% To generate an index:
 \usepackage{makeidx}
@@ -54,13 +55,25 @@
 \date{\svnInfoLongDate{}, revision r\svnInfoRevision}
 
 \begin{document}
-\svnInfo $Id: ri.tex 17253 2010-05-31 08:43:19Z creusillet $
+\svnInfo $Id: effects.tex 17253 2010-05-31 08:43:19Z creusillet $
 \maketitle
 \sloppy
 \newpage
 \tableofcontents
 \newpage
 \section*{Introduction}
+Each statement reads and writes several memory locations to retrieve
+stored values and to store new values. Understanding the relationship
+between statements and memory is one of the many keys to restructure
+and parallelize programs. Several analyses provide different
+approximations of the statement effects on memory. This document
+gathers the internal data structures used to represent memory
+locations and the effects of statements~\footnote{Several of the
+  newgen domains declared in this document were originally part of the
+  \texttt{ri.tex} file. They have been moved here because, strictly
+  speaking, they do not deal with the internal representation of
+  programs, and because the extension to C programs required the
+  extension of the \texttt{cell} domain.}.
 
 \section{Imported domains}
 \domain{import entity from "ri.newgen"}
@@ -76,21 +89,194 @@
 \domain{External Psysteme}
 {}
 
-\section{Memory access paths}
+\section{Representing memory locations}
 
-\domain{Cell = reference + preference}
-{}
-Cells are used in effects to specify memory access paths. See Section~\ref{effects} for more details.
+A first solution to represent memory locations would be to use dummy
+memory addresses, potentially one for each memory cell. However
+analyses results would be equivalent modulo a renaming of dummy
+addresses, making non-regression tests more dificult. Moreover,
+analyses results would be difficult to interpret for a human operator,
+and program transformations would lead to code difficult to read for
+an end-user. This would not be a problem in a traditional
+compiler. However, PIPS is a source-to-source compiler, and aims at
+generating user-readable code, as close as possible to the user input
+code. The first target language being Fortran~77, this primarily led
+to represent memory locations as they are represented in the internal
+program representation, that is to say as symbolic references on
+program variables. Hence a read of variable \texttt{a} is represented
+as an effect on reference \texttt{a}, and a read of array element
+\texttt{t[5]} by an effect on reference \texttt{t[5]}. \texttt{t[*]}
+is used to represent a set of unknown locations in array \texttt{t} or
+to obtain a representation independent of the memory store.
+
+However, this representation is highly imprecise to deal with sets of
+array elements, which is necessary for effective dependence testing
+and program transformations. Polyhedral sets (also called \emph{array
+  regions}~\cite{Creu96}\cite{Trio84}) were introduced to refine the memory location
+representation for arrays. Internally, the \texttt{reference} domain
+is still used, but parameterized by dummy\texttt{phi} variables. An
+additional convex descriptor describes the relations between the
+\texttt{phi} variables and the program variables values in the
+considered memory store. 
+
+It has been chosen not to append the descriptor to the memory location
+representation, but to integrate it in the client domains. This
+seems more adapted to alias-like analyses for which we intend to use a
+single descriptor to describe the relationships between the sink and
+source memory cells representations.
+
+For C programs, memory accesses are not solely represented by objects
+of the \texttt{reference} domain (see~\texttt{ri.pdf}), in particular
+when dereferencing pointers or refering to aggregate data
+structures. Subsection~\ref{subsec:pointers_and_structs} presents the
+choices made to represent memory accesses through pointers and
+non-recursive data structures. Subsection~\ref{subsec:gaps} introduces
+new domains to enable analyses of recursive data structures.
+
+\subsection{Pointers, non-recursive structs and unions}
+\label{subsec:pointers_and_structs}
+
+Many question arose with the introduction of C as an PIPS input
+language. For memory location representation, most of them were due to
+pointers. A discussion of the different issues encountered and the
+different solutions that were considered can be found
+in~\verb+ri_C.pdf+. As it stretches over several pages, we do not
+move or reproduce it here, but only present the final option.
+
+It has been chosen to preserve the present represent representation of
+memory locations as symbolic \texttt{reference}s. This has the
+invaluable advantage of backward compatibilty for the existing
+analyses. But it also enables the use of existing operators and
+functions dealing with memory locations represented as references, and
+thus enables a quicker integration of new functionalities necessary do
+deal with C data structures.
+
+This is not to the cost of the representation
+precision. Table~\ref{tab:references} shows that memory accesses
+involving pointers, arrays, structs and mix of them, can be
+accuratly represented using symbolic references.
+
+
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{| >{\tt}l | >{\tt}l | >{\tt}l |}
+
+\hline
+declarations & reference & effects \\ \hline
+
+int a, *p; &   & \\
+      & a & a\\
+      &*p & p[0] \\\hline
+
+int t[N], *p, (*q)[N], *u[N], **v; & & \\ 
+        & *t & t[0] \\
+        & t[i] & t[i] \\
+        & *p & p[0] \\
+         & p[i]& p[i]\\ 
+        & (*q)[i] & q[0][i] \\
+        & *u[i]& u[i][0]\\
+        & *v[i]& v[i][0]\\\hline
+
+typedef struct \{ & & \\
+int num; && \\
+int tab1[N] ; && \\
+int *tab2; \} mys;&& \\
+&& \\
+
+mys a, b[N], *c, **d; & & \\
+                  & a.num  & a[.num] \\
+                  & a.tab1[j] & a[.tab1][j] \\
+                  & a.tab2[k] & a[.tab2][k] \\
+&& \\
+                  & b[i].num & b[i][.num] \\
+                  & b[i].tab1[j] & b[i][.tab1][j]\\
+                  & b[i].tab2[k]& b[i][.tab2][k]\\
+&& \\
+                  & c->num & c[0][1]\\
+                  & c->tab1[j] & c[0][.tab1][j] \\
+                  & c->tab2[k] & c[0][.tab2][k] \\
+&& \\
+                  & d[i]->num & d[i][0][.num]\\
+                  & d[i]->tab1[j] & d[i][0][.tab1][j]\\
+                  & d[i]->tab2[k] & d[i][0][.tab2][k]\\ \hline
+                  
+\end{tabular}
+\end{center}
+\caption{Representing memory locations using references}\label{tab:references}
+\end{table}
+
+Unions are more difficult to track because they create an equivalence
+between two structures located at the same address. We intend to
+represent accesses as we would do it for structs, delaying the burden
+to disambiguate them to client analyses.
+
+\subsection{Recursive data structures : GAPs}
+\label{subsec:gaps}
+
+Recursive data structures such as linked lists or trees are frequent
+in C programs, and being able to deal with them is essential. However,
+the \texttt{reference} domain is not adapted to the collective
+representation of sets of recursive data structures elements, because
+it can only describe fixed length access paths (that is to say the
+number of indices of the reference must be numerically known and
+finite). 
+
+A quick extension could have been the introduction of a special flag
+index meaning that up to a certain depth the path is
+recursive. However, some intended program transformations could not
+sufficiently benefit from this approach, and we have searched for a
+new data structure to hold the necessary information. 
+
+Experiments on real codes, and the need of a maximal compatibility
+with existing data structures, led us to chose an extension of Alain
+Deutsch's Symbolic Access Paths (SAPs)~\cite{Deutsch94}, which we call
+Generic Access Paths or GAPs. GAPs are very similar to SAPs, but for
+path selectors, which, instead of being limited to variable names and
+struture field names, can additionally be any subscript expression,
+thus allowing the representation of elements of arrays of linked lists
+of arrays of linked lists... 
+
+For instance $\mathtt{p[i]([0][.next])^(c)[.tab][j]}$ represents the
+j-th element of the \texttt{tab} field of the c-th element of the
+linked list towards which \texttt{p[i]} points.
+
+For backward compatibility reasons, we intend to use GAPs internally
+only for recursive data structures, but they could also be used for
+single scalar variables, stack or heap arrays, non-recursive aggregate
+data structures...
+
+
+\domain{Gap = variable:entity x path_selectors} 
+{} 
+\domain{Path_selectors = path_selector*} 
+{} 
+\domain{Path_selector = expression + recursive_selector} 
+{} 
+\domain{Recursive_selector = basis:path_selectors* x coefficient:expression} 
+{} 
+
+
+
+\subsection{Cell domain}
+
+The domain~\texttt{cell} is used to represent memory
+locations. Instead of the~\texttt{reference} domain,
+\texttt{preference} can be used to retain a link to the actual program
+reference. This is mainly used for Fortran programs where all memory
+locations references are internally represented as objects of domain
+\texttt{reference}. However this does not make much sense for C
+programs because more complex expressions are often used to refer to
+memory locations. GAPs have been added for recursive data structures
+(see~ref{subsec:gaps} for more details).
+
+
+\domain{Cell = reference + preference + gap} 
+{} 
 
 % \section{Effets des instructions}
 \section{Effects of statements and instructions}
 \label{effects}
 
-Each statement reads and writes several memory locations to retrieve
-stored values and to store new values. Understanding the relationship between
-statements and memory is one of the many keys to restructure and
-parallelize programs. Several analyses provide different approximations
-of the statement effects on memory.
 
 Each program variable is a unique set of memory locations. Effects can
 be expressed as effects on these sets. They are called \emph{atomic}
@@ -106,26 +292,33 @@ interval. PIPS is able to handle polyhedral sets, called \emph{array
 regions}. Extension to non-convex sets, intersections of a lattice and a
 polyhedron, is under investigation.
 
-Memory effects are not always perfectly known. It is undecidable in the
-general case. Effects can be labelled as \texttt{MAY} if they might happen,
-\texttt{MUST} if they always happen, and \texttt{EXACT} if the abstract set
-used to represent them is equal to the dynamic set of effects. For
-historical reasons, exact effects are labelled \texttt{MUST} and must
-effects are not computed.
+Memory effects are not always perfectly known. It is undecidable in
+the general case. Effects can be labelled as \texttt{MAY} if they
+might happen, \texttt{MUST} if they always happen, and \texttt{EXACT}
+if the abstract set used to represent them is equal to the dynamic set
+of effects. For historical reasons, exact effects are labelled
+\texttt{MUST} and must effects are not computed because with
+polyhedral sets, they are either equal to the exact set or to the
+empty set.
 
-Finally, read and write effects are not precise enough for compound
-statements. It is more interesting to known if the \emph{initial} value
-of a memory location is \emph{used} by a statement, which is called a
-\texttt{IN} effect, or if the memory location only is used for temporary
-storage. In the same way, it is important to know if the value left by a
-statement in a memory location is dead when leaving a statement or if it
-is used later by another statement execution. In the later case, it is
-called an \texttt{OUT} effect.
+\texttt{READ} and \texttt{write} effects are useful for dependence
+analyses. However, it is sometimes interesting to see compound
+statements as black boxes. In this case we only want to known if the
+\emph{initial} value of a memory location is \emph{used} by the
+statement, which is called a \texttt{IN} effect, or if the memory
+location is only used for temporary storage. In the same way, it is
+important to know if the value left by a statement in a memory
+location is dead when leaving a statement or if it is used later by
+another statement execution. In the later case, it is called an
+\texttt{OUT} effect. Currently \texttt{IN} effects are internally
+represented as \texttt{READ} effects, and \texttt{OUT} effects as
+\texttt{WRITE} effects. The programmer must be aware of the type of
+effects he is dealing with.
 
 Note that spurious effects are added in loop bodies to avoid... and/or
-simulate later a control dependence by a data dependence \marginpar{see
-PJ}.  These effects are \verb/read/ effects on the loop bounds
-(variables used in loop bound expressions?).
+simulate later a control dependence by a data dependence
+\marginpar{see PJ}. These effects are \verb/read/ effects due to the
+loop bounds and increment evaluations.
 
 Note also that \verb/read/ effects of Fortran \verb/DO/ loop indices due
 to the incrementations are ignored because they are never upward
@@ -135,55 +328,8 @@ such surprising approximations. Note that read effects which might be due
 to bound or increment expressions as in \verb/DO I = I, 10*I, I/ must be
 preserved.
 
-\subsection{Effects}
-\label{subsection-effects}
-\index{Effects}
 
-The \texttt{effects} domain is a list of individual effects. Each
-effect can only be a read or a write and is related to only one
-entity, most of the time a variable entity\footnote{In Fortran, the
-  entity is always a variable entity.}, but possibly an area entity or
-even an entity representing a set of areas\footnote{Areas and set of
-  areas are used to express imprecise memory effects due to pointer
-  dereferencing.}. Lots of individual effects are linked to each
-statements, especially compound statements like \texttt{blocks},
-\texttt{tests}, \texttt{loops} and \texttt{unstructured}.
-
-Control effects, such as \verb/STOP/ or exception, are not
-computed. PIPS only deals with memory effects. Fortran exceptions like
-overflows or zero divides are considered programm errors and the error
-behaviors are not taken into account in PIPS analyses.
-
-Effects and the types defined in the following subsections are not used to
-represent code, but to store analysis result. These types are declared in
-the \emph{internal representation\/} for historical reasons.
-
-\domain{Effects = effects:effect*}
-
-The next domain can be used to store summary effects of callees.
-
-\domain{entity\_effects = entity->effects}
-{}
-
-The next domain can be used to store a statement to effects mapping.
-Should be used for proper and cumulated effects and references.
-
-\domain{statement\_effects = persistent statement->effects}
-{}
-
-
-\subsection{Effects Classes}
-\label{subsection-effects-classes}
-\index{Effects Classes}
-
-\domain{Effects\_classes = classes:effects*}
-{}
-
-The type \texttt{effects\_classes} is used to store equivalence classes of
-dynamic aliases, i.e. aliases created at call sites. \texttt{Effects\_classes}
-are lists of effects, i.e. lists of lists of regions.
-
-\subsection{Effect}
+\subsection{Effect representation}
 \label{subsection-effect}
 \index{Effect}\index{Region}
 
@@ -192,11 +338,11 @@ are lists of effects, i.e. lists of lists of regions.
 \domain{Descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit}
 {}
 
-Type \verb/effect/ is used to represent a read or write access to a
+Domain \verb/effect/ is used to represent a read or write access to a
 variable or through a pointer, i.e. to abstract a reference in a
 statement. Statement effects are used to compute array regions,
 transformers and preconditions, to build use-def chains, dependence
-%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
+%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html
 graphs, Summary Data Flow Information (SDFI), known as summary effects
 at the module level, and as cumulated effects at the statement level,
 and array regions. Proper effects, cumulated effects, summary effects
@@ -212,8 +358,11 @@ either a \verb/reference/ or a persistant\footnote{Persitant is a
   Newgen attribute carried by a type or by a field. It means that
   recursive Newgen procedures must stop there. This impacts especially
   the free and copy functions.} \verb/preference/. Attribute
-\verb/persistant/ is used for so-called \emph{reference} and \emph{simple} 
-effects to keep track of actual program references, that should not be modified or freed. This feature is useful for several program analyses or transformations(see the pipsmake-rc documentation).
+\verb/persistant/ is used for so-called \emph{reference} and
+\emph{simple} effects to keep track of actual program references, that
+should not be modified or freed. This feature is useful for several
+program analyses or transformations(see the pipsmake-rc
+documentation).
 
 
 This persistant attribute is not welcome for more advanced effects,
@@ -269,16 +418,16 @@ as well as pseudo-variables, known as \verb/PHI/ variables. There is one
 \verb/PHI/ variable per array dimension.
 
 Field \verb/context/ only is used for effects known as \emph{array
-regions}. They were defined by RÃ©mi Triolet in~\cite{Trio84} and
-extended by BÃ©atrice Creusillet in~\cite{Creu96}.
+regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
+extended by Béatrice Creusillet in~\cite{Creu96}.
 
 There should not be much strict aliasing between effects in an effect
 list, but this is (was?) not checked and enforced. Some efforts are
 made when translating the summary effects of a callee into the
 caller's frame to avoid this problem.
 
-\subsection{Nature of an Effect}
-\label{subsection-action}
+\subsubsection{Nature of an Effect}
+\label{subsubsection-action}
 \index{Action}
 
 \domain{Action = read:unit + write:unit}
@@ -290,8 +439,8 @@ read and write. \verb/IN/ regions are represented by \verb/read/ effects
 and \verb/OUT/ regions by \verb/write/ effects.
 
 
-\subsection{Approximation of an Effect}
-\label{subsection-approximation}
+\subsubsection{Approximation of an Effect}
+\label{subsubsection-approximation}
 \index{Approximation}
 
 \domain{Approximation = may:unit + must:unit + exact:unit}
@@ -305,11 +454,11 @@ other ones may never access it, and some may access it or not dependeing
 on the statement occurence. Such effects are of the \verb/may/ kind.
 
 \begin{comment}
-La prÃ©sence de tests et boucles ne permet pas de dÃ©terminer en gÃ©nÃ©ral
-si une variable est effectivement lue ou Ã©crite lors de l'exÃ©cution
-d'un \texttt{statement}. Il se peut mÃªme que certaines exÃ©cutions
-y accÃ¨dent et que d'autres n'y fassent pas rÃ©fÃ©rence. Les effets
-calculÃ©s sont alors de type \texttt{may}.
+La présence de tests et boucles ne permet pas de déterminer en général
+si une variable est effectivement lue ou écrite lors de l'exécution
+d'un \texttt{statement}. Il se peut même que certaines exécutions
+y accèdent et que d'autres n'y fassent pas référence. Les effets
+calculés sont alors de type \texttt{may}.
 \end{comment}
 
 Sometimes, a simple statement, such as an assignment like \texttt{J = 2},
@@ -327,14 +476,65 @@ numerically known.
 
 \begin{comment}
 Dans quelques cas particuliers, comme une affectation simple \texttt{I = 2},
-l'effet est certain (\emph{must}). Il peut alors Ãªtre utilisÃ© dans
+l'effet est certain (\emph{must}). Il peut alors être utilisé dans
 le calcul des \emph{use-def chains} pour effectuer un \emph{kill} sur les
 variables scalaires. Un effet \emph{must} sur un tableau ne signifie pas
-que tout le tableau est lu ou Ã©crit mais qu'au moins un de ses
-Ã©lÃ©ments l'est.
+que tout le tableau est lu ou écrit mais qu'au moins un de ses
+éléments l'est.
 \end{comment}
 
-\subsection{Mapping from Statements to Effects}
+\subsection{Lists of effects}
+\label{subsection-effects}
+\index{Effects}
+
+The \texttt{effects} domain is a list of individual effects. Each
+effect can only be a read or a write and is related to only one
+entity, most of the time a variable entity\footnote{In Fortran, the
+  entity is always a variable entity.}, but possibly an area entity or
+even an entity representing a set of areas\footnote{Areas and set of
+  areas are used to express imprecise memory effects due to pointer
+  dereferencing.}. Lots of individual effects are linked to each
+statements, especially compound statements like \texttt{blocks},
+\texttt{tests}, \texttt{loops} and \texttt{unstructured}.
+
+Control effects, such as \verb/STOP/ or exception, are not
+computed. PIPS only deals with memory effects. Fortran exceptions like
+overflows or zero divides are considered programm errors and the error
+behaviors are not taken into account in PIPS analyses.
+
+Effects and the types defined in the following subsections are not used to
+represent code, but to store analysis result. These types are declared in
+the \emph{internal representation\/} for historical reasons.
+
+\domain{Effects = effects:effect*}
+{}
+
+
+
+The next domain can be used to store summary effects of callees.
+
+\domain{entity\_effects = entity->effects}
+{}
+
+The next domain can be used to store a statement to effects mapping.
+Should be used for proper and cumulated effects and references.
+
+\domain{statement\_effects = persistent statement->effects}
+{}
+
+
+\subsubsection{Effects Classes}
+\label{subsubsubsection-effects-classes}
+\index{Effects Classes}
+
+\domain{Effects\_classes = classes:effects*}
+{}
+
+The type \texttt{effects\_classes} is used to store equivalence classes of
+dynamic aliases, i.e. aliases created at call sites. \texttt{Effects\_classes}
+are lists of effects, i.e. lists of lists of regions.
+
+\subsubsection{Mapping from Statements to Effects}
 
 A different mapping from reachable statements to effect lists is
 computed by each effect analysis. Because NewGen did not offer the 
@@ -347,69 +547,63 @@ For details about effect analyses available see the Effects Section in the
 PIPS phase descriptions).
 %%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
 
-\subsection{Mapping between Expressions and effects}
+\subsubsection{Mapping between Expressions and effects}
 
 \domain{persistant\_expression\_to\_effects = persistant expression -> effects}
-
+{}
 
 \section{Conclusion}
 
-The PIPS internal representation is a relatively small set of data
-structures, which has very slowly increased since the project inception.
-Various mappings have been added. It was not possible to declare them
-with NewGen in 1988 and quite a few implicit mappings exist.
 
-NewGen data types can be walked with two generic iterators,
-\verb/gen_recurse()/ and \verb/gen_multi_recurse()/. These two iterators
-have been added to NewGen. They are not systematically used.
+
 
 \newpage
 
-\section*{Annexe: NewGen Declarations -- ri.newgen --}
+\section*{Annexe: NewGen Declarations -- effects.newgen --}
 \verbatiminput{effects.newgen}
 
 \newpage
 
 \begin{thebibliography}{9}
 
-% pipsmake
 \bibitem{Baro91} B. Baron,
-\emph{Construction flexible et cohÃ©rente pour la compilation
-interprocÃ©durale}, 
+\emph{Construction flexible et cohérente pour la compilation
+interprocédurale}, 
 Rapport interne EMP-CRI-E157, juillet 1991
 
 \bibitem{Bern66} A. J. Bernstein, \emph{Analysis of Programs for
 Parallel Processing}, IEEE Transactions on Electronic Computers,
 Vol.~15, n.~5, pp. 757-763, Oct. 1966.
 
+
 \bibitem{Creu96} B. Creusillet,
-\emph{Analyses de rÃ©gions de tableaux et applications}, ThÃ¨se de
-Doctorat, Ecole des mines de Paris, DÃ©cembre 1996
+\emph{Analyses de régions de tableaux et applications}, Thèse de
+Doctorat, Ecole des mines de Paris, Décembre 1996.
+
+\bibitem{Deutsch94} A. Deutsch,
+\emph{Interprocedural may-alias analysis for
+  pointers: beyond k-limiting}, Conference on Programming Language
+Design and Implementation Proceedings of the ACM SIGPLAN 1994
+conference on Programming language design and implementation 1994 ,
+Orlando, Florida, United States.
+
 
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 \emph{NewGen: A Language Independent Program Generator},
-Rapport Interne CAII 191, 1989
+Rapport Interne CAII 191, 1989.
 
 \bibitem{JT90} P. Jouvelot, R. Triolet,
 \emph{NewGen User Manual},
 Rapport Interne CAII ???, 1990
 
-\bibitem{Trio90} R. Triolet,
-\emph{PIPSMAKE and PIPSDBM: Motivations et fonctionalitÃ©s},
-Rapport Interne CAII TR~E/133
-
 \bibitem{Trio84} R. Triolet,
-\emph{Contribution Ã  la parallÃ©lisation automatique de programmes
-Fortran comportant des appels de procÃ©dures}, ThÃ¨se de
-Docteur-IngÃ©nieur, UniversitÃ© Pierre et Marie Curie, dÃ©cembre 1984.
+\emph{Contribution à la parallélisation automatique de programmes
+Fortran comportant des appels de procédures}, Thèse de
+Docteur-Ingénieur, Université Pierre et Marie Curie, décembre 1984.
 
-\bibitem{TrIr91} R. Triolet,  F. Irigoin,
-\emph{PIPS High-Level Software Interface: Pipsmake}
-Documentation PIPS
-
-\bibitem{ZhIr91} L. Zhou, F. Irigoin,
-\emph{Properties: Low Level Tuning of PIPS},
-PIPS Documentation
+\bibitem{Trio90} R. Triolet,
+\emph{PIPSMAKE and PIPSDBM: Motivations et fonctionalités},
+Rapport Interne CAII TR~E/133
 
 \end{thebibliography}
 

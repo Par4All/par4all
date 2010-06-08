@@ -388,7 +388,7 @@ void compile_f90_module( string filename ) {
 
   // Create precompiled directory
   char *compiled_dir_name = strdup( concatenate( dir, "/Precompiled", NULL ) );
-  mkdir( compiled_dir_name, 0xffffffff );
+  mkdir( compiled_dir_name, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 
   char *gfc_command = concatenate( "gfortran -fsyntax-only",
                                   " -fcray-pointer -ffree-form",

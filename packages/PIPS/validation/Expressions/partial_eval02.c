@@ -6,7 +6,7 @@ int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6
   int i;
 
   i = size;
-  return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+  return *((int *) riri+2) = *(zaza+1)+*( &loulou[0][0][0]+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 int main()

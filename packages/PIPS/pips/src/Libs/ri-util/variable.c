@@ -543,7 +543,7 @@ entity make_new_scalar_variable(entity module, basic b)
 
 /* J'ai ameliore la fonction make_scalar_entity afin de l'etendre  a des tableau   */
 static entity make_array_entity(name, module_name, base,lis)
-string name;
+const char* name;
 string module_name;
 basic base;
 list lis;

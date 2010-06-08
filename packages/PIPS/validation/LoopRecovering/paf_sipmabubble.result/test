@@ -113,6 +113,8 @@ void paf_sipmabubble(int n, int A[n])
 void paf_sipmabubble(int n, int A[n])
 {
    int i = n;
+   //PIPS generated variable
+   int j0, i0;
    for(i0 = i; i0 >= 0; i0 += -1) {
       int j = 0;
       i = i0;
@@ -127,41 +129,5 @@ void paf_sipmabubble(int n, int A[n])
       }
       i--;
    }
-   return;
-}
-
-COMPLEXITY
-
-//                       15.50*i^2 - 15.50*i.j + 24.50*i - 15.50*j + 12 (SUMMARY)
-void paf_sipmabubble(int n, int A[n])
-{
-//                                                                    0 (STMT)
-   int i = n;
-//                       15.50*i^2 - 15.50*i.j + 24.50*i - 15.50*j + 12 (DO)
-   for(i0 = i; i0 >= 0; i0 += -1) {
-//                                                                    0 (STMT)
-      int j = 0;
-//                                                                    2 (STMT)
-      i = i0;
-//                                                15.50*i - 15.50*j + 4 (DO)
-      for(j0 = j; j0 <= i-1; j0 += 1) {
-//                                                                    2 (STMT)
-         j = j0;
-//                                                                10.50 (TEST)
-         if (A[j]>A[j+1]) {
-//                                                                    0 (STMT)
-            int tmp = A[j];
-//                                                                    5 (STMT)
-            A[j] = A[j+1];
-//                                                                    4 (STMT)
-            A[j+1] = tmp;
-         }
-//                                                                    2 (STMT)
-         j++;
-      }
-//                                                                    2 (STMT)
-      i--;
-   }
-//                                                                    0 (STMT)
    return;
 }

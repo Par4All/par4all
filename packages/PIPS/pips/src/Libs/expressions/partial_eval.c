@@ -1264,6 +1264,16 @@ eformat_t partial_eval_binary_operator(entity func,
     partial_eval_expression_and_regenerate(ep2, ps, fx);
     ef = eformat_undefined;
   }
+  /* some more optimization if a neutral element has been generated */
+  entity neutral = operator_neutral_element(func);
+  if(same_entity_p(expression_to_entity(*ep1),neutral)) {
+      ef.expr=*ep2;
+      ef.simpler=true;
+  }
+  else if(same_entity_p(expression_to_entity(*ep2),neutral)) {
+      ef.expr=*ep1;
+      ef.simpler=true;
+  }
 
   return ef;
 }
