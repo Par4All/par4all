@@ -21,6 +21,10 @@
 
 \sloppy
 
+% Number everything in the TOC:
+\setcounter{secnumdepth}{10}
+\setcounter{tocdepth}{10}
+
 \begin{document}
 
 \title{Par4All organization\\
@@ -62,11 +66,11 @@ projects should also be taken into account.
 Before using \Apips, once it is installed, you should do, according to your
 shell, a
 \begin{verbatim}
-source run/etc/par4all-rc.sh
+source .../etc/par4all-rc.sh
 \end{verbatim}
 or a
 \begin{verbatim}
-source run/etc/par4all-rc.csh
+source .../etc/par4all-rc.csh
 \end{verbatim}
 
 
@@ -84,30 +88,32 @@ If you want to download \Apfa from the \Agit and compile it, do:
   git checkout -b p4a remotes/origin/p4a
   src/simple_tools/p4a_setup [--prefix=/install/dir] [-v[v[v]]] [...]
 \end{alltt}%$
-Everything will be installed into \verb|/usr/local/par4all| by default. 
-If you want to install in another location, use the \verb|--prefix| option.
-If you need more installation options (such as if you want to specify the location for the various packages), 
-run \verb|p4a_setup -h| to list them.
+Everything will be installed into \verb|/usr/local/par4all| by default.
+If you want to install in another location, use the \verb|--prefix|
+option.  If you need more installation options (such as if you want to
+specify the location for the various packages), run \verb|p4a_setup -h| to
+list them or look at section~\ref{sec:p4a_s-comp-script}.
 
 If you want to pull a new version, do:
 \begin{verbatim}
 git pull origin p4a
 \end{verbatim}
 
-And run \verb|p4a_setup| again. It is wise to do it with the \verb|--rebuild| \verb|--clean| parameters to make
-sure you recompile everything (PIPS being a quickly moving project, incremental build is not always guaranteed to work).
+And run \verb|p4a_setup| again. It is wise to do it with the
+\verb|--rebuild| and \verb|--clean| parameters to make sure you recompile
+everything (\Apips being a quickly moving project, incremental build is
+not always guaranteed to work).
 
-To create a .deb or .tar.gz package of the installation 
-you have made using \verb|p4a_setup|, use the \verb|p4a_pack| command: 
-\begin{verbatim}
-src/simple_tools/p4a_pack <--deb|--tgz> --revision=0.1-mybuild \
-  --dir=/current/install/dir [--prefix=/final/install/dir]
-\end{verbatim}
+To create a \texttt{.deb} or \texttt{.tar.gz} package of the installation
+you have made using \verb|p4a_setup| as explained in
+\ref{sec:making-distributions}.
 
-About committing your change to the Git repository: 
-to make sure you do not break the compilation process, you should compile
-your work before committing it on the central repositories. By a nice side
-effect, it allows you to test your code. \smiley
+About committing your change to the \Agit repository (assuming you work
+only in the \texttt{p4a-own} branch itself and not in one of the \Apfa
+sub-packages, in this case see section~\ref{sec:packages}): to make sure
+you do not break the compilation process, you should compile your work
+before committing it on the central repositories. By a nice side effect,
+it allows you to test your code. \smiley
 
 More seriously, it is not obvious that it may compile on your account but
 not for other people. For example because you forgot to commit some files.
@@ -117,7 +123,7 @@ the publication, you can test your own committed state before it hurts the
 team when you push it on the global server.
 
 For example, you can create a light\footnote{Because the objects are
-  shared with symbolic links and not copied since we did not use the
+  shared with symbolic links and not copied, since we did not use the
   \texttt{file://} syntax.} clone with a
 \begin{verbatim}
 git clone par4all par4all-compile
@@ -141,7 +147,8 @@ that is, \emph{before} using \verb|p4a_setup|) that allow \texttt{gdb} to
 access macro definitions that are heavily used in \Apips.
 
 You can pass some options to \verb|src/dev/p4a_setup| to modify the
-installation process:
+installation process as explained in \S~\ref{sec:p4a_s-comp-script} for
+all the options:
 \begin{description}
 \item[\texttt{--skip-polylib}:] skip the \Apolylib installation;
 \item[\texttt{--skip-newgen}:] skip the \Anewgen installation;
@@ -219,6 +226,15 @@ verify it still compiles at the same time without breaking the running
 version.
 
 
+\subsection{The \protect\texttt{p4a\_setup} compilation and installation
+script}
+\label{sec:p4a_s-comp-script}
+
+The compilation and installation of \Apfa is controlled by the
+\verb|p4a_setup| that has the following options.
+
+\input{p4a_setup-help}
+
 
 \section{Collaborative repositories}
 \label{sec:coll-repos}
@@ -279,10 +295,16 @@ be created and used on demand.
 \section{Packages}
 \label{sec:packages}
 
-\Apfa integrate different tools from different projects. Right now \Apfa
+\Apfa integrates different tools from different projects. Right now \Apfa
 is composed by \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
 project is included in \Apfa as a package and is placed in a directory
 inside the \texttt{package} top-level directory.
+
+Since \Apfa is an integration project, if you want to modify or develop in
+some packages, please work in the upstream package and not in \Apfa. Since
+it is easy to compile \Apfa with some package stuff outside of \Apfa (see
+\S~\ref{sec:p4a_s-comp-script}) and commit them onto their own upstream
+version control systems.
 
 
 \section{Directory organization}
@@ -314,8 +336,8 @@ inside the \texttt{package} top-level directory.
 \item[\texttt{src}] contains source of tools used for the internal
   organization of \Apfa itself, such as repository and product management,
   publication process or some run-time, such as \verb|p4a_accel|;
-\item[\texttt{run}] is where the usable \Apfa is installed after
-  compilation:
+\item[\texttt{\emph{PREFIX-DIR}}] is where the usable \Apfa is installed
+  after compilation:
   \begin{description}
   \item[\texttt{bin}] contains the executable programs from \Apfa;
   \item[\texttt{doc}] is the generated documentation for the \Apfa
@@ -576,7 +598,6 @@ p4a_setup
 \subsubsection{Internal organization}
 \label{sec:intern-organ}
 
-
 The work-flow related to \Apips is quite more complex since we must
 consolidate data from 5 different \Asvn repositories. The script
 \verb|p4a_git| is used to automate the management of this workflow too,
@@ -667,7 +688,7 @@ rollback.
 \subsubsection{New version}
 \label{sec:new-version}
 
-In the work of Mehdi, \textsc{Amini}, the branch
+In the work of Mehdi \textsc{Amini}, the branch
 \texttt{p4a-gcc-gfc-4.4.3} contains the sources of \Agcc-\Agfc 4.4.3 to
 get the Fortran~95. Then the branch is named also \texttt{p4a-gcc-gfc}
 which is merged into \texttt{p4a-packages}.
@@ -727,6 +748,7 @@ these branches).
 
 There are scripts to ease the developer and user life.
 
+
 \subsubsection{Packages needed to build and run Par4All}
 \label{sec:pack-need-build}
 
@@ -747,6 +769,7 @@ To only run \Apfa, the following packages on Debian or Ubuntu are needed:
   \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
   \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
 \end{quote}
+
 
 \subsubsection{Scripts for an everyday work}
 \label{sec:an-everyday-work}
@@ -775,7 +798,6 @@ To only run \Apfa, the following packages on Debian or Ubuntu are needed:
 \subsubsection{Scripts used to setup the infrastructure}
 \label{sec:scripts-used-setup}
 
-
 Some scripts used to setup the infrastructure. They have been used to
 bootstrap the \Apfa infrastructure and should not be used by ordinary
 people but contain some interesting hacks that could be usefull for other
@@ -801,22 +823,38 @@ projects or if things go really wrong. There are located in
 \subsubsection{Making distributions}
 \label{sec:making-distributions}
 
-The \verb|p4a_pack| is used to build compressed \texttt{tar} balls, Debian
-\texttt{.deb} and RedHat \texttt{.rpm} packet files.
+The \verb|p4a_pack| is used to build compressed \texttt{tar} balls or Debian
+\texttt{.deb} packet files.
 
 The place of where the \Apfa files are looked for is specified according
-to the \verb|P4A_ROOT| variable, but there may be some hard-coded
-locations at configure and build time, so moving the installation
-directory afterwards and changing \verb|P4A_ROOT| to follow the new location may not be enough.
+to the \verb|P4A_DIST| variable or \texttt{--dir} option, but there may be
+some hard-coded locations at configure and build time, so moving the
+installation directory afterwards and changing \verb|P4A_ROOT| to follow
+the new location may not be enough.
 
 So you should choose the location at build time. To have a distribution
 that build up into for example \texttt{/usr/local/par4all}, you should
-first create a \texttt{/usr/local/par4all} writable by you, set the
-\verb|INSTALL_PREFIX| environment variable to this installation directory
-and do a \verb|p4a_setup|.
+first create a \texttt{/usr/local/par4all} \emph{writable by you} (you may
+create this directory as super-user and change the owner to you with a
+\texttt{chown}), and do a \verb|p4a_setup|.
 
-Then you can pack this directory into what format you want with
-\verb|p4a_pack|.
+Then you can pack this directory into what format you want with for
+example:
+\begin{verbatim}
+src/simple_tools/p4a_pack <--deb|--tgz> --revision=0.1-mybuild \
+  --dir=/current/install/dir [--prefix=/final/install/dir]
+\end{verbatim}
+
+Here is the full option list of this command.
+
+\input{p4a_pack-help}
+
+
+\subsubsection{Making releases}
+\label{sec:releases}
+
+After validating, a release is done by making some branch at a given state
+a tag.
 
 
 \section{Examples and demos}
@@ -1064,16 +1102,10 @@ to specific versions of conceptual branches such as
 \texttt{p4a-packages-0.2-beta}.
 
 
-\section{Making releases}
-\label{sec:releases}
-
-After validating, a release is done by making some branch at a given state
-a tag.
-
 \section{Some \protect\Agit tricks useful in \protect\Apfa}
 \label{sec:some-agit-tricks}
 
-\section{You have committed to the wrong branch}
+\subsection{You have committed to the wrong branch}
 \label{sec:you-have-comited}
 
 There are (too) many branches in \Apfa, right? It is so easy for example
