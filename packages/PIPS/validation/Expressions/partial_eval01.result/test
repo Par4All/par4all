@@ -110,16 +110,36 @@ int main()
 Initial code with preconditions for "duck"
 
 
-//  P() {}
+//  P() {size==2}
 
 int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
 
-//  P() {}
+//  P() {size==2}
 
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
-//  P() {}
+//  P() {size==2}
 
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
+
+Code after array conversion
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Code after partial eval
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+3;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
+}
+
+Unsplit resulting code
+
+ok

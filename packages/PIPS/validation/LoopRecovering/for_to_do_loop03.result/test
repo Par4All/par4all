@@ -72,7 +72,7 @@ int main()
 
    int a[100];                                                          /*0002*/
 
-//  T() {}
+//  T(i,j) {}
 
    int i, j;                                                            /*0003*/
 
@@ -108,17 +108,17 @@ int main()
 
    int i, j;                                                            /*0003*/
 
-//  P() {}
+//  P(i,j) {}
 
    
    // A do loop ! Should be parallel.
    for(j = 10; j >= 1; j += -4)
 
-//  P(j) {1<=j, j<=10}
+//  P(i,j) {1<=j, j<=10}
 
       a[j] = 2;                                                         /*0007*/
 
-//  P(j) {0<=j+3, j<=0}
+//  P(i,j) {0<=j+3, j<=0}
 
 
    return 0;                                                            /*0009*/
