@@ -88,7 +88,7 @@ int main()
 
    int a[1000];                                                         /*0003*/
 
-//  T() {}
+//  T(j) {}
 
    int j;                                                               /*0004*/
 
@@ -132,7 +132,7 @@ int main()
 
    int j;                                                               /*0004*/
 
-//  P() {}
+//  P(j) {}
 
    
    // A do loop ! Should be parallel.
