@@ -185,7 +185,7 @@ static void save_edited_file(GtkWidget * widget, gpointer file) {
 			TRUE);
 
 	FILE * fd = fopen(filename, "w+");
-	fprintf(fd, txt);
+	fprintf(fd, "%s", txt);
 	fclose(fd);
 
 	gtk_widget_set_sensitive(GTK_WIDGET(current_selection_menu_item), FALSE);

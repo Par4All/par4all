@@ -27,6 +27,9 @@
  * problems to use those procedures with wpips: show_message() and
  * update_props() .
  */
+#ifdef HAVE_CONFIG_H
+#include "pips_config.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>

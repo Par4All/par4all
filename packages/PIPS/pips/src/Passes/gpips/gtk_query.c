@@ -135,7 +135,7 @@ success end_user_request_notify(const char * the_answer) {
 
 string gpips_user_request(const char * a_printf_format, va_list args) {
 
-	char * the_answer;
+  /* char * the_answer; */
 
 	static char message_buffer[SMALL_BUFFER_LENGTH];
 
@@ -152,7 +152,7 @@ string gpips_user_request(const char * a_printf_format, va_list args) {
 	gtk_window_set_modal(GTK_WINDOW(query_dialog), FALSE);
 
 	/* Log the answer for possible rerun through tpips: */
-	user_log("%s\n\"%s\"\nEnd User Request\n", message_buffer, the_answer);
+	user_log("%s\n\"%s\"\nEnd User Request\n", message_buffer, "" /*the_answer*/);
 
 	return strdup(gtk_entry_get_text(GTK_ENTRY(query_entry)));
 }
