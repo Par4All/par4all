@@ -96,7 +96,7 @@ def main():
 
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     main_group.add_option("--root", "-r", metavar = "DIR", default = None,
-        help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes: " + default_root)
+        help = "Specify the directory for the Par4All source tree. If the P4A_ROOT environment variable is currently defined, it will be used. Otherwise, the default is to use the source tree from which this script comes.")
     
     main_group.add_option("--packages-dir", "--package-dir", "-P", metavar = "DIR", default = None,
         help = "Specify the packages location. By default it is <root>/packages.")
