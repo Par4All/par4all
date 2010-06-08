@@ -22,13 +22,18 @@ publish:
 	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_DIR)
 	rsync -av $(DOCUMENT)-expose.pdf $(INSTALL_MACHINE):$(INSTALL_DIR)
 
-$(DOCUMENT).tex: p4a.help.tex
+$(DOCUMENT).tex: p4a-help.tex
 
-p4a.help.tex: p4a.help
-	# Compile the help output into slides:
-	../../../src/dev/optparse_help_to_tex $< > $@
+# How to generate the script documentation into slides:
+%-help.tex: %.help Makefile
+	../../../src/dev/optparse_help_to_tex --slides $< > $@
 
-.PHONY: always_rebuild
+%.help: ../../../src/simple_tools/% Makefile
+	# Generate raw help message for the given command:
+	$< -h > $@
 
-p4a.help: always_rebuild
-	p4a -h > $@
+# local stuff
+clean:: local-clean
+
+local-clean:
+	rm -rf *.help *-help.tex parsetab.py

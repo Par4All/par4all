@@ -231,16 +231,16 @@ p4a --cuda saxpy.c -o s
 p4a [\emph{options}] \emph{files}
 \end{alltt}
   \begin{itemize}
-  \item \texttt{--openmp} generates OpenMP output. This is the default
+  \item \texttt{-{}-openmp} generates OpenMP output. This is the default
     behaviour
-  \item \texttt{--cuda} generates CUDA output
-  \item \texttt{--accel} \texttt{--openmp} generates OpenMP output that
+  \item \texttt{-{}-cuda} generates CUDA output
+  \item \texttt{-{}-accel} \texttt{-{}-openmp} generates OpenMP output that
     simulates the CUDA behaviour
   \end{itemize}
 \end{frame}
 
 
-\include{p4a.help}
+\input{p4a-help}
 
 
 \begin{trans}{Current limitations for CUDA}

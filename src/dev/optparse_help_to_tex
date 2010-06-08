@@ -95,7 +95,7 @@ def p_optparse_help(p):
 
 def p_options(p):
     'options : Options option_list group_list'
-    p[0] = slide_itemize("Options", p[2]) + p[3]
+    p[0] = block_itemize("Options", p[2]) + p[3]
 
 
 def p_option_list(p):
@@ -123,7 +123,7 @@ def p_group_list(p):
 
 def p_group(p):
     'group : Group suboption_list'
-    p[0] = slide_itemize(p[1], p[2])
+    p[0] = block_itemize(p[1], p[2])
 
 
 def p_suboption_list(p):
@@ -157,15 +157,20 @@ def p_empty(p):
 
 def LaTeX_protect(string):
     "Protect the LaTeX special characters"
-    return re.sub(r'([\\&~#_%$])', r'\\\1', string)
+    s = re.sub(r'([\\&~#_%$<>])', r'\\\1', string)
+    # Insert an empty group to avoid ligature in -- for some fonts:
+    return re.sub('--', '-{}-', s)
 
 
-def slide_itemize(title, content):
-    """Make a trans environment with the content.
-    Assume the content is already protected"""
-    return '\\begin{trans}{' + LaTeX_protect(title) \
-           + '}\n  \\begin{description}\n' \
-           + content + '\n  \\end{description}\n\\end{trans}\n\n\n'
+def LaTeX_section(level):
+    "Return the string of the section command at the given level"
+    return '\\' + ( "part",
+                    "chapter",
+                    "section",
+                    "subsection",
+                    "subsubsection",
+                    "paragraph",
+                    "subparagraph" )[level]
 
 
 def beautified_item(item_title, content):
@@ -174,14 +179,67 @@ def beautified_item(item_title, content):
            + LaTeX_protect(content) + '\n'
 
 
+def slide_itemize(title, content):
+    """Make a trans environment with the content.
+    Assume the content is already protected"""
+    return '\\begin{trans}{' + LaTeX_protect(title) \
+           + '}\n  \\begin{description}\n' \
+           + content + '  \\end{description}\n\\end{trans}\n\n\n'
+
+
+def section_itemize(title, content):
+    """Make a section at options.article_section_level with the content.
+    Assume the content is already protected"""
+    return (LaTeX_section(options.article_section_level) + '{'
+        + LaTeX_protect(title) + '}\n\n\\begin{description}\n'
+        + content + '\\end{description}\n\n\n')
+
+
+def block_itemize(title, content):
+    """Make a trans or section environment with the content.
+    Assume the content is already protected"""
+
+    # Remove some trailing ':':
+    title = title.rstrip(':')
+
+    if options.slides:
+        return slide_itemize(title, content)
+    else:
+        return section_itemize(title, content)
+
+
 def main():
     '''The function called when this program is executed by its own'''
+
+    # I'm lazy on this, so I globalize options:
+    global verbose, options
 
     parser = optparse.OptionParser(description = __doc__,
                                    usage = "%prog [options] [<files>]")
 
+    parser.add_option("--slides", action = "store_true",
+                      default = False,
+                      help = "Generate the help in a format suitable for a slides presentation with LaTeX/Beamer and proper styles.")
+
+    parser.add_option("--article", action = "store_true",
+                      default = False,
+                      help = "Generate the help in a format suitable for inclusion in a LaTeX document.")
+
+    parser.add_option("--article-section-level", action = "store",
+                      type = "int", default = 2, metavar = "SECTION-LEVEL",
+                      help = "When generating for a LaTeX document, this define the starting level of the generated sections, with 0 for \part, 1 for \chapter, 2 for \section, 3 for \subsection and so on.")
+
+    parser.add_option("--verbose", "-v", action = "store_true",
+                      default = False,
+                      help = "Run in verbose mode.")
 
     (options, args) = parser.parse_args()
+
+    verbose = options.verbose
+
+    if not (options.slides ^ options.article):
+        print "You need to choose the --slides or --article option and only one"
+        sys.exit()
 
     if len(args) == 0:
         # If no argument is given, use standard input:
