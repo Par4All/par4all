@@ -42,7 +42,6 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[duck]
 activate PRINT_CODE
-quit
 echo
 echo Code after array conversion
 echo
