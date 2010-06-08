@@ -502,7 +502,7 @@ static void phrase_remove_dependences_rwt(statement stat)
   if((statement_comments(stat) != string_undefined) &&
      (statement_comments(stat) != NULL))
     {
-      printf(statement_comments(stat));
+      printf("%s", statement_comments(stat));
     }
   if(!statement_loop_p(stat))
     {

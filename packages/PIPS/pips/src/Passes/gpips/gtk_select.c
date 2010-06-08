@@ -281,7 +281,7 @@ void end_delete_workspace_notify(const char * name) {
 
 		GtkWidget * dialog = gtk_message_dialog_new(GTK_WINDOW(log_window),
 				GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO,
-				GTK_BUTTONS_YES_NO, concatenate("The workspace ", name,
+							    GTK_BUTTONS_YES_NO, "%s", concatenate("The workspace ", name,
 						" is currently opened!\n",
 						"Do you really want to close and remove it ?", NULL));
 		result = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -385,7 +385,7 @@ success continue_create_workspace_notify(const char* name) {
 
 				GtkWidget * dialog = gtk_message_dialog_new(GTK_WINDOW(
 						log_window), GTK_DIALOG_DESTROY_WITH_PARENT,
-						GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, concatenate(
+									    GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, "%s", concatenate(
 								"The database ", name, " already exists!\n",
 								"Do you really want to remove it ?", NULL));
 				result = gtk_dialog_run(GTK_DIALOG(dialog));

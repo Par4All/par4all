@@ -90,7 +90,7 @@ void display_memory_usage() {
 			"_text %#x, _data %#x, _end %#x, _brk %#x\n", &etext, &edata, &end,
 			sbrk(0));
 
-	sprintf(memory_string, "%10.3f", ((int) sbrk(0) - (int) &etext)
+	sprintf(memory_string, "%10.3f", ((intptr_t) sbrk(0) - (intptr_t) &etext)
 			/ (double) (1 << 20));
 
 	gtk_label_set_text(GTK_LABEL(memory_name), memory_string);

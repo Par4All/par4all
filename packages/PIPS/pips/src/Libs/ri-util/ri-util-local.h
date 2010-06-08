@@ -1526,7 +1526,7 @@ the variable is unsigned, signed or not */
 #define STDIN_LUN (5)
 #define STDOUT_LUN (6)
 /*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */
-#ifndef _UNISTD_H
+#ifndef HAVE_UNISTD_H
 #define STDIN_FILENO (0)
 #define STDOUT_FILENO (1)
 #define STDERR_FILENO (2)
