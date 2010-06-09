@@ -23,10 +23,11 @@
 
 # PIPS Libraries
 PIPSLIBS_LIBS = ../../../../../Libs/
-LIBS_PIPS =  $(PIPSLIBS_LIBS)/ri-util/.libs/libri-util.a \
+LIBS_PIPS = \
 	$(PIPSLIBS_LIBS)/text-util/.libs/libtext-util.a \
 	$(PIPSLIBS_LIBS)/syntax/.libs/libsyntax.a \
 	$(PIPSLIBS_LIBS)/alias-classes/.libs/libalias-classes.a \
+	$(PIPSLIBS_LIBS)/effects-util/.libs/libeffects-util.a \
 	$(PIPSLIBS_LIBS)/ri-util/.libs/libri-util.a \
 	$(PIPSLIBS_LIBS)/misc/.libs/libmisc.a \
 	$(PIPSLIBS_LIBS)/newgen/.libs/libnewgen.a
