@@ -24,6 +24,7 @@
 # PIPS Libraries
 PIPSLIBS_LIBS = ../../../../../Libs/
 LIBS_PIPS = \
+	$(PIPSLIBS_LIBS)/ri-util/.libs/libri-util.a \
 	$(PIPSLIBS_LIBS)/text-util/.libs/libtext-util.a \
 	$(PIPSLIBS_LIBS)/syntax/.libs/libsyntax.a \
 	$(PIPSLIBS_LIBS)/alias-classes/.libs/libalias-classes.a \
