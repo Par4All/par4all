@@ -1,0 +1,40 @@
+int main(int argc, char *argv[])
+{
+   int i, a[10];
+here:
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, a[10];
+here:
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+#pragma pips inserted statement to check
+   for(i = 10; i <= 15; i += 1)
+      a[i] = 0;
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, a[16];
+here:
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+#pragma pips inserted statement
+   for(i = 10; i <= 15; i += 1)
+      a[i] = 0;
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, a[16];
+here:
+   for(i = 0; i <= 15; i += 1)
+      a[i] = 0;
+
+   return 0;
+}
+
