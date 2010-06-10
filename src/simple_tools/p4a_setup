@@ -86,7 +86,7 @@ def main():
         help = "Skip building and installing of PIPS.")
         
     main_group.add_option("--skip", "-s", metavar = "PACKAGE", action = "append", default = [],
-        help = "Alias for being able to say -sP (besides --sP), for example. -sA is also available and means 'skip all', in which case only final installation stages will be performed.")
+        help = "Alias for being able to say -s pips (besides --skip pips), for example. -sall or --skip all are also available and means 'skip all', in which case only final installation stages will be performed.")
 
     main_group.add_option("--only", "-o", metavar = "PACKAGE", action = "append", default = [],
         help = "Build only the selected package. Overrides any other option.")
@@ -185,56 +185,50 @@ def main():
         return
     
     # Since dest_dir option is commented out, set options.dest_dir to None for now.
-    options.dest_dir = None    
+    options.dest_dir = None
 
     # Check options and exclude packages from
     # processing as requested.
     for s in options.skip:
-        if s == "p":
+        if s == "polylib":
             options.skip_polylib = True
-        elif s == "n":
+        elif s == "newgen":
             options.skip_newgen = True
-        elif s == "l":
+        elif s == "linear":
             options.skip_linear = True
-        elif s == "P":
+        elif s == "pips":
             options.skip_pips = True
-        elif s == "A":
+        elif s == "all":
             options.skip_polylib = True
             options.skip_newgen = True
             options.skip_linear = True
             options.skip_pips = True
         else:
-            die("Invalid option: -s" + s)
+            die("Invalid option: --skip=" + s)
     for s in options.only:
-        if s == "p":
+        # Skip everything...
+        options.skip_polylib = True
+        options.skip_newgen = True
+        options.skip_linear = True
+        options.skip_pips = True
+        # ... but
+        if s == "polylib":
             options.skip_polylib = False
-            options.skip_newgen = True
-            options.skip_linear = True
-            options.skip_pips = True
-        elif s == "n":
-            options.skip_polylib = True
+        elif s == "newgen":
             options.skip_newgen = False
-            options.skip_linear = True
-            options.skip_pips = True
-        elif s == "l":
-            options.skip_polylib = True
-            options.skip_newgen = True
+        elif s == "linear":
             options.skip_linear = False
-            options.skip_pips = True
-        elif s == "P":
-            options.skip_polylib = True
-            options.skip_newgen = True
-            options.skip_linear = True
+        elif s == "pips":
             options.skip_pips = False
         else:
-            die("Invalid option: -o" + s)
+            die("Invalid option: --only=" + s)
     if options.clean:
         options.skip_polylib = False
         options.skip_newgen = False
         options.skip_linear = False
         options.skip_pips = False
         options.rebuild = True
-    
+
     # Initialize main variables and set defaults.
     # "root" is the Par4All source root directory.
     root = ""
@@ -349,6 +343,7 @@ def main():
     else:
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
     debug("PIPS source dir: " + pips_src_dir)
+    print os.path.isdir(pips_src_dir)
     if not os.path.isdir(pips_src_dir):
         die("Missing directory: " + pips_src_dir)
     
