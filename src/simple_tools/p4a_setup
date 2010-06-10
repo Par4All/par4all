@@ -32,7 +32,8 @@ from p4a_version import *
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
-def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_flags = [], rebuild = False):
+def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_opts = [], 
+    rebuild = False, install = True, reconf = True):
     '''Builds the given package in package_dir using autotools.'''
     if rebuild:
         # Rebuild requested? Delete existing build directory.
@@ -44,29 +45,31 @@ def build_package(package_dir, build_dir, dest_dir, configure_flags = [], make_f
         rebuild = True
         os.makedirs(build_dir)
     if rebuild:
-        # Call autoconf to generate the configure utility.
-        autoreconf_args = [ "autoreconf", "--install" ] #"--force" ] # Dont use --force or it will no longer compile.
-        if get_verbosity() >= 3:
-            autoreconf_args += [ "-v" ]
-        run2(autoreconf_args, working_dir = package_dir)
+        if reconf:
+            # Call autoconf to generate the configure utility.
+            autoreconf_args = [ "autoreconf", "--install" ] #"--force" ] # Dont use --force or it will no longer compile.
+            if get_verbosity() >= 3:
+                autoreconf_args += [ "-v" ]
+            run2(autoreconf_args, working_dir = package_dir)
         if dest_dir:
-            configure_flags += [ "DESTDIR=" + dest_dir ]
+            configure_opts += [ "DESTDIR=" + dest_dir ]
         # Call configure to generate the Makefile's.
-        run2([ os.path.join(package_dir, "configure") ] + configure_flags, working_dir = build_dir)
+        run2([ os.path.join(package_dir, "configure") ] + configure_opts, working_dir = build_dir)
     # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
-    run2([ "make" ] + make_flags, working_dir = build_dir)
-    # Call make install to install in DESTDIR if requested.
-    if dest_dir:
-        info("Installing " + package_dir + " in " + dest_dir)
-        run2([ "make", "install", "DESTDIR=" + dest_dir ], working_dir = build_dir)
-    else:
-        run2([ "make", "install" ], working_dir = build_dir)
+    run2([ "make" ] + make_opts, working_dir = build_dir)
+    if install:
+        # Call make install to install in DESTDIR if requested.
+        install_mopts = []
+        if dest_dir:
+            install_mopts.append("DESTDIR=" + dest_dir)
+            info("Installing " + package_dir + " in " + dest_dir)
+        run2([ "make", "install" ] + install_mopts, working_dir = build_dir)
 
 def main():
     '''The function called when this program is executed by its own.'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]", version = guess_file_revision(__file__))
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]", version = "Please use -V to get script version")
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
@@ -108,23 +111,87 @@ def main():
     main_group.add_option("--prefix", "-p", metavar = "DIR", default = None,
         help = "Specify the prefix used to configure the packages.")
     
+    main_group.add_option("--polylib-src", metavar = "DIR", default = None,
+        help = "Specify polylib source directory.")
+
+    main_group.add_option("--newgen-src", metavar = "DIR", default = None,
+        help = "Specify newgen source directory.")
+
+    main_group.add_option("--linear-src", metavar = "DIR", default = None,
+        help = "Specify linear source directory.")
+    
+    main_group.add_option("--pips-src", metavar = "DIR", default = None,
+        help = "Specify PIPS source directory.")
+    
+    main_group.add_option("--nlpmake-src", metavar = "DIR", default = None,
+        help = "Specify nlpmake source directory.")
+    
+    main_group.add_option("--polylib-copts", metavar = "OPTS", default = None,
+        help = "Specify polylib configure opts.")
+    
+    main_group.add_option("--newgen-copts", metavar = "OPTS", default = None,
+        help = "Specify newgen configure opts.")
+    
+    main_group.add_option("--linear-copts", metavar = "OPTS", default = None,
+        help = "Specify linear configure opts.")
+    
+    main_group.add_option("--pips-copts", metavar = "OPTS", default = None,
+        help = "Specify PIPS configure opts.")
+    
+    main_group.add_option("--polylib-mopts", metavar = "OPTS", default = None,
+        help = "Specify polylib make opts.")
+    
+    main_group.add_option("--newgen-mopts", metavar = "OPTS", default = None,
+        help = "Specify newgen make opts.")
+    
+    main_group.add_option("--linear-mopts", metavar = "OPTS", default = None,
+        help = "Specify linear make opts.")
+    
+    main_group.add_option("--pips-mopts", metavar = "OPTS", default = None,
+        help = "Specify PIPS make opts.")
+    
+    main_group.add_option("--configure-opts", "-c", metavar = "OPTS", default = None,
+        help = "Specify global configure opts.")
+    
+    main_group.add_option("--make-opts", "-m", metavar = "OPTS", default = None,
+        help = "Specify global make opts.")
+    
+    main_group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
+        help = "Make packages concurrently using COUNT jobs.")
+    
+    main_group.add_option("--noinstall", "-I", action = "store_true", default = False,
+        help = "Do not install any package (do not run make install for any package). NB: this might break the compilation of packages depending on the binaries of uninstalled previous packages.")
+    
+    main_group.add_option("--nofinal", "-F", action = "store_true", default = False,
+        help = "Skip final installations steps in install directory (installation of various files). NB: never running the final installation step will not give you a functional Par4All build.")
+    
+    main_group.add_option("--noreconf", "-A", action = "store_true", default = False,
+        help = "Skip running autoreconf before running configure for all packages.")
+    
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
     main_group.add_option("--nocolor", action = "store_true", default = False,
         help = "Disable coloring of terminal output.")
+    
+    main_group.add_option("--true-version", "-V", action = "store_true", default = False,
+        help = "Display script version and exit.")
 
     parser.add_option_group(main_group)
 
     (options, args) = parser.parse_args()
     
-    # Since dest_dir option is commented out, set options.dest_dir to None for now.
-    options.dest_dir = None
-
-    set_verbosity(options.verbose)
-    
     if options.nocolor:
         p4a_term.disabled = True
+    
+    set_verbosity(options.verbose)
+    
+    if options.true_version:
+        print(guess_file_revision(__file__))
+        return
+    
+    # Since dest_dir option is commented out, set options.dest_dir to None for now.
+    options.dest_dir = None    
 
     # Check options and exclude packages from
     # processing as requested.
@@ -253,34 +320,86 @@ def main():
     build_dir = os.path.join(root, "build")
     debug("Build dir: " + build_dir)
     
-    # Path for some some source packages.
-    nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
-    debug("nlpmake source package dir: " + nlpmake_src_dir)
-    if not os.path.isdir(nlpmake_src_dir):
-        die("Missing directory: " + nlpmake_src_dir)
-    pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
-    debug("PIPS source package dir: " + pips_src_dir)
+    # Path for source packages:
+    
+    polylib_src_dir = ""
+    if options.polylib_src:
+        polylib_src_dir = options.polylib_src
+    else:
+        polylib_src_dir = os.path.join(packages_dir, "polylib")
+    debug("polylib source dir: " + polylib_src_dir)
+    if not os.path.isdir(polylib_src_dir):
+        die("Missing directory: " + polylib_src_dir)
+    
+    newgen_src_dir = ""
+    if options.newgen_src:
+        newgen_src_dir = options.newgen_src
+    else:
+        newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
+    debug("newgen source dir: " + newgen_src_dir)
+    if not os.path.isdir(newgen_src_dir):
+        die("Missing directory: " + newgen_src_dir)
+    
+    linear_src_dir = ""
+    if options.linear_src:
+        linear_src_dir = options.linear_src
+    else:
+        linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
+    debug("linear source dir: " + linear_src_dir)
+    if not os.path.isdir(linear_src_dir):
+        die("Missing directory: " + linear_src_dir)
+    
+    pips_src_dir = ""
+    if options.pips_src:
+        pips_src_dir = options.pips_src
+    else:
+        pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
+    debug("PIPS source dir: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir):
         die("Missing directory: " + pips_src_dir)
     
-    # Initial configure flags.
-    configure_flags = [ 
+    nlpmake_src_dir = ""
+    if options.nlpmake_src:
+        nlpmake_src_dir = options.nlpmake_src
+    else:
+        nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
+    debug("nlpmake source dir: " + nlpmake_src_dir)
+    if not os.path.isdir(nlpmake_src_dir):
+        die("Missing directory: " + nlpmake_src_dir)
+
+    # Global configure flags:
+    configure_opts = [ 
         '--disable-static', 
         '--prefix=' + prefix, 
         #'--libdir=' + os.path.join(install_dir, "lib"), 
-        ]
-
+    ]
+    if options.configure_opts:
+        configure_opts.append(options.configure_opts)
+    
+    # Global make flags:
+    make_opts = []
+    if options.make_opts:
+        make_opts.append(options.make_opts)
+    if options.jobs:
+        make_opts.append("-j" + options.jobs)
+    
     ############################## polylib
     
     if not options.skip_polylib:
-        info("Preparing polylib")
-        build_package(package_dir = os.path.join(packages_dir, "polylib"), build_dir = os.path.join(build_dir, "polylib"),
-            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+        polylib_copts = configure_opts
+        if options.polylib_copts:
+            polylib_copts.append(options.polylib_copts)
+        polylib_mopts = make_opts
+        if options.polylib_mopts:
+            polylib_mopts.append(options.polylib_mopts)
+        build_package(package_dir = polylib_src_dir, build_dir = os.path.join(build_dir, "polylib"),
+            configure_opts = polylib_copts, make_opts = polylib_mopts, dest_dir = dest_dir, 
+            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
     
     ##############################
     
     # This was used for testing with DESTDIR...
-    configure_flags += [ 
+    configure_opts += [ 
         #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
         #'POLYLIB64_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lpolylib64"',
         #'CFLAGS="-g -O2 -I' + os.path.join(install_dir, "include") + '"',
@@ -294,17 +413,25 @@ def main():
         info("Preparing newgen")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/newgen/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/newgen/makes") ])
-        build_package(package_dir = os.path.join(packages_dir, "PIPS/newgen"), build_dir = os.path.join(build_dir, "newgen"),
-            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+        run2([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
+        
+        newgen_copts = configure_opts
+        if options.newgen_copts:
+            newgen_copts.append(options.newgen_copts)
+        newgen_mopts = make_opts
+        if options.newgen_mopts:
+            newgen_mopts.append(options.newgen_mopts)
+        build_package(package_dir = newgen_src_dir, build_dir = os.path.join(build_dir, "newgen"),
+            configure_opts = newgen_copts, make_opts = newgen_mopts, dest_dir = dest_dir, 
+            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
     
     ##############################
     
     # This was used for testing with DESTDIR...
-    #configure_flags += [ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
+    #configure_opts += [ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
     #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ]
-    configure_flags += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
+    configure_opts += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
     
     ############################## linear
     
@@ -312,17 +439,25 @@ def main():
         info("Preparing linear")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/linear/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/linear/makes") ])
-        build_package(package_dir = os.path.join(packages_dir, "PIPS/linear"), build_dir = os.path.join(build_dir, "linear"),
-            configure_flags = configure_flags, dest_dir = dest_dir, rebuild = options.rebuild)
+        run2([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
+        linear_copts = configure_opts
+        
+        if options.linear_copts:
+            linear_copts.append(options.linear_copts)
+        linear_mopts = make_opts
+        if options.linear_mopts:
+            linear_mopts.append(options.linear_mopts)
+        build_package(package_dir = linear_src_dir, build_dir = os.path.join(build_dir, "linear"),
+            configure_opts = linear_copts, make_opts = linear_mopts, dest_dir = dest_dir, 
+            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
     
     ##############################
     
     # This was used for testing with DESTDIR...
-    #configure_flags += [ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
+    #configure_opts += [ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
     #    'LINEARLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -llinearlibs"' ]
-    #~ configure_flags += [ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
+    #~ configure_opts += [ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
         #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ]
     
     # Update the PATH. Needed because PIPS relies on utilities built by newgen.
@@ -337,8 +472,8 @@ def main():
         info("Preparing pips")
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(packages_dir, "PIPS/pips/makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(packages_dir, "PIPS/pips/makes") ])
+        run2([ "rm", "-fv", os.path.join(pips_src_dir, "makes") ])
+        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
 
         # Fix the following error:
         # /bin/sed: can't read /lib/libpolylib64.la: No such file or directory
@@ -369,11 +504,25 @@ def main():
             run2([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
         
-        build_package(package_dir = os.path.join(packages_dir, "PIPS/pips"), build_dir = os.path.join(build_dir, "pips"),
-            configure_flags = configure_flags + [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ],
-            dest_dir = dest_dir, rebuild = options.rebuild)
+        pips_copts = configure_opts
+        if options.pips_copts:
+            pips_copts.append(options.pips_copts)
+        else:
+            pips_copts += [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+        pips_mopts = make_opts
+        if options.pips_mopts:
+            pips_mopts.append(options.pips_mopts)
+        build_package(package_dir = pips_src_dir, build_dir = os.path.join(build_dir, "pips"),
+            configure_opts = pips_copts, make_opts = pips_mopts, dest_dir = dest_dir,
+            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
+    
 
     ##############################
+    
+    if options.nofinal:
+        warn("Skipping final installation steps (--nofinal)")
+        return
+        
     
     # Proceed with local scripts and libraries installation.
     
