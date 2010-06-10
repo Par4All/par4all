@@ -538,7 +538,7 @@ int maximize;
 	    return (c1);
 	}
     }
-    else 
+    else
 	complexity_rm(&c2);
 
     complexity_rm(&c1);
@@ -550,12 +550,17 @@ int maximize;
  *                                       list effects_list,
  *                                       int maximize)
  * Return, packed in a complexity, the exact value of variable var
- * or its max if (maximize==MAXIMUM_VALUE), or its min, according to 
- * preconditions passed in precond. 
+ * or its max if (maximize==MAXIMUM_VALUE), or its min, according to
+ * preconditions passed in precond.
+ *
  * If nothing is found,
  * the complexity returned is UNKNOWN_VARIABLE, with a
  * varcount_unknown set to 1. The variable statistics are up to
  * date in the new complexity returned, in any case.
+ *
+ * FI: I do not understand this algorithm as it does not try the
+ * easiest substitution, using any equation in precond that uses var
+ * with a non-zero coefficient.
  */
 complexity evaluate_var_to_complexity(entity var,
 				      transformer precond,
@@ -564,20 +569,20 @@ complexity evaluate_var_to_complexity(entity var,
 {
     predicate pred = transformer_relation(precond);
     Psysteme psyst = (Psysteme) predicate_system(pred);
-    Value min = VALUE_MAX; 
+    Value min = VALUE_MAX;
     Value max = VALUE_MIN;
     boolean faisable;
     complexity comp = make_zero_complexity();
 
 #define maxint_p(i) ((i) == INT_MAX)
 #define minint_p(i) ((i) == (INT_MIN))
-    
+
     trace_on("variable %s -> pnome, maximize %d ", entity_name(var), maximize);
 
     /* This is the only case that we use the precondition */
     if (entity_integer_scalar_p(var) &&
 	precond != transformer_undefined &&
-	pred != predicate_undefined && 
+	pred != predicate_undefined &&
 	!SC_UNDEFINED_P(psyst) ) {
 	Psysteme ps = sc_dup(psyst);
 	Psysteme ps1;
@@ -591,11 +596,11 @@ complexity evaluate_var_to_complexity(entity var,
 	for ( pv=ps->base; !VECTEUR_NUL_P(pv); pv=pv->succ) {
 	    if ( var_of(pv) != (Variable)var ) {
 		boolean b = hash_contains_p(hash_complexity_parameters,
-					(char *)module_local_name((entity)var_of(pv))); 
+					(char *)module_local_name((entity)var_of(pv)));
 
 		if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 		    fprintf(stderr,"var_of is %s -- variable is %s --bool is %d\n",
-		       module_local_name((entity)(var_of(pv)) ), 
+		       module_local_name((entity)(var_of(pv)) ),
 		       module_local_name((entity)(var) ), b);
 		}
 
@@ -614,7 +619,7 @@ complexity evaluate_var_to_complexity(entity var,
 
 	    if ( !SC_UNDEFINED_P(ps) )
 		fprintf(stderr,"ps OK\n");
-	    else 
+	    else
 		fprintf(stderr,"ps is NULL\n");
 	}
 
