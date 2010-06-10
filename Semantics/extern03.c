@@ -3,6 +3,10 @@
 
    Transformers are computed "in context". Make sure that the
    precondition is used in the declarations.
+
+   In fact, program_precondition should then be a prerequisite for
+   transformer computation, but it would only be useful when a "main"
+   is analyzed.
  */
 
 float delta = 1.;

@@ -1,0 +1,109 @@
+
+C  T() {}
+
+!     Copy of loopshared01.f, modified to be able to prettyprint the
+!     loop body transformers of the first loop
+
+      PROGRAM LOOPSHARED02
+
+C  T(N) {N==0}
+
+
+      N = 0                                                             0006
+
+C  T(I,J,K,L,N) {5I+N#init==N+5, 1<=I}
+
+      DO 100 I = 1, 10                                                  0007
+
+C  T(J,K,L,N) {I==J, K==6, L==5, N==N#init+5}
+
+         IF (.TRUE.) THEN                                               0008
+
+C  T(J) {I==J}
+
+            J = I                                                       0009
+
+C  T(K,L,N) {K+N#init==N+1, N#init<=N}
+
+            DO 200 K = 1, 5                                             0010
+
+C  T(L) {K==L}
+
+               L = K                                                    0011
+
+C  T(N) {N==N#init+1}
+
+               N = N+1                                                  0012
+
+C  T() {}
+
+200            CONTINUE                                                 0013
+         ENDIF
+
+C  T() {}
+
+100      CONTINUE                                                       0015
+
+C  T() {}
+
+
+!     n == 50
+      PRINT *, I, J, K, L, N                                            0018
+
+      END
+
+C  P() {}
+
+!     Copy of loopshared01.f, modified to be able to prettyprint the
+!     loop body transformers of the first loop
+
+      PROGRAM LOOPSHARED02
+
+C  P() {}
+
+
+      N = 0                                                             0006
+
+C  P(N) {N==0}
+
+      DO 100 I = 1, 10                                                  0007
+
+C  P(I,J,K,L,N) {5I==N+5, 1<=I, I<=10}
+
+         IF (.TRUE.) THEN                                               0008
+
+C  P(I,J,K,L,N) {5I==N+5, 1<=I, I<=10}
+
+            J = I                                                       0009
+
+C  P(I,J,K,L,N) {I==J, 5I==N+5, 1<=I, I<=10}
+
+            DO 200 K = 1, 5                                             0010
+
+C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 5I<=N+5, 1<=K, K<=5}
+
+               L = K                                                    0011
+
+C  P(I,J,K,L,N) {I==J, 5I+K==N+6, K==L, 1<=I, I<=10, 5I<=N+5, 1<=K,
+C    K<=5}
+
+               N = N+1                                                  0012
+
+C  P(I,J,K,L,N) {I==J, 5I+K==N+5, K==L, 1<=I, I<=10, 5I<=N+4, 1<=K,
+C    K<=5}
+
+200            CONTINUE                                                 0013
+         ENDIF
+
+C  P(I,J,K,L,N) {I==J, 5I==N, K==6, L==5, 1<=I, I<=10}
+
+100      CONTINUE                                                       0015
+
+C  P(I,J,K,L,N) {I==11, J==10, K==6, L==5, N==50}
+
+
+!     n == 50
+      PRINT *, I, J, K, L, N                                            0018
+
+      END
+

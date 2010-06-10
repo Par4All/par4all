@@ -23,7 +23,7 @@ C (0,2)
 
       IF (.TRUE.) THEN                                                  0009
 
-C  T(L,T,X) {L+X#init==L#init+X, T+X#init==T#init+X, T#init<=T, X<=9,
+C  T(L,T,X) {L+X#init==L#init+X, T+X#init==T#init+X, X<=9, X#init<=X,
 C    X#init<=9}
 
 C (0,3)
