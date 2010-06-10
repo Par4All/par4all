@@ -1,0 +1,18 @@
+delete parameter
+create parameter parameter.f90
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE(%ALL)
+
+apply UNSPLIT (%ALL)
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o parameter.database/Src/parameter.o parameter.database/Src/parameter.f90
+
+close
+delete parameter
+quit
+

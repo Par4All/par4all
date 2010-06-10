@@ -1,0 +1,31 @@
+int main(int argc, char *argv[])
+{
+   int i, a[10];
+   pied(a);
+   return 0;
+}
+void pied(int a[10])
+{
+   int i;
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+#pragma  pips inserted statement to check
+   for(i = 10; i <= 10; i += 1)
+      a[i] = 0;
+}
+int main(int argc, char *argv[])
+{
+   int i, a[11];
+   pied(a);
+   return 0;
+}
+void pied(int a[11])
+{
+   int i;
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+#pragma pips inserted statement
+   for(i = 10; i <= 10; i += 1)
+      a[i] = 0;
+}
+

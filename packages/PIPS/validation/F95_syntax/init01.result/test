@@ -1,0 +1,7 @@
+PROGRAM INIT01
+   INTEGER :: ARRAY(1:10)
+   ARRAY(:) = 0
+END PROGRAM INIT01
+
+"compile sources produced by pips"
+

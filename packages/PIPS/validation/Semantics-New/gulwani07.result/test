@@ -34,8 +34,8 @@ int main()
 
          x++;
 
-//  T(x,y) {x+y#init==x#init+y, 50<=x, x<=99, x#init<=x, 50<=x#init,
-//    x#init<=99}
+//  T(x,y) {x+y#init==x#init+y, 50<=x, x<=99, 50<=x#init, x#init<=99,
+//    y#init<=y}
 
       while (x<100&&x>=50) {
 

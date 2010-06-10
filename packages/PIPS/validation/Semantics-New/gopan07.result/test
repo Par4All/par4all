@@ -26,7 +26,7 @@ int main()
 
    while (y>=0) {
 
-//  T(x,y) {x+y#init==x#init+y, x<=50, x#init<=x, x#init<=50, 0<=y,
+//  T(x,y) {x+y#init==x#init+y, x<=50, x#init<=50, 0<=y, y#init<=y,
 //    0<=y#init}
 
       while (y>=0&&x<=50) {
@@ -40,7 +40,7 @@ int main()
          y++;
       }
 
-//  T(x,y) {x+y==x#init+y#init, 51<=x, 51<=x#init, 0<=y, y<=y#init,
+//  T(x,y) {x+y==x#init+y#init, 51<=x, x#init<=x, 51<=x#init, 0<=y,
 //    0<=y#init}
 
       while (y>=0&&x>50) {
