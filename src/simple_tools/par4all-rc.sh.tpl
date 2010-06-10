@@ -31,7 +31,7 @@ export PATH=$$(prepend_to_path_var PATH $$P4A_DIST/bin)
 export PKG_CONFIG_PATH=$$(prepend_to_path_var PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig)
 # If libs path not in ld.so.conf.d, then ldconfig -p should not have it and
 # we must add it to LD_LIBRARY_PATH.
-if [ `ldconfig -p | grep $$P4A_DIST/lib | wc -l` = 0 ]; then
+if [ `/sbin/ldconfig -p | grep $$P4A_DIST/lib | wc -l` = 0 ]; then
 	export LD_LIBRARY_PATH=$$(prepend_to_path_var LD_LIBRARY_PATH $$P4A_DIST/lib)
 fi
 
