@@ -33,6 +33,7 @@ class p4a_git():
 		'''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
 		self._git_ext = git_ext
 		git_dir = os.path.abspath(os.path.realpath(os.path.expanduser(any_file_inside_target_repos)))
+		debug("Looking for Git root for " + git_dir)
 		while True:
 			if not os.path.isdir(git_dir):
 				(git_dir, name) = os.path.split(git_dir)
@@ -58,7 +59,7 @@ class p4a_git():
 			self._dir = os.path.normpath(re.sub(re.escape(self._git_ext) + "$", "", self._git_dir))
 		else:
 			raise p4a_error("Git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
-		#debug("git dir for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
+		debug("Git root for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
 	
 	def fix_input_file_path(self, path):
 		'''Function for fixing input paths: make it relative to the repository root or carp if it is not in there.'''
