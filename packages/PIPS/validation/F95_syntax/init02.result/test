@@ -1,0 +1,10 @@
+Creating allocatable struct for dim 1
+PROGRAM INIT01
+   INTEGER :: IERR
+   INTEGER , ALLOCATABLE :: ARRAY(:)
+   ALLOCATE (ARRAY(10), STAT=IERR) 
+   ARRAY(:) = 0
+END PROGRAM INIT01
+
+"compile sources produced by pips"
+

@@ -51,7 +51,7 @@ int main()
 
    // BEGIN BLOCK
 
-//  T(i) {0.==i, 1.+2.==delta2, 1.==delta}}
+//  T(i) {0.==i}
 
    float i = 0.;
 

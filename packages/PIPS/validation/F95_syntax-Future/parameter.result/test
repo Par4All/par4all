@@ -1,5 +1,6 @@
 PROGRAM MAIN
-   INTEGER :: ARRAY(1:10)
+  INTEGER, PARAMETER :: SIZE = 10
+  INTEGER :: ARRAY (SIZE)
 END PROGRAM MAIN
 
 "compile sources produced by pips"

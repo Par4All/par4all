@@ -1,0 +1,67 @@
+
+Proper effects for "main"
+
+int main()
+{
+   int a, aa, *b, *bb, **c;                                             /*0003*/
+//               <must be written>: a
+
+   a = 1;                                                               /*0005*/
+//               <must be written>: b
+   b = &a;                                                              /*0006*/
+//               <must be written>: c
+   c = &b;                                                              /*0007*/
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: bb
+
+   bb = *c;                                                             /*0009*/
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: aa
+   aa = **c;                                                            /*0010*/
+   return 0;                                                            /*0011*/
+}
+
+POINTS TO for "main"
+
+//  {}
+int main()
+{
+//  points to = {}
+   int a, aa, *b, *bb, **c;                                             /*0003*/
+//  points to = {}
+
+   a = 1;                                                               /*0005*/
+//  points to = {}
+   b = &a;                                                              /*0006*/
+//  {(b,a,-Exact-)}
+   c = &b;                                                              /*0007*/
+//  {(b,a,-Exact-);(c,b,-Exact-)}
+
+   bb = *c;                                                             /*0009*/
+//  {(b,a,-Exact-);(bb,a,-Exact-);(c,b,-Exact-)}
+   aa = **c;                                                            /*0010*/
+//  {(b,a,-Exact-);(bb,a,-Exact-);(c,b,-Exact-)}
+   return 0;                                                            /*0011*/
+}
+
+Proper effects using points_to
+
+int main()
+{
+   int a, aa, *b, *bb, **c;                                             /*0003*/
+//               <must be written>: a
+
+   a = 1;                                                               /*0005*/
+//               <must be written>: b
+   b = &a;                                                              /*0006*/
+//               <must be written>: c
+   c = &b;                                                              /*0007*/
+//               <must be read   >: b c
+//               <must be written>: bb
+
+   bb = *c;                                                             /*0009*/
+//               <must be read   >: a b c
+//               <must be written>: aa
+   aa = **c;                                                            /*0010*/
+   return 0;                                                            /*0011*/
+}

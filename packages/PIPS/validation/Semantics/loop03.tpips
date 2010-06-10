@@ -10,13 +10,16 @@ echo Parse as C:
 activate C_PARSER
 echo Prettyprint the source as C, of course
 setproperty PRETTYPRINT_LANGUAGE "C"
+
 echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 apply FOR_LOOP_TO_DO_LOOP[getimage]
 echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 apply FOR_LOOP_TO_WHILE_LOOP[getimage]
-echo Select the most precise analysis:
+
+echo Select the most precise analyses:
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
@@ -27,6 +30,7 @@ echo   transformers and use them to improve the accuracy of expression
 echo   and statement transformers:
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
 echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
