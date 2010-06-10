@@ -99,8 +99,7 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz> --revision=0.1-mybuild --dir=/current/install/dir [--prefix=/final/install/dir] [...]", 
-        version = "Please use -V to get script version")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz> --revision=0.1-mybuild --dir=/current/install/dir [--prefix=/final/install/dir] [...]")
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
@@ -138,7 +137,7 @@ def main():
     main_group.add_option("--nocolor", action = "store_true", default = False,
         help = "Disable coloring of terminal output.")
     
-    main_group.add_option("--true-version", "-V", action = "store_true", default = False,
+    main_group.add_option("--version", "-V", action = "store_true", default = False,
         help = "Display script version and exit.")
     
     parser.add_option_group(main_group)
@@ -150,7 +149,7 @@ def main():
     
     set_verbosity(options.verbose)
     
-    if options.true_version:
+    if options.version:
         print(guess_file_revision(__file__))
         return
     

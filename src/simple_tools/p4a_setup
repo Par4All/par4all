@@ -10,18 +10,12 @@
 
 Par4All setup script.
 
-On Ubuntu/Debian you need to have these packages installed for building:
-
-    sudo aptitude install libc6 python libncurses5 libreadline5 subversion cproto build-essential bison flex libreadline5-dev libtool autoconf \
-libmcrypt-dev libmcrypt4 cproto indent gfortran tex4ht texlive-latex-extra swig git-core python-ply automake python-dev libgmp3-dev libmpfr-dev python3.1 fakeroot
-
-(Optional packages for compiling non working GUIs: emacs23 tk8.5 sun-java6-jdk)
-
-For running the binaries, you only need those packages:
-
-    sudo aptitude install libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran python3.1
+On Ubuntu/Debian you need to have these packages installed for running this script: libc6 python libncurses5 libreadline5 subversion cproto build-essential bison flex libreadline5-dev libtool autoconf \
+libmcrypt-dev libmcrypt4 cproto indent gfortran tex4ht texlive-latex-extra swig git-core python-ply automake python-dev libgmp3-dev libmpfr-dev python3.1 fakeroot --
+For running the binaries installed by this script, you only need these packages: libc6 libncurses5 libreadline5 python python-ply libmcrypt4 build-essential gfortran python3.1
 
 '''
+#(Optional packages for compiling non working GUIs: emacs23 tk8.5 sun-java6-jdk)
 
 import string, sys, os, re, optparse, tempfile, shutil
 from p4a_util import *
@@ -69,7 +63,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 def main():
     '''The function called when this program is executed by its own.'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]", version = "Please use -V to get script version")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]")
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
@@ -174,7 +168,7 @@ def main():
     main_group.add_option("--nocolor", action = "store_true", default = False,
         help = "Disable coloring of terminal output.")
     
-    main_group.add_option("--true-version", "-V", action = "store_true", default = False,
+    main_group.add_option("--version", "-V", action = "store_true", default = False,
         help = "Display script version and exit.")
 
     parser.add_option_group(main_group)
@@ -186,7 +180,7 @@ def main():
     
     set_verbosity(options.verbose)
     
-    if options.true_version:
+    if options.version:
         print(guess_file_revision(__file__))
         return
     
