@@ -246,6 +246,24 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      else
 		pips_internal_error("GAP case not implemented yet\n");
 
+	      /* We should deal here with abstract locations. This is commented out 
+		 because there is a problem with flow-sensitive heap locations which are
+		 considered as abstract locations. This reqauires some more thinking
+	      */
+	      /*   if (entity_abstract_location_p(reference_variable(sink_ref))) */
+	      /* 		{ */
+	      /* Here, we should analyse the source remaining indices to know if there are remaining dereferencing dimensions.
+		 This would imply keeping track of the indices types.
+		 In case there are no more dereferencing dimensions, we can reuse the sink abstract location.
+		 Otherwise (which is presently the only default case), we return an all location cell
+	      */
+	      /*   build_ref = make_reference(entity_all_locations(), NIL); */
+	      /* 		  *exact_p = false; */
+	      /* 		} */
+	      /* 	      else */
+	      /* 		{ */
+	      
+
 	      /* from here it's not generic, that is to say it does not work for convex effect references */
 	      list input_remaining_indices = input_indices;
 
@@ -331,6 +349,34 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	} /* else branche of if (input_path_length == 0) */
     } /* else branch of if (entity_abstract_location_p(input_ent)) */
 
+
+  /* If the results contain dereferencing dimensions, we must eval them recursively */
+  list l_tmp = l;
+  l = NIL;
+  FOREACH(CELL, c, l_tmp)
+    {
+      bool r_exact_p;
+      reference ref;
+      if(cell_reference_p(c)) 
+	ref = cell_reference(c);
+      else if (cell_preference_p(c))
+	ref = preference_reference(cell_preference(c));
+      else /* Should be the gap case */
+	pips_internal_error("GAPs not implemented yet\n");
+      
+      if ((!entity_abstract_location_p(reference_variable(ref)))
+	  && effect_reference_dereferencing_p(ref, &r_exact_p))
+	{
+	  *exact_p = *exact_p && r_exact_p;
+	  l = gen_nconc(eval_reference_with_points_to(ref, ptl, &r_exact_p), l);
+	  *exact_p = *exact_p && r_exact_p;
+	  free_cell(c);
+	}
+      else 
+	l = CONS(CELL, c, l);
+    }
+  gen_nreverse(l);
+  gen_free_list(l_tmp);
   return l;
 }
 
