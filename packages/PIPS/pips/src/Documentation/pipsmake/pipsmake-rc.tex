@@ -6638,7 +6638,8 @@ This pass should be reserved to internal use only, another pass should create an
 \begin{PipsMake}
 statement_insertion > MODULE.code
     < PROGRAM.entities
-    < MODULE.code
+    < ALL.code
+    > ALL.code
 	< MODULE.regions
 	< MODULE.out_regions
 \end{PipsMake}
@@ -6653,14 +6654,18 @@ STATEMENT_INSERTION_FAILURE_PRAGMA "pips inserted statement to remove"
 \end{PipsProp}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
 \subsection{Loop Expansion}
+\begin{PipsPass}{loop_expansion_init}
 Prepare the loop expansion by creating a new statement (that may be invalid) for further processing by \PipsPassRef{statement_insertion}.
 Use \PipsPropRef{STATEMENT_INSERTION_PRAGMA} to identify the created statement.
+Otherwise \PipsPropRef{LOOP_LABEL} and \PipsPropRef{LOOP_EXPANSION_SIZE} have the same meaning as in \PipsPassRef{loop_expansion}
+\end{PipsPass}
 
 \begin{PipsMake}
 loop_expansion_init 	> MODULE.code
     < PROGRAM.entities
     < MODULE.code
 \end{PipsMake}
+
 \begin{PipsPass}{loop_expansion}
 Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.
 An offset can be set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the lower bound too.
@@ -8774,7 +8779,7 @@ scalarization  > MODULE.code
         < MODULE.out_regions
 \end{PipsMake}
 
-\begin{PipsPass}{CONSTANT_ARRAY_SCALARIZATION}
+\begin{PipsPass}{constant_array_scalarization}
 Similar to \PipsPassRef{scalarization}, but with a different criterium:
 if the array is only accessed through constant indices, all its references are repalced by
 scalars.

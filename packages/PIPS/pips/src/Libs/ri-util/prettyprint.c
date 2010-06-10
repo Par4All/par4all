@@ -2629,48 +2629,64 @@ loop_private_variables(loop obj, list pdl)
   list locals = loop_private_variables_as_entites(obj,
                                                   omp_private,
                                                   !all_private);
-  /* comma-separated list of private variables.
-   * built in reverse order to avoid adding at the end...
-   */
-  FOREACH (ENTITY, p, locals) {
-    if (some_before)
-      l = CHAIN_SWORD(l, ",");
-    else
-      some_before = TRUE; /* from now on commas, triggered... */
-    l = gen_nconc(l, words_declaration(p, TRUE, pdl));
-  }
-
-  gen_free_list(locals);
 
   pips_debug(5, "#printed %zd/%zd\n", gen_length(l),
       gen_length(loop_locals(obj)));
 
   /* stuff around if not empty
    */
-  if (l) {
-    string private;
+  if (locals) {
+    string private = string_undefined;
     if (hpf_private) {
-    private = "NEW(";
+      private = "NEW(";
     } else if (omp_private) {
       switch (get_prettyprint_language_tag()) {
-        case is_language_fortran:
-        private = "PRIVATE(";
-          break;
-        case is_language_c:
-        private = "private(";
-          break;
-        case is_language_fortran95:
-          pips_internal_error("Need to update F95 case");
-          break;
-        default:
-          pips_internal_error("Language unknown !");
-          break;
+      case is_language_fortran:
+	private = "PRIVATE(";
+	break;
+      case is_language_c:
+	private = "private(";
+	break;
+      case is_language_fortran95:
+	pips_internal_error("Need to update F95 case");
+	break;
+      default:
+	pips_internal_error("Language unknown !");
+	break;
       }
-    } else
-    private = "PRIVATE ";
+    } else if(get_prettyprint_language_tag()==is_language_fortran) {
+      /* This is debugging way to print out code. I do not know which
+	 Fortran parser takes this language extension. */
+      private = "PRIVATE ";
+    }
+    else {
+      /* In C case, it might be a good idea to re-declare the private
+	 variables in the loop body, exceot for outer loop indices,
+	 but this is not easy here. PIPS data structures should be
+	 updated because loop_private is somehow redundant with
+	 statement declarations. */
+      pips_user_warning("Privatized variables are ignored with the "
+			"current prettyprintrer options.\n");
+    }
+
+    if(!string_undefined_p(private)) {
+    /* comma-separated list of private variables.
+     * built in reverse order to avoid adding at the end...
+     */
+    FOREACH (ENTITY, p, locals) {
+      if (some_before)
+	l = CHAIN_SWORD(l, ",");
+      else
+	some_before = TRUE; /* from now on commas, triggered... */
+      l = gen_nconc(l, words_declaration(p, TRUE, pdl));
+    }
+
+    gen_free_list(locals);
+
     l = CONS(STRING, MAKE_SWORD(private), l);
     if (hpf_private || omp_private)
       CHAIN_SWORD(l, ")");
+    }
   }
 
   return l;

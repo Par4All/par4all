@@ -93,6 +93,65 @@ static Pcontrainte dimensions_to_psysteme(list dims,list phis)
     }
     return pc;
 }
+typedef struct {
+    entity to;
+    list found;
+} entity_list_pair;
+
+static void find_calls_to_function_walker(call c, entity_list_pair *p)
+{
+    if(same_entity_p(p->to,call_function(c)))
+        p->found=CONS(CALL,c,p->found);
+}
+
+static void find_calls_to_function_walker_in_declaration(statement s, entity_list_pair *p)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+        if(value_expression_p(entity_initial(e)))
+            gen_context_recurse(s,&p,call_domain,gen_true,find_calls_to_function_walker);
+}
+
+/* returns a list of call to @p to found in @p in*/
+static list find_calls_to_function(statement in,entity to) {
+    entity_list_pair p = { to , NIL };
+    gen_context_multi_recurse(in,&p,call_domain,gen_true,find_calls_to_function_walker,
+            statement_domain,gen_true,find_calls_to_function_walker_in_declaration,0);
+    return p.found;
+}
+
+
+/* tries hard to propagate entity dimension change */
+static void statement_insertion_fix_access_in_callers(const char * module_name, entity new_formal)
+{
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name,true);
+    intptr_t new_formal_offset=formal_offset(storage_formal(entity_storage(new_formal)));
+    size_t new_formal_dimensions=gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(new_formal)))));
+    FOREACH(STRING,caller_name,callees_callees(callers)) {
+        statement caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,true);
+        list calls = find_calls_to_function(caller_statement,module_name_to_entity(module_name));
+        FOREACH(CALL,c,calls) {
+            expression nth = EXPRESSION(gen_nth(new_formal_offset-1,call_arguments(c)));
+            if(expression_reference_p(nth))
+            {
+                reference r = expression_reference(nth);
+                size_t nb_indices = gen_length(reference_indices(r));
+                size_t nb_dimensions = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r))))));
+                if(nb_dimensions - nb_indices == new_formal_dimensions)
+                {
+                    list *iter = &variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
+                    for(size_t i=nb_indices;i;i--) POP(*iter);
+                    gen_full_free_list(*iter);
+                    *iter=gen_full_copy_list(variable_dimensions(type_variable(ultimate_type(entity_type(new_formal)))));
+                    statement_insertion_fix_access_in_callers(caller_name,reference_variable(r));
+                }
+                else pips_internal_error("unhandled case");
+            }
+            else pips_internal_error("unhandled case");
+        }
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE,caller_name,caller_statement);
+        gen_free_list(calls);
+    }
+}
 
 /* fixes statement declaration depending on region access */
 static void statement_insertion_fix_access(list regions)
@@ -144,6 +203,9 @@ static void statement_insertion_fix_access(list regions)
         gen_full_free_list(variable_dimensions(type_variable(entity_type(e))));
         variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
         gen_free_list(phis);
+        /* formal entites are a special case: the actual parameter declaration must be changed too*/
+        if(formal_parameter_p(e))
+            statement_insertion_fix_access_in_callers(get_current_module_name(),e);
     }
 }
 

@@ -11,7 +11,7 @@ display PRINTED_FILE[%ALL]
 
 apply UNSPLIT[%ALL]
 
-# compile sources produced by pips
+#echo compile sources produced by pips
 #shell gcc -c -o generate.database/Src/generate.o  generate.database/Src/generate.f90
 
 close

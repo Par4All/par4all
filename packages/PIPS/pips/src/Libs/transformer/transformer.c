@@ -1111,8 +1111,8 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 
     /* Step 1: get rid of unwanted values in the relation r and in the basis */
     for (cea = args ; !ENDP(cea); POP(cea)) {
-      /* Automatic variables read in a CATCH block need to be declared volatile as
-       * specified by the documentation*/
+      /* Automatic variables read in a CATCH block need to be declared
+       * volatile as specified by the documentation*/
       entity volatile e = ENTITY(CAR(cea));
       pips_assert("base contains variable to project...",
 		  base_contains_variable_p(sc_base(r), (Variable) e));

@@ -1020,8 +1020,52 @@ invariant_vector_p(Pvecteur v)
 
     return invariant;
 }
+
+/* Specific for the derivative fix point: each constant term in the
+   constraints is multiplied by ik which is not in sc's basis, and ik
+   is added to the basis is necessary */
+static Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
+{
+  Pcontrainte c;
 
-/* Computation of a fix point using constraints on the discrete derivative.
+  pips_assert("sc is defined", !SC_UNDEFINED_P(sc));
+  pips_assert("ik is not in sc's basis",
+	      !base_contains_variable_p(sc->base, ik));
+
+  for(c = sc->egalites; !CONTRAINTE_UNDEFINED_P(c); c = c->succ) {
+    Pvecteur v = c->vecteur;
+    for(;!VECTEUR_NUL_P(v); v = v->succ) {
+      Variable var = var_of(v);
+      if(var==TCST) {
+	var_of(v) = ik;
+	break;
+      }
+    }
+  }
+
+  for(c = sc->inegalites; !CONTRAINTE_UNDEFINED_P(c); c = c->succ) {
+    Pvecteur v = c->vecteur;
+    for(;!VECTEUR_NUL_P(v); v = v->succ) {
+      Variable var = var_of(v);
+      if(var==TCST) {
+	var_of(v) = ik;
+	break;
+      }
+    }
+  }
+
+  /* add constraint ik >= 0 to compute T*. Would be ik>=1 if T+ were
+     sought. */
+  c = contrainte_make(vect_new(ik, VALUE_MONE));
+  sc_add_inegalite(sc, c);
+  base_add_dimension(&(sc->base), ik);
+  sc->dimension++;
+
+  return sc;
+}
+
+/* Computation of a transitive closure using constraints on the
+ * discrete derivative. See TR CRI ???.
  *
  * Implicit equations, n#new - n#old = 0, are not added. Instead, invariant
  * constraints in tf are obtained by projection and added.
@@ -1095,7 +1139,7 @@ transformer transformer_derivative_fix_point(transformer tf)
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
 
-    /* Project all variables but differences */
+    /* Project all variables but differences to get T' */
 
     sc = sc_projection_ofl_along_variables(sc, b);
 
@@ -1104,99 +1148,18 @@ transformer transformer_derivative_fix_point(transformer tf)
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
 
-    /* Eliminate constant terms to get homogeneous constraints.
-     * The constant term elimination is equivalent to a simultaneous
-     * integration of all derivatives: all variables are modified by
-     * the same number of iterations.
-     */
-
-    sc_homo = sc_dup(sc);
-    sc_homo = sc_projection_ofl(sc_homo, TCST);
-
-    ifdebug(8) {
-      pips_debug(8,
-		 "derivative constraints after elimination of constant terms=\n");
-      sc_fprint(stderr, sc_homo, (char * (*)(Variable)) external_value_name);
-    }
-
-    sc = sc_append(sc, sc_homo);
-    sc_rm(sc_homo);
-
-    ifdebug(8) {
-      pips_debug(8, "All constraints on derivatives=\n");
-      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
-    }
-
-    /* Generate invariants from the derivative constraints */
-
-    /* For each equation, keep an equation if the constant term is zero
-     * or transform it in an inequality if not. The constant term of the
-     * inequality must be zero because T* is computed, not T+
-     */
-    for(ceq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(ceq);
-	ceq = contrainte_succ(ceq)) {
-      Pvecteur eq = vect_dup(contrainte_vecteur(ceq));
-      Pcontrainte new_c = contrainte_make(eq);
-      Value cst = vect_coeff(TCST, eq);
-
-      if(cst == VALUE_ZERO) {
-	/* leave the equation as it is and put it in the equation list */
-	new_c->succ = leq;
-	leq = new_c;
-      }
-      else {
-	vect_chg_coeff(&(contrainte_vecteur(new_c)), TCST, VALUE_ZERO);
-	new_c->succ = lineq;
-	lineq = new_c;
-
-	if(cst >= VALUE_ONE) {
-	  /* the signs are OK */
-	  ;
-	}
-	else /* cst <= VALUE_MONE */ {
-	  vect_chg_sgn(contrainte_vecteur(new_c));
-	}
-      }
-    }
-
-    /* For each inequality, keep an equality if the constant term is positive
-     * (i.e. the lhs is decreasing). Constant term in
-     * inequality must be zero because T* is conputed, not T+. T+ can be
-     * derived from T* as T o T*.
-     */
-    for(cineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(cineq);
-	cineq = contrainte_succ(cineq)) {
-      Value cst = vect_coeff(TCST, contrainte_vecteur(cineq));
-
-      if(cst >= VALUE_ZERO) {
-	/* OK for decreasing derivative
-	   (Note: the constant term is in the lhs) */
-	Pvecteur ineq = vect_dup(contrainte_vecteur(cineq));
-	Pcontrainte new_c = CONTRAINTE_UNDEFINED;
-
-	vect_chg_coeff(&ineq, TCST, VALUE_ZERO);
-	new_c = contrainte_make(ineq);
-	new_c->succ = lineq;
-	lineq = new_c;
-      }
-      else {
-	/* The sign of the derivative is unknown:
-	   no invariant can be deduced */
-	;
-      }
-    }
-
-    ifdebug(8) {
-      pips_debug(8, "First set of equality invariants=\n");
-      egalites_fprint(stderr, leq, (char * (*)(Variable)) external_value_name);
-      pips_debug(8, "First set of inequality invariants=\n");
-      inegalites_fprint(stderr, lineq, (char * (*)(Variable)) external_value_name);
-    }
-
-    /* sc is not needed anymore, it can be updated with leq and lineq */
-
-    sc_rm(sc);
-    sc = sc_make(leq, lineq);
+    /* Multiply the constant terms by the iteration number ik and add a
+       positivity constraint for the iteration number ik and then
+       eliminate the iteration number ik. */
+    entity ik = make_local_temporary_integer_value_entity();
+    //Psysteme sc_t_prime_k = sc_dup(sc);
+    //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
+    sc = sc_multiply_constant_terms(sc, (Variable) ik);
+    //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
+    sc = sc_projection_ofl(sc, (Variable) ik);
+    // FI: I do not remember nor find how to get rid of local values...
+    //sc_rm(sc);
+    //sc = sc_t_prime_star;
 
     /* Difference variables must substituted back to differences
      * between old and new values.

@@ -200,8 +200,10 @@ char *module_name;
 	summary_comp_dup = copy_complexity(summary_comp);
     }
 
-    pips_assert("summary_complexity", complexity_consistent_p(summary_comp));
-    pips_assert("summary_complexity", complexity_consistent_p(summary_comp_dup));
+    pips_assert("summary_comp is conssten",
+		complexity_consistent_p(summary_comp));
+    pips_assert("summary_comp_dup is consistent",
+		complexity_consistent_p(summary_comp_dup));
 
     trace_off();
 
@@ -219,7 +221,7 @@ char *module_name;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr,"After  ======== SUMMARY ; module %s\n",module_name);
     }
-    
+
     reset_complexity_map();
     reset_current_module_statement();
 
@@ -237,10 +239,10 @@ complexity statement_to_complexity(statement stat,
     list effects_list = load_cumulated_rw_effects_list(stat);
     complexity comp = make_zero_complexity();
 
-    trace_on("statement %s, ordering (%d %d)", 
+    trace_on("statement %s, ordering (%d %d)",
 	     module_local_name(statement_label(stat)),
 	     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-/*    
+    /*
     if ( perfectly_nested_loop_p(stat) )
 	fprintf(stderr, "PERFECTLY nested loop, ordering %d\n",
 		statement_ordering(perfectly_nested_loop_to_body(stat)));
@@ -255,7 +257,7 @@ complexity statement_to_complexity(statement stat,
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr,"complexity for statement (%td,%td) at %p\n",
-		(statement_ordering(stat) >> 16), 
+		(statement_ordering(stat) >> 16),
 		(statement_ordering(stat) & 0xffff), comp);
 	complexity_fprint(stderr, comp, TRUE, TRUE);
     }
@@ -330,83 +332,86 @@ list effects_list;
 /* Modification:
  *  - To postpone the variable evaluation, we reverse the block.
  *    Attention: gen_nreverse destroys the original list.  LZ  4 Dec. 92
+ *
  *  - Secondly, we check the variables in complexity. If a certain variable
  *    is must_be_written variable ( obtained from cumulated effects ),
  *    we evaluate it.  LZ 5 Dec. 92
- *  - When the variable is must_be_written, the precondition is no longer 
+ *
+ *  - When the variable is must_be_written, the precondition is no longer
  *    available with this effect. So we need to use the next statement effect
  *    with current precondition to evaluate the variable. LZ 9 Dec. 92
+ *
  *  - Francois suggested not to create new list, ie, reverse block.
  *    Hence we don't use MAPL any more here. Instead, gen_nthcdr is used.
  *    16 Dec 92
  */
-complexity block_to_complexity(block, precond, effects_list)
-list block;
-transformer precond;
-list effects_list;
+complexity block_to_complexity(list block, // list of statements
+			       transformer precond,
+			       list effects_list)
 {
-    complexity comp = make_zero_complexity();
-    int block_length = gen_length( block );
-    int i;
+  complexity comp = make_zero_complexity();
+  int block_length = gen_length( block );
+  int i;
 
-    trace_on("block");
+  trace_on("block");
 
-    if (get_bool_property("COMPLEXITY_EARLY_EVALUATION")) {
-	MAPL (pa, {
-	    statement stat = STATEMENT(CAR(pa));
-	    complexity ctemp = statement_to_complexity(stat, precond, effects_list);
-	    complexity_add(&comp, ctemp);
-	}, block);
+  if (get_bool_property("COMPLEXITY_EARLY_EVALUATION")) {
+    FOREACH(STATEMENT, stat, block) {
+      complexity ctemp = statement_to_complexity(stat, precond, effects_list);
+      complexity_add(&comp, ctemp);
     }
-    else {
-	for ( i = block_length; i > 0 ; i-- ) {
-	    statement stat = STATEMENT(CAR(gen_nthcdr( i-1, block )));
-	    statement up_stat;
-	    complexity ctemp = statement_to_complexity(stat, 
-						       precond, effects_list);
-	    transformer prec = load_statement_precondition(stat);
-	    
-	    list cumu_list = load_cumulated_rw_effects_list(stat);
-	    //extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
-	    
-	    Pbase pb = VECTEUR_NUL;
-	    
-	    if ( i > 1 ) {
-		up_stat = STATEMENT(CAR(gen_nthcdr( i-2, block )));
-		cumu_list = load_cumulated_rw_effects_list(up_stat);
-	    }
-	    complexity_add(&comp, ctemp);
-	    
-	    pb = vect_dup(polynome_used_var(complexity_polynome(comp), 
-					    default_is_inferior_pvarval));
-	    
-	    for ( ; !VECTEUR_NUL_P(pb); pb = pb->succ) {
-		boolean mustbewritten;
-		char *var = variable_local_name(pb->var);
-		
-		mustbewritten = is_must_be_written_var(cumu_list, var);
-		
-		if ( mustbewritten ) {
-		    complexity csubst;
-		    
-		    csubst = evaluate_var_to_complexity((entity)pb->var, 
-							prec, 
-							cumu_list, 1);
-		    comp = complexity_var_subst(comp, pb->var, csubst);
-		}
-	    }
+  }
+  else { // default property setting
+    for ( i = block_length; i > 0 ; i-- ) {
+      statement stat = STATEMENT(CAR(gen_nthcdr( i-1, block )));
+      statement up_stat;
+      transformer prec = load_statement_precondition(stat);
+      complexity ctemp = statement_to_complexity(stat,
+						 prec, effects_list);
+
+      list cumu_list = load_cumulated_rw_effects_list(stat);
+      //extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
+
+      Pbase pb = VECTEUR_NUL;
+
+      if ( i > 1 ) {
+	up_stat = STATEMENT(CAR(gen_nthcdr( i-2, block )));
+	cumu_list = load_cumulated_rw_effects_list(up_stat);
+      }
+      complexity_add(&comp, ctemp);
+
+      pb = vect_dup(polynome_used_var(complexity_polynome(comp),
+				      default_is_inferior_pvarval));
+
+      for ( ; !VECTEUR_NUL_P(pb); pb = pb->succ) {
+	boolean mustbewritten;
+	entity v = (entity) (pb->var);
+	//char *var = variable_local_name(pb->var);
+
+	//mustbewritten = is_must_be_written_var(cumu_list, var);
+	mustbewritten = effects_write_variable_p(cumu_list, v);
+
+	if ( mustbewritten ) {
+	  complexity csubst;
+
+	  csubst = evaluate_var_to_complexity((entity)pb->var,
+					      prec,
+					      cumu_list, 1);
+	  comp = complexity_var_subst(comp, pb->var, csubst);
 	}
+      }
     }
+  }
 
-    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	(void) complexity_consistent_p(comp);
-	fprintf(stderr, "block comp is at %p and comp value is ", comp);
-	complexity_fprint(stderr, comp, FALSE, TRUE);
-    }
-    complexity_check_and_warn("block_to_complexity", comp);    
+  if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+    (void) complexity_consistent_p(comp);
+    fprintf(stderr, "block comp is at %p and comp value is ", comp);
+    complexity_fprint(stderr, comp, FALSE, TRUE);
+  }
+  complexity_check_and_warn("block_to_complexity", comp);
 
-    trace_off();
-    return(comp);
+  trace_off();
+  return(comp);
 }
 
 /* 2nd element of instruction */

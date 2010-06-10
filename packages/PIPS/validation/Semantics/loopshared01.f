@@ -8,8 +8,9 @@ C     11-9
          j = i
          do 100 k = 1, 5
             l = k
- 100     n = n + 1
+ 100        n = n + 1
 
+!     n == 50
       print *, i, j, k, l, n
 
       n = 0
@@ -17,8 +18,9 @@ C     11-9
          j = i
          do 200 k = 5, 1
             l = k
- 200     n = n + 1
+ 200        n = n + 1
 
+!     n == 0
       print *, i, j, k, l, n
 
       end
