@@ -7,19 +7,23 @@
 # if a change occured, we validate it !
 # erros from cproto are just dropped (-O switch)
 #
-# not that the time stamp is here to prevent too many runs of cproto ...
+# note that the time stamp is here to prevent too many runs of cproto ...
 
 CPROTO_STAMP_FILE=.cproto.stamp
 
 cproto_bootstrap:$(CPROTO_STAMP_FILE)_init
 
-# this one ensure there is a minimal header
+# this one ensures there is a minimal header
 $(CPROTO_STAMP_FILE)_init:$(srcdir)/$(TARGET)-local.h $(srcdir)/Makefile.am
 	test -f $(TARGET).h || ( cp $(srcdir)/$(TARGET)-local.h $(TARGET).h && chmod u+w $(TARGET).h && touch -r  $(srcdir)/$(TARGET)-local.h $(TARGET).h )
 	touch $(CPROTO_STAMP_FILE)_init
 
-# this one generate the stamp
-$(CPROTO_STAMP_FILE):$(SOURCES) $(srcdir)/Makefile.am $(CPROTO_STAMP_FILE)_init
+# this one generates the stamp
+# we cannot depend on BUILT_SOURCES because it would create a circular dep
+# instead we force make of thos targets
+$(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
+	cproto_extra_deps="`echo $(BUILT_SOURCES) | sed -e 's/$(TARGET).h//'`" ;\
+	if test "$$cproto_extra_deps" ; then $(MAKE) $$cproto_extra_deps ; fi
 	cproto_sources=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
 		cproto_guard="`echo $(TARGET)_header_included | tr - _`";\
