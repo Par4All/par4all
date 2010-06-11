@@ -429,13 +429,18 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
 								 &e2, false);
   effects_free(l1);
   effects_free(l2);
-  effect_add_dereferencing_dimension(e2);
+  /* transform tab[i] into tab[*]. */
+  list l3 = effect_to_store_independent_sdfi_list(e2, false);
   generic_effects_reset_all_methods();
   ref1 = effect_any_reference(e1);
   source = make_cell_reference(ref1);
   // add the points_to relation to the set generated
   // by this assignment
-  ref2 = effect_any_reference(e2);
+  e2 = EFFECT(CAR(l3));
+  /* transform tab[*] into tab[*][0]. */
+  effect_add_dereferencing_dimension(e2);
+  ref2 = effect_any_reference(copy_effect(e2));
+  free(l3);
   sink = make_cell_reference(copy_reference(ref2));
   new_sink = make_cell_reference(copy_reference(ref2));
   // access new_source = copy_access(source);
@@ -2943,33 +2948,7 @@ set points_to_expression(expression e, set pt_in, bool store) {
   return pt_out;
 }
 
-/* not yet fuly implemented.*/
-set points_to_of_declarations(entity decl, set pt_in)
-{
 
-set pt_out = set_generic_make(set_private, points_to_equal_p,
-				points_to_rank);
-
-  pips_debug(1, "declaration of entity %s \n", entity_local_name(decl));
-
-  if(type_variable_p(entity_type(decl)))
-    {
-      value v_init = entity_initial(decl);
-      
-      pips_debug(1, "begin\n");
-      /* generate points-to due to the initialisation */
-      if (value_expression_p(v_init))
-	{
-	  expression exp_init = value_expression(v_init);
-	  print_expression(exp_init);
-	  fprintf(stderr,"\n");
-	  set_assign(pt_out, points_to_expression(exp_init,pt_in,true));
-	}
-      
-    }
- return pt_out;
-
-}
 
 /* Process recursively statement "current". Use pt_list as the input
    points-to set. Save it in the statement mapping. Compute and return
@@ -2982,19 +2961,35 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
   instruction i = statement_instruction(current);
   /*  Convert the pt_in set into a sorted list for storage */
   /*  Store the current points-to list */
+
   /* test if the statement is a declaration. */
-if (c_module_p(get_current_module_entity()) && 
+  if (c_module_p(get_current_module_entity()) &&
       (declaration_statement_p(current) ))
-    {
+    {/* retrieve the list of declarations attatched to the module*/
       list l_decls = statement_declarations(current);
-      print_entities(l_decls);
       pips_debug(1, "declaration statement \n");
 
       FOREACH(ENTITY, e, l_decls)
 	{
-	  set_assign(pt_in,points_to_of_declarations(e, pt_in));
+	  if(type_variable_p(entity_type(e)))
+	    {/* test if the dclaration is an initialization */
+	      value v_init = entity_initial(e);
+	      /* generate points-to due to the initialisation */
+	      if (value_expression_p(v_init))
+		{
+		  expression exp_init = value_expression(v_init);
+		  expression lhs = entity_to_expression(e);
+		  /* get the rhs (exp_init) and create the lhs from
+		     the entity. Then call points_to_assignment which
+		     will identify the type of each hand side and
+		     call the appropriate basic case. */
+		  set_assign(pt_out,points_to_assignment(current,
+							 lhs,
+							 exp_init,
+							 pt_in));
+		}
+	    }
 	}
-
     }
   points_to_storage(pt_in, current, store);
   ifdebug(1) print_statement(current);
