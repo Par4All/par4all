@@ -160,6 +160,11 @@ static void statement_insertion_fix_access(list regions)
     {
         reference r = region_any_reference(reg);
         entity e = reference_variable(r);
+        if(formal_parameter_p(e)) {
+            pips_user_warning("cannot change formal parameter with this version\n"
+                    "try using inlining if possibleǹ");
+            break;
+        }
         list phis = expressions_to_entities(reference_indices(r));
         Pcontrainte dims_sc = dimensions_to_psysteme(variable_dimensions(type_variable(entity_type(e))), phis);
         Psysteme access_syst = region_system(reg);
@@ -204,6 +209,8 @@ static void statement_insertion_fix_access(list regions)
         variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
         gen_free_list(phis);
         /* formal entites are a special case: the actual parameter declaration must be changed too*/
+
+        /* currently disabled, see you later, aligator */
         if(formal_parameter_p(e))
             statement_insertion_fix_access_in_callers(get_current_module_name(),e);
     }

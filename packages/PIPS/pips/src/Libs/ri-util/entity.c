@@ -2093,7 +2093,7 @@ entity operator_neutral_element(entity op)
         NULL
     };
     for(int i=0;one_neutral[i];i++)
-        if(same_string_p(one_neutral[i],en)) return find_entity_1();
+        if(same_string_p(one_neutral[i],en)) return make_integer_constant_entity(1);
 
     const char * plus_inf_neutral[] = {
         MIN_OPERATOR_NAME ,
@@ -2128,7 +2128,7 @@ entity operator_neutral_element(entity op)
         NULL
     };
     for(int i=0;zero_neutral[i];i++)
-        if(same_string_p(zero_neutral[i],en)) return find_entity_0();
+        if(same_string_p(zero_neutral[i],en)) return make_integer_constant_entity(0);
 
     return entity_undefined;
 }
