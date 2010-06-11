@@ -463,7 +463,7 @@ To push the official version, just use a:
 p4a_git --branch-action git push origin p4a\$suffix
 \end{verbatim}
 
-If you want to pull all different \Apfa branches that may have been
+If you want to pull all the different \Apfa branches that may have been
 changed by others:
 \begin{verbatim}
 p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
@@ -775,12 +775,15 @@ To only run \Apfa, the following packages on Debian or Ubuntu are needed:
 \label{sec:an-everyday-work}
 
 \begin{itemize}
-\item To automate the \Apfa workflow and deal with \texttt{git} stuff, the
+\item \verb|p4a_doc| in \verb|src/dev| is used to compile the \Apfa
+  documentation and publish it on the server. Have a look to
+  \texttt{p4a\_doc -h} for the help;
+\item to automate the \Apfa workflow and deal with \texttt{git} stuff, the
   \verb|p4a_git| is available, as described in
   \S~\ref{sec:p4a_git-script-deal};
 \item \verb|p4a_setup| is used to compile all the \Apfa infrastructure and
-  setting up many things. It should be used at least for the first
-  compilation;
+  to set up many things. It should be used at least for the first
+  compilation. See \S~\ref{sec:p4a_s-comp-script} for more details;
 \item \verb|p4a_validate| is used to leverage the \Apips validation.
 \end{itemize}
 
@@ -804,7 +807,7 @@ people but contain some interesting hacks that could be usefull for other
 projects or if things go really wrong. There are located in
 \texttt{src/dev}, that should be used in this order:
 \begin{itemize}
-\item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips
+\item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips{}
   \Asvn-\Agit gateways. This script is here to show how it can be done but
   also to keep track of the exact parameters used to create them in the
   case we loose them and want to recreate them with exactly with the same
