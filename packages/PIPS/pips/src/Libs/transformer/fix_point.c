@@ -1094,16 +1094,11 @@ transformer transformer_derivative_fix_point(transformer tf)
     /* sc is going to be modified and destroyed and eventually
        replaced in fix_tf */
     Psysteme sc = predicate_system(transformer_relation(fix_tf));
-    Psysteme sc_homo = SC_UNDEFINED;
     /* Do not handle variable which do not appear explicitly in constraints! */
     Pbase b = sc_to_minimal_basis(sc);
     Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
     Pbase bv = BASE_NULLE; /* basis vector */
     Pbase diffb = BASE_NULLE; /* basis of difference vectors */
-    Pcontrainte ceq = CONTRAINTE_UNDEFINED; /* loop index */
-    Pcontrainte cineq = CONTRAINTE_UNDEFINED; /* loop index */
-    Pcontrainte leq = CONTRAINTE_UNDEFINED; /* fix point equations */
-    Pcontrainte lineq = CONTRAINTE_UNDEFINED; /* fix point inequalities */
 
     ifdebug(8) {
       pips_debug(8, "Begin for transformer %p:\n", tf);
@@ -1150,25 +1145,27 @@ transformer transformer_derivative_fix_point(transformer tf)
 
     /* Multiply the constant terms by the iteration number ik and add a
        positivity constraint for the iteration number ik and then
-       eliminate the iteration number ik. */
+       eliminate the iteration number ik to get T*(dx). */
     entity ik = make_local_temporary_integer_value_entity();
     //Psysteme sc_t_prime_k = sc_dup(sc);
     //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
     sc = sc_multiply_constant_terms(sc, (Variable) ik);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
+    sc->base = base_remove_variable(sc->base, (Variable) ik);
+    sc->dimension--;
     // FI: I do not remember nor find how to get rid of local values...
     //sc_rm(sc);
     //sc = sc_t_prime_star;
-
-    /* Difference variables must substituted back to differences
-     * between old and new values.
-     */
 
     ifdebug(8) {
       pips_debug(8, "All invariants on derivatives=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
+
+    /* Difference variables must substituted back to differences
+     * between old and new values.
+     */
 
     for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
       entity oldv = (entity) vecteur_var(bv);
