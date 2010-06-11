@@ -201,7 +201,7 @@ def rmtree(dir, can_fail = 0, remove_top = True):
         if can_fail:
             warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
         else:
-            raise e
+            raise
 
 def find(file_re, dir = None, abs_path = True, match_files = True, 
     match_dirs = False, match_whole_path = False, can_fail = True):
