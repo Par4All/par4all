@@ -1094,16 +1094,11 @@ transformer transformer_derivative_fix_point(transformer tf)
     /* sc is going to be modified and destroyed and eventually
        replaced in fix_tf */
     Psysteme sc = predicate_system(transformer_relation(fix_tf));
-    Psysteme sc_homo = SC_UNDEFINED;
     /* Do not handle variable which do not appear explicitly in constraints! */
     Pbase b = sc_to_minimal_basis(sc);
     Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
     Pbase bv = BASE_NULLE; /* basis vector */
     Pbase diffb = BASE_NULLE; /* basis of difference vectors */
-    Pcontrainte ceq = CONTRAINTE_UNDEFINED; /* loop index */
-    Pcontrainte cineq = CONTRAINTE_UNDEFINED; /* loop index */
-    Pcontrainte leq = CONTRAINTE_UNDEFINED; /* fix point equations */
-    Pcontrainte lineq = CONTRAINTE_UNDEFINED; /* fix point inequalities */
 
     ifdebug(8) {
       pips_debug(8, "Begin for transformer %p:\n", tf);
