@@ -3478,7 +3478,7 @@ gen_chunk * gen_get_recurse_ancestor(const void * object)
 
    @param type newgen domain of the ancestor looked for.
    @param object we want the ancestor of.
-   @return NULL if the root is reached without finding the said type or obj does not have an ancestor
+   @return NULL if the root is reached without finding the said type
  */
 gen_chunk * gen_get_ancestor(int type, const void * obj)
 {
@@ -3486,7 +3486,8 @@ gen_chunk * gen_get_ancestor(int type, const void * obj)
   while (true)
   {
     gen_chunk * prev = hash_get(current_mrc->seen, obj);
-    if (prev==NULL || prev==HASH_UNDEFINED_VALUE)
+    message_assert("some ancestor or NULL", prev!=HASH_UNDEFINED_VALUE);
+    if (prev==NULL)
       return NULL;
     else if (prev->i == type)
       return prev;
