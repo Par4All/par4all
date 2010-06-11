@@ -1150,25 +1150,27 @@ transformer transformer_derivative_fix_point(transformer tf)
 
     /* Multiply the constant terms by the iteration number ik and add a
        positivity constraint for the iteration number ik and then
-       eliminate the iteration number ik. */
+       eliminate the iteration number ik to get T*(dx). */
     entity ik = make_local_temporary_integer_value_entity();
     //Psysteme sc_t_prime_k = sc_dup(sc);
     //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
     sc = sc_multiply_constant_terms(sc, (Variable) ik);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
+    sc->base = base_remove_variable(sc->base, (Variable) ik);
+    sc->dimension--;
     // FI: I do not remember nor find how to get rid of local values...
     //sc_rm(sc);
     //sc = sc_t_prime_star;
-
-    /* Difference variables must substituted back to differences
-     * between old and new values.
-     */
 
     ifdebug(8) {
       pips_debug(8, "All invariants on derivatives=\n");
       sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
     }
+
+    /* Difference variables must substituted back to differences
+     * between old and new values.
+     */
 
     for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
       entity oldv = (entity) vecteur_var(bv);
