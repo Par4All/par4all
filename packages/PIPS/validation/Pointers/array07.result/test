@@ -1,0 +1,35 @@
+
+Proper effects for "main"
+
+int main()
+{
+   int t[100][10][3], i;                                                /*0006*/
+
+   int (*p)[3];                                                         /*0008*/
+//               <must be written>: i
+   for(i = 0; i <= 2; i += 1)
+//               <must be read   >: i
+//               <must be written>: p
+      p = t[i];                                                         /*0010*/
+
+   return 0;                                                            /*0012*/
+}
+
+POINTS TO for "main"
+
+//  {}
+int main()
+{
+//  points to = {}
+   int t[100][10][3], i;                                                /*0006*/
+
+//  points to = {}
+   int (*p)[3];                                                         /*0008*/
+//  points to = {}
+   for(i = 0; i <= 2; i += 1)
+//  {(p,t[*][0],-MAY-)}
+      p = t[i];                                                         /*0010*/
+//  {(p,t[*][0],-MAY-)}
+
+   return 0;                                                            /*0012*/
+}
