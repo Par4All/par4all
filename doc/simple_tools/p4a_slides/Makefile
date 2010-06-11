@@ -9,17 +9,10 @@ INSTALL_DIR=/var/www/par4all/doc/simple_tools/p4a
 
 USE_PDFTEX=1
 
-# OK, not really usable except by me right now... :-)
-# point to where our local TeX stuff is installed:
-TEX_ROOT=/home/keryell/projets/Wild_Systems/svn/doc/TeX
-
-# Add this to the TeX path:
-INSERT_TEXINPUTS=::$(TEX_ROOT)//:$(TEX_ROOT)/../Images//
-#APPEND_TEXINPUTS=$(TEX_ROOT)//:$(TEX_ROOT)/../Images//
-include $(TEX_ROOT)/Makefiles/beamer.mk
+include ../../libs/tex/beamer.mk
 
 publish:
-	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_DIR)
+	#ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_DIR)
 	rsync -av $(DOCUMENT)-expose.pdf $(INSTALL_MACHINE):$(INSTALL_DIR)
 
 $(DOCUMENT).tex: p4a-help.tex
@@ -32,8 +25,11 @@ $(DOCUMENT).tex: p4a-help.tex
 	# Generate raw help message for the given command:
 	$< -h > $@
 
-# local stuff
-clean:: local-clean
+clean::
+	rm -rf *.help *-help.tex parsetab.py \
+		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py
 
-local-clean:
-	rm -rf *.help *-help.tex parsetab.py
+### Local Variables:
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:
