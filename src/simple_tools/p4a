@@ -32,6 +32,10 @@ def main():
     main_group.add_option("--keep-database", "-k",
                           action = "store_true", default = False,
                           help = "Keep database directory after processing.")
+    
+    main_group.add_option("--remove-first", "-r",
+                          action = "store_true", default = False,
+                          help = "Remove existing database directory before processing.")
 
     main_group.add_option("--verbose", "-v", action = "count",
                           default = get_verbosity(),
@@ -274,14 +278,26 @@ def main():
     # XXX: would be good to be able to specify the location for the .database and .build dir?
     # Or put it in /tmp by default?..
     project_name = options.project_name
+    expected_database_dir = ""
+    build_dir = ""
     if not project_name:
         while True:
             project_name = gen_name()
-            if (not os.path.exists(os.path.join(os.getcwd(), project_name + ".database"))
-                and not os.path.exists(os.path.join(os.getcwd(), project_name + ".build"))):
+            expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
+            build_dir = os.path.join(os.getcwd(), project_name + ".build")
+            if options.remove_first or (not os.path.exists(expected_database_dir) and not os.path.exists(build_dir)):
                 break
         info("Generated project name: " + project_name)
-
+    else:
+        expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
+        build_dir = os.path.join(os.getcwd(), project_name + ".build")
+    
+    if options.remove_first:
+        if os.path.exists(expected_database_dir):
+            rmtree(expected_database_dir)
+        if os.path.exists(build_dir):
+            rmtree(build_dir)
+    
     # Prepare the C preprocessor flags and linker flags.
     cppflags = options.cppflags
     for include_dir in options.include_dirs:
@@ -395,8 +411,6 @@ def main():
     output_files = []
     for file in options.output_file:
         output_files.append(os.path.abspath(os.path.expanduser(file)))
-
-    build_dir = os.path.join(os.getcwd(), project_name + ".build")
 
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
