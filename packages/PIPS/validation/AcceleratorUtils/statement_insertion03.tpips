@@ -3,7 +3,12 @@ setenv WS "statement_insertion03"
 delete $WS
 create $WS $WS.c
 display PRINTED_FILE[%ALLFUNC]
-apply STATEMENT_INSERTION[%ALLFUNC]
-display PRINTED_FILE[%ALLFUNC]
+
+apply UNFOLDING[main]
+display PRINTED_FILE[main]
+
+apply STATEMENT_INSERTION[main]
+display PRINTED_FILE[main]
+
 close
 delete $WS
