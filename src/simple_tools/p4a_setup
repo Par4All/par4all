@@ -239,31 +239,35 @@ def main():
     # "root" is the Par4All source root directory.
     root = ""
     if options.root:
-        root = options.root
+        root = os.path.abspath(os.path.expanduser(options.root))
+        warn("Par4All source tree root is " + root + " (--root)")
     # If environment variable P4A_ROOT is defined and 
     # --root was not specified, pick it up from there.
-    elif "P4A_ROOT" in os.environ and os.environ["P4A_ROOT"]:
-        root = os.environ["P4A_ROOT"]
+    #~ elif "P4A_ROOT" in os.environ and os.environ["P4A_ROOT"]:
+        #~ root = os.path.abspath(os.path.expanduser(os.environ["P4A_ROOT"]))
+        #~ warn("Assuming Par4All source tree root is " + root + " (P4A_ROOT environment variable)")
     else:
         root = default_root
-    root = os.path.abspath(os.path.expanduser(root))
+        warn("Assuming Par4All source tree root is " + root + " (default)")
     if not os.path.isdir(root):
-        die("Invalid root directory: " + root)
-    info("Par4All source tree root: " + root)
+        die("Invalid directory: " + root)
+    #~ info("Par4All source tree root: " + root)
     
     # "packages_dir" is where the source packages lie.
     packages_dir = ""
     if options.packages_dir:
         packages_dir = os.path.abspath(os.path.expanduser(options.packages_dir))
+        warn("Packages directory is " + packages_dir + " (--packages-dir)")
     else:
         packages_dir = os.path.join(root, "packages")
+        warn("Assuming packages directory is " + packages_dir + " (individual packages location may be overriden with --xxx-src)")
     #~ if not os.path.isdir(packages_dir):
         #~ die("Invalid packages dir: " + packages_dir)
     
     # "dest_dir" is the staging installation directory.
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     if options.dest_dir:
-        die("--dest-dir is ignored for now.")
+        die("--dest-dir is ignored for now")
     dest_dir = "" #options.dest_dir
     #if not dest_dir:
     #    dest_dir = os.path.join(root, "run") # By default.
@@ -277,6 +281,9 @@ def main():
     prefix = "/usr/local/par4all" # Default.
     if options.prefix:
         prefix = options.prefix
+        warn("Prefix is " + prefix + " (--prefix)")
+    else:
+        warn("Assuming prefix is " + prefix + " (default)")
     if prefix:
         prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
         
@@ -293,7 +300,7 @@ def main():
     # "install_dir" is the most important variable here.
     # It is dest_dir + safe_prefix.
     install_dir = os.path.normpath(dest_dir + safe_prefix)
-    info("Install dir: " + install_dir)
+    warn("Install directory is " + install_dir)
     # Check that we are not installing in a system or an invalid directory.
     if not install_dir or is_system_dir(install_dir):
         die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
@@ -305,14 +312,13 @@ def main():
             warn("Removing everything in " + install_dir + " (--clean)")
             rmtree(install_dir, remove_top = False)
         else:
-            warn("Installation directory " + install_dir + " already exists; " 
-                + "you should pass --clean to make sure no file conflicts happen")
+            info("Install directory " + install_dir + " already exists")
     else:
         os.makedirs(install_dir)
     
     # Build directory: where the Makefile are generated, where the make commands are issued, etc.
     build_dir = os.path.join(root, "build")
-    debug("Build dir: " + build_dir)
+    debug("Build directory: " + build_dir)
     
     # Path for source packages:
     
@@ -321,7 +327,7 @@ def main():
         polylib_src_dir = options.polylib_src
     else:
         polylib_src_dir = os.path.join(packages_dir, "polylib")
-    debug("polylib source dir: " + polylib_src_dir)
+    debug("polylib source directory: " + polylib_src_dir)
     if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
         die("Missing directory: " + polylib_src_dir)
     
@@ -330,7 +336,7 @@ def main():
         newgen_src_dir = options.newgen_src
     else:
         newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
-    debug("newgen source dir: " + newgen_src_dir)
+    debug("newgen source directory: " + newgen_src_dir)
     if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
         die("Missing directory: " + newgen_src_dir)
     
@@ -339,7 +345,7 @@ def main():
         linear_src_dir = options.linear_src
     else:
         linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
-    debug("linear source dir: " + linear_src_dir)
+    debug("linear source directory: " + linear_src_dir)
     if not os.path.isdir(linear_src_dir) and not options.skip_linear:
         die("Missing directory: " + linear_src_dir)
     
@@ -348,7 +354,7 @@ def main():
         pips_src_dir = options.pips_src
     else:
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
-    debug("PIPS source dir: " + pips_src_dir)
+    debug("PIPS source directory: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir) and not options.skip_pips:
         die("Missing directory: " + pips_src_dir)
     
@@ -357,7 +363,7 @@ def main():
         nlpmake_src_dir = options.nlpmake_src
     else:
         nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
-    debug("nlpmake source dir: " + nlpmake_src_dir)
+    debug("nlpmake source directory: " + nlpmake_src_dir)
     #~ if not os.path.isdir(nlpmake_src_dir):
         #~ die("Missing directory: " + nlpmake_src_dir)
 
