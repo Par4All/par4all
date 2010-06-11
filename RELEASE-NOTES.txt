@@ -1,16 +1,19 @@
-Release notes for Par4All 0.2, 2010/05/22
+Release notes for Par4All 0.2, 2010/06/10
 =========================================
 
 Par4All is an open-source environment to do source-to-source
 transformations on C and Fortran programs for parallelizing, optimizing,
 instrumenting, reverse-engineering, etc. on various targets.
 
+Ronan Keryell, HPC Project.
+
+
 Introduction:
 -------------
 
 More documentation and information on http://par4all.org
 
-This is the first public version of Par4All that parallelize C programs to
+This is the first public version of Par4All that parallelizes C programs to
 OpenMP and CUDA, and Fortran programs to OpenMP.
 
 For support : support at par4all dot org
@@ -34,6 +37,8 @@ Fortran:
 The support for Fortran95 is not included in this release since it was not
 mature enough at this release time, so only Fortran 77 with some
 extensions is currently accepted.
+
+Fortran95 support should be in the 2010/09 release.
 
 
 C:
@@ -71,12 +76,14 @@ few known limitations :
   parallelization. The point-to analysis is still on-going in PIPS
 
 - there are still issues in the part that analyzes the control graph (the
-  PIPS ``controlizer``). For example, right now we cannot deal with a
+  PIPS ``controlizer``). For example, right now we cannot deal well with a
   different hierarchy between the control graph and the variable
   scoping. For example if you have a block with a variable declaration
   within and a ``goto`` to/from outside, it may probably fail. This
-  happens also if you have break or continue in loops with some local
+  happens also if you have ``break`` or ``continue`` in loops with some local
   variables since those are internally represented with ``goto``.
+
+Full C99 support should be in the 2010/09 release.
 
 
 Cuda:
@@ -91,8 +98,11 @@ environment variables set:
 - ``CUDA_SDK_DIR`` to where the CUDA SDK has been installed (default to
   ``$HOME/NVIDIA_GPU_Computing_SDK``)
 
+- ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
+
+
 SIMD and multimedia extensions:
-------------------------------
+-------------------------------
 
 The SIMD (SSE) output is not included in this release yet since it was not
 ready at release time but should be in the 2010/09 release.
@@ -111,5 +121,6 @@ Specification. For more information:
 http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
 
 %%% Local Variables:
+%%% mode: rst
 %%% ispell-local-dictionary: "american"
 %%% End:
