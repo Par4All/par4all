@@ -71,7 +71,7 @@ if __name__ == "__main__":
 	m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=1)
 	m.display()
-	m.partial_eval(linearize=True)
+	m.partial_eval()
 	m.display()
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
