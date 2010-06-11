@@ -7,6 +7,8 @@ int main() {
  
    for(i = 1; i<5; i++){
      c = 5;
+     a = b;
+     b = &d;
    }
 
   return 0;

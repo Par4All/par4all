@@ -11,9 +11,17 @@ int main()
 //               <must be read   >: i
 //               <must be written>: i
 
-   for (i = 1;i<5;i++)
+   for (i = 1;i<5;i++) {
+      // BEGIN BLOCK
 //               <must be written>: c
       c = 5;
+//               <must be read   >: b
+//               <must be written>: a
+      a = b;
+//               <must be written>: b
+      b = &d;
+      // END BLOCK
+   }
 
    return 0;
    // END BLOCK
@@ -34,10 +42,18 @@ int main()
    b = &c;
 //  {(b,c,-Exact-)}
 
-   for (i = 1;i<5;i++)
-//  {(b,c,-Exact-)}
+   for (i = 1;i<5;i++) {
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-MAY-);(b,d,-MAY-)}
+      // BEGIN BLOCK
+//  points to = {}
       c = 5;
-//  {(b,c,-Exact-)}
+//  points to = {}
+      a = b;
+//  points to = {}
+      b = &d;
+      // END BLOCK
+   }
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-MAY-);(b,d,-MAY-)}
 
    return 0;
    // END BLOCK
