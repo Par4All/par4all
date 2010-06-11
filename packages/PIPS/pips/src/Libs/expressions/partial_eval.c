@@ -1267,12 +1267,22 @@ eformat_t partial_eval_binary_operator(entity func,
   /* some more optimization if a neutral element has been generated */
   entity neutral = operator_neutral_element(func);
   if(same_entity_p(expression_to_entity(*ep1),neutral)) {
-      ef.expr=*ep2;
-      ef.simpler=true;
+      ef=partial_eval_expression(*ep2,ps,fx);
+      if(!ef.simpler) /*use some partial eval dark magic */
+      {
+          ef.simpler=true;
+          ef.icoef=1;
+          ef.expr=*ep2;
+      }
   }
   else if(same_entity_p(expression_to_entity(*ep2),neutral)) {
-      ef.expr=*ep1;
-      ef.simpler=true;
+      ef=partial_eval_expression(*ep1,ps,fx);
+      if(!ef.simpler) /*use some partial eval dark magic */
+      {
+          ef.simpler=true;
+          ef.icoef=1;
+          ef.expr=*ep1;
+      }
   }
 
   return ef;
