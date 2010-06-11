@@ -248,16 +248,6 @@ def main():
         info("Enabling --accel because of --cuda")
         options.accel = True
 
-    # If no project name is provided, try some random names for which 
-    # you cannot find any resembling files in the current working directory.
-    if not options.project_name:
-        while True:
-            options.project_name = gen_name()
-            found_files = find(".*" + re.escape(options.project_name) + ".*", dir = os.getcwd(), match_dirs = True, match_files = True)
-            if len(found_files) == 0:
-                break
-        info("Generated project name: " + options.project_name)
-
     files = []
     other_files = []
     header_files = []
@@ -265,6 +255,8 @@ def main():
     # Put all files not supported by the p4a_processor class in a separate list.
     for file in args:
         abs_file = os.path.abspath(os.path.expanduser(file))
+        if not os.path.exists(abs_file):
+            die("Invalid/missing input file: " + abs_file)
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)
@@ -277,6 +269,18 @@ def main():
             info("Ignoring header file: " + abs_file)
         else:
             die("File format not supported: " + abs_file)
+    
+    # If no project name is provided, try some random names.
+    # XXX: would be good to be able to specify the location for the .database and .build dir?
+    # Or put it in /tmp by default?..
+    project_name = options.project_name
+    if not project_name:
+        while True:
+            project_name = gen_name()
+            if (not os.path.exists(os.path.join(os.getcwd(), project_name + ".database"))
+                and not os.path.exists(os.path.join(os.getcwd(), project_name + ".build"))):
+                break
+        info("Generated project name: " + project_name)
 
     # Prepare the C preprocessor flags and linker flags.
     cppflags = options.cppflags
@@ -325,7 +329,7 @@ def main():
     info("CPP flags: " + " ".join(builder.cppflags))
 
     # Process (parallelize) files (or not).
-    database_dir = "?"
+    database_dir = ""
     processor_output_files = []
     if options.noprocess:
         warn("Bypassing processor")
@@ -336,7 +340,7 @@ def main():
         try:
             # Create a workspace with PIPS:
             processor = p4a_processor(files = files,
-                                  project_name = options.project_name,
+                                  project_name = project_name,
                                   verbose = (verbosity != 0),
                                   cppflags = " ".join(builder.cppflags),
                                   recover_includes = not options.skip_recover_includes,
@@ -364,7 +368,8 @@ def main():
             
         except p4a_error:
             error("Processing of " + ", ".join(files) + " failed: " + sys.exc_info()[1].msg)
-            error("Database directory was " + database_dir)
+            if database_dir:
+                error("Database directory was " + database_dir)
             die("Aborting")
 
     if os.path.isdir(database_dir):
@@ -391,12 +396,12 @@ def main():
     for file in options.output_file:
         output_files.append(os.path.abspath(os.path.expanduser(file)))
 
-    build_dir = os.path.join(os.getcwd(), options.project_name + ".build")
+    build_dir = os.path.join(os.getcwd(), project_name + ".build")
 
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
         if options.cmake:
-            builder.cmake_write(options.project_name, all_buildable_files + header_files, 
+            builder.cmake_write(project_name, all_buildable_files + header_files, 
                 output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
         if options.cmake_gen or options.cmake_build:
             builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir, 

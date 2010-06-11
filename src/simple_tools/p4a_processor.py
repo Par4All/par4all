@@ -242,7 +242,9 @@ class p4a_processor():
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
-        self.filter_modules(filter_include, filter_exclude).ompify_code()
+        modules = self.filter_modules(filter_include, filter_exclude);
+        modules.ompify_code()
+        modules.omp_merge_pragma()
 
 
     def accel_post(self, file, dest_dir = None):

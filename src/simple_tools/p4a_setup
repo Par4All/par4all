@@ -240,7 +240,7 @@ def main():
         root = os.environ["P4A_ROOT"]
     else:
         root = default_root
-    root = os.path.abspath(root)
+    root = os.path.abspath(os.path.expanduser(root))
     if not os.path.isdir(root):
         die("Invalid root directory: " + root)
     info("Par4All source tree root: " + root)
@@ -248,11 +248,11 @@ def main():
     # "packages_dir" is where the source packages lie.
     packages_dir = ""
     if options.packages_dir:
-        packages_dir = options.packages_dir
+        packages_dir = os.path.abspath(os.path.expanduser(options.packages_dir))
     else:
         packages_dir = os.path.join(root, "packages")
-    if not os.path.isdir(packages_dir):
-        die("Invalid packages dir: " + packages_dir)
+    #~ if not os.path.isdir(packages_dir):
+        #~ die("Invalid packages dir: " + packages_dir)
     
     # "dest_dir" is the staging installation directory.
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
@@ -263,7 +263,7 @@ def main():
     #    dest_dir = os.path.join(root, "run") # By default.
     if dest_dir:
         debug("DESTDIR=" + dest_dir)
-        dest_dir = os.path.abspath(dest_dir) # Make it absolute whatsoever.
+        dest_dir = os.path.abspath(os.path.expanduser(dest_dir)) # Make it absolute whatsoever.
     
     # "prefix" is the installation prefix which is passed
     # as option --prefix when configure is called for the
@@ -316,7 +316,7 @@ def main():
     else:
         polylib_src_dir = os.path.join(packages_dir, "polylib")
     debug("polylib source dir: " + polylib_src_dir)
-    if not os.path.isdir(polylib_src_dir):
+    if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
         die("Missing directory: " + polylib_src_dir)
     
     newgen_src_dir = ""
@@ -325,7 +325,7 @@ def main():
     else:
         newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
     debug("newgen source dir: " + newgen_src_dir)
-    if not os.path.isdir(newgen_src_dir):
+    if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
         die("Missing directory: " + newgen_src_dir)
     
     linear_src_dir = ""
@@ -334,7 +334,7 @@ def main():
     else:
         linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
     debug("linear source dir: " + linear_src_dir)
-    if not os.path.isdir(linear_src_dir):
+    if not os.path.isdir(linear_src_dir) and not options.skip_linear:
         die("Missing directory: " + linear_src_dir)
     
     pips_src_dir = ""
@@ -343,8 +343,7 @@ def main():
     else:
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
     debug("PIPS source dir: " + pips_src_dir)
-    print os.path.isdir(pips_src_dir)
-    if not os.path.isdir(pips_src_dir):
+    if not os.path.isdir(pips_src_dir) and not options.skip_pips:
         die("Missing directory: " + pips_src_dir)
     
     nlpmake_src_dir = ""
@@ -353,8 +352,8 @@ def main():
     else:
         nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
     debug("nlpmake source dir: " + nlpmake_src_dir)
-    if not os.path.isdir(nlpmake_src_dir):
-        die("Missing directory: " + nlpmake_src_dir)
+    #~ if not os.path.isdir(nlpmake_src_dir):
+        #~ die("Missing directory: " + nlpmake_src_dir)
 
     # Global configure flags:
     configure_opts = [ 
@@ -481,7 +480,7 @@ def main():
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
         # to relauch the patch:
-        run2([ "rsync", "-av", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        run2([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
         for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
@@ -550,12 +549,14 @@ def main():
         "src/validation/p4a_validation",
         "src/p4a_accel/p4a_post_processor.py"
         ]:
-        debug(os.path.join(root, file) + " -> " + install_dir_bin)
-        shutil.copy(os.path.join(root, file), install_dir_bin)
+        run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
+        #~ debug(os.path.join(root, file) + " -> " + install_dir_bin)
+        #~ shutil.copy(os.path.join(root, file), install_dir_bin)
     
     for file in [ "src/dev/p4a_git_lib.bash" ]:
-        debug(os.path.join(root, file) + " -> " + install_dir_etc)
-        shutil.copy(os.path.join(root, file), install_dir_etc)
+        run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
+        #~ debug(os.path.join(root, file) + " -> " + install_dir_etc)
+        #~ shutil.copy(os.path.join(root, file), install_dir_etc)
     
     # Install accelerator source.
     info("Installing accel files")
@@ -563,7 +564,7 @@ def main():
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
         if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
-            run2([ "cp", "-av", os.path.join(accel_src_dir, file), install_dir_share_accel ])
+            run2([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
     
     # Copy python dependencies and templates.
     info("Copying python libs")
@@ -580,28 +581,28 @@ def main():
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
-            run2([ "cp", "-av", os.path.join(dir, file), install_python_lib_dir ])
+            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
     
     # Install stuff still lacking from PIPS install.
     info("Installing pips scripts")
     dir = os.path.join(pips_src_dir, "src/Scripts/validation")
     for file in os.listdir(dir):
         if file.startswith("pips"):
-            run2([ "cp", "-av", os.path.join(dir, file), install_dir_bin ])
-    run2([ "cp", "-av", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
+    run2([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
 
     # Fix validation.
     info("Fixing validation")
     dir = os.path.join(nlpmake_src_dir, "makes")
     for file in os.listdir(dir):
         if file == "arch.sh" or file == "version.sh":
-            run2([ "cp", "-av", os.path.join(dir, file), install_dir_makes ])
+            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
 
     # Install various files.
     info("Installing release notes")
-    run2([ "cp", "-av", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
+    run2([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
     info("Installing examples")
-    run2([ "cp", "-av", os.path.join(root, "examples"), install_dir ])
+    run2([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
     # Write the environment shell scripts.
     info("Writing shell rc files")

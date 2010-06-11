@@ -203,8 +203,8 @@ def rmtree(dir, can_fail = 0, remove_top = True):
         else:
             raise e
 
-def find(file_re, dir = None, abs_path = True, match_files = True, match_dirs = False, 
-    match_whole_path = False, can_fail = True):
+def find(file_re, dir = None, abs_path = True, match_files = True, 
+    match_dirs = False, match_whole_path = False, can_fail = True):
     '''Lookup files matching the regular expression file_re underneath dir.
     If dir is empty, os.getcwd() will be looked up.	
     If full_path is true, absolute path names of matching file/dir names will be returned.
