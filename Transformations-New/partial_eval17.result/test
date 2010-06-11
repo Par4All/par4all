@@ -112,8 +112,8 @@ int main()
 
    k *= 0;
 
-   k <<= 0;
-   k >>= 0;
+
+
 
    i++;
    return i;
