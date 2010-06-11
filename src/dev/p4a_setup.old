@@ -12,6 +12,8 @@
 # Stop on error, since going on after errors may lead to havoc
 set -o errexit
 
+script=${0/*\//}
+
 default_compilation_targets="autoreconf configure install"
 # Display help
 function usage()

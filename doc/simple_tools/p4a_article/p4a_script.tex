@@ -2,14 +2,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage{url}
 \usepackage{alltt}
-\usepackage{../libs/tex/abbrev_reactive}
+\usepackage{libs/tex/abbrev_reactive}
 
 \let\OldRightarrow=\Rightarrow
 \RequirePackage{marvosym}
 \let\MarvosymRightarrow=\Rightarrow
 \let\Rightarrow=\OldRightarrow
 \RequirePackage{wasysym}
-\let\Lightning\UnTrucIndefini% Car conflit entre ifsym et marvosym
+\let\Lightning\UnTrucIndefini% Because conflict between ifsym and marvosym
 \let\Sun\UnTrucIndefini%
 \RequirePackage[weather]{ifsym}
 
@@ -18,12 +18,12 @@
 
 \begin{document}
 
-\title{Par4All script\\
-  \textsc{draft}\\
+\title{Par4All Command Line Interface\\
+  \texttt{p4a}\\
   ---\\
   HPC Project}
 
-\author{Ronan \textsc{Keryell}}
+\author{Ronan \textsc{Keryell} \& Grégoire \textsc{Péan}}
 
 \maketitle
 
@@ -81,7 +81,7 @@ define the
 \end{itemize}
 
 
-\section{Options}
+\section{p4a full option list}
 \label{sec:options}
 
 The basic usage is \texttt{p4a [\emph{options}] <\emph{source files}>}
@@ -107,6 +107,9 @@ with the following options:
 
 \item[\texttt{-h} or \texttt{--help}:] show this help message and exit.
 \end{description}
+
+
+\input{p4a-help}
 
 
 \end{document}
