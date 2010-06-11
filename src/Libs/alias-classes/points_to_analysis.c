@@ -429,13 +429,18 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
 								 &e2, false);
   effects_free(l1);
   effects_free(l2);
-  effect_add_dereferencing_dimension(e2);
+  /* transform tab[i] into tab[*]. */
+  list l3 = effect_to_store_independent_sdfi_list(e2, false);
   generic_effects_reset_all_methods();
   ref1 = effect_any_reference(e1);
   source = make_cell_reference(ref1);
   // add the points_to relation to the set generated
   // by this assignment
-  ref2 = effect_any_reference(e2);
+  e2 = EFFECT(CAR(l3));
+  /* transform tab[*] into tab[*][0]. */
+  effect_add_dereferencing_dimension(e2);
+  ref2 = effect_any_reference(copy_effect(e2));
+  free(l3);
   sink = make_cell_reference(copy_reference(ref2));
   new_sink = make_cell_reference(copy_reference(ref2));
   // access new_source = copy_access(source);
