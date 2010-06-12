@@ -122,6 +122,7 @@ static eformat_t  eformat_undefined = {expression_undefined, 1, 0, FALSE};
  */
 
 static list live_loop_indices = list_undefined;
+static statement  partial_eval_current_statement =statement_undefined;
 
 static void set_live_loop_indices()
 {
@@ -302,7 +303,7 @@ eformat_t partial_eval_expression_and_copy(expression expr, Psysteme ps, effects
   ef = partial_eval_expression(expr, ps, fx);
 
   if(eformat_equivalent_p(ef,eformat_undefined)) {
-    ef.expr = copy_expression(expr);
+    ef.expr = expr;
   }
 
   return(ef);
@@ -1080,11 +1081,9 @@ eformat_t partial_eval_min_or_max_operator(int token,
 {
     eformat_t ef;
     bool ok = false;
-    statement parent = (statement)gen_get_ancestor(statement_domain,*ep1);
-    if(parent)
     {
         expression fake = make_op_exp(MINUS_OPERATOR_NAME,*ep1,*ep2);
-        transformer tr = transformer_range(load_statement_precondition(parent));
+        transformer tr = transformer_range(load_statement_precondition(partial_eval_current_statement));
         intptr_t lb,ub;
         if(precondition_minmax_of_expression(fake,tr,&lb,&ub))
         {
@@ -1266,22 +1265,24 @@ eformat_t partial_eval_binary_operator(entity func,
   }
   /* some more optimization if a neutral element has been generated */
   entity neutral = operator_neutral_element(func);
-  if(same_entity_p(expression_to_entity(*ep1),neutral)) {
-      ef=partial_eval_expression(*ep2,ps,fx);
-      if(!ef.simpler) /*use some partial eval dark magic */
-      {
-          ef.simpler=true;
-          ef.icoef=1;
-          ef.expr=*ep2;
+  if(!entity_undefined_p(neutral)) {
+      if(same_entity_p(expression_to_entity(*ep1),neutral)) {
+          ef=partial_eval_expression(*ep2,ps,fx);
+          if(!ef.simpler) /*use some partial eval dark magic */
+          {
+              ef.simpler=true;
+              ef.icoef=1;
+              ef.expr=*ep2;
+          }
       }
-  }
-  else if(same_entity_p(expression_to_entity(*ep2),neutral)) {
-      ef=partial_eval_expression(*ep1,ps,fx);
-      if(!ef.simpler) /*use some partial eval dark magic */
-      {
-          ef.simpler=true;
-          ef.icoef=1;
-          ef.expr=*ep1;
+      else if(same_entity_p(expression_to_entity(*ep2),neutral)) {
+          ef=partial_eval_expression(*ep1,ps,fx);
+          if(!ef.simpler) /*use some partial eval dark magic */
+          {
+              ef.simpler=true;
+              ef.icoef=1;
+              ef.expr=*ep1;
+          }
       }
   }
 
@@ -1677,6 +1678,8 @@ void partial_eval_statement(statement stmt)
 {
   instruction inst = statement_instruction(stmt);
   statement_effects fx_map = get_proper_rw_effects();
+  pips_assert("internal current_statement was reseted",statement_undefined_p(partial_eval_current_statement));
+  partial_eval_current_statement=stmt;
 
   pips_debug(8, "begin with tag %d\n",  instruction_tag(inst));
 
@@ -1798,35 +1801,8 @@ void partial_eval_statement(statement stmt)
   default :
     pips_internal_error("Bad instruction tag %d\n", instruction_tag(inst));
   }
+  partial_eval_current_statement=statement_undefined;
 }
-/* to is freed, from is copied into to and then freed */
-static void assign_expression(expression to, expression from)
-{
-    /* copy from to to */
-    free_syntax(expression_syntax(to));
-    free_normalized(expression_normalized(to));
-    expression_syntax(to)=expression_syntax(from);
-    expression_normalized(to)=expression_normalized(from);
-    /* clean memory */
-    expression_syntax(from)=syntax_undefined;
-    expression_normalized(from)=normalized_undefined;
-    free_expression(from);
-}
-
-void PartialEvalExpression(expression e)
-{
-  unnormalize_expression(e);
-  NORMALIZE_EXPRESSION(e);
-  normalized n = expression_normalized(e);
-  if( normalized_linear_p(n))
-    {
-        Pvecteur pv = normalized_linear(n);
-        expression new_e = make_vecteur_expression(pv);
-        if(!expression_undefined_p(new_e))
-            assign_expression(e,new_e);
-    }
-}
-
 
 /* Top-level function
  */
@@ -1863,8 +1839,6 @@ bool partial_eval(char *module_name)
 
   debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
   gen_recurse(module_statement,statement_domain,gen_true,partial_eval_statement);
-  if(get_bool_property("PARTIAL_EVAL_LINEARIZE"))
-      gen_recurse(module_statement,expression_domain,gen_true,PartialEvalExpression);
   debug_off();
 
   /* Reorder the module, because new statements may have been generated. */
