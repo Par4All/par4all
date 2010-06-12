@@ -9,6 +9,8 @@ INSTALL_DIR=/var/www/par4all/doc/simple_tools/p4a
 
 USE_PDFTEX=1
 
+default: $(DOCUMENT)-expose.pdf
+
 include ../../libs/tex/beamer.mk
 
 publish:

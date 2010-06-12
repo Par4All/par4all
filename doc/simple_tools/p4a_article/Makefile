@@ -23,7 +23,7 @@ include $(ROOT)/makes/main.mk
 
 publish:
 	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_DIR)
-	rsync -av $(INSTALL_DOC) $(INSTALL_HTM) (INSTALL_MACHINE):$(INSTALL_MACHINE_DIR)
+	rsync -av $(INSTALL_DOC) $(INSTALL_HTM) $(INSTALL_MACHINE):$(INSTALL_MACHINE_DIR)
 
 # local stuff
 clean: local-clean

@@ -2,6 +2,9 @@
 
 # Script to deal with Par4All documentation
 
+# Stop on error, since going on after errors may lead to havoc:
+set -o errexit
+
 # What to do:
 make_target=""
 
@@ -50,8 +53,7 @@ while [ "$1" ] ; do
       -h|--help) usage 0 ;;
       -v|--verbose) let verb++ ;;
       --clean) make_target+="clean ";;
-      # Nothing indeed, since it is the default:
-      --make) make_target+="";;
+      --make) make_target+="default ";;
       --publish) make_target+="publish ";;
       *) usage 1 "unexpected option: $opt"
   esac
@@ -63,7 +65,7 @@ if (( $verb >= 1)) ; then
 fi
 
 # Subdirectory where there is some documentation to build or publish:
-doc_dirs="doc/organization doc/p4a_script doc/simple_tools/p4a_slides"
+doc_dirs="doc/organization doc/simple_tools/p4a_article doc/simple_tools/p4a_slides"
 
 for d in $doc_dirs; do
     ad=$P4A_ROOT/$d
