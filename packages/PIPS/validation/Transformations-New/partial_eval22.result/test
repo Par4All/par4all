@@ -1,0 +1,33 @@
+
+"isme" file
+
+char isme()
+{
+   int el;
+   el = (int) 3;
+}
+
+"isme" file with preconditions
+
+
+//  P() {}
+
+char isme()
+{
+
+//  P() {}
+
+   int el;
+
+//  P(el) {}
+
+   el = (int) 3;
+}
+
+"isme" file after partial evaluation
+
+char isme()
+{
+   int el;
+   el = (int) 3;
+}

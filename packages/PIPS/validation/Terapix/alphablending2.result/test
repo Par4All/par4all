@@ -1,0 +1,673 @@
+tidy the code just in case of
+I have to do this early
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   for(i = 0; i <= 510; i += 1)
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+}
+tiling
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 510; i += 1)
+l99999:
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+#pragma pips inserted statement to check
+   for(i = 511; i <= 511; i += 1)
+l99997:
+      for(I_0 = 0; I_0 <= 510; I_0 += 1)
+         result[i][I_0] = (40*src0[i][I_0]+60*src1[i][I_0])*(1/100<<4)>>4;
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 510; i += 1)
+l99999:
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+#pragma pips inserted statement
+   for(i = 511; i <= 511; i += 1)
+l99997:
+      for(I_0 = 0; I_0 <= 510; I_0 += 1)
+         result[i][I_0] = (40*src0[i][I_0]+60*src1[i][I_0])*(1/100<<4)>>4;
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 511; i += 1)
+l99999:
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 511; i += 1) {
+l99999:
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+#pragma pips inserted statement to check
+      for(j = 511; j <= 511; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+   }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 511; i += 1) {
+l99999:
+      for(j = 0; j <= 510; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+#pragma pips inserted statement
+      for(j = 511; j <= 511; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+   }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0;
+l99998:
+   for(i = 0; i <= 511; i += 1) {
+l99999:
+      for(j = 0; j <= 511; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+
+   }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+l99998:
+   for(i_t = 0; i_t <= 3; i_t += 1)
+      for(j_t = 0; j_t <= 63; j_t += 1)
+         for(i = 128*i_t; i <= 128*i_t+127; i += 1)
+            for(j = 8*j_t; j <= 8*j_t+7; j += 1)
+               result[i][j] = (40*src0[i][j]+60*src1[i][j])*(0<<4)>>4;
+
+}
+group constants and isolate
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+l99998:
+   for(i_t = 0; i_t <= 3; i_t += 1)
+l99993:
+      for(j_t = 0; j_t <= 63; j_t += 1) {
+         //PIPS generated variable
+         int caillou[6];
+         caillou[0] = 0;
+         caillou[1] = 4;
+         caillou[2] = 40;
+         caillou[3] = 60;
+         caillou[4] = i_t;
+         caillou[5] = j_t;
+
+l99994:
+         for(i = 128*i_t; i <= 128*i_t+127; i += 1)
+l99995:
+            for(j = 8*j_t; j <= 8*j_t+7; j += 1)
+               result[i][j] = (caillou[2]*src0[i][j]+caillou[3]*src1[i][j])*(caillou[0]<<caillou[1])>>caillou[1];
+      }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+   //PIPS generated variable
+   int i0, i1, i2, i3, i4, i5, i6;
+l99998:
+   for(i_t = 0; i_t <= 3; i_t += 1)
+l99993:
+      for(j_t = 0; j_t <= 63; j_t += 1) {
+         //PIPS generated variable
+         int caillou[6];
+         caillou[0] = 0;
+         caillou[1] = 4;
+         caillou[2] = 40;
+         caillou[3] = 60;
+         caillou[4] = i_t;
+         caillou[5] = j_t;
+
+         {
+            //PIPS generated variable
+            short result0[128][8];
+            //PIPS generated variable
+            int caillou0[4];
+            //PIPS generated variable
+            short src10[128][8], src00[128][8];
+            /* transfer loop generated by PIPS from src0 to src00 */
+            for(i5 = 0; i5 <= 7; i5 += 1)
+               for(i6 = 0; i6 <= 127; i6 += 1)
+                  src00[i6][i5] = src0[128*i_t+i6][8*j_t+i5];
+            /* transfer loop generated by PIPS from src1 to src10 */
+            for(i3 = 0; i3 <= 7; i3 += 1)
+               for(i4 = 0; i4 <= 127; i4 += 1)
+                  src10[i4][i3] = src1[128*i_t+i4][8*j_t+i3];
+            /* transfer loop generated by PIPS from caillou to caillou0 */
+            for(i2 = 0; i2 <= 3; i2 += 1)
+               caillou0[i2] = caillou[i2];
+
+l99994:
+            for(i = 128*i_t; i <= 128*i_t+127; i += 1)
+l99995:
+               for(j = 8*j_t; j <= 8*j_t+7; j += 1)
+                  result0[i-128*i_t][j-8*j_t] = (caillou0[2-0]*src00[i-128*i_t][j-8*j_t]+caillou0[3-0]*src10[i-128*i_t][j-8*j_t])*(caillou0[0-0]<<caillou0[1-0])>>caillou0[1-0];
+            /* transfer loop generated by PIPS from result0 to result */
+            for(i0 = 0; i0 <= 7; i0 += 1)
+               for(i1 = 0; i1 <= 127; i1 += 1)
+                  result[128*i_t+i1][8*j_t+i0] = result0[i1][i0];
+         }
+      }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+   //PIPS generated variable
+   int i0, i1, i2, i3, i4, i5, i6;
+l99998:
+   for(i_t = 1; i_t <= 4; i_t += 1)
+l99993:
+      for(j_t = 1; j_t <= 64; j_t += 1) {
+         //PIPS generated variable
+         int caillou[6];
+         caillou[0] = 0;
+         caillou[1] = 4;
+         caillou[2] = 40;
+         caillou[3] = 60;
+         caillou[4] = -1+i_t;
+         caillou[5] = -1+j_t;
+
+         {
+            //PIPS generated variable
+            short result0[128][8];
+            //PIPS generated variable
+            int caillou0[4];
+            //PIPS generated variable
+            short src10[128][8], src00[128][8];
+            /* transfer loop generated by PIPS from src0 to src00 */
+            for(i5 = 1; i5 <= 8; i5 += 1)
+               for(i6 = 1; i6 <= 128; i6 += 1)
+                  src00[-1+i6][-1+i5] = src0[128*(-1+i_t)+-1+i6][8*(-1+j_t)+-1+i5];
+            /* transfer loop generated by PIPS from src1 to src10 */
+            for(i3 = 1; i3 <= 8; i3 += 1)
+               for(i4 = 1; i4 <= 128; i4 += 1)
+                  src10[-1+i4][-1+i3] = src1[128*(-1+i_t)+-1+i4][8*(-1+j_t)+-1+i3];
+            /* transfer loop generated by PIPS from caillou to caillou0 */
+            for(i2 = 1; i2 <= 4; i2 += 1)
+               caillou0[-1+i2] = caillou[-1+i2];
+
+l99994:
+            for(i = 1; i <= 128; i += 1)
+l99995:
+               for(j = 1; j <= 8; j += 1)
+                  result0[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = (caillou0[2-0]*src00[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+caillou0[3-0]*src10[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*(caillou0[0-0]<<caillou0[1-0])>>caillou0[1-0];
+            /* transfer loop generated by PIPS from result0 to result */
+            for(i0 = 1; i0 <= 8; i0 += 1)
+               for(i1 = 1; i1 <= 128; i1 += 1)
+                  result[128*(-1+i_t)+-1+i1][8*(-1+j_t)+-1+i0] = result0[-1+i1][-1+i0];
+         }
+      }
+
+}
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+   //PIPS generated variable
+   int i0, i1, i2, i3, i4, i5, i6;
+l99998:
+   for(i_t = 1; i_t <= 4; i_t += 1)
+l99993:
+      for(j_t = 1; j_t <= 64; j_t += 1) {
+         //PIPS generated variable
+         int caillou[6];
+         caillou[0] = 0;
+         caillou[1] = 4;
+         caillou[2] = 40;
+         caillou[3] = 60;
+         caillou[4] = i_t-1;
+         caillou[5] = j_t-1;
+
+         {
+            //PIPS generated variable
+            short result0[128][8];
+            //PIPS generated variable
+            int caillou0[4];
+            //PIPS generated variable
+            short src10[128][8], src00[128][8];
+            /* transfer loop generated by PIPS from src0 to src00 */
+            for(i5 = 1; i5 <= 8; i5 += 1)
+               for(i6 = 1; i6 <= 128; i6 += 1)
+                  src00[i6-1][i5-1] = src0[i6+128*i_t-129][i5+8*j_t-9];
+            /* transfer loop generated by PIPS from src1 to src10 */
+            for(i3 = 1; i3 <= 8; i3 += 1)
+               for(i4 = 1; i4 <= 128; i4 += 1)
+                  src10[i4-1][i3-1] = src1[i4+128*i_t-129][i3+8*j_t-9];
+            /* transfer loop generated by PIPS from caillou to caillou0 */
+            for(i2 = 1; i2 <= 4; i2 += 1)
+               caillou0[i2-1] = caillou[i2-1];
+
+l99994:
+            for(i = 1; i <= 128; i += 1)
+l99995:
+               for(j = 1; j <= 8; j += 1)
+                  result0[i-1][j-1] = (caillou0[2]*src00[i-1][j-1]+caillou0[3]*src10[i-1][j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+            /* transfer loop generated by PIPS from result0 to result */
+            for(i0 = 1; i0 <= 8; i0 += 1)
+               for(i1 = 1; i1 <= 128; i1 += 1)
+                  result[i1+128*i_t-129][i0+8*j_t-9] = result0[i1-1][i0-1];
+         }
+      }
+
+}
+outlining to launcher
+void alphablending(short src0[511][511], short src1[511][511], short result[511][511])
+{
+   unsigned int i, j;
+   //PIPS generated variable
+   unsigned int I_0, i_t, j_t;
+   //PIPS generated variable
+   int i0, i1, i2, i3, i4, i5, i6;
+l99998:
+   for(i_t = 1; i_t <= 4; i_t += 1)
+l99993:
+      for(j_t = 1; j_t <= 64; j_t += 1) {
+         //PIPS generated variable
+         int caillou[6];
+         caillou[0] = 0;
+         caillou[1] = 4;
+         caillou[2] = 40;
+         caillou[3] = 60;
+         caillou[4] = i_t-1;
+         caillou[5] = j_t-1;
+
+         {
+            //PIPS generated variable
+            short result0[128][8];
+            //PIPS generated variable
+            int caillou0[4];
+            //PIPS generated variable
+            short src10[128][8], src00[128][8];
+            /* transfer loop generated by PIPS from src0 to src00 */
+l99991:
+            for(i5 = 1; i5 <= 8; i5 += 1)
+l99992:
+               for(i6 = 1; i6 <= 128; i6 += 1)
+                  src00[i6-1][i5-1] = src0[i6+128*i_t-129][i5+8*j_t-9];
+            /* transfer loop generated by PIPS from src1 to src10 */
+l99989:
+            for(i3 = 1; i3 <= 8; i3 += 1)
+l99990:
+               for(i4 = 1; i4 <= 128; i4 += 1)
+                  src10[i4-1][i3-1] = src1[i4+128*i_t-129][i3+8*j_t-9];
+            /* transfer loop generated by PIPS from caillou to caillou0 */
+l99988:
+            for(i2 = 1; i2 <= 4; i2 += 1)
+               caillou0[i2-1] = caillou[i2-1];
+
+l99994:            launcher_0(8, caillou0, result0, src00, src10);
+            /* transfer loop generated by PIPS from result0 to result */
+l99986:
+            for(i0 = 1; i0 <= 8; i0 += 1)
+l99987:
+               for(i1 = 1; i1 <= 128; i1 += 1)
+                  result[i1+128*i_t-129][i0+8*j_t-9] = result0[i1-1][i0-1];
+         }
+      }
+
+}
+
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_1==8}>
+//  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+//  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+//  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+
+void launcher_0(int I_1, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
+{
+   //PIPS generated variable
+   unsigned int i, j;
+
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_1==8}>
+//  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+//  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+//  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_1==8}>
+
+l99994:
+   for(i = 1; i <= 128; i += 1)
+
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_1==8, 1<=i, i<=128}>
+//  <result0[PHI1][PHI2]-W-MAY-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_1==8,
+//    1<=i, i<=128}>
+//  <src00[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_1==8,
+//    1<=i, i<=128}>
+//  <src10[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_1==8,
+//    1<=i, i<=128}>
+
+l99995:
+      for(j = 1; j <= I_1; j += 1)
+
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_1==8, 1<=i, i<=128,
+//    1<=j, j<=8}>
+//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_1==8, 1<=i,
+//    i<=128, 1<=j, j<=8}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_1==8, 1<=i,
+//    i<=128, 1<=j, j<=8}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_1==8, 1<=i,
+//    i<=128, 1<=j, j<=8}>
+
+         result0[i-1][j-1] = (caillou0[2]*src00[i-1][j-1]+caillou0[3]*src10[i-1][j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+}
+outlining to microcode
+label: l99995
+void launcher_0(int I_1, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
+{
+   //PIPS generated variable
+   unsigned int i, j;
+l99994:
+   for(i = 1; i <= 128; i += 1)
+l99995:      launcher_0_microcode(I_1, caillou0, &result0[-1+i], &src00[-1+i], &src10[-1+i]);
+}
+void launcher_0_microcode(int I_1, int caillou0[4], short (*result00)[8], short (*src000)[8], short (*src100)[8])
+{
+   //PIPS generated variable
+   unsigned int j;
+l99995:
+   for(j = 1; j <= I_1; j += 1)
+      (*result00)[j-1] = (caillou0[2]*(*src000)[j-1]+caillou0[3]*(*src100)[j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+}
+normalize microcode launcher_0_microcode
+void launcher_0_microcode(int I_1, int caillou0[4], short (*result00)[8], short (*src000)[8], short (*src100)[8])
+{
+   //PIPS generated variable
+   unsigned int j;
+l99995:
+   for(j = 0; j <= -1+I_1; j += 1)
+      (*result00)[j+1-1] = (caillou0[2]*(*src000)[j+1-1]+caillou0[3]*(*src100)[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+}
+void launcher_0_microcode(int I_1, int caillou0[4], short (*result00)[8], short (*src000)[8], short (*src100)[8])
+{
+   //PIPS generated variable
+   unsigned int j;
+l99995:
+   for(j = 0; j <= -1+I_1; j += 1)
+      (*result00)[j+1-1] = (caillou0[2]*(*src000)[j+1-1]+caillou0[3]*(*src100)[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+}
+void launcher_0_microcode(int I_1, int *caillou0, short **result00, short **src000, short **src100)
+{
+   //PIPS generated variable
+   unsigned int j;
+l99995:
+   for(j = 0; j <= -1+I_1; j += 1)
+      *(*result00+j+1-1) = (caillou0[2]**(*src000+j+1-1)+caillou0[3]**(*src100+j+1-1))*(caillou0[0]<<caillou0[1])>>caillou0[1];
+}
+I_1 belongs to a loop bound
+caillou0 seems a mask
+result00 seems an image
+src000 seems an image
+src100 seems an image
+void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+{
+   //PIPS generated variable
+   unsigned int j;
+   //PIPS generated variable
+   char * re0, re1;
+   //PIPS generated variable
+   int *caillou0, *ma0;
+   //PIPS generated variable
+   short *result00, *im1;
+   //PIPS generated variable
+   short *src000, *im2;
+   //PIPS generated variable
+   short *src100, *im3;
+   //PIPS generated variable
+   unsigned int re2, re3;
+   //PIPS generated variable
+   int *im4;
+   //PIPS generated variable
+   short *im5, *im6, *im7;
+   im3 = *FIFO3;
+   im2 = *FIFO2;
+   im1 = *FIFO1;
+   ma0 = FIFO0;
+l99995:   ;
+   re2 = 1;
+   while (re2<=N0) {
+      *(im1+re2+1-1) = (ma0[2]**(im2+re2+1-1)+ma0[3]**(im3+re2+1-1))*(ma0[0]<<ma0[1])>>ma0[1];
+      re2 = 1+re2;
+   }
+}
+void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+{
+   //PIPS generated variable
+   unsigned int j;
+   //PIPS generated variable
+   char * re0, re1;
+   //PIPS generated variable
+   int *caillou0, *ma0;
+   //PIPS generated variable
+   short *result00, *im1;
+   //PIPS generated variable
+   short *src000, *im2;
+   //PIPS generated variable
+   short *src100, *im3;
+   //PIPS generated variable
+   unsigned int re2, re3;
+   //PIPS generated variable
+   int *im4;
+   //PIPS generated variable
+   short *im5, *im6, *im7;
+   //PIPS generated variable
+   int I_2, I_3;
+   //PIPS generated variable
+   short *P_0;
+   //PIPS generated variable
+   int I_4, I_5, I_6;
+   //PIPS generated variable
+   short *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12;
+   //PIPS generated variable
+   short *P_2;
+   im3 = *FIFO3;
+   im2 = *FIFO2;
+   im1 = *FIFO1;
+   ma0 = FIFO0;
+l99995:   ;
+   re2 = 1;
+   while (re2<=N0) {
+      I_2 = re2+1;
+      I_3 = I_2-1;
+      P_0 = im2+I_3;
+      I_4 = ma0[2]**P_0;
+      I_5 = re2+1;
+      I_6 = I_5-1;
+      P_1 = im3+I_6;
+      I_7 = ma0[3]**P_1;
+      I_8 = I_4+I_7;
+      I_9 = ma0[0]<<ma0[1];
+      I_10 = I_8*I_9;
+      I_11 = re2+1;
+      I_12 = I_11-1;
+      P_2 = im1+I_12;
+      *P_2 = I_10>>ma0[1];
+      re2 = 1+re2;
+   }
+}
+void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+{
+   //PIPS generated variable
+   unsigned int j;
+   //PIPS generated variable
+   char * re0, re1;
+   //PIPS generated variable
+   int *caillou0, *ma0;
+   //PIPS generated variable
+   short *result00, *im1;
+   //PIPS generated variable
+   short *src000, *im2;
+   //PIPS generated variable
+   short *src100, *im3;
+   //PIPS generated variable
+   unsigned int re2, re3;
+   //PIPS generated variable
+   int *im4;
+   //PIPS generated variable
+   short *im5, *im6, *im7;
+   //PIPS generated variable
+   int I_2, I_3;
+   //PIPS generated variable
+   short *P_0;
+   //PIPS generated variable
+   int I_4, I_5, I_6;
+   //PIPS generated variable
+   short *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12;
+   //PIPS generated variable
+   short *P_2;
+   im3 = *FIFO3;
+   im2 = *FIFO2;
+   im1 = *FIFO1;
+   ma0 = FIFO0;
+l99995:   ;
+   re2 = 1;
+   while (re2<=N0) {
+      I_2 = re2;
+      I_2 = I_2+1;
+      I_3 = I_2;
+      I_3 = I_3-1;
+      P_0 = im2;
+      P_0 = P_0+I_3;
+      I_4 = ma0[2];
+      I_4 = I_4**P_0;
+      I_5 = re2;
+      I_5 = I_5+1;
+      I_6 = I_5;
+      I_6 = I_6-1;
+      P_1 = im3;
+      P_1 = P_1+I_6;
+      I_7 = ma0[3];
+      I_7 = I_7**P_1;
+      I_8 = I_4;
+      I_8 = I_8+I_7;
+      I_9 = ma0[0];
+      I_9 = I_9<<ma0[1];
+      I_10 = I_8;
+      I_10 = I_10*I_9;
+      I_11 = re2;
+      I_11 = I_11+1;
+      I_12 = I_11;
+      I_12 = I_12-1;
+      P_2 = im1;
+      P_2 = P_2+I_12;
+      *P_2 = I_10;
+      *P_2 = *P_2>>ma0[1];
+      re2 = 1;
+      re2 = re2+re2;
+   }
+}
+void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+{
+   //PIPS generated variable
+   int *ma0;
+   //PIPS generated variable
+   short *im1;
+   //PIPS generated variable
+   short *im2;
+   //PIPS generated variable
+   short *im3;
+   //PIPS generated variable
+   unsigned int re2;
+   //PIPS generated variable
+   int I_2, I_3;
+   //PIPS generated variable
+   short *P_0;
+   //PIPS generated variable
+   int I_4, I_5, I_6;
+   //PIPS generated variable
+   short *P_1;
+   //PIPS generated variable
+   int I_7, I_8, I_9, I_10, I_11, I_12;
+   //PIPS generated variable
+   short *P_2;
+   setpi(im3, FIFO3);
+   setpi(im2, FIFO2);
+   setpi(im1, FIFO1);
+   seti(ma0, FIFO0);
+l99995:   ;
+   seti(re2, 1);
+   while (re2<=N0) {
+      seti(I_2, re2);
+      addi(I_2, 1);
+      seti(I_3, I_2);
+      subi(I_3, 1);
+      seti(P_0, im2);
+      paddi(P_0, I_3);
+      seti(I_4, ma0[2]);
+      mulri(I_4, P_0);
+      seti(I_5, re2);
+      addi(I_5, 1);
+      seti(I_6, I_5);
+      subi(I_6, 1);
+      seti(P_1, im3);
+      paddi(P_1, I_6);
+      seti(I_7, ma0[3]);
+      mulri(I_7, P_1);
+      seti(I_8, I_4);
+      paddi(I_8, I_7);
+      seti(I_9, ma0[0]);
+      lshifti(I_9, ma0[1]);
+      seti(I_10, I_8);
+      muli(I_10, I_9);
+      seti(I_11, re2);
+      addi(I_11, 1);
+      seti(I_12, I_11);
+      subi(I_12, 1);
+      seti(P_2, im1);
+      paddi(P_2, I_12);
+      pseti(P_2, I_10);
+      prshifti(P_2, ma0[1]);
+      seti(re2, 1);
+      addi(re2, re2);
+   }
+}

@@ -1,0 +1,33 @@
+delete partial_eval22
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval22 partial_eval22.c
+
+module isme
+
+echo
+echo "isme" file
+echo
+
+display PRINTED_FILE
+
+echo
+echo "isme" file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+apply PARTIAL_EVAL
+
+echo
+echo "isme" file after partial evaluation
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete partial_eval22
+quit
