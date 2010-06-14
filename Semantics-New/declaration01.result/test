@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
 //  T(i) {i==i#init+1}
 
-   long long size[i++];
+   long long int size[i++];
 
 //  T(main) {}
 
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
 //  P(i) {i==1}
 
-   long long size[i++];
+   long long int size[i++];
 
 //  P(i) {i==2}
 

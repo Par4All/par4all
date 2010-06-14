@@ -8,8 +8,8 @@ Declarations for module "decl27!" with type "() -> unknown"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 18
-	Declared entity "TOP-LEVEL:i1" with type "variable" "long long"
-	Declared entity "TOP-LEVEL:i2" with type "variable" "long"
+	Declared entity "TOP-LEVEL:i1" with type "variable" "long long int"
+	Declared entity "TOP-LEVEL:i2" with type "variable" "long int"
 	Declared entity "TOP-LEVEL:i3" with type "variable" "int"
 	Declared entity "TOP-LEVEL:i4" with type "variable" "short"
 	Declared entity "decl27!:*DYNAMIC*" with type "area" with size 0
@@ -50,7 +50,7 @@ End of declarations for module decl27!
 Parsed printed file for "decl27!"
 
 /* Check PIPS size of different integers */
-long long i1;
-long i2;
+long long int i1;
+long int i2;
 int i3;
 short i4;
