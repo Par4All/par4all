@@ -261,6 +261,10 @@ def main():
         abs_file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(abs_file):
             die("Invalid/missing input file: " + abs_file)
+        # Check if file has the .p4a suffix, and skip it it is the case:
+        if change_file_ext(abs_file, "").endswith(".p4a"):
+            warn("Ignoring already processed file: " + file)
+            continue
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)
