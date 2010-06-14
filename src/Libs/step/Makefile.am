@@ -4,10 +4,11 @@ BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
 dist_noinst_HEADERS=STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h defines-local.h
-libstep_la_SOURCES=step.c \
+libstep_la_SOURCES=	step.c \
 		atomizer.c \
 		outlining.c \
 		directives.c \
+		directive_transformation.c \
 		directive_parallel.c \
 		directive_do.c \
 		directive_section.c \
@@ -17,6 +18,9 @@ libstep_la_SOURCES=step.c \
 		directive_private.c \
 		analyse.c \
 		compile.c \
+		compile_RT.c \
+		compile_region.c \
+		compile_parallel.c \
 		compile_do.c \
 		compile_reduction.c \
 		compile_master.c \

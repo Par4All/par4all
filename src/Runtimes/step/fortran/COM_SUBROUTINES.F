@@ -1,5 +1,5 @@
-#ifdef
-* Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
+#ifdef COPYRIGHT
+* Copyright 2007, 2008, 2009 Alain Muller, Frederique Silber-Chaussumier, Christian Parrot
 *
 *This file is part of STEP.
 *
@@ -19,7 +19,7 @@
 #else                                                                     !$\
       AlltoAll_nBlocking(TYPE_SUFFIX,TYPE_FORTRAN)                        !$\
       InitReduction(TYPE_SUFFIX,TYPE_FORTRAN,TYPE_MPI)                    !$\
-      Reducion(TYPE_SUFFIX,TYPE_FORTRAN,TYPE_MPI)                         !$\
+      Reduction(TYPE_SUFFIX,TYPE_FORTRAN,TYPE_MPI)                        !$\
       STEP_MasterToAllScalar(TYPE_SUFFIX,TYPE_FORTRAN,TYPE_MPI)           !$\
       STEP_MasterToAllRegion(TYPE_SUFFIX,TYPE_FORTRAN,TYPE_MPI)           !$\
 #endif                                                                    !$\

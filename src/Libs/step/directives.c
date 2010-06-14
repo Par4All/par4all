@@ -6,19 +6,33 @@ The program is distributed under the terms of the GNU General Public
 License.
 */
 
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
 GENERIC_GLOBAL_FUNCTION(global_directives,directives);
 
 
+string step_directives_USER_FILE_name()
+{
+  string file_name = "step_directives.f";
+  string dir_name = db_get_current_workspace_directory();
+  string full_name = strdup(concatenate(dir_name, "/", WORKSPACE_TMP_SPACE, "/", file_name, NULL));
+  free (dir_name);
+  return full_name;
+}
+
 bool directives_init(string __attribute__ ((unused)) module_name)
 {
   init_global_directives();
   global_directives_save();
+
+  // creation du futur USER_FILE regroupant les modules directives
+  string directives_file_name = step_directives_USER_FILE_name();
+  safe_system(concatenate("mkdir -p $(dirname ", directives_file_name, ") && touch ", directives_file_name,  NULL));
+  free(directives_file_name);
+  
   return TRUE;
 }
 
@@ -39,8 +53,12 @@ void global_directives_save()
 DEFINE_GLOBAL_STACK(current_directives, directive);
 
 /*
-  Phase PIPS de pres traitement :  les directives sont remplacees par des appels a la fonction DIR_CALL
-  dont l'argument est le texte de la directive et le nouveau fichier a pour suffix STEP_FILTERED_SUFFIX.
+  Phase PIPS de pretraitement : les directives sont remplacees par des
+  appels a la fonction DIR_CALL
+
+  dont l'argument est le texte de la directive et le nouveau fichier a
+  pour suffixe STEP_FILTERED_SUFFIX.
+
 */
 #define DIR_CALL "STEP_DIRECTIVES_"
 #define STEP_FILTERED_SUFFIX ".step_filtered"
@@ -66,7 +84,7 @@ bool directive_filter(string name)
     free(src_name);
     free(dir_name);
 
-    pips_debug(1, "fin step_filter\n");
+    pips_debug(1, "fin\n");
     debug_off();
     return TRUE;
 }
@@ -126,7 +144,13 @@ string step_make_new_directive_module_name(string suffix, string id)
 
       free(i_s);
       free(new_name);
-      make_empty_subroutine(final_name,copy_language(module_language(current_module))); // for matching the next try with the same "new_name" but for a new directive
+
+      /*
+	Creation of the entity final_name
+	for matching the next try with the same "final_name" but for a new directive
+      */
+
+      make_empty_subroutine(final_name,copy_language(module_language(get_current_module_entity()))); 
       new_name = final_name;
     }
 
@@ -264,98 +288,98 @@ typedef struct {
 
 static directive_hooks directives_hooks[]= {
   {is_type_directive_omp_parallel_sections,
-   PARALLEL_SECTIONS_TEXT,
+   PARALLEL_SECTIONS_TXT,
    make_directive_omp_parallel_sections,
    is_begin_directive_omp_parallel_sections,
    hook_block_FALSE,
-   handle_omp_section
+   handle_omp_sections
   },
   {is_type_directive_omp_end_parallel_sections,
-   END_PARALLEL_SECTIONS_TEXT,
+   END_PARALLEL_SECTIONS_TXT,
    make_directive_omp_end_parallel_sections,
    hook_block_FALSE,
    is_end_directive_omp_end_parallel_sections,
-   handle_omp_section
+   NULL
   },
   {is_type_directive_omp_sections,
-   SECTIONS_TEXT,
+   SECTIONS_TXT,
    make_directive_omp_sections,
    is_begin_directive_omp_sections,
    hook_block_FALSE,
-   handle_omp_section
+   handle_omp_sections
   },
   {is_type_directive_omp_section,
-   SECTION_TEXT,
+   SECTION_TXT,
    make_directive_omp_section,
-   hook_block_FALSE,
+   is_begin_directive_omp_section,
    is_end_directive_omp_section,
    handle_omp_section
   },
   {is_type_directive_omp_end_sections,
-   END_SECTIONS_TEXT,
+   END_SECTIONS_TXT,
    make_directive_omp_end_sections,
    hook_block_FALSE,
    is_end_directive_omp_end_sections,
-   handle_omp_section
+   NULL
   },
   {is_type_directive_omp_parallel_do,
-   PARALLEL_DO_TEXT,
+   PARALLEL_DO_TXT,
    make_directive_omp_parallel_do,
    is_begin_directive_omp_parallel_do,
    hook_block_FALSE,
    handle_omp_parallel_do
   },
   {is_type_directive_omp_end_parallel_do,
-   END_PARALLEL_DO_TEXT,
+   END_PARALLEL_DO_TXT,
    make_directive_omp_end_parallel_do,
    hook_block_FALSE,
    is_end_directive_omp_end_parallel_do,
    handle_omp_parallel_do
   },
   {is_type_directive_omp_parallel,
-   PARALLEL_TEXT,
+   PARALLEL_TXT,
    make_directive_omp_parallel,
    is_begin_directive_omp_parallel,
    hook_block_FALSE,
    handle_omp_parallel
   },
   {is_type_directive_omp_end_parallel,
-   END_PARALLEL_TEXT,
+   END_PARALLEL_TXT,
    make_directive_omp_end_parallel,
    hook_block_FALSE,
    is_end_directive_omp_end_parallel,
    handle_omp_parallel
   },
   {is_type_directive_omp_do,
-   DO_TEXT,
+   DO_TXT,
    make_directive_omp_do,
    is_begin_directive_omp_do,
    hook_block_FALSE,
    handle_omp_do
   },
   {is_type_directive_omp_end_do,
-   END_DO_TEXT,
+   END_DO_TXT,
    make_directive_omp_end_do,
    hook_block_FALSE,
    is_end_directive_omp_end_do,
    handle_omp_do
    },
   {is_type_directive_omp_master,
-   MASTER_TEXT,
+   MASTER_TXT,
    make_directive_omp_master,
    begin_directive_omp_master,
    hook_block_FALSE,
    handle_omp_master
   },
   {is_type_directive_omp_end_master,
-   END_MASTER_TEXT,
+   END_MASTER_TXT,
    make_directive_omp_end_master,
    hook_block_FALSE,
    end_directive_omp_end_master,
    handle_omp_master
   },
   {is_type_directive_omp_barrier,
-   BARRIER_TEXT,
+   BARRIER_TXT,
    make_directive_omp_barrier,
    begin_directive_omp_barrier,
    end_directive_omp_barrier,
@@ -376,7 +400,7 @@ bool step_directive_p(string directive, string entity_name)
   int retcode;
   char *debut;
 
-  pips_debug(3, "%zd directive = %s, entity_name = %s\n",strlen(directive), directive, entity_name);
+  pips_debug(3, "directive = %s (len=%zd), entity_name = %s\n", directive, strlen(directive), entity_name);
 
   if (string_undefined_p(directive))
     return FALSE;
@@ -391,10 +415,17 @@ bool step_directive_p(string directive, string entity_name)
 static directive_hooks hooks_by_txt(string txt)
 {
   int id_hook=0;
+  directive_hooks hook;
+
+  pips_debug(2, "txt = %s\n", txt);
+
   while (id_hook < is_type_directive_none &&
 	 !step_directive_p(directives_hooks[id_hook].directive_txt, txt))
     id_hook++;
-  return directives_hooks[id_hook];
+  hook = directives_hooks[id_hook];
+
+  pips_debug(2, "end\n");
+  return hook;
 }
 
 static directive_hooks hooks_by_directive(directive d)
@@ -410,31 +441,58 @@ static directive_hooks hooks_by_directive(directive d)
 static bool directive_statement_p(statement stmt)
 {
   entity f;
+  bool b;
+  
+  pips_debug(1, "stmt = %p\n", stmt);
+
   if (statement_undefined_p(stmt) || !statement_call_p(stmt))
     return FALSE;
   
   f = call_function(statement_call(stmt));
-  return (top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0);
+  b = (top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0);
+
+  pips_debug(1, "b = %d\n", b);
+  return b;
 }
 
 string statement_to_directive_txt(statement stmt)
 {
+  string txt;
+  entity f;
+  pips_debug(1, "stmt = %p\n", stmt);
+
   pips_assert("call",!statement_undefined_p(stmt) && statement_call_p(stmt));
-  entity f = call_function(statement_call(stmt));
+  f = call_function(statement_call(stmt));
   pips_assert("directive",(top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0));
-  return entity_local_name(expr_to_entity(EXPRESSION(CAR(call_arguments(statement_call(stmt))))));
+
+  txt = entity_local_name(expression_to_entity(EXPRESSION(CAR(call_arguments(statement_call(stmt))))));
+  
+  pips_debug(1, "txt = %s\n", txt);
+  return txt;
 }
 
 // un parser serait pas mal pour reconnaitre la type de directive avec ses clauses :)
 static directive make_directive_from_statement(statement stmt)
 {
-  pips_debug(1, "stmt = %p\n", stmt);
+  directive drt;
+  pips_debug(1, "BEGIN stmt = %p\n", stmt);
+
+  STEP_DEBUG_STATEMENT(2, "stmt", stmt);
 
   if (!directive_statement_p(stmt))
-    return make_directive_none(stmt);
+    {
+      drt = make_directive_none(stmt);
+    }
   else
-    /* Where the directive is created */
-    return ((hooks_by_txt(statement_to_directive_txt(stmt))).make)(stmt);
+    {
+      /* Where the directive is created */
+      drt = ((hooks_by_txt(statement_to_directive_txt(stmt))).make)(stmt);
+      
+      directive_clauses(drt)=gen_nconc(directive_clauses(drt),CONS(CLAUSE,directive_transformation(directive_txt(drt)),NIL));
+    }
+
+  pips_debug(1, "END drt = %p\n", drt);
+  return drt;
 }
 
 static bool directive_none_p(directive d)
@@ -452,13 +510,21 @@ static bool end_directive_p(directive d)
   return ((hooks_by_directive(d)).end)(current_directives_head(),d);
 }
 
-static instruction handle_directive(directive begin,directive end)
+static void handle_directive_push(list remaining, directive drt)
 {
+  handle_directive_sections_push(remaining, drt);
+}
+
+static instruction handle_directive_pop(directive begin, directive end)
+{
+  pips_debug(1, "begin = %p, end = %p\n", begin, end);
+
   if (directive_none_p(begin)&&directive_none_p(end))
     {
        /*
 	 Case of the fake directive
        */ 
+      pips_debug(2, "handle end (head, end)\n");
       return ((hooks_by_directive(end)).handle)(current_directives_head(),end);
     }
   else
@@ -466,31 +532,33 @@ static instruction handle_directive(directive begin,directive end)
       /*
 	Case of a directive
       */
+      pips_debug(2, "handle begin (begin, end)\n");
       return ((hooks_by_directive(begin)).handle)(begin,end);
     }
+  pips_debug(1, "end\n");
 }
 
 /*######################################################################################################*/
 static bool dir_filter(statement);
 
-static void add_instruction_to_list(instruction i, list l)
+static void add_instruction_to_list(instruction instr, list l)
 {
-  pips_debug(1, "i = %p, l = %p\n", i, l);
+  pips_debug(1, "instr = %p, l = %p\n", instr, l);
 
   pips_assert("list",!ENDP(l));
   
   /* add at the beginning of the list */
-  if(instruction_sequence_p(i))
+  if(instruction_sequence_p(instr))
     {
-      CDR(l)=gen_nconc(gen_full_copy_list(instruction_block(i)),CDR(l));
-      free_instruction(i);
+      CDR(l)=gen_nconc(gen_full_copy_list(instruction_block(instr)),CDR(l));
+      free_instruction(instr);
     }
   else
     CDR(l)=CONS(STATEMENT,make_statement(entity_empty_label(), 
 					 STATEMENT_NUMBER_UNDEFINED,
 					 STATEMENT_ORDERING_UNDEFINED, 
 					 empty_comments,
-					 i,
+					 instr,
 					 NIL,NULL,empty_extensions ()),CDR(l));
 
   pips_debug(1, "end\n");
@@ -499,23 +567,40 @@ static void add_instruction_to_list(instruction i, list l)
 
 statement step_keep_directive_txt(directive begin,statement stmt,directive end)
 {
+  string new_comment;
   
+  pips_debug(1, "begin = %p, stmt = %p, end = %p\n", begin, stmt, end);
+  
+
   if(!(directive_undefined_p(begin) || directive_none_p(begin)))
-    insert_statement(stmt,make_statement(entity_empty_label(), 
-					 STATEMENT_NUMBER_UNDEFINED,
-					 STATEMENT_ORDERING_UNDEFINED, 
-					 strdup(concatenate("C     !$omp ",step_remove_quote(directive_txt(begin)),"\n",NULL)),
-					 make_continue_instruction(),
-					 NIL,NULL,empty_extensions ()),
-		     TRUE);
+    {
+      string d_txt=step_remove_quote(directive_txt(begin));
+      new_comment = strdup(concatenate(STEP_KEEP_DIRECTIVE_PREFFIX,d_txt,"\n",NULL));
+      free(d_txt);
+
+      insert_statement(stmt, make_statement(entity_empty_label(), 
+					    STATEMENT_NUMBER_UNDEFINED,
+					    STATEMENT_ORDERING_UNDEFINED, 
+					    new_comment,
+					    make_continue_instruction(),
+					    NIL, NULL,empty_extensions ()),
+		       TRUE); /* before */
+    }
+
   if(!(directive_undefined_p(end) || directive_none_p(end)))
-    insert_statement(stmt,make_statement(entity_empty_label(), 
-					 STATEMENT_NUMBER_UNDEFINED,
-					 STATEMENT_ORDERING_UNDEFINED, 
-					 strdup(concatenate("C     !$omp ",step_remove_quote(directive_txt(end)),"\n",NULL)),
-					 make_continue_instruction(),
-					 NIL,NULL,empty_extensions ()),
-		     FALSE);
+    {
+      new_comment = strdup(concatenate(STEP_KEEP_DIRECTIVE_PREFFIX,step_remove_quote(directive_txt(end)),"\n",NULL));
+
+      insert_statement(stmt, make_statement(entity_empty_label(), 
+					    STATEMENT_NUMBER_UNDEFINED,
+					    STATEMENT_ORDERING_UNDEFINED, 
+					    new_comment,
+					    make_continue_instruction(),
+					    NIL, NULL, empty_extensions()),
+		       FALSE); /* after */
+    }
+
+  pips_debug(1, "stmt = %p\n", stmt);
   return stmt;
 }
 
@@ -536,7 +621,8 @@ static void directive_statement_filter(statement stmt)
      begin_directive_p(new_directive) && end_directive_p(new_directive))
 	{
 	  free_instruction(statement_instruction(stmt));
-	  statement_instruction(stmt)=handle_directive(new_directive,new_directive);
+	  pips_debug(2, "1 HANDLE directive (new_drt, new_drt)\n");
+	  statement_instruction(stmt) = handle_directive_pop(new_directive,new_directive);
 	}
   /*
     a block begin/end  or an unknown directive is found in a non-block statement
@@ -564,6 +650,7 @@ static void _directives_outline(list remaining, statement stmt)
     {
       /*
 	Case where the end directive is optional (and present or not)
+	for omp_do and omp_parallel_do
 	Where the current directive is handled (outlined)
       */
       
@@ -572,10 +659,11 @@ static void _directives_outline(list remaining, statement stmt)
       pips_debug(2, "optional end directive\n");
 
       begin = current_directives_pop();
-      STEP_DEBUG_DIRECTIVE(2,"pop current_directives", begin);
+      STEP_DEBUG_DIRECTIVE(2,"POP current_directives", begin);
 
       /* handle (outline) the current directive */
-      add_instruction_to_list(handle_directive(begin, make_directive_none(stmt)), remaining);
+      pips_debug(2, "2 HANDLE directive (pop head, none)\n");
+      add_instruction_to_list(handle_directive_pop(begin, make_directive_none(stmt)), remaining);
     }
   else
     {
@@ -587,14 +675,16 @@ static void _directives_outline(list remaining, statement stmt)
       */
       
       new_directive = make_directive_from_statement(stmt);
-      pips_debug(2,"new_directive = %s\n", directive_txt(new_directive));
       
       if(begin_directive_p(new_directive)) 
 	{
 	  /* add a new directive into the stack */
 	  pips_debug(2, "begin directive\n");
-	  STEP_DEBUG_DIRECTIVE(2,"push current_directives", new_directive);
+	  STEP_DEBUG_DIRECTIVE(2,"PUSH current_directives", new_directive);
 	  current_directives_push(new_directive);
+
+	  /* used only for omp_sections et omp_parallel_sections */
+	  handle_directive_push(remaining, new_directive);
 	}
       
       /* a master directive is both begin and end */
@@ -608,10 +698,11 @@ static void _directives_outline(list remaining, statement stmt)
 	  
 	  pips_debug(2, "end directive\n");
 	  begin = current_directives_pop();
-	  STEP_DEBUG_DIRECTIVE(2,"pop current_directives", begin);
+	  STEP_DEBUG_DIRECTIVE(2,"POP current_directives", begin);
 
 	  /* handle (outline) the current directive */
-	  add_instruction_to_list(handle_directive(begin, new_directive), remaining);
+	  pips_debug(2, "3 HANDLE directive (pop head, new_drt)\n");
+	  add_instruction_to_list(handle_directive_pop(begin, new_directive), remaining);
 	}
       else if(directive_none_p(new_directive))
 	{
@@ -628,10 +719,11 @@ static void _directives_outline(list remaining, statement stmt)
 	  current = current_directives_head();
 	  STEP_DEBUG_DIRECTIVE(2,"head current_directives", current);
 
-	  /* free instr corresponding to new_directive */
+	  /* free instr corresponding to the none new_directive */
 	  free_instruction(statement_instruction(stmt));
-	  statement_instruction(stmt) = handle_directive(new_directive, new_directive);
-	  pips_debug(2, "Add the none directive to the body of the head of current_directives\n");
+	  pips_debug(2, "4 HANDLE directive (new_drt, new_drt)\n");
+	  statement_instruction(stmt) = handle_directive_pop(new_directive, new_directive);
+	  pips_debug(2, "ADD the none directive to the body of the head of current_directives\n");
 	  directive_body(current) = gen_nconc(directive_body(current), CONS(STATEMENT, copy_statement(stmt), NIL));
 
 	}
@@ -680,8 +772,9 @@ static void directives_outline(list remaining)
     }
 
   pips_debug(2, "sequence_level = %d, nb remaining = %zd\n", sequence_level, gen_length(remaining) - 1);
+
   pips_debug(2, "Size of the current_directives stack = %d\n", current_directives_size());
-  STEP_DEBUG_DIRECTIVE(2, "current_directives head", current_directives_head());
+
   pips_debug(1, "end\n");
 }
 
@@ -697,17 +790,17 @@ static void directive_block_filter(statement stmt)
 
   sequence = gen_full_copy_list(sequence_statements(instruction_sequence(statement_instruction(stmt))));
 
+  sequence_level ++;
   /* 
      make a fake directive to record sequence statement in the directive body
   */
 
-  pips_debug(2, "push a fake none directive to record sequence statement in the directive body\n");
+  pips_debug(2, "push a fake none directive for level %d\n", sequence_level);
   current_directives_push(make_directive_none(statement_undefined));
 
   /*
     for each statement of the sequence (not yet traited)
   */
-  sequence_level ++;
   pips_debug(2, "directives_outline on the block level %d\n", sequence_level);
   MAPL(remaining,
        {
@@ -833,13 +926,15 @@ static string clauses_to_string(list clauses,bool close)
       s = string_undefined;
       switch (clause_tag(c))
 	{
-	case is_clause_step_reduction:
+	case is_clause_reduction:
 	  if (close==false)
-	    s=clause_reduction_to_string(clause_step_reduction(c));
+	    s=clause_reduction_to_string(clause_reduction(c));
 	  break;
-	case is_clause_step_private:
+	case is_clause_private:
 	  if (close==false)
-	    s=clause_private_to_string(clause_step_private(c));
+	    s=clause_private_to_string(clause_private(c));
+	  break;
+	case is_clause_transformation:
 	  break;
 	default:
 	  pips_user_warning("unexpected clause\n");
@@ -912,7 +1007,7 @@ string directive_to_string(directive d,bool close)
 
   if (d_txt ==string_undefined )
     {
-      pips_user_warning("directive handling not yet implemented\n");
+      pips_user_warning("directive handling not yet implemented : %s\n",directive_txt(d));
       if(close==false)
 	d_txt=strdup(concatenate(step_remove_quote(directive_txt(d)),NULL));
     }
@@ -922,7 +1017,7 @@ string directive_to_string(directive d,bool close)
       d_txt=strdup(concatenate(d_txt,c_txt,NULL));
     }
 
-  if (!string_undefined_p(d_txt))
+  if (!string_undefined_p(d_txt) && strlen(d_txt))
     {
       directive_formated=directive_formate(d_txt, OMP_DIRECTIVE, OMP_DIR_CONT);
       if (!string_undefined_p(c_txt)) free(c_txt);

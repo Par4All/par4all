@@ -5,15 +5,15 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
 
 /* An atomizer that uses the one made by Fabien Coelho for HPFC.
    based on Ronan Keryell atomizer
 
    Alain Muller 9/10/2008
 */
+#ifdef HAVE_CONFIG_H
+#include "pips_config.h"
+#endif
 #include "defines-local.h"
 
 extern void atomize_as_required(
@@ -27,12 +27,12 @@ extern void atomize_as_required(
 
 static expression step_expression_atomized=expression_undefined;
 
-GENERIC_LOCAL_FUNCTION(step_atomized, step_atomized_map)
+GENERIC_LOCAL_FUNCTION(local_atomized, step_atomized)
 
 entity step_new_variable(entity module, basic b)
 {
   entity e=make_new_scalar_variable(module, copy_basic(b));
-  store_or_update_step_atomized(e,copy_expression(step_expression_atomized));
+  store_or_update_local_atomized(e,copy_expression(step_expression_atomized));
   return e;
 }
 
@@ -124,7 +124,7 @@ boolean step_atomize(char * mod_name)
   statement mod_stat;
   entity module;
 
-  init_step_atomized();
+  init_local_atomized();
   mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
   set_current_module_statement(mod_stat);
@@ -145,25 +145,25 @@ boolean step_atomize(char * mod_name)
   
   /* We save the new CODE. */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ATOMIZED, strdup(mod_name), get_step_atomized());
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ATOMIZED, strdup(mod_name), get_local_atomized());
   
   reset_current_module_statement();
   reset_current_module_entity();
-  reset_step_atomized();
+  reset_local_atomized();
   
   return(TRUE);
 }
 
 static bool step_expression_atomize_filter(expression expr)
 {
-  pips_debug(1,"entity_name = %s\n",entity_name(expr_to_entity(expr)));
+  pips_debug(1,"entity_name = %s\n",entity_name(expression_to_entity(expr)));
 
-  if (expression_reference_p(expr) && bound_step_atomized_p(reference_variable(syntax_reference(expression_syntax(expr)))))
+  if (expression_reference_p(expr) && bound_local_atomized_p(reference_variable(syntax_reference(expression_syntax(expr)))))
     {
       entity e=reference_variable(syntax_reference(expression_syntax(expr)));
       free_syntax(expression_syntax(expr));
-      expression_syntax(expr)=copy_syntax(expression_syntax(load_step_atomized(e)));
-      delete_step_atomized(e);
+      expression_syntax(expr)=copy_syntax(expression_syntax(load_local_atomized(e)));
+      delete_local_atomized(e);
     }
 
   return TRUE;
@@ -178,7 +178,7 @@ static bool step_call_atomize_filter(call c)
     {
       expression e1 = EXPRESSION(CAR(call_arguments(c)));
       syntax s1 = expression_syntax(e1);
-      if(syntax_reference_p(s1)&&bound_step_atomized_p(reference_variable(syntax_reference(s1))))
+      if(syntax_reference_p(s1)&&bound_local_atomized_p(reference_variable(syntax_reference(s1))))
 	{
 	  call_function(c)=entity_intrinsic(CONTINUE_FUNCTION_NAME);
 	  gen_free_list(call_arguments(c));
@@ -194,7 +194,7 @@ boolean step_unatomize(char * mod_name)
   statement mod_stat;
   entity module;
 
-  set_step_atomized((step_atomized_map)db_get_memory_resource(DBR_STEP_ATOMIZED, mod_name, TRUE));
+  set_local_atomized((step_atomized)db_get_memory_resource(DBR_STEP_ATOMIZED, mod_name, TRUE));
   mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   
   set_current_module_statement(mod_stat);
@@ -215,11 +215,11 @@ boolean step_unatomize(char * mod_name)
   
   /* We save the new CODE. */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ATOMIZED, strdup(mod_name), get_step_atomized());
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ATOMIZED, strdup(mod_name), get_local_atomized());
   
   reset_current_module_statement();
   reset_current_module_entity();
-  reset_step_atomized();
+  reset_local_atomized();
   
   return(TRUE);
 }

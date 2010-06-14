@@ -5,7 +5,7 @@
 
 %%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
-\title{STEP \\ structure des données}
+\title{STEP \\ structure des donnï¿½es}
 \author{Alain Muller\\
                 \\
         INT}
@@ -26,36 +26,36 @@
 \domain{import statement from "ri.newgen"}
 {}
 
-\domain{step_reduction = entity->string}
+\domain{map_entity_string = entity->string}
 {}
-\domain{step_private = entity *}
+\domain{map_entity_bool = entity->bool}
 {}
-\domain{clause = step_reduction + step_private}
+\domain{map_entity_expression = entity->expression}
 {}
-
-\domain{loop_data = index:entity x lower:entity x upper:entity x step:int}
-{}
-
-\domain{step_region_analyse = recv: effect* x send:effect* x interlaced:effect* x used:effect*}
-{}
-
-\domain{step_entity_map = entity->entity}
-{}
-\domain{step_atomized_map = entity->expression}
-{}
-\domain{analyse_map = entity->step_region_analyse}
-{}
-
-\domain{type_directive = omp_parallel_do:loop_data* + omp_end_parallel_do:unit + omp_parallel:unit + omp_end_parallel:unit + omp_do:loop_data* + omp_end_do:unit + omp_parallel_sections:statement* + omp_end_parallel_sections: unit + omp_sections:statement* + omp_end_sections:unit + omp_section:unit + omp_master:unit + omp_end_master:unit + omp_barrier:unit + none:unit}
-{}
-\domain{directive = txt:string x module_name : string x type : type_directive x body : statement* x clauses : clause*}
-{}
-\domain{directives = entity->directive}
+\domain{map_entity_entity = entity->entity}
 {}
 
 \domain{outlined = list:string*}
 {}
-\domain{step_status = analyses:analyse_map x mpi_module:step_entity_map x omp_module:step_entity_map}
+
+\domain{directives = entity->directive}
+{}
+\domain{directive = txt:string x module_name : string x type : type_directive x body : statement* x clauses : clause*}
+{}
+\domain{clause = reduction:map_entity_string  + private:entity* + transformation:int}
+{}
+\domain{type_directive = omp_parallel_do:loop_data* + omp_end_parallel_do:unit + omp_parallel:unit + omp_end_parallel:unit + omp_do:loop_data* + omp_end_do:unit + omp_parallel_sections:statement* + omp_end_parallel_sections: unit + omp_sections:statement* + omp_end_sections:unit + omp_section:unit + omp_master:unit + omp_end_master:unit + omp_barrier:unit + none:unit}
+{}
+\domain{loop_data = index:entity x lower:entity x upper:entity x step:int}
 {}
 
+\domain{map_entity_step_analyses = entity->step_analyses}
+{}
+\domain{step_analyses = recv: effect* x send:effect* x interlaced:effect* x used:effect*}
+{}
+
+\domain{step_status = compiled: entity* x generated: entity *}
+{}
+\domain{step_atomized = entity->expression}
+{}
 \end{document}

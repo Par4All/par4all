@@ -30,9 +30,8 @@ Modification: F. Silber-Chaussumier, 2008
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
-
 #include "defines-local.h"
 
 /* pour step_rw_regions */
@@ -46,6 +45,25 @@ Modification: F. Silber-Chaussumier, 2008
 
 #define LOCAL_DEBUG 2
 
+GENERIC_GLOBAL_FUNCTION(global_step_analyses,map_entity_step_analyses);
+
+void global_step_analyses_load()
+{
+  set_global_step_analyses((map_entity_step_analyses)db_get_memory_resource(DBR_STEP_ANALYSES, "", TRUE));
+}
+
+void global_step_analyses_save()
+{
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ANALYSES, "", get_global_step_analyses());
+  reset_global_step_analyses();
+}
+
+void global_step_analyse_init()
+{
+  init_global_step_analyses();
+  global_step_analyses_save();
+}
+
 static void step_print_region(char *text, list reg)
 {
   printf("\n%s : %zd\n", text, gen_length(reg));
@@ -58,11 +76,11 @@ static int step_nb_phi_vecteur(list phi_l, Pvecteur v)
 
   pips_debug(1, "phi_l = %p, v = %p\n", phi_l, v);
 
-  MAP(VARIABLE,phi,{
-    if(vect_coeff((Variable)phi,v)!=VALUE_ZERO)
-      nb_phi++;
-  },
-      phi_l);
+  FOREACH(VARIABLE,phi,phi_l)
+    {
+      if(vect_coeff((Variable)phi,v)!=VALUE_ZERO)
+	nb_phi++;
+    }
 
   pips_debug(1, "nb_phi = %d\n", nb_phi);
   return nb_phi;
@@ -78,13 +96,13 @@ static void step_drop_complex_constraints(region reg)
   pips_debug(LOCAL_DEBUG, "Region entity %s\n", entity_name(region_entity(reg)));
 
   phi_l = NIL;
-  MAP(EXPRESSION, exp, {
+  FOREACH(EXPRESSION, exp,reference_indices(effect_any_reference(reg)))
+    {
       syntax s=expression_syntax(exp);
       pips_assert("reference", syntax_reference_p(s));
       entity phi=reference_variable(syntax_reference(s));
       phi_l=CONS(ENTITY,phi,phi_l);
-    },
-    reference_indices(effect_any_reference(reg)));
+    }
 
   sc_base(region_system(reg)) = BASE_NULLE;
 
@@ -128,7 +146,6 @@ static void step_drop_complex_constraints(region reg)
 }
 
 
-#if 0
 /* Recherche des variables et tableaux privatisables  
    
    Calcul de PRIV a partir de LOCAL: variables ecrites non
@@ -149,7 +166,7 @@ static list step_private_regions(list write_l, list in_l, list out_l)
   return priv_l;
 }
 
-
+#if 0
 /* Recherche des variables et sections de tableau privatisables 
    
    Possibilite de diviser les tableaux en plusieurs sections au lieu
@@ -214,20 +231,21 @@ static list step_copy_out_regions(list priv_sec,list out_l)
 static list step_send_regions(list write_l, list out_l)
 {
   // simplification des regions (on ne garde que les contraintes ayant 1 "PHI")
-  MAP(REGION, reg, {step_drop_complex_constraints(reg);}, write_l);
-  MAP(REGION, reg, {step_drop_complex_constraints(reg);}, out_l);
+  FOREACH(REGION, reg, write_l){step_drop_complex_constraints(reg);};
+  FOREACH(REGION, reg, out_l) {step_drop_complex_constraints(reg);};
 
   list send_l = RegionsIntersection(regions_dup(out_l), regions_dup(write_l), w_w_combinable_p);
   list send_final = NIL;
 
-  MAP(REGION,r,{
+  FOREACH(REGION,r,send_l)
+    {
       entity e=region_entity(r);
       if (strcmp(entity_module_name(e),IO_EFFECTS_PACKAGE_NAME) ==0 )
 	pips_user_warning("STEP : possible IO concurrence\n");
       else
 	send_final=CONS(REGION,region_dup(r),send_final);
     }
-    ,send_l);
+
   gen_full_free_list(send_l);
 
   ifdebug(LOCAL_DEBUG) step_print_region("Region Send ", send_final); 
@@ -259,7 +277,7 @@ static boolean step_interlaced_iteration_regions_p(region reg, list loop_data_l)
   Psysteme  s_prime = sc_dup(s);
   pips_debug(1, "reg = %p, loop_data_l = %p\n", reg, loop_data_l);
  
-  MAP(LOOP_DATA,data,
+  FOREACH(LOOP_DATA,data,loop_data_l)
     {
       Pcontrainte c;
       entity l_prime;
@@ -282,7 +300,7 @@ static boolean step_interlaced_iteration_regions_p(region reg, list loop_data_l)
 				    (Variable) l_prime, VALUE_MONE,
 				    TCST, VALUE_ONE));
       sc_add_inegalite(s_prime, contrainte_dup(c));
-    },loop_data_l);
+    }
   
   s = sc_append(s,s_prime);
   s->base = BASE_NULLE;
@@ -298,10 +316,11 @@ static list step_interlaced_iteration_regions(list loop_data_l, list send_l)
 {
   list interlaced_l = NIL;
 
-  MAP(REGION,reg,{
+  FOREACH(REGION,reg,send_l)
+    {
       if (step_interlaced_iteration_regions_p(reg,loop_data_l))
 	interlaced_l = CONS(REGION, reg, interlaced_l);
-    }, send_l);
+    }
 
   ifdebug(LOCAL_DEBUG) step_print_region("Region interlaced ", interlaced_l);
 
@@ -325,17 +344,18 @@ static list step_recv_regions(list send_l, list in_l)
   list recv_l;
   list send_may_l = NIL;
 
-  MAP(REGION,reg,{
-      if (region_may_p(reg))
-	send_may_l=CONS(REGION, reg, send_may_l);
-    }, send_l);
-
+  FOREACH(REGION,r,send_l)
+    {
+      if (region_may_p(r))
+	send_may_l=CONS(REGION, region_dup(r), send_may_l);
+    }
   recv_l = RegionsMustUnion(regions_dup(in_l),regions_dup(send_may_l),r_w_combinable_p);
+
+  gen_full_free_list(send_may_l);
 
   ifdebug(LOCAL_DEBUG) step_print_region("Region Recv ", recv_l);
   return recv_l;
 }
-
 
 #if 0
 /* Recherche des regions USED 
@@ -354,7 +374,7 @@ static list step_used_regions(list read_l, list write_l)
 }
 #endif
 
-static step_region_analyse step_analyse_loop_regions(list read_l, list write_l, list in_l, list out_l, list loop_data_l)
+static step_analyses step_analyse_loop_regions(list read_l, list write_l, list in_l, list out_l, list loop_data_l)
 {
   // Recherche des regions SEND et de leur entrelacement
   list send_l = step_send_regions(write_l, out_l);
@@ -371,10 +391,10 @@ static step_region_analyse step_analyse_loop_regions(list read_l, list write_l, 
   list priv_l = step_private_regions(write_l, in_l, out_l);
   */
 
-  return make_step_region_analyse(recv_l,send_l, interlaced_l,NIL);
+  return make_step_analyses(recv_l, send_l, interlaced_l, NIL);
 }
 
-static step_region_analyse step_analyse_master_regions(list read_l, list write_l, list in_l, list out_l)
+static step_analyses step_analyse_master_regions(list read_l, list write_l, list in_l, list out_l)
 {
   ifdebug(LOCAL_DEBUG)
   {
@@ -385,8 +405,10 @@ static step_region_analyse step_analyse_master_regions(list read_l, list write_l
   }
   // Recherche des regions SEND
   list send_l = step_send_regions(write_l, out_l);
+  list recv_l = step_recv_regions(send_l, in_l);
+
   ifdebug(LOCAL_DEBUG) step_print_region("Region master SEND ", send_l);
-  return make_step_region_analyse(NIL,send_l,NIL,NIL);
+  return make_step_analyses(recv_l, send_l, NIL, NIL);
 }
 
 
@@ -394,7 +416,7 @@ bool step_analyse(string module_name)
 { 
   list region_l,read_l,write_l,in_l,out_l;
   entity module = local_name_to_top_level_entity(module_name);  ;
-  step_region_analyse result=step_region_analyse_undefined;
+  step_analyses result=step_analyses_undefined;
 
   debug_on("STEP_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);
@@ -417,7 +439,7 @@ bool step_analyse(string module_name)
     step_print_region("Region out ", out_l);
   }
 
-  step_load_status();
+  global_step_analyses_load();
   global_directives_load();
   set_current_module_entity(module);
 
@@ -449,7 +471,7 @@ bool step_analyse(string module_name)
 	default:
 	    pips_user_warning("Directive %s : analyse not yet implemented\n", directive_txt(d));
 	}
-      store_or_update_step_analyse_map(module,result);
+      store_or_update_global_step_analyses(module,result);
     }
   else
     pips_debug(2,"Not directive module\n");
@@ -461,7 +483,7 @@ bool step_analyse(string module_name)
 
   generic_effects_reset_all_methods();
   global_directives_save();
-  step_save_status();
+  global_step_analyses_save();
   
   debug_off(); 
   debug_off();

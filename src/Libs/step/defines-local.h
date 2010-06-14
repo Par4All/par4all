@@ -7,9 +7,8 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
-
 /*
 
 Module STEP
@@ -66,40 +65,59 @@ extern int the_current_debug_level;
 #define STEP_SF_SUFFIX ".step_sf"
 #define STEP_MPI_SUFFIX "_MPI"
 #define STEP_OMP_SUFFIX "_OMP"
+#define STEP_HYB_SUFFIX "_HYBRID"
 
-
-#define STEP_DEFAULT_RT_H "src/Scripts/step/default/"
+#define STEP_DEFAULT_RT_H "src/Runtimes/step"
 
 enum {DO_DIRECTIVE,
       SECTION_DIRECTIVE};
 
 #define NAME_BUFFERSIZE 3
 
+/* STEP clause
+ */
+#define STEP_CLAUSE_HYBRID_TXT "!$step hybrid" // transformation MPI & OpenMP
+#define STEP_CLAUSE_NOMPI_TXT "!$step no_mpi"   // transformation OpenMP
+#define STEP_CLAUSE_IGNORE_TXT "!$step ignore"  // transformation sequentielle
+#define STEP_CLAUSE_MPI_TXT "!$step mpi"        // transformation MPI
+
+ // definit les valeurs possible pour la property STEP_DEFAULT_TRANSFORMATION utilisee en l'abscence de clause STEP
+#define STEP_DEFAULT_TRANSFORMATION_OMP_TXT "OMP"
+#define STEP_DEFAULT_TRANSFORMATION_HYBRID_TXT "HYBRID"
+#define STEP_DEFAULT_TRANSFORMATION_MPI_TXT "MPI"
+
+#define STEP_TRANSFORMATION_OMP    1
+#define STEP_TRANSFORMATION_MPI    2
+#define STEP_TRANSFORMATION_HYBRID 3
+#define STEP_TRANSFORMATION_SEQ    4
 
 /* OMP directives text
 */
+
+#define STEP_KEEP_DIRECTIVE_PREFFIX "C$STEP !$omp "
+
 #define OMP_DIRECTIVE "!$OMP "
 #define OMP_DIR_CONT  "!$OMP&"
 
 
-#define PARALLEL_TEXT "parallel"
-#define END_PARALLEL_TEXT "end parallel"
+#define PARALLEL_TXT "parallel"
+#define END_PARALLEL_TXT "end parallel"
 
-#define DO_TEXT "do"
-#define END_DO_TEXT "end do"
-#define PARALLEL_DO_TEXT "parallel do"
-#define END_PARALLEL_DO_TEXT "end parallel do"
+#define DO_TXT "do"
+#define END_DO_TXT "end do"
+#define PARALLEL_DO_TXT "parallel do"
+#define END_PARALLEL_DO_TXT "end parallel do"
 
-#define SECTIONS_TEXT "sections"
-#define END_SECTIONS_TEXT "end sections"
-#define PARALLEL_SECTIONS_TEXT "parallel sections"
-#define END_PARALLEL_SECTIONS_TEXT "end parallel sections"
-#define SECTION_TEXT "section"
+#define SECTIONS_TXT "sections"
+#define END_SECTIONS_TXT "end sections"
+#define PARALLEL_SECTIONS_TXT "parallel sections"
+#define END_PARALLEL_SECTIONS_TXT "end parallel sections"
+#define SECTION_TXT "section"
 
-#define MASTER_TEXT "master"
-#define END_MASTER_TEXT "end master"
+#define MASTER_TXT "master"
+#define END_MASTER_TXT "end master"
 
-#define BARRIER_TEXT "barrier"
+#define BARRIER_TXT "barrier"
 
 /* Suffix for generated OMP directives routines
 */

@@ -5,9 +5,8 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -44,7 +43,7 @@ instruction handle_omp_master(directive begin,directive end)
   instruction i;
   entity directive_module=outlining_start(directive_module_name(begin));
   outlining_scan_block(directive_body(begin));
-  call=outlining_close();
+  call=outlining_close(step_directives_USER_FILE_name());
   if(statement_comments(call)!=empty_comments)
     {
       free(statement_comments(call));
@@ -68,7 +67,7 @@ string directive_omp_master_to_string(directive d,bool close)
 {
   pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
-    return strdup(END_MASTER_TEXT);
+    return strdup(END_MASTER_TXT);
   else
-    return strdup(MASTER_TEXT);
+    return strdup(MASTER_TXT);
 }

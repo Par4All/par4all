@@ -6,9 +6,8 @@ The program is distributed under the terms of the GNU General Public
 License.
 */
 
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 #include "preprocessor.h"
@@ -110,16 +109,16 @@ static bool outlining_loop_filter(loop l)
 
 static bool outlining_entity_filter(entity e)
 {
-  pips_debug(1, "e = %p\n", e);
+  pips_debug(5, "e = %p\n", e);
 
   if (gen_in_list_p(e,outline_list))
     {
-      pips_debug(3,"entity %s already treated\n", entity_global_name(e));
+      pips_debug(5,"entity %s already treated\n", entity_global_name(e));
       return TRUE;
     }
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(get_current_module_entity())))))
     {
-      pips_debug(4,"entity %s not in %s declaration\n", entity_global_name(e), entity_global_name(get_current_module_entity()));
+      pips_debug(5,"entity %s not in %s declaration\n", entity_global_name(e), entity_global_name(get_current_module_entity()));
       return TRUE;
     }
   if(entity_variable_p(e)) // scan entity in type
@@ -128,10 +127,10 @@ static bool outlining_entity_filter(entity e)
 			call_domain,outlining_call_filter,gen_null,
 			NULL);
 
-  pips_debug(3,"new scanned entity %s\n", entity_global_name(e));
+  pips_debug(5,"new scanned entity %s\n", entity_global_name(e));
   outline_list=CONS(ENTITY,e,outline_list);      
 
-  pips_debug(1, "end\n");
+  pips_debug(5, "end\n");
   return TRUE;
 }
 
@@ -159,7 +158,7 @@ list outlining_scan_block(list block_list)
 
 static void outlining_make_argument(entity e, expression expr)
 {
-  pips_debug(1, "e = %p, expr = %p\n", e, expr);
+  pips_debug(3, "e = %p, expr = %p\n", e, expr);
 
   pips_assert("outlined_module",!entity_undefined_p(outlined_module));
   pips_assert("outline_list",!list_undefined_p(outline_list));
@@ -181,31 +180,49 @@ static void outlining_make_argument(entity e, expression expr)
 		 functional_parameters(ft));
       outline_data_formal(outline_outlining)=CONS(ENTITY,new_entity,outline_data_formal(outline_outlining));
       outline_data_arguments(outline_outlining)=CONS(EXPRESSION,expr,outline_data_arguments(outline_outlining));
-      pips_debug(2,"add argument %s\n", entity_global_name(e));
+      pips_debug(3,"add argument %s\n", entity_global_name(e));
     }
       else
 	entity_storage(new_entity) = copy_storage(entity_storage(e));
   
-  pips_debug(2,"add entity %s\n", entity_global_name(new_entity));
+  pips_debug(3,"add entity %s\n", entity_global_name(new_entity));
   code_declarations(value_code(entity_initial(outlined_module)))=CONS(ENTITY,new_entity,code_declarations(value_code(entity_initial(outlined_module))));
 
-  pips_debug(1, "fin\n");
+  pips_debug(3, "fin\n");
 }
 
 void outlining_add_argument(entity e,expression expr)
 {
-  pips_debug(1, "e = %p, expr = %p\n", e, expr);
+  pips_debug(3, "e = %p, expr = %p\n", e, expr);
 
   pips_assert("step", outline_step==2);
   gen_remove(&outline_list,e);
   outlining_make_argument(e,expr);
 
-  pips_debug(1, "fin\n");
+  pips_debug(3, "fin\n");
 }
 
 //####################### OUTLINE STEP 3 #######################
 
-statement outlining_close(void)
+
+static expression entity_to_expr(e)
+     entity e;
+{
+  switch (type_tag(entity_type(e))){
+  case is_type_variable:
+    return reference_to_expression(make_reference(e,NIL));
+    break;
+  case is_type_functional:
+    return call_to_expression(make_call(e,NIL));
+    break;
+  default:
+    pips_internal_error("unexpected entity tag: %d\n", type_tag(entity_type(e)));
+    return expression_undefined; 
+  }
+}
+
+
+statement outlining_close(string new_user_file)
 {
   entity label = entity_undefined;
   statement call = statement_undefined;
@@ -217,9 +234,10 @@ statement outlining_close(void)
 
   // argument building
   outline_list = gen_nreverse(outline_list);
-  MAP(ENTITY, e,{
+  FOREACH(ENTITY, e, outline_list)
+    {
       outlining_make_argument(e,entity_to_expr(e));
-    }, outline_list);
+    }
 
   code_declarations(value_code(entity_initial(outlined_module))) = gen_nreverse(code_declarations(value_code(entity_initial(outlined_module))));
   outline_data_formal(outline_outlining) = gen_nreverse(outline_data_formal(outline_outlining));
@@ -250,6 +268,9 @@ statement outlining_close(void)
   add_new_module(entity_local_name(outlined_module), outlined_module, source_body, TRUE);
   free_statement(source_body);
 
+  if(new_user_file && !string_undefined_p(new_user_file))
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_local_name(outlined_module), new_user_file);
+
   store_outline(outlined_module,outline_outlining);
   pips_debug(1,"New outlined module : %s\n", entity_user_name(outlined_module));
   
@@ -278,7 +299,7 @@ static bool outline_statement(statement stmt,string name,int from, int to)
       list block=CONS(STATEMENT,stmt,NIL);
       outlining_scan_block(block);
       gen_free_list(block);
-      call=outlining_close();
+      call=outlining_close(NULL);
       free_instruction(statement_instruction(stmt));
       statement_instruction(stmt)=statement_instruction(call);
       statement_comments(stmt)=statement_comments(call);
@@ -301,26 +322,26 @@ static bool outline_block(statement stmt, string name, int from, int to)
   if (!instruction_sequence_p(statement_instruction(stmt)))
     return FALSE;
 
-  MAP(STATEMENT,s,
-      {
-	if (!end_p && !record_p && from==statement_number(s))
-	  record_p=TRUE;
-	if (!end_p && record_p)
-	  block_list=CONS(STATEMENT,s,block_list);
-	else
-	  treated=CONS(STATEMENT,s,treated);
-	if (!end_p && to==statement_number(s))
-	  {
-	    end_p=TRUE;
-	    // block outlining
-	    if(outlining_start(name))
-	      {
-		outlining_scan_block(block_list);
-		call=outlining_close();
-		treated=CONS(STATEMENT,call,treated);
-	      }
-	  }
-      },sequence_statements(instruction_sequence(statement_instruction(stmt))));
+  FOREACH(STATEMENT,s,sequence_statements(instruction_sequence(statement_instruction(stmt))))
+    {
+      if (!end_p && !record_p && from==statement_number(s))
+	record_p=TRUE;
+      if (!end_p && record_p)
+	block_list=CONS(STATEMENT,s,block_list);
+      else
+	treated=CONS(STATEMENT,s,treated);
+      if (!end_p && to==statement_number(s))
+	{
+	  end_p=TRUE;
+	  // block outlining
+	  if(outlining_start(name))
+	    {
+	      outlining_scan_block(block_list);
+	      call=outlining_close(NULL);
+	      treated=CONS(STATEMENT,call,treated);
+	    }
+	}
+    }
   if (end_p)
       sequence_statements(instruction_sequence(statement_instruction(stmt)))=gen_nreverse(treated);
   else
@@ -433,11 +454,12 @@ static bool inline_outlined_block(statement stmt)
   pips_debug(1,"stmt = %p\n", stmt);
 
   STEP_DEBUG_STATEMENT(3,"current",stmt);
-
+  
   if (!statement_block_p(stmt))
     return FALSE;
 
-  MAP(STATEMENT,s,{
+  FOREACH(STATEMENT,s,sequence_statements(instruction_sequence(statement_instruction(stmt))))
+    {
       if(statement_call_p(s) && strcmp(target_label,entity_name(statement_label(s)))==0)
 	{
 	  entity function = call_function(instruction_call(statement_instruction(s)));
@@ -447,13 +469,13 @@ static bool inline_outlined_block(statement stmt)
 	      outline_outlining = load_outline(function);
 	      list block = outline_data_block(outline_outlining);
 	      outline_outlining = outline_data_undefined;
-	      treated = gen_append(gen_nreverse(gen_full_copy_list(block)),treated);
+	      treated = gen_nconc(gen_nreverse(gen_full_copy_list(block)),treated);
 	      delete_outline(function);
 	    }
 	}
       else
 	treated=CONS(STATEMENT,s,treated); 
-    },sequence_statements(instruction_sequence(statement_instruction(stmt))));
+    }
 
   if(find_p)
       sequence_statements(instruction_sequence(statement_instruction(stmt)))=gen_nreverse(treated);

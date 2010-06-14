@@ -6,58 +6,31 @@
 #The program is distributed under the terms of the GNU General Public
 #License.
 
-# Ce script filtre le code généré par PIPS pour remplecer l'inclusion de STEP.h par 'include "STEP.h"'
-# - le premier argument indique le répertoir d'instalation
-# - les arguments suivant indique les fichiers à filtrer
+# Ce script installe dans le répertoire $DEST_DIR les fichiers générés dans le répertoire $SRC_DIR et les fichiers de la runtime de STEP
+# - le premier argument indique le répertoir d'instalation $DEST_DIR
+# - les arguments suivant indique le répertoire contenant les fichiers générés
 
-install_dir=$1
-shift
+RUNTIME=$1
+DEST_DIR=$2
+SRC_DIR=$3
 
-mkdir -p $install_dir;
+STEP_RT=step_rt
+DEFAULT_STEP_HEADER=STEP.h
+STEP_HEADER=STEP.h
 
-while [[ $# -gt 0 ]];
-do
-    exec 4< $1
-    exec 5> $install_dir/step.tmp
-    cut=0
 
-    while read -u 4; do
-	case $REPLY in
-	    "! include \"STEP.h\"" )
-		if (($cut == 0)) 
-		then
-		    cut=1
-		else
-		    echo >&5 "$REPLY"
-		fi
-	    ;;
-	    "! end include \"STEP.h\"" )
-		if (($cut == 1))
-		then
-		    cut=0
-		else
-		    echo >&5 "$REPLY"
-		fi
-		;;
-	    "!       include \"STEP.h\"" )
-		echo >&5 "      include \"STEP.h\"";
-		;;
-	    "! MIL-STD-1753 Fortran extension not in PIPS" )
-		;;
-	    "!       implicit none" )
-		echo >&5 "      implicit none";
-		;;
-	    * )
-		if (($cut == 0))
-		then
-		    echo >&5 "$REPLY"
-		fi
-	esac
-    done
+#filtrage des includes $DEFAULT_STEP_HEADER et deplacement des fichiers générés
+step_filtre_include $DEST_DIR $DEFAULT_STEP_HEADER $STEP_HEADER $SRC_DIR/*
 
-    exec 4<&-
-    exec 5>&-
+#installation des fichiers de la runtime
+mkdir -p $DEST_DIR/$STEP_RT
 
-    mv $install_dir/step.tmp $install_dir/$(basename $1)
-    shift
-done
+cp $PIPS_ROOT/src/Runtimes/step/$RUNTIME/* $DEST_DIR/$STEP_RT
+cp -r $PIPS_ROOT/src/Runtimes/step/util $DEST_DIR/$STEP_RT
+
+#installation des fichiers .h
+cp $PIPS_ROOT/src/Runtimes/step/STEP.h $DEST_DIR
+cp $PIPS_ROOT/src/Runtimes/step/steprt_f.h $DEST_DIR
+
+#installation du Makefile par defaut
+cp $PIPS_ROOT/src/Runtimes/step/Makefile $DEST_DIR

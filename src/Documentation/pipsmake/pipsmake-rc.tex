@@ -6058,12 +6058,25 @@ HPFC_EXTRACT_LATTICE TRUE
 
 \marginpar{RK: IT SudParis : insert your documentation here}
 
+\subsubsection{STEP outlining-inlining}
+
+\begin{PipsPass}{outlining_init}
+The \PipsPassRef{outlining_init} phase initialize the
+\texttt{PROGRAM.outlined} ressource keeping trace of outlinined
+modules.
+\end{PipsPass}
+
 \begin{PipsMake}
 outlining_init              > PROGRAM.outlined
 \end{PipsMake}
 
+\begin{PipsPass}{step_outlining}
+The \PipsPassRef{step_outlining} phase is to test the outliner used
+by STEP.
+\end{PipsPass}
+
 \begin{PipsMake}
-step_outlining                   > PROGRAM.outlined
+step_outlining              > PROGRAM.outlined
                             > MODULE.code
                             > MODULE.callees
    < PROGRAM.entities
@@ -6071,6 +6084,13 @@ step_outlining                   > PROGRAM.outlined
    < MODULE.code
    < MODULE.callees
 \end{PipsMake}
+
+The property \PipsPropRef{OUTLINING_NAME} is the name for the new outlined
+module. The statement outlined are the statments which statement
+number are between \PipsPropRef{OUTLINING_FROM} and \PipsPropRef{OUTLINING_TO}.
+If the property \PipsPropRef{OUTLINING_SYMBOLIC} is set to true, the
+symbolic parametres are passed as argument to the outlined module.
+
 
 \begin{PipsProp}{OUTLINING_NAME} 
 OUTLINING_NAME "outline"
@@ -6084,6 +6104,14 @@ OUTLINING_TO 0
 \begin{PipsProp}{OUTLINING_SYMBOLIC} 
 OUTLINING_SYMBOLIC TRUE
 \end{PipsProp}
+
+\begin{PipsPass}{step_inlining}
+The \PipsPassRef{step_inlining} phase is the reverse transformation of
+\PipsPassRef{step_outlining}. During the outlining, the new call
+statement is labelized. Setting the property
+\PipsPropRef{INLINING_LABEL} with this label inligne the code
+previously outlined by \PipsPassRef{step_outlining}.
+\end{PipsPass}
 
 \begin{PipsMake}
 step_inlining               > PROGRAM.outlined
@@ -6099,15 +6127,33 @@ step_inlining               > PROGRAM.outlined
 INLINING_LABEL 0
 \end{PipsProp}
 
+\subsubsection{STEP Directives}
+
+\begin{PipsPass}{directives_init}
+The \PipsPassRef{directives_init} phase init the
+\texttt{PROGRAM.directives} ressource keeping trace of the directives
+reconized by the \PipsPassRef{step_directives} phase.
+\end{PipsPass}
 
 \begin{PipsMake}
 directives_init             > PROGRAM.directives
 \end{PipsMake}
 
+\begin{PipsPass}{directive_filter}
+The \PipsPassRef{directive_filter} phase preproces an original
+source file to transform the OpenMP directives in statement
+understandable by the Pips parser.
+\end{PipsPass}
+
 \begin{PipsMake}
 directive_filter            > MODULE.directive_filtered_file
    < MODULE.source_file
 \end{PipsMake}
+
+\begin{PipsPass}{directive_parser}
+The \PipsPassRef{directive_parser} phase invoke the PIPS parser on
+pre-proceed source file \texttt{MODULES.directive\_filtered\_file}
+\end{PipsPass}
 
 \begin{PipsMake}
 directive_parser            > MODULE.parsed_code
@@ -6116,23 +6162,45 @@ directive_parser            > MODULE.parsed_code
    < MODULE.directive_filtered_file
 \end{PipsMake}
 
+\begin{PipsPass}{step_directives}
+The \PipsPassRef{step_directives} phase identifies the OpenMP
+constructs and outlines them in new modules. The directive semantics
+of outlined modules are stored in the \texttt{PROGRAM.directives} ressource.
+\end{PipsPass}
+
 \begin{PipsMake}
 step_directives             > PROGRAM.directives
                             > PROGRAM.outlined
                             > MODULE.code
                             > MODULE.callees
    ! MODULE.directive_parser
-   < PROGRAM.directives
-   < PROGRAM.outlined
    < PROGRAM.entities
+   < PROGRAM.outlined
+   < PROGRAM.directives
    < MODULE.code
    < MODULE.callees
 \end{PipsMake}
 
 
+\subsubsection{STEP Analysis}
+
+\begin{PipsPass}{step_init}
+The \PipsPassRef{step_init} phase init the
+\texttt{PROGRAM.step\_status} and \texttt{PROGRAM.step\_analyses}
+ressources 
+\end{PipsPass}
+
 \begin{PipsMake}
 step_init                   > PROGRAM.step_status
+                            > PROGRAM.step_analyses
 \end{PipsMake}
+
+
+\begin{PipsPass}{step_atomize}
+The \PipsPassRef{step_atomize} phase transforms the code for
+expressions analyses and keep trace of the transformation in the
+\texttt{step\_atomized} ressource. 
+\end{PipsPass}
 
 \begin{PipsMake}
 step_atomize                > MODULE.code
@@ -6141,17 +6209,27 @@ step_atomize                > MODULE.code
    < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{step_analyse}
+The \PipsPassRef{step_analyse} phase triggers the regions analyses to
+compute SEND regions leading to MPI messages.
+\end{PipsPass}
+
 \begin{PipsMake}
-step_analyse                > PROGRAM.step_status
-   < PROGRAM.directives
-   < PROGRAM.step_status
+step_analyse                > PROGRAM.step_analyses
    < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
    < MODULE.code
    < MODULE.summary_regions
    < MODULE.in_summary_regions
    < MODULE.out_summary_regions
 \end{PipsMake}
 
+\begin{PipsPass}{step_unatomize}
+The\PipsPassRef{step_unatomize} phase perfome the reverse
+transformation of the \PipsPassRef{step_atomize} phase in order to
+source-to-source transformation.
+\end{PipsPass}
 \begin{PipsMake}
 step_unatomize              > MODULE.code
                             > MODULE.step_atomized
@@ -6160,31 +6238,68 @@ step_unatomize              > MODULE.code
    < MODULE.code
 \end{PipsMake}
 
+
+\subsubsection{STEP code generation}
+
+Based on the OpenMP construct and analyses, new modules are generated
+to translate the original code with OpenMP directives. The default
+code transformation for OpenMP construct is driven by the
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} property. the deferent value
+allowed are :
+\begin{itemize}
+\item \verb+"HYBRID"+ : for OpenMP and MPI parallel code
+\item \verb+"MPI"+ : for MPI parallel code
+\item \verb+"OMP"+ : for OpenMP parallel code
+\end{itemize}
+
+The \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
+with the generated sources. The allowed value are :
+\begin{itemize}
+\item \verb+"c"+
+\item \verb+"fortran"+ (no more maintained)
+\end{itemize}
+
+\begin{PipsProp}{STEP_DEFAULT_TRANSFORMATION}
+STEP_DEFAULT_TRANSFORMATION "HYBRID"
+\end{PipsProp}
+\begin{PipsProp}{STEP_RUNTIME}
+STEP_RUNTIME "c"
+\end{PipsProp}
+
+\begin{PipsPass}{step_compile}
+The \PipsPassRef{step_compile} phase generates source code for OpenMP
+constructs depending of the transformation desired. Each OpenMP
+construct could have a specific transformation define by STEP
+clauses (without specific clauses, the
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} is used)
+The specific STEP clauses allowed are :
+\begin{itemize}
+\item \verb+"!\$step hybrid"+ : for OpenMP and MPI parallel code
+\item \verb+"!\$step no\_mpi"+ : for OpenMP parallel code
+\item \verb+"!\$step mpi"+ : for MPI parallel code
+\item \verb+"!\$step ignore"+ : for sequential code
+\end{itemize}
+\end{PipsPass}
+
 \begin{PipsMake}
-step_mpi                   > PROGRAM.step_status
-   < PROGRAM.directives
-   < PROGRAM.step_status
-   < PROGRAM.outlined
-   < PROGRAM.entities
-   < MODULE.code
-
-step_omp                   > PROGRAM.step_status
-   < PROGRAM.directives
-   < PROGRAM.step_status
-   < PROGRAM.outlined
-   < PROGRAM.entities
-   < MODULE.code
-
 step_compile               > PROGRAM.step_status
                            > MODULE.code
                            > MODULE.callees
    ! CALLEES.step_compile
-   < PROGRAM.directives
-   < PROGRAM.step_status
-   < PROGRAM.outlined
    < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
+   < PROGRAM.step_status
    < MODULE.code
+\end{PipsMake}
 
+\begin{PipsPass}{step_install}
+The \PipsPassRef{step_install} phase copy the generated source files
+in the directory specified by the \PipsPropRef{STEP_INSTALL_PATH}
+property.
+\end{PipsPass}
+
+\begin{PipsMake}
 step_install               > PROGRAM.user_file
                            > ALL.user_file
    < ALL.user_file

@@ -1,80 +1,87 @@
-* Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
+* Copyright 2007, 2008, 2009 Alain Muller, Frederique Silber-Chaussumier, Christian Parrot
 *
 *This file is part of STEP.
 *
 *The program is distributed under the terms of the GNU General Public
 *License.
 
-
-
-
       subroutine STEP_get_myloopslice(i)
       INTEGER STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
       COMMON /MYLOOPSLICE/ STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
-
       i = STEP_MYLOOPSLICE
       end
 
       subroutine STEP_get_i_low(i)
       INTEGER STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
       COMMON /MYLOOPSLICE/ STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
-
       i = STEP_I_LOW
-      END
+      end
 
       subroutine STEP_get_i_up(i)
       INTEGER STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
       COMMON /MYLOOPSLICE/ STEP_I_LOW, STEP_I_UP, STEP_MYLOOPSLICE
-
       i = STEP_I_UP
       end
 
       subroutine STEP_Init()
       implicit none
+      include 'mpif.h'
       include 'STEP.h'
-      integer*4 ierr,iBidon
+      include 'steprt.h'                                                                                  
       logical Initialized
-      call MPI_Initialized(Initialized,ierr )
+      integer*4 iErr,iBidon,internalRank,internalSize,provided
+      call MPI_Initialized(Initialized,iErr )
       if (.not. Initialized) then
-         call MPI_Init ( ierr )
-!     print *, STEP_size, STEP_rank
+         call MPI_Init_Thread ( MPI_THREAD_FUNNELED,provided,iErr )
+         if (provided .NE. MPI_THREAD_FUNNELED) then
+            print *, "STEP_Init() : FUNNELED support not provided"
+         end if
       end if
-      call MPI_Comm_size ( MPI_COMM_WORLD, STEP_size, ierr )
-      call MPI_Comm_rank ( MPI_COMM_WORLD, STEP_rank, ierr )      
-
+      call MPI_Comm_size ( MPI_COMM_WORLD, internalSize, iErr )
+      call MPI_Comm_rank ( MPI_COMM_WORLD, internalRank, iErr )
+      STEP_rank=internalRank
+      STEP_size=internalSize
       if (STEP_size .gt. STEP_MAX_NBNODE) then
          print *,"STEP_Init() : STEP_MAX_NBNODE
-     &trop petit (update STEP.h) STEP_size = ",STEP_size
-         call MPI_ABORT(MPI_COMM_WORLD, iBidon, ierr)
+     &trop petit (update STEP.h) STEP_size = ",internalSize
+         call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
       end if
       end
       
+      subroutine step_init_fortran_order()
+      call STEP_Init
+      end
+
       subroutine STEP_Finalize()
       implicit none
       include 'mpif.h'
-      integer*4 ierr
-      call MPI_Finalize(ierr)
+      integer*4 iErr
+      call MPI_Finalize(iErr)
       end
 
       subroutine STEP_Barrier()
       implicit none
       include 'mpif.h'
-      integer*4 ierr
-      call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+      integer*4 iErr
+      call MPI_BARRIER(MPI_COMM_WORLD,iErr)
       end
 
       subroutine STEP_Get_size(size)
       implicit none
       include 'mpif.h'
-      integer*4 size,ierr
-      call MPI_Comm_size (  MPI_COMM_WORLD, size, ierr )
+      integer size
+      integer*4 internalSize,iErr
+      call MPI_Comm_size (  MPI_COMM_WORLD, internalSize, iErr )
+      size=internalSize
       end
 
       subroutine STEP_Get_rank(rank)
       implicit none
       include 'mpif.h'
-      integer*4 rank,ierr
-      call MPI_Comm_rank ( MPI_COMM_WORLD, rank, ierr )
+      integer rank
+      integer*4 internalRank,iErr
+      call MPI_Comm_rank ( MPI_COMM_WORLD, internalRank, iErr )
+      rank=internalRank
       end
 	
       function STEP_Get_thread_num()
@@ -89,10 +96,6 @@
       parameter (F=1,T=2)
       integer bounds(F:T,size)
       integer nb_indices,nb_i,nb_e,i
-      
-c      print *,'from',from,'to',to,'step',step,'nb',nb,'size',size,
-c     * 'bounds'
-
       do 5 i=1,size
          bounds(F,i)=-1
          bounds(T,i)=-1
@@ -105,7 +108,6 @@ c         print *,'pas d''iteration'
  10         bounds(T,i)=from
       else
          nb_indices=(to-from)/step+1
-c         print *,nb_indices,' iterations'
          if (nb_indices.LE.nb) then ! une iteration par noeud
 c            print *,'au plus une iteration par noeud'
             bounds(F,1)=from
@@ -135,42 +137,35 @@ c               print *,'do35',i
  35            bounds(T,i)=bounds(F,i)+(nb_e-1)*step
          endif
       endif
-    
-c      print *,bounds
       end
       
-******************************************
-c
 c     procédure produisant type_sub_region (handler de  type MPI) 
 c     représentant la sous-region subregion définit dans l'espace d'indice region
 c     d'élément de type type_region (handler de type MPI)
-c
       subroutine type_subRegion(dim,region,sub_region,type_region,
      &     type_sub_region)
       implicit none
+      include 'mpif.h'
       include 'STEP.h'
+      include 'steprt.h'
       integer dim               !< nombre de dimension de l'espace
       integer L,U
       parameter (L=1, U=2)
       integer region(L:U,dim)      !< borne min/max des indices selon chaque dimension
-      integer*4 sub_region(L:U,dim)      !< borne min/max des indices selon chaque dimension
       integer type_region       !< type MPI décrivant un element de la region
       integer type_sub_region   !> type MPI décrivant la sous-region
-      
-      integer*4 array_type(0:STEP_MAX_DIM),data_size(0:STEP_MAX_DIM),i
-      integer*4 iBidon,IERROR
       logical valide
-
+      integer sub_region(L:U,dim)      !< borne min/max des indices selon chaque dimension
+      integer*4 internalSub_region
+      integer*4 array_type(0:STEP_MAX_DIM),data_size(0:STEP_MAX_DIM),i
+      integer*4 iBidon,iErr
       if (dim .gt. STEP_MAX_DIM) then
          print *,"type_subRegion() : STEP_MAX_DIM 
      &trop petit (update STEP.h) dim = ",dim
-         call MPI_ABORT(MPI_COMM_WORLD, iBidon, IERROR)
+         call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
       end if
-!      print *,'dim=',dim,'region =',region,
-!     &     'sub_region =',sub_region
-
       array_type(0)=type_region
-      call MPI_TYPE_EXTENT(array_type(0),data_size(0),IERROR)
+      call MPI_TYPE_EXTENT(array_type(0),data_size(0),iErr)
       i=1
       valide=.TRUE.
       do while (valide .AND. (i.LE.dim))
@@ -183,20 +178,18 @@ c     verification des définitions des régions/sous-regions
          else
             data_size(i)=data_size(i-1)*
      &           (region(U,i)-region(L,i)+1)
+            internalSub_region=sub_region(U,i)-sub_region(L,i)+1
             call MPI_TYPE_HVECTOR(
-     &           sub_region(U,i)-sub_region(L,i)+1, 1,
-     &           data_size(i-1), array_type(i-1), array_type(i),IERROR)
+     &           internalSub_region, 1,
+     &           data_size(i-1), array_type(i-1), array_type(i),iErr)
          endif
          i=i+1
       enddo
       type_sub_region=array_type(dim)
       end
       
-******************************************
-c     
 c     retourne la taille d'un tableau donc l'espace des indices 
 c     est définit par region
-      
       function STEP_SizeRegion(dim,region)
       implicit none
       integer dim,d,STEP_sizeRegion
@@ -209,10 +202,8 @@ c     est définit par region
  10   continue
       end
 
-c     
 c     retourne l'indice dans un tableau linéaire dont l'indice commence à 1,
 c     d'une case de cordonnées coords définit pour l'espace d'indice  region 
-c     
       function indice(dim,coords,region)
       implicit none
       integer dim,d,indice
@@ -228,59 +219,60 @@ c
       indice=indice+1
       end
       
-c     
 c     retourne l'indice dans un tableau linéaire dont l'indice commence à 1,
 c     de l'origine d'une sous-region subregion, définit dans l'espace d'indice
 c     definit par region
-c     
       function origine(dim,region,subregion)
       implicit none
+      include 'mpif.h'
       include 'STEP.h'
+      include 'steprt.h'
       integer dim,d,origine,indice
       integer L,U
       parameter (L=1,U=2)
       integer region(L:U,dim)
       integer subregion(L:U,dim)
       integer coords(STEP_MAX_DIM)
-      integer*4 iBidon, IERROR
-
+      integer*4 iBidon, iErr
       if (dim .gt. STEP_MAX_DIM) then
          print *,"origine() : STEP_MAX_DIM 
      &trop petit (update STEP.h) dim = ",dim
-         call MPI_ABORT(MPI_COMM_WORLD, iBidon, IERROR)
+         call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
       end if
       do 10 d=1,dim
          coords(d)=subregion(L,d)
  10   continue
       origine=indice(dim,coords,region)
-!      print *,'\nregion=',region,'\nsubregion=',subregion,
-!     &     '\ncoords=',coords,'\norigine=',origine
       end
 
-******************************************
-       subroutine STEP_WaitAll(NbReq,Request)
+      subroutine STEP_WaitAll(NbReq,Request)
       implicit none
+      include 'mpif.h'
       include 'STEP.h'
-      integer*4 NbReq,Request(NbReq)
+      include 'steprt.h'
+      integer iReq
+      integer NbReq,Request(NbReq)
+      integer*4 internalNbReq,internalRequest(NbReq)
       integer*4 Status(MPI_STATUS_SIZE,STEP_MAX_NBREQ)
       integer*4 iErr,iBidon
-
       if (NbReq .gt. STEP_MAX_NBREQ) then
          print *,"STEP_WaitAll() : STEP_MAX_NBREQ
      &trop petit (update STEP.h) NbReq = ",NbReq
          call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
       end if
-      call MPI_BARRIER(MPI_COMM_WORLD,iErr)
-      if (iErr .ne. MPI_SUCCESS) then
-         print *,'STEP_WaitAll() : MPI_BARRIER() Pb'
-         call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
-      end if
       if (NbReq .ne. 0) then
-         call mpi_waitall(NbReq,Request,Status,iErr)
+         internalNbReq=NbReq
+         do 10 iReq=1,NbReq
+            internalRequest(iReq)=Request(iReq)
+ 10      continue
+         call mpi_waitall(internalNbReq,internalRequest,Status,iErr)
          if (iErr .ne. MPI_SUCCESS) then
             print *,'STEP_WaitAll() : mpi_wait_all() Pb'
             call MPI_ABORT(MPI_COMM_WORLD, iBidon, iErr)
          end if
+         do 20 iReq=1,NbReq
+            Request(iReq)=internalRequest(iReq)
+ 20      continue
       end if
       end
 

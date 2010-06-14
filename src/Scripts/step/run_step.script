@@ -35,13 +35,14 @@ usage()
             -s file: stubs files for pips analysis (file.stubs.f file.fix file.f)
             -d destination: destination directory
             -v: verbose
+            -t transformation: default transformation OMP,MPI or HYBRID (default OMP)
 
 	END
   exit ${1:-1}
 }
 
 # options
-while getopts i:g:cfs:d:v OPT
+while getopts i:g:cfs:d:vt:r: OPT
 do
   case $OPT in
     i) INCLUDE=$OPTARG;;
@@ -51,6 +52,8 @@ do
     s) STUBS="$STUBS $OPTARG";;
     d) destination=$OPTARG;;
     v) VERBOSE="verbose";;
+    t) TRANSFORMATION=$OPTARG;;
+    r) RUNTIME=$OPTARG;;
     *) usage 4
   esac
 done
@@ -77,6 +80,14 @@ case $extension in
 	shift;
 	;;
 esac
+
+if [ -n "$RUNTIME" ]
+then RUNTIME="setproperty STEP_RUNTIME \""$RUNTIME"\"";
+fi
+
+if [ -z "$TRANSFORMATION" ]
+then TRANSFORMATION="HYBRID";
+fi
 
 if [ -z "$destination" ]
 then destination=$workspace;
@@ -113,8 +124,8 @@ then
 	echo "cp $f $destination/Source/;"
 	cp $f $destination/Source/;
 	f=$f"ix"
-	echo "cp $f $destination/;"
-	cp $f $destination/;
+	echo "cp $f $destination/Source/;"
+	cp $f $destination/Source/;
 	
 	source_files="$source_files ./Source/$(basename $stub)";
     done
@@ -144,7 +155,10 @@ cat >$tpips_file <<EOF
 delete $workspace
 create $workspace $source_files
 activate MUST_REGIONS
+activate INTRAPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
+setproperty STEP_DEFAULT_TRANSFORMATION "$TRANSFORMATION"
+$RUNTIME
 apply STEP_DIRECTIVES[%ALL]
 apply STEP_ANALYSE[%ALL]
 apply STEP_COMPILE[%MAIN]
@@ -159,8 +173,10 @@ then
     do
 	f=$(basename $f)
 	cat >>$tpips_file <<EOF
+!rm ./$workspace.database/Src/$f.stubs.f
 !cd ./Source && cp $f.f ../$workspace.database/Src/
-!. $f.fix ./$workspace.database/Src/
+!bash ./Source/$f.fix ./$workspace.database/Src/
+
 EOF
     done
 fi
