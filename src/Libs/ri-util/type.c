@@ -2418,6 +2418,26 @@ type make_standard_integer_type(type t, int size)
     }
 }
 
+/* Used to encode the long keyword in the parser. Used to detect long
+   double type in parser*/
+bool standard_long_integer_type_p(type t)
+{
+  bool long_p = FALSE;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_int_p(b)) {
+      int s = basic_int(b);
+
+      long_p = ENDP(variable_dimensions(v))
+	&& ENDP(variable_qualifiers(v))
+	&& (s == DEFAULT_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+    }
+  }
+}
+
 type make_standard_long_integer_type(type t)
 {
   if (t == type_undefined)

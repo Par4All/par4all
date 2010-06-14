@@ -2218,7 +2218,17 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_DOUBLE
                         {
-			  variable v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
+			  variable v = variable_undefined;
+			  type t = c_parser_context_type(ycontext);
+
+			  if(type_undefined_p(t))
+			    v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
+			  else {
+			    if(standard_long_integer_type_p(t))
+			      v = make_variable(make_basic_float(DEFAULT_QUADPRECISION_TYPE_SIZE),NIL,NIL);
+			    else
+			      v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
+			  }
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}

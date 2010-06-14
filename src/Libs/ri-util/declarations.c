@@ -331,10 +331,10 @@ list words_basic(basic obj, list pdl)
                 pc = CHAIN_SWORD(pc,"int");
                 break;
               case 6:
-                pc = CHAIN_SWORD(pc,"long");
+                pc = CHAIN_SWORD(pc,"long int");
                 break;
               case 8:
-                pc = CHAIN_SWORD(pc,"long long");
+                pc = CHAIN_SWORD(pc,"long long int");
                 break;
               case 11:
                 pc = CHAIN_SWORD(pc,"unsigned char");
@@ -346,10 +346,10 @@ list words_basic(basic obj, list pdl)
                 pc = CHAIN_SWORD(pc,"unsigned int");
                 break;
               case 16:
-                pc = CHAIN_SWORD(pc,"unsigned long");
+                pc = CHAIN_SWORD(pc,"unsigned long int");
                 break;
               case 18:
-                pc = CHAIN_SWORD(pc,"unsigned long long");
+                pc = CHAIN_SWORD(pc,"unsigned long long int");
                 break;
               case 21:
                 pc = CHAIN_SWORD(pc,"signed char");
@@ -361,10 +361,10 @@ list words_basic(basic obj, list pdl)
                 pc = CHAIN_SWORD(pc,"signed int");
                 break;
               case 26:
-                pc = CHAIN_SWORD(pc,"signed long");
+                pc = CHAIN_SWORD(pc,"signed long int");
                 break;
               case 28:
-                pc = CHAIN_SWORD(pc,"signed long long");
+                pc = CHAIN_SWORD(pc,"signed long long int");
                 break;
             }
             break;
@@ -388,6 +388,9 @@ list words_basic(basic obj, list pdl)
                 break;
               case 8:
                 pc = CHAIN_SWORD(pc,"double");
+                break;
+              case 16:
+                pc = CHAIN_SWORD(pc,"long double");
                 break;
             }
             break;
