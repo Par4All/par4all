@@ -9,20 +9,25 @@ Add object oriented organization above PIPS validation.
 
 Introduce the concept of validation class.
 """
-import os, commands, string, re, optparse
+import os, commands, string, re, optparse,glob
 
 class ValidationClass:
 
 ###### Init of the validation ######
   def __init__(self):
-		self.p4a_root = os.environ.get("P4A_ROOT")
 		
+		self.p4a_root = ''
+
+		for root, subfolders, files in os.walk(os.environ.get("PWD")):
+			for file in files:
+				if (file == 'p4a_validate_class.py'):
+					 self.p4a_root = os.path.dirname(os.path.join(root,file))
+
 		if (not self.p4a_root):
 			print ('You need to define P4A_ROOT environment variable')
 			exit()
 
-		self.PWD = os.environ.get("PWD")
-		self.par4ll_validation_dir = self.p4a_root+'/packages/PIPS/validation/'
+		self.par4ll_validation_dir = self.p4a_root+'/../../packages/PIPS/validation/'
 
 		# get default architecture and tpips/pips
 		self.arch=commands.getoutput(self.p4a_root+"/run/makes/arch.sh")
@@ -96,8 +101,8 @@ class ValidationClass:
 
 			if (os.path.isfile(err_file_path) == True):
 				# copy error file on RESULT directories of par4all validation
-				commands.getstatusoutput("mv -f "+err_file_path+' $P4A_ROOT/src/validation/RESULT')
-				os.rename(self.p4a_root+"/src/validation/RESULT/"+os.path.basename(err_file_path),self.p4a_root+"/src/validation/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
+				commands.getstatusoutput("mv -f "+err_file_path+' '+self.p4a_root+'/RESULT')
+				os.rename(self.p4a_root+"/RESULT/"+os.path.basename(err_file_path),self.p4a_root+"/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
 		
 			if(int_status != 0):
 				status = "failed"
@@ -170,21 +175,22 @@ class ValidationClass:
 		self.file_result.close()
 	
 		# Return to validation Par4All
-		os.chdir(self.PWD)
+		os.chdir(self.p4a_root)
 		return status
 
 ###### Validate only test what we want ######
   def valid_par4all(self):
 	
+		os.chdir(self.p4a_root)
 		if os.path.isfile('par4all_validation.txt'):
 			f = open("par4all_validation.txt")
 		else:
-			print ('No par4all_validation.txt file in P4A_ROOT/src/validation. Create one before launch validation par4all')
+			print ('No par4all_validation.txt file in %s. Create one before launch validation par4all'%(self.p4a_root))
 			exit()
 
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
-			commands.getstatusoutput("rm -rf RESULT")
+			commands.getstatusoutput('rm -rf RESULT')
 		os.mkdir("RESULT")
 
 		if os.path.isfile('p4a_log.txt'):
@@ -228,6 +234,8 @@ class ValidationClass:
 
 ###### Validate all tests (done by "default" file) ######
   def valid_pips(self):
+
+		os.chdir(self.p4a_root)
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
 			commands.getstatusoutput("rm -rf RESULT")
@@ -263,6 +271,8 @@ class ValidationClass:
 
 ###### Diff between p4a and pips options ######
   def diff(self):
+
+		os.chdir(self.p4a_root)
 		# Read default file to build a file with all tests
 		default_file = open(self.par4ll_validation_dir+"defaults")
 
@@ -321,6 +331,8 @@ class ValidationClass:
 ###### Validate all tests of a specific directory ################
   def valid_dir(self,arg_dir):
 
+		
+		os.chdir(self.p4a_root)
 		if os.path.isfile('directory_log.txt'):
 			commands.getstatusoutput('rm -rf directory_log.txt')
 
@@ -356,7 +368,8 @@ class ValidationClass:
 
 ###### Validate all desired tests ################
   def valid_test(self,arg_test):
-
+		
+		os.chdir(self.p4a_root)
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
 			commands.getstatusoutput("rm -rf RESULT")
@@ -430,6 +443,8 @@ def main():
 	else:
 		output = commands.getoutput("python p4a_validate_class.py -h")
 		print(output)
+
+	os.chdir(os.getcwd())
 
 # If this programm is independent it is executed:
 if __name__ == "__main__":
