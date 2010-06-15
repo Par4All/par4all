@@ -1,4 +1,4 @@
-Release notes for Par4All 0.2, 2010/06/10
+Release notes for Par4All 0.2, 2010/06/15
 =========================================
 
 Par4All is an open-source environment to do source-to-source
@@ -13,13 +13,13 @@ Introduction:
 
 More documentation and information on http://par4all.org
 
-This is the first public version of Par4All that parallelizes C programs to
+This is the first public version of Par4All. It parallelizes C programs to
 OpenMP and CUDA, and Fortran programs to OpenMP.
 
 For support : support at par4all dot org
 
 This release presents basic features of Par4All. If you need more complex
-transformations , parallelizations and optimizations, you may contact HPC
+transformations, parallelizations and optimizations, you may contact HPC
 Project for business support.
 
 The main user interface in Par4All is the command-line interface ``p4a`` to
@@ -29,6 +29,59 @@ invoke parallelization, but also back-end compilation or automatic
 But the other commands from the PIPS project included in Par4All are also
 available: ``tpips`` and ``ipyps``. Of course, it is reserved for quite more
 advised users. For more information, look at http://pips4u.org
+
+
+Installation:
+-------------
+
+You can install Par4All in different ways, more or less automatic. The
+installation is done into ``/usr/local/par4all``. If you want Par4All
+installed in another location, use the compilation way at the end of this
+section.
+
+The more automatic way if you are on GNU/Linux Debian or Ubuntu is to use
+our packet repository. In this way, when a new version is out, your
+classical packet manager can automatically install it.
+
+[<- TO BE COMPLETED HERE WITH AN EXAMPLE ->]
+
+A less automatic way on Debian or Linux is to install Par4All manually a
+``.deb`` package you have found on http://download.par4all.org with a::
+
+  dpkg -i <the_package>.deb
+
+An even less automatic way is to use a tar ball ``.tgz`` file. It should
+work on any GNU/Linux distribution. The procedure is first as ``root`` to
+create a repository you can write into with the user id of your choice
+with something like::
+
+  mkdir /usr/local/par4all
+  chown <your-id> /usr/local/par4all
+
+and then outside the ``root`` mode do a::
+
+  cd /
+  tar xvf <the_tar_ball>.tgz
+
+
+Once you have installed Par4All with any of the previous way, you have to
+do, if you use a (ba)sh script (more common case)::
+
+  source /usr/local/par4all/etc/par4all-rc.sh
+
+or if you use a (t)csh script::
+
+  source /usr/local/par4all/etc/par4all-rc.csh
+
+to initialize all the environment variables to run Par4All.
+
+Then you can look at the manual of ``p4a`` on
+http://www.par4all.org/documentation for information on how to use Par4All.
+
+More details on the installation or how to compile Par4All from your own
+can be found into the document describing all the infrastructure:
+http://www.par4all.org/documentation/par4all-infrastructure
+
 
 
 Fortran:
@@ -111,7 +164,7 @@ ready at release time but should be in the 2010/09 release.
 Python:
 -------
 
-On Debian PLY seems to be installed only with Python 2.5. It works with
+On Debian, PLY seems to be installed only with Python 2.5. It works with
 Python 2.6 and 3.1 with the ``PYTHONPATH`` generated for Par4All (with a
 trailing ``:/usr/share/pyshared``). Unfortunately this breaks ``ipyps``.
 
