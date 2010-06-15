@@ -1,0 +1,15 @@
+atomized code
+int main()
+{
+   int i;
+   int *p;
+   int **q;
+
+   p = 0;
+   **q = 0;
+
+   *p = 1;
+   *q = &i;
+
+   return 0;
+}

@@ -1,0 +1,7 @@
+atomized code
+void lhs03()
+{
+   int i;
+
+   i = 2;
+}

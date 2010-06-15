@@ -620,7 +620,7 @@ Boston, MA 02111-1307, USA.  */
 typedef unsigned char __u_char;
 typedef unsigned short __u_short;
 typedef unsigned int __u_int;
-typedef unsigned long __u_long;
+typedef unsigned long int __u_long;
 
 /* Fixed-size types, underlying types depend on word size and compiler.  */
 typedef signed char __int8_t;
@@ -631,7 +631,7 @@ typedef signed int __int32_t;
 typedef unsigned int __uint32_t;
 /* quad_t is also 64 bits.  */
 typedef struct {
-   long __val[2];
+   long int __val[2];
 } __quad_t;
 typedef struct {
    __u_long __val[2];
@@ -698,23 +698,23 @@ typedef struct {
 
 
 
-typedef unsigned long long __dev_t;
+typedef unsigned long long int __dev_t;
 /* Type of device numbers.  */
 typedef unsigned int __uid_t;
 /* Type of user identifications.  */
 typedef unsigned int __gid_t;
 /* Type of group identifications.  */
-typedef unsigned long __ino_t;
+typedef unsigned long int __ino_t;
 /* Type of file serial numbers.  */
-typedef unsigned long long __ino64_t;
+typedef unsigned long long int __ino64_t;
 /* Type of file serial numbers (LFS).*/
 typedef unsigned int __mode_t;
 /* Type of file attribute bitmasks.  */
 typedef unsigned int __nlink_t;
 /* Type of file link counts.  */
-typedef long __off_t;
+typedef long int __off_t;
 /* Type of file sizes and offsets.  */
-typedef long long __off64_t;
+typedef long long int __off64_t;
 /* Type of file sizes and offsets (LFS).  */
 typedef int __pid_t;
 /* Type of process identifications.  */
@@ -722,24 +722,24 @@ typedef struct {
    int __val[2];
 } __fsid_t;
 /* Type of file system IDs.  */
-typedef long __clock_t;
+typedef long int __clock_t;
 /* Type of CPU usage counts.  */
-typedef unsigned long __rlim_t;
+typedef unsigned long int __rlim_t;
 /* Type for resource measurement.  */
-typedef unsigned long long __rlim64_t;
+typedef unsigned long long int __rlim64_t;
 /* Type for resource measurement (LFS).  */
 typedef unsigned int __id_t;
 /* General type for IDs.  */
-typedef long __time_t;
+typedef long int __time_t;
 /* Seconds since the Epoch.  */
 typedef unsigned int __useconds_t;
 /* Count of microseconds.  */
-typedef long __suseconds_t;
+typedef long int __suseconds_t;
 /* Signed count of microseconds.  */
 
 typedef int __daddr_t;
 /* The type of a disk address.  */
-typedef long __swblk_t;
+typedef long int __swblk_t;
 /* Type of a swap block maybe?  */
 typedef int __key_t;
 /* Type of an IPC key.  */
@@ -751,21 +751,21 @@ typedef int __clockid_t;
 typedef int __timer_t;
 
 /* Type to represent block size.  */
-typedef long __blksize_t;
+typedef long int __blksize_t;
 
 /* Types from the Large File Support interface.  */
 
 /* Type to count number of disk blocks.  */
-typedef long __blkcnt_t;
-typedef long long __blkcnt64_t;
+typedef long int __blkcnt_t;
+typedef long long int __blkcnt64_t;
 
 /* Type to count file system blocks.  */
-typedef unsigned long __fsblkcnt_t;
-typedef unsigned long long __fsblkcnt64_t;
+typedef unsigned long int __fsblkcnt_t;
+typedef unsigned long long int __fsblkcnt64_t;
 
 /* Type to count file system nodes.  */
-typedef unsigned long __fsfilcnt_t;
-typedef unsigned long long __fsfilcnt64_t;
+typedef unsigned long int __fsfilcnt_t;
+typedef unsigned long long int __fsfilcnt64_t;
 
 typedef int __ssize_t;
 /* Type of a byte count, or error.  */
@@ -955,7 +955,7 @@ Boston, MA 02111-1307, USA.  */
 /* FreeBSD 5 can't be handled well using "traditional" logic above
    since it no longer defines _BSD_RUNE_T_ yet still desires to export
    rune_t in some cases... */
-typedef long wchar_t;
+typedef long int wchar_t;
 typedef unsigned int wint_t;
 /* Value so far.  */
 typedef struct {
@@ -2033,12 +2033,12 @@ extern size_t fwrite_unlocked(const void *__ptr, size_t __size, size_t __n, FILE
 
    This function is a possible cancellation point and therefore not
    marked with __THROW.  */
-extern int fseek(FILE *__stream, long __off, int __whence);
+extern int fseek(FILE *__stream, long int __off, int __whence);
 /* Return the current position of STREAM.
 
    This function is a possible cancellation point and therefore not
    marked with __THROW.  */
-extern long ftell(FILE *__stream);
+extern long int ftell(FILE *__stream);
 /* Rewind to the beginning of STREAM.
 
    This function is a possible cancellation point and therefore not

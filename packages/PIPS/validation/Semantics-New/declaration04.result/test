@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
 //  T(argc) {argc==argc#init+2}
 
-   long long size[argc++][argc++];
+   long long int size[argc++][argc++];
 
 //  T(main) {}
 

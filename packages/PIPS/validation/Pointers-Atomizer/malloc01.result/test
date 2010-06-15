@@ -1,0 +1,14 @@
+atomized code
+int main(int argc, char *argv[])
+{
+   int i, j;
+   int *a[64];
+
+   for(i = 0; i <= 63; i += 1) {
+      a[i] = (float) malloc(64*sizeof(float));
+      for(j = 0; j <= 63; j += 1)
+         a[i][j] = 0.;
+   }
+
+   return 0;
+}

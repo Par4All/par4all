@@ -1,0 +1,10 @@
+atomized code
+int main()
+{
+   mystruct s;
+
+   s.champ1 = 3;
+   s.champ2 = 4;
+   decl04(s);
+   return 0;
+}

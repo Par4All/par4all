@@ -1,0 +1,14 @@
+atomized code
+int main(int argc, char *argv[])
+{
+   int *p, i, j;
+   i = 0;
+   j = 1;
+
+   for(i = 1; i <= 4; i += 1)
+
+      p = (int *) malloc(sizeof(int));
+   
+   
+   return 0;
+}

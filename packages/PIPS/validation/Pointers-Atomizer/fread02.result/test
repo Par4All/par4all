@@ -1,0 +1,15 @@
+atomized code
+int main()
+{
+   FILE *fp;
+   size_t n;
+   char buf[200];
+   //PIPS generated variable
+   char *P_0;
+   fp = fopen("file.txt", "rb");
+   P_0 = &buf[0];
+   n = fread(P_0, sizeof(double), 50, fp);
+   if (n==-1) 
+      printf("fread failed");
+   fclose(fp);
+}

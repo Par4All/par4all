@@ -1,0 +1,13 @@
+atomized code
+int main()
+{
+   s_t s;
+   int j;
+
+   init_s(s, 10);
+
+   compute_s(s, 10);
+   
+   
+   return 0;
+}

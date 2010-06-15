@@ -1,0 +1,6 @@
+atomized code
+int main(int argc, char **argv)
+{
+   long long size = get_result(argc, argv);
+   return size;
+}

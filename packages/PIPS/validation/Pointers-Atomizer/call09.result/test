@@ -1,0 +1,8 @@
+atomized code
+int main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+
+   call09(s.one, sp->one);
+}

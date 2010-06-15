@@ -1,0 +1,7 @@
+atomized code
+void assign01()
+{
+   int i, j;
+
+   i = j = 1;
+}

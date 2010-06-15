@@ -3,7 +3,7 @@ Parsed printed file for "longdouble01"
 
 int main()
 {
-   double res = 90.123l;
+   long double res = 90.123l;
    printf("res=%Lf", res);
    return 0;
 }
@@ -17,7 +17,7 @@ Cumulated effetcs for "longdouble01"
 int main()
 {
 //               <must be written>: res
-   double res = 90.123l;
+   long double res = 90.123l;
 //               <may be read    >: stdout[0]
 //               <may be written >: stdout[0]
 //               <must be read   >: stdout __IO_EFFECTS:LUNS[1] res

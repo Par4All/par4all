@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
 //  T(k) {}
 
-   long long k = foo(argv);
+   long long int k = foo(argv);
 
 //  T(main) {j==main}
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
 //  P(i,j) {i==11, j==10}
 
-   long long k = foo(argv);
+   long long int k = foo(argv);
 
 //  P(i,j,k) {i==11, j==10}
 
@@ -67,12 +67,12 @@ Preconditions for "foo"
 
 //  P() {}
 
-long long foo(char **argv)
+long long int foo(char **argv)
 {
 
 //  P() {}
 
-   long long result = 0;
+   long long int result = 0;
 
 //  P(result) {result==0}
 

@@ -13,7 +13,7 @@ Try to restructure the code for more precision:
 Preconditions for "main"
 
 
-C  P() {}
+//  P() {}
 
 void main()
 {

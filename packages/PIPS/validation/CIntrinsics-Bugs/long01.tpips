@@ -1,0 +1,28 @@
+delete long01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create long01 long01.c
+
+activate C_SYMBOL_TABLE
+
+
+display SYMBOL_TABLE_FILE[main]
+
+echo
+echo Parsed printed file for "long01"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "long01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete long01
+quit
+
