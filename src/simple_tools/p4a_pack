@@ -18,8 +18,10 @@ from p4a_version import *
 default_install_prefix = "usr/local/par4all" # NO beginning slash please.
 package_name = "par4all"
 default_publish_host = "download.par4all.org"
+default_publish_dir = "/srv/www-par4all/download/releases"
+default_nightly_publish_dir = "/srv/www-par4all/download/nightly"
 default_deb_publish_dir = "/srv/www-par4all/download/dists/custom/main"
-default_publish_dir = "/srv/www-par4all/download"
+default_deb_nightly_publish_dir = "/srv/www-par4all/download/dists/custom/nightly"
 
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
@@ -96,18 +98,29 @@ def publish_tgz(file, host, remote_dir):
     warn("Copying " + file + " on " + host)
     run([ "scp", file, host + ":" + remote_dir ])
 
-def publish_files(files):
-    global default_publish_host, default_deb_publish_dir, default_publish_dir
+def publish_files(files, nightly = False):
+    global default_publish_host
+    global default_publish_dir, default_nightly_publish_dir
+    global default_deb_publish_dir, default_deb_nightly_publish_dir
+    
+    publish_dir = ""
+    deb_publish_dir = ""
+    if nightly:
+        publish_dir = default_nightly_publish_dir
+        deb_publish_dir = default_deb_nightly_publish_dir
+    else:
+        publish_dir = default_publish_dir
+        deb_publish_dir = default_deb_publish_dir
+    
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(file):
             die("Invalid file: " + file)
         ext = get_file_ext(file)
         if ext == ".deb":
-            publish_deb(file, default_publish_host, default_deb_publish_dir)
-        else:
-            warn("Copying " + file + " on " + default_publish_host)
-            run([ "scp", file, default_publish_host + ":" + default_publish_dir ])
+            publish_deb(file, default_publish_host, deb_publish_dir)
+        warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
+        run([ "scp", file, default_publish_host + ":" + publish_dir ])
 
 def create_sdeb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
     die("create_sdeb is TODO")
@@ -187,7 +200,10 @@ def main():
     
     main_group.add_option("--publish", "-P", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
-    
+
+    main_group.add_option("--nightly", "-N", action = "store_true", default = False,
+        help = "When publishing, store files in the 'nightly' directory (i.e. for nightly builds). Implies --append-date.")
+
     global default_install_prefix
     main_group.add_option("--prefix", "-p", metavar = "DIR", default = default_install_prefix,
         help = "Specify the installation prefix. Default is: " + default_install_prefix)
@@ -216,13 +232,16 @@ def main():
     if options.version:
         print(guess_file_revision(__file__))
         return
-    
+
     if len(args):
         if not options.publish:
             die("You specified files on command line but did not specify --publish")
-        publish_files(args)
+        publish_files(args, options.nightly)
         return
-    
+
+    if options.nightly and not options.append_date:
+        options.append_date = True
+
     if (not options.deb #and not options.sdeb 
         and not options.tgz and not options.stgz):
         die("Please specify any of --deb, --tgz, --stgz")
@@ -294,7 +313,7 @@ def main():
                     return
     
     if options.publish:
-        publish_files(output_files)
+        publish_files(output_files, options.nightly)
 
 
 if __name__ == "__main__":
