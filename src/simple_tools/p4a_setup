@@ -26,38 +26,47 @@ from p4a_version import *
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
-def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_opts = [], 
-    rebuild = False, install = True, reconf = True):
+def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_opts = [], install = True, reconf = False):
     '''Builds the given package in package_dir using autotools.'''
-    if rebuild:
-        # Rebuild requested? Delete existing build directory.
-        if os.path.isdir(build_dir):
-            warn("Package " + package_dir + " marked for rebuild, removing existing build dir " + build_dir)
-            rmtree(build_dir)
+    
+    configure_script = os.path.join(package_dir, "configure")
+    makefile = os.path.join(build_dir, "Makefile")
+    
+    configure = False
+
+    if not os.path.exists(configure_script):
+        reconf = True
+        configure = True
+
+    if not os.path.isdir(build_dir):
+        configure = True
         os.makedirs(build_dir)
-    elif not os.path.isdir(build_dir):
-        rebuild = True
-        os.makedirs(build_dir)
-    if rebuild:
+
+    if not configure and not os.path.exists(makefile):
+        configure = True
+
+    if configure:
         if reconf:
             # Call autoconf to generate the configure utility.
             autoreconf_args = [ "autoreconf", "--install" ] #"--force" ] # Dont use --force or it will no longer compile.
             if get_verbosity() >= 3:
                 autoreconf_args += [ "-v" ]
             run2(autoreconf_args, working_dir = package_dir)
-        if dest_dir:
-            configure_opts += [ "DESTDIR=" + dest_dir ]
-        # Call configure to generate the Makefile's.
-        run2([ os.path.join(package_dir, "configure") ] + configure_opts, working_dir = build_dir)
+        #~ if dest_dir:
+            #~ configure_opts += [ "DESTDIR=" + dest_dir ]
+        # Call configure to generate the Makefiles.
+        run2([ configure_script ] + configure_opts, working_dir = build_dir)
+    
     # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
     run2([ "make" ] + make_opts, working_dir = build_dir)
+    
     if install:
         # Call make install to install in DESTDIR if requested.
         install_mopts = []
-        if dest_dir:
-            install_mopts.append("DESTDIR=" + dest_dir)
-            info("Installing " + package_dir + " in " + dest_dir)
+        #~ if dest_dir:
+            #~ install_mopts.append("DESTDIR=" + dest_dir)
+            #~ info("Installing " + package_dir + " in " + dest_dir)
         run2([ "make", "install" ] + install_mopts, working_dir = build_dir)
 
 def main():
@@ -159,8 +168,8 @@ def main():
     main_group.add_option("--nofinal", "-F", action = "store_true", default = False,
         help = "Skip final installations steps in install directory (installation of various files). NB: never running the final installation step will not give you a functional Par4All build.")
     
-    main_group.add_option("--noreconf", "-A", action = "store_true", default = False,
-        help = "Skip running autoreconf before running configure for all packages.")
+    main_group.add_option("--reconf", action = "store_true", default = False,
+        help = "Always run autoreconf before running configure for all packages.")
     
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
@@ -377,18 +386,37 @@ def main():
     if options.jobs:
         make_opts.append("-j" + options.jobs)
     
+    spin = None
+    if get_verbosity() == 0:
+        warn("Building and installing, please wait...")
+        spin = spinner()
+    
     ############################## polylib
     
     if not options.skip_polylib:
+        
+        info("Processing polylib")
+
+        package_build_dir = os.path.join(build_dir, "polylib")
+
+        # Rebuild requested? Delete existing build directory.
+        if options.rebuild and os.path.isdir(package_build_dir):
+                warn("Package " + polylib_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                rmtree(package_build_dir)
+
+        if not os.path.isdir(package_build_dir):
+            os.makedirs(package_build_dir)
+
         polylib_copts = configure_opts
         if options.polylib_copts:
             polylib_copts.append(options.polylib_copts)
         polylib_mopts = make_opts
         if options.polylib_mopts:
             polylib_mopts.append(options.polylib_mopts)
-        build_package(package_dir = polylib_src_dir, build_dir = os.path.join(build_dir, "polylib"),
+
+        build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_copts, make_opts = polylib_mopts, dest_dir = dest_dir, 
-            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
+            install = not options.noinstall, reconf = options.reconf)
     
     ##############################
     
@@ -404,21 +432,33 @@ def main():
     ############################## newgen
     
     if not options.skip_newgen:
-        info("Preparing newgen")
+        info("Processing newgen")
+
+        package_build_dir = os.path.join(build_dir, "newgen")
+
+        # Rebuild requested? Delete existing build directory.
+        if options.rebuild and os.path.isdir(package_build_dir):
+                warn("Package " + newgen_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                rmtree(package_build_dir)
+
+        if not os.path.isdir(package_build_dir):
+            os.makedirs(package_build_dir)
+
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
         run2([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
         run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
-        
+
         newgen_copts = configure_opts
         if options.newgen_copts:
             newgen_copts.append(options.newgen_copts)
         newgen_mopts = make_opts
         if options.newgen_mopts:
             newgen_mopts.append(options.newgen_mopts)
-        build_package(package_dir = newgen_src_dir, build_dir = os.path.join(build_dir, "newgen"),
+
+        build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_copts, make_opts = newgen_mopts, dest_dir = dest_dir, 
-            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
+            install = not options.noinstall, reconf = options.reconf)
     
     ##############################
     
@@ -430,21 +470,33 @@ def main():
     ############################## linear
     
     if not options.skip_linear:
-        info("Preparing linear")
+        info("Processing linear")
+
+        package_build_dir = os.path.join(build_dir, "linear")
+
+        # Rebuild requested? Delete existing build directory.
+        if options.rebuild and os.path.isdir(package_build_dir):
+                warn("Package " + linear_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                rmtree(package_build_dir)
+
+        if not os.path.isdir(package_build_dir):
+            os.makedirs(package_build_dir)
+
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
         run2([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
         run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
         linear_copts = configure_opts
-        
+
         if options.linear_copts:
             linear_copts.append(options.linear_copts)
         linear_mopts = make_opts
         if options.linear_mopts:
             linear_mopts.append(options.linear_mopts)
-        build_package(package_dir = linear_src_dir, build_dir = os.path.join(build_dir, "linear"),
+
+        build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_copts, make_opts = linear_mopts, dest_dir = dest_dir, 
-            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
+            install = not options.noinstall, reconf = options.reconf)
     
     ##############################
     
@@ -463,7 +515,18 @@ def main():
     ############################## pips
     
     if not options.skip_pips:
-        info("Preparing pips")
+        info("Processing pips")
+        
+        package_build_dir = os.path.join(build_dir, "pips")
+
+        # Rebuild requested? Delete existing build directory.
+        if options.rebuild and os.path.isdir(package_build_dir):
+                warn("Package " + pips_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                rmtree(package_build_dir)
+
+        if not os.path.isdir(package_build_dir):
+            os.makedirs(package_build_dir)
+
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
         run2([ "rm", "-fv", os.path.join(pips_src_dir, "makes") ])
@@ -497,7 +560,7 @@ def main():
         for file in [ ".dir", ".md5-check-core", ".md5-check-fortran", ".untar-core", ".untar-fortran", ".untar" ]:
             run2([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
-        
+
         pips_copts = configure_opts
         if options.pips_copts:
             pips_copts.append(options.pips_copts)
@@ -506,9 +569,10 @@ def main():
         pips_mopts = make_opts
         if options.pips_mopts:
             pips_mopts.append(options.pips_mopts)
-        build_package(package_dir = pips_src_dir, build_dir = os.path.join(build_dir, "pips"),
+
+        build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_copts, make_opts = pips_mopts, dest_dir = dest_dir,
-            rebuild = options.rebuild, install = not options.noinstall, reconf = not options.noreconf)
+            install = not options.noinstall, reconf = options.reconf)
     
 
     ##############################
@@ -638,13 +702,22 @@ def main():
     done("To begin using this Par4All installation.")
     done("")
 
+
 if __name__ == "__main__":
     try:
         main()
     except p4a_error:
         error(str(sys.exc_info()[1]))
-        error("To get verbose output from the build, try passing -v, -vv, or -vvv.")
-        error("You can also try running again with --rebuild --clean (-RC) and see if it picks up.")
+        error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        error("You can also try running again with --rebuild --clean (-RC) and see if it picks up")
+        sys.exit(1)
+    except:
+        #~ error(str(sys.exc_info()[1]))
+        #~ error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        raise
+    finally:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+
 
 # Some Emacs stuff:
 ### Local Variables:

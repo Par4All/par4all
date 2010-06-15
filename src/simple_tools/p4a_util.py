@@ -9,7 +9,8 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, re, datetime, shutil, subprocess
+import string, sys, random, logging, os, re, datetime, shutil, subprocess, time
+from threading import Thread
 import p4a_term
 
 # Global variables.
@@ -26,33 +27,40 @@ def get_verbosity():
     global verbosity
     return verbosity
 
+msg_prefix = os.path.split(sys.argv[0])[1] + ": "
+
 # Printing/logging helpers.
 def debug(msg):
+    global msg_prefix
     if verbosity >= 2:
-        sys.stderr.write(sys.argv[0] + ": " + str(msg).rstrip("\n") + "\n");
+        sys.stderr.write(msg_prefix + str(msg).rstrip("\n") + "\n");
     if logger:
         logger.debug(msg)
 
 def info(msg):
+    global msg_prefix
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.info(msg)
 
 def done(msg):
+    global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.info(msg)
 
 def warn(msg):
+    global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.warn(msg)
 
 def error(msg):
-    sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+    global msg_prefix
+    sys.stderr.write(msg_prefix + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.error(msg)
 
@@ -70,11 +78,49 @@ class p4a_error(Exception):
     def __str__(self):
         return self.msg
 
+spinners = []
+
+class spinner(Thread):
+
+    def __init__(self):
+        Thread.__init__(self)
+        self.flag = False
+        self.startt = time.time()
+        global spinners
+        spinners.append(self)
+        self.start()
+
+    def stop(self):
+        if not self.flag:
+            self.flag = True
+            self.join()
+    
+    #~ def __del__(self):
+        #~ self.stop()
+
+    def run(self):
+        while time.time() - self.startt < 1:
+            time.sleep(0.05)
+            if self.flag:
+                return
+        #~ sys.stderr.write("\n")
+        while not self.flag:
+            for item in "-\|/":
+                sys.stderr.write("\b\b" + item)
+                time.sleep(0.05)
+        sys.stderr.write("\b\b")
+
+def stop_all_spinners():
+    global spinners
+    for spin in spinners:
+        spin.stop()
+
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("magenta") 
+        global msg_prefix
+        sys.stderr.write(msg_prefix + p4a_term.escape("magenta") 
             + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
@@ -124,7 +170,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     else:
         w = os.getcwd()
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") 
+        global msg_prefix
+        sys.stderr.write(msg_prefix + "(in " + w + ") " + p4a_term.escape("magenta") 
             + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
@@ -134,6 +181,9 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     redir = subprocess.PIPE
     if verbosity >= 2 and not capture:
         redir = None
+    spin = None
+    if redir and verbosity >= 1: # Display a spinner if we are hiding output and we displayed command.
+        spin = spinner()
     try:
         if shell:
             process = subprocess.Popen(" ".join(cmd_list), shell = True, 
@@ -155,6 +205,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         except:
             break
     ret = process.wait()
+    if spin is not None:
+        spin.stop()
     if ret != 0 and not can_fail:
         if err:
             error(err)

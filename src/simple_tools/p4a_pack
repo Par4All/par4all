@@ -9,14 +9,19 @@
 Par4All packing script: allows you to create .deb or .tar.gz packages of Par4all.
 '''
 
-import string, sys, os, re, optparse, tempfile, shutil
+import string, sys, os, re, optparse, tempfile, shutil, time
 from p4a_util import *
 from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
 
-default_install_prefix = "usr/local/par4all" # NO beginning slash please.
-package_name = "par4all"
+default_install_prefix          = "usr/local/par4all" # NO beginning slash please.
+package_name                    = "par4all"
+default_publish_host            = "download.par4all.org"
+default_publish_dir             = "/srv/www-par4all/download/releases"
+default_nightly_publish_dir     = "/srv/www-par4all/download/nightly"
+default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/releases/main"
+default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/nightly/main"
 
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
@@ -67,6 +72,7 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     info("Adjusting values in " + postinst_file)
     subs_template_file(postinst_file, subs_map)
     package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
+    package_file = os.path.abspath(package_file_name)
     run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
@@ -76,6 +82,48 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
         warn("Temporary directory was " + temp_dir)
     else:
         rmtree(temp_dir, can_fail = 1)
+    return package_file_name
+
+def publish_deb(file, host, remote_dir):
+    arch = change_file_ext(file, "").split("_")[-1]
+    info("Publishing " + file + " (" + arch + ")")
+    warn("Removing existing .deb file for arch " + arch)
+    run([ "ssh", host, "rm -fv " + remote_dir + "/binary-" + arch + "/*.deb" ])
+    warn("Copying " + file + " on " + host)
+    run([ "scp", file, host + ":" + remote_dir + "/binary-" + arch ])
+    warn("Please wait 5 minute for repository indexes to get updated by cron")
+    warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
+
+def publish_tgz(file, host, remote_dir):
+    warn("Copying " + file + " on " + host)
+    run([ "scp", file, host + ":" + remote_dir ])
+
+def publish_files(files, nightly = False):
+    global default_publish_host
+    global default_publish_dir, default_nightly_publish_dir
+    global default_deb_publish_dir, default_deb_nightly_publish_dir
+    
+    publish_dir = ""
+    deb_publish_dir = ""
+    if nightly:
+        publish_dir = default_nightly_publish_dir
+        deb_publish_dir = default_deb_nightly_publish_dir
+    else:
+        publish_dir = default_publish_dir
+        deb_publish_dir = default_deb_publish_dir
+    
+    for file in files:
+        file = os.path.abspath(os.path.expanduser(file))
+        if not os.path.exists(file):
+            die("Invalid file: " + file)
+        ext = get_file_ext(file)
+        if ext == ".deb":
+            publish_deb(file, default_publish_host, deb_publish_dir)
+        warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
+        run([ "scp", file, default_publish_host + ":" + publish_dir ])
+
+def create_sdeb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
+    die("create_sdeb is TODO")
 
 def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
     '''Creates a simple .tar.gz package.'''
@@ -84,8 +132,9 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     if not arch:
         arch = get_machine_arch()
     package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
-    if os.path.exists(package_file_name):
-        os.remove(package_file_name)
+    package_file = os.path.abspath(package_file_name)
+    if os.path.exists(package_file):
+        os.remove(package_file)
     run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
@@ -95,28 +144,50 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
         warn("Temporary directory was " + temp_dir)
     else:
         rmtree(temp_dir, can_fail = 1)
+    return package_file
+
+def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
+    global package_name
+    package_full_name = "_".join([ package_name, revision, "src" ])
+    package_file_name = package_full_name + ".tar.gz"
+    package_file = os.path.abspath(package_file_name)
+    git = p4a_git(script_dir)
+    current_branch = git.current_branch()
+    if current_branch != "p4a":
+        die("Not on branch p4a! (" + current_branch + ")")
+    git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
+    run([ "gzip", "-9", change_file_ext(package_file_name, "") ])
+    if os.path.exists(package_file_name):
+        done("Created " + package_file_name)
+    return package_file
 
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz> --revision=0.1-mybuild --dir=/current/install/dir [--prefix=/final/install/dir] [...]")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz|-stgz> --revision=0.1 [--append-date] --dir=/current/install/dir [--prefix=/final/install/dir] [--publish] [...]")
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
     main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
         help = "Directory where the distribution to package is currently installed. Defaults to environment variable P4A_DIST if defined.")
-
-    main_group.add_option("--src", "-s", action = "store_true", default = False,
-        help = "[TODO] Create a source package instead of a binary package.")
     
     main_group.add_option("--deb", "-D", action = "store_true", default = False,
         help = "Build a .deb package.")
     
-    main_group.add_option("--rpm", "-R", action = "store_true", default = False,
-        help = "[TODO] Build a .rpm package.")
+    #~ main_group.add_option("--sdeb", action = "store_true", default = False,
+        #~ help = "Create a source .deb package.")
+    
+    #~ main_group.add_option("--rpm", "-R", action = "store_true", default = False,
+        #~ help = "Build a .rpm package.")
+    
+    #~ main_group.add_option("--srpm", action = "store_true", default = False,
+        #~ help = "Build a source .rpm package.")
     
     main_group.add_option("--tgz", "-T", action = "store_true", default = False,
-        help = "Build a .tar.gz package.")
+        help = "Create a .tar.gz archive.")
+    
+    main_group.add_option("--stgz", action = "store_true", default = False,
+        help = "Create a source .tar.gz archive.")
     
     main_group.add_option("--arch", metavar = "ARCH", default = None,
         help = "Specify the package architecture manually. By default, the current machine architecture is used.")
@@ -124,6 +195,15 @@ def main():
     main_group.add_option("--revision", "-r", metavar = "REVISION",
         help = "Specify package version. Current Git revision will be automatically appended.")
     
+    main_group.add_option("--append-date", "-a", action = "store_true", default = False,
+        help = "Automatically append date to version string.")
+    
+    main_group.add_option("--publish", "-P", action = "store_true", default = False,
+        help = "Create a .tar.gz archive.")
+
+    main_group.add_option("--nightly", "-N", action = "store_true", default = False,
+        help = "When publishing, store files in the 'nightly' directory (i.e. for nightly builds). Implies --append-date.")
+
     global default_install_prefix
     main_group.add_option("--prefix", "-p", metavar = "DIR", default = default_install_prefix,
         help = "Specify the installation prefix. Default is: " + default_install_prefix)
@@ -152,54 +232,77 @@ def main():
     if options.version:
         print(guess_file_revision(__file__))
         return
-    
-    if options.src:
-        die("--src is TODO")
-    if options.rpm:
-        die("--rpm is TODO")
-    
-    if not options.deb and not options.rpm and not options.tgz:
-        die("Please specify --deb or --tgz")
+
+    if len(args):
+        if not options.publish:
+            die("You specified files on command line but did not specify --publish")
+        publish_files(args, options.nightly)
+        return
+
+    if options.nightly and not options.append_date:
+        options.append_date = True
+
+    if (not options.deb #and not options.sdeb 
+        and not options.tgz and not options.stgz):
+        die("Please specify any of --deb, --tgz, --stgz")
 
     dir = options.dir
-    if not dir and "P4A_DIST" in os.environ:
-        dir = os.environ["P4A_DIST"]
-    if not dir:
-        die("Please specify --dir")
-    dir = os.path.abspath(os.path.expanduser(dir))
-    warn("Taking dist from " + dir)
-    if not os.path.isdir(dir):
-        die("Invalid dist directory: " + dir)
+    if options.deb or options.tgz:
+        if not dir and "P4A_DIST" in os.environ:
+            dir = os.environ["P4A_DIST"]
+        if not dir:
+            die("Please specify --dir")
+        dir = os.path.abspath(os.path.expanduser(dir))
+        warn("Taking dist from " + dir)
+        if not os.path.isdir(dir):
+            die("Invalid dist directory: " + dir)
 
     if not options.revision:
         die("Please use --revision to specify the package version/revision")
     tmp = options.revision.split("-")
     if len(tmp) > 2:
         die("Invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
+    if options.append_date and len(tmp) > 1:
+        die("Invalid revision format: no '-' permitted with --append-date")
     if not re.match("\d\.\d(\.\d)?", tmp[0]):
         die("Revision must begin with a version string, e.g. 1.2.3 or 0.2")
     for i in range(len(tmp)):
         tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
+    if options.append_date:
+        tmp.append(time.strftime("%Y%m%dT%H%M%S"))
     revision = "-".join(tmp)
-    
+
     if not revision:
         die("Invalid characters in revision")
-    
+
+    append_revision_bin = ""
     git_revision = guess_file_revision(dir)
     if git_revision:
-        revision += "~" + git_revision.replace("~exported", "")
-    
+        append_revision_bin = git_revision.replace("~exported", "").split("~")[-1]
+
+    append_revision_src = p4a_git(script_dir).current_revision()
+
     # Check that fakeroot is available.
     if not which("fakeroot"):
         die("fakeroot not found, please install it (sudo aptitude install fakeroot)")
 
+    output_files = []
     try:
         if options.deb:
-            create_deb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-                keep_temp = options.keep, arch = options.arch)
+            output_files.append(create_deb(dist_dir = dir, install_prefix = options.prefix, 
+                revision = revision + "~" + append_revision_bin,
+                keep_temp = options.keep, arch = options.arch))
+        #~ if options.sdeb:
+            #~ output_files.append(create_sdeb(dist_dir = dir, install_prefix = options.prefix, revision = revision,
+                #~ keep_temp = options.keep, arch = options.arch))
         if options.tgz:
-            create_tgz(dist_dir = dir, install_prefix = options.prefix, revision = revision,
-                keep_temp = options.keep, arch = options.arch)
+            output_files.append(create_tgz(dist_dir = dir, install_prefix = options.prefix,
+                revision = revision + "~" + append_revision_bin,
+                keep_temp = options.keep, arch = options.arch))
+        if options.stgz:
+            output_files.append(create_stgz(dist_dir = dir, install_prefix = options.prefix,
+                revision = revision + "~" + append_revision_src,
+                keep_temp = options.keep, arch = options.arch))
     except KeyboardInterrupt:
         if not options.keep:
             global auto_remove_temp_dirs_on_break
@@ -207,15 +310,28 @@ def main():
                 if os.path.isdir(dir):
                     warn("Removing " + dir)
                     rmtree(dir, can_fail = 1)
+                    return
     
-    return 0
+    if options.publish:
+        publish_files(output_files, options.nightly)
+
 
 if __name__ == "__main__":
     try:
         main()
     except p4a_error:
         error(str(sys.exc_info()[1]))
-        error("To get verbose output, try passing -v, -vv, or -vvv.")
+        error("To get verbose output, try passing -v, -vv, or -vvv")
+        sys.exit(1)
+    except:
+        #~ if sys.exc_info()[0].__name__ == "SystemExit":
+            #~ raise
+        #~ error(str(sys.exc_info()[1]))
+        #~ error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        raise
+    finally:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+
 
 # Some Emacs stuff:
 ### Local Variables:
