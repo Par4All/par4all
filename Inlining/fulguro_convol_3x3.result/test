@@ -523,13 +523,13 @@ void flgr2d_draw_filled_ellipse_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int a
 {
    int x = 0, y = b;
    unsigned int width = 1;
-   long a2 = (long) a*a, b2 = (long) b*b;
-   long crit1 = -(a2/4+a%2+b2);
-   long crit2 = -(b2/4+b%2+a2);
-   long crit3 = -(b2/4+b%2);
-   long t = -(a2*y);
-   long dxt = 2*b2*x, dyt = -(2*a2*y);
-   long d2xt = 2*b2, d2yt = 2*a2;
+   long int a2 = (long int) a*a, b2 = (long int) b*b;
+   long int crit1 = -(a2/4+a%2+b2);
+   long int crit2 = -(b2/4+b%2+a2);
+   long int crit3 = -(b2/4+b%2);
+   long int t = -(a2*y);
+   long int dxt = 2*b2*x, dyt = -(2*a2*y);
+   long int d2xt = 2*b2, d2yt = 2*a2;
    while (y>=0&&x<=a) 
       if (t+b2*x<=crit1||t+a2*y<=crit3) {
          x++, dxt += d2xt, t += dxt;
