@@ -5,9 +5,8 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -28,14 +27,14 @@ static boolean reduction_op_p(string op)
   return FALSE;
 }
 
-step_reduction step_check_reduction(entity module, string directive_txt)
+clause step_check_reduction(entity module, string directive_txt)
 {
   string reduction_,reduction_clause,reduction_clause_dup,remaining;
   string operator_,operator;
   string list_,item,comma;
   int nb_item, nb_comma;
   boolean erreur=false;
-  step_reduction reductions=make_step_reduction();
+  map_entity_string reductions=make_map_entity_string();
   string msg_err;
 
   remaining=strdup(directive_txt);
@@ -92,13 +91,13 @@ step_reduction step_check_reduction(entity module, string directive_txt)
 	      break;
 	    }
 	  /* verifier la non existance d'une réduction précédente pour la variable*/
-	  if (bound_step_reduction_p(reductions,e))
+	  if (bound_map_entity_string_p(reductions,e))
 	    {
 	      msg_err="several reduction for the same variable.";
 	      erreur=TRUE;
 	      break;
 	    }
-	  extend_step_reduction(reductions,e,strdup(operator));
+	  extend_map_entity_string(reductions,e,strdup(operator));
 	  pips_debug(2,"reduction %s %s\n",entity_name(e),operator);
 	  nb_item++;
 	  item = strtok (NULL, ", ");
@@ -115,29 +114,33 @@ step_reduction step_check_reduction(entity module, string directive_txt)
   if (erreur)
     {
       pips_user_error("\n\nSTEP : erreur in clause : reduction (%s)\n%s\n\n",reduction_clause,msg_err);
-      free_step_reduction(reductions);
-      return step_reduction_undefined;
+      free_map_entity_string(reductions);
+      return clause_undefined;
     }
 
-  return reductions;
+  return make_clause_reduction(reductions);
 }
 
-clause clause_reductions(entity module, string directive_txt)
-{
-  return make_clause_step_reduction(step_check_reduction(module,directive_txt));
-}
 
-string clause_reduction_to_string(step_reduction reductions)
+string clause_reduction_to_string(map_entity_string reductions)
 {
   string s = string_undefined;
   string_buffer sb = string_buffer_make(FALSE);
+  list entity_reduction=NIL;
 
-  STEP_REDUCTION_MAP(variable,operator,
-     {
-       s=strdup(concatenate(" reduction(",operator," : ",entity_local_name(variable),")",NULL));
-       string_buffer_append(sb, s);
-     },reductions);
-  
+  MAP_ENTITY_STRING_MAP(e, __attribute__ ((unused))op,{
+      entity_reduction=CONS(ENTITY,e,entity_reduction);
+    },reductions);
+  sort_list_of_entities(entity_reduction);
+
+  FOREACH(ENTITY,variable,entity_reduction)
+    {
+      string operator=apply_map_entity_string(reductions,variable);
+      s=strdup(concatenate(" reduction(",operator," : ",entity_local_name(variable),")",NULL));
+      string_buffer_append(sb, s);
+    }
+  gen_free_list(entity_reduction);
+
   s = string_buffer_to_string(sb);
   string_buffer_free_all(&sb);
   return s;

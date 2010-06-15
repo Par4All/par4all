@@ -5,9 +5,8 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -60,10 +59,10 @@ static void clause_handling(entity directive_module, directive d)
   pips_debug(1,"d = %p", d);
   // reduction handling
   directive_clauses(d) = gen_nconc(directive_clauses(d),
-				       CONS(CLAUSE,clause_reductions(directive_module,directive_txt(d)),NIL));
+				       CONS(CLAUSE,step_check_reduction(directive_module,directive_txt(d)),NIL));
   // private handling
   directive_clauses(d) = gen_nconc(directive_clauses(d),
-				       CONS(CLAUSE,clause_private(directive_module,directive_txt(d)),NIL));
+				       CONS(CLAUSE,step_check_private(directive_module,directive_txt(d)),NIL));
 }
 
 static statement do_outlining(directive d)
@@ -95,6 +94,7 @@ static statement do_outlining(directive d)
   id_suffix = step_find_loop_range_suffix_id(strdup(concatenate(new_module_name, MODULE_SEP_STRING,module_local_name(loop_index(loop_l)),NULL)));
   lower=strdup(concatenate(entity_user_name(loop_index(loop_l)), RANGENAME_LOW_SUFFIX, id_suffix, NULL));
   upper=strdup(concatenate(entity_user_name(loop_index(loop_l)), RANGENAME_UP_SUFFIX, id_suffix, NULL));
+  free(id_suffix);
 
   index = outlining_add_declaration(loop_index(loop_l));
   low_e = outlining_add_declaration(clone_scalar(lower, new_module, index));
@@ -102,16 +102,16 @@ static statement do_outlining(directive d)
 
   low_range_expr = range_lower(loop_range(loop_l));
   up_range_expr = range_upper(loop_range(loop_l));
-  range_lower(loop_range(loop_l))=entity_to_expr(low_e);
-  range_upper(loop_range(loop_l))=entity_to_expr(up_e);
+  range_lower(loop_range(loop_l))=entity_to_expression(low_e);
+  range_upper(loop_range(loop_l))=entity_to_expression(up_e);
 
   outlining_scan_block(gen_full_copy_list(body));
   
-  outlining_add_argument(index,entity_to_expr(index));
+  outlining_add_argument(index,entity_to_expression(index));
   outlining_add_argument(low_e,low_range_expr);
   outlining_add_argument(up_e,up_range_expr);
 
-  call = outlining_close();
+  call = outlining_close(step_directives_USER_FILE_name());
 
   data = make_loop_data(index,low_e,up_e,expression_to_int(range_increment(loop_range(loop_l))));
 
@@ -369,16 +369,16 @@ string directive_omp_do_to_string(directive d,bool close)
 {
   pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
-    return strdup(END_DO_TEXT);
+    return strdup(END_DO_TXT);
   else
-    return strdup(DO_TEXT);
+    return strdup(DO_TXT);
 }
 
 string directive_omp_parallel_do_to_string(directive d,bool close)
 {
   pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
-    return strdup(END_PARALLEL_DO_TEXT);
+    return strdup(END_PARALLEL_DO_TXT);
   else
-    return strdup(PARALLEL_DO_TEXT);
+    return strdup(PARALLEL_DO_TXT);
 }

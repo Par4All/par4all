@@ -7,163 +7,140 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
-
 #include "defines-local.h"
 #include "effects-convex.h"
 
-static statement build_call_STEP_MastertoAllScalar(entity scalar)
+static statement build_call_STEP_MastertoAllScalar(entity module, expression expr_requests, entity scalar)
 {
-  /* subroutine STEP_OnetoAllScalar_I(scalar,
+ /* subroutine STEP_OnetoAllScalar(scalar,
+    &     step_max_nb_request, step_requests, step_nb_request,
     &     algorithm)
   */
-  expression expr_scalar = entity_to_expression(scalar);
-  expression expr_algorithm = int_to_expression(0);
-  list arglist = CONS(EXPRESSION,expr_scalar,
-		      CONS(EXPRESSION,expr_algorithm,NIL));
-  return call_STEP_subroutine(strdup(concatenate(RT_STEP_MasterToAllScalar,step_type_suffix(scalar),NULL)),arglist);
+  list arglist = CONS(EXPRESSION, entity_to_expression(scalar),
+		      CONS(EXPRESSION, step_parameter_max_nb_request(module,expression_undefined),
+			   CONS(EXPRESSION,expr_requests,
+				CONS(EXPRESSION,step_local_nb_request(module),
+				     CONS (EXPRESSION, step_symbolic(STEP_NONBLOCKING_NAME, module), NIL)))));
+  return call_STEP_subroutine(RT_STEP_MasterToAllScalar, arglist,entity_type(scalar));
 }
 
-static statement build_call_STEP_MastertoAllRegion(entity array)
+static statement build_call_STEP_MastertoAllRegion(entity module, expression expr_requests, entity array)
 {
-  /*subroutine STEP_OnetoAllRegion_I(dim,
-     &     region,size,array,
+  /*subroutine STEP_OnetoAllRegion_I(array,
+     &     dim,region,size,
+     &     max_nb_request,requests,nb_request
      &     algorithm)   
   */
-  entity array_region = load_send_region_entities(array);
-  expression expr_dim = copy_expression(dimension_upper(DIMENSION(gen_nth(1,variable_dimensions(type_variable(entity_type(array_region)))))));
+  entity array_region = step_local_SR(module,array, expression_undefined);
+  expression expr_dim = copy_expression(dimension_upper(DIMENSION(gen_nth(1, variable_dimensions(type_variable(entity_type(array_region)))))));
   expression expr_region = entity_to_expression(array_region);
-  expression expr_origine = make_expression(make_syntax_reference(make_reference(array_region,
-										 CONS(EXPRESSION,entity_to_expression(step_i_slice_low),
-										      CONS(EXPRESSION,int_to_expression(1),NIL)))),
-					    normalized_undefined);
-  expression expr_size = make_call_expression(step_sizeRegion,CONS(EXPRESSION,copy_expression(expr_dim),
-								   CONS(EXPRESSION,expr_origine,NIL)));
+  expression expr_origine = reference_to_expression(make_reference(array_region,
+								   CONS(EXPRESSION, step_symbolic(STEP_INDEX_SLICE_LOW_NAME, module),
+									CONS(EXPRESSION, int_to_expression(1), NIL))));
+  expression expr_size = step_function(RT_STEP_SizeRegion, CONS(EXPRESSION, copy_expression(expr_dim),
+								CONS(EXPRESSION, expr_origine, NIL)));
   expression expr_array = entity_to_expression(array);
-  expression expr_max_nb_request = entity_to_expression(step_max_nb_request);
-  expression expr_requests = entity_to_expression(step_requests);
-  expression expr_nb_request = entity_to_expression(step_nb_request);
-  expression expr_algorithm = int_to_expression(0);
+  expression expr_max_nb_request = step_parameter_max_nb_request(module,expression_undefined);
+  expression expr_nb_request = step_local_nb_request(module);
+  expression expr_algorithm = step_symbolic(STEP_NONBLOCKING_NAME, module);
  
-  list arglist = CONS(EXPRESSION,expr_array,
-		      CONS(EXPRESSION,expr_dim,
-			   CONS(EXPRESSION,expr_region,
-				CONS(EXPRESSION,expr_size,
-				     CONS(EXPRESSION,expr_array,
-					  CONS(EXPRESSION,expr_max_nb_request,
-					       CONS(EXPRESSION,expr_requests,
-						    CONS(EXPRESSION,expr_nb_request,
-							 CONS(EXPRESSION,expr_algorithm,NIL)))))))));
-  return call_STEP_subroutine(strdup(concatenate(RT_STEP_MasterToAllRegion,step_type_suffix(array),NULL)),arglist);
+  list arglist = CONS(EXPRESSION, expr_array,
+		      CONS(EXPRESSION, expr_dim,
+			   CONS(EXPRESSION, expr_region,
+				CONS(EXPRESSION, expr_size,
+				     CONS(EXPRESSION, expr_max_nb_request,
+					  CONS(EXPRESSION, expr_requests,
+					       CONS(EXPRESSION, expr_nb_request,
+						    CONS(EXPRESSION, expr_algorithm, NIL))))))));
+ return call_STEP_subroutine(RT_STEP_MasterToAllRegion, arglist, entity_type(array));
 }
 
-static void step_create_mpi_before_master(step_region_analyse master_analyse, entity mpi_module)
-{
-  statement assigne_region = make_block_statement(NIL);
-  step_add_parameter(mpi_module);
 
+static entity master_SR_array(entity mpi_module, region reg)
+{
+  return step_local_SR(mpi_module,region_entity(reg),expression_undefined);
+}
+
+static statement build_mpi_before_master(entity directive_module,entity mpi_module)
+{
+  step_analyses master_analyse=load_global_step_analyses(directive_module);
+  
   //Calcul des regions SEND
-  MAP(REGION,r,{
-      if(!region_scalar_p(r))
-	{
-	  entity send=region_entity(r);
-	  store_or_update_send_region_entities(region_entity(r),
-					       step_create_region_array(mpi_module,strdup(STEP_SR_NAME(send)),send,FALSE));
-	  insert_statement(assigne_region,build_assigne_region0(0,r,load_send_region_entities(region_entity(r))),FALSE);
-	}
-    },step_region_analyse_send(master_analyse));
-  step_seqlist = CONS(STATEMENT,assigne_region, step_seqlist);
+  list send_regions=NIL;
+  FOREACH(REGION,reg,step_analyses_send(master_analyse))
+    {
+      if(!region_scalar_p(reg))
+	send_regions=CONS(REGION,reg,send_regions);
+    }
+  statement rank_stmt = call_STEP_subroutine(RT_STEP_Get_rank, CONS(EXPRESSION,step_local_rank(mpi_module),NIL), type_undefined);
+  return make_block_statement(CONS(STATEMENT,step_build_arrayRegion(mpi_module, send_regions, master_SR_array, entity_undefined),
+				   CONS(STATEMENT,rank_stmt,NIL)));
 }
 
-static void step_call_outlined_master(entity directive_module)
+static statement build_mpi_master(entity mpi_module, statement work)
 {
-  list arglist, exprlist;
-  statement call_stmt;
-
-  pips_debug(1, "original_module = %p\n", directive_module);
-
-  exprlist=NIL;
-  arglist=NIL;
-
-  MAP(ENTITY,e,{
-      entity ne = load_new_entities(e);
-      pips_debug(2,"call : entity %s -> %s\n", entity_name(e), entity_name(ne));
-
-      exprlist = CONS(EXPRESSION,entity_to_expression(ne),exprlist);
-    },
-    outline_data_formal(load_outline(directive_module)));
-  exprlist=gen_nreverse(exprlist);
-      
-  call_stmt = make_stmt_of_instr(make_instruction_call(make_call(directive_module, gen_append(arglist,exprlist))));
-
-  // if (STEP_RANK.EQ.0)
-  // call ....
-  step_seqlist = CONS(STATEMENT, make_stmt_of_instr(make_instruction_test(make_test(MakeBinaryCall(gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME, ".EQ."), entity_domain),entity_to_expr(MakeConstant(STEP_RANK_NAME,is_basic_string)), int_expr(0)),
-										    call_stmt,
-										    make_block_statement(NIL)))),
-		      step_seqlist);
+  // if (STEP_RANK.EQ.0) ...
+  statement if_stmt = make_stmt_of_instr(make_instruction_test(make_test(MakeBinaryCall(gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME, ".EQ."), entity_domain),step_local_rank(mpi_module), int_expr(0)), work, make_block_statement(NIL))));
+  return make_block_statement(CONS(STATEMENT,if_stmt,NIL));
 }
 
-static void step_create_mpi_after_master(step_region_analyse step_analyse, entity mpi_module)
+static statement build_mpi_after_master(entity directive_module,entity mpi_module)
 {
+  step_analyses master_analyse = load_global_step_analyses(directive_module);
+
   // communications OUT
-  pips_debug(1,"mpi_module = %p\n", mpi_module);
+  pips_debug(1, "mpi_module = %p\n", mpi_module);
   list seqlist_one2all = NIL;
-  entity requests_array = step_declare_requests_array(mpi_module,step_region_analyse_send(step_analyse));// effet de bord : initialisation de l'entite "step_nb_max_request" (constante symbolique)
-
-  MAP(REGION,r,{
-      statement stmt;
-      entity array = region_entity(r);
-      pips_debug(2,"region %s\n",entity_name(array));
+  int nb_communication_max = gen_length(step_analyses_send(master_analyse));
+  
+  if (nb_communication_max != 0)
+    {
+      expression expr_requests = step_local_requests_array(mpi_module, int_expr(nb_communication_max));
       
-      if(!region_scalar_p(r))
-	stmt = build_call_STEP_MastertoAllRegion(array);
-      else
-	stmt = build_call_STEP_MastertoAllScalar(array);
-
-      seqlist_one2all=CONS(STATEMENT,stmt,seqlist_one2all);
-    },step_region_analyse_send(step_analyse));
-
-  if (!ENDP(seqlist_one2all))
-    code_declarations(EntityCode(mpi_module)) =gen_append(code_declarations(EntityCode(mpi_module)),
-							  CONS(ENTITY,step_max_nb_request,CONS(ENTITY,step_requests,NIL)));
-
-    step_seqlist = gen_append(step_handle_comm_requests(requests_array,seqlist_one2all),step_seqlist);
-
+      FOREACH(REGION, r, step_analyses_send(master_analyse))
+	{
+	  statement stmt;
+	  entity array = region_entity(r);
+	  pips_debug(2, "region %s\n", entity_name(array));
+	  
+	  if(!region_scalar_p(r))
+	    stmt = build_call_STEP_MastertoAllRegion(mpi_module, copy_expression(expr_requests), array);
+	  else
+	    stmt = build_call_STEP_MastertoAllScalar(mpi_module, copy_expression(expr_requests), array);
+	  
+	  seqlist_one2all = CONS(STATEMENT, stmt, seqlist_one2all);
+	}
+      free_expression(expr_requests);
+    }
   pips_debug(1, "End\n");
+
+  return step_handle_comm_requests(mpi_module, seqlist_one2all, nb_communication_max);
 }
 
-
-entity step_create_mpi_master(entity directive_module)
+statement step_compile_master(int step_transformation, entity new_module, statement work)
 {
-  string new_name = step_find_new_module_name(directive_module,STEP_MPI_SUFFIX);
-  entity mpi_module = make_empty_subroutine(new_name,copy_language(module_language(get_current_module_entity())));
-  statement statmt;
-  step_region_analyse master_analyse = load_step_analyse_map(directive_module);
-  /* 
-     ajout des variables formelles pour la nouvelle fonction MPI
-     (identiques a celles de la fonction outlinee
-  */
-  init_new_entities();
-  init_old_entities();
-  init_send_region_entities();
-
-  step_add_formal_copy(mpi_module,outline_data_formal(load_outline(directive_module)));
-  step_create_mpi_before_master(master_analyse, mpi_module);
-
-  step_call_outlined_master(directive_module);
-
-  statmt = make_continue_statement(entity_undefined);
-  statement_comments(statmt)=strdup("\nC     Communicating data to other nodes\n");
-  step_seqlist = CONS(STATEMENT, statmt, step_seqlist);
-
-  step_create_mpi_after_master(master_analyse, mpi_module);
-  step_seqlist = CONS(STATEMENT, make_return_statement(mpi_module), step_seqlist);
-
-  close_new_entities();
-  close_old_entities();
-  close_send_region_entities();
-
-  return mpi_module;
+  entity directive_module=get_current_module_entity();
+  directive d=load_global_directives(directive_module);
+  pips_assert("is master directive",type_directive_omp_master_p(directive_type(d)));
+  
+  if (step_transformation == STEP_TRANSFORMATION_OMP)
+    {
+      add_pragma_entity_to_statement(work, directive_module);
+      return work;
+    }
+  else
+    {
+      statement before_work = build_mpi_before_master(directive_module, new_module);
+      statement after_work = build_mpi_after_master(directive_module, new_module);
+      statement body = make_block_statement(CONS(STATEMENT, before_work,
+						 CONS(STATEMENT, build_mpi_master(new_module, work),
+						      CONS(STATEMENT, after_work,NIL))));
+      
+      if (step_transformation == STEP_TRANSFORMATION_HYBRID)
+	return step_guard_hybride(body);
+      else
+	return body;
+    }
 }

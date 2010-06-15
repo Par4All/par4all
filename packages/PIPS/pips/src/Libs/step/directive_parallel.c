@@ -5,9 +5,8 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -72,7 +71,7 @@ instruction handle_omp_parallel(directive begin, directive end)
 
   directive_module = outlining_start(directive_module_name(begin));
   outlining_scan_block(directive_body(begin));
-  call = outlining_close();
+  call = outlining_close(step_directives_USER_FILE_name());
 
   if(statement_comments(call) != empty_comments)
     {
@@ -97,7 +96,7 @@ string directive_omp_parallel_to_string(directive d,bool close)
 {
   pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
-    return strdup(END_PARALLEL_TEXT);
+    return strdup(END_PARALLEL_TXT);
   else
-    return strdup(PARALLEL_TEXT);
+    return strdup(PARALLEL_TXT);
 }

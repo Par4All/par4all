@@ -7,12 +7,11 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
-
 #include "defines-local.h"
 
-GENERIC_GLOBAL_FUNCTION(reduction_entities,step_entity_map)
+GENERIC_LOCAL_FUNCTION(reduction_entities,map_entity_entity)
 
 static string op_to_step_op(string op)
 {
@@ -51,32 +50,49 @@ static entity step_declare_reduction_variable(entity module,entity variable)
   return new;
 }
 
-static step_reduction get_reductions_clause(entity module)
+static map_entity_string get_reductions_clause(entity module)
 {
+  map_entity_string reductions;
+  directive d;
+
   pips_assert("directive module",bound_global_directives_p(module));
-  directive d=load_global_directives(module);
-  step_reduction r=step_reduction_undefined;
+  d=load_global_directives(module);
+
   pips_assert("loop directive",type_directive_omp_parallel_do_p(directive_type(d))
 	      ||  type_directive_omp_do_p(directive_type(d)));
 
+  reductions=map_entity_string_undefined;
   // recherche de la clause reduction dans la listes des clauses de la directive
   FOREACH(CLAUSE,c,directive_clauses(d))
     {
-      if (clause_step_reduction_p(c))
+      if (clause_reduction_p(c))
 	{
-	  pips_assert("only one clause reduction per directive",step_reduction_undefined_p(r));
-	  r=clause_step_reduction(c);
+	  pips_assert("only one clause reduction per directive",map_entity_string_undefined_p(reductions));
+	  reductions=clause_reduction(c);
 	}
     }
 
-  return r;
+  return reductions;
 }
 
-void step_reduction_before(entity directive_module, entity mpi_module)
+list step_reduction_before(entity directive_module, entity mpi_module)
 {
   list arglist;
   expression variable,variable_reduc,operator;
-  STEP_REDUCTION_MAP(e,op,{
+  list entity_reduction=NIL;
+  map_entity_string reductions=get_reductions_clause(directive_module);
+  list lstmt=NIL;
+
+  init_reduction_entities();
+
+  MAP_ENTITY_STRING_MAP(e, __attribute__ ((unused))op,{
+      entity_reduction=CONS(ENTITY,e,entity_reduction);
+    },reductions);
+  sort_list_of_entities(entity_reduction);
+
+  FOREACH(ENTITY,e,entity_reduction)
+    {
+      string op=apply_map_entity_string(reductions,e);
       step_declare_reduction_variable(mpi_module,e);
       variable=entity_to_expression(e);
       variable_reduc=entity_to_expression(load_reduction_entities(e));
@@ -84,27 +100,46 @@ void step_reduction_before(entity directive_module, entity mpi_module)
       arglist=CONS(EXPRESSION,variable,
 		   CONS(EXPRESSION,variable_reduc,
       			CONS(EXPRESSION,operator,NIL)));
-      step_seqlist=CONS(STATEMENT,call_STEP_subroutine(strdup(concatenate(RT_STEP_InitReduction,step_type_suffix(e),NULL)),arglist),step_seqlist);
+      lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_InitReduction, arglist, entity_type(e)), lstmt);
       pips_debug(1,"reduction %s : %s\n",entity_name(e),op);
-    },get_reductions_clause(directive_module));
-  
-  return ;
+    }
+  gen_free_list(entity_reduction);
+  return lstmt;
 }
 
-void step_reduction_after(entity directive_module)
+list step_reduction_after(entity directive_module)
 {
   list arglist;
   expression variable,variable_reduc,operator;
-  STEP_REDUCTION_MAP(e,op,{
+  list entity_reduction=NIL;
+  map_entity_string reductions=get_reductions_clause(directive_module);
+  list lstmt=NIL;
+
+  MAP_ENTITY_STRING_MAP(e, __attribute__ ((unused))op,{
+      entity_reduction=CONS(ENTITY,e,entity_reduction);
+    },reductions);
+  sort_list_of_entities(entity_reduction);
+
+  FOREACH(ENTITY,e,entity_reduction)
+    {
+      string op=apply_map_entity_string(reductions,e); 
       variable=entity_to_expression(e);
       variable_reduc=entity_to_expression(load_reduction_entities(e));
       operator=entity_to_expression(MakeConstant(op_to_step_op(op),is_basic_string));
       arglist=CONS(EXPRESSION,variable,
 		   CONS(EXPRESSION,variable_reduc,
       			CONS(EXPRESSION,operator,NIL)));
-      step_seqlist=CONS(STATEMENT,call_STEP_subroutine(strdup(concatenate(RT_STEP_Reduction,step_type_suffix(e),NULL)),arglist),step_seqlist);
-      pips_debug(1,"reduction %s : %s\n",entity_name(e),op);}
-    ,get_reductions_clause(directive_module));
+      lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_Reduction, arglist, entity_type(e)), lstmt);
+      pips_debug(1,"reduction %s : %s\n",entity_name(e),op);
+    }
+  gen_free_list(entity_reduction);
+  
+  close_reduction_entities();
+  return lstmt;
+}
 
-  return;
+bool step_reduction_p(entity e)
+{
+  pips_assert("reduction initialized",!reduction_entities_undefined_p());
+  return bound_reduction_entities_p(e);
 }

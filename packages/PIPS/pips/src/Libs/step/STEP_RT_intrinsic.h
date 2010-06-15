@@ -9,7 +9,7 @@ Par defaut les appels aux intrinseques sont affiches sans "CALL" or dans le cas 
   {RT_STEP_get_myloopslice,words_call_intrinsic,0},
   {RT_STEP_get_i_low,words_call_intrinsic,0},
   {RT_STEP_get_i_up,words_call_intrinsic,0},
-  {RT_STEP_Init,words_call_intrinsic,0},
+  {RT_STEP_Init_Fortran_Order,words_call_intrinsic,0},
   {RT_STEP_Finalize,words_call_intrinsic,0},
   {RT_STEP_Barrier,words_call_intrinsic,0},
   {RT_STEP_Get_size,words_call_intrinsic,0},
@@ -18,7 +18,15 @@ Par defaut les appels aux intrinseques sont affiches sans "CALL" or dans le cas 
   {RT_STEP_ComputeLoopSlices,words_call_intrinsic,0},
   /*  {RT_STEP_SizeRegion,words_call_intrinsic,0}, c'est une function ! */
   {RT_STEP_WaitAll,words_call_intrinsic,0},
+  {RT_STEP_InitReduction,words_call_intrinsic,0},
+  {RT_STEP_Reduction,words_call_intrinsic,0},
+  {RT_STEP_MasterToAllScalar,words_call_intrinsic,0},
+  {RT_STEP_MasterToAllRegion,words_call_intrinsic,0},
+  {RT_STEP_AlltoAllRegion,words_call_intrinsic,0},
+  {RT_STEP_InitInterlaced,words_call_intrinsic,0},
+  {RT_STEP_AlltoAllRegion_Merge,words_call_intrinsic,0},
 
+  /* Lignes commentees pour eviter un bug portant sur le nombre d'entré dans la table des entites a bootstraper
   {RT_STEP_InitReduction "_I1",words_call_intrinsic,0},
   {RT_STEP_Reduction "_I1",words_call_intrinsic,0},
   {RT_STEP_MasterToAllScalar "_I1",words_call_intrinsic,0},
@@ -26,7 +34,7 @@ Par defaut les appels aux intrinseques sont affiches sans "CALL" or dans le cas 
   {RT_STEP_AlltoAllRegion "_I1",words_call_intrinsic,0},
   {RT_STEP_InitInterlaced "_I1",words_call_intrinsic,0},
   {RT_STEP_AlltoAllRegion_Merge "_I1",words_call_intrinsic,0},
-  {RT_STEP_InitReduction "_I2",words_call_intrinsic,0},
+  {RT_STEP_InitReduction "_I2",words_call_intrinsic,0},*/
   {RT_STEP_Reduction "_I2",words_call_intrinsic,0},
   {RT_STEP_MasterToAllScalar "_I2",words_call_intrinsic,0},
   {RT_STEP_MasterToAllRegion "_I2",words_call_intrinsic,0},

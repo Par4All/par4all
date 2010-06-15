@@ -1,0 +1,17 @@
+      INCLUDE 'steprt_f.h'
+
+      INTEGER STEP_MAX_NBNODE
+      PARAMETER (STEP_MAX_NBNODE = 16)
+
+      INTEGER max_nb_loopslices
+      INTEGER step_nbrequest
+
+      INTEGER STEP_COMM_SIZE, STEP_COMM_RANK
+
+      PARAMETER (MAX_NB_LOOPSLICES = STEP_MAX_NBNODE)
+      
+      ! Globals
+       INTEGER STEP_SizeRegion
+       INTEGER IDX_SLICE_LOW,IDX_SLICE_UP,STEP_IDX
+       PARAMETER (IDX_SLICE_LOW = 1,IDX_SLICE_UP=2)
+
