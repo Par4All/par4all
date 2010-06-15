@@ -15,13 +15,13 @@ from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
 
-default_install_prefix = "usr/local/par4all" # NO beginning slash please.
-package_name = "par4all"
-default_publish_host = "download.par4all.org"
-default_publish_dir = "/srv/www-par4all/download/releases"
-default_nightly_publish_dir = "/srv/www-par4all/download/nightly"
-default_deb_publish_dir = "/srv/www-par4all/download/dists/custom/main"
-default_deb_nightly_publish_dir = "/srv/www-par4all/download/dists/custom/nightly"
+default_install_prefix          = "usr/local/par4all" # NO beginning slash please.
+package_name                    = "par4all"
+default_publish_host            = "download.par4all.org"
+default_publish_dir             = "/srv/www-par4all/download/releases"
+default_nightly_publish_dir     = "/srv/www-par4all/download/nightly"
+default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/releases/main"
+default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/nightly/main"
 
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
