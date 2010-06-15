@@ -1,0 +1,5 @@
+atomized code
+int main()
+{
+   inter01();
+}

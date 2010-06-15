@@ -1,0 +1,6 @@
+atomized code
+int main()
+{
+   dereferencing02();
+   return 1;
+}

@@ -1,0 +1,11 @@
+atomized code
+int main()
+{
+   float a[5][3], ret;
+
+   ret = foo(a);
+   ret = foo2(a);
+   ret = foo3();
+
+   return 1;
+}

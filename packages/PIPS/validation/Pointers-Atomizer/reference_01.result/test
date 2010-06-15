@@ -1,0 +1,7 @@
+atomized code
+int main(void)
+{
+   int k = reference_01();
+
+   return k;
+}

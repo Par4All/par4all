@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 
 //  P() {}
 
-   long long size = test_intr(argv);
+   long long int size = test_intr(argv);
 
 //  P(size) {}
 
@@ -16,12 +16,12 @@ int main(int argc, char **argv)
 
 //  P() {}
 
-long long test_intr(char **argv)
+long long int test_intr(char **argv)
 {
 
 //  P() {}
 
-   long long result = 0;
+   long long int result = 0;
 
 //  P(result) {result==0}
 

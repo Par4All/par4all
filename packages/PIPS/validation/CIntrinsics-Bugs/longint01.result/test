@@ -1,0 +1,27 @@
+
+Parsed printed file for "longint01"
+
+int main()
+{
+   long int x = 2147483640;
+   printf("x=%ld", x);
+   return 0;
+}
+
+Cumulated effects for "longint01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <must be written>: x
+   long int x = 2147483640;
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] x
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("x=%ld", x);
+   return 0;
+}

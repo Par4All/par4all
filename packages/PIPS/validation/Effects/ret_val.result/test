@@ -1,7 +1,7 @@
-long long get_result(int argc, char **argv)
+long long int get_result(int argc, char **argv)
 {
 //               <must be written>: result
-   long long result = 0;
+   long long int result = 0;
 //               <must be read   >: argv argv[1]
 //               <must be written>: result
    result = atoll(argv[1]);
@@ -19,14 +19,14 @@ int main(int argc, char **argv)
 //               <may be written >: stdout[0]
 //               <must be read   >: __IO_EFFECTS:LUNS[1] argc argv
 //               <must be written>: __IO_EFFECTS:LUNS[1] size
-   long long size = get_result(argc, argv);
+   long long int size = get_result(argc, argv);
 //               <must be read   >: size
    return size;
 }
-long long get_result(int argc, char **argv)
+long long int get_result(int argc, char **argv)
 {
 //               <must be written>: result
-   long long result = 0;
+   long long int result = 0;
 //               <must be read   >: argv argv[1]
 //               <must be written>: result
    result = atoll(argv[1]);
