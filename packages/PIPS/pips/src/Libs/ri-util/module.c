@@ -68,8 +68,8 @@ bool static_module_name_p(const char* name)
    @param prefix is the prefix string
 
    @return the first module name (malloc'd string) of the form
-   "<prefix>_<integer>" with integer starting at 0 that do not correspond
-   to an existing module
+   "<prefix>_<integer>" that do not correspond to an existing module with
+   integer starting at 0
  */
 string
 build_new_top_level_module_name(string prefix) {
@@ -77,7 +77,7 @@ build_new_top_level_module_name(string prefix) {
   int version = 0;
 
   for(;;) {
-    asprintf(&name, "%s_%x", prefix, version++);
+    asprintf(&name, "%s_%d", prefix, version++);
     if (module_name_to_entity(name) == entity_undefined)
       break;
     free(name);

@@ -2224,10 +2224,13 @@ type_spec:   /* ISO 6.7.2 */
 			  if(type_undefined_p(t))
 			    v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			  else {
+			    /* This secondary test is probably
+			       useless. See the case of TK_COMPLEX. */
 			    if(standard_long_integer_type_p(t))
 			      v = make_variable(make_basic_float(DEFAULT_QUADPRECISION_TYPE_SIZE),NIL,NIL);
 			    else
 			      v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
+			    free_type(t);
 			  }
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
