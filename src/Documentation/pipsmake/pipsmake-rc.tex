@@ -1276,6 +1276,7 @@ generated for lines ending after column 72.
 
 \end{enumerate}
 
+
 \subsubsection{Declaration of the standard parser}
 \label{subsubsection:declaration-of-the-standard-parser}
 \index{PARSER\_WARN\_FOR\_COLUMNS\_73\_80}
@@ -1303,15 +1304,17 @@ fortran_symbol_table        > MODULE.symbol_table_file
     < MODULE.parsed_code
 \end{PipsMake}
 
+
 \subsubsection*{Input Format}
 
 Some subtle errors occur because the PIPS parser uses a fixed
 format. Columns 73 to 80 are ignored, but the parser may emit a warning
 if some characters are encountered in this comment field.
 
-\begin{PipsProp}{PARSER_WARN_FOR_COLUMNS_73_80} 
+\begin{PipsProp}{PARSER_WARN_FOR_COLUMNS_73_80}
 PARSER_WARN_FOR_COLUMNS_73_80 TRUE
 \end{PipsProp}
+
 
 \subsubsection*{ANSI extension}
 \index{PARSER\_ACCEPT\_ANSI\_EXTENSIONS}
@@ -1327,7 +1330,7 @@ CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS
 (see Section~\ref{subsection-preprocessing-and-splitting}) and the property below should
 be set to false.
 
-\begin{PipsProp}{PARSER_ACCEPT_ANSI_EXTENSIONS} 
+\begin{PipsProp}{PARSER_ACCEPT_ANSI_EXTENSIONS}
 PARSER_ACCEPT_ANSI_EXTENSIONS TRUE
 \end{PipsProp}
 
@@ -1382,7 +1385,7 @@ Most PIPS analyses work better if loop bounds are affine. It is sometimes
 possible to improve results for non-affine bounds by assigning the bound
 to an integer variables and by using this variable as bound.
 
-\begin{PipsProp}{PARSER_LINEARIZE_LOOP_BOUNDS} 
+\begin{PipsProp}{PARSER_LINEARIZE_LOOP_BOUNDS}
 PARSER_LINEARIZE_LOOP_BOUNDS FALSE
 \end{PipsProp}
 
@@ -4858,7 +4861,7 @@ complementary_sections > MODULE.compsec
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.transformers
-        < MODULE.preconditions     
+        < MODULE.preconditions
         < CALLEES.summary_compsec
 \end{PipsMake}
 
@@ -4872,12 +4875,8 @@ complementary_sections > MODULE.compsec
 summary_complementary_sections > MODULE.summary_compsec
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.compsec  
+        < MODULE.compsec
 \end{PipsMake}
-
-
-
-
 
 
 
@@ -4938,7 +4937,7 @@ parallel code) right now but it should evolves. See
 
 There are few properties that control the parallelization behaviour.
 
-\subsubsection{Rice (Parallelization)}
+\subsubsection{Properties controlling Rice parallelization}
 \index{Allen\&Kennedy}
 \index{GENERATE\_NESTED\_PARALLEL\_LOOPS}
 \index{PARALLELIZATION\_STATISTICS}
@@ -4946,24 +4945,26 @@ There are few properties that control the parallelization behaviour.
 
 TRUE to make all possible parallel loops, FALSE to generate real (vector,
 innermost parallel?) code:
-\begin{PipsProp}{GENERATE_NESTED_PARALLEL_LOOPS} 
+\begin{PipsProp}{GENERATE_NESTED_PARALLEL_LOOPS}
 GENERATE_NESTED_PARALLEL_LOOPS TRUE
 \end{PipsProp}
 
 Show statistics on the number of loops parallelized by pips:
-\begin{PipsProp}{PARALLELIZATION_STATISTICS} 
+\begin{PipsProp}{PARALLELIZATION_STATISTICS}
 PARALLELIZATION_STATISTICS FALSE
 \end{PipsProp}
 
 
 To select whether parallelization and loop distribution is done again for
 already parallel loops:
-\begin{PipsProp}{PARALLELIZE_AGAIN_PARALLEL_CODE} 
+\begin{PipsProp}{PARALLELIZE_AGAIN_PARALLEL_CODE}
 PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
-The motivation is when applying \emph{à la} Rice parallelizing to improve
-some sequential code, we may not want loop distribution on already
-parallel code to preserve cache resources.
+The motivation is we may want to parallelize with a coarse grain method
+first, and finish with a fine grain method here to try to parallelize what
+has not been parallelized.  When applying \emph{à la} Rice parallelizing
+to parallelize some (still) sequential code, we may not want loop
+distribution on already parallel code to preserve cache resources, etc.
 
 Thread-safe libraries are protected by critical sections. Their
 functions can be called safely from different execution threads. For
@@ -4972,7 +4973,7 @@ parallelized. The underlying state changes do no hinder
 parallelization, at least if the code is not sensitive to pointer
 values.
 
-\begin{PipsProp}{PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES} 
+\begin{PipsProp}{PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES}
 PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES FALSE
 \end{PipsProp}
 
@@ -4981,6 +4982,7 @@ must be exploited by each parallelization phase independently. It is
 not used to derived a simplified version of the use-def chains or of
 the dependence graph to avoid wrong result with use-def elimination,
 which is based on the same graph.
+
 
 \subsection{Menu for Parallelization Algorithm Selection}
 
@@ -5000,66 +5002,6 @@ alias internalize_parallel_code 'Consider a parallel code as a sequential one'
 \end{PipsMake}
 
 
-\subsection{Mark Parallel Loops in Sequential Code}
-\label{sec:cons-parall-code}
-
-\begin{PipsPass}{internalize_parallel_code}
-To simplify the user interface and to display with one click a
-parallelized program, programs in PIPS are ({\em parallelized code})
-instead of standard ({\em code}.\marginpar{PV:not clear} As a consequence, parallelized
-programs cannot be further analyzed and transformed because sequential
-code and parallelized code do not have the same resource type. Most
-pipsmake rules apply to {\em code} but not to {\em parallelized
-code}. Unfortunately, improving the parallelized code with some other
-transformations such as dead-code elimination is also useful. Thus
-this pseudo-transformation is added to coerce a parallel code into a
-classical (sequential) one. Parallelization is made an internal code
-transformation in PIPS with this rule.
-
-Although this is not the effective process, parallel loops are tagged
-as parallel and loop local variables may be added in a {\em code}
-resource because of a previous privatization phase.
-
-If you display the ``generated'' code, it may not be displayed as a
-parallel one if the \PipsPropRef{PRETTYPRINT_SEQUENTIAL_STYLE} is set
-to a parallel output style (such as \texttt{omp}). Anyway, the information
-is available in {\em code}.
-
-Note this transformation may no be usable with some special
-parallelizations in PIPS such as WP65 or HPFC that generate other resource
-types that may be quite different.
-\end{PipsPass}
-
-\begin{PipsMake}
-internalize_parallel_code             > MODULE.code
-        < MODULE.parallelized_code
-\end{PipsMake}
-
-\subsection{Manage Parallel Loops}
-\label{sec:manage-parallel-loops}
-
-\begin{PipsPass}{limit_nested_parallelism}
-The following transformation works on the parallel information available
-in the sequential code. The transformation will limit the number of nested
-parallel loops to a given value.
-It might be interesting to use the phase
-internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
-limit\_nested\_parallelism in order to maximize the number of parallel
-information available.
-\end{PipsPass}
-
-\begin{PipsMake}
-limit_nested_parallelism          > MODULE.code
-        < MODULE.code
-\end{PipsMake}
-
-PIPS relies on the property NESTED\_PARALLELISM\_THRESHOLD to determine the
-desired level of nested parallelism.
-\begin{PipsProp}{OMP_MERGE_POLICY}
-NESTED_PARALLELISM_THRESHOLD 0
-\end{PipsProp}
-
-
 \subsection{Allen \& Kennedy's Parallelization Algorithm}
 \label{subsubsection-allen-kennedy-parallelization-algorithm}
 \index{Parallelization}
@@ -5075,6 +5017,7 @@ rice_all_dependence             > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code MODULE.dg
 \end{PipsMake}
+
 
 \subsection{Def-Use Based Parallelization Algorithm}
 
@@ -5100,203 +5043,6 @@ rice_data_dependence            > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{PipsMake}
 
-
-\subsection{Parallelization for Terapix architecture}
-\index{Terapix}
-
-\subsubsection{Isolate Statement}
-\begin{PipsPass}{isolate_statement}
-Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory.
-Transfer are generated using either loops or \PipsPropRef{ISOLATE_STATEMENT_LOAD_FUNCTION} and \PipsPropRef{ISOLATE_STATEMENT_STORE_FUNCTION}
-\end{PipsPass}
-\begin{PipsMake}
-isolate_statement > MODULE.code
-	< MODULE.code
-	< MODULE.regions
-	< PROGRAM.entities
-\end{PipsMake}
-
-\begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
-ISOLATE_STATEMENT_LABEL ""
-\end{PipsProp}
-
-\begin{PipsProp}{ISOLATE_STATEMENT_LOAD_FUNCTION}
-ISOLATE_STATEMENT_LOAD_FUNCTION ""
-\end{PipsProp}
-
-\begin{PipsProp}{ISOLATE_STATEMENT_STORE_FUNCTION}
-ISOLATE_STATEMENT_STORE_FUNCTION ""
-\end{PipsProp}
-
-
-\subsubsection{kernelize}
-
-Bootstraps the kernel ressource
-\begin{PipsMake}
-bootstrap_kernels > PROGRAM.kernels
-\end{PipsMake}
-
-\begin{PipsPass}{flag_kernel}
-Add a kernel to the list of kernels known to pips
-\end{PipsPass}
-\begin{PipsMake}
-flag_kernel	> PROGRAM.kernels
-		< PROGRAM.kernels
-\end{PipsMake}
-
-
-\begin{PipsPass}{kernel_load_store}
-Generate unoptimized load / store information for each call to the module
-\end{PipsPass}
-\begin{PipsMake}
-kernel_load_store	> CALLERS.code
-		> CALLERS.callees
-		> PROGRAM.kernels
-		< PROGRAM.kernels
-		< CALLERS.code
-   		< CALLERS.cumulated_effects
-\end{PipsMake}
-
-The following properties can be used to customized the allocate/load/store
-functions:
-\begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION} 
-KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_accel_malloc"
-\end{PipsProp}
-\begin{PipsProp}{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION} 
-KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
-\end{PipsProp}
-\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION} 
-KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
-\end{PipsProp}
-\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION} 
-KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
-\end{PipsProp}
-
-Due to the current limitation of the effects, PIPS provides this property to
-force the load of any array that is writed in the kernel. This actually
-fixes the problem of partially writed array. A better solution using the region
-is under implementation.
-\begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
-KERNEL_LOAD_STORE_FORCE_LOAD FALSE
-\end{PipsProp}
-
-
-\begin{PipsPass}{kernelize}
-Split a parallel loop with a local index into three parts: a host side
-part, a kernel part and an intermediate part.
-The intermediate part simulates the parallel code to the kernel from the host
-\end{PipsPass}
-\begin{PipsMake}
-kernelize				> MODULE.code
-		> MODULE.callees
-		> PROGRAM.kernels
-		! MODULE.privatize_module
-		! MODULE.coarse_grain_parallelization
-		< PROGRAM.entities
-		< MODULE.code
-		< PROGRAM.kernels
-\end{PipsMake}
-The property \PipsPropRef{KERNELIZE_NBNODES} is used to set the number of nodes for this kernel.
-\PipsPropRef{KERNELIZE_KERNEL_NAME} is used to set the name of generated kernel.
-\PipsPropRef{KERNELIZE_HOST_CALL_NAME} is used to set the name of generated call to kernel (host side).
-
-\begin{PipsProp}{KERNELIZE_NBNODES}
-KERNELIZE_NBNODES 128
-\end{PipsProp}
-\begin{PipsProp}{KERNELIZE_KERNEL_NAME}
-KERNELIZE_KERNEL_NAME ""
-\end{PipsProp}
-\begin{PipsProp}{KERNELIZE_HOST_CALL_NAME}
-KERNELIZE_HOST_CALL_NAME ""
-\end{PipsProp}
-
-%\begin{PipsPass}{terapixify}
-%Function \verb+terapixify+ targets the {\em Terapix} multiprocessor from Thales.
-%This vector architecture require the generation of micro-codes (a.k.a ''kernels'' in the GPU terminology).
-%A microcode is a code portion that will be executed symmetrically on all processors of the machines.
-%They only work on parallel loops and can contain inner loops, but no branching.
-%This pass basically picks a parallel loop, strip-mines it and apply outlining to the tiled loop.
-%It then performs basic validity checks on resulting code to make sure it's a valid microcode.
-%
-%\textbf{Warning: this transformation should be applied to a loop nest, and the loop nest should be strip-mined before calling this}
-%\end{PipsPass}
-%
-%\begin{PipsMake}
-%terapixify				> MODULE.code
-%		! MODULE.kernelize
-%		! MODULE.outline
-%        < PROGRAM.entities
-%        < MODULE.code
-%        < MODULE.cumulated_effects
-%\end{PipsMake}
-%
-%The property \verb+OUTLINE_MODULE_NAME+ will be used as microcode name.
-%If not set, it will be asked for interactively.
-%The property \verb+OUTLINE_LABEL+ is used to select a statement.
-%If \verb+OUTLINE_LOOP_STATEMENT+ is set to \verb+TRUE+ and \verb+OUTLINE_LABEL+ is a loop, the loop body is selected instead of the loop itself.
-\begin{PipsProp}{OUTLINE_LOOP_STATEMENT}
-OUTLINE_LOOP_STATEMENT FALSE
-\end{PipsProp}
-
-\begin{PipsPass}{group_constants}
-Gather all constants from a module and put them in a single array.
-Relevant for Terapix code generation, and maybe for other accelerators as well
-\end{PipsPass}
-\begin{PipsMake}
-group_constants > MODULE.code
-	< PROGRAM.entities
-	< MODULE.code
-	< MODULE.regions
-\end{PipsMake}
-
-You may want to group constants only for a particular statement, in that case use \PipsPropRef{GROUP_CONSTANTS_STATEMENT_LABEL}
-\begin{PipsProp}{GROUP_CONSTANTS_STATEMENT_LABEL}
-GROUP_CONSTANTS_STATEMENT_LABEL ""
-\end{PipsProp}
-
-The way variables are grouped is control by \PipsPropRef{GROUP_CONSTANTS_LAYOUT},
-the only relevant value as of now is \texttt{"terapix"}.
-
-\begin{PipsProp}{GROUP_CONSTANTS_LAYOUT}
-GROUP_CONSTANTS_LAYOUT ""
-\end{PipsProp}
-
-The name of the variable holding constants can be set using \PipsPropRef{GROUP_CONSTANTS_HOLDER}.
-
-\begin{PipsProp}{GROUP_CONSTANTS_HOLDER}
-GROUP_CONSTANTS_HOLDER "caillou"
-\end{PipsProp}
-
-You may want to skip loop bounds from the grouping
-\begin{PipsProp}{GROUP_CONSTANTS_SKIP_LOOP_RANGE}
-GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
-\end{PipsProp}
-
-
-
-\begin{PipsPass}{normalize_microcode}
-Perform various checks on a Terapix microcode to make sure it can be
-synthesized.
-\end{PipsPass}
-\begin{PipsMake}
-normalize_microcode				> MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-\end{PipsMake}
-\begin{PipsPass}{terapix_remove_divide}
- converts divide operator into multiply operator using formula
-  $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
-\end{PipsPass}
-\begin{PipsMake}
-terapix_remove_divide > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{PipsMake}
-Use this property for accuracy of divide to multiply conversion.
-\begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
-TERAPIX_REMOVE_DIVIDE_ACCURACY 4
-\end{PipsProp}
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
@@ -5370,7 +5116,68 @@ nest_parallelization                    > MODULE.parallelized_code
 \end{PipsMake}
 
 
-\subsection{SIMDizer for SIMD multimedia instruction set}
+\subsection{Coerce parallel code into sequential code}
+\label{sec:cons-parall-code}
+
+\begin{PipsPass}{internalize_parallel_code}
+To simplify the user interface and to display with one click a
+parallelized program, programs in PIPS are ({\em parallelized code})
+instead of standard ({\em code}.\marginpar{PV:not clear} As a consequence, parallelized
+programs cannot be further analyzed and transformed because sequential
+code and parallelized code do not have the same resource type. Most
+pipsmake rules apply to {\em code} but not to {\em parallelized
+code}. Unfortunately, improving the parallelized code with some other
+transformations such as dead-code elimination is also useful. Thus
+this pseudo-transformation is added to coerce a parallel code into a
+classical (sequential) one. Parallelization is made an internal code
+transformation in PIPS with this rule.
+
+Although this is not the effective process, parallel loops are tagged
+as parallel and loop local variables may be added in a {\em code}
+resource because of a previous privatization phase.
+
+If you display the ``generated'' code, it may not be displayed as a
+parallel one if the \PipsPropRef{PRETTYPRINT_SEQUENTIAL_STYLE} is set
+to a parallel output style (such as \texttt{omp}). Anyway, the information
+is available in {\em code}.
+
+Note this transformation may no be usable with some special
+parallelizations in PIPS such as WP65 or HPFC that generate other resource
+types that may be quite different.
+\end{PipsPass}
+
+\begin{PipsMake}
+internalize_parallel_code             > MODULE.code
+        < MODULE.parallelized_code
+\end{PipsMake}
+
+
+\subsection{Manage Parallel Loops}
+\label{sec:manage-parallel-loops}
+
+\begin{PipsPass}{limit_nested_parallelism}
+The following transformation works on the parallel information available
+in the sequential code. The transformation will limit the number of nested
+parallel loops to a given value.
+It might be interesting to use the phase
+internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
+limit\_nested\_parallelism in order to maximize the number of parallel
+information available.
+\end{PipsPass}
+
+\begin{PipsMake}
+limit_nested_parallelism          > MODULE.code
+        < MODULE.code
+\end{PipsMake}
+
+PIPS relies on the property NESTED\_PARALLELISM\_THRESHOLD to determine the
+desired level of nested parallelism.
+\begin{PipsProp}{OMP_MERGE_POLICY}
+NESTED_PARALLELISM_THRESHOLD 0
+\end{PipsProp}
+
+
+\section{SIMDizer for SIMD multimedia instruction set}
 \index{Superword parallelism}
 \index{Atomizer}
 
@@ -5627,18 +5434,18 @@ simd_memory_packing  > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-\subsubsection{SIMD properties}
+\subsection{SIMD properties}
 
 This property is used to set the target register size, expressed in
 bits, for places where this is needed (for instance, auto-unroll with
 simple algorithm).
 
-\begin{PipsProp}{SAC_SIMD_REGISTER_WIDTH} 
+\begin{PipsProp}{SAC_SIMD_REGISTER_WIDTH}
 SAC_SIMD_REGISTER_WIDTH 64
 \end{PipsProp}
 
 
-\paragraph{Auto-Unroll}
+\subsubsection{Auto-Unroll}
 
 This property is used to control how the auto unroll phase computes
 the unroll factor. By default, the minimum unroll factor is used. It
@@ -5646,7 +5453,7 @@ is computed by using the minimum of the optimal factor for each
 statement. If the property is set to FALSE, then the maximum unroll
 factor is used instead.
 
-\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL} 
+\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL}
 SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
 \end{PipsProp}
 
@@ -5657,11 +5464,11 @@ to the size of the registers to find out the best unroll factor.
 If the property is set to FALSE, a more complex algorithm is used,
 which takes into account the actual SIMD instructions.
 
-\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION} 
+\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION}
 SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
 \end{PipsProp}
 
-\paragraph{Memory Organisation}
+\subsubsection{Memory Organisation}
 
 This property is used by the sac library to know which elements of
 multi-dimensional array are consecutive in memory. Let us consider the
@@ -5678,33 +5485,15 @@ but \lstinline|a(i,j,k)| and \lstinline|a(i+1,j,k)| are not.
 SIMD_FORTRAN_MEM_ORGANISATION TRUE
 \end{PipsProp}
 
-\paragraph{Pattern file}
+\subsubsection{Pattern file}
 
 This property is used by the sac library to know the path of the pattern definition file.
 If the file is not found, the execution fails.
 
-\begin{PipsProp}{SIMD_PATTERN_FILE} 
+\begin{PipsProp}{SIMD_PATTERN_FILE}
 SIMD_PATTERN_FILE "patterns.def"
 \end{PipsProp}
 
-\section{Task Parralelization}
-\label{subsection-task-parralelization}
-
-\subsection{Scalopes project}
-\label{subsubsection-scalopes-project}
-
-The goal of the following phase is to generate several task from one sequential
-programm. Each task is generated as an independant main programm. Then the task
-are linked and scheduled using the SCMP HAL.
-
-\begin{PipsMake}
-scalopify                    > MODULE.code
-		> MODULE.callees
-		> PROGRAM.entities
-		< PROGRAM.entities
-		< MODULE.code
-                < MODULE.cumulated_effects
-\end{PipsMake}
 
 \section{Code Distribution}
 \label{subsection-code-distribution}
@@ -6511,6 +6300,204 @@ COMENGINE_NUMBER_OF_FIFO 100
 \end{PipsProp}
 
 
+\subsection{Parallelization for Terapix architecture}
+\index{Terapix}
+
+\subsubsection{Isolate Statement}
+\begin{PipsPass}{isolate_statement}
+Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory.
+Transfer are generated using either loops or \PipsPropRef{ISOLATE_STATEMENT_LOAD_FUNCTION} and \PipsPropRef{ISOLATE_STATEMENT_STORE_FUNCTION}
+\end{PipsPass}
+\begin{PipsMake}
+isolate_statement > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< PROGRAM.entities
+\end{PipsMake}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
+ISOLATE_STATEMENT_LABEL ""
+\end{PipsProp}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_LOAD_FUNCTION}
+ISOLATE_STATEMENT_LOAD_FUNCTION ""
+\end{PipsProp}
+
+\begin{PipsProp}{ISOLATE_STATEMENT_STORE_FUNCTION}
+ISOLATE_STATEMENT_STORE_FUNCTION ""
+\end{PipsProp}
+
+
+\subsubsection{kernelize}
+
+Bootstraps the kernel ressource
+\begin{PipsMake}
+bootstrap_kernels > PROGRAM.kernels
+\end{PipsMake}
+
+\begin{PipsPass}{flag_kernel}
+Add a kernel to the list of kernels known to pips
+\end{PipsPass}
+\begin{PipsMake}
+flag_kernel	> PROGRAM.kernels
+		< PROGRAM.kernels
+\end{PipsMake}
+
+
+\begin{PipsPass}{kernel_load_store}
+Generate unoptimized load / store information for each call to the module
+\end{PipsPass}
+\begin{PipsMake}
+kernel_load_store	> CALLERS.code
+		> CALLERS.callees
+		> PROGRAM.kernels
+		< PROGRAM.kernels
+		< CALLERS.code
+   		< CALLERS.cumulated_effects
+\end{PipsMake}
+
+The following properties can be used to customized the allocate/load/store
+functions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}
+KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_accel_malloc"
+\end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION}
+KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
+\end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION}
+KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
+\end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION}
+KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
+\end{PipsProp}
+
+Due to the current limitation of the effects, PIPS provides this property to
+force the load of any array that is writed in the kernel. This actually
+fixes the problem of partially writed array. A better solution using the region
+is under implementation.
+\begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
+KERNEL_LOAD_STORE_FORCE_LOAD FALSE
+\end{PipsProp}
+
+
+\begin{PipsPass}{kernelize}
+Split a parallel loop with a local index into three parts: a host side
+part, a kernel part and an intermediate part.
+The intermediate part simulates the parallel code to the kernel from the host
+\end{PipsPass}
+\begin{PipsMake}
+kernelize				> MODULE.code
+		> MODULE.callees
+		> PROGRAM.kernels
+		! MODULE.privatize_module
+		! MODULE.coarse_grain_parallelization
+		< PROGRAM.entities
+		< MODULE.code
+		< PROGRAM.kernels
+\end{PipsMake}
+The property \PipsPropRef{KERNELIZE_NBNODES} is used to set the number of nodes for this kernel.
+\PipsPropRef{KERNELIZE_KERNEL_NAME} is used to set the name of generated kernel.
+\PipsPropRef{KERNELIZE_HOST_CALL_NAME} is used to set the name of generated call to kernel (host side).
+
+\begin{PipsProp}{KERNELIZE_NBNODES}
+KERNELIZE_NBNODES 128
+\end{PipsProp}
+\begin{PipsProp}{KERNELIZE_KERNEL_NAME}
+KERNELIZE_KERNEL_NAME ""
+\end{PipsProp}
+\begin{PipsProp}{KERNELIZE_HOST_CALL_NAME}
+KERNELIZE_HOST_CALL_NAME ""
+\end{PipsProp}
+
+%\begin{PipsPass}{terapixify}
+%Function \verb+terapixify+ targets the {\em Terapix} multiprocessor from Thales.
+%This vector architecture require the generation of micro-codes (a.k.a ''kernels'' in the GPU terminology).
+%A microcode is a code portion that will be executed symmetrically on all processors of the machines.
+%They only work on parallel loops and can contain inner loops, but no branching.
+%This pass basically picks a parallel loop, strip-mines it and apply outlining to the tiled loop.
+%It then performs basic validity checks on resulting code to make sure it's a valid microcode.
+%
+%\textbf{Warning: this transformation should be applied to a loop nest, and the loop nest should be strip-mined before calling this}
+%\end{PipsPass}
+%
+%\begin{PipsMake}
+%terapixify				> MODULE.code
+%		! MODULE.kernelize
+%		! MODULE.outline
+%        < PROGRAM.entities
+%        < MODULE.code
+%        < MODULE.cumulated_effects
+%\end{PipsMake}
+%
+%The property \verb+OUTLINE_MODULE_NAME+ will be used as microcode name.
+%If not set, it will be asked for interactively.
+%The property \verb+OUTLINE_LABEL+ is used to select a statement.
+%If \verb+OUTLINE_LOOP_STATEMENT+ is set to \verb+TRUE+ and \verb+OUTLINE_LABEL+ is a loop, the loop body is selected instead of the loop itself.
+\begin{PipsProp}{OUTLINE_LOOP_STATEMENT}
+OUTLINE_LOOP_STATEMENT FALSE
+\end{PipsProp}
+
+\begin{PipsPass}{group_constants}
+Gather all constants from a module and put them in a single array.
+Relevant for Terapix code generation, and maybe for other accelerators as well
+\end{PipsPass}
+\begin{PipsMake}
+group_constants > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.regions
+\end{PipsMake}
+
+You may want to group constants only for a particular statement, in that case use \PipsPropRef{GROUP_CONSTANTS_STATEMENT_LABEL}
+\begin{PipsProp}{GROUP_CONSTANTS_STATEMENT_LABEL}
+GROUP_CONSTANTS_STATEMENT_LABEL ""
+\end{PipsProp}
+
+The way variables are grouped is control by \PipsPropRef{GROUP_CONSTANTS_LAYOUT},
+the only relevant value as of now is \texttt{"terapix"}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_LAYOUT}
+GROUP_CONSTANTS_LAYOUT ""
+\end{PipsProp}
+
+The name of the variable holding constants can be set using \PipsPropRef{GROUP_CONSTANTS_HOLDER}.
+
+\begin{PipsProp}{GROUP_CONSTANTS_HOLDER}
+GROUP_CONSTANTS_HOLDER "caillou"
+\end{PipsProp}
+
+You may want to skip loop bounds from the grouping
+\begin{PipsProp}{GROUP_CONSTANTS_SKIP_LOOP_RANGE}
+GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
+\end{PipsProp}
+
+
+
+\begin{PipsPass}{normalize_microcode}
+Perform various checks on a Terapix microcode to make sure it can be
+synthesized.
+\end{PipsPass}
+\begin{PipsMake}
+normalize_microcode				> MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+\begin{PipsPass}{terapix_remove_divide}
+ converts divide operator into multiply operator using formula
+  $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
+\end{PipsPass}
+\begin{PipsMake}
+terapix_remove_divide > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+Use this property for accuracy of divide to multiply conversion.
+\begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
+TERAPIX_REMOVE_DIVIDE_ACCURACY 4
+\end{PipsProp}
+
+
 \subsection{Code distribution on GPU}
 \label{sec:code-distr-gpu}
 
@@ -6624,6 +6611,23 @@ To annotate only outer parallel loop nests, set the following variable to true:
 \begin{PipsProp}{GPU_LOOP_NEST_ANNOTATE_PARALLEL}
 GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
 \end{PipsProp}
+
+
+\subsection{Task generation for SCALOPES project}
+\label{subsubsection-scalopes-project}
+
+The goal of the following phase is to generate several tasks from one
+sequential program. Each task is generated as an independent main
+program. Then the tasks are linked and scheduled using the SCMP HAL.
+
+\begin{PipsMake}
+scalopify                    > MODULE.code
+		> MODULE.callees
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+                < MODULE.cumulated_effects
+\end{PipsMake}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
@@ -6741,9 +6745,10 @@ Partial distribution distributes the statements of a loop nest except
  the isolated statements,that have no dependences at the common level l,
  are gathered in the same l-th loop.
 
-\begin{PipsProp}{PARTIAL_DISTRIBUTION} 
+\begin{PipsProp}{PARTIAL_DISTRIBUTION}
 PARTIAL_DISTRIBUTION FALSE
 \end{PipsProp}
+
 
 \subsection{Statement Insertion}
 \begin{PipsPass}{statement_insertion}
@@ -6767,6 +6772,8 @@ STATEMENT_INSERTION_SUCCESS_PRAGMA "pips inserted statement"
 \begin{PipsProp}{STATEMENT_INSERTION_FAILURE_PRAGMA}
 STATEMENT_INSERTION_FAILURE_PRAGMA "pips inserted statement to remove"
 \end{PipsProp}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
 \subsection{Loop Expansion}
 \begin{PipsPass}{loop_expansion_init}
@@ -6914,7 +6921,7 @@ fully unrolled.
 
 Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give it interactively
 
-\begin{PipsProp}{FULL_UNROLL_INTERACTIVELY} 
+\begin{PipsProp}{FULL_UNROLL_INTERACTIVELY}
 FULL_UNROLL_INTERACTIVELY TRUE
 \end{PipsProp}
 
@@ -7114,7 +7121,8 @@ guard_elimination       > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-\subsection{Tiling for sequences of loop nests }
+
+\subsection{Tiling for sequences of loop nests}
 \label{subsection-tiling-for-sequences-loop-ness}
 
 \begin{PipsPass}{tiling_sequence}
@@ -7133,6 +7141,7 @@ tiling_sequence      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 
 \subsection{Hardware Accelerator}
 \label{hardware-accelerator}
@@ -9691,7 +9700,8 @@ transformation_test    > MODULE.code
 \section{Extensions Transformations}
 \label{section-extensions_transformations}
 
-\subsection {OpenMP Pragma}
+
+\subsection{OpenMP Pragma}
 \label{subsection-open_mp_pragma}
 \index{OpenMP}
 
@@ -9715,7 +9725,7 @@ As defined in the ri, the pragma can be of different types. The following
 property can be set to \verb|str| or \verb|expr|. Obviously, if the
 property is set to \verb|str| then pragmas would be generated as strings
 otherwise pragmas would be generated as expressions.
-\begin{PipsProp}{PRAGMA_TYPE} 
+\begin{PipsProp}{PRAGMA_TYPE}
 PRAGMA_TYPE "expr"
 \end{PipsProp}
 
