@@ -447,10 +447,11 @@ if __name__ == "__main__":
     try:
         main()
     except:
-        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
         error(str(sys.exc_info()[1]))
         error("To get verbose output, try passing -v, -vv, or -vvv")
+        stop_all_spinners()
         raise
+    stop_all_spinners() # Make sure no spinner is hindering script from exiting.
 
 
 # Some Emacs stuff:
