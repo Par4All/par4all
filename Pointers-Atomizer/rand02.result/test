@@ -1,0 +1,41 @@
+atomized code
+void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
+{
+   int ix, iy;
+   double u, A, v, B;
+   //PIPS generated variable
+   double F_0, F_1, F_2;
+   //PIPS generated variable
+   float F_3;
+   //PIPS generated variable
+   double F_4, F_5, F_6, F_7, F_8, F_9;
+   
+   // MOTIF 
+   u = 0;
+   for(iy = 0; iy <= ny-1; iy += 1)
+      for(ix = 0; ix <= nx-1; ix += 1) {
+
+         while (u==0||u>1) 
+            u = rand()/32768.;
+         F_0 = log(u);
+         F_1 = 2.*F_0;
+         F_2 = -F_1;
+         A = sqrt(F_2);
+         v = rand()/32768.;
+         F_3 = 2.*3.141592653589793238;
+         B = F_3*v;
+         A = 1.0;
+         v = 1.0;
+         B = 1.0;
+         F_4 = Sigma2*A;
+         F_5 = cos(B);
+         F_6 = F_4*F_5;
+
+         pt_out[iy][ix].re = pt_in[iy][ix].re+F_6;
+         F_7 = Sigma2*A;
+         F_8 = sin(B);
+         F_9 = F_7*F_8;
+         pt_out[iy][ix].im = pt_in[iy][ix].im+F_9;
+         u = 0;
+      }
+}

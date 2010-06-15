@@ -1,0 +1,8 @@
+atomized code
+int main()
+{
+   int i;
+   tf_t s;
+
+   call15(&i, &s);
+}

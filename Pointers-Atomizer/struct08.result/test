@@ -1,0 +1,12 @@
+atomized code
+int main()
+{
+   mys *p, *q, **r, *s[5];
+
+   init(p);
+   init2(q);
+   init3(r);
+   init4(s);
+
+   return 1;
+}

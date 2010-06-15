@@ -1,0 +1,12 @@
+atomized code
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+
+   for(i = 0; i <= 8; i += 1)
+      for(j = 0; j <= 8; j += 1) {
+         imagein[i][j].re = 0.0;
+         imagein[i][j].im = 0.0;
+      }
+   return imagein[2][1].re;
+}

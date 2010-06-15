@@ -1,0 +1,10 @@
+atomized code
+int main()
+{
+   int ny = 10, nx = 10;
+   Cplfloat pt_in[ny][nx];
+   float Sigma2;
+   Cplfloat pt_out[ny][nx];
+
+   AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+}

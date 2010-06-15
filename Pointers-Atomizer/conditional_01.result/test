@@ -1,0 +1,16 @@
+atomized code
+int conditional_01()
+{
+   int *q;
+   int *p;
+   int i = 0, j = 1;
+   //PIPS generated variable
+   int I_0;
+   //PIPS generated variable
+   int *P_0;
+   q = &i;
+   I_0 = i>0;
+   P_0 = &j;
+   p = I_0?P_0:q;
+   return 0;
+}
