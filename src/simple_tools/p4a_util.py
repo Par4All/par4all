@@ -119,7 +119,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("magenta") 
+        global msg_prefix
+        sys.stderr.write(msg_prefix + p4a_term.escape("magenta") 
             + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
@@ -169,7 +170,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     else:
         w = os.getcwd()
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": (in " + w + ") " + p4a_term.escape("magenta") 
+        global msg_prefix
+        sys.stderr.write(msg_prefix + "(in " + w + ") " + p4a_term.escape("magenta") 
             + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
