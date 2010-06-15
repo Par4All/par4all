@@ -65,7 +65,7 @@ int main(int ac, char *av[])
    char c1;
    char c2;
    double t;
-   long i, size;
+   long int i, size;
 
    if (ac!=4) {
       printf("Usage: light infile.pgm mapfile.amp outfile.pgm\n");
