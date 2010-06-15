@@ -1,0 +1,140 @@
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "long01!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 118
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`a" with type "variable" "int"
+	Declared entity "main:0`b" with type "variable" "long int"
+	Declared entity "main:0`c" with type "variable" "long int"
+	Declared entity "main:0`d" with type "variable" "long long int"
+	Declared entity "main:0`e" with type "variable" "long long int"
+	Declared entity "main:0`f" with type "variable" "double"
+	Declared entity "main:0`g" with type "variable" "long double"
+	Declared entity "main:0`h" with type "variable" "float _Complex"
+	Declared entity "main:0`y" with type "variable" "long double _Complex"
+	Declared entity "main:0`z" with type "variable" "double _Complex"
+	Declared entity "main:main" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
+
+
+Layout for memory area "long01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 118:
+	Variable "main:0`a"	offset = 10	size = 4
+	Variable "main:0`b"	offset = 14	size = 4
+	Variable "main:0`c"	offset = 18	size = 4
+	Variable "main:0`d"	offset = 22	size = 8
+	Variable "main:0`e"	offset = 30	size = 8
+	Variable "main:0`f"	offset = 38	size = 8
+	Variable "main:0`g"	offset = 46	size = 16
+	Variable "main:0`h"	offset = 62	size = 8
+	Variable "main:0`z"	offset = 70	size = 16
+	Variable "main:0`y"	offset = 86	size = 32
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+
+Parsed printed file for "long01"
+
+int main()
+{
+   int a = 11;
+   long int b = 1000000000;
+   long int c = 200000;
+   long long int d = 20480744900000585;
+   long long int e = 3669993212;
+   double f = 2560.000;
+   long double g = 90.500l;
+   float _Complex h;
+   // = 2.1 + 7.7*I;
+   double _Complex z;
+   //= 42.1550 + 42.2000*I;
+   long double _Complex y;
+   // = 8.6523l + 98.23541l*I;
+   
+   //printf("float complex h= %f + %fI, double complex z= %f + %fI, long double complex y= %Lf + %LfI \n", crealf(h), cimagf(h), creal(z), cimag(z), creall(y), cimagl(y));  
+   printf("int a=%d, long b=%ld, long int c=%ld, long long d=%lld, long long int e=%lld, double f=%f, long double g=%Lf\n", a, b, c, d, e, f, g);
+   return 0;
+}
+
+Cumulated effetcs for "long01"
+
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <must be written>: a
+   int a = 11;
+//               <must be written>: b
+   long int b = 1000000000;
+//               <must be written>: c
+   long int c = 200000;
+//               <must be written>: d
+   long long int d = 20480744900000585;
+//               <must be written>: e
+   long long int e = 3669993212;
+//               <must be written>: f
+   double f = 2560.000;
+//               <must be written>: g
+   long double g = 90.500l;
+   float _Complex h;
+   // = 2.1 + 7.7*I;
+   double _Complex z;
+   //= 42.1550 + 42.2000*I;
+   long double _Complex y;
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a b c 
+//                                  d e f g
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   // = 8.6523l + 98.23541l*I;
+   
+   //printf("float complex h= %f + %fI, double complex z= %f + %fI, long double complex y= %Lf + %LfI \n", crealf(h), cimagf(h), creal(z), cimag(z), creall(y), cimagl(y));  
+   printf("int a=%d, long b=%ld, long int c=%ld, long long d=%lld, long long int e=%lld, double f=%f, long double g=%Lf\n", a, b, c, d, e, f, g);
+   return 0;
+}
