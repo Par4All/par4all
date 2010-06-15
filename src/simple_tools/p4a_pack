@@ -107,7 +107,7 @@ def publish_files(files):
             publish_deb(file, default_publish_host, default_deb_publish_dir)
         else:
             warn("Copying " + file + " on " + default_publish_host)
-            run([ "scp", file, default_publish_host + ":" + remote_dir ])
+            run([ "scp", file, default_publish_host + ":" + default_publish_dir ])
 
 def create_sdeb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
     die("create_sdeb is TODO")
@@ -303,12 +303,13 @@ if __name__ == "__main__":
     except p4a_error:
         error(str(sys.exc_info()[1]))
         error("To get verbose output, try passing -v, -vv, or -vvv")
+        sys.exit(1)
     except:
         error(str(sys.exc_info()[1]))
         error("To get verbose output from the build, try passing -v, -vv, or -vvv")
-        stop_all_spinners()
         raise
-    stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+    finally:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
 
 
 # Some Emacs stuff:
