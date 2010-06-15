@@ -2436,6 +2436,7 @@ bool standard_long_integer_type_p(type t)
 	    || s == DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
     }
   }
+  return long_p;
 }
 
 type make_standard_long_integer_type(type t)

@@ -146,6 +146,7 @@ static void step_drop_complex_constraints(region reg)
 }
 
 
+#if 0
 /* Recherche des variables et tableaux privatisables  
    
    Calcul de PRIV a partir de LOCAL: variables ecrites non
@@ -166,7 +167,6 @@ static list step_private_regions(list write_l, list in_l, list out_l)
   return priv_l;
 }
 
-#if 0
 /* Recherche des variables et sections de tableau privatisables 
    
    Possibilite de diviser les tableaux en plusieurs sections au lieu
