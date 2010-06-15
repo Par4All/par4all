@@ -653,8 +653,8 @@ if __name__ == "__main__":
         error("You can also try running again with --rebuild --clean (-RC) and see if it picks up")
         sys.exit(1)
     except:
-        error(str(sys.exc_info()[1]))
-        error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        #~ error(str(sys.exc_info()[1]))
+        #~ error("To get verbose output from the build, try passing -v, -vv, or -vvv")
         raise
     finally:
         stop_all_spinners() # Make sure no spinner is hindering script from exiting.

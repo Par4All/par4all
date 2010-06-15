@@ -305,8 +305,10 @@ if __name__ == "__main__":
         error("To get verbose output, try passing -v, -vv, or -vvv")
         sys.exit(1)
     except:
-        error(str(sys.exc_info()[1]))
-        error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        #~ if sys.exc_info()[0].__name__ == "SystemExit":
+            #~ raise
+        #~ error(str(sys.exc_info()[1]))
+        #~ error("To get verbose output from the build, try passing -v, -vv, or -vvv")
         raise
     finally:
         stop_all_spinners() # Make sure no spinner is hindering script from exiting.

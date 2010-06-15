@@ -27,33 +27,40 @@ def get_verbosity():
     global verbosity
     return verbosity
 
+msg_prefix = os.path.split(sys.argv[0])[1] + ": "
+
 # Printing/logging helpers.
 def debug(msg):
+    global msg_prefix
     if verbosity >= 2:
-        sys.stderr.write(sys.argv[0] + ": " + str(msg).rstrip("\n") + "\n");
+        sys.stderr.write(msg_prefix + str(msg).rstrip("\n") + "\n");
     if logger:
         logger.debug(msg)
 
 def info(msg):
+    global msg_prefix
     if verbosity >= 1:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.info(msg)
 
 def done(msg):
+    global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.info(msg)
 
 def warn(msg):
+    global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.warn(msg)
 
 def error(msg):
-    sys.stderr.write(sys.argv[0] + ": " + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+    global msg_prefix
+    sys.stderr.write(msg_prefix + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
     if logger:
         logger.error(msg)
 
