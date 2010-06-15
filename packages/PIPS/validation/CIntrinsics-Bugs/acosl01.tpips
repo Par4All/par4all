@@ -1,14 +1,8 @@
 delete acosl01
 
-setenv PIPS_CPP="cpp -C"
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create acosl01 acosl01.c
-
-activate C_PARSER
-
-setproperty PRETTYPRINT_C_CODE TRUE
 
 echo
 echo Parsed printed file for "acosl01"

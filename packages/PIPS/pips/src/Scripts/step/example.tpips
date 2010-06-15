@@ -1,12 +1,14 @@
 delete myProgram
 create myProgram myProg.f mySubprog1.f mySubProg2.f
 
-activate TRANSFORMERS_INTER_FULL 
 activate MUST_REGIONS
-activate STEP_DIRECTIVE_PARSER
+activate TRANSFORMERS_INTER_FULL
 
 apply STEP_DIRECTIVES[%ALL]
 apply STEP_ANALYSE[%ALL]
-apply STEP_MPI[%MAIN]
+apply STEP_COMPILE[%MAIN]
+
+setproperty STEP_INSTALL_PATH "$PATH_GENERATED_FILE"
+apply STEP_INSTALL
 
 close

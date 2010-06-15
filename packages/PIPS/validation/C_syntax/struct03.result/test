@@ -12,7 +12,7 @@ typedef double __pthread_slist_t;
 typedef union {
    struct __pthread_mutex_s {int __lock; unsigned int __count; int __owner; int __kind; int __spins; __pthread_list_t __list;} __data;
    char __size[123];
-   long __align;
+   long int __align;
 } pthread_mutex_t;
 
 extern void main();

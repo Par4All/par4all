@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 //  T(i,j) {i==i#init+1, i==j-20}
 
-   long long size[i++][j = foo(i)];
+   long long int size[i++][j = foo(i)];
 
 //  T(main) {}
 

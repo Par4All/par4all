@@ -10,7 +10,7 @@ int main(char *fmt1, ...)
    char *i_name;
    int i, r, c, max;
    fpos_t *fp_pos, pos;
-   long fp_pos_indic;
+   long int fp_pos_indic;
    va_list vl;
 //               <must be written>: fmt2
    

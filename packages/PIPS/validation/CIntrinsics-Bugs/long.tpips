@@ -1,0 +1,31 @@
+delete long
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create long long.c
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+
+display SYMBOL_TABLE_FILE[%ALL]
+
+echo
+echo Parsed printed file for "long"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "long"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete long
+quit
+

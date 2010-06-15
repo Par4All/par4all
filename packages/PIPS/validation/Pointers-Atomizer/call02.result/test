@@ -1,0 +1,12 @@
+atomized code
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+   tf_t *sp = &s;
+
+   call02(a, b, x, ap, sp);
+}

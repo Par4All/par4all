@@ -23,7 +23,7 @@ Variable list:
 
 Typedef entities:
 
-	Typedef "decl02!:$STD_uint32"	with type "variable" "long"
+	Typedef "decl02!:$STD_uint32"	with type "variable" "long int"
 
 Layouts for memory areas:
 
@@ -54,7 +54,7 @@ End of declarations for module decl02!
 
 Parsed printed file
 
-typedef long STD_uint32;
+typedef long int STD_uint32;
 
 static const char *cmd = "No cmd";
 static const char *file = "No file";
@@ -67,7 +67,7 @@ int array[] = {1, 2, 3};
 
 Printed file
 
-typedef long STD_uint32;
+typedef long int STD_uint32;
 
 static const char *cmd = "No cmd";
 static const char *file = "No file";
