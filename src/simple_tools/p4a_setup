@@ -377,6 +377,11 @@ def main():
     if options.jobs:
         make_opts.append("-j" + options.jobs)
     
+    spin = None
+    if get_verbosity() == 0:
+        warn("Building and installing, please wait...")
+        spin = spinner()
+    
     ############################## polylib
     
     if not options.skip_polylib:
@@ -638,13 +643,21 @@ def main():
     done("To begin using this Par4All installation.")
     done("")
 
+
 if __name__ == "__main__":
     try:
         main()
     except p4a_error:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
         error(str(sys.exc_info()[1]))
-        error("To get verbose output from the build, try passing -v, -vv, or -vvv.")
-        error("You can also try running again with --rebuild --clean (-RC) and see if it picks up.")
+        error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        error("You can also try running again with --rebuild --clean (-RC) and see if it picks up")
+    except:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+        error(str(sys.exc_info()[1]))
+        error("To get verbose output from the build, try passing -v, -vv, or -vvv")
+        raise
+
 
 # Some Emacs stuff:
 ### Local Variables:

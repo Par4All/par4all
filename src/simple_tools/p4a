@@ -441,10 +441,17 @@ def main():
             warn("Not removing build directory " + build_dir)
         else:
             rmtree(build_dir, can_fail = True)
-    
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except:
+        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+        error(str(sys.exc_info()[1]))
+        error("To get verbose output, try passing -v, -vv, or -vvv")
+        raise
+
 
 # Some Emacs stuff:
 ### Local Variables:
