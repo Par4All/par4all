@@ -5,6 +5,7 @@ LIB_CFILES=	step.c \
 		atomizer.c \
 		outlining.c \
 		directives.c \
+		directive_transformation.c \
 		directive_parallel.c \
 		directive_do.c \
 		directive_section.c \
@@ -14,6 +15,9 @@ LIB_CFILES=	step.c \
 		directive_private.c \
 		analyse.c \
 		compile.c \
+		compile_RT.c \
+		compile_region.c \
+		compile_parallel.c \
 		compile_do.c \
 		compile_reduction.c \
 		compile_master.c \

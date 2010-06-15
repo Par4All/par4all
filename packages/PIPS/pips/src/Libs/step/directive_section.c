@@ -7,24 +7,65 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
+static directive _make_directive_omp_section(string directive_txt)
+{
+  string new_name;
+  directive drt;
+
+  pips_debug(1,"stmt = %s\n", directive_txt);
+
+  new_name = step_make_new_directive_module_name(SUFFIX_OMP_SECTION,"");
+  
+  drt = make_directive(strdup(directive_txt), new_name, make_type_directive_omp_section(), NIL, NIL);
+
+  pips_debug(1,"d = %p\n", drt);
+  return drt;
+}
+
+
+void handle_directive_sections_push(list remaining, directive drt)
+{
+  pips_debug(1, "remaining = %p, drt = %p\n", remaining, drt);
+
+  if (type_directive_omp_sections_p(directive_type(drt))
+      || type_directive_omp_parallel_sections_p(directive_type(drt)))
+    {
+      directive new_drt;
+      
+      /*
+	After any 'sections' or 'parallel sections'
+	Automatically add a section
+      */ 
+      
+      new_drt = _make_directive_omp_section("'section'");
+      
+      STEP_DEBUG_DIRECTIVE(2,"Automatical PUSH current_directives", new_drt);
+      current_directives_push(new_drt);
+    }
+
+  pips_debug(1, "fin\n");
+}
 
 directive make_directive_omp_parallel_sections(statement stmt)
 {
-  directive d;
+  string new_name;
+  directive drt;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
-  d = make_directive(strdup(statement_to_directive_txt(stmt)),step_make_new_directive_module_name(SUFFIX_OMP_PARALLEL_SECTIONS,""),make_type_directive_omp_parallel_sections(NIL),NIL,NIL);
+  new_name = step_make_new_directive_module_name(SUFFIX_OMP_PARALLEL_SECTIONS,"");
 
-  pips_debug(1,"d = %p\n", d);
-  return d;
+  drt = make_directive(strdup(statement_to_directive_txt(stmt)), new_name, make_type_directive_omp_parallel_sections(NIL), NIL, NIL);
+
+  pips_debug(1,"d = %p\n", drt);
+  return drt;
 }
 
-bool is_begin_directive_omp_parallel_sections(directive __attribute__ ((unused)) current,directive next)
+bool is_begin_directive_omp_parallel_sections(directive __attribute__ ((unused)) current, directive next)
 {
   bool b;
 
@@ -38,83 +79,47 @@ bool is_begin_directive_omp_parallel_sections(directive __attribute__ ((unused))
 
 directive make_directive_omp_end_parallel_sections(statement stmt)
 {
-  directive d;
+  string new_name;
+  directive drt;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
-  d = make_directive(strdup(statement_to_directive_txt(stmt)),step_make_new_directive_module_name(SUFFIX_OMP_SECTION,""),make_type_directive_omp_end_parallel_sections(),NIL,NIL);
+  new_name = step_make_new_directive_module_name("end","");
 
-  pips_debug(1,"d = %p\n", d);
-  return d;
+  drt = make_directive(strdup(statement_to_directive_txt(stmt)), new_name, make_type_directive_omp_end_parallel_sections(), NIL, NIL);
+
+  pips_debug(1,"drt = %p\n", drt);
+  return drt;
 }
 
-bool is_end_directive_omp_end_parallel_sections(directive current,directive next)
+bool is_end_directive_omp_end_parallel_sections(directive  __attribute__ ((unused)) current, directive  __attribute__ ((unused)) next)
 {
-  bool b1, b2;
+  bool b;
   
   pips_debug(1,"current = %p, next = %p\n", current, next);
 
-  b1 = type_directive_omp_end_parallel_sections_p(directive_type(next));
-  b2 = type_directive_omp_parallel_sections_p(directive_type(current));
+  b = TRUE;
 
-  pips_debug(1,"b1 = %d, b2 = %d\n", b1, b2);
-  return b1 && b2;
-}
-
-instruction handle_omp_parallel_sections(directive begin,directive end)
-{
-  instruction instr;
-  statement call;
-  entity directive_module;
-
-  pips_debug(1,"begin = %p, end = %p\n", begin, end);
-
-  pips_assert("parallel sections",type_directive_omp_parallel_sections_p(directive_type(begin)));
-  pips_assert("end parallel sections",type_directive_omp_end_parallel_sections_p(directive_type(end)));
-  
-  if (ENDP(type_directive_omp_parallel_sections(directive_type(begin))))
-    pips_error("handle_omp_parallel_sections", "no section in parallel_sections directive");
-
-  // handle the parallel sections directive
-  directive_module = outlining_start(directive_module_name(begin));
-  outlining_scan_block(type_directive_omp_sections(directive_type(begin)));
-  call = outlining_close();
-  if(statement_comments(call)!=empty_comments)
-    {
-      free(statement_comments(call));
-      statement_comments(call)=empty_comments;
-    }
-  statement_label(call) = entity_empty_label();
-  
-  call = step_keep_directive_txt(begin,call,end);
-
-  instr = statement_instruction(call);
-  statement_instruction(call) = instruction_undefined;
-  free_statement(call);
-  
-  // reduction handling
-  directive_clauses(begin) = gen_nconc(directive_clauses(begin),
-				       CONS(CLAUSE,clause_reductions(call_function(instruction_call(instr)),directive_txt(begin)),NIL));
-  
-  store_global_directives(directive_module,begin);
-
-  pips_debug(1,"instr = %p\n", instr);
-  return instr;
+  pips_debug(1,"b = %d\n", b);
+  return b;
 }
 
 directive make_directive_omp_sections(statement stmt)
 {
-  directive d;
+  string new_name;
+  directive drt;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
-  d = make_directive(strdup(statement_to_directive_txt(stmt)),step_make_new_directive_module_name(SUFFIX_OMP_SECTIONS,""),make_type_directive_omp_sections(NIL),NIL,NIL);
+  new_name = step_make_new_directive_module_name(SUFFIX_OMP_SECTIONS,"");
 
-  pips_debug(1,"d = %p\n", d);
-  return d;
+  drt = make_directive(strdup(statement_to_directive_txt(stmt)), new_name, make_type_directive_omp_sections(NIL),NIL,NIL);
+  
+  pips_debug(1,"d = %p\n", drt);
+  return drt;
 }
 
-bool is_begin_directive_omp_sections(directive __attribute__ ((unused)) current,directive next)
+bool is_begin_directive_omp_sections(directive __attribute__ ((unused)) current, directive next)
 {
   bool b;
   
@@ -126,21 +131,45 @@ bool is_begin_directive_omp_sections(directive __attribute__ ((unused)) current,
   return b;
 }
 
+bool is_begin_directive_omp_section(directive current, directive next)
+{
+  bool b;
+  
+  pips_debug(1,"current = %p, next = %p\n", current, next);
+  
+  /* the first omp_section is automatically added
+     when omp_sections is handled (push)
+     thus already in the stack
+
+     the next omp_section are added after 
+     handling previous omp_section
+
+     thus omp_section is considered as an end_directive
+  */
+  b = FALSE;
+
+  pips_debug(1,"b = %d\n", b);
+  return b;
+}
+
 directive make_directive_omp_section(statement stmt)
 {
-  directive d;
+  string directive_txt;
+  directive drt;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
-  d = make_directive(strdup(statement_to_directive_txt(stmt)),step_make_new_directive_module_name(SUFFIX_OMP_SECTION,""),make_type_directive_omp_section(),NIL,NIL);
+  directive_txt = strdup(statement_to_directive_txt(stmt));
 
-  pips_debug(1,"d = %p\n", d);
-  return d;
+  drt = _make_directive_omp_section(directive_txt);
+
+
+  pips_debug(1,"d = %p\n", drt);
+  return drt;
 }
 
 bool is_end_directive_omp_section(directive current, directive next)
 {
-  bool b1, b2, b3;
   bool b;
 
   pips_debug(1,"current = %p, next = %p\n", current, next);
@@ -148,155 +177,209 @@ bool is_end_directive_omp_section(directive current, directive next)
   STEP_DEBUG_DIRECTIVE(2, "current", current);
   STEP_DEBUG_DIRECTIVE(2, "next", next);
 
-  b1 = type_directive_omp_sections_p(directive_type(current));
-  b2 = type_directive_omp_parallel_sections_p(directive_type(current));
+  pips_assert("current is omp_section", type_directive_omp_section_p(directive_type(current)));
+  pips_assert("next is omp_section", type_directive_omp_section_p(directive_type(next)));
+  
+  /* if body of current is not empty then it is end */
+  b = !ENDP(directive_body(current));
 
-  b3 = type_directive_omp_section_p(directive_type(next));
-
-  pips_debug(2,"sections_p(current) = %d, parallel_sections_p(current) = %d, section_p(next) = %d\n", b1, b2, b3);
-
-  b = (b1 || b2) && b3;
   pips_debug(1, "b = %d\n", b);
   return b;
 }
 
 directive make_directive_omp_end_sections(statement stmt)
 {
-  directive d;
+  directive drt;
+  string new_name;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
-  d = make_directive(strdup(statement_to_directive_txt(stmt)),step_make_new_directive_module_name(SUFFIX_OMP_SECTION,""),make_type_directive_omp_end_sections(),NIL,NIL);
+  new_name = step_make_new_directive_module_name(NULL,"");
 
-  pips_debug(1,"d = %p\n", d);
-  return d;
+  drt = make_directive(strdup(statement_to_directive_txt(stmt)), new_name, make_type_directive_omp_end_sections(), NIL, NIL);
+
+  pips_debug(1,"drt = %p\n", drt);
+  return drt;
 }
 
 bool is_end_directive_omp_end_sections(directive current, directive next)
 {
-  bool b1, b2;
+  bool b;
   
   pips_debug(1,"current = %p, next = %p\n", current, next);
 
-  b1 = type_directive_omp_end_sections_p(directive_type(next));
-  b2 = type_directive_omp_sections_p(directive_type(current));
+  pips_assert("current is omp_section", type_directive_omp_section_p(directive_type(current)));
 
-  pips_debug(1,"b1 = %d, b2 = %d\n", b1, b2);
-  return b1 && b2;
+  b = type_directive_omp_end_sections_p(directive_type(next));
+
+  pips_debug(1,"b = %d\n", b);
+  return b;
 }
 
-instruction handle_omp_sections(directive begin, directive end)
+instruction handle_omp_sections(directive __attribute__ ((unused)) d1, directive __attribute__ ((unused)) d2)
 {
-  instruction instr;
-  statement call;
+  instruction instr = instruction_undefined;
+
+  pips_error("handle_omp_sections", "compatibily function: should never be called\n");
+
+  return instr;
+}
+
+static instruction outline_omp_sections_body(directive begin, directive end)
+{
   entity directive_module;
+  statement call;
+  instruction instr;
 
   pips_debug(1,"begin = %p, end = %p\n", begin, end);
 
-  pips_assert("sections",type_directive_omp_sections_p(directive_type(begin)));
-  pips_assert("end sections",type_directive_omp_end_sections_p(directive_type(end)));
-  
-  if (ENDP(type_directive_omp_sections(directive_type(begin))))
-    pips_error("handle_omp_sections","no section in sections directive");
+  STEP_DEBUG_DIRECTIVE(3, "begin", begin);
+  STEP_DEBUG_DIRECTIVE(3, "end", end);
 
-  // handle the sections directive
   directive_module = outlining_start(directive_module_name(begin));
-  outlining_scan_block(type_directive_omp_sections(directive_type(begin)));
-  call = outlining_close();
-  if(statement_comments(call)!=empty_comments)
+  outlining_scan_block(gen_full_copy_list(directive_body(begin)));
+  call = outlining_close(step_directives_USER_FILE_name());
+
+  if(statement_comments(call) != empty_comments)
     {
       free(statement_comments(call));
-      statement_comments(call)=empty_comments;
+      statement_comments(call) = empty_comments;
     }
   statement_label(call) = entity_empty_label();
   
-  call = step_keep_directive_txt(begin,call,end);
+  /* add comments in the generated code to keep track of the OpenMP
+     directives */
+
+  call = step_keep_directive_txt(begin, call, directive_undefined);
 
   instr = statement_instruction(call);
   statement_instruction(call)=instruction_undefined;
   free_statement(call);
   
-  // reduction handling
+
+  store_global_directives(directive_module, begin); 
+
+  pips_debug(1,"end instr = %p\n", instr);
+  return instr;
+}
+
+/*
+  will be also called with
+   - omp_end_sections
+   - omp_end_parallel_sections
+*/
+static void outline_omp_section_body(directive begin)
+{
+  entity directive_module;
+  statement call;
+
+  directive end;
+  pips_assert("not empty body", !ENDP(directive_body(begin)));
+
+  end = current_directives_head();
+  STEP_DEBUG_DIRECTIVE(3, "begin", begin);
+  STEP_DEBUG_DIRECTIVE(3, "end", end);
+
+  pips_assert("end is omp_sections or omp_parallel_sections", type_directive_omp_sections_p(directive_type(end)) || type_directive_omp_parallel_sections_p(directive_type(end)));
+  
+  pips_debug(2, "begin section outlining\n");
+  /* new call */
+  directive_module = outlining_start(directive_module_name(begin));
+  outlining_scan_block(gen_full_copy_list(directive_body(begin)));
+  call = outlining_close(step_directives_USER_FILE_name());
+
+  if(statement_comments(call) != empty_comments)
+    {
+      free(statement_comments(call));
+      statement_comments(call)=empty_comments;
+    }
+  statement_label(call) = entity_empty_label();
+
+  /* add comments in the generated code to keep track of the OpenMP
+     directives */
+
+  call = step_keep_directive_txt(begin, call, directive_undefined);
+
+  store_global_directives(directive_module, begin);  
+
+  pips_debug(2, "ADD the new call to the body of the head of current_directives\n");
+  directive_body(end) = gen_nconc(directive_body(end), CONS(STATEMENT, copy_statement(call), NIL));
+
+  STEP_DEBUG_DIRECTIVE(2, "end", end);
+
+  pips_debug(1, "end\n");
+}
+
+
+static instruction handle_omp_end_sections(directive begin, directive end)
+{
+  instruction instr;
+
+  pips_debug(1,"begin = %p, end = %p\n", begin, end);
+
+  STEP_DEBUG_DIRECTIVE(2, "begin", begin);
+  STEP_DEBUG_DIRECTIVE(2, "end", end);
+
+  pips_assert("begin is omp_sections or omp_parallel_sections", type_directive_omp_sections_p(directive_type(begin)) || type_directive_omp_parallel_sections_p(directive_type(begin)));
+
+
+  /* outline omp_sections body */
+  instr = outline_omp_sections_body(begin, end);
+
+  /* reduction handling */
   directive_clauses(begin)=gen_nconc(directive_clauses(begin),
-				     CONS(CLAUSE,clause_reductions(call_function(instruction_call(instr)),directive_txt(begin)),NIL));
-
-  store_global_directives(directive_module,begin);
-
+				     CONS(CLAUSE,step_check_reduction(call_function(instruction_call(instr)),directive_txt(begin)),NIL));
+  
   pips_debug(1,"instr = %p\n", instr);
   return instr;
 }
+
 
 instruction handle_omp_section(directive begin, directive end)
 {
   instruction instr;
 
   pips_debug(1, "begin = %p, end = %p\n", begin, end);
-    
-  pips_assert("sections",type_directive_omp_sections_p(directive_type(begin))
-	      || type_directive_omp_parallel_sections_p(directive_type(begin)));
-  pips_assert("end section",type_directive_omp_section_p(directive_type(end))
-	      || type_directive_omp_end_sections_p(directive_type(end))
-	      || type_directive_omp_end_parallel_sections_p(directive_type(end)));
-
+  
   STEP_DEBUG_DIRECTIVE(2, "begin", begin);
   STEP_DEBUG_DIRECTIVE(2, "end", end);
 
+  pips_assert("begin is omp_section", type_directive_omp_section_p(directive_type(begin)));
+  pips_assert("end is omp_section or omp_end_sections or omp_end_parallel_sections", type_directive_omp_section_p(directive_type(end)) || type_directive_omp_end_sections_p(directive_type(end)) || type_directive_omp_end_parallel_sections_p(directive_type(end)));
+
+  /* end is like sect1_sect1 or end... thus incorrect*/ 
+  /* A VOIR supprimer end de la liste des entites */
+
   if (ENDP(directive_body(begin)))
     {
-      pips_debug(2, "no outlining: empty body\n");
+      /* case where the first optional section is present */
+      /* begin has been automatically added when sections is handled */
+      /* so do nothing */
 
-      /* il faudrait detruire l'entite contenant le nom sect1 par
-	 exemple (genere avec le end) */
-
+      pips_debug(2, "section has already been automatically added so do nothing\n");
+      instr = make_continue_instruction();
     }
   else 
     {
-      statement call;
-      list body;
-      entity directive_module;
-
-      pips_assert("empty body", !ENDP(directive_body(begin)));
-
-      pips_debug(2, "current section outlining\n");
-
-      body = directive_body(end)=directive_body(begin);
-      directive_module = outlining_start(directive_module_name(end));
-      outlining_scan_block(body);
-      call = outlining_close();
+      outline_omp_section_body(begin);
       
-      directive_body(begin)=NIL;
-      
-      if(statement_comments(call)!=empty_comments)
+      if (type_directive_omp_section_p(directive_type(end)))
 	{
-	  free(statement_comments(call));
-	  statement_comments(call)=empty_comments;
+	  /* add the new section (like sect2) */
+	  directive_module_name(end) = step_make_new_directive_module_name(SUFFIX_OMP_SECTION,"");
+	  current_directives_push(end);
+	  instr = make_continue_instruction();
 	}
-      statement_label(call)=entity_empty_label();
-
-      call = step_keep_directive_txt(make_directive("'section'","",make_type_directive_omp_section(),NIL,NIL),call,directive_undefined);
-
-      //add the new outlined section call to the call section list
-      if (type_directive_omp_sections_p(directive_type(begin)))
-	type_directive_omp_sections(directive_type(begin))=
-	  gen_nconc(type_directive_omp_sections(directive_type(begin)),CONS(STATEMENT,call,NIL));
       else
-	type_directive_omp_parallel_sections(directive_type(begin))=
-	  gen_nconc(type_directive_omp_parallel_sections(directive_type(begin)),CONS(STATEMENT,call,NIL));
+	{
+	  /* case end_sections or end_parallel_sections */
+	  begin = current_directives_pop();
+	  STEP_DEBUG_DIRECTIVE(2,"POP current_directives", begin);
 
-      store_global_directives(directive_module,end);
+	  instr = handle_omp_end_sections(begin, end);
+	}
+	
     }
-
-  if (type_directive_omp_end_sections_p(directive_type(end)))
-    instr = handle_omp_sections(begin,end);
-  else if (type_directive_omp_end_parallel_sections_p(directive_type(end)))
-    instr = handle_omp_parallel_sections(begin,end);
-  else
-    {
-      STEP_DEBUG_DIRECTIVE(2, "push current_directives", begin);
-      current_directives_push(begin);
-      instr = make_continue_instruction();
-    }
-
-  pips_debug(1,"instr = %p\n", instr);
+  pips_debug(1,"END instr = %p\n", instr);
   return instr;
 }

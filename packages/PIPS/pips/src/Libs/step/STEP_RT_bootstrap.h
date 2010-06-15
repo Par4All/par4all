@@ -6,7 +6,7 @@ Fichier inclus par : src/Libs/bootstrap/bootstrap.c
   {RT_STEP_get_myloopslice,1,overloaded_to_void_type,0,0},
   {RT_STEP_get_i_low,1,overloaded_to_void_type,0,0},
   {RT_STEP_get_i_up,1,overloaded_to_void_type,0,0},
-  {RT_STEP_Init,0,overloaded_to_void_type,0,0},
+  {RT_STEP_Init_Fortran_Order,0,overloaded_to_void_type,0,0},
   {RT_STEP_Finalize,0,overloaded_to_void_type,0,0},
   {RT_STEP_Barrier,0,overloaded_to_void_type,0,0},
   {RT_STEP_Get_size,1,overloaded_to_void_type,0,0},
@@ -16,6 +16,15 @@ Fichier inclus par : src/Libs/bootstrap/bootstrap.c
   {RT_STEP_SizeRegion,2,integer_to_integer_type,0,0},
   {RT_STEP_WaitAll,2,overloaded_to_void_type,0,0},
 
+  {RT_STEP_InitReduction,4,overloaded_to_void_type,0,0},
+  {RT_STEP_Reduction,4,overloaded_to_void_type,0,0},
+  {RT_STEP_MasterToAllScalar,6,overloaded_to_void_type,0,0},
+  {RT_STEP_MasterToAllRegion,8,overloaded_to_void_type,0,0},
+  {RT_STEP_AlltoAllRegion,11,overloaded_to_void_type,0,0},
+  {RT_STEP_InitInterlaced,4,overloaded_to_void_type,0,0},
+  {RT_STEP_AlltoAllRegion_Merge,13,overloaded_to_void_type,0,0},
+
+  /*  Lignes commentees pour eviter un bug portant sur le nombre d'entré dans la table des entites a bootstraper
   {RT_STEP_InitReduction "_I1",3,overloaded_to_void_type,0,0},
   {RT_STEP_Reduction "_I1",3,overloaded_to_void_type,0,0},
   {RT_STEP_MasterToAllScalar "_I1",2,overloaded_to_void_type,0,0},
@@ -23,7 +32,7 @@ Fichier inclus par : src/Libs/bootstrap/bootstrap.c
   {RT_STEP_AlltoAllRegion "_I1",10,overloaded_to_void_type,0,0},
   {RT_STEP_InitInterlaced "_I1",4,overloaded_to_void_type,0,0},
   {RT_STEP_AlltoAllRegion_Merge "_I1",12,overloaded_to_void_type,0,0},
-  {RT_STEP_InitReduction "_I2",3,overloaded_to_void_type,0,0},
+  {RT_STEP_InitReduction "_I2",3,overloaded_to_void_type,0,0},*/
   {RT_STEP_Reduction "_I2",3,overloaded_to_void_type,0,0},
   {RT_STEP_MasterToAllScalar "_I2",2,overloaded_to_void_type,0,0},
   {RT_STEP_MasterToAllRegion "_I2",5,overloaded_to_void_type,0,0},

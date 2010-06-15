@@ -5,9 +5,8 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
-
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 #include "step_private.h"
@@ -17,50 +16,6 @@ License.
 #include <string.h>
 
 
-static string saved_srcpath=string_undefined;
-
-static step_status step_status_g = (step_status) NULL;
-
-GENERIC_GLOBAL_FUNCTION(step_analyse_map,analyse_map);
-GENERIC_GLOBAL_FUNCTION(step_mpi_module_map,step_entity_map);
-GENERIC_GLOBAL_FUNCTION(step_omp_module_map,step_entity_map);
-
-static void step_init_status()
-{
-  init_step_analyse_map();
-  init_step_mpi_module_map();
-  init_step_omp_module_map();
-  step_status_g = make_step_status(get_step_analyse_map(),get_step_mpi_module_map(),get_step_omp_module_map());
-}
-
-/*les libÈrations mÈmoires sont faites par pipsdbm... */
-static void step_reset_status()
-{
-  reset_step_analyse_map();
-  reset_step_mpi_module_map();
-  reset_step_omp_module_map();
-  step_status_g = NULL;
-}
-
-void step_save_status()
-{
-  pips_assert("some current status",step_status_g);
-  step_status_analyses(step_status_g) = get_step_analyse_map();
-  step_status_mpi_module(step_status_g) = get_step_mpi_module_map();
-  step_status_omp_module(step_status_g) = get_step_omp_module_map();
-  
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_STATUS, "", step_status_g);
-  step_reset_status();
-}
-
-void step_load_status()
-{
-  step_status_g = (step_status)db_get_memory_resource(DBR_STEP_STATUS, "", TRUE);
-  set_step_analyse_map(step_status_analyses(step_status_g));
-  set_step_mpi_module_map(step_status_mpi_module(step_status_g));
-  set_step_omp_module_map(step_status_omp_module(step_status_g));
-}
-
 bool step_init(string program_name)
 {
   string srcpath;
@@ -69,13 +24,14 @@ bool step_init(string program_name)
   pips_debug(1, "program_name = %s\n", program_name);
   
   set_bool_property("PARSER_WARN_FOR_COLUMNS_73_80", FALSE);
-  // set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE);
+  //  set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE);
   
-  step_init_status();
-  step_save_status();
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_STATUS, "", make_step_status(NIL,NIL));
+  global_step_analyse_init();
 
   srcpath=strdup(concatenate(getenv("PIPS_ROOT"),"/",STEP_DEFAULT_RT_H,NULL));
-  saved_srcpath=pips_srcpath_append(srcpath);
+  string old_path=pips_srcpath_append(srcpath);
+  free(old_path);
   free(srcpath);
 
   debug_off();
@@ -89,22 +45,29 @@ bool step_install(string program_name)
   pips_debug(1, "considering %s\n", program_name);
   
   string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
-  string dest_dir = get_string_property("STEP_INSTALL_PATH");
+  string dest_dir = strdup(get_string_property("STEP_INSTALL_PATH"));
+  string runtime = strdup(get_string_property("STEP_RUNTIME"));
 
   if (empty_string_p(dest_dir))
-    dest_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    {
+      free(dest_dir);
+      dest_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    }
 
   // concatenation des PRINTED_FILE selon les USER_FILE
   unsplit(NULL);
 
-  // filtrage des 'include "STEP.h"' et copie des fichiers sources
-  safe_system(concatenate("step_install ", dest_dir, " ", src_dir , "/*",  NULL));
-  
-  // mise en place de STEP.f et STEP.h
-  safe_system(concatenate("cp $PIPS_ROOT/share/STEP.[fh] ", dest_dir, NULL));
+  // suppression du fichier regroupant les modules directives
+  string directives_file_name = step_directives_USER_FILE_name();
+  safe_system(concatenate("rm ", src_dir, "/$(basename ",directives_file_name ,")",  NULL));
+  free(directives_file_name);
+
+  // installation des fichiers g√©n√©r√©s
+  safe_system(concatenate("step_install ", runtime ," ", dest_dir, " ", src_dir,  NULL));
 
   free(src_dir);
   free(dest_dir);
+  free(runtime);
   
   pips_debug(1, "fin step_install\n");
   debug_off();
@@ -122,47 +85,6 @@ void step_print_code(FILE* file, entity module, statement statmt)
     free_text(t);
     
     debug_off();
-}
-
-
-entity expr_to_entity(e)
-expression e;
-{
-    syntax s = expression_syntax(e);
-    
-    switch (syntax_tag(s))
-    {
-    case is_syntax_call:
-	return call_function(syntax_call(s));
-    case is_syntax_reference:
-	return reference_variable(syntax_reference(s));
-    case is_syntax_range:
-    default: 
-	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
-	return entity_undefined; 
-    }
-}
-
-expression entity_to_expr(e)
-     entity e;
-{
-  type t=entity_type(e);
-  syntax s;
-  expression exp;
-  switch (type_tag(t)){
-  case is_type_variable:
-    s=make_syntax(is_syntax_reference,make_reference(e,NIL));
-    exp=make_expression(s,normalized_undefined);
-    break;
-  case is_type_functional:
-    s=make_syntax(is_syntax_call,make_call(e,NIL));
-    exp=make_expression(s,normalized_undefined);
-    break;
-  default:
-    pips_internal_error("unexpected entity tag: %d\n", type_tag(t));
-    return expression_undefined; 
-  }
-  return exp;
 }
 
 

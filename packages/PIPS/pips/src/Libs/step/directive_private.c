@@ -7,11 +7,11 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "defines-local.h"
 
-step_private step_check_private(entity module, string directive_txt)
+clause step_check_private(entity module, string directive_txt)
 {
   string private_,private_clause,remaining;
   string list_,item,comma;
@@ -79,24 +79,18 @@ step_private step_check_private(entity module, string directive_txt)
     {
       pips_user_error("\n\nSTEP : erreur in clause : private (%s)\n%s\n\n",private_clause,msg_err);
       gen_free_list(privates);
-      return step_private_undefined;
+      return clause_undefined;
     }
 
-  return make_step_private(privates);
+  return make_clause_private(gen_nreverse(privates));
 }
 
-clause clause_private(entity module, string directive_txt)
-{
-  return make_clause_step_private(step_check_private(module,directive_txt));
-}
-
-
-string clause_private_to_string(step_private privates)
+string clause_private_to_string(list privates)
 {
   string s = string_undefined;
   string_buffer sb = string_buffer_make(FALSE);
 
-  FOREACH(ENTITY,variable,step_private_entity(privates))
+  FOREACH(ENTITY,variable,privates)
     {
       if(s == string_undefined)
 	s=strdup(concatenate(" private(",entity_local_name(variable),NULL));
