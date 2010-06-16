@@ -1,6 +1,16 @@
 delete multideclsamgfile
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# This property cannot be set because the purpose of this test is to
+# check that multiple declarations of the same variable are caught by
+# PIPS and generate a user error. If we abort on user errors, the
+# validation script detects an error and oes not care if it is
+# intended or not.
+
+# By not setting this option, tpips is going to move forward in the
+# script, so we have to insert a quit when the error must have been
+# detected.
+
+#setproperty ABORT_ON_USER_ERROR TRUE
 
 create multideclsamgfile multideclsamgfile/foo.c multideclsamgfile/bar.c
 
@@ -10,6 +20,10 @@ create multideclsamgfile multideclsamgfile/foo.c multideclsamgfile/bar.c
 #setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 #activate C_SYMBOL_TABLE
 #activate C_PARSER
+
+make PARSED_CODE[%ALL]
+
+quit
 
 echo
 echo Symbol tables for "%ALL"
