@@ -10,15 +10,6 @@ int main () {
   m = 0;
   x = 2.12;
 
-#if 1
-  // This loop nest is here to have the following one parallelized :-(
-  for (i = 0; i < 10; i++) {
-    for (j = 0; j < 10; j++) {
-      b[i][j] = 0;
-    }
-  }
-#endif
-
   for (i = 0; i < 10; i++) {
     for (j = 0; j < 10; j++) {
       // comments 2
