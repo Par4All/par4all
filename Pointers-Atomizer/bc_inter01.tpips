@@ -4,9 +4,16 @@ delete $WS
 create $WS $WS.c
 
 
-apply UNFOLDING[%ALL]
+apply UNFOLDING[%ALLFUNC]
+apply FLATTEN_CODE[%ALLFUNC]
+apply SIMD_ATOMIZER[%ALLFUNC]
 display PRINTED_FILE
 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+shell gcc -c $WS.database/Src/$WS.c -o $WS.database/Src/$WC.o
 
 close
 
