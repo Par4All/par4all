@@ -6,6 +6,8 @@ Set ANSI Terminal Color and Attributes.
 Originally found on http://code.activestate.com/recipes/574451.
 '''
 
+import os
+
 # Set to True to disable module (coloring etc.).
 disabled = False
 
@@ -18,7 +20,7 @@ for k, v in dict(
     colors = 'grey red green yellow blue magenta cyan white'
 ).items(): globals()[k] = dict((s, i) for i, s in enumerate(v.split()))
 
-def escape(arg = '', sep = ' ', end = '\n'):
+def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
     '''
     "arg" is a string or None
     If "arg" is None : the terminal is reset to his default values.
@@ -46,6 +48,8 @@ def escape(arg = '', sep = ' ', end = '\n'):
     escape('@@ hello')			: clear the screen and print 'hello' at 1;1
     '''
     if disabled:
+        return ''
+    if if_tty_fd != -1 and not os.isatty(if_tty_fd):
         return ''
     cmd, txt = [reset], []
     if arg:

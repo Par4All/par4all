@@ -40,27 +40,27 @@ def debug(msg):
 def info(msg):
     global msg_prefix
     if verbosity >= 1:
-        sys.stderr.write(msg_prefix + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("white", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
     if logger:
         logger.info(msg)
 
 def done(msg):
     global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(msg_prefix + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("green", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
     if logger:
         logger.info(msg)
 
 def warn(msg):
     global msg_prefix
     if verbosity >= 0:
-        sys.stderr.write(msg_prefix + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("yellow", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
     if logger:
         logger.warn(msg)
 
 def error(msg):
     global msg_prefix
-    sys.stderr.write(msg_prefix + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+    sys.stderr.write(msg_prefix + p4a_term.escape("red", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
     if logger:
         logger.error(msg)
 
@@ -83,6 +83,10 @@ spinners = []
 class spinner(Thread):
 
     def __init__(self):
+        self.flag = True
+        # Not a tty? return now
+        if not os.isatty(2):
+            return
         Thread.__init__(self)
         self.flag = False
         self.startt = time.time()
@@ -120,8 +124,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     if verbosity >= 1:
         global msg_prefix
-        sys.stderr.write(msg_prefix + p4a_term.escape("magenta") 
-            + " ".join(cmd_list) + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + p4a_term.escape("magenta", if_tty_fd = 2) 
+            + " ".join(cmd_list) + p4a_term.escape(if_tty_fd = 2) + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     prev_env = {}
@@ -171,8 +175,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         w = os.getcwd()
     if verbosity >= 1:
         global msg_prefix
-        sys.stderr.write(msg_prefix + "(in " + w + ") " + p4a_term.escape("magenta") 
-            + " ".join(cmd_list) + p4a_term.escape() + "\n");
+        sys.stderr.write(msg_prefix + "(in " + w + ") " + p4a_term.escape("magenta", if_tty_fd = 2) 
+            + " ".join(cmd_list) + p4a_term.escape(if_tty_fd = 2) + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     env = os.environ
