@@ -1,0 +1,20 @@
+delete $WSPACE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+create $WSPACE $FILE
+
+echo atomized code
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+
+
+
+close
+
+shell cat $WSPACE.database/Src/*.c
+
+delete $WSPACE
+quitde		

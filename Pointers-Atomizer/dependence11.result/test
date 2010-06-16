@@ -1,0 +1,16 @@
+atomized code
+void dependence11(struct my_struct *s)
+{
+   int *b, *a;
+   int i;
+   a = s->a;
+   // a points_to s[0][0][0]
+   b = s->b;
+   // b points_to ?
+   
+   
+   for(i = 0; i <= 9; i += 1) {
+      a[i] = 0;
+      b[i] = 1;
+   }
+}

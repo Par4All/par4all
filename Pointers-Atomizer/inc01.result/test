@@ -1,0 +1,10 @@
+atomized code
+int inc01(int *pi)
+{
+   int *q;
+   int i = 0;
+   q = pi;
+   i = *q;
+   *q = i++;
+   return 0;
+}

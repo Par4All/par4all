@@ -1,0 +1,21 @@
+atomized code
+int main()
+{
+   struct2 *p1, *p2;
+   struct1 *q1, *q2;
+
+   q1 = (struct1 *) malloc(sizeof(struct1));
+   q2 = (struct1 *) malloc(sizeof(struct1));
+
+   q1->r = 10;
+   q2->r = 20;
+
+   p1 = (struct2 *) malloc(sizeof(struct2));
+
+   p1->q = q1;
+
+   foo(p1, &p2, q2);
+
+   printf("%d\n", p1->q->r);
+   return 0;
+}
