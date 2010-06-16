@@ -1,8 +1,0 @@
-atomized code
-int main()
-{
-   tf_t s;
-   tf_t *sp = &s;
-
-   call10(s.one, s.two, sp->one, sp->two);
-}
