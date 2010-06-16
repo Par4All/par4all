@@ -106,9 +106,9 @@ class spinner(Thread):
         #~ sys.stderr.write("\n")
         while not self.flag:
             for item in "-\|/":
-                sys.stderr.write("\b\b" + item)
+                sys.stderr.write("\r" + item)
                 time.sleep(0.05)
-        sys.stderr.write("\b\b")
+        sys.stderr.write("\r")
 
 def stop_all_spinners():
     global spinners
