@@ -15,17 +15,31 @@ from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
 
-default_install_prefix          = "usr/local/par4all" # NO beginning slash please.
+# Default directory to take current binary installation from.
+default_dir                     = "/usr/local/par4all"
+
+# Default installation prefix when installing a .deb or .rpm package on the client machine.
+# NO beginning slash please.
+default_install_prefix          = "usr/local/par4all"
+
+# Package name. Used for naming the packages.
 package_name                    = "par4all"
+
+# Settings for --publish. There is currently no option to override these defaults.
 default_publish_host            = "download.par4all.org"
 default_publish_dir             = "/srv/www-par4all/download/releases"
 default_nightly_publish_dir     = "/srv/www-par4all/download/nightly"
-default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/releases/main"
-default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/nightly/main"
+default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/dists/releases/main"
+default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/dists/nightly/main"
 
+# Where are the .deb settings files? (i.e. the control, postinst, etc. files).
+debian_dir = os.path.join(script_dir, "DEBIAN")
+
+# Some useful variables:
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
-debian_dir = os.path.join(script_dir, "DEBIAN")
+
+# Put temp directories in this array to make sure no temp dir remains after script exits.
 auto_remove_temp_dirs_on_break = []
 
 def create_dist(dist_dir, install_prefix, revision):
@@ -38,12 +52,12 @@ def create_dist(dist_dir, install_prefix, revision):
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
-    shutil.copytree(dist_dir, temp_dir_with_prefix)
+    #~ shutil.copytree(dist_dir, temp_dir_with_prefix)
+    run([ "cp", "-av", dist_dir, temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
         dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
-    # XXX: version file path hard coded in 3 different scripts
     dump(get_version_file_path(temp_dir_with_prefix), revision)
     return [ temp_dir, temp_dir_with_prefix ]
 
@@ -135,7 +149,13 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
         os.remove(package_file)
-    run([ "tar", "czf", package_file_name, "-C " + temp_dir, "." ])
+    #~ new_temp_dir_with_prefix = os.path.join(os.path.split(temp_dir_with_prefix)[0], package_name + "_" + revision)
+    #~ shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
+    new_temp_dir_with_prefix = temp_dir_with_prefix
+    tar_dir = os.path.split(new_temp_dir_with_prefix)[0] # one level up
+    tar_cmd = " ".join([ "tar", "czf", package_file_name, "-C", tar_dir, "." ])
+    sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
+    run([ "fakeroot", "sh", "-c", sh_cmd])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     else:
@@ -151,12 +171,20 @@ def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = No
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
+    package_file_tar = change_file_ext(package_file_name, "")
     git = p4a_git(script_dir)
     current_branch = git.current_branch()
     if current_branch != "p4a":
         die("Not on branch p4a! (" + current_branch + ")")
-    git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
-    run([ "gzip", "-9", change_file_ext(package_file_name, "") ])
+    #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
+    git.archive(package_file_tar, prefix = package_name + "_src/")
+    temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
+    prev_cwd = os.getcwd()
+    os.chdir(temp_dir)
+    dump("VERSION", revision)
+    run([ "tar", "rf", package_file_tar, "VERSION" ])
+    os.chdir(prev_cwd)
+    run([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     return package_file
@@ -168,8 +196,9 @@ def main():
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
+    global default_dir
     main_group.add_option("--dir", "-d", metavar = "DIR", default = None,
-        help = "Directory where the distribution to package is currently installed. Defaults to environment variable P4A_DIST if defined.")
+        help = "Directory where the distribution to package is currently installed. Default is: " + default_dir)
     
     main_group.add_option("--deb", "-D", action = "store_true", default = False,
         help = "Build a .deb package.")
@@ -248,14 +277,14 @@ def main():
 
     dir = options.dir
     if options.deb or options.tgz:
-        if not dir and "P4A_DIST" in os.environ:
-            dir = os.environ["P4A_DIST"]
-        if not dir:
-            die("Please specify --dir")
-        dir = os.path.abspath(os.path.expanduser(dir))
-        warn("Taking dist from " + dir)
+        if dir:
+            dir = os.path.abspath(os.path.expanduser(dir))
+            warn("Par4All installation is to be found in " + dir + " (--dir)")
+        else:
+            dir = default_dir
+            warn("Assuming Par4All is currently installed in " + dir + " (default; use --dir to override)")
         if not os.path.isdir(dir):
-            die("Invalid dist directory: " + dir)
+            die("Directory does not exist: " + dir)
 
     if not options.revision:
         die("Please use --revision to specify the package version/revision")
@@ -276,11 +305,20 @@ def main():
         die("Invalid characters in revision")
 
     append_revision_bin = ""
-    git_revision = guess_file_revision(dir)
-    if git_revision:
-        append_revision_bin = git_revision.replace("~exported", "").split("~")[-1]
+    append_revision_src = ""
+    
+    if options.deb or options.tgz:
+        append_revision_bin = guess_file_revision(dir)
+        if not append_revision_bin:
+            die("Unable to determine appended revision for binary packages")
+        append_revision_bin = append_revision_bin.replace("~exported", "")
+        debug("Appended revision for binary packages: " + append_revision_bin)
 
-    append_revision_src = p4a_git(script_dir).current_revision()
+    if options.stgz:
+        append_revision_src = p4a_git(script_dir).current_revision()
+        if not append_revision_src:
+            die("Unable to determine appended revision for source packages")
+        debug("Appended revision for source packages: " + append_revision_bin)
 
     # Check that fakeroot is available.
     if not which("fakeroot"):

@@ -27,40 +27,105 @@ def get_verbosity():
     global verbosity
     return verbosity
 
+all_spinners = []
+
+class spinner(Thread):
+
+    def __init__(self, start_it = True):
+        Thread.__init__(self)
+        self.stopped = True
+        global all_spinners
+        all_spinners.append(self)
+        if start_it:
+            self.start_spinning()
+
+    def start_spinning(self):
+        self.stop()
+        # Not a tty? return now
+        if not os.isatty(2):
+            return
+        self.stopped = False
+        self.startt = time.time()
+        self.start()
+
+    def stop(self):
+        if not self.stopped:
+            self.stopped = True
+            self.join()
+    
+    def __del__(self):
+        self.stop()
+
+    def run(self):
+        while time.time() - self.startt < 1:
+            time.sleep(0.05)
+            if self.stopped:
+                return
+        while not self.stopped:
+            for item in "-\|/":
+                sys.stderr.write("\r" + item)
+                time.sleep(0.05)
+        sys.stderr.write("\r")
+
+def stop_all_spinners():
+    global all_spinners
+    for spin in all_spinners:
+        spin.stop()
+
 msg_prefix = os.path.split(sys.argv[0])[1] + ": "
+master_spin = spinner(False)
 
 # Printing/logging helpers.
-def debug(msg):
-    global msg_prefix
+def debug(msg, spin = False):
     if verbosity >= 2:
+        master_spin.stop()
         sys.stderr.write(msg_prefix + str(msg).rstrip("\n") + "\n");
+        if spin:
+            master_spin.start_spinning()
     if logger:
         logger.debug(msg)
 
-def info(msg):
-    global msg_prefix
+def info(msg, spin = False):
     if verbosity >= 1:
-        sys.stderr.write(msg_prefix + p4a_term.escape("white") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        master_spin.stop()
+        sys.stderr.write(msg_prefix + p4a_term.escape("white", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        if spin:
+            master_spin.start_spinning()
     if logger:
         logger.info(msg)
 
-def done(msg):
-    global msg_prefix
-    if verbosity >= 0:
-        sys.stderr.write(msg_prefix + p4a_term.escape("green") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+def cmd(msg, spin = False):
+    if verbosity >= 1:
+        master_spin.stop()
+        sys.stderr.write(msg_prefix + p4a_term.escape("magenta", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        if spin:
+            master_spin.start_spinning()
     if logger:
         logger.info(msg)
 
-def warn(msg):
-    global msg_prefix
+def done(msg, spin = False):
     if verbosity >= 0:
-        sys.stderr.write(msg_prefix + p4a_term.escape("yellow") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+        master_spin.stop()
+        sys.stderr.write(msg_prefix + p4a_term.escape("green", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        if spin:
+            master_spin.start_spinning()
+    if logger:
+        logger.info(msg)
+
+def warn(msg, spin = False):
+    if verbosity >= 0:
+        master_spin.stop()
+        sys.stderr.write(msg_prefix + p4a_term.escape("yellow", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        if spin:
+            master_spin.start_spinning()
     if logger:
         logger.warn(msg)
 
-def error(msg):
-    global msg_prefix
-    sys.stderr.write(msg_prefix + p4a_term.escape("red") + str(msg).rstrip("\n") + p4a_term.escape() + "\n");
+def error(msg, spin = False):
+    master_spin.stop()
+    sys.stderr.write(msg_prefix + p4a_term.escape("red", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+    if spin:
+            master_spin.start_spinning()
     if logger:
         logger.error(msg)
 
@@ -78,50 +143,10 @@ class p4a_error(Exception):
     def __str__(self):
         return self.msg
 
-spinners = []
-
-class spinner(Thread):
-
-    def __init__(self):
-        Thread.__init__(self)
-        self.flag = False
-        self.startt = time.time()
-        global spinners
-        spinners.append(self)
-        self.start()
-
-    def stop(self):
-        if not self.flag:
-            self.flag = True
-            self.join()
-    
-    #~ def __del__(self):
-        #~ self.stop()
-
-    def run(self):
-        while time.time() - self.startt < 1:
-            time.sleep(0.05)
-            if self.flag:
-                return
-        #~ sys.stderr.write("\n")
-        while not self.flag:
-            for item in "-\|/":
-                sys.stderr.write("\b\b" + item)
-                time.sleep(0.05)
-        sys.stderr.write("\b\b")
-
-def stop_all_spinners():
-    global spinners
-    for spin in spinners:
-        spin.stop()
-
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    if verbosity >= 1:
-        global msg_prefix
-        sys.stderr.write(msg_prefix + p4a_term.escape("magenta") 
-            + " ".join(cmd_list) + p4a_term.escape() + "\n");
+    cmd(" ".join(cmd_list))
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     prev_env = {}
@@ -162,17 +187,12 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     '''Runs a command and dies if return code is not zero.
     Returns the final stdout and stderr output as a list.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    #if cmd_list.__class__.__name__ != "list":
-    #    cmd_list = [ cmd_list ]
+    cmd(" ".join(cmd_list))
     w = ""
     if working_dir:
         w = working_dir
     else:
         w = os.getcwd()
-    if verbosity >= 1:
-        global msg_prefix
-        sys.stderr.write(msg_prefix + "(in " + w + ") " + p4a_term.escape("magenta") 
-            + " ".join(cmd_list) + p4a_term.escape() + "\n");
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     env = os.environ
