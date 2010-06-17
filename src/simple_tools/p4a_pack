@@ -29,8 +29,8 @@ package_name                    = "par4all"
 default_publish_host            = "download.par4all.org"
 default_publish_dir             = "/srv/www-par4all/download/releases"
 default_nightly_publish_dir     = "/srv/www-par4all/download/nightly"
-default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/releases/main"
-default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/nightly/main"
+default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/dists/releases/main"
+default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/dists/nightly/main"
 
 # Where are the .deb settings files? (i.e. the control, postinst, etc. files).
 debian_dir = os.path.join(script_dir, "DEBIAN")
