@@ -18,12 +18,13 @@ script_dir = os.path.split(actual_script)[0]
 program_dir = os.path.split(os.path.abspath(os.path.realpath(sys.argv[0])))[0]
 
 def get_version_file_path(dist_dir = None):
-    '''Returns the Par4All version file path (named p4a_version).'''
+    '''Returns the Par4All version file path.'''
     global program_dir
+    version_file_name = "VERSION"
     if dist_dir and os.path.isdir(dist_dir):
-        version_file_path = os.path.join(dist_dir, "bin/p4a_version")
+        version_file_path = os.path.join(dist_dir, version_file_name)
     else:
-        version_file_path = os.path.join(program_dir, "p4a_version")
+        version_file_path = os.path.normpath(os.path.join(program_dir, "..", version_file_name))
     debug("p4a_version is " + version_file_path)
     return version_file_path
 

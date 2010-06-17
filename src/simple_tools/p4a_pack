@@ -149,8 +149,9 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
         os.remove(package_file)
-    new_temp_dir_with_prefix = os.path.join(os.path.split(temp_dir_with_prefix)[0], package_name + "_" + revision)
-    shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
+    #~ new_temp_dir_with_prefix = os.path.join(os.path.split(temp_dir_with_prefix)[0], package_name + "_" + revision)
+    #~ shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
+    new_temp_dir_with_prefix = temp_dir_with_prefix
     tar_dir = os.path.split(new_temp_dir_with_prefix)[0] # one level up
     tar_cmd = " ".join([ "tar", "czf", package_file_name, "-C", tar_dir, "." ])
     sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
@@ -170,12 +171,20 @@ def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = No
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
+    package_file_tar = change_file_ext(package_file_name, "")
     git = p4a_git(script_dir)
     current_branch = git.current_branch()
     if current_branch != "p4a":
         die("Not on branch p4a! (" + current_branch + ")")
-    git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
-    run([ "gzip", "-9", change_file_ext(package_file_name, "") ])
+    #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
+    git.archive(package_file_tar, prefix = package_name + "_src/")
+    temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
+    prev_cwd = os.getcwd()
+    os.chdir(temp_dir)
+    dump("VERSION", revision)
+    run([ "tar", "rf", package_file_tar, "VERSION" ])
+    os.chdir(prev_cwd)
+    run([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     return package_file
