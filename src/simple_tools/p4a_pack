@@ -52,7 +52,8 @@ def create_dist(dist_dir, install_prefix, revision):
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
-    shutil.copytree(dist_dir, temp_dir_with_prefix)
+    #~ shutil.copytree(dist_dir, temp_dir_with_prefix)
+    run([ "cp", "-av", dist_dir, temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
