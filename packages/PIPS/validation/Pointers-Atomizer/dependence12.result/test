@@ -1,0 +1,15 @@
+atomized code
+void dependence12(struct my_struct *s)
+{
+   int *a;
+   int i;
+   while (s!=(void *) 0) {
+      
+      // loop over a chained list
+      a = s->a;
+      // a points_to "s[0][0][0]", but where does s points_to ?
+      for(i = 0; i <= 9; i += 1)
+         a[i] = 0;
+      s = s->next;
+   }
+}

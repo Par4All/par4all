@@ -17,4 +17,4 @@ close
 shell cat $WSPACE.database/Src/*.c
 
 delete $WSPACE
-quit
+quitde		

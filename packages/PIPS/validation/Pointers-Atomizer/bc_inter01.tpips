@@ -1,0 +1,29 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="bc_inter01"
+delete $WS
+create $WS $WS.c
+
+
+apply UNFOLDING[%ALLFUNC]
+apply FLATTEN_CODE[%ALLFUNC]
+setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
+setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
+apply SIMD_ATOMIZER[%ALLFUNC]
+display PRINTED_FILE
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+shell gcc -c $WS.database/Src/$WS.c -o $WS.database/Src/$WC.o
+
+close
+
+#shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+#shell ( test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/out`" && echo ok ) || echo ko
+
+delete $WS
+
+

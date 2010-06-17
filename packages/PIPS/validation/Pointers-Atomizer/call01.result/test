@@ -1,8 +1,0 @@
-atomized code
-int main()
-{
-   int i;
-   tf_t s;
-
-   call01(&i, &s);
-}

@@ -1,7 +1,0 @@
-atomized code
-void lhs05()
-{
-   int x;
-
-   *&x = 1;
-}

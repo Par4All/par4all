@@ -1,0 +1,9 @@
+atomized code
+void dependence04()
+{
+   int *b;
+   b = &global_a;
+   // b points_to global_a
+   
+   *b = 0;
+}
