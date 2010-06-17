@@ -167,23 +167,30 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     return package_file
 
 def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-    global package_name
+    global package_name, auto_remove_temp_dirs_on_break
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
-    package_file_tar = change_file_ext(package_file_name, "")
+    package_file_tar = change_file_ext(package_file, "")
     git = p4a_git(script_dir)
     current_branch = git.current_branch()
-    if current_branch != "p4a":
-        die("Not on branch p4a! (" + current_branch + ")")
+    #~ if current_branch != "p4a":
+        #~ die("Not on branch p4a! (" + current_branch + ")")
+    prefix = package_name + "_src"
     #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
-    git.archive(package_file_tar, prefix = package_name + "_src/")
+    git.archive(package_file_tar, prefix = prefix + "/")
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
+    auto_remove_temp_dirs_on_break += temp_dir
     prev_cwd = os.getcwd()
     os.chdir(temp_dir)
-    dump("VERSION", revision)
-    run([ "tar", "rf", package_file_tar, "VERSION" ])
+    os.makedirs(os.path.join(temp_dir, prefix))
+    relative_version_file = os.path.join(prefix, "VERSION")
+    dump(relative_version_file, revision)
+    tar_cmd = " ".join([ "tar", "uf", package_file_tar, relative_version_file ])
+    sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
+    run([ "fakeroot", "sh", "-c", sh_cmd])
     os.chdir(prev_cwd)
+    rmtree(temp_dir)
     run([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
