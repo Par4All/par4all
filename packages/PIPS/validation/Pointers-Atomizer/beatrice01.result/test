@@ -1,0 +1,55 @@
+atomized code
+int main()
+{
+   int i, j, k;
+   float x, y;
+   syst *my_syst;
+   part *curr_part1, *curr_part2;
+   //PIPS generated variable
+   float F_0, F_1;
+   
+   // initializations
+   my_syst = (syst *) malloc(sizeof(syst));
+   for(i = 0; i <= 9; i += 1) {
+      (my_syst->tab_dom)[i] = (dom *) malloc(sizeof(dom));
+      for(j = 0; j <= 99; j += 1)
+         ((my_syst->tab_dom)[i]->tab_part)[j] = (part *) malloc(sizeof(part));
+   }
+   x = 0;
+   y = 0;
+   
+   // computations
+   for(i = 0; i <= 9; i += 1) {
+      dom *curr_dom;
+      curr_dom = (my_syst->tab_dom)[i];
+
+      for(j = 0; j <= 99; j += 1) {
+         part *curr_part1;
+         curr_part1 = (curr_dom->tab_part)[j];
+         F_0 = 0.01*(float) j;
+
+         curr_part1->x = x+F_0;
+         F_1 = 0.01*(float) j;
+         curr_part1->y = y+F_1;
+      }
+
+      for(j = 0; j <= 99; j += 1) {
+         part *curr_part1;
+         curr_part1 = (curr_dom->tab_part)[j];
+
+         for(k = j+1; k <= 99; k += 1) {
+            part *curr_part2;
+            curr_part2 = (curr_dom->tab_part)[k];
+
+            if (dist(curr_part1, curr_part2)<0.1) {
+               curr_part1->x_new = curr_part1->x-0.1;
+               curr_part1->y_new = curr_part1->y-0.1;
+            }
+         }
+      }
+   }
+   
+   // final IOs (& free()...)
+   
+   return 0;
+}
