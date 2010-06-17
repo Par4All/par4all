@@ -251,7 +251,7 @@ def main():
         #~ warn("Assuming Par4All source tree root is " + root + " (P4A_ROOT environment variable)")
     else:
         root = default_root
-        warn("Assuming Par4All source tree root is " + root + " (default)")
+        warn("Assuming Par4All source tree root is " + root + " (default; use --root to override)")
     if not os.path.isdir(root):
         die("Invalid directory: " + root)
     #~ info("Par4All source tree root: " + root)
@@ -286,7 +286,7 @@ def main():
         prefix = options.prefix
         warn("Prefix is " + prefix + " (--prefix)")
     else:
-        warn("Assuming prefix is " + prefix + " (default)")
+        warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
     if prefix:
         prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
         
@@ -386,10 +386,8 @@ def main():
     if options.jobs:
         make_opts.append("-j" + options.jobs)
     
-    spin = None
     if get_verbosity() == 0:
-        warn("Building and installing, please wait...")
-        spin = spinner()
+        warn("Building and installing, please wait...", spin = True)
     
     ############################## polylib
     
@@ -401,7 +399,7 @@ def main():
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                warn("Package " + polylib_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                info("Package " + polylib_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
                 rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
@@ -438,7 +436,7 @@ def main():
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                warn("Package " + newgen_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                info("Package " + newgen_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
                 rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
@@ -476,7 +474,7 @@ def main():
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                warn("Package " + linear_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                info("Package " + linear_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
                 rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
@@ -521,7 +519,7 @@ def main():
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                warn("Package " + pips_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                info("Package " + pips_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
                 rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
