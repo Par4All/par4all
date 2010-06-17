@@ -53,7 +53,7 @@ def create_dist(dist_dir, install_prefix, revision):
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
     #~ shutil.copytree(dist_dir, temp_dir_with_prefix)
-    run([ "cp", "-av", dist_dir, temp_dir_with_prefix ])
+    run2([ "cp", "-av", dist_dir, temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
@@ -87,7 +87,10 @@ def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     subs_template_file(postinst_file, subs_map)
     package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
     package_file = os.path.abspath(package_file_name)
-    run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
+    if os.path.exists(package_file):
+        warn("Removing existing " + package_file)
+        os.remove(package_file)
+    run2([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     else:
@@ -148,14 +151,15 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
+        warn("Removing existing " + package_file)
         os.remove(package_file)
     #~ new_temp_dir_with_prefix = os.path.join(os.path.split(temp_dir_with_prefix)[0], package_name + "_" + revision)
     #~ shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
     new_temp_dir_with_prefix = temp_dir_with_prefix
     tar_dir = os.path.split(new_temp_dir_with_prefix)[0] # one level up
-    tar_cmd = " ".join([ "tar", "czf", package_file_name, "-C", tar_dir, "." ])
+    tar_cmd = " ".join([ "tar", "czvf", package_file_name, "-C", tar_dir, "." ])
     sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
+    run2([ "fakeroot", "sh", "-c", sh_cmd])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     else:
@@ -172,10 +176,13 @@ def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = No
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
     package_file_tar = change_file_ext(package_file, "")
+    if os.path.exists(package_file):
+        warn("Removing existing " + package_file)
+        os.remove(package_file)
     git = p4a_git(script_dir)
     current_branch = git.current_branch()
-    #~ if current_branch != "p4a":
-        #~ die("Not on branch p4a! (" + current_branch + ")")
+    if current_branch != "p4a":
+        die("Not on branch p4a! (" + current_branch + ")")
     prefix = package_name + "_src"
     #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
     git.archive(package_file_tar, prefix = prefix + "/")
@@ -186,12 +193,12 @@ def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = No
     os.makedirs(os.path.join(temp_dir, prefix))
     relative_version_file = os.path.join(prefix, "VERSION")
     dump(relative_version_file, revision)
-    tar_cmd = " ".join([ "tar", "uf", package_file_tar, relative_version_file ])
+    tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
     sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
+    run2([ "fakeroot", "sh", "-c", sh_cmd])
     os.chdir(prev_cwd)
     rmtree(temp_dir)
-    run([ "gzip", "-9", package_file_tar ])
+    run2([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     return package_file
