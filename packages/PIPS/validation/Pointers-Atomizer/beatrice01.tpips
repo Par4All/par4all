@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="beatrice01"
+delete $WS
+create $WS $WS.c
+
+
+apply UNFOLDING[%ALL]
+display PRINTED_FILE
+
+
+close
+
+#shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+#shell ( test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/out`" && echo ok ) || echo ko
+
+delete $WS
+
+

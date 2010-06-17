@@ -1,7 +1,0 @@
-atomized code
-int main()
-{
-   flatten_code12();
-
-   return 0;
-}

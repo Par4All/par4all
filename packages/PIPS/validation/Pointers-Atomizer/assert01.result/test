@@ -1,6 +1,0 @@
-atomized code
-void assert01()
-{
-   int i;
-   i>0?(void) 0:__assert_fail("i>0", "$VDIR/assert01.c", 15, (const char *) 0);
-}

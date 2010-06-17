@@ -1,7 +1,0 @@
-atomized code
-void lhs04()
-{
-   float x;
-
-   *((int *) &x) &= 0x7fffffff;
-}

@@ -1,0 +1,10 @@
+atomized code
+void dependence02(int *b)
+{
+   int *a;
+
+   a = b;
+   // a and b are aliased, a points_to b[0]
+   
+   *a = 0;
+}

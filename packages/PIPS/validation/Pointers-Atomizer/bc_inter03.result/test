@@ -1,0 +1,18 @@
+atomized code
+int main()
+{
+   int *pa, *pb, a, b;
+
+   a = 1;
+   b = 2;
+
+   pa = &a;
+   pb = &b;
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+
+   exchange(&pa, &pb);
+
+   printf("*pa = %d, *pb = %d\n", *pa, *pb);
+   return 0;
+}
