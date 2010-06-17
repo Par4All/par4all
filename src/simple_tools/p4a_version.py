@@ -15,31 +15,18 @@ from p4a_git import *
 
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
+program_dir = os.path.split(os.path.abspath(os.path.realpath(sys.argv[0])))[0]
 
 def get_version_file_path(dist_dir = None):
-    '''Returns the Par4All version file path (named p4a_version), if any. 
-    If dist_dir is specified, look for a p4a_version file in the same 
-    directory as a p4a_version.py underneath dist_dir.'''
-    version_file_path = ""
-    global actual_script
-    global script_dir
-    if dist_dir:
-        # Lookup for a file with the same name as current script.
-        found_script = find(re.escape(os.path.split(actual_script)[1]), dir = dist_dir)
-        if len(found_script):
-            version_file_path = os.path.join(os.path.split(found_script[0])[0], "p4a_version")
+    '''Returns the Par4All version file path.'''
+    global program_dir
+    version_file_name = "VERSION"
+    if dist_dir and os.path.isdir(dist_dir):
+        version_file_path = os.path.join(dist_dir, version_file_name)
     else:
-        # Assume the version file is in the same location as this file.
-        version_file_path = os.path.join(script_dir, "p4a_version")
-    debug("p4a_version location is " + version_file_path)
+        version_file_path = os.path.normpath(os.path.join(program_dir, "..", version_file_name))
+    debug("p4a_version is " + version_file_path)
     return version_file_path
-    #if dist_dir and os.path.isdir(dist_dir):
-    #    return os.path.join(dist_dir, "lib", "p4a_version")
-    #elif "P4A_DIST" in os.environ and os.path.isdir(os.environ["P4A_DIST"]):
-    #    return os.path.join(os.environ["P4A_DIST"], "lib", "p4a_version")
-    #else:
-    #    global script_dir
-    #    return os.path.normpath(os.path.join(script_dir, "../../p4a_version"))
 
 def guess_file_revision(file_dir = None):
     '''Try to guess a revision/version string for a given file or directory.'''

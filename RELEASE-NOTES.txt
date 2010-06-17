@@ -11,12 +11,12 @@ Ronan Keryell, HPC Project.
 Introduction:
 -------------
 
-More documentation and information on http://par4all.org
+(More documentation and information is available on http://par4all.org.)
 
 This is the first public version of Par4All. It parallelizes C programs to
 OpenMP and CUDA, and Fortran programs to OpenMP.
 
-For support : support at par4all dot org
+For support: support at par4all dot org
 
 This release presents basic features of Par4All. If you need more complex
 transformations, parallelizations and optimizations, you may contact HPC
@@ -39,41 +39,61 @@ installation is done into ``/usr/local/par4all``. If you want Par4All
 installed in another location, use the compilation way at the end of this
 section.
 
-The more automatic way if you are on GNU/Linux Debian or Ubuntu is to use
-our packet repository. In this way, when a new version is out, your
-classical packet manager can automatically install it.
+The best way if you are on GNU/Linux Debian or Ubuntu is to use
+our package repository. This way, when a new version is out, your
+classical package manager can automatically install it.
 
-[<- TO BE COMPLETED HERE WITH AN EXAMPLE ->]
+To use our package repository, pick *one* of the following lines, and 
+append it to your /etc/apt/sources.list:
 
-A less automatic way on Debian or Linux is to install Par4All manually a
-``.deb`` package you have found on http://download.par4all.org with a::
+  deb http://download.par4all.org/ubuntu releases main
+  deb http://download.par4all.org/ubuntu nightly main
+  deb http://download.par4all.org/debian releases main
+  deb http://download.par4all.org/debian nightly main
+  
+(Nightly packages are generated every night, and is best suited if you want
+to track closely Par4All development. The stability is not guaranteed with
+nightly builds.)
 
-  dpkg -i <the_package>.deb
+Once this is done, run::
 
-An even less automatic way is to use a tar ball ``.tgz`` file. It should
-work on any GNU/Linux distribution. The procedure is first as ``root`` to
-create a repository you can write into with the user id of your choice
-with something like::
+  sudo aptitude update
+  sudo aptitude install par4all
 
-  mkdir /usr/local/par4all
-  chown <your-id> /usr/local/par4all
+And you are (almost) good to go! You will need to source a shell script as
+described when you issue the ``aptitude install par4all`` command,
+or log out and log in again for the environment to get properly set
+up for Par4All. Once this is done, you can, for example, run ``p4a -h``
+to get help about the usage of the p4a frontend script.
 
-and then outside the ``root`` mode do a::
+A less automatic way on Debian or Linux is to install the Par4All
+``.deb`` package you have found on http://download.par4all.org with::
 
-  cd /
-  tar xvf <the_tar_ball>.tgz
+  sudo gdebi <the_package>.deb
 
+(sudo dpkg -i <the_package>.deb would also work but does not automatically
+install dependencies.)
 
-Once you have installed Par4All with any of the previous way, you have to
-do, if you use a (ba)sh script (more common case)::
+An even less automatic way is to use a tar ball ``.tar.gz`` file. It contains
+the binaries as built on a stable Ubuntu or Debian distribution. It should
+work on any GNU/Linux distribution with the following libraries installed:
 
-  source /usr/local/par4all/etc/par4all-rc.sh
+  (a fairly recent) libc.so.6, libncurses.so.5, libreadline.so.6
 
-or if you use a (t)csh script::
+Once you have downloaded one of these .tar.gz packages from http://download.par4all.org,
+extract it with the following command:
+  
+  tar xvzf <the_package>.tar.gz
 
-  source /usr/local/par4all/etc/par4all-rc.csh
+It will create a directory named par4all. Move this directory to its final location::
 
-to initialize all the environment variables to run Par4All.
+  sudo mv par4all /usr/local/
+
+You will then need to source one of the following shell scripts which set up
+the environment variables for proper Par4All execution:
+
+  source /usr/local/par4all/etc/par4all-rc.sh (if you use bash, sh, dash, etc.)
+  source /usr/local/par4all/etc/par4all-rc.csh (if you use csh, tcsh etc.)
 
 Then you can look at the manual of ``p4a`` on
 http://www.par4all.org/documentation for information on how to use Par4All.
@@ -81,7 +101,6 @@ http://www.par4all.org/documentation for information on how to use Par4All.
 More details on the installation or how to compile Par4All from your own
 can be found into the document describing all the infrastructure:
 http://www.par4all.org/documentation/par4all-infrastructure
-
 
 
 Fortran:
