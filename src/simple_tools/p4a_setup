@@ -253,7 +253,7 @@ def main():
         root = default_root
         warn("Assuming Par4All source tree root is " + root + " (default; use --root to override)")
     if not os.path.isdir(root):
-        die("Invalid directory: " + root)
+        die("Directory does not exist: " + root)
     #~ info("Par4All source tree root: " + root)
     
     # "packages_dir" is where the source packages lie.
@@ -332,7 +332,7 @@ def main():
         polylib_src_dir = os.path.join(packages_dir, "polylib")
     debug("polylib source directory: " + polylib_src_dir)
     if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
-        die("Missing directory: " + polylib_src_dir)
+        die("Directory does not exist: " + polylib_src_dir)
     
     newgen_src_dir = ""
     if options.newgen_src:
@@ -341,7 +341,7 @@ def main():
         newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
     debug("newgen source directory: " + newgen_src_dir)
     if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
-        die("Missing directory: " + newgen_src_dir)
+        die("Directory does not exist: " + newgen_src_dir)
     
     linear_src_dir = ""
     if options.linear_src:
@@ -350,7 +350,7 @@ def main():
         linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
     debug("linear source directory: " + linear_src_dir)
     if not os.path.isdir(linear_src_dir) and not options.skip_linear:
-        die("Missing directory: " + linear_src_dir)
+        die("Directory does not exist: " + linear_src_dir)
     
     pips_src_dir = ""
     if options.pips_src:
@@ -359,7 +359,7 @@ def main():
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
     debug("PIPS source directory: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir) and not options.skip_pips:
-        die("Missing directory: " + pips_src_dir)
+        die("Directory does not exist: " + pips_src_dir)
     
     nlpmake_src_dir = ""
     if options.nlpmake_src:
@@ -368,7 +368,7 @@ def main():
         nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
     debug("nlpmake source directory: " + nlpmake_src_dir)
     #~ if not os.path.isdir(nlpmake_src_dir):
-        #~ die("Missing directory: " + nlpmake_src_dir)
+        #~ die("Directory does not exist: " + nlpmake_src_dir)
 
     # Global configure flags:
     configure_opts = [ 

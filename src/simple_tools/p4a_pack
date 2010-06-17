@@ -275,7 +275,7 @@ def main():
             dir = default_dir
             warn("Assuming Par4All is currently installed in " + dir + " (default; use --dir to override)")
         if not os.path.isdir(dir):
-            die("Invalid directory: " + dir)
+            die("Directory does not exist: " + dir)
 
     if not options.revision:
         die("Please use --revision to specify the package version/revision")
