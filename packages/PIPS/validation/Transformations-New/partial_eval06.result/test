@@ -6,7 +6,7 @@ int foo(int i)
    int j;
    int n;
 
-   j = i+++0;
+   j = i++ +0;
 
    return j;
 }
@@ -30,7 +30,7 @@ int foo(int i)
 //  P(j,n) {}
 
 
-   j = i+++0;
+   j = i++ +0;
 
 //  P(i,j,n) {i==j+1}
 

@@ -133,6 +133,6 @@ int main()
    k = 2*m*n;
    k = 2*m*n+1;
    k = m*n+m*n+1;
-   k += 0;
+
    return 5;
 }

@@ -36,6 +36,9 @@ display PARALLELPRINTED_FILE(main)
 apply  INTERNALIZE_PARALLEL_CODE
 display PRINTED_FILE
 
+apply UNSPLIT
+shell gcc -fopenmp -c omp2_c.database/Src/omp2.c -o omp2_c.database/Src/omp2.o
+
 close
 delete omp2_c
 quit
