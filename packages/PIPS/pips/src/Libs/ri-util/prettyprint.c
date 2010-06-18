@@ -2036,9 +2036,38 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
   if(prettyprint_language_is_fortran95_p()
       && strcmp(fun, FIELD_OPERATOR_NAME) == 0) {
     pc = gen_nconc(pc, we1);
-  } else {
+  }
+  else if(prettyprint_language_is_c_p()) {
+    /* Check that C ambiguities such as "a+++b" for "a++ + b" or "a +
+       ++b" are not generated */
+    if(strcmp(fun,"+")==0 || strcmp(fun, "-")==0) {
+      pips_assert("left and right subexpressions are defined",
+		  !ENDP(we1) && !ENDP(we2));
+      string l = STRING(CAR(gen_last(we1)));
+      string f = STRING(CAR(we2));
+      char lc = *(l+strlen(l)-1);
+      char fc = *f;
+      string pre = "";
+      string post = "";
+      if(*fun==lc)
+	pre = " ";
+      if(*fun==fc)
+	post = " ";
+      pc = gen_nconc(pc, we1);
+      pc = CHAIN_SWORD(pc, pre);
+      pc = CHAIN_SWORD(pc, fun);
+      pc = CHAIN_SWORD(pc, post);
+      pc = gen_nconc(pc, we2);
+    }
+    else {
+      pc = gen_nconc(pc, we1);
+      pc = CHAIN_SWORD(pc, fun);
+      pc = gen_nconc(pc, we2);
+    }
+  }
+  else {
     pc = gen_nconc(pc, we1);
-    pc = CHAIN_SWORD(pc, strdup(fun));
+    pc = CHAIN_SWORD(pc, fun);
     pc = gen_nconc(pc, we2);
   }
 
