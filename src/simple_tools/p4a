@@ -23,6 +23,42 @@ def main():
     parser = optparse.OptionParser(description = __doc__,
                                    usage = "%prog [options] [<files>]")
 
+    proc_group = optparse.OptionGroup(parser, "Processing Options")
+
+    proc_group.add_option("--accel", "-A", action = "store_true",
+                          default = False,
+                          help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
+
+    proc_group.add_option("--cuda", "-C", action = "store_true",
+                          default = False,
+                          help = "Enable CUDA generation. Implies --accel.")
+
+    proc_group.add_option("--openmp", "-O", action = "store_true",
+                          default = False,
+                          help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output. If --cuda is not specified, this option is set by default.")
+
+    proc_group.add_option("--simple", "-S", dest = "simple",
+                          action = "store_true", default = False,
+                          help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it.")
+
+    proc_group.add_option("--fine", "-F", action = "store_true",
+                          default = False,
+                          help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
+
+    proc_group.add_option("--include-modules", metavar = "REGEXP",
+                          default = None,
+                          help = "Process only the modules which names match the regular expression.")
+
+    proc_group.add_option("--exclude-modules", metavar = "REGEXP",
+                          default = None,
+                          help = "Exclude the modules matching the regular expression from the parallelization.")
+
+    proc_group.add_option("--no-process", "-N", action = "store_true",
+                          default = False,
+                          help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
+
+    parser.add_option_group(proc_group)
+
     main_group = optparse.OptionGroup(parser, "General Options")
 
     main_group.add_option("--project-name", "--project", "-p",
@@ -75,42 +111,6 @@ def main():
                          help = "By default, try to recover standard #include. To skip this phase, use this option.")
 
     parser.add_option_group(cpp_group)
-
-    proc_group = optparse.OptionGroup(parser, "Processing Options")
-
-    proc_group.add_option("--accel", "-A", action = "store_true",
-                          default = False,
-                          help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
-
-    proc_group.add_option("--cuda", "-C", action = "store_true",
-                          default = False,
-                          help = "Enable CUDA generation. Implies --accel.")
-
-    proc_group.add_option("--openmp", "-O", action = "store_true",
-                          default = False,
-                          help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output. If --cuda is not specified, this option is set by default.")
-
-    proc_group.add_option("--simple", "-S", dest = "simple",
-                          action = "store_true", default = False,
-                          help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it.")
-
-    proc_group.add_option("--fine", "-F", action = "store_true",
-                          default = False,
-                          help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
-
-    proc_group.add_option("--include-modules", metavar = "REGEXP",
-                          default = None,
-                          help = "Process only the modules which names match the regular expression.")
-
-    proc_group.add_option("--exclude-modules", metavar = "REGEXP",
-                          default = None,
-                          help = "Exclude the modules matching the regular expression from the parallelization.")
-
-    proc_group.add_option("--no-process", "-N", action = "store_true",
-                          default = False,
-                          help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
-
-    parser.add_option_group(proc_group)
 
     compile_group = optparse.OptionGroup(parser, "Compilation Options")
 
@@ -224,7 +224,7 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    if options.nocolor:
+    if options.no_color:
         p4a_term.disabled = True
 
     set_verbosity(options.verbose)
@@ -277,7 +277,7 @@ def main():
             info("Ignoring header file: " + abs_file)
         else:
             die("File format not supported: " + abs_file)
-    
+
     # If no project name is provided, try some random names.
     # XXX: would be good to be able to specify the location for the .database and .build dir?
     # Or put it in /tmp by default?..
@@ -295,37 +295,37 @@ def main():
     else:
         expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
         build_dir = os.path.join(os.getcwd(), project_name + ".build")
-    
+
     if options.remove_first:
         if os.path.exists(expected_database_dir):
             rmtree(expected_database_dir)
         if os.path.exists(build_dir):
             rmtree(build_dir)
-    
+
     # Prepare the C preprocessor flags and linker flags.
-    cppflags = options.cppflags
+    cppflags = options.cpp_flags
     for include_dir in options.include_dirs:
         cppflags += [ "-I" + include_dir ]
     for define in options.defines:
         cppflags += [ "-D" + define ]
     for undefine in options.undefines:
         cppflags += [ "-U" + undefine ]
-    ldflags = options.ldflags
+    ldflags = options.ld_flags
     for lib_dir in options.lib_dirs:
         ldflags += [ "-L" + lib_dir ]
     for lib in options.libs:
         ldflags += [ "-l" + lib ]
-    
+
     # Instantiate the builder. It will be used to keep track and arrange all
     # the CPP, C, Fortran etc. flags, apart from being used for building the
     # project after processing, if requested.
     builder = p4a_builder(
         cppflags = cppflags,
-        cflags = options.cflags,
-        cxxflags = options.cxxflags,
+        cflags = options.c_flags,
+        cxxflags = options.cxx_flags,
         ldflags = ldflags,
-        nvccflags = options.nvccflags,
-        fortranflags = options.fortranflags,
+        nvccflags = options.nvcc_flags,
+        fortranflags = options.fortran_flags,
         cpp = options.cpp,
         cc = options.cc,
         cxx = options.cxx,
@@ -339,19 +339,19 @@ def main():
         icc = options.icc,
         cuda = options.cuda,
         add_debug_flags = options.debug,
-        add_optimization_flags = not options.nofast,
+        add_optimization_flags = not options.no_fast,
         no_default_flags = options.no_default_flags
     )
-    
+
     ###################
     ### XXXXXXXXXXXXXX TODO: override CPP used by the processor -> pyps -> pips with builder.cpp
-    
+
     info("CPP flags: " + " ".join(builder.cppflags))
 
     # Process (parallelize) files (or not).
     database_dir = ""
     processor_output_files = []
-    if options.noprocess:
+    if options.no_process:
         warn("Bypassing processor")
         processor_output_files = files
     elif len(files) == 0:
@@ -368,7 +368,7 @@ def main():
                                   filter_exclude = options.exclude_modules,
                                   accel = options.accel,
                                   cuda = options.cuda)
-            
+
             # Save it for later.
             database_dir = os.path.abspath(processor.workspace.directory())
 
@@ -380,12 +380,12 @@ def main():
 
             if options.openmp:
                 processor.ompify()
-            
+
             # Write the output files.
             processor_output_files = processor.save()
-            
+
             del processor
-            
+
         except p4a_error:
             error("Processing of " + ", ".join(files) + " failed: " + sys.exc_info()[1].msg)
             if database_dir:
@@ -395,7 +395,7 @@ def main():
     if os.path.isdir(database_dir):
         # Remove database unless otherwise specified.
         if options.keep_database:
-            warn("Not removing database directory " + database_dir) 
+            warn("Not removing database directory " + database_dir)
         else:
             # To improve later with a workspace.close() and
             # workspace.delete() some days... -> Yes because some files are left open
@@ -410,7 +410,7 @@ def main():
     all_buildable_files = processor_output_files + other_files + options.extra
     if len(all_buildable_files) == 0:
         die("No buildable input files")
-    
+
     # Make every path absolute.
     output_files = []
     for file in options.output_file:
@@ -419,16 +419,16 @@ def main():
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
         if options.cmake:
-            builder.cmake_write(project_name, all_buildable_files + header_files, 
+            builder.cmake_write(project_name, all_buildable_files + header_files,
                 output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
         if options.cmake_gen or options.cmake_build:
-            builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir, 
-                cmakeflags = options.cmakeflags, build = options.cmake_build)
+            builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir,
+                cmakeflags = options.cmake_flags, build = options.cmake_build)
         return
-    
+
     try:
         info("Building " + ", ".join(output_files))
-        builder.build(files = all_buildable_files, output_files = output_files, 
+        builder.build(files = all_buildable_files, output_files = output_files,
             extra_obj = options.extra_obj, build_dir = build_dir)
     except p4a_error:
         error("Building failed: " + sys.exc_info()[1].msg)
