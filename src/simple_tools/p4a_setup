@@ -387,7 +387,7 @@ def main():
         make_opts.append("-j" + options.jobs)
     
     if get_verbosity() == 0:
-        warn("Building and installing, please wait...", spin = True)
+        warn("Building and installing", spin = True)
     
     ############################## polylib
     
