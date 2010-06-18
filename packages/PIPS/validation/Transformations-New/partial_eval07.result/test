@@ -7,9 +7,9 @@ int foo(int i)
    int n;
 
    if (n>0)
-      return j = i+++0;
+      return j = i++ +0;
    else if (n<0)
-      return i+++0;
+      return i++ +0;
    else
       return 1+2+3;
 }
@@ -37,12 +37,12 @@ int foo(int i)
 
 //  P(j,n) {1<=n}
 
-      return j = i+++0;
+      return j = i++ +0;
    else if (n<0)
 
 //  P(j,n) {n+1<=0}
 
-      return i+++0;
+      return i++ +0;
    else
 
 //  P(j,n) {n==0}

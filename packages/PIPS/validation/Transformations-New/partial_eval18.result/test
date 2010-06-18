@@ -6,10 +6,10 @@ int main()
    int i = 2;
    int j;
    int k = 3;
-   i+++j-j;
-   i+++j-j;
-   i+++k-k;
-   i+++k-k;
+   i++ +j-j;
+   i++ +j-j;
+   i++ +k-k;
+   i++ +k-k;
    return i;
 }
 
@@ -35,19 +35,19 @@ int main()
 
 //  P(i,j,k) {i==2, k==3}
 
-   i+++j-j;
+   i++ +j-j;
 
 //  P(i,j,k) {k==3}
 
-   i+++j-j;
+   i++ +j-j;
 
 //  P(i,j,k) {k==3}
 
-   i+++k-k;
+   i++ +k-k;
 
 //  P(i,j,k) {k==3}
 
-   i+++k-k;
+   i++ +k-k;
 
 //  P(i,j,k) {k==3}
 
@@ -61,7 +61,7 @@ int main()
    int i = 2;
    int j;
    int k = 3;
-   i+++j-j;
+   i++ +j-j;
    i++;
    i++;
    i++;
