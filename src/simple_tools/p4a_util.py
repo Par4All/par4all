@@ -63,7 +63,7 @@ class spinner(Thread):
                 return
         while not self.stopped:
             for item in "-\|/":
-                sys.stderr.write("\r" + item)
+                sys.stderr.write("\rPlease wait... " + item)
                 time.sleep(0.05)
         sys.stderr.write("\r")
 

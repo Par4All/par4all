@@ -2,33 +2,79 @@
 
 set -e
 
-DIR=/tmp/p4apub$$
+DIR=/tmp/p4a_build_$$
 REVISION=0.2
+NIGHTLY=1
+PUBLISH=0
+KEEP_TMP=0
+VERBOSITY=-v
+VERBOSE=0
+V=0
+J=-j4
+OUTPUT_DIR=$(pwd)
+
+if [ $PUBLISH != 0 ]; then
+	PUBLISH=--publish
+else
+	PUBLISH=''
+fi
+
+if [ $NIGHTLY != 0 ]; then
+        NIGHTLY=--nightly
+else
+	NIGHTLY=''
+fi
+
+if [ $VERBOSE != 0 -o $V != 0 ]; then
+	VERBOSITY=-vvv
+fi
 
 cleanup()
 {
-	echo "Removing $DIR"
-	rm -rf $DIR
+	if [ $KEEP_TMP = 0 ]; then
+		echo "Removing $DIR"
+		rm -rf $DIR
+	else
+	        echo NOT removing $DIR
+	fi
 }
 
 trap cleanup INT
+
+echo
+echo "*** $(date)"
+echo
 
 mkdir -p $DIR
 cd $DIR
 git clone git://git.hpc-project.com/par4all p4a
 cd $DIR/p4a
 git checkout -b p4a remotes/origin/p4a
-#cd $DIR
-#cp -a p4a p4a-own
-#cd $DIR/p4a-own
-#git checkout -b p4a-own remotes/origin/p4a-own
-#src/simple_tools/p4a_setup --clean --rebuild --packages-dir=$DIR/p4a/packages -v
-src/simple_tools/p4a_setup --clean --rebuild -j4 -v
-#src/simple_tools/p4a_pack --deb --tgz --dir /usr/local/par4all --revision $REVISION --nightly --publish -v
-src/simple_tools/p4a_pack --deb --tgz --dir /usr/local/par4all --revision $REVISION --nightly --publish -v
-#cd $DIR/p4a
-src/simple_tools/p4a_pack --stgz --revision $REVISION --nightly --publish -v
+
+# Rename the folder with the commit tag because the source file paths appear
+# in PIPS error messages and therefore this could help trace back errors...
+SUFFIX=$(git log --abbrev-commit --pretty=oneline -n 1 | cut -f1 -d' ')
+SUFFIX=$(date --utc +%Y%m%dT%H%M%S)~$SUFFIX
+cd $DIR
+mv p4a p4a_$SUFFIX
+cd p4a_$SUFFIX
+
+# Build and install:
+src/simple_tools/p4a_setup --clean --rebuild $J $VERBOSITY
+
+# Create the deb and tgz binary packages:
+src/simple_tools/p4a_pack --deb --tgz --dir /usr/local/par4all \
+	--revision $REVISION $NIGHTLY $PUBLISH --append-date --output-dir=$OUTPUT_DIR $VERBOSITY
+
+# Create the source package:
+src/simple_tools/p4a_pack --stgz \
+	--revision $REVISION $NIGHTLY $PUBLISH --append-date --output-dir=$OUTPUT_DIR $VERBOSITY
 
 cleanup
 
+echo 
+echo "**** $(date)"
+echo 
+echo All done.
+echo
 
