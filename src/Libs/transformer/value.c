@@ -420,7 +420,9 @@ static entity make_local_value_entity(int n, int nature, type t)
        reset? */
     /* It is likely to take longer to compare types than to free one and
        allocate one... */
-    if(!type_equal_p(entity_type(v), t)) {
+    /* Well, type_equal_p() replaces typedefs types by the underlying
+       type which leads to disasters; see suppress_dead_code04.c */
+    if(TRUE || type_equal_p(entity_type(v), t)) {
       free_type(entity_type(v));
       entity_type(v) = copy_type(t);
     }
