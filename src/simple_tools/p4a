@@ -32,7 +32,7 @@ def main():
     main_group.add_option("--keep-database", "-k",
                           action = "store_true", default = False,
                           help = "Keep database directory after processing.")
-    
+
     main_group.add_option("--remove-first", "-r",
                           action = "store_true", default = False,
                           help = "Remove existing database directory before processing.")
@@ -41,7 +41,7 @@ def main():
                           default = get_verbosity(),
                           help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
 
-    main_group.add_option("--nocolor", action = "store_true", default = False,
+    main_group.add_option("--no-color", action = "store_true", default = False,
                           help = "Disable coloring of terminal output.")
 
     main_group.add_option("--version", "-V", action = "store_true", default = False,
@@ -66,7 +66,7 @@ def main():
                          metavar = "NAME", default = [],
                          help = "Remove a preprocessor define. Same as passing the preprocessor a -U option. Several are allowed.")
 
-    cpp_group.add_option("--cppflags", action = "append",
+    cpp_group.add_option("--cpp-flags", action = "append",
                          metavar = "FLAGS", default = [],
                          help = "Add additional flags for the C preprocessor. Several are allowed.")
 
@@ -106,7 +106,7 @@ def main():
                           default = None,
                           help = "Exclude the modules matching the regular expression from the parallelization.")
 
-    proc_group.add_option("--noprocess", "-N", action = "store_true",
+    proc_group.add_option("--no-process", "-N", action = "store_true",
                           default = False,
                           help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
 
@@ -132,7 +132,7 @@ def main():
 
     compile_group.add_option("--ar", metavar = "ARCHIVER", default = None,
                              help = "Archiver to use (defaults to ar).")
-    
+
     compile_group.add_option("--icc", action = "store_true", default = False,
                              help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
 
@@ -140,29 +140,29 @@ def main():
                              default = False,
                              help = "Add debug flags (-g compiler flag).")
 
-    compile_group.add_option("--nofast", "--notfast", action = "store_true",
+    compile_group.add_option("--no-fast", "--not-fast", action = "store_true",
                              default = False,
                              help = "Do not add optimized compilation flags automatically.")
-    
+
     compile_group.add_option("--no-default-flags", action = "store_true",
                              default = False,
                              help = "Do not add some C flags such as -fPIC, -g, etc. automatically.")
-    
-    compile_group.add_option("--cflags", action = "append",
-                             metavar = "FLAGS", default = [],
-                             help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
 
-    compile_group.add_option("--cxxflags", action = "append",
+    compile_group.add_option("--c-flags", action = "append",
                              metavar = "FLAGS", default = [],
-                             help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--cflags) are also passed to the C++ compiler.")
+                             help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
 
-    compile_group.add_option("--nvccflags", action = "append",
+    compile_group.add_option("--cxx-flags", action = "append",
                              metavar = "FLAGS", default = [],
-                             help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
+                             help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--c-flags) are also passed to the C++ compiler.")
 
-    compile_group.add_option("--fortranflags", action = "append",
+    compile_group.add_option("--nvcc-flags", action = "append",
                              metavar = "FLAGS", default = [],
-                             help = "Specify flags to pass to the Fortran compiler. Several are allowed. Note that --cppflags will be automatically prepended to the actual flags passed to the compiler.")
+                             help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
+
+    compile_group.add_option("--fortran-flags", action = "append",
+                             metavar = "FLAGS", default = [],
+                             help = "Specify flags to pass to the Fortran compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
 
     compile_group.add_option("--extra", action = "append",
                              metavar = "FILE", default = [],
@@ -189,7 +189,7 @@ def main():
                           metavar = "LIB", default = [],
                           help = "Specify an input library to link against. Same as the linker -l option. Several are allowed.")
 
-    link_group.add_option("--ldflags", action = "append",
+    link_group.add_option("--ld-flags", action = "append",
                           metavar = "FLAGS", default = [],
                           help = "Specify additional flags to pass to the linker. Several are allowed.")
 
@@ -198,25 +198,25 @@ def main():
                           help = "Add an additional object file for linking. Several are allowed.")
 
     parser.add_option_group(link_group)
-    
+
     cmake_group = optparse.OptionGroup(parser, "CMake Options")
 
     cmake_group.add_option("--cmake", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --make alone will NOT build the project.")
-    
-    cmake_group.add_option("--cmakeflags", action = "append",
+
+    cmake_group.add_option("--cmake-flags", action = "append",
                           metavar = "FLAGS", default = [],
                           help = "Specify additional flags to pass to CMake. Several are allowed.")
-    
+
     cmake_group.add_option("--cmake-dir", metavar = "DIR", default = None,
                           help = "Output/lookup the CMakeLists.txt file in this directory instead of the current working directory.")
-    
+
     cmake_group.add_option("--cmake-gen", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will make p4a try to locate a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir), and generate Makefiles in a specific directory (--cmake-gen-dir).")
-    
+
     cmake_group.add_option("--cmake-gen-dir", metavar = "DIR", default = None,
                           help = "Generate Makefiles in this directory instead of <project name>.gen by default.")
-    
+
     cmake_group.add_option("--cmake-build", action = "store_true", default = False,
                           help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")
 
@@ -226,9 +226,9 @@ def main():
 
     if options.nocolor:
         p4a_term.disabled = True
-    
+
     set_verbosity(options.verbose)
-    
+
     if options.version:
         print(guess_file_revision(__file__))
         return
