@@ -18,7 +18,7 @@ int main()
    k <<= j-j;
    k >>= j-j;
    k |= j*m-j*m;
-   i+++j-j;
+   i++ +j-j;
    return i;
 }
 
@@ -89,7 +89,7 @@ int main()
 
 //  P(i,j,k,m) {i==0, j==0}
 
-   i+++j-j;
+   i++ +j-j;
 
 //  P(i,j,k,m) {j==0}
 
