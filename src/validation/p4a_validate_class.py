@@ -198,6 +198,7 @@ class ValidationClass:
 
 		nb_test = 0
 		nb_failed = 0
+		nb_warning = 0
 
     # Open the file where par4all tests are:		
 		for line in f:
@@ -222,7 +223,9 @@ class ValidationClass:
 					# Run test
 					nb_test = nb_test+1
 					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt',ext)
-					if (status != "succeeded"):
+					if (status == "skipped"):
+						nb_warning = nb_warning+1
+					elif (status != "succeeded"):
 						nb_failed = nb_failed+1
 				else:
 					print ('%s not accessible' % (directory_test))
@@ -230,7 +233,7 @@ class ValidationClass:
 				print ("To test %s, use an extension like .c, .f90, .f, .F\n"%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
 
 		f.close()
-		print('%s failed in %s tests'%(nb_failed,nb_test))
+		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
 
 ###### Validate all tests (done by "default" file) ######
   def valid_pips(self):
@@ -250,6 +253,7 @@ class ValidationClass:
 
 		nb_test = 0
 		nb_failed = 0
+		nb_warning = 0
 
 		for line in default_file:
 				if (not re.match('#',line)):
@@ -263,10 +267,12 @@ class ValidationClass:
 							nb_test = nb_test+1
 							file_tested = directory_test + '/' + file_test
 							status = self.test_par4all(directory_test, file_tested,'pips_log.txt',ext)
-							if (status != "succeeded"):
+							if (status == "skipped"):
+								nb_warning = nb_warning+1
+							elif (status != "succeeded"):
 								nb_failed = nb_failed+1
 
-		print('%s failed in %s tests'%(nb_failed,nb_test))
+		print('%s failed and %s warning (skipped) in %s tests.'%(nb_failed,nb_warning,nb_test))
 		default_file.close()
 
 ###### Diff between p4a and pips options ######
@@ -343,6 +349,7 @@ class ValidationClass:
 		
 		nb_failed = 0
 		nb_test = 0
+		nb_warning = 0
 
 		#read the directory
 		i = 0
@@ -361,10 +368,12 @@ class ValidationClass:
 						file_tested = directory_test + '/' + file_test
 						print (file_tested)
 						status = self.test_par4all(directory_test, file_tested,'directory_log.txt',ext)
-						if (status != "succeeded"):
+						if (status == "skipped"):
+							nb_warning = nb_warning+1
+						elif (status != "succeeded"):
 							nb_failed = nb_failed+1
 
-		print('%s failed in %s tests'%(nb_failed,nb_test))
+		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
 
 ###### Validate all desired tests ################
   def valid_test(self,arg_test):
