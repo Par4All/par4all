@@ -5,7 +5,7 @@ int main()
 {
    int i;
    int j;
-   i+++j-j;
+   i++ +j-j;
    j;
    return i;
 }
@@ -28,7 +28,7 @@ int main()
 
 //  P(i,j) {}
 
-   i+++j-j;
+   i++ +j-j;
 
 //  P(i,j) {}
 
