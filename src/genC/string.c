@@ -310,3 +310,17 @@ string remove_newline_of_string (string s)
   return chop_newline (s, TRUE) ;
 }
 
+/* @return array of string
+ * @param s string  considered
+ * @pram d delimiter
+ */
+list strsplit(const char *s,const char *d)
+{
+    string buffer=strdup(s);
+    list split = NIL;
+    for(string tmp = strtok(buffer,d); tmp;tmp=strtok(NULL,d))
+        split=CONS(STRING,strdup(tmp),split);
+    free(buffer);
+    return gen_nreverse(split);
+}
+
