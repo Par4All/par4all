@@ -15,7 +15,12 @@ my $rcfile=$ARGV[0];
 # read source file file into a string
 open INPUT ,$rcfile or die "cannot open $rcfile:$!";
 my @lines=<INPUT>; 
-my $rc = join "", @lines;
+my $rc="";
+# strip out comment
+foreach(@lines) {
+	s/%.*//g;
+	$rc.=$_;
+}
 close INPUT;
 
 # parse the string for pass section
