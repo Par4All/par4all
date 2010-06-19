@@ -52,10 +52,7 @@ typedef dg_vertex_label vertex_label;
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "transformer.h"
-#include "semantics.h"
 #include "control.h"
-#include "transformations.h"
 #include "arithmetique.h"
 
 #include "effects-generic.h"
@@ -63,7 +60,6 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "properties.h"
 #include "atomizer.h"
-#include "preprocessor.h"
 #include "properties.h"
 
 #include "expressions.h"
