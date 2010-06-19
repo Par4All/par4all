@@ -33,7 +33,7 @@ from os import listdir, path
 from os.path import isdir, isfile
 from re import match, sub
 from subprocess import Popen, PIPE
-from sys import argv,stderr
+from sys import argv,stderr,exit
 
 generate_dot_file=False
 srcdir="../../../src/Libs"
@@ -46,7 +46,7 @@ class sym:
 	def undefined(self):
 		return match("^ +U (\w+)$",self.name)
 	def defined(self):
-		return match("^[0123456789abcdef]+ +[tTD] (\w+)$",self.name)
+		return match("^[0123456789abcdef]+ +[TD] (\w+)$",self.name)
 
 
 
@@ -85,9 +85,9 @@ class library:
 		fmt+='\n'
 		if full:
 			for d in self.depends:
-				fmt+=self.dotname()
-				fmt+=" -> "
 				fmt+=d.dotname()
+				fmt+=" -> "
+				fmt+=self.dotname()
 				fmt+='\n'
 		return fmt
 
@@ -121,6 +121,7 @@ for lib0 in libraries:
 			lib0.depends.append(lib1)
 
 # some checks on includes
+check_result=0
 for lib in libraries:
 	sdepends=set(map(lambda x:x.name,lib.depends))
 	diff=lib.includes().difference(sdepends)
@@ -128,12 +129,32 @@ for lib in libraries:
 		for elib in diff:
 			if elib in map(lambda x:x.name,libraries) and elib != lib.name:
 				print >> stderr, elib,"included in",lib.name,"but never used" 
+				check_result+=1
+
+# some checks on definitions
+for lib0 in libraries:
+	for lib1 in libraries:
+		if lib0 != lib1:
+			for symbol in lib0.defined_symbols.intersection(lib1.defined_symbols):
+				print >> stderr, lib0.name , "and", lib1.name, "both define symbol", symbol
+				check_result+=1
+
 
 			
 			
 
 # pretty print dot file if required
 if generate_dot_file:
+	# l0 depends on l1 if l0.used_symbols inter l1.defined_symbols != 0
+	for lib0 in libraries:
+		lib0.depends=list()
+	for lib0 in libraries:
+		for lib1 in libraries:
+			s=lib0.defined_symbols.intersection(lib1.used_symbols)
+			if s:
+				#print >>stderr,lib0.name,s
+				lib0.depends.append(lib1)
+
 	print "digraph pipslibs {"
 	if len(argv) == 1:
 		for lib in libraries:
@@ -143,7 +164,7 @@ if generate_dot_file:
 			print lib.dotstr(lib.name in argv[1:])
 	print "}"
 
-
+exit(check_result)
 
 
 

@@ -90,3 +90,10 @@ libpipslibs_la_LIBADD=\
 	paf-util/libpaf-util.la \
 	gnulib/libgnu.la
 
+# devel mode enables various checks
+if WITH_DEVEL_MODE
+check-local:check-includes
+
+check-includes:
+	$(top_srcdir)/src/Scripts/dev/pipslibsdep.py
+endif

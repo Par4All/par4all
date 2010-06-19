@@ -67,6 +67,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
+#include "phrase.h"
 
 hash_table gLoopToRef;
 hash_table gStatToRef;

@@ -48,13 +48,7 @@ one process on the HRE
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
-#include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
+#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -72,18 +66,7 @@ typedef dg_vertex_label vertex_label;
 #include "phrase_distribution.h"
 #include "comEngine.h"
 #include "comEngine_generate_code.h"
-
-// See the file comEngine_distribute.c to know
-// what this hash_table's mean
-extern hash_table gLoopToRef;
-extern hash_table gStatToRef;
-extern hash_table gRefToEff;
-extern hash_table gLoopToSync;
-extern hash_table gLoopToSupRef;
-extern hash_table gLoopToUnSupRef;
-extern entity gHREMemory;
-extern expression gBufferSizeEnt;
-extern hash_table gRefToHREFifo;
+#include "phrase.h"
 
 // This hash_table associates an old reference to private
 // HRE variable

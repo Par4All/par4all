@@ -48,14 +48,7 @@ processes on the HRE
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
-#include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-
+#include "sac.h"
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
@@ -72,21 +65,7 @@ typedef dg_vertex_label vertex_label;
 #include "phrase_distribution.h"
 #include "comEngine.h"
 #include "comEngine_generate_code.h"
-
-// See the file comEngine_distribute.c to know
-// what this hash_table's mean
-extern hash_table gLoopToRef;
-extern hash_table gStatToRef;
-extern hash_table gRefToEff;
-extern hash_table gLoopToUnSupRef;
-extern entity gHREMemory;
-extern expression gBufferSizeEnt;
-extern hash_table gRefToHREFifo;
-extern hash_table gEntToHREFifo;
-extern hash_table gRefToHREVar;
-extern hash_table gIndToNum;
-extern hash_table gRefToInd;
-extern hash_table gRefToToggle;
+#include "phrase.h"
 
 // gOldIndToNewInd associated a loop index of
 // input code to a loop index of the new one

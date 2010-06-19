@@ -25,6 +25,9 @@
  */
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
+#include "hpf_private.h"
+#include "hpf.h"
+#include "message.h"
 
 /* end of it
  */

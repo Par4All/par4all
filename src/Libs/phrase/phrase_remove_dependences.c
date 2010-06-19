@@ -43,13 +43,7 @@
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
-#include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
+#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -66,6 +60,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
+#include "phrase.h"
 
 static hash_table gRefTolRef;
 static entity gIndex;
