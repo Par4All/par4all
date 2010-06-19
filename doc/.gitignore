@@ -1,0 +1,3 @@
+# Ignore automatically generated documentation files:
+*-help.tex
+*.help
