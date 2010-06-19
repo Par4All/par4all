@@ -12,13 +12,16 @@ _HAS_HTLATEX_ = 1
 ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
 
+include $(P4A_ROOT)/doc/libs/par4all.mk
+
 default: full-compile phase7
 
 include $(ROOT)/makes/main.mk
 
 
 publish:
-	rsync -av par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
+	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_MACHINE_DIR)
+	rsync -av $(INSTALL_DOC) $(INSTALL_HTM) $(INSTALL_MACHINE):$(INSTALL_MACHINE_DIR)
 
 # local stuff
 clean: local-clean
