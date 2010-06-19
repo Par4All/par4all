@@ -38,7 +38,6 @@
 #include "text-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 

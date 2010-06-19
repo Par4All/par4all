@@ -63,7 +63,6 @@ typedef dg_vertex_label vertex_label;
 #include "effects-util.h"
 #include "resources.h"
 #include "pipsdbm.h"
-#include "transformations.h"
 #include "movements.h"
 #include "effects-generic.h"
 #include "effects-convex.h"

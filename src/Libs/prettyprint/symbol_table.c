@@ -41,7 +41,6 @@
 #include "c_parser_private.h"
 #include "parser_private.h" /* FI: for syntax.h */
 
-#include "c_syntax.h"
 #include "syntax.h"
 #include "misc.h"
 

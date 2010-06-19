@@ -48,24 +48,47 @@
 
 /* filename extensions
  */
+#define FORTRAN_FILE_SUFFIX ".f"
+#define FORTRAN90_FILE_SUFFIX ".f90"
+#define FORTRAN95_FILE_SUFFIX ".f95"
+#define RATFOR_FILE_SUFFIX ".F"
+#define C_FILE_SUFFIX ".c"
+#define FORTRAN_INITIAL_FILE_SUFFIX ".initial.f"
+
+
 #define SEQUENTIAL_CODE_EXT ".code"
 #define PARALLEL_CODE_EXT ".parcode"
 
-#define SEQUENTIAL_FORTRAN_EXT ".f"
-#define SEQUENTIAL_FORTRAN95_EXT ".f90"
-#define SEQUENTIAL_C_EXT ".c"
-#define PARALLEL_FORTRAN_EXT ".par.f"
-#define PARALLEL_FORTRAN95_EXT ".par.f90"
-#define PARALLEL_C_EXT ".par.c"
+#define SEQUENTIAL_FORTRAN_EXT FORTRAN_FILE_SUFFIX
+#define SEQUENTIAL_FORTRAN90_EXT FORTRAN90_FILE_SUFFIX
+#define SEQUENTIAL_FORTRAN95_EXT FORTRAN95_FILE_SUFFIX
+#define SEQUENTIAL_C_EXT C_FILE_SUFFIX
+
+#define PARALLEL_FORTRAN_EXT ".par" FORTRAN_FILE_SUFFIX
+#define PARALLEL_FORTRAN90_EXT ".par" FORTRAN90_FILE_SUFFIX
+#define PARALLEL_FORTRAN95_EXT ".par" FORTRAN95_FILE_SUFFIX
+#define PARALLEL_C_EXT ".par" C_FILE_SUFFIX
+
 
 /* Suffixes for code and parsed_code. No idea why the word PREDICAT
    is used for code. Old misusage? */
-#define PREDICAT_FORTRAN_EXT ".pre.f"
-#define PRETTYPRINT_FORTRAN_EXT ".pp.f"
-#define PREDICAT_C_EXT ".pre.c"
-#define PRETTYPRINT_C_EXT ".pp.c"
-#define PREDICAT_F95_EXT ".pre.f90"
-#define PRETTYPRINT_F95_EXT ".pp.f90"
+#define PRETTYPRINT_FORTRAN_EXT ".pp" FORTRAN_FILE_SUFFIX
+#define PRETTYPRINT_C_EXT ".pp" C_FILE_SUFFIX
+#define PRETTYPRINT_F90_EXT ".pp" FORTRAN90_FILE_SUFFIX
+#define PRETTYPRINT_F95_EXT ".pp" FORTRAN95_FILE_SUFFIX
+
+/* an issue is that the preprocessor used for .F must be Fortran 77 aware.
+ */
+#define PREDICAT_FORTRAN_EXT ".pre" FORTRAN_FILE_SUFFIX
+#define PREDICAT_C_EXT ".pre" C_FILE_SUFFIX
+#define PREDICAT_F90_EXT ".pre" FORTRAN90_FILE_SUFFIX
+#define PREDICAT_F95_EXT ".pre" FORTRAN95_FILE_SUFFIX
+
+/* The extensions used by the various source file types involved by the
+   preprocessor: */
+#define PP_FORTRAN_ED		 	".fpp_processed.f"
+#define PP_C_ED		 	".cpp_processed.c"
+#define PP_ERR			".stderr"
 
 
 #define WP65_BANK_EXT ".bank"

@@ -31,6 +31,7 @@
 
 #include "genC.h"
 #include "text.h"
+#include "constants.h"
 
 #include "text-util.h"
 #include "misc.h"

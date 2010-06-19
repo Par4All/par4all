@@ -41,7 +41,6 @@
 #include "effects-util.h"
 #include "properties.h"  /* used by get_bool_property   */
 #include "misc.h"
-#include "control.h"
 #include "matrice.h"
 #include "complexity.h"
 

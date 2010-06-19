@@ -48,7 +48,6 @@ This file contains functions used to generate the MMCDs generation code
 #include "prettyprint.h"
 
 #include "dg.h"
-#include "transformations.h"
 #include "transformer.h"
 
 typedef dg_arc_label arc_label;
@@ -60,7 +59,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 

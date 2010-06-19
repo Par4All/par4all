@@ -94,7 +94,6 @@ char vcid_control_control[] = "$Id$";
 
 #include "constants.h"
 
-#include "c_syntax.h"
 
 #define LABEL_TABLES_SIZE 10
 

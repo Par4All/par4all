@@ -62,7 +62,6 @@
 #include "text-util.h"
 
 #include "dg.h"
-#include "transformations.h"
 #include "properties.h"
 
 #include "control.h"

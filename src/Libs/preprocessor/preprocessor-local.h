@@ -27,21 +27,7 @@
 /* the name of the environment variable where source files are searched for. */
 #define SRCPATH "PIPS_SRCPATH"
 
-#define FORTRAN_FILE_SUFFIX ".f"
-#define FORTRAN90_FILE_SUFFIX ".f90"
-#define FORTRAN95_FILE_SUFFIX ".f95"
-#define RATFOR_FILE_SUFFIX ".F"
-#define C_FILE_SUFFIX ".c"
-#define FORTRAN_INITIAL_FILE_SUFFIX ".initial.f"
 
-/* an issue is that the preprocessor used for .F must be Fortran 77 aware.
- */
-
-/* The extensions used by the various source file types involved by the
-   preprocessor: */
-#define PP_FORTRAN_ED		 	".fpp_processed.f"
-#define PP_C_ED		 	".cpp_processed.c"
-#define PP_ERR			".stderr"
 
 /* pre-processor and added options from environment
  */

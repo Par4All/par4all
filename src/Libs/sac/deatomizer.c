@@ -37,7 +37,6 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 
@@ -58,7 +57,6 @@ typedef dg_vertex_label vertex_label;
 #include "polyedre.h"
 
 #include "ricedg.h"
-#include "semantics.h"
 #include "transformations.h"
 #include "control.h"
 

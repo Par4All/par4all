@@ -41,7 +41,6 @@
 #include "linear.h"
 #include "ri.h"
 
-#include "newgen.h" /* statement_mapping */
 #include "pipsdbm.h"
 
 /* pipsmake interruption 

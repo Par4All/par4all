@@ -36,7 +36,6 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 
@@ -50,7 +49,6 @@ typedef dg_vertex_label vertex_label;
                         * simdizer.c is compiled */
 #include "sac.h"
 
-#include "semantics.h"
 #include "transformations.h"
 #include "control.h"
 

@@ -65,7 +65,6 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
-#include "chains.h"
 
 /* privatizable() checks whether the entity e is privatizable. */
 static bool privatizable(entity e)

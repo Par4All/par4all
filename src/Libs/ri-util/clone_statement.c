@@ -31,7 +31,6 @@
 #include "misc.h"
 #include "ri.h"
 #include "cloning.h"
-#include "newgen_hash.h"
 
 #include "ri-util.h"
 

@@ -35,7 +35,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "callgraph.h"
 #include "transformations.h"
 #include "expressions.h"
 

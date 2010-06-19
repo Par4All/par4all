@@ -42,7 +42,7 @@ class sym:
 	def undefined(self):
 		return match("^ +U (\w+)$",self.name)
 	def defined(self):
-		return match("^[0123456789abcdef]+ +[tT] (\w+)$",self.name)
+		return match("^[0123456789abcdef]+ +[tTD] (\w+)$",self.name)
 
 
 

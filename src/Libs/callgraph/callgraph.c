@@ -48,11 +48,8 @@
 #include "text.h"
 #include "text-util.h"
 #include "constants.h"
-#include "control.h"      /* CONTROL_MAP is defined there */
-#include "properties.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "misc.h"
 #include "database.h"     /* DB_PUT_FILE_RESOURCE is defined there */
 #include "pipsdbm.h"
@@ -60,7 +57,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "transformer.h"
 #include "semantics.h"
 #include "complexity_ri.h"
 #include "complexity.h"

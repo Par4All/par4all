@@ -29,7 +29,6 @@
  */
 
 #include "defines-local.h"
-#include "bootstrap.h"
 
 /* ??? this should work (but that is not the case yet),
  * with every call with no write to distributed arrays.

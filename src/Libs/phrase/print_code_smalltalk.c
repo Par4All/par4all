@@ -65,7 +65,6 @@
 #include "pipsdbm.h"
 #include "text-util.h"
 
-#include "transformations.h"
 
 #define STPRETTY		".st"
 

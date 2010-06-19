@@ -1800,6 +1800,7 @@ the variable is unsigned, signed or not */
 
 /** @} */
 
+
 /* polymorhism thanks to newgen ! */
 #define INSTANCE_OF(type,value) ( (_int)((value)->u) == (_int)(type##_domain) )
 

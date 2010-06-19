@@ -36,7 +36,6 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 #include "preprocessor.h"
@@ -54,13 +53,11 @@ typedef dg_vertex_label vertex_label;
 #include "patterns.h"
 
 #include "properties.h"
-#include "locality.h"
 
 #include "misc.h"
 #include "alias-classes.h"
 #include <ctype.h>
 #include <stdlib.h>
-#include "c_syntax.h"
 
 #define MAX_PACK 16
 #define VECTOR_POSTFIX "_vec"

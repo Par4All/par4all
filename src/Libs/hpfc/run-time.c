@@ -30,7 +30,6 @@
  */
 
 #include "defines-local.h"
-#include "bootstrap.h"
 
 #include "control.h"
 #include "semantics.h"
