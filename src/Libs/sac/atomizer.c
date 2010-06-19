@@ -201,8 +201,9 @@ static void change_basic_if_needed(statement stat)
 		{
 
 			// Check that the statement can be potentially integrated in a 
-			// SIMD statement
-			if(match_statement(stat) != NIL)
+			// SIMD statement 
+            // SG: atomizer is no longer limited to sac
+			// if(match_statement(stat) != NIL)
 			{
 				get_type_max_width(syntax_call(expression_syntax(rExp)), &maxWidth);
 			}
@@ -359,8 +360,6 @@ boolean simd_atomizer(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
-    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
-    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
 
     debug_on("SIMD_ATOMIZER_DEBUG_LEVEL");
 
@@ -375,8 +374,6 @@ boolean simd_atomizer(char * mod_name)
     /* update/release resources */
     reset_current_module_statement();
     reset_current_module_entity();
-    reset_simd_operator_mappings();
-    reset_simd_treematch();
 
     debug_off();
 
