@@ -1,0 +1,38 @@
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   // ok if following line is uncommented
+   //int i = 0;
+   
+   if (1!=1)
+
+//  P() {0==-1}
+
+      // DEAD CODE TO BE REMOVED
+      return 1;
+
+//  P() {}
+
+
+   return 0;
+}
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   // ok if following line is uncommented
+   //int i = 0;
+   
+   
+   return 0;
+}
+
