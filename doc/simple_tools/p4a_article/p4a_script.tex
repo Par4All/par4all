@@ -1,5 +1,6 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{a4wide}
 \usepackage{url}
 \usepackage{alltt}
 \usepackage{libs/tex/abbrev_reactive}
@@ -29,53 +30,98 @@
 
 \tableofcontents{}
 
+
 \section{Introduction}
 \label{sec:introduction}
 
+\Apfa is a project aiming at easing code generation for various parallel
+architectures from sequential source codes written in C or Fortran with
+almost no manual code modification required. \Apfa is based on various
+components such as the \Apips source-to-source compiler framework and is
+mainly developed by \Ahpcp, Mines ParisTech and Institut Télécom. It
+is open source to take advantage of a community effect and to avoid
+capturing users in a proprietary short-term solution. Specialized target
+developments and professional support are also available on demand.
+
+The main interest of a source-to-source compiler is to be naturally
+independent of the target very details and to take advantage of the best
+back-end tools, such as highly optimized vendor compilers for a given
+processor or platform, open-source compilers and tools, high-level
+hardware synthesizers, \Acuda or \Aopencl compilers for \Agpu. At the same
+time, some architectural aspects can be expressed or generated in some
+special source constructs to capture architectural details when needed
+(\Asimd or accelerators intrinsics). The source-to-source aspect makes
+\Apfa \emph{de facto} interoperable with various other tools as front-end
+or back-end to build complete tool chains.
+
 \texttt{p4a} is the basic script interface to quickly use \Apfa for people
-not interested in all the \Apfa details.
+not interested in all the \Apips details but produce parallel code from
+user sources.
 
 This script can take C or Fortran source files and generate \Aopenmp or
 \Acuda output to run respectively on shared memory multicore processors or
 \Agpu.
 
-The output is created in a \texttt{\emph{x}.database} directory.
+The output is created into local \texttt{...p4a...} files extracted from a
+temporary \texttt{\emph{x}.database} directory that can be optionally kept
+for inspection as with any \Apips usage.
+
+This script can also be used to call a back-end compiler such as
+\texttt{gcc}, \texttt{icc} or \texttt{nvcc} to directly generate a binary
+executable and you can choose many compiler and preprocessor options.
+
+A CMake build infrastructure can be automatically generated to ease
+further compilation by the back-end when running with the correct options.
 
 The \Apfa documentation is available from \url{http://www.par4all.org} and
-more specifically, this one can be found in \Apdf in
-\url{http://par4all.enstb.org/par4all/doc/simple_tools/p4a/p4a_script.pdf}
+more specifically, this one can be found in \Apdf from
+\url{http://download.par4all.org/doc/simple_tools/p4a/p4a_script.pdf}
 
-\section{Examples}
+Since \Apfa is a large project in continuous progress, you should refer to
+release note and more generally on \url{http://www.par4all.org} to know
+about the current status and limitations of the tools.
+
+This project is funded through various research projects : ARTEMIS
+SCALOPES, ANR FREIA, ARTEMIS SMECY.
+
+
+\section{Examples and use cases of p4a}
 \label{sec:examples}
 
-You want to generate some \Aopenmp code:
+You want to generate some \Aopenmp code from a Fortran program:
 \begin{verbatim}
 p4a --openmp example.f
 \end{verbatim}
-and the output should be in a \texttt{\emph{random-name}.database/Src}
-directory.
+and the output is in the \texttt{example.p4a.f}. Since it is the default
+behavior, you can elide the \verb/--openmp/ option. The compilation
+process transforms automatically data-parallel \emph{do}-loops into
+\Aopenmp parallel loops with the correct pragmas and privatization of
+scalar variables.
 
-To generate a \Acuda executable:
+To generate from a C program source a \Acuda program that is also compiled
+into an executable:
 \begin{verbatim}
-p4a --accel --cuda --compile --database a example.c
+p4a --cuda example.c -o e
 \end{verbatim}
-there should be a \texttt{example} binary executable file in
-\texttt{a.database/P4A}
+produces an \texttt{example.p4a.cu} \Acuda program source and an
+\texttt{e} executable that will execute on a \Agpu. The \Agpu accelerator
+support relies on a small \Apfa Accel interface that connects to the
+\Acuda infrastructure. Data-parallel loops are automatically transformed
+into \Acuda kernels that execute on the \Agpu with generation of \emph{ad
+  hoc} communications between the host memory and the \Agpu memory.
 
-To generate an \Aopenmp emulation executable of \Agpu like code, try:
+To generate an \Aopenmp emulation executable of \Agpu-like accelerated
+code (that ease with to ease debugging or if you do not have a \Agpu), try:
 \begin{verbatim}
-p4a --accel --openmp --compile example.c
+p4a --accel --openmp example.c -o e
 \end{verbatim}
-there should be a \texttt{example} binary executable file in
-\texttt{\emph{random-name}.database/P4A}
+there should be an \texttt{e} binary executable file with its
+corresponding \texttt{example.p4a.c} program source.
 
-To generate accelerated source code, use:
-\begin{verbatim}
-p4a --accel --database b example.c
-\end{verbatim}
-then you will have in \texttt{b.database/P4A} a parallelized source code
-you can use later by compiling it or improving it. When compiling if you
-define the
+The interest of the source-to-source approach is that you can further
+improve the generated code manually or use it as starting point for other
+developments. When compiling the \Apfa Accel generated code, you can
+define different preprocessor symbols according to the expected target:
 \begin{itemize}
 \item \verb|P4A_ACCEL_CUDA| preprocessor symbol, the source is to be
   compiled as \Acuda;
@@ -88,29 +134,9 @@ define the
 \label{sec:options}
 
 The basic usage is \texttt{p4a [\emph{options}] <\emph{source files}>}
-with the following options:
-\begin{description}
-\item[\texttt{--openmp}:] parallelize with \Aopenmp output. If combined
-  with the \texttt{--accel} option, generate \Apfa \texttt{accel} run-time
-  call with \Aopenmp implementation instead of native \Aopenmp output;
 
-\item[\texttt{--accel}:] parallelize with output using the \Apfa
-  \texttt{accel} run-time that can execute code for various
-  hardware accelerators such as \Agpu or even \Aopenmp emulation;
-
-\item[\emph{--cuda}:] ask for \Acuda output, to be combined with
-  \texttt{--accel};
-
-\item[\texttt{--compile}:] call the compiler to generate an executable,
-  \texttt{gcc} in the case of sequential or \Aopenmp code, \texttt{nvcc}
-  in the case of \Acuda output code.
-
-\item[\texttt{--database \emph{name}}:] choose to create a
-  \texttt{\emph{name}.database} database instead of one with a random name;
-
-\item[\texttt{-h} or \texttt{--help}:] show this help message and exit.
-\end{description}
-
+The following documentation is automatically generated from the
+\texttt{p4a} source code.
 
 \input{p4a-help}
 

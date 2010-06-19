@@ -16,8 +16,8 @@
 
 
 \newcommand{\LINK}[1]{\url{#1}\xspace}
-\newcommand{\PfaOrganizationPDF}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.pdf}}
-\newcommand{\PfaAllOrganizationHTDOC}{\LINK{http://par4all.enstb.org/par4all/doc/organization/par4all_organization.htdoc}}
+\newcommand{\PfaOrganizationPDF}{\LINK{http://download.par4all.org/doc/organization/par4all_organization.pdf}}
+\newcommand{\PfaAllOrganizationHTDOC}{\LINK{http://download.par4all.org/doc/organization/par4all_organization.htdoc}}
 
 \sloppy
 
@@ -28,7 +28,6 @@
 \begin{document}
 
 \title{Par4All organization\\
-  \textsc{draft}\\
   ---\\
   HPC Project}
 
@@ -49,9 +48,9 @@ on \PfaAllOrganizationHTDOC.
 \section{Introduction}
 \label{sec:introduction}
 
-\Apfa is a platform that merges various open source developments
-to aim at achieving the migration of software to multicore and other
-parallel processors.
+\Apfa is a platform that merges various open source developments to ease
+the migration of sequential software to multicore and other parallel
+processors.
 
 It is mainly developed by \Ahpcp, MINES ParisTech/\Acri, Institut
 Télécom/Télécom Bretagne and others.
@@ -61,7 +60,7 @@ construction relies on \Agit repositories, \Asvn repositories and other
 projects.
 
 Since it relies on other tool projects, the documentation of these other
-projects should also be taken into account.
+projects should also be taken into account and are not included here.
 
 Before using \Apips, once it is installed, you should do, according to your
 shell, a
@@ -83,10 +82,14 @@ by running \verb|src/simple_tools/p4a_setup| in it.
 
 If you want to download \Apfa from the \Agit and compile it, do:
 \begin{alltt}
+  # Get a working copy of the Par4All public read-only git repository:
   git clone git://git.hpc-project.com/git/par4all.git
+  # Go into the working copy:
   cd par4all
+  # Switch to the p4a branch, where everything is assembled:
   git checkout -b p4a remotes/origin/p4a
-  src/simple_tools/p4a_setup [--prefix=/install/dir] [-v[v[v]]] [...]
+  # Build everything using 8 processes to speed up things:
+  src/simple_tools/p4a_setup [--prefix=/install/dir] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%$
 Everything will be installed into \verb|/usr/local/par4all| by default.
 If you want to install in another location, use the \verb|--prefix|
@@ -116,7 +119,8 @@ before committing it on the central repositories. By a nice side effect,
 it allows you to test your code. \smiley
 
 More seriously, it is not obvious that it may compile on your account but
-not for other people. For example because you forgot to commit some files.
+not for other people. For example because you forgot to commit some
+files...
 
 A nice feature of \Agit over \Asvn is that since you split the commit from
 the publication, you can test your own committed state before it hurts the
@@ -146,36 +150,20 @@ are good debugging options (to set \emph{before} using the \Aautotools,
 that is, \emph{before} using \verb|p4a_setup|) that allow \texttt{gdb} to
 access macro definitions that are heavily used in \Apips.
 
-You can pass some options to \verb|src/dev/p4a_setup| to modify the
+You can pass some options to \verb|p4a_setup| to modify the
 installation process as explained in \S~\ref{sec:p4a_s-comp-script} for
-all the options:
-\begin{description}
-\item[\texttt{--skip-polylib}:] skip the \Apolylib installation;
-\item[\texttt{--skip-newgen}:] skip the \Anewgen installation;
-\item[\texttt{--skip-linear}:] skip the \Alinear installation;
-\item[\texttt{--skip-pips}:] skip the \Apips installation;
-\item[\texttt{-v|--verbose}:] be verbose;
-\item[\texttt{-h|--help}:] display this usage;
-\item[\texttt{\emph{compilation targets}}:] the targets that are built, by
-  default it is \texttt{autoreconf configure install}.
-\end{description}
+all the options, for example to skip the (re)compilation of a package (for
+example with \verb/--skip-polylib/).
 
-If you often want to skip the compilation of a package you can define with
-some value respective environment variable: \verb|P4A_SKIP_POLYLIB|,
-\verb|P4A_SKIP_NEWGEN|, \verb|P4A_SKIP_LINEAR|, \verb|P4A_SKIP_PIPS|.
-
-To speed up the compilation, you can pass options to the compilation with
-the \verb|P4A_MAKE_OPTS| environment variable, such as with
-\begin{verbatim}
-export P4A_MAKE_OPTS=--jobs=8
-\end{verbatim}
-to compile with 8 processes.
+To speed up the compilation, you can pass options to make, and more
+specifically you can run on, say, 8 processes by adding the
+\verb/--jobs=8/ option.
 
 You may want to compile \Apfa directly from source packages that are not
 inside the \Apfa directory hierarchy (see \S~\ref{sec:direct-organ}). For
-this, you can specify in the \texttt{P4A\_\emph{PACKAGE}\_SRC} the
+this, you can specify with \texttt{-{}-\emph{PACKAGE}-src=...} the
 location of the sources of \texttt{\emph{package}}, for example
-\verb|P4A_PIPS_SRC| or \verb|P4A_POLYLIB_SRC|. If all these variables are
+\verb|-pips-src=...| or \verb|--polylib-src=...|. If all these options are
 set (for example to a working copy of the \Apips{} \Asvn), you should be
 able to compile with only the \texttt{p4a-own} branch. For the \Apips
 packages, you should have the links to \texttt{nlpmake/makes} to have them
@@ -183,20 +171,19 @@ to compile. Have a look to \S~\ref{sec:comp-from-sourc} for more
 information on this.
 
 You can change the options passed to \texttt{configure} for a package by
-setting the \texttt{P4A\_\emph{PACKAGE}\_CONFIGURE\_OPTIONS} environment
-variable.
+using the \texttt{-{}-\emph{PACKAGE}-c-opts=...}
 
-For example, if you want just to compile \Apips with Fortran 95 support:
+For example, if you want just to reconfigure to compile \Apips with
+Fortran 95 support:
 \begin{verbatim}
-export P4A_PIPS_CONFIGURE_OPTIONS="--enable-tpips --enable-pyps \
-  --enable-hpfc --enable-fortran95"
-p4a_setup --skip-polylib --skip-newgen --skip-linear
+p4a_setup --only=pips --pips-c-opts="--enable-tpips --enable-pyps \
+  --enable-hpfc --enable-fortran95" --reconf --no-final
 \end{verbatim}
 
 Then, if you have modified \Apips and you just want to recompile and
 install it, just use:
 \begin{verbatim}
-p4a_setup --skip-polylib --skip-newgen --skip-linear install
+p4a_setup --only=pips --no-final
 \end{verbatim}
 
 Beware that if you have used a \Apips directory to compile in an other
@@ -594,6 +581,8 @@ You build a new \Apfa version using this \Apips version just with:
 p4a_setup
 \end{verbatim}
 
+\verb|src/simple_tools/p4a_setup --only=pips -vvv -j 8 --nofinal|
+
 
 \subsubsection{Internal organization}
 \label{sec:intern-organ}
@@ -987,7 +976,7 @@ To accept the validation of what changed in \texttt{C\_syntax/decl\emph{*}}:
 p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
              --keep-status=changed --accept
 \end{verbatim}
-then if you are happy with it you can commit with 'Agit or revert back to
+then if you are happy with it you can commit with \Agit or revert back to
 previous state with \Agit.
 
 
