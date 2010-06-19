@@ -6,6 +6,8 @@ by serge guelton o(^_-)O
 ==========================
 EOF
 
+
+
 if ! test -f "$1" || ! test `basename "$1"` = properties.rc ; then
 	echo "must be called with the property file as first parameter" 1>&2
 	exit 1
