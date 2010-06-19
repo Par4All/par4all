@@ -934,8 +934,8 @@ bool do_unfolding(inlining_parameters p, char* module_name)
     string unfolding_filter_names = strdup(get_string_property("UNFOLDING_FILTER"));
     set unfolding_filters = set_make(set_string);
 
-    string filter_name= NULL;
-    for(filter_name = strtok(unfolding_filter_names," ") ; filter_name ; filter_name=strtok(NULL," ") )
+    list filtersname = strsplit(unfolding_filter_names," ");
+    FOREACH(STRING,filter_name,filtersname)
     {
         set_add_element(unfolding_filters, unfolding_filters, filter_name);
         recompile_module(module_name);
@@ -944,6 +944,7 @@ bool do_unfolding(inlining_parameters p, char* module_name)
             if(!remove_useless_label(module_name))
                 pips_user_warning("failed to remove useless labels after restructure_control in inlining");
     }
+    gen_map(free,filtersname);gen_free_list(filtersname);
 
     /* parse callee property */
     string unfolding_callees_names = strdup(get_string_property("UNFOLDING_CALLEES"));
