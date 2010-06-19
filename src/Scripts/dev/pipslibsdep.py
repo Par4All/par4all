@@ -177,7 +177,3 @@ if generate_dot_file:
 if check_result == 0:
 	print "everything ok"
 exit(check_result)
-
-
-
-
