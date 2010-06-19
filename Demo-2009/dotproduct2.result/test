@@ -64,28 +64,28 @@
       LU_IB0 = 0
       DO 99999 LU_IND0 = 0, LU_IB0-1
          I_0 = LU_IND0+1
-         I_1 = LU_IND0+1
          F_0 = X(I_0)
+         I_1 = LU_IND0+1
          F_1 = Y(I_1)
          F_2 = F_0*F_1
          S = S+F_2
 99999    CONTINUE
       DO 99998 LU_IND0 = LU_IB0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -104,28 +104,28 @@
       LU_IB0 = 0
       DO 99999 LU_IND0 = 0, LU_IB0-1
          I_0 = LU_IND0+1
-         I_1 = LU_IND0+1
          F_0 = X(I_0)
+         I_1 = LU_IND0+1
          F_1 = Y(I_1)
          F_2 = F_0*F_1
          S = S+F_2
 99999    CONTINUE
       DO 99998 LU_IND0 = LU_IB0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -157,28 +157,28 @@
       LU_IB0 = 0
       DO 99999 LU_IND0 = 0, -1
          I_0 = LU_IND0+1
-         I_1 = LU_IND0+1
          F_0 = X(I_0)
+         I_1 = LU_IND0+1
          F_1 = Y(I_1)
          F_2 = F_0*F_1
          S = S+F_2
 99999    CONTINUE
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -197,20 +197,20 @@
       LU_IND0 = 0
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -226,20 +226,20 @@
       S = 0.
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -255,20 +255,20 @@
       S = 0.
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
-         I_3 = LU_IND0+1
          F_3 = X(I_2)
+         I_3 = LU_IND0+1
          F_4 = Y(I_3)
          F_5 = F_3*F_4
          S = S+F_5
          I_4 = LU_IND0+2
-         I_5 = LU_IND0+2
          F_6 = X(I_4)
+         I_5 = LU_IND0+2
          F_7 = Y(I_5)
          F_8 = F_6*F_7
          S = S+F_8
          I_6 = LU_IND0+3
-         I_7 = LU_IND0+3
          F_9 = X(I_6)
+         I_7 = LU_IND0+3
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
@@ -300,12 +300,12 @@ C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {N==90, 0<=LU_IND0, LU_IND0<=89}
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==LU_IND0+1, N==90, 1<=I_2,
 C    I_2<=90}
 
-         I_3 = LU_IND0+1
-
-C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
-C    N==90, 1<=I_2, I_2<=90}
-
          F_3 = X(I_2)
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==LU_IND0+1, N==90, 1<=I_2,
+C    I_2<=90}
+
+         I_3 = LU_IND0+1
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==LU_IND0+1,
 C    N==90, 1<=I_2, I_2<=90}
@@ -330,12 +330,12 @@ C    N==90, 1<=I_2, I_2<=90}
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
 C    I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
 
-         I_5 = LU_IND0+2
+         F_6 = X(I_4)
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
-C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
+C    I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
 
-         F_6 = X(I_4)
+         I_5 = LU_IND0+2
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
 C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
@@ -360,13 +360,12 @@ C    I_2==I_5-1, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
 C    I_2==I_5-1, I_2==I_6-2, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
 
-         I_7 = LU_IND0+3
+         F_9 = X(I_6)
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
-C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
-C    1<=I_2, I_2<=90}
+C    I_2==I_5-1, I_2==I_6-2, I_2==LU_IND0+1, N==90, 1<=I_2, I_2<=90}
 
-         F_9 = X(I_6)
+         I_7 = LU_IND0+3
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
 C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
