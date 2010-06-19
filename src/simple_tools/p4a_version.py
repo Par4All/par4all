@@ -5,17 +5,21 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
 
+
 '''
-This module guesses the current Par4All version.
+This module guesses the version of a given file or the current Par4All version.
 '''
+
 
 import sys, os, string
 from p4a_util import *
 from p4a_git import *
 
+
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 program_dir = os.path.split(os.path.abspath(os.path.realpath(sys.argv[0])))[0]
+
 
 def get_version_file_path(dist_dir = None):
     '''Returns the Par4All version file path.'''
@@ -27,6 +31,7 @@ def get_version_file_path(dist_dir = None):
         version_file_path = os.path.normpath(os.path.join(program_dir, "..", version_file_name))
     debug("p4a_version is " + version_file_path)
     return version_file_path
+
 
 def guess_file_revision(file_dir = None):
     '''Try to guess a revision/version string for a given file or directory.'''
@@ -73,10 +78,10 @@ def guess_file_revision(file_dir = None):
     #    return revision
 
     # Finally, make up a version string based on last file modification date/time.
-    try:
-        revision = file_lastmod(file_dir).strftime("%Y%m%dT%H%M%S") + "~unknown"
-    except:
-        pass
+    #~ try:
+        #~ revision = file_lastmod(file_dir).strftime("%Y%m%dT%H%M%S") + "~unknown"
+    #~ except:
+        #~ pass
     
     # Fail gracefully.
     if not revision:
@@ -92,6 +97,7 @@ if __name__ == "__main__":
     else:
         print("Version file path is " + get_version_file_path())
     print("Default global version is " + guess_file_revision())
+
 
 # Some Emacs stuff:
 ### Local Variables:
