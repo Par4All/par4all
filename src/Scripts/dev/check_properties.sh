@@ -6,8 +6,11 @@ by serge guelton o(^_-)O
 ==========================
 EOF
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> devclean
 if ! test -f "$1" || ! test `basename "$1"` = properties.rc ; then
 	echo "must be called with the property file as first parameter" 1>&2
 	exit 1
@@ -22,7 +25,11 @@ all_sources="`find $2/src -name '*.[chly]'`"
 sed -e '/^$/ d' $1 | cut -d ' ' -f 1 | \
 while read line ; do
 	if test "$line" ; then
+<<<<<<< HEAD
 		if ! grep -q $line $all_sources && ! grep -q $line $0; then
+=======
+		if ! grep -q $line $all_sources ; then
+>>>>>>> devclean
 			echo "$line never used"
 			all_ok=1
 		fi
@@ -30,9 +37,12 @@ while read line ; do
 done 
 
 test $all_ok = 0 && echo "nothing found" 1>&2
+<<<<<<< HEAD
 exit $all_ok
 
 # use a white list because some directives are not grepable
 HPFC_IGNORE_FCD_SYNCHRO
 HPFC_IGNORE_FCD_SET
 HPFC_IGNORE_FCD_TIME
+=======
+>>>>>>> devclean
