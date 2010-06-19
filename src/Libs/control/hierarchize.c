@@ -441,7 +441,7 @@ hierarchize_control_list(vertex interval,
     unstructured new_unstructured = make_unstructured(new_entry_node,
 						      new_exit_node);
     control_statement(entry_node) =
-	make_stmt_of_instr(make_instruction(is_instruction_unstructured,
+	instruction_to_statement(make_instruction(is_instruction_unstructured,
 					    new_unstructured));
     ifdebug(6) {
 	pips_debug(0, "List of controls: ");

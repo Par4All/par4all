@@ -326,7 +326,7 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
             make_sequence(
                 gen_nconc(
                     gen_nreverse(new_declarations_initialization),
-                    CONS(STATEMENT,make_stmt_of_instr(new_instruction),NIL))
+                    CONS(STATEMENT,instruction_to_statement(new_instruction),NIL))
                 ));
 
     return make_statement(

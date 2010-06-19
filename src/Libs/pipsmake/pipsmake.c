@@ -69,6 +69,7 @@
 
 #include "linear.h"
 #include "ri.h"
+#include "constants.h"
 #include "database.h"
 
 #include "misc.h"
@@ -226,11 +227,10 @@ string compilation_unit_of_module(const char* module_name)
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
   if(db_resource_p(DBR_USER_FILE, module_name)) {
     string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
-    string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
+    string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
     /* It is not clear how robust it is going to be when file name conflicts occur. */
-    compilation_unit_name
-      = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+    asprintf(&compilation_unit_name,"%s" FILE_SEP_STRING,simpler_file_name);
     free(simpler_file_name);
   }
 

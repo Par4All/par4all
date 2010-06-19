@@ -92,13 +92,13 @@ list *lhp, *lnp;
      * then updated statements are to be added to both host and nodes:
      */
 
-    staths = make_stmt_of_instr(make_instruction
+    staths = instruction_to_statement(make_instruction
 			  (is_instruction_call,
 			   make_call(call_function(the_call),
 				     lUpdateExpr(host_module,
 						 call_arguments(the_call)))));
 
-    statns = make_stmt_of_instr(make_instruction
+    statns = instruction_to_statement(make_instruction
 			  (is_instruction_call,
 			   make_call(call_function(the_call),
 				     lUpdateExpr(node_module,
@@ -790,7 +790,7 @@ syntax *sp;
 
     (*sp)=make_syntax(is_syntax_reference, make_reference(temp, NIL));
 
-    stat=make_stmt_of_instr
+    stat=instruction_to_statement
  	(make_assign_instruction
 	 (reference_to_expression(make_reference(temp, NIL)),
 	  expr_compute_local_index(array,

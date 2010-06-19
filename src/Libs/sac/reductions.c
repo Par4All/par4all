@@ -51,23 +51,6 @@
 #include "control.h"
 #include "properties.h"
 
-static entity make_float_constant_entity(float c)
-{
-    char num[32];
-
-    snprintf(num,sizeof(num)/sizeof(*num), "%f", c);
-    return MakeConstant(num,is_basic_float);
-}
-
-expression make_float_constant_expression(float c)
-{
-    entity ce = make_float_constant_entity(c);
-    return call_to_expression(make_call(ce,NIL));
-}
-static expression make_complex_constant_expression(float re, float im)
-{
-    return MakeComplexConstantExpression(make_float_constant_expression(re),make_float_constant_expression(im));
-}
 
 static entity make_reduction_vector_entity(reduction r)
 {
@@ -264,13 +247,13 @@ static expression make_0val_expression(basic b)
     switch(basic_tag(b))
     {
         case is_basic_float:
-            return make_float_constant_expression(0);
+            return float_to_expression(0);
 
         case is_basic_int:
-            return make_integer_constant_expression(0);
+            return int_to_expression(0);
 
         case is_basic_complex:
-            return make_complex_constant_expression(0,0);
+            return complex_to_expression(0,0);
 
         default:
             pips_internal_error("function not implemented for this basic \n");
@@ -287,13 +270,13 @@ static expression make_1val_expression(basic b)
     switch(basic_tag(b))
     {
         case is_basic_float:
-            return make_float_constant_expression(1);
+            return float_to_expression(1);
 
         case is_basic_int:
-            return make_integer_constant_expression(1);
+            return int_to_expression(1);
 
         case is_basic_complex:
-            return make_complex_constant_expression(0,1);
+            return complex_to_expression(0,1);
 
         default:
             return expression_undefined;
@@ -436,7 +419,7 @@ static statement generate_compact(reductionInfo ri)
             reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
             rightExpr);
 
-    return make_stmt_of_instr(compact);
+    return instruction_to_statement(compact);
 }
 
 /*

@@ -557,7 +557,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
    * END
    ***********************************************/
 
-  gfc_function_body = make_stmt_of_instr(icf);
+  gfc_function_body = instruction_to_statement(icf);
 
   //we automatically add a return statement
   //we have got a problem with multiple return in the function
@@ -2225,7 +2225,7 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
   if(!c) {
     //fprintf(stderr,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
     return make_instruction_block(CONS( STATEMENT,
-        make_stmt_of_instr( make_instruction_block( NULL ) ),
+        instruction_to_statement( make_instruction_block( NULL ) ),
         NIL ));
   }
 
@@ -2340,7 +2340,7 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
   } else {
     fprintf(stderr, "Warning ! no instruction dumped => very bad\n");
     return make_instruction_block(CONS( STATEMENT,
-        make_stmt_of_instr( make_instruction_block( NULL ) ),
+        instruction_to_statement( make_instruction_block( NULL ) ),
         NIL ));
   }
 }
@@ -2358,7 +2358,7 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence) {
     if(force_sequence) {
       //fprintf(stderr,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
       return make_instruction_block(CONS( STATEMENT,
-          make_stmt_of_instr( make_instruction_block( NULL ) ),
+          instruction_to_statement( make_instruction_block( NULL ) ),
           NIL ));
     } else {
       //fprintf(stderr,"Undefined code\n");
@@ -3402,7 +3402,7 @@ list gfc2pips_dumpSELECT(gfc_code *c) {
   }
 
   /*list_of_statements = CONS(STATEMENT,
-   make_stmt_of_instr(
+   instruction_to_statement(
    make_assign_instruction(
    gfc2pips_expr2expression(c->expr),
    gfc2pips_expr2expression(c->expr2)
@@ -3437,10 +3437,10 @@ list gfc2pips_dumpSELECT(gfc_code *c) {
       statement casetest;
       if(test_expr == expression_undefined) {
         // Default case
-        default_stmt = make_stmt_of_instr(s_if);
+        default_stmt = instruction_to_statement(s_if);
       } else {
-        casetest = make_stmt_of_instr(test_to_instruction(make_test(test_expr,
-                make_stmt_of_instr(s_if),
+        casetest = instruction_to_statement(test_to_instruction(make_test(test_expr,
+                instruction_to_statement(s_if),
                 make_empty_block_statement())));
         if(current_case != NULL) {
           free_statement(test_false(statement_test(current_case)));

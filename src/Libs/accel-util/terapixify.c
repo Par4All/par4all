@@ -284,7 +284,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             sequence seq = make_sequence(
                     make_statement_list(
                         make_assign_statement(entity_to_expression(loop_index(l)),make_expression_1()),
-                        make_stmt_of_instr(make_instruction_whileloop(wl))
+                        instruction_to_statement(make_instruction_whileloop(wl))
                         )
                     );
 

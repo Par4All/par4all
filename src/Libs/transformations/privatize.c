@@ -542,7 +542,7 @@ void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
     */
     if(!ENDP(loop_locals(l))) {
         /* Put the loop in a new statement block if there are loop-private variable(s): */
-        statement new_statement = make_stmt_of_instr(i);
+        statement new_statement = instruction_to_statement(i);
         instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
         statement_instruction(s) = iblock;
         /* Since this is illegal to have comments and label on a block,

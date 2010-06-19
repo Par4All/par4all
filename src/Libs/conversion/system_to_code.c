@@ -609,7 +609,7 @@ systeme_to_loop_nest(
                         int_to_expression(1));
 
                 current = 
-                    make_stmt_of_instr
+                    instruction_to_statement
                     (make_instruction
                      (is_instruction_loop,
                       make_loop((entity) var,

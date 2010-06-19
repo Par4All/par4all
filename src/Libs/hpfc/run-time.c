@@ -320,7 +320,7 @@ statement
 hpfc_make_call_statement(entity e, list l)
 {
     pips_assert("defined", !entity_undefined_p(e));
-    return make_stmt_of_instr(make_instruction(is_instruction_call,
+    return instruction_to_statement(make_instruction(is_instruction_call,
 					       make_call(e, l)));
 }
 
