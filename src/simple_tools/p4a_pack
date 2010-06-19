@@ -254,6 +254,10 @@ def main():
     main_group.add_option("--keep", "-k", action = "store_true", default = False,
         help = "Do not remove temporary directories after script execution.")
     
+    main_group.add_option("--output-dir", metavar = "DIR", default = None,
+        help = "Directory where package files will be put (locally). Any existing package with the same name (exact same revision) "
+        + "will be overwritten without prompt. Defaults to current working directory: " + os.getcwd())
+    
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
@@ -299,6 +303,15 @@ def main():
             warn("Assuming Par4All is currently installed in " + dir + " (default; use --dir to override)")
         if not os.path.isdir(dir):
             die("Directory does not exist: " + dir)
+
+    output_dir = options.output_dir
+    if output_dir:
+        output_dir = os.path.abspath(os.path.expanduser(output_dir))
+        warn("Packages will be put in " + output_dir + " (--output-dir)")
+        if output_dir == os.getcwd():
+            output_dir = None
+    else:
+        warn("Packages will be put in " + os.getcwd() + " (default; override with --output-dir)")
 
     if not options.revision:
         die("Please use --revision to specify the package version/revision")
@@ -363,9 +376,17 @@ def main():
                     warn("Removing " + dir)
                     rmtree(dir, can_fail = 1)
                     return
-    
+
     if options.publish:
         publish_files(output_files, options.nightly)
+
+    if output_dir:
+        for file in output_files:
+            dest_file = os.path.join(output_dir, os.path.split(file)[1])
+            if os.path.exists(dest_file):
+                warn("Removing existing " + dest_file)
+                os.remove(dest_file)
+            run2([ "mv", "-v", file, dest_file ])
 
 
 if __name__ == "__main__":

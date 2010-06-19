@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 '''
 Set ANSI Terminal Color and Attributes.
 Originally found on http://code.activestate.com/recipes/574451.
 '''
 
+
 import os
+
 
 # Set to True to disable module (coloring etc.).
 disabled = False
+
 
 esc = '%s[' % chr(27)
 reset = '%s0m' % esc
@@ -19,6 +23,7 @@ for k, v in dict(
     attrs = 'none bold faint italic underline blink fast reverse concealed',
     colors = 'grey red green yellow blue magenta cyan white'
 ).items(): globals()[k] = dict((s, i) for i, s in enumerate(v.split()))
+
 
 def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
     '''
@@ -75,9 +80,11 @@ def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
         txt[-1] += end
     return esc.join(cmd) + sep.join(txt)
 
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")
+
 
 # Some Emacs stuff:
 ### Local Variables:
