@@ -168,7 +168,13 @@ static void get_type_max_width(call ca, int* maxWidth)
                     *maxWidth=MAX(*maxWidth , basic_type_size(bas));
                     free_basic(bas);
                 } break;
-            default:pips_internal_error("synatx_tag %u not supported yet",syntax_tag(s));
+            case is_syntax_subscript:
+                {
+                    basic bas = basic_of_expression(subscript_array(syntax_subscript(s)));
+                    *maxWidth=MAX(*maxWidth , basic_type_size(bas));
+                    free_basic(bas);
+                } break;
+            default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
 
         }
     }

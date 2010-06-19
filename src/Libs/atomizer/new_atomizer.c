@@ -1,3 +1,4 @@
+
 /*
 
   $Id$
@@ -24,141 +25,171 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* An atomizer that uses the one made by Fabien Coelho for HPFC.
+/* An atomizer that uses the one made by Fabien Coelho for HPFC,
+ * and is in fact just a hacked version of the one made by Ronan
+ * Keryell...
+ */
 
-   Ronan Keryell, 17/5/1995. 
-*/
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include "local.h"
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "effects.h"
+
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+#include "ri-util.h"
+#include "effects-util.h"
+#include "text-util.h"
+#include "database.h"
+#include "misc.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "transformer.h"
+#include "semantics.h"
+#include "control.h"
+#include "transformations.h"
+#include "arithmetique.h"
+
+#include "effects-generic.h"
+#include "alias-classes.h"
+#include "effects-simple.h"
+#include "properties.h"
+#include "atomizer.h"
+#include "preprocessor.h"
+#include "properties.h"
+
 #include "expressions.h"
 
-extern entity hpfc_new_variable(entity, basic);
-extern bool expression_constant_p(expression);
+typedef struct {
+    list written_references;
+    list inserted_statements;
+} atomizer_param;
 
-static bool 
-simple_expression_decision(e)
-expression e;
+static void atomize_call(expression ,atomizer_param* );
+static void do_atomize_call(expression parent,atomizer_param* p,list expressions)
 {
-    syntax s = expression_syntax(e);
-
-    /*  don't atomize A(I)
+    bool safe=true;
+    /* stop if call directly involves a written reference */
+    FOREACH(EXPRESSION,arg,expressions)
+    {
+        if(expression_reference_p(arg)&&
+                !entity_field_p(reference_variable(expression_reference(arg))))
+        {
+            list effects = proper_effects_of_expression(arg);
+            FOREACH(REFERENCE,rw,p->written_references) {
+                FOREACH(EFFECT,eff,effects)
+                    if(references_may_conflict_p(rw,effect_any_reference(eff)))
+                    { safe=false; break; }
+                if(!safe) break;
+            }
+            gen_full_free_list(effects);
+            if(!safe) break;
+        }
+    }
+    /* go on and atomize, that is
+     * - create a variable to store call result
+     * - recurse on call arguments
      */
-    if (syntax_reference_p(s)) 
-	return(!entity_scalar_p(reference_variable(syntax_reference(s))));
+    if( safe )
+    {
+            basic bofe=basic_of_expression(parent);
+            entity result = make_new_scalar_variable(get_current_module_entity(),bofe);
+            AddEntityToCurrentModule(result);
+            statement ass = make_assign_statement(
+                    entity_to_expression(result),
+                    make_expression(expression_syntax(parent),normalized_undefined));
+            p->inserted_statements=CONS(STATEMENT,ass,p->inserted_statements);
+            expression_syntax(parent)=syntax_undefined;
+            update_expression_syntax(parent,make_syntax_reference(make_reference(result,NIL)));
+    }
+}
 
-    /*  don't atomize A(1)
-     */
-    if (expression_constant_p(e)) 
-	return(FALSE);
+static void atomize_call(expression parent,atomizer_param* p)
+{
+    if(expression_call_p(parent))
+    {
+        call c = expression_call(parent);
+        do_atomize_call(parent,p,call_arguments(c));
+    }
+    else if(expression_reference_p(parent))
+    {
+        reference ref = expression_reference(parent);
+        if(!ENDP(reference_indices(ref)))
+            do_atomize_call(parent,p,reference_indices(ref));
+    }
+}
 
-    /* do not atomize A(I+5) as it is compiled as (A+5)(I). We miss
-       A(-1+I), unless expression_constant_p() accepts it. */
-    if(!get_bool_property("ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS")) {
-      if(syntax_call_p(s)) {
-	call c = syntax_call(s);
-	entity op = call_function(c);
 
-	if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
-	  expression e1 = EXPRESSION(CAR(call_arguments(c)));
-	  expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
-	  syntax s1 = expression_syntax(e1);
-	  syntax s2 = expression_syntax(e2);
+static bool atomize_call_filter(expression parent,atomizer_param* p)
+{
+    if(expression_call_p(parent))
+    {
+        call c= expression_call(parent);
+        entity op = call_function(c);
+        /* do not visit rhs of . and -> */
+        if(ENTITY_POINT_TO_P(op) || ENTITY_FIELD_P(op)) gen_recurse_stop(binary_call_rhs(c));
+        if(call_constant_p(c)) return false;
+    }
+    return true;
+}
 
-	  if(syntax_reference_p(s1))
-	    return(!(entity_scalar_p(reference_variable(syntax_reference(s1)))
-		     && expression_constant_p(e2)));
-	  else if(syntax_reference_p(s2))
-	    return(!(entity_scalar_p(reference_variable(syntax_reference(s2)))
-		     && expression_constant_p(e1)));
+static void atomize_all(void *v,atomizer_param* p)
+{
+    gen_context_multi_recurse(v,p,
+            expression_domain,atomize_call_filter,atomize_call,
+            0);
+}
 
-	}
-      }
+/* This function is called for all statements in the code
+*/
+static void atomize_statement(statement stat)
+{
+    instruction i = statement_instruction(stat);
+    /* SG: we could atomize condition in test, loops etc too */
+    if(instruction_call_p(i) || instruction_expression_p(i))
+    {
+        atomizer_param p = { NIL, NIL };
+        list weffects = effects_write_effects(load_cumulated_rw_effects_list(stat));
+        FOREACH(EFFECT,weff,weffects)
+            p.written_references=CONS(REFERENCE,effect_any_reference(weff),p.written_references);
+        /* this may cause a useless atomization if i is an expression */
+        atomize_all(i,&p);
+        if(!ENDP(p.inserted_statements))
+            insert_statement(stat,make_block_statement(gen_nreverse(p.inserted_statements)),true);
     }
 
-    return(TRUE);
 }
 
-static bool
-new_atomizer_expr_decide(reference r, expression e)
+bool new_atomizer(char * mod_name)
 {
-    return(simple_expression_decision(e));
-}
+    /* get the resources */
+    set_current_module_entity(module_name_to_entity(mod_name));
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, mod_name,true));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
+    debug_on("NEW_ATOMIZER_DEBUG_LEVEL");
 
 
-static bool
-new_atomizer_func_decide(call c, expression e)
-{
-    entity f = call_function(c);
-    syntax s = expression_syntax(e);
+    /* Now do the job */
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, atomize_statement);
 
-    if (ENTITY_ASSIGN_P(f)) return(FALSE);
-    if (value_tag(entity_initial(f)) == is_value_intrinsic ||
-	!syntax_reference_p(s))
-	return(simple_expression_decision(e));
-	
-    /* the default is *not* to atomize.
-     * should check that the reference is not used as a vector
-     * and is not modified?
-     */ 
-    return(FALSE); 
-}
+    /* Reorder the module, because new statements have been added */  
+    clean_up_sequences(get_current_module_statement());
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
+    /* update/release resources */
+    reset_cumulated_rw_effects();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    debug_off();
 
-/*
-static entity
-new_atomizer_create_a_new_entity(entity module_entity, tag variable_type)
-{
-   basic a_basic;
-   int a_kind;
-   
-   basic_tag(a_basic) = variable_type;
-   a_kind = TMP_ENT;
-   return make_new_entity(a_basic, a_kind);
-}
-*/
-
-boolean new_atomizer(char * mod_name)
-{
-   statement mod_stat;
-   entity module;
-
-   debug_on("ATOMIZER_DEBUG_LEVEL");
-
-   if(get_debug_level() > 0)
-      user_log("\n\n *** ATOMIZER for %s\n", mod_name);
-
-   mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-
-   set_current_module_statement(mod_stat);
-
-   module = local_name_to_top_level_entity(mod_name);
-   set_current_module_entity(module);
-
-   atomize_as_required(mod_stat,
-                       new_atomizer_expr_decide,
-(bool (*)(call,expression))                            new_atomizer_func_decide,
-(bool (*)(test,expression))                            gen_false,
-(bool (*)(range,expression))    		       gen_false, /* range */
-(bool (*)(whileloop,expression))		       gen_false, /* whileloop */
-                       /*new_atomizer_create_a_new_entity*/
-                       hpfc_new_variable);
-
-   ifdebug(1) print_statement(mod_stat);
-      
-   /* Reorder the module, because new statements may have been
-      changed. */
-   module_reorder(mod_stat);
-
-   /* We save the new CODE. */
-   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
-
-   reset_current_module_statement();
-   reset_current_module_entity();
-
-   if(get_debug_level() > 0)
-      user_log("\n\n *** ATOMIZER done\n");
-
-   debug_off();
-
-   return(TRUE);
+    return true;
 }
