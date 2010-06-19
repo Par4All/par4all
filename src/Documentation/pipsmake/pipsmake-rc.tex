@@ -7044,13 +7044,32 @@ loop_tiling                            > MODULE.code
 \end{PipsMake}
 
 This transformations prompts the user for a partition matrix.
-Alternatetively, this matrix can be provided through the \PipsPropRef{LOOP_TILING_MATRIX} property.
+Alternatively, this matrix can be provided through the \PipsPropRef{LOOP_TILING_MATRIX} property.
 The format of the matrix is a00 a01 a02,a10 a11 a12,a20 a21 a22
 \begin{PipsProp}{LOOP_TILING_MATRIX}
 LOOP_TILING_MATRIX ""
 \end{PipsProp}
 
-Likewise, one ca use the \PipsPropRef{LOOP_LABEL} property to specify the targeted loop.
+Likewise, one can use the \PipsPropRef{LOOP_LABEL} property to specify the targeted loop.
+
+\subsection{Symbolic Tiling}
+
+\begin{PipsPass}{symbolic_tiling}
+Tiles a loop nest using a partitioning vector that can contain symbolic values.
+The tiling only works for parallelepiped tiles.
+Use \PipsPropRef{LOOP_LABEL} to specify the loop to tile.
+Use \PipsPropRef{SYMBOLIC_TILING_VECTOR} as a comma-separated list to specify tile sizes.
+\end{PipsPass}
+\begin{PipsMake}
+symbolic_tiling > MODULE.code
+	! MODULE.internalize_parallel_code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.cumulated_effects
+\end{PipsMake}
+\begin{PipsProp}{SYMBOLIC_TILING_VECTOR}
+SYMBOLIC_TILING_VECTOR ""
+\end{PipsProp}
 
 \subsection{Loop Normalize}
 \label{subsection-loop-normalize}
