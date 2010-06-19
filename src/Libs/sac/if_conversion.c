@@ -83,7 +83,7 @@ make_phi_assign_instruction(reference lRef, expression cond,
 
    So, this function returns true if the statement stat is supported.
    */
-bool simd_supported_stat_p(statement stat)
+static bool simd_supported_stat_p(statement stat)
 {
     if(instruction_call_p(statement_instruction(stat)))
     {

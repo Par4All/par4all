@@ -89,7 +89,7 @@ void reset_vector_to_expressions()
     vector_to_expressions=hash_table_undefined;
 }
 
-entity expressions_to_vector(list expressions)
+static entity expressions_to_vector(list expressions)
 {
     void * hiter = NULL;
     entity key;
@@ -101,7 +101,7 @@ entity expressions_to_vector(list expressions)
     }
     return entity_undefined;
 }
-void update_vector_to_expressions(entity e, list exps)
+static void update_vector_to_expressions(entity e, list exps)
 {
     pips_assert("entity is ok",entity_consistent_p(e));
     FOREACH(EXPRESSION,exp,exps) pips_assert("expressions are ok",expression_consistent_p(exp));

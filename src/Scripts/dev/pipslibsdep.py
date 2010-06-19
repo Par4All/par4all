@@ -36,9 +36,17 @@ from subprocess import Popen, PIPE
 from sys import argv,stderr,exit
 
 generate_dot_file=False
-srcdir="../../../src/Libs"
-if len(argv)>1 and isfile(path.join(argv[1],"syntax/syntax-local.h")):
+libdir="src/Libs"
+srcdir=path.join("..","src/Libs")
+if not isfile(path.join(srcdir,"syntax/syntax-local.h")):
 	srcdir=argv[1]
+
+print """\
+=========================
+PIPS include checker
+by serge guelton o(^_-)O
+=========================\
+"""
 
 class sym:
 	def __init__(self,name):
@@ -51,13 +59,14 @@ class sym:
 
 
 class library:
-	def __init__(self,name):
+	def __init__(self,name,path):
 		self.name=name
+		self.path=path
 		self.used_symbols = set()
 		self.defined_symbols = set()
 		self.depends = []
 	def objects(self):
-		objsdir=path.join(self.name,".libs")
+		objsdir=path.join(self.path,".libs")
 		if not isdir(objsdir):
 			raise "object files not built in " + self.name
 		objs=[ o for o in listdir(objsdir) if match(".*\.o$",o) ]
@@ -93,7 +102,7 @@ class library:
 
 
 
-libraries = [ library(d) for d in listdir(".") if isdir(d) and isfile(path.join(d,"Makefile")) ]
+libraries = [ library(d,path.join(libdir,d)) for d in listdir(libdir) if isdir(path.join(libdir,d)) and isfile(path.join(libdir,d,"Makefile")) ]
 
 for lib in libraries:
 
@@ -122,6 +131,7 @@ for lib0 in libraries:
 
 # some checks on includes
 check_result=0
+print "checking library includes"
 for lib in libraries:
 	sdepends=set(map(lambda x:x.name,lib.depends))
 	diff=lib.includes().difference(sdepends)
@@ -164,6 +174,8 @@ if generate_dot_file:
 			print lib.dotstr(lib.name in argv[1:])
 	print "}"
 
+if check_result == 0:
+	print "everything ok"
 exit(check_result)
 
 
