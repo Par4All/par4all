@@ -1031,5 +1031,27 @@ Pbase variables;
 
     return(sc_res);
 }
+/** 
+ * creates a hash_table containing statements from @a statements as keys and their respective succesors according to @a dg as values
+ * 
+ * @param statements input statements
+ * @param dg dependecy graph
+ * 
+ * @return allocated hash_table with (statement,successors pairs)
+ */
+hash_table statements_to_successors(list statements, graph dg)
+{
+    hash_table successors = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
+    FOREACH(VERTEX,v,graph_vertices(dg))
+    {
+        statement s = vertex_to_statement(v);
+        if( !statement_undefined_p(gen_find_eq(s,statements)))
+        {
+            list succ = vertex_successors(v);
+            hash_put(successors,s,succ);
+        }
+    }
+    return successors;
+}
 
 /* That's all */

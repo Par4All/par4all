@@ -43,25 +43,18 @@
 #include "transformations.h"
 #include "alias-classes.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
 
+#include "sac.h"
 #include "ricedg.h"
 #include "transformations.h"
 #include "control.h"
 #include "callgraph.h"
 
 #include "effects-convex.h"
-#include "sac.h"
 #include "atomizer.h"
 
 

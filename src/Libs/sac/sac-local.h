@@ -23,6 +23,13 @@
 */
 
 #include "sac_private.h"
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 
 #define FUNC_TO_ATOMIZE_P(call) (\
         type_functional_p(entity_type(call_function(call))) && \

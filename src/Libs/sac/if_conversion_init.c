@@ -37,12 +37,6 @@
 #include "complexity_ri.h"
 #include "text.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "text-util.h"
@@ -56,14 +50,13 @@ typedef dg_vertex_label vertex_label;
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "atomizer.h"
 
 #include "expressions.h"
 #include "complexity.h"
 #include "callgraph.h"
-
-#include "sac-local.h"
 #include "sac.h"
+
+#include "atomizer.h"
 
 /** 
  * atomize the condition of a test and returns generated statements

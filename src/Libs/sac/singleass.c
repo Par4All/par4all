@@ -41,19 +41,14 @@
 #include "effects-generic.h"
 #include "transformations.h"
 
-#include "dg.h"
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-#include "graph.h"
-
-#include "ricedg.h"
 #include "control.h"
 #include "callgraph.h"
 #include "preprocessor.h"
 #include "effects-simple.h"
 #include "alias-classes.h"
-#include "atomizer.h"
 #include "sac.h"
+#include "ricedg.h"
+#include "atomizer.h"
 
 //Creates a new entity to replace the given one
 static entity make_replacement_entity(entity e)

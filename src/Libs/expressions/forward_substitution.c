@@ -82,7 +82,6 @@ typedef dg_vertex_label vertex_label;
 #include "expressions.h"
 
 #include "ricedg.h"
-#include "sac.h"
 
 /* structure to hold a substitution to be performed forward.
  */

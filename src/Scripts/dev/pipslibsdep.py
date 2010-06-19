@@ -28,13 +28,17 @@
 # If none is given, all libraries are considered
 # you must manually set generate_dot_file to true if you want to activate this feature
 
-generate_dot_file=False
 
 from os import listdir, path
 from os.path import isdir, isfile
 from re import match, sub
 from subprocess import Popen, PIPE
 from sys import argv,stderr
+
+generate_dot_file=False
+srcdir="../../../src/Libs"
+if len(argv)>1 and isfile(path.join(argv[1],"syntax/syntax-local.h")):
+	srcdir=argv[1]
 
 class sym:
 	def __init__(self,name):
@@ -61,16 +65,16 @@ class library:
 			raise "object files not built in " + self.name
 		return map(lambda x:path.join(objsdir,x),objs)
 	def includes(self):
-		depsdir=path.join(self.name,".deps")
+		depsdir=path.join(srcdir,self.name)
 		if not isdir(depsdir):
-			raise "dep files not built in " + self.name
+			raise "dep files not built in " + depsdir
 		deps=set()
 		for d in listdir(depsdir):
-			if match(".*\.Plo$",d):
+			if match(".*\.[cly]$",d):
 				fd=file(path.join(depsdir,d))
 				for line in fd:
-					m= match("../\w+/(\w+)\.h",line)
-					if m: deps.add(m.groups()[0])
+					m= match('#include\s*"(\w+)\.h"',line)
+					if m:deps.add(m.groups()[0])
 		return deps
 
 
@@ -122,7 +126,8 @@ for lib in libraries:
 	diff=lib.includes().difference(sdepends)
 	if len(argv) == 1 or lib.name in argv[1:]:
 		for elib in diff:
-			print >> stderr, elib,"included in",lib.name,"but never used" 
+			if elib in map(lambda x:x.name,libraries) and elib != lib.name:
+				print >> stderr, elib,"included in",lib.name,"but never used" 
 
 			
 			

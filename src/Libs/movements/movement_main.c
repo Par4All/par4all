@@ -36,7 +36,6 @@
 #include "resources.h"  /* useful, because make is called directly by main */
 #include "ri-util.h"    /* useful, because polynome_gen_write is called    */
 #include "constants.h"  /* useful, because DBR_ is called directly by main */
-#include "properties.h"
 
 jmp_buf pips_top_level;
  extern void search_array_from_statement();
