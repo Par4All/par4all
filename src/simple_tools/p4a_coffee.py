@@ -25,9 +25,9 @@ def add_module_options(parser):
 
     group = optparse.OptionGroup(parser, "Coffee Options")
     
-    group.add_option("--work-dir", metavar = "DIR", default = None,
-        help = "Directory where the Git repository will be cloned and where the build will happen. "
-        + "By default, it will pick a temporary directory and remove it afterwards unless an error occurred.")
+    #~ group.add_option("--work-dir", metavar = "DIR", default = None,
+        #~ help = "Directory where the Git repository will be cloned and where the build will happen. "
+        #~ + "By default, it will pick a temporary directory and remove it afterwards unless an error occurred.")
 
     group.add_option("--here", action = "store_true", default = False,
         help = "Do not clone the repository, assume we are building from the Git tree where the script " + sys.argv[0] + " lies.")
@@ -40,24 +40,24 @@ def add_module_options(parser):
 
 def main(options = {}, args = []):
 
-    work_dir = ""
-    if options.work_dir:
-        work_dir = os.path.abspath(os.path.expanduser(options.work_dir))
-    else:
-        work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
+    #~ work_dir = ""
+    #~ if options.work_dir:
+        #~ work_dir = os.path.abspath(os.path.expanduser(options.work_dir))
+    #~ else:
+    work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
 
-    if not os.path.isdir(work_dir):
-        os.makedirs(work_dir)
+    #~ if not os.path.isdir(work_dir):
+    #~ os.makedirs(work_dir)
 
     try:
         if options.here:
             setup_options = options
-            #~ options.packages_dir = os.path.join(work_dir_p4a_actual, "packages")
+            #~ options.packages_dir = os.path.join(work_dir_p4a_version, "packages")
             #~ warn("Forcing --packages-dir=" + options.packages_dir)
             p4a_setup.main(setup_options)
 
             pack_options = options
-            #~ options.pack_dir = work_dir_p4a_actual
+            #~ options.pack_dir = work_dir_p4a_version
             #~ warn("Forcing --pack-dir=" + options.pack_dir)
             p4a_pack.main(pack_options)
         
@@ -65,15 +65,15 @@ def main(options = {}, args = []):
             os.chdir(work_dir)
 
             work_dir_p4a = os.path.join(work_dir, "p4a")
-            if os.path.isdir(work_dir_p4a):
-                warn("p4a directory already exists (" + work_dir_p4a + "), will not clone the repository again")
-                os.chdir(work_dir_p4a)
-                run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
-                run([ "git", "pull" ])
-            else:
-                run([ "git", "clone", "git://git.hpc-project.com/par4all", "p4a" ])
-                os.chdir(work_dir_p4a)
-                run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
+            #~ if os.path.isdir(work_dir_p4a):
+                #~ warn("p4a directory already exists (" + work_dir_p4a + "), will not clone the repository again")
+                #~ os.chdir(work_dir_p4a)
+                #~ run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
+                #~ run([ "git", "pull" ])
+            #~ else:
+            run([ "git", "clone", "git://git.hpc-project.com/par4all", "p4a" ])
+            os.chdir(work_dir_p4a)
+            run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
 
             suffix = utc_datetime()
             revision = p4a_git(work_dir_p4a).current_revision()
@@ -82,21 +82,22 @@ def main(options = {}, args = []):
 
             # Include the revision in the path so that it appears in debug messages
             # of PIPS and we can trace back a faulty revision.
-            work_dir_p4a_actual = os.path.join(work_dir, "p4a_" + suffix)
-            run([ "rm", "-fv", work_dir_p4a_actual ])
-            run([ "ln", "-sv", work_dir_p4a, work_dir_p4a_actual ])
+            work_dir_p4a_version = os.path.join(work_dir, "p4a_" + suffix)
+            #~ run([ "rm", "-fv", work_dir_p4a_version ])
+            #~ run([ "ln", "-sv", work_dir_p4a, work_dir_p4a_version ])
+            run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
 
-            ret = os.system(os.path.join(work_dir_p4a_actual, "src/simple_tools/p4a_coffee") + " --here " + " ".join(sys.argv[1:]))
+            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee") + " --here " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
 
     except:
-        if not options.work_dir:
-            warn("Work directory was " + work_dir + " (not removed)")
+        #~ if not options.work_dir:
+        warn("Work directory was " + work_dir + " (not removed)")
         raise
 
-    if not options.work_dir:
-        rmtree(work_dir)
+    #~ if not options.work_dir:
+    rmtree(work_dir)
 
 
 # Some Emacs stuff:
