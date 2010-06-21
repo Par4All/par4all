@@ -39,7 +39,7 @@ def add_module_options(parser):
 
 
 def main(options = {}, args = []):
-
+    rmtree("/usr/local/par4all", remove_top = False)
     #~ work_dir = ""
     #~ if options.work_dir:
         #~ work_dir = os.path.abspath(os.path.expanduser(options.work_dir))

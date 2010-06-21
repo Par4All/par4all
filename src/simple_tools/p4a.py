@@ -60,6 +60,9 @@ def main(options = {}, args = []):
         if change_file_ext(abs_file, "").endswith(".p4a"):
             warn("Ignoring already processed file: " + file)
             continue
+        if abs_file in files or abs_file in other_files or abs_file in header_files:
+            warn("Ignoring second mention of file " + abs_file)
+            continue
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)

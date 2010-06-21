@@ -312,7 +312,10 @@ def rmtree(dir, can_fail = False, remove_top = True):
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
     #~ debug("Removing tree: " + dir)
-    run([ "rm", "-rf", dir ], can_fail = can_fail)
+    if remove_top:
+        run([ "rm", "-rf", dir + "/" ], can_fail = can_fail)
+    else:
+        run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)
     #~ try:
         #~ for root, dirs, files in os.walk(dir, topdown = False):
             #~ for name in files:
