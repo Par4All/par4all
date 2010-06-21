@@ -17,7 +17,7 @@ from p4a_version import *
 
 
 # Default directory to take current binary installation from.
-default_dir                     = "/usr/local/par4all"
+default_pack_dir                     = "/usr/local/par4all"
 
 # Default installation prefix when installing a .deb or .rpm package on the client machine.
 default_install_prefix          = "/usr/local/par4all"
@@ -43,7 +43,7 @@ actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), "
 script_dir = os.path.split(actual_script)[0]
 
 # Put temp directories in this array to make sure no temp dir remains after script exits.
-auto_remove_temp_dirs_on_break = []
+temp_dirs = []
 
 
 def add_module_options(parser):
@@ -101,18 +101,19 @@ def add_module_options(parser):
     parser.add_option_group(group)
 
 
-def create_dist(dist_dir, install_prefix, revision):
-    '''Creates a temporary directory and copy the whole installation directory (dist_dir), under the prefix designated by install_prefix.
+def create_dist(pack_dir, install_prefix, revision):
+    '''Creates a temporary directory and copy the whole installation directory (pack_dir), under the prefix designated by install_prefix.
     Also writes updated rc files (shell scripts for setting the environment), and a version file.
     Returns a list with the temporary directory created and the full path of the temporary directory and the appended install_prefix.'''
-    global auto_remove_temp_dirs_on_break
+    global temp_dirs
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_")
-    auto_remove_temp_dirs_on_break += temp_dir
+    temp_dirs.append(temp_dir)
+    debug("Temp dir is " + temp_dir)
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
-    info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
-    #~ shutil.copytree(dist_dir, temp_dir_with_prefix)
-    run2([ "cp", "-av", dist_dir + "/", temp_dir_with_prefix ])
+    info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
+    #~ shutil.copytree(pack_dir, temp_dir_with_prefix)
+    run2([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
@@ -121,12 +122,12 @@ def create_dist(dist_dir, install_prefix, revision):
     return [ temp_dir, temp_dir_with_prefix ]
 
 
-def create_deb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_deb(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
     '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
     and substitute some values in files in this DEBIAN directory. No modification of the
     distribution is made.'''
     global debian_dir, package_name
-    (temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
+    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, revision)
     temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
     info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
@@ -203,14 +204,14 @@ def publish_files(files, nightly = False):
         run([ "scp", file, default_publish_host + ":" + publish_dir ])
 
 
-def create_sdeb(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_sdeb(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
     die("create_sdeb is TODO")
 
 
-def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_tgz(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
     '''Creates a simple .tar.gz package.'''
     global package_name
-    (temp_dir, temp_dir_with_prefix) = create_dist(dist_dir, install_prefix, revision)
+    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, revision)
     if not arch:
         arch = get_machine_arch()
     package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
@@ -236,8 +237,8 @@ def create_tgz(dist_dir, install_prefix, revision, keep_temp = False, arch = Non
     return package_file
 
 
-def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = None):
-    global package_name, auto_remove_temp_dirs_on_break
+def create_stgz(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
+    global package_name, temp_dirs
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
@@ -253,7 +254,8 @@ def create_stgz(dist_dir, install_prefix, revision, keep_temp = False, arch = No
     #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
     git.archive(package_file_tar, prefix = prefix + "/")
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
-    auto_remove_temp_dirs_on_break += temp_dir
+    debug("Temp dir is " + temp_dir)
+    temp_dirs.append(temp_dir)
     prev_cwd = os.getcwd()
     os.chdir(temp_dir)
     os.makedirs(os.path.join(temp_dir, prefix))
@@ -299,16 +301,16 @@ def main(options = {}, args = []):
     if prefix[0] == "/" and len(prefix):
         prefix = prefix[1:]
 
-    dir = options.pack_dir
+    pack_dir = options.pack_dir
     if options.deb or options.tgz:
-        if dir:
-            dir = os.path.realpath(os.path.abspath(os.path.expanduser(dir)))
-            warn("Par4All installation is to be found in " + dir + " (--pack-dir)")
+        if pack_dir:
+            pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
+            warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
         else:
-            dir = default_dir
-            warn("Assuming Par4All is currently installed in " + dir + " (default; use --pack-dir to override)")
-        if not os.path.isdir(dir):
-            die("Directory does not exist: " + dir)
+            pack_dir = default_pack_dir
+            warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
+        if not os.path.isdir(pack_dir):
+            die("Directory does not exist: " + pack_dir)
 
     output_dir = options.pack_output_dir
     if output_dir:
@@ -348,7 +350,7 @@ def main(options = {}, args = []):
     append_revision_src = ""
     
     if options.deb or options.tgz:
-        append_revision_bin = guess_file_revision(dir)
+        append_revision_bin = guess_file_revision(pack_dir)
         if not append_revision_bin:
             die("Unable to determine appended revision for binary packages")
         append_revision_bin = append_revision_bin.replace("~exported", "")
@@ -364,42 +366,49 @@ def main(options = {}, args = []):
     if not which("fakeroot"):
         die("fakeroot not found, please install it (sudo aptitude install fakeroot)")
 
+    global temp_dirs
     output_files = []
     try:
         if options.deb:
-            output_files.append(create_deb(dist_dir = dir, install_prefix = prefix, 
+            output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix, 
                 revision = revision + "~" + append_revision_bin,
                 keep_temp = options.keep_temp, arch = options.arch))
         #~ if options.sdeb:
-            #~ output_files.append(create_sdeb(dist_dir = dir, install_prefix = options.install_prefix, revision = revision,
+            #~ output_files.append(create_sdeb(pack_dir = pack_dir, install_prefix = options.install_prefix, revision = revision,
                 #~ keep_temp = options.keep_temp, arch = options.arch))
         if options.tgz:
-            output_files.append(create_tgz(dist_dir = dir, install_prefix = prefix,
+            output_files.append(create_tgz(pack_dir = pack_dir, install_prefix = prefix,
                 revision = revision + "~" + append_revision_bin,
                 keep_temp = options.keep_temp, arch = options.arch))
         if options.stgz:
-            output_files.append(create_stgz(dist_dir = dir, install_prefix = prefix,
+            output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
                 revision = revision + "~" + append_revision_src,
                 keep_temp = options.keep_temp, arch = options.arch))
-    except KeyboardInterrupt:
-        if not options.keep_temp:
-            global auto_remove_temp_dirs_on_break
-            for dir in auto_remove_temp_dirs_on_break:
-                if os.path.isdir(dir):
-                    warn("Removing " + dir)
-                    rmtree(dir, can_fail = 1)
-                    return
 
-    if options.publish:
-        publish_files(output_files, options.nightly)
+        if options.publish:
+            publish_files(output_files, options.nightly)
 
-    if output_dir:
-        for file in output_files:
-            dest_file = os.path.join(output_dir, os.path.split(file)[1])
-            if os.path.exists(dest_file):
-                warn("Removing existing " + dest_file)
-                os.remove(dest_file)
-            run2([ "mv", "-v", file, dest_file ])
+        if output_dir:
+            for file in output_files:
+                dest_file = os.path.join(output_dir, os.path.split(file)[1])
+                if dest_file == file:
+                    continue
+                if os.path.exists(dest_file):
+                    warn("Removing existing " + dest_file)
+                    os.remove(dest_file)
+                run2([ "mv", "-v", file, dest_file ])
+    except:
+        for dir in temp_dirs:
+            if os.path.isdir(dir):
+                warn("NOT Removing " + dir)
+        raise
+
+    for dir in temp_dirs:
+        if os.path.isdir(dir):
+            if options.keep_temp:
+                warn("NOT Removing " + dir + " (--keep-temp)")
+            else:
+                rmtree(dir, can_fail = True)
 
 
 # Some Emacs stuff:
