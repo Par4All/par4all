@@ -12,7 +12,7 @@ Par4All Builder Class
 import sys, os, re, shutil, time
 from p4a_util import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 def make_safe_intermediate_file_path(input_file, build_dir, change_ext = None):

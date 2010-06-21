@@ -29,9 +29,8 @@ def add_module_options(parser):
         help = "Directory where the Git repository will be cloned and where the build will happen. "
         + "By default, it will pick a temporary directory and remove it afterwards unless an error occurred.")
 
-    #~ group.add_option("--noclone", "--nopull", action = "store_true", default = False,
-        #~ help = "Do not attempt to clone a new repository, or update (pull) an existing repository in --work-dir. "
-        #~ + "Specifying --work-dir is therefore mandatory to use these options.")
+    group.add_option("--here", action = "store_true", default = False,
+        help = "Do not clone the repository, assume we are building from the Git tree where the script " + sys.argv[0] + " lies.")
 
     parser.add_option_group(group)
 
@@ -51,42 +50,45 @@ def main(options = {}, args = []):
         os.makedirs(work_dir)
 
     try:
-        os.chdir(work_dir)
+        if options.here:
+            setup_options = options
+            #~ options.packages_dir = os.path.join(work_dir_p4a_actual, "packages")
+            #~ warn("Forcing --packages-dir=" + options.packages_dir)
+            p4a_setup.main(setup_options)
 
-        work_dir_p4a = os.path.join(work_dir, "p4a")
-        if os.path.isdir(work_dir_p4a):
-            warn("p4a directory already exists (" + work_dir_p4a + "), will not clone the repository again")
-            os.chdir(work_dir_p4a)
-            run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
-            #~ if not options.noclone:
-            run([ "git", "pull" ])
+            pack_options = options
+            #~ options.pack_dir = work_dir_p4a_actual
+            #~ warn("Forcing --pack-dir=" + options.pack_dir)
+            p4a_pack.main(pack_options)
+        
         else:
-            #~ if options.noclone:
-                #~ die("Cannot use --noclone/--nopull if no repository preexist in " + work_dir_p4a)
-            run([ "git", "clone", "git://git.hpc-project.com/par4all", "p4a" ])
-            os.chdir(work_dir_p4a)
-            run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
+            os.chdir(work_dir)
 
-        suffix = utc_datetime()
-        revision = p4a_git(work_dir_p4a).current_revision()
-        if revision:
-            suffix += "~" + revision
+            work_dir_p4a = os.path.join(work_dir, "p4a")
+            if os.path.isdir(work_dir_p4a):
+                warn("p4a directory already exists (" + work_dir_p4a + "), will not clone the repository again")
+                os.chdir(work_dir_p4a)
+                run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
+                run([ "git", "pull" ])
+            else:
+                run([ "git", "clone", "git://git.hpc-project.com/par4all", "p4a" ])
+                os.chdir(work_dir_p4a)
+                run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
 
-        work_dir_p4a_symlink = os.path.join(work_dir, "p4a_" + suffix)
-        run([ "rm", "-fv", work_dir_p4a_symlink ])
-        run([ "ln", "-sv", work_dir_p4a, work_dir_p4a_symlink ])
+            suffix = utc_datetime()
+            revision = p4a_git(work_dir_p4a).current_revision()
+            if revision:
+                suffix += "~" + revision
 
-        os.chdir(work_dir_p4a_symlink)
+            # Include the revision in the path so that it appears in debug messages
+            # of PIPS and we can trace back a faulty revision.
+            work_dir_p4a_actual = os.path.join(work_dir, "p4a_" + suffix)
+            run([ "rm", "-fv", work_dir_p4a_actual ])
+            run([ "ln", "-sv", work_dir_p4a, work_dir_p4a_actual ])
 
-        setup_options = options
-        options.packages_dir = os.path.join(work_dir_p4a_symlink, "packages")
-        warn("Forcing --packages-dir=" + options.packages_dir)
-        p4a_setup.main(setup_options)
-
-        pack_options = options
-        options.pack_dir = work_dir_p4a_symlink
-        warn("Forcing --pack-dir=" + options.pack_dir)
-        p4a_pack.main(pack_options)
+            ret = os.system(os.path.join(work_dir_p4a_actual, "src/simple_tools/p4a_coffee") + " --here " + " ".join(sys.argv[1:]))
+            if ret:
+                raise p4a_error("Child p4a_coffee failed")
 
     except:
         if not options.work_dir:

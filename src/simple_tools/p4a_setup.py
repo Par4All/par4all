@@ -162,7 +162,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 
 def main(options = {}, args = []):
 
-    actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+    actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
     script_dir = os.path.split(actual_script)[0]
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     default_prefix = "/usr/local/par4all"

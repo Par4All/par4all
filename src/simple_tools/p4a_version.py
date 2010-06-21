@@ -13,9 +13,9 @@ import sys, os, string
 from p4a_util import *
 from p4a_git import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
-program_dir = os.path.split(os.path.abspath(os.path.realpath(sys.argv[0])))[0]
+program_dir = os.path.split(os.path.realpath(os.path.abspath(sys.argv[0])))[0]
 
 
 def get_version_file_path(dist_dir = None):
@@ -34,7 +34,7 @@ def guess_file_revision(file_dir = None):
     '''Try to guess a revision/version string for a given file or directory.'''
     
     if file_dir:
-        file_dir = os.path.abspath(os.path.realpath(os.path.expanduser(file_dir))) 
+        file_dir = os.path.realpath(os.path.abspath(os.path.expanduser(file_dir)))
     else:
         # Default to version for this p4a_version.py script.
         global actual_script

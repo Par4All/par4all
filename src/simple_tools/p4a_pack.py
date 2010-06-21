@@ -39,7 +39,7 @@ default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/dists/nightl
 debian_dir = os.path.join(script_dir, "DEBIAN")
 
 # Some useful variables:
-actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 # Put temp directories in this array to make sure no temp dir remains after script exits.
@@ -112,7 +112,7 @@ def create_dist(dist_dir, install_prefix, revision):
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + dist_dir + " to " + temp_dir_with_prefix)
     #~ shutil.copytree(dist_dir, temp_dir_with_prefix)
-    run2([ "cp", "-av", dist_dir, temp_dir_with_prefix ])
+    run2([ "cp", "-av", dist_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
@@ -296,13 +296,13 @@ def main(options = {}, args = []):
         warn("Installation prefix: " + prefix + " (default; override with --install-prefix)")
 
     # Strip forward slash:
-    if prefix[0] == "/":
+    if prefix[0] == "/" and len(prefix):
         prefix = prefix[1:]
 
     dir = options.pack_dir
     if options.deb or options.tgz:
         if dir:
-            dir = os.path.abspath(os.path.expanduser(dir))
+            dir = os.path.realpath(os.path.abspath(os.path.expanduser(dir)))
             warn("Par4All installation is to be found in " + dir + " (--pack-dir)")
         else:
             dir = default_dir

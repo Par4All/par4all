@@ -292,7 +292,7 @@ def is_system_dir(dir):
 
 def rmtree(dir, can_fail = 0, remove_top = True):
     '''Removes a directory recursively, alternative to shutil.rmtree()'''
-    dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
+    dir = os.path.realpath(os.path.abspath(os.path.expanduser(dir)))
     if not dir or not os.path.isdir(dir):
         raise p4a_error("Not a directory: " + dir)
     if is_system_dir(dir): # Prevent deletion of major system dirs...
@@ -325,7 +325,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
             raise p4a_error("Invalid directory: " + dir)
     else:
         dir = os.getcwd()
-    dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
+    dir = os.path.abspath(os.path.expanduser(dir))
     #debug("Looking for files matching '" + file_re + "' in " + dir)
     try:
         for root, dirs, files in os.walk(dir, topdown = False):
