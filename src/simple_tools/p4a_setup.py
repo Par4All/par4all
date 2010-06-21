@@ -141,7 +141,6 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     if configure:
         if reconf:
             # Call autoconf to generate the configure utility.
-            autoreconf_args =  #"--force" ] # Dont use --force or it will no longer compile.
             run2([ "autoreconf", "--install" ], working_dir = package_dir)
         #~ if dest_dir:
             #~ configure_opts += [ "DESTDIR=" + dest_dir ]
