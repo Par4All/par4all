@@ -110,6 +110,7 @@ static void pips_timeout_handler(int __attribute__ ((__unused__)) sig)
  */
 void set_pips_timeout(unsigned int delay)
 {
+  pips_user_warning("setting pips timeout to %d\n", delay);
   if (delay>0) {
     pips_timeout_delay = delay;
     struct sigaction act;
@@ -136,6 +137,7 @@ void set_pips_timeout_from_env(void)
  */
 void reset_pips_timeout(void)
 {
+  pips_user_warning("resetting pips timeout\n");
   // cleanup alarm
   pips_timeout_delay = 0;
   struct sigaction act;
