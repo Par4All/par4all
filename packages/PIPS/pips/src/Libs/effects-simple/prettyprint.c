@@ -50,7 +50,6 @@
 #include "text.h"
 
 #include "text-util.h"
-#include "prettyprint.h"
 #include "database.h"
 #include "resources.h"
 #include "pipsdbm.h"

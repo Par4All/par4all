@@ -32,7 +32,6 @@
 #include "semantics.h"
 #include "resources.h"
 #include "pipsdbm.h"
-#include "pipsmake.h"
 #include "control.h"
 #include "transformations.h"
 #include "effects-generic.h"

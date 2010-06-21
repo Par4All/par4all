@@ -48,20 +48,12 @@ The HRE code if we want to have only one process on the HRE
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
-#include "transformations.h"
-#include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
+#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 
@@ -73,27 +65,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
-
-// See the file comEngine_distribute.c to know
-// what this hash_table's mean
-extern hash_table gLoopToRef;
-extern hash_table gStatToRef;
-extern hash_table gRefToEff;
-extern hash_table gLoopToSync;
-extern hash_table gRefToBuff;
-extern hash_table gLoopToSupRef;
-extern hash_table gLoopToUnSupRef;
-extern expression gBufferSizeEnt;
-extern hash_table gStatToHtOffset;
-extern hash_table gLoopToToggleEnt;
-extern hash_table gRefToFifo;
-extern hash_table gRefToFifoOff;
-extern hash_table gToggleToInc;
-
-// These hash_table's are used by some functions in file
-// comEngine_optimization_function.c
-extern hash_table gLoopToOpt;
-extern hash_table gIsNewLoop;
+#include "phrase.h"
 
 hash_table gLoopToOuterInd;
 
@@ -127,22 +99,9 @@ entity comEngine_make_new_scalar_variable(string prefix,
 					  basic bas)
 {
   entity retEnt = entity_undefined;
-
-  if(gGenHRE)
-    {
-      retEnt =
-	make_new_scalar_variable_with_prefix(prefix,
+  make_new_scalar_variable_with_prefix(prefix,
 					     get_current_module_entity(),
 					     bas);
-    }
-  else
-    {
-      retEnt =
-	make_new_C_scalar_variable_with_prefix(prefix,
-					       get_current_module_entity(),
-					       get_current_module_statement(),
-					       bas);
-    }
   AddEntityToCurrentModule(retEnt);
 
   return retEnt;

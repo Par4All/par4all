@@ -50,7 +50,6 @@
 #include "effects-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "control.h"
 #include "text-util.h"
 #include "text.h"
 #include "sommet.h"

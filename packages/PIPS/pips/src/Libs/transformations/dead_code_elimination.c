@@ -601,7 +601,7 @@ static bool dead_deal_with_test(statement s,
        the false branch: */
     statement_instruction(s) =
       make_instruction_block(
-			     make_statement_list(make_stmt_of_instr(statement_instruction(s)),st_false)
+			     make_statement_list(instruction_to_statement(statement_instruction(s)),st_false)
 			     );
 
     /* Go on the recursion on the remaining branch : */
@@ -621,7 +621,7 @@ static bool dead_deal_with_test(statement s,
     statement_instruction(s) =
        make_instruction_block(
 			      make_statement_list(
-						  make_stmt_of_instr(statement_instruction(s)),st_true));
+						  instruction_to_statement(statement_instruction(s)),st_true));
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_true);
     dead_code_if_false_branch_removed++;

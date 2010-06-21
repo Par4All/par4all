@@ -231,7 +231,7 @@ statement s;
 		 syntax_list))
 	{
 	    found_definitions = 
-		CONS(STATEMENT, make_stmt_of_instr(i), found_definitions);
+		CONS(STATEMENT, instruction_to_statement(i), found_definitions);
 	    statement_instruction(s) = 
 		make_continue_instruction();
 	}

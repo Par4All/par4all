@@ -44,7 +44,6 @@
 #include "prettyprint.h"
 
 #include "dg.h"
-#include "transformations.h"
 #include "transformer.h"
 
 typedef dg_arc_label arc_label;
@@ -56,7 +55,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 
@@ -68,19 +66,13 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
-extern void print_entity_variable(entity );
-
-extern hash_table gLoopToToggleEnt;
-extern hash_table gToggleToInc;
-extern hash_table gRefToToggle;
+#include "hpfc.h"
+#include "phrase.h"
 
 hash_table gLoopToOpt;
-extern hash_table gIsNewLoop;
 
 static list glSeqs = NIL;
 static list glStats = NIL;
-
-extern list glToggleInitStats;
 
 static void opt_loop_interchange_fill_lists_stat(statement stat)
 {

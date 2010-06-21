@@ -44,7 +44,6 @@
 #include "prettyprint.h"
 
 #include "dg.h"
-#include "transformations.h"
 #include "transformer.h"
 
 typedef dg_arc_label arc_label;
@@ -56,10 +55,11 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 #include "callgraph.h"
+#include "preprocessor.h"
+#include "pipsmake.h"
 
 #include "phrase_tools.h"
 
@@ -68,7 +68,6 @@ typedef dg_vertex_label vertex_label;
 #include "effects-convex.h"
 
 #include "phrase_distribution.h"
-#include "preprocessor.h"
 
 static entity create_module_with_statement (statement stat, 
 					    string new_module_name,
@@ -722,62 +721,41 @@ static entity create_module_with_statement (statement stat,
 					    list l_params,
 					    list l_priv) 
 {
-  entity new_module;
-  string source_file;
-  text text_code;
-  int param_nb = 0;
+    entity new_module;
+    int param_nb = 0;
 
-  pips_debug(2, "Creating new module: [%s]\n", new_module_name);
+    pips_debug(2, "Creating new module: [%s]\n", new_module_name);
 
-  new_module = make_empty_subroutine(new_module_name,make_language_unknown());
-  
-  /* Deal with private variables */
-  MAP (REFERENCE, ref, {
-    add_private_variable_to_module (ref, 
-				    new_module, 
-				    stat, 
-				    new_module_name);
-  },references_for_regions (l_priv));
-  
-  // Deal with parameters variables 
-  param_nb = gen_length(l_params);
-  MAP (REFERENCE, ref, {
-    add_parameter_variable_to_module (ref, 
-				      new_module, 
-				      stat, 
-				      new_module_name, 
-				      param_nb);
-    param_nb--;
-  },references_for_regions (l_params));
-  
-  pips_debug(2, "Making new module: [%s]\n", new_module_name);
-  ifdebug(5) {
-    pips_debug(5, "With statement: \n");
-    print_statement (stat);
-  }
+    new_module = make_empty_subroutine(new_module_name,make_language_unknown());
 
-  init_prettyprint(empty_text);
-  text_code = text_module(new_module,stat);
-  make_text_resource(new_module_name,
-		     DBR_SOURCE_FILE, 
-		     ".f",
-		     text_code);
-  close_prettyprint();
+    /* Deal with private variables */
+    FOREACH (REFERENCE, ref, references_for_regions (l_priv)){
+        add_private_variable_to_module (ref, 
+                new_module, 
+                stat, 
+                new_module_name);
+    }
 
-  source_file = db_build_file_resource_name(DBR_SOURCE_FILE, new_module_name, ".f");
+    // Deal with parameters variables 
+    param_nb = gen_length(l_params);
+    FOREACH (REFERENCE, ref, references_for_regions(l_params)){
+        add_parameter_variable_to_module (ref, 
+                new_module, 
+                stat, 
+                new_module_name, 
+                param_nb);
+        param_nb--;
+    }
 
-  pips_debug(5, "Source file : [%s]\n", source_file);
+    pips_debug(2, "Making new module: [%s]\n", new_module_name);
+    ifdebug(5) {
+        pips_debug(5, "With statement: \n");
+        print_statement (stat);
+    }
+    text t = text_named_module(new_module, new_module, stat);
+    add_new_module_from_text(new_module_name, t, fortran_module_p(get_current_module_entity()), compilation_unit_of_module(get_current_module_name()) );
 
-  DB_PUT_NEW_FILE_RESOURCE (DBR_USER_FILE, new_module_name, source_file);
-
-  init_prettyprint(empty_text);
-  make_text_resource(new_module_name,
-		     DBR_INITIAL_FILE, 
-		     FORTRAN_INITIAL_FILE_SUFFIX,
-		     text_code);
-  close_prettyprint();
-
-  return new_module;
+    return new_module;
 }
 
 /*********************************************************

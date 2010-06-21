@@ -34,13 +34,6 @@
 #include "ri.h"
 #include "effects.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-
-#include "graph.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "text-util.h"
@@ -48,22 +41,19 @@ typedef dg_vertex_label vertex_label;
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "transformer.h"
-#include "semantics.h"
 #include "control.h"
 #include "transformations.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "atomizer.h"
 
 #include "expressions.h"
 #include "callgraph.h"
 
-#include "ricedg.h"
-
 #include "sac.h"
+#include "ricedg.h"
+#include "atomizer.h"
 
 
 /** 
@@ -93,7 +83,7 @@ make_phi_assign_instruction(reference lRef, expression cond,
 
    So, this function returns true if the statement stat is supported.
    */
-bool simd_supported_stat_p(statement stat)
+static bool simd_supported_stat_p(statement stat)
 {
     if(instruction_call_p(statement_instruction(stat)))
     {

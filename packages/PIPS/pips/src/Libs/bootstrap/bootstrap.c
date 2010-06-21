@@ -66,7 +66,6 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "parser_private.h"
-#include "syntax.h"
 #include "constants.h"
 #include "resources.h"
 

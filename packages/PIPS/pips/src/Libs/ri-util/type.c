@@ -239,7 +239,10 @@ type MakeAnyScalarResult(tag t, _int size)
  *
  * typedef int foo;
  *
- * type_equal_p(int, foo)==TRUE, because foo is simply a renaming for int
+ * type_equal_p(int, foo)==TRUE, because foo is simply a renaming for
+ * int, but note that type_int_p(entity_type(foo)) returns
+ * false. Hence, type_int_p(t1) and type_equal_p(t1,t2) does not imply
+ * type_int_p(t2), which may lead to funny bugs.
  *
  * typedef struct a {
  *     int x;

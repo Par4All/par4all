@@ -21,7 +21,6 @@
 #include "pipsdbm.h"
 #include "accel-util.h"
 #include "resources.h"
-#include "properties.h"
 
 /// the list to store the loop to outline
 list loops_to_outline;

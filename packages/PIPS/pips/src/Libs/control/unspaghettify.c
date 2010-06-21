@@ -530,7 +530,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
     }
     else {
 	/* Take out the entry node: */
-	*new_unstructured_statement = make_stmt_of_instr(i);
+	*new_unstructured_statement = instruction_to_statement(i);
 	statement_instruction(s) =
 	    make_instruction_block(CONS(STATEMENT,
 					control_statement(entry_node),
@@ -659,7 +659,7 @@ try_to_structure_the_unstructured(statement s,
             post-sequence: */
          list list_of_the_new_statements;
          /* Put the unstructured in the new statement list: */
-         *new_unstructured_statement = make_stmt_of_instr(i);
+         *new_unstructured_statement = instruction_to_statement(i);
 
          list_of_the_new_statements = CONS(STATEMENT,
                                            *new_unstructured_statement,
@@ -785,7 +785,7 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	control_statement(exit_node) = first_statement;
 	/* Then, append the last statements at the end of the
 	   unstructured: */
-	the_unstructured = make_stmt_of_instr(i);
+	the_unstructured = instruction_to_statement(i);
 	statement_instruction(s) =
 	    make_instruction_block(CONS(STATEMENT,
 					the_unstructured,
@@ -811,8 +811,8 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	    pips_assert("Statement is consistent", statement_consistent_p(the_exit_statement));
 	/* Replace the unstructured by an unstructured followed by the
 	   out-keeped instruction: */
-	new_statement = make_stmt_of_instr(i);
-	out_keeping = make_stmt_of_instr(the_exit_instruction);
+	new_statement = instruction_to_statement(i);
+	out_keeping = instruction_to_statement(the_exit_instruction);
 	/* Keep track of the statement number: */
 	statement_number(out_keeping) = statement_number(the_exit_statement);
 	statement_instruction(the_unstructured) =

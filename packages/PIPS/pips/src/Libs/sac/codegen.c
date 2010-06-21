@@ -36,31 +36,21 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 #include "preprocessor.h"
 #include "text-util.h"
 #include "effects-simple.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-
 #include "sac.h"
 #include "patterns.h"
 
 #include "properties.h"
-#include "locality.h"
 
 #include "misc.h"
 #include "alias-classes.h"
 #include <ctype.h>
 #include <stdlib.h>
-#include "c_syntax.h"
 
 #define MAX_PACK 16
 #define VECTOR_POSTFIX "_vec"
@@ -99,7 +89,7 @@ void reset_vector_to_expressions()
     vector_to_expressions=hash_table_undefined;
 }
 
-entity expressions_to_vector(list expressions)
+static entity expressions_to_vector(list expressions)
 {
     void * hiter = NULL;
     entity key;
@@ -111,7 +101,7 @@ entity expressions_to_vector(list expressions)
     }
     return entity_undefined;
 }
-void update_vector_to_expressions(entity e, list exps)
+static void update_vector_to_expressions(entity e, list exps)
 {
     pips_assert("entity is ok",entity_consistent_p(e));
     FOREACH(EXPRESSION,exp,exps) pips_assert("expressions are ok",expression_consistent_p(exp));

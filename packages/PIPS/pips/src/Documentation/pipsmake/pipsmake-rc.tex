@@ -732,10 +732,12 @@ They still are used for the old non-regression tests.
 
 \Tpips{} is one of PIPS user interfaces.
 
-\begin{PipsProp}{TPIPS_NO_EXECUTION_MODE} 
-TPIPS_NO_EXECUTION_MODE FALSE
-\end{PipsProp}
-controls whether we shall execute the instructions of just check the syntax:
+% no longer used {
+% \begin{PipsProp}{TPIPS_NO_EXECUTION_MODE} 
+% TPIPS_NO_EXECUTION_MODE FALSE
+% \end{PipsProp}
+% controls whether we shall execute the instructions of just check the syntax:
+% }
 
 \begin{PipsProp}{TPIPS_IS_A_SHELL} 
 TPIPS_IS_A_SHELL FALSE
@@ -1466,15 +1468,17 @@ following property:
 \begin{PipsProp}{PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS} 
 PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS FALSE
 \end{PipsProp}
-\begin{PipsProp}{PRETTYPRINT_REGENERATED_LABEL}
-PRETTYPRINT_REGENERATED_LABEL "12345"
-\end{PipsProp}
-
-This is useful to link modules processed by PIPS with user modules using
-the alternate return constructs if alternate returns are replaced by STOP
-statement in the code processed by PIPS. The actual labels present in call
-sites may be dead code eliminated and a fake non-conflicting label must be
-used. It is defined by property \PipsPropRef{PRETTYPRINT_REGENERATED_LABEL}.
+% no longer used {
+% \begin{PipsProp}{PRETTYPRINT_REGENERATED_LABEL}
+% PRETTYPRINT_REGENERATED_LABEL "12345"
+% \end{PipsProp}
+% 
+% This is useful to link modules processed by PIPS with user modules using
+% the alternate return constructs if alternate returns are replaced by STOP
+% statement in the code processed by PIPS. The actual labels present in call
+% sites may be dead code eliminated and a fake non-conflicting label must be
+% used. It is defined by property \PipsPropRef{PRETTYPRINT_REGENERATED_LABEL}.
+% }
 
 If all modules have been processed by PIPS, it is possible not to
 regenerate alternate returns and to use a code close to the internal
@@ -2217,11 +2221,13 @@ cumulated_references    > MODULE.cumulated_references
 \index{Memory Effects}
 \index{EFFECTS\_PRINT\_SDFI}
 
-Print SDFI just after computation:
-
-\begin{PipsProp}{EFFECTS_PRINT_SDFI} 
-EFFECTS_PRINT_SDFI TRUE
-\end{PipsProp}
+% no longer used {
+% Print SDFI just after computation:
+% 
+% \begin{PipsProp}{EFFECTS_PRINT_SDFI} 
+% EFFECTS_PRINT_SDFI TRUE
+% \end{PipsProp}
+% }
 
 Filter this variable in phase \PipsPassRef{filter_proper_effects}.
 
@@ -4773,11 +4779,13 @@ safe result is the top abstract location.
 ABSTRACT_HEAP_LOCATIONS "unique"
 \end{PipsProp}
 
-The following property is used to bound the length of any generic
-access path or reference. Its default value is 0. It means that no limit is set.
-\begin{PipsProp}{GAP_MAX_LENGTH}
-GAP_MAX_LENGTH 0
-\end{PipsProp}
+% no longer used {
+% The following property is used to bound the length of any generic
+% access path or reference. Its default value is 0. It means that no limit is set.
+% \begin{PipsProp}{GAP_MAX_LENGTH}
+% GAP_MAX_LENGTH 0
+% \end{PipsProp}
+% }
 
 \subsection{Menu for Alias Views}
 
@@ -5170,9 +5178,9 @@ limit_nested_parallelism          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-PIPS relies on the property NESTED\_PARALLELISM\_THRESHOLD to determine the
+PIPS relies on the property \PipsPropRef{NESTED_PARALLELISM_THRESHOLD} to determine the
 desired level of nested parallelism.
-\begin{PipsProp}{OMP_MERGE_POLICY}
+\begin{PipsProp}{NESTED_PARALLELISM_THRESHOLD}
 NESTED_PARALLELISM_THRESHOLD 0
 \end{PipsProp}
 
@@ -5202,8 +5210,6 @@ alias simd_atomizer 'SIMD Atomizer'
 
 simd_atomizer                      > MODULE.code
         < PROGRAM.entities
-		< PROGRAM.simd_treematch
-		< PROGRAM.simd_operator_mappings
         < MODULE.code
 \end{PipsMake}
 
@@ -6285,20 +6291,21 @@ process on the HRE.
 COMENGINE_CONTROL_IN_HRE TRUE
 \end{PipsProp}
 
-\begin{PipsProp}{COMENGINE_BUFFER_HRE_INTERFACE} 
-COMENGINE_BUFFER_HRE_INTERFACE TRUE
-\end{PipsProp}
-
 This property holds the fifo size of the ComEngine.
 \begin{PipsProp}{COMENGINE_SIZE_OF_FIFO} 
 COMENGINE_SIZE_OF_FIFO 128
 \end{PipsProp}
 
-This property holds the number of fifos in the ComEngine.
-\begin{PipsProp}{COMENGINE_NUMBER_OF_FIFO} 
-COMENGINE_NUMBER_OF_FIFO 100
-\end{PipsProp}
-
+% no longer used {
+% This property holds the number of fifos in the ComEngine.
+% \begin{PipsProp}{COMENGINE_NUMBER_OF_FIFO} 
+% COMENGINE_NUMBER_OF_FIFO 100
+% \end{PipsProp}
+% 
+% \begin{PipsProp}{COMENGINE_BUFFER_HRE_INTERFACE} 
+% COMENGINE_BUFFER_HRE_INTERFACE TRUE
+% \end{PipsProp}
+% }
 
 \subsection{Parallelization for Terapix architecture}
 \index{Terapix}
@@ -6921,9 +6928,11 @@ fully unrolled.
 
 Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give it interactively
 
-\begin{PipsProp}{FULL_UNROLL_INTERACTIVELY}
-FULL_UNROLL_INTERACTIVELY TRUE
-\end{PipsProp}
+% no longer used {
+% \begin{PipsProp}{FULL_UNROLL_INTERACTIVELY}
+% FULL_UNROLL_INTERACTIVELY TRUE
+% \end{PipsProp}
+% }
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% STRIP MINING
@@ -7035,13 +7044,32 @@ loop_tiling                            > MODULE.code
 \end{PipsMake}
 
 This transformations prompts the user for a partition matrix.
-Alternatetively, this matrix can be provided through the \PipsPropRef{LOOP_TILING_MATRIX} property.
+Alternatively, this matrix can be provided through the \PipsPropRef{LOOP_TILING_MATRIX} property.
 The format of the matrix is a00 a01 a02,a10 a11 a12,a20 a21 a22
 \begin{PipsProp}{LOOP_TILING_MATRIX}
 LOOP_TILING_MATRIX ""
 \end{PipsProp}
 
-Likewise, one ca use the \PipsPropRef{LOOP_LABEL} property to specify the targeted loop.
+Likewise, one can use the \PipsPropRef{LOOP_LABEL} property to specify the targeted loop.
+
+\subsection{Symbolic Tiling}
+
+\begin{PipsPass}{symbolic_tiling}
+Tiles a loop nest using a partitioning vector that can contain symbolic values.
+The tiling only works for parallelepiped tiles.
+Use \PipsPropRef{LOOP_LABEL} to specify the loop to tile.
+Use \PipsPropRef{SYMBOLIC_TILING_VECTOR} as a comma-separated list to specify tile sizes.
+\end{PipsPass}
+\begin{PipsMake}
+symbolic_tiling > MODULE.code
+	! MODULE.internalize_parallel_code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.cumulated_effects
+\end{PipsMake}
+\begin{PipsProp}{SYMBOLIC_TILING_VECTOR}
+SYMBOLIC_TILING_VECTOR ""
+\end{PipsProp}
 
 \subsection{Loop Normalize}
 \label{subsection-loop-normalize}
@@ -8020,6 +8048,7 @@ alias new_atomizer 'New Atomizer'
 new_atomizer                      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.cumulated_effects
 \end{PipsMake}
 
 An atomizer is also used by WP65 (see
@@ -9770,11 +9799,13 @@ omp_merge_pragma             > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-PIPS merges the omp pragma on the inner or outer loop depending on the property
-OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|
-\begin{PipsProp}{OMP_MERGE_POLICY}
-OMP_MERGE_POLICY "outer"
-\end{PipsProp}
+% no longer used {
+% PIPS merges the omp pragma on the inner or outer loop depending on the property
+% OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|
+% \begin{PipsProp}{OMP_MERGE_POLICY}
+% OMP_MERGE_POLICY "outer"
+% \end{PipsProp}
+% }
 
 The merging of the if clause of the omp pragma follows its own rule.
 This clause can be ignore without changing the output of the program,
@@ -10685,15 +10716,16 @@ PRETTYPRINT_ANALYSES_WITH_LF TRUE
 
 This feature only exists for the semantics analyses.
 
-\begin{PipsProp}{PRETTYPRINT_FREE_FORM} 
-PRETTYPRINT_FREE_FORM FALSE
-\end{PipsProp}
-
-This properties control the output of the prettyprinter, if set to false it'll
-be compliant with F77 Standard (line begin on 7th column and so on), else code
-will be display on a free form basis. This property is set to FALSE by default
-for Fortran77 file, and is set to TRUE for Fortran90/95 and C files.
-
+% no longer used {
+% \begin{PipsProp}{PRETTYPRINT_FREE_FORM} 
+% PRETTYPRINT_FREE_FORM FALSE
+% \end{PipsProp}
+% 
+% This properties control the output of the prettyprinter, if set to false it'll
+% be compliant with F77 Standard (line begin on 7th column and so on), else code
+% will be display on a free form basis. This property is set to FALSE by default
+% for Fortran77 file, and is set to TRUE for Fortran90/95 and C files.
+% }
 \subsubsection{Target Language Selection}
 \index{HPF}
 \index{Fortran 90}
@@ -10908,14 +10940,16 @@ redundant with the IO statement itself.
 PRETTYPRINT_CHECK_IO_STATEMENTS FALSE
 \end{PipsProp}
 
-Manage internal RETURNs correctly if set to TRUE.  This results in a
-slightly ugly (but correct) prettyprint, compared to a nicer (but
-possibly incorrect) default one. Internal returns are converted by the
-parser into GO~TO's the final and unique return.
-
-\begin{PipsProp}{PRETTYPRINT_INTERNAL_RETURN} 
-PRETTYPRINT_INTERNAL_RETURN TRUE
-\end{PipsProp}
+% no longer used {
+% Manage internal RETURNs correctly if set to TRUE.  This results in a
+% slightly ugly (but correct) prettyprint, compared to a nicer (but
+% possibly incorrect) default one. Internal returns are converted by the
+% parser into GO~TO's the final and unique return.
+% 
+% \begin{PipsProp}{PRETTYPRINT_INTERNAL_RETURN} 
+% PRETTYPRINT_INTERNAL_RETURN TRUE
+% \end{PipsProp}
+% }
 
 Print the final RETURN statement, although this is useless according to
 Fortran standard. Note that comments attached to the final return are

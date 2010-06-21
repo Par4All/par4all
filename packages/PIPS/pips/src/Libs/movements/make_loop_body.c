@@ -47,7 +47,6 @@
 #include "misc.h"
 #include "text-util.h"
 #include "parser_private.h"
-#include "syntax.h"
 #include "polyedre.h"
 
 void wp65_debug_print_text(entity m, statement s)

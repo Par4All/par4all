@@ -91,9 +91,7 @@ partial_eval_expression().
 #include "semantics.h" /* for module_to_value_mappings() */
 
 #include "arithmetique.h"
-#include "transformations.h" /*used for FORTRAN_DIV ... */
 
-#include "preprocessor.h"
 #include "expressions.h"
 
 

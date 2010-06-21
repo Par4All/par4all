@@ -96,7 +96,6 @@ for further generation of CUDA code.
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
-#include "transformations.h"
 
 #define COMMA         ","
 #define OPENPAREN     "("

@@ -42,13 +42,6 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-
-#include "dg.h"
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-#include "graph.h"
-
-#include "sac-local.h"
 #include "sac.h"
 #include "patterns.h"
 
