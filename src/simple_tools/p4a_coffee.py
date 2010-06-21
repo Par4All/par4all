@@ -63,6 +63,8 @@ def main(options = {}, args = []):
         
         else:
             work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
+
+            prev_cwd = os.getcwd()
             os.chdir(work_dir)
 
             work_dir_p4a = os.path.join(work_dir, "p4a")
@@ -88,6 +90,7 @@ def main(options = {}, args = []):
             #~ run([ "ln", "-sv", work_dir_p4a, work_dir_p4a_version ])
             run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
 
+            os.chdir(prev_cwd)
             ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee") + " --here " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
