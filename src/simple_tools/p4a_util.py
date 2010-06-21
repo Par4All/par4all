@@ -188,7 +188,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
             w = os.getcwd()
         if capture:
             (stdout_fd, stdout_to) = tempfile.mkstemp("stdout")
-            (stdout_fd, stderr_to) = tempfile.mkstemp("stderr")
+            (stderr_fd, stderr_to) = tempfile.mkstemp("stderr")
             ret = os.system(" ".join(cmd_list) + " >" + stdout_to + " 2>" + stderr_to)
             out = slurp(stdout_to)
             err = slurp(stderr_to)
