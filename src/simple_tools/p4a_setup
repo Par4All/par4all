@@ -38,7 +38,7 @@ def main():
     main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
         help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
     
-    main_group.add_option("--nocolor", action = "store_true", default = False,
+    main_group.add_option("--no-color", action = "store_true", default = False,
         help = "Disable coloring of terminal output.")
     
     main_group.add_option("-V", dest = "script_version", action = "store_true", default = False,
@@ -48,7 +48,7 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    if options.nocolor:
+    if options.no_color:
         p4a_term.disabled = True
     
     set_verbosity(options.verbose)

@@ -98,29 +98,29 @@ def main(options = {}, args = []):
             rmtree(build_dir)
     
     # Prepare the C preprocessor flags and linker flags.
-    cppflags = options.cppflags
+    cpp_flags = options.cpp_flags
     for include_dir in options.include_dirs:
-        cppflags += [ "-I" + include_dir ]
+        cpp_flags += [ "-I" + include_dir ]
     for define in options.defines:
-        cppflags += [ "-D" + define ]
+        cpp_flags += [ "-D" + define ]
     for undefine in options.undefines:
-        cppflags += [ "-U" + undefine ]
-    ldflags = options.ldflags
+        cpp_flags += [ "-U" + undefine ]
+    ld_flags = options.ld_flags
     for lib_dir in options.lib_dirs:
-        ldflags += [ "-L" + lib_dir ]
+        ld_flags += [ "-L" + lib_dir ]
     for lib in options.libs:
-        ldflags += [ "-l" + lib ]
+        ld_flags += [ "-l" + lib ]
     
     # Instantiate the builder. It will be used to keep track and arrange all
     # the CPP, C, Fortran etc. flags, apart from being used for building the
     # project after processing, if requested.
     builder = p4a_builder(
-        cppflags = cppflags,
-        cflags = options.cflags,
-        cxxflags = options.cxxflags,
-        ldflags = ldflags,
-        nvccflags = options.nvccflags,
-        fortranflags = options.fortranflags,
+        cpp_flags = cpp_flags,
+        c_flags = options.c_flags,
+        cxx_flags = options.cxx_flags,
+        ld_flags = ld_flags,
+        nvcc_flags = options.nvcc_flags,
+        fortran_flags = options.fortran_flags,
         cpp = options.cpp,
         cc = options.cc,
         cxx = options.cxx,
@@ -134,19 +134,19 @@ def main(options = {}, args = []):
         icc = options.icc,
         cuda = options.cuda,
         add_debug_flags = options.debug,
-        add_optimization_flags = not options.nofast,
+        add_optimization_flags = not options.no_fast,
         no_default_flags = options.no_default_flags
     )
     
     ###################
     ### XXXXXXXXXXXXXX TODO: override CPP used by the processor -> pyps -> pips with builder.cpp
     
-    info("CPP flags: " + " ".join(builder.cppflags))
+    info("CPP flags: " + " ".join(builder.cpp_flags))
 
     # Process (parallelize) files (or not).
     database_dir = ""
     processor_output_files = []
-    if options.noprocess:
+    if options.no_process:
         warn("Bypassing processor")
         processor_output_files = files
     elif len(files) == 0:
@@ -157,7 +157,7 @@ def main(options = {}, args = []):
             processor = p4a_processor(files = files,
                                   project_name = project_name,
                                   verbose = (verbosity != 0),
-                                  cppflags = " ".join(builder.cppflags),
+                                  cpp_flags = " ".join(builder.cpp_flags),
                                   recover_includes = not options.skip_recover_includes,
                                   filter_include = options.include_modules,
                                   filter_exclude = options.exclude_modules,
@@ -218,7 +218,7 @@ def main(options = {}, args = []):
                 output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
         if options.cmake_gen or options.cmake_build:
             builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir, 
-                cmakeflags = options.cmakeflags, build = options.cmake_build)
+                cmake_flags = options.cmake_flags, build = options.cmake_build)
         return
     
     try:

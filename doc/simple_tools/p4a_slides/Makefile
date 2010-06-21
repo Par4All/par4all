@@ -1,8 +1,7 @@
 DOCUMENT = p4a_slides
 
 # Where to install the documentation:
-INSTALL_MACHINE=ridee.enstb.org
-INSTALL_DIR=/var/www/par4all/doc/simple_tools/p4a
+INSTALL_MACHINE_DIR=$(INSTALL_MACHINE_DOC_DIR)/simple_tools/p4a
 
 # We have an index to compute
 #MAKEINDEX=1
@@ -11,11 +10,12 @@ USE_PDFTEX=1
 
 default: $(DOCUMENT)-expose.pdf
 
-include ../../libs/tex/beamer.mk
+include $(P4A_ROOT)/doc/libs/par4all.mk
+include $(P4A_ROOT)/doc/libs/tex/beamer.mk
 
 publish:
-	#ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_DIR)
-	rsync -av $(DOCUMENT)-expose.pdf $(INSTALL_MACHINE):$(INSTALL_DIR)
+	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_MACHINE_DIR)
+	rsync -av $(DOCUMENT)-expose.pdf $(INSTALL_MACHINE):$(INSTALL_MACHINE_DIR)
 
 $(DOCUMENT).tex: p4a-help.tex
 

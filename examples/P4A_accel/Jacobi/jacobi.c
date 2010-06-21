@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-typedef float float_t;
+typedef float real_t;
 #define SIZE 501
 #define T 400
 
 
-float_t space[SIZE][SIZE];
+real_t space[SIZE][SIZE];
 // For the dataparallel semantics:
-float_t save[SIZE][SIZE];
+real_t save[SIZE][SIZE];
 
 void get_data(char filename[]) {
   int i, j, nx, ny;
@@ -79,7 +79,7 @@ void write_data(char filename[]) {
 }
 
 
-void iteration(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
+void iteration(real_t space[SIZE][SIZE], real_t save[SIZE][SIZE]) {
   int i, j;
 
   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
@@ -98,7 +98,7 @@ void iteration(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 }
 
 
-void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
+void compute(real_t space[SIZE][SIZE], real_t save[SIZE][SIZE]) {
   int t;
 
   /* Apply the relaxation T times: */
