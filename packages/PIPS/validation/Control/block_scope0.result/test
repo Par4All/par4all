@@ -1,0 +1,64 @@
+
+Parser output
+
+{{
+   extern int block_scope();
+}}
+
+int block_scope()
+{
+{{
+   int x = 6;
+{{
+lab1:   x--;
+   x++;
+}}
+{{
+   x = -1;
+   goto lab1;
+}}
+   return x;
+}}
+}
+
+Controlizer output
+
+int block_scope()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+{{
+// (1,2)
+lab1:   x--;
+// (1,3)
+   x++;
+// (1,4)
+   x = -1;
+}}
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+}
+int block_scope()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+{{
+// (1,2)
+lab1:   x--;
+// (1,3)
+   x++;
+// (1,4)
+   x = -1;
+}}
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+}
+

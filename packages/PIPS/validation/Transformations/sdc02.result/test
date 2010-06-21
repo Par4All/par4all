@@ -1,0 +1,21 @@
+int main()
+{
+   if (1==0) goto switch_1_case_0;
+   if (1==1) {
+   }
+   else {
+      goto switch_1_default;
+   }
+switch_1_case_1:   ;
+   return 1;
+switch_1_case_0:   ;
+   return 0;
+switch_1_default:   ;
+   return 2;
+}
+int main()
+{
+   return 1;
+   return 2;
+}
+

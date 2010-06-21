@@ -1,0 +1,166 @@
+
+Symbol table for test
+
+if02!
+
+Declarations for module "if02!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:test" with type "functional" "() -> void"
+	Declared entity "if02!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "if02!:*HEAP*" with type "area" with size 0
+	Declared entity "if02!:*STACK*" with type "area" with size 0
+	Declared entity "if02!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:test"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "if02!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "if02!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "if02!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "if02!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module if02!
+
+
+test
+
+Declarations for module "test" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "if02!:*STATIC*" with type "area" with size 0
+	Declared entity "test:*DYNAMIC*" with type "area" with size 14
+	Declared entity "test:*HEAP*" with type "area" with size 0
+	Declared entity "test:*STACK*" with type "area" with size 0
+	Declared entity "test:*STATIC*" with type "area" with size 0
+	Declared entity "test:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "test:0`__func__" with type "variable" "char *"
+	Declared entity "test:0`x" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "if02!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "test:*DYNAMIC*" of size 14:
+	Variable "test:0`x"	offset = 10	size = 4
+	Variable "test:0`__func__"	offset = 0	size = 5
+	Variable "test:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "test:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "test:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "test:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module test
+
+
+Parser output
+
+{{
+   /* Simple case for tests in the controlizer: */
+   extern void test();
+}}
+
+void test()
+{
+{{
+   int x = 6;
+ici:   if (x>4) {
+   {{
+      x = 2;
+      goto ici;
+   }}
+   }
+   else
+      x = 3;
+}}
+}
+
+Controlizer output
+
+void test()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+ici:   if (x>4) {
+   }
+   else {
+      goto l99999;
+   }
+// (2,1)
+   x = 2;
+   goto ici;
+l99999:   ;
+// (3,1)
+
+//:   END UNSTRUCTURED
+// (0,4)
+   x = 3;
+}}
+}
+void test()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+ici:   if (x>4) {
+   }
+   else {
+      goto l99999;
+   }
+// (2,1)
+   x = 2;
+   goto ici;
+l99999:   ;
+// (3,1)
+
+//:   END UNSTRUCTURED
+// (0,4)
+   x = 3;
+}}
+}
+

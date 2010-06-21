@@ -1,0 +1,24 @@
+setenv WS="atomizer04"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+activate PRINT_CODE_CUMULATED_EFFECTS
+echo original code
+display PRINTED_FILE
+activate PRINT_CODE
+
+echo atomized code
+apply NEW_ATOMIZER
+display PRINTED_FILE
+
+apply UNSPLIT
+close
+
+shell sed -i -e '1,/main(/ d' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ( test `./$WS.database/Tmp/out` = `./$WS.database/Tmp/ref` && echo "ok" ) || echo "ko"
+
+delete $WS
