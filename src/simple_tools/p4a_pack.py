@@ -17,7 +17,7 @@ from p4a_version import *
 
 
 # Default directory to take current binary installation from.
-default_pack_dir                     = "/usr/local/par4all"
+default_pack_dir                = "/usr/local/par4all"
 
 # Default installation prefix when installing a .deb or .rpm package on the client machine.
 default_install_prefix          = "/usr/local/par4all"
