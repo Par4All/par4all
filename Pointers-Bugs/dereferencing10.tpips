@@ -1,8 +1,8 @@
-delete mehdi01
+delete dereferencing10
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create mehdi01 mehdi01.c
+create dereferencing10 dereferencing10.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -10,14 +10,14 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 
 echo
-echo Proper effetcs for "mehdi01"
+echo Proper effetcs for "dereferencing10"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
 echo
-echo Proper Pointer effetcs for "mehdi01"
+echo Proper Pointer effetcs for "dereferencing10"
 echo
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS 
@@ -31,5 +31,5 @@ display PRINTED_FILE[main]
 
 
 close
-delete mehdi01
+delete dereferencing10
 quit
