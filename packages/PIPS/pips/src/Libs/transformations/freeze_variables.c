@@ -151,7 +151,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 		e1 = reference_to_expression(make_reference(new_ent, NIL));
 		e2 = reference_to_expression(copy_reference(r));
 		i1 = make_assign_instruction(e1,e2);
-		s1=make_stmt_of_instr(i1);
+		s1=instruction_to_statement(i1);
 		statement_label(s)= entity_empty_label();
 		first_st=CONS(STATEMENT,s1, first_st);
 		st_to_insert_before = TRUE;

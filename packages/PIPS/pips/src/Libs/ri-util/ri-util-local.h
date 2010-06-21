@@ -1299,15 +1299,9 @@
 #define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
 
-/* building instruction and statements... */
-#define instruction_to_statement(i) \
-   make_statement(entity_empty_label(),\
-                  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
-                  empty_comments, i, NIL, NULL, empty_extensions ())
-
-#define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
-#define test_to_instruction(t) make_instruction(is_instruction_test, t)
-#define call_to_instruction(c) make_instruction(is_instruction_call, c)
+#define loop_to_instruction make_instruction_loop
+#define test_to_instruction make_instruction_test
+#define call_to_instruction make_instruction_call
 
 #define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
@@ -1799,6 +1793,7 @@ the variable is unsigned, signed or not */
 
 
 /** @} */
+
 
 /* polymorhism thanks to newgen ! */
 #define INSTANCE_OF(type,value) ( (_int)((value)->u) == (_int)(type##_domain) )

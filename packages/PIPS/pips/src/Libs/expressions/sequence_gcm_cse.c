@@ -58,7 +58,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-#include "transformations.h" /* out? */
 #include "expressions.h"
 
 #include "eole_private.h"

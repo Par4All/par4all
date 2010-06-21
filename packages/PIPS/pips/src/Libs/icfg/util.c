@@ -44,7 +44,6 @@
 #include "effects-convex.h"
 #include "resources.h"
 #include "semantics.h"
-#include "prettyprint.h"
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */

@@ -35,10 +35,9 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "c_parser_private.h"
-#include "parser_private.h" /* FI: for syntax.h */
-
 #include "c_syntax.h"
-#include "syntax.h" /* FI: To dump the symbol table. move in ri-util? */
+#include "syntax.h"
+
 #include "text-util.h"
 
 #include "cyacc.h"
@@ -48,7 +47,6 @@
 
 #include "misc.h"
 #include "pipsdbm.h"
-#include "transformations.h"
 #include "properties.h"
 
 extern string compilation_unit_name;

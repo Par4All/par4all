@@ -48,6 +48,7 @@
 
 #include "arithmetique.h"
 #include "alias-classes.h"
+#include "pipsmake.h"
 
 #include "ri-util.h"
 
@@ -977,16 +978,36 @@ expression find_ith_expression(list le, int r)
   */
 expression int_to_expression(_int i)
 {
-  char constant_name[3*sizeof(i)];
-    expression e;
-
-    (void) sprintf(constant_name,"%td", i >= 0 ? i : -i);
-    e = MakeIntegerConstantExpression(constant_name);
+    char *constant_name;
+    (void) asprintf(&constant_name,"%td", i >= 0 ? i : -i);
+    expression e = MakeIntegerConstantExpression(constant_name);
+    free(constant_name);
     if(i<0) {
-	entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
-	e = MakeUnaryCall(um, e);
+        entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+        e = MakeUnaryCall(um, e);
     }
     return e;
+}
+static entity float_to_entity(float c)
+{
+    string num;
+    asprintf(&num, "%f", c);
+    entity e = MakeConstant(num,is_basic_float);
+    free(num);
+    return e;
+}
+
+expression float_to_expression(float c)
+{
+    entity e = float_to_entity(c);
+    if(c<0)
+        return unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME,entity_to_expression(e));
+    else
+        return call_to_expression(make_call(e,NIL));
+}
+expression complex_to_expression(float re, float im)
+{
+    return MakeComplexConstantExpression(float_to_expression(re),float_to_expression(im));
 }
 
 /* added interface for linear stuff.
@@ -3011,4 +3032,39 @@ void update_expression_syntax(expression e, syntax s)
     unnormalize_expression(e);
     free_syntax(expression_syntax(e));
     expression_syntax(e)=s;
+}
+
+/**
+ * very simple conversion from string to expression
+ * only handles entities and numeric values at the time being
+ */
+expression string_to_expression(const char * s,entity module)
+{
+    /* try float conversion */
+    string endptr,module_name=module_local_name(module);
+    float f = strtof(s,&endptr);
+    if(!endptr) return float_to_expression(f);
+    long int l = strtol(s,&endptr,10);
+    if(!endptr) return int_to_expression(l);
+
+    entity candidate = entity_undefined;
+    /* first find all relevent entities */
+    FOREACH(ENTITY,e,entity_declarations(module))
+    {
+        /* this an heuristic to find the one with a suiting scope
+         * error prone*/
+        if(same_string_p(entity_user_name(e),s) )
+            if(entity_undefined_p(candidate) ||
+                    strlen(entity_name(candidate)) > strlen(entity_name(e)))
+                candidate=e;
+    }
+    /* try at the compilation unit level */
+    if(entity_undefined_p(candidate))
+        candidate=FindEntity(compilation_unit_of_module(module_name),s);
+    /* try at top level */
+    if(entity_undefined_p(candidate))
+        candidate=FindEntity(TOP_LEVEL_MODULE_NAME,s);
+    return entity_undefined_p(candidate)?
+        expression_undefined:
+        entity_to_expression(candidate);
 }

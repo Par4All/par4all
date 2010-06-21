@@ -36,21 +36,11 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 
-#include "semantics.h"
 #include "effects-generic.h"
 #include "transformations.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-#include "sac-local.h" /* needed because sac.h may not exist when 
-                        * simdizer.c is compiled */
 #include "sac.h"
 
-#include "semantics.h"
 #include "transformations.h"
 #include "control.h"
 

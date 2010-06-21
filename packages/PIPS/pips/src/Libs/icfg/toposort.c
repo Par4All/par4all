@@ -50,7 +50,6 @@
 #include "properties.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "misc.h"
 
 
@@ -58,7 +57,6 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
-#include "transformer.h"
 #include "semantics.h"
 
 #include "icfg.h"

@@ -25,6 +25,7 @@
 #include "linear.h"
 #include "newgen.h"
 #include "ri.h"
+#include "effects.h"
 
 #define effect_system(e) \
         (descriptor_convex_p(effect_descriptor(e))? \

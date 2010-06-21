@@ -703,7 +703,7 @@ make_loop_nest_for_overlap(
 
     loop_body(newloop) = make_block_statement(lnew_body);
     lnew_loop = CONS(STATEMENT,
-		     make_stmt_of_instr(make_instruction(is_instruction_loop,
+		     instruction_to_statement(make_instruction(is_instruction_loop,
 							 newloop)),
 		     NIL);
 

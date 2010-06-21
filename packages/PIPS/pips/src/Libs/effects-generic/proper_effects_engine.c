@@ -46,14 +46,12 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "control.h"
 #include "constants.h"
 #include "misc.h"
 #include "text-util.h"
 #include "text.h"
 
 #include "properties.h"
-#include "pipsmake.h"
 #include "preprocessor.h"
 
 #include "transformer.h"

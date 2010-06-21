@@ -88,17 +88,6 @@ static string c_expression(expression,bool);
 #define RESULT_NAME	"result"
 
 
-
-/*
- * convert string to lower case, string is modified in place
- */
-static void string_tolower(string s)
-{
-    string car=NULL;
-    for (car = s; *car; car++)
-        *car = (char) tolower(*car);
-}
-
 /*
  * convert some fortran constant to their equivalent in C
  */
@@ -109,8 +98,7 @@ static void const_wrapper(string* s)
     int i;
 
     /* search fortran constant */
-    char *name = strdup(*s);
-    string_tolower(name);
+    char *name = strlower(strdup(*s),*s);
     for(i=0;i<const_to_c_sz;i++)
     {
         if(strcmp(name,const_to_c[i][0]) == 0 )
@@ -123,7 +111,7 @@ static void const_wrapper(string* s)
 }
 
 /*
- * warning : return allocated string, otherwise it leads to modification (through string_tolower)
+ * warning : return allocated string, otherwise it leads to modification (through strlower)
  * of critical entities
  */
 static string c_entity_local_name(entity var)
@@ -155,10 +143,7 @@ static string c_entity_local_name(entity var)
         /* switch to lower cases... */
 
     }
-    name=strdup(name);
-    string_tolower(name);
-
-
+    name=strlower(strdup(name),name);
     return name;
 }
 
@@ -905,13 +890,14 @@ static string c_call(call c,bool breakable)
     else if (call_constant_p(c))
     {
         const_wrapper(&local_name);
-        result = strdup(local_name);
-        string_tolower(result);
+        result = strlower(strdup(local_name),local_name);
     }
     else
     {
         result = ppt->ppt(ppt->c? ppt->c: local_name, call_arguments(c));
-        string_tolower(result);
+        string tmp = result;
+        result=strlower(strdup(result),result);
+        free(tmp);
     }
 
     return result;

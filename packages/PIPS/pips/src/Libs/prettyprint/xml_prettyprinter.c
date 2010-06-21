@@ -35,7 +35,6 @@
 #include "ri.h"
 #include "effects.h"
 
-#include "c_syntax.h"
 #include "c_parser_private.h"
 
 #include "resources.h"
@@ -51,7 +50,6 @@
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "transformations.h"
-#include "callgraph.h"
 #include "semantics.h"
 #include "preprocessor.h"
 

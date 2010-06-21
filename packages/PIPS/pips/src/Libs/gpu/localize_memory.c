@@ -18,7 +18,6 @@
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
-#include "transformations.h"
 #include "resources.h"
 
 /** Store the loop nests found that meet the spec to be executed on a

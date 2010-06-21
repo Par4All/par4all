@@ -65,7 +65,6 @@ typedef void * vertex_label;
 #include "paf_ri.h"
 #include "database.h"
 #include "parser_private.h"
-#include "syntax.h"
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"

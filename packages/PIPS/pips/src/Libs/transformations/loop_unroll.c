@@ -302,7 +302,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 
         instruction_block(block)= gen_nconc(instruction_block(block),
                 CONS(STATEMENT,
-                    make_stmt_of_instr(inst),
+                    instruction_to_statement(inst),
                     NIL ));
         
             /* Unrolled loop created:
@@ -410,7 +410,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 
         instruction_block(block)= gen_nconc(instruction_block(block),
                 CONS(STATEMENT,
-                    make_stmt_of_instr(inst),
+                    instruction_to_statement(inst),
                     NIL ));
         
             /* Generate a statement to reinitialize old index

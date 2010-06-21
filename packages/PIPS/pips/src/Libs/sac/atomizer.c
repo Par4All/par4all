@@ -38,12 +38,6 @@
 #include "ri.h"
 #include "effects.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "text-util.h"
@@ -51,8 +45,6 @@ typedef dg_vertex_label vertex_label;
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "transformer.h"
-#include "semantics.h"
 #include "control.h"
 #include "transformations.h"
 #include "arithmetique.h"
@@ -60,15 +52,13 @@ typedef dg_vertex_label vertex_label;
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "atomizer.h"
 #include "preprocessor.h"
 #include "properties.h"
 
 #include "expressions.h"
 
-#include "sac-local.h" 
-
 #include "sac.h"
+#include "atomizer.h"
 
 static statement orginal_statement = NULL;
 
@@ -178,7 +168,13 @@ static void get_type_max_width(call ca, int* maxWidth)
                     *maxWidth=MAX(*maxWidth , basic_type_size(bas));
                     free_basic(bas);
                 } break;
-            default:pips_internal_error("synatx_tag %u not supported yet",syntax_tag(s));
+            case is_syntax_subscript:
+                {
+                    basic bas = basic_of_expression(subscript_array(syntax_subscript(s)));
+                    *maxWidth=MAX(*maxWidth , basic_type_size(bas));
+                    free_basic(bas);
+                } break;
+            default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
 
         }
     }
@@ -201,8 +197,9 @@ static void change_basic_if_needed(statement stat)
 		{
 
 			// Check that the statement can be potentially integrated in a 
-			// SIMD statement
-			if(match_statement(stat) != NIL)
+			// SIMD statement 
+            // SG: atomizer is no longer limited to sac
+			// if(match_statement(stat) != NIL)
 			{
 				get_type_max_width(syntax_call(expression_syntax(rExp)), &maxWidth);
 			}
@@ -359,8 +356,6 @@ boolean simd_atomizer(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
-    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
-    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
 
     debug_on("SIMD_ATOMIZER_DEBUG_LEVEL");
 
@@ -375,8 +370,6 @@ boolean simd_atomizer(char * mod_name)
     /* update/release resources */
     reset_current_module_statement();
     reset_current_module_entity();
-    reset_simd_operator_mappings();
-    reset_simd_treematch();
 
     debug_off();
 

@@ -41,7 +41,6 @@
 
 #include "ri-util.h"
 #include "effects-util.h"
-#include "control.h"
 #include "constants.h"
 #include "misc.h"
 #include "text-util.h"
@@ -50,8 +49,6 @@
 
 #include "properties.h"
 
-#include "transformer.h"
-#include "semantics.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"

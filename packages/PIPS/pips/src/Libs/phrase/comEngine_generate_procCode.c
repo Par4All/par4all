@@ -47,20 +47,12 @@ This file contains functions used to generate the MMCDs generation code
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
-#include "transformations.h"
-#include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
+#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 
@@ -73,25 +65,7 @@ typedef dg_vertex_label vertex_label;
 #include "phrase_distribution.h"
 #include "comEngine.h"
 #include "comEngine_generate_code.h"
-
-// See the file comEngine_distribute.c to know
-// what this hash_table's mean
-extern hash_table gLoopToRef;
-extern hash_table gStatToRef;
-extern hash_table gRefToEff;
-extern hash_table gLoopToSync;
-extern hash_table gLoopToSupRef;
-extern hash_table gLoopToUnSupRef;
-extern expression gBufferSizeEnt;
-extern hash_table gRefToFifo;
-extern hash_table gRefToFifoOff;
-extern hash_table gRefToHREFifo;
-extern hash_table gLoopToToggleEnt;
-extern hash_table gEntToHREFifo;
-extern hash_table gIndToNum;
-extern hash_table gRefToInd;
-extern hash_table gRefToToggle;
-extern hash_table gToggleToInc;
+#include "phrase.h"
 
 // This hash_table is used to store the fifo
 // used at a given point of the algorithm
@@ -235,24 +209,6 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
     }
 
   return success;
-}
-
-
-/*
-This function creates a new entity and stores its declaration
-in the module statement declaration list
- */
-entity make_new_C_scalar_variable_with_prefix(string prefix,
-					      entity module,
-					      statement stat,
-					      basic b)
-{
-  entity retEnt = 
-    make_new_scalar_variable_with_prefix(prefix,
-					 module,
-					 b);
-  AddLocalEntityToDeclarations(retEnt,module,stat);
-  return retEnt;
 }
 
 /*
@@ -1355,10 +1311,8 @@ statement comEngine_generate_procCode(statement externalized_code,
   gOldRefToHREFifo = gRefToHREFifo;
   gRefToHREFifo = hash_table_make(hash_pointer, 0);
   gRealFifo = hash_table_make(hash_pointer, 0);
-  gStepEnt =
-    make_new_C_scalar_variable_with_prefix(strdup("step"),
-					   get_current_module_entity(),
-					   get_current_module_statement(),
+  gStepEnt =comEngine_make_new_scalar_variable
+    (strdup("step"),
 					   make_basic(is_basic_int, (void*)4));
   gGenHRE = FALSE;
 

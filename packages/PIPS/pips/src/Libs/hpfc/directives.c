@@ -35,7 +35,6 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "bootstrap.h"
 #include "control.h"
 
 /* several phases are used to analyze the directives.

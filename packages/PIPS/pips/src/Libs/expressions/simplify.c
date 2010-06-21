@@ -411,7 +411,7 @@ static entity THE_I = entity_undefined;
 static void set_the_i() {
     THE_I = make_new_scalar_variable_with_prefix("IM",get_current_module_entity(), make_basic_complex(DEFAULT_COMPLEX_TYPE_SIZE));
     free_value(entity_initial(THE_I));
-    entity_initial(THE_I)=make_value_expression(MakeComplexConstantExpression(make_float_constant_expression(0),make_float_constant_expression(1)));
+    entity_initial(THE_I)=make_value_expression(MakeComplexConstantExpression(float_to_expression(0),float_to_expression(1)));
     AddEntityToCurrentModule(THE_I);
 }
 

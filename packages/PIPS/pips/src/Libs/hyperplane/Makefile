@@ -27,6 +27,7 @@ LIB_CFILES = 	hyperplane.c  \
 	 	global_parallelization.c  \
 		code_generation.c \
 		tiling.c \
+		symbolic_tiling.c \
 		unimodular.c
 
 INC_TARGET =    $(TARGET).h

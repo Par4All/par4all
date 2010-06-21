@@ -52,10 +52,8 @@
 #include "ri-util.h" 
 #include "effects-util.h" 
 #include "misc.h" 
-#include "control.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
-#include "semantics.h"
 
 #include "conversion.h"
 
@@ -611,7 +609,7 @@ systeme_to_loop_nest(
                         int_to_expression(1));
 
                 current = 
-                    make_stmt_of_instr
+                    instruction_to_statement
                     (make_instruction
                      (is_instruction_loop,
                       make_loop((entity) var,
