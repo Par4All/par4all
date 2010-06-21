@@ -1209,7 +1209,7 @@ string l;
 						      make_execution(is_execution_sequential, 
 								     UU),
 						      NIL));
-	list a = CONS(STATEMENT, make_stmt_of_instr(sido), NIL);
+	list a = CONS(STATEMENT, instruction_to_statement(sido), NIL);
  
 	if(!normalized_linear_p(ni)) {
 	  entity nv = make_new_scalar_variable_with_prefix("INC_",
@@ -1217,7 +1217,7 @@ string l;
 							   make_basic(is_basic_int, (void*) 4));
 	  instruction na = make_assign_instruction(entity_to_expression(nv),range_increment(r));
 	  range_increment(r) = entity_to_expression(nv);
-	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	  a = CONS(STATEMENT, instruction_to_statement(na), a);
 	}
  
 	if(!normalized_linear_p(nu)) {
@@ -1226,7 +1226,7 @@ string l;
 							   make_basic(is_basic_int, (void*) 4));
 	  instruction na = make_assign_instruction(entity_to_expression(nv),range_upper(r));
 	  range_upper(r) = entity_to_expression(nv);
-	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	  a = CONS(STATEMENT, instruction_to_statement(na), a);
 	}
 
 	if(!normalized_linear_p(nl)) {
@@ -1235,7 +1235,7 @@ string l;
 							   make_basic(is_basic_int, (void*) 4));
 	  instruction na = make_assign_instruction(entity_to_expression(nv),range_lower(r));
 	  range_lower(r) = entity_to_expression(nv);
-	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	  a = CONS(STATEMENT, instruction_to_statement(na), a);
 	}
 	ido = make_instruction_block(a);
       }

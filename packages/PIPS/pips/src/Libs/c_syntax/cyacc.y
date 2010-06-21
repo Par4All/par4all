@@ -65,9 +65,6 @@
 #include "ri-util.h"
 #include "text-util.h"
 #include "misc.h"
-#include "transformations.h" // FI: should not be referenced
-#include "alias_private.h" // FI: should not be referenced
-#include "instrumentation.h" // FI: Wow! Just for int_to_string() which is also defined in prettyprint?
 
 #include "c_parser_private.h"
 

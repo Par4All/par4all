@@ -41,7 +41,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "conversion.h"
 
 
 static char *noms_var(i)

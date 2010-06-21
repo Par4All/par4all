@@ -134,3 +134,10 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
    if (push_debug_status(), \
        setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__, \
       	                    __FILE__, __LINE__, pop_debug_status)))
+
+/* SG moved there from transformation.h */
+#define SIGN_EQ(a,b) ((((a)>0 && (b)>0) || ((a)<0 && (b)<0)) ? TRUE : FALSE)
+#define FORTRAN_DIV(n,d) (SIGN_EQ((n),(d)) ? ABS(n)/ABS(d) : -(ABS(n)/ABS(d)))
+#define C_DIVISION(n,d) ((n)/(d))
+#define FORTRAN_MOD(n,m) (SIGN_EQ((n),(m)) ? ABS(n)%ABS(m) : -(ABS(n)%ABS(m)))
+#define C_MODULO(n,m) ((n)%(m))

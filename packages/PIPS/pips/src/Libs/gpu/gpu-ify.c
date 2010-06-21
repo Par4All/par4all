@@ -24,7 +24,6 @@
 #include "accel-util.h"
 #include "resources.h"
 #include "properties.h"
-#include "bootstrap.h"
 #include "preprocessor.h"
 
 /** Store the loop nests found that meet the spec to be executed on a

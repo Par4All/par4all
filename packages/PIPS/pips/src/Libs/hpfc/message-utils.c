@@ -689,7 +689,7 @@ list lr;
     expression guard;
 
     return((make_guard_expression(proc, lr, &guard))?
-	   (make_stmt_of_instr
+	   (instruction_to_statement
 	    (make_instruction(is_instruction_test,
 			      make_test(guard,
 					stat,

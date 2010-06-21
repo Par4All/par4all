@@ -218,7 +218,15 @@ statement rice_loop(statement stat,
   pips_assert("block or loop",
 	      instruction_block_p(statement_instruction(nstat)) ||
 	      instruction_loop_p(statement_instruction(nstat))) ;
-  statement_label(nstat) = entity_empty_label();
+  /* try to keep label */
+  if(statement_loop_p(nstat)) statement_label(nstat)=statement_label(stat);
+  else {
+      FOREACH(STATEMENT,s,statement_block(nstat))
+          if(statement_loop_p(s)) {
+              statement_label(s)=statement_label(stat) ;
+              break ;
+          }
+  }
   statement_number(nstat) =
     (statement_block_p(nstat)? STATEMENT_NUMBER_UNDEFINED :
      statement_number(stat));

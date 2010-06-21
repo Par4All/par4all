@@ -30,7 +30,6 @@
 #include "defines-local.h"
 
 #include "control.h"
-#include "transformer.h"
 #include "semantics.h"
 #include "conversion.h"
 #include "effects-generic.h"

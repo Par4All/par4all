@@ -34,12 +34,11 @@
 #include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "transformations.h"
 
-#include "c_syntax.h"
 #include "cyacc.h"
 
 #include "c_parser_private.h"
+#include "c_syntax.h"
 
 #include "resources.h"
 #include "database.h"

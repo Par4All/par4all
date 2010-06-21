@@ -49,7 +49,6 @@ HRE.
 #include "prettyprint.h"
 
 #include "dg.h"
-#include "transformations.h"
 #include "transformer.h"
 
 typedef dg_arc_label arc_label;
@@ -61,7 +60,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
 
@@ -73,20 +71,11 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
+#include "phrase.h"
 
 static bool check_distribution_feasability(statement stat);
 
 static bool check_for_conflict(reference ref);
-
-// See the file comEngine_distribute.c to know
-// what this hash_table's mean
-extern hash_table gLoopToRef;
-extern hash_table gStatToRef;
-extern hash_table gRefToEff;
-extern hash_table gLoopToSync;
-extern hash_table gRefToFifo;
-extern hash_table gRefToFifoOff;
-extern hash_table gRefToHREFifo;
 
 // This variable holds the number of
 // if we have entered at a given point of

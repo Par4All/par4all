@@ -13,11 +13,6 @@ License.
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-// for :  string text_to_string(text t)...
-#include "icfg.h"
-#include "graph.h"
-#include "ricedg.h"
-
 
 /*############################################################################################*/
 

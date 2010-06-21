@@ -72,7 +72,6 @@ typedef dg_vertex_label vertex_label;
 #include "transformer.h"
 #include "semantics.h"
 #include "control.h"
-#include "transformations.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -81,10 +80,8 @@ typedef dg_vertex_label vertex_label;
 
 #include "expressions-local.h"
 #include "expressions.h"
-#include "callgraph.h"
 
 #include "ricedg.h"
-#include "sac.h"
 
 /* structure to hold a substitution to be performed forward.
  */

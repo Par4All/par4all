@@ -82,7 +82,7 @@ static statement build_mpi_before_master(entity directive_module,entity mpi_modu
 static statement build_mpi_master(entity mpi_module, statement work)
 {
   // if (STEP_RANK.EQ.0) ...
-  statement if_stmt = make_stmt_of_instr(make_instruction_test(make_test(MakeBinaryCall(gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME, ".EQ."), entity_domain),step_local_rank(mpi_module), int_expr(0)), work, make_block_statement(NIL))));
+  statement if_stmt = instruction_to_statement(make_instruction_test(make_test(MakeBinaryCall(gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME, ".EQ."), entity_domain),step_local_rank(mpi_module), int_expr(0)), work, make_block_statement(NIL))));
   return make_block_statement(CONS(STATEMENT,if_stmt,NIL));
 }
 

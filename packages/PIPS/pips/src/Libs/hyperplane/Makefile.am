@@ -9,6 +9,7 @@ libhyperplane_la_SOURCES= 	hyperplane.c  \
 	 	global_parallelization.c  \
 		code_generation.c \
 		tiling.c \
+		symbolic_tiling.c \
 		unimodular.c
 
 

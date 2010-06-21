@@ -72,7 +72,6 @@
 #include "sparse_sc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "conversion.h"
 
 #include "transformations.h"

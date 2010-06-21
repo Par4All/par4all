@@ -41,9 +41,8 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "parser_private.h"
-
 #include "c_syntax.h"
-#include "syntax.h"
+
 
 #include "resources.h"
 #include "database.h"
@@ -53,7 +52,6 @@
 #include "text-util.h"
 #include "properties.h"
 #include "alias_private.h"
-#include "instrumentation.h"
 
 extern statement ModuleStatement;
 

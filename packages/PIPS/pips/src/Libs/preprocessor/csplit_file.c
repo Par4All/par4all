@@ -37,6 +37,7 @@
 #include "misc.h"
 
 /* To import FILE_SEP_STRING... */
+#include "constants.h"
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
