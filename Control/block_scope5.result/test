@@ -1,0 +1,85 @@
+// BEGIN BLOCK
+{{
+   /* Jump into a block from a goto before the block */
+   extern void block_scope();                                           /*0002*/
+}}
+// END BLOCK
+
+void block_scope()
+{
+   // BEGIN BLOCK
+{{
+   int x = 6;                                                           /*0004*/
+   goto lab1;                                                           /*0005*/
+lab2:   x = 2;                                                               /*0007*/
+   {
+      // BEGIN BLOCK
+   {{
+      int x = 7;                                                        /*0009*/
+lab1:      x--;
+   }}
+      // END BLOCK
+   }
+   x++;                                                                 /*0013*/
+   goto lab2;                                                           /*0014*/
+}}
+   // END BLOCK
+}
+
+Controlizer output
+
+void block_scope()
+{
+// (0,1)
+   // BEGIN BLOCK
+{{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+   // BEGIN BLOCK
+{{
+// (1,2)
+lab1:   x_--;
+// (1,3)
+   x++;                                                                 /*0013*/
+// (1,4)
+lab2:   x = 2;                                                               /*0007*/
+// (1,5)
+   int x = 7;                                                           /*0009*/
+}}
+   // END BLOCK
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+   // END BLOCK
+}
+void block_scope()
+{
+// (0,1)
+   // BEGIN BLOCK
+{{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+   // BEGIN BLOCK
+{{
+// (1,2)
+lab1:   x_--;
+// (1,3)
+   x++;                                                                 /*0013*/
+// (1,4)
+lab2:   x = 2;                                                               /*0007*/
+// (1,5)
+   int x = 7;                                                           /*0009*/
+}}
+   // END BLOCK
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+   // END BLOCK
+}
+

@@ -1,0 +1,30 @@
+setenv WKS=block_scope7
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_ALL_LABELS TRUE
+setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[block_scope]
+
+apply RESTRUCTURE_CONTROL[block_scope]
+display PRINTED_FILE[block_scope]
+
+close
+
+#delete $WKS
+
+

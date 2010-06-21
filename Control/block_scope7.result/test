@@ -1,0 +1,38 @@
+
+Controlizer output
+
+void block_scope()
+{
+{{
+   {
+   {{
+      int x;
+      x = 0;
+   }}
+   }
+   {
+   {{
+      int x;
+      x = 1;
+   }}
+   }
+}}
+}
+void block_scope()
+{
+{{
+   {
+   {{
+      int x;
+      x = 0;
+   }}
+   }
+   {
+   {{
+      int x;
+      x = 1;
+   }}
+   }
+}}
+}
+

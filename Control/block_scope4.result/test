@@ -1,0 +1,79 @@
+// BEGIN BLOCK
+{{
+   /* Jump into a block from a goto after the block */
+   extern void block_scope();                                           /*0002*/
+}}
+// END BLOCK
+
+void block_scope()
+{
+   // BEGIN BLOCK
+{{
+   int x = 6;                                                           /*0004*/
+   {
+      // BEGIN BLOCK
+   {{
+      int x;                                                            /*0006*/
+lab1:      x--;                                                              /*0008*/
+   }}
+      // END BLOCK
+   }
+   x++;                                                                 /*0010*/
+   goto lab1;                                                           /*0011*/
+}}
+   // END BLOCK
+}
+
+Controlizer output
+
+void block_scope()
+{
+// (0,1)
+   // BEGIN BLOCK
+{{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+   int x;                                                               /*0006*/
+// (0,4)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+   // BEGIN BLOCK
+{{
+// (1,2)
+lab1:   x_--;                                                                /*0008*/
+// (1,3)
+   x++;                                                                 /*0010*/
+}}
+   // END BLOCK
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+   // END BLOCK
+}
+void block_scope()
+{
+// (0,1)
+   // BEGIN BLOCK
+{{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+   int x;                                                               /*0006*/
+// (0,4)
+//:   BEGIN UNSTRUCTURED
+// (1,1)
+   // BEGIN BLOCK
+{{
+// (1,2)
+lab1:   x_--;                                                                /*0008*/
+// (1,3)
+   x++;                                                                 /*0010*/
+}}
+   // END BLOCK
+   goto lab1;
+//:   END UNSTRUCTURED
+}}
+   // END BLOCK
+}
+

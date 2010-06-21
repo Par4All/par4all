@@ -62,22 +62,22 @@ void decl41(int size)
 
 // if the switch is removed, the loop index declarations reappears
    if ((0==0)) goto l99999;
+// (12,1)
+
+// (11,1)
+
 // (10,1)
+   // BEGIN BLOCK
+// (10,2)
 
-// (9,1)
+// (10,3)
 
+   // END BLOCK
 // (8,1)
    // BEGIN BLOCK
 // (8,2)
-
-// (8,3)
-
-   // END BLOCK
-// (6,1)
-   // BEGIN BLOCK
-// (6,2)
 break_2:   ;
-// (6,3)
+// (8,3)
    x = 0;                                                               /*0014*/
    // END BLOCK
    goto l99998;
@@ -85,17 +85,14 @@ l99999:   ;
 // (4,1)
 
 // (5,1)
-   // BEGIN BLOCK
-// (5,2)
 
-// (5,3)
+// (6,1)
 switch_2_case_0:   ;
-// (5,4)
+// (7,1)
    x = 1;                                                               /*0011*/
-   // END BLOCK
    goto break_2;
 l99998:   ;
-// (7,1)
+// (9,1)
 
    // END BLOCK
 }
