@@ -1,5 +1,5 @@
 raw file with loop flagged and privated variables scanned
-int elligent(long le, short ie)
+int elligent(long int le, short ie)
 {
    short eil;
 l99999:
@@ -8,7 +8,7 @@ l99999:
    return eil;
 }
 after loop expansion
-int elligent(long le, short ie)
+int elligent(long int le, short ie)
 {
    short eil;
 l99999:

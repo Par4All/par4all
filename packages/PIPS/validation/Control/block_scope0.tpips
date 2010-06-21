@@ -1,0 +1,50 @@
+setenv WKS=block_scope0
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_ALL_LABELS TRUE
+setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#display SYMBOL_TABLE_FILE[$WKS!]
+#display SYMBOL_TABLE_FILE[block_scope]
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[$WKS!]
+echo
+display PARSED_PRINTED_FILE[block_scope]
+
+echo
+echo Controlizer output
+echo
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+#setenv CONTROL_DEBUG_LEVEL=8
+display PRINTED_FILE[block_scope]
+
+apply RESTRUCTURE_CONTROL[block_scope]
+display PRINTED_FILE[block_scope]
+
+close
+
+#delete $WKS
+
+

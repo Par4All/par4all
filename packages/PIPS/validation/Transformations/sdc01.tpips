@@ -1,0 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "sdc01"
+delete $WS
+create $WS $WS.c
+module main
+
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+close
+delete $WS
+

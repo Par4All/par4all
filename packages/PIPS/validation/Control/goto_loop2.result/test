@@ -1,12 +1,11 @@
 int main()
 {
    int i = 5;
-   printf("Begin\n");
    
    /* The a label */
-a:   printf("a\n");
+a:   i++;
    /* The b label */
-b:   printf("b\n");
+b:   i--;
    /* Oh, go to a... */
    ;
    goto a;
@@ -23,18 +22,14 @@ int main()
 
 //  P(i) {i==5}
 
-   printf("Begin\n");
-
-//  P(i) {i==5}
-
    
    /* The a label */
-a:   printf("a\n");
+a:   i++;
 
-//  P(i) {i==5}
+//  P(i) {i==6}
 
    /* The b label */
-b:   printf("b\n");
+b:   i--;
 
 //  P(i) {i==5}
 
@@ -54,18 +49,14 @@ int main()
 
 //  P(i) {i==5}
 
-   printf("Begin\n");
-
-//  P(i) {i==5}
-
    
    /* The a label */
-a:   printf("a\n");
+a:   i++;
 
-//  P(i) {i==5}
+//  P(i) {i==6}
 
    /* The b label */
-b:   printf("b\n");
+b:   i--;
 
 //  P(i) {i==5}
 

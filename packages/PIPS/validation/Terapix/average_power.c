@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
                     in[i][j][k].im=i*j+k;
                 }
         average_power(th,rg,v,in,pow);
-        /* only print with bad precision for valdiation */
+        /* only print with bad precision for validation */
         for(i=0;i<th;i++)
             printf("-%d-%d-", ((int)pow[i].re)/10, ((int)pow[i].im))/10;
     }
