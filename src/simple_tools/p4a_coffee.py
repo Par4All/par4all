@@ -95,6 +95,22 @@ def main(options = {}, args = []):
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
 
+            done('''All done. Here is your cup of coffee:
+
+         (    (     (     (
+          )    )     )     )
+        _(____(_____(_____(___
+        |                     |
+        |                     |______
+        |                      ___   |
+        |                     |   |  |
+        |    P a r 4 A l l    |___|  |
+        |                     ______/
+        |                     |
+         \___________________/
+
+''')
+
     except:
         #~ if not options.work_dir:
         if work_dir:
