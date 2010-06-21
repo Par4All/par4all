@@ -290,27 +290,34 @@ def is_system_dir(dir):
             return True
     return False
 
-def rmtree(dir, can_fail = 0, remove_top = True):
+def rmtree(dir, can_fail = False, remove_top = True):
     '''Removes a directory recursively, alternative to shutil.rmtree()'''
+    if not dir:
+        if can_fail:
+            return
+        raise p4a_error("Invalid arguments")
     dir = os.path.realpath(os.path.abspath(os.path.expanduser(dir)))
-    if not dir or not os.path.isdir(dir):
-        raise p4a_error("Not a directory: " + dir)
+    if not os.path.isdir(dir):
+        if can_fail:
+            return
+        raise p4a_error("Directory does not exist: " + dir)
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
     debug("Removing tree: " + dir)
-    try:
-        for root, dirs, files in os.walk(dir, topdown = False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        if remove_top:
-            os.rmdir(dir)
-    except:
-        if can_fail:
-            warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
-        else:
-            raise
+    run([ "rm", "-rf", dir ], can_fail = can_fail)
+    #~ try:
+        #~ for root, dirs, files in os.walk(dir, topdown = False):
+            #~ for name in files:
+                #~ os.remove(os.path.join(root, name))
+            #~ for name in dirs:
+                #~ os.rmdir(os.path.join(root, name))
+        #~ if remove_top:
+            #~ os.rmdir(dir)
+    #~ except:
+        #~ if can_fail:
+            #~ warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
+        #~ else:
+            #~ raise
 
 def find(file_re, dir = None, abs_path = True, match_files = True, 
     match_dirs = False, match_whole_path = False, can_fail = True):
