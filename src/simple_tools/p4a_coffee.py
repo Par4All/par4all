@@ -44,7 +44,7 @@ def main(options = {}, args = []):
     #~ if options.work_dir:
         #~ work_dir = os.path.abspath(os.path.expanduser(options.work_dir))
     #~ else:
-    work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
+    work_dir = ""
 
     #~ if not os.path.isdir(work_dir):
     #~ os.makedirs(work_dir)
@@ -62,6 +62,7 @@ def main(options = {}, args = []):
             p4a_pack.main(pack_options)
         
         else:
+            work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
             os.chdir(work_dir)
 
             work_dir_p4a = os.path.join(work_dir, "p4a")
@@ -93,11 +94,13 @@ def main(options = {}, args = []):
 
     except:
         #~ if not options.work_dir:
-        warn("Work directory was " + work_dir + " (not removed)")
+        if work_dir:
+            warn("Work directory was " + work_dir + " (not removed)")
         raise
 
     #~ if not options.work_dir:
-    rmtree(work_dir)
+    if work_dir:
+        rmtree(work_dir)
 
 
 # Some Emacs stuff:
