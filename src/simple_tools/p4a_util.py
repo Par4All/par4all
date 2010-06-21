@@ -204,8 +204,9 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
             os.chdir(old_cwd)
     except:
         if not can_fail:
+            debug("Environment was: " + repr(os.environ))
             raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
-                + str(sys.exc_info()[1]) + " (env = " + repr(os.environ) + ")")
+                + str(sys.exc_info()[1]))
     if spin is not None:
         spin.stop()
     for e in prev_env:
@@ -215,8 +216,12 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
             else:
                 del os.environ[e]
     if ret != 0 and not can_fail:
+        if err:
+            error("Error output from program follows:")
+            sys.stderr.write(err)
+        debug("Environment was: " + repr(os.environ))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret) + " (env = " + repr(os.environ) + ")")
+            + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False, extra_env = {}):
@@ -250,8 +255,9 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
                 stdout = redir, stderr = redir, cwd = working_dir, env = env)
     except:
         if not can_fail:
+            debug("Environment was: " + repr(env))
             raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
-                + str(sys.exc_info()[1]) + " (env = " + repr(env) + ")")
+                + str(sys.exc_info()[1]))
     out = ""
     err = ""
     while True:
@@ -266,9 +272,11 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         spin.stop()
     if ret != 0 and not can_fail:
         if err:
-            error(err)
+            error("Error output from program follows:")
+            sys.stderr.write(err)
+        debug("Environment was: " + repr(env))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret) + " (env = " + repr(env) + ")")
+            + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 # Not portable!
@@ -303,7 +311,7 @@ def rmtree(dir, can_fail = False, remove_top = True):
         raise p4a_error("Directory does not exist: " + dir)
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
-    debug("Removing tree: " + dir)
+    #~ debug("Removing tree: " + dir)
     run([ "rm", "-rf", dir ], can_fail = can_fail)
     #~ try:
         #~ for root, dirs, files in os.walk(dir, topdown = False):
