@@ -12,7 +12,7 @@ Par4All Builder Class
 import sys, os, re, shutil, time
 from p4a_util import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 def make_safe_intermediate_file_path(input_file, build_dir, change_ext = None):
@@ -56,13 +56,13 @@ def get_cuda_sdk_dir():
                 + "). Please set the CUDA_SDK_DIR environment variable correctly")
     return cuda_sdk_dir
 
-def get_cuda_cppflags():
+def get_cuda_cpp_flags():
     return [
         "-I" + os.path.join(get_cuda_dir(), "include"),
         "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
     ]
 
-def get_cuda_ldflags(m64 = True, cutil = True, cublas = False, cufft = False):
+def get_cuda_ld_flags(m64 = True, cutil = True, cublas = False, cufft = False):
     cuda_dir = get_cuda_dir()
     cuda_sdk_dir = get_cuda_sdk_dir()
     lib_arch_suffix = ""
@@ -84,12 +84,12 @@ def get_cuda_ldflags(m64 = True, cutil = True, cublas = False, cufft = False):
     return flags
 
 class p4a_builder():
-    cppflags = []
-    cflags = []
-    cxxflags = []
-    ldflags = []
-    nvccflags = []
-    fortranflags = []
+    cpp_flags = []
+    c_flags = []
+    cxx_flags = []
+    ld_flags = []
+    nvcc_flags = []
+    fortran_flags = []
     
     cpp = None
     cc = None
@@ -106,16 +106,16 @@ class p4a_builder():
     def cudafy_flags(self):
         if self.cudafied:
             return
-        self.cppflags += get_cuda_cppflags()
-        self.ldflags += get_cuda_ldflags(self.m64)
+        self.cpp_flags += get_cuda_cpp_flags()
+        self.ld_flags += get_cuda_ld_flags(self.m64)
         
-        self.cppflags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+        self.cpp_flags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
         self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
 
         self.cudafied = True
     
     def __init__(self,
-        cppflags = [], cflags = [], cxxflags = [], ldflags = [], nvccflags = [], fortranflags = [],
+        cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [], nvcc_flags = [], fortran_flags = [],
         cpp = None, cc = None, cxx = None, ld = None, ar = None, nvcc = None, fortran = None,
         arch = None,
         openmp = False, accel_openmp = False, icc = False, cuda = False,
@@ -147,28 +147,28 @@ class p4a_builder():
         
         if add_optimization_flags:
             if icc:
-                cflags += [ "-fast" ]
+                c_flags += [ "-fast" ]
             else:
-                cflags += [ "-O2" ]
+                c_flags += [ "-O2" ]
         
         if openmp:
             if icc:
-                cflags += [ "-openmp" ]
-                ldflags += [ "-openmp" ]
+                c_flags += [ "-openmp" ]
+                ld_flags += [ "-openmp" ]
             else:
-                cflags += [ "-fopenmp" ]
-                ldflags += [ "-fopenmp" ]
+                c_flags += [ "-fopenmp" ]
+                ld_flags += [ "-fopenmp" ]
             
             if accel_openmp:
-                cppflags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+                cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
         
         if add_debug_flags:
-            cppflags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
-            cflags = [ "-g" ] + cflags
+            cpp_flags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
+            c_flags = [ "-g" ] + c_flags
         
         if not no_default_flags:
-            cflags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + cflags
+            c_flags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + c_flags
         
         m64 = False
         machine_arch = get_machine_arch()
@@ -177,22 +177,22 @@ class p4a_builder():
                 m64 = True
         else:
             if arch == 32 or arch == "32" or arch == "i386":
-                cflags += [ "-m32" ]
+                c_flags += [ "-m32" ]
             elif arch == 64 or arch == "64" or arch == "x86_64" or arch == "amd64":
-                cflags += [ "-m64" ]
+                c_flags += [ "-m64" ]
                 m64 = True
             else:
                 raise p4a_error("Unsupported architecture: " + arch)
         
-        if cflags and len(cxxflags) == 0:
-            cxxflags = cflags
+        if c_flags and len(cxx_flags) == 0:
+            cxx_flags = c_flags
         
-        self.cppflags = cppflags
-        self.cflags = cflags
-        self.cxxflags = cxxflags
-        self.ldflags = ldflags
-        self.nvccflags = nvccflags
-        self.fortranflags = fortranflags
+        self.cpp_flags = cpp_flags
+        self.c_flags = c_flags
+        self.cxx_flags = cxx_flags
+        self.ld_flags = ld_flags
+        self.nvcc_flags = nvcc_flags
+        self.fortran_flags = fortran_flags
         
         self.cpp = cpp
         self.cc = cc
@@ -207,18 +207,18 @@ class p4a_builder():
             self.cudafy_flags()
 
     def cu2cpp(self, file, output_file):
-        run2([ self.nvcc, "--cuda" ] + self.cppflags + self.nvccflags + [ "-o", output_file, file ],
+        run2([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file ],
             #extra_env = dict(CPP = self.cpp) # Necessary?
         )
 
     def c2o(self, file, output_file):
-        run2([ self.cc, "-c" ] + self.cppflags + self.cflags + [ "-o", output_file, file ])
+        run2([ self.cc, "-c" ] + self.cpp_flags + self.c_flags + [ "-o", output_file, file ])
     
     def cpp2o(self, file, output_file):
-        run2([ self.cxx, "-c" ] + self.cppflags + self.cxxflags + [ "-o", output_file, file ])
+        run2([ self.cxx, "-c" ] + self.cpp_flags + self.cxx_flags + [ "-o", output_file, file ])
 
     def f2o(self, file, output_file):
-        run2([ self.fortran, "-c" ] + self.cppflags + self.fortranflags + [ "-o", output_file, file ])
+        run2([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
         
@@ -273,15 +273,15 @@ class p4a_builder():
         for output_file in output_files:
             #output_file = os.path.abspath(os.path.expanduser(output_file))
             
-            more_ldflags = []
+            more_ld_flags = []
             
             # Prepare for creating the final binary.
             if lib_file_p(output_file):
                 if has_cuda:
                     raise p4a_error("Cannot build a static library when using CUDA")
-                more_ldflags += [ "-static" ]
+                more_ld_flags += [ "-static" ]
             elif sharedlib_file_p(output_file):
-                more_ldflags += [ "-shared" ]
+                more_ld_flags += [ "-shared" ]
             elif exe_file_p(output_file):
                 pass
             else:
@@ -294,7 +294,7 @@ class p4a_builder():
                 final_command = self.cxx
             
             # Create the final binary.
-            run2([ final_command ] + self.ldflags + more_ldflags + [ "-o", output_file ] + second_pass_files + extra_obj,
+            run2([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", output_file ] + second_pass_files + extra_obj,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
             
@@ -365,19 +365,19 @@ class p4a_builder():
             ar = self.ar,
             nvcc = self.nvcc,
             fortran = self.fortran,
-            cppflags_all = " ".join(self.cppflags),
-            cppflags = " ".join([elem for elem in self.cppflags if not elem.startswith("-I")]),
-            cflags = " ".join(self.cflags),
-            cxxflags = " ".join(self.cxxflags),
-            ldflags_all = " ".join(self.ldflags),
-            ldflags = " ".join([elem for elem in self.ldflags if not (elem.startswith("-L") or elem.startswith("-l") or elem.startswith("-Bdynamic") or elem.startswith("-Bstatic"))]),
-            nvccflags = " ".join(self.nvccflags),
-            fortranflags = " ".join(self.fortranflags),
+            cpp_flags_all = " ".join(self.cpp_flags),
+            cpp_flags = " ".join([elem for elem in self.cpp_flags if not elem.startswith("-I")]),
+            c_flags = " ".join(self.c_flags),
+            cxx_flags = " ".join(self.cxx_flags),
+            ld_flags_all = " ".join(self.ld_flags),
+            ld_flags = " ".join([elem for elem in self.ld_flags if not (elem.startswith("-L") or elem.startswith("-l") or elem.startswith("-Bdynamic") or elem.startswith("-Bstatic"))]),
+            nvcc_flags = " ".join(self.nvcc_flags),
+            fortran_flags = " ".join(self.fortran_flags),
             header_files = "\n    ".join(header_files),
             source_files = "\n    ".join(source_files),
-            include_dirs = " ".join([elem[2:].strip() for elem in self.cppflags if elem.startswith("-I")]),
-            lib_dirs = " ".join([elem[2:].strip() for elem in self.ldflags if elem.startswith("-L")]),
-            libs = " ".join([elem[2:].strip() for elem in self.ldflags if elem.startswith("-l")]),
+            include_dirs = " ".join([elem[2:].strip() for elem in self.cpp_flags if elem.startswith("-I")]),
+            lib_dirs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-L")]),
+            libs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-l")]),
         )
         
         cmakelists = string.Template("""# Generated on $time by $script
@@ -394,9 +394,9 @@ set(CMAKE_C_COMPILER $cc)
 set(CMAKE_CXX_COMPILER $cxx)
 set(CMAKE_LINKER $ld)
 set(CMAKE_AR $ar)
-set(CMAKE_C_FLAGS "$cflags")
-set(CMAKE_CXX_FLAGS "$cxxflags")
-set(CMAKE_LINKER_FLAGS "$ldflags")
+set(CMAKE_C_FLAGS "$c_flags")
+set(CMAKE_CXX_FLAGS "$cxx_flags")
+set(CMAKE_LINKER_FLAGS "$ld_flags")
 
 set(${project}_HEADER_FILES
     $header_files
@@ -426,7 +426,7 @@ link_directories($lib_dirs)
                     #subs["cuda_target"] = os.path.split(change_file_ext(cuda_files[i], ""))[1]
                     subs["cuda_in"] = cuda_files[i]
                     subs["cuda_out"] = cuda_output_files[i]
-                    cmakelists += string.Template("add_custom_command(OUTPUT $cuda_out COMMAND ${nvcc} --cuda ${cppflags_all} ${nvccflags} -o $cuda_out $cuda_in)\n").substitute(subs)
+                    cmakelists += string.Template("add_custom_command(OUTPUT $cuda_out COMMAND ${nvcc} --cuda ${cpp_flags_all} ${nvcc_flags} -o $cuda_out $cuda_in)\n").substitute(subs)
                     #cmakelists += string.Template("add_dependencies($output_filename $cuda_target)\n").substitute(subs)
             if exe_file_p(output_filename):
                 cmakelists += string.Template("""
@@ -456,7 +456,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         done("Generated " + cmakelists_file)
         dump(cmakelists_file, cmakelists)
 
-    def cmake_gen(self, dir = None, gen_dir = None, cmakeflags = [], build = False):
+    def cmake_gen(self, dir = None, gen_dir = None, cmake_flags = [], build = False):
          # Determine the directory where the CMakeLists.txt file should be found.
         if dir:
             dir = os.path.abspath(dir)
@@ -474,7 +474,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         if not os.path.isdir(gen_dir):
             os.makedirs(gen_dir)
         
-        run2([ "cmake", "." ] + cmakeflags, working_dir = dir)
+        run2([ "cmake", "." ] + cmake_flags, working_dir = dir)
         if build:
             makeflags = []
             if get_verbosity() >= 2:

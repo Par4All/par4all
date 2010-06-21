@@ -12,8 +12,10 @@ Git Repositories Manipulation Class
 import sys, os, string
 from p4a_util import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
+
+actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
+
 
 class p4a_git():
     '''Git Repositories Manipulation Class'''
@@ -29,7 +31,7 @@ class p4a_git():
         #debug("is_valid_git_dir("+ dir +") = " + str(result))
         return result
     
-    def __init__(self, any_file_inside_target_repos, git_ext = ".git"):
+    def __init__(self, any_file_inside_target_repos = os.getcwd(), git_ext = ".git"):
         '''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
         self._git_ext = git_ext
         git_dir = os.path.abspath(os.path.realpath(os.path.expanduser(any_file_inside_target_repos)))
@@ -135,9 +137,11 @@ class p4a_git():
         '''Returns the absolute path for the working tree directory.'''
         return self._dir
 
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")
+
 
 # Some Emacs stuff:
 ### Local Variables:

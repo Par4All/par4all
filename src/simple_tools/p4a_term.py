@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 '''
 Set ANSI Terminal Color and Attributes.
 Originally found on http://code.activestate.com/recipes/574451.
 '''
-
 
 import os
 
