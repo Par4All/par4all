@@ -6,7 +6,7 @@
 #
 
 '''
-Par4All packing script: allows you to create .deb or .tar.gz packages of Par4all.
+Clone the Par4All public Git repository, build it, package it, and optionally publish it.
 '''
 
 import string, sys, os, re, optparse, tempfile, shutil, time
@@ -15,15 +15,15 @@ from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
 
-import p4a_pack
+import p4a_coffee
 
 
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz|-stgz> [--version=0.1] [--append-date] [--dir=/current/install/dir] [--prefix=/final/install/dir] [--publish] [other options] [optional additional files to publish]")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]")
 
-    p4a_pack.add_module_options(parser)
+    p4a_coffee.add_module_options(parser)
 
     main_group = optparse.OptionGroup(parser, "General Options")
 
@@ -49,7 +49,7 @@ def main():
         print(guess_file_revision(__file__))
         return
 
-    p4a_pack.main(options, args)
+    p4a_coffee.main(options, args)
 
 
 if __name__ == "__main__":

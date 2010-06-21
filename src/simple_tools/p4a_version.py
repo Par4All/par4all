@@ -5,16 +5,13 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
 
-
 '''
 This module guesses the version of a given file or the current Par4All version.
 '''
 
-
 import sys, os, string
 from p4a_util import *
 from p4a_git import *
-
 
 actual_script = change_file_ext(os.path.abspath(os.path.realpath(os.path.expanduser(__file__))), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]

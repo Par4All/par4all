@@ -29,7 +29,7 @@ class p4a_git():
         #debug("is_valid_git_dir("+ dir +") = " + str(result))
         return result
     
-    def __init__(self, any_file_inside_target_repos, git_ext = ".git"):
+    def __init__(self, any_file_inside_target_repos = os.getcwd(), git_ext = ".git"):
         '''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
         self._git_ext = git_ext
         git_dir = os.path.abspath(os.path.realpath(os.path.expanduser(any_file_inside_target_repos)))

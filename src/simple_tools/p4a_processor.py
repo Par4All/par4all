@@ -12,7 +12,6 @@ Par4All Processing Class
 
 import sys, os, re, shutil
 from p4a_util import *
-import pyps
 
 class p4a_processor():
     """Process program files with PIPS and other tools"""
@@ -93,6 +92,12 @@ class p4a_processor():
 
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
+        
+            pyps = None
+            try:
+                pyps = __import__("pyps")
+            except:
+                raise
 
             # Create the PyPS workspace.
             self.workspace = pyps.workspace(self.files,
