@@ -12,7 +12,6 @@ Par4All Processing Class
 
 import sys, os, re, shutil
 from p4a_util import *
-import pyps
 
 class p4a_processor():
     """Process program files with PIPS and other tools"""
@@ -33,7 +32,7 @@ class p4a_processor():
     files = []
     accel_files = []
 
-    def __init__(self, workspace = None, project_name = "", cppflags = "",
+    def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_include = None,
                  filter_exclude = None, accel = False, cuda = False,
                  recover_includes = True):
@@ -47,8 +46,8 @@ class p4a_processor():
         else:
             # This is because pyps.workspace.__init__ will test for empty
             # strings
-            if cppflags is None:
-                cppflags = ""
+            if cpp_flags is None:
+                cpp_flags = ""
             
             if not project_name:
                 raise p4a_error("Missing project_name")
@@ -93,13 +92,19 @@ class p4a_processor():
 
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
+        
+            pyps = None
+            try:
+                pyps = __import__("pyps")
+            except:
+                raise
 
             # Create the PyPS workspace.
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
                                             activates = [],
                                             verboseon = verbose,
-                                            cppflags = cppflags)
+                                            cpp_flags = cpp_flags)
             self.workspace.set_property(
                 # Useless to go on if something goes wrong... :-(
                 ABORT_ON_USER_ERROR = True,

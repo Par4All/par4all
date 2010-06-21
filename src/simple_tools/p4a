@@ -17,11 +17,67 @@ from p4a_builder import *
 from p4a_git import *
 from p4a_version import *
 
+import p4a
+
+
 def main():
     '''The function called when this program is executed by its own'''
 
     parser = optparse.OptionParser(description = __doc__,
-                                   usage = "%prog [options] [<files>]")
+                                   usage = "%prog [options] [files]")
+
+    main_group = optparse.OptionGroup(parser, "General Options")
+
+    main_group.add_option("--project-name", "--project", "-p",
+                          metavar = "NAME", default = None,
+                          help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used.")
+
+    main_group.add_option("--keep-database", "-k",
+                          action = "store_true", default = False,
+                          help = "Keep database directory after processing.")
+    
+    main_group.add_option("--remove-first", "-r",
+                          action = "store_true", default = False,
+                          help = "Remove existing database directory before processing.")
+
+    main_group.add_option("--verbose", "-v", action = "count",
+                          default = get_verbosity(),
+                          help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+
+    main_group.add_option("--no-color", action = "store_true", default = False,
+                          help = "Disable coloring of terminal output.")
+
+    main_group.add_option("-V", dest = "script_version", action = "store_true", default = False,
+                          help = "Display script version and exit.")
+
+    parser.add_option_group(main_group)
+
+    cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+
+    cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
+                         help = "C preprocessor to use (defaults to gcc -E).")
+
+    cpp_group.add_option("-I", dest="include_dirs",
+                         action = "append", metavar = "DIR", default = [],
+                         help = "Add an include search directory. Same as the compiler -I option. Several are allowed.")
+
+    cpp_group.add_option("-D", dest="defines", action = "append",
+                         metavar = "NAME[=VALUE]", default = [],
+                         help = "Add a preprocessor define. Same as passing the preprocessor a -D option. Several are allowed.")
+
+    cpp_group.add_option("-U", dest="undefines", action = "append",
+                         metavar = "NAME", default = [],
+                         help = "Remove a preprocessor define. Same as passing the preprocessor a -U option. Several are allowed.")
+
+    cpp_group.add_option("--cpp-flags", action = "append",
+                         metavar = "FLAGS", default = [],
+                         help = "Add additional flags for the C preprocessor. Several are allowed.")
+
+    cpp_group.add_option("--skip-recover-includes", action = "store_true",
+                         default = False,
+                         help = "By default, try to recover standard #include. To skip this phase, use this option.")
+
+    parser.add_option_group(cpp_group)
 
     proc_group = optparse.OptionGroup(parser, "Processing Options")
 
@@ -59,59 +115,6 @@ def main():
 
     parser.add_option_group(proc_group)
 
-    main_group = optparse.OptionGroup(parser, "General Options")
-
-    main_group.add_option("--project-name", "--project", "-p",
-                          metavar = "NAME", default = None,
-                          help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used.")
-
-    main_group.add_option("--keep-database", "-k",
-                          action = "store_true", default = False,
-                          help = "Keep database directory after processing.")
-
-    main_group.add_option("--remove-first", "-r",
-                          action = "store_true", default = False,
-                          help = "Remove existing database directory before processing.")
-
-    main_group.add_option("--verbose", "-v", action = "count",
-                          default = get_verbosity(),
-                          help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
-
-    main_group.add_option("--no-color", action = "store_true", default = False,
-                          help = "Disable coloring of terminal output.")
-
-    main_group.add_option("--version", "-V", action = "store_true", default = False,
-                          help = "Display script version and exit.")
-
-    parser.add_option_group(main_group)
-
-    cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
-
-    cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
-                         help = "C preprocessor to use (defaults to gcc -E).")
-
-    cpp_group.add_option("-I", dest="include_dirs",
-                         action = "append", metavar = "DIR", default = [],
-                         help = "Add an include search directory. Same as the compiler -I option. Several are allowed.")
-
-    cpp_group.add_option("-D", dest="defines", action = "append",
-                         metavar = "NAME[=VALUE]", default = [],
-                         help = "Add a preprocessor define. Same as passing the preprocessor a -D option. Several are allowed.")
-
-    cpp_group.add_option("-U", dest="undefines", action = "append",
-                         metavar = "NAME", default = [],
-                         help = "Remove a preprocessor define. Same as passing the preprocessor a -U option. Several are allowed.")
-
-    cpp_group.add_option("--cpp-flags", action = "append",
-                         metavar = "FLAGS", default = [],
-                         help = "Add additional flags for the C preprocessor. Several are allowed.")
-
-    cpp_group.add_option("--skip-recover-includes", action = "store_true",
-                         default = False,
-                         help = "By default, try to recover standard #include. To skip this phase, use this option.")
-
-    parser.add_option_group(cpp_group)
-
     compile_group = optparse.OptionGroup(parser, "Compilation Options")
 
     compile_group.add_option("--output-file", "-o", action = "append",
@@ -132,7 +135,7 @@ def main():
 
     compile_group.add_option("--ar", metavar = "ARCHIVER", default = None,
                              help = "Archiver to use (defaults to ar).")
-
+    
     compile_group.add_option("--icc", action = "store_true", default = False,
                              help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
 
@@ -143,11 +146,11 @@ def main():
     compile_group.add_option("--no-fast", "--not-fast", action = "store_true",
                              default = False,
                              help = "Do not add optimized compilation flags automatically.")
-
+    
     compile_group.add_option("--no-default-flags", action = "store_true",
                              default = False,
                              help = "Do not add some C flags such as -fPIC, -g, etc. automatically.")
-
+    
     compile_group.add_option("--c-flags", action = "append",
                              metavar = "FLAGS", default = [],
                              help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
@@ -156,7 +159,7 @@ def main():
                              metavar = "FLAGS", default = [],
                              help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--c-flags) are also passed to the C++ compiler.")
 
-    compile_group.add_option("--nvcc-flags", action = "append",
+    compile_group.add_option("--nvcc_flags", action = "append",
                              metavar = "FLAGS", default = [],
                              help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
 
@@ -198,27 +201,27 @@ def main():
                           help = "Add an additional object file for linking. Several are allowed.")
 
     parser.add_option_group(link_group)
-
+    
     cmake_group = optparse.OptionGroup(parser, "CMake Options")
 
     cmake_group.add_option("--cmake", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --make alone will NOT build the project.")
-
+    
     cmake_group.add_option("--cmake-flags", action = "append",
                           metavar = "FLAGS", default = [],
                           help = "Specify additional flags to pass to CMake. Several are allowed.")
-
+    
     cmake_group.add_option("--cmake-dir", metavar = "DIR", default = None,
                           help = "Output/lookup the CMakeLists.txt file in this directory instead of the current working directory.")
-
+    
     cmake_group.add_option("--cmake-gen", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will make p4a try to locate a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir), and generate Makefiles in a specific directory (--cmake-gen-dir).")
-
+    
     cmake_group.add_option("--cmake-gen-dir", metavar = "DIR", default = None,
                           help = "Generate Makefiles in this directory instead of <project name>.gen by default.")
-
+    
     cmake_group.add_option("--cmake-build", action = "store_true", default = False,
-                          help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")
+                          help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")    
 
     parser.add_option_group(cmake_group)
 
@@ -226,232 +229,27 @@ def main():
 
     if options.no_color:
         p4a_term.disabled = True
-
+    
     set_verbosity(options.verbose)
-
-    if options.version:
+    
+    if options.script_version:
         print(guess_file_revision(__file__))
         return
 
-    # Preliminary check.
-    if not os.path.exists(os.environ["P4A_ROOT"]) or not os.path.exists(os.environ["P4A_ACCEL_DIR"]):
-        die("Invalid P4A_* environment variables -- Have you run \"source .../par4all-rc.sh\"?")
-
-    # Check options and set up defaults.
-    if len(args) == 0:
-        die("Missing input files")
-
-    if options.simple and (options.cuda or options.openmp):
-        die("Cannot combine --simple with --cuda and/or --openmp")
-
-    if not options.simple and not options.cuda and not options.openmp:
-        info("Defaulting to --openmp")
-        options.openmp = True
-
-    if options.cuda and not options.accel:
-        info("Enabling --accel because of --cuda")
-        options.accel = True
-
-    files = []
-    other_files = []
-    header_files = []
-    # Make all paths absolute for input files, and check passed files extension.
-    # Put all files not supported by the p4a_processor class in a separate list.
-    for file in args:
-        abs_file = os.path.abspath(os.path.expanduser(file))
-        if not os.path.exists(abs_file):
-            die("Invalid/missing input file: " + abs_file)
-        # Check if file has the .p4a suffix, and skip it it is the case:
-        if change_file_ext(abs_file, "").endswith(".p4a"):
-            warn("Ignoring already processed file: " + file)
-            continue
-        ext = get_file_ext(abs_file)
-        if c_file_p(file) or fortran_file_p(file):
-            files.append(abs_file)
-            debug("Input file: " + abs_file)
-        elif cxx_file_p(file) or cuda_file_p(file):
-            other_files.append(abs_file)
-            info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
-        elif header_file_p(file):
-            header_files.append(abs_file)
-            info("Ignoring header file: " + abs_file)
-        else:
-            die("File format not supported: " + abs_file)
-
-    # If no project name is provided, try some random names.
-    # XXX: would be good to be able to specify the location for the .database and .build dir?
-    # Or put it in /tmp by default?..
-    project_name = options.project_name
-    expected_database_dir = ""
-    build_dir = ""
-    if not project_name:
-        while True:
-            project_name = gen_name()
-            expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
-            build_dir = os.path.join(os.getcwd(), project_name + ".build")
-            if options.remove_first or (not os.path.exists(expected_database_dir) and not os.path.exists(build_dir)):
-                break
-        info("Generated project name: " + project_name)
-    else:
-        expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
-        build_dir = os.path.join(os.getcwd(), project_name + ".build")
-
-    if options.remove_first:
-        if os.path.exists(expected_database_dir):
-            rmtree(expected_database_dir)
-        if os.path.exists(build_dir):
-            rmtree(build_dir)
-
-    # Prepare the C preprocessor flags and linker flags.
-    cppflags = options.cpp_flags
-    for include_dir in options.include_dirs:
-        cppflags += [ "-I" + include_dir ]
-    for define in options.defines:
-        cppflags += [ "-D" + define ]
-    for undefine in options.undefines:
-        cppflags += [ "-U" + undefine ]
-    ldflags = options.ld_flags
-    for lib_dir in options.lib_dirs:
-        ldflags += [ "-L" + lib_dir ]
-    for lib in options.libs:
-        ldflags += [ "-l" + lib ]
-
-    # Instantiate the builder. It will be used to keep track and arrange all
-    # the CPP, C, Fortran etc. flags, apart from being used for building the
-    # project after processing, if requested.
-    builder = p4a_builder(
-        cppflags = cppflags,
-        cflags = options.c_flags,
-        cxxflags = options.cxx_flags,
-        ldflags = ldflags,
-        nvccflags = options.nvcc_flags,
-        fortranflags = options.fortran_flags,
-        cpp = options.cpp,
-        cc = options.cc,
-        cxx = options.cxx,
-        ld = options.ld,
-        ar = options.ar,
-        nvcc = options.nvcc,
-        fortran = options.fortran,
-        arch = options.arch,
-        openmp = options.openmp,
-        accel_openmp = options.accel,
-        icc = options.icc,
-        cuda = options.cuda,
-        add_debug_flags = options.debug,
-        add_optimization_flags = not options.no_fast,
-        no_default_flags = options.no_default_flags
-    )
-
-    ###################
-    ### XXXXXXXXXXXXXX TODO: override CPP used by the processor -> pyps -> pips with builder.cpp
-
-    info("CPP flags: " + " ".join(builder.cppflags))
-
-    # Process (parallelize) files (or not).
-    database_dir = ""
-    processor_output_files = []
-    if options.no_process:
-        warn("Bypassing processor")
-        processor_output_files = files
-    elif len(files) == 0:
-        warn("No supported files to process!")
-    else:
-        try:
-            # Create a workspace with PIPS:
-            processor = p4a_processor(files = files,
-                                  project_name = project_name,
-                                  verbose = (verbosity != 0),
-                                  cppflags = " ".join(builder.cppflags),
-                                  recover_includes = not options.skip_recover_includes,
-                                  filter_include = options.include_modules,
-                                  filter_exclude = options.exclude_modules,
-                                  accel = options.accel,
-                                  cuda = options.cuda)
-
-            # Save it for later.
-            database_dir = os.path.abspath(processor.workspace.directory())
-
-            # First apply some generic parallelization:
-            processor.parallelize(options.fine)
-
-            if options.cuda:
-                processor.gpuify()
-
-            if options.openmp:
-                processor.ompify()
-
-            # Write the output files.
-            processor_output_files = processor.save()
-
-            del processor
-
-        except p4a_error:
-            error("Processing of " + ", ".join(files) + " failed: " + sys.exc_info()[1].msg)
-            if database_dir:
-                error("Database directory was " + database_dir)
-            die("Aborting")
-
-    if os.path.isdir(database_dir):
-        # Remove database unless otherwise specified.
-        if options.keep_database:
-            warn("Not removing database directory " + database_dir)
-        else:
-            # To improve later with a workspace.close() and
-            # workspace.delete() some days... -> Yes because some files are left open
-            # and we cannot remote the database everytime :-(
-            # We should be able to work on an existing database too!
-            rmtree(database_dir, can_fail = True)
-
-    if len(options.output_file) == 0:
-        # Build not requested.
-        return
-
-    all_buildable_files = processor_output_files + other_files + options.extra
-    if len(all_buildable_files) == 0:
-        die("No buildable input files")
-
-    # Make every path absolute.
-    output_files = []
-    for file in options.output_file:
-        output_files.append(os.path.abspath(os.path.expanduser(file)))
-
-    # Generate CMakeLists.txt/build using it as requested.
-    if options.cmake or options.cmake_gen or options.cmake_build:
-        if options.cmake:
-            builder.cmake_write(project_name, all_buildable_files + header_files,
-                output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
-        if options.cmake_gen or options.cmake_build:
-            builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir,
-                cmakeflags = options.cmake_flags, build = options.cmake_build)
-        return
-
-    try:
-        info("Building " + ", ".join(output_files))
-        builder.build(files = all_buildable_files, output_files = output_files,
-            extra_obj = options.extra_obj, build_dir = build_dir)
-    except p4a_error:
-        error("Building failed: " + sys.exc_info()[1].msg)
-        error("Build directory was " + build_dir)
-        die("Aborting")
-
-    # Remove build dir as requested.
-    if os.path.isdir(build_dir):
-        if options.keep_build_dir:
-            warn("Not removing build directory " + build_dir)
-        else:
-            rmtree(build_dir, can_fail = True)
+    p4a.main(options, args)
 
 
 if __name__ == "__main__":
     try:
         main()
+    except p4a_error:
+        error(str(sys.exc_info()[1]))
+        error("To get verbose output, try passing -v, -vv, or -vvv")
+        sys.exit(1)
     except:
-        #~ error(str(sys.exc_info()[1]))
-        #~ error("To get verbose output, try passing -v, -vv, or -vvv")
         raise
     finally:
-        stop_all_spinners() # Make sure no spinner is hindering script from exiting.
+        stop_all_spinners() # Make sure no spinner thread is hindering script from exiting.
 
 
 # Some Emacs stuff:

@@ -9,7 +9,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, re, datetime, shutil, subprocess, time
+import string, sys, random, logging, os, re, datetime, shutil, subprocess, time, tempfile
 from threading import Thread
 import p4a_term
 
@@ -143,7 +143,21 @@ class p4a_error(Exception):
     def __str__(self):
         return self.msg
 
-def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extra_env = {}):
+def slurp(file):
+    '''Slurp file contents.'''
+    f = open(file)
+    content = f.read()
+    f.close()
+    return content
+
+def dump(file, content):
+    '''Dump contents to file.'''
+    debug("Writing " + str(len(content)) + " bytes to " + file)
+    f = open(file, "w")
+    f.write(content)
+    f.close()
+
+def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capture = False, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
     cmd(" ".join(cmd_list))
@@ -156,8 +170,15 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
         else:
             prev_env[e] = ""
         os.environ[e] = extra_env[e]
+    err = ""
+    out = ""
     old_cwd = ""
     w = ""
+    if verbosity < 2:
+        capture = True
+    spin = None
+    if capture:
+        spin = spinner()
     try:
         if working_dir:
             old_cwd = os.getcwd()
@@ -165,13 +186,29 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
             w = working_dir
         else:
             w = os.getcwd()
-        ret = os.system(" ".join(cmd_list))
+        if capture:
+            (stdout_fd, stdout_to) = tempfile.mkstemp("stdout")
+            (stderr_fd, stderr_to) = tempfile.mkstemp("stderr")
+            ret = os.system(" ".join(cmd_list) + " >" + stdout_to + " 2>" + stderr_to)
+            out = slurp(stdout_to)
+            err = slurp(stderr_to)
+            if stdout_fd:
+                os.close(stdout_fd)
+            if stderr_fd:
+                os.close(stderr_fd)
+            os.remove(stdout_to)
+            os.remove(stderr_to)
+        else:
+            ret = os.system(" ".join(cmd_list))
         if old_cwd:
             os.chdir(old_cwd)
     except:
         if not can_fail:
+            debug("Environment was: " + repr(os.environ))
             raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
-                + str(sys.exc_info()[1]) + " (env = " + repr(os.environ) + ")")
+                + str(sys.exc_info()[1]))
+    if spin is not None:
+        spin.stop()
     for e in prev_env:
         if e in os.environ:
             if len(e):
@@ -179,9 +216,13 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, extr
             else:
                 del os.environ[e]
     if ret != 0 and not can_fail:
+        if err:
+            #~ error("Error output from program follows:")
+            sys.stderr.write(err)
+        debug("Environment was: " + repr(os.environ))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret) + " (env = " + repr(os.environ) + ")")
-    return ret
+            + " failed with exit code " + str(ret))
+    return [ out, err, ret ]
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
@@ -202,7 +243,8 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     if verbosity >= 2 and not capture:
         redir = None
     spin = None
-    if redir and verbosity >= 1: # Display a spinner if we are hiding output and we displayed command.
+    #~ if redir and verbosity >= 1: # Display a spinner if we are hiding output and we displayed command.
+    if redir: # Display a spinner if we are hiding output and we displayed command.
         spin = spinner()
     try:
         if shell:
@@ -213,8 +255,9 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
                 stdout = redir, stderr = redir, cwd = working_dir, env = env)
     except:
         if not can_fail:
+            debug("Environment was: " + repr(env))
             raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
-                + str(sys.exc_info()[1]) + " (env = " + repr(env) + ")")
+                + str(sys.exc_info()[1]))
     out = ""
     err = ""
     while True:
@@ -229,9 +272,11 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         spin.stop()
     if ret != 0 and not can_fail:
         if err:
-            error(err)
+            #~ error("Error output from program follows:")
+            sys.stderr.write(err)
+        debug("Environment was: " + repr(env))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret) + " (env = " + repr(env) + ")")
+            + " failed with exit code " + str(ret))
     return [ out, err, ret ]
 
 # Not portable!
@@ -253,27 +298,37 @@ def is_system_dir(dir):
             return True
     return False
 
-def rmtree(dir, can_fail = 0, remove_top = True):
+def rmtree(dir, can_fail = False, remove_top = True):
     '''Removes a directory recursively, alternative to shutil.rmtree()'''
-    dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
-    if not dir or not os.path.isdir(dir):
-        raise p4a_error("Not a directory: " + dir)
+    if not dir:
+        if can_fail:
+            return
+        raise p4a_error("Invalid arguments")
+    dir = os.path.realpath(os.path.abspath(os.path.expanduser(dir)))
+    if not os.path.isdir(dir):
+        if can_fail:
+            return
+        raise p4a_error("Directory does not exist: " + dir)
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
-    debug("Removing tree: " + dir)
-    try:
-        for root, dirs, files in os.walk(dir, topdown = False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        if remove_top:
-            os.rmdir(dir)
-    except:
-        if can_fail:
-            warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
-        else:
-            raise
+    #~ debug("Removing tree: " + dir)
+    if remove_top:
+        run([ "rm", "-rf", dir + "/" ], can_fail = can_fail)
+    else:
+        run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)
+    #~ try:
+        #~ for root, dirs, files in os.walk(dir, topdown = False):
+            #~ for name in files:
+                #~ os.remove(os.path.join(root, name))
+            #~ for name in dirs:
+                #~ os.rmdir(os.path.join(root, name))
+        #~ if remove_top:
+            #~ os.rmdir(dir)
+    #~ except:
+        #~ if can_fail:
+            #~ warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
+        #~ else:
+            #~ raise
 
 def find(file_re, dir = None, abs_path = True, match_files = True, 
     match_dirs = False, match_whole_path = False, can_fail = True):
@@ -288,7 +343,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
             raise p4a_error("Invalid directory: " + dir)
     else:
         dir = os.getcwd()
-    dir = os.path.abspath(os.path.realpath(os.path.expanduser(dir)))
+    dir = os.path.abspath(os.path.expanduser(dir))
     #debug("Looking for files matching '" + file_re + "' in " + dir)
     try:
         for root, dirs, files in os.walk(dir, topdown = False):
@@ -404,20 +459,6 @@ def get_machine_arch():
     (sysname, nodename, release, version, machine) = os.uname()
     return machine
 
-def slurp(file):
-    '''Slurp file contents.'''
-    f = open(file)
-    content = f.read()
-    f.close()
-    return content
-
-def dump(file, content):
-    '''Dump contents to file.'''
-    debug("Writing " + str(len(content)) + " bytes to " + file)
-    f = open(file, "w")
-    f.write(content)
-    f.close()
-
 def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext = True):
     '''Substitute keys with values from map in template designated by template_file.
     output_file can be empty, in which case the original template will be overwritten with the substituted file.
@@ -439,6 +480,9 @@ def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext
 def file_lastmod(file):
     '''Returns file's last modification date/time.'''
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
+
+def utc_datetime():
+    return time.strftime("%Y%m%dT%H%M%S", time.gmtime())
 
 def sh2csh(file, output_file = None):
     '''Attempts to convert a sh file to csh.'''
