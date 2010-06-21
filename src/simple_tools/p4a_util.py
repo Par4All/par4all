@@ -217,7 +217,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
                 del os.environ[e]
     if ret != 0 and not can_fail:
         if err:
-            error("Error output from program follows:")
+            #~ error("Error output from program follows:")
             sys.stderr.write(err)
         debug("Environment was: " + repr(os.environ))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
@@ -272,7 +272,7 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
         spin.stop()
     if ret != 0 and not can_fail:
         if err:
-            error("Error output from program follows:")
+            #~ error("Error output from program follows:")
             sys.stderr.write(err)
         debug("Environment was: " + repr(env))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
