@@ -104,9 +104,16 @@ while [ "$1" ] ; do
   esac
 done
 
+
 if (( $verb >= 2 )) ; then
     # Put shell tracing on:
     set -vx
+fi
+
+if [[ -z "$P4A_ROOT" ]] ; then
+    echo "The P4A_ROOT environment variable is not set or you have not use"
+    echo "the -r/--root option"
+    exit 3
 fi
 
 if [[ $update_git_svn ]]; then

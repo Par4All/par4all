@@ -899,7 +899,7 @@ But right now it is still mostly done in the
 \texttt{package/PIPS/validation} directory.
 
 
-\subsection{p4a\_validate utility}
+\subsection{\protect\texttt{p4a\_validate} utility}
 \label{sec:p4a_validate-utility}
 
 
@@ -925,6 +925,53 @@ The first use in \Apfa is to select from \Apips only the test cases that
 pass the validation (futuristic cases are interesting for \Apips but from
 least interest for \Apfa...), defining smaller validation classes such as
 a \Amat (Minimal Acceptance Test).
+
+\subsubsection{Example}
+\label{sec:example}
+
+To display from the last validation the test cases marked as
+\texttt{changed} only in \verb|C_syntax|, you can use:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/' \
+             --keep-status=changed --list
+\end{verbatim}
+
+To show what changed compared to the reference:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
+             --keep-status=changed --show-diff-files
+\end{verbatim}
+
+To accept the validation of what changed in \texttt{C\_syntax/decl\emph{*}}:
+\begin{verbatim}
+p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
+             --keep-status=changed --accept
+\end{verbatim}
+then if you are happy with it you can commit with \Agit or revert back to
+previous state with \Agit.
+
+You may want to move all the currently failing test of the validation for
+\texttt{Control} into a new validation directory \texttt{Control-Bugs} to
+clean up the mainstream validation. You can do with:
+\begin{verbatim}
+mkdir Control-Bugs
+p4a_validate --file=RESULTS/SUMMARY  --list --filter=^Control/ --keep-status=failed \
+ | sed -n -e 's,failed: ,,p' > files-to-move
+\end{verbatim}
+If you are happy after inspection of \texttt{files-to-move} after some
+cleaning with a
+\begin{verbatim}
+rm -rf Control/*.database
+\end{verbatim}
+you can really move stuffs into with:
+\begin{verbatim}
+for f in `cat files-to-move` ; do git mv $f* Control-Bugs ; done
+\end{verbatim}
+
+
+\subsubsection{Option list of \protect\texttt{p4a\_validate}}
+\label{sec:opti-list-p4a_v-1}
+
 
 Here is a small description of the options of \verb|p4a_validate|, that
 are processed in this very order, so that you can pipe actions. To be
@@ -984,31 +1031,6 @@ There are also some debug options:
 
 \item[\texttt{-q} or \texttt{--quiet}:] run in quiet mode (default mode).
 \end{description}
-
-
-\subsection{Example}
-\label{sec:example}
-
-To display from the last validation the test cases marked as
-\texttt{changed} only in \verb|C_syntax|, you can use:
-\begin{verbatim}
-p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/' \
-             --keep-status=changed --list
-\end{verbatim}
-
-To show what changed compared to the reference:
-\begin{verbatim}
-p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
-             --keep-status=changed --show-diff-files
-\end{verbatim}
-
-To accept the validation of what changed in \texttt{C\_syntax/decl\emph{*}}:
-\begin{verbatim}
-p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
-             --keep-status=changed --accept
-\end{verbatim}
-then if you are happy with it you can commit with \Agit or revert back to
-previous state with \Agit.
 
 
 \subsection{Validation script}
