@@ -74,28 +74,28 @@ def add_module_options(parser):
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
     
-    group.add_option("--polylib-copts", metavar = "OPTS", default = None,
+    group.add_option("--polylib-conf-opts", metavar = "OPTS", default = None,
         help = "Specify polylib configure opts.")
     
-    group.add_option("--newgen-copts", metavar = "OPTS", default = None,
+    group.add_option("--newgen-conf-opts", metavar = "OPTS", default = None,
         help = "Specify newgen configure opts.")
     
-    group.add_option("--linear-copts", metavar = "OPTS", default = None,
+    group.add_option("--linear-conf-opts", metavar = "OPTS", default = None,
         help = "Specify linear configure opts.")
     
-    group.add_option("--pips-copts", metavar = "OPTS", default = None,
+    group.add_option("--pips-conf-opts", metavar = "OPTS", default = None,
         help = "Specify PIPS configure opts.")
     
-    group.add_option("--polylib-mopts", metavar = "OPTS", default = None,
+    group.add_option("--polylib-make-opts", metavar = "OPTS", default = None,
         help = "Specify polylib make opts.")
     
-    group.add_option("--newgen-mopts", metavar = "OPTS", default = None,
+    group.add_option("--newgen-make-opts", metavar = "OPTS", default = None,
         help = "Specify newgen make opts.")
     
-    group.add_option("--linear-mopts", metavar = "OPTS", default = None,
+    group.add_option("--linear-make-opts", metavar = "OPTS", default = None,
         help = "Specify linear make opts.")
     
-    group.add_option("--pips-mopts", metavar = "OPTS", default = None,
+    group.add_option("--pips-make-opts", metavar = "OPTS", default = None,
         help = "Specify PIPS make opts.")
     
     group.add_option("--configure-opts", "-c", metavar = "OPTS", default = None,
@@ -154,11 +154,11 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     
     if install:
         # Call make install to install in DESTDIR if requested.
-        install_mopts = []
+        install_make_opts = []
         #~ if dest_dir:
-            #~ install_mopts.append("DESTDIR=" + dest_dir)
+            #~ install_make_opts.append("DESTDIR=" + dest_dir)
             #~ info("Installing " + package_dir + " in " + dest_dir)
-        run2([ "make", "install" ] + install_mopts, working_dir = build_dir)
+        run2([ "make", "install" ] + install_make_opts, working_dir = build_dir)
 
 
 def main(options = {}, args = []):
@@ -380,15 +380,15 @@ def main(options = {}, args = []):
         if not os.path.isdir(package_build_dir):
             os.makedirs(package_build_dir)
 
-        polylib_copts = configure_opts
-        if options.polylib_copts:
-            polylib_copts.append(options.polylib_copts)
-        polylib_mopts = make_opts
-        if options.polylib_mopts:
-            polylib_mopts.append(options.polylib_mopts)
+        polylib_conf_opts = configure_opts
+        if options.polylib_conf_opts:
+            polylib_conf_opts.append(options.polylib_conf_opts)
+        polylib_make_opts = make_opts
+        if options.polylib_make_opts:
+            polylib_make_opts.append(options.polylib_make_opts)
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
-            configure_opts = polylib_copts, make_opts = polylib_mopts, dest_dir = dest_dir, 
+            configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
     
     ##############################
@@ -422,15 +422,15 @@ def main(options = {}, args = []):
         run2([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
         run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
 
-        newgen_copts = configure_opts
-        if options.newgen_copts:
-            newgen_copts.append(options.newgen_copts)
-        newgen_mopts = make_opts
-        if options.newgen_mopts:
-            newgen_mopts.append(options.newgen_mopts)
+        newgen_conf_opts = configure_opts
+        if options.newgen_conf_opts:
+            newgen_conf_opts.append(options.newgen_conf_opts)
+        newgen_make_opts = make_opts
+        if options.newgen_make_opts:
+            newgen_make_opts.append(options.newgen_make_opts)
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
-            configure_opts = newgen_copts, make_opts = newgen_mopts, dest_dir = dest_dir, 
+            configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
     
     ##############################
@@ -459,16 +459,16 @@ def main(options = {}, args = []):
         # or a symlink recursion will appear).
         run2([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
         run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
-        linear_copts = configure_opts
+        linear_conf_opts = configure_opts
 
-        if options.linear_copts:
-            linear_copts.append(options.linear_copts)
-        linear_mopts = make_opts
-        if options.linear_mopts:
-            linear_mopts.append(options.linear_mopts)
+        if options.linear_conf_opts:
+            linear_conf_opts.append(options.linear_conf_opts)
+        linear_make_opts = make_opts
+        if options.linear_make_opts:
+            linear_make_opts.append(options.linear_make_opts)
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
-            configure_opts = linear_copts, make_opts = linear_mopts, dest_dir = dest_dir, 
+            configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
     
     ##############################
@@ -534,17 +534,17 @@ def main(options = {}, args = []):
             run2([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
 
-        pips_copts = configure_opts
-        if options.pips_copts:
-            pips_copts.append(options.pips_copts)
+        pips_conf_opts = configure_opts
+        if options.pips_conf_opts:
+            pips_conf_opts.append(options.pips_conf_opts)
         else:
-            pips_copts += [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
-        pips_mopts = make_opts
-        if options.pips_mopts:
-            pips_mopts.append(options.pips_mopts)
+            pips_conf_opts += [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+        pips_make_opts = make_opts
+        if options.pips_make_opts:
+            pips_make_opts.append(options.pips_make_opts)
 
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
-            configure_opts = pips_copts, make_opts = pips_mopts, dest_dir = dest_dir,
+            configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
             install = not options.noinstall, reconf = options.reconf)
     
 
