@@ -364,9 +364,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, 0<=PHI2,
-//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1+th<=Nth, 0<=th}>
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, th+1<=Nth, 0<=th}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, 0<=PHI2,
-//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, 1+th<=Nth, 0<=th}>
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv, th+1<=Nth, 0<=th}>
 //  <rg-R-EXACT-{}>
 //  <rg-W-EXACT-{}>
 //  <th-R-EXACT-{}>
@@ -381,9 +381,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
-//    0<=PHI3, PHI3+1<=Nv, 1+rg<=Nrg, 1+th<=Nth, 0<=rg, 0<=th}>
+//    0<=PHI3, PHI3+1<=Nv, rg+1<=Nrg, th+1<=Nth, 0<=rg, 0<=th}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, PHI2==rg,
-//    0<=PHI3, PHI3+1<=Nv, 1+rg<=Nrg, 1+th<=Nth, 0<=rg, 0<=th}>
+//    0<=PHI3, PHI3+1<=Nv, rg+1<=Nrg, th+1<=Nth, 0<=rg, 0<=th}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
@@ -397,9 +397,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, 1+rg<=Nrg, 1+th<=Nth, 1+v<=Nv, 0<=rg, 0<=th, 0<=v}>
+//    PHI3==v, rg+1<=Nrg, th+1<=Nth, v+1<=Nv, 0<=rg, 0<=th, 0<=v}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, 1+rg<=Nrg, 1+th<=Nth, 1+v<=Nv, 0<=rg, 0<=th, 0<=v}>
+//    PHI3==v, rg+1<=Nrg, th+1<=Nth, v+1<=Nv, 0<=rg, 0<=th, 0<=v}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
@@ -411,14 +411,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nth-R-EXACT-{}>
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
-//  <Pow[PHI1][.re]-W-EXACT-{PHI1==th, Nrg<=rg, 1+th<=Nth, 0<=rg,
+//  <Pow[PHI1][.re]-W-EXACT-{PHI1==th, Nrg<=rg, th+1<=Nth, 0<=rg,
 //    0<=th}>
 //  <th-R-EXACT-{}>
 
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
 
 //  <Nth-R-EXACT-{}>
-//  <Pow[PHI1][.im]-W-EXACT-{PHI1==th, Nrg<=rg, 1+th<=Nth, 0<=rg,
+//  <Pow[PHI1][.im]-W-EXACT-{PHI1==th, Nrg<=rg, th+1<=Nth, 0<=rg,
 //    0<=th}>
 //  <th-R-EXACT-{}>
 

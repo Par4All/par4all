@@ -165,7 +165,7 @@ int main()
 //  <ap[PHI1][PHI2]-W-EXACT-{PHI1==b+1, PHI2==0}>
 //  <b-R-EXACT-{}>
 //  <sp-R-EXACT-{}>
-//  <sp[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, b==PHI3}>
+//  <sp[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==b}>
 //  <sp[PHI1][.one]-W-EXACT-{PHI1==0}>
 //  <x[PHI1]-W-EXACT-{PHI1==b+1}>
 

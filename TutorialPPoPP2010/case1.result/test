@@ -315,7 +315,7 @@ int main()
    for(i = 1; i <= 10; i += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2.0, 1<=i,
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, 2.0==h, 1<=i,
 //    i<=10}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-EXACT-{}>
@@ -323,7 +323,7 @@ int main()
       for(j = 1; j <= 10; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, h==2.0, 1<=i, i<=10,
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, 2.0==h, 1<=i, i<=10,
 //    1<=j, j<=10}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
@@ -350,7 +350,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{i==PHI1, PHI2==j, *SEMANTICS*:o#1==11,
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, *SEMANTICS*:o#1==11,
 //    2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
@@ -365,12 +365,12 @@ int main()
 
    for(i = 1; i <= 10; i += 1)
 
-//  <b[PHI1][PHI2]-OUT-EXACT-{i==PHI1, 1<=PHI2, PHI2<=10, 1<=i,
+//  <b[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, 1<=i,
 //    i<=10}>
 
       for(j = 1; j <= 10; j += 1)
 
-//  <b[PHI1][PHI2]-OUT-EXACT-{PHI1==i, j==PHI2, 1<=i, i<=10, 1<=j,
+//  <b[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=10, 1<=j,
 //    j<=10}>
 
          b[i][j] = 1.0;

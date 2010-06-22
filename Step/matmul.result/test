@@ -50,19 +50,19 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0156
          J_LOW = STEP_J_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0157
          J_UP = STEP_J_LOOPSLICES(IDX_SLICE_UP,IDX)                     0158
-C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2, 1<=PHI2,
+C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
          STEP_SR_A(IDX_SLICE_LOW,1,IDX) = 1                             0161
          STEP_SR_A(IDX_SLICE_UP,1,IDX) = N                              0162
          STEP_SR_A(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0163
          STEP_SR_A(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0164
-C  <B(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2, 1<=PHI2,
+C  <B(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
          STEP_SR_B(IDX_SLICE_LOW,1,IDX) = 1                             0167
          STEP_SR_B(IDX_SLICE_UP,1,IDX) = N                              0168
          STEP_SR_B(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0169
          STEP_SR_B(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0170
-C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2, 1<=PHI2,
+C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
          STEP_SR_C(IDX_SLICE_LOW,1,IDX) = 1                             0173
          STEP_SR_C(IDX_SLICE_UP,1,IDX) = N                              0174
@@ -146,7 +146,7 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0146
          J_LOW = STEP_J_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0147
          J_UP = STEP_J_LOOPSLICES(IDX_SLICE_UP,IDX)                     0148
-C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2, 1<=PHI2,
+C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
          STEP_SR_C(IDX_SLICE_LOW,1,IDX) = 1                             0151
          STEP_SR_C(IDX_SLICE_UP,1,IDX) = N                              0152

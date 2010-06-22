@@ -90,11 +90,11 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 
    for(i = 0; i <= SIZE-1; i += 1)
 
-//  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, PHI2==0, SIZE==10}>
+//  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, SIZE==10}>
 
       for(j = 0; j <= SIZE-1; j += 1)
 
-//  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, j==PHI2, PHI2==0,
+//  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, PHI2==j,
 //    SIZE==10}>
 
          A[i][j] = B[i][j]*B[i][j]+B[i][j];

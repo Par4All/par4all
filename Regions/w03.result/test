@@ -225,7 +225,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 
       I = 1                                                             0007
 
-C  <A(PHI1)-W-MAY-{I<=PHI1, 1<=PHI1, PHI1<=10}>
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=10, I<=PHI1}>
 
 
       DO WHILE (I.LE.10)                                                0009
@@ -238,7 +238,7 @@ C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
 
       I = 2                                                             0014
 
-C  <A(PHI1)-R-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
+C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=8, I<=PHI1+1}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, I<=9}>
 
@@ -279,7 +279,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6}>
 
       I = 2                                                             0014
 
-C  <A(PHI1)-IN-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
+C  <A(PHI1)-IN-MAY-{1<=PHI1, PHI1<=8, I<=PHI1+1}>
 C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, I<=9}>
 
 
@@ -307,7 +307,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==10}>
 
       I = 1                                                             0007
 
-C  <A(PHI1)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=8, I<=10}>
+C  <A(PHI1)-OUT-MAY-{1<=PHI1, PHI1<=8, I<=PHI1, I<=10}>
 
 
       DO WHILE (I.LE.10)                                                0009
