@@ -523,32 +523,34 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
 static bool
 ask_a_missing_file(string module, bool is_fortran)
 {
-    string file;
-    bool ok, cont;
-    string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+  string file;
+  bool ok, cont;
+  string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
 
-    /* Should be simplified... */
-    do {
-	file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);
-	if(file && strcmp(file, "quit")==0) {
-	  free(file);
-	  break;
-	}
-	if (file)
-	  {
-	    if (same_string_p(file, "generate"))
-		ok = missing_file_initializer(module, string_fortran_filename_p(module));
-	    else
-		ok = process_user_file(file);
-	  }
-	cont = file && !same_string_p(file, "quit") &&
-	    !db_resource_p(res, module);
-	if(cont)
-	  pips_user_warning("Module \"%s\" not found in \"%s\".\n"
-			    "Please type \"quit\" or another file name.\n", module, file);
-	if (file) free(file);
-    } while (cont);
-    return db_resource_p(res, module);
+  /* Should be simplified... Maybe, but not bugged... */
+  do {
+    file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);
+    if(file && strcmp(file, "quit")==0) {
+      free(file);
+      break;
+    }
+    if (file)
+      {
+	if (same_string_p(file, "generate"))
+	  ok = missing_file_initializer(module,
+					string_fortran_filename_p(module));
+	else
+	  ok = process_user_file(file);
+      }
+    cont = file && !same_string_p(file, "quit") &&
+      !db_resource_p(res, module);
+    if(cont)
+      pips_user_warning("Module \"%s\" not found in \"%s\".\n"
+			"Please type \"quit\" or another file name.\n",
+			module, file);
+    if (file) free(file);
+  } while (cont);
+  return db_resource_p(res, module);
 }
 
 
