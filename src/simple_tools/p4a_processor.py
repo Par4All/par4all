@@ -104,7 +104,7 @@ class p4a_processor():
                                             name = self.project_name,
                                             activates = [],
                                             verboseon = verbose,
-                                            cpp_flags = cpp_flags)
+                                            cppflags = cpp_flags)
             self.workspace.set_property(
                 # Useless to go on if something goes wrong... :-(
                 ABORT_ON_USER_ERROR = True,

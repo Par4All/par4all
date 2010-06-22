@@ -664,7 +664,7 @@ def main(options = {}, args = []):
     info("Writing version file " + version_file)
     dump(version_file, version)
 
-    done("")
+    done("                   ") # Some blanks to erase any spinner tracks ...
     done("All done. Par4All " + version + " is ready and has been installed in " + install_dir)
     done("According to your shell religion, you should source:")
     done("")
