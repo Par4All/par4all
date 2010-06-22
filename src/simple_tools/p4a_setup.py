@@ -107,10 +107,10 @@ def add_module_options(parser):
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
         help = "Make packages concurrently using COUNT jobs.")
 
-    group.add_option("--noinstall", "-I", action = "store_true", default = False,
+    group.add_option("--no-install", "-I", action = "store_true", default = False,
         help = "Do not install any package (do not run make install for any package). NB: this might break the compilation of packages depending on the binaries of uninstalled previous packages.")
 
-    group.add_option("--nofinal", "-F", action = "store_true", default = False,
+    group.add_option("--no-final", "-F", action = "store_true", default = False,
         help = "Skip final installations steps in install directory (installation of various files). NB: never running the final installation step will not give you a functional Par4All build.")
 
     group.add_option("--reconf", action = "store_true", default = False,
@@ -391,7 +391,7 @@ def main(options = {}, args = []):
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir, 
-            install = not options.noinstall, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf)
 
     ##############################
 
@@ -433,7 +433,7 @@ def main(options = {}, args = []):
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir, 
-            install = not options.noinstall, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf)
 
     ##############################
 
@@ -471,7 +471,7 @@ def main(options = {}, args = []):
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir, 
-            install = not options.noinstall, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf)
 
     ##############################
 
@@ -547,13 +547,13 @@ def main(options = {}, args = []):
 
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
-            install = not options.noinstall, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf)
 
 
     ##############################
 
-    if options.nofinal:
-        warn("Skipping final installation steps (--nofinal)")
+    if options.no_final:
+        warn("Skipping final installation steps (--no-final)")
         return
 
 
