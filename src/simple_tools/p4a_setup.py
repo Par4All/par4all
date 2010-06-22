@@ -17,6 +17,9 @@ from p4a_git import *
 from p4a_version import *
 
 
+default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+
+
 def add_module_options(parser):
     '''Add options specific to this module to an existing optparse options parser.'''
 
@@ -74,35 +77,36 @@ def add_module_options(parser):
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
 
-    group.add_option("--polylib-conf-opts", metavar = "OPTS", default = None,
-        help = "Specify polylib configure opts.")
-
-    group.add_option("--newgen-conf-opts", metavar = "OPTS", default = None,
-        help = "Specify newgen configure opts.")
-
-    group.add_option("--linear-conf-opts", metavar = "OPTS", default = None,
-        help = "Specify linear configure opts.")
-
-    group.add_option("--pips-conf-opts", metavar = "OPTS", default = None,
-        help = "Specify PIPS configure opts.")
-
-    group.add_option("--polylib-make-opts", metavar = "OPTS", default = None,
-        help = "Specify polylib make opts.")
-
-    group.add_option("--newgen-make-opts", metavar = "OPTS", default = None,
-        help = "Specify newgen make opts.")
-
-    group.add_option("--linear-make-opts", metavar = "OPTS", default = None,
-        help = "Specify linear make opts.")
-
-    group.add_option("--pips-make-opts", metavar = "OPTS", default = None,
-        help = "Specify PIPS make opts.")
-
-    group.add_option("--configure-opts", "-c", metavar = "OPTS", default = None,
+    group.add_option("--configure-opts", "-c", metavar = "OPTS", default = [],
         help = "Specify global configure opts.")
 
-    group.add_option("--make-opts", "-m", metavar = "OPTS", default = None,
+    group.add_option("--polylib-conf-opts", metavar = "OPTS", default = [],
+        help = "Specify polylib configure opts (appended to --configure-opts).")
+
+    group.add_option("--newgen-conf-opts", metavar = "OPTS", default = [],
+        help = "Specify newgen configure opts (appended to --configure-opts).")
+
+    group.add_option("--linear-conf-opts", metavar = "OPTS", default = [],
+        help = "Specify linear configure opts (appended to --configure-opts).")
+
+    global default_pips_conf_opts
+    group.add_option("--pips-conf-opts", metavar = "OPTS", default = [],
+        help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts))
+
+    group.add_option("--make-opts", "-m", metavar = "OPTS", default = [],
         help = "Specify global make opts.")
+
+    group.add_option("--polylib-make-opts", metavar = "OPTS", default = [],
+        help = "Specify polylib make opts (appended to --make-opts).")
+
+    group.add_option("--newgen-make-opts", metavar = "OPTS", default = [],
+        help = "Specify newgen make opts (appended to --make-opts).")
+
+    group.add_option("--linear-make-opts", metavar = "OPTS", default = [],
+        help = "Specify linear make opts (appended to --make-opts).")
+
+    group.add_option("--pips-make-opts", metavar = "OPTS", default = [],
+        help = "Specify PIPS make opts (appended to --make-opts).")
 
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
         help = "Make packages concurrently using COUNT jobs.")
@@ -540,7 +544,8 @@ def main(options = {}, args = []):
         if options.pips_conf_opts:
             pips_conf_opts.append(options.pips_conf_opts)
         else:
-            pips_conf_opts += [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+            global default_pips_conf_opts
+            pips_conf_opts += default_pips_conf_opts
         pips_make_opts = make_opts
         if options.pips_make_opts:
             pips_make_opts.append(options.pips_make_opts)
