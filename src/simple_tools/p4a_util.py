@@ -94,10 +94,13 @@ def info(msg, spin = False):
     if logger:
         logger.info(msg)
 
-def cmd(msg, spin = False):
+def cmd(msg, spin = False, dir = None):
     if verbosity >= 1:
         master_spin.stop()
-        sys.stderr.write(msg_prefix + p4a_term.escape("magenta", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        if verbosity >= 2 and dir:
+            sys.stderr.write(msg_prefix + "(in " + dir + ") " + p4a_term.escape("magenta", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
+        else:
+            sys.stderr.write(msg_prefix + p4a_term.escape("magenta", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
         if spin:
             master_spin.start_spinning()
     if logger:
@@ -160,7 +163,6 @@ def dump(file, content):
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capture = False, extra_env = {}):
     '''Runs a command and dies if return code is not zero.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    cmd(" ".join(cmd_list))
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     prev_env = {}
@@ -174,18 +176,19 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
     out = ""
     old_cwd = ""
     w = ""
+    if working_dir:
+        old_cwd = os.getcwd()
+        os.chdir(working_dir)
+        w = working_dir
+    else:
+        w = os.getcwd()
+    cmd(" ".join(cmd_list), dir = w)
     if verbosity < 2:
         capture = True
     spin = None
     if capture:
         spin = spinner()
     try:
-        if working_dir:
-            old_cwd = os.getcwd()
-            os.chdir(working_dir)
-            w = working_dir
-        else:
-            w = os.getcwd()
         if capture:
             (stdout_fd, stdout_to) = tempfile.mkstemp("stdout")
             (stderr_fd, stderr_to) = tempfile.mkstemp("stderr")
@@ -200,13 +203,13 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
             os.remove(stderr_to)
         else:
             ret = os.system(" ".join(cmd_list))
-        if old_cwd:
-            os.chdir(old_cwd)
     except:
         if not can_fail:
             debug("Environment was: " + repr(os.environ))
             raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
                 + str(sys.exc_info()[1]))
+    if old_cwd:
+        os.chdir(old_cwd)
     if spin is not None:
         spin.stop()
     for e in prev_env:
@@ -228,12 +231,12 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
     '''Runs a command and dies if return code is not zero.
     Returns the final stdout and stderr output as a list.
     NB: cmd_list must be a list with each argument to the program being an element of the list.'''
-    cmd(" ".join(cmd_list))
     w = ""
     if working_dir:
         w = working_dir
     else:
         w = os.getcwd()
+    cmd(" ".join(cmd_list), dir = w)
     if force_locale is not None:
         extra_env["LC_ALL"] = force_locale
     env = os.environ
