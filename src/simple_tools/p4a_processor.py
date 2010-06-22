@@ -48,10 +48,10 @@ class p4a_processor():
             # strings
             if cpp_flags is None:
                 cpp_flags = ""
-            
+
             if not project_name:
                 raise p4a_error("Missing project_name")
-            
+
             self.project_name = project_name
 
             if self.recover_includes:
@@ -92,7 +92,7 @@ class p4a_processor():
 
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
-        
+
             pyps = None
             try:
                 pyps = __import__("pyps")

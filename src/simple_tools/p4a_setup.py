@@ -19,12 +19,12 @@ from p4a_version import *
 
 def add_module_options(parser):
     '''Add options specific to this module to an existing optparse options parser.'''
-    
+
     group = optparse.OptionGroup(parser, "Setup Options")
 
     group.add_option("--rebuild", "-R", action = "store_true", default = False,
         help = "Rebuild the packages completely.")
-    
+
     group.add_option("--clean", "-C", action = "store_true", default = False,
         help = "Wipe out the installation directory before proceeding. Implies -R and not skipping any package.")
 
@@ -36,10 +36,10 @@ def add_module_options(parser):
 
     group.add_option("--skip-linear", "--sl", action = "store_true", default = False,
         help = "Skip building and installing of the linear library.")
-    
+
     group.add_option("--skip-pips", "--sP", action = "store_true", default = False,
         help = "Skip building and installing of PIPS.")
-        
+
     group.add_option("--skip", "-s", metavar = "PACKAGE", action = "append", default = [],
         help = "Alias for being able to say -s pips (besides --skip pips), for example. -sall or --skip all are also available and means 'skip all', in which case only final installation stages will be performed.")
 
@@ -48,17 +48,17 @@ def add_module_options(parser):
 
     group.add_option("--root", "-r", metavar = "DIR", default = None,
         help = "Specify the directory for the Par4All source tree. The default is to use the source tree from which this script comes.")
-    
+
     group.add_option("--packages-dir", "--package-dir", "-P", metavar = "DIR", default = None,
         help = "Specify the packages location. By default it is <root>/packages.")
-    
+
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     #~ group.add_option("--dest-dir", "--dest", "-d", metavar = "DIR", default = None,
            #~ help = "[IGNORED, BLANK] Specify the staging installation directory.")
-    
+
     group.add_option("--prefix", "-p", metavar = "DIR", default = None,
         help = "Specify the prefix used to configure the packages. Default is /usr/local/par4all.")
-    
+
     group.add_option("--polylib-src", metavar = "DIR", default = None,
         help = "Specify polylib source directory.")
 
@@ -67,52 +67,52 @@ def add_module_options(parser):
 
     group.add_option("--linear-src", metavar = "DIR", default = None,
         help = "Specify linear source directory.")
-    
+
     group.add_option("--pips-src", metavar = "DIR", default = None,
         help = "Specify PIPS source directory.")
-    
+
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
-    
+
     group.add_option("--polylib-conf-opts", metavar = "OPTS", default = None,
         help = "Specify polylib configure opts.")
-    
+
     group.add_option("--newgen-conf-opts", metavar = "OPTS", default = None,
         help = "Specify newgen configure opts.")
-    
+
     group.add_option("--linear-conf-opts", metavar = "OPTS", default = None,
         help = "Specify linear configure opts.")
-    
+
     group.add_option("--pips-conf-opts", metavar = "OPTS", default = None,
         help = "Specify PIPS configure opts.")
-    
+
     group.add_option("--polylib-make-opts", metavar = "OPTS", default = None,
         help = "Specify polylib make opts.")
-    
+
     group.add_option("--newgen-make-opts", metavar = "OPTS", default = None,
         help = "Specify newgen make opts.")
-    
+
     group.add_option("--linear-make-opts", metavar = "OPTS", default = None,
         help = "Specify linear make opts.")
-    
+
     group.add_option("--pips-make-opts", metavar = "OPTS", default = None,
         help = "Specify PIPS make opts.")
-    
+
     group.add_option("--configure-opts", "-c", metavar = "OPTS", default = None,
         help = "Specify global configure opts.")
-    
+
     group.add_option("--make-opts", "-m", metavar = "OPTS", default = None,
         help = "Specify global make opts.")
-    
+
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
         help = "Make packages concurrently using COUNT jobs.")
-    
+
     group.add_option("--noinstall", "-I", action = "store_true", default = False,
         help = "Do not install any package (do not run make install for any package). NB: this might break the compilation of packages depending on the binaries of uninstalled previous packages.")
-    
+
     group.add_option("--nofinal", "-F", action = "store_true", default = False,
         help = "Skip final installations steps in install directory (installation of various files). NB: never running the final installation step will not give you a functional Par4All build.")
-    
+
     group.add_option("--reconf", action = "store_true", default = False,
         help = "Always run autoreconf before running configure for all packages.")
 
@@ -121,10 +121,10 @@ def add_module_options(parser):
 
 def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_opts = [], install = True, reconf = False):
     '''Builds the given package in package_dir using autotools.'''
-    
+
     configure_script = os.path.join(package_dir, "configure")
     makefile = os.path.join(build_dir, "Makefile")
-    
+
     configure = False
 
     if not os.path.exists(configure_script):
@@ -146,11 +146,11 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
             #~ configure_opts += [ "DESTDIR=" + dest_dir ]
         # Call configure to generate the Makefiles.
         run2([ configure_script ] + configure_opts, working_dir = build_dir)
-    
+
     # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
     run2([ "make" ] + make_opts, working_dir = build_dir)
-    
+
     if install:
         # Call make install to install in DESTDIR if requested.
         install_make_opts = []
@@ -188,6 +188,8 @@ def main(options = {}, args = []):
             options.skip_pips = True
         else:
             die("Invalid option: --skip=" + s)
+        if options.clean:
+            die("--skip is not compatible with --clean")
     for s in options.only:
         # Skip everything...
         options.skip_polylib = True
@@ -205,6 +207,7 @@ def main(options = {}, args = []):
             options.skip_pips = False
         else:
             die("Invalid option: --only=" + s)
+        die("--only is not compatible with --clean")
     if options.clean:
         options.skip_polylib = False
         options.skip_newgen = False
@@ -229,7 +232,7 @@ def main(options = {}, args = []):
     if not os.path.isdir(root):
         die("Directory does not exist: " + root)
     #~ info("Par4All source tree root: " + root)
-    
+
     # "packages_dir" is where the source packages lie.
     packages_dir = ""
     if options.packages_dir:
@@ -240,7 +243,7 @@ def main(options = {}, args = []):
         warn("Assuming packages directory is " + packages_dir + " (individual packages location may be overriden with --xxx-src)")
     #~ if not os.path.isdir(packages_dir):
         #~ die("Invalid packages dir: " + packages_dir)
-    
+
     # "dest_dir" is the staging installation directory.
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     if options.dest_dir:
@@ -251,7 +254,7 @@ def main(options = {}, args = []):
     if dest_dir:
         debug("DESTDIR=" + dest_dir)
         dest_dir = os.path.abspath(os.path.expanduser(dest_dir)) # Make it absolute whatsoever.
-    
+
     # "prefix" is the installation prefix which is passed
     # as option --prefix when configure is called for the
     # various packages.
@@ -263,7 +266,7 @@ def main(options = {}, args = []):
         warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
     if prefix:
         prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
-        
+
     # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
     # we prepend /.
@@ -273,7 +276,7 @@ def main(options = {}, args = []):
     else:
         safe_prefix = prefix
     debug("Prefix: " + quote(prefix) + " (" + safe_prefix + ")")
-    
+
     # "install_dir" is the most important variable here.
     # It is dest_dir + safe_prefix.
     install_dir = os.path.normpath(dest_dir + safe_prefix)
@@ -292,13 +295,13 @@ def main(options = {}, args = []):
             info("Install directory " + install_dir + " already exists")
     else:
         os.makedirs(install_dir)
-    
+
     # Build directory: where the Makefile are generated, where the make commands are issued, etc.
     build_dir = os.path.join(root, "build")
     debug("Build directory: " + build_dir)
-    
+
     # Path for source packages:
-    
+
     polylib_src_dir = ""
     if options.polylib_src:
         polylib_src_dir = options.polylib_src
@@ -307,7 +310,7 @@ def main(options = {}, args = []):
     debug("polylib source directory: " + polylib_src_dir)
     if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
         die("Directory does not exist: " + polylib_src_dir)
-    
+
     newgen_src_dir = ""
     if options.newgen_src:
         newgen_src_dir = options.newgen_src
@@ -316,7 +319,7 @@ def main(options = {}, args = []):
     debug("newgen source directory: " + newgen_src_dir)
     if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
         die("Directory does not exist: " + newgen_src_dir)
-    
+
     linear_src_dir = ""
     if options.linear_src:
         linear_src_dir = options.linear_src
@@ -325,7 +328,7 @@ def main(options = {}, args = []):
     debug("linear source directory: " + linear_src_dir)
     if not os.path.isdir(linear_src_dir) and not options.skip_linear:
         die("Directory does not exist: " + linear_src_dir)
-    
+
     pips_src_dir = ""
     if options.pips_src:
         pips_src_dir = options.pips_src
@@ -334,7 +337,7 @@ def main(options = {}, args = []):
     debug("PIPS source directory: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir) and not options.skip_pips:
         die("Directory does not exist: " + pips_src_dir)
-    
+
     nlpmake_src_dir = ""
     if options.nlpmake_src:
         nlpmake_src_dir = options.nlpmake_src
@@ -352,21 +355,21 @@ def main(options = {}, args = []):
     ]
     if options.configure_opts:
         configure_opts.append(options.configure_opts)
-    
+
     # Global make flags:
     make_opts = []
     if options.make_opts:
         make_opts.append(options.make_opts)
     if options.jobs:
         make_opts.append("-j" + options.jobs)
-    
+
     #~ if get_verbosity() == 0:
         #~ warn("Building and installing", spin = True)
-    
+
     ############################## polylib
-    
+
     if not options.skip_polylib:
-        
+
         info("Processing polylib")
 
         package_build_dir = os.path.join(build_dir, "polylib")
@@ -389,9 +392,9 @@ def main(options = {}, args = []):
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
-    
+
     ##############################
-    
+
     # This was used for testing with DESTDIR...
     configure_opts += [ 
         #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
@@ -400,9 +403,9 @@ def main(options = {}, args = []):
         #'CPPFLAGS="' + '-I' + os.path.join(install_dir, "include") + '"',
         #'LDFLAGS="-Wl,-z,defs -L' + os.path.join(install_dir, "lib") + '"'
         ]
-    
+
     ############################## newgen
-    
+
     if not options.skip_newgen:
         info("Processing newgen")
 
@@ -431,16 +434,16 @@ def main(options = {}, args = []):
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
-    
+
     ##############################
-    
+
     # This was used for testing with DESTDIR...
     #configure_opts += [ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
     #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ]
     configure_opts += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
-    
+
     ############################## linear
-    
+
     if not options.skip_linear:
         info("Processing linear")
 
@@ -469,26 +472,26 @@ def main(options = {}, args = []):
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir, 
             install = not options.noinstall, reconf = options.reconf)
-    
+
     ##############################
-    
+
     # This was used for testing with DESTDIR...
     #configure_opts += [ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
     #    'LINEARLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -llinearlibs"' ]
     #~ configure_opts += [ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
         #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ]
-    
+
     # Update the PATH. Needed because PIPS relies on utilities built by newgen.
     add_to_path(os.path.join(install_dir, "bin"))
-    
+
     # This was used for testing with DESTDIR...
     #add_to_path(os.path.join(install_dir, "lib"), var = "LD_LIBRARY_PATH")
-    
+
     ############################## pips
-    
+
     if not options.skip_pips:
         info("Processing pips")
-        
+
         package_build_dir = os.path.join(build_dir, "pips")
 
         # Rebuild requested? Delete existing build directory.
@@ -545,17 +548,17 @@ def main(options = {}, args = []):
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
             install = not options.noinstall, reconf = options.reconf)
-    
+
 
     ##############################
-    
+
     if options.nofinal:
         warn("Skipping final installation steps (--nofinal)")
         return
-        
-    
+
+
     # Proceed with local scripts and libraries installation.
-    
+
     # Create directory tree.
     info("Creating dirs")
     install_dir_bin = os.path.join(install_dir, "bin")
@@ -579,7 +582,7 @@ def main(options = {}, args = []):
 
     # Install a few scripts.
     info("Installing scripts")
-    
+
     for file in [ 
         "src/dev/p4a_git", 
         "src/dev/p4a_valgrind", 
@@ -594,12 +597,12 @@ def main(options = {}, args = []):
         run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
         #~ debug(os.path.join(root, file) + " -> " + install_dir_bin)
         #~ shutil.copy(os.path.join(root, file), install_dir_bin)
-    
+
     for file in [ "src/dev/p4a_git_lib.bash" ]:
         run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
         #~ debug(os.path.join(root, file) + " -> " + install_dir_etc)
         #~ shutil.copy(os.path.join(root, file), install_dir_etc)
-    
+
     # Install accelerator source.
     info("Installing accel files")
     accel_src_dir = os.path.join(root, "src/p4a_accel")
@@ -607,7 +610,7 @@ def main(options = {}, args = []):
         ext = os.path.splitext(file)[1]
         if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
             run2([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
-    
+
     # Copy python dependencies and templates.
     info("Copying python libs")
     install_python_lib_dir = ""
@@ -624,7 +627,7 @@ def main(options = {}, args = []):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
             run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
-    
+
     # Install stuff still lacking from PIPS install.
     info("Installing pips scripts")
     dir = os.path.join(pips_src_dir, "src/Scripts/validation")
@@ -657,7 +660,7 @@ def main(options = {}, args = []):
         fortran = "false"
     p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir, 
         accel = install_dir_share_accel, fortran = fortran))
-    
+
     # Write version file.
     version = guess_file_revision(root) + "~exported"
     version_file = get_version_file_path(dist_dir = install_dir)

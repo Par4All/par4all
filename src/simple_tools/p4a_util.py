@@ -52,7 +52,7 @@ class spinner(Thread):
         if not self.stopped:
             self.stopped = True
             self.join()
-    
+
     def __del__(self):
         self.stop()
 

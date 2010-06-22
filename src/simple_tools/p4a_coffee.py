@@ -24,7 +24,7 @@ def add_module_options(parser):
     '''Add options specific to this module to an existing optparse options parser.'''
 
     group = optparse.OptionGroup(parser, "Coffee Options")
-    
+
     #~ group.add_option("--work-dir", metavar = "DIR", default = None,
         #~ help = "Directory where the Git repository will be cloned and where the build will happen. "
         #~ + "By default, it will pick a temporary directory and remove it afterwards unless an error occurred.")
@@ -60,7 +60,7 @@ def main(options = {}, args = []):
             #~ options.pack_dir = work_dir_p4a_version
             #~ warn("Forcing --pack-dir=" + options.pack_dir)
             p4a_pack.main(pack_options)
-        
+
         else:
             work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")
 

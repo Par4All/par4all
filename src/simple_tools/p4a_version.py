@@ -32,7 +32,7 @@ def get_version_file_path(dist_dir = None):
 
 def guess_file_revision(file_dir = None):
     '''Try to guess a revision/version string for a given file or directory.'''
-    
+
     if file_dir:
         file_dir = os.path.realpath(os.path.abspath(os.path.expanduser(file_dir)))
     else:
@@ -43,9 +43,9 @@ def guess_file_revision(file_dir = None):
     # File is invalid, return gracefully.
     if not os.path.exists(file_dir):
         return "unknown"
-    
+
     revision = ""
-    
+
     # First, attempt to get the Git revision for the whole repos where the file lies, if any.
     try:
         revision = p4a_git(file_dir).current_revision()
@@ -53,7 +53,7 @@ def guess_file_revision(file_dir = None):
         pass
     if revision:
         return revision
-    
+
     # Try to locate a version file.
     # If file_dir is a directory, look it up underneath this directory.
     # Else, locate the "regular" version file path which should be in the
@@ -79,7 +79,7 @@ def guess_file_revision(file_dir = None):
         #~ revision = file_lastmod(file_dir).strftime("%Y%m%dT%H%M%S") + "~unknown"
     #~ except:
         #~ pass
-    
+
     # Fail gracefully.
     if not revision:
         revision = "unknown"
