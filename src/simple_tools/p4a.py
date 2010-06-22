@@ -60,9 +60,17 @@ def main(options = {}, args = []):
         if change_file_ext(abs_file, "").endswith(".p4a"):
             warn("Ignoring already processed file: " + file)
             continue
+        # Check that a file with the exact same path is not already included:
         if abs_file in files or abs_file in other_files or abs_file in header_files:
-            warn("Ignoring second mention of file " + abs_file)
+            warn("Ignoring second mention of file: " + abs_file)
             continue
+        # Check that there is no file with the same name in files
+        # to be processed by PIPS (PIPS does not accept several files
+        # with same name):
+        for review_file in files:
+            if os.path.split(review_file)[1] == os.path.split(abs_file)[1]:
+                error(review_file + " has same name as " + abs_file)
+                die("PIPS does not accept several files with same name")
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)
