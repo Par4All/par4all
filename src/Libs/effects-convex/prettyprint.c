@@ -85,9 +85,6 @@ pips_region_user_name(entity ent)
 	    /* ent is a PHI entity from the regions module */
 	    name = entity_local_name(ent);
 	else
-	    /**** ARGH why using this stuff in transformer... ******/
-	    /* if (entity_has_values_p(ent)) */
-	    /* else name = entity_name(ent); */
 	    name = entity_minimal_name(ent);
     }
 
@@ -101,6 +98,46 @@ region_sc_to_string(string __attribute__ ((unused)) s,
     pips_internal_error("implementation dropped\n");
     return string_undefined;
 }
+
+/** @brief weight function for Pvecteur passed as argument to 
+ *         sc_lexicographic_sort in text_region.
+ *
+ * The strange argument type is required by qsort(), deep down in the calls.
+ * This function is an adaptation of is_inferior_pvarval in semantics
+ */
+static int
+is_inferior_region_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    /* The constant term is given the highest weight to push constant
+       terms at the end of the constraints and to make those easy
+       to compare. If not, constant 0 will be handled differently from
+       other constants. However, it would be nice to give constant terms
+       the lowest weight to print simple constraints first...
+
+       Either I define two comparison functions, or I cheat somewhere else.
+       Let's cheat? */
+    int is_equal = 0;
+
+    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
+      is_equal = 1;
+    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
+      is_equal = 0;
+    else if(term_cst(*pvarval2))
+      is_equal = -1;
+    else if(variable_phi_p((entity) vecteur_var(*pvarval1)) 
+	    && !variable_phi_p((entity) vecteur_var(*pvarval2)))
+      is_equal = -1;
+    else  if(variable_phi_p((entity) vecteur_var(*pvarval2)) 
+	    && !variable_phi_p((entity) vecteur_var(*pvarval1)))
+      is_equal = 1;
+    else
+	is_equal =
+	    strcmp(pips_region_user_name((entity) vecteur_var(*pvarval1)),
+		   pips_region_user_name((entity) vecteur_var(*pvarval2)));
+
+    return is_equal;
+}
+
 
 #define append(s) add_to_current_line(line_buffer, s, str_prefix, t_reg)
 
@@ -172,17 +209,13 @@ text_region(effect reg)
     /* SYSTEM
      * sorts in such a way that constraints with phi variables come first.
      */
-    sorted_base = region_sorted_base_dup(reg);
-    sc = sc_dup(region_system(reg));
-    region_sc_sort(sc, sorted_base);
-
-    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc,
-			      (get_variable_name_t) pips_region_user_name,
-			      vect_contains_phi_p, foresys);
-
+    sc = sc_copy(region_system(reg));
+    sc_lexicographic_sort(sc, is_inferior_region_pvarval);
+    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
+		       (get_variable_name_t) pips_region_user_name,
+		       vect_contains_phi_p, foresys); 
+    
     sc_rm(sc);
-    base_rm(sorted_base);
-
     /* CLOSE
      */
     if (!foresys) append(">");
