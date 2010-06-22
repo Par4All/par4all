@@ -530,9 +530,10 @@ ask_a_missing_file(string module, bool is_fortran)
     /* Should be simplified... */
     do {
 	file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);
-	if(file && strcmp(file, "quit")==0)
+	if(file && strcmp(file, "quit")==0) {
 	  free(file);
 	  break;
+	}
 	if (file)
 	  {
 	    if (same_string_p(file, "generate"))
