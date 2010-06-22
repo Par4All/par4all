@@ -14,6 +14,7 @@ from p4a_util import *
 from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
+from p4a_opts import *
 
 import p4a_pack
 
@@ -21,35 +22,17 @@ import p4a_pack
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog <--deb|--tgz|-stgz> [--version=0.1] [--append-date] [--dir=/current/install/dir] [--prefix=/final/install/dir] [--publish] [other options] [optional additional files to publish]")
+    parser = optparse.OptionParser(description = __doc__, 
+        usage = "%prog <--deb|--tgz|-stgz> [--version=0.1] [--append-date] [--dir=/current/install/dir] [--prefix=/final/install/dir] [--publish] [other options] [optional additional files to publish]")
 
     p4a_pack.add_module_options(parser)
 
-    main_group = optparse.OptionGroup(parser, "General Options")
-
-    main_group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-        help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
-
-    main_group.add_option("--no-color", action = "store_true", default = False,
-        help = "Disable coloring of terminal output.")
-
-    main_group.add_option("-V", dest = "script_version", action = "store_true", default = False,
-        help = "Display script version and exit.")
-
-    parser.add_option_group(main_group)
+    add_common_options(parser)
 
     (options, args) = parser.parse_args()
 
-    if options.no_color:
-        p4a_term.disabled = True
-
-    set_verbosity(options.verbose)
-
-    if options.script_version:
-        print(guess_file_revision(__file__))
-        return
-
-    p4a_pack.main(options, args)
+    if process_common_options(options, args):
+        p4a_pack.main(options, args)
 
 
 if __name__ == "__main__":
@@ -57,8 +40,13 @@ if __name__ == "__main__":
         main()
     except p4a_error:
         error(str(sys.exc_info()[1]))
-        error("To get verbose output, try passing -v, -vv, or -vvv")
-        sys.exit(1)
+        if sys.exc_info()[1].code == -2:
+            error("Interrupted")
+        else:
+            error("To get verbose output, try passing -v, -vv, or -vvv")
+            if report_enabled():
+                send_report_email()
+        sys.exit(sys.exc_info()[1].code)
     except:
         raise
     finally:

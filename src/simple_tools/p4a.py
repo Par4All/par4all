@@ -116,7 +116,7 @@ def add_module_options(parser):
 
     compile_group.add_option("--ar", metavar = "ARCHIVER", default = None,
                              help = "Archiver to use (defaults to ar).")
-
+    
     compile_group.add_option("--icc", action = "store_true", default = False,
                              help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
 
@@ -127,11 +127,11 @@ def add_module_options(parser):
     compile_group.add_option("--no-fast", "--not-fast", action = "store_true",
                              default = False,
                              help = "Do not add optimized compilation flags automatically.")
-
+    
     compile_group.add_option("--no-default-flags", action = "store_true",
                              default = False,
                              help = "Do not add some C flags such as -fPIC, -g, etc. automatically.")
-
+    
     compile_group.add_option("--c-flags", action = "append",
                              metavar = "FLAGS", default = [],
                              help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
@@ -182,25 +182,25 @@ def add_module_options(parser):
                           help = "Add an additional object file for linking. Several are allowed.")
 
     parser.add_option_group(link_group)
-
+    
     cmake_group = optparse.OptionGroup(parser, "CMake Options")
 
     cmake_group.add_option("--cmake", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --make alone will NOT build the project.")
-
+    
     cmake_group.add_option("--cmake-flags", action = "append",
                           metavar = "FLAGS", default = [],
                           help = "Specify additional flags to pass to CMake. Several are allowed.")
-
+    
     cmake_group.add_option("--cmake-dir", metavar = "DIR", default = None,
                           help = "Output/lookup the CMakeLists.txt file in this directory instead of the current working directory.")
-
+    
     cmake_group.add_option("--cmake-gen", action = "store_true", default = False,
                           help = "If output files are specified (with -o), setting this flag will make p4a try to locate a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir), and generate Makefiles in a specific directory (--cmake-gen-dir).")
-
+    
     cmake_group.add_option("--cmake-gen-dir", metavar = "DIR", default = None,
                           help = "Generate Makefiles in this directory instead of <project name>.gen by default.")
-
+    
     cmake_group.add_option("--cmake-build", action = "store_true", default = False,
                           help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")    
 
@@ -273,7 +273,7 @@ def main(options = {}, args = []):
             info("Ignoring header file: " + abs_file)
         else:
             die("File format not supported: " + abs_file)
-
+    
     # If no project name is provided, try some random names.
     # XXX: would be good to be able to specify the location for the .database and .build dir?
     # Or put it in /tmp by default?..
@@ -291,13 +291,13 @@ def main(options = {}, args = []):
     else:
         expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
         build_dir = os.path.join(os.getcwd(), project_name + ".build")
-
+    
     if options.remove_first:
         if os.path.exists(expected_database_dir):
             rmtree(expected_database_dir)
         if os.path.exists(build_dir):
             rmtree(build_dir)
-
+    
     # Prepare the C preprocessor flags and linker flags.
     cpp_flags = options.cpp_flags
     for include_dir in options.include_dirs:
@@ -311,7 +311,7 @@ def main(options = {}, args = []):
         ld_flags += [ "-L" + lib_dir ]
     for lib in options.libs:
         ld_flags += [ "-l" + lib ]
-
+    
     # Instantiate the builder. It will be used to keep track and arrange all
     # the CPP, C, Fortran etc. flags, apart from being used for building the
     # project after processing, if requested.
@@ -338,10 +338,10 @@ def main(options = {}, args = []):
         add_optimization_flags = not options.no_fast,
         no_default_flags = options.no_default_flags
     )
-
+    
     ###################
     ### XXXXXXXXXXXXXX TODO: override CPP used by the processor -> pyps -> pips with builder.cpp
-
+    
     info("CPP flags: " + " ".join(builder.cpp_flags))
 
     # Process (parallelize) files (or not).
@@ -364,7 +364,7 @@ def main(options = {}, args = []):
                                   filter_exclude = options.exclude_modules,
                                   accel = options.accel,
                                   cuda = options.cuda)
-
+            
             # Save it for later.
             database_dir = os.path.abspath(processor.workspace.directory())
 
@@ -376,12 +376,12 @@ def main(options = {}, args = []):
 
             if options.openmp:
                 processor.ompify()
-
+            
             # Write the output files.
             processor_output_files = processor.save()
-
+            
             del processor
-
+            
         except p4a_error:
             error("Processing of " + ", ".join(files) + " failed: " + sys.exc_info()[1].msg)
             if database_dir:
