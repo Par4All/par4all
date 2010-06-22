@@ -1,0 +1,66 @@
+delete mixed_eol
+
+# setenv PIPS_CPP="cpp" (pour eviter l'option -ansi)  
+
+# Arret a la premiere erreur:
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create mixed_eol mixed_eol.c
+echo ensuite
+# options necessaires pour pouvoir travailler sur du code C
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# fin des options C
+
+# Ter@ops:
+# activate PRINT_XML_APPLICATION
+echo
+echo Printed file du fichier choisi par defaut lors du create
+echo
+ 
+display PRINTED_FILE
+
+echo
+echo Transformers for "main"
+echo
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+quit
+
+echo
+echo Calcul des regions de tableaux "must" en vue de privatisation
+echo
+
+activate MUST_REGIONS
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE
+#display PRINTED_FILE
+#apply ARRAY_PRIVATIZER
+
+activate PRINT_PARALLELIZEDOMP_CODE
+# activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE[%ALL]
+#display XML_PRINTED_FILE[main]
+
+close
+quit
