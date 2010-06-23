@@ -2630,14 +2630,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       expression e = gfc2pips_expr2expression(c->expr);
       expression e1 = MakeBinaryCall(CreateIntrinsic(LESS_THAN_OPERATOR_NAME),
                                      e,
-                                     MakeIntegerConstantExpression("0"));
+                                     int_to_expression(0));
       expression e2 = MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
                                      e,
-                                     MakeIntegerConstantExpression("0"));
+                                     int_to_expression(0));
       expression e3 =
           MakeBinaryCall(CreateIntrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
                          e,
-                         MakeIntegerConstantExpression("0"));
+                         int_to_expression(0));
       /*
        * we handle the labels doubled because it will never be checked
        * afterwards to combine/fuse
