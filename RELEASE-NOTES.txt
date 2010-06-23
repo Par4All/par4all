@@ -1,4 +1,4 @@
-Release notes for Par4All 0.2, 2010/06/15
+Release notes for Par4All 0.2, 2010/06/21
 =========================================
 
 Par4All is an open-source environment to do source-to-source
@@ -43,14 +43,14 @@ The best way if you are on GNU/Linux Debian or Ubuntu is to use
 our package repository. This way, when a new version is out, your
 classical package manager can automatically install it.
 
-To use our package repository, pick *one* of the following lines, and 
-append it to your /etc/apt/sources.list:
+To use our package repository, pick *one* of the following lines, and
+append it to your /etc/apt/sources.list::
 
   deb http://download.par4all.org/ubuntu releases main
   deb http://download.par4all.org/ubuntu nightly main
   deb http://download.par4all.org/debian releases main
   deb http://download.par4all.org/debian nightly main
-  
+
 (Nightly packages are generated every night, and is best suited if you want
 to track closely Par4All development. The stability is not guaranteed with
 nightly builds.)
@@ -80,12 +80,13 @@ work on any GNU/Linux distribution with the following libraries installed:
 
   (a fairly recent) libc.so.6, libncurses.so.5, libreadline.so.6
 
-Once you have downloaded one of these .tar.gz packages from http://download.par4all.org,
-extract it with the following command:
-  
+Once you have downloaded one of these .tar.gz packages from
+http://download.par4all.org, extract it with the following command::
+
   tar xvzf <the_package>.tar.gz
 
-It will create a directory named par4all. Move this directory to its final location::
+It will create a directory named par4all. Move this directory to its final
+location::
 
   sudo mv par4all /usr/local/
 
@@ -171,6 +172,9 @@ environment variables set:
   ``$HOME/NVIDIA_GPU_Computing_SDK``)
 
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
+
+Sometimes, Par4All generates C99 array parameter declarations in the
+generated CUDA kernels that are not yet dealt with nvcc 3.0.
 
 
 SIMD and multimedia extensions:
