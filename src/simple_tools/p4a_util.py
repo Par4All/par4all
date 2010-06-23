@@ -345,9 +345,11 @@ class runner(Thread):
             #spin_text = ".·°·..·°·..·°·."
             self.spin_pos = len(self.spin_text)
             self.spin_back = False
-            self.spin_after = .5
+            self.spin_after = .8
             #~ self.can_spin = not self.silent and os.isatty(2)
             self.can_spin = os.isatty(2)
+            self.out_line_chunk = ""
+            self.err_line_chunk = ""
             self.startt = time.time()
             self.start()
 
@@ -371,17 +373,22 @@ class runner(Thread):
         if not self.can_spin or time.time() - self.startt < self.spin_after:
             return
         sys.__stderr__.write("\r")
+        self.startt = time.time()
 
     def read_output(self, spin = True):
         try:
             while True:
                 new_out = self.process.stdout.read()
+                lines = new_out.split("\n")
+                lines[0] = self.out_line_chunk + lines[0]
+                self.out_line_chunk = lines.pop()
+                new_out = "\n".join(lines)
                 if new_out:
-                    self.out += new_out
                     if self.stdout_handler:
                         if spin:
                             self.hide_spinner()
-                        self.stdout_handler(new_out)
+                        for line in lines:
+                            self.stdout_handler(line)
                 else:
                     break
         except IOError:
@@ -391,12 +398,16 @@ class runner(Thread):
         try:
             while True:
                 new_err = self.process.stderr.read()
+                lines = new_err.split("\n")
+                lines[0] = self.err_line_chunk + lines[0]
+                self.err_line_chunk = lines.pop()
+                new_err = "\n".join(lines)
                 if new_err:
-                    self.err += new_err
                     if self.stderr_handler:
                         if spin:
                             self.hide_spinner()
-                        self.stderr_handler(new_err)
+                        for line in lines:
+                            self.stderr_handler(line)
                 else:
                     break
         except IOError:
@@ -478,11 +489,11 @@ def rmtree(dir, can_fail = False, remove_top = True):
     #~ debug("Removing tree: " + dir)
     ret = 0
     if remove_top:
-        ret = run([ "rm", "-rf", dir + "/" ], can_fail = can_fail)
+        if run([ "rm", "-rf", dir + "/" ], can_fail = can_fail):
+            warn("Could not remove " + dir + " recursively")
     else:
-        ret = run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)
-    if ret:
-        warn("Could not remove " + dir)
+        if run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail):
+            warn("Could not remove everything in " + dir)
     #~ try:
         #~ for root, dirs, files in os.walk(dir, topdown = False):
             #~ for name in files:

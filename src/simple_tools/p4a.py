@@ -342,18 +342,27 @@ def main(options, args = []):
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
         input.recover_includes = not options.skip_recover_includes
+        
+        output = None
 
-        (input_fd, input_file) = tempfile.mkstemp(text = False)
-        (output_fd, output_file) = tempfile.mkstemp(text = False)
+	if options.here:
+            output = process(input)
 
-        save_pickle(input_file, input)
+        else:
+            (input_fd, input_file) = tempfile.mkstemp(text = False)
+            (output_fd, output_file) = tempfile.mkstemp(text = False)
 
-        process_script = os.path.join(get_program_dir(), "p4a_process")
+            save_pickle(input_file, input)
 
-        run([ process_script, "--input-file", input_file, "--output-file", output_file ],
-            stderr_handler = lambda s: sys.__stderr__.write("====" + s + "\n"))
+            process_script = os.path.join(get_program_dir(), "p4a_process")
 
-        output = load_pickle(output_file)
+            # PIPS outputs everything in stderr in a somewhat weird way...
+            # Its output is buffered.
+            (out, err, ret) = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
+                stdout_handler = lambda s: debug(s, bare = True)
+                stderr_handler = lambda s: debug(s, bare = True))
+
+            output = load_pickle(output_file)
 
         processor_output_files = output.files
         database_dir = output.database_dir
