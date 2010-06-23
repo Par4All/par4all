@@ -19,18 +19,18 @@ script_dir = os.path.split(actual_script)[0]
 
 class p4a_git():
     '''Git Repositories Manipulation Class'''
-    
+
     _git_ext = None
     _git_dir = None
     _dir = None
-    
+
     def is_valid_git_dir(self, dir):
         '''Returns True if the directory appears to be a valid Git repository.'''
         result = ((os.path.splitext(dir)[1] == self._git_ext or os.path.split(dir)[1] == self._git_ext) 
             and os.path.exists(os.path.join(dir, "index")))
         #debug("is_valid_git_dir("+ dir +") = " + str(result))
         return result
-    
+
     def __init__(self, any_file_inside_target_repos = os.getcwd(), git_ext = ".git"):
         '''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
         self._git_ext = git_ext
@@ -62,7 +62,7 @@ class p4a_git():
         else:
             raise p4a_error("Git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
         debug("Git root for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
-    
+
     def fix_input_file_path(self, path):
         '''Function for fixing input paths: make it relative to the repository root or carp if it is not in there.'''
         if not path:
@@ -72,7 +72,7 @@ class p4a_git():
             raise p4a_error("File is outside repository in " + self._dir + ": " + path)
         path = path[len(self._dir) + 1:]
         return path
-    
+
     def cmd(self, git_command, can_fail = True):
         '''Runs a git command with correct environment and path settings.'''
         old_git_dir = ""
@@ -87,14 +87,14 @@ class p4a_git():
         os.environ["GIT_DIR"] = old_git_dir
         os.environ["GIT_WORK_TREE"] = old_work_tree
         return output
-    
+
     def current_branch(self):
         output = self.cmd([ "branch" ])
         for b in output.split("\n"):
             if b.startswith("* "):
                 return b.replace("* ", "")
         return None
-    
+
     def is_dirty(self, file = None):
         '''Returns True if the file in the repository has been altered since last revision.
         If file is None or empty, it will return True if any file in the repository has been modified.'''
@@ -108,7 +108,7 @@ class p4a_git():
             result = True
         #debug("is_dirty("+ file +") = " + str(result))
         return result
-    
+
     def current_revision(self, file = None, test_dirty = True):
         '''Returns the current revision for the currently checked out branch, for the given file.
         file can be None or empty, in which case, the current revision for the whole branch will be returned.'''
@@ -124,15 +124,15 @@ class p4a_git():
                 short_rev += "~dirty"
         #debug("current_revision("+ file +") = " + short_rev)
         return short_rev
-    
+
     def archive(self, output_file, prefix, format = "tar"):
         self.cmd([ "archive", "--format", format, "-o", output_file, 
             "--prefix", prefix, self.current_revision(test_dirty = False) ])
-    
+
     def git_dir(self):
         '''Returns the absolute path for the .git directory.'''
         return self._git_dir
-    
+
     def dir(self):
         '''Returns the absolute path for the working tree directory.'''
         return self._dir

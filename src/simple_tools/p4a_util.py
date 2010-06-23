@@ -9,13 +9,49 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, os, re, datetime, shutil, subprocess, time, tempfile
+import string, sys, random, logging, logging.handlers, os, re, datetime, shutil, subprocess, time, tempfile, smtplib, optparse
 from threading import Thread
+from email.mime.text import MIMEText
 import p4a_term
 
 # Global variables.
 verbosity = 0
 logger = None
+current_log_file = None
+program_name = os.path.split(sys.argv[0])[1]
+
+def get_program_name():
+    global program_name
+    return program_name
+
+def get_current_log_file():
+    global current_log_file
+    return current_log_file
+
+def change_file_ext(file, new_ext = None, if_ext = None):
+    '''Changes the extension for the given file path if it matches if_ext.'''
+    (base, ext) = os.path.splitext(file)
+    if new_ext is None:
+        new_ext = ""
+    if if_ext:
+        if ext == if_ext:
+            return base + new_ext
+        else:
+            return file
+    else:
+        return base + new_ext
+
+def get_file_extension(file):
+    '''Returns the extension of the given file.'''
+    return os.path.splitext(file)[1]
+
+def get_file_ext(file):
+    return get_file_extension(file)
+
+def file_add_suffix(file, suffix):
+    '''Adds a suffix to the given file (before its extension).'''
+    (base, ext) = os.path.splitext(file)
+    return base + suffix + ext
 
 def set_verbosity(level):
     '''Sets global verbosity level'''
@@ -72,29 +108,29 @@ def stop_all_spinners():
     for spin in all_spinners:
         spin.stop()
 
-msg_prefix = os.path.split(sys.argv[0])[1] + ": "
+msg_prefix = program_name + ": "
 master_spin = spinner(False)
 
 # Printing/logging helpers.
-def debug(msg, spin = False):
+def debug(msg, spin = False, log = True):
     if verbosity >= 2:
         master_spin.stop()
         sys.stderr.write(msg_prefix + str(msg).rstrip("\n") + "\n");
         if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.debug(msg)
 
-def info(msg, spin = False):
+def info(msg, spin = False, log = True):
     if verbosity >= 1:
         master_spin.stop()
         sys.stderr.write(msg_prefix + p4a_term.escape("white", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
         if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.info(msg)
 
-def cmd(msg, spin = False, dir = None):
+def cmd(msg, spin = False, dir = None, log = True):
     if verbosity >= 1:
         master_spin.stop()
         if verbosity >= 2 and dir:
@@ -103,48 +139,68 @@ def cmd(msg, spin = False, dir = None):
             sys.stderr.write(msg_prefix + p4a_term.escape("magenta", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
         if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.info(msg)
 
-def done(msg, spin = False):
+def done(msg, spin = False, log = True):
     if verbosity >= 0:
         master_spin.stop()
         sys.stderr.write(msg_prefix + p4a_term.escape("green", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
         if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.info(msg)
 
-def warn(msg, spin = False):
+def warn(msg, spin = False, log = True):
     if verbosity >= 0:
         master_spin.stop()
         sys.stderr.write(msg_prefix + p4a_term.escape("yellow", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
         if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.warn(msg)
 
-def error(msg, spin = False):
+def error(msg, spin = False, log = True):
     master_spin.stop()
     sys.stderr.write(msg_prefix + p4a_term.escape("red", if_tty_fd = 2) + str(msg).rstrip("\n") + p4a_term.escape(if_tty_fd = 2) + "\n");
     if spin:
             master_spin.start_spinning()
-    if logger:
+    if logger and log:
         logger.error(msg)
 
-def die(msg, exit_code = 255):
-    error(msg)
+def die(msg, exit_code = 254, log = True):
+    error(msg, log = log)
     #error("aborting")
     sys.exit(exit_code)
 
+default_log_file = os.path.join(os.getcwd(), program_name + ".log")
+log_file_handler = None
+
+def setup_logging(file = default_log_file, suffix = "", remove = False):
+    global logger, program_name, current_log_file, log_file_handler
+    logger = logging.getLogger(program_name)
+    logger.setLevel(logging.DEBUG)
+    if suffix:
+        file = file_add_suffix(file, suffix)
+    if remove and os.path.exists(file):
+        os.remove(file)
+    log_file_handler = logging.handlers.RotatingFileHandler(file, maxBytes = 1024 * 1024, backupCount = 10)
+    log_file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    logger.addHandler(log_file_handler)
+    current_log_file = file
+    warn("Log file is " + file)
+
+def flush_log():
+    if log_file_handler:
+        log_file_handler.flush()
+
 class p4a_error(Exception):
     '''Generic base class for exceptions'''
-    msg = "error"
-    def __init__(self, msg):
+    def __init__(self, msg = "Generic error", code = 123):
         self.msg = msg
-        #error(msg)
+        self.code = code
     def __str__(self):
-        return self.msg
+        return self.msg + " (" + str(self.code) + ")"
 
 def slurp(file):
     '''Slurp file contents.'''
@@ -224,7 +280,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, capt
             sys.stderr.write(err)
         debug("Environment was: " + repr(os.environ))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret))
+            + " failed with exit code " + str(ret), code = ret)
     return [ out, err, ret ]
 
 def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, shell = True, capture = False, extra_env = {}):
@@ -279,12 +335,20 @@ def run2(cmd_list, can_fail = False, force_locale = "C", working_dir = None, she
             sys.stderr.write(err)
         debug("Environment was: " + repr(env))
         raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w 
-            + " failed with exit code " + str(ret))
+            + " failed with exit code " + str(ret), code = ret)
     return [ out, err, ret ]
 
-# Not portable!
 def which(cmd):
     return run2([ "which", cmd ], can_fail = True, capture = True)[0]
+
+def whoami():
+    return run2([ "whoami" ], can_fail = True, capture = True)[0]
+
+def hostname():
+    return run2([ "hostname", "--fqdn" ], can_fail = True, capture = True)[0]
+
+def ping(host):
+    return 0 == run2([ "ping", "-w1", "-q", host ], can_fail = True, capture = True)[2]
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password'''
@@ -389,31 +453,6 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
 #			if not os.path.isdir(install_python_lib_dir):
 #				install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
 #			break
-
-def change_file_ext(file, new_ext = None, if_ext = None):
-    '''Changes the extension for the given file path if it matches if_ext.'''
-    (base, ext) = os.path.splitext(file)
-    if new_ext is None:
-        new_ext = ""
-    if if_ext:
-        if ext == if_ext:
-            return base + new_ext
-        else:
-            return file
-    else:
-        return base + new_ext
-
-def get_file_extension(file):
-    '''Returns the extension of the given file.'''
-    return os.path.splitext(file)[1]
-
-def get_file_ext(file):
-    return get_file_extension(file)
-
-def file_add_suffix(file, suffix):
-    '''Adds a suffix to the given file (before its extension).'''
-    (base, ext) = os.path.splitext(file)
-    return base + suffix + ext
 
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
@@ -563,9 +602,11 @@ def relativize(file_dir = None, dirs = [], base = os.getcwd()):
             file_dir = file_dir[1:]
     return file_dir
 
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")
+
 
 # Some Emacs stuff:
 ### Local Variables:

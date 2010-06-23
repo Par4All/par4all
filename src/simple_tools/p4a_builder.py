@@ -90,7 +90,7 @@ class p4a_builder():
     ld_flags = []
     nvcc_flags = []
     fortran_flags = []
-    
+
     cpp = None
     cc = None
     cxx = None
@@ -98,22 +98,22 @@ class p4a_builder():
     ar = None
     nvcc = None
     fortran = None
-    
+
     m64 = False
     cudafied = False
     extra_source_files = []
-    
+
     def cudafy_flags(self):
         if self.cudafied:
             return
         self.cpp_flags += get_cuda_cpp_flags()
         self.ld_flags += get_cuda_ld_flags(self.m64)
-        
+
         self.cpp_flags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
         self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
 
         self.cudafied = True
-    
+
     def __init__(self,
         cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [], nvcc_flags = [], fortran_flags = [],
         cpp = None, cc = None, cxx = None, ld = None, ar = None, nvcc = None, fortran = None,
@@ -121,7 +121,7 @@ class p4a_builder():
         openmp = False, accel_openmp = False, icc = False, cuda = False,
         add_debug_flags = False, add_optimization_flags = False, no_default_flags = False
     ):
-        
+
         if not nvcc:
             nvcc = "nvcc"
         if icc:
@@ -144,13 +144,13 @@ class p4a_builder():
             cpp = cc + " -E"
         if not fortran:
             fortran = "gfortran"
-        
+
         if add_optimization_flags:
             if icc:
                 c_flags += [ "-fast" ]
             else:
                 c_flags += [ "-O2" ]
-        
+
         if openmp:
             if icc:
                 c_flags += [ "-openmp" ]
@@ -158,18 +158,18 @@ class p4a_builder():
             else:
                 c_flags += [ "-fopenmp" ]
                 ld_flags += [ "-fopenmp" ]
-            
+
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
-        
+
         if add_debug_flags:
             cpp_flags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
             c_flags = [ "-g" ] + c_flags
-        
+
         if not no_default_flags:
             c_flags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + c_flags
-        
+
         m64 = False
         machine_arch = get_machine_arch()
         if arch is None:
@@ -183,17 +183,17 @@ class p4a_builder():
                 m64 = True
             else:
                 raise p4a_error("Unsupported architecture: " + arch)
-        
+
         if c_flags and len(cxx_flags) == 0:
             cxx_flags = c_flags
-        
+
         self.cpp_flags = cpp_flags
         self.c_flags = c_flags
         self.cxx_flags = cxx_flags
         self.ld_flags = ld_flags
         self.nvcc_flags = nvcc_flags
         self.fortran_flags = fortran_flags
-        
+
         self.cpp = cpp
         self.cc = cc
         self.cxx = cxx
@@ -201,7 +201,7 @@ class p4a_builder():
         self.ar = ar
         self.nvcc = nvcc
         self.fortran = fortran
-        
+
         self.m64 = m64
         if cuda:
             self.cudafy_flags()
@@ -213,7 +213,7 @@ class p4a_builder():
 
     def c2o(self, file, output_file):
         run2([ self.cc, "-c" ] + self.cpp_flags + self.c_flags + [ "-o", output_file, file ])
-    
+
     def cpp2o(self, file, output_file):
         run2([ self.cxx, "-c" ] + self.cpp_flags + self.cxx_flags + [ "-o", output_file, file ])
 
@@ -221,21 +221,21 @@ class p4a_builder():
         run2([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
-        
+
         files += self.extra_source_files
-        
+
         has_cuda = False
         has_c = False
         has_cxx = False
         has_fortran = False
-        
+
         # Determine build directory.
         if not build_dir:
             build_dir = os.path.join(os.getcwd(), ".build")
         debug("Build dir: " + build_dir)
         if not os.path.isdir(build_dir):
             os.makedirs(build_dir)
-        
+
         # First pass: make .c, .cpp or .f files out of other extensions (.cu, ..):
         first_pass_files = []
         for file in files:
@@ -247,7 +247,7 @@ class p4a_builder():
                 first_pass_files += [ cucpp_file ]
             else:
                 first_pass_files += [ file ]
-        
+
         # Second pass: make object files out of source files.
         second_pass_files = []
         for file in first_pass_files:
@@ -268,13 +268,13 @@ class p4a_builder():
                 second_pass_files += [ obj_file ]
             else:
                 raise p4a_error("Unsupported extension for input file: " + file)
-        
+
         # Create output files.
         for output_file in output_files:
             #output_file = os.path.abspath(os.path.expanduser(output_file))
-            
+
             more_ld_flags = []
-            
+
             # Prepare for creating the final binary.
             if lib_file_p(output_file):
                 if has_cuda:
@@ -286,18 +286,18 @@ class p4a_builder():
                 pass
             else:
                 raise p4a_error("I do not know how to make this output file: " + output_file)
-            
+
             final_command = self.cc
             if has_fortran:
                 final_command = self.fortran
             elif has_cxx:
                 final_command = self.cxx
-            
+
             # Create the final binary.
             run2([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", output_file ] + second_pass_files + extra_obj,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
-            
+
             if os.path.exists(output_file):
                 done("Generated " + output_file)
             else:
@@ -305,10 +305,10 @@ class p4a_builder():
 
     def cmake_write(self, project_name, files, output_files, extra_obj = [], dir = None):
         '''Creates a CMakeLists.txt project file suitable for building the project with CMake.'''
-        
+
         if not project_name:
             project_name = gen_name(prefix = "")
-        
+
         # Determine the directory where the CMakeLists.txt file should be put.
         if dir:
             dir = os.path.abspath(dir)
@@ -320,20 +320,20 @@ class p4a_builder():
 
         # We will try to make all paths relatives to this dir:
         base_dir = dir
-        
+
         # Make flags CUDA aware if not already the case.
         for file in files:
             if cuda_file_p(file):
                 self.cudafy_flags()
-        
+
         # Append additional required files such as accel files.
         files += self.extra_source_files
-        
+
         # Make input files relative to the base directory.
         rel_files = []
         for file in files:
             rel_files.append(relativize(file, base_dir))
-        
+
         # Split input files between regular source files and .cu files,
         # add .cu.cpp files to regular source files for each .cu file.
         cuda_files = []
@@ -350,7 +350,7 @@ class p4a_builder():
                 header_files.append(file)
             else:
                 source_files.append(file)
-        
+
         # Create a big dictionary with all the substitutions
         # possible for the string templates.
         global actual_script
@@ -379,7 +379,7 @@ class p4a_builder():
             lib_dirs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-L")]),
             libs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-l")]),
         )
-        
+
         cmakelists = string.Template("""# Generated on $time by $script
 
 cmake_minimum_required(VERSION 2.6)
@@ -452,7 +452,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
 """).substitute(subs)
             else:
                 raise p4a_error("I do not know how to build this file type: " + output_file)
-        
+
         done("Generated " + cmakelists_file)
         dump(cmakelists_file, cmakelists)
 
@@ -466,14 +466,14 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         if not os.path.exists(cmakelists_file):
             raise p4a_error("Could not find " + cmakelists_file)
         debug("Generating from " + cmakelists_file) 
-        
+
         # Determine generation directory.
         if not gen_dir:
             gen_dir = os.path.join(os.getcwd(), ".cmake")
         debug("Gen dir: " + gen_dir)
         if not os.path.isdir(gen_dir):
             os.makedirs(gen_dir)
-        
+
         run2([ "cmake", "." ] + cmake_flags, working_dir = dir)
         if build:
             makeflags = []

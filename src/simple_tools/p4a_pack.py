@@ -48,40 +48,40 @@ temp_dirs = []
 
 def add_module_options(parser):
     '''Add options specific to this module to an existing optparse options parser.'''
-    
+
     group = optparse.OptionGroup(parser, "Packing Options")
 
     group.add_option("--pack-dir", metavar = "DIR", default = None,
         help = "Directory where the distribution to package is currently installed. "
         + "Default is to take the root of the Git repository in which this script lies.")
-    
+
     group.add_option("--deb", action = "store_true", default = False,
         help = "Build a .deb package.")
-    
+
     #~ group.add_option("--sdeb", action = "store_true", default = False,
         #~ help = "Create a source .deb package.")
-    
+
     #~ group.add_option("--rpm", "-R", action = "store_true", default = False,
         #~ help = "Build a .rpm package.")
-    
+
     #~ group.add_option("--srpm", action = "store_true", default = False,
         #~ help = "Build a source .rpm package.")
-    
+
     group.add_option("--tgz", "-T", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
-    
+
     group.add_option("--stgz", action = "store_true", default = False,
         help = "Create a source .tar.gz archive.")
-    
+
     group.add_option("--arch", metavar = "ARCH", default = None,
         help = "Specify the package architecture manually. By default, the current machine architecture is used.")
-    
+
     group.add_option("--version", "--revision", metavar = "REVISION",
         help = "Specify package version. Current Git revision will be automatically appended.")
-    
+
     group.add_option("--append-date", action = "store_true", default = False,
         help = "Automatically append date to version string.")
-    
+
     group.add_option("--publish", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
 
@@ -183,7 +183,7 @@ def publish_files(files, nightly = False):
     global default_publish_host
     global default_publish_dir, default_nightly_publish_dir
     global default_deb_publish_dir, default_deb_nightly_publish_dir
-    
+
     publish_dir = ""
     deb_publish_dir = ""
     if nightly:
@@ -192,7 +192,7 @@ def publish_files(files, nightly = False):
     else:
         publish_dir = default_publish_dir
         deb_publish_dir = default_deb_publish_dir
-    
+
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(file):
@@ -348,7 +348,7 @@ def main(options = {}, args = []):
 
     append_revision_bin = ""
     append_revision_src = ""
-    
+
     if options.deb or options.tgz:
         append_revision_bin = guess_file_revision(pack_dir)
         if not append_revision_bin:
