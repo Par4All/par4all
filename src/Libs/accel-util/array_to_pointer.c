@@ -39,7 +39,6 @@
 #include "properties.h"
 #include "misc.h"
 #include "control.h"
-#include "preprocessor.h"
 #include "accel-util.h"
 
 typedef enum {

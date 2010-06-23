@@ -41,7 +41,6 @@
 #include "ri-util.h"
 
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "parser_private.h"
 #include "syntax.h"
@@ -239,7 +238,7 @@ entity make_global_entity_from_local(entity local) {
     entity_initial(new)=copy_value(entity_initial(local));
     entity a = global_name_to_entity(TOP_LEVEL_MODULE_NAME,DYNAMIC_AREA_LOCAL_NAME);
     entity f = local_name_to_top_level_entity(TOP_LEVEL_MODULE_NAME);
-    entity_storage(new)=make_storage_ram(make_ram(f,a,add_any_variable_to_area(a,new,fortran_module_p(local)),NIL));
+    entity_storage(new)=make_storage_ram(make_ram(f,a,add_any_variable_to_area(a,new,fortran_module_p(entity_to_module_entity(local))),NIL));
     return new;
 }
 

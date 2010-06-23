@@ -50,7 +50,6 @@
 #include "ri-util.h"
 
 #include "properties.h"
-#include "preprocessor.h"
 #include "control.h"
 #include "syntax.h"
 

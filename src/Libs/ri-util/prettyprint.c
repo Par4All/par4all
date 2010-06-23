@@ -122,7 +122,6 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 
 #include "misc.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "STEP_name.h"
 

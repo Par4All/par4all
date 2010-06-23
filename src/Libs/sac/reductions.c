@@ -44,7 +44,10 @@
 
 #include "effects-convex.h"
 #include "effects-simple.h"
+<<<<<<< HEAD
 #include "preprocessor.h"
+=======
+>>>>>>> devclean
 
 #include "control.h"
 #include "properties.h"

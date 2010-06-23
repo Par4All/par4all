@@ -36,7 +36,6 @@
 #include "effects-util.h"
 
 #include "effects-generic.h"
-#include "preprocessor.h"
 #include "text-util.h"
 #include "effects-simple.h"
 

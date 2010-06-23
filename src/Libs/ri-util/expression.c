@@ -970,19 +970,13 @@ expression find_ith_expression(list le, int r)
 expression int_to_expression(_int i)
 {
     entity e = int_to_entity(i);
-    if(i<0)
-        return unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME,entity_to_expression(e));
-    else
-        return call_to_expression(make_call(e,NIL));
+    return call_to_expression(make_call(e,NIL));
 }
 
 expression float_to_expression(float c)
 {
     entity e = float_to_entity(c);
-    if(c<0)
-        return unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME,entity_to_expression(e));
-    else
-        return call_to_expression(make_call(e,NIL));
+    return call_to_expression(make_call(e,NIL));
 }
 expression complex_to_expression(float re, float im)
 {

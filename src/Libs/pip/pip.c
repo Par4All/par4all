@@ -85,8 +85,6 @@
 #define PIP_OPTION "-s"
 #define PIP_IN_FILE "pip_in"
 #define PIP_OUT_FILE "pip_out"
-extern	int quayyparse();
-extern	FILE * quayyin;
 
 /* Variables for the direct call to PIP version */
 #define INLENGTH 1024
@@ -127,10 +125,6 @@ int   	ind_min_max;
    int nb_unknowns;
    int min_or_max;
    {
-     extern quast quast_act;
-     extern Pbase base_var_ref, old_base_var, base_ref, old_base;
-     extern int ind_min_max;
-   
      Pvecteur pvect;
      int aux, n, i, res, infinite_num;
      char *com = "essai";
@@ -215,9 +209,6 @@ quast old2_pip_solve(ps_dep, ps_context, nb_unknowns, min_or_max)
 Psysteme ps_dep, ps_context;
 int nb_unknowns, min_or_max;
 {
-        extern quast quast_act;
-        extern Pbase base_var_ref, old_base_var, base_ref, old_base;
-        extern int ind_min_max;
         Pvecteur pvect;
         int     i, infinite_num;
 
@@ -344,9 +335,6 @@ quast pip_solve_min_with_big(ps_dep, ps_context, pv_unknowns, big)
  char       *big; 
 {
  /* FD variables */
- extern 	quast quast_act;
- extern 	Pbase base_var_ref, old_base_var, base_ref, old_base;
- extern 	int ind_min_max;
  int        infinite_num;
 
  /* Pip variables */
@@ -518,9 +506,6 @@ Pvecteur pv_unknowns;
 int 	 int_or_rat, min_or_max;
 {
 	/* FD variables */
-	extern 	quast quast_act;
-	extern 	Pbase base_var_ref, old_base_var, base_ref, old_base;
-	extern 	int ind_min_max;
 	int     infinite_num, nb_unknowns;
 
 	/* Pip variables */

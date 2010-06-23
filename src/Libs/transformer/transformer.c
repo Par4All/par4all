@@ -1089,7 +1089,6 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-  extern string entity_global_name(entity); /* useless with ri-util.h */
 
   ifdebug(9) {
     pips_debug(9, "Begin for transformer %p\n", t);
@@ -1380,7 +1379,6 @@ transformer transformer_filter(transformer t, list args)
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-  extern string entity_global_name(entity); /* useless with ri-util.h */
 
   ifdebug(9) {
     pips_debug(9, "Begin for transformer %p\n", t);

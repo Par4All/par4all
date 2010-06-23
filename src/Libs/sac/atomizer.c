@@ -51,7 +51,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "preprocessor.h"
 #include "properties.h"
 
 
@@ -264,7 +263,9 @@ entity sac_make_new_variable(entity module, basic b)
 }
 static entity sac_get_current_lhs(entity module, basic b)
 {
-    entity current_entity = expression_to_entity(current_lhs);
+    entity current_entity = expression_scalar_p(current_lhs)?
+        expression_to_entity(current_lhs):
+        entity_undefined;
     return entity_undefined_p(current_entity)? sac_make_new_variable(module,b): current_entity;
 }
 

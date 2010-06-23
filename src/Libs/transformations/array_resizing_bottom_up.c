@@ -52,7 +52,6 @@
 #include "effects-simple.h"
 #include "text-util.h" /* for words_to_string*/
 #include "alias_private.h"
-#include "instrumentation.h"
 #include "transformations.h"
 
 static int number_of_right_array_declarations = 0;

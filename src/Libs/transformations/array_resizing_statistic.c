@@ -41,7 +41,6 @@
 #include "resources.h"
 #include "misc.h"
 #include "alias_private.h"
-#include "instrumentation.h"
 #include "transformations.h"
 
 static int number_of_pointer_type_and_formal_arrays = 0;

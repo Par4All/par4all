@@ -392,7 +392,7 @@ bool complex_constant_expression_p(expression cce)
 entity float_to_entity(float c)
 {
     string num;
-    asprintf(&num, "%f", fabs(c));
+    asprintf(&num, "%f", c);
     entity e = MakeConstant(num,is_basic_float);
     free(num);
     return e;
@@ -400,7 +400,7 @@ entity float_to_entity(float c)
 entity int_to_entity(_int c)
 {
     string num;
-    asprintf(&num, "%td", abs(c));
+    asprintf(&num, "%d", c);
     entity e = MakeConstant(num,is_basic_int);
     free(num);
     return e;

@@ -66,7 +66,6 @@
 #include "transformer.h"
 
 #include "semantics.h"
-#include "preprocessor.h"
 
 transformer effects_to_transformer(list e) /* list of effects */
 {
