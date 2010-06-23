@@ -578,7 +578,7 @@ do_plage: TK_EQUALS expression TK_COMMA expression
 	    { 
 	      if(expression_implied_do_p($2) || expression_implied_do_p($4))
 		  ParserError("Syntax", "Unexpected implied DO\n");
-	      $$ = make_range($2, $4, MakeIntegerConstantExpression("1"));
+	      $$ = make_range($2, $4, int_to_expression(1));
 	    }
 	| TK_EQUALS expression TK_COMMA expression TK_COMMA expression
 	    {
@@ -815,11 +815,11 @@ ldim_tableau: dim_tableau
 
 dim_tableau: expression
 	    {
-		    $$ = make_dimension(MakeIntegerConstantExpression("1"),$1);
+		    $$ = make_dimension(int_to_expression(1),$1);
 	    }
 	| TK_STAR
 	    {
-		$$ = make_dimension(MakeIntegerConstantExpression("1"),
+		$$ = make_dimension(int_to_expression(1),
 		  MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)));
 	    }
 	| expression TK_COLON TK_STAR
