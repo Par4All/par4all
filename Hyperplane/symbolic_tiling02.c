@@ -5,7 +5,6 @@ char isme(int elligent)
     int repide[elligent];
 donne: for(roverti=0;roverti<elligent;roverti+=2)
        {
-           repide[roverti]=1;
-           N=3;
+           repide[roverti]=repide[roverti+1]*2;
        }
 }
