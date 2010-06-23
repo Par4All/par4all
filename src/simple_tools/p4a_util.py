@@ -9,7 +9,7 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, logging.handlers, os, re, datetime, shutil, subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle
+import string, sys, random, logging, logging.handlers, os, re, datetime, shutil, subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob
 from threading import Thread
 import p4a_term
 
@@ -425,10 +425,14 @@ class runner(Thread):
         self.hide_spinner()
 
     def wait(self):
-        if self.redir:
-            self.join()
-        ret = self.process.wait()
-        self.read_output(spin = False) # Read remaining output in pipes.
+        try:
+            if self.redir:
+                self.join()
+            ret = self.process.wait()
+            self.read_output(spin = False) # Read remaining output in pipes.
+        except KeyboardInterrupt:
+            raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
+               + " interrupted", code = -2)
         if ret != 0 and not self.can_fail:
             #~ if self.err:
                 #~ sys.stderr.write(self.err)
@@ -484,15 +488,17 @@ def rmtree(dir, can_fail = False, remove_top = True):
         if can_fail:
             return
         raise p4a_error("Directory does not exist: " + dir)
+    if not remove_top and not glob.glob(os.path.join(dir, "*")):
+        return
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
     #~ debug("Removing tree: " + dir)
     ret = 0
     if remove_top:
-        if run([ "rm", "-rf", dir + "/" ], can_fail = can_fail):
+        if run([ "rm", "-rvf", dir + "/" ], can_fail = can_fail)[2]:
             warn("Could not remove " + dir + " recursively")
     else:
-        if run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail):
+        if run([ "rm", "-rvf", dir + "/*" ], can_fail = can_fail)[2]:
             warn("Could not remove everything in " + dir)
     #~ try:
         #~ for root, dirs, files in os.walk(dir, topdown = False):

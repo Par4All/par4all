@@ -291,10 +291,11 @@ def main(options, args = []):
     # Create install_dir it if it does not already exist.
     if os.path.isdir(install_dir):
         if options.clean:
-            # If we are requested to clean first, remove everything
-            # under install_dir.
-            warn("Removing everything in " + install_dir + " (--clean)")
-            rmtree(install_dir, remove_top = False)
+            if glob.glob(os.path.join(install_dir, "*")):
+                # If we are requested to clean first, remove everything
+                # under install_dir.
+                warn("Removing everything in " + install_dir + " (--clean)")
+                rmtree(install_dir, remove_top = False)
         else:
             info("Install directory " + install_dir + " already exists")
     else:
