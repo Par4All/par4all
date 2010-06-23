@@ -75,7 +75,7 @@ def report_enabled():
     return static_options.report
 
 
-def send_report_email(recipient = "gpean@hpc-project.com"):
+def send_report_email(recipient = "par4all@hpc-project.com"):
     
     try:
         global static_options, static_args

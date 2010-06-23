@@ -9,7 +9,7 @@
 Par4All packing script: allows you to create .deb or .tar.gz packages of Par4all.
 '''
 
-import string, sys, os, re, optparse, tempfile, shutil, time
+import string, sys, os, re, optparse, tempfile, shutil, time, traceback
 from p4a_util import *
 from p4a_rc import *
 from p4a_git import *
@@ -39,16 +39,36 @@ if __name__ == "__main__":
     try:
         main()
     except p4a_error:
-        error(str(sys.exc_info()[1]))
-        if sys.exc_info()[1].code == -2:
+        (t, e, tb) = sys.exc_info()
+        error(str(e))
+        debug("".join(traceback.format_exception(t, e, tb)))
+        if e.code == -2:
             error("Interrupted")
         else:
-            error("To get verbose output, try passing -v, -vv, or -vvv")
+            error("To get verbose output, try passing -v, -vv, or -vvv", log = False)
             if report_enabled():
                 send_report_email()
-        sys.exit(sys.exc_info()[1].code)
-    except:
+        sys.exit(e.code)
+    except EnvironmentError: # IOError, OSError.
+        (t, e, tb) = sys.exc_info()
+        error(str(e))
+        debug("".join(traceback.format_exception(t, e, tb)))
+        if report_enabled():
+                send_report_email()
+        sys.exit(e.errno)
+    except KeyboardInterrupt:
+        error("Interrupted")
+    except SystemExit:
         raise
+    except:
+        (t, e, tb) = sys.exc_info()
+        error("Unhandled " + e.__class__.__name__ + ": " + str(e))
+        error("".join(traceback.format_exception(t, e, tb)))
+        if report_enabled():
+            send_report_email()
+        else:
+            error("You may report this error to Par4All support by running again using --report", log = False)
+        sys.exit(255)
     finally:
         stop_all_spinners() # Make sure no spinner thread is hindering script from exiting.
 

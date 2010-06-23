@@ -168,7 +168,7 @@ def error(msg, spin = False, log = True):
     if logger and log:
         logger.error(msg)
 
-def die(msg, exit_code = 255, log = True):
+def die(msg, exit_code = 254, log = True):
     error(msg, log = log)
     #error("aborting")
     sys.exit(exit_code)
@@ -196,9 +196,7 @@ def flush_log():
 
 class p4a_error(Exception):
     '''Generic base class for exceptions'''
-    msg = "Generic error"
-    code = 254
-    def __init__(self, msg, code = 254):
+    def __init__(self, msg = "Generic error", code = 123):
         self.msg = msg
         self.code = code
     def __str__(self):
