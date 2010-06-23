@@ -985,8 +985,8 @@ C     ------------------------------------------------
             CALL HPFC CMPNEIGHBOUR(-4)
             CALL HPFC RCVFR N
             CALL HPFC REAL8 UNPACK 3(U, ONDE24 U LO1, ONDE24 U UP1, 
-     &      ONDE24 U LO2, ONDE24 U UP2, ONDE24 U LO3, ONDE24 U UP3, -
-     &      1, 0, 1, 1, 200, 1, KM, KM, 1)
+     &      ONDE24 U LO2, ONDE24 U UP2, ONDE24 U LO3, ONDE24 U UP3, 
+     &      -1, 0, 1, 1, 200, 1, KM, KM, 1)
          ENDIF
 ! PE(1:3, 1:4) receive U(201:202, 1:200, X) from (+4)
          IF (MY POS(1,1).LE.3) THEN

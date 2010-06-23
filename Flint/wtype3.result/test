@@ -2,6 +2,6 @@
 Flinted file
 
 flint message from check_call, in module FOO, in statement (0.2), number 3
-incompatible basic type, 0th arg in call to TOP-LEVEL:=, int>float
+incompatible basic type, 0th arg in call to TOP-LEVEL:=, INTEGER*4>REAL*4
 number of messages from flint for FOO : 1
 WTYPE3 has been flinted : everything is ok.
