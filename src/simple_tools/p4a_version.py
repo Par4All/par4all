@@ -13,7 +13,7 @@ import sys, os, string
 from p4a_util import *
 from p4a_git import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 program_dir = os.path.split(os.path.realpath(os.path.abspath(sys.argv[0])))[0]
 
@@ -65,12 +65,12 @@ def guess_file_revision(file_dir = None):
         version_file = get_version_file_path()
     if version_file and os.path.exists(version_file):
         # Read the version_file and replace any blanks in it.
-        revision = re.sub("\s+", "", slurp(version_file))
+        revision = re.sub("\s+", "", read_file(version_file))
     if revision:
         return revision
 
     # Next, try svnversion.
-    #revision = run2([ "svnversion", file ], can_fail = True)[0].strip()
+    #revision = run([ "svnversion", file ], can_fail = True)[0].strip()
     #if revision:
     #    return revision
 
@@ -89,11 +89,7 @@ def guess_file_revision(file_dir = None):
 
 if __name__ == "__main__":
     print(__doc__)
-    if len(sys.argv) > 1:
-        print("Version file path for " + sys.argv[1] + " is " + get_version_file_path(sys.argv[1]))
-    else:
-        print("Version file path is " + get_version_file_path())
-    print("Default global version is " + guess_file_revision())
+    print("This module is not directly executable")
 
 
 # Some Emacs stuff:

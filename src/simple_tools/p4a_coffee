@@ -68,8 +68,6 @@ if __name__ == "__main__":
         else:
             error("You may report this error to Par4All support by running again using --report", log = False)
         sys.exit(255)
-    finally:
-        stop_all_spinners() # Make sure no spinner thread is hindering script from exiting.
 
 
 # Some Emacs stuff:

@@ -38,7 +38,7 @@ def add_module_options(parser):
     p4a_pack.add_module_options(parser)
 
 
-def main(options = {}, args = []):
+def main(options, args = []):
 
     #~ work_dir = ""
     #~ if options.work_dir:
