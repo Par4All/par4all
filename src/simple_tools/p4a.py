@@ -17,6 +17,196 @@ from p4a_builder import *
 from p4a_git import *
 from p4a_version import *
 
+
+def add_module_options(parser):
+
+    proj_group = optparse.OptionGroup(parser, "Project Options")
+
+    proj_group.add_option("--project-name", "--project", "-p", metavar = "NAME", default = None,
+        help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used.")
+
+    proj_group.add_option("--keep-database", "-k", action = "store_true", default = False,
+        help = "Keep database directory after processing.")
+
+    proj_group.add_option("--remove-first", "-r", action = "store_true", default = False,
+        help = "Remove existing database directory before processing.")
+
+    parser.add_option_group(proj_group)
+
+    proc_group = optparse.OptionGroup(parser, "Processing Options")
+
+    proc_group.add_option("--accel", "-A", action = "store_true",
+                          default = False,
+                          help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
+
+    proc_group.add_option("--cuda", "-C", action = "store_true",
+                          default = False,
+                          help = "Enable CUDA generation. Implies --accel.")
+
+    proc_group.add_option("--openmp", "-O", action = "store_true",
+                          default = False,
+                          help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output. If --cuda is not specified, this option is set by default.")
+
+    proc_group.add_option("--simple", "-S", dest = "simple",
+                          action = "store_true", default = False,
+                          help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it.")
+
+    proc_group.add_option("--fine", "-F", action = "store_true",
+                          default = False,
+                          help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
+
+    proc_group.add_option("--include-modules", metavar = "REGEXP",
+                          default = None,
+                          help = "Process only the modules which names match the regular expression.")
+
+    proc_group.add_option("--exclude-modules", metavar = "REGEXP",
+                          default = None,
+                          help = "Exclude the modules matching the regular expression from the parallelization.")
+
+    proc_group.add_option("--no-process", "-N", action = "store_true",
+                          default = False,
+                          help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
+
+    parser.add_option_group(proc_group)
+
+    cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+
+    cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
+                         help = "C preprocessor to use (defaults to gcc -E).")
+
+    cpp_group.add_option("-I", dest="include_dirs",
+                         action = "append", metavar = "DIR", default = [],
+                         help = "Add an include search directory. Same as the compiler -I option. Several are allowed.")
+
+    cpp_group.add_option("-D", dest="defines", action = "append",
+                         metavar = "NAME[=VALUE]", default = [],
+                         help = "Add a preprocessor define. Same as passing the preprocessor a -D option. Several are allowed.")
+
+    cpp_group.add_option("-U", dest="undefines", action = "append",
+                         metavar = "NAME", default = [],
+                         help = "Remove a preprocessor define. Same as passing the preprocessor a -U option. Several are allowed.")
+
+    cpp_group.add_option("--cpp-flags", action = "append",
+                         metavar = "FLAGS", default = [],
+                         help = "Add additional flags for the C preprocessor. Several are allowed.")
+
+    cpp_group.add_option("--skip-recover-includes", action = "store_true",
+                         default = False,
+                         help = "By default, try to recover standard #include. To skip this phase, use this option.")
+
+    parser.add_option_group(cpp_group)
+
+    compile_group = optparse.OptionGroup(parser, "Compilation Options")
+
+    compile_group.add_option("--output-file", "-o", action = "append",
+                             metavar = "FILE", default = [],
+                             help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so, .a files or have no extension in which case an executable will be built.")
+
+    compile_group.add_option("--cc", metavar = "COMPILER", default = None,
+                             help = "C compiler to use (defaults to gcc).")
+
+    compile_group.add_option("--cxx", metavar = "COMPILER", default = None,
+                             help = "C++ compiler to use (defaults to g++).")
+
+    compile_group.add_option("--nvcc", metavar = "COMPILER", default = None,
+                             help = "NVCC compiler to use (defaults to nvcc). Note that the NVCC compiler is used only to transform .cu files into .cpp files, but not compiling the final binary.")
+
+    compile_group.add_option("--fortran", metavar = "COMPILER", default = None,
+                             help = "Fortran compiler to use (defaults to gfortran).")
+
+    compile_group.add_option("--ar", metavar = "ARCHIVER", default = None,
+                             help = "Archiver to use (defaults to ar).")
+    
+    compile_group.add_option("--icc", action = "store_true", default = False,
+                             help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
+
+    compile_group.add_option("--debug", "-g", action = "store_true",
+                             default = False,
+                             help = "Add debug flags (-g compiler flag).")
+
+    compile_group.add_option("--no-fast", "--not-fast", action = "store_true",
+                             default = False,
+                             help = "Do not add optimized compilation flags automatically.")
+    
+    compile_group.add_option("--no-default-flags", action = "store_true",
+                             default = False,
+                             help = "Do not add some C flags such as -fPIC, -g, etc. automatically.")
+    
+    compile_group.add_option("--c-flags", action = "append",
+                             metavar = "FLAGS", default = [],
+                             help = "Specify flags to pass to the C compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
+
+    compile_group.add_option("--cxx-flags", action = "append",
+                             metavar = "FLAGS", default = [],
+                             help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--c-flags) are also passed to the C++ compiler.")
+
+    compile_group.add_option("--nvcc_flags", action = "append",
+                             metavar = "FLAGS", default = [],
+                             help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
+
+    compile_group.add_option("--fortran-flags", action = "append",
+                             metavar = "FLAGS", default = [],
+                             help = "Specify flags to pass to the Fortran compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
+
+    compile_group.add_option("--extra", action = "append",
+                             metavar = "FILE", default = [],
+                             help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
+
+    compile_group.add_option("--arch", "-m", metavar = "32|64", default = None,
+                         help = "Specify compilation target architecture (defaults to current native architecture).")
+
+    compile_group.add_option("--keep-build-dir", "-K", action = "store_true", default = False,
+                         help = "Do not remove build directory after compilation. If an error occurs, it will not be removed anyways.")
+
+    parser.add_option_group(compile_group)
+
+    link_group = optparse.OptionGroup(parser, "Linking Options")
+
+    link_group.add_option("--ld", metavar = "LINKER", default = None,
+                          help = "Linker to use (defaults to ld).")
+
+    link_group.add_option("-L", dest = "lib_dirs", action = "append",
+                          metavar = "DIR", default = [],
+                          help = "Add a library search directory. Same as the linker -L option. Several are allowed.")
+
+    link_group.add_option("-l", dest = "libs", action = "append",
+                          metavar = "LIB", default = [],
+                          help = "Specify an input library to link against. Same as the linker -l option. Several are allowed.")
+
+    link_group.add_option("--ld-flags", action = "append",
+                          metavar = "FLAGS", default = [],
+                          help = "Specify additional flags to pass to the linker. Several are allowed.")
+
+    link_group.add_option("--extra-obj", action = "append",
+                          metavar = "FILE", default = [],
+                          help = "Add an additional object file for linking. Several are allowed.")
+
+    parser.add_option_group(link_group)
+    
+    cmake_group = optparse.OptionGroup(parser, "CMake Options")
+
+    cmake_group.add_option("--cmake", action = "store_true", default = False,
+                          help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --make alone will NOT build the project.")
+    
+    cmake_group.add_option("--cmake-flags", action = "append",
+                          metavar = "FLAGS", default = [],
+                          help = "Specify additional flags to pass to CMake. Several are allowed.")
+    
+    cmake_group.add_option("--cmake-dir", metavar = "DIR", default = None,
+                          help = "Output/lookup the CMakeLists.txt file in this directory instead of the current working directory.")
+    
+    cmake_group.add_option("--cmake-gen", action = "store_true", default = False,
+                          help = "If output files are specified (with -o), setting this flag will make p4a try to locate a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir), and generate Makefiles in a specific directory (--cmake-gen-dir).")
+    
+    cmake_group.add_option("--cmake-gen-dir", metavar = "DIR", default = None,
+                          help = "Generate Makefiles in this directory instead of <project name>.gen by default.")
+    
+    cmake_group.add_option("--cmake-build", action = "store_true", default = False,
+                          help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")    
+
+    parser.add_option_group(cmake_group)
+
+
 def main(options = {}, args = []):
 
     pyps = None
@@ -60,9 +250,17 @@ def main(options = {}, args = []):
         if change_file_ext(abs_file, "").endswith(".p4a"):
             warn("Ignoring already processed file: " + file)
             continue
+        # Check that a file with the exact same path is not already included:
         if abs_file in files or abs_file in other_files or abs_file in header_files:
-            warn("Ignoring second mention of file " + abs_file)
+            warn("Ignoring second mention of file: " + abs_file)
             continue
+        # Check that there is no file with the same name in files
+        # to be processed by PIPS (PIPS does not accept several files
+        # with same name):
+        for review_file in files:
+            if os.path.split(review_file)[1] == os.path.split(abs_file)[1]:
+                error(review_file + " has same name as " + abs_file)
+                die("PIPS does not accept several files with same name")
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)
@@ -202,13 +400,15 @@ def main(options = {}, args = []):
             rmtree(database_dir, can_fail = True)
 
     if len(options.output_file) == 0:
+        if options.cmake or options.cmake_gen or options.cmake_build:
+            die("--cmake, --cmake-gen and/or --cmake-build was given but no output files were specified (-o mybinary, -o mysharedlib.so etc.)")
         # Build not requested.
         return
 
     all_buildable_files = processor_output_files + other_files + options.extra
     if len(all_buildable_files) == 0:
-        die("No buildable input files")
-    
+        die("No buildable input files!")
+
     # Make every path absolute.
     output_files = []
     for file in options.output_file:
@@ -223,7 +423,7 @@ def main(options = {}, args = []):
             builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir, 
                 cmake_flags = options.cmake_flags, build = options.cmake_build)
         return
-    
+
     try:
         info("Building " + ", ".join(output_files))
         builder.build(files = all_buildable_files, output_files = output_files, 
