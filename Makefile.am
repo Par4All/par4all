@@ -5,7 +5,7 @@ dist_noinst_HEADERS=link-warning.h
 # devel mode enables various checks
 if WITH_DEVEL_MODE
 check-includes:
-	$(top_srcdir)/src/Scripts/dev/pipslibsdep.py
+	$(top_srcdir)/src/Scripts/dev/pipslibsdep.py -s $(top_srcdir) -b $(top_builddir)
 
 inspect-symbols:
 	for lib in src/Libs/* ; do \
