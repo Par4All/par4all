@@ -49,7 +49,6 @@
 #include "conversion.h"
 #include "text-util.h"
 #include "alias-classes.h"
-extern Pbase entity_list_to_base(list);
 
 /* This analysis checks if the program uses a variable or an array element
    which has not been assigned a value. In this case, anything may happen:

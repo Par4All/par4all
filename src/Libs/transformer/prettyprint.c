@@ -45,6 +45,7 @@
 #include "constants.h"
 
 #include "misc.h"
+#include "preprocessor.h"
 
 #include "transformer.h"
 
@@ -77,9 +78,8 @@ relation_to_string(
     return string_undefined;
 }
 
-char * pips_user_value_name(entity e)
+const char * pips_user_value_name(entity e)
 {
-  extern string entity_minimal_name(entity);
     if(e == (entity) TCST) {
 	return "";
     }
@@ -90,10 +90,9 @@ char * pips_user_value_name(entity e)
     }
 }
 
-char * generic_value_name(entity e)
+const char * generic_value_name(entity e)
 {
-  string n = string_undefined;
-  extern string entity_minimal_name(entity);
+  const char* n = string_undefined;
 
   if(e == (entity) TCST) {
     n = "";

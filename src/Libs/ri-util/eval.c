@@ -615,7 +615,7 @@ expression range_to_expression(range r,enum range_to_expression_mode mode)
     expression distance =  make_op_exp(PLUS_OPERATOR_NAME,
             copy_expression(range_upper(r)),
             make_op_exp(MINUS_OPERATOR_NAME,
-                make_expression_1(),
+                int_to_expression(1),
                 copy_expression(range_lower(r))));
     if( range_to_nbiter_p(mode) ) distance = make_op_exp(DIVIDE_OPERATOR_NAME,distance,copy_expression(range_increment(r)));
     return distance;

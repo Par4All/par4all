@@ -157,7 +157,6 @@ text_region(effect reg)
     action ac;
     approximation ap;
     Psysteme sc;
-    Pbase sorted_base;
     list /* of string */ ls;
 
     if(effect_undefined_p(reg))

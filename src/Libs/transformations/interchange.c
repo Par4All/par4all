@@ -49,9 +49,6 @@
 #include "effects-util.h"
 #include "conversion.h"
 
-extern void global_parallelization();
-extern int set_interchange_parameters();
-
 /* statement gener_DOSEQ(cons *lls,Pvecteur pvg[], Pbase base_oldindex,
  * Pbase base_newindex)
  * generation of loops interchange code for the nested loops  (cons *lls).

@@ -60,9 +60,8 @@ typedef dg_vertex_label vertex_label;
 #include "resources.h"
 
 #include "constants.h"
+#include "conversion.h"
 #include "wp65.h"
-
-extern Psysteme loop_iteration_domaine_to_sc();
 
 void find_iteration_domain(s, sc, basis, nested_level,
                                     list_statement_block, inst)

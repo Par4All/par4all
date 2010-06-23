@@ -1669,7 +1669,6 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       effect eff = (*reference_to_effect_func)(r, is_action_write,false);
       effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! */
-      extern list c_summary_effect_to_proper_effects(effect, expression);
       le = c_summary_effect_to_proper_effects(eff, exp);
       /* FI: We also need the read effects implied by the evaluation
 	 of exp... but I do not know any function available to do

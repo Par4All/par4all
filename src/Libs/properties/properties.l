@@ -25,15 +25,15 @@
 %option noinput
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * - 01/1996: PIPS_PROPERTIESRC added. FC.
  * - 09/1997: save/load properties in database. FC.
  */
 
 /* The syntax of a property list. */
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +44,7 @@
 #include "misc.h"
 #include "top-level.h"
 #include "constants.h"
+#include "pipsdbm.h"
 
 #define TTRUE	10
 #define TFALSE	11
@@ -453,12 +454,10 @@ void fprint_properties(FILE * fd)
 
 /******************************************************* TOP-LEVEL INTERFACE */
 
-extern string db_get_meta_data_directory(void); /* in pipsdbm */
-
 static string get_property_file_name(void)
 {
-    string dir_name = db_get_meta_data_directory(),
-	name = strdup(concatenate(dir_name, "/properties", NULL));
+    string dir_name = db_get_meta_data_directory(),name;
+    asprintf(&name,"%s/properties",dir_name);
     free(dir_name); return name;
 }
 

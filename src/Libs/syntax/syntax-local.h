@@ -29,7 +29,12 @@
  */
 #define START_COMMENT_LINE "CcDd*!#\n"
 
-extern FILE * syn_in; /* the file read in by the scanner */
+/* lex yacc interface */
+extern FILE * syn_in; 
+extern int syn_lex();
+extern void syn_reset_lex();
+extern int syn_parse();
+extern void syn_error(char*);
 
 /* definition of implementation dependent constants */
 

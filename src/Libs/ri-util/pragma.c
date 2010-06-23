@@ -170,7 +170,7 @@ expression pragma_build_if_condition (expression cond) {
     break;
   }
   int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
-  list args_if =  gen_expression_cons (int_expr (threshold), NIL);
+  list args_if =  gen_expression_cons (int_to_expression(threshold), NIL);
   args_if = gen_expression_cons (cond, args_if);
   call c = make_call (op, args_if);
   return call_to_expression (c);

@@ -44,6 +44,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "preprocessor.h"
+#include "c_syntax.h"
 #include "splitc.h"
 
 
@@ -437,10 +438,6 @@ void csplit_copy(string module_name,
   //free(unambiguous_module_name);
 }
 
-
-extern void reset_keyword_typedef_table(void);
-extern void reset_csplit_line_number(void);
-extern hash_table keyword_typedef_table;
 void keep_track_of_typedef(string type_name)
 {
   hash_put(keyword_typedef_table, type_name,(void *) TK_NAMED_TYPE);
@@ -482,9 +479,6 @@ string  csplit(
 	       FILE * out
 )
 {
-  extern FILE * splitc_in;
-  extern void init_keyword_typedef_table(void);
-  extern void splitc_parse();
   string error_message = string_undefined;
 
   /* */

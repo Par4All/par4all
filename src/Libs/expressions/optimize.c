@@ -44,12 +44,9 @@
 #include "control.h"
 
 #include "eole_private.h"
+#include "expressions.h"
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
-
-extern void module_reorder(statement);
-extern void perform_icm_association(string, statement);
-extern void perform_ac_cse(string, statement);
 
 /****************************************************************** STRATEGY */
 

@@ -36,8 +36,6 @@
 #include "ri-util.h"
 #include "misc.h"
 
-extern value EvalExpression();
-
 int number_of_initial_values(list args)
 {
   int niv = 0;
@@ -507,7 +505,7 @@ SizeOfDimension(dimension d)
     return 
         make_op_exp(PLUS_OPERATOR_NAME,
                 make_op_exp(MINUS_OPERATOR_NAME,copy_expression(dimension_upper(d)),copy_expression(dimension_lower(d))),
-                make_expression_1()
+                int_to_expression(1)
                 )
                 ;
 }

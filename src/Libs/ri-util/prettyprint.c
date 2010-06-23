@@ -125,7 +125,6 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "preprocessor.h"
 
 #include "STEP_name.h"
-extern string compilation_unit_of_module(string);
 
 /* operator precedences are in the [0,100] range */
 

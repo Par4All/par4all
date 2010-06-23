@@ -52,8 +52,6 @@
 #include "properties.h"
 #include "alias_private.h"
 
-extern statement ModuleStatement;
-
 stack BlockStack; /* BlockStack is used to handle block scope */
 
 list LabeledStatements; /* list of labeled statements of the current module*/

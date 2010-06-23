@@ -58,6 +58,7 @@
 #include "resources.h"
 
 #include "effects-generic.h"
+#include "effects-convex.h"
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
@@ -574,7 +575,6 @@ static void rw_effects_of_test(test t)
   list le, lt, lf, lc, lr;
   statement true_s = test_true(t);
   statement false_s = test_false(t);
-  extern effect reference_to_convex_region(reference, tag /* action */, bool /* use_preference */);
 
   pips_debug(2, "begin\n");
 
@@ -686,13 +686,9 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 				      // interprocedural translation and intra-procedural propagation will have to be re-packaged later
 				      list l_tmp = CONS(EFFECT, eff, NIL);
 				      list l_res_tmp;
-				      extern list c_convex_effects_on_formal_parameter_backward_translation(list ,
-													    expression ,
-													    transformer );
 				      
 				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
 					{
-					  extern void set_translation_context_sc(Psysteme);
 					  Psysteme sc = sc_new();
 					  sc_creer_base(sc);
 					  set_translation_context_sc(sc);
@@ -706,7 +702,6 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 				      
 				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
 					{
-					  extern void reset_translation_context_sc();
 					  reset_translation_context_sc();
 					}
 				      

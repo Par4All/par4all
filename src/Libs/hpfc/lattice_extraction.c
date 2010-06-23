@@ -33,8 +33,6 @@
 #include "matrice.h"
 #include "sparse_sc.h"
 
-extern Pbase list_to_base(list); /* paf-utils */
-
 /*
 void normalize_system(Psysteme * ps)
 {

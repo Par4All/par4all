@@ -51,7 +51,6 @@
 #include "complexity.h"
 #include "transformations.h"
 #include "semantics.h"
-#include "preprocessor.h"
 
 #define COMMA         ","
 #define EMPTY         ""
@@ -116,7 +115,6 @@ static string array_location_string;
 static string array_mem_string;
 
 
-extern dimension find_ith_dimension();
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \

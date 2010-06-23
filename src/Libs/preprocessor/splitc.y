@@ -75,18 +75,6 @@
 */
 #define YYMAXDEPTH 1000000
 
-extern int splitc_lex(void);
-extern void splitc_error(char *);
-extern int get_csplit_current_beginning(void);
-extern int get_user_current_beginning(void);
-extern size_t get_current_csplit_file_offset(void);
-extern size_t get_csplit_file_offset_beginning(void);
-extern void reset_csplit_current_beginning(void);
-extern int csplit_line_number;
-extern string splitc_text;
-extern int get_user_current_beginning();
-
-
 /* The following global variables are used to store the information such as
    the scope, type and storage of an entity, given by the decl_spec_list,
    which are used later by direct_decl to create the entity.

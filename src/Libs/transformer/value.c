@@ -700,8 +700,8 @@ bool old_value_entity_p(entity e)
   if(!local_temporary_value_entity_p(e)) {
     /* string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX); */
     string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);
-    /*string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);*/
-    return s1!=NULL /*|| s2!=NULL*/;
+    string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);
+    return s1!=NULL || s2!=NULL;
   }
   else
     return FALSE;

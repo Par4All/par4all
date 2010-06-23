@@ -58,6 +58,7 @@
 #include "prettyprint.h"
 #include "preprocessor.h"
 
+#include "effects-convex.h"
 #include "effects-generic.h"
 
 /***************************************************** ACTION INTERPRETATION */
@@ -538,7 +539,6 @@ void
 generic_print_effects( list pc)
 {
   /* Well that should not be done this way BC. */ 
-  extern bool region_consistent_p(effect);  
   if(effect_consistent_p_func == region_consistent_p &&
      effects_reference_sharing_p(pc, FALSE)) {
       pips_internal_error("A list of regions share some references");

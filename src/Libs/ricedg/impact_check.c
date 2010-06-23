@@ -57,8 +57,6 @@ static call current_call = call_undefined;
 static int number_of_processed_modules = 0;
 static int number_of_impact_alias = 0;
 
-extern statement vertex_to_statement(vertex);
-
 static void display_impact_alias_statistics()
 {
   user_log("\n Number of processed modules: %d", number_of_processed_modules);

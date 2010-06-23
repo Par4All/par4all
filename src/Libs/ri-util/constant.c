@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 #include "linear.h"
 
@@ -39,53 +40,8 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
-
-extern string make_entity_fullname();
-
-/* As fragile as next function. Avoid if possible! */
-entity find_entity_0()
-{
-    entity e_0;
-    string n_0 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "0");
-
-    e_0 = gen_find_tabulated(n_0, entity_domain);
-
-    pips_assert("e_0 is defined", e_0 != entity_undefined);
-
-    return(e_0);
-}
-
-/*
-  Returns the top-level entity that represents the integer constant 1.
-  its name is "TOP-LEVEL:1".
-
-  This entity must exist because it is necessarily created by the
-  parser. Or at least by the Fortran parser... but not by the C parser.
-*/
-entity find_entity_1()
-{
-    entity e_1;
-    string n_1 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "1");
-
-    e_1 = gen_find_tabulated(n_1, entity_domain);
-
-    pips_assert("e_1 is defined", e_1 != entity_undefined);
-
-    return(e_1);
-}
-
-expression make_expression_0()
-{
-  return int_to_expression(0);
-}
-
-/*
-  returns the integer constant expression of value 1.
-*/
-expression make_expression_1()
-{
-  return int_to_expression(1);
-}
+#include "syntax.h"
+#include "c_syntax.h"
 
 int DefaultLengthOfBasic(tag t)
 {
@@ -225,8 +181,6 @@ Character constants are typed as int.
       int basis = is_fortran? 10 : 0;
       char * error_string = string_undefined;
       long long int l = 0;
-      extern bool ParserError(string, string);
-      extern void CParserError(string);
       int error_number = 0;
       //int (* conversion)(string, string *, int);
 
@@ -287,8 +241,8 @@ Character constants are typed as int.
 	pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
 			  name, size, error_string);
 	if(is_fortran)
-	  ParserError("make_constant_entity",
-		      "Integer constant conversion error\n");
+      ParserError("make_constant_entity",
+              "Integer constant conversion error\n");
 	else
 	  CParserError("Integer constant conversion error\n");
       }
@@ -435,33 +389,20 @@ bool complex_constant_expression_p(expression cce)
   return is_complex_constant_p;
 }
 
-/* this function creates an integer constant and then a call to that
-constant. */
-
-expression MakeIntegerConstantExpression(s)
-string s;
+entity float_to_entity(float c)
 {
-    return(MakeNullaryCall(MakeConstant(s, is_basic_int)));
+    string num;
+    asprintf(&num, "%f", fabs(c));
+    entity e = MakeConstant(num,is_basic_float);
+    free(num);
+    return e;
 }
-
-expression make_constant_boolean_expression(bool b)
+entity int_to_entity(_int c)
 {
-    return MakeNullaryCall
-        (MakeConstant(b ? TRUE_OPERATOR_NAME : FALSE_OPERATOR_NAME,
-		      is_basic_logical));
-}
-
-/// @brief generate an expression from an integer value
-/// @return the integer as an expresion.
-/// @param i the integer value to generate as an expression.
-/* FI: see int_to_expression()? Which may be safer wrt to the obsolete
-   use of i2a? */
-expression int_expr(int i)
-{
-    /* What should be the length of buffer? */
-    char * istr = i2a(i);
-    expression e = MakeIntegerConstantExpression(istr);
-    free(istr);
+    string num;
+    asprintf(&num, "%td", abs(c));
+    entity e = MakeConstant(num,is_basic_int);
+    free(num);
     return e;
 }
 

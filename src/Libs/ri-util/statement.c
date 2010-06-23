@@ -52,6 +52,7 @@
 #include "properties.h"
 #include "preprocessor.h"
 #include "control.h"
+#include "syntax.h"
 
 
 /** @defgroup statement_util Methods dealing with statements
@@ -746,7 +747,6 @@ statement make_print_statement(string message)
   /*TK_PRINT = 301*/
   /* This function has been moved from alias_check.c and uses a
      function still in the syntax library, hence the 301 argument... */
-  extern instruction MakeSimpleIoInst2(int /*keyword*/, expression /*f*/, list /*io_list*/);
   instruction ins = MakeSimpleIoInst2(301,fmt,args);
   return instruction_to_statement(ins);
 }

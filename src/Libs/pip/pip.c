@@ -103,13 +103,6 @@ char    dump_name[] = "XXXXXX";
 quast 	quast_act;
 Pbase 	base_var_ref, base_ref, old_base, old_base_var;
 int   	ind_min_max;
-extern 	quast quast_act;	/* "quast_act" will contain the result
-				 * computed by PIP.  */
-extern Pbase base_var_ref,	/* Base of the unknowns */
-       	     old_base_var,   	/* Base of the unknowns */
-             base_ref,		/* Base of the parameters */
-	     old_base;		/* Base of the parameters */
-extern int ind_min_max;		/* Tag for MIN or MAX resolution */
 
 /*===========================================================================*/
 /* quast old_pip_solve(Psysteme ps_dep, ps_context, int nb_unknowns,

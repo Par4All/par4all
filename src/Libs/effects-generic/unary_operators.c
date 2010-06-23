@@ -416,7 +416,7 @@ db_get_empty_list(string name)
 void effect_add_dereferencing_dimension(effect eff)
 {
 
-  expression deref_exp = MakeIntegerConstantExpression("0");
+  expression deref_exp = int_to_expression(0);
 
   (*effect_add_expression_dimension_func)(eff, deref_exp);
   free_expression(deref_exp);

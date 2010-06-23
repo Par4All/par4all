@@ -98,7 +98,6 @@ ifdebug(1){region_consistent_p(reg);}
 #define PROPER TRUE
 #define SUMMARY FALSE
 
-#define REGIONS_MODULE_NAME "REGIONS-PACKAGE"
 
 
 /* TRUE if e is a phi variable

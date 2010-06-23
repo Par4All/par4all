@@ -607,7 +607,6 @@ static bool written_before_read_p(entity ent,list args)
     MAP(REFERENCE,ref,
     {
       entity e = reference_variable(ref);
-      extern boolean reference_scalar_p(reference); /* located in wp65? */
       if (same_entity_p(e,ent))
 	{
 	  /* the variable is in the reference list, check if it is written or read*/

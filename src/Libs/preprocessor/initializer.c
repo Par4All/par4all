@@ -43,6 +43,7 @@
 
 #include "resources.h"
 #include "phases.h"
+#include "pipsmake.h"
 #include "preprocessor.h"
 
 #define FILE_WARNING 							\
@@ -386,7 +387,6 @@ add_new_module_from_text(string module_name,
     // Build the coresponding compilation unit for C code
     if(string_undefined_p(compilation_unit_name) ) {
       // Function defined in pipsmake
-      extern string compilation_unit_of_module(string);
       cun = compilation_unit_of_module(module_name);
 
       if(string_undefined_p(cun)) {
@@ -620,62 +620,3 @@ bool c_initializer(string module_name)
 }
 
 
-/* FI: I tried to put it in ri-util/entity.c, but it did not work
-   because the database is used. */
-entity find_enum_of_member(entity m)
-{
-  entity mod = entity_to_module_entity(m);
-  list dl = code_declarations(value_code(entity_initial(mod)));
-  list sdl = list_undefined;
-  list fdl = list_undefined;
-
-  if(compilation_unit_entity_p(mod)) {
-    /* if m was declared in the compilation unit cu and used elsewhere, cu may not be parsed yet. */
-    sdl = NIL;
-  }
-  else {
-    statement mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE,
-							    entity_local_name(mod), TRUE);
-    /* Not good in general, but should work for compilation units... */
-    /* No, it does not... */
-    sdl = statement_declarations(mod_stat);
-  }
-  fdl = gen_nconc(gen_copy_seq(dl), gen_copy_seq(sdl));
-
-  entity ee = entity_undefined;
-
-  ifdebug(8) {
-    pips_debug(8, "Declarations for enclosing module \"\%s\": \"", entity_name(mod));
-    print_entities(dl);
-    //print_entities(sdl);
-    fprintf(stderr, "\"\n");
-  }
-
-  MAP(ENTITY, e, {
-    if(entity_enum_p(e)) {
-      list ml = type_enum(entity_type(e));
-
-      pips_debug(8, "Checking enum \"\%s\"\n", entity_name(e));
-
-      if(gen_in_list_p((void *) m, ml)) {
-	ee = e;
-	break;
-      }
-      ifdebug(8) {
-	if(entity_undefined_p(ee)) {
-	  pips_debug(8, "Member \"\%s\" not found in enum \"\%s\"\n",
-		     entity_name(m), entity_name(e));
-	}
-	else {
-	  pips_debug(8, "Member \"\%s\" found in enum \"\%s\"\n",
-		     entity_name(m), entity_name(e));
-	}
-      }
-    }
-  }, fdl);
-
-  pips_assert("enum entity is found", !entity_undefined_p(ee));
-  gen_free_list(fdl);
-		       
-  return ee;
-}

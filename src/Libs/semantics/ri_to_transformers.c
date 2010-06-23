@@ -68,8 +68,6 @@
 #include "semantics.h"
 #include "preprocessor.h"
 
-extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
-
 transformer effects_to_transformer(list e) /* list of effects */
 {
   /* algorithm: keep only write effects on variables with values */

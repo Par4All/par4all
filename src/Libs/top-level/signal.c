@@ -35,11 +35,12 @@
 #include <unistd.h>
 
 #include "genC.h"
+#include "linear.h"
+#include "ri.h"
 #include "misc.h"
-
-extern void checkpoint_workspace(void); /* in pipsmake */
-extern void interrupt_pipsmake_asap(void); /* in pipsdbm */
-extern void user_log(char *, ...); /* in misc */
+#include "pipsdbm.h"
+#include "pipsmake.h"
+#include "top-level.h"
 
 static void pips_signal_handler(int num)
 {
@@ -75,8 +76,6 @@ static void pips_signal_handler(int num)
      */
     (void) signal(num, pips_signal_handler);
 }
-
-extern void set_pips_timeout_from_env(void);
 
 void initialize_signal_catcher(void)
 {

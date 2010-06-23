@@ -84,115 +84,6 @@ list current_module_declarations()
   entity m = get_current_module_entity();
   return module_declarations(m);
 }
-
-/* Retrieve the compilation unit containing a module definition.
-
-   The implementation is clumsy.
-
-   It would be nice to memoize the informtion as with
-   get_current_module_entity().
-*/
-entity module_entity_to_compilation_unit_entity(entity m)
-{
-  entity cu = entity_undefined;
-
-  if(compilation_unit_entity_p(m))
-    cu = m;
-  else {
-    // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
-    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
-    string lufn = strrchr(aufn, '/')+1;
-
-    if(lufn!=NULL) {
-      string n = strstr(lufn, PP_C_ED);
-      int l = n-lufn;
-      string cun = strndup(lufn, l);
-
-      if(static_module_name_p(cun)) {
-	string end = strrchr(cun, FILE_SEP_CHAR);
-	*(end+1) = '\0';
-	cu = local_name_to_top_level_entity(cun);
-      }
-      else {
-	string ncun = strdup(concatenate(cun, FILE_SEP_STRING, NULL));
-	cu = local_name_to_top_level_entity(ncun);
-	free(ncun);
-      }
-      free(cun);
-    }
-    else
-      pips_internal_error("Not implemented yet\n");
-  }
-  pips_assert("cu is a compilation unit", compilation_unit_entity_p(cu));
-  return cu;
-}
-
-bool language_module_p(entity m, string lid)
-{
-  bool c_p = FALSE;
-
-  if(entity_module_p(m)) {
-    /* FI: does not work with static functions */
-    //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
-    /* SG: must check if the ressource exist (not always the case) */
-    string lname= module_local_name(m);
-    if( db_resource_p(DBR_USER_FILE,lname) )
-    {
-        string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
-        string n = strstr(aufn, lid);
-
-        c_p = (n!=NULL);
-    }
-    else
-        c_p = TRUE; /* SG: be positive ! (needed for Hpfc)*/
-  }
-  return c_p;
-}
-
-
-/** Test if a module is in C */
-bool c_module_p(entity m)
-{
-  bool c_p = FALSE;
-  value v = entity_initial(m);
-
-  if(!value_undefined_p(v)) {
-    language l = code_language(value_code(v));
-    c_p = language_c_p(l);
-    /* Temporary fix for the too many make_unknown_language()... */
-    if(language_unknown_p(l))
-      c_p = language_module_p(m, PP_C_ED);
-  }
-  else
-    c_p = language_module_p(m, PP_C_ED);
-
-  return c_p;
-}
-
-
-/** Test if a module is in Fortran */
-/* Could be better factored in with C case */
-bool fortran_module_p(entity m)
-{
-  /* These two first lines should be replaced by what follows. */
-  bool fortran_p =  language_module_p(m, FORTRAN_FILE_SUFFIX);
-  return fortran_p;
-
-  /* FI->FC: the code that follows breaks the validation of Hpfc?!? */
-
-  /*bool*/ fortran_p = FALSE;
-  value v = entity_initial(m);
-  if(!value_undefined_p(v)) {
-    fortran_p = language_fortran_p(code_language(value_code(v)));
-  }
-  else {
-    /* If this alternative did not exist, the source code should be
-       moved to ri-util*/
-    fortran_p =  language_module_p(m, FORTRAN_FILE_SUFFIX);
-  }
-  return fortran_p;
-}
-
 /* Return a list of all variables and functions accessible somewhere in a module. */
 list module_entities(entity m)
 {
@@ -261,9 +152,6 @@ const char* entity_unambiguous_user_name(entity e)
 
    FI: why is this function in preprocessor and not in ri-util?
 */
-/* For REGIONS_MODULE_NAME, which could/should be defined in
-   ri-util-local.h as it is used to create entities? */
-#include "effects-convex.h"
 static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
 {
   entity m = get_current_module_entity();
@@ -382,6 +270,69 @@ const char* entity_minimal_name(entity e)
 const char* entity_minimal_user_name(entity e)
 {
   return entity_more_or_less_minimal_name(e, FALSE);
+}
+
+/* Retrieve the compilation unit containing a module definition.
+
+   The implementation is clumsy.
+
+   It would be nice to memoize the informtion as with
+   get_current_module_entity().
+*/
+entity module_entity_to_compilation_unit_entity(entity m)
+{
+  entity cu = entity_undefined;
+
+  if(compilation_unit_entity_p(m))
+    cu = m;
+  else {
+    // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
+    string lufn = strrchr(aufn, '/')+1;
+
+    if(lufn!=NULL) {
+      string n = strstr(lufn, PP_C_ED);
+      int l = n-lufn;
+      string cun = strndup(lufn, l);
+
+      if(static_module_name_p(cun)) {
+	string end = strrchr(cun, FILE_SEP_CHAR);
+	*(end+1) = '\0';
+	cu = local_name_to_top_level_entity(cun);
+      }
+      else {
+	string ncun = strdup(concatenate(cun, FILE_SEP_STRING, NULL));
+	cu = local_name_to_top_level_entity(ncun);
+	free(ncun);
+      }
+      free(cun);
+    }
+    else
+      pips_internal_error("Not implemented yet\n");
+  }
+  pips_assert("cu is a compilation unit", compilation_unit_entity_p(cu));
+  return cu;
+}
+bool language_module_p(entity m, string lid)
+{
+  bool c_p = FALSE;
+
+  if(entity_module_p(m)) {
+    /* FI: does not work with static functions */
+    //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    /* SG: must check if the ressource exist (not always the case) */
+    string lname= module_local_name(m);
+    if( db_resource_p(DBR_USER_FILE,lname) )
+    {
+        string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
+        string n = strstr(aufn, lid);
+
+        c_p = (n!=NULL);
+    }
+    else
+        c_p = TRUE; /* SG: be positive ! (needed for Hpfc)*/
+  }
+  return c_p;
 }
 
 /* Add an entity to the current's module compilation unit declarations

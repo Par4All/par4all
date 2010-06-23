@@ -36,7 +36,6 @@
  */
 #include <sys/time.h>
 #include <sys/resource.h>
-extern int getrusage(int, struct rusage*); /* not found in any header! */
 
 #include "genC.h"
 #include "misc.h"

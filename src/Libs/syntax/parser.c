@@ -45,9 +45,6 @@
 #include "misc.h"
 #include "pipsdbm.h"
 
-/*
- * declarations of extern variables
- */
 /* name of the current file */
 char *CurrentFN = NULL;
 
@@ -109,7 +106,6 @@ bool empty_current_label_string_p()
 statement */
 char FormatValue[FORMATLENGTH];
 
-extern void syn_reset_lex(void);
 
 static bool parser_recursive_call = FALSE;
 
@@ -231,8 +227,6 @@ void BeginingOfParsing()
     CurrentPackage = TOP_LEVEL_MODULE_NAME;
     called = TRUE;
 }
-
-extern void syn_parse();
 
 /* parse "module.dbr_file"
  */

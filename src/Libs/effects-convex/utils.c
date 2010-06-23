@@ -1141,7 +1141,6 @@ effect make_reference_region(reference ref, tag tac)
       int n_ind = gen_length(ind);
       int max_phi = 0;
       /* imported from preprocessor.h */
-      extern bool fortran_module_p(entity);
 
       pips_debug(8, "pointer or array case \n");
 

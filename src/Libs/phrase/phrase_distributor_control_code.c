@@ -474,7 +474,7 @@ make_global_common_and_initialize (entity main_module,
 								*global_common);
   new_stat = make_assignement_statement
     (units_nb_variable,
-     int_expr (number_of_deployment_units), NULL);
+     int_to_expression (number_of_deployment_units), NULL);
   stats_list = CONS (STATEMENT, new_stat,stats_list);
 
   if (number_of_deployment_units > 1) {
@@ -485,7 +485,7 @@ make_global_common_and_initialize (entity main_module,
 						  *global_common);
       new_stat = make_assignement_statement
 	(unit_id_variable,
-	 int_expr (i), NULL);
+	 int_to_expression (i), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }
   }
@@ -498,7 +498,7 @@ make_global_common_and_initialize (entity main_module,
 
   new_stat = make_assignement_statement
     (functions_nb_variable,
-     int_expr (hash_table_entry_count(ht_calls)), NULL);
+     int_to_expression (hash_table_entry_count(ht_calls)), NULL);
   stats_list = CONS (STATEMENT, new_stat,stats_list);
  
   id_function = 1;
@@ -517,7 +517,7 @@ make_global_common_and_initialize (entity main_module,
      *global_common);
     new_stat = make_assignement_statement
     (function_id_variable,
-     int_expr (id_function++), NULL);
+     int_to_expression (id_function++), NULL);
     stats_list = CONS (STATEMENT, new_stat,stats_list);
      
     id_param = 1;
@@ -538,7 +538,7 @@ make_global_common_and_initialize (entity main_module,
 	 *global_common);
       new_stat = make_assignement_statement
 	(param_id_variable,
-	 int_expr (id_param++), NULL);
+	 int_to_expression (id_param++), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }, l_in);
    
@@ -552,7 +552,7 @@ make_global_common_and_initialize (entity main_module,
 	 *global_common);
       new_stat = make_assignement_statement
 	(param_id_variable,
-	 int_expr (id_param++), NULL);
+	 int_to_expression (id_param++), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }, l_out);
    
@@ -596,7 +596,7 @@ static entity create_externalized_function_common (entity main_module,
       variable_dimensions(var)
 	= gen_nconc(l_dimensions,
 		    CONS(DIMENSION,
-			 make_dimension (int_expr(1),int_expr (number_of_deployment_units)),
+			 make_dimension (int_to_expression(1),int_to_expression (number_of_deployment_units)),
 			 NIL));
     }
     create_new_common_variable(get_common_param_name(in_variable,externalized_function),
@@ -828,20 +828,20 @@ static statement controlize_distribution (statement module_stat,
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(func_id_variable),
+				entity_to_expression(func_id_variable),
 				call_params);
 	    if (number_of_deployment_units > 1) {
 	      call_params = CONS (EXPRESSION,
-				  make_expression_from_entity(unit_id_variable),
+				  entity_to_expression(unit_id_variable),
 				  call_params);
 	    }
 	    param_id_variable = entity_in_module (get_in_param_id_name(param,f),
 						  module);
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(param_id_variable),
+				entity_to_expression(param_id_variable),
 				call_params);
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(param),
+				entity_to_expression(param),
 				call_params);
 
 	   
@@ -855,7 +855,7 @@ static statement controlize_distribution (statement module_stat,
 		
 		MAP (ENTITY, dyn_var, {
 		  call_params = CONS (EXPRESSION,
-				      make_expression_from_entity(dyn_var),
+				      entity_to_expression(dyn_var),
 				      call_params);
 		}, l_reg_variables);
 	      }
@@ -880,9 +880,9 @@ static statement controlize_distribution (statement module_stat,
 	  /* START_RU_CALL */
 	  {
 	    list start_ru_call_params = CONS(EXPRESSION,
-				    make_expression_from_entity(func_id_variable),
+				    entity_to_expression(func_id_variable),
 				    (number_of_deployment_units>1)?CONS(EXPRESSION,
-									make_expression_from_entity(unit_id_variable),
+									entity_to_expression(unit_id_variable),
 									NIL):NIL);
 	    l_stats = CONS (STATEMENT,
 			    make_statement(entity_empty_label(),
@@ -900,9 +900,9 @@ static statement controlize_distribution (statement module_stat,
 	  /* WAIT_RU_CALL */
 	  {
 	    list wait_ru_call_params = CONS(EXPRESSION,
-				       make_expression_from_entity(func_id_variable),
+				       entity_to_expression(func_id_variable),
 				       (number_of_deployment_units>1)?CONS(EXPRESSION,
-									   make_expression_from_entity(unit_id_variable),
+									   entity_to_expression(unit_id_variable),
 									   NIL):NIL);
 	    l_stats = CONS (STATEMENT,
 			    make_statement(entity_empty_label(),
@@ -933,20 +933,20 @@ static statement controlize_distribution (statement module_stat,
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(func_id_variable),
+				entity_to_expression(func_id_variable),
 				call_params);
 	    if (number_of_deployment_units > 1) {
 	      call_params = CONS (EXPRESSION,
-				  make_expression_from_entity(unit_id_variable),
+				  entity_to_expression(unit_id_variable),
 				  call_params);
 	    }
 	    param_id_variable = entity_in_module (get_out_param_id_name(param,f),
 						  module);
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(param_id_variable),
+				entity_to_expression(param_id_variable),
 				call_params);
 	    call_params = CONS (EXPRESSION,
-				make_expression_from_entity(param),
+				entity_to_expression(param),
 				call_params);
 
 
@@ -960,7 +960,7 @@ static statement controlize_distribution (statement module_stat,
 		
 		MAP (ENTITY, dyn_var, {
 		  call_params = CONS (EXPRESSION,
-				      make_expression_from_entity(dyn_var),
+				      entity_to_expression(dyn_var),
 				      call_params);
 		}, l_reg_variables);
 	      }

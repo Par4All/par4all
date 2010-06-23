@@ -52,6 +52,7 @@
  *
  */
 
+#include "genC.h"
 #include "local.h"
 
 /* local variables */
@@ -207,8 +208,6 @@ static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 
 
 /**************************************** WALK THROUGH THE DEPENDENCE GRAPH */
-
-extern int current_shared_obj_table_size(void); /* in genClib.c */
 
 /* The supplementary call to init_ordering_to_statement should be
    avoided if ordering.c were more clever. */
@@ -2075,7 +2074,6 @@ gcd_and_constant_dependence_test(
 
     if (pc1 != NIL || pc2 != NIL) {
       /* Part of preprocessor.h, unfortunately */
-      extern bool fortran_module_p(entity);
       if(fortran_module_p(get_current_module_entity())) {
 	pips_internal_error("numbers of subscript expressions differ\n");
       }

@@ -143,7 +143,7 @@ statement region_to_dma(statement stat, enum region_to_dma_switch s)
 	  else
 	    pips_internal_error("failed to get upper constraint on %s\n",entity_user_name((entity)endex));
 
-	  ranges=CONS(RANGE, make_range(lower_bound,upper_bound,make_expression_1()), ranges);
+	  ranges=CONS(RANGE, make_range(lower_bound,upper_bound,int_to_expression(1)), ranges);
         }
       if(!ENDP(ranges))
         {
@@ -240,11 +240,11 @@ statement effects_to_dma(statement stat,
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
       if(!ENDP(variable_dimensions(type_variable(entity_type(re))))) {
-	range the_range = make_range(make_expression_0(),
+	range the_range = make_range(int_to_expression(0),
 				     make_op_exp(MINUS_OPERATOR_NAME,
 						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
-						 make_expression_1()),
-				     make_expression_1());
+						 int_to_expression(1)),
+				     int_to_expression(1));
 	expression from = entity_to_expression(re);
 	entity eto;
 	if(val == HASH_UNDEFINED_VALUE) {

@@ -99,20 +99,6 @@ static expression crt_exp;	/* Current expression */
  */
 bdt	base;
 
-
-/* External variables */
-
-
-#if defined(HAS_BDTYY)
-
-/* The file read in by the scanner */
-extern FILE * bdtyyin;
-
-/* The parsing function created by Yacc */
-extern int bdtyyparse();
-
-#endif
-
 /*============================================================================*/
 /* bdt bdt_read_paf(char *s) : computes the BDT of the PAF program name given
  * in argument and returns it.

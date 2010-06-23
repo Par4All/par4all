@@ -1493,8 +1493,10 @@ the variable is unsigned, signed or not */
 /* Already defined */
 //#define DEFAULT_POINTER_TYPE_SIZE (4)
 
-/* Implicit variables to handle IO effetcs */
+/* package name for region variables */
+#define REGIONS_MODULE_NAME "REGIONS-PACKAGE"
 
+/* Implicit variables to handle IO effetcs */
 /* package name for io routines */
 #define IO_EFFECTS_PACKAGE_NAME "__IO_EFFECTS"
 /* package name for random routines */

@@ -14,4 +14,5 @@ inspect-symbols:
 
 check-properties:
 	$(top_srcdir)/src/Scripts/dev/check_properties.sh src/Documentation/pipsmake/properties.rc $(top_srcdir)
+
 endif

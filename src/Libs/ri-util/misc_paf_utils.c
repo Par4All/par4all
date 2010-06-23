@@ -36,8 +36,7 @@
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
-
-extern int CurrentOffsetOfArea(entity /*a*/, entity /*v*/);
+#include "syntax.h"
 
 #define STATIC_CONTROLIZE_MODULE_NAME 	"STATCON"
 #define NLC_PREFIX 			"NLC"
@@ -177,7 +176,6 @@ int Gcount_nub;
  */
 entity make_nsp_entity()
 {
-    extern  int Gcount_nsp;
 	entity  new_ent, mod_ent;
 	char    *name, *num;
 	entity  dynamic_area;
@@ -219,7 +217,6 @@ entity make_nsp_entity()
  */
 entity make_nub_entity()
 {
-	extern  int Gcount_nub;
 	entity  new_ent, mod_ent;
 	char    *name, *num;
 	entity	dynamic_area;

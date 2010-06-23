@@ -174,47 +174,42 @@ char *complexity_sprint(comp, print_stats_p, print_local_names_p)
 complexity comp;
 boolean print_stats_p, print_local_names_p;
 {
-#define COMPLEXITY_BUFFER_SIZE 20480
-    static char t[COMPLEXITY_BUFFER_SIZE];
-    char *s, *p;
-    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
 
-    s = t;
+    char *s=NULL;
 
     if ( COMPLEXITY_UNDEFINED_P(comp) )
 	pips_error("complexity_sprint", "complexity undefined\n");
     else {
-	varcount vc   = complexity_varcount(comp);
-	rangecount rc = complexity_rangecount(comp);
-	ifcount ic    = complexity_ifcount(comp);
+        varcount vc   = complexity_varcount(comp);
+        rangecount rc = complexity_rangecount(comp);
+        ifcount ic    = complexity_ifcount(comp);
 
-	if ( print_stats_p ) {
-	    sprintf(s, "[(var:%td/%td/%td/%td)", varcount_symbolic(vc),
-		                             varcount_guessed(vc),
-		                             varcount_bounded(vc), 
-		                             varcount_unknown(vc));
-	    sprintf(s+strlen(s), " (rng:%td/%td/%td/%td)", 
-		                             rangecount_profiled(rc),
-		                             rangecount_guessed(rc),
-		                             rangecount_bounded(rc), 
-		                             rangecount_unknown(rc));
+        char * p = polynome_sprint(complexity_polynome(comp),
+                (print_local_names_p ? variable_local_name 
+                 : variable_name),
+                is_inferior_pvarval);
 
-	    sprintf(s+strlen(s), " (ifs:%td/%td/%td)]  ", 
-		                             ifcount_profiled(ic), 
-		                             ifcount_computed(ic),
-		                             ifcount_halfhalf(ic));
-
-
-	    s = strchr(s, '\0');
-	}
-	p = polynome_sprint(complexity_polynome(comp),
-			    (print_local_names_p ? variable_local_name 
-			                         : variable_name),
-			    is_inferior_pvarval);
-	strcpy(s, p);
+        if ( print_stats_p ) {
+            asprintf(&s,"[(var:%td/%td/%td/%td)"
+                    " (rng:%td/%td/%td/%td)"
+                    " (ifs:%td/%td/%td)]  %s",
+                    varcount_symbolic(vc),
+                    varcount_guessed(vc),
+                    varcount_bounded(vc), 
+                    varcount_unknown(vc),
+                    rangecount_profiled(rc),
+                    rangecount_guessed(rc),
+                    rangecount_bounded(rc), 
+                    rangecount_unknown(rc),
+                    ifcount_profiled(ic), 
+                    ifcount_computed(ic),
+                    ifcount_halfhalf(ic),p);
+            free(p);
+        }
+        else
+            s=p;
     }
-    pips_assert("no buffer overflow", strlen(s) < COMPLEXITY_BUFFER_SIZE);
-    return((char *) strdup((char *) t));
+    return s;
 }
 
 void complexity_fprint(fd, comp, print_stats_p, print_local_names_p)
@@ -1029,7 +1024,6 @@ list effects_list;
 {
     complexity final_comp = complexity_dup(comp);
     Ppolynome pp = complexity_polynome(comp);
-    extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
     Pbase pb = vect_dup(polynome_used_var(pp, default_is_inferior_pvarval));
 
 
@@ -1076,7 +1070,6 @@ complexity callee_comp;
 string oldname,newname;
 {
     Ppolynome pp = complexity_polynome(callee_comp);
-    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
     Pbase pb = polynome_used_var(pp, is_inferior_pvarval);
     Pbase pbcur = BASE_UNDEFINED;
     complexity comp = make_zero_complexity();

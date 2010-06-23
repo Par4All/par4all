@@ -39,12 +39,7 @@
 #include "patterns.h"
 #include "pipsdbm.h"
 
-typedef struct {
-    int id;
-    hash_table sons; /* char -> operator_id_tree*/
-} operator_id_tree;
-
-static operator_id_tree * mappings = NULL;
+static operator_id_tree mappings = NULL;
 void set_simd_operator_mappings(void * m)
 {
     pips_assert("not already set",mappings==NULL);
@@ -116,74 +111,49 @@ static oper_id_mapping operators[] =
 };
 
 
-static operator_id_tree* make_operator_id_tree()
-{
-    operator_id_tree* n;
-
-    n = (operator_id_tree*)malloc(sizeof(operator_id_tree));
-    n->id = UNKNOWN_TOK;
-    n->sons = hash_table_make(hash_int, 0);
-
-    return n;
-}
-
-void free_operator_id_tree(void* t)
-{
-    operator_id_tree * tree = (operator_id_tree*)t;
-    operator_id_tree * next;
-    HASH_MAP(key,l,
-    {
-        next = (operator_id_tree *) hash_get(tree->sons,key);
-        free_operator_id_tree(next);
-        hash_del(tree->sons,key);
-    }, tree->sons )
-    hash_table_free(tree->sons);
-    free(tree);
-}
-
 static void insert_mapping(oper_id_mapping* item)
 {
     char * s;
-    operator_id_tree* t;
+    operator_id_tree t;
 
     t = mappings;
     for(s = item->name; *s != 0; s++)
     {
-        operator_id_tree * next;
+        operator_id_tree next;
         intptr_t c = *s;
 
-        next = (operator_id_tree *)hash_get(t->sons, (void*)c);
+        next = (operator_id_tree)hash_get(operator_id_tree_sons(t), (void*)c);
         if (next == HASH_UNDEFINED_VALUE)
         {
-            next = make_operator_id_tree();
-            hash_put(t->sons, (void *)c, (void*)next);
+            next = make_operator_id_tree(UNKNOWN_TOK,hash_table_make(hash_int,HASH_DEFAULT_SIZE));
+            hash_put(operator_id_tree_sons(t), (void *)c, (void*)next);
         }
 
         t = next;
     }
 
-    if (t->id != UNKNOWN_TOK)
+    if (operator_id_tree_id(t) != UNKNOWN_TOK)
         pips_user_warning("overwriting previous mapping...\n");
 
-    t->id = item->id;
+    operator_id_tree_id(t) = item->id;
 }
 
 static int do_get_operator_id(string ename)
 {
-    operator_id_tree* t = mappings;
+    operator_id_tree t = mappings;
     for(char *s = ename; *s != 0; s++)
     {
-        operator_id_tree * next;
+        operator_id_tree next;
         intptr_t c = *s;
 
-        next = (operator_id_tree *)hash_get(t->sons, (void*)c);
+        next = (operator_id_tree)hash_get(operator_id_tree_sons(t), (void*)c);
         if (next == HASH_UNDEFINED_VALUE)
         {
             return UNKNOWN_TOK;
         }
         t = next;
     }
-    return t->id;
+    return operator_id_tree_id(t);
 }
 
 int get_operator_id(entity e)
@@ -202,7 +172,7 @@ int get_operator_id(entity e)
 bool simd_operator_mappings(__attribute__((unused)) char * module_name)
 {
     /* create a new operator id */
-    operator_id_tree *m= make_operator_id_tree();
+    operator_id_tree m= make_operator_id_tree(UNKNOWN_TOK,hash_table_make(hash_int,HASH_DEFAULT_SIZE));
     set_simd_operator_mappings(m);
 
     for(size_t i=0; operators[i].name != NULL; i++)

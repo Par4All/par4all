@@ -51,8 +51,6 @@
 #include "sparse_sc.h"
 #include "tiling.h"
 #include "movements.h"
-extern Variable variable_of_rank();
-
 
 /* Print the complex expression 
  * [coeff1 * (exp1 / coeff2) + exp2 ] / coeff3

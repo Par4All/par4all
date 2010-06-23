@@ -45,7 +45,6 @@
 
 #include "database.h"
 #include "resources.h"
-#include "preprocessor.h"
 #include "icfg.h"
 
 /*

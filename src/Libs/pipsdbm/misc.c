@@ -63,8 +63,6 @@ bool interrupt_pipsmake_asap_p()
     return res;
 }
 
-extern int gettimeofday();
-
 /* Timing of one request */
 static struct tms request_time;
 static struct tms request_phase_time;

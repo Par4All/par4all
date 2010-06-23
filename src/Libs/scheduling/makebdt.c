@@ -82,30 +82,6 @@ typedef dfg_vertex_label vertex_label;
 #define my_polynome_fprint(fp,p) \
    polynome_fprint(fp,p,entity_local_name,default_is_inferior_var);
 
-/*
-extern void sc_to_matrices();
-extern void matrices_to_sc();
-extern int ppcm();
-extern int strncmp();
-extern 	 int fprintf();
-*/
-/* functions defined in bdt_utils.c */
-extern bdt true_copy_bdt();
-/*
-extern Psysteme predicate_to_system();
-extern schedule true_copy_schedule();
-extern boolean system_contains_var();
-extern void poly_chg_var();
-extern Psysteme suppress_sc_in_sc();
-extern Psysteme my_sc_normalize();
-extern void analyze_expression();
-extern quast pip_solve_min_with_big();
-extern boolean exp_equals_p();
-extern void fprint_sccs();
-extern expression make_rational_exp();
-extern Psysteme find_implicit_equation();
-extern entity create_named_entity();
-*/
 hash_table h_node;
 
 typedef struct n_coef {

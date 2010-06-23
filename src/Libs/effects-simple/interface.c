@@ -453,7 +453,6 @@ proper_effects_of_range(range r)
 
 bool expression_invariant_wrt_effects(expression exp, list el)
 {
-  extern list proper_effects_of_expression(expression);
   list ee = proper_effects_of_expression(exp);
   list cee = list_undefined;
   list cel = list_undefined;

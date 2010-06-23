@@ -176,9 +176,6 @@
 
 #include "syntax.h"
 
-extern int yylex(void);
-extern void yyerror(char *);
-
 #define YYERROR_VERBOSE 1 /* much clearer error messages with bison */
 
     /* local variables */

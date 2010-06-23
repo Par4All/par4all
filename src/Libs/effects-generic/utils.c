@@ -50,6 +50,7 @@
 #include "preprocessor.h"
 
 #include "effects-generic.h"
+#include "effects-simple.h"
 #include "effects-convex.h"
 #include "alias-classes.h"
 
@@ -523,60 +524,13 @@ list /* of effect */ make_effects_for_array_declarations(list refs)
 
      
 
-typedef struct { list le, lr; } deux_listes;
 
-static void make_uniq_reference_list(reference r, deux_listes * l)
-{
-  entity e = reference_variable(r);
-  if (! (storage_rom_p(entity_storage(e)) &&
-	 !(value_undefined_p(entity_initial(e))) &&
-	 value_symbolic_p(entity_initial(e)) &&
-	 type_functional_p(entity_type(e)))) {
-
-    /* Add reference r only once */
-    if (l->le ==NIL || !gen_in_list_p(e, l->le)) {
-      l->le = CONS(ENTITY,e,  l->le);
-      l->lr = CONS(REFERENCE,r,l->lr);
-    }
-  }
-}
-
-/* FI: this function has not yet been extended for C types!!! */
-list extract_references_from_declarations(list decls)
-{
-  list arrays = NIL;
-  deux_listes lref = { NIL, NIL };
-
-  MAPL(le,{
-    entity e= ENTITY(CAR(le));
-    type t = entity_type(e);
-
-    if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
-      arrays = CONS(VARIABLE,type_variable(t), arrays);
-  }, decls );
-
-  MAPL(array,
-  { variable v = VARIABLE(CAR(array));
-  list ldim = variable_dimensions(v);
-  while (!ENDP(ldim))
-    {
-      dimension d = DIMENSION(CAR(ldim));
-      gen_context_recurse(d, &lref, reference_domain, make_uniq_reference_list, gen_null);
-      ldim=CDR(ldim);
-
-    }
-  }, arrays);
-  gen_free_list(lref.le);
-
-  return(lref.lr);
-}
 
 list summary_effects_from_declaration(string module_name __attribute__ ((unused)))
 {
   list sel = NIL;
   //entity mod = module_name_to_entity(module_name);
   //list decls = code_declarations(value_code(entity_initial(mod)));
-  extern list current_module_declarations(void);
   list decls = current_module_declarations();
   list refs = list_undefined;
 
@@ -649,7 +603,6 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 
     if(!reference_undefined_p(r)) {
       if(gen_in_list_p((void *) r, rl)) {
-	extern void print_effect(effect);
 	fprintf(stderr, "this effect shares its reference with another effect in the list\n");
 	print_effect(e);
 	sharing_p = TRUE;
@@ -765,7 +718,6 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
   list l_res = NIL;
   effect eff_read = effect_undefined;
   effect eff_write = effect_undefined;
-  extern void print_effect(effect);
 	
   pips_assert("effect is defined \n", !effect_undefined_p(eff));
 
@@ -822,7 +774,6 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 {
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
-  extern void print_effect(effect);
 	
   
   if (anywhere_effect_p(eff))

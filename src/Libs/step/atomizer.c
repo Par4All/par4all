@@ -15,15 +15,7 @@ License.
 #include "pips_config.h"
 #endif
 #include "defines-local.h"
-
-extern void atomize_as_required(
-  statement stat, 
-  bool (*ref_decide)(reference, expression), /* reference */
-  bool (*call_decide)(call, expression), /* call */
-  bool (*test_decide)(test, expression), /* test */
-  bool (*range_decide)(range, expression), /* range */
-  bool (*while_decide)(whileloop, expression), /* whileloop */
-  entity (*new)(entity, basic));
+#include "expressions.h"
 
 static expression step_expression_atomized=expression_undefined;
 

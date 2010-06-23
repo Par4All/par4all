@@ -24,6 +24,10 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "ri-util.h"
 /*
  * Here is the database!
  *
@@ -34,8 +38,6 @@
 
 #include "private.h"
 #include "pipsdbm_private.h"
-
-extern bool compilation_unit_p(string); /* alas in c_syntax.h */
 
 /******************************************************************** UTILS */
 

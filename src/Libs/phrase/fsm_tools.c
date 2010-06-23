@@ -67,8 +67,8 @@ expression make_expression_with_state_variable(entity state_variable,
 					       string intrinsic_name)
 {
   return MakeBinaryCall (entity_intrinsic(intrinsic_name),
-			 make_expression_from_entity (state_variable),
-			 int_expr (value));
+			 entity_to_expression (state_variable),
+			 int_to_expression (value));
 }
 
 /**
@@ -135,8 +135,8 @@ statement make_state_variable_assignement_statement (statement stat,
 
   assignment_call = make_call (entity_intrinsic(ASSIGN_OPERATOR_NAME),
 			       CONS(EXPRESSION,
-				    make_expression_from_entity(state_variable),
-				    CONS(EXPRESSION, int_expr (assignement_value), NIL)));
+				    entity_to_expression(state_variable),
+				    CONS(EXPRESSION, int_to_expression (assignement_value), NIL)));
  
   new_instruction
     = make_instruction(is_instruction_call,

@@ -78,14 +78,6 @@ char vcid_scheduling_scheduling[] = "$Id$";
 typedef dfg_arc_label arc_label;
 typedef dfg_vertex_label vertex_label;
 
-extern char *strdup();
-/*extern int fprintf();
-extern int fclose();
-extern int fflush();
-extern int printf();*/
-extern sccs dfg_find_sccs();
-extern bdt search_graph_bdt();
-
 #define BDT_EXT ".bdt_file"
 
 /*==================================================================*/

@@ -46,8 +46,7 @@
 #include "effects-generic.h" // {set,reset}_proper_rw_effects
 
 #include "freia.h"
-
-extern string freia_compile(string, statement, string);
+#include "hwac.h"
 
 static int freia_compiler(string module, string hardware)
 {
