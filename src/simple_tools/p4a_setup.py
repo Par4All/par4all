@@ -170,7 +170,7 @@ def main(options = {}, args = []):
     script_dir = os.path.split(actual_script)[0]
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     default_prefix = "/usr/local/par4all"
-    foo
+
     # Force options.dest_dir to None for now.
     options.dest_dir = None
 
