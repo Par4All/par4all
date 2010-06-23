@@ -81,8 +81,6 @@
 #include "misc.h"
 #include "control.h"
 #include "properties.h"
-#include "semantics.h"
-#include "transformations.h"
 #include "instrumentation.h"
 
 /* As we create checks with stop error message who tell us there are bound

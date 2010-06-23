@@ -36,8 +36,8 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
-#include "effects.h"
 #include "misc.h"
+#include "effects.h"
 
 /* REFERENCES */
 GENERIC_GLOBAL_FUNCTION(proper_references, statement_effects)

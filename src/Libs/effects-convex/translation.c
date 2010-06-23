@@ -62,7 +62,6 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "misc.h"
-#include "semantics.h"
 #include "text.h"
 #include "transformer.h"
 #include "preprocessor.h"

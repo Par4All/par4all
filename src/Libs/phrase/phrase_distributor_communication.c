@@ -45,11 +45,8 @@
 #include "pipsdbm.h"
 
 #include "text-util.h"
-#include "properties.h"
-#include "prettyprint.h"
 
 #include "dg.h"
-#include "transformer.h"
 
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
@@ -60,8 +57,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "semantics.h"
-#include "control.h"
 
 #include "phrase_tools.h"
 

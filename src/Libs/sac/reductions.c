@@ -38,7 +38,6 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
 
 #include "reductions.h"
 #include "sac.h"
@@ -46,7 +45,6 @@
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
-#include "callgraph.h"
 
 #include "control.h"
 #include "properties.h"

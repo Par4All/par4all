@@ -57,7 +57,6 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 #include "text-util.h"
-#include "transformations.h"
 
 #define EMPTY         ""
 #define NL            "\n"

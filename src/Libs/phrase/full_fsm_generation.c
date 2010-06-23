@@ -52,7 +52,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "semantics.h"
 #include "control.h"
 #include "callgraph.h"
 

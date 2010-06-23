@@ -47,7 +47,6 @@
 #include "text-util.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "effects-generic.h"

@@ -48,7 +48,6 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-#include "control.h"
 #include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
@@ -57,7 +56,6 @@
 #include "transformations.h"
 #include "parser_private.h"
 #include "alias-classes.h"
-#include "conversion.h"
 #include "pipsmake.h"
 #include "accel-util.h"
 

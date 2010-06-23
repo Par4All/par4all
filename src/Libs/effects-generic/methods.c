@@ -44,7 +44,6 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "misc.h"
 #include "text-util.h"
 
 #include "effects-generic.h"

@@ -47,7 +47,6 @@
 
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "conversion.h"
 
 extern void global_parallelization();

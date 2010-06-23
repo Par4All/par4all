@@ -40,12 +40,9 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "properties.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "transformer.h"
-#include "semantics.h"
 #include "control.h"
 
 #include "transformations.h"

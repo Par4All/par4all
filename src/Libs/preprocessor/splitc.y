@@ -64,7 +64,6 @@
 #include "ri-util.h"
 #include "misc.h"
 
-#include "c_syntax.h"
 #include "preprocessor.h"
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */

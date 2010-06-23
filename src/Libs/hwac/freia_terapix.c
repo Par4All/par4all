@@ -33,7 +33,6 @@
 #include "misc.h"
 
 #include "linear.h"
-#include "pipsdbm.h"
 
 #include "ri.h"
 #include "effects.h"

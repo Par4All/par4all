@@ -46,7 +46,6 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
-#include "transformations.h"
 #include "arithmetique.h"
 
 #include "effects-generic.h"
@@ -55,10 +54,8 @@
 #include "preprocessor.h"
 #include "properties.h"
 
-#include "expressions.h"
 
 #include "sac.h"
-#include "atomizer.h"
 
 static statement orginal_statement = NULL;
 

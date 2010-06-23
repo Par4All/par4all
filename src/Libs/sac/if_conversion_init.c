@@ -51,12 +51,9 @@
 #include "effects-simple.h"
 #include "properties.h"
 
-#include "expressions.h"
 #include "complexity.h"
-#include "callgraph.h"
 #include "sac.h"
 
-#include "atomizer.h"
 
 /** 
  * atomize the condition of a test and returns generated statements

@@ -35,7 +35,6 @@
 #include <sys/time.h>
 
 #include "genC.h"
-#include "misc.h"
 
 #include "database.h"
 #include "linear.h"

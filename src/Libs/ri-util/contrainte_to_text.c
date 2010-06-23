@@ -37,8 +37,8 @@
 #include "text.h"
 #include "text-util.h"
 
-#include "misc.h"
 #include "properties.h"
+#include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
 

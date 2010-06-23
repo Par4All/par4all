@@ -30,7 +30,6 @@
 #include "effects.h"
 
 #include "resources.h"
-#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"

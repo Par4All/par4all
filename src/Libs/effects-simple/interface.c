@@ -46,7 +46,6 @@
 #include "effects-util.h"
 #include "database.h"
 #include "resources.h"
-#include "pipsdbm.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 

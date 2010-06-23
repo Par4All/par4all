@@ -41,7 +41,6 @@
 
 #include "text-util.h"
 #include "properties.h"
-#include "prettyprint.h"
 
 #include "dg.h"
 #include "transformer.h"

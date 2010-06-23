@@ -301,7 +301,7 @@ static expression expression_less_than_in_context(expression e1, expression e2,
 		for(; !VECTEUR_NUL_P(b);b = b->succ)
 		  {
 		    entity e = (entity) vecteur_var(b);
-		    if (strstr(entity_name(e),OLD_VALUE_SUFFIX) != NULL) 
+		    if (old_value_entity_p(e))
 		      vect_add_elem(&pv_var, (Variable) e, VALUE_ONE);
 		  }
 		if (pv_var!=NULL)

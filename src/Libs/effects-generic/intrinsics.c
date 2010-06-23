@@ -57,7 +57,6 @@
 
 #include "transformer.h"
 #include "semantics.h"
-#include "pipsdbm.h"
 #include "resources.h"
 
 #include "effects-generic.h"

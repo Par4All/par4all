@@ -35,7 +35,6 @@
 #include "freia_spoc.h"
 
 #include "linear.h"
-#include "pipsdbm.h"
 
 #include "ri.h"
 #include "effects.h"

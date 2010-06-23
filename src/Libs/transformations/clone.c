@@ -45,7 +45,6 @@
 #include "pipsdbm.h"
 #include "properties.h"
 #include "preprocessor.h"
-#include "prettyprint.h"
 #include "semantics.h"
 #include "callgraph.h"
 

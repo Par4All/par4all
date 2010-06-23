@@ -32,8 +32,6 @@
  
 #include "defines-local.h"
 
-#include "control.h"
-#include "semantics.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"

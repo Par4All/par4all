@@ -58,7 +58,6 @@ typedef dg_vertex_label vertex_label;
 #include "ri-util.h"
 #include "effects-util.h"
 #include "text-util.h"
-#include "conversion.h"
 /* #include "generation.h" */
 #include "movements.h"
 

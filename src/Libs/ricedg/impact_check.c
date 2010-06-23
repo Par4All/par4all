@@ -25,7 +25,6 @@
     #include "pips_config.h"
 #endif
 #include "local.h"
-#include "icfg.h"
 
 #define DEP_FLOW 0
 #define DEP_ANTI 1

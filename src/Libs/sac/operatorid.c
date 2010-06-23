@@ -38,7 +38,6 @@
 #include "sac.h"
 #include "patterns.h"
 #include "pipsdbm.h"
-#include "properties.h"
 
 typedef struct {
     int id;

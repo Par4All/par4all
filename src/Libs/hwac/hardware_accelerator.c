@@ -35,7 +35,6 @@
 // needs some arg_label & vertex_label types
 // #include "graph.h"
 
-#include "properties.h"
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"

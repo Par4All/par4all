@@ -119,11 +119,9 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "ri.h"
 #include "ri-util.h"
 #include "effects.h"
-#include "pipsdbm.h"
 
 #include "misc.h"
 #include "properties.h"
-#include "prettyprint.h"
 #include "preprocessor.h"
 
 #include "STEP_name.h"

@@ -42,18 +42,14 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-#include "conversion.h"
 #include "control.h"
 #include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "preprocessor.h"
 #include "text-util.h"
 #include "transformations.h"
 #include "parser_private.h"
-#include "semantics.h"
-#include "transformer.h"
 #include "accel-util.h"
 
 

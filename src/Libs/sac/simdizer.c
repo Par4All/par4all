@@ -40,7 +40,6 @@
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "transformations.h"
 #include "alias-classes.h"
 
 #include "ray_dte.h"
@@ -50,7 +49,6 @@
 
 #include "sac.h"
 #include "ricedg.h"
-#include "transformations.h"
 #include "control.h"
 #include "callgraph.h"
 

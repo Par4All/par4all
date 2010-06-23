@@ -107,7 +107,6 @@
 #include "instrumentation.h"
 #include "resources.h"
 #include "misc.h"
-#include "control.h"
 #include "properties.h"
 #include "semantics.h"
 #include "transformer.h"

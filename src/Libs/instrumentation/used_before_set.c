@@ -36,11 +36,9 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "misc.h"
-#include "control.h"
-#include "properties.h"
-#include "semantics.h"
 #include "transformer.h"
+#include "misc.h"
+#include "properties.h"
 #include "pipsmake.h"
 #include "alias_private.h"
 #include "instrumentation.h"
@@ -49,7 +47,6 @@
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "conversion.h"
-#include "transformations.h"
 #include "text-util.h"
 #include "alias-classes.h"
 extern Pbase entity_list_to_base(list);
@@ -264,7 +261,7 @@ static Psysteme remove_temporal_variables_from_system(Psysteme ps)
       for(; !VECTEUR_NUL_P(b);b = b->succ)
 	{
 	  entity e = (entity) vecteur_var(b);
-	  if (strstr(entity_name(e),OLD_VALUE_SUFFIX) != NULL) 
+	  if (old_value_entity_p(e))
 	    vect_add_elem(&pv_var, (Variable) e, VALUE_ONE);
 	}
       return my_system_projection_along_variables(ps, pv_var); 

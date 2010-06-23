@@ -45,7 +45,6 @@
 #include "constants.h"
 
 #include "misc.h"
-#include "properties.h"
 
 #include "transformer.h"
 

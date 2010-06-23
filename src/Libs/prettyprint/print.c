@@ -46,7 +46,6 @@
 #include "effects-util.h"
 #include "pipsdbm.h"
 #include "prettyprint.h"
-#include "preprocessor.h"
 
 #include "constants.h"
 #include "resources.h"

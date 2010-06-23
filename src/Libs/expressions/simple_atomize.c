@@ -37,7 +37,6 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
-#include "control.h" /* for CONTROL_MAP() */
 #include "properties.h"
 
 /* void atomize_as_required(stat, ref_decide, call_decide, test_decide, range_decide, while_decide, new)

@@ -52,7 +52,6 @@
 #include "resources.h"
 
 #include "misc.h"
-#include "properties.h"
 
 #include "prettyprint.h"
 #include "semantics.h"

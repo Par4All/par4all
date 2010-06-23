@@ -46,7 +46,6 @@
 #include "database.h"
 
 #include "misc.h"
-#include "pipsdbm.h"
 #include "properties.h"
 
 extern string compilation_unit_name;

@@ -52,13 +52,10 @@
 
 #include "properties.h"
 
-#include "transformer.h"
-#include "semantics.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-#include "pipsdbm.h"
 #include "resources.h"
 
 /******************************************************* CONVEX R/W REGIONS */

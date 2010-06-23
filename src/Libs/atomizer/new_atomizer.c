@@ -58,11 +58,8 @@ typedef dg_vertex_label vertex_label;
 #include "effects-generic.h"
 #include "alias-classes.h"
 #include "effects-simple.h"
-#include "properties.h"
 #include "atomizer.h"
-#include "properties.h"
 
-#include "expressions.h"
 
 typedef struct {
     list written_references;

@@ -77,7 +77,6 @@ typedef dfg_arc_label arc_label;
 typedef dfg_vertex_label vertex_label;
 #include "graph.h"
 #include "paf-util.h"
-#include "static_controlize.h"
 
 #define POSITIVE 1
 #define NEGATIVE 0

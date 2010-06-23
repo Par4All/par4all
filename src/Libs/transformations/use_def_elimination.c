@@ -55,7 +55,6 @@ typedef dg_vertex_label vertex_label;
 #include "polyedre.h"
 /* */
 #include "ricedg.h"
-#include "semantics.h"
 #include "preprocessor.h"
 #include "transformations.h"
 
