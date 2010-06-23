@@ -311,11 +311,22 @@ static void read_properties(void)
 
 static property get_property(const string name, bool cool)
 {
-    property p;
-    if (!pl) read_properties(); /* rather lazy... */
-    if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) {
-	if (!cool) error("unknown property: --%s--\n", name);
-	/* else */
+    property p = property_undefined;
+    property u = (property) HASH_UNDEFINED_VALUE;
+
+    if (!pl)
+       read_properties(); /* rather lazy... */
+
+    p = (property) hash_get(pl, name);
+
+    if (p == u) {
+	if (!cool) {
+            fprintf(stderr, "unknown property: --%s--\n", name);
+            /* Not a nice exit from PIPS... */
+            abort();
+            //error("unknown property: --%s--\n", name);
+        }
+	/* else since error does not return */
 	p = property_undefined;
     }
     return p;
