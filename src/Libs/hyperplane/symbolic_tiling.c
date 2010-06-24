@@ -122,6 +122,7 @@ generate_tile:;
     gen_free_list(tiled_loops_outer);
 }
 
+
 /* checks if sloop is a perfectly nested loop of depth @depth */
 static bool symbolic_tiling_valid_p(statement sloop, size_t depth)
 {
@@ -133,6 +134,39 @@ static bool symbolic_tiling_valid_p(statement sloop, size_t depth)
         }
         else return false;
     }
+}
+
+static void convert_min_max_to_tests_in_loop(loop l)
+{
+    expression ub = range_upper(loop_range(l));
+    if(expression_call_p(ub))
+    {
+        call c = expression_call(ub);
+        entity op = call_function(c);
+        if(ENTITY_MIN_P(op)) {
+            expression lhs = copy_expression(binary_call_lhs(c));
+            expression rhs = copy_expression(binary_call_rhs(c));
+            free_expression(range_upper(loop_range(l)));
+            range_upper(loop_range(l))=lhs;
+            loop_body(l)=instruction_to_statement(
+                    make_instruction_test(
+                        make_test(
+                            binary_intrinsic_expression(
+                                LESS_OR_EQUAL_OPERATOR_NAME,
+                                entity_to_expression(loop_index(l)),
+                                rhs),
+                            loop_body(l),
+                            make_empty_block_statement()
+                            )
+                        )
+                    );
+        }
+    }
+}
+
+static void convert_min_max_to_tests(statement s)
+{
+    gen_recurse(s,loop_domain, gen_true, convert_min_max_to_tests_in_loop);
 }
 
 bool symbolic_tiling(const char *module_name)
@@ -153,8 +187,11 @@ bool symbolic_tiling(const char *module_name)
         list vector = strsplit(get_string_property("SYMBOLIC_TILING_VECTOR"),",");
         if(ENDP(vector))
             pips_user_warning("must provide a non empty array\n");
-        else if((result=symbolic_tiling_valid_p(sloop,gen_length(vector))))
+        else if((result=symbolic_tiling_valid_p(sloop,gen_length(vector)))) {
             do_symbolic_tiling(sloop,vector);
+            if(get_bool_property("SYMBOLIC_TILING_NO_MIN"))
+                convert_min_max_to_tests(sloop);/* << this one is here to wait for better preconditions computations */
+        }
         gen_map(free,vector);
         gen_free_list(vector);
     }

@@ -7071,6 +7071,11 @@ symbolic_tiling > MODULE.code
 SYMBOLIC_TILING_VECTOR ""
 \end{PipsProp}
 
+As a work-around to precondition computation limitations, you can set following property to true, it will generate tests instead of min.
+\begin{PipsProp}{SYMBOLIC_TILING_NO_MIN}
+SYMBOLIC_TILING_NO_MIN FALSE
+\end{PipsProp}
+
 \subsection{Loop Normalize}
 \label{subsection-loop-normalize}
 \index{Loop Normalize}
