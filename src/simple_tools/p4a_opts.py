@@ -77,6 +77,7 @@ def report_enabled():
 
 def send_report_email(recipient = "par4all@hpc-project.com"):
     #~ if True:
+    msg_string = ""
     try:
         global static_options, static_args
 
@@ -124,12 +125,19 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         msg['From'] = "anonymous@par4all.org"
         msg['To'] = recipient
 
+        msg_string = msg.as_string()
+
         s = smtplib.SMTP(server)
-        s.sendmail(msg['From'], [ msg['To'] ], msg.as_string())
+        s.sendmail(msg['From'], [ msg['To'] ], msg_string)
         s.quit()
 
     except:
-        warn("Sending the email failed -- Try sending " + current_log_file + " manually to " + recipient, log = False)
+        (t, e, tb) = sys.exc_info()
+        warn("Sending the email failed: " + e.__class__.__name__ + ": " + str(e))
+        debug("".join(traceback.format_exception(t, e, tb)), level = 3)
+        if msg_string:
+            debug("Email was: " + msg_string, level = 3)
+        suggest("Try sending " + current_log_file + " manually to " + recipient)
 
     else:
         done("Report email sent to " + recipient + ", thank you for your feedback", log = False)
