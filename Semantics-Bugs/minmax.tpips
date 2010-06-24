@@ -1,0 +1,11 @@
+delete minmax
+create minmax minmax.f
+
+display PRINTED_FILE
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+close
+
+delete minmax
