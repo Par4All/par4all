@@ -337,7 +337,7 @@ class runner(Thread):
 
         self.out = ""
         self.err = ""
-        
+
         self.out_line_chunk = ""
         self.err_line_chunk = ""
 
@@ -351,7 +351,7 @@ class runner(Thread):
         #~ self.can_spin = not self.silent and os.isatty(2)
         self.can_spin = os.isatty(2)
         self.startt = time.time()
-        
+
         if self.redir:
             self.start()
 
