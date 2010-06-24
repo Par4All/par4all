@@ -243,14 +243,15 @@ def setup_logging(file = default_log_file, suffix = "", remove = False):
         file = file_add_suffix(file, suffix)
     if remove and os.path.exists(file):
         os.remove(file)
-    log_file_handler = logging.handlers.RotatingFileHandler(file, maxBytes = 1024 * 1024, backupCount = 10)
-    log_file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    log_file_handler = logging.handlers.RotatingFileHandler(file, maxBytes = 20 * 1024 * 1024, backupCount = 10)
+    log_file_handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s"))
     logger.addHandler(log_file_handler)
     current_log_file = file
     logger.info("*" * 50)
     logger.info("*" * 50)
     logger.info("*" * 50)
-    warn("Log file is " + file)
+    logger.info("Command: " + " ".join(sys.argv))
+    warn("Logging to " + file)
 
 def flush_log():
     if log_file_handler:
@@ -323,7 +324,7 @@ class runner(Thread):
         self.silent = silent
 
         if self.silent:
-            debug("Running " + self.cmd + " in " + self.working_dir)
+            debug("Running '" + self.cmd + "' in " + self.working_dir)
         else:
             cmd(self.cmd, dir = self.working_dir)
 
@@ -457,9 +458,14 @@ class runner(Thread):
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, 
         shell = True, extra_env = {}, silent = False, 
         stdout_handler = None, stderr_handler = None):
-    if not silent and stdout_handler is None and stderr_handler is None:
-        stdout_handler = lambda s: debug(s, bare = True)
-        stderr_handler = lambda s: info(s, bare = True)
+    if stdout_handler is None and stderr_handler is None:
+        if silent:
+            stdout_handler = lambda s: debug(s, bare = True)
+            stderr_handler = lambda s: info(s, bare = True)
+        else:
+            # Log output even in silent mode.
+            stdout_handler = lambda s: debug(s, bare = True, level = 4)
+            stderr_handler = lambda s: info(s, bare = True, level = 3)
     r = runner(cmd_list, can_fail = can_fail, 
         force_locale = force_locale, working_dir = working_dir, extra_env = extra_env, 
         stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)
@@ -506,10 +512,10 @@ def rmtree(dir, can_fail = False, remove_top = True):
     #~ debug("Removing tree: " + dir)
     ret = 0
     if remove_top:
-        if run([ "rm", "-rvf", dir + "/" ], can_fail = can_fail)[2]:
+        if run([ "rm", "-rf", dir + "/" ], can_fail = can_fail)[2]:
             warn("Could not remove " + dir + " recursively")
     else:
-        if run([ "rm", "-rvf", dir + "/*" ], can_fail = can_fail)[2]:
+        if run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)[2]:
             warn("Could not remove everything in " + dir)
     #~ try:
         #~ for root, dirs, files in os.walk(dir, topdown = False):

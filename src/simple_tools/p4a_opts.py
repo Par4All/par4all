@@ -57,7 +57,7 @@ def process_common_options(options, args):
         return False
 
     if options.log and not options.report:
-        setup_logging()
+        setup_logging(suffix = "_" + utc_datetime(), remove = True)
     elif options.report:
         options.log = True
         setup_logging(suffix = "_report_" + utc_datetime(), remove = True)

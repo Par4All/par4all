@@ -90,11 +90,14 @@ class p4a_git():
         return output
 
     def current_branch(self):
+        br = None
         output = self.cmd([ "branch" ])
         for b in output.split("\n"):
             if b.startswith("* "):
-                return b.replace("* ", "")
-        return None
+                br = b.replace("* ", "")
+                break
+        debug("current_branch() = " + br)
+        return br
 
     def is_dirty(self, file = None):
         '''Returns True if the file in the repository has been altered since last revision.
@@ -107,7 +110,7 @@ class p4a_git():
         result = False
         if re.search("Changes to be committed:", output) or re.search("Changed but not updated:", output):
             result = True
-        #debug("is_dirty("+ file +") = " + str(result))
+        debug("is_dirty("+ repr(file) +") = " + str(result))
         return result
 
     def current_revision(self, file = None, test_dirty = True):
@@ -123,7 +126,7 @@ class p4a_git():
             short_rev = output.split(" ")[0]
             if test_dirty and self.is_dirty(file):
                 short_rev += "~dirty"
-        #debug("current_revision("+ file +") = " + short_rev)
+        debug("current_revision("+ repr(file) +") = " + short_rev)
         return short_rev
 
     def archive(self, output_file, prefix, format = "tar"):
