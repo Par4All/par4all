@@ -3,15 +3,111 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
-# - Ronan Keryell
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
 
 '''
-Par4All Processing Class
+Par4All processing
 '''
 
 import sys, os, re, shutil
 from p4a_util import *
+
+
+class p4a_processor_output():
+    files = []
+    database_dir = ""
+    exception = None
+
+
+class p4a_processor_input():
+    project_name = ""
+    accel = False
+    cuda = False
+    openmp = False
+    fine = False
+    include_modules = ""
+    exclude_modules = ""
+    cpp_flags = ""
+    files = []
+    recover_includes = True
+
+
+def add_module_options(parser):
+
+    group = optparse.OptionGroup(parser, "Processor Options")
+
+    group.add_option("--input-file", metavar = "FILE", default = None, 
+        help = "Input file (as created using the pickle module on a p4a_processor_input instance).")
+
+    group.add_option("--output-file", metavar = "FILE", default = None,
+        help = "Output file (to be created using the pickle module on a p4a_processor_output instance).")
+
+    parser.add_option_group(group)
+
+
+def process(input):
+
+    output = p4a_processor_output()
+
+    try:
+        # Create a workspace with PIPS:
+        processor = p4a_processor(
+            project_name = input.project_name,
+            cpp_flags = input.cpp_flags,
+            verbose = True,
+            files = input.files,
+            filter_include = input.include_modules,
+            filter_exclude = input.exclude_modules,
+            accel = input.accel,
+            cuda = input.cuda,
+            recover_includes = input.recover_includes
+        )
+
+        output.database_dir = processor.get_database_directory()
+
+        # First apply some generic parallelization:
+        processor.parallelize(input.fine)
+
+        if input.cuda:
+            processor.gpuify()
+
+        if input.openmp:
+            processor.ompify()
+
+        # Write the output files.
+        output.files = processor.save()
+
+    except:
+        e = sys.exc_info()[1]
+        if e.__class__.__name__ == "RuntimeError" and str(e).find("pips") != -1:
+            output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
+        else:
+            #~ error("Processing of " + ", ".join(input.files) + " failed")
+            output.exception = e
+
+    return output
+
+
+def process_file(input_file, output_file):
+    input = load_pickle(input_file)
+    output = process(input)
+    save_pickle(output_file, output)
+
+
+def main(options, args = []):
+
+    if not options.input_file:
+        die("Missing --input-file")
+
+    if not options.output_file:
+        die("Missing --output-file")
+
+    if not os.path.exists(options.input_file):
+        die("Input file does not exist: " + options.input_file)
+
+    process_file(options.input_file, options.output_file)
+
 
 class p4a_processor():
     """Process program files with PIPS and other tools"""
@@ -153,6 +249,10 @@ class p4a_processor():
             and (filter_include_re == None or filter_include_re.match(module.name)))
 
 
+    def get_database_directory():
+        return os.path.abspath(self.workspace.directory())
+
+
     def filter_modules(self, filter_include = None, filter_exclude = None, other_filter = lambda x: True):
         filter_include_re = None
         if filter_include:
@@ -244,6 +344,8 @@ class p4a_processor():
             and add at the beginning of main() a line with:
                P4A_init_accel;
             ''')
+
+
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
@@ -257,14 +359,15 @@ class p4a_processor():
 
         info("Post-processing " + file)
 
-        args = [ 'p4a_post_processor.py' ]
+        post_process_script = os.path.join(get_program_dir(), "p4a_post_processor.py")
 
+        args = [ post_process_script ]
         if dest_dir:
             args += [ '--dest-dir', dest_dir ]
-
         args.append(file)
 
-        subprocess.call(args)
+        run(args)
+        #~ subprocess.call(args)
 
 
     def save(self, in_dir = None, prefix = "", suffix = ".p4a"):
@@ -331,6 +434,7 @@ class p4a_processor():
             output_files.append(output_file)
 
         return output_files
+
 
     def __del__(self):
         # Waiting for pyps.workspace.close!

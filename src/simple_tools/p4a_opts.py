@@ -9,7 +9,8 @@
 Par4All common option parsing
 '''
 
-import string, sys, optparse
+import string, sys, optparse, smtplib
+from email.mime.text import MIMEText
 from p4a_util import *
 from p4a_version import *
 
@@ -56,8 +57,7 @@ def process_common_options(options, args):
     if options.script_version:
         main_script = os.path.abspath(sys.argv[0])
         version = guess_file_revision(main_script)
-        info("Version of " + main_script + ":")
-        print(version)
+        sys.__stdout__.write(version + "\n")
         return False
 
     if options.log and not options.report:
@@ -76,10 +76,10 @@ def report_enabled():
 
 
 def send_report_email(recipient = "par4all@hpc-project.com"):
-    
+    #~ if True:
     try:
         global static_options, static_args
-        
+
         current_log_file = get_current_log_file()
         if not current_log_file or not os.path.exists(current_log_file):
             raise p4a_error("Current log file is invalid")
@@ -107,7 +107,7 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         args = ""
         if static_args:
             for a in static_args:
-                args += a + ": " + static_args[a] + "\n"
+                args += a + "\n"
         else:
             args = "[]"
         env = ""
@@ -117,9 +117,9 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         msg = MIMEText("This is an automated report email for the following command which failed:\n\n" + " ".join(sys.argv)
             + "\n\nTranslated options:\n\n" + repr(static_options)
             + "\n\nTranslated arguments:\n\n" + args
-            + "\n\nIs root? " + is_root
+            + "\nIs root? " + is_root
             + "\n\nEnvironment:\n\n" + env
-            + "\n\nThe full log for this session follow:\n\n" + slurp(current_log_file))
+            + "\nThe full log for this session follow:\n\n" + read_file(current_log_file))
         msg['Subject'] = "[" + get_program_name() + "] Anonymous failure report"
         msg['From'] = "anonymous@par4all.org"
         msg['To'] = recipient
@@ -132,7 +132,20 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         warn("Sending the email failed -- Try sending " + current_log_file + " manually to " + recipient, log = False)
 
     else:
-        done("Report email sent to " + recipient, log = False)
+        done("Report email sent to " + recipient + ", thank you for your feedback", log = False)
+
+
+def send_report_email_if_enabled():
+    if report_enabled():
+        send_report_email()
+    else:
+        error("You may report this error to the Par4All team by running again using --report", log = False)
+
+
+def suggest_more_verbosity():
+    if get_verbosity() < 3:
+        v = "v" * (get_verbosity() + 1)
+        error("To get more verbose output, try passing -" + v, log = False)
 
 
 if __name__ == "__main__":

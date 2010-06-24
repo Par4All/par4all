@@ -13,7 +13,7 @@ import sys, os, string
 from p4a_util import *
 
 
-actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 
@@ -83,7 +83,7 @@ class p4a_git():
             old_work_tree = os.environ["GIT_WORK_TREE"]
         os.environ["GIT_DIR"] = self._git_dir
         os.environ["GIT_WORK_TREE"] = self._dir
-        output = run2([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir, capture = True)[0].strip()
+        output = run([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir)[0].strip()
         os.environ["GIT_DIR"] = old_git_dir
         os.environ["GIT_WORK_TREE"] = old_work_tree
         return output
