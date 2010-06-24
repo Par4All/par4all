@@ -73,7 +73,7 @@ class p4a_git():
         path = path[len(self._dir) + 1:]
         return path
 
-    def cmd(self, git_command, can_fail = True):
+    def cmd(self, git_command, can_fail = True, silent = True):
         '''Runs a git command with correct environment and path settings.'''
         old_git_dir = ""
         if "GIT_DIR" in os.environ:
@@ -83,7 +83,8 @@ class p4a_git():
             old_work_tree = os.environ["GIT_WORK_TREE"]
         os.environ["GIT_DIR"] = self._git_dir
         os.environ["GIT_WORK_TREE"] = self._dir
-        output = run([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir)[0].strip()
+        output = run([ "git" ] + git_command, can_fail = can_fail, 
+            working_dir = self._dir, silent = silent)[0].strip()
         os.environ["GIT_DIR"] = old_git_dir
         os.environ["GIT_WORK_TREE"] = old_work_tree
         return output
@@ -127,7 +128,8 @@ class p4a_git():
 
     def archive(self, output_file, prefix, format = "tar"):
         self.cmd([ "archive", "--format", format, "-o", output_file, 
-            "--prefix", prefix, self.current_revision(test_dirty = False) ])
+            "--prefix", prefix, self.current_revision(test_dirty = False), 
+            silent = False ])
 
     def git_dir(self):
         '''Returns the absolute path for the .git directory.'''

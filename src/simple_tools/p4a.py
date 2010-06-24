@@ -359,7 +359,7 @@ def main(options, args = []):
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
         input.recover_includes = not options.skip_recover_includes
-        
+
         output = None
 
         if options.here:
@@ -380,7 +380,7 @@ def main(options, args = []):
                 stderr_handler = pips_output_filter)
 
             output = load_pickle(output_file)
-            
+
             os.remove(input_file)
             os.remove(output_file)
 

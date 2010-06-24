@@ -11,7 +11,6 @@ Clone the Par4All public Git repository, build it, package it, and optionally pu
 
 import string, sys, os, re, optparse, tempfile
 from p4a_util import *
-from p4a_processor import *
 from p4a_builder import *
 from p4a_git import *
 from p4a_version import *
@@ -91,7 +90,13 @@ def main(options, args = []):
             run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
 
             os.chdir(prev_cwd)
-            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee") + " --here " + " ".join(sys.argv[1:]))
+
+            # Make sure child coffee maker will be using the python modules
+            # which come with the git repos which was just cloned:
+            os.environ["PYTHONPATH"] = os.path.join(work_dir_p4a_version, "src/simple_tools")
+
+            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee") 
+                + " --here " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
 
