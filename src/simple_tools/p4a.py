@@ -345,7 +345,7 @@ def main(options, args = []):
         
         output = None
 
-	if options.here:
+        if options.here:
             output = process(input)
 
         else:
@@ -359,7 +359,7 @@ def main(options, args = []):
             # PIPS outputs everything in stderr in a somewhat weird way...
             # Its output is buffered.
             (out, err, ret) = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
-                stdout_handler = lambda s: debug(s, bare = True)
+                stdout_handler = lambda s: debug(s, bare = True),
                 stderr_handler = lambda s: debug(s, bare = True))
 
             output = load_pickle(output_file)

@@ -337,20 +337,22 @@ class runner(Thread):
 
         self.out = ""
         self.err = ""
+        
+        self.out_line_chunk = ""
+        self.err_line_chunk = ""
 
+        make_non_blocking(self.process.stdout)
+        make_non_blocking(self.process.stderr)
+        self.spin_text = "-=-          " 
+        #spin_text = ".·°·..·°·..·°·."
+        self.spin_pos = len(self.spin_text)
+        self.spin_back = False
+        self.spin_after = .8
+        #~ self.can_spin = not self.silent and os.isatty(2)
+        self.can_spin = os.isatty(2)
+        self.startt = time.time()
+        
         if self.redir:
-            make_non_blocking(self.process.stdout)
-            make_non_blocking(self.process.stderr)
-            self.spin_text = "-=-          " 
-            #spin_text = ".·°·..·°·..·°·."
-            self.spin_pos = len(self.spin_text)
-            self.spin_back = False
-            self.spin_after = .8
-            #~ self.can_spin = not self.silent and os.isatty(2)
-            self.can_spin = os.isatty(2)
-            self.out_line_chunk = ""
-            self.err_line_chunk = ""
-            self.startt = time.time()
             self.start()
 
     def running(self):
@@ -384,6 +386,7 @@ class runner(Thread):
                 self.out_line_chunk = lines.pop()
                 new_out = "\n".join(lines)
                 if new_out:
+                    self.out += new_out
                     if self.stdout_handler:
                         if spin:
                             self.hide_spinner()
@@ -403,6 +406,7 @@ class runner(Thread):
                 self.err_line_chunk = lines.pop()
                 new_err = "\n".join(lines)
                 if new_err:
+                    self.out += new_err
                     if self.stderr_handler:
                         if spin:
                             self.hide_spinner()
