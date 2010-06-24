@@ -578,7 +578,8 @@ static transformer add_index_bound_conditions(transformer pre,
   else { /* Why not use loop_bound_evaluation_to_transformer()? */
     type it = ultimate_type(entity_type(index));
     entity bv = make_local_temporary_value_entity(it);
-    transformer bt = safe_any_expression_to_transformer(bv, bound, pre, TRUE);
+    transformer pre_r = transformer_range(pre);
+    transformer bt = safe_any_expression_to_transformer(bv, bound, pre_r, TRUE);
     transformer br = transformer_range(bt);
     transformer npre = transformer_undefined;
 
@@ -603,6 +604,7 @@ static transformer add_index_bound_conditions(transformer pre,
     transformer_arguments(npre) = NIL;
     transformer_relation(npre) = predicate_undefined;
     free_transformer(npre);
+    free_transformer(pre_r);
   }
 
   return(pre);
