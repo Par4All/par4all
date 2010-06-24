@@ -350,7 +350,7 @@ transformer_add_identity(transformer tf, entity v)
 
   vect_add_elem(&eq, (Variable) v_old, (Value) -1);
   tf = transformer_equality_add(tf, eq);
-  transformer_arguments(tf) = 
+  transformer_arguments(tf) =
     arguments_add_entity(transformer_arguments(tf), v_new);
 
   return tf;
@@ -364,8 +364,21 @@ transformer transformer_add_equality(transformer tf, entity v1, entity v2)
   //pips_assert("v1 has values", entity_has_values_p(v1));
   //pips_assert("v2 has values", entity_has_values_p(v2));
 
-  vect_add_elem(&eq, (Variable) v2, (Value) -1);
+  vect_add_elem(&eq, (Variable) v2, VALUE_MONE);
   tf = transformer_equality_add(tf, eq);
+
+  return tf;
+}
+
+/* Add the equality v1 <= v2 or v1 < v2 */
+transformer transformer_add_inequality(transformer tf, entity v1, entity v2, bool strict_p)
+{
+  Pvecteur eq = vect_new((Variable) v1, VALUE_ONE);
+
+  vect_add_elem(&eq, (Variable) v2, VALUE_MONE);
+  if(strict_p)
+    vect_add_elem(&eq, TCST, VALUE_ONE);
+  tf = transformer_inequality_add(tf, eq);
 
   return tf;
 }

@@ -1488,29 +1488,29 @@ unsigned_const_simple: TK_TRUE
 	| TK_SCON
 	    {
 		    $$ = MakeConstant($1, is_basic_string);
-		    free($1);		    
+		    free($1);
 	    }
-        | TK_RCON 
+        | TK_RCON
 	    {
 		    $$ = MakeConstant($1, is_basic_float);
 		    free($1);
 	    }
 	;
 
-icon: TK_ICON 
+icon: TK_ICON
 	    {
 		    $$ = MakeConstant($1, is_basic_int);
 		    free($1);
 	    }
 	;
 
-label: TK_ICON 
+label: TK_ICON
 	    {
 		    $$ = $1;
 	    }
 	;
 
-ival: TK_ICON 
+ival: TK_ICON
 	    {
 		    $$ = atoi($1);
 		    free($1);
