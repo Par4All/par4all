@@ -26,7 +26,6 @@ int main()
    int i, j;                                                            /*0009*/
    
    // A do loop ! Should be parallel
-   ;
 #pragma omp parallel for 
    for(i = LB; i <= 99; i += INC)
       a[i] = 2;                                                         /*0013*/

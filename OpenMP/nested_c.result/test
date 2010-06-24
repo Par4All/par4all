@@ -8,13 +8,11 @@ int main(void)
    sum = 0;
    float array[size][size];                                             /*0008*/
 
-
 #pragma omp parallel for private(i)
    for(k = 0; k <= size-1; k += 1)
 #pragma omp parallel for 
       for(i = 0; i <= size-1; i += 1)
          array[k][i] = i+k;                                             /*0012*/
-
 
    for(i = 0; i <= size-1; i += 1)
       for(k = 0; k <= size-1; k += 1)
@@ -30,14 +28,12 @@ int main(void)
    float sum;                                                           /*0007*/
    sum = 0;
    float array[size][size];                                             /*0008*/
-
-
 #pragma omp parallel for private(i)
+
    for(k = 0; k <= size-1; k += 1)
 #pragma omp parallel for
       for(i = 0; i <= size-1; i += 1)
          array[k][i] = i+k;                                             /*0012*/
-
 
    for(i = 0; i <= size-1; i += 1)
       for(k = 0; k <= size-1; k += 1)
