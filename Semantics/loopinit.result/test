@@ -95,7 +95,7 @@ C  P(J) {J==2}
 
       DO I = INC(J), N                                                  0009
 
-C  P(I,J) {I<=N}
+C  P(I,J) {J<=I, I<=N}
 
          T(I) = 0.                                                      0010
 
