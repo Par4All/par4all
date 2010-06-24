@@ -183,6 +183,23 @@ def add_module_options(parser):
     parser.add_option_group(cmake_group)
 
 
+error_re = re.compile(r"^\w+ error ")
+warning_re = re.compile(r"^\w+ warning ")
+
+def pips_output_filter(s):
+    global error_re, warning_re
+    if s.find("Cannot preprocess file") != -1:
+        error("PIPS: " + s)
+    elif error_re.search(s):
+        error("PIPS: " + s)
+    elif warning_re.search(s):
+        warn("PIPS: " + s)
+    elif s.find("python3.1: No such file or directory") != -1:
+        error("Python 3.1 is required to run the post-processor, please install it")
+    else:
+        debug("PIPS: " + s)
+
+
 def main(options, args = []):
 
     pyps = None
@@ -359,10 +376,13 @@ def main(options, args = []):
             # PIPS outputs everything in stderr in a somewhat weird way...
             # Its output is buffered.
             (out, err, ret) = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
-                stdout_handler = lambda s: debug(s, bare = True),
-                stderr_handler = lambda s: debug(s, bare = True))
+                stdout_handler = pips_output_filter,
+                stderr_handler = pips_output_filter)
 
             output = load_pickle(output_file)
+            
+            os.remove(input_file)
+            os.remove(output_file)
 
         processor_output_files = output.files
         database_dir = output.database_dir
