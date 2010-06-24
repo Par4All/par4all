@@ -185,15 +185,19 @@ def add_module_options(parser):
 
 error_re = re.compile(r"^\w+ error ")
 warning_re = re.compile(r"^\w+ warning ")
+property_redefined_re = re.compile(r"property \S+ redefined")
+already_printed_warning_errors = []
 
 def pips_output_filter(s):
-    global error_re, warning_re
+    global error_re, warning_re, property_redefined_re, already_printed_warning_errors
     if s.find("Cannot preprocess file") != -1:
         error("PIPS: " + s)
-    elif error_re.search(s):
+    elif error_re.search(s) and s not in already_printed_warning_errors:
         error("PIPS: " + s)
-    elif warning_re.search(s):
+        already_printed_warning_errors.append(s)
+    elif warning_re.search(s) and not property_redefined_re.search(s) and s not in already_printed_warning_errors:
         warn("PIPS: " + s)
+        already_printed_warning_errors.append(s)
     elif s.find("python3.1: No such file or directory") != -1:
         error("Python 3.1 is required to run the post-processor, please install it")
     else:
@@ -386,7 +390,10 @@ def main(options, args = []):
 
         processor_output_files = output.files
         database_dir = output.database_dir
+
         if output.exception:
+            if database_dir:
+                warn("Not removing database directory " + database_dir)
             raise output.exception
 
     if os.path.isdir(database_dir):

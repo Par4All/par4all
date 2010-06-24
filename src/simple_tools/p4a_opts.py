@@ -139,7 +139,7 @@ def send_report_email_if_enabled():
     if report_enabled():
         send_report_email()
     else:
-        advise("You may report this error to the Par4All team by running again using --report")
+        suggest("You may report this error to the Par4All team by running again using --report")
 
 
 def suggest_more_verbosity():
