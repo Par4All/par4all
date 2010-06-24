@@ -139,19 +139,19 @@ def send_report_email_if_enabled():
     if report_enabled():
         send_report_email()
     else:
-        error("You may report this error to the Par4All team by running again using --report", log = False, bare = True)
+        advise("You may report this error to the Par4All team by running again using --report")
 
 
 def suggest_more_verbosity():
     global static_options
     if get_verbosity() < 2:
         v = "v" * (get_verbosity() + 1)
-        error("To get more verbose output, pass -" + v, log = False, bare = True)
+        suggest("To get more verbose output, pass -" + v)
         if not static_options.log:
-            error("Alternatively, you can pass --log to log -vv output to a file", log = False, bare = True)
+            suggest("Alternatively, you can pass --log to log -vv output to a file")
     current_log_file = get_current_log_file()
     if static_options.log and current_log_file and os.path.exists(current_log_file):
-        error("Log file was " + current_log_file, log = False, bare = True)
+        warn("Log file was " + current_log_file)
 
 
 if __name__ == "__main__":

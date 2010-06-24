@@ -674,7 +674,7 @@ def main(options, args = []):
     info("Writing version file " + version_file)
     write_file(version_file, version)
 
-    done("                   ") # Some blanks to erase any spinner tracks ...
+    done("")
     done("All done. Par4All " + version + " is ready and has been installed in " + install_dir)
     done("According to your shell religion, you should source:")
     done("")

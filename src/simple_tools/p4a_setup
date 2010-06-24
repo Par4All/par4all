@@ -43,7 +43,7 @@ def main():
 
 
 def suggest_RC():
-    error("You can try running again with --rebuild --clean (-RC) and see if it picks up", log = False)
+    suggest("You may try running again with --rebuild --clean (-RC)")
 
 
 if __name__ == "__main__":
