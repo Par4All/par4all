@@ -249,7 +249,7 @@ class p4a_processor():
             and (filter_include_re == None or filter_include_re.match(module.name)))
 
 
-    def get_database_directory():
+    def get_database_directory(self):
         return os.path.abspath(self.workspace.directory())
 
 

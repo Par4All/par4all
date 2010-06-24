@@ -23,7 +23,7 @@ def add_common_options(parser):
     group = optparse.OptionGroup(parser, "General Options")
 
     group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-        help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+        help = "Run in verbose mode: -v will display more information, -vv will display most information.")
 
     group.add_option("--log", action = "store_true", default = False,
         help = "Enable logging in current directory.")
@@ -45,10 +45,6 @@ def add_common_options(parser):
 
 def process_common_options(options, args):
 
-    global static_options, static_args
-    static_options = options
-    static_args = args
-
     if options.no_color:
         p4a_term.disabled = True
 
@@ -63,9 +59,13 @@ def process_common_options(options, args):
     if options.log and not options.report:
         setup_logging()
     elif options.report:
-        report = False
+        options.log = True
         setup_logging(suffix = "_report_" + utc_datetime(), remove = True)
         warn("--report enabled, will send an anonymous email with the program output in case of error")
+
+    global static_options, static_args
+    static_options = options
+    static_args = args
 
     return True
 
@@ -139,13 +139,19 @@ def send_report_email_if_enabled():
     if report_enabled():
         send_report_email()
     else:
-        error("You may report this error to the Par4All team by running again using --report", log = False)
+        suggest("You may report this error to the Par4All team by running again using --report")
 
 
 def suggest_more_verbosity():
-    if get_verbosity() < 3:
+    global static_options
+    if get_verbosity() < 2:
         v = "v" * (get_verbosity() + 1)
-        error("To get more verbose output, try passing -" + v, log = False)
+        suggest("To get more verbose output, pass -" + v)
+        if not static_options.log:
+            suggest("Alternatively, you can pass --log to log -vv output to a file")
+    current_log_file = get_current_log_file()
+    if static_options.log and current_log_file and os.path.exists(current_log_file):
+        warn("Log file was " + current_log_file)
 
 
 if __name__ == "__main__":
