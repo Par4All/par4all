@@ -128,8 +128,8 @@ class p4a_git():
 
     def archive(self, output_file, prefix, format = "tar"):
         self.cmd([ "archive", "--format", format, "-o", output_file, 
-            "--prefix", prefix, self.current_revision(test_dirty = False), 
-            silent = False ])
+            "--prefix", prefix, self.current_revision(test_dirty = False) ], 
+            silent = False)
 
     def git_dir(self):
         '''Returns the absolute path for the .git directory.'''
