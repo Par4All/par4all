@@ -548,6 +548,7 @@ static transformer add_affine_bound_conditions(transformer pre,
   return pre;
 }
 
+/* Side effect on pre */
 static transformer add_index_bound_conditions(transformer pre,
 					      entity index,
 					      expression bound,
@@ -555,23 +556,55 @@ static transformer add_index_bound_conditions(transformer pre,
 					      transformer tfb)
 {
   normalized n = NORMALIZE_EXPRESSION(bound);
-  /* tfb does not take into account the index incrementation */
-  transformer t_iter = transformer_dup(tfb);
 
   /* It is assumed on entry that index has values recognized
    * by the semantics analysis
    */
   /* pips_assert("add_index_bound_conditions", entity_has_values_p(index)); */
 
-  transformer_arguments(t_iter) =
-    arguments_add_entity(transformer_arguments(t_iter), index);
-
   if(normalized_linear_p(n)) {
+    /* Old implementation, careful about the impact of the loop body
+       but not about side effets in bound */
     Pvecteur v_bound = (Pvecteur) normalized_linear(n);
+    /* tfb does not take into account the index incrementation */
+    transformer t_iter = transformer_dup(tfb);
+
+    transformer_arguments(t_iter) =
+      arguments_add_entity(transformer_arguments(t_iter), index);
+
     add_affine_bound_conditions(pre, index, v_bound, lower_or_upper, t_iter);
+    free_transformer(t_iter);
+  }
+  else { /* Why not use loop_bound_evaluation_to_transformer()? */
+    type it = ultimate_type(entity_type(index));
+    entity bv = make_local_temporary_value_entity(it);
+    transformer bt = safe_any_expression_to_transformer(bv, bound, pre, TRUE);
+    transformer br = transformer_range(bt);
+    transformer npre = transformer_undefined;
+
+    /* An inequation between index and bv should be added */
+    if(lower_or_upper)
+      br = transformer_add_inequality(br, index, bv, FALSE);
+    else
+      br = transformer_add_inequality(br, bv, index, FALSE);
+
+    br = transformer_temporary_value_projection(br);
+    reset_temporary_value_counter();
+    npre = transformer_safe_intersection(pre, br);
+    /* FI: we need a side effect on pre... */
+    //gen_free_list(transformer_arguments(pre));
+    free_predicate(transformer_relation(pre));
+    /* Likely memory leak here: arguments_union may allocate a new list*/
+    transformer_arguments(pre) = arguments_union(transformer_arguments(pre),
+						 transformer_arguments(npre));
+    transformer_relation(pre) = transformer_relation(npre);
+    free_transformer(bt);
+    free_transformer(br);
+    transformer_arguments(npre) = NIL;
+    transformer_relation(npre) = predicate_undefined;
+    free_transformer(npre);
   }
 
-  free_transformer(t_iter);
   return(pre);
 }
 
@@ -664,9 +697,19 @@ static transformer add_good_loop_conditions(transformer pre,
 
   pips_debug(8, "begin\n");
 
-  pre = add_index_range_conditions(pre, i, r, tfb);
+  if(FALSE) { /* New version to deal with complex do loop bounds? */
+    transformer lbt = loop_bound_evaluation_to_transformer(l, pre);
+    transformer opre = pre;
+    pre = transformer_apply(pre, lbt);
+    free_transformer(opre);
+  }
+  else {
+    /* Old version */
+    pre = add_index_range_conditions(pre, i, r, tfb);
+  }
 
   pips_debug(8, "end\n");
+
   return(pre);
 }
 
@@ -1048,8 +1091,8 @@ transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
   transformer r = transformer_undefined;
   entity i = loop_index(l);
 
-  pips_assert("No temporary variables are allocated",
-	      number_of_temporary_values()==0);
+  //pips_assert("No temporary variables are allocated",
+  //      number_of_temporary_values()==0);
 
   if(entity_has_values_p(i)) {
     expression lbe = range_lower(loop_range(l));
