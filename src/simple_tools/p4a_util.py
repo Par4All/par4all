@@ -137,7 +137,7 @@ debug_suffix = ""
         #~ master_spin.stop()
         #~ master_spin = None
 
-def debug(msg, spin = False, log = True, bare = False):
+def debug(msg, log = True, bare = False):
     global debug_prefix, debug_suffix, msg_prefix, master_spin
     if verbosity >= 2:
         #~ stop_master_spinner()
@@ -155,7 +155,7 @@ def debug(msg, spin = False, log = True, bare = False):
 info_prefix = p4a_term.escape("white", if_tty_fd = 2)
 info_suffix = p4a_term.escape(if_tty_fd = 2)
 
-def info(msg, spin = False, log = True, bare = False):
+def info(msg, log = True, bare = False):
     global info_prefix, info_suffix, msg_prefix, master_spin
     if verbosity >= 1:
         if bare:
@@ -168,7 +168,7 @@ def info(msg, spin = False, log = True, bare = False):
 cmd_prefix = p4a_term.escape("magenta", if_tty_fd = 2)
 cmd_suffix = p4a_term.escape(if_tty_fd = 2)
 
-def cmd(msg, spin = False, dir = None, log = True, bare = False):
+def cmd(msg, dir = None, log = True, bare = False):
     global cmd_prefix, cmd_suffix, msg_prefix, master_spin
     if verbosity >= 1:
         if verbosity >= 2 and dir:
@@ -187,7 +187,7 @@ def cmd(msg, spin = False, dir = None, log = True, bare = False):
 done_prefix = p4a_term.escape("green", if_tty_fd = 2)
 done_suffix = p4a_term.escape(if_tty_fd = 2)
 
-def done(msg, spin = False, log = True, bare = False):
+def done(msg, log = True, bare = False):
     global done_prefix, done_suffix, msg_prefix, master_spin
     if verbosity >= 0:
         if bare:
@@ -200,7 +200,7 @@ def done(msg, spin = False, log = True, bare = False):
 warn_prefix = p4a_term.escape("yellow", if_tty_fd = 2)
 warn_suffix = p4a_term.escape(if_tty_fd = 2)
 
-def warn(msg, spin = False, log = True, bare = False):
+def warn(msg, log = True, bare = False):
     global warn_prefix, warn_suffix, msg_prefix, master_spin
     if verbosity >= 0:
         if bare:
@@ -213,7 +213,7 @@ def warn(msg, spin = False, log = True, bare = False):
 error_prefix = p4a_term.escape("red", if_tty_fd = 2)
 error_suffix = p4a_term.escape(if_tty_fd = 2)
 
-def error(msg, spin = False, log = True, bare = False):
+def error(msg, log = True, bare = False):
     global error_prefix, error_suffix, msg_prefix, master_spin
     if bare:
         sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -316,8 +316,10 @@ class runner(Thread):
 
         self.silent = silent
 
-        if not self.silent:
-            cmd(self.cmd, dir = self.working_dir, spin = True)
+        if self.silent:
+            debug("Running " + self.cmd, dir = self.working_dir)
+        else:
+            cmd(self.cmd, dir = self.working_dir)
 
         try:
             self.process = subprocess.Popen(subp_cmd, shell = shell, 
@@ -325,8 +327,7 @@ class runner(Thread):
                 cwd = self.working_dir, env = self.env)
         except:
             if not can_fail:
-                if not self.silent:
-                    debug("Environment was: " + repr(env))
+                debug("Environment was: " + repr(env))
                 raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
                     + str(sys.exc_info()[1]))
 
@@ -440,8 +441,8 @@ class runner(Thread):
         if ret != 0 and not self.can_fail:
             #~ if self.err:
                 #~ sys.stderr.write(self.err)
-            if not self.silent:
-                debug("Environment was: " + repr(self.env))
+            #~ if not self.silent:
+            debug("Environment was: " + repr(self.env))
             raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
                 + " failed with exit code " + str(ret), code = ret)
         #~ stop_master_spinner()
@@ -452,7 +453,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         stdout_handler = None, stderr_handler = None):
     if not silent and stdout_handler is None and stderr_handler is None:
         stdout_handler = lambda s: debug(s, spin = True, bare = True)
-        stderr_handler = lambda s: error(s, spin = True, bare = True)
+        stderr_handler = lambda s: info(s, spin = True, bare = True)
     r = runner(cmd_list, can_fail = can_fail, 
         force_locale = force_locale, working_dir = working_dir, extra_env = extra_env, 
         stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)

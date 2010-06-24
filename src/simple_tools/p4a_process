@@ -29,7 +29,7 @@ def main():
 
     # Display everything. The parent process will filter out the output.
     # PIPS shall be verbose too.
-    set_verbosity(3)
+    set_verbosity(2)
 
     #~ if process_common_options(options, args):
     p4a_process.main(options, args)
