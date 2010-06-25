@@ -48,12 +48,9 @@
 #include "effects-simple.h"
 #include "properties.h"
 
-#include "expressions.h"
 #include "callgraph.h"
 
 #include "sac.h"
-#include "ricedg.h"
-#include "atomizer.h"
 
 
 /** 

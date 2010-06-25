@@ -26,7 +26,7 @@
 #endif
 
 #include <stdio.h>
-
+ 
 #include "linear.h"
 
 #include "genC.h"
@@ -39,8 +39,6 @@
 #include "ri-util.h"
 #include "effects-util.h"
 
-#include "alias-classes.h"
-#include "effects-generic.h"
 
 /**
  * @brief Check if two effects always conflict.
@@ -463,11 +461,6 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
  */
 bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
   bool conflict_p = !must_p; // safe default value
-  extern bool entity_abstract_location_p( entity );
-  extern bool abstract_locations_may_conflict_p( entity, entity );
-  extern bool abstract_locations_must_conflict_p( entity, entity );
-  extern entity variable_to_abstract_location( entity );
-
   bool (*abstract_locations_conflict_p)(entity,entity);
   if( must_p ) {
     abstract_locations_conflict_p = abstract_locations_must_conflict_p;

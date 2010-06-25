@@ -29,7 +29,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "control.h"
-#include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
 

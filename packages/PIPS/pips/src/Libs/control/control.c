@@ -273,10 +273,10 @@ static void update_used_labels(hash_table used_labels,
     if (hash_defined_p(used_labels, name))
       /* If there was already something associated to the label, register
 	 the new list: */
-      hash_update(used_labels, name, (char*) new_sts);
+      hash_update(used_labels, name,  new_sts);
     else
       /* Or create a new entry: */
-      hash_put(used_labels, name, (char*) new_sts);
+      hash_put(used_labels, name,  new_sts);
     debug(5, "update_used_labels", "Reference to statement %d seen\n",
 	  statement_number( st )) ;
   }
@@ -1204,7 +1204,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 					  "_",
 					  entity_to_module_entity(e));
       new_variables = gen_entity_cons(v , new_variables);
-      hash_put(old_to_new_variables, e, v);
+      hash_put_or_update(old_to_new_variables, e, v);
     }
     else
       v = e;
@@ -1919,15 +1919,15 @@ statement st;
 	/* Just append st to the list of statements pointing to
 	   this label. */
 	if (hash_defined_p(Label_statements, name))
-	    hash_update(Label_statements, name, (char *) sts);
+	    hash_update(Label_statements, name,  sts);
 	else
-	    hash_put(Label_statements, name, (char *) sts);
+	    hash_put(Label_statements, name,  sts);
 
 	if (! hash_defined_p(Label_control, name)) {
 	    statement new_st = make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
 	    pips_debug(8, "control %p allocated for label \"%s\"", c, name);
-	    hash_put(Label_control, name, (char *)c);
+	    hash_put(Label_control, name, c);
 	}
     }
 }

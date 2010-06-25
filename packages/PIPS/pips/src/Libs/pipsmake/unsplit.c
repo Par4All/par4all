@@ -53,9 +53,6 @@ static string
 get_new_user_file(string dir_name, string preprocessed_user_file)
 {
   /* C or Fortran preprocessing may have or have not occured */
-  extern string preprocessed_to_user_file(string);
-  extern bool dot_f_file_p(string);
-  extern bool dot_c_file_p(string);
   string user_file = preprocessed_to_user_file(preprocessed_user_file);
   string s = hash_get(user_files, user_file);
 

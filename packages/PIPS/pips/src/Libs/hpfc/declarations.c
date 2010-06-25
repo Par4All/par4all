@@ -32,8 +32,6 @@
  
 #include "defines-local.h"
 
-#include "control.h"
-#include "semantics.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -373,7 +371,7 @@ int *templdimp, *procsdimp;
 	    {
 	    case is_style_block:
 		distribution_parameter(d)=
-		    int_expr(iceil(szoftempldim, szofprocsdim));
+		    int_to_expression(iceil(szoftempldim, szofprocsdim));
 		break;
 	    default:
 		pips_internal_error("undefined style tag\n");

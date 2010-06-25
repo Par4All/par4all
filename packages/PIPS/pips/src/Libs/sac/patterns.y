@@ -37,14 +37,8 @@
 
 #include "misc.h"
 #include "ri-util.h"
-#include "pipsdbm.h"
 
 #include "sac.h"
-
-int yywrap(void);
-void yyerror(char*);
-int yylex();
-int yyparse();
 
 static size_t opcode_argc =0;
 size_t sac_lineno = 0;

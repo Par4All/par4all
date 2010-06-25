@@ -39,7 +39,6 @@
 #include "ri-util.h"
 
 #include "misc.h"
-#include "properties.h"
 
 static bool module_coherent_p=TRUE;
 static entity checked_module = entity_undefined;

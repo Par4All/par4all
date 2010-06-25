@@ -183,7 +183,7 @@ list args ;
 	    if( syntax_range_p( ls )) {
 		range rl = syntax_range( ls ) ;
 
-		new_e = update_range(f, rl, rhs, rhs, make_expression_1(), TRUE) ;
+		new_e = update_range(f, rl, rhs, rhs, int_to_expression(1), TRUE) ;
 	    }
 	    else {
 		new_e = MakeBinaryCall( f, lhs, rhs ) ;
@@ -194,7 +194,7 @@ list args ;
 	    if( syntax_range_p( rs )) {
 		range rr = syntax_range( rs ) ;
 
-		new_e = update_range(f, rr, lhs, lhs, make_expression_1(), FALSE) ;
+		new_e = update_range(f, rr, lhs, lhs, int_to_expression(1), FALSE) ;
 	    }
 	    else {
 		new_e = MakeBinaryCall( f, lhs, rhs ) ;

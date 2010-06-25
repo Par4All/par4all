@@ -241,8 +241,8 @@ statement step_build_arrayRegion(entity mpi_module, list regions, entity (*array
       /*
 	Generation de la boucle parcourant les differents work_chunk
       */
-      range rng = make_range(make_expression_1(), step_local_size(mpi_module), make_expression_1());
-      instruction loop_instr = make_instruction_loop(make_loop(slice_index, rng, body_region, MakeLabel(""), make_execution_sequential(), NIL));
+      range rng = make_range(int_to_expression(1), step_local_size(mpi_module), int_to_expression(1));
+      instruction loop_instr = make_instruction_loop(make_loop(slice_index, rng, body_region, entity_empty_label(), make_execution_sequential(), NIL));
 
       insert_comments_to_statement(assigne_dim,
 				   concatenate("\nC     Put array boundaries into region arrays (SR: Send region)",

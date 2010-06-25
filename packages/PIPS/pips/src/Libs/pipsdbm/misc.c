@@ -35,7 +35,6 @@
 #include <sys/time.h>
 
 #include "genC.h"
-#include "misc.h"
 
 #include "database.h"
 #include "linear.h"
@@ -63,8 +62,6 @@ bool interrupt_pipsmake_asap_p()
     flag_interrupt_pipsmake_asap = FALSE;
     return res;
 }
-
-extern int gettimeofday();
 
 /* Timing of one request */
 static struct tms request_time;

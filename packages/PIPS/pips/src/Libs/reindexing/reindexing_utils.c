@@ -91,19 +91,6 @@
 typedef dfg_vertex_label vertex_label;
 typedef dfg_arc_label arc_label;
 
-/* Extern prototypes */
-
-extern void sa_print_ins();
-extern int count_dataflows_on_ref();
-extern boolean full_predicate_p();
-extern void fprint_plc();
-extern boolean vecteurs_libres_p();
-extern Psysteme completer_base();
-extern Psysteme append_eg();
-extern void analyze_expression();
-extern Psysteme predicate_to_system();
-extern Psysteme include_trans_in_sc();
-
 #define SUCC(cp) (((cp) == NULL) ? NULL : (cp)->succ)
 
 

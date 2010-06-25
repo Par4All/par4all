@@ -42,16 +42,11 @@
 #include "misc.h"
 #include "conversion.h"
 #include "control.h"
-#include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "preprocessor.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
-#include "semantics.h"
-#include "transformer.h"
 #include "accel-util.h"
 /* generate a pcontrainte corresponding to dimensions, with a preset list of phis
  * ex: int a[10][n]; and (phi0,phi1)

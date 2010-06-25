@@ -44,19 +44,14 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "misc.h"
-#include "control.h"
 #include "properties.h"
 #include "semantics.h"
-#include "transformer.h"
-#include "pipsmake.h"
 #include "abc_private.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
 #include "effects-simple.h"
-#include "conversion.h"
 #include "text-util.h" /* for words_to_string*/
 #include "alias_private.h"
-#include "instrumentation.h"
 #include "transformations.h"
 
 static int number_of_right_array_declarations = 0;

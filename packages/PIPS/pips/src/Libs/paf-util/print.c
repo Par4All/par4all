@@ -74,8 +74,6 @@ typedef dfg_vertex_label vertex_label;
 #include "misc.h"
 #include "paf-util.h"
 
-extern int adg_number_to_ordering(int /*in_nb*/);
-
 /* Macro functions	*/
 #define IS_INEG 0
 #define IS_EG 1
@@ -515,8 +513,6 @@ void imprime_quast (fp, qu)
 FILE *fp;
 quast qu;
 {
-  extern int quast_depth;
-
   Psysteme        paux  = SC_UNDEFINED;
   predicate       pred_aux = predicate_undefined;
   conditional     cond_aux;

@@ -62,7 +62,6 @@ typedef void * vertex_label;
 
 #include "resources.h"
 
-#include "alias-classes.h"
 
 /* Some forward declarations */
 static void reset_effects();

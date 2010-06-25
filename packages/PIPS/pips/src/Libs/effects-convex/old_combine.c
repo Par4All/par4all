@@ -57,7 +57,6 @@
 #include "pipsdbm.h"
 #include "misc.h"
 #include "text.h"
-#include "transformer.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"

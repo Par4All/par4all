@@ -39,12 +39,6 @@
 #include "misc.h"
 #include "properties.h"
 
-/* ??? stupid cyclic text-util <-> ri-util dependency */
-extern void deal_with_attachments_at_this_character();
-extern void deal_with_attachments_in_this_string();
-extern void deal_with_attachments_in_this_string_length();
-extern char * strcat_word_and_migrate_attachments();
-
 /* FI: just to make sure that text.h is built; pips-makemake -l does not
    take into account a library whose modules do not use the library header */
 #include "text-util.h"

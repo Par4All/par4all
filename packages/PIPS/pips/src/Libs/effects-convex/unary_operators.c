@@ -45,7 +45,6 @@
 #include "effects-util.h"
 #include "misc.h"
 
-#include "properties.h"
 #include "preprocessor.h"
 
 #include "effects-generic.h"

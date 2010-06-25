@@ -39,7 +39,6 @@
 #include "text.h"
 #include "text-util.h"
 #include "misc.h"
-#include "properties.h"
 
 
 char *

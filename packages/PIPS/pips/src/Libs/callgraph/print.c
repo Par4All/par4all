@@ -50,7 +50,6 @@
 #include "effects-util.h"
 
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 #include "callgraph.h"
 

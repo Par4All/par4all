@@ -42,19 +42,15 @@
 #include "constants.h"
 #include "misc.h"
 #include "parser_private.h"
-#include "syntax.h"
 #include "top-level.h"
 #include "text-util.h"
 #include "text.h"
-#include "properties.h"
-#include "pipsmake.h"
 #include "transformer.h"
 #include "semantics.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "prettyprint.h"
 #include "transformations.h"
 
 /* We use a set to accumulate loop indices during loop traversal */
@@ -297,15 +293,15 @@ static bool subtitute_induction_statement_in( statement s ) {
                             if ( coeff == -1 ) {
                                 /* Coeff is -1, we want "-v" instead of "-1 * v" */
                                 local_expr = MakeUnaryCall( entity_intrinsic( UNARY_MINUS_OPERATOR_NAME ), //
-                                make_expression_from_entity( v ) );
+                                entity_to_expression( v ) );
                             } else if ( coeff == 1 ) {
                                 /* Coeff is 1, we want "v" instead of "1 * v" */
-                                local_expr = make_expression_from_entity( v );
+                                local_expr = entity_to_expression( v );
                             } else {
                                 /* General case : produce "coeff*v" */
                                 local_expr = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
                                 int_to_expression( coeff ), //
-                                make_expression_from_entity( v ) );
+                                entity_to_expression( v ) );
                             }
                         } else if ( !entity_undefined_p( induction_variable_candidate ) ) {
                             /* We have a variable that is not a loop index,
@@ -452,7 +448,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                         /* Construct the unsugarized instruction */
                         statement_instruction( s ) = make_call_instruction( entity_intrinsic( ASSIGN_OPERATOR_NAME ), //
                         CONS( EXPRESSION, //
-                                make_expression_from_entity( induction_variable_candidate ), //
+                                entity_to_expression( induction_variable_candidate ), //
                                 CONS(EXPRESSION, unsugarized, NIL ) ) );
 
                         ifdebug( 1 ) {

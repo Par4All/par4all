@@ -123,8 +123,7 @@ empty_range_wrt_precondition_p(range r, transformer p)
   return empty;
 }
 
-bool
-non_empty_range_wrt_precondition_p(range r, transformer p)
+bool non_empty_range_wrt_precondition_p(range r, transformer p)
 {
   bool non_empty = FALSE;
 
@@ -133,8 +132,12 @@ non_empty_range_wrt_precondition_p(range r, transformer p)
   return non_empty;
 }
 
-bool
-check_range_wrt_precondition(range r, transformer p, bool check_empty)
+/* FI: this function is outdated because it does not compute the
+   transformers for the range expressions, because it does not take
+   side effects into account and ... We might need a
+   range_to_transformer() or loop_range_to_transformer() instead and
+   check that its range is empty. */
+bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 {
   bool check = TRUE;
   expression lb_e = range_lower(r);
@@ -146,9 +149,7 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
   int incr_lb = 0;
   int incr_ub = 0;
 
-  debug(8, "check_range_wrt_precondition",
-	"begins for check %s\n",
-	check_empty? "empty" : "non-empty");
+  pips_debug(8, "begins for check %s\n", check_empty? "empty" : "non-empty");
 
   if(normalized_undefined_p(lb_n)
      || normalized_undefined_p(lb_n)
@@ -175,7 +176,7 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
       Pvecteur lb_v = vect_dup((Pvecteur) normalized_linear(lb_n));
       Pvecteur ub_v = vect_dup((Pvecteur) normalized_linear(ub_n));
       Pcontrainte ci = CONTRAINTE_UNDEFINED;
-	
+
       if(check_empty) {
 	/* Try to prove that no iterations are performed */
 	if(incr_lb>=1) {

@@ -29,7 +29,6 @@
 
 #include "defines-local.h"
 
-#include "control.h"
 #include "semantics.h"
 #include "conversion.h"
 #include "effects-generic.h"
@@ -714,23 +713,6 @@ hpfc_algorithm_tiling(
     base_rm(inner);
 }
 
-Pbase entity_list_to_base(l)
-list l;
-{
-    list l2 = gen_nreverse(gen_copy_seq(l));
-    Pbase result = BASE_NULLE;
-	
-    MAP(ENTITY, e,
-    {
-	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
-	new->succ = result;
-	result = new;
-    },
-	l2);
-
-    gen_free_list(l2);
-    return(result);
-}
 
 /* void hpfc_simplify_condition(psc, stat, move)
  *

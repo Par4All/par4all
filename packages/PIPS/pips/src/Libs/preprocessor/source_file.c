@@ -45,14 +45,12 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
-#include "effects.h"
 #include "database.h"
 
 #include "misc.h"
 #include "properties.h"
 
 #include "ri-util.h"
-#include "effects-util.h"
 #include "pipsdbm.h"
 
 #include "constants.h"

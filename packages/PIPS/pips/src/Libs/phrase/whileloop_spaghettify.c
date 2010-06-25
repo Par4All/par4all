@@ -59,14 +59,11 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "text-util.h"
 
 #include "dg.h"
-#include "properties.h"
 
-#include "control.h"
 
 #include "phrase_tools.h"
 #include "spaghettify.h"

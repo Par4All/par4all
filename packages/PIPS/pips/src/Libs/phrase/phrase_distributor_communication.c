@@ -45,11 +45,8 @@
 #include "pipsdbm.h"
 
 #include "text-util.h"
-#include "properties.h"
-#include "prettyprint.h"
 
 #include "dg.h"
-#include "transformer.h"
 
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
@@ -60,8 +57,6 @@ typedef dg_vertex_label vertex_label;
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "semantics.h"
-#include "control.h"
 
 #include "phrase_tools.h"
 
@@ -161,7 +156,7 @@ entity make_start_ru_module (hash_table ht_params,
 			  indices);
 	  to_be_replaced=dimension_lower(dim);
 	}, primary_indices);
-	gen_list_patch (indices,to_be_replaced,make_expression_from_entity(unit_id));
+	gen_list_patch (indices,to_be_replaced,entity_to_expression(unit_id));
 	indices = gen_nreverse(indices);
       } 
       new_param = make_entity_expression (local_variable, indices);
@@ -182,8 +177,8 @@ entity make_start_ru_module (hash_table ht_params,
 
     test_condition
       = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
-			make_expression_from_entity (func_id),
-			make_expression_from_entity (entity_in_module (get_function_id_name(function), start_ru_module)));
+			entity_to_expression (func_id),
+			entity_to_expression (entity_in_module (get_function_id_name(function), start_ru_module)));
    
     new_test = make_test (test_condition, call_statement,
 			  make_continue_statement(entity_undefined));
@@ -301,31 +296,31 @@ static statement make_communication_statement (entity function,
 
   if (region_scalar_p(reg)) {
     if (number_of_deployment_units > 1) {
-      list inds = CONS(EXPRESSION, make_expression_from_entity(unit_id),NIL);
+      list inds = CONS(EXPRESSION, entity_to_expression(unit_id),NIL);
       if (is_receiving) {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(param),
+					   entity_to_expression(param),
 					   make_entity_expression(local_entity, inds),
 					   NULL);
       }
       else {
  	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
 					   make_entity_expression(local_entity, inds),
-					   make_expression_from_entity(param),
+					   entity_to_expression(param),
 					   NULL);
       }
     }
     else {
       if (is_receiving) {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(param),
-					   make_expression_from_entity(local_entity),
+					   entity_to_expression(param),
+					   entity_to_expression(local_entity),
 					   NULL);
       }
       else {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(local_entity),
-					   make_expression_from_entity(param),
+					   entity_to_expression(local_entity),
+					   entity_to_expression(param),
 					   NULL);
       }
     }
@@ -425,8 +420,8 @@ static entity make_scalar_communication_module (variable var,
      
       test_condition2
       = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
-			make_expression_from_entity (param_id),
-			make_expression_from_entity (param_id_value));
+			entity_to_expression (param_id),
+			entity_to_expression (param_id_value));
 
       new_test2 = make_test (test_condition2, communication_stat,
 			     make_continue_statement(entity_undefined));
@@ -464,8 +459,8 @@ static entity make_scalar_communication_module (variable var,
  
   test_condition
     = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
-		      make_expression_from_entity (func_id),
-		      make_expression_from_entity (entity_in_module (get_function_id_name(function), new_module)));
+		      entity_to_expression (func_id),
+		      entity_to_expression (entity_in_module (get_function_id_name(function), new_module)));
  
     new_test = make_test (test_condition, function_statement,
 			  make_continue_statement(entity_undefined));
@@ -716,7 +711,7 @@ static statement make_array_communication_statement(entity function,
   ref = effect_any_reference(reg);
   param_inds = gen_copy_seq(reference_indices(ref));
   if (number_of_deployment_units > 1) {
-    local_entity_inds = gen_nconc(gen_copy_seq(reference_indices(ref)),CONS(EXPRESSION, make_expression_from_entity(unit_id),NIL));
+    local_entity_inds = gen_nconc(gen_copy_seq(reference_indices(ref)),CONS(EXPRESSION, entity_to_expression(unit_id),NIL));
   }
   else {
     local_entity_inds = gen_copy_seq(reference_indices(ref));

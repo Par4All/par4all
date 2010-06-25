@@ -57,7 +57,6 @@
 
 #include "transformer.h"
 #include "effects-generic.h"
-#include "effects-simple.h"
 
 #include "semantics.h"
 #include "preprocessor.h"

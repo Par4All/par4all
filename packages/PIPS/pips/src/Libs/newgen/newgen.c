@@ -35,6 +35,7 @@ typedef void * void_star;
 typedef void * arc_label;
 typedef void * vertex_label;
 typedef void * db_void;
+typedef void * operator_id_sons;
 
 #include "linear.h"
 #include "matrice.h"
@@ -108,6 +109,14 @@ void initialize_newgen()
 		      (void (*)()) gen_null,
 		      (void* (*)()) gen_identity,
 		      (int (*)()) gen_false);
+
+    /* added because newgen lacks support for hash maps with integer keys */
+    gen_init_external(OPERATOR_ID_SONS_NEWGEN_EXTERNAL,
+		      (void* (*)()) gen_false, /* read */
+		      (void (*)()) gen_null, /* write */
+		      (void (*)()) gen_null, /* free */
+		      (void* (*)()) gen_false, /* copy */
+		      (int (*)()) gen_true); /* size */
 
     /* do nothing! */
     gen_init_external(DB_VOID_NEWGEN_EXTERNAL,

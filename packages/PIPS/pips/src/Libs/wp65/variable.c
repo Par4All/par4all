@@ -210,11 +210,6 @@ int ls;
 
     dimension esvd1 = dimension_undefined;
     dimension esvd2 = dimension_undefined;
-    /* the name of a constant entity is its ASCII representation:
-       10 digits, 1 sign, 1 null terminating character */
-    static char esvd_string[12];
-    static char string_0[12];
-
     debug(8,"make_emulated_shared_variable", "begin\n");
 
     pips_assert("make_emulated_shared_variable", esv == entity_undefined );
@@ -246,14 +241,10 @@ int ls;
       * 12/11/91
       */
     if(number_of_elements > 1) {
-	(void) sprintf(esvd_string,"%d", ls-1);
-	(void) strcpy(string_0,"0");
-	esvd1 = make_dimension(MakeIntegerConstantExpression(string_0),
-			       MakeIntegerConstantExpression(esvd_string));
-	(void) sprintf(esvd_string,"%d", (number_of_elements+ls*bn-1)/(ls*bn));
-	(void) strcpy(string_0,"0");
-	esvd2 = make_dimension(MakeIntegerConstantExpression(string_0),
-			       MakeIntegerConstantExpression(esvd_string));
+	esvd1 = make_dimension(int_to_expression(0),
+			       int_to_expression(ls-1));
+	esvd2 = make_dimension(int_to_expression(0),
+			       int_to_expression((number_of_elements+ls*bn-1)/(ls*bn)));
 
 	entity_type(esv) = MakeTypeVariable(copy_basic(bv), 
 					    CONS(DIMENSION, esvd1,

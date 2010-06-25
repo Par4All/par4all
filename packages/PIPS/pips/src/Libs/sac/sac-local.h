@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
+typedef hash_table operator_id_sons ;
 #include "sac_private.h"
 #include "dg.h"
 
@@ -38,8 +38,6 @@ typedef dg_vertex_label vertex_label;
         (!ENTITY_POINT_TO_P(call_function(call))) && \
         (!ENTITY_FIELD_P(call_function(call)))\
         )
-
-extern entity hpfc_new_variable(entity, basic);
 
 /* if conversion */
 #define IF_TO_CONVERT "PIPS IF_TO_CONVERT"
@@ -76,4 +74,10 @@ extern entity hpfc_new_variable(entity, basic);
 /* simd_loop_unroll.c */
 
 #define SIMD_COMMENT "SIMD_COMMENT_"
+
+/* symbols exported by the parser */
+extern FILE *patterns_yyin;
+extern int patterns_yyparse();
+extern int patterns_yylex();
+extern void patterns_yyerror(char*);
 

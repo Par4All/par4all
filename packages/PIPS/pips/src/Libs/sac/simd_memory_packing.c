@@ -37,12 +37,8 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
 
 #include "sac.h"
-
-#include "transformations.h"
-#include "control.h"
 
 #include "effects-convex.h"
 #include "preprocessor.h"

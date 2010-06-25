@@ -10,7 +10,8 @@ libeffects_simple_la_SOURCES=\
 	interprocedural.c \
 	prettyprint.c \
 	unary_operators.c \
-	filter_proper_effects.c
+	filter_proper_effects.c \
+        eval.c
 
 
 include $(srcdir)/../pipslibs_includes.mk

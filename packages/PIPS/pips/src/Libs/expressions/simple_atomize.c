@@ -37,7 +37,6 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
-#include "control.h" /* for CONTROL_MAP() */
 #include "properties.h"
 
 /* void atomize_as_required(stat, ref_decide, call_decide, test_decide, range_decide, while_decide, new)
@@ -207,7 +206,8 @@ statement atomize_this_expression(entity (*create)(entity, basic),
                     pips_debug(1,"atomizing expression:\n");
                     print_expression(e);
                 }
-                entity newvar = (*create)(get_current_module_entity(), bofe);
+                entity newvar = (*create)(get_current_module_entity(), copy_basic(bofe));
+                AddEntityToCurrentModule(newvar);
                 expression rhs = make_expression(expression_syntax(e), normalized_undefined);
                 normalize_all_expressions_of(rhs);
 

@@ -44,7 +44,6 @@
 #include "database.h"
 
 #include "misc.h"
-#include "properties.h"
 
 #include "ri-util.h"
 #include "pipsdbm.h"

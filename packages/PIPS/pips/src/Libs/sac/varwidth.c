@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+#include "stdlib.h"
 
 #include "genC.h"
 #include "linear.h"
@@ -32,10 +33,8 @@
 
 #include "resources.h"
 
-#include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "sac.h"
 

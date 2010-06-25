@@ -48,9 +48,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "constants.h"
-#include "control.h"
 #include "effects-generic.h"
-#include "alias-classes.h"
 #include "effects-simple.h"
 
 #include "misc.h"
@@ -67,9 +65,6 @@
 #include "transformer.h"
 
 #include "semantics.h"
-#include "preprocessor.h"
-
-extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 
 transformer effects_to_transformer(list e) /* list of effects */
 {

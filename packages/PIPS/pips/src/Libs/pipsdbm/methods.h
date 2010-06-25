@@ -258,7 +258,7 @@
 { DBR_ENTITIES,			ENTITY_METHODS },
 { DBR_KERNELS,          NEWGEN_METHODS },
 { DBR_SIMD_TREEMATCH,   NEWGEN_METHODS },
-{ DBR_SIMD_OPERATOR_MAPPINGS, no_read, no_write,(FREER)free_operator_id_tree,(CHECKER)gen_true},
+{ DBR_SIMD_OPERATOR_MAPPINGS, NEWGEN_METHODS },
 
 #define UNEXPECTED_METHODS \
 	(READER) unexpected, (WRITER) unexpected, \

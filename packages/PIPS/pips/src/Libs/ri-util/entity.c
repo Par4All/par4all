@@ -26,18 +26,20 @@
 #endif
 /* Functions closely related to the entity class, constructors, predicates,...
  */
-// To have strndup():
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "linear.h"
+#include "constants.h"
 
 #include "genC.h"
 #include "newgen_set.h"
 #include "misc.h"
 #include "ri.h"
 #include "properties.h"
+#include "pipsdbm.h"
 
 #include "ri-util.h"
 
@@ -208,10 +210,9 @@ entity make_label(string strg)
 
   entity l = find_or_create_entity(strg);
   if( type_undefined_p(entity_type(l)) ) {
-    entity_type(l) = (type) MakeTypeStatement();
-    entity_storage(l) = (storage) make_storage_rom();
-    entity_initial(l) = make_value(is_value_constant,
-				   make_constant_litteral());
+    entity_type(l) =  MakeTypeStatement();
+    entity_storage(l) =  make_storage_rom();
+    entity_initial(l) = make_value_constant(make_constant_litteral());
   }
   return l;
 }
@@ -354,6 +355,52 @@ const char * entity_user_name(entity e)
   return un;
 }
 
+/* Functions used to manage the block scoping in conjunction with
+   ContextStack and ycontext */
+
+string empty_scope() { return strdup("");}
+
+bool empty_scope_p(string s) {return strcmp(s, "")==0;}
+
+/* same kind of testing required for union as well */
+bool string_struct_scope_p(string s)
+{
+  /* Full testing would require a module_name, a block_scope and a struct name */
+  /* Just lookup the struct identifier*/
+  string ss = strchr(s, MEMBER_SEP_CHAR);
+  return ss != NULL;
+}
+
+bool string_block_scope_p(string s)
+{
+  // A block scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
+  char valid[12] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', BLOCK_SEP_CHAR, '\0'};
+  bool is_block_scope = FALSE;
+  string cs = s;
+  bool is_number = FALSE;
+
+  pips_debug(10, "Potential block scope string = \"%s\"\n", s);
+
+  if(strspn(s, valid) == strlen(s)) {
+    for(cs=s; *cs!='\0'; cs++) {
+      if(is_number && isdigit(*cs))
+	;
+      else if(is_number && *cs==BLOCK_SEP_CHAR)
+	is_number = FALSE;
+      else if(!is_number && isdigit(*cs))
+	is_number = TRUE;
+      else if(!is_number && *cs==BLOCK_SEP_CHAR) {
+	is_block_scope = FALSE;
+	break;
+      }
+    }
+    is_block_scope = !is_number;
+  }
+
+  pips_debug(10, "String = \"%s\" is %sa block scope string\n", s, is_block_scope?"":"not ");
+
+  return is_block_scope;
+}
 
 /* allocates a new string */
 string entity_name_without_scope(entity e)
@@ -380,7 +427,6 @@ string local_name_to_scope(string ln)
 {
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   string s = string_undefined;
-  extern string empty_scope(void);
 
   if(ns==NULL)
     s = empty_scope();
@@ -445,7 +491,6 @@ string
 entity_relative_name(e)
 entity e;
 {
-    extern entity get_current_module_entity();
     entity m = get_current_module_entity();
     string s = string_undefined;
 
@@ -568,6 +613,54 @@ bool array_entity_p(entity e)
 {
     return entity_array_p(e);
 }
+
+bool assumed_size_array_p(entity e)
+{  
+  /* return TRUE if e has an assumed-size array declarator  
+     (the upper bound of the last dimension is equal to * : REAL A(*) )*/
+  if (entity_variable_p(e))
+    {
+      variable v = type_variable(entity_type(e));   
+      list l_dims = variable_dimensions(v);
+      if (l_dims != NIL)
+	{
+	  int length = gen_length(l_dims);
+	  dimension last_dim =  find_ith_dimension(l_dims,length);
+	  if (unbounded_dimension_p(last_dim)) 
+	    return TRUE;
+	}
+    }
+  return FALSE;
+}
+
+bool pointer_type_array_p(entity e)
+{  
+  /* return TRUE if e has a pointer-type array declarator  
+     (the upper bound of the last dimension is  equal to 1: REAL A(1) )*/
+  if (entity_variable_p(e))
+    {
+      variable v = type_variable(entity_type(e));   
+      list l_dims = variable_dimensions(v);
+      if (l_dims != NIL)
+	{
+	  int length = gen_length(l_dims);
+	  dimension last_dim =  find_ith_dimension(l_dims,length);
+	  expression exp = dimension_upper(last_dim);
+	  if (expression_equal_integer_p(exp,1)) 
+	    return TRUE;
+	}
+    }
+  return FALSE;
+}
+
+bool unnormalized_array_p(entity e)
+{
+  /* return TRUE if e is an assumed-size array or a pointer-type array*/
+  if (assumed_size_array_p(e) || pointer_type_array_p(e))
+    return TRUE;
+  return FALSE;
+}
+
 
 
 /* e is the field of a structure */
@@ -1163,7 +1256,7 @@ expression entity_ith_bounds(entity e, int i)
   syntax s = make_syntax(is_syntax_range,
 			 make_range(copy_expression(dimension_lower(d)),
 				    copy_expression(dimension_upper(d)),
-				    make_expression_1()));
+				    int_to_expression(1)));
   return(make_expression(s, normalized_undefined));
 }
 
@@ -1415,7 +1508,6 @@ entity find_ith_formal_parameter(entity the_fnct, int rank)
 
 /* returns whether there is a main in the database
  */
-extern gen_array_t db_get_module_list(void);
 
 bool some_main_entity_p(void)
 {
@@ -1613,18 +1705,11 @@ entity entity_to_module_entity(entity e)
     m = e;
   else {
     string mn = entity_module_name(e);
-
-    if(static_module_name_p(mn)) {
-      m = gen_find_tabulated(concatenate(mn, MODULE_SEP_STRING, mn, NULL),entity_domain);
-    }
-    else {
-      m = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-					 MODULE_SEP_STRING, mn, NULL),
-			     entity_domain);
-    }
+    m = module_name_to_entity(mn);
   }
 
   pips_assert("entity m is defined", !entity_undefined_p(m));
+  pips_assert("entity m is a module", entity_module_p(m));
 
   return m;
 }
@@ -1664,7 +1749,6 @@ bool parameter_passing_mode_p(entity f, int tag)
   else {
     /* We are in trouble... because we have to call a higher-level
        function from the preprocessor library. */
-    extern bool c_module_p(entity);
     if(c_module_p(f))
       mode_p = (tag==is_mode_value);
     else
@@ -2191,4 +2275,165 @@ list entities_to_expressions(list l_ent) {
   /*     args_expr = gen_expression_cons (expr, args_expr); */
   /*   } */
 
+}
+
+entity find_enum_of_member(entity m)
+{
+  entity mod = entity_to_module_entity(m);
+  list dl = code_declarations(value_code(entity_initial(mod)));
+  list sdl = list_undefined;
+  list fdl = list_undefined;
+
+  if(compilation_unit_entity_p(mod)) {
+    /* if m was declared in the compilation unit cu and used elsewhere, cu may not be parsed yet. */
+    sdl = NIL;
+  }
+  else {
+    /* Not good in general, but should work for compilation units... */
+    /* No, it does not... */
+    sdl = entity_declarations(mod);
+  }
+  fdl = gen_nconc(gen_copy_seq(dl), gen_copy_seq(sdl));
+
+  entity ee = entity_undefined;
+
+  ifdebug(8) {
+    pips_debug(8, "Declarations for enclosing module \"\%s\": \"", entity_name(mod));
+    print_entities(dl);
+    //print_entities(sdl);
+    fprintf(stderr, "\"\n");
+  }
+
+  MAP(ENTITY, e, {
+    if(entity_enum_p(e)) {
+      list ml = type_enum(entity_type(e));
+
+      pips_debug(8, "Checking enum \"\%s\"\n", entity_name(e));
+
+      if(gen_in_list_p((void *) m, ml)) {
+	ee = e;
+	break;
+      }
+      ifdebug(8) {
+	if(entity_undefined_p(ee)) {
+	  pips_debug(8, "Member \"\%s\" not found in enum \"\%s\"\n",
+		     entity_name(m), entity_name(e));
+	}
+	else {
+	  pips_debug(8, "Member \"\%s\" found in enum \"\%s\"\n",
+		     entity_name(m), entity_name(e));
+	}
+      }
+    }
+  }, fdl);
+
+  pips_assert("enum entity is found", !entity_undefined_p(ee));
+  gen_free_list(fdl);
+		       
+  return ee;
+}
+
+
+/** Test if a module is in C */
+bool c_module_p(entity m)
+{
+  bool c_p = FALSE;
+  value v = entity_initial(m);
+
+  if(!value_undefined_p(v)) {
+    language l = code_language(value_code(v));
+    c_p = language_c_p(l);
+    /* Temporary fix for the too many make_unknown_language()... */
+    if(language_unknown_p(l))
+      pips_internal_error("language should not be unknown");
+  }
+  else
+      pips_internal_error("language should not be unknown");
+
+  return c_p;
+}
+
+
+
+
+/** Test if a module is in Fortran */
+/* Could be better factored in with C case */
+bool fortran_module_p(entity m)
+{
+  /* FI->FC: the code that follows breaks the validation of Hpfc?!? */
+  bool fortran_p = FALSE;
+  value v = entity_initial(m);
+  if(!value_undefined_p(v)) {
+    fortran_p = language_fortran_p(code_language(value_code(v)));
+  }
+  else {
+    /* If this alternative did not exist, the source code should be
+       moved to ri-util*/
+      pips_internal_error("language should not be unknown");
+  }
+  return fortran_p;
+}
+
+typedef struct { list le, lr; } deux_listes;
+
+static void make_uniq_reference_list(reference r, deux_listes * l)
+{
+  entity e = reference_variable(r);
+  if (! (storage_rom_p(entity_storage(e)) &&
+	 !(value_undefined_p(entity_initial(e))) &&
+	 value_symbolic_p(entity_initial(e)) &&
+	 type_functional_p(entity_type(e)))) {
+
+    /* Add reference r only once */
+    if (l->le ==NIL || !gen_in_list_p(e, l->le)) {
+      l->le = CONS(ENTITY,e,  l->le);
+      l->lr = CONS(REFERENCE,r,l->lr);
+    }
+  }
+}
+/* FI: this function has not yet been extended for C types!!! */
+list extract_references_from_declarations(list decls)
+{
+  list arrays = NIL;
+  deux_listes lref = { NIL, NIL };
+
+  MAPL(le,{
+    entity e= ENTITY(CAR(le));
+    type t = entity_type(e);
+
+    if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
+      arrays = CONS(VARIABLE,type_variable(t), arrays);
+  }, decls );
+
+  MAPL(array,
+  { variable v = VARIABLE(CAR(array));
+  list ldim = variable_dimensions(v);
+  while (!ENDP(ldim))
+    {
+      dimension d = DIMENSION(CAR(ldim));
+      gen_context_recurse(d, &lref, reference_domain, make_uniq_reference_list, gen_null);
+      ldim=CDR(ldim);
+
+    }
+  }, arrays);
+  gen_free_list(lref.le);
+
+  return(lref.lr);
+}
+Pbase entity_list_to_base(l)
+list l;
+{
+    list l2 = gen_nreverse(gen_copy_seq(l));
+    Pbase result = BASE_NULLE;
+	
+    MAP(ENTITY, e,
+    {
+	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
+	new->succ = result;
+	result = new;
+    },
+	l2);
+
+    gen_free_list(l2);
+    return(result);
 }

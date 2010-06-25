@@ -2087,14 +2087,22 @@ statements such as a loop body or a test branch.
 \end{PipsPass}
 
 \begin{PipsMake}
-cumulated_pointer_effects               > MODULE.cumulated_pointer_effects
+cumulated_pointer_effects   > MODULE.cumulated_pointer_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_pointer_effects
 \end{PipsMake}
 
 \begin{PipsMake}
-cumulated_effects               > MODULE.cumulated_effects
+cumulated_pointer_effects_with_points_to > MODULE.cumulated_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_effects
+        < MODULE.points_to_list
+\end{PipsMake}
+
+\begin{PipsMake}
+cumulated_effects            > MODULE.cumulated_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
@@ -4365,6 +4373,24 @@ must_pointer_regions            > MODULE.proper_pointer_regions
         < CALLEES.summary_pointer_regions
 \end{PipsMake}
 
+\begin{PipsPass}{must_pointer_regions_with_points_to}
+  This function computes the \verb|MUST| pointer regions in a module
+  using simple points\_to to disambiguate dereferencing paths. 
+\end{PipsPass}
+\begin{PipsMake}
+must_pointer_regions_with_points_to > MODULE.proper_pointer_regions
+                                    > MODULE.pointer_regions
+                                    > MODULE.inv_pointer_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.preconditions 
+        < MODULE.points_to_list
+        < CALLEES.summary_pointer_regions
+\end{PipsMake}
+
+
 \begin{PipsPass}{must_regions}
 This function computes the \verb|MUST| regions in a module.
 \end{PipsPass}
@@ -4643,7 +4669,6 @@ alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Point
 intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
            < PROGRAM.entities
            < MODULE.code
-           < MODULE.summary_pointer_effects
 \end{PipsMake}
 
 \subsection{Points to Analysis}
@@ -6334,6 +6359,19 @@ ISOLATE_STATEMENT_LOAD_FUNCTION ""
 ISOLATE_STATEMENT_STORE_FUNCTION ""
 \end{PipsProp}
 
+\subsubsection{Hardware Constraints Solver}
+\begin{PipsMake}
+solve_hardware_constraints > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< PROGRAM.entities
+\end{PipsMake}
+\begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_LABEL}
+SOLVE_HARDWARE_CONSTRAINTS_LABEL ""
+\end{PipsProp}
+\begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_LIMIT}
+SOLVE_HARDWARE_CONSTRAINTS_LIMIT 0
+\end{PipsProp}
 
 \subsubsection{kernelize}
 
@@ -7069,6 +7107,11 @@ symbolic_tiling > MODULE.code
 \end{PipsMake}
 \begin{PipsProp}{SYMBOLIC_TILING_VECTOR}
 SYMBOLIC_TILING_VECTOR ""
+\end{PipsProp}
+
+As a work-around to precondition computation limitations, you can set following property to true, it will generate tests instead of min.
+\begin{PipsProp}{SYMBOLIC_TILING_NO_MIN}
+SYMBOLIC_TILING_NO_MIN FALSE
 \end{PipsProp}
 
 \subsection{Loop Normalize}

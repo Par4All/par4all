@@ -37,10 +37,6 @@
 
 #include "newgen.h"
 
-#define error(fun, msg) { \
-    fprintf(stderr, "pips internal error in %s: %s\n", fun, msg); exit(2); \
-}
-
 void monome_gen_write(FILE *fd, Pmonome pm)
 {
     pips_assert("monome_gen_write", !MONOME_UNDEFINED_P(pm));
@@ -59,12 +55,12 @@ int (*f)();
     int c, ibuffer = 0;
 
     if ( (c = f()) != '{' ) {
-	error("monome_gen_read","initial '{' missing!\n");
+	pips_internal_error("initial '{' missing!\n");
     }
 
     while ( (c = f()) != '<' ) { 
 	if ( ibuffer >= 127 )
-	    error("monome_gen_read","vecteur '<' missing!\n");
+	    pips_internal_error("vecteur '<' missing!\n");
 	buffer[ibuffer++] = c;
     }
     buffer[ibuffer] = '\0';
@@ -76,11 +72,11 @@ int (*f)();
     }
 
     if ( (c = f()) != '>' ) {
-	error("monome_gen_read","closing '>' missing!\n");
+	pips_internal_error("closing '>' missing!\n");
     }
 
     if ( (c = f()) != '}' ) {
-	error("monome_gen_read","closing '}' missing!\n");
+	pips_internal_error("closing '}' missing!\n");
     }
 
     return pm;
@@ -126,11 +122,11 @@ int (*f)();
     int c;
 
     if ( (c = f()) != '\n' ) {
-	error("polynome_gen_read","initial newline missing!\n");
+	pips_internal_error("initial newline missing!\n");
     }
 
     if ( (c = f()) != '[' ) {
-	error("polynome_gen_read","initial '[' missing!\n");
+	pips_internal_error("initial '[' missing!\n");
     }
 
     while ( (c = f()) != ']' ) {
@@ -143,7 +139,7 @@ int (*f)();
     }
 
     if ( (c = f()) != '\n' ) {
-	error("polynome_gen_read","closing newline missing!\n");
+	pips_internal_error("closing newline missing!\n");
     }
 
     return pp;

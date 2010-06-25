@@ -46,7 +46,6 @@
 #include "effects-util.h"
 #include "database.h"
 #include "resources.h"
-#include "pipsdbm.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 
@@ -99,6 +98,16 @@ summary_pointer_effects(string module_name)
 
 bool 
 cumulated_pointer_effects(string module_name)
+{
+    bool ok;
+    set_methods_for_simple_pointer_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
+cumulated_pointer_effects_with_points_to(string module_name)
 {
     bool ok;
     set_methods_for_simple_pointer_effects();
@@ -454,7 +463,6 @@ proper_effects_of_range(range r)
 
 bool expression_invariant_wrt_effects(expression exp, list el)
 {
-  extern list proper_effects_of_expression(expression);
   list ee = proper_effects_of_expression(exp);
   list cee = list_undefined;
   list cel = list_undefined;

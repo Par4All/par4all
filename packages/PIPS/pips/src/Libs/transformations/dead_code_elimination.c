@@ -46,7 +46,6 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"

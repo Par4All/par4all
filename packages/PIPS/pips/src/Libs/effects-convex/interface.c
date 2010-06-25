@@ -52,13 +52,10 @@
 
 #include "properties.h"
 
-#include "transformer.h"
-#include "semantics.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-#include "pipsdbm.h"
 #include "resources.h"
 
 /******************************************************* CONVEX R/W REGIONS */
@@ -133,6 +130,23 @@ may_regions(char *module_name)
 
 bool 
 must_pointer_regions(char *module_name)
+{
+  bool res1, res2;
+  set_bool_property("MUST_REGIONS", TRUE);
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res1 = proper_effects_engine(module_name);
+  generic_effects_reset_all_methods();
+  
+  set_methods_for_convex_rw_pointer_effects();
+  res2 = rw_effects_engine(module_name);
+ 
+  generic_effects_reset_all_methods();
+  return res1 && res2;
+}
+
+bool 
+must_pointer_regions_with_points_to(char *module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", TRUE);

@@ -42,11 +42,6 @@
 #define FATAL(msg,value) {fprintf(stderr,msg,value);exit(1);}
 
 /*************************************************************************/
-/* External defined functions */
-extern value    EvalExpression();
-extern bool     expression_integer_value();
-
-/*************************************************************************/
 /*
  * this function computes the number of elements of a variable. ld is the
  * list of dimensions of the variable
@@ -209,45 +204,5 @@ bool            find_bd_call(c, base, dims)
     return (find_bd_type_variable(functional_result(type_functional(tp)), base, dims));
 }
 
-/*************************************************************************/
-char           *flint_print_basic(b)
-    basic           b;
-{
-    static char    *strings_of_basic[] =
-    {"int", "float", "logical", "overloaded",
-    "complex", "string", "unknown tag"};
-    int             i = -1;
-
-    switch (basic_tag(b)) {
-    case is_basic_int:{
-	    i = 0;
-	    break;
-	}
-    case is_basic_float:{
-	    i = 1;
-	    break;
-	}
-    case is_basic_logical:{
-	    i = 2;
-	    break;
-	}
-    case is_basic_overloaded:{
-	    i = 3;
-	    break;
-	}
-    case is_basic_complex:{
-	    i = 4;
-	    break;
-	}
-    case is_basic_string:{
-	    i = 5;
-	    break;
-	}
-    default:
-	pips_error("Anormal basic type of element",
-		   "%d found by flinter", basic_tag(b));
-    }
-    return (strings_of_basic[i]);
-}
 /*************************************************************************/
 /* End of File */

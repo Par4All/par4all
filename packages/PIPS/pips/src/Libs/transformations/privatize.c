@@ -58,7 +58,6 @@
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "alias-classes.h"
 
 /* instantiation of the dependence graph */
 typedef dg_arc_label arc_label;

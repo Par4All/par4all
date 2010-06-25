@@ -46,19 +46,15 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
-#include "transformations.h"
 #include "arithmetique.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "preprocessor.h"
 #include "properties.h"
 
-#include "expressions.h"
 
 #include "sac.h"
-#include "atomizer.h"
 
 static statement orginal_statement = NULL;
 
@@ -123,6 +119,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
         if (!basic_overloaded_p(bofe))
         {
             entity newvar = (*create)(get_current_module_entity(), bofe);
+            AddEntityToCurrentModule(newvar);
             expression rhs = make_expression(expression_syntax(e), normalized_undefined);
             normalize_all_expressions_of(rhs);
             statement assign = make_assign_statement(entity_to_expression(newvar),rhs);
@@ -261,13 +258,14 @@ static
 entity sac_make_new_variable(entity module, basic b)
 {
     entity e = make_new_scalar_variable(module, copy_basic(b));
-    AddLocalEntityToDeclarations(e,module,
-            c_module_p(module)?get_current_module_statement():statement_undefined);
+    AddLocalEntityToDeclarations(e,module,get_current_module_statement());
     return e;
 }
 static entity sac_get_current_lhs(entity module, basic b)
 {
-    entity current_entity = expression_to_entity(current_lhs);
+    entity current_entity = expression_scalar_p(current_lhs)?
+        expression_to_entity(current_lhs):
+        entity_undefined;
     return entity_undefined_p(current_entity)? sac_make_new_variable(module,b): current_entity;
 }
 

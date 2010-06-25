@@ -38,10 +38,10 @@ FWD_DIRS	= \
 	misc newgen properties text-util pipsdbm \
 	top-level ri-util conversion movements \
 	comp_sections transformer bootstrap control flint \
-	syntax c_syntax prettyprint \
-	effects-util effects-generic effects-simple semantics complexity \
-	continuation reductions regions effects-convex alias-classes \
-	callgraph icfg ricedg \
+	syntax c_syntax prettyprint alias-classes \
+	effects-generic effects-simple semantics complexity \
+	continuation reductions effects-convex \
+	effects-util callgraph icfg ricedg \
 	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu pipslibs scalopes \

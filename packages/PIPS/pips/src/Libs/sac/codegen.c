@@ -34,11 +34,8 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
-#include "preprocessor.h"
 #include "text-util.h"
 #include "effects-simple.h"
 
@@ -48,7 +45,6 @@
 #include "properties.h"
 
 #include "misc.h"
-#include "alias-classes.h"
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -685,7 +681,8 @@ void replace_subscript(expression e)
 static statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
-    if( c_module_p(get_current_module_entity()) )
+    entity exec_function = module_name_to_entity(ename);
+    if( c_module_p(exec_function) )
     {
         if( strstr(ename,SIMD_GEN_LOAD_NAME) )
         {
@@ -1189,7 +1186,7 @@ simdstatement make_simd_statements(set opkinds, list statements)
         {
             args[index]=NIL;
             for(int i=0;i<=index;i++)
-                args[index]=CONS(EXPRESSION,make_expression_0(),args[index]);
+                args[index]=CONS(EXPRESSION,int_to_expression(0),args[index]);
             ++index;
         }
 

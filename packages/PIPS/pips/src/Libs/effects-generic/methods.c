@@ -44,7 +44,6 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "misc.h"
 #include "text-util.h"
 
 #include "effects-generic.h"
@@ -97,6 +96,9 @@ list (*effects_transformer_inverse_composition_op)(list, transformer);
 
 /* composition with preconditions */
 list (*effects_precondition_composition_op)(list,transformer);
+
+/* evaluation with alias information */
+list (*eval_cell_with_points_to_func)(cell, list, bool *);
 
 /* union over a range */
 list (*effects_descriptors_variable_change_func)(list, entity, entity);
@@ -225,6 +227,9 @@ generic_effects_reset_all_methods()
     effects_transformer_inverse_composition_op = (list_function) UNDEF;
     effects_precondition_composition_op = (list_function) UNDEF;
     effects_descriptors_variable_change_func = (list_function) UNDEF;
+
+    eval_cell_with_points_to_func = (list_function) UNDEF;
+
 
     effects_loop_normalize_func = (list (*)(list, entity, range, entity* , descriptor ,bool)) UNDEF;
     effects_union_over_range_op = (list (*)(list, entity, range, descriptor)) UNDEF;

@@ -54,20 +54,14 @@ typedef dg_vertex_label vertex_label;
 #include "text.h"
 
 #include "misc.h"
-#include "properties.h"
-#include "prettyprint.h"
 #include "text-util.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "resources.h"
-#include "pipsdbm.h"
-#include "rice.h"
-#include "movements.h"
 
 #include "constants.h"
+#include "conversion.h"
 #include "wp65.h"
-
-extern Psysteme loop_iteration_domaine_to_sc();
 
 void find_iteration_domain(s, sc, basis, nested_level,
                                     list_statement_block, inst)

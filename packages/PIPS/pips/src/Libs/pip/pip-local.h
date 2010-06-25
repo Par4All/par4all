@@ -43,3 +43,6 @@
 #include "pip__sol.h"
 #include "pip__tab.h"
 
+/* PIP parser symbols */
+extern	int quayyparse();
+extern	FILE * quayyin;

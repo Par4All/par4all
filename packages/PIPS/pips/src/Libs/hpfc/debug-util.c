@@ -32,8 +32,6 @@
 #include "defines-local.h"
 #include "pipsdbm.h"
 
-extern char *flint_print_basic(basic);
-
 /* print_entity_variable(e)
  * 
  * if it is just a variable, the type is printed,
@@ -58,7 +56,7 @@ void print_entity_variable(entity e)
 
     v = type_variable(entity_type(e));
 
-    fprintf(stderr,"basic %s\n",flint_print_basic(variable_basic(v)));
+    fprintf(stderr,"basic %s\n",basic_to_string(variable_basic(v)));
     gen_map((gen_iter_func_t)print_dimension, variable_dimensions(v));
 }
 

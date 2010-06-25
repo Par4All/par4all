@@ -46,8 +46,6 @@
 #include "text.h"
 
 #include "constants.h"
-#include "control.h"
-#include "properties.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
@@ -57,7 +55,6 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
-#include "semantics.h"
 
 #include "icfg.h"
 

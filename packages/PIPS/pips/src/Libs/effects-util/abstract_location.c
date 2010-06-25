@@ -19,19 +19,14 @@
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
+#include "points_to_private.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "misc.h"
+#include "text.h"
 #include "text-util.h"
-#include "newgen_set.h"
-#include "points_to_private.h"
+#include "misc.h"
 #include "properties.h"
-#include "preprocessor.h"
 
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "effects-convex.h"
-#include "alias-classes.h"
 
 /*
   Heap Modelization

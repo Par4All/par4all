@@ -1300,7 +1300,7 @@ list gfc2pips_get_list_of_dimensions2(gfc_symbol *s) {
           i = as->rank - 1;
           do {
             list_of_dimensions
-                = gen_cons(make_dimension(MakeIntegerConstantExpression("1"),
+                = gen_cons(make_dimension(int_to_expression(1),
                                           MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
                            list_of_dimensions);
           } while(--i >= j);
@@ -1723,7 +1723,7 @@ char* gfc2pips_get_safe_name(const char* str) {
  * @brief create a <dimension> from the integer value given
  */
 dimension gfc2pips_int2dimension(int n) {
-  return make_dimension(MakeIntegerConstantExpression("1"),
+  return make_dimension(int_to_expression(1),
                         gfc2pips_int2expression(n));
 }
 
@@ -2055,7 +2055,7 @@ list gfc2pips_array_ref2indices(gfc_array_ref *ar) {
           if(ar->stride[i]) {
             stride = gfc2pips_expr2expression(ar->stride[i]);
           } else {
-            stride = MakeIntegerConstantExpression("1");
+            stride = int_to_expression(1);
           }
 
           range r = make_range(start, end, stride);
@@ -2630,14 +2630,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c) {
       expression e = gfc2pips_expr2expression(c->expr);
       expression e1 = MakeBinaryCall(CreateIntrinsic(LESS_THAN_OPERATOR_NAME),
                                      e,
-                                     MakeIntegerConstantExpression("0"));
+                                     int_to_expression(0));
       expression e2 = MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
                                      e,
-                                     MakeIntegerConstantExpression("0"));
+                                     int_to_expression(0));
       expression e3 =
           MakeBinaryCall(CreateIntrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
                          e,
-                         MakeIntegerConstantExpression("0"));
+                         int_to_expression(0));
       /*
        * we handle the labels doubled because it will never be checked
        * afterwards to combine/fuse

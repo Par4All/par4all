@@ -31,14 +31,10 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "semantics.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "transformations.h"
 #include "expressions.h"
-
-extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
 #define src(name, suf) \
 	strdup(concatenate(WORKSPACE_SRC_SPACE "/", name, suf, NULL))

@@ -34,11 +34,13 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "effects.h"
 #include "properties.h"
 
 #include "misc.h"
 #include "newgen.h"
 #include "ri-util.h"
+#include "effects-util.h"
 #include "complexity_ri.h"
 
 #include "constants.h"
