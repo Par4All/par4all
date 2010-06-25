@@ -6359,6 +6359,19 @@ ISOLATE_STATEMENT_LOAD_FUNCTION ""
 ISOLATE_STATEMENT_STORE_FUNCTION ""
 \end{PipsProp}
 
+\subsubsection{Hardware Constraints Solver}
+\begin{PipsMake}
+solve_hardware_constraints > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< PROGRAM.entities
+\end{PipsMake}
+\begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_LABEL}
+SOLVE_HARDWARE_CONSTRAINTS_LABEL ""
+\end{PipsProp}
+\begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_LIMIT}
+SOLVE_HARDWARE_CONSTRAINTS_LIMIT 0
+\end{PipsProp}
 
 \subsubsection{kernelize}
 

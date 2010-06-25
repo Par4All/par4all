@@ -29,7 +29,8 @@ LIB_CFILES =group_constants.c \
 			array_to_pointer.c  \
 			inlining.c\
  			kernels.c\
-			terapixify.c
+			terapixify.c \
+			constraints.c
 
 INC_TARGET =    $(TARGET).h
 

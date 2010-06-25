@@ -118,7 +118,7 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
             0);
 }
 
-static bool
+bool
 expression_minmax_p(expression e)
 {
     if(expression_call_p(e))
@@ -165,7 +165,7 @@ static void lowerbound_of_expression(expression e, transformer tr)
 }
 #endif
 
-static void simplify_minmax_expression(expression e,transformer tr)
+void simplify_minmax_expression(expression e,transformer tr)
 {
     call c =expression_call(e);
     bool is_max = ENTITY_MAX_P(call_function(c));
@@ -188,7 +188,6 @@ static void simplify_minmax_expression(expression e,transformer tr)
         }
     }
 }
-
 
 /** 
  * generate a list of dimensions @p dims and of offsets @p from a region @p r
@@ -257,7 +256,7 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
  * 
  * @return region from @p regions on entity @p e
  */
-static region find_region_on_entity(entity e,list regions)
+region find_region_on_entity(entity e,list regions)
 {
     FOREACH(REGION,r,regions)
         if(same_entity_p(e,reference_variable(region_any_reference(r)))) return r;
