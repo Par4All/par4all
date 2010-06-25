@@ -94,50 +94,53 @@ C  P(I,J) {I==513, ISI==512, ISJ==512, J==513, KSI==3, KSJ==3}
 
       DO 400 I = 1+KSI/2, ISI-KSI/2
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I}
+C  P(I) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511}
 
          DO 300 J = 1+KSJ/2, ISJ-KSJ/2
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511, 2<=J,
+C    J<=511}
 
             NEW_IMAGE(I,J) = 0.
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511, 2<=J,
+C    J<=511}
 
             DO 200 KI = 1, KSI
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
-C    1<=KI, KI<=3}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=511, 1<=KI, KI<=3}
 
                DO 100 KJ = 1, KSJ
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
-C    1<=KI, KI<=3, 1<=KJ, KJ<=3}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=511, 1<=KI, KI<=3, 1<=KJ, KJ<=3}
 
                   NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+KI-KSI/2-1,
      &            J+KJ-KSJ/2-1)*KERNEL(KI,KJ)
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J,
-C    1<=KI, KI<=3, 1<=KJ, KJ<=3}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=511, 1<=KI, KI<=3, 1<=KJ, KJ<=3}
 
 100               CONTINUE
 
 C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KJ==4, KSI==3, KSJ==3, 2<=I,
-C    2<=J, 1<=KI, KI<=3}
+C    I<=511, 2<=J, J<=511, 1<=KI, KI<=3}
 
 200            CONTINUE
 
 C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KI==4, KJ==4, KSI==3, KSJ==3,
-C    2<=I, 2<=J}
+C    2<=I, I<=511, 2<=J, J<=511}
 
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/(KSI*KSJ)
 
 C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KI==4, KJ==4, KSI==3, KSJ==3,
-C    2<=I, 2<=J}
+C    2<=I, I<=511, 2<=J, J<=511}
 
 300         CONTINUE
 
-C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, 2<=J}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=512}
 
 400      CONTINUE
 
