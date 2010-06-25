@@ -264,12 +264,10 @@ def main(options, args = []):
     # various packages.
     prefix = default_prefix
     if options.prefix:
-        prefix = options.prefix
+        prefix = os.path.abspath(os.path.expanduser(options.prefix))
         warn("Prefix is " + prefix + " (--prefix)")
     else:
         warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
-    if prefix:
-        prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
 
     # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
