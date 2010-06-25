@@ -69,7 +69,7 @@
 
 #include "effects-generic.h"
 #include "effects-convex.h"
-#include "alias-classes.h"
+//#include "alias-classes.h"
 
 #define BACKWARD TRUE
 #define FORWARD FALSE

@@ -72,7 +72,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "alias-classes.h"
 #include "properties.h"
 
 #include "expressions-local.h"

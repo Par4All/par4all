@@ -49,7 +49,6 @@
 #include "effects-util.h"
 #include "constants.h"
 #include "effects-generic.h"
-#include "alias-classes.h"
 #include "effects-simple.h"
 
 #include "misc.h"

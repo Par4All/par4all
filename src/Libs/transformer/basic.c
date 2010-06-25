@@ -43,9 +43,10 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "effects-util.h"
 
 #include "transformer.h"
-#include "alias-classes.h"
+//#include "alias-classes.h"
 
 transformer transformer_dup(transformer t_in)
 {

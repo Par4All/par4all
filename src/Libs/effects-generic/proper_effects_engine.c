@@ -55,7 +55,6 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "alias-classes.h"
 
 #include "effects-generic.h"
 

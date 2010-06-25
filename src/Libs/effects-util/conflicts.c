@@ -26,7 +26,7 @@
 #endif
 
 #include <stdio.h>
-
+ 
 #include "linear.h"
 
 #include "genC.h"
@@ -39,8 +39,6 @@
 #include "ri-util.h"
 #include "effects-util.h"
 
-#include "alias-classes.h"
-#include "effects-generic.h"
 
 /**
  * @brief Check if two effects always conflict.

@@ -49,7 +49,6 @@
 #include "misc.h"
 #include "properties.h"
 #include "effects-generic.h"
-#include "alias-classes.h"
 #include "control.h" // for clean_up_sequences
 #include "transformations.h"
 

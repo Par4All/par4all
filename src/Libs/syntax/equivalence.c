@@ -41,6 +41,8 @@ char vcid_syntax_equivalence[] = "$Id$";
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "parser_private.h"
 
 #include "properties.h"
@@ -48,7 +50,6 @@ char vcid_syntax_equivalence[] = "$Id$";
 #include "misc.h"
 
 #include "syntax.h"
-#include "alias-classes.h"
 
 #define EQUIADD 0
 #define EQUIMERGE 1

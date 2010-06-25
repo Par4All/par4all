@@ -43,7 +43,6 @@
 #include "control.h"
 #include "callgraph.h"
 #include "effects-simple.h"
-#include "alias-classes.h"
 #include "sac.h"
 #include "ricedg.h"
 #include "atomizer.h"

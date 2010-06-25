@@ -196,6 +196,8 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "constants.h"
 
 #include "properties.h"
@@ -204,7 +206,7 @@
 #include "preprocessor.h"
 
 #include "transformer.h"
-#include "alias-classes.h"
+//#include "alias-classes.h"
 
 /* STATIC VARIABLES */
 

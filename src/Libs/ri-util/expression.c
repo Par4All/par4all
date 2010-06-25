@@ -47,7 +47,6 @@
 #include "text-util.h"
 
 #include "arithmetique.h"
-#include "alias-classes.h"
 #include "pipsmake.h"
 
 #include "ri-util.h"
@@ -328,6 +327,18 @@ bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
 }
+
+bool array_argument_p(expression e)
+{
+  if (expression_reference_p(e))
+    {
+      reference ref = expression_reference(e);
+      entity ent = reference_variable(ref);
+      if (array_entity_p(ent)) return TRUE;
+    }
+  return FALSE;
+}
+
 
 
 /* Test if an expression is a reference.

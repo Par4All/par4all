@@ -53,7 +53,6 @@
 
 #include "resources.h"
 #include "pipsdbm.h"
-#include "alias-classes.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"

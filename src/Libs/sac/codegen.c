@@ -45,7 +45,6 @@
 #include "properties.h"
 
 #include "misc.h"
-#include "alias-classes.h"
 #include <ctype.h>
 #include <stdlib.h>
 

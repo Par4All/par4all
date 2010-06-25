@@ -107,6 +107,16 @@ cumulated_pointer_effects(string module_name)
 }
 
 bool 
+cumulated_pointer_effects_with_points_to(string module_name)
+{
+    bool ok;
+    set_methods_for_simple_pointer_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
 proper_effects(string module_name)
 {
     bool ok;

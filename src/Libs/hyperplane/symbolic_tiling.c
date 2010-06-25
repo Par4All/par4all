@@ -18,7 +18,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-util.h"
-#include "alias-classes.h"
 
 #include "transformations.h"
 

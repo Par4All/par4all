@@ -614,6 +614,54 @@ bool array_entity_p(entity e)
     return entity_array_p(e);
 }
 
+bool assumed_size_array_p(entity e)
+{  
+  /* return TRUE if e has an assumed-size array declarator  
+     (the upper bound of the last dimension is equal to * : REAL A(*) )*/
+  if (entity_variable_p(e))
+    {
+      variable v = type_variable(entity_type(e));   
+      list l_dims = variable_dimensions(v);
+      if (l_dims != NIL)
+	{
+	  int length = gen_length(l_dims);
+	  dimension last_dim =  find_ith_dimension(l_dims,length);
+	  if (unbounded_dimension_p(last_dim)) 
+	    return TRUE;
+	}
+    }
+  return FALSE;
+}
+
+bool pointer_type_array_p(entity e)
+{  
+  /* return TRUE if e has a pointer-type array declarator  
+     (the upper bound of the last dimension is  equal to 1: REAL A(1) )*/
+  if (entity_variable_p(e))
+    {
+      variable v = type_variable(entity_type(e));   
+      list l_dims = variable_dimensions(v);
+      if (l_dims != NIL)
+	{
+	  int length = gen_length(l_dims);
+	  dimension last_dim =  find_ith_dimension(l_dims,length);
+	  expression exp = dimension_upper(last_dim);
+	  if (expression_equal_integer_p(exp,1)) 
+	    return TRUE;
+	}
+    }
+  return FALSE;
+}
+
+bool unnormalized_array_p(entity e)
+{
+  /* return TRUE if e is an assumed-size array or a pointer-type array*/
+  if (assumed_size_array_p(e) || pointer_type_array_p(e))
+    return TRUE;
+  return FALSE;
+}
+
+
 
 /* e is the field of a structure */
 bool entity_field_p(entity e)

@@ -400,7 +400,7 @@ entity float_to_entity(float c)
 entity int_to_entity(_int c)
 {
     string num;
-    asprintf(&num, "%d", c);
+    asprintf(&num, "%d", (int) c);
     entity e = MakeConstant(num,is_basic_int);
     free(num);
     return e;

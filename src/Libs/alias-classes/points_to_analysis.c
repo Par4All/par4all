@@ -63,28 +63,25 @@ points_to_statement
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
+#include "points_to_private.h"
 #include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "parser_private.h"
+//#include "parser_private.h"
 #include "top-level.h"
 #include "text-util.h"
 #include "text.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "effects-convex.h"
-#include "transformations.h"
+//#include "effects-convex.h"
+//#include "transformations.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "newgen_set.h"
-#include "points_to_private.h"
 #include "alias-classes.h"
 
-/* Function storing points to information attached to a statement
- */
-GENERIC_GLOBAL_FUNCTION(pt_to_list, statement_points_to)
 
 /* operator fusion to calculate the relation of two points
    to. (should be at a higher level) */
@@ -227,33 +224,6 @@ entity argument_entity(expression exp) {
   return copy_entity(var);
 }
 
-/* test if two cells are equal, celles are supposed to be references.*/
-
-bool cell_equal_p(cell c1, cell c2)
-{
-  /* Has to be extended for GAPs */
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
-  return reference_equal_p(r1, r2);
-}
-
-
-/* FI: probably to be moved elsewhere in ri-util */
-/* Here, we only know how to cope (for the time being) with
-   cell_reference and cell_preference, not with cell_gap and other
-   future fields. A bit safer than macro cell_any_reference(). */
-reference cell_to_reference(cell c) {
-  reference r = reference_undefined;
-
-  if (cell_reference_p(c))
-    r = cell_reference(c);
-  else if (cell_preference_p(c))
-    r = preference_reference(cell_preference(c));
-  else
-    pips_internal_error("unexpected cell tag\n");
-
-  return r;
-}
 
 /* Order the two points-to relations according to the alphabetical
    order of the underlying variables. Return -1, 0, or 1. */

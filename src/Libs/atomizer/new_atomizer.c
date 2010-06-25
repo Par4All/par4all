@@ -56,7 +56,6 @@ typedef dg_vertex_label vertex_label;
 #include "arithmetique.h"
 
 #include "effects-generic.h"
-#include "alias-classes.h"
 #include "effects-simple.h"
 #include "atomizer.h"
 
