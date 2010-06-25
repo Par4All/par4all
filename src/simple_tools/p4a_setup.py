@@ -17,6 +17,8 @@ from p4a_git import *
 from p4a_version import *
 
 
+default_configure_opts = [ "--disable-static", "CFLAGS='-O2 -std=c99'" ]
+default_debug_configure_opts = [ "--disable-static", "CFLAGS='-ggdb -g3 -O0 -Wall -std=c99'" ]
 default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
 
 
@@ -77,35 +79,40 @@ def add_module_options(parser):
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
 
-    group.add_option("--configure-opts", "-c", metavar = "OPTS", default = [],
-        help = "Specify global configure opts.")
+    global default_configure_opts, default_debug_configure_opts
+    group.add_option("--configure-opts", "--configure-flags", "-c", metavar = "OPTS", action = "append", default = [],
+        help = "Specify global configure opts. Default is '" + " ".join(default_configure_opts) 
+        + "' OR '" + " ".join(default_debug_configure_opts) + "' if --debug is specified.")
 
-    group.add_option("--polylib-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--debug", "-g", action = "store_true", default = False,
+        help = "Set debug CFLAGS in configure opts (see --configure-opts). Please note that this option has NO EFFECT if --configure-opts is manually set.")
+
+    group.add_option("--polylib-conf-opts", "--polylib-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify polylib configure opts (appended to --configure-opts).")
 
-    group.add_option("--newgen-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--newgen-conf-opts", "--newgen-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify newgen configure opts (appended to --configure-opts).")
 
-    group.add_option("--linear-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--linear-conf-opts", "--linear-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify linear configure opts (appended to --configure-opts).")
 
     global default_pips_conf_opts
-    group.add_option("--pips-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--pips-conf-opts", "--pips-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts))
 
-    group.add_option("--make-opts", "-m", metavar = "OPTS", default = [],
+    group.add_option("--make-opts", "--make-flags", "-m", metavar = "OPTS", action = "append", default = [],
         help = "Specify global make opts.")
 
-    group.add_option("--polylib-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--polylib-make-opts", "--polylib-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify polylib make opts (appended to --make-opts).")
 
-    group.add_option("--newgen-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--newgen-make-opts", "--newgen-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify newgen make opts (appended to --make-opts).")
 
-    group.add_option("--linear-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--linear-make-opts", "--linear-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify linear make opts (appended to --make-opts).")
 
-    group.add_option("--pips-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--pips-make-opts", "--pips-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify PIPS make opts (appended to --make-opts).")
 
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
@@ -145,15 +152,15 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     if configure:
         if reconf:
             # Call autoconf to generate the configure utility.
-            run2([ "autoreconf", "--install" ], working_dir = package_dir)
+            run([ "autoreconf", "--install" ], working_dir = package_dir)
         #~ if dest_dir:
             #~ configure_opts += [ "DESTDIR=" + dest_dir ]
         # Call configure to generate the Makefiles.
-        run2([ configure_script ] + configure_opts, working_dir = build_dir)
+        run([ configure_script ] + configure_opts, working_dir = build_dir)
 
     # Call make all to compile.
     info("Building " + package_dir + " in " + build_dir)
-    run2([ "make" ] + make_opts, working_dir = build_dir)
+    run([ "make" ] + make_opts, working_dir = build_dir)
 
     if install:
         # Call make install to install in DESTDIR if requested.
@@ -161,12 +168,12 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
         #~ if dest_dir:
             #~ install_make_opts.append("DESTDIR=" + dest_dir)
             #~ info("Installing " + package_dir + " in " + dest_dir)
-        run2([ "make", "install" ] + install_make_opts, working_dir = build_dir)
+        run([ "make", "install" ] + install_make_opts, working_dir = build_dir)
 
 
-def main(options = {}, args = []):
+def main(options, args = []):
 
-    actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+    actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
     script_dir = os.path.split(actual_script)[0]
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     default_prefix = "/usr/local/par4all"
@@ -264,12 +271,10 @@ def main(options = {}, args = []):
     # various packages.
     prefix = default_prefix
     if options.prefix:
-        prefix = options.prefix
+        prefix = os.path.abspath(os.path.expanduser(options.prefix))
         warn("Prefix is " + prefix + " (--prefix)")
     else:
         warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
-    if prefix:
-        prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
 
     # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
@@ -291,10 +296,11 @@ def main(options = {}, args = []):
     # Create install_dir it if it does not already exist.
     if os.path.isdir(install_dir):
         if options.clean:
-            # If we are requested to clean first, remove everything
-            # under install_dir.
-            warn("Removing everything in " + install_dir + " (--clean)")
-            rmtree(install_dir, remove_top = False)
+            if glob.glob(os.path.join(install_dir, "*")):
+                # If we are requested to clean first, remove everything
+                # under install_dir.
+                warn("Removing everything in " + install_dir + " (--clean)")
+                rmtree(install_dir, remove_top = False)
         else:
             info("Install directory " + install_dir + " already exists")
     else:
@@ -352,13 +358,14 @@ def main(options = {}, args = []):
         #~ die("Directory does not exist: " + nlpmake_src_dir)
 
     # Global configure flags:
-    configure_opts = [ 
-        '--disable-static', 
-        '--prefix=' + prefix, 
-        #'--libdir=' + os.path.join(install_dir, "lib"), 
-    ]
+    configure_opts = [ "--prefix=" + prefix ]
     if options.configure_opts:
-        configure_opts.append(options.configure_opts)
+        configure_opts += options.configure_opts
+    else:
+        if options.debug:
+            configure_opts += default_debug_configure_opts
+        else:
+            configure_opts += default_configure_opts
 
     # Global make flags:
     make_opts = []
@@ -425,8 +432,8 @@ def main(options = {}, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
+        run([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
+        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
 
         newgen_conf_opts = configure_opts
         if options.newgen_conf_opts:
@@ -463,8 +470,8 @@ def main(options = {}, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
+        run([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
+        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
         linear_conf_opts = configure_opts
 
         if options.linear_conf_opts:
@@ -508,15 +515,15 @@ def main(options = {}, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run2([ "rm", "-fv", os.path.join(pips_src_dir, "makes") ])
-        run2([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
+        run([ "rm", "-fv", os.path.join(pips_src_dir, "makes") ])
+        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
 
         # Fix the following error:
         # /bin/sed: can't read /lib/libpolylib64.la: No such file or directory
         # libtool: link: `/lib/libpolylib64.la' is not a valid libtool archive
         # make[5]: *** [libpipslibs.la] Error 1
         # make[5]: Leaving directory `/home/gpean/p4a-foo/build/pips/src/Libs'
-        #~ run2([ "sudo", "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
+        #~ run([ "sudo", "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
 
         ### FIX for fortran
         fortran = os.path.join(build_dir, "pips/src/Passes/fortran95")
@@ -528,16 +535,16 @@ def main(options = {}, args = []):
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
         # to relauch the patch:
-        run2([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        run([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
         for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
-            run2([ "touch", os.path.join(fortran, file) ])
+            run([ "touch", os.path.join(fortran, file) ])
         fortran2 = os.path.join(fortran, "gcc-4.4.3")
         if not os.path.isdir(fortran2):
             os.makedirs(fortran2)
         for file in [ ".dir", ".md5-check-core", ".md5-check-fortran", ".untar-core", ".untar-fortran", ".untar" ]:
-            run2([ "touch", os.path.join(fortran2, file) ])
+            run([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
 
         pips_conf_opts = configure_opts
@@ -592,6 +599,7 @@ def main(options = {}, args = []):
         "src/dev/p4a_git", 
         "src/dev/p4a_valgrind", 
         "src/simple_tools/p4a",
+        "src/simple_tools/p4a_process",
         #"src/simple_tools/p4a_setup",
         #"src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
@@ -599,12 +607,12 @@ def main(options = {}, args = []):
         "src/validation/p4a_validation",
         "src/p4a_accel/p4a_post_processor.py"
         ]:
-        run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
+        run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
         #~ debug(os.path.join(root, file) + " -> " + install_dir_bin)
         #~ shutil.copy(os.path.join(root, file), install_dir_bin)
 
     for file in [ "src/dev/p4a_git_lib.bash" ]:
-        run2([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
+        run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
         #~ debug(os.path.join(root, file) + " -> " + install_dir_etc)
         #~ shutil.copy(os.path.join(root, file), install_dir_etc)
 
@@ -614,7 +622,7 @@ def main(options = {}, args = []):
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
         if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
-            run2([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
+            run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
 
     # Copy python dependencies and templates.
     info("Copying python libs")
@@ -631,28 +639,28 @@ def main(options = {}, args = []):
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
-            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
+            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
 
     # Install stuff still lacking from PIPS install.
     info("Installing pips scripts")
     dir = os.path.join(pips_src_dir, "src/Scripts/validation")
     for file in os.listdir(dir):
         if file.startswith("pips"):
-            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
-    run2([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
+    run([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
 
     # Fix validation.
     info("Fixing validation")
     dir = os.path.join(nlpmake_src_dir, "makes")
     for file in os.listdir(dir):
         if file == "arch.sh" or file == "version.sh":
-            run2([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
+            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
 
     # Install various files.
     info("Installing release notes")
-    run2([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
+    run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
     info("Installing examples")
-    run2([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
+    run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
     # Write the environment shell scripts.
     info("Writing shell rc files")
@@ -670,9 +678,9 @@ def main(options = {}, args = []):
     version = guess_file_revision(root) + "~exported"
     version_file = get_version_file_path(dist_dir = install_dir)
     info("Writing version file " + version_file)
-    dump(version_file, version)
+    write_file(version_file, version)
 
-    done("                   ") # Some blanks to erase any spinner tracks ...
+    done("")
     done("All done. Par4All " + version + " is ready and has been installed in " + install_dir)
     done("According to your shell religion, you should source:")
     done("")

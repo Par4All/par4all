@@ -12,7 +12,7 @@ Par4All Builder Class
 import sys, os, re, shutil, time
 from p4a_util import *
 
-actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 def make_safe_intermediate_file_path(input_file, build_dir, change_ext = None):
@@ -207,18 +207,18 @@ class p4a_builder():
             self.cudafy_flags()
 
     def cu2cpp(self, file, output_file):
-        run2([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file ],
+        run([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file ],
             #extra_env = dict(CPP = self.cpp) # Necessary?
         )
 
     def c2o(self, file, output_file):
-        run2([ self.cc, "-c" ] + self.cpp_flags + self.c_flags + [ "-o", output_file, file ])
+        run([ self.cc, "-c" ] + self.cpp_flags + self.c_flags + [ "-o", output_file, file ])
 
     def cpp2o(self, file, output_file):
-        run2([ self.cxx, "-c" ] + self.cpp_flags + self.cxx_flags + [ "-o", output_file, file ])
+        run([ self.cxx, "-c" ] + self.cpp_flags + self.cxx_flags + [ "-o", output_file, file ])
 
     def f2o(self, file, output_file):
-        run2([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
+        run([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
 
@@ -294,7 +294,7 @@ class p4a_builder():
                 final_command = self.cxx
 
             # Create the final binary.
-            run2([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", output_file ] + second_pass_files + extra_obj,
+            run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", output_file ] + second_pass_files + extra_obj,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
 
@@ -454,7 +454,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
                 raise p4a_error("I do not know how to build this file type: " + output_file)
 
         done("Generated " + cmakelists_file)
-        dump(cmakelists_file, cmakelists)
+        write_file(cmakelists_file, cmakelists)
 
     def cmake_gen(self, dir = None, gen_dir = None, cmake_flags = [], build = False):
          # Determine the directory where the CMakeLists.txt file should be found.
@@ -474,12 +474,12 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         if not os.path.isdir(gen_dir):
             os.makedirs(gen_dir)
 
-        run2([ "cmake", "." ] + cmake_flags, working_dir = dir)
+        run([ "cmake", "." ] + cmake_flags, working_dir = dir)
         if build:
             makeflags = []
             if get_verbosity() >= 2:
                 makeflags.append("VERBOSE=1")
-            run2([ "make" ] + makeflags, working_dir = dir)
+            run([ "make" ] + makeflags, working_dir = dir)
 
 
 if __name__ == "__main__":

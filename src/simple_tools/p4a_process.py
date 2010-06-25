@@ -3,15 +3,148 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
-# - Ronan Keryell
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
 
 '''
-Par4All Processing Class
+Par4All processing
 '''
 
 import sys, os, re, shutil
 from p4a_util import *
+
+
+default_properties = dict(
+    # Useless to go on if something goes wrong... :-(
+    ABORT_ON_USER_ERROR = True,
+    # Compute the intraprocedural preconditions at the same
+    # time as transformers and use them to improve the
+    # accuracy of expression and statement transformers:
+    SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+    # Use the more precise fix point operator to cope with
+    # while loops:
+    SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+    # Try to restructure the code for more precision:
+    UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
+    UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+    # Simplify for loops into Fortran do-loops internally for
+    # better precision of analysis:
+    FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+    # Regions are a must! :-) Ask for most precise regions:
+    MUST_REGIONS = True,
+    # Warning: assume that there is no aliasing between IO
+    # streams ('FILE *' variables):
+    ALIASING_ACROSS_IO_STREAMS = False,
+    # Warning: this is a work in progress. Assume no weird
+    # aliasing
+    CONSTANT_PATH_EFFECTS = False,
+    # Prevents automatic addition of OpenMP directives when
+    # unslitting.  We will add them manually using ompify if
+    # requested.
+    PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+)
+
+# Import of pyps will be done manually.
+# Module instance will be held in following variable.
+pyps = None
+
+
+class p4a_processor_output():
+    files = []
+    database_dir = ""
+    exception = None
+
+
+class p4a_processor_input():
+    project_name = ""
+    accel = False
+    cuda = False
+    openmp = False
+    fine = False
+    include_modules = ""
+    exclude_modules = ""
+    cpp_flags = ""
+    files = []
+    recover_includes = True
+    properties = {}
+
+
+def add_module_options(parser):
+
+    group = optparse.OptionGroup(parser, "Processor Options")
+
+    group.add_option("--input-file", metavar = "FILE", default = None, 
+        help = "Input file (as created using the pickle module on a p4a_processor_input instance).")
+
+    group.add_option("--output-file", metavar = "FILE", default = None,
+        help = "Output file (to be created using the pickle module on a p4a_processor_output instance).")
+
+    parser.add_option_group(group)
+
+
+def process(input):
+
+    output = p4a_processor_output()
+
+    try:
+        # Create a workspace with PIPS:
+        processor = p4a_processor(
+            project_name = input.project_name,
+            cpp_flags = input.cpp_flags,
+            verbose = True,
+            files = input.files,
+            filter_include = input.include_modules,
+            filter_exclude = input.exclude_modules,
+            accel = input.accel,
+            cuda = input.cuda,
+            recover_includes = input.recover_includes,
+            properties = input.properties
+        )
+
+        output.database_dir = processor.get_database_directory()
+
+        # First apply some generic parallelization:
+        processor.parallelize(input.fine)
+
+        if input.cuda:
+            processor.gpuify()
+
+        if input.openmp:
+            processor.ompify()
+
+        # Write the output files.
+        output.files = processor.save()
+
+    except:
+        e = sys.exc_info()[1]
+        if e.__class__.__name__ == "RuntimeError" and str(e).find("pips") != -1:
+            output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
+        else:
+            #~ error("Processing of " + ", ".join(input.files) + " failed")
+            output.exception = e
+
+    return output
+
+
+def process_file(input_file, output_file):
+    input = load_pickle(input_file)
+    output = process(input)
+    save_pickle(output_file, output)
+
+
+def main(options, args = []):
+
+    if not options.input_file:
+        die("Missing --input-file")
+
+    if not options.output_file:
+        die("Missing --output-file")
+
+    if not os.path.exists(options.input_file):
+        die("Input file does not exist: " + options.input_file)
+
+    process_file(options.input_file, options.output_file)
+
 
 class p4a_processor():
     """Process program files with PIPS and other tools"""
@@ -35,7 +168,7 @@ class p4a_processor():
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_include = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 recover_includes = True):
+                 recover_includes = True, properties = {}):
 
         self.recover_includes = recover_includes
         self.accel = accel
@@ -93,7 +226,9 @@ class p4a_processor():
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
 
-            pyps = None
+            # Late import of pyps to avoid importing until
+            # we really need it.
+            global pyps
             try:
                 pyps = __import__("pyps")
             except:
@@ -105,34 +240,14 @@ class p4a_processor():
                                             activates = [],
                                             verboseon = verbose,
                                             cppflags = cpp_flags)
-            self.workspace.set_property(
-                # Useless to go on if something goes wrong... :-(
-                ABORT_ON_USER_ERROR = True,
-                # Compute the intraprocedural preconditions at the same
-                # time as transformers and use them to improve the
-                # accuracy of expression and statement transformers:
-                SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
-                # Use the more precise fix point operator to cope with
-                # while loops:
-                SEMANTICS_FIX_POINT_OPERATOR = "derivative",
-                # Try to restructure the code for more precision:
-                UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
-                UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
-                # Simplify for loops into Fortran do-loops internally for
-                # better precision of analysis:
-                FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-                # Regions are a must! :-) Ask for most precise regions:
-                MUST_REGIONS = True,
-                # Warning: assume that there is no aliasing between IO
-                # streams ('FILE *' variables):
-                ALIASING_ACROSS_IO_STREAMS = False,
-                # Warning: this is a work in progress. Assume no weird
-                # aliasing
-                CONSTANT_PATH_EFFECTS = False,
-                # Prevents automatic addition of OpenMP directives when
-                # unslitting.  We will add them manually using ompify if
-                # requested.
-                PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+            
+            global default_properties
+            all_properties = default_properties
+            for k in properties:
+                all_properties[k] = properties[k]
+            for k in all_properties:
+                debug("Property " + k + " = " + str(all_properties[k]))
+            self.workspace.set_property(**all_properties)
 
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
@@ -151,6 +266,10 @@ class p4a_processor():
         self.main_filter = (lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_include_re == None or filter_include_re.match(module.name)))
+
+
+    def get_database_directory(self):
+        return os.path.abspath(self.workspace.directory())
 
 
     def filter_modules(self, filter_include = None, filter_exclude = None, other_filter = lambda x: True):
@@ -244,6 +363,8 @@ class p4a_processor():
             and add at the beginning of main() a line with:
                P4A_init_accel;
             ''')
+
+
     def ompify(self, filter_include = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
@@ -257,14 +378,15 @@ class p4a_processor():
 
         info("Post-processing " + file)
 
-        args = [ 'p4a_post_processor.py' ]
+        post_process_script = os.path.join(get_program_dir(), "p4a_post_processor.py")
 
+        args = [ post_process_script ]
         if dest_dir:
             args += [ '--dest-dir', dest_dir ]
-
         args.append(file)
 
-        subprocess.call(args)
+        run(args)
+        #~ subprocess.call(args)
 
 
     def save(self, in_dir = None, prefix = "", suffix = ".p4a"):
@@ -331,6 +453,7 @@ class p4a_processor():
             output_files.append(output_file)
 
         return output_files
+
 
     def __del__(self):
         # Waiting for pyps.workspace.close!

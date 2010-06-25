@@ -9,7 +9,8 @@
 Par4All common option parsing
 '''
 
-import string, sys, optparse
+import string, sys, optparse, smtplib
+from email.mime.text import MIMEText
 from p4a_util import *
 from p4a_version import *
 
@@ -22,7 +23,7 @@ def add_common_options(parser):
     group = optparse.OptionGroup(parser, "General Options")
 
     group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-        help = "Run in verbose mode (you can have several -v, such as -vvv which will display the most debugging information).")
+        help = "Run in verbose mode: -v will display more information, -vv will display most information.")
 
     group.add_option("--log", action = "store_true", default = False,
         help = "Enable logging in current directory.")
@@ -44,10 +45,6 @@ def add_common_options(parser):
 
 def process_common_options(options, args):
 
-    global static_options, static_args
-    static_options = options
-    static_args = args
-
     if options.no_color:
         p4a_term.disabled = True
 
@@ -56,16 +53,19 @@ def process_common_options(options, args):
     if options.script_version:
         main_script = os.path.abspath(sys.argv[0])
         version = guess_file_revision(main_script)
-        info("Version of " + main_script + ":")
-        print(version)
+        sys.__stdout__.write(version + "\n")
         return False
 
     if options.log and not options.report:
-        setup_logging()
+        setup_logging(suffix = "_" + utc_datetime(), remove = True)
     elif options.report:
-        report = False
+        options.log = True
         setup_logging(suffix = "_report_" + utc_datetime(), remove = True)
         warn("--report enabled, will send an anonymous email with the program output in case of error")
+
+    global static_options, static_args
+    static_options = options
+    static_args = args
 
     return True
 
@@ -76,10 +76,11 @@ def report_enabled():
 
 
 def send_report_email(recipient = "par4all@hpc-project.com"):
-    
+    #~ if True:
+    msg_string = ""
     try:
         global static_options, static_args
-        
+
         current_log_file = get_current_log_file()
         if not current_log_file or not os.path.exists(current_log_file):
             raise p4a_error("Current log file is invalid")
@@ -107,7 +108,7 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         args = ""
         if static_args:
             for a in static_args:
-                args += a + ": " + static_args[a] + "\n"
+                args += a + "\n"
         else:
             args = "[]"
         env = ""
@@ -117,22 +118,48 @@ def send_report_email(recipient = "par4all@hpc-project.com"):
         msg = MIMEText("This is an automated report email for the following command which failed:\n\n" + " ".join(sys.argv)
             + "\n\nTranslated options:\n\n" + repr(static_options)
             + "\n\nTranslated arguments:\n\n" + args
-            + "\n\nIs root? " + is_root
+            + "\nIs root? " + is_root
             + "\n\nEnvironment:\n\n" + env
-            + "\n\nThe full log for this session follow:\n\n" + slurp(current_log_file))
+            + "\nThe full log for this session follow:\n\n" + read_file(current_log_file))
         msg['Subject'] = "[" + get_program_name() + "] Anonymous failure report"
         msg['From'] = "anonymous@par4all.org"
         msg['To'] = recipient
 
+        msg_string = msg.as_string()
+
         s = smtplib.SMTP(server)
-        s.sendmail(msg['From'], [ msg['To'] ], msg.as_string())
+        s.sendmail(msg['From'], [ msg['To'] ], msg_string)
         s.quit()
 
     except:
-        warn("Sending the email failed -- Try sending " + current_log_file + " manually to " + recipient, log = False)
+        (t, e, tb) = sys.exc_info()
+        warn("Sending the email failed: " + e.__class__.__name__ + ": " + str(e))
+        debug("".join(traceback.format_exception(t, e, tb)), level = 3)
+        if msg_string:
+            debug("Email was: " + msg_string, level = 3)
+        suggest("Try sending " + current_log_file + " manually to " + recipient)
 
     else:
-        done("Report email sent to " + recipient, log = False)
+        done("Report email sent to " + recipient + ", thank you for your feedback", log = False)
+
+
+def send_report_email_if_enabled():
+    if report_enabled():
+        send_report_email()
+    else:
+        suggest("You may report this error to the Par4All team by running again using --report")
+
+
+def suggest_more_verbosity():
+    global static_options
+    if get_verbosity() < 2:
+        v = "v" * (get_verbosity() + 1)
+        suggest("To get a more verbose output, pass -" + v)
+        if not static_options.log:
+            suggest("Alternatively, you can pass --log to log -vv output to a file")
+    current_log_file = get_current_log_file()
+    if static_options.log and current_log_file and os.path.exists(current_log_file):
+        warn("Log file was " + current_log_file)
 
 
 if __name__ == "__main__":

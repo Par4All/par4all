@@ -13,7 +13,7 @@ import sys, os, string
 from p4a_util import *
 
 
-actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 
@@ -73,7 +73,7 @@ class p4a_git():
         path = path[len(self._dir) + 1:]
         return path
 
-    def cmd(self, git_command, can_fail = True):
+    def cmd(self, git_command, can_fail = True, silent = True):
         '''Runs a git command with correct environment and path settings.'''
         old_git_dir = ""
         if "GIT_DIR" in os.environ:
@@ -83,17 +83,21 @@ class p4a_git():
             old_work_tree = os.environ["GIT_WORK_TREE"]
         os.environ["GIT_DIR"] = self._git_dir
         os.environ["GIT_WORK_TREE"] = self._dir
-        output = run2([ "git" ] + git_command, can_fail = can_fail, working_dir = self._dir, capture = True)[0].strip()
+        output = run([ "git" ] + git_command, can_fail = can_fail, 
+            working_dir = self._dir, silent = silent)[0].strip()
         os.environ["GIT_DIR"] = old_git_dir
         os.environ["GIT_WORK_TREE"] = old_work_tree
         return output
 
     def current_branch(self):
+        br = None
         output = self.cmd([ "branch" ])
         for b in output.split("\n"):
             if b.startswith("* "):
-                return b.replace("* ", "")
-        return None
+                br = b.replace("* ", "")
+                break
+        debug("current_branch() = " + br)
+        return br
 
     def is_dirty(self, file = None):
         '''Returns True if the file in the repository has been altered since last revision.
@@ -106,7 +110,7 @@ class p4a_git():
         result = False
         if re.search("Changes to be committed:", output) or re.search("Changed but not updated:", output):
             result = True
-        #debug("is_dirty("+ file +") = " + str(result))
+        debug("is_dirty("+ repr(file) +") = " + str(result))
         return result
 
     def current_revision(self, file = None, test_dirty = True):
@@ -122,12 +126,13 @@ class p4a_git():
             short_rev = output.split(" ")[0]
             if test_dirty and self.is_dirty(file):
                 short_rev += "~dirty"
-        #debug("current_revision("+ file +") = " + short_rev)
+        debug("current_revision("+ repr(file) +") = " + short_rev)
         return short_rev
 
     def archive(self, output_file, prefix, format = "tar"):
         self.cmd([ "archive", "--format", format, "-o", output_file, 
-            "--prefix", prefix, self.current_revision(test_dirty = False) ])
+            "--prefix", prefix, self.current_revision(test_dirty = False) ], 
+            silent = False)
 
     def git_dir(self):
         '''Returns the absolute path for the .git directory.'''

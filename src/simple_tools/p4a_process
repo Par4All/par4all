@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Authors:
+# - Grégoire Péan <gregoire.pean@hpc-project.com>
+#
+
+'''
+Par4All intermediate processing script.
+Do not use this script directly unless you know what you are doing.
+'''
+
+import string, sys, os, re, optparse, traceback
+from p4a_util import *
+
+import p4a_process
+
+
+def main():
+    '''The function called when this program is executed by its own'''
+
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]")
+
+    p4a_process.add_module_options(parser)
+
+    #~ add_common_options(parser)
+
+    (options, args) = parser.parse_args()
+
+    # Display everything. The parent process will filter out the output.
+    # PIPS shall be verbose too.
+    set_verbosity(2)
+
+    #~ if process_common_options(options, args):
+    p4a_process.main(options, args)
+
+
+if __name__ == "__main__":
+    #~ try:
+    main()
+    #~ except p4a_error:
+        #~ (t, e, tb) = sys.exc_info()
+        #~ error(str(e))
+        #~ debug("".join(traceback.format_exception(t, e, tb)))
+        #~ if e.code == -2:
+            #~ error("Interrupted")
+        #~ else:
+            #~ error("To get verbose output, try passing -v, -vv, or -vvv", log = False)
+            #~ if report_enabled():
+                #~ send_report_email()
+        #~ sys.exit(e.code)
+    #~ except EnvironmentError: # IOError, OSError.
+        #~ (t, e, tb) = sys.exc_info()
+        #~ error(str(e))
+        #~ debug("".join(traceback.format_exception(t, e, tb)))
+        #~ if report_enabled():
+                #~ send_report_email()
+        #~ sys.exit(e.errno)
+    #~ except KeyboardInterrupt:
+        #~ error("Interrupted")
+    #~ except SystemExit:
+        #~ raise
+    #~ except:
+        #~ (t, e, tb) = sys.exc_info()
+        #~ error("Unhandled " + e.__class__.__name__ + ": " + str(e))
+        #~ error("".join(traceback.format_exception(t, e, tb)))
+        #~ if report_enabled():
+            #~ send_report_email()
+        #~ else:
+            #~ error("You may report this error to Par4All support by running again using --report", log = False)
+        #~ sys.exit(255)
+    #~ finally:
+
+
+# Some Emacs stuff:
+### Local Variables:
+### mode: python
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### tab-width: 4
+### End:

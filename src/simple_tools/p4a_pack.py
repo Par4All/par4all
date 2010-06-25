@@ -39,7 +39,7 @@ default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/dists/nightl
 debian_dir = os.path.join(script_dir, "DEBIAN")
 
 # Some useful variables:
-actual_script = change_file_ext(os.path.abspath(os.path.expanduser(__file__)), ".py", if_ext = ".pyc")
+actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 # Put temp directories in this array to make sure no temp dir remains after script exits.
@@ -113,12 +113,12 @@ def create_dist(pack_dir, install_prefix, revision):
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
     #~ shutil.copytree(pack_dir, temp_dir_with_prefix)
-    run2([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
+    run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
     # XXX: gfortran or not??
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
         dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
-    dump(get_version_file_path(temp_dir_with_prefix), revision)
+    write_file(get_version_file_path(temp_dir_with_prefix), revision)
     return [ temp_dir, temp_dir_with_prefix ]
 
 
@@ -151,7 +151,7 @@ def create_deb(pack_dir, install_prefix, revision, keep_temp = False, arch = Non
     if os.path.exists(package_file):
         warn("Removing existing " + package_file)
         os.remove(package_file)
-    run2([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
+    run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     else:
@@ -225,7 +225,7 @@ def create_tgz(pack_dir, install_prefix, revision, keep_temp = False, arch = Non
     tar_dir = os.path.split(new_temp_dir_with_prefix)[0] # one level up
     tar_cmd = " ".join([ "tar", "czvf", package_file_name, "-C", tar_dir, "." ])
     sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
-    run2([ "fakeroot", "sh", "-c", sh_cmd])
+    run([ "fakeroot", "sh", "-c", sh_cmd])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     else:
@@ -260,19 +260,19 @@ def create_stgz(pack_dir, install_prefix, revision, keep_temp = False, arch = No
     os.chdir(temp_dir)
     os.makedirs(os.path.join(temp_dir, prefix))
     relative_version_file = os.path.join(prefix, "VERSION")
-    dump(relative_version_file, revision)
+    write_file(relative_version_file, revision)
     tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
     sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
-    run2([ "fakeroot", "sh", "-c", sh_cmd])
+    run([ "fakeroot", "sh", "-c", sh_cmd])
     os.chdir(prev_cwd)
     rmtree(temp_dir)
-    run2([ "gzip", "-9", package_file_tar ])
+    run([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
         done("Created " + package_file_name)
     return package_file
 
 
-def main(options = {}, args = []):
+def main(options, args = []):
 
     if len(args):
         if not options.publish:
@@ -396,7 +396,7 @@ def main(options = {}, args = []):
                 if os.path.exists(dest_file):
                     warn("Removing existing " + dest_file)
                     os.remove(dest_file)
-                run2([ "mv", "-v", file, dest_file ])
+                run([ "mv", "-v", file, dest_file ])
     except:
         for dir in temp_dirs:
             if os.path.isdir(dir):
