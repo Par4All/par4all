@@ -35,11 +35,12 @@
 #include <unistd.h>
 
 #include "genC.h"
+#include "linear.h"
+#include "ri.h"
 #include "misc.h"
-
-extern void checkpoint_workspace(void); /* in pipsmake */
-extern void interrupt_pipsmake_asap(void); /* in pipsdbm */
-extern void user_log(char *, ...); /* in misc */
+#include "pipsdbm.h"
+#include "pipsmake.h"
+#include "top-level.h"
 
 static void pips_signal_handler(int num)
 {
@@ -76,8 +77,6 @@ static void pips_signal_handler(int num)
     (void) signal(num, pips_signal_handler);
 }
 
-extern void set_pips_timeout_from_env(void);
-
 void initialize_signal_catcher(void)
 {
     // misc signals
@@ -110,7 +109,7 @@ static void pips_timeout_handler(int __attribute__ ((__unused__)) sig)
  */
 void set_pips_timeout(unsigned int delay)
 {
-  pips_user_warning("setting pips timeout to %d\n", delay);
+  // pips_user_warning("setting pips timeout to %d\n", delay);
   if (delay>0) {
     pips_timeout_delay = delay;
     struct sigaction act;
@@ -137,7 +136,7 @@ void set_pips_timeout_from_env(void)
  */
 void reset_pips_timeout(void)
 {
-  pips_user_warning("resetting pips timeout\n");
+  // pips_user_warning("resetting pips timeout\n");
   // cleanup alarm
   pips_timeout_delay = 0;
   struct sigaction act;

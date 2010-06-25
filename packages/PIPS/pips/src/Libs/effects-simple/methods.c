@@ -114,6 +114,8 @@ set_methods_for_proper_references()
     effects_precondition_composition_op =
 	effects_composition_with_preconditions_nop;
 
+    eval_cell_with_points_to_func = eval_cell_with_points_to;
+
     effects_descriptors_variable_change_func =
 	effects_undefined_descriptors_variable_change;
     loop_descriptor_make_func = loop_undefined_descriptor_make;
@@ -184,6 +186,9 @@ set_methods_for_cumulated_references()
 	effects_undefined_composition_with_transformer;
     effects_precondition_composition_op =
 	effects_composition_with_preconditions_nop;
+
+    eval_cell_with_points_to_func = eval_cell_with_points_to;
+
 
     effects_descriptors_variable_change_func =
 	effects_undefined_descriptors_variable_change;
@@ -271,6 +276,8 @@ set_methods_for_proper_simple_pointer_effects()
     effects_precondition_composition_op =
 	effects_composition_with_preconditions_nop;
 
+    eval_cell_with_points_to_func = eval_cell_with_points_to;
+
     effects_descriptors_variable_change_func =
 	effects_undefined_descriptors_variable_change;
     loop_descriptor_make_func = loop_undefined_descriptor_make;
@@ -352,6 +359,8 @@ set_methods_for_simple_effects()
 	effects_composition_with_transformer_nop;
     effects_precondition_composition_op =
 	effects_composition_with_preconditions_nop;
+
+    eval_cell_with_points_to_func = eval_cell_with_points_to;
 
     effects_descriptors_variable_change_func =
 	effects_descriptors_variable_change_nop;
@@ -448,6 +457,8 @@ set_methods_for_simple_pointer_effects()
 	effects_composition_with_transformer_nop;
     effects_precondition_composition_op =
 	effects_composition_with_preconditions_nop;
+
+    eval_cell_with_points_to_func = eval_cell_with_points_to;
 
     effects_descriptors_variable_change_func =
 	effects_descriptors_variable_change_nop;

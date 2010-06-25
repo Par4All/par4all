@@ -341,9 +341,10 @@ do_it(
     }
 
     debug_off();
+    clean_up_sequences(mod_parallel_stat);
 
     /* FI: This may be parallel or sequential code */
-    DB_PUT_MEMORY_RESOURCE(what, mod_name, (char*) mod_parallel_stat);
+    DB_PUT_MEMORY_RESOURCE(what, mod_name,  mod_parallel_stat);
 
     print_parallelization_statistics(mod_name, "post", mod_parallel_stat);
 

@@ -72,7 +72,6 @@ typedef void * vertex_label;
 #include "pipsdbm.h"
 #include "resources.h"
 #include "paf-util.h"
-#include "preprocessor.h"
 #include "static_controlize.h"
 
 /* Global Variables	*/

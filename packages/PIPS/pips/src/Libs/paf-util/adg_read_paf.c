@@ -154,16 +154,6 @@ list loop_list;
  */
 static hash_table STS;
 
-#if defined(HAS_ADGYY)
-
-/* The file read in by the scanner */
-extern FILE *adgyyin;
-
-/* The parsing function created by Yacc */
-extern int adgyyparse();
-
-#endif
-
 
 /* Internal variables 	*/
 static vertex crt_node;		/* Current source node */

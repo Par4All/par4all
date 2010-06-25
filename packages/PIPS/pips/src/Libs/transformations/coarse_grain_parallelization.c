@@ -47,11 +47,9 @@
 #include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "control.h"
 #include "constants.h"
 #include "misc.h"
 #include "parser_private.h"
-#include "syntax.h"
 #include "top-level.h"
 #include "text-util.h"
 #include "text.h"
@@ -63,7 +61,6 @@
 #include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "prettyprint.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"

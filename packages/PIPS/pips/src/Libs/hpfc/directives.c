@@ -33,7 +33,6 @@
 
 #include "defines-local.h"
 
-#include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
 

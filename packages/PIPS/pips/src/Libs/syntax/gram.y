@@ -176,9 +176,6 @@
 
 #include "syntax.h"
 
-extern int yylex(void);
-extern void yyerror(char *);
-
 #define YYERROR_VERBOSE 1 /* much clearer error messages with bison */
 
     /* local variables */
@@ -581,7 +578,7 @@ do_plage: TK_EQUALS expression TK_COMMA expression
 	    { 
 	      if(expression_implied_do_p($2) || expression_implied_do_p($4))
 		  ParserError("Syntax", "Unexpected implied DO\n");
-	      $$ = make_range($2, $4, MakeIntegerConstantExpression("1"));
+	      $$ = make_range($2, $4, int_to_expression(1));
 	    }
 	| TK_EQUALS expression TK_COMMA expression TK_COMMA expression
 	    {
@@ -818,11 +815,11 @@ ldim_tableau: dim_tableau
 
 dim_tableau: expression
 	    {
-		    $$ = make_dimension(MakeIntegerConstantExpression("1"),$1);
+		    $$ = make_dimension(int_to_expression(1),$1);
 	    }
 	| TK_STAR
 	    {
-		$$ = make_dimension(MakeIntegerConstantExpression("1"),
+		$$ = make_dimension(int_to_expression(1),
 		  MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)));
 	    }
 	| expression TK_COLON TK_STAR
@@ -1491,29 +1488,29 @@ unsigned_const_simple: TK_TRUE
 	| TK_SCON
 	    {
 		    $$ = MakeConstant($1, is_basic_string);
-		    free($1);		    
+		    free($1);
 	    }
-        | TK_RCON 
+        | TK_RCON
 	    {
 		    $$ = MakeConstant($1, is_basic_float);
 		    free($1);
 	    }
 	;
 
-icon: TK_ICON 
+icon: TK_ICON
 	    {
 		    $$ = MakeConstant($1, is_basic_int);
 		    free($1);
 	    }
 	;
 
-label: TK_ICON 
+label: TK_ICON
 	    {
 		    $$ = $1;
 	    }
 	;
 
-ival: TK_ICON 
+ival: TK_ICON
 	    {
 		    $$ = atoi($1);
 		    free($1);

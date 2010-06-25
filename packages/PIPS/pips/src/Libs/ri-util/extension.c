@@ -29,14 +29,11 @@
 
 #include "linear.h"
 #include "genC.h"
-#include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
 #include "outlining_private.h"
 #include "step_private.h"
-#include "step.h"
-#include "properties.h"
 
 /*****************************************************A CONSTRUCTOR LIKE PART
  */

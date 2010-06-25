@@ -58,6 +58,7 @@
 #include "prettyprint.h"
 #include "preprocessor.h"
 
+#include "effects-convex.h"
 #include "effects-generic.h"
 
 /***************************************************** ACTION INTERPRETATION */
@@ -410,73 +411,6 @@ print_source_or_code_effects_engine(
 
 
 
-/********************************************************************* MISC */
-/* Now that addressing is alwys indexed, these functions should be removed */
-/* kept for backward compatibility */
-
-/* made from words_reference
- * this function can print entity_name instead of entity_local_name,
- * when the entity is not called in the current program.
- */
-list /* of string */ effect_words_reference(reference obj)
-{
-  list pc = NIL;
-  string begin_attachment;
-  entity e = reference_variable(obj);
-
-  if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")
-      && entity_in_common_p(e)) {
-    pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
-  } else
-    pc = CHAIN_SWORD(pc, entity_minimal_name(e));
-
-  begin_attachment = STRING(CAR(pc));
-
-  if (reference_indices(obj) != NIL) {
-    string beg = string_undefined;
-    string mid = string_undefined;
-    string end = string_undefined;
-
-    switch(get_prettyprint_language_tag()) {
-      case is_language_fortran95:
-      case is_language_fortran:
-        beg = "(";
-        mid = ",";
-        end = ")";
-        break;
-      case is_language_c:
-        beg = "[";
-        mid = "][";
-        end = "]";
-        break;
-      default:
-        pips_internal_error("Language unknown !");
-        break;
-    }
-
-    pc = CHAIN_SWORD(pc,beg);
-    for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
-      {
-	expression ind_exp = EXPRESSION(CAR(pi));
-	syntax s = expression_syntax(ind_exp);
-	if (syntax_reference_p(s) && 
-	    entity_field_p(reference_variable(syntax_reference(s))))
-	  {
-	    // add a '.' to disambiguate field names from variable names 
-	    pc = CHAIN_SWORD(pc, ".");
-	  }
-	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
-	if (CDR(pi) != NIL)
-	  pc = CHAIN_SWORD(pc,mid);
-      }
-    pc = CHAIN_SWORD(pc,end);
-  }
-
-  attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				obj);
-  return(pc);
-}
-
 
 /************************************************************ INTERFACES */
 
@@ -538,7 +472,6 @@ void
 generic_print_effects( list pc)
 {
   /* Well that should not be done this way BC. */ 
-  extern bool region_consistent_p(effect);  
   if(effect_consistent_p_func == region_consistent_p &&
      effects_reference_sharing_p(pc, FALSE)) {
       pips_internal_error("A list of regions share some references");

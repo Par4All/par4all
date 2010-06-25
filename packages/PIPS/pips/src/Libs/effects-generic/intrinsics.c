@@ -57,11 +57,10 @@
 
 #include "transformer.h"
 #include "semantics.h"
-#include "pipsdbm.h"
 #include "resources.h"
 
 #include "effects-generic.h"
-#include "effects-simple.h"
+//#include "effects-simple.h"
 
 
 /********************************************************* LOCAL FUNCTIONS */
@@ -1007,12 +1006,8 @@ conditional_effects(entity e __attribute__ ((__unused__)),list args)
 
   le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
 
-  ifdebug(8) {
-    pips_debug(8, "Effects for the two branches:\n");
-    print_effects(le);
-    (void) fprintf(stderr, "\n");
-  }
-
+  pips_debug_effects(8, "Effects for the two branches:\n", le);
+    
   le = (*effects_union_op)(le, lc, effects_same_action_p);
 
   pips_debug(5, "end\n");
@@ -1662,16 +1657,17 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
-    else { /* C language */
+    else { 
+      pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose\n");
+      /* C language */
       /* FI: we lack information about the number of elements written */
       /* This is not generic! */
       entity ioptr = make_dummy_io_ptr();
       reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
       effect eff = (*reference_to_effect_func)(r, is_action_write,false);
       effect_approximation_tag(eff) = is_approximation_may;
-      /* FI: this is really not generic! */
-      extern list c_summary_effect_to_proper_effects(effect, expression);
-      le = c_summary_effect_to_proper_effects(eff, exp);
+      /* FI: this is really not generic! removed because should be useless BC. */
+      // le = c_summary_effect_to_proper_effects(eff, exp);
       /* FI: We also need the read effects implied by the evaluation
 	 of exp... but I do not know any function available to do
 	 that. generic_proper_effects_of_expression() is ging to

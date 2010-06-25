@@ -133,7 +133,7 @@ const char* global_name_to_user_name(const char* global_name)
 }
 
 /* Does not take care of block scopes and returns a pointer */
-string local_name(string s)
+string local_name(const char * s)
 {
     pips_assert("some separator", strchr(s, MODULE_SEP) != NULL);
     return strchr(s, MODULE_SEP)+1;
@@ -210,7 +210,7 @@ entity find_label_entity(const char* module_name, const char* label_local_name)
  * should stack allocate a buffer of size strlen(s), but we would end
  * up returning a pointer to a popped area of the stack...
  */
-string module_name(string s)
+string module_name(const char * s)
 {
   /* FI: shouldnt'we allocate dynamically "local" since its size is
      smaller than the size of "s"? */

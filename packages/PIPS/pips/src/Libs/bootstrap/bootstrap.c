@@ -142,12 +142,12 @@ static void CreateLogicalUnits()
           MakeTypeArray(make_basic_int(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
                         CONS(DIMENSION,
                              make_dimension
-                             (MakeIntegerConstantExpression("0"),
+                             (int_to_expression(0),
                                 /*
                                   MakeNullaryCall
                                   (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
                                 */
-                              MakeIntegerConstantExpression("2000")
+                              int_to_expression(2000)
                               ),
                              NIL)),
               /* make_storage(is_storage_ram,
@@ -166,12 +166,12 @@ static void CreateLogicalUnits()
         MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
                       CONS(DIMENSION,
                            make_dimension
-                           (MakeIntegerConstantExpression("0"),
+                           (int_to_expression(0),
                             /*
                               MakeNullaryCall
                               (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
                             */
-                            MakeIntegerConstantExpression("2000")
+                            int_to_expression(2000)
                             ),
                            NIL)),
               /* make_storage(is_storage_ram,
@@ -190,12 +190,12 @@ static void CreateLogicalUnits()
 		     MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 				   CONS(DIMENSION,
 					make_dimension
-					(MakeIntegerConstantExpression("0"),
+					(int_to_expression(0),
 					 /*
 					   MakeNullaryCall
 					   (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
 					 */
-					 MakeIntegerConstantExpression("2000")
+					 int_to_expression(2000)
 					 ),
 					NIL)),
 		     /* make_storage(is_storage_ram,

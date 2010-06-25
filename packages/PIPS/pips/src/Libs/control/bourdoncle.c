@@ -86,10 +86,9 @@
 #include "ri-util.h"
 #include "control.h"
 #include "properties.h"
+#include "pipsdbm.h"
 
 #include "misc.h"
-
-/* #include "constants.h" */
 
 
 /* Data structures for Bourdoncle's heuristics:
@@ -430,8 +429,6 @@ static void set_davinci_count()
 
 static void davinci_print_control_nodes(list l, string msg)
 {
-  extern string itoa(int);
-  extern string db_get_current_workspace_directory(void);
   string dn = db_get_current_workspace_directory();
   FILE * f = safe_fopen(concatenate(dn, "/",
 				    get_current_module_name(), "/", 
@@ -472,8 +469,6 @@ static void davinci_print_control_nodes(list l, string msg)
 static void davinci_print_non_deterministic_unstructured
 (unstructured u, string msg, hash_table scc_map, hash_table ancestor_map)
 {
-  extern string itoa(int);
-  extern string db_get_current_workspace_directory(void);
   string dn = db_get_current_workspace_directory();
   FILE * f = safe_fopen(concatenate(dn, "/",
 				    get_current_module_name(), "/", 
@@ -1802,8 +1797,6 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
  * This is not part of Bourdoncle's algorithm.
  *
  */
-extern unstructured ancestor_cycle_head_to_scc(control, hash_table);
-
 static void replicate_cycles(unstructured u_main, hash_table scc_map, hash_table ancestor_map)
 {
   list scc_to_process = CONS(UNSTRUCTURED, u_main, NIL);

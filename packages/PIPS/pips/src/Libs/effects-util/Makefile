@@ -21,7 +21,13 @@
 
 TARGET	= effects-util
 
-LIB_CFILES =	effects.c 
+LIB_CFILES = effects.c \
+       anywhere_abstract_locations.c \
+       abstract_location.c \
+       points_to.c \
+       prettyprint.c \
+       type.c \
+       conflicts.c
 
 INC_TARGET =	$(TARGET).h
 

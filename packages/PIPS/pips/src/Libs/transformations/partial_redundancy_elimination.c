@@ -48,9 +48,7 @@
 #include "pipsdbm.h"
 #include "misc.h"
 #include "expressions.h"
-#include "transformer.h"
 #include "alias_private.h"
-#include "instrumentation.h"
 #include "semantics.h" /* for module_to_value_mappings() */
 #include "transformations.h"
 

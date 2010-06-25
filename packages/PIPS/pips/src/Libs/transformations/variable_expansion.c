@@ -167,7 +167,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
     }
     else
         init=copy_expression(range_lower(r));
-    dimension d = make_dimension(make_expression_0(), make_op_exp("-",range_to_expression(r,range_to_nbiter),make_expression_1()));
+    dimension d = make_dimension(int_to_expression(0), make_op_exp("-",range_to_expression(r,range_to_nbiter),int_to_expression(1)));
     expression ie = entity_to_expression(i);
     expression ir = make_op_exp(
                 "-",
@@ -377,7 +377,7 @@ bool reduction_variable_expansion(char *module_name) {
             /* convert the loop range to an expression */
             loop theloop = statement_loop(theloopstatement);
             expression loop_nbiters = range_to_expression(loop_range(theloop),range_to_nbiter);
-            dimension thedim = make_dimension(make_expression_0(),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,make_expression_1()));
+            dimension thedim = make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,int_to_expression(1)));
 
             /* used to keep track of reference <> expanded reference */
             hash_table new_entities = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
@@ -428,9 +428,9 @@ bool reduction_variable_expansion(char *module_name) {
                 instruction do_the_assignment = make_instruction_loop(
                         make_loop(
                             loop_index(theloop),
-                            make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),make_expression_1()),
+                            make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),int_to_expression(1)),
                             make_assign_statement(
-                                reference_to_expression(make_reference(new_entity,make_expression_list(make_expression_from_entity(loop_index(theloop))))),
+                                reference_to_expression(make_reference(new_entity,make_expression_list(entity_to_expression(loop_index(theloop))))),
                                 entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
                             entity_empty_label(),
                             make_execution_sequential(),

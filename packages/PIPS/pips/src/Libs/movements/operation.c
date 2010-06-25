@@ -37,7 +37,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
-#include "misc.h"
 
 expression
 make_div_expression(expression ex1,  cons * ex2)

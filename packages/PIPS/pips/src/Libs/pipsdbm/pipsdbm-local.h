@@ -21,6 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "linear.h"
 #include "resources.h"
 
 #define PIPSDBM_DEBUG_LEVEL "PIPSDBM_DEBUG_LEVEL"
@@ -31,6 +32,10 @@
 #define WORKSPACE_SRC_SPACE 		"Src"
 #define WORKSPACE_PROGRAM_SPACE 	"Program"
 #define WORKSPACE_METADATA_SPACE	"Metadata"
+
+/* symbols exported by parser / lexer */
+extern FILE *genread_in;
+extern int genread_input();
 
 /* conform to old interface.
  */

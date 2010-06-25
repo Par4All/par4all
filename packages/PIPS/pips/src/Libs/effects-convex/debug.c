@@ -42,10 +42,7 @@
 #include "text-util.h"
 #include "text.h"
 
-#include "properties.h"
 
-#include "transformer.h"
-#include "semantics.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"

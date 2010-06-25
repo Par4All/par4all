@@ -67,9 +67,8 @@
 #include "resources.h"
 #include "misc.h"
 #include "control.h"
-#include "properties.h"
-#include "semantics.h"
 #include "transformer.h"
+#include "properties.h"
 #include "pipsmake.h"
 #include "instrumentation.h"
 #include "abc_private.h"
@@ -77,7 +76,6 @@
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "conversion.h"
-#include "transformations.h"
 
 /* The following data structure is the context of top_down_abc:
    The read_marked_list marks if one bound of one array's dimension
@@ -265,7 +263,7 @@ static Psysteme my_system_remove_variables(Psysteme ps)
       for(; !VECTEUR_NUL_P(b);b = b->succ)
 	{
 	  entity e = (entity) vecteur_var(b);
-	  if (strstr(entity_name(e),OLD_VALUE_SUFFIX) != NULL)
+	  if (old_value_entity_p(e))
 	    vect_add_elem(&pv_var, (Variable) e, VALUE_ONE);
 	}
       ps = my_system_projection_along_variables(ps, pv_var);

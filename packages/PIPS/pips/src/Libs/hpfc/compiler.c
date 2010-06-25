@@ -42,8 +42,6 @@
 
 #include "defines-local.h"
 
-#include "control.h"     /* for CONTROL_MAP() */
-
 /* global variables
  */
 entity host_module, node_module;

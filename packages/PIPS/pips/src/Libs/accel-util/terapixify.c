@@ -42,18 +42,13 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-#include "conversion.h"
 #include "control.h"
-#include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "preprocessor.h"
 #include "text-util.h"
 #include "transformations.h"
 #include "parser_private.h"
-#include "semantics.h"
-#include "transformer.h"
 #include "accel-util.h"
 
 
@@ -267,14 +262,14 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
 
             /* patch loop */
             free_expression(range_lower(loop_range(l)));
-            range_lower(loop_range(l))=make_expression_1();
+            range_lower(loop_range(l))=int_to_expression(1);
             free_expression(range_upper(loop_range(l)));
             range_upper(loop_range(l))=entity_to_expression(loop_bound);
 
             /* convert the loop to a while loop */
             list statements = make_statement_list(
                     copy_statement(loop_body(l)),
-                    make_assign_statement(entity_to_expression(loop_index(l)),make_op_exp(PLUS_OPERATOR_NAME,entity_to_expression(loop_index(l)),make_expression_1()))
+                    make_assign_statement(entity_to_expression(loop_index(l)),make_op_exp(PLUS_OPERATOR_NAME,entity_to_expression(loop_index(l)),int_to_expression(1)))
             );
             whileloop wl = make_whileloop(
                     MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),entity_to_expression(loop_index(l)),entity_to_expression(loop_bound)),
@@ -283,7 +278,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
                     make_evaluation_before());
             sequence seq = make_sequence(
                     make_statement_list(
-                        make_assign_statement(entity_to_expression(loop_index(l)),make_expression_1()),
+                        make_assign_statement(entity_to_expression(loop_index(l)),int_to_expression(1)),
                         instruction_to_statement(make_instruction_whileloop(wl))
                         )
                     );

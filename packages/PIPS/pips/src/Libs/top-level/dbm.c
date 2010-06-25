@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "misc.h"
+#include "bootstrap.h"
 
 #include "preprocessor.h"
 
@@ -196,7 +197,6 @@ bool create_workspace(gen_array_t files)
 
     if( fortran_90_p ) {
       // Load entities (fortran95 need it)
-      extern bool bootstrap(string workspace);
       bootstrap( NULL );
     }
 

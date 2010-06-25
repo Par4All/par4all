@@ -41,7 +41,6 @@
 
 #include "text-util.h"
 #include "properties.h"
-#include "prettyprint.h"
 
 #include "dg.h"
 #include "transformer.h"
@@ -413,7 +412,7 @@ static void distribute_code (string function_name,
   
   call_params = NIL;
   MAP (REFERENCE, ref, {
-    call_params = CONS(EXPRESSION, make_expression_from_entity(reference_variable(ref)), call_params);
+    call_params = CONS(EXPRESSION, entity_to_expression(reference_variable(ref)), call_params);
   }, references_for_regions(l_params));
   
   // Insert an analyzed tag 

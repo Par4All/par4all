@@ -38,14 +38,9 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 #include "misc.h"
-#include "control.h"
-#include "properties.h"
-#include "semantics.h"
 #include "alias_private.h"
-#include "instrumentation.h"
 #include "transformations.h"
 
 static int number_of_pointer_type_and_formal_arrays = 0;

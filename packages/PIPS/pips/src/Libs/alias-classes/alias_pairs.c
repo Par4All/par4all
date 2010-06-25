@@ -53,8 +53,12 @@
 #include "resources.h"
 
 #include "vecteur.h"
-/* #include "ricedg.h" */
-extern Psysteme sc_restricted_to_variables_transitive_closure(Psysteme /*sc*/, Pbase /*variables*/);
+/* Instantiation of the dependence graph: */
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+#include "ricedg.h"
 
 #define BACKWARD TRUE
 #define FORWARD FALSE

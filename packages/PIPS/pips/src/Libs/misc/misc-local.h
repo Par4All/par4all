@@ -70,18 +70,14 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define pips_assert(what, predicate)					\
   do {									\
     if(!(predicate)) {							\
-      (void) fprintf(stderr,						\
-		     "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
-		     __FUNCTION__ , __FILE__ , __LINE__ , what);	\
+      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
       abort();								\
     }									\
   } while(0)
 #define pips_user_assert(what, predicate)				\
   do {									\
     if(!(predicate)) {							\
-      (void) fprintf(stderr,						\
-		     "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
-		     __FUNCTION__ , __FILE__ , __LINE__ , what);	\
+      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
       pips_user_error("this is a USER ERROR, I guess\n");		\
     };									\
   } while(0)
@@ -102,18 +98,14 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define pips_assert(what, predicate)					\
   do {									\
     if(!(predicate)) {							\
-      (void) fprintf(stderr,						\
-		     "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
-		     __FILE__ , __LINE__ , what);			\
+      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
       abort();								\
     }									\
   } while(0)
 #define pips_user_assert(what, predicate)				\
   do {									\
     if(!(predicate)) {							\
-      (void) fprintf(stderr,						\
-		     "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
-		     __FILE__ , __LINE__ , what);			\
+      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
       pips_user_error("this is a USER ERROR, I guess\n");		\
     }									\
   } while(0)

@@ -40,7 +40,6 @@
 #include "text.h"
 #include "text-util.h"
 #include "ri.h"
-#include "misc.h"
 
 #include "ri-util.h"
 

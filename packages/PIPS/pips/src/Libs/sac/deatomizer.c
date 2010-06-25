@@ -38,7 +38,6 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
 
 #include "sac.h"
 
@@ -48,7 +47,6 @@
 #include "polyedre.h"
 
 #include "ricedg.h"
-#include "transformations.h"
 #include "control.h"
 
 #include "effects-generic.h"

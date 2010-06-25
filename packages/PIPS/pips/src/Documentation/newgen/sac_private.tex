@@ -92,6 +92,11 @@ arguments for the opcode.
 
 \domain{matchTreeSons = int->matchTree}
 {}
+\domain{External operator_id_sons}
+{}
+
+\domain{operator_id_tree = id:int x sons:operator_id_sons}
+{}
 
 \verb+matchTree+ is a structure used to efficiently identify
 patterns corresponding to a statement. When traversed, it can thus map

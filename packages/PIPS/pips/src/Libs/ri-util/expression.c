@@ -47,7 +47,6 @@
 #include "text-util.h"
 
 #include "arithmetique.h"
-#include "alias-classes.h"
 #include "pipsmake.h"
 
 #include "ri-util.h"
@@ -193,16 +192,6 @@ expression make_entity_expression(entity e, cons *inds)
   return make_expression(s, normalized_undefined);
 }
 
-
-/**
- * This function build and return an expression given
- * an entity an_entity
- */
-expression make_expression_from_entity(entity an_entity)
-{
-  return make_entity_expression(an_entity, NIL);
-}
-
 /*
  * remarks: why is the default to normalized_complex~?
  * should be undefined, OR normalized if possible.
@@ -338,6 +327,18 @@ bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
 }
+
+bool array_argument_p(expression e)
+{
+  if (expression_reference_p(e))
+    {
+      reference ref = expression_reference(e);
+      entity ent = reference_variable(ref);
+      if (array_entity_p(ent)) return TRUE;
+    }
+  return FALSE;
+}
+
 
 
 /* Test if an expression is a reference.
@@ -968,6 +969,7 @@ expression find_ith_expression(list le, int r)
     return EXPRESSION(CAR(cle));
 }
 
+
 /* transform an int into an expression and generate the corresponding
    entity if necessary; it is not clear if strdup() is always/sometimes
    necessary and if a memory leak occurs; wait till syntax/expression.c
@@ -978,36 +980,24 @@ expression find_ith_expression(list le, int r)
   */
 expression int_to_expression(_int i)
 {
-    char *constant_name;
-    (void) asprintf(&constant_name,"%td", i >= 0 ? i : -i);
-    expression e = MakeIntegerConstantExpression(constant_name);
-    free(constant_name);
-    if(i<0) {
-        entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
-        e = MakeUnaryCall(um, e);
-    }
-    return e;
-}
-static entity float_to_entity(float c)
-{
-    string num;
-    asprintf(&num, "%f", c);
-    entity e = MakeConstant(num,is_basic_float);
-    free(num);
-    return e;
+    entity e = int_to_entity(i);
+    return call_to_expression(make_call(e,NIL));
 }
 
 expression float_to_expression(float c)
 {
     entity e = float_to_entity(c);
-    if(c<0)
-        return unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME,entity_to_expression(e));
-    else
-        return call_to_expression(make_call(e,NIL));
+    return call_to_expression(make_call(e,NIL));
 }
 expression complex_to_expression(float re, float im)
 {
     return MakeComplexConstantExpression(float_to_expression(re),float_to_expression(im));
+}
+expression bool_to_expression(bool b)
+{
+    return MakeNullaryCall
+        (MakeConstant(b ? TRUE_OPERATOR_NAME : FALSE_OPERATOR_NAME,
+		      is_basic_logical));
 }
 
 /* added interface for linear stuff.
@@ -1238,6 +1228,14 @@ bool same_expression_p(expression e1, expression e2)
   else
     return expression_equal_p(e1, e2);
 }
+bool sizeofexpression_equal_p(sizeofexpression s0, sizeofexpression s1)
+{
+    if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))
+        return type_equal_p(sizeofexpression_type(s0), sizeofexpression_type(s1));
+    if(sizeofexpression_expression_p(s0) && sizeofexpression_expression_p(s1))
+        return expression_equal_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
+    return false;
+}
 
 bool cast_equal_p(cast c1, cast c2)
 {
@@ -1257,17 +1255,15 @@ bool syntax_equal_p(syntax s1, syntax s2)
   switch(t1) {
   case is_syntax_reference:
     return reference_equal_p(syntax_reference(s1), syntax_reference(s2));
-    break;
   case is_syntax_range:
     return range_equal_p(syntax_range(s1), syntax_range(s2));
-    break;
   case is_syntax_call:
     return call_equal_p(syntax_call(s1), syntax_call(s2));
-    break;
   case is_syntax_cast:
     return cast_equal_p(syntax_cast(s1), syntax_cast(s2));
-    break;
   case is_syntax_sizeofexpression:
+    return sizeofexpression_equal_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
+
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
@@ -2226,6 +2222,22 @@ bool same_range_name_p(range r1, range r2)
     same_expression_name_p(range_upper(r1), range_upper(r2)) &&
     same_expression_name_p(range_increment(r1), range_increment(r2));
 }
+bool same_type_name_p(type t0, type t1)
+{
+    string s0 = type_to_string(t0),
+           s1 = type_to_string(t1);
+    bool same = same_string_p(s0,s1);
+    return same;
+}
+
+bool same_sizeofexpression_name_p(sizeofexpression s0, sizeofexpression s1)
+{
+    if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))
+        return same_type_name_p(sizeofexpression_type(s0),sizeofexpression_type(s1));
+    if(sizeofexpression_expression_p(s0) && sizeofexpression_expression_p(s1))
+        return same_expression_name_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
+    return false;
+}
 
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
@@ -2240,6 +2252,8 @@ bool same_syntax_name_p(syntax s1, syntax s2)
       return same_ref_name_p(syntax_reference(s1), syntax_reference(s2));
     case is_syntax_range:
       return same_range_name_p(syntax_range(s1), syntax_range(s2));
+    case is_syntax_sizeofexpression:
+      return same_sizeofexpression_name_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
     default:
       pips_internal_error("unexpected syntax tag\n");
     }

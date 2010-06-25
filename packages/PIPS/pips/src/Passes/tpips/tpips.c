@@ -545,31 +545,6 @@ static char * tpips_read_a_line(char * main_prompt)
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
 
-static void tpips_user_log(const char *fmt, va_list args)
-{
-	FILE * log_file = get_log_file();
-
-	/* It goes to stderr to have only displayed files on stdout.
-	 */
-
-	/* To be C99 compliant, a va_list can be used only once...
-		 Also to avoid exploding on x86_64: */
-	va_list args_copy;
-	va_copy (args_copy, args);
-
-	vfprintf(stderr, fmt, args);
-	fflush(stderr);
-
-	if (!log_file || !get_bool_property("USER_LOG_P"))
-		return;
-
-	if (vfprintf(log_file, fmt, args_copy) <= 0) {
-		perror("tpips_user_log");
-		abort();
-	}
-	else fflush(log_file);
-}
-
 /* Tpips user request */
 
 #define BEGIN_RQ	"begin_user_request"
@@ -951,7 +926,7 @@ void tpips_init(void)
 
 	set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
 
-	pips_log_handler = tpips_user_log;
+	pips_log_handler = smart_log_handler;
 	pips_request_handler = tpips_user_request;
 	pips_error_handler = tpips_user_error;
 
@@ -1249,7 +1224,7 @@ static void parse_arguments(int argc, char * argv[])
 int tpips_main(int argc, char * argv[])
 {
 	debug_on("TPIPS_DEBUG_LEVEL");
-	pips_log_handler = tpips_user_log;
+	pips_log_handler = smart_log_handler;
 	initialize_signal_catcher();
 	/* I need this one right now, as tpips init may be called too late. */
 	set_exception_callbacks(push_pips_context, pop_pips_context);

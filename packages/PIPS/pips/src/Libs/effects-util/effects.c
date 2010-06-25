@@ -42,7 +42,10 @@
 
 #include "ri-util.h"
 #include "effects-util.h"
-#include "alias-classes.h"
+#include "text.h"
+#include "text-util.h"
+#include "properties.h"
+
 
 /* functions for entity */
 entity effect_entity(effect e)
@@ -695,4 +698,68 @@ bool effect_list_can_be_safely_full_freed_p(list el)
     }
   }
   return safe_p;
+}
+
+
+/******************************************* COMBINATION OF APPROXIMATIONS */
+
+
+
+/* tag approximation_and(tag t1, tag t2)
+ * input    : two approximation tags.
+ * output   : the tag representing their "logical and", assuming that 
+ *            must = true and may = false.
+ * modifies :  nothing 
+ */
+tag approximation_and(tag t1, tag t2)
+{
+    if ((t1 == is_approximation_must) && (t2 == is_approximation_must)) 
+	return(is_approximation_must);
+    else
+	return(is_approximation_may);
+}
+
+
+/* tag approximation_or(tag t1, tag t2) 
+ * input    : two approximation tags.
+ * output   : the tag representing their "logical or", assuming that 
+ *            must = true and may = false.
+ * modifies : nothing
+ */
+tag approximation_or(tag t1, tag t2)
+{
+    if ((t1 == is_approximation_must) || (t2 == is_approximation_must)) 
+	return(is_approximation_must);
+    else
+	return(is_approximation_may);
+}
+
+
+/** CELLS */
+/* test if two cells are equal, celles are supposed to be references.*/
+
+bool cell_equal_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return reference_equal_p(r1, r2);
+}
+ 
+
+/* FI: probably to be moved elsewhere in ri-util */
+/* Here, we only know how to cope (for the time being) with
+   cell_reference and cell_preference, not with cell_gap and other
+   future fields. A bit safer than macro cell_any_reference(). */
+reference cell_to_reference(cell c) {
+  reference r = reference_undefined;
+
+  if (cell_reference_p(c))
+    r = cell_reference(c);
+  else if (cell_preference_p(c))
+    r = preference_reference(cell_preference(c));
+  else
+    pips_internal_error("unexpected cell tag\n");
+
+  return r;
 }

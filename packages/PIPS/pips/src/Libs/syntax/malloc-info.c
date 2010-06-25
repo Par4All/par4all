@@ -27,8 +27,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-extern void user_log(); /* in misc/messages.c */
-
 /* mallinfo portability os restricted to SUN C library */
 void
 print_malloc_info(__attribute__((unused)) FILE * fd)

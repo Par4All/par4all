@@ -30,7 +30,6 @@
 #include "effects.h"
 
 #include "resources.h"
-#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -305,8 +304,6 @@ void insert_pattern(char * s, list tokens, list args)
 
     matchTree_patterns(m) = CONS(PATTERNX, p, matchTree_patterns(m));
 }
-extern void patterns_yyparse();
-extern FILE * patterns_yyin;
 
 bool simd_treematcher(__attribute__((unused)) char * module_name)
 {

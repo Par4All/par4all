@@ -69,14 +69,10 @@
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
-/*
-#include "text.h"
-#include "text-util.h"
-*/
+
 #include "ri-util.h"
 #include "effects-util.h"
-/* #include "constants.h" */
-/* #include "control.h" */
+#include "text-util.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 
@@ -381,7 +377,6 @@ transformer any_assign_operation_to_transformer(entity tmp,
 	    /* Is it standard compliant? The assigned variable is
 	       modified by the rhs. */
 	    transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
-	    extern string words_to_string(list);
 	    string s =
 	      words_to_string(words_syntax(expression_syntax(rhs),NIL));
 

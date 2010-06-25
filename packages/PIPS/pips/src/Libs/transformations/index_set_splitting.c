@@ -51,7 +51,6 @@
 
 #include "arithmetique.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "transformations.h"
 
@@ -121,7 +120,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
     /* fix the bound */
     bool index_set_split_before_bound = get_bool_property("INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND");
     expression increment = range_increment(loop_range(statement_loop(the_second_loop_statement)));
-    expression new_loop_bound_expression = make_expression_from_entity(new_loop_bound);
+    expression new_loop_bound_expression = entity_to_expression(new_loop_bound);
     expression new_loop_bound_expression_with_xcrement = 
         make_expression(
                 make_syntax_call(
@@ -130,7 +129,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
                             index_set_split_before_bound?
                             MINUS_OPERATOR_NAME:
                             PLUS_OPERATOR_NAME),
-                        make_expression_list(make_expression_from_entity(new_loop_bound),copy_expression(increment))
+                        make_expression_list(entity_to_expression(new_loop_bound),copy_expression(increment))
                         )
                     ),
                 normalized_undefined

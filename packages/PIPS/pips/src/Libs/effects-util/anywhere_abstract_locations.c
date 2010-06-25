@@ -12,17 +12,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
-//#include "text-util.h"
-//#include "newgen_set.h"
-//#include "points_to_private.h"
-#include "properties.h"
-//#include "preprocessor.h"
-
-#include "alias-classes.h"
-
-//#include "effects-generic.h"
-//#include "effects-simple.h"
-//#include "effects-convex.h"
+#include "properties.h" 
 
 /*
 The ANYWHERE lattice is shown in the figure:

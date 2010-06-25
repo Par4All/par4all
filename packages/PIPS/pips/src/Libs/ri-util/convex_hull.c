@@ -32,9 +32,9 @@
 
 #include "linear.h"
 #include "genC.h"
+#include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "misc.h"
 
 /* debug messages before calling the version in polyedre.
  */

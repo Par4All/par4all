@@ -53,7 +53,6 @@
 
 #include "arithmetique.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "transformations.h"
 
@@ -188,7 +187,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                 && expression_integer_value(inc, &incval)) {
             numeric_range_p = TRUE;
             pips_assert("loop_unroll", incval != 0);
-            rhs_expr = int_expr(FORTRAN_DIV(ubval-lbval+incval, incval));
+            rhs_expr = int_to_expression(FORTRAN_DIV(ubval-lbval+incval, incval));
         }
         else {
             expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -221,13 +220,13 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         AddEntityToCurrentModule(ib);
 
         if (numeric_range_p) {
-            rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
+            rhs_expr = int_to_expression(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
                             incval), rate));
         }
         else {
             rhs_expr = MakeBinaryCall(entity_intrinsic("MOD"),
                     make_ref_expr(nub, NIL),
-                    int_expr(rate));
+                    int_to_expression(rate));
         }
 
         expr = make_expression(make_syntax(is_syntax_reference, 
@@ -250,11 +249,11 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         AddEntityToCurrentModule(lu_ind);
 
         /* Loop range is created */
-        rg = make_range(MakeIntegerConstantExpression("0"),
+        rg = make_range(int_to_expression(0),
                 MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
                     make_ref_expr(ib, NIL),
-                    int_expr(1) ),
-                MakeIntegerConstantExpression("1") );
+                    int_to_expression(1) ),
+                int_to_expression(1) );
         if(get_debug_level()>=9) {
             pips_assert("loop_unroll", range_consistent_p(rg));
         }
@@ -317,8 +316,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             rg = make_range(make_ref_expr(ib, NIL),
                     MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
                         make_ref_expr(nub, NIL),
-                        int_expr(1) ),
-                    int_expr(rate) );
+                        int_to_expression(1) ),
+                    int_to_expression(rate) );
 
         /* Create body of the loop, with updated index */
         body = make_empty_block_statement();
@@ -336,7 +335,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                 statement_consistent_p(transformed_stmt);
             tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
                     make_ref_expr(lu_ind, NIL),
-                    int_expr(rate) );
+                    int_to_expression(rate) );
             expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
                     MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
                         tmp_expr,
@@ -372,7 +371,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                         if( value_expression_p(v) )
                         {
                             statement s = make_assign_statement(
-                                    make_expression_from_entity(e),
+                                    entity_to_expression(e),
                                     copy_expression(value_expression(v)));
                             declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
                         }
@@ -419,7 +418,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             expr = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
                     MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME),
                         make_ref_expr(nub, NIL),
-                        int_expr(0) ),
+                        int_to_expression(0) ),
                     copy_expression(inc) );
         rhs_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
                 copy_expression(lb),
@@ -570,7 +569,7 @@ void full_loop_unroll(statement loop_statement)
                     if( value_expression_p(v) )
                     {
                         statement s = make_assign_statement(
-                                make_expression_from_entity(e),
+                                entity_to_expression(e),
                                 copy_expression(value_expression(v)));
                         declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
                     }

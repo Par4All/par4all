@@ -42,11 +42,9 @@ The HRE code if we want to have only one process on the HRE
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "text-util.h"
 #include "properties.h"
-#include "prettyprint.h"
 
 #include "sac.h"
 
@@ -54,8 +52,6 @@ The HRE code if we want to have only one process on the HRE
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "semantics.h"
-#include "control.h"
 
 #include "phrase_tools.h"
 

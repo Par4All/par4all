@@ -31,7 +31,6 @@
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
-#include "control.h"      /* CONTROL_MAP is defined there */
 #include "text.h"
 #include "text-util.h"
 #include "ri-util.h"
@@ -43,13 +42,10 @@
 #include "effects-simple.h"
 #include "effects-convex.h"
 #include "resources.h"
-#include "semantics.h"
 #include "complexity_ri.h"
-#include "complexity.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
 #include "text-util.h"
 #include "icfg.h"
-#include "alias-classes.h"
 
 void safe_free_vertex(vertex ver, list l_of_vers)
 {

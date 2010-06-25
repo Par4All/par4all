@@ -53,7 +53,6 @@
 
 #include "resources.h"
 #include "pipsdbm.h"
-#include "alias-classes.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -458,8 +457,6 @@ static bool atomizable_sub_expression_p(expression e)
   }
 }
 
-extern entity hpfc_new_variable(entity, basic);
-
 static gen_array_t /* of list of expressions */
 group_expr_by_level(int nlevels, list le)
 {
@@ -566,7 +563,7 @@ static void do_atomize_if_different_level(expression e, int level)
             !side_effects_p(e))
     {
         pips_debug(1,"atomize \n");
-        statement atom = atomize_this_expression(hpfc_new_variable, e);
+        statement atom = atomize_this_expression(make_new_scalar_variable, e);
         if (atom)
             insert_before_statement(atom, statement_of_level(elevel), TRUE);
     }
@@ -664,7 +661,7 @@ static void atomize_or_associate_for_level(expression e, int level)
 	    eatom = e;
 	  }
 
-	  atom = atomize_this_expression(hpfc_new_variable, eatom);
+	  atom = atomize_this_expression(make_new_scalar_variable, eatom);
 	  insert_before_statement(atom, statement_of_level(i), TRUE);
 	}
       }
@@ -805,7 +802,6 @@ static statement update_number_of_use(entity ent, list lst_stat, int up_down)
           /* Update old value */
           else
           {
-              extern string i2a(int);
               char *new;
               int number_use = 0;
               char* comment = statement_comments(s);
@@ -1560,7 +1556,7 @@ static void atom_cse_expression(expression e,list * skip_list)
 
                                 cse = call_to_expression(make_call(aspt->operator,
                                             in_common));
-                                scse = atomize_this_expression(hpfc_new_variable, cse);
+                                scse = atomize_this_expression(make_new_scalar_variable, cse);
 
                                 /* now cse is a reference to the newly created scalar. */
                                 pips_assert("a reference...",
@@ -1645,7 +1641,7 @@ static void atom_cse_expression(expression e,list * skip_list)
             statement atom;
 
             /* create a new atom... */
-            atom = atomize_this_expression(hpfc_new_variable, e);
+            atom = atomize_this_expression(make_new_scalar_variable, e);
             if(atom) {
                 /* At fisrt, this statement is set "virtual" */
                 set_comment_of_statement(atom,strdup("1"));

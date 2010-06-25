@@ -76,13 +76,10 @@
 #include "text-util.h"
 #include "database.h"
 #include "pipsdbm.h"
-#include "preprocessor.h"
 #include "resources.h"
 #include "misc.h"
 #include "control.h"
 #include "properties.h"
-#include "semantics.h"
-#include "transformations.h"
 #include "instrumentation.h"
 
 /* As we create checks with stop error message who tell us there are bound
@@ -203,17 +200,6 @@ bool array_need_bound_check_p(entity e)
   return TRUE;
 }
 
-/* This function returns the ith dimension of a list of dimensions */
-dimension find_ith_dimension(list dims, int n)
-{
-  int i;
-  pips_assert("find_ith_dimension", n > 0);
-  for(i=1; i<n && !ENDP(dims); i++, POP(dims))
-    ;
-  if(i==n && !ENDP(dims))
-    return DIMENSION(CAR(dims));
-  return dimension_undefined;
-}
 
 static array_dimension_bound_test
 make_true_array_dimension_bound_test(entity e, int i, bool low)

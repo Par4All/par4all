@@ -25,15 +25,15 @@
 %option noinput
 
 %{
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 /*
  * - 01/1996: PIPS_PROPERTIESRC added. FC.
  * - 09/1997: save/load properties in database. FC.
  */
 
 /* The syntax of a property list. */
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +44,7 @@
 #include "misc.h"
 #include "top-level.h"
 #include "constants.h"
+#include "pipsdbm.h"
 
 #define TTRUE	10
 #define TFALSE	11
@@ -96,7 +97,8 @@ void parse_properties_string(char *s)
 
 void parse_properties_string(char *s)
 {
-    pips_user_error(
+    // DO NOT CALL pips_user_error here
+    fprintf(stderr, "[parse_properties_string] "
 	    "cannot parse string (%s) without flex\n", s);
     exit(1);
 }
@@ -174,15 +176,18 @@ static void parse_properties(void)
 	string n;
 
 	if (tok != TIDENT) {
-	    pips_user_error("ident expected, got %d for -%s-.\n",
-			    tok, yytext);
+	    // DO NOT CALL pips_user_error here
+	    fprintf(stderr, "syntax error in parse_properties, "
+		    "ident expected, got %d for -%s-.\n", tok, yytext);
 	    return;
 	}
 
 	n = strdup(yytext);
 
 	if (update_property && property_undefined_p(get_property(n, TRUE))) {
-	    pips_user_error("Unknown property %s to update\n", n);
+	    // DO NOT CALL pips_user_error here
+	    fprintf(stderr, "user error in parse_properties: "
+		    "Unknown property %s to update\n", n);
 	    return;
 	}
 
@@ -203,7 +208,9 @@ static void parse_properties(void)
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
-                pips_user_error("bad string : %s\n", yytext);
+	    // DO NOT CALL pips_user_error here
+		fprintf(stderr, "user error in parse_properties: "
+			"bad string : %s\n", yytext);
 		return;
 	    }
             *q = '\0';
@@ -211,8 +218,9 @@ static void parse_properties(void)
 	    break;
 	}
 	default:
-	    pips_user_error("bad value for property %s: %s\n",
-                            n, yytext);
+	    // DO NOT CALL pips_user_error here
+	    fprintf(stderr, "user error in parse_properties: "
+		    "bad value for property %s: %s\n", n, yytext);
 	    return;
 	}
 
@@ -221,7 +229,9 @@ static void parse_properties(void)
 	{
 	    if (property_tag(opr)!=property_tag(pr))
 	    {
-            pips_user_warning("cannot change type from %s to %s "
+	    // DO NOT CALL pips_user_error here
+		fprintf(stderr, "user warning, "
+			"cannot change type from %s to %s "
 			"when updating property %s\n",
 			property_tag_to_string(property_tag(opr)),
 			property_tag_to_string(property_tag(pr)),
@@ -231,7 +241,9 @@ static void parse_properties(void)
 	    else
 	    {
 		if(!property_equal_p(pr, opr))
-		    pips_user_warning("property %s redefined\n", n);
+	    // DO NOT CALL pips_user_error here
+		    fprintf(stderr, "user warning, "
+			    "property %s redefined\n", n);
 		free_property(opr);
 		hash_update(pl, n, (char *) pr);
 	    }
@@ -300,11 +312,22 @@ static void read_properties(void)
 
 static property get_property(const string name, bool cool)
 {
-    property p;
-    if (!pl) read_properties(); /* rather lazy... */
-    if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) {
-	if (!cool) error("unknown property: --%s--\n", name);
-	/* else */
+    property p = property_undefined;
+    property u = (property) HASH_UNDEFINED_VALUE;
+
+    if (!pl)
+       read_properties(); /* rather lazy... */
+
+    p = (property) hash_get(pl, name);
+
+    if (p == u) {
+	if (!cool) {
+            fprintf(stderr, "unknown property: --%s--\n", name);
+            /* Not a nice exit from PIPS... */
+            abort();
+            //error("unknown property: --%s--\n", name);
+        }
+	/* else since error does not return */
 	p = property_undefined;
     }
     return p;
@@ -431,12 +454,10 @@ void fprint_properties(FILE * fd)
 
 /******************************************************* TOP-LEVEL INTERFACE */
 
-extern string db_get_meta_data_directory(void); /* in pipsdbm */
-
 static string get_property_file_name(void)
 {
-    string dir_name = db_get_meta_data_directory(),
-	name = strdup(concatenate(dir_name, "/properties", NULL));
+    string dir_name = db_get_meta_data_directory(),name;
+    asprintf(&name,"%s/properties",dir_name);
     free(dir_name); return name;
 }
 

@@ -43,6 +43,8 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "syntax.h"
+#include "control.h"
+#include "prettyprint.h"
 
 #include "syn_yacc.h"
 
@@ -710,7 +712,6 @@ static void store_initial_value(entity var, expression val)
   if(!value_unknown_p(entity_initial(var))) {
     value v = entity_initial(var);
     constant c = value_constant(v);
-    extern char * itoa(int);
 
     pips_assert("value must be constant", value_constant_p(v));
     pips_assert("constant must be int or call",
@@ -1903,10 +1904,6 @@ static statement BuildStatementForEntry(
     return es;
 }
 
-extern void unspaghettify_statement(statement);
-extern unstructured control_graph(statement);
-extern bool make_text_resource_and_free(string, string, string, text);
-
 static void ProcessEntry(
     entity cm,
     entity e,
@@ -2181,7 +2178,6 @@ entity SafeLocalToGlobal(entity e, type r)
     if(!top_level_entity_p(e)) {
 	storage s = entity_storage(e);
 	if(s == storage_undefined || storage_ram_p(s)) {
-	    extern list arguments_add_entity(list a, entity e);
 
 	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 				    entity_local_name(e));

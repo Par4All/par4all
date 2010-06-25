@@ -70,9 +70,6 @@
 
 #include "c_syntax.h"
 
-extern int c_lineno;
-extern  int yylex (void);
-
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
 /* Increase the parser stack to have SPEC2006/445.gobmk/owl_defendpat.c
@@ -82,19 +79,11 @@ extern  int yylex (void);
 */
 #define YYMAXDEPTH 1000000
 
-extern void discard_comments(void);
-
-extern string compilation_unit_name;
-extern statement ModuleStatement;
-
 static int CurrentMode = 0; /**< to know the mode of the formal parameter: by value or by reference*/
 static bool is_external = TRUE; /**< to know if the variable is declared inside or outside a function, so its scope
 				   is the current function or the compilation unit or TOP-LEVEL*/
 static int enum_counter = 0; /**< to compute the enumerator value: val(i) = val(i-1) + 1 */
 static int abstract_counter = 1; /**< to create temporary entities for abstract types */
-
-extern int loop_counter; /**< Global counter */
-extern int derived_counter;
 
 /* The following structures must be stacks because all the related
    entities are in recursive structures.  Since there are not stacks
@@ -102,15 +91,6 @@ extern int derived_counter;
    basic_domain to avoid creating special stacks for FormalStack,
    OffsetStack, ... */
 
-extern stack LoopStack;
-extern stack SwitchControllerStack;
-extern stack SwitchGotoStack;
-
-extern stack StructNameStack; /**< to remember the name of a struct/union and add it to the member prefix name*/
-
-extern stack ContextStack;
-
-extern stack FunctionStack; /**< to know in which function the current formal arguments are declared */
 static void PushFunction(entity f)
 {
   /*
@@ -158,9 +138,6 @@ entity GetFunction()
   return f;
 }
 
-extern stack FormalStack; /**< to know if the entity is a formal parameter or not */
-extern stack OffsetStack; /**< to know the offset of the formal argument */
-
  // FI: I assumed it was the current context; in fact the current
  // context is rather the top of the ContextStack.I tried to maintain
  // as an invariant ycontext==stack_head(ContextStack) But this is not
@@ -188,52 +165,6 @@ void reset_expression_comment()
   expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 }
 
-/* Functions used to manage the block scoping in conjunction with
-   ContextStack and ycontext */
-
-string empty_scope() { return strdup("");}
-
-bool empty_scope_p(string s) {return strcmp(s, "")==0;}
-
-/* same kind of testing required for union as well */
-bool string_struct_scope_p(string s)
-{
-  /* Full testing would require a module_name, a block_scope and a struct name */
-  /* Just lookup the struct identifier*/
-  string ss = strchr(s, MEMBER_SEP_CHAR);
-  return ss != NULL;
-}
-
-bool string_block_scope_p(string s)
-{
-  // A block scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
-  char valid[12] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', BLOCK_SEP_CHAR, '\0'};
-  bool is_block_scope = FALSE;
-  string cs = s;
-  bool is_number = FALSE;
-
-  pips_debug(10, "Potential block scope string = \"%s\"\n", s);
-
-  if(strspn(s, valid) == strlen(s)) {
-    for(cs=s; *cs!='\0'; cs++) {
-      if(is_number && isdigit(*cs))
-	;
-      else if(is_number && *cs==BLOCK_SEP_CHAR)
-	is_number = FALSE;
-      else if(!is_number && isdigit(*cs))
-	is_number = TRUE;
-      else if(!is_number && *cs==BLOCK_SEP_CHAR) {
-	is_block_scope = FALSE;
-	break;
-      }
-    }
-    is_block_scope = !is_number;
-  }
-
-  pips_debug(10, "String = \"%s\" is %sa block scope string\n", s, is_block_scope?"":"not ");
-
-  return is_block_scope;
-}
 
 /* The scope is moved up the scope tree and a NULL is return when
    there are no more scope to explore. */

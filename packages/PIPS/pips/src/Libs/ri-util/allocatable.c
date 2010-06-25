@@ -145,8 +145,8 @@ expression get_allocatable_data_expr(entity e) {
 
   // Construct the expression e.data
   return MakeBinaryCall(CreateIntrinsic(FIELD_OPERATOR_NAME),
-                        make_expression_from_entity(e),
-                        make_expression_from_entity(data_field));
+                        entity_to_expression(e),
+                        entity_to_expression(data_field));
 
 }
 
@@ -254,8 +254,8 @@ entity find_or_create_allocatable_struct(basic b, string name, int ndim) {
       fields = CONS(ENTITY,upper,fields);
 
       // Dimensions for the data array
-      dimension d = make_dimension(make_expression_from_entity(lower),
-                                   make_expression_from_entity(upper));
+      dimension d = make_dimension(entity_to_expression(lower),
+                                   entity_to_expression(upper));
       dimensions = CONS(DIMENSION,d,dimensions );
     }
 

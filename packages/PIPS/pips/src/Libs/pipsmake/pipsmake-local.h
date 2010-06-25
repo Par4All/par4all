@@ -24,3 +24,8 @@
 #include "makefile.h"
 typedef bool (*pipsmake_callback_handler_type)(void);
 
+/* symbols exported by lex / yacc */
+extern void pipsmake_error(char *);
+extern FILE *pipsmake_in;
+extern int pipsmake_lex();
+extern int pipsmake_parse();

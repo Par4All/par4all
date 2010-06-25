@@ -31,7 +31,6 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
-#include "misc.h"
 
 int loop_unimodular(string name)
 {

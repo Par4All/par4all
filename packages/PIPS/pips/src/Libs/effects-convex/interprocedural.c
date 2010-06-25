@@ -58,7 +58,6 @@
 #include "semantics.h"
 #include "text.h"
 #include "text-util.h"
-#include "preprocessor.h"
 
 #include "sommet.h"
 #include "ray_dte.h"

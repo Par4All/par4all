@@ -142,7 +142,6 @@ list effects_dynamic_elim(list l_eff)
   list c_eff = list_undefined;
   bool add_anywhere_write_effect_p = FALSE;
   bool add_anywhere_read_effect_p = FALSE;
-  extern bool c_module_p(entity); /* From preprocessor.h */
   bool value_passing_p = c_module_p(get_current_module_entity());
 
   for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {

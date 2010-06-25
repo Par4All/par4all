@@ -46,15 +46,7 @@
 #include "database.h"
 
 #include "misc.h"
-#include "pipsdbm.h"
 #include "properties.h"
-
-extern string compilation_unit_name;
-extern hash_table keyword_typedef_table;
-
-extern list CalledModules;
-extern entity StaticArea;
-extern entity DynamicArea;
 
 /* The data structure to tackle the memory allocation problem due to
    reparsing of compilatio unit
@@ -71,7 +63,7 @@ entity previouscompunit;
 static int current_dummy_parameter_number=0;
 
 static void set_current_dummy_parameter_number(int n)
-{extern int c_lineno; current_dummy_parameter_number=n+c_lineno;}
+{current_dummy_parameter_number=n+c_lineno;}
 
 void reset_current_dummy_parameter_number()
 {current_dummy_parameter_number=0;}
@@ -690,7 +682,6 @@ entity FindEntityFromLocalName(string name)
   entity ent = entity_undefined;
   string prefixes[] = {"",STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX,NULL};
   int i;
-  //extern c_parser_context GetScope(void);
   //c_parser_context cpc = GetScope();
   //string scope = scope_to_block_scope(c_parser_context_scope(cpc));
 
@@ -812,8 +803,6 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 
   /* Is it a formal parameter not yet converted in the function frame? */
   if(entity_undefined_p(ent)) {
-    extern string int_to_string(int);
-
     /* Should we change the current dummy parameter number? */
     string sn = i2a(get_current_dummy_parameter_number());
 
@@ -1047,7 +1036,6 @@ entity FindOrCreateCurrentEntity(string name,
 	       for a functional typedef */
 	    stack st = get_from_entity_type_stack_table(function);
 	    type ft = stack_undefined_p(st)? type_undefined : (type)stack_head(st);
-	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
 	      string sn =string_undefined;
@@ -1730,7 +1718,6 @@ void UseFormalArguments(entity f)
     list cd = list_undefined;
     list formals = NIL;
     string mn = string_undefined;
-    extern list extract_references_from_declarations(list);
     // This is a minimal list of references. We need all references.
     //list refs1 =  extract_references_from_declarations(dl);
     list refs =  declaration_supporting_references(dl);
@@ -2050,7 +2037,8 @@ void CreateReturnEntity(entity f)
 	if(type_undefined_p(entity_type(re))) {
 	  entity_type(re) = copy_type(rt);
 	  entity_storage(re) = make_storage_return(f);
-	  entity_initial(re) = make_value_unknown();
+      /* set the language */
+      entity_initial(re) = make_value_unknown();
 	  AddToDeclarations(re, f);
 	}
       }
@@ -2309,7 +2297,6 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	value ev = entity_initial(e);
 	code ec = value_code(ev);
 	list cmdl = code_declarations(ec);
-	extern list extract_references_from_declarations(list);
 	list refs =  extract_references_from_declarations(cmdl);
 
 	RemoveDummyArguments(e, refs);

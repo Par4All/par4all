@@ -48,12 +48,9 @@
 #include "database.h"
 
 #include "misc.h"
-#include "pipsdbm.h"
 #include "text-util.h"
 #include "properties.h"
 #include "alias_private.h"
-
-extern statement ModuleStatement;
 
 stack BlockStack; /* BlockStack is used to handle block scope */
 

@@ -72,9 +72,6 @@
 
 #include "syntax.h"
 
-/* Problem with conditional includes, different strands of UNIXes,... */
-/* extern int isascii(int); */
-
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
 int
@@ -554,7 +551,7 @@ void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
 
     dims =
       CONS(DIMENSION,
-	   make_dimension(MakeIntegerConstantExpression("1"),
+	   make_dimension(int_to_expression(1),
 		  MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
 	   NIL);
 

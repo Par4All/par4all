@@ -28,7 +28,8 @@ LIB_CFILES = \
 	interprocedural.c \
 	prettyprint.c \
 	unary_operators.c \
-	filter_proper_effects.c
+	filter_proper_effects.c \
+        eval.c
 
 INC_TARGET =    $(TARGET).h
 

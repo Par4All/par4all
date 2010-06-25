@@ -91,40 +91,7 @@ ifdebug(1){region_consistent_p(reg);}
 
 /* other things */
 
-#define PHI_PREFIX "PHI"
-#define PSI_PREFIX "PSI"
-#define RHO_PREFIX "RHO"
-#define BETA_PREFIX "BETA"
-#define PROPER TRUE
-#define SUMMARY FALSE
 
-#define REGIONS_MODULE_NAME "REGIONS-PACKAGE"
-
-
-/* TRUE if e is a phi variable
- * PHI entities have a name like: REGIONS:PHI#, where # is a number.
- * takes care if TCST and undefined entities, just in case.
- * FC, 09/12/94
- */
-#define variable_phi_p(e) \
-  ((e)!=(entity)NULL && (e)!=entity_undefined && \
-    strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
-    strstr(entity_name(e), PHI_PREFIX) != NULL)
-
-#define variable_psi_p(e) \
-  ((e)!=(entity)NULL && (e)!=entity_undefined && \
-    strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
-    strstr(entity_name(e), PSI_PREFIX) != NULL)
-
-#define variable_rho_p(e) \
-  ((e)!=(entity)NULL && (e)!=entity_undefined && \
-    strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
-    strstr(entity_name(e), RHO_PREFIX) != NULL)
-
-#define variable_beta_p(e)\
-  ((e)!=(entity)NULL && (e)!=entity_undefined && \
-    strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
-    strstr(entity_name(e), BETA_PREFIX) != NULL)
 
 #define R_RW 0
 #define R_IN 1

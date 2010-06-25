@@ -339,7 +339,6 @@ static transformer call_to_postcondition(transformer pre,
   case is_value_symbolic:
   case is_value_constant: {
     /* Declared in preprocessor.h */
-    extern bool c_module_p(entity);
     /* This cannot occur in Fortran, but is possible in C. */
     if(c_module_p(get_current_module_entity())) {
       post = transformer_apply(tf, pre);

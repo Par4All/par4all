@@ -33,12 +33,6 @@ static char vcid_pip_traiter[] = "$Id$";
 #include "pip__type.h"
 #include "pip__sol.h"
 #include "pip__tab.h"
-extern long int cross_product, limit;
-extern int verbose;
-extern FILE *dump;
-
-extern void sol_forme();
-extern int integrer();
 
 Entier sol_pgcd();
 

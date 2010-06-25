@@ -99,6 +99,34 @@ log_on_file(char chaine[])
    }
 }
 
+/* log message on stderr and in the log file
+ * can be used as pips_log_handler
+ */
+void smart_log_handler(const char *fmt, va_list args)
+{
+	FILE * log_file = get_log_file();
+
+	/* It goes to stderr to have only displayed files on stdout.
+	 */
+
+	/* To be C99 compliant, a va_list can be used only once...
+		 Also to avoid exploding on x86_64: */
+	va_list args_copy;
+	va_copy (args_copy, args);
+
+	vfprintf(stderr, fmt, args);
+	fflush(stderr);
+
+	if (!log_file || !get_bool_property("USER_LOG_P"))
+		return;
+
+	if (vfprintf(log_file, fmt, args_copy) <= 0) {
+		perror("user_log");
+		abort();
+	}
+	else fflush(log_file);
+}
+
 /* The # "stringificator" only works in a macro expansion... */
 #define PIPS_THANKS_STRING(arch)					\
   "%s (ARCH=" arch ")\n  running as %s\n\n"				\

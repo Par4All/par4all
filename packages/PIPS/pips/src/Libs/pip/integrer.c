@@ -27,14 +27,6 @@
 #include <stdio.h>
 #include "pip__type.h"
 #include "pip__tab.h"
-extern long int cross_product, limit;
-
-extern Entier sol_pgcd();
-extern void sol_new();
-extern void sol_div();
-extern void sol_forme();
-extern void sol_val();
-extern int llog();
 
 Entier sol_mod(x, y)
 Entier x, y;

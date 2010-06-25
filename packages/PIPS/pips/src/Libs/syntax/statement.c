@@ -1270,7 +1270,7 @@ MakeWhileDoInst(expression c, string l)
     if(!logical_expression_p(c)) {
       /* with the f77 compiler, this is equivalent to c.NE.0*/
       cond = MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-			    c, int_expr(0));
+			    c, int_to_expression(0));
       pips_user_warning("WHILE condition between lines %d and %d is not a logical expression.\n",
 			line_b_I,line_e_I);
     }
@@ -1300,7 +1300,7 @@ expression fix_if_condition(expression e)
        integer expression. */
     if(integer_expression_p(e)) {
       cond = MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-			    e, int_expr(0));
+			    e, int_to_expression(0));
       pips_user_warning("IF condition between lines %d and %d is not a logical expression.\n",
 			line_b_I,line_e_I);
     }
@@ -1423,7 +1423,7 @@ string l1, l2, l3;
 	     */
 	    e1 = MakeUnaryCall(CreateIntrinsic("ABS"), e);
 	    e2 = MakeBinaryCall(CreateIntrinsic(".GE."), 
-				e1, MakeIntegerConstantExpression("0"));
+				e1, int_to_expression(0));
 
 	    s1 = instruction_to_statement(MakeGotoInst(l1));
 	    s2 = make_empty_block_statement();
@@ -1433,7 +1433,7 @@ string l1, l2, l3;
 	}
 	else {
 	    e1 = MakeBinaryCall(CreateIntrinsic(".LE."), 
-				e, MakeIntegerConstantExpression("0"));
+				e, int_to_expression(0));
 
 	    s1 = instruction_to_statement(MakeGotoInst(l1));
 	    s3 = instruction_to_statement(MakeGotoInst(l3));
@@ -1444,7 +1444,7 @@ string l1, l2, l3;
     }
     else if(strcmp(l1,l3)==0) {
 	e1 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
-			    e, MakeIntegerConstantExpression("0"));
+			    e, int_to_expression(0));
 
 	s1 = instruction_to_statement(MakeGotoInst(l1));
 	s2 = instruction_to_statement(MakeGotoInst(l2));
@@ -1454,7 +1454,7 @@ string l1, l2, l3;
     }
     else if(strcmp(l2,l3)==0) {
 	e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
-			    e, MakeIntegerConstantExpression("0"));
+			    e, int_to_expression(0));
 
 	s1 = instruction_to_statement(MakeGotoInst(l1));
 	s2 = instruction_to_statement(MakeGotoInst(l2));
@@ -1465,9 +1465,9 @@ string l1, l2, l3;
     else {
 	/* General case */
 	e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
-			    e, MakeIntegerConstantExpression("0"));
+			    e, int_to_expression(0));
 	e2 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
-			    copy_expression(e), MakeIntegerConstantExpression("0"));
+			    copy_expression(e), int_to_expression(0));
 
 	s1 = instruction_to_statement(MakeGotoInst(l1));
 	s2 = instruction_to_statement(MakeGotoInst(l2));

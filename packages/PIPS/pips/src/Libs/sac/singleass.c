@@ -39,13 +39,10 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
 
 #include "control.h"
 #include "callgraph.h"
-#include "preprocessor.h"
 #include "effects-simple.h"
-#include "alias-classes.h"
 #include "sac.h"
 #include "ricedg.h"
 #include "atomizer.h"

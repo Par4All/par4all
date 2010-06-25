@@ -52,13 +52,9 @@
 #include "text.h"
 
 #include "properties.h"
-#include "preprocessor.h"
 
-#include "transformer.h"
-#include "semantics.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "alias-classes.h"
 
 #include "effects-generic.h"
 

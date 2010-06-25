@@ -130,14 +130,14 @@ static expression step_sizevariable_in_expression(entity e)
 
   dim_l = gen_copy_seq(variable_dimensions(v));
   d = dimension_undefined;
-  p = make_expression_1();
+  p = int_to_expression(1);
   s = expression_undefined;
 
   for (dim_ll=dim_l;dim_ll;)
     {
       d=DIMENSION(CAR(dim_ll));POP(dim_ll);
       s=binary_intrinsic_expression(MINUS_OPERATOR_NAME,copy_expression(dimension_upper(d)),copy_expression(dimension_lower(d)));
-      s=binary_intrinsic_expression(PLUS_OPERATOR_NAME,s,make_expression_1());
+      s=binary_intrinsic_expression(PLUS_OPERATOR_NAME,s,int_to_expression(1));
       p=binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,p,s);
     }
   gen_free_list(dim_l);
@@ -204,7 +204,7 @@ statement build_call_STEP_AlltoAllRegion(entity mpi_module, int nb_communication
 
   expr_origine = reference_to_expression(make_reference(array_region,
 							CONS(EXPRESSION, step_symbolic(STEP_INDEX_SLICE_LOW_NAME, mpi_module),
-							     CONS(EXPRESSION, make_expression_1(),
+							     CONS(EXPRESSION, int_to_expression(1),
 								  CONS(EXPRESSION, int_to_expression(0), NIL)))));
   
   expr_dim = copy_expression(dimension_upper(DIMENSION(gen_nth(1,variable_dimensions(type_variable(entity_type(array_region)))))));
@@ -215,8 +215,8 @@ statement build_call_STEP_AlltoAllRegion(entity mpi_module, int nb_communication
   
   expr_array = entity_to_expression(array);
   expr_tag = step_symbolic(STEP_TAG_DEFAULT_NAME, mpi_module);
-  expr_max_nb_request = step_parameter_max_nb_request(mpi_module, int_expr(nb_communication_max));
-  expr_requests = step_local_requests_array(mpi_module, int_expr(nb_communication_max));
+  expr_max_nb_request = step_parameter_max_nb_request(mpi_module, int_to_expression(nb_communication_max));
+  expr_requests = step_local_requests_array(mpi_module, int_to_expression(nb_communication_max));
   expr_nb_request = step_local_nb_request(mpi_module);
   expr_algorithm = step_symbolic(STEP_NONBLOCKING_NAME, mpi_module);
   
@@ -253,7 +253,7 @@ statement step_handle_comm_requests(entity module,list comm_stmt, int nb_communi
 
   if(!ENDP(block))
     {
-      statement s = make_assign_statement(step_local_nb_request(module),int_expr(0));
+      statement s = make_assign_statement(step_local_nb_request(module),int_to_expression(0));
       statement_comments(s)=strdup(concatenate("\nC     Communicating data to other nodes",
 					       "\nC     3 communication shemes for all-to-all personalized broadcast :",
 					       "\nC     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.",

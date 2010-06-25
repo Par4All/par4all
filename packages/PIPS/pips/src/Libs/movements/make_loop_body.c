@@ -256,7 +256,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     expr = make_op_expression(operator_minus,
 			      CONS(EXPRESSION,expr_ind2,lex2));
 
-    lex2 = CONS(EXPRESSION,make_expression_1(),NIL);
+    lex2 = CONS(EXPRESSION,int_to_expression(1),NIL);
     expr2 = make_op_expression(operator_plus,
 			       CONS(EXPRESSION,expr,lex2));
 
@@ -433,7 +433,7 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
        Bank_id,L_A(LJ,LI),1 for engine case
        */
  
-    args = CONS(EXPRESSION,make_expression_1(),NIL);
+    args = CONS(EXPRESSION,int_to_expression(1),NIL);
     pvt =(!VECTEUR_NUL_P(ofs->succ))  ?
 	vect_add(vect_new(vecteur_var(ofs->succ),VALUE_ONE),
 		 vect_new(TCST,offset_dim2)):
@@ -517,7 +517,7 @@ entity var_id;
     /* build the  expression :     S    */
     /*    args = CONS(EXPRESSION,int_expr(nb_bytes),NIL);*/
  
-    lexp1= CONS(EXPRESSION,make_expression_1(),NIL);
+    lexp1= CONS(EXPRESSION,int_to_expression(1),NIL);
     expr = make_expression(make_syntax(is_syntax_reference,r
 				       ),normalized_undefined);
     args = CONS(EXPRESSION,expr,lexp1);

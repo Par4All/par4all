@@ -35,7 +35,6 @@
 #include "text.h"
 #include "text-util.h"
 #include "database.h"
-#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"

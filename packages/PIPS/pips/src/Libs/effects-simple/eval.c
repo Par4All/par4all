@@ -12,13 +12,8 @@
 #include "text-util.h"
 #include "newgen_set.h"
 #include "points_to_private.h"
-#include "properties.h"
-#include "preprocessor.h"
 
-#include "effects-generic.h"
 #include "effects-simple.h"
-#include "effects-convex.h"
-#include "alias-classes.h"
 
 /*
   @param r1 and r2 are two path references

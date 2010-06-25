@@ -41,11 +41,9 @@ This file contains functions used to generate the MMCDs generation code
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "text-util.h"
 #include "properties.h"
-#include "prettyprint.h"
 
 #include "sac.h"
 
@@ -53,8 +51,6 @@ This file contains functions used to generate the MMCDs generation code
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "semantics.h"
-#include "control.h"
 
 #include "phrase_tools.h"
 

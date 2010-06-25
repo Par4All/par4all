@@ -52,7 +52,6 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "control.h"
 
 #include "arithmetique.h"
 

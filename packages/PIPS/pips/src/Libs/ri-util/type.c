@@ -2947,7 +2947,6 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
     if(symbolic_constant_entity_p(f)) {
       if(language_c_p) {
 	/* In C, f cannot be declared directly, we need its enum */
-	extern entity find_enum_of_member(entity);
 	entity e_of_f = find_enum_of_member(f);
 	//sel = CONS(ENTITY, e_of_f, sel);
 	sel = enum_supporting_entities(sel, vt, e_of_f);
@@ -3263,7 +3262,6 @@ list constant_expression_supporting_references(list srl, expression e)
 	 enum member. But currently they are four byte signed integer (c89)
 	 and this Fortran INTEGER type :-( */
 
-      extern entity find_enum_of_member(entity);
       entity e_of_f = find_enum_of_member(f);
       //srl = CONS(ENTITY, e_of_f, srl);
       srl = enum_supporting_references(srl, e_of_f);
@@ -3499,7 +3497,6 @@ bool check_C_function_type(entity f, list args)
   type t = entity_type(f);
   type ct = call_compatible_type(t);
   list parms = functional_parameters(type_functional(ct));
-  extern void print_text(FILE *, text); /* FI: well, for debugging only... */
 
   pips_assert("f can be used to generate a call", call_compatible_type_p(t));
 
@@ -4186,7 +4183,17 @@ type subscripted_type_to_type(type t, expression se)
   }
   return st;
 }
-
+/* This function returns the ith dimension of a list of dimensions */
+dimension find_ith_dimension(list dims, int n)
+{
+  int i;
+  pips_assert("find_ith_dimension", n > 0);
+  for(i=1; i<n && !ENDP(dims); i++, POP(dims))
+    ;
+  if(i==n && !ENDP(dims))
+    return DIMENSION(CAR(dims));
+  return dimension_undefined;
+}
 
 /*
  *  that is all
