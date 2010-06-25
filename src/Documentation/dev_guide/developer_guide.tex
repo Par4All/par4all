@@ -2293,7 +2293,12 @@ accordingly: \PipsAutotoolsGuidePDF{} and \PipsAutotoolsGuideHTDOC{}
 \texttt{mylib} in \texttt{src/Libs};
 \item add the new directory name to the
   \verb|$PIPS_ROOT/src/Libs/local.mk|, so that the recursive make will
-  consider it.
+  consider it.\marginpar{is this one obsolete ?} 
+\item add the new directory name to the
+  \verb|$PIPS_ROOT/libraries.make|\index{libraries.make}, taking care of library dependences.
+\item also add it to \verb|$PIPS_ROOT/src/Libs/Makefile.am| for the
+  build infrastructure using \texttt{autotools}; make sure you modify
+  \verb|PIPS_SUBDIRS| \emph{and} \verb|libpipslibs_la_LIBADD|.
 \end{itemize}
 
 Skip this step if you are using an already existing library.
@@ -2319,6 +2324,8 @@ Skip this step if you are using an already existing library.
   Note that the \texttt{cproto} command is used to generate the library
   header file \texttt{mylib.h}. To force this file to be build again, type
   \texttt{make header}.
+
+\item create a \texttt{Makefile.am} for the \texttt{autotools} build infrastructure (see examples in the other libraries).
 
 \item Update file \texttt{libraries.make}\index{libraries.make} at
   the root of the project. It contains the ordered list of PIPS

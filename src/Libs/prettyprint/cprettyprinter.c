@@ -434,7 +434,7 @@ static string this_entity_cdeclaration(entity var)
                             set_prettyprint_language_tag (is_language_c);
                             string sbasic = basic_to_string(entity_basic(var));
                             set_prettyprint_language_tag(old_lang);
-                            asprintf(&result,"static const %s %s = %s;\n",sbasic,svar,sval);
+                            asprintf(&result,"static const %s %s = %s\n",sbasic,svar,sval);
                             free(sval);
                             free(svar);
                             free(sbasic);
@@ -597,19 +597,23 @@ static string c_declarations(
     {
         string tmp = NULL;
         tmp = c_entity_local_name(var);
-        debug(2, "\n Prettyprinter declaration for variable :",tmp);
+        pips_debug(2, "Prettyprinter declaration for variable :%s\n",tmp);
         free(tmp);
         if (consider_this_entity(var))
         {
             string old = result;
             string svar = this_entity_cdeclaration(var);
-            result = strdup(concatenate(old, !first && !lastsep? separator: "",
-                        svar, lastsep? separator: "", NULL));
+            pips_debug(6, "svar = %s\n", svar);
+            result = strdup(concatenate(old, !first ? separator: "",
+                        svar, NULL));
+	    pips_debug(6, "result = %s\n", result);
             free(svar);
             free(old);
             first = FALSE;
         }
     }
+    if (lastsep) 
+      result = strdup(concatenate(result, separator, NULL));
     return result;
 }
 
