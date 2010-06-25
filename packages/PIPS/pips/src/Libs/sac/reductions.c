@@ -38,15 +38,12 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
-#include "transformations.h"
 
 #include "reductions.h"
 #include "sac.h"
 
 #include "effects-convex.h"
 #include "effects-simple.h"
-#include "preprocessor.h"
-#include "callgraph.h"
 
 #include "control.h"
 #include "properties.h"
@@ -63,10 +60,9 @@ static entity make_reduction_vector_entity(reduction r)
     sprintf(buffer,"%s%u",prefix,counter++);
 
     mod_ent = get_current_module_entity();
-    list lis = CONS(DIMENSION,make_dimension(int_expr(0),int_expr(0)), NIL);
+    list lis = CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)), NIL);
     new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
-    AddLocalEntityToDeclarations(new_ent,mod_ent,
-            c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
+    AddLocalEntityToDeclarations(new_ent,mod_ent,get_current_module_statement());
 #if 0
     /* The new entity is stored in the list of entities of the same type. */
     switch(basic_tag(base))
@@ -112,7 +108,7 @@ static reductionInfo add_reduction(list* reds, reduction r)
             reductionInfo_count(ri)++;
 
             free_expression(dimension_upper(DIMENSION(CAR((variable_dimensions(type_variable(entity_type(reductionInfo_vector(ri)))))))));
-            dimension_upper(DIMENSION(CAR((variable_dimensions(type_variable(entity_type(reductionInfo_vector(ri)))))))) = int_expr(reductionInfo_count(ri)-1);
+            dimension_upper(DIMENSION(CAR((variable_dimensions(type_variable(entity_type(reductionInfo_vector(ri)))))))) = int_to_expression(reductionInfo_count(ri)-1);
 
             return ri; 
         }
@@ -136,7 +132,7 @@ static void rename_reduction_ref_walker(expression e, reductionInfo ri)
     {
         free_reference(syntax_reference(s));
         syntax_reference(s)= make_reference(reductionInfo_vector(ri),
-                make_expression_list(int_expr(reductionInfo_count(ri)-1)));
+                make_expression_list(int_to_expression(reductionInfo_count(ri)-1)));
     }
 }
 
@@ -318,11 +314,11 @@ static statement generate_prelude(reductionInfo ri)
             break;
 
         case is_reduction_operator_and:
-            initval = make_constant_boolean_expression(TRUE);
+            initval = bool_to_expression(TRUE);
             break;
 
         case is_reduction_operator_or:
-            initval = make_constant_boolean_expression(FALSE);
+            initval = bool_to_expression(FALSE);
             break;
     }
 
@@ -336,7 +332,7 @@ static statement generate_prelude(reductionInfo ri)
         is = make_assign_instruction(
                 reference_to_expression(make_reference(
                         reductionInfo_vector(ri), CONS(EXPRESSION, 
-                            int_expr(reductionInfo_count(ri)-i-1),
+                            int_to_expression(reductionInfo_count(ri)-i-1),
                             NIL))),
                 copy_expression(initval));
 
@@ -407,7 +403,7 @@ static statement generate_compact(reductionInfo ri)
         expression e;
 
         e = reference_to_expression(make_reference(
-                    reductionInfo_vector(ri), CONS(EXPRESSION, int_expr(i), NIL)));
+                    reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
         c = make_call(operator, CONS(EXPRESSION, e, 
                     CONS(EXPRESSION, rightExpr, NIL)));
 

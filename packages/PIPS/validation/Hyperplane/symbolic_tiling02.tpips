@@ -11,5 +11,10 @@ apply SYMBOLIC_TILING
 
 display PRINTED_FILE
 
+activate PRINT_CODE_REGIONS
+activate MUST_REGIONS
+#activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
 close
 delete $WS

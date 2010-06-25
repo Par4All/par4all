@@ -46,9 +46,6 @@
 
 /* reads an int while sharing file and buffers with newgen...
  */
-extern int genread_input(void);
-extern FILE * genread_in;
-
 static int 
 lire_int(FILE * fd)
 {

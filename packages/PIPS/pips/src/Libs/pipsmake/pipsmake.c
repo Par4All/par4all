@@ -80,6 +80,7 @@
 #include "phases.h"
 #include "builder_map.h"
 #include "properties.h"
+
 #include "pipsmake.h"
 
 static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
@@ -151,51 +152,35 @@ void reinit_make_cache_if_necessary(void)
    pipsmake does not know which ones are used. */
 void reset_static_phase_variables()
 {
-    extern void error_reset_current_module_entity(void);
-    extern void error_reset_current_module_statement(void);
-    extern void error_reset_rw_effects(void);
-    extern void error_reset_invariant_rw_effects(void);
-    extern void error_reset_proper_rw_effects(void);
-    extern void error_reset_cumulated_rw_effects(void);
-    extern void reset_transformer_map(void);
-    extern void error_reset_value_mappings(void);
-    extern void proper_effects_error_handler(void);
-    extern void icfg_error_handler(void);
-    extern void use_def_elimination_error_handler(void);
-    extern void simple_atomize_error_handler(void);
-    extern void coarse_grain_parallelization_error_handler(void);
-    extern void clone_error_handler(void);
-    extern void array_privatization_error_handler(void);
-    extern void hpfc_error_handler(void);
-
-    hpfc_error_handler();
+#define DECLARE_ERROR_HANDLER(name) extern void \
+    name(); name()
 
     /* From ri-util/static.c */
-    error_reset_current_module_entity();
-    error_reset_current_module_statement();
+    DECLARE_ERROR_HANDLER(error_reset_current_module_entity);
+    DECLARE_ERROR_HANDLER(error_reset_current_module_statement);
 
     /* Macro-generated resets */
-    error_reset_rw_effects();
-    error_reset_invariant_rw_effects();
-    error_reset_proper_rw_effects();
-    error_reset_cumulated_rw_effects();
-    reset_transformer_map();
-
-    icfg_error_handler();
+    DECLARE_ERROR_HANDLER(error_reset_rw_effects);
+    DECLARE_ERROR_HANDLER(error_reset_invariant_rw_effects);
+    DECLARE_ERROR_HANDLER(error_reset_proper_rw_effects);
+    DECLARE_ERROR_HANDLER(error_reset_cumulated_rw_effects);
+    DECLARE_ERROR_HANDLER(reset_transformer_map);
+    DECLARE_ERROR_HANDLER(icfg_error_handler);
 
     /* Macro-generated resets in effects-generic/utils.c */
-    proper_effects_error_handler();
+    DECLARE_ERROR_HANDLER(proper_effects_error_handler);
 
     /* Error handlers for the transformation library */
-    use_def_elimination_error_handler();
-    simple_atomize_error_handler();
-    clone_error_handler();
-    array_privatization_error_handler();
+    DECLARE_ERROR_HANDLER(use_def_elimination_error_handler);
+    DECLARE_ERROR_HANDLER(simple_atomize_error_handler);
+    DECLARE_ERROR_HANDLER(clone_error_handler);
+    DECLARE_ERROR_HANDLER(array_privatization_error_handler);
 
-    hpfc_error_handler();
+    DECLARE_ERROR_HANDLER(hpfc_error_handler);
 
     /* Special cases: Transformers or preconditions are computed or used */
-    error_reset_value_mappings();
+    DECLARE_ERROR_HANDLER(error_reset_value_mappings);
+#undef DECLARE_ERROR_HANDLER
 }
 
 /* Apply an instantiated rule with a given ressource owner 

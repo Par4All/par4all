@@ -24,11 +24,6 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* comp_prettyprint.c */
-
-/* Modif:
-  -- entity_local_name is replaced by module_local_name. LZ 230993
-*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,7 +49,6 @@
 #include "prettyprint.h"
 #include "text-util.h"
 #include "top-level.h"
-#include "preprocessor.h"
 #include "complexity.h"
 
 static bool is_user_view;	/* print_code_complexities or print_source_complexities */

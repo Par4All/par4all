@@ -77,7 +77,6 @@ typedef dfg_arc_label arc_label;
 typedef dfg_vertex_label vertex_label;
 #include "graph.h"
 #include "paf-util.h"
-#include "static_controlize.h"
 
 #define POSITIVE 1
 #define NEGATIVE 0
@@ -99,20 +98,6 @@ static expression crt_exp;	/* Current expression */
  * in paf_ri.h
  */
 bdt	base;
-
-
-/* External variables */
-
-
-#if defined(HAS_BDTYY)
-
-/* The file read in by the scanner */
-extern FILE * bdtyyin;
-
-/* The parsing function created by Yacc */
-extern int bdtyyparse();
-
-#endif
 
 /*============================================================================*/
 /* bdt bdt_read_paf(char *s) : computes the BDT of the PAF program name given

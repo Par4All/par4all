@@ -49,14 +49,11 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "text-util.h"
 
 #include "dg.h"
-#include "properties.h"
 
-#include "control.h"
 
 #include "phrase_tools.h"
 
@@ -397,7 +394,7 @@ statement make_assignement_statement (entity a_variable,
 				      statement stat)
 {
   return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-				     make_expression_from_entity(a_variable),
+				     entity_to_expression(a_variable),
 				     an_expression,
 				     stat);
 }

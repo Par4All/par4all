@@ -44,7 +44,6 @@
 #include "matrice.h"
 #include "conversion.h"
 
-#include "misc.h"
 
 void derive_new_basis(Pbase base_oldindex, Pbase * base_newindex, entity (*new_entity)(entity))
 {

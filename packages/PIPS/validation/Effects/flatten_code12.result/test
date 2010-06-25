@@ -1,0 +1,234 @@
+
+Execute initial code
+
+foo=1
+foo=2
+foo=3
+foo=4
+
+Initial code
+
+void flatten_code12(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int i = foo_0;                                                       /*0011*/
+// (0,3)
+
+   for(i = 0; i <= 3; i += 1) {
+// (0,4)
+      // BEGIN BLOCK
+// (0,5)
+      static int foo = 0;                                               /*0014*/
+// (0,6)
+
+      foo++;                                                            /*0016*/
+// (0,7)
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0018*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code with cumulated effects
+
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//               <must be read   >: foo_0
+void flatten_code12(void)
+{
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//               <must be read   >: foo_0
+// (0,1)
+   // BEGIN BLOCK
+//               <must be read   >: foo_0
+//               <must be written>: i
+// (0,2)
+   int i = foo_0;                                                       /*0011*/
+//               <may be read    >: stdout stdout[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//               <must be written>: i
+// (0,3)
+
+   for(i = 0; i <= 3; i += 1) {
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] foo
+//               <must be written>: __IO_EFFECTS:LUNS[1] foo
+// (0,4)
+      // BEGIN BLOCK
+// (0,5)
+      static int foo = 0;                                               /*0014*/
+//               <must be read   >: foo
+//               <must be written>: foo
+// (0,6)
+
+      foo++;                                                            /*0016*/
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] foo
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+// (0,7)
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0018*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code with transformers
+
+
+//  T() {}
+
+void flatten_code12(void)
+{
+
+//  T(foo) {}
+
+// (0,1)
+   // BEGIN BLOCK
+
+//  T(i) {foo_0==i}
+
+// (0,2)
+   int i = foo_0;                                                       /*0011*/
+
+//  T(foo,i) {}
+
+// (0,3)
+
+   for(i = 0; i <= 3; i += 1) {
+
+//  T(foo) {foo==foo#init+1}
+
+// (0,4)
+      // BEGIN BLOCK
+
+//  T() {}
+
+// (0,5)
+      static int foo = 0;                                               /*0014*/
+
+//  T(foo) {foo==foo#init+1}
+
+// (0,6)
+
+      foo++;                                                            /*0016*/
+
+//  T() {}
+
+// (0,7)
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0018*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code with preconditions
+
+
+//  P() {}
+
+void flatten_code12(void)
+{
+
+//  P() {}
+
+// (0,1)
+   // BEGIN BLOCK
+
+//  P() {}
+
+// (0,2)
+   int i = foo_0;                                                       /*0011*/
+
+//  P(i) {foo_0==i}
+
+// (0,3)
+
+   for(i = 0; i <= 3; i += 1) {
+
+//  P(foo,i) {0<=i, i<=3}
+
+// (0,4)
+      // BEGIN BLOCK
+
+//  P(foo,i) {0<=i, i<=3}
+
+// (0,5)
+      static int foo = 0;                                               /*0014*/
+
+//  P(foo,i) {0<=i, i<=3}
+
+// (0,6)
+
+      foo++;                                                            /*0016*/
+
+//  P(foo,i) {0<=i, i<=3}
+
+// (0,7)
+
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0018*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code after code flattening
+
+void flatten_code12(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int i = foo_0;                                                       /*0011*/
+   //PIPS generated variable
+// (0,3)
+   static int foo_1 = 0;
+// (0,4)
+   
+   
+   foo_1++;                                                             /*0016*/
+// (0,5)
+
+   fprintf(stdout, "foo=%d\n", foo_1);                                  /*0018*/
+// (0,6)
+
+   foo_1++;                                                             /*0016*/
+// (0,7)
+
+   fprintf(stdout, "foo=%d\n", foo_1);                                  /*0018*/
+// (0,8)
+
+   foo_1++;                                                             /*0016*/
+// (0,9)
+
+   fprintf(stdout, "foo=%d\n", foo_1);                                  /*0018*/
+// (0,10)
+
+   foo_1++;                                                             /*0016*/
+// (0,11)
+
+   fprintf(stdout, "foo=%d\n", foo_1);                                  /*0018*/
+// (0,12)
+   i = 4;
+   // END BLOCK
+}
+
+Unsplit and compile resulting code
+
+
+Execute resulting code
+
+foo=1
+foo=2
+foo=3
+foo=4

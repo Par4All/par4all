@@ -23,34 +23,6 @@
 */
 #include "effects.h"
 
-/* some useful SHORTHANDS for EFFECT:
- */
-/* FI: Let's hope this one is not used as lhs! */
-#define effect_any_entity(e) reference_variable(effect_any_reference(e))
-#define effect_action_tag(eff) action_tag(effect_action(eff))
-#define effect_approximation_tag(eff) \
-	approximation_tag(effect_approximation(eff))
-
-/* #define effect_scalar_p(eff) entity_scalar_p(effect_entity(eff))
- *
- * The semantics of effects_scalar_p() must be refined. If all the
- * indices are constant expressions, we still have a scalar effect,
- * unless they are later replaced by "*", as is the case currently for
- * summary effects.
- *
- * Potential bug: eff is evaluated twice. Should be copied in a local
- * variable and braces be used.
- */
-#define effect_scalar_p(eff) ((type_depth(entity_type(effect_entity(eff)))==0) \
-			      && ENDP(reference_indices(effect_any_reference(eff))))
-#define effect_read_p(eff) (action_tag(effect_action(eff))==is_action_read)
-#define effect_write_p(eff) (action_tag(effect_action(eff))==is_action_write)
-#define effect_may_p(eff) \
-        (approximation_tag(effect_approximation(eff)) == is_approximation_may)
-#define effect_must_p(eff) \
-        (approximation_tag(effect_approximation(eff)) == is_approximation_must)
-#define effect_exact_p(eff) \
-        (approximation_tag(effect_approximation(eff)) ==is_approximation_exact)
 
 
 /* some string constants for prettyprints...
@@ -64,6 +36,16 @@
 #define ACTION_COPYOUT		"COPYOUT"
 #define ACTION_PRIVATE		"PRIVATE"
 
+/* for debug 
+*/
+#define pips_debug_effect(level, message, eff) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  (*effect_consistent_p_func)(eff); \
+  (*effect_prettyprint_func)(eff);}
+
+#define pips_debug_effects(level, message, l_eff) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  generic_print_effects(l_eff);}
 
 /* prettyprint function types:
  */
@@ -106,24 +88,6 @@ static void db_put_##name(char *m, list l) \
 #define DB_GETPUT_LS(name, NAME) DB_GET_LS(name, NAME) DB_PUT_LS(name, NAME)
 #define DB_GETNOPUT_LS(name, NAME) DB_GET_LS(name, NAME)DB_NOPUT_LS(name)
 
-
-/* for debug 
-*/
-#define pips_debug_effect(level, message, eff) \
-  ifdebug(level) { pips_debug(level, "%s\n", message); \
-  (*effect_consistent_p_func)(eff); \
-  (*effect_prettyprint_func)(eff);}
-
-#define pips_debug_effects(level, message, l_eff) \
-  ifdebug(level) { pips_debug(level, "%s\n", message); \
-  generic_print_effects(l_eff);}
-
-
-
-
-/* For COMPATIBILITY purpose only - DO NOT USE anymore
- */
-#define effect_variable(e) reference_variable(effect_any_reference(e))
 
 /* end of effects-generic-local.h
  */

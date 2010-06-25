@@ -39,8 +39,8 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0145
          I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0146
          I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0147
-C  <A(PHI1,PHI2)-write-MAY-{PHI2==1, I_LOW<=PHI1, 1<=PHI1, PHI1<=I_UP,
-C    PHI1<=10}>
+C  <A(PHI1,PHI2)-write-MAY-{PHI2==1, 1<=PHI1, PHI1<=10, I_LOW<=PHI1,
+C    PHI1<=I_UP}>
          STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0150
          STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0151
          STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 1                             0152
@@ -111,8 +111,8 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0145
          I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0146
          I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0147
-C  <A(PHI1,PHI2)-write-EXACT-{PHI2==2, I_LOW<=PHI1, 1<=PHI1,
-C    PHI1<=I_UP, PHI1<=10}>
+C  <A(PHI1,PHI2)-write-EXACT-{PHI2==2, 1<=PHI1, PHI1<=10, I_LOW<=PHI1,
+C    PHI1<=I_UP}>
          STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0150
          STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0151
          STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 2                             0152

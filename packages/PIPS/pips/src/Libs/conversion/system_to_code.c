@@ -49,9 +49,9 @@
 /* PIPS stuff
  */
 
+#include "misc.h"
 #include "ri-util.h" 
 #include "effects-util.h" 
-#include "misc.h" 
 #include "effects-generic.h"
 #include "effects-convex.h"
 

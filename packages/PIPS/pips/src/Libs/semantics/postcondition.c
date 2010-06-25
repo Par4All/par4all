@@ -53,7 +53,6 @@
 #include "ri-util.h" 
 #include "effects-util.h"
 #include "misc.h" 
-#include "control.h"
 #include "semantics.h"
 #include "transformer.h"
 

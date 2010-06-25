@@ -39,7 +39,6 @@
 #include "properties.h"
 #include "misc.h"
 #include "control.h"
-#include "preprocessor.h"
 #include "accel-util.h"
 
 typedef enum {
@@ -78,7 +77,7 @@ expression reference_offset(reference ref)
                         copy_expression(dimension_upper(dim)),
                         copy_expression(dimension_lower(dim))
                         ),
-                    make_expression_1());
+                    int_to_expression(1));
 
             if( !ENDP(indices) ) { /* there may be more dimensions than indices */
                 expression index_expression = EXPRESSION(CAR(indices));
@@ -350,7 +349,7 @@ reduce_array_declaration_dimension(statement s)
                     print_expression(new_dim);
                 }
                 gen_full_free_list(variable_dimensions(v));
-                variable_dimensions(v)=CONS(DIMENSION,make_dimension(make_expression_0(),make_op_exp(MINUS_OPERATOR_NAME,new_dim,make_expression_1())),NIL);
+                variable_dimensions(v)=CONS(DIMENSION,make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,new_dim,int_to_expression(1))),NIL);
             }
         }
     }

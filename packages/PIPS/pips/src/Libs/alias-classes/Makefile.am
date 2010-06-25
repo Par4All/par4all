@@ -7,14 +7,10 @@ libalias_classes_la_SOURCES=alias_pairs.c \
 		alias_lists.c \
 		alias_classes.c \
 		points_to_set.c	\
-		anywhere_abstract_locations.c \
-		eval.c \
-		abstract_location.c \
+                points_to_prettyprint.c \
 		points_to_analysis.c \
 		points_to_interprocedural_analysis.c \
-	 	prettyprint.c \
-		points_to_prettyprint.c \
-		conflicts.c
+	 	prettyprint.c 
 
 include $(srcdir)/../pipslibs_includes.mk
 include $(top_srcdir)/makes/cproto.mk

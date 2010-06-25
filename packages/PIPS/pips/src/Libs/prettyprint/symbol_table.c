@@ -49,8 +49,6 @@
 
 #include "misc.h"
 #include "pipsdbm.h"
-#include "transformations.h"
-#include "properties.h"
 
 #define NL       "\n"
 

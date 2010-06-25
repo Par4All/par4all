@@ -42,18 +42,15 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
-#include "transformations.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
 
 #include "expressions.h"
-#include "callgraph.h"
 
 #include "sac.h"
 #include "ricedg.h"
-#include "atomizer.h"
 
 
 /** 

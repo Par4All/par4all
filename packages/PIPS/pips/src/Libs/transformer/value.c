@@ -196,14 +196,17 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "effects.h"
+#include "effects-util.h"
 #include "constants.h"
 
 #include "properties.h"
 
 #include "misc.h"
+#include "preprocessor.h"
 
 #include "transformer.h"
-#include "alias-classes.h"
+//#include "alias-classes.h"
 
 /* STATIC VARIABLES */
 
@@ -593,7 +596,6 @@ string global_value_name_to_user_name(string gn)
 
 string external_value_name(entity e)
 {
-  extern entity get_current_module_entity();
   entity m = get_current_module_entity();
   string s = hash_get(hash_value_to_name, (char *) e);
 
@@ -698,7 +700,6 @@ bool old_value_entity_p(entity e)
   /* string s = strstr(entity_local_name(e), OLD_VALUE_PREFIX); */
 
   if(!local_temporary_value_entity_p(e)) {
-    /* string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX); */
     string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);
     string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);
     return s1!=NULL || s2!=NULL;
@@ -733,8 +734,6 @@ static string string_identity(string s)
 
 void print_value_mappings()
 {
-  extern string entity_minimal_name(entity);
-
   (void) fprintf(stderr,"\nhash table value to name:\n");
   hash_table_fprintf(stderr, (gen_string_func_t)dump_value_name, (gen_string_func_t)string_identity,
 		     hash_value_to_name);
@@ -1228,7 +1227,6 @@ entity value_to_variable(entity val)
   int l_suffix = -1; /* for gcc only! */
   string s = hash_get(hash_value_to_name, (char *) val);
   string var_name;
-  extern entity get_current_module_entity();
 
   /* pips_assert("value_to_variable", s != HASH_UNDEFINED_VALUE); */
 

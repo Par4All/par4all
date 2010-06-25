@@ -106,14 +106,11 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "pipsdbm.h"
 
 #include "text-util.h"
 
 #include "dg.h"
-#include "properties.h"
 
-#include "control.h"
 
 #include "phrase_tools.h"
 #include "spaghettify.h"
@@ -199,7 +196,7 @@ static control make_initialization_from_loop (loop the_loop,
     = make_assignement_statement (increment_variable, increment, stat);
   init_index_statement 
     = make_assignement_statement (index_variable, 
-				  make_expression_from_entity(begin_variable),
+				  entity_to_expression(begin_variable),
 				  stat);
 
   init_sequence 
@@ -251,8 +248,8 @@ static control make_condition_from_loop (loop the_loop,
     }
     test_condition 
       = MakeBinaryCall (entity_intrinsic(intrinsic_name),
-			make_expression_from_entity (index_variable),
-			make_expression_from_entity (end_variable));
+			entity_to_expression (index_variable),
+			entity_to_expression (end_variable));
   }
   else {
     // Generate (((INDEX'.LE.END').AND.(INC'.GE.0)).OR.((INDEX'.GE.END').AND.(INC'.LE.0)))
@@ -260,18 +257,18 @@ static control make_condition_from_loop (loop the_loop,
       = MakeBinaryCall (entity_intrinsic(OR_OPERATOR_NAME),
 			MakeBinaryCall (entity_intrinsic(AND_OPERATOR_NAME),
 					MakeBinaryCall (entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-							make_expression_from_entity (index_variable),
-							make_expression_from_entity (end_variable)),
+							entity_to_expression (index_variable),
+							entity_to_expression (end_variable)),
 					MakeBinaryCall (entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
-							make_expression_from_entity (increment_variable),
-							int_expr (0))),
+							entity_to_expression (increment_variable),
+							int_to_expression (0))),
 			MakeBinaryCall (entity_intrinsic(AND_OPERATOR_NAME),
 					MakeBinaryCall (entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
-							make_expression_from_entity (index_variable),
-							make_expression_from_entity (end_variable)),
+							entity_to_expression (index_variable),
+							entity_to_expression (end_variable)),
 					MakeBinaryCall (entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-							make_expression_from_entity (increment_variable),
-							int_expr (0))));
+							entity_to_expression (increment_variable),
+							int_to_expression (0))));
 
 					
   }
@@ -315,7 +312,7 @@ static control make_body_from_loop (loop the_loop,
 {
   statement assignement_statement 
     = make_assignement_statement (loop_index(the_loop),
-				  make_expression_from_entity (index_variable),
+				  entity_to_expression (index_variable),
 				  stat);
   statement spaghettified_body 
     = spaghettify_statement(loop_body(the_loop),
@@ -324,8 +321,8 @@ static control make_body_from_loop (loop the_loop,
     = make_assignement_statement 
     (index_variable,
      MakeBinaryCall (entity_intrinsic(PLUS_OPERATOR_NAME),
-		     make_expression_from_entity (index_variable),
-		     make_expression_from_entity (increment_variable)),
+		     entity_to_expression (index_variable),
+		     entity_to_expression (increment_variable)),
      stat);
 
   sequence body_sequence 

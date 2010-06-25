@@ -717,8 +717,8 @@ transformer transformer_range_intersection(transformer tf, transformer r)
 static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     int is_inferior = TRUE;
-    string s1 = generic_value_name((entity) vecteur_var(*pvarval1));
-    string s2 = generic_value_name((entity) vecteur_var(*pvarval2));
+    const char* s1 = generic_value_name((entity) vecteur_var(*pvarval1));
+    const char* s2 = generic_value_name((entity) vecteur_var(*pvarval2));
 
     is_inferior = (strcmp(s1, s2) > 0 );
 
@@ -938,11 +938,19 @@ transformer safe_transformer_projection(transformer t, list args)
     list nargs = NIL;
 
     /* keep only values of args related to the transformer t */
-    MAP(ENTITY, v, {
+    FOREACH(ENTITY, v, args) {
+      /* Make sure v is in the basis */
       if(base_contains_variable_p(sc_base(r), (Variable) v)) {
-	nargs = gen_nconc(nargs, CONS(ENTITY, v, NIL));
+	nargs = arguments_add_entity(nargs, v);
       }
-    }, args);
+      if(entity_is_argument_p(v, transformer_arguments(t))) {
+	/* Make sure the old value is projected too */
+	entity ov = entity_to_old_value(v);
+	if(base_contains_variable_p(sc_base(r), (Variable) ov)) {
+	  nargs = arguments_add_entity(nargs, ov);
+	}
+      }
+    }
 
     nt = transformer_projection(t, nargs);
     gen_free_list(nargs);
@@ -1089,7 +1097,6 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-  extern string entity_global_name(entity); /* useless with ri-util.h */
 
   ifdebug(9) {
     pips_debug(9, "Begin for transformer %p\n", t);
@@ -1380,7 +1387,6 @@ transformer transformer_filter(transformer t, list args)
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-  extern string entity_global_name(entity); /* useless with ri-util.h */
 
   ifdebug(9) {
     pips_debug(9, "Begin for transformer %p\n", t);

@@ -38,7 +38,6 @@
 #include "constants.h"  /* useful, because DBR_ is called directly by main */
 
 jmp_buf pips_top_level;
- extern void search_array_from_statement();
 
 main(argc, argv)
 int argc;

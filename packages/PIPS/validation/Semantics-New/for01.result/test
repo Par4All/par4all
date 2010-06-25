@@ -1,0 +1,120 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0}
+
+   int a[20];
+
+//  T(n) {i==0}
+
+   int n;
+
+//  T(m) {i==0}
+
+   int m;
+
+//  T(k) {i==0, k<=m, k<=n}
+
+   int k = m<=n?m:n;
+
+//  T(n) {i==0, k<=m, k<=n#init}
+
+
+   scanf("%d", &n);
+
+//  T(m) {i==0, k<=m#init}
+
+   scanf("%d", &m);
+
+//  T(i) {i==0, i#init==0}
+
+
+   i = 0;
+
+//  T(i) {i#init==0, i<=m, i<=n, 0<=m, 0<=n}
+
+   while (i<=(n<=m?n:m)) {
+
+//  T() {i<=m, i<=n, 0<=m, 0<=n}
+
+      a[i] = i;
+
+//  T(i) {i#init<=m, i#init<=n, 0<=m, 0<=n}
+
+      i = inc(i);
+   }
+
+//  T() {0<=i}
+
+   printf("%d\n", i);
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int a[20];
+
+//  P(i) {i==0}
+
+   int n;
+
+//  P(i,n) {i==0}
+
+   int m;
+
+//  P(i,m,n) {i==0}
+
+   int k = m<=n?m:n;
+
+//  P(i,k,m,n) {i==0, k<=m, k<=n}
+
+
+   scanf("%d", &n);
+
+//  P(i,k,m,n) {i==0, k<=m}
+
+   scanf("%d", &m);
+
+//  P(i,k,m,n) {i==0}
+
+
+   i = 0;
+
+//  P(i,k,m,n) {i==0}
+
+   while (i<=(n<=m?n:m)) {
+
+//  P(i,k,m,n) {i<=m, i<=n, 0<=m, 0<=n}
+
+      a[i] = i;
+
+//  P(i,k,m,n) {i<=m, i<=n, 0<=m, 0<=n}
+
+      i = inc(i);
+   }
+
+//  P(i,k,m,n) {0<=i}
+
+   printf("%d\n", i);
+}

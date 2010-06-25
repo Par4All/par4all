@@ -29,6 +29,9 @@
  * DBLL = Data Base Low Level
  */
 
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
 #include "private.h"
 
 /**************************************************** METHODS FOR RESOURCES */

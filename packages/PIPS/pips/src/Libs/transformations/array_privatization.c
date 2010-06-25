@@ -44,7 +44,6 @@
 #include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "control.h"
 #include "constants.h"
 #include "misc.h"
 #include "parser_private.h"
@@ -60,7 +59,6 @@
 #include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "prettyprint.h"
 
 /********************** 1-  PRIVATIZABILITY DETECTION  && LOOP PRIVATISATION */
 

@@ -70,7 +70,7 @@ static entity loop_SR_array(entity mpi_module, region reg)
 
 static statement build_new_loop_bounds(entity new_module, entity index)
 {
-  expression rank_expr_p1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,step_local_rank(new_module),make_expression_1());  
+  expression rank_expr_p1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,step_local_rank(new_module),int_to_expression(1));  
 
   // creation  et declaration des variables locales STEP_I_LOW, STEP_I_UP
   entity loopSlice = step_local_loopSlices(new_module,index);

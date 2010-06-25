@@ -477,9 +477,9 @@ static expression split_complex_expression(expression e)
     list ri = reference_indices(r);
 
     list ri0 = gen_full_copy_list(ri);
-    complex_translation(&ri0,make_expression_list(make_expression_0()));
+    complex_translation(&ri0,make_expression_list(int_to_expression(0)));
     list ri1 = gen_full_copy_list(ri);
-    complex_translation(&ri1,make_expression_list(make_expression_1()));
+    complex_translation(&ri1,make_expression_list(int_to_expression(1)));
 
     expression new = MakeBinaryCall(
             CreateIntrinsic(PLUS_OPERATOR_NAME),
@@ -519,7 +519,7 @@ static bool simplify_complex_expression(expression e)
             if(expression_reference_p(arg)) /* ok let's do something */
             {
                 reference r = expression_reference(arg);
-                complex_translation(&reference_indices(r),make_expression_list(make_expression_0()));
+                complex_translation(&reference_indices(r),make_expression_list(int_to_expression(0)));
                 /* replace the call by a reference */
                 syntax_reference(expression_syntax(arg))=reference_undefined;
                 free_syntax(expression_syntax(e));
@@ -536,7 +536,7 @@ static bool simplify_complex_expression(expression e)
             if(expression_reference_p(arg)) /* ok let's do something */
             {
                 reference r = expression_reference(arg);
-                complex_translation(&reference_indices(r),make_expression_list(make_expression_1()));
+                complex_translation(&reference_indices(r),make_expression_list(int_to_expression(1)));
                 /* replace the call by a reference */
                 syntax_reference(expression_syntax(arg))=reference_undefined;
                 free_syntax(expression_syntax(e));

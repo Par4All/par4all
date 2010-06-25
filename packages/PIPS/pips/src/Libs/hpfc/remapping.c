@@ -788,14 +788,15 @@ generate_remapping_code(
     /*   some comments to help understand the generated code
      */
     {
-	char buffer[128];
+	char *buffer;
 	
-	sprintf(buffer, "! remapping %s[%"PRIdPTR"]: %s[%"PRIdPTR"] -> %s[%"PRIdPTR"]\n",
+	asprintf(&buffer, "! remapping %s[%"PRIdPTR"]: %s[%"PRIdPTR"] -> %s[%"PRIdPTR"]\n",
 		entity_local_name(primary), load_hpf_number(primary),
 		entity_local_name(src), load_hpf_number(src),
 		entity_local_name(trg), load_hpf_number(trg));
 	
 	insert_comments_to_statement(result, buffer);
+    free(buffer);
 	insert_comments_to_statement(send, "! send part\n");
 	insert_comments_to_statement(receive, "! receive part\n");
 	insert_comments_to_statement(cont, "! end of remapping\n");
@@ -841,7 +842,7 @@ set_live_status(
     int trg_n = load_hpf_number(load_similar_mapping(trg));
 
     return make_assign_statement(live_mapping_expression(trg_n),
-				 make_constant_boolean_expression(TRUE));
+				 bool_to_expression(TRUE));
 }
 
 static statement 
@@ -911,7 +912,7 @@ generate_remapping_guard(
 
 	l = CONS(STATEMENT,
 		 make_assign_statement(live_mapping_expression(trg_n),
-				   make_constant_boolean_expression(TRUE)), l);
+				   bool_to_expression(TRUE)), l);
     }
 
     result = test_to_statement(make_test(cond, 
@@ -938,7 +939,7 @@ generate_all_liveness_but(
 	    ls = CONS(STATEMENT, 
 		      make_assign_statement
 		      (live_mapping_expression(load_hpf_number(array)),
-		       make_constant_boolean_expression(val)), ls);
+		       bool_to_expression(val)), ls);
     },
 	entities_list(load_dynamic_hpf(primary)));
 
@@ -982,7 +983,7 @@ generate_dynamic_liveness_for_primary(
 	    ls = CONS(STATEMENT, 
 	      make_assign_statement
                   (live_mapping_expression(load_hpf_number(array)),
-		   make_constant_boolean_expression(FALSE)), ls);
+		   bool_to_expression(FALSE)), ls);
 	}	    
     },
 	entities_list(load_dynamic_hpf(primary)));
@@ -1171,14 +1172,14 @@ static string
 remapping_file_name(
     renaming remap)
 {
-    static char buffer[80]; /* ??? stupid static buffer... */
+    char *buffer;
     entity src = renaming_old(remap), trg = renaming_new(remap);
     string module, array;
 
     module = strdup(entity_module_name(src));
     array  = strdup(entity_local_name(load_primary_entity(src)));
 
-    sprintf(buffer, "%s_%s_%"PRIdPTR"_%"PRIdPTR"_node.h", module, array,
+    asprintf(&buffer, "%s_%s_%"PRIdPTR"_%"PRIdPTR"_node.h", module, array,
 	    load_hpf_number(src), load_hpf_number(trg));
 
     free(module);
@@ -1244,7 +1245,9 @@ generate_hpf_remapping_file(renaming r)
     /* put it in a file
      */
     dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
-    file_name = strdup(concatenate(dir, "/", remapping_file_name(r), NULL));
+    string rfn = remapping_file_name(r);
+    asprintf(&file_name,"%s/%s",dir,rfn);
+    free(rfn);
     free(dir);
 
     f = hpfc_fopen(file_name);

@@ -39,9 +39,7 @@
 
 #include "resources.h"
 
-#include "misc.h"
 #include "ri-util.h"
-#include "pipsdbm.h"
 #include "sac.h"
 #include "patterns.h"
 

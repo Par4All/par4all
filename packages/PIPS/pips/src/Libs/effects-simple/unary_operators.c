@@ -48,11 +48,10 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "alias-classes.h"
+//#include "alias-classes.h"
 
 
 
@@ -592,7 +591,6 @@ list old_effects_composition_with_effect_transformer(list l_eff,
 */
   list l1 = list_undefined;
   list l2 = list_undefined;
-  extern string words_to_string(list);
 
   ifdebug(8) {
     pips_debug(8, "Begin: %zd effects before composition:\n", gen_length(l_eff));

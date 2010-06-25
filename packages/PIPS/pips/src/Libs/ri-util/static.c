@@ -38,10 +38,10 @@
 #include "linear.h"
 
 #include "genC.h"
+#include "misc.h"
 
 #include "ri.h"
 #include "ri-util.h"
-#include "misc.h"
 
 
 /*********************************************************** CURRENT ENTITY */

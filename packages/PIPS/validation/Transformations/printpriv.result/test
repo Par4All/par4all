@@ -3,8 +3,8 @@ Cray code for "PRINTPRIV"
 
       PROGRAM PRINTPRIV
       REAL B(10,10), T
-c
 CMIC$ DO ALL PRIVATE(J,I) SHARED(B) 
+c
       DO I = 1, 10                                                      0004
 CDIR$ IVDEP 
          DO J = 1, 10                                                   0005

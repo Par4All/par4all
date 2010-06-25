@@ -47,13 +47,11 @@
 #include "text.h"
 
 
-#include "properties.h"
 
 
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-#include "pipsdbm.h"
 #include "resources.h"
 
 

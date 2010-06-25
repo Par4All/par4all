@@ -54,11 +54,8 @@ typedef dg_vertex_label vertex_label;
 #include "tiling.h"
 #include "database.h"
 #include "text.h"
-#include "properties.h"
-#include "prettyprint.h"
 #include "text-util.h"
 #include "resources.h"
-#include "movements.h"
 
 #include "wp65.h"
 

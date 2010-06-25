@@ -50,14 +50,10 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 
 #include "misc.h"
-#include "rice.h"
-#include "properties.h"
 #include "text-util.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "resources.h"
-#include "pipsdbm.h"
 #include "movements.h"
 #include "constants.h"
 #include "wp65.h"
@@ -590,7 +586,6 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
 static list 
 build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
 {
-    list endlt=NIL;
     list newlt=NIL;
     MAPL(ref, {
 	Variable var1 = (Variable) reference_variable(REFERENCE(CAR(ref)));
@@ -601,9 +596,9 @@ build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
 	    (vect_new((char *) bank_indices->succ->succ->var, VALUE_ONE));
 	list args = CONS(EXPRESSION,expr2, CONS(EXPRESSION,expr1,NIL));
 	reference ref1 =  make_reference((Variable) esv,args);
-	INSERT_AT_END(newlt,endlt,CONS(REFERENCE,ref1, NIL));
+    newlt=CONS(REFERENCE,ref1,newlt);
     },lt);
-    return newlt;
+    return gen_nreverse(newlt);
  
 }
 

@@ -28,9 +28,7 @@
 #endif
 
 #include "local.h"
-
-extern bool 
-ignore_this_conflict(vertex v1, vertex v2, conflict c, int l);
+#include "rice.h"
 
 
 /* Vertex_to_statement looks for the statement that is pointed to by

@@ -323,7 +323,7 @@ check_call_basic(be, bp, c, i)
 	flint_message("check_call",
 		      "incompatible basic type, %dth arg in call to %s, %s>%s\n",
 		      i, entity_name(call_function(c)),
-		      flint_print_basic(be), flint_print_basic(bp));
+		      basic_to_string(be), basic_to_string(bp));
     return (FALSE);
 }
 

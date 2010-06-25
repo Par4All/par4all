@@ -61,6 +61,7 @@
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "phases.h"
+#include "pipsmake.h"
 
 #include "callgraph.h"
 
@@ -384,7 +385,6 @@ bool callgraph(string name)
       /* Should not be an error as PIPS can synthesize missing code
 	 and does it elsewhere... */
       if(!found) {
-	extern bool rmake(string, string);
 
 	pips_user_warning("no source file for module %s, let's try so synthesize code\n",
 			  module_called);

@@ -79,9 +79,6 @@
     fprintf(stderr, "pips internal error in %s: %s\n", fun, msg); exit(2); \
 }
 
-extern Pvecteur vect_gen_read();
-extern void vect_gen_write();
-
 void sc_gen_write(FILE *fd, Psysteme s)
 {
     Pcontrainte c;

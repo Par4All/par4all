@@ -25,7 +25,6 @@
     #include "pips_config.h"
 #endif
 #include "local.h"
-#include "icfg.h"
 
 #define DEP_FLOW 0
 #define DEP_ANTI 1
@@ -57,8 +56,6 @@ static string caller_name;
 static call current_call = call_undefined;
 static int number_of_processed_modules = 0;
 static int number_of_impact_alias = 0;
-
-extern statement vertex_to_statement(vertex);
 
 static void display_impact_alias_statistics()
 {

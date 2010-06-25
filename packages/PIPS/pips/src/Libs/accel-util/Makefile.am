@@ -11,6 +11,7 @@ libaccel_util_la_SOURCES=group_constants.c \
 			array_to_pointer.c  \
 			inlining.c\
  			kernels.c\
-			terapixify.c
+			terapixify.c\
+			constraints.c
 
 include $(srcdir)/../pipslibs_includes.mk

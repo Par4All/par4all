@@ -53,10 +53,8 @@ typedef dg_vertex_label vertex_label;
 #include "text.h"
 
 #include "misc.h"
-#include "properties.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "text-util.h"
 #include "resources.h"
 #include "pipsdbm.h"

@@ -81,23 +81,6 @@ bool dot_f95_file_p( string name ) {
   return !!find_suffix( name, FORTRAN95_FILE_SUFFIX );
 }
 
-
-/** Test if a module is in C */
-bool c_module_p( entity m ) {
-  STUB_WARNING();
-  return FALSE;
-}
-
-/** Test if a module is in Fortran */
-bool fortran_module_p( entity m ) {
-  STUB_WARNING();
-  return TRUE;
-}
-
-entity find_enum_of_member( entity m ) {
-  STUB_ERROR();
-}
-
 const char* entity_minimal_name(entity e) {
   STUB_ERROR();
 }
@@ -153,14 +136,6 @@ void db_put_or_update_memory_resource( string rname,
  * C_Syntax
  */
 
-string empty_scope() {
-  STUB_WARNING();
-  return strdup( "" );
-}
-bool empty_scope_p( string s ) {
-  STUB_WARNING();
-  return strcmp( s, "" ) == 0;
-}
 void CParserError( char *msg ) {
   STUB_ERROR();
 }

@@ -32,9 +32,9 @@
       PARAMETER (N=100)
       PARAMETER (CHUNKSIZE=10)
       REAL A(N), B(N), RESULT
+!$OMP PARALLEL DO 
 
 !     Some initializations
-!$OMP PARALLEL DO 
       DO I = 1, N
          A(I) = I*1.0
       ENDDO
@@ -46,8 +46,8 @@
 !$omp end parallel do
       RESULT = 0.0
       CHUNK = CHUNKSIZE
-
 !$omp parallel do reduction(+:RESULT)
+
       DO I = 1, N
          RESULT = RESULT+A(I)*B(I)
       ENDDO

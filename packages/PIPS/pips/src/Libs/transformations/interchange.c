@@ -47,11 +47,7 @@
 
 #include "ri-util.h"
 #include "effects-util.h"
-#include "prettyprint.h"
 #include "conversion.h"
-
-extern void global_parallelization();
-extern int set_interchange_parameters();
 
 /* statement gener_DOSEQ(cons *lls,Pvecteur pvg[], Pbase base_oldindex,
  * Pbase base_newindex)

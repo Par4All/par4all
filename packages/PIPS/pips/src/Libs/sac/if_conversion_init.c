@@ -51,12 +51,9 @@
 #include "effects-simple.h"
 #include "properties.h"
 
-#include "expressions.h"
 #include "complexity.h"
-#include "callgraph.h"
 #include "sac.h"
 
-#include "atomizer.h"
 
 /** 
  * atomize the condition of a test and returns generated statements
@@ -70,7 +67,7 @@ static statement atomize_condition(statement cs)
         test t = statement_test(cs);
         expression cond = test_condition(t);
         if(!expression_reference_p(cond))
-            return simd_atomize_this_expression(hpfc_new_variable, cond);
+            return simd_atomize_this_expression(make_new_scalar_variable, cond);
         return statement_undefined;
 }
 

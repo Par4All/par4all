@@ -24,7 +24,6 @@
 #include "accel-util.h"
 #include "resources.h"
 #include "properties.h"
-#include "preprocessor.h"
 
 /** Store the loop nests found that meet the spec to be executed on a
     GPU. Use a list and not a set or hash_map to have always the same

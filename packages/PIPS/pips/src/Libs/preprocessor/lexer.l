@@ -71,13 +71,7 @@
 
 #include "c_syntax.h"
 #include "splitc.h"
-
-extern string csplit_current_function_name;
-extern string csplit_current_function_name2;
-extern string csplit_definite_function_name;
-extern string csplit_definite_function_signature;
-extern bool csplit_is_static_p;
-extern int check_signature_balance(void);
+#include "preprocessor.h"
 
 int csplit_line_number = 1; /**< To be exported to the parser for
 				splitting the preprocessed file */
@@ -221,10 +215,6 @@ static int lf_count(string s)
   return count;
 }
 
-extern int csplit_is_external;
-extern int csplit_is_function;
-
-extern intptr_t is_c_keyword_typedef(char * s);
 %}
 
 /* To track file line number automatically: */

@@ -67,24 +67,6 @@
 #include "paf_ri.h"
 #include "paf-util.h"
 
-extern void retire_par_de_pile(void);
-extern void init_quast(void);
-extern void creer_quast_value(void);
-extern void creer_true_quast(void);
-extern void creer_predicat(void);
-extern void fait_quast(void);
-extern void fait_quast_value(void);
-extern void init_liste_vecteur(void);
-extern void init_vecteur(void);
-extern void ecrit_coeff1(int /*ent*/);
-extern void creer_Psysteme(void);
-extern void init_new_base(void);
-extern void ajoute_new_var(int /*ent*/, int /*rang*/);
-extern void ecrit_liste_vecteur(void);
-extern void ecrit_une_var(int /*ent*/);
-extern void ecrit_une_var_neg(int /*ent*/);
-extern void ecrit_coeff_neg2(int /*ent*/);
-
 %}
 
 %union{

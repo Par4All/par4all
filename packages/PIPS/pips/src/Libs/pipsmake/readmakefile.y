@@ -77,12 +77,6 @@
 
 #include "stdlib.h"
 
-extern void add_rule(rule);
-extern void yyerror(char *);
-extern int yylex(void);
-
-extern FILE * yyin; 
-
 static makefile pipsmakefile = makefile_undefined;
 static hash_table activated;
 %}
@@ -267,9 +261,6 @@ void fprint_makefile(FILE *fd, makefile m)
 makefile 
 parse_makefile(void)
 {
-    extern int init_lex();
-    extern int yyparse();
-
     if (pipsmakefile == makefile_undefined)
     {
 	debug_on("PIPSMAKE_DEBUG_LEVEL");

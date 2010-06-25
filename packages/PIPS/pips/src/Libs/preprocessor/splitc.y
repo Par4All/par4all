@@ -64,7 +64,6 @@
 #include "ri-util.h"
 #include "misc.h"
 
-#include "c_syntax.h"
 #include "preprocessor.h"
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
@@ -75,18 +74,6 @@
    user warning in splitc_error: C memory exhausted near "0" at preprocessed line 13459 (user line 8732)
 */
 #define YYMAXDEPTH 1000000
-
-extern int splitc_lex(void);
-extern void splitc_error(char *);
-extern int get_csplit_current_beginning(void);
-extern int get_user_current_beginning(void);
-extern size_t get_current_csplit_file_offset(void);
-extern size_t get_csplit_file_offset_beginning(void);
-extern void reset_csplit_current_beginning(void);
-extern int csplit_line_number;
-extern string splitc_text;
-extern int get_user_current_beginning();
-
 
 /* The following global variables are used to store the information such as
    the scope, type and storage of an entity, given by the decl_spec_list,

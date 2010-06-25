@@ -328,9 +328,11 @@ hpfc_ith_broadcast_function(
     int dim,      /* number of dimensions of the broadcast */
     bool special) /* whether to use the special version */
 {
-    char buffer[20]; /* ??? static buffer size */
-    (void) sprintf(buffer, "%s%d", special? GUARDED_BRD: BROADCAST, dim);
-    return MakeRunTimeSupportSubroutine(buffer, 2*dim+1);
+    char *buffer; /* ??? static buffer size */
+    asprintf(&buffer, "%s%d", special? GUARDED_BRD: BROADCAST, dim);
+    entity e= MakeRunTimeSupportSubroutine(buffer, 2*dim+1);
+    free(buffer);
+    return e;
 }
 
 /* send the buffer, possibly a broadcast.

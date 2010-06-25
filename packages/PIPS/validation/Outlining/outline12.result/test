@@ -73,7 +73,7 @@ compute_kernel:         imagein_re[i][j] = 1+imagein_im[i][j];
    return 0;
 }
 The kernels should be parallel. Unfotunately, current OUTLINE version relies on reparsing the code, so parallelism information is lost...
-void compute_kernel(float imagein_im, float *imagein_re0)
+void compute_kernel(float *imagein_re0, float imagein_im)
 {
 compute_kernel:   *imagein_re0 = 1+imagein_im;
 }
@@ -97,7 +97,7 @@ init_kernel:         init_kernel(&imagein_re[i][j], i);
    for(i = 0; i <= 63; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1)
-compute_kernel:         compute_kernel(imagein_im[i][j], &imagein_re[i][j]);
+compute_kernel:         compute_kernel(&imagein_re[i][j], imagein_im[i][j]);
 
    for(i = 0; i <= 63; i += 1) {
       printf("Line %d:\n");
@@ -109,7 +109,7 @@ compute_kernel:         compute_kernel(imagein_im[i][j], &imagein_re[i][j]);
    return 0;
 }
 All the kernel loops should be //
-void compute_kernel(float imagein_im, float *imagein_re0)
+void compute_kernel(float *imagein_re0, float imagein_im)
 {
 compute_kernel:   *imagein_re0 = 1+imagein_im;
 }
@@ -133,7 +133,7 @@ init_kernel:         init_kernel(&imagein_re[i][j], i);
    for(i = 0; i <= 63; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1)
-compute_kernel:         compute_kernel(imagein_im[i][j], &imagein_re[i][j]);
+compute_kernel:         compute_kernel(&imagein_re[i][j], imagein_im[i][j]);
 
    for(i = 0; i <= 63; i += 1) {
       printf("Line %d:\n");

@@ -88,7 +88,7 @@ expression step_parameter_max_nb_request(entity module, expression nb_communicat
   expression expr = expression_undefined;
 
   if(!expression_undefined_p(nb_communication))
-    expr = make_op_exp("*", int_expr(2),
+    expr = make_op_exp("*", int_to_expression(2),
 		       make_op_exp("*", nb_communication, 
 				   step_symbolic(STEP_MAX_NB_LOOPSLICES_NAME, module)));
 
@@ -140,7 +140,7 @@ static entity step_local_RT_Integer(int size_of_integer, entity mpi_module, stri
 entity step_local_SR(entity module, entity array, expression expr_nb_region)
 {
   string name = strdup(STEP_SR_NAME(array));
-  dimension dim_array = make_dimension(make_expression_1(), int_expr(NumberOfDimension(array)));
+  dimension dim_array = make_dimension(int_to_expression(1), int_to_expression(NumberOfDimension(array)));
   dimension bounds = make_dimension(step_symbolic(STEP_INDEX_SLICE_LOW_NAME, module),
 				    step_symbolic(STEP_INDEX_SLICE_UP_NAME, module));
   list dims = NIL;
@@ -171,7 +171,7 @@ entity step_local_loopSlices(entity module, entity i)
 {
   list dims = CONS(DIMENSION, make_dimension(step_symbolic(STEP_INDEX_SLICE_LOW_NAME, module),
 					     step_symbolic(STEP_INDEX_SLICE_UP_NAME, module)),
-		   CONS(DIMENSION, make_dimension(make_expression_1(), 
+		   CONS(DIMENSION, make_dimension(int_to_expression(1), 
 						  step_symbolic(STEP_MAX_NB_LOOPSLICES_NAME, module)), NIL));
   return step_local_RT_Integer(STEP_RT_LOOP_INDEX_INTEGER, module, STEP_LOOPSLICES_NAME(i), dims, false);
 }
@@ -180,7 +180,7 @@ entity step_local_loopSlices(entity module, entity i)
 expression step_local_requests_array(entity module, expression nb_communication)
 {
   expression step_max_nb_request = step_parameter_max_nb_request(module,nb_communication);
-  list dims = CONS(DIMENSION, make_dimension(make_expression_1(), step_max_nb_request), NIL);
+  list dims = CONS(DIMENSION, make_dimension(int_to_expression(1), step_max_nb_request), NIL);
   return entity_to_expression(step_local_RT_Integer(STEP_RT_NB_WORKCHUNK_INTEGER, module, STEP_REQUEST_NAME, dims, false));
 }
 

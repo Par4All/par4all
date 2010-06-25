@@ -116,33 +116,5 @@ typedef struct Variants  {
 
 typedef simple_section tDad;
 
-/* function prototypes */
-/* ss.c */
-extern tag GetRefTemp(simple_section Dad, int DimNo);
-extern void PutRefTemp(simple_section Dad, int DimNo, tag Val);
-extern LinExpr GetBoundary(simple_section Dad, int DimNo, unsigned Low);
-extern void PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up);
-extern LinExpr MinBoundary(LinExpr Lin1, LinExpr Lin2);
-extern LinExpr MaxBoundary(LinExpr Lin1, LinExpr Lin2);
-extern LinExpr MergeLinExprs(LinExpr Expr1, LinExpr Expr2, OpFlag Op);
-extern unsigned int ComputeIndex(unsigned int I, unsigned int J, unsigned int Rank);
-extern LinExpr CopyAccVec(LinExpr Expr);
-extern bool IsExprConst(LinExpr Expr);
-extern bool DivExists(loop Loop, LinExpr Lin);
-extern expression GetAccVec(unsigned No, const reference ref);
-extern unsigned int CardinalityOf(list gl);
-extern dad_struct AllocateDadStruct(int Rank);
-extern simple_section AllocateSimpleSection(reference ref);
-extern void ScanAllDims(reference ref, simple_section Dad);
-extern void ComputeRTandSS(expression Sub, unsigned DimNo, simple_section Dad);
-extern void TranslateRefsToLoop(loop ThisLoop, list ListOfComps);
-extern void TranslateToLoop(loop ThisLoop, comp_desc Desc);
-extern tVariants *TransRefTemp(loop ThisLoop, comp_desc Desc);
-extern void ComputeBoundaries(simple_section Dad, loop Loop, LinExpr lbExpr, LinExpr ubExpr, unsigned Offset);
-extern void TransSimpSec(simple_section Dad, loop Loop, tVariants *Vars);
-extern void Lbound(loop Loop, LinExpr Lin);
-extern void Ubound(loop Loop, LinExpr Lin);
-extern simple_section SimpUnion(simple_section S1, simple_section S2);
-
 #endif
 

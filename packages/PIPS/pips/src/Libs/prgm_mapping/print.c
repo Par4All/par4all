@@ -70,8 +70,6 @@
 #include "misc.h"
 #include "paf-util.h"
 
-extern int adg_number_to_ordering(int /*in_nb*/);
-
 /* Macro functions  	*/
 
 /* Global variables 	*/

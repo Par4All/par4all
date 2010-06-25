@@ -43,8 +43,6 @@
 
 #include "syntax.h"
 
-extern void parser_substitute_all_macros_in_expression(expression);
-
 /*********************************************************** MACRO HANDLING */
 
 typedef struct {

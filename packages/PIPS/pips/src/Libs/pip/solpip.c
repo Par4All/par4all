@@ -50,8 +50,6 @@
 #include "paf_ri.h"
 #include "pip.h"
 
-extern expression make_op_exp(char *op_name, expression exp1, expression exp2);
-
 #define PREMIERE_VAR1_BASE premiere_var1 == 0
 #define RESET_PREMIERE_VAR1 premiere_var1 = 0;
 #define SET_PREMIERE_VAR1 premiere_var1 = 1;
@@ -89,10 +87,6 @@ typedef struct pilequast
         quast              q;
         struct pilequast   *succ;
         } pilequast, *Ppilequast;
-
-extern  int             ind_min_max;
-extern  Pbase           base_ref, base_var_ref, old_base, old_base_var;
-extern  quast           quast_act;
 
 list        newparms_act;
 list       solution_act;
@@ -135,8 +129,6 @@ ajoute_constante ( ent )
       int            ent;
 
 {
-extern  expression      expression_act;
-
         if (expression_act == NULL)
            {
            expression_act=int_to_expression(ent);

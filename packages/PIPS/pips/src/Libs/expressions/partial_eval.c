@@ -496,7 +496,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
       ef.simpler = TRUE;
       return(ef);
 
-      /*		new_expr=int_expr((int)min); */
+      /*		new_expr=int_to_expression((int)min); */
       /* replace expression_normalized(e) with
 	 expression_normalized(new_expr) */
       /*		free_normalized(expression_normalized(e));
@@ -518,7 +518,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 	if ( get_debug_level() == 9) {
 	debug(9, "partial_eval_reference",
 	"Constant replaced by expression: \n");
-	print_expression(e);
+	print_to_expressionession(e);
 	expression_consistent_p(e);
 	pips_assert("partial_eval_reference",
 	syntax_call_p(expression_syntax(e)));
@@ -1539,7 +1539,7 @@ void regenerate_expression(eformat_t *efp, expression *ep)
       else {
 	/* generate product */
 	tmp_expr= MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-				 int_expr(efp->icoef),
+				 int_to_expression(efp->icoef),
 				 efp->expr);
       }
 
@@ -1549,7 +1549,7 @@ void regenerate_expression(eformat_t *efp, expression *ep)
 	  : MINUS_OPERATOR_NAME;
 	tmp_expr= MakeBinaryCall(entity_intrinsic(operator),
 				 tmp_expr,
-				 int_expr(ABS(efp->ishift)));
+				 int_to_expression(ABS(efp->ishift)));
       }
     }
     else {
@@ -1557,7 +1557,7 @@ void regenerate_expression(eformat_t *efp, expression *ep)
       pips_assert("the expression is undefined",
 		  efp->expr == expression_undefined);
       /* final expression is constant efp->ishift */
-      tmp_expr= int_expr(efp->ishift);
+      tmp_expr= int_to_expression(efp->ishift);
     }
 
     /* replace *ep by tmp_expr */
@@ -1606,7 +1606,7 @@ expression generate_monome(int coef, expression expr)
 {
   if(coef==0) {
     pips_assert("generate_monome", expr==expression_undefined);
-    return(int_expr(0));
+    return(int_to_expression(0));
   }
   pips_assert("generate_monome", expr!=expression_undefined);
   if(coef==1) {
@@ -1617,7 +1617,7 @@ expression generate_monome(int coef, expression expr)
 			 expr));
   }
   return(MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-			int_expr(coef),
+			int_to_expression(coef),
 			expr));
 }
 

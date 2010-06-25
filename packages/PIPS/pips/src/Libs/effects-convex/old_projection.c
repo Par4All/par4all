@@ -60,10 +60,7 @@
 #include "matrix.h"
 #include "matrice.h"
 #include "sparse_sc.h"
-#include "properties.h"
 #include "pipsdbm.h"
-#include "transformer.h"
-#include "semantics.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"

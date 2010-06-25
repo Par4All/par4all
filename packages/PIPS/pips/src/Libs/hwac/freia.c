@@ -42,7 +42,6 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "properties.h"
 
 #include "freia_spoc_private.h"
 #include "hwac.h"

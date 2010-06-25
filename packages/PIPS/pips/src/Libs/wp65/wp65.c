@@ -71,8 +71,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "wp65.h"
 
-extern entity MakeRunTimeSupportFunction();
-
 DEFINE_CURRENT_MAPPING(fetch,list)
 DEFINE_CURRENT_MAPPING(store,list) 
 

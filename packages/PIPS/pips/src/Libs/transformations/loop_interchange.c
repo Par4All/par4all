@@ -32,18 +32,14 @@
 
 #include "genC.h"
 #include "constants.h"
-#include "misc.h"
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 
-#include "control.h"
-#include "conversion.h"
 /* #include "generation.h" */
 
 #include "transformations.h"

@@ -62,17 +62,14 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "misc.h"
-#include "semantics.h"
 #include "text.h"
 #include "transformer.h"
 #include "preprocessor.h"
+#include "properties.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
-#include "alias-classes.h"
-
-extern entity CreateIntrinsic(string /*name*/); /* from syntax.h */
-extern bool get_bool_property(string);
+//#include "alias-classes.h"
 
 #define BACKWARD TRUE
 #define FORWARD FALSE

@@ -54,8 +54,6 @@
 #include "text-util.h"
 #include "transformations.h"
 #include "parser_private.h"
-#include "alias-classes.h"
-#include "conversion.h"
 #include "accel-util.h"
 /**
  * @name outlining

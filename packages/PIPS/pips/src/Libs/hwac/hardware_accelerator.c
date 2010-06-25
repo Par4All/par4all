@@ -35,7 +35,6 @@
 // needs some arg_label & vertex_label types
 // #include "graph.h"
 
-#include "properties.h"
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
@@ -47,8 +46,7 @@
 #include "effects-generic.h" // {set,reset}_proper_rw_effects
 
 #include "freia.h"
-
-extern string freia_compile(string, statement, string);
+#include "hwac.h"
 
 static int freia_compiler(string module, string hardware)
 {

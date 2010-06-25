@@ -41,6 +41,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "effects.h"
+#include "syntax.h"
 
 #include "pipsdbm.h"
 
@@ -3127,7 +3128,6 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 
       equiv_members = arguments_difference(equiv_members, members);
       if(!ENDP(equiv_members)) {
-	extern int SafeSizeOfArray(entity a);
 	sort_list_of_entities(equiv_members);
 
 	(void) fprintf(fd, "\tVariables aliased to this common:\n");
@@ -3322,7 +3322,6 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 
   /* Return variable */
   if(!entity_undefined_p(rv)) {
-    extern int SafeSizeOfArray(entity a);
 
     (void) fprintf(fd, "\nLayout for return variable:\n\n");
     (void) fprintf(fd, "\tVariable %s,\tsize = %d\n",
