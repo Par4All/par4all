@@ -1228,6 +1228,14 @@ bool same_expression_p(expression e1, expression e2)
   else
     return expression_equal_p(e1, e2);
 }
+bool sizeofexpression_equal_p(sizeofexpression s0, sizeofexpression s1)
+{
+    if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))
+        return type_equal_p(sizeofexpression_type(s0), sizeofexpression_type(s1));
+    if(sizeofexpression_expression_p(s0) && sizeofexpression_expression_p(s1))
+        return expression_equal_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
+    return false;
+}
 
 bool cast_equal_p(cast c1, cast c2)
 {
@@ -1247,17 +1255,15 @@ bool syntax_equal_p(syntax s1, syntax s2)
   switch(t1) {
   case is_syntax_reference:
     return reference_equal_p(syntax_reference(s1), syntax_reference(s2));
-    break;
   case is_syntax_range:
     return range_equal_p(syntax_range(s1), syntax_range(s2));
-    break;
   case is_syntax_call:
     return call_equal_p(syntax_call(s1), syntax_call(s2));
-    break;
   case is_syntax_cast:
     return cast_equal_p(syntax_cast(s1), syntax_cast(s2));
-    break;
   case is_syntax_sizeofexpression:
+    return sizeofexpression_equal_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
+
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
@@ -2216,6 +2222,22 @@ bool same_range_name_p(range r1, range r2)
     same_expression_name_p(range_upper(r1), range_upper(r2)) &&
     same_expression_name_p(range_increment(r1), range_increment(r2));
 }
+bool same_type_name_p(type t0, type t1)
+{
+    string s0 = type_to_string(t0),
+           s1 = type_to_string(t1);
+    bool same = same_string_p(s0,s1);
+    return same;
+}
+
+bool same_sizeofexpression_name_p(sizeofexpression s0, sizeofexpression s1)
+{
+    if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))
+        return same_type_name_p(sizeofexpression_type(s0),sizeofexpression_type(s1));
+    if(sizeofexpression_expression_p(s0) && sizeofexpression_expression_p(s1))
+        return same_expression_name_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
+    return false;
+}
 
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
@@ -2230,6 +2252,8 @@ bool same_syntax_name_p(syntax s1, syntax s2)
       return same_ref_name_p(syntax_reference(s1), syntax_reference(s2));
     case is_syntax_range:
       return same_range_name_p(syntax_range(s1), syntax_range(s2));
+    case is_syntax_sizeofexpression:
+      return same_sizeofexpression_name_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
     default:
       pips_internal_error("unexpected syntax tag\n");
     }
