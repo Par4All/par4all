@@ -109,7 +109,7 @@ void call10(int i, int x[10], int j, int y[10])
 
    for(k = 0; k <= i-1; k += 1)
 
-//  <x[PHI1]-W-EXACT-{PHI1==i, 1+k<=i, 0<=k}>
+//  <x[PHI1]-W-EXACT-{PHI1==i, k+1<=i, 0<=k}>
 
       x[i] = 0;
 
@@ -117,7 +117,7 @@ void call10(int i, int x[10], int j, int y[10])
 
    for(l = 0; l <= j-1; l += 1)
 
-//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, 1+l<=j, 0<=k, 0<=l}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, l+1<=j, 0<=k, 0<=l}>
 
       y[i] = 0;
 }

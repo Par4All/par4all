@@ -136,7 +136,6 @@ void malloc02()
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
-
    for(i = 0; i <= 9; i += 1)
       p[i] = malloc(sizeof(int));                                       /*0007*/
 #pragma omp parallel for 
@@ -150,7 +149,6 @@ void malloc02()
 {
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
-
 
    for(i = 0; i <= 9; i += 1)
       p[i] = malloc(sizeof(int));                                       /*0007*/

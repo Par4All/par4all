@@ -109,6 +109,7 @@ Dependence graph for "struct07"
 
  **************** Effective Dependence Graph ****************
 
+
 ****************** End of Dependence Graph ******************
 
 Printed files after parallelization
@@ -124,7 +125,6 @@ int struct03()
       struct three deux;
    } x[10];
    int i = 0;
-
 
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)

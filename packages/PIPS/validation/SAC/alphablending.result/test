@@ -392,7 +392,6 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   int lu_ib0;
   int lu_nub0;
   static const int size = 50000;
-  ;
   int i;
 
   aligned2[3] = 1;

@@ -157,7 +157,7 @@ void call05(int r, int m, int *x)
    for(j = 0; j <= m-1; j += 1)
 
 //  <x-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==j, 0<=j, 1+j<=m}>
+//  <x[PHI1]-W-EXACT-{PHI1==j, 0<=j, j+1<=m}>
 
       x[j] = 10*r+j;
 }

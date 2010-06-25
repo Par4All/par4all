@@ -38,7 +38,6 @@ int main()
    int i, j;                                                            /*0003*/
    
    // A do loop ! Should be parallel
-   ;
    for(i = 2; i <= 99; i += 1)
       a[i] = 2;                                                         /*0007*/
    

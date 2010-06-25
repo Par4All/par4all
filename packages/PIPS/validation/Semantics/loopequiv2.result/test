@@ -53,12 +53,12 @@ C  P(I,K) {K==2, L==2}
          T(I) = 0.                                                      0029
       ENDDO
 
-C  P(I,K) {K==L, N+1<=I, 1<=K, K<=2}
+C  P(I,K) {K==L, K+N<=I+1, 1<=K, K<=2}
 
 
       N = 1                                                             0032
 
-C  P(I,K,N) {K==L, N==1, N#init+1<=I, 1<=K, K<=2}
+C  P(I,K,N) {K==L, N==1, K+N#init<=I+1, 1<=K, K<=2}
 
 
 C     Although N is modified in the loop body, the increment sign

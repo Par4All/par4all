@@ -27,7 +27,6 @@ void empty_for()
 
    int i, j;
 
-
 #pragma omp parallel for private(j)
    for(i = 0; i <= 9999; i += 1)
 #pragma omp parallel for 

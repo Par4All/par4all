@@ -1,0 +1,463 @@
+
+Printed file
+
+static Bool unRLE_obuf_to_output_FAST(DState *s)
+{
+   UChar k1;
+
+   if (s->blockRandomised) goto l99999;
+   
+   /* restore */
+   UInt32 c_calculatedBlockCRC = s->calculatedBlockCRC;
+   UChar c_state_out_ch = s->state_out_ch;
+   Int32 c_state_out_len = s->state_out_len;
+   Int32 c_nblock_used = s->nblock_used;
+   Int32 c_k0 = s->k0;
+   UInt32 *c_tt = s->tt;
+   UInt32 c_tPos = s->tPos;
+   char *cs_next_out = s->strm->next_out;
+   unsigned int cs_avail_out = s->strm->avail_out;
+   /* end restore */
+   
+   UInt32 avail_out_INIT = cs_avail_out;
+   Int32 s_save_nblockPP = s->save_nblock+1;
+   unsigned int total_out_lo32_old;
+l99993:   ;
+   if (!((Bool) 1)) goto return_notr;
+
+/* try to finish existing run */
+   if (c_state_out_len>0) goto l99998;
+l99991:   ;
+   /* Only caused by corrupt data stream? */
+   if (c_nblock_used>s_save_nblockPP) 
+      return (Bool) 1;
+
+/* can a new run be started? */
+   if (c_nblock_used==s_save_nblockPP) goto l99997;
+   c_state_out_ch = c_k0;
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   if (k1!=c_k0) goto l99996;
+   if (c_nblock_used==s_save_nblockPP) goto s_state_out_len_eq_one;
+
+   c_state_out_len = 2;
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   if (c_nblock_used==s_save_nblockPP) goto loop_end_3;
+   if (k1!=c_k0) goto l99995;
+
+   c_state_out_len = 3;
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   if (c_nblock_used==s_save_nblockPP) goto loop_end_3;
+   if (k1!=c_k0) goto l99994;
+
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   c_state_out_len = (Int32) k1+4;
+   c_tPos = c_tt[c_tPos];
+   c_k0 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+loop_end_3:   ;
+   goto l99993;
+l99994:   ;
+   c_k0 = k1;
+   goto loop_end_3;
+l99995:   ;
+   c_k0 = k1;
+   goto loop_end_3;
+s_state_out_len_eq_one:   ;
+   if (cs_avail_out==0) goto l99992;
+   *((UChar *) cs_next_out) = c_state_out_ch;
+   c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];
+   cs_next_out++;
+   cs_avail_out--;
+   goto l99991;
+l99992:   ;
+   c_state_out_len = 1;
+
+return_notr:   total_out_lo32_old = s->strm->total_out_lo32;
+   s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;
+   if (s->strm->total_out_lo32<total_out_lo32_old) 
+      s->strm->total_out_hi32++;
+   
+   /* save */
+   s->calculatedBlockCRC = total_out_lo32_old_;
+   s->state_out_ch = c_state_out_ch;
+   s->state_out_len = c_state_out_len;
+   s->nblock_used = c_nblock_used;
+   s->k0 = c_k0;
+   s->tt = c_tt;
+   s->tPos = c_tPos;
+   s->strm->next_out = cs_next_out;
+   s->strm->avail_out = cs_avail_out;
+   goto l99990;
+l99996:   ;
+   c_k0 = k1;
+   goto s_state_out_len_eq_one;
+l99997:   ;
+   c_state_out_len = 0;
+   goto return_notr;
+l99998:   ;
+   if (!((Bool) 1)) goto break_4;
+   if (cs_avail_out==0) goto return_notr;
+   if (c_state_out_len==1) goto break_4;
+   *((UChar *) cs_next_out) = c_state_out_ch;
+   c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];
+   c_state_out_len--;
+   cs_next_out++;
+   cs_avail_out--;
+   goto l99998;
+break_4:   ;
+   goto s_state_out_len_eq_one;
+l99999:   ;
+   if (!((Bool) 1)) goto l99990;
+l99989:   ;
+   if (!((Bool) 1)) goto break_2;
+   if (s->strm->avail_out==0) 
+      return (Bool) 0;
+   if (s->state_out_len==0) goto break_2;
+   *((UChar *) s->strm->next_out) = s->state_out_ch;
+   goto l99989;
+break_2:   ;
+   
+   /* can a new run be started? */
+   if (s->nblock_used==s->save_nblock+1) 
+      return (Bool) 0;
+   
+   /* Only caused by corrupt data stream? */
+   if (s->nblock_used>s->save_nblock+1) 
+      return (Bool) 1;
+
+   s->state_out_len = 1;
+   s->state_out_ch = s->k0;
+   s->tPos = (s->tt)[s->tPos];
+   k1 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   k1 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+   if (s->nblock_used==s->save_nblock+1) goto loop_end_1;
+   if (k1!=s->k0) goto l99988;
+
+   s->state_out_len = 2;
+   s->tPos = (s->tt)[s->tPos];
+   k1 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   k1 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+   if (s->nblock_used==s->save_nblock+1) goto loop_end_1;
+   if (k1!=s->k0) goto l99987;
+
+   s->state_out_len = 3;
+   s->tPos = (s->tt)[s->tPos];
+   k1 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   k1 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+   if (s->nblock_used==s->save_nblock+1) goto loop_end_1;
+   if (k1!=s->k0) goto l99986;
+
+   s->tPos = (s->tt)[s->tPos];
+   k1 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   k1 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+   s->state_out_len = (Int32) k1+4;
+   s->tPos = (s->tt)[s->tPos];
+   s->k0 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   s->k0 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+loop_end_1:   ;
+   goto l99999;
+l99986:   ;
+   s->k0 = k1;
+   goto loop_end_1;
+l99987:   ;
+   s->k0 = k1;
+   goto loop_end_1;
+l99988:   ;
+   s->k0 = k1;
+   goto loop_end_1;
+l99990:   ;
+   return (Bool) 0;
+}
+
+Printed file after RESTUCTURE_CONTROL
+
+static Bool unRLE_obuf_to_output_FAST(DState *s)
+{
+   UChar k1;
+
+   if (s->blockRandomised) goto l99999;
+   
+   /* restore */
+   UInt32 c_calculatedBlockCRC = s->calculatedBlockCRC;
+   UChar c_state_out_ch = s->state_out_ch;
+   Int32 c_state_out_len = s->state_out_len;
+   Int32 c_nblock_used = s->nblock_used;
+   Int32 c_k0 = s->k0;
+   UInt32 *c_tt = s->tt;
+   UInt32 c_tPos = s->tPos;
+   char *cs_next_out = s->strm->next_out;
+   unsigned int cs_avail_out = s->strm->avail_out;
+   /* end restore */
+   
+   UInt32 avail_out_INIT = cs_avail_out;
+   Int32 s_save_nblockPP = s->save_nblock+1;
+   unsigned int total_out_lo32_old;
+l99995:   ;
+   if (!((Bool) 1)) goto return_notr;
+
+/* try to finish existing run */
+   if (c_state_out_len>0) goto l99998;
+l99993:   ;
+   /* Only caused by corrupt data stream? */
+   if (c_nblock_used>s_save_nblockPP) 
+      return (Bool) 1;
+
+/* can a new run be started? */
+   if (c_nblock_used==s_save_nblockPP) goto l99997;
+   c_state_out_ch = c_k0;
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   if (k1!=c_k0) goto l99996;
+   if (c_nblock_used==s_save_nblockPP) goto s_state_out_len_eq_one;
+
+   c_state_out_len = 2;
+   c_tPos = c_tt[c_tPos];
+   k1 = (UChar) (c_tPos&0xff);
+   c_tPos >>= 8;
+   c_nblock_used++;
+   if (c_nblock_used==s_save_nblockPP)
+      ;
+   else if (k1!=c_k0)
+      c_k0 = k1;
+   else {
+
+      c_state_out_len = 3;
+      c_tPos = c_tt[c_tPos];
+      k1 = (UChar) (c_tPos&0xff);
+      c_tPos >>= 8;
+      c_nblock_used++;
+      if (c_nblock_used==s_save_nblockPP)
+         ;
+      else if (k1!=c_k0)
+         c_k0 = k1;
+      else {
+
+         c_tPos = c_tt[c_tPos];
+         k1 = (UChar) (c_tPos&0xff);
+         c_tPos >>= 8;
+         c_nblock_used++;
+         c_state_out_len = (Int32) k1+4;
+         c_tPos = c_tt[c_tPos];
+         c_k0 = (UChar) (c_tPos&0xff);
+         c_tPos >>= 8;
+         c_nblock_used++;
+      }
+   }
+loop_end_3:   ;
+   goto l99995;
+s_state_out_len_eq_one:   ;
+   if (cs_avail_out==0) goto l99994;
+   *((UChar *) cs_next_out) = c_state_out_ch;
+   c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];
+   cs_next_out++;
+   cs_avail_out--;
+   goto l99993;
+l99994:   ;
+   c_state_out_len = 1;
+
+return_notr:   total_out_lo32_old = s->strm->total_out_lo32;
+   s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;
+   if (s->strm->total_out_lo32<total_out_lo32_old) 
+      s->strm->total_out_hi32++;
+   
+   /* save */
+   s->calculatedBlockCRC = total_out_lo32_old_;
+   s->state_out_ch = c_state_out_ch;
+   s->state_out_len = c_state_out_len;
+   s->nblock_used = c_nblock_used;
+   s->k0 = c_k0;
+   s->tt = c_tt;
+   s->tPos = c_tPos;
+   s->strm->next_out = cs_next_out;
+   s->strm->avail_out = cs_avail_out;
+   goto l99992;
+l99996:   ;
+   c_k0 = k1;
+   goto s_state_out_len_eq_one;
+l99997:   ;
+   c_state_out_len = 0;
+   goto return_notr;
+l99998:   ;
+   if (!((Bool) 1)) goto break_4;
+   if (cs_avail_out==0) goto return_notr;
+   if (c_state_out_len==1) goto break_4;
+   *((UChar *) cs_next_out) = c_state_out_ch;
+   c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];
+   c_state_out_len--;
+   cs_next_out++;
+   cs_avail_out--;
+   goto l99998;
+break_4:   ;
+   goto s_state_out_len_eq_one;
+l99999:   ;
+l99990:   ;
+   if (!((Bool) 1)) goto l99991;
+l99989:   ;
+   if (!((Bool) 1)) goto break_2;
+   if (s->strm->avail_out==0) 
+      return (Bool) 0;
+   if (s->state_out_len==0) goto break_2;
+   *((UChar *) s->strm->next_out) = s->state_out_ch;
+   goto l99989;
+break_2:   ;
+   
+   /* can a new run be started? */
+   if (s->nblock_used==s->save_nblock+1) 
+      return (Bool) 0;
+   
+   /* Only caused by corrupt data stream? */
+   if (s->nblock_used>s->save_nblock+1) 
+      return (Bool) 1;
+
+   s->state_out_len = 1;
+   s->state_out_ch = s->k0;
+   s->tPos = (s->tt)[s->tPos];
+   k1 = (UChar) (s->tPos&0xff);
+   s->tPos >>= 8;
+   if (s->rNToGo==0) {
+      s->rNToGo = BZ2_rNums[s->rTPos];
+      s->rTPos++;
+      if (s->rTPos==512) 
+         s->rTPos = 0;
+   }
+   s->rNToGo--;
+   k1 ^= s->rNToGo==1?1:0;
+   s->nblock_used++;
+   if (s->nblock_used==s->save_nblock+1)
+      ;
+   else if (k1!=s->k0)
+      s->k0 = k1;
+   else {
+
+      s->state_out_len = 2;
+      s->tPos = (s->tt)[s->tPos];
+      k1 = (UChar) (s->tPos&0xff);
+      s->tPos >>= 8;
+      if (s->rNToGo==0) {
+         s->rNToGo = BZ2_rNums[s->rTPos];
+         s->rTPos++;
+         if (s->rTPos==512) 
+            s->rTPos = 0;
+      }
+      s->rNToGo--;
+      k1 ^= s->rNToGo==1?1:0;
+      s->nblock_used++;
+      if (s->nblock_used==s->save_nblock+1)
+         ;
+      else if (k1!=s->k0)
+         s->k0 = k1;
+      else {
+
+         s->state_out_len = 3;
+         s->tPos = (s->tt)[s->tPos];
+         k1 = (UChar) (s->tPos&0xff);
+         s->tPos >>= 8;
+         if (s->rNToGo==0) {
+            s->rNToGo = BZ2_rNums[s->rTPos];
+            s->rTPos++;
+            if (s->rTPos==512) 
+               s->rTPos = 0;
+         }
+         s->rNToGo--;
+         k1 ^= s->rNToGo==1?1:0;
+         s->nblock_used++;
+         if (s->nblock_used==s->save_nblock+1)
+            ;
+         else if (k1!=s->k0)
+            s->k0 = k1;
+         else {
+
+            s->tPos = (s->tt)[s->tPos];
+            k1 = (UChar) (s->tPos&0xff);
+            s->tPos >>= 8;
+            if (s->rNToGo==0) {
+               s->rNToGo = BZ2_rNums[s->rTPos];
+               s->rTPos++;
+               if (s->rTPos==512) 
+                  s->rTPos = 0;
+            }
+            s->rNToGo--;
+            k1 ^= s->rNToGo==1?1:0;
+            s->nblock_used++;
+            s->state_out_len = (Int32) k1+4;
+            s->tPos = (s->tt)[s->tPos];
+            s->k0 = (UChar) (s->tPos&0xff);
+            s->tPos >>= 8;
+            if (s->rNToGo==0) {
+               s->rNToGo = BZ2_rNums[s->rTPos];
+               s->rTPos++;
+               if (s->rTPos==512) 
+                  s->rTPos = 0;
+            }
+            s->rNToGo--;
+            s->k0 ^= s->rNToGo==1?1:0;
+            s->nblock_used++;
+         }
+      }
+   }
+loop_end_1:   ;
+   goto l99990;
+l99991:   ;
+l99992:   ;
+   return (Bool) 0;
+}

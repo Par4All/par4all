@@ -1,5 +1,5 @@
 
-C  <A(PHI1)-R-MAY-{J<=PHI1+1, PHI1<=1+J}>
+C  <A(PHI1)-R-MAY-{J<=PHI1+1, PHI1<=J+1}>
 C  <A(PHI1)-W-EXACT-{PHI1==J}>
 
       SUBROUTINE MAYBLK(A,J)
@@ -7,7 +7,7 @@ C  <A(PHI1)-W-EXACT-{PHI1==J}>
 C
       I = J                                                             0004
 
-C  <A(PHI1)-R-MAY-{I<=PHI1+1, PHI1<=1+I, I==J}>
+C  <A(PHI1)-R-MAY-{I<=PHI1+1, PHI1<=I+1, I==J}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, I==J}>
 
       A(I) = A(I-1)+A(I+1)                                              0005

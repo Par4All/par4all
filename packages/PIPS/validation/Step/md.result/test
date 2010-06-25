@@ -47,8 +47,8 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0153
          I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0154
          I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0155
-C  <F(PHI1,PHI2)-write-MAY-{1<=PHI1, PHI1<=ND, PHI1<=3, I_LOW<=PHI2,
-C    1<=PHI2, PHI2<=I_UP, PHI2<=500}>
+C  <F(PHI1,PHI2)-write-MAY-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    PHI2<=500, I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_F(IDX_SLICE_LOW,1,IDX) = 1                             0158
          STEP_SR_F(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                     0159
          STEP_SR_F(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)                 0160
@@ -232,20 +232,20 @@ C     Region computation
       DO IDX = 1, STEP_COMM_SIZE                                        0158
          I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0159
          I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0160
-C  <POS(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=ND, PHI1<=3,
-C    I_LOW<=PHI2, 1<=PHI2, PHI2<=I_UP}>
+C  <POS(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0163
          STEP_SR_POS(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0164
          STEP_SR_POS(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0165
          STEP_SR_POS(IDX_SLICE_UP,2,IDX) = I_UP                         0166
-C  <VEL(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=ND, PHI1<=3,
-C    I_LOW<=PHI2, 1<=PHI2, PHI2<=I_UP}>
+C  <VEL(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0169
          STEP_SR_VEL(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0170
          STEP_SR_VEL(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0171
          STEP_SR_VEL(IDX_SLICE_UP,2,IDX) = I_UP                         0172
-C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=ND, PHI1<=3, I_LOW<=PHI2,
-C    1<=PHI2, PHI2<=I_UP}>
+C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_A(IDX_SLICE_LOW,1,IDX) = 1                             0175
          STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                     0176
          STEP_SR_A(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)                 0177

@@ -4,8 +4,8 @@
       REAL SUM
 
       SUM = 0                                                           0006
-
 !$omp parallel do reduction(+:SUM) private(K)
+
       DO I = 1, SIZE                                                    0008
 !$omp parallel do reduction(+:SUM)
          DO K = 1, SIZE                                                 0009

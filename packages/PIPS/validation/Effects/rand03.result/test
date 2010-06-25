@@ -193,13 +193,13 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <pt_in[PHI1][PHI2][.im]-R-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
-//    0<=iy, 1+iy<=ny}>
+//    0<=iy, iy+1<=ny}>
 //  <pt_in[PHI1][PHI2][.re]-R-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
-//    0<=iy, 1+iy<=ny}>
+//    0<=iy, iy+1<=ny}>
 //  <pt_out[PHI1][PHI2][.re]-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
-//    0<=iy, 1+iy<=ny}>
+//    0<=iy, iy+1<=ny}>
 //  <pt_out[PHI1][PHI2][.im]-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
-//    0<=iy, 1+iy<=ny}>
+//    0<=iy, iy+1<=ny}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
 //  <u-W-EXACT-{}>
@@ -275,9 +275,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <pt_in[PHI1][PHI2][.re]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
-//    1+ix<=nx, 0<=iy, 1+iy<=ny}>
+//    ix+1<=nx, 0<=iy, iy+1<=ny}>
 //  <pt_out[PHI1][PHI2][.re]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
-//    1+ix<=nx, 0<=iy, 1+iy<=ny}>
+//    ix+1<=nx, 0<=iy, iy+1<=ny}>
 
 
          pt_out[iy][ix].re = pt_in[iy][ix].re+Sigma2*A*cos(B);
@@ -290,9 +290,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <pt_in[PHI1][PHI2][.im]-R-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
-//    1+ix<=nx, 0<=iy, 1+iy<=ny}>
+//    ix+1<=nx, 0<=iy, iy+1<=ny}>
 //  <pt_out[PHI1][PHI2][.im]-W-EXACT-{PHI1==iy, PHI2==ix, 0<=ix,
-//    1+ix<=nx, 0<=iy, 1+iy<=ny}>
+//    ix+1<=nx, 0<=iy, iy+1<=ny}>
 
          pt_out[iy][ix].im = pt_in[iy][ix].im+Sigma2*A*sin(B);
 

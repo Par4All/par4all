@@ -98,10 +98,10 @@ void dotprod(int *a, int *b, int *c)
    for(i = 0; i <= 999999; i += 1)
 
 //  <a-R-EXACT-{}>
-//  <a[PHI1]-W-EXACT-{i==PHI1}>
-//  <b[PHI1]-R-EXACT-{i==PHI1}>
+//  <a[PHI1]-W-EXACT-{PHI1==i}>
+//  <b[PHI1]-R-EXACT-{PHI1==i}>
 //  <b-R-EXACT-{}>
-//  <c[PHI1]-R-EXACT-{i==PHI1}>
+//  <c[PHI1]-R-EXACT-{PHI1==i}>
 //  <c-R-EXACT-{}>
 
       call16(i, a, b, c);

@@ -1,0 +1,35 @@
+#
+delete loop_private
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_private loop_private.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+apply PRIVATIZE_MODULE(main)
+
+display PRINTED_FILE(main)
+
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+apply UNSPLIT
+shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.0
+
+close
+delete loop_private
+quit
+# EOF

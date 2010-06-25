@@ -134,7 +134,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 PRINTED Regions for convold1
 
 
-//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>
+//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=i+5}>
 //  <coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=5}>
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
@@ -145,7 +145,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
    
    res = 0;
 
-//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>
+//  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=i+5}>
 //  <coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=5}>
 
    for(m = 0; m <= 5; m += 1)
