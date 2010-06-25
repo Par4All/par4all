@@ -360,12 +360,12 @@ def main(options, args = []):
     # Global configure flags:
     configure_opts = [ "--prefix=" + prefix ]
     if options.configure_opts:
-        configure_opts = options.configure_opts
+        configure_opts += options.configure_opts
     else:
         if options.debug:
-            configure_opts = default_debug_configure_opts
+            configure_opts += default_debug_configure_opts
         else:
-            configure_opts = default_configure_opts
+            configure_opts += default_configure_opts
 
     # Global make flags:
     make_opts = []
