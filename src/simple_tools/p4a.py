@@ -84,6 +84,9 @@ def add_module_options(parser):
     cpp_group.add_option("--skip-recover-includes", action = "store_true", default = False,
         help = "By default, try to recover standard #include. To skip this phase, use this option.")
 
+    cpp_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
+        help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py).")
+
     parser.add_option_group(cpp_group)
 
     compile_group = optparse.OptionGroup(parser, "Compilation Options")
@@ -200,6 +203,8 @@ def pips_output_filter(s):
         already_printed_warning_errors.append(s)
     elif s.find("python3.1: No such file or directory") != -1:
         error("Python 3.1 is required to run the post-processor, please install it")
+    elif s.find("p4a_process: ") == 0:
+        debug(s, bare = True)
     else:
         debug("PIPS: " + s)
 
@@ -364,14 +369,30 @@ def main(options, args = []):
         input.files = files
         input.recover_includes = not options.skip_recover_includes
 
+        prop_dict = dict()
+        for p in options.property:
+            (k, v) = p.split("=")
+            if v == "False" or v == "false":
+                v = False
+            elif v == "True" or v == "true":
+                v = True
+            else:
+                try:
+                    v = int(v)
+                except:
+                    pass
+            prop_dict[k] = v
+
+        input.properties = prop_dict
+
         output = None
 
         if options.here:
             output = process(input)
 
         else:
-            (input_fd, input_file) = tempfile.mkstemp(text = False)
-            (output_fd, output_file) = tempfile.mkstemp(text = False)
+            (input_fd, input_file) = tempfile.mkstemp(prefix = "p4a", text = False)
+            (output_fd, output_file) = tempfile.mkstemp(prefix = "p4a", text = False)
 
             save_pickle(input_file, input)
 
@@ -379,9 +400,15 @@ def main(options, args = []):
 
             # PIPS outputs everything in stderr in a somewhat weird way...
             # Its output is buffered.
-            (out, err, ret) = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
-                stdout_handler = pips_output_filter,
-                stderr_handler = pips_output_filter)
+            
+            out, err, ret = "", "", -1
+            try:
+                out, err, ret = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
+                    silent = True,
+                    stdout_handler = pips_output_filter,
+                    stderr_handler = pips_output_filter)
+            except:
+                raise p4a_error("PIPS processing aborted")
 
             output = load_pickle(output_file)
 
