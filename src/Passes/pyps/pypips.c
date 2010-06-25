@@ -51,7 +51,7 @@ void atinit()
     /* init various composants */
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
-    pips_log_handler = pips_error_user_log;
+    pips_log_handler = smart_log_handler;
     set_exception_callbacks(push_pips_context, pop_pips_context);
 }
 
