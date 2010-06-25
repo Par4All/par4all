@@ -460,12 +460,12 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         stdout_handler = None, stderr_handler = None):
     if stdout_handler is None and stderr_handler is None:
         if silent:
-            stdout_handler = lambda s: debug(s, bare = True)
-            stderr_handler = lambda s: info(s, bare = True)
-        else:
             # Log output even in silent mode.
             stdout_handler = lambda s: debug(s, bare = True, level = 4)
             stderr_handler = lambda s: info(s, bare = True, level = 3)
+        else:
+            stdout_handler = lambda s: debug(s, bare = True)
+            stderr_handler = lambda s: info(s, bare = True)
     r = runner(cmd_list, can_fail = can_fail, 
         force_locale = force_locale, working_dir = working_dir, extra_env = extra_env, 
         stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)
