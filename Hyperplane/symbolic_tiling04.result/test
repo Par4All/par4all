@@ -1,0 +1,80 @@
+short alphablend(int n, int m, short alpha, short a[n][m], short b[n][m], short c[n][m])
+{
+   short i, j;
+here:
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= m-1; j += 1)
+         a[i][j] = b[i][j]*alpha+c[i][j]*(100-alpha);
+}
+short alphablend(int n, int m, short alpha, short a[n][m], short b[n][m], short c[n][m])
+{
+   short i, j;
+   //PIPS generated variable
+   short it, jt;
+#pragma omp parallel for private(i)
+here:
+   for(it = 0; it <= n-1; it += N)
+#pragma omp parallel for private(j)
+      for(jt = 0; jt <= m-1; jt += N)
+#pragma omp parallel for 
+         for(i = it; i <= MIN(it+N, n-1); i += 1)
+#pragma omp parallel for 
+            for(j = jt; j <= MIN(jt+N, m-1); j += 1)
+               a[i][j] = b[i][j]*alpha+c[i][j]*(100-alpha);
+}
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+//  <b[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+//  <c[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+
+short alphablend(int n, int m, short alpha, short a[n][m], short b[n][m], short c[n][m])
+{
+   short i, j;
+   //PIPS generated variable
+   short it, jt;
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+//  <b[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+//  <c[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
+
+#pragma omp parallel for private(i)
+here:
+   for(it = 0; it <= n-1; it += N)
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2+1<=m}>
+//  <b[PHI1][PHI2]-R-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2+1<=m}>
+//  <c[PHI1][PHI2]-R-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2+1<=m}>
+
+#pragma omp parallel for private(j)
+      for(jt = 0; jt <= m-1; jt += N)
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2<=N+jt,
+//    jt<=PHI2, PHI2+1<=m}>
+//  <b[PHI1][PHI2]-R-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2<=N+jt,
+//    jt<=PHI2, PHI2+1<=m}>
+//  <c[PHI1][PHI2]-R-MAY-{PHI1<=N+it, it<=PHI1, PHI1+1<=n, PHI2<=N+jt,
+//    jt<=PHI2, PHI2+1<=m}>
+
+#pragma omp parallel for 
+         for(i = it; i <= MIN(it+N, n-1); i += 1)
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2<=N+jt, jt<=PHI2, PHI2+1<=m,
+//    i<=N+it, it<=i, i+1<=n}>
+//  <b[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2<=N+jt, jt<=PHI2, PHI2+1<=m,
+//    i<=N+it, it<=i, i+1<=n}>
+//  <c[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2<=N+jt, jt<=PHI2, PHI2+1<=m,
+//    i<=N+it, it<=i, i+1<=n}>
+
+#pragma omp parallel for 
+            for(j = jt; j <= MIN(jt+N, m-1); j += 1)
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, i<=N+it, j<=N+jt, it<=i,
+//    i+1<=n, jt<=j, j+1<=m}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, i<=N+it, j<=N+jt, it<=i,
+//    i+1<=n, jt<=j, j+1<=m}>
+//  <c[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, i<=N+it, j<=N+jt, it<=i,
+//    i+1<=n, jt<=j, j+1<=m}>
+
+               a[i][j] = b[i][j]*alpha+c[i][j]*(100-alpha);
+}
+
