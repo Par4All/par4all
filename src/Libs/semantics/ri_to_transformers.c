@@ -1110,6 +1110,7 @@ transformer any_user_call_site_to_transformer(entity f,
 
     tf = transformer_combine(tf, ctf);
     npre = transformer_apply(ctf, cpre);
+    transformer_normalize(npre, 2);
     free_transformer(cpre);
     cpre = npre;
     POP(cpl);
