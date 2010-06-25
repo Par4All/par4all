@@ -505,7 +505,7 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
     free_transformer(id);
   }
 
-  debug(8,"test_to_transformer","end\n");
+  pips_debug(8,"end\n");
   return tf;
 }
 
@@ -933,7 +933,7 @@ transformer_intra_to_inter(
   gen_free_list(lost_args);
   lost_args = NIL;
 
-  debug(8,"transformer_intra_to_inter","after first filtering ftf=%x\n",ftf);
+  pips_debug(8,"after first filtering ftf=%x\n",ftf);
   ifdebug(8) (void) dump_transformer(ftf);
   */
 
@@ -967,9 +967,9 @@ transformer_intra_to_inter(
   gen_free_list(lost_args);
   lost_args = NIL;
 
-  debug(8,"transformer_intra_to_inter","return ftf=%x\n",ftf);
+  pips_debug(8,"return ftf=%x\n",ftf);
   ifdebug(8) (void) dump_transformer(ftf);
-  debug(8,"transformer_intra_to_inter","end\n");
+  pips_debug(8,"end\n");
 
   return ftf;
 }
@@ -1110,7 +1110,7 @@ transformer any_user_call_site_to_transformer(entity f,
 
     tf = transformer_combine(tf, ctf);
     npre = transformer_apply(ctf, cpre);
-    transformer_normalize(npre, 2);
+    npre = transformer_normalize(npre, 2);
     free_transformer(cpre);
     cpre = npre;
     POP(cpl);
@@ -1808,7 +1808,7 @@ static transformer instruction_to_transformer(instruction i,
   whileloop wl;
   forloop fl;
 
-  debug(8,"instruction_to_transformer","begin\n");
+  pips_debug(8,"begin\n");
 
   switch(instruction_tag(i)) {
   case is_instruction_block:
