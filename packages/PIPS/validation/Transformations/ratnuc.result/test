@@ -124,11 +124,11 @@ C  <RATX(PHI1)-W-EXACT-{PHI1==I, 2<=I, I<=NPP1}>
          ENDIF
 1        CONTINUE                                                       0071
 
-C  <QNUC(PHI1)-W-EXACT-{PHI1==1, 1+NPP1<=I, 2<=I}>
+C  <QNUC(PHI1)-W-EXACT-{PHI1==1, 2<=I, NPP1+1<=I}>
 
       QNUC(1) = 0.0D0                                                   0072
 
-C  <RATX(PHI1)-W-EXACT-{PHI1==1, 1+NPP1<=I, 2<=I}>
+C  <RATX(PHI1)-W-EXACT-{PHI1==1, 2<=I, NPP1+1<=I}>
 
       RATX(1) = 0.0D0                                                   0073
       END
@@ -261,11 +261,11 @@ C  <RATX(PHI1)-W-EXACT-{PHI1==I, 2<=I, I<=NPP1}>
          ENDIF
 1        CONTINUE                                                       0071
 
-C  <QNUC(PHI1)-W-EXACT-{PHI1==1, 1+NPP1<=I, 2<=I}>
+C  <QNUC(PHI1)-W-EXACT-{PHI1==1, 2<=I, NPP1+1<=I}>
 
       QNUC(1) = 0.0D0                                                   0072
 
-C  <RATX(PHI1)-W-EXACT-{PHI1==1, 1+NPP1<=I, 2<=I}>
+C  <RATX(PHI1)-W-EXACT-{PHI1==1, 2<=I, NPP1+1<=I}>
 
       RATX(1) = 0.0D0                                                   0073
       END

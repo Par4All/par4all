@@ -15,7 +15,7 @@ void calc(int n)
 
    int i, j;
 
-//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=PHI2, PHI2+1<=n}>
 
 
    for(i = 0; i <= n-1; i += 1)
@@ -24,7 +24,7 @@ void calc(int n)
 
       for(j = i; j <= n-1; j += 1)
 
-//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, j+1<=n}>
 
          h_A[i][j] = 1;
 }
@@ -36,7 +36,6 @@ void calc(int n)
    float h_A[n][n];
 
    int i, j;
-
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
@@ -51,9 +50,8 @@ void calc(int n)
 
    int i, j;
 
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=PHI2, PHI2+1<=n}>
 
-
-//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
@@ -63,7 +61,7 @@ void calc(int n)
 #pragma omp parallel for 
       for(j = i; j <= n-1; j += 1)
 
-//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, j+1<=n}>
 
          h_A[i][j] = 1;
 }
@@ -73,11 +71,10 @@ void calc(int n)
    float h_A[n][n];
 
    int i, j;
-
-
 #pragma omp parallel for private(j)
 
-//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
+//  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=PHI2, PHI2+1<=n}>
+
 
    for(i = 0; i <= n-1; i += 1)
 #pragma omp parallel for
@@ -86,7 +83,7 @@ void calc(int n)
 
       for(j = i; j <= n-1; j += 1)
 
-//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, 1+j<=n}>
+//  <h_A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=j, j+1<=n}>
 
          h_A[i][j] = 1;
 }

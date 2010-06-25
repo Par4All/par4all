@@ -10,11 +10,11 @@ int scalarization08(int x[10], int y[10][10])
 
    for(i = 0; i <= 9; i += 1)
 
-//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1}>
+//  <x[PHI1]-OUT-EXACT-{PHI1==1, PHI1==i}>
 
       for(j = 0; j <= 9; j += 1)
 
-//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1, j==9, 0<=j}>
+//  <x[PHI1]-OUT-EXACT-{PHI1==1, PHI1==i, j==9, 0<=j}>
 
          x[i] = y[i][j];
    //printf("%d", x[1]);
@@ -36,13 +36,13 @@ int scalarization08(int x[10], int y[10][10])
 
    for(i = 0; i <= 9; i += 1) {
 
-//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1}>
+//  <x[PHI1]-OUT-EXACT-{PHI1==1, PHI1==i}>
 
       // BEGIN BLOCK
       for(j = 0; j <= 9; j += 1)
          __scalar__0 = y[i][j];
 
-//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1, j==10}>
+//  <x[PHI1]-OUT-EXACT-{PHI1==1, PHI1==i, j==10}>
 
       x[i] = __scalar__0;
       // END BLOCK

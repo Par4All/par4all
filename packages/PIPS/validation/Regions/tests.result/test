@@ -55,7 +55,7 @@ C  <B(PHI1)-W-EXACT-{PHI1==N}>
          B(N) = A(N)*R                                                  0025
       ENDIF
 
-C  <A(PHI1)-W-MAY-{N<=PHI1, PHI1<=1+N}>
+C  <A(PHI1)-W-MAY-{N<=PHI1, PHI1<=N+1}>
 
 
 C     TWO DIFFERENT ARRAY ELEMENTS ACCESSED IN THE BRANCHES

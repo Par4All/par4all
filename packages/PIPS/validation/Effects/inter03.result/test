@@ -396,7 +396,7 @@ void foo(int *p)
 
    for(i = 0; i <= 9; i += 1)
 
-//  <p[PHI1]-OUT-EXACT-{i==PHI1, 0<=i, i<=9}>
+//  <p[PHI1]-OUT-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       p[i] = i;                                                         /*0014*/
    return;                                                              /*0015*/

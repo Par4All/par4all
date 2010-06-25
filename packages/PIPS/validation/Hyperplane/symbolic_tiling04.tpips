@@ -1,0 +1,18 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "symbolic_tiling04"
+delete $WS
+create $WS symbolic_tiling03.c
+
+display PRINTED_FILE
+
+setproperty LOOP_LABEL "here"
+setproperty SYMBOLIC_TILING_VECTOR "N,N"
+apply SYMBOLIC_TILING
+
+display PRINTED_FILE
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+close
+delete $WS

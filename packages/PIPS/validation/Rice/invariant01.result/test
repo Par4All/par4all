@@ -26,19 +26,14 @@ void invariant01(int n, int ni, int nj)
    float x[n][n], y[n];                                                 /*0006*/
    int i, j;                                                            /*0007*/
    float s;                                                             /*0008*/
-   // BEGIN BLOCK
-
 
    for(i = 0; i <= ni-1; i += 1)
-      // BEGIN BLOCK
       for(j = 0; j <= nj-1; j += 1) {
          // BEGIN BLOCK
          s = y[i];                                                      /*0012*/
          x[i][j] = s;                                                   /*0013*/
          // END BLOCK
       }
-      // END BLOCK
-   // END BLOCK
    // END BLOCK
 }
 
@@ -65,6 +60,3 @@ void invariant01(int n, int ni, int nj)
 
 Warnings
 
-unknown[unknown] (parse_properties) property PRETTYPRINT_BLOCKS redefined
-unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
-unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined

@@ -46,43 +46,43 @@ void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
 l99998:
    for(i_t = 0; i_t <= 3; i_t += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{10i_t<=PHI1, PHI1<=9+10i_t, 0<=PHI2,
+//  <result[PHI1][PHI2]-W-MAY-{10i_t<=PHI1, PHI1<=10i_t+9, 0<=PHI2,
 //    PHI2<=39, 0<=i_t, i_t<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=9+10i_t, 0<=PHI2,
+//  <src0[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=10i_t+9, 0<=PHI2,
 //    PHI2<=39, 0<=i_t, i_t<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=9+10i_t, 0<=PHI2,
+//  <src1[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=10i_t+9, 0<=PHI2,
 //    PHI2<=39, 0<=i_t, i_t<=3}>
 
 l99995:
       for(j_t = 0; j_t <= 3; j_t += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{10i_t<=PHI1, PHI1<=9+10i_t,
-//    10j_t<=PHI2, PHI2<=9+10j_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=9+10i_t, 10j_t<=PHI2,
-//    PHI2<=9+10j_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=9+10i_t, 10j_t<=PHI2,
-//    PHI2<=9+10j_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <result[PHI1][PHI2]-W-MAY-{10i_t<=PHI1, PHI1<=10i_t+9,
+//    10j_t<=PHI2, PHI2<=10j_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <src0[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=10i_t+9, 10j_t<=PHI2,
+//    PHI2<=10j_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <src1[PHI1][PHI2]-R-MAY-{10i_t<=PHI1, PHI1<=10i_t+9, 10j_t<=PHI2,
+//    PHI2<=10j_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
 
 l99996:
          for(i = 10*i_t; i <= 10*i_t+9; i += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=9+10j_t,
-//    10i_t<=i, i<=9+10i_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=9+10j_t,
-//    10i_t<=i, i<=9+10i_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=9+10j_t,
-//    10i_t<=i, i<=9+10i_t, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=10j_t+9,
+//    10i_t<=i, i<=10i_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <src0[PHI1][PHI2]-R-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=10j_t+9,
+//    10i_t<=i, i<=10i_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
+//  <src1[PHI1][PHI2]-R-MAY-{PHI1==i, 10j_t<=PHI2, PHI2<=10j_t+9,
+//    10i_t<=i, i<=10i_t+9, 0<=i_t, i_t<=3, 0<=j_t, j_t<=3}>
 
 l99997:
             for(j = 10*j_t; j <= 10*j_t+9; j += 1)
 
 //  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 10i_t<=i,
-//    i<=9+10i_t, 0<=i_t, i_t<=3, 10j_t<=j, j<=9+10j_t, 0<=j_t,
+//    i<=10i_t+9, 0<=i_t, i_t<=3, 10j_t<=j, j<=10j_t+9, 0<=j_t,
 //    j_t<=3}>
-//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 10i_t<=i, i<=9+10i_t,
-//    0<=i_t, i_t<=3, 10j_t<=j, j<=9+10j_t, 0<=j_t, j_t<=3}>
-//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 10i_t<=i, i<=9+10i_t,
-//    0<=i_t, i_t<=3, 10j_t<=j, j<=9+10j_t, 0<=j_t, j_t<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 10i_t<=i, i<=10i_t+9,
+//    0<=i_t, i_t<=3, 10j_t<=j, j<=10j_t+9, 0<=j_t, j_t<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 10i_t<=i, i<=10i_t+9,
+//    0<=i_t, i_t<=3, 10j_t<=j, j<=10j_t+9, 0<=j_t, j_t<=3}>
 
                result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }

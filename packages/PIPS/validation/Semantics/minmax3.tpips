@@ -1,0 +1,11 @@
+delete minmax3
+create minmax3 minmax3.f
+
+display PRINTED_FILE
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+close
+
+delete minmax3

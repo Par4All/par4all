@@ -1,0 +1,11 @@
+! Check that integer constants are preserved
+
+      PROGRAM INTEGER01
+
+      I = 1                                                             0005
+      J = 01                                                            0006
+      K = 001                                                           0007
+      PRINT *, I, J, K                                                  0008
+
+      END
+

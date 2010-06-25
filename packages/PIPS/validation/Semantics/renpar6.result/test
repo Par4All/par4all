@@ -80,12 +80,12 @@ C    0<=K}>
 
       DO I = 1, N                                                       0006
 
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=1+K,
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=K+1,
 C    I<=N}>
 
          DO J = 1, N                                                    0007
 
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=1+K, I<=N,
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+1, I<=N,
 C    1<=J, J<=N}>
 
             WORK(J,K) = J+K                                             0008
@@ -135,8 +135,8 @@ C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
 
          CALL INC1(K)                                                   0011
 
-C  <A(PHI1)-IN-EXACT-{I==PHI1, 1<=I, I<=K, I<=N, 1<=N}>
-C  <WORK(PHI1,PHI2)-IN-EXACT-{K==PHI2+1, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
+C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=N}>
+C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI2==K-1, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
 C    I<=N}>
 
 
@@ -158,12 +158,12 @@ C    PHI2<=K, 1<=I, I<=K, I<=N}>
       K = M*M                                                           0005
       DO I = 1, N                                                       0006
 
-C  <WORK(PHI1,PHI2)-OUT-EXACT-{K==PHI2, 1<=PHI1, PHI1<=N, 1<=I,
-C    I<=1+K, I<=N}>
+C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I,
+C    I<=K+1, I<=N}>
 
          DO J = 1, N                                                    0007
 
-C  <WORK(PHI1,PHI2)-OUT-EXACT-{J==PHI1, PHI2==K, 1<=I, I<=1+K, I<=N,
+C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+1, I<=N,
 C    1<=J, J<=N}>
 
             WORK(J,K) = J+K                                             0008
@@ -178,7 +178,7 @@ C    1<=J, J<=N}>
 
             WORK(J,K) = J*J-K*K                                         0014
 
-C  <A(PHI1)-OUT-EXACT-{I==PHI1, 1<=I, I<=K, I<=N, 1<=J, 1+J<=N}>
+C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J+1<=N}>
 
             A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO

@@ -8,7 +8,7 @@ but not added_module which does not exist
 
       SUBROUTINE ADDED_MODULES
 
-      PRINT *, 'added_modules'                                          0001
+      PRINT *, 'added_modules'                                          0003
 
       END
 C     Check that tpips survives looking for an unexistant file
@@ -19,6 +19,6 @@ C     Check that tpips survives looking for an unexistant file
 
       SUBROUTINE ANOTHER_ADDED_MODULE
 
-      PRINT *, 'another_added_module'                                   0001
+      PRINT *, 'another_added_module'                                   0004
 
       END

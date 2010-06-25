@@ -1,0 +1,12 @@
+! Check that floating point constants are preserved
+
+      PROGRAM FLOAT01
+
+      X = 1.                                                            0005
+      Y = 1.0                                                           0006
+      Z = 1.00                                                          0007
+      U = 0.1234567890123456789                                         0008
+      PRINT *, X, Y, Z, U                                               0009
+
+      END
+

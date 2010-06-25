@@ -161,7 +161,6 @@ int main()
    int j;                                                               /*0004*/
    
    // A do loop ! Should be parallel.
-   ;
 #pragma omp parallel for 
    for(j = 0; j <= 999; j += 1)
       a[j] = j;                                                         /*0008*/
