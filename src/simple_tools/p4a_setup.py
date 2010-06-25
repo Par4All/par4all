@@ -17,6 +17,8 @@ from p4a_git import *
 from p4a_version import *
 
 
+default_configure_opts = [ "--disable-static", "CFLAGS='-O2 -std=c99'" ]
+default_debug_configure_opts = [ "--disable-static", "CFLAGS='-ggdb -g3 -O0 -Wall -std=c99'" ]
 default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
 
 
@@ -77,35 +79,40 @@ def add_module_options(parser):
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
 
-    group.add_option("--configure-opts", "-c", metavar = "OPTS", default = [],
-        help = "Specify global configure opts.")
+    global default_configure_opts, default_debug_configure_opts
+    group.add_option("--configure-opts", "--configure-flags", "-c", metavar = "OPTS", action = "append", default = [],
+        help = "Specify global configure opts. Default is '" + " ".join(default_configure_opts) 
+        + "' OR '" + " ".join(default_debug_configure_opts) + "' if --debug is specified.")
 
-    group.add_option("--polylib-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--debug", "-g", action = "store_true", default = False,
+        help = "Set debug CFLAGS in configure opts (see --configure-opts). Please note that this option has NO EFFECT if --configure-opts is manually set.")
+
+    group.add_option("--polylib-conf-opts", "--polylib-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify polylib configure opts (appended to --configure-opts).")
 
-    group.add_option("--newgen-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--newgen-conf-opts", "--newgen-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify newgen configure opts (appended to --configure-opts).")
 
-    group.add_option("--linear-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--linear-conf-opts", "--linear-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify linear configure opts (appended to --configure-opts).")
 
     global default_pips_conf_opts
-    group.add_option("--pips-conf-opts", metavar = "OPTS", default = [],
+    group.add_option("--pips-conf-opts", "--pips-conf-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts))
 
-    group.add_option("--make-opts", "-m", metavar = "OPTS", default = [],
+    group.add_option("--make-opts", "--make-flags", "-m", metavar = "OPTS", action = "append", default = [],
         help = "Specify global make opts.")
 
-    group.add_option("--polylib-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--polylib-make-opts", "--polylib-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify polylib make opts (appended to --make-opts).")
 
-    group.add_option("--newgen-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--newgen-make-opts", "--newgen-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify newgen make opts (appended to --make-opts).")
 
-    group.add_option("--linear-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--linear-make-opts", "--linear-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify linear make opts (appended to --make-opts).")
 
-    group.add_option("--pips-make-opts", metavar = "OPTS", default = [],
+    group.add_option("--pips-make-opts", "--pips-make-flags", metavar = "OPTS", action = "append", default = [],
         help = "Specify PIPS make opts (appended to --make-opts).")
 
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
@@ -264,12 +271,10 @@ def main(options, args = []):
     # various packages.
     prefix = default_prefix
     if options.prefix:
-        prefix = options.prefix
+        prefix = os.path.abspath(os.path.expanduser(options.prefix))
         warn("Prefix is " + prefix + " (--prefix)")
     else:
         warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
-    if prefix:
-        prefix = os.path.abspath(prefix) # Make prefix absolute in any case.
 
     # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
@@ -353,13 +358,14 @@ def main(options, args = []):
         #~ die("Directory does not exist: " + nlpmake_src_dir)
 
     # Global configure flags:
-    configure_opts = [ 
-        '--disable-static', 
-        '--prefix=' + prefix, 
-        #'--libdir=' + os.path.join(install_dir, "lib"), 
-    ]
+    configure_opts = [ "--prefix=" + prefix ]
     if options.configure_opts:
-        configure_opts.append(options.configure_opts)
+        configure_opts += options.configure_opts
+    else:
+        if options.debug:
+            configure_opts += default_debug_configure_opts
+        else:
+            configure_opts += default_configure_opts
 
     # Global make flags:
     make_opts = []

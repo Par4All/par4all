@@ -154,7 +154,7 @@ def suggest_more_verbosity():
     global static_options
     if get_verbosity() < 2:
         v = "v" * (get_verbosity() + 1)
-        suggest("To get more verbose output, pass -" + v)
+        suggest("To get a more verbose output, pass -" + v)
         if not static_options.log:
             suggest("Alternatively, you can pass --log to log -vv output to a file")
     current_log_file = get_current_log_file()

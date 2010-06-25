@@ -14,6 +14,41 @@ import sys, os, re, shutil
 from p4a_util import *
 
 
+default_properties = dict(
+    # Useless to go on if something goes wrong... :-(
+    ABORT_ON_USER_ERROR = True,
+    # Compute the intraprocedural preconditions at the same
+    # time as transformers and use them to improve the
+    # accuracy of expression and statement transformers:
+    SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+    # Use the more precise fix point operator to cope with
+    # while loops:
+    SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+    # Try to restructure the code for more precision:
+    UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
+    UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+    # Simplify for loops into Fortran do-loops internally for
+    # better precision of analysis:
+    FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+    # Regions are a must! :-) Ask for most precise regions:
+    MUST_REGIONS = True,
+    # Warning: assume that there is no aliasing between IO
+    # streams ('FILE *' variables):
+    ALIASING_ACROSS_IO_STREAMS = False,
+    # Warning: this is a work in progress. Assume no weird
+    # aliasing
+    CONSTANT_PATH_EFFECTS = False,
+    # Prevents automatic addition of OpenMP directives when
+    # unslitting.  We will add them manually using ompify if
+    # requested.
+    PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+)
+
+# Import of pyps will be done manually.
+# Module instance will be held in following variable.
+pyps = None
+
+
 class p4a_processor_output():
     files = []
     database_dir = ""
@@ -31,6 +66,7 @@ class p4a_processor_input():
     cpp_flags = ""
     files = []
     recover_includes = True
+    properties = {}
 
 
 def add_module_options(parser):
@@ -61,7 +97,8 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
-            recover_includes = input.recover_includes
+            recover_includes = input.recover_includes,
+            properties = input.properties
         )
 
         output.database_dir = processor.get_database_directory()
@@ -131,7 +168,7 @@ class p4a_processor():
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_include = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 recover_includes = True):
+                 recover_includes = True, properties = {}):
 
         self.recover_includes = recover_includes
         self.accel = accel
@@ -189,7 +226,9 @@ class p4a_processor():
             # Use a special preprocessor to track #include:
             os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
 
-            pyps = None
+            # Late import of pyps to avoid importing until
+            # we really need it.
+            global pyps
             try:
                 pyps = __import__("pyps")
             except:
@@ -201,34 +240,14 @@ class p4a_processor():
                                             activates = [],
                                             verboseon = verbose,
                                             cppflags = cpp_flags)
-            self.workspace.set_property(
-                # Useless to go on if something goes wrong... :-(
-                ABORT_ON_USER_ERROR = True,
-                # Compute the intraprocedural preconditions at the same
-                # time as transformers and use them to improve the
-                # accuracy of expression and statement transformers:
-                SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
-                # Use the more precise fix point operator to cope with
-                # while loops:
-                SEMANTICS_FIX_POINT_OPERATOR = "derivative",
-                # Try to restructure the code for more precision:
-                UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
-                UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
-                # Simplify for loops into Fortran do-loops internally for
-                # better precision of analysis:
-                FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
-                # Regions are a must! :-) Ask for most precise regions:
-                MUST_REGIONS = True,
-                # Warning: assume that there is no aliasing between IO
-                # streams ('FILE *' variables):
-                ALIASING_ACROSS_IO_STREAMS = False,
-                # Warning: this is a work in progress. Assume no weird
-                # aliasing
-                CONSTANT_PATH_EFFECTS = False,
-                # Prevents automatic addition of OpenMP directives when
-                # unslitting.  We will add them manually using ompify if
-                # requested.
-                PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+            
+            global default_properties
+            all_properties = default_properties
+            for k in properties:
+                all_properties[k] = properties[k]
+            for k in all_properties:
+                debug("Property " + k + " = " + str(all_properties[k]))
+            self.workspace.set_property(**all_properties)
 
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
