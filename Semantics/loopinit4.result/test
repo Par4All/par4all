@@ -95,7 +95,7 @@ C  P() {0==-1}
          J = J+2                                                        0024
       ENDDO
 
-C  P(I,J,N) {I==4, J==4, N==0}
+C  P(I,J,N) {I==3, J==3, N==0}
 
 
 c     The precondition should be: i==3, j==3
