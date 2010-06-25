@@ -938,11 +938,19 @@ transformer safe_transformer_projection(transformer t, list args)
     list nargs = NIL;
 
     /* keep only values of args related to the transformer t */
-    MAP(ENTITY, v, {
+    FOREACH(ENTITY, v, args) {
+      /* Make sure v is in the basis */
       if(base_contains_variable_p(sc_base(r), (Variable) v)) {
-	nargs = gen_nconc(nargs, CONS(ENTITY, v, NIL));
+	nargs = arguments_add_entity(nargs, v);
       }
-    }, args);
+      if(entity_is_argument_p(v, transformer_arguments(t))) {
+	/* Make sure the old value is projected too */
+	entity ov = entity_to_old_value(v);
+	if(base_contains_variable_p(sc_base(r), (Variable) ov)) {
+	  nargs = arguments_add_entity(nargs, ov);
+	}
+      }
+    }
 
     nt = transformer_projection(t, nargs);
     gen_free_list(nargs);

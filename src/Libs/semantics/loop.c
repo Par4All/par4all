@@ -582,6 +582,7 @@ static transformer add_index_bound_conditions(transformer pre,
     transformer bt = safe_any_expression_to_transformer(bv, bound, pre_r, TRUE);
     transformer br = transformer_range(bt);
     transformer npre = transformer_undefined;
+    transformer ipre = transformer_undefined;
 
     /* An inequation between index and bv should be added */
     if(lower_or_upper)
@@ -591,13 +592,25 @@ static transformer add_index_bound_conditions(transformer pre,
 
     br = transformer_temporary_value_projection(br);
     reset_temporary_value_counter();
-    npre = transformer_safe_intersection(pre, br);
+
+    /* FI: Fixt the result of the intersection in case of side
+       effects in loop range*/
+    npre = transformer_range_intersection(pre, br);
+    //transformer_arguments(npre) = arguments_union(transformer_arguments(pre),
+    //					 transformer_arguments(npre));
+    /* Make sure the loop body does not modify the loop bounds */
+    // FI: ipre is not a range, invariant_wrt_transformer() cannot be used
+    //npre = invariant_wrt_transformer(ipre, tfb);
+    // FI: removes to many variables of ipre
+    npre = safe_transformer_projection(npre, transformer_arguments(tfb));
     /* FI: we need a side effect on pre... */
     //gen_free_list(transformer_arguments(pre));
     free_predicate(transformer_relation(pre));
     /* Likely memory leak here: arguments_union may allocate a new list*/
-    transformer_arguments(pre) = arguments_union(transformer_arguments(pre),
-						 transformer_arguments(npre));
+    transformer_arguments(pre) =
+      arguments_difference(arguments_union(transformer_arguments(pre),
+					   transformer_arguments(npre)),
+			   transformer_arguments(tfb));
     transformer_relation(pre) = transformer_relation(npre);
     free_transformer(bt);
     free_transformer(br);
@@ -606,6 +619,9 @@ static transformer add_index_bound_conditions(transformer pre,
     free_transformer(npre);
     free_transformer(pre_r);
   }
+
+  pips_assert("The resulting transformer is consistent",
+	      transformer_consistent_p(pre));
 
   return(pre);
 }
@@ -2314,7 +2330,7 @@ transformer loop_to_postcondition(transformer pre,
      * Note 3: This is fixed by reverting the above decision.
      */
     if(empty_range_wrt_precondition_p(r, pre)) {
-      debug(8, "loop_to_postcondition", "The loop is never executed\n");
+      pips_debug(8, "The loop is never executed\n");
 
       /* propagate an impossible precondition in the loop body */
       (void) statement_to_postcondition(transformer_empty(), s);
@@ -2366,7 +2382,7 @@ transformer loop_to_postcondition(transformer pre,
       transformer post_al = transformer_undefined;
       transformer lpre = transformer_range(post_ne);
 
-      debug(8, "loop_to_postcondition", "The loop may be executed or not\n");
+      pips_debug(8, "The loop may be executed or not\n");
 
       /* propagate preconditions in the loop body */
       post_al =  statement_to_postcondition(preb, s);
@@ -2376,7 +2392,8 @@ transformer loop_to_postcondition(transformer pre,
        * For instance, DO I = 1, N leads to N <= 0
        */
       post_ne = add_loop_skip_condition(post_ne, l, lpre);
-      post_ne = add_loop_index_initialization(post_ne, l, lpre);
+      // FI: already done with t_init
+      //post_ne = add_loop_index_initialization(post_ne, l, lpre);
       free_transformer(lpre);
 
       post_al = add_loop_index_exit_value(post_al, l, post_al);
