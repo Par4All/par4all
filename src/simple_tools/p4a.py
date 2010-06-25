@@ -342,11 +342,11 @@ def main(options, args = []):
 
     # Process (parallelize) files (or not).
     database_dir = ""
-    processor_output_files = []
+    processed_files = []
 
     if options.no_process:
         warn("Bypassing processor")
-        processor_output_files = files
+        processed_files = files
 
     elif len(files) == 0:
         warn("No supported files to process!")
@@ -388,7 +388,7 @@ def main(options, args = []):
             os.remove(input_file)
             os.remove(output_file)
 
-        processor_output_files = output.files
+        processed_files = output.files
         database_dir = output.database_dir
 
         if output.exception:
@@ -407,13 +407,16 @@ def main(options, args = []):
             # We should be able to work on an existing database too!
             rmtree(database_dir, can_fail = True)
 
+    for file in processed_files:
+        done("Generated " + file, level = 1)
+
     if len(options.output_file) == 0:
         if options.cmake or options.cmake_gen or options.cmake_build:
             die("--cmake, --cmake-gen and/or --cmake-build was given but no output files were specified (-o mybinary, -o mysharedlib.so etc.)")
         # Build not requested.
         return
 
-    all_buildable_files = processor_output_files + other_files + options.extra
+    all_buildable_files = processed_files + other_files + options.extra
     if len(all_buildable_files) == 0:
         die("No buildable input files!")
 
