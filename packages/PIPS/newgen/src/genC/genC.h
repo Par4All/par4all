@@ -321,6 +321,9 @@ extern gen_chunk * gen_get_ancestor(int, const void *);
     /* else should I say something? Hmmm... */				\
   }
 
+/* for debug */
+extern int current_shared_obj_table_size();
+
 #include "newgen_map.h"
 #include "newgen_array.h"
 
