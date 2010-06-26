@@ -8,6 +8,7 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE
 
 close
-delete mehdi01
+shell cat mehdi01.database/Logfile|grep -i transformer
+#delete mehdi01
 quit
 
