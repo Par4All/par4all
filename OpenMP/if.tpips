@@ -1,0 +1,37 @@
+#
+delete if
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create if if.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+#unset parallal printed of do loop to avoid pragma duplication
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+setproperty OMP_LOOP_PARALLEL_THRESHOLD_VALUE 100
+setproperty OMP_IF_CLAUSE_RECURSIVE TRUE
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+apply OMP_LOOP_PARALLEL_THRESHOLD_SET
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c if.database/Src/if.c
+shell rm *.o
+
+close
+delete if
+quit
+# EOF
