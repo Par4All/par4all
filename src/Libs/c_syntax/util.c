@@ -2578,8 +2578,25 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	    type pt = type_to_final_pointed_type(t2);
 	    if(type_void_p(pt))
 	      type_void(pt) = ql;
-	    else
+	    else if(type_variable_p(pt))
 	      variable_qualifiers(type_variable(pt)) = ql;
+	    else if(type_functional_p(pt)) {
+	      /* What do we do for functional types for instance? */
+	      /* FI: I assume the qualifiers are carried by the
+		 result */
+	      functional f = type_functional(pt);
+	      type rt = functional_result(f);
+	      if(type_variable_p(rt))
+		variable_qualifiers(type_variable(rt)) = ql;
+	      else
+		pips_internal_error();
+	    }
+	    else {/* What do we do for functional types for instance?
+		     */
+	      /* FI: I assume the qualifiers are carried by the
+		 result */
+	      pips_internal_error();
+	    }
 	  }
 	  else {
 	    variable_qualifiers(type_variable(t2)) = ql;
