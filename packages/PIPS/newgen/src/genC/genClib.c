@@ -306,12 +306,21 @@ gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
   message_assert("gen_check_p parameter value ok",
 		 gen_check_p==0 || gen_check_p==1);
 
-
   check_read_spec_performed();
 
   va_start(ap, dom);
 
   cp = (gen_chunk *) alloc(size) ;
+  message_assert("allocated pointer", cp);
+
+  // zero all bytes...
+  // I guess it must be an integral number of pointers, but just in case...
+  char * p = (char *) cp;
+  int i;
+  for (i=0; i<size; i++)
+	p[i] = '\0';
+
+  // now initialize contents
   cp->i = dom;
 
   bp = &Domains[dom];
