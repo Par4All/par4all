@@ -218,7 +218,8 @@ def main(options, args = []):
             options.skip_pips = False
         else:
             die("Invalid option: --only=" + s)
-        die("--only is not compatible with --clean")
+        if options.clean:
+            die("--only is not compatible with --clean")
     if options.clean:
         options.skip_polylib = False
         options.skip_newgen = False
