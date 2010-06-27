@@ -39,7 +39,7 @@ local-clean:
 
 
 # Add the dependence on some automatically generated help:
-par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex
+par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
@@ -50,7 +50,7 @@ p4a_pack-help.tex: p4a_pack.help Makefile
 	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
 
 # Where to find commands we want generate documentation:
-VPATH = ../../src/dev:../../src/p4a_accel:../../src/postprocessor:../../src/simple_tools
+VPATH = ../../src/dev:../../src/p4a_accel:../../src/postprocessor:../../src/simple_tools:../../src/validation
 
 # Match commands into the directories specified in the VPATH above
 %.help:% Makefile
