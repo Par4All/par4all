@@ -329,7 +329,7 @@ list generic_c_effects_backward_translation(entity callee,
 	     the caller. */
 	  eff = (*effect_dup_func)(eff);
 	  (*effect_descriptor_interprocedural_translation_op)(eff);
-	  /* Memory leak ? I don't understand the second dup */ 
+	  /* Memory leak ? I don't understand the second dup */
 	  l_eff = gen_nconc(l_eff,CONS(EFFECT, (*effect_dup_func)(eff), NIL));
 
 	  /* remove the current element from the list */
@@ -378,10 +378,19 @@ list generic_c_effects_backward_translation(entity callee,
 
       if (!param_varargs_p)
 	{
-	  formal_arg = PARAMETER(CAR(formal_args));
-	  te = parameter_type(formal_arg);
-	  pips_debug(8, "parameter type : %s\n", type_to_string(te));
-	  param_varargs_p = param_varargs_p || type_varargs_p(te);
+	  if(ENDP(formal_args)) {
+	    pips_user_error("Function \"%s\" is called with at least one real"
+			    " argument by function \"%s\" but its functional"
+			    " type is void -> xxx\n",
+			    entity_user_name(callee),
+			    entity_user_name(get_current_module_entity()));
+	  }
+	  else {
+	    formal_arg = PARAMETER(CAR(formal_args));
+	    te = parameter_type(formal_arg);
+	    pips_debug(8, "parameter type : %s\n", type_to_string(te));
+	    param_varargs_p = param_varargs_p || type_varargs_p(te);
+	  }
 	}
 
       if (param_varargs_p)
