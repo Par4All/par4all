@@ -28,8 +28,8 @@ int main(void)
    float sum;                                                           /*0007*/
    sum = 0;
    float array[size][size];                                             /*0008*/
-#pragma omp parallel for private(i)
 
+#pragma omp parallel for private(i)
    for(k = 0; k <= size-1; k += 1)
 #pragma omp parallel for
       for(i = 0; i <= size-1; i += 1)

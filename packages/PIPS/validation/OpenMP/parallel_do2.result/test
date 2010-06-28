@@ -16,8 +16,8 @@
       INTEGER N, I
       PARAMETER (N=100)
       REAL A(N)
-!$omp parallel do
 
+!$omp parallel do
       DO I = 1, N
          A(I) = I*1.0
       ENDDO

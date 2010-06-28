@@ -22,8 +22,8 @@ int main(void)
    i = 0;
    int sum;                                                             /*0005*/
    sum = 0;
-#pragma omp parallel for reduction(+:sum) private(i)
 
+#pragma omp parallel for reduction(+:sum) private(i)
    for(k = 0; k <= 99; k += 1)
 #pragma omp parallel for reduction(+:sum)
       for(i = 0; i <= 99; i += 1)
