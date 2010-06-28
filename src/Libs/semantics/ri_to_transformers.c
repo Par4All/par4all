@@ -967,7 +967,7 @@ transformer_intra_to_inter(
   gen_free_list(lost_args);
   lost_args = NIL;
 
-  pips_debug(8,"return ftf=%x\n",ftf);
+  pips_debug(8,"return ftf=%p\n",ftf);
   ifdebug(8) (void) dump_transformer(ftf);
   pips_debug(8,"end\n");
 
