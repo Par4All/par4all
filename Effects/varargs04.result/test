@@ -30,9 +30,9 @@ void f3(int n_ptrs, int f4_after, ...)
 //               <must be read   >: ap
    va_end(ap);
 //               <may be read    >: stderr stderr[0] 
-//                                  __IO_EFFECTS:LUNS[0] array[*] 
+//                                  __IO_EFFECTS:LUNS[2] array[*] 
 //                                  array[*][*]
-//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[0]
+//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2]
 //               <must be read   >: n_ptrs
    f2(n_ptrs, array);
 //               <must be read   >: f4_after n_ptrs
