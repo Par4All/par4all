@@ -127,8 +127,8 @@ AX_ARG_ENABLE([tpips],
 			 AC_CHECK_TYPES([rl_compentry_func_t], , , [#include <readline/readline.h>])
 			 #reset CPPFLAGS
 			 CPPFLAGS="$ax_cppflags"
-			 AX_CHECK_PKG([termcap],[tgetent],[term.h])
-			 AX_DEPENDS([tpips],[readline termcap])
+			 AX_CHECK_PKG([ncurses],[tgetent],[term.h])
+			 AX_DEPENDS([tpips],[readline ncurses])
 			]
 )
 
@@ -149,8 +149,8 @@ AX_ARG_ENABLE([hpfc],
 			  [no],
 			  [
 			   AX_CHECK_PKG([readline],[readline],[readline/readline.h])
-			   AX_CHECK_PKG([termcap],[tgetent],[term.h])
-			   AX_DEPENDS([hpfc],[readline termcap])
+			   AX_CHECK_PKG([ncurses],[tgetent],[term.h])
+			   AX_DEPENDS([hpfc],[readline ncurses])
 			  ]
 )
 
