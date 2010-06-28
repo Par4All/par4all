@@ -582,7 +582,6 @@ static transformer add_index_bound_conditions(transformer pre,
     transformer bt = safe_any_expression_to_transformer(bv, bound, pre_r, TRUE);
     transformer br = transformer_range(bt);
     transformer npre = transformer_undefined;
-    transformer ipre = transformer_undefined;
 
     /* An inequation between index and bv should be added */
     if(lower_or_upper)

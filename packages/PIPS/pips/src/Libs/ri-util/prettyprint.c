@@ -4027,12 +4027,6 @@ text text_statement_enclosed(entity module,
     comments = strdup(i_comments);
   }
 
-  // the first thing to do is to print the statement extensions
-  string ext =  extensions_to_string (statement_extensions (stmt), TRUE);
-  if (ext != string_undefined) {
-    ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, ext));
-  }
-
   /* Generate text for local declarations
    *
    * 31/07/2003 Nga Nguyen : This code is added for C, because a
@@ -4162,6 +4156,12 @@ text text_statement_enclosed(entity module,
           break;
       }
     }
+    // append the extensions after comments
+    string ext =  extensions_to_string (statement_extensions (stmt), TRUE);
+    if (ext != string_undefined) {
+      ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, ext));
+    }
+
     MERGE_TEXTS(r, temp);
   }
   else {

@@ -78,7 +78,7 @@ if(syntax_tag(sy) == is_syntax_call)
   call c = syntax_call(sy);
   if(! call_constant_p(c))
     {
-    expression_normalized(exp) = NORMALIZE_EXPRESSION(exp);
+    NORMALIZE_EXPRESSION(exp);
     if(normalized_tag(expression_normalized(exp)) == is_normalized_linear)
       {
       pips_debug(5, "Expression Linear : %s\n",
