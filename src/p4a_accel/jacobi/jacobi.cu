@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
     compute(*p4a_var_space, *p4a_var_save);
 
   double execution_time = P4A_accel_timer_stop_and_float_measure();
-  fprintf(stderr, "Temps d'exécution : %f s\n", execution_time);
+  fprintf(stderr, "Temps d'exÃ©cution : %f s\n", execution_time);
   fprintf(stderr, "GFLOPS : %f\n",
 	  4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
 

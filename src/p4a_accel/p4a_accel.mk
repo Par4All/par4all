@@ -17,7 +17,7 @@ CUFLAGS += --compiler-options -fno-strict-aliasing --ptxas-options=-v -arch=sm_1
 
 LDFLAGS = -fPIC -L$(CUDA_DIR)/lib64 -L$(NVIDIA_SDK_DIR)/C/lib -L$(NVIDIA_SDK_DIR)/C/common/lib/linux
 
-LDLIBS = -lcudart -lcutil
+LDLIBS = -lcudart -lcutil_x86_64
 
 # New default rule to compile CUDA source files:
 %.o: %.cu
