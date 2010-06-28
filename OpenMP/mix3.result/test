@@ -37,8 +37,8 @@ int main()
       n = n+1;                                                          /*0009*/
       a[m] = n;                                                         /*0010*/
    }
-#pragma omp parallel for reduction(+:o)
 
+#pragma omp parallel for reduction(+:o)
    for(m = 0; m <= 9; m += 1) {
       o = 2+o;                                                          /*0016*/
       o = 2+o;                                                          /*0017*/
