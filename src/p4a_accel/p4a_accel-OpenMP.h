@@ -266,7 +266,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] n_x_iter is the number of iterations in the first dimension
 
-    @param[in] n_y_iter is the number of iterations in the first dimension
+    @param[in] n_y_iter is the number of iterations in the second dimension
 
     @param ... following parameters are given to the kernel
 */
@@ -278,6 +278,35 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
       P4A_vp_1 = P4A_index_y;						\
       P4A_vp_2 = 0;							\
      kernel(__VA_ARGS__);						\
+    }									\
+  }
+
+
+
+/** Call a kernel in a 3-dimension parallel loop
+
+    Translate it into an OpenMP parallel loop-nest
+
+    @param[in] kernel to call
+
+    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+
+    @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
+
+    @param[in] P4A_n_iter_2 is the number of iterations in the third dimension
+
+    @param ... following parameters are given to the kernel
+*/
+#define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1,  P4A_n_iter_2, ...) \
+  _Pragma("omp parallel for")						\
+  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
+    for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+      for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
+        P4A_vp_0 = P4A_index_0;						\
+        P4A_vp_1 = P4A_index_1;						\
+        P4A_vp_2 = P4A_index_2;						\
+        kernel(__VA_ARGS__);						\
+      }									\
     }									\
   }
 

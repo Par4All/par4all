@@ -43,6 +43,7 @@ enum {
   P4A_THREAD_X_PER_BLOCK_IN_2D = 512,
   P4A_THREAD_Y_PER_BLOCK_IN_2D = 1,
 
+  /* Well, the 3D is not dealt in CUDA even it is described by a dim3 :-( */
   /** The thread layout size per block in 3D organization */
   P4A_THREAD_X_PER_BLOCK_IN_3D = 8,
   P4A_THREAD_Y_PER_BLOCK_IN_3D = 8,
@@ -77,7 +78,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Release the hardware accelerator as OpenMP
 
     Nothing to do
- */
+*/
 #define P4A_release_accel
 
 /** @} */
@@ -291,15 +292,15 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param[in] kernel to call
 
-    @param[in] size is the number of iterations
+    @param[in] P4A_n_iter_0 is the number of iterations
 
     @param ... the following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_1d(kernel, size, ...)		\
+#define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {								\
     P4A_create_1d_thread_descriptors(P4A_block_descriptor,	\
 				     P4A_grid_descriptor,	\
-				     size);			\
+				     P4A_n_iter_0);			\
     P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)
@@ -309,17 +310,17 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param[in] kernel to call
 
-    @param[in] n_x_iter is the number of iterations in the first dimension
+    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
 
-    @param[in] n_y_iter is the number of iterations in the first dimension
+    @param[in] P4A_n_iter_1 is the number of iterations in the first dimension
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_2d(kernel, n_x_iter, n_y_iter, ...)	\
+#define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...)	\
   do {									\
     P4A_create_2d_thread_descriptors(P4A_block_descriptor,		\
 				     P4A_grid_descriptor,		\
-				     n_x_iter, n_y_iter);		\
+				     P4A_n_iter_0, P4A_n_iter_1);		\
     P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)

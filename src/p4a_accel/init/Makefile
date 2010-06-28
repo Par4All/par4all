@@ -1,6 +1,6 @@
 # Add source files here
 EXECUTABLE = init
-# Cuda source files (compiled with cudacc)
+# Cuda source files (compiled with nvcc)
 OBJFILES = init.o
 
 P4A_ACCEL_DIR = ..
