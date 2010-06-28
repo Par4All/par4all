@@ -775,3 +775,64 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
     return sc;
 }
+
+void sc_enumerate(Psysteme sc, Psysteme contexte)
+{
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
+    Polyhedron * volatile A = NULL;
+    Matrix * volatile a = NULL;
+    Polyhedron * volatile C = NULL;
+    Matrix * volatile c = NULL;
+    Enumeration * volatile ehrhart = NULL;
+    Ptsg volatile sg = NULL;
+
+    int nbrows = 0;
+    int nbcolumns = 0;
+
+    CATCH(any_exception_error)
+    {
+      if (A) my_Polyhedron_Free(&A);
+      if (a) my_Matrix_Free(&a);
+      if (C) my_Polyhedron_Free(&C);
+      if (sg) sg_rm(sg);
+
+      RETHROW();
+    }
+    TRY 
+    {
+
+      {
+          assert(!SC_UNDEFINED_P(sc) && (sc_dimension(sc) != 0));
+          nbrows = sc->nb_eq + sc->nb_ineq + 1;
+          nbcolumns = sc->dimension +2;
+          sg->base = base_dup(sc->base);
+          //replace base_dup, which changes the pointer given as parameter
+          a = Matrix_Alloc(nbrows, nbcolumns);
+          sc_to_matrix(sc,a);
+
+          A = Constraints2Polyhedron(a, MAX_NB_RAYS);
+          my_Matrix_Free(&a);
+      }
+      {
+          assert(!SC_UNDEFINED_P(contexte) && (sc_dimension(contexte) != 0));
+          nbrows = contexte->nb_eq + contexte->nb_ineq + 1;
+          nbcolumns = contexte->dimension +2;
+          sg->base = base_dup(sc->base);
+          //replace base_dup, which changes the pointer given as parameter
+          c = Matrix_Alloc(nbrows, nbcolumns);
+          sc_to_matrix(contexte,c);
+
+          C = Constraints2Polyhedron(c, MAX_NB_RAYS);
+          my_Matrix_Free(&c);
+      }
+
+      ehrhart = Polyhedron_Enumerate(A,C, MAX_NB_RAYS,NULL);
+      my_Polyhedron_Free(&A);
+      my_Polyhedron_Free(&C);
+    } /* end TRY */
+
+    UNCATCH(any_exception_error);
+
+    return ;
+}
