@@ -1,4 +1,7 @@
 delete struct08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create struct08 struct08.c
 
 #echo Select some options to deal with the C Language:
@@ -69,7 +72,33 @@ echo Proper regions for "init4"
 echo
 display PRINTED_FILE[init4]
 
+echo
+echo Points-to for init3
+echo
 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init3]
+
+echo
+echo Proper effects for init3
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[init3]
+
+echo
+echo Transformers for init3
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[init3]
+
+echo
+echo Preconditions for init3
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[init3]
 
 close
 delete struct08
