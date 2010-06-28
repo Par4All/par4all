@@ -1,4 +1,4 @@
-/* linearization of call04 */
+/* linearization of y in call to call04 */
 
 /* #include<stdio.h> */
 
