@@ -12,7 +12,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
-
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 #echo Select the most precise analysis:
 activate MUST_REGIONS
@@ -26,7 +26,7 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 
 #setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
+activate PRINT_CODE_PROPER_EFFECTS
 
 
 echo
@@ -46,13 +46,13 @@ echo Proper effects for "init4"
 echo
 display PRINTED_FILE[init4]
 
-#activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+#activate PRINT_CODE_CUMULATED_EFFECTS
 #display PRINTED_FILE[init]
 #display PRINTED_FILE[init2]
 #display PRINTED_FILE[init3]
 #display PRINTED_FILE[init4]
 
-activate PRINT_CODE_PROPER_POINTER_REGIONS
+activate PRINT_CODE_PROPER_REGIONS
 
 
 echo
@@ -72,34 +72,7 @@ echo Proper regions for "init4"
 echo
 display PRINTED_FILE[init4]
 
-echo
-echo Points-to for init3
-echo
-
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[init3]
-
-echo
-echo Proper effects for init3
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[init3]
-
-echo
-echo Transformers for init3
-echo
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[init3]
-
-echo
-echo Preconditions for init3
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[init3]
-
 close
 delete struct08
 quit
+
