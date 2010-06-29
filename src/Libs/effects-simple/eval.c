@@ -287,10 +287,6 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      else
 		pips_internal_error("GAP case not implemented yet\n");
 
-	      /* We should deal here with abstract locations. This is commented out 
-		 because there is a problem with flow-sensitive heap locations which are
-		 considered as abstract locations. This requires some more thinking
-	      */
 	      entity sink_ent = reference_variable(sink_ref);
 	      if (entity_abstract_location_p(sink_ent) 
 		  && ! entity_flow_or_context_sentitive_heap_location_p(sink_ent))
