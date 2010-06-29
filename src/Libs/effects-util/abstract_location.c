@@ -1,10 +1,33 @@
+/*
+
+  $Id: eval.c 17426 2010-06-25 09:24:14Z creusillet $
+
+  Copyright 1989-2010 MINES ParisTech
+  Copyright 2009-2010 HPC Project
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
 /* package abstract location. Amira Mensi 2010
  *
  * File: abstract_location.c
  *
  *
- * This file contains various useful functions to modelize a heap,
- * some of which/most should be moved elsewhere, probably in ri-util.
+ * This file contains various useful functions to modelize a heap.
  *
  */
 #ifdef HAVE_CONFIG_H
@@ -46,6 +69,73 @@ bool entity_heap_location_p(entity b)
   }
 
   return bucket_p;
+}
+
+entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
+{
+  entity e;
+  string m = i2a(stmt_number);
+  string s = strdup(concatenate(get_current_module_name(),
+				MODULE_SEP_STRING,
+				HEAP_AREA_LOCAL_NAME,
+				"_l_",
+				m,
+				NULL));
+
+  e = find_or_create_entity(s);
+  if(type_undefined_p(entity_type(e))) {
+    entity f = get_current_module_entity();
+    entity a = module_to_heap_area(f);
+    ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL);
+
+    /* FI: Beware, the symbol table is updated but this is not
+       reflected in pipsmake.rc */
+    entity_type(e) = t;
+    entity_storage(e) = make_storage_ram(r);
+    entity_initial(e) = make_value_unknown();
+    (void) add_C_variable_to_area(a, e);
+      
+      
+  }
+  else {
+    /* We might be in trouble, unless a piece of code is
+       reanalyzed. Let's assume the type is unchanged */
+    pips_assert("The type is unchanged",
+		type_equal_p(t, entity_type(e)));
+  }
+  return e;
+
+}
+
+bool entity_flow_or_context_sentitive_heap_location_p(entity e)
+{
+  bool result = false;
+  string ln = entity_local_name(e);
+  string found = strstr(ln, ANYWHERE_LOCATION);
+
+  pips_debug(9, "input entity: %s\n", ln);
+  pips_debug(9, "found (1) = : %s\n", found);
+
+  if (found == NULL) 
+    {
+      found = strstr(ln, HEAP_AREA_LOCAL_NAME);
+      pips_debug(9, "found (2) = : %s\n", found);
+      if (found!=NULL)
+	{
+	  size_t found_n = strspn(found, HEAP_AREA_LOCAL_NAME);
+	  ln = &found[found_n];
+	  pips_debug(0, "ln : %s\n", ln);
+	  found = strstr(ln, "_l_");
+	  pips_debug(0, "found (3) = : %s\n", found);
+	  result = (found != NULL);
+	}
+      else
+	result = false;
+    }
+  else
+    result = false;
+  pips_debug(9, "result = %d\n", (int) result);
+  return result;
 }
 
 /* to handle malloc instruction : type t = (cast)
@@ -112,36 +202,7 @@ reference malloc_to_abstract_location(reference lhs,
   */
   else if(strcmp(opt, "flow-sensitive")==0
 	  || strcmp(opt, "context-sensitive")==0 ){
-	  string m = i2a(stmt_number);
-	  string s = strdup(concatenate(get_current_module_name(),
-									MODULE_SEP_STRING,
-									HEAP_AREA_LOCAL_NAME,
-									"_l_",
-									m,
-									NULL));
-
-	  e = find_or_create_entity(s);
-    if(type_undefined_p(entity_type(e))) {
-      entity f = get_current_module_entity();
-      entity a = module_to_heap_area(f);
-      ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL);
-
-      /* FI: Beware, the symbol table is updated but this is not
-	 reflected in pipsmake.rc */
-	  entity_type(e) = var_t;
-	  entity_storage(e) = make_storage_ram(r);
-	  entity_initial(e) = make_value_unknown();
-      (void) add_C_variable_to_area(a, e);
-      
-      
-	}
-    else {
-      /* We might be in trouble, unless a piece of code is
-	 reanalyzed. Let's assume the type is unchanged */
-      pips_assert("The type is unchanged",
-		  type_equal_p(var_t, entity_type(e)));
-    }
-
+    e = entity_flow_or_context_sentitive_heap_location(stmt_number, var_t);
     r = make_reference(e , NIL);
   }
   else {
