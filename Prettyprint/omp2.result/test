@@ -4,34 +4,33 @@ int main()
    float a[10][10][10][10][10];                                         /*0002*/
    int i, j, k, l, m;                                                   /*0003*/
    float x;                                                             /*0004*/
-   i = 0;                                                               /*0005*/
-   j = 0;                                                               /*0006*/
-   k = 0;                                                               /*0007*/
-   l = 0;                                                               /*0008*/
-   m = 0;                                                               /*0009*/
-   x = 2.12;                                                            /*0010*/
+   float z;                                                             /*0005*/
+   float y;                                                             /*0006*/
 
+   i = 0;                                                               /*0008*/
+   j = 0;                                                               /*0009*/
+   k = 0;                                                               /*0010*/
+   l = 0;                                                               /*0011*/
+   m = 0;                                                               /*0012*/
+   x = 2.12;                                                            /*0013*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 9; i += 1) {
-#pragma omp parallel for private(k)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for private(z,k)
       for(j = 0; j <= 9; j += 1) {
-         z = 0.0;                                                       /*0016*/
-#pragma omp parallel for private(l,z)
+         z = 0.0;                                                       /*0017*/
+#pragma omp parallel for private(z,l)
          for(k = 0; k <= 9; k += 1) {
-            z = k*2.0;                                                  /*0018*/
+            z = k*2.0;                                                  /*0019*/
 #pragma omp parallel for private(m)
-            for(l = 0; l <= 9; l += 1) {
-#pragma omp parallel for 
+            for(l = 0; l <= 9; l += 1)
+#pragma omp parallel for private(y)
                for(m = 0; m <= 9; m += 1) {
-                  y = 2.0;                                              /*0023*/
-                  // comments 4
-                  y = 3.5+x+z;                                          /*0025*/
-                  a[i][j][k][l][m] = x*y;                               /*0026*/
+                  y = 2.0;                                              /*0022*/
+                  y = 3.5+x+z;                                          /*0023*/
+                  a[i][j][k][l][m] = x*y;                               /*0024*/
                }
-            }
          }
       }
-   }
-   return 0;                                                            /*0032*/
+   return 0;                                                            /*0030*/
 }
