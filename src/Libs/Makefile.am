@@ -3,7 +3,7 @@ PIPS_SUBDIRS=\
 	top-level ri-util effects-util conversion movements \
 	comp_sections transformer bootstrap control flint \
 	syntax c_syntax prettyprint \
-	effects-generic effects-simple effects-util semantics complexity \
+	effects-generic effects-simple semantics complexity \
 	continuation reductions effects-convex alias-classes \
 	callgraph icfg ricedg \
 	chains rice hyperplane transformations accel-util hwac expressions \
