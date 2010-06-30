@@ -1,0 +1,6 @@
+
+extern int a;
+extern int a;
+
+extern int main();
+
