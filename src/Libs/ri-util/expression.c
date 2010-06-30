@@ -3052,14 +3052,14 @@ void update_expression_syntax(expression e, syntax s)
  * very simple conversion from string to expression
  * only handles entities and numeric values at the time being
  */
-expression string_to_expression(const char * s,entity module)
+entity string_to_entity(const char * s,entity module)
 {
     /* try float conversion */
     string endptr,module_name=module_local_name(module);
     float f = strtof(s,&endptr);
-    if(!endptr) return float_to_expression(f);
+    if(!endptr) return float_to_entity(f);
     long int l = strtol(s,&endptr,10);
-    if(!endptr) return int_to_expression(l);
+    if(!endptr) return int_to_entity(l);
 
     entity candidate = entity_undefined;
     /* first find all relevent entities */
@@ -3079,6 +3079,11 @@ expression string_to_expression(const char * s,entity module)
     if(entity_undefined_p(candidate))
         candidate=FindEntity(TOP_LEVEL_MODULE_NAME,s);
     return entity_undefined_p(candidate)?
-        expression_undefined:
-        entity_to_expression(candidate);
+        entity_undefined:
+        candidate;
+}
+expression string_to_expression(const char * s,entity module)
+{
+    entity e = string_to_entity(s,module);
+    return entity_undefined_p(e)?expression_undefined:entity_to_expression(e);
 }
