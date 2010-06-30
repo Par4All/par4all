@@ -1,0 +1,23 @@
+delete switch_case
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+
+create switch_case switch_case.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# The user order is preserved in the PARSED_PRINTED_FILE, but reversed
+# in the PRINTED_FILE, either because of the controlizer or of the
+# prettyprinter
+display PARSED_PRINTED_FILE[main]
+
+apply UNSPLIT(%ALL)
+shell gcc -c switch_case.database/Src/switch_case.c -o switch_case.database/Src/switch_case.o
+
+close
+
+delete switch_case
+quit
