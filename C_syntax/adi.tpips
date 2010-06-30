@@ -2,8 +2,8 @@ delete adi
 
 create adi adi.c
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 
@@ -12,7 +12,7 @@ setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
 
 #setenv C_SYNTAX_DEBUG_LEVEL 4
 
-activate C_PARSER
+#activate C_PARSER
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7
 
@@ -20,6 +20,13 @@ activate C_PARSER
 
 #display PRINTED_FILE[adi!]
 #display PRINTED_FILE[tridag]
+
+echo
+echo Symbol table for "adi"
+echo
+
+# No return entity for "adi" because it is a void function
+display SYMBOL_TABLE_FILE[adi]
 
 echo
 echo Unsplit adi

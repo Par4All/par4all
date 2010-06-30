@@ -15,6 +15,7 @@ Variable list:
 	Declared entity "p3:*STATIC*" with type "area" with size 0
 	Declared entity "p3:0`__FUNCTION__" with type "variable" "char *"
 	Declared entity "p3:0`__func__" with type "variable" "char *"
+	Declared entity "p3:p3" with type "variable" "int"
 	Declared entity "p3:x" with type "variable" "double"
 	Declared entity "p3:z" with type "variable" "double *"
 
@@ -25,6 +26,10 @@ Layout for formal parameters:
 
 	Variable p3:x	offset = 1
 	Variable p3:z	offset = 2
+
+Layout for return variable:
+
+	Variable "p3:p3"	size = 4
 
 Layouts for memory areas:
 
