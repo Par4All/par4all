@@ -8,6 +8,9 @@ int main()
   case 'b':
     c--;
     break;
+  case '?':
+    c=0;
+    break;
   default:
     break;
   }
