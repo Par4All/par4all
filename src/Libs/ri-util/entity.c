@@ -2329,7 +2329,7 @@ entity find_enum_of_member(entity m)
 
   pips_assert("enum entity is found", !entity_undefined_p(ee));
   gen_free_list(fdl);
-		       
+
   return ee;
 }
 
