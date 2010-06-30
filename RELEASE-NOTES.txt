@@ -1,4 +1,4 @@
-Release notes for Par4All 0.2, 2010/06/21
+Release notes for Par4All 0.2, 2010/06/30
 =========================================
 
 Ronan Keryell, HPC Project.
@@ -10,8 +10,8 @@ multiprocessor system-on-chip with hardware accelerators up to high
 performance computer and GPU.
 
 
-Introduction:
--------------
+Introduction
+------------
 
 This is the first public version of Par4All. It parallelizes C programs to
 OpenMP and CUDA, and Fortran programs to OpenMP.
@@ -33,8 +33,8 @@ available: ``tpips`` and ``ipyps``. Of course, they are reserved for quite
 more advised users. For more information, look at http://pips4u.org
 
 
-Installation:
--------------
+Installation
+------------
 
 You can install Par4All in different ways, more or less automatic. The
 installation is done into ``/usr/local/par4all``. If you want Par4All
@@ -55,9 +55,9 @@ your ``/etc/apt/sources.list``::
   deb http://download.par4all.org/debian releases main
   deb http://download.par4all.org/debian nightly main
 
-(Nightly packages are generated every night, and is best suited if you want
+Nightly packages are generated every night, and is best suited if you want
 to track closely Par4All development. The stability is not guaranteed with
-nightly builds.)
+nightly builds.
 
 Once this is done, run::
 
@@ -75,8 +75,8 @@ A less automatic way on Debian or Linux is to install the Par4All
 
   sudo gdebi <the_package>.deb
 
-(``sudo dpkg -i <the_package>.deb`` would also work but does not automatically
-install dependencies.)
+``sudo dpkg -i <the_package>.deb`` would also work but does not
+automatically install dependencies you should install later.
 
 An even less automatic way is to use a tar ball ``.tar.gz`` file. It
 contains the binaries as built on a stable Ubuntu or Debian
@@ -113,8 +113,8 @@ can be found into the document describing all the infrastructure:
 http://www.par4all.org/documentation/par4all-infrastructure
 
 
-Fortran:
---------
+Fortran
+-------
 
 The support for Fortran95 is not included in this release since it was not
 mature enough at this release time, so only Fortran 77 with some
@@ -123,8 +123,8 @@ extensions is currently accepted.
 Fortran95 support should be in the 2010/09 release.
 
 
-C:
---
+C
+-
 
 Full C99 support is almost complete but right now there are nevertheless
 few known limitations :
@@ -168,8 +168,8 @@ few known limitations :
 Full C99 support should be in the 2010/09 release.
 
 
-Cuda:
------
+Cuda
+----
 
 To compile and to run the CUDA output, you should have the following
 environment variables set:
@@ -183,25 +183,42 @@ environment variables set:
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
 
 Sometimes, Par4All generates C99 array parameter declarations in the
-generated CUDA kernels that are not yet dealt with nvcc 3.0.
+generated CUDA kernels that are not yet dealt with nvcc 3.0. To avoid this
+we apply an array to pointer transformation on generated kernels. We hope
+nVidia will release soon a CUDA version that is C99-compliant as OpenCL
+is. That means that in the mean time, the entry code should not contain
+this kind of C99 function declaration::
+
+  f_type my_function(size_t n, size_t m, float array[n][m]) {
+     ...
+  }
+
+ instead you may have::
+
+  f_type my_function(float array[n][m]) {
+     ...
+  }
+
+with ``n`` and ``m`` that may be global variables, ``enum`` value or
+``#define``.
 
 
-Embedded systems:
------------------
+Embedded systems
+----------------
 
 The code generation for the Scaleo Chip Leon 3 MP-SoC is done through the
 OpenMP support of the target.
 
 
-SIMD and multimedia extensions:
--------------------------------
+SIMD and multimedia extensions
+------------------------------
 
 The SIMD (SSE) output is not included in this release yet since it was not
 ready at release time but should be in the 2010/09 release.
 
 
-Python:
--------
+Python
+------
 
 On Debian, PLY seems to be installed only with Python 2.5. It works with
 Python 2.6 and 3.1 with the ``PYTHONPATH`` generated for Par4All (with a
