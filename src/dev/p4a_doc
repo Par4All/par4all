@@ -2,9 +2,6 @@
 
 # Script to deal with Par4All documentation
 
-# Stop on error, since going on after errors may lead to havoc:
-set -o errexit
-
 # What to do:
 make_target=""
 
