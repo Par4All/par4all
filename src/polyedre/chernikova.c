@@ -776,16 +776,24 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     return sc;
 }
 
-void sc_enumerate(Psysteme sc, Psysteme contexte)
+struct pehrhart {
+    Enumeration *e;
+};
+/* enumerate the systeme sc using base pb
+ * pb contains the unknow variables
+ * and sc all the constraints
+ * ordered_sc must be order as follows:
+ * elements from ordered_base appear last
+ * variable_names can be provided for debugging purpose (name of bases) or set to NULL
+ */ 
+Pehrhart sc_enumerate(Psysteme ordered_sc, Pbase ordered_base, const char* variable_names[])
 {
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Polyhedron * volatile A = NULL;
     Matrix * volatile a = NULL;
     Polyhedron * volatile C = NULL;
-    Matrix * volatile c = NULL;
     Enumeration * volatile ehrhart = NULL;
-    Ptsg volatile sg = NULL;
 
     int nbrows = 0;
     int nbcolumns = 0;
@@ -795,44 +803,80 @@ void sc_enumerate(Psysteme sc, Psysteme contexte)
       if (A) my_Polyhedron_Free(&A);
       if (a) my_Matrix_Free(&a);
       if (C) my_Polyhedron_Free(&C);
-      if (sg) sg_rm(sg);
 
       RETHROW();
     }
     TRY 
     {
+        assert(!SC_UNDEFINED_P(ordered_sc) && (sc_dimension(ordered_sc) != 0));
+        nbrows = ordered_sc->nb_eq + ordered_sc->nb_ineq+1;
+        nbcolumns = ordered_sc->dimension +2;
+        a = Matrix_Alloc(nbrows, nbcolumns);
+        sc_to_matrix(ordered_sc,a);
 
-      {
-          assert(!SC_UNDEFINED_P(sc) && (sc_dimension(sc) != 0));
-          nbrows = sc->nb_eq + sc->nb_ineq + 1;
-          nbcolumns = sc->dimension +2;
-          sg->base = base_dup(sc->base);
-          //replace base_dup, which changes the pointer given as parameter
-          a = Matrix_Alloc(nbrows, nbcolumns);
-          sc_to_matrix(sc,a);
+        A = Constraints2Polyhedron(a, MAX_NB_RAYS);
+        my_Matrix_Free(&a);
 
-          A = Constraints2Polyhedron(a, MAX_NB_RAYS);
-          my_Matrix_Free(&a);
-      }
-      {
-          assert(!SC_UNDEFINED_P(contexte) && (sc_dimension(contexte) != 0));
-          nbrows = contexte->nb_eq + contexte->nb_ineq + 1;
-          nbcolumns = contexte->dimension +2;
-          sg->base = base_dup(sc->base);
-          //replace base_dup, which changes the pointer given as parameter
-          c = Matrix_Alloc(nbrows, nbcolumns);
-          sc_to_matrix(contexte,c);
+        C = Universe_Polyhedron(base_dimension(ordered_base));
 
-          C = Constraints2Polyhedron(c, MAX_NB_RAYS);
-          my_Matrix_Free(&c);
-      }
-
-      ehrhart = Polyhedron_Enumerate(A,C, MAX_NB_RAYS,NULL);
-      my_Polyhedron_Free(&A);
-      my_Polyhedron_Free(&C);
+        ehrhart = Polyhedron_Enumerate(A,C, MAX_NB_RAYS,variable_names);
+        /*
+        Value vals[2]= {0,0};
+        Value *val = compute_poly(ehrhart,&vals[0]);
+        printf("%lld\n",*val);*/
+        my_Polyhedron_Free(&A);
+        my_Polyhedron_Free(&C);
     } /* end TRY */
 
     UNCATCH(any_exception_error);
 
-    return ;
+    {
+        Pehrhart p;
+        p=malloc(sizeof(*p));
+        p->e=ehrhart;
+        return p;
+    }
 }
+
+/* evaluate the ehrhart polynomial p using values as context
+ * returned value is allocated
+ */
+Value* Pehrhart_evaluate(Pehrhart p, Value values[])
+{
+    return compute_poly(p->e,values);
+}
+
+/* generate a pretty printed version of the polynomial p,
+ * suitable for interaction with third party tools
+ * pname is the name of each basis
+ */
+char ** Pehrhart_string(Pehrhart p, const char *pname[])
+{
+    Enumeration * curr = p->e,*iter=p->e;
+    size_t nb_enum = 0,i;
+    char ** enum_strings;
+    /* count the number of domains */
+    while(iter) {
+        nb_enum++;
+        iter=iter->next;
+    }
+
+    if(!nb_enum || !(enum_strings=malloc(sizeof(*enum_strings)*(1+nb_enum))))
+        return NULL;
+
+    for(i=0;i<nb_enum;i++)
+    {
+        char * generated_string;
+        size_t generated_string_size;
+        FILE* fd;
+        fd = open_memstream(&generated_string,&generated_string_size);
+        print_evalue(fd,&curr->EP,pname);
+        fclose(fd);
+        enum_strings[i]=generated_string;
+        /* remove trailing \n */
+        generated_string[generated_string_size-1]=0;
+    }
+    enum_strings[i]=NULL;
+    return enum_strings;
+}
+
