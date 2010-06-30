@@ -35,11 +35,11 @@ clean: local-clean
 
 local-clean:
 	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
-		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py
+		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py release-notes.tex release-notes-extract.tex
 
 
 # Add the dependence on some automatically generated help:
-par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex
+par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex release-notes-extract.tex
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
@@ -56,6 +56,16 @@ VPATH = ../../src/dev:../../src/p4a_accel:../../src/postprocessor:../../src/simp
 %.help:% Makefile
 	# Generate raw help message for the given command:
 	$< -h > $@
+
+release-notes.tex: ../../RELEASE-NOTES.txt Makefile
+	rst2latex --section-numbering $< $@
+
+release-notes-extract.tex: release-notes.tex Makefile
+	awk '/^This text is typeset according to the reStructuredText Markup/ { enable_output = 0 } { if (enable_output) print } /^% Document title/ { enable_output = 1 }' $< | \
+	sed -e '/\\phantomsection%/d' -e 's/\\href{[^}]*}/\\url/g' \
+	-e '/\\addcontentsline{/d'  -e 's/^\\section\*{/\\subsection{/' \
+	-e '/\\author{/d' -e '/\\date{/d' -e '/^\\maketitle/d' \
+	-e 's/^\\title{/\\section{/' > $@
 
 ### Local Variables:
 ### mode: flyspell

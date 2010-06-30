@@ -44,6 +44,8 @@
 You can get this document in PDF format on \PfaOrganizationPDF and in HTML
 on \PfaAllOrganizationHTDOC.
 
+% To automatically build reports from this content:
+%%ContentBegin
 
 \section{Introduction}
 \label{sec:introduction}
@@ -71,92 +73,37 @@ only the \Apfa core developers.
 
 \bigskip{}
 
-\section{Release notes}
-\label{sec:release-notes}
-
-%\verbatiminput{../../RELEASE-NOTES.txt}
-
-\section{Installation from binary distribution}
-\label{sec:inst-from-binary}
-
-\marginpar{TODO : to be generated from RELEASE-NOTES.txt}
-You can install Par4All in different ways, more or less automatic. The
-installation is done into ``/usr/local/par4all``. If you want Par4All
-installed in another location, use the compilation way at the end of this
-section.
-
-The best way if you are on GNU/Linux Debian or Ubuntu is to use
-our package repository. This way, when a new version is out, your
-classical package manager can automatically install it.
-
-To use our package repository, pick *one* of the following lines, and
-append it to your /etc/apt/sources.list::
-
-  deb http://download.par4all.org/ubuntu releases main
-  deb http://download.par4all.org/ubuntu nightly main
-  deb http://download.par4all.org/debian releases main
-  deb http://download.par4all.org/debian nightly main
-
-(Nightly packages are generated every night, and is best suited if you want
-to track closely Par4All development. The stability is not guaranteed with
-nightly builds.)
-
-Once this is done, run::
-
-  sudo aptitude update
-  sudo aptitude install par4all
-
-And you are (almost) good to go! You will need to source a shell script as
-described when you issue the ``aptitude install par4all`` command,
-or log out and log in again for the environment to get properly set
-up for Par4All. Once this is done, you can, for example, run ``p4a -h``
-to get help about the usage of the p4a frontend script.
-
-A less automatic way on Debian or Linux is to install the Par4All
-``.deb`` package you have found on http://download.par4all.org with::
-
-  sudo gdebi <thepackage>.deb
-
-(sudo dpkg -i <thepackage>.deb would also work but does not automatically
-install dependencies.)
-
-An even less automatic way is to use a tar ball ``.tar.gz`` file. It contains
-the binaries as built on a stable Ubuntu or Debian distribution. It should
-work on any GNU/Linux distribution with the following libraries installed:
-
-  (a fairly recent) libc.so.6, libncurses.so.5, libreadline.so.6
-
-Once you have downloaded one of these .tar.gz packages from
-http://download.par4all.org, extract it with the following command::
-\begin{verbatim}
-  tar xvzf <the_package>.tar.gz
-\end{verbatim}
-It will create a directory named par4all. Move this directory to its final
-location::
-\begin{verbatim}
-  sudo mv par4all /usr/local/
-\end{verbatim}
-
-You will then need to source one of the following shell scripts which set up
-the environment variables for proper Par4All execution:
-
-  source /usr/local/par4all/etc/par4all-rc.sh (if you use bash, sh, dash, etc.)
-  source /usr/local/par4all/etc/par4all-rc.csh (if you use csh, tcsh etc.)
-
-Then you can look at the manual of ``p4a`` on
-http://www.par4all.org/documentation for information on how to use Par4All.
-
-More details on the installation or how to compile Par4All from your own
-can be found into the document describing all the infrastructure:
-http://www.par4all.org/documentation/par4all-infrastructure
-
-
-There are more information in the \verb|RELEASE-NOTES.txt| file at the
-root of the \Apfa files.
+\input{release-notes-extract}
 
 
 \section{Compilation}
 \label{sec:compilation}
+
+\subsection{Packages needed to build and run Par4All}
+\label{sec:pack-need-build}
+
+The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
+Debian/unstable and you need to have at least these packages installed to
+compile and run:
+\begin{quote}
+  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
+  \texttt{texlive-latex-extra}, \texttt{tex4ht}, \texttt{automake},
+  \texttt{libtool}, \texttt{autoconf}, \texttt{libreadline5-dev},
+  \texttt{python-dev}, \texttt{swig}, \texttt{python-ply},
+  \texttt{libgmp3-dev}, \texttt{libmpfr-dev}, \texttt{gfortran},
+  \texttt{subversion}, \texttt{git}
+\end{quote}
+
+To only run \Apfa, the following packages on Debian or Ubuntu are needed:
+\begin{quote}
+  \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
+  \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
+\end{quote}
+
+
+\subsection{The compilation process}
+\label{sec:compilation-process}
+
 
 Once you have the \Apfa source directory (have a look to
 section~\ref{sec:public-repositories}), \Apfa is compiled and configured
@@ -713,8 +660,7 @@ but we can detail it a bit further for this example.
 For example, you have a \Asvn working copy of \Apips (the \texttt{trunk}
 into \texttt{prod}, your branch in \verb|pips_dev|, or whatever. Refer
 to the \Apips developer guide for more informations). You just need to
-point this directory to \Apfa by setting the \verb|P4A_PIPS_SRC|
-environment variable.
+point this directory to \Apfa by using the \verb|--pips-src=| option.
 
 Be sure you do not have sourced the old configuration file of the \Apips
 \Asvn environment from \Acri in your shell and that you do not have old
@@ -724,16 +670,50 @@ instead the right \Apfa variable set in your shell.
 Then you clean this directory to remove dangling dependencies the first
 time you use a classical \Apips directory with \Apfa with:
 \begin{verbatim}
-cd $P4A_PIPS_SRC
+cd <where the wanted PIPS is>
 make clean
 \end{verbatim}
 
-You build a new \Apfa version using this \Apips version just with:
+You build a new \Apfa version using this \Apips version in debug mode,
+compiled with 4 compilation processes to take advantage of your 4-core
+machine, just with:
 \begin{verbatim}
-p4a_setup
+src/simple_tools/p4a_setup -vvv --pips-src=<where the wanted PIPS is> --debug --jobs=4
 \end{verbatim}
 
-\verb|src/simple_tools/p4a_setup --only=pips -vvv -j 8 --nofinal|
+It runs everything. Once you have all the infrastructure setup, it is
+useless to recompile everything, or even reconfigure \Apips when you only
+change few things. You can just recompile \Apips and skip the installation
+of typical \Apfa things, with a:
+\begin{verbatim}
+src/simple_tools/p4a_setup -vvv --pips-src=<where the wanted PIPS is> \
+   --debug --only=pips --no-final --jobs=4
+\end{verbatim}
+
+
+\subsubsection{Debuging PIPS and p4a}
+\label{sec:debuging-pips-p4a}
+
+To debug \texttt{tpips} in \Apfa, you just need to run \texttt{gdb
+  tpips}\footnote{Or whatever debugger or frontend such as Eclipse or
+  Emacs. For example with Emacs, use \texttt{M-x gdb} and then ask for
+  many windows in the \texttt{Gud/Gdb-UI} menu.} and then \texttt{run
+  \emph{the}.tpips} file in parameter.
+
+To debug a \Apyps program, since indeed it is a Python program that uses
+\Apips libraries, you then need to launch \texttt{gdb python} and inside
+the debugger run the program with \texttt{run \emph{the\_PyPS\_file}.py}
+
+To debug \texttt{p4a}, it is still a Python program, but you need to run
+\texttt{p4a} and passing arguments to it. So you first launch a
+\texttt{gdb python} and then run like:
+\begin{alltt}
+run \emph{the-path-to/}p4a --cuda
+\end{alltt}
+
+To run your own version of \texttt{p4a}, you can put the directory
+containing your \texttt{p4a} \texttt{.py} libraries first into the
+\texttt{PYTHONPATH} environment variable.
 
 
 \subsubsection{Internal organization}
@@ -888,28 +868,6 @@ these branches).
 \label{sec:setup}
 
 There are scripts to ease the developer and user life.
-
-
-\subsubsection{Packages needed to build and run Par4All}
-\label{sec:pack-need-build}
-
-The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
-Debian/unstable and you need to have at least these packages installed to
-compile and run:
-\begin{quote}
-  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
-  \texttt{texlive-latex-extra}, \texttt{tex4ht}, \texttt{automake},
-  \texttt{libtool}, \texttt{autoconf}, \texttt{libreadline5-dev},
-  \texttt{python-dev}, \texttt{swig}, \texttt{python-ply},
-  \texttt{libgmp3-dev}, \texttt{libmpfr-dev}, \texttt{gfortran},
-  \texttt{subversion}, \texttt{git}
-\end{quote}
-
-To only run \Apfa, the following packages on Debian or Ubuntu are needed:
-\begin{quote}
-  \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
-  \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
-\end{quote}
 
 
 \subsubsection{Scripts for an everyday work}
@@ -1390,6 +1348,7 @@ indeed. \smiley
 
 \input{optparse_help_to_tex-help}
 
+%%ContentEnd
 
 \end{document}
 

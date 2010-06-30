@@ -147,7 +147,7 @@ class p4a_builder():
 
         if add_optimization_flags:
             if icc:
-                c_flags += [ "-fast" ]
+                c_flags += [ "-xHOST -O3 -ipo -no-prec-div" ] # Do not specify -fast with implies -static and bugs with STT_GNU_IFUNC upon linkage.
             else:
                 c_flags += [ "-O2" ]
 
@@ -408,7 +408,6 @@ set(${project}_SOURCE_FILES
 
 source_group("Header Files" FILES $${${project}_HEADER_FILES})
 source_group("Source Files" FILES $${${project}_SOURCE_FILES})
-source_group("CUDA Source Files" FILES $${${project}_CUDA_FILES})
 
 include_directories($include_dirs)
 link_directories($lib_dirs)
