@@ -1,6 +1,6 @@
 
 extern int a;
-extern int a;
+int a;
 
 extern int main();
 
