@@ -374,7 +374,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
     }
   return smt;
 }
-
+
 statement MakeSwitchStatement(statement s)
 {
   /* Transform a switch statement to if - else - goto. Example:
@@ -383,7 +383,7 @@ statement MakeSwitchStatement(statement s)
      case 1:
      s1;
      case 2:
-     s2; 
+     s2;
      default:
      sd;
      }
@@ -416,7 +416,7 @@ statement MakeSwitchStatement(statement s)
      if (c==1) goto switch_xxx_case_1;
      if (c==2) goto switch_xxx_case_2;
      goto switch_xxx_default;
-    
+
 
      before s and return the inserted statement.  */
   int i = basic_int((basic) stack_head(LoopStack));
@@ -434,7 +434,8 @@ statement MakeSwitchStatement(statement s)
     pips_debug(8, "tl=%p\n", tl);
   }
 
-  /* For the time being, the switch comment is lost. It should already be included in the argument,s  */
+  /* For the time being, the switch comment is lost. It should already
+     be included in the argument,s  */
   /* pop_current_C_comment(); */
 
   /* Make sure the default case is the last one in the test sequence */
@@ -445,7 +446,10 @@ statement MakeSwitchStatement(statement s)
       ds = s;
     }
     else {
+      /* Keep the cases in the user order. Tobe checked at the
+	 pARSED_PRINTED_FILE level. */
       ntl = gen_nconc(ntl, CONS(STATEMENT,s,NIL));
+      //ntl = CONS(STATEMENT,s,ntl);
     }
   }
   if(statement_undefined_p(ds)) {
@@ -468,7 +472,7 @@ statement MakeSwitchStatement(statement s)
       /* This switch has a break statement which has been transformed to goto
 	 Add the labeled statement after the switch */
       insert_statement(s,smt,FALSE);
-    } 
+    }
   pips_assert("Switch is consistent",statement_consistent_p(s));
   ifdebug(5)
     {
@@ -490,6 +494,8 @@ statement MakeCaseStatement(expression e)
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
+  /* It might be easier to evaluate e since e must be evaluable at
+     compile time... */
   string estr = words_to_string(words_expression(e, NIL));
   string restr = estr;
 
@@ -500,7 +506,49 @@ statement MakeCaseStatement(expression e)
     *(estr+strlen(estr)-1) = '\000';
   }
 
-  asprintf(&lab,"switch_%d_case_%s",i,restr);
+  /* Make sure restr only contains C characters valid for a label if
+     a character constant is used: is_letter || is_digit || '_'. */
+  if(strspn(restr,
+	    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz")!=strlen(restr) && *estr=='\'') {
+    /* illegal characters such as '?' or ',' or '.' must be converted
+       as well as octal constant such as '\001' and special
+       characters such as '\n' */
+    if(strlen(restr)==1) {
+      /* Must be an illegal character for a label */
+      /* FI: not too safe to make it octal among decimal because it
+	 can generate a label conflict. */
+      asprintf(&lab,"switch_%d_case_%hhd",i,*restr);
+    }
+    else if(*restr=='\\') {
+      if(*(restr+1)=='0'||*(restr+1)=='1'||*(restr+1)=='2'||*(restr+1)=='3')
+	/* octal character */
+	asprintf(&lab,"switch_%d_case_%s",i,restr+1);
+      else {
+	/* FI: let's deal with special cases such as \n, \r, \t,...*/
+	char labc; // A string would carry more ASCII information
+	if(*(restr+1)=='a') // bell
+	  labc = '\a'; // "BEL"
+	else if(*(restr+1)=='b') // backspace
+	  labc = '\b'; // "BS"
+	else if(*(restr+1)=='f') // form feed
+	  labc = '\f'; // "FF"
+	else if(*(restr+1)=='n') // new line
+	  labc = '\n'; // "LF"
+	else if(*(restr+1)=='t') // horizontal tab
+	  labc = '\t'; // "HT"
+	else if(*(restr+1)=='r') // carriage return
+	  labc = '\r'; // "CR"
+	else if(*(restr+1)=='v') // vertical tab
+	  labc = '\v'; // "VT"
+	else
+	  pips_internal_error("Unexpected case.\n");
+	asprintf(&lab,"switch_%d_case_%hhd",i,labc);
+      }
+    }
+  }
+  else
+    asprintf(&lab,"switch_%d_case_%s",i,restr);
+
   free(estr);
   statement s = MakeLabeledStatement(lab,
 				     make_continue_statement(entity_empty_label()),
