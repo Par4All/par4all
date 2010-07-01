@@ -95,11 +95,16 @@ If you want to compile \Apfa by your own, you need to have a bigger list
 of packages installed:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
-  \texttt{texlive-latex-extra}, \texttt{tex4ht}, \texttt{automake},
-  \texttt{libtool}, \texttt{autoconf}, \texttt{libreadline5-dev},
-  \texttt{python-dev}, \texttt{swig}, \texttt{python-ply},
-  \texttt{python3.1}, \texttt{libgmp3-dev}, \texttt{libmpfr-dev},
-  \texttt{gfortran}, \texttt{subversion}, \texttt{git}
+  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
+  \texttt{libreadline5-dev}, \texttt{python-dev}, \texttt{swig},
+  \texttt{python-ply}, \texttt{python3.1}, \texttt{libgmp3-dev},
+  \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
+  \texttt{git}
+\end{quote}
+
+If you want also to compile the documentation, you need also:
+\begin{quote}
+  \texttt{texlive-full}, \texttt{tex4ht}
 \end{quote}
 
 
@@ -135,7 +140,10 @@ git pull origin p4a
 And run \verb|p4a_setup| again. It is wise to do it with the
 \verb|--rebuild| and \verb|--clean| parameters to make sure you recompile
 everything (\Apips being a quickly moving project, incremental build is
-not always guaranteed to work).
+not always guaranteed to work). Removing the \texttt{build} directory can
+help when you change the \verb|--prefix| directory because it seems that
+some obsolete information about the installation directory may remain in
+the \texttt{build} directory and that makes the compilation to fail.
 
 To create a \texttt{.deb} or \texttt{.tar.gz} package of the installation
 you have made using \verb|p4a_setup| as explained in

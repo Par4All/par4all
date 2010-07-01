@@ -50,7 +50,7 @@ while [ "$1" ] ; do
       -h|--help) usage 0 ;;
       -v|--verbose) let verb++ ;;
       --clean) make_target+="clean ";;
-      --make) make_target+="default ";;
+      --make) make_target+="default "; set -o errexit;;
       --publish) make_target+="publish ";;
       *) usage 1 "unexpected option: $opt"
   esac
