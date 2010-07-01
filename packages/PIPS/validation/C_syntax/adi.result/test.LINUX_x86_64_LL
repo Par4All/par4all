@@ -1,4 +1,140 @@
 
+Symbol table for "adi"
+
+adi
+
+Declarations for module "adi" with type "double * * x double * * x double * * x double * * x double * * x double * * x double * * x double * * x int x int x double x double x double -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:dmatrix" with type "functional" "int x int x int x int -> double * *"
+	Declared entity "TOP-LEVEL:dvector" with type "functional" "int x int -> double *"
+	Declared entity "TOP-LEVEL:free_dmatrix" with type "functional" "double * * x int x int x int x int -> void"
+	Declared entity "TOP-LEVEL:free_dvector" with type "functional" "double * x int x int -> void"
+	Declared entity "TOP-LEVEL:nrerror" with type "functional" "char * -> void"
+	Declared entity "TOP-LEVEL:tridag" with type "functional" "double * x double * x double * x double * x double * x int -> void"
+	Declared entity "adi!:*STATIC*" with type "area" with size 0
+	Declared entity "adi:*DYNAMIC*" with type "area" with size 176
+	Declared entity "adi:*HEAP*" with type "area" with size 0
+	Declared entity "adi:*STACK*" with type "area" with size 0
+	Declared entity "adi:*STATIC*" with type "area" with size 0
+	Declared entity "adi:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "adi:0`__func__" with type "variable" "char *"
+	Declared entity "adi:0`aa" with type "variable" "double *"
+	Declared entity "adi:0`ab" with type "variable" "double"
+	Declared entity "adi:0`alph" with type "variable" "double *"
+	Declared entity "adi:0`anorm" with type "variable" "double"
+	Declared entity "adi:0`anormg" with type "variable" "double"
+	Declared entity "adi:0`bb" with type "variable" "double *"
+	Declared entity "adi:0`bet" with type "variable" "double *"
+	Declared entity "adi:0`cc" with type "variable" "double *"
+	Declared entity "adi:0`disc" with type "variable" "double"
+	Declared entity "adi:0`i" with type "variable" "int"
+	Declared entity "adi:0`j" with type "variable" "int"
+	Declared entity "adi:0`k1" with type "variable" "int"
+	Declared entity "adi:0`kits" with type "variable" "int"
+	Declared entity "adi:0`l" with type "variable" "int"
+	Declared entity "adi:0`n" with type "variable" "int"
+	Declared entity "adi:0`next" with type "variable" "int"
+	Declared entity "adi:0`nits" with type "variable" "int"
+	Declared entity "adi:0`nr" with type "variable" "int"
+	Declared entity "adi:0`psi" with type "variable" "double * *"
+	Declared entity "adi:0`r" with type "variable" "double *"
+	Declared entity "adi:0`resid" with type "variable" "double"
+	Declared entity "adi:0`rfact" with type "variable" "double"
+	Declared entity "adi:0`rr" with type "variable" "double *"
+	Declared entity "adi:0`s" with type "variable" "double * *"
+	Declared entity "adi:0`twopwr" with type "variable" "int"
+	Declared entity "adi:0`uu" with type "variable" "double *"
+	Declared entity "adi:a" with type "variable" "double * *"
+	Declared entity "adi:alpha" with type "variable" "double"
+	Declared entity "adi:b" with type "variable" "double * *"
+	Declared entity "adi:beta" with type "variable" "double"
+	Declared entity "adi:c" with type "variable" "double * *"
+	Declared entity "adi:d" with type "variable" "double * *"
+	Declared entity "adi:e" with type "variable" "double * *"
+	Declared entity "adi:eps" with type "variable" "double"
+	Declared entity "adi:f" with type "variable" "double * *"
+	Declared entity "adi:g" with type "variable" "double * *"
+	Declared entity "adi:jmax" with type "variable" "int"
+	Declared entity "adi:k" with type "variable" "int"
+	Declared entity "adi:u" with type "variable" "double * *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable adi:a	offset = 1
+	Variable adi:alpha	offset = 11
+	Variable adi:b	offset = 2
+	Variable adi:beta	offset = 12
+	Variable adi:c	offset = 3
+	Variable adi:d	offset = 4
+	Variable adi:e	offset = 5
+	Variable adi:eps	offset = 13
+	Variable adi:f	offset = 6
+	Variable adi:g	offset = 7
+	Variable adi:jmax	offset = 9
+	Variable adi:k	offset = 10
+	Variable adi:u	offset = 8
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "adi!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "adi:*DYNAMIC*" of size 176:
+	Variable "adi:0`i"	offset = 8	size = 4
+	Variable "adi:0`nr"	offset = 12	size = 4
+	Variable "adi:0`nits"	offset = 16	size = 4
+	Variable "adi:0`next"	offset = 20	size = 4
+	Variable "adi:0`n"	offset = 24	size = 4
+	Variable "adi:0`l"	offset = 28	size = 4
+	Variable "adi:0`kits"	offset = 32	size = 4
+	Variable "adi:0`k1"	offset = 36	size = 4
+	Variable "adi:0`j"	offset = 40	size = 4
+	Variable "adi:0`twopwr"	offset = 44	size = 4
+	Variable "adi:0`psi"	offset = 48	size = 8
+	Variable "adi:0`rfact"	offset = 56	size = 8
+	Variable "adi:0`resid"	offset = 64	size = 8
+	Variable "adi:0`disc"	offset = 72	size = 8
+	Variable "adi:0`anormg"	offset = 80	size = 8
+	Variable "adi:0`anorm"	offset = 88	size = 8
+	Variable "adi:0`ab"	offset = 96	size = 8
+	Variable "adi:0`aa"	offset = 104	size = 8
+	Variable "adi:0`bb"	offset = 112	size = 8
+	Variable "adi:0`cc"	offset = 120	size = 8
+	Variable "adi:0`rr"	offset = 128	size = 8
+	Variable "adi:0`uu"	offset = 136	size = 8
+	Variable "adi:0`s"	offset = 144	size = 8
+	Variable "adi:0`r"	offset = 152	size = 8
+	Variable "adi:0`alph"	offset = 160	size = 8
+	Variable "adi:0`bet"	offset = 168	size = 8
+	Variable "adi:0`__func__"	offset = 0	size = 4
+	Variable "adi:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "adi:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "adi:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "adi:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module adi
+
+
 Unsplit adi
 
 /*

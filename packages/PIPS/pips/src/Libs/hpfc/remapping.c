@@ -656,27 +656,6 @@ remapping_stats(
     return result;
 }
 
-/* ??? should be moved to sc?
- * builds two systems from one according to base b:
- * the system of constraints that contain some b variables,
- * and the system of those that do not.
- * s and b are not touched.
- */
-void 
-sc_separate_on_vars(
-    Psysteme s,
-    Pbase b,
-    Psysteme *pwith,
-    Psysteme *pwithout)
-{
-    Pcontrainte i_with, e_with, i_without, e_without;
-
-    Pcontrainte_separate_on_vars(sc_inegalites(s), b, &i_with, &i_without);
-    Pcontrainte_separate_on_vars(sc_egalites(s), b, &e_with, &e_without);
-
-    *pwith = sc_make(e_with, i_with),
-    *pwithout = sc_make(e_without, i_without);
-}
 
 /* generates a full remapping code, given the systems and indexes
  * to be used in the different loops. that is complementary send/broadcast

@@ -1,9 +1,9 @@
 #
-delete omp2_c
+delete all_privates
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create omp2_c omp2.c
+create all_privates all_privates.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -25,12 +25,17 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 apply PRIVATIZE_MODULE(main)
 
+setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+#display PRINTED_FILE[main]
+
+#display DG_FILE[main]
+
 echo // OMP style
 
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
 
 close
-delete omp2_c
+delete all_privates
 quit
 # EOF
