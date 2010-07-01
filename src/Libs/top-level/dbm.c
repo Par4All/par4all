@@ -122,6 +122,8 @@ bool open_module(const char* name)
 			  name, upper_case_name);
     }
 
+    if (upper_case_name != module_name)
+        free(upper_case_name);
     free(module_name);
     return success;
 }
