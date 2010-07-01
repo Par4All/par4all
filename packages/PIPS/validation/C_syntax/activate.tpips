@@ -1,0 +1,26 @@
+delete activate
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create activate activate.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Symbole table for "activate"
+echo
+
+display SYMBOL_TABLE_FILE[activate]
+
+#display PARSED_PRINTED_FILE[activate]
+
+close
+delete activate
+quit

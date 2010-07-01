@@ -1,15 +1,55 @@
 int main()
 {
    char c;                                                              /*0003*/
-   if (c=='a') goto switch_1_case_a;
-   if (c=='b') goto switch_1_case_b;
-switch_1_default:   ;
-   goto break_1;
-switch_1_case_b:   ;
-   c--;                                                                 /*0009*/
-   goto break_1;
+
+   if (c=='a')
+      goto switch_1_case_a;                                             /*0005*/
+   if (c=='b')
+      goto switch_1_case_b;                                             /*0008*/
+   if (c=='?')
+      goto switch_1_case_63;                                            /*0011*/
+   if (c=='\n')
+      goto switch_1_case_10;                                            /*0014*/
+   if (c=='\001')
+      goto switch_1_case_001;                                           /*0017*/
+   if (c=='\002')
+      goto switch_1_case_002;                                           /*0020*/
+   if (c=='\177')
+      goto switch_1_case_177;                                           /*0023*/
+   if (c=='\277')
+      goto switch_1_case_277;                                           /*0026*/
+   if (c=='\377')
+      goto switch_1_case_377;                                           /*0029*/
+   goto switch_1_default;                                               /*0032*/
 switch_1_case_a:   ;
    c++;                                                                 /*0006*/
+   goto break_1;                                                        /*0007*/
+switch_1_case_b:   ;
+   c--;                                                                 /*0009*/
+   goto break_1;                                                        /*0010*/
+switch_1_case_63:   ;
+   c = 0;                                                               /*0012*/
+   goto break_1;                                                        /*0013*/
+switch_1_case_10:   ;
+   c = 1;                                                               /*0015*/
+   goto break_1;                                                        /*0016*/
+switch_1_case_001:   ;
+   c = '\001';                                                          /*0018*/
+   goto break_1;                                                        /*0019*/
+switch_1_case_002:   ;
+   c = '\002';                                                          /*0021*/
+   goto break_1;                                                        /*0022*/
+switch_1_case_177:   ;
+   c = '\177';                                                          /*0024*/
+   goto break_1;                                                        /*0025*/
+switch_1_case_277:   ;
+   c = '\277';                                                          /*0027*/
+   goto break_1;                                                        /*0028*/
+switch_1_case_377:   ;
+   c = '\377';                                                          /*0030*/
+   goto break_1;                                                        /*0031*/
+switch_1_default:   ;
+   goto break_1;                                                        /*0033*/
 break_1:   ;
-   return 0;                                                            /*0014*/
+   return 0;                                                            /*0035*/
 }

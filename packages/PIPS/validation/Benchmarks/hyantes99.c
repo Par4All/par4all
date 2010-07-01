@@ -60,26 +60,22 @@ towns read_towns(const char fname[])
 }
 
 
-void run(data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step,data_t range, size_t rangex, size_t rangey, int nb, town pt[rangex][rangey], town t[rangex][rangey])
+void run(data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step,data_t range, size_t rangex, size_t rangey, int nb, town pt[rangex][rangey], town t[nb])
 {
-    size_t i,j;
-    size_t ki, kj;
+    size_t i,j,k;
 
     fprintf(stderr,"begin computation ...\n");
-    fprintf(stderr,"xrange: " OUTPUT_FORMAT ,xmin,xmax,rangex);
-    fprintf(stderr,"yrange: " OUTPUT_FORMAT ,ymin,ymax,rangey);
 
     for(i=0;i<rangex;i++)
         for(j=0;j<rangey;j++) {
-	  pt[i][j][0]=(xmin+step*i)*180/M_PI;
-          pt[i][j][1]=(ymin+step*j)*180/M_PI;
-	  pt[i][j][2]=0.;
-	  for(ki=0;ki<rangex;ki++)
-	    for(kj=0;kj<rangey;kj++) {
-	      data_t tmp =
-		6368.* acos(cos(xmin+step*i)*cos( t[ki][kj][0] ) * cos((ymin+step*j)-t[ki][kj][1]) + sin(xmin+step*i)*sin(t[ki][kj][0]));
+            pt[i][j][0]=(xmin+step*i)*180/M_PI;
+            pt[i][j][1]=(ymin+step*j)*180/M_PI;
+            pt[i][j][2]=0.;
+            for(k=0;k<nb;k++) {
+                data_t tmp =
+                    6368.* acos(cos(xmin+step*i)*cos( t[k][0] ) * cos((ymin+step*j)-t[k][1]) + sin(xmin+step*i)*sin(t[k][0]));
                 if( tmp < range )
-                    pt[i][j][2]+= t[ki][kj][2]  / (1 + tmp) ;
+                    pt[i][j][2]+= t[k][2]  / (1 + tmp) ;
             }
         }
     fprintf(stderr,"end computation ...\n");
@@ -100,8 +96,7 @@ int main(int argc, char * argv[])
 {
     if(argc != 8) return 1;
     {
-	int nb;
-	towns tout;
+        int nb;
         towns t = read_towns(argv[1]);
         data_t xmin = atof(argv[2])*M_PI/180.,
                ymin =atof(argv[3])*M_PI/180.,
@@ -109,12 +104,14 @@ int main(int argc, char * argv[])
                ymax=atof(argv[5])*M_PI/180.,
                step=atof(argv[6])*M_PI/180.,
                range=atof(argv[7]);
-	size_t rangex=( (xmax - xmin )/step ),
-	  rangey=( (ymax - ymin )/step );
-	town (*pt)[rangex][rangey];
-	nb = 1+  rangex*rangey;
-	pt = malloc(sizeof(town)*nb);
-        run(xmin,ymin,xmax,ymax,step,range, rangex, rangey, nb, *pt, &t.data[0][0]);
+        size_t rangex=( (xmax - xmin )/step ),
+               rangey=( (ymax - ymin )/step );
+        town (*pt)[rangex][rangey];
+        town (*pi)[t.nb];
+        pi=(void*)t.data;
+        nb = rangex*rangey;
+        pt = malloc(sizeof(town)*nb);
+        run(xmin,ymin,xmax,ymax,step,range, rangex, rangey, t.nb, *pt, *pi);
         display(rangex, rangey, *pt);
     }
     return 0;
