@@ -92,6 +92,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
         pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to an entity that is not the loop bound\n");
     }
 
+    loop l = statement_loop(original_loop);
     /* split the loop */
     statement first_loop_statement = copy_statement(original_loop);
 
@@ -120,20 +121,24 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
     /* fix the bound */
     bool index_set_split_before_bound = get_bool_property("INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND");
     expression increment = range_increment(loop_range(statement_loop(the_second_loop_statement)));
-    expression new_loop_bound_expression = entity_to_expression(new_loop_bound);
+
+    intptr_t vincrement;
+    if (!expression_integer_value(increment, &vincrement)) {
+        pips_user_warning("unable to guess loop increment sign, assuming positive\n");
+        vincrement = 1;
+    }
+
+
+    expression new_loop_bound_expression =
+            binary_intrinsic_expression(vincrement > 0 ? MIN_OPERATOR_NAME : MAX_OPERATOR_NAME,
+                                        entity_to_expression(new_loop_bound),
+                                        copy_expression(range_upper(loop_range(l)))
+                                        );
     expression new_loop_bound_expression_with_xcrement = 
-        make_expression(
-                make_syntax_call(
-                    make_call(
-                        CreateIntrinsic(
-                            index_set_split_before_bound?
-                            MINUS_OPERATOR_NAME:
-                            PLUS_OPERATOR_NAME),
-                        make_expression_list(entity_to_expression(new_loop_bound),copy_expression(increment))
-                        )
-                    ),
-                normalized_undefined
-                );
+
+       binary_intrinsic_expression(index_set_split_before_bound? MINUS_OPERATOR_NAME: PLUS_OPERATOR_NAME,
+                        copy_expression(new_loop_bound_expression),
+                        copy_expression(increment));
 
     expression fst_loop_upper = index_set_split_before_bound ?
         new_loop_bound_expression_with_xcrement:

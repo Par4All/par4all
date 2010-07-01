@@ -1,3 +1,31 @@
+/*
+
+  $Id: eval.c 17426 2010-06-25 09:24:14Z creusillet $
+
+  Copyright 1989-2010 MINES ParisTech
+  Copyright 2009-2010 HPC Project
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -130,7 +158,7 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
   list l = NIL;
   list matching_ptl = NIL;
 
-  pips_debug(8, "input reference  : %s\n input points_to :",
+  pips_debug(8, "input reference  : %s\n",
 	words_to_string(words_reference(input_ref, NIL)));
   ifdebug(8)
     {
@@ -173,6 +201,9 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      else
 		pips_internal_error("GAP case not implemented yet\n");
 
+	      pips_debug(8, "considering point-to  : %s\n ",
+			 words_to_string(word_points_to(pt)));
+
 	      list source_indices = reference_indices(source_ref);	      
 	      size_t source_path_length = gen_length(source_indices);
 	      bool exact_prec = false;
@@ -206,6 +237,18 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 		}
 	    } /* end of FOREACH */
 
+	     
+	  ifdebug(8)
+	    {
+	      points_to_list ptll = make_points_to_list(matching_list);
+	      fprintf(stderr, "matching points-to list %s\n", 
+		      words_to_string(words_points_to_list("", ptll)));
+	      points_to_list_list(ptll) = NIL;
+	      free_points_to_list(ptll);
+	      
+	    }
+	  
+
 	  /* Then build the return list with the points-to sinks to which we add/append the indices of input_ref 
 	     which are not in the points-to source reference. This is comparable to an interprocedural translation
 	     where the input_ref is a path from the formal parameter, the source the formal parameter and the
@@ -234,6 +277,9 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      reference build_ref = reference_undefined;
 	      list build_indices = NIL;
 	      
+	      pips_debug(8, "considering point-to  : %s\n ",
+			 words_to_string(word_points_to(pt)));
+
 	      if (cell_reference_p(sink_cell))
 		sink_ref = cell_reference(sink_cell);
 	      else if (cell_preference_p(sink_cell))
@@ -241,109 +287,125 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      else
 		pips_internal_error("GAP case not implemented yet\n");
 
-	      /* We should deal here with abstract locations. This is commented out 
-		 because there is a problem with flow-sensitive heap locations which are
-		 considered as abstract locations. This reqauires some more thinking
-	      */
-	      /*   if (entity_abstract_location_p(reference_variable(sink_ref))) */
-	      /* 		{ */
-	      /* Here, we should analyse the source remaining indices to know if there are remaining dereferencing dimensions.
-		 This would imply keeping track of the indices types.
-		 In case there are no more dereferencing dimensions, we can reuse the sink abstract location.
-		 Otherwise (which is presently the only default case), we return an all location cell
-	      */
-	      /*   build_ref = make_reference(entity_all_locations(), NIL); */
-	      /* 		  *exact_p = false; */
-	      /* 		} */
-	      /* 	      else */
-	      /* 		{ */
-	      
-
-	      /* from here it's not generic, that is to say it does not work for convex effect references */
-	      list input_remaining_indices = input_indices;
-
-	      build_ref = copy_reference(sink_ref);
-	      build_indices = gen_last(reference_indices(build_ref));
-	      
-	      /* special case for the first remaning index: we must add it to the last index of build_ref */
-	      if (!ENDP(build_indices))
+	      entity sink_ent = reference_variable(sink_ref);
+	      if (entity_abstract_location_p(sink_ent) 
+		  && ! entity_flow_or_context_sentitive_heap_location_p(sink_ent))
 		{
-		  expression last_build_indices_exp = EXPRESSION(CAR(build_indices)); 
-		  expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
-		  expression new_exp = expression_undefined;
-		  /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation 
-		     this should maybe be put in another function
+		  /* Here, we should analyse the source remaining indices to know if there are remaining dereferencing dimensions.
+		     This would imply keeping track of the indices types.
+		     In case there are no more dereferencing dimensions, we would then reuse the sink abstract location.
+		     Otherwise (which is presently the only default case), we return an all location cell
 		  */
-		  if(!unbounded_expression_p(last_build_indices_exp))
+		  build_ref = make_reference(entity_all_locations(), NIL);
+		  *exact_p = false;
+		}
+	      else
+		{
+	      
+
+		  /* from here it's not generic, that is to say it does not work for convex effect references */
+		  list input_remaining_indices = input_indices;
+		  
+		  build_ref = copy_reference(sink_ref);
+		  build_indices = gen_last(reference_indices(build_ref));
+		  
+		  /* special case for the first remaning index: we must add it to the last index of build_ref */
+		  if (!ENDP(build_indices))
 		    {
-		      if (expression_reference_p(last_build_indices_exp) && 
-			  entity_field_p(expression_variable(last_build_indices_exp)))
+		      expression last_build_indices_exp = EXPRESSION(CAR(build_indices)); 
+		      expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
+		      expression new_exp = expression_undefined;
+		      /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation 
+			 this should maybe be put in another function
+		      */
+		      if(!unbounded_expression_p(last_build_indices_exp))
 			{
-			  if (!expression_equal_integer_p(first_input_remaining_exp, 0))
+			  if (expression_reference_p(last_build_indices_exp) && 
+			      entity_field_p(expression_variable(last_build_indices_exp)))
 			    {
-			      pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
-			    }	
-			  else
-			    new_exp = last_build_indices_exp;
-			}
+			      if (!expression_equal_integer_p(first_input_remaining_exp, 0))
+				{
+				  pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
+				}	
+			      else
+				new_exp = last_build_indices_exp;
+			    }
 			    
-		      else if(!unbounded_expression_p(first_input_remaining_exp))
-			{
-				
-			  value v;
-			  new_exp = MakeBinaryCall
-			    (entity_intrinsic(PLUS_OPERATOR_NAME),
-			     copy_expression(last_build_indices_exp), copy_expression(first_input_remaining_exp));
-			  /* Then we must try to evaluate the expression */
-			  v = EvalExpression(new_exp);
-			  if (! value_undefined_p(v) && 
-			      value_constant_p(v))
+			  else if(!unbounded_expression_p(first_input_remaining_exp))
 			    {
-			      constant vc = value_constant(v);
-			      if (constant_int_p(vc))
-				{				    
-				  free_expression(new_exp);
-				  new_exp = int_to_expression(constant_int(vc));
+				
+			      value v;
+			      new_exp = MakeBinaryCall
+				(entity_intrinsic(PLUS_OPERATOR_NAME),
+				 copy_expression(last_build_indices_exp), copy_expression(first_input_remaining_exp));
+			      /* Then we must try to evaluate the expression */
+			      v = EvalExpression(new_exp);
+			      if (! value_undefined_p(v) && 
+				  value_constant_p(v))
+				{
+				  constant vc = value_constant(v);
+				  if (constant_int_p(vc))
+				    {				    
+				      free_expression(new_exp);
+				      new_exp = int_to_expression(constant_int(vc));
+				    }
 				}
 			    }
+			  else
+			    {
+			      new_exp = make_unbounded_expression();
+			      *exact_p = false;
+			    }
+			  CAR(gen_last(reference_indices(build_ref))).p 
+			    = (void *) new_exp;
 			}
 		      else
 			{
-			  new_exp = make_unbounded_expression();
 			  *exact_p = false;
 			}
-		      CAR(gen_last(reference_indices(build_ref))).p 
-			= (void *) new_exp;
 		    }
-		  else
+		  else /* ENDP(build_indices) */
 		    {
-		      *exact_p = false;
+		      /* The sink is a scalar: the first remaning index must be equal to 0 */
+		      expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
+		      if (!expression_equal_integer_p(first_input_remaining_exp, 0))
+			pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
 		    }
-		}
-	      else /* ENDP(build_indices) */
-		{
-		  /* The sink is a scalar: the first remaning index must be equal to 0 */
-		  expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
-		  if (!expression_equal_integer_p(first_input_remaining_exp, 0))
-		       pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
-		}
 	      
-	      FOREACH(EXPRESSION, input_ind, CDR(input_remaining_indices))
-		{
-		  reference_indices(build_ref) = gen_nconc(reference_indices(build_ref),
-							   CONS(EXPRESSION, 
-								copy_expression(input_ind), 
-								NIL));
-		}
-	      pips_debug(8, "adding reference %s\n",
-			 words_to_string(words_reference(build_ref, NIL)));
-	      l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);
-	      /* the approximation tag of the points-to is taken into account for the exactness of the result  */
-	      *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
+		  FOREACH(EXPRESSION, input_ind, CDR(input_remaining_indices))
+		    {
+		      reference_indices(build_ref) = gen_nconc(reference_indices(build_ref),
+							       CONS(EXPRESSION, 
+								    copy_expression(input_ind), 
+								    NIL));
+		    }
+		  pips_debug(8, "adding reference %s\n",
+			     words_to_string(words_reference(build_ref, NIL)));
+		  l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);
+		  /* the approximation tag of the points-to is taken into account for the exactness of the result  */
+		  *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
+		} /* end of else branch of if (entity_abstract_location_p(sink_ent) 
+		     && ! entity_flow_or_context_sentitive_heap_location_p(sink_ent)) */
 	    } /* end of FOREACH(POINTS_TO,...) */
 	} /* else branche of if (input_path_length == 0) */
     } /* else branch of if (entity_abstract_location_p(input_ent)) */
 
+  ifdebug(8)
+    {
+      pips_debug(8, "resulting list before recursing:");
+      FOREACH(CELL, c, l)
+	{ 
+	  reference ref = reference_undefined;
+	  if(cell_reference_p(c)) 
+	    ref = cell_reference(c);
+	  else if (cell_preference_p(c))
+	    ref = preference_reference(cell_preference(c));
+	  else /* Should be the gap case */
+	    pips_internal_error("GAPs not implemented yet\n");
+	  fprintf(stderr, " %s", words_to_string(words_reference(ref, NIL)));
+	}
+      fprintf(stderr, "\n");
+    }
 
   /* If the results contain dereferencing dimensions, we must eval them recursively */
   list l_tmp = l;
@@ -351,7 +413,7 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
   FOREACH(CELL, c, l_tmp)
     {
       bool r_exact_p;
-      reference ref;
+      reference ref = reference_undefined;
       if(cell_reference_p(c)) 
 	ref = cell_reference(c);
       else if (cell_preference_p(c))
@@ -362,16 +424,38 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
       if ((!entity_abstract_location_p(reference_variable(ref)))
 	  && effect_reference_dereferencing_p(ref, &r_exact_p))
 	{
+	  pips_debug(8, "recursing\n");
 	  *exact_p = *exact_p && r_exact_p;
 	  l = gen_nconc(eval_reference_with_points_to(ref, ptl, &r_exact_p), l);
 	  *exact_p = *exact_p && r_exact_p;
 	  free_cell(c);
 	}
       else 
-	l = CONS(CELL, c, l);
+	{
+	  pips_debug(8, "no need to recurse\n");
+	  l = CONS(CELL, c, l);
+	}
     }
-  gen_nreverse(l);
+  l = gen_nreverse(l);
   gen_free_list(l_tmp);
+
+  ifdebug(8)
+    {
+      pips_debug(8, "resulting list after recursing:");
+      FOREACH(CELL, c, l)
+	{ 
+	  reference ref = reference_undefined;
+	  if(cell_reference_p(c)) 
+	    ref = cell_reference(c);
+	  else if (cell_preference_p(c))
+	    ref = preference_reference(cell_preference(c));
+	  else /* Should be the gap case */
+	    pips_internal_error("GAPs not implemented yet\n");
+	  fprintf(stderr, " %s", words_to_string(words_reference(ref, NIL)));
+	}
+      fprintf(stderr, "\n");
+    }
+  
   return l;
 }
 
@@ -410,6 +494,7 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
 {
   list l = NIL;
+  debug_on("EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL");
 
   if(cell_reference_p(c)) {
     l = eval_reference_with_points_to(cell_reference(c), ptl, exact_p);
@@ -421,7 +506,7 @@ list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
   else { /* Should be the gap case */
     pips_internal_error("GAPs not implemented yet\n");
   }
-
+  debug_off();
   return l;
 }
 

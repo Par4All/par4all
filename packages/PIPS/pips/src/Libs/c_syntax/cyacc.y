@@ -931,7 +931,8 @@ expression:
 			  /* paren_comma_expression is a list of
 			     expressions, maybe reduced to one */
 			  if(!string_undefined_p(expression_comment)) {
-			    pips_user_warning("comment \"%s\" is lost\n", expression_comment);
+			    if(strcmp(expression_comment, "")!=0)
+			      pips_user_warning("comment \"%s\" is lost\n", expression_comment);
 			  }
 			  expression_comment = pop_current_C_comment();
 			  expression_line_number = pop_current_C_line_number();
@@ -2874,6 +2875,7 @@ direct_old_proto_decl:
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
 			  (void) UpdateFunctionEntity(e, paras);
+			  //CreateReturnEntity(e);
 			  $$ = e;
 			}
 /* Never used because of conflict
@@ -2908,10 +2910,16 @@ old_pardef_list:
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list
                         {
+			  /* Rule used for C_syntax/activate.c,
+			     decl33.c and adi.c. CreateReturnEntity()
+			     only useful for activate.c  */
 			  list el = $2;
 			  entity f = stack_head(FunctionStack);
 			  SubstituteDummyParameters(f, el);
 			  UpdateEntities(el,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
+			  // The functional type of f could be
+			  // completed with the parameter types...
+			  CreateReturnEntity(f);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/

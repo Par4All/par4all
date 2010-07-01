@@ -329,8 +329,7 @@ list generic_c_effects_backward_translation(entity callee,
 	     the caller. */
 	  eff = (*effect_dup_func)(eff);
 	  (*effect_descriptor_interprocedural_translation_op)(eff);
-	  /* Memory leak ? I don't understand the second dup */
-	  l_eff = gen_nconc(l_eff,CONS(EFFECT, (*effect_dup_func)(eff), NIL));
+	  l_eff = gen_nconc(l_eff,CONS(EFFECT, eff, NIL));
 
 	  /* remove the current element from the list */
 	  if (l_begin == l_current)

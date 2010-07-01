@@ -162,7 +162,9 @@ char* info(char * about)
 
 void apply(char * phasename, char * target)
 {
-    safe_apply(phasename,target);
+    if (!safe_apply(phasename,target)) {
+        pips_user_error("error in applying transformation %s to module %s\n", phasename, target);
+    }
 }
 
 void capply(char * phasename, char ** targets)
