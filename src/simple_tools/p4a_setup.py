@@ -81,7 +81,7 @@ def add_module_options(parser):
 
     global default_configure_opts, default_debug_configure_opts
     group.add_option("--configure-opts", "--configure-flags", "-c", metavar = "OPTS", action = "append", default = [],
-        help = "Specify global configure opts. Default is '" + " ".join(default_configure_opts) 
+        help = "Specify global configure opts. Default is '" + " ".join(default_configure_opts)
         + "' OR '" + " ".join(default_debug_configure_opts) + "' if --debug is specified.")
 
     group.add_option("--debug", "-g", action = "store_true", default = False,
@@ -233,7 +233,7 @@ def main(options, args = []):
     if options.root:
         root = os.path.abspath(os.path.expanduser(options.root))
         warn("Par4All source tree root is " + root + " (--root)")
-    # If environment variable P4A_ROOT is defined and 
+    # If environment variable P4A_ROOT is defined and
     # --root was not specified, pick it up from there.
     #~ elif "P4A_ROOT" in os.environ and os.environ["P4A_ROOT"]:
         #~ root = os.path.abspath(os.path.expanduser(os.environ["P4A_ROOT"]))
@@ -402,13 +402,13 @@ def main(options, args = []):
             polylib_make_opts.append(options.polylib_make_opts)
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
-            configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir, 
+            configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir,
             install = not options.no_install, reconf = options.reconf)
 
     ##############################
 
     # This was used for testing with DESTDIR...
-    configure_opts += [ 
+    configure_opts += [
         #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
         #'POLYLIB64_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lpolylib64"',
         #'CFLAGS="-g -O2 -I' + os.path.join(install_dir, "include") + '"',
@@ -444,7 +444,7 @@ def main(options, args = []):
             newgen_make_opts.append(options.newgen_make_opts)
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
-            configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir, 
+            configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir,
             install = not options.no_install, reconf = options.reconf)
 
     ##############################
@@ -482,7 +482,7 @@ def main(options, args = []):
             linear_make_opts.append(options.linear_make_opts)
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
-            configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir, 
+            configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir,
             install = not options.no_install, reconf = options.reconf)
 
     ##############################
@@ -596,15 +596,15 @@ def main(options, args = []):
     # Install a few scripts.
     info("Installing scripts")
 
-    for file in [ 
-        "src/dev/p4a_git", 
-        "src/dev/p4a_valgrind", 
+    for file in [
+        "src/dev/p4a_git",
+        "src/dev/p4a_valgrind",
         "src/simple_tools/p4a",
         "src/simple_tools/p4a_process",
         #"src/simple_tools/p4a_setup",
         #"src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
-        "src/validation/p4a_validate", 
+        "src/validation/p4a_validate",
         "src/validation/p4a_validation",
         "src/p4a_accel/p4a_post_processor.py"
         ]:
@@ -628,14 +628,16 @@ def main(options, args = []):
     # Copy python dependencies and templates.
     info("Copying python libs")
     install_python_lib_dir = ""
+    print install_dir_lib, os.listdir(install_dir_lib)
     for file in os.listdir(install_dir_lib):
+        print file
         if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
             install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
             if not os.path.isdir(install_python_lib_dir):
                 install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
             break
     if not install_python_lib_dir:
-        die("Could not determine python lib dir in " + install_dir_lib)
+        die("Cannot not determine python lib dir in " + install_dir_lib)
     dir = os.path.join(root, "src/simple_tools")
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
@@ -672,7 +674,7 @@ def main(options, args = []):
         fortran = "g77"
     else:
         fortran = "false"
-    p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir, 
+    p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
         accel = install_dir_share_accel, fortran = fortran))
 
     # Write version file.
