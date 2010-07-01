@@ -44,7 +44,6 @@
 #include "effects-util.h"
 #include "text.h"
 #include "text-util.h"
-#include "properties.h"
 
 
 /* functions for entity */

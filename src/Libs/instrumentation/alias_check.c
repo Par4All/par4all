@@ -96,7 +96,6 @@
 #include "properties.h"
 #include "effects-generic.h"
 #include "instrumentation.h"
-#include "transformations.h"
 #include "text-util.h" /* for words_to_string*/
 
 #define PREFIX1 "$ALIAS_CHECK"

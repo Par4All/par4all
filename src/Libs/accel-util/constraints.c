@@ -42,7 +42,6 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-#include "conversion.h"
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
