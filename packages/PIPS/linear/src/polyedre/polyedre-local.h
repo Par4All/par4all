@@ -80,3 +80,6 @@ typedef struct Spoly {
 #define poly_nbre_inegalites(p) (sc_nbre_inegalites((p)->sc))
 */
 
+/* incomplete type used to manipulate erhart polynomials */
+typedef struct pehrhart *Pehrhart;
+
