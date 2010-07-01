@@ -315,6 +315,7 @@ bool close_workspace(bool is_quit)
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
+    reset_label_counter();
     close_warning_file();
     pop_path();
     return success;
