@@ -42,7 +42,6 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-#include "conversion.h"
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -55,6 +54,7 @@
 
 
 /* only works for hypercube */
+#if 0
 static
 expression region_enumerate(region r,transformer tr)
 {
@@ -99,9 +99,19 @@ expression region_enumerate(region r,transformer tr)
     }
     return volume;
 }
+#endif
+static Variable sort_key;
+static int shc_sort(Pvecteur *v0, Pvecteur *v1)
+{
+    if((*v0)->var==sort_key) return 1;
+    if((*v1)->var==sort_key) return -1;
+    return compare_entities((entity*)&(*v0)->var,(entity*)&(*v1)->var);
+}
+
+#define SCILAB_PSOLVE "./psolve"
 
 /* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
-static bool do_solve_hardware_constraints(statement s, Pvecteur * solution)
+static bool do_solve_hardware_constraints(statement s)
 {
     list regions = load_cumulated_rw_effects_list(s);
 
@@ -110,7 +120,17 @@ static bool do_solve_hardware_constraints(statement s, Pvecteur * solution)
     transformer tr = transformer_range(load_statement_precondition(s));
 
     set visited_entities = set_make(set_pointer);
-    expression volume_used = int_to_expression(0);
+    char * volume_used[gen_length(regions)];
+    size_t volume_index=0;
+
+    /* retreive the unknown variable { */
+    entity e = string_to_entity(get_string_property("SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN"),get_current_module_entity());
+    if(entity_undefined_p(e))
+        pips_user_error("must provide the unknown value\n");
+    Pbase pb = (Pbase) vect_new(e,-1);
+    sort_key = e;
+    /* } */
+
     FOREACH(REGION,reg,regions)
     {
         reference r = region_any_reference(reg);
@@ -128,63 +148,53 @@ static bool do_solve_hardware_constraints(statement s, Pvecteur * solution)
                     region_undefined_p(read_region)?write_region:
                     region_undefined_p(write_region)?read_region:
                     regions_must_convex_hull(read_region,write_region);
-                /* then compute their surface */
-                expression local_volume=region_enumerate(rw_region,tr);
-                if(expression_undefined_p(local_volume)){
-                    pips_user_warning("unable to compute volume of the region of %s\n",entity_user_name(e));
-                    free_expression(volume_used);
-                    return false;
+
+                Psysteme rw_sc = region_system(rw_region);
+                vect_sort_in_place(&sc_base(rw_sc),shc_sort);
+                const char * base_names [sc_dimension(rw_sc)];
+                int i=0;
+                for(Pbase b = sc_base(rw_sc);!BASE_NULLE_P(b);b=b->succ)
+                    base_names[i]=entity_user_name((entity)b->var);
+
+                Pehrhart er = sc_enumerate(rw_sc,pb,base_names);
+                if(er) {
+                    char ** ps = Pehrhart_string(er,base_names);
+                    volume_used[volume_index++]=ps[0];/* use first ... */
+                    for(char ** iter = ps +1; *iter; iter++) free(*iter);
+                    free(ps);
                 }
-                volume_used=binary_intrinsic_expression(PLUS_OPERATOR_NAME,volume_used,local_volume);
+                else
+                    pips_user_error("unable to compute volume of the region of %s\n",entity_user_name(e));
             }
         }
     }
     int max_volume= get_int_property("SOLVE_HARDWARE_CONSTRAINTS_LIMIT");
-    /* ok now we have our global volume, lets find the solution to volume_used<=max_volume 
-     * we do not implement a generic solution */
-    NORMALIZE_EXPRESSION(volume_used);
-    if(normalized_complex_p(expression_normalized(volume_used)))
-    {
-        pips_user_warning("do not know how to optimize the non linear expression of the volume\n");
-        print_expression(volume_used);
-        free_expression(volume_used);
-        return false;
+    if(max_volume<=0) pips_user_error("constraint limit must be greater than 0\n");
+    /* create a string representation of all polynome gathered */
+    char* full_poly =strdup(itoa(-max_volume));
+    for(int i=0;i<volume_index;i++) {
+        char *tmp;
+        asprintf(&tmp,"%s+%s",full_poly,volume_used[i]);
+        free(full_poly);
+        full_poly=tmp;
     }
-    Pvecteur vvolume = normalized_linear(expression_normalized(volume_used));
-    int vvolume_sz = vect_size(vvolume);
-    if(vvolume_sz == 0) {
-        pips_user_warning("empty volume ??");
-        return false;
-    }
-    else if(vvolume_sz <=2 ) {
-        entity sym=entity_undefined;
-        int sym_coeff=0;
-        int constant=0;
-        for (Pvecteur iter=vvolume;iter != VECTEUR_NUL ;iter = vecteur_succ(iter)) {
-            if (term_cst(iter) ) {
-                constant=vecteur_val(iter);
-            } 
-            else {
-                if(!entity_undefined_p(sym)) {
-                    pips_user_warning("do not know how to optimize the linear expression of the volume\n");
-                    return false;
-                }
-                sym_coeff=vecteur_val(iter);
-                sym=(entity)vecteur_var(iter);
-            }
-        }
-        *solution=vect_new(sym,(max_volume-constant)/sym_coeff);
-    }
-    else {
-        pips_user_warning("do not know how to optimize the linear expression of the volume\n");
-        print_expression(volume_used);
-        free_expression(volume_used);
-        return false;
-    }
+    /* call an external solver */
+    char *scilab_cmd;
+    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s'",full_poly);
+    FILE* scilab_response = popen(scilab_cmd,"r");
+    if(!scilab_response) pips_user_error("failed to solve polynomial %s\n",full_poly);
+    float fresponse=0.;
+    if(fscanf(scilab_response,"%f",&fresponse)!=1)
+        pips_user_error("failed to scan "SCILAB_PSOLVE"response\n");
+    if(pclose(scilab_response))
+        pips_user_error("failed to call "SCILAB_PSOLVE" %s\n",full_poly);
 
-
-
-
+    /* if the result is an integer, we have won, otherwise, try near integers */
+    int iresponse = (int)fresponse;
+    /* assume it will be ok with nearset integer , should do more check there ... */
+    insert_statement(s,
+            make_assign_statement(entity_to_expression(e),int_to_expression(iresponse)),
+            true);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
@@ -204,18 +214,14 @@ bool solve_hardware_constraints(const char * module_name)
     string stmt_label=get_string_property("SOLVE_HARDWARE_CONSTRAINTS_LABEL");
     statement equation_to_solve = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
 
-    Pvecteur solution = VECTEUR_NUL;
     bool result =false;
     if(!statement_undefined_p(equation_to_solve))
     {
-        if((result=do_solve_hardware_constraints(equation_to_solve,&solution))) {
-            pips_user_warning("found a solution\n");
-            vect_fprint(stderr,solution,(get_variable_name_t)entity_user_name);
+        if((result=do_solve_hardware_constraints(equation_to_solve))) {
+            /* validate */
+            module_reorder(get_current_module_statement());
+            DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
         }
-
-        /* validate */
-        module_reorder(get_current_module_statement());
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
     }
 
     reset_current_module_entity();

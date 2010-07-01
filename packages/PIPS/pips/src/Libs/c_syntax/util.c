@@ -2023,28 +2023,40 @@ void SubstituteDummyParameters(entity f, list el)
    a function. */
 void CreateReturnEntity(entity f)
 {
-  type ft = ultimate_type(entity_type(f));
+  if(type_undefined_p(entity_type(f))) {
+    pips_user_warning("Type of \"%s\" is undefined."
+		      " Return value cannot be created.\n",
+		      entity_user_name(f));
+  }
+  else {
+    type ft = ultimate_type(entity_type(f));
 
-  pips_debug(8, "For module \"%s\"\n", entity_name(f));
+    pips_debug(8, "For module \"%s\"\n", entity_name(f));
 
-  if(type_functional_p(ft)) {
+    if(type_functional_p(ft)) {
       type rt = functional_result(type_functional(ft));
 
-      if(!type_void_p(rt)) {
+      if(type_undefined_p(rt)) {
+	pips_user_warning("Return type of \"%s\" is undefined."
+			  " Return value cannot be created.\n",
+			  entity_user_name(f));
+      }
+      else if(!type_void_p(rt)) {
 	/* Create the return value */
 	string fn = entity_local_name(f);
 	entity re = FindOrCreateEntity(fn,fn);
 	if(type_undefined_p(entity_type(re))) {
 	  entity_type(re) = copy_type(rt);
 	  entity_storage(re) = make_storage_return(f);
-      /* set the language */
-      entity_initial(re) = make_value_unknown();
+	  /* set the language */
+	  entity_initial(re) = make_value_unknown();
 	  AddToDeclarations(re, f);
 	}
       }
+    }
+    else
+      pips_internal_error("This function should only be called with a function entity\n");
   }
-  else
-    pips_internal_error("This function should only be called with a function entity\n");
 }
 
 /* A subset of UpdateEntity, used when the function entity is already

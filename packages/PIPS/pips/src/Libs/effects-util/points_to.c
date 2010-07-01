@@ -36,10 +36,7 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "misc.h"
 #include "text-util.h"
-#include "properties.h"
-#include "preprocessor.h"
 
 /***************************************/
 /* Function storing points to information attached to a statement

@@ -320,7 +320,7 @@ bool dbll_storable_p(const char* rname)
 
 /****************************************************** LESS BASIC INTERFACE */
 
-void dbll_save_and_free_resource(const char* rname, const char* oname, 
+void dbll_save_and_free_resource(const char* rname, const char* oname,
 				 void * p, bool do_free)
 {
     dbll_save_resource(rname, oname, p);

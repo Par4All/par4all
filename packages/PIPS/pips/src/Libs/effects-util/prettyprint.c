@@ -49,7 +49,6 @@
 #include "effects-util.h"
 
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
 #include "preprocessor.h"
