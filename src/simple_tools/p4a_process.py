@@ -315,8 +315,8 @@ class p4a_processor():
         all_modules.gpu_ify(GPU_USE_WRAPPER = False,
                             GPU_USE_KERNEL = False)
 
-        # Isolate kernels by using the fact that all the generated kernels have
-        # their name beginning with "p4a_":
+        # Select kernel launchers by using the fact that all the generated
+        # functions have their name beginning with "p4a_kernel_launcher":
         kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
@@ -352,6 +352,31 @@ class p4a_processor():
 
         # Add communication around all the call site of the kernels:
         kernel_launchers.kernel_load_store()
+
+        # Select kernels by using the fact that all the generated kernels
+        # have their names of this form:
+        kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+        kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+
+        # Unfortunately CUDA 3.0 does not accept C99 array declarations
+        # with sizes also passed as parameters in kernels. So we degrade
+        # the quality of the generated code by generating array
+        # declarations as pointers and by accessing them as
+        # array[linearized expression]:
+        kernels.array_to_pointer(ARRAY_TO_POINTER_FLATTEN_ONLY = True,
+                                 ARRAY_TO_POINTER_CONVERT_PARAMETERS= "POINTER")
+
+        # Indeed, it is not only in kernels but also in all the CUDA code
+        # that these C99 declarations are forbidden. We need them in the
+        # original code for more precise analysis but we need to remove
+        # them everywhere :-(
+        #self.workspace.all_functions.array_to_pointer(
+        #    ARRAY_TO_POINTER_FLATTEN_ONLY = True,
+        #    ARRAY_TO_POINTER_CONVERT_PARAMETERS = "POINTER"
+        #    )
+
+        #self.workspace.all_functions.display()
+        
         # To be able to inject Par4All accelerator run time initialization
         # later:
         if "main" in self.workspace:
