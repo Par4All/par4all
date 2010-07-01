@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -849,6 +850,9 @@ Value* Pehrhart_evaluate(Pehrhart p, Value values[])
 /* generate a pretty printed version of the polynomial p,
  * suitable for interaction with third party tools
  * pname is the name of each basis
+ *
+ * the implementation could use open_memstream,
+ * but it is not portable and not handled by gnulib ...
  */
 char ** Pehrhart_string(Pehrhart p, const char *pname[])
 {
@@ -863,20 +867,39 @@ char ** Pehrhart_string(Pehrhart p, const char *pname[])
 
     if(!nb_enum || !(enum_strings=malloc(sizeof(*enum_strings)*(1+nb_enum))))
         return NULL;
+    else {
+        char seed[]="pipsXXXXXX";
+        int tmpfd;
+        FILE * tmpf;
+        tmpfd=mkstemp(seed);
+        if(tmpfd==-1) {
+            perror(strerror(errno));
+            return NULL;
+        }
+        tmpf=fdopen(tmpfd,"r+");
+        if(!tmpf) {
+            close(tmpfd);
+            perror(strerror(errno));
+            return NULL;
+        }
 
-    for(i=0;i<nb_enum;i++)
-    {
-        char * generated_string;
-        size_t generated_string_size;
-        FILE* fd;
-        fd = open_memstream(&generated_string,&generated_string_size);
-        print_evalue(fd,&curr->EP,pname);
-        fclose(fd);
-        enum_strings[i]=generated_string;
-        /* remove trailing \n */
-        generated_string[generated_string_size-1]=0;
+        for(i=0;i<nb_enum;i++)
+        {
+            char * generated_string;
+            long pos;
+            size_t generated_string_size;
+            rewind(tmpf);
+            print_evalue(tmpf,&curr->EP,pname);
+            pos=ftell(tmpf)-2; /* remove trainling \n*/
+            rewind(tmpf);
+            generated_string=calloc(1+pos,sizeof(*generated_string));
+            generated_string_size=fread(generated_string,sizeof(*generated_string),1+pos,tmpf);
+            enum_strings[i]=generated_string;
+        }
+        enum_strings[i]=NULL;
+        if(fclose(tmpf)!=0)
+            perror(strerror(errno));
+        return enum_strings;
     }
-    enum_strings[i]=NULL;
-    return enum_strings;
 }
 
