@@ -46,7 +46,7 @@ void fprint_Value(FILE *f, Value v)
 
 void fprint_string_Value(FILE *f, char * blah, Value v)
 {
-    fprintf(f, "%s", blah);
+    fputs(blah,f);
     fprint_Value(f, v);
 }
 
