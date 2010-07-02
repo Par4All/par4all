@@ -378,10 +378,10 @@ MakeLoopCounter()
 {
     entity e;
     string s;
-    static char lcn[] = "lc#XXXX";
+    static char lcn[] = "lc#XXXXXX";
 
     while (1) {
-	sprintf(lcn+3, "%04d", ilc);
+	sprintf(lcn+3, "%06d", ilc);
 	
 	s = concatenate(LOOP_COUNTER_MODULE_NAME, MODULE_SEP_STRING, 
 			lcn, (char*) NULL);
