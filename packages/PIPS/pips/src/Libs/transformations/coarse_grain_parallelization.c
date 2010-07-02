@@ -326,6 +326,8 @@ static bool coarse_grain_parallelization_main(string module_name,
 
     print_parallelization_statistics(module_name, "ante", module_stat);
 
+    ResetLoopCounter();
+
     debug_on("COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL");
 
     //module_parallelized_stat = copy_statement(module_stat);
