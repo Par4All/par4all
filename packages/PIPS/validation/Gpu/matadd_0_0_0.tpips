@@ -28,9 +28,9 @@ apply GPU_IFY
 
 display PRINTED_FILE[%ALLFUNC]
 
-apply UNSPLIT
+apply UNSPLIT[%PROGRAM]
 
-shell cat $WKS.database/Src/matadd.f
+shell cat $WKS.database/Src/*
 
 close
 delete $WKS

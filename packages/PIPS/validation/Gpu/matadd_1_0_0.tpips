@@ -26,7 +26,10 @@ setproperty GPU_USE_KERNEL FALSE
 
 apply GPU_IFY
 
-display PRINTED_FILE[%ALLFUNC]
+apply UNSPLIT[%PROGRAM]
+
+shell cat $WKS.database/Src/*
+
 close
 delete $WKS
 quit

@@ -4,6 +4,10 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete $WKS
 create $WKS $WKS.c include/p4a_stubs.c
 
+# Warning: this is a work in progress. Assume no weird
+# aliasing
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
 activate PRINT_CODE_CUMULATED_EFFECTS
 
 display PRINTED_FILE[give,change]
@@ -26,6 +30,8 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
+
+shell cat $WKS.database/Src/$WKS.c
 shell gcc -c $WKS.database/Src/$WKS.c  -o  $WKS.database/Src/$WKS
 
 close

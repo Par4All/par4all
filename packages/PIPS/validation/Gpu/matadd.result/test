@@ -127,9 +127,7 @@ int
 main (int argc, char *argv[])
 {
   static const int m = 402;
-  ;
   static const int n = 160;
-  ;
   int i;
   int j;
   float a[N - 0][M - 0];
@@ -158,6 +156,7 @@ main (int argc, char *argv[])
 void
 p4a_accel_free (int dest)
 {
+  ;
 
   return;
 }
@@ -165,6 +164,7 @@ p4a_accel_free (int dest)
 void
 p4a_accel_malloc (int dest, int n)
 {
+  ;
 
   return;
 }
@@ -233,9 +233,9 @@ p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
 
-      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C, I, J)
 
-      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C, I, J)
 
       END
 /* C pretty print for module MATADD. */
@@ -243,23 +243,22 @@ int
 main (int argc, char *argv[])
 {
   static const int m = 402;
-  ;
   static const int n = 160;
-  ;
   int i;
   int j;
   float a[N - 0][M - 0];
   float b[N - 0][M - 0];
   float c[N - 0][M - 0];
 
-  p4a_kernel_launcher_0 (m, n, b, c);
-  p4a_kernel_launcher_1 (m, n, a, b, c);
+  p4a_kernel_launcher_0 (m, n, b, c, i, j);
+  p4a_kernel_launcher_1 (m, n, a, b, c, i, j);
   return 0;
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
 void
 p4a_accel_free (int dest)
 {
+  ;
 
   return;
 }
@@ -267,6 +266,7 @@ p4a_accel_free (int dest)
 void
 p4a_accel_malloc (int dest, int n)
 {
+  ;
 
   return;
 }
@@ -304,6 +304,7 @@ void
 p4a_kernel_0 (int m, int n, float b[N - 0][M - 0], float c[N - 0][M - 0],
 	      int i, int j)
 {
+  ;
 
   b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
   c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
@@ -314,6 +315,7 @@ void
 p4a_kernel_1 (int m, int n, float a[N - 0][M - 0], float b[N - 0][M - 0],
 	      float c[N - 0][M - 0], int i, int j)
 {
+  ;
 
   a[(j + 1) - 1][(i + 1) - 1] =
     (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
@@ -322,10 +324,9 @@ p4a_kernel_1 (int m, int n, float a[N - 0][M - 0], float b[N - 0][M - 0],
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
 void
 p4a_kernel_launcher_0 (int m, int n, float b[N - 0][M - 0],
-		       float c[N - 0][M - 0])
+		       float c[N - 0][M - 0], int i, int j)
 {
-  int j;
-  int i;
+  ;
 
   for (i = 0; i <= ((m - 1) + 1) + -1; i++)
     {
@@ -339,10 +340,10 @@ p4a_kernel_launcher_0 (int m, int n, float b[N - 0][M - 0],
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
 void
 p4a_kernel_launcher_1 (int m, int n, float a[N - 0][M - 0],
-		       float b[N - 0][M - 0], float c[N - 0][M - 0])
+		       float b[N - 0][M - 0], float c[N - 0][M - 0], int i,
+		       int j)
 {
-  int j;
-  int i;
+  ;
 
   for (i = 0; i <= ((m - 1) + 1) + -1; i++)
     {
@@ -358,6 +359,7 @@ void
 p4a_kernel_wrapper_0 (int m, int n, float b[N - 0][M - 0],
 		      float c[N - 0][M - 0], int i, int j)
 {
+  ;
 
   p4a_kernel_0 (m, n, b, c, i, j);
   return;
@@ -368,6 +370,7 @@ p4a_kernel_wrapper_1 (int m, int n, float a[N - 0][M - 0],
 		      float b[N - 0][M - 0], float c[N - 0][M - 0], int i,
 		      int j)
 {
+  ;
 
   p4a_kernel_1 (m, n, a, b, c, i, j);
   return;
