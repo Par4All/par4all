@@ -26,7 +26,6 @@ Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(EQUIV02)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(EQUIV02)
   RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(EQUIV02)
-dep 11 (<T(I)-W-MUST>) --> 11 (<U(I-1)-R-MUST>) 
 user warning in TestCoupleOfReferences: Dependence between differents variables: T and U
 Dependence assumed
   RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(EQUIV02)
