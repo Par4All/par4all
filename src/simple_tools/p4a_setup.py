@@ -74,7 +74,7 @@ def add_module_options(parser):
         help = "Specify linear source directory.")
 
     group.add_option("--pips-src", metavar = "DIR", default = None,
-        help = "Specify PIPS source directory.")
+        help = "Specify PIPS source directory. When changing the directory, do not forget to reconfigure since this is when the source location is taken into account.")
 
     group.add_option("--nlpmake-src", metavar = "DIR", default = None,
         help = "Specify nlpmake source directory.")
