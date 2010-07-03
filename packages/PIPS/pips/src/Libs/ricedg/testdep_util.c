@@ -24,65 +24,61 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* here is a collection of function intended to create and manipulate di
- variables and test of dependence. di variables are pseudo variables created
- by pips and not accessible to the user that represent the distance between 
- two dependent statement iterations.
- the sign of this distance is sufficient for kennedy's way of
- parallelizing programs, but the exact value migth be of interest for
- other algorithms such as systolic algorithms.
- written by Remi, Yi-Qing; reorganized by Yi-Qing (18/09/91)
- */
+/* here is a collection of function intended to create and manipulate "di"
+ variables and test of dependence. di variables are pseudo variables
+ created by PIPS and not accessible to the user that represent the
+ distance between two dependent statement iterations.  the sign of this
+ distance is sufficient for Kennedy's way of parallelizing programs, but
+ the exact value migth be of interest for other algorithms such as
+ systolic algorithms.
+
+  Written by Remi, Yi-Qing; reorganized by Yi-Qing (18/09/91)
+*/
 
 #include "local.h"
- 
-/* to deal with overflow errors occuring during the projection 
+
+/* To deal with overflow errors occuring during the projection
  * of a Psysteme along a variable */
 
-/* the tables of di variables, li variables and ds variables.
+/* The tables of di variables, li variables and ds variables.
  *
- * variable DiVars[i-1] or LiVars[i-1] is associated to the loop at nesting
+ * Variable DiVars[i-1] or LiVars[i-1] is associated to the loop at nesting
  * level i. A di variable represents the difference in iteration number
  * between the two references considered.
  *
- * the variable DsiVars[i] is associated to the ith element in the list
+ * The variable DsiVars[i] is associated to the ith element in the list
  * of scalar variables modified in the loops
  */
 entity DiVars[MAXDEPTH];
 entity LiVars[MAXDEPTH];
 entity DsiVars[MAXSV];
 
-/* 
-this function creates di variables. there are MAXDEPTH di variables
-which means that programs with more than MAXDEPTH nested loops cannot be
-parallelized by pips.
 
-l is the nesting level of the variable to create
+/* This function creates di variables. There are MAXDEPTH di variables
+   which means that programs with more than MAXDEPTH nested loops cannot be
+   parallelized by pips.
+
+   @param l is the nesting level of the variable to create
 */
-entity 
-MakeDiVar(l)
-int l;
-{
-    entity e;
-    string s;
-    static char din[] = "d#X";
+entity
+MakeDiVar(int l) {
+  entity e;
+  string s;
+  /* Create a variable of this format: "d#X" */
+  asprintf(&s, "%s%sd#%d", DI_VAR_MODULE_NAME, MODULE_SEP_STRING, l);
 
-    sprintf(din+2, "%1d", l);
-    s = concatenate(DI_VAR_MODULE_NAME, MODULE_SEP_STRING, din, (char*) NULL);
+  if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined)
+    e = make_entity(s, type_undefined, storage_undefined, value_undefined);
+  else
+    free(s);
 
-    if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
-	e = make_entity(strdup(s), type_undefined, storage_undefined, 
-			value_undefined);
-    }
-
-    return(e);
+  return(e);
 }
 
-/*
-this functions looks up a di variable of nesting level l in table
-DiVars. di variables are created if they do not exist.
-*/
-entity 
+
+/* This functions looks up a di variable of nesting level l in table
+   DiVars. di variables are created if they do not exist.  */
+entity
 GetDiVar(l)
 int l;
 {
@@ -102,29 +98,25 @@ int l;
     return(e);
 }
 
-/* 
-this function creates li variables(thee ith loop index variable). there are MAXDEPTH 
-li variables which means that programs with more than MAXDEPTH nested loops cannot be 
-parallelized by pips.
-l is the nesting level of the variable to create
-*/
-entity 
-MakeLiVar(l)
-int l;
-{
-    entity e;
-    string s;
-    static char lin[] = "l#X";
+/* This function creates li variables(thee ith loop index variable).
 
-    sprintf(lin+2, "%1d", l);
-    s = concatenate(DI_VAR_MODULE_NAME, MODULE_SEP_STRING, lin, (char*) NULL);
+   There are MAXDEPTH li variables which means that programs with more
+   than MAXDEPTH nested loops cannot be parallelized by pips.
 
-    if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
-	e = make_entity(strdup(s), type_undefined, storage_undefined, 
-			value_undefined);
-    }
+   @param l is the nesting level of the variable to create */
+entity
+MakeLiVar(int l) {
+  entity e;
+  string s;
+  /* Create a variable of this format: "l#X" */
+  asprintf(&s, "%s%sl#%d", DI_VAR_MODULE_NAME, MODULE_SEP_STRING, l);
 
-    return(e);
+  if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined)
+    e = make_entity(s, type_undefined, storage_undefined, value_undefined);
+  else
+    free(s);
+
+  return(e);
 }
 
 /*
@@ -151,33 +143,29 @@ int l;
     return(e);
 }
 
-/* 
-this function creates dsi variables. there are MAXSV dsi variables
-which means that programs with more than MAXSV scalar variables cannot be
-parallelized by pips.
 
-l means to create Dsi[l] variable
+/* This function creates dsi variables.
+
+   There are MAXSV dsi variables which means that programs with more than
+   MAXSV scalar variables cannot be parallelized by PIPS.
+
+   @param l means to create Dsi[l] variable
 */
-entity 
-MakeDsiVar(l)
-int l;
-{
-    entity e;
-    string s;
-    static char din[] = "ds#XXXX";
+entity
+MakeDsiVar(int l) {
+  entity e;
+  string s;
+  /* Create a variable of this format: "ds#XXXX" */
+  asprintf(&s, "%s%sds#%.4d", DI_VAR_MODULE_NAME, MODULE_SEP_STRING, l);
 
-    pips_assert ("check four digits number",l < 10000);
-    
-    sprintf(din+3, "%.4d", l);
-    s = concatenate(DI_VAR_MODULE_NAME, MODULE_SEP_STRING, din, (char*) NULL);
+  if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined)
+    e = make_entity(s, type_undefined, storage_undefined, value_undefined);
+  else
+    free(s);
 
-    if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
-	e = make_entity(strdup(s), type_undefined, storage_undefined, 
-			value_undefined);
-    }
-
-    return(e);
+  return(e);
 }
+
 
 /*
 this functions looks up a dsi variable of the lth varable in table
@@ -373,32 +361,37 @@ ResetLoopCounter()
     ilc = 0;
 }
 
-entity 
-MakeLoopCounter()
-{
-    entity e;
-    string s;
-    static char lcn[] = "lc#XXXXXX";
 
-    while (1) {
-	sprintf(lcn+3, "%06d", ilc);
-	
-	s = concatenate(LOOP_COUNTER_MODULE_NAME, MODULE_SEP_STRING, 
-			lcn, (char*) NULL);
+/* Create a new loop counter variable */
+entity
+MakeLoopCounter() {
+  entity e;
+  string s;
+  static char lcn[] = "lc#XXXXXX";
 
-	if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
-	    pips_debug(8, "loop counter is %s\n", s);
-	    return(make_entity(strdup(s), type_undefined, 
-			    storage_undefined, value_undefined));
-	}
+  while (1) {
+    /* Create a variable of this format: "lc#XXXXXX" */
+    asprintf(&s, "%s%slc#%06d", LOOP_COUNTER_MODULE_NAME,
+	     MODULE_SEP_STRING, ilc);
 
-	if ((ilc += 1) == ILCMAX)
-	    break;
+    if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
+      pips_debug(8, "loop counter is %s\n", s);
+      return make_entity(strdup(s), type_undefined,
+			 storage_undefined, value_undefined);
     }
+    else
+      free(s);
 
-    pips_internal_error("too many loop counters");
-    return(entity_undefined);
+    /* Try a new free one: */
+    if ((ilc += 1) == ILCMAX)
+      break;
+  }
+
+  pips_internal_error("too many loop counters");
+  return(entity_undefined);
 }
+
+
 
 /* int dep_type(action ac1,action ac2) 
  * This function test the type of the dependence. ac1, ac2 are the action of 
