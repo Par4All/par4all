@@ -978,18 +978,19 @@ TestCoupleOfReferences(
 	mem_spy_begin();
     }
 
-    if (e1 != e2)
-      {
+    if (e1 != e2) {
+      ifdebug(1) {
 	fprintf(stderr, "dep %02td (", statement_number(s1));
 	print_words(stderr, words_effect(ef1));
 	fprintf(stderr, ") --> %02td (", statement_number(s2));
 	print_words(stderr, words_effect(ef2));
 	fprintf(stderr, ") \n");
-	pips_user_warning("Dependence between differents variables: "
-			  "%s and %s\nDependence assumed\n",
-			  entity_local_name(e1), entity_local_name(e2));
       }
-    
+      pips_user_warning("Dependence between differents variables: "
+			"%s and %s\nDependence assumed\n",
+			entity_local_name(e1), entity_local_name(e2));
+    }
+
     /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */
     /* FI: Why have two tests under the condition e1==e2? */
 

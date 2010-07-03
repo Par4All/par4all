@@ -4679,11 +4679,11 @@ points\_to\_analysis phase.
 
 This function is being implemented by Amira \textsc{Mensi}.
 The \PipsPassRef{points_to_analysis} is implemented in order to
-compute points-to relations, based on Emami algorithm. Emami algorithm
+compute points-to relations, based on Emami algorithm. \textsc{Emami} algorithm
 is a top-down analysis which calcules the points-to relations by
 applying specific rules to each assignement pattern identified.
 This phase requires another resource which
-is\PipsPassRef{Intraprocedural Summary Points To Analysis}.  
+is \PipsPassRef{Intraprocedural Summary Points To Analysis}.
 \begin{PipsMake}
 alias points_to_analysis  'Points To Analysis'
 
@@ -4771,11 +4771,11 @@ the heap. The possible values are "unique", "insensitive",
 
 The default value, "unique", implies
  that the heap is a unique array. It is enough to parallelize simple
- loops containing pointer-based references such as 
-"p[i]". 
+ loops containing pointer-based references such as
+"p[i]".
 
 In the "insensitive" case and all other cases, one array is
-allocated in each function to modelize the heap. 
+allocated in each function to modelize the heap.
 
 In the "flow-sensitive" case, the statement numbers of the malloc()
 call sites are used to subscribe this array, as well as all indices of
@@ -4785,14 +4785,14 @@ In the "context\_sensitive" case, the interprocedural translation of
 memory acces paths based on the abstract heap are prefixed by the same
 information regarding the call site: function containing the call
 site, statement number of the call site and indices of surrounding
-loops. 
+loops.
 
 Note that the naming of options is not fully compatible with
 the usual notations in pointer analyses. Note also that the
 insensitive case is redundant with context sensitive case: in the
 later case, a unique heap associated to malloc() would carry exactly
 the same amount of information [flow and context sensitivity are
-orthogonal]. 
+orthogonal].
 
 Finally, note that abstract heap arrays are distinguished according to
 their types if the property \PipsPropRef{ALIASING_ACROSS_TYPES} is set
@@ -5185,17 +5185,21 @@ internalize_parallel_code             > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Manage Parallel Loops}
+\subsection{Limit parallelism in parallel loop nests}
 \label{sec:manage-parallel-loops}
 
 \begin{PipsPass}{limit_nested_parallelism}
-The following transformation works on the parallel information available
-in the sequential code. The transformation will limit the number of nested
-parallel loops to a given value.
-It might be interesting to use the phase
-internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
-limit\_nested\_parallelism in order to maximize the number of parallel
-information available.
+  This phase restricts the parallelism of parallel do-loop nests by
+  limiting the number of top-level parallel do-loops to be below a given
+  limit. The too many innermost parallel loops are replaced by sequential
+  loops, if any. This is useful to keep enough coarse-grain parallelism
+  and respecting some hardware or optimization constraints. For example on
+  GPU, in CUDA there is a 2D limitation on grids of thread blocks, in
+  OpenCL it is limited to 3D. Of course, since the phase works onto
+  parallel loop nest, it might be interesting to use a parallelizing phase
+  such as \texttt{internalize\_parallel\_code} (see
+  \S~\ref{sec:cons-parall-code}) or coarse grain parallelization before
+  applying \texttt{limit\_nested\_parallelism}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5203,8 +5207,8 @@ limit_nested_parallelism          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-PIPS relies on the property \PipsPropRef{NESTED_PARALLELISM_THRESHOLD} to determine the
-desired level of nested parallelism.
+PIPS relies on the property \PipsPropRef{NESTED_PARALLELISM_THRESHOLD} to
+determine the desired level of nested parallelism.
 \begin{PipsProp}{NESTED_PARALLELISM_THRESHOLD}
 NESTED_PARALLELISM_THRESHOLD 0
 \end{PipsProp}

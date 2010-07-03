@@ -14,9 +14,12 @@ void p4a_kernel_0(int N, double array[N], int k)
 void p4a_kernel_launcher_0(int N, double array[N], int *k)
 {
 
-   for(k = 0; k <= 99; k += 1)
+   *k = 0;
+   while (*k<=99) {
       // To be assigned to a call to P4A_vp_0: k
       p4a_kernel_wrapper_0(N, array, *k);
+      *k += 1;
+   }
 }
 void p4a_kernel_wrapper_0(int N, double array[N], int k)
 {
@@ -39,9 +42,12 @@ void p4a_kernel_0(int N, double array[N], int k), p4a_kernel_wrapper_0(int N, do
 void p4a_kernel_launcher_0(int N, double array[N], int *k)
 {
 
-   for(*k = 0; *k <= 99; *k += 1)
+   *k = 0;
+   while (*k<=99) {
       // To be assigned to a call to P4A_vp_0: k
       p4a_kernel_wrapper_0(N, array, *k);
+      *k += 1;
+   }
 }
 void p4a_kernel_wrapper_0(int N, double array[N], int k)
 {
