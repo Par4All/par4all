@@ -50,11 +50,11 @@ def add_module_options(parser):
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
 
-    proc_group.add_option("--include-modules", metavar = "REGEXP", default = None,
-        help = "Process only the modules which names match the regular expression.")
+    proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
+        help = "Process only the modules (functions and subroutines) which names match the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of th Python library reference for example. In Fortran, the names should be given uppercase. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
 
     proc_group.add_option("--exclude-modules", metavar = "REGEXP", default = None,
-        help = "Exclude the modules matching the regular expression from the parallelization.")
+        help = "Exclude the modules (functions and subroutines) with names matching the regular expression from the parallelization. For example '(?i)^my_runtime' will skip all the functions or subroutines which names begin with 'my_runtime' in uppercase or lowercase. Have a look to the regular expression documentation for more details.")
 
     proc_group.add_option("--no-process", "-N", action = "store_true", default = False,
         help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
@@ -218,9 +218,9 @@ def main(options, args = []):
         pass
 
     if (pyps is None
-        or "P4A_ROOT" not in os.environ 
-        or "P4A_ACCEL_DIR" not in os.environ 
-        or not os.path.exists(os.environ["P4A_ROOT"]) 
+        or "P4A_ROOT" not in os.environ
+        or "P4A_ACCEL_DIR" not in os.environ
+        or not os.path.exists(os.environ["P4A_ROOT"])
         or not os.path.exists(os.environ["P4A_ACCEL_DIR"])):
         die("The Par4All environment has not been properly set (through par4all-rc.sh)")
 
@@ -363,7 +363,7 @@ def main(options, args = []):
         input.cuda = options.cuda
         input.openmp = options.openmp
         input.fine = options.fine
-        input.include_modules = options.include_modules
+        input.select_modules = options.select_modules
         input.exclude_modules = options.exclude_modules
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
@@ -400,7 +400,7 @@ def main(options, args = []):
 
             # PIPS outputs everything in stderr in a somewhat weird way...
             # Its output is buffered.
-            
+
             out, err, ret = "", "", -1
             try:
                 out, err, ret = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
@@ -426,7 +426,7 @@ def main(options, args = []):
     if os.path.isdir(database_dir):
         # Remove database unless otherwise specified.
         if options.keep_database:
-            warn("Not removing database directory " + database_dir + " (--keep-database)") 
+            warn("Not removing database directory " + database_dir + " (--keep-database)")
         else:
             # To improve later with a workspace.close() and
             # workspace.delete() some days... -> Yes because some files are left open
@@ -455,16 +455,16 @@ def main(options, args = []):
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
         if options.cmake:
-            builder.cmake_write(project_name, all_buildable_files + header_files, 
+            builder.cmake_write(project_name, all_buildable_files + header_files,
                 output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
         if options.cmake_gen or options.cmake_build:
-            builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir, 
+            builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir,
                 cmake_flags = options.cmake_flags, build = options.cmake_build)
         return
 
     try:
         info("Building " + ", ".join(output_files))
-        builder.build(files = all_buildable_files, output_files = output_files, 
+        builder.build(files = all_buildable_files, output_files = output_files,
             extra_obj = options.extra_obj, build_dir = build_dir)
     except:
         warn("Build directory was not removed: " + build_dir)

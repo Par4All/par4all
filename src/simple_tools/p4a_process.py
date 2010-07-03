@@ -60,7 +60,7 @@ class p4a_processor_input():
     cuda = False
     openmp = False
     fine = False
-    include_modules = ""
+    select_modules = ""
     exclude_modules = ""
     cpp_flags = ""
     files = []
@@ -92,7 +92,7 @@ def process(input):
             cpp_flags = input.cpp_flags,
             verbose = True,
             files = input.files,
-            filter_include = input.include_modules,
+            filter_select = input.select_modules,
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
@@ -167,7 +167,7 @@ class p4a_processor():
     accel_files = []
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
-                 verbose = False, files = [], filter_include = None,
+                 verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
                  recover_includes = True, properties = {}, activates = []):
 
@@ -257,39 +257,54 @@ class p4a_processor():
 
         # Also filter out modules based on --include-modules and
         # --exclude-modules.
-        filter_include_re = None
-        if filter_include:
-            filter_include_re = re.compile(filter_include)
+        filter_select_re = None
+        if filter_select:
+            filter_select_re = re.compile(filter_select)
         filter_exclude_re = None
         if filter_exclude:
             filter_exclude_re = re.compile(filter_exclude)
         # Combine the 3 filters in one:
         self.main_filter = (lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
-            and (filter_include_re == None or filter_include_re.match(module.name)))
+            and (filter_select_re == None or filter_select_re.match(module.name)))
 
 
     def get_database_directory(self):
+        "Return the directory of the current PIPS database"
         return os.path.abspath(self.workspace.directory())
 
 
-    def filter_modules(self, filter_include = None, filter_exclude = None, other_filter = lambda x: True):
-        filter_include_re = None
-        if filter_include:
-            filter_include_re = re.compile(filter_include)
+    def filter_modules(self, filter_select = None, filter_exclude = None, other_filter = lambda x: True):
+        """Filter modules according to their names and select them if they
+        match all the 3 following conditions.
+
+        If filter_exclude regex if defined, then matching modules are
+        filtered out.
+
+        If filter_select regex if defined, the matching modules are kept.
+
+        If other_filter regex if defined, select also according to this
+        matching.
+
+        """
+        filter_select_re = None
+        if filter_select:
+            filter_select_re = re.compile(filter_select)
+
         filter_exclude_re = None
         if filter_exclude:
             filter_exclude_re = re.compile(filter_exclude)
+
         filter = (lambda module: self.main_filter(module)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
-            and (filter_include_re == None or filter_include_re.match(module.name))
+            and (filter_select_re == None or filter_select_re.match(module.name))
             and other_filter(module.name))
         # Select the interesting modules:
         return self.workspace.filter(filter)
 
 
-    def parallelize(self, fine = False, filter_include = None, filter_exclude = None):
-        all_modules = self.filter_modules(filter_include, filter_exclude)
+    def parallelize(self, fine = False, filter_select = None, filter_exclude = None):
+        all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
@@ -302,8 +317,8 @@ class p4a_processor():
             all_modules.coarse_grain_parallelization()
 
 
-    def gpuify(self, filter_include = None, filter_exclude = None):
-        all_modules = self.filter_modules(filter_include, filter_exclude)
+    def gpuify(self, filter_select = None, filter_exclude = None):
+        all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
@@ -376,7 +391,7 @@ class p4a_processor():
         #    )
 
         #self.workspace.all_functions.display()
-        
+
         # To be able to inject Par4All accelerator run time initialization
         # later:
         if "main" in self.workspace:
@@ -396,10 +411,10 @@ class p4a_processor():
             ''')
 
 
-    def ompify(self, filter_include = None, filter_exclude = None):
+    def ompify(self, filter_select = None, filter_exclude = None):
         """Add OpenMP #pragma from internal representation"""
 
-        modules = self.filter_modules(filter_include, filter_exclude);
+        modules = self.filter_modules(filter_select, filter_exclude);
         modules.ompify_code()
         modules.omp_merge_pragma()
 
