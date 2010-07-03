@@ -1,4 +1,4 @@
-Release notes for Par4All 0.2, 2010/06/30
+Release notes for Par4All 0.2, 2010/07/03
 =========================================
 
 Ronan Keryell, HPC Project.
@@ -183,7 +183,7 @@ environment variables set:
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
 
 Sometimes, Par4All generates C99 array parameter declarations in the
-generated CUDA kernels that are not yet dealt with nvcc 3.0. To avoid this
+generated CUDA kernels that are not yet dealt with nvcc 3.0. To avoid this,
 we apply an array to pointer transformation on generated kernels. We hope
 nVidia will release soon a CUDA version that is C99-compliant as OpenCL
 is. That means that in the mean time, the entry code should not contain
@@ -202,12 +202,30 @@ this kind of C99 function declaration::
 with ``n`` and ``m`` that may be global variables, ``enum`` value or
 ``#define``.
 
+There is another limitation in th nVidia CUDA 3.0 compiler that does not
+accept function declarations with incomplete types such as::
+
+  void saxpy (long long size, t_precision dst[], t_precision src[], t_precision alpha) {
+    long long i = 0;
+    for (i = 0; i < size; i++)
+	  dst[i] = alpha * src[i] + dst[i];
+  }
+
 
 Embedded systems
 ----------------
 
-The code generation for the Scaleo Chip Leon 3 MP-SoC is done through the
-OpenMP support of the target.
+With OpenMP output, as any other shared memory multiprocessor systems, all
+the embedded systems that accept OpenMP can be addressed.
+
+For example in the SCALOPES ARTEMIS European project, the code generation
+for the Scaleo Chip Leon 3 MP-SoC is done through the OpenMP support of
+the target.
+
+Due to the immature state of the special code generation for the Ter@pix
+SIMD image processor from Thales TRT (funded by FREIA ANR project) or the
+SCMP dataflow architecture from CEA (funded by SCALOPES ARTEMIS European
+project) are not included in this release.
 
 
 SIMD and multimedia extensions
@@ -224,6 +242,8 @@ On Debian, PLY seems to be installed only with Python 2.5. It works with
 Python 2.6 and 3.1 with the ``PYTHONPATH`` generated for Par4All (with a
 trailing ``:/usr/share/pyshared``). Unfortunately this breaks ``ipyps``.
 
+On Ubuntu 10.04 there are also some configuration issues that make Python to
+output harmless warning messages.
 
 This text is typeset according to the reStructuredText Markup
 Specification. For more information:
