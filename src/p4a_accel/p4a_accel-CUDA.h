@@ -15,7 +15,7 @@
     "mailto:Ronan.Keryell@hpc-project.com"
 */
 
-/* License BSD */
+/* BSD License */
 
 #include <cutil_inline.h>
 #include <cuda.h>
@@ -27,29 +27,52 @@
 
 /** Parameters used to choose thread allocation per blocks
 
+    This allow to chosse the size of the blocks of threads in 1,2 and 3D.
+
+    If there is not enough iterations to fill an expected block size in a
+    dimension, the block size is indeed the number of iteration in this
+    dimension to avoid spoling CUDA threads here.
+
     It should be OK for big iteration spaces, but quit suboptimal fo small
     ones.
+
+    They can be redefined at compilation time with definition options such
+    as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
+    --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
+
 */
-enum {
-  /** There is a maximum of 512 threads per block. Use it. May cause some
-      trouble if too many resources per thread are used. */
-  P4A_THREAD_PER_BLOCK_IN_1D = 512,
-  //P4A_THREAD_PER_BLOCK_IN_1D = 5,
+#ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
+/** There is a maximum of 512 threads per block. Use it. May cause some
+    trouble if too many resources per thread are used. */
+#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D 512
+//P4A_CUDA_THREAD_PER_BLOCK_IN_1D = 5,
+#endif
 
-  /** The thread layout size per block in 2D organization */
-  //P4A_THREAD_X_PER_BLOCK_IN_2D = 32,
-  //P4A_THREAD_Y_PER_BLOCK_IN_2D = 16,
-  // Better if the memory accesses are rather according to the X axis
-  P4A_THREAD_X_PER_BLOCK_IN_2D = 512,
-  P4A_THREAD_Y_PER_BLOCK_IN_2D = 1,
+#ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D
+/** The thread layout size per block in 2D organization */
+//P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D = 32,
+//P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D = 16,
+// Better if the memory accesses are rather according to the X axis
+#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D 512
+#endif
+#ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D
+#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D 1
+#endif
 
-  /* Well, the 3D is not dealt in CUDA even it is described by a dim3 :-( */
-  /** The thread layout size per block in 3D organization */
-  P4A_THREAD_X_PER_BLOCK_IN_3D = 8,
-  P4A_THREAD_Y_PER_BLOCK_IN_3D = 8,
-  P4A_THREAD_Z_PER_BLOCK_IN_3D = 8,
-};
+#ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D
+/** The thread layout size per block in 3D organization
 
+    Well, the 3D is not really dealt in CUDA even it is described by a
+    dim3 :-( You may try OpenCL instead. :-)
+*/
+#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D 8
+#endif
+#ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_3D
+#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_3D 8
+#endif
+#ifndef P4A_CUDA_THREAD_Z_PER_BLOCK_IN_3D
+#define P4A_CUDA_THREAD_Z_PER_BLOCK_IN_3D 8
+#endif
 
 /** @} */
 
@@ -240,9 +263,9 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 					 size)				\
   /* Define the number of thread per block: */				\
   dim3 block_descriptor_name(P4A_min((int)size,				\
-				     (int)P4A_THREAD_PER_BLOCK_IN_1D));	\
+				     (int)P4A_CUDA_THREAD_PER_BLOCK_IN_1D));	\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)size) + P4A_THREAD_PER_BLOCK_IN_1D - 1)/P4A_THREAD_PER_BLOCK_IN_1D);	\
+  dim3 grid_descriptor_name((((int)size) + P4A_CUDA_THREAD_PER_BLOCK_IN_1D - 1)/P4A_CUDA_THREAD_PER_BLOCK_IN_1D);	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
@@ -255,12 +278,12 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 					 n_x_iter, n_y_iter)		\
   /* Define the number of thread per block: */				\
   dim3 block_descriptor_name(P4A_min((int)n_x_iter,			\
-				     (int)P4A_THREAD_X_PER_BLOCK_IN_2D), \
+				     (int)P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D), \
 			     P4A_min((int)n_y_iter,			\
-				     (int)P4A_THREAD_Y_PER_BLOCK_IN_2D)); \
+				     (int)P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D)); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)n_x_iter) + P4A_THREAD_X_PER_BLOCK_IN_2D - 1)/P4A_THREAD_X_PER_BLOCK_IN_2D, \
-			    (((int)n_y_iter) + P4A_THREAD_Y_PER_BLOCK_IN_2D - 1)/P4A_THREAD_Y_PER_BLOCK_IN_2D); \
+  dim3 grid_descriptor_name((((int)n_x_iter) + P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D - 1)/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D, \
+			    (((int)n_y_iter) + P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D - 1)/P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D); \
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
