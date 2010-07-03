@@ -3,10 +3,14 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS $WKS.c include/p4a_stubs.c
+shell rm -rf /tmp/$WKS; mkdir /tmp/$WKS
+shell cp $WKS.c include/p4a_stubs.c /tmp/$WKS
+# Instrument the source for include tracking:
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS/$WKS.c
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS/p4a_stubs.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_LANGUAGE "C"
+create $WKS /tmp/$WKS/$WKS.c /tmp/$WKS/p4a_stubs.c
+
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
@@ -43,8 +47,15 @@ apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
 
 apply UNSPLIT
 
-echo All generated modules should be there
-shell cat $WKS.database/Src/$WKS.c
+# Recover crudely the headers:
+shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WKS.database/Src/$WKS.c
+shell grep '//pips_begin' $WKS.database/Src/$WKS.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/$WKS.c ; done
+
+shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WKS.database/Src/p4a_stubs.c
+shell grep '//pips_begin' $WKS.database/Src/p4a_stubs.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/p4a_stubs.c ; done
+
+echo [after unsplit and recovering]
+shell cat $WKS.database/Src/*.c
 
 shell gcc -o $WKS.database/Src/$WKS $WKS.database/Src/*.c
 

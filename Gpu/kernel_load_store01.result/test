@@ -1,0 +1,142 @@
+void give()
+{
+//               <must be written>: j
+   int j = 3;
+   double array[N];
+//               <may be written >: array[*]
+//               <must be read   >: j
+//               <must be written>: j
+
+   change(&j, array);
+}
+//               <may be written >: array[*]
+//               <must be read   >: i i[0]
+//               <must be written>: i[0]
+void change(int *i, double array[N])
+{
+   int k;
+//               <must be read   >: i i[0]
+//               <must be written>: i[0]
+
+   (*i)++;
+//               <may be read    >: k
+//               <may be written >: array[*]
+//               <must be written>: k
+
+   for(k = 0; k <= 99; k += 1)
+//               <may be written >: array[*]
+//               <must be read   >: k
+      array[k] = 0;
+}
+void give()
+{
+//               <must be written>: j
+   int j = 3;
+   double array[N];
+//               <may be written >: array[*]
+//               <must be read   >: j
+//               <must be written>: j
+
+   change(&j, array);
+}
+//               <may be written >: array[*]
+//               <must be read   >: i i[0]
+//               <must be written>: i[0]
+void change(int *i, double array[N])
+{
+   int k;
+//               <must be read   >: i i[0]
+//               <must be written>: i[0]
+
+   (*i)++;
+//               <may be read    >: k
+//               <may be written >: array[*]
+//               <must be written>: k
+
+   for(k = 0; k <= 99; k += 1)
+//               <may be written >: array[*]
+//               <must be read   >: k
+      array[k] = 0;
+}
+void P4A_accel_free(void *dest)
+{
+   free(dest);
+}
+void P4A_accel_malloc(void **dest, size_t n)
+{
+   *dest = malloc(n);
+}
+void * P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n)
+{
+   size_t i;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) host_address)[i] = ((const char *) accel_address)[i];
+   return host_address;
+}
+void * P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n)
+{
+   size_t i;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) accel_address)[i] = ((const char *) host_address)[i];
+   return accel_address;
+}
+void change(int *i, double array[N])
+{
+   int k;
+
+   (*i)++;
+
+   for(k = 0; k <= 99; k += 1)
+      array[k] = 0;
+}
+void give()
+{
+   int j = 3;
+   double array[N];
+   //PIPS generated variable
+   double (*P_0)[N];
+   P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
+
+   change(&j, *P_0);
+   P4A_copy_from_accel(array, *P_0, sizeof(double[N])-1+1);
+   P4A_accel_free(*P_0);
+}
+
+Unsplit resulting code
+
+/*
+ * file for kernel_load_store01.c
+ */
+/* Test kernel_load_store on a scalar modification.
+
+   Assume that only the pointed scalar is touched, since it is often the
+   case for generated code given to kernel_load_store
+*/
+enum {N=100};
+
+extern void change(int *i, double array[N]);
+
+extern void give();
+void change(int *i, double array[N])
+{
+   int k;
+
+   (*i)++;
+
+   for(k = 0; k <= 99; k += 1)
+      array[k] = 0;
+}
+void give()
+{
+   int j = 3;
+   double array[N];
+   //PIPS generated variable
+   double (*P_0)[N];
+   P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
+
+   change(&j, *P_0);
+   P4A_copy_from_accel(array, *P_0, sizeof(double[N])-1+1);
+   P4A_accel_free(*P_0);
+}
