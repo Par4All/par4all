@@ -808,11 +808,13 @@ transformer statement_to_postcondition(
 	if(!transformer_consistency_p(pre)) {
 	  ;
 	}
-	pre = transformer_normalize(pre, 4);
+/* 	pre = transformer_normalize(pre, 4); */
+	pre = transformer_normalize(pre, 2);
 
 	if(!transformer_consistency_p(pre)) {
 	  ;
 	}
+/* 	pre = transformer_normalize(pre, 2); */
 	pre = transformer_normalize(pre, 4);
 
 	if(!transformer_consistency_p(pre)) {
@@ -937,7 +939,8 @@ transformer propagate_preconditions_in_declarations
     }
 
     post = transformer_safe_apply(stf, pre);
-    post = transformer_safe_normalize(post, 4);
+/*     post = transformer_safe_normalize(post, 4); */
+    post = transformer_safe_normalize(post, 2);
 
     for (POP(l) ; !ENDP(l); POP(l)) {
       v = ENTITY(CAR(l));
@@ -952,9 +955,11 @@ transformer propagate_preconditions_in_declarations
       next_pre = post;
       stf = declaration_to_transformer(v, next_pre);
       post = transformer_safe_apply(stf, next_pre);
-      post = transformer_safe_normalize(post, 4);
+/*       post = transformer_safe_normalize(post, 4); */
+      post = transformer_safe_normalize(post, 2);
       btf = transformer_combine(btf, stf);
-      btf = transformer_normalize(btf, 4);
+/*       btf = transformer_normalize(btf, 4); */
+      btf = transformer_normalize(btf, 2);
 
       ifdebug(1)
 	pips_assert("btf is a consistent transformer",
