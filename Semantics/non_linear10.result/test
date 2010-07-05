@@ -385,8 +385,8 @@ C    0<=N, 1<=NQ, NQ<=64}
 C (2,5)
       KU = 2                                                            0022
 
-C  T(KN) {KN==N+2, KN==NU+2, KU==2, 0<=IS+1, IS<=1, 2<=KN, M+3<=KN,
-C    2M+2<=KN, 5<=M, M<=6, 1<=NQ, NQ<=64}
+C  T(KN) {KN==N+2, KU==2, N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
+C    2M<=N, 0<=N, 1<=NQ, NQ<=64}
 
 C (2,6)
       KN = KU+NU                                                        0023

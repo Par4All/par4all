@@ -96,7 +96,7 @@ C  P(J,NN) {J==1, 2N==NN}
 C (0,4)
       M = NN/2                                                          0007
 
-C  P(J,M,NN) {J==1, M==N, 2M==NN}
+C  P(J,M,NN) {J==1, M==N, 2N==NN}
 
 C (0,5)
       DO WHILE (M.GE.2.AND.J.GT.M)                                      0008

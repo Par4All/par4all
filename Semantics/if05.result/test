@@ -15,7 +15,7 @@ C  T(I) {I==0}
 
       I = 0
 
-C  T(I,N) {I+N==I#init+N#init, N#init<=N+1, N<=N#init+1}
+C  T(I,N) {I+N==I#init+N#init, I#init<=I+1, I<=I#init+1}
 
 
       IF (N.GT.0) THEN

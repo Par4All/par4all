@@ -57,7 +57,7 @@ C  T() {}
 
       PROGRAM UNSTRUC11
 
-C  T(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
+C  T(I,J,K,L) {2J+L==4I, 3I==K, J<=2I, 0<=J}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -85,9 +85,8 @@ C  T(L) {L==0}
 C (0,5)
       L = 0                                                             0008
 
-C  T(I,J,K,L) {3I+K#init==3I#init+K,
-C    6J+4K#init+3L==6J#init+4K+3L#init, 4K#init+3L<=4K+3L#init,
-C    L#init<=L}
+C  T(I,J,K,L) {4I+2J#init+L#init==4I#init+2J+L, 3I+K#init==3I#init+K,
+C    4I#init+L<=4I+L#init, L#init<=L}
 
 C (0,6)
 C     BEGIN UNSTRUCTURED
@@ -200,7 +199,7 @@ C  P(I,J,K,L) {I==0, J==0, K==0, L==0}
 C (0,6)
 C     BEGIN UNSTRUCTURED
 
-C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+C  P(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
 
 C (1,1)
 
@@ -248,19 +247,19 @@ C (7,1)
       J = J+2                                                           0017
       GOTO 200
 
-C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+C  P(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
 
 C (3,1)
 
 300   CONTINUE                                                          0020
 C     END UNSTRUCTURED
 
-C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+C  P(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
 
 C (0,7)
       PRINT *, I, J, K, L                                               0021
 
-C  P(I,J,K,L) {2J+L==4I, 6J+3L==4K, 0<=J, 0<=L}
+C  P(I,J,K,L) {2J+L==4I, 3I==K, L<=4I, 0<=L}
 
 C (0,8)
 
