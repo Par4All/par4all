@@ -324,7 +324,7 @@ class runner(Thread):
         self.silent = silent
 
         if self.silent:
-            debug("Running '" + self.cmd + "' in " + self.working_dir)
+            debug("Running '" + self.cmd + "' in " + self.working_dir, level = 3)
         else:
             cmd(self.cmd, dir = self.working_dir)
 
@@ -472,16 +472,19 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
     return r.wait()
 
 def which(cmd, silent = True):
-    return run([ "which", cmd ], can_fail = True, silent = True)[0]
+    return run([ "which", cmd ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def whoami(silent = True):
-    return run([ "whoami" ], can_fail = True, silent = True)[0]
+    return run([ "whoami" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def hostname(silent = True):
-    return run([ "hostname", "--fqdn" ], can_fail = True, silent = True)[0]
+    return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
+
+def uname(silent = True):
+    return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def ping(host, silent = True):
-    return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = True)[2]
+    return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password'''

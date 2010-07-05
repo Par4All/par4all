@@ -163,6 +163,9 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 
 
 def main(options, args = []):
+    
+    if args:
+        die("No arguments are accepted by this script, only options")
 
     actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
     script_dir = os.path.split(actual_script)[0]
