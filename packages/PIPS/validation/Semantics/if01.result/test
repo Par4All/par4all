@@ -16,7 +16,7 @@ int if01()
 
    i = 0;
 
-//  T(i,n) {i+n==i#init+n#init, n#init<=n+1, n<=n#init+1}
+//  T(i,n) {i+n==i#init+n#init, i#init<=i+1, i<=i#init+1}
 
    //n = 10;
    

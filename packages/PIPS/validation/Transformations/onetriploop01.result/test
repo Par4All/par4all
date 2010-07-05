@@ -35,7 +35,7 @@ C  P(M,N) {M==N}
 
       DO I = N, M                                                       0007
 
-C  P(I,M,N) {I==M, I==N}
+C  P(I,M,N) {I==M, M==N}
 
          PRINT *, 'i = ', I                                             0008
       ENDDO

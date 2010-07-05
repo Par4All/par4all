@@ -1,0 +1,14 @@
+delete global_extern02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create global_extern02 global_extern02.c
+
+display PARSED_PRINTED_FILE[global_extern02!]
+
+apply UNSPLIT
+shell gcc -c global_extern02.database/Src/global_extern02.c
+
+close
+# delete global_extern02
+quit

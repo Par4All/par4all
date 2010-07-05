@@ -5,13 +5,13 @@ PARSED PRINTED FILE FOR MODULE resp01!
 /* #include <stdio.h> */
 
 
-extern int filter(int x);
+int filter(int x);
 
 int res;
 
 extern int main();
 
-extern int filter(int x);
+int filter(int x);
 
 PARSED PRINTED FILE FOR MODULE main (undefined function "filtre")
 

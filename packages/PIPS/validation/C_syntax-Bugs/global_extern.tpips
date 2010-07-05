@@ -1,4 +1,0 @@
-delete global_extern
-create global_extern global_extern.c
-
-display PRINTED_FILE[global_extern!]

@@ -78,8 +78,9 @@ Variable list:
 	Declared entity "generate07:0`y" with type "variable" "foo"
 	Declared entity "generate07:0`z" with type "variable" "z_t"
 
-* empty extern declaration list *
+External variable list:
 
+	Declared external entity "TOP-LEVEL:func"	with type "functional" "foo x z_t x morning_t x double * -> fii"
 
 Derived entities:
 

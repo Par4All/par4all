@@ -82,7 +82,7 @@ void complete04()
 
       int j = 0;                                                        /*0015*/
 
-//  T(i,j) {i+j#init==j, 0<=i, i+j#init+1<=j+n, i+1<=n, j#init<=j}
+//  T(i,j) {i+j#init==j, i+j#init+1<=j+n, i+1<=n, j#init<=j}
 
       for (i = 0;i<n;i++)                                               /*0016*/
 
