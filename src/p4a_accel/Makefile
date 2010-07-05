@@ -3,7 +3,7 @@
 # Some own Par4All stuff:
 include $(P4A_ROOT)/doc/libs/par4all.mk
 
-DOXYGEN_PUBLISH_LOCATION_DIR=$(INSTALL_MACHINE)/$(INSTALL_MACHINE_DOC_DIR)
+DOXYGEN_PUBLISH_LOCATION_DIR=$(INSTALL_MACHINE):$(INSTALL_MACHINE_DOC_DIR)
 
 # common stuff, recycled directly from PIPS:
 ROOT    = $(P4A_ROOT)/packages/PIPS/pips
