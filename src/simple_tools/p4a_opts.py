@@ -162,6 +162,12 @@ def suggest_more_verbosity():
         warn("Log file was " + current_log_file)
 
 
+def suggest_RC():
+    global static_options
+    if not static_options.rebuild or not static_options.clean:
+        suggest("You may try running again with --rebuild --clean (-RC)")
+
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")

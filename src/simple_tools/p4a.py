@@ -127,7 +127,7 @@ def add_module_options(parser):
     compile_group.add_option("--cxx-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--c-flags) are also passed to the C++ compiler.")
 
-    compile_group.add_option("--nvcc_flags", action = "append", metavar = "FLAGS", default = [],
+    compile_group.add_option("--nvcc-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
 
     compile_group.add_option("--fortran-flags", action = "append", metavar = "FLAGS", default = [],
@@ -137,7 +137,7 @@ def add_module_options(parser):
         help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
 
     compile_group.add_option("--arch", "-m", metavar = "32|64", default = None,
-        help = "Specify compilation target architecture (defaults to current native architecture).")
+        help = "Specify compilation target architecture (defaults to current host architecture).")
 
     compile_group.add_option("--keep-build-dir", "-K", action = "store_true", default = False,
         help = "Do not remove build directory after compilation. If an error occurs, it will not be removed anyways.")
