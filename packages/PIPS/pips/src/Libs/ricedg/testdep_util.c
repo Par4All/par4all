@@ -367,7 +367,7 @@ entity
 MakeLoopCounter() {
   entity e;
   string s;
-  static char lcn[] = "lc#XXXXXX";
+  //static char lcn[] = "lc#XXXXXX";
 
   while (1) {
     /* Create a variable of this format: "lc#XXXXXX" */

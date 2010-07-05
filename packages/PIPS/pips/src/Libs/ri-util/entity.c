@@ -1060,7 +1060,7 @@ bool entity_list_p(list el)
 {
   bool pure = TRUE;
 
-  MAP(ENTITY, e,
+  FOREACH(ENTITY, e, el)
       {
 	static entity le = entity_undefined;
 	pips_debug(10, "Entity e in list is \"%s\"\n", safe_entity_name(e));
@@ -1070,7 +1070,7 @@ bool entity_list_p(list el)
 	  break;
 	}
 	le = e;
-      }, el);
+      }
   return pure;
 }
 

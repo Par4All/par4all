@@ -62,9 +62,15 @@
  */
 list module_declarations(entity m)
 {
-  statement s = get_current_module_statement();
-  list dl = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
-  dl = gen_nconc(dl, statement_to_declarations(s));
+  list dl = get_current_module_declarations();
+  if (list_undefined_p(dl))
+    {
+      statement s = get_current_module_statement();
+      list dl2 = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
+      dl = statement_to_declarations(s);
+      dl = gen_nconc(dl, dl2);
+      set_current_module_declarations(dl);
+    }  
 
   /* FI: maybe we should also look up the declarations in the compilation unit... */
 
@@ -74,7 +80,7 @@ list module_declarations(entity m)
     fprintf(stderr, "\n");
   }
 
-  return dl;
+  return gen_copy_seq(dl);
 }
 
 list current_module_declarations()
@@ -89,7 +95,16 @@ list module_entities(entity m)
   list cudl = gen_copy_seq(code_declarations(value_code(entity_initial(cu))));
   list mdl = module_declarations(m);
 
+  pips_assert("compilation unit is an entity list.",
+	      entity_list_p(code_declarations(value_code(entity_initial(cu)))));
+  pips_assert("initial cudl is an entity list.", entity_list_p(cudl));
+  pips_assert("mdl is an entity list.", entity_list_p(mdl));
+
   cudl = gen_nconc(cudl, mdl);
+
+  /* Make sure you only have entities in list cudl */
+  pips_assert("Final cudl is an entity list.", entity_list_p(cudl));
+
   return cudl;
 }
 

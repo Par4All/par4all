@@ -210,8 +210,10 @@ transformer transformer_convex_hull(transformer t1, transformer t2)
   /* return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); */
   /* return transformer_convex_hulls(t1, t2, sc_common_projection_convex_hull);
    */
-  t1 = transformer_normalize(t1, 4);
-  t2 = transformer_normalize(t2, 4);
+/*   t1 = transformer_normalize(t1, 4); */
+/*   t2 = transformer_normalize(t2, 4); */
+  t1 = transformer_normalize(t1, 2);
+  t2 = transformer_normalize(t2, 2);
   return transformer_convex_hulls(t1, t2, cute_convex_union);
 }
 

@@ -418,7 +418,8 @@ transformer any_assign_operation_to_transformer(entity tmp,
   return tf;
 }
 
-/* v = (e1 = e1 op e2) */
+/* v = (e1 = e1 op e2) ; e1 must be a reference; does not compute
+   information for dereferenced pointers such as in "*p += 2;" */
 static transformer update_operation_to_transformer(entity v,
 						   entity op,
 						   expression e1,
@@ -427,44 +428,45 @@ static transformer update_operation_to_transformer(entity v,
 						   bool is_internal)
 {
   transformer tf = transformer_undefined;
-  //transformer utf = transformer_undefined;
-  entity tmp1 = make_local_temporary_value_entity(entity_type(v));
-  entity tmp2 = make_local_temporary_value_entity(entity_type(v));
-  /* sub-expressions are not necessarily integer? Then the expression
-     should not be integer? */
-  /* We assume that the update operation is syntactically correct */
-  entity v1 = reference_variable(syntax_reference(expression_syntax(e1)));
-  entity sop = update_operator_to_regular_operator(op);
-  expression n_exp = MakeBinaryCall(sop, copy_expression(e1), copy_expression(e2));
-  list args = CONS(EXPRESSION, e1, CONS(EXPRESSION, n_exp, NIL));
 
-  pips_assert("e1 is an reference", expression_reference_p(e1));
+  if(expression_reference_p(e1)) {
+    //transformer utf = transformer_undefined;
+    entity tmp1 = make_local_temporary_value_entity(entity_type(v));
+    entity tmp2 = make_local_temporary_value_entity(entity_type(v));
+    /* sub-expressions are not necessarily integer? Then the expression
+       should not be integer? */
+    /* We assume that the update operation is syntactically correct */
+    entity v1 = reference_variable(syntax_reference(expression_syntax(e1)));
+    entity sop = update_operator_to_regular_operator(op);
+    expression n_exp = MakeBinaryCall(sop, copy_expression(e1), copy_expression(e2));
+    list args = CONS(EXPRESSION, e1, CONS(EXPRESSION, n_exp, NIL));
 
-  pips_debug(9, "Begin officialy... but a lot has been done already!\n");
+    pips_debug(9, "Begin officialy... but a lot has been done already!\n");
 
-  /* Effects are used at a higher level */
-  tf = any_assign_operation_to_transformer(v, args, /* ef,*/ pre, is_internal);
-  gen_free_list(args);
-  free_expression(n_exp);
+    /* Effects are used at a higher level */
+    tf = any_assign_operation_to_transformer(v, args, /* ef,*/ pre, is_internal);
+    gen_free_list(args);
+    free_expression(n_exp);
 
-  tf = transformer_add_equality(tf, v, v1);
+    tf = transformer_add_equality(tf, v, v1);
 
-  ifdebug(8) {
-    pips_debug(8, "before projection, with temporaries v=%s, tmp1=%s, tmp2=%s,"
-	       " transformer rf=%p\n",
-	       entity_local_name(v), entity_local_name(tmp1),
-	       entity_local_name(tmp2), tf);
-    dump_transformer(tf);
+    ifdebug(8) {
+      pips_debug(8, "before projection, with temporaries v=%s, tmp1=%s, tmp2=%s,"
+		 " transformer rf=%p\n",
+		 entity_local_name(v), entity_local_name(tmp1),
+		 entity_local_name(tmp2), tf);
+      dump_transformer(tf);
+    }
+
+    /* Too early: you are projecting v and loosing all useful information
+       within an expression! */
+    /* tf = transformer_temporary_value_projection(tf); */
+
+    //free_transformer(tf2);
+    //free_transformer(tf12);
+    //free_transformer(tf12u);
+    //free_transformer(tf_op);
   }
-
-  /* Too early: you are projecting v and loosing all useful information
-     within an expression! */
-  /* tf = transformer_temporary_value_projection(tf); */
-
-  //free_transformer(tf2);
-  //free_transformer(tf12);
-  //free_transformer(tf12u);
-  //free_transformer(tf_op);
 
   pips_debug(9, "End with transformer tf=%p\n", tf);
   ifdebug(8) dump_transformer(tf);

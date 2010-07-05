@@ -325,7 +325,8 @@ transformer declarations_to_transformer(list dl, transformer pre)
     v = ENTITY(CAR(l));
     stf = declaration_to_transformer(v, pre);
     post = transformer_safe_apply(stf, pre);
-    post = transformer_safe_normalize(post, 4);
+/*     post = transformer_safe_normalize(post, 4); */
+    post = transformer_safe_normalize(post, 2);
     btf = transformer_dup(stf);
     for (POP(l) ; !ENDP(l); POP(l)) {
       v = ENTITY(CAR(l));
@@ -336,9 +337,11 @@ transformer declarations_to_transformer(list dl, transformer pre)
       post = transformer_safe_apply(stf, next_pre);
       free_transformer(next_pre);
       next_pre = transformer_undefined; // FI: works even without this...
-      post = transformer_safe_normalize(post, 4);
+/*       post = transformer_safe_normalize(post, 4); */
+      post = transformer_safe_normalize(post, 2);
       btf = transformer_combine(btf, stf);
-      btf = transformer_normalize(btf, 4);
+/*       btf = transformer_normalize(btf, 4); */
+      btf = transformer_normalize(btf, 2);
 
       ifdebug(1)
 	pips_assert("btf is a consistent transformer",
@@ -371,7 +374,8 @@ static transformer block_to_transformer(list b, transformer pre)
     s = STATEMENT(CAR(l));
     stf = statement_to_transformer(s, pre);
     post = transformer_safe_apply(stf, pre);
-    post = transformer_safe_normalize(post, 4);
+/*     post = transformer_safe_normalize(post, 4); */
+    post = transformer_safe_normalize(post, 2);
     btf = transformer_dup(stf);
     for (POP(l) ; !ENDP(l); POP(l)) {
       s = STATEMENT(CAR(l));
@@ -380,9 +384,11 @@ static transformer block_to_transformer(list b, transformer pre)
       next_pre = post;
       stf = statement_to_transformer(s, next_pre);
       post = transformer_safe_apply(stf, next_pre);
-      post = transformer_safe_normalize(post, 4);
+/*       post = transformer_safe_normalize(post, 4); */
+      post = transformer_safe_normalize(post, 2);
       btf = transformer_combine(btf, stf);
-      btf = transformer_normalize(btf, 4);
+/*       btf = transformer_normalize(btf, 4); */
+      btf = transformer_normalize(btf, 2);
       ifdebug(1)
 	pips_assert("btf is a consistent transformer",
 		    transformer_consistency_p(btf));
@@ -654,7 +660,8 @@ transformer call_to_transformer(call c,
   ifdebug(8) {
     (void) print_transformer(pre);
   }
-  tf = transformer_normalize(tf, 4);
+/*   tf = transformer_normalize(tf, 4); */
+  tf = transformer_normalize(tf, 2);
 
   pips_debug(8,"end after normalization with tf=%p\n", tf);
   ifdebug(8) {
@@ -2058,7 +2065,8 @@ transformer statement_to_transformer(
 	nt = safe_transformer_projection(nt, vl);
     }
     /* nt = transformer_normalize(nt, 7); */
-    nt = transformer_normalize(nt, 4);
+/*     nt = transformer_normalize(nt, 4); */
+    nt = transformer_normalize(nt, 2);
 
     if(!transformer_consistency_p(nt)) {
       _int so = statement_ordering(s);
@@ -2079,6 +2087,7 @@ transformer statement_to_transformer(
        statement transformer is the convex hull of all its replicate
        transformers. */
     if(transformer_undefined_p(ot)) {
+    nt = transformer_normalize(nt, 4);
       t = copy_transformer(nt);
     }
     else {
