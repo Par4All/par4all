@@ -3,21 +3,21 @@ Initial code
 
 typedef struct farray_t *farray;
 
-extern farray farray_new(unsigned int n);
-extern void farray_delete(farray a);
-extern float farray_get(farray a, unsigned int i);
-extern void farray_set(farray a, unsigned int i, float f);
+farray farray_new(unsigned int n);
+void farray_delete(farray a);
+float farray_get(farray a, unsigned int i);
+void farray_set(farray a, unsigned int i, float f);
 struct farray_t {
    unsigned int size;
    float *data;
 };
 
-extern farray farray_new(unsigned int n);
+farray farray_new(unsigned int n);
 
-extern void farray_delete(farray a);
+void farray_delete(farray a);
 
-extern float farray_get(farray a, unsigned int i);
-extern void farray_set(farray a, unsigned int i, float f);
+float farray_get(farray a, unsigned int i);
+void farray_set(farray a, unsigned int i, float f);
 void farray_delete(farray a)
 {
    free(a->data);

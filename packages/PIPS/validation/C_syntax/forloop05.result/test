@@ -231,31 +231,29 @@ int main()
 
          for(n = 0; n <= BlockEnd-1; n += 1) {
 
-//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i+n==j, j<=n+15, 0<=n,
-//    n<=2}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, n<=2}
 
             int k, l;
 
-//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, i+n==j, j<=n+15, 0<=n,
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, i+n==j, i<=15, 0<=n,
 //    n<=2}
 
             k = foo((j, n));
 
 //  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
-//    foo:0`l==k, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, j<=foo:0`l+15,
-//    i<=15}
+//    foo:0`l==k, foo:0`l==n, foo:0`l<=2, i<=15, i<=j}
 
             l = k;
 
 //  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
 //    foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2,
-//    j<=foo:0`l+15, i<=15}
+//    i<=15}
 
             printf("%d\n", l);
 
 //  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
 //    foo:0`l==k, foo:0`l==l, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2,
-//    j<=foo:0`l+15, i<=15}
+//    i<=15}
 
             j++;
          }

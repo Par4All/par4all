@@ -9,6 +9,9 @@ display PRINTED_FILE
 
 close
 shell cat mehdi01.database/Logfile|grep -i transformer
+delete mehdi01
+# Infinite recursion. You need a condition based on the existence or not of the database
+#shell tpips <mehdi01.tpips
 #delete mehdi01
 quit
 

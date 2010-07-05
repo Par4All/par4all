@@ -1477,33 +1477,33 @@ C    4<=I+J, J<=I, 1<=J, NP+1<=J, 2<=N, NT+1<=N}>
       SISMIN = SISMO(1,1)                                               0663
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=NT,
-C    K==51, KM+KP==3, NT+1<=N}>
+C    K==51, KM+KP==3, 2<=N, NT+1<=N}>
 
       DO 111 I = 1, NBTRAC                                              0664
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=NT, K==51,
-C    KM+KP==3, 1<=I, I<=50, NT+1<=N}>
+C    KM+KP==3, 1<=I, I<=50, 2<=N, NT+1<=N}>
 
          DO 121 J = 1, NT                                               0665
 
-C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=PHI2, PHI2<=NT,
-C    K==51, KM+KP==3, 1<=I, I<=50, NT+1<=N}>
+C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
+C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
 
             IF (SISMO(I,J).LT.SISMIN) THEN                              0666
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
-C    I<=50, 1<=J, J<=NT, NT+1<=N}>
+C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
 
                SISMIN = SISMO(I,J)                                      0667
             ENDIF
 
-C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=PHI2, PHI2<=NT,
-C    K==51, KM+KP==3, 1<=I, I<=50, NT+1<=N}>
+C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
+C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
 
             IF (SISMO(I,J).GT.SISMAX) THEN                              0669
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
-C    I<=50, 1<=J, J<=NT, NT+1<=N}>
+C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
 
                SISMAX = SISMO(I,J)                                      0670
             ENDIF

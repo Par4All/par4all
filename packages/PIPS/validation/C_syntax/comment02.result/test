@@ -6,12 +6,12 @@ PARSED PRINTED FILE FOR MODULE comment02!
 
 
 /* Comment of a function declaration */
-extern int filter(int x);
+int filter(int x);
 
 /* Comment of a function body*/
 extern int main();
 
-extern int filter(int x);
+int filter(int x);
 
 PARSED PRINTED FILE FOR MODULE main
 

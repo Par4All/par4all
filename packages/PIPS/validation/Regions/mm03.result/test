@@ -93,20 +93,18 @@ C  <C(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N, 1<=J, J<=N}>
          ENDDO
       ENDDO
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=I,
-C    N+1<=I}>
-C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=I,
-C    N+1<=I}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
 C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
 C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
 
 C     
       DO J = 1, N                                                       0018
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=I,
-C    N+1<=I, 1<=J, J<=N}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I,
+C    1<=J, J<=N}>
 C  <B(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    1<=I, N+1<=I}>
+C    N+1<=I}>
 C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
 C    N+1<=I}>
 C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
@@ -115,9 +113,9 @@ C    N+1<=I}>
          DO K = 1, N                                                    0019
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    1<=I, N+1<=I, 1<=J, J<=N}>
+C    N+1<=I, 1<=J, J<=N}>
 C  <B(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2,
-C    PHI2<=N, 1<=I, N+1<=I}>
+C    PHI2<=N, N+1<=I}>
 C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
 C    N+1<=I, 1<=K, K<=N}>
 C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,

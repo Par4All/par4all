@@ -80,17 +80,15 @@ C  P(I,J,K,L,N) {I==J, 5I==N+5, 1<=I, I<=10}
 
             DO 200 K = 1, 5                                             0010
 
-C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 5I<=N+5, 1<=K, K<=5}
+C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 5I<=N+5, K<=5}
 
                L = K                                                    0011
 
-C  P(I,J,K,L,N) {I==J, 5I+K==N+6, K==L, 1<=I, I<=10, 5I<=N+5, 1<=K,
-C    K<=5}
+C  P(I,J,K,L,N) {I==J, 5I+K==N+6, K==L, 1<=I, I<=10, 1<=K, K<=5}
 
                N = N+1                                                  0012
 
-C  P(I,J,K,L,N) {I==J, 5I+K==N+5, K==L, 1<=I, I<=10, 5I<=N+4, 1<=K,
-C    K<=5}
+C  P(I,J,K,L,N) {I==J, 5I+K==N+5, K==L, 1<=I, I<=10, 1<=K, K<=5}
 
 200            CONTINUE                                                 0013
          ENDIF

@@ -1,0 +1,14 @@
+delete global_extern
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create global_extern global_extern.c
+
+display PARSED_PRINTED_FILE[global_extern!]
+
+apply UNSPLIT
+shell gcc -c global_extern.database/Src/global_extern.c
+
+close
+# delete global_extern
+quit

@@ -70,12 +70,14 @@ C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1, 0<=I, I<=1}
       IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0007
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==1,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==1,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1}
 
       PRINT *, "First standard return from foo"                         0008
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==1,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==1,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1}
 
 
       CALL FOO(*123, I)                                                 0010
@@ -93,19 +95,22 @@ C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2, 1<=I, I<=2}
       IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0010
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
 C     This should not happen!
       PRINT *, "Second standard return from foo"                        0012
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
 
       PRINT *, 'STOP 0 in ALTRET01'                                     0014
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
       STOP 0                                                            0015
 
@@ -164,12 +169,14 @@ C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1, 0<=I, I<=1}
       IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0007
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==1,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==1,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1}
 
       PRINT *, "First standard return from foo"                         0008
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==1,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==1,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==1}
 
 
       CALL FOO(*123, I)                                                 0010
@@ -187,19 +194,22 @@ C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2, 1<=I, I<=2}
       IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0010
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
 C     This should not happen!
       PRINT *, "Second standard return from foo"                        0012
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
 
       PRINT *, 'STOP 0 in ALTRET01'                                     0014
 
 C  P(I,I_PIPS_RETURN_CODE_,SET_I_PIPS_RETURN_CODE_:IRC_SHARED) {I==2,
-C    I_PIPS_RETURN_CODE_==0, SET_I_PIPS_RETURN_CODE_:IRC_SHARED==0}
+C    I+I_PIPS_RETURN_CODE_==2,
+C    I+SET_I_PIPS_RETURN_CODE_:IRC_SHARED==2}
 
       STOP 0                                                            0015
 

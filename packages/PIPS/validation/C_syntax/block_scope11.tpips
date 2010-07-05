@@ -2,10 +2,11 @@
 
 delete block_scope11
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# To avoid compilation warnings
+# setproperty ABORT_ON_USER_ERROR TRUE
 
-# create block_scope11 block_scope11.src/main.c block_scope11.src/global.c
-create block_scope11 block_scope11.src/main.c
+create block_scope11 block_scope11.src/main.c block_scope11.src/global.c
+# create block_scope11 block_scope11.src/main.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
@@ -22,38 +23,44 @@ echo Symbol table for "main"
 echo
 
 display SYMBOL_TABLE_FILE[main]
-quit
-display SYMBOL_TABLE_FILE[main!]
+
+# Removed because I now include stdio.h to execute the resulting code
+# display SYMBOL_TABLE_FILE[main!]
+
 echo
 display SYMBOL_TABLE_FILE[main!foo]
 echo
 
 
-echo
-echo Parser output
-echo
-
-display PARSED_PRINTED_FILE[block_scope11!]
-echo
-display PARSED_PRINTED_FILE[block_scope11!block_scope11]
+#echo
+#echo Parser output
+#echo
+#
+#display PARSED_PRINTED_FILE[block_scope11!]
+#echo
+#display PARSED_PRINTED_FILE[block_scope11!block_scope11]
 # quit
 
-echo
-echo Parser output
-echo
+#echo
+#echo Parser output
+#echo
 
-display PARSED_PRINTED_FILE[block_scope11!]
-echo
-display PARSED_PRINTED_FILE[block_scope11!block_scope11]
+#display PARSED_PRINTED_FILE[block_scope11!]
+#echo
+#display PARSED_PRINTED_FILE[block_scope11!block_scope11]
 
-echo
-echo Controlizer output
-echo
+#echo
+#echo Controlizer output
+#echo
 
-display PRINTED_FILE[block_scope11!block_scope11]
+#display PRINTED_FILE[block_scope11!block_scope11]
+
+apply UNSPLIT[%ALL]
+
+shell gcc block_scope11.database/Src/main.c block_scope11.database/Src/global.c -o block_scope11.database/a.out
+shell block_scope11.database/a.out
 
 close
 
-delete block_scope11
-
-
+#delete block_scope11
+quit
