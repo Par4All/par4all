@@ -1034,13 +1034,14 @@ entity FindOrCreateCurrentEntity(string name,
 		pips_assert("el is a pure entity list", entity_list_p(el));
 	      }
 	    }
-	  else if(strstr(full_scope,TOP_LEVEL_MODULE_NAME)!=NULL)
-	    if(!compilation_unit_entity_p(function=get_current_module_entity()))
+	  else if(strstr(full_scope,TOP_LEVEL_MODULE_NAME)!=NULL){
+	    if(!compilation_unit_entity_p(function=get_current_module_entity())) 
 	      if(type_undefined_p(entity_type(ent))
 		 || !type_functional_p(entity_type(ent))) {
 	    /* This variable is declared extern within a function
 	       body. */
 	    AddToExterns(ent, function);
+          }
 	  }
 	  else {
 	    /* Impossible: this is not detected here  */
