@@ -178,16 +178,18 @@ If some files are lacking from the commit, it will be detected.
 Afterwards you can do a \texttt{git push} into the central \Apfa
 repository with less risks.
 
-The classical \Aautotools environment variables can be used to
-influence\marginpar{More proof-reading needed here!}
-the compilation. The most important one are \texttt{CFLAGS} and
-\texttt{CPPFLAGS} to compile \Apfa in debug mode. For example,
+The classical \Aautotools environment variables can be used to influence
+the compilation but some are directly set up from the \verb|p4a_setup|
+script. So, if you want to set the \texttt{CFLAGS} and \texttt{CPPFLAGS}
+to compile \Apfa in debug mode you should pass their value change through
+a \verb|p4a_setup| option, for example with
 \begin{verbatim}
-export CFLAGS='-ggdb -g3 -Wall -std=c99'
+--configure-options="CFLAGS='-ggdb -g3 -Wall -std=c99'"
 \end{verbatim}
-are good debugging options (to set \emph{before} using the \Aautotools,
-that is, \emph{before} using \verb|p4a_setup|) that allow \texttt{gdb} to
-access macro definitions that are heavily used in \Apips.
+to set good debugging options that allow \texttt{gdb} to access macro
+definitions that are heavily used in \Apips. Indeed this case is so common
+when debugging \Apfa that the \verb|--debug| or \verb|-g| options are just
+doing this for simplicity.
 
 You can pass some options to \verb|p4a_setup| to modify the
 installation process as explained in \S~\ref{sec:p4a_s-comp-script} for

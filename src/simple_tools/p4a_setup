@@ -42,10 +42,6 @@ def main():
         p4a_setup.main(options, args)
 
 
-def suggest_RC():
-    suggest("You may try running again with --rebuild --clean (-RC)")
-
-
 if __name__ == "__main__":
     try:
         main()

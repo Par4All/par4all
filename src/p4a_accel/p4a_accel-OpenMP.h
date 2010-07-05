@@ -10,10 +10,11 @@
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
+
+    This work is done under MIT license.
 */
 
-/* License BSD */
-
+/* Do not include twice this file: */
 #ifndef P4A_ACCEL_OPENMP_H
 #define P4A_ACCEL_OPENMP_H
 
@@ -27,7 +28,7 @@ struct timeval p4a_time_begin, p4a_time_end;
     coordinates in OpenMP because we need to pass a local variable to a
     function without passing it in the arguments.
 
-    Use thead local storage to have it local to each OpenMP thread.
+    Use thead local storage (TLS) to have it local to each OpenMP thread.
  */
 extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
@@ -37,20 +38,19 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     @{
 */
 
-/** Start a timer on the accelerator */
+/** Start a timer on the host for OpenMP implementation */
 #define P4A_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
 /** @} */
 
-/** @defgroup P4A_init Initialization of P4A C to OpenMP
+/** @defgroup P4A_init_OpenMP Initialization of P4A C to OpenMP
 
     @{
 */
 
-/** Associate the program to the accelerator
+/** Associate the program to the accelerator as OpenMP
 
-    Initialized the use of the hardware accelerator
-
-    Nothing to do
+    Initialized the use of the hardware accelerator: nothing to do since
+    there is no accelerator, only OpenMP with local processors...
 */
 #define P4A_init_accel
 
@@ -64,30 +64,33 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 /** @} */
 
 
-/** A declaration attribute of a hardware-accelerated kernel
+/** A declaration attribute of a hardware-accelerated kernel in OpenMP
 
-    Nothing by default
+    Nothing by default for OpenMP since it is normal C
 */
 #define P4A_accel_kernel
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
-    the host
+    the host in OpenMP
 
-    Nothing by default
+    Nothing by default since it is homogeneous programming model
 */
 #define P4A_accel_kernel_wrapper
 
 
-/** Get the coordinate of the virtual processor in X (first) dimension */
+/** Get the coordinate of the virtual processor in X (first) dimension in
+    OpenMP emulation */
 #define P4A_vp_0 P4A_vp_coordinate[0]
 
 
-/** Get the coordinate of the virtual processor in Y (second) dimension */
+/** Get the coordinate of the virtual processor in Y (second) dimension in
+    OpenMP emulation */
 #define P4A_vp_1 P4A_vp_coordinate[1]
 
 
-/** Get the coordinate of the virtual processor in Z (second) dimension */
+/** Get the coordinate of the virtual processor in Z (second) dimension in
+    OpenMP emulation */
 #define P4A_vp_2 P4A_vp_coordinate[2]
 
 
@@ -96,7 +99,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     @{
 */
 
-/** Allocate memory on the hardware accelerator
+/** Allocate memory on the hardware accelerator in OpenMP emulation.
 
     For OpenMP it is on the host too
 
@@ -109,7 +112,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
   *(void **)address = malloc(size)
 
 
-/** Free memory on the hardware accelerator
+/** Free memory on the hardware accelerator in OpenMP emulation.
 
     It is on the host too
 
@@ -120,7 +123,8 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
   free(address)
 
 
-/** Copy memory from the host to the hardware accelerator
+/** Copy memory from the host to the hardware accelerator in OpenMP
+    emulation.
 
     Since it is an OpenMP implementation, use standard memory copy
     operations
@@ -140,7 +144,8 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
   memcpy(accel_address, host_address, size)
 
 
-/** Copy memory from the hardware accelerator to the host.
+/** Copy memory from the hardware accelerator to the host in OpenMP
+    emulation.
 
     Since it is an OpenMP implementation, use standard memory copy
     operations
@@ -168,69 +173,78 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     @{
 */
 
-/** Call a CUDA kernel on the accelerator.
+/** Call a CUDA like kernel with an OpenMP implementation.
 
     An API for full call control. For simpler usage: @see
     P4A_call_accel_kernel_1d, @see P4A_call_accel_kernel_2d, @see
     P4A_call_accel_kernel_3d
 
-    This transform for example:
-
-    P4A_call_accel_kernel((pips_accel_1, 1, pips_accel_dimBlock_1),
-                          (*accel_imagein_re, *accel_imagein_im));
-
-    into:
-
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); __cutilCheckMsg ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
+    This is not yet implemented. Ask for it if you really want it (that is
+    you need the dim3 grids of blocks and blocks of threads). Right now
+    only the functions useful for codegeneration from PIPS has been
+    implemented.
 */
-#define P4A_call_accel_kernel(context, parameters)
-
+#define P4A_call_accel_kernel(context, parameters) \
+  error "P4A_call_accel_kernel not yet implemented"
 /* @} */
 
 
-/** CUDA kernel invocation.
+/** CUDA kernel invocation with an OpenMP implementation.
 
-    Generate something like "kernel<<<block_dimension,thread_dimension>>>"
+    Generate something like "kernel<<<block_dimension,thread_dimension>>>
+
+    This is not yet implemented.
 */
-#define P4A_call_accel_kernel_context(kernel, ...)
+#define P4A_call_accel_kernel_context(kernel, ...) \
+  error "P4A_call_accel_kernel_context not yet implemented"
 
 
-/** Add CUDA kernel parameters for invocation.
+/** Add CUDA kernel parameters for invocation with an OpenMP
+    implementation.
 
-    Simply add them in parenthesis.  Well, this could be done without
-    variadic arguments... Just for fun. :-)
+    This is not yet implemented.
 */
-#define P4A_call_accel_kernel_parameters(...)
+#define P4A_call_accel_kernel_parameters(...) \
+  error "P4A_call_accel_kernel_parameters not yet implemented"
 
 
 /** Creation of block and thread descriptors */
 
-/** Allocate the descriptors for a linear set of thread with a
-    simple strip-mining
+/** Allocate the descriptors for a linear set of thread with a simple
+    strip-mining with an OpenMP implementation.
 */
 #define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 size)
+					 size) \
+  error "P4A_create_1d_thread_descriptors not yet implemented"
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
-    strip-mining in each dimension
+    strip-mining in each dimension with an OpenMP implementation.
 */
 #define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 n_x_iter, n_y_iter)
+					 n_x_iter, n_y_iter) \
+  error "P4A_create_2d_thread_descriptors not yet implemented"
 
 
-/** Dump a CUDA dim3 descriptor with an introduction message */
-#define P4A_dump_descriptor(message, descriptor_name)
+/** Dump a CUDA dim3 descriptor with an introduction message with an
+    OpenMP implementation.
+*/
+#define P4A_dump_descriptor(message, descriptor_name) \
+  error "P4A_dump_descriptor not yet implemented"
 
 
-/** Dump a CUDA dim3 block descriptor */
-#define P4A_dump_block_descriptor(descriptor_name)
+/** Dump a CUDA dim3 block descriptor with an OpenMP implementation.
+*/
+#define P4A_dump_block_descriptor(descriptor_name) \
+  error "P4A_dump_block_descriptort not yet implemented"
 
 
-/** Dump a CUDA dim3 grid descriptor */
-#define P4A_dump_grid_descriptor(descriptor_name)
+/** Dump a CUDA dim3 grid descriptor with an OpenMP implementation.
+*/
+#define P4A_dump_grid_descriptor(descriptor_name) \
+  error "P4A_dump_grid_descriptor not yet implemented"
 
 
 /** @addtogroup P4A_cuda_kernel_call
@@ -238,7 +252,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     @{
 */
 
-/** Call a kernel in a 1-dimension parallel loop
+/** Call a kernel in a 1-dimension parallel loop with OpenMP emulation.
 
     Translate it into an OpenMP parallel loop
 
@@ -258,7 +272,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
   }
 
 
-/** Call a kernel in a 2-dimension parallel loop
+/** Call a kernel in a 2-dimension parallel loop with OpenMP emulation.
 
     Translate it into an OpenMP parallel loop-nest
 
@@ -277,13 +291,12 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
       P4A_vp_0 = P4A_index_x;						\
       P4A_vp_1 = P4A_index_y;						\
       P4A_vp_2 = 0;							\
-     kernel(__VA_ARGS__);						\
+      kernel(__VA_ARGS__);						\
     }									\
   }
 
 
-
-/** Call a kernel in a 3-dimension parallel loop
+/** Call a kernel in a 3-dimension parallel loop with OpenMP emulation.
 
     Translate it into an OpenMP parallel loop-nest
 

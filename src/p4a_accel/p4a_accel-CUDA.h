@@ -1,6 +1,3 @@
-#ifndef P4A_ACCEL_CUDA_H
-#define P4A_ACCEL_CUDA_H
-
 /** @file
 
     API of Par4All C to CUDA
@@ -13,9 +10,13 @@
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
+
+    This work is done under MIT license.
 */
 
-/* BSD License */
+/* Do not include twice this file: */
+#ifndef P4A_ACCEL_CUDA_H
+#define P4A_ACCEL_CUDA_H
 
 #include <cutil_inline.h>
 #include <cuda.h>
@@ -25,9 +26,9 @@
     @{
 */
 
-/** Parameters used to choose thread allocation per blocks
+/** Parameters used to choose thread allocation per blocks in CUDA
 
-    This allow to chosse the size of the blocks of threads in 1,2 and 3D.
+    This allow to choose the size of the blocks of threads in 1,2 and 3D.
 
     If there is not enough iterations to fill an expected block size in a
     dimension, the block size is indeed the number of iteration in this
@@ -76,16 +77,16 @@
 
 /** @} */
 
-/** Events for timing: */
+/** Events for timing in CUDA: */
 extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
 
-/** @defgroup P4A_init Initialization of P4A C to CUDA
+/** @defgroup P4A_init_CUDA Initialization of P4A C to CUDA
 
     @{
 */
 
-/** Associate the program to the accelerator
+/** Associate the program to the accelerator in CUDA
 
     Initialized the use of the hardware accelerator
 
@@ -98,7 +99,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   } while (0);
 
 
-/** Release the hardware accelerator as OpenMP
+/** Release the hardware accelerator in CUDA
 
     Nothing to do
 */
@@ -112,29 +113,36 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @{
 */
 
-/** Start a timer on the accelerator */
+/** Start a timer on the accelerator in CUDA */
 #define P4A_accel_timer_start cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
 
 /** @} */
 
 
 
-/** A declaration attribute of a hardware-accelerated kernel called from
-    the GPU it-self */
+/** A declaration attribute of a hardware-accelerated kernel in CUDA
+    called from the GPU it-self
+*/
 #define P4A_accel_kernel __device__
 
 /** A declaration attribute of a hardware-accelerated kernel called from
-    the host */
+    the host in CUDA */
 #define P4A_accel_kernel_wrapper __global__
 
 
-/** Get the coordinate of the virtual processor in X (first) dimension */
+/** Get the coordinate of the virtual processor in X (first) dimension in
+    CUDA
+*/
 #define P4A_vp_0 (blockIdx.x*blockDim.x + threadIdx.x)
 
-/** Get the coordinate of the virtual processor in Y (second) dimension */
+/** Get the coordinate of the virtual processor in Y (second) dimension in
+    CUDA
+*/
 #define P4A_vp_1 (blockIdx.y*blockDim.y + threadIdx.y)
 
-/** Get the coordinate of the virtual processor in Z (second) dimension */
+/** Get the coordinate of the virtual processor in Z (second) dimension in
+    CUDA
+*/
 #define P4A_vp_2 (blockIdx.z*blockDim.z + threadIdx.z)
 
 
@@ -143,7 +151,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @{
 */
 
-/** Allocate memory on the hardware accelerator
+/** Allocate memory on the hardware accelerator in CUDA.
 
     @param[out] address is the address of a variable that is updated by
     this macro to contains the address of the allocated memory block
@@ -154,7 +162,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   cutilSafeCall(cudaMalloc((void **)address, size))
 
 
-/** Free memory on the hardware accelerator
+/** Free memory on the hardware accelerator in CUDA
 
     @param[in] address is the address of a previously allocated memory zone on
     the hardware accelerator
@@ -163,7 +171,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   cutilSafeCall(cudaFree(address))
 
 
-/** Copy memory from the host to the hardware accelerator
+/** Copy memory from the host to the hardware accelerator in CUDA.
 
     Do not change the place of the pointers in the API. The host address
     is always in the first position...
@@ -181,7 +189,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 			   size,				\
 			   cudaMemcpyHostToDevice))
 
-/** Copy memory from the hardware accelerator to the host.
+/** Copy memory from the hardware accelerator to the host in CUDA.
 
     Do not change the place of the pointers in the API. The host address
     is always in the first position...
@@ -214,7 +222,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     P4A_call_accel_kernel_1d, @see P4A_call_accel_kernel_2d, @see
     P4A_call_accel_kernel_3d
 
-    This transform for example:
+    This transforms for example:
 
     P4A_call_accel_kernel((pips_accel_1, 1, pips_accel_dimBlock_1),
                           (*accel_imagein_re, *accel_imagein_im));
@@ -253,10 +261,10 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   (__VA_ARGS__)
 
 
-/** Creation of block and thread descriptors */
+/** Creation of block and thread descriptors for CUDA */
 
 /** Allocate the descriptors for a linear set of thread with a
-    simple strip-mining
+    simple strip-mining for CUDA
 */
 #define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
@@ -271,7 +279,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
-    strip-mining in each dimension
+    strip-mining in each dimension for CUDA
 */
 #define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
@@ -311,7 +319,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @{
 */
 
-/** Call a kernel in a 1-dimension parallel loop
+/** Call a kernel in a 1-dimension parallel loop in CUDA
 
     @param[in] kernel to call
 
@@ -329,7 +337,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   } while (0)
 
 
-/** Call a kernel in a 2-dimension parallel loop
+/** Call a kernel in a 2-dimension parallel loop in CUDA
 
     @param[in] kernel to call
 

@@ -16,6 +16,7 @@ from p4a_process import *
 from p4a_builder import *
 from p4a_git import *
 from p4a_version import *
+from p4a_opts import *
 
 
 def add_module_options(parser):
@@ -127,7 +128,7 @@ def add_module_options(parser):
     compile_group.add_option("--cxx-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify flags to pass to the C++ compiler. Several are allowed. By default, C flags (--c-flags) are also passed to the C++ compiler.")
 
-    compile_group.add_option("--nvcc_flags", action = "append", metavar = "FLAGS", default = [],
+    compile_group.add_option("--nvcc-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify flags to pass to the NVCC compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
 
     compile_group.add_option("--fortran-flags", action = "append", metavar = "FLAGS", default = [],
@@ -137,7 +138,7 @@ def add_module_options(parser):
         help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
 
     compile_group.add_option("--arch", "-m", metavar = "32|64", default = None,
-        help = "Specify compilation target architecture (defaults to current native architecture).")
+        help = "Specify compilation target architecture (defaults to current host architecture).")
 
     compile_group.add_option("--keep-build-dir", "-K", action = "store_true", default = False,
         help = "Do not remove build directory after compilation. If an error occurs, it will not be removed anyways.")
@@ -246,7 +247,7 @@ def main(options, args = []):
     # Put all files not supported by the p4a_processor class in a separate list.
     for file in args:
         abs_file = os.path.abspath(os.path.expanduser(file))
-        if not os.path.exists(abs_file):
+        if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
             die("Invalid/missing input file: " + abs_file)
         # Check if file has the .p4a suffix, and skip it it is the case:
         if change_file_ext(abs_file, "").endswith(".p4a"):
@@ -263,6 +264,7 @@ def main(options, args = []):
             if os.path.split(review_file)[1] == os.path.split(abs_file)[1]:
                 error(review_file + " has same name as " + abs_file)
                 die("PIPS does not accept several files with same name")
+        report_add_file(file)
         ext = get_file_ext(abs_file)
         if c_file_p(file) or fortran_file_p(file):
             files.append(abs_file)
@@ -275,6 +277,12 @@ def main(options, args = []):
             info("Ignoring header file: " + abs_file)
         else:
             die("File format not supported: " + abs_file)
+
+    for file in options.extra:
+        abs_file = os.path.abspath(os.path.expanduser(file))
+        if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
+            die("Invalid/missing extra file: " + abs_file)
+        report_add_file(file)
 
     # If no project name is provided, try some random names.
     # XXX: would be good to be able to specify the location for the .database and .build dir?
@@ -436,6 +444,7 @@ def main(options, args = []):
 
     for file in processed_files:
         done("Generated " + file, level = 1)
+        report_add_file(file)
 
     if len(options.output_file) == 0:
         if options.cmake or options.cmake_gen or options.cmake_build:
@@ -454,6 +463,7 @@ def main(options, args = []):
 
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
+        report_add_file(os.path.join(options.cmake_dir, "CMakeLists.txt"))
         if options.cmake:
             builder.cmake_write(project_name, all_buildable_files + header_files,
                 output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)

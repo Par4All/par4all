@@ -51,7 +51,10 @@ def add_module_options(parser):
     group.add_option("--only", "-o", metavar = "PACKAGE", action = "append", default = [],
         help = "Build only the selected package. Overrides any other option.")
 
-    group.add_option("--root", "-r", metavar = "DIR", default = None,
+    group.add_option("--reconf", "-r", metavar = "PACKAGE", action = "append", default = [],
+        help = "Always run autoreconf and configure selected packages. By default, only packages which lack a Makefile will be reconfigured. If --rebuild is specified, all packages will be reconfigured.")
+
+    group.add_option("--root", metavar = "DIR", default = None,
         help = "Specify the directory for the Par4All source tree. The default is to use the source tree from which this script comes.")
 
     group.add_option("--packages-dir", "--package-dir", "-P", metavar = "DIR", default = None,
@@ -124,9 +127,6 @@ def add_module_options(parser):
     group.add_option("--no-final", "-F", action = "store_true", default = False,
         help = "Skip final installations steps in install directory (installation of various files). NB: never running the final installation step will not give you a functional Par4All build.")
 
-    group.add_option("--reconf", action = "store_true", default = False,
-        help = "Always run autoreconf before running configure for all packages.")
-
     parser.add_option_group(group)
 
 
@@ -136,23 +136,14 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     configure_script = os.path.join(package_dir, "configure")
     makefile = os.path.join(build_dir, "Makefile")
 
-    configure = False
-
-    if not os.path.exists(configure_script):
+    if (not os.path.exists(configure_script) 
+        or not os.path.isdir(build_dir)
+        or not os.path.exists(makefile)):
         reconf = True
-        configure = True
 
-    if not os.path.isdir(build_dir):
-        configure = True
-        os.makedirs(build_dir)
-
-    if not configure and not os.path.exists(makefile):
-        configure = True
-
-    if configure:
-        if reconf:
-            # Call autoconf to generate the configure utility.
-            run([ "autoreconf", "--install" ], working_dir = package_dir)
+    if reconf:
+        # Call autoconf to generate the configure utility.
+        run([ "autoreconf", "--install" ], working_dir = package_dir)
         #~ if dest_dir:
             #~ configure_opts += [ "DESTDIR=" + dest_dir ]
         # Call configure to generate the Makefiles.
@@ -172,6 +163,9 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 
 
 def main(options, args = []):
+    
+    if args:
+        die("No arguments are accepted by this script, only options")
 
     actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
     script_dir = os.path.split(actual_script)[0]
@@ -226,6 +220,27 @@ def main(options, args = []):
         options.skip_linear = False
         options.skip_pips = False
         options.rebuild = True
+
+    options.reconf_polylib = False
+    options.reconf_newgen = False
+    options.reconf_linear = False
+    options.reconf_pips = False
+    for s in options.reconf:
+        if s == "polylib":
+            options.reconf_polylib = True
+        elif s == "newgen":
+            options.reconf_newgen = True
+        elif s == "linear":
+            options.reconf_linear = True
+        elif s == "pips":
+            options.reconf_pips = True
+        elif s == "all":
+            options.reconf_polylib = True
+            options.reconf_newgen = True
+            options.reconf_linear = True
+            options.reconf_pips = True
+        else:
+            die("Invalid option: --reconf=" + s)
 
     # Initialize main variables and set defaults.
     # "root" is the Par4All source root directory.
@@ -403,7 +418,7 @@ def main(options, args = []):
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir,
-            install = not options.no_install, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf_polylib)
 
     ##############################
 
@@ -445,7 +460,7 @@ def main(options, args = []):
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir,
-            install = not options.no_install, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf_newgen)
 
     ##############################
 
@@ -483,7 +498,7 @@ def main(options, args = []):
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir,
-            install = not options.no_install, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf_linear)
 
     ##############################
 
@@ -560,7 +575,7 @@ def main(options, args = []):
 
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
-            install = not options.no_install, reconf = options.reconf)
+            install = not options.no_install, reconf = options.reconf_pips)
 
 
     ##############################
