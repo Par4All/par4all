@@ -30,14 +30,8 @@ echo
 
 display PARSED_PRINTED_FILE[decl14!]
 
-echo
-echo Parsed rinted file for "decl14"
-echo
-
-display PARSED_PRINTED_FILE[decl14]
-
 apply UNSPLIT
-shell cc -c decl14.database/Src/decl14.c
+shell cc -c decl14.database/Src/decl14.c -o decl14.database/Src/decl14.o
 
 
 close

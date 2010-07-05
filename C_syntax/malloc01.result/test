@@ -20,8 +20,11 @@ Variable list:
 	Declared entity "malloc01:0`__FUNCTION__" with type "variable" "char *"
 	Declared entity "malloc01:0`__func__" with type "variable" "char *"
 
-* empty extern declaration list *
+External variable list:
 
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> void *"
+	Declared external entity "TOP-LEVEL:bar"	with type "functional" "void -> void *"
+	Declared external entity "TOP-LEVEL:f"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 

@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "decl19!:*STACK*" with type "area" with size 0
 	Declared entity "decl19!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:decl19"	with type "functional" "int -> int"
 
 Typedef entities:
 
@@ -115,9 +114,9 @@ typedef int f(int cookie);
 
 typedef int (*g)(int);
 
-extern int decl19(int cookie);
+int decl19(int cookie);
 
-extern int decl19(int cookie);
+int decl19(int cookie);
 
 int decl19(int cookie)
 {

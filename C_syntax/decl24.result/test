@@ -13,30 +13,30 @@ typedef struct _hdl_progress_handler {
 
 /*extern void HDL_display(HDL_progress_handler *prog); */
 
-extern void HDL_progress_display(HDL_progress_handler *prog);
+void HDL_progress_display(HDL_progress_handler *prog);
 
 
 
-extern void HDL_progress_progress(HDL_progress_handler *prog, const int nbfait, const int nbtotal);
+void HDL_progress_progress(HDL_progress_handler *prog, const int nbfait, const int nbtotal);
 
-extern void *HDL_progress_end(HDL_progress_handler *prog);
+void *HDL_progress_end(HDL_progress_handler *prog);
 
-extern void HDL_progress_display(HDL_progress_handler *prog);
+void HDL_progress_display(HDL_progress_handler *prog);
 
 //void HDL_progress_display(HDL_progress_handler *prog)
 //{
 //}
 
-extern void HDL_progress_progress(HDL_progress_handler *prog, const int nbfait, const int nbtotal);
+void HDL_progress_progress(HDL_progress_handler *prog, const int nbfait, const int nbtotal);
 
 //void HDL_progress_progress(HDL_progress_handler *prog, const int nbfait, const int nbtotal)
 //{
 //}
 
 
-extern void *HDL_progress_end(HDL_progress_handler *prog);
+void *HDL_progress_end(HDL_progress_handler *prog);
 
-extern void *HDL_progress_end(HDL_progress_handler *prog);
+void *HDL_progress_end(HDL_progress_handler *prog);
 
 extern void HDL_progress_start_monitor(HDL_progress_handler *progress);
 

@@ -20,7 +20,7 @@ int main()
  */
 /* Check PIPS behavior when source file names conflict*/
 
-extern int conflict01();
+int conflict01();
 int conflict01()
 {
 }

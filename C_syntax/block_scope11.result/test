@@ -18,8 +18,9 @@ Variable list:
 	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "main:main" with type "variable" "int"
 
-* empty extern declaration list *
+External variable list:
 
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
 
 Layout for return variable:
 
@@ -28,7 +29,14 @@ Layout for return variable:
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
-	* empty area *
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
 
 
 Layout for memory area "main!:*STATIC*" of size 0:
@@ -52,4 +60,59 @@ Layout for memory area "main:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module main
+
+
+main!foo
+
+Declarations for module "main!foo" with type "void -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "main!:*STATIC*" with type "area" with size 0
+	Declared entity "main!foo:*DYNAMIC*" with type "area" with size 8
+	Declared entity "main!foo:*HEAP*" with type "area" with size 0
+	Declared entity "main!foo:*STACK*" with type "area" with size 0
+	Declared entity "main!foo:*STATIC*" with type "area" with size 0
+	Declared entity "main!foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main!foo:0`__func__" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
+
+
+Layout for memory area "main!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main!foo:*DYNAMIC*" of size 8:
+	Variable "main!foo:0`__func__"	offset = 0	size = 4
+	Variable "main!foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "main!foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main!foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main!foo:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main!foo
+
 

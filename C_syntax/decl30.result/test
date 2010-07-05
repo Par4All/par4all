@@ -33,8 +33,9 @@ Variable list:
 	Declared entity "decl30:0`x" with type "variable" "double[] *"
 	Declared entity "decl30:0`z" with type "variable" "double"
 
-* empty extern declaration list *
+External variable list:
 
+	Declared external entity "TOP-LEVEL:mymalloc"	with type "functional" "int -> void *"
 
 Layouts for memory areas:
 

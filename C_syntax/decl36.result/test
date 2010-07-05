@@ -14,11 +14,11 @@ PRINTED FILE for "decl36!"
  * Problem shown in C_syntax/tpips.tpips
 */
 
-extern void decl36(int i);
+void decl36(int i);
 
-extern void decl36(int i);
+void decl36(int i);
 
 extern int main();
 
-extern void decl36(int i);
+void decl36(int i);
 
