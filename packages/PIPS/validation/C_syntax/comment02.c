@@ -7,15 +7,15 @@ int filter();
 
 /* Comment of a function body*/
 int  main()
-{ 
+{
   /* Declaration comment */
   int i;
   int j;
 
   j = filter(i);  // Function call comment
   i = j;
-}   
-  
+}
+
 int  filter(int x)
 {
   int y;

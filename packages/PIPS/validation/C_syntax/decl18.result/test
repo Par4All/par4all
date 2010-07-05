@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "decl18!:*STACK*" with type "area" with size 0
 	Declared entity "decl18!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:decl18"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -100,11 +99,11 @@ Parsed printed file for "decl18!" and "decl18"
 
 /* This OK with gcc -ansi -pedantic */
 
-extern void decl18(int iarg2);
+void decl18(int iarg2);
 
-extern void decl18(int iarg2);
+void decl18(int iarg2);
 
-extern void decl18(int iarg2);
+void decl18(int iarg2);
 
 void decl18(int iarg2)
 {

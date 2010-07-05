@@ -71,7 +71,7 @@ C  T() {2N==NN, 1<=I, I+1<=J, I<=2N, 1<=N}
             DATA(I+1) = TEMPI                                           0034
          ENDIF
 
-C  T(M) {M==N, 2M==NN, 1<=I, I<=2M, 1<=M}
+C  T(M) {M==N, 2N==NN, 1<=I, I<=2N, 1<=N}
 
          M = NN/2                                                       0036
 
@@ -388,37 +388,37 @@ C    1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                J = I+MMAX                                               0058
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
-C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN,
+C    I+2<=J, I+M<=J, J+1<=I+2N, M<=I, I<=2N, 1<=M, MMAX+2<=4N, 1<=N}
 
                TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)              0059
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                TEMPI = SNGL(WR)*DATA(J+1)+SNGL(WI)*DATA(J)              0060
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                DATA(J) = DATA(I)-TEMPR                                  0061
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                DATA(J+1) = DATA(I+1)-TEMPI                              0062
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                DATA(I) = DATA(I)+TEMPR                                  0063
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
                DATA(I+1) = DATA(I+1)+TEMPI                              0064
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN, M<=I,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {2I+ISTEP==2J, I+MMAX==J, 2N==NN, M<=I,
 C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
 12             CONTINUE                                                 0065
@@ -429,27 +429,27 @@ C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WTEMP = WR                                                  0066
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WR = WR*WPR-WI*WPI+WR                                       0067
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WI = WI*WPR+WTEMP*WPI+WI                                    0068
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
 13          CONTINUE                                                    0069
 
 C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
-C    M+2MMAX<=I+2, I<=2MMAX+2N, 2N+1<=I, 3<=M, MMAX+1<=M, M<=MMAX+2,
-C    2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
+C    I+M<=J+2MMAX+2, M+2MMAX<=I+2, I<=2MMAX+2N, 2N+1<=I, 3<=M,
+C    MMAX+1<=M, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
          MMAX = ISTEP                                                   0070
       ENDIF

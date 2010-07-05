@@ -34,7 +34,7 @@ extern int bar_d(int k);
 
 static int bar_c(int k);
 
-extern int bar_b(int k);
+int bar_b(int k);
 int bar_e(int k)
 {
    return k+5;

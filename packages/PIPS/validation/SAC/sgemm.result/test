@@ -5607,7 +5607,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l_1;
   int l_0;
   static const float size = 10;
-  ;
   int i;
   int j;
   int l;

@@ -19,12 +19,12 @@ C  T(W) {W==0}
 
       W = 0                                                             0008
 
-C  T(I,R,W) {R+W==R#init+W#init, W#init+1<=I+W, W+1<=I+W#init}
+C  T(I,R,W) {R+W==R#init+W#init, R#init+1<=I+R, R+1<=I+R#init}
 
 
       DO I = 1, L                                                       0010
 
-C  T(R,W) {R+W==R#init+W#init, W#init<=W+1, W<=W#init+1}
+C  T(R,W) {R+W==R#init+W#init, R#init<=R+1, R<=R#init+1}
 
          IF (X.GT.0) THEN                                               0011
 
@@ -129,12 +129,12 @@ C  T(W) {W==0}
 
       W = 0                                                             0008
 
-C  T(I,R,W) {R+W==R#init+W#init, W#init+1<=I+W, W+1<=I+W#init}
+C  T(I,R,W) {R+W==R#init+W#init, R#init+1<=I+R, R+1<=I+R#init}
 
 
       DO I = 1, L                                                       0010
 
-C  T(R,W) {R+W==R#init+W#init, W#init<=W+1, W<=W#init+1}
+C  T(R,W) {R+W==R#init+W#init, R#init<=R+1, R<=R#init+1}
 
          IF (X.GT.0) THEN                                               0011
 

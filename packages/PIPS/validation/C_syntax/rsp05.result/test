@@ -4,21 +4,21 @@ PARSED PRINTED FILE FOR MODULE resp05!
 /* #include <stdio.h> */
 
 
-extern int convold1(int X[13][13], int coeff[6], int i, int j);
-extern int convold2(int H[8][13], int coeff[6], int i, int j);
-extern int filtre(int H[8][13], int K[8][8], int i, int j);
-extern void init_coeff(int COEFF[6]);
+int convold1(int X[13][13], int coeff[6], int i, int j);
+int convold2(int H[8][13], int coeff[6], int i, int j);
+int filtre(int H[8][13], int K[8][8], int i, int j);
+void init_coeff(int COEFF[6]);
 
 extern int main();
 
 
-extern void init_coeff(int COEFF[6]);
+void init_coeff(int COEFF[6]);
 
-extern int convold1(int X[13][13], int coeff[6], int i, int j);
+int convold1(int X[13][13], int coeff[6], int i, int j);
 
-extern int convold2(int H[8][13], int coeff[6], int i, int j);
+int convold2(int H[8][13], int coeff[6], int i, int j);
 
-extern int filtre(int H[8][13], int K[8][8], int i, int j);
+int filtre(int H[8][13], int K[8][8], int i, int j);
 
 PRINTED FILE FOR main
 

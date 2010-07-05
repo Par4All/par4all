@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for (i = 0;i<501;i++)
+      /* It is not parallelized since the 4 corners are written twice indeed: */
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
    return 0;
 }
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
+      /* It is not parallelized since the 4 corners are written twice indeed: */
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
    return 0;
 }
@@ -27,6 +29,7 @@ int main(int argc, char *argv[])
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
+      /* It is not parallelized since the 4 corners are written twice indeed: */
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
    return 0;
 }
@@ -36,6 +39,7 @@ int main(int argc, char *argv[])
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
+      /* It is not parallelized since the 4 corners are written twice indeed: */
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
    return 0;
 }

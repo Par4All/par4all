@@ -51,21 +51,20 @@ int main()
    a = 1;                                                               /*0010*/
 //  points to = {}
    p = (struct p_s *) malloc(sizeof(struct p_s ));                      /*0011*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(p,*HEAP*_l_11,-Exact-)}
    x = &b;                                                              /*0012*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(x,b,-Exact-)}
+//  {(p,*HEAP*_l_11,-Exact-);(x,b,-Exact-)}
    p->q = x;                                                            /*0013*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[0][q],b,-Exact-);(x,b,
-//   -Exact-)}
+//  {(p,*HEAP*_l_11,-Exact-);(p[0][q],b,-Exact-);(x,b,-Exact-)}
    z = &p->q;                                                           /*0014*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[0][q],b,-Exact-);(x,b,
-//   -Exact-);(z,p[0][q],-Exact-)}
+//  {(p,*HEAP*_l_11,-Exact-);(p[0][q],b,-Exact-);(x,b,-Exact-);(z,
+//   p[0][q],-Exact-)}
    *z = &u;                                                             /*0015*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[0][q],u,-Exact-);(x,b,
-//   -Exact-);(z,p[0][q],-Exact-)}
+//  {(p,*HEAP*_l_11,-Exact-);(p[0][q],u,-Exact-);(x,b,-Exact-);(z,
+//   p[0][q],-Exact-)}
    p->q->r = a;                                                         /*0016*/
-//  {(p,*ANY_MODULE*:*HEAP*_b0,-MAY-);(p[0][q],u,-Exact-);(x,b,
-//   -Exact-);(z,p[0][q],-Exact-)}
+//  {(p,*HEAP*_l_11,-Exact-);(p[0][q],u,-Exact-);(x,b,-Exact-);(z,
+//   p[0][q],-Exact-)}
    return 0;                                                            /*0017*/
 }
 
@@ -87,17 +86,16 @@ int main()
    p = (struct p_s *) malloc(sizeof(struct p_s ));                      /*0011*/
 //               <must be written>: x
    x = &b;                                                              /*0012*/
-//               <may be written >: *ANY_MODULE*:*HEAP*_b0[.q]
 //               <must be read   >: p x
+//               <must be written>: *HEAP*_l_11[.q]
    p->q = x;                                                            /*0013*/
 //               <must be read   >: p
 //               <must be written>: z
    z = &p->q;                                                           /*0014*/
 //               <must be read   >: z
-//               <must be written>: p[0][.q]
+//               <must be written>: *HEAP*_l_11[.q]
    *z = &u;                                                             /*0015*/
-//               <may be read    >: *ANY_MODULE*:*HEAP*_b0[.q]
-//               <must be read   >: a p
+//               <must be read   >: *HEAP*_l_11[.q] a p
 //               <must be written>: u[.r]
    p->q->r = a;                                                         /*0016*/
    return 0;                                                            /*0017*/

@@ -146,8 +146,8 @@ C (0,17)
 99996 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=J, J<=161}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=J, J<=161}
 
 C (1,1)
 *
@@ -171,22 +171,22 @@ C     DO loop 5 with exit had to be desugared
       IF (I.GT.MP) GOTO 99998                                           0071
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=I, I<=402, 1<=J, J<=160}
 
 C (9,1)
       READ (UNIT=11,FMT=1000,END=99) RO(I,J)                            0072
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=I, I<=402, 1<=J, J<=160}
 
 C (6,1)
 C     BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=I, I<=402, 1<=J, J<=160}
 
 C (6,2)
 5     CONTINUE                                                          0073
@@ -201,15 +201,15 @@ C     END BLOCK
       GOTO 99997
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=I, I<=402, 1<=J, J<=160}
 
 C (4,1)
 C     BEGIN BLOCK
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, 1<=I, I<=402, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, 1<=I, I<=402, 1<=J, J<=160}
 
 C (4,2)
 99    WRITE (6, 1099)                                                   0109
@@ -234,8 +234,8 @@ C     END BLOCK
 99998 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
-C    {0.0D0==FTR, 1.0D0==BSR, 1.0D0==BSZ, 1.0D0+CON==GAM, 1.0D0==QTR,
-C    1.0D0==QTZ, I==403, 1<=J, J<=160}
+C    {0.0D0==FTR, 1.0D0+CON==GAM, 1.0D0==QTR, BSR+CON==GAM,
+C    BSZ+CON==GAM, CON+QTZ==GAM, I==403, 1<=J, J<=160}
 
 C (8,1)
       J = J+1                                                           0070
