@@ -179,7 +179,7 @@ void init_c_areas()
 void init_c_implicit_variables(entity m)
 {
   /* Function name variable __function__ and __FUNCTION__ */
-  const char * mn = entity_user_name(m);
+  const char * mn = entity_local_name(m);
   string bs = "0`"; // first local scope in a module: should be
 		    // returned by a function to stay consistent in
 		    // case of change
@@ -1011,22 +1011,50 @@ entity FindOrCreateCurrentEntity(string name,
 					  the context */
 	      /* && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL*/ )
 	    {
-	      /* This entity is declared in a compilation unit with keyword EXTERN.
-		 Add it to the storage of the compilation unit to help code generation*/
+	      /* This entity is declared in a compilation unit with
+		 keyword EXTERN. Add it to the storage of the
+		 compilation unit to help code prettyprint unless if
+		 has already been declared earlier in the current
+		 compilation unit. See C_syntax/global_extern.c */
+	      if(type_undefined_p(entity_type(ent))
+		 || intrinsic_entity_p(ent)) {
+		/* ent has not been declared earlier */
+		entity com_unit = get_current_compilation_unit_entity();
+		list el = code_externs(value_code(entity_initial(com_unit)));
+		//ram_shared(storage_ram(entity_storage(com_unit))) =
+		//gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
+		pips_debug(8, "Variable \"%s\" added to external declarations of \"%s\"\n",
+			   entity_name(ent), entity_name(com_unit));
+		pips_assert("ent is an entity", entity_domain_number(ent)==entity_domain);
+		pips_assert("com_unit is an entity", entity_domain_number(com_unit)==entity_domain);
+		pips_assert("el is a pure entity list", entity_list_p(el));
+		code_externs(value_code(entity_initial(com_unit))) =
+		  gen_nconc(code_externs(value_code(entity_initial(com_unit))), CONS(ENTITY,ent,NIL));
+		el = code_externs(value_code(entity_initial(com_unit)));
+		pips_assert("el is a pure entity list", entity_list_p(el));
+	      }
+	    }
+	  else if(strstr(full_scope,TOP_LEVEL_MODULE_NAME)!=NULL)
+	    if(!compilation_unit_entity_p(function=get_current_module_entity()))
+	      if(type_undefined_p(entity_type(ent))
+		 || !type_functional_p(entity_type(ent))) {
+	    /* This variable is declared extern within a function
+	       body. */
+	    AddToExterns(ent, function);
+	  }
+	  else {
+	    /* Impossible: this is not detected here  */
+	    /* This entity may have already been declared external but
+	       is redeclared inside the same module. See
+	       C_syntax/global_extern.c */
+	    /*
 	      entity com_unit = get_current_compilation_unit_entity();
 	      list el = code_externs(value_code(entity_initial(com_unit)));
-	      //ram_shared(storage_ram(entity_storage(com_unit))) =
-	      //gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
-	      pips_debug(8, "Variable \"%s\" added to external declarations of \"%s\"\n",
-			 entity_name(ent), entity_name(com_unit));
-	      pips_assert("ent is an entity", entity_domain_number(ent)==entity_domain);
-	      pips_assert("com_unit is an entity", entity_domain_number(com_unit)==entity_domain);
-	      pips_assert("el is a pure entity list", entity_list_p(el));
-	      code_externs(value_code(entity_initial(com_unit))) =
-		gen_nconc(code_externs(value_code(entity_initial(com_unit))), CONS(ENTITY,ent,NIL));
-	      el = code_externs(value_code(entity_initial(com_unit)));
-	      pips_assert("el is a pure entity list", entity_list_p(el));
-	    }
+	      if(entity_is_argument_p(ent, el))
+		code_externs(value_code(entity_initial(com_unit))) =
+		  arguments_rm_entity(el, ent);
+	    */
+	  }
 	}
       else
 	{
@@ -1106,8 +1134,19 @@ entity FindOrCreateCurrentEntity(string name,
 								   MODULE_SEP_STRING,
 								   compilation_unit_name,
 								   name,NULL));
-		  else
+		  else {
+		    /* We may have to remove it from the extern list:
+		       C_syntax/global_extern01.c */
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
+		    entity com_unit = get_current_compilation_unit_entity();
+		    list el = code_externs(value_code(entity_initial(com_unit)));
+		    if(entity_is_argument_p(ent, el)) {
+		      type ent_t = entity_type(ent);
+		      if(!type_undefined_p(ent_t) && !type_functional_p(ent_t))
+			code_externs(value_code(entity_initial(com_unit))) =
+			  arguments_rm_entity(el, ent);
+		    }
+		  }
 		}
 	      else
 		{
@@ -2230,9 +2269,16 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     /* It is too early to use extern_entity_p() */
     //if(extern_entity_p(function, e))
     if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
-      if(!empty_scope_p(c_parser_context_scope(context)))
+      if(!empty_scope_p(c_parser_context_scope(context))) {
 	/* Keyword EXTERN has just been encountered */
-	AddToExterns(e,function);
+	/* Yes,  but this may have been already recognized in
+	   FindOrCreateCurrentEntity() and this may not imply the
+	   declaration as extern is another declaration of e has
+	   already been encountered. */
+	type et = ultimate_type(entity_type(e));
+	if(type_functional_p(et))
+	  AddToExterns(e,function);
+      }
 
     /* To avoid multiple declarations */
     if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&

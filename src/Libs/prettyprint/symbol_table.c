@@ -287,7 +287,8 @@ string get_symbol_table(entity m, bool isfortran)
   entity rv = entity_undefined; /* return variable */
   list ce = list_undefined;
 
-  pips_assert("get_symbol_table", entity_module_p(m));
+  pips_assert("m is a module", entity_module_p(m));
+  pips_assert("decls is a list of entities", entity_list_p(decls));
 
   /* To simplify validation, at the expense of some information about
      the parsing process. */

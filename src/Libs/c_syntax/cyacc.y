@@ -1919,6 +1919,11 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL));
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
+			  /* FI: because of C laxity about
+			     redeclarations in compilation unit, the
+			     EXTERN information should be carried by
+			     the declaration statement to be able to
+			     regenerate precise source-to-source. */
 			  $$ = $2;
 			}
 |   TK_STATIC decl_spec_list_opt

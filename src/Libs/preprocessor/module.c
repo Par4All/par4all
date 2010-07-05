@@ -89,7 +89,16 @@ list module_entities(entity m)
   list cudl = gen_copy_seq(code_declarations(value_code(entity_initial(cu))));
   list mdl = module_declarations(m);
 
+  pips_assert("compilation unit is an entity list.",
+	      entity_list_p(code_declarations(value_code(entity_initial(cu)))));
+  pips_assert("initial cudl is an entity list.", entity_list_p(cudl));
+  pips_assert("mdl is an entity list.", entity_list_p(mdl));
+
   cudl = gen_nconc(cudl, mdl);
+
+  /* Make sure you only have entities in list cudl */
+  pips_assert("Final cudl is an entity list.", entity_list_p(cudl));
+
   return cudl;
 }
 
