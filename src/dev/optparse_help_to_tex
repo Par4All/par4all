@@ -65,16 +65,16 @@ def t_SubOption(t):
     return t
 
 
-# Normal text is some thing else begining with 2 spaces
+# Normal text is something else begining with 2 spaces:
 def t_Text(t):
     r'[ ]{2,}.*\n'
-    # Remove the leading and trailing spaces around
+    # Remove the leading and trailing spaces around:
     t.value = str.strip(t.value)
     verbose_print(t)
     return t
 
 
-# For other characters, we store them as the current declaration:
+# Skip other characters:
 def t_error(t):
     if verbose:
         print("Found character '%s'" % t.value[0])
@@ -145,7 +145,13 @@ def p_text_list(p):
                  | Text'''
     if len(p) == 3:
         # Concatenate the texts
-        p[0] = p[1] + " " + p[2]
+        if p[1][-1] == '-':
+            # optparse seems to cut words after '-', so rejoin the lines
+            # without space in this case:
+            p[0] = p[1] + p[2]
+        else:
+            # Normal join with a space:
+            p[0] = p[1] + " " + p[2]
     else:
         p[0] = p[1]
 
@@ -157,7 +163,12 @@ def p_empty(p):
 
 def LaTeX_protect(string):
     "Protect the LaTeX special characters"
-    s = re.sub(r'([\\&~#_%$])', r'\\\1', string)
+    #s = re.sub(r'\\', r'\\string\\', string)
+    # Use \( \) instead of $ $ to enter math mode to simplify the
+    # following regex that protect $:
+    s = re.sub(r'\\', r'\\(\\backslash\\)', string)
+    # Backslashify special characters:
+    s = re.sub(r'([&~#_%$^])', r'\\\1', s)
     # Protect the '<' and '>'
     s = re.sub(r'([<>])', r'\\texttt{\1}', s)
     # Insert an empty group to avoid ligature in -- for some fonts:
