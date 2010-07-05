@@ -52,7 +52,7 @@ void onetriploop03(int n)
 
    for(i = n; i <= m; i += 1)
 
-//  P(i,m) {i==m, i==n}
+//  P(i,m) {i==m, m==n}
 
       foo("i = %d\n", i);
 

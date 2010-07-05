@@ -43,9 +43,9 @@ C  <Y(PHI1)-W-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
          ENDDO
 
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1+1<=PHI2, 1<=PHI2, PHI2<=N,
-C    1<=I, N+1<=I, 1<=K, K<=10}>
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N, 1<=I, N+1<=I, 1<=K, K<=10}>
-C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N, 1<=I, N+1<=I, 1<=K, K<=10}>
+C    N+1<=I, 1<=K, K<=10}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N, N+1<=I, 1<=K, K<=10}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N, N+1<=I, 1<=K, K<=10}>
 
 C
          CALL FUNC(N, X, A)                                             0014
