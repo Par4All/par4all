@@ -215,11 +215,13 @@ test_to_total_precondition(
 
     t_pret = transformer_add_domain_condition(t_pret, c, context,
 					       TRUE);
-    t_pret = transformer_normalize(t_pret, 4);
+/*     t_pret = transformer_normalize(t_pret, 4); */
+    t_pret = transformer_normalize(t_pret, 2);
 
     t_pref = transformer_add_domain_condition(t_pref, c, context,
 					      FALSE);
-    transformer_normalize(t_pref, 4);
+/*     transformer_normalize(t_pref, 4); */
+    transformer_normalize(t_pref, 2);
 
     ifdebug(DEBUG_TEST_TO_TOTAL_PRECONDITION) {
       pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"t_pret=%p\n",t_pret);
@@ -416,7 +418,8 @@ statement_to_total_precondition(
     /* add equivalence equalities */
     t_pre = tf_equivalence_equalities_add(t_pre);
 
-    t_pre = transformer_normalize(t_pre, 4);
+/*     t_pre = transformer_normalize(t_pre, 4); */
+    t_pre = transformer_normalize(t_pre, 2);
 
     if(!transformer_consistency_p(t_pre)) {
       _int so = statement_ordering(s);

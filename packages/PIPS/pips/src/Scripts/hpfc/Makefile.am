@@ -27,8 +27,8 @@ dist_bin_SCRIPTS = 	hpfc \
 
 bin_PROGRAMS= hpfc_interactive
 hpfc_interactive_SOURCES=hpfc_interactive.c
-AM_CPPFLAGS=$(READLINE_CPPFLAGS) $(TERMCAP_CPPFLAGS)
-hpfc_interactive_LDFLAGS=$(READLINE_LIBS) $(TERMCAP_LIBS)
+AM_CPPFLAGS=$(READLINE_CPPFLAGS) $(NCURSES_CPPFLAGS)
+hpfc_interactive_LDFLAGS=$(READLINE_LIBS) $(NCURSES_LIBS)
 
 dist_data_DATA= hpfc_stubs.f hpfc_stubs.direct.f
 

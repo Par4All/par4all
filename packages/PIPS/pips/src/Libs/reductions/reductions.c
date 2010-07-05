@@ -169,7 +169,7 @@ list_of_reduced_variables(
     list /* of entity */ le = NIL;
     le = add_reduced_variables(le, load_proper_reductions(node));
     FOREACH (STATEMENT, s, ls) {
-      if (bound_cumulated_reductions_p(s) == TRUE)
+      if (bound_cumulated_reductions_p(s) )
 	le = add_reduced_variables(le, load_cumulated_reductions(s));
       else {
 	pips_debug(5, "stat %s %p\n", note_for_statement(s), s);
@@ -438,7 +438,7 @@ build_reduction_of_variable(
 {
     *pr = make_reduction
 	(reference_undefined,
-	 make_reduction_operator(is_reduction_operator_none, UU),
+	 make_reduction_operator_none(),
 	 NIL, NIL);
 
     if (!update_compatible_reduction
@@ -450,7 +450,7 @@ build_reduction_of_variable(
     }
 
     FOREACH (STATEMENT, s, ls) {
-      if (bound_cumulated_reductions_p(s) == TRUE) {
+      if (bound_cumulated_reductions_p(s) ) {
 	if (!update_compatible_reduction (pr, var, load_rw_effects_list(s),
 					  load_cumulated_reductions(s)))
 	  {
@@ -504,79 +504,42 @@ build_creductions_of_statement(
  * - the cumulated reductions and effects of its sons
  * the computation is performed by build_reductions_of_statement.
  * the current statement is retrieved thru the crt_stat stack.
+ * Perform the bottom-up propagation of cumulated reductions
  */
-static void cr_sequence_rwt(sequence s)
+static void compute_cumulated_reductions(instruction i)
 {
-    build_creductions_of_statement(crt_stat_head(), sequence_statements(s));
-}
-
-static void cr_loop_rwt(loop l)
-{
-    list /* of statement */ ls = CONS(STATEMENT, loop_body(l), NIL);
-    build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls);
-}
-
-static void cr_whileloop_rwt(whileloop l)
-{
-    list /* of statement */ ls = CONS(STATEMENT, whileloop_body(l), NIL);
-    build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls);
-}
-
-static void cr_forloop_rwt(forloop l)
-{
-    list /* of statement */ ls = CONS(STATEMENT, forloop_body(l), NIL);
-    build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls);
-}
-
-static void cr_test_rwt(test t)
-{
-    list /* of statement */ ls =
-	CONS(STATEMENT, test_true(t), CONS(STATEMENT, test_false(t), NIL));
-    build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls);
-}
-
-static void cr_unstructured_rwt(unstructured u)
-{
-    list /* of control */ lc = NIL, /* of statement */ ls;
-    CONTROL_MAP(__attribute__ ((unused)) c, {}, unstructured_control(u), lc);
-    ls = control_list_to_statement_list(lc);
-    build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls); gen_free_list(lc);
-}
-
-static void cr_call_rwt(__attribute__((unused)) call c)
-{
-    statement s = crt_stat_head();
-    store_cumulated_reductions(s, copy_reductions(load_proper_reductions(s)));
-    pips_debug(5, "stat %s %p\n",
-	       note_for_statement(s), s);
-}
-
-/* Perform the bottom-up propagation of cumulated reductions
- * for statement s, through gen_multi_recurse.
- * only call instructions must be walked thru,
- *   hence it is stoped on expressions.
- * the crt_stat stack is used.
- */
-static void compute_cumulated_reductions(statement s)
-{
-    make_crt_stat_stack();
-    gen_multi_recurse(s,
-		      statement_domain, crt_stat_filter, crt_stat_rewrite,
-		      sequence_domain, gen_true, cr_sequence_rwt,
-		      loop_domain, gen_true, cr_loop_rwt,
-		      whileloop_domain, gen_true, cr_whileloop_rwt,
-		      forloop_domain, gen_true, cr_forloop_rwt,
-		      test_domain, gen_true, cr_test_rwt,
-		      unstructured_domain, gen_true, cr_unstructured_rwt,
-		      call_domain, gen_true, cr_call_rwt,
-		      expression_domain, gen_false, gen_null,
-		      NULL);
-    free_crt_stat_stack();
+    statement parent = (statement)gen_get_ancestor(statement_domain,i);
+    list l = NIL;
+    bool tofree = true;
+    switch(instruction_tag(i)) {
+        case is_instruction_sequence:
+            tofree=false;
+            l=instruction_block(i);break;
+        case is_instruction_loop:
+            l=make_statement_list(loop_body(instruction_loop(i)));break;
+        case is_instruction_forloop:
+            l=make_statement_list(forloop_body(instruction_forloop(i)));break;
+        case is_instruction_whileloop:
+            l=make_statement_list(whileloop_body(instruction_whileloop(i)));break;
+        case is_instruction_test:
+            l=make_statement_list(test_true(instruction_test(i)),test_false(instruction_test(i)));break;
+        case is_instruction_unstructured:
+            {
+                list /* of control */ lc = NIL;
+                CONTROL_MAP( c, lc=CONS(CONTROL,c,lc), unstructured_control(instruction_unstructured(i)), lc);
+                l = control_list_to_statement_list(lc);
+                gen_free_list(lc);
+            } ; break ;
+        case is_instruction_call:
+        case is_instruction_expression:
+            store_cumulated_reductions(parent,copy_reductions(load_proper_reductions(parent)));
+            pips_debug(5, "stat %s %p\n", note_for_statement(parent), parent);
+            return ; /* it is important to return here */
+        default:
+            pips_internal_error("should not happen\n");
+    };
+    build_creductions_of_statement(parent,l);
+    if(tofree) gen_free_list(l);
 }
 
 /* handler for pipsmake
@@ -608,7 +571,7 @@ bool cumulated_reductions(string module_name)
 
     /* do the job here
      */
-    compute_cumulated_reductions(get_current_module_statement());
+    gen_recurse(get_current_module_statement(),instruction_domain,gen_true,compute_cumulated_reductions);
 
     /* returns the result to the DBM...
      */

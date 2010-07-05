@@ -2,7 +2,7 @@ TARGET	= tpips
 bin_PROGRAMS=tpips
 tpips_SOURCES=tp_yacc.y tp_lex.l tpips.c wrapper.c revisions.c main_tpips.c
 tpips_LDADD=../../Libs/libpipslibs.la
-tpips_LDFLAGS=$(READLINE_LIBS) $(TERMCAP_LIBS)
+tpips_LDFLAGS=$(READLINE_LIBS) $(NCURSES_LIBS)
 nodist_include_HEADERS=completion_list.h $(TARGET).h
 dist_noinst_SCRIPTS=make_completion_lists.sh
 
@@ -42,7 +42,7 @@ AM_CPPFLAGS=\
 	-I../../Libs/properties\
 	-I../../Libs/top-level\
 	-I../../Libs/preprocessor\
-	$(READLINE_CFLAGS) $(TERMCAP_CFLAGS)\
+	$(READLINE_CFLAGS) $(NCURSES_CFLAGS)\
 	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
 	-DNEWGEN_REV='"unknown"' \
 	-DUTC_DATE='"unknown"' \

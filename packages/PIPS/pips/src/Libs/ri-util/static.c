@@ -47,6 +47,7 @@
 /*********************************************************** CURRENT ENTITY */
 
 static entity current_module_entity = entity_undefined;
+static list current_module_declarations=list_undefined;
 
 /** @defgroup current_module Methods related to the current module
 
@@ -73,6 +74,7 @@ set_current_module_entity(entity e)
 		entity_undefined_p(current_module_entity));
 
     current_module_entity = e;
+    reset_current_module_declarations();
     return e;
 }
 
@@ -96,6 +98,7 @@ reset_current_module_entity()
     pips_assert("current entity defined",
 		!entity_undefined_p(current_module_entity));
     current_module_entity = entity_undefined;
+    reset_current_module_declarations();
 }
 
 /** @} */
@@ -105,6 +108,7 @@ void
 error_reset_current_module_entity()
 {
     current_module_entity = entity_undefined;
+    reset_current_module_declarations();
 }
 
 
@@ -118,6 +122,22 @@ get_current_module_name()
 {
   return module_local_name(current_module_entity);
   /* return entity_user_name(current_module_entity); */
+}
+
+
+void set_current_module_declarations(list l)
+{
+  current_module_declarations = l;
+}
+
+void reset_current_module_declarations()
+{
+  current_module_declarations = list_undefined;
+}
+
+list get_current_module_declarations()
+{
+  return current_module_declarations;
 }
 
 /** @} */
@@ -146,6 +166,7 @@ set_current_module_statement(statement s)
   pips_assert("The new module statement is not undefined",
 	      s != statement_undefined);
   current_module_statement = s;
+  reset_current_module_declarations();
   return s;
 }
 
@@ -199,6 +220,7 @@ reset_current_module_statement()
   pips_assert("current module statement defined",
 	      !statement_undefined_p(current_module_statement));
   current_module_statement = statement_undefined;
+  reset_current_module_declarations();
 }
 
 /** @} */
@@ -210,4 +232,5 @@ error_reset_current_module_statement()
 {
     current_module_statement = statement_undefined;
     stacked_current_module_statement = statement_undefined;
+    reset_current_module_declarations();
 }
