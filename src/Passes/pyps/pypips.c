@@ -58,14 +58,6 @@ void atinit()
 
 void create(char* workspace_name, char ** filenames)
 {
-    /* create the array of arguments */
-    gen_array_t filename_list = gen_array_make(0);
-    while(*filenames)
-    {
-        gen_array_append(filename_list,*filenames);
-        filenames++;
-    }
-
     if (workspace_exists_p(workspace_name))
         pips_user_error
             ("Workspace %s already exists. Delete it!\n", workspace_name);
@@ -78,7 +70,19 @@ void create(char* workspace_name, char ** filenames)
     {
         if (db_create_workspace(workspace_name))
         {
-            if (!create_workspace(filename_list))
+            /* create the array of arguments */
+            gen_array_t filename_list = gen_array_make(0);
+            while(*filenames)
+            {
+                gen_array_append(filename_list,*filenames);
+                filenames++;
+            }
+
+            bool success = create_workspace(filename_list);
+
+            gen_array_free(filename_list);
+
+            if (!success)
             {
                 db_close_workspace(false);
                 pips_user_error("Could not create workspace %s\n",
@@ -90,7 +94,6 @@ void create(char* workspace_name, char ** filenames)
                     ", check rights!\n");
         }
     }
-    gen_array_free(filename_list);
 }
 
 void quit()
