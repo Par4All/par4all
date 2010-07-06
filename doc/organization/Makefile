@@ -39,7 +39,7 @@ local-clean:
 
 
 # Add the dependence on some automatically generated help:
-par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex release-notes-extract.tex
+par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex p4a_coffee-help.tex release-notes-extract.tex
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
@@ -47,6 +47,14 @@ par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processo
 
 # p4a_pack-help is included at a deeper sectioning level:
 p4a_pack-help.tex: p4a_pack.help Makefile
+	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
+
+# p4a_validate-help is included at a deeper sectioning level:
+p4a_validate-help.tex: p4a_validate.help Makefile
+	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
+
+# p4a_coffee-help is included at a deeper sectioning level:
+p4a_coffee-help.tex: p4a_coffee.help Makefile
 	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
 
 # Where to find commands we want generate documentation:

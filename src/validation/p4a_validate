@@ -456,23 +456,6 @@ def main():
 
     parser.add_option_group(vc_file)
 
-    vc_display = optparse.OptionGroup(parser, "Validation class display")
-
-    vc_display.add_option("-l", "--list",
-                          action = "store_true", dest = "list_elements",
-                          default = False,
-                          help = "list the elements of the validation class;")
-
-    vc_display.add_option("-s",  "--show-diff-files", action = "store_true",
-                          dest = "show_diff_files", default = False,
-                          help = "show the output differences for the current class by looking into the *.results directories;")
-
-    vc_display.add_option("--show-diff-results", action = "store_true",
-                          dest = "show_diff_results", default = False,
-                          help = "show the output differences for the current class from the RESULTS directory;")
-
-    parser.add_option_group(vc_display)
-
     vc_filtering = optparse.OptionGroup(parser,
                                         "Validation class filtering")
 
@@ -493,6 +476,23 @@ def main():
                             metavar="REGULAR-EXPRESSION")
 
     parser.add_option_group(vc_filtering)
+
+    vc_display = optparse.OptionGroup(parser, "Validation class display")
+
+    vc_display.add_option("-l", "--list",
+                          action = "store_true", dest = "list_elements",
+                          default = False,
+                          help = "list the elements of the validation class;")
+
+    vc_display.add_option("-s",  "--show-diff-files", action = "store_true",
+                          dest = "show_diff_files", default = False,
+                          help = "show the output differences for the current class by looking into the *.results directories;")
+
+    vc_display.add_option("--show-diff-results", action = "store_true",
+                          dest = "show_diff_results", default = False,
+                          help = "show the output differences for the current class from the RESULTS directory;")
+
+    parser.add_option_group(vc_display)
 
     vc_accept = optparse.OptionGroup(parser, "Accept the validation from a validation class")
 
