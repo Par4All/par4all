@@ -402,6 +402,7 @@ def main(options, args = []):
             (input_fd, input_file) = tempfile.mkstemp(prefix = "p4a", text = False)
             (output_fd, output_file) = tempfile.mkstemp(prefix = "p4a", text = False)
 
+            # Why?
             save_pickle(input_file, input)
 
             process_script = os.path.join(get_program_dir(), "p4a_process")
@@ -411,13 +412,18 @@ def main(options, args = []):
 
             out, err, ret = "", "", -1
             try:
+                # Do the PIPS job:
                 out, err, ret = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
                     silent = True,
+                    # Do not overload current locale because then we can
+                    # no longer work on files with special characters:
+                    force_locale = None,
                     stdout_handler = pips_output_filter,
                     stderr_handler = pips_output_filter)
             except:
                 raise p4a_error("PIPS processing aborted")
 
+            # Why?
             output = load_pickle(output_file)
 
             os.remove(input_file)
