@@ -335,7 +335,7 @@ def main(options, args = []):
         polylib_src_dir = os.path.join(packages_dir, "polylib")
     debug("polylib source directory: " + polylib_src_dir)
     if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
-        die("Directory does not exist: " + polylib_src_dir)
+        die("polylib source directory does not exist: " + polylib_src_dir)
 
     newgen_src_dir = ""
     if options.newgen_src:
@@ -344,7 +344,7 @@ def main(options, args = []):
         newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
     debug("newgen source directory: " + newgen_src_dir)
     if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
-        die("Directory does not exist: " + newgen_src_dir)
+        die("newgen source directory does not exist: " + newgen_src_dir)
 
     linear_src_dir = ""
     if options.linear_src:
@@ -353,7 +353,7 @@ def main(options, args = []):
         linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
     debug("linear source directory: " + linear_src_dir)
     if not os.path.isdir(linear_src_dir) and not options.skip_linear:
-        die("Directory does not exist: " + linear_src_dir)
+        die("linear source directory does not exist: " + linear_src_dir)
 
     pips_src_dir = ""
     if options.pips_src:
@@ -362,7 +362,7 @@ def main(options, args = []):
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
     debug("PIPS source directory: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir) and not options.skip_pips:
-        die("Directory does not exist: " + pips_src_dir)
+        die("PIPS source directory does not exist: " + pips_src_dir)
 
     nlpmake_src_dir = ""
     if options.nlpmake_src:
