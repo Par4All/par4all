@@ -2087,7 +2087,8 @@ transformer statement_to_transformer(
        statement transformer is the convex hull of all its replicate
        transformers. */
     if(transformer_undefined_p(ot)) {
-    nt = transformer_normalize(nt, 4);
+      if (get_int_property("SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE") == 4)
+	nt = transformer_normalize(nt, 4);
       t = copy_transformer(nt);
     }
     else {
