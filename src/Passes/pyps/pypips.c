@@ -133,16 +133,8 @@ char* info(char * about)
             string m = gen_array_item(modules, i);
             sinfo_size+=strlen(m)+1;
         }
-        sinfo=(char*)calloc(1+sinfo_size,sizeof(char));
+        sinfo=strdup(string_array_join(modules, " "));
         if(!sinfo) fprintf(stderr,"not enough memory to hold all module names\n");
-        else {
-            for(i=0; i<n; i++)
-            {
-                string m = gen_array_item(modules, i);
-                strcat(sinfo,m); /* suboptimum*/
-                strcat(sinfo," ");
-            }
-        }
         gen_array_full_free(modules);
     }
     else if (same_string_p(about, "directory"))
@@ -227,3 +219,15 @@ char* show(char * rname, char *mname)
     return strdup(db_get_memory_resource(rname, mname, TRUE));
 }
 
+/* Returns the list of the modules that call that specific module,
+   separated by ' '. */
+char * get_callers_of(char * module_name)
+{
+    gen_array_t callers = get_callers(module_name);
+
+    char * callers_string = strdup(string_array_join(callers, " "));
+
+    gen_array_free(callers);
+
+    return callers_string;
+}
