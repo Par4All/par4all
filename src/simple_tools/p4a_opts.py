@@ -174,12 +174,12 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "par4all@
                 # Note: we should handle calculating the charset
                 msg = MIMEText(read_file(file), _subtype = subtype)
             elif maintype == "image":
-                msg = MIMEImage(read_file(file, test = False), _subtype = subtype)
+                msg = MIMEImage(read_file(file, text = False), _subtype = subtype)
             elif maintype == "audio":
-                msg = MIMEAudio(read_file(file, test = False), _subtype = subtype)
+                msg = MIMEAudio(read_file(file, text = False), _subtype = subtype)
             else:
                 msg = MIMEBase(maintype, subtype)
-                msg.set_payload(read_file(file, test = False))
+                msg.set_payload(read_file(file, text = False))
                 # Encode the payload using Base64
                 encoders.encode_base64(msg)
             # Set the filename parameter
@@ -213,7 +213,7 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "par4all@
                 raise p4a_error("No SMTP server is reachable")
 
             s = smtplib.SMTP(server)
-            s.sendmail(from_addr, recipients, read_file(msg))
+            s.sendmail(from_addr, recipients, read_file(eml_file))
             s.quit()
 
         except:
