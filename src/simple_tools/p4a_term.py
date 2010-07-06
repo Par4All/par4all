@@ -17,10 +17,8 @@ esc = '%s[' % chr(27)
 reset = '%s0m' % esc
 format = '1;%dm'
 fgoffset, bgoffset = 30, 40
-for k, v in dict(
-    attrs = 'none bold faint italic underline blink fast reverse concealed',
-    colors = 'grey red green yellow blue magenta cyan white'
-).items(): globals()[k] = dict((s, i) for i, s in enumerate(v.split()))
+attrs = { 'none': 0, 'bold': 1, 'faint': 2, 'italic': 3, 'underline': 4, 'blink': 5, 'fast': 6, 'reverse': 7, 'concealed': 8 }
+colors = { 'grey': 0, 'red': 1, 'green': 2, 'yellow': 3, 'blue': 4, 'magenta': 5, 'cyan': 6, 'white': 7 }
 
 
 def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
@@ -50,9 +48,9 @@ def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
     escape('blink Python')		: output a blinking 'Python'
     escape('@@ hello')			: clear the screen and print 'hello' at 1;1
     '''
-    if disabled:
-        return ''
-    if if_tty_fd != -1 and not os.isatty(if_tty_fd):
+    # If we are disabled or if destination stream fd is not a TTY,
+    # return an empty string.
+    if disabled or (if_tty_fd != -1 and not os.isatty(if_tty_fd)):
         return ''
     cmd, txt = [reset], []
     if arg:
@@ -61,7 +59,9 @@ def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
             if arglist and arglist[0] in colors:
                 cmd.append(format % (colors[arglist.pop(0)] + offset))
         for a in arglist:
-            c = format % attrs[a] if a in attrs else None
+            c = None
+            if a in attrs:
+                c = format % attrs[a]
             if c and c not in cmd:
                 cmd.append(c)
             else:
