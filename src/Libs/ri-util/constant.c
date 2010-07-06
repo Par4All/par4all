@@ -218,7 +218,7 @@ Character constants are typed as int.
 	else
 	  l = strtol(name, &error_string, basis);
       error_number = errno;
-      /* %ld, long; %zd, size_t; %td, ptrdiff_t */
+     /* %ld, long; %zd, size_t; %td, ptrdiff_t */
       pips_debug(8, "value = %lld, errno=%d\n", l, error_number);
       errno = 0;
 
@@ -266,7 +266,11 @@ Character constants are typed as int.
       }
 
       /* SG :this ensure everything is ok on 32 bits */
-      pips_assert("no data lost in conversion",l == (long long int )(intptr_t)l);
+      if(l != (long long int)(intptr_t)l)
+      {
+      	pips_user_warning("some data lost in conversion, %lli is not representatble in pips \n",l);
+	l = ~(intptr_t)0;
+      }
       ce = make_constant_int( (intptr_t)l); 
     }
     else if(bt == is_basic_int && size==1) {
