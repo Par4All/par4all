@@ -21,7 +21,7 @@ $(DOCUMENT).tex: p4a-help.tex
 
 # How to generate the script documentation into slides:
 %-help.tex: %.help Makefile
-	../../../src/dev/optparse_help_to_tex --slides $< > $@
+	../../../src/dev/optparse_help_to_tex --slides --no-output-usage $< > $@
 
 %.help: ../../../src/simple_tools/% Makefile
 	# Generate raw help message for the given command:

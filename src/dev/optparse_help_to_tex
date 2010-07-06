@@ -15,7 +15,7 @@ import ply.yacc as yacc
 
 verbose = True
 verbose = False
-
+no_output_usage = False
 
 def verbose_print(*list):
     if verbose:
@@ -88,9 +88,13 @@ t_ignore  = ''
 
 """The parser of the output optparse help"""
 
+# The starting parser rule:
 def p_optparse_help(p):
     'optparse_help : Usage options'
-    p[0] = p[2]
+    if no_output_usage:
+        p[0] = p[2]
+    else:
+       p[0] = r'{\tt ' + LaTeX_protect(p[1]) + '}' + '\n' + p[2]
 
 
 def p_options(p):
@@ -238,6 +242,10 @@ def main():
                       default = False,
                       help = "Generate the help in a format suitable for inclusion in a LaTeX document.")
 
+    parser.add_option("--no-output-usage", action = "store_true",
+                      default = False,
+                      help = "By default, this script generates also the usage description. Since it may not suitable for slide output, added this option to remove this usage so that a special manual slide can be written aside.")
+
     parser.add_option("--article-section-level", action = "store",
                       type = "int", default = 2, metavar = "SECTION-LEVEL",
                       help = "When generating for a LaTeX document, this define the starting level of the generated sections, with 0 for \part, 1 for \chapter, 2 for \section, 3 for \subsection and so on.")
@@ -248,7 +256,10 @@ def main():
 
     (options, args) = parser.parse_args()
 
+    global verbose
     verbose = options.verbose
+    global no_output_usage
+    no_output_usage = options.no_output_usage
 
     if not (options.slides ^ options.article):
         print "You need to choose the --slides or --article option and only one"
