@@ -3875,6 +3875,31 @@ not seem to add much useful information in general.
 SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS FALSE
 \end{PipsProp}
 
+\subsubsection{Normalization level}
+\index{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE}
+
+Normalizing transformer and preconditions systems is a delicate issue
+which is not mathematically defined, and as such is highly
+empirical. It's a tradeoff between eliminating redundant information,
+keeping an internal storage not too far from the prettyprinting for
+non-regression testing, exposing useful information for subsequent
+analyses,... all this at a reasonable cost. 
+
+Several \emph{levels} of normalization are possible. These levels do
+not correspond to graduations on a normalization scale, but are
+different normalization heuristics. A level of 4 includes a
+preliminary lexicographic sort of contraints, which is very user
+friendly, but currently implies strings manipulations which are quite
+costly. It has been recently chosen to perform this normalization only
+before storing transformers and preconditions to the database
+(\texttt{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE} with a
+default value of 4). However, this can still have a serious impact on
+performances. With any other value, the normalization level is equel to 2.
+
+\begin{PipsProp}{SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE} 
+SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 4
+\end{PipsProp}
+
 \subsubsection{Prettyprint}
 \index{SEMANTICS\_FILTERED\_PRECONDITIONS}
 

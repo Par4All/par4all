@@ -815,7 +815,10 @@ transformer statement_to_postcondition(
 	  ;
 	}
 /* 	pre = transformer_normalize(pre, 2); */
-	pre = transformer_normalize(pre, 4);
+	if (get_int_property("SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE") == 4)
+	  pre = transformer_normalize(pre, 4);
+	else
+	  pre = transformer_normalize(pre, 2);
 
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
