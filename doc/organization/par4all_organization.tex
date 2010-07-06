@@ -251,7 +251,7 @@ script}
 \label{sec:p4a_s-comp-script}
 
 The compilation and installation of \Apfa is controlled by the
-\verb|p4a_setup| that has the following options.
+\verb|p4a_setup| that has the following usage and options.
 
 \input{p4a_setup-help}
 
@@ -971,7 +971,7 @@ src/simple_tools/p4a_pack <--deb|--tgz> --revision=\emph{0.1-mybuild} \(\backsla
   --dir=\emph{/current/install/dir} [--prefix=\emph{/final/install/dir}]
 \end{alltt}
 
-Here is the full option list of this command.
+Here are the usage and full option list of this command.
 
 \input{p4a_pack-help}
 
@@ -981,6 +981,11 @@ Here is the full option list of this command.
 
 After validating, a release is done by making some branch at a given state
 a tag.
+
+There is also a \verb|p4a_coffee| script to build and publish everything
+at once.
+
+\input{p4a_coffee-help}
 
 
 \section{Examples and demos}
@@ -1076,12 +1081,12 @@ for f in `cat files-to-move` ; do git mv $f* Control-Bugs ; done
 \subsubsection{Option list of \protect\texttt{p4a\_validate}}
 \label{sec:opti-list-p4a_v-1}
 
-Here is a small description of the options of \verb|p4a_validate|, that
-are processed in the order of class construction, filtering, display and
-acceptance, so that you can pipe actions. To be useful,
-\verb|pips_validate| should be run with the \texttt{-k} (history keeping)
-option before, so that you can operate on differences between different
-validations.
+Here is a small description of the usage and options of
+\verb|p4a_validate|, that are processed in the order of class
+construction, filtering, display and acceptance, so that you can pipe
+actions. To be useful, \verb|pips_validate| should be run with the
+\texttt{-k} (history keeping) option before, so that you can operate on
+differences between different validations.
 
 \input{p4a_validate-help}
 
@@ -1161,7 +1166,7 @@ Currently, available options are:
 
 \item[\texttt{--dir}:] Validate tests which are done in \verb|packages/PIPS/validation/directory_name|. Syntax is \verb|./p4a_validate_class.py --dir dir1 dir2 dir3|
 
-\item[\texttt{--test}:] Validate tests which are done in argument. Syntax is \verb|./p4a\_validate_class.py --test directory_test/test.f| for example
+\item[\texttt{--test}:] Validate tests which are done in argument. Syntax is \verb|./p4a_validate_class.py --test directory_test/test.f| for example
 
 \item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
 \end{description}
