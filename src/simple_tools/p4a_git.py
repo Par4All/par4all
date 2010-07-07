@@ -17,7 +17,7 @@ actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".p
 script_dir = os.path.split(actual_script)[0]
 
 
-class p4a_git():
+class p4a_git:
     '''Git Repositories Manipulation Class'''
 
     _git_ext = None

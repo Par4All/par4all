@@ -47,13 +47,13 @@ default_properties = dict(
 pyps = None
 
 
-class p4a_processor_output():
+class p4a_processor_output:
     files = []
     database_dir = ""
     exception = None
 
 
-class p4a_processor_input():
+class p4a_processor_input:
     "Store options given to the process engine, mainly digested by PyPS"
     project_name = ""
     accel = False
@@ -147,7 +147,7 @@ def main(options, args = []):
     process_file(options.input_file, options.output_file)
 
 
-class p4a_processor():
+class p4a_processor:
     """Process program files with PIPS and other tools"""
 
     # If the main language is Fortran, set to True:
