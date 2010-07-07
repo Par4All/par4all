@@ -83,7 +83,7 @@ def get_cuda_ld_flags(m64 = True, cutil = True, cublas = False, cufft = False):
         die("TODO")
     return flags
 
-class p4a_builder():
+class p4a_builder:
     cpp_flags = []
     c_flags = []
     cxx_flags = []
