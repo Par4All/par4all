@@ -22,7 +22,7 @@ import p4a_coffee
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]; run %prog --help for options")
 
     p4a_coffee.add_module_options(parser)
 

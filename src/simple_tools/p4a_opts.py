@@ -12,15 +12,7 @@ XXX: kind of a p4a_util2 right now.
 '''
 
 
-import string, sys, optparse, smtplib, traceback, mimetypes, re
-
-from email import encoders
-from email.message import Message
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import string, sys, optparse, smtplib, traceback, mimetypes, re, platform
 
 from p4a_util import *
 from p4a_version import *
@@ -30,8 +22,11 @@ static_options = None
 static_args = None
 extra_report_files = []
 
+report_available = (platform.python_version() >= "2.5")
 
 def add_common_options(parser):
+
+    global report_available
 
     group = optparse.OptionGroup(parser, "General Options")
 
@@ -41,18 +36,20 @@ def add_common_options(parser):
     group.add_option("--log", action = "store_true", default = False,
         help = "Enable logging in current directory.")
 
-    group.add_option("--report", metavar = "YOUR-EMAIL-ADDRESS", default = None,
-        help = "Send a report email to the Par4All support email address in case of error. "
-            + "This implies --log (it will log to a distinct file every time). "
-            + "The report will contain the full log for the failed command, as well as "
-            + "the runtime environment of the script like arguments and environment variables.")
+    if report_available:
+        group.add_option("--report", metavar = "YOUR-EMAIL-ADDRESS", default = None,
+            help = "Send a report email to the Par4All support email address in case of error. "
+                + "This implies --log (it will log to a distinct file every time). "
+                + "The report will contain the full log for the failed command, as well as "
+                + "the runtime environment of the script like arguments and environment variables.")
 
-    group.add_option("--report-files", action = "store_true", default = False,
-        help = "If --report is specified, and if there were files specified as arguments to the script, they will be attached to the generated report email. "
-            + "NB: This might be a privacy/legal concern for your organization, so please check twice you are allowed and willing to do so.")
+        group.add_option("--report-files", action = "store_true", default = False,
+            help = "If --report is specified, and if there were files specified as arguments to the script, they will be attached to the generated report email. "
+                + "WARNING: This might be a privacy/legal concern for your organization, so please check twice you are allowed and willing to do so. "
+                + "The Par4All team cannot be held responsible for a misuse/unintended specification of the --report-files option.")
 
-    group.add_option("--report-dont-send", action = "store_true", default = False,
-        help = "If --report is specified, generate an .eml file with the email which would have been send to the Par4All team, but do not actually send it.")
+        group.add_option("--report-dont-send", action = "store_true", default = False,
+            help = "If --report is specified, generate an .eml file with the email which would have been send to the Par4All team, but do not actually send it.")
 
     group.add_option("--no-color", action = "store_true", default = False,
         help = "Disable coloring of terminal output.")
@@ -64,6 +61,8 @@ def add_common_options(parser):
 
 
 def process_common_options(options, args):
+    
+    global report_available
 
     if options.no_color:
         p4a_term.disabled = True
@@ -76,12 +75,19 @@ def process_common_options(options, args):
         sys.__stdout__.write(version + "\n")
         return False
 
-    if options.log and not options.report:
-        setup_logging(suffix = "_" + utc_datetime(), remove = True)
-    elif options.report:
-        options.log = True
-        setup_logging(suffix = "_report_" + utc_datetime(), remove = True)
-        warn("--report enabled, I will send an email to the Par4All team in case of error")
+    if report_available:
+        if options.log and not options.report:
+            setup_logging(suffix = "_" + utc_datetime(), remove = True)
+        elif options.report:
+            options.log = True
+            setup_logging(suffix = "_report_" + utc_datetime(), remove = True)
+            warn("--report enabled, I will send an email to the Par4All team in case of error")
+            if options.report_files:
+                warn("--report-files specified: This might be a privacy/legal/licensing concern for your organization/company")
+                warn("--report-files specified: Please check twice you are allowed and willing to do so, or hit CTRL+C NOW!!")
+                warn("--report-files specified: The Par4All team cannot be held responsible for a misuse/unintended specification of the --report-files option,")
+                warn("--report-files specified: nor does the --report-files obliges the Par4All team to purchase any licensing for your software,")
+                warn("--report-files specified: nor does the --report-files transfers the Par4All team any copyright/licensing rights on your software.")
 
     global static_options, static_args
     static_options = options
@@ -100,7 +106,16 @@ def report_add_file(file):
     extra_report_files.append(file)
 
 
-def send_report_email(from_addr = "anonymous@par4all.org", recipient = "par4all@hpc-project.com"):
+def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@par4all.org"):
+
+    # Only for Python >= 2.5:
+    from email import encoders
+    from email.message import Message
+    from email.mime.audio import MIMEAudio
+    from email.mime.base import MIMEBase
+    from email.mime.image import MIMEImage
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
     global static_options, static_args, extra_report_files
 
@@ -228,7 +243,9 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "par4all@
 
 
 def send_report_email_if_enabled():
-    global static_options, static_args, extra_report_files
+    global static_options, static_args, extra_report_files, report_available
+    if not report_available:
+        return
     if static_options.report:
         from_addr = static_options.report
         if not re.match(r"[\w\+\-\_\.]+\@[\w\-\.]+", from_addr):
@@ -238,7 +255,7 @@ def send_report_email_if_enabled():
     else:
         suggest("You may report this error to the Par4All team by running again using --report <your email address>")
     if not static_options.report_files and (static_args or extra_report_files):
-        suggest("Pass --report-files to attach input/processed files to the report email")
+        suggest("Pass --report-files to attach input/processed files to the report email (CAREFUL: this assumes you are allowed and willing to send us potentially confidential files!)")
 
 
 def suggest_more_verbosity():
@@ -253,10 +270,10 @@ def suggest_more_verbosity():
         warn("Log file was " + current_log_file)
 
 
-def suggest_RC():
+def suggest_rebuild():
     global static_options
     if not static_options.rebuild or not static_options.clean:
-        suggest("You may try running again with --rebuild --clean (-RC)")
+        suggest("You may try running again with --clean --rebuild --reconf all")
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ import p4a
 def main():
     '''The function called when this program is executed by its own'''
 
-    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [files]")
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [files]; run %prog --help for options")
 
     p4a.add_module_options(parser)
 

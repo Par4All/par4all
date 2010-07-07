@@ -9,7 +9,8 @@
 Par4All Common Utility Functions
 '''
 
-import string, sys, random, logging, logging.handlers, os, re, datetime, shutil, subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob
+import string, sys, random, logging, logging.handlers, os, re, datetime, shutil
+import subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob, platform
 from threading import Thread
 import p4a_term
 
@@ -79,76 +80,18 @@ def get_program_dir():
     global program_dir
     return program_dir
 
-#~ all_spinners = []
-
-#~ class spinner(Thread):
-
-    #~ def __init__(self, start_it = True):
-        #~ Thread.__init__(self)
-        #~ self.stopped = True
-        #~ global all_spinners
-        #~ all_spinners.append(self)
-        #~ if start_it:
-            #~ self.start_spinning()
-
-    #~ def start_spinning(self):
-        #~ if not self.stopped:
-            #~ return
-        #~ # Not a tty? return now
-        #~ if not os.isatty(2):
-            #~ return
-        #~ self.startt = time.time()
-        #~ self.start()
-        #~ self.stopped = False
-
-    #~ def stop(self):
-        #~ if not self.stopped:
-            #~ self.stopped = True
-            #~ self.join()
-
-    #~ def __del__(self):
-        #~ self.stop()
-
-    #~ def run(self):
-        #~ while time.time() - self.startt < 1:
-            #~ time.sleep(0.05)
-            #~ if self.stopped:
-                #~ return
-        #~ while not self.stopped:
-            #~ for item in "-\|/":
-                #~ sys.__stderr__.write("\rPlease wait... " + item)
-                #~ time.sleep(0.05)
-        #~ sys.__stderr__.write("\r")
-
-#~ def stop_all_spinners():
-    #~ global all_spinners
-    #~ for spin in all_spinners:
-        #~ spin.stop()
-
 msg_prefix = program_name + ": "
-#~ master_spin = None
 
 debug_prefix = ""
 debug_suffix = ""
 
-#~ def stop_master_spinner():
-    #~ global master_spin
-    #~ if master_spin:
-        #~ master_spin.stop()
-        #~ master_spin = None
-
 def debug(msg, log = True, bare = False, level = 2):
     global debug_prefix, debug_suffix, msg_prefix
     if get_verbosity() >= level:
-        #~ stop_master_spinner()
-        #~ if msg and msg[len(msg) - 1] == "\n":
-            #~ msg = msg[0:len(msg) - 2]
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
         else:
             sys.__stderr__.write(msg_prefix + debug_prefix + str(msg).rstrip("\n") + debug_suffix + "\n");
-        #~ if spin:
-            #~ master_spin = spinner()
     if logger and log:
         logger.debug(msg)
 
@@ -251,6 +194,7 @@ def setup_logging(file = default_log_file, suffix = "", remove = False):
     logger.info("*" * 50)
     logger.info("*" * 50)
     logger.info("Command: " + " ".join(sys.argv))
+    logger.info("Python version: " + platform.python_version())
     warn("Logging to " + file)
 
 def flush_log():
@@ -512,7 +456,6 @@ def rmtree(dir, can_fail = False, remove_top = True):
         return
     if is_system_dir(dir): # Prevent deletion of major system dirs...
         raise p4a_error("Will not remove protected directory: " + dir)
-    #~ debug("Removing tree: " + dir)
     ret = 0
     if remove_top:
         if run([ "rm", "-rf", dir + "/" ], can_fail = can_fail)[2]:
@@ -520,19 +463,6 @@ def rmtree(dir, can_fail = False, remove_top = True):
     else:
         if run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)[2]:
             warn("Could not remove everything in " + dir)
-    #~ try:
-        #~ for root, dirs, files in os.walk(dir, topdown = False):
-            #~ for name in files:
-                #~ os.remove(os.path.join(root, name))
-            #~ for name in dirs:
-                #~ os.rmdir(os.path.join(root, name))
-        #~ if remove_top:
-            #~ os.rmdir(dir)
-    #~ except:
-        #~ if can_fail:
-            #~ warn("Could not remove directory " + dir + ": " + str(sys.exc_info()[1]))
-        #~ else:
-            #~ raise
 
 def find(file_re, dir = None, abs_path = True, match_files = True, 
     match_dirs = False, match_whole_path = False, can_fail = True):
@@ -574,22 +504,6 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
         if not can_fail:
             raise e
     return matches
-
-#def get_python_lib_dir(dist_dir = None):
-#	lib_dir = ""
-#	if dist_dir:
-#		lib_dir = os.path.join(dist_dir, "lib")
-#	else:
-#		global script_dir
-#		return script_dir
-#	python_dir = find(r"python\d\.\d", dir = dist_dir)
-#	
-#	for file in os.listdir(dist_dir):
-#		if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
-#			install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
-#			if not os.path.isdir(install_python_lib_dir):
-#				install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
-#			break
 
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
@@ -674,7 +588,6 @@ def sh2csh(file, output_file = None):
     content += "\n\nrehash\n";
     write_file(output_file, content)
 
-# XXX: make it cross platform
 def add_to_path(new_value, var = "PATH", after = False):
     '''Adds a new value to the PATH environment variable (or any other var working the same way).
     Returns the previous whole value for the variable.'''
