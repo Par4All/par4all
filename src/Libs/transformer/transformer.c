@@ -735,8 +735,7 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
    Does not take into account value types. So s=="hello" and
    s=="world" do not result into an empty transformer.
  */
-transformer
-transformer_normalize(transformer t, int level)
+transformer transformer_normalize(transformer t, int level)
 {
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
@@ -835,6 +834,17 @@ transformer_normalize(transformer t, int level)
 	  break;
 
 	case 4:
+	  /* Too expensive according to measurements by Beatrice
+	   * Creusillet to be used anywhere but before storing
+	   * transformers or preconditons or before printing
+	   * them. Lots of calls to string operations when C is the
+	   * analyzed language because variable names used for sorting
+	   * are easy to extract due to scope information. It is not
+	   * clear from the information mailed by Beatrice if
+	   * sc_normalize2 is also too computational but it should be
+	   * as only the basis of the constraint system is sorted out
+	   * to normalize r more effectively.
+	   */
 	  vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
 	  r = sc_normalize2(r);
 	  break;

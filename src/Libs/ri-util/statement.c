@@ -194,10 +194,35 @@ bool continue_statement_p(statement s) {
   return instruction_continue_p(i);
 }
 
-bool declaration_statement_p(statement s) {
-  instruction i = statement_instruction(s);
+/* Had to be optimized according to Beatrice Creusillet. We assume
+   that FALSE is returned most of the time. String operations are
+   avoided (almost) as much as possible.
 
-  return instruction_continue_p(i) && !ENDP(statement_declarations(s));
+   For the time being a declaration statement is a call to continue
+   with non-empty declarations.
+*/
+bool declaration_statement_p(statement s) {
+  bool declaration_p = FALSE;
+
+  /* Initial implementation. It would have been better to check
+     !ENDP() first. */
+  //return instruction_continue_p(i) &&
+  //!ENDP(statement_declarations(s));
+
+  if(!ENDP(statement_declarations(s))) {
+    instruction i = statement_instruction(s);
+    if(instruction_call_p(i)) {
+      call c = instruction_call(i);
+      entity f = call_function(c);
+      string n = entity_name(f);
+      /* You want entity_name(f)=="TOP-LEVEL:CONTINUE"*/
+      if(*(n+17)=='E')
+	if(*(n+3)=='-')
+	  declaration_p = strcmp(n, "TOP-LEVEL:CONTINUE")==0;
+    }
+  }
+
+  return declaration_p;
 }
 
 /* Check that all statements contained in statement list sl are a
