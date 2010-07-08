@@ -8,23 +8,34 @@
 
 '''
 Par4All common option parsing and report email generation routines
-XXX: kind of a p4a_util2 right now.
 '''
 
 
-import string, sys, optparse, smtplib, traceback, mimetypes, re, platform
+import string, sys, optparse, traceback, re, platform
 
 from p4a_util import *
 from p4a_version import *
 
 
+# A copy of the program options as parsed with optparse:
 static_options = None
+
+# A copy of the program arguments as parsed with optparse:
 static_args = None
+
+# The array containing additional files to add to a *potential* report
+# if --report and --report-files are specified:
 extra_report_files = []
 
+# With Python 2.4 (previous versions untested/not allowed, see process_common_options),
+# --report is unavailable because email modules are not present.
+# You might as well set this to False to disable reporting once and for all.
 report_available = (platform.python_version() >= "2.5")
 
+
 def add_common_options(parser):
+    '''Add common options (for setting verbosity, reporting errors etc.)
+    to the optparse list of options.'''
 
     global report_available
 
@@ -51,8 +62,8 @@ def add_common_options(parser):
         group.add_option("--report-dont-send", action = "store_true", default = False,
             help = "If --report is specified, generate an .eml file with the email which would have been send to the Par4All team, but do not actually send it.")
 
-    group.add_option("--no-color", action = "store_true", default = False,
-        help = "Disable coloring of terminal output.")
+    group.add_option("--plain", "--no-color", "--no-fancy", "-z", action = "store_true", default = False,
+        help = "Disable coloring of terminal output and disable all fancy tickers and spinners and this kind of eye-candy things :-)")
 
     group.add_option("-V", dest = "script_version", action = "store_true", default = False,
         help = "Display script version and exit.")
@@ -61,14 +72,23 @@ def add_common_options(parser):
 
 
 def process_common_options(options, args):
+    '''Process options and do some initialization depending on common options
+    described above.'''
 
-    global report_available
-
-    if options.no_color:
-        p4a_term.disabled = True
+    global static_options, static_args, report_available
 
     set_verbosity(options.verbose)
 
+    # Disable coloring and any terminal decorations if requested:
+    set_fancy(not options.plain)
+
+    # Only Python >= 2.4 supported.
+    if platform.python_version() < "2.4":
+        die("You must at least use Python 2.4 to run Par4All scripts")
+
+    # We were asked what is the script version:
+    # try to determine the git revision or look at the
+    # p4a_version file somewhere:
     if options.script_version:
         main_script = os.path.abspath(sys.argv[0])
         version = guess_file_revision(main_script)
@@ -82,6 +102,7 @@ def process_common_options(options, args):
             options.log = True
             setup_logging(suffix = "_report_" + utc_datetime(), remove = True)
             warn("--report enabled, I will send an email to the Par4All team in case of error")
+            # Warn a lot if --report-files is specified...
             if options.report_files:
                 warn("--report-files specified: This might be a privacy/legal/licensing concern for your organization/company")
                 warn("--report-files specified: Please check twice you are allowed and willing to do so, or hit CTRL+C NOW!!")
@@ -89,7 +110,6 @@ def process_common_options(options, args):
                 warn("--report-files specified: nor does the --report-files obliges the Par4All team to purchase any licensing for your software,")
                 warn("--report-files specified: nor does the --report-files transfers the Par4All team any copyright/licensing rights on your software.")
 
-    global static_options, static_args
     static_options = options
     static_args = args
 
@@ -107,6 +127,8 @@ def report_add_file(file):
 
 
 def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@par4all.org"):
+
+    import smtplib, mimetypes
 
     # Only for Python >= 2.5:
     from email import encoders
