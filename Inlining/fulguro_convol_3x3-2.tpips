@@ -42,7 +42,6 @@ apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
 apply INLINING_SIMPLE[flgr2d_convolution]
 
 module main
-activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE
 
 quit
