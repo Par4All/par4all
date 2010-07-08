@@ -61,7 +61,7 @@ def add_common_options(parser):
 
 
 def process_common_options(options, args):
-    
+
     global report_available
 
     if options.no_color:
@@ -122,9 +122,9 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@
     current_log_file = get_current_log_file()
     if not current_log_file or not os.path.exists(current_log_file):
         raise p4a_error("Current log file is invalid")
-    
+
     eml_file = change_file_ext(current_log_file, ".eml")
-    
+
     recipients = [ recipient, from_addr ]
 
     flush_log()

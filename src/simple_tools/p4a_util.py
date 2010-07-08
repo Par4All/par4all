@@ -15,27 +15,37 @@ from threading import Thread
 import p4a_term
 
 def save_pickle(file, obj):
+    '''Serizializes/marshalls object in obj in file.'''
     f = open(file, "wb")
     cPickle.dump(obj, f)
     f.close()
 
 def load_pickle(file):
+    '''Deserializes/unmarshalls object contained in file, 
+    previously serialized using pickle or cPickle modules.
+    Returns the new object.'''
     f = open(file, "rb")
     obj = cPickle.load(f)
     f.close()
     return obj
 
-# Global variables.
+# Global verbosity level:
 verbosity = 0
+
+# Logger instance to log to when something is output:
 logger = None
+
+# Log file associated with current logger instance:
 current_log_file = None
 
 def get_current_log_file():
+    '''Helper function which returns the current log file.'''
     global current_log_file
     return current_log_file
 
 def change_file_ext(file, new_ext = None, if_ext = None):
-    '''Changes the extension for the given file path if it matches if_ext.'''
+    '''Changes the extension for the given file path if it matches if_ext.
+    If if_ext is None, will change the extension every time. '''
     (base, ext) = os.path.splitext(file)
     if new_ext is None:
         new_ext = ""
@@ -52,6 +62,7 @@ def get_file_extension(file):
     return os.path.splitext(file)[1]
 
 def get_file_ext(file):
+    '''Alias for get_file_extension.'''
     return get_file_extension(file)
 
 def file_add_suffix(file, suffix):
@@ -60,12 +71,12 @@ def file_add_suffix(file, suffix):
     return base + suffix + ext
 
 def set_verbosity(level):
-    '''Sets global verbosity level'''
+    '''Sets global verbosity level.'''
     global verbosity
     verbosity = level
 
 def get_verbosity():
-    '''Returns global verbosity level'''
+    '''Returns global verbosity level.'''
     global verbosity
     return verbosity
 
@@ -73,10 +84,12 @@ def get_verbosity():
 program_name = change_file_ext(program_name, "")
 
 def get_program_name():
+    '''Helper function which returns the calling program name (argv[0], see above).'''
     global program_name
     return program_name
 
 def get_program_dir():
+    '''Helper function which returns the calling program directory.'''
     global program_dir
     return program_dir
 
@@ -86,6 +99,8 @@ debug_prefix = ""
 debug_suffix = ""
 
 def debug(msg, log = True, bare = False, level = 2):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
     global debug_prefix, debug_suffix, msg_prefix
     if get_verbosity() >= level:
         if bare:
@@ -99,6 +114,8 @@ info_prefix = p4a_term.escape("white", if_tty_fd = 2)
 info_suffix = p4a_term.escape(if_tty_fd = 2)
 
 def info(msg, log = True, bare = False, level = 1):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
     global info_prefix, info_suffix, msg_prefix
     if get_verbosity() >= level:
         if bare:
@@ -109,6 +126,7 @@ def info(msg, log = True, bare = False, level = 1):
         logger.info(msg)
 
 def suggest(msg, level = 0):
+    '''Suggest something at given level. This one never logs.'''
     global msg_prefix
     if get_verbosity() >= level:
         sys.__stderr__.write(msg_prefix + str(msg).rstrip("\n") + "\n");
@@ -117,6 +135,11 @@ cmd_prefix = p4a_term.escape("magenta", if_tty_fd = 2)
 cmd_suffix = p4a_term.escape(if_tty_fd = 2)
 
 def cmd(msg, dir = None, log = True, bare = False, level = 1):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.
+    This function is specific to external commands: it will print out the command
+    in a specific color and will print the directory in which the command is run
+    if verbosity is high enough.'''
     global cmd_prefix, cmd_suffix, msg_prefix
     if get_verbosity() >= level:
         if get_verbosity() > level and dir:
@@ -136,6 +159,9 @@ done_prefix = p4a_term.escape("green", if_tty_fd = 2)
 done_suffix = p4a_term.escape(if_tty_fd = 2)
 
 def done(msg, log = True, bare = False, level = 0):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.
+    This function is specific to results (for displaying explicit "ok it's done" messages).'''
     global done_prefix, done_suffix, msg_prefix
     if get_verbosity() >= level:
         if bare:
@@ -149,6 +175,8 @@ warn_prefix = p4a_term.escape("yellow", if_tty_fd = 2)
 warn_suffix = p4a_term.escape(if_tty_fd = 2)
 
 def warn(msg, log = True, bare = False, level = 0):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
     global warn_prefix, warn_suffix, msg_prefix
     if get_verbosity() >= level:
         if bare:
@@ -162,6 +190,8 @@ error_prefix = p4a_term.escape("red", if_tty_fd = 2)
 error_suffix = p4a_term.escape(if_tty_fd = 2)
 
 def error(msg, log = True, bare = False, level = 0):
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
     global error_prefix, error_suffix, msg_prefix
     if get_verbosity() >= level:
         if bare:
@@ -172,6 +202,7 @@ def error(msg, log = True, bare = False, level = 0):
         logger.error(msg)
 
 def die(msg, exit_code = 254, log = True, bare = False, level = 0):
+    '''Issue an error() and then commit suicide.'''
     error(msg, log = log, bare = bare, level = level)
     sys.exit(exit_code)
 
@@ -179,6 +210,8 @@ default_log_file = os.path.join(os.getcwd(), program_name + ".log")
 log_file_handler = None
 
 def setup_logging(file = default_log_file, suffix = "", remove = False):
+    '''Setup the logger instance so that all calls to debug, info, warn, etc.
+    end up in a file, not only on the screen.'''
     global logger, program_name, current_log_file, log_file_handler
     logger = logging.getLogger(program_name)
     logger.setLevel(logging.DEBUG)
@@ -198,11 +231,13 @@ def setup_logging(file = default_log_file, suffix = "", remove = False):
     warn("Logging to " + file)
 
 def flush_log():
+    '''Flush the log handler to disk.'''
+    global log_file_handler
     if log_file_handler:
         log_file_handler.flush()
 
 class p4a_error(Exception):
-    '''Generic base class for exceptions'''
+    '''Generic base class for exceptions.'''
     def __init__(self, msg = "Generic error", code = 123):
         self.msg = msg
         self.code = code
@@ -211,7 +246,7 @@ class p4a_error(Exception):
         return self.msg
 
 def read_file(file, text = True):
-    '''Slurp file contents.'''
+    '''"Slurp" (read whole) file contents.'''
     f = None
     if text:
         f = open(file, "r")
@@ -222,6 +257,8 @@ def read_file(file, text = True):
     return content
 
 def write_file(file, content, text = True):
+    '''Write some text or binary data to a file.
+    This will overwrite any existing data in file!'''
     debug("Writing " + str(len(content)) + " bytes to " + file)
     f = None
     if text:
@@ -232,11 +269,16 @@ def write_file(file, content, text = True):
     f.close()
 
 def make_non_blocking(f):
+    '''Make a file-like object non-blocking (reads will not block)
+    until there is something to actually read). Useful for pipes.'''
     fd = f.fileno()
     fl = fcntl.fcntl(fd, fcntl.F_GETFL)
     fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
 class runner(Thread):
+
+    '''This class can be used to spawn an external command and
+    capture its output. For a typical usage see the p4a_util.run() function.'''
 
     def __init__(self, cmd_list, can_fail = False, shell = True,
                  force_locale = "C", working_dir = None, extra_env = {},
@@ -402,6 +444,7 @@ class runner(Thread):
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, 
         shell = True, extra_env = {}, silent = False, 
         stdout_handler = None, stderr_handler = None):
+    '''Helper function to spawn an external command and wait for it to finish.'''
     if stdout_handler is None and stderr_handler is None:
         if silent:
             # Log output even in silent mode.
@@ -416,22 +459,27 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
     return r.wait()
 
 def which(cmd, silent = True):
+    '''Calls the "which" UNIX utility for the given program.'''
     return run([ "which", cmd ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def whoami(silent = True):
+    '''Calls the whoami UNIX utility.'''
     return run([ "whoami" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def hostname(silent = True):
+    '''Calls the hostname UNIX utility.'''
     return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def uname(silent = True):
+    '''Calls the uname UNIX utility.'''
     return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def ping(host, silent = True):
+    '''Calls the ping utility. Returns True if remote host answers within 1 second.'''
     return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
-    '''Generates a random name or password'''
+    '''Generates a random name or password.'''
     return prefix + "".join(random.choice(chars) for x in range(length)) + suffix
 
 def is_system_dir(dir):
@@ -575,6 +623,7 @@ def file_lastmod(file):
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
 
 def utc_datetime():
+    '''Returns the current UTC date/time in ISO format.'''
     return time.strftime("%Y%m%dT%H%M%S", time.gmtime())
 
 def sh2csh(file, output_file = None):
@@ -635,6 +684,7 @@ def quote(s):
         return s
 
 def env(var, default = ""):
+    '''Helper to return a variable environment value if it is defined.'''
     if var in os.environ:
         return os.environ[var]
     else:
