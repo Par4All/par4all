@@ -14,28 +14,43 @@ import subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob, pla
 from threading import Thread
 import p4a_term
 
-def save_pickle(file, obj):
-    f = open(file, "wb")
-    cPickle.dump(obj, f)
-    f.close()
 
-def load_pickle(file):
-    f = open(file, "rb")
-    obj = cPickle.load(f)
-    f.close()
-    return obj
+# Disable all fancy output animation and coloring once and for all:
+never_fancy = False
 
-# Global variables.
+# Current state of fancyness, will be set depending on options in p4a_opts.process_common_options:
+fancy = not never_fancy
+
+# Global verbosity level:
 verbosity = 0
+
+# Logger instance to log to when something is output:
 logger = None
+
+# Log file associated with current logger instance:
 current_log_file = None
 
+
+def is_fancy():
+    global fancy
+    return fancy
+
+def set_fancy(f):
+    global never_fancy, fancy
+    if not never_fancy:
+        fancy = f
+        p4a_term.disabled = not fancy
+
+
 def get_current_log_file():
+    '''Helper function which returns the current log file.'''
     global current_log_file
     return current_log_file
 
+
 def change_file_ext(file, new_ext = None, if_ext = None):
-    '''Changes the extension for the given file path if it matches if_ext.'''
+    '''Changes the extension for the given file path if it matches if_ext.
+    If if_ext is None, will change the extension every time. '''
     (base, ext) = os.path.splitext(file)
     if new_ext is None:
         new_ext = ""
@@ -52,6 +67,7 @@ def get_file_extension(file):
     return os.path.splitext(file)[1]
 
 def get_file_ext(file):
+    '''Alias for get_file_extension.'''
     return get_file_extension(file)
 
 def file_add_suffix(file, suffix):
@@ -59,34 +75,40 @@ def file_add_suffix(file, suffix):
     (base, ext) = os.path.splitext(file)
     return base + suffix + ext
 
+
 def set_verbosity(level):
-    '''Sets global verbosity level'''
+    '''Sets global verbosity level.'''
     global verbosity
     verbosity = level
 
 def get_verbosity():
-    '''Returns global verbosity level'''
+    '''Returns global verbosity level.'''
     global verbosity
     return verbosity
+
 
 (program_dir, program_name) = os.path.split(sys.argv[0])
 program_name = change_file_ext(program_name, "")
 
 def get_program_name():
+    '''Helper function which returns the calling program name (argv[0], see above).'''
     global program_name
     return program_name
 
 def get_program_dir():
+    '''Helper function which returns the calling program directory.'''
     global program_dir
     return program_dir
 
+
 msg_prefix = program_name + ": "
 
-debug_prefix = ""
-debug_suffix = ""
-
 def debug(msg, log = True, bare = False, level = 2):
-    global debug_prefix, debug_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
+    global msg_prefix
+    debug_prefix = ""
+    debug_suffix = ""
     if get_verbosity() >= level:
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -95,11 +117,12 @@ def debug(msg, log = True, bare = False, level = 2):
     if logger and log:
         logger.debug(msg)
 
-info_prefix = p4a_term.escape("white", if_tty_fd = 2)
-info_suffix = p4a_term.escape(if_tty_fd = 2)
-
 def info(msg, log = True, bare = False, level = 1):
-    global info_prefix, info_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
+    global msg_prefix
+    info_prefix = p4a_term.escape("white", if_tty_fd = 2)
+    info_suffix = p4a_term.escape(if_tty_fd = 2)
     if get_verbosity() >= level:
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -109,15 +132,20 @@ def info(msg, log = True, bare = False, level = 1):
         logger.info(msg)
 
 def suggest(msg, level = 0):
+    '''Suggest something at given level. This one never logs.'''
     global msg_prefix
     if get_verbosity() >= level:
         sys.__stderr__.write(msg_prefix + str(msg).rstrip("\n") + "\n");
 
-cmd_prefix = p4a_term.escape("magenta", if_tty_fd = 2)
-cmd_suffix = p4a_term.escape(if_tty_fd = 2)
-
 def cmd(msg, dir = None, log = True, bare = False, level = 1):
-    global cmd_prefix, cmd_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.
+    This function is specific to external commands: it will print out the command
+    in a specific color and will print the directory in which the command is run
+    if verbosity is high enough.'''
+    global msg_prefix
+    cmd_prefix = p4a_term.escape("magenta", if_tty_fd = 2)
+    cmd_suffix = p4a_term.escape(if_tty_fd = 2)
     if get_verbosity() >= level:
         if get_verbosity() > level and dir:
             if bare:
@@ -132,11 +160,13 @@ def cmd(msg, dir = None, log = True, bare = False, level = 1):
     if logger and log:
         logger.info(msg)
 
-done_prefix = p4a_term.escape("green", if_tty_fd = 2)
-done_suffix = p4a_term.escape(if_tty_fd = 2)
-
 def done(msg, log = True, bare = False, level = 0):
-    global done_prefix, done_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.
+    This function is specific to results (for displaying explicit "ok it's done" messages).'''
+    global msg_prefix
+    done_prefix = p4a_term.escape("green", if_tty_fd = 2)
+    done_suffix = p4a_term.escape(if_tty_fd = 2)
     if get_verbosity() >= level:
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -145,11 +175,12 @@ def done(msg, log = True, bare = False, level = 0):
     if logger and log:
         logger.info(msg)
 
-warn_prefix = p4a_term.escape("yellow", if_tty_fd = 2)
-warn_suffix = p4a_term.escape(if_tty_fd = 2)
-
 def warn(msg, log = True, bare = False, level = 0):
-    global warn_prefix, warn_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
+    global msg_prefix
+    warn_prefix = p4a_term.escape("yellow", if_tty_fd = 2)
+    warn_suffix = p4a_term.escape(if_tty_fd = 2)
     if get_verbosity() >= level:
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -158,11 +189,12 @@ def warn(msg, log = True, bare = False, level = 0):
     if logger and log:
         logger.warn(msg)
 
-error_prefix = p4a_term.escape("red", if_tty_fd = 2)
-error_suffix = p4a_term.escape(if_tty_fd = 2)
-
 def error(msg, log = True, bare = False, level = 0):
-    global error_prefix, error_suffix, msg_prefix
+    '''Log (and print out if verbosity is high enough (cf. level parameter))
+    the passed message msg.'''
+    global msg_prefix
+    error_prefix = p4a_term.escape("red", if_tty_fd = 2)
+    error_suffix = p4a_term.escape(if_tty_fd = 2)
     if get_verbosity() >= level:
         if bare:
             sys.__stderr__.write(str(msg).rstrip("\n") + "\n");
@@ -172,6 +204,7 @@ def error(msg, log = True, bare = False, level = 0):
         logger.error(msg)
 
 def die(msg, exit_code = 254, log = True, bare = False, level = 0):
+    '''Issue an error() and then commit suicide.'''
     error(msg, log = log, bare = bare, level = level)
     sys.exit(exit_code)
 
@@ -179,6 +212,8 @@ default_log_file = os.path.join(os.getcwd(), program_name + ".log")
 log_file_handler = None
 
 def setup_logging(file = default_log_file, suffix = "", remove = False):
+    '''Setup the logger instance so that all calls to debug, info, warn, etc.
+    end up in a file, not only on the screen.'''
     global logger, program_name, current_log_file, log_file_handler
     logger = logging.getLogger(program_name)
     logger.setLevel(logging.DEBUG)
@@ -198,11 +233,14 @@ def setup_logging(file = default_log_file, suffix = "", remove = False):
     warn("Logging to " + file)
 
 def flush_log():
+    '''Flush the log handler to disk.'''
+    global log_file_handler
     if log_file_handler:
         log_file_handler.flush()
 
+
 class p4a_error(Exception):
-    '''Generic base class for exceptions'''
+    '''Generic base class for exceptions.'''
     def __init__(self, msg = "Generic error", code = 123):
         self.msg = msg
         self.code = code
@@ -210,8 +248,9 @@ class p4a_error(Exception):
         #~ return self.msg + " (" + str(self.code) + ")"
         return self.msg
 
+
 def read_file(file, text = True):
-    '''Slurp file contents.'''
+    '''"Slurp" (read whole) file contents.'''
     f = None
     if text:
         f = open(file, "r")
@@ -222,6 +261,8 @@ def read_file(file, text = True):
     return content
 
 def write_file(file, content, text = True):
+    '''Write some text or binary data to a file.
+    This will overwrite any existing data in file!'''
     debug("Writing " + str(len(content)) + " bytes to " + file)
     f = None
     if text:
@@ -231,12 +272,19 @@ def write_file(file, content, text = True):
     f.write(content)
     f.close()
 
+
 def make_non_blocking(f):
+    '''Make a file-like object non-blocking (reads will not block)
+    until there is something to actually read). Useful for pipes.'''
     fd = f.fileno()
     fl = fcntl.fcntl(fd, fcntl.F_GETFL)
     fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+
 class runner(Thread):
+
+    '''This class can be used to spawn an external command and
+    capture its output. For a typical usage see the p4a_util.run() function.'''
 
     def __init__(self, cmd_list, can_fail = False, shell = True,
                  force_locale = "C", working_dir = None, extra_env = {},
@@ -301,7 +349,7 @@ class runner(Thread):
         self.spin_back = False
         self.spin_after = .8
         #~ self.can_spin = not self.silent and os.isatty(2)
-        self.can_spin = os.isatty(2)
+        self.can_spin = is_fancy() and os.isatty(2)
         self.startt = time.time()
 
         if self.redir:
@@ -402,6 +450,7 @@ class runner(Thread):
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, 
         shell = True, extra_env = {}, silent = False, 
         stdout_handler = None, stderr_handler = None):
+    '''Helper function to spawn an external command and wait for it to finish.'''
     if stdout_handler is None and stderr_handler is None:
         if silent:
             # Log output even in silent mode.
@@ -416,23 +465,30 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
     return r.wait()
 
 def which(cmd, silent = True):
+    '''Calls the "which" UNIX utility for the given program.'''
     return run([ "which", cmd ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def whoami(silent = True):
+    '''Calls the whoami UNIX utility.'''
     return run([ "whoami" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def hostname(silent = True):
+    '''Calls the hostname UNIX utility.'''
     return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def uname(silent = True):
+    '''Calls the uname UNIX utility.'''
     return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def ping(host, silent = True):
+    '''Calls the ping utility. Returns True if remote host answers within 1 second.'''
     return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
 
+
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
-    '''Generates a random name or password'''
+    '''Generates a random name or password.'''
     return prefix + "".join(random.choice(chars) for x in range(length)) + suffix
+
 
 def is_system_dir(dir):
     '''Returns True if dir is a system directory (any directory which matters to the system).'''
@@ -444,6 +500,7 @@ def is_system_dir(dir):
         if dir == s:
             return True
     return False
+
 
 def rmtree(dir, can_fail = False, remove_top = True):
     '''Removes a directory recursively, alternative to shutil.rmtree()'''
@@ -463,6 +520,7 @@ def rmtree(dir, can_fail = False, remove_top = True):
     else:
         if run([ "rm", "-rf", dir + "/*" ], can_fail = can_fail)[2]:
             warn("Could not remove everything in " + dir)
+
 
 def find(file_re, dir = None, abs_path = True, match_files = True, 
     match_dirs = False, match_whole_path = False, can_fail = True):
@@ -504,6 +562,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
         if not can_fail:
             raise e
     return matches
+
 
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
@@ -547,10 +606,12 @@ def header_file_p(file):
     ext = get_file_extension(file)
     return ext == '.h' or ext == '.hpp'
 
+
 def get_machine_arch():
     '''Returns current machine architecture'''
     (sysname, nodename, release, version, machine) = os.uname()
     return machine
+
 
 def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext = True):
     '''Substitute keys with values from map in template designated by template_file.
@@ -570,12 +631,15 @@ def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext
     debug("Template " + template_file + " subsituted to " + output_file)
     return output_file
 
+
 def file_lastmod(file):
     '''Returns file's last modification date/time.'''
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
 
 def utc_datetime():
+    '''Returns the current UTC date/time in ISO format.'''
     return time.strftime("%Y%m%dT%H%M%S", time.gmtime())
+
 
 def sh2csh(file, output_file = None):
     '''Attempts to convert a sh file to csh.'''
@@ -587,6 +651,7 @@ def sh2csh(file, output_file = None):
     content = re.sub("(\S+?)\s*=\s*(.+?)(\n?)(;?)", "set \\1=\\2\\3\\4", content)
     content += "\n\nrehash\n";
     write_file(output_file, content)
+
 
 def add_to_path(new_value, var = "PATH", after = False):
     '''Adds a new value to the PATH environment variable (or any other var working the same way).
@@ -604,6 +669,14 @@ def add_to_path(new_value, var = "PATH", after = False):
     os.environ[var] = os.pathsep.join(values)
     debug("New " + var + " value: " + os.environ[var])
     return os.pathsep.join(old_values)
+
+def env(var, default = ""):
+    '''Helper to return a variable environment value if it is defined.'''
+    if var in os.environ:
+        return os.environ[var]
+    else:
+        return default
+
 
 def quote(s):
     '''Quote the string if necessary and escape dangerous characters.
@@ -634,11 +707,6 @@ def quote(s):
     else:
         return s
 
-def env(var, default = ""):
-    if var in os.environ:
-        return os.environ[var]
-    else:
-        return default
 
 def relativize(file_dir = None, dirs = [], base = os.getcwd()):
     '''Make a file or directory relative to the base directory, 
@@ -651,6 +719,22 @@ def relativize(file_dir = None, dirs = [], base = os.getcwd()):
         if file_dir[0] == os.path.sep:
             file_dir = file_dir[1:]
     return file_dir
+
+
+def save_pickle(file, obj):
+    '''Serizializes/marshalls object in obj in file.'''
+    f = open(file, "wb")
+    cPickle.dump(obj, f)
+    f.close()
+
+def load_pickle(file):
+    '''Deserializes/unmarshalls object contained in file, 
+    previously serialized using pickle or cPickle modules.
+    Returns the new object.'''
+    f = open(file, "rb")
+    obj = cPickle.load(f)
+    f.close()
+    return obj
 
 
 if __name__ == "__main__":

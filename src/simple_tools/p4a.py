@@ -193,6 +193,9 @@ property_redefined_re = re.compile(r"property \S+ redefined")
 already_printed_warning_errors = []
 
 def pips_output_filter(s):
+    '''This callback can be used to filter out lines in PIPS output.
+    This is useful because PIPS prints everything out to STDERR, even informational messages.
+    At minimum verbosity level, we want to display errors/warnings, but not debug messages.'''
     global error_re, warning_re, property_redefined_re, already_printed_warning_errors
     if s.find("Cannot preprocess file") != -1:
         error("PIPS: " + s)
@@ -282,6 +285,8 @@ def main(options, args = []):
         abs_file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
             die("Invalid/missing extra file: " + abs_file)
+        # Push the file for a potential report (so that if --report-files is specified, the report
+        # will include the input files).
         report_add_file(file)
 
     # If no project name is provided, try some random names.
@@ -365,6 +370,11 @@ def main(options, args = []):
         warn("No supported files to process!")
 
     else:
+        # Craft a p4a_processor_input class instance
+        # with all parameters for the processor (pyps).
+        # If --here is not specified, this instance 
+        # will be serialized (pickle'd) to ease the 
+        # passing of parameters to the processor.
         input = p4a_processor_input()
         input.project_name = project_name
         input.accel = options.accel
@@ -377,6 +387,8 @@ def main(options, args = []):
         input.files = files
         input.recover_includes = not options.skip_recover_includes
 
+        # Interpret correctly the True/False strings, and integer strings,
+        # for the --property option specifications:
         prop_dict = dict()
         for p in options.property:
             (k, v) = p.split("=")
@@ -393,26 +405,41 @@ def main(options, args = []):
 
         input.properties = prop_dict
 
+        # This will hold the output (p4a_processor_output instance)
+        # when the processor has been called and its output has been
+        # deserialized (unpickle'd) (unless --here is specified in 
+        # which case the p4a_processor_output instance will be obtained
+        # directly):
         output = None
 
         if options.here:
+            # If --here is specified, run the processor in the current process:
+            # no serialization (pickling) neeed.
             output = process(input)
 
         else:
+            # Else, we are going to serialize the p4a_processor_input instance
+            # and deserialize the p4a_processor_output instance when the external
+            # processor script has finished.
+
+            # Make temporary files for our input and output "pickles" for the processor script.
             (input_fd, input_file) = tempfile.mkstemp(prefix = "p4a", text = False)
             (output_fd, output_file) = tempfile.mkstemp(prefix = "p4a", text = False)
 
-            # Why?
+            # Serialize (pickle) the input parameters for the processor.
+            # The processor is a different/separate script, so that we can run it as a different process.
+            # We run the processor in a separate process because we want to be able
+            # to filter out the PIPS (pyps) output.            
+            # NB: PIPS outputs everything in stderr in a somewhat weird way...
+            # and its output is buffered.
             save_pickle(input_file, input)
 
+            # Where is the processor script?
             process_script = os.path.join(get_program_dir(), "p4a_process")
-
-            # PIPS outputs everything in stderr in a somewhat weird way...
-            # Its output is buffered.
 
             out, err, ret = "", "", -1
             try:
-                # Do the PIPS job:
+                # Do the PIPS job, run the processor script with our input and output pickle files as parameters:
                 out, err, ret = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
                     silent = True,
                     # Do not overload current locale because then we can
@@ -423,15 +450,24 @@ def main(options, args = []):
             except:
                 raise p4a_error("PIPS processing aborted")
 
-            # Why?
+            # Load the results of the processor from the output pickle file:
             output = load_pickle(output_file)
 
+            # Remove our pickle files:
             os.remove(input_file)
             os.remove(output_file)
 
+        # Assign back useful variables from the processor output:
         processed_files = output.files
         database_dir = output.database_dir
 
+        # If an exception occurred in the processor script (in pyps)
+        # it will have been caught and will have been serialized in the
+        # processor output class (or put directly in the p4a_processor_output 
+        # instance if --here was specified).
+        # Raise this exception from our very script if this is the case,
+        # so that the normal error catching code is run, so that suggestions 
+        # are made, so that we can handle --report, etc., etc.
         if output.exception:
             if database_dir:
                 warn("Not removing database directory " + database_dir)
@@ -450,6 +486,8 @@ def main(options, args = []):
 
     for file in processed_files:
         done("Generated " + file, level = 1)
+        # Push the file for a potential report (so that if --report-files is specified, the report
+        # will include the processed files).
         report_add_file(file)
 
     if len(options.output_file) == 0:
@@ -469,6 +507,9 @@ def main(options, args = []):
 
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
+        # Push the CMakeLists.txt file for a potential report 
+        # (so that if --report-files is specified, the report
+        # will include this file).
         report_add_file(os.path.join(options.cmake_dir, "CMakeLists.txt"))
         if options.cmake:
             builder.cmake_write(project_name, all_buildable_files + header_files,
@@ -478,6 +519,7 @@ def main(options, args = []):
                 cmake_flags = options.cmake_flags, build = options.cmake_build)
         return
 
+    # All the building is handled by p4a_builder.py:
     try:
         info("Building " + ", ".join(output_files))
         builder.build(files = all_buildable_files, output_files = output_files,

@@ -163,7 +163,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 
 
 def main(options, args = []):
-    
+
     if args:
         die("No arguments are accepted by this script, only options")
 

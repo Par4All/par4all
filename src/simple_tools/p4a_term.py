@@ -48,10 +48,14 @@ def escape(arg = '', sep = ' ', end = '\n', if_tty_fd = -1):
     escape('blink Python')		: output a blinking 'Python'
     escape('@@ hello')			: clear the screen and print 'hello' at 1;1
     '''
+
+    global disabled, esc, reset, format, fgoffset, bgoffset, attrs, colors
+
     # If we are disabled or if destination stream fd is not a TTY,
     # return an empty string.
     if disabled or (if_tty_fd != -1 and not os.isatty(if_tty_fd)):
-        return ''
+        return ""
+
     cmd, txt = [reset], []
     if arg:
         arglist = arg.split(sep)
