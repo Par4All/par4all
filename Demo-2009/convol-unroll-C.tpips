@@ -21,20 +21,33 @@ echo Inital code
 echo
 
 display PRINTED_FILE[convol]
+
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
 
 echo
-echo After strip mining and partial eval
+echo After partial eval
 echo
+
 apply PARTIAL_EVAL[convol]
 display PRINTED_FILE[convol]
+
+echo
+echo After privatization and index set splitting
+echo
+
 apply PRIVATIZE_MODULE[convol]
 setproperty INDEX_SET_SPLITTING_BOUND "384"
 setproperty LOOP_LABEL "l400"
 apply INDEX_SET_SPLITTING[convol]
 display PRINTED_FILE[convol]
+
+
+echo
+echo After strip-minig, loop normalization, partial evaluation, dead code suppression
+echo
+
 #apply LOOP_TILING[convol]
 #l400
 #128 0
@@ -50,8 +63,9 @@ apply SUPPRESS_DEAD_CODE[convol]
 display PRINTED_FILE[convol]
 
 echo
-echo After double unrolling
+echo After double unrolling and partial evaluation
 echo
+
 setproperty LOOP_LABEL "l100"
 apply FULL_UNROLL[convol]
 setproperty LOOP_LABEL "l200"
@@ -60,6 +74,8 @@ apply FULL_UNROLL[convol]
 apply PARTIAL_EVAL
 #apply USE_DEF_ELIMINATION
 display PRINTED_FILE[convol]
+
+# Nothing else...
 
 #apply DECLARATIONS_PRIVATIZER[convol]
 #apply PRIVATIZE_MODULE[convol]
@@ -91,6 +107,6 @@ display PRINTED_FILE[convol]
 
 #apply VARIABLE_EXPANSION[convol]
 #display PARALLELPRINTED_FILE[convol]
+
 close
 quit
-### EOF

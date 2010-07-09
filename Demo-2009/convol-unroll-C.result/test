@@ -28,7 +28,7 @@ l100:
       }
 }
 
-After strip mining and partial eval
+After partial eval
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
@@ -56,6 +56,9 @@ l100:
          new_image[i][j] = new_image[i][j]/9;
       }
 }
+
+After privatization and index set splitting
+
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
    //     The convolution kernel is not applied on the outer part
@@ -68,7 +71,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
          new_image[i][j] = image[i][j];
 
 l400:
-   for(i = 1; i <= 384; i += 1)
+   for(i = 1; i <= MIN(384, 510); i += 1)
 l300:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
@@ -82,7 +85,7 @@ l100:
          new_image[i][j] = new_image[i][j]/9;
       }
 l99999:
-   for(i = 384+1; i <= 510; i += 1)
+   for(i = MIN(384, 510)+1; i <= 510; i += 1)
 l99997:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
@@ -94,6 +97,9 @@ l99993:
          new_image[i][j] = new_image[i][j]/9;
       }
 }
+
+After strip-minig, loop normalization, partial evaluation, dead code suppression
+
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
    //     The convolution kernel is not applied on the outer part
@@ -138,7 +144,7 @@ l99993:
    ;
 }
 
-After double unrolling
+After double unrolling and partial evaluation
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
