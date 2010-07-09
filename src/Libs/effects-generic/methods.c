@@ -193,6 +193,10 @@ text (*effects_to_text_func)(list);
 void (*attach_effects_decoration_to_text_func)(text);
 
 
+/* for cells */
+bool (*cell_preceding_p_func)(cell, descriptor, cell, descriptor, bool *);
+
+
 /* RESET all generic methods... should be called when pips is started...
  */
 
