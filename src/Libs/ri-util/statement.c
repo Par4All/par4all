@@ -1216,8 +1216,7 @@ text statement_to_text(statement s)
 void safe_print_statement(statement s)
 {
   if(statement_undefined_p(s)) {
-    fprintf(stderr, "Statement undefined: %s\n",
-	    statement_identification(s));
+    fprintf(stderr, "Statement undefined\n");
   }
   else if(continue_statement_p(s)
      && entity_return_label_p(statement_label(s))) {
@@ -1493,24 +1492,24 @@ string external_statement_identification(statement s)
 string statement_identification(statement s)
 {
   char * buffer;
-    instruction i = statement_instruction(s);
-    string instrstring = instruction_identification(i);
-    int so = statement_ordering(s);
-    entity called = entity_undefined;
+  instruction i = statement_instruction(s);
+  string instrstring = instruction_identification(i);
+  int so = statement_ordering(s);
+  entity called = entity_undefined;
 
-    if(same_string_p(instrstring, "CALL")) {
-	called = call_function(instruction_call(i));
-    }
+  if(same_string_p(instrstring, "CALL")) {
+    called = call_function(instruction_call(i));
+  }
 
-    asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
-	     statement_number(s),
-	     ORDERING_NUMBER(so),
-	     ORDERING_STATEMENT(so),
-	     s,
-	     instrstring,
-	     entity_undefined_p(called)? "" : module_local_name(called));
+  asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
+	   statement_number(s),
+	   ORDERING_NUMBER(so),
+	   ORDERING_STATEMENT(so),
+	   s,
+	   instrstring,
+	   entity_undefined_p(called)? "" : module_local_name(called));
 
-    return buffer;
+  return buffer;
 }
 
 string
