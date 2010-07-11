@@ -20,7 +20,5 @@ void bla(void)
 }
 void foo(void)
 {
-   float a[3];
-   int i = 1;
-   // various no write effect statements that should be removed
+   ;
 }
