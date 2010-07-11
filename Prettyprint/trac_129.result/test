@@ -1,16 +1,103 @@
+
+Proper effects for "main"
+
 int main()
 {
-   float a[10];
-   int i;
-   int j;
-   float x = 2.12;
+   float a[10];                                                         /*0005*/
+   // comments 1
+   int i, j;                                                            /*0007*/
+//               <must be written>: x
+   float x = 2.12;                                                      /*0008*/
    {
-      float z = 3.0;
-      x += z;                                                           /*0010*/
+//               <must be written>: z
+      float z = 3.0;                                                    /*0011*/
+//               <must be read   >: x z
+//               <must be written>: x
+      x += z;                                                           /*0012*/
+   }
+//               <must be written>: i
+   for(i = 0; i <= 9; i += 1) {
+//               <must be written>: y
+      float y = 2.0;                                                    /*0015*/
+//               <must be read   >: i x y
+//               <must be written>: a[i]
+      a[i] = x*y;                                                       /*0016*/
+   }
+}
+
+Privatization
+
+
+Preconditions for "main" after privatization
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float a[10];                                                         /*0005*/
+   // comments 1
+
+//  P() {}
+
+   int i, j;                                                            /*0007*/
+
+//  P(i,j) {}
+
+   float x = 2.12;                                                      /*0008*/
+   {
+
+//  P(i,j) {}
+
+      float z = 3.0;                                                    /*0011*/
+
+//  P(i,j) {}
+
+      x += z;                                                           /*0012*/
+   }
+
+//  P(i,j) {}
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  P(i,j) {0<=i, i<=9}
+
+      float y = 2.0;                                                    /*0015*/
+
+//  P(i,j) {0<=i, i<=9}
+
+      a[i] = x*y;                                                       /*0016*/
+   }
+}
+
+Dependence graph for "main"
+
+
+ **************** Effective Dependence Graph ****************
+
+	15 --> 16 with conflicts
+		from <y-W-MUST> to <y-R-MUST> at levels  2
+
+****************** End of Dependence Graph ******************
+
+Parallelization of "main" after privatization
+
+int main()
+{
+   float a[10];                                                         /*0005*/
+   // comments 1
+   int i, j;                                                            /*0007*/
+   float x = 2.12;                                                      /*0008*/
+   {
+      float z = 3.0;                                                    /*0011*/
+      x += z;                                                           /*0012*/
    }
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1) {
-      float y = 2.0;
-      a[i] = x*y;                                                       /*0014*/
+      float y = 2.0;                                                    /*0015*/
+      a[i] = x*y;                                                       /*0016*/
    }
 }
