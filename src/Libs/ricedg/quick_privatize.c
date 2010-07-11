@@ -60,7 +60,7 @@ void quick_privatize_graph(graph dep_graph)
   }
 }
 
-static bool quick_privatize_loop(statement stat, list successors;
+static bool quick_privatize_loop(statement stat, list successors)
 {
   pips_debug(3, "arcs from %d\n", statement_number(stat));
 
