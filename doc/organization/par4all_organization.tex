@@ -219,13 +219,15 @@ install it, just use:
 p4a_setup --only=pips --no-final
 \end{verbatim}
 
-Beware that if you have used a \Apips directory to compile in an other
-context (such as the classical \Asvn build), the compilation will fail
-because of the wrong dependencies between files. You should do a
+Beware that if you use a \Apips directory with \verb|--pips-src| and that
+you also used before this directory to build \Apips in a classical way
+(such as the classical \Asvn build), the compilation will fail because of
+the wrong dependencies between files existing there and not related to the
+\Apfa \texttt{build} directory location. You should do a
 \begin{verbatim}
 make clean
 \end{verbatim}
-there first.
+in the \Apips source directory you are really using first.
 
 Another way to recompile a part of \Apfa, for example when you are
 debugging one of the components, without using \verb|p4a_setup|, you go to

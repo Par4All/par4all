@@ -7,7 +7,8 @@ In this directory you should find the following files:
             version of the matrix multiplication program (see bellow
             for details).
    - matmul.f     : The matrix multiplication source code
-   - matmul.tpips : The tpips script that parallelizes the matmul.f program
+   - matmul.tpips : The tpips script that parallelizes the matmul.f program.
+     It is a minimal program you can start from to build more complex scripts
    - PipsCheck.sh : A simple script to test if the PIPS environment is set up
    - README   : This file you are reading
 
