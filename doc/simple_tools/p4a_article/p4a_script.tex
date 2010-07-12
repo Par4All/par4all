@@ -90,6 +90,9 @@ SCALOPES, ANR FREIA, ARTEMIS SMECY.
 \section{Examples and use cases of p4a}
 \label{sec:examples}
 
+\subsection{Automatic parallelization with OpenMP generation}
+\label{sec:autom-parall-with}
+
 You want to generate some \Aopenmp code from a Fortran program:
 \begin{verbatim}
 p4a --openmp example.f
@@ -99,6 +102,10 @@ behavior, you can elide the \verb/--openmp/ option. The compilation
 process transforms automatically data-parallel \emph{do}-loops into
 \Aopenmp parallel loops with the correct pragmas and privatization of
 scalar variables.
+
+
+\subsection{Automatic parallelization with CUDA generation}
+\label{sec:autom-parall-with-1}
 
 To generate from a C program source a \Acuda program that is also compiled
 into an executable:
@@ -130,6 +137,63 @@ define different preprocessor symbols according to the expected target:
 \item \verb|P4A_ACCEL_OPENMP| preprocessor symbol, the source is to be
   compiled as \Aopenmp or sequential emulation code.
 \end{itemize}
+
+You can avoid parallelizing some functions by using
+\texttt{-{}-exclude-modules=\emph{regex}} when the parallel part is not
+enough compute-intensive since transferring data and launching a kernel
+may be more expensive than sequential execution.
+
+
+\subsubsection{P4A Accel runtime tweaking}
+\label{sec:p4a-accel-runtime}
+
+To ease code generation and portability, \Apfa does not directly generate
+direct \Acuda code for example. It generates calls to functions and
+macrofunctions defined in the P4A Accel runtime.
+
+There are many parameters that can be changed to better suit a given
+application on a given target.
+
+In the case of \Acuda generation, you can pass flags to the \texttt{nvcc}
+back-end compiler with the \verb|--nvcc-flags=...| option.
+
+For example
+\begin{itemize}
+\item if you want to debug the output with \texttt{cuda-gdb}, use
+  \verb|--nvcc-flags="-g -G"|;
+\item \verb|--nvcc-flags="-gencode arch=compute_20,code=sm_20"| to
+  generate code to Fermi board;
+\item
+  \verb|--nvcc-flags="-gencode arch=compute_10,code=sm_10 -gencode arch=compute_20,code=sm_20"|
+  to generate code to both Tesla \& Fermi board.
+\end{itemize}
+
+You can debug the P4A Accel runtime itself with
+\verb|--nvcc-flags=-DP4A_DEBUG| to output debugging messages around all
+the \Acuda kernels invocations, such as: {\scriptsize
+\begin{verbatim}
+Executing the CUDA kernel on a GPU with KERNEL_SIZE=8192:
+ P4A: Creating block descriptor "P4A_block_descriptor" of size 512x256x1
+ P4A: Creating grid of block descriptor "P4A_grid_descriptor" of size 16x32x1
+ P4A: Invoking kernel (p4a_kernel_wrapper_0, P4A_block_descriptor, P4A_grid_descriptor) with (i, j, array)
+\end{verbatim}
+}
+
+You can select the maximum number of threads in a block of thread for 1D
+kernels with a \verb|--nvcc-flags='-DP4A_CUDA_THREAD_PER_BLOCK_IN_1D=...|
+
+For 2D kernels, you can set the \verb|P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D|
+and \verb|P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D| in the same way. For
+efficiency reasons, on nVidia \Agpu, the threads are first allocated along
+the $X$ dimension (the \emph{warp} dimension) and once the
+\verb|P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D| limit is reached, it is allocated
+along the $Y$ dimension. Right now, parallel loop nests that are
+parallelized have their parallelism then limited up to 2 dimensions to
+cope more easily with \Acuda \Agpu. The outer-loop is mapped on the $X$
+\Agpu dimension, so it is the dimension that must have enough parallelism.
+
+For more tweaking, look at the \Apfa Accel runtime source on \url{} or
+directly in the \Agit repository.
 
 
 \section{p4a full option list}

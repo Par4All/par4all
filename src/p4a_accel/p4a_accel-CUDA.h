@@ -34,17 +34,21 @@
     dimension, the block size is indeed the number of iteration in this
     dimension to avoid spoling CUDA threads here.
 
-    It should be OK for big iteration spaces, but quit suboptimal fo small
-    ones.
+    It should be OK for big iteration spaces, but quite suboptimal for
+    small ones.
 
     They can be redefined at compilation time with definition options such
     as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
     --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
 
+    There are unfortunately some hardware limits on the thread block size
+    that appear at the programming level, so we should add another level
+    of tiling
 */
 #ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
 /** There is a maximum of 512 threads per block. Use it. May cause some
-    trouble if too many resources per thread are used. */
+    trouble if too many resources per thread are used. Change it with an
+    option at compile time if that causes trouble: */
 #define P4A_CUDA_THREAD_PER_BLOCK_IN_1D 512
 //P4A_CUDA_THREAD_PER_BLOCK_IN_1D = 5,
 #endif
