@@ -631,218 +631,51 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	      {
 		reference eff_ref = effect_any_reference(eff);
 		list eff_ind = reference_indices(eff_ref);
-		int nb_phi_eff = (int) gen_length(eff_ind);
-		int nb_phi_n_eff;
 
 		pips_debug_effect(6, "current formal effect :\n", eff);
 		
 		if (effect_undefined_p(eff_real) || anywhere_effect_p(eff_real))
 		  {
 		    n_eff =  make_anywhere_effect(effect_action_tag(eff));
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		  }
 		else 
 		  {
-		    n_eff = (*effect_dup_func)(eff_real);
-		    effect_approximation_tag(n_eff) = 
-		      effect_approximation_tag(eff);
-		    effect_action_tag(n_eff) = effect_action_tag(eff);
-		    nb_phi_n_eff = (int) 
-		      gen_length(reference_indices(effect_any_reference(n_eff)));
-		    
 		    if(!ENDP(eff_ind))
 		      {
 			effect eff_init = (*effect_dup_func)(eff);
 			Psysteme sc_init ;
-			Psysteme sc_n_eff = region_system(n_eff);
-			int i;
 			
 			/* we translate the initial region descriptor
 			   into the caller's name space
 			*/
 			convex_region_descriptor_translation(eff_init);
 			sc_init = region_system(eff_init);
+
+			reference output_ref;
+			descriptor output_desc;
+			bool exact;
 			
-			if (nb_phi_n_eff !=0)
+			convex_cell_reference_with_address_of_cell_reference_translation
+			  (effect_any_reference(eff), effect_descriptor(eff_init),
+			   effect_any_reference(eff_real), effect_descriptor(eff_real),
+			   0,
+			   &output_ref, &output_desc,
+			   &exact);
+			
+			if (entity_all_locations_p(reference_variable(output_ref)))
 			  {
-			    /* the first index of eff_init is added to the last index
-			       of n_eff, and the other indexes of eff_init are 
-			       appended to n_eff
-			       We first check that if the last index of n_eff is a field entity
-			       then the first index of eff_init is equal to zero. If not we
-			       issue a warning and return an anywhere effect.
-			    */
-			    reference n_eff_ref = effect_any_reference(n_eff);		
-			    expression last_n_eff_ind = 
-			      EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
-			    
-			    if(entity_field_p(expression_variable(last_n_eff_ind)))
-			      {
-				Psysteme volatile sc = sc_dup(sc_init);
-				entity phi1 = make_phi_entity(1);
-				Pvecteur v = vect_new(TCST, VALUE_ONE);
-				Pvecteur v_phi1 = vect_new((Variable) phi1, VALUE_ONE);
-				boolean feasible = TRUE;
-				v = vect_substract(v, v_phi1);
-				sc_constraint_add(sc, contrainte_make(v), FALSE);
-
-				CATCH(overflow_error)
-				{	
-				  pips_debug(3, "overflow error \n");
-				  feasible = TRUE;				  
-				}
-				TRY
-				  {    
-				    feasible = sc_integer_feasibility_ofl_ctrl(sc, 
-									       FWD_OFL_CTRL, TRUE);
-				    UNCATCH(overflow_error);
-				  }
-				if (feasible)
-				  {
-				    pips_user_warning("potential memory overflow due to effect :");
-				    print_region(eff);
-				    fprintf(stderr, "corresponding to real argument %s -> returning anywhere effect\n",
-						      words_to_string(words_expression(real_arg, NIL)));
-				    free_effect(n_eff);
-				    n_eff = make_anywhere_effect(effect_action_tag(eff));
-				  }
-				sc_rm(sc);
-			      }
-			    
-			    if( !anywhere_effect_p(n_eff))
-			      {
-				/* preparing the system of eff_init */
-				/* first rename phi1 into psi1 */
-				entity phi1 = make_phi_entity(1);
-				entity psi1 = make_psi_entity(1);
-				sc_init = sc_variable_rename(sc_init, (Variable) phi1, (Variable) psi1);
-			  
-				/* then translate other phi variables */
-				for(i=nb_phi_eff; i>1; i--)
-				  {
-				    entity old_phi = make_phi_entity(i);
-				    entity new_phi = make_phi_entity(nb_phi_n_eff+i-1);
-			      
-				    sc_init = sc_variable_rename(sc_init, (Variable) old_phi, (Variable) new_phi);	  
-				  }
-			  
-				/* preparing the system of n_eff */
-				entity phi_max_n_eff = make_phi_entity(nb_phi_n_eff);
-				entity rho_max_n_eff = make_rho_entity(nb_phi_n_eff);
-			  
-				sc_n_eff = sc_variable_rename(sc_n_eff, (Variable) phi_max_n_eff, (Variable) rho_max_n_eff);
-				region_system(n_eff) = sc_n_eff;
-
-				pips_debug_effect(8, "n_eff after variable renaming: \n", n_eff);
-			  
-				/* then we append sc_init to sc_n_eff
-				 */
-				region_sc_append_and_normalize(n_eff, sc_init, TRUE);
-			  
-				pips_debug_effect(8, "n_eff after appending sc_init: \n", n_eff);
-			  
-				/* then we add the constraint phi_max_n_eff = psi1 + rho_max_n_eff 
-				   and we eliminate psi1 and rho_max_n_eff
-				*/
-				Pvecteur v_phi_max_n_eff = vect_new((Variable) phi_max_n_eff, VALUE_ONE);
-				Pvecteur v_psi1 = vect_new((Variable) psi1, VALUE_ONE);
-				Pvecteur v_rho_max_n_eff = vect_new((Variable) rho_max_n_eff, VALUE_ONE);
-				sc_n_eff = region_system(n_eff);
-				v_phi_max_n_eff = vect_substract(v_phi_max_n_eff, v_psi1);
-				v_phi_max_n_eff = vect_substract(v_phi_max_n_eff, v_rho_max_n_eff);
-				sc_constraint_add(sc_n_eff, contrainte_make(v_phi_max_n_eff), TRUE);
-				region_system(n_eff) = sc_n_eff;
-			  			  
-				region_remove_psi_variables(n_eff);
-				region_remove_rho_variables(n_eff);
-			  
-				/* finally we must add the additional PHI variables or the field entities
-				   to the indices of the effect reference */
-				reference n_eff_ref = effect_any_reference(n_eff);
-				POP(eff_ind);
-				for(i = nb_phi_n_eff +1; i<nb_phi_n_eff + nb_phi_eff; i++)
-				  {
-				    expression eff_ind_exp = EXPRESSION(CAR(eff_ind));
-				    if (entity_field_p(expression_variable(eff_ind_exp)))
-				      reference_indices(n_eff_ref) = gen_nconc(reference_indices(n_eff_ref),
-							  CONS(EXPRESSION,
-							       copy_expression(eff_ind_exp),
-							       NIL));
-				    else
-				      reference_indices(n_eff_ref) = gen_nconc(reference_indices(n_eff_ref), 
-									       CONS(EXPRESSION,
-										    make_phi_expression(i),
-										    NIL));
-				  }
-				pips_debug_effect(8, "n_eff after adding phi: \n", n_eff);
-			      } /* if(!anywhere_effect_p(n_eff))*/
-
-			  } /*  if (nb_phi_n_eff !=0) */
+			    free_reference(output_ref);
+			    n_eff = make_anywhere_effect(effect_action_tag(eff));
+			  }
 			else
 			  {
-			    /* if it's a scalar, but not a pointer, n_eff is OK */
-			    /* if it's a pointer, n_eff is equal to eff but for the first
-			       dimension, which should be equal to 0 in eff (I should check
-			       that as in the previous case).
-			    */
-			    entity n_eff_ent = reference_variable(effect_any_reference(n_eff));
-			    type bct = basic_concrete_type(entity_type(n_eff_ent));
-
-			    if (derived_type_p(bct) || pointer_type_p(bct))
-			      {
-				reference ref;
-				Psysteme sc;
-				sc_rm(sc_n_eff);
-				region_system(n_eff) = sc_dup(sc_init);
-				pips_debug(8, "derived or pointer_type\n");
-
-				/* first remove the phi1 variable */
-				entity phi1 = make_phi_entity(1);
-				list l_tmp = CONS(ENTITY, phi1, NIL);
-				region_exact_projection_along_variables(n_eff, l_tmp);
-				gen_free_list(l_tmp);
-				POP(eff_ind);
-				sc = region_system(n_eff);
-
-				/* then rename all the phi variables in reverse order */
-				for(i=2; i<=nb_phi_eff; i++)
-				  {
-				    entity old_phi = make_phi_entity(i);
-				    entity new_phi = make_phi_entity(i-1);
-				  
-				    sc_variable_rename(sc, old_phi, new_phi);	  
-				  }
-
-				if (cell_preference_p(effect_cell(n_eff)))
-				  {
-				    /* it's a preference : we should not modify it */
-				    pips_debug(8, "It's a preference\n");
-				    ref = copy_reference(preference_reference(cell_preference(effect_cell(n_eff))));
-				    preference_reference(cell_preference(effect_cell(n_eff))) = ref;
-				  }
-				else
-				  {
-				    /* it's a reference : let'us modify it */
-				    ref = cell_reference(effect_cell(n_eff));
-				  }
-				int i;
-				int n_ref_inds = (int) gen_length(reference_indices(ref));
-				for(i = 1; i<nb_phi_eff; i++)
-				  {
-				    expression eff_ind_exp = EXPRESSION(CAR(eff_ind));
-				    if ( entity_field_p(expression_variable(eff_ind_exp)))
-				      reference_indices(ref) = gen_nconc(reference_indices(ref), 
-									 CONS(EXPRESSION, copy_expression(eff_ind_exp), NIL));
-				    else
-				      reference_indices(ref) = gen_nconc( reference_indices(ref),
-									  CONS(EXPRESSION,
-									       make_phi_expression(i+n_ref_inds),
-									       NIL));
-				    POP(eff_ind);								     
-				  }
-			      }
-			    free_type(bct);
+			    n_eff = make_effect(make_cell_reference(output_ref),
+						copy_action(effect_action(eff)),
+						exact? copy_approximation(effect_approximation(eff)): make_approximation_may(),
+						output_desc);
+			    pips_debug_effect(6, "resulting effect: \n", n_eff);
 			  }
+			
 		      		      		     		  
 		      } /* if(!ENDP(eff_ind))*/
 		  

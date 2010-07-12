@@ -1,0 +1,53 @@
+delete trac_130
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create trac_130 trac_130.c
+
+#setproperty CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS TRUE
+
+#SELECT C LANGUAGE
+#activate C_PARSER
+#setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Privatization
+echo
+
+apply PRIVATIZE_MODULE(main)
+
+echo
+echo Preconditions for "main" after privatization
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Dependence graph for "main"
+echo
+
+display DG_FILE[main]
+
+echo
+echo Parallelization of "main" after privatization
+echo
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+close
+#delete trac_130
+quit

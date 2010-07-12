@@ -125,7 +125,18 @@ static void scan_statement(statement s, list loops)
 	    }
 	}
 
+	/* Add the loop index because it does not have to be taken
+	   into account for parallelization. */
 	loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
+
+	/* FI: add the local variables of the loop body at least, but
+	   they might have to be added recursively for all enclosed
+	   loops. Note: their dependency pattern should lead to
+	   privatization, but they are eliminated from the body
+	   effect and not taken into consideration. */
+	loop_locals(l) = gen_nconc(loop_locals(l),
+				   gen_copy_seq(statement_declarations(b)));
+
 	scan_statement( b, new_loops ) ;
 	hash_del(get_enclosing_loops_map(), (char *) s) ;
 	store_statement_enclosing_loops(s, new_loops);
@@ -485,7 +496,6 @@ bool privatize_module(char *mod_name)
 
 	pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
 	ifdebug(4) {
-
 	  print_statement(st);
 	}
 

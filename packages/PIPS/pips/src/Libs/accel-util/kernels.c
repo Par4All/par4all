@@ -185,7 +185,7 @@ struct dma_pair {
 entity make_temporary_pointer_to_array_entity(entity efrom,
 					      expression from) {
   basic pointee = copy_basic(variable_basic(type_variable(entity_type(efrom))));
-  list dims = gen_copy_seq(variable_dimensions(type_variable(entity_type(efrom))));
+  list dims = gen_full_copy_list(variable_dimensions(type_variable(entity_type(efrom))));
 
   /* Make the pointer type */
   basic pointer = make_basic_pointer(make_type_variable(make_variable(pointee,

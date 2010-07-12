@@ -27,7 +27,7 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 
 apply UNSPLIT
-shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.0
+shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
 
 close
 delete loop_private

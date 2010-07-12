@@ -138,6 +138,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"case", (char *) TK_CASE);
   hash_put(keyword_typedef_table,"char", (char *) TK_CHAR);
   hash_put(keyword_typedef_table,"const", (char *) TK_CONST);
+  hash_put(keyword_typedef_table,"__const", (char *) TK_CONST);
   hash_put(keyword_typedef_table,"continue", (char *) TK_CONTINUE);
   hash_put(keyword_typedef_table,"default", (char *) TK_DEFAULT);
   hash_put(keyword_typedef_table,"do", (char *) TK_DO);
@@ -155,6 +156,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"long", (char *) TK_LONG);
   hash_put(keyword_typedef_table,"register", (char *) TK_REGISTER);
   hash_put(keyword_typedef_table,"restrict", (char *) TK_RESTRICT);
+  hash_put(keyword_typedef_table,"__restrict", (char *) TK_RESTRICT);
   hash_put(keyword_typedef_table,"return", (char *) TK_RETURN);
   hash_put(keyword_typedef_table,"short", (char *) TK_SHORT);
   hash_put(keyword_typedef_table,"signed", (char *) TK_SIGNED);

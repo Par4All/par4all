@@ -1066,17 +1066,7 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 		pips_debug(7,"reduce rule owner (CALLERS)\n");
 		if (tpips_execution_mode)
 		{
-			callees caller_modules;
-
-			if (!safe_make(DBR_CALLERS, db_get_current_module_name()))
-				pips_internal_error("Cannot make callers for %s\n",
-														db_get_current_module_name());
-
-			caller_modules = (callees)
-				db_get_memory_resource(DBR_CALLERS,
-															 db_get_current_module_name(),TRUE);
-
-			$$ = gen_array_from_list(callees_callees(caller_modules));
+                        $$ = get_callers(db_get_current_module_name());
 		}
 	}
 	| TK_OPENPAREN list_of_owner_name TK_CLOSEPAREN

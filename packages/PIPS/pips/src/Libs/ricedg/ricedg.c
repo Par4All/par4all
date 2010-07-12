@@ -2511,7 +2511,7 @@ statement stat;
     loop l;
     list locals;
 
-    pips_assert("loop_variant_list", statement_loop_p(stat));
+    pips_assert("statement stat is a loop", statement_loop_p(stat));
 
     FOREACH (EFFECT, ef, load_cumulated_rw_effects_list(stat)) {
       entity en = effect_entity(ef) ;
