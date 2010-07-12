@@ -410,6 +410,33 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 
 }
 
+Psysteme cell_system_sc_append_and_normalize(Psysteme sc1, Psysteme sc2, int level)
+{
+  Psysteme sc;
+  Psysteme sc22 = sc_dup(sc2);
+
+
+  sc = sc1;
+  if(!sc_weak_consistent_p(sc1)) {
+    pips_debug(8, "Inconsistent system: \n");
+    sc_syst_debug(sc1);
+    assert(sc_weak_consistent_p(sc1));
+  }
+  assert(sc_weak_consistent_p(sc22));
+  sc22 = sc_safe_normalize(sc22);
+  sc = sc_safe_append(sc_safe_normalize(sc), sc22);
+  assert(sc_weak_consistent_p(sc));
+  if (level!=-1)
+    sc = region_sc_normalize(sc, level);
+  assert(sc_weak_consistent_p(sc));
+
+  sc_rm(sc22);
+
+  return sc;
+}
+
+
+
 /* void region_sc_append(region reg, Psysteme sc, bool nredund_p)
  * input    : a region and a Psysteme
  * output   : nothing.
@@ -420,29 +447,9 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
  */
 void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
 {
-  Psysteme sc_reg;
-  Psysteme copy = sc_dup(sc);
+  Psysteme sc_reg = region_system(reg);
 
-  /* pips_assert("region context must be defined\n",
-     !transformer_undefined_p(region_context(reg))); */
-
-  sc_reg = region_system(reg);
-  if(!sc_weak_consistent_p(sc_reg)) {
-    pips_debug(8, "Inconsistent region: \n");
-    sc_syst_debug(sc_reg);
-    assert(sc_weak_consistent_p(sc_reg));
-  }
-  assert(sc_weak_consistent_p(copy));
-  copy = sc_safe_normalize(copy);
-  sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy);
-  assert(sc_weak_consistent_p(sc_reg));
-  if (level!=-1)
-    sc_reg = region_sc_normalize(sc_reg, level);
-  assert(sc_weak_consistent_p(sc_reg));
-
-  sc_rm(copy);
-
-  region_system_(reg) = newgen_Psysteme(sc_reg);
+  region_system_(reg) = cell_system_sc_append_and_normalize(sc_reg, sc, level);
 }
 
 /* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only, 
@@ -2130,6 +2137,39 @@ list rho_entities_list(int rho_min, int rho_max)
     return(l_rho);
 }
 
+boolean rho_reference_p( reference ref )
+{
+  list l = reference_indices(ref);
+  
+  for (;!ENDP(l); POP(l))
+    {
+      entity e = reference_variable
+		     (syntax_reference
+		      (expression_syntax
+		       (EXPRESSION(CAR(l)))));
+      if (!entity_field_p(e))
+	{
+	  if (variable_rho_p(e))
+	    return TRUE;
+	  else
+	    return FALSE;
+	}
+    }
+  return TRUE; /* in case of a scalar */
+}
+
+/* boolean psi_region_p(effect reg)
+ * input    : a region.
+ * output   : TRUE if it is a PSI region
+ * modifies : nothing
+ * comment  : tests if the first indice of the reference is a PSI variable.
+ */
+boolean rho_region_p(region reg)
+{
+    pips_assert("array region (not scalar)\n", !region_scalar_p(reg));
+
+    return (rho_reference_p(effect_any_reference(reg)));
+}
 
 /* expression make_rho_expression(int n)
  * input    : the range of the PHI entity to create.
@@ -2164,6 +2204,23 @@ int base_nb_rho(Pbase b)
 /* PHI AND PSY ENTITIES                                                          */
 /*********************************************************************************/
 
+list cell_reference_phi_cfc_variables(reference ref, Psysteme sc)
+{
+
+  list l_ent = NIL;
+  if(entity_scalar_p(reference_variable(ref)))
+    return NIL;
+
+  if (psi_reference_p(ref))
+    l_ent = psi_entities_list(1, (int) gen_length(reference_indices(ref)));
+  else if (rho_reference_p(ref))
+    l_ent = rho_entities_list(1, (int) gen_length(reference_indices(ref)));
+  else 
+    l_ent = phi_entities_list(1, (int) gen_length(reference_indices(ref)));
+
+  return(sc_entities_cfc_variables(sc, l_ent));
+  
+}
 
 /* list region_phi_cfc_variables(effect reg)
  * input    : a region
@@ -2180,19 +2237,10 @@ int base_nb_rho(Pbase b)
  */
 list region_phi_cfc_variables(region reg)
 {
-    list l_ent;
-
     if (region_scalar_p(reg))
 	return(NIL);
-
-    if (psi_region_p(reg))
-	l_ent = psi_entities_list(1,NumberOfDimension(region_entity(reg)));
-    else
-	l_ent = phi_entities_list(1,NumberOfDimension(region_entity(reg)));
-
-    /* ps_reg has no particularity. We just scan its equalities and inequalities
-     * to find which variables are related to the PHI variables */
-    return(region_entities_cfc_variables(reg, l_ent));
+    else 
+      return(cell_reference_phi_cfc_variables(effect_any_reference(reg), region_system(reg)));
 }
 
 /* void psi_to_phi_region(effect reg)
@@ -2203,7 +2251,7 @@ list region_phi_cfc_variables(region reg)
  */
 void psi_to_phi_region(region reg)
 {
-    int i, ndims = NumberOfDimension(region_entity(reg));
+  int i, ndims = (int) gen_length(reference_indices(region_any_reference(reg)));
     reference reg_ref;
 
     /* if not a scalar region */
@@ -2232,7 +2280,7 @@ void psi_to_phi_region(region reg)
  */
 void phi_to_psi_region(region reg)
 {
-    int i, ndims = NumberOfDimension(region_entity(reg));
+    int i, ndims = (int) gen_length(reference_indices(region_any_reference(reg)));
     reference reg_ref;
 
     /* if not a scalar region */
@@ -2251,6 +2299,28 @@ void phi_to_psi_region(region reg)
 }
 
 
+boolean psi_reference_p(reference ref)
+{
+  
+  list l = reference_indices(ref);
+  
+  for (;!ENDP(l); POP(l))
+    {
+      entity e = reference_variable
+		     (syntax_reference
+		      (expression_syntax
+		       (EXPRESSION(CAR(l)))));
+      if (!entity_field_p(e))
+	{
+	  if (variable_psi_p(e))
+	    return TRUE;
+	  else
+	    return FALSE;
+	}
+    }
+  return TRUE; /* in case of a scalar */
+}
+
 /* boolean psi_region_p(effect reg)
  * input    : a region.
  * output   : TRUE if it is a PSI region
@@ -2261,14 +2331,7 @@ boolean psi_region_p(region reg)
 {
     pips_assert("array region (not scalar)\n", !region_scalar_p(reg));
 
-    if (variable_psi_p(reference_variable
-		       (syntax_reference
-			(expression_syntax
-			 (EXPRESSION
-			  (CAR(reference_indices(region_any_reference(reg)))))))))
-	return TRUE;
-    else
-	return FALSE;
+    return (psi_reference_p(effect_any_reference(reg)));
 }
 
 /************************************************************* PROPERTIES */

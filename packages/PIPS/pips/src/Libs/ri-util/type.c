@@ -1180,11 +1180,25 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             }
             else {
                 type et = call_to_type(c);
-                if(ultimate_p) et=basic_concrete_type(et);
+                if(ultimate_p) et=ultimate_type(et);
                 if( type_variable_p(et) )
                 {
+		    variable v=type_variable(et);
                     free_basic(rb);
-                    rb=copy_basic(variable_basic(type_variable(et)));
+                    if(ENDP(variable_dimensions(v)))
+                        rb = copy_basic(variable_basic(v));
+                    else {
+                        /* consider int a[12][13] is of type int (*)[13]*/
+                        rb = make_basic_pointer(
+                                make_type_variable(
+                                    make_variable(
+                                        copy_basic(variable_basic(v)),
+                                        gen_full_copy_list(CDR(variable_dimensions(v))),
+                                        gen_full_copy_list(variable_qualifiers(v))
+                                        )
+                                    )
+                                );
+                    }
                 }
                 if( !type_variable_p(et) ) {
 
@@ -1579,34 +1593,36 @@ type intrinsic_call_to_type(call c)
 	else if(ENTITY_DEREFERENCING_P(f))
 	  {
 	    expression e = EXPRESSION(CAR(args));
-	    type ct = expression_to_type(e);
+	    type ct = ultimate_type(expression_to_type(e));
 
 	    if (type_variable_p(ct))
 	      {
 		variable cv = type_variable(ct);
 		basic cb = variable_basic(cv);
 		list cd = variable_dimensions(cv);
-
-		if(basic_pointer_p(cb))
-		  {
-		    t = copy_type(ultimate_type(basic_pointer(cb)));
-		    pips_assert("The pointed type is consistent",
-				type_consistent_p(t));
-		    free_type(ct);
-		  }
-		else if(basic_string_p(cb))
-		  {
-		    t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
-		  }
-		else
-		  {
-		    pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
-
-		    variable_dimensions(cv) = CDR(cd);
-		    cd->cdr = NIL;
-		    gen_full_free_list(cd);
-		    t = ct;
-		  }
+		if( ENDP(cd)) {
+			if(basic_pointer_p(cb))
+			{
+				t = copy_type(ultimate_type(basic_pointer(cb)));
+				pips_assert("The pointed type is consistent",
+						type_consistent_p(t));
+				free_type(ct);
+			}
+			else if(basic_string_p(cb))
+			{
+				t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
+			}
+			else
+			{
+				pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
+			}
+		}
+		else {
+			variable_dimensions(cv) = CDR(cd);
+			cd->cdr = NIL;
+			gen_full_free_list(cd);
+			t = ct;
+		}
 	      }
 	    else
 	      {

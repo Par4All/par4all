@@ -643,6 +643,35 @@ void region_remove_phi_variables(region reg)
 }
 
 
+Psysteme cell_reference_system_remove_psi_variables(reference ref, Psysteme sc, bool * exact_p)
+{
+  list volatile l_psi = psi_entities_list(1,NB_MAX_ARRAY_DIM);
+  *exact_p = true;
+  
+  for(; !ENDP(l_psi) && *exact_p; l_psi = CDR(l_psi)) 
+    {
+      entity e = ENTITY(CAR(l_psi));
+      bool exact_projection;
+      sc = cell_reference_sc_exact_projection_along_variable(ref, sc, e, &exact_projection);
+      *exact_p = *exact_p && exact_projection;      
+    } 
+  Psysteme volatile ps = sc;
+  if (!ENDP(l_psi) && !SC_UNDEFINED_P(ps))
+    {
+      CATCH(overflow_error) 
+      {
+	sc_rm(ps);
+	ps = SC_UNDEFINED;
+      }
+      TRY 
+	{
+	  ps = sc_projection_ofl_along_list_of_variables(ps, l_psi); 
+	  UNCATCH(overflow_error);
+	}
+    }
+  return ps;
+}
+
 /* void region_remove_psi_variables(effect reg, int phi_max)
  * input    : a PHI region in which psi variables must be eliminated.
  * output   : nothing.
@@ -670,6 +699,35 @@ void region_remove_psi_variables(region reg)
 	pips_debug(8, "final region : \n ");
 	print_region(reg);
     }
+}
+
+Psysteme cell_reference_system_remove_rho_variables(reference ref, Psysteme sc, bool *exact_p)
+{
+  list volatile l_rho = rho_entities_list(1,NB_MAX_ARRAY_DIM);
+  *exact_p = true;
+  
+  for(; !ENDP(l_rho) && *exact_p; l_rho = CDR(l_rho)) 
+    {
+      entity e = ENTITY(CAR(l_rho));
+      bool exact_projection;
+      sc = cell_reference_sc_exact_projection_along_variable(ref, sc, e, &exact_projection);
+      *exact_p = *exact_p && exact_projection;      
+    } 
+  Psysteme volatile ps = sc;
+  if (!ENDP(l_rho) && !SC_UNDEFINED_P(ps))
+    {
+      CATCH(overflow_error) 
+      {
+	sc_rm(ps);
+	ps = SC_UNDEFINED;
+      }
+      TRY 
+	{
+	  ps = sc_projection_ofl_along_list_of_variables(ps, l_rho); 
+	  UNCATCH(overflow_error);
+	}
+    }
+  return ps;
 }
 
 
@@ -1020,7 +1078,49 @@ list l_var;
     }
 }
     
+Psysteme cell_reference_sc_exact_projection_along_variable(reference ref, Psysteme sc, entity var, bool *exact_p)
+{
+  Psysteme volatile ps = sc;
+  *exact_p = true;
+  if (!sc_empty_p(ps) && !sc_rn_p(ps))
+    {      
+      if (base_contains_variable_p(ps->base, (Variable) var))
+	{
+	  CATCH(overflow_error)
+	  {	    
+	    sc_rm(ps);
+	    *exact_p = false;
+	    return SC_UNDEFINED;
+	  }
+	  TRY {
+	    list l_phi_var = cell_reference_phi_cfc_variables(ref, ps);
 
+	    if (gen_find_eq(var, l_phi_var) == chunk_undefined)
+	      {
+		Psysteme volatile * psc = &ps;
+		sc_projection_along_variable_ofl_ctrl(psc,(Variable) var,
+						      FWD_OFL_CTRL);
+		sc_base_remove_variable(ps, (Variable) var);
+		ps = region_sc_normalize(ps,2);
+		*exact_p = true;
+	      }
+	    else
+	      {
+		Pvecteur pv_var = NULL;
+
+		vect_add_elem(&pv_var, (Variable) var, VALUE_ONE);
+		ps = sc_projection_ofl_along_variables_with_test
+		  (ps, pv_var,  exact_p);
+		vect_rm(pv_var);
+		ps = region_sc_normalize(ps,2);	
+	      }
+	    gen_free_list(l_phi_var);
+	    UNCATCH(overflow_error);
+	  }
+	}
+    }
+  return ps;
+}
 
 /* void region_exact_projection_along_variable(effect reg, entity var) 
  * input    : a region and a variable (a loop index for instance).

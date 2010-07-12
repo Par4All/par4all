@@ -7,6 +7,7 @@ libeffects_simple_la_SOURCES=\
 	binary_operators.c \
 	interface.c \
 	methods.c \
+        translation.c \
 	interprocedural.c \
 	prettyprint.c \
 	unary_operators.c \

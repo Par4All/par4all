@@ -194,10 +194,35 @@ bool continue_statement_p(statement s) {
   return instruction_continue_p(i);
 }
 
-bool declaration_statement_p(statement s) {
-  instruction i = statement_instruction(s);
+/* Had to be optimized according to Beatrice Creusillet. We assume
+   that FALSE is returned most of the time. String operations are
+   avoided (almost) as much as possible.
 
-  return instruction_continue_p(i) && !ENDP(statement_declarations(s));
+   For the time being a declaration statement is a call to continue
+   with non-empty declarations.
+*/
+bool declaration_statement_p(statement s) {
+  bool declaration_p = FALSE;
+
+  /* Initial implementation. It would have been better to check
+     !ENDP() first. */
+  //return instruction_continue_p(i) &&
+  //!ENDP(statement_declarations(s));
+
+  if(!ENDP(statement_declarations(s))) {
+    instruction i = statement_instruction(s);
+    if(instruction_call_p(i)) {
+      call c = instruction_call(i);
+      entity f = call_function(c);
+      string n = entity_name(f);
+      /* You want entity_name(f)=="TOP-LEVEL:CONTINUE"*/
+      if(*(n+17)=='E')
+	if(*(n+3)=='-')
+	  declaration_p = strcmp(n, "TOP-LEVEL:CONTINUE")==0;
+    }
+  }
+
+  return declaration_p;
 }
 
 /* Check that all statements contained in statement list sl are a
@@ -1191,8 +1216,7 @@ text statement_to_text(statement s)
 void safe_print_statement(statement s)
 {
   if(statement_undefined_p(s)) {
-    fprintf(stderr, "Statement undefined: %s\n",
-	    statement_identification(s));
+    fprintf(stderr, "Statement undefined\n");
   }
   else if(continue_statement_p(s)
      && entity_return_label_p(statement_label(s))) {
@@ -1468,24 +1492,24 @@ string external_statement_identification(statement s)
 string statement_identification(statement s)
 {
   char * buffer;
-    instruction i = statement_instruction(s);
-    string instrstring = instruction_identification(i);
-    int so = statement_ordering(s);
-    entity called = entity_undefined;
+  instruction i = statement_instruction(s);
+  string instrstring = instruction_identification(i);
+  int so = statement_ordering(s);
+  entity called = entity_undefined;
 
-    if(same_string_p(instrstring, "CALL")) {
-	called = call_function(instruction_call(i));
-    }
+  if(same_string_p(instrstring, "CALL")) {
+    called = call_function(instruction_call(i));
+  }
 
-    asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
-	     statement_number(s),
-	     ORDERING_NUMBER(so),
-	     ORDERING_STATEMENT(so),
-	     s,
-	     instrstring,
-	     entity_undefined_p(called)? "" : module_local_name(called));
+  asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
+	   statement_number(s),
+	   ORDERING_NUMBER(so),
+	   ORDERING_STATEMENT(so),
+	   s,
+	   instrstring,
+	   entity_undefined_p(called)? "" : module_local_name(called));
 
-    return buffer;
+  return buffer;
 }
 
 string

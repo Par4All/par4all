@@ -25,6 +25,7 @@ LIB_CFILES = \
 	binary_operators.c \
 	interface.c \
 	methods.c \
+        translation.c \
 	interprocedural.c \
 	prettyprint.c \
 	unary_operators.c \

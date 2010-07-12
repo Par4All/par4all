@@ -246,6 +246,7 @@ bool expression_array_to_pointer(expression exp, bool in_init)
 
 
     }
+    pips_assert("everything went well",expression_consistent_p(exp));
     return true;
 }
 
@@ -261,6 +262,7 @@ bool declaration_array_to_pointer(statement s,bool __attribute__((unused)) in_in
 {
     FOREACH(ENTITY,e,statement_declarations(s))
         gen_context_recurse(entity_initial(e),(void*)true,expression_domain,expression_array_to_pointer,gen_null);
+    pips_assert("everything went well",statement_consistent_p(s));
     return true;
 }
 
@@ -313,6 +315,7 @@ void make_pointer_from_variable(variable param)
             break;
 
     }
+    pips_assert("everything went well",variable_consistent_p(param));
 }
 
 static void make_pointer_from_all_variable(void* obj)
@@ -353,6 +356,7 @@ reduce_array_declaration_dimension(statement s)
             }
         }
     }
+    pips_assert("everything went well",statement_consistent_p(s));
 }
 
 static void gather_call_sites(call c, list * sites)
@@ -399,6 +403,7 @@ static void array_to_pointer_fix_call_site(expression exp)
         expression_syntax(exp)=make_syntax_call(
                 make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),make_expression_list(make_expression( expression_syntax(exp), normalized_undefined))));
     }
+    pips_assert("everything went well",expression_consistent_p(exp));
 }
 
 bool array_to_pointer(char *module_name)
@@ -467,6 +472,7 @@ bool array_to_pointer(char *module_name)
     }
 
     /* validate */
+    pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
     /* also validate callers */

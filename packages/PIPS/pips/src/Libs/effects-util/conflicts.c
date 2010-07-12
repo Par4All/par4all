@@ -459,7 +459,8 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
  * @param must_p define if we enforce must conflict or only may one
  *
  */
-bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
+bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
+{
   bool conflict_p = !must_p; // safe default value
   bool (*abstract_locations_conflict_p)(entity,entity);
   if( must_p ) {
@@ -473,10 +474,10 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
       conflict_p = abstract_locations_conflict_p( e1, e2 );
     else if ( entity_variable_p(e2) ) {
       if ( variable_return_p( e2 ) )
-        conflict_p = FALSE;
+	conflict_p = FALSE;
       else {
-        entity al2 = variable_to_abstract_location( e2 );
-        conflict_p = abstract_locations_conflict_p( e1, al2 );
+	entity al2 = variable_to_abstract_location( e2 );
+	conflict_p = abstract_locations_conflict_p( e1, al2 );
       }
     } else {
       pips_internal_error("Unexpected case.\n");
@@ -485,27 +486,35 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p ) {
   else {
     if ( entity_abstract_location_p( e2 ) ) {
       if ( entity_variable_p(e1) ) {
-        if ( variable_return_p( e1 ) )
-          conflict_p = FALSE;
-        else {
-          entity al1 = variable_to_abstract_location( e1 );
-          conflict_p = abstract_locations_conflict_p( al1, e2 );
-        }
+	if ( variable_return_p( e1 ) )
+	  conflict_p = FALSE;
+	else {
+	  entity al1 = variable_to_abstract_location( e1 );
+	  conflict_p = abstract_locations_conflict_p( al1, e2 );
+	}
       } else {
-        pips_internal_error("Unexpected case.\n");
-        ;
+	pips_internal_error("Unexpected case.\n");
+	;
       }
     } else {
       if ( variable_return_p( e1 ) && variable_return_p( e2 ) ) {
-        return e1 == e2;
+	return e1 == e2;
       } else if ( entity_variable_p(e1) && entity_variable_p(e2) ) {
-        /* FIXME : variable_entity_must_conflict_p doesn't exist yet */
-        if( !must_p) {
-          conflict_p = variable_entity_may_conflict_p( e1, e2 );
-        }
+	/* FIXME : variable_entity_must_conflict_p doesn't exist yet */
+	if( !must_p) {
+	  conflict_p = variable_entity_may_conflict_p( e1, e2 );
+	}
       } else {
-        pips_internal_error("Unexpected case.\n");
-        ;
+	/* Since PIPS does not detect the user syntax error, we could
+	   make this pips_user_error(). */
+	if(!entity_variable_p(e1))
+	  pips_internal_error("Unexpected case. \"%s\" is not a variable"
+			      " and cannot be written\n",
+			      entity_user_name(e1));
+	else if(!entity_variable_p(e2))
+	  pips_internal_error("Unexpected case. \"%s\" is not a variable"
+			      " and cannot be written\n",
+			      entity_user_name(e2));
       }
     }
   }

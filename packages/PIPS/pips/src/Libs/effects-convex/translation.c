@@ -63,6 +63,7 @@
 #include "resources.h"
 #include "misc.h"
 #include "text.h"
+#include "text-util.h"
 #include "transformer.h"
 #include "preprocessor.h"
 #include "properties.h"
@@ -2156,5 +2157,282 @@ void convex_region_descriptor_translation(effect eff)
       print_region(eff);
     }   
   
+  
+}
+
+
+
+/************************************************** PATH TRANSLATION */
+
+/** @brief translates a convex memory access path reference from given indices
+           using an address_of memory access path reference 
+
+    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref, 
+    knowing that a[i] = &address_of_ref. In this case the list of remaning_input_indices is [j][k].
+    
+    @param input_ref is the input convex cell reference
+    @param input_desc is the descriptor describing the input reference
+    @param input_remaining_indices is the list of indices from input_ref which have to be translated.
+
+    @param address_of_ref is the convex cell reference giving the output base memory access path.
+    @param address_of_desc is the descriptor describing address_of_ref.
+    
+    @param output_ref is a pointer on the resulting convex reference
+    @param output_desc is a pointer on teh resulting descriptor describing output_ref.
+    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+
+    input_remaining_indices does not need to be a copy of a part of the indices of input_ref, because it is not modified.
+    In a first version of this function, it was replaced by a integer giving the rank of the beginning of this list
+    in the input_ref indices list. However, in generic_eval_cell_with_points_to, 
+    convex_cell_reference_with_address_of_cell_reference_translation may be called
+    several times with the same input_ref and rank, so it was more efficient to pass the input_remaning_indices list
+    directly as an argument.
+  
+ */
+void convex_cell_reference_with_address_of_cell_reference_translation
+(reference input_ref, descriptor input_desc,
+ reference address_of_ref, descriptor address_of_desc,
+ int nb_common_indices,
+ reference *output_ref, descriptor *output_desc,
+ bool *exact_p)
+{
+  Psysteme sc_output = SC_UNDEFINED;
+
+  *output_ref = copy_reference(address_of_ref);
+		
+  if (entity_all_locations_p(reference_variable(address_of_ref)))
+    {
+      *output_desc = descriptor_undefined;
+      *exact_p = false;
+    }
+  else 
+    {
+      *exact_p = true;
+      int nb_phi_address_of_ref = (int) gen_length(reference_indices(address_of_ref));
+      list volatile input_remaining_indices = reference_indices(input_ref);
+      int nb_phi_input_ref = (int) gen_length(input_remaining_indices);
+
+      for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices)); 
+		    
+      if(!ENDP(input_remaining_indices))
+	{
+	  Psysteme sc_input = descriptor_convex(input_desc);
+	  int i;
+			
+	  if (nb_phi_address_of_ref !=0)
+	    {
+ 	      /* the first index of address_of_ref is added to the last index
+		 of input_ref, and the other indexes of address_of_ref are 
+		 appended to those of input_ref
+		 We first check that if the last index of address_of_ref is a field entity
+		 then the first non-common index of input_ref is equal to zero. If not we
+		 issue a warning and return an anywhere effect.
+	      */
+	      expression last_address_of_index = 
+		EXPRESSION(CAR(gen_last(reference_indices(address_of_ref))));
+	      
+	      if(entity_field_p(expression_variable(last_address_of_index)))
+		{
+		  Psysteme volatile sc = sc_dup(sc_input);
+		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
+		  Pvecteur v1 = vect_new(TCST, VALUE_ONE);
+		  Pvecteur v_phi_first_non_common = vect_new((Variable) phi_first_non_common, VALUE_ONE);
+		  boolean feasible = TRUE;
+		  Pvecteur v = vect_substract(v1, v_phi_first_non_common);
+		  vect_rm(v1);
+		  vect_rm(v_phi_first_non_common);
+		  sc_constraint_add(sc, contrainte_make(v), FALSE);
+		  
+		  CATCH(overflow_error)
+		  {	
+		    pips_debug(3, "overflow error \n");
+		    feasible = TRUE;				  
+		  }
+		  TRY
+		    {    
+		      feasible = sc_integer_feasibility_ofl_ctrl(sc, 
+								 FWD_OFL_CTRL, TRUE);
+		      UNCATCH(overflow_error);
+		    }
+		  if (feasible)
+		    {
+		      pips_user_warning("potential memory overflow -> returning anywhere\n");
+		      free_reference(*output_ref);
+		      *output_ref = make_reference(entity_all_locations(), NIL);
+		      *output_desc = descriptor_undefined;
+		      *exact_p = false;
+		    }
+		  sc_rm(sc);
+		}
+			    
+	      if(!entity_all_locations_p(reference_variable(*output_ref)))
+		{
+		  /* preparing the part of sc_input which is to be added to sc_output */
+		  /* first eliminate common dimensions in sc_input (well a copy, do not modify the original) */
+		  sc_input = sc_dup(sc_input);
+		  if (nb_common_indices >0)
+		    {
+		      list l_phi = phi_entities_list(1,nb_common_indices);
+		      FOREACH(ENTITY,phi, l_phi)
+			{
+			  bool exact_projection;
+			  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi, &exact_projection);
+			  *exact_p = *exact_p && exact_projection;
+			}
+		    }
+		    
+		  /* then rename phi_nb_common_indices+1 into psi1 in sc_input */
+		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
+		  entity psi1 = make_psi_entity(1);
+		  sc_input = sc_variable_rename(sc_input, (Variable) phi_first_non_common, (Variable) psi1);
+			  
+		  /* then shift other phi variables */
+		  for(i=nb_phi_input_ref; i>(nb_common_indices+1); i--)
+		    {
+		      entity old_phi = make_phi_entity(i);
+		      entity new_phi = make_phi_entity(nb_phi_address_of_ref+i-(nb_common_indices+1));
+			      
+		      sc_input = sc_variable_rename(sc_input, (Variable) old_phi, (Variable) new_phi);	  
+		    }
+			  
+		  /* preparing the system of sc_output from sc_address_of */
+		  sc_output = sc_dup(descriptor_convex(address_of_desc));
+		  entity phi_max_output = make_phi_entity(nb_phi_address_of_ref);
+		  entity rho_max_output = make_rho_entity(nb_phi_address_of_ref);
+			  
+		  sc_output = sc_variable_rename(sc_output, (Variable) phi_max_output, (Variable) rho_max_output);
+
+		  ifdebug(8)
+		    {
+		      pips_debug(8, "sc_output after variable renaming: \n");
+		      sc_print(sc_output, (get_variable_name_t) entity_local_name);
+		    }  
+
+		  /* then we append sc_input to sc_output
+		   */
+		  sc_output = cell_system_sc_append_and_normalize(sc_output, sc_input, TRUE);
+			  
+		  ifdebug(8)
+		    {
+		      pips_debug(8, "sc_output after appending sc_input: \n");
+		      sc_print(sc_output, (get_variable_name_t) entity_local_name);
+		    }
+			  
+		  /* then we add the constraint phi_max_output = psi1 + rho_max_output 
+		     and we eliminate psi1 and rho_max_output
+		  */
+		  Pvecteur v_phi_max_output = vect_new((Variable) phi_max_output, VALUE_ONE);
+		  Pvecteur v_psi1 = vect_new((Variable) psi1, VALUE_ONE);
+		  Pvecteur v_rho_max_output = vect_new((Variable) rho_max_output, VALUE_ONE);
+		  v_phi_max_output = vect_substract(v_phi_max_output, v_psi1);
+		  v_phi_max_output = vect_substract(v_phi_max_output, v_rho_max_output);
+		  sc_constraint_add(sc_output, contrainte_make(v_phi_max_output), TRUE);
+
+		  bool exact_removal;
+		  sc_output = cell_reference_system_remove_psi_variables(*output_ref, sc_output, &exact_removal);
+		  *exact_p = *exact_p && exact_removal;
+		  sc_output = cell_reference_system_remove_rho_variables(*output_ref, sc_output, &exact_removal);
+		  *exact_p = *exact_p && exact_removal;
+
+		  ifdebug(8)
+		    {
+		      pips_debug(8, "sc_output after appending removing psi and rho variables: \n");
+		      sc_print(sc_output, (get_variable_name_t) entity_local_name);
+		    }	  
+		  *output_desc = make_descriptor_convex(sc_output);
+
+		  /* finally we must add the additional PHI variables or the field entities
+		     to the indices of the output reference */
+		  for(i = nb_phi_address_of_ref +1; i<nb_phi_address_of_ref + nb_phi_input_ref - nb_common_indices; i++)
+		    {
+		      POP(input_remaining_indices);
+		      expression input_remaining_indices_exp = EXPRESSION(CAR(input_remaining_indices));
+		      if (entity_field_p(expression_variable(input_remaining_indices_exp)))
+			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
+								 CONS(EXPRESSION,
+								      copy_expression(input_remaining_indices_exp),
+								      NIL));
+		      else
+			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref), 
+								 CONS(EXPRESSION,
+								      make_phi_expression(i),
+								      NIL));
+		    }
+		  pips_debug(8, "*output_ref after adding phi: %s\n", words_to_string(effect_words_reference(*output_ref)));
+		} /* if(!anywhere_effect_p(n_eff))*/
+
+	    } /*  if (nb_phi_address_of_ref !=0) */
+	  else
+	    {
+	      /* here nb_phi_address_of_ref is equal to 0 */
+	      /* if it's a scalar, but not a pointer, output_ref is OK */
+	      /* if it's a pointer, output_ref is equal to input_ref but for the first
+		 non-common dimension, which should be equal to 0 in input_ref (I should check
+		 that as in the previous case).
+	      */
+	      entity output_ent = reference_variable(*output_ref);
+	      type bct = basic_concrete_type(entity_type(output_ent));
+
+	      if (derived_type_p(bct) || pointer_type_p(bct))
+		{
+		  sc_output = sc_dup(sc_input);
+		  pips_debug(8, "derived or pointer_type\n");
+
+		  /* preparing the part of sc_input which is to be added to sc_output */
+		  /* first eliminate common dimensions in sc_input (well a copy, do not modify the original) */
+		  sc_input = sc_dup(sc_input);
+		  if (nb_common_indices >0)
+		    {
+		      list l_phi = phi_entities_list(1,nb_common_indices);
+		      FOREACH(ENTITY,phi, l_phi)
+			{
+			  bool exact_projection;
+			  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi, &exact_projection);
+			  *exact_p = *exact_p && exact_projection;
+			}
+		    }
+		  
+		  /* first remove the first common phi variable which should be equal to zero */
+		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
+		  bool exact_projection;
+		  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi_first_non_common, &exact_projection);
+		  *exact_p = *exact_p && exact_projection;
+
+		  /* then rename all the phi variables in reverse order */
+		  for(i=nb_common_indices+2; i<=nb_phi_input_ref; i++)
+		    {
+		      entity old_phi = make_phi_entity(i);
+		      entity new_phi = make_phi_entity(i-(nb_common_indices+1));
+				  
+		      sc_variable_rename(sc_output, old_phi, new_phi);	  
+		    }
+		  *output_desc = make_descriptor_convex(sc_output);
+		  
+		  /* int output_ref_inds = (int) gen_length(reference_indices(*output_ref));*/
+		  for(int i = 1; i<nb_phi_input_ref-nb_common_indices; i++)
+		    {
+		      POP(input_remaining_indices);
+		      expression input_remaining_indices_exp = EXPRESSION(CAR(input_remaining_indices));
+		      if ( entity_field_p(expression_variable(input_remaining_indices_exp)))
+			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref), 
+								   CONS(EXPRESSION, copy_expression(input_remaining_indices_exp), NIL));
+		      else
+			reference_indices(*output_ref) = gen_nconc( reference_indices(*output_ref),
+								    CONS(EXPRESSION,
+									 make_phi_expression(i),
+									 NIL));
+		    } /* for */
+		} /* if (derived_type_p(bct) || pointer_type_p(bct)) */
+	      else
+		{
+		  *output_desc = copy_descriptor(address_of_desc);
+		}
+	      free_type(bct);
+	    }
+		      		      		     		  
+	} /* if(!ENDP(input_remaining_indices))*/
+		  
+    } /* else du if (effect_undefined_p(eff_real) || ...) */
+						
   
 }

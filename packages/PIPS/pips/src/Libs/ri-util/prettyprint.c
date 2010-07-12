@@ -2691,7 +2691,7 @@ loop_private_variables(loop obj, list pdl)
 	 updated because loop_private is somehow redundant with
 	 statement declarations. */
       pips_user_warning("Privatized variables are ignored with the "
-			"current prettyprintrer options.\n");
+			"current prettyprinter options.\n");
     }
 
     if(!string_undefined_p(private)) {
