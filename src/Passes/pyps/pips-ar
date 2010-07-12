@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+import sys
+import os
+import subprocess
+import pipsgcc
+import fcntl
+import pickle
+from pipsgcc import getDirectory 
+from pipsgcc import CCWorkspace 
+from pipsgcc import ArObject 
+
+
+
+if len(sys.argv) == 1:
+	sp=subprocess.Popen(CC)
+	exitcode=sp.wait()
+	exit(0)
+
+
+AR=os.getenv("PIPS_AR","ar")
+
+#Call AR
+cmd = [AR] + sys.argv[1:]
+#print "\033[91mCalling " + " ".join(cmd) + "\033[00m"
+sp=subprocess.Popen(cmd)
+exitcode=sp.wait()
+
+obj = ArObject(sys.argv[1:])
+
+
+#Load workspace
+workspace = None
+wsfile = None
+
+try:
+	wsfile = file(os.path.join(getDirectory(),"workspace"), "r+")
+	fcntl.flock(wsfile, fcntl.LOCK_EX)
+except IOError:
+	workspace =  _CCWorkspace()
+
+if wsfile != None:
+	workspace =  pickle.load(wsfile)
+else:
+	wsfile = file(os.path.join(getDirectory(),"workspace"), "w")
+	fcntl.flock(wsfile, fcntl.LOCK_EX)
+
+#Add the new object to the workspace
+workspace.addObject(obj)
+
+#Save the new workspace
+wsfile.seek(0)
+pickle.dump(workspace,wsfile)
+
+exit(exitcode)

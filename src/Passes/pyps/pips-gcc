@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+import os
+import sys
+import pickle
+import subprocess
+import fnmatch
+import fcntl
+import pipsgcc
+from pipsgcc import getDirectory
+from pipsgcc import Object
+from pipsgcc import LinkerObject
+from pipsgcc import _CCWorkspace
+
+
+def ofile(argv):
+	for opt in argv:
+		if opt == '-o':
+			index=argv.index(opt)
+			return argv[index+1]
+	return ""
+
+CC=os.getenv("PIPS_CC","gcc")
+
+if ofile(sys.argv).find(".o") == -1 :
+	CC=os.getenv("PIPS_LD",CC)
+
+if len(sys.argv) == 1:
+	sp=subprocess.Popen(CC)
+	exitcode=sp.wait()
+	exit(0)
+
+if sys.argv[1] == "-print-prog-name=ld":
+	print sys.argv[0]
+	exit(0)
+
+if sys.argv[1] == "-do":
+	wp = pipsgcc.CCWorkspace("pips.ws")
+	if not os.path.exists("output"):
+		os.mkdir("output")
+	wp.compile(outdir="output")
+	exit(0)
+
+#Beginning of the program
+
+#Call GCC
+cmd = [CC] + sys.argv[1:]
+sp=subprocess.Popen(cmd)
+exitcode=sp.wait()
+
+
+#Create object
+obj = None
+if ofile(sys.argv).find(".o") != -1 :
+	obj = Object(sys.argv[1:])
+else:
+	obj = LinkerObject(sys.argv[1:])
+
+
+#Load workspace
+workspace = None
+wsfile = None
+
+try:
+	wsfile = file(os.path.join(getDirectory(),"workspace"), "r+")
+	fcntl.flock(wsfile, fcntl.LOCK_EX)
+except IOError:
+	workspace =  _CCWorkspace()
+
+if wsfile != None:
+	workspace =  pickle.load(wsfile)
+else:
+	wsfile = file(os.path.join(getDirectory(),"workspace"), "w")
+	fcntl.flock(wsfile, fcntl.LOCK_EX)
+
+#Add the new object to the workspace
+workspace.addObject(obj)
+
+#Save the new workspace
+wsfile.seek(0)
+pickle.dump(workspace,wsfile)
+
+
+sys.exit(exitcode)
