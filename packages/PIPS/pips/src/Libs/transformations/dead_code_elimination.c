@@ -192,15 +192,14 @@ dead_test_filter(statement st_true, statement st_false)
 
 /* Replace an instruction by an empty one. If there is a label on the
    statement, put it on a continue to be coherent with the PIPS RI. */
-static bool
-discard_statement_and_save_label_and_comment(statement s)
+static bool discard_statement_and_save_label_and_comment(statement s)
 {
 
   /* NN -> Bug found : if we have two loops with the same label
      such as :
 
      DO 100 I=1,N
-        DO 100 J=1,M
+     DO 100 J=1,M
      ......
 
      100 CONTINUE
@@ -212,46 +211,62 @@ discard_statement_and_save_label_and_comment(statement s)
 
      SOLUTION : like in full_loop_unroll()*/
 
-  if (instruction_loop_p(statement_instruction(s)))
-    {
-      entity flbl = find_final_statement_label(loop_body(instruction_loop(statement_instruction(s))));
+  if (statement_loop_p(s)) {
+    loop l = instruction_loop(statement_instruction(s));
+    entity flbl = find_final_statement_label(loop_body(l));
 
-      if(!entity_empty_label_p(flbl)) {
+    if(!entity_empty_label_p(flbl)) {
 
-	instruction block =  make_instruction_block(NIL);
-	statement stmt = make_continue_statement(flbl);
-	instruction_block(block)= gen_nconc(instruction_block(block),
-					    CONS(STATEMENT, stmt, NIL ));
-	free_instruction(statement_instruction(s));
-	/* And put a new empty one: */
-	statement_instruction(s) = block;
-	/* Since the RI need to have no label on instruction block: */
-
-	fix_sequence_statement_attributes(s);
-
-      }
-
-    }
-  /* this avoids removing declarations */
-  else if(!ENDP(statement_declarations(s)))
-  {
-      if(statement_block_p(s))
-      {
-          FOREACH(STATEMENT,st,statement_block(s))
-              if(!declaration_statement_p(s)) discard_statement_and_save_label_and_comment(st);
-      }
-  }
-  else
-  {
-      /* Discard the old instruction: */
+      instruction block =  make_instruction_block(NIL);
+      statement stmt = make_continue_statement(flbl);
+      instruction_block(block)= gen_nconc(instruction_block(block),
+					  CONS(STATEMENT, stmt, NIL ));
       free_instruction(statement_instruction(s));
       /* And put a new empty one: */
-      statement_instruction(s) = make_instruction_block(NIL);
-
+      statement_instruction(s) = block;
       /* Since the RI need to have no label on instruction block: */
+
       fix_sequence_statement_attributes(s);
+
+    }
+
   }
-   return false;
+   /* FI: Why do we want to avoid eliminating declarations? If they are
+   * dead code, they should not be used anywhere? This is only useful
+   * if the elimination decision is taken according to effects...
+   */
+  else if(declaration_statement_p(s)) {
+    ; /* do not modify the declaration statement... in case it has no
+	 memory effect */
+  }
+  /* "this avoids removing declarations" (previous comment)
+   *
+   * FI: If a whole block has no effect, its internal declarations are
+   * useless too. But if it is the body of a function returning a
+   * value, the return statement should be preserved for syntactic
+   * correctness. This is not done here. The main test should be
+   * if(statement_block_p(s)).
+   *
+   * Maybe also, we might want to preserve some comments. See
+   * Transformations/no_effect_statement_00
+   */
+  else if(FALSE && !ENDP(statement_declarations(s))) {
+    if(statement_block_p(s)) {
+      FOREACH(STATEMENT,st,statement_block(s))
+	if(!declaration_statement_p(s))
+	  discard_statement_and_save_label_and_comment(st);
+    }
+  }
+  else {
+    /* Discard the old instruction: */
+    free_instruction(statement_instruction(s));
+    /* And put a new empty one: */
+    statement_instruction(s) = make_instruction_block(NIL);
+
+    /* Since the RI need to have no label on instruction block: */
+    fix_sequence_statement_attributes(s);
+  }
+  return false;
 }
 
 
@@ -285,7 +300,7 @@ remove_loop_statement(statement s, instruction i, loop l)
   statement as;
   expression init_val;
 
-  init_val = copy_expression (rl = range_lower(lr = loop_range(l))); 
+  init_val = copy_expression (rl = range_lower(lr = loop_range(l)));
   /* Assume here that index is a scalar variable... :-) */
   pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
 
@@ -977,6 +992,9 @@ static bool dead_statement_filter(statement s)
      * But STOP statements can also introduce discontinuities...
      * Well, to please Ronan let's put a fast accurate enough
      * test for that last case.
+     *
+     * This can also happen when a function is never called, but
+     * analyzed interprocedurally.
      */
     if (!statement_weakly_feasible_p(s)) {
       pips_debug(2, "Dead statement %td (%td, %td)\n",

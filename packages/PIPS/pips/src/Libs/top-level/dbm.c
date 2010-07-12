@@ -406,3 +406,18 @@ void compile_f90_module( string filename ) {
   }
 
 }
+
+/* Get all the callers of the specified module. The returned value is allocated dynamically
+    and needs to be freed by the caller of this function */
+gen_array_t get_callers (string module)
+{
+    callees caller_modules;
+
+    if (!safe_make(DBR_CALLERS, module))
+            pips_internal_error("Cannot make callers for %s\n", module);
+
+    caller_modules = (callees)
+            db_get_memory_resource(DBR_CALLERS, module,TRUE);
+
+    return gen_array_from_list(callees_callees(caller_modules));
+}

@@ -266,16 +266,13 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	     Besides, it should be made generic to handle convex input paths as well. Only simple paths are currently 
 	     taken into account.
 	  */
-	  /* first compute the list of additional indices of input_ref */
-	  for(int i = 0; i < (int) current_max_path_length; i++, POP(input_indices));
 	    
-	  /* Then transform each sink reference to add it in the return list */
+	  /* Transform each sink reference to add it in the return list */
 	  FOREACH(POINTS_TO, pt, matching_list)
 	    {
 	      cell sink_cell = points_to_sink(pt);
 	      reference sink_ref = reference_undefined;
 	      reference build_ref = reference_undefined;
-	      list build_indices = NIL;
 	      
 	      pips_debug(8, "considering point-to  : %s\n ",
 			 words_to_string(word_points_to(pt)));
@@ -302,83 +299,15 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
 	      else
 		{
 	      
-
-		  /* from here it's not generic, that is to say it does not work for convex effect references */
-		  list input_remaining_indices = input_indices;
+		  descriptor d1 = descriptor_undefined, d2 = descriptor_undefined, d3;
+		  bool exact_translation_p;
 		  
-		  build_ref = copy_reference(sink_ref);
-		  build_indices = gen_last(reference_indices(build_ref));
-		  
-		  /* special case for the first remaning index: we must add it to the last index of build_ref */
-		  if (!ENDP(build_indices))
-		    {
-		      expression last_build_indices_exp = EXPRESSION(CAR(build_indices)); 
-		      expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
-		      expression new_exp = expression_undefined;
-		      /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation 
-			 this should maybe be put in another function
-		      */
-		      if(!unbounded_expression_p(last_build_indices_exp))
-			{
-			  if (expression_reference_p(last_build_indices_exp) && 
-			      entity_field_p(expression_variable(last_build_indices_exp)))
-			    {
-			      if (!expression_equal_integer_p(first_input_remaining_exp, 0))
-				{
-				  pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
-				}	
-			      else
-				new_exp = last_build_indices_exp;
-			    }
-			    
-			  else if(!unbounded_expression_p(first_input_remaining_exp))
-			    {
-				
-			      value v;
-			      new_exp = MakeBinaryCall
-				(entity_intrinsic(PLUS_OPERATOR_NAME),
-				 copy_expression(last_build_indices_exp), copy_expression(first_input_remaining_exp));
-			      /* Then we must try to evaluate the expression */
-			      v = EvalExpression(new_exp);
-			      if (! value_undefined_p(v) && 
-				  value_constant_p(v))
-				{
-				  constant vc = value_constant(v);
-				  if (constant_int_p(vc))
-				    {				    
-				      free_expression(new_exp);
-				      new_exp = int_to_expression(constant_int(vc));
-				    }
-				}
-			    }
-			  else
-			    {
-			      new_exp = make_unbounded_expression();
-			      *exact_p = false;
-			    }
-			  CAR(gen_last(reference_indices(build_ref))).p 
-			    = (void *) new_exp;
-			}
-		      else
-			{
-			  *exact_p = false;
-			}
-		    }
-		  else /* ENDP(build_indices) */
-		    {
-		      /* The sink is a scalar: the first remaning index must be equal to 0 */
-		      expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
-		      if (!expression_equal_integer_p(first_input_remaining_exp, 0))
-			pips_internal_error("potential memory overflow: should have been converted to anywhere before \n");
-		    }
-	      
-		  FOREACH(EXPRESSION, input_ind, CDR(input_remaining_indices))
-		    {
-		      reference_indices(build_ref) = gen_nconc(reference_indices(build_ref),
-							       CONS(EXPRESSION, 
-								    copy_expression(input_ind), 
-								    NIL));
-		    }
+		  simple_cell_reference_with_address_of_cell_reference_translation(input_ref, d1, 
+										   sink_ref, d2,
+										   current_max_path_length,
+										   &build_ref, &d3, 
+										   &exact_translation_p);
+		  *exact_p = *exact_p && exact_translation_p; 
 		  pips_debug(8, "adding reference %s\n",
 			     words_to_string(words_reference(build_ref, NIL)));
 		  l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);

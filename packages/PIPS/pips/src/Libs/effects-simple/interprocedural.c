@@ -1134,11 +1134,10 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
 		    reference eff_ref = effect_any_reference(eff);
-		    list eff_ind = reference_indices(eff_ref);
 		    tag eff_act = effect_action_tag(eff);
 		    
 		    pips_debug_effect(6, "current effect :%s\n",eff);
-		    
+		    		    
 		    if ((anywhere_r_p && eff_act == is_action_read) || (anywhere_w_p && eff_act == is_action_write))
 		      {
 			pips_debug(6, "no need to translate, result is already anywhere\n");
@@ -1155,127 +1154,32 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			  }
 			else
 			  {
-			    n_eff = (*effect_dup_func)(eff1);
-			    /* memory leaks ? */
-			    effect_approximation(n_eff) = 
-			      copy_approximation(effect_approximation(eff));
-			    effect_action(n_eff) =
-			      copy_action(effect_action(eff));
-			  }
-	      
-			/* BC : This must certainely be improved only simple cases are handled .*/
-			if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
-			  {
-			    expression first_ind = EXPRESSION(CAR(eff_ind));
-		    
-			    /* The operand of & is a scalar expression */
-			    /* the first index of eff reference (which must
-			       be equal to 0) must not be taken into account.
-			       The other indices must be appended to n_eff indices
-			    */
-		    
-			    if (!expression_equal_integer_p(first_ind, 0))
+			    reference eff1_ref = effect_any_reference(eff1);
+			    reference n_eff_ref;
+			    descriptor d;
+			    bool exact_translation_p;
+			    simple_cell_reference_with_address_of_cell_reference_translation(eff_ref, descriptor_undefined,
+											     eff1_ref, descriptor_undefined,
+											     0,
+											     &n_eff_ref, &d,
+											     &exact_translation_p);
+			    n_eff = make_effect(make_cell(is_cell_reference, n_eff_ref), 
+						copy_action(effect_action(eff)), 
+						exact_translation_p? copy_approximation(effect_approximation(eff)):
+						make_approximation_may(), 
+						make_descriptor(is_descriptor_none,UU));
+			    
+			    if (entity_all_locations_p(reference_variable(n_eff_ref)))
 			      {
-				pips_user_warning("potential memory overflow due to effect : %s"
-						  " corresponding to real argument %s -> returning anywhere effect\n",
-						  words_to_string(words_effect(eff)),
-						  words_to_string(words_expression(real_arg, NIL)));
-				free_effect(n_eff);
-				n_eff = make_anywhere_effect(eff_act);
 				if (eff_act == is_action_read) 
 				  anywhere_r_p = true;
 				else
 				  anywhere_w_p = true;
-			      }
-			    else
-			      {
-				FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
-				  {
-				    (*effect_add_expression_dimension_func)
-				      (n_eff, eff_ind_exp);
-				  }
-			      }
+				}
 			  }
-			else 
-			  {
-			    expression first_ind = EXPRESSION(CAR(eff_ind));
-			    reference n_eff_ref = effect_any_reference(n_eff);
-			    expression last_n_eff_ind = 
-			      EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
-			    expression n_exp;
-		    
-		    
-			    /* The operand of & is subcripted */
-			    /* The first index of eff must be added to the last
-			     * index of n_eff (except if it is unbounded
-			     * or if it is a field),
-			     * and the remaining indices list 
-			     * be appended to th indices of n_eff
-			     * could be more generic
-			     */
-			    if(!unbounded_expression_p(last_n_eff_ind))
-			      {
-				if (expression_reference_p(last_n_eff_ind) && 
-				    entity_field_p(expression_variable(last_n_eff_ind)))
-				  {
-				    if (!expression_equal_integer_p(first_ind, 0))
-				      {
-					pips_user_warning("potential memory overflow due to effect : %s"
-							  " corresponding to real argument %s -> returning anywhere effect\n",
-							  words_to_string(words_effect(eff)),
-							  words_to_string(words_expression(real_arg, NIL)));
-					free_effect(n_eff);
-					n_eff = make_anywhere_effect(eff_act);
-					if (eff_act == is_action_read) 
-					  anywhere_r_p = true;
-					else
-					  anywhere_w_p = true;
-				      }	
-				    else
-				      n_exp = last_n_eff_ind;
-				  }
-			    
-				else if(!unbounded_expression_p(first_ind))
-				  {
-				
-				    value v;
-				    n_exp = MakeBinaryCall
-				      (entity_intrinsic(PLUS_OPERATOR_NAME),
-				       last_n_eff_ind, copy_expression(first_ind));
-				    /* Then we must try to evaluate the expression */
-				    v = EvalExpression(n_exp);
-				    if (! value_undefined_p(v) && 
-					value_constant_p(v))
-				      {
-					constant vc = value_constant(v);
-					if (constant_int_p(vc))
-					  {
-				    
-					    /* free_expression(n_exp);*/
-					    n_exp = int_to_expression(constant_int(vc));
-					  }
-				      }
-				  }
-				else
-				  {
-				    n_exp = make_unbounded_expression();
-				  }
-				if (!anywhere_effect_p(n_eff))
-				  {CAR(gen_last(reference_indices(n_eff_ref))).p 
-				      = (void *) n_exp;
-				  }
-				/*should we free last_n_eff_ind ? beware n_exp can be equal to it*/
-			      }
-			    if (!anywhere_effect_p(n_eff))
-			      {
-				FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
-				  {
-				    (*effect_add_expression_dimension_func)
-				      (n_eff, eff_ind_exp);
-				  }
-			      }
-			  } /*else */
+	      			
 			l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		      
 		      }
 		  } /*  FOREACH(EFFECT, eff, l_sum_eff) */
 		gen_free_list(l_real_arg);
@@ -2031,7 +1935,7 @@ simple_effects_forward_translation(
 }
 
 list c_simple_effects_on_actual_parameter_forward_translation
-(entity callee, expression real_exp, entity formal_ent, list l_eff, transformer context)
+(entity  __attribute__ ((unused)) callee, expression  __attribute__ ((unused)) real_exp, entity  __attribute__ ((unused)) formal_ent, list  __attribute__ ((unused)) l_eff, transformer  __attribute__ ((unused)) context)
 {
   pips_internal_error("not yet implemented\n");
   return NIL;

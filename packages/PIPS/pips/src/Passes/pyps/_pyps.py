@@ -4,7 +4,10 @@ import os
 import tempfile
 import shutil
 import re
+import time
 from string import split, upper, join
+from subprocess import Popen, PIPE
+import sys
 
 pypips.atinit()
 
@@ -45,6 +48,18 @@ class module:
 
 	@property
 	def name(self): return self._name
+
+	def run(self,cmd):
+		"""runs command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd 'path/to/module/src' > 'path/to/module/src''"""
+		self.print_code()
+		printcode_rc=os.path.join(self._ws.directory(),pypips.show("PRINTED_FILE",self.name))
+		code_rc=os.path.join(self._ws.directory(),pypips.show("C_SOURCE_FILE",self.name))
+		thecmd=cmd+[printcode_rc]
+		time.sleep(1) # sleep 1 sec to make sure pipsmake detects the change
+		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
+		if pid.wait() != 0:
+			print sys.stderr > pid.stderr.readlines()
+
 
 	def show(self,rc):
 		"""returns the name of resource rc"""

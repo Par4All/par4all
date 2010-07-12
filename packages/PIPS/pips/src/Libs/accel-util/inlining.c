@@ -171,6 +171,7 @@ static bool has_similar_entity(entity e,set se)
 }
 
 
+static statement expanded;
 
 /* look for entity locally named has `new' in statements `s'
  * when found, find a new name and perform substitution
@@ -195,7 +196,8 @@ solve_name_clashes(statement s, entity new)
                 entity_name(solve_clash)=ename;
             } while( has_similar_entity(solve_clash,re));
             CAR(l).p = (void*)solve_clash;
-            replace_entity(s,decl_ent,solve_clash);
+            replace_entity(expanded,decl_ent,solve_clash);
+            gen_recurse_stop(0);
         }
     }
     set_free(re);
@@ -306,7 +308,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
-    statement expanded = copy_statement(inlined_module_statement(p));
+    expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = make_empty_block_statement();
     //statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 

@@ -420,7 +420,7 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
   ifdebug(9)
     print_statement_set(stderr, region);
 
-  debug(9, "CodeGenerate", "finding and top-sorting sccs ...\n");
+  pips_debug(9, "finding and top-sorting sccs ...\n");
   set_sccs_drivers(&AK_ignore_this_vertex, &AK_ignore_this_successor);
   lsccs = FindAndTopSortSccs(g, region, l);
   reset_sccs_drivers();
@@ -493,10 +493,10 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
   }
 
   ifdebug(8) {
-    debug(8, "CodeGenerate", "Result:\n") ;
+    pips_debug(8, "Result:\n") ;
 
     if (rst==statement_undefined)
-      debug(8, "CodeGenerate", "No code to generate\n") ;
+      pips_debug(8, "No code to generate\n") ;
     else
       print_parallel_statement(rst);
 
@@ -574,61 +574,83 @@ statement MakeLoopAs(statement old_loop_statement,
  * ??? the effects shouldn't be computed once more...
  *
  * FC 22/09/93
+ *
+ * FI: I've added the body local variables to the loop local variables
+ * for C. I'm glad they are removed here.
  */
 list NewLoopLocals(statement body, list locals)
 {
   list body_effects = statement_to_effects(body);
   list result = NIL;
 
-    ifdebug(8) {
-      pips_debug(8, "body is:\n");
-      print_statement(body);
-      pips_debug(8, "effects considered are:\n");
-      print_effects(body_effects);
+  ifdebug(8) {
+    pips_debug(8, "body is:\n");
+    print_statement(body);
+    pips_debug(8, "effects considered are:\n");
+    print_effects(body_effects);
+  }
+
+  FOREACH(ENTITY, private_variable, locals) {
+    pips_debug(8, "considering entity %s with given effects\n",
+	       entity_local_name(private_variable));
+
+    if (effects_read_or_write_entity_p(body_effects, private_variable))
+      result = CONS(ENTITY, private_variable, result);
+  }
+
+  gen_free_list(body_effects);
+
+  pips_debug(8,
+	     "%td private variables kept out of %td\n",
+	     gen_length(result),
+	     gen_length(locals));
+  ifdebug(9) {
+    pips_debug(9, "the kept variables are : \n");
+    FOREACH(ENTITY, private, result) {
+      pips_debug(9, "%s\n", entity_local_name(private));
     }
-
-    FOREACH(ENTITY, private_variable, locals) {
-      pips_debug(8, "considering entity %s with given effects\n",
-		 entity_local_name(private_variable));
-
-      if (effects_read_or_write_entity_p(body_effects, private_variable))
-	result = CONS(ENTITY, private_variable, result);
-     }
-
-    gen_free_list(body_effects);
-
-    pips_debug(8,
-	       "%td private variables kept out of %td\n",
-	       gen_length(result),
-	       gen_length(locals));
-    ifdebug(9) {
-      pips_debug(9, "the kept varaibles are : \n");
-      FOREACH(ENTITY, private, result) {
-	pips_debug(9, "%s\n", entity_local_name(private));
-      }
-    }
-    return(result);
+  }
+  return(result);
 }
 
+/* If the isolated statement is a CALL and is not a CONTINUE,
+   regenerate the nested loops around it. Otherwise, returns an
+   undefined statement. */
 statement IsolatedStatement(scc s,
 			    int l,
 			    bool task_parallelize_p)
 {
     vertex v = VERTEX(CAR(scc_vertices(s)));
-    statement st = vertex_to_statement(v), rst;
+    statement st = vertex_to_statement(v);
+    statement rst = statement_undefined;
     list loops = load_statement_enclosing_loops(st);
     instruction sbody = statement_instruction(st);
     extern int enclosing ;
 
-    debug(8, "IsolatedStatement", "statement %d\n", statement_number(st));
+    pips_debug(8, "Input statement %d\n", statement_number(st));
 
     /* continue statements are ignored. */
-    if (!instruction_call_p(sbody)
-	|| continue_statement_p(st))
-	return (statement_undefined);
+    /*FI: But they should not be isolated statements if the contain
+       declarations... */
+    //if(declaration_statement_p(st))
+    //pips_internal_error("Declaration statement is junked.\n");
 
-    rst = MakeNestOfParallelLoops(l-1-enclosing,
-				  loops, st, task_parallelize_p);
+    if (!instruction_call_p(sbody)
+	|| (continue_statement_p(st) && !declaration_statement_p(st)))
+	;
+    /* FI: we are likely to end up in trouble here because C allows
+       expressions as instructions... */
+    /* FI: if the statement is any kind of loop or a test, do not go
+       down.*/
+    else
+      rst = MakeNestOfParallelLoops(l-1-enclosing,
+				    loops, st, task_parallelize_p);
+
+    ifdebug(8) {
+      pips_debug(8, "Returned statement:\n");
+      safe_print_statement(rst);
+    }
+
     return(rst);
 }
 
@@ -637,6 +659,8 @@ statement IsolatedStatement(scc s,
 /* BB: ConnectedStatements() is called when s contains more than one
 vertex or one vertex dependent upon itself. Thus, vectorization can't
 occur.
+
+FI: it may not be true if one of the statements is a C declaration.
  */
 statement ConnectedStatements(graph g, scc s, int l, bool task_parallelize_p)
 {
@@ -648,7 +672,7 @@ statement ConnectedStatements(graph g, scc s, int l, bool task_parallelize_p)
   tag seq_or_par;
   bool task_parallelize_inner;
 
-  pips_debug(8, "at level %d:",l);
+  pips_debug(8, "at level %d:\n",l);
   ifdebug(8) PrintScc(s);
 
   inner_region = scc_region(s);
@@ -663,7 +687,7 @@ statement ConnectedStatements(graph g, scc s, int l, bool task_parallelize_p)
      && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
     FALSE : task_parallelize_p;
 
-  /* CodeGenerate don't use the first parameter... */
+  /* CodeGenerate does not use the first parameter... */
   inner_stat = CodeGenerate(/* big hack */ statement_undefined,
 			    g, inner_region, l+1, task_parallelize_inner);
 
