@@ -1,0 +1,57 @@
+
+Symbol table for "restrict01"
+
+restrict01!
+
+Declarations for module "restrict01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:restrict01" with type "functional" "int * x int * -> void"
+	Declared entity "TOP-LEVEL:restrict01a" with type "functional" "int * x int * -> void"
+	Declared entity "TOP-LEVEL:restrict01b" with type "functional" "int * x int * -> void"
+	Declared entity "restrict01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "restrict01!:*HEAP*" with type "area" with size 0
+	Declared entity "restrict01!:*STACK*" with type "area" with size 0
+	Declared entity "restrict01!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "restrict01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "restrict01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "restrict01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "restrict01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module restrict01!
+
+
+Parsed printed file
+
+/* Check prettyprint of restrict */
+
+/* non standard version: void restrict01(int * __restrict p, int * __restrict q);*/
+/* C99 version: void restrict01(int * restrict p, int * restrict q);*/
+
+void restrict01(int *restrict p, int *restrict q);
+
+void restrict01a(const int *restrict p, int *const q);
+
+void restrict01b(const int *restrict p, int *const q);

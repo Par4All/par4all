@@ -1,5 +1,5 @@
-delete convol2-sg1-C
-create convol2-sg1-C convol-unroll.c include/p4a_stubs.c
+delete convol-unroll-C2
+create convol-unroll-C2 convol-unroll.c include/p4a_stubs.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 
@@ -70,8 +70,9 @@ apply SUPPRESS_DEAD_CODE[microcode]
 display PRINTED_FILE[microcode]
 
 echo
-echo After atomization
+echo After atomization of "microcode"
 echo
+
 setproperty SIMD_ATOMIZER_ATOMIZE_LHS TRUE
 #setproperty SIMD_ATOMIZER_ATOMIZE_REFERENCE TRUE
 apply SIMD_ATOMIZER[microcode]
@@ -82,13 +83,42 @@ display PRINTED_FILE[microcode]
 
 # probably useless for terapix microcode
 #apply INVARIANT_CODE_MOTION
+
+echo
+echo After array to pointer conversion of "microcode"
+echo
+
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
 setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER[microcode]
 display PRINTED_FILE[microcode]
+
+echo
+echo Printed file for "launch_microcode1!
+echo
+
 display PRINTED_FILE[launch_microcode1]
+#quit
+echo
+echo Transformers for "convol"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[convol]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo After a last partial evaluation of "microcode"
+echo
+
 apply PARTIAL_EVAL[microcode]
-display PRINTED_FILE[microcode]
+display PRINTED_FILE[microcode] 
 
 close
 quit

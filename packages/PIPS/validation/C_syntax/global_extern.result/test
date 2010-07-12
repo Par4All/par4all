@@ -1,0 +1,16 @@
+/* The extern declaration is invalidated by the direct declaration */
+
+int a;
+int a;
+
+int b;
+int b;
+int b;
+
+// The prettyprinter should memorize declared and initialized
+// variables so as not to redeclare them.
+//int c = 3;
+int c;
+int c;
+
+extern int main();
