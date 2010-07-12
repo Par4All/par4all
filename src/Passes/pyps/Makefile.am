@@ -1,9 +1,9 @@
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.pl
 
-dist_bin_SCRIPTS =	ipyps
+dist_bin_SCRIPTS =	ipyps pips-gcc pips-ar pips-make
 
-dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py
+dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py
 nodist_pkgpython_PYTHON=pypips.py
 pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c
