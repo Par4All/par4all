@@ -98,18 +98,18 @@ void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t
    size_t rangex, rangey;
    size_t i, j;
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb = t.nb;
+   size_t _PIPS_STRUCT_27_nb = t.nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data = t.data;
+   town *_PIPS_STRUCT_27_data = t.data;
    rangex = (xmax-xmin)/step;
    rangey = (ymax-ymin)/step;
    for(i = 0; i <= rangex-1; i += 1) {
       for(j = 0; j <= rangey-1; j += 1)
-         printf("%lf %lf %lf\n", _PIPS_STRUCT_31_data[i*rangey+j][0], _PIPS_STRUCT_31_data[i*rangey+j][1], _PIPS_STRUCT_31_data[i*rangey+j][2]);
+         printf("%lf %lf %lf\n", _PIPS_STRUCT_27_data[i*rangey+j][0], _PIPS_STRUCT_27_data[i*rangey+j][1], _PIPS_STRUCT_27_data[i*rangey+j][2]);
       printf("\n");
    }
-   t.nb = _PIPS_STRUCT_31_nb;
-   t.data = _PIPS_STRUCT_31_data;
+   t.nb = _PIPS_STRUCT_27_nb;
+   t.data = _PIPS_STRUCT_27_data;
 }
 int main(int argc, char *argv[])
 {
@@ -187,13 +187,13 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    int nb;
    towns tout;
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb_0 = nb;
+   size_t _PIPS_STRUCT_27_nb_0 = nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data_0 = malloc(sizeof(town)*nb);
+   town *_PIPS_STRUCT_27_data_0 = malloc(sizeof(town)*nb);
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb_1 = t.nb;
+   size_t _PIPS_STRUCT_27_nb_1 = t.nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data_1 = t.data;
+   town *_PIPS_STRUCT_27_data_1 = t.data;
    rangex = (xmax-xmin)/step;
    rangey = (ymax-ymin)/step;
    nb = 1+rangex*rangey;
@@ -203,22 +203,22 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
    for(i = 0; i <= rangex-1; i += 1)
       for(j = 0; j <= rangey-1; j += 1) {
-         _PIPS_STRUCT_31_data_0[i*rangey+j][0] = (xmin+step*i)*180/3.14159265358979323846;
-         _PIPS_STRUCT_31_data_0[i*rangey+j][1] = (ymin+step*j)*180/3.14159265358979323846;
-         _PIPS_STRUCT_31_data_0[i*rangey+j][2] = 0.;
-         for(k = 0; k <= _PIPS_STRUCT_31_nb_1-1; k += 1) {
+         _PIPS_STRUCT_27_data_0[i*rangey+j][0] = (xmin+step*i)*180/3.14159265358979323846;
+         _PIPS_STRUCT_27_data_0[i*rangey+j][1] = (ymin+step*j)*180/3.14159265358979323846;
+         _PIPS_STRUCT_27_data_0[i*rangey+j][2] = 0.;
+         for(k = 0; k <= _PIPS_STRUCT_27_nb_1-1; k += 1) {
             data_t tmp;
-            tmp = 6368.*acos(cos(xmin+step*i)*cos(_PIPS_STRUCT_31_data_1[k][0])*cos(ymin+step*j-_PIPS_STRUCT_31_data_1[k][1])+sin(xmin+step*i)*sin(_PIPS_STRUCT_31_data_1[k][0]));
+            tmp = 6368.*acos(cos(xmin+step*i)*cos(_PIPS_STRUCT_27_data_1[k][0])*cos(ymin+step*j-_PIPS_STRUCT_27_data_1[k][1])+sin(xmin+step*i)*sin(_PIPS_STRUCT_27_data_1[k][0]));
             if (tmp<range) 
-               _PIPS_STRUCT_31_data_0[i*rangey+j][2] += _PIPS_STRUCT_31_data_1[k][2]/(1+tmp);
+               _PIPS_STRUCT_27_data_0[i*rangey+j][2] += _PIPS_STRUCT_27_data_1[k][2]/(1+tmp);
          }
       }
    fprintf(stderr, "end computation ...\n");
-   tout.nb = _PIPS_STRUCT_31_nb_0;
-   tout.data = _PIPS_STRUCT_31_data_0;
+   tout.nb = _PIPS_STRUCT_27_nb_0;
+   tout.data = _PIPS_STRUCT_27_data_0;
    return tout;
-   t.nb = _PIPS_STRUCT_31_nb_1;
-   t.data = _PIPS_STRUCT_31_data_1;
+   t.nb = _PIPS_STRUCT_27_nb_1;
+   t.data = _PIPS_STRUCT_27_data_1;
 }
 validate result
 

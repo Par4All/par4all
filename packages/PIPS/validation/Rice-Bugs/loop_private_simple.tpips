@@ -1,9 +1,9 @@
 #
-delete loop_private
+delete loop_private_simple
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create loop_private loop_private.c
+create loop_private_simple loop_private_simple.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -27,7 +27,7 @@ apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 
 apply UNSPLIT
-shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
+shell gcc -fopenmp -c loop_private_simple.database/Src/loop_private_simple.c -o loop_private_simple.database/Src/loop_private_simple.o
 
 close
 delete loop_private

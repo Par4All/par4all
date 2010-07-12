@@ -1,0 +1,4 @@
+delete goto02
+create goto02 goto02.c
+display PRINTED_FILE
+close
