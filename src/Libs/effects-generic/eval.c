@@ -105,9 +105,10 @@
  */
 
 list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, list ptl, bool *exact_p,
+				      transformer current_precondition,
 				      bool (*cell_reference_preceding_p_func)(reference, descriptor,
 									      reference, descriptor ,
-										bool * ),
+									      transformer, bool * ),
 				      void (*cell_reference_with_address_of_cell_reference_translation_func)(reference, descriptor,
 													    reference, descriptor,
 													    int,
@@ -193,8 +194,9 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	         their path must be a predecessor of the input_ref
 	         path.*/
 	      if ( (source_path_length >= current_max_path_length)
-		   && (*cell_reference_preceding_p_func)(source_ref, source_desc, input_ref, input_desc, &exact_prec))
+		   && (*cell_reference_preceding_p_func)(source_ref, source_desc, input_ref, input_desc, current_precondition, &exact_prec))
 		{		  
+		  pips_debug(8, "exact_prec is %s\n", exact_prec? "true":"false");
 		  if (source_path_length > current_max_path_length )
 		    {
 		      /* if the candidate has a path length strictly greater than the current maximum lenght,
@@ -227,7 +229,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	      points_to_list_list(ptll) = NIL;
 	      free_points_to_list(ptll);
 	      fprintf(stderr,"current_max_path_length = %d\n", (int) current_max_path_length);
-	      
+	      fprintf(stderr, "*exact_p is %s\n", *exact_p? "true":"false");
 	    }
 	  
 
@@ -324,7 +326,8 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	{
 	  pips_debug(8, "recursing\n");
 	  list l_eval = generic_eval_cell_with_points_to(effect_cell(eff), effect_descriptor(eff), ptl, &r_exact_p,
-							cell_reference_preceding_p_func,
+							current_precondition,
+							 cell_reference_preceding_p_func,
 							cell_reference_with_address_of_cell_reference_translation_func,
 							cell_reference_conversion_func);
 	  *exact_p = *exact_p && r_exact_p;

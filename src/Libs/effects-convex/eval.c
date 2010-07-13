@@ -55,6 +55,7 @@
  */
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1, 
 				       reference r2, descriptor d2, 
+				       transformer current_precondition, 
 				       bool * exact_p)
 {
   bool res = true;
@@ -110,7 +111,28 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	    }
 	  else
 	    {
-	      list ld = region_sup_difference(reg1, reg2);
+	      
+	      pips_debug_effect(8, "reg2 before eliminating phi variables: \n ", reg2);
+	
+	      effect reg2_dup = copy_effect(reg2);
+	      list l_reg2 = CONS(EFFECT,reg2_dup,NIL);
+	      list l_phi = phi_entities_list(r1_path_length+1,r2_path_length);    
+	      project_regions_along_variables(l_reg2, l_phi);
+	      gen_free_list(l_reg2);
+	      gen_free_list(l_phi);
+	      pips_debug_effect(8, "reg2_dup after elimination: \n ", reg2_dup);
+	
+	      effect reg1_dup = copy_effect(reg1);
+	      if (!transformer_undefined_p(current_precondition))
+		{
+		  Psysteme sc_context = predicate_system(transformer_relation(current_precondition));
+		  region_sc_append(reg1_dup, sc_context, FALSE);
+		}
+		
+	      pips_debug_effect(8, "reg1_dup after adding preconditions: \n ", reg1_dup);
+	      pips_debug_effect(8, "reg1 after adding preconditions: \n ", reg1);
+	
+	      list ld = region_sup_difference(reg1_dup, reg2_dup);
 	      if (ENDP(ld))
 		{
 		  res = true;
@@ -137,7 +159,7 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
   else
     {
       res = false;
-      *exact_p = false;
+      *exact_p = true;
     }
 
   pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
@@ -199,10 +221,10 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
   This function is called by effects to see if a convex memory access path
   can be transformed into a constant one. 
 */
-list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p)
+list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p, transformer current_precondition)
 {
   
-  return generic_eval_cell_with_points_to(c, d, ptl, exact_p,
+  return generic_eval_cell_with_points_to(c, d, ptl, exact_p, current_precondition,
 					  convex_cell_reference_preceding_p,
 					  convex_cell_reference_with_address_of_cell_reference_translation,
 					  simple_reference_to_convex_reference_conversion);

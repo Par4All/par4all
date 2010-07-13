@@ -55,6 +55,7 @@
  */
 bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1, 
 			     reference r2, descriptor __attribute__ ((unused)) d2, 
+			     transformer __attribute__ ((unused)) current_precondition,
 			     bool * exact_p)
 {
   bool res = true;
@@ -100,7 +101,7 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
   else
     {
       res = false;
-      *exact_p = false;
+      *exact_p = true;
     }
 
   pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
@@ -149,6 +150,7 @@ list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused))
 {
   
   return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
+					  transformer_undefined,
 					  simple_cell_reference_preceding_p,
 					  simple_cell_reference_with_address_of_cell_reference_translation,
 					  simple_reference_to_simple_reference_conversion);

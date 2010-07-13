@@ -98,7 +98,7 @@ list (*effects_transformer_inverse_composition_op)(list, transformer);
 list (*effects_precondition_composition_op)(list,transformer);
 
 /* evaluation with alias information */
-list (*eval_cell_with_points_to_func)(cell, descriptor, list, bool *);
+list (*eval_cell_with_points_to_func)(cell, descriptor, list, bool *, transformer);
 
 /* union over a range */
 list (*effects_descriptors_variable_change_func)(list, entity, entity);

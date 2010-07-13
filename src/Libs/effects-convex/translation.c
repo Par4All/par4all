@@ -2385,8 +2385,8 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 	      entity output_ent = reference_variable(*output_ref);
 	      type bct = basic_concrete_type(entity_type(output_ent));
 	      
-	      //if (derived_type_p(bct) || pointer_type_p(bct))
-	      //{
+	      if (!entity_scalar_p(output_ent) || derived_type_p(bct) || pointer_type_p(bct))
+	      {
 	      sc_output = sc_dup(sc_input);
 	      pips_debug(8, "derived or pointer_type\n");
 	      
@@ -2434,11 +2434,12 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 								     make_phi_expression(i),
 								     NIL));
 		} /* for */
-	      //} /* if (derived_type_p(bct) || pointer_type_p(bct)) */
-	      //else
-	      //{
-	      //  *output_desc = copy_descriptor(address_of_desc);
-	      //}
+	      } /* if (derived_type_p(bct) || pointer_type_p(bct)) */
+	      else
+	      {
+	        *output_desc = make_descriptor_convex(sc_new());
+		*exact_p = true;
+	      }
 	      free_type(bct);
 	    }
 		      		      		     		  

@@ -1416,9 +1416,16 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 		{
 		  pips_debug(8, "dereferencing case \n");
 		  bool exact_p = false;
+		  transformer context;
+		  if (effects_private_current_context_empty_p())
+		    context = transformer_undefined;
+		  else {
+		    context = effects_private_current_context_head();
+		  }
+
 		  list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff), 
 							      points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-							      &exact_p); 
+							      &exact_p, context); 
 		  if (ENDP(l_eval))
 		    {
 		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
