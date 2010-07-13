@@ -92,8 +92,14 @@ def add_module_options(parser):
 
     compile_group = optparse.OptionGroup(parser, "Compilation Options")
 
-    compile_group.add_option("--output-file", "-o", action = "append", metavar = "FILE", default = [],
+    compile_group.add_option("--output-file", "--output", "-o", action = "append", metavar = "FILE", default = [],
         help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so, .a files or have no extension in which case an executable will be built.")
+
+    compile_group.add_option("--exclude-file", "--exclude", "-X", action = "append", metavar = "FILE", default = [],
+        help = "Exclude a source file from the compilation. Several are allowed. This is helpful if you need to pass a stub so that PIPS knows how to parallelize something, but do not want this file to end up being compiled.")
+
+    compile_group.add_option("--extra-file", "--extra", "-x", action = "append", metavar = "FILE", default = [],
+        help = "Include an additional source file when compiling. Several are allowed. They will not be processed through PIPS.")
 
     compile_group.add_option("--cc", metavar = "COMPILER", default = None,
         help = "C compiler to use (defaults to gcc).")
@@ -133,9 +139,6 @@ def add_module_options(parser):
 
     compile_group.add_option("--fortran-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify flags to pass to the Fortran compiler. Several are allowed. Note that --cpp-flags will be automatically prepended to the actual flags passed to the compiler.")
-
-    compile_group.add_option("--extra", action = "append", metavar = "FILE", default = [],
-        help = "Add additional file for compilation. Several are allowed. They will not be parallelized and will be passed as is.")
 
     compile_group.add_option("--arch", "-m", metavar = "32|64", default = None,
         help = "Specify compilation target architecture (defaults to current host architecture).")
@@ -281,7 +284,7 @@ def main(options, args = []):
         else:
             die("File format not supported: " + abs_file)
 
-    for file in options.extra:
+    for file in options.extra_file:
         abs_file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
             die("Invalid/missing extra file: " + abs_file)
@@ -496,7 +499,23 @@ def main(options, args = []):
         # Build not requested.
         return
 
-    all_buildable_files = processed_files + other_files + options.extra
+    all_buildable_files = []
+    
+    # Filter out the excluded files from the build (--exclude-file):
+    for file in processed_files + other_files + options.extra_file:
+        # This is normally not necessary at this point, but just to be sure:
+        file = os.path.abspath(os.path.expanduser(file))
+        found = False
+        for exclude_file in options.exclude_file:
+            abs_exclude_file = os.path.abspath(os.path.expanduser(exclude_file))
+            if abs_exclude_file == file:
+                warn("Excluding " + file + " from the build (--exclude-file " + exclude_file + ")")
+                found = True
+            else:
+                debug("Compared " + file + " to --exclude-file " + exclude_file + " -> " + abs_exclude_file + ", no match")
+        if not found:
+            all_buildable_files.append(file)
+
     if len(all_buildable_files) == 0:
         die("No buildable input files!")
 

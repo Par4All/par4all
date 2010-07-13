@@ -643,16 +643,14 @@ def main(options, args = []):
     # Copy python dependencies and templates.
     info("Copying python libs")
     install_python_lib_dir = ""
-    print install_dir_lib, os.listdir(install_dir_lib)
     for file in os.listdir(install_dir_lib):
-        print file
         if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
             install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
             if not os.path.isdir(install_python_lib_dir):
                 install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
             break
     if not install_python_lib_dir:
-        die("Cannot not determine python lib dir in " + install_dir_lib)
+        die("Cannot not determine python lib dir in " + install_dir_lib + ", try --rebuild")
     dir = os.path.join(root, "src/simple_tools")
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
