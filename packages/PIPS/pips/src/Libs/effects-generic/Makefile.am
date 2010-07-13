@@ -15,7 +15,8 @@ libeffects_generic_la_SOURCES=\
         methods.c \
 	prettyprint.c \
 	intrinsics.c \
-	interprocedural.c
+	interprocedural.c \
+	eval.c
 
 
 include $(srcdir)/../pipslibs_includes.mk

@@ -13,6 +13,7 @@ libeffects_convex_la_SOURCES=interface.c \
 		interprocedural.c \
 		prettyprint.c \
 		old_combine.c \
-		old_projection.c
+		old_projection.c \
+                eval.c
 
 include $(srcdir)/../pipslibs_includes.mk

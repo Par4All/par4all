@@ -4431,6 +4431,21 @@ must_regions                    > MODULE.proper_regions
         < CALLEES.summary_regions
 \end{PipsMake}
 
+\begin{PipsPass}{must_regions}
+This function computes the \verb|MUST| regions in a module.
+\end{PipsPass}
+\begin{PipsMake}
+must_regions_with_points_to     > MODULE.proper_regions
+                                > MODULE.regions
+                                > MODULE.inv_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.preconditions     
+        < CALLEES.summary_regions
+\end{PipsMake}
+
 \subsection{Summary READ/WRITE Regions}
 \label{subsubsection-summary-regions}
 \index{Summary Region}

@@ -1416,28 +1416,30 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 		{
 		  pips_debug(8, "dereferencing case \n");
 		  bool exact_p = false;
-		  list l_new_cells = (*eval_cell_with_points_to_func)(effect_cell(eff), 
+		  transformer context;
+		  if (effects_private_current_context_empty_p())
+		    context = transformer_undefined;
+		  else {
+		    context = effects_private_current_context_head();
+		  }
+
+		  list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff), 
 							      points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-							      &exact_p); 
-		  if (ENDP(l_new_cells))
+							      &exact_p, context); 
+		  if (ENDP(l_eval))
 		    {
 		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
 		      /* We have not found any equivalent constant path : it may point anywhere */
 		      /* We should maybe contract these effects later. Is it done by the callers ? */
 		      le = CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), le);
-		    }
+		    }	
 		  else
 		    {
-		      FOREACH(CELL, c, l_new_cells)
-			{			  
-			  le = CONS(EFFECT, 
-				    make_effect(c, copy_action(effect_action(eff)), 
-						make_approximation(exact_p? is_approximation_must:is_approximation_may,UU), 
-						make_descriptor_none()),
-				    le);
-			}	
+		      /* change the resulting effects action to the current effect action */
+		      if (effect_read_p(eff))
+			effects_to_read_effects(l_eval);
+		      le = gen_nconc(l_eval,le);
 		    }
-		  
 		}
 	      else
 		le = CONS(EFFECT, copy_effect(eff), le);

@@ -35,7 +35,8 @@ LIB_CFILES = \
         methods.c \
 	prettyprint.c \
 	intrinsics.c \
-	interprocedural.c
+	interprocedural.c \
+	eval.c
 
 INC_TARGET =    $(TARGET).h
 

@@ -2198,6 +2198,9 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 {
   Psysteme sc_output = SC_UNDEFINED;
 
+  pips_debug(6, "beginning with input_ref = %s and address_of_ref = %s, nb_common_indices = %d\n", 
+	     entity_name(reference_variable(input_ref)), entity_name(reference_variable(address_of_ref)), nb_common_indices);
+
   *output_ref = copy_reference(address_of_ref);
 		
   if (entity_all_locations_p(reference_variable(address_of_ref)))
@@ -2211,14 +2214,14 @@ void convex_cell_reference_with_address_of_cell_reference_translation
       int nb_phi_address_of_ref = (int) gen_length(reference_indices(address_of_ref));
       list volatile input_remaining_indices = reference_indices(input_ref);
       int nb_phi_input_ref = (int) gen_length(input_remaining_indices);
-
+      
       for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices)); 
-		    
+      
       if(!ENDP(input_remaining_indices))
 	{
 	  Psysteme sc_input = descriptor_convex(input_desc);
 	  int i;
-			
+	  
 	  if (nb_phi_address_of_ref !=0)
 	    {
  	      /* the first index of address_of_ref is added to the last index
@@ -2285,14 +2288,23 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
 		  entity psi1 = make_psi_entity(1);
 		  sc_input = sc_variable_rename(sc_input, (Variable) phi_first_non_common, (Variable) psi1);
-			  
-		  /* then shift other phi variables */
-		  for(i=nb_phi_input_ref; i>(nb_common_indices+1); i--)
+		  ifdebug(8)
 		    {
-		      entity old_phi = make_phi_entity(i);
-		      entity new_phi = make_phi_entity(nb_phi_address_of_ref+i-(nb_common_indices+1));
-			      
-		      sc_input = sc_variable_rename(sc_input, (Variable) old_phi, (Variable) new_phi);	  
+		      pips_debug(8, "sc_input after phi_first_non_common variable renaming: \n");
+		      sc_print(sc_input, (get_variable_name_t) entity_local_name);
+		    }  	  
+
+		  /* then shift other phi variables if necessary */
+		  if (nb_phi_address_of_ref != nb_common_indices + 1)
+		    {
+		      for(i=nb_phi_input_ref; i>(nb_common_indices+1); i--)
+			{
+			  entity old_phi = make_phi_entity(i);
+			  entity new_phi = make_phi_entity(nb_phi_address_of_ref+i-(nb_common_indices+1));
+			  
+			  pips_debug(8, "renaming %s into %s\n", entity_name(old_phi), entity_name(new_phi));
+			  sc_input = sc_variable_rename(sc_input, (Variable) old_phi, (Variable) new_phi);	  
+			}
 		    }
 			  
 		  /* preparing the system of sc_output from sc_address_of */
@@ -2349,14 +2361,14 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		      expression input_remaining_indices_exp = EXPRESSION(CAR(input_remaining_indices));
 		      if (entity_field_p(expression_variable(input_remaining_indices_exp)))
 			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
-								 CONS(EXPRESSION,
-								      copy_expression(input_remaining_indices_exp),
-								      NIL));
+								   CONS(EXPRESSION,
+									copy_expression(input_remaining_indices_exp),
+									NIL));
 		      else
 			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref), 
-								 CONS(EXPRESSION,
-								      make_phi_expression(i),
-								      NIL));
+								   CONS(EXPRESSION,
+									make_phi_expression(i),
+									NIL));
 		    }
 		  pips_debug(8, "*output_ref after adding phi: %s\n", words_to_string(effect_words_reference(*output_ref)));
 		} /* if(!anywhere_effect_p(n_eff))*/
@@ -2372,61 +2384,62 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 	      */
 	      entity output_ent = reference_variable(*output_ref);
 	      type bct = basic_concrete_type(entity_type(output_ent));
-
-	      if (derived_type_p(bct) || pointer_type_p(bct))
+	      
+	      if (!entity_scalar_p(output_ent) || derived_type_p(bct) || pointer_type_p(bct))
+	      {
+	      sc_output = sc_dup(sc_input);
+	      pips_debug(8, "derived or pointer_type\n");
+	      
+	      /* preparing the part of sc_input which is to be added to sc_output */
+	      /* first eliminate common dimensions in sc_input (well a copy, do not modify the original) */
+	      // sc_input = sc_dup(sc_input);
+	      if (nb_common_indices >0)
 		{
-		  sc_output = sc_dup(sc_input);
-		  pips_debug(8, "derived or pointer_type\n");
-
-		  /* preparing the part of sc_input which is to be added to sc_output */
-		  /* first eliminate common dimensions in sc_input (well a copy, do not modify the original) */
-		  sc_input = sc_dup(sc_input);
-		  if (nb_common_indices >0)
+		  list l_phi = phi_entities_list(1,nb_common_indices);
+		  FOREACH(ENTITY,phi, l_phi)
 		    {
-		      list l_phi = phi_entities_list(1,nb_common_indices);
-		      FOREACH(ENTITY,phi, l_phi)
-			{
-			  bool exact_projection;
-			  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi, &exact_projection);
-			  *exact_p = *exact_p && exact_projection;
-			}
+		      bool exact_projection;
+		      sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi, &exact_projection);
+		      *exact_p = *exact_p && exact_projection;
 		    }
-		  
-		  /* first remove the first common phi variable which should be equal to zero */
-		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
-		  bool exact_projection;
-		  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi_first_non_common, &exact_projection);
-		  *exact_p = *exact_p && exact_projection;
-
-		  /* then rename all the phi variables in reverse order */
-		  for(i=nb_common_indices+2; i<=nb_phi_input_ref; i++)
-		    {
-		      entity old_phi = make_phi_entity(i);
-		      entity new_phi = make_phi_entity(i-(nb_common_indices+1));
-				  
-		      sc_variable_rename(sc_output, old_phi, new_phi);	  
-		    }
-		  *output_desc = make_descriptor_convex(sc_output);
-		  
-		  /* int output_ref_inds = (int) gen_length(reference_indices(*output_ref));*/
-		  for(int i = 1; i<nb_phi_input_ref-nb_common_indices; i++)
-		    {
-		      POP(input_remaining_indices);
-		      expression input_remaining_indices_exp = EXPRESSION(CAR(input_remaining_indices));
-		      if ( entity_field_p(expression_variable(input_remaining_indices_exp)))
-			reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref), 
-								   CONS(EXPRESSION, copy_expression(input_remaining_indices_exp), NIL));
-		      else
-			reference_indices(*output_ref) = gen_nconc( reference_indices(*output_ref),
-								    CONS(EXPRESSION,
-									 make_phi_expression(i),
-									 NIL));
-		    } /* for */
-		} /* if (derived_type_p(bct) || pointer_type_p(bct)) */
-	      else
-		{
-		  *output_desc = copy_descriptor(address_of_desc);
 		}
+	      
+	      /* first remove the first common phi variable which should be equal to zero */
+	      entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
+	      bool exact_projection;
+	      sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi_first_non_common, &exact_projection);
+	      *exact_p = *exact_p && exact_projection;
+	      
+	      /* then rename all the phi variables in reverse order */
+	      for(i=nb_common_indices+2; i<=nb_phi_input_ref; i++)
+		{
+		  entity old_phi = make_phi_entity(i);
+		  entity new_phi = make_phi_entity(i-(nb_common_indices+1));
+		  
+		  sc_variable_rename(sc_output, old_phi, new_phi);	  
+		}
+	      *output_desc = make_descriptor_convex(sc_output);
+	      
+	      /* int output_ref_inds = (int) gen_length(reference_indices(*output_ref));*/
+	      for(int i = 1; i<nb_phi_input_ref-nb_common_indices; i++)
+		{
+		  POP(input_remaining_indices);
+		  expression input_remaining_indices_exp = EXPRESSION(CAR(input_remaining_indices));
+		  if ( entity_field_p(expression_variable(input_remaining_indices_exp)))
+		    reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref), 
+							       CONS(EXPRESSION, copy_expression(input_remaining_indices_exp), NIL));
+		  else
+		    reference_indices(*output_ref) = gen_nconc( reference_indices(*output_ref),
+								CONS(EXPRESSION,
+								     make_phi_expression(i),
+								     NIL));
+		} /* for */
+	      } /* if (derived_type_p(bct) || pointer_type_p(bct)) */
+	      else
+	      {
+	        *output_desc = make_descriptor_convex(sc_new());
+		*exact_p = true;
+	      }
 	      free_type(bct);
 	    }
 		      		      		     		  
