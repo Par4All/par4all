@@ -42,7 +42,7 @@
 #include "points_to_private.h"
 
 #include "effects-generic.h"
-#include "effects-simple.h"
+#include "effects-convex.h"
 
 /*
   @param r1 and r2 are two path references
@@ -53,9 +53,9 @@
   (we consider that p[1] is a predecessor of p[*], with *exact_p = false.)
 
  */
-bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1, 
-			     reference r2, descriptor __attribute__ ((unused)) d2, 
-			     bool * exact_p)
+bool convex_cell_reference_preceding_p(reference r1, descriptor d1, 
+				       reference r2, descriptor d2, 
+				       bool * exact_p)
 {
   bool res = true;
   entity e1 = reference_variable(r1);
@@ -82,12 +82,7 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
 	  expression exp1 = EXPRESSION(CAR(ind1));
 	  expression exp2 = EXPRESSION(CAR(ind2));
 	  
-	  if (unbounded_expression_p(exp1) || unbounded_expression_p(exp2))
-	    {
-	      res = true;
-	      *exact_p = false;
-	    }	    
-	  else if(!expression_equal_p(exp1, exp2))
+	  if(!expression_equal_p(exp1, exp2))
 	    {
 	      res = false;
 	      *exact_p = true;
@@ -95,6 +90,48 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
 	  
 	  POP(ind1);
 	  POP(ind2);
+	}
+      if (res)
+	{
+	  /* only matching reference indices have been found (phi variables or struct field entities).
+	     we must now check the descriptors.
+	  */
+	  region reg1 = make_effect(make_cell(is_cell_reference, r1), make_action_write(), make_approximation_must(), d1);
+	  region reg2 = make_effect(make_cell(is_cell_reference, r2), make_action_write(), make_approximation_must(), d2);
+
+	  pips_debug_effect(6, "reg1 = \n", reg1);
+	  pips_debug_effect(6, "reg2 = \n", reg1);
+	  
+	  list li = region_intersection(reg1, reg2);
+	  if (ENDP(li))
+	    {
+	      res = false;
+	      *exact_p = true;
+	    }
+	  else
+	    {
+	      list ld = region_sup_difference(reg1, reg2);
+	      if (ENDP(ld))
+		{
+		  res = true;
+		  *exact_p = true;
+		}
+	      else
+		{
+		  res = true;
+		  *exact_p = false;
+		}
+	      gen_full_free_list(ld);	   
+	    }
+	  gen_full_free_list(li);
+	      
+	  cell_reference(effect_cell(reg1)) = reference_undefined;
+	  effect_descriptor(reg1) = descriptor_undefined;
+	  free_effect(reg1);
+
+	  cell_reference(effect_cell(reg2)) = reference_undefined;
+	  effect_descriptor(reg2) = descriptor_undefined;
+	  free_effect(reg2);
 	}
     }
   else
@@ -107,21 +144,42 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
   return res;
 }
 
-void simple_reference_to_simple_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
+void simple_reference_to_convex_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
 {
-  *output_ref = ref;
-  *output_desc = descriptor_undefined;
+
+  effect reg = make_effect(make_cell(is_cell_reference, make_reference(reference_variable(ref), NIL)),
+			   make_action_write(), make_approximation_must(),
+			   make_descriptor(is_descriptor_convex, sc_new()));
+
+  FOREACH(EXPRESSION, exp, reference_indices(ref))
+    {
+      if((expression_reference_p(exp) && entity_field_p(reference_variable(expression_reference(exp)))))
+	{
+	  entity e = reference_variable(expression_reference(exp));
+	  effect_add_field_dimension(reg, e);
+	}
+      else
+	convex_region_add_expression_dimension(reg, exp);
+    }
+  *output_ref = effect_any_reference(reg);
+  *output_desc = effect_descriptor(reg);
+
+  pips_debug_effect(6, "reg = \n", reg);
+
+  cell_reference(effect_cell(reg)) = reference_undefined;
+  effect_descriptor(reg) = descriptor_undefined;
+  free_effect(reg);
 }
 
 /*
-  @param c is a the simple cell for which we look an equivalent constant path
+  @param c is a the convex cell for which we look an equivalent constant path
   @param ptl is the list of points-to in which we search for constant paths
   @param  exact_p is a pointer towards a boolean. It is set to true if
          the result is exact, and to false if it is an approximation, 
 	 either because the matching points-to sources found in ptl are 
 	 over-approximations of the preceding path of input_ref or because 
 	 the matching points-to have MAY approximation tag.
-  @return a list of constant path cells. It is a list because at a given
+  @return a list of constant path effects. It is a list because at a given
           program point the cell may correspond to several constant paths.
 
 
@@ -138,35 +196,16 @@ void simple_reference_to_simple_reference_conversion(reference ref, reference * 
   in the last example we should also have (p[0], i, EXACT) in the
   points-to list. (BC)
 
-  This function is called by effects to see if a memory access path
-  can be transformed into a constant. It should also be called by the
-  points-to analysis to see if a sink or a source can be preserved in
-  spite of write effects. This function should be called before
-  points_to_filter_effects() to reduce the number of anywhere
-  locations generated.
+  This function is called by effects to see if a convex memory access path
+  can be transformed into a constant one. 
 */
-list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p)
+list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p)
 {
   
-  return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
-					  simple_cell_reference_preceding_p,
-					  simple_cell_reference_with_address_of_cell_reference_translation,
-					  simple_reference_to_simple_reference_conversion);
+  return generic_eval_cell_with_points_to(c, d, ptl, exact_p,
+					  convex_cell_reference_preceding_p,
+					  convex_cell_reference_with_address_of_cell_reference_translation,
+					  simple_reference_to_convex_reference_conversion);
 }
 
 
-/* for backward compatibility */
-
-list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
-{
-  list l_eff = eval_simple_cell_with_points_to(c, descriptor_undefined, ptl, exact_p);
-  list l = NIL;
-
-  FOREACH(EFFECT,eff, l_eff)
-    {
-      l = CONS(CELL, effect_cell(eff), l);
-      effect_cell(eff) = cell_undefined;
-    }
-  gen_full_free_list(l_eff);
-  return l;
-} 
