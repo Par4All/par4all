@@ -942,6 +942,11 @@ bool rw_effects_engine(char * module_name)
     /* Compute the rw effects or references of the module. */
     init_rw_effects();
     init_invariant_rw_effects();
+
+   if (get_use_points_to())
+      set_pt_to_list( (statement_points_to)
+			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
+  
   
     debug_on("EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
@@ -950,6 +955,9 @@ bool rw_effects_engine(char * module_name)
 
     pips_debug(1, "end\n");
     debug_off();
+
+    if (get_use_points_to())
+       reset_pt_to_list();
 
     (*db_put_rw_effects_func) 
 	(module_name, get_rw_effects());

@@ -80,10 +80,6 @@ DB_GETPUT_LS(convex_summary_out_regions, OUT_SUMMARY_REGIONS)
 
 /******************************************************************* SET... */
 
-/* should be removed when eval_cell_with_points_to_func is correctly defined */
-#define UNDEF abort
-typedef list (*list_function)();
-
 void
 set_methods_for_convex_effects()
 {
@@ -114,7 +110,7 @@ set_methods_for_convex_effects()
 	convex_regions_precondition_compose;
 
 
-    eval_cell_with_points_to_func = (list_function) UNDEF;
+    eval_cell_with_points_to_func = eval_convex_cell_with_points_to;
 
 
     effects_descriptors_variable_change_func =
