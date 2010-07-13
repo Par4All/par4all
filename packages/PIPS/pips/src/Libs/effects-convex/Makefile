@@ -31,7 +31,8 @@ LIB_CFILES =	interface.c \
 		interprocedural.c \
 		prettyprint.c \
 		old_combine.c \
-		old_projection.c
+		old_projection.c \
+                eval.c
 
 INC_TARGET =    $(TARGET).h
 

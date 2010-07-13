@@ -41,6 +41,7 @@
 #include "newgen_set.h"
 #include "points_to_private.h"
 
+#include "effects-generic.h"
 #include "effects-simple.h"
 
 /*
@@ -49,11 +50,13 @@
          is the result is an over-approximation, true if it's an exact answer.
   @return true if r1 path may be a predecessor of r2 path
 
-  (we consider that p[1] is not a predecessor of p[*], with *exact_p = false.)
+  (we consider that p[1] is a predecessor of p[*], with *exact_p = false.)
 
-  should be move elsewhere. There should be a cell library
  */
-bool cell_reference_predeceding_p(reference r1, reference r2, bool * exact_p)
+bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1, 
+			     reference r2, descriptor __attribute__ ((unused)) d2, 
+			     transformer __attribute__ ((unused)) current_precondition,
+			     bool * exact_p)
 {
   bool res = true;
   entity e1 = reference_variable(r1);
@@ -80,14 +83,12 @@ bool cell_reference_predeceding_p(reference r1, reference r2, bool * exact_p)
 	  expression exp1 = EXPRESSION(CAR(ind1));
 	  expression exp2 = EXPRESSION(CAR(ind2));
 	  
-	  if (unbounded_expression_p(exp1))
-	    *exact_p = false;
-	  else if (unbounded_expression_p(exp2))
+	  if (unbounded_expression_p(exp1) || unbounded_expression_p(exp2))
 	    {
-	      res = false;
+	      res = true;
 	      *exact_p = false;
 	    }	    
-	  else if(!expression_equal_p(exp1, exp2)) /*would it be more efficient to compare strings ?*/
+	  else if(!expression_equal_p(exp1, exp2))
 	    {
 	      res = false;
 	      *exact_p = true;
@@ -100,296 +101,21 @@ bool cell_reference_predeceding_p(reference r1, reference r2, bool * exact_p)
   else
     {
       res = false;
-      *exact_p = false;
+      *exact_p = true;
     }
 
   pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
   return res;
 }
 
-
-/*
-  @brief tries to find in the points-to list ptl a points-to with a
-       maximal length source path but shorter than the length of the
-       input path represetned by input_ref. If it's an exact
-       points-to, that's OK, if not we have to find other possible
-       paths. (I don't know yet if we must iterate the process with
-       found paths as suggested in the original comment of this
-       function), because I don't know if points-to sinks can be
-       non-constant paths.  I presently assume that all sinks are
-       constant paths.
-       
-       There is no sharing between the returned list cells and the
-       input reference.
-       
-       When the input reference contains no dereferencing dimension
-       the result is an empty list. The caller should check this
-       case before calling the function because an empty list when there 
-       is a dereferencing dimension means that no target has been found
-       and that the input path may point to anywhere.
-
-  @param input_ref is a reference representing a memory access path.
-  @param ptl is a list of points-to
-  @param exact_p is a pointer towards a boolean. It is set to true if
-         the result is exact, and to false if it is an approximation, 
-	 either because the matching points-to sources found in ptl are 
-	 over-approximations of the preceding path of input_ref or because 
-	 the matching points-to have MAY approximation tag.
-
-  From the original comment (FI): it is not clear if the decision to
-  replace a dereferencement by a reference to anywhere should be taken
-  here or not. I would rather postpone it as it depends on write
-  effects unknown from this function.
-
-  Reply (BC): the original function used to return a single
-  reference. It now returns a list of cell. It's up to the caller to
-  take the decision to turn this list into an anywhere effect or not,
-  depending on the context.
-
- */
-
-list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
+void simple_reference_to_simple_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
 {
-/* iterer sur le path p[0][1][2][0] et tester chaque fois si on peut
- * dereferencer le pointeur*/
-  entity input_ent = reference_variable(input_ref);
-  list input_indices = reference_indices(input_ref);
-  size_t input_path_length = gen_length(input_indices);
-  list l = NIL;
-  list matching_ptl = NIL;
-
-  pips_debug(8, "input reference  : %s\n",
-	words_to_string(words_reference(input_ref, NIL)));
-  ifdebug(8)
-    {
-      points_to_list ptll = make_points_to_list(ptl);
-      fprintf(stderr, "%s\n", words_to_string(words_points_to_list("", ptll)));
-      points_to_list_list(ptll) = NIL;
-      free_points_to_list(ptll);
-      
-    }
-
-  if (entity_abstract_location_p(input_ent))
-    {
-      /* If the input path is an abstract location, the result is the same abstract location */
-      l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL);
-      *exact_p = false;
-    }
-  else
-    {
-      if (input_path_length == 0) 
-	{
-	  /* simple scalar case. I think this should not happen, because there is no dereferencing dimension. */
-	  l = NIL;
-	  *exact_p = true;
-	}
-      else 
-	{
-	  /* first build a temporary list with matching points-to of maximum length */
-	  size_t current_max_path_length = 0; /* the current maximum length */
-	  list matching_list = NIL;
-	  *exact_p = true; /* assume exactness */
-	  FOREACH(POINTS_TO, pt, ptl)
-	    {
-	      cell source_cell = points_to_source(pt);
-	      reference source_ref = reference_undefined;
-	      
-	      if (cell_reference_p(source_cell))
-		source_ref = cell_reference(source_cell);
-	      else if (cell_preference_p(source_cell))
-		source_ref = preference_reference(cell_preference(source_cell));
-	      else
-		pips_internal_error("GAP case not implemented yet\n");
-
-	      pips_debug(8, "considering point-to  : %s\n ",
-			 words_to_string(word_points_to(pt)));
-
-	      list source_indices = reference_indices(source_ref);	      
-	      size_t source_path_length = gen_length(source_indices);
-	      bool exact_prec = false;
-
-	      /* eligible points-to candidates must have a path length
-	         greater or equal to the current maximum length and
-	         their path must be a predecessor of the input_ref
-	         path.*/
-	      if ( (source_path_length >= current_max_path_length)
-		   && cell_reference_predeceding_p(source_ref, input_ref, &exact_prec))
-		{		  
-		  if (source_path_length > current_max_path_length )
-		    {
-		      /* if the candidate has a path length strictly greater than the current maximum lenght,
-		         the list of previously found matching candidates must be cleared
-		      */
-		      if(!ENDP(matching_ptl))
-			{
-			  gen_free_list(matching_ptl);
-			  matching_list = NIL;
-			}
-		      current_max_path_length = source_path_length;
-		      *exact_p = exact_prec;
-		    }
-		  else
-		    *exact_p = *exact_p && exact_prec;
-		  /* I keep the whole points_to and not only the sink because I will need the approximation to further test
-		     the exactness
-		  */
-		  matching_list = CONS(POINTS_TO, pt, matching_list); 		  
-		}
-	    } /* end of FOREACH */
-
-	     
-	  ifdebug(8)
-	    {
-	      points_to_list ptll = make_points_to_list(matching_list);
-	      fprintf(stderr, "matching points-to list %s\n", 
-		      words_to_string(words_points_to_list("", ptll)));
-	      points_to_list_list(ptll) = NIL;
-	      free_points_to_list(ptll);
-	      
-	    }
-	  
-
-	  /* Then build the return list with the points-to sinks to which we add/append the indices of input_ref 
-	     which are not in the points-to source reference. This is comparable to an interprocedural translation
-	     where the input_ref is a path from the formal parameter, the source the formal parameter and the
-	     sink the actual parameter preceded by a & operator.
-	     
-	     Let the remaining indices be the indices from input_ref which are not in common with the sources of the points-to
-	     (which by construction have all the same path length).
-	     For each points-to, the new path is built from the sink reference. If the latter has indices, we add to 
-	     the value of its last index the value of the first index of the remaining indices. Then we append to the new path 
-	     the last indices of the reamining indices. If the sink reference has no indices, then the first index of the
-	     remaining indices must be equal to zero, and be skipped. And we simply append to the new path 
-	     the last indices of the reamining indices.
-
-	     The part of the code inside of the FOREACH could certainely be shared with the interprocedural translation.
-	     Besides, it should be made generic to handle convex input paths as well. Only simple paths are currently 
-	     taken into account.
-	  */
-	    
-	  /* Transform each sink reference to add it in the return list */
-	  FOREACH(POINTS_TO, pt, matching_list)
-	    {
-	      cell sink_cell = points_to_sink(pt);
-	      reference sink_ref = reference_undefined;
-	      reference build_ref = reference_undefined;
-	      
-	      pips_debug(8, "considering point-to  : %s\n ",
-			 words_to_string(word_points_to(pt)));
-
-	      if (cell_reference_p(sink_cell))
-		sink_ref = cell_reference(sink_cell);
-	      else if (cell_preference_p(sink_cell))
-		sink_ref = preference_reference(cell_preference(sink_cell));
-	      else
-		pips_internal_error("GAP case not implemented yet\n");
-
-	      entity sink_ent = reference_variable(sink_ref);
-	      if (entity_abstract_location_p(sink_ent) 
-		  && ! entity_flow_or_context_sentitive_heap_location_p(sink_ent))
-		{
-		  /* Here, we should analyse the source remaining indices to know if there are remaining dereferencing dimensions.
-		     This would imply keeping track of the indices types.
-		     In case there are no more dereferencing dimensions, we would then reuse the sink abstract location.
-		     Otherwise (which is presently the only default case), we return an all location cell
-		  */
-		  build_ref = make_reference(entity_all_locations(), NIL);
-		  *exact_p = false;
-		}
-	      else
-		{
-	      
-		  descriptor d1 = descriptor_undefined, d2 = descriptor_undefined, d3;
-		  bool exact_translation_p;
-		  
-		  simple_cell_reference_with_address_of_cell_reference_translation(input_ref, d1, 
-										   sink_ref, d2,
-										   current_max_path_length,
-										   &build_ref, &d3, 
-										   &exact_translation_p);
-		  *exact_p = *exact_p && exact_translation_p; 
-		  pips_debug(8, "adding reference %s\n",
-			     words_to_string(words_reference(build_ref, NIL)));
-		  l = CONS(CELL, make_cell(is_cell_reference, build_ref), l);
-		  /* the approximation tag of the points-to is taken into account for the exactness of the result  */
-		  *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
-		} /* end of else branch of if (entity_abstract_location_p(sink_ent) 
-		     && ! entity_flow_or_context_sentitive_heap_location_p(sink_ent)) */
-	    } /* end of FOREACH(POINTS_TO,...) */
-	} /* else branche of if (input_path_length == 0) */
-    } /* else branch of if (entity_abstract_location_p(input_ent)) */
-
-  ifdebug(8)
-    {
-      pips_debug(8, "resulting list before recursing:");
-      FOREACH(CELL, c, l)
-	{ 
-	  reference ref = reference_undefined;
-	  if(cell_reference_p(c)) 
-	    ref = cell_reference(c);
-	  else if (cell_preference_p(c))
-	    ref = preference_reference(cell_preference(c));
-	  else /* Should be the gap case */
-	    pips_internal_error("GAPs not implemented yet\n");
-	  fprintf(stderr, " %s", words_to_string(words_reference(ref, NIL)));
-	}
-      fprintf(stderr, "\n");
-    }
-
-  /* If the results contain dereferencing dimensions, we must eval them recursively */
-  list l_tmp = l;
-  l = NIL;
-  FOREACH(CELL, c, l_tmp)
-    {
-      bool r_exact_p;
-      reference ref = reference_undefined;
-      if(cell_reference_p(c)) 
-	ref = cell_reference(c);
-      else if (cell_preference_p(c))
-	ref = preference_reference(cell_preference(c));
-      else /* Should be the gap case */
-	pips_internal_error("GAPs not implemented yet\n");
-      
-      if ((!entity_abstract_location_p(reference_variable(ref)))
-	  && effect_reference_dereferencing_p(ref, &r_exact_p))
-	{
-	  pips_debug(8, "recursing\n");
-	  *exact_p = *exact_p && r_exact_p;
-	  l = gen_nconc(eval_reference_with_points_to(ref, ptl, &r_exact_p), l);
-	  *exact_p = *exact_p && r_exact_p;
-	  free_cell(c);
-	}
-      else 
-	{
-	  pips_debug(8, "no need to recurse\n");
-	  l = CONS(CELL, c, l);
-	}
-    }
-  l = gen_nreverse(l);
-  gen_free_list(l_tmp);
-
-  ifdebug(8)
-    {
-      pips_debug(8, "resulting list after recursing:");
-      FOREACH(CELL, c, l)
-	{ 
-	  reference ref = reference_undefined;
-	  if(cell_reference_p(c)) 
-	    ref = cell_reference(c);
-	  else if (cell_preference_p(c))
-	    ref = preference_reference(cell_preference(c));
-	  else /* Should be the gap case */
-	    pips_internal_error("GAPs not implemented yet\n");
-	  fprintf(stderr, " %s", words_to_string(words_reference(ref, NIL)));
-	}
-      fprintf(stderr, "\n");
-    }
-  
-  return l;
+  *output_ref = ref;
+  *output_desc = descriptor_undefined;
 }
 
 /*
-  @param c is a the cell for which we look an equivalent constant path
+  @param c is a the simple cell for which we look an equivalent constant path
   @param ptl is the list of points-to in which we search for constant paths
   @param  exact_p is a pointer towards a boolean. It is set to true if
          the result is exact, and to false if it is an approximation, 
@@ -420,24 +146,29 @@ list eval_reference_with_points_to(reference input_ref, list ptl, bool *exact_p)
   points_to_filter_effects() to reduce the number of anywhere
   locations generated.
 */
-list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
+list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p)
 {
-  list l = NIL;
-  debug_on("EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL");
-
-  if(cell_reference_p(c)) {
-    l = eval_reference_with_points_to(cell_reference(c), ptl, exact_p);
-  }
-  else if(cell_preference_p(c)) {
-    reference r = preference_reference(cell_preference(c));
-    l = eval_reference_with_points_to(r, ptl, exact_p);
-  }
-  else { /* Should be the gap case */
-    pips_internal_error("GAPs not implemented yet\n");
-  }
-  debug_off();
-  return l;
+  
+  return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
+					  transformer_undefined,
+					  simple_cell_reference_preceding_p,
+					  simple_cell_reference_with_address_of_cell_reference_translation,
+					  simple_reference_to_simple_reference_conversion);
 }
 
 
+/* for backward compatibility */
 
+list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
+{
+  list l_eff = eval_simple_cell_with_points_to(c, descriptor_undefined, ptl, exact_p);
+  list l = NIL;
+
+  FOREACH(EFFECT,eff, l_eff)
+    {
+      l = CONS(CELL, effect_cell(eff), l);
+      effect_cell(eff) = cell_undefined;
+    }
+  gen_full_free_list(l_eff);
+  return l;
+} 

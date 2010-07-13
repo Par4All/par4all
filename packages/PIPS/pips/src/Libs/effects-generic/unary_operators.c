@@ -178,6 +178,17 @@ effects_to_write_effects(list l_eff)
 }
 
 void
+effect_to_read_effect(effect eff)
+{
+    effect_action_tag(eff) = is_action_read;
+}
+
+void
+effects_to_read_effects(list l_eff)
+{
+    effects_map(l_eff, effect_to_read_effect);
+}
+void
 array_effects_to_may_effects(list l_eff)
 {
     MAP(EFFECT, eff, 
