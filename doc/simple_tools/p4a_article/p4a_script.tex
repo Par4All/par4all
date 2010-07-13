@@ -33,6 +33,7 @@
 % To automatically build reports from this content:
 %%ContentBegin
 
+
 \section{Introduction}
 \label{sec:introduction}
 
@@ -87,7 +88,7 @@ This project is funded through various research projects : ARTEMIS
 SCALOPES, ANR FREIA, ARTEMIS SMECY.
 
 
-\section{Examples and use cases of p4a}
+\section{Examples and use cases of \protect\texttt{p4a}}
 \label{sec:examples}
 
 \subsection{Automatic parallelization with OpenMP generation}
@@ -125,7 +126,9 @@ code (that ease with to ease debugging or if you do not have a \Agpu), try:
 p4a --accel --openmp example.c -o e
 \end{verbatim}
 there should be an \texttt{e} binary executable file with its
-corresponding \texttt{example.p4a.c} program source.
+corresponding \texttt{example.p4a.c} program source. This \Aopenmp
+emulation of \Acuda with memory transfer may be helpful to debug some code
+since there is no longer emulation mode in recent version of \Acuda.
 
 The interest of the source-to-source approach is that you can further
 improve the generated code manually or use it as starting point for other
@@ -142,6 +145,15 @@ You can avoid parallelizing some functions by using
 \texttt{-{}-exclude-modules=\emph{regex}} when the parallel part is not
 enough compute-intensive since transferring data and launching a kernel
 may be more expensive than sequential execution.
+
+There is also an option to exclude some files from the back-end
+compilation, for example if you want to use already optimized library. For
+this you analyze your program by providing stubs definitions in a file
+that are dummy function definitions that have a similar global memory
+effect so that \Apips global interprocedural analysis are happy and just
+in the back-end stage you skip this file with \verb|--exclude-file|, then
+replace the dummy calls by the real library functions, by linking with
+them with \texttt{-l} or compiling them with \verb|--extra-file|.
 
 
 \subsubsection{P4A Accel runtime tweaking}
@@ -189,8 +201,9 @@ the $X$ dimension (the \emph{warp} dimension) and once the
 \verb|P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D| limit is reached, it is allocated
 along the $Y$ dimension. Right now, parallel loop nests that are
 parallelized have their parallelism then limited up to 2 dimensions to
-cope more easily with \Acuda \Agpu. The outer-loop is mapped on the $X$
-\Agpu dimension, so it is the dimension that must have enough parallelism.
+cope more easily with \Acuda \Agpu hardware limitation. The outer-loop is
+mapped on the $X$ \Agpu dimension, so it is the dimension that must have
+enough parallelism.
 
 For more tweaking, look at the \Apfa Accel runtime source on \url{} or
 directly in the \Agit repository.
