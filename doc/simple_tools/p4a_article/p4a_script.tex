@@ -33,6 +33,7 @@
 % To automatically build reports from this content:
 %%ContentBegin
 
+
 \section{Introduction}
 \label{sec:introduction}
 
@@ -83,11 +84,12 @@ Since \Apfa is a large project in continuous progress, you should refer to
 release note and more generally on \url{http://www.par4all.org} to know
 about the current status and limitations of the tools.
 
-This project is funded through various research projects : ARTEMIS
-SCALOPES, ANR FREIA, ARTEMIS SMECY.
+This project is funded through various research projects : French ANR
+FREIA, European ARTEMIS SCALOPES, French Images and Network TransMedi@,
+French System@tic OpenGPU, French ANR MediaGPU, European ARTEMIS SMECY.
 
 
-\section{Examples and use cases of p4a}
+\section{Examples and use cases of \protect\texttt{p4a}}
 \label{sec:examples}
 
 \subsection{Automatic parallelization with OpenMP generation}
@@ -125,7 +127,9 @@ code (that ease with to ease debugging or if you do not have a \Agpu), try:
 p4a --accel --openmp example.c -o e
 \end{verbatim}
 there should be an \texttt{e} binary executable file with its
-corresponding \texttt{example.p4a.c} program source.
+corresponding \texttt{example.p4a.c} program source. This \Aopenmp
+emulation of \Acuda with memory transfer may be helpful to debug some code
+since there is no longer emulation mode in recent version of \Acuda.
 
 The interest of the source-to-source approach is that you can further
 improve the generated code manually or use it as starting point for other
@@ -142,6 +146,15 @@ You can avoid parallelizing some functions by using
 \texttt{-{}-exclude-modules=\emph{regex}} when the parallel part is not
 enough compute-intensive since transferring data and launching a kernel
 may be more expensive than sequential execution.
+
+There is also an option to exclude some files from the back-end
+compilation, for example if you want to use already optimized library. For
+this you analyze your program by providing stubs definitions in a file
+that are dummy function definitions that have a similar global memory
+effect so that \Apips global interprocedural analysis are happy and just
+in the back-end stage you skip this file with \verb|--exclude-file|, then
+replace the dummy calls by the real library functions, by linking with
+them with \texttt{-l} or compiling them with \verb|--extra-file|.
 
 
 \subsubsection{P4A Accel runtime tweaking}
@@ -161,6 +174,7 @@ For example
 \begin{itemize}
 \item if you want to debug the output with \texttt{cuda-gdb}, use
   \verb|--nvcc-flags="-g -G"|;
+\item to optimize the \Acuda code with \verb|--nvcc-flags=-O3|;
 \item \verb|--nvcc-flags="-gencode arch=compute_20,code=sm_20"| to
   generate code to Fermi board;
 \item
@@ -172,12 +186,23 @@ You can debug the P4A Accel runtime itself with
 \verb|--nvcc-flags=-DP4A_DEBUG| to output debugging messages around all
 the \Acuda kernels invocations, such as: {\scriptsize
 \begin{verbatim}
-Executing the CUDA kernel on a GPU with KERNEL_SIZE=8192:
- P4A: Creating block descriptor "P4A_block_descriptor" of size 512x256x1
- P4A: Creating grid of block descriptor "P4A_grid_descriptor" of size 16x32x1
- P4A: Invoking kernel (p4a_kernel_wrapper_0, P4A_block_descriptor, P4A_grid_descriptor) with (i, j, array)
+ P4A: Calling 2D kernel "p4a_kernel_wrapper_0" of size (8192x8192)
+ P4A: Creating grid of block descriptor "P4A_grid_descriptor" of size 16x8192x1
+ P4A: Creating thread block descriptor "P4A_block_descriptor" of size 512x1x1
+ P4A: line 43 of function p4a_kernel_launcher_0 in file ".../parameterized_kernel.p4a.cu":
+ P4A: Invoking kernel (p4a_kernel_wrapper_0, P4A_grid_descriptor, P4A_block_descriptor) with (i, j, array)
 \end{verbatim}
 }
+
+If you get at runtime some error message such as:
+\begin{verbatim}
+CUTIL CUDA error : P4A CUDA kernel execution failed :
+too many resources requested for launch
+\end{verbatim}
+there is not enough registers to run all the requested threads in a block,
+so you can try by relaunching \texttt{p4a} with a
+\verb|--nvcc=-DP4A_CUDA_THREAD_MAX=384| or even less, instead the default
+value of 512 threads per block.
 
 You can select the maximum number of threads in a block of thread for 1D
 kernels with a \verb|--nvcc-flags='-DP4A_CUDA_THREAD_PER_BLOCK_IN_1D=...|
@@ -189,8 +214,9 @@ the $X$ dimension (the \emph{warp} dimension) and once the
 \verb|P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D| limit is reached, it is allocated
 along the $Y$ dimension. Right now, parallel loop nests that are
 parallelized have their parallelism then limited up to 2 dimensions to
-cope more easily with \Acuda \Agpu. The outer-loop is mapped on the $X$
-\Agpu dimension, so it is the dimension that must have enough parallelism.
+cope more easily with \Acuda \Agpu hardware limitation. The outer-loop is
+mapped on the $X$ \Agpu dimension, so it is the dimension that must have
+enough parallelism.
 
 For more tweaking, look at the \Apfa Accel runtime source on \url{} or
 directly in the \Agit repository.

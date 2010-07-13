@@ -39,10 +39,10 @@ def add_common_options(parser):
 
     global report_available
 
-    group = optparse.OptionGroup(parser, "General Options")
+    group = optparse.OptionGroup(parser, "General options")
 
     group.add_option("--verbose", "-v", action = "count", default = get_verbosity(),
-        help = "Run in verbose mode: -v will display more information, -vv will display most information.")
+        help = "Run in verbose mode: each -v increases verbosity mode and display more information, -vvv will display most information.")
 
     group.add_option("--log", action = "store_true", default = False,
         help = "Enable logging in current directory.")

@@ -13,8 +13,8 @@
 
     Should target Ter\@pix and SCALOPES accelerators, CUDA and OpenCL.
 
-    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
-    Compétitivité Images and Network) and SCALOPES (Artemis European
+    Funded by the FREIA (French ANR), TransMedi\@ (French PÃ´le de
+    CompÃ©titivitÃ© Images and Network) and SCALOPES (Artemis European
     Project project)
 
     "mailto:Stephanie.Even@enstb.org"
@@ -59,9 +59,14 @@ extern double P4A_accel_timer_stop_and_float_measure();
 #endif
 
 
-/** Output a debug message à la printf */
-#define P4A_dump_message(...)			\
+/** Output a debug message Ã  la printf */
+#define P4A_dump_message(...)						\
   fprintf(stderr, " P4A: " __VA_ARGS__)
+
+/** Output where we are */
+#define P4A_dump_location()						\
+  fprintf(stderr, " P4A: line %d of function %s in file \"%s\":\n",	\
+          __LINE__, __func__, __FILE__)
 
 
 /** A macro to compute an minimum value of 2 values

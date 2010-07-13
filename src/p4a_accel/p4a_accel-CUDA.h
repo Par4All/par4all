@@ -4,8 +4,8 @@
 
     This file is an implementation of the C to CUDA Par4All API.
 
-    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
-    Compétitivité Images and Network) and SCALOPES (Artemis European
+    Funded by the FREIA (French ANR), TransMedi\@ (French PÃ´le de
+    CompÃ©titivitÃ© Images and Network) and SCALOPES (Artemis European
     Project project)
 
     "mailto:Stephanie.Even@enstb.org"
@@ -41,34 +41,47 @@
     as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
     --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
 
+    If you get arrors such as "cutilCheckMsg() CUTIL CUDA error : P4A CUDA
+    kernel execution failed : too many resources requested for launch.",
+    there is not enough registers to run all the requested threads of your
+    block. So try to reduce them with -DP4A_CUDA_THREAD_MAX=384 or
+    less. That may need some trimming.
+
     There are unfortunately some hardware limits on the thread block size
     that appear at the programming level, so we should add another level
-    of tiling
+    of tiling.
 */
+#ifndef P4A_CUDA_THREAD_MAX
+/** The maximum number of threads in a block of thread */
+#define P4A_CUDA_THREAD_MAX 512
+#endif
+
 #ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
-/** There is a maximum of 512 threads per block. Use it. May cause some
-    trouble if too many resources per thread are used. Change it with an
-    option at compile time if that causes trouble: */
-#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D 512
+/** There is a maximum of P4A_CUDA_THREAD_MAX threads per block. Use
+    them. May cause some trouble if too many resources per thread are
+    used. Change it with an option at compile time if that causes
+    trouble: */
+#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D P4A_CUDA_THREAD_MAX
 //P4A_CUDA_THREAD_PER_BLOCK_IN_1D = 5,
 #endif
 
 #ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D
-/** The thread layout size per block in 2D organization */
-//P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D = 32,
-//P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D = 16,
-// Better if the memory accesses are rather according to the X axis
-#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D 512
+/** The thread layout size per block in 2D organization asymptotically. If
+    there are enough iterations along X and the amount of iteration is not
+    that big in Y, P4A_create_2d_thread_descriptors() allocates all
+    threads in X that seems to often leads to better performance if the
+    memory accesses are rather according to the X axis: */
+#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D (P4A_CUDA_THREAD_MAX/16)
 #endif
 #ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D
-#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D 1
+#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D (P4A_CUDA_THREAD_MAX/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D)
 #endif
 
 #ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D
 /** The thread layout size per block in 3D organization
 
     Well, the 3D is not really dealt in CUDA even it is described by a
-    dim3 :-( You may try OpenCL instead. :-)
+    dim3...
 */
 #define P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D 8
 #endif
@@ -237,6 +250,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
+    P4A_skip_debug(P4A_dump_location());				\
     P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
 				    #context,				\
 				    #parameters));			\
@@ -270,34 +284,47 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Allocate the descriptors for a linear set of thread with a
     simple strip-mining for CUDA
 */
-#define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
-					 grid_descriptor_name,		\
+#define P4A_create_1d_thread_descriptors(grid_descriptor_name,		\
+					 block_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
-  dim3 block_descriptor_name(P4A_min((int)size,				\
-				     (int)P4A_CUDA_THREAD_PER_BLOCK_IN_1D));	\
+  dim3 block_descriptor_name(P4A_min((int) size,			\
+				     (int) P4A_CUDA_THREAD_PER_BLOCK_IN_1D)); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)size) + P4A_CUDA_THREAD_PER_BLOCK_IN_1D - 1)/P4A_CUDA_THREAD_PER_BLOCK_IN_1D);	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
+  dim3 grid_descriptor_name((((int)size) + P4A_CUDA_THREAD_PER_BLOCK_IN_1D - 1)/P4A_CUDA_THREAD_PER_BLOCK_IN_1D); \
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
     strip-mining in each dimension for CUDA
 */
-#define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
-					 grid_descriptor_name,		\
+#define P4A_create_2d_thread_descriptors(grid_descriptor_name,		\
+					 block_descriptor_name,		\
 					 n_x_iter, n_y_iter)		\
+  int p4a_block_x, p4a_block_y;						\
   /* Define the number of thread per block: */				\
-  dim3 block_descriptor_name(P4A_min((int)n_x_iter,			\
-				     (int)P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D), \
-			     P4A_min((int)n_y_iter,			\
-				     (int)P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D)); \
+									\
+  if (n_y_iter > 10000) {						\
+    /* If we have a lot of interations in Y, use asymptotical block	\
+       sizes: */							\
+    p4a_block_x = P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D;			\
+    p4a_block_y = P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D;			\
+  }									\
+  else {								\
+    /* Allocate a maximum of threads alog X axis (the warp dimension) for \
+       better average efficiency: */					\
+    p4a_block_x = P4A_min((int) n_x_iter,				\
+                          (int) P4A_CUDA_THREAD_MAX);			\
+    p4a_block_y = P4A_min((int) n_y_iter,				\
+                          P4A_CUDA_THREAD_MAX/p4a_block_x);		\
+  }									\
+  dim3 block_descriptor_name(p4a_block_x, p4a_block_y);			\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)n_x_iter) + P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D - 1)/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D, \
-			    (((int)n_y_iter) + P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D - 1)/P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D); \
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
+  dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
+			    (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y); \
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
@@ -309,7 +336,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
 /** Dump a CUDA dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)			\
-  P4A_dump_descriptor("Creating block descriptor ", descriptor_name)
+  P4A_dump_descriptor("Creating thread block descriptor ", descriptor_name)
 
 
 /** Dump a CUDA dim3 grid descriptor */
@@ -332,11 +359,13 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @param ... the following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
-  do {								\
-    P4A_create_1d_thread_descriptors(P4A_block_descriptor,	\
-				     P4A_grid_descriptor,	\
+  do {									\
+    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
+                   P4A_n_iter_0));					\
+    P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
+				     P4A_block_descriptor,		\
 				     P4A_n_iter_0);			\
-    P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
+    P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)
 
@@ -351,12 +380,14 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...)	\
+#define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {									\
-    P4A_create_2d_thread_descriptors(P4A_block_descriptor,		\
-				     P4A_grid_descriptor,		\
-				     P4A_n_iter_0, P4A_n_iter_1);		\
-    P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
+    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
+                   P4A_n_iter_0, P4A_n_iter_1));			\
+    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
+				     P4A_block_descriptor,		\
+				     P4A_n_iter_0, P4A_n_iter_1);	\
+    P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)
 

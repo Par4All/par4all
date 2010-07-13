@@ -21,10 +21,10 @@ from p4a_opts import *
 
 def add_module_options(parser):
 
-    proj_group = optparse.OptionGroup(parser, "Project Options")
+    proj_group = optparse.OptionGroup(parser, "Project (aka workspace) options")
 
     proj_group.add_option("--project-name", "--project", "-p", metavar = "NAME", default = None,
-        help = "Name for the project (and for the program database). If you do not specify the project, a random name will be used.")
+        help = "Name for the project (and for the PIPS workspace database used to work on the analyzed program). If you do not specify the project, a random name will be used.")
 
     proj_group.add_option("--keep-database", "-k", action = "store_true", default = False,
         help = "Keep database directory after processing.")
@@ -34,38 +34,41 @@ def add_module_options(parser):
 
     parser.add_option_group(proj_group)
 
-    proc_group = optparse.OptionGroup(parser, "Processing Options")
+    proc_group = optparse.OptionGroup(parser, "PIPS processing options")
 
     proc_group.add_option("--accel", "-A", action = "store_true", default = False,
-        help = "Parallelize with output using the Par4All accel run-time that can execute code for various hardware accelerators such as GPU or even OpenMP emulation.")
+        help = "Parallelize for heterogeneous accelerators by using the Par4All Accel run-time that allows executing code for various hardware accelerators such as GPU or even OpenMP emulation.")
 
     proc_group.add_option("--cuda", "-C", action = "store_true", default = False,
         help = "Enable CUDA generation. Implies --accel.")
 
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
-        help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All accel run-time call with OpenMP implementation instead of native OpenMP output. If --cuda is not specified, this option is set by default.")
+        help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it.")
+        help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
 
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
-        help = "Process only the modules (functions and subroutines) which names match the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of th Python library reference for example. In Fortran, the names should be given uppercase. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
+        help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
 
     proc_group.add_option("--exclude-modules", metavar = "REGEXP", default = None,
         help = "Exclude the modules (functions and subroutines) with names matching the regular expression from the parallelization. For example '(?i)^my_runtime' will skip all the functions or subroutines which names begin with 'my_runtime' in uppercase or lowercase. Have a look to the regular expression documentation for more details.")
 
     proc_group.add_option("--no-process", "-N", action = "store_true", default = False,
-        help = "Bypass all processing (no parallelizing). This voids all processing options. Merely useful for testing compilation/linking option.")
+        help = "Bypass all PIPS processing (no parallelizing...) and voids all processing options. The given files are just passed to the back-end compiler. This is merely useful for testing compilation and linking options.")
+
+    proc_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
+        help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py). There are many properties in PIPS that can be used to modify its behaviour. Have a look to the 'pipsmake-rc' documentation for their descriptions.")
 
     proc_group.add_option("--here", action = "store_true", default = False,
-        help = "Do not spawn a child process to run processing (so that we can catch PIPS output).")
+        help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
 
     parser.add_option_group(proc_group)
 
-    cpp_group = optparse.OptionGroup(parser, "Preprocessing Options")
+    cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
 
     cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
         help = "C preprocessor to use (defaults to gcc -E).")
@@ -85,21 +88,18 @@ def add_module_options(parser):
     cpp_group.add_option("--skip-recover-includes", action = "store_true", default = False,
         help = "By default, try to recover standard #include. To skip this phase, use this option.")
 
-    cpp_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
-        help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py).")
-
     parser.add_option_group(cpp_group)
 
-    compile_group = optparse.OptionGroup(parser, "Compilation Options")
+    compile_group = optparse.OptionGroup(parser, "Back-end compilation options")
 
     compile_group.add_option("--output-file", "--output", "-o", action = "append", metavar = "FILE", default = [],
         help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so, .a files or have no extension in which case an executable will be built.")
 
     compile_group.add_option("--exclude-file", "--exclude", "-X", action = "append", metavar = "FILE", default = [],
-        help = "Exclude a source file from the compilation. Several are allowed. This is helpful if you need to pass a stub so that PIPS knows how to parallelize something, but do not want this file to end up being compiled.")
+        help = "Exclude a source file from the back-end compilation. Several are allowed. This is helpful if you need to pass a stub file with dummy function definitions (FFT, linear algebra library...) so that PIPS knows how to parallelize something around them, but do not want this file to end up being compiled since it is not a real implementation. Then use the --extra-file or -l option to give the real implementation to the back-end.")
 
     compile_group.add_option("--extra-file", "--extra", "-x", action = "append", metavar = "FILE", default = [],
-        help = "Include an additional source file when compiling. Several are allowed. They will not be processed through PIPS.")
+        help = "Include an additional source file when compiling with the back-end compiler. Several are allowed. They will not be processed through PIPS.")
 
     compile_group.add_option("--cc", metavar = "COMPILER", default = None,
         help = "C compiler to use (defaults to gcc).")
@@ -144,11 +144,11 @@ def add_module_options(parser):
         help = "Specify compilation target architecture (defaults to current host architecture).")
 
     compile_group.add_option("--keep-build-dir", "-K", action = "store_true", default = False,
-        help = "Do not remove build directory after compilation. If an error occurs, it will not be removed anyways.")
+        help = "Do not remove build directory after compilation. If an error occurs, it will not be removed anyways, for further inspection.")
 
     parser.add_option_group(compile_group)
 
-    link_group = optparse.OptionGroup(parser, "Linking Options")
+    link_group = optparse.OptionGroup(parser, "Back-end linking options")
 
     link_group.add_option("--ld", metavar = "LINKER", default = None,
         help = "Linker to use (defaults to ld).")
@@ -167,10 +167,10 @@ def add_module_options(parser):
 
     parser.add_option_group(link_group)
 
-    cmake_group = optparse.OptionGroup(parser, "CMake Options")
+    cmake_group = optparse.OptionGroup(parser, "CMake file generation options")
 
     cmake_group.add_option("--cmake", action = "store_true", default = False,
-        help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --make alone will NOT build the project.")
+        help = "If output files are specified (with -o), setting this flag will have p4a produce a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir). This CMakeLists.txt file will be suitable for building the project with CMake. NB: setting --cmake alone will NOT build the project.")
 
     cmake_group.add_option("--cmake-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify additional flags to pass to CMake. Several are allowed.")
@@ -366,7 +366,7 @@ def main(options, args = []):
     processed_files = []
 
     if options.no_process:
-        warn("Bypassing processor")
+        warn("Bypassing PIPS process")
         processed_files = files
 
     elif len(files) == 0:
@@ -375,8 +375,8 @@ def main(options, args = []):
     else:
         # Craft a p4a_processor_input class instance
         # with all parameters for the processor (pyps).
-        # If --here is not specified, this instance 
-        # will be serialized (pickle'd) to ease the 
+        # If --here is not specified, this instance
+        # will be serialized (pickle'd) to ease the
         # passing of parameters to the processor.
         input = p4a_processor_input()
         input.project_name = project_name
@@ -410,7 +410,7 @@ def main(options, args = []):
 
         # This will hold the output (p4a_processor_output instance)
         # when the processor has been called and its output has been
-        # deserialized (unpickle'd) (unless --here is specified in 
+        # deserialized (unpickle'd) (unless --here is specified in
         # which case the p4a_processor_output instance will be obtained
         # directly):
         output = None
@@ -432,7 +432,7 @@ def main(options, args = []):
             # Serialize (pickle) the input parameters for the processor.
             # The processor is a different/separate script, so that we can run it as a different process.
             # We run the processor in a separate process because we want to be able
-            # to filter out the PIPS (pyps) output.            
+            # to filter out the PIPS (pyps) output.
             # NB: PIPS outputs everything in stderr in a somewhat weird way...
             # and its output is buffered.
             save_pickle(input_file, input)
@@ -466,10 +466,10 @@ def main(options, args = []):
 
         # If an exception occurred in the processor script (in pyps)
         # it will have been caught and will have been serialized in the
-        # processor output class (or put directly in the p4a_processor_output 
+        # processor output class (or put directly in the p4a_processor_output
         # instance if --here was specified).
         # Raise this exception from our very script if this is the case,
-        # so that the normal error catching code is run, so that suggestions 
+        # so that the normal error catching code is run, so that suggestions
         # are made, so that we can handle --report, etc., etc.
         if output.exception:
             if database_dir:
@@ -500,7 +500,7 @@ def main(options, args = []):
         return
 
     all_buildable_files = []
-    
+
     # Filter out the excluded files from the build (--exclude-file):
     for file in processed_files + other_files + options.extra_file:
         # This is normally not necessary at this point, but just to be sure:
@@ -526,7 +526,7 @@ def main(options, args = []):
 
     # Generate CMakeLists.txt/build using it as requested.
     if options.cmake or options.cmake_gen or options.cmake_build:
-        # Push the CMakeLists.txt file for a potential report 
+        # Push the CMakeLists.txt file for a potential report
         # (so that if --report-files is specified, the report
         # will include this file).
         report_add_file(os.path.join(options.cmake_dir, "CMakeLists.txt"))
