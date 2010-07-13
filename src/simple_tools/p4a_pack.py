@@ -26,7 +26,7 @@ default_install_prefix          = "/usr/local/par4all"
 package_name                    = "par4all"
 
 # If no version is specified, assume this is the version:
-default_version                 = "0.2"
+default_version                 = "1.0"
 
 # Settings for --publish. There is currently no option to override these defaults.
 default_publish_host            = "download.par4all.org"
