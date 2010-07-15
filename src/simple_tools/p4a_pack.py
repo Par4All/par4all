@@ -34,8 +34,8 @@ default_version                 = "1.0"
 default_publish_host                = "download.par4all.org"
 default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
 default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$DATE"
-default_deb_publish_dir             = "/srv/www-par4all/download/$DISTRO/dists/releases/main"
-default_deb_development_publish_dir = "/srv/www-par4all/download/$DISTRO/dists/development/main"
+default_deb_publish_dir             = "/srv/www-par4all/download/apt/$DISTRO/dists/releases/main"
+default_deb_development_publish_dir = "/srv/www-par4all/download/apt/$DISTRO/dists/development/main"
 
 # Where are the .deb settings files? (i.e. the control, postinst, etc. files).
 debian_dir = os.path.join(script_dir, "DEBIAN")
@@ -90,8 +90,10 @@ def add_module_options(parser):
     group.add_option("--publish", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
 
-    group.add_option("--development", "--dev", "--untested", "--unstable", "--nightly", action = "store_true", default = False,
-        help = "When publishing, store files in the 'development' directory (i.e. for development (vs. release) builds). Implies --append-date.")
+    #~ group.add_option("--development", "--dev", "--untested", "--unstable", "--nightly", action = "store_true", default = False,
+        #~ help = "When publishing, store files in the 'development' directory (i.e. for development (vs. release) builds). Implies --append-date.")
+    group.add_option("--release", dest = "development", action = "store_false", default = True,
+        help = "When publishing, put the packages in release directories instead of development ones.")
 
     group.add_option("--install-prefix", metavar = "DIR", default = None,
         help = "Specify the installation prefix. Default is /usr/local/par4all.")
@@ -160,7 +162,7 @@ def create_deb(pack_dir, install_prefix, revision, distro, arch, keep_temp = Fal
     return package_file_name
 
 
-def publish_deb(file, host, repos_dir, remote_dir, arch):
+def publish_deb(file, host, repos_dir, arch):
     #~ arch = change_file_ext(file, "").split("_")[-1]
     info("Publishing " + file + " in the deb repository (" + arch + ")")
     repos_arch_dir = repos_dir + "/binary-" + arch
@@ -232,7 +234,7 @@ def create_tgz(pack_dir, install_prefix, revision, distro, arch, keep_temp = Fal
     if keep_temp:
         warn("Temporary directory was " + temp_dir)
     else:
-        rmtree(temp_dir, can_fail = 1)
+        rmtree(temp_dir, can_fail = True)
     return package_file
 
 
