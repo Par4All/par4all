@@ -50,7 +50,7 @@ vpath %.c $(P4A_ACCEL_DIR)
 #	echo Target $@ not implemented...
 
 # Keep intermediate files for the demo:
-.PRECIOUS: $(TARGETS:=_omp.c) $(TARGETS:=.database)
+.PRECIOUS: $(TARGETS:=.p4a.c) $(TARGETS:=.database)
 
 
 .INTERMEDIATE: $(TARGETS)
@@ -69,7 +69,7 @@ demo : $(addprefix demo_, $(TARGETS))
 
 
 clean :
-	rm -rf $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=_omp.c) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda) *~ *.database output.pgm amplitude.pgm phase.pgm
+	rm -rf $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=.p4a.c) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda) *~ *.database output.pgm amplitude.pgm phase.pgm
 
 all : $(TARGET) $(TARGET)_pips_omp
 
@@ -77,12 +77,6 @@ all : $(TARGET) $(TARGET)_pips_omp
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
 
 # Use complex more solution to avoid interaction with .c rules...
-run_fresne%:
-	$(MAKE) fresne$*
-	time ./fresne$* Logo_HPC-Project-GTC.pgm 100 amplitude.pgm phase.pgm
-	# It was total time (starting time, I/O and computaions)
-	# Compare the result with the reference:
-	-diff -q amplitude.pgm amplitude-ref.pgm; diff -q phase.pgm phase-ref.pgm
 
 run_jacob%:
 	$(MAKE) jacob$*
@@ -95,13 +89,11 @@ run_jacob%:
 # This must be after the previous rules to avoid run_jacobi_omp to be
 # interpreted as a sequel of run_jacobi_omp.c... :-)
 
-%_omp.c : %.c Makefile
+%.p4a.c : %.c Makefile
 	# Parallelize the code:
-	pips_c2openmp $<
-	# The result should be in the more recent PIPS database.
-	cat `ls -td *.database | head -1`/Src/*.c > $@
+	p4a -vvv $<
 
-%_omp : %_omp.c Makefile
+%_omp : %.p4a.c Makefile
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OPENMP) $(LDLIBS) -o $@ $<
 
 # Build the binary from the output of PIPS:
