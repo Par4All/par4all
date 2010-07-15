@@ -197,7 +197,6 @@ already_printed_warning_errors = []
 
 def pips_output_filter(s):
     '''This callback can be used to filter out lines in PIPS output.
-    This is useful because PIPS prints everything out to STDERR, even informational messages.
     At minimum verbosity level, we want to display errors/warnings, but not debug messages.'''
     global error_re, warning_re, property_redefined_re, already_printed_warning_errors
     if s.find("Cannot preprocess file") != -1:
@@ -433,8 +432,6 @@ def main(options, args = []):
             # The processor is a different/separate script, so that we can run it as a different process.
             # We run the processor in a separate process because we want to be able
             # to filter out the PIPS (pyps) output.
-            # NB: PIPS outputs everything in stderr in a somewhat weird way...
-            # and its output is buffered.
             save_pickle(input_file, input)
 
             # Where is the processor script?

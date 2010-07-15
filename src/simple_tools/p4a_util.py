@@ -472,17 +472,32 @@ def whoami(silent = True):
     '''Calls the whoami UNIX utility.'''
     return run([ "whoami" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
-def hostname(silent = True):
+def hostname(silent = True): # platform.node()???
     '''Calls the hostname UNIX utility.'''
     return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
-def uname(silent = True):
+def uname(silent = True): # platform.uname()???
     '''Calls the uname UNIX utility.'''
     return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def ping(host, silent = True):
     '''Calls the ping utility. Returns True if remote host answers within 1 second.'''
     return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
+
+
+def get_distro():
+    '''Returns currently running Linux distribution name (ubuntu, debian, redhat, etc.).'''
+    s = ""
+    distro = ""
+    try:
+        s = platform.platform()
+        distro = s.split("-")[-3].lower()
+    except:
+        pass
+    if not re.match(r"\w+", distro):
+        raise p4a_error("Could not determine distribution name from this: " + s) 
+    debug("distro=" + distro)
+    return distro
 
 
 def get_python_lib_dir(dist_dir):
