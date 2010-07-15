@@ -100,3 +100,51 @@ int main()
    p->q->r = a;                                                         /*0016*/
    return 0;                                                            /*0017*/
 }
+int main()
+{
+   struct p_s {                                                         /*0005*/
+      struct q_s *q;
+   } *p;
+   struct q_s {                                                         /*0008*/
+      int r;
+   } **z, *x, b, u;
+   int a;                                                               /*0009*/
+
+//  <a-W-EXACT-{}>
+
+   a = 1;                                                               /*0010*/
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <p-W-EXACT-{}>
+
+   p = (struct p_s *) malloc(sizeof(struct p_s ));                      /*0011*/
+
+//  <x-W-EXACT-{}>
+
+   x = &b;                                                              /*0012*/
+
+//  <*HEAP*_l_11[.q]-W-EXACT-{a==1}>
+//  <p-R-EXACT-{}>
+//  <x-R-EXACT-{}>
+
+   p->q = x;                                                            /*0013*/
+
+//  <p-R-EXACT-{}>
+//  <z-W-EXACT-{}>
+
+   z = &p->q;                                                           /*0014*/
+
+//  <*HEAP*_l_11[.q]-W-EXACT-{a==1}>
+//  <z-R-EXACT-{}>
+
+   *z = &u;                                                             /*0015*/
+
+//  <*HEAP*_l_11[.q]-R-EXACT-{a==1}>
+//  <a-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <u[.r]-W-EXACT-{a==1}>
+
+   p->q->r = a;                                                         /*0016*/
+   return 0;                                                            /*0017*/
+}
