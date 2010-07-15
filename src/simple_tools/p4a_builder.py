@@ -131,6 +131,8 @@ class p4a_builder:
             cxx = "icpc"
             ld = "xild"
             ar = "xiar"
+            if which("ifort"):
+                fortran = "ifort"
         else:
             if not cxx:
                 cxx = "g++"
@@ -148,15 +150,22 @@ class p4a_builder:
         if add_optimization_flags:
             if icc:
                 c_flags += [ "-xHOST -O3 -ipo -no-prec-div" ] # Do not specify -fast with implies -static and bugs with STT_GNU_IFUNC upon linkage.
+                if fortran == "ifort":
+                    fortran_flags += [ "-O3 -ipo" ] # == -fast without -static, same remark as above.
+                else:
+                    fortran_flags += [ "-O3" ]
             else:
-                c_flags += [ "-O2" ]
+                c_flags += [ "-O3" ]
+                fortran_flags += [ "-O3" ]
 
         if openmp:
             if icc:
                 c_flags += [ "-openmp" ]
+                fortran_flags += [ "-openmp" ]
                 ld_flags += [ "-openmp" ]
             else:
                 c_flags += [ "-fopenmp" ]
+                fortran_flags += [ "-fopenmp" ]
                 ld_flags += [ "-fopenmp" ]
 
             if accel_openmp:
@@ -166,6 +175,7 @@ class p4a_builder:
         if add_debug_flags:
             cpp_flags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
             c_flags = [ "-g" ] + c_flags
+            fortran_flags = [ "-g" ] + fortran_flags
 
         if not no_default_flags:
             c_flags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + c_flags
