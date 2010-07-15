@@ -26,10 +26,10 @@ setenv PIPS_F77 $fortran
 setenv PATH $$P4A_DIST/bin:$$PATH
 
 # Update libraries search paths.
-setenv PKG_CONFIG_PATH $$P4A_DIST/lib/pkgconfig:$$PKG_CONFIG_PATH
-setenv LD_LIBRARY_PATH $$P4A_DIST/lib:$$LD_LIBRARY_PATH
+setenv PKG_CONFIG_PATH $$P4A_DIST/lib64/pkgconfig:$$P4A_DIST/lib/pkgconfig:$$PKG_CONFIG_PATH
+setenv LD_LIBRARY_PATH $$P4A_DIST/lib64:$$P4A_DIST/lib:$$LD_LIBRARY_PATH
 
 # Update Python module search path with PIPS Python bindings (PyPS).
-setenv PYTHONPATH `ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1`:/usr/share/pyshared
+setenv PYTHONPATH `ls -d $$P4A_DIST/lib64/python*/*-packages/pips 2>/dev/null | tail -1`:`ls -d $$P4A_DIST/lib/python*/*-packages/pips 2>/dev/null | tail -1`:/usr/share/pyshared
 
 rehash
