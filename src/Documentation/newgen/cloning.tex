@@ -41,6 +41,7 @@ It consist of three fields given by the user:
 \begin{itemize}
 \item \lstinline|previous_module| is the entity of the module from which the cloned statement comes
 \item \lstinline|new_module| is the entity of the module to which the cloned statement will be added. It can be the same as \lstinline|previous_module|
+\item \lstinline|labels| is the label mapping between old labels and new labels. If the old statement has two entities with the same label (like the statement and a loop inside the statement), then the new entity must also have those two entities with the same label.
 \item \lstinline|new_module_statement| is the root statement of \lstinline|new_module|
 \end{itemize}
 
@@ -49,8 +50,7 @@ It consist of three fields given by the user:
 \domain{import statement from "ri.newgen"}
 {}
 
-
-
-\domain{clone_context = previous_module:entity x new_module:entity x persistent new_module_statement:statement}
-
+\domain{clone_context = previous_module:entity x new_module:entity x labels:entity* x persistent new_module_statement:statement}
 \end{document}
+
+
