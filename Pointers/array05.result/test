@@ -232,3 +232,114 @@ int main()
 
    return 0;                                                            /*0042*/
 }
+int main()
+{
+   int t[100][10][3];                                                   /*0005*/
+
+   int (*p)[3];                                                         /*0007*/
+   int *pu;                                                             /*0008*/
+
+   int (*q)[10][3];                                                     /*0010*/
+   int (*qu)[3];                                                        /*0011*/
+
+   int (*r)[100][10][3];                                                /*0013*/
+   int (*ru)[10][3];                                                    /*0014*/
+
+//  <p-W-EXACT-{}>
+
+   
+   
+   p = &t[1][2];                                                        /*0017*/
+
+//  <p-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==1}>
+
+   (*p)[1] = 0;                                                         /*0018*/
+
+//  <p-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==3, PHI3==1}>
+
+   p[1][1] = 0;                                                         /*0019*/
+
+//  <pu-W-EXACT-{}>
+
+
+   pu = &t[1][2][0];                                                    /*0021*/
+
+//  <pu-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==0}>
+
+   *pu = 0;                                                             /*0022*/
+
+//  <pu-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==2}>
+
+   pu[2] = 0;                                                           /*0023*/
+
+//  <q-W-EXACT-{}>
+
+
+   q = &t[1];                                                           /*0025*/
+
+//  <q-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==3}>
+
+   ((*q)[2])[3] = 0;                                                    /*0026*/
+
+//  <q-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==2, PHI2==2, PHI3==3}>
+
+   q[1][2][3] = 0;                                                      /*0027*/
+
+//  <qu-W-EXACT-{}>
+
+
+   qu = &t[1][0];                                                       /*0029*/
+
+//  <qu-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==0, PHI3==1}>
+
+   (*qu)[1] = 0;                                                        /*0030*/
+
+//  <qu-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==1, PHI3==1}>
+
+   qu[1][1] = 0;                                                        /*0031*/
+
+//  <r-W-EXACT-{}>
+
+
+   r = &t;                                                              /*0033*/
+
+//  <r-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
+
+   (((*r)[0])[0])[0] = 0;                                               /*0034*/
+
+//  <r-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==3}>
+
+   (((*r)[1])[2])[3] = 0;                                               /*0035*/
+
+//  <ru-W-EXACT-{}>
+
+
+   ru = &t[0];                                                          /*0037*/
+
+//  <ru-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
+
+   ((*ru)[0])[0] = 0;                                                   /*0038*/
+
+//  <ru-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
+
+   ru[0][0][0] = 0;                                                     /*0039*/
+
+//  <ru-R-EXACT-{}>
+//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==1}>
+
+   ru[1][2][1] = 0;                                                     /*0040*/
+
+   return 0;                                                            /*0042*/
+}
