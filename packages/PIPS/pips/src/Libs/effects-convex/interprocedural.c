@@ -792,7 +792,8 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
   
   free_type(real_arg_t);
   
-
+  if (!transformer_undefined_p(context))
+    (*effects_precondition_composition_op)(l_eff, context);
   ifdebug(8)
     {
       pips_debug(8, "end with effects :\n");

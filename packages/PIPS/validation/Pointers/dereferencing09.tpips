@@ -41,6 +41,9 @@ activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
  
+activate MUST_REGIONS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE
 
 close
 delete dereferencing09

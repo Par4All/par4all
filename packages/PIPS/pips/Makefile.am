@@ -1,6 +1,8 @@
 SUBDIRS=src
 ACLOCAL_AMFLAGS=-I makes/m4 -I src/Libs/gnulib/m4
 dist_noinst_HEADERS=link-warning.h
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA= pips.pc
 
 # devel mode enables various checks
 if WITH_DEVEL_MODE

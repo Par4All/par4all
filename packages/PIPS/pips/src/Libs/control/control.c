@@ -430,7 +430,8 @@ bool controlize(statement st,
 		hash_table used_labels)
 {
     instruction i = statement_instruction(st);
-    string label = entity_name(statement_label(st));
+    entity elabel = statement_label(st);
+    string label = entity_name(elabel);
     bool controlized = FALSE;
     control n_succ = control_undefined; // To be used in case of goto
 
@@ -568,6 +569,11 @@ bool controlize(statement st,
       controlized = controlize_forloop(st, instruction_forloop(i),
 				       pred, succ, c_res, used_labels);
 	statement_consistent_p(st);
+        /* SG+EC:some label may have been lost in the process
+           fix it here instead of understanding why */
+        if(!same_entity_p(statement_label(st),elabel)) {
+            statement_label(st)=elabel;
+        }
       break;
     case is_instruction_expression:
       /* PJ: controlize_call() controlize any "nice" statement */

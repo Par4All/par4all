@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+pythondir=@pythondir@
+pkgpythondir=@pkgpythondir@
+
+Name: pips
+Description: pips library
+Version: @VERSION@
+URL: http://pips4u.org
+Libs: -L${libdir} -lpipslibs @LIBS@
+Cflags: -I${includedir}

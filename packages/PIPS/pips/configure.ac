@@ -192,6 +192,7 @@ AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
 # register autoconf translated files here
 AC_CONFIG_FILES([pips_config.h
 				 Makefile
+				 pips.pc
                  src/Documentation/Makefile
                  src/Documentation/constants/Makefile
                  src/Documentation/help/Makefile
