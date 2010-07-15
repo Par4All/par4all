@@ -224,7 +224,6 @@ do_clone_label(entity l, clone_context cc/*, hash_table ht*/)
 
     /* if the label was cloned in the past, we get the same clone this function
        returned before instead of creating a new one */
-    printf("cloning label %s\n", entity_name(l));
     entity replacement = entity_undefined;
 
     /* Checking if the entity is in the list of cloned labels */
@@ -238,14 +237,12 @@ do_clone_label(entity l, clone_context cc/*, hash_table ht*/)
     }
 
     if(entity_undefined_p(replacement)) {
-        printf("creating new value in list\n");
         replacement=make_new_label(module_local_name(clone_context_new_module(cc)));
         /* Insert those two values at beginning of the list (reverse inserting order
            as it's insterting before instead of inserting at the end) */
         clone_context_labels(cc) = CONS(ENTITY, replacement, clone_context_labels(cc));
         clone_context_labels(cc) = CONS(ENTITY, l, clone_context_labels(cc));
     }
-    printf("value: %s\n", entity_name(replacement));
 
     return replacement;
 }
