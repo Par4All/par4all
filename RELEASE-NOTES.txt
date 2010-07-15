@@ -55,14 +55,17 @@ add it graphically with the *Update Manager* with
 *Settings...*/*Third-Party Software* or append it with a text editor to
 your ``/etc/apt/sources.list``::
 
-  deb http://download.par4all.org/ubuntu releases main
-  deb http://download.par4all.org/ubuntu nightly main
-  deb http://download.par4all.org/debian releases main
-  deb http://download.par4all.org/debian nightly main
+  # If you are using Ubuntu:
+  deb http://download.par4all.org/apt/ubuntu releases main
+  # --OR--
+  deb http://download.par4all.org/apt/ubuntu development main
 
-Nightly packages are generated every night, and is best suited if you want
-to track closely Par4All development. The stability is not guaranteed with
-nightly builds.
+  # If you are running Debian:
+  deb http://download.par4all.org/apt/debian releases main
+  # --OR--
+  deb http://download.par4all.org/apt/debian development main
+
+Development packages are generated often, may be unstable, and are best suited if you want to track closely the Par4All development.
 
 Once this is done, run::
 
