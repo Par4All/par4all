@@ -697,7 +697,7 @@ static void split_initializations_in_statement(statement s)
 
 	FOREACH(ENTITY, var, decls) {
 	  string mn  = module_name(entity_name(var));
-	  const char* cmn = entity_user_name(get_current_module_entity());
+          const char* cmn = get_current_module_name();
 	  if ( strcmp(mn,cmn) == 0
 	       && !value_unknown_p(entity_initial(var))
 	       ) {
