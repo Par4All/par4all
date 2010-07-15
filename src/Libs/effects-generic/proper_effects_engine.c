@@ -1976,6 +1976,12 @@ static list generic_proper_effects_of_declaration(entity decl)
 	 I should may be call generic_proper_effects_of lhs instead, but the case is
 	 slightly different for arrays. Or directly (*reference_to_effect_func) in case of a scalar ?
       */
+      /* To avoid problems with loop distribution, we need a (write)
+	 effect whether there is an initialization or not. This is
+	 consistent with transformers and preconditions, but not with
+	 the used before set analysis. In the short term, you can
+	 comment out the second part of the condition to solve the
+	 loop distribution issue. */
       if (!variable_static_p(decl) && !value_unknown_p(v_init))
 	{
 	  type decl_t = basic_concrete_type(entity_type(decl));
