@@ -100,6 +100,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
     clone_context cc = make_clone_context(
             get_current_module_entity(),
             get_current_module_entity(),
+            NIL,
             get_current_module_statement() );
 
     statement second_loop_statement = clone_statement(original_loop,cc);

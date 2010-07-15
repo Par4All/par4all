@@ -52,6 +52,7 @@ bool dowhile_to_while_walker(statement stmt)
 			clone_context cc = make_clone_context(
 					get_current_module_entity(),
 					get_current_module_entity(),
+                                        NIL,
 					duplicated_statement
 			);
 			instruction_block(statement_instruction(duplicated_statement)) = CONS(STATEMENT,clone_statement( whileloop_body(wl),cc ),NIL);

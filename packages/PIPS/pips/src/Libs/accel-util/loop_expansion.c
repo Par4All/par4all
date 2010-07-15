@@ -348,7 +348,7 @@ void do_loop_expansion_init(statement st, int size,int offset)
 
                 );
 
-        clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),get_current_module_statement());
+        clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),NIL,get_current_module_statement());
         statement inserted_statement = 
             instruction_to_statement(
                     make_instruction_loop(
