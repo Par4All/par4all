@@ -28,12 +28,14 @@ package_name                    = "par4all"
 # If no version is specified, assume this is the version:
 default_version                 = "1.0"
 
-# Settings for --publish. There is currently no option to override these defaults.
-default_publish_host            = "download.par4all.org"
-default_publish_dir             = "/srv/www-par4all/download/releases"
-default_nightly_publish_dir     = "/srv/www-par4all/download/nightly"
-default_deb_publish_dir         = "/srv/www-par4all/download/ubuntu/dists/releases/main"
-default_deb_nightly_publish_dir = "/srv/www-par4all/download/ubuntu/dists/nightly/main"
+# Settings for --publish. There ais currently no command line option to override these defaults.
+# Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
+# to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
+default_publish_host                = "download.par4all.org"
+default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
+default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$DATE"
+default_deb_publish_dir             = "/srv/www-par4all/download/$DISTRO/dists/releases/main"
+default_deb_development_publish_dir = "/srv/www-par4all/download/$DISTRO/dists/development/main"
 
 # Where are the .deb settings files? (i.e. the control, postinst, etc. files).
 debian_dir = os.path.join(script_dir, "DEBIAN")
@@ -76,6 +78,9 @@ def add_module_options(parser):
     group.add_option("--arch", metavar = "ARCH", default = None,
         help = "Specify the package architecture manually. By default, the current machine architecture is used.")
 
+    group.add_option("--distro", metavar = "DISTRO", default = None,
+        help = "Specify the target distribution manually. By default, the current running Linux distribution is used.")
+
     group.add_option("--version", "--revision", metavar = "REVISION",
         help = "Specify package version. Current Git revision will be automatically appended.")
 
@@ -85,8 +90,8 @@ def add_module_options(parser):
     group.add_option("--publish", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
 
-    group.add_option("--nightly", action = "store_true", default = False,
-        help = "When publishing, store files in the 'nightly' directory (i.e. for nightly builds). Implies --append-date.")
+    group.add_option("--development", "--dev", "--untested", "--unstable", "--nightly", action = "store_true", default = False,
+        help = "When publishing, store files in the 'development' directory (i.e. for development (vs. release) builds). Implies --append-date.")
 
     group.add_option("--install-prefix", metavar = "DIR", default = None,
         help = "Specify the installation prefix. Default is /usr/local/par4all.")
@@ -122,7 +127,7 @@ def create_dist(pack_dir, install_prefix, revision):
     return [ temp_dir, temp_dir_with_prefix ]
 
 
-def create_deb(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_deb(pack_dir, install_prefix, revision, distro, arch, keep_temp = False):
     '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
     and substitute some values in files in this DEBIAN directory. No modification of the
     distribution is made.'''
@@ -132,14 +137,6 @@ def create_deb(pack_dir, install_prefix, revision, keep_temp = False, arch = Non
     info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
     control_file = os.path.join(temp_debian_dir, "control.tpl")
-    if not arch:
-        arch = get_machine_arch()
-        if arch == "x86_64":
-            arch = "amd64"
-        elif re.match("i\d86", arch):
-            arch = "i386"
-        else:
-            die("Unknown architecture " + arch + ", use --arch")
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
     info("Adjusting values in " + control_file)
     subs_template_file(control_file, subs_map)
@@ -163,52 +160,54 @@ def create_deb(pack_dir, install_prefix, revision, keep_temp = False, arch = Non
     return package_file_name
 
 
-def publish_deb(file, host, remote_dir):
-    arch = change_file_ext(file, "").split("_")[-1]
-    info("Publishing " + file + " (" + arch + ")")
-    warn("Removing existing .deb file for arch " + arch)
-    run([ "ssh", host, "rm -fv " + remote_dir + "/binary-" + arch + "/*.deb" ])
-    warn("Copying " + file + " on " + host)
-    run([ "scp", file, host + ":" + remote_dir + "/binary-" + arch ])
-    warn("Please wait 5 minute for repository indexes to get updated by cron")
+def publish_deb(file, host, repos_dir, remote_dir, arch):
+    #~ arch = change_file_ext(file, "").split("_")[-1]
+    info("Publishing " + file + " in the deb repository (" + arch + ")")
+    repos_arch_dir = repos_dir + "/binary-" + arch
+    warn("Removing existing .deb file for arch " + arch + " (" + repos_arch_dir + ")")
+    run([ "ssh", host, "mkdir -p " + repos_arch_dir ])
+    run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
+    warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
+    run([ "scp", file, host + ":" + repos_arch_dir ])
+    warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
     warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
 
-def publish_tgz(file, host, remote_dir):
-    warn("Copying " + file + " on " + host)
-    run([ "scp", file, host + ":" + remote_dir ])
-
-
-def publish_files(files, nightly = False):
+def publish_files(files, distro, deb_distro, arch, deb_arch, development = False):
     global default_publish_host
-    global default_publish_dir, default_nightly_publish_dir
-    global default_deb_publish_dir, default_deb_nightly_publish_dir
+    global default_publish_dir, default_development_publish_dir
+    global default_deb_publish_dir, default_deb_development_publish_dir
 
     publish_dir = ""
     deb_publish_dir = ""
-    if nightly:
-        publish_dir = default_nightly_publish_dir
-        deb_publish_dir = default_deb_nightly_publish_dir
+    if development:
+        publish_dir = default_development_publish_dir
+        deb_publish_dir = default_deb_development_publish_dir
     else:
         publish_dir = default_publish_dir
         deb_publish_dir = default_deb_publish_dir
+
+    # Subsistute placeholders such as $DISTRO, $DATE etc.
+    publish_dir = string.Template(publish_dir).substitute(
+        DISTRO = distro, ARCH = arch, DATE = utc_date())
+    deb_publish_dir = string.Template(deb_publish_dir).substitute(
+        DISTRO = deb_distro, ARCH = deb_arch, DATE = utc_date())
 
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(file):
             die("Invalid file: " + file)
+        warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
+        warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
+        warn("If something goes wrong, try creating directories or publishing the file manually")
+        run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
+        run([ "scp", file, default_publish_host + ":" + publish_dir ])
         ext = get_file_ext(file)
         if ext == ".deb":
-            publish_deb(file, default_publish_host, deb_publish_dir)
-        warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
-        run([ "scp", file, default_publish_host + ":" + publish_dir ])
+            publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
 
 
-def create_sdeb(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
-    die("create_sdeb is TODO")
-
-
-def create_tgz(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_tgz(pack_dir, install_prefix, revision, distro, arch, keep_temp = False):
     '''Creates a simple .tar.gz package.'''
     global package_name
     (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, revision)
@@ -237,7 +236,7 @@ def create_tgz(pack_dir, install_prefix, revision, keep_temp = False, arch = Non
     return package_file
 
 
-def create_stgz(pack_dir, install_prefix, revision, keep_temp = False, arch = None):
+def create_stgz(pack_dir, install_prefix, revision, keep_temp = False):
     global package_name, temp_dirs
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
@@ -274,13 +273,33 @@ def create_stgz(pack_dir, install_prefix, revision, keep_temp = False, arch = No
 
 def main(options, args = []):
 
+    # Determine architecture for binary packages (and special arch name for debs).
+    deb_arch = arch = options.arch
+    if not arch:
+        arch = get_machine_arch()
+    if arch == "x86_64":
+        deb_arch = "amd64"
+    elif re.match("i\d86", arch):
+        deb_arch = "i386"
+    debug("arch=" + arch)
+    debug("deb_arch=" + deb_arch)
+
+    # Determine current running distro unless provided.
+    distro = options.distro
+    if not distro:
+        distro = get_distro()
+    if options.deb:
+        if distro not in [ "ubuntu", "debian" ]:
+            die("Invalid target distro for building .debs: " + distro)
+    debug("distro=" + distro)
+
     if len(args):
         if not options.publish:
             die("You specified files on command line but did not specify --publish")
-        publish_files(args, options.nightly)
+        publish_files(args, distro, distro, arch, deb_arch, options.development)
         return
 
-    if options.nightly and not options.append_date:
+    if options.development and not options.append_date:
         options.append_date = True
 
     if (not options.deb #and not options.sdeb 
@@ -371,22 +390,19 @@ def main(options, args = []):
     try:
         if options.deb:
             output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix, 
-                revision = revision + "~" + append_revision_bin,
-                keep_temp = options.keep_temp, arch = options.arch))
-        #~ if options.sdeb:
-            #~ output_files.append(create_sdeb(pack_dir = pack_dir, install_prefix = options.install_prefix, revision = revision,
-                #~ keep_temp = options.keep_temp, arch = options.arch))
+                revision = revision + "~" + append_revision_bin, distro = distro, arch = deb_arch,
+                keep_temp = options.keep_temp))
         if options.tgz:
             output_files.append(create_tgz(pack_dir = pack_dir, install_prefix = prefix,
-                revision = revision + "~" + append_revision_bin,
-                keep_temp = options.keep_temp, arch = options.arch))
+                revision = revision + "~" + append_revision_bin, distro = distro, arch = arch,
+                keep_temp = options.keep_temp))
         if options.stgz:
             output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
                 revision = revision + "~" + append_revision_src,
-                keep_temp = options.keep_temp, arch = options.arch))
+                keep_temp = options.keep_temp))
 
         if options.publish:
-            publish_files(output_files, options.nightly)
+            publish_files(output_files, distro, distro, arch, deb_arch, options.development)
 
         if output_dir:
             for file in output_files:

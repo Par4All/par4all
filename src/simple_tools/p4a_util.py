@@ -406,7 +406,7 @@ class runner(Thread):
                 self.err_line_chunk = lines.pop()
                 new_err = "\n".join(lines)
                 if new_err:
-                    self.out += new_err
+                    self.err += new_err
                     if self.stderr_handler:
                         if spin:
                             self.hide_spinner()
@@ -472,17 +472,46 @@ def whoami(silent = True):
     '''Calls the whoami UNIX utility.'''
     return run([ "whoami" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
-def hostname(silent = True):
+def hostname(silent = True): # platform.node()???
     '''Calls the hostname UNIX utility.'''
     return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
-def uname(silent = True):
+def uname(silent = True): # platform.uname()???
     '''Calls the uname UNIX utility.'''
     return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
 def ping(host, silent = True):
     '''Calls the ping utility. Returns True if remote host answers within 1 second.'''
     return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
+
+
+def get_distro():
+    '''Returns currently running Linux distribution name (ubuntu, debian, redhat, etc.).'''
+    s = ""
+    distro = ""
+    try:
+        s = platform.platform()
+        distro = s.split("-")[-3].lower()
+    except:
+        pass
+    if not re.match(r"\w+", distro):
+        raise p4a_error("Could not determine distribution name from this: " + s) 
+    debug("distro=" + distro)
+    return distro
+
+
+def get_python_lib_dir(dist_dir):
+    lib = run([ "ls", "-d", dist_dir + "/lib/python*/*-packages/pips" ], can_fail = True, silent = True)[0].rstrip("\n")
+    lib64 = run([ "ls", "-d", dist_dir + "/lib64/python*/*-packages/pips" ], can_fail = True, silent = True)[0].rstrip("\n")
+    ret = ""
+    if not lib and not lib64:
+        raise p4a_error("Could not determine Python modules installation path in " + dist_dir + " -- Has PyPS been installed yet? Try reinstalling in " + dist_dir)
+    elif lib64:
+        ret = lib64
+    else:
+        ret = lib
+    debug("Python lib dir for " + dist_dir + ": " + ret)
+    return ret
 
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
@@ -636,9 +665,13 @@ def file_lastmod(file):
     '''Returns file's last modification date/time.'''
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
 
-def utc_datetime():
+def utc_datetime(sep = "T", dsep = "", tsep = ""):
     '''Returns the current UTC date/time in ISO format.'''
-    return time.strftime("%Y%m%dT%H%M%S", time.gmtime())
+    return time.strftime("%Y" + dsep + "%m" + dsep + "%d" + sep + "%H" + tsep + "%M" + tsep + "%S", time.gmtime())
+
+def utc_date(dsep = "-"):
+    '''Returns the current UTC date.'''
+    return time.strftime("%Y" + dsep + "%m" + dsep + "%d", time.gmtime())
 
 
 def sh2csh(file, output_file = None):
