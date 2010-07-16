@@ -49,11 +49,11 @@ def mconv(tiling_matrix):
 
 """ smart loop expasion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
 def smart_loop_expansion(m,l,sz):
-	l.loop_expansion_init(loop_expansion_size=sz)
+	l.loop_expansion_init(loop_expansion_size=str(sz))
 	m.display()
 	m.statement_insertion()
 	m.display()
-	l.loop_expansion(size=sz)
+	l.loop_expansion(size=str(sz))
 	m.display()
 
 module.smart_loop_expansion=smart_loop_expansion

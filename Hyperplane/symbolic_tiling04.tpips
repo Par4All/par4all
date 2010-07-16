@@ -5,6 +5,7 @@ create $WS symbolic_tiling03.c
 
 display PRINTED_FILE
 
+apply PRIVATIZE_MODULE
 setproperty LOOP_LABEL "here"
 setproperty SYMBOLIC_TILING_VECTOR "N,N"
 apply SYMBOLIC_TILING

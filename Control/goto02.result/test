@@ -1,0 +1,19 @@
+int main(int arc, char **argv)
+{
+   int i, j, x;
+loop:
+   for(i = 0; i <= 9; i += 1)
+      printf("%d\n", i);
+
+   if (i>11) goto loop;
+
+
+   x = 0;
+   i = 0;
+   while (i<100) {
+      x += i;
+      j++;
+   }
+   return 0;
+}
+
