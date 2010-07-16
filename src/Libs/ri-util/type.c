@@ -2536,16 +2536,17 @@ type ultimate_type(type t)
       type st = entity_type(e);
 
       nt = ultimate_type(st);
-#if 0
+#if 1
       if( !ENDP(variable_dimensions(vt) ) ) /* without this test, we would erase the dimension ... */
       {
           /* what should we do ? allocate a new type ... but this breaks the semantic of the function
            * we still create a leak for this case, which does not appear to often
            * a warning is printed out, so that we don't forget it
            */
-          pips_user_warning("leaking some memory\n");
-          nt=copy_type(nt);
-          variable_dimensions(type_variable(nt))=gen_nconc(gen_copy_seq(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
+          static type holder = type_undefined;// SG: this should avoid the leak;
+          if(!type_undefined_p(holder)) free_type(holder);
+          nt=holder=copy_type(nt);
+          variable_dimensions(type_variable(nt))=gen_nconc(gen_full_copy_list(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
 
       }
 #endif
