@@ -532,7 +532,7 @@ bool number_it;
 {
     statement s;
     cons * pc;
-    entity l = MakeLabel(strdup(lab_I));
+    entity l = MakeLabel(lab_I);
 
     pips_debug(8, "Begin for instruction %s with label \"%s\"\n",
 	       instruction_identification(i), &(lab_I[0]));

@@ -741,6 +741,7 @@ i_create: TK_CREATE workspace_name /* workspace name */
 			user_log("Main module PROGRAM \"%s\" selected.\n",
 							 main_module_name);
 			lazy_open_module(main_module_name);
+			free(main_module_name);
 		}
 		$$ = TRUE;
 				}
@@ -762,6 +763,7 @@ i_close: TK_CLOSE /* assume current workspace */ TK_ENDOFLINE
 	| TK_CLOSE TK_NAME /* workspace name */ TK_ENDOFLINE
 	{
 		$$ = tp_close_the_workspace($2);
+		free($2);
 	}
 	;
 

@@ -188,6 +188,7 @@ static void parse_properties(void)
 	    // DO NOT CALL pips_user_error here
 	    fprintf(stderr, "user error in parse_properties: "
 		    "Unknown property %s to update\n", n);
+		free(n);
 	    return;
 	}
 
@@ -207,12 +208,13 @@ static void parse_properties(void)
 	       the quote and do not use s+1 anymore*/
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
-            if (q == NULL) {
-	    // DO NOT CALL pips_user_error here
-		fprintf(stderr, "user error in parse_properties: "
-			"bad string : %s\n", yytext);
-		return;
-	    }
+			if (q == NULL) {
+				// DO NOT CALL pips_user_error here
+				fprintf(stderr, "user error in parse_properties: "
+						"bad string : %s\n", yytext);
+				free(n);
+				return;
+			}
             *q = '\0';
 	    pr = make_property_string(s);
 	    break;
@@ -250,6 +252,7 @@ static void parse_properties(void)
         }
         else
 	    hash_put(pl, n, (char *) pr);
+		free(n);
     }
 }
 
