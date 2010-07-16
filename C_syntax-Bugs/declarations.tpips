@@ -1,0 +1,8 @@
+delete declarations
+create declarations declarations.c declarations_.c declarations__.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE[%ALL]
+
+close
+delete declarations
