@@ -1,4 +1,4 @@
-Release notes for Par4All 1.0, 2010/07/12
+Release notes for Par4All 1.0, 2010/07/16
 =========================================
 
 Ronan Keryell, HPC Project.
@@ -43,8 +43,8 @@ Installation
 
 You can install Par4All in different ways, more or less automatic. The
 installation is done into ``/usr/local/par4all``. If you want Par4All
-installed in another location, use the compilation way at the end of this
-section.
+installed in another location, use the compilation way of life at the end
+of this section.
 
 The best way if you are on GNU/Linux Debian or Ubuntu is to use
 our package repository. This way, when a new version is out, your
@@ -53,21 +53,24 @@ classical package manager can automatically install it.
 To use our package repository, pick *one* of the following lines, and
 add it graphically with the *Update Manager* with
 *Settings...*/*Third-Party Software* or append it with a text editor to
-your ``/etc/apt/sources.list``::
+your ``/etc/apt/sources.list``, if you are using Ubuntu::
 
-  # If you are using Ubuntu:
   deb http://download.par4all.org/apt/ubuntu releases main
   # --OR--
   deb http://download.par4all.org/apt/ubuntu development main
 
-  # If you are running Debian:
+or if you are running Debian::
+
   deb http://download.par4all.org/apt/debian releases main
   # --OR--
   deb http://download.par4all.org/apt/debian development main
 
-Development packages are generated often, may be unstable, and are best suited if you want to track closely the Par4All development.
+So you need to choose between ``releases`` or ``development``
+versions. Development packages are generated often, may be unstable, and
+are best suited if you want to track more closely the Par4All development.
 
-Once this is done, run::
+Once this is done, run your favorite graphics package tool
+(``synaptic``...)  or::
 
   sudo aptitude update
   sudo aptitude install par4all
@@ -78,7 +81,7 @@ or log out and log in again for the environment to get properly set
 up for Par4All. Once this is done, you can, for example, run ``p4a -h``
 to get help about the usage of the ``p4a`` frontend script.
 
-A less automatic way on Debian or Linux is to install the Par4All
+A less automatic way on Debian or Ubuntu is to install the Par4All
 ``.deb`` package you have found on http://download.par4all.org with::
 
   sudo gdebi <the_package>.deb
@@ -87,7 +90,7 @@ A less automatic way on Debian or Linux is to install the Par4All
 automatically install dependencies you should install later.
 
 An even less automatic way is to use a tar ball ``.tar.gz`` file. It
-contains the binaries as built on a stable Ubuntu or Debian
+contains the binaries as built on a stable Ubuntu or unstable Debian
 distribution. It should work on any GNU/Linux distribution with the
 following libraries installed: (a fairly recent) ``libc.so.6``,
 ``libncurses.so.5``, ``libreadline.so.6``
@@ -119,6 +122,15 @@ http://www.par4all.org/documentation for information on how to use Par4All.
 More details on the installation or how to compile Par4All from your own
 can be found into the document describing all the infrastructure:
 http://www.par4all.org/documentation/par4all-infrastructure
+
+
+Examples:
+---------
+
+In the examples directory there are few examples showing some ``p4a``,
+``tpips`` and ``pyps`` use cases.
+
+Have a look at ``examples/README.txt``
 
 
 Fortran
@@ -191,7 +203,7 @@ environment variables set:
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
 
 Sometimes, Par4All generates C99 array parameter declarations in the
-generated CUDA kernels that are not yet dealt with nvcc 3.1. To avoid this,
+generated CUDA kernels that are not yet dealt with ``nvcc`` 3.1. To avoid this,
 we apply an array to pointer transformation on generated kernels. We hope
 nVidia will release soon a CUDA version that is C99-compliant as OpenCL
 is. That means that in the mean time, the entry code should not contain
@@ -225,7 +237,7 @@ regular accesses to memory.
 
 Par4All does not generate additional tiling yet, so right now the
 iteration spaces of the 2 outer loops of a parallel loop nest are limited
-by hardware \Agpu limits.
+by hardware GPU limits.
 
 
 Embedded systems

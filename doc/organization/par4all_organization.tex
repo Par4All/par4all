@@ -188,7 +188,7 @@ installation process as explained in \S~\ref{sec:p4a_s-comp-script} for
 all the options, for example to skip the (re)compilation of a package (for
 example with \verb/--skip-polylib/).
 
-To speed up the compilation, you can pass options to make, and more
+To speed up the compilation, you can pass options to \texttt{make}, and more
 specifically you can run on, say, 8 processes by adding the
 \verb/--jobs=8/ option.
 
@@ -282,7 +282,7 @@ repositories, ask \Ahpcp.
 
 There are also ancillary \Agit repositories to offer a \Agit interface to
 the trunk of the \Asvn repositories for the \Apips components from
-\Acri:\marginpar{Right now there are not in production yet.}
+\Acri:
 \begin{itemize}
 \item \url{ssh://git.hpc-project.com/git/svn-linear.git}
 \item \url{ssh://git.hpc-project.com/git/svn-newgen.git}
@@ -941,7 +941,7 @@ projects or if things go really wrong. There are located in
 \item \verb|optparse_help_to_tex| is a small compiler that transforms a
   help output message of a command (using the \texttt{optparse} format)
   when launched with \texttt{-h} into La\TeX{} code for inclusion in
-  articles or slides. See \S~\ref{sec:docum-help-tex} for more details;
+  articles or slides. See \S~\ref{sec:help-docum-tex} for more details;
 \item \verb|p4a_doc| in \verb|src/dev| is used to compile the \Apfa
   documentation and publish it on the server. Have a look to
   \texttt{p4a\_doc -h} for the help.
@@ -1336,7 +1336,7 @@ that is generated.
   Par4All Accel}
 \label{sec:p4a_p-script-from}
 
-\verb|p4a_post_processor.py| is the script that transform the \Apips
+\verb|p4a_post_processor.py| is the script that transforms the \Apips
 output into calls to \Apfa Accel. It is mainly used by the \texttt{p4a}
 script but can be used for power users that need to write their own
 specialized \Apips scripts with \texttt{tpips} or \texttt{PyPS}.
@@ -1344,11 +1344,11 @@ specialized \Apips scripts with \texttt{tpips} or \texttt{PyPS}.
 \input{p4a_post_processor.py-help}
 
 
-\subsection{The \protect\texttt{optparse\_help\_to\_tex} documentation
-  help to \TeX{} compiler}
-\label{sec:docum-help-tex}
+\subsection{The \protect\texttt{optparse\_help\_to\_tex} help
+  documentation to \TeX{} compiler}
+\label{sec:help-docum-tex}
 
-\verb|optparse_help_to_tex| is a small compiler that translated a help
+\verb|optparse_help_to_tex| is a small compiler that translates a help
 output message of a command using the \texttt{optparse} format when
 launched with \texttt{-h} into La\TeX{} code with section for inclusion in
 an article or slide generation with Beamer.
