@@ -3056,10 +3056,10 @@ entity string_to_entity(const char * s,entity module)
 {
     /* try float conversion */
     string endptr,module_name=module_local_name(module);
-    float f = strtof(s,&endptr);
-    if(!endptr) return float_to_entity(f);
     long int l = strtol(s,&endptr,10);
-    if(!endptr) return int_to_entity(l);
+    if(!*endptr) return int_to_entity(l);
+    float f = strtof(s,&endptr);
+    if(!*endptr) return float_to_entity(f);
 
     entity candidate = entity_undefined;
     /* first find all relevent entities */
