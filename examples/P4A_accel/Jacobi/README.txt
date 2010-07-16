@@ -19,7 +19,7 @@ make jacobi
 make run_jacobi (note that it compiles too if needed...)
 The reference source is in jacobi.c
 
-# To compile and run the Par4All 0.1 to OpenMP version:
+# To compile and run the Par4All OpenMP version:
 make jacobi_omp
 make run_jacobi_omp (note that is compile too if needed...)
 The generated source is in jacobi_omp.c
@@ -28,7 +28,7 @@ The generated source is in jacobi_omp.c
 
 - CUDA version:
 make jacobi_p4a_cuda
-make run_jacobi_p4a_cuda (note that is compile too if needed...)
+make run_jacobi_p4a_cuda (note that it compiles too if needed...)
 
 There is not a big improvement compared with sequential or OpenMP version
 because we do not used shared memory yet, but the CPU can take advantage of
@@ -36,5 +36,5 @@ its cache.
 
 - Par4All P4A_accel runtime OpenMP version (with useless memory copies):
 make jacobi_p4a_omp
-make run_jacobi_p4a_omp (note that is compile too if needed...)
+make run_jacobi_p4a_omp (note that it compiles too if needed...)
 The generated source files are in jacobi.database/P4A

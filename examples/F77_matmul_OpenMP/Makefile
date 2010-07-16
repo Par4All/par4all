@@ -1,6 +1,6 @@
 FC=gfortran
 PAR_FLAG=-fopenmp
-OPT_FLAG=-O2
+OPT_FLAG=-O3
 PIPS=tpips
 
 all: parallel sequential
