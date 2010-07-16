@@ -2522,6 +2522,7 @@ type make_standard_long_integer_type(type t)
 type ultimate_type(type t)
 {
   type nt;
+  pips_assert("type consistent",type_consistent_p(t));
 
   pips_debug(9, "Begins with type \"%s\"\n", type_to_string(t));
 
@@ -2543,11 +2544,22 @@ type ultimate_type(type t)
            * we still create a leak for this case, which does not appear to often
            * a warning is printed out, so that we don't forget it
            */
-          static type holder = type_undefined;// SG: this should avoid the leak;
+          static size_t holder_iter = 0;
+          static type holder[8] = {// SG: this should avoid the leak
+              type_undefined,
+              type_undefined,
+              type_undefined,
+              type_undefined,
+              type_undefined,
+              type_undefined,
+              type_undefined,
+              type_undefined
+          };
           nt=copy_type(nt);
-          if(!type_undefined_p(holder)) free_type(holder);
-          holder=nt;
+          holder_iter = 7 & ( 1 + holder_iter );
           variable_dimensions(type_variable(nt))=gen_nconc(gen_full_copy_list(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
+          if(!type_undefined_p(holder[holder_iter])) free_type(holder[holder_iter]);
+          holder[holder_iter]=nt;
 
       }
 #endif
