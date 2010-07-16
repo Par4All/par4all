@@ -386,7 +386,7 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
     list varargs = make_expression_list(entity_to_expression(new));
     varargs=CONS(EXPRESSION,int_to_expression(gen_length(new_dimensions)),varargs);
     FOREACH(DIMENSION,dim,new_dimensions) varargs=CONS(EXPRESSION,SizeOfDimension(dim),varargs);
-    varargs=CONS(EXPRESSION, MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),reference_to_expression(make_reference(old,gen_full_copy_list(offsets)))),varargs);
+    varargs=CONS(EXPRESSION, MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),region_reference_to_expression(make_reference(old,gen_full_copy_list(offsets)))),varargs);
     varargs=CONS(EXPRESSION,int_to_expression(gen_length(old_dimensions)),varargs);
     FOREACH(DIMENSION,dim,old_dimensions) varargs=CONS(EXPRESSION,SizeOfDimension(dim),varargs);
 
@@ -403,26 +403,31 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
  * fixes entity type as well ...
  * fix it here
  */
-static expression offsets_to_expression(entity e, list offsets)
+expression region_reference_to_expression(reference r)
 {
+    entity e = reference_variable(r);
+    list indices = gen_full_copy_list(reference_indices(r));
     entity f = entity_undefined;
     size_t where = 0;
-    FOREACH(EXPRESSION,exp,offsets) {
+    FOREACH(EXPRESSION,exp,indices) {
         if(entity_field_p(f=reference_variable(expression_reference(exp))))
             break;
         where++;
     }
-    list tail = gen_nthcdr(where,offsets);
+    list tail = gen_nthcdr(where,indices);
     if(where) {
-        CDR(gen_nthcdr(where-1,offsets))=NIL;
+        CDR(gen_nthcdr(where-1,indices))=NIL;
     }
     if(ENDP(tail))
-        return reference_to_expression(make_reference(e,offsets));
+        return reference_to_expression(make_reference(e,indices));
     else {
-        return binary_intrinsic_expression(
+        reference fake = make_reference(f,CDR(tail));
+        expression res =  binary_intrinsic_expression(
                 FIELD_OPERATOR_NAME,
-                reference_to_expression(make_reference(e,offsets)),
-                offsets_to_expression(f,CDR(tail)));
+                reference_to_expression(make_reference(e,indices)),
+                region_reference_to_expression(fake));
+        free_reference(fake);
+        return res;
     }
 }
 
@@ -439,8 +444,11 @@ static statement isolate_make_loop_array_transfer(entity old,entity new, list di
         isolate_merge_offsets(index_expressions,offsets);
 
 
-    expression e0 = offsets_to_expression(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
-               e1 = offsets_to_expression(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
+    reference fake0 = make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
+              fake1 = make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
+    expression e0 = region_reference_to_expression(fake0),
+               e1 = region_reference_to_expression(fake1);
+    free_reference(fake0), free_reference(fake1);
 
     if(transfer_in_p(t)) {
         basic b = basic_of_expression(e1);

@@ -53,52 +53,53 @@
 #include "accel-util.h"
 
 
-/* only works for hypercube */
-#if 0
+/* computes the volume of a region
+ * output it as a string representing the associated polynomial
+ * maybe one day, conversion from string to expression will be possible ?
+ *
+ * the string is here to communicate with polylib.
+ * It would be far better to convert polylib view into an expression
+ *
+ * the result is in number of bytes used
+ */
 static
-expression region_enumerate(region r,transformer tr)
+char* region_enumerate(region reg)
 {
-    reference ref = region_any_reference(r);
-    Psysteme sc = sc_dup(region_system(r));
-    sc_transform_eg_in_ineg(sc);
-    expression volume = expression_undefined;
-    FOREACH(EXPRESSION,index,reference_indices(ref))
-    {
-        Variable phi = expression_to_entity(index);
-        Pcontrainte lower,upper;
-        constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
-        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
-        {
-            /* this is a constant : the volume is 1 */
-            if(bounds_equal_p(phi,lower,upper))
-            {
-                volume=int_to_expression(1);
-            }
-            /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
-            else
-            {
-                expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                if(expression_minmax_p(elower))
-                    simplify_minmax_expression(elower,tr);
-                if(expression_minmax_p(eupper))
-                    simplify_minmax_expression(eupper,tr);
-                expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                dim = make_op_exp(PLUS_OPERATOR_NAME,dim,int_to_expression(1));
-                if(expression_undefined_p(volume))
-                    volume=dim;
-                else
-                    volume=binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,volume,dim);
-            }
-        }
-        else {
-            pips_user_warning("failed to analyse region\n");
-            free_expression(volume);
-            return expression_undefined;
-        }
+    char * volume_used = NULL;
+    Psysteme r_sc = region_system(reg);
+    sc_fix(r_sc);
+    Pbase sorted_base = region_sorted_base_dup(reg);
+    sc_base(r_sc)=sorted_base;
+    Pbase local_base = BASE_NULLE;
+    for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
+        if(!variable_phi_p((entity)b->var))
+            local_base=base_add_variable(local_base,b->var);
+
+    const char * base_names [sc_dimension(r_sc)];
+    int i=0;
+    for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
+        base_names[i++]=entity_user_name((entity)b->var);
+
+    ifdebug(1) print_region(reg);
+
+    Pehrhart er = sc_enumerate(r_sc,
+            local_base,
+            base_names);
+    if(er) {
+        char ** ps = Pehrhart_string(er,base_names);
+        expression fake_expression = region_reference_to_expression(region_any_reference(reg));
+        type fake_type = expression_to_type(fake_expression);
+        /* use first ... */
+        asprintf(&volume_used,"%d * ( %s )",
+                type_memory_size(fake_type),ps[0]);
+        free_expression(fake_expression);
+        free_type(fake_type);
+        for(char ** iter = ps; *iter; iter++) free(*iter);
+        free(ps);
     }
-    return volume;
+    return volume_used;
 }
+#if 0
 static Variable sort_key;
 static int shc_sort(Pvecteur *v0, Pvecteur *v1)
 {
@@ -163,31 +164,9 @@ static bool do_solve_hardware_constraints(statement s)
                     regions_must_convex_hull(read_region,write_region);
 
                 region hregion = rw_region;//region_hypercube(rw_region);
-                Psysteme rw_sc = region_system(hregion);
-                sc_fix(rw_sc);
-                Pbase sorted_base = region_sorted_base_dup(hregion);
-                sc_base(rw_sc)=sorted_base;
-                Pbase local_base = BASE_NULLE;
-                for(Pbase b = sc_base(rw_sc);!BASE_NULLE_P(b);b=b->succ)
-                    if(!variable_phi_p((entity)b->var))
-                        local_base=base_add_variable(local_base,b->var);
-
-                const char * base_names [sc_dimension(rw_sc)];
-                int i=0;
-                for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
-                    base_names[i++]=entity_user_name((entity)b->var);
-
-                ifdebug(1) print_region(hregion);
-
-                Pehrhart er = sc_enumerate(rw_sc,
-                        local_base,
-                        base_names);
-                if(er) {
-                    char ** ps = Pehrhart_string(er,base_names);
-                    volume_used[volume_index++]=ps[0];/* use first ... */
-                    for(char ** iter = ps +1; *iter; iter++) free(*iter);
-                    free(ps);
-                }
+                char * vused = region_enumerate(hregion);
+                if(vused)
+                    volume_used[volume_index++]=vused;
                 else
                     pips_user_error("unable to compute volume of the region of %s\n",entity_user_name(e));
             }
