@@ -142,7 +142,7 @@ replace_reference(void* s, reference old, entity new) {
 }
 
 
-struct param { entity ent; expression exp; };
+struct param { entity ent; expression exp; set visited_entities;};
 static
 void replace_entity_by_expression_expression_walker(expression e, struct param *p)
 {
@@ -191,9 +191,13 @@ void replace_entity_by_expression_expression_walker(expression e, struct param *
 static
 void replace_entity_by_expression_entity_walker(entity e, struct param *p)
 {
-    value v = entity_initial(e);
-    if( value_expression_p(v) )
-        gen_context_recurse(value_expression(v),p,expression_domain,gen_true,replace_entity_by_expression_expression_walker);
+    if( ! set_belong_p(p->visited_entities,e)) {
+        set_add_element(p->visited_entities,p->visited_entities,e);
+        value v = entity_initial(e);
+        if( value_expression_p(v) )
+            gen_context_recurse(value_expression(v),p,expression_domain,gen_true,replace_entity_by_expression_expression_walker);
+        gen_context_recurse(entity_type(e),p,expression_domain,gen_true,replace_entity_by_expression_expression_walker);
+    }
 }
 
 
@@ -213,12 +217,13 @@ void replace_entity_by_expression_loop_walker(loop l, struct param *p)
 void
 replace_entity_by_expression_with_filter(void* s, entity ent, expression exp,bool (*filter)(expression))
 {
-    struct param p = { ent, exp};
+    struct param p = { ent, exp, set_make(set_pointer)};
     gen_context_multi_recurse(s,&p,
             expression_domain,filter,replace_entity_by_expression_expression_walker,
             statement_domain,gen_true,replace_entity_by_expression_declarations_walker,
 			loop_domain,gen_true, replace_entity_by_expression_loop_walker,
             NULL);
+    set_free(p.visited_entities);
 }
 
 /** 
