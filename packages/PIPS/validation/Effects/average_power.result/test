@@ -270,11 +270,15 @@ int main(int argc, char *argv[])
             }
 
 //  <in[PHI1][PHI2][PHI3][.im]-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v}>
+//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, i==14, j==13, k==12, rg==13,
+//    th==14, v==12}>
 //  <in[PHI1][PHI2][PHI3][.re]-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v}>
-//  <pow[PHI1][.re]-W-EXACT-{0<=PHI1, PHI1+1<=th}>
-//  <pow[PHI1][.im]-W-EXACT-{0<=PHI1, PHI1+1<=th}>
+//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, i==14, j==13, k==12, rg==13,
+//    th==14, v==12}>
+//  <pow[PHI1][.re]-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
+//    rg==13, th==14, v==12}>
+//  <pow[PHI1][.im]-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
+//    rg==13, th==14, v==12}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
 //  <v-R-EXACT-{}>
