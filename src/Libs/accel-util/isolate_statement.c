@@ -76,19 +76,43 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         FOREACH(EXPRESSION,index,reference_indices(r))
         {
             expression offset = EXPRESSION(CAR(offsets));
-            unnormalize_expression(index);
-            expression_syntax(index)=
-                make_syntax_call(
-                        make_call(
-                            entity_intrinsic(MINUS_OPERATOR_NAME),
-                            make_expression_list(
-                                copy_expression(index),
-                                copy_expression(offset)
+            if(!entity_field_p(reference_variable(expression_reference(offset)))){
+                update_expression_syntax(index,
+                    make_syntax_call(
+                            make_call(
+                                entity_intrinsic(MINUS_OPERATOR_NAME),
+                                make_expression_list(
+                                    copy_expression(index),
+                                    copy_expression(offset)
+                                    )
                                 )
                             )
-                        );
-            NORMALIZE_EXPRESSION(index);
+                    );
+            }
             POP(offsets);
+        }
+    }
+}
+static void isolate_patch_callexp(expression exp, isolate_param *p)
+{
+    if(expression_call_p(exp)) {
+        call c = expression_call(exp);
+        entity op = call_function(c);
+        if(ENTITY_FIELD_P(op))
+        {
+            expression lhs = binary_call_lhs(c),
+                       rhs = binary_call_rhs(c);
+            if(!expression_reference_p(lhs) ||
+                    !expression_reference_p(rhs) )
+                pips_internal_error("case not handled, should use subscripts\n");
+            else {
+                reference_indices(expression_reference(lhs)) = 
+                    gen_append(reference_indices(expression_reference(lhs)),
+                            CONS(EXPRESSION,int_to_expression(0),
+                                reference_indices(expression_reference(rhs))));
+                update_expression_syntax(exp,copy_syntax(expression_syntax(lhs)));
+            }
+
         }
     }
 }
@@ -114,6 +138,7 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
     isolate_param p = { old,new,offsets };
     gen_context_multi_recurse(where,&p,
             reference_domain,gen_true,isolate_patch_reference,
+            expression_domain,gen_true,isolate_patch_callexp,
             statement_domain,gen_true,isolate_patch_statement,
             0);
 }
@@ -203,48 +228,62 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
     reference ref = region_any_reference(r);
-    Psysteme sc = sc_dup(region_system(r));
-    sc_transform_eg_in_ineg(sc);
-    FOREACH(EXPRESSION,index,reference_indices(ref))
+    for(list iter = reference_indices(ref);!ENDP(iter); POP(iter))
     {
+        expression index = EXPRESSION(CAR(iter));
         Variable phi = expression_to_entity(index);
-        Pcontrainte lower,upper;
-        constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
-        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
-        {
-            /* this is a constant : the dimension is 1 and the offset is the bound */
-            if(bounds_equal_p(phi,lower,upper))
+        if(variable_phi_p((entity)phi)) {
+            Psysteme sc = sc_dup(region_system(r));
+            sc_transform_eg_in_ineg(sc);
+            Pcontrainte lower,upper;
+            constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
+            if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
             {
-                expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
-                *offsets=CONS(EXPRESSION,bound,*offsets);
-            }
-            /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
-            else
-            {
-                expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                if(expression_minmax_p(elower))
-                    simplify_minmax_expression(elower,tr);
-                if(expression_minmax_p(eupper))
-                    simplify_minmax_expression(eupper,tr);
-                expression offset = copy_expression(elower);
+                /* this is a constant : the dimension is 1 and the offset is the bound */
+                if(bounds_equal_p(phi,lower,upper))
+                {
+                    expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
+                    *offsets=CONS(EXPRESSION,bound,*offsets);
+                }
+                /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
+                else
+                {
+                    expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    if(expression_minmax_p(elower))
+                        simplify_minmax_expression(elower,tr);
+                    if(expression_minmax_p(eupper))
+                        simplify_minmax_expression(eupper,tr);
+                    expression offset = copy_expression(elower);
 
-                expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
-                    upperbound_of_expression(dim,tr);
+                    expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
+                    if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
+                        upperbound_of_expression(dim,tr);
 
-                *dims=CONS(DIMENSION,
-                        make_dimension(
-                            int_to_expression(0),
-                            dim
-                            ),*dims);
-                *offsets=CONS(EXPRESSION,offset,*offsets);
+                    *dims=CONS(DIMENSION,
+                            make_dimension(
+                                int_to_expression(0),
+                                dim
+                                ),*dims);
+                    *offsets=CONS(EXPRESSION,offset,*offsets);
+                }
             }
+            else {
+                pips_user_warning("failed to analyse region\n");
+                sc_free(sc);
+                return false;
+            }
+            sc_free(sc);
         }
-        else {
-            pips_user_warning("failed to analyse region\n");
-            return false;
+        /* index is a field ... */
+        else { /* and the last field, store it as an extra dimension */
+            *dims=CONS(DIMENSION,
+                    make_dimension(
+                        int_to_expression(0),
+                        int_to_expression(0)
+                        ),*dims);
+            *offsets=CONS(EXPRESSION,copy_expression(index),*offsets);
         }
     }
     *dims=gen_nreverse(*dims);
@@ -272,7 +311,10 @@ static list isolate_merge_offsets(list global, list local)
     FOREACH(EXPRESSION,gexp,global)
     {
         expression lexp = EXPRESSION(CAR(local));
-        out=CONS(EXPRESSION,make_op_exp(PLUS_OPERATOR_NAME,copy_expression(gexp),copy_expression(lexp)),out);
+        if(entity_field_p(reference_variable(expression_reference(lexp))))
+            out=CONS(EXPRESSION,copy_expression(lexp),out);
+        else
+            out=CONS(EXPRESSION,make_op_exp(PLUS_OPERATOR_NAME,copy_expression(gexp),copy_expression(lexp)),out);
         POP(local);
     }
     return gen_nreverse(out);
@@ -356,6 +398,34 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
             );
 }
 
+/* because of the way we build offsets list, it may contains struct field
+ * so we cannot rely on make_reference only
+ * fixes entity type as well ...
+ * fix it here
+ */
+static expression offsets_to_expression(entity e, list offsets)
+{
+    entity f = entity_undefined;
+    size_t where = 0;
+    FOREACH(EXPRESSION,exp,offsets) {
+        if(entity_field_p(f=reference_variable(expression_reference(exp))))
+            break;
+        where++;
+    }
+    list tail = gen_nthcdr(where,offsets);
+    if(where) {
+        CDR(gen_nthcdr(where-1,offsets))=NIL;
+    }
+    if(ENDP(tail))
+        return reference_to_expression(make_reference(e,offsets));
+    else {
+        return binary_intrinsic_expression(
+                FIELD_OPERATOR_NAME,
+                reference_to_expression(make_reference(e,offsets)),
+                offsets_to_expression(f,CDR(tail)));
+    }
+}
+
 /** 
  * @return a statement holding the loop necessary to initialize @p new from @p old,
  * knowing the dimension of the isolated entity @p dimensions and its offsets @p offsets and the direction of the transfer @p t
@@ -369,15 +439,16 @@ static statement isolate_make_loop_array_transfer(entity old,entity new, list di
         isolate_merge_offsets(index_expressions,offsets);
 
 
-    statement body = make_assign_statement(
-            reference_to_expression(
-                make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset)
-                ),
-            reference_to_expression(
-                make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions)
-                )
-            );
+    expression e0 = offsets_to_expression(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
+               e1 = offsets_to_expression(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
 
+    if(transfer_in_p(t)) {
+        basic b = basic_of_expression(e1);
+        free_basic(variable_basic(type_variable(entity_type(new))));
+        variable_basic(type_variable(entity_type(new)))=b;
+    }
+
+    statement body = make_assign_statement(e0,e1);
     FOREACH(DIMENSION,d,dimensions)
     {
         entity index = ENTITY(CAR(index_entities));
