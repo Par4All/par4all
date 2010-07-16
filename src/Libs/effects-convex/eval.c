@@ -55,7 +55,10 @@
  */
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1, 
 				       reference r2, descriptor d2, 
+<<<<<<< HEAD
 				       transformer current_precondition, 
+=======
+>>>>>>> new phase to compute constant path regions using points-to.
 				       bool * exact_p)
 {
   bool res = true;
@@ -111,6 +114,7 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	    }
 	  else
 	    {
+<<<<<<< HEAD
 	      
 	      pips_debug_effect(8, "reg2 before eliminating phi variables: \n ", reg2);
 	
@@ -133,6 +137,9 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	      pips_debug_effect(8, "reg1 after adding preconditions: \n ", reg1);
 	
 	      list ld = region_sup_difference(reg1_dup, reg2_dup);
+=======
+	      list ld = region_sup_difference(reg1, reg2);
+>>>>>>> new phase to compute constant path regions using points-to.
 	      if (ENDP(ld))
 		{
 		  res = true;
@@ -159,7 +166,11 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
   else
     {
       res = false;
+<<<<<<< HEAD
       *exact_p = true;
+=======
+      *exact_p = false;
+>>>>>>> new phase to compute constant path regions using points-to.
     }
 
   pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
@@ -221,10 +232,17 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
   This function is called by effects to see if a convex memory access path
   can be transformed into a constant one. 
 */
+<<<<<<< HEAD
 list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p, transformer current_precondition)
 {
   
   return generic_eval_cell_with_points_to(c, d, ptl, exact_p, current_precondition,
+=======
+list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p)
+{
+  
+  return generic_eval_cell_with_points_to(c, d, ptl, exact_p,
+>>>>>>> new phase to compute constant path regions using points-to.
 					  convex_cell_reference_preceding_p,
 					  convex_cell_reference_with_address_of_cell_reference_translation,
 					  simple_reference_to_convex_reference_conversion);
