@@ -452,12 +452,6 @@ static statement isolate_make_loop_array_transfer(entity old,entity new, list di
                e1 = region_reference_to_expression(fake1);
     free_reference(fake0), free_reference(fake1);
 
-    if(transfer_in_p(t)) {
-        basic b = basic_of_expression(e1);
-        free_basic(variable_basic(type_variable(entity_type(new))));
-        variable_basic(type_variable(entity_type(new)))=b;
-    }
-
     statement body = make_assign_statement(e0,e1);
     FOREACH(DIMENSION,d,dimensions)
     {
