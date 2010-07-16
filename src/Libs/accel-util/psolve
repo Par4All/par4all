@@ -19,6 +19,6 @@ for line in fd.readlines():
 			pmatch = answer.match(pline)
 			if pmatch:
 				pans=pmatch.groups()[0].split(',')
-				print sub(r'([0-9a-zA-Z]+)\^([0-9a-zA-Z]+)',r'pow(\1,\2)',pans[-1])
+				print sub(r'([0-9a-zA-Z]+)\^([0-9a-zA-Z]+)',r'pow(\1,\2)',pans[-1]),';'
 	else:
-			print line,
+		print line,

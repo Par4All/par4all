@@ -189,7 +189,10 @@ static bool do_solve_hardware_constraints(statement s)
     /* call an external solver */
     char *scilab_cmd;
     asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s' '%s'",full_poly,entity_user_name(e));
-    add_pragma_str_to_statement(s,scilab_cmd,false);
+    /* must put the pragma on anew statement, because the pragma will be changed into a statement later */
+    statement holder = make_continue_statement(entity_empty_label());
+    add_pragma_str_to_statement(holder,scilab_cmd,false);
+    insert_statement(s,holder,true);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
