@@ -2544,8 +2544,9 @@ type ultimate_type(type t)
            * a warning is printed out, so that we don't forget it
            */
           static type holder = type_undefined;// SG: this should avoid the leak;
+          nt=copy_type(nt);
           if(!type_undefined_p(holder)) free_type(holder);
-          nt=holder=copy_type(nt);
+          holder=nt;
           variable_dimensions(type_variable(nt))=gen_nconc(gen_full_copy_list(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
 
       }
@@ -2570,6 +2571,7 @@ type ultimate_type(type t)
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 
+  pips_assert("type consistent",type_consistent_p(nt));
   return nt;
 }
 
