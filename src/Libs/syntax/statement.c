@@ -1740,7 +1740,7 @@ cons *lio;
     if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
       if( ! expression_undefined_p(unit) )
 	free_expression(unit);
-      unit = copy_expression(EXPRESSION(CAR(CDR(l))));
+      unit = EXPRESSION(CAR(CDR(l)));
     }
   }
 

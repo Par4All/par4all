@@ -230,6 +230,7 @@ bool create_workspace(gen_array_t files)
 
       l = workspace_language(files);
       activate_language(l);
+      free_language(l);
     }
 
     if (!success)
