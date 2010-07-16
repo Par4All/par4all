@@ -110,6 +110,21 @@ static int shc_sort(Pvecteur *v0, Pvecteur *v1)
 
 #define SCILAB_PSOLVE "psolve"
 
+static bool statement_parent_walker(statement s, statement *param)
+{
+    if(s == param[0]) {
+        param[1]=(statement)gen_get_ancestor(statement_domain,s);
+        gen_recurse_stop(NULL);
+    }
+    return true;
+}
+static statement statement_parent(statement root, statement s)
+{
+    statement args[] = { s, statement_undefined };
+    gen_context_recurse(root,args,statement_domain,statement_parent_walker,gen_null);
+    return args[1] == NULL || statement_undefined_p(args[1]) ? s : args[1];
+}
+
 /* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
 static bool do_solve_hardware_constraints(statement s)
 {
@@ -162,6 +177,8 @@ static bool do_solve_hardware_constraints(statement s)
                 for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
                     base_names[i++]=entity_user_name((entity)b->var);
 
+                ifdebug(1) print_region(hregion);
+
                 Pehrhart er = sc_enumerate(rw_sc,
                         local_base,
                         base_names);
@@ -192,7 +209,8 @@ static bool do_solve_hardware_constraints(statement s)
     /* must put the pragma on anew statement, because the pragma will be changed into a statement later */
     statement holder = make_continue_statement(entity_empty_label());
     add_pragma_str_to_statement(holder,scilab_cmd,false);
-    insert_statement(s,holder,true);
+    statement parent = statement_parent(get_current_module_statement(),s);
+    insert_statement(parent,holder,true);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
@@ -203,6 +221,7 @@ static bool do_solve_hardware_constraints(statement s)
 
 bool solve_hardware_constraints(const char * module_name)
 {
+    debug_on("SOLVE_HARDWARE_CONSTRAINTS");
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
@@ -227,5 +246,6 @@ bool solve_hardware_constraints(const char * module_name)
     reset_cumulated_rw_effects();
     reset_precondition_map();
     free_value_mappings();
+    debug_off();
     return result;
 }
