@@ -1,15 +1,24 @@
-#!/bin/sh
-# called as psolve 'mypoly' 'symbolic variable name'
-# prints out first positive answer
-scilab-cli -nb <<EOF
-n=poly(0,'$2');
-p=$1;
-r=roots(p);
-for x =r'
-	if conj(x)==x & abs(x) == x
-		mfprintf(6,"%f\n",x);
-		exit(0)
-	end
-end
-exit(1)
-EOF
+#!/usr/bin/env python
+from sys import argv
+from re import compile,sub
+from subprocess import Popen, PIPE
+
+fd=file(argv[1])
+pragma=compile(r'#pragma psolve \'([^\']+)\' +\'([^\']+)\'')
+answer=compile(r'\(\%o1\)\s+\[(.*)\]')
+
+for line in fd.readlines():
+	match = pragma.match(line)
+	if match:
+		poly = match.groups()[0]
+		var = match.groups()[1]
+		cmd=['maxima','-q','--batch-string','string(solve('+poly+'=0,'+var+'));']
+		pid=Popen(cmd,stdout=PIPE)
+		pid.wait()
+		for pline in pid.stdout.readlines():
+			pmatch = answer.match(pline)
+			if pmatch:
+				pans=pmatch.groups()[0].split(',')
+				print sub(r'([0-9a-zA-Z]+)\^([0-9a-zA-Z]+)',r'pow(\1,\2)',pans[-1])
+	else:
+			print line,

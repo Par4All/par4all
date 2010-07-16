@@ -99,7 +99,6 @@ expression region_enumerate(region r,transformer tr)
     }
     return volume;
 }
-#endif
 static Variable sort_key;
 static int shc_sort(Pvecteur *v0, Pvecteur *v1)
 {
@@ -107,8 +106,9 @@ static int shc_sort(Pvecteur *v0, Pvecteur *v1)
     if((*v1)->var==sort_key) return -1;
     return compare_entities((entity*)&(*v0)->var,(entity*)&(*v1)->var);
 }
+#endif
 
-#define SCILAB_PSOLVE "./psolve"
+#define SCILAB_PSOLVE "psolve"
 
 /* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
 static bool do_solve_hardware_constraints(statement s)
@@ -127,8 +127,6 @@ static bool do_solve_hardware_constraints(statement s)
     entity e = string_to_entity(get_string_property("SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN"),get_current_module_entity());
     if(entity_undefined_p(e))
         pips_user_error("must provide the unknown value\n");
-    Pbase pb = (Pbase) vect_new(e,-1);
-    sort_key = e;
     /* } */
 
     FOREACH(REGION,reg,regions)
@@ -149,14 +147,24 @@ static bool do_solve_hardware_constraints(statement s)
                     region_undefined_p(write_region)?read_region:
                     regions_must_convex_hull(read_region,write_region);
 
-                Psysteme rw_sc = region_system(rw_region);
-                vect_sort_in_place(&sc_base(rw_sc),shc_sort);
+                region hregion = rw_region;//region_hypercube(rw_region);
+                Psysteme rw_sc = region_system(hregion);
+                sc_fix(rw_sc);
+                Pbase sorted_base = region_sorted_base_dup(hregion);
+                sc_base(rw_sc)=sorted_base;
+                Pbase local_base = BASE_NULLE;
+                for(Pbase b = sc_base(rw_sc);!BASE_NULLE_P(b);b=b->succ)
+                    if(!variable_phi_p((entity)b->var))
+                        local_base=base_add_variable(local_base,b->var);
+
                 const char * base_names [sc_dimension(rw_sc)];
                 int i=0;
-                for(Pbase b = sc_base(rw_sc);!BASE_NULLE_P(b);b=b->succ)
-                    base_names[i]=entity_user_name((entity)b->var);
+                for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
+                    base_names[i++]=entity_user_name((entity)b->var);
 
-                Pehrhart er = sc_enumerate(rw_sc,pb,base_names);
+                Pehrhart er = sc_enumerate(rw_sc,
+                        local_base,
+                        base_names);
                 if(er) {
                     char ** ps = Pehrhart_string(er,base_names);
                     volume_used[volume_index++]=ps[0];/* use first ... */
@@ -180,21 +188,8 @@ static bool do_solve_hardware_constraints(statement s)
     }
     /* call an external solver */
     char *scilab_cmd;
-    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s'",full_poly);
-    FILE* scilab_response = popen(scilab_cmd,"r");
-    if(!scilab_response) pips_user_error("failed to solve polynomial %s\n",full_poly);
-    float fresponse=0.;
-    if(fscanf(scilab_response,"%f",&fresponse)!=1)
-        pips_user_error("failed to scan "SCILAB_PSOLVE"response\n");
-    if(pclose(scilab_response))
-        pips_user_error("failed to call "SCILAB_PSOLVE" %s\n",full_poly);
-
-    /* if the result is an integer, we have won, otherwise, try near integers */
-    int iresponse = (int)fresponse;
-    /* assume it will be ok with nearset integer , should do more check there ... */
-    insert_statement(s,
-            make_assign_statement(entity_to_expression(e),int_to_expression(iresponse)),
-            true);
+    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s' '%s'",full_poly,entity_user_name(e));
+    add_pragma_str_to_statement(s,scilab_cmd,false);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
