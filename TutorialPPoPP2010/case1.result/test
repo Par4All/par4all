@@ -300,7 +300,8 @@ int main()
          b[i][j] = 1.0;
    h = 2.0;
 
-//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    2.0==h, i==11, j==11}>
 
    func1(10, 10, a, b, h);
 
@@ -377,7 +378,7 @@ int main()
    h = 2.0;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#1==11, 2.0==h, j==11}>
+//    *SEMANTICS*:o#1==11, 2.0==h, i==11, j==11}>
 
    func1(10, 10, a, b, h);
    for(i = 1; i <= 10; i += 1)
