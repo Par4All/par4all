@@ -2,7 +2,9 @@ delete declarations
 create declarations declarations.c declarations_.c declarations__.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[d1]
+display PRINTED_FILE[d2]
+display PRINTED_FILE[d3]
 
 close
 delete declarations
