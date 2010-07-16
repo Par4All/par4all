@@ -506,7 +506,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 	    asprintf(&variable_name, format, DEFAULT_UNION_PREFIX,
 		     unique_string_number++);
 	}
-	if(type_enum_p(dt)) {
+    else if(type_enum_p(dt)) {
 	   asprintf(&variable_name, format, DEFAULT_ENUM_PREFIX,
 		    unique_string_number++);
 	}
