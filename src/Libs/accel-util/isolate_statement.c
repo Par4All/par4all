@@ -75,27 +75,29 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         list offsets = p->offsets;
         FOREACH(EXPRESSION,index,reference_indices(r))
         {
-            expression offset = EXPRESSION(CAR(offsets));
-            if(!entity_field_p(reference_variable(expression_reference(offset)))){
-                update_expression_syntax(index,
-                    make_syntax_call(
-                            make_call(
-                                entity_intrinsic(MINUS_OPERATOR_NAME),
-                                make_expression_list(
-                                    copy_expression(index),
-                                    copy_expression(offset)
+            if(!ENDP(offsets)) {
+                expression offset = EXPRESSION(CAR(offsets));
+                if(!entity_field_p(reference_variable(expression_reference(offset)))){
+                    update_expression_syntax(index,
+                            make_syntax_call(
+                                make_call(
+                                    entity_intrinsic(MINUS_OPERATOR_NAME),
+                                    make_expression_list(
+                                        copy_expression(index),
+                                        copy_expression(offset)
+                                        )
                                     )
                                 )
-                            )
-                    );
+                            );
+                }
+                POP(offsets);
             }
-            POP(offsets);
         }
     }
 }
 static void isolate_patch_callexp(expression exp, isolate_param *p)
 {
-    if(expression_call_p(exp)) {
+    if(false && expression_call_p(exp)) {
         call c = expression_call(exp);
         entity op = call_function(c);
         if(ENTITY_FIELD_P(op))
@@ -492,6 +494,68 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
         return isolate_make_call_array_transfer(old,new,offsets,t,transfer_func);
 
 }
+static void region_remove_fields(region reg) {
+    for(list prev=NIL,iter = reference_indices(region_any_reference(reg));!ENDP(iter);POP(iter)) {
+        expression index = EXPRESSION(CAR(iter));
+        if(entity_field_p(reference_variable(expression_reference(index)))){
+            if(!ENDP(CDR(iter))) pips_internal_error("cas not handled, SG should think more about this\nCurrently only last index as field is managed\n");
+            if(!ENDP(prev)) {
+                gen_full_free_list(iter);
+                CDR(prev)=NIL;
+            }
+            break;
+        }
+        prev=iter;
+    }
+}
+
+static list filter_regions(list regions) {
+    list fregions=NIL;
+    set read_regions = set_make(set_pointer);
+    set write_regions = set_make(set_pointer);
+    for(list iter = regions;!ENDP(iter);POP(iter)){
+        region reg = REGION(CAR(iter));
+        entity e = reference_variable(region_any_reference(reg));
+        
+        if(region_read_p(reg)) {
+            if(!set_belong_p(read_regions,e)) {
+                region curr = region_dup(reg);
+                region_remove_fields(curr);
+                set_add_element(read_regions,read_regions,e);
+                FOREACH(REGION,regn,CDR(iter)) {
+                    entity en = reference_variable(region_any_reference(regn));
+                    if(same_entity_p(en,e)&&region_read_p(regn)) {
+                        region ncurr = region_dup(regn);
+                        region_remove_fields(ncurr);
+                        region tmp = regions_must_convex_hull(curr,ncurr);
+                        region_free(curr);
+                        region_free(ncurr);
+                        curr=tmp;
+                    }
+                }
+                fregions=CONS(REGION,curr,fregions);
+            }
+        }
+        else {
+            if(!set_belong_p(write_regions,e)) {
+                region curr = region_dup(reg);
+                set_add_element(write_regions,write_regions,e);
+                FOREACH(REGION,regn,CDR(iter)) {
+                    entity en = reference_variable(region_any_reference(regn));
+                    if(same_entity_p(en,e)&&region_write_p(regn)) {
+                        region tmp = regions_must_convex_hull(curr,regn);
+                        region_free(curr);
+                        curr=tmp;
+                    }
+                }
+                fregions=CONS(REGION,curr,fregions);
+            }
+        }
+    }
+    set_free(read_regions);
+    set_free(write_regions);
+    return gen_nreverse(fregions);
+}
 
 /** 
  * isolate statement @p s from the outer memory, generating appropriate local array copy and copy code
@@ -499,15 +563,16 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
 static void do_isolate_statement(statement s)
 {
     list regions = load_cumulated_rw_effects_list(s);
+    list pregions = filter_regions(regions);
 
-    list read_regions = regions_read_regions(regions);
-    list write_regions = regions_write_regions(regions);
+    list read_regions = regions_read_regions(pregions);
+    list write_regions = regions_write_regions(pregions);
     transformer tr = transformer_range(load_statement_precondition(s));
 
     statement prelude=make_empty_block_statement(),postlude=make_empty_block_statement();
     set visited_entities = set_make(set_pointer);
 
-    FOREACH(REGION,reg,regions)
+    FOREACH(REGION,reg,pregions)
     {
         reference r = region_any_reference(reg);
         entity e = reference_variable(r);

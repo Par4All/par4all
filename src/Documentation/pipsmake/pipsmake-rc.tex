@@ -7154,7 +7154,7 @@ Use \PipsPropRef{SYMBOLIC_TILING_FORCE} to bypass condition checks.
 \end{PipsPass}
 \begin{PipsMake}
 symbolic_tiling > MODULE.code
-	! MODULE.internalize_parallel_code
+	! MODULE.coarse_grain_parallelization
 	< PROGRAM.entities
 	< MODULE.code
 	< MODULE.cumulated_effects
