@@ -42,12 +42,12 @@ int main(int argc, char *argv[])
    Cplfloat cpl[10];
    int i;
 
-//  <cpl[PHI1][.re]-W-EXACT-{}>
+//  <cpl[PHI1][.re]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
-//  <cpl[PHI1][.re]-W-EXACT-{PHI1==i}>
+//  <cpl[PHI1][.re]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       call19(&cpl[i].re);
    return 0;

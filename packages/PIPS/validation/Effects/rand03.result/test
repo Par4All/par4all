@@ -327,13 +327,13 @@ int main()
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <pt_in[PHI1][PHI2][.im]-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
+//    PHI2+1<=nx, nx==10, ny==10}>
 //  <pt_in[PHI1][PHI2][.re]-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
+//    PHI2+1<=nx, nx==10, ny==10}>
 //  <pt_out[PHI1][PHI2][.im]-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
+//    PHI2+1<=nx, nx==10, ny==10}>
 //  <pt_out[PHI1][PHI2][.re]-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
+//    PHI2+1<=nx, nx==10, ny==10}>
 
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
