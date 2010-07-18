@@ -69,9 +69,8 @@ Variable list:
 	Declared entity "sizeofArray02!:*STACK*" with type "area" with size 0
 	Declared entity "sizeofArray02!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int x int -> void"
 
 Layouts for memory areas:
 
@@ -101,7 +100,7 @@ Parsed code
 
 //Checks the memory allocation offsets of non continous arrays of dynamic sizes.
 
-extern void foo(int m, int n);
+void foo(int m, int n);
 void foo(int m, int n)
 {
    int A[m];

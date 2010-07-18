@@ -19,5 +19,5 @@ PRINTED FILE for "decl37!"
 
 typedef char *string;
 
-extern void decl37();
+void decl37();
 

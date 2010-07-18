@@ -4,7 +4,7 @@ Parsed code for "void_func_prt"
 /* Bug in handling the functional pointer, probably interpreted as a
    function. No fix but work around the bug in util.c,
    RemoveFromExterns() */
-extern void void_func_ptr(void (*func)(void *));                        /*0004*/
+void void_func_ptr(void (*func)(void *));                               /*0004*/
 void void_func_ptr(void (*func)(void *))
 {
 }

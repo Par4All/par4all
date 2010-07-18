@@ -1,8 +1,8 @@
 void f(void)
 {
 }
-extern void f(void);                                                    /*0001*/
+void f(void);                                                           /*0001*/
 void f(void)
 {
 }
-extern void f(void);                                                    /*0001*/
+void f(void);                                                           /*0001*/

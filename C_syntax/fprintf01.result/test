@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "fprintf01!:*STACK*" with type "area" with size 0
 	Declared entity "fprintf01!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:fprintf01"	with type "functional" "char * x varargs:overloaded -> int"
 
 Layouts for memory areas:
 

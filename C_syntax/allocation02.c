@@ -1,4 +1,5 @@
-//Check Memory Allocation offsets for local dynamic and global variables of known sizes in one C file
+// Check Memory Allocation offsets for local dynamic and global
+// variables of known sizes in one C file
 
 int global1;
 int global2;
@@ -12,5 +13,5 @@ int main()
 {
   int k;
   foo();
-  return 0; 
+  return 0;
 }

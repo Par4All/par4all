@@ -42,7 +42,7 @@ Unsplit goto
 /*
  * file for goto.c
  */
-extern int main();
+int main();
 int main()
 {
    int i = 0;

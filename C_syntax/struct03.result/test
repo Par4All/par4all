@@ -15,4 +15,4 @@ typedef union {
    long int __align;
 } pthread_mutex_t;
 
-extern void main();
+void main();

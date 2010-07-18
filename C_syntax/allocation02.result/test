@@ -17,10 +17,8 @@ Variable list:
 	Declared entity "allocation02!:*STACK*" with type "area" with size 0
 	Declared entity "allocation02!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 

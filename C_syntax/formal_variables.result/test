@@ -1,9 +1,9 @@
 void foo(int a, double b)
 {
 }
-extern int main();
+int main();
 
-extern void foo(int a, double b);
+void foo(int a, double b);
 int main()
 {
 }

@@ -18,7 +18,7 @@ void decl36(int i);
 
 void decl36(int i);
 
-extern int main();
+int main();
 
 void decl36(int i);
 

@@ -4,7 +4,7 @@
    Simplified version of enum09.c, for easier debugging
  */
 
-extern void enum10();
+void enum10();
 
 void enum10()
 {

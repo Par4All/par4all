@@ -5,4 +5,4 @@ parsed printed file
 
 typedef unsigned long int __dev_t;
 
-extern unsigned int foo();
+unsigned int foo();

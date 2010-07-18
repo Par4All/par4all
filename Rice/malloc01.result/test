@@ -46,6 +46,7 @@ void malloc01()
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
+//               <must be written>: i
    int i;
 //               <must be written>: i
 
@@ -65,6 +66,7 @@ void malloc01()
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
+//               <must be written>: i
    int i;
 //               <may be read    >: i p
 //               <may be written >: p[*]
@@ -91,6 +93,9 @@ void malloc01()
 
    int *p = malloc(10*sizeof(int));
    //int p[10];
+
+//  <i-W-EXACT-{}>
+
    int i;
 
 //  <i-R-EXACT-{}>

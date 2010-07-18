@@ -9,7 +9,7 @@ PARSED PRINTED FILE FOR MODULE comment02!
 int filter(int x);
 
 /* Comment of a function body*/
-extern int main();
+int main();
 
 int filter(int x);
 

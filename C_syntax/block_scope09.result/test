@@ -16,9 +16,8 @@ Variable list:
 	Declared entity "block_scope09!:*STACK*" with type "area" with size 0
 	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:block_scope09"	with type "functional" "int -> int"
 
 Layouts for memory areas:
 
@@ -113,7 +112,7 @@ int x = 1;
 int y = 2;
 
 // The formal parameter hides the global x
-extern int block_scope09(int x);
+int block_scope09(int x);
 
 int block_scope09(int x)
 {

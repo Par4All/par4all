@@ -56,7 +56,7 @@ End of declarations for module array02
 
 /* check the impact of sizeof() for Serge */
 
-extern int array02();
+int array02();
 int array02()
 {
    int a[sizeof(int)];
