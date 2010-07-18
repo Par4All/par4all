@@ -1,0 +1,10 @@
+delete array_to_pointer
+create array_to_pointer array_to_pointer.c
+
+display PRINTED_FILE[%ALL]
+apply ARRAY_TO_POINTER[%ALL]
+display PRINTED_FILE[%ALL]
+
+
+quit
+
