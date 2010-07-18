@@ -1,0 +1,30 @@
+
+
+typedef double fftw_complex[2];
+
+extern int main(int argc, char **argv);
+int main(int argc, char **argv)
+{
+   fftw_complex cdens[1024];
+   int i;
+   for(i = 0; i <= 1024; i += 1) {
+      cdens[i][0] = 1;
+      cdens[i][1] = 0;
+   }
+   return 0;
+}
+
+
+typedef double fftw_complex[2];
+
+extern int main(int argc, char **argv);
+int main(int argc, char **argv)
+{
+   fftw_complex cdens[1024];
+   int i;
+   for(i = 0; i <= 1024; i += 1) {
+      *((fftw_complex *) cdens+i)[0] = 1;
+      *((fftw_complex *) cdens+i)[1] = 0;
+   }
+   return 0;
+}
