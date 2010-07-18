@@ -1016,11 +1016,12 @@ entity FindOrCreateCurrentEntity(string name,
 		 compilation unit to help code prettyprint unless if
 		 has already been declared earlier in the current
 		 compilation unit. See C_syntax/global_extern.c */
+	      entity com_unit = get_current_compilation_unit_entity();
+	      code c = value_code(entity_initial(com_unit));
+	      list el = code_externs(c);
 	      if(type_undefined_p(entity_type(ent))
 		 || intrinsic_entity_p(ent)) {
 		/* ent has not been declared earlier */
-		entity com_unit = get_current_compilation_unit_entity();
-		list el = code_externs(value_code(entity_initial(com_unit)));
 		//ram_shared(storage_ram(entity_storage(com_unit))) =
 		//gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
 		pips_debug(8, "Variable \"%s\" added to external declarations of \"%s\"\n",
@@ -1028,20 +1029,41 @@ entity FindOrCreateCurrentEntity(string name,
 		pips_assert("ent is an entity", entity_domain_number(ent)==entity_domain);
 		pips_assert("com_unit is an entity", entity_domain_number(com_unit)==entity_domain);
 		pips_assert("el is a pure entity list", entity_list_p(el));
-		code_externs(value_code(entity_initial(com_unit))) =
-		  gen_nconc(code_externs(value_code(entity_initial(com_unit))), CONS(ENTITY,ent,NIL));
+		//code_externs(c) = gen_nconc(el,
+		//CONS(ENTITY,ent,NIL));
+		AddToExterns(ent, com_unit);
+		AddToExterns(ent, com_unit);
 		el = code_externs(value_code(entity_initial(com_unit)));
 		pips_assert("el is a pure entity list", entity_list_p(el));
 	      }
+	      else if(!gen_in_list_p(ent, el)
+		      && !type_undefined_p(entity_type(ent))
+		      && !type_functional_p(entity_type(ent))) {
+		/* A global entity may already have been seen in a
+		   previous compilation unit and so it is already
+		   typed but still must be declared as extern. See
+		   test case C_syntax/declarations.c */
+		/* The bad news is: function are not yet fully typed
+		   when this is executed and their type is "variable",
+		   the future result type; hence, they are declared
+		   "extern" no matter what... Do we want to clean up
+		   the code_externs list later since the extern
+		   keyword is useless for functions? No other simple
+		   solution found... */
+		/* FI: The test above may be stronger than the previous one,
+		   but I'm pretty conservative when dealing with the
+		   parser. */
+		AddToExterns(ent, com_unit);
+	      }
 	    }
-	  else if(strstr(full_scope,TOP_LEVEL_MODULE_NAME)!=NULL){
-	    if(!compilation_unit_entity_p(function=get_current_module_entity())) 
+	  else if(strstr(full_scope,TOP_LEVEL_MODULE_NAME)!=NULL) {
+	    if(!compilation_unit_entity_p(function=get_current_module_entity()))
 	      if(type_undefined_p(entity_type(ent))
 		 || !type_functional_p(entity_type(ent))) {
-	    /* This variable is declared extern within a function
-	       body. */
-	    AddToExterns(ent, function);
-          }
+		/* This variable is declared extern within a function
+		   body. */
+		AddToExterns(ent, function);
+	      }
 	  }
 	  else {
 	    /* Impossible: this is not detected here  */
@@ -1421,7 +1443,7 @@ void UpdateFunctionEntity(entity oe, list la)
   //string sn = local_name_to_scope(oeln);
   //entity ne = oe;
 
-  pips_debug(3,"Update function entity %s\n",entity_name(oe));
+  pips_debug(3,"Update function entity \"%s\"\n",entity_name(oe));
 
   ifdebug(8) {
     pips_debug(8, "with type list la: ");

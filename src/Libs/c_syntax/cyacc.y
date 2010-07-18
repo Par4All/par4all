@@ -2746,6 +2746,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
     rest_par_list TK_RPAREN
                         {
+			  entity m = get_current_module_entity();
 			  entity e = GetFunction();
 			  entity ne = e;
 			  PopFunction();
@@ -2766,9 +2767,15 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			      ne = RenameFunctionEntity(e);
 			  }
 			  UpdateFunctionEntity(ne,$4);
+			  /* No need to declare C user functions
+			     extern in a compilation unit; they are
+			     global or local. */
+			  if(!entity_undefined_p(m)
+			     && compilation_unit_entity_p(m)
+			     && !intrinsic_entity_p(ne))
+			    RemoveFromExterns(ne);
 			  $$ = ne;
-			}
-;
+			};
 
 parameter_list_startscope:
     TK_LPAREN
