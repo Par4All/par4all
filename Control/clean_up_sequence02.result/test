@@ -2,7 +2,7 @@ Try to restructure the code for more precision:
 // (0,1)
 // BEGIN BLOCK
 // (0,2)
-extern int main(int argc, char *argv[]);                                /*0001*/
+int main(int argc, char *argv[]);                                       /*0001*/
 // END BLOCK
 int main(int argc, char *argv[])
 {

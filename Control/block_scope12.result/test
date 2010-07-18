@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "block_scope12!:*STACK*" with type "area" with size 0
 	Declared entity "block_scope12!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:block_scope"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 
@@ -103,7 +102,7 @@ Parser output
 // (statement ordering unavailable)
 // BEGIN BLOCK
 // (statement ordering unavailable)
-extern int block_scope();
+int block_scope();
 // END BLOCK
 
 int block_scope()

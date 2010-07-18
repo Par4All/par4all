@@ -7,7 +7,7 @@ struct a {
    int c[10];
 };
 
-extern int foo();
+int foo();
 int foo()
 {
    struct a b;
@@ -20,4 +20,4 @@ struct a {
    int c[10];
 };
 
-extern int foo();
+int foo();

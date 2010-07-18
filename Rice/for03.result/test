@@ -13,15 +13,9 @@ Check the proper effects
 
 void for03(int n)
 {
-//               <must be written>: j
    int j;
-//               <may be written >: e1[.x][*]
-//               <must be written>: e1[.next]
    al_t e1;
-//               <may be written >: e2[.x][*]
-//               <must be written>: e2[.next]
    al_t e2;
-//               <must be written>: delta_t t t_max
    float t, delta_t, t_max;
 //               <must be written>: e1[.next]
 
@@ -43,15 +37,7 @@ Check the regions
 void for03(int n)
 {
    int j;
-
-//  <e1[.next]-W-EXACT-{}>
-//  <e1[.x][PHI2]-W-MAY-{}>
-
    al_t e1;
-
-//  <e2[.next]-W-EXACT-{}>
-//  <e2[.x][PHI2]-W-MAY-{}>
-
    al_t e2;
    float t, delta_t, t_max;
 
@@ -91,22 +77,6 @@ Chains
 	25 --> 29 with conflicts
 		from <e1[.next]-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
 		from <e1[.next]-W-MUST> to <e1[.next]-R-MUST>
-	23 --> 29 with conflicts
-		from <t_max-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-		from <t-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-		from <delta_t-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-	22 --> 29 with conflicts
-		from <e2[.x][PHI2]-W-MAY> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-		from <e2[.next]-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-	21 --> 29 with conflicts
-		from <e1[.next]-W-MUST> to <e1[.next][PHI2][.x][PHI4]-W-MUST>
-		from <e1[.next]-W-MUST> to <e1[.next]-R-MUST>
-	21 --> 28 with conflicts
-		from <e1[.x][PHI2]-W-MAY> to <e1[.x][PHI2]-W-MUST>
-	21 --> 25 with conflicts
-		from <e1[.next]-W-MUST> to <e1[.next]-W-MUST>
-	20 --> -1 with conflicts
-		from <j-W-MUST> to <j-W-MUST>
 
 ****************** End of Dependence Graph ******************
 

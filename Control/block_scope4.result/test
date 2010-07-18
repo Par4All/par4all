@@ -1,7 +1,7 @@
 // BEGIN BLOCK
 {{
    /* Jump into a block from a goto after the block */
-   extern void block_scope();                                           /*0002*/
+   void block_scope();                                                  /*0002*/
 }}
 // END BLOCK
 

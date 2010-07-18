@@ -11,9 +11,7 @@ Try to restructure the code for more precision:
 Check the proper effects
 void for01(int n)
 {
-//               <must be written>: i j
    int i, j;
-//               <may be written >: x[*]
    float x[100];
 //               <must be read   >: i n
 //               <must be written>: i

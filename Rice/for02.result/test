@@ -11,11 +11,8 @@ Try to restructure the code for more precision:
 Check the proper effects
 void for02(int n)
 {
-//               <must be written>: j
    int j;
-//               <may be written >: x[*]
    float x[100];
-//               <must be written>: delta_t t t_max
    float t, delta_t, t_max;
 //               <must be read   >: delta_t t_max
 //               <must be written>: t

@@ -15,7 +15,7 @@ Code after inlining
 
 static void test();
 
-extern void thetest();
+void thetest();
 void thetest()
 {
    test();
