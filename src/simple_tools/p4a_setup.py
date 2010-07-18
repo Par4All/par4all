@@ -448,7 +448,7 @@ def main(options, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-fv", os.path.join(newgen_src_dir, "makes") ])
+        run([ "rm", "-Rfv", os.path.join(newgen_src_dir, "makes") ])
         run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
 
         newgen_conf_opts = configure_opts
@@ -486,7 +486,7 @@ def main(options, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-fv", os.path.join(linear_src_dir, "makes") ])
+        run([ "rm", "-Rfv", os.path.join(linear_src_dir, "makes") ])
         run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
         linear_conf_opts = configure_opts
 
@@ -531,7 +531,7 @@ def main(options, args = []):
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-fv", os.path.join(pips_src_dir, "makes") ])
+        run([ "rm", "-Rfv", os.path.join(pips_src_dir, "makes") ])
         run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
 
         # Fix the following error:
