@@ -431,7 +431,7 @@ class p4a_processor:
             args += [ '--dest-dir', dest_dir ]
         args.append(file)
 
-        run(args)
+        run(args,force_locale = None)
         #~ subprocess.call(args)
 
 
