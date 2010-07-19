@@ -5,8 +5,6 @@ import tempfile
 import shutil
 import re
 from string import split, upper, join
-from subprocess import Popen, PIPE
-import sys
 
 pypips.atinit()
 
@@ -21,12 +19,17 @@ class loop:
 
 	@property
 	def label(self): return self._label
+	
+	@property
+	def module(self): return self._module
 
 	def display(self): self._module.display()
 
 	def loops(self):
 		self._module.flag_loops()
 		loops=pypips.module_loops(self._module.name,self._label)
+		if not loops:
+			return []
 		return map(lambda l:loop(self._module,l),str.split(loops," "))
 
 
@@ -47,18 +50,6 @@ class module:
 
 	@property
 	def name(self): return self._name
-
-	def run(self,cmd):
-		"""runs command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd 'path/to/module/src' > 'path/to/module/src''"""
-		self.print_code()
-		printcode_rc=os.path.join(self._ws.directory(),pypips.show("PRINTED_FILE",self.name))
-		code_rc=os.path.join(self._ws.directory(),pypips.show("C_SOURCE_FILE",self.name))
-		thecmd=cmd+[printcode_rc]
-		pypips.db_invalidate_memory_resource("C_SOURCE_FILE",self.name)
-		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
-		if pid.wait() != 0:
-			print sys.stderr > pid.stderr.readlines()
-
 
 	def show(self,rc):
 		"""returns the name of resource rc"""
@@ -87,7 +78,15 @@ class module:
 		else:
 			self.flag_loops()
 			loops=pypips.module_loops(self.name,"")
-			return map(lambda l:loop(self,l),str.split(loops," "))
+			if not loops:
+				return []
+			return map(lambda l:loop(self,l),loops.split(" "))
+	
+	def callers(self):
+		callers=pypips.get_callers_of(self.name)
+		if not callers:
+			return []
+		return callers.split(" ")
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
@@ -129,7 +128,7 @@ class modules:
 
 ### modules_methods /!\ do not touch this line /!\
 
-class workspace:
+class workspace(object):
 	"""top level element of the pyps hierarchy,
 		it represents a set of source files and provides methods
 		to manipulate them"""
@@ -224,22 +223,28 @@ class workspace:
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-		if not os.path.isdir(outdir): raise ValueError("'" + indir + "' is not a directory")
+		if not os.path.isdir(outdir): raise ValueError("'" + outdir + "' is not a directory")
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
 		if link:
 			if not outfile:
 				outfile=self._name
+			self.goingToRunWith(otmpfiles, outdir)
 			command+=otmpfiles
 			command+=[LDFLAGS]
 			command+=["-o", outfile]
 		else:
+			self.goingToRunWith(otmpfiles, outdir)
 			command+=["-c"]
 			command+=otmpfiles
 		#print "running", " ".join(command)
 		if os.system(" ".join(command)):
 			if not link: map(os.remove,otmpfiles)
 		return outfile
+	
+	# allows subclasses to tamper with the files before compiling
+	def goingToRunWith(self, files, outdir):
+		pass
 
 	def activate(self,phase):
 		"""activate a given phase"""
