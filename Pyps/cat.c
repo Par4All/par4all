@@ -61,28 +61,32 @@
 /*
  * file for cat.c
  */
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
-extern int main();
+/*
+ * file for cat.c
+ */
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
+int main();
 int main()
 {
    printf("I like dogs\n");
