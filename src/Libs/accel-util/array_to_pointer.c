@@ -64,7 +64,7 @@ expression reference_offset(reference ref)
         expression address_computation = copy_expression(EXPRESSION(CAR(reference_indices(ref))));
 
         /* iterate on the dimensions & indices to create the index expression */
-        list dims = variable_dimensions(type_variable(entity_type(reference_variable(ref))));
+        list dims = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(ref)))));
         list indices = reference_indices(ref);
         POP(indices);
         if(!ENDP(dims)) POP(dims); // the first dimension is unused
@@ -111,6 +111,13 @@ expression reference_offset(reference ref)
     }
 }
 
+static size_t pointer_depth(type t) {
+    basic b  = variable_basic(type_variable(t));
+    if(basic_pointer_p(b))
+        return 1 + pointer_depth(basic_pointer(b));
+    else return 0;
+}
+
 
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
@@ -129,7 +136,8 @@ bool expression_array_to_pointer(expression exp, bool in_init)
         {
             /* we need to check if we know the dimension of this reference */
             size_t nb_indices =gen_length(reference_indices(ref));
-            size_t nb_dims =gen_length(variable_dimensions(type_variable(entity_type(reference_variable(ref))))) ;
+            size_t nb_dims =gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(ref)))))) ;
+            size_t nb_pointer = pointer_depth(entity_type(reference_variable(ref)));
 
             /* if the considered reference is a formal parameter and the property is properly set,
              * we are allowded to convert formal parameters such as int a[n][12] into int *a
@@ -151,13 +159,13 @@ bool expression_array_to_pointer(expression exp, bool in_init)
             {
                 /* get the base type of the reference */
                 type type_without_indices = make_type_variable(make_variable(
-                            copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
+                            copy_basic(variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref)))))),
                             NIL,
-                            gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
+                            gen_full_copy_list(variable_qualifiers(type_variable(ultimate_type(entity_type(reference_variable(ref))))))));
 
 
                 /* create an expression for the new reference, possibly casted */
-                if( force_cast && ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
+                if( force_cast && ! basic_pointer_p( variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref) )) ) ) ) )
                 {
                     base_ref = make_expression(
                             make_syntax_cast(
@@ -181,7 +189,7 @@ bool expression_array_to_pointer(expression exp, bool in_init)
                 new_syntax=make_syntax_reference(ref_without_indices);
             }
             else {
-                if(nb_indices == nb_dims || nb_dims == 0 ) {
+                if(nb_indices == nb_dims + nb_pointer ) {
 
                     new_syntax=make_syntax_call(
                             make_call(
@@ -265,6 +273,20 @@ bool declaration_array_to_pointer(statement s,bool __attribute__((unused)) in_in
     pips_assert("everything went well",statement_consistent_p(s));
     return true;
 }
+static void variable_downgrade_basic(variable param) {
+    /* fix type if several pointers are chained */
+    basic vb = basic_ultimate(variable_basic(param));
+    if( basic_pointer_p(vb)) {
+        while(basic_pointer_p(vb)) {
+            vb = variable_basic(type_variable(ultimate_type(basic_pointer(vb))));
+        }
+        variable_basic(param) = make_basic_pointer(
+                make_type_variable(
+                    make_variable(vb,NIL, NIL)
+                    )
+                );
+    }
+}
 
 static
 void make_pointer_from_variable(variable param)
@@ -273,7 +295,8 @@ void make_pointer_from_variable(variable param)
     switch(get_array_to_pointer_conversion_mode())
     {
         case NO_CONVERSION:return;
-        case ARRAY_1D:
+        case ARRAY_1D: {
+            variable_downgrade_basic(param);
             if(gen_length(parameter_dimensions) > 1)
             {
                 list iter = parameter_dimensions;
@@ -298,21 +321,24 @@ void make_pointer_from_variable(variable param)
                                 make_op_exp(MINUS_OPERATOR_NAME,full_length,int_to_expression(1))
                                 ),
                             NIL);
-            } break;
+            } } break;
         case POINTER:
+            variable_downgrade_basic(param);
             if(!ENDP(parameter_dimensions))
             {
                 gen_full_free_list(parameter_dimensions);
                 variable_dimensions(param)=NIL;
-                basic parameter_basic = variable_basic(param);
-                basic new_parameter_basic = make_basic_pointer(
-                        make_type_variable(
-                            make_variable(parameter_basic,NIL,NIL)
-                            )
-                        );
-                variable_basic(param)=new_parameter_basic;
-            }
-            break;
+                basic vb = basic_ultimate(variable_basic(param));
+                if(!basic_pointer_p(vb)) {
+                    basic parameter_basic = variable_basic(param);
+                    basic new_parameter_basic = make_basic_pointer(
+                            make_type_variable(
+                                make_variable(parameter_basic,NIL,NIL)
+                                )
+                            );
+                    variable_basic(param)=new_parameter_basic;
+                }
+            } break;
 
     }
     pips_assert("everything went well",variable_consistent_p(param));
@@ -406,6 +432,29 @@ static void array_to_pointer_fix_call_site(expression exp)
     pips_assert("everything went well",expression_consistent_p(exp));
 }
 
+
+static void array_to_pointer_call_rewriter(expression e)
+{
+    if(expression_call_p(e)) {
+        call c = expression_call(e);
+        entity op = call_function(c);
+        if(ENTITY_ADDRESS_OF_P(op))
+        {
+            expression lhs = binary_call_lhs(c);
+            if(expression_call_p(lhs)) {
+                call c2 = expression_call(lhs);
+                entity op2 = call_function(c2);
+                if(ENTITY_DEREFERENCING_P(op2)) {
+                    expression lhs2 = binary_call_lhs(c2);
+                    syntax syn = expression_syntax(lhs2);
+                    expression_syntax(lhs2)=syntax_undefined;
+                    update_expression_syntax(e,syn);
+                }
+            }
+        }
+    }
+}
+
 bool array_to_pointer(char *module_name)
 {
     /* prelude */
@@ -470,6 +519,7 @@ bool array_to_pointer(char *module_name)
         }
 
     }
+    gen_recurse(get_current_module_statement(),expression_domain,gen_true,array_to_pointer_call_rewriter);
 
     /* validate */
     pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
