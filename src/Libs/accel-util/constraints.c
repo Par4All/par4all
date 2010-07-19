@@ -99,15 +99,6 @@ char* region_enumerate(region reg)
     }
     return volume_used;
 }
-#if 0
-static Variable sort_key;
-static int shc_sort(Pvecteur *v0, Pvecteur *v1)
-{
-    if((*v0)->var==sort_key) return 1;
-    if((*v1)->var==sort_key) return -1;
-    return compare_entities((entity*)&(*v0)->var,(entity*)&(*v1)->var);
-}
-#endif
 
 #define SCILAB_PSOLVE "psolve"
 
