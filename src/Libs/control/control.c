@@ -580,6 +580,12 @@ bool controlize(statement st,
       controlized = return_instruction_p(i) || controlize_call(st, pred, succ, c_res);
 
 	statement_consistent_p(st);
+
+        /* SG+EC:some label may have been lost in the process
+           fix it here instead of understanding why */
+        if(!same_entity_p(statement_label(st),elabel)) {
+            statement_label(st)=elabel;
+        }
       break;
     default:
 	pips_error("controlize",
