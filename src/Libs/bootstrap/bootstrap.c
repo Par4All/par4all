@@ -4562,7 +4562,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   /*#include <tgmath.h>*/
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {CLOCK_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {CLOCK_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
 
   /*#include <wchar.h>*/
   { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
