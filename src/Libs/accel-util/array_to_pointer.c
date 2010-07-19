@@ -118,6 +118,21 @@ static size_t pointer_depth(type t) {
     else return 0;
 }
 
+static void remove_dereferencment(expression e)
+{
+    if(expression_call_p(e)) {
+        call c = expression_call(e);
+        entity op = call_function(c);
+        if(ENTITY_DEREFERENCING_P(op)) {
+            expression lhs = binary_call_lhs(c);
+            syntax syn = expression_syntax(lhs);
+            expression_syntax(lhs)=syntax_undefined;
+            update_expression_syntax(e,syn);
+            remove_dereferencment(e);
+        }
+    }
+}
+
 
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
@@ -225,10 +240,14 @@ bool expression_array_to_pointer(expression exp, bool in_init)
     {
         subscript s = syntax_subscript(expression_syntax(exp));
         pips_assert("non empty subscript",!ENDP(subscript_indices(s)));
+        expression sarray = copy_expression(subscript_array(s));
+        if(get_array_to_pointer_conversion_mode() != NO_CONVERSION)
+            remove_dereferencment(sarray);
+
         call c = make_call(
                 CreateIntrinsic(PLUS_C_OPERATOR_NAME),
                 make_expression_list(
-                    copy_expression(subscript_array(s)),
+                    sarray,
                     EXPRESSION(CAR(subscript_indices(s)))
                     ));
         list indices = subscript_indices(s);
