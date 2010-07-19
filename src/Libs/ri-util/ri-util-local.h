@@ -776,6 +776,7 @@
 
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME            "time"
+#define CLOCK_FUNCTION_NAME            "clock"
 
 /* netdb.h */
 #define __H_ERRNO_LOCATION_OPERATOR_NAME "__h_erno_location"
