@@ -306,7 +306,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     }
 
     /* create the new instruction sequence
-     * no need to change all entities in the new statements, because we build a new text ressource later
+     * no need to change all entities in the new statements, because we build a new text ressource latter
      */
     expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = make_empty_block_statement();
