@@ -95,29 +95,6 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         }
     }
 }
-static void isolate_patch_callexp(expression exp, isolate_param *p)
-{
-    if(false && expression_call_p(exp)) {
-        call c = expression_call(exp);
-        entity op = call_function(c);
-        if(ENTITY_FIELD_P(op))
-        {
-            expression lhs = binary_call_lhs(c),
-                       rhs = binary_call_rhs(c);
-            if(!expression_reference_p(lhs) ||
-                    !expression_reference_p(rhs) )
-                pips_internal_error("case not handled, should use subscripts\n");
-            else {
-                reference_indices(expression_reference(lhs)) = 
-                    gen_append(reference_indices(expression_reference(lhs)),
-                            CONS(EXPRESSION,int_to_expression(0),
-                                reference_indices(expression_reference(rhs))));
-                update_expression_syntax(exp,copy_syntax(expression_syntax(lhs)));
-            }
-
-        }
-    }
-}
 
 static void isolate_patch_entities(void * ,entity , entity ,list );
 /** 
@@ -140,7 +117,6 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
     isolate_param p = { old,new,offsets };
     gen_context_multi_recurse(where,&p,
             reference_domain,gen_true,isolate_patch_reference,
-            expression_domain,gen_true,isolate_patch_callexp,
             statement_domain,gen_true,isolate_patch_statement,
             0);
 }
@@ -405,6 +381,7 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
  * fixes entity type as well ...
  * fix it here
  */
+<<<<<<< HEAD
 expression region_reference_to_expression(reference r)
 {
     entity e = reference_variable(r);
@@ -412,10 +389,18 @@ expression region_reference_to_expression(reference r)
     entity f = entity_undefined;
     size_t where = 0;
     FOREACH(EXPRESSION,exp,indices) {
+=======
+static expression offsets_to_expression(entity e, list offsets)
+{
+    entity f = entity_undefined;
+    size_t where = 0;
+    FOREACH(EXPRESSION,exp,offsets) {
+>>>>>>> Improve Isolate Statement to handle field operator
         if(entity_field_p(f=reference_variable(expression_reference(exp))))
             break;
         where++;
     }
+<<<<<<< HEAD
     list tail = gen_nthcdr(where,indices);
     if(where) {
         CDR(gen_nthcdr(where-1,indices))=NIL;
@@ -430,6 +415,19 @@ expression region_reference_to_expression(reference r)
                 region_reference_to_expression(fake));
         free_reference(fake);
         return res;
+=======
+    list tail = gen_nthcdr(where,offsets);
+    if(where) {
+        CDR(gen_nthcdr(where-1,offsets))=NIL;
+    }
+    if(ENDP(tail))
+        return reference_to_expression(make_reference(e,offsets));
+    else {
+        return binary_intrinsic_expression(
+                FIELD_OPERATOR_NAME,
+                reference_to_expression(make_reference(e,offsets)),
+                offsets_to_expression(f,CDR(tail)));
+>>>>>>> Improve Isolate Statement to handle field operator
     }
 }
 
@@ -446,11 +444,22 @@ static statement isolate_make_loop_array_transfer(entity old,entity new, list di
         isolate_merge_offsets(index_expressions,offsets);
 
 
+<<<<<<< HEAD
     reference fake0 = make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
               fake1 = make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
     expression e0 = region_reference_to_expression(fake0),
                e1 = region_reference_to_expression(fake1);
     free_reference(fake0), free_reference(fake1);
+=======
+    expression e0 = offsets_to_expression(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
+               e1 = offsets_to_expression(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
+
+    if(transfer_in_p(t)) {
+        basic b = basic_of_expression(e1);
+        free_basic(variable_basic(type_variable(entity_type(new))));
+        variable_basic(type_variable(entity_type(new)))=b;
+    }
+>>>>>>> Improve Isolate Statement to handle field operator
 
     statement body = make_assign_statement(e0,e1);
     FOREACH(DIMENSION,d,dimensions)
