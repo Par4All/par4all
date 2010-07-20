@@ -438,10 +438,9 @@ class runner(Thread):
             raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
                + " interrupted", code = -2)
         if ret != 0 and not self.can_fail:
-            #~ if self.err:
-                #~ sys.stderr.write(self.err)
-            #~ if not self.silent:
-            debug("Environment was: " + repr(self.env))
+            if self.err and get_verbosity() == 0:
+                sys.stderr.write(self.err + "\n")
+            self.stderr_handler("Environment was: " + repr(self.env))
             raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
                 + " failed with exit code " + str(ret), code = ret)
         #~ stop_master_spinner()
