@@ -376,7 +376,7 @@ bool empty_statement_p(statement st)
 {
   instruction i;
 
-  return(entity_empty_label_p(statement_label(st)) &&
+  return(unlabelled_statement_p(st) &&
 	 instruction_block_p(i=statement_instruction(st)) &&
 	 ENDP(instruction_block(i)) &&
 	 ENDP(statement_declarations(st)));
@@ -405,7 +405,7 @@ bool nop_statement_p(statement s)
   instruction i = statement_instruction(s);
 
   if(instruction_block_p(i) && ENDP(instruction_block(i))) {
-    pips_assert("No label!", entity_empty_label_p(statement_label(s)));
+    pips_assert("No label!",  unlabelled_statement_p(s));
     pips_assert("No comments", empty_comments_p(statement_comments(s)));
     pips_assert("No statement number",
 		statement_number(s) == STATEMENT_NUMBER_UNDEFINED);
@@ -431,7 +431,7 @@ bool empty_statement_or_labelless_continue_p(statement st)
 {
   instruction i;
 
-  if (!entity_empty_label_p(statement_label(st))
+  if (!unlabelled_statement_p(st)
       || !empty_extensions_p(statement_extensions(st)))
     return FALSE;
 
@@ -487,7 +487,7 @@ bool empty_statement_or_continue_without_comment_p(statement st)
   if (!empty_comments_p(the_comments))
     return FALSE;
 
-  if (!entity_empty_label_p(statement_label(st)))
+  if (!unlabelled_statement_p(st))
     return FALSE;
   if (continue_statement_p(st) && ENDP(statement_declarations(st)))
     return TRUE;
