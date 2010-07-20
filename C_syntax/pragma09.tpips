@@ -1,4 +1,4 @@
-setenv WS pragma08
+setenv WS pragma09
 delete $WS
 create $WS $WS.c
 
@@ -33,8 +33,9 @@ echo
 
 display PRINTED_FILE[$WS]
 
+apply UNSPLIT[%PROGRAM]
 
 close
-delete $WS
+#delete $WS
 
 quit
