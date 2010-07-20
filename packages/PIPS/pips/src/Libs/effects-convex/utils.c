@@ -2975,3 +2975,13 @@ string region_to_string(effect reg __attribute__ ((unused)))
 {
     return strdup("[region_to_string] no longer implemented\n");
 }
+
+region region_hypercube(region reg)
+{
+    region hyper = copy_effect(reg);
+    list phis = region_phi_cfc_variables(reg);
+    region_exact_projection_along_parameters(hyper,phis);
+    sc_fix(region_system(hyper));
+    gen_free_list(phis);
+    return hyper;
+}

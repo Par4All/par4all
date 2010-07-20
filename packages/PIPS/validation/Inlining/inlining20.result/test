@@ -8,9 +8,9 @@ void inlining20(int j)
    foo(2);                                                              /*0009*/
    foo(j);                                                              /*0010*/
 }
-extern void foo(int i);                                                 /*0001*/
+void foo(int i);                                                        /*0001*/
 
-extern void inlining20(int j);                                          /*0003*/
+void inlining20(int j);                                                 /*0003*/
 void inlining20(int j)
 {
    {

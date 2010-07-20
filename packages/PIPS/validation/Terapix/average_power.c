@@ -1,39 +1,33 @@
+int N;
 #include<stdio.h>
+#include<math.h>
 // Define complex number
 typedef struct {
-    float re;
-    float im;
+ float re;
+ float im;
 } Cplfloat;
 
-static void internal(float *in, Cplfloat* from0, Cplfloat *from1)
-{
-    *in += from0->re * from1->re
-        +from0->im * from1->im;
+float CplAbs(Cplfloat const * c) {
+    return sqrtf(c->re*c->re+c->im*c->im);
 }
 
-void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv],
-        Cplfloat Pow[Nth]) {
 
-    int th, v, rg;
-
-    for (th=0; th<Nth; th++) {
-        for (rg=0; rg<Nrg; rg++) {
-            for (v=0; v<Nv; v++) {
-                internal(&(Pow[th].re),&(ptrin[th][rg][v]),&(ptrin[th][rg][v]));
-            }
-        }
-        Pow[th].re/= (float)(Nv*Nrg);
-        Pow[th].im= 0.;
-    }
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float Pow[Nth]) {
+ int th, v, rg;
+ for(th=0;th<Nth;++th)
+  for (rg=0; rg<Nrg; rg++)
+   for (v=0; v<Nv; v++)
+    Pow[th]+=CplAbs(&ptrin[th][rg][v]);
 }
 
 int main(int argc, char *argv[])
 {
     int i,j,k;
     int th,rg,v;
-    th=16,rg=13,v=12;
+    th=12,rg=13,v=v;
     {
-        Cplfloat in[th][rg][v],pow[th];
+        Cplfloat in[th][rg][v];
+        float pow[th];
         for(i=0;i<th;i++) {
             pow[th]=0.;
             for(j=0;j<rg;j++)
@@ -44,9 +38,11 @@ int main(int argc, char *argv[])
                 }
         }
         average_power(th,rg,v,in,pow);
+        for(i=0;i<th;i++) 
+            pow[th]/=rg*v;
         /* only print with bad precision for validation */
         for(i=0;i<th;i++)
-            printf("-%d-%d-", ((int)pow[i].re)/10, ((int)pow[i].im))/10;
+            printf("-%d-%d-", ((int)pow[i])/10);
     }
     return 0;
 }

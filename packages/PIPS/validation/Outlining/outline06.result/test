@@ -10,7 +10,7 @@ kernel:
          bar[i][j] = K*i*j;
 }
 int K = 12;
-extern void foo(int bar[256][256]);
+void foo(int bar[256][256]);
 
 Code after outlining
 
@@ -29,7 +29,7 @@ kernel:
       bar[i][j] = K*i*j;
 }
 int K = 12;
-extern void foo(int bar[256][256]);
+void foo(int bar[256][256]);
 //PIPS generated variable
 void kernel(int i, int bar[256][256]);
 

@@ -885,16 +885,20 @@ char ** Pehrhart_string(Pehrhart p, const char *pname[])
 
         for(i=0;i<nb_enum;i++)
         {
-            char * generated_string;
+            char * generated_string,*iter;
             long pos;
             size_t generated_string_size;
             rewind(tmpf);
             print_evalue(tmpf,&curr->EP,pname);
-            pos=ftell(tmpf)-2; /* remove trainling \n*/
+            pos=ftell(tmpf);
             rewind(tmpf);
             generated_string=calloc(1+pos,sizeof(*generated_string));
             generated_string_size=fread(generated_string,sizeof(*generated_string),1+pos,tmpf);
+            for(iter=generated_string;*iter;iter++)
+                if(iter[0]=='\n' )
+                    iter[0]=' ';
             enum_strings[i]=generated_string;
+
         }
         enum_strings[i]=NULL;
         if(fclose(tmpf)!=0)

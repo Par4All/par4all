@@ -17,11 +17,11 @@ Code after inlining
 struct a {
    int b;
 };
-extern void foo(struct a *_);
+void foo(struct a *_);
 
-extern void bar();
+void bar();
 
-extern int main();
+int main();
 void bar()
 {
    struct a A = {0};

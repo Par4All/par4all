@@ -1,0 +1,10 @@
+delete array_to_pointer08
+create array_to_pointer08 array_to_pointer08.c
+
+display PRINTED_FILE[%ALL]
+apply ARRAY_TO_POINTER[%ALL]
+display PRINTED_FILE[%ALL]
+
+
+quit
+

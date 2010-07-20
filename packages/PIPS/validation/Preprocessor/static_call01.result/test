@@ -6,7 +6,7 @@ int main()
 
 static void foo(int i);
 
-extern int main();
+int main();
 static void foo(int i)
 {
    i++;
@@ -19,7 +19,7 @@ int main()
 
 static void foo(int i);
 
-extern int main();
+int main();
 static void foo(int i)
 {
    i++;

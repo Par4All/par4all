@@ -5,7 +5,7 @@
    not parsed as a compilation unit.
  */
 
-extern void struct18();
+void struct18();
 void struct18()
 {
    union {

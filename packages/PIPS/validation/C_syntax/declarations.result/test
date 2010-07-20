@@ -1,0 +1,153 @@
+
+Symbol table for "declarations01!"
+
+declarations01!
+
+Declarations for module "declarations01!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:d1" with type "functional" "() -> void"
+	Declared entity "declarations01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "declarations01!:*HEAP*" with type "area" with size 0
+	Declared entity "declarations01!:*STACK*" with type "area" with size 0
+	Declared entity "declarations01!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:a"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:a"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "declarations01!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations01!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations01!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module declarations01!
+
+
+Parsed printed file for "declarations01!"
+
+extern int a;
+
+void d1();
+
+Symbol table for "declarations02!"
+
+declarations02!
+
+Declarations for module "declarations02!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:d2" with type "functional" "() -> void"
+	Declared entity "declarations02!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "declarations02!:*HEAP*" with type "area" with size 0
+	Declared entity "declarations02!:*STACK*" with type "area" with size 0
+	Declared entity "declarations02!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:a"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:a"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "declarations02!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations02!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations02!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations02!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module declarations02!
+
+
+Parsed printed file for "declarations02!"
+
+extern int a;
+extern int a;
+
+
+void d2();
+
+Symbol table for "declarations03!"
+
+declarations03!
+
+Declarations for module "declarations03!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:d3" with type "functional" "() -> void"
+	Declared entity "declarations03!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "declarations03!:*HEAP*" with type "area" with size 0
+	Declared entity "declarations03!:*STACK*" with type "area" with size 0
+	Declared entity "declarations03!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:a"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:a"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "declarations03!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations03!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations03!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "declarations03!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module declarations03!
+
+
+Parsed printed file for "declarations03!"
+
+extern int a;
+
+void d3();
+

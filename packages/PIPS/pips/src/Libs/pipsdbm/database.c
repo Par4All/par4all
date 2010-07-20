@@ -887,6 +887,18 @@ void db_put_or_update_memory_resource(const char* rname, const char* oname,
   debug_off();
 }
 
+void db_invalidate_memory_resource(const char * rname, const char *oname)
+{
+    db_resource r;
+    /* Check the database coherency: */
+    DB_OK;
+
+    /* Get the database resource associated to the given resource: */
+    r = find_or_create_db_resource(rname, oname);
+    if (!db_status_undefined_p(db_resource_db_status(r)))
+        db_resource_file_time(r)=0;
+}
+
 /** Delete all the resources of a given type
  */
 void db_unput_resources(const char* rname)

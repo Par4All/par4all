@@ -2,7 +2,7 @@
  * file for intro01.c
  */
 int temp;
-extern int main(void);
+int main(void);
 int main(void)
 {
    int i, j, c, a[100];

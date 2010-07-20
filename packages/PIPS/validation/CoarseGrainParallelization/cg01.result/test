@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 }
 float imagein_re[64][64];                                               /*0002*/
 float imagein_im[64][64];                                               /*0003*/
-extern int main(int argc, char *argv[]);                                /*0004*/
+int main(int argc, char *argv[]);                                       /*0004*/
 int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0005*/

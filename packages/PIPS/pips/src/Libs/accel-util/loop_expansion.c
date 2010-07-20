@@ -152,7 +152,7 @@ void guard_expanded_statement_if_needed(statement s,expression guard, loop paren
 }
 
 static
-void do_loop_expansion(statement st, int size,int offset,bool apply_guard)
+void do_loop_expansion(statement st, expression size,int offset,bool apply_guard)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -163,16 +163,16 @@ void do_loop_expansion(statement st, int size,int offset,bool apply_guard)
         /* this gets the expanded nb_iter */
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
-                    int_to_expression(size),
+                    size,
                     make_op_exp(DIVIDE_OPERATOR_NAME,
                         make_op_exp(PLUS_OPERATOR_NAME,
                             nb_iter,
                             make_op_exp(MINUS_OPERATOR_NAME,
-                                int_to_expression(size),
+                                copy_expression(size),
                                 int_to_expression(1)
                                 )
                             ),
-                        int_to_expression(size)
+                        copy_expression(size)
                         )
                     );
         expression new_range_lower_value=
@@ -277,17 +277,14 @@ bool loop_expansion(const string module_name)
             statement loop_statement = find_loop_from_label(get_current_module_statement(),lb_entity);
             if(!statement_undefined_p(loop_statement))
             {
-                int rate = get_int_property("LOOP_EXPANSION_SIZE");
-                if( rate > 0)
-                {
-                    /* ok for the ui part, let's do something !*/
-                    do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"),apply_guard);
-                    /* commit changes */
-                    module_reorder(get_current_module_statement()); ///< we may have add statements
-                    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+                string srate = get_string_property("LOOP_EXPANSION_SIZE");
+                expression rate = string_to_expression(srate,get_current_module_entity());
+                /* ok for the ui part, let's do something !*/
+                do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"),apply_guard);
+                /* commit changes */
+                module_reorder(get_current_module_statement()); ///< we may have add statements
+                DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
-                }
-                else pips_user_error("Please provide a positive loop expansion size\n");
             }
             else pips_user_error("label '%s' is not put on a loop\n",lp_label);
 
@@ -308,7 +305,7 @@ bool loop_expansion(const string module_name)
 /* creates a new statement that perfom the expansion of the loop
  * this statement is flagged for further processing */
 static
-void do_loop_expansion_init(statement st, int size,int offset)
+void do_loop_expansion_init(statement st, expression size,int offset)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -323,16 +320,16 @@ void do_loop_expansion_init(statement st, int size,int offset)
         /* this gets the expanded nb_iter */
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
-                    int_to_expression(size),
+                    size,
                     make_op_exp(DIVIDE_OPERATOR_NAME,
                         make_op_exp(PLUS_OPERATOR_NAME,
                             nb_iter,
                             make_op_exp(MINUS_OPERATOR_NAME,
-                                int_to_expression(size),
+                                copy_expression(size),
                                 int_to_expression(1)
                                 )
                             ),
-                        int_to_expression(size)
+                        copy_expression(size)
                         )
                     );
 
@@ -394,17 +391,14 @@ bool loop_expansion_init(const char* module_name)
             statement loop_statement = find_loop_from_label(get_current_module_statement(),lb_entity);
             if(!statement_undefined_p(loop_statement))
             {
-                int rate = get_int_property("LOOP_EXPANSION_SIZE");
-                if( rate > 0)
-                {
-                    /* ok for the ui part, let's do something !*/
-                    do_loop_expansion_init(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
-                    /* commit changes */
-                    module_reorder(get_current_module_statement()); ///< we may have add statements
-                    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+                string srate = get_string_property("LOOP_EXPANSION_SIZE");
+                expression rate =string_to_expression(srate,get_current_module_entity());
+                /* ok for the ui part, let's do something !*/
+                do_loop_expansion_init(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
+                /* commit changes */
+                module_reorder(get_current_module_statement()); ///< we may have add statements
+                DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
-                }
-                else pips_user_error("Please provide a positive loop expansion size\n");
             }
             else pips_user_error("label '%s' is not put on a loop\n",lp_label);
 

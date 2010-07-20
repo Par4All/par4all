@@ -58,11 +58,11 @@ int bla(void)
    bla_int = f+2;                                                       /*0015*/
    return bla_int;                                                      /*0016*/
 }
-extern int foo(void);                                                   /*0001*/
+int foo(void);                                                          /*0001*/
 
-extern int bla(void);                                                   /*0003*/
+int bla(void);                                                          /*0003*/
 
-extern int main(void);                                                  /*0005*/
+int main(void);                                                         /*0005*/
 int main(void)
 {
    int f;                                                               /*0003*/

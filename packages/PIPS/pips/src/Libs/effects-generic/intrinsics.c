@@ -799,6 +799,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                           no_write_effects},
+  {CLOCK_FUNCTION_NAME,                           no_write_effects},
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                          c_io_effects},

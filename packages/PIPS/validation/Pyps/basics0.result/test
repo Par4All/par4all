@@ -88,13 +88,13 @@ l99997:      ;
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-extern int foo(int a);
+int foo(int a);
 
-extern void bar(int *c);
-extern void malabar(int *c);
+void bar(int *c);
+void malabar(int *c);
 
-extern void megablast(int n);
-extern int main();
+void megablast(int n);
+int main();
 int main()
 {
    return 1;

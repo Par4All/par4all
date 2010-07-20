@@ -53,62 +53,69 @@
 #include "accel-util.h"
 
 
-/* only works for hypercube */
-#if 0
+/* computes the volume of a region
+ * output it as a string representing the associated polynomial
+ * maybe one day, conversion from string to expression will be possible ?
+ *
+ * the string is here to communicate with polylib.
+ * It would be far better to convert polylib view into an expression
+ *
+ * the result is in number of bytes used
+ */
 static
-expression region_enumerate(region r,transformer tr)
+char* region_enumerate(region reg)
 {
-    reference ref = region_any_reference(r);
-    Psysteme sc = sc_dup(region_system(r));
-    sc_transform_eg_in_ineg(sc);
-    expression volume = expression_undefined;
-    FOREACH(EXPRESSION,index,reference_indices(ref))
-    {
-        Variable phi = expression_to_entity(index);
-        Pcontrainte lower,upper;
-        constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
-        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
-        {
-            /* this is a constant : the volume is 1 */
-            if(bounds_equal_p(phi,lower,upper))
-            {
-                volume=int_to_expression(1);
-            }
-            /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
-            else
-            {
-                expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                if(expression_minmax_p(elower))
-                    simplify_minmax_expression(elower,tr);
-                if(expression_minmax_p(eupper))
-                    simplify_minmax_expression(eupper,tr);
-                expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                dim = make_op_exp(PLUS_OPERATOR_NAME,dim,int_to_expression(1));
-                if(expression_undefined_p(volume))
-                    volume=dim;
-                else
-                    volume=binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,volume,dim);
-            }
-        }
-        else {
-            pips_user_warning("failed to analyse region\n");
-            free_expression(volume);
-            return expression_undefined;
-        }
+    char * volume_used = NULL;
+    Psysteme r_sc = region_system(reg);
+    sc_fix(r_sc);
+    Pbase sorted_base = region_sorted_base_dup(reg);
+    sc_base(r_sc)=sorted_base;
+    Pbase local_base = BASE_NULLE;
+    for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
+        if(!variable_phi_p((entity)b->var))
+            local_base=base_add_variable(local_base,b->var);
+
+    const char * base_names [sc_dimension(r_sc)];
+    int i=0;
+    for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
+        base_names[i++]=entity_user_name((entity)b->var);
+
+    ifdebug(1) print_region(reg);
+
+    Pehrhart er = sc_enumerate(r_sc,
+            local_base,
+            base_names);
+    if(er) {
+        char ** ps = Pehrhart_string(er,base_names);
+        expression fake_expression = region_reference_to_expression(region_any_reference(reg));
+        type fake_type = expression_to_type(fake_expression);
+        /* use first ... */
+        asprintf(&volume_used,"%d * ( %s )",
+                type_memory_size(fake_type),ps[0]);
+        free_expression(fake_expression);
+        free_type(fake_type);
+        for(char ** iter = ps; *iter; iter++) free(*iter);
+        free(ps);
     }
-    return volume;
-}
-#endif
-static Variable sort_key;
-static int shc_sort(Pvecteur *v0, Pvecteur *v1)
-{
-    if((*v0)->var==sort_key) return 1;
-    if((*v1)->var==sort_key) return -1;
-    return compare_entities((entity*)&(*v0)->var,(entity*)&(*v1)->var);
+    return volume_used;
 }
 
-#define SCILAB_PSOLVE "./psolve"
+#define SCILAB_PSOLVE "psolve"
+
+static bool statement_parent_walker(statement s, statement *param)
+{
+    if(s == param[0]) {
+        param[1]=(statement)gen_get_ancestor(statement_domain,s);
+        gen_recurse_stop(NULL);
+    }
+    return true;
+}
+static statement statement_parent(statement root, statement s)
+{
+    statement args[] = { s, statement_undefined };
+    gen_context_recurse(root,args,statement_domain,statement_parent_walker,gen_null);
+    return args[1] == NULL || statement_undefined_p(args[1]) ? s : args[1];
+}
 
 /* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
 static bool do_solve_hardware_constraints(statement s)
@@ -127,8 +134,6 @@ static bool do_solve_hardware_constraints(statement s)
     entity e = string_to_entity(get_string_property("SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN"),get_current_module_entity());
     if(entity_undefined_p(e))
         pips_user_error("must provide the unknown value\n");
-    Pbase pb = (Pbase) vect_new(e,-1);
-    sort_key = e;
     /* } */
 
     FOREACH(REGION,reg,regions)
@@ -149,20 +154,10 @@ static bool do_solve_hardware_constraints(statement s)
                     region_undefined_p(write_region)?read_region:
                     regions_must_convex_hull(read_region,write_region);
 
-                Psysteme rw_sc = region_system(rw_region);
-                vect_sort_in_place(&sc_base(rw_sc),shc_sort);
-                const char * base_names [sc_dimension(rw_sc)];
-                int i=0;
-                for(Pbase b = sc_base(rw_sc);!BASE_NULLE_P(b);b=b->succ)
-                    base_names[i]=entity_user_name((entity)b->var);
-
-                Pehrhart er = sc_enumerate(rw_sc,pb,base_names);
-                if(er) {
-                    char ** ps = Pehrhart_string(er,base_names);
-                    volume_used[volume_index++]=ps[0];/* use first ... */
-                    for(char ** iter = ps +1; *iter; iter++) free(*iter);
-                    free(ps);
-                }
+                region hregion = rw_region;//region_hypercube(rw_region);
+                char * vused = region_enumerate(hregion);
+                if(vused)
+                    volume_used[volume_index++]=vused;
                 else
                     pips_user_error("unable to compute volume of the region of %s\n",entity_user_name(e));
             }
@@ -180,21 +175,12 @@ static bool do_solve_hardware_constraints(statement s)
     }
     /* call an external solver */
     char *scilab_cmd;
-    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s'",full_poly);
-    FILE* scilab_response = popen(scilab_cmd,"r");
-    if(!scilab_response) pips_user_error("failed to solve polynomial %s\n",full_poly);
-    float fresponse=0.;
-    if(fscanf(scilab_response,"%f",&fresponse)!=1)
-        pips_user_error("failed to scan "SCILAB_PSOLVE"response\n");
-    if(pclose(scilab_response))
-        pips_user_error("failed to call "SCILAB_PSOLVE" %s\n",full_poly);
-
-    /* if the result is an integer, we have won, otherwise, try near integers */
-    int iresponse = (int)fresponse;
-    /* assume it will be ok with nearset integer , should do more check there ... */
-    insert_statement(s,
-            make_assign_statement(entity_to_expression(e),int_to_expression(iresponse)),
-            true);
+    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s' '%s'",full_poly,entity_user_name(e));
+    /* must put the pragma on anew statement, because the pragma will be changed into a statement later */
+    statement holder = make_continue_statement(entity_empty_label());
+    add_pragma_str_to_statement(holder,scilab_cmd,false);
+    statement parent = statement_parent(get_current_module_statement(),s);
+    insert_statement(parent,holder,true);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
@@ -205,6 +191,7 @@ static bool do_solve_hardware_constraints(statement s)
 
 bool solve_hardware_constraints(const char * module_name)
 {
+    debug_on("SOLVE_HARDWARE_CONSTRAINTS");
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
@@ -229,5 +216,6 @@ bool solve_hardware_constraints(const char * module_name)
     reset_cumulated_rw_effects();
     reset_precondition_map();
     free_value_mappings();
+    debug_off();
     return result;
 }

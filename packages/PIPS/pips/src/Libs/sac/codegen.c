@@ -430,11 +430,9 @@ expression reference_offset(const reference r)
                     );
         }
         gen_free_list(indices);
-        basic b = basic_of_reference(r);
         expression result = make_op_exp(MULTIPLY_OPERATOR_NAME,
-                int_to_expression(SizeOfElements(b)),
+                int_to_expression(SizeOfElements(variable_basic(type_variable(entity_type(reference_variable(r)))))),
                 offset);
-        free_basic(b);
         return result;
     }
 }

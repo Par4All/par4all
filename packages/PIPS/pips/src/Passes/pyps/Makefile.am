@@ -47,6 +47,7 @@ pypips.h:pypips.c Makefile
 	echo '#include "ri.h"' >> pypips.h
 	echo '#include "text.h"' >> pypips.h
 	echo '#include "pipsmake.h"' >> pypips.h
+	echo '#include "pipsdbm.h"' >> pypips.h
 	echo '#include "top-level.h"' >> pypips.h
 	echo '#include "transformations.h"' >> pypips.h
 	echo "#undef _POSIX_C_SOURCE" >> pypips.h

@@ -10,7 +10,7 @@ int b;
 // The prettyprinter should memorize declared and initialized
 // variables so as not to redeclare them.
 //int c = 3;
-int c;
-int c;
+extern int c;
+extern int c;
 
-extern int main();
+int main();

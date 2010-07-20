@@ -2,12 +2,12 @@ int bar()
 {
    int a;
 }
-extern int main();
+int main();
 enum hue {node, nide};
-extern int foo();
+int foo();
 enum test {a, b};
 // int a;
-extern int bar();
+int bar();
 int foo()
 {
    enum hue {node, nide};

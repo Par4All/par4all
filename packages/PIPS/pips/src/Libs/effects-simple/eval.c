@@ -146,7 +146,7 @@ void simple_reference_to_simple_reference_conversion(reference ref, reference * 
   points_to_filter_effects() to reduce the number of anywhere
   locations generated.
 */
-list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p)
+list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p, transformer __attribute__ ((unused)) t)
 {
   
   return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
@@ -161,7 +161,7 @@ list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused))
 
 list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
 {
-  list l_eff = eval_simple_cell_with_points_to(c, descriptor_undefined, ptl, exact_p);
+  list l_eff = eval_simple_cell_with_points_to(c, descriptor_undefined, ptl, exact_p, transformer_undefined);
   list l = NIL;
 
   FOREACH(EFFECT,eff, l_eff)

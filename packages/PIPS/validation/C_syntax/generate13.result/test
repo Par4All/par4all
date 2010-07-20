@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "generate13!:*STACK*" with type "area" with size 0
 	Declared entity "generate13!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:generate13"	with type "functional" "() -> void"
 
 Layouts for memory areas:
 

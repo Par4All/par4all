@@ -48,3 +48,4 @@
 
 extern char* activate(char* );
 extern int delete_workspace(char* );
+extern void db_invalidate_memory_resource(char*, char*);
