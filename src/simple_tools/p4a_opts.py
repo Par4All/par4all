@@ -65,7 +65,7 @@ def add_common_options(parser):
     group.add_option("--plain", "--no-color", "--no-fancy", "-z", action = "store_true", default = False,
         help = "Disable coloring of terminal output and disable all fancy tickers and spinners and this kind of eye-candy things :-)")
 
-    group.add_option("-V", dest = "script_version", action = "store_true", default = False,
+    group.add_option("--version", "-V", dest = "script_version", action = "store_true", default = False,
         help = "Display script version and exit.")
 
     parser.add_option_group(group)
