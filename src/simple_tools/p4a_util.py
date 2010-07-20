@@ -500,18 +500,19 @@ def get_distro():
     return distro
 
 
+def pkg_config(dist_dir, variable):
+    pkg_config_path = os.path.join(dist_dir, "lib", "pkgconfig")
+    if not os.path.isdir(pkg_config_path):
+        pkg_config_path = os.path.join(dist_dir, "lib64", "pkgconfig")
+        if not os.path.isdir(pkg_config_path):
+            raise p4a_error("Could not determine PKG_CONFIG_PATH in " + dist_dir + ", try reinstalling Par4All")
+    return run([ "pkg-config", "pips", "--variable=" + variable ], extra_env = dict(PKG_CONFIG_PATH = pkg_config_path))[0].rstrip("\n")
+
 def get_python_lib_dir(dist_dir):
-    lib = run([ "ls", "-d", dist_dir + "/lib/python*/*-packages/pips" ], can_fail = True, silent = True)[0].rstrip("\n")
-    lib64 = run([ "ls", "-d", dist_dir + "/lib64/python*/*-packages/pips" ], can_fail = True, silent = True)[0].rstrip("\n")
-    ret = ""
-    if not lib and not lib64:
-        raise p4a_error("Could not determine Python modules installation path in " + dist_dir + " -- Has PyPS been installed yet? Try reinstalling in " + dist_dir)
-    elif lib64:
-        ret = lib64
-    else:
-        ret = lib
-    debug("Python lib dir for " + dist_dir + ": " + ret)
-    return ret
+    dir = pkg_config(dist_dir, "pkgpythondir")
+    if not dir or not os.path.isdir(dir):
+        raise p4a_error("Could not determine Python modules installation path in " + dist_dir + ", try reinstalling Par4All")
+    return dir
 
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):

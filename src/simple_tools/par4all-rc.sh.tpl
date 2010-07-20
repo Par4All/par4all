@@ -41,15 +41,15 @@ update_libs_search_paths()
         if [ `/sbin/ldconfig -p | grep $$P4A_DIST/$$1 | wc -l` = 0 ]; then
             export LD_LIBRARY_PATH=$$(prepend_to_path_var LD_LIBRARY_PATH $$P4A_DIST/$$1)
         fi
-        # Update the Python module search path for pyps. Need a more elegant way to find where python likes to put its
-        # modules. It is basically different for all distros, and sometimes depends on arch...
-        NEW_PYTHON_PATH=$$(ls -d $$P4A_DIST/$$1/python*/*-packages/pips 2>/dev/null | tail -1)
-        export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
     fi
 }
 
 update_libs_search_paths lib
 update_libs_search_paths lib64
+
+# Update the Python module search path for pyps.
+NEW_PYTHON_PATH=$$(pkg-config pips --variable=pkgpythondir)
+export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
 
 # Update the Python module search path so that python 3.1 locates python-ply.
 PYTHONPATH=$$(prepend_to_path_var PYTHONPATH /usr/share/pyshared)
@@ -58,4 +58,3 @@ export PYTHONPATH
 # Do not leave our functions defined in user namespace.
 unset update_libs_search_paths 
 unset prepend_to_path_var
-
