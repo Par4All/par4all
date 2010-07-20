@@ -194,12 +194,21 @@ error_re = re.compile(r"^\w+ error ")
 warning_re = re.compile(r"^\w+ warning ")
 property_redefined_re = re.compile(r"property \S+ redefined")
 already_printed_warning_errors = []
+began_comment = ""
 
 def pips_output_filter(s):
     '''This callback can be used to filter out lines in PIPS output.
     At minimum verbosity level, we want to display errors/warnings, but not debug messages.'''
-    global error_re, warning_re, property_redefined_re, already_printed_warning_errors
-    if s.find("Cannot preprocess file") != -1:
+    global error_re, warning_re, property_redefined_re, already_printed_warning_errors, began_comment
+    if s.find("user warning in c_parse: comment \"") != -1:
+        began_comment = s
+    elif began_comment:
+        began_comment += s
+        if s.find("\" is lost") != -1:
+            warn("PIPS: " + began_comment)
+            already_printed_warning_errors.append(began_comment)
+            began_comment = ""
+    elif s.find("Cannot preprocess file") != -1:
         error("PIPS: " + s)
     elif error_re.search(s) and s not in already_printed_warning_errors:
         error("PIPS: " + s)
