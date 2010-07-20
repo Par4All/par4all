@@ -68,6 +68,8 @@ def get_cuda_ld_flags(m64 = True, cutil = True, cublas = False, cufft = False):
     lib_arch_suffix = ""
     if m64:
         lib_arch_suffix = "_x86_64"
+    else:
+        lib_arch_suffix = "_i386"
     flags = [
         "-L" + os.path.join(cuda_dir, "lib64"),
         "-L" + os.path.join(cuda_dir, "lib"),
