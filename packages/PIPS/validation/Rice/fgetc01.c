@@ -1,3 +1,7 @@
+/* Special case: the function getimage() is never called. Hence no
+   dependence exists and the loops can be parallelized and
+   distributed. */
+
 #include <stdlib.h>
 #include <stdio.h>
 

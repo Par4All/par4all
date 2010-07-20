@@ -7,7 +7,7 @@ static int k;
 typedef int km;
 
 
-extern int main();
+int main();
 int main()
 {
 

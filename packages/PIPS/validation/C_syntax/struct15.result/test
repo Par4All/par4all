@@ -4,7 +4,7 @@ struct s {
    int l;
 };
 
-extern void struct15();
+void struct15();
 void struct15()
 {
    int i = sizeof(struct s );

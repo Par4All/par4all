@@ -22,11 +22,11 @@ struct key {
    int node;
 };
 
-extern int main();
+int main();
 
-extern int foo();
+int foo();
 
-extern int toto();
+int toto();
 int toto()
 {
    int i = 1;

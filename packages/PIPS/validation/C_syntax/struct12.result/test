@@ -9,4 +9,4 @@
 struct s {
    int l;
 };
-extern void struct12(union u_u u);
+void struct12(union u_u u);

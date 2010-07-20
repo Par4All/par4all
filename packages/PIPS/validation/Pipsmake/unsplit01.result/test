@@ -28,9 +28,9 @@ typedef struct bar {
    int bar_second;
 } t_bar;
 
-extern int bar_e(int k);
+int bar_e(int k);
 
-extern int bar_d(int k);
+int bar_d(int k);
 
 static int bar_c(int k);
 
@@ -61,7 +61,7 @@ typedef struct foo {
 
 static int foo_a(int k);
 
-extern int foo();
+int foo();
 static int foo_a(int k)
 {
    return k+1;

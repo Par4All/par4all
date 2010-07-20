@@ -23,9 +23,8 @@ Variable list:
 	Declared entity "generate08!:*STACK*" with type "area" with size 0
 	Declared entity "generate08!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:generate08"	with type "functional" "() -> void"
 
 Derived entities:
 

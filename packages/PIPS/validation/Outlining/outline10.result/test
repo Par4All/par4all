@@ -8,7 +8,7 @@ void foo(int bar[256][256])
       for(j = 0; j <= 255; j += 1)
 kernel:         bar[i][j] = i*j;
 }
-extern void foo(int bar[256][256]);
+void foo(int bar[256][256]);
 
 Code after outlining
 
@@ -23,7 +23,7 @@ void kernel(int i, int j, int *bar0)
 {
 kernel:   *bar0 = i*j;
 }
-extern void foo(int bar[256][256]);
+void foo(int bar[256][256]);
 //PIPS generated variable
 void kernel(int i, int j, int *bar0);
 

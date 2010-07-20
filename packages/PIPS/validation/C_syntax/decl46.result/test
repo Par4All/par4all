@@ -18,7 +18,6 @@ Variable list:
 External variable list:
 
 	Declared external entity "TOP-LEVEL:sqrt"	with type "functional" "double -> double"
-	Declared external entity "TOP-LEVEL:decl46"	with type "functional" "double -> void"
 
 Layouts for memory areas:
 

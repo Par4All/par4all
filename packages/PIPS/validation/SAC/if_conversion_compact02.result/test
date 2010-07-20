@@ -5,7 +5,7 @@ int foo_tball()
    j = 3;
    i = !j?2:i;
 }
-extern int foo_tball();
+int foo_tball();
 int foo_tball()
 {
    int i, j;
@@ -13,5 +13,5 @@ int foo_tball()
    j = 3;
    i = !j?2:i;
 }
-extern int foo_tball();
+int foo_tball();
 

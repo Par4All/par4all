@@ -12,7 +12,7 @@ char isme(int elligent)
    int repide[elligent];
    //PIPS generated variable
    int rovertit;
-#pragma omp parallel for private(roverti)
+#pragma omp parallel for 
 donne:
    for(rovertit = 0; rovertit <= elligent-1; rovertit += N)
 #pragma omp parallel for 

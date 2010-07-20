@@ -17,10 +17,8 @@ Variable list:
 	Declared entity "block_scope01!:*STACK*" with type "area" with size 0
 	Declared entity "block_scope01!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -166,11 +164,11 @@ End of declarations for module foo
 
 Parsed printed files
 
-extern int main();
+int main();
 
 int x = 1;
 
-extern void foo(int x);
+void foo(int x);
 int main()
 {
    int x = 6;
@@ -198,11 +196,11 @@ void foo(int x)
 
 Printed files
 
-extern int main();
+int main();
 
 int x = 1;
 
-extern void foo(int x);
+void foo(int x);
 int main()
 {
    int x = 6;

@@ -114,12 +114,12 @@ void c()
    shiftval[2] = 1;                                                     /*0026*/
 }
 /**/
-extern void a();                                                        /*0002*/
+void a();                                                               /*0002*/
 /***/
-extern void b();                                                        /*0004*/
+void b();                                                               /*0004*/
 /****/
-extern void c();                                                        /*0006*/
-extern void d();                                                        /*0007*/
+void c();                                                               /*0006*/
+void d();                                                               /*0007*/
 void d()
 {
    int i;                                                               /*0029*/

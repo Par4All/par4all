@@ -44,8 +44,8 @@ def microcode_normalizer(ws,module):
 	module.display()
 
 """ convert a matrix to a string suitable for loop_tiling"""
-def mconv(tiling_matrix):
-	return ",".join(map(lambda x:" ".join(map(str,x)),tiling_matrix))
+def vconv(tiling_vector):
+	return ",".join(tiling_vector)
 
 """ smart loop expasion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
 def smart_loop_expansion(m,l,sz):
@@ -71,17 +71,18 @@ if __name__ == "__main__":
 	m.terapix_remove_divide()
 	m.display()
 
-	tiling_matrix=[[128,0],[0,8]]
+	tiling_vector=["128","8"]
 	
 	print "tiling"
 	for l in m.loops():
 		if l.loops():
 				# this take care of expanding the loop in order to match number of processor constraint
-				m.smart_loop_expansion(l,tiling_matrix[0][0])
+				m.smart_loop_expansion(l,tiling_vector[0])
 				# this take care of expanding the loop in order to match memory size constraint
-				m.smart_loop_expansion(l.loops()[0],tiling_matrix[1][1])
+				m.smart_loop_expansion(l.loops()[0],tiling_vector[1])
 				# this performs the real tiling
-				l.loop_tiling(matrix=mconv(tiling_matrix))
+				m.privatize_module()
+				l.symbolic_tiling(vector=vconv(tiling_vector))
 				m.display()
 
 	print "group constants and isolate"

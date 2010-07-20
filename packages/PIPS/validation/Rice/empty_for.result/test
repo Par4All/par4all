@@ -20,7 +20,7 @@ typedef struct {
 
 complex imagein[N][N];
 
-extern int main(int argc, char *argv[]);
+int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
    int i, j, k;

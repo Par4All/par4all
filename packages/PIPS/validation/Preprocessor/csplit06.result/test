@@ -6,7 +6,7 @@ void foo()
    /* This is the first foo function */
    ;
 }
-extern void foo();
+void foo();
 static void foo();
 static void foo()
 {

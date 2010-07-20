@@ -12,9 +12,8 @@ Variable list:
 	Declared entity "static_function!:*STATIC*" with type "area" with size 0
 	Declared entity "static_function!:static_function!foo" with type "functional" "int -> void"
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> void"
 
 Layouts for memory areas:
 
@@ -50,7 +49,7 @@ Module static_function!
 
 static void foo(int x);
 
-extern void main();
+void main();
 
 Module main
 

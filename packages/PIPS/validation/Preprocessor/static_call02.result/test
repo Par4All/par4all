@@ -21,7 +21,7 @@ void foo(int i)
 }
 static void foo(int i);
 
-extern void bar(int i);
+void bar(int i);
 static void foo(int i)
 {
    int foo;
@@ -38,7 +38,7 @@ int main()
 }
 
 
-extern int main();
+int main();
 
 Printed file for all
 
@@ -62,7 +62,7 @@ void foo(int i)
 }
 static void foo(int i);
 
-extern void bar(int i);
+void bar(int i);
 static void foo(int i)
 {
    int foo;
@@ -79,7 +79,7 @@ int main()
 }
 
 
-extern int main();
+int main();
 
 Symbole tables for all
 
@@ -240,9 +240,8 @@ Variable list:
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
 	Declared entity "foo!:foo!foo" with type "functional" "int -> void"
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:bar"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -388,9 +387,8 @@ Variable list:
 	Declared entity "static_call02!:*STACK*" with type "area" with size 0
 	Declared entity "static_call02!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 

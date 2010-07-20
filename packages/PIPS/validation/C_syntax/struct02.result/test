@@ -4,7 +4,7 @@ struct foo {
 
 struct foo f();
 
-extern int struct02(int index);
+int struct02(int index);
 int struct02(int index)
 {
    return (f().a)[index];

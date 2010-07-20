@@ -90,13 +90,13 @@ int decl33(int i, int j)
 
 Parsed printed file for "decl33!"
 
-extern int decl33(int i, int j);
-extern int decl33(int i, int j);
-extern int decl33(int i, int j);
+int decl33(int i, int j);
+int decl33(int i, int j);
+int decl33(int i, int j);
 
-extern int main();
+int main();
 
-extern int decl33(int i, int j);
+int decl33(int i, int j);
 
 Symbol table for "decl33"
 

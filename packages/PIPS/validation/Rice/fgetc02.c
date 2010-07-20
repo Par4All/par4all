@@ -1,3 +1,8 @@
+/* Warning: getimage() was never called! Anything can happen.
+ *
+ * FI: I remove "main" to check the privatization of C
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 

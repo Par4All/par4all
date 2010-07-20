@@ -69,7 +69,6 @@ External variable list:
 
 	Declared external entity "TOP-LEVEL:n"	with type "variable" "int"
 	Declared external entity "TOP-LEVEL:m"	with type "variable" "int"
-	Declared external entity "TOP-LEVEL:fcompat"	with type "functional" "() -> void"
 
 Layouts for memory areas:
 
@@ -102,7 +101,7 @@ Parsed code
 
 extern int n;
 extern int m;
-extern void fcompat();
+void fcompat();
 void fcompat()
 {
    int a[n];

@@ -87,7 +87,7 @@ Parsed printed file for "allocation09"
 
 // Check allocation for int
 
-extern int allocation09();
+int allocation09();
 int allocation09()
 {
    char a;

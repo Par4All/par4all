@@ -13,7 +13,7 @@ pas_trop:
 struct a {
    struct b {int jedi;} the;
 };
-extern int foo(int c);
+int foo(int c);
 
 Code after outlining
 
@@ -35,7 +35,7 @@ pas_trop:
 struct a {
    struct b {int jedi;} the;
 };
-extern int foo(int c);
+int foo(int c);
 //PIPS generated variable
 void kernel(int c, struct a of);
 

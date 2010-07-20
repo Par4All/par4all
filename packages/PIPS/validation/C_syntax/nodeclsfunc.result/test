@@ -58,9 +58,8 @@ Variable list:
 	Declared entity "nodeclsfunc!:*STACK*" with type "area" with size 0
 	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:nodecls"	with type "functional" "() -> void"
 
 Layouts for memory areas:
 
@@ -90,4 +89,4 @@ void nodecls()
    foo();
 }
 //Checks for No declaration of function
-extern void nodecls();
+void nodecls();

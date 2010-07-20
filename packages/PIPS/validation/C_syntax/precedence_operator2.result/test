@@ -7,7 +7,7 @@ struct test1 {
    struct test2 t2;
 };
 
-extern int main();
+int main();
 int main()
 {
    struct test1 t1;

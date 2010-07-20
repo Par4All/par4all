@@ -5,7 +5,7 @@
  */
 enum e {a};
 
-extern void enum08();
+void enum08();
 
 void enum08()
 {

@@ -4,7 +4,8 @@ setproprety ABORT_ON_USER_ERROR TRUE
 
 create fgetc03 fgetc03.c
 
-module main
+# FI: I remove the "main" module as it does not call the other functions, wich creates havoc on results
+#module main
 
 echo Select some options to deal with the C Language:
 echo Parse as C:
@@ -46,7 +47,7 @@ activate PRINT_CODE
 
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[getimage]
-apply PRIVATIZE_MODULE[main]
+#apply PRIVATIZE_MODULE[main]
 
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
@@ -56,9 +57,9 @@ module getimage
 apply COARSE_GRAIN_PARALLELIZATION
 display PRINTED_FILE
 
-module main
-apply COARSE_GRAIN_PARALLELIZATION
-display PRINTED_FILE
+#module main
+#apply COARSE_GRAIN_PARALLELIZATION
+#display PRINTED_FILE
 
 echo Regenerate the sources from the PIPS transformed code:
 apply UNSPLIT

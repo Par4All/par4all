@@ -45,7 +45,7 @@ Regenerate the sources from the PIPS transformed code:
 // BEGIN BLOCK
 enum {M=64};
 
-extern  main(int argc, char *argv[]);
+ main(int argc, char *argv[]);
 //PIPS generated variable
 void compute();
 // END BLOCK

@@ -1,3 +1,8 @@
+/* Warning: getimage wss never called. Anything can happen!
+ *
+ * FI: I remove "main" to check the privatization of scalar c
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -34,7 +39,7 @@ void getimage(void)
       imagein_im[i][j]=0.0;
     }
 }
-
+/*
 int main(argc,argv)
 
 int argc;
@@ -43,3 +48,4 @@ char *argv[];
 {
 	return EXIT_SUCCESS;
 }
+*/

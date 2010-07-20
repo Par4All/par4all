@@ -4,7 +4,7 @@ struct s {
    int in;
 };
 
-extern struct s struct23();
+struct s struct23();
 struct s  struct23()
 {
    struct s s;

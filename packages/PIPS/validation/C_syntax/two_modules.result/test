@@ -14,6 +14,6 @@ int main()
 }
 int g;
 
-extern void foo();
+void foo();
 
-extern int main();
+int main();

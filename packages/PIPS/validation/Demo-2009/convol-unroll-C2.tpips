@@ -99,6 +99,10 @@ echo
 
 display PRINTED_FILE[launch_microcode1]
 #quit
+
+# This is going to fail beacuse i_1 is declared in a CONTINUE but not
+# at the enclosing block level
+
 echo
 echo Transformers for "convol"
 echo

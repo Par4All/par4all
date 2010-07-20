@@ -4,7 +4,7 @@ delete $WS
 create $WS $WS.c
 display PRINTED_FILE[%ALLFUNC]
 setproperty LOOP_LABEL "here"
-setproperty LOOP_EXPANSION_SIZE 16
+setproperty LOOP_EXPANSION_SIZE "16"
 apply LOOP_EXPANSION_INIT[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 apply STATEMENT_INSERTION(%ALLFUNC)

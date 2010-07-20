@@ -3,7 +3,7 @@ struct s1 {
    int l;
 };
 
-extern void struct14();
+void struct14();
 void struct14()
 {
    int i;

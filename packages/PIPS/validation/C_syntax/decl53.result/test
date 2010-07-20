@@ -13,4 +13,4 @@ const void *z;
 // constant pointer to a constant: Well, this is forbidden!
 // const * int const u;
 
-extern void foo();
+void foo();

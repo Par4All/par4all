@@ -38,7 +38,7 @@ void *HDL_progress_end(HDL_progress_handler *prog);
 
 void *HDL_progress_end(HDL_progress_handler *prog);
 
-extern void HDL_progress_start_monitor(HDL_progress_handler *progress);
+void HDL_progress_start_monitor(HDL_progress_handler *progress);
 
 Parsed printed file for "HDL_progress_display"
 

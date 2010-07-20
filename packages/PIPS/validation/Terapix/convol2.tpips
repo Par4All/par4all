@@ -28,7 +28,7 @@ echo
 apply FLAG_LOOPS
 apply PRIVATIZE_MODULE
 setproperty LOOP_LABEL "l99993"
-setproperty LOOP_EXPANSION_SIZE 126
+setproperty LOOP_EXPANSION_SIZE "126"
 apply LOOP_EXPANSION
 display PRINTED_FILE
 
@@ -54,7 +54,7 @@ echo
 echo loop expansion again
 echo
 setproperty LOOP_LABEL "l99991"
-setproperty LOOP_EXPANSION_SIZE 128
+setproperty LOOP_EXPANSION_SIZE "128"
 setproperty LOOP_EXPANSION_OFFSET 1
 apply PRIVATIZE_MODULE
 apply LOOP_EXPANSION
