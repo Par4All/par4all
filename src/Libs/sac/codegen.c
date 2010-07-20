@@ -1259,18 +1259,6 @@ static statement generate_exec_statement(simdstatement ss)
     return make_exec_statement_from_opcode(simdstatement_opcode(ss), args);
 }
 
-#if 0
-static statement make_shuffle_statement(entity dest, entity src, int order)
-{
-    list args = gen_make_list(expression_domain,
-            entity_to_expression(dest),
-            entity_to_expression(src),
-            make_integer_constant_expression(order),
-            NULL);
-    return make_exec_statement_from_name( "PSHUFW",args);
-}
-#endif
-
 static 
 statement generate_load_statement(simdstatement si, int line)
 {
@@ -1334,65 +1322,6 @@ static statement generate_save_statement(simdstatement si)
     return make_save_statement(opcode_vectorSize(simdstatement_opcode(si)), args, padded);
 }
 
-static int intsort(const void *a, const void*b)
-{
-    int A = *(int*)a;
-    int B = *(int*)b;
-    return A==B?0:A<B?-1:1; }
-
-static void simdstatement_bubblesort_arguments(simdstatement ssi,intptr_t sz, intptr_t distances[sz])
-{
-    int tmp[sz];
-    memcpy(&tmp[0],&distances[0],sizeof(int)*sz);
-    qsort(&tmp[0],sz,sizeof(int),intsort);
-    for(intptr_t i=1;i<sz;i++) // do nothing if some elements are equals
-        if(tmp[i]==tmp[i-1]) return;
-    expression tmpargs[sz* simdstatement_nbArgs(ssi)];
-    memcpy(&tmpargs[0],simdstatement_arguments(ssi),sizeof(expression)*sz*simdstatement_nbArgs(ssi));
-    for(intptr_t i=0;i<sz;i++)
-    {
-        intptr_t new_index = ((int*)bsearch(distances+i,&tmp[0],sz,sizeof(int),intsort))-&tmp[0];
-        for(intptr_t j =0;j<simdstatement_nbArgs(ssi) ; j++)
-        {
-            simdstatement_arguments(ssi)[i+j*sz]= tmpargs[new_index+j*sz];
-        }
-    }
-}
-
-static
-void simd_optimize_data_layout(simdstatement ssi)
-{
-    opcode oc = simdstatement_opcode(ssi);
-    intptr_t sz = opcode_vectorSize(oc);
-    /* first optimization : if all statements are comparable, sort them accordingly */
-    for(intptr_t i = 0 ; i < simdstatement_nbArgs(ssi) ; i++)
-    {
-        bool all_comparable = true;
-        intptr_t distances[sz];
-        distances[0]=0;
-        for(intptr_t j = 1 ; j < sz ; j++)
-        {
-            expression distance = distance_between_expression(
-                    simdstatement_arguments(ssi)[0+sz*i],
-                    simdstatement_arguments(ssi)[j+sz*i]
-                    );
-            if(!expression_undefined_p(distance) && expression_integer_value(distance,&distances[0]+j))
-            {
-                free_expression(distance);
-            }
-            else
-            {
-                all_comparable = false;
-                break;
-            }
-        }
-        if(all_comparable)
-        {
-            simdstatement_bubblesort_arguments(ssi,sz,distances);
-            break;
-        }
-    }
-}
 
 list generate_simd_code(simdstatement ssi, float * simdCost)
 {
@@ -1407,10 +1336,6 @@ list generate_simd_code(simdstatement ssi, float * simdCost)
     /* SIMD statement (will generate more than one statement) */
     int i;
     
-
-    /* this phase optimizes the data layout */
-    simd_optimize_data_layout(ssi);
-
     //First, the load statement(s)
     for(i = 0; i < simdstatement_nbArgs(ssi)-1; i++)
     {

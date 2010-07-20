@@ -48,14 +48,22 @@
 #include "control.h"
 #include "properties.h"
 
+bool sac_expression_reduction_p(expression e){
+    if(expression_reference_p(e)) {
+        const char* refname = entity_user_name(reference_variable(expression_reference(e)));
+        if(refname==strstr(refname,get_string_property("SIMD_REMOVE_REDUCTIONS_PREFIX")))
+            return true;
+    }
+    return false;
+}
 
 static entity make_reduction_vector_entity(reduction r)
 {
     basic base = basic_of_reference(reduction_reference(r));
     entity new_ent, mod_ent;
     static int counter = 0;
-    static const char prefix[] = "RED" ;
-    static char buffer[ 1 + 3 + sizeof(prefix) ];
+    const char *prefix = get_string_property("SIMD_REMOVE_REDUCTIONS_PREFIX") ;
+    char buffer[ 1 + 3 + strlen(prefix) ];
     pips_assert("buffer does not overflow",counter < 1000);
     sprintf(buffer,"%s%u",prefix,counter++);
 
