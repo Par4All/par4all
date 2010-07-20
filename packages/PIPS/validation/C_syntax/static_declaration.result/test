@@ -10,7 +10,7 @@ Unsplit stati_declaration
  */
 static int x = 2;
 
-extern int main();
+int main();
 int main()
 {
    x++;

@@ -4,12 +4,12 @@ int foo_tball()
    i = j?1:i;
    i = !j?2:i;
 }
-extern int foo_tball();
+int foo_tball();
 int foo_tball()
 {
    int i, j;
    i = j?1:2;
 
 }
-extern int foo_tball();
+int foo_tball();
 

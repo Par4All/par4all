@@ -12,7 +12,7 @@ foo fooo(foo fo)
 
 typedef int foo;
 
-extern foo fooo(foo fo);
+foo fooo(foo fo);
 foo fooo(foo fo)
 {
    return fo;

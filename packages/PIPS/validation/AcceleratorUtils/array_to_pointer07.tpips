@@ -1,0 +1,11 @@
+delete array_to_pointer07
+create array_to_pointer07 array_to_pointer07.c
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+display PRINTED_FILE[%ALL]
+apply ARRAY_TO_POINTER[%ALL]
+display PRINTED_FILE[%ALL]
+
+
+quit
+

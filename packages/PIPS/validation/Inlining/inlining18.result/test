@@ -11,9 +11,9 @@ int main(void)
    fun3 = __func__;
    return 0;
 }
-extern char *foo(void);
+char *foo(void);
 
-extern int main(void);
+int main(void);
 int main(void)
 {
    const char *fun, *fun2, *fun3;

@@ -12,13 +12,13 @@ void megablast(int n)
    for(i = 0; i <= n-1; i += 1)
       j = foo(i);
 }
-extern int foo(int a);
+int foo(int a);
 
-extern void bar(int *c);
-extern void malabar(int *c);
+void bar(int *c);
+void malabar(int *c);
 
-extern void megablast(int n);
-extern int main();
+void megablast(int n);
+int main();
 int main()
 {
    return 1;

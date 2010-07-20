@@ -6,21 +6,14 @@ l99993
 == loops of l99998
 l99999
 == loops of l99997
-
 == loops of l99993
 l99995
 l99994
 = third level loops
 == loops of l99999
-
-== loops of 
-l99998
-l99997
-l99993
 == loops of l99995
 l99996
 == loops of l99994
-
 void looping()
 {
    int i, j, k, l;

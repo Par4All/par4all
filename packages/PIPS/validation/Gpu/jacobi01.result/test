@@ -27,12 +27,14 @@ void compute(float_t space[501][501], float_t save[501][501])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, 0<=t, t<=399}>
+//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    0<=t, t<=399}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, 0<=t, t<=399}>
+//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    0<=t, t<=399}>
 
       iteration(space, save);                                           /*0106*/
 }
@@ -419,12 +421,14 @@ int main(int argc, char *argv[])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, argc==2, i==501}>
+//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    argc==2, i==501}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, argc==2, i==501}>
+//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    argc==2, i==501}>
 
 
    compute(space, save);                                                /*0127*/

@@ -2,7 +2,7 @@
 Parser output
 
 {{
-   extern int block_scope();
+   int block_scope();
 }}
 
 int block_scope()

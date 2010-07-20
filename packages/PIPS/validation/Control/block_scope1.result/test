@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "block_scope1!:*STACK*" with type "area" with size 0
 	Declared entity "block_scope1!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:block_scope"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 
@@ -99,7 +98,7 @@ End of declarations for module block_scope
 Parser output
 
 {{
-   extern int block_scope();
+   int block_scope();
 }}
 
 int block_scope()

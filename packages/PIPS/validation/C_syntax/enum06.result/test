@@ -1,4 +1,4 @@
 /* Check the prettyprint of enum declarations */
 enum e {a};
 
-extern int main();
+int main();

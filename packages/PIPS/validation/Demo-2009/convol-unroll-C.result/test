@@ -86,12 +86,12 @@ l100:
       }
 l99999:
    for(i = MIN(384, 510)+1; i <= 510; i += 1)
-l99997:
+l99998:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
-l99995:
+l99997:
          for(ki = 0; ki <= 2; ki += 1)
-l99993:
+l99996:
             for(kj = 0; kj <= 2; kj += 1)
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;
@@ -131,12 +131,12 @@ l100:
    i_1 = 385;
 l99999:
    for(i = 385; i <= 510; i += 1)
-l99997:
+l99998:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
-l99995:
+l99997:
          for(ki = 0; ki <= 2; ki += 1)
-l99993:
+l99996:
             for(kj = 0; kj <= 2; kj += 1)
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;
@@ -202,12 +202,12 @@ l200:            ;
    i_1 = 385;
 l99999:
    for(i = 385; i <= 510; i += 1)
-l99997:
+l99998:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
-l99995:
+l99997:
          for(ki = 0; ki <= 2; ki += 1)
-l99993:
+l99996:
             for(kj = 0; kj <= 2; kj += 1)
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;

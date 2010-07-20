@@ -1,0 +1,52 @@
+# Check that multiple declarations of the same external variable does
+# not end up with wrong internal declarations
+
+delete declarations
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create declarations declarations.src/declarations01.c \
+       declarations.src/declarations02.c \
+       declarations.src/declarations03.c
+
+# Not needed to see the bug in the symbol table of declarations_!
+# declarations__.c
+
+echo
+echo Symbol table for "declarations01!"
+echo
+
+display SYMBOL_TABLE_FILE[declarations01!]
+
+echo
+echo Parsed printed file for "declarations01!"
+echo
+
+display PARSED_PRINTED_FILE[declarations01!]
+
+echo
+echo Symbol table for "declarations02!"
+echo
+
+display SYMBOL_TABLE_FILE[declarations02!]
+
+echo
+echo Parsed printed file for "declarations02!"
+echo
+
+display PARSED_PRINTED_FILE[declarations02!]
+
+echo
+echo Symbol table for "declarations03!"
+echo
+
+display SYMBOL_TABLE_FILE[declarations03!]
+
+echo
+echo Parsed printed file for "declarations03!"
+echo
+
+display PARSED_PRINTED_FILE[declarations03!]
+
+close
+delete declarations

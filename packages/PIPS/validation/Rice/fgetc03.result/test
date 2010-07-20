@@ -12,8 +12,11 @@ Try to restructure the code for more precision:
 Check the proper effects, especially for variable fp and call to fgetc()
 void getimage(void)
 {
+//               <must be written>: i j
    int i, j;
+//               <must be written>: c
    unsigned char c;
+//               <must be written>: fp
    FILE *fp;
 //               <must be written>: fp
    
@@ -59,9 +62,5 @@ void getimage(void)
          imagein_re[i][j] = c==0?0.0:1.0;
          imagein_im[i][j] = 0.0;
       }
-}
-int main(int argc, char *argv[])
-{
-   return 0;
 }
 Regenerate the sources from the PIPS transformed code:

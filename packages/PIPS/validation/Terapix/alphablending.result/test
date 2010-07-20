@@ -324,20 +324,20 @@ l99997:
    for(j = 0; j <= -1+I_0; j += 1)
       (*result00)[j+1-1] = (caillou0[2]*(*src000)[j+1-1]+caillou0[3]*(*src100)[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
-void launcher_0_microcode(int I_0, int *caillou0, short **result00, short **src000, short **src100)
+void launcher_0_microcode(int I_0, int *caillou0, short *result00, short *src000, short *src100)
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
    for(j = 0; j <= -1+I_0; j += 1)
-      *(*result00+j+1-1) = (caillou0[2]**(*src000+j+1-1)+caillou0[3]**(*src100+j+1-1))*(caillou0[0]<<caillou0[1])>>caillou0[1];
+      *(result00+j+1-1) = (caillou0[2]**(src000+j+1-1)+caillou0[3]**(src100+j+1-1))*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
 I_0 belongs to a loop bound
 caillou0 seems a mask
-result00 seems an image
-src000 seems an image
-src100 seems an image
-void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+result00 seems a mask
+src000 seems a mask
+src100 seems a mask
+void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
@@ -346,29 +346,25 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    //PIPS generated variable
    int *caillou0, *ma0;
    //PIPS generated variable
-   short *result00, *im1;
-   //PIPS generated variable
-   short *src000, *im2;
-   //PIPS generated variable
-   short *src100, *im3;
+   short *result00, *ma1, *src000, *ma2, *src100, *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
    int *im4;
    //PIPS generated variable
    short *im5, *im6, *im7;
-   im3 = *FIFO3;
-   im2 = *FIFO2;
-   im1 = *FIFO1;
+   ma3 = FIFO3;
+   ma2 = FIFO2;
+   ma1 = FIFO1;
    ma0 = FIFO0;
 l99997:   ;
    re2 = 1;
    while (re2<=N0) {
-      *(im1+re2+1-1) = (ma0[2]**(im2+re2+1-1)+ma0[3]**(im3+re2+1-1))*(ma0[0]<<ma0[1])>>ma0[1];
+      *(ma1+re2+1-1) = (ma0[2]**(ma2+re2+1-1)+ma0[3]**(ma3+re2+1-1))*(ma0[0]<<ma0[1])>>ma0[1];
       re2 = 1+re2;
    }
 }
-void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
@@ -377,11 +373,7 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    //PIPS generated variable
    int *caillou0, *ma0;
    //PIPS generated variable
-   short *result00, *im1;
-   //PIPS generated variable
-   short *src000, *im2;
-   //PIPS generated variable
-   short *src100, *im3;
+   short *result00, *ma1, *src000, *ma2, *src100, *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
@@ -400,32 +392,32 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    int I_6, I_7, I_8, I_9, I_10, I_11;
    //PIPS generated variable
    short *P_2;
-   im3 = *FIFO3;
-   im2 = *FIFO2;
-   im1 = *FIFO1;
+   ma3 = FIFO3;
+   ma2 = FIFO2;
+   ma1 = FIFO1;
    ma0 = FIFO0;
 l99997:   ;
    re2 = 1;
    while (re2<=N0) {
       I_1 = re2+1;
       I_2 = I_1-1;
-      P_0 = im2+I_2;
+      P_0 = ma2+I_2;
       I_3 = ma0[2]**P_0;
       I_4 = re2+1;
       I_5 = I_4-1;
-      P_1 = im3+I_5;
+      P_1 = ma3+I_5;
       I_6 = ma0[3]**P_1;
       I_7 = I_3+I_6;
       I_8 = ma0[0]<<ma0[1];
       I_9 = I_7*I_8;
       I_10 = re2+1;
       I_11 = I_10-1;
-      P_2 = im1+I_11;
+      P_2 = ma1+I_11;
       *P_2 = I_9>>ma0[1];
       re2 = 1+re2;
    }
 }
-void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
@@ -434,11 +426,7 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    //PIPS generated variable
    int *caillou0, *ma0;
    //PIPS generated variable
-   short *result00, *im1;
-   //PIPS generated variable
-   short *src000, *im2;
-   //PIPS generated variable
-   short *src100, *im3;
+   short *result00, *ma1, *src000, *ma2, *src100, *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
@@ -457,9 +445,9 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    int I_6, I_7, I_8, I_9, I_10, I_11;
    //PIPS generated variable
    short *P_2;
-   im3 = *FIFO3;
-   im2 = *FIFO2;
-   im1 = *FIFO1;
+   ma3 = FIFO3;
+   ma2 = FIFO2;
+   ma1 = FIFO1;
    ma0 = FIFO0;
 l99997:   ;
    re2 = 1;
@@ -468,7 +456,7 @@ l99997:   ;
       I_1 = I_1+1;
       I_2 = I_1;
       I_2 = I_2-1;
-      P_0 = im2;
+      P_0 = ma2;
       P_0 = P_0+I_2;
       I_3 = ma0[2];
       I_3 = I_3**P_0;
@@ -476,7 +464,7 @@ l99997:   ;
       I_4 = I_4+1;
       I_5 = I_4;
       I_5 = I_5-1;
-      P_1 = im3;
+      P_1 = ma3;
       P_1 = P_1+I_5;
       I_6 = ma0[3];
       I_6 = I_6**P_1;
@@ -490,7 +478,7 @@ l99997:   ;
       I_10 = I_10+1;
       I_11 = I_10;
       I_11 = I_11-1;
-      P_2 = im1;
+      P_2 = ma1;
       P_2 = P_2+I_11;
       *P_2 = I_9;
       *P_2 = *P_2>>ma0[1];
@@ -498,16 +486,12 @@ l99997:   ;
       re2 = re2+re2;
    }
 }
-void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, short **FIFO3)
+void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    int *ma0;
    //PIPS generated variable
-   short *im1;
-   //PIPS generated variable
-   short *im2;
-   //PIPS generated variable
-   short *im3;
+   short *ma1, *ma2, *ma3;
    //PIPS generated variable
    unsigned int re2;
    //PIPS generated variable
@@ -522,9 +506,9 @@ void launcher_0_microcode(int N0, int *FIFO0, short **FIFO1, short **FIFO2, shor
    int I_6, I_7, I_8, I_9, I_10, I_11;
    //PIPS generated variable
    short *P_2;
-   setpi(im3, FIFO3);
-   setpi(im2, FIFO2);
-   setpi(im1, FIFO1);
+   seti(ma3, FIFO3);
+   seti(ma2, FIFO2);
+   seti(ma1, FIFO1);
    seti(ma0, FIFO0);
 l99997:   ;
    seti(re2, 1);
@@ -533,7 +517,7 @@ l99997:   ;
       addi(I_1, 1);
       seti(I_2, I_1);
       subi(I_2, 1);
-      seti(P_0, im2);
+      seti(P_0, ma2);
       paddi(P_0, I_2);
       seti(I_3, ma0[2]);
       mulri(I_3, P_0);
@@ -541,7 +525,7 @@ l99997:   ;
       addi(I_4, 1);
       seti(I_5, I_4);
       subi(I_5, 1);
-      seti(P_1, im3);
+      seti(P_1, ma3);
       paddi(P_1, I_5);
       seti(I_6, ma0[3]);
       mulri(I_6, P_1);
@@ -555,7 +539,7 @@ l99997:   ;
       addi(I_10, 1);
       seti(I_11, I_10);
       subi(I_11, 1);
-      seti(P_2, im1);
+      seti(P_2, ma1);
       paddi(P_2, I_11);
       pseti(P_2, I_9);
       prshifti(P_2, ma0[1]);

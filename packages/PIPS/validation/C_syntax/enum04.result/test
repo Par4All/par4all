@@ -1,6 +1,6 @@
 enum {a, b, c=b};
 
-extern int main();
+int main();
 
 Preconditions derived from enum
 
@@ -15,7 +15,7 @@ enum {a, b, c=b};
 
 //  P() {}
 
-extern int main();
+int main();
 
 
 //  P() {}

@@ -11,9 +11,8 @@ Variable list:
 	Declared entity "bar!:*STACK*" with type "area" with size 0
 	Declared entity "bar!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 
@@ -132,7 +131,7 @@ End of declarations for module main
 
 //Checks memory allocation offsets for extern variables in 2 files:
 // bar.c extern variable declared in a function
-extern int main();
+int main();
 //foo.c local variable declaration
 int i = 2;
 int main()

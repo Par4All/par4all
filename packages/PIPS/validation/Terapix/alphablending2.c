@@ -1,6 +1,5 @@
-#define n 511
 #define alpha 40
-void alphablending(short src0[n][n], short src1[n][n], short result[n][n])
+void alphablending(int n,short src0[n][n], short src1[n][n], short result[n][n])
 {
     unsigned int i,j;
     for(i=0;i<n;i++)
@@ -14,6 +13,7 @@ void alphablending(short src0[n][n], short src1[n][n], short result[n][n])
 
 caller()
 {
+    int n;
     short a[n][n],b[n][n],c[n][n];
-    alphablending(a,b,c);
+    alphablending(n,a,b,c);
 }

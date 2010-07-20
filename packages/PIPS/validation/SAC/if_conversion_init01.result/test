@@ -11,7 +11,7 @@ void foo(int a, unsigned short b, char x, long int j, long long int i)
       j = 3;
    }
 }
-extern void foo(int a, unsigned short b, char x, long int j, long long int i);
+void foo(int a, unsigned short b, char x, long int j, long long int i);
 void foo(int a, unsigned short b, char x, long int j, long long int i)
 {
    //PIPS generated variable
@@ -35,5 +35,5 @@ void foo(int a, unsigned short b, char x, long int j, long long int i)
    if (!I_2)
       j = 3;
 }
-extern void foo(int a, unsigned short b, char x, long int j, long long int i);
+void foo(int a, unsigned short b, char x, long int j, long long int i);
 

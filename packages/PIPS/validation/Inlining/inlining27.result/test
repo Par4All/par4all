@@ -20,9 +20,9 @@ int bar(int i_)
 
 Code after inlining
 
-extern int foo(int i);
-extern int bar(int i_);
-extern int main();
+int foo(int i);
+int bar(int i_);
+int main();
 int bar(int i_)
 {
    int i__ = 0, i = 0;

@@ -2,50 +2,6 @@ from pyps import *
 import terapips
 import os,sys
 
-save_dir="tera.out"
-
-def microcode_normalizer(ws,module):
-	ws.activate("must_regions")
-	ws.activate("transformers_inter_full")
-	ws.set_property(array_priv_false_dep_only=False)
-
-	# remove ifs
-	#module.if_conversion_init()
-	#module.if_conversion()
-
-	module.loop_normalize(one_increment=True,lower_bound=0,skip_index_side_effect=True)
-	module.display()
-	module.flatten_code(flatten_code_unroll=False)
-	module.display()
-	#module.partial_eval()
-	#module.display()
-	#module.common_subexpression_elimination()
-	#module.display()
-	#module.icm()
-	#module.display()
-	#module.partial_eval()
-	#module.display()
-	#module.suppress_dead_code()
-	#module.display()
-	#module.clean_declarations()
-	#module.display()
-	module.array_to_pointer(convert_parameters="POINTER",flatten_only=True)
-	module.display()
-	module.normalize_microcode()
-	module.display()
-	module.simd_atomizer(atomize_reference=True,atomize_lhs=True)
-	module.display()
-	module.generate_two_addresses_code()
-	module.display()
-	for p in ["addi","addri","subi","subri","muli","mulri","seti","lshifti","rshifti","psubi","paddi","setpi","prshifti","pseti"]:
-		module.expression_substitution(pattern=p)
-	module.flatten_code(flatten_code_unroll=False)
-	module.clean_declarations()
-	module.display()
-
-""" convert a matrix to a string suitable for loop_tiling"""
-def mconv(tiling_matrix):
-	return ",".join(map(lambda x:" ".join(map(str,x)),tiling_matrix))
 
 """ smart loop expasion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
 def smart_loop_expansion(m,l,sz):
@@ -58,41 +14,44 @@ def smart_loop_expansion(m,l,sz):
 
 module.smart_loop_expansion=smart_loop_expansion
 
+def vconv(tiling_vector):
+	return ",".join(tiling_vector)
 
 
 if __name__ == "__main__":
-	w = workspace(["average_power.c", "include/load.c", "include/terasm.c"], cppflags="-I.")
+	w = workspace(["average_power.c"], cppflags="-I.")
 	w.set_property(constant_path_effects=False)
+	w.activate("MUST_REGIONS")
+	w.activate("TRANSFORMERS_INTER_FULL")
+	w.activate("INTERPROCEDURAL_SUMMARY_PRECONDITION")
+	w.activate("PRECONDITIONS_INTER_FULL")
+	w.activate("REGION_CHAINS")
+
 	m = w["average_power"]
 	
 	print "tidy the code just in case of"
 	m.partial_eval()
 	 
 	#print "I have to do this early"
-	#m.display()
+	m.display()
+	m.recover_for_loop()
+	m.for_loop_to_do_loop()
+	m.display()
+#	w["CplAbs"].inlining()
+	m.display()
 
-	tiling_matrix=[[128,0],[0,8]]
+	tiling_vector=["128","N"]
 	
 	print "tiling"
 	for l in m.loops():
 		if l.loops():
 				# this take care of expanding the loop in order to match number of processor constraint
-				m.smart_loop_expansion(l,tiling_matrix[0][0])
+				m.smart_loop_expansion(l,tiling_vector[0])
 				# this take care of expanding the loop in order to match memory size constraint
-				m.smart_loop_expansion(l.loops()[0],tiling_matrix[1][1])
-				# this performs the real tiling, we use an outling trick to limit tiling to depht 2
-				memory=[]
-				for ll in l.loops():
-					for lll in ll.loops():
-						tricky="zou"+lll.label
-						memory.append(tricky)
-						m.outline(module_name=tricky,label=lll.label)
-						m.display()
-				l.loop_tiling(matrix=mconv(tiling_matrix))
-				for mem in memory:
-					w[mem].inlining()
-					m.display()
-				
+				m.smart_loop_expansion(l.loops()[0],tiling_vector[1])
+				l.symbolic_tiling(force=True,vector=vconv(tiling_vector))
+				m.display()
+				#m.icm()
 				m.display()
 
 	print "group constants and isolate"
@@ -100,6 +59,11 @@ if __name__ == "__main__":
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
+				m.display(With="PRINT_CODE_REGIONS")
+				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=2**14)
+				m.display()
+				m.run(["psolve"])
+				m.display(With="PRINT_CODE_REGIONS")
 	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 	#			m.display()
 				kernels+=[l2]
@@ -137,10 +101,12 @@ if __name__ == "__main__":
 		loop_to_outline=theloop.loops()[0]
 		print "label:" , loop_to_outline.label
 		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
+		m.display()
 		mc=w[name]
 		l.display()
 		mc.display()
 		microcodes+=[mc]
+	sys.exit()
 
 		#print "normalize microcode", mc.name
 		#microcode_normalizer(w,mc)

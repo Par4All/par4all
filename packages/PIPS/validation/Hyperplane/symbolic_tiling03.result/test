@@ -11,7 +11,7 @@ short alphablend(int n, int m, short alpha, short a[n][m], short b[n][m], short 
    short i, j;
    //PIPS generated variable
    short it, jt;
-#pragma omp parallel for private(i)
+#pragma omp parallel for private(i,j)
 here:
    for(it = 0; it <= n-1; it += N)
 #pragma omp parallel for private(j)
@@ -39,7 +39,7 @@ short alphablend(int n, int m, short alpha, short a[n][m], short b[n][m], short 
 //  <b[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
 //  <c[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=N}>
 
-#pragma omp parallel for private(i)
+#pragma omp parallel for private(i,j)
 here:
    for(it = 0; it <= n-1; it += N)
 

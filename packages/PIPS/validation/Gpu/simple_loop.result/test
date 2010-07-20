@@ -127,16 +127,16 @@ void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
 
 /* Equivalent stubs of Par4All runtime to have PIPS analyze happy */
 
-extern void *P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n);
+void *P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n);
 
 
-extern void *P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n);
+void *P4A_copy_from_accel(void *host_address, const void *accel_address, size_t n);
 
 
-extern void P4A_accel_malloc(void **dest, size_t n);
+void P4A_accel_malloc(void **dest, size_t n);
 
 
-extern void P4A_accel_free(void *dest);
+void P4A_accel_free(void *dest);
 void * P4A_copy_to_accel(const void *host_address, void *accel_address, size_t n)
 {
    size_t i;
@@ -168,7 +168,7 @@ enum {N=10000};
 
 double a[N], b[N], c[N];
 
-extern int main();
+int main();
 //PIPS generated variable
 void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N]);
 void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])

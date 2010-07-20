@@ -18,9 +18,8 @@ Variable list:
 	Declared entity "initialization04!:*STACK*" with type "area" with size 0
 	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:initialization04"	with type "functional" "() -> void"
 
 Derived entities:
 
@@ -135,7 +134,7 @@ f_t dec;
 
 si_t tab[] = {{0, {ini, inc, dec}}, {1, {ini, inc, dec}}, {2, {ini, inc, dec}}};
 
-extern void initialization04();
+void initialization04();
 
 Printed file for "initialization04"
 

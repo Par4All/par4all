@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "typedef11!:*STACK*" with type "area" with size 0
 	Declared entity "typedef11!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:typedef11"	with type "functional" "km -> int"
 
 Typedef entities:
 
@@ -55,7 +54,7 @@ Parsed printed file "typedef11!"
 
 typedef int km;
 
-extern int typedef11(km x);
+int typedef11(km x);
 
 Symbol table file "typedef11"
 

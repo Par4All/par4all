@@ -20,9 +20,9 @@ int bar(int a, int b)
 
 Code after inlining
 
-extern int bar(int a, int b);
+int bar(int a, int b);
 
-extern int foo(int argc, char **argv);
+int foo(int argc, char **argv);
 int foo(int argc, char **argv)
 {
    int c;

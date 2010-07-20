@@ -116,9 +116,9 @@ Unsplit resulting code
 */
 enum {N=100};
 
-extern void change(int *i, double array[N]);
+void change(int *i, double array[N]);
 
-extern void give();
+void give();
 void change(int *i, double array[N])
 {
    int k;

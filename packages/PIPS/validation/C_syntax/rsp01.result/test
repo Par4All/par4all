@@ -9,7 +9,7 @@ int filter(int x);
 
 int res;
 
-extern int main();
+int main();
 
 int filter(int x);
 

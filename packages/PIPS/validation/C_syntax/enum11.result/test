@@ -4,7 +4,7 @@
    additional nesting
  */
 
-extern void enum11();
+void enum11();
 
 void enum11()
 {
