@@ -48,12 +48,13 @@ void quick_privatize_graph(graph dep_graph)
 
       if (gen_find_eq(ind, locals) == entity_undefined) {
 	if (quick_privatize_loop(s1, successors)) {
-	  pips_debug(1, "Index for loop %d privatized\n",
+	  pips_debug(1, "Index for loop %" PRIdPTR " privatized\n",
 		     statement_number(s1));
 	  loop_locals(l) = CONS(ENTITY, ind, locals);
 	}
 	else {
-	  pips_debug(1, "could not privatize loop %d\n", statement_number(s1));
+	  pips_debug(1, "could not privatize loop %" PRIdPTR "\n",
+		     statement_number(s1));
 	}
       }
     }
@@ -62,13 +63,13 @@ void quick_privatize_graph(graph dep_graph)
 
 static bool quick_privatize_loop(statement stat, list successors)
 {
-  pips_debug(3, "arcs from %d\n", statement_number(stat));
+  pips_debug(3, "arcs from %" PRIdPTR "\n", statement_number(stat));
 
   FOREACH(SUCCESSOR, su, successors) {
     dg_arc_label dal =  (dg_arc_label) successor_arc_label(su);
     statement st = vertex_to_statement(successor_vertex(su));
 
-    pips_debug(3, "arcs to %d\n", statement_number(st));
+    pips_debug(3, "arcs to %" PRIdPTR "\n", statement_number(st));
 
     if (! quick_privatize_statement_pair(stat, st,
 					 dg_arc_label_conflicts(dal)))
