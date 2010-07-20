@@ -27,7 +27,8 @@ LIB_CFILES =	stub.c \
 		transformation.c \
 		pragma.c \
 		prettyprint.c \
-		call.c
+		call.c \
+		propagation.c
 
 INC_TARGET =    $(TARGET).h
 

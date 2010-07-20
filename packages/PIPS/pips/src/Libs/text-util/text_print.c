@@ -159,7 +159,7 @@ void print_sentence(FILE * fd, sentence s) {
            * so "l" is added for this case
            */
           if (strlen(label) > 0)
-            fprintf_sentence(fd, isdigit(label[0]) ? "l%s:" : "%s:", label);
+            fprintf_sentence(fd, get_C_label_printf_format(label), label);
           break;
         default:
           pips_internal_error("language unknown not handled");
