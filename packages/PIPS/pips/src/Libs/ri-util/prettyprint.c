@@ -333,6 +333,22 @@ void close_prettyprint() {
 }
 
 
+/* Get the prettyprint format of a C label
+
+   @param label a string to render
+
+   @return the printf-format string
+ */
+string get_C_label_printf_format(string label) {
+  /* If the label begin with a digit, prefix it with a 'l' to be C
+     compatible.
+
+     Hmmm, this does not verify that there is no such label in the program
+     already... :-( Should be solved quite earlier anyway...
+  */
+  return isdigit(label[0]) ? "l%s:" : "%s:";
+}
+
 /**
  * @brief Can this statement be printed on one line, without enclosing braces?
  */
@@ -3965,24 +3981,38 @@ text C_comment_to_text(int margin, string comment)
   return ct;
 }
 
-/* See text_statement for most parameters
- *
- * braces_p: the statement is within a block; this has an impact of
- * the print-out of continue statements in C, ";"
- *
- * drop_continue_p: another condition to control the print-out of ";"
- * or not;
- *
- * Notes:
- *
- * in simple tests, the statement ";" may be mandatory or not.
- *
- * continue may be used to preserve comments and then the ";" may be
- * dropped
- *
- * Source fidelity would be easier if a new NOP statement that is
- * never printed out were used.
- */
+
+/* Build the text of a statement
+
+   @param module: the module containing the statement
+
+   @param imargin: current tabulation
+
+   @param stmt: the statement to print
+
+   @param braces_p: the statement is within a block; this has an impact of
+   the print-out of continue statements in C, ";"
+
+   @param drop_continue_p: another condition to control the print-out of
+   ";" or not;
+
+   @param pdl: previous declaration list; list of entities that have
+   already been declared and should not be redeclared; this is required
+   for struct and union which may be declared independently or in a nested
+   way. See C_syntax/struct03, 04, 05, etc...
+
+   @return the text of the statement
+
+   Notes:
+
+   - in simple tests, the statement ";" may be mandatory or not.
+
+   - continue may be used to preserve comments and then the ";" may be
+     dropped
+
+   - source fidelity would be easier if a new NOP statement that is
+   never printed out were used.
+*/
 text text_statement_enclosed(entity module,
 			     int imargin,
 			     statement stmt,
@@ -3993,8 +4023,6 @@ text text_statement_enclosed(entity module,
   instruction i = statement_instruction(stmt);
   text r= make_text(NIL);
   text temp;
-  string label =
-    entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
   string i_comments = statement_comments(stmt);
   string comments = string_undefined;
   bool braces_added = FALSE;
@@ -4076,8 +4104,21 @@ text text_statement_enclosed(entity module,
     pips_debug(1, "I unexpectedly bumped into dead code?\n");
   }
 
-  if (same_string_p(label, RETURN_LABEL_NAME))
-    {
+  string label;
+
+  bool pragma_before_label_in_C = prettyprint_language_is_c_p()
+    && statement_with_pragma_p(stmt) && !unlabelled_statement_p(stmt);
+
+  if (pragma_before_label_in_C)
+    /* We are in trouble because a pragma in C should appear after the label but
+       the Fortran-oriented prettyprinter is to prettyprint a label and an
+      instruction in block. So we print the instruction without the label
+      that is to be added in another way afterwards */
+    label = "";
+  else
+    label = label_local_name(statement_label(stmt));
+
+  if (entity_return_label_p(statement_label(stmt))) {
       pips_assert("Statement with return label must be a return statement",
 		  return_statement_p(stmt));
 
@@ -4086,7 +4127,7 @@ text text_statement_enclosed(entity module,
 	 || !last_statement_p(stmt))
 	{
 	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, RETURN_FUNCTION_NAME);
-	  temp = make_text(CONS(SENTENCE, s ,NIL));
+	  temp = make_text(CONS(SENTENCE, s, NIL));
 	}
       else {
 	temp = make_text(NIL);
@@ -4097,15 +4138,15 @@ text text_statement_enclosed(entity module,
       entity m = entity_undefined_p(module)?
 	get_current_module_entity()
 	: module;
+
       if(TRUE || !compilation_unit_p(entity_name(m))) {
 	/* Do we need to print this CONTINUE statement in C? */
 	string cs = statement_comments(stmt);
-	entity l = statement_label(stmt);
 
-	if(prettyprint_language_is_c_p()
-	   && (braces_p || drop_continue_p)
-	   && empty_label_p(entity_local_name(l))
-	   && instruction_continue_p(i)) {
+	if (prettyprint_language_is_c_p()
+	    && (braces_p || drop_continue_p)
+	    && unlabelled_statement_p(stmt)
+	    && instruction_continue_p(i)) {
 	  if(!ENDP(statement_declarations(stmt))) {
 	    /* The declarations will be printed, no need for anything else */
 	    temp = make_text(NIL);
@@ -4138,6 +4179,7 @@ text text_statement_enclosed(entity module,
    * sure that the free is NEVER performed as it should. FC.
    */
   if(!ENDP(text_sentences(temp))) {
+    /* There is something to output for the instruction... */
     MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     if (! empty_comments_p(comments)) {
       text ct = text_undefined;
@@ -4156,16 +4198,11 @@ text text_statement_enclosed(entity module,
           break;
       }
     }
-    // append the extensions after comments
-    string ext =  extensions_to_string (statement_extensions (stmt), TRUE);
-    if (ext != string_undefined) {
-      ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, ext));
-    }
-
-    MERGE_TEXTS(r, temp);
   }
   else {
-    /* Preserve comments and empty C instruction */
+    /* There is nothing to output for the instruction itself.
+
+       Preserve comments and empty C instruction */
     if (! empty_comments_p(comments)) {
       text ct = text_undefined;
       switch (get_prettyprint_language_tag()) {
@@ -4196,8 +4233,25 @@ text text_statement_enclosed(entity module,
     else if(!ENDP(dl)) {
       MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     }
-    free_text(temp);
   }
+
+  /* Add the label if not already done, in the case we want it before a
+     extension/pragma: */
+  if (pragma_before_label_in_C)
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					  make_unformatted(strdup(label_local_name(statement_label(stmt))),
+							   STATEMENT_NUMBER_UNDEFINED,
+							   0,
+							   NULL)));
+
+  /* Append the extensions after comments: */
+  string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
+  if (ext != string_undefined) {
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
+  }
+
+  /* Then add any instruction text: */
+  MERGE_TEXTS(r, temp);
 
   /* append local variables  that might have not been inserted
      previously
@@ -4248,18 +4302,20 @@ text text_statement_enclosed(entity module,
 }
 
 /* Handles all statements but tests that are nodes of an unstructured.
- * Those are handled by text_control.
- *
- * module: the module containing the statement
- *
- * margin: current tabulation
- *
- * stat: the statement to print
- *
- * pdl: previous declaration list; list of entities that have already
- * been declared and should not be redeclared; this is required for
- * struct and union which may be declared independently or in a nested
- * way. See C_syntax/struct03, 04, 05, etc...
+   Those are handled by text_control.
+
+   @param module: the module containing the statement
+
+   @param margin: current tabulation
+
+   @param stmt: the statement to print
+
+   @param pdl: previous declaration list; list of entities that have already
+   been declared and should not be redeclared; this is required for
+   struct and union which may be declared independently or in a nested
+   way. See C_syntax/struct03, 04, 05, etc...
+
+   @return the text of the statement
  */
 text text_statement(
     entity module,

@@ -607,3 +607,24 @@ bool simplify_complex(string module_name)
     reset_current_module_statement();
     return true;
 }
+
+static void do_simplify_c_operator(call c)
+{
+  entity op =call_function(c);
+  if(ENTITY_PLUS_C_P(op)||ENTITY_MINUS_C_P(op)) {
+    expression lhs = binary_call_lhs(c);
+    expression rhs = binary_call_rhs(c);
+    basic blhs = basic_of_expression(lhs);
+    basic brhs = basic_of_expression(rhs);
+    if(!basic_pointer_p(blhs) && ! basic_pointer_p(brhs))
+      call_function(c) = entity_intrinsic(
+          ENTITY_PLUS_C_P(op)?PLUS_OPERATOR_NAME:MINUS_OPERATOR_NAME);
+    free_basic(blhs);
+    free_basic(brhs);
+  }
+}
+
+/* replace PLUS_C_OPERATOR_NAME by PLUS_OPERATOR_NAME when relevant */
+void simplify_c_operator(statement s) {
+  gen_recurse(s,call_domain,gen_true, do_simplify_c_operator);
+}

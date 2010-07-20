@@ -10,6 +10,7 @@ libreductions_la_SOURCES=stub.c \
 						 transformation.c \
 						 pragma.c \
 						 prettyprint.c \
-						 call.c
+						 call.c \
+						 propagation.c
 
 include $(srcdir)/../pipslibs_includes.mk

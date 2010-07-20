@@ -118,7 +118,7 @@ static size_t pointer_depth(type t) {
     else return 0;
 }
 
-static void remove_dereferencment(expression e)
+static void remove_dereferencement(expression e)
 {
     if(expression_call_p(e)) {
         call c = expression_call(e);
@@ -128,7 +128,7 @@ static void remove_dereferencment(expression e)
             syntax syn = expression_syntax(lhs);
             expression_syntax(lhs)=syntax_undefined;
             update_expression_syntax(e,syn);
-            remove_dereferencment(e);
+            remove_dereferencement(e);
         }
     }
 }
@@ -242,7 +242,7 @@ bool expression_array_to_pointer(expression exp, bool in_init)
         pips_assert("non empty subscript",!ENDP(subscript_indices(s)));
         expression sarray = copy_expression(subscript_array(s));
         if(get_array_to_pointer_conversion_mode() != NO_CONVERSION)
-            remove_dereferencment(sarray);
+            remove_dereferencement(sarray);
 
         call c = make_call(
                 CreateIntrinsic(PLUS_C_OPERATOR_NAME),
