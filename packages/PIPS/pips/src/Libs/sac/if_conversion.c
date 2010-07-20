@@ -245,7 +245,7 @@ static void if_conv_statement(statement cs)
     // If the statement comment contains the string IF_TO_CONVERT,
     // then it means that this statement must be converted ...
     extension ex;
-    if( (ex=statement_with_pragma_p(cs, IF_TO_CONVERT)) )
+    if ( (ex = get_extension_from_statement_with_pragma(cs, IF_TO_CONVERT)) )
     {
         // remove the pragma
         gen_remove(&extensions_extension(statement_extensions(cs)),ex);

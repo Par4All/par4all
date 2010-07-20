@@ -1,0 +1,111 @@
+address_of01
+
+Declarations for module "address_of01" with type "int x REAL * -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "address_of01!:*STATIC*" with type "area" with size 0
+	Declared entity "address_of01:*DYNAMIC*" with type "area" with size 458
+	Declared entity "address_of01:*HEAP*" with type "area" with size 0
+	Declared entity "address_of01:*STACK*" with type "area" with size 0
+	Declared entity "address_of01:*STATIC*" with type "area" with size 0
+	Declared entity "address_of01:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "address_of01:0`__func__" with type "variable" "char *"
+	Declared entity "address_of01:0`a" with type "variable" "int"
+	Declared entity "address_of01:0`j" with type "variable" "int"
+	Declared entity "address_of01:0`k" with type "variable" "int"
+	Declared entity "address_of01:0`p" with type "variable" "int *"
+	Declared entity "address_of01:0`q" with type "variable" "REAL *"
+	Declared entity "address_of01:0`x" with type "variable" "REAL"
+	Declared entity "address_of01:address_of01" with type "variable" "int"
+	Declared entity "address_of01:b" with type "variable" "REAL *"
+	Declared entity "address_of01:i" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable address_of01:b	offset = 2
+	Variable address_of01:i	offset = 1
+
+Layout for return variable:
+
+	Variable "address_of01:address_of01"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "address_of01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "address_of01:*DYNAMIC*" of size 458:
+	Variable "address_of01:0`a"	offset = 26	size = 400
+	Variable "address_of01:0`j"	offset = 426	size = 4
+	Variable "address_of01:0`k"	offset = 430	size = 4
+	Variable "address_of01:0`p"	offset = 434	size = 8
+	Variable "address_of01:0`q"	offset = 442	size = 8
+	Variable "address_of01:0`x"	offset = 450	size = 8
+	Variable "address_of01:0`__func__"	offset = 0	size = 13
+	Variable "address_of01:0`__FUNCTION__"	offset = 13	size = 13
+
+
+Layout for memory area "address_of01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "address_of01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "address_of01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module address_of01
+
+/* check the print out of &a[i*k*k] for Benchmark/linpackd.c */
+
+typedef double REAL;
+
+
+/* Bug in unsplit: the code of void is requested */
+/* Bug in pretyprinter or in the prettyprinter: the "extern" keyword is lost */
+
+int foo(int i, int *q);
+
+REAL bar(int i, REAL *r);
+
+int address_of01(int i, REAL *b);
+int address_of01(int i, REAL *b)
+{
+   int a[100];
+   int j, k;
+   int *p;
+   REAL *q;
+   REAL x;
+   //extern void foo(int *);
+   
+   p = &a[i+j*k];
+   i = j+foo(i, &a[i+j*k]);
+   q = &b[i+j*k];
+   x = x+bar(i, &b[i+j*k]);
+}
+int address_of01(int i, REAL *b)
+{
+   int a[100];
+   int j, k;
+   int *p;
+   REAL *q;
+   REAL x;
+   //extern void foo(int *);
+   
+   p = &a[i+j*k];
+   i = j+foo(i, &a[i+j*k]);
+   q = &b[i+j*k];
+   x = x+bar(i, &b[i+j*k]);
+}

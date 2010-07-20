@@ -318,6 +318,22 @@ static list sac_statement_to_expressions(statement s)
     return out;
 }
 
+
+static void sac_sort_expressions_reductions_last(list *l)
+{
+    list tail = NIL;
+    list head = NIL;
+    FOREACH(EXPRESSION,exp,*l)
+        if(sac_expression_reduction_p(exp))
+            tail=CONS(EXPRESSION,exp,tail);
+        else
+            head=CONS(EXPRESSION,exp,head);
+    tail=gen_nreverse(tail);
+    head=gen_nreverse(head);
+    gen_free_list(*l);
+    *l=gen_nconc(head,tail);
+}
+
 static bool comparable_statements_on_distance_p(statement s0, statement s1)
 {
     list exp0=sac_statement_to_expressions(s0),
@@ -354,7 +370,14 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
     const statement s1 = *(const statement*)v1;
     list exp0=sac_statement_to_expressions(s0),
         exp1=sac_statement_to_expressions(s1);
+    /* hook for reductions :
+     * it is less painful to load reduction in a bad order than other reference,
+     * so we reorder the expressions exp0 in order to check reductions last
+     */
+    sac_sort_expressions_reductions_last(&exp0);
+    sac_sort_expressions_reductions_last(&exp1);
     list iter=exp1;
+    int res = 0;
     FOREACH(EXPRESSION,e0,exp0)
     {
         expression e1 = EXPRESSION(CAR(iter));
@@ -364,11 +387,13 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
         {
             (void)expression_integer_value(distance,&val);
             free_expression(distance);
-            if(val) return val;
+            if((res=val)) break;
         }
         POP(iter);
     }
-    return compare_statements_on_ordering(v0,v1);
+    gen_free_list(exp0);
+    gen_free_list(exp1);
+    return res?res:compare_statements_on_ordering(v0,v1);
 }
 static int compare_list_from_length(const void *v0, const void *v1)
 {

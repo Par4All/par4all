@@ -627,7 +627,7 @@ statement IsolatedStatement(scc s,
     instruction sbody = statement_instruction(st);
     extern int enclosing ;
 
-    pips_debug(8, "Input statement %d\n", statement_number(st));
+    pips_debug(8, "Input statement %" PRIdPTR "\n", statement_number(st));
 
     /* continue statements are ignored. */
     /*FI: But they should not be isolated statements if the contain
