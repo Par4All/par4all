@@ -153,7 +153,7 @@ static void statement_insertion_fix_access(list regions)
         entity e = reference_variable(r);
         if(formal_parameter_p(e)) {
             pips_user_warning("cannot change formal parameter with this version\n"
-                    "try using inlining if possibleǹ");
+                    "try using inlining if possible\n");
             break;
         }
         list phis = expressions_to_entities(reference_indices(r));
@@ -244,7 +244,7 @@ static bool do_statement_insertion(statement s)
                 }
                 else
                 {
-                    pips_user_warning("inserted statment has out effects");
+                    pips_user_warning("inserted statment has out effects\n");
                     /* update pragma */
                     FOREACH(EXTENSION,ext,extensions_extension(statement_extensions(flagged_statement)))
                     {

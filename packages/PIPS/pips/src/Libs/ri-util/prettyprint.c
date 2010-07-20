@@ -2449,10 +2449,10 @@ sentence_tail(entity e)
   sentence result = sentence_undefined;
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
-      result = MAKE_ONE_WORD_SENTENCE(0, strdup("END"));
+      result = MAKE_ONE_WORD_SENTENCE(0, "END");
       break;
     case is_language_c:
-      result = MAKE_ONE_WORD_SENTENCE(0, strdup("}"));
+      result = MAKE_ONE_WORD_SENTENCE(0, "}");
       break;
     case is_language_fortran95: {
       /* In fortran 95, we want the end to be followed by the type of construct

@@ -75,20 +75,23 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         list offsets = p->offsets;
         FOREACH(EXPRESSION,index,reference_indices(r))
         {
-            expression offset = EXPRESSION(CAR(offsets));
-            unnormalize_expression(index);
-            expression_syntax(index)=
-                make_syntax_call(
-                        make_call(
-                            entity_intrinsic(MINUS_OPERATOR_NAME),
-                            make_expression_list(
-                                copy_expression(index),
-                                copy_expression(offset)
+            if(!ENDP(offsets)) {
+                expression offset = EXPRESSION(CAR(offsets));
+                if(!entity_field_p(reference_variable(expression_reference(offset)))){
+                    update_expression_syntax(index,
+                            make_syntax_call(
+                                make_call(
+                                    entity_intrinsic(MINUS_OPERATOR_NAME),
+                                    make_expression_list(
+                                        copy_expression(index),
+                                        copy_expression(offset)
+                                        )
+                                    )
                                 )
-                            )
-                        );
-            NORMALIZE_EXPRESSION(index);
-            POP(offsets);
+                            );
+                }
+                POP(offsets);
+            }
         }
     }
 }
@@ -203,48 +206,62 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
     reference ref = region_any_reference(r);
-    Psysteme sc = sc_dup(region_system(r));
-    sc_transform_eg_in_ineg(sc);
-    FOREACH(EXPRESSION,index,reference_indices(ref))
+    for(list iter = reference_indices(ref);!ENDP(iter); POP(iter))
     {
+        expression index = EXPRESSION(CAR(iter));
         Variable phi = expression_to_entity(index);
-        Pcontrainte lower,upper;
-        constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
-        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
-        {
-            /* this is a constant : the dimension is 1 and the offset is the bound */
-            if(bounds_equal_p(phi,lower,upper))
+        if(variable_phi_p((entity)phi)) {
+            Psysteme sc = sc_dup(region_system(r));
+            sc_transform_eg_in_ineg(sc);
+            Pcontrainte lower,upper;
+            constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
+            if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
             {
-                expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
-                *offsets=CONS(EXPRESSION,bound,*offsets);
-            }
-            /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
-            else
-            {
-                expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                if(expression_minmax_p(elower))
-                    simplify_minmax_expression(elower,tr);
-                if(expression_minmax_p(eupper))
-                    simplify_minmax_expression(eupper,tr);
-                expression offset = copy_expression(elower);
+                /* this is a constant : the dimension is 1 and the offset is the bound */
+                if(bounds_equal_p(phi,lower,upper))
+                {
+                    expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
+                    *offsets=CONS(EXPRESSION,bound,*offsets);
+                }
+                /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
+                else
+                {
+                    expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    if(expression_minmax_p(elower))
+                        simplify_minmax_expression(elower,tr);
+                    if(expression_minmax_p(eupper))
+                        simplify_minmax_expression(eupper,tr);
+                    expression offset = copy_expression(elower);
 
-                expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
-                    upperbound_of_expression(dim,tr);
+                    expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
+                    if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
+                        upperbound_of_expression(dim,tr);
 
-                *dims=CONS(DIMENSION,
-                        make_dimension(
-                            int_to_expression(0),
-                            dim
-                            ),*dims);
-                *offsets=CONS(EXPRESSION,offset,*offsets);
+                    *dims=CONS(DIMENSION,
+                            make_dimension(
+                                int_to_expression(0),
+                                dim
+                                ),*dims);
+                    *offsets=CONS(EXPRESSION,offset,*offsets);
+                }
             }
+            else {
+                pips_user_warning("failed to analyse region\n");
+                sc_free(sc);
+                return false;
+            }
+            sc_free(sc);
         }
-        else {
-            pips_user_warning("failed to analyse region\n");
-            return false;
+        /* index is a field ... */
+        else { /* and the last field, store it as an extra dimension */
+            *dims=CONS(DIMENSION,
+                    make_dimension(
+                        int_to_expression(0),
+                        int_to_expression(0)
+                        ),*dims);
+            *offsets=CONS(EXPRESSION,copy_expression(index),*offsets);
         }
     }
     *dims=gen_nreverse(*dims);
@@ -272,7 +289,10 @@ static list isolate_merge_offsets(list global, list local)
     FOREACH(EXPRESSION,gexp,global)
     {
         expression lexp = EXPRESSION(CAR(local));
-        out=CONS(EXPRESSION,make_op_exp(PLUS_OPERATOR_NAME,copy_expression(gexp),copy_expression(lexp)),out);
+        if(entity_field_p(reference_variable(expression_reference(lexp))))
+            out=CONS(EXPRESSION,copy_expression(lexp),out);
+        else
+            out=CONS(EXPRESSION,make_op_exp(PLUS_OPERATOR_NAME,copy_expression(gexp),copy_expression(lexp)),out);
         POP(local);
     }
     return gen_nreverse(out);
@@ -344,7 +364,7 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
     list varargs = make_expression_list(entity_to_expression(new));
     varargs=CONS(EXPRESSION,int_to_expression(gen_length(new_dimensions)),varargs);
     FOREACH(DIMENSION,dim,new_dimensions) varargs=CONS(EXPRESSION,SizeOfDimension(dim),varargs);
-    varargs=CONS(EXPRESSION, MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),reference_to_expression(make_reference(old,gen_full_copy_list(offsets)))),varargs);
+    varargs=CONS(EXPRESSION, MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),region_reference_to_expression(make_reference(old,gen_full_copy_list(offsets)))),varargs);
     varargs=CONS(EXPRESSION,int_to_expression(gen_length(old_dimensions)),varargs);
     FOREACH(DIMENSION,dim,old_dimensions) varargs=CONS(EXPRESSION,SizeOfDimension(dim),varargs);
 
@@ -354,6 +374,39 @@ static statement isolate_make_call_array_transfer(entity old,entity new, list of
                 gen_nreverse(varargs)
                 )
             );
+}
+
+/* because of the way we build offsets list, it may contains struct field
+ * so we cannot rely on make_reference only
+ * fixes entity type as well ...
+ * fix it here
+ */
+expression region_reference_to_expression(reference r)
+{
+    entity e = reference_variable(r);
+    list indices = gen_full_copy_list(reference_indices(r));
+    entity f = entity_undefined;
+    size_t where = 0;
+    FOREACH(EXPRESSION,exp,indices) {
+        if(entity_field_p(f=reference_variable(expression_reference(exp))))
+            break;
+        where++;
+    }
+    list tail = gen_nthcdr(where,indices);
+    if(where) {
+        CDR(gen_nthcdr(where-1,indices))=NIL;
+    }
+    if(ENDP(tail))
+        return reference_to_expression(make_reference(e,indices));
+    else {
+        reference fake = make_reference(f,CDR(tail));
+        expression res =  binary_intrinsic_expression(
+                FIELD_OPERATOR_NAME,
+                reference_to_expression(make_reference(e,indices)),
+                region_reference_to_expression(fake));
+        free_reference(fake);
+        return res;
+    }
 }
 
 /** 
@@ -368,16 +421,13 @@ static statement isolate_make_loop_array_transfer(entity old,entity new, list di
     list index_expressions_with_offset = 
         isolate_merge_offsets(index_expressions,offsets);
 
+    reference fake0 = make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset),
+              fake1 = make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions);
+    expression e0 = region_reference_to_expression(fake0),
+               e1 = region_reference_to_expression(fake1);
+    free_reference(fake0), free_reference(fake1);
 
-    statement body = make_assign_statement(
-            reference_to_expression(
-                make_reference(new,transfer_in_p(t)?index_expressions:index_expressions_with_offset)
-                ),
-            reference_to_expression(
-                make_reference(old,transfer_in_p(t)?index_expressions_with_offset:index_expressions)
-                )
-            );
-
+    statement body = make_assign_statement(e0,e1);
     FOREACH(DIMENSION,d,dimensions)
     {
         entity index = ENTITY(CAR(index_entities));
@@ -413,6 +463,68 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
         return isolate_make_call_array_transfer(old,new,offsets,t,transfer_func);
 
 }
+static void region_remove_fields(region reg) {
+    for(list prev=NIL,iter = reference_indices(region_any_reference(reg));!ENDP(iter);POP(iter)) {
+        expression index = EXPRESSION(CAR(iter));
+        if(entity_field_p(reference_variable(expression_reference(index)))){
+            if(!ENDP(CDR(iter))) pips_internal_error("cas not handled, SG should think more about this\nCurrently only last index as field is managed\n");
+            if(!ENDP(prev)) {
+                gen_full_free_list(iter);
+                CDR(prev)=NIL;
+            }
+            break;
+        }
+        prev=iter;
+    }
+}
+
+static list filter_regions(list regions) {
+    list fregions=NIL;
+    set read_regions = set_make(set_pointer);
+    set write_regions = set_make(set_pointer);
+    for(list iter = regions;!ENDP(iter);POP(iter)){
+        region reg = REGION(CAR(iter));
+        entity e = reference_variable(region_any_reference(reg));
+        
+        if(region_read_p(reg)) {
+            if(!set_belong_p(read_regions,e)) {
+                region curr = region_dup(reg);
+                region_remove_fields(curr);
+                set_add_element(read_regions,read_regions,e);
+                FOREACH(REGION,regn,CDR(iter)) {
+                    entity en = reference_variable(region_any_reference(regn));
+                    if(same_entity_p(en,e)&&region_read_p(regn)) {
+                        region ncurr = region_dup(regn);
+                        region_remove_fields(ncurr);
+                        region tmp = regions_must_convex_hull(curr,ncurr);
+                        region_free(curr);
+                        region_free(ncurr);
+                        curr=tmp;
+                    }
+                }
+                fregions=CONS(REGION,curr,fregions);
+            }
+        }
+        else {
+            if(!set_belong_p(write_regions,e)) {
+                region curr = region_dup(reg);
+                set_add_element(write_regions,write_regions,e);
+                FOREACH(REGION,regn,CDR(iter)) {
+                    entity en = reference_variable(region_any_reference(regn));
+                    if(same_entity_p(en,e)&&region_write_p(regn)) {
+                        region tmp = regions_must_convex_hull(curr,regn);
+                        region_free(curr);
+                        curr=tmp;
+                    }
+                }
+                fregions=CONS(REGION,curr,fregions);
+            }
+        }
+    }
+    set_free(read_regions);
+    set_free(write_regions);
+    return gen_nreverse(fregions);
+}
 
 /** 
  * isolate statement @p s from the outer memory, generating appropriate local array copy and copy code
@@ -420,15 +532,16 @@ static statement isolate_make_array_transfer(entity old,entity new, list dimensi
 static void do_isolate_statement(statement s)
 {
     list regions = load_cumulated_rw_effects_list(s);
+    list pregions = filter_regions(regions);
 
-    list read_regions = regions_read_regions(regions);
-    list write_regions = regions_write_regions(regions);
+    list read_regions = regions_read_regions(pregions);
+    list write_regions = regions_write_regions(pregions);
     transformer tr = transformer_range(load_statement_precondition(s));
 
     statement prelude=make_empty_block_statement(),postlude=make_empty_block_statement();
     set visited_entities = set_make(set_pointer);
 
-    FOREACH(REGION,reg,regions)
+    FOREACH(REGION,reg,pregions)
     {
         reference r = region_any_reference(reg);
         entity e = reference_variable(r);

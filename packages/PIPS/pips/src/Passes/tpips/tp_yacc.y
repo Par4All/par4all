@@ -128,7 +128,8 @@ static void try_to_parse_everything_just_in_case(void)
 	res_or_rule * pr = (res_or_rule*) malloc(sizeof(res_or_rule));
 	pr->the_owners = modules;
 	pr->the_name = strdup(DBR_CALLEES);
-	perform(safe_make, pr); /* pr is freed inside. */
+	perform(safe_make, pr); 
+	free(pr);
 }
 
 /* try hard to open a module.
@@ -265,8 +266,10 @@ static bool perform(bool (*what)(const char*, const char*), res_or_rule * res)
 			pips_user_error("Open or create a workspace first!\n");
 
 		/* This may be always trapped earlier in the parser by rule "owner". */
-		if(gen_array_nitems(res->the_owners)==0)
-		pips_user_error("Empty action: no argument!\n");
+        if(gen_array_nitems(res->the_owners)==0) {
+            free_owner_content(res);
+            pips_user_error("Empty action: no argument!\n");
+        }
 
 		/* push the current module. */
 		save_current_module_name =
@@ -741,6 +744,7 @@ i_create: TK_CREATE workspace_name /* workspace name */
 			user_log("Main module PROGRAM \"%s\" selected.\n",
 							 main_module_name);
 			lazy_open_module(main_module_name);
+			free(main_module_name);
 		}
 		$$ = TRUE;
 				}
@@ -762,6 +766,7 @@ i_close: TK_CLOSE /* assume current workspace */ TK_ENDOFLINE
 	| TK_CLOSE TK_NAME /* workspace name */ TK_ENDOFLINE
 	{
 		$$ = tp_close_the_workspace($2);
+		free($2);
 	}
 	;
 
@@ -805,12 +810,14 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 		if (tpips_execution_mode) {
 			if (db_get_current_workspace_name()) {
 				$$ = tp_set_current_module($2 /*strupper($2,$2)*/);
+		        free($2);
 			} else {
+		        free($2);
 				pips_user_error("No workspace open. Open or create one!\n");
 				$$ = FALSE;
 			}
 		}
-		free($2);
+        else free($2);
 	}
 	;
 
