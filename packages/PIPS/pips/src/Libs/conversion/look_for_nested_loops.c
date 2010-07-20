@@ -107,6 +107,11 @@ void look_for_nested_loop_statements(statement s,
 	b = instruction_block(i);
 	if(ENDP(b)) break;
 	ss = STATEMENT(CAR(b));
+    /* SG: added to cope with empty statements */
+    while(empty_statement_or_continue_p(ss) && !ENDP(CDR(b))) {
+        POP(b);
+        ss=STATEMENT(CAR(b));
+    }
 	look_for_nested_loop_statements(ss, loop_transformation, loop_predicate);
 	for(b1 = CDR(b); !ENDP(b1); b1 = CDR(b1)) {
 	    ss = STATEMENT(CAR(b1));
@@ -187,10 +192,17 @@ statement look_for_inner_loops(loop l,
 	break;
 
     case is_instruction_block:
-
+retry:
 	b = instruction_block(i);
 	ss = STATEMENT(CAR(b));
+    /* SG: added to cope with empty statements */
+    while(empty_statement_or_continue_p(ss) && !ENDP(CDR(b))) {
+        POP(b);
+        ss=STATEMENT(CAR(b));
+    }
 	i = statement_instruction(ss);
+    if(instruction_block_p(i)) 
+        goto retry;
 	if (instruction_loop_p(i)){
 	    /* i is an inner loop, append it to the list of loops */
 	    li = instruction_loop(i);

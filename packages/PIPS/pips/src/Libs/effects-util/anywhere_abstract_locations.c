@@ -229,7 +229,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
       //area a = make_area(0,NIL); /* Size and layout are unknown */
       //type t = make_type_area(a);
       /*FI: more work to be done here... */
-      entity_type(e) = t;
+      entity_type(e) = copy_type(t); /* no aliasing */
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
       found_p = TRUE;

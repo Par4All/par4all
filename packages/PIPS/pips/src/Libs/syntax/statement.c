@@ -532,7 +532,7 @@ bool number_it;
 {
     statement s;
     cons * pc;
-    entity l = MakeLabel(strdup(lab_I));
+    entity l = MakeLabel(lab_I);
 
     pips_debug(8, "Begin for instruction %s with label \"%s\"\n",
 	       instruction_identification(i), &(lab_I[0]));
@@ -1740,7 +1740,7 @@ cons *lio;
     if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
       if( ! expression_undefined_p(unit) )
 	free_expression(unit);
-      unit = copy_expression(EXPRESSION(CAR(CDR(l))));
+      unit = EXPRESSION(CAR(CDR(l)));
     }
   }
 

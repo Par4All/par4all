@@ -13,5 +13,6 @@ libaccel_util_la_SOURCES=group_constants.c \
  			kernels.c\
 			terapixify.c\
 			constraints.c
+dist_bin_SCRIPTS=psolve
 
 include $(srcdir)/../pipslibs_includes.mk

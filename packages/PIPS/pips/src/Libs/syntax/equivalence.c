@@ -64,6 +64,8 @@ static equivalences FinalEquivSet = equivalences_undefined;
 void 
 ResetChains()
 {
+    free_equivalences(TempoEquivSet);
+    free_equivalences(FinalEquivSet);
     TempoEquivSet = equivalences_undefined;
     FinalEquivSet = equivalences_undefined;
 }
@@ -239,18 +241,17 @@ ComputeEquivalences()
     PrintChains(TempoEquivSet);
 
     while (again) {
-	for (pc = equivalences_chains(TempoEquivSet); pc != NIL; pc = CDR(pc))
-		again = (AddOrMergeChain(CHAIN(CAR(pc))) == EQUIMERGE);
+        for (pc = equivalences_chains(TempoEquivSet); pc != NIL; pc = CDR(pc))
+            again = (AddOrMergeChain(CHAIN(CAR(pc))) == EQUIMERGE);
 
-	free_equivalences(TempoEquivSet);
+        if (again) {
+            free_equivalences(TempoEquivSet);
+            TempoEquivSet = FinalEquivSet;
+            FinalEquivSet = make_equivalences(NIL);
 
-	if (again) {
-	    TempoEquivSet = FinalEquivSet;
-	    FinalEquivSet = make_equivalences(NIL);
-
-	    pips_debug(8, "Intermediate equivalence chains\n");
-	    PrintChains(TempoEquivSet);
-	}
+            pips_debug(8, "Intermediate equivalence chains\n");
+            PrintChains(TempoEquivSet);
+        }
     }
 
     pips_debug(8, "Resulting equivalence chains\n");

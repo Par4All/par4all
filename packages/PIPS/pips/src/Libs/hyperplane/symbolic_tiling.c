@@ -127,7 +127,10 @@ static bool symbolic_tiling_valid_p(statement sloop, size_t depth)
 {
     if(depth == 0 ) return true;
     else {
-        if(statement_loop_p(sloop) && execution_parallel_p(loop_execution(statement_loop(sloop)))) {
+        if(statement_loop_p(sloop) && 
+                ( execution_parallel_p(loop_execution(statement_loop(sloop)))
+                                     || get_bool_property("SYMBOLIC_TILING_FORCE") )
+          ){
             statement body = loop_body(statement_loop(sloop));
             return symbolic_tiling_valid_p(body,depth-1);
         }
@@ -175,6 +178,9 @@ bool symbolic_tiling(const char *module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
+
+    // sometimes empty continues are put here and there and disturb me
+    clean_up_sequences(get_current_module_statement());
 
     entity elabel = find_label_entity(
             get_current_module_name(),

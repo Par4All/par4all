@@ -103,8 +103,10 @@ static_partitioning_matrix(matrice P, int n, string serialized_matrix)
         DENOMINATOR(P) = VALUE_ONE;
         for(row=1;row<=n;row++){
             elem = strtok_r(line," ",&ctxt1);
+
             for(col=1;col<=n;col++)
             {
+                if(!elem) elem = col==row ? "1" : "0";
                 ACCESS(P, n, row, col)=atoi(elem);
                 elem = strtok_r(NULL," ",&ctxt1);
             }
@@ -325,9 +327,10 @@ tiling( list lls)
 
     P = matrice_new(n, n);
     HT = matrice_new(n, n);
+    string smatrix = get_string_property("LOOP_TILING_MATRIX");
 
     if( 
-            !static_partitioning_matrix(P,n,get_string_property("LOOP_TILING_MATRIX")) &&
+            !static_partitioning_matrix(P,n,smatrix) &&
             !interactive_partitioning_matrix(P, n)
       ) {
         pips_user_error("A proper partitioning matrix was not provided\n");
