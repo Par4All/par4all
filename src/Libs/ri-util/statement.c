@@ -3124,7 +3124,33 @@ struct fswp {
 /*
    @addtogroup statement_predicate
 */
-extension statement_with_pragma_p(statement s, string seed)
+
+/* Test if a statement has some pragma
+
+   @param s is the statement to test
+
+   @return true if a statement has a pragma
+*/
+bool statement_with_pragma_p(statement s) {
+  list exs = extensions_extension(statement_extensions(s));
+  FOREACH(EXTENSION, ex, exs) {
+    pragma pr = extension_pragma(ex);
+    if(pragma_string_p(pr))
+      return true;
+  }
+  return false;
+}
+
+
+/* Get the extension of a statement with pragma begining with a prefix
+
+   @param s is the statement to work on
+
+   @param begin is the prefix a pragma has to begin with to be selected
+
+   @return the first extension matching the pragma
+*/
+extension get_extension_from_statement_with_pragma(statement s, string seed)
 {
     list exs = extensions_extension(statement_extensions(s));
     FOREACH(EXTENSION,ex,exs)
@@ -3140,7 +3166,7 @@ extension statement_with_pragma_p(statement s, string seed)
 
 static bool find_statements_with_pragma_walker(statement s, struct fswp *p)
 {
-    if(statement_with_pragma_p(s,p->begin))
+    if (get_extension_from_statement_with_pragma(s,p->begin))
     {
         p->l=CONS(STATEMENT,s,p->l);
         gen_recurse_stop(NULL);
@@ -3149,6 +3175,14 @@ static bool find_statements_with_pragma_walker(statement s, struct fswp *p)
 }
 
 
+/* Get a list of statements with pragma begining with a prefix
+
+   @param s is the statement to start to recurse
+
+   @param begin is the prefix a pragma has to begin with to be selected
+
+   @return a list of statement
+*/
 list find_statements_with_pragma(statement s, string begin)
 {
   struct fswp p = { NIL, begin };
