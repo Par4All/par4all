@@ -6,6 +6,8 @@ import shutil
 import re
 import time
 from string import split, upper, join
+from subprocess import Popen, PIPE
+import sys
 
 pypips.atinit()
 
@@ -235,10 +237,6 @@ class workspace(object):
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-<<<<<<< HEAD
-=======
-		if not os.path.isdir(outdir): raise ValueError("'" + outdir + "' is not a directory")
->>>>>>> Made workspace inherit from object and added functions.
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
 		if link:
