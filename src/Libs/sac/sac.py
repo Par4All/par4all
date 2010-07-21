@@ -102,7 +102,6 @@ def system(*cmd):
 system("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
        "-o", "%s.database/Tmp/ref" % wsname)
 ref = getout("./%s.database/Tmp/ref" % wsname)
-print ref
 
 def unincludeSIMD(self, files, outdir):
     # in the modulename.c file, undo the inclusion of SIMD.h by deleting
@@ -120,10 +119,8 @@ def unincludeSIMD(self, files, outdir):
         f.writelines(contents)
         f.close()
         print fname
-        exit(4)
 
 workspace.goingToRunWith = unincludeSIMD
-
 ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
@@ -135,7 +132,29 @@ if seq != ref:
 else:
     print "seq ok"
 
-system("sed", "-i", "-e", "1 d", "%s.database/Src/%s.c" % (wsname, modulename))
+def addSSE(self, files, outdir):
+    for fname in filter(lambda x: not re.search("SIMD.c$", x), files):
+        contents = open("include/ssh.h").readlines()
+        contents += ["#define MOD(a,b)  ((a)%(b))",
+                     "#define MAX0(a,b) (a>b?a:b)"]
+        f = open(fname)
+        for line in f:
+            line = re.sub("float (v4sf_[^[]+)", "__m128 \1", line)
+            line = re.sub("float (v4si_[^[]+)", "__m128i \1", line)
+            line = re.sub("v4s[if]_([^,[]+)\[[^]]*\]", "\1", line)
+            line = re.sub("v4s[if]_([^ ,[]+)", "\1", line)
+            line = re.sub("double (v2df_[^[]+)", "__m128d \1", line)
+            line = re.sub("double (v2di_[^[]+)", "__m128i \1", line)
+            line = re.sub("v2d[if]_([^,[]+)\[[^]]*\]", "\1", line)
+            line = re.sub("v2d[if]_([^ ,[]+)", "\1", line)
+            contents.append(line)
+        f.close()
+        f = open(fname, "w")
+        f.writlines(contents)
+        f.close()
+
+workspace.goingToRunWith = lambda s, files, outdir: (unincludeSIMD(s, files, outdir), addSSE(s, files, outdir))
+
 system("./compileC.sh", wsname, modulename+".c", wsname + ".database/Tmp/sse.c")
 system("cc", "-O3", "-I.", "-march=native", wsname + ".database/Tmp/sse.c",
        "-o", wsname +".database/Tmp/sse")
