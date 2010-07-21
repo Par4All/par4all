@@ -36,14 +36,6 @@ def insert_kernel_launcher_declaration(m):
         print "Inserting", decl
     return decl
 
-# NULL is preprocessed differently in C and C++ ; 
-# PIPS generated code for NULL is "(void *) 0"
-# This will break cuda compilation !
-# So here is a quick hack to recover NULL symbolic
-def fix_null_constant(file_name):
-    cmd = "sed -i 's/(void \*) 0/NULL/g' " + file_name
-    print cmd
-    os.system(cmd)    
 
 def patch_to_use_p4a_methods(file_name, dir_name):
     file_base_name = os.path.basename(file_name);
@@ -124,6 +116,13 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ### content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
     ###                 insert_kernel_launcher_declaration, content)
 
+    # NULL is preprocessed differently in C and C++ ; 
+    # PIPS generated code for NULL is "(void *) 0"
+    # This will break cuda compilation !
+    # So here is a quick hack to recover NULL symbolic
+    content = re.sub(r'\(void \*\) 0',
+                     "NULL", content)
+
 
     if verbose:
         print content,
@@ -171,9 +170,6 @@ to put files in. It defaults to "P4A" in the current directory>""")
     if not os.path.isdir(options.dest_dir):
         # Create the destination directory:
         os.makedirs(options.dest_dir)
-
-    for name in args:
-        fix_null_constant(name)
 
     for name in args:
         gather_kernel_launcher_declarations(name)
