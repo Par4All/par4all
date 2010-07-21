@@ -373,6 +373,7 @@ static
 void make_pointer_entity_from_reference_entity(entity e)
 {
     make_pointer_from_all_variable(entity_type(e));
+    pips_assert("everything went well",entity_consistent_p(e));
 }
 
 static void
@@ -401,6 +402,7 @@ reduce_array_declaration_dimension(statement s)
                 variable_dimensions(v)=CONS(DIMENSION,make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,new_dim,int_to_expression(1))),NIL);
             }
         }
+        pips_assert("everything went well",entity_consistent_p(e));
     }
     pips_assert("everything went well",statement_consistent_p(s));
 }
@@ -473,6 +475,7 @@ static void array_to_pointer_call_rewriter(expression e)
                 }
             }
         }
+        pips_assert("everything went well",expression_consistent_p(e));
     }
 }
 
@@ -513,8 +516,11 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
         }
         type t = parameter_type(p);
         make_pointer_from_all_variable(t);
+        pips_assert("everything went well",parameter_consistent_p(p));
     }
     gen_free_list(call_site_args);
+    pips_assert("everything went well",entity_consistent_p(m));
+
 
     /* also validate callers */
     FOREACH(STATEMENT,caller_statement,callers_statement)
