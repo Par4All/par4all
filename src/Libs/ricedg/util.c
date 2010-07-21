@@ -770,6 +770,27 @@ prettyprint_dependence_graph_view(FILE * fd,
 	    list loops2 = load_statement_enclosing_loops(s2);
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
+      /*
+       * If we have more than one conflict, let's sort them !
+       */
+      int nb_conflicts = gen_length(dg_arc_label_conflicts(dal));
+      if ( nb_conflicts > 1 ) {
+        /*
+         * Convert the list to an array for sorting
+         * 20 is the initial size, should be enough for most of the case
+         */
+        gen_array_t conflicts_array = gen_array_make( 20 );
+        list_to_array( dg_arc_label_conflicts(dal), conflicts_array );
+        qsort( gen_array_pointer( conflicts_array ),
+               gen_array_nitems( conflicts_array ),
+               sizeof(void *),
+               (gen_cmp_func_t) conflicts_sort_callback);
+        list conflicts_list = NIL;
+        GEN_ARRAY_MAP(s, conflicts_list = CONS(CONFLICT, s, conflicts_list), conflicts_array);
+        gen_array_free(conflicts_array);
+        dg_arc_label_conflicts(dal)=conflicts_list;
+      }
+
 	    int nbrcomloops = FindMaximumCommonLevel(loops1, loops2);
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
 		conflict c = CONFLICT(CAR(pc));
