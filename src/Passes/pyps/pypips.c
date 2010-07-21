@@ -205,7 +205,9 @@ void display(char *rname, char *mname)
 	    if (pgpid) {
 		    waitpid(pgpid, NULL, 0);
 	    } else {
-		    char *pager = getenv("PAGER");
+		    char *pager = getenv("PIPS_MORE");
+		    if (!pager)
+			    pager = getenv("PAGER");
 		    if (!pager)
 			    pager = "more";
 		    execlp(pager, pager, fname, NULL);
