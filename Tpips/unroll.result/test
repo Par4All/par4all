@@ -20,13 +20,13 @@ C
       LU_NUB0 = 100
       LU_IB0 = 0
       DO 99999 LU_IND0 = 0, LU_IB0-1
-         T(LU_IND0*1+1) = -2*(LU_IND0*1+1)                              0009
+         T(LU_IND0*1+1) = -2*(LU_IND0*1+1)
 99999    CONTINUE
       DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
-         T((LU_IND0+0)*1+1) = -2*((LU_IND0+0)*1+1)                      0009
-         T((LU_IND0+1)*1+1) = -2*((LU_IND0+1)*1+1)                      0009
-         T((LU_IND0+2)*1+1) = -2*((LU_IND0+2)*1+1)                      0009
-         T((LU_IND0+3)*1+1) = -2*((LU_IND0+3)*1+1)                      0009
+         T((LU_IND0+0)*1+1) = -2*((LU_IND0+0)*1+1)
+         T((LU_IND0+1)*1+1) = -2*((LU_IND0+1)*1+1)
+         T((LU_IND0+2)*1+1) = -2*((LU_IND0+2)*1+1)
+         T((LU_IND0+3)*1+1) = -2*((LU_IND0+3)*1+1)
 99998    CONTINUE
       I = 1+MAX0(LU_NUB0, 0)*1
 C

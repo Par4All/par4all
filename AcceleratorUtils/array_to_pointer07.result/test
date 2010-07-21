@@ -1,0 +1,36 @@
+
+
+void atp(float *cdens[2]);
+
+int main(int argc, char **argv);
+void atp(float *cdens[2])
+{
+   int i;
+   for(i = 0; i <= 1073741823; i += 1) {
+      cdens[i][0] = 1;
+      cdens[i][1] = 0;
+   }
+}
+int main(int argc, char **argv)
+{
+   float cdens[1024][2];
+   atp(cdens);
+}
+
+
+void atp(float *cdens);
+
+int main(int argc, char *argv);
+void atp(float *cdens)
+{
+   int i;
+   for(i = 0; i <= 1073741823; i += 1) {
+      *(cdens+i) = 1;
+      *(cdens+1+i) = 0;
+   }
+}
+int main(int argc, char *argv)
+{
+   float cdens[2048];
+   atp((float *) cdens+0);
+}

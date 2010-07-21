@@ -15,7 +15,6 @@ void malabar(int *c)
 {
    *c = foo(3);
 }
-l99999
 void megablast(int n)
 {
    int i, j;

@@ -350,19 +350,19 @@ c 20   PRINT *, 'bef'
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
 c SIMD_COMMENT_1
-            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                           0046
+            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
 c SIMD_COMMENT_1
-            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                           0046
+            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
 c SIMD_COMMENT_1
-            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                           0046
+            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
 c SIMD_COMMENT_1
-            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                           0046
+            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
          I = 1001
 c      PRINT *, 'aft'
@@ -399,19 +399,19 @@ c 20   PRINT *, 'bef'
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
 c SIMD_COMMENT_1
-            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                           0046
+            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
 c SIMD_COMMENT_1
-            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                           0046
+            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
 c SIMD_COMMENT_1
-            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                           0046
+            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
 c SIMD_COMMENT_1
-            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                           0046
+            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
          I = 1001
 c      PRINT *, 'aft'
@@ -444,19 +444,19 @@ c 20   PRINT *, 'bef'
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
 c SIMD_COMMENT_1
-            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                           0046
+            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
 c SIMD_COMMENT_1
-            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                           0046
+            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
 c SIMD_COMMENT_1
-            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                           0046
+            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
 c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
 c SIMD_COMMENT_1
-            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                           0046
+            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF
@@ -489,19 +489,19 @@ c 20   PRINT *, 'bef'
 c SIMD_COMMENT_0
             F_03 = SA0*SX(LU_IND0+1)
 c SIMD_COMMENT_1
-            SY(LU_IND0+1) = SY(LU_IND0+1)+F_03                          0046
+            SY(LU_IND0+1) = SY(LU_IND0+1)+F_03
 c SIMD_COMMENT_0
             F_02 = SA0*SX(LU_IND0+2)
 c SIMD_COMMENT_1
-            SY(LU_IND0+2) = SY(LU_IND0+2)+F_02                          0046
+            SY(LU_IND0+2) = SY(LU_IND0+2)+F_02
 c SIMD_COMMENT_0
             F_01 = SA0*SX(LU_IND0+3)
 c SIMD_COMMENT_1
-            SY(LU_IND0+3) = SY(LU_IND0+3)+F_01                          0046
+            SY(LU_IND0+3) = SY(LU_IND0+3)+F_01
 c SIMD_COMMENT_0
             F_00 = SA0*SX(LU_IND0+4)
 c SIMD_COMMENT_1
-            SY(LU_IND0+4) = SY(LU_IND0+4)+F_00                          0046
+            SY(LU_IND0+4) = SY(LU_IND0+4)+F_00
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF

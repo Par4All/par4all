@@ -87,7 +87,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             F_0 = ptrin[th][rg][LU_IND0].re*ptrin[th][rg][LU_IND0].re;
             F_1 = ptrin[th][rg][LU_IND0].im*ptrin[th][rg][LU_IND0].im;
             F_2 = F_0+F_1;
-
             PP = PP+F_2;
          }
          for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
@@ -98,7 +97,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             F_2 = F_0+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_2;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+1].re*ptrin[th][rg][LU_IND0+1].re;
@@ -107,7 +105,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             F_2 = F_0+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_2;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+2].re*ptrin[th][rg][LU_IND0+2].re;
@@ -116,7 +113,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             F_2 = F_0+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_2;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+3].re*ptrin[th][rg][LU_IND0+3].re;
@@ -125,7 +121,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             F_2 = F_0+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_2;
          }
       }
@@ -153,7 +148,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             F_0 = ptrin[th][rg][LU_IND0].re*ptrin[th][rg][LU_IND0].re;
             F_1 = ptrin[th][rg][LU_IND0].im*ptrin[th][rg][LU_IND0].im;
             PP = PP+F_1;
-
             PP = PP+F_0;
          }
          for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
@@ -164,7 +158,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             PP = PP+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+1].re*ptrin[th][rg][LU_IND0+1].re;
@@ -173,7 +166,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             PP = PP+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+2].re*ptrin[th][rg][LU_IND0+2].re;
@@ -182,7 +174,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             PP = PP+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+3].re*ptrin[th][rg][LU_IND0+3].re;
@@ -191,7 +182,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             PP = PP+F_1;
             //c SIMD_COMMENT_3
-
             PP = PP+F_0;
          }
       }
@@ -227,7 +217,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             F_0 = ptrin[th][rg][LU_IND0].re*ptrin[th][rg][LU_IND0].re;
             F_1 = ptrin[th][rg][LU_IND0].im*ptrin[th][rg][LU_IND0].im;
             RED0[0] = RED0[0]+F_1;
-
             RED0[1] = RED0[1]+F_0;
          }
          RED2[0] = RED0[1]+RED0[0]+RED2[0];
@@ -247,7 +236,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[0] = RED1[0]+F_1;
             //c SIMD_COMMENT_3
-
             RED1[1] = RED1[1]+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+1].re*ptrin[th][rg][LU_IND0+1].re;
@@ -256,7 +244,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[2] = RED1[2]+F_1;
             //c SIMD_COMMENT_3
-
             RED1[3] = RED1[3]+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+2].re*ptrin[th][rg][LU_IND0+2].re;
@@ -265,7 +252,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[4] = RED1[4]+F_1;
             //c SIMD_COMMENT_3
-
             RED1[5] = RED1[5]+F_0;
             //c SIMD_COMMENT_0
             F_0 = ptrin[th][rg][LU_IND0+3].re*ptrin[th][rg][LU_IND0+3].re;
@@ -274,7 +260,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[6] = RED1[6]+F_1;
             //c SIMD_COMMENT_3
-
             RED1[7] = RED1[7]+F_0;
          }
          RED2[1] = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+RED2[1];
@@ -313,7 +298,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             F_04 = ptrin[th][rg][LU_IND0].re*ptrin[th][rg][LU_IND0].re;
             F_14 = ptrin[th][rg][LU_IND0].im*ptrin[th][rg][LU_IND0].im;
             RED0[0] = RED0[0]+F_14;
-
             RED0[1] = RED0[1]+F_04;
          }
          RED2[0] = RED0[1]+RED0[0]+RED2[0];
@@ -333,7 +317,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[0] = RED1[0]+F_13;
             //c SIMD_COMMENT_3
-
             RED1[1] = RED1[1]+F_03;
             //c SIMD_COMMENT_0
             F_02 = ptrin[th][rg][LU_IND0+1].re*ptrin[th][rg][LU_IND0+1].re;
@@ -342,7 +325,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[2] = RED1[2]+F_12;
             //c SIMD_COMMENT_3
-
             RED1[3] = RED1[3]+F_02;
             //c SIMD_COMMENT_0
             F_01 = ptrin[th][rg][LU_IND0+2].re*ptrin[th][rg][LU_IND0+2].re;
@@ -351,7 +333,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[4] = RED1[4]+F_11;
             //c SIMD_COMMENT_3
-
             RED1[5] = RED1[5]+F_01;
             //c SIMD_COMMENT_0
             F_00 = ptrin[th][rg][LU_IND0+3].re*ptrin[th][rg][LU_IND0+3].re;
@@ -360,7 +341,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             //c SIMD_COMMENT_2
             RED1[6] = RED1[6]+F_10;
             //c SIMD_COMMENT_3
-
             RED1[7] = RED1[7]+F_00;
          }
          RED2[1] = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+RED2[1];

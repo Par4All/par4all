@@ -88,7 +88,6 @@ kernel1:
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_1 = F_0+space[i][LU_IND0];
          F_2 = F_1+space[i][LU_IND0+2];
-
          save[i][LU_IND0+1] = 0.25*F_2;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
@@ -99,7 +98,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+2];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+1] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
@@ -108,7 +106,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+3];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+2] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
@@ -117,7 +114,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+4];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+3] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
@@ -126,7 +122,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+5];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+4] = 0.25*F_2;
       }
    }
@@ -135,7 +130,6 @@ kernel1:
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_4 = F_3+save[i][LU_IND1];
          F_5 = F_4+save[i][LU_IND1+2];
-
          space[i][LU_IND1+1] = 0.25*F_5;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
@@ -146,7 +140,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+2];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+1] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
@@ -155,7 +148,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+3];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+2] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
@@ -164,7 +156,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+4];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+3] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
@@ -173,7 +164,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+5];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+4] = 0.25*F_5;
       }
    }
@@ -199,7 +189,6 @@ kernel1:
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_1 = F_0+space[i][LU_IND0];
          F_2 = F_1+space[i][LU_IND0+2];
-
          save[i][LU_IND0+1] = 0.25*F_2;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
@@ -210,7 +199,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+2];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+1] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
@@ -219,7 +207,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+3];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+2] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
@@ -228,7 +215,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+4];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+3] = 0.25*F_2;
          //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
@@ -237,7 +223,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+5];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+4] = 0.25*F_2;
       }
    }
@@ -246,7 +231,6 @@ kernel1:
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_4 = F_3+save[i][LU_IND1];
          F_5 = F_4+save[i][LU_IND1+2];
-
          space[i][LU_IND1+1] = 0.25*F_5;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
@@ -257,7 +241,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+2];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+1] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
@@ -266,7 +249,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+3];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+2] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
@@ -275,7 +257,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+4];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+3] = 0.25*F_5;
          //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
@@ -284,7 +265,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+5];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+4] = 0.25*F_5;
       }
    }
@@ -311,7 +291,6 @@ kernel1:
          F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
          F_14 = F_04+space[i][LU_IND0];
          F_24 = F_14+space[i][LU_IND0+2];
-
          save[i][LU_IND0+1] = 0.25*F_24;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
@@ -322,7 +301,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_23 = F_13+space[i][LU_IND0+2];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+1] = 0.25*F_23;
          //c SIMD_COMMENT_0
          F_02 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
@@ -331,7 +309,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_22 = F_12+space[i][LU_IND0+3];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+2] = 0.25*F_22;
          //c SIMD_COMMENT_0
          F_01 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
@@ -340,7 +317,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_21 = F_11+space[i][LU_IND0+4];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+3] = 0.25*F_21;
          //c SIMD_COMMENT_0
          F_00 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
@@ -349,7 +325,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_20 = F_10+space[i][LU_IND0+5];
          //c SIMD_COMMENT_3
-
          save[i][LU_IND0+4] = 0.25*F_20;
       }
    }
@@ -358,7 +333,6 @@ kernel1:
          F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
          F_44 = F_34+save[i][LU_IND1];
          F_54 = F_44+save[i][LU_IND1+2];
-
          space[i][LU_IND1+1] = 0.25*F_54;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
@@ -369,7 +343,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_53 = F_43+save[i][LU_IND1+2];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+1] = 0.25*F_53;
          //c SIMD_COMMENT_0
          F_32 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
@@ -378,7 +351,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_52 = F_42+save[i][LU_IND1+3];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+2] = 0.25*F_52;
          //c SIMD_COMMENT_0
          F_31 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
@@ -387,7 +359,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_51 = F_41+save[i][LU_IND1+4];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+3] = 0.25*F_51;
          //c SIMD_COMMENT_0
          F_30 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
@@ -396,7 +367,6 @@ kernel1:
          //c SIMD_COMMENT_2
          F_50 = F_40+save[i][LU_IND1+5];
          //c SIMD_COMMENT_3
-
          space[i][LU_IND1+4] = 0.25*F_50;
       }
    }
@@ -423,7 +393,6 @@ kernel1:
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
          F_24 = F_14+space[i][2+LU_IND0];
-
          save[i][1+LU_IND0] = 0.25*F_24;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
@@ -463,7 +432,6 @@ kernel1:
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
          F_54 = F_44+save[i][2+LU_IND1];
-
          space[i][1+LU_IND1] = 0.25*F_54;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
@@ -521,7 +489,6 @@ kernel1:   ;
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
          F_24 = F_14+space[i][2+LU_IND0];
-
          save[i][1+LU_IND0] = 0.25*F_24;
       }
       {
@@ -571,7 +538,6 @@ kernel1:   ;
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
          F_54 = F_44+save[i][2+LU_IND1];
-
          space[i][1+LU_IND1] = 0.25*F_54;
       }
       {
@@ -636,7 +602,6 @@ void compute()
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
          F_14 = F_04+space[i][LU_IND0];
          F_24 = F_14+space[i][2+LU_IND0];
-
          save[i][1+LU_IND0] = 0.25*F_24;
       }
       {
@@ -686,7 +651,6 @@ void compute()
          F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
          F_44 = F_34+save[i][LU_IND1];
          F_54 = F_44+save[i][2+LU_IND1];
-
          space[i][1+LU_IND1] = 0.25*F_54;
       }
       {

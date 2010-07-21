@@ -78,7 +78,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+1)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+1) = F_0+F_3                                    0016
+         RESULT(LU_IND0+1) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+2)
 c SIMD_COMMENT_1
@@ -88,7 +88,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+2)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+2) = F_0+F_3                                    0016
+         RESULT(LU_IND0+2) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+3)
 c SIMD_COMMENT_1
@@ -98,7 +98,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+3)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+3) = F_0+F_3                                    0016
+         RESULT(LU_IND0+3) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+4)
 c SIMD_COMMENT_1
@@ -108,7 +108,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+4)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+4) = F_0+F_3                                    0016
+         RESULT(LU_IND0+4) = F_0+F_3
 99998    CONTINUE
       I = 50001
 
@@ -136,7 +136,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+1)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+1) = F_0+F_3                                    0016
+         RESULT(LU_IND0+1) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+2)
 c SIMD_COMMENT_1
@@ -146,7 +146,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+2)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+2) = F_0+F_3                                    0016
+         RESULT(LU_IND0+2) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+3)
 c SIMD_COMMENT_1
@@ -156,7 +156,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+3)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+3) = F_0+F_3                                    0016
+         RESULT(LU_IND0+3) = F_0+F_3
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+4)
 c SIMD_COMMENT_1
@@ -166,7 +166,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_3 = F_2*DEST(LU_IND0+4)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+4) = F_0+F_3                                    0016
+         RESULT(LU_IND0+4) = F_0+F_3
 99998    CONTINUE
       I = 50001
 
@@ -195,7 +195,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_33 = F_23*DEST(LU_IND0+1)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+1) = F_03+F_33                                  0016
+         RESULT(LU_IND0+1) = F_03+F_33
 c SIMD_COMMENT_0
          F_02 = ALPHA*SRC(LU_IND0+2)
 c SIMD_COMMENT_1
@@ -205,7 +205,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_32 = F_22*DEST(LU_IND0+2)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+2) = F_02+F_32                                  0016
+         RESULT(LU_IND0+2) = F_02+F_32
 c SIMD_COMMENT_0
          F_01 = ALPHA*SRC(LU_IND0+3)
 c SIMD_COMMENT_1
@@ -215,7 +215,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_31 = F_21*DEST(LU_IND0+3)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+3) = F_01+F_31                                  0016
+         RESULT(LU_IND0+3) = F_01+F_31
 c SIMD_COMMENT_0
          F_00 = ALPHA*SRC(LU_IND0+4)
 c SIMD_COMMENT_1
@@ -225,7 +225,7 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_3
          F_30 = F_20*DEST(LU_IND0+4)
 c SIMD_COMMENT_4
-         RESULT(LU_IND0+4) = F_00+F_30                                  0016
+         RESULT(LU_IND0+4) = F_00+F_30
 99998    CONTINUE
       I = 50001
 
