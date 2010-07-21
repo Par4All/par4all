@@ -22,7 +22,7 @@ SUBDIRS=newgen pipsmake constants help
 
 if WITH_DOC
 
-SUBDIRS+=dev_guide linear bugs_and_wishes faq tpips-user-manual xpomp manl
+SUBDIRS+=dev_guide auto_pips linear bugs_and_wishes faq tpips-user-manual xpomp manl
 
 # Not yet supported:
 #SUBDIRS+=doxygen logo web

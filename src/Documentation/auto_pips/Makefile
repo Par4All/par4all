@@ -20,9 +20,9 @@
 #
 
 use_pdflatex = 1
-INSTALL_DOC = developer_guide.pdf auto_pips.pdf
-INSTALL_HTM = developer_guide.htdoc auto_pips.htdoc
-#DOC.subd = developer_guide
+INSTALL_DOC = auto_pips.pdf
+INSTALL_HTM = auto_pips.htdoc
+DOC.subd = auto_pips.htdoc
 
 #PUBLISH_LOCATION = ssh.cri.ensmp.fr:~pips/public_html/developer_guide
 #TO_BE_PUBLISH = $(INSTALL_DOC) $(INSTALL_HTM)

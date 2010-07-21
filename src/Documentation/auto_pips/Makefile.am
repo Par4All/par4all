@@ -18,6 +18,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-dist_noinst_DATA=developer_guide.tex auto_pips.tex
-doc_DATA=developer_guide.pdf auto_pips.pdf
+dist_noinst_DATA=auto_pips.tex
+doc_DATA=auto_pips.pdf
 include $(top_srcdir)/makes/latex.mk
