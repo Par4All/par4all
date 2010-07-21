@@ -235,7 +235,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         stmt = make_assign_statement(expr, rhs_expr);
         instruction_block(block)= gen_nconc(instruction_block(block),
                 CONS(STATEMENT, stmt, NIL ));
-
+        
             /* Loop for some of the first iterations created:
              * DO LU_IND = 0, LU_IB-1, 1
              *    BODY(I\(LU_IND*INC + LB))
@@ -310,7 +310,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                 CONS(STATEMENT,
                     instruction_to_statement(inst),
                     NIL ));
-
+        
             /* Unrolled loop created:
              * DO LU_IND = LU_IB, LU_NUB-1, rate
              *    BODY(I\(LU_IND*INC + LB))
