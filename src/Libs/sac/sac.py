@@ -103,24 +103,53 @@ system("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
        "-o", "%s.database/Tmp/ref" % wsname)
 ref = getout("./%s.database/Tmp/ref" % wsname)
 
-def unincludeSIMD(self, files, outdir):
+def unincludeSIMD(fname):
     # in the modulename.c file, undo the inclusion of SIMD.h by deleting
     # everything up to the definition of our function (not as clean as could
     # be, to say the least...)
-    for fname in filter(lambda x: not re.search("SIMD.c$", x), files):
-        f = open(fname, "r+")
-        while not re.search("dotprod", f.readline()):
-            pass
-        contents = f.readlines()
-        f.seek(0)
-        f.truncate(0)
-        f.write('#include "SIMD.h"\n')
-        f.write('#include <stdio.h>\n')
-        f.writelines(contents)
-        f.close()
-        print fname
+    f = open(fname, "r")
+    print "unincludeSIMD:", fname
+    while not re.search("dotprod", f.readline()):
+        pass
+    print "unincludeSIMD:", "removing dotprod done"
+    contents = f.readlines()
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+    print fname
 
-workspace.goingToRunWith = unincludeSIMD
+def addBeginning(fname, *args):
+    contents = map((lambda(s): s + "\n" if s[-1] != "\n" else s),
+                   args)
+    
+    f = open(fname, "r")
+    contents += f.readlines()
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+
+def reincludeSIMD(fname):
+    addBeginning(fname, '#include "SIMD.h"')
+
+def reincludestdio(fname):
+    addBeginning(fname, "#include <stdio.h>")
+
+def goingToRunWithFactory(*funs):
+    def goingToRunWithAux(s, files, outdir):
+        for fname in files:
+            if re.search(r"SIMD\.c$", fname):
+                continue
+            for fun in funs:
+                print "goingToRunWithAux:", "arg:", fname
+                fun(fname)
+    return goingToRunWithAux
+
+workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
+                                                 reincludeSIMD,
+                                                 reincludestdio)
+
 ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
@@ -132,32 +161,34 @@ if seq != ref:
 else:
     print "seq ok"
 
-def addSSE(self, files, outdir):
-    for fname in filter(lambda x: not re.search("SIMD.c$", x), files):
-        contents = open("include/ssh.h").readlines()
-        contents += ["#define MOD(a,b)  ((a)%(b))",
-                     "#define MAX0(a,b) (a>b?a:b)"]
-        f = open(fname)
-        for line in f:
-            line = re.sub("float (v4sf_[^[]+)", "__m128 \1", line)
-            line = re.sub("float (v4si_[^[]+)", "__m128i \1", line)
-            line = re.sub("v4s[if]_([^,[]+)\[[^]]*\]", "\1", line)
-            line = re.sub("v4s[if]_([^ ,[]+)", "\1", line)
-            line = re.sub("double (v2df_[^[]+)", "__m128d \1", line)
-            line = re.sub("double (v2di_[^[]+)", "__m128i \1", line)
-            line = re.sub("v2d[if]_([^,[]+)\[[^]]*\]", "\1", line)
-            line = re.sub("v2d[if]_([^ ,[]+)", "\1", line)
-            contents.append(line)
-        f.close()
-        f = open(fname, "w")
-        f.writlines(contents)
-        f.close()
+def addSSE(fname):
+    contents = open("include/sse.h").readlines()
+    f = open(fname)
+    for line in f:
+        line = re.sub(r"float (v4sf_[^[]+)", r"__m128 \1", line)
+        line = re.sub(r"float (v4si_[^[]+)", r"__m128i \1", line)
+        line = re.sub(r"v4s[if]_([^,[]+)\[[^]]*\]", r"\1", line)
+        line = re.sub(r"v4s[if]_([^ ,[]+)", r"\1", line)
+        line = re.sub(r"double (v2df_[^[]+)", r"__m128d \1", line)
+        line = re.sub(r"double (v2di_[^[]+)", r"__m128i \1", line)
+        line = re.sub(r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1", line)
+        line = re.sub(r"v2d[if]_([^ ,[]+)", r"\1", line)
+        contents.append(line)
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
 
-workspace.goingToRunWith = lambda s, files, outdir: (unincludeSIMD(s, files, outdir), addSSE(s, files, outdir))
+workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
+                                                 reincludestdio,
+                                                 addSSE)
+#system("./compileC.sh", wsname, modulename+".c", wsname + ".database/Tmp/sse.c")
 
-system("./compileC.sh", wsname, modulename+".c", wsname + ".database/Tmp/sse.c")
-system("cc", "-O3", "-I.", "-march=native", wsname + ".database/Tmp/sse.c",
-       "-o", wsname +".database/Tmp/sse")
+ws.compile(outfile = "%s.database/Tmp/sse" % (wsname),
+           outdir =  "%s.database/Tmp" % (wsname),
+           CFLAGS = "-Iinclude")
+# system("cc", "-O3", "-I.", "-march=native", wsname + ".database/Tmp/sse.c",
+#        "-o", wsname +".database/Tmp/sse")
 sse = getout("./%s.database/Tmp/sse" % wsname)
 
 if sse != ref:
