@@ -3,15 +3,11 @@ from subprocess import *
 import shutil
 
 modulename = "DOTPROD"
-wsname = "dotprod_c"
 
 sources = ["kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c"]
-try:
-    shutil.rmtree(wsname + ".database")
-except:
-    pass
 
-ws = workspace(sources, name = wsname)
+ws = workspace(sources)
+wsname = ws.name
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
 print "Initial code"
@@ -126,3 +122,6 @@ else:
 # system("./compileC.sh $WS $module.c $WS.database/Tmp/sse.c")
 # system("cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse")
 # system("if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi"")
+
+
+ws.close()
