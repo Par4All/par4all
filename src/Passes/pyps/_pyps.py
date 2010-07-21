@@ -60,7 +60,7 @@ class module:
 		printcode_rc=os.path.join(self._ws.directory(),pypips.show("PRINTED_FILE",self.name))
 		code_rc=os.path.join(self._ws.directory(),pypips.show("C_SOURCE_FILE",self.name))
 		thecmd=cmd+[printcode_rc]
-		time.sleep(1) # sleep 1 sec to make sure pipsmake detects the change
+		pypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
 		if pid.wait() != 0:
 			print sys.stderr > pid.stderr.readlines()
@@ -238,7 +238,6 @@ class workspace(object):
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-		if not os.path.isdir(outdir): raise ValueError("'" + outdir + "' is not a directory")
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
 		if link:
