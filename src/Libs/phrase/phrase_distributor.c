@@ -754,6 +754,8 @@ static entity create_module_with_statement (statement stat,
     text t = text_named_module(new_module, new_module, stat);
     add_new_module_from_text(new_module_name, t, fortran_module_p(get_current_module_entity()), compilation_unit_of_module(get_current_module_name()) );
 
+    free_text(t);
+
     return new_module;
 }
 

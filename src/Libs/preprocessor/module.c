@@ -419,6 +419,8 @@ recompile_module(char* module)
     FILE* f = safe_fopen(fullname,"w");
     print_text(f,t);
     fclose(f);
+    free_text(t);
+
     DB_PUT_FILE_RESOURCE(res,module,filename);
 
     /* the module will be reparsed, so fix(=delete) all its previous entites */

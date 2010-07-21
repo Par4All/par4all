@@ -156,6 +156,7 @@ static entity build_a_clone_for(entity cloned,
   text_sentences(t) =
     CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
   add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
+  free_text(t);
 
   /* should fix the declarations ... but not the language... */
   entity_initial(new_fun) =

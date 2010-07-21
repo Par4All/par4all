@@ -172,10 +172,12 @@ bool simd_memory_packing(char *mod_name)
                 pips_user_warning("I did not find any vectorized array in module parameters :'(\n");
                 goto simd_memory_packing_end;
             }
+            text t = text_module(get_current_module_entity(),get_current_module_statement());
             add_new_module_from_text( mod_name,
-                    text_module(get_current_module_entity(),get_current_module_statement()),
+                    t,
                     fortran_module_p(get_current_module_entity()),compilation_unit_of_module(get_current_module_name())
                     );
+            free_text(t);
             /* update/release resources */
             hash_table_free(array_to_vector);
 
