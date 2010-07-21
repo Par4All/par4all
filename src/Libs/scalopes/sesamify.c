@@ -78,7 +78,7 @@ bool sesamify (char* module_name) {
   shared_mem      = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
   entity_action   = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
 
-  int counter = 1;
+  intptr_t counter = 1;
   int nb_task_total = gen_length(callees_callees(callees_list));
   int num_task=1;
   
@@ -125,7 +125,7 @@ bool sesamify (char* module_name) {
 	 
 	  //shared memory ID
 	  id=counter-1;
-	  hash_put(shared_mem, re, counter); 
+	  hash_put(shared_mem, re, (void*)counter); 
  
 	  
 	  //compute table memory size
