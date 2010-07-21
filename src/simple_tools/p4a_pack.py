@@ -25,9 +25,6 @@ default_install_prefix          = "/usr/local/par4all"
 # Package name. Used for naming the packages.
 package_name                    = "par4all"
 
-# If no version is specified, assume this is the version:
-default_version                 = "1.0"
-
 # Settings for --publish. There ais currently no command line option to override these defaults.
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
 # to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
@@ -37,12 +34,12 @@ default_development_publish_dir     = "/srv/www-par4all/download/development/$DI
 default_deb_publish_dir             = "/srv/www-par4all/download/apt/$DISTRO/dists/releases/main"
 default_deb_development_publish_dir = "/srv/www-par4all/download/apt/$DISTRO/dists/development/main"
 
-# Where are the .deb settings files? (i.e. the control, postinst, etc. files).
-debian_dir = os.path.join(script_dir, "DEBIAN")
-
 # Some useful variables:
 actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
+
+# Where are the .deb settings files? (i.e. the control, postinst, etc. files).
+debian_dir = os.path.join(script_dir, "DEBIAN")
 
 # Put temp directories in this array to make sure no temp dir remains after script exits.
 temp_dirs = []
@@ -81,11 +78,14 @@ def add_module_options(parser):
     group.add_option("--distro", metavar = "DISTRO", default = None,
         help = "Specify the target distribution manually. By default, the current running Linux distribution is used.")
 
-    group.add_option("--version", "--revision", metavar = "REVISION",
-        help = "Specify package version. Current Git revision will be automatically appended.")
+    group.add_option("--version", metavar = "VERSION",
+        help = "Specify version for binary packages.")
 
-    group.add_option("--append-date", action = "store_true", default = False,
-        help = "Automatically append date to version string.")
+    group.add_option("--src-version", metavar = "VERSION",
+        help = "Specify version for source packages.")
+
+    group.add_option("--append-date", "--date", action = "store_true", default = False,
+        help = "Automatically append current date/time to version string.")
 
     group.add_option("--publish", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
@@ -108,7 +108,7 @@ def add_module_options(parser):
     parser.add_option_group(group)
 
 
-def create_dist(pack_dir, install_prefix, revision):
+def create_dist(pack_dir, install_prefix, version, gitrev):
     '''Creates a temporary directory and copy the whole installation directory (pack_dir), under the prefix designated by install_prefix.
     Also writes updated rc files (shell scripts for setting the environment), and a version file.
     Returns a list with the temporary directory created and the full path of the temporary directory and the appended install_prefix.'''
@@ -122,23 +122,33 @@ def create_dist(pack_dir, install_prefix, revision):
     #~ shutil.copytree(pack_dir, temp_dir_with_prefix)
     run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
-    # XXX: gfortran or not??
+
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
-        dict(root = abs_prefix, dist = abs_prefix, accel = os.path.join(abs_prefix, "share/p4a_accel"), fortran = "gfortran"))
-    write_file(get_version_file_path(temp_dir_with_prefix), revision)
+        dict(
+            root = abs_prefix,
+            dist = abs_prefix,
+            accel = os.path.join(abs_prefix, "share/p4a_accel"),
+            fortran = "gfortran" # ???
+        )
+    )
+
+    write_VERSION(temp_dir_with_prefix, version)
+    write_GITREV(temp_dir_with_prefix, gitrev)
+
     return [ temp_dir, temp_dir_with_prefix ]
 
 
-def create_deb(pack_dir, install_prefix, revision, distro, arch, keep_temp = False):
+def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
     '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
     and substitute some values in files in this DEBIAN directory. No modification of the
     distribution is made.'''
     global debian_dir, package_name
-    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, revision)
+    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
     temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
     info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
     control_file = os.path.join(temp_debian_dir, "control.tpl")
+    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
     info("Adjusting values in " + control_file)
     subs_template_file(control_file, subs_map)
@@ -209,12 +219,13 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
 
 
-def create_tgz(pack_dir, install_prefix, revision, distro, arch, keep_temp = False):
+def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
     '''Creates a simple .tar.gz package.'''
     global package_name
-    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, revision)
+    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
     if not arch:
         arch = get_machine_arch()
+    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
     package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
@@ -238,8 +249,9 @@ def create_tgz(pack_dir, install_prefix, revision, distro, arch, keep_temp = Fal
     return package_file
 
 
-def create_stgz(pack_dir, install_prefix, revision, keep_temp = False):
+def create_stgz(pack_dir, install_prefix, version, gitrev, keep_temp = False):
     global package_name, temp_dirs
+    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
     package_full_name = "_".join([ package_name, revision, "src" ])
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
@@ -260,8 +272,8 @@ def create_stgz(pack_dir, install_prefix, revision, keep_temp = False):
     prev_cwd = os.getcwd()
     os.chdir(temp_dir)
     os.makedirs(os.path.join(temp_dir, prefix))
-    relative_version_file = os.path.join(prefix, "VERSION")
-    write_file(relative_version_file, revision)
+    write_VERSION(prefix, version)
+    write_GITREV(prefix, gitrev)
     tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
     sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
     run([ "fakeroot", "sh", "-c", sh_cmd])
@@ -345,43 +357,29 @@ def main(options, args = []):
     version = ""
     if options.version:
         version = options.version
-        warn("Version: " + version + " (--version)")
+        info("Version: " + version + " (--version)")
     else:
-        global default_version
-        version = default_version
-        warn("Version: " + version + " (default; override with --version)")
+        version = VERSION(pack_dir)
+        info("Version: " + version + " (override with --version)")
 
-    tmp = version.split("-")
-    if len(tmp) > 2:
-        die("Invalid revision format: it can have only one '-', e.g. 0.2-beta~foo")
-    if options.append_date and len(tmp) > 1:
-        die("Invalid revision format: no '-' permitted with --append-date")
-    if not re.match("\d\.\d(\.\d)?", tmp[0]):
-        die("Revision must begin with a version string, e.g. 1.2.3 or 0.2")
-    for i in range(len(tmp)):
-        tmp[i] = re.sub("[^\w~\.]", "", tmp[i])
+    src_version = ""
+    if options.src_version:
+        src_version = options.src_version
+        info("Sources version: " + src_version + " (--src-version)")
+    else:
+        src_version = VERSION()
+        info("Sources version: " + src_version + " (override with --src-version)")
+
     if options.append_date:
-        tmp.append(time.strftime("%Y%m%dT%H%M%S"))
-    revision = "-".join(tmp)
+        dt = utc_datetime()
+        version += "~" + dt
+        src_version += "~" + dt
 
-    if not revision:
-        die("Invalid characters in revision")
+    gitrev = GITREV(pack_dir)
+    info("Git revision: " + gitrev)
 
-    append_revision_bin = ""
-    append_revision_src = ""
-
-    if options.deb or options.tgz:
-        append_revision_bin = guess_file_revision(pack_dir)
-        if not append_revision_bin:
-            die("Unable to determine appended revision for binary packages")
-        append_revision_bin = append_revision_bin.replace("~exported", "")
-        debug("Appended revision for binary packages: " + append_revision_bin)
-
-    if options.stgz:
-        append_revision_src = p4a_git(script_dir).current_revision()
-        if not append_revision_src:
-            die("Unable to determine appended revision for source packages")
-        debug("Appended revision for source packages: " + append_revision_bin)
+    src_gitrev = GITREV()
+    info("Sources Git revision: " + src_gitrev)
 
     # Check that fakeroot is available.
     if not which("fakeroot"):
@@ -392,15 +390,17 @@ def main(options, args = []):
     try:
         if options.deb:
             output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix, 
-                revision = revision + "~" + append_revision_bin, distro = distro, arch = deb_arch,
+                version = version, gitrev = gitrev, distro = distro, arch = deb_arch,
                 keep_temp = options.keep_temp))
+
         if options.tgz:
             output_files.append(create_tgz(pack_dir = pack_dir, install_prefix = prefix,
-                revision = revision + "~" + append_revision_bin, distro = distro, arch = arch,
+                version = version, gitrev = gitrev, distro = distro, arch = arch,
                 keep_temp = options.keep_temp))
+
         if options.stgz:
             output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
-                revision = revision + "~" + append_revision_src,
+                version = src_version, gitrev = src_gitrev,
                 keep_temp = options.keep_temp))
 
         if options.publish:
