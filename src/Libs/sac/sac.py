@@ -37,8 +37,6 @@ ws.set_property(PRETTYPRINT_ALL_DECLARATIONS = True)
 
 dotprod.split_update_operator()
 
-dotprod.display()
-print ws.get_property("IF_CONVERSION_INIT_THRESHOLD")
 dotprod.if_conversion_init()
 dotprod.display()
 
