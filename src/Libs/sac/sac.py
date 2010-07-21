@@ -1,10 +1,12 @@
 from pyps import *
 from subprocess import *
+import shutil
 
 modulename = "DOTPROD"
 wsname = "dotprod_c"
 
 sources = ["kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c"]
+shutil.rmtree(wsname + ".database")
 ws = workspace(sources, name = wsname)
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
