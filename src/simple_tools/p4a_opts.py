@@ -65,7 +65,7 @@ def add_common_options(parser):
     group.add_option("--plain", "--no-color", "--no-fancy", "-z", action = "store_true", default = False,
         help = "Disable coloring of terminal output and disable all fancy tickers and spinners and this kind of eye-candy things :-)")
 
-    group.add_option("--version", "-V", dest = "script_version", action = "store_true", default = False,
+    group.add_option("--script-version", "--version", "-V", action = "store_true", default = False,
         help = "Display script version and exit.")
 
     parser.add_option_group(group)
@@ -264,7 +264,7 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@
 
 def send_report_email_if_enabled():
     global static_options, static_args, extra_report_files, report_available
-    if not report_available:
+    if not report_available or not static_options:
         return
     if static_options.report:
         from_addr = static_options.report
@@ -283,16 +283,16 @@ def suggest_more_verbosity():
     if get_verbosity() < 2:
         v = "v" * (get_verbosity() + 1)
         suggest("To get a more verbose output, pass -" + v)
-        if not static_options.log:
+        if static_options and not static_options.log:
             suggest("Alternatively, you can pass --log to log -vv output to a file")
     current_log_file = get_current_log_file()
-    if static_options.log and current_log_file and os.path.exists(current_log_file):
+    if static_options and static_options.log and current_log_file and os.path.exists(current_log_file):
         warn("Log file was " + current_log_file)
 
 
 def suggest_rebuild():
     global static_options
-    if not static_options.rebuild or not static_options.clean:
+    if static_options and (not static_options.rebuild or not static_options.clean):
         suggest("You may try running again with --clean --rebuild --reconf all")
 
 
