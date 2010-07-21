@@ -26,6 +26,9 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+
+#include <sys/wait.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -197,9 +200,23 @@ void display(char *rname, char *mname)
         return;
     }
 
-    FILE * in = safe_fopen(fname, "r");
-    safe_cat(stdout, in);
-    safe_fclose(in, fname);
+    if (isatty(fileno(stdout))) {
+	    int pgpid = fork();
+	    if (pgpid) {
+		    waitpid(pgpid, NULL, 0);
+	    } else {
+		    char *pager = getenv("PIPS_MORE");
+		    if (!pager)
+			    pager = getenv("PAGER");
+		    if (!pager)
+			    pager = "more";
+		    execlp(pager, pager, fname, NULL);
+	    }
+    } else {
+	    FILE * in = safe_fopen(fname, "r");
+	    safe_cat(stdout, in);
+	    safe_fclose(in, fname);
+    }
 
     free(fname);
     return;
