@@ -53,14 +53,18 @@
 
 entity selected_label;
 
-bool selected_loop_p(loop l)
+bool selected_loop_p(statement s)
 {
-  return loop_label(l) == selected_label ;
+    /* SG+EC 2010:
+        The loop_label(statement_loop(s)) is kept for compatibility reasons
+        but is invalid and should eventually be removed */
+  return statement_loop_p(s) &&
+          (statement_label(s) == selected_label || loop_label(statement_loop(s)) == selected_label);
 }
 
 bool interactive_loop_transformation
 (string module_name,
- statement (*loop_transformation)(list,bool (*)(loop))
+ statement (*loop_transformation)(list,bool (*)(statement))
 )
 {
   char *lp_label=NULL;

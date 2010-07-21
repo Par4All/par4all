@@ -166,7 +166,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
    here. Did the author want to be able to apply
    loop_chunk_size_and_strip_mine() several times on different loops
    with different strip mining parameters? */
-static statement loop_chunk_size_and_strip_mine(list lls,__attribute__((unused)) bool (*unused)(loop))
+static statement loop_chunk_size_and_strip_mine(list lls,__attribute__((unused)) bool (*unused)(statement))
 {
 
     string resp;
@@ -264,8 +264,7 @@ bool strip_mine(char *mod_name)
         mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
         set_current_module_statement(mod_stmt);
 
-        look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
-                selected_loop_p);
+        look_for_nested_loop_statements(mod_stmt, loop_chunk_size_and_strip_mine, selected_loop_p);
 
         /* Reorder the module, because new statements have been generated. */
         module_reorder(mod_stmt);

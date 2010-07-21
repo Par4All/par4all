@@ -837,6 +837,9 @@ static bool find_unroll_pragma_and_fully_unroll(statement s)
 
 bool full_unroll_pragma(char * mod_name)
 {
+  set_current_module_entity(module_name_to_entity(mod_name));
+  set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+
   statement mod_stmt = statement_undefined;
   bool return_status = FALSE;
 
@@ -882,6 +885,9 @@ bool full_unroll_pragma(char * mod_name)
 
   debug(1,"full_unroll_pragma","done for %s\n", mod_name);
   debug_off();
+
+  reset_current_module_entity();
+  reset_current_module_statement();
 
   return return_status;
 }
