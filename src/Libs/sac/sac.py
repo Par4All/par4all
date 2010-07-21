@@ -104,24 +104,33 @@ system("sed", "-i", "-e", "1,/dotprod/ d",
 system("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
        "-o", "%s.database/Tmp/ref" % wsname)
 ref = getout("./%s.database/Tmp/ref" % wsname)
+print ref
 
 system("sed", "-i", "-e", "1 i #include \"SIMD.h\"",
        "%s.database/Src/%s.c" % (wsname, modulename))
 # This wasn't necessary in the .tpips version
-system("sed", "-i", "-e", "1 i #include <stdio.h>",
-       "%s.database/Src/%s.c" % (wsname, modulename))
+# system("sed", "-i", "-e", "1 i #include <stdio.h>",
+#        "%s.database/Src/%s.c" % (wsname, modulename))
 system("cc", "-Iinclude", "%s.database/Src/%s.c" % (wsname, modulename),
        "include/SIMD.c", "-o", "%s.database/Tmp/seq" % (wsname))
 seq = getout("./%s.database/Tmp/seq" % wsname)
 
-if ref != seq:
+if seq != ref:
     print "seq ko"
+    exit(3)
 else:
     print "seq ok"
 
-# system("./compileC.sh $WS $module.c $WS.database/Tmp/sse.c")
-# system("cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse")
-# system("if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi"")
+system("sed", "-i", "-e", "1 d", "%s.database/Src/%s.c" % (wsname, modulename))
+system("./compileC.sh", wsname, modulename+".c", wsname + ".database/Tmp/sse.c")
+system("cc", "-O3", "-I.", "-march=native", wsname + ".database/Tmp/sse.c",
+       "-o", wsname +".database/Tmp/sse")
+sse = getout("./%s.database/Tmp/sse" % wsname)
 
+if sse != ref:
+    print "sse ko"
+    exit(3)
+else:
+    print "sse ok"
 
 ws.close()
