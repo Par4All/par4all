@@ -616,21 +616,15 @@ def main(options, args = []):
         "src/dev/p4a_valgrind",
         "src/simple_tools/p4a",
         "src/simple_tools/p4a_process",
-        #"src/simple_tools/p4a_setup",
-        #"src/simple_tools/p4a_pack",
         "src/postprocessor/p4a_recover_includes",
         "src/validation/p4a_validate",
         "src/validation/p4a_validation",
         "src/p4a_accel/p4a_post_processor.py"
         ]:
         run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
-        #~ debug(os.path.join(root, file) + " -> " + install_dir_bin)
-        #~ shutil.copy(os.path.join(root, file), install_dir_bin)
 
     for file in [ "src/dev/p4a_git_lib.bash" ]:
         run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
-        #~ debug(os.path.join(root, file) + " -> " + install_dir_etc)
-        #~ shutil.copy(os.path.join(root, file), install_dir_etc)
 
     # Install accelerator source.
     info("Installing accel files")

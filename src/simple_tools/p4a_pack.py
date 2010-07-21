@@ -110,7 +110,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
     info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
     run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
-
+    
     p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
         dict(
             root = abs_prefix,
@@ -119,12 +119,11 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
             fortran = "gfortran" # ???
         )
     )
-
+    
     write_VERSION(temp_dir_with_prefix, version)
     write_GITREV(temp_dir_with_prefix, gitrev)
 
     return [ temp_dir, temp_dir_with_prefix ]
-
 
 def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
     '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
@@ -136,14 +135,14 @@ def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_tem
     info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
     control_file = os.path.join(temp_debian_dir, "control.tpl")
-    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
     info("Adjusting values in " + control_file)
     subs_template_file(control_file, subs_map)
     postinst_file = os.path.join(temp_debian_dir, "postinst.tpl")
     info("Adjusting values in " + postinst_file)
     subs_template_file(postinst_file, subs_map)
-    package_file_name = "_".join([ package_name, revision, arch ]) + ".deb"
+    package_file_name = package_name + "-" + revision + "_" + arch + ".deb"
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
         warn("Removing existing " + package_file)
@@ -158,6 +157,71 @@ def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_tem
     else:
         rmtree(temp_dir, can_fail = 1)
     return package_file_name
+
+def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
+    '''Creates a simple .tar.gz package.'''
+    global package_name
+    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
+    if not arch:
+        arch = get_machine_arch()
+    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+    package_file_name = package_name + "-" + revision + "_" + arch + ".tar.gz"
+    package_file = os.path.abspath(package_file_name)
+    if os.path.exists(package_file):
+        warn("Removing existing " + package_file)
+        os.remove(package_file)
+    tar_dir = os.path.split(temp_dir_with_prefix)[0]
+    new_temp_dir_with_prefix = os.path.join(tar_dir, package_name + "-" + versiond)
+    shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
+    tar_cmd = " ".join([ "tar", "czvf", package_file_name, "-C", tar_dir, "." ])
+    sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
+    run([ "fakeroot", "sh", "-c", sh_cmd])
+    if os.path.exists(package_file_name):
+        done("Created " + package_file_name)
+    else:
+        warn(package_file_name + " file not created!?")
+    if keep_temp:
+        warn("Temporary directory was " + temp_dir)
+    else:
+        rmtree(temp_dir, can_fail = True)
+    return package_file
+
+def create_stgz(pack_dir, install_prefix, version, gitrev, keep_temp = False):
+    global package_name, temp_dirs
+    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+    package_full_name = package_name + "-" + revision + "_src"
+    package_file_name = package_full_name + ".tar.gz"
+    package_file = os.path.abspath(package_file_name)
+    package_file_tar = change_file_ext(package_file, "")
+    if os.path.exists(package_file):
+        warn("Removing existing " + package_file)
+        os.remove(package_file)
+    git = p4a_git(script_dir)
+    current_branch = git.current_branch()
+    if current_branch != "p4a":
+        die("Not on branch p4a (" + current_branch + "), cannot create a source package")
+    prefix = package_name + "-" + versiond + "_src"
+    git.archive(package_file_tar, prefix = prefix + "/")
+    temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
+    debug("Temp dir is " + temp_dir)
+    temp_dirs.append(temp_dir)
+    prev_cwd = os.getcwd()
+    os.chdir(temp_dir)
+    os.makedirs(os.path.join(temp_dir, prefix))
+    relative_version_file = write_VERSION(prefix, version)
+    relative_gitrev_file = write_GITREV(prefix, gitrev)
+    tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
+    sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
+    run([ "fakeroot", "sh", "-c", sh_cmd])
+    tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_gitrev_file ])
+    sh_cmd = '"chown root:root ' + relative_gitrev_file + " && " + tar_cmd + '"'
+    run([ "fakeroot", "sh", "-c", sh_cmd])
+    os.chdir(prev_cwd)
+    rmtree(temp_dir)
+    run([ "gzip", "-9", package_file_tar ])
+    if os.path.exists(package_file_name):
+        done("Created " + package_file_name)
+    return package_file
 
 
 def publish_deb(file, host, repos_dir, arch):
@@ -205,72 +269,6 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         ext = get_file_ext(file)
         if ext == ".deb":
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
-
-
-def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
-    '''Creates a simple .tar.gz package.'''
-    global package_name
-    (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
-    if not arch:
-        arch = get_machine_arch()
-    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
-    package_file_name = "_".join([ package_name, revision, arch ]) + ".tar.gz"
-    package_file = os.path.abspath(package_file_name)
-    if os.path.exists(package_file):
-        warn("Removing existing " + package_file)
-        os.remove(package_file)
-    #~ new_temp_dir_with_prefix = os.path.join(os.path.split(temp_dir_with_prefix)[0], package_name + "_" + revision)
-    #~ shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
-    new_temp_dir_with_prefix = temp_dir_with_prefix
-    tar_dir = os.path.split(new_temp_dir_with_prefix)[0] # one level up
-    tar_cmd = " ".join([ "tar", "czvf", package_file_name, "-C", tar_dir, "." ])
-    sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
-    if os.path.exists(package_file_name):
-        done("Created " + package_file_name)
-    else:
-        warn(package_file_name + " file not created!?")
-    if keep_temp:
-        warn("Temporary directory was " + temp_dir)
-    else:
-        rmtree(temp_dir, can_fail = True)
-    return package_file
-
-
-def create_stgz(pack_dir, install_prefix, version, gitrev, keep_temp = False):
-    global package_name, temp_dirs
-    revision = make_full_revision(custom_version = version, custom_gitrev = gitrev)
-    package_full_name = "_".join([ package_name, revision, "src" ])
-    package_file_name = package_full_name + ".tar.gz"
-    package_file = os.path.abspath(package_file_name)
-    package_file_tar = change_file_ext(package_file, "")
-    if os.path.exists(package_file):
-        warn("Removing existing " + package_file)
-        os.remove(package_file)
-    git = p4a_git(script_dir)
-    current_branch = git.current_branch()
-    if current_branch != "p4a":
-        die("Not on branch p4a (" + current_branch + "), cannot create a source package")
-    prefix = package_name + "_src"
-    #~ git.archive(change_file_ext(package_file, ""), prefix = package_full_name + "/")
-    git.archive(package_file_tar, prefix = prefix + "/")
-    temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
-    debug("Temp dir is " + temp_dir)
-    temp_dirs.append(temp_dir)
-    prev_cwd = os.getcwd()
-    os.chdir(temp_dir)
-    os.makedirs(os.path.join(temp_dir, prefix))
-    write_VERSION(prefix, version)
-    write_GITREV(prefix, gitrev)
-    tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
-    sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
-    os.chdir(prev_cwd)
-    rmtree(temp_dir)
-    run([ "gzip", "-9", package_file_tar ])
-    if os.path.exists(package_file_name):
-        done("Created " + package_file_name)
-    return package_file
 
 
 def main(options, args = []):
