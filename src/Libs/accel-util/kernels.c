@@ -71,6 +71,7 @@ call range_to_dma(expression from,
 {
   expression dest;
   list args;
+  int scalar_entity=0;
   string function_name =
     dma_load_p(m) ? get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION")
     : dma_store_p(m) ? get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION")
@@ -84,13 +85,23 @@ call range_to_dma(expression from,
 		    "KERNEL_LOAD_STORE_..._FUNCTION "
 		    "set to a defined entity and added the correct .c file?\n",function_name);
 
+
+  /*scalar detection*/
+  if(!entity_array_p(expression_variable(from))) {
+    scalar_entity=1;
+ }
+
   if (dma_allocate_p(m))
     /* Need the address for the allocator to modify the pointer itself: */
     dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), to);
-  else if (!dma_allocate_p(m))
+ 
+  else if (!dma_allocate_p(m) && !scalar_entity)
     /* Except for the deallocation, the original array is referenced
        throudh pointer dereferencing: */
     dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), to);
+  else if(!dma_allocate_p(m) && scalar_entity){
+    dest=to;
+  }
 
   if (dma_deallocate_p(m))
     args = make_expression_list(dest);
@@ -98,7 +109,10 @@ call range_to_dma(expression from,
     expression transfer_size = range_to_expression(r,range_to_distance);
 
     if (dma_load_p(m) || dma_store_p(m)) {
-      expression source = from;
+      expression source;
+      source = from;
+      if(scalar_entity)
+	source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
       args = make_expression_list(source, dest, transfer_size);
     }
     else
@@ -239,7 +253,7 @@ statement effects_to_dma(statement stat,
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
-      if(!ENDP(variable_dimensions(type_variable(entity_type(re))))) {
+      if(!ENDP(variable_dimensions(type_variable(entity_type(re)))) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
 	range the_range = make_range(int_to_expression(0),
 				     make_op_exp(MINUS_OPERATOR_NAME,
 						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
@@ -248,8 +262,16 @@ statement effects_to_dma(statement stat,
 	expression from = entity_to_expression(re);
 	entity eto;
 	if(val == HASH_UNDEFINED_VALUE) {
+
+	  /*initialized with NULL value for runtime manager in SCMP mode*/
+	  expression init;
+	  if(get_bool_property("SCMP_MODE"))
+	    init=int_to_expression(0);
+	  else
+	    init = expression_undefined;
+
 	  /* Replace the reference to the array re to *eto: */
-	  eto = make_temporary_pointer_to_array_entity(re,expression_undefined);
+	  eto = make_temporary_pointer_to_array_entity(re,init);
 	  AddEntityToCurrentModule(eto);
 	  expression exp =
 	    MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
@@ -468,7 +490,7 @@ kernel_load_store_generator(statement s, string module_name)
 	    insert_a_statement(s, allocates);
 	  if (stores != statement_undefined)
 	    append_a_statement(s, stores);
-	  if (deallocates != statement_undefined)
+	  if (deallocates != statement_undefined && !get_bool_property("SCMP_MODE"))
 	    append_a_statement(s, deallocates);
         }
     }
@@ -481,8 +503,12 @@ kernel_load_store_generator(statement s, string module_name)
  */
 bool kernel_load_store(char *module_name) {
   /* generate a load stores on each caller */
-  {
+  
     debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
+    
+    /*Filter for the tasking mode*/
+    if((get_bool_property("SCMP_MODE") && (strstr(module_name, get_string_property("GPU_LAUNCHER_PREFIX"))!=NULL)) || !get_bool_property("SCMP_MODE")) {
+
     callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
     FOREACH(STRING,caller_name,callees_callees(callers)) {
       /* prelude */
