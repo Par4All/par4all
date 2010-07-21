@@ -19,7 +19,8 @@
 
 TARGET	= scalopes
 
-LIB_CFILES =	scalopify.c
+LIB_CFILES =	scalopify.c \
+		sesamify.c
 
 INC_TARGET =    $(TARGET).h
 

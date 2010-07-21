@@ -6747,7 +6747,14 @@ scalopify                    > MODULE.code
 		< MODULE.code
                 < MODULE.cumulated_effects
 \end{PipsMake}
-
+\begin{PipsMake}
+sesamify                    > MODULE.code
+		> MODULE.callees
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+                < MODULE.cumulated_effects
+\end{PipsMake}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
