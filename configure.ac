@@ -268,6 +268,7 @@ AC_CONFIG_FILES([pips_config.h
                  src/Scripts/simple_tools/pips_f2openmp
                  src/Scripts/validation/Makefile
                  src/Documentation/dev_guide/Makefile
+                 src/Documentation/auto_pips/Makefile
                  src/Documentation/tpips-user-manual/Makefile
 				 src/Documentation/linear/Makefile
 				 src/Documentation/bugs_and_wishes/Makefile
