@@ -99,25 +99,24 @@ def system(*cmd):
         exit(1)
     return 0
 
+# get the result from the initial, reference file, without SIMD'izing anything
 system("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
        "-o", "%s.database/Tmp/ref" % wsname)
 ref = getout("./%s.database/Tmp/ref" % wsname)
+
 
 def unincludeSIMD(fname):
     # in the modulename.c file, undo the inclusion of SIMD.h by deleting
     # everything up to the definition of our function (not as clean as could
     # be, to say the least...)
     f = open(fname, "r")
-    print "unincludeSIMD:", fname
     while not re.search("dotprod", f.readline()):
         pass
-    print "unincludeSIMD:", "removing dotprod done"
     contents = f.readlines()
     f.close()
     f = open(fname, "w")
     f.writelines(contents)
     f.close()
-    print fname
 
 def addBeginning(fname, *args):
     contents = map((lambda(s): s + "\n" if s[-1] != "\n" else s),
@@ -142,14 +141,13 @@ def goingToRunWithFactory(*funs):
             if re.search(r"SIMD\.c$", fname):
                 continue
             for fun in funs:
-                print "goingToRunWithAux:", "arg:", fname
                 fun(fname)
     return goingToRunWithAux
 
+# compile, undoing the inclusion of SIMD.h
 workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
                                                  reincludeSIMD,
                                                  reincludestdio)
-
 ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
@@ -179,16 +177,14 @@ def addSSE(fname):
     f.writelines(contents)
     f.close()
 
+# recompile, using sse.h instead of SIMD.h
 workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
                                                  reincludestdio,
                                                  addSSE)
-#system("./compileC.sh", wsname, modulename+".c", wsname + ".database/Tmp/sse.c")
 
 ws.compile(outfile = "%s.database/Tmp/sse" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
-# system("cc", "-O3", "-I.", "-march=native", wsname + ".database/Tmp/sse.c",
-#        "-o", wsname +".database/Tmp/sse")
 sse = getout("./%s.database/Tmp/sse" % wsname)
 
 if sse != ref:
