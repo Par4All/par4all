@@ -700,7 +700,6 @@ def main(options, args = []):
     done("To begin using it, you should source, depending on your shell religion:")
     done("")
     done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
-    done("  or")
     done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
     done("")
 
