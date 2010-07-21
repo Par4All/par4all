@@ -89,10 +89,14 @@ def GITREV(file_dir = None, test_dirty = True, include_tag = False):
 
 
 def write_VERSION(dir, version):
-    write_file(os.path.join(dir, "VERSION"), version)
+    file = os.path.join(dir, "VERSION")
+    write_file(file, version)
+    return file
 
 def write_GITREV(dir, gitrev):
-    write_file(os.path.join(dir, "GITREV"), gitrev)
+    file = os.path.join(dir, "GITREV")
+    write_file(file, gitrev)
+    return file
 
 
 def make_full_revision(file_dir = None, custom_version = "", custom_gitrev = ""):
@@ -131,14 +135,15 @@ def make_full_revision(file_dir = None, custom_version = "", custom_gitrev = "")
     else:
         warn("Numeric version not found, please add/fix VERSION file, "
             + "custom version specification, or Git tag")
-        version = "0.0-" + version
+        versiond = "0.0"
+        version = versiond + "-" + version
 
     #if append_date:
     #    version += "~" + utc_datetime()
 
     debug("Version string for " + repr(file_dir) + ": " + version)
-
-    return version
+    
+    return version, versiond
 
 
 if __name__ == "__main__":
