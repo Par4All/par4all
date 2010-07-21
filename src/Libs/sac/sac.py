@@ -99,20 +99,34 @@ def system(*cmd):
         exit(1)
     return 0
 
-system("sed", "-i", "-e", "1,/dotprod/ d",
-       "%s.database/Src/%s.c" % (wsname, modulename))
 system("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
        "-o", "%s.database/Tmp/ref" % wsname)
 ref = getout("./%s.database/Tmp/ref" % wsname)
 print ref
 
-system("sed", "-i", "-e", "1 i #include \"SIMD.h\"",
-       "%s.database/Src/%s.c" % (wsname, modulename))
-# This wasn't necessary in the .tpips version
-# system("sed", "-i", "-e", "1 i #include <stdio.h>",
-#        "%s.database/Src/%s.c" % (wsname, modulename))
-system("cc", "-Iinclude", "%s.database/Src/%s.c" % (wsname, modulename),
-       "include/SIMD.c", "-o", "%s.database/Tmp/seq" % (wsname))
+def unincludeSIMD(self, files, outdir):
+    # in the modulename.c file, undo the inclusion of SIMD.h by deleting
+    # everything up to the definition of our function (not as clean as could
+    # be, to say the least...)
+    for fname in filter(lambda x: not re.search("SIMD.c$", x), files):
+        f = open(fname, "r+")
+        while not re.search("dotprod", f.readline()):
+            pass
+        contents = f.readlines()
+        f.seek(0)
+        f.truncate(0)
+        f.write('#include "SIMD.h"\n')
+        f.write('#include <stdio.h>\n')
+        f.writelines(contents)
+        f.close()
+        print fname
+        exit(4)
+
+workspace.goingToRunWith = unincludeSIMD
+
+ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
+           outdir =  "%s.database/Tmp" % (wsname),
+           CFLAGS = "-Iinclude")
 seq = getout("./%s.database/Tmp/seq" % wsname)
 
 if seq != ref:
