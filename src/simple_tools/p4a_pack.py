@@ -17,13 +17,13 @@ from p4a_version import *
 
 
 # Default directory to take current binary installation from.
-default_pack_dir                = "/usr/local/par4all"
+default_pack_dir                    = "/usr/local/par4all"
 
 # Default installation prefix when installing a .deb or .rpm package on the client machine.
-default_install_prefix          = "/usr/local/par4all"
+default_install_prefix              = "/usr/local/par4all"
 
 # Package name. Used for naming the packages.
-package_name                    = "par4all"
+package_name                        = "par4all"
 
 # Settings for --publish. There ais currently no command line option to override these defaults.
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
@@ -57,15 +57,6 @@ def add_module_options(parser):
     group.add_option("--deb", action = "store_true", default = False,
         help = "Build a .deb package.")
 
-    #~ group.add_option("--sdeb", action = "store_true", default = False,
-        #~ help = "Create a source .deb package.")
-
-    #~ group.add_option("--rpm", "-R", action = "store_true", default = False,
-        #~ help = "Build a .rpm package.")
-
-    #~ group.add_option("--srpm", action = "store_true", default = False,
-        #~ help = "Build a source .rpm package.")
-
     group.add_option("--tgz", "-T", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
 
@@ -78,10 +69,10 @@ def add_module_options(parser):
     group.add_option("--distro", metavar = "DISTRO", default = None,
         help = "Specify the target distribution manually. By default, the current running Linux distribution is used.")
 
-    group.add_option("--version", metavar = "VERSION",
+    group.add_option("--package-version", dest = "version", metavar = "VERSION",
         help = "Specify version for binary packages.")
 
-    group.add_option("--src-version", metavar = "VERSION",
+    group.add_option("--package-src-version", dest = "src_version", metavar = "VERSION",
         help = "Specify version for source packages.")
 
     group.add_option("--append-date", "--date", action = "store_true", default = False,
@@ -90,8 +81,6 @@ def add_module_options(parser):
     group.add_option("--publish", action = "store_true", default = False,
         help = "Create a .tar.gz archive.")
 
-    #~ group.add_option("--development", "--dev", "--untested", "--unstable", "--nightly", action = "store_true", default = False,
-        #~ help = "When publishing, store files in the 'development' directory (i.e. for development (vs. release) builds). Implies --append-date.")
     group.add_option("--release", dest = "development", action = "store_false", default = True,
         help = "When publishing, put the packages in release directories instead of development ones.")
 
@@ -119,7 +108,6 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
     info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
-    #~ shutil.copytree(pack_dir, temp_dir_with_prefix)
     run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
 
@@ -357,18 +345,18 @@ def main(options, args = []):
     version = ""
     if options.version:
         version = options.version
-        info("Version: " + version + " (--version)")
+        info("Version: " + version + " (--package-version)")
     else:
         version = VERSION(pack_dir)
-        info("Version: " + version + " (override with --version)")
+        info("Version: " + version + " (override with --package-version)")
 
     src_version = ""
     if options.src_version:
         src_version = options.src_version
-        info("Sources version: " + src_version + " (--src-version)")
+        info("Sources version: " + src_version + " (--package-src-version)")
     else:
         src_version = VERSION()
-        info("Sources version: " + src_version + " (override with --src-version)")
+        info("Sources version: " + src_version + " (override with --package-src-version)")
 
     if options.append_date:
         dt = utc_datetime()
