@@ -259,7 +259,14 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         }
 
         /* Create body of the loop, with updated index */
-        body = copy_statement(loop_body(il));
+        clone_context cc = make_clone_context(
+                get_current_module_entity(),
+                get_current_module_entity(),
+                NIL,
+                get_current_module_statement() );
+        body = clone_statement(loop_body(il), cc);
+        free_clone_context(cc);
+
         ifdebug(9) {
             pips_assert("loop_unroll", statement_consistent_p(body));
             /* "gen_copy_tree returns bad statement\n"); */
@@ -330,7 +337,14 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             statement transformed_stmt;
             list body_block = instruction_block(statement_instruction(body));
 
-            transformed_stmt = copy_statement(loop_body(il));
+            clone_context cc = make_clone_context(
+                    get_current_module_entity(),
+                    get_current_module_entity(),
+                    NIL,
+                    get_current_module_statement() );
+            transformed_stmt = clone_statement(loop_body(il), cc);
+            free_clone_context(cc);
+
             ifdebug(9)
                 statement_consistent_p(transformed_stmt);
             tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -538,7 +552,14 @@ void full_loop_unroll(statement loop_statement)
     for(iter = lbval; iter <= ubval; iter += incval) {
         statement transformed_stmt;
 
-        transformed_stmt = copy_statement(loop_body(il));
+        clone_context cc = make_clone_context(
+                get_current_module_entity(),
+                get_current_module_entity(),
+                NIL,
+                get_current_module_statement() );
+        transformed_stmt = clone_statement(loop_body(il), cc);
+        free_clone_context(cc);
+
         ifdebug(9)
             statement_consistent_p(transformed_stmt);
         expr = int_to_expression(iter);
