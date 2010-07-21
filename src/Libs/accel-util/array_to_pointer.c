@@ -133,7 +133,6 @@ static void remove_dereferencement(expression e)
     }
 }
 
-
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
  *
