@@ -422,3 +422,18 @@ gen_array_t get_callers (string module)
 
     return gen_array_from_list(callees_callees(caller_modules));
 }
+
+/* Get all the callers of the specified module. The returned value is allocated dynamically
+    and needs to be freed by the caller of this function */
+gen_array_t get_callees (string module)
+{
+    callees callee_modules;
+
+    if (!safe_make(DBR_CALLEES, module))
+            pips_internal_error("Cannot make callees for %s\n", module);
+
+    callee_modules = (callees)
+            db_get_memory_resource(DBR_CALLEES, module,TRUE);
+
+    return gen_array_from_list(callees_callees(callee_modules));
+}

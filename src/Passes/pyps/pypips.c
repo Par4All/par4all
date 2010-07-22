@@ -251,3 +251,16 @@ char * get_callers_of(char * module_name)
 
     return callers_string;
 }
+
+/* Returns the list of the modules called by that specific module,
+   separated by ' '. */
+char * get_callees_of(char * module_name)
+{
+    gen_array_t callees = get_callees(module_name);
+
+    char * callees_string = strdup(string_array_join(callees, " "));
+
+    gen_array_free(callees);
+
+    return callees_string;
+}

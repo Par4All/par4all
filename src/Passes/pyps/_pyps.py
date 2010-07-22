@@ -101,6 +101,12 @@ class module:
 			return []
 		return callers.split(" ")
 
+	def callees(self):
+		callees=pypips.get_callees_of(self.name)
+		if not callees:
+			return []
+		return callees.split(" ")
+
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
 		for name,val in props.iteritems():
