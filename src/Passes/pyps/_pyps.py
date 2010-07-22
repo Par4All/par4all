@@ -6,6 +6,7 @@ import shutil
 import re
 import time
 from string import split, upper, join
+from subprocess import Popen, PIPE
 
 pypips.atinit()
 

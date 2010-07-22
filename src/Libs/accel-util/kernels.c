@@ -361,8 +361,7 @@ bool do_kernelize(statement s, entity loop_label)
 	if(!ENDP(loop_locals(statement_loop(s2)))) replace_entity(loop_locals(statement_loop(s2)),outer_index,inner_index);
 	loop_index(statement_loop(s))=inner_index;
 	replace_entity(loop_range(statement_loop(s)),outer_index,inner_index);
-	gen_remove_once(&entity_declarations(get_current_module_entity()),outer_index);
-	gen_remove_once(&statement_declarations(get_current_module_statement()),outer_index);
+    RemoveLocalEntityFromDeclarations(outer_index,get_current_module_entity(),get_current_module_statement());
 	loop_body(statement_loop(s))=make_block_statement(make_statement_list(s2));
 	AddLocalEntityToDeclarations(outer_index,get_current_module_entity(),loop_body(statement_loop(s)));
 	l = statement_loop(s);

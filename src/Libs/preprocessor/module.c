@@ -65,10 +65,7 @@ list module_declarations(entity m)
   list dl = get_current_module_declarations();
   if (list_undefined_p(dl))
     {
-      statement s = get_current_module_statement();
-      list dl2 = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
-      dl = statement_to_declarations(s);
-      dl = gen_nconc(dl, dl2);
+      dl = code_declarations(value_code(entity_initial(m)));
       set_current_module_declarations(dl);
     }  
 

@@ -349,6 +349,7 @@ void make_pointer_from_variable(type tparam)
             {
                 gen_full_free_list(parameter_dimensions);
                 variable_dimensions(param)=NIL;
+
                 basic vb = basic_ultimate(variable_basic(param));
                 if(!basic_pointer_p(vb)) {
                     basic parameter_basic = variable_basic(param);
@@ -359,6 +360,7 @@ void make_pointer_from_variable(type tparam)
                             );
                     variable_basic(param)=new_parameter_basic;
                 }
+
             } break;
 
     }
@@ -494,6 +496,7 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
     FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(m))))
         if(formal_parameter_p(e)) {
             make_pointer_entity_from_reference_entity(e);
+            pips_debug(1,"changing %s \n",entity_name(e));
         }
 
     FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m))))
@@ -505,7 +508,7 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
             for(list iter = call_site_args; !ENDP(iter);POP(iter))
             {
                 list* args = (list*)REFCAR(iter);
-                if(get_array_to_pointer_conversion_mode() == POINTER && entity_array_p(dummy_identifier(d)))
+                if(get_array_to_pointer_conversion_mode() != NO_CONVERSION && entity_array_p(dummy_identifier(d)))
                 {
                     expression arg = EXPRESSION(CAR(*args));
                     array_to_pointer_fix_call_site(arg);
@@ -513,6 +516,7 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
                 POP(*args);
             }
             make_pointer_entity_from_reference_entity(dummy_identifier(d));
+            pips_debug(1,"changing %s \n",entity_name(dummy_identifier(d)));
         }
         type t = parameter_type(p);
         make_pointer_from_all_variable(t);
@@ -525,6 +529,7 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
     /* also validate callers */
     FOREACH(STATEMENT,caller_statement,callers_statement)
     {
+      pips_assert("everything went well",statement_consistent_p(caller_statement));
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(callers)),caller_statement);
         POP(callers);
     }
@@ -532,6 +537,7 @@ static void reduce_parameter_declaration_dimension(entity m, const char * module
 
 bool array_to_pointer(char *module_name)
 {
+    debug_on("ARRAY_TO_POINTER_DEBUG_LEVEL");
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
@@ -552,17 +558,19 @@ bool array_to_pointer(char *module_name)
          * tricky : signature must be changed in two places !
          */
         reduce_parameter_declaration_dimension(get_current_module_entity(),module_name);
-    }
-    gen_recurse(get_current_module_statement(),expression_domain,gen_true,array_to_pointer_call_rewriter);
+        gen_recurse(get_current_module_statement(),expression_domain,gen_true,array_to_pointer_call_rewriter);
 
-    /* validate */
-    pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
-    module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+        /* validate */
+        pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+    }
+
 
     /*postlude*/
     reset_current_module_entity();
     reset_current_module_statement();
+    debug_off();
     return true;
 }
 
