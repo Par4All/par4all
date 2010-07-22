@@ -116,6 +116,13 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ### content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
     ###                 insert_kernel_launcher_declaration, content)
 
+    # NULL is preprocessed differently in C and C++ ; 
+    # PIPS generated code for NULL is "(void *) 0"
+    # This will break cuda compilation !
+    # So here is a quick hack to recover NULL symbolic
+    content = re.sub(r'\(void \*\) 0',
+                     "NULL", content)
+
 
     if verbose:
         print content,

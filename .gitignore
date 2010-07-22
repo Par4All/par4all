@@ -19,3 +19,4 @@ install-sh
 ltmain.sh
 missing
 packages/PIPS/pips/pips_config.h.in
+GITREV
