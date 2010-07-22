@@ -687,7 +687,7 @@ def main(options, args = []):
     # Write version file.
     write_VERSION(install_dir, VERSION(root))
     write_GITREV(install_dir, GITREV(root))
-    revision = make_full_revision(install_dir)
+    (revision, versiond) = make_full_revision(install_dir)
 
     done("")
     done("All done. Par4All " + revision + " is ready and has been installed in " + install_dir)
