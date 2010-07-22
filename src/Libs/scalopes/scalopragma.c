@@ -19,6 +19,7 @@
 #include "pipsdbm.h"
 #include "transformations.h"
 #include "resources.h"
+#include "accel-util.h"
 #include "properties.h"
 
 list statement_to_outline;

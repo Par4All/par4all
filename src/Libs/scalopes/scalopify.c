@@ -19,12 +19,10 @@
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
+#include "properties.h"
 #include "accel-util.h"
 #include "resources.h"
 
-list entities_to_wrap;
-list call_to_wrap;
-entity get_call_entity;
 
 
 static bool call_load_store_p(call c){
@@ -38,13 +36,13 @@ static bool call_load_store_p(call c){
 
 }
 
-static bool find_call_to_wrap(call c){
-  call_to_wrap = CONS(CALL,c,call_to_wrap); 
+static bool find_call_to_wrap(call c,list *call_to_wrap){
+  *call_to_wrap = CONS(CALL,c,*call_to_wrap); 
   return FALSE;
 }
 
 
-static bool find_entities_to_wrap(call c){
+static bool find_entities_to_wrap(call c,set entities_to_wrap){
 
   if(call_load_store_p(c)){
     
@@ -63,8 +61,8 @@ static bool find_entities_to_wrap(call c){
     entity e = expression_variable(EXPRESSION(CAR(call_arguments(c))));
     
 
-    if(gen_find_eq(e, entities_to_wrap)==gen_chunk_undefined){
-      entities_to_wrap = CONS(ENTITY,e,entities_to_wrap);   
+    if(!set_belong_p(entities_to_wrap,e)) {
+        set_add_element(entities_to_wrap,entities_to_wrap,e);
     }
   }  
   return TRUE;
@@ -101,26 +99,26 @@ bool scalopify (char* module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "SCALOPIFY_DEBUG_LEVEL");
-  entities_to_wrap=NIL;
-  call_to_wrap=NIL;
+  set entities_to_wrap=set_make(set_pointer);
+  list call_to_wrap=NIL;
 
   expression exp;
   type t;
 
-  get_call_entity = local_name_to_top_level_entity("P4A_scmp_flow");
+  entity get_call_entity = local_name_to_top_level_entity("P4A_scmp_flow");
 
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
   gen_recurse(module_statement,call_domain,find_entities_to_wrap,gen_identity);
 
-  gen_recurse(module_statement,call_domain,find_call_to_wrap,gen_identity);
+  gen_context_recurse(module_statement,&call_to_wrap,call_domain,find_call_to_wrap,gen_identity);
 
 
   FOREACH(CALL, c , call_to_wrap){
  
     if(!call_load_store_p(c)){
   
-      FOREACH(ENTITY, e, entities_to_wrap){
+      SET_FOREACH(entity, e, entities_to_wrap){
  
 	/*Two cases: vector or scalar*/
 	if(entity_array_p(e)) {	
@@ -138,8 +136,8 @@ bool scalopify (char* module_name) {
 	}
 	else{
 	 
-	  t   = make_basic_pointer(copy_type(entity_type(e)));
-	  t   = make_type_variable(make_variable(t,NIL,NIL));
+	  basic b   = make_basic_pointer(copy_type(entity_type(e)));
+	  t   = make_type_variable(make_variable(b,NIL,NIL));
 
 	  exp = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), entity_to_expression(e));
 	  exp = MakeUnaryCall(get_call_entity, exp);
@@ -154,7 +152,7 @@ bool scalopify (char* module_name) {
 
  
   gen_free_list(call_to_wrap);
-  gen_free_list(entities_to_wrap);
+  set_free(entities_to_wrap);
 
   // We may have outline some code, so recompute the callees:
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,
