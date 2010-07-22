@@ -171,16 +171,30 @@ bool expression_array_to_pointer(expression exp, bool in_init)
             /* create a pointer if needed */
             if( !get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY"))
             {
-                /* get the base type of the reference */
-                type type_without_indices = make_type_variable(make_variable(
-                            copy_basic(variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref)))))),
-                            NIL,
-                            gen_full_copy_list(variable_qualifiers(type_variable(ultimate_type(entity_type(reference_variable(ref))))))));
-
 
                 /* create an expression for the new reference, possibly casted */
                 if( force_cast && ! basic_pointer_p( variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref) )) ) ) ) )
                 {
+                    /* get the base type of the reference */
+                    type type_without_indices = make_type_variable(
+                            make_variable(
+                                copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
+                                NIL,
+                                gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
+                    /* remove typedef as long as needed */
+                    while(!ENDP(variable_dimensions(type_variable(ultimate_type(type_without_indices))))) {
+                        basic b = variable_basic(type_variable(type_without_indices));
+                        pips_assert("basic typedef",basic_typedef_p(b));
+                        entity tmp = basic_typedef(variable_basic(type_variable(type_without_indices)));
+                        free_type(type_without_indices);
+                        type_without_indices=make_type_variable(
+                                make_variable(
+                                    copy_basic(entity_basic(tmp)),
+                                    NIL,NIL)
+                                );
+                    }
+
+
                     base_ref = make_expression(
                             make_syntax_cast(
                                 make_cast(
@@ -295,8 +309,8 @@ static void variable_downgrade_basic(variable param) {
     /* fix type if several pointers are chained */
     basic vb = basic_ultimate(variable_basic(param));
     if( basic_pointer_p(vb)) {
-        while(basic_pointer_p(vb)) {
-            vb = variable_basic(type_variable(ultimate_type(basic_pointer(vb))));
+        while(basic_pointer_p(basic_ultimate(vb))) {
+            vb = variable_basic(type_variable(basic_pointer(vb)));
         }
         variable_basic(param) = make_basic_pointer(
                 make_type_variable(
