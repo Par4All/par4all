@@ -14,7 +14,9 @@ void atp(float *cdens[2])
 int main(int argc, char **argv)
 {
    float cdens[1024][2];
+   float *pdens[2] = (float **) malloc(sizeof(float *)*1024);
    atp(cdens);
+   atp(pdens);
 }
 
 
@@ -32,5 +34,7 @@ void atp(float *cdens)
 int main(int argc, char *argv)
 {
    float cdens[2048];
+   float *pdens = (float **) malloc(sizeof(float *)*1024*2);
    atp((float *) cdens+0);
+   atp(pdens);
 }

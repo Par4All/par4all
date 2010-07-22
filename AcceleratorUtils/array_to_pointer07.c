@@ -12,7 +12,9 @@ void atp( float *cdens[2] ) {
 
 int main ( int argc, char **argv ) {
   float cdens[NCELL][2];
+  float *pdens[2] = (float **)malloc(sizeof(float *)*NCELL);
   atp(cdens);
+  atp(pdens);
 }
 
 
