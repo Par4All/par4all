@@ -1,3 +1,7 @@
+If you do not have write access to this directory, copy its content (with
+cp -a for example) somewhere you can write into and try the examples from
+this new location.
+
 This is a simple example to demonstrate what pips can achieve on Fortran77
 programs with 2 different methods by using an explicit .tpips script or
 directly with p4a. Here you will automatically parallelize a matrix

@@ -1,3 +1,7 @@
+If you do not have write access to this directory, copy its content (with
+cp -a for example) somewhere you can write into and try the examples from
+this new location.
+
 Hyantes is a library to compute neighbourhood population potential with
 scale control. It is developed by the Mescal team from the Laboratoire
 Informatique de Grenoble (France), as a part of Hypercarte project. The
