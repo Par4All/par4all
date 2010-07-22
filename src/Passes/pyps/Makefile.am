@@ -1,7 +1,12 @@
+SUBDIRS  = doc drivers
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.pl
 
-dist_bin_SCRIPTS =	ipyps pips-gcc pips-ar pips-make
+dist_bin_SCRIPTS = pips-gcc pips-ar pips-make
+
+if WITH_PYPS_EXTRA
+	dist_bin_SCRIPTS += ipyps
+endif
 
 dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py
 nodist_pkgpython_PYTHON=pypips.py
