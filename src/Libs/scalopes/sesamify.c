@@ -58,11 +58,14 @@ static type convert_local_to_pointer_array(type local_type){
 }
 
 bool sesamify (char* module_name) {
-
   debug_on("SESAMIFY_DEBUG_LEVEL");
-  
-  list args,args2,args3, args4, args5, malloc_statements, map_statements, unmap_statements, wait_statements, send_statements,  rw_effects, entity_declaration;
-  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES, module_name, true);
+  list args = NIL, args2 = NIL, args3 = NIL, args4 = NIL, args5 = NIL;
+  list malloc_statements, map_statements;
+  list unmap_statements, wait_statements, send_statements,  rw_effects;
+  list entity_declaration;
+  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES,
+							  module_name,
+							  true);
   int id;
   entity reserve_data     = local_name_to_top_level_entity("sesam_reserve_data");
   entity get_page_size    = local_name_to_top_level_entity("sesam_get_page_size");
@@ -81,7 +84,7 @@ bool sesamify (char* module_name) {
   intptr_t counter = 1;
   int nb_task_total = gen_length(callees_callees(callees_list));
   int num_task=1;
-  
+
   FOREACH(STRING,callee_name,gen_nreverse(callees_callees(callees_list))) {
 
     pips_debug(1,"%s\n", callee_name);
@@ -89,10 +92,10 @@ bool sesamify (char* module_name) {
     set_current_module_entity(module_name_to_entity( callee_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, callee_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, callee_name, TRUE));
-    
+
     //reset tables
     hash_table_clear(entity_action);
-    
+
     rw_effects = load_cumulated_rw_effects_list(get_current_module_statement());
     map_statements     = NIL;
     malloc_statements  = NIL;
@@ -105,7 +108,7 @@ bool sesamify (char* module_name) {
     FOREACH(EFFECT,e,rw_effects) {
 
       re = reference_variable(effect_any_reference(e));
- 
+
        val = (struct dma_action *) hash_get(entity_action, re);
        /*check if the entities has already been processed with the same action to avoid doublons*/
       if(val==HASH_UNDEFINED_VALUE|| (action_read_p(effect_action(e)) && val->read==0) || (action_write_p(effect_action(e)) && val->write==0)){
@@ -113,21 +116,17 @@ bool sesamify (char* module_name) {
 	/*if the entity is not stored yet*/
 	if(val==HASH_UNDEFINED_VALUE)
 	  val = (struct dma_action *) malloc(sizeof(struct dma_action));
-	
 	//flags entity effects
 	if(action_read_p(effect_action(e)))
 	  val->read=1;
-	else 
+	else
 	  val->write=1;
 
 	//MEMORY ALLOCATION
 	if(hash_get(shared_mem,re)==HASH_UNDEFINED_VALUE){
-	 
 	  //shared memory ID
 	  id=counter-1;
-	  hash_put(shared_mem, re, (void*)counter); 
- 
-	  
+	  hash_put(shared_mem, re, (void*)counter);
 	  //compute table memory size
 	  range the_range = make_range(int_to_expression(0),
 				     make_op_exp(MINUS_OPERATOR_NAME,
@@ -147,14 +146,12 @@ bool sesamify (char* module_name) {
 
 	  malloc_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(reserve_data,args))), malloc_statements);
 	  malloc_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(data_assignation,args2))), malloc_statements);
-	  
 	  counter++;
 	}
 	else{
 	  id = (int) hash_get(shared_mem, re)-1;
-	
 	}
-	  
+
 	//MAP_DATA + pointer creation +UNMAP + CHMOD
 	type t = convert_local_to_pointer_array(entity_type(re));
 	new = make_new_scalar_variable(get_current_module_entity(),
@@ -176,32 +173,35 @@ bool sesamify (char* module_name) {
 	  unmap_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(chown_data,args5))),unmap_statements);
 	}
 
-
 	//SEND + WAIT dispo
 	print_effect(e);
 	if(action_read_p(effect_action(e))){
 	  print_entities(CONS(ENTITY,re,NIL));
 	  pips_debug(1,"READ\n");
-	  wait_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(wait_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(0),int_to_expression(0))))),wait_statements);	   
+	  wait_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(wait_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(0),int_to_expression(0))))),wait_statements);
 	  send_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(send_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(1))))),send_statements);
 	}
 	else{
 	  print_entities(CONS(ENTITY,re,NIL));
 	  pips_debug(1,"WRITE\n");
-	  
 	  wait_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(wait_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(1),int_to_expression(0))))), wait_statements);
 	   send_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(send_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(0))))), send_statements);
 	}
       }
     }
-    
+
     //insert all statements
-    insert_a_statement(get_current_module_statement(), make_block_statement(gen_nreverse(wait_statements)));
-    insert_a_statement(get_current_module_statement(), make_block_statement(gen_nreverse(map_statements)));
-    insert_a_statement(get_current_module_statement(), make_block_statement(gen_nreverse(malloc_statements)));
-    append_a_statement(get_current_module_statement(), make_block_statement(gen_nreverse(send_statements)));
-    append_a_statement(get_current_module_statement(), make_block_statement(gen_nreverse(unmap_statements)));
-    
+    insert_a_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(wait_statements)));
+    insert_a_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(map_statements)));
+    insert_a_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(malloc_statements)));
+    append_a_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(send_statements)));
+    append_a_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(unmap_statements)));
+
     //add declaration
     FOREACH(ENTITY,ent,entity_declaration){
       AddEntityToCurrentModule(ent);
@@ -220,13 +220,11 @@ bool sesamify (char* module_name) {
   }
 
   /*free memory*/
-  /* gen_free_list(args); */
-  /* gen_free_list(args2); */
-  /* gen_free_list(args3); */
-  /* gen_free_list(args4); */
-  /* gen_free_list(before_statements); */
-  /* gen_free_list(after_statements); */
- 
+  gen_free_list(args);
+  gen_free_list(args2);
+  gen_free_list(args3);
+  gen_free_list(args4);
+
   debug_off();
   return TRUE;
 }
