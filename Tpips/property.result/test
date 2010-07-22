@@ -5,8 +5,16 @@ COMPUTE_ALL_DEPENDENCES FALSE
 ! new values
 COMPLEXITY_PRINT_STATISTICS 1
 COMPUTE_ALL_DEPENDENCES TRUE
-! if this message appear, we get through many user errors;-)
+! done testing before creating the database
+getting... ABORT_ON_USER_ERROR 1
 ABORT_ON_USER_ERROR FALSE
+getting... ABORT_ON_USER_ERROR 2
+ABORT_ON_USER_ERROR FALSE
+! if this message appear, we get through many user errors;-)
+getting... ABORT_ON_USER_ERROR 3
+ABORT_ON_USER_ERROR FALSE
+! workspace is now closed
+! workspace is reopened
 ! saved values
 COMPLEXITY_PRINT_STATISTICS 1
 COMPUTE_ALL_DEPENDENCES TRUE
