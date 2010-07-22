@@ -1479,11 +1479,11 @@ void UpdateFunctionEntity(entity oe, list la)
   // pips_assert("A function name does not include a scope", empty_string_p(sn));
 
   if (type_undefined_p(t))
-    entity_type(oe) = make_type_functional(make_functional(gen_full_copy_list(la),type_undefined));
+    entity_type(oe) = make_type_functional(make_functional(la,type_undefined));
   else if(type_functional_p(t)) {
     /* FI: We used never to bump into this case... */
     functional f = type_functional(t);
-    functional_parameters(f) = gen_full_copy_list(la);
+    functional_parameters(f) = la;
   }
   else {
     pips_internal_error("What should be done here?");

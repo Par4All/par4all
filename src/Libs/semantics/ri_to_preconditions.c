@@ -672,7 +672,7 @@ static void add_reference_information(transformer pre, statement s, bool renamin
     }
   }, efs);
 }
-
+
 void precondition_add_reference_information(transformer pre, statement s)
 {
   add_reference_information(pre, s, FALSE);
@@ -682,7 +682,7 @@ void transformer_add_reference_information(transformer tf, statement s)
 {
   add_reference_information(tf, s, TRUE);
 }
-
+
 /* Refine the precondition pre of s using side effects and compute its
    postcondition post. Postcondition post is returned. */
 transformer statement_to_postcondition(
@@ -873,7 +873,7 @@ transformer statement_to_postcondition(
 
     return post;
 }
-
+
 /* This function is mostly copied from
    declarations_to_transformer(). It is used to recompute
    intermediate preconditions and to process the initialization

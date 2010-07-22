@@ -730,7 +730,7 @@ static transformer add_good_loop_conditions(transformer pre,
   return(pre);
 }
 
-
+/* Always returns newly allocated memory */
 transformer add_loop_index_initialization(transformer tf,
 					  loop l,
 					  transformer pre)
@@ -777,6 +777,8 @@ transformer add_loop_index_initialization(transformer tf,
  * been proved that the loop was executed which implies that the upper and
  * lower bounds are affine, that the increment is affine and that the
  * increment sign is known.
+ *
+ * Always returns a newly allocated value
  */
 transformer add_loop_index_exit_value(
     transformer post, /* postcondition of the last iteration */
@@ -806,7 +808,7 @@ transformer add_loop_index_exit_value(
       pips_debug(8, "end with post:\n");
       (void) print_transformer(post);
     }
-    return post;
+    return transformer_dup(post);
   }
 
   expression_and_precondition_to_integer_interval(e_incr, pre, &lb_inc, &ub_inc);
@@ -1596,7 +1598,9 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
 
   /* add the exit condition, without any information pre to estimate the
      increment */
+  transformer tmp = t_enter;
   t_enter = add_loop_index_exit_value(t_enter, l, pre);
+  transformer_free(tmp);
 
   ifdebug(8) {
     pips_debug(8, "entered and exited loop transformer t_enter=\n");
@@ -1605,10 +1609,11 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
 
   /* add initialization for the unconditional initialization of the loop
      index variable */
-  t_skip = transformer_undefined_p(pre)?
+  tmp = transformer_undefined_p(pre)?
     transformer_identity() :
     transformer_dup(pre);
-  t_skip = add_loop_index_initialization(t_skip, l, pre);
+  t_skip = add_loop_index_initialization(tmp, l, pre);
+  transformer_free(tmp);
   t_skip = add_loop_skip_condition(t_skip, l, pre);
 
   ifdebug(8) {
@@ -2335,8 +2340,10 @@ transformer loop_to_postcondition(transformer pre,
       (void) statement_to_postcondition(transformer_empty(), s);
       /* The loop body precondition is not useful any longer */
       free_transformer(preb);
-      post = transformer_dup(pre);
-      post = add_loop_index_initialization(post, l, pre);
+
+      transformer tmp = transformer_dup(pre);
+      post = add_loop_index_initialization(tmp, l, pre);
+      transformer_free(tmp);
     }
     else if(non_empty_range_wrt_precondition_p(r, pre)) {
       debug(8, "loop_to_postcondition", "The loop certainly is executed\n");
@@ -2354,7 +2361,9 @@ transformer loop_to_postcondition(transformer pre,
        * not modified when the body is executed. But it is not available
        * and it is not yet used by ad_loop_index_exit_value()!
        */
+      transformer tmp = post;
       post = add_loop_index_exit_value(post, l, pre);
+      transformer_free(tmp);
     }
     else {
       /* First version: OK, but could be better! */
@@ -2395,7 +2404,9 @@ transformer loop_to_postcondition(transformer pre,
       //post_ne = add_loop_index_initialization(post_ne, l, lpre);
       free_transformer(lpre);
 
+      transformer tmp = post_al;
       post_al = add_loop_index_exit_value(post_al, l, post_al);
+      transformer_free(tmp);
 
       ifdebug(8) {
 	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
@@ -2425,7 +2436,7 @@ transformer loop_to_postcondition(transformer pre,
   debug(8,"loop_to_postcondition","end\n");
   return post;
 }
-
+
 transformer loop_to_total_precondition(
     transformer t_post,
     loop l,
