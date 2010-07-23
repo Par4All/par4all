@@ -21,17 +21,18 @@ int main(int argc, char **argv)
 void atp(float *cdens)
 {
    int i;
-   for(i = 0; i <= 1073741823; i += 1) {
-      cdens+i = 1;
-      cdens+1+i = 0;
+   for(i = 0; i <= 1073741823; i += 2) {
+      *((float *)cdens+i) = 1;
+      *((float *)cdens+1+i) = 0;
    }
 }
 int main(int argc, char *argv)
 {
    float cdens[2048];
    float (*pdens)[2];
-   pdens = (float (*)[2]) malloc(sizeof(float[2] *)*1024);
+   pdens = (float (*)[2]) malloc(sizeof(float (*)[2])*1024);
    atp(cdens);
    atp(pdens);
    return 0;
 }
+
