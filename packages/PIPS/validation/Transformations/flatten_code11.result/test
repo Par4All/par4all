@@ -82,26 +82,14 @@ void flatten_code11(void)
    static int foo_0 = 0;
    
    /* Let's execute this loop four times! */
-   
-   /* Let's update a static variable! */
-   foo_0++;                                                             /*0014*/
-
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
-   
-   /* Let's update a static variable! */
-   foo_0++;                                                             /*0014*/
-
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
-   
-   /* Let's update a static variable! */
-   foo_0++;                                                             /*0014*/
-
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
-   
-   /* Let's update a static variable! */
-   foo_0++;                                                             /*0014*/
-
-   fprintf(stdout, "foo=%d\n", foo_0);                                  /*0016*/
+   foo_0++;
+   fprintf(stdout, "foo=%d\n", foo_0);
+   foo_0++;
+   fprintf(stdout, "foo=%d\n", foo_0);
+   foo_0++;
+   fprintf(stdout, "foo=%d\n", foo_0);
+   foo_0++;
+   fprintf(stdout, "foo=%d\n", foo_0);
    i = 4;
    // END BLOCK
 }

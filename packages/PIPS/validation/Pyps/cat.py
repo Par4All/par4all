@@ -1,17 +1,19 @@
 from pyps import *
 from subprocess import call
 from os import remove
+from shutil import rmtree
 
 w = workspace(["cat.c"])
-binary=w.compile(outfile="toto")
+w["main"].display()
+binary=w.compile(outdir="toto")
 call("./"+binary)
-remove(binary)
+rmtree("toto")
 
 w["main"].run(["sed","-e",'s/cats/dogs/'])
 w["main"].display()
-binary=w.compile(outfile="toto2")
+binary=w.compile(outdir="toto")
 call("./"+binary)
-remove(binary)
+rmtree("toto")
 
 
 

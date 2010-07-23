@@ -105,14 +105,8 @@ l300:
 l200:
          for(ki = 0; ki <= 2; ki += 1) {
 l100:            ;
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+ki-1][j-1]*kernel[ki][0];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+ki-1][j]*kernel[ki][1];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+ki-1][j+1]*kernel[ki][2];
             kj = 3;
          }
@@ -148,14 +142,8 @@ l300:
 l200:
          for(ki = 0; ki <= 2; ki += 1) {
 l100:            ;
-            
-            
             RED0[0] = RED0[0]+image[i+ki-1][j-1]*kernel[ki][0];
-            
-            
             RED0[1] = RED0[1]+image[i+ki-1][j]*kernel[ki][1];
-            
-            
             RED0[2] = RED0[2]+image[i+ki-1][j+1]*kernel[ki][2];
             kj = 3;
          }
@@ -193,16 +181,10 @@ l200:
          for(ki = 0; ki <= 2; ki += 1) {
 l100:            ;
             F_0 = image[i+ki-1][j-1]*kernel[ki][0];
-            
-            
             RED0[0] = RED0[0]+F_0;
             F_1 = image[i+ki-1][j]*kernel[ki][1];
-            
-            
             RED0[1] = RED0[1]+F_1;
             F_2 = image[i+ki-1][j+1]*kernel[ki][2];
-            
-            
             RED0[2] = RED0[2]+F_2;
             kj = 3;
          }
@@ -240,16 +222,10 @@ l200:
          for(ki = 0; ki <= 2; ki += 1) {
 l100:            ;
             F_00 = image[i+ki-1][j-1]*kernel[ki][0];
-            
-            
             RED0[0] = RED0[0]+F_00;
             F_10 = image[i+ki-1][j]*kernel[ki][1];
-            
-            
             RED0[1] = RED0[1]+F_10;
             F_20 = image[i+ki-1][j+1]*kernel[ki][2];
-            
-            
             RED0[2] = RED0[2]+F_20;
             kj = 3;
          }

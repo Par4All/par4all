@@ -1,0 +1,40 @@
+
+
+void atp(float *cdens[2]);
+
+int main(int argc, char **argv);
+void atp(float *cdens[2])
+{
+   int i;
+   for(i = 0; i <= 1073741823; i += 1) {
+      cdens[i][0] = 1;
+      cdens[i][1] = 0;
+   }
+}
+int main(int argc, char **argv)
+{
+   float cdens[1024][2];
+   float *pdens[2] = (float **) malloc(sizeof(float *)*1024);
+   atp(cdens);
+   atp(pdens);
+}
+
+
+void atp(float *cdens);
+
+int main(int argc, char *argv);
+void atp(float *cdens)
+{
+   int i;
+   for(i = 0; i <= 1073741823; i += 1) {
+      *(cdens+i) = 1;
+      *(cdens+1+i) = 0;
+   }
+}
+int main(int argc, char *argv)
+{
+   float cdens[2048];
+   float *pdens[2] = (float **) malloc(sizeof(float *)*1024);
+   atp((float *) cdens+0);
+   atp(&(pdens+0));
+}
