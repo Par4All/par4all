@@ -27,17 +27,17 @@ C     First: pragma inside a comment; Second: just the pragma; third:
 C     nor pragma at all
 C
 Cxxx
-      T(1) = -2*1                                                       0010
-      T(2) = -2*2                                                       0010
-      T(3) = -2*3                                                       0010
-      T(4) = -2*4                                                       0010
+      T(1) = -2*1
+      T(2) = -2*2
+      T(3) = -2*3
+      T(4) = -2*4
 10    CONTINUE
       I = 5
 Cxxx
-      T(1) = -2*1                                                       0014
-      T(2) = -2*2                                                       0014
-      T(3) = -2*3                                                       0014
-      T(4) = -2*4                                                       0014
+      T(1) = -2*1
+      T(2) = -2*2
+      T(3) = -2*3
+      T(4) = -2*4
 20    CONTINUE
       I = 5
 C

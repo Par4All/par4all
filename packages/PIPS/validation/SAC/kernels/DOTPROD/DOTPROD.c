@@ -4,7 +4,7 @@ float dotprod(float b[N], float c[N])
 {
     int i;
     float a=0;
-    for(i=0;i<1000000;++i)
+    for(i=0; i<N; ++i)
     {
         a += b[i] * c[i] ;
     }

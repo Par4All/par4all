@@ -17,6 +17,7 @@ getproperty COMPUTE_ALL_DEPENDENCES
 setproperty ABORT_ON_USER_ERROR
 setproperty f ifjh fk fhds f sfdhaskd f
 setproperty 47239 nbf48yfhcnw4w c492jfkjldu48329xmdri[cxn2rc 8950cmc[m " 
+echo ! done testing before creating the database
 #
 # now with a workspace
 #
@@ -27,18 +28,25 @@ create property property.f
 setproperty here is another not wellcomed!
 getproperty FOOF OOOF OF O F OFOFOFOFOF 
 getproperty FOO
+echo getting... ABORT_ON_USER_ERROR 1
+getproperty ABORT_ON_USER_ERROR
 setproperty PRETTY=2
+echo getting... ABORT_ON_USER_ERROR 2
+getproperty ABORT_ON_USER_ERROR
 getproperty PRETTY 
 echo ! if this message appear, we get through many user errors;-)
 #
 # get one real now!
 #
+echo getting... ABORT_ON_USER_ERROR 3
 getproperty ABORT_ON_USER_ERROR
 close
+echo ! workspace is now closed
 #
 # check that properties were indeed saved in the database.
 #
 open property
+echo ! workspace is reopened
 echo ! saved values
 getproperty COMPLEXITY_PRINT_STATISTICS
 getproperty COMPUTE_ALL_DEPENDENCES

@@ -42,8 +42,6 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
-   //PIPS generated variable
-   int i_1;
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
@@ -82,8 +80,6 @@ int foo(int seed[100])
    int c[100];
    int i;
    //PIPS generated variable
-   int i_1;
-   //PIPS generated variable
    int (*P_0)[100], (*P_1)[100], (*P_2)[100];
    /* init */
 #pragma omp parallel for 
@@ -116,8 +112,6 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
-   //PIPS generated variable
-   int i_1;
    //PIPS generated variable
    int (*P_0)[100], (*P_1)[100], (*P_2)[100];
    /* init */

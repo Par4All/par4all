@@ -48,21 +48,17 @@ C
 C     Outer unrolling with different labels
 
 Cxxx
-C
-      DO J = 1, N                                                       0011
-         T(1,J) = -N*1+J                                                0012
+      DO I_0 = 1, N
+         T(1,I_0) = -N*1+I_0
       ENDDO
-C
-      DO J = 1, N                                                       0011
-         T(2,J) = -N*2+J                                                0012
+      DO I_1 = 1, N
+         T(2,I_1) = -N*2+I_1
       ENDDO
-C
-      DO J = 1, N                                                       0011
-         T(3,J) = -N*3+J                                                0012
+      DO I_2 = 1, N
+         T(3,I_2) = -N*3+I_2
       ENDDO
-C
-      DO J = 1, N                                                       0011
-         T(4,J) = -N*4+J                                                0012
+      DO I_3 = 1, N
+         T(4,I_3) = -N*4+I_3
       ENDDO
 10    CONTINUE
       I = 5
@@ -71,10 +67,10 @@ C     Inner unrolling with different labels
 
       DO 30 I = 1, N                                                    0018
 Cxxx
-         T(I,1) = -N*I+1                                                0021
-         T(I,2) = -N*I+2                                                0021
-         T(I,3) = -N*I+3                                                0021
-         T(I,4) = -N*I+4                                                0021
+         T(I,1) = -N*I+1
+         T(I,2) = -N*I+2
+         T(I,3) = -N*I+3
+         T(I,4) = -N*I+4
 40       CONTINUE
          J = 5
 30       CONTINUE                                                       0023
@@ -82,21 +78,17 @@ Cxxx
 C     Outer unrolling with same labels
 
 Cxxx
-C
-      DO J = 1, N                                                       0030
-         T(1,J) = -N*1+J                                                0031
+      DO I_4 = 1, N
+         T(1,I_4) = -N*1+I_4
       ENDDO
-C
-      DO J = 1, N                                                       0030
-         T(2,J) = -N*2+J                                                0031
+      DO I_5 = 1, N
+         T(2,I_5) = -N*2+I_5
       ENDDO
-C
-      DO J = 1, N                                                       0030
-         T(3,J) = -N*3+J                                                0031
+      DO I_6 = 1, N
+         T(3,I_6) = -N*3+I_6
       ENDDO
-C
-      DO J = 1, N                                                       0030
-         T(4,J) = -N*4+J                                                0031
+      DO I_7 = 1, N
+         T(4,I_7) = -N*4+I_7
       ENDDO
 11    CONTINUE
       I = 5
@@ -105,10 +97,10 @@ C     Inner unrolling with same labels
 
       DO 31 I = 1, N                                                    0036
 Cxxx
-         T(I,1) = -N*I+1                                                0039
-         T(I,2) = -N*I+2                                                0039
-         T(I,3) = -N*I+3                                                0039
-         T(I,4) = -N*I+4                                                0039
+         T(I,1) = -N*I+1
+         T(I,2) = -N*I+2
+         T(I,3) = -N*I+3
+         T(I,4) = -N*I+4
 31       CONTINUE
          J = 5
 C

@@ -47,17 +47,17 @@ c     compute x := y * z
  **************** Effective Dependence Graph ****************
 
 	10 --> 10 with conflicts
-		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
-	10 --> 10 with conflicts
 		from <X(I,J)-W-MUST> to <X(I,J)-W-MUST> at levels  3
+	10 --> 10 with conflicts
+		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
 	10 --> 10 with conflicts
 		from <X(I,J)-R-MUST> to <X(I,J)-W-MUST> at levels  3
 	09 --> 09 with conflicts
 		from <K-W-MUST> to <K-W-MUST> at levels  1 2
 	08 --> 10 with conflicts
-		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
-	08 --> 10 with conflicts
 		from <X(I,J)-W-MUST> to <X(I,J)-W-MUST> at levels  3
+	08 --> 10 with conflicts
+		from <X(I,J)-W-MUST> to <X(I,J)-R-MUST> at levels  3
 	07 --> 07 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
@@ -88,9 +88,9 @@ c     compute x := y * z
 	10 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
 	10 --> 10 with conflicts
-		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	10 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  1 2 3
+	10 --> 10 with conflicts
+		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
 	10 --> 10 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  1 2 3
 	10 --> 08 with conflicts
@@ -102,9 +102,9 @@ c     compute x := y * z
 	08 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
 	08 --> 10 with conflicts
-		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
-	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  1 2 3
+	08 --> 10 with conflicts
+		from <S-W-MUST> to <S-R-MUST> at levels  1 2 3
 	08 --> 08 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  1 2
 	07 --> 07 with conflicts
@@ -135,17 +135,17 @@ c     compute x := y * z
 	10 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
 	10 --> 10 with conflicts
-		from <S-W-MUST> to <S-R-MUST> at levels  3
-	10 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  3
+	10 --> 10 with conflicts
+		from <S-W-MUST> to <S-R-MUST> at levels  3
 	10 --> 10 with conflicts
 		from <S-R-MUST> to <S-W-MUST> at levels  3
 	08 --> 12 with conflicts
 		from <S-W-MUST> to <S-R-MUST> at levels  3
 	08 --> 10 with conflicts
-		from <S-W-MUST> to <S-R-MUST> at levels  3
-	08 --> 10 with conflicts
 		from <S-W-MUST> to <S-W-MUST> at levels  3
+	08 --> 10 with conflicts
+		from <S-W-MUST> to <S-R-MUST> at levels  3
 
 ****************** End of Dependence Graph ******************
 
