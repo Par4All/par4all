@@ -463,7 +463,7 @@ loop_tiling(string module_name)
 {
     bool return_status = FALSE;
 
-    return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(loop)))tiling);
+    return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(statement)))tiling);
     
     return return_status;
 }

@@ -127,8 +127,6 @@ void write_data(char filename[])
 void compute()
 {
    int i, j;
-   //PIPS generated variable
-   int i_1;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -277,8 +275,6 @@ void write_data(char filename[])
 void compute()
 {
    int i, j;
-   //PIPS generated variable
-   int i_1;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */

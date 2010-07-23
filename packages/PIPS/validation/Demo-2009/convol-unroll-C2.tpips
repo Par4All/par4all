@@ -88,10 +88,12 @@ echo
 echo After array to pointer conversion of "microcode"
 echo
 
+display PRINTED_FILE[main]
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
 setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER[microcode]
 display PRINTED_FILE[microcode]
+display PRINTED_FILE[main]
 
 echo
 echo Printed file for "launch_microcode1!

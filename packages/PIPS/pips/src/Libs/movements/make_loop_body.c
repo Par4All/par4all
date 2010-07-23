@@ -59,7 +59,9 @@ void wp65_debug_print_text(entity m, statement s)
 void wp65_debug_print_module(entity m, statement s)
 {
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    print_text(stderr, text_module(m, s));
+    text t = text_module(m, s);
+    print_text(stderr, t);
+    free_text(t);
     debug_off();
 }
 

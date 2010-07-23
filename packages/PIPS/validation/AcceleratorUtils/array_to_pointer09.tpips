@@ -1,0 +1,21 @@
+delete array_to_pointer09
+create array_to_pointer09 array_to_pointer09.c
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+display PRINTED_FILE[atp]
+display PRINTED_FILE[main]
+
+echo
+echo "/* After apply ARRAY_TO_POINTER[%ALL] */"
+echo
+
+apply ARRAY_TO_POINTER[%ALL]
+display PRINTED_FILE[atp]
+display PRINTED_FILE[main]
+
+quit
+
+apply UNSPLIT[%ALL]
+shell gcc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c
+
+

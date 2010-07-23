@@ -72,7 +72,7 @@ AC_C_VOLATILE
 AX_LD_NO_UNDEFINED
 
 # we cannot lauch all cproto in // if ulimit -u is too low
-AS_IF([test `ulimit -u` -gt 10000],[ax_use_parallel_cproto=yes],[ax_use_parallel_cproto=no])
+AS_IF([test `ulimit -u` = "unlimited" || test `ulimit -u` -gt 10000],[ax_use_parallel_cproto=yes],[ax_use_parallel_cproto=no])
 AM_CONDITIONAL([USE_PARALLEL_CPROTO],[test x$ax_use_parallel_cproto = xyes])
 
 # Checks for library functions.
@@ -140,6 +140,15 @@ AX_ARG_ENABLE([pyps],
 			 AC_PROG_SWIG
 			 AC_PYTHON_DEVEL([2.5])
 			 AX_DEPENDS([pyps],[swig python_devel])
+			]
+)
+
+AX_ARG_ENABLE([pyps-extra],
+			[enable extra python tools],
+			[no],
+			[
+			 AX_CHECK_PROG([ipython])
+			 AX_DEPENDS([pyps-extra],[pyps ipython])
 			]
 )
 
@@ -258,6 +267,8 @@ AC_CONFIG_FILES([pips_config.h
                  src/Passes/gpips/Makefile
                  src/Passes/pips/Makefile
                  src/Passes/pyps/Makefile
+		 src/Passes/pyps/doc/Makefile
+		 src/Passes/pyps/drivers/Makefile
                  src/Passes/tpips/Makefile
                  src/Runtimes/Makefile
                  src/Scripts/Makefile
@@ -268,6 +279,7 @@ AC_CONFIG_FILES([pips_config.h
                  src/Scripts/simple_tools/pips_f2openmp
                  src/Scripts/validation/Makefile
                  src/Documentation/dev_guide/Makefile
+                 src/Documentation/auto_pips/Makefile
                  src/Documentation/tpips-user-manual/Makefile
 				 src/Documentation/linear/Makefile
 				 src/Documentation/bugs_and_wishes/Makefile
@@ -307,4 +319,4 @@ AC_CONFIG_FILES([pips_config.h
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_OUTPUT([minimum],[tpips pyps gpips hpfc doc fortran95])
+AX_OUTPUT([minimum],[tpips pyps pyps-extra gpips hpfc doc fortran95])

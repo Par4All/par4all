@@ -482,10 +482,12 @@ add_new_module(string module_name,
 				  text heading*/) {
   /* Get a text code for the new module */
   text code_text = text_module(module, stat);
-  return add_new_module_from_text(module_name,
+  bool ret = add_new_module_from_text(module_name,
 				  code_text,
 				  is_fortran,string_undefined);
+  free_text(code_text);
 
+  return ret;
 }
 
 
@@ -512,9 +514,11 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
   }
 
   stub = stub_text(m, is_fortran);
-  return add_new_module_from_text(module_name,
+  bool ret = add_new_module_from_text(module_name,
 				  stub,
 				  is_fortran,string_undefined);
+  free_text(stub);
+  return ret;
 }
 
 

@@ -53,14 +53,18 @@
 
 entity selected_label;
 
-bool selected_loop_p(loop l)
+bool selected_loop_p(statement s)
 {
-  return loop_label(l) == selected_label ;
+    /* SG+EC 2010:
+        The loop_label(statement_loop(s)) is kept for compatibility reasons
+        but is invalid and should eventually be removed */
+  return statement_loop_p(s) &&
+          (statement_label(s) == selected_label || loop_label(statement_loop(s)) == selected_label);
 }
 
 bool interactive_loop_transformation
 (string module_name,
- statement (*loop_transformation)(list,bool (*)(loop))
+ statement (*loop_transformation)(list,bool (*)(statement))
 )
 {
   char *lp_label=NULL;
@@ -137,23 +141,9 @@ bool interactive_loop_transformation
 static void flag_loop(statement st, list *loops)
 {
   instruction i = statement_instruction(st);
-  if(instruction_loop_p(i))
+  if(instruction_loop_p(i) && entity_empty_label_p(statement_label(st)))
     {
-      loop l = instruction_loop(i);
-      if(entity_empty_label_p(loop_label(l)))
-	{
-	  if(entity_empty_label_p(statement_label(st)))
-	    statement_label(st)=
-	      loop_label(l)=make_new_label(get_current_module_name());
-	  else
-	    loop_label(l)=statement_label(st);
-	}
-      else if(entity_empty_label_p(statement_label(st)))
-	statement_label(st)=loop_label(l);
-      else
-	pips_assert("same label on loop and statement",
-		    same_entity_p(statement_label(st),loop_label(l)));
-      *loops=CONS(STRING,strdup(entity_user_name(loop_label(l))),*loops);
+        statement_label(st) = make_new_label(get_current_module_name());
     }
   if( !get_bool_property("FLAG_LOOPS_DO_LOOPS_ONLY")
       && instruction_forloop_p(i))
