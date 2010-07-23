@@ -1,1 +1,23 @@
+2010-07-23  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
+		* Par4All 1.0.1
+
+		* Corrected library name issue for libcutil on 32 bit x86
+
+		* Fixed bugs into array_to_pointer
+
+		* Corrected behaviour of NULL for nvcc
+
+		* Fixed usage of limit_nested_parallelism in p4a_process.py
+
+		* Better error message display
+
+		* Fixed OpenMP prettyprint of C parallel loops with label
+
+		* Deals with clock() intrinsic function
+
+2010-07-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+		* Par4All 1.0 released
+
+			Initial version
