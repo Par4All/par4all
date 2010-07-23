@@ -219,7 +219,7 @@ static statement tuned_loop_strip_mine(statement s)
 }
 
 
-static bool always_select_p(__attribute__((unused)) loop l)
+static bool always_select_p(__attribute__((unused)) statement s)
 {
     return TRUE;
 }
@@ -581,7 +581,7 @@ static bool contiguous_array_reference_p(reference r)
 }
 
 
-static statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*unused)(loop))
+static statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*unused)(statement))
 {
     statement ls = STATEMENT(CAR(lls));
     execution_tag(loop_execution(statement_loop(ls))) = is_execution_parallel;
@@ -589,7 +589,7 @@ static statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*
     return ls;
 }
 
-static bool nth_loop_p(__attribute__((unused))loop ls)
+static bool nth_loop_p(__attribute__((unused))statement s)
 {
     /* FI: this is *wrong* but should work for a demo :-( */
     static int count = 0;
@@ -738,7 +738,7 @@ static statement loop_nest_parallelization(list lls)
     return s;
 }
 
-static statement parallelization(list lls, __attribute__((unused)) bool (*loop_predicate) (loop))
+static statement parallelization(list lls, __attribute__((unused)) bool (*loop_predicate) (statement))
 {
     statement s = statement_undefined;
 

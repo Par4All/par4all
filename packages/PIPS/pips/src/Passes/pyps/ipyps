@@ -22,7 +22,7 @@ from pyps import *
 sys.argv[1:1] = [ '-prompt_in1', 'iPyPS [\#]: ']
 #print sys.argv
 
-banner = """Wellcome to iPyPS, the interactive Python PIPS environment shell
+banner = """Welcome to iPyPS, the interactive Python PIPS environment shell
 
 ?         -> Introduction and overview of IPython's features.
 %quickref -> Quick reference.
@@ -55,5 +55,5 @@ ip = IPython.ipapi.get()
 
 ip.expose_magic('load', load_pyps)
 
-# Call the iPython shell it-self:
+# Call the iPython shell itself:
 ipshell()

@@ -1,3 +1,4 @@
+# $Id$
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -18,6 +19,22 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-dist_noinst_DATA=developer_guide.tex
-doc_DATA=developer_guide.pdf
-include $(top_srcdir)/makes/latex.mk
+use_pdflatex = 1
+INSTALL_DOC = auto_pips.pdf
+INSTALL_HTM = auto_pips.htdoc
+DOC.subd = auto_pips.htdoc
+
+#PUBLISH_LOCATION = ssh.cri.ensmp.fr:~pips/public_html/developer_guide
+#TO_BE_PUBLISH = $(INSTALL_DOC) $(INSTALL_HTM)
+
+# common stuff
+ROOT    = ../../..
+PROJECT	= pips
+include $(ROOT)/makes/main.mk
+
+# local stuff
+clean: local-clean
+
+local-clean:
+	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
+		*.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out

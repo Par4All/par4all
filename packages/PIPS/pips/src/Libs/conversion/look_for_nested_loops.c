@@ -54,8 +54,8 @@
  *  
 */
 void look_for_nested_loop_statements(statement s,
-				     statement (*loop_transformation)(list, bool (*)(loop)),
-				     bool (*loop_predicate)(loop))
+                                     statement (*loop_transformation)(list, bool (*)(statement)),
+                                     bool (*loop_predicate)(statement))
 {
     instruction i;
     cons *b, *b1;
@@ -71,7 +71,7 @@ void look_for_nested_loop_statements(statement s,
 	new_s = s;
 	l = instruction_loop(i);
 
-	if ((*loop_predicate)(l)) {
+        if ((*loop_predicate)(s)) {
 	    list_loop_statement = CONS (STATEMENT,s,NIL);
 
 	    ifdebug(9) {
@@ -167,8 +167,8 @@ void look_for_nested_loop_statements(statement s,
 /* FI: I do not understand how debug levels are managed... They should be factored out. */
 statement look_for_inner_loops(loop l,
 			       list sl,
-			       statement (*loop_transformation)(list, bool (*)(loop)),
-			       bool (*loop_predicate)(loop))
+                               statement (*loop_transformation)(list, bool (*)(statement)),
+                               bool (*loop_predicate)(statement))
 
 {
     statement lb = loop_body(l);
@@ -308,8 +308,8 @@ cons *sl;
  * unstructured u
  */
 void look_for_nested_loops_unstructured(unstructured u,
-					statement (*loop_transformation) (list, bool (*)(loop)),
-					bool (*loop_predicate)(loop))
+                                        statement (*loop_transformation) (list, bool (*)(statement)),
+                                        bool (*loop_predicate)(statement))
 {
     cons *blocs = NIL;
     control ct = unstructured_control(u);

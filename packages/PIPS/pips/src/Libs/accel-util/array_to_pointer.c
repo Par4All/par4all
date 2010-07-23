@@ -133,7 +133,6 @@ static void remove_dereferencement(expression e)
     }
 }
 
-
 /**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
  *
@@ -172,16 +171,30 @@ bool expression_array_to_pointer(expression exp, bool in_init)
             /* create a pointer if needed */
             if( !get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY"))
             {
-                /* get the base type of the reference */
-                type type_without_indices = make_type_variable(make_variable(
-                            copy_basic(variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref)))))),
-                            NIL,
-                            gen_full_copy_list(variable_qualifiers(type_variable(ultimate_type(entity_type(reference_variable(ref))))))));
-
 
                 /* create an expression for the new reference, possibly casted */
                 if( force_cast && ! basic_pointer_p( variable_basic(type_variable(ultimate_type(entity_type(reference_variable(ref) )) ) ) ) )
                 {
+                    /* get the base type of the reference */
+                    type type_without_indices = make_type_variable(
+                            make_variable(
+                                copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
+                                NIL,
+                                gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
+                    /* remove typedef as long as needed */
+                    while(!ENDP(variable_dimensions(type_variable(ultimate_type(type_without_indices))))) {
+                        basic b = variable_basic(type_variable(type_without_indices));
+                        pips_assert("basic typedef",basic_typedef_p(b));
+                        entity tmp = basic_typedef(variable_basic(type_variable(type_without_indices)));
+                        free_type(type_without_indices);
+                        type_without_indices=make_type_variable(
+                                make_variable(
+                                    copy_basic(entity_basic(tmp)),
+                                    NIL,NIL)
+                                );
+                    }
+
+
                     base_ref = make_expression(
                             make_syntax_cast(
                                 make_cast(
@@ -296,8 +309,8 @@ static void variable_downgrade_basic(variable param) {
     /* fix type if several pointers are chained */
     basic vb = basic_ultimate(variable_basic(param));
     if( basic_pointer_p(vb)) {
-        while(basic_pointer_p(vb)) {
-            vb = variable_basic(type_variable(ultimate_type(basic_pointer(vb))));
+        while(basic_pointer_p(basic_ultimate(vb))) {
+            vb = variable_basic(type_variable(basic_pointer(vb)));
         }
         variable_basic(param) = make_basic_pointer(
                 make_type_variable(
@@ -308,15 +321,18 @@ static void variable_downgrade_basic(variable param) {
 }
 
 static
-void make_pointer_from_variable(variable param)
+void make_pointer_from_variable(type tparam)
 {
+    if(!type_variable_p(tparam)) return;
+    variable param = type_variable(tparam);
     list parameter_dimensions = variable_dimensions(param);
+    size_t nb_dims = gen_length(parameter_dimensions);
     switch(get_array_to_pointer_conversion_mode())
     {
         case NO_CONVERSION:return;
         case ARRAY_1D: {
             variable_downgrade_basic(param);
-            if(gen_length(parameter_dimensions) > 1)
+            if(nb_dims > 1)
             {
                 list iter = parameter_dimensions;
                 expression full_length = expression_undefined;
@@ -343,10 +359,11 @@ void make_pointer_from_variable(variable param)
             } } break;
         case POINTER:
             variable_downgrade_basic(param);
-            if(!ENDP(parameter_dimensions))
+            if(nb_dims>0)
             {
                 gen_full_free_list(parameter_dimensions);
                 variable_dimensions(param)=NIL;
+
                 basic vb = basic_ultimate(variable_basic(param));
                 if(!basic_pointer_p(vb)) {
                     basic parameter_basic = variable_basic(param);
@@ -357,6 +374,7 @@ void make_pointer_from_variable(variable param)
                             );
                     variable_basic(param)=new_parameter_basic;
                 }
+
             } break;
 
     }
@@ -365,13 +383,13 @@ void make_pointer_from_variable(variable param)
 
 static void make_pointer_from_all_variable(void* obj)
 {
-    gen_recurse(obj,variable_domain,gen_true,make_pointer_from_variable);
+    gen_recurse(obj,type_domain,gen_true,make_pointer_from_variable);
 }
 static
 void make_pointer_entity_from_reference_entity(entity e)
 {
-    variable param = type_variable(entity_type(e));
-    make_pointer_from_all_variable(param);
+    make_pointer_from_all_variable(entity_type(e));
+    pips_assert("everything went well",entity_consistent_p(e));
 }
 
 static void
@@ -400,6 +418,7 @@ reduce_array_declaration_dimension(statement s)
                 variable_dimensions(v)=CONS(DIMENSION,make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,new_dim,int_to_expression(1))),NIL);
             }
         }
+        pips_assert("everything went well",entity_consistent_p(e));
     }
     pips_assert("everything went well",statement_consistent_p(s));
 }
@@ -444,9 +463,10 @@ static void array_to_pointer_fix_call_site(expression exp)
                 POP(iter);
         }
         reference_indices(r) = gen_nconc(reference_indices(r),gen_nreverse(new_indices));
-        unnormalize_expression(exp);
-        expression_syntax(exp)=make_syntax_call(
-                make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),make_expression_list(make_expression( expression_syntax(exp), normalized_undefined))));
+        syntax syn = expression_syntax(exp);
+        expression_syntax(exp)=syntax_undefined;
+        update_expression_syntax(exp,make_syntax_call(
+                make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),make_expression_list(make_expression( syn, normalized_undefined)))));
     }
     pips_assert("everything went well",expression_consistent_p(exp));
 }
@@ -471,17 +491,70 @@ static void array_to_pointer_call_rewriter(expression e)
                 }
             }
         }
+        pips_assert("everything went well",expression_consistent_p(e));
+    }
+}
+
+static void reduce_parameter_declaration_dimension(entity m, const char * module_name)
+{
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_name, true));
+    list callers_statement = callers_to_statements(callers);
+    list call_sites = callers_to_call_sites(callers_statement);
+
+    /* we may have to change the call sites, prepare iterators over call sites arguments here */
+    list call_site_args = NIL;
+    FOREACH(CALL,c,call_sites)
+        call_site_args=CONS(LIST,call_arguments(c),call_site_args);
+
+    /* manage conversion */
+    FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(m))))
+        if(formal_parameter_p(e)) {
+            make_pointer_entity_from_reference_entity(e);
+            pips_debug(1,"changing %s \n",entity_name(e));
+        }
+
+    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m))))
+    {
+        dummy d = parameter_dummy(p);
+        if(dummy_identifier_p(d))
+        {
+            /* manage call site substitution */
+            for(list iter = call_site_args; !ENDP(iter);POP(iter))
+            {
+                list* args = (list*)REFCAR(iter);
+                if(get_array_to_pointer_conversion_mode() != NO_CONVERSION && entity_array_p(dummy_identifier(d)))
+                {
+                    expression arg = EXPRESSION(CAR(*args));
+                    array_to_pointer_fix_call_site(arg);
+                }
+                POP(*args);
+            }
+            make_pointer_entity_from_reference_entity(dummy_identifier(d));
+            pips_debug(1,"changing %s \n",entity_name(dummy_identifier(d)));
+        }
+        type t = parameter_type(p);
+        make_pointer_from_all_variable(t);
+        pips_assert("everything went well",parameter_consistent_p(p));
+    }
+    gen_free_list(call_site_args);
+    pips_assert("everything went well",entity_consistent_p(m));
+
+
+    /* also validate callers */
+    FOREACH(STATEMENT,caller_statement,callers_statement)
+    {
+      pips_assert("everything went well",statement_consistent_p(caller_statement));
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(callers)),caller_statement);
+        POP(callers);
     }
 }
 
 bool array_to_pointer(char *module_name)
 {
+    debug_on("ARRAY_TO_POINTER_DEBUG_LEVEL");
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
-    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_name, true));
-    list callers_statement = callers_to_statements(callers);
-    list call_sites = callers_to_call_sites(callers_statement);
 
     /* run transformation */
     if(!c_module_p(get_current_module_entity()))
@@ -498,62 +571,20 @@ bool array_to_pointer(char *module_name)
         /* eventually change the signature of the module
          * tricky : signature must be changed in two places !
          */
-        {
-            /* we may have to change the call sites, prepare iterators over call sites arguments here */
-            list call_site_args = NIL;
-            FOREACH(CALL,c,call_sites)
-                call_site_args=CONS(LIST,call_arguments(c),call_site_args);
+        reduce_parameter_declaration_dimension(get_current_module_entity(),module_name);
+        gen_recurse(get_current_module_statement(),expression_domain,gen_true,array_to_pointer_call_rewriter);
 
-            FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
-            {
-                if(formal_parameter_p(e))
-                {
-                    /* manage conversion */
-                    make_pointer_entity_from_reference_entity(e);
-                }
-            }
-
-            FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity()))))
-            {
-                dummy d = parameter_dummy(p);
-                if(dummy_identifier_p(d))
-                {
-                    /* manage call site substitution */
-                    for(list iter = call_site_args; !ENDP(iter);POP(iter))
-                    {
-                        list* args = (list*)REFCAR(iter);
-                        if(get_array_to_pointer_conversion_mode() == POINTER && entity_array_p(dummy_identifier(d)))
-                        {
-                            expression arg = EXPRESSION(CAR(*args));
-                            array_to_pointer_fix_call_site(arg);
-                        }
-                        POP(*args);
-                    }
-                    make_pointer_entity_from_reference_entity(dummy_identifier(d));
-                }
-                type t = parameter_type(p);
-                make_pointer_from_all_variable(t);
-            }
-            gen_free_list(call_site_args);
-        }
-
+        /* validate */
+        pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
     }
-    gen_recurse(get_current_module_statement(),expression_domain,gen_true,array_to_pointer_call_rewriter);
 
-    /* validate */
-    pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
-    module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-    /* also validate callers */
-    FOREACH(STATEMENT,caller_statement,callers_statement)
-    {
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(callers)),caller_statement);
-        POP(callers);
-    }
 
     /*postlude*/
     reset_current_module_entity();
     reset_current_module_statement();
+    debug_off();
     return true;
 }
 
