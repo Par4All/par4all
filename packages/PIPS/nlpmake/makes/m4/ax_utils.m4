@@ -217,7 +217,7 @@ $PACKAGE_NAME Configuration:
 $[]AX_MSG([$1])
 m4_foreach_w([_i_],[$2],[dnl
   Build _i_ ? $[]AX_WITH(_i_)
-  $[]AX_MSG(_i_)
+  `AS_IF([test x"$[]AX_WITH(_i_)" = "xdisabled"],,echo $[]AX_MSG(_i_))`
 ])
 EOF
 
@@ -235,14 +235,20 @@ dnl sets the shell_variable ax_enable_feature-name to FEATURE-NAME or, if given 
 dnl sets the conditionnal WITH_FEATURE-NAME
 dnl and set the disable message for AX_HAS(FEATURE-NAME)
 AC_DEFUN([AX_ARG_ENABLE],[
+		
 		AC_ARG_ENABLE([$1],
 			[AS_HELP_STRING([--enable-$1],[$2 (defaut is $3)])],
-			[AS_IF([test x"$enableval" = "xyes"],[$4],[])],
+			[AS_IF([test x"$enableval" = "xyes"],[$4],
+				[
+					AX_WITH([$1])=disabled
+					AX_MSG([$1])="$1 disabled"	
+				]
+			)],
 			[
 				m4_if([$3],[yes],[$4],
 					[
 						AX_WITH([$1])=disabled
-						AX_MSG([$1])=""
+						AX_MSG([$1])="$1 disabled"
 					])
 			]
 		)
