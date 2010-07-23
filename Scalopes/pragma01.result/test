@@ -1,0 +1,18 @@
+int main()
+{
+
+   int a[100];
+   int i;
+
+   p4a_kernel_launcher_0(a);
+
+   return 0;
+}
+void p4a_kernel_launcher_0(int a[100])
+{
+   //PIPS generated variable
+   int i;
+
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+}
