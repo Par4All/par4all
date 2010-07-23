@@ -93,7 +93,7 @@ sub print_python_method {
 		$self="self._module";
 	}
 	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and (not $generator eq "-loop") ) ) {
-		if($generator eq "-modules" ) { $extraparams="$extraparams concurrent=True,"; }
+		if($generator eq "-modules" ) { $extraparams="$extraparams concurrent=False,"; }
     	print <<EOF
 
 	def $name(self,$extraparams **props):

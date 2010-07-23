@@ -4562,7 +4562,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   /*#include <tgmath.h>*/
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {CLOCK_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
+  {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},
 
   /*#include <wchar.h>*/
   { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
@@ -4717,8 +4717,7 @@ switch_name_function get_switch_name_function_for_intrinsic(string name)
    functional type whose result and arguments have an overloaded basic
    type. The number of arguments is given by the IntrinsicTypeDescriptorTable
    data structure. */
-entity
-MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int)) {
+static entity MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int)) {
   entity e;
 
   e = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, name),
@@ -4727,6 +4726,25 @@ MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int)) {
                   make_value(is_value_intrinsic, NIL));
 
   return e;
+}
+
+/* This function creates an entity that represents an intrinsic
+   function, if the entity does not already exist. Fortran operators
+   and basic statements are intrinsic functions.
+
+   An intrinsic function has a rom storage, an unknown initial value and a
+   functional type whose result and arguments have an overloaded basic
+   type. The number of arguments is given by the IntrinsicTypeDescriptorTable
+   data structure. */
+entity FindOrMakeIntrinsic(string name, int arity, type (*intrinsic_type)(int))
+{
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME, name);
+
+    if (entity_undefined_p(e)) {
+        e = MakeIntrinsic(name, arity, intrinsic_type);
+    }
+
+    return e;
 }
 
 
@@ -4744,14 +4762,13 @@ MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int)) {
     @return the entity of the intrinsic
 */
 entity
-FindOrMakeDefaultIntrinsic(string name, int arity) {
-#if 0
-  // Hmmm, it looks like FindEntity create the entity anyway... :-(
+FindOrMakeDefaultIntrinsic(string name, int arity)
+{
   entity e = FindEntity(TOP_LEVEL_MODULE_NAME, name);
   if (!entity_undefined_p(e))
     /* It seems it has been previously created: */
     return e;
-#endif
+
   return MakeIntrinsic(name, arity, default_intrinsic_type);
 }
 
@@ -4765,7 +4782,7 @@ CreateIntrinsics()
   IntrinsicDescriptor *pid;
 
   for (pid = IntrinsicTypeDescriptorTable; pid->name != NULL; pid++) {
-    MakeIntrinsic(pid->name, pid->nbargs, pid->intrinsic_type);
+    FindOrMakeIntrinsic(pid->name, pid->nbargs, pid->intrinsic_type);
   }
 }
 

@@ -673,6 +673,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
     }
+    free_text(t);
     return new_stmt;
 }
 

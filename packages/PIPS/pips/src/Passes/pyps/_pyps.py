@@ -4,7 +4,9 @@ import os
 import tempfile
 import shutil
 import re
+import time
 from string import split, upper, join
+from subprocess import Popen, PIPE
 
 pypips.atinit()
 
@@ -51,6 +53,17 @@ class module:
 	@property
 	def name(self): return self._name
 
+	def run(self,cmd):
+		"""runs command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd 'path/to/module/src' > 'path/to/module/src''"""
+		self.print_code()
+		printcode_rc=os.path.join(self._ws.directory(),pypips.show("PRINTED_FILE",self.name))
+		code_rc=os.path.join(self._ws.directory(),pypips.show("C_SOURCE_FILE",self.name))
+		thecmd=cmd+[printcode_rc]
+		pypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
+		if pid.wait() != 0:
+			print sys.stderr > pid.stderr.readlines()
+
 	def show(self,rc):
 		"""returns the name of resource rc"""
 		return split(pypips.show(upper(rc),self._name))[-1]
@@ -87,6 +100,12 @@ class module:
 		if not callers:
 			return []
 		return callers.split(" ")
+
+	def callees(self):
+		callees=pypips.get_callees_of(self.name)
+		if not callees:
+			return []
+		return callees.split(" ")
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
@@ -223,7 +242,6 @@ class workspace(object):
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-		if not os.path.isdir(outdir): raise ValueError("'" + outdir + "' is not a directory")
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
 		if link:

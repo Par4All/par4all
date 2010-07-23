@@ -96,6 +96,8 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
 	       " and for preprocessed_user_file \"%s\".\n"
 	       "in table %p\n",
 	       s, user_file, preprocessed_user_file, user_files);
+    /* No hash_put was used with it so it has to be freed here */
+    free(user_file);
   }
   /* Do not free it, as it is used in the hash table and will be freed
      later with the hash table */

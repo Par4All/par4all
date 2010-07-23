@@ -151,7 +151,7 @@ gener_DOSEQ(
  */
 
 statement interchange_inner_outermost_loops(list lls,
-				__attribute__((unused)) bool (*unused)(loop))
+                                __attribute__((unused)) bool (*unused)(statement))
 {
   Psysteme sci;			/* sc initial */
   Psysteme scn;			/* sc nouveau */

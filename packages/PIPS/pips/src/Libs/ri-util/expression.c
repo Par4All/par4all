@@ -1268,6 +1268,7 @@ bool syntax_equal_p(syntax s1, syntax s2)
   case is_syntax_application:
   case is_syntax_va_arg:
   default:
+    return FALSE;
     break;
   }
 

@@ -78,7 +78,7 @@
 #include "stdlib.h"
 
 static makefile pipsmakefile = makefile_undefined;
-static hash_table activated;
+static hash_table activated = NULL;
 %}
 
 %union {
@@ -95,7 +95,9 @@ rules:  	rules rule
 		{ add_rule($2); }
 	|
 		{ 
-		    pipsmakefile = make_makefile(NIL, NIL); 
+		    pipsmakefile = make_makefile(NIL, NIL);
+            if (activated)
+                hash_table_free(activated), activated=NULL;
 		    activated = hash_table_make(hash_string, 0);
 		}
 	;

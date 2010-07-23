@@ -235,7 +235,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         stmt = make_assign_statement(expr, rhs_expr);
         instruction_block(block)= gen_nconc(instruction_block(block),
                 CONS(STATEMENT, stmt, NIL ));
-        
+
             /* Loop for some of the first iterations created:
              * DO LU_IND = 0, LU_IB-1, 1
              *    BODY(I\(LU_IND*INC + LB))
@@ -259,7 +259,14 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         }
 
         /* Create body of the loop, with updated index */
-        body = copy_statement(loop_body(il));
+        clone_context cc = make_clone_context(
+                get_current_module_entity(),
+                get_current_module_entity(),
+                NIL,
+                get_current_module_statement() );
+        body = clone_statement(loop_body(il), cc);
+        free_clone_context(cc);
+
         ifdebug(9) {
             pips_assert("loop_unroll", statement_consistent_p(body));
             /* "gen_copy_tree returns bad statement\n"); */
@@ -303,7 +310,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                 CONS(STATEMENT,
                     instruction_to_statement(inst),
                     NIL ));
-        
+
             /* Unrolled loop created:
              * DO LU_IND = LU_IB, LU_NUB-1, rate
              *    BODY(I\(LU_IND*INC + LB))
@@ -330,7 +337,14 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             statement transformed_stmt;
             list body_block = instruction_block(statement_instruction(body));
 
-            transformed_stmt = copy_statement(loop_body(il));
+            clone_context cc = make_clone_context(
+                    get_current_module_entity(),
+                    get_current_module_entity(),
+                    NIL,
+                    get_current_module_statement() );
+            transformed_stmt = clone_statement(loop_body(il), cc);
+            free_clone_context(cc);
+
             ifdebug(9)
                 statement_consistent_p(transformed_stmt);
             tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -538,7 +552,14 @@ void full_loop_unroll(statement loop_statement)
     for(iter = lbval; iter <= ubval; iter += incval) {
         statement transformed_stmt;
 
-        transformed_stmt = copy_statement(loop_body(il));
+        clone_context cc = make_clone_context(
+                get_current_module_entity(),
+                get_current_module_entity(),
+                NIL,
+                get_current_module_statement() );
+        transformed_stmt = clone_statement(loop_body(il), cc);
+        free_clone_context(cc);
+
         ifdebug(9)
             statement_consistent_p(transformed_stmt);
         expr = int_to_expression(iter);
@@ -837,6 +858,9 @@ static bool find_unroll_pragma_and_fully_unroll(statement s)
 
 bool full_unroll_pragma(char * mod_name)
 {
+  set_current_module_entity(module_name_to_entity(mod_name));
+  set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+
   statement mod_stmt = statement_undefined;
   bool return_status = FALSE;
 
@@ -882,6 +906,9 @@ bool full_unroll_pragma(char * mod_name)
 
   debug(1,"full_unroll_pragma","done for %s\n", mod_name);
   debug_off();
+
+  reset_current_module_entity();
+  reset_current_module_statement();
 
   return return_status;
 }
