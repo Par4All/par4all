@@ -1,6 +1,6 @@
 /*
 
-  $Id: eval.c 17426 2010-06-25 09:24:14Z creusillet $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
   Copyright 2009-2010 HPC Project
