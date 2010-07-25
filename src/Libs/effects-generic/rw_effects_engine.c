@@ -29,7 +29,7 @@
  * File: rw_effects_engine.c
  * ~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the computation of 
+ * This File contains the generic functions necessary for the computation of
  * all types of read and write effects and cumulated references.
  */
 #include <stdio.h>
@@ -74,10 +74,10 @@ void set_contracted_rw_effects(bool b)
 bool summary_rw_effects_engine(string module_name)
 {
 
-    list l_glob = NIL, l_loc = NIL,l_loc2 = NIL, l_dec=NIL; 
+    list l_glob = NIL, l_loc = NIL,l_loc2 = NIL, l_dec=NIL;
     statement module_stat;
 
-    set_current_module_entity(module_name_to_entity(module_name)); 
+    set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
@@ -94,7 +94,7 @@ bool summary_rw_effects_engine(string module_name)
 	pips_debug(2, "local regions, before translation to global scope:\n");
 	(*effects_prettyprint_func)(l_loc);
     }
- 
+
 
     l_dec = summary_effects_from_declaration(module_name);
     ifdebug(8) {
@@ -103,11 +103,11 @@ bool summary_rw_effects_engine(string module_name)
       (*effects_prettyprint_func)(l_dec);
       nb_param = gen_length(functional_parameters(type_functional(ultimate_type(entity_type(get_current_module_entity())))));
       pips_debug(8, "number of declared formal parameters:%d\n", nb_param);
-	
+
     }
-    
+
     l_loc2 = gen_append(l_loc,l_dec);
-    
+
     // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_any_reference(e)))) ,l_loc2);
     l_glob = (*effects_local_to_global_translation_op)(l_loc2);
 
@@ -149,7 +149,7 @@ bool summary_rw_effects_engine(string module_name)
 
     debug_off();
     (*effects_computation_reset_func)(module_name);
-    
+
     return(TRUE);
 }
 
@@ -173,7 +173,7 @@ static void rw_effects_of_unstructured(unstructured unst)
 	le = effects_dup(load_rw_effects_list(control_statement(ct)));
     }
     else
-    {	
+    {
 	transformer t_unst = (*load_transformer_func)(current_stat);
 	list l_node;
 
@@ -181,12 +181,12 @@ static void rw_effects_of_unstructured(unstructured unst)
 	    l_node = effects_dup(load_rw_effects_list(control_statement(c)));
 	    le = (*effects_test_union_op) (l_node, le, effects_same_action_p) ;
 	},
-	    ct, blocs) ;	
+	    ct, blocs) ;
 	le = (*effects_transformer_composition_op)(le, t_unst);
-	effects_to_may_effects(le);	
+	effects_to_may_effects(le);
 	gen_free_list(blocs) ;
-    }     
-    
+    }
+
     (*effects_descriptor_normalize_func)(le);
 
     ifdebug(2){
@@ -232,14 +232,14 @@ static void rw_effects_of_unstructured(unstructured unst)
  *   T*[while(C)S] = T*[while(C)S] o T[S] o E[C] u Id
  *
  * That is the resolution of the fixpoint for R is expressed as a fixpoint
- * on transformers only, and a direct computation on R. 
+ * on transformers only, and a direct computation on R.
  *
  * Also we know that the output state is the one which makes C false.
  *
  *   T[while(C)S] = E[.not.C] O T*[while(C)S] ;
  *
- * note that T[] Sigma -> Sigma, 
- * but T*[] Sigma -> P(Sigma) 
+ * note that T[] Sigma -> Sigma,
+ * but T*[] Sigma -> P(Sigma)
  * that is it describes exactly intermediate stores reached by the while.
  *
  * FC, 04/06/1998
@@ -250,11 +250,11 @@ static void rw_effects_of_while(whileloop w)
     list l_prop, l_body, l_cond_first, l_res;
     statement b = whileloop_body(w);
     transformer trans;
-    
-    /* we should check if the loop is executed at least once : 
-       we could keep exact effects on scalars at least. 
+
+    /* we should check if the loop is executed at least once :
+       we could keep exact effects on scalars at least.
     */
-				   
+
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
 
     /* The condition is executed at least once : let's keep exact effects if we can */
@@ -285,15 +285,15 @@ static void rw_effects_of_forloop(forloop w)
     transformer trans;
 
     list l_body = NIL, l_res = NIL, li = NIL, lc = NIL, linc = NIL, l_init = NIL, l_cond_inc = NIL;
-    
-    /* we should check if the loop is executed at least once : 
-       we could keep exact effects on scalars at least. 
+
+    /* we should check if the loop is executed at least once :
+       we could keep exact effects on scalars at least.
     */
 
     /* proper_effects first : we must recompute them
      * there are must effects for the intialization and the first evaluation
      * of the condition.
-     * the next evaluations of the condition and the incrementation must be 
+     * the next evaluations of the condition and the incrementation must be
      * composed by the transformer.
      */
 
@@ -331,7 +331,7 @@ static void rw_effects_of_forloop(forloop w)
 
     /* We finally add the effects of the initialization phase */
     l_res = (*effects_union_op)(l_init, l_res, effects_same_action_p);
-    
+
     (*effects_descriptor_normalize_func)(l_res);
 
     store_rw_effects_list(current_stat, l_res);
@@ -351,8 +351,8 @@ static void rw_effects_of_loop(loop l)
     /* proper effects of loop */
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat));
     if (contract_p)
-	l_prop = proper_to_summary_effects(l_prop);    
-   
+	l_prop = proper_to_summary_effects(l_prop);
+
     /* rw effects of loop body */
     l_body = load_rw_effects_list(b);
 
@@ -372,29 +372,29 @@ static void rw_effects_of_loop(loop l)
     /* effects on locals are unconditionnaly masked */
     l_body = effects_dup_without_variables(l_body, loop_locals(l));
     l_body = effects_dup_without_variables(l_body, statement_declarations(b));
-    
+
     /* COMPUTATION OF INVARIANT RW EFFECTS */
-        
+
     /* We get the loop transformer, which gives the loop invariant */
     /* We must remove the loop index from the list of modified variables */
     loop_trans = (*load_transformer_func)(current_stat);
-    
-    ifdebug(8) 
+
+    ifdebug(8)
       {
 	pips_debug(8, "loop transformer : \n");
 	dump_transformer(loop_trans);
       }
-    
+
     loop_trans = transformer_remove_variable_and_dup(loop_trans, i);
 
-    ifdebug(8) 
+    ifdebug(8)
       {
 	pips_debug(8, "loop transformer after removing loop index %s : \n",
 		   entity_name(i));
 	dump_transformer(loop_trans);
       }
 
-    
+
     /* And we compute the invariant RW effects. */
     l_body = (*effects_transformer_composition_op)(l_body, loop_trans);
     update_invariant_rw_effects_list(b, effects_dup(l_body));
@@ -402,7 +402,7 @@ static void rw_effects_of_loop(loop l)
     ifdebug(4){
 	pips_debug(4, "invariant rw effects of loop body:\n");
 	(*effects_prettyprint_func)(l_body);
-    }    
+    }
 
     /* COMPUTATION OF RW EFFECTS OF LOOP FROM INVARIANT RW EFFECTS */
     if (!ENDP(l_body))
@@ -410,9 +410,9 @@ static void rw_effects_of_loop(loop l)
 
 	l_loop = l_body;
 	/* We eliminate the loop index */
-	l_loop = (*effects_union_over_range_op)(l_loop, i, r, 
-						descriptor_undefined);	  
-	
+	l_loop = (*effects_union_over_range_op)(l_loop, i, r,
+						descriptor_undefined);
+
     }
 
     ifdebug(4){
@@ -579,7 +579,7 @@ static void rw_effects_of_test(test t)
 
   /* FI: when regions are computed the test condition should be
      evaluated wrt the current precondition to see if it evaluates
-     to true or false. This would preserve must effects. 
+     to true or false. This would preserve must effects.
 
      dead_test_filter() could be used, but it returns an enum
      defined in transformations-local.h */
@@ -616,7 +616,7 @@ static void rw_effects_of_test(test t)
     pips_debug(2, "R/W effects: \n");
     (*effects_prettyprint_func)(lr);
   }
-    
+
   store_rw_effects_list(current_stat, lr);
   pips_debug(2, "end\n");
 }
@@ -627,15 +627,15 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 
   if (!ENDP(l_decl))
     {
-      
+
       // treat last declarations first
       if (!ENDP(CDR(l_decl)))
 	rb_lrw = rw_effects_of_declarations(rb_lrw, CDR(l_decl));
-      
+
       // then handle top declaration
       entity decl = ENTITY(CAR(l_decl));
       storage decl_s = entity_storage(decl);
-      
+
       ifdebug(8)
 	{
 	  type ct = basic_concrete_type(entity_type(decl));
@@ -648,14 +648,14 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 	  /* static variable declaration has no effect, even in case of initialization. */
 	  if (! static_area_p(ram_section(storage_ram(decl_s))))
 	    {
-	      
+
 	      if(type_variable_p(entity_type(decl)))
 		{
 		  value v_init = entity_initial(decl);
 		  expression exp_init = expression_undefined;
 		  if(value_expression_p(v_init))
-		    exp_init = value_expression(v_init);  
-		  
+		    exp_init = value_expression(v_init);
+
 		  // We must first eliminate effects on the declared variable
 		  // except if it is a static or extern variable.
 		  // or use the initial value to translate them to the preceding memory state
@@ -666,7 +666,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 		    {
 		      reference eff_ref = effect_any_reference(eff);
 		      entity eff_ent = reference_variable(eff_ref);
-		      
+
 		      pips_debug_effect(8,"dealing_with_effect: \n", eff);
 
 		      if (eff_ent == decl)
@@ -685,40 +685,40 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 				      // interprocedural translation and intra-procedural propagation will have to be re-packaged later
 				      list l_tmp = CONS(EFFECT, eff, NIL);
 				      list l_res_tmp;
-				      
+
 				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
 					{
 					  Psysteme sc = sc_new();
 					  sc_creer_base(sc);
 					  set_translation_context_sc(sc);
 					}
-				      
+
 				      /* beware of casts : do not take them into account for the moment */
 				      syntax s_init = expression_syntax(exp_init);
 				      if (syntax_cast_p(s_init))
 					exp_init = cast_expression(syntax_cast(s_init));
 				      l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)(l_tmp, exp_init, transformer_undefined);
-				      
+
 				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
 					{
 					  reset_translation_context_sc();
 					}
-				      
+
 				      if (!exact_p) effects_to_may_effects(l_res_tmp);
 				      l_eff = (*effects_union_op)(l_res_tmp, l_eff, effects_same_action_p);
-				      gen_free_list(l_tmp); 
+				      gen_free_list(l_tmp);
 				    }
 				  else
 				    {
 				      pips_debug(8, "there is no inital_value\n");
 				      if (get_constant_paths_p())
-					{ 
+					{
 					  pips_debug(8, "-> anywhere effect \n");
-					  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), NIL), l_eff);
+					  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), NIL), l_eff);
 					  l_eff = clean_anywhere_effects(l_tmp);
 					  gen_full_free_list(l_tmp);
 					}
-				      
+
 				    }
 				}
 			    } /* if( !ENP(reference_indices(eff_ref))) */
@@ -729,21 +729,21 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 			  // keep the effect if it's an effect on another entity
 			  l_eff = CONS(EFFECT, eff, l_eff);
 			}
-		      
+
 		    }
 		  rb_lrw = gen_nreverse(l_eff); // we try to preserve the order in which effects arise
-		  
+
 		  // and then add the effects due to the initialization part
 		  if(!expression_undefined_p(exp_init))
 		    {
 		      rb_lrw = (*effects_union_op)(generic_proper_effects_of_expression(exp_init), rb_lrw, effects_same_action_p);
 		    }
 		} /* if (! static_area_p(ram_section(storage_ram(decl_s))))*/
-	      
+
 	    } /* if (storage_ram(decl_s)) */
 	} /* if (!ENDP(CDR(l_decl))) */
       // we should also do some kind of unioning...
-      
+
     } /* if (!ENDP(l_decl))*/
   return rb_lrw;
 }
@@ -752,17 +752,17 @@ static list r_rw_effects_of_sequence(list l_inst)
 {
     statement first_statement;
     list remaining_block = NIL;
-    
+
     list s1_lrw; /* rw effects of first statement */
     list rb_lrw; /* rw effects of remaining block */
     list l_rw = NIL; /* resulting rw effects */
     transformer t1; /* transformer of first statement */
     list l_decl = NIL; /* declarations if first_statement is a declaration statement */
- 
+
     first_statement = STATEMENT(CAR(l_inst));
     remaining_block = CDR(l_inst);
 
-    if (c_module_p(get_current_module_entity()) && 
+    if (c_module_p(get_current_module_entity()) &&
 	(declaration_statement_p(first_statement) ))
       {
 	// if it's a declaration statement, effects will be added on the fly
@@ -773,11 +773,11 @@ static list r_rw_effects_of_sequence(list l_inst)
       }
     else
       s1_lrw = effects_dup(load_rw_effects_list(first_statement));
-    
+
     /* Is it the last instruction of the block */
     if (!ENDP(remaining_block))
-    {	
-	t1 = (*load_transformer_func)(first_statement);    
+    {
+	t1 = (*load_transformer_func)(first_statement);
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
 
 	ifdebug(3){
@@ -788,17 +788,17 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    /* if (!transformer_undefined_p(t1))
 	    {
 		pips_debug(3, "transformer of first statement: %s\n",
-			   transformer_to_string(t1));		
+			   transformer_to_string(t1));
 	    }*/
 	}
-    	if (rb_lrw !=NIL)    
+	if (rb_lrw !=NIL)
 	  {
 	    rb_lrw = generic_effects_store_update(rb_lrw, first_statement, true);
 	  }
 	else {
 	  ifdebug(3){
 	    pips_debug(3, "warning - no effect on  remaining block\n");
-	   
+
 	  }
 	}
 	ifdebug(5){
@@ -815,7 +815,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    rb_lrw = pointer_effects_to_constant_path_effects(rb_lrw);
 	    effects_free(l_tmp);
 	  }
-	
+
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
 		       "after taking declarations into account: \n");
@@ -830,8 +830,8 @@ static list r_rw_effects_of_sequence(list l_inst)
 		       "after union: \n");
 	    (*effects_prettyprint_func)(l_rw);
 	}
-    }	
-    else 
+    }
+    else
     {
       l_rw = rw_effects_of_declarations(s1_lrw, l_decl);
       if (get_constant_paths_p())
@@ -841,7 +841,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    effects_free(l_tmp);
 	  }
     }
-    
+
 
     return(l_rw);
 }
@@ -872,7 +872,7 @@ static void rw_effects_of_sequence(sequence seq)
     }
 
     (*effects_descriptor_normalize_func)(le);
-    
+
     store_rw_effects_list(current_stat, le);
     pips_debug(2, "end\n");
 }
@@ -881,7 +881,7 @@ static bool rw_effects_stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n", statement_ordering(s), statement_number(s));
     ifdebug(4) {
-      
+
       print_statement(s);
     }
     effects_private_current_stmt_push(s);
@@ -906,9 +906,9 @@ void rw_effects_of_module_statement(statement module_stat)
     /* for backward compatibility and experimental purposes */
     if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
       set_constant_paths_p(false);
-    
+
     gen_multi_recurse
-	(module_stat, 
+	(module_stat,
 	 statement_domain, rw_effects_stmt_filter, rw_effects_of_statement,
 	 sequence_domain, gen_true, rw_effects_of_sequence,
 	 test_domain, gen_true, rw_effects_of_test,
@@ -919,7 +919,7 @@ void rw_effects_of_module_statement(statement module_stat)
 	 unstructured_domain, gen_true, rw_effects_of_unstructured,
 	 instruction_domain, gen_true, rw_effects_of_expression_instruction,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
-	 NULL); 
+	 NULL);
 
     pips_debug(1,"end\n");
     free_effects_private_current_stmt_stack();
@@ -946,12 +946,12 @@ bool rw_effects_engine(char * module_name)
    if (get_use_points_to())
       set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
-  
-  
+
+
     debug_on("EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
-    rw_effects_of_module_statement(get_current_module_statement()); 
+    rw_effects_of_module_statement(get_current_module_statement());
 
     pips_debug(1, "end\n");
     debug_off();
@@ -959,7 +959,7 @@ bool rw_effects_engine(char * module_name)
     if (get_use_points_to())
        reset_pt_to_list();
 
-    (*db_put_rw_effects_func) 
+    (*db_put_rw_effects_func)
 	(module_name, get_rw_effects());
     (*db_put_invariant_rw_effects_func)
 	(module_name, get_invariant_rw_effects());
@@ -971,7 +971,7 @@ bool rw_effects_engine(char * module_name)
     reset_invariant_rw_effects();
 
     (*effects_computation_reset_func)(module_name);
-    
+
     return(TRUE);
 }
 

@@ -56,14 +56,12 @@
 
 static bool constant_paths_p = FALSE;
 
-void 
-set_constant_paths_p(bool b)
+void set_constant_paths_p(bool b)
 {
   constant_paths_p = b;
 }
 
-bool
-get_constant_paths_p()
+bool get_constant_paths_p()
 {
   return constant_paths_p;
 }
@@ -75,27 +73,25 @@ DEFINE_GLOBAL_STACK(effects_private_current_stmt, statement)
 /* Context stack to keep current context when walking on expressions */
 DEFINE_GLOBAL_STACK(effects_private_current_context, transformer)
 
-bool 
-effects_private_current_context_stack_initialized_p()
+bool effects_private_current_context_stack_initialized_p()
 {
     return (effects_private_current_context_stack != stack_undefined);
 }
 
-bool 
-normalizable_and_linear_loop_p(entity index, range l_range)
+bool normalizable_and_linear_loop_p(entity index, range l_range)
 {
     Value incr = VALUE_ZERO;
     normalized nub, nlb;
     expression e_incr = range_increment(l_range);
     normalized n;
     bool result = TRUE;
-    
+
     /* Is the loop index an integer variable */
     if (! entity_integer_scalar_p(index))
     {
-	pips_user_warning("non integer scalar loop index %s.\n", 
+	pips_user_warning("non integer scalar loop index %s.\n",
 			  entity_local_name(index));
-	result = FALSE;	
+	result = FALSE;
     }
     else
     {
@@ -104,17 +100,17 @@ normalizable_and_linear_loop_p(entity index, range l_range)
 	if(normalized_linear_p(n))
 	{
 	    Pvecteur v_incr = normalized_linear(n);
-	    if(vect_constant_p(v_incr)) 
-		incr = vect_coeff(TCST, v_incr);	
+	    if(vect_constant_p(v_incr))
+		incr = vect_coeff(TCST, v_incr);
 	}
-	
+
 	nub = NORMALIZE_EXPRESSION(range_upper(l_range));
-	nlb = NORMALIZE_EXPRESSION(range_lower(l_range));    
-	
-	result = value_notzero_p(incr) && normalized_linear_p(nub) 
+	nlb = NORMALIZE_EXPRESSION(range_lower(l_range));
+
+	result = value_notzero_p(incr) && normalized_linear_p(nub)
 	    && normalized_linear_p(nlb);
     }
-    
+
     return(result);
 }
 
@@ -125,7 +121,7 @@ transformer_remove_variable_and_dup(transformer orig_trans, entity ent)
 
     if (orig_trans != transformer_undefined)
     {
-	res_trans = copy_transformer(orig_trans);	
+	res_trans = copy_transformer(orig_trans);
 	gen_remove(&transformer_arguments(res_trans), ent);
     }
     return(res_trans);
@@ -155,7 +151,7 @@ descriptor_inequality_add(descriptor d, Pvecteur v)
     {
 	Psysteme sc = descriptor_convex(d);
 	Pcontrainte contrainte = contrainte_make(v);
-	sc_add_inegalite(sc, contrainte);   
+	sc_add_inegalite(sc, contrainte);
 	sc->base = BASE_NULLE;
 	sc_creer_base(sc);
 	descriptor_convex_(d) = newgen_Psysteme(sc);
@@ -182,8 +178,8 @@ descriptor_variable_rename(descriptor d, entity old_ent, entity new_ent)
 {
     if (descriptor_convex_p(d))
     {
-	sc_variable_rename(descriptor_convex(d), 
-			   (Variable) old_ent, 
+	sc_variable_rename(descriptor_convex(d),
+			   (Variable) old_ent,
 			   (Variable) new_ent);
     }
 }
@@ -196,10 +192,10 @@ descriptor_append(descriptor d1, descriptor d2)
 	Psysteme
 	    sc1 = descriptor_convex(d1),
 	    sc2 = descriptor_convex(d2);
-	
+
 	sc1 = sc_safe_append(sc1, sc2);
 	descriptor_convex_(d1) = newgen_Psysteme(sc1);
-    }	
+    }
     else
 	d1 = descriptor_undefined;
     return d1;
@@ -227,13 +223,13 @@ empty_context_test_false(transformer context __attribute__ ((__unused__)) )
     return FALSE;
 }
 
-void 
+void
 effects_computation_no_init(string module_name __attribute__ ((__unused__)) )
 {
     return;
 }
 
-void 
+void
 effects_computation_no_reset(string module_name __attribute__ ((__unused__)) )
 {
     return;
@@ -260,7 +256,7 @@ bool integer_scalar_read_effects_p(fx)
 cons * fx;
 {
     MAPL(ceffect,
-     {entity e = 
+     {entity e =
 	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
      if(!integer_scalar_entity_p(e)) return FALSE;},
 	 fx);
@@ -275,7 +271,7 @@ bool some_integer_scalar_read_or_write_effects_p(fx)
 cons * fx;
 {
     MAPL(ceffect,
-     {entity e = 
+     {entity e =
 	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
 	  if(integer_scalar_entity_p(e)) return TRUE;},
 	 fx);
@@ -290,11 +286,11 @@ cons * fx;
 entity e;
 {
     bool write = FALSE;
-    MAP(EFFECT, ef, 
+    MAP(EFFECT, ef,
     {
 	action a = effect_action(ef);
 	entity e_used = reference_variable(effect_any_reference(ef));
-	
+
 	/* Note: to test aliasing == should be replaced below by
 	 * entities_may_conflict_p()
 	 */
@@ -465,28 +461,28 @@ bool statement_has_a_formal_argument_write_effect_p(statement s)
 
 
 list /* of effect */ make_effects_for_array_declarations(list refs)
-{     
+{
   list leff = NIL;
   effect eff;
   MAPL(l1,
-  {  
-    
+  {
     reference ref = REFERENCE(CAR(l1));
     /* FI: in this context, I assume that eff is never returned undefined */
-    eff = (*reference_to_effect_func)(ref, is_action_read, true);
+    /* FI: memory leak for action? */
+    eff = (*reference_to_effect_func)(ref, make_action_read_memory(), true);
      if(effect_undefined_p(eff)) {
-       pips_debug(8, "Reference to \"%s\" ignored\n", entity_name(reference_variable(ref)));
+       pips_debug(8, "Reference to \"%s\" ignored\n",
+		  entity_name(reference_variable(ref)));
      }
      else
        leff= CONS(EFFECT,eff,leff);
   },refs);
-  
-  
+
   gen_free_list(refs);
   return leff;
 }
 
-     
+
 
 
 
@@ -514,7 +510,8 @@ list summary_effects_from_declaration(string module_name __attribute__ ((unused)
 
   return sel;
 }
-
+
+/* Debugging functions (to be augmented for GAPs) */
 void dump_cell(cell c)
 {
   fprintf(stderr, "Cell %p = (cell_tag=%u, reference=%p)\n", c, cell_tag(c),
@@ -525,13 +522,15 @@ void dump_effect(effect e)
 {
   cell c = effect_cell(e);
   action ac = effect_action(e);
+  action_kind ak = action_read_p(ac)? action_read(ac):
+    action_write(ac);
   approximation ap = effect_approximation(e);
   descriptor d = effect_descriptor(e);
 
   effect_consistent_p(e);
   fprintf(stderr, "Effect %p = (domain=%td, cell=%p, action=%p,"
-	  " approximation=%p, descriptor=%p\n",
-	  e, effect_domain_number(e), c, ac, ap, d);
+	  " action_kind=%p, approximation=%p, descriptor=%p\n",
+	  e, effect_domain_number(e), c, ac, ak, ap, d);
   dump_cell(c);
 }
 
@@ -543,7 +542,7 @@ void dump_effects(list le)
       dump_effect(e);
     }, le);
 }
-
+
 /* Check if a reference appears more than once in the effect list. If
    persistant_p is true, do not go thru persistant arcs. Else, use all
    references. */
@@ -583,9 +582,9 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 
 /**
  @return a new anywhere effect.
- @param act is an action tag 
+ @param act is an action tag
 
- Allocate a new anywhere effect using generic function 
+ Allocate a new anywhere effect using generic function
  reference_to_effect_func, and the anywhere entity on demand
  which may not be best if we want to express it's aliasing with all
  module areas. In the later case, the anywhere entity should be
@@ -594,17 +593,18 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
  reference to avoid trouble with convex-effect nypassing of the
  persistant pointer. (re-used from original non-generic function
  anywhere_effect.)
- 
+
    Action a is integrated in the new effect (aliasing).
  */
-effect make_anywhere_effect(tag act)
+effect make_anywhere_effect(action act)
 {
- 
+
   entity anywhere_ent = entity_all_locations();
   effect anywhere_eff = effect_undefined;
- 
+
   anywhere_eff = (*reference_to_effect_func)
     (make_reference(anywhere_ent, NIL),
+     //     copy_action(act), false);
      act, false);
   effect_to_may_effect(anywhere_eff);
   return anywhere_eff;
@@ -613,10 +613,10 @@ effect make_anywhere_effect(tag act)
 /**
    remove duplicate anywhere effects and keep anywhere effects and
    effects not combinable with anywhere effects.
-   
+
    @param l_eff is a list of effects
    @return a new list with no sharing with the initial effect list.
-   
+
  */
 list clean_anywhere_effects(list l_eff)
 {
@@ -634,37 +634,37 @@ list clean_anywhere_effects(list l_eff)
 	  anywhere_w_p = anywhere_w_p || effect_write_p(eff);
 	  anywhere_r_p = anywhere_r_p || effect_read_p(eff);
 	}
-      
+
       POP(l_tmp);
     }
 
   l_res = NIL;
 
   if (anywhere_r_p)
-    l_res = gen_nconc(l_res, 
-		      CONS(EFFECT, make_anywhere_effect(is_action_read), 
+    l_res = gen_nconc(l_res,
+		      CONS(EFFECT, make_anywhere_effect(make_action_read_memory()),
 			   NIL));
   if (anywhere_w_p)
-    l_res = gen_nconc(l_res, 
-		      CONS(EFFECT, make_anywhere_effect(is_action_write), 
+    l_res = gen_nconc(l_res,
+		      CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
 			   NIL));
-  
-  
+
+
   l_tmp = l_eff;
   while (!ENDP(l_tmp))
     {
       effect eff = EFFECT(CAR(l_tmp));
-      
-      
+
+
       if (malloc_effect_p(eff) || io_effect_p(eff) ||
 	  (effect_write_p(eff) && !anywhere_w_p) ||
 	  (effect_read_p(eff) && !anywhere_r_p))
 	{
 	  l_res = gen_nconc(l_res, CONS(EFFECT, (*effect_dup_func)(eff), NIL));
-	}     
+	}
       POP(l_tmp);
     }
-  
+
   return l_res;
 }
 
@@ -682,11 +682,11 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
   list l_res = NIL;
   effect eff_read = effect_undefined;
   effect eff_write = effect_undefined;
-	
+
   pips_assert("effect is defined \n", !effect_undefined_p(eff));
 
   if (act == 'x')
-    {      
+    {
       eff_write = eff;
       effect_action_tag(eff_write) = is_action_write;
       eff_read = (*effect_dup_func)(eff_write);
@@ -694,7 +694,7 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
     }
   else if (act == 'r')
     {
-      
+
       eff_read = eff;
       effect_action_tag(eff_read) = is_action_read;
       eff_write = effect_undefined;
@@ -705,20 +705,20 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
       eff_write = eff;
       effect_action_tag(eff_write) = is_action_write;
     }
-  
+
   ifdebug(8)
     {
       pips_debug(8, "adding effects to l_res : \n");
-      if(!effect_undefined_p(eff_write)) 
+      if(!effect_undefined_p(eff_write))
 	(*effect_prettyprint_func)(eff_write);
-      if(!effect_undefined_p(eff_read)) 
+      if(!effect_undefined_p(eff_read))
 	(*effect_prettyprint_func)(eff_read);
     }
-  
-  if(!effect_undefined_p(eff_write)) 
+
+  if(!effect_undefined_p(eff_write))
     l_res = gen_nconc(l_res, CONS(EFFECT, eff_write, NIL));
-  if(!effect_undefined_p(eff_read)) 
-    l_res = gen_nconc(l_res, CONS(EFFECT, eff_read, NIL)); 
+  if(!effect_undefined_p(eff_read))
+    l_res = gen_nconc(l_res, CONS(EFFECT, eff_read, NIL));
 
   return l_res;
 }
@@ -732,19 +732,19 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
               'r' for read, 'w' for write, and 'x' for read and write.
    @return a list of effects on all the accessible paths from eff reference.
  */
-list generic_effect_generate_all_accessible_paths_effects(effect eff, 
-							  type eff_type, 
+list generic_effect_generate_all_accessible_paths_effects(effect eff,
+							  type eff_type,
 							  tag act)
 {
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
-	
-  
+
+
   if (anywhere_effect_p(eff))
     {
       /* there is no other accessible path */
       pips_debug(6, "anywhere effect -> returning NIL \n");
-      
+
     }
   else
     {
@@ -754,10 +754,10 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
       int d = effect_type_depth(t);
       effect eff_write = effect_undefined;
 
-      /* this may lead to memory leak if no different access path is 
+      /* this may lead to memory leak if no different access path is
 	 reachable */
       eff_write = (*effect_dup_func)(eff);
-      
+
       ifdebug(6)
 	{
 	  pips_debug(6, "considering effect : \n");
@@ -765,8 +765,8 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	  pips_debug(6, " with entity effect type depth %d \n",
 		     d);
 	}
-      
-           
+
+
       switch (type_tag(eff_type))
 	{
 	case is_type_variable :
@@ -774,12 +774,12 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	    variable v = type_variable(eff_type);
 	    basic b = variable_basic(v);
 	    bool add_effect = false;
-	    
-	    pips_debug(8, "variable case, of dimension %d\n", 
-		       (int) gen_length(variable_dimensions(v))); 
+
+	    pips_debug(8, "variable case, of dimension %d\n",
+		       (int) gen_length(variable_dimensions(v)));
 
 	    /* we first add the array dimensions if any */
-	    FOREACH(DIMENSION, c_t_dim, 
+	    FOREACH(DIMENSION, c_t_dim,
 		    variable_dimensions(v))
 	      {
 		(*effect_add_expression_dimension_func)
@@ -802,22 +802,22 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	    if(basic_pointer_p(b))
 	      {
 		pips_debug(8, "pointer case, \n");
-				
+
 		eff_write = (*effect_dup_func)(eff_write);
 		(*effect_add_expression_dimension_func)
 		  (eff_write, make_unbounded_expression());
-		
+
 		l_res = gen_nconc
 		  (l_res,
 		   effect_to_effects_with_given_tag(eff_write,act));
-		
+
 		l_res = gen_nconc
 		  (l_res,
 		   generic_effect_generate_all_accessible_paths_effects
 		   (eff_write,  basic_pointer(b), act));
-		
-	      }	    	    
-	    
+
+	      }
+
 	    break;
 	  }
 	default:
@@ -825,10 +825,10 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	    pips_internal_error("case not handled yet\n");
 	  }
 	} /*switch */
-      
+
     } /* else */
-  
-  
+
+
   return(l_res);
 }
 
@@ -888,12 +888,12 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 		POP(l_dim);
 		POP(l_ind);
 	      }
-	    
+
 	    if(ENDP(l_ind) && ENDP(l_dim))
 	      {
 	      if(basic_pointer_p(b))
 		{
-		  p = true;		  
+		  p = true;
 		  finished = true;
 		}
 	      else
@@ -901,21 +901,21 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	      }
 	    else if (ENDP(l_dim)) /* && !ENDP(l_ind) by construction */
 	      {
-		pips_assert("the current basic should be a pointer or a derived\n", 
-			    basic_pointer_p(b) || basic_derived_p(b));	
-		
+		pips_assert("the current basic should be a pointer or a derived\n",
+			    basic_pointer_p(b) || basic_derived_p(b));
+
 		if (basic_pointer_p(b))
 		  {
 		    ct = basic_pointer(b);
 		    POP(l_ind);
 		  }
-		else /* b is a derived */ 
+		else /* b is a derived */
 		  {
-		    ct = entity_type(basic_derived(b));	
+		    ct = entity_type(basic_derived(b));
 		    p = r_effect_pointer_type_p(eff, l_ind, ct);
 		    finished = true;
 		  }
-		 
+
 	      }
 	    else /* ENDP(l_ind) but !ENDP(l_dim) */
 	      {
@@ -940,13 +940,13 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    */
 	    if (!unbounded_expression_p(field_exp))
 	      {
-		pips_assert("the field expression must be a reference\n", 
+		pips_assert("the field expression must be a reference\n",
 			    expression_reference_p(field_exp));
 		field = expression_variable(field_exp);
 		if (variable_phi_p(field))
 		  field = entity_undefined;
 	      }
-	      
+
 	    if (!entity_undefined_p(field))
 	      {
 		/* the current type is the type of the field */
@@ -962,13 +962,13 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 		while (!ENDP(l_ent) && p)
 		  {
 		    type new_ct = basic_concrete_type(entity_type(ENTITY(CAR(l_ent))));
-		    p = r_effect_pointer_type_p(eff, CDR(l_ind), 
+		    p = r_effect_pointer_type_p(eff, CDR(l_ind),
 						new_ct);
 		    free_type(new_ct);
 		    POP(l_ent);
 		  }
 		finished = true;
-	      }	    
+	      }
 	    break;
 	  }
 	default:
@@ -984,7 +984,7 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 }
 
 
-/** 
+/**
  NOT YET IMPLEMENTED FOR VARARGS AND FUNCTIONAL TYPES.
 
  @param eff is an effect
@@ -1062,18 +1062,18 @@ type simple_effect_reference_type(reference ref)
 		/* we must know which field it is, else return an undefined type */
 		expression field_exp = EXPRESSION(CAR(l_inds));
 		entity field = entity_undefined;
-		pips_debug(8, "field dimension : %s\n", 
+		pips_debug(8, "field dimension : %s\n",
 			   words_to_string(words_expression(field_exp,NIL)));
-		
+
 		if (!unbounded_expression_p(field_exp))
 		  {
-		    pips_assert("the field expression must be a reference\n", 
+		    pips_assert("the field expression must be a reference\n",
 				expression_reference_p(field_exp));
 		    field = expression_variable(field_exp);
 		    if (variable_phi_p(field))
 		      field = entity_undefined;
 		  }
-	      		
+
 		if (!entity_undefined_p(field))
 		  {
 		    pips_debug(8, "known field, poping field dimension\n");
@@ -1082,7 +1082,7 @@ type simple_effect_reference_type(reference ref)
 		    ct = bct;
 		    POP(l_inds);
 		  }
-		else 
+		else
 		  {
 		    pips_debug(8, "unknown field, returning type_undefined\n");
 		    t = type_undefined;
@@ -1169,7 +1169,7 @@ list statement_modified_pointers_effects_list(statement s)
   if (anywhere_p)
     {
       gen_free_list(l_res);
-      l_res = CONS(EFFECT, make_anywhere_effect(is_action_write), NIL);
+      l_res = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
     }
 
   ifdebug(6){
@@ -1193,7 +1193,7 @@ static bool effects_reference_indices_may_equal_p(expression ind1, expression in
 }
 
 /**
-   This function should be instanciated differently for simple and convex 
+   This function should be instanciated differently for simple and convex
    effects : much more work should be done for convex effects.
 
    @return true if the effects have comparable access paths
@@ -1203,7 +1203,7 @@ static bool effects_reference_indices_may_equal_p(expression ind1, expression in
 		  -1 if eff2 access path may lead to eff1 access path
            false otherwise.
 */
-static bool effects_access_paths_comparable_p(effect eff1, effect eff2, 
+static bool effects_access_paths_comparable_p(effect eff1, effect eff2,
 int *result)
 {
   bool comparable_p = true; /* assume they are compable */
@@ -1211,14 +1211,14 @@ int *result)
   reference ref2 = effect_any_reference(eff2);
   list linds1 = reference_indices(ref1);
   list linds2 = reference_indices(ref2);
-  
+
   pips_debug_effect(8, "begin\neff1 = \n", eff1);
   pips_debug_effect(8, "begin\neff2 = \n", eff2);
 
   /* to be comparable, they must have the same entity */
-  comparable_p = same_entity_p(reference_variable(ref1), 
+  comparable_p = same_entity_p(reference_variable(ref1),
 			       reference_variable(ref2));
-  
+
   while( comparable_p && !ENDP(linds1) && !ENDP(linds2))
     {
       if (!effects_reference_indices_may_equal_p(EXPRESSION(CAR(linds1)),
@@ -1228,13 +1228,13 @@ int *result)
       POP(linds1);
       POP(linds2);
     }
-  
+
   if (comparable_p)
     {
       *result = (int) (gen_length(linds2) - gen_length(linds1)) ;
       if (*result != 0) *result = *result / abs(*result);
     }
- 
+
   pips_debug(8, "end with comparable_p = %s and *result = %d",
 	     comparable_p ? "true" : "false", *result);
 
@@ -1252,17 +1252,17 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
    bool anywhere_r_p = false;
 
    pips_debug(5, "begin\n");
-	
-   t = (*load_transformer_func)(s);    
 
-   if (l_eff !=NIL)    
+   t = (*load_transformer_func)(s);
+
+   if (l_eff !=NIL)
      {
        /* first change the store of the descriptor */
        if (backward_p)
 	 l_eff = (*effects_transformer_composition_op)(l_eff, t);
        else
 	 l_eff =  (*effects_transformer_inverse_composition_op)(l_eff, t);
-   
+
        ifdebug(5){
 	 pips_debug(5, " effects after composition with transformer: \n");
 	 (*effects_prettyprint_func)(l_eff);
@@ -1272,60 +1272,60 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 	 {
 	   /* then change the effects references if some pointer is modified */
 	   /* backward_p is not used here because we lack points_to information
-	      and we thus generate anywhere effects 
+	      and we thus generate anywhere effects
 	   */
 	   l_eff_pointers = statement_modified_pointers_effects_list(s);
-	   
-	   while( !ENDP(l_eff) && 
+
+	   while( !ENDP(l_eff) &&
 		  ! (anywhere_w_p && anywhere_r_p))
 	     {
 	       list l_eff_p_tmp = l_eff_pointers;
 	       effect eff = EFFECT(CAR(l_eff));
 	       bool eff_w_p = effect_write_p(eff);
 	       bool found = false;
-	       
-	       
-	       
+
+
+
 	       while( !ENDP(l_eff_p_tmp) &&
 		      !((eff_w_p && anywhere_w_p) || (!eff_w_p && anywhere_r_p)))
 		 {
 		   effect eff_p = EFFECT(CAR(l_eff_p_tmp));
 		   effect new_eff = effect_undefined;
 		   int comp_res = 0;
-		   
+
 		   if(effects_access_paths_comparable_p(eff, eff_p, &comp_res)
 		      && comp_res <=0 )
 		     {
-		       new_eff = make_anywhere_effect(effect_action_tag(eff));
+		       new_eff = make_anywhere_effect(copy_action(effect_action(eff)));
 		       l_res = gen_nconc(l_res, CONS(EFFECT, new_eff, NIL));
 		       found = true;
 		       if (eff_w_p)
 			 anywhere_w_p = true;
-		       else 
-			 anywhere_r_p = true;			   
-		
+		       else
+			 anywhere_r_p = true;
+
 		     } /*  if(effects_access_paths_comparable_p) */
-		   
+
 		   POP(l_eff_p_tmp);
-		 } /* while( !ENDP(l_eff_p_tmp))*/ 
-	       
+		 } /* while( !ENDP(l_eff_p_tmp))*/
+
 	       /* if we have found no modifiying pointer, we keep the effect */
 	       if (!found)
 		 {
 		   /* is the copy necessary ?*/
 		   l_res = gen_nconc(l_res, CONS(EFFECT,(*effect_dup_func)(eff) , NIL));
-		   
+
 		 }
-	       
+
 	       POP(l_eff);
-	       
+
 	     } /* while( !ENDP(l_eff)) */
-	   
+
 	   ifdebug(5){
 	     pips_debug(5, " effects after composition with pointer effects: \n");
 	     (*effects_prettyprint_func)(l_res);
 	   }
-            
+
 	 } /* if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))*/
        else
 	 l_res = l_eff;
@@ -1371,14 +1371,14 @@ static bool FILE_star_effect_reference(reference ref)
 		    entity te = basic_derived(b);
 		    if (same_string_p(entity_user_name(te), "_IO_FILE"))
 		      {
-			res = true;		  
+			res = true;
 		      }
 		  }
 	     }
 	}
     }
   pips_debug(8, "end with : %s\n", res? "true":"false");
-			
+
   return res;
 }
 
@@ -1388,7 +1388,7 @@ static bool FILE_star_effect_reference(reference ref)
    @return a list of effects with no access paths dereferencing pointers.
 
    Two algorithms are currently used, depending on the value returned by get_use_points_to.
-   
+
    If true, when there is an effect reference with a dereferencing dimension, eval_cell_with_points_to is called
    to find an equivalent constant path using points-to.
    If false, effect references with a dereferencing dimension are systematically replaced by anywhere effects.
@@ -1405,12 +1405,12 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	{
 	  bool exact_p;
 	  reference ref = effect_any_reference(eff);
-      
+
 	  if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
 	    {
 	      le = CONS(EFFECT, copy_effect(eff), le);
 	    }
-	  else 
+	  else
 	    {
 	      if (effect_reference_dereferencing_p(ref, &exact_p))
 		{
@@ -1423,16 +1423,16 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 		    context = effects_private_current_context_head();
 		  }
 
-		  list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff), 
+		  list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff),
 							      points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-							      &exact_p, context); 
+							      &exact_p, context);
 		  if (ENDP(l_eval))
 		    {
 		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
 		      /* We have not found any equivalent constant path : it may point anywhere */
 		      /* We should maybe contract these effects later. Is it done by the callers ? */
-		      le = CONS(EFFECT, make_anywhere_effect(effect_action_tag(eff)), le);
-		    }	
+		      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+		    }
 		  else
 		    {
 		      /* change the resulting effects action to the current effect action */
@@ -1445,7 +1445,7 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 		le = CONS(EFFECT, copy_effect(eff), le);
 	    }
 	}
-	
+
       le = gen_nreverse(le);
 
     }
@@ -1455,35 +1455,35 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
       bool write_dereferencing_p = false;
       list l = l_pointer_eff, lkeep = NIL;
 
-      while (!ENDP(l)) 
+      while (!ENDP(l))
 	{
 	  bool exact_p;
 	  effect eff = EFFECT(CAR(l));
 	  reference ref = effect_any_reference(eff);
-      
-	  if (io_effect_p(eff)|| malloc_effect_p(eff) 
+
+	  if (io_effect_p(eff)|| malloc_effect_p(eff)
 	      || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff))
 	      || (!get_bool_property("ALIASING_ACROSS_IO_STREAMS") && FILE_star_effect_reference(ref)))
 	    {
 	      lkeep = CONS(EFFECT, eff, lkeep);
 	    }
-	  else 
-	    if (!(read_dereferencing_p && write_dereferencing_p) 
+	  else
+	    if (!(read_dereferencing_p && write_dereferencing_p)
 		&& effect_reference_dereferencing_p(ref, &exact_p))
-	      {		
+	      {
 		if (effect_read_p(eff)) read_dereferencing_p = true;
 		    else write_dereferencing_p = true;
 	      }
-	  POP(l);      
+	  POP(l);
 	}
-	
+
       lkeep = gen_nreverse(lkeep);
 
       if (write_dereferencing_p)
-	le = CONS(EFFECT, make_anywhere_effect(is_action_write), le);
+	le = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), le);
       if (read_dereferencing_p)
-	le = CONS(EFFECT, make_anywhere_effect(is_action_read), le); 
-      
+	le = CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), le);
+
       if (!write_dereferencing_p)
 	if (!read_dereferencing_p)
 	  {
@@ -1515,11 +1515,11 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	    }
 	}
       gen_free_list(lkeep);
-	
+
     }
 
   pips_debug_effects(8, "ouput effects : \n", le);
-	
+
   return le;
 }
 

@@ -29,7 +29,7 @@
  * File: unary_operators.c
  * ~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the intanciation of the generic functions necessary 
+ * This File contains the intanciation of the generic functions necessary
  * for the computation of all types of simple effects.
  *
  */
@@ -68,18 +68,18 @@
  subscripted array). This has to be done at a higher level. (BC)
 
  */
-effect reference_to_simple_effect(reference ref, tag act,
+effect reference_to_simple_effect(reference ref, action act,
 				  bool use_preference_p)
 {
   entity ent = reference_variable(ref);
   effect eff = effect_undefined;
-  action ac = make_action(act, UU);
+  action ac = copy_action(act);
 
   pips_debug(8, "Begins for reference: \"%s\"\n",
 	     words_to_string(words_reference(ref,NIL)));
 
   if (dummy_parameter_entity_p(ent))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)\n", 
+    pips_internal_error("the input reference entity is a dummy parameter (%s)\n",
 			entity_name(ent));
 
   if (entity_all_locations_p(ent))
@@ -97,22 +97,22 @@ effect reference_to_simple_effect(reference ref, tag act,
       type t = entity_type(reference_variable(ref));
       type ut = basic_concrete_type(t);
 
-      
-      if(type_variable_p(ut)) 
+
+      if(type_variable_p(ut))
 	{
 	  variable utv = type_variable(ut);
 	  list utd = variable_dimensions(utv);
 	  bool is_array_p = !ENDP(utd);
-	  	  
+
 	  if (is_array_p)
 	    {
 	      if(gen_length(ind) == type_depth(ut))
 		{
 		  /* The dimensionalities of the index and type are the same: */
 		  cell cell_ref;
-		  if (use_preference_p)		    
+		  if (use_preference_p)
 		    cell_ref = make_cell_preference(make_preference(ref));
-		  else 
+		  else
 		    cell_ref = make_cell_reference(ref);
 		  approximation ap = make_approximation_must();
 		  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
@@ -124,43 +124,43 @@ effect reference_to_simple_effect(reference ref, tag act,
 		  if (c_module_p(get_current_module_entity()))
 		    {
 		      cell cell_ref;
-		      if (use_preference_p)		    
+		      if (use_preference_p)
 			cell_ref = make_cell_preference(make_preference(ref));
-		      else 
+		      else
 			cell_ref = make_cell_reference(ref);
 		      approximation ap = make_approximation_must();
-		      eff = make_effect(cell_ref, ac, ap, 
+		      eff = make_effect(cell_ref, ac, ap,
 					make_descriptor_none());
 		    }
 		  else
 		    {
-		      /* we are in Fortran. A reference to TAB with no 
-			 index is a reference to the whole array 
+		      /* we are in Fortran. A reference to TAB with no
+			 index is a reference to the whole array
 		      */
 		      pips_assert("invalid number of reference indices \n",
-				  gen_length(variable_dimensions(utv)) > 
+				  gen_length(variable_dimensions(utv)) >
 				  gen_length(ind));
-	  
+
 		      pips_debug(7, "less ref indices than number of dimensions\n");
 		      /* generate effects on whole (sub-)array */
-	  	      /* it is necessary to copy the reference because
+		      /* it is necessary to copy the reference because
                          we add dimensions afterwards.
-			 this may lead to memory leaks, but I assume that this 
-			 case only arises when dealing with actual program 
-			 references 
-		      */ 
+			 this may lead to memory leaks, but I assume that this
+			 case only arises when dealing with actual program
+			 references
+		      */
 		      eff = make_effect
 			(make_cell_reference(copy_reference(ref)),
 			 ac, make_approximation_must(), make_descriptor_none());
-		      
-		      FOREACH(DIMENSION, c_t_dim, 
+
+		      FOREACH(DIMENSION, c_t_dim,
 			      gen_nthcdr((int) gen_length(ind),
 					 variable_dimensions(utv)))
-			{		      
+			{
 			  simple_effect_add_expression_dimension
-			    (eff, make_unbounded_expression());		      
+			    (eff, make_unbounded_expression());	
 			} /* FOREACH */
-		      
+
 		    }
 		}
 	    }
@@ -168,9 +168,9 @@ effect reference_to_simple_effect(reference ref, tag act,
 	    {
 	      /* It is a scalar : keep the actual reference */
 	      cell cell_ref;
-	      if (use_preference_p)		    
+	      if (use_preference_p)
 		cell_ref = make_cell_preference(make_preference(ref));
-	      else 
+	      else
 		cell_ref = make_cell_reference(ref);
 	      approximation ap = make_approximation_must();
 	      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
@@ -181,34 +181,34 @@ effect reference_to_simple_effect(reference ref, tag act,
 	  /* reference n_ref = copy_reference(ref); */
 /* 	  cell cell_ref = make_cell_reference(n_ref); */
 	  cell cell_ref;
-	  if (use_preference_p)		    
+	  if (use_preference_p)
 	    cell_ref = make_cell_preference(make_preference(ref));
-	  else 
+	  else
 	    cell_ref = make_cell_reference(ref);
 	  approximation ap = make_approximation_must();
-	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none()); 
+	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	}
       free_type(ut);
-      
+
     }
-  
+
   ifdebug(8)
     {
       pips_debug(8, "end with effect\n");
       print_effect(eff);
     }
-  
+
   return eff;
 }
 
 
- 
+
 
 /* void simple_effect_add_expression_dimension(effect eff, expression exp)
  * input    : a simple effect and an expression
  * output   : nothing
  * modifies : the effect eff, and normalizes the expression
- * comment  : adds a last dimension [exp] to the effect if the expression 
+ * comment  : adds a last dimension [exp] to the effect if the expression
  *            is normlizable. If not adds a last dimension [*], and changes
  *            the approximation into may.
  */
@@ -217,13 +217,13 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
 
   cell eff_c = effect_cell(eff);
   reference ref;
-  
+
   ifdebug(8)
     {
       pips_debug(8, "begin with effect :\n");
       print_effect(eff);
     }
-  
+
   if (cell_preference_p(eff_c))
     {
       /* it's a preference : we change for a reference cell */
@@ -239,11 +239,11 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
     }
 
   reference_indices(ref) = gen_nconc(reference_indices(ref),
-				     CONS(EXPRESSION, 
-					  copy_expression(exp), 
+				     CONS(EXPRESSION,
+					  copy_expression(exp),
 					  NIL));
-  
-  
+
+
   if(unbounded_expression_p(exp))
     {
       effect_approximation_tag(eff) = is_approximation_may;
@@ -254,7 +254,7 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
       print_effect(eff);
       pips_assert("the effect is not consistent", effect_consistent_p(eff));
     }
-  
+
   return;
 }
 
@@ -278,13 +278,13 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
   reference ref;
   normalized nexp = NORMALIZE_EXPRESSION(exp);
   list l_ind;
-  
+
   ifdebug(8)
     {
       pips_debug(8, "begin with effect :\n");
       print_effect(eff);
     }
-  
+
   if (cell_preference_p(eff_c))
     {
       /* it's a preference : we change for a reference cell */
@@ -298,10 +298,10 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
       /* it's a reference : let'us modify it */
       ref = cell_reference(eff_c);
     }
-  
+
   l_ind = gen_nthcdr(i-1,reference_indices(ref));
   pips_assert("ith index must exist",!ENDP(l_ind));
-  
+
   free_expression(EXPRESSION(CAR(l_ind)));
 
   if (normalized_linear_p(nexp))
@@ -309,17 +309,17 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
       EXPRESSION_(CAR(l_ind)) =  copy_expression(exp);
     }
   else
-    {      
+    {
       EXPRESSION_(CAR(l_ind)) =  make_unbounded_expression();
-      effect_approximation_tag(eff) = is_approximation_may; 
-    }  
-  
+      effect_approximation_tag(eff) = is_approximation_may;
+    }
+
   ifdebug(8)
     {
       pips_debug(8, "end with effect :\n");
       print_effect(eff);
     }
-  
+
   return;
 }
 
@@ -332,7 +332,7 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
  */
 effect simple_effect_field_to_rank_conversion(effect input_effect)
 {
-  effect eff = copy_effect(input_effect); 
+  effect eff = copy_effect(input_effect);
   cell c = effect_cell(input_effect);
   /* if it's a preference, we are sure there are no field dimensions */
   if (cell_reference_p(c))
@@ -350,7 +350,7 @@ effect simple_effect_field_to_rank_conversion(effect input_effect)
 		{
 		  int rank = entity_field_rank(ind_e);
 		  expression new_ind = int_to_expression(rank);
-		  
+
 		  free_syntax(s);
 		  expression_syntax(ind) = copy_syntax(expression_syntax(new_ind));
 		  free_expression(new_ind);
@@ -376,22 +376,22 @@ simple_effect_dup(effect eff)
 {
   effect new_eff = effect_undefined;
 
-  
-  if(cell_preference_p(effect_cell(eff))) 
+
+  if(cell_preference_p(effect_cell(eff)))
     {
       new_eff = make_effect(make_cell_reference(copy_reference(effect_any_reference(eff))),
-			    copy_action(effect_action(eff)), 
+			    copy_action(effect_action(eff)),
 			    copy_approximation(effect_approximation(eff)),
 			    copy_descriptor(effect_descriptor(eff)));
     }
   else
     {
       new_eff = copy_effect(eff);
-      
+
     }
-  
+
   ifdebug(8) pips_assert("the new effect is consistent", effect_consistent_p(new_eff));
-  
+
   return(new_eff);
 }
 
@@ -402,15 +402,15 @@ simple_effect_dup(effect eff)
            to the original program reference.
  */
  effect
- reference_to_reference_effect(reference ref, tag act,
+ reference_to_reference_effect(reference ref, action act,
 			       bool __attribute__((unused)) use_preference_p)
  {
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
    approximation ap = make_approximation(is_approximation_must, UU);
-   action ac = make_action(act, UU);
+   action ac = copy_action(act);
    effect eff;
-    
-   eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
+
+   eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));
    return(eff);
  }
 
@@ -427,7 +427,7 @@ list simple_effects_union_over_range(list l_eff,
     list c_eff = list_undefined;
     reference ref = make_reference(i, NIL);
     cell c = make_cell_reference(ref);
-    effect i_eff = make_effect(c, make_action_write(), 
+    effect i_eff = make_effect(c, make_action_write_memory(),
 			       make_approximation_must(), make_descriptor_none());
 
     list r_eff_l = proper_effects_of_range(r);
@@ -459,7 +459,7 @@ list simple_effects_union_over_range(list l_eff,
 /* FI: instead of simply getting rid of indices, I preserve constant
    indices for the semantics analysis. Instead of stripping the
    indices, they are replaced by unbounded expressions to keep the
-   difference between p and p[*] when p is a pointer. 
+   difference between p and p[*] when p is a pointer.
 
    This is not as strong as store_independent_effect_p() which would
    require that the reference is not pointer dependent.
@@ -469,7 +469,7 @@ list simple_effects_union_over_range(list l_eff,
    possible. It's easier to work on a copy of the reference when a
    "preference" is used.
 */
-list 
+list
 effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 {
   cell c = effect_cell(eff);
@@ -485,9 +485,9 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 
     if(!extended_integer_constant_expression_p(se)) {
       if(!unbounded_expression_p(se)) {
-	
+
 	/* it may still be a field entity */
-	    if (!(expression_reference_p(se) && 
+	    if (!(expression_reference_p(se) &&
 		  entity_field_p(expression_variable(se))))
 	    {
 	      may_p = TRUE;
@@ -515,7 +515,7 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
   return(CONS(EFFECT,eff,NIL));
 }
 
-list 
+list
 effect_to_may_sdfi_list(effect eff)
 {
   return effect_to_store_independent_sdfi_list(eff, TRUE);
@@ -523,7 +523,7 @@ effect_to_may_sdfi_list(effect eff)
 
 /* FI: instead of simpy getting rid of indices, I preserve cosntant
    indices for the semantics analysis. */
-list 
+list
 effect_to_sdfi_list(effect eff)
 {
   return effect_to_store_independent_sdfi_list(eff, FALSE);
@@ -536,7 +536,7 @@ simple_effects_descriptor_normalize(list l_eff __attribute__ ((unused)))
 }
 
 
-/* 
+/*
  * It's not yet completely safe for C code when pointers are
  * modified.
 */
@@ -545,8 +545,8 @@ list simple_effects_composition_with_effect_transformer(list l_eff,
 						   __attribute__((__unused__)))
 {
   list l_res=NIL;
-  
-  ifdebug(8) 
+
+  ifdebug(8)
     {
       pips_debug(8, "Begin\n");
       print_effects(l_eff);
@@ -554,24 +554,24 @@ list simple_effects_composition_with_effect_transformer(list l_eff,
 
   FOREACH (EFFECT, eff, l_eff)
     {
-      l_res = 
-	gen_nconc(l_res, 
-		  effect_to_store_independent_sdfi_list(eff, FALSE) 
+      l_res =
+	gen_nconc(l_res,
+		  effect_to_store_independent_sdfi_list(eff, FALSE)
 		  );
     }
-  
-  ifdebug(8) 
+
+  ifdebug(8)
     {
       pips_debug(8, "End\n");
       print_effects(l_res);
     }
-  
+
   return(l_res);
 }
 
-/* This function does not do what it was designed for : 
+/* This function does not do what it was designed for :
    It should transform the effects l_eff corresponding to S2 with
-   transformer T1 corresponding to S1. 
+   transformer T1 corresponding to S1.
    But it uses effects from S2 instead of effects from S1.
    (see r_rw_effects_of_sequence)
    I keep it for future reuse after modification.
@@ -584,7 +584,7 @@ list old_effects_composition_with_effect_transformer(list l_eff,
      intraprocedurally with loops, maybe because I modified simple
      effects; since we do not have transformers, we use instead the
      effects themselves, which could be transformed into a
-     transformer... 
+     transformer...
 
      The effects are supposed to be ordered. A write effect must
      appears before another effect to require an update.

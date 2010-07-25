@@ -66,7 +66,7 @@ static void display_impact_alias_statistics()
 static bool same_call_site_p(call_site cs1, call_site cs2)
 {
   entity f1 = call_site_function(cs1);
-  entity f2 = call_site_function(cs2); 
+  entity f2 = call_site_function(cs2);
   int o1 = call_site_ordering(cs1);
   int o2 = call_site_ordering(cs2);
   return (same_entity_p(f1,f2) && (o1==o2));
@@ -74,7 +74,7 @@ static bool same_call_site_p(call_site cs1, call_site cs2)
 
 /****************************************************************************
 
- This function returns true if l1 = conc(cs,l2)               
+ This function returns true if l1 = conc(cs,l2)
 
 *****************************************************************************/
 
@@ -90,7 +90,7 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
 
 /*****************************************************************************
 
-   This function computes the offset of a storage ram variable : 
+   This function computes the offset of a storage ram variable :
    offset = initial_offset + subscript_value_stride
 
 *****************************************************************************/
@@ -114,10 +114,10 @@ static expression storage_ram_offset(storage s,expression subval)
 
 /****************************************************************************
 
-   This function computes the offset of a formal storage variable : 
+   This function computes the offset of a formal storage variable :
    offset = initial_offset + subscript_value_stride
 
-   initial_offset is from alias_association with path' = path - {cs} 
+   initial_offset is from alias_association with path' = path - {cs}
 
 *****************************************************************************/
 
@@ -125,7 +125,7 @@ static expression storage_formal_offset(call_site cs,entity actual_var,
 					expression subval,list path)
 {
   list l_caller_aliases = alias_associations_list((alias_associations)
-        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE)); 
+        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE));
   expression exp = expression_undefined;
   MAP(ALIAS_ASSOCIATION, aa,
   {
@@ -134,12 +134,12 @@ static expression storage_formal_offset(call_site cs,entity actual_var,
     if (same_entity_p(caller_var,actual_var) && tail_call_path_p(cs,caller_path,path))
       {
 	expression initial_off = alias_association_offset(aa);
-	if (!expression_undefined_p(initial_off)) 
+	if (!expression_undefined_p(initial_off))
 	  {
 	    if (expression_equal_integer_p(subval,0))
 	      exp = copy_expression(initial_off);
-	    else 
-	      exp = binary_intrinsic_expression(PLUS_OPERATOR_NAME, 
+	    else
+	      exp = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
 						copy_expression(initial_off),
 						copy_expression(subval));
 	  }
@@ -153,9 +153,10 @@ static expression storage_formal_offset(call_site cs,entity actual_var,
 
 /*****************************************************************************
 
- If e is a formal parameter, find its rank in the formal parameter list of 
- current module in order to find out the corresponding actual argument and 
- then its offset								      
+ If e is a formal parameter, find its rank in the formal parameter list of
+ current module in order to find out the corresponding actual argument and
+ then its offset
+
  If e is a common variable in the current module, offset of e is constant
 
 *****************************************************************************/
@@ -177,17 +178,17 @@ static expression offset_in_caller(entity e, call_site cs, list path)
       expression subval = subscript_value_stride(actual_var,l_actual_inds);
       storage s = entity_storage(actual_var);
       ifdebug(3)
-	fprintf(stderr, " \n Current actual argument %s",entity_name(actual_var));	
+	fprintf(stderr, " \n Current actual argument %s",entity_name(actual_var));
       if (storage_ram_p(s))
 	/* The actual argument has a ram storage */
 	return storage_ram_offset(s,subval);
       if (storage_formal_p(s))
-	/* The actual argument is a formal parameter of the current caller, 
+	/* The actual argument is a formal parameter of the current caller,
 	   we must take the alias_associations of the caller */
 	return storage_formal_offset(cs,actual_var,subval,path);
     }
   // common variable
-  ra = storage_ram(entity_storage(e)); 
+  ra = storage_ram(entity_storage(e));
   return int_to_expression(ram_offset(ra));
 }
 
@@ -295,7 +296,7 @@ bool check_way_between_two_statements(statement s1, statement s2, graph g)
     return FALSE;
 }
 
-/* This function prints the call path , including names of caller functions 
+/* This function prints the call path , including names of caller functions
    and orderings of call sites in their corresponding functions */
 static string print_call_path(list path)
 {
@@ -405,7 +406,7 @@ static int __attribute__ ((unused)) expression_approximation(statement s, expres
       }
       TRY {
 	bool n_positif, n_negatif;
-	n_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE); 
+	n_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
 	(void) vect_chg_sgn(pv);
 	n_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
 	fprintf(stderr, "n_negatif : %s\n", n_negatif ? "TRUE" : "FALSE");
@@ -424,7 +425,7 @@ static int loop_executed_approximation(statement s)
     n_m1 = NORMALIZE_EXPRESSION(range_lower(rg)),
     n_m2 = NORMALIZE_EXPRESSION(range_upper(rg)),
     n_m3 = NORMALIZE_EXPRESSION(range_increment(rg));
-  
+
   transformer pre = load_statement_precondition(s);
   Psysteme precondition_ps = predicate_system(transformer_relation(pre));
 
@@ -443,23 +444,23 @@ static int loop_executed_approximation(statement s)
 	return MAY_APPROXIMATION;
       }
       TRY {
-	m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE); 
+	m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
 	(void) vect_chg_sgn(pv3);
 	m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
 	UNCATCH(overflow_error);
       }
       pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
 		 m3_positif, m3_negatif);
-      
+
       /* Vire aussi pv3 & pc3 : */
       sc_rm(ps);
-      
+
       /* le signe est d�termin� et diff�rent de 0 */
       if (m3_positif ^ m3_negatif)
 	{
 	  Pvecteur pv1, pv2, pv, pv_inverse;
 	  Pcontrainte c, c_inverse;
-	  
+
 	  pv1 = normalized_linear(n_m1);
 	  pv2 = normalized_linear(n_m2);
 
@@ -471,14 +472,14 @@ static int loop_executed_approximation(statement s)
 
 	  c = contrainte_make(pv);
 	  c_inverse = contrainte_make(pv_inverse);
-	  
+
 	  /* ??? on overflows, go next ... */
 	  if(ineq_redund_with_sc_p(precondition_ps, c)) {
 	    contrainte_free(c);
 	    return (m3_positif ? MUST_APPROXIMATION : NOT_APPROXIMATION);
 	  }
 	  contrainte_free(c);
-	  
+
 	  /* ??? on overflows, should assume MAY_BE_EXECUTED... */
 	  if(ineq_redund_with_sc_p(precondition_ps, c_inverse)) {
 	    contrainte_free(c_inverse);
@@ -519,7 +520,7 @@ static void __attribute__ ((unused)) computing_dominators(hash_table control_to_
   CONTROL_MAP(n, set_add_element(set_N, set_N, (char *)n), n0, blocs);
   gen_free_list(blocs);
   blocs = NIL;
-  
+
   /* Initialization D(n) = N */
   CONTROL_MAP(n, {
     if (n == n0) continue;
@@ -692,7 +693,7 @@ static void check_for_effected_statement(statement s, list le)
   list stat_writes1_old = gen_copy_seq(stat_writes1);
   list stat_reads2_old = gen_copy_seq(stat_reads2);
   list stat_writes2_old = gen_copy_seq(stat_writes2);
-  
+
   MAP(EFFECT, eff, {
     entity ent_dest = reference_variable(effect_any_reference(eff));
     action act_dest = effect_action(eff);
@@ -708,11 +709,11 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sw2)) { /* new flow-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sw2, make_action_write(), alias_ent2,
+					      sw2, make_action_write_memory(), alias_ent2,
 					      s, act_dest, alias_ent1))
 	      {
 		number_of_impact_alias++;
-	        /*switch (control_approximation_between_statement_p(sw2, s)) {*/
+		/*switch (control_approximation_between_statement_p(sw2, s)) {*/
 		switch(MUST_APPROXIMATION) {
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_write_of_statement_on_variable(sw2, alias_ent2);
@@ -740,7 +741,7 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sr2)) { /* new anti-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sr2, make_action_read(), alias_ent2,
+					      sr2, make_action_read_memory(), alias_ent2,
 					      s, act_dest, alias_ent1))
 	      {
 		number_of_impact_alias++;
@@ -768,7 +769,7 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sw2)) { /* new output-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sw2, make_action_write(), alias_ent2,
+					      sw2, make_action_write_memory(), alias_ent2,
 					      s, act_dest, alias_ent1))
 	      {
 		number_of_impact_alias++;
@@ -803,7 +804,7 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sw1)) { /* new flow-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sw1, make_action_write(), alias_ent1,
+					      sw1, make_action_write_memory(), alias_ent1,
 					      s, act_dest, alias_ent2))
 	      {
 		number_of_impact_alias++;
@@ -835,7 +836,7 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sr1)) { /* new anti-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sr1, make_action_read(), alias_ent1,
+					      sr1, make_action_read_memory(), alias_ent1,
 					      s, act_dest, alias_ent2))
 	      {
 		number_of_impact_alias++;
@@ -863,7 +864,7 @@ static void check_for_effected_statement(statement s, list le)
 	  if (!statement_undefined_p(sw1)) { /* new output-dependence created */
 	    set_clear(arcs_processed_set);
 	    if (!find_covering_reference_path(arcs_processed_set,
-					      sw1, make_action_write(), alias_ent1,
+					      sw1, make_action_write_memory(), alias_ent1,
 					      s, act_dest, alias_ent2))
 	      {
 		number_of_impact_alias++;
@@ -929,7 +930,7 @@ static void check_new_arc_for_structured_statement(statement s)
 	list stat_reads2_old = NIL;
 	list stat_writes1_old = NIL;
 	list stat_writes2_old = NIL;
-	
+
 	le = proper_effects_of_expression(test_condition(instruction_test(istat)));
 	check_for_effected_statement(s, le);
 
@@ -1041,7 +1042,7 @@ static void impact_check_two_scalar_variables_in_path(entity e1, entity e2, expr
         alias_ent1 = e1;
 	alias_ent2 = e2;
 	current_path = path;
-	
+
         check_new_arc_for_structured_statement(mod_stat);
 	/*gen_recurse(mod_stat, statement_domain, check_new_arc_for_structured_statement, gen_null);*/
 
@@ -1085,7 +1086,7 @@ static void impact_check_in_path(entity e1, entity e2, expression off1, expressi
 static bool written = FALSE;
 static entity current_entity  = entity_undefined;
 
-/* This function returns TRUE if the variable is written directly in the current module, 
+/* This function returns TRUE if the variable is written directly in the current module,
    or by its callees */
 static bool variable_is_written_by_statement_flt(statement s)
 {
@@ -1106,10 +1107,10 @@ static bool variable_is_written_by_statement_flt(statement s)
 		    return FALSE;
 		}
 	    }
-	}, l_rw); 
+	}, l_rw);
 	return FALSE;
     }
-    return TRUE; 
+    return TRUE;
 }
 
 static bool variable_is_written_p(entity ent)
@@ -1133,7 +1134,7 @@ static void set_dynamic_checked(entity e1, entity e2)
 
 static bool dynamic_checked_p(entity e1, entity e2)
 {
-    MAP(DYNAMIC_CHECK, dc, { 
+    MAP(DYNAMIC_CHECK, dc, {
         if ((dynamic_check_first(dc)==e1)&&(dynamic_check_second(dc)==e2))
 	    return dynamic_check_checked(dc);
     }, l_dynamic_check);
@@ -1142,7 +1143,7 @@ static bool dynamic_checked_p(entity e1, entity e2)
 
 static void init_dynamic_check_list(entity current_mod)
 {
-    list l_decls = code_declarations(entity_code(current_mod)); 
+    list l_decls = code_declarations(entity_code(current_mod));
     list l_formals = NIL;
     list l_commons = NIL;
 
@@ -1177,12 +1178,12 @@ static void impact_check_two_variables(entity e1, entity e2, expression off1, ex
 	    /* good offset --> check */
 	    impact_check_in_path(e1, e2, off1, off2, path);
 	} else {
-	    /* As we do not have exact offsets of variables, we have to go to the 
+	    /* As we do not have exact offsets of variables, we have to go to the
 	       caller's frame to check for alias impact. The direct caller is
 	       CAR(call_path) because of the following concatenation in alias_propagation:
 	       path = CONS(CALL_SITE,cs,gen_full_copy_list(alias_association_call_chain(aa)));
-	       
-	       To find a call site from its ordering, we have to do a gen_recurse 
+
+	       To find a call site from its ordering, we have to do a gen_recurse
 	       in the caller module. */
 	    call_site cs = CALL_SITE(CAR(path));
 	    statement caller_statement;
@@ -1194,8 +1195,9 @@ static void impact_check_two_variables(entity e1, entity e2, expression off1, ex
 	    statement_in_caller = statement_undefined;
 	    gen_recurse(caller_statement,statement_domain,
 			search_statement_by_ordering_flt,gen_null);
-	    
-	    if (!statement_undefined_p(statement_in_caller) && statement_call_p(statement_in_caller)) {
+
+	    if (!statement_undefined_p(statement_in_caller)
+		&& statement_call_p(statement_in_caller)) {
 	        expression new_off1, new_off2;
 		current_call = statement_call(statement_in_caller);
 		new_off1 = offset_in_caller(e1, cs, path);
@@ -1205,7 +1207,7 @@ static void impact_check_two_variables(entity e1, entity e2, expression off1, ex
 		    impact_check_in_path(e1, e2, new_off1, new_off2, path);
 		} else {
 		  /* Try with special cases : CALL FOO(R(TR(K)),R(TR(K))) ???????
-		     Does this case exist when we create special section + offset 
+		     Does this case exist when we create special section + offset
 		     for same actual arguments ??? */
 		  /* use dynamic alias check*/
 		  set_dynamic_checked(e1, e2);
@@ -1233,11 +1235,11 @@ bool impact_check(char * module_name)
     l_module_aliases = alias_associations_list((alias_associations)
 					       db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,
 								      module_name, TRUE));
-    
+
     if (l_module_aliases != NIL) {
         dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 	/*full_control_graph(module_name);*/
-	mod_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);	
+	mod_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
         set_current_module_entity(current_mod);
 
 	set_ordering_to_statement(mod_stat);
@@ -1258,32 +1260,32 @@ bool impact_check(char * module_name)
 	    int l1 = alias_association_lower_offset(aa1);
 	    int u1 = alias_association_upper_offset(aa1);
 	    l_module_aliases = CDR(l_module_aliases);
-	    
+
 	    /* Looking for another formal variable in the list of alias
-	       associations that has same section and included call path. 
-	       If this variable is checked dynamically with e1 => no need 
+	       associations that has same section and included call path.
+	       If this variable is checked dynamically with e1 => no need
 	       to continue */
 	    MAP(ALIAS_ASSOCIATION, aa2, {
 	        entity e2 = alias_association_variable(aa2);
 		entity sec2 = alias_association_section(aa2);
 		list path2 = alias_association_call_chain(aa2);
-		if (!same_entity_p(e1,e2) && same_entity_p(sec1,sec2) && 
-		    !dynamic_checked_p(e1, e2) && included_call_chain_p(path1,path2)) {  
+		if (!same_entity_p(e1,e2) && same_entity_p(sec1,sec2) &&
+		    !dynamic_checked_p(e1, e2) && included_call_chain_p(path1,path2)) {
 
 		    int l2 = alias_association_lower_offset(aa2);
 		    int u2 = alias_association_upper_offset(aa2);
-		    
+
 		    if (((u1==-1)||(u1>=l2))&&((u2==-1)||(u2>=l1))) {
 		        expression off2 = alias_association_offset(aa2);
 			if (gen_length(path1) < gen_length(path2))
 			    impact_check_two_variables(e1, e2, off1, off2, path2);
 			else
-			    impact_check_two_variables(e1, e2, off1, off2, path1);			
+			    impact_check_two_variables(e1, e2, off1, off2, path1);
 		    }
 		}
 	    }, l_module_aliases);
-	    
-	    /* Looking for common variables in module or callee of modules 
+
+	    /* Looking for common variables in module or callee of modules
 	       to check for alias impact ... */
 	    MAP(ENTITY, e2, {
 	        if (variable_in_common_p(e2)) {
@@ -1315,7 +1317,7 @@ bool impact_check(char * module_name)
 	l_dynamic_check = NIL;
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE,module_name,mod_stat);
-	
+
 	/*hash_table_free(control_to_set_of_dominators);*/
 	/*clean_ctrl_graph();*/
 	reset_current_module_entity();
@@ -1326,5 +1328,5 @@ bool impact_check(char * module_name)
     display_impact_alias_statistics();
     l_module_aliases = NIL;
     current_mod = entity_undefined;
-    return TRUE; 
+    return TRUE;
 }

@@ -46,7 +46,7 @@
  * It can be sundered in seven groups of functions :
  *                           _ manipulation of regions and lists of regions
  *                           _ regions/list of regions conversion
- *                           _ creation of regions 
+ *                           _ creation of regions
  *                           _ phi entities
  *                           _ properties
  *                           _ variables and entities
@@ -90,38 +90,38 @@
 #define BETA_MAX 5
 static entity beta[BETA_MAX]; /* beta entities */
 
-/* entity make_beta_entity(int n) 
+/* entity make_beta_entity(int n)
  * input    : an integer n giving the range of the BETA entity.
  * output   : the entity BETA_n.
  * modifies : beta[] (eventually).
  * comment  : finds or generates an entity representing a dummy variable.
  *
- *            Once a BETA dummy entity, it is stored into a static array 
- *            (beta[]); thus, each next time such an entity is needed, 
+ *            Once a BETA dummy entity, it is stored into a static array
+ *            (beta[]); thus, each next time such an entity is needed,
  *            it is just picked up in beta[].
  *            If the dummy is not in beta[], it may be in the table
  *            where all entities are stored, because of previous computations.
- *            At last, if it is not found there, it is created. 
+ *            At last, if it is not found there, it is created.
  */
 entity make_beta_entity(int n)
 {
-    
-    pips_assert("BETA range (n) must be between 1 and BETA_MAX\n", 
+
+    pips_assert("BETA range (n) must be between 1 and BETA_MAX\n",
 		1<=n && n<=BETA_MAX);
 
     /* beta indices are between 1 and BETA_MAX.
        Array indices are between 0 to BETA_MAX - 1. */
-    if (beta[n-1] == entity_undefined) 
+    if (beta[n-1] == entity_undefined)
     {
 	entity v;
 	char beta_name[6];
 	char * s;
-	
+
 	sprintf(beta_name,"%s%d",BETA_PREFIX,n);
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, beta_name, (char *) NULL));
-	
-	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
+
+	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined)
 	{
 	    v = make_entity(s, make_scalar_integer_type(4),
 			    make_storage(is_storage_rom, UU),
@@ -141,10 +141,10 @@ list beta_entities_list(int beta_min, int beta_max)
 {
     list l_beta = NIL;
     int i;
-    
-    for(i=beta_min; i<=beta_max; i++) 
+
+    for(i=beta_min; i<=beta_max; i++)
 	l_beta = gen_nconc(l_beta, CONS(ENTITY, make_beta_entity(i), NIL));
-    
+
     return(l_beta);
 }
 
@@ -194,7 +194,7 @@ region region_dup(region reg)
     region new_reg;
     debug_region_consistency(reg);
 
-    pips_assert("region cell must be a reference\n", 
+    pips_assert("region cell must be a reference\n",
 		cell_reference_p(effect_cell(reg)));
 
     new_reg = copy_effect(reg);
@@ -258,8 +258,8 @@ void regions_free(list l_reg)
 void region_free(region reg)
 {
     debug_region_consistency(reg);
-    
-    pips_assert("region cell must be a reference\n", 
+
+    pips_assert("region cell must be a reference\n",
 		cell_reference_p(effect_cell(reg)));
 
       free_effect(reg);
@@ -286,7 +286,7 @@ list regions_add_region(list l_reg, region reg)
 /* list regions_add_context(list l_reg, transformer context)
  * input    : a list of regions and a precondition representing the current
  *            context.
- * output   : nothing. 
+ * output   : nothing.
  * modifies : the input regions ; their predicates contain the initial
  *            constraints plus the constraints of the context, modulo
  *            the elimination of redundancies.
@@ -294,7 +294,7 @@ list regions_add_region(list l_reg, region reg)
 list regions_add_context(l_reg, context)
 list l_reg;
 transformer context;
-{	
+{
 
     l_reg = array_regions_sc_append_and_normalize
 	(l_reg,
@@ -307,23 +307,23 @@ transformer context;
  */
 Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 {
-    
+
     if (!sc_empty_p(sc_reg))
     {
 	Pbase b = base_dup(sc_base(sc_reg));
-	
+
 	/* Select one tradeoff between speed and accuracy:
 	 * enumerated by increasing speeds according to Beatrice
 	 */
-	
-	switch(level) 
+
+	switch(level)
 	{
-	    
+
 	case 0:
 	    /* Our best choice for accuracy, but damned slow on ocean */
 	    sc_reg = sc_elim_redund(sc_reg);
 	    break;
-	    
+
 	case 1:
 	    /* Beatrice's best choice: does not deal with minmax2 (only)
 	     * but still requires 74 minutes of real time
@@ -339,7 +339,7 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	     */
 	    sc_nredund(&sc_reg);
 	    break;
-	    
+
 	case 2:
 	    /* Francois' own: does most of the easy stuff.
 	     * Fails on mimax2 and sum_prec, but it is somehow
@@ -352,13 +352,13 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	     */
 	    sc_reg = sc_strong_normalize(sc_reg);
 	    break;
-	    
+
 	case 5:
 	    /* Same plus a good feasibility test
 	     */
 	    sc_reg = sc_strong_normalize3(sc_reg);
 	    break;
-	    
+
 	case 3:
 	    /* Similar, but variable are actually substituted
 	     * which is sometimes painful when a complex equations
@@ -378,7 +378,7 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 		sc_strong_normalize4(sc_reg,
 		    (char * (*)(Variable)) external_value_name);
 	    break;
-	    
+
 	case 7:
 	    /* Same plus a good feasibility test, plus variable selection
 	     * for elimination, plus equation selection for elimination
@@ -387,21 +387,21 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 		sc_strong_normalize5(sc_reg,
 		    (char * (*)(Variable)) external_value_name);
 	    break;
-	    
+
 	case 4:
-	    /* Pretty lousy: equations are not even used to eliminate 
+	    /* Pretty lousy: equations are not even used to eliminate
 	     * redundant inequalities!
 	     */
 	    sc_reg = sc_normalize(sc_reg);
 	    break;
-	    
+
 	default:
 	    pips_error("region_sc_normalize", "unknown level %d\n", level);
 	}
-	
-	if (SC_EMPTY_P(sc_reg))	
-	    sc_reg = sc_empty(b);	
-	else 
+
+	if (SC_EMPTY_P(sc_reg))
+	    sc_reg = sc_empty(b);
+	else
 	    base_rm(b);
 
 	sc_reg->dimension = vect_size(sc_reg->base);
@@ -452,10 +452,10 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
   region_system_(reg) = cell_system_sc_append_and_normalize(sc_reg, sc, level);
 }
 
-/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only, 
+/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only,
  *                        scalars_only, bool nredund_p)
- * input    : a list of regions, a Psysteme and two booleans. 
- * output   : a list of regions; 
+ * input    : a list of regions, a Psysteme and two booleans.
+ * output   : a list of regions;
  * modifies : the regions contained in the list.
  * comment  : add to the predicate of each region the system sc. if arrays_only
  *            is true, scalar variables regions are not concerned. if
@@ -479,30 +479,30 @@ list regions_sc_append_and_normalize(list l_reg, Psysteme sc,
 	MAP(EFFECT, reg,
 	    {
 		boolean scalar_p = region_scalar_p(reg);
-		
-		if ((scalar_p && !arrays_only) || (!scalar_p && !scalars_only)) 
+
+		if ((scalar_p && !arrays_only) || (!scalar_p && !scalars_only))
 		{
 		    region_sc_append_and_normalize(reg, sc, level);
 		    if (!region_empty_p(reg))
 			l_res = region_add_to_regions(reg, l_res);
 		    else
 			region_free(reg);
-		} 
+		}
 		else
 		{
-		    l_res = region_add_to_regions(reg, l_res); 
+		    l_res = region_add_to_regions(reg, l_res);
 		}
-	    }, l_reg);	
-    gen_free_list(l_reg);	
+	    }, l_reg);
+    gen_free_list(l_reg);
     }
     return(l_res);
 }
 
 /* void array_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
- * input    : a list of regions and the Psysteme to add. 
+ * input    : a list of regions and the Psysteme to add.
  * output   : nothing.
  * modifies : the regions contained in the list.
- * comment  : add to the predicate of each array region the system sc. 
+ * comment  : add to the predicate of each array region the system sc.
  */
 list array_regions_sc_append_and_normalize(list l_reg, Psysteme sc, int level)
 {
@@ -516,7 +516,7 @@ list array_regions_sc_append_and_normalize(list l_reg, Psysteme sc, int level)
  * output   : nothing.
  * modifies : the initial region to which a copy of sc is appended.
  * comment  : add to the predicate of the region a copy of the system sc.
- *            redundancies are then eliminated if nredund_p is true. 
+ *            redundancies are then eliminated if nredund_p is true.
  */
 void region_sc_append(region reg, Psysteme sc, bool nredund_p)
 {
@@ -524,10 +524,10 @@ void region_sc_append(region reg, Psysteme sc, bool nredund_p)
     region_sc_append_and_normalize(reg, sc, level);
 }
 
-/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only, 
+/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only,
  *                        scalars_only, bool nredund_p)
- * input    : a list of regions, a Psysteme and two booleans. 
- * output   : a list of regions; 
+ * input    : a list of regions, a Psysteme and two booleans.
+ * output   : a list of regions;
  * modifies : the regions contained in the list.
  * comment  : add to the predicate of each region the system sc. if arrays_only
  *            is true, scalar variables regions are not concerned. if
@@ -547,10 +547,10 @@ list regions_sc_append(list l_reg, Psysteme sc,
 
 
 /* void all_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
- * input    : a list of regions and the Psysteme to add. 
+ * input    : a list of regions and the Psysteme to add.
  * output   : nothing.
  * modifies : the regions contained in the list.
- * comment  : add to the predicate of each region the system sc. 
+ * comment  : add to the predicate of each region the system sc.
  */
 list all_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
@@ -559,10 +559,10 @@ list all_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 }
 
 /* void scalar_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
- * input    : a list of regions and the Psysteme to add. 
+ * input    : a list of regions and the Psysteme to add.
  * output   : nothing.
  * modifies : the regions contained in the list.
- * comment  : add to the predicate of each region the system sc. 
+ * comment  : add to the predicate of each region the system sc.
  */
 list scalar_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
@@ -571,10 +571,10 @@ list scalar_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 }
 
 /* void array_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
- * input    : a list of regions and the Psysteme to add. 
+ * input    : a list of regions and the Psysteme to add.
  * output   : nothing.
  * modifies : the regions contained in the list.
- * comment  : add to the predicate of each array region the system sc. 
+ * comment  : add to the predicate of each array region the system sc.
  */
 list array_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
@@ -590,16 +590,16 @@ list array_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 
 /* list regions_remove_variable_regions(list l_reg, l_var)
  * input    : a list of reigons and a list of variables
- * output   : a list of regions 
+ * output   : a list of regions
  * modifies : nothing.
  * comment  : the returned list of regions is the same as the input
  *            list, except that the regions corresponding to the variables
- *            in l_var are removed.	
+ *            in l_var are removed.
  */
 list regions_remove_variables_regions(list l_reg, list l_var)
 {
     list l_res = NIL;
-    
+
     MAP(REGION, reg,
     {
 	if (gen_find_eq(region_entity(reg),l_var) == entity_undefined)
@@ -617,19 +617,19 @@ list regions_remove_variables_regions(list l_reg, list l_var)
  * output   : nothing.
  * modifies : the list of regions
  * comment  : in the array reigons of l_reg, the variable old_entity
- *            that appears in the predicates is replaced with new_entity.	
+ *            that appears in the predicates is replaced with new_entity.
  */
 void array_regions_variable_rename(list l_reg, entity old_entity, entity new_entity)
 {
-    MAP(EFFECT, reg, 
+    MAP(EFFECT, reg,
     {
 	if (!region_scalar_p(reg))
 	{
 	    Psysteme sc_reg = region_system(reg);
-      
+
 	    if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
-	    { 
-		sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity, 
+	    {
+		sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity,
 					    (Variable) new_entity);
 	    }
 	}
@@ -641,13 +641,13 @@ void array_regions_variable_rename(list l_reg, entity old_entity, entity new_ent
  * output   : nothing.
  * modifies : the list of regions
  * comment  : in the array regions of l_reg, the variable old_entity
- *            that appears in the predicates is replaced with new_entity.	
+ *            that appears in the predicates is replaced with new_entity.
  */
 void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entity)
 {
   MAP(EFFECT, reg, {
     Psysteme sc_reg = region_system(reg);
-      
+
     if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg)) {
       Pbase b = sc_base(sc_reg);
       ifdebug(8){
@@ -681,7 +681,7 @@ void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entit
 	}
       }
 
-      sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity, 
+      sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity,
 				    (Variable) new_entity);
     }
   },l_reg);
@@ -691,11 +691,11 @@ void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entit
  * input    : an effect, an old entity e1 to rename into a new entity e2.
  * output   : nothing
  * modifies : the system of reg.
- * comment  : adapted from transformer_value_substitute. 
+ * comment  : adapted from transformer_value_substitute.
  *
  * if e2 does not appear in t initially:
  *    replaces occurences of value e1 by value e2 in transformer t's arguments
- *    and relation fields; 
+ *    and relation fields;
  * else
  *    error
  * fi
@@ -739,8 +739,8 @@ region_value_substitute(region reg, entity e1, entity e2)
  *            or indirectly
  * modifies : nothing
  * comment  : "cfc" stands for "Composante Fortement Connexe"; because
- *            if systems are considered as graphs which vertices are 
- *            the constraints and which edges connect constraints 
+ *            if systems are considered as graphs which vertices are
+ *            the constraints and which edges connect constraints
  *            concerning at least one common variable, then this
  *            function searches for the variables contained in
  *            the strongly connected component that also contains
@@ -752,15 +752,15 @@ list region_entities_cfc_variables(region reg, list l_ent)
 }
 
 /* list sc_entities_cfc_variables(Psysteme sc, list l_ent)
- * input    : a system of constraints and a list of entities that may appear 
- *            in its constraints.   
+ * input    : a system of constraints and a list of entities that may appear
+ *            in its constraints.
  *            expression.
  * output   : the list of variables that define the initial entities, directly
  *            or indirectly
  * modifies : nothing
  * comment  : "cfc" stands for "Composante Fortement Connexe"; because
- *            if systems are considered as graphs which vertices are 
- *            the constraints and which edges connect constraints 
+ *            if systems are considered as graphs which vertices are
+ *            the constraints and which edges connect constraints
  *            concerning at least one common variable, then this
  *            function searches for the variables contained in
  *            the strongly connected component that also contains
@@ -799,88 +799,88 @@ list sc_entities_cfc_variables(Psysteme sc, list l_ent)
 	l_ent);
 
     v_res = vect_dup(v_ent);
-    
-    /* sc has no particularity. We just scan its equalities and inequalities 
-     * to find which variables are related to the initial entities */ 
+
+    /* sc has no particularity. We just scan its equalities and inequalities
+     * to find which variables are related to the initial entities */
     while(vect_common_variables_p((Pvecteur) sc_base(sc), v_res))
-    { 
-	/* equalities first */ 
+    {
+	/* equalities first */
 	c = sc_egalites(sc);
-	c_pred = (Pcontrainte) NULL; 
-	while (c != (Pcontrainte) NULL) { 
-	    c_suiv = c->succ; 
-	    /* if a constraint is found in sc, that contains 
-	     * a variable that already belongs to v_res then this constraint 
-	     * is removed from sc and its variables are added to v_res */ 
+	c_pred = (Pcontrainte) NULL;
+	while (c != (Pcontrainte) NULL) {
+	    c_suiv = c->succ;
+	    /* if a constraint is found in sc, that contains
+	     * a variable that already belongs to v_res then this constraint
+	     * is removed from sc and its variables are added to v_res */
 	    if (vect_common_variables_p(c->vecteur,v_res))
-	    { 
-		if (c_pred != (Pcontrainte) NULL) 
-		    c_pred->succ = c_suiv; 
-		else 
-		    sc_egalites(sc) = c_suiv; 
-		for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-		{ 
-		    if (vecteur_var(v) != TCST) 
-			vect_add_elem(&v_res, (Variable) vecteur_var(v), VALUE_ONE); 
-		} 
-	    } 
-	    else 
-		c_pred = c; 
-	    c = c_suiv;
-	} 
-	
-	/* inequalities then */ 
-	c = sc_inegalites(sc); 
-	c_pred = (Pcontrainte) NULL; 
-	while (c != (Pcontrainte) NULL) 
-	{ 
-	    c_suiv = c->succ; 
-	    /* if a constraint is found in sc, that contains a variable that 
-	     * already belongs to v_res then this constraint is removed from 
-	     * sc and its variables are added to v_res */ 
-	    if (vect_common_variables_p(c->vecteur,v_res))
-	    { 
-		if (c_pred != (Pcontrainte) NULL) 
-		    c_pred->succ = c_suiv; 
-		else 
-		    sc_inegalites(sc) = c_suiv; 
-		for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-		{ 
-		    if (vecteur_var(v) != TCST) 
+	    {
+		if (c_pred != (Pcontrainte) NULL)
+		    c_pred->succ = c_suiv;
+		else
+		    sc_egalites(sc) = c_suiv;
+		for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ)
+		{
+		    if (vecteur_var(v) != TCST)
 			vect_add_elem(&v_res, (Variable) vecteur_var(v), VALUE_ONE);
-		} 
-	    } 
-	    else 
-		c_pred = c; 
+		}
+	    }
+	    else
+		c_pred = c;
 	    c = c_suiv;
-	} 
-	
+	}
+
+	/* inequalities then */
+	c = sc_inegalites(sc);
+	c_pred = (Pcontrainte) NULL;
+	while (c != (Pcontrainte) NULL)
+	{
+	    c_suiv = c->succ;
+	    /* if a constraint is found in sc, that contains a variable that
+	     * already belongs to v_res then this constraint is removed from
+	     * sc and its variables are added to v_res */
+	    if (vect_common_variables_p(c->vecteur,v_res))
+	    {
+		if (c_pred != (Pcontrainte) NULL)
+		    c_pred->succ = c_suiv;
+		else
+		    sc_inegalites(sc) = c_suiv;
+		for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ)
+		{
+		    if (vecteur_var(v) != TCST)
+			vect_add_elem(&v_res, (Variable) vecteur_var(v), VALUE_ONE);
+		}
+	    }
+	    else
+		c_pred = c;
+	    c = c_suiv;
+	}
+
 	/* update sc base */
 	base_rm(sc->base);
-	sc_base(sc) = (Pbase) NULL; 
-	(void) sc_creer_base(sc); 
-    } /* while */ 
-    
+	sc_base(sc) = (Pbase) NULL;
+	(void) sc_creer_base(sc);
+    } /* while */
+
     sc_rm(sc);
     sc = NULL;
-    
+
     /* construction of the list of variables. It contains all the variables of
-     * v_res except for the initial entities */  
-    for(; !VECTEUR_NUL_P(v_res); v_res = v_res->succ) 
+     * v_res except for the initial entities */
+    for(; !VECTEUR_NUL_P(v_res); v_res = v_res->succ)
     {
 	entity e = (entity) v_res->var;
 	if (!vect_contains_variable_p(v_ent, (Variable) e))
-	    l_res = CONS(ENTITY, e, l_res);	
+	    l_res = CONS(ENTITY, e, l_res);
     }
-    
-    vect_rm(v_res); 
-    
+
+    vect_rm(v_res);
+
     ifdebug(8) {
 	pips_debug(8, "l_res : \n");
 	print_arguments(l_res);
     }
 
-    return(l_res); 
+    return(l_res);
 }
 
 
@@ -888,11 +888,11 @@ list sc_entities_cfc_variables(Psysteme sc, list l_ent)
 /* REGIONS / LISTS OF REGIONS CONVERSION                                         */
 /*********************************************************************************/
 
-/* list region_to_list(reg) 
+/* list region_to_list(reg)
  * input    : a region
- * output   : a list containing this region 
+ * output   : a list containing this region
  * modifies : nothing
- * comment  : it does not duplicate the region.	
+ * comment  : it does not duplicate the region.
  */
 list region_to_list(region reg)
 {
@@ -917,7 +917,7 @@ effect reg;
  * input    : a region
  * output   : an empty list of regions
  * modifies : nothing
- * comment  : for compatibility	
+ * comment  : for compatibility
  */
 list regions_to_nil_list(region reg1 __attribute__ ((unused)),
 			 region reg2 __attribute__ ((unused)))
@@ -929,7 +929,7 @@ list regions_to_nil_list(region reg1 __attribute__ ((unused)),
  * input    : a region
  * output   : an empty list of regions
  * modifies : nothing
- * comment  : for compatibility	
+ * comment  : for compatibility
  */
 list region_to_nil_list(region reg __attribute__ ((unused)))
 {
@@ -940,14 +940,15 @@ list region_to_nil_list(region reg __attribute__ ((unused)))
 /* list regions_to_write_regions(list l_reg)
  * input    : a list of regions.
  * output   : the same list of regions converted to a list of write regions.
- * modifies : the regions in l_reg are converted to write regions 
- * comment  : 	
+ * modifies : the regions in l_reg are converted to write regions
+ * comment  :
  */
 list regions_to_write_regions(list l_reg)
 {
     MAP(REGION, reg,
     {
-	region_action_tag(reg) = is_action_write; 
+      /* Memory leak */
+      region_action(reg) = make_action_write_memory();
     },
 	l_reg);
     return(l_reg);
@@ -956,18 +957,18 @@ list regions_to_write_regions(list l_reg)
 
 /* list regions_read_regions(list l_reg)
  * input    : a list of regions read and write.
- * output   : a list of read regions consisting of the read regions 
+ * output   : a list of read regions consisting of the read regions
  *            of the initial list.
  * modifies : nothing.
- * comment  : sharing between the initial and the returned lists components.	
+ * comment  : sharing between the initial and the returned lists components.
  */
 list regions_read_regions(list l_reg)
 {
-    list l_read = NIL; 
-    
+    list l_read = NIL;
+
     MAP(REGION, reg,
      {
-	 if (action_read_p(region_action(reg))) 
+	 if (action_read_p(region_action(reg)))
 	     l_read = region_add_to_regions(reg, l_read);
      },
 	l_reg);
@@ -977,19 +978,19 @@ list regions_read_regions(list l_reg)
 
 /* list regions_write_regions(list l_reg)
  * input    : a list of regions read and write.
- * output   : a list of write regions consisting of the write regions 
+ * output   : a list of write regions consisting of the write regions
  *            of the initial list.
  * modifies : nothing.
- * comment  : sharing between the initial and the returned lists components.	
+ * comment  : sharing between the initial and the returned lists components.
  */
 list regions_write_regions(l_reg)
 list l_reg;
 {
-    list l_write = NIL; 
-    
+    list l_write = NIL;
+
     MAP(REGION, reg,
      {
-	 if (action_write_p(region_action(reg))) 
+	 if (action_write_p(region_action(reg)))
 	     l_write = region_add_to_regions(reg, l_write);
      },
 	l_reg);
@@ -1057,7 +1058,7 @@ reference make_regions_reference(entity ent)
 /* static predicate make_whole_array_predicate(reference ref)
  * input    : a variable, which can be either a scalar or an array.
  * output   : a predicate; its system contains no constraint, but
- *            the base of the latter contains the phi variables if 
+ *            the base of the latter contains the phi variables if
  *            the input variable is an array.
  * modifies : nothing;
  * comment  :
@@ -1113,7 +1114,7 @@ static Psysteme make_whole_array_predicate(entity e)
  @return an effect representing a region corresponding to the reference.
 
  */
-effect make_reference_region(reference ref, tag tac)
+effect make_reference_region(reference ref, action tac)
 {
   entity e = reference_variable(ref);
   type t = entity_type(e);
@@ -1136,7 +1137,7 @@ effect make_reference_region(reference ref, tag tac)
     }
 
   if (dummy_parameter_entity_p(e))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)\n", 
+    pips_internal_error("the input reference entity is a dummy parameter (%s)\n",
 			entity_name(e));
 
   /* FI: If t is a pointer type, then d should depend on the type_depth
@@ -1235,7 +1236,7 @@ effect make_reference_region(reference ref, tag tac)
      reference is built for each region. BC */
   reg = make_region(
 		    make_reference(reference_variable(ref), reg_ref_inds),
-		    make_action(tac, UU),
+		    copy_action(tac),
 		    make_approximation
 		    (linear_p? is_approximation_must : is_approximation_may,
 		     UU),
@@ -1278,21 +1279,21 @@ reference make_regions_psi_reference(entity ent)
 }
 
 
-/* effect reference_whole_region(reference ref, tag tac, tap)
+/* effect reference_whole_region(reference ref, action tac, tap)
  * input    : a variable reference, and the action of the region.
  * output   : a region representing the entire memory space allocated
  *            to the variable *reference* (and not entity, this is useful
- *            for partially subscripted arrays, as is the case for 
+ *            for partially subscripted arrays, as is the case for
  *            PRINT *, A, where A is an array, see for instance
  *            Regions/incr3. BC).
- *            the systeme of constraints is a sc_rn(phi_1, ..., phi_n) 
- *            except if REGIONS_WITH_ARRAY_BOUNDS is true. 
+ *            the systeme of constraints is a sc_rn(phi_1, ..., phi_n)
+ *            except if REGIONS_WITH_ARRAY_BOUNDS is true.
  *            The resulting region is a MUST region if everything is linear,
  *            MAY otherwise. It's the responsibility of the caller to change it
  *            according to the calling context. (BC).
  * modifies : nothing.
  */
-effect reference_whole_region(reference ref, tag tac)
+effect reference_whole_region(reference ref, action tac)
 {
     entity e = reference_variable(ref);
     type t = entity_type(e);
@@ -1383,7 +1384,7 @@ effect reference_whole_region(reference ref, tag tac)
 
     reg = make_region(
 		      make_reference(reference_variable(ref), reg_ref_inds),
-		      make_action(tac, UU),
+		      copy_action(tac),
 		      make_approximation
 		      (linear_p? is_approximation_must : is_approximation_may,
 		       UU),
@@ -1399,10 +1400,10 @@ effect reference_whole_region(reference ref, tag tac)
 
 }
 
-region entity_whole_region(entity e, tag tac)
+region entity_whole_region(entity e, action tac)
 {
     region new_eff;
-    action ac = make_action(tac, UU);
+    action ac = copy_action(tac);
     approximation ap = make_approximation(is_approximation_may, UU);
 
     new_eff = make_region(make_regions_reference(e), ac, ap,
@@ -1427,7 +1428,7 @@ list region_to_store_independent_region_list(effect reg,
 					     bool __attribute__ ((unused)) force_may_p)
 {
     reference ref =  effect_any_reference(reg);
-    effect eff = reference_whole_region(ref, region_action_tag(reg));
+    effect eff = reference_whole_region(ref, region_action(reg));
     return(CONS(EFFECT,eff,NIL));
 }
 
@@ -1436,8 +1437,8 @@ list region_to_store_independent_region_list(effect reg,
  * input    : a convex region and an expression
  * output   : nothing
  * modifies : the region reg, and normalizes the expression
- * comment  : adds a last dimension phi_last to the region. If the expression 
- *            is normalizable, also adds a constraint phi_last = exp. Else, 
+ * comment  : adds a last dimension phi_last to the region. If the expression
+ *            is normalizable, also adds a constraint phi_last = exp. Else,
  *            changes the approximation into may.
  */
 void convex_region_add_expression_dimension(effect reg, expression exp)
@@ -1452,7 +1453,7 @@ void convex_region_add_expression_dimension(effect reg, expression exp)
       pips_debug(8, "begin with region :\n");
       print_region(reg);
     }
-  
+
   pips_assert("region cell must be a reference\n", cell_reference_p(reg_c));
 
   ref = cell_reference(reg_c);
@@ -1536,15 +1537,15 @@ void convex_region_change_ith_dimension_expression(effect reg, expression exp,
 
 /**
    @brief copies the input_effect and converts all it's reference indices that refer to
-          field entities to a phi variable, and add the corresponding constraint 
-	  (PHI_x == rank) in the descriptor system, rank being the integer corresponding 
+          field entities to a phi variable, and add the corresponding constraint
+	  (PHI_x == rank) in the descriptor system, rank being the integer corresponding
 	  to the field rank in the field list of the ancestor derived type.
    @input input_effect is a convex effect, and is not modified.
    @return a new effect.
  */
 effect convex_effect_field_to_rank_conversion(effect input_effect)
 {
-  effect eff = copy_effect(input_effect); 
+  effect eff = copy_effect(input_effect);
   cell c = effect_cell(input_effect);
   /* if it's a preference, we are sure there are no field dimensions */
   if (cell_reference_p(c))
@@ -1552,7 +1553,7 @@ effect convex_effect_field_to_rank_conversion(effect input_effect)
       reference r = cell_reference(c);
       list l_ind = reference_indices(r);
       int dim = 1;
-      
+
       FOREACH(EXPRESSION, ind, l_ind)
 	{
 	  syntax s = expression_syntax(ind);
@@ -1582,23 +1583,23 @@ effect convex_effect_field_to_rank_conversion(effect input_effect)
 
 
 /**
- 
+
  @param eff1 and eff2 are convex regions.
- @return eff1 (which is modified) : the reference indices of eff2 
+ @return eff1 (which is modified) : the reference indices of eff2
          (accordingly shifted) are appended to the reference indices of eff1 ;
-	 and the Psystem of eff2 is appended to eff1 after renaming of phi 
+	 and the Psystem of eff2 is appended to eff1 after renaming of phi
 	 variables.
  */
 effect region_append(effect eff1, effect eff2)
 {
   list l_ind_1 = reference_indices(effect_any_reference(eff1));
   int nb_phi_1 = (int) gen_length(l_ind_1);
-  
+
   list l_ind_2 = reference_indices(effect_any_reference(eff2));
   int nb_phi_2 = (int) gen_length(l_ind_2);
 
   Psysteme sc2 = region_system(eff2);
-  
+
   int i;
 
   ifdebug(8) {
@@ -1621,26 +1622,26 @@ effect region_append(effect eff1, effect eff2)
 	l_ind_1 = gen_nconc(l_ind_1,
 			    CONS(EXPRESSION,
 				 make_phi_expression(nb_phi_1+i),
-				 NIL));  
+				 NIL));
       POP(l_ind_2);
     }
   reference_indices(effect_any_reference(eff1)) = l_ind_1;
-  
+
   if(nb_phi_1 >0)
     {
       for(i=nb_phi_2; i>=1; i--)
 	{
 	  entity old_phi = make_phi_entity(i);
 	  entity new_phi = make_phi_entity(nb_phi_1+i);
-	  
-	  sc_variable_rename(sc2, old_phi, new_phi);	  
+
+	  sc_variable_rename(sc2, old_phi, new_phi);
 	}
     }
 
   region_sc_append(eff1, sc2, TRUE);
-  
-  effect_approximation_tag(eff1) = 
-    approximation_and(effect_approximation_tag(eff1), 
+
+  effect_approximation_tag(eff1) =
+    approximation_and(effect_approximation_tag(eff1),
 		      effect_approximation_tag(eff2));
 
   ifdebug(8) {
@@ -1690,7 +1691,7 @@ entity make_phi_entity(int n)
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, phi_name, (char *) NULL));
 
-	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
+	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined)
 	{
 	    v = make_entity(s, make_scalar_integer_type(4),
 			    make_storage(is_storage_rom, UU),
@@ -2017,7 +2018,7 @@ entity make_psi_entity(int n)
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, psi_name, (char *) NULL));
 
-	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
+	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined)
 	{
 	    v = make_entity(s,
 			    make_scalar_integer_type(4),
@@ -2112,7 +2113,7 @@ entity make_rho_entity(int n)
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, rho_name, (char *) NULL));
 
-	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
+	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined)
 	{
 	    v = make_entity(s,
 			    make_scalar_integer_type(4),
@@ -2140,7 +2141,7 @@ list rho_entities_list(int rho_min, int rho_max)
 boolean rho_reference_p( reference ref )
 {
   list l = reference_indices(ref);
-  
+
   for (;!ENDP(l); POP(l))
     {
       entity e = reference_variable
@@ -2215,11 +2216,11 @@ list cell_reference_phi_cfc_variables(reference ref, Psysteme sc)
     l_ent = psi_entities_list(1, (int) gen_length(reference_indices(ref)));
   else if (rho_reference_p(ref))
     l_ent = rho_entities_list(1, (int) gen_length(reference_indices(ref)));
-  else 
+  else
     l_ent = phi_entities_list(1, (int) gen_length(reference_indices(ref)));
 
   return(sc_entities_cfc_variables(sc, l_ent));
-  
+
 }
 
 /* list region_phi_cfc_variables(effect reg)
@@ -2239,7 +2240,7 @@ list region_phi_cfc_variables(region reg)
 {
     if (region_scalar_p(reg))
 	return(NIL);
-    else 
+    else
       return(cell_reference_phi_cfc_variables(effect_any_reference(reg), region_system(reg)));
 }
 
@@ -2295,15 +2296,15 @@ void phi_to_psi_region(region reg)
     free_reference(effect_any_reference(reg));
     pips_assert("region cell must be a reference\n",
 		cell_reference_p(effect_cell(reg)));
-    cell_reference(effect_cell(reg)) = reg_ref;    
+    cell_reference(effect_cell(reg)) = reg_ref;
 }
 
 
 boolean psi_reference_p(reference ref)
 {
-  
+
   list l = reference_indices(ref);
-  
+
   for (;!ENDP(l); POP(l))
     {
       entity e = reference_variable
@@ -2469,14 +2470,14 @@ void region_sc_sort(Psysteme sc, Pbase sorted_base)
 }
 
 
-/* Pcontrainte region_constraints_sort(Pcontrainte c, Pbase sorted_base) 
+/* Pcontrainte region_constraints_sort(Pcontrainte c, Pbase sorted_base)
  * input    : a region list of contraints, a base giving the priority order
  *            of the variables (phi variables first).
  * output   : the sorted list of constraints.
  * modifies : c.
  * comment  : sorts the constraints using compare_region_constraints.
  */
-Pcontrainte 
+Pcontrainte
 region_constraints_sort(
     Pcontrainte c,
     Pbase sorted_base,
@@ -2806,7 +2807,7 @@ list function_formal_parameters(entity func)
     pips_assert("func must be a function",entity_module_p(func));
 
     decl = code_declarations(entity_code(func));
-    MAP(ENTITY, e, 
+    MAP(ENTITY, e,
      {
 	 if(storage_formal_p(entity_storage(e)))
 	     formals = CONS(ENTITY, e, formals);
@@ -2956,7 +2957,7 @@ bool empty_convex_context_p(transformer context)
 	 * even if unreachable. Thus transformer are not computed,
 	 * orderings are not set... however gen_multi_recurse goes there.
 	 * I just store NIL, what seems reasonnable an answer.
-	 * It seems to be sufficient for other passes. 
+	 * It seems to be sufficient for other passes.
 	 * I should check that it is indeed the exit node?
 	 * FC (RK).
 	 */

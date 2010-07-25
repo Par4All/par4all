@@ -52,7 +52,7 @@
 
 
 effect
-reference_to_convex_region(reference ref, tag  act /* action tag */ ,
+reference_to_convex_region(reference ref, action act /* action tag */ ,
 			   bool __attribute__((unused)) use_preference_p)
 {
   return make_reference_region(ref, act);

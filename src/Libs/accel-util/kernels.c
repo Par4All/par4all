@@ -240,7 +240,7 @@ statement effects_to_dma(statement stat,
     if(get_bool_property("KERNEL_LOAD_STORE_FORCE_LOAD")
        &&(dma_load_p(s) && action_write_p(effect_action(e)))){
 	effect hack = copy_effect(e);
-	effect_action(hack) = make_action_read();
+	effect_action(hack) = make_action_read_memory();
 	effects=CONS(EFFECT,hack,effects);
       }
   }

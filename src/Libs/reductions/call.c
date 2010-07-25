@@ -47,7 +47,7 @@ summary_to_proper_reference(
     reference r)
 {
     effect e = make_simple_effect(r, /* persistent! */
-			   make_action(is_action_write, UU),
+				  make_action_write_memory(),
 			   make_approximation(is_approximation_must, UU));
     list /* of effect */ lef, /* of reference */ lref = NIL;
 

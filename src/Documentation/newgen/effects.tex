@@ -75,7 +75,8 @@ locations and the effects of statements~\footnote{Several of the
   programs, and because the extension to C programs required the
   extension of the \texttt{cell} domain.}.
 
-\section{Imported domains}
+\section{Imported Domains}
+
 \domain{import entity from "ri.newgen"}
 {}
 \domain{import reference from "ri.newgen"}
@@ -89,7 +90,7 @@ locations and the effects of statements~\footnote{Several of the
 \domain{External Psysteme}
 {}
 
-\section{Representing memory locations}
+\section{Representing Memory Locations}
 
 A first solution to represent memory locations would be to use dummy
 memory addresses, potentially one for each memory cell. However
@@ -430,13 +431,29 @@ caller's frame to avoid this problem.
 \label{subsubsection-action}
 \index{Action}
 
-\domain{Action = read:unit + write:unit}
+\domain{Action = read:action_kind + write:action_kind}
 {}
 
-Two kinds of memory effects are used in Bernstein parallelization
-conditions \cite{Bern66} and in other program transformation conditions:
-read and write. \verb/IN/ regions are represented by \verb/read/ effects
-and \verb/OUT/ regions by \verb/write/ effects.
+Two different memory effects are used in Bernstein parallelization
+conditions \cite{Bern66} and in other program transformation
+conditions: read (a.k.a. use) and write (a.k.a. def).
+
+To generalize use-def chains and dependence graphs to C source code,
+several new kinds of state mutations must be taken into account. The
+usual state at low level includes only the memory (a.k.a. the store),
+but, at C source level, local variable and type declarations must also
+be considered before distributing loops or eliminating seemingly
+useless statements. So two new kinds of actions are added:
+\verb/environment/ for variable declarations and
+\verb/type_declaration/ for declarations of types, struct, union and
+enum. This information is carried by the \verb/action_kind/ domain.
+
+\domain{Action_kind = store:unit + environment:unit + type_declaration:unit}
+{}
+
+\verb/IN/ regions are
+represented by \verb/read/ effects and \verb/OUT/ regions by
+\verb/write/ effects. The action kind is \verb/store/.
 
 
 \subsubsection{Approximation of an Effect}

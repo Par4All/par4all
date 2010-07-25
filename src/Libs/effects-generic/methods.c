@@ -50,8 +50,8 @@
 
 
 
-/* GENERIC FUNCTIONS on lists of effects to be instanciated for specific 
-   types of effects */
+/* GENERIC FUNCTIONS on lists of effects to be instanciated for
+   specific types of effects */
 
 /* consistency checking */
 bool (*effect_consistent_p_func)(effect);
@@ -66,11 +66,11 @@ effect (*effect_dup_func)(effect eff);
 void (*effect_free_func)(effect eff);
 
 /* make functions for effects */
-effect (*reference_to_effect_func)(reference, tag /* action */, 
+effect (*reference_to_effect_func)(reference, action /* action */,
 				   bool /* use_preference */);
 list (*effect_to_store_independent_effect_list_func)(effect, bool);
 void (*effect_add_expression_dimension_func)(effect eff, expression exp);
-void (*effect_change_ith_dimension_expression_func)(effect eff, expression exp, 
+void (*effect_change_ith_dimension_expression_func)(effect eff, expression exp,
 					       int i);
 
 /* union */

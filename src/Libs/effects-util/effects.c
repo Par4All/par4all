@@ -140,7 +140,7 @@ statement_mapping listmap_to_effectsmap(l_map)
 statement_mapping l_map;
 {
     statement_mapping efs_map = MAKE_STATEMENT_MAPPING();
-    
+
     STATEMENT_MAPPING_MAP(s,val,{
 	hash_put((hash_table) efs_map, (char *) s, (char *) list_to_effects((list) val));
     }, l_map);
@@ -274,7 +274,7 @@ bool malloc_effect_p(effect e)
 /*************** I/O EFFECTS *****************/
 bool io_effect_entity_p(entity e)
 {
-    return io_entity_p(e) && 
+    return io_entity_p(e) &&
 	same_string_p(entity_local_name(e), IO_EFFECTS_ARRAY_NAME);
 }
 
@@ -302,7 +302,7 @@ bool effect_comparable_p(effect e1, effect e2)
   if(v1==v2) {
     action a1 = effect_action(e1);
     action a2 = effect_action(e2);
-    if(action_tag(a1)==action_tag(a2))
+    if(action_equal_p(a1, a2))
       {
 
 	/* Check the subscript lists because p and p[0] do not refer
@@ -619,9 +619,73 @@ effect effect_interference(effect eff1, effect eff2)
   return n_eff1;
 }
 
+/* Functions dealing with actions */
+
 string action_to_string(action ac)
 {
+  /* This is correct, but imprecise when action_kinds are taken into
+     account */
   return action_read_p(ac)? "read" : "write";
+}
+
+string full_action_to_string(action ac)
+{
+  string s = string_undefined;
+  if(action_read_p(ac)) {
+    action_kind ak = action_read(ac);
+
+    if(action_kind_store_p(ak))
+      s = "read memory";
+    else if(action_kind_environment_p(ak))
+      s = "read environment";
+    else if(action_kind_type_declaration_p(ak))
+      s = "read type";
+  }
+  else {
+    action_kind ak = action_write(ac);
+
+    if(action_kind_store_p(ak))
+      s = "write memory";
+    else if(action_kind_environment_p(ak))
+      s = "write environment";
+    else if(action_kind_type_declaration_p(ak))
+      s = "write type";
+  }
+  return s;
+}
+
+/* To ease the extension of action with action_kind */
+action make_action_write_memory(void)
+{
+  action a = make_action_write(make_action_kind_store());
+  return a;
+}
+
+action make_action_read_memory(void)
+{
+  action a = make_action_read(make_action_kind_store());
+  return a;
+}
+
+bool action_equal_p(action a1, action a2)
+{
+  bool equal_p = FALSE;
+
+  if(action_tag(a1)==action_tag(a2)) {
+    if(action_read_p(a1)) {
+      action_kind ak1 = action_read(a1);
+      action_kind ak2 = action_read(a2);
+
+      equal_p = action_kind_tag(ak1)==action_kind_tag(ak2);
+    }
+    else /* action_write_p(a1) */ {
+      action_kind ak1 = action_write(a1);
+      action_kind ak2 = action_write(a2);
+
+      equal_p = action_kind_tag(ak1)==action_kind_tag(ak2);
+    }
+  }
+  return equal_p;
 }
 
 bool effects_write_variable_p(list el, entity v)
