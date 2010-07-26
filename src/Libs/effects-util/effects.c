@@ -177,7 +177,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
    MAP(EFFECT, an_effect,
        {
           entity a_variable = reference_variable(effect_any_reference(an_effect));
-          
+
           if (action_write_p(effect_action(an_effect))
               && (variable_return_p(a_variable)
 		  || variable_is_a_module_formal_parameter_p(a_variable,
@@ -286,7 +286,7 @@ bool io_effect_p(effect e)
 bool std_file_effect_p(effect e)
 {
   const char * s = entity_user_name(effect_entity(e));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr")); 
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
 }
 
 /* Can we merge these two effects because they are equal or because
@@ -770,28 +770,28 @@ bool effect_list_can_be_safely_full_freed_p(list el)
 
 /* tag approximation_and(tag t1, tag t2)
  * input    : two approximation tags.
- * output   : the tag representing their "logical and", assuming that 
+ * output   : the tag representing their "logical and", assuming that
  *            must = true and may = false.
- * modifies :  nothing 
+ * modifies :  nothing
  */
 tag approximation_and(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) && (t2 == is_approximation_must)) 
+    if ((t1 == is_approximation_must) && (t2 == is_approximation_must))
 	return(is_approximation_must);
     else
 	return(is_approximation_may);
 }
 
 
-/* tag approximation_or(tag t1, tag t2) 
+/* tag approximation_or(tag t1, tag t2)
  * input    : two approximation tags.
- * output   : the tag representing their "logical or", assuming that 
+ * output   : the tag representing their "logical or", assuming that
  *            must = true and may = false.
  * modifies : nothing
  */
 tag approximation_or(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) || (t2 == is_approximation_must)) 
+    if ((t1 == is_approximation_must) || (t2 == is_approximation_must))
 	return(is_approximation_must);
     else
 	return(is_approximation_may);
@@ -808,7 +808,7 @@ bool cell_equal_p(cell c1, cell c2)
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
 }
- 
+
 
 /* FI: probably to be moved elsewhere in ri-util */
 /* Here, we only know how to cope (for the time being) with
@@ -825,4 +825,15 @@ reference cell_to_reference(cell c) {
     pips_internal_error("unexpected cell tag\n");
 
   return r;
+}
+
+/* Debugging */
+bool effect_list_consistent_p(list el)
+{
+  bool ok_p = TRUE;
+
+  FOREACH(EFFECT, e, el)
+    ok_p = ok_p && effect_consistent_p(e);
+
+  return ok_p;
 }

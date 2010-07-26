@@ -925,7 +925,7 @@ fortran_summary_to_proper_effects(entity func,
         }
 	else {
 	    /* check if there is no must write effect */
-	    MAP(EFFECT, formal_effect,
+	  FOREACH(EFFECT, formal_effect, func_sdfi)
 		{
 		    entity formal_param = effect_entity(formal_effect);
 
@@ -967,8 +967,7 @@ fortran_summary_to_proper_effects(entity func,
 				     entity_local_name(formal_param));
 			}
 		    }
-		},
-		    func_sdfi);
+		}
 
 	    /* if everything is fine, then the effects are the read effects
 	     * of the expression */
@@ -980,13 +979,12 @@ fortran_summary_to_proper_effects(entity func,
 /* effets of func on static and global variables are translated */
     if (get_bool_property("GLOBAL_EFFECTS_TRANSLATION"))
     {
-	MAP(EFFECT, ef,
+      FOREACH(EFFECT, ef, func_sdfi)
 	    {
 		if (storage_ram_p(entity_storage(effect_entity(ef))))
 		    le = gen_nconc(global_effect_translation
 				   (ef, func, get_current_module_entity()),le);
-	    },
-		func_sdfi);
+	    }
     }
     else
 	/* hack for HPFC: no translation of global effects */

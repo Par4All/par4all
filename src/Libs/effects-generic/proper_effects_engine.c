@@ -1464,6 +1464,8 @@ generic_proper_effects_of_external(entity func, list args)
 	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation\n",
 			      entity_name(func));
     }
+    ifdebug(1) pips_assert("All effects in "le" are consistent",
+			   effect_list_consistent_p(le));
     return le;
 }
 
