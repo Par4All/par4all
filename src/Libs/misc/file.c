@@ -35,6 +35,8 @@
 
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include <dirent.h>
 #include <regex.h>
@@ -569,6 +571,51 @@ safe_copy(char *source, char *target)
     safe_cat(out, in);
     safe_fclose(out, target);
     safe_fclose(in, source);
+}
+
+/* Display a file through $PIPS_MORE (or $PAGER) if stdout is a TTY,
+   on stdout otherwise.
+
+   Return false if the file couldn't be displayed.
+ */
+int
+safe_display(char *fname)
+{
+	if (!file_exists_p(fname))
+	{
+		pips_user_error("View file \"%s\" not found\n", fname);
+		return 0;
+	}
+
+	if (isatty(fileno(stdout))) {
+		int pgpid = fork();
+		if (pgpid)
+		{
+			int status;
+			waitpid(pgpid, &status, 0);
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+				return 1;
+			else
+				return 0;
+		}
+		else
+		{
+			char *pager = getenv("PIPS_MORE");
+			if (!pager)
+				pager = getenv("PAGER");
+			if (!pager)
+				pager = "more";
+			execlp(pager, pager, fname, NULL);
+			pips_internal_error("running %s %s: %s\n",
+					    pager, fname, strerror(errno));
+			exit(127);
+		}
+	} else {
+		FILE * in = safe_fopen(fname, "r");
+		safe_cat(stdout, in);
+		safe_fclose(in, fname);
+		return 1;
+	}
 }
 
 

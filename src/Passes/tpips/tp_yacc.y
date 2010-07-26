@@ -161,8 +161,8 @@ static bool tp_set_current_module(const char* name)
  */
 static bool display_a_resource(const char* rname, const char* mname)
 {
-	string fname, pager = getenv("PAGER");
-	if (!isatty(fileno(stdout))) pager = NULL;
+	string fname;
+	bool ret;
 
 	if (!tp_set_current_module(mname))
 	{
@@ -178,33 +178,21 @@ static bool display_a_resource(const char* rname, const char* mname)
 		return FALSE;
 	}
 
-	if (!file_exists_p(fname))
-	{
-		pips_user_error("View file \"%s\" not found\n", fname);
-		free(fname);
-		return FALSE;
-	}
-
 	if (jpips_is_running)
 	{
 		/* Should tell about what it is?
 		 * What about special formats, such as graphs and all?
 		 */
 		jpips_tag2("show", fname);
-	}
-	else if (pager)
-	{
-		safe_system(concatenate(pager, " ", fname, NULL));
+		ret = TRUE;
 	}
 	else
 	{
-		FILE * in = safe_fopen(fname, "r");
-		safe_cat(stdout, in);
-		safe_fclose(in, fname);
+		ret = safe_display(fname);
 	}
 
 	free(fname);
-	return TRUE;
+	return ret;
 }
 
 static bool remove_a_resource(const char* rname, const char* mname)
