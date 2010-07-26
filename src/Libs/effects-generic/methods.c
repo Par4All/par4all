@@ -238,7 +238,7 @@ generic_effects_reset_all_methods()
     effects_loop_normalize_func = (list (*)(list, entity, range, entity* , descriptor ,bool)) UNDEF;
     effects_union_over_range_op = (list (*)(list, entity, range, descriptor)) UNDEF;
 
-    reference_to_effect_func = (effect(*)(reference,tag,bool)) UNDEF;
+    reference_to_effect_func = (effect(*)(reference,action,bool)) UNDEF;
     loop_descriptor_make_func = (descriptor_function) UNDEF;
     vector_to_descriptor_func = (descriptor_function) UNDEF;
 
