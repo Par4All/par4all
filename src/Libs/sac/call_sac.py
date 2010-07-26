@@ -3,24 +3,34 @@ import pyps
 from subprocess import *
 import sys
 import re
+from optparse import OptionParser
 
-sources = sys.argv[1:]
+parser = OptionParser(usage = "%prog -f FUCNTION src1.c src2.c ...",
+                      epilog = "Try `$0 -f dotprod .../validation/SAC/kernels/DOTPROD/DOTPROD.c'.")
+
+parser.add_option("-f", "--function", dest = "function",
+                  help = "function to optimize")
+(opts, sources) = parser.parse_args()
+
+if not opts.function:
+    print "The -f argument is mandatory"
+    exit(2)
 
 ws = sac.sac_workspace(sources)
 wsname = ws.name
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
 print "Initial code"
-dotprod = ws['dotprod']
-print "Module dotprod selected"
-dotprod.display()
+module = ws[opts.function]
+print "Module", module.name, "selected"
+module.display()
 
-dotprod.sac()
+module.sac()
 
 print "simdized code"
-dotprod.display()
+module.display()
 
-dotprod.unsplit()
+module.unsplit()
 
 def getout(*cmd):
     return Popen(cmd, stdout=PIPE).communicate()[0]
