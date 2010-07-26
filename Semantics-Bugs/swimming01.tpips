@@ -1,0 +1,61 @@
+delete swimming01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create swimming01 swimming01.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setproperty SEMANTICS_K_FIX_POINT 1
+
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[swimming01]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[swimming01]
+quit
+
+echo
+echo TRANSFORMERS AFTER REFINEMENT
+echo
+
+apply REFINE_TRANSFORMERS[swimming01]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[swimming01]
+
+# quit
+
+echo
+echo PRECONDITIONS AFTER REFINEMENT
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[swimming01]
+
+quit
+echo
+echo AFTER DEAD CODE ELIMINATION
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+# delete swimming01
+quit
