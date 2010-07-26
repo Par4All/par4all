@@ -61,13 +61,9 @@ static type convert_local_to_pointer_array(type local_type){
 
 bool sesamify (char* module_name) {
   debug_on("SESAMIFY_DEBUG_LEVEL");
-  list args = NIL, args2 = NIL, args3 = NIL, args4 = NIL, args5 = NIL;
-  list malloc_statements, map_statements;
-  list unmap_statements, wait_statements, send_statements,  rw_effects;
-  list entity_declaration;
-  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES,
-							  module_name,
-							  true);
+  
+  list args,args2,args3, args4, args5, malloc_statements, map_statements, unmap_statements, wait_statements, send_statements,  rw_effects, entity_declaration;
+  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES, module_name, true);
   intptr_t id;
   entity reserve_data     = local_name_to_top_level_entity("sesam_reserve_data");
   entity get_page_size    = local_name_to_top_level_entity("sesam_get_page_size");
@@ -164,7 +160,7 @@ bool sesamify (char* module_name) {
 	  counter++;
 	}
 	else{
-	  id = (intptr_t) hash_get(shared_mem, re)-1;
+		id = (intptr_t) hash_get(shared_mem, re)-1;
 	}
 
 	//MAP_DATA + pointer creation +UNMAP + CHMOD
