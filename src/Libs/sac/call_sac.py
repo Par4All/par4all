@@ -41,8 +41,7 @@ ref = getout("./%s.database/Tmp/ref" % wsname)
 
 sac.sac_compile(ws,
                 outfile = "%s.database/Tmp/seq" % (wsname),
-                outdir =  "%s.database/Tmp" % (wsname),
-                CFLAGS = "-I.")
+                outdir =  "%s.database/Tmp" % (wsname))
 
 seq = getout("./%s.database/Tmp/seq" % wsname)
 
@@ -54,8 +53,7 @@ else:
 
 sac.sac_compile_sse(ws,
                     outfile = "%s.database/Tmp/sse" % (wsname),
-                    outdir =  "%s.database/Tmp" % (wsname),
-                    CFLAGS = "-Iinclude")
+                    outdir =  "%s.database/Tmp" % (wsname))
 sse = getout("./%s.database/Tmp/sse" % wsname)
 
 if sse != ref:

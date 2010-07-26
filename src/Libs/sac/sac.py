@@ -137,10 +137,6 @@ def reincludeSIMD(fname):
     print "include SIMD.h"
     addBeginning(fname, '#include "SIMD.h"')
 
-def reincludestdio(fname):
-    print "include stdio.h"
-    addBeginning(fname, "#include <stdio.h>")
-
 # Shouldn't we allow to easily add functions, in the same way that
 # emacs does it with (add-hook HOOK FUN) / (remove-hook HOOK FUN) ?
 # That would be easier for us...
@@ -157,6 +153,11 @@ def goingToRunWithFactory(old_goingToRunWith, *funs):
 def sac_compile(ws, **args):
     # compile, undoing the inclusion of SIMD.h
     old_goingToRunWith = workspace.goingToRunWith
+    CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
+    if args.has_key("CFLAGS"):
+        args["CFLAGS"] += (" " + CFLAGS)
+    else:
+        args["CFLAGS"] = CFLAGS
     workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
                                                      unincludeSTDIO,
                                                      unincludeSIMD,
@@ -189,6 +190,11 @@ def addSSE(fname):
 def sac_compile_sse(ws, **args):
     # compile, undoing the inclusion of SIMD.h
     old_goingToRunWith = workspace.goingToRunWith
+    CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
+    if args.has_key("CFLAGS"):
+        args["CFLAGS"] += (" " + CFLAGS)
+    else:
+        args["CFLAGS"] = CFLAGS
     workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
                                                      unincludeSTDIO,
                                                      unincludeSIMD,
