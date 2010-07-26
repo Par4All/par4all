@@ -24,7 +24,7 @@ print "Initial code"
 module = ws[opts.function]
 print "Module", module.name, "selected"
 module.display()
-
+print dir(module)
 module.sac()
 
 print "simdized code"
@@ -39,9 +39,8 @@ def getout(*cmd):
 call(["cc"] + sources + ["-o", "%s.database/Tmp/ref" % wsname]) and exit(1)
 ref = getout("./%s.database/Tmp/ref" % wsname)
 
-sac.sac_compile(ws,
-                outfile = "%s.database/Tmp/seq" % (wsname),
-                outdir =  "%s.database/Tmp" % (wsname))
+ws.sac_compile(outfile = "%s.database/Tmp/seq" % (wsname),
+               outdir =  "%s.database/Tmp" % (wsname))
 
 seq = getout("./%s.database/Tmp/seq" % wsname)
 
@@ -51,9 +50,8 @@ if seq != ref:
 else:
     print "seq ok"
 
-sac.sac_compile_sse(ws,
-                    outfile = "%s.database/Tmp/sse" % (wsname),
-                    outdir =  "%s.database/Tmp" % (wsname))
+ws.sac_compile_sse(outfile = "%s.database/Tmp/sse" % (wsname),
+                   outdir =  "%s.database/Tmp" % (wsname))
 sse = getout("./%s.database/Tmp/sse" % wsname)
 
 if sse != ref:
