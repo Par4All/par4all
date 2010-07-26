@@ -13,3 +13,4 @@ ltmain.sh
 makes/
 missing
 py-compile
+*.pyc
