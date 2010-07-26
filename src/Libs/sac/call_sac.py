@@ -11,7 +11,6 @@ wsname = ws.name
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
 print "Initial code"
-modulename = "DOTPROD"
 dotprod = ws['dotprod']
 print "Module dotprod selected"
 dotprod.display()
@@ -27,10 +26,8 @@ def getout(*cmd):
     return Popen(cmd, stdout=PIPE).communicate()[0]
 
 # get the result from the initial, reference file, without SIMD'izing anything
-call(["cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
-      "-o", "%s.database/Tmp/ref" % wsname]) and exit(1)
+call(["cc"] + sources + ["-o", "%s.database/Tmp/ref" % wsname]) and exit(1)
 ref = getout("./%s.database/Tmp/ref" % wsname)
-
 
 def unincludeSIMD(fname):
     # in the modulename.c file, undo the inclusion of SIMD.h by deleting
