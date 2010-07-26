@@ -2,6 +2,24 @@ import pyps
 import os
 import re
 
+# TODO: some of the top-level functions don't belong here, they should
+# be in a more general toolbox. (string2file(), addBeginning(), I'm
+# looking at you.).
+
+# Remove unincludeXXX() when this functionnality is ported to pips.
+
+# Make a more general hook system (see comments and code around
+# goingToRunWithFactory()).
+
+# We need to dump SIMD.c to disk when creating the workspace. Doing so
+# in $PWD, without cleaning after ourselves, is not very nice.
+# Err, actually, do we *need* to? Wouldn't SIMD.h be sufficient?
+
+# I'm not happy with the way we "inherit" from pyps.workspace: the way
+# it is currently done, we can "inherit" from any other workspace,
+# but other people can't "inherit" from sac_workspace. Maybe we need a
+# more general composition mechanism.
+
 def string2file(string, fname):
     f = open(fname, "w")
     f.write(string)
@@ -9,9 +27,10 @@ def string2file(string, fname):
 
 def sac(module):
     ws = module._ws
+    # Here are the transformations made by benchmark.tpips.h, blindy
+    # translated in pyps.
     module.split_update_operator()
 
-    # benchmark.tpips.h begin
     ws.activate("MUST_REGIONS")
     ws.activate("PRECONDITIONS_INTER_FULL")
     ws.activate("TRANSFORMERS_INTER_FULL")
@@ -64,6 +83,8 @@ def sac(module):
     module.clean_declarations()
     module.suppress_dead_code()
 
+# We need to undo the inclusion of SIMD.h in case we want to compile
+# with sse.h instead.
 def unincludeSIMD(fname):
     print "removing SIMD.h"
     # XXX: un-including something ought to be part of Pips
@@ -146,9 +167,9 @@ def addSSE(fname):
     f.writelines(contents)
     f.close()
 
-# Shouldn't we allow to easily add functions, in the same way that
-# emacs does it with (add-hook HOOK FUN) / (remove-hook HOOK FUN) ?
-# That would be easier for us...
+# XXX: Shouldn't we allow to easily add functions, in the same way
+# that emacs does it with (add-hook HOOK FUN) / (remove-hook HOOK
+# FUN)? That would be easier for us...
 def goingToRunWithFactory(old_goingToRunWith, *funs):
     def goingToRunWithAux(s, files, outdir):
         old_goingToRunWith(s, files, outdir)
@@ -168,6 +189,8 @@ def workspace_sac(sources, parent = pyps, **args):
             parent.workspace.__init__(self, sources + ["SIMD.c"], **args)
             parent.module.sac = sac
 
+        # XXX: rename to compile(ws, **args) to make one of the
+        # following the default.
         def sac_compile(ws, **args):
             # compile, undoing the inclusion of SIMD.h
             old_goingToRunWith = ws.__class__.goingToRunWith
