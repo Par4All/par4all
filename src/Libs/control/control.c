@@ -1125,11 +1125,13 @@ hash_table used_labels;
 
 	 pips_internal_error("Forloop with goto not implemented yet\n");*/
 
+      free_statement(control_statement(c_test));
       control_statement(c_test) = forloop_test(st);
       control_predecessors(c_test) =
 	CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
 	control_successors(c_test) =
 	CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
+      free_statement(control_statement(c_inc));
       control_statement(c_inc) = forloop_inc(st);
       control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
       UPDATE_CONTROL(c_res,
