@@ -256,7 +256,7 @@ class workspace(object):
 			command+=["-c"]
 			command+=otmpfiles
 		commandline = " ".join(command)
-		print "running", commandline
+		#print "running", commandline
 		ret = os.system(commandline)
 		if ret:
 			if not link: map(os.remove,otmpfiles)
