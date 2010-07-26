@@ -91,10 +91,13 @@ dotprod.display()
 
 dotprod.unsplit()
 
+def getout(*cmd):
+    return Popen(cmd, stdout=PIPE).communicate()[0]
+
 # get the result from the initial, reference file, without SIMD'izing anything
-call("cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
-     "-o", "%s.database/Tmp/ref" % wsname) and exit(1)
-ref = check_output(["./%s.database/Tmp/ref" % wsname])
+call(["cc", "kernels/%s/%s.c" % (modulename, modulename), "include/SIMD.c",
+      "-o", "%s.database/Tmp/ref" % wsname]) and exit(1)
+ref = getout("./%s.database/Tmp/ref" % wsname)
 
 
 def unincludeSIMD(fname):
@@ -143,7 +146,7 @@ workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
 ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
-seq = check_output(["./%s.database/Tmp/seq" % wsname])
+seq = getout("./%s.database/Tmp/seq" % wsname)
 
 if seq != ref:
     print "seq ko"
@@ -177,7 +180,7 @@ workspace.goingToRunWith = goingToRunWithFactory(unincludeSIMD,
 ws.compile(outfile = "%s.database/Tmp/sse" % (wsname),
            outdir =  "%s.database/Tmp" % (wsname),
            CFLAGS = "-Iinclude")
-sse = check_output(["./%s.database/Tmp/sse" % wsname])
+sse = getout("./%s.database/Tmp/sse" % wsname)
 
 if sse != ref:
     print "sse ko"
