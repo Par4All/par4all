@@ -2671,11 +2671,14 @@ bool all_statements_defined_p(statement s)
 */
 bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
-    /* naive version with O(n^2) complexity)*/
     if(declaration_statement_p(s))
     {
+        set sp = set_make(set_pointer);
+        set_assign_list(sp,*statement_to_all_included_declarations);
         FOREACH(ENTITY,e,statement_declarations(s))
-            *statement_to_all_included_declarations=gen_once(e,*statement_to_all_included_declarations);
+            if(!set_belong_p(sp,e))
+                *statement_to_all_included_declarations=CONS(ENTITY,e,*statement_to_all_included_declarations);
+        set_free(sp);
     }
   return true;
 }
@@ -2689,6 +2692,14 @@ list statement_to_declarations(statement s)
 		      statement_domain, add_statement_declarations, gen_null);
 
   return statement_to_all_included_declarations;
+}
+/* Returns the declarations contained in a list of statement. */
+list statements_to_declarations(list sl)
+{
+    list  dl = NIL;
+    FOREACH(STATEMENT,st,sl)
+        dl=gen_nconc(dl,statement_to_declarations(st));
+    return dl;
 }
 
 

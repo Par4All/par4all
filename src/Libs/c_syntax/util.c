@@ -189,10 +189,10 @@ void init_c_implicit_variables(entity m)
   entity func_name2 = FindOrCreateEntity(mn, fn2);
   const char * name = entity_user_name(m);
   string cn = strdup(concatenate("\"", mn, "\"", NULL));
-  /* cn can probably be freed after this call */
   entity fn = make_C_constant_entity(cn,
 				     is_basic_string,
 				     strlen(name)+1);
+  free(cn);
   entity a = DynamicArea; /* Should be static, but not compatible with
 			   FREIA inlining. */
 
@@ -292,6 +292,7 @@ expression MakeBraceExpression(list l)
   return make_call_expression(CreateIntrinsic(BRACE_INTRINSIC),l);
 }
 
+/* e is now owned by returend expression and must not be used any longer */
 expression MakeFunctionExpression(expression e, list le)
 {
   /* There are 2 cases:
@@ -314,6 +315,7 @@ expression MakeFunctionExpression(expression e, list le)
     case is_syntax_reference:
       {
 	entity ent = reference_variable(syntax_reference(s));
+    free_expression(e);
 	bool ok = TRUE;
 	entity cf = get_current_module_entity();
 
@@ -604,8 +606,9 @@ expression IdentifierToExpression(string s)
 	  /* Generate a call to an enum member */
 	  exp = make_expression(make_syntax_call(make_call(ent, NIL)), normalized_undefined);
 	else
-	  exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),
-				normalized_undefined);
+      exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),
+                                               normalized_undefined);
+
 	break;
       }
     default:
@@ -1430,6 +1433,7 @@ entity RenameFunctionEntity(entity oe)
       gen_clear_tabulated_element((gen_chunkp)oe);
     }
   }
+  free(sn);
   return ne;
 }
 
@@ -1864,6 +1868,7 @@ void UseFormalArguments(entity f)
 	//free_entity(p); // FI: we may use them in the type data structures in spite of the MAP on refs?
       }
     }
+    gen_free_list(dl);
 
     ifdebug(1) {
       dl = module_all_declarations(f);
@@ -1871,6 +1876,7 @@ void UseFormalArguments(entity f)
       ifdebug(8) {
 	pips_debug(8, "list of declared variables:\n");
 	print_entities(dl);
+    gen_free_list(dl);
 	(void) fprintf(stderr, "\n");
       }
       refs =  declaration_supporting_references(dl);
@@ -3214,7 +3220,7 @@ nodecl_p(entity __attribute__ ((unused)) module, statement stat)
 void NStackPop(stack s, int n)
 {
   while (n-->0)
-    stack_pop(s);
+    gen_free(stack_pop(s));
 }
 
 /* The OffsetStack is poped n times, where n is the number of formal arguments

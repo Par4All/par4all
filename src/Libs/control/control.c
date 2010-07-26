@@ -143,6 +143,7 @@ DEFINE_LOCAL_STACK(scoping_statement, statement)
 /* Add control "pred" to the predecessor set of control c if not already
    here */
 #define ADD_PRED_IF_NOT_ALREADY_HERE(pred,c) (gen_once(pred,control_predecessors(c)))
+#define ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred,c) (gen_once(pred,gen_copy_seq(control_predecessors(c))))
 
 /* Update control c by setting its statement to s, by unioning its predecessor
  * set with pd, and by setting its successor set to sc (i.e. previous successors
@@ -157,6 +158,8 @@ DEFINE_LOCAL_STACK(scoping_statement, statement)
 	MAPL(preds, {control_predecessors(c) = \
 			      ADD_PRED_IF_NOT_ALREADY_HERE(CONTROL(CAR(preds)), c);}, \
 	      pd); \
+    gen_free_list(pd);\
+    gen_free_list( control_successors(c));\
 	control_successors(c)=sc; \
 	}
 
@@ -398,6 +401,7 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
   }
   else {
     /* Do whatever was done before and let memory leak! */
+    gen_free_list(control_successors(pred));
     control_successors(pred) = CONS(CONTROL, c_res, NIL);
   }
 }
@@ -631,8 +635,7 @@ bool controlize_call(statement st,
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
 
-  UPDATE_CONTROL(c_res, st,
-		 ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+  UPDATE_CONTROL(c_res, st,ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		 CONS(CONTROL, succ, NIL));
 
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
@@ -770,7 +773,7 @@ hash_table used_labels;
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
 				      copy_extensions(statement_extensions(st))),
-		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL)) ;
 	controlized = FALSE;
 	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
@@ -785,7 +788,7 @@ hash_table used_labels;
 	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
 	UPDATE_CONTROL(c_res,
 		       loop_header(st),
-		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, c_test, NIL));
 	controlized = TRUE ;
 	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
@@ -930,7 +933,7 @@ hash_table used_labels;
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
 				      copy_extensions(statement_extensions(st))),
-		       ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
 	controlized = FALSE;
     }
@@ -1114,7 +1117,7 @@ hash_table used_labels;
 
     UPDATE_CONTROL(c_res,
 		   d_st,
-		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     controlized = FALSE;
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
@@ -1136,7 +1139,7 @@ hash_table used_labels;
       control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
       UPDATE_CONTROL(c_res,
 		     forloop_header(st),
-		     ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		     ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		     CONS(CONTROL, c_test, NIL));
       controlized = TRUE ;
       control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
@@ -1752,7 +1755,7 @@ bool controlize_list(statement st,
            linked to succ. RK */
 	UPDATE_CONTROL(c_res,
 		       control_statement(c_block),
-		       control_predecessors(c_block),
+		       gen_copy_seq(control_predecessors(c_block)),
 		       control_successors(c_block));
 	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_end, succ);
 	control_successors(c_end) = CONS(CONTROL, succ, NIL);
@@ -1862,7 +1865,7 @@ hash_table used_labels;
 				  gen_copy_seq(statement_declarations(st)),
 				  strdup(statement_decls_text(st)),
 				  copy_extensions(statement_extensions(st))),
-		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
     controlized = FALSE;
@@ -1870,7 +1873,7 @@ hash_table used_labels;
   else {
     // Keep the unstructured test:
     UPDATE_CONTROL(c_res, st,
-		   ADD_PRED_IF_NOT_ALREADY_HERE(pred, c_res),
+		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
     test_true(t) = make_plain_continue_statement();
     test_false(t) = make_plain_continue_statement();
@@ -2021,11 +2024,13 @@ simplified_unstructured(control top,
     unstructured_consistent_p(u);
 
     if(!ENDP(control_predecessors(top))) {
+    free_control(res);
 	/* There are goto on the entry node: */
 	return(u);
     }
 
     if(gen_length(succs=control_successors(top)) != 1) {
+    free_control(res);
 	/* The entry node is not a simple node sequence: */
 	return(u);
     }
@@ -2034,11 +2039,13 @@ simplified_unstructured(control top,
 		CONTROL(CAR(succs)) == res);
 
     if(gen_length(control_predecessors(res)) != 1) {
+    free_control(res);
 	/* The second node has more than 1 goto on it: */
 	return(u);
     }
 
     if(gen_length(succs=control_successors(res)) != 1) {
+    free_control(res);
 	/* Second node is not a simple node sequence: */
 	return(u);
     }
@@ -2049,17 +2056,21 @@ simplified_unstructured(control top,
     }
 
     if(gen_length(control_predecessors(bottom)) != 1) {
+    free_control(res);
 	/* The exit node has more than 1 goto on it: */
 	return(u);
     }
 
     if(!ENDP(control_successors(bottom))) {
+    free_control(res);
 	/* The exit node has a successor: */
 	return(u);
     }
 
     /* Here we have a sequence of 3 control node: top, res and
        bottom. */
+    gen_free_list(control_predecessors(res));
+    gen_free_list(control_successors(res));
     control_predecessors(res) = control_successors(res) = NIL;
     st = control_statement(res);
 
@@ -2067,7 +2078,10 @@ simplified_unstructured(control top,
 	/* If the second node is an unstructured, just return it
            instead of top and bottom: (??? Lot of assumptions. RK) */
       unstructured_consistent_p(instruction_unstructured(i));
-	return(instruction_unstructured(i));
+      unstructured iu = instruction_unstructured(i);
+      instruction_unstructured(i)=unstructured_undefined;
+      free_statement(st);
+	return iu;
     }
 
     /* Just keep the second node as an unstructured with only 1

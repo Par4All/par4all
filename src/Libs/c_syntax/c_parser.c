@@ -71,6 +71,8 @@ static hash_table entity_to_type_stack_table = hash_table_undefined;
 
 void init_entity_type_storage_table()
 {
+  if(!hash_table_undefined_p(entity_to_type_stack_table))
+      reset_entity_type_stack_table();
   entity_to_type_stack_table = hash_table_make(hash_string,0);
   //put_stack_storage_table("test","T");
 }
@@ -124,6 +126,7 @@ void remove_entity_type_stacks(list el)
 
 void reset_entity_type_stack_table()
 {
+    HASH_MAP(k,v,stack_free((stack*)&v),entity_to_type_stack_table);
   hash_table_free(entity_to_type_stack_table);
   entity_to_type_stack_table = hash_table_undefined;
 }
@@ -303,7 +306,7 @@ static bool actual_c_parser(string module_name,
 
     if (is_compilation_unit_parser)
       {
-	compilation_unit_name = module_name;
+	compilation_unit_name = strdup(module_name);
 	init_keyword_typedef_table();
       }
     else
@@ -367,11 +370,11 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_bool) = make_value_unknown();
     }
     built_in_complex =
-      find_or_create_entity(strdup(concatenate(compilation_unit_name,
+      find_or_create_entity(concatenate(compilation_unit_name,
 					       MODULE_SEP_STRING,
 					       TYPEDEF_PREFIX,
 					       "_Complex",
-					       NULL)));
+					       NULL));
     if(storage_undefined_p(entity_storage(built_in_complex))) {
       entity_storage(built_in_complex) = make_storage_rom();
       entity_type(built_in_complex) =
@@ -412,10 +415,10 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_start) = make_value_intrinsic();
     }
 
-    built_in_va_end = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+    built_in_va_end = find_or_create_entity(concatenate(compilation_unit_name,
 							    MODULE_SEP_STRING,
 							    BUILTIN_VA_END,
-							    NULL)));
+							    NULL));
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t =
@@ -561,6 +564,7 @@ static bool actual_c_parser(string module_name,
     stack_free(&FormalStack);
     stack_free(&OffsetStack);
     stack_free(&StructNameStack);
+    free(compilation_unit_name);
     ContextStack = FunctionStack = FormalStack = OffsetStack = StructNameStack = stack_undefined;
     debug_off();
     return TRUE;
