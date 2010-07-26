@@ -255,9 +255,12 @@ class workspace(object):
 			self.goingToRunWith(otmpfiles, outdir)
 			command+=["-c"]
 			command+=otmpfiles
-		#print "running", " ".join(command)
-		if os.system(" ".join(command)):
+		commandline = " ".join(command)
+		print "running", commandline
+		ret = os.system(commandline)
+		if ret:
 			if not link: map(os.remove,otmpfiles)
+			raise RuntimeError("`%s' failed with return code %d" % (commandline, ret >> 8))
 		return outfile
 	
 	# allows subclasses to tamper with the files before compiling
