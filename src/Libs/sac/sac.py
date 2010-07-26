@@ -75,13 +75,20 @@ module.sac = sac
 
 def unincludeSIMD(fname):
     print "removing SIMD.h"
-    # in the modulename.c file, undo the inclusion of SIMD.h by deleting
-    # everything up to the definition of our function (not as clean as could
-    # be, to say the least...)
+    # XXX: un-including something ought to be part of Pips
     f = open(fname, "r")
-    while not re.search("dotprod", f.readline()):
-        pass
-    contents = f.readlines()
+    contents = []
+    in_simd_h = False
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        if line == simd_h_begin:
+            in_simd_h = True
+        if not in_simd_h:
+            contents += line
+        if line == simd_h_end:
+            in_simd_h = False
     f.close()
     f = open(fname, "w")
     f.writelines(contents)
@@ -124,8 +131,7 @@ def sac_compile(ws, **args):
     old_goingToRunWith = workspace.goingToRunWith
     workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
                                                      unincludeSIMD,
-                                                     reincludeSIMD,
-                                                     reincludestdio)
+                                                     reincludeSIMD)
     ws.compile(**args)
     workspace.goingToRunWith = old_goingToRunWith
 
@@ -952,7 +958,10 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
 #undef DMAX
 """
 
-simd_h = """
+simd_h_begin = "/* PIPS-included SIMD.h begins here */\n"
+simd_h_end = "/* PIPS-included SIMD.h end here */\n"
+
+simd_h = simd_h_begin + """
 /* SIMD.c */
 int PHI(int L, int X1, int X2);
 void SIMD_PHIW(int R[4], int L[4], int X1[4], int X2[4]);
@@ -1028,8 +1037,7 @@ void SIMD_SETD(int DEST[2], int SRC[2]);
 void SIMD_SETW(short DEST[4], short SRC[4]);
 void SIMD_SETB(char DEST[8], char SRC[8]);
 void SIMD_LOAD_CONSTANT_V2DF(double vec[2], double v0, double v1);
-
-"""
+""" + simd_h_end
 
 sse_h = """
 #include <xmmintrin.h>
