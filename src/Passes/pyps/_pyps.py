@@ -331,4 +331,5 @@ class workspace(object):
 ### mode: flyspell
 ### ispell-local-dictionary: "american"
 ### tab-width: 4
+### python-indent: 4
 ### End:
