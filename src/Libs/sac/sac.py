@@ -7,7 +7,6 @@ def string2file(string, fname):
     f.write(string)
     f.close()
 
-# XXX: shouldn't be there in the hierarchy
 def sac(module):
     ws = module._ws
     module.split_update_operator()
@@ -75,11 +74,11 @@ def unincludeSIMD(fname):
         line = f.readline()
         if not line:
             break
-        if line == sac_workspace.simd_h_begin:
+        if line == simd_h_begin:
             in_simd_h = True
         if not in_simd_h:
             contents += line
-        if line == sac_workspace.simd_h_end:
+        if line == simd_h_end:
             in_simd_h = False
     f.close()
     f = open(fname, "w")
@@ -89,7 +88,7 @@ def unincludeSIMD(fname):
 def unincludeSTDIO(fname):
     # XXX: Beurk. Should disappear, replaced with pips functionnality.
     # Likely to break on other machines.
-    # XXX: yes, this is mostly duplicated from the function just
+    # XXXBIS: yes, this is mostly duplicated from the function just
     # above, except for the re-inclusion of <stdio.h>
     print "undoing the inclusion of stdio.h in", fname
     stdio_h_begin = "/* Define ISO C stdio on top of C++ iostreams.\n"
@@ -130,7 +129,7 @@ def reincludeSIMD(fname):
 
 def addSSE(fname):
     print "adding sse.h"
-    contents = [sac_workspace.sse_h]
+    contents = [sse_h]
     f = open(fname)
     for line in f:
         line = re.sub(r"float (v4sf_[^[]+)", r"__m128 \1", line)
@@ -160,51 +159,49 @@ def goingToRunWithFactory(old_goingToRunWith, *funs):
                 fun(fname)
     return goingToRunWithAux
 
+def workspace_sac(sources, parent = pyps, **args):
+    class sac_workspace(parent.workspace):
+        def __init__(self, sources, **args):
+            # add SIMD.[ch] to the project
+            string2file(simd_c, "SIMD.c")
+            string2file(simd_h, "SIMD.h")
+            parent.workspace.__init__(self, sources + ["SIMD.c"], **args)
+            parent.module.sac = sac
 
-class sac_workspace(pyps.workspace):
-    def __init__(self, sources, **args):
-        if args.has_key("parent"):
-            parent = args["parent"]
-        else:
-            parent = pyps
-        # add SIMD.[ch] to the project
-        string2file(sac_workspace.simd_c, "SIMD.c")
-        string2file(sac_workspace.simd_h, "SIMD.h")
-        parent.workspace.__init__(self, sources + ["SIMD.c"], **args)
-        parent.module.sac = sac
+        def sac_compile(ws, **args):
+            # compile, undoing the inclusion of SIMD.h
+            old_goingToRunWith = ws.__class__.goingToRunWith
+            CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
+            if args.has_key("CFLAGS"):
+                args["CFLAGS"] += (" " + CFLAGS)
+            else:
+                args["CFLAGS"] = CFLAGS
+            ws.__class__.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                                unincludeSTDIO,
+                                                                unincludeSIMD,
+                                                                reincludeSIMD)
+            ws.compile(**args)
+            ws.__class__.goingToRunWith = old_goingToRunWith
 
-    def sac_compile(ws, **args):
-        # compile, undoing the inclusion of SIMD.h
-        old_goingToRunWith = ws.__class__.goingToRunWith
-        CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
-        if args.has_key("CFLAGS"):
-            args["CFLAGS"] += (" " + CFLAGS)
-        else:
-            args["CFLAGS"] = CFLAGS
-        ws.__class__.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
-                                                            unincludeSTDIO,
-                                                            unincludeSIMD,
-                                                            reincludeSIMD)
-        ws.compile(**args)
-        ws.__class__.goingToRunWith = old_goingToRunWith
+        def sac_compile_sse(ws, **args):
+            # compile, undoing the inclusion of SIMD.h
+            old_goingToRunWith = ws.__class__.goingToRunWith
+            CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
+            if args.has_key("CFLAGS"):
+                args["CFLAGS"] += (" " + CFLAGS)
+            else:
+                args["CFLAGS"] = CFLAGS
+            ws.__class__.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                                unincludeSTDIO,
+                                                                unincludeSIMD,
+                                                                addSSE)
+            ws.compile(**args)
+            ws.__class__.goingToRunWith = old_goingToRunWith
 
-    def sac_compile_sse(ws, **args):
-        # compile, undoing the inclusion of SIMD.h
-        old_goingToRunWith = ws.__class__.goingToRunWith
-        CFLAGS = "-O3 -I. -march=native" # the -I. for finding SIMD.h
-        if args.has_key("CFLAGS"):
-            args["CFLAGS"] += (" " + CFLAGS)
-        else:
-            args["CFLAGS"] = CFLAGS
-        ws.__class__.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
-                                                          unincludeSTDIO,
-                                                          unincludeSIMD,
-                                                          addSSE)
-        ws.compile(**args)
-        ws.__class__.goingToRunWith = old_goingToRunWith
-    
-    # SIMD.c from validation/SAC/include/SIMD.c r2257
-    simd_c = """
+    return sac_workspace(sources, **args)
+
+# SIMD.c from validation/SAC/include/SIMD.c r2257
+simd_c = """
 #define LOGICAL int
 #define DMAX(A,B) (A)>(B)?(A):(B)
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
@@ -994,10 +991,10 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
 #undef DMAX
 """
 
-    simd_h_begin = "/* PIPS-included SIMD.h begins here */\n"
-    simd_h_end = "/* PIPS-included SIMD.h end here */\n"
+simd_h_begin = "/* PIPS-included SIMD.h begins here */\n"
+simd_h_end = "/* PIPS-included SIMD.h end here */\n"
 
-    simd_h = simd_h_begin + """
+simd_h = simd_h_begin + """
 /* SIMD.c */
 int PHI(int L, int X1, int X2);
 void SIMD_PHIW(int R[4], int L[4], int X1[4], int X2[4]);
@@ -1075,7 +1072,7 @@ void SIMD_SETB(char DEST[8], char SRC[8]);
 void SIMD_LOAD_CONSTANT_V2DF(double vec[2], double v0, double v1);
 """ + simd_h_end
 
-    sse_h = """
+sse_h = """
 #include <xmmintrin.h>
 
 /* extras */
@@ -1129,6 +1126,5 @@ do { \
     SIMD_SAVE_GENERIC_V2DF(vec,(f),(f)+1)
 #define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
     SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
-
 
 """

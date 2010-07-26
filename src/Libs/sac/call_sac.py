@@ -1,5 +1,5 @@
-import sac
 import pyps
+import sac
 from subprocess import *
 import sys
 import re
@@ -16,7 +16,7 @@ if not opts.function:
     print "The -f argument is mandatory"
     exit(2)
 
-ws = sac.sac_workspace(sources)
+ws = sac.workspace_sac(sources, parent = pyps)
 wsname = ws.name
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
