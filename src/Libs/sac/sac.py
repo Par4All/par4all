@@ -94,6 +94,34 @@ def unincludeSIMD(fname):
     f.writelines(contents)
     f.close()
 
+def unincludeSTDIO(fname):
+    # XXX: Beurk. Should disappear, replaced with pips functionnality.
+    # Likely to break on other machines.
+
+    # XXX: yes, this is mostly duplicated from the function just
+    # above, except for the re-inclusion of <stdio.h>
+    print "undoing the inclusion of stdio.h"
+    stdio_h_begin = "/* Define ISO C stdio on top of C++ iostreams.\n"
+    stdio_h_end = "   several optimizing inline functions and macros.  */\n"
+    f = open(fname, "r")
+    contents = []
+    in_stdio_h = False
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        if line == stdio_h_begin:
+            in_stdio_h = True
+        if not in_stdio_h:
+            contents += line
+        if line == stdio_h_end:
+            in_stdio_h = False
+            contents += "#include <stdio.h>\n"
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+
 def addBeginning(fname, *args):
     contents = map((lambda(s): s + "\n" if s[-1] != "\n" else s),
                    args)
@@ -130,6 +158,7 @@ def sac_compile(ws, **args):
     # compile, undoing the inclusion of SIMD.h
     old_goingToRunWith = workspace.goingToRunWith
     workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                     unincludeSTDIO,
                                                      unincludeSIMD,
                                                      reincludeSIMD)
     ws.compile(**args)
@@ -161,6 +190,7 @@ def sac_compile_sse(ws, **args):
     # compile, undoing the inclusion of SIMD.h
     old_goingToRunWith = workspace.goingToRunWith
     workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                     unincludeSTDIO,
                                                      unincludeSIMD,
                                                      addSSE)
     ws.compile(**args)
