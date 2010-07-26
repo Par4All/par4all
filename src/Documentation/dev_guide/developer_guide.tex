@@ -1380,6 +1380,9 @@ the \texttt{make} invocation.
 \section{Validation}
 \label{sec:validation}
 
+\textbf{TODO: Fabien, update this section for \texttt{Makefile}-based
+  validation.}
+
 The validation is stored in a separate subversion repository
 \url{https://svn.cri.ensmp.fr/svn/validation}
 
@@ -1387,10 +1390,12 @@ For an overview of the validation daily use case, you should also have a
 look to \S~\ref{sec:devel-branch-valid}.
 
 Different phases are validated in distinct sub-directories.
-Running the validation uses the \texttt{pips\_validate} script.
+Running the validation uses the \texttt{pips\_validate} script (old
+sequential version) or a local \texttt{Makefile} (new parallel version).
 
 See the \texttt{README} at the root of the \texttt{trunk} for details on
-how to run the validation. Basically, one must simply type \texttt{make}.
+how to run the validation. Basically, one must simply type
+\texttt{make} with some target.
 
 See various examples around to add new validation files.  The preferred
 way is to provide a source file \texttt{MyTest.f} or \texttt{MyTest.c}, a
@@ -1429,7 +1434,7 @@ accept clean}.  Using this approach does not require the validation
 directory to be under \texttt{\$PIPS\_ROOT}.
 
 
-\subsection{Validation makefile}
+\subsection{Validation Makefile}
 \label{sec:validation-makefile}
 
 The main user interface is from the \texttt{Makefile} at the validation
@@ -1460,12 +1465,13 @@ default options for the validation.
 \subsection{Validation output}
 \label{sec:validation-output}
 
-As an output the make validate creates a RESULTS directory. This directory contains:
+As an output the make validate creates a RESULTS directory. This
+directory contains:
 a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.diff} and
 \texttt{.out}). Those files are named using the following rule : \texttt{FolderName\_TestCaseName.xxx}
 
 \begin{itemize}
-\item Obviusly the \texttt{SUMMARY} file contains a summary of the previous validation.
+\item Obviously the \texttt{SUMMARY} file contains a summary of the previous validation.
 \item \texttt{FolderName\_TestCaseName.err} contains the execution stderr of the test case
   named TestCaseName that you can find in the folder named FolderName.
 \item \texttt{FolderName\_TestCaseName.diff} contains the diff of the output with the expected one.
@@ -1480,6 +1486,10 @@ a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.dif
 Three validation scripts are available:
 \begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
+
+  \textbf{Note that this script is now in obsolation, it is superseded by
+  local \texttt{Makefile} targets which do the same but also
+  parallelize the process per directory or per file.}
 
   The arguments are names of subdirectories in
   \texttt{\$PIPS\_ROOT/../../validation} or source files within these
@@ -1545,6 +1555,14 @@ Three validation scripts are available:
   encouraged. It is very important not to validate \texttt{stderr} output
   and pips with some level of debugging on, because these outputs are not
   very stable from one architecture to another.
+
+  Choosing tpips-based scripts also helps a lot with debugging, for
+  instance with a \texttt{default\_tpips} case:
+\begin{verbatim}
+  sh> WSPACE=foo FILE=foo.f gdb /path/to/binary/of/tpips
+  gdb> run default_tpips
+  ...
+\end{verbatim}
 
   This script is also used by the various nightly validations such as
   \verb|pips_at_night|.
