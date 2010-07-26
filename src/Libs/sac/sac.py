@@ -15,7 +15,6 @@ def sac_workspace(sources, **args):
 def sac(module):
 
     ws = module._ws
-
     module.split_update_operator()
 
     # benchmark.tpips.h begin
@@ -74,6 +73,95 @@ def sac(module):
 module.sac = sac
 
 
+def unincludeSIMD(fname):
+    print "removing SIMD.h"
+    # in the modulename.c file, undo the inclusion of SIMD.h by deleting
+    # everything up to the definition of our function (not as clean as could
+    # be, to say the least...)
+    f = open(fname, "r")
+    while not re.search("dotprod", f.readline()):
+        pass
+    contents = f.readlines()
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+
+def addBeginning(fname, *args):
+    contents = map((lambda(s): s + "\n" if s[-1] != "\n" else s),
+                   args)
+    
+    f = open(fname, "r")
+    contents += f.readlines()
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+
+def reincludeSIMD(fname):
+    print "include SIMD.h"
+    addBeginning(fname, '#include "SIMD.h"')
+
+def reincludestdio(fname):
+    print "include stdio.h"
+    addBeginning(fname, "#include <stdio.h>")
+
+# Shouldn't we allow to easily add functions, in the same way that
+# emacs does it with (add-hook HOOK FUN) / (remove-hook HOOK FUN) ?
+# That would be easier for us...
+def goingToRunWithFactory(old_goingToRunWith, *funs):
+    def goingToRunWithAux(s, files, outdir):
+        old_goingToRunWith(s, files, outdir)
+        for fname in files:
+            if re.search(r"SIMD\.c$", fname):
+                continue
+            for fun in funs:
+                fun(fname)
+    return goingToRunWithAux
+
+def sac_compile(ws, **args):
+    # compile, undoing the inclusion of SIMD.h
+    old_goingToRunWith = workspace.goingToRunWith
+    workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                     unincludeSIMD,
+                                                     reincludeSIMD,
+                                                     reincludestdio)
+    ws.compile(**args)
+    workspace.goingToRunWith = old_goingToRunWith
+
+# if we want it for all compilations...
+# pyps.workspace.compile = sac_compile
+
+def addSSE(fname):
+    print "adding sse.h"
+    contents = [sse_h]
+    f = open(fname)
+    for line in f:
+        line = re.sub(r"float (v4sf_[^[]+)", r"__m128 \1", line)
+        line = re.sub(r"float (v4si_[^[]+)", r"__m128i \1", line)
+        line = re.sub(r"v4s[if]_([^,[]+)\[[^]]*\]", r"\1", line)
+        line = re.sub(r"v4s[if]_([^ ,[]+)", r"\1", line)
+        line = re.sub(r"double (v2df_[^[]+)", r"__m128d \1", line)
+        line = re.sub(r"double (v2di_[^[]+)", r"__m128i \1", line)
+        line = re.sub(r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1", line)
+        line = re.sub(r"v2d[if]_([^ ,[]+)", r"\1", line)
+        contents.append(line)
+    f.close()
+    f = open(fname, "w")
+    f.writelines(contents)
+    f.close()
+
+def sac_compile_sse(ws, **args):
+    # compile, undoing the inclusion of SIMD.h
+    old_goingToRunWith = workspace.goingToRunWith
+    workspace.goingToRunWith = goingToRunWithFactory(old_goingToRunWith,
+                                                     unincludeSIMD,
+                                                     addSSE)
+    ws.compile(**args)
+    workspace.goingToRunWith = old_goingToRunWith
+
+
+# SIMD.c from validation/SAC/include/SIMD.c r2257
 simd_c = """
 #define LOGICAL int
 #define DMAX(A,B) (A)>(B)?(A):(B)
@@ -940,5 +1028,63 @@ void SIMD_SETD(int DEST[2], int SRC[2]);
 void SIMD_SETW(short DEST[4], short SRC[4]);
 void SIMD_SETB(char DEST[8], char SRC[8]);
 void SIMD_LOAD_CONSTANT_V2DF(double vec[2], double v0, double v1);
+
+"""
+
+sse_h = """
+#include <xmmintrin.h>
+
+/* extras */
+#define MOD(a,b) ((a)%(b))
+#define MAX0(a,b) ((a)>(b)?(a):(b))
+
+/* float */
+#define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
+#define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
+#define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
+#define SIMD_SAVE_V4SF(vec,arr) _mm_storeu_ps(arr,vec)
+#define SIMD_SAVE_GENERIC_V4SF(vec,v0,v1,v2,v3) \
+do { \
+    float tmp[4]; \
+    SIMD_SAVE_V4SF(vec,&tmp[0]);\
+    *v0=tmp[0];\
+    *v1=tmp[1];\
+    *v2=tmp[2];\
+    *v3=tmp[3];\
+} while (0)
+#define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)\
+do { \
+    float v[4] = { v0,v1,v2,v3 };\
+    SIMD_LOAD_V4SF(vec,&v[0]); \
+} while(0)
+
+/* handle padded value, this is a very bad implementation ... */
+#define SIMD_MASKED_SAVE_V4SF(vec,arr) do { float tmp[4] ; SIMD_SAVE_V4SF(vec,&tmp[0]); (arr)[0]=tmp[0];(arr)[1]=tmp[1];(arr)[2]=tmp[2]; } while(0)
+
+
+/* double */
+#define SIMD_LOAD_V2DF(vec,arr) vec=_mm_loadu_pd(arr)
+#define SIMD_MULPD(vec1,vec2,vec3) vec1=_mm_mul_pd(vec2,vec3)
+#define SIMD_ADDPD(vec1,vec2,vec3) vec1=_mm_add_pd(vec2,vec3)
+#define SIMD_SAVE_V2DF(vec,arr) _mm_storeu_pd(arr,vec)
+#define SIMD_SAVE_GENERIC_V2DF(vec,v0,v1) \
+do { \
+    double tmp[2]; \
+    SIMD_SAVE_V2DF(vec,&tmp[0]);\
+    *(v0)=tmp[0];\
+    *(v1)=tmp[1];\
+} while (0)
+#define SIMD_LOAD_GENERIC_V2DF(vec,v0,v1)\
+do { \
+    double v[2] = { v0,v1};\
+    SIMD_LOAD_V2DF(vec,&v[0]); \
+} while(0)
+
+/* conversions */
+#define SIMD_SAVE_V2SF_TO_V2DF(vec,f) \
+    SIMD_SAVE_GENERIC_V2DF(vec,(f),(f)+1)
+#define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
+    SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
+
 
 """
