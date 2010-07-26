@@ -82,6 +82,7 @@ def sac(module):
     # module.use_def_elimination()
     module.clean_declarations()
     module.suppress_dead_code()
+    module.unsplit()
 
 # We need to undo the inclusion of SIMD.h in case we want to compile
 # with sse.h instead.

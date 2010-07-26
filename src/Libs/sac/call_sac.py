@@ -1,8 +1,6 @@
 import pyps
 import sac
 from subprocess import *
-import sys
-import re
 from optparse import OptionParser
 
 parser = OptionParser(usage = "%prog -f FUCNTION src1.c src2.c ...",
@@ -17,25 +15,24 @@ if not opts.function:
     exit(2)
 
 ws = sac.workspace_sac(sources, parent = pyps)
-wsname = ws.name
 ws.set_property(ABORT_ON_USER_ERROR = True)
 
 print "Initial code"
 module = ws[opts.function]
 print "Module", module.name, "selected"
 module.display()
-print dir(module)
+
+# Magie !
 module.sac()
 
 print "simdized code"
 module.display()
 
-module.unsplit()
-
 def getout(*cmd):
     return Popen(cmd, stdout=PIPE).communicate()[0]
 
 # get the result from the initial, reference file, without SIMD'izing anything
+wsname = ws.name
 call(["cc"] + sources + ["-o", "%s.database/Tmp/ref" % wsname]) and exit(1)
 ref = getout("./%s.database/Tmp/ref" % wsname)
 
