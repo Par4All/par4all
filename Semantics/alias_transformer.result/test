@@ -24,6 +24,7 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
 Selecting rule: PRECONDITIONS_INTER_FULL
 Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
 Selecting rule: PRINT_CODE_TRANSFORMERS
 Module ALIAS_TRANSFORMER already active.
 Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
@@ -60,6 +61,13 @@ PRINTED_FILE made for FOO.
 
 C  T() {0==-1}
 
+C This program is likely not to confomr to the Fortran standard because
+C of aliasing between a formal parameter and a global variable.
+
+C The result found by tpips is wrong.
+
+C The aliasing should be checked before the analysis
+
       PROGRAM ALIAS_TRANSFORMER
       COMMON I
 
@@ -69,11 +77,15 @@ C     BEGIN BLOCK
 
 C  T(I) {I==0}
 
-      I = 0                                                             0003
+      I = 0                                                             0010
 
 C  T() {0==-1}
 
-      CALL FOO(I)                                                       0004
+      CALL FOO(I)                                                       0011
+
+C  T() {}
+
+      PRINT *, I                                                        0012
 
 C  T() {}
 
@@ -106,18 +118,31 @@ C     END BLOCK
 Selecting rule: PRINT_CODE_PRECONDITIONS
 Module ALIAS_TRANSFORMER already active.
 Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
-  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ALIAS_TRANSFORMER)
+  CALLGRAPH                      building   CALLERS(ALIAS_TRANSFORMER)
+                                 building   CALLERS(FOO)
+                                 building   HEIGHT(ALIAS_TRANSFORMER)
+                                 building   HEIGHT(FOO)
+                                 building   DEPTH(ALIAS_TRANSFORMER)
+                                 building   DEPTH(FOO)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ALIAS_TRANSFORMER)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(ALIAS_TRANSFORMER)
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(ALIAS_TRANSFORMER)
 PRINTED_FILE made for ALIAS_TRANSFORMER.
 Module FOO selected
 Request: build resource PRINTED_FILE for module FOO.
-  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(FOO)
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(FOO)
 PRINTED_FILE made for FOO.
 
 C  P() {}
+
+C This program is likely not to confomr to the Fortran standard because
+C of aliasing between a formal parameter and a global variable.
+
+C The result found by tpips is wrong.
+
+C The aliasing should be checked before the analysis
 
       PROGRAM ALIAS_TRANSFORMER
       COMMON I
@@ -128,11 +153,15 @@ C     BEGIN BLOCK
 
 C  P() {}
 
-      I = 0                                                             0003
+      I = 0                                                             0010
 
 C  P(I) {I==0}
 
-      CALL FOO(I)                                                       0004
+      CALL FOO(I)                                                       0011
+
+C  P() {0==-1}
+
+      PRINT *, I                                                        0012
 
 C  P() {0==-1}
 
@@ -140,24 +169,24 @@ C  P() {0==-1}
 C     END BLOCK
       END
 
-C  P() {}
+C  P() {I==0, J==0}
 
       SUBROUTINE FOO(J)
       COMMON I
 
-C  P() {}
+C  P() {I==0, J==0}
 
 C     BEGIN BLOCK
 
-C  P() {}
+C  P() {I==0, J==0}
 
       J = J+1                                                           0003
 
-C  P(J) {J==J#init+1}
+C  P(J) {I==0, J==1, J#init==0}
 
       I = I+2                                                           0004
 
-C  P(I,J) {I==I#init+2, J==J#init+1}
+C  P(I,J) {I==2, I#init==0, J==1, J#init==0}
 
       RETURN
 C     END BLOCK
