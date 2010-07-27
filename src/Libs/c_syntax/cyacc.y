@@ -278,13 +278,15 @@ void EnterScope()
   if(C_scope_identifier>=0) {
     string ns = i2a(C_scope_identifier);
 
-    free(c_parser_context_scope(nc));
+    char * stf = c_parser_context_scope(nc);
     c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
+	free(stf);
     free(ns);
   }
   else {
-    free(c_parser_context_scope(nc));
+    char * stf = c_parser_context_scope(nc);
     c_parser_context_scope(nc) = strdup(cs);
+	free(stf);
   }
 
   stack_push((char *) nc, ContextStack);
@@ -2093,9 +2095,10 @@ decl_spec_list_opt_no_named:
 			    PushContext(ycontext);
 			  else {
 			    c_parser_context y = GetContext();
-			    free(c_parser_context_scope(ycontext));
+			    string stf = (c_parser_context_scope(ycontext));
 			    c_parser_context_scope(ycontext) =
 			      strdup(c_parser_context_scope(y));
+				free(stf);
 			    PushContext(ycontext);
 			  }
                           $$ = NIL;
@@ -2431,8 +2434,9 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  c_parser_context ycontext = GetContext();
 			  /* Add struct/union name and MEMBER_SEP_STRING to entity name */
 			  string derived = code_decls_text((code) stack_head(StructNameStack));
-			  free(c_parser_context_scope(ycontext));
+			  string stf = (c_parser_context_scope(ycontext));
 			  c_parser_context_scope(ycontext) = CreateMemberScope(derived,is_external);
+			  free(stf);
 			  c_parser_context_storage(ycontext) = make_storage_rom();
 			}
     field_decl_list TK_SEMICOLON struct_decl_list
