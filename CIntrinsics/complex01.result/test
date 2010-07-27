@@ -1,0 +1,20 @@
+
+Parsed printed file for "complex01"
+
+int main()
+{
+   double _Complex cacos(double _Complex z);
+   float _Complex cacosf(float _Complex z);
+   long double _Complex cacosl(long double _Complex z);
+   return 0;
+}
+
+Cumulated effetcs for "complex01"
+
+int main()
+{
+   double _Complex cacos(double _Complex z);
+   float _Complex cacosf(float _Complex z);
+   long double _Complex cacosl(long double _Complex z);
+   return 0;
+}
