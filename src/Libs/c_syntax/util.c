@@ -1874,10 +1874,9 @@ void UseFormalArguments(entity f)
       dl = module_all_declarations(f);
       /* Check substitution in formal parameter declarations */
       ifdebug(8) {
-	pips_debug(8, "list of declared variables:\n");
-	print_entities(dl);
-    gen_free_list(dl);
-	(void) fprintf(stderr, "\n");
+          pips_debug(8, "list of declared variables:\n");
+          print_entities(dl);
+          (void) fprintf(stderr, "\n");
       }
       refs =  declaration_supporting_references(dl);
       MAP(REFERENCE, r, {
@@ -1888,6 +1887,7 @@ void UseFormalArguments(entity f)
 	    pips_internal_error("Failed substitution\n");
 	  }
 	}, refs);
+      gen_free_list(dl);
     }
 
     /* FI: just in case? */
