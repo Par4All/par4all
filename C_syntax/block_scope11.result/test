@@ -116,3 +116,11 @@ Layout for memory area "main!foo:*STATIC*" of size 0:
 End of declarations for module main!foo
 
 
+
+Compilation of block_scope11.c
+
+
+Execution of block_scope11.c
+
+call to local function
+call to local function

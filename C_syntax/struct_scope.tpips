@@ -1,4 +1,7 @@
 delete struct_scope
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create struct_scope struct_scope.c
 
 activate C_PARSER
@@ -6,7 +9,53 @@ activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-display PRINTED_FILE[%ALL]
+echo
+echo Symbol table for "struct_scope!"
+echo
+
+display SYMBOL_TABLE_FILE[struct_scope!]
+
+echo
+echo Parsed code for "struct_scope!"
+echo
+
+display PARSED_PRINTED_FILE[struct_scope!]
+
+echo
+echo Symbol table for "main"
+echo
+
+display SYMBOL_TABLE_FILE[main]
+
+echo
+echo Parsed code for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Symbol table for "foo"
+echo
+
+display SYMBOL_TABLE_FILE[foo]
+
+echo
+echo Parsed code for "foo"
+echo
+
+display PARSED_PRINTED_FILE[foo]
+
+echo
+echo Symbol table for "toto"
+echo
+
+display SYMBOL_TABLE_FILE[toto]
+
+echo
+echo Parsed code for "toto"
+echo
+
+display PARSED_PRINTED_FILE[toto]
 
 close
 

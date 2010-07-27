@@ -57,7 +57,16 @@ echo
 
 apply UNSPLIT[%ALL]
 
+echo
+echo Compilation of block_scope11.c
+echo
+
 shell gcc block_scope11.database/Src/main.c block_scope11.database/Src/global.c -o block_scope11.database/a.out
+
+echo
+echo Execution of block_scope11.c
+echo
+
 shell block_scope11.database/a.out
 
 close
