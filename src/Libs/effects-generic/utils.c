@@ -279,7 +279,7 @@ cons * fx;
 }
 
 /* bool effects_write_entity_p(cons * effects, entity e): check whether e
- * is written by effects "effects" or not
+ * is certainly (MUST/EXACT) written by effects "effects" or not
  */
 bool effects_write_entity_p(fx, e)
 cons * fx;
@@ -304,7 +304,7 @@ entity e;
 }
 
 /* bool effects_read_or_write_entity_p(cons * effects, entity e): check whether e
- * is read or written by effects "effects" or not accessed at all
+ * may be read or written by effects "effects" or cannot accessed at all
  *
  * In semantics, e can be a functional entity such as constant string
  * or constant float.
@@ -318,6 +318,29 @@ bool effects_read_or_write_entity_p(cons * fx, entity e)
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
       if(entities_may_conflict_p(e, e_used)) {
+	read_or_write = TRUE;
+	break;
+      }
+    }
+  }
+  return read_or_write;
+}
+
+/* check whether e must be read or written by any effect "effects" or
+ * if it simply might be accessed or not even access at all
+ *
+ * In semantics, e can be a functional entity such as constant string
+ * or constant float.
+ */
+bool effects_must_read_or_write_entity_p(cons * fx, entity e)
+{
+  bool read_or_write = FALSE;
+
+  if(entity_variable_p(e)) {
+    FOREACH(EFFECT, ef, fx) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      /* Used to be a simple pointer equality test */
+      if(entities_must_conflict_p(e, e_used)) {
 	read_or_write = TRUE;
 	break;
       }

@@ -782,13 +782,16 @@ entity entity_locations_dereference(entity al __attribute__ ((__unused__)))
 
  /**
   * @brief Do these two abstract locations MUST share some real memory
-  * locations ? Never !!! DO NOT USE THIS FUNCTION !
+  * locations ? Never ! DO NOT USE THIS FUNCTION UNLESS...
   */
  bool abstract_locations_must_conflict_p(entity al1, entity al2)
  {
 
-   pips_internal_error("abstract_locations_must_conflict_p is a non sense : "
-       "it's always FALSE ! avoid use it.");
+   /* The function is useful in functional drivers to avoid dealing
+      with specific cases*/
+
+   //pips_internal_error("abstract_locations_must_conflict_p is a non sense : "
+   //    "it's always FALSE ! avoid use it.");
 
    return FALSE;
  }

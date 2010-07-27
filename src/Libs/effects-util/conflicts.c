@@ -504,6 +504,14 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	if( !must_p) {
 	  conflict_p = variable_entity_may_conflict_p( e1, e2 );
 	}
+	else {
+	  /* We assume that e1 and e2 are program variables. Because
+	     we do not have enough comments, we do not know if this
+	     only hold for variables and arrays of one element. It is
+	     easy to argue that an array cannot must conflict with
+	     itself. */
+	  conflict_p = e1==e2;
+	}
       } else {
 	/* Since PIPS does not detect the user syntax error, we could
 	   make this pips_user_error(). */
@@ -530,10 +538,10 @@ bool entities_may_conflict_p( entity e1, entity e2 ) {
 }
 
 /**
- * @brief Check if two entities may conflict
+ * @brief Check if two entities must conflict
  *
  */
 bool entities_must_conflict_p( entity e1, entity e2 ) {
-  return entities_maymust_conflict_p( e1, e2, FALSE);
+  return entities_maymust_conflict_p( e1, e2, TRUE);
 }
 
