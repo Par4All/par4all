@@ -94,16 +94,16 @@ Pvecteur v;
     */
 }
 
-/* Pvecteur vect_new(Variable var,Value coeff): 
+/* Pvecteur vect_new(Variable var,Value coeff):
  * allocation d'un vecteur colineaire
  * au vecteur de base var et de coefficient coeff (i.e. creation
  * d'un nouveau vecteur ne comportant qu'un seul couple (var,coeff))
  *
- *       --> 
+ *       -->
  * coeff var
- * 
+ *
  * Pourrait etre remplace par un vect_chain(NULL,,)
- * 
+ *
  * Modifications:
  *  - a 0 coeff generates a null vector; Francois Irigoin, 26 March 1991
  */
@@ -117,15 +117,15 @@ Value coeff;
 	v = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_new");
 	if (v == NULL) {
 	    (void) fprintf(stderr,"vect_new: Out of memory space\n");
-	    /* fprintf(stderr, "%10.3f MB", 
+	    /* fprintf(stderr, "%10.3f MB",
 	       (sbrk(0) - etext)/(double)(1 << 20)); // not portable */
-   	    abort();
+	    abort();
 	    /*exit(-1);*/
 	}
 	var_of(v) = var;
 	val_of(v) = coeff;
 	v->succ = NULL;
-    
+
     }
     else
 	v = NULL;
@@ -189,8 +189,8 @@ vect_make(Pvecteur v, Variable var, Value val, ...)
 }
 
 
-/* direct duplication. 
- * vect_dup() and vect_reversal() do the same thing : 
+/* direct duplication.
+ * vect_dup() and vect_reversal() do the same thing :
  * duplicate the vector with the reversal order.
  * vect_copy duplicate the vector with the same order.
  * in use of sc_copy. (DN,24/6/02)
