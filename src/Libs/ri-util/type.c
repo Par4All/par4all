@@ -1539,6 +1539,33 @@ basic basic_maximum(basic fb1, basic fb2)
   */
 }
 
+basic basic_of_expressions(list expressions,bool skip_overloaded)
+{
+    if(ENDP(expressions)) return basic_undefined;
+    else if(ENDP(CDR(expressions))) return basic_of_expression(EXPRESSION(CAR(expressions)));
+    else {
+        basic out = basic_of_expression(EXPRESSION(CAR(expressions)));
+        FOREACH(EXPRESSION,exp,CDR(expressions)) {
+            basic b = basic_of_expression(exp);
+            if(skip_overloaded && basic_overloaded_p(out)) {
+                free_basic(out);
+                out=b;
+            }
+            else if( skip_overloaded && basic_overloaded_p(b)) {
+                free_basic(b);
+            }
+            else {
+                basic tmp =basic_maximum(out,b);
+                free_basic(b);
+                free_basic(out);
+                out=tmp;
+            }
+        }
+        return out;
+    }
+}
+
+
 /* END_EOLE */
 
 /**************************************************** expression_to_type */

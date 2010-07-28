@@ -595,14 +595,13 @@ static string get_simd_vector_type(list lExp)
 /*
    This function returns the name of a vector from the data inside it
    */
-static string get_vect_name_from_data(int argc, expression exp)
+static string get_vect_name_from_data(int argc, list exps)
 {
     char prefix[5];
     string result;
-    basic bas;
     int itemSize;
 
-    bas = basic_of_expression(exp);
+    basic bas = basic_of_expressions(exps,true);
 
     prefix[0] = 'v';
     prefix[1] = '0'+argc;
@@ -629,6 +628,7 @@ static string get_vect_name_from_data(int argc, expression exp)
             break;
 
         default:
+            free_basic(bas);
             return strdup("");
             break;
     }
@@ -712,7 +712,6 @@ static bool sac_aligned_expression_p(expression e)
     }
     return false;
 }
-
 
 
 static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
@@ -830,15 +829,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     {
         list new_statements = NIL;
         size_t nbargs=gen_length(CDR(args));
-        basic shared_basic = basic_undefined;
-        FOREACH(EXPRESSION,e,CDR(args))
-        {
-            shared_basic=basic_of_expression(e);
-            if(basic_overloaded_p(shared_basic))
-                free_basic(shared_basic);
-            else
-                break;
-        }
+        basic shared_basic = basic_of_expressions(CDR(args),true);
         entity scalar_holder = make_new_array_variable_with_prefix(
                 SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
                 CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
@@ -932,7 +923,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         case MASKED_CONSEC_REFS:
             {
 
-                string realVectName = get_vect_name_from_data(argc, EXPRESSION(CAR(CDR(args))));
+                string realVectName = get_vect_name_from_data(argc, CDR(args));
 
                 if(strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
                 {
