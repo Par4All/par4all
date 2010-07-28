@@ -1,0 +1,38 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS 'cry4pips'
+delete $WS
+create $WS $WS.c ../SAC/include/SIMD.c
+
+echo
+echo Initial code
+echo
+
+module $WS
+display PRINTED_FILE
+apply SPLIT_UPDATE_OPERATOR
+
+source ../SAC/include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+
+apply UNSPLIT
+shell sed -i -e '1,/faust-flag/ d'  $WS.database/Src/$WS.c
+
+shell cc $WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/ref
+shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+shell cc -I../SAC/include $WS.database/Src/$WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/seq
+shell sed -i -e '1 d' $WS.database/Src/$WS.c
+shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+#shell ./compileC.sh $WS $WS.c $WS.database/Tmp/sse.c
+#shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
+
+
+close
+delete cry4pips
+quit
