@@ -110,7 +110,7 @@ static
 void simd_trace_call(statement s, hash_table array_to_vector)
 {
     /* we only look for load - save statement */
-    if( simd_loadsave_stat_p(s) )
+    if( simd_dma_stat_p(s) )
     {
         list args = call_arguments(statement_call(s));
         int nb_args = gen_length(args);

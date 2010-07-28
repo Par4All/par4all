@@ -39,6 +39,7 @@
 
 #include "effects-generic.h"
 #include "transformations.h"
+#include "properties.h"
 
 #include "sac.h"
 
@@ -50,23 +51,39 @@
 static graph dependence_graph;
 
 
-#define SIZEOFSTRING(s) (sizeof((s))-1)
+/* a conflict is a dma conflict if source and sink regions are not included
+ * one in each other.
+ * this a very rough approximattion and requires more care
+ * this require region_chains :)
+ */
+static bool dma_conflict_p(conflict c)
+{
+    effect source = conflict_source(c),
+           sink = conflict_sink(c);
+    descriptor dsource = effect_descriptor(source),
+           dsink = effect_descriptor(sink);
+    if(descriptor_convex_p(dsource) && descriptor_convex_p(dsink))
+    {
+        Psysteme psource = descriptor_convex(dsource),
+                 psink = descriptor_convex(dsink);
+        return !(sc_inclusion_p(psink,psource) || sc_inclusion_p(psource,psink));
+    }
+    /* be conservative */
+    return true;
+}
 
-
-static bool simd_save_stat_p(statement stat)
+static bool simd_work_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
 
         string funcName = entity_local_name(call_function(statement_call(stat)));
-        return    same_stringn_p(funcName, SIMD_SAVE_NAME, SIZEOFSTRING(SIMD_SAVE_NAME))
-               || same_stringn_p(funcName, SIMD_GEN_SAVE_NAME, SIZEOFSTRING(SIMD_GEN_SAVE_NAME))
-               || same_stringn_p(funcName, SIMD_CONS_SAVE_NAME, SIZEOFSTRING(SIMD_CONS_SAVE_NAME))
-               || same_stringn_p(funcName, SIMD_MASKED_SAVE_NAME, SIZEOFSTRING(SIMD_MASKED_SAVE_NAME));
+        string simd_work = get_string_property("ACCEL_WORK");
+        return    same_stringn_p(funcName, simd_work, strlen(simd_work));
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 static bool simd_load_stat_p(statement stat)
@@ -75,22 +92,34 @@ static bool simd_load_stat_p(statement stat)
     {
 
         string funcName = entity_local_name(call_function(statement_call(stat)));
-        return    same_stringn_p(funcName, SIMD_LOAD_NAME, SIZEOFSTRING(SIMD_LOAD_NAME))
-               || same_stringn_p(funcName, SIMD_GEN_LOAD_NAME, SIZEOFSTRING(SIMD_GEN_LOAD_NAME))
-               || same_stringn_p(funcName, SIMD_CONS_LOAD_NAME,SIZEOFSTRING(SIMD_CONS_LOAD_NAME))
-               || same_stringn_p(funcName, SIMD_MASKED_LOAD_NAME, SIZEOFSTRING(SIMD_MASKED_LOAD_NAME));
+        string simd_load = get_string_property("ACCEL_LOAD");
+        return    same_stringn_p(funcName, simd_load, strlen(simd_load));
     }
     else
     {
-        return FALSE;
+        return false;
+    }
+}
+static bool simd_store_stat_p(statement stat)
+{
+    if(statement_call_p(stat))
+    {
+
+        string funcName = entity_local_name(call_function(statement_call(stat)));
+        string simd_store = get_string_property("ACCEL_STORE");
+        return    same_stringn_p(funcName, simd_store, strlen(simd_store));
+    }
+    else
+    {
+        return false;
     }
 }
 /* This function returns true if the statement is a simd loadsave
  * statement
  */
-bool simd_loadsave_stat_p(statement stat)
+bool simd_dma_stat_p(statement stat)
 {
-    return simd_load_stat_p(stat) || simd_save_stat_p(stat);
+    return simd_load_stat_p(stat) || simd_store_stat_p(stat);
 }
 
 /* This function returns true if the statement is a simd
@@ -98,48 +127,8 @@ bool simd_loadsave_stat_p(statement stat)
  */
 static bool simd_stat_p(statement stat)
 {
-    return statement_call_p(stat)
-        && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIZEOFSTRING(SIMD_NAME));
+    return simd_dma_stat_p(stat) || simd_work_stat_p(stat);
 }
-
-/* This function checks if two list of expression are equals (modulo the & operator)
- */
-static bool list_eq_expression(list args1, list args2, bool allow_addressing)
-{
-    if(gen_length(args1) == gen_length(args2))
-    {
-        list pArgs2 = args2;
-        FOREACH(EXPRESSION, exp1, args1)
-        {
-            expression exp2 = EXPRESSION(CAR(pArgs2));
-            /* hack to handle the & operator in C */
-            if(allow_addressing)
-            {
-                if( expression_call_p(exp1) )
-                {
-                    call c = expression_call(exp1);
-                    if( entity_an_operator_p( call_function(c) , ADDRESS_OF ) )
-                        exp1 = EXPRESSION(CAR( call_arguments(c) ) );
-                }
-                if( expression_call_p(exp2) )
-                {
-                    call c = expression_call(exp2);
-                    if( entity_an_operator_p( call_function(c) , ADDRESS_OF ) )
-                        exp2 = EXPRESSION(CAR( call_arguments(c) ) );
-                }
-            }
-            if(!same_expression_p(exp1, exp2))
-                return FALSE;
-            pArgs2 = CDR(pArgs2);
-        }
-        return TRUE;
-    }
-    else
-    {
-        return FALSE;
-    }
-}
-
 
 /* This function returns true if the arguments of the simd statement theStat do
  * not depend on the loop iteration
@@ -174,10 +163,8 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                         return false;
                     }
                     // If stat2 is a loadsave statement and that there is a conflict
-                    // between the arguments of
-                    else if(   simd_loadsave_stat_p(stat2)
-                            && !list_eq_expression(args, CDR(call_arguments(statement_call(stat2))),true)
-                           )
+                    // between their arguments of
+                    else if( simd_dma_stat_p(stat2) && dma_conflict_p(c))
                     {
                         pips_debug(1,"conflicting with:\n");
                         ifdebug(1) { print_statement(stat2); }
@@ -247,10 +234,9 @@ static bool searchForConstArgs(statement head,statement body, hash_table constAr
             ifdebug(1) { print_statement(curStat); }
 
             // If if it is a simd load or save statement, ...
-            if(simd_loadsave_stat_p(curStat))
+            if(simd_dma_stat_p(curStat))
             {
-                /* first argument is always a vector */
-                list args = CDR(call_arguments(statement_call(curStat)));
+                list args = call_arguments(statement_call(curStat));
 
                 /* If the arguments of the statement do not depend on the iteration,
                  * then store the statement in constArgs
@@ -271,30 +257,6 @@ static bool searchForConstArgs(statement head,statement body, hash_table constAr
     {
         return false;
     }
-}
-
-static list simdstatement_to_entities(statement s)
-{
-    list out = NIL;
-    FOREACH(EXPRESSION,exp,call_arguments(statement_call(s)))
-    {
-        if(expression_call_p(exp))
-        {
-            call c = expression_call(exp);
-            if(ENTITY_ADDRESS_OF_P(call_function(c)))
-            {
-                exp=EXPRESSION(CAR(call_arguments(c)));
-                if(expression_reference_p(exp))
-                    out=CONS(ENTITY,expression_to_entity(exp),out);
-                else if(expression_field_p(exp))
-                    out=CONS(ENTITY,expression_to_entity(binary_call_lhs(expression_call(exp))),out);
-            }
-
-        }
-        else if(expression_reference_p(exp))
-            out=CONS(ENTITY,expression_to_entity(exp),out);
-    }
-    return out;
 }
 
 /* This function moves the statements in constArgs out of the loop body
@@ -318,7 +280,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
     /* reverse now so that everything is built in correct order */
     sequence_statements(instruction_sequence(statement_instruction(body)))=gen_nreverse(statement_block(body));
 
-    /* work on a copy beacuase we remove statement during iteration */
+    /* work on a copy because we remove statement during iteration */
     list body_statement_copies = gen_copy_seq(statement_block(body));
     
     FOREACH(STATEMENT, curStat, body_statement_copies)
@@ -328,12 +290,13 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
         /* add it to argsToVect / argsToFunc */
         if(args != HASH_UNDEFINED_VALUE)
         {
-            list moved_entities=simdstatement_to_entities(curStat);
-            set_append_list(moved_vectors,moved_entities);
-            gen_free_list(moved_entities);
+            set moved_entities=get_referenced_entities(curStat);
+            SET_FOREACH(entity,e,moved_entities)
+                if(entity_variable_p(e)) set_add_element(moved_vectors,moved_vectors,e);
+            set_free(moved_entities);
             if(simd_load_stat_p(curStat))
                 headerSeq = CONS(STATEMENT, curStat,headerSeq);
-            else if(simd_save_stat_p(curStat) )
+            else if(simd_store_stat_p(curStat) )
                 footerSeq = CONS(STATEMENT, curStat,footerSeq);
             else
                 pips_user_error("const statement not a load or save !?!");
@@ -342,7 +305,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
          * moved entities from moved_vectors */
         else if(declaration_statement_p(curStat))
         {
-            /* copy beacause cannot modify in place using RemoveLocal... */
+            /* copy because cannot modify in place using RemoveLocal... */
             list declared_entities = gen_copy_seq(statement_declarations(curStat));
             bool something_did_not_move = false;
             FOREACH(ENTITY,e,declared_entities)

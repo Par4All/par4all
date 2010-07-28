@@ -659,14 +659,13 @@ void replace_subscript(expression e)
     {
         if(!expression_call_p(e) || expression_field_p(e))
         {
-            unnormalize_expression(e);
-            expression_syntax(e) = make_syntax_call(
-                    make_call(
-                        entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                        make_expression_list(
-                            make_expression(
-                                expression_syntax(e),
-                                normalized_undefined
+            syntax syn = expression_syntax(e);
+            expression_syntax(e)=syntax_undefined;
+            update_expression_syntax(e,make_syntax_call(
+                        make_call(
+                            entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                            make_expression_list(
+                                make_expression(syn,normalized_undefined)
                                 )
                             )
                         )
@@ -682,14 +681,14 @@ static statement make_exec_statement_from_name(string ename, list args)
     entity exec_function = module_name_to_entity(ename);
     if( c_module_p(exec_function) )
     {
-        if( strstr(ename,SIMD_GEN_LOAD_NAME) )
-        {
+        string pattern0;
+        asprintf(&pattern0,"%s" SIMD_GENERIC_SUFFIX,get_string_property("ACCEL_LOAD"));
+        if( strstr(ename,pattern0) )
             replace_subscript( EXPRESSION(CAR(args)));
-        }
-        else
-        {
+        else {
             FOREACH(EXPRESSION,e,args) replace_subscript(e);
         }
+        free(pattern0);
     }
     return call_to_statement(make_call(get_function_entity(ename), args));
 }
@@ -724,12 +723,17 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         CONSTANT,
         OTHER
     } argsType;
-    const char funcNames[4][2][20] = {
-        { SIMD_SAVE_NAME"_",            SIMD_LOAD_NAME"_"},
-        { SIMD_MASKED_SAVE_NAME"_",     SIMD_MASKED_LOAD_NAME"_"},
-        { SIMD_CONS_SAVE_NAME"_",       SIMD_CONS_LOAD_NAME"_"},
-        { SIMD_GEN_SAVE_NAME"_",        SIMD_GEN_LOAD_NAME"_"}
-    };
+    static  char *funcNames[4][2] = { { NULL,NULL},{NULL,NULL},{NULL,NULL},{NULL,NULL}};
+    if(!funcNames[0][0]) {
+        asprintf(&funcNames[0][0],"%s_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[0][1],"%s_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[1][0],"%s"SIMD_MASKED_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[1][1],"%s"SIMD_MASKED_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[2][0],"%s"SIMD_CONSTANT_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[2][1],"%s"SIMD_CONSTANT_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[3][0],"%s"SIMD_GENERIC_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[3][1],"%s"SIMD_GENERIC_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+    }
     int lastOffset = 0;
     char *functionName;
 

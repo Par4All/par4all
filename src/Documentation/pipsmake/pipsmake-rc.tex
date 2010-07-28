@@ -5279,6 +5279,19 @@ The SAC project aims at generating efficient code for processors with SIMD
 extension instruction set such as VMX, SSE4, etc. For more information,
 see \url{https://info.enstb.org/projets/sac}.
 
+Some phases use \PipsPropRef{DMA_LOAD} and \PipsPropRef{DMA_STORE} to generate DMA calls
+and \PipsPropRef{ACCEL_WORK}.
+
+\begin{PipsProp}{ACCEL_LOAD}
+ACCEL_LOAD "SIMD_LOAD"
+\end{PipsProp}
+\begin{PipsProp}{ACCEL_STORE}
+ACCEL_STORE "SIMD_STORE"
+\end{PipsProp}
+\begin{PipsProp}{ACCEL_WORK}
+ACCEL_WORK "SIMD_"
+\end{PipsProp}
+
 \begin{PipsPass}{simd_atomizer}
   Here is yet another atomizer, based on {\tt new\_atomizer} (see
   Section~\ref{subsubsection:limited-atomizer}), used to reduce
