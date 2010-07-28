@@ -17,7 +17,7 @@ void foo_l(int a[4], int b[40])
       SIMD_LOAD_V4SI(v4si_vec1, &b[4*i]);
       SIMD_LOAD_V4SI(v4si_vec0, &a[0]);
       SIMD_ADDD(v4si_vec0, v4si_vec0, v4si_vec1);
-      SIMD_SAVE_V4SI(v4si_vec0, &a[0]);
+      SIMD_STORE_V4SI(v4si_vec0, &a[0]);
    }
 }
 void foo_l(int a[4], int b[40])
@@ -33,7 +33,7 @@ void foo_l(int a[4], int b[40])
          SIMD_LOAD_V4SI(v4si_vec1, &b[4*i]);
          SIMD_ADDD(v4si_vec0, v4si_vec0, v4si_vec1);
       }
-      SIMD_SAVE_V4SI(v4si_vec0, &a[0]);
+      SIMD_STORE_V4SI(v4si_vec0, &a[0]);
    }
 }
 

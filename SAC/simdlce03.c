@@ -35,10 +35,10 @@ l100:            ;
             SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
             SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
             SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-            SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+            SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
             SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
             SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-            SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED0[0]);
+            SIMD_STORE_MASKED_V4SF(v4sf_vec3, &RED0[0]);
             kj = 3;
          }
          F_30 = RED0[0]+new_image[i][j];

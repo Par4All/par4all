@@ -6,6 +6,8 @@ delete fs03
 create fs03 fs03.f
 echo !! Initial file
 display PRINTED_FILE
+activate REGION_CHAINS
+activate RICE_REGIONS_DEPENDENCE_GRAPH
 apply FORWARD_SUBSTITUTE
 echo !! After forward substitution
 display PRINTED_FILE

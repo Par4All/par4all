@@ -255,10 +255,10 @@ loop1:      ;
       SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[0][0], b[1][0], b[2][0], PADDING_VALUE);
       SIMD_LOAD_V4SF(v4sf_vec1, &a[i][0]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
       SIMD_LOAD_V4SF(v4sf_vec3, &RED[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-      SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED[0]);
+      SIMD_STORE_MASKED_V4SF(v4sf_vec3, &RED[0]);
       k = 3;
       for(k = 0; k <= 2; k += 1)
          c[i][0] = c[i][0]+RED[k];
@@ -268,10 +268,10 @@ loop1:      ;
       SIMD_LOAD_GENERIC_V4SF(v4sf_vec7, b[0][1], b[1][1], b[2][1], PADDING_VALUE);
       SIMD_LOAD_V4SF(v4sf_vec6, &a[i][0]);
       SIMD_MULPS(v4sf_vec5, v4sf_vec6, v4sf_vec7);
-      SIMD_SAVE_V4SF(v4sf_vec5, &aligned0[0]);
+      SIMD_STORE_V4SF(v4sf_vec5, &aligned0[0]);
       SIMD_LOAD_V4SF(v4sf_vec8, &RED[0]);
       SIMD_ADDPS(v4sf_vec8, v4sf_vec8, v4sf_vec5);
-      SIMD_MASKED_SAVE_V4SF(v4sf_vec8, &RED[0]);
+      SIMD_STORE_MASKED_V4SF(v4sf_vec8, &RED[0]);
       k = 3;
       for(k = 0; k <= 2; k += 1)
          c[i][1] = c[i][1]+RED[k];
@@ -281,10 +281,10 @@ loop1:      ;
       SIMD_LOAD_GENERIC_V4SF(v4sf_vec12, b[0][2], b[1][2], b[2][2], PADDING_VALUE);
       SIMD_LOAD_V4SF(v4sf_vec11, &a[i][0]);
       SIMD_MULPS(v4sf_vec10, v4sf_vec11, v4sf_vec12);
-      SIMD_SAVE_V4SF(v4sf_vec10, &aligned1[0]);
+      SIMD_STORE_V4SF(v4sf_vec10, &aligned1[0]);
       SIMD_LOAD_V4SF(v4sf_vec13, &RED[0]);
       SIMD_ADDPS(v4sf_vec13, v4sf_vec13, v4sf_vec10);
-      SIMD_MASKED_SAVE_V4SF(v4sf_vec13, &RED[0]);
+      SIMD_STORE_MASKED_V4SF(v4sf_vec13, &RED[0]);
       k = 3;
       for(k = 0; k <= 2; k += 1)
          c[i][2] = c[i][2]+RED[k];
@@ -332,7 +332,7 @@ loop1:         ;
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_LOAD_V4SF(v4sf_vec3, &RED[0]);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-         SIMD_MASKED_SAVE_V4SF(v4sf_vec3, &RED[0]);
+         SIMD_STORE_MASKED_V4SF(v4sf_vec3, &RED[0]);
          k = 3;
          for(k = 0; k <= 2; k += 1)
             c[i][0] = c[i][0]+RED[k];
@@ -343,7 +343,7 @@ loop1:         ;
          SIMD_MULPS(v4sf_vec5, v4sf_vec6, v4sf_vec7);
          SIMD_LOAD_V4SF(v4sf_vec8, &RED[0]);
          SIMD_ADDPS(v4sf_vec8, v4sf_vec8, v4sf_vec5);
-         SIMD_MASKED_SAVE_V4SF(v4sf_vec8, &RED[0]);
+         SIMD_STORE_MASKED_V4SF(v4sf_vec8, &RED[0]);
          k = 3;
          for(k = 0; k <= 2; k += 1)
             c[i][1] = c[i][1]+RED[k];
@@ -354,15 +354,15 @@ loop1:         ;
          SIMD_MULPS(v4sf_vec10, v4sf_vec11, v4sf_vec12);
          SIMD_LOAD_V4SF(v4sf_vec13, &RED[0]);
          SIMD_ADDPS(v4sf_vec13, v4sf_vec13, v4sf_vec10);
-         SIMD_MASKED_SAVE_V4SF(v4sf_vec13, &RED[0]);
+         SIMD_STORE_MASKED_V4SF(v4sf_vec13, &RED[0]);
          k = 3;
          for(k = 0; k <= 2; k += 1)
             c[i][2] = c[i][2]+RED[k];
          j = 3;
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-      SIMD_SAVE_V4SF(v4sf_vec5, &aligned0[0]);
-      SIMD_SAVE_V4SF(v4sf_vec10, &aligned1[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec5, &aligned0[0]);
+      SIMD_STORE_V4SF(v4sf_vec10, &aligned1[0]);
    }
 }
 seq-ok

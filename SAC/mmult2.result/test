@@ -436,10 +436,10 @@ l99999:
                   SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[LU_IND1][j+4*j_t-5], b[1+LU_IND1][j+4*j_t-5], b[2+LU_IND1][j+4*j_t-5], b[3+LU_IND1][j+4*j_t-5]);
                   SIMD_LOAD_V4SF(v4sf_vec1, &a[i+4*i_t-5][LU_IND1]);
                   SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-                  SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+                  SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
                   SIMD_LOAD_V4SF(v4sf_vec3, &RED[LU_IND1]);
                   SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-                  SIMD_SAVE_V4SF(v4sf_vec3, &RED[LU_IND1]);
+                  SIMD_STORE_V4SF(v4sf_vec3, &RED[LU_IND1]);
                }
                k = 17;
                LU_NUB2 = 16;
@@ -519,9 +519,9 @@ l99999:            ;
                      SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
                      SIMD_LOAD_V4SF(v4sf_vec3, &RED[LU_IND1]);
                      SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-                     SIMD_SAVE_V4SF(v4sf_vec3, &RED[LU_IND1]);
+                     SIMD_STORE_V4SF(v4sf_vec3, &RED[LU_IND1]);
                   }
-                  SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+                  SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
                }
                k = 17;
                LU_NUB2 = 16;

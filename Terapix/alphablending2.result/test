@@ -12,7 +12,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= n-1; i += 1)
 l99999:
@@ -21,14 +21,14 @@ l99999:
 #pragma pips inserted statement to check
    for(i = n; i <= 128*((127+n)/128)-1; i += 1)
 l99997:
-      for(I_0 = 0; I_0 <= n-1; I_0 += 1)
-         result[i][I_0] = (40*src0[i][I_0]+60*src1[i][I_0])*(1/100<<4)>>4;
+      for(j0 = 0; j0 <= n-1; j0 += 1)
+         result[i][j0] = (40*src0[i][j0]+60*src1[i][j0])*(1/100<<4)>>4;
 }
 void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= n-1; i += 1)
 l99999:
@@ -37,14 +37,14 @@ l99999:
 #pragma pips inserted statement
    for(i = n; i <= 128*((127+n)/128)-1; i += 1)
 l99997:
-      for(I_0 = 0; I_0 <= n-1; I_0 += 1)
-         result[i][I_0] = (40*src0[i][I_0]+60*src1[i][I_0])*(1/100<<4)>>4;
+      for(j0 = 0; j0 <= n-1; j0 += 1)
+         result[i][j0] = (40*src0[i][j0]+60*src1[i][j0])*(1/100<<4)>>4;
 }
 void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= 128*((127+n)/128)-1; i += 1)
 l99999:
@@ -56,7 +56,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= 128*((127+n)/128)-1; i += 1) {
 l99999:
@@ -72,7 +72,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= 128*((127+n)/128)-1; i += 1) {
 l99999:
@@ -88,7 +88,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0;
+   unsigned int j0;
 l99998:
    for(i = 0; i <= 128*((127+n)/128)-1; i += 1) {
 l99999:
@@ -102,7 +102,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
 #pragma omp parallel for private(i,j)
 l99998:
    for(it = 0; it <= 128*((127+n)/128)-1; it += 128)
@@ -120,7 +120,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
 #pragma omp parallel for private(i,j)
 l99998:
    for(it = 0; it <= 128*((127+n)/128)-1; it += 128)
@@ -151,7 +151,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
    //PIPS generated variable
    int i0, i1, i2, i3, i4, i5, i6;
 #pragma omp parallel for private(i,j)
@@ -208,7 +208,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
    //PIPS generated variable
    int i0, i1, i2, i3, i4, i5, i6;
 #pragma omp parallel for private(i,j)
@@ -265,7 +265,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
    //PIPS generated variable
    int i0, i1, i2, i3, i4, i5, i6;
 #pragma omp parallel for private(i,j)
@@ -323,7 +323,7 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 {
    unsigned int i, j;
    //PIPS generated variable
-   unsigned int I_0, it, jt;
+   unsigned int j0, it, jt;
    //PIPS generated variable
    int i0, i1, i2, i3, i4, i5, i6;
 #pragma omp parallel for private(i,i0,i1,i2,i3,i4,i5,i6,jt)
@@ -378,99 +378,99 @@ l99989:
       }
 }
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_1, I_1<=9, I_1<=n+7,
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_0, I_0<=9, I_0<=n+7,
 //    1<=it, 128it<=n+254}>
 //  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 //  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 //  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 
-void launcher_0(int I_1, unsigned int it, int caillou0[5], int n, short result0[129][9], short src00[129][9], short src10[129][9])
+void launcher_0(int I_0, unsigned int it, int caillou0[5], int n, short result0[129][9], short src00[129][9], short src10[129][9])
 {
    //PIPS generated variable
    unsigned int i, j;
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_1, I_1<=9, I_1<=n+7,
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_0, I_0<=9, I_0<=n+7,
 //    1<=it, 128it<=n+254}>
 //  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 //  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 //  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_1, I_1<=9, I_1<=n+7, 1<=it}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0<=n+7, 1<=it}>
 
 l99995:
    for(i = 1; i <= MIN(128*it, 128*((n+127)/128)-1)-128*it+129; i += 1)
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_1, I_1<=9, I_1<=n+7,
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_0, I_0<=9, I_0<=n+7,
 //    1<=i, i<=129, i+128it<=n+255, 1<=it}>
-//  <result0[PHI1][PHI2]-W-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_1,
-//    I_1<=9, I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
-//  <src00[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_1, I_1<=9,
-//    I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
-//  <src10[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_1, I_1<=9,
-//    I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
+//  <result0[PHI1][PHI2]-W-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0,
+//    I_0<=9, I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
+//  <src00[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0, I_0<=9,
+//    I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
+//  <src10[PHI1][PHI2]-R-MAY-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0, I_0<=9,
+//    I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it}>
 
 l99996:
-      for(j = 1; j <= I_1; j += 1)
+      for(j = 1; j <= I_0; j += 1)
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, I_1<=9, j<=I_1, I_1<=n+7,
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, I_0<=9, j<=I_0, I_0<=n+7,
 //    1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
-//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_1<=9,
-//    j<=I_1, I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
-//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_1<=9, j<=I_1,
-//    I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
-//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_1<=9, j<=I_1,
-//    I_1<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
+//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_0<=9,
+//    j<=I_0, I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0<=9, j<=I_0,
+//    I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0<=9, j<=I_0,
+//    I_0<=n+7, 1<=i, i<=129, i+128it<=n+255, 1<=it, 1<=j}>
 
          result0[i-1][j-1] = (caillou0[3]*src00[i-1][j-1]+caillou0[4]*src10[i-1][j-1])*(caillou0[0]/caillou0[1]<<caillou0[2])>>caillou0[2];
 }
 outlining to microcode
 label: l99996
-void launcher_0(int I_1, unsigned int it, int caillou0[5], int n, short result0[129][9], short src00[129][9], short src10[129][9])
+void launcher_0(int I_0, unsigned int it, int caillou0[5], int n, short result0[129][9], short src00[129][9], short src10[129][9])
 {
    //PIPS generated variable
    unsigned int i, j;
 l99995:
    for(i = 1; i <= MIN(128*it, 128*((n+127)/128)-1)-128*it+129; i += 1)
-l99996:      launcher_0_microcode(I_1, caillou0, &result0[-1+i], &src00[-1+i], &src10[-1+i]);
+l99996:      launcher_0_microcode(I_0, caillou0, &result0[-1+i], &src00[-1+i], &src10[-1+i]);
 }
-void launcher_0_microcode(int I_1, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
+void launcher_0_microcode(int I_0, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
 {
    //PIPS generated variable
    unsigned int j;
 l99996:
-   for(j = 1; j <= I_1; j += 1)
+   for(j = 1; j <= I_0; j += 1)
       (*result00)[j-1] = (caillou0[3]*(*src000)[j-1]+caillou0[4]*(*src100)[j-1])*(caillou0[0]/caillou0[1]<<caillou0[2])>>caillou0[2];
 }
 normalize microcode launcher_0_microcode
-void launcher_0_microcode(int I_1, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
+void launcher_0_microcode(int I_0, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
 {
    //PIPS generated variable
    unsigned int j;
 l99996:
-   for(j = 0; j <= -1+I_1; j += 1)
+   for(j = 0; j <= -1+I_0; j += 1)
       (*result00)[j+1-1] = (caillou0[3]*(*src000)[j+1-1]+caillou0[4]*(*src100)[j+1-1])*(caillou0[0]/caillou0[1]<<caillou0[2])>>caillou0[2];
 }
-void launcher_0_microcode(int I_1, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
+void launcher_0_microcode(int I_0, int caillou0[5], short (*result00)[9], short (*src000)[9], short (*src100)[9])
 {
    //PIPS generated variable
    unsigned int j;
 l99996:
-   for(j = 0; j <= -1+I_1; j += 1)
+   for(j = 0; j <= -1+I_0; j += 1)
       (*result00)[j+1-1] = (caillou0[3]*(*src000)[j+1-1]+caillou0[4]*(*src100)[j+1-1])*(caillou0[0]/caillou0[1]<<caillou0[2])>>caillou0[2];
 }
-void launcher_0_microcode(int I_1, int *caillou0, short *result00, short *src000, short *src100)
+void launcher_0_microcode(int I_0, int *caillou0, short *result00, short *src000, short *src100)
 {
    //PIPS generated variable
    unsigned int j;
 l99996:
-   for(j = 0; j <= -1+I_1; j += 1)
+   for(j = 0; j <= -1+I_0; j += 1)
       *(result00+j+1-1) = (caillou0[3]**(src000+j+1-1)+caillou0[4]**(src100+j+1-1))*(caillou0[0]/caillou0[1]<<caillou0[2])>>caillou0[2];
 }
-I_1 belongs to a loop bound
+I_0 belongs to a loop bound
 caillou0 seems a mask
 result00 seems a mask
 src000 seems a mask
@@ -519,15 +519,15 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int I_2, I_3;
+   int I_1, I_2;
    //PIPS generated variable
    short *P_0;
    //PIPS generated variable
-   int I_4, I_5, I_6;
+   int I_3, I_4, I_5;
    //PIPS generated variable
    short *P_1;
    //PIPS generated variable
-   int I_7, I_8, I_9, I_10, I_11, I_12, I_13;
+   int I_6, I_7, I_8, I_9, I_10, I_11, I_12;
    //PIPS generated variable
    short *P_2;
    ma3 = FIFO3;
@@ -537,22 +537,22 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
 l99996:   ;
    re2 = 1;
    while (re2<=N0) {
-      I_2 = re2+1;
-      I_3 = I_2-1;
-      P_0 = ma2+I_3;
-      I_4 = ma0[3]**P_0;
-      I_5 = re2+1;
-      I_6 = I_5-1;
-      P_1 = ma3+I_6;
-      I_7 = ma0[4]**P_1;
-      I_8 = I_4+I_7;
-      I_9 = ma0[0]/ma0[1];
-      I_10 = I_9<<ma0[2];
-      I_11 = I_8*I_10;
-      I_12 = re2+1;
-      I_13 = I_12-1;
-      P_2 = ma1+I_13;
-      *P_2 = I_11>>ma0[2];
+      I_1 = re2+1;
+      I_2 = I_1-1;
+      P_0 = ma2+I_2;
+      I_3 = ma0[3]**P_0;
+      I_4 = re2+1;
+      I_5 = I_4-1;
+      P_1 = ma3+I_5;
+      I_6 = ma0[4]**P_1;
+      I_7 = I_3+I_6;
+      I_8 = ma0[0]/ma0[1];
+      I_9 = I_8<<ma0[2];
+      I_10 = I_7*I_9;
+      I_11 = re2+1;
+      I_12 = I_11-1;
+      P_2 = ma1+I_12;
+      *P_2 = I_10>>ma0[2];
       re2 = 1+re2;
    }
 }
@@ -573,15 +573,15 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int I_2, I_3;
+   int I_1, I_2;
    //PIPS generated variable
    short *P_0;
    //PIPS generated variable
-   int I_4, I_5, I_6;
+   int I_3, I_4, I_5;
    //PIPS generated variable
    short *P_1;
    //PIPS generated variable
-   int I_7, I_8, I_9, I_10, I_11, I_12, I_13;
+   int I_6, I_7, I_8, I_9, I_10, I_11, I_12;
    //PIPS generated variable
    short *P_2;
    ma3 = FIFO3;
@@ -591,37 +591,37 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
 l99996:   ;
    re2 = 1;
    while (re2<=N0) {
-      I_2 = re2;
-      I_2 = I_2+1;
-      I_3 = I_2;
-      I_3 = I_3-1;
+      I_1 = re2;
+      I_1 = I_1+1;
+      I_2 = I_1;
+      I_2 = I_2-1;
       P_0 = ma2;
-      P_0 = P_0+I_3;
-      I_4 = ma0[3];
-      I_4 = I_4**P_0;
-      I_5 = re2;
-      I_5 = I_5+1;
-      I_6 = I_5;
-      I_6 = I_6-1;
+      P_0 = P_0+I_2;
+      I_3 = ma0[3];
+      I_3 = I_3**P_0;
+      I_4 = re2;
+      I_4 = I_4+1;
+      I_5 = I_4;
+      I_5 = I_5-1;
       P_1 = ma3;
-      P_1 = P_1+I_6;
-      I_7 = ma0[4];
-      I_7 = I_7**P_1;
-      I_8 = I_4;
-      I_8 = I_8+I_7;
-      I_9 = ma0[0];
-      I_9 = I_9/ma0[1];
-      I_10 = I_9;
-      I_10 = I_10<<ma0[2];
-      I_11 = I_8;
-      I_11 = I_11*I_10;
-      I_12 = re2;
-      I_12 = I_12+1;
-      I_13 = I_12;
-      I_13 = I_13-1;
+      P_1 = P_1+I_5;
+      I_6 = ma0[4];
+      I_6 = I_6**P_1;
+      I_7 = I_3;
+      I_7 = I_7+I_6;
+      I_8 = ma0[0];
+      I_8 = I_8/ma0[1];
+      I_9 = I_8;
+      I_9 = I_9<<ma0[2];
+      I_10 = I_7;
+      I_10 = I_10*I_9;
+      I_11 = re2;
+      I_11 = I_11+1;
+      I_12 = I_11;
+      I_12 = I_12-1;
       P_2 = ma1;
-      P_2 = P_2+I_13;
-      *P_2 = I_11;
+      P_2 = P_2+I_12;
+      *P_2 = I_10;
       *P_2 = *P_2>>ma0[2];
       re2 = 1;
       re2 = re2+re2;
@@ -636,15 +636,15 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
    //PIPS generated variable
    unsigned int re2;
    //PIPS generated variable
-   int I_2, I_3;
+   int I_1, I_2;
    //PIPS generated variable
    short *P_0;
    //PIPS generated variable
-   int I_4, I_5, I_6;
+   int I_3, I_4, I_5;
    //PIPS generated variable
    short *P_1;
    //PIPS generated variable
-   int I_7, I_8, I_9, I_10, I_11, I_12, I_13;
+   int I_6, I_7, I_8, I_9, I_10, I_11, I_12;
    //PIPS generated variable
    short *P_2;
    seti(ma3, FIFO3);
@@ -654,37 +654,37 @@ void launcher_0_microcode(int N0, int *FIFO0, short *FIFO1, short *FIFO2, short 
 l99996:   ;
    seti(re2, 1);
    while (re2<=N0) {
-      seti(I_2, re2);
-      addi(I_2, 1);
-      seti(I_3, I_2);
-      subi(I_3, 1);
+      seti(I_1, re2);
+      addi(I_1, 1);
+      seti(I_2, I_1);
+      subi(I_2, 1);
       seti(P_0, ma2);
-      paddi(P_0, I_3);
-      seti(I_4, ma0[3]);
-      mulri(I_4, P_0);
-      seti(I_5, re2);
-      addi(I_5, 1);
-      seti(I_6, I_5);
-      subi(I_6, 1);
+      paddi(P_0, I_2);
+      seti(I_3, ma0[3]);
+      mulri(I_3, P_0);
+      seti(I_4, re2);
+      addi(I_4, 1);
+      seti(I_5, I_4);
+      subi(I_5, 1);
       seti(P_1, ma3);
-      paddi(P_1, I_6);
-      seti(I_7, ma0[4]);
-      mulri(I_7, P_1);
-      seti(I_8, I_4);
-      paddi(I_8, I_7);
-      seti(I_9, ma0[0]);
-      I_9 = I_9/ma0[1];
-      seti(I_10, I_9);
-      lshifti(I_10, ma0[2]);
-      seti(I_11, I_8);
-      muli(I_11, I_10);
-      seti(I_12, re2);
-      addi(I_12, 1);
-      seti(I_13, I_12);
-      subi(I_13, 1);
+      paddi(P_1, I_5);
+      seti(I_6, ma0[4]);
+      mulri(I_6, P_1);
+      seti(I_7, I_3);
+      paddi(I_7, I_6);
+      seti(I_8, ma0[0]);
+      I_8 = I_8/ma0[1];
+      seti(I_9, I_8);
+      lshifti(I_9, ma0[2]);
+      seti(I_10, I_7);
+      muli(I_10, I_9);
+      seti(I_11, re2);
+      addi(I_11, 1);
+      seti(I_12, I_11);
+      subi(I_12, 1);
       seti(P_2, ma1);
-      paddi(P_2, I_13);
-      pseti(P_2, I_11);
+      paddi(P_2, I_12);
+      pseti(P_2, I_10);
       prshifti(P_2, ma0[2]);
       seti(re2, 1);
       addi(re2, re2);

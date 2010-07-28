@@ -171,7 +171,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, _return04;
+   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
@@ -181,7 +181,7 @@ float dotprod(int n, float b[n], float c[n])
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
    }
-   a = RED0[0]+a;
+   a1 = RED0[0]+a;
    RED1[0] = 0.000000;
    RED1[1] = 0.000000;
    RED1[2] = 0.000000;
@@ -204,7 +204,7 @@ float dotprod(int n, float b[n], float c[n])
       //c SIMD_COMMENT_1
       RED1[3] = RED1[3]+_return00;
    }
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
+   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
    
    
    return a0;
@@ -217,7 +217,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, _return04;
+   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
@@ -227,7 +227,7 @@ float dotprod(int n, float b[n], float c[n])
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
    }
-   a = RED0[0]+a;
+   a1 = RED0[0]+a;
    RED1[0] = 0.000000;
    RED1[1] = 0.000000;
    RED1[2] = 0.000000;
@@ -242,12 +242,12 @@ float dotprod(int n, float b[n], float c[n])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-      SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+      SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
    }
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
+   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
    
    
    return a0;
@@ -260,7 +260,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, _return04;
+   float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
@@ -270,7 +270,7 @@ float dotprod(int n, float b[n], float c[n])
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
    }
-   a = RED0[0]+a;
+   a1 = RED0[0]+a;
    RED1[0] = 0.000000;
    RED1[1] = 0.000000;
    RED1[2] = 0.000000;
@@ -293,10 +293,10 @@ float dotprod(int n, float b[n], float c[n])
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-      SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
    }
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
+   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
    
    
    return a0;
@@ -307,7 +307,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, _return04;
+   float RED0[1], RED1[4], a0, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
@@ -317,7 +317,7 @@ float dotprod(int n, float b[n], float c[n])
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
    }
-   a = RED0[0]+a;
+   a1 = RED0[0]+a;
    RED1[0] = 0.000000;
    RED1[1] = 0.000000;
    RED1[2] = 0.000000;
@@ -340,10 +340,10 @@ float dotprod(int n, float b[n], float c[n])
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-      SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
    }
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
+   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
    
    
    return a0;
@@ -357,7 +357,7 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, _return04;
+   float RED0[1], RED1[4], a0, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
@@ -367,7 +367,7 @@ float dotprod(int n, float b[n], float c[n])
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
    }
-   a = RED0[0]+a;
+   a1 = RED0[0]+a;
    RED1[0] = 0.000000;
    RED1[1] = 0.000000;
    RED1[2] = 0.000000;
@@ -390,10 +390,10 @@ float dotprod(int n, float b[n], float c[n])
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-      SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
    }
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
+   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
    
    
    return a0;

@@ -262,17 +262,17 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(1+LU_IND0))
          CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
          CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
-         CALL SIMD_SAVE_V4SF(v4sf_vec0, aligned0(0))
+         CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
          CALL SIMD_UMINPS(v4sf_vec3, v4sf_vec1)
-         CALL SIMD_SAVE_V4SF(v4sf_vec3, aligned1(0))
+         CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
          CALL SIMD_LOAD_V4SI_TO_V4SF(v4sf_vec7, aligned2(0))
          CALL SIMD_ADDPS(v4sf_vec5, v4sf_vec3, v4sf_vec7)
-         CALL SIMD_SAVE_V4SF(v4sf_vec5, aligned3(0))
+         CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
          CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
          CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
-         CALL SIMD_SAVE_V4SF(v4sf_vec8, aligned4(0))
+         CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
          CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_SAVE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
+         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
 99998    CONTINUE
       I = 50001
 
@@ -315,12 +315,12 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
          CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
          CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_SAVE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
+         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
 99998    CONTINUE
-      CALL SIMD_SAVE_V4SF(v4sf_vec0, aligned0(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec3, aligned1(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec5, aligned3(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec8, aligned4(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
       I = 50001
 
       END
@@ -359,12 +359,12 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
          CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
          CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_SAVE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
+         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
 99998    CONTINUE
-      CALL SIMD_SAVE_V4SF(v4sf_vec0, aligned0(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec3, aligned1(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec5, aligned3(0))
-      CALL SIMD_SAVE_V4SF(v4sf_vec8, aligned4(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
+      CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
       I = 50001
 
       END
@@ -417,13 +417,13 @@ alphablending (float result[50000], float src[50000], float dest[50000],
       simd_load_v4sf (v4sf_vec10, dest[(1 + lu_ind0) - 1]);
       simd_mulps (v4sf_vec8, v4sf_vec5, v4sf_vec10);
       simd_addps (v4sf_vec11, v4sf_vec0, v4sf_vec8);
-      simd_save_v4sf (v4sf_vec11, result[(1 + lu_ind0) - 1]);
+      simd_store_v4sf (v4sf_vec11, result[(1 + lu_ind0) - 1]);
       continue;
     }
-  simd_save_v4sf (v4sf_vec0, aligned0[0]);
-  simd_save_v4sf (v4sf_vec3, aligned1[0]);
-  simd_save_v4sf (v4sf_vec5, aligned3[0]);
-  simd_save_v4sf (v4sf_vec8, aligned4[0]);
+  simd_store_v4sf (v4sf_vec0, aligned0[0]);
+  simd_store_v4sf (v4sf_vec3, aligned1[0]);
+  simd_store_v4sf (v4sf_vec5, aligned3[0]);
+  simd_store_v4sf (v4sf_vec8, aligned4[0]);
   i = 50001;
   return;
 }

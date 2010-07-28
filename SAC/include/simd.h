@@ -71,7 +71,7 @@ void SIMD(LOAD_GENERIC_V4SI)(v4si vec, int x1, int x2, int x3, int x4)
     simd_load_generic(vec,x1,x2,x3,x4);
 }
 
-void SIMD(SAVE_V4SI)(v4si vec, int *dest)
+void SIMD(STORE_V4SI)(v4si vec, int *dest)
 {
     simd_save(vec,dest);
 }

@@ -121,7 +121,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    for(i = 3; i <= 99; i += 1) {
@@ -164,7 +164,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    for(i = 3; i <= 99; i += 1) {
@@ -207,7 +207,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    for(i = 3; i <= 99; i += 1) {
@@ -230,10 +230,10 @@ void filtre(float x[100], float y[100], float h[4])
       SIMD_LOAD_V4SF(v4sf_vec2, &h[LU_IND0]);
       SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, x[i-LU_IND0], x[i-LU_IND0-1], x[i-LU_IND0-2], x[i-LU_IND0-3]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-      SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+      SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
       y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
       k = 4;
    }
@@ -247,7 +247,7 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
+   float RED0[1], RED1[4], F_00, F_01, F_02, F_03;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    {
@@ -275,11 +275,11 @@ void filtre(float x[100], float y[100], float h[4])
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-         SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
          y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
          k = 4;
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
    }
    ;
 }
@@ -315,11 +315,11 @@ void filtre(float x[100], float y[100], float h[4])
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-         SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
          y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
          4;
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
    }
    ;
 }
@@ -358,11 +358,11 @@ void filtre(float x[100], float y[100], float h[4])
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
          SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-         SIMD_SAVE_V4SF(v4sf_vec3, &RED1[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &RED1[0]);
          y[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y[i];
          4;
       }
-      SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
    }
    ;
 }

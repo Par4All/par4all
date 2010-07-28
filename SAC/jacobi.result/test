@@ -415,16 +415,16 @@ kernel1:
          SIMD_LOAD_V4SF(v4sf_vec2, &space[1+i][1+LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &space[i-1][1+LU_IND0]);
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-         SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
+         SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
          SIMD_LOAD_V4SF(v4sf_vec5, &space[i][LU_IND0]);
          SIMD_ADDPS(v4sf_vec3, v4sf_vec0, v4sf_vec5);
-         SIMD_SAVE_V4SF(v4sf_vec3, &aligned0[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &aligned0[0]);
          SIMD_LOAD_V4SF(v4sf_vec8, &space[i][2+LU_IND0]);
          SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
-         SIMD_SAVE_V4SF(v4sf_vec6, &aligned1[0]);
+         SIMD_STORE_V4SF(v4sf_vec6, &aligned1[0]);
          SIMD_LOAD_V4SF(v4sf_vec10, &aligned2[0]);
          SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
-         SIMD_SAVE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
+         SIMD_STORE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
       }
    }
    for(i = 1; i <= 62; i += 1) {
@@ -454,16 +454,16 @@ kernel1:
          SIMD_LOAD_V4SF(v4sf_vec14, &save[1+i][1+LU_IND1]);
          SIMD_LOAD_V4SF(v4sf_vec13, &save[i-1][1+LU_IND1]);
          SIMD_ADDPS(v4sf_vec12, v4sf_vec13, v4sf_vec14);
-         SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
+         SIMD_STORE_V4SF(v4sf_vec12, &aligned3[0]);
          SIMD_LOAD_V4SF(v4sf_vec17, &save[i][LU_IND1]);
          SIMD_ADDPS(v4sf_vec15, v4sf_vec12, v4sf_vec17);
-         SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
+         SIMD_STORE_V4SF(v4sf_vec15, &aligned4[0]);
          SIMD_LOAD_V4SF(v4sf_vec20, &save[i][2+LU_IND1]);
          SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
-         SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
+         SIMD_STORE_V4SF(v4sf_vec18, &aligned5[0]);
          SIMD_LOAD_V4SF(v4sf_vec22, &aligned6[0]);
          SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
-         SIMD_SAVE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
+         SIMD_STORE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
       }
    }
    ;
@@ -526,11 +526,11 @@ kernel1:   ;
             SIMD_LOAD_V4SF(v4sf_vec8, &space[i][2+LU_IND0]);
             SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
             SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
-            SIMD_SAVE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
+            SIMD_STORE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-         SIMD_SAVE_V4SF(v4sf_vec3, &aligned0[0]);
-         SIMD_SAVE_V4SF(v4sf_vec6, &aligned1[0]);
+         SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &aligned0[0]);
+         SIMD_STORE_V4SF(v4sf_vec6, &aligned1[0]);
       }
    }
    for(i = 1; i <= 62; i += 1) {
@@ -575,11 +575,11 @@ kernel1:   ;
             SIMD_LOAD_V4SF(v4sf_vec20, &save[i][2+LU_IND1]);
             SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
             SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
-            SIMD_SAVE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
+            SIMD_STORE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
-         SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
-         SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
+         SIMD_STORE_V4SF(v4sf_vec12, &aligned3[0]);
+         SIMD_STORE_V4SF(v4sf_vec15, &aligned4[0]);
+         SIMD_STORE_V4SF(v4sf_vec18, &aligned5[0]);
       }
    }
    ;
@@ -639,11 +639,11 @@ void compute()
             SIMD_LOAD_V4SF(v4sf_vec8, &space[i][2+LU_IND0]);
             SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
             SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
-            SIMD_SAVE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
+            SIMD_STORE_V4SF(v4sf_vec9, &save[i][1+LU_IND0]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec0, &aligned[0]);
-         SIMD_SAVE_V4SF(v4sf_vec3, &aligned0[0]);
-         SIMD_SAVE_V4SF(v4sf_vec6, &aligned1[0]);
+         SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &aligned0[0]);
+         SIMD_STORE_V4SF(v4sf_vec6, &aligned1[0]);
       }
    }
    for(i = 1; i <= 62; i += 1) {
@@ -688,11 +688,11 @@ void compute()
             SIMD_LOAD_V4SF(v4sf_vec20, &save[i][2+LU_IND1]);
             SIMD_ADDPS(v4sf_vec18, v4sf_vec15, v4sf_vec20);
             SIMD_MULPS(v4sf_vec21, v4sf_vec22, v4sf_vec18);
-            SIMD_SAVE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
+            SIMD_STORE_V4SF(v4sf_vec21, &space[i][1+LU_IND1]);
          }
-         SIMD_SAVE_V4SF(v4sf_vec12, &aligned3[0]);
-         SIMD_SAVE_V4SF(v4sf_vec15, &aligned4[0]);
-         SIMD_SAVE_V4SF(v4sf_vec18, &aligned5[0]);
+         SIMD_STORE_V4SF(v4sf_vec12, &aligned3[0]);
+         SIMD_STORE_V4SF(v4sf_vec15, &aligned4[0]);
+         SIMD_STORE_V4SF(v4sf_vec18, &aligned5[0]);
       }
    }
    ;

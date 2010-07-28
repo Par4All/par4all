@@ -14,7 +14,7 @@ SIMD_LOAD_GENERIC_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
     VEC[3] = X3;
 }
 void
-SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
+SIMD_STORE_V4SF (float VEC[4], float BASE[4])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
@@ -22,7 +22,7 @@ SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
     BASE[3] = VEC[3];
 }
 void
-SIMD_SAVE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
+SIMD_STORE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
         float X3[1], float X4[1])
 {
 

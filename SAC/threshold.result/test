@@ -205,9 +205,9 @@ void threshold(float data[128], float val)
          SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
          SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-         SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+         SIMD_STORE_V4SI(v4si_vec0, &I_0[LU_IND0]);
          SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+         SIMD_STORE_V4SF(v4sf_vec3, &data[LU_IND0]);
       }
       i = 128;
    }
@@ -243,9 +243,9 @@ void threshold(float data[128], float val)
             float v4sf_vec5[4];
             SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
             SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_STORE_V4SI(v4si_vec0, &I_0[LU_IND0]);
             SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+            SIMD_STORE_V4SF(v4sf_vec3, &data[LU_IND0]);
          }
       }
       i = 128;
@@ -281,9 +281,9 @@ void threshold(float data[128], float val)
             float v4sf_vec5[4];
             SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
             SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_STORE_V4SI(v4si_vec0, &I_0[LU_IND0]);
             SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+            SIMD_STORE_V4SF(v4sf_vec3, &data[LU_IND0]);
          }
       }
       128;
@@ -322,9 +322,9 @@ void threshold(float data[128], float val)
             float v4sf_vec5[4];
             SIMD_LOAD_V4SF(v4sf_vec1, &data[LU_IND0]);
             SIMD_GTPS(v4si_vec0, v4sf_vec1, v4sf_vec2);
-            SIMD_SAVE_V4SI(v4si_vec0, &I_0[LU_IND0]);
+            SIMD_STORE_V4SI(v4si_vec0, &I_0[LU_IND0]);
             SIMD_PHIPS(v4sf_vec3, v4si_vec0, v4sf_vec2, v4sf_vec1);
-            SIMD_SAVE_V4SF(v4sf_vec3, &data[LU_IND0]);
+            SIMD_STORE_V4SF(v4sf_vec3, &data[LU_IND0]);
          }
       }
       128;

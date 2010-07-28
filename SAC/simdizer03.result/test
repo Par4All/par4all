@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
       SIMD_LOAD_V4SI(v4si_vec2, &aligned[0]);
       SIMD_LOAD_V4SI(v4si_vec1, &aligned0[0]);
       SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);
-      SIMD_SAVE_V4SI(v4si_vec0, &c[0]);
+      SIMD_STORE_V4SI(v4si_vec0, &c[0]);
    }
    while (0);
    return 0;
