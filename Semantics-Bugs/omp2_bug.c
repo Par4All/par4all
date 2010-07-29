@@ -1,4 +1,11 @@
-int main () {
+/* Transformers in the second loop nest are wrong: 0==-1 is always
+   returned
+
+   If the first loop nest is commented out, the problem disappears.
+ */
+
+int main ()
+{
   float a[10][10][10][10][10];
   int i,j,k,l,m;
   float x;
@@ -10,12 +17,14 @@ int main () {
   m = 0;
   x = 2.12;
 
-   for (i = 0; i < 10; i++) {
+  for (i = 0; i < 10; i++) {
     for (j = 0; j < 10; j++) {
       b[i][j] = 0.0;
     }
-   }
+  }
 
+  //i = i; // to check the poscondition
+  /*
   for (i = 0; i < 10; i++) {
     for (j = 0; j < 10; j++) {
       // comments 2
@@ -37,5 +46,6 @@ int main () {
       }
     }
   }
+  */
   return 0;
 }
