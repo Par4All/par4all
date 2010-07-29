@@ -112,8 +112,9 @@ static void free_owner_content(res_or_rule * pr)
 static void set_env_log_and_free(string var, string val)
 {
 	string ival = getenv(var);
-	if (!ival || !same_string_p(val, ival))
+	if (!ival || !same_string_p(val, ival)) {
 		putenv(strdup(concatenate(var, "=", val, NULL)));
+    }
 	user_log("setenv %s \"%s\"\n", var, val);
 	free(var); free(val);
 }

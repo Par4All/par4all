@@ -370,8 +370,9 @@ static void rw_effects_of_loop(loop l)
     }, l_body);
 
     /* effects on locals are unconditionnaly masked */
-    l_body = effects_dup_without_variables(l_body, loop_locals(l));
-    l_body = effects_dup_without_variables(l_body, statement_declarations(b));
+    list tmp = effects_dup_without_variables(l_body, loop_locals(l));
+    l_body = effects_dup_without_variables(tmp, statement_declarations(b));
+    gen_free_list(tmp);
 
     /* COMPUTATION OF INVARIANT RW EFFECTS */
 

@@ -141,12 +141,12 @@ static bool successor_only_has_rr_conflict_p(successor su)
                     words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
         }
         else {
-            /* filter out a bug in region_chains ? */
             all_rr = false;
-            pips_debug(3,
-                    "conflict found between %s and %s\n",
-                    words_to_string(words_reference(effect_any_reference(conflict_sink(c)),NIL)),
-                    words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
+            pips_debug(3,"conflict found :\n");
+            ifdebug(3) {
+                print_effect(conflict_sink(c));
+                print_effect(conflict_source(c));
+            }
         }
     }
     return all_rr;

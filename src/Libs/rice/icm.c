@@ -1230,9 +1230,9 @@ static expression
 compute_final_index_value(expression m1, expression m2, expression m3)
 {
     expression result;
-    expression E0 = make_op_exp("-", m2, m1);
-    expression E1 = make_op_exp("+", E0, m3);
-    expression E2 = make_op_exp("/", E1, m3);
+    expression E0 = make_op_exp("-", m2, copy_expression(m1));
+    expression E1 = make_op_exp("+", E0, copy_expression(m3));
+    expression E2 = make_op_exp("/", E1, copy_expression(m3));
 
     if (expression_constant_p(E2)) {
 	int val_E2 = expression_to_int(E2);
@@ -1244,6 +1244,7 @@ compute_final_index_value(expression m1, expression m2, expression m3)
 	}
 	else {
 	    result = m1;
+        free_expression(m3);
 	}
     }
     else {

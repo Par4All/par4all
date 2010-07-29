@@ -3742,7 +3742,7 @@ static text text_instruction(entity module,
                                  margin,
                                  CHAIN_SWORD(words_call(instruction_call(obj),
                                          0, TRUE, TRUE, pdl),
-                                     strdup(C_STATEMENT_END_STRING)));
+                                     C_STATEMENT_END_STRING));
             break;
           default:
             pips_internal_error("Language unknown !");

@@ -173,8 +173,8 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  /* Keep the number of iterations for the generation of the
 	     outermost comment */
 	  c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME,
-					   c_upper,
-					   c_lower);
+					   copy_expression(c_upper),
+					   copy_expression(c_lower));
 	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
 					   c_number_iter_exp,
 					   make_integer_constant_expression(1));

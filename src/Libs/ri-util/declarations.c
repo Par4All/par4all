@@ -2303,12 +2303,16 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  /* Array name is a simple reference  */
 	  tmp = name;
 	}
+      gen_full_free_list(variable_dimensions(type_variable(t1)));
       variable_dimensions(type_variable(t1)) = NIL;
+      gen_full_free_list(variable_qualifiers(type_variable(t1)));
       variable_qualifiers(type_variable(t1)) = NIL;
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      return gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),is_safe, FALSE, is_first, in_type_declaration, pdl));
+      list ret = gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),is_safe, FALSE, is_first, in_type_declaration, pdl));
+      free_type(t1);
+      return ret;
     }
 
   if (derived_type_p(t))

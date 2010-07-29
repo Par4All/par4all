@@ -282,8 +282,10 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     current = (*proper_to_summary_effect_func)(lcurrent);
  
    // n = entity_name(effect_entity(current));
+    list w;
     n = words_to_string
-      (effect_words_reference(effect_any_reference(current)));
+      (w=effect_words_reference(effect_any_reference(current)));
+    gen_map(free,w);gen_free_list(w);
     a = effect_action_tag(current);
 
     pips_debug(8,"key: \"\%s\"\n", n);

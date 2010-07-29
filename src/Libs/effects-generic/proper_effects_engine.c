@@ -534,6 +534,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 		  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 		}
 	    }
+      free_type(ref_type);
 	}
 	else
 	  pips_internal_error("case not handled yet \n");

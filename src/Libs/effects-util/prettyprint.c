@@ -70,7 +70,7 @@ list /* of string */ effect_words_reference(reference obj)
 
   if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")
       && entity_in_common_p(e)) {
-    pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
+    pc = CHAIN_SWORD(pc, entity_and_common_name(e));
   } else
     pc = CHAIN_SWORD(pc, entity_minimal_name(e));
 

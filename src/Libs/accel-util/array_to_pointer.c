@@ -83,7 +83,7 @@ expression reference_offset(reference ref)
                 expression index_expression = EXPRESSION(CAR(indices));
                 address_computation = make_op_exp(
                         PLUS_OPERATOR_NAME,
-                        index_expression,
+                        copy_expression(index_expression),
                         make_op_exp(
                             MULTIPLY_OPERATOR_NAME,
                             dimension_size,address_computation
@@ -104,7 +104,7 @@ expression reference_offset(reference ref)
         {
             address_computation = make_op_exp(
                     PLUS_OPERATOR_NAME,
-                    address_computation,e
+                    address_computation,copy_expression(e)
                     );
         }
         return address_computation ;
@@ -346,7 +346,7 @@ void make_pointer_from_variable(type tparam)
                     full_length=make_op_exp(
                             MULTIPLY_OPERATOR_NAME,
                             SizeOfDimension(d),
-                            full_length);
+                            copy_expression(full_length));
                 }
                 gen_full_free_list(parameter_dimensions);
                 variable_dimensions(param)=
@@ -412,7 +412,7 @@ reduce_array_declaration_dimension(statement s)
                                 new_dim,
                                 SizeOfDimension(d)
                                 );
-                    print_expression(new_dim);
+                    ifdebug(1) print_expression(new_dim);
                 }
                 gen_full_free_list(variable_dimensions(v));
                 variable_dimensions(v)=CONS(DIMENSION,make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,new_dim,int_to_expression(1))),NIL);

@@ -163,7 +163,7 @@ void do_loop_expansion(statement st, expression size,int offset,bool apply_guard
         /* this gets the expanded nb_iter */
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
-                    size,
+                    copy_expression(size),
                     make_op_exp(DIVIDE_OPERATOR_NAME,
                         make_op_exp(PLUS_OPERATOR_NAME,
                             nb_iter,
@@ -176,7 +176,7 @@ void do_loop_expansion(statement st, expression size,int offset,bool apply_guard
                         )
                     );
         expression new_range_lower_value=
-            make_op_exp(MINUS_OPERATOR_NAME,range_lower(r),int_to_expression(offset));
+            make_op_exp(MINUS_OPERATOR_NAME,copy_expression(range_lower(r)),int_to_expression(offset));
         /* we must check for loop_index() in range_lower*/
         set ents = get_referenced_entities(new_range_lower_value);
         entity new_range_lower_value_entity = entity_undefined;
@@ -320,10 +320,10 @@ void do_loop_expansion_init(statement st, expression size,int offset)
         /* this gets the expanded nb_iter */
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
-                    size,
+                    copy_expression(size),
                     make_op_exp(DIVIDE_OPERATOR_NAME,
                         make_op_exp(PLUS_OPERATOR_NAME,
-                            nb_iter,
+                            copy_expression(nb_iter),
                             make_op_exp(MINUS_OPERATOR_NAME,
                                 copy_expression(size),
                                 int_to_expression(1)
