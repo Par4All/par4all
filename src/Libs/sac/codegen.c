@@ -384,6 +384,7 @@ entity get_function_entity(string name)
     {
         pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
                 "Please feed pips with its definition and source\n",name);
+        e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
     }
 
     return e;
@@ -678,7 +679,7 @@ void replace_subscript(expression e)
 static statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
-    entity exec_function = module_name_to_entity(ename);
+    entity exec_function = get_function_entity(ename);
     if( c_module_p(exec_function) )
     {
         string pattern0;
@@ -834,7 +835,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
                 SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
                 CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
                 );
-        AddLocalEntityToDeclarations(scalar_holder,get_current_module_entity(),sac_current_block);
+        AddEntityToCurrentModule(scalar_holder);
         int index=0;
         list inits = NIL;
         list replacements = NIL;
@@ -887,6 +888,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             POP(iter);
             entity e = ENTITY(CAR(iter));
             replace_entity_by_expression(sac_real_current_instruction,e,r);
+            replace_entity_by_expression(get_current_module_statement(),e,r);
         }
         gen_free_list(replacements);
         if(!fortran_module_p(get_current_module_entity()))
@@ -917,6 +919,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
      * load instruction.
      */
     list current_args = NIL;
+    char* tofree = NULL;
     switch(argsType)
     {
         case CONSEC_REFS:
@@ -925,17 +928,18 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
 
                 string realVectName = get_vect_name_from_data(argc, CDR(args));
 
-                if(strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
+                if(!same_string_p(realVectName, lsType))
                 {
-                    /*string temp = local_name(lsType);*/
-                    asprintf(&lsType,"%s_TO_%s",realVectName,lsType);
+                    asprintf(&lsType,"%s_TO_%s",
+                            isLoad?realVectName:lsType,
+                            isLoad?lsType:realVectName);
+                    tofree=lsType;
                 }
                 if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
                 {
-                    current_args = gen_make_list( expression_domain, 
-                            EXPRESSION(CAR(args)),
-                            fstExp,
-                            NULL);
+                    current_args = make_expression_list(
+                            copy_expression(EXPRESSION(CAR(args))),
+                            copy_expression(fstExp));
                 }
                 else
                 {
@@ -956,7 +960,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             }
 
         case OTHER:
-            current_args=args;
+            current_args=gen_full_copy_list(args);
         default:
             break;
     }
@@ -964,6 +968,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     update_vector_to_expressions(expression_to_entity(EXPRESSION(CAR(args))),CDR(args));
 
     asprintf(&functionName, "%s%s", funcNames[argsType][isLoad], lsType);
+    if(tofree) free(tofree);
     statement es = make_exec_statement_from_name(functionName, current_args);
     free(functionName);
     return es;
