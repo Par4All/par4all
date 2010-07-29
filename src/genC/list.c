@@ -200,7 +200,7 @@ bool gen_equals(const list l0, const list l1,gen_eq_func_t equals)
         POP(iter0);
         POP(iter1);
     }
-    return true;
+    return ENDP(iter0)&&ENDP(iter1);
 
 }
 
