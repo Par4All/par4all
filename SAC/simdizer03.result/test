@@ -23,19 +23,19 @@ after vectorization
 int main(int argc, char *argv[])
 {
    int b, *a, c[4];
+   //SAC generated temporary array
+   int aligned[4] = {0, 0, 0, 0}, aligned0[4] = {2, 3, 4, 5};
    do {
       a = malloc(4*sizeof(int));
-      a[0] = 2*b;
-      a[1] = 3*b;
-      a[2] = 4*b;
-      a[3] = 5*b;
+      a[0] = 2*aligned[0];
+      a[1] = 3*aligned[0];
+      a[2] = 4*aligned[0];
+      a[3] = 5*aligned[0];
    }
    while (0);
    do {
       //PIPS:SAC generated int vector(s)
       int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
-      //SAC generated temporary array
-      int aligned[4] = {0, 0, 0, 0}, aligned0[4] = {2, 3, 4, 5};
       SIMD_LOAD_V4SI(v4si_vec2, &aligned[0]);
       SIMD_LOAD_V4SI(v4si_vec1, &aligned0[0]);
       SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);

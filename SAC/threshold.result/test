@@ -183,6 +183,8 @@ void threshold(float data[128], float val)
    int i;
    //PIPS generated variable
    int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   //SAC generated temporary array
+   float aligned[4] = {val, val, val, val};
    {
       //PIPS generated variable
       int I_0[128];
@@ -193,11 +195,7 @@ void threshold(float data[128], float val)
          //PIPS:SAC generated int vector(s)
          int v4si_vec0[4];
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //SAC generated temporary array
-         float aligned[4] = {val, val, val, val};
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec3[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
          //PIPS:SAC generated int vector(s)
          int v4si_vec4[4];
          //PIPS:SAC generated float vector(s)
@@ -218,6 +216,8 @@ void threshold(float data[128], float val)
    int i;
    //PIPS generated variable
    int I_0, LU_NUB0, LU_IB0, LU_IND0;
+   //SAC generated temporary array
+   float aligned[4] = {val, val, val, val};
    {
       //PIPS generated variable
       int I_0[128];
@@ -225,8 +225,6 @@ void threshold(float data[128], float val)
       LU_IB0 = 0;
       LU_IND0 = 0;
       {
-         //SAC generated temporary array
-         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
          float v4sf_vec2[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
@@ -234,9 +232,7 @@ void threshold(float data[128], float val)
             //PIPS:SAC generated int vector(s)
             int v4si_vec0[4];
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec1[4];
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
+            float v4sf_vec1[4], v4sf_vec3[4];
             //PIPS:SAC generated int vector(s)
             int v4si_vec4[4];
             //PIPS:SAC generated float vector(s)
@@ -256,6 +252,8 @@ void threshold(float data[128], float val)
 {
    //PIPS generated variable
    int LU_IND0;
+   //SAC generated temporary array
+   float aligned[4] = {val, val, val, val};
    {
       //PIPS generated variable
       int I_0[128];
@@ -263,8 +261,6 @@ void threshold(float data[128], float val)
       0;
       LU_IND0 = 0;
       {
-         //SAC generated temporary array
-         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
          float v4sf_vec2[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
@@ -272,9 +268,7 @@ void threshold(float data[128], float val)
             //PIPS:SAC generated int vector(s)
             int v4si_vec0[4];
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec1[4];
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
+            float v4sf_vec1[4], v4sf_vec3[4];
             //PIPS:SAC generated int vector(s)
             int v4si_vec4[4];
             //PIPS:SAC generated float vector(s)
@@ -297,6 +291,8 @@ void threshold(float data[128], float val)
 {
    //PIPS generated variable
    int LU_IND0;
+   //SAC generated temporary array
+   float aligned[4] = {val, val, val, val};
    {
       //PIPS generated variable
       int I_0[128];
@@ -304,8 +300,6 @@ void threshold(float data[128], float val)
       0;
       LU_IND0 = 0;
       {
-         //SAC generated temporary array
-         float aligned[4] = {val, val, val, val};
          //PIPS:SAC generated float vector(s)
          float v4sf_vec2[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &aligned[0]);
@@ -313,9 +307,7 @@ void threshold(float data[128], float val)
             //PIPS:SAC generated int vector(s)
             int v4si_vec0[4];
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec1[4];
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
+            float v4sf_vec1[4], v4sf_vec3[4];
             //PIPS:SAC generated int vector(s)
             int v4si_vec4[4];
             //PIPS:SAC generated float vector(s)

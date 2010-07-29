@@ -66,6 +66,8 @@ int main(int argc, char *argv[])
    int *__a;
    //PIPS generated variable
    int __c[4];
+   //SAC generated temporary array
+   int aligned[4] = {2, 3, 4, 5};
    do {
       __a = malloc(4*sizeof(int));
       __a[0] = 2*b;
@@ -77,8 +79,6 @@ int main(int argc, char *argv[])
    do {
       //PIPS:SAC generated int vector(s)
       int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
-      //SAC generated temporary array
-      int aligned[4] = {2, 3, 4, 5};
       SIMD_LOAD_V4SI(v4si_vec2, &__a[0]);
       SIMD_LOAD_V4SI(v4si_vec1, &aligned[0]);
       SIMD_MULD(v4si_vec0, v4si_vec1, v4si_vec2);

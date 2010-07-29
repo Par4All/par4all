@@ -47,8 +47,8 @@ do { \
 } while(0)
 
 /* conversions */
-#define SIMD_STORE_V2SF_TO_V2DF(vec,f) \
-    SIMD_STORE_GENERIC_V2DF(vec,(f),(f)+1)
+#define SIMD_STORE_V2DF_TO_V2SF(f,vec) \
+    SIMD_STORE_GENERIC_V2SF(vec,(f),(f)+1)
 #define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
     SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
 

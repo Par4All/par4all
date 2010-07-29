@@ -180,9 +180,9 @@ double distance(double X[2], double Y[2])
 // (0,12)
    SIMD_STORE_V2DF(v2df_vec0, &aligned[0]);
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], aligned1[1]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], F_70);
 // (0,14)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], aligned1[0]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], F_60);
 // (0,15)
    SIMD_MULPD(v2df_vec2, v2df_vec3, v2df_vec4);
 // (0,16)
@@ -236,9 +236,9 @@ double distance(double X[2], double Y[2])
 // (0,12)
    SIMD_STORE_V2DF(v2df_vec0, &aligned[0]);
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], aligned1[1]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], F_70);
 // (0,14)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], aligned1[0]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], F_60);
 // (0,15)
    SIMD_MULPD(v2df_vec2, v2df_vec3, v2df_vec4);
 // (0,16)
@@ -264,7 +264,7 @@ double distance(double X[2], double Y[2])
 {
    //PIPS generated variable
 // (0,3)
-   double tmp0, F_50, F_40, F_30;
+   double tmp0, F_70, F_60, F_50, F_40, F_30;
    //PIPS:SAC generated double vector(s)
 // (0,4)
    double v2df_vec0[2], v2df_vec1[2];
@@ -290,9 +290,9 @@ double distance(double X[2], double Y[2])
 // (0,12)
    SIMD_STORE_V2DF(v2df_vec0, &aligned[0]);
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], aligned1[1]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], F_70);
 // (0,14)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], aligned1[0]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], F_60);
 // (0,15)
    SIMD_MULPD(v2df_vec2, v2df_vec3, v2df_vec4);
 // (0,16)
@@ -321,7 +321,7 @@ double distance(double X[2], double Y[2])
 {
    //PIPS generated variable
 // (0,3)
-   double tmp0, F_50, F_40, F_30;
+   double tmp0, F_70, F_60, F_50, F_40, F_30;
    //PIPS:SAC generated double vector(s)
 // (0,4)
    double v2df_vec0[2], v2df_vec1[2];
@@ -347,9 +347,9 @@ double distance(double X[2], double Y[2])
 // (0,12)
    SIMD_STORE_V2DF(v2df_vec0, &aligned[0]);
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], aligned1[1]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec4, aligned[1], F_70);
 // (0,14)
-   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], aligned1[0]);
+   SIMD_LOAD_GENERIC_V2DF(v2df_vec3, aligned[0], F_60);
 // (0,15)
    SIMD_MULPD(v2df_vec2, v2df_vec3, v2df_vec4);
 // (0,16)

@@ -92,6 +92,7 @@ shell sed -i -e '1 d' $WS.database/Src/$WS.c
 shell if test "`./${WS}.database/Tmp/seq`" = "`./${WS}.database/Tmp/ref`" ; then echo seq-ok ; else echo seq-ko ; fi
 
 shell ./compileC.sh $WS $WS.c ${WS}.database/Tmp/sse.c
+shell sed -i -r -e 's,^\s*SIMD_STORE_V2DF_TO_V2SF,//,g' ${WS}.database/Tmp/sse.c
 shell cc -O0 -I. -march=native ${WS}.database/Tmp/sse.c  -o ${WS}.database/Tmp/sse
 shell if test "`./${WS}.database/Tmp/sse`" = "`./${WS}.database/Tmp/ref`" ; then echo sse-ok ; else echo sse-ko ; fi
 

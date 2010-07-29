@@ -2,27 +2,27 @@
 #define DMAX(A,B) (A)>(B)?(A):(B)
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
 {
-    b[0]=a[0];
-    b[1]=a[1];
-    b[2]=a[2];
-    b[3]=a[3];
-}
-void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4])
-{
     a[0]=b[0];
     a[1]=b[1];
     a[2]=b[2];
     a[3]=b[3];
 }
-void SIMD_STORE_V2SF_TO_V2DF(double a[2],float b[2])
-{
-    a[0]=b[0];
-    a[1]=b[1];
-}
-void SIMD_LOAD_V2SF_TO_V2DF(double a[2],float b[2])
+void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4])
 {
     b[0]=a[0];
     b[1]=a[1];
+    b[2]=a[2];
+    b[3]=a[3];
+}
+void SIMD_STORE_V2DF_TO_V2SF(double a[2],float b[2])
+{
+    b[0]=a[0];
+    b[1]=a[1];
+}
+void SIMD_LOAD_V2SF_TO_V2DF(double a[2],float b[2])
+{
+    a[0]=b[0];
+    a[1]=b[1];
 }
 
 int

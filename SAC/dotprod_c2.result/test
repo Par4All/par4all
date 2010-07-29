@@ -220,6 +220,8 @@ float dotprod(int n, float b[n], float c[n])
    float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
    LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
@@ -234,11 +236,7 @@ float dotprod(int n, float b[n], float c[n])
    RED1[3] = 0.000000;
    for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4], v4sf_vec4[4];
+      float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -263,6 +261,8 @@ float dotprod(int n, float b[n], float c[n])
    float RED0[1], RED1[4], a0, _return00, _return01, _return02, _return03, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
    LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
@@ -277,17 +277,11 @@ float dotprod(int n, float b[n], float c[n])
    RED1[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -310,6 +304,8 @@ float dotprod(int n, float b[n], float c[n])
    float RED0[1], RED1[4], a0, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
    LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
@@ -324,17 +320,11 @@ float dotprod(int n, float b[n], float c[n])
    RED1[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -360,6 +350,8 @@ float dotprod(int n, float b[n], float c[n])
    float RED0[1], RED1[4], a0, a1, _return04;
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
    LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
@@ -374,17 +366,11 @@ float dotprod(int n, float b[n], float c[n])
    RED1[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);

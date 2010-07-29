@@ -3555,24 +3555,23 @@ c SIMD_COMMENT_1
      &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
      &LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO
      &, J, L, NCOLA, NROWA, NROWB
-      REAL*4 aligned13(0:1), aligned12(0:1), aligned11(0:1), 
-     &v4sf_vec28(0:3), v4sf_vec27(0:3), aligned10(0:3), v4sf_vec26(0:
-     &3), v4sf_vec25(0:3), v4sf_vec24(0:3), v4sf_vec23(0:3), 
-     &v4sf_vec22(0:3), aligned9(0:3), aligned8(0:3), v4sf_vec21(0:3)
-     &, v4sf_vec20(0:3), v4sf_vec19(0:3), aligned7(0:3), v4sf_vec18(0
-     &:3), v4sf_vec17(0:3), aligned6(0:1), aligned5(0:1), aligned4(0:
-     &1), v4sf_vec13(0:3), v4sf_vec12(0:3), aligned3(0:3), v4sf_vec11
-     &(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), 
-     &v4sf_vec7(0:3), aligned2(0:3), aligned1(0:3), v4sf_vec6(0:3), 
-     &v4sf_vec5(0:3), v4sf_vec4(0:3), aligned0(0:3), v4sf_vec3(0:3), 
-     &v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), 
-     &ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, F_14, 
-     &TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, C10, 
-     &TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, F_53, 
-     &F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3), RED2(
-     &0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2, F_1, 
-     &F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE
-     &), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      REAL*4 aligned10(0:1), aligned9(0:1), v4sf_vec28(0:3), 
+     &v4sf_vec27(0:3), aligned8(0:3), v4sf_vec26(0:3), v4sf_vec25(0:3
+     &), v4sf_vec24(0:3), v4sf_vec23(0:3), v4sf_vec22(0:3), aligned7(
+     &0:3), aligned6(0:3), v4sf_vec21(0:3), v4sf_vec20(0:3), 
+     &v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0:3), aligned5(0:1
+     &), aligned4(0:1), aligned3(0:1), v4sf_vec13(0:3), v4sf_vec12(0:
+     &3), aligned2(0:3), v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec9(
+     &0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), aligned1(0:3), aligned0(0
+     &:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(
+     &0:3), v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0
+     &:3), ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, 
+     &F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, 
+     &C10, TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, 
+     &F_53, F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3)
+     &, RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2
+     &, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE
+     &, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
       REAL*8 v2df_vec31(0:1), v2df_vec30(0:1), v2df_vec29(0:1), 
      &v2df_vec16(0:1), v2df_vec15(0:1), v2df_vec14(0:1)
       LOGICAL NOTA0, NOTB0, L_911, L_111, L_120, L_130, L_140, L_150
@@ -3598,18 +3597,8 @@ c SIMD_COMMENT_1
      &L_11, L_9, L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, 
      &L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      aligned12(1) = ALPHA
-      aligned12(0) = ALPHA
-      aligned7(3) = BETA
-      aligned7(2) = BETA
-      aligned7(1) = BETA
-      aligned7(0) = BETA
-      aligned5(1) = ALPHA
-      aligned5(0) = ALPHA
-      aligned0(3) = BETA
-      aligned0(2) = BETA
-      aligned0(1) = BETA
-      aligned0(0) = BETA
+      aligned4(1) = ALPHA
+      aligned4(0) = ALPHA
       aligned(3) = BETA
       aligned(2) = BETA
       aligned(1) = BETA
@@ -3749,14 +3738,14 @@ c SIMD_COMMENT_1
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0088
-     &   .EQ.ONE0) THEN                                                 0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(aligned4(0).EQ.ZERO0.OR.K.EQ.0)       0088
+     &   .AND.aligned(0).EQ.ONE0) THEN                                  0088
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO0) THEN                                    0094
-               IF (BETA.EQ.ZERO0) THEN                                  0095
+            IF (aligned4(0).EQ.ZERO0) THEN                              0094
+               IF (aligned(0).EQ.ZERO0) THEN                            0095
                   DO 20 J = 1, N                                        0096
                      LU_NUB00 = M
                      LU_IB00 = MOD(LU_NUB00, 4)
@@ -3779,7 +3768,7 @@ c SIMD_COMMENT_0
                      LU_NUB10 = M
                      LU_IB10 = MOD(LU_NUB10, 4)
                      DO 99997 LU_IND1 = 0, LU_IB10-1
-                        C(1+LU_IND1,J) = BETA*C(1+LU_IND1,J)
+                        C(1+LU_IND1,J) = aligned(0)*C(1+LU_IND1,J)
 99997                   CONTINUE
                      DO 99996 LU_IND1 = LU_IB10, LU_NUB10-1, 4
                         CALL SIMD_LOAD_V4SF(v4sf_vec0, C(1+LU_IND1,J)
@@ -3805,7 +3794,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B + beta*C.
 *
                      DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO0) THEN                         0119
+                        IF (aligned(0).EQ.ZERO0) THEN                   0119
                            LU_NUB20 = M
                            LU_IB20 = MOD(LU_NUB20, 4)
                            DO 99995 LU_IND2 = 0, LU_IB20-1
@@ -3821,17 +3810,18 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                               C(4+LU_IND2,J) = ZERO0
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE0) THEN                      0119
+                        ELSEIF (aligned(0).NE.ONE0) THEN                0119
                            LU_NUB30 = M
                            LU_IB30 = MOD(LU_NUB30, 4)
                            DO 99993 LU_IND3 = 0, LU_IB30-1
-                              C(1+LU_IND3,J) = BETA*C(1+LU_IND3,J)
+                              C(1+LU_IND3,J) = aligned(0)*C(1+LU_IND3
+     &                        ,J)
 99993                         CONTINUE
                            DO 99992 LU_IND3 = LU_IB30, LU_NUB30-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec2, C(1+
      &                        LU_IND3,J))
-                              CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned0
-     &                        (0))
+                              CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned(
+     &                        0))
                               CALL SIMD_MULPS(v4sf_vec2, v4sf_vec3, 
      &                        v4sf_vec2)
                               CALL SIMD_STORE_V4SF(v4sf_vec2, C(1+
@@ -3840,11 +3830,11 @@ c SIMD_COMMENT_0
                         ENDIF
                         DO 80 L = 1, K                                  0128
                            IF (B(L,J).NE.ZERO0) THEN                    0129
-                              TEMP7 = ALPHA*B(L,J)                      0130
+                              aligned0(0) = aligned4(0)*B(L,J)          0130
                               LU_NUB40 = M
                               LU_IB40 = MOD(LU_NUB40, 4)
                               DO 99991 LU_IND4 = 0, LU_IB40-1
-                                 F_04 = TEMP7*A(1+LU_IND4,L)
+                                 F_04 = aligned0(0)*A(1+LU_IND4,L)
                                  C(1+LU_IND4,J) = C(1+LU_IND4,J)+F_04
 99991                            CONTINUE
                               DO 99990 LU_IND4 = LU_IB40, LU_NUB40-1
@@ -3852,11 +3842,11 @@ c SIMD_COMMENT_0
                                  CALL SIMD_LOAD_V4SF(v4sf_vec6, A(1+
      &                           LU_IND4,L))
                                  CALL SIMD_LOAD_V4SF(v4sf_vec5, 
-     &                           aligned1(0))
+     &                           aligned0(0))
                                  CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5
      &                           , v4sf_vec6)
                                  CALL SIMD_STORE_V4SF(v4sf_vec4, 
-     &                           aligned2(0))
+     &                           aligned1(0))
                                  CALL SIMD_LOAD_V4SF(v4sf_vec7, C(1+
      &                           LU_IND4,J))
                                  CALL SIMD_ADDPS(v4sf_vec7, v4sf_vec7
@@ -3897,7 +3887,7 @@ c SIMD_COMMENT_0
                               CALL SIMD_MULPS(v4sf_vec9, v4sf_vec10, 
      &                        v4sf_vec11)
                               CALL SIMD_STORE_V4SF(v4sf_vec9, 
-     &                        aligned3(0))
+     &                        aligned2(0))
                               CALL SIMD_LOAD_V4SF(v4sf_vec12, RED1(0)
      &                        )
                               CALL SIMD_ADDPS(v4sf_vec12, v4sf_vec12
@@ -3905,20 +3895,20 @@ c SIMD_COMMENT_0
                               CALL SIMD_STORE_V4SF(v4sf_vec12, RED1(0
      &                        ))
 99988                         CONTINUE
-                           aligned4(0) = RED1(3)+RED1(2)+RED1(1)+RED1
+                           aligned3(0) = RED1(3)+RED1(2)+RED1(1)+RED1
      &                     (0)+TEMP5
-                           L_710 = BETA.EQ.ZERO0
+                           L_710 = aligned(0).EQ.ZERO0
                            CALL SIMD_LOAD_V2SF_TO_V2DF(v2df_vec16, 
-     &                     aligned4(0))
+     &                     aligned3(0))
                            CALL SIMD_LOAD_V2SF_TO_V2DF(v2df_vec15, 
-     &                     aligned5(0))
+     &                     aligned4(0))
                            CALL SIMD_MULPD(v2df_vec14, v2df_vec15, 
      &                     v2df_vec16)
-                           CALL SIMD_STORE_V2SF_TO_V2DF(v2df_vec14, 
-     &                     aligned6(0))
-                           C(I,J) = L_710?aligned6(0):C(I,J)
-                           F_30 = BETA*C(I,J)
-                           C10 = aligned6(1)+F_30
+                           CALL SIMD_STORE_V2DF_TO_V2SF(v2df_vec14, 
+     &                     aligned5(0))
+                           C(I,J) = L_710?aligned5(0):C(I,J)
+                           F_30 = aligned(0)*C(I,J)
+                           C10 = aligned5(1)+F_30
                            L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
@@ -3932,7 +3922,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B' + beta*C
 *
                   DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO0) THEN                            0161
+                     IF (aligned(0).EQ.ZERO0) THEN                      0161
                         LU_NUB60 = M
                         LU_IB60 = MOD(LU_NUB60, 4)
                         DO 99987 LU_IND6 = 0, LU_IB60-1
@@ -3948,17 +3938,17 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                            C(4+LU_IND6,J) = ZERO0
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE0) THEN                         0161
+                     ELSEIF (aligned(0).NE.ONE0) THEN                   0161
                         LU_NUB70 = M
                         LU_IB70 = MOD(LU_NUB70, 4)
                         DO 99985 LU_IND7 = 0, LU_IB70-1
-                           C(1+LU_IND7,J) = BETA*C(1+LU_IND7,J)
+                           C(1+LU_IND7,J) = aligned(0)*C(1+LU_IND7,J)
 99985                      CONTINUE
                         DO 99984 LU_IND7 = LU_IB70, LU_NUB70-1, 4
                            CALL SIMD_LOAD_V4SF(v4sf_vec17, C(1+
      &                     LU_IND7,J))
-                           CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned7(0
-     &                     ))
+                           CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned(0)
+     &                     )
                            CALL SIMD_MULPS(v4sf_vec17, v4sf_vec18, 
      &                     v4sf_vec17)
                            CALL SIMD_STORE_V4SF(v4sf_vec17, C(1+
@@ -3967,22 +3957,22 @@ c SIMD_COMMENT_0
                      ENDIF
                      DO 160 L = 1, K                                    0170
                         IF (B(J,L).NE.ZERO0) THEN                       0171
-                           TEMP3 = ALPHA*B(J,L)                         0172
+                           aligned6(0) = aligned4(0)*B(J,L)             0172
                            LU_NUB80 = M
                            LU_IB80 = MOD(LU_NUB80, 4)
                            DO 99983 LU_IND8 = 0, LU_IB80-1
-                              F_44 = TEMP3*A(1+LU_IND8,L)
+                              F_44 = aligned6(0)*A(1+LU_IND8,L)
                               C(1+LU_IND8,J) = C(1+LU_IND8,J)+F_44
 99983                         CONTINUE
                            DO 99982 LU_IND8 = LU_IB80, LU_NUB80-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec21, A(1+
      &                        LU_IND8,L))
                               CALL SIMD_LOAD_V4SF(v4sf_vec20, 
-     &                        aligned8(0))
+     &                        aligned6(0))
                               CALL SIMD_MULPS(v4sf_vec19, v4sf_vec20
      &                        , v4sf_vec21)
                               CALL SIMD_STORE_V4SF(v4sf_vec19, 
-     &                        aligned9(0))
+     &                        aligned7(0))
                               CALL SIMD_LOAD_V4SF(v4sf_vec22, C(1+
      &                        LU_IND8,J))
                               CALL SIMD_ADDPS(v4sf_vec22, v4sf_vec22
@@ -4023,27 +4013,27 @@ c SIMD_COMMENT_0
      &                     LU_IND9,I))
                            CALL SIMD_MULPS(v4sf_vec24, v4sf_vec25, 
      &                     v4sf_vec26)
-                           CALL SIMD_STORE_V4SF(v4sf_vec24, aligned10
-     &                     (0))
+                           CALL SIMD_STORE_V4SF(v4sf_vec24, aligned8(
+     &                     0))
                            CALL SIMD_LOAD_V4SF(v4sf_vec27, RED3(0))
                            CALL SIMD_ADDPS(v4sf_vec27, v4sf_vec27, 
      &                     v4sf_vec24)
                            CALL SIMD_STORE_V4SF(v4sf_vec27, RED3(0))
 99980                      CONTINUE
-                        aligned11(0) = RED3(3)+RED3(2)+RED3(1)+RED3(0
-     &                  )+TEMP1
-                        L_810 = BETA.EQ.ZERO0
+                        aligned9(0) = RED3(3)+RED3(2)+RED3(1)+RED3(0)
+     &                  +TEMP1
+                        L_810 = aligned(0).EQ.ZERO0
                         CALL SIMD_LOAD_V2SF_TO_V2DF(v2df_vec31, 
-     &                  aligned11(0))
+     &                  aligned9(0))
                         CALL SIMD_LOAD_V2SF_TO_V2DF(v2df_vec30, 
-     &                  aligned12(0))
+     &                  aligned4(0))
                         CALL SIMD_MULPD(v2df_vec29, v2df_vec30, 
      &                  v2df_vec31)
-                        CALL SIMD_STORE_V2SF_TO_V2DF(v2df_vec29, 
-     &                  aligned13(0))
-                        C(I,J) = L_810?aligned13(0):C(I,J)
-                        F_70 = BETA*C(I,J)
-                        C30 = aligned13(1)+F_70
+                        CALL SIMD_STORE_V2DF_TO_V2SF(v2df_vec29, 
+     &                  aligned10(0))
+                        C(I,J) = L_810?aligned10(0):C(I,J)
+                        F_70 = aligned(0)*C(I,J)
+                        C30 = aligned10(1)+F_70
                         L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
@@ -4076,24 +4066,23 @@ c SIMD_COMMENT_0
      &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
      &LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO
      &, J, L, NCOLA, NROWA, NROWB
-      REAL*4 aligned13(0:1), aligned12(0:1), aligned11(0:1), 
-     &v4sf_vec28(0:3), v4sf_vec27(0:3), aligned10(0:3), v4sf_vec26(0:
-     &3), v4sf_vec25(0:3), v4sf_vec24(0:3), v4sf_vec23(0:3), 
-     &v4sf_vec22(0:3), aligned9(0:3), aligned8(0:3), v4sf_vec21(0:3)
-     &, v4sf_vec20(0:3), v4sf_vec19(0:3), aligned7(0:3), v4sf_vec18(0
-     &:3), v4sf_vec17(0:3), aligned6(0:1), aligned5(0:1), aligned4(0:
-     &1), v4sf_vec13(0:3), v4sf_vec12(0:3), aligned3(0:3), v4sf_vec11
-     &(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), 
-     &v4sf_vec7(0:3), aligned2(0:3), aligned1(0:3), v4sf_vec6(0:3), 
-     &v4sf_vec5(0:3), v4sf_vec4(0:3), aligned0(0:3), v4sf_vec3(0:3), 
-     &v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), 
-     &ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, F_14, 
-     &TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, C10, 
-     &TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, F_53, 
-     &F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3), RED2(
-     &0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2, F_1, 
-     &F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE
-     &), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      REAL*4 aligned10(0:1), aligned9(0:1), v4sf_vec28(0:3), 
+     &v4sf_vec27(0:3), aligned8(0:3), v4sf_vec26(0:3), v4sf_vec25(0:3
+     &), v4sf_vec24(0:3), v4sf_vec23(0:3), v4sf_vec22(0:3), aligned7(
+     &0:3), aligned6(0:3), v4sf_vec21(0:3), v4sf_vec20(0:3), 
+     &v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0:3), aligned5(0:1
+     &), aligned4(0:1), aligned3(0:1), v4sf_vec13(0:3), v4sf_vec12(0:
+     &3), aligned2(0:3), v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec9(
+     &0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), aligned1(0:3), aligned0(0
+     &:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(
+     &0:3), v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0
+     &:3), ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, 
+     &F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, 
+     &C10, TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, 
+     &F_53, F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3)
+     &, RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2
+     &, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE
+     &, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
       REAL*8 v2df_vec31(0:1), v2df_vec30(0:1), v2df_vec29(0:1), 
      &v2df_vec16(0:1), v2df_vec15(0:1), v2df_vec14(0:1)
       LOGICAL NOTA0, NOTB0, L_911, L_111, L_120, L_130, L_140, L_150
@@ -4119,14 +4108,8 @@ c SIMD_COMMENT_0
      &L_11, L_9, L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, 
      &L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      aligned7(3) = BETA
-      aligned7(2) = BETA
-      aligned7(1) = BETA
-      aligned7(0) = BETA
-      aligned0(3) = BETA
-      aligned0(2) = BETA
-      aligned0(1) = BETA
-      aligned0(0) = BETA
+      aligned4(1) = ALPHA
+      aligned4(0) = ALPHA
       aligned(3) = BETA
       aligned(2) = BETA
       aligned(1) = BETA
@@ -4228,14 +4211,14 @@ c SIMD_COMMENT_0
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0088
-     &   .EQ.ONE0) THEN                                                 0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(aligned4(0).EQ.ZERO0.OR.K.EQ.0)       0088
+     &   .AND.aligned(0).EQ.ONE0) THEN                                  0088
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO0) THEN                                    0094
-               IF (BETA.EQ.ZERO0) THEN                                  0095
+            IF (aligned4(0).EQ.ZERO0) THEN                              0094
+               IF (aligned(0).EQ.ZERO0) THEN                            0095
                   DO 20 J = 1, N                                        0096
                      LU_NUB00 = M
                      LU_IB00 = MOD(LU_NUB00, 4)
@@ -4258,7 +4241,7 @@ c SIMD_COMMENT_0
                      LU_NUB10 = M
                      LU_IB10 = MOD(LU_NUB10, 4)
                      DO 99997 LU_IND1 = 0, LU_IB10-1
-                        C(1+LU_IND1,J) = BETA*C(1+LU_IND1,J)
+                        C(1+LU_IND1,J) = aligned(0)*C(1+LU_IND1,J)
 99997                   CONTINUE
                      DO 99996 LU_IND1 = LU_IB10, LU_NUB10-1, 4
                         CALL SIMD_LOAD_V4SF(v4sf_vec0, C(1+LU_IND1,J)
@@ -4284,7 +4267,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B + beta*C.
 *
                      DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO0) THEN                         0119
+                        IF (aligned(0).EQ.ZERO0) THEN                   0119
                            LU_NUB20 = M
                            LU_IB20 = MOD(LU_NUB20, 4)
                            DO 99995 LU_IND2 = 0, LU_IB20-1
@@ -4300,17 +4283,18 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                               C(4+LU_IND2,J) = ZERO0
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE0) THEN                      0119
+                        ELSEIF (aligned(0).NE.ONE0) THEN                0119
                            LU_NUB30 = M
                            LU_IB30 = MOD(LU_NUB30, 4)
                            DO 99993 LU_IND3 = 0, LU_IB30-1
-                              C(1+LU_IND3,J) = BETA*C(1+LU_IND3,J)
+                              C(1+LU_IND3,J) = aligned(0)*C(1+LU_IND3
+     &                        ,J)
 99993                         CONTINUE
                            DO 99992 LU_IND3 = LU_IB30, LU_NUB30-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec2, C(1+
      &                        LU_IND3,J))
-                              CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned0
-     &                        (0))
+                              CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned(
+     &                        0))
                               CALL SIMD_MULPS(v4sf_vec2, v4sf_vec3, 
      &                        v4sf_vec2)
                               CALL SIMD_STORE_V4SF(v4sf_vec2, C(1+
@@ -4319,11 +4303,11 @@ c SIMD_COMMENT_0
                         ENDIF
                         DO 80 L = 1, K                                  0128
                            IF (B(L,J).NE.ZERO0) THEN                    0129
-                              TEMP7 = ALPHA*B(L,J)                      0130
+                              aligned0(0) = aligned4(0)*B(L,J)          0130
                               LU_NUB40 = M
                               LU_IB40 = MOD(LU_NUB40, 4)
                               DO 99991 LU_IND4 = 0, LU_IB40-1
-                                 F_04 = TEMP7*A(1+LU_IND4,L)
+                                 F_04 = aligned0(0)*A(1+LU_IND4,L)
                                  C(1+LU_IND4,J) = C(1+LU_IND4,J)+F_04
 99991                            CONTINUE
                               DO 99990 LU_IND4 = LU_IB40, LU_NUB40-1
@@ -4331,7 +4315,7 @@ c SIMD_COMMENT_0
                                  CALL SIMD_LOAD_V4SF(v4sf_vec6, A(1+
      &                           LU_IND4,L))
                                  CALL SIMD_LOAD_V4SF(v4sf_vec5, 
-     &                           aligned1(0))
+     &                           aligned0(0))
                                  CALL SIMD_MULPS(v4sf_vec4, v4sf_vec5
      &                           , v4sf_vec6)
                                  CALL SIMD_LOAD_V4SF(v4sf_vec7, C(1+
@@ -4353,10 +4337,10 @@ c SIMD_COMMENT_0
 *
                      DO 120 J = 1, N                                    0141
                         DO 110 I = 1, M                                 0142
-                           L_710 = BETA.EQ.ZERO0
-                           C(I,J) = L_710?aligned6(0):C(I,J)
-                           F_30 = BETA*C(I,J)
-                           C10 = aligned6(1)+F_30
+                           L_710 = aligned(0).EQ.ZERO0
+                           C(I,J) = L_710?aligned5(0):C(I,J)
+                           F_30 = aligned(0)*C(I,J)
+                           C10 = aligned5(1)+F_30
                            L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
@@ -4370,7 +4354,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B' + beta*C
 *
                   DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO0) THEN                            0161
+                     IF (aligned(0).EQ.ZERO0) THEN                      0161
                         LU_NUB60 = M
                         LU_IB60 = MOD(LU_NUB60, 4)
                         DO 99987 LU_IND6 = 0, LU_IB60-1
@@ -4386,17 +4370,17 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                            C(4+LU_IND6,J) = ZERO0
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE0) THEN                         0161
+                     ELSEIF (aligned(0).NE.ONE0) THEN                   0161
                         LU_NUB70 = M
                         LU_IB70 = MOD(LU_NUB70, 4)
                         DO 99985 LU_IND7 = 0, LU_IB70-1
-                           C(1+LU_IND7,J) = BETA*C(1+LU_IND7,J)
+                           C(1+LU_IND7,J) = aligned(0)*C(1+LU_IND7,J)
 99985                      CONTINUE
                         DO 99984 LU_IND7 = LU_IB70, LU_NUB70-1, 4
                            CALL SIMD_LOAD_V4SF(v4sf_vec17, C(1+
      &                     LU_IND7,J))
-                           CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned7(0
-     &                     ))
+                           CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned(0)
+     &                     )
                            CALL SIMD_MULPS(v4sf_vec17, v4sf_vec18, 
      &                     v4sf_vec17)
                            CALL SIMD_STORE_V4SF(v4sf_vec17, C(1+
@@ -4405,18 +4389,18 @@ c SIMD_COMMENT_0
                      ENDIF
                      DO 160 L = 1, K                                    0170
                         IF (B(J,L).NE.ZERO0) THEN                       0171
-                           TEMP3 = ALPHA*B(J,L)                         0172
+                           aligned6(0) = aligned4(0)*B(J,L)             0172
                            LU_NUB80 = M
                            LU_IB80 = MOD(LU_NUB80, 4)
                            DO 99983 LU_IND8 = 0, LU_IB80-1
-                              F_44 = TEMP3*A(1+LU_IND8,L)
+                              F_44 = aligned6(0)*A(1+LU_IND8,L)
                               C(1+LU_IND8,J) = C(1+LU_IND8,J)+F_44
 99983                         CONTINUE
                            DO 99982 LU_IND8 = LU_IB80, LU_NUB80-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec21, A(1+
      &                        LU_IND8,L))
                               CALL SIMD_LOAD_V4SF(v4sf_vec20, 
-     &                        aligned8(0))
+     &                        aligned6(0))
                               CALL SIMD_MULPS(v4sf_vec19, v4sf_vec20
      &                        , v4sf_vec21)
                               CALL SIMD_LOAD_V4SF(v4sf_vec22, C(1+
@@ -4438,10 +4422,10 @@ c SIMD_COMMENT_0
 *
                   DO 200 J = 1, N                                       0183
                      DO 190 I = 1, M                                    0184
-                        L_810 = BETA.EQ.ZERO0
-                        C(I,J) = L_810?aligned13(0):C(I,J)
-                        F_70 = BETA*C(I,J)
-                        C30 = aligned13(1)+F_70
+                        L_810 = aligned(0).EQ.ZERO0
+                        C(I,J) = L_810?aligned10(0):C(I,J)
+                        F_70 = aligned(0)*C(I,J)
+                        C30 = aligned10(1)+F_70
                         L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
@@ -4474,24 +4458,23 @@ c SIMD_COMMENT_0
      &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
      &LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO
      &, J, L, NCOLA, NROWA, NROWB
-      REAL*4 aligned13(0:1), aligned12(0:1), aligned11(0:1), 
-     &v4sf_vec28(0:3), v4sf_vec27(0:3), aligned10(0:3), v4sf_vec26(0:
-     &3), v4sf_vec25(0:3), v4sf_vec24(0:3), v4sf_vec23(0:3), 
-     &v4sf_vec22(0:3), aligned9(0:3), aligned8(0:3), v4sf_vec21(0:3)
-     &, v4sf_vec20(0:3), v4sf_vec19(0:3), aligned7(0:3), v4sf_vec18(0
-     &:3), v4sf_vec17(0:3), aligned6(0:1), aligned5(0:1), aligned4(0:
-     &1), v4sf_vec13(0:3), v4sf_vec12(0:3), aligned3(0:3), v4sf_vec11
-     &(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), 
-     &v4sf_vec7(0:3), aligned2(0:3), aligned1(0:3), v4sf_vec6(0:3), 
-     &v4sf_vec5(0:3), v4sf_vec4(0:3), aligned0(0:3), v4sf_vec3(0:3), 
-     &v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), 
-     &ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, F_14, 
-     &TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, C10, 
-     &TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, F_53, 
-     &F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3), RED2(
-     &0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2, F_1, 
-     &F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE
-     &), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
+      REAL*4 aligned10(0:1), aligned9(0:1), v4sf_vec28(0:3), 
+     &v4sf_vec27(0:3), aligned8(0:3), v4sf_vec26(0:3), v4sf_vec25(0:3
+     &), v4sf_vec24(0:3), v4sf_vec23(0:3), v4sf_vec22(0:3), aligned7(
+     &0:3), aligned6(0:3), v4sf_vec21(0:3), v4sf_vec20(0:3), 
+     &v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0:3), aligned5(0:1
+     &), aligned4(0:1), aligned3(0:1), v4sf_vec13(0:3), v4sf_vec12(0:
+     &3), aligned2(0:3), v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec9(
+     &0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), aligned1(0:3), aligned0(0
+     &:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(
+     &0:3), v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:3), v4sf_vec0(0
+     &:3), ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6, 
+     &F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, 
+     &C10, TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, 
+     &F_53, F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED3(0:3)
+     &, RED2(0:0), RED1(0:3), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2
+     &, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE
+     &, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
       REAL*8 v2df_vec31(0:1), v2df_vec30(0:1), v2df_vec29(0:1), 
      &v2df_vec16(0:1), v2df_vec15(0:1), v2df_vec14(0:1)
       LOGICAL NOTA0, NOTB0, L_911, L_111, L_120, L_130, L_140, L_150
@@ -4517,14 +4500,8 @@ c SIMD_COMMENT_0
      &L_11, L_9, L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, 
      &L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      aligned7(3) = BETA
-      aligned7(2) = BETA
-      aligned7(1) = BETA
-      aligned7(0) = BETA
-      aligned0(3) = BETA
-      aligned0(2) = BETA
-      aligned0(1) = BETA
-      aligned0(0) = BETA
+      aligned4(1) = ALPHA
+      aligned4(0) = ALPHA
       aligned(3) = BETA
       aligned(2) = BETA
       aligned(1) = BETA
@@ -4626,14 +4603,14 @@ c SIMD_COMMENT_0
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0088
-     &   .EQ.ONE0) THEN                                                 0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(aligned4(0).EQ.ZERO0.OR.K.EQ.0)       0088
+     &   .AND.aligned(0).EQ.ONE0) THEN                                  0088
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO0) THEN                                    0094
-               IF (BETA.EQ.ZERO0) THEN                                  0095
+            IF (aligned4(0).EQ.ZERO0) THEN                              0094
+               IF (aligned(0).EQ.ZERO0) THEN                            0095
                   DO 20 J = 1, N
                      LU_NUB00 = M
                      LU_IB00 = MOD(LU_NUB00, 4)
@@ -4656,7 +4633,7 @@ c SIMD_COMMENT_0
                      LU_NUB10 = M
                      LU_IB10 = MOD(LU_NUB10, 4)
                      DO 99997 LU_IND1 = 0, LU_IB10-1
-                        C(1+LU_IND1,J) = BETA*C(1+LU_IND1,J)
+                        C(1+LU_IND1,J) = aligned(0)*C(1+LU_IND1,J)
 99997                   CONTINUE
                      CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
                      DO 99996 LU_IND1 = LU_IB10, LU_NUB10-1, 4
@@ -4682,7 +4659,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B + beta*C.
 *
                      DO 90 J = 1, N
-                        IF (BETA.EQ.ZERO0) THEN                         0119
+                        IF (aligned(0).EQ.ZERO0) THEN                   0119
                            LU_NUB20 = M
                            LU_IB20 = MOD(LU_NUB20, 4)
                            DO 99995 LU_IND2 = 0, LU_IB20-1
@@ -4698,14 +4675,14 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                               C(4+LU_IND2,J) = ZERO0
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE0) THEN                      0119
+                        ELSEIF (aligned(0).NE.ONE0) THEN                0119
                            LU_NUB30 = M
                            LU_IB30 = MOD(LU_NUB30, 4)
                            DO 99993 LU_IND3 = 0, LU_IB30-1
-                              C(1+LU_IND3,J) = BETA*C(1+LU_IND3,J)
+                              C(1+LU_IND3,J) = aligned(0)*C(1+LU_IND3
+     &                        ,J)
 99993                         CONTINUE
-                           CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned0(0)
-     &                     )
+                           CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned(0))
                            DO 99992 LU_IND3 = LU_IB30, LU_NUB30-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec2, C(1+
      &                        LU_IND3,J))
@@ -4717,14 +4694,14 @@ c SIMD_COMMENT_0
                         ENDIF
                         DO 80 L = 1, K
                            IF (B(L,J).NE.ZERO0) THEN                    0129
-                              TEMP7 = ALPHA*B(L,J)                      0130
+                              aligned0(0) = aligned4(0)*B(L,J)          0130
                               LU_NUB40 = M
                               LU_IB40 = MOD(LU_NUB40, 4)
                               DO 99991 LU_IND4 = 0, LU_IB40-1
-                                 F_04 = TEMP7*A(1+LU_IND4,L)
+                                 F_04 = aligned0(0)*A(1+LU_IND4,L)
                                  C(1+LU_IND4,J) = C(1+LU_IND4,J)+F_04
 99991                            CONTINUE
-                              CALL SIMD_LOAD_V4SF(v4sf_vec5, aligned1
+                              CALL SIMD_LOAD_V4SF(v4sf_vec5, aligned0
      &                        (0))
                               DO 99990 LU_IND4 = LU_IB40, LU_NUB40-1
      &                        , 4
@@ -4751,10 +4728,10 @@ c SIMD_COMMENT_0
 *
                      DO 120 J = 1, N
                         DO 110 I = 1, M
-                           L_710 = BETA.EQ.ZERO0
-                           C(I,J) = L_710?aligned6(0):C(I,J)
-                           F_30 = BETA*C(I,J)
-                           C10 = aligned6(1)+F_30
+                           L_710 = aligned(0).EQ.ZERO0
+                           C(I,J) = L_710?aligned5(0):C(I,J)
+                           F_30 = aligned(0)*C(I,J)
+                           C10 = aligned5(1)+F_30
                            L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
@@ -4768,7 +4745,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B' + beta*C
 *
                   DO 170 J = 1, N
-                     IF (BETA.EQ.ZERO0) THEN                            0161
+                     IF (aligned(0).EQ.ZERO0) THEN                      0161
                         LU_NUB60 = M
                         LU_IB60 = MOD(LU_NUB60, 4)
                         DO 99987 LU_IND6 = 0, LU_IB60-1
@@ -4784,13 +4761,13 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                            C(4+LU_IND6,J) = ZERO0
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE0) THEN                         0161
+                     ELSEIF (aligned(0).NE.ONE0) THEN                   0161
                         LU_NUB70 = M
                         LU_IB70 = MOD(LU_NUB70, 4)
                         DO 99985 LU_IND7 = 0, LU_IB70-1
-                           C(1+LU_IND7,J) = BETA*C(1+LU_IND7,J)
+                           C(1+LU_IND7,J) = aligned(0)*C(1+LU_IND7,J)
 99985                      CONTINUE
-                        CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned7(0))
+                        CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned(0))
                         DO 99984 LU_IND7 = LU_IB70, LU_NUB70-1, 4
                            CALL SIMD_LOAD_V4SF(v4sf_vec17, C(1+
      &                     LU_IND7,J))
@@ -4802,14 +4779,14 @@ c SIMD_COMMENT_0
                      ENDIF
                      DO 160 L = 1, K
                         IF (B(J,L).NE.ZERO0) THEN                       0171
-                           TEMP3 = ALPHA*B(J,L)                         0172
+                           aligned6(0) = aligned4(0)*B(J,L)             0172
                            LU_NUB80 = M
                            LU_IB80 = MOD(LU_NUB80, 4)
                            DO 99983 LU_IND8 = 0, LU_IB80-1
-                              F_44 = TEMP3*A(1+LU_IND8,L)
+                              F_44 = aligned6(0)*A(1+LU_IND8,L)
                               C(1+LU_IND8,J) = C(1+LU_IND8,J)+F_44
 99983                         CONTINUE
-                           CALL SIMD_LOAD_V4SF(v4sf_vec20, aligned8(0
+                           CALL SIMD_LOAD_V4SF(v4sf_vec20, aligned6(0
      &                     ))
                            DO 99982 LU_IND8 = LU_IB80, LU_NUB80-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec21, A(1+
@@ -4835,10 +4812,10 @@ c SIMD_COMMENT_0
 *
                   DO 200 J = 1, N
                      DO 190 I = 1, M
-                        L_810 = BETA.EQ.ZERO0
-                        C(I,J) = L_810?aligned13(0):C(I,J)
-                        F_70 = BETA*C(I,J)
-                        C30 = aligned13(1)+F_70
+                        L_810 = aligned(0).EQ.ZERO0
+                        C(I,J) = L_810?aligned10(0):C(I,J)
+                        F_70 = aligned(0)*C(I,J)
+                        C30 = aligned10(1)+F_70
                         L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
@@ -4864,14 +4841,14 @@ c SIMD_COMMENT_0
      &LU_IB70, LU_NUB80, LU_IB80, LU_IND8, LU_IND7, LU_IND6, LU_IND4
      &, LU_IND3, LU_IND2, LU_IND1, LU_IND0, M, N, K, LDA, LDB, LDC, I
      &, INFO, J, L
-      REAL*4 aligned13(0:1), v4sf_vec22(0:3), aligned8(0:3), 
-     &v4sf_vec21(0:3), v4sf_vec20(0:3), v4sf_vec19(0:3), aligned7(0:3
-     &), v4sf_vec18(0:3), v4sf_vec17(0:3), aligned6(0:1), v4sf_vec7(0
-     &:3), aligned1(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0
-     &:3), aligned0(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), aligned(0:3
-     &), v4sf_vec1(0:3), v4sf_vec0(0:3), ONE0, ZERO0, TEMP7, F_04, 
-     &F_30, C10, TEMP3, F_44, F_70, C30, ALPHA, A(1:SIZE, 1:SIZE), B(
-     &1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE)
+      REAL*4 aligned10(0:1), v4sf_vec22(0:3), aligned6(0:3), 
+     &v4sf_vec21(0:3), v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0
+     &:3), v4sf_vec17(0:3), aligned5(0:1), aligned4(0:1), v4sf_vec7(0
+     &:3), aligned0(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0
+     &:3), v4sf_vec3(0:3), v4sf_vec2(0:3), aligned(0:3), v4sf_vec1(0:
+     &3), v4sf_vec0(0:3), ONE0, ZERO0, F_04, F_30, C10, F_44, F_70, 
+     &C30, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:
+     &SIZE, 1:SIZE)
       LOGICAL NOTA0, NOTB0, L_911, L_111, L_120, L_130, L_140, L_150
      &, L_611, L_500, L_160, L_511, L_400, L_190, L_211, L_220, L_411
      &, L_300, L_270, L_280, L_290, L_311, L_320, L_310, L_200, L_390
@@ -4882,14 +4859,8 @@ c SIMD_COMMENT_0
      &, L_910, L_920, L_930, L_940, L_950, L_960, L_970, L_710, L_980
      &, L_810, L_990, L_5, L_4, L_3, L_2, L_1, L_0
       CHARACTER TRANSA, TRANSB
-      aligned7(3) = BETA
-      aligned7(2) = BETA
-      aligned7(1) = BETA
-      aligned7(0) = BETA
-      aligned0(3) = BETA
-      aligned0(2) = BETA
-      aligned0(1) = BETA
-      aligned0(0) = BETA
+      aligned4(1) = ALPHA
+      aligned4(0) = ALPHA
       aligned(3) = BETA
       aligned(2) = BETA
       aligned(1) = BETA
@@ -4991,14 +4962,14 @@ c SIMD_COMMENT_0
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0088
-     &   .EQ.ONE0) THEN                                                 0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(aligned4(0).EQ.ZERO0.OR.K.EQ.0)       0088
+     &   .AND.aligned(0).EQ.ONE0) THEN                                  0088
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO0) THEN                                    0094
-               IF (BETA.EQ.ZERO0) THEN                                  0095
+            IF (aligned4(0).EQ.ZERO0) THEN                              0094
+               IF (aligned(0).EQ.ZERO0) THEN                            0095
                   DO 20 J = 1, N
                      LU_NUB00 = M
                      LU_IB00 = MOD(LU_NUB00, 4)
@@ -5021,7 +4992,7 @@ c SIMD_COMMENT_0
                      LU_NUB10 = M
                      LU_IB10 = MOD(LU_NUB10, 4)
                      DO 99997 LU_IND1 = 0, LU_IB10-1
-                        C(1+LU_IND1,J) = BETA*C(1+LU_IND1,J)
+                        C(1+LU_IND1,J) = aligned(0)*C(1+LU_IND1,J)
 99997                   CONTINUE
                      CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
                      DO 99996 LU_IND1 = LU_IB10, LU_NUB10-1, 4
@@ -5047,7 +5018,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B + beta*C.
 *
                      DO 90 J = 1, N
-                        IF (BETA.EQ.ZERO0) THEN                         0119
+                        IF (aligned(0).EQ.ZERO0) THEN                   0119
                            LU_NUB20 = M
                            LU_IB20 = MOD(LU_NUB20, 4)
                            DO 99995 LU_IND2 = 0, LU_IB20-1
@@ -5063,14 +5034,14 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                               C(4+LU_IND2,J) = ZERO0
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE0) THEN                      0119
+                        ELSEIF (aligned(0).NE.ONE0) THEN                0119
                            LU_NUB30 = M
                            LU_IB30 = MOD(LU_NUB30, 4)
                            DO 99993 LU_IND3 = 0, LU_IB30-1
-                              C(1+LU_IND3,J) = BETA*C(1+LU_IND3,J)
+                              C(1+LU_IND3,J) = aligned(0)*C(1+LU_IND3
+     &                        ,J)
 99993                         CONTINUE
-                           CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned0(0)
-     &                     )
+                           CALL SIMD_LOAD_V4SF(v4sf_vec3, aligned(0))
                            DO 99992 LU_IND3 = LU_IB30, LU_NUB30-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec2, C(1+
      &                        LU_IND3,J))
@@ -5082,14 +5053,14 @@ c SIMD_COMMENT_0
                         ENDIF
                         DO 80 L = 1, K
                            IF (B(L,J).NE.ZERO0) THEN                    0129
-                              TEMP7 = ALPHA*B(L,J)                      0130
+                              aligned0(0) = aligned4(0)*B(L,J)          0130
                               LU_NUB40 = M
                               LU_IB40 = MOD(LU_NUB40, 4)
                               DO 99991 LU_IND4 = 0, LU_IB40-1
-                                 F_04 = TEMP7*A(1+LU_IND4,L)
+                                 F_04 = aligned0(0)*A(1+LU_IND4,L)
                                  C(1+LU_IND4,J) = C(1+LU_IND4,J)+F_04
 99991                            CONTINUE
-                              CALL SIMD_LOAD_V4SF(v4sf_vec5, aligned1
+                              CALL SIMD_LOAD_V4SF(v4sf_vec5, aligned0
      &                        (0))
                               DO 99990 LU_IND4 = LU_IB40, LU_NUB40-1
      &                        , 4
@@ -5116,10 +5087,10 @@ c SIMD_COMMENT_0
 *
                      DO 120 J = 1, N
                         DO 110 I = 1, M
-                           L_710 = BETA.EQ.ZERO0
-                           C(I,J) = L_710?aligned6(0):C(I,J)
-                           F_30 = BETA*C(I,J)
-                           C10 = aligned6(1)+F_30
+                           L_710 = aligned(0).EQ.ZERO0
+                           C(I,J) = L_710?aligned5(0):C(I,J)
+                           F_30 = aligned(0)*C(I,J)
+                           C10 = aligned5(1)+F_30
                            L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
@@ -5133,7 +5104,7 @@ c SIMD_COMMENT_0
 *           Form  C := alpha*A*B' + beta*C
 *
                   DO 170 J = 1, N
-                     IF (BETA.EQ.ZERO0) THEN                            0161
+                     IF (aligned(0).EQ.ZERO0) THEN                      0161
                         LU_NUB60 = M
                         LU_IB60 = MOD(LU_NUB60, 4)
                         DO 99987 LU_IND6 = 0, LU_IB60-1
@@ -5149,13 +5120,13 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_0
                            C(4+LU_IND6,J) = ZERO0
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE0) THEN                         0161
+                     ELSEIF (aligned(0).NE.ONE0) THEN                   0161
                         LU_NUB70 = M
                         LU_IB70 = MOD(LU_NUB70, 4)
                         DO 99985 LU_IND7 = 0, LU_IB70-1
-                           C(1+LU_IND7,J) = BETA*C(1+LU_IND7,J)
+                           C(1+LU_IND7,J) = aligned(0)*C(1+LU_IND7,J)
 99985                      CONTINUE
-                        CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned7(0))
+                        CALL SIMD_LOAD_V4SF(v4sf_vec18, aligned(0))
                         DO 99984 LU_IND7 = LU_IB70, LU_NUB70-1, 4
                            CALL SIMD_LOAD_V4SF(v4sf_vec17, C(1+
      &                     LU_IND7,J))
@@ -5167,14 +5138,14 @@ c SIMD_COMMENT_0
                      ENDIF
                      DO 160 L = 1, K
                         IF (B(J,L).NE.ZERO0) THEN                       0171
-                           TEMP3 = ALPHA*B(J,L)                         0172
+                           aligned6(0) = aligned4(0)*B(J,L)             0172
                            LU_NUB80 = M
                            LU_IB80 = MOD(LU_NUB80, 4)
                            DO 99983 LU_IND8 = 0, LU_IB80-1
-                              F_44 = TEMP3*A(1+LU_IND8,L)
+                              F_44 = aligned6(0)*A(1+LU_IND8,L)
                               C(1+LU_IND8,J) = C(1+LU_IND8,J)+F_44
 99983                         CONTINUE
-                           CALL SIMD_LOAD_V4SF(v4sf_vec20, aligned8(0
+                           CALL SIMD_LOAD_V4SF(v4sf_vec20, aligned6(0
      &                     ))
                            DO 99982 LU_IND8 = LU_IB80, LU_NUB80-1, 4
                               CALL SIMD_LOAD_V4SF(v4sf_vec21, A(1+
@@ -5200,10 +5171,10 @@ c SIMD_COMMENT_0
 *
                   DO 200 J = 1, N
                      DO 190 I = 1, M
-                        L_810 = BETA.EQ.ZERO0
-                        C(I,J) = L_810?aligned13(0):C(I,J)
-                        F_70 = BETA*C(I,J)
-                        C30 = aligned13(1)+F_70
+                        L_810 = aligned(0).EQ.ZERO0
+                        C(I,J) = L_810?aligned10(0):C(I,J)
+                        F_70 = aligned(0)*C(I,J)
+                        C30 = aligned10(1)+F_70
                         L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
@@ -5314,22 +5285,21 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
        float a[10][10], int lda, float b[10][10], int ldb, float beta,
        float c[10][10], int ldc)
 {
-  float aligned13[2];
+  float aligned10[2];
   float v4sf_vec22[4];
-  float aligned8[4];
+  float aligned6[4];
   float v4sf_vec21[4];
   float v4sf_vec20[4];
   float v4sf_vec19[4];
-  float aligned7[4];
   float v4sf_vec18[4];
   float v4sf_vec17[4];
-  float aligned6[2];
+  float aligned5[2];
+  float aligned4[2];
   float v4sf_vec7[4];
-  float aligned1[4];
+  float aligned0[4];
   float v4sf_vec6[4];
   float v4sf_vec5[4];
   float v4sf_vec4[4];
-  float aligned0[4];
   float v4sf_vec3[4];
   float v4sf_vec2[4];
   float aligned[4];
@@ -5420,7 +5390,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int lu_ib20;
   int lu_nub30;
   int lu_ib30;
-  float temp7;
   int lu_nub40;
   int lu_ib40;
   float f_04;
@@ -5432,7 +5401,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int lu_ib60;
   int lu_nub70;
   int lu_ib70;
-  float temp3;
   int lu_nub80;
   int lu_ib80;
   float f_44;
@@ -5460,14 +5428,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int j;
   int l;
 
-  aligned7[3] = beta;
-  aligned7[2] = beta;
-  aligned7[1] = beta;
-  aligned7[0] = beta;
-  aligned0[3] = beta;
-  aligned0[2] = beta;
-  aligned0[1] = beta;
-  aligned0[0] = beta;
+  aligned4[1] = alpha;
+  aligned4[0] = alpha;
   aligned[3] = beta;
   aligned[2] = beta;
   aligned[1] = beta;
@@ -5562,14 +5524,14 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   else
     {
       if (((m == 0) || (n == 0))
-	  || (((alpha == zero0) || (k == 0)) && (beta == one0)))
+	  || (((aligned4[0] == zero0) || (k == 0)) && (aligned[0] == one0)))
 	{
 	}
       else
 	{
-	  if (alpha == zero0)
+	  if (aligned4[0] == zero0)
 	    {
-	      if (beta == zero0)
+	      if (aligned[0] == zero0)
 		{
 		  for (j = 1; j <= n; j++)
 		    {
@@ -5601,7 +5563,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		      for (lu_ind1 = 0; lu_ind1 <= lu_ib10 - 1; lu_ind1++)
 			{
 			  c[j - 1][(1 + lu_ind1) - 1] =
-			    (beta * c[j - 1][(1 + lu_ind1) - 1]);
+			    (aligned[0] * c[j - 1][(1 + lu_ind1) - 1]);
 			  continue;
 			}
 		      simd_load_v4sf (v4sf_vec1, aligned[0]);
@@ -5627,7 +5589,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		    {
 		      for (j = 1; j <= n; j++)
 			{
-			  if (beta == zero0)
+			  if (aligned[0] == zero0)
 			    {
 			      lu_nub20 = m;
 			      lu_ib20 = mod (lu_nub20, 4);
@@ -5649,7 +5611,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    }
 			  else
 			    {
-			      if (beta != one0)
+			      if (aligned[0] != one0)
 				{
 				  lu_nub30 = m;
 				  lu_ib30 = mod (lu_nub30, 4);
@@ -5657,10 +5619,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				       lu_ind3++)
 				    {
 				      c[j - 1][(1 + lu_ind3) - 1] =
-					(beta * c[j - 1][(1 + lu_ind3) - 1]);
+					(aligned[0] *
+					 c[j - 1][(1 + lu_ind3) - 1]);
 				      continue;
 				    }
-				  simd_load_v4sf (v4sf_vec3, aligned0[0]);
+				  simd_load_v4sf (v4sf_vec3, aligned[0]);
 				  for (lu_ind3 = lu_ib30;
 				       lu_ind3 <= lu_nub30 - 1; lu_ind3 += 4)
 				    {
@@ -5681,19 +5644,21 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (b[j - 1][l - 1] != zero0)
 				{
-				  temp7 = (alpha * b[j - 1][l - 1]);
+				  aligned0[0] =
+				    (aligned4[0] * b[j - 1][l - 1]);
 				  lu_nub40 = m;
 				  lu_ib40 = mod (lu_nub40, 4);
 				  for (lu_ind4 = 0; lu_ind4 <= lu_ib40 - 1;
 				       lu_ind4++)
 				    {
 				      f_04 =
-					(temp7 * a[l - 1][(1 + lu_ind4) - 1]);
+					(aligned0[0] *
+					 a[l - 1][(1 + lu_ind4) - 1]);
 				      c[j - 1][(1 + lu_ind4) - 1] =
 					(c[j - 1][(1 + lu_ind4) - 1] + f_04);
 				      continue;
 				    }
-				  simd_load_v4sf (v4sf_vec5, aligned1[0]);
+				  simd_load_v4sf (v4sf_vec5, aligned0[0]);
 				  for (lu_ind4 = lu_ib40;
 				       lu_ind4 <= lu_nub40 - 1; lu_ind4 += 4)
 				    {
@@ -5725,12 +5690,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      l_710 = (beta == zero0);
+			      l_710 = (aligned[0] == zero0);
 			      c[j - 1][i - 1] =
-				__c - conditional__ (l_710, aligned6[0],
+				__c - conditional__ (l_710, aligned5[0],
 						     c[j - 1][i - 1]);
-			      f_30 = (beta * c[j - 1][i - 1]);
-			      c10 = (aligned6[1] + f_30);
+			      f_30 = (aligned[0] * c[j - 1][i - 1]);
+			      c10 = (aligned5[1] + f_30);
 			      l_980 = !l_710;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_980, c10,
@@ -5747,7 +5712,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		    {
 		      for (j = 1; j <= n; j++)
 			{
-			  if (beta == zero0)
+			  if (aligned[0] == zero0)
 			    {
 			      lu_nub60 = m;
 			      lu_ib60 = mod (lu_nub60, 4);
@@ -5769,7 +5734,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    }
 			  else
 			    {
-			      if (beta != one0)
+			      if (aligned[0] != one0)
 				{
 				  lu_nub70 = m;
 				  lu_ib70 = mod (lu_nub70, 4);
@@ -5777,10 +5742,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				       lu_ind7++)
 				    {
 				      c[j - 1][(1 + lu_ind7) - 1] =
-					(beta * c[j - 1][(1 + lu_ind7) - 1]);
+					(aligned[0] *
+					 c[j - 1][(1 + lu_ind7) - 1]);
 				      continue;
 				    }
-				  simd_load_v4sf (v4sf_vec18, aligned7[0]);
+				  simd_load_v4sf (v4sf_vec18, aligned[0]);
 				  for (lu_ind7 = lu_ib70;
 				       lu_ind7 <= lu_nub70 - 1; lu_ind7 += 4)
 				    {
@@ -5801,19 +5767,21 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (b[l - 1][j - 1] != zero0)
 				{
-				  temp3 = (alpha * b[l - 1][j - 1]);
+				  aligned6[0] =
+				    (aligned4[0] * b[l - 1][j - 1]);
 				  lu_nub80 = m;
 				  lu_ib80 = mod (lu_nub80, 4);
 				  for (lu_ind8 = 0; lu_ind8 <= lu_ib80 - 1;
 				       lu_ind8++)
 				    {
 				      f_44 =
-					(temp3 * a[l - 1][(1 + lu_ind8) - 1]);
+					(aligned6[0] *
+					 a[l - 1][(1 + lu_ind8) - 1]);
 				      c[j - 1][(1 + lu_ind8) - 1] =
 					(c[j - 1][(1 + lu_ind8) - 1] + f_44);
 				      continue;
 				    }
-				  simd_load_v4sf (v4sf_vec20, aligned8[0]);
+				  simd_load_v4sf (v4sf_vec20, aligned6[0]);
 				  for (lu_ind8 = lu_ib80;
 				       lu_ind8 <= lu_nub80 - 1; lu_ind8 += 4)
 				    {
@@ -5845,12 +5813,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      l_810 = (beta == zero0);
+			      l_810 = (aligned[0] == zero0);
 			      c[j - 1][i - 1] =
-				__c - conditional__ (l_810, aligned13[0],
+				__c - conditional__ (l_810, aligned10[0],
 						     c[j - 1][i - 1]);
-			      f_70 = (beta * c[j - 1][i - 1]);
-			      c30 = (aligned13[1] + f_70);
+			      f_70 = (aligned[0] * c[j - 1][i - 1]);
+			      c30 = (aligned10[1] + f_70);
 			      l_990 = !l_810;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_990, c30,

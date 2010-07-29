@@ -368,6 +368,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    int LU_IB00, LU_NUB00;
    //PIPS generated variable
    float PP1;
+   //SAC generated temporary array
+   float aligned[2] = {0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0};
    
    
    for(th = 0; th <= Nth-1; th += 1) {
@@ -381,14 +383,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED0[1] = 0.000000;
          for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
             //PIPS:SAC generated double vector(s)
-            double v2df_vec0[2], v2df_vec1[2];
-            //SAC generated temporary array
-            float aligned[2] = {0, 0};
-            //PIPS:SAC generated double vector(s)
-            double v2df_vec2[2], v2df_vec3[2];
+            double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2];
             SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &ptrin[th][rg][LU_IND0].re);
             SIMD_MULPD(v2df_vec0, v2df_vec1, v2df_vec1);
-            SIMD_STORE_V2SF_TO_V2DF(v2df_vec0, &aligned[0]);
+            SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &aligned[0]);
             SIMD_LOAD_GENERIC_V2DF(v2df_vec2, RED0[1], RED0[0]);
             SIMD_ADDPD(v2df_vec2, v2df_vec0, v2df_vec2);
             SIMD_STORE_GENERIC_V2DF(v2df_vec2, &RED0[1], &RED0[0]);
@@ -404,15 +402,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED1[7] = 0.000000;
          for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec4[4], v4sf_vec5[4];
-            //SAC generated temporary array
-            float aligned0[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec6[4], v4sf_vec7[4];
-            //SAC generated temporary array
-            float aligned1[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec8[4], v4sf_vec9[4], v4sf_vec10[4], v4sf_vec11[4];
+            float v4sf_vec4[4], v4sf_vec5[4], v4sf_vec6[4], v4sf_vec7[4], v4sf_vec8[4], v4sf_vec9[4], v4sf_vec10[4], v4sf_vec11[4];
             SIMD_LOAD_V4SF(v4sf_vec5, &ptrin[th][rg][LU_IND0].re);
             SIMD_MULPS(v4sf_vec4, v4sf_vec5, v4sf_vec5);
             SIMD_STORE_V4SF(v4sf_vec4, &aligned0[0]);
@@ -449,6 +439,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    int LU_IB00, LU_NUB00;
    //PIPS generated variable
    float PP1;
+   //SAC generated temporary array
+   float aligned[2] = {0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0};
    
    
    for(th = 0; th <= Nth-1; th += 1) {
@@ -462,22 +454,16 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED0[1] = 0.000000;
          {
             //PIPS:SAC generated double vector(s)
-            double v2df_vec2[2];
-            //SAC generated temporary array
-            float aligned[2] = {0, 0};
-            //PIPS:SAC generated double vector(s)
-            double v2df_vec0[2];
+            double v2df_vec0[2], v2df_vec2[2];
             SIMD_LOAD_GENERIC_V2DF(v2df_vec2, RED0[1], RED0[0]);
             for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
                //PIPS:SAC generated double vector(s)
-               double v2df_vec1[2];
-               //PIPS:SAC generated double vector(s)
-               double v2df_vec3[2];
+               double v2df_vec1[2], v2df_vec3[2];
                SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &ptrin[th][rg][LU_IND0].re);
                SIMD_MULPD(v2df_vec0, v2df_vec1, v2df_vec1);
                SIMD_ADDPD(v2df_vec2, v2df_vec0, v2df_vec2);
             }
-            SIMD_STORE_V2SF_TO_V2DF(v2df_vec0, &aligned[0]);
+            SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &aligned[0]);
             SIMD_STORE_GENERIC_V2DF(v2df_vec2, &RED0[1], &RED0[0]);
          }
          RED2[0] = RED0[1]+RED0[0]+RED2[0];
@@ -491,24 +477,12 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED1[7] = 0.000000;
          {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec8[4], v4sf_vec10[4];
-            //SAC generated temporary array
-            float aligned1[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec6[4];
-            //SAC generated temporary array
-            float aligned0[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec4[4];
+            float v4sf_vec4[4], v4sf_vec6[4], v4sf_vec8[4], v4sf_vec10[4];
             SIMD_LOAD_GENERIC_V4SF(v4sf_vec8, RED1[1], RED1[0], RED1[3], RED1[2]);
             SIMD_LOAD_GENERIC_V4SF(v4sf_vec10, RED1[5], RED1[4], RED1[7], RED1[6]);
             for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
                //PIPS:SAC generated float vector(s)
-               float v4sf_vec5[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec7[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec9[4], v4sf_vec11[4];
+               float v4sf_vec5[4], v4sf_vec7[4], v4sf_vec9[4], v4sf_vec11[4];
                SIMD_LOAD_V4SF(v4sf_vec5, &ptrin[th][rg][LU_IND0].re);
                SIMD_MULPS(v4sf_vec4, v4sf_vec5, v4sf_vec5);
                SIMD_LOAD_V4SF(v4sf_vec7, &ptrin[th][rg][2+LU_IND0].re);
@@ -540,6 +514,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    int LU_IB00, LU_NUB00;
    //PIPS generated variable
    float PP1;
+   //SAC generated temporary array
+   float aligned[2] = {0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0};
    
    
    for(th = 0; th <= Nth-1; th += 1) {
@@ -553,22 +529,16 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED0[1] = 0.000000;
          {
             //PIPS:SAC generated double vector(s)
-            double v2df_vec2[2];
-            //SAC generated temporary array
-            float aligned[2] = {0, 0};
-            //PIPS:SAC generated double vector(s)
-            double v2df_vec0[2];
+            double v2df_vec0[2], v2df_vec2[2];
             SIMD_LOAD_GENERIC_V2DF(v2df_vec2, RED0[1], RED0[0]);
             for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
                //PIPS:SAC generated double vector(s)
-               double v2df_vec1[2];
-               //PIPS:SAC generated double vector(s)
-               double v2df_vec3[2];
+               double v2df_vec1[2], v2df_vec3[2];
                SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &ptrin[th][rg][LU_IND0].re);
                SIMD_MULPD(v2df_vec0, v2df_vec1, v2df_vec1);
                SIMD_ADDPD(v2df_vec2, v2df_vec0, v2df_vec2);
             }
-            SIMD_STORE_V2SF_TO_V2DF(v2df_vec0, &aligned[0]);
+            SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &aligned[0]);
             SIMD_STORE_GENERIC_V2DF(v2df_vec2, &RED0[1], &RED0[0]);
          }
          RED2[0] = RED0[1]+RED0[0]+RED2[0];
@@ -582,24 +552,12 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED1[7] = 0.000000;
          {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec8[4], v4sf_vec10[4];
-            //SAC generated temporary array
-            float aligned1[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec6[4];
-            //SAC generated temporary array
-            float aligned0[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec4[4];
+            float v4sf_vec4[4], v4sf_vec6[4], v4sf_vec8[4], v4sf_vec10[4];
             SIMD_LOAD_GENERIC_V4SF(v4sf_vec8, RED1[1], RED1[0], RED1[3], RED1[2]);
             SIMD_LOAD_GENERIC_V4SF(v4sf_vec10, RED1[5], RED1[4], RED1[7], RED1[6]);
             for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
                //PIPS:SAC generated float vector(s)
-               float v4sf_vec5[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec7[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec9[4], v4sf_vec11[4];
+               float v4sf_vec5[4], v4sf_vec7[4], v4sf_vec9[4], v4sf_vec11[4];
                SIMD_LOAD_V4SF(v4sf_vec5, &ptrin[th][rg][LU_IND0].re);
                SIMD_MULPS(v4sf_vec4, v4sf_vec5, v4sf_vec5);
                SIMD_LOAD_V4SF(v4sf_vec7, &ptrin[th][rg][2+LU_IND0].re);

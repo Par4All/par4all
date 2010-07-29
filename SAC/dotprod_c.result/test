@@ -110,13 +110,14 @@ float dotprod(float b[200], float c[200])
 }
 float dotprod(float b[200], float c[200])
 {
-   float a = 0;
+   float a;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[4], a0 = 0, F_00, F_01, F_02, F_03, a1 = 0;
+   float RED0[4], a0, F_00, F_01, F_02, F_03, a1;
+   a1 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -145,13 +146,16 @@ float dotprod(float b[200], float c[200])
 }
 float dotprod(float b[200], float c[200])
 {
-   float a = 0;
+   float a;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[4], a0 = 0, F_00, F_01, F_02, F_03, a1 = 0;
+   float RED0[4], a0, F_00, F_01, F_02, F_03, a1;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
+   a1 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -159,11 +163,7 @@ float dotprod(float b[200], float c[200])
    RED0[3] = 0.000000;
    for(LU_IND0 = 0; LU_IND0 <= 199; LU_IND0 += 4) {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4], v4sf_vec4[4];
+      float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -177,13 +177,16 @@ float dotprod(float b[200], float c[200])
 }
 float dotprod(float b[200], float c[200])
 {
-   float a = 0;
+   float a;
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[4], a0 = 0, F_00, F_01, F_02, F_03, a1 = 0;
+   float RED0[4], a0, F_00, F_01, F_02, F_03, a1;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
+   a1 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -191,17 +194,11 @@ float dotprod(float b[200], float c[200])
    RED0[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
       for(LU_IND0 = 0; LU_IND0 <= 199; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -218,7 +215,10 @@ float dotprod(float b[200], float c[200])
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[4], a0 = 0, a1 = 0;
+   float RED0[4], a0, a1;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
+   a1 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -226,17 +226,11 @@ float dotprod(float b[200], float c[200])
    RED0[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
       for(LU_IND0 = 0; LU_IND0 <= 199; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
@@ -256,7 +250,10 @@ float dotprod(float b[200], float c[200])
    //PIPS generated variable
    int LU_IND0;
    //PIPS generated variable
-   float RED0[4], a0 = 0, a1 = 0;
+   float RED0[4], a0, a1;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
+   a1 = 0;
    LU_IND0 = 0;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
@@ -264,17 +261,11 @@ float dotprod(float b[200], float c[200])
    RED0[3] = 0.000000;
    {
       //PIPS:SAC generated float vector(s)
-      float v4sf_vec3[4];
-      //SAC generated temporary array
-      float aligned[4] = {0, 0, 0, 0};
-      //PIPS:SAC generated float vector(s)
-      float v4sf_vec0[4];
+      float v4sf_vec0[4], v4sf_vec3[4];
       SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
       for(LU_IND0 = 0; LU_IND0 <= 199; LU_IND0 += 4) {
          //PIPS:SAC generated float vector(s)
-         float v4sf_vec1[4], v4sf_vec2[4];
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec4[4];
+         float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
          SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
          SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
          SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);

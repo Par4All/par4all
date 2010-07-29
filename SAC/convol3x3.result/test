@@ -246,6 +246,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -264,11 +266,7 @@ l300:
 l200:
          for(ki = 0; ki <= 2; ki += 1) {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
-            //SAC generated temporary array
-            float aligned[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4], v4sf_vec4[4];
+            float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4];
 l100:            ;
             SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
             SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
@@ -296,6 +294,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
    //PIPS:SAC generated variable
    overloaded PADDING_VALUE;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -313,18 +313,12 @@ l300:      ;
          RED0[2] = 0.000000;
          {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
-            //SAC generated temporary array
-            float aligned[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec0[4];
+            float v4sf_vec0[4], v4sf_vec3[4];
 l200:            ;
             SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
             for(ki = 0; ki <= 2; ki += 1) {
                //PIPS:SAC generated float vector(s)
-               float v4sf_vec1[4], v4sf_vec2[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec4[4];
+               float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
 l100:               ;
                SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
                SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
@@ -351,6 +345,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int i, j, ki;
    //PIPS generated variable
    float RED0[3], F_40, F_30;
+   //SAC generated temporary array
+   float aligned[4] = {0, 0, 0, 0};
    
    
    for(i = 0; i <= isi-1; i += 1)
@@ -368,18 +364,12 @@ l300:      ;
          RED0[2] = 0.000000;
          {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
-            //SAC generated temporary array
-            float aligned[4] = {0, 0, 0, 0};
-            //PIPS:SAC generated float vector(s)
-            float v4sf_vec0[4];
+            float v4sf_vec0[4], v4sf_vec3[4];
 l200:            ;
             SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
             for(ki = 0; ki <= 2; ki += 1) {
                //PIPS:SAC generated float vector(s)
-               float v4sf_vec1[4], v4sf_vec2[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec4[4];
+               float v4sf_vec1[4], v4sf_vec2[4], v4sf_vec4[4];
 l100:               ;
                SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
                SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);

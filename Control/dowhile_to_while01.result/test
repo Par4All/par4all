@@ -19,19 +19,19 @@ Code after conversion
 int main(int argc, char *argv[])
 {
    int i = 0;
-   //PIPS generated variable
-   int I_0;
    {
-      I_0 = 0;
-      I_0 = 0;
+      //PIPS generated variable
+      int j0;
+      j0 = 0;
+      j0 = 0;
 
-      I_0 = i++;
-      printf("%d", I_0);
-   }
-   while (i<10) {
-      int j = 0;
-      j = i++;
-      printf("%d", j);
+      j0 = i++;
+      printf("%d", j0);
+      while (i<10) {
+         int j = 0;
+         j = i++;
+         printf("%d", j);
+      }
    }
    printf("\n");
    return 0;
