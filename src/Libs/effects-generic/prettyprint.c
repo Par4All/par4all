@@ -56,7 +56,6 @@
 
 #include "text-util.h"
 #include "prettyprint.h"
-#include "preprocessor.h"
 
 #include "effects-convex.h"
 #include "effects-generic.h"
