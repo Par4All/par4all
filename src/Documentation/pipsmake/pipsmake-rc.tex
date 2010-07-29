@@ -5461,6 +5461,7 @@ it into single-assignment form.
 alias single_assignment 'Single Assignment Form'
 
 single_assignment           > MODULE.code
+		! MODULE.split_initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
@@ -9113,6 +9114,9 @@ scalarization  > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 \end{PipsMake}
+\begin{PipsProp}{SCALARIZATION_PREFIX}
+SCALARIZATION_PREFIX "__scalar__"
+\end{PipsProp}
 
 \begin{PipsPass}{constant_array_scalarization}
 Similar to \PipsPassRef{scalarization}, but with a different criterium:
