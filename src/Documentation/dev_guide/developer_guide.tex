@@ -467,6 +467,8 @@ sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
 # do the merging into the branch working copy
 # consider options -x -b or -x -w
 # to ignore space-related changes
+sh> svn status
+# check for conflicts (C state) or other issues, and resolve them.
 sh> svn commit
 \end{verbatim}
   }
@@ -478,6 +480,7 @@ sh> cd my-branch-name
 sh> svn merge ^/trunk
 # consider options -x -b or -x -w
 # to ignore space-related changes
+sh> svn status
 sh> svn commit
 \end{verbatim}
   }
@@ -514,6 +517,9 @@ svn diff https://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips trunk.
   You must have write access to the \texttt{trunk} in order to do the commit.
+  First, you must bring your branch up-to-date with respect to the
+  \texttt{trunk}, which is the \texttt{merge} described above.
+  Then you can reintegrate your changes to the \texttt{trunk}:
   {\small
 \begin{verbatim}
 sh> cd prod/pips  # cd in your pips trunk copy, or better a fresh copy
@@ -526,6 +532,8 @@ sh> svn merge \
   --reintegrate
 # consider options -x -b or -x -w
 # to ignore space-related changes
+sh> svn status
+# there should be no issue on a reintegration.
 sh> svn commit
 \end{verbatim}
   }
