@@ -464,9 +464,11 @@ sh> svn commit my-branch-name
 \begin{verbatim}
 sh> cd my-branch-name
 sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
-# do the merging into the branch working copy
-# consider options -x -b or -x -w
-# to ignore space-related changes
+# this does the merging into the branch working copy
+# - consider options -x -b or -x -w
+#   to ignore space-related changes
+# - if there are conflicts, choose 'p' (postpone)
+#   and deal with them later.
 sh> svn status
 # check for conflicts (C state) or other issues, and resolve them.
 sh> svn commit
