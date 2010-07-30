@@ -21,6 +21,16 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/*
+ * Modifications :
+ * --------------
+ *
+ * Molka Becher (MB), June-July 2010
+ *
+ * Add of functions on Long Int, Long Long Int, Long Double and Long Double Complex types
+ *
+ */
+
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
@@ -133,6 +143,16 @@ parameter MakeIntegerParameter()
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
 }
 
+parameter MakeLongIntegerParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_LONG_INTEGER_TYPE_SIZE);
+}
+
+parameter MakeLongLongIntegerParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+}
+
 parameter MakeRealParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
@@ -141,6 +161,11 @@ parameter MakeRealParameter()
 parameter MakeDoubleprecisionParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+parameter MakeQuadprecisionParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_float, DEFAULT_QUADPRECISION_TYPE_SIZE);
 }
 
 parameter MakeLogicalParameter()
@@ -156,6 +181,11 @@ parameter MakeComplexParameter()
 parameter MakeDoublecomplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+}
+
+parameter MakeLongDoublecomplexParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_complex, DEFAULT_LONGDOUBLECOMPLEX_TYPE_SIZE);
 }
 
 parameter MakeCharacterParameter()
@@ -190,6 +220,16 @@ type MakeIntegerResult()
     return MakeAnyScalarResult(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
 
+type MakeLongIntegerResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_LONG_INTEGER_TYPE_SIZE);
+}
+
+type MakeLongLongIntegerResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+}
+
 type MakeRealResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
@@ -198,6 +238,11 @@ type MakeRealResult()
 type MakeDoubleprecisionResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+type MakeQuadprecisionResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_float, DEFAULT_QUADPRECISION_TYPE_SIZE);
 }
 
 type MakeLogicalResult()
@@ -214,6 +259,12 @@ type MakeDoublecomplexResult()
 {
     return MakeAnyScalarResult(is_basic_complex,
 			       DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+}
+
+type MakeLongDoublecomplexResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_complex,
+			       DEFAULT_LONGDOUBLECOMPLEX_TYPE_SIZE);
 }
 
 type MakeCharacterResult()

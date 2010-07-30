@@ -32,7 +32,8 @@
 
   Remi Triolet
 
-  Modifications:
+  Modifications :
+  ---------------
   - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
   Francois Irigoin, 02/06/90
   - add .SEQ. to handle ranges outside of arrays [pj]
@@ -40,8 +41,15 @@
   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
     FI, 25/12/96
   - Fortran specification conformant typing of expressions...
+  
+  Molka Becher (MB), June 2010
+  - Check of C intrinsics already added
+  - Add of missing C intrinsics according to ISO/IEC 9899:TC2
+  - Add of functions handling long double type and long double complex type
 
-   Bugs:
+
+  Bugs:
+  ----- 
   - intrinsics are not properly typed
 
 */
@@ -371,6 +379,20 @@ overloaded_to_double_type(int n)
 }
 
 static type
+overloaded_to_longdouble_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeQuadprecisionResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeOverloadedParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
 overloaded_to_complex_type(int n)
 {
   type t = type_undefined;
@@ -397,6 +419,20 @@ overloaded_to_doublecomplex_type(int n)
 
   return t;
 }
+
+//static type
+//overloaded_to_longdoublecomplex_type(int n)  /* MB */
+/*{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongDoublecomplexResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeOverloadedParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}*/
 
 static type
 overloaded_to_logical_type(int n)
@@ -578,12 +614,94 @@ real_to_double_type(int n)
 }
 
 static type
+real_to_longinteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongIntegerResult());
+  functional_parameters(ft) = make_parameter_list(n, MakeRealParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+real_to_longlonginteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongLongIntegerResult());
+  functional_parameters(ft) = make_parameter_list(n, MakeRealParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
 double_to_integer_type(int n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
 
   ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeDoubleprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+double_to_longinteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeDoubleprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+double_to_longlonginteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongLongIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeDoubleprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longinteger_to_longinteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeDoubleprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longlonginteger_to_longlonginteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongLongIntegerResult());
   functional_parameters(ft) =
     make_parameter_list(n, MakeDoubleprecisionParameter);
   t = make_type(is_type_functional, ft);
@@ -601,7 +719,7 @@ double_to_real_type(int n)
   ft = make_functional(NIL, MakeRealResult());
   functional_parameters(ft) =
     make_parameter_list(n, MakeDoubleprecisionParameter);
-  t = make_type(is_type_functional, ft);
+ // t = make_type(is_type_functional, ft);
 
   return t;
 }
@@ -620,6 +738,64 @@ double_to_double_type(int n)
 
   return t;
 }
+
+static type
+longdouble_to_integer_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeQuadprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longdouble_to_longinteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeQuadprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longdouble_to_longlonginteger_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongLongIntegerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeQuadprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+
+static type
+longdouble_to_longdouble_type(int n)  /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeQuadprecisionResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeQuadprecisionParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
 
 static type
 complex_to_real_type(int n)
@@ -670,6 +846,34 @@ doublecomplex_to_doublecomplex_type(int n)
   ft = make_functional(NIL, MakeDoublecomplexResult());
   functional_parameters(ft) =
     make_parameter_list(n, MakeDoublecomplexParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longdoublecomplex_to_longdoublecomplex_type(int n) /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLongDoublecomplexResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeLongDoublecomplexParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type
+longdoublecomplex_to_longdouble_type(int n) /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL,  MakeQuadprecisionResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeLongDoublecomplexParameter);
   t = make_type(is_type_functional, ft);
 
   return t;
@@ -1353,6 +1557,10 @@ insert_cast(basic cast, basic from, expression exp, type_context_p context)
 #define TC_DCOMPLEX \
 get_bool_property("TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION")
 
+/* MB : Type check long double complex */
+#define TC_LONGDCOMPLEX \
+get_bool_property("TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION")
+
 /* Determine the longest basic among the arguments of c
  */
 static basic
@@ -1402,7 +1610,17 @@ check_if_basics_ok(list le, hash_table types, bool(*basic_ok)(basic))
 static bool
 is_basic_int_p(basic b)
 {
-  return basic_int_p(b);
+  return basic_int_p(b) && basic_int(b)==4;
+}
+static bool 
+is_basic_longint_p(basic b) /* MB */
+{
+  return basic_int_p(b) && basic_int(b)==6;
+}
+static bool 
+is_basic_longlongint_p(basic b) /* MB */
+{
+  return basic_int_p(b) && basic_int(b)==8;
 }
 static bool
 is_basic_real_p(basic b)
@@ -1415,6 +1633,11 @@ is_basic_double_p(basic b)
   return basic_float_p(b) && basic_float(b)==8;
 }
 static bool
+is_basic_longdouble_p(basic b)  /* MB */
+{
+  return basic_float_p(b) && basic_float(b)==16;
+}
+static bool
 is_basic_complex_p(basic b)
 {
   return basic_complex_p(b) && basic_complex(b)==8;
@@ -1424,11 +1647,26 @@ is_basic_dcomplex_p(basic b)
 {
   return basic_complex_p(b) && basic_complex(b)==16;
 }
+static bool
+is_basic_longdcomplex_p(basic b)  /* MB */
+{
+  return basic_complex_p(b) && basic_complex(b)==32;
+}
 
 static bool
 arguments_are_integer(call c, hash_table types)
 {
   return check_if_basics_ok(call_arguments(c), types, is_basic_int_p);
+}
+static bool
+arguments_are_longinteger(call c, hash_table types) /* MB */
+{
+  return check_if_basics_ok(call_arguments(c), types, is_basic_longint_p);
+}
+static bool
+arguments_are_longlonginteger(call c, hash_table types) /* MB */
+{
+  return check_if_basics_ok(call_arguments(c), types, is_basic_longlongint_p);
 }
 
 static bool
@@ -1442,6 +1680,11 @@ arguments_are_double(call c, hash_table types)
   return check_if_basics_ok(call_arguments(c), types, is_basic_double_p);
 }
 static bool
+arguments_are_longdouble(call c, hash_table types) /* MB */
+{
+  return check_if_basics_ok(call_arguments(c), types, is_basic_longdouble_p);
+}
+static bool
 arguments_are_complex(call c, hash_table types)
 {
   return check_if_basics_ok(call_arguments(c), types, is_basic_complex_p);
@@ -1451,24 +1694,34 @@ arguments_are_dcomplex(call c, hash_table types)
 {
   return check_if_basics_ok(call_arguments(c), types, is_basic_dcomplex_p);
 }
+static bool
+arguments_are_longdcomplex(call c, hash_table types)  /* MB */
+{
+  return check_if_basics_ok(call_arguments(c), types, is_basic_longdcomplex_p);
+}
+
 
 /**************************************************************************
  * Verify if all the arguments basic of function C
  * If there is no argument, I return TRUE
  *
- * Note: I - Integer; R - Real; D - Double; C - Complex
+ * Note: I - Integer; R - Real; D - Double; C - Complex; 
  */
 
-
+/* MB : add of long int, long long int, long double and long double complex types */
 static bool
 arguments_are_something(
     call c,
     type_context_p context,
     bool integer_ok,
+    bool longinteger_ok,
+    bool longlonginteger_ok,
     bool real_ok,
     bool double_ok,
+    bool longdouble_ok,
     bool complex_ok,
     bool dcomplex_ok,
+    bool longdcomplex_ok,
     bool logical_ok,
     bool character_ok)
 {
@@ -1513,11 +1766,15 @@ arguments_are_something(
       context->number_of_error++;
       okay = FALSE;
     }
-    else if (!((integer_ok && basic_int_p(b)) ||
+    else if (!((integer_ok && basic_int_p(b) && basic_int(b)==4) ||
+          (longinteger_ok && basic_int_p(b) && basic_int(b)==6) ||
+          (longlonginteger_ok && basic_int_p(b) && basic_int(b)==8) ||     
           (real_ok && basic_float_p(b) && basic_float(b)==4) ||
           (double_ok &&  basic_float_p(b) && basic_float(b)==8) ||
+          (longdouble_ok &&  basic_float_p(b) && basic_float(b)==16) ||
           (complex_ok && basic_complex_p(b) && basic_complex(b)==8) ||
           (dcomplex_ok && basic_complex_p(b) && basic_complex(b)==16) ||
+          (longdcomplex_ok && basic_complex_p(b) && basic_complex(b)==32) ||
           (logical_ok && basic_logical_p(b)) ||
           (character_ok && basic_string_p(b))))
     {
@@ -1526,10 +1783,14 @@ arguments_are_something(
                               argnumber,
                               entity_local_name(call_function(c)),
                               integer_ok? "INT, ": "",
+                              longinteger_ok? "LONGINT, ": "",
+                              longlonginteger_ok? "LONGLONGINT, ": "",
                               real_ok? "REAL, ": "",
                               double_ok? "DOUBLE, ": "",
+                              longdouble_ok? "LONGDOUBLE, ": "",
                               complex_ok? "COMPLEX, ": "",
                               dcomplex_ok? "DCOMPLEX, ": "",
+                              longdcomplex_ok? "LONGDCOMPLEX, ": "",
                               logical_ok? "LOGICAL, ": "",
                               character_ok? "CHARACTER, ": "",
                               basic_to_string(b));
@@ -1562,45 +1823,45 @@ static bool
 arguments_are_IRDCS(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, TRUE);
+    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, TRUE);
 }
 
 static bool
 arguments_are_IRDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, FALSE);
+    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, FALSE);
 }
 static bool
 arguments_are_character(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
+    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
 }
 static bool
 arguments_are_logical(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
+    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
 }
 static bool
 arguments_are_RD(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
 }
 
 static bool
 arguments_are_IR(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
 }
 static bool
 arguments_are_IRD(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
 }
 /**************************************************************************
  * Verify if all the arguments basic of function C are REAL, DOUBLE
@@ -1615,7 +1876,7 @@ static bool
 arguments_are_RDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, FALSE);
+    (c, context, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, FALSE);
 }
 
 /**************************************************************************
@@ -1799,9 +2060,19 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   bool check_arg = FALSE;
 
   /* INT */
-  if(basic_int_p(from_type))
+  if(basic_int_p(from_type) && basic_int(from_type) == 4)
   {
     check_arg = arguments_are_integer(c, context->types);
+  }
+  /* LONG INT : added by MB */
+  else if(basic_int_p(from_type) && basic_int(from_type) == 6)
+  {
+    check_arg = arguments_are_longinteger(c, context->types);
+  }
+  /* LONG LONG INT */
+  else if(basic_int_p(from_type) && basic_int(from_type) == 8)
+  {
+    check_arg = arguments_are_longlonginteger(c, context->types);
   }
   /* REAL */
   else if(basic_float_p(from_type) && basic_float(from_type) == 4)
@@ -1813,6 +2084,11 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   {
     check_arg = arguments_are_double(c, context->types);
   }
+  /* LONG DOUBLE : added by MB */
+  else if(basic_float_p(from_type) && basic_float(from_type) == 16)
+  {
+    check_arg = arguments_are_longdouble(c, context->types);
+  }  
   /* COMPLEX */
   else if(basic_complex_p(from_type) && basic_complex(from_type) == 8)
   {
@@ -1823,6 +2099,12 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   {
     if (TC_DCOMPLEX)
       check_arg = arguments_are_dcomplex(c, context->types);
+  }
+  /* LONG DOUBLE COMPLEX : added by MB*/
+  else if(basic_complex_p(from_type) && basic_complex(from_type) == 32)
+  {
+    if (TC_LONGDCOMPLEX)
+      check_arg = arguments_are_longdcomplex(c, context->types);
   }
   /* CHAR */
   else if(basic_string_p(from_type))
@@ -1865,6 +2147,24 @@ typing_function_int_to_int(call c, type_context_p context)
   return result;
 }
 static basic
+typing_function_longint_to_longint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LINT = make_basic_int(6);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                     type_LINT, type_LINT);
+  free_basic(type_LINT);
+  return result;
+}
+static basic
+typing_function_longlongint_to_longlongint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LLINT = make_basic_int(8);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                     type_LLINT, type_LLINT);
+  free_basic(type_LLINT);
+  return result;
+}
+static basic
 typing_function_real_to_real(call c, type_context_p context)
 {
   basic result, type_REAL = make_basic_float(4);
@@ -1883,6 +2183,15 @@ typing_function_double_to_double(call c, type_context_p context)
   return result;
 }
 static basic
+typing_function_longdouble_to_longdouble(call c, type_context_p context)  /* MB */
+{
+  basic result, type_LDBLE = make_basic_float(16);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                      type_LDBLE, type_LDBLE);
+  free_basic(type_LDBLE);
+  return result;
+}
+static basic
 typing_function_complex_to_complex(call c, type_context_p context)
 {
   basic result, type_CMPLX = make_basic_complex(8);
@@ -1898,6 +2207,26 @@ typing_function_dcomplex_to_dcomplex(call c, type_context_p context)
   result = typing_function_argument_type_to_return_type(c, context,
                                                     type_DCMPLX, type_DCMPLX);
   free_basic(type_DCMPLX);
+  return result;
+}
+static basic
+typing_function_longdcomplex_to_longdcomplex(call c, type_context_p context)  /*MB: added for long double complex type*/
+{
+  basic result, type_LDCMPLX = make_basic_complex(32);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                    type_LDCMPLX, type_LDCMPLX);
+  free_basic(type_LDCMPLX);
+  return result;
+}
+static basic
+typing_function_longdcomplex_to_longdouble(call c, type_context_p context)  /* MB */
+{
+  basic result, type_LDBLE = make_basic_float(16);
+  basic type_LDCMPLX = make_basic_complex(32);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                    type_LDCMPLX, type_LDBLE);
+  free_basic(type_LDBLE);
+  free_basic(type_LDCMPLX);
   return result;
 }
 static basic
@@ -1932,6 +2261,30 @@ typing_function_real_to_int(call c, type_context_p context)
                                                         type_REAL,
                                                         type_INT);
   free_basic(type_INT);
+  free_basic(type_REAL);
+  return result;
+}
+static basic
+typing_function_real_to_longint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LINT = make_basic_int(6);
+  basic type_REAL = make_basic_float(4);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_REAL,
+                                                        type_LINT);
+  free_basic(type_LINT);
+  free_basic(type_REAL);
+  return result;
+}
+static basic
+typing_function_real_to_longlongint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LLINT = make_basic_int(8);
+  basic type_REAL = make_basic_float(4);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_REAL,
+                                                        type_LLINT);
+  free_basic(type_LLINT);
   free_basic(type_REAL);
   return result;
 }
@@ -1973,6 +2326,67 @@ typing_function_double_to_int(call c, type_context_p context)
                                                         type_INT);
   free_basic(type_INT);
   free_basic(type_DBLE);
+  return result;
+}
+static basic
+typing_function_double_to_longint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LINT = make_basic_int(6);
+  basic type_DBLE = make_basic_float(8);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                      type_DBLE, type_LINT);
+  free_basic(type_LINT);
+  free_basic(type_DBLE);
+  return result;
+}
+
+static basic
+typing_function_double_to_longlongint(call c, type_context_p context) /* MB */
+{
+  basic result, type_LLINT = make_basic_int(8);
+  basic type_DBLE = make_basic_float(8);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                      type_DBLE, type_LLINT);
+  free_basic(type_LLINT);
+  free_basic(type_DBLE);
+  return result;
+}
+static basic
+typing_function_longdouble_to_int(call c, type_context_p context)  /* MB */
+{
+  basic result, type_INT = make_basic_int(4);
+  basic type_LDBLE = make_basic_float(16);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_LDBLE,
+                                                        type_INT);
+  free_basic(type_INT);
+  free_basic(type_LDBLE);
+  return result;
+}
+
+static basic
+typing_function_longdouble_to_longint(call c, type_context_p context)  /* MB */
+{
+  basic result, type_LINT = make_basic_int(6);
+  basic type_LDBLE = make_basic_float(16);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_LDBLE,
+                                                        type_LINT);
+  free_basic(type_LINT);
+  free_basic(type_LDBLE);
+  return result;
+}
+
+static basic
+typing_function_longdouble_to_longlongint(call c, type_context_p context)  /* MB */
+{
+  basic result, type_LLINT = make_basic_int(8);
+  basic type_LDBLE = make_basic_float(16);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_LDBLE,
+                                                        type_LLINT);
+  free_basic(type_LLINT);
+  free_basic(type_LDBLE);
   return result;
 }
 static basic
@@ -3726,6 +4140,34 @@ integer_to_overloaded_type(int n)
 }
 
 static type
+longinteger_to_overloaded_type(int n) /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeLongIntegerParameter);
+  return t;
+}
+
+static type
+longlonginteger_to_overloaded_type(int n) /* MB */
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeLongLongIntegerParameter);
+  return t;
+}
+
+static type
 integer_to_void_type(int n)
 {
   type t = type_undefined;
@@ -3922,6 +4364,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
    typing_function_RealDouble_to_Integer, switch_specific_nint},
   {IDNINT_CONVERSION_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
 
+  //Fortran
   {IABS_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
   {ABS_OPERATOR_NAME, 1, real_to_real_type,
    typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal,
@@ -4110,7 +4553,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   { IMS_OPERATOR_NAME, 3, integer_to_integer_type,
         typing_function_int_to_int, 0 },
 
-  /* Here are C intrinsics */
+  /* Here are C intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
 
   /* ISO 6.5.2.3 structure and union members */
   {FIELD_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
@@ -4188,43 +4631,130 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ASSERT_FUNCTION_NAME, 3, overloaded_to_void_type,0,0},
   {ASSERT_FAIL_FUNCTION_NAME, 4, overloaded_to_void_type,0,0}, /* does not return */
 
-  /* #include <complex.h>*/
+  /* #include <complex.h> */
+
+  {CACOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CACOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CACOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CASIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CASINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CASINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CATAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CATANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CATANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CCOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CCOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CCOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CSIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CSINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CSINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CTAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CTANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CTANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CACOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CACOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CACOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CASINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CASINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CASINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CATANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CATANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CATANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CCOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CCOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CCOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CSINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CSINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CSINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CTANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CTANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CTANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CEXP_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CEXPF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CEXPL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CLOG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CLOGF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CLOGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CABS_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {CABSF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+  {CABSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+  {CPOW_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CPOWF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CPOWL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {C_CSQRT_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CSQRTF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CSQRTL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CARG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {CARGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+  {CARGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+  {CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {CIMAGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+  {CIMAGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+  {CONJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CONJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CONJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CPROJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+  {CPROJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {CPROJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+  {CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {CREALF_OPERATOR_NAME, 1,  complex_to_real_type, typing_function_complex_to_real, 0},
+  {CREALL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
 
   /* #include <ctype.h> */
-  {ISALNUM_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISALPHA_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISCNTRL_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISGRAPH_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISLOWER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISPRINT_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISPUNCT_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISSPACE_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISUPPER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISXDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {ISASCII_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {TOASCII_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {_TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
-  {_TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
+ 
+  {ISALNUM_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISALPHA_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISBLANK_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISCNTRL_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISGRAPH_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISPRINT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISPUNCT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISSPACE_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISXDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  /* End ctype.h */
+  //not found in standard C99 (in GNU C Library)
+  {ISASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {TOASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {_TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {_TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
   /* Real type is void -> unsigned short int ** */
   {CTYPE_B_LOC_OPERATOR_NAME, 0, integer_to_integer_type, 0, 0},
 
-  /* #include <errno.h>*/
+  /* #include <errno.h> */
   /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */
+  /* bits/errno.h */
+  {__ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
 
-  /* #include <fenv.h>*/
 
-  /* #include <float.h>*/
+  /* #include <fenv.h> */
+  {FECLEAREXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {FERAISEEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {FESETEXCEPTFLAG_FUNCTION_NAME, 2,  overloaded_to_integer_type, 0, 0},
+  {FETESTEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {FEGETROUND_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
+  {FESETROUND_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  // fenv_t *
+  //{FESETENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  //{FEUPDATEENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
+
+  /* #include <float.h> */
   /* {"__flt_rounds", 1, void_to_integer_type, 0, 0}, */
 
-  /* #include <inttypes.h>*/
+  /* #include <inttypes.h> */
+  {IMAXABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {IMAXDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
 
-  /* #include <iso646.h>*/
+  /* #include <iso646.h> */
 
   /* {"_sysconf", 1, integer_to_integer_type, 0, 0},
-  {"setlocale", 2, default_intrinsic_type, 0, 0},
+
   {"localeconv", 1, default_intrinsic_type, 0, 0},
   {"dcgettext", 3, default_intrinsic_type, 0, 0},
   {"dgettext", 2, default_intrinsic_type, 0, 0},
@@ -4238,63 +4768,204 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {"mcfiller", 1, void_to_overloaded_type, 0, 0},
   {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
 
-  /* #include <limits.h>*/
+  /* #include <limits.h> */
 
-  /* #include <locale.h>*/
+  /* #include <locale.h> */
+  {SETLOCALE_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
 
-  /* #include <math.h>*/
-  {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_ASIN_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_ATAN_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_ATAN2_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {C_COS_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_SIN_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_TAN_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_COSH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_SINH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_TANH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_EXP_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {FREXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+  /* #include <math.h> */
+
+  {FPCLASSIFY_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
+  {ISFINITE_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISINF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISNORMAL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {SIGNBIT_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
+  {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double , 0},
+  {ACOSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ACOSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_ASIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ASINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ASINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_ATAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ATANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ATANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_ATAN2_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {ATAN2F_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {ATAN2L_OPERATOR_NAME, 2, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_COS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {COSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {COSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_SIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {SINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {SINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_TAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {TANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {TANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_ACOSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ACOSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ACOSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_ASINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ASINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ASINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_ATANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ATANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ATANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_COSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {COSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {COSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_SINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {SINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {SINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_TANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {TANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {TANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_EXP_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {EXPF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {EXPL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {EXP2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {EXP2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {EXP2L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {EXPM1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {EXPM1F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {EXPM1L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},    
+  {FREXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},/*?*/
+  {ILOGB_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {ILOGBF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+  {ILOGBL_OPERATOR_NAME, 1, longdouble_to_integer_type, typing_function_longdouble_to_int, 0},    
   {LDEXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {C_LOG_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_LOG10_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
+  {LDEXPF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+  {LDEXPL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
+  {C_LOG_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LOGF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LOGL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {C_LOG10_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LOG10F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LOG10L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {LOG1P_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LOG1PF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LOG1PL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {LOG2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LOG2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LOG2L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {LOGB_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LOGBF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LOGBL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
   {MODF_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {POW_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {C_SQRT_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_SQRTF_OPERATOR_NAME, 1, real_to_real_type, 0, 0},
-  {CEIL_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {FABS_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {FLOOR_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {FMOD_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {ERF_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {ERFC_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {GAMMA_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {HYPOT_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, 0, 0},
-  {J0_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {J1_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {JN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {LGAMMA_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {Y0_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {Y1_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {YN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {C_ACOSH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_ASINH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {C_ATANH_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {CBRT_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {LOGB_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {NEXTAFTER_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {REMAINDER_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {SCALB_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {EXPM1_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {ILOGB_OPERATOR_NAME, 1, double_to_integer_type, 0, 0},
-  {LOG1P_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {RINT_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {MATHERR_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {SIGNIFICAND_OPERATOR_NAME, 1, double_to_double_type, 0, 0},
-  {COPYSIGN_OPERATOR_NAME, 2, double_to_double_type, 0, 0},
-  {SCALBN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
   {MODFF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+  {SCALBN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+  {SCALBNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+  {SCALBNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0}, 
+  {SCALB_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0}, //POSIX.1-2001
+  {SCALBLN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+  {SCALBLNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+  {SCALBLNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
+  {CBRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {CBRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {CBRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+  {FABS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {FABSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {FABSL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {HYPOT_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {HYPOTF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {HYPOTL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {POW_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {POWF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {POWL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {C_SQRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {SQRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {SQRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {ERF_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ERFF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ERFL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {ERFC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ERFCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ERFCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {GAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0}, /* GNU C Library */
+  {LGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {LGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {LGAMMAL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {TGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {TGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {CEIL_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {CEILF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {CEILL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {FLOOR_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {FLOORF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {FLOORL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {NEARBYINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {NEARBYINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {NEARBYINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+  {RINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {RINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {RINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {LRINT_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0}, 
+  {LRINTF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},         
+  {LRINTL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
+  {LLRINT_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},
+  {LLRINTF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
+  {LLRINTL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
+  {ROUND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {ROUNDF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {ROUNDL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {LROUND_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0},   
+  {LROUNDF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},
+  {LROUNDL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
+  {LLROUND_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},   
+  {LLROUNDF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
+  {LLROUNDL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
+  {TRUNC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {TRUNCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+  {TRUNCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {FMOD_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {FMODF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {FMODL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {REMAINDER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {REMAINDERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {REMAINDERL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+  {COPYSIGN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {COPYSIGNF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {COPYSIGNL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {NAN_OPERATOR_NAME, 1, char_pointer_to_double_type, 0, 0},
+  {NANF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+  {NANL_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+  {NEXTAFTER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {NEXTAFTERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {NEXTAFTERL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {NEXTTOWARD_OPERATOR_NAME, 2,  overloaded_to_double_type,0, 0},
+  {NEXTTOWARDF_OPERATOR_NAME, 2,  overloaded_to_real_type, 0, 0},
+  {NEXTTOWARDL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {FDIM_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {FDIMF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {FDIML_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {FMAX_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {FMAXF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {FMAXL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {FMIN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+  {FMINF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+  {FMINL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {FMA_OPERATOR_NAME, 3, double_to_double_type, typing_function_double_to_double, 0},
+  {FMAF_OPERATOR_NAME, 3, real_to_real_type, typing_function_real_to_real, 0},
+  {FMAL_OPERATOR_NAME, 3,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+  {ISGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISGREATEREQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISLESS_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISLESSEQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISLESSGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  {ISUNORDERED_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+  /* End math.h */
+
+  {J0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {J1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {JN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+
+  {Y0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {Y1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+  {YN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+ 
+  {MATHERR_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {SIGNIFICAND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {SIGFPE_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
   {SINGLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
   {DOUBLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
@@ -4317,14 +4988,6 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {QFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
   {QGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
 
-  /* netdb.h */
-  {__H_ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
-
-  /* bits/errno.h */
-  {__ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
-
-  /* signal.h */
-  {SIGNAL_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
 
   /* same name in stdlib
      {"ecvt", 4, default_intrinsic_type, 0, 0},
@@ -4341,7 +5004,11 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
   {"siglongjmp", 2, overloaded_to_void_type, 0, 0},
 
+
   /*#include <signal.h>*/
+  {SIGNAL_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+  {RAISE_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
   /*#include <stdarg.h>*/
   /*#include <stdbool.h>*/
   /*#include <stddef.h>*/
@@ -4445,41 +5112,49 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
   {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
 
+
   /*#include <stdlib.h>*/
 
-  {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-
-  {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
-  {ABS_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
-  {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
   {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
   {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
-  {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {DIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
-  {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
-  {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {MALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MBLEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {MBTOWC_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {RAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0}, /* void -> int */
-  {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {STRTOF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {STRTOL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {STRTOUL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {STRTOULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {RAND_FUNCTION_NAME, 1,  void_to_integer_type, 0, 0},
+  {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {MALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
+  {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
+  {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
+  {_EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
+  {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {SYSTEM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {WCTOMB_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
+  {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+  {ABS_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {LABS_FUNCTION_NAME, 1, longinteger_to_longinteger_type, typing_function_longint_to_longint, 0},
+  {LLABS_FUNCTION_NAME, 1, longlonginteger_to_longlonginteger_type, typing_function_longlongint_to_longlongint, 0},
+  {DIV_FUNCTION_NAME, 2, integer_to_overloaded_type, 0, 0},
+  {LDIV_FUNCTION_NAME, 2, longinteger_to_overloaded_type, 0, 0},
+  {LLDIV_FUNCTION_NAME, 2, longlonginteger_to_overloaded_type, 0, 0},
+  {MBLEN_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+  {MBTOWC_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+  {WCTOMB_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+  {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {WCSTOMBS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+
+
+  //to check
+  {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {EXITHANDLE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ERAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
@@ -4526,11 +5201,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ISATTY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {MEMALIGN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {TTYNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LLABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LLDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STRTOULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {ULLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
 
   /*#include <string.h>*/
@@ -4626,6 +5297,29 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   { WCSRTOMBS_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},  
 
   /*#include <wctype.h>*/
+
+  {ISWALNUM_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWALPHA_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWBLANK_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWCNTRL_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWDIGIT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWGRAPH_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWLOWER_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWPRINT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWPUNCT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWSPACE_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWUPPER_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWXDIGIT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {ISWCTYPE_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+  {WCTYPE_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+  {TOWLOWER_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+  {TOWUPPER_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+  {TOWCTRANS_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+  {WCTRANS_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+
+  /* netdb.h */
+  {__H_ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
+
 
   /* #include <fcntl.h>*/
 
