@@ -459,10 +459,13 @@ sh> svn commit my-branch-name
   used. Have a look to \S~\ref{sec:shell} for more information.
 
 \item To merge into your branch on-going developments by other people from
-  trunk, first you need to have already committed your branch and then:
+  trunk, first you need to have already committed your branch and
+  then, in your branch (and no other directory above or under):
   {\small
 \begin{verbatim}
 sh> cd my-branch-name
+# the above cd is useful: it aims at going into the branch root,
+# i.e. the copy of the "trunk", before merging.
 sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
 # this does the merging into the branch working copy
 # - consider options -x -b or -x -w
