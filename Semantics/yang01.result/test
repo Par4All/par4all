@@ -7,10 +7,6 @@ Transformers for "foo"
 int foo(int s)
 {
 
-//  T(foo) {s<=foo+1, foo<=s+1}
-
-   // BEGIN BLOCK
-
 //  T(t) {s==t-2}
 
    int t = s+2;
@@ -33,7 +29,6 @@ int foo(int s)
 
 
    return t;
-   // END BLOCK
 }
 
 Transformers for "bar"
@@ -43,10 +38,6 @@ Transformers for "bar"
 
 int bar()
 {
-
-//  T(bar) {1<=bar}
-
-   // BEGIN BLOCK
 
 //  T(x) {x==3}
 
@@ -61,10 +52,6 @@ int bar()
 
    while (x<=4) {
 
-//  T(x,y) {y==y#init+1, x#init<=x+1, x<=x#init+1}
-
-      // BEGIN BLOCK
-
 //  T(y) {y==y#init+1}
 
       y++;
@@ -72,18 +59,26 @@ int bar()
 //  T(x) {x#init<=x+1, x<=x#init+1}
 
       x = foo(x);
-      // END BLOCK
+
+//  T() {}
+
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
 
 //  T(y) {y#init<=y+1, y<=y#init+1}
 
    y = foo(y);
 
+//  T() {}
+
+   
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+
 //  T(bar) {bar==y}
 
-
    return y;
-   // END BLOCK
 }
 
 Preconditions for "bar"
@@ -93,10 +88,6 @@ Preconditions for "bar"
 
 int bar()
 {
-
-//  P() {}
-
-   // BEGIN BLOCK
 
 //  P() {}
 
@@ -113,16 +104,16 @@ int bar()
 
 //  P(x,y) {x<=4, 3<=x+y, x<=y+3}
 
-      // BEGIN BLOCK
-
-//  P(x,y) {x<=4, 3<=x+y, x<=y+3}
-
       y++;
 
 //  P(x,y) {x<=4, 4<=x+y, x<=y+2}
 
       x = foo(x);
-      // END BLOCK
+
+//  P(x,y) {x<=5, 3<=x+y, x<=y+3, 1<=y}
+
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
 
 //  P(x,y) {x==5, 2<=y}
@@ -131,9 +122,13 @@ int bar()
 
 //  P(x,y) {x==5, 1<=y}
 
+   
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+
+//  P(x,y) {x==5, 1<=y}
 
    return y;
-   // END BLOCK
 }
 
 Preconditions for "foo"
@@ -143,10 +138,6 @@ Preconditions for "foo"
 
 int foo(int s)
 {
-
-//  P() {}
-
-   // BEGIN BLOCK
 
 //  P() {}
 
@@ -170,137 +161,94 @@ int foo(int s)
 
 
    return t;
-   // END BLOCK
 }
 
 After inlining/unfolding of "bar"
 
 int bar()
 {
-   // BEGIN BLOCK
-   // BEGIN BLOCK
    int x = 3;
    int y = x-3;
    //PIPS generated variable
    int _return0, _return1;
 
    while (x<=4) {
-      // BEGIN BLOCK
-      // BEGIN BLOCK
       y++;
       {
-         // BEGIN BLOCK
-         // BEGIN BLOCK
          int t = x+2;
 
          if (t>6)
             t -= 3;
          else
             t--;
-         // BEGIN BLOCK
          
          
-         // BEGIN BLOCK
          _return0 = t;
-         // END BLOCK
-         // END BLOCK
-         ;
-         // END BLOCK
       }
-      // END BLOCK
       x = _return0;
-      // END BLOCK
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
    {
-      // BEGIN BLOCK
-      // BEGIN BLOCK
       int t = y+2;
 
       if (t>6)
          t -= 3;
       else
          t--;
-      // BEGIN BLOCK
       
       
-      // BEGIN BLOCK
       _return1 = t;
-      // END BLOCK
-      // END BLOCK
-      ;
-      // END BLOCK
    }
-   // END BLOCK
    y = _return1;
-   // END BLOCK
    
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
    return y;
-   // END BLOCK
 }
 
 After unspahettify of "bar"
 
 int bar()
 {
-   // BEGIN BLOCK
-   // BEGIN BLOCK
    int x = 3;
    int y = x-3;
    //PIPS generated variable
    int _return0, _return1;
 
    while (x<=4) {
-      // BEGIN BLOCK
-      // BEGIN BLOCK
       y++;
       {
-         // BEGIN BLOCK
-         // BEGIN BLOCK
          int t = x+2;
 
          if (t>6)
             t -= 3;
          else
             t--;
-         // BEGIN BLOCK
          
          
-         // BEGIN BLOCK
          _return0 = t;
-         // END BLOCK
-         // END BLOCK
-         ;
-         // END BLOCK
       }
-      // END BLOCK
       x = _return0;
-      // END BLOCK
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
    {
-      // BEGIN BLOCK
-      // BEGIN BLOCK
       int t = y+2;
 
       if (t>6)
          t -= 3;
       else
          t--;
-      // BEGIN BLOCK
       
       
-      // BEGIN BLOCK
       _return1 = t;
-      // END BLOCK
-      // END BLOCK
-      ;
-      // END BLOCK
    }
-   // END BLOCK
    y = _return1;
-   // END BLOCK
    
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
    return y;
-   // END BLOCK
 }
 
 Preconditions for "bar"
@@ -310,11 +258,6 @@ Preconditions for "bar"
 
 int bar()
 {
-
-//  P() {}
-
-   // BEGIN BLOCK
-   // BEGIN BLOCK
 
 //  P() {}
 
@@ -336,18 +279,8 @@ int bar()
 
 //  P(_return0,_return1,x,y) {x<=4, 3<=x+y, x<=y+3}
 
-      // BEGIN BLOCK
-
-//  P(_return0,_return1,x,y) {x<=4, 3<=x+y, x<=y+3}
-
-      // BEGIN BLOCK
       y++;
       {
-
-//  P(_return0,_return1,x,y) {x<=4, 4<=x+y, x<=y+2}
-
-         // BEGIN BLOCK
-         // BEGIN BLOCK
 
 //  P(_return0,_return1,x,y) {x<=4, 4<=x+y, x<=y+2}
 
@@ -372,34 +305,23 @@ int bar()
 //  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+1, 0`1`2`t<=5,
 //    5<=0`1`2`t+y, 0`1`2`t<=y+3}
 
-         // BEGIN BLOCK
          
          
-         // BEGIN BLOCK
          _return0 = t;
-
-//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==_return0, 0`1`2`t==x+1,
-//    0`1`2`t<=5, 5<=0`1`2`t+y, 0`1`2`t<=y+3}
-
-         // END BLOCK
-         // END BLOCK
-         ;
-         // END BLOCK
       }
 
 //  P(_return0,_return1,x,y) {_return0==x+1, _return0<=5,
 //    5<=_return0+y, _return0<=y+3}
 
-      // END BLOCK
       x = _return0;
-      // END BLOCK
+
+//  P(_return0,_return1,x,y) {_return0==x, _return0<=5, 5<=_return0+y,
+//    _return0<=y+3}
+
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
    {
-
-//  P(_return0,_return1,x,y) {_return0==5, x==5, 2<=y}
-
-      // BEGIN BLOCK
-      // BEGIN BLOCK
 
 //  P(_return0,_return1,x,y) {_return0==5, x==5, 2<=y}
 
@@ -425,34 +347,27 @@ int bar()
 //  P(0`3`t,_return0,_return1,x,y) {_return0==5, x==5, y+7<=30`3`t,
 //    y<=0`3`t+1, 0`3`t<=y+1}
 
-      // BEGIN BLOCK
       
       
-      // BEGIN BLOCK
       _return1 = t;
-
-//  P(0`3`t,_return0,_return1,x,y) {0`3`t==_return1, _return0==5,
-//    x==5, y+7<=30`3`t, y<=0`3`t+1, 0`3`t<=y+1}
-
-      // END BLOCK
-      // END BLOCK
-      ;
-      // END BLOCK
    }
 
 //  P(_return0,_return1,x,y) {_return0==5, x==5, y+7<=3_return1,
 //    y<=_return1+1, _return1<=y+1}
 
-   // END BLOCK
    y = _return1;
 
 //  P(_return0,_return1,x,y) {_return0==5, _return1==y, x==5,
 //    3<=_return1}
 
-   // END BLOCK
    
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+
+//  P(_return0,_return1,x,y) {_return0==5, _return1==y, x==5,
+//    3<=_return1}
+
    return y;
-   // END BLOCK
 }
 
 After dead code elimination of "bar"
@@ -462,11 +377,6 @@ After dead code elimination of "bar"
 
 int bar()
 {
-
-//  P() {}
-
-   // BEGIN BLOCK
-   // BEGIN BLOCK
 
 //  P() {}
 
@@ -488,18 +398,8 @@ int bar()
 
 //  P(_return0,_return1,x,y) {x==y+3, 3<=x, x<=4}
 
-      // BEGIN BLOCK
-
-//  P(_return0,_return1,x,y) {x==y+3, 3<=x, x<=4}
-
-      // BEGIN BLOCK
       y++;
       {
-
-//  P(_return0,_return1,x,y) {x==y+2, 3<=x, x<=4}
-
-         // BEGIN BLOCK
-         // BEGIN BLOCK
 
 //  P(_return0,_return1,x,y) {x==y+2, 3<=x, x<=4}
 
@@ -514,34 +414,23 @@ int bar()
 //  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==x+1, 0`1`2`t==y+3,
 //    4<=0`1`2`t, 0`1`2`t<=5}
 
-         // BEGIN BLOCK
          
          
-         // BEGIN BLOCK
          _return0 = t;
-
-//  P(0`1`2`t,_return0,_return1,x,y) {0`1`2`t==_return0, 0`1`2`t==x+1,
-//    0`1`2`t==y+3, 4<=0`1`2`t, 0`1`2`t<=5}
-
-         // END BLOCK
-         // END BLOCK
-         ;
-         // END BLOCK
       }
 
 //  P(_return0,_return1,x,y) {_return0==x+1, _return0==y+3,
 //    4<=_return0, _return0<=5}
 
-      // END BLOCK
       x = _return0;
-      // END BLOCK
+
+//  P(_return0,_return1,x,y) {_return0==x, _return0==y+3, 4<=_return0,
+//    _return0<=5}
+
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
    }
    {
-
-//  P(_return0,_return1,x,y) {_return0==5, x==5, y==2}
-
-      // BEGIN BLOCK
-      // BEGIN BLOCK
 
 //  P(_return0,_return1,x,y) {_return0==5, x==5, y==2}
 
@@ -563,30 +452,22 @@ int bar()
 
 //  P(0`3`t,_return0,_return1,x,y) {0`3`t==3, _return0==5, x==5, y==2}
 
-      // BEGIN BLOCK
       
       
-      // BEGIN BLOCK
       _return1 = t;
-
-//  P(0`3`t,_return0,_return1,x,y) {0`3`t==3, _return0==5,
-//    _return1==3, x==5, y==2}
-
-      // END BLOCK
-      // END BLOCK
-      ;
-      // END BLOCK
    }
 
 //  P(_return0,_return1,x,y) {_return0==5, _return1==3, x==5, y==2}
 
-   // END BLOCK
    y = _return1;
 
 //  P(_return0,_return1,x,y) {_return0==5, _return1==3, x==5, y==3}
 
-   // END BLOCK
    
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+
+//  P(_return0,_return1,x,y) {_return0==5, _return1==3, x==5, y==3}
+
    return y;
-   // END BLOCK
 }

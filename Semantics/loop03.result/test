@@ -164,12 +164,12 @@ Privatize scalar variables on all the modules of the program:
 Transformers for "getimage" after privatization
 
 
-//  T() {0==-1}
+//  T() {}
 
 void getimage(char *filename)
 {
 
-//  T() {0==-1}
+//  T() {}
 
    // BEGIN BLOCK
 
@@ -216,12 +216,12 @@ void getimage(char *filename)
          // END BLOCK
       }
 
-//  T(i,j) {192i==j-64, i#init==64, j#init==64, 0<=i}
+//  T(i,j) {i#init==64, j#init==64, 0<=i}
 
 
    for(i = 0; i <= 255; i += 1)
 
-//  T(j) {j#init==64, 0<=i, i<=255, 0<=j}
+//  T(j) {0<=i, i<=255, 0<=j}
 
       for(j = 0; j <= 255; j += 1) {
 
@@ -239,12 +239,12 @@ void getimage(char *filename)
          // END BLOCK
       }
 
-//  T() {0==-1}
+//  T() {i==256, j==256}
 
 
    fp = fopen(filename, "r");
 
-//  T() {0==-1}
+//  T() {i==256, j==256}
 
    fclose(fp);
    // END BLOCK
@@ -310,30 +310,30 @@ void getimage(char *filename)
 
    for(i = 0; i <= 255; i += 1)
 
-//  P(c,conj,i,j,nx,ny) {192i==j-64, 0<=i, i<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255}
 
       for(j = 0; j <= 255; j += 1) {
 
-//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255, 0<=j, j<=255}
 
          // BEGIN BLOCK
 
-//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255, 0<=j, j<=255}
 
          imageout_re[i][j] = 0.0;
 
-//  P(c,conj,i,j,nx,ny) {i==0, 0<=j, j<=255}
+//  P(c,conj,i,j,nx,ny) {0<=i, i<=255, 0<=j, j<=255}
 
          imageout_im[i][j] = 0.0;
          // END BLOCK
       }
 
-//  P() {0==-1}
+//  P(c,conj,i,j,nx,ny) {i==256, j==256}
 
 
    fp = fopen(filename, "r");
 
-//  P() {0==-1}
+//  P(c,conj,i,j,nx,ny) {i==256, j==256}
 
    fclose(fp);
    // END BLOCK

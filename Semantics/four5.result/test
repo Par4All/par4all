@@ -429,19 +429,19 @@ C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WTEMP = WR                                                  0066
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WR = WR*WPR-WI*WPI+WR                                       0067
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WI = WI*WPR+WTEMP*WPI+WI                                    0068
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, J+MMAX==I, 2N==NN,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
 C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
