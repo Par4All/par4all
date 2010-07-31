@@ -234,7 +234,7 @@ entity make_temporary_scalar_entity(expression from,statement * assign)
     /* create the scalar */
 	entity new = make_new_scalar_variable(
 			get_current_module_entity(),
-			basic_of_expression(from)
+                        some_basic_of_any_expression(from,false,false)
 			);
     /* set intial */
     if(!expression_undefined_p(from))
@@ -440,7 +440,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         {
             tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
-            type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module(p)))));
+            type treturn = functional_result(type_functional(entity_type(inlined_module(p))));
             if( type_void_p(treturn) ) /* only replace return statement by gotos */
             {
                 gen_context_recurse(expanded, p,statement_domain, gen_true, &inline_return_remover);
@@ -630,7 +630,9 @@ reget:
 
         }
         gen_free_list(formal_parameters);
-        /* take care of dependant types substitutions */
+        /* SG: C dependant types are a pain in the a**,
+           we fix them here, that is perform substitution if needed
+           */
         for(list iter = new_old_pairs;!ENDP(iter);POP(iter)) {
             entity new = ENTITY(CAR(iter));
             POP(iter);

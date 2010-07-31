@@ -467,8 +467,8 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 
     if (empty_prefix) {
       /* Use a default type-dependent variable name since the programmer
-	 gave none: */
-		basic ub = basic_ultimate(b);
+         gave none: */
+      basic ub = basic_ultimate(b);
       switch(basic_tag(ub)) {
       case is_basic_int:
 	asprintf(&variable_name,  format, DEFAULT_INT_PREFIX,
@@ -495,7 +495,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 		unique_string_number++);
 	break;
       case is_basic_derived: {
-	entity de = basic_derived(b);
+        entity de = basic_derived(ub);
 	type dt = ultimate_type(entity_type(de));
 
 	if(type_struct_p(dt)) {
@@ -506,7 +506,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 	    asprintf(&variable_name, format, DEFAULT_UNION_PREFIX,
 		     unique_string_number++);
 	}
-    else if(type_enum_p(dt)) {
+        else if(type_enum_p(dt)) {
 	   asprintf(&variable_name, format, DEFAULT_ENUM_PREFIX,
 		    unique_string_number++);
 	}
