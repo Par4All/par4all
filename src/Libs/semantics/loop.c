@@ -1229,6 +1229,8 @@ transformer loop_to_transformer(loop l, transformer pre, list e)
   transformer abtf = effects_to_transformer(e);
   /* loop body precondition */
   transformer preb = invariant_wrt_transformer(pre, abtf);
+  /* Information about loop local variables is lost */
+  list lv = loop_locals(l);
   /* range r = loop_range(l); */
   statement b = loop_body(l);
   transformer t_init = transformer_undefined;
@@ -1238,6 +1240,16 @@ transformer loop_to_transformer(loop l, transformer pre, list e)
   ifdebug(8) {
     (void) print_transformer(pre);
   }
+
+  /* eliminate all information about local variables
+   *
+   * Mostly useful for Fortran code.
+   *
+   * In C, variables declared in the loop body do not exist before the
+   * loop is entered and so do not have to be projected. But local
+   * variables may have been introduced by a privatization phase.
+   */
+  preb = safe_transformer_projection(preb, lv);
 
   /* compute the loop body transformer under loop body precondition preb */
   if(!transformer_undefined_p(preb))
@@ -1314,7 +1326,7 @@ transformer complete_any_loop_transformer(transformer t_init,
 					  transformer t_inc,
 					  transformer t_exit)
 {
-  /* t_loop = t_init ; t_skip + t_bodystar ; t_body ; t_inc; t_exit 
+  /* t_loop = t_init ; t_skip + t_bodystar ; t_body ; t_inc; t_exit
    *
    * Before entering t_body, t_enter or t_next have been applied which
    * let us restrict the set of state modified by t_body. But this
@@ -1576,7 +1588,16 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
        bodies... Let's hope that perfectly nested loops are neither
        frequent nor deep! */
     loop il = instruction_loop(statement_instruction(s));
-    btf = complete_loop_transformer(load_statement_transformer(s), pre, il);
+    /* compute the loop body precondition */
+    transformer raw_ipre = transformer_apply(ltf, pre);
+    //transformer ipre = transformer_range(raw_ipre);
+    //ipre = transformer_normalize(ipre, 2);
+    /* You do not need a range to recurse. A full precondition with
+       arguments is expected by complete_loop_transformer(). */
+    btf = complete_loop_transformer(load_statement_transformer(s), raw_ipre, il);
+    btf = transformer_normalize(btf, 2);
+    //free_transformer(ipre);
+    free_transformer(raw_ipre);
   }
   else {
     btf = transformer_dup(load_statement_transformer(s));
@@ -1584,7 +1605,7 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
   /* The final index incrementation is performed later by add_loop_index_exit_value() */
   /* btf = transformer_add_loop_index_incrementation(btf, l, pre); */
 
-  /* compute the transformer when the loop is entered */
+  /* compute the transformer when the loop is entered: T o T* */
   t_enter = transformer_combine(transformer_dup(ltf), btf);
 
   ifdebug(8) {
@@ -1596,9 +1617,19 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
   /* but it seems to be in t already */
   /* t_enter = transformer_add_loop_index_initialization(t_enter, l); */
 
+  /* It would make sense to apply the incrementation, but this is
+     performed as a side effect by add_loop_index_exit_value(), which
+     avoids unfeasability wrt the final loop bound. */
+  /*
+  transformer t_inc = transformer_identity();
+  t_inc = transformer_add_loop_index_incrementation(t_inc, l, pre);
+  t_enter = transformer_combine(t_enter, t_inc);
+  */
+
   /* add the exit condition, without any information pre to estimate the
      increment */
   transformer tmp = t_enter;
+  /* FI: oops, pre is used in spite of previous comment */
   t_enter = add_loop_index_exit_value(t_enter, l, pre);
   transformer_free(tmp);
 
@@ -1615,6 +1646,7 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
   t_skip = add_loop_index_initialization(tmp, l, pre);
   transformer_free(tmp);
   t_skip = add_loop_skip_condition(t_skip, l, pre);
+  t_skip = transformer_normalize(t_skip, 2);
 
   ifdebug(8) {
     pips_debug(8, "skipped loop transformer t_skip=\n");
@@ -1638,6 +1670,8 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
     free_transformer(t_enter);
     free_transformer(t_skip);
   }
+
+  tf = transformer_normalize(tf, 2);
 
   ifdebug(8) {
     pips_debug(8, "full refined loop transformer tf=\n");
