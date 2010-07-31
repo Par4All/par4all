@@ -28,6 +28,7 @@
  *  - unfolding(char* module) to inline all call in a module
  *
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
+ * I am not proud of this code, it is a real mess !
  * @date 2009-01-07
  */
 #ifdef HAVE_CONFIG_H
@@ -274,6 +275,53 @@ bool has_entity_with_same_name(entity e, list l) {
     return false;
 }
 
+static void do_slightly_rename_entities(statement s, hash_table old_new) {
+    static const unsigned int magic_block_number = (unsigned int)-1;
+    /* forge a new name with a magical block number */
+    if(declaration_statement_p(s)) {
+        for(list iter=statement_declarations(s);!ENDP(iter);POP(iter)) {
+            entity *e=(entity*)REFCAR(iter);
+            if(!formal_parameter_p(*e)) {
+                entity ebis = copy_entity(*e);
+                char* ename = entity_name(ebis);
+                const char* euname = entity_user_name(ebis);
+                const char* eprefix = strndup(ename,euname-ename);
+                asprintf(&entity_name(ebis),"%s%u"BLOCK_SEP_STRING"%s",eprefix,magic_block_number,euname);
+                free(ename);
+                hash_put(old_new,*e,ebis);
+                *e=ebis;
+            }
+        }
+    }
+    /* beacause of bottom up transversal, 
+     * we are sure old_new has already been fed
+     */
+    else if(statement_block_p(s)) {
+        for(list iter=statement_declarations(s);!ENDP(iter);POP(iter)) {
+            entity *e=(entity*)REFCAR(iter);
+            entity new = (entity)hash_get(old_new,*e);
+            if(new != HASH_UNDEFINED_VALUE) 
+                *e=new;
+        }
+    }
+}
+
+/* sg: this is another inlining mostruosity
+ * it ensures all entities in s have new pointer
+ * and different name (is it usefull ?)
+ * it takes care of dependant types
+ */
+static void slightly_rename_entities(statement s) {
+    hash_table old_new = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    gen_context_recurse(s,old_new,statement_domain,gen_true,do_slightly_rename_entities);
+    HASH_FOREACH(entity,old,entity,new,old_new)
+        replace_entities(new,old_new);
+    replace_entities(s,old_new);
+
+    hash_table_free(old_new);
+}
+
+
 
 /* this should inline the call callee
  * calling module inlined_module
@@ -307,10 +355,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
     /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource later
+     * sg: not so true, beacuase of dependant types
      */
     expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = make_empty_block_statement();
-    //statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* add external declartions for all extern referenced entities it
      * is needed because inlined module and current module may not
@@ -328,6 +376,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         set inlined_referenced_entities = get_referenced_entities(expanded);
         list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
         set_free(inlined_referenced_entities);
+
 
         FOREACH(ENTITY,ref_ent,lire)
         {
@@ -364,11 +413,9 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             }
         }
         gen_free_list(lire);
+        slightly_rename_entities(expanded);
     }
-    /* we have anothe rproblem with fortran, where declaration are  not handled like in C
-     * another side effect of 'declarations as statements' */
-    else
-    {
+    else {
         bool did_something = false;
         FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
         {
@@ -387,7 +434,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 else
                 {
                     /*sg: unsafe
-                     * sg: iam unsure this is ,still needed */
+                     *sg: i am unsure this is still needed */
                     bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
                     new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
                     if(regenerate)
@@ -477,12 +524,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* fix declarations */
     {
         /* retreive formal parameters*/
-        list formal_parameters = NIL;
+        list formal_parameters = gen_nreverse(
+                module_formal_parameters(inlined_module(p))
+                );
         list new_old_pairs = NIL ; /* store association between new and old declarations */
-        FOREACH(ENTITY,cd,code_declarations(inlined_code))
-            if( entity_formal_p(cd)) formal_parameters=CONS(ENTITY,cd,formal_parameters);
-        formal_parameters = gen_nreverse(formal_parameters);
-
         { /* some basic checks */
             size_t n1 = gen_length(formal_parameters), n2 = gen_length(call_arguments(callee));
             pips_assert("function call has enough arguments",n1 >= n2);
