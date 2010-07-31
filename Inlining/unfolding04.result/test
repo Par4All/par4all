@@ -30,10 +30,10 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
    /*0009*/
    /*0006*/
    //PIPS generated variable
-   int _return0, _return1, _return2;                                    /*0015*/
+   fgINT32 _return0, _return1, _return2;                                /*0015*/
    /*0011*/
    //PIPS generated variable
-   int _return3, _return4;                                              /*0017*/
+   fgINT32 _return3, _return4;                                          /*0017*/
    /*0083*/
    i = 0;                                                               /*0019*/
    /*0013*/

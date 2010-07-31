@@ -2469,7 +2469,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2568,7 +2568,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                            I_2 = l*spp+n;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
@@ -2586,7 +2586,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                               I_3 = j*spp+n;
                               {
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  {
                                     //PIPS generated variable
                                     fgUINT16 *P_40;
@@ -2664,7 +2664,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2753,7 +2753,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      register fgUINT16 val;
                      register int i, k;
                      //PIPS generated variable
-                     unsigned short _return0;
+                     fgUINT16 _return0;
                      i = pos2*spp1;
 
                      for(k = 0; k <= spp1-1; k += 1) {
@@ -2789,7 +2789,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      register fgUINT16 val;
                      register int i, k;
                      //PIPS generated variable
-                     unsigned short _return0;
+                     fgUINT16 _return0;
                      i = pos3*spp2;
 
                      for(k = 0; k <= spp2-1; k += 1) {
@@ -2831,7 +2831,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                            I_2 = l*spp+n;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
@@ -2849,7 +2849,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                               I_3 = j*spp+n;
                               {
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  {
                                     //PIPS generated variable
                                     fgUINT16 *P_40;
@@ -2984,7 +2984,7 @@ int main(int argc, char *argv[])
    FLGR_Data2D *imgsrc, *imgref, *img, *nhb;
    FLGR_Ret ret;
    //PIPS generated variable
-   enum {FLGR_RET_OK, FLGR_RET_TYPE_UNKNOWN=-1, FLGR_RET_TYPE_DIFFERENT=-2, FLGR_RET_SIZE_ERROR=-3, FLGR_RET_ALLOCATION_ERROR=-4, FLGR_RET_CONNEXITY_UNKNOWN=-5, FLGR_RET_PARAM_UNKNOWN=-6, FLGR_RET_NOT_IMPLEMENTED=-7, FLGR_RET_UNDEFINED_ERROR=-8, FLGR_RET_NULL_OBJECT=-9, FLGR_RET_VECTOR_SIZE_DIFFERENT=-10, FLGR_RET_VECTOR_SIZE_ERROR=-11, FLGR_RET_PARAM_ERROR=-12} _return0;
+   FLGR_Ret _return0;
 
    imgsrc = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
    imgref = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
@@ -3037,7 +3037,7 @@ int main(int argc, char *argv[])
                      //PIPS generated variable
                      void **P_39;
                      //PIPS generated variable
-                     unsigned short _return0, _return1, _return2;
+                     fgUINT16 _return0, _return1, _return2;
                      spp = imgsrc0->spp;
                      w = imgsrc0->size_x;
                      h = imgsrc0->size_y;
@@ -3127,7 +3127,7 @@ int main(int argc, char *argv[])
                                        register fgUINT16 val;
                                        register int i, k;
                                        //PIPS generated variable
-                                       unsigned short _return0;
+                                       fgUINT16 _return0;
                                        i = pos2*spp1;
 
                                        for(k = 0; k <= spp1-1; k += 1) {
@@ -3163,7 +3163,7 @@ int main(int argc, char *argv[])
                                        register fgUINT16 val;
                                        register int i, k;
                                        //PIPS generated variable
-                                       unsigned short _return0;
+                                       fgUINT16 _return0;
                                        i = pos3*spp2;
 
                                        for(k = 0; k <= spp2-1; k += 1) {
@@ -3205,7 +3205,7 @@ int main(int argc, char *argv[])
                                           I_2 = l*spp+n;
                                           {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;
@@ -3223,7 +3223,7 @@ int main(int argc, char *argv[])
                                           I_3 = j*spp+n;
                                           {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;

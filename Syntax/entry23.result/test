@@ -18,6 +18,7 @@ Request: build resource PRINTED_FILE for module ENTRY23.
   FILTER_FILE                    building   SOURCE_FILE(ENTRY23)
   PARSER                         building   PARSED_CODE(ENTRY23)
                                  building   CALLEES(ENTRY23)
+user warning in NormalizeExpression: expression is already normalized
 user warning in SafeSizeOfArray: Varying size of array "ENTRY23:X"
 user warning in SafeSizeOfArray: An integer PARAMETER may have been initialized with a real value?
 user error in SafeSizeOfArray: Parser error between lines 19 and 19
@@ -38,6 +39,7 @@ Request: build resource PRINTED_FILE for module INIBND.
   FILTER_FILE                    building   SOURCE_FILE(INIBND)
   PARSER                         building   PARSED_CODE(INIBND)
                                  building   CALLEES(INIBND)
+user warning in NormalizeExpression: expression is already normalized
 user warning in SafeSizeOfArray: Varying size of array "ENTRY23:X"
 user warning in SafeSizeOfArray: An integer PARAMETER may have been initialized with a real value?
 user error in SafeSizeOfArray: Parser error between lines 19 and 19

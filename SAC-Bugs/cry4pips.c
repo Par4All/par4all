@@ -128,29 +128,29 @@ void cry4pips (int count, FAUSTFLOAT input[8][1024], FAUSTFLOAT output[8][1024])
         fRec3[i] = (fSlow5 + (0.999f * fRec3[i-1]));
 
         fRec0[i] = (0 - (((fRec3[i] * fRec0[i-2]) + (fRec2[0] * fRec0[i-1])) - ((float)input0[i] * fRec1[i])));
-        output0[i] = (FAUSTFLOAT)(fRec0[i] - fRec0[i-1]);
+        output0[i] = (fRec0[i] - fRec0[i-1]);
 
 
         fRec4[i] = (0 - (((fRec3[i] * fRec4[i-2]) + (fRec2[i] * fRec4[i-1])) - ((float)input1[i] * fRec1[i])));
-        output1[i] = (FAUSTFLOAT)(fRec4[0] - fRec4[1]);
+        output1[i] = (fRec4[i] - fRec4[i-1]);
 
         fRec5[i] = (0 - (((fRec3[i] * fRec5[i-2]) + (fRec2[i] * fRec5[i-1])) - ((float)input2[i] * fRec1[i])));
-        output2[i] = (FAUSTFLOAT)(fRec5[i] - fRec5[i-1]);
+        output2[i] = (fRec5[i] - fRec5[i-1]);
 
         fRec6[i] = (0 - (((fRec3[i] * fRec6[i-2]) + (fRec2[i] * fRec6[i-1])) - ((float)input3[i] * fRec1[i])));
-        output3[i] = (FAUSTFLOAT)(fRec6[0] - fRec6[1]);
+        output3[i] = (fRec6[i] - fRec6[i-1]);
 
         fRec7[i] = (0 - (((fRec3[i] * fRec7[i-2]) + (fRec2[i] * fRec7[i-1])) - ((float)input4[i] * fRec1[i])));
-        output4[i] = (FAUSTFLOAT)(fRec7[i] - fRec7[i-1]);
+        output4[i] = (fRec7[i] - fRec7[i-1]);
 
         fRec8[0] = (0 - (((fRec3[i] * fRec8[i-2]) + (fRec2[i] * fRec8[i-1])) - ((float)input5[i] * fRec1[i])));
-        output5[i] = (FAUSTFLOAT)(fRec8[i] - fRec8[i-1]);
+        output5[i] = (fRec8[i] - fRec8[i-1]);
 
         fRec9[i] = (0 - (((fRec3[i] * fRec9[i-2]) + (fRec2[i] * fRec9[i-1])) - ((float)input6[i] * fRec1[i])));
-        output6[i] = (FAUSTFLOAT)(fRec9[i] - fRec9[i-1]);
+        output6[i] = (fRec9[i] - fRec9[i-1]);
 
         fRec10[i] = (0 - (((fRec3[i] * fRec10[i-2]) + (fRec2[i] * fRec10[i-1])) - ((float)input7[i] * fRec1[i])));
-        output7[i] = (FAUSTFLOAT)(fRec10[i] - fRec10[i-1]);
+        output7[i] = (fRec10[i] - fRec10[i-1]);
 
         // post processing
         /*fRec10[2] = fRec10[1]; fRec10[1] = fRec10[0];
