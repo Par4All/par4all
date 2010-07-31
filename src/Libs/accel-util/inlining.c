@@ -478,6 +478,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     {
         /* retreive formal parameters*/
         list formal_parameters = NIL;
+        list new_old_pairs = NIL ; /* store association between new and old declarations */
         FOREACH(ENTITY,cd,code_declarations(inlined_code))
             if( entity_formal_p(cd)) formal_parameters=CONS(ENTITY,cd,formal_parameters);
         formal_parameters = gen_nreverse(formal_parameters);
@@ -503,7 +504,14 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
                 }
                 else {
-                    new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                    if(formal_parameter_p(e)) {
+                        new = make_temporary_pointer_to_array_entity(e,expression_undefined);
+                        expression etmp = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e));
+                        replace_entity_by_expression(expanded,e,etmp);
+                        free_expression(etmp);
+                    }
+                    else
+                        new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
                             copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
                 }
 
@@ -616,11 +624,22 @@ reget:
                     else replace_entity(expanded ,e,new);
                     pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
 
+
             }
+            new_old_pairs=CONS(ENTITY,new,CONS(ENTITY,e,new_old_pairs));
 
         }
         gen_free_list(formal_parameters);
+        /* take care of dependant types substitutions */
+        for(list iter = new_old_pairs;!ENDP(iter);POP(iter)) {
+            entity new = ENTITY(CAR(iter));
+            POP(iter);
+            entity old = ENTITY(CAR(iter));
+            replace_entity(declaration_holder,old,new);
+        }
+        gen_free_list(new_old_pairs);
     }
+
 
     /* add declaration at the beginning of the statement */
     insert_statement(declaration_holder,expanded,false);
