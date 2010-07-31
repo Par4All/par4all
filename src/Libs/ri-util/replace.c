@@ -91,7 +91,8 @@ replace_entity(void* s, entity old, entity new) {
 void
 replace_entities(void* s, hash_table ht)
 {
-    HASH_MAP(k, v, replace_entity(s,(entity)k,(entity)v);, ht);
+    HASH_FOREACH(entity, k,entity, v, ht)
+        replace_entity(s,k,v);
 }
 
 /** Replace an old reference by a reference to a new entity in a statement
