@@ -76,7 +76,7 @@ void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_
    register fgUINT16 val;
    register int i, k;
    //PIPS generated variable
-   unsigned short _return0;
+   fgUINT16 _return0;
    i = pos*spp;
 
    for(k = 0; k <= spp-1; k += 1) {
@@ -114,7 +114,7 @@ void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_
    register fgUINT16 val;
    register int i, k;
    //PIPS generated variable
-   unsigned short _return0;
+   fgUINT16 _return0;
    i = pos*spp;
 
    for(k = 0; k <= spp-1; k += 1) {
@@ -157,7 +157,7 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    int w = nhb->size_x;
    int h = nhb->size_y;
    //PIPS generated variable
-   enum {FLGR_RET_OK, FLGR_RET_TYPE_UNKNOWN=-1, FLGR_RET_TYPE_DIFFERENT=-2, FLGR_RET_SIZE_ERROR=-3, FLGR_RET_ALLOCATION_ERROR=-4, FLGR_RET_CONNEXITY_UNKNOWN=-5, FLGR_RET_PARAM_UNKNOWN=-6, FLGR_RET_NOT_IMPLEMENTED=-7, FLGR_RET_UNDEFINED_ERROR=-8, FLGR_RET_NULL_OBJECT=-9, FLGR_RET_VECTOR_SIZE_DIFFERENT=-10, FLGR_RET_VECTOR_SIZE_ERROR=-11, FLGR_RET_PARAM_ERROR=-12} _return0;
+   FLGR_Ret _return0;
    {
       //PIPS generated variable
       FLGR_Vector *vctdest0;
@@ -214,7 +214,7 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
                   register fgUINT16 val;
                   register int i, k;
                   //PIPS generated variable
-                  unsigned short _return0;
+                  fgUINT16 _return0;
                   i = pos0*spp0;
 
                   for(k = 0; k <= spp0-1; k += 1) {
@@ -270,7 +270,7 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
                      register fgUINT16 val;
                      register int i, k;
                      //PIPS generated variable
-                     unsigned short _return0;
+                     fgUINT16 _return0;
                      i = pos0*spp0;
 
                      for(k = 0; k <= spp0-1; k += 1) {
