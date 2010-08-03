@@ -1,0 +1,19 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS inlining34
+delete $WS
+create $WS $WS.c
+
+display PRINTED_FILE[%ALLFUNC]
+apply INLINING[foo]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+close
+
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out` && echo ok ) || echo ko
+
+delete $WS
