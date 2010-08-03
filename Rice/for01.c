@@ -1,4 +1,5 @@
-/* Check that parallel loops located inside a non-convertibal for foop are parallelized */
+/* Check that parallel loops located inside a non-convertible for foop
+   are parallelized */
 
 
 void for01(int n)

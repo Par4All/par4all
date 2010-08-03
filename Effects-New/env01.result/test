@@ -1,0 +1,58 @@
+
+Parsed code for "env01"
+
+void env01()
+{
+   int j;
+
+   j = 1;
+}
+
+Code for "env01"
+
+void env01()
+{
+   int j;
+
+   j = 1;
+}
+
+Proper effects for "env01"
+
+void env01()
+{
+//               <must be declared>: j
+   int j;
+//               <must be written>: j
+//               <must be referenced>: j
+
+   j = 1;
+}
+
+Cumulated effects for "env01"
+
+void env01()
+{
+//               <must be declared>: j
+   int j;
+//               <must be written>: j
+//               <must be referenced>: j
+
+   j = 1;
+}
+
+Pointer Regions for "env01"
+
+void env01()
+{
+
+//  <j-WE-EXACT-{}>
+
+   int j;
+
+//  <j-RE-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+
+   j = 1;
+}
