@@ -2206,6 +2206,7 @@ static void init_gen_quick_recurse_tables(void);
 
 extern void genspec_set_string_to_parse(char*);
 extern void genspec_reset_string_to_parse(void);
+extern void genspec_lex_destroy();
 
 void gen_read_spec(char * spec, ...)
 {
@@ -2234,6 +2235,7 @@ void gen_read_spec(char * spec, ...)
 
     spec = va_arg( ap, char *);
   }
+  genspec_lex_destroy();
 
   compile() ;
 
