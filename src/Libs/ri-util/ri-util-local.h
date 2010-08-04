@@ -877,7 +877,7 @@
 #define SYSTEM_FUNCTION_NAME            "system"
 #define BSEARCH_FUNCTION_NAME           "bsearch"
 #define QSORT_FUNCTION_NAME             "qsort"
-#define ABS_FUNCTION_NAME               "abs"
+#define C_ABS_FUNCTION_NAME               "abs"
 #define LABS_FUNCTION_NAME              "labs"
 #define LLABS_FUNCTION_NAME             "llabs"
 #define DIV_FUNCTION_NAME               "div"
@@ -1333,7 +1333,7 @@
 #define ENTITY_FTELLO64_SYSTEM_P(e)      ENTITY_NAME_P(e, "ftello64")
 
 #define ENTITY_ABORT_SYSTEM_P(e)         ENTITY_NAME_P(e, "abort")
-#define ENTITY_ABS_SYSTEM_P(e)           ENTITY_NAME_P(e, "abs")
+#define ENTITY_C_ABS_SYSTEM_P(e)         ENTITY_NAME_P(e, "abs")
 #define ENTITY_ATEXIT_SYSTEM_P(e)        ENTITY_NAME_P(e, "atexit")
 #define ENTITY_ATOF_SYSTEM_P(e)          ENTITY_NAME_P(e, "atof")
 #define ENTITY_ATOI_SYSTEM_P(e)          ENTITY_NAME_P(e, "atoi")
