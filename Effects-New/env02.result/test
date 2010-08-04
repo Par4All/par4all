@@ -1,0 +1,71 @@
+
+Parsed code for "env02"
+
+void env02()
+{
+   typedef int km;
+   km j;
+
+   j = 1;
+}
+
+Code for "env02"
+
+void env02()
+{
+   typedef int km;
+   km j;
+
+   j = 1;
+}
+
+Proper effects for "env02"
+
+void env02()
+{
+//               <must be declared>: km
+   typedef int km;
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;
+//               <must be written>: j
+//               <must be referenced>: j
+
+   j = 1;
+}
+
+Cumulated effects for "env02"
+
+void env02()
+{
+//               <must be declared>: km
+   typedef int km;
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;
+//               <must be written>: j
+//               <must be referenced>: j
+
+   j = 1;
+}
+
+Pointer Regions for "env02"
+
+void env02()
+{
+
+//  <km-WT-EXACT-{}>
+
+   typedef int km;
+
+//  <j-WE-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+   km j;
+
+//  <j-RE-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+
+   j = 1;
+}
