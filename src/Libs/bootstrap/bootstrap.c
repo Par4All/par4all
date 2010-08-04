@@ -1705,10 +1705,11 @@ arguments_are_longdcomplex(call c, hash_table types)  /* MB */
  * Verify if all the arguments basic of function C
  * If there is no argument, I return TRUE
  *
- * Note: I - Integer; R - Real; D - Double; C - Complex; 
+ * Note: I - Integer; R - Real; D - Double; C - Complex;
  */
 
-/* MB : add of long int, long long int, long double and long double complex types */
+/* Molka Becher: add of long int, long long int, long double and long
+   double complex types */
 static bool
 arguments_are_something(
     call c,
@@ -1734,87 +1735,116 @@ arguments_are_something(
 
   list args = call_arguments(c);
 
-  MAP(EXPRESSION, e,
-  {
-    argnumber++;
-
-    pips_assert("type is defined", hash_defined_p(context->types, e));
-
-    b = GET_TYPE(context->types, e);
-
-    /* Subroutine maybe be used as a function */
-    if (basic_overloaded_p(b))
+  FOREACH(EXPRESSION, e, args)
     {
-      syntax s = expression_syntax(e);
-      string what = NULL;
-      switch (syntax_tag(s)) {
-      case is_syntax_call:
-        what = entity_local_name(call_function(syntax_call(s)));
-        break;
-      case is_syntax_reference:
-        what = entity_local_name(reference_variable(syntax_reference(s)));
-        break;
-      case is_syntax_range:
-        what = "**RANGE**";
-        break;
-      default: pips_internal_error("unexpected syntax tag");
-      }
+      argnumber++;
 
-      add_one_line_of_comment((statement) stack_head(context->stats),
-                              "not typed '%s' used as a function.",
-                              what, entity_local_name(call_function(c)));
-      context->number_of_error++;
-      okay = FALSE;
+      pips_assert("type is defined", hash_defined_p(context->types, e));
+
+      b = GET_TYPE(context->types, e);
+
+      /* Subroutine maybe be used as a function */
+      if (basic_overloaded_p(b))
+	{
+	  syntax s = expression_syntax(e);
+	  string what = NULL;
+	  switch (syntax_tag(s)) {
+	  case is_syntax_call:
+	    what = entity_local_name(call_function(syntax_call(s)));
+	    break;
+	  case is_syntax_reference:
+	    what = entity_local_name(reference_variable(syntax_reference(s)));
+	    break;
+	  case is_syntax_range:
+	    what = "**RANGE**";
+	    break;
+	  default: pips_internal_error("unexpected syntax tag");
+	  }
+
+	  add_one_line_of_comment((statement) stack_head(context->stats),
+				  "not typed '%s' used as a function.",
+				  what, entity_local_name(call_function(c)));
+	  context->number_of_error++;
+	  okay = FALSE;
+	}
+      else if (!((integer_ok && basic_int_p(b) && basic_int(b)==4) ||
+		 (longinteger_ok && basic_int_p(b) && basic_int(b)==6) ||
+		 (longlonginteger_ok && basic_int_p(b) && basic_int(b)==8) ||
+		 (real_ok && basic_float_p(b) && basic_float(b)==4) ||
+		 (double_ok &&  basic_float_p(b) && basic_float(b)==8) ||
+		 (longdouble_ok &&  basic_float_p(b) && basic_float(b)==16) ||
+		 (complex_ok && basic_complex_p(b) && basic_complex(b)==8) ||
+		 (dcomplex_ok && basic_complex_p(b) && basic_complex(b)==16) ||
+		 (longdcomplex_ok && basic_complex_p(b) && basic_complex(b)==32) ||
+		 (logical_ok && basic_logical_p(b)) ||
+		 (character_ok && basic_string_p(b))))
+	{
+	  /* The message should be language dependent, C or Fortran */
+	  if(fortran_language_module_p(get_current_module_entity())) {
+	  add_one_line_of_comment((statement) stack_head(context->stats),
+				  "#%d argument of '%s' must be "
+				  "%s%s%s%s%s%s%s%s%s%s%s but not %s",
+				  argnumber,
+				  entity_local_name(call_function(c)),
+				  integer_ok? "INT, ": "",
+				  // The next two types are not used
+				  // for Fortran
+				  longinteger_ok? "": "",
+				  longlonginteger_ok? "": "",
+				  real_ok? "REAL, ": "",
+				  double_ok? "DOUBLE, ": "",
+				  // FI: Used to be QUAD. Exists or not?
+				  //longdouble_ok? "DOUBLE*16, ": "",
+				  longdouble_ok? "": "",
+				  complex_ok? "COMPLEX, ": "",
+				  dcomplex_ok? "DCOMPLEX, ": "",
+				  // FI: what should it be in Fortran?
+				  longdcomplex_ok? "": "",
+				  logical_ok? "LOGICAL, ": "",
+				  character_ok? "CHARACTER, ": "",
+				  basic_to_string(b));
+	  } else { /* Assume C */
+	    /* FI: assumes no pointers ever; still pretty much
+	       Fortran stuff */
+	  add_one_line_of_comment((statement) stack_head(context->stats),
+				  "#%d argument of '%s' must be "
+				  "%s%s%s%s%s%s%s%s%s%s%s but not %s",
+				  argnumber,
+				  entity_local_name(call_function(c)),
+				  integer_ok? "int, ": "",
+				  longinteger_ok? "long int, ": "",
+				  longlonginteger_ok? "long long int, ": "",
+				  real_ok? "float, ": "",
+				  double_ok? "double, ": "",
+				  longdouble_ok? "long double, ": "",
+				  complex_ok? "complex, ": "",
+				  dcomplex_ok? "double complex, ": "",
+				  longdcomplex_ok? "long double complex, ": "",
+				  logical_ok? "bool, ": "",
+				  /* FI: nothing about strings? */
+				  character_ok? "char, ": "",
+				  basic_to_string(b));
+	  }
+	  context->number_of_error++;
+	  okay = FALSE;
+	}
+
+      /* if TC_DCOMPLEX, maybe they should not be incompatible? */
+      arg_cmplx = arg_cmplx ||
+	(complex_ok && basic_complex_p(b) && basic_complex(b)==8);
+
+      arg_double = arg_double ||
+	(double_ok &&  basic_float_p(b) && basic_float(b)==8);
     }
-    else if (!((integer_ok && basic_int_p(b) && basic_int(b)==4) ||
-          (longinteger_ok && basic_int_p(b) && basic_int(b)==6) ||
-          (longlonginteger_ok && basic_int_p(b) && basic_int(b)==8) ||     
-          (real_ok && basic_float_p(b) && basic_float(b)==4) ||
-          (double_ok &&  basic_float_p(b) && basic_float(b)==8) ||
-          (longdouble_ok &&  basic_float_p(b) && basic_float(b)==16) ||
-          (complex_ok && basic_complex_p(b) && basic_complex(b)==8) ||
-          (dcomplex_ok && basic_complex_p(b) && basic_complex(b)==16) ||
-          (longdcomplex_ok && basic_complex_p(b) && basic_complex(b)==32) ||
-          (logical_ok && basic_logical_p(b)) ||
-          (character_ok && basic_string_p(b))))
-    {
-      add_one_line_of_comment((statement) stack_head(context->stats),
-           "#%d argument of '%s' must be %s%s%s%s%s%s%s but not %s",
-                              argnumber,
-                              entity_local_name(call_function(c)),
-                              integer_ok? "INT, ": "",
-                              longinteger_ok? "LONGINT, ": "",
-                              longlonginteger_ok? "LONGLONGINT, ": "",
-                              real_ok? "REAL, ": "",
-                              double_ok? "DOUBLE, ": "",
-                              longdouble_ok? "LONGDOUBLE, ": "",
-                              complex_ok? "COMPLEX, ": "",
-                              dcomplex_ok? "DCOMPLEX, ": "",
-                              longdcomplex_ok? "LONGDCOMPLEX, ": "",
-                              logical_ok? "LOGICAL, ": "",
-                              character_ok? "CHARACTER, ": "",
-                              basic_to_string(b));
-      context->number_of_error++;
-      okay = FALSE;
-    }
-
-    /* if TC_DCOMPLEX, maybe they should not be incompatible? */
-    arg_cmplx = arg_cmplx ||
-      (complex_ok && basic_complex_p(b) && basic_complex(b)==8);
-
-    arg_double = arg_double ||
-      (double_ok &&  basic_float_p(b) && basic_float(b)==8);
-  }
-      , args);
 
   if (arg_cmplx && arg_double)
-  {
-    add_one_line_of_comment((statement) stack_head(context->stats),
-                    "mixed complex and double arguments of '%s' forbidden",
-                            entity_local_name(call_function(c)));
-    context->number_of_error++;
-    okay = FALSE;
-  }
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats),
+			      "mixed complex and double arguments of '%s' forbidden",
+			      entity_local_name(call_function(c)));
+      context->number_of_error++;
+      okay = FALSE;
+    }
 
   return okay;
 }

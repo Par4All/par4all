@@ -130,14 +130,14 @@ entity find_final_statement_label(statement s)
 }
 
 /* db_get_current_module_name() unusable because module not set,
- * and setting it causes previous current module to be closed! 
+ * and setting it causes previous current module to be closed!
  */
 /* static string current_module_name = NULL; */
 
 void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_processor)(statement))
 {
-    debug(2, "loop_unroll", "unroll %d times\n", rate);
-    pips_assert("loop_unroll", 
+    pips_debug(2, "unroll %d times\n", rate);
+    pips_assert("loop_unroll",
             instruction_loop_p(statement_instruction(loop_statement)));
     /* "bad argument type\n"); */
     pips_assert("loop_unroll", rate > 0);

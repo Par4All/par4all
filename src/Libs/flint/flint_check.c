@@ -26,11 +26,11 @@
 #endif
 /*
  * flint_check.c
- * 
+ *
  * Fabien Coelho & Laurent Aniort May 1992
- * 
+ *
  * Modification : 92 09 Author       : Arnauld Leservot
- * 
+ *
  */
 
 #include "local.h"
@@ -73,13 +73,13 @@
 
 /*
  * check call sites
- * 
+ *
  */
 
 
 /*
  * check_procedure
- * 
+ *
  * this function verify that a statement_call is a subroutine call. if not, a
  * message is broadcast. intrinsics are not checked. Calls to things that are
  * not functions are not checked, (for instance, there are calls to labels
@@ -119,7 +119,7 @@ bool check_procedure(c)
 
 /*
  * check_call
- * 
+ *
  * check other calls : number of arguments, the basic of these args, and if
  * possible the dimensions. There is also a warning if a reference to a
  * constant may be modified. Calls to intrinsics are checked separately.
@@ -154,7 +154,7 @@ bool check_the_call(c)
 
     if ((int) gen_length(la) == 0)
 	return (TRUE);
-    
+
     /* else */
     if (!check_call_types_compatibility(la, lt, c))
 	return (FALSE);
@@ -175,7 +175,7 @@ bool check_the_call(c)
 
 /*
  * check_call_intrinsic
- * 
+ *
  * This function is dedicated to the check of calls to intrinsics. Only the
  * assignment is checked: Same basic and dimension for both arguments.
  * problem :there is no casting, so there may be messages despite the call
@@ -216,13 +216,12 @@ check_call_intrinsic(list la,
 
 /*
  * check_call_args_number
- * 
+ *
  * This function check that the number of arguments of a call is valid.
  * intrinsics without parameter are not checked. (they are supposed to be
  * varryings)
  */
-bool 
-check_call_args_number(
+bool check_call_args_number(
     list            la, /* list of actual arguments */
     list            lt, /* list of parameters */
     call            c)
@@ -230,8 +229,8 @@ check_call_args_number(
     int             na = gen_length(la);
     int             nt = gen_length(lt);
 
-    
-    if (na == nt || (nt<=na && type_varargs_p(parameter_type(PARAMETER(CAR(gen_last(lt)))))))
+    if (na == nt ||
+	(nt<=na && type_varargs_p(parameter_type(PARAMETER(CAR(gen_last(lt)))))))
 	return (TRUE);
 
     if (call_intrinsic_p(c) && (nt == 0)) {	/* sometimes out... */
@@ -249,11 +248,11 @@ check_call_args_number(
 
 /*
  * check_call_types_compatibility
- * 
+ *
  * This function checks that the list of parameters and the list of arguments
  * are compatible.
  */
-bool 
+bool
 check_call_types_compatibility(la, lt, c)
     list            la, lt;
     call            c;
@@ -281,14 +280,13 @@ check_call_types_compatibility(la, lt, c)
 
 /*
  * check_call_one_type
- * 
+ *
  * this function checks that an argument and a parameter are compatible. It is
  * not very interesting a function, but it may have other calls to
  * check-functions later
- * 
+ *
  */
-bool 
-check_call_one_type(exp, param, c, i)
+bool check_call_one_type(exp, param, c, i)
     expression      exp;
     parameter       param;
     call            c;
@@ -302,19 +300,18 @@ check_call_one_type(exp, param, c, i)
 
 /*
  * check_call_basic
- * 
+ *
  * This function checks that two basics are compatible (ie the same) if not, a
  * message is broadcast
  */
-bool 
-check_call_basic(be, bp, c, i)
+bool check_call_basic(be, bp, c, i)
     basic           be, bp;
     call            c;
     int             i;
 {
     if (basic_tag(be) == basic_tag(bp))
 	return (TRUE);
-    
+
     if (basic_overloaded_p(be))
 	flint_message("check_call: WARNING",
 		      "may be incompatible basic type, %dth arg in call to %s\n",
@@ -333,18 +330,14 @@ check_call_basic(be, bp, c, i)
 
 /*
  * check_call_dim
- * 
+ *
  * This function checks that the dimensions of two arrays are compatible. if
  * not, a message... (dimension means here the number of elements of the
  * array)
  */
-bool 
-check_call_dim(de, dp, c, i)
-    list            de, dp;
-    call            c;
-    int             i;
+bool check_call_dim(list de, list dp, call c, int i)
 {
-    intptr_t             n_de, n_dp;
+  intptr_t n_de, n_dp;
     bool
 	ok_de = number_of_elements(de, &n_de),
 	ok_dp = number_of_elements(dp, &n_dp);
@@ -369,7 +362,7 @@ check_call_dim(de, dp, c, i)
 
 /*
  * check_call_basic_and_dim
- * 
+ *
  * This function checks that the list of parameters and the list of arguments
  * are compatible. ie same basics and compatible dimensions.
  */
@@ -398,7 +391,7 @@ bool check_call_basic_and_dim(exp, param, c, i)
 
 /*
  * check_reference
- * 
+ *
  * this function checks that the indexes of an array are all mere integers.
  * maybe it could accept floats with a cast, if the ANSI says so.
  */
@@ -456,7 +449,7 @@ void check_the_reference(ref)
 
 /*
  * check_call_mode_consistency
- * 
+ *
  * this function checks all the arguments of a call, looking for so called "mode
  * inconsistency".
  */
@@ -473,22 +466,21 @@ bool check_call_mode_consistency(la, lt, the_fnct)
     parameter
 	param;
     bool
-	ok = TRUE, 
+	ok = TRUE,
 	temp = -1;
-    int 
+    int
 	i, len = gen_length(lt);
 
-    module_name = 
-	module_local_name(the_fnct);
+    module_name = module_local_name(the_fnct);
 
-    /* FI: the last argument should be pure=TRUE 
-     * since summary effects should not be touched 
+    /* FI: the last argument should be pure=TRUE
+     * since summary effects should not be touched
      */
     sefs_list = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
-    debug(7, "check_call_mode_consistency", 
-	  "summary effects list for %s (%x)\n", module_name, sefs_list);
+    pips_debug(7, "summary effects list for %s (%x)\n",
+	       module_name, sefs_list);
 
     for (i = 1; i <= len; i++) {
 	exp = EXPRESSION(CAR(la));
@@ -498,7 +490,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
 	temp = check_call_one_mode(exp, param, the_fnct, sefs_list, i);
 	ok = (ok && temp);
     }
-    
+
     return (ok);
 }
 
@@ -507,53 +499,51 @@ bool check_call_mode_consistency(la, lt, the_fnct)
 /* This function checks that a reference to a constant in a call may not be
  * modified, if it could happen, a message is broadcast.
  */
-bool check_call_one_mode(exp, param, the_fnct, sefs_list, i)
-    expression      exp;
-    parameter       param;
-    entity          the_fnct;
-    list            sefs_list;
-    int             i;
+bool check_call_one_mode(expression exp,
+			 parameter param,
+			 entity the_fnct,
+			 list sefs_list,
+			 int i)
 {
-    list            sefl = sefs_list;	/* locally */
-    bool            encountered = FALSE;
-    effect          the_effect;
-    entity          the_ent;
+  list            sefl = sefs_list;	/* locally */
+  bool            encountered = FALSE;
+  effect          the_effect;
+  entity          the_ent;
 
-    if (!(param_ref_p(param) && arg_const_p(exp)))
-	return (TRUE);
+  if (!(param_ref_p(param) && arg_const_p(exp)))
+    return (TRUE);
 
-    /* else : control */
+  /* else : control */
 
-    the_ent = find_ith_formal_parameter(the_fnct, i);
+  the_ent = find_ith_formal_parameter(the_fnct, i);
 
-    while ((sefl != NULL) && (!encountered)) 
+  while ((sefl != NULL) && (!encountered))
     {
-	the_effect = EFFECT(CAR(sefl));
-	sefl = CDR(sefl);
-	encountered = (effect_write_p(the_effect) &&
-		       effect_may_or_must_p(the_effect) &&
-	       (!strcmp(entity_name(the_ent), effect_to_name(the_effect))));
+      the_effect = EFFECT(CAR(sefl));
+      sefl = CDR(sefl);
+      encountered = (effect_write_p(the_effect) &&
+		     effect_may_or_must_p(the_effect) &&
+		     (!strcmp(entity_name(the_ent), effect_to_name(the_effect))));
     }
 
-    if (encountered)
-	flint_message("check call mode",
-	  "modified reference to a constant, %dth argument in call to %s\n",
-		      i, entity_name(the_fnct));
+  if (encountered)
+    flint_message("check call mode",
+		  "modified reference to a constant, %dth argument in call to %s\n",
+		  i, entity_name(the_fnct));
 
-    return (!encountered);
+  return (!encountered);
 }
 
 /*-----------------------------------------------------------------------*/
 
 /*
  * look_at_the_commons
- * 
+ *
  * this function looks at the common declaration, just to see what it looks
  * like, in order to decide what we can do about it. it should not be
  * necessary if good and up to date documentations were provided.
  */
-bool look_at_the_commons(module)
-    entity          module;
+bool look_at_the_commons(entity module)
 {
     list            ldecl = code_declarations(value_code(entity_initial(module)));
     entity          local;
@@ -586,13 +576,11 @@ bool look_at_the_commons(module)
 
 /*
  * position_in_the_area
- * 
+ *
  * this function gives back, if possible, the starting and ending offsets of the
  * variable in the area
  */
-bool position_in_the_area(the_var, inf, sup)
-    entity          the_var;
-    intptr_t            *inf, *sup;
+bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
 {
     basic           base;
     list            dims;
@@ -638,21 +626,20 @@ bool position_in_the_area(the_var, inf, sup)
 
 /*
  * check_commons
- * 
+ *
  * this function checks the commons of the module, looking for all variables of
  * the module in commons, that could overlap with other variables and may be
  * incompatible. the boolean given back is set to TRUE whatever happens.
  * Special Commons used by PIPS, (dynamic and static) are not checked.
  */
-bool check_commons(module)
-    entity          module;
+bool check_commons(entity module)
 {
     list
 	ldecl = code_declarations(value_code(entity_initial(module)));
     entity
 	local;
 
-    while (ldecl != NULL) 
+    while (ldecl != NULL)
     {
 	local = ENTITY(CAR(ldecl));
 	ldecl = CDR(ldecl);
@@ -660,45 +647,43 @@ bool check_commons(module)
 	if (entity_is_a_common_p(local) && (!special_common(local)))
 	    check_one_common(local, module);
     }
-    
+
     return (TRUE);
 }
 
 /*
  * check_one_common
- * 
+ *
  * This function checks one given common in one given module. for each argument
  * belonging to the common [while llayout], every other arguments belonging
  * to another [while lothers] declaration of the common is checked to find if
  * there is a possible overlap [call to check_overlap_in_common]. possible
  * synonymous variable within the same module and common are also checked.
  */
-void check_one_common(local, module)
-entity local, module;
+void check_one_common(entity local, entity module)
 {
     list
 	llayout_init = area_layout(type_area(entity_type(local))),
 	llayout = llayout_init;
 
-    debug(4, "check_one_common",
-	  "checking common %s of module %s\n",
-	  entity_local_name(local),
-	  module_local_name(module));
+    pips_debug(4, "checking common %s of module %s\n",
+	       entity_local_name(local),
+	       module_local_name(module));
 
-    while (!ENDP(llayout)) 
+    while (!ENDP(llayout))
     {
-	intptr_t 
-	    common_beginning_offset = -1, 
-	    common_ending_offset = -1, 
+	intptr_t
+	    common_beginning_offset = -1,
+	    common_ending_offset = -1,
 	    other_beginning_offset = -1,
 	    other_ending_offset = -1;
 	entity
 	    current_variable = ENTITY(CAR(llayout));
 	list
-            lothers = llayout_init;
+	  lothers = llayout_init;
 
 	llayout = CDR(llayout);
-	
+
 	if (strcmp(module_name(entity_name(current_variable)),
 		   module_local_name(module)))
 	    continue;
@@ -708,13 +693,13 @@ entity local, module;
 				  &common_ending_offset))
 	    continue;
 
-	while (lothers != NULL) 
+	while (lothers != NULL)
 	{
 	    entity          head = ENTITY(CAR(lothers));
 	    int             synonymous = 0;
 	    lothers = CDR(lothers);
-	    
-	    if (!strcmp(entity_name(current_variable), entity_name(head))) 
+
+	    if (!strcmp(entity_name(current_variable), entity_name(head)))
 	    {
 		if (synonymous)
 		    flint_message("check common",
@@ -728,7 +713,7 @@ entity local, module;
 				      &other_beginning_offset,
 				      &other_ending_offset))
 		continue;
-	    
+
 	    check_overlap_in_common(local,
 				    current_variable,
 				    common_beginning_offset,
@@ -744,7 +729,7 @@ entity local, module;
 
 /*
  * check_overlap_in_common
- * 
+ *
  * This function is used to detect possible overlap between two variables of the
  * same common in two declarations, with incompatible basics (ANSI says that
  * a compiler must allows that one complex is also two floats) if so, a

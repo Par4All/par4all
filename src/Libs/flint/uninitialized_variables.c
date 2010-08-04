@@ -37,7 +37,7 @@ static hash_table flint_statement_def_use_variables;
 static bool flint_no_uninitialized_variable_ouput_yet;
 
 /* Build the tables relating a statement with the variables it uses
-   that has been initialized elsewhere.
+   that have been initialized elsewhere.
 
    This function is heavily inspired by
    build_statement_to_statement_dependence_mapping() in the use-def
@@ -45,100 +45,86 @@ static bool flint_no_uninitialized_variable_ouput_yet;
 static void
 flint_initialize_statement_def_use_variables(graph dependence_graph)
 {
-    flint_statement_def_use_variables = hash_table_make(hash_pointer, 0);
+  flint_statement_def_use_variables = hash_table_make(hash_pointer, 0);
 
-    MAP(VERTEX,
-	a_vertex,
+  FOREACH(VERTEX, a_vertex, graph_vertices(dependence_graph))	{
+    statement s1 = vertex_to_statement(a_vertex);
+
+    pips_debug(7, "\tSuccessor list: %p for statement ordering %td\n",
+	       vertex_successors(a_vertex),
+	       dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
+    FOREACH(SUCCESSOR, a_successor, vertex_successors(a_vertex)) {
+      vertex v2 = successor_vertex(a_successor);
+      statement s2 = vertex_to_statement(v2);
+      dg_arc_label an_arc_label = successor_arc_label(a_successor);
+      pips_debug(7, "\t%p --> %p with conflicts\n", s1, s2);
+      /* Try to find at least one of the use-def chains between
+	 s and a successor: */
+      FOREACH(CONFLICT, a_conflict,
+	      dg_arc_label_conflicts(an_arc_label)) {
+	statement use;
+	statement def;
+	effect src_eff = conflict_source(a_conflict);
+	effect sink_eff = conflict_sink(a_conflict);
+
+	ifdebug(7) {
+	  fprintf(stderr, "\t\tfrom ");
+	  print_words(stderr, words_effect(src_eff));
+	  fprintf(stderr, " to ");
+	  print_words(stderr, words_effect(sink_eff));
+	  fprintf(stderr, "\n");
+	}
+
+	/* Something is useful for the current statement if it writes
+	   something that is used in the current statement: */
+	if (action_write_p(effect_action(src_eff))
+	    && action_read_p(effect_action(sink_eff))) {
+	  def = s1;
+	  use = s2;
+	}
+	else
+	  /* The dependance is not a use-def one, look forward... */
+	  /* FI: it looks more like a def-use... */
+	  continue;
+
 	{
-	    statement s1 = vertex_to_statement(a_vertex);
+	  /* Mark that we will visit the node that defined a source
+	     for this statement, if not already visited: */
+	  /* FI: in Fortran, with static aliasing, this is not really
+	     safe. a_variable is not uniquely defined */
+	  entity a_variable = reference_variable(effect_any_reference(src_eff));
+	  set def_use_variables;
 
-	    pips_debug(7, "\tSuccessor list: %p for statement ordering %td\n", 
-		       vertex_successors(a_vertex),
-		       dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
-	    MAP(SUCCESSOR, a_successor,
-		{
-		    vertex v2 = successor_vertex(a_successor);
-		    statement s2 = vertex_to_statement(v2);
-		    dg_arc_label an_arc_label = successor_arc_label(a_successor);
-		    pips_debug(7, "\t%p --> %p with conflicts\n", s1, s2);
-		    /* Try to find at least one of the use-def chains between
-		       s and a successor: */
-		    MAP(CONFLICT, a_conflict,
-			{
-			    statement use;
-			    statement def;
-			    cell a_use_cell;
+	  def_use_variables = (set) hash_get(flint_statement_def_use_variables, (char *) use);
 
-			    ifdebug(7) {
-				fprintf(stderr, "\t\tfrom ");
-				print_words(stderr, words_effect(conflict_source(a_conflict)));
-				fprintf(stderr, " to ");
-				print_words(stderr, words_effect(conflict_sink(a_conflict)));
-				fprintf(stderr, "\n");
-			    }
+	  if (def_use_variables == (set) HASH_UNDEFINED_VALUE) {
+	    /* It is the first dependence found for use. Create the
+	       set. */
+	    def_use_variables = set_make(set_pointer);
 
-			    /* Something is useful for the current
-			       statement if it writes something that
-			       is used in the current statement: */
-			    if (action_write_p(effect_action(conflict_source(a_conflict)))
-				     && action_read_p(effect_action(conflict_sink(a_conflict)))) {
-				def = s1;
-				a_use_cell =
-				    effect_cell(conflict_sink(a_conflict));
-				use = s2;
-			    }
-			    else
-				/* The dependance is not a use-def
-				   one, look forward... */
-				continue;
+	    hash_put(flint_statement_def_use_variables,
+		     (char *) use,
+		     (char *) def_use_variables);
+	  }
 
-			    {
-				/* Mark that we will visit the node
-				   that defined a source for this
-				   statement, if not already visited: */
-				entity a_variable;
-				set def_use_variables;
+	  /* Mark the fact that s2 create something
+	     useful for s1: */
+	  set_add_element(def_use_variables,
+			  def_use_variables,
+			  (char *)  a_variable);
 
-				/* Get the variable entity involved in
-                                   the dependence: */
-				if (cell_preference_p(a_use_cell))
-				    a_variable = reference_variable(preference_reference(cell_preference(a_use_cell)));
-				else
-				    a_variable = reference_variable(cell_reference(a_use_cell));
+	  pips_debug(6, "\tUse: statement %p (%#tx). Def: statement %p (%#tx), variable \"%s\".\n",
+		     use, (_uint) statement_ordering(use),
+		     def, (_uint) statement_ordering(def),
+		     entity_minimal_name(a_variable));
+	}
 
-				def_use_variables = (set) hash_get(flint_statement_def_use_variables, (char *) use);
-
-				if (def_use_variables == (set) HASH_UNDEFINED_VALUE) {
-				    /* It is the first dependence we
-				       found for use. Create the set: */
-				    def_use_variables = set_make(set_pointer);
-				    hash_put(flint_statement_def_use_variables,
-					     (char *) use,
-					     (char *) def_use_variables);
-				}
-
-				/* Mark the fact that s2 create something
-				   useful for s1: */
-				set_add_element(def_use_variables,
-						def_use_variables,
-						(char *)  a_variable);
-
-				pips_debug(6, "\tUse: statement %p (%#tx). Def: statement %p (%#tx), variable \"%s\".\n",
-					   use, (_uint) statement_ordering(use),
-					   def, (_uint) statement_ordering(def),
-					   entity_minimal_name(a_variable));
-			    }
-
-			    /* One use-def is enough for this variable
-			       couple: */
-			    break;
-			},
-                        dg_arc_label_conflicts(an_arc_label));
-		},
-		vertex_successors(a_vertex));
-
-	},
-	graph_vertices(dependence_graph));
+	/* One use-def is enough for this variable
+	   couple: */
+	break;
+      }
+    }
+  }
 }
 
 
@@ -155,7 +141,7 @@ flint_free_statement_def_use_variables()
     flint_statement_def_use_variables = NULL;
 }
 
-    
+
 /* Return true if a_variable is not initialized elsewhere: */
 static bool
 flint_variable_uninitialize_elsewhere(statement s,
