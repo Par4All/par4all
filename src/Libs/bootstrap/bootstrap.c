@@ -41,7 +41,7 @@
   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
     FI, 25/12/96
   - Fortran specification conformant typing of expressions...
-  
+
   Molka Becher (MB), June 2010
   - Check of C intrinsics already added
   - Add of missing C intrinsics according to ISO/IEC 9899:TC2
@@ -49,7 +49,7 @@
 
 
   Bugs:
-  ----- 
+  -----
   - intrinsics are not properly typed
 
 */
@@ -5139,7 +5139,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {SYSTEM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
   {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {ABS_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+  {C_ABS_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
   {LABS_FUNCTION_NAME, 1, longinteger_to_longinteger_type, typing_function_longint_to_longint, 0},
   {LLABS_FUNCTION_NAME, 1, longlonginteger_to_longlonginteger_type, typing_function_longlongint_to_longlongint, 0},
   {DIV_FUNCTION_NAME, 2, integer_to_overloaded_type, 0, 0},
