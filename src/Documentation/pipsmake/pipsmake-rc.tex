@@ -2228,6 +2228,7 @@ cumulated_references    > MODULE.cumulated_references
 \index{Effects (Memory)}
 \index{Memory Effects}
 \index{EFFECTS\_PRINT\_SDFI}
+\index{MEMORY\_EFFECTS\_ONLY}
 
 % no longer used {
 % Print SDFI just after computation:
@@ -2277,6 +2278,24 @@ leads to less precise effects.
 
 \begin{PipsProp}{USER_EFFECTS_ON_STD_FILES FALSE}
 USER_EFFECTS_ON_STD_FILES FALSE
+\end{PipsProp}
+
+Property \PipsPropRef{MEMORY_EFFECTS_ONLY} is used to restrict the
+action kind of an effect action to \verb/store/. In other words,
+variable declarations and type declarations are not considered to
+alter the execution state when this property is set to TRUE. This is
+fine for Fortran code because variables cannot be declared among
+executable statements and because new type cannot be declared. But
+this leads to wrong result for C code when loop distribution or
+use-def elimination is performed.
+
+Currently, PIPS does not have the capability to store default values
+depending on the source code language. The default value is TRUE to
+avoid disturbing too many phases of PIPS at the same time while
+environment and type declaration effects are introduced.
+
+\begin{PipsProp}{MEMORY_EFFECTS_ONLY}
+MEMORY_EFFECTS_ONLY TRUE
 \end{PipsProp}
  
 
@@ -10963,6 +10982,7 @@ PRETTYPRINT_SEQUENTIAL_STYLE "omp"
 \subsubsection{Display Analysis Results}
 \index{PRETTYPRINT\_EFFECTS}
 \index{PRETTYPRINT\_IO\_EFFECTS}
+\index{PRETTYPRINT\_MEMORY\_EFFECTS\_ONLY}
 \index{PRETTYPRINT\_REVERSE\_DOALL}
 \index{PRETTYPRINT\_TRANSFORMER}
 \index{PRETTYPRINT\_EXECUTION\_CONTEXT}
@@ -10992,32 +11012,61 @@ output program is no longer guaranteed.
 PRETTYPRINT_IO_EFFECTS TRUE
 \end{PipsProp}
 
+To transform C source code properly, variable and type declarations as
+well as variable and type references must be tracked alhtough standard
+use and def information is restricted to memory loads and stores
+because the optimizations are performed at a lower level. Fortran~77
+analyses do not need information about variable declarations and there
+is not possibility of type definition. So the added information about
+variable declarations and references may be pure noise. It is possible
+to get rid of it by setting this property to TRUE, which is its
+default value before August 2010. For C code, it is better to set it
+to FALSE. For the time being, the default value cannot depend on the
+code language. 
+
+\begin{PipsProp}{PRETTYPRINT_MEMORY_EFFECTS_ONLY}
+PRETTYPRINT_MEMORY_EFFECTS_ONLY FALSE
+\end{PipsProp}
+
+
 Transform DOALL loops into sequential loops with an opposed increment
-not implemented
+to check validity of the parallelization on a sequential machine. This
+property is not implemented.
 
 \begin{PipsProp}{PRETTYPRINT_REVERSE_DOALL} 
 PRETTYPRINT_REVERSE_DOALL FALSE
 \end{PipsProp}
 
-Print statement transformers as comments in code.
+It is possible to print statement transformers as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Transformers can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_TRANSFORMERS/
 
 \begin{PipsProp}{PRETTYPRINT_TRANSFORMER} 
 PRETTYPRINT_TRANSFORMER FALSE
 \end{PipsProp}
 
-Print statement preconditions as comments in code.
+It is possible to print statement preconditions as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Preconditions can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_PRECONDITIONS/
 
 \begin{PipsProp}{PRETTYPRINT_EXECUTION_CONTEXT} 
 PRETTYPRINT_EXECUTION_CONTEXT FALSE
 \end{PipsProp}
 
-Print statement regions as comments in code.
+It is possible to print statement with convex array region information as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Convex array regions can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_REGIONS/ or \verb/PRINT_CODE_PROPER_REGIONS/
 
 \begin{PipsProp}{PRETTYPRINT_REGION} 
 PRETTYPRINT_REGION FALSE
 \end{PipsProp}
 
-Print regions of scalars.
+By default, convex array regions are printed for arrays only, but the
+internal representation includes scalar variables as well. The default
+option can be overriden with this property.
 
 \begin{PipsProp}{PRETTYPRINT_SCALAR_REGIONS} 
 PRETTYPRINT_SCALAR_REGIONS FALSE
