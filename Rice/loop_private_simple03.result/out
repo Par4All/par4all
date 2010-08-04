@@ -1,0 +1,36 @@
+
+Proper effects for "main" after privatization
+
+int main()
+{
+   float a[10];
+   int i;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+      float z;
+//               <must be written>: z
+      z = 0.0;
+//               <must be read   >: i z
+//               <must be written>: a[i]
+      a[i] = z;
+   }
+   return 0;
+}
+
+Parallel code for "main"
+
+int main()
+{
+   float a[10];
+   int i;
+
+   forall(i = 0; i <= 9; i += 1) {
+      float z;
+   }
+   for(i = 0; i <= 9; i += 1) {
+      z = 0.0;
+      a[i] = z;
+   }
+   return 0;
+}
