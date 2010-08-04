@@ -294,7 +294,7 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
     string rn = words_to_string
       (w=effect_words_reference(effect_any_reference(current)));
     gen_map(free,w);gen_free_list(w);
-    /* Do not combine effects of different kinds */
+    /* Do not combine effects of different kinds: use the kind in the key */
     n = strdup(concatenate(rn, " ", action_kind_to_string(ak)));
     free(rn);
     a = effect_action_tag(current);
@@ -310,6 +310,7 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
      * used let us deal with complex effects.
      */
     may_combine = (!scalars_only_p || effect_scalar_p(current));
+    //&& !store_effect_p(current);
 
 
     /* FI: addressing should be checked below against writing of the

@@ -541,6 +541,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
       (*effects_precondition_composition_op)(le, context);
     }
 
+  /* Environment and declaration type effects */
   if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
     /* May not be generic enough altough contexts seem useless for
        environment effects */
@@ -549,7 +550,18 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
        effects. See Bootstrap/iand01.f, assuming all effects are
        computed, of course. */
     effect re = make_declaration_effect(v, FALSE); // reference effect
+    //type vt = entity_type(v);
+
     le = CONS(EFFECT, re, le);
+
+    /*
+    if(typedef_type_p(vt)) {
+      entity te = basic_typedef(variable_basic(type_variable(vt)));
+      effect tre = make_declaration_effect(te, FALSE); // type
+						      // reference effect
+      le = CONS(EFFECT, tre, le);
+    }
+    */
   }
 
   pips_debug(3, "end\n");
@@ -827,10 +839,20 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
     {
       pips_debug(4, "This is a cast\n");
       /* FI: The cast has an impact o pointer arithmetic. I do not know
-	 how to take it into account. */
+	 how to take it into account. The cast may also use a typedef
+	 type. */
       /* BC : it is a translation. The main effect should be translated
 	 accordingly to the cast type on return of the recursion. */
       pips_user_warning("Cast impact on pointer arithmetic and indexing is ignored\n");
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    type ct = cast_type(syntax_cast(s));
+
+	    if(typedef_type_p(ct)) {
+	      entity te = basic_typedef(variable_basic(type_variable(ct)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      *pme = gen_nconc(*pme, CONS(EFFECT, tre, NIL));
+	    }
+	  }
       s_exp = cast_expression(syntax_cast(s));
     }
   else if(syntax_subscript_p(s))
@@ -1013,6 +1035,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    }
 	  else if(syntax_cast_p(s))
 	    {
+	      /* FI->BC: probably a type effect to generate here if a
+		 typedef type is used? */
 	      /* nothing to do */
 	      finished_p = true;
 	    }
@@ -1321,8 +1345,20 @@ generic_proper_effects_of_expression(expression e)
 	break;
       }
     case is_syntax_cast:
-      le = generic_proper_effects_of_expression(cast_expression(syntax_cast(s)));
-      break;
+      {
+	le = generic_proper_effects_of_expression(cast_expression(syntax_cast(s)));
+	if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	  type ct = cast_type(syntax_cast(s));
+
+	  if(typedef_type_p(ct)) {
+	    entity te = basic_typedef(variable_basic(type_variable(ct)));
+	    effect tre = make_declaration_effect(te, FALSE); // type
+	    le = gen_nconc(le, CONS(EFFECT, tre, NIL));
+	  }
+	}
+
+	break;
+      }
     case is_syntax_sizeofexpression:
       {
 	sizeofexpression se = syntax_sizeofexpression(s);
@@ -1335,6 +1371,17 @@ generic_proper_effects_of_expression(expression e)
 	    /* le = generic_proper_effects_of_expression(sizeofexpression_expression(se)); */
 	  ;
 	  }
+	else {
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    type sot = sizeofexpression_type(se);
+
+	    if(typedef_type_p(sot)) {
+	      entity te = basic_typedef(variable_basic(type_variable(sot)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
+	    }
+	  }
+	}
 	break;
       }
     case is_syntax_subscript:
@@ -2081,7 +2128,19 @@ static void proper_effects_of_statement(statement s)
 	{
 	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
 	    effect de = make_declaration_effect(e, TRUE);
+	    type vt = entity_type(e);
+
 	    l_eff = gen_nconc(l_eff, CONS(EFFECT, de, NIL));
+	    // Should be put first or last?
+	    //l_eff = CONS(EFFECT, re, l_eff);
+
+	    if(typedef_type_p(vt)) {
+	      entity te = basic_typedef(variable_basic(type_variable(vt)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      // reference effect
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, tre, NIL));
+	      //l_eff = CONS(EFFECT, tre, l_eff);
+	    }
 	  }
 	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
 	}

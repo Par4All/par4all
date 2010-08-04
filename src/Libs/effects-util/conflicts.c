@@ -109,7 +109,7 @@ bool effects_may_conflict_p( effect eff1, effect eff2 ) {
 	   empty and the conflict is only based on the referenced
 	   entity */
 	entity v1 = effect_variable(eff1);
-	entity v2 = effect_variable(eff1);
+	entity v2 = effect_variable(eff2);
 	conflict_p = v1==v2;
       }
     }
