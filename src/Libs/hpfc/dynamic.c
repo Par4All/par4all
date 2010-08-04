@@ -441,7 +441,7 @@ static bool same_align_p(
  * input: an array (which *must* be dynamic) and an align
  * output: returns an array aligned as specified by align a
  * side effects:
- *  - creates a new entity if necessary. 
+ *  - creates a new entity if necessary.
  *  - this entity is stored as a synonym of array, and tagged as dynamic.
  *  - the align is freed if not used.
  * bugs or features:
@@ -938,8 +938,7 @@ static void ref_rwt(reference r)
     }
 }
 
-static void 
-simple_switch_old_to_new(statement s)
+static void simple_switch_old_to_new(statement s)
 {
     DEBUG_STAT(9, "considering", s);
 
@@ -960,17 +959,18 @@ simple_switch_old_to_new(statement s)
 
     if (!array_modified && bound_proper_rw_effects_p(s))
     {
-	MAP(EFFECT, e,
-        {
-	    entity v = reference_variable(effect_any_reference(e));
-	    if (same_primary_entity_p(v,new_variable) && effect_write_p(e))
-	    {
-		pips_debug(9, "%s W in %p\n", entity_name(new_variable), s);
-		array_modified = TRUE;
-		return;
+	FOREACH(EFFECT, e, load_proper_rw_effects_list(s))
+	  {
+	    if(store_effect_p(e)) {
+	      entity v = reference_variable(effect_any_reference(e));
+	      if (same_primary_entity_p(v,new_variable) && effect_write_p(e))
+		{
+		  pips_debug(9, "%s W in %p\n", entity_name(new_variable), s);
+		  array_modified = TRUE;
+		  return;
+		}
 	    }
-	},
-	    load_proper_rw_effects_list(s));
+	  }
     }
 }
 
@@ -1547,7 +1547,7 @@ alive_arrays(
 	list_of_distributed_arrays());
 
     DEBUG_ELST(9, "seen arrays", lseens);
-    gen_free_list(lseens); 
+    gen_free_list(lseens);
 
     DEBUG_ELST(7, "returned alive arrays", l);
     return l;

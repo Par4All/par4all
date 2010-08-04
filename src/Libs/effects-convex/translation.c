@@ -892,15 +892,14 @@ static list l_arguments_to_eliminate = NIL;
 void set_forward_arguments_to_eliminate()
 {
     entity module = get_current_module_entity();
+    /* FI: Let's hope it's OK for C as well */
     list l_decls = code_declarations(value_code(entity_initial(module)));
 
-    MAPL(l_var,
+    FOREACH(ENTITY, var, l_decls)
      {
-	 entity var = ENTITY(CAR(l_var));
 	 if (type_variable_p(entity_type(var)) && entity_scalar_p(var))
 	     l_arguments_to_eliminate = CONS(ENTITY, var, l_arguments_to_eliminate);
-     },
-	 l_decls);
+     }
 
 }
 
@@ -2121,43 +2120,44 @@ static void region_translation_of_predicate(region reg, entity to_func)
 
 void convex_region_descriptor_translation(effect eff)
 {
-  ifdebug(8)
-    {
-      pips_debug(8, "region before translation: \n");
-      print_region(eff);
-    }
+  /* FI: regions were are not store regions do not need translation */
+  if(store_effect_p(eff)) {
+    ifdebug(8)
+      {
+	pips_debug(8, "region before translation: \n");
+	print_region(eff);
+      }
 
-  if (!sc_rn_p(region_system(eff)))
-    {
-      /* we add the system representing the association between
-       * actual and formal parameters to the region */
-      region_sc_append_and_normalize(eff, get_translation_context_sc(),2);
+    if (!sc_rn_p(region_system(eff)))
+      {
+	/* we add the system representing the association between
+	 * actual and formal parameters to the region */
+	region_sc_append_and_normalize(eff, get_translation_context_sc(),2);
 
-      /* then, we eliminate all the scalar variables that appear in the formal
-       * parameters */
-      ifdebug(8)
-	{
-	  pips_debug(8, "variables to eliminate: \n");
-	  print_arguments(get_arguments_to_eliminate());
-	}
-      if (must_regions_p())
-	region_exact_projection_along_parameters
-	  (eff, get_arguments_to_eliminate());
-      else
-	region_non_exact_projection_along_parameters
-	  (eff, get_arguments_to_eliminate());
-
-
-      debug_region_consistency(eff);
-    }
-
-  ifdebug(8)
-    {
-      pips_debug(8, "region after translation of arguments: \n");
-      print_region(eff);
-    }
+	/* then, we eliminate all the scalar variables that appear in the formal
+	 * parameters */
+	ifdebug(8)
+	  {
+	    pips_debug(8, "variables to eliminate: \n");
+	    print_arguments(get_arguments_to_eliminate());
+	  }
+	if (must_regions_p())
+	  region_exact_projection_along_parameters
+	    (eff, get_arguments_to_eliminate());
+	else
+	  region_non_exact_projection_along_parameters
+	    (eff, get_arguments_to_eliminate());
 
 
+	debug_region_consistency(eff);
+      }
+
+    ifdebug(8)
+      {
+	pips_debug(8, "region after translation of arguments: \n");
+	print_region(eff);
+      }
+  }
 }
 
 

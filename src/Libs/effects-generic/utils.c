@@ -338,11 +338,13 @@ bool effects_must_read_or_write_entity_p(cons * fx, entity e)
 
   if(entity_variable_p(e)) {
     FOREACH(EFFECT, ef, fx) {
-      entity e_used = reference_variable(effect_any_reference(ef));
-      /* Used to be a simple pointer equality test */
-      if(entities_must_conflict_p(e, e_used)) {
-	read_or_write = TRUE;
-	break;
+      if(store_effect_p(ef)) {
+	entity e_used = reference_variable(effect_any_reference(ef));
+	/* Used to be a simple pointer equality test */
+	if(entities_must_conflict_p(e, e_used)) {
+	  read_or_write = TRUE;
+	  break;
+	}
       }
     }
   }
@@ -560,10 +562,10 @@ void dump_effect(effect e)
 void dump_effects(list le)
 {
   int i = 1;
-  MAP(EFFECT, e, {
+  FOREACH(EFFECT, e, le) {
       fprintf(stderr, "%d ", i++);
       dump_effect(e);
-    }, le);
+    }
 }
 
 /* Check if a reference appears more than once in the effect list. If
@@ -572,13 +574,17 @@ void dump_effects(list le)
 bool effects_reference_sharing_p(list el, bool persistant_p)
 {
   bool sharing_p = FALSE;
-  list rl = NIL; /* reference list */
+  list srl = NIL; /* store reference list */
+  list erl = NIL; /* environment reference list */
+  list tdrl = NIL; /* type declaration reference list */
   list ce = list_undefined; /* current effect */
 
   for(ce=el; !ENDP(ce); POP(ce)) {
     effect e = EFFECT(CAR(ce));
     cell c = effect_cell(e);
     reference r = reference_undefined;
+
+    pips_assert("effect e is consistent", effect_consistent_p(e));
 
     if(persistant_p) {
       if(cell_reference_p(c))
@@ -588,14 +594,44 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
       r = effect_any_reference(e);
 
     if(!reference_undefined_p(r)) {
-      if(gen_in_list_p((void *) r, rl)) {
-	fprintf(stderr, "this effect shares its reference with another effect in the list\n");
-	(*effect_prettyprint_func)(e);
-	sharing_p = TRUE;
-	break;
+      /* FI: I though about parametrizing thru a list, but this
+	 requires to conditional affectation, before and after each
+	 loop body. Hence the cut-and-paste. */
+      if(store_effect_p(e)) {
+	if(gen_in_list_p((void *) r, srl)) {
+	  fprintf(stderr, "this effect shares its reference with "
+		  "another effect in list srl\n");
+	  (*effect_prettyprint_func)(e);
+	  sharing_p = TRUE;
+	  break;
+	}
+	else {
+	  srl = CONS(REFERENCE, r, srl);
+	}
+      } else if (environment_effect_p(e)) {
+	if(gen_in_list_p((void *) r, erl)) {
+	  fprintf(stderr, "this effect shares its reference with "
+		  "another effect in list srl\n");
+	  (*effect_prettyprint_func)(e);
+	  sharing_p = TRUE;
+	  break;
+	}
+	else {
+	  erl = CONS(REFERENCE, r, erl);
+	}
+      } else if (type_declaration_effect_p(e)) {
+	if(gen_in_list_p((void *) r, tdrl)) {
+	  fprintf(stderr, "this effect shares its reference with "
+		  "another effect in list srl\n");
+	  (*effect_prettyprint_func)(e);
+	  sharing_p = TRUE;
+	  break;
+	}
+	else {
+	  tdrl = CONS(REFERENCE, r, tdrl);
+	}
+      } else {
       }
-      else
-	rl = CONS(REFERENCE, r, rl);
     }
   }
   return sharing_p;
@@ -1407,14 +1443,20 @@ static bool FILE_star_effect_reference(reference ref)
 
 
 /**
-   @param l_pointer_eff is a list of effects that may involve access paths dereferencing pointers.
+   @param l_pointer_eff is a list of effects that may involve access
+   paths dereferencing pointers.
+
    @return a list of effects with no access paths dereferencing pointers.
 
-   Two algorithms are currently used, depending on the value returned by get_use_points_to.
+   Two algorithms are currently used, depending on the value returned
+   by get_use_points_to.
 
-   If true, when there is an effect reference with a dereferencing dimension, eval_cell_with_points_to is called
-   to find an equivalent constant path using points-to.
-   If false, effect references with a dereferencing dimension are systematically replaced by anywhere effects.
+   If true, when there is an effect reference with a dereferencing
+   dimension, eval_cell_with_points_to is called to find an equivalent
+   constant path using points-to.
+
+   If false, effect references with a dereferencing dimension are
+   systematically replaced by anywhere effects.
  */
 list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 {
@@ -1426,46 +1468,52 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
     {
       FOREACH(EFFECT, eff, l_pointer_eff)
 	{
-	  bool exact_p;
-	  reference ref = effect_any_reference(eff);
+	  if(store_effect_p(eff))
+	    {
+	      bool exact_p;
+	      reference ref = effect_any_reference(eff);
 
-	  if (io_effect_p(eff)|| malloc_effect_p(eff) || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)))
-	    {
-	      le = CONS(EFFECT, copy_effect(eff), le);
-	    }
-	  else
-	    {
-	      if (effect_reference_dereferencing_p(ref, &exact_p))
+	      if (io_effect_p(eff)
+		  || malloc_effect_p(eff)
+		  || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+		      && std_file_effect_p(eff)))
 		{
-		  pips_debug(8, "dereferencing case \n");
-		  bool exact_p = false;
-		  transformer context;
-		  if (effects_private_current_context_empty_p())
-		    context = transformer_undefined;
-		  else {
-		    context = effects_private_current_context_head();
-		  }
-
-		  list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff),
-							      points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-							      &exact_p, context);
-		  if (ENDP(l_eval))
-		    {
-		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
-		      /* We have not found any equivalent constant path : it may point anywhere */
-		      /* We should maybe contract these effects later. Is it done by the callers ? */
-		      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
-		    }
-		  else
-		    {
-		      /* change the resulting effects action to the current effect action */
-		      if (effect_read_p(eff))
-			effects_to_read_effects(l_eval);
-		      le = gen_nconc(l_eval,le);
-		    }
+		  le = CONS(EFFECT, copy_effect(eff), le);
 		}
 	      else
-		le = CONS(EFFECT, copy_effect(eff), le);
+		{
+		  if (effect_reference_dereferencing_p(ref, &exact_p))
+		    {
+		      pips_debug(8, "dereferencing case \n");
+		      bool exact_p = false;
+		      transformer context;
+		      if (effects_private_current_context_empty_p())
+			context = transformer_undefined;
+		      else {
+			context = effects_private_current_context_head();
+		      }
+
+		      list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff),
+								     points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
+								     &exact_p, context);
+		      if (ENDP(l_eval))
+			{
+			  pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+			  /* We have not found any equivalent constant path : it may point anywhere */
+			  /* We should maybe contract these effects later. Is it done by the callers ? */
+			  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+			}
+		      else
+			{
+			  /* change the resulting effects action to the current effect action */
+			  if (effect_read_p(eff))
+			    effects_to_read_effects(l_eval);
+			  le = gen_nconc(l_eval,le);
+			}
+		    }
+		  else
+		    le = CONS(EFFECT, copy_effect(eff), le);
+		}
 	    }
 	}
 
@@ -1480,23 +1528,26 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 
       while (!ENDP(l))
 	{
-	  bool exact_p;
 	  effect eff = EFFECT(CAR(l));
-	  reference ref = effect_any_reference(eff);
-
-	  if (io_effect_p(eff)|| malloc_effect_p(eff)
-	      || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff))
-	      || (!get_bool_property("ALIASING_ACROSS_IO_STREAMS") && FILE_star_effect_reference(ref)))
+	  if(store_effect_p(eff))
 	    {
-	      lkeep = CONS(EFFECT, eff, lkeep);
-	    }
-	  else
-	    if (!(read_dereferencing_p && write_dereferencing_p)
-		&& effect_reference_dereferencing_p(ref, &exact_p))
-	      {
-		if (effect_read_p(eff)) read_dereferencing_p = true;
+	      reference ref = effect_any_reference(eff);
+	      bool exact_p;
+
+	      if (io_effect_p(eff)|| malloc_effect_p(eff)
+		  || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff))
+		  || (!get_bool_property("ALIASING_ACROSS_IO_STREAMS") && FILE_star_effect_reference(ref)))
+		{
+		  lkeep = CONS(EFFECT, eff, lkeep);
+		}
+	      else
+		if (!(read_dereferencing_p && write_dereferencing_p)
+		    && effect_reference_dereferencing_p(ref, &exact_p))
+		  {
+		    if (effect_read_p(eff)) read_dereferencing_p = true;
 		    else write_dereferencing_p = true;
-	      }
+		  }
+	    }
 	  POP(l);
 	}
 

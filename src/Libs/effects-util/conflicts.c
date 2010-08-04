@@ -90,10 +90,28 @@ bool effects_may_conflict_p( effect eff1, effect eff2 ) {
     // Two read won't conflict
     conflict_p = FALSE;
   } else {
-    cell cell1 = effect_cell(eff1);
-    cell cell2 = effect_cell(eff2);
-    if ( !cells_may_conflict_p( cell1, cell2 ) ) {
+    action_kind ak1 = action_to_action_kind(ac1);
+    action_kind ak2 = action_to_action_kind(ac2);
+
+    if(action_kind_tag(ak1) != action_kind_tag(ak2)) {
+      // A store mutation cannot conflict with an environment or type
+      // declaration mutation
       conflict_p = FALSE;
+    } else {
+      if(action_kind_store_p(ak1)) {
+	cell cell1 = effect_cell(eff1);
+	cell cell2 = effect_cell(eff2);
+	if ( !cells_may_conflict_p( cell1, cell2 ) ) {
+	  conflict_p = FALSE;
+	}
+      } else {
+	/* For environment and type declarations, the references are
+	   empty and the conflict is only based on the referenced
+	   entity */
+	entity v1 = effect_variable(eff1);
+	entity v2 = effect_variable(eff1);
+	conflict_p = v1==v2;
+      }
     }
   }
   return conflict_p;
@@ -456,6 +474,10 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
 /**
  * @brief Check if two entities may or must conflict
  *
+ * FI->MA: we certainly said a lot more during the February 2010
+ * meeting, when abstract locations were added. And now we have store
+ * and type declaration dependencies...
+ *
  * @param must_p define if we enforce must conflict or only may one
  *
  */
@@ -463,6 +485,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 {
   bool conflict_p = !must_p; // safe default value
   bool (*abstract_locations_conflict_p)(entity,entity);
+
   if( must_p ) {
     abstract_locations_conflict_p = abstract_locations_must_conflict_p;
   } else  {
@@ -513,16 +536,24 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	  conflict_p = e1==e2;
 	}
       } else {
+	/* FI: we end up here if references linked to environment or
+	   type declarations are tested for conflicts. Should we
+	   perform such tests, basically e1==e2, or assume that they
+	   should have been handled at a higher level? */
 	/* Since PIPS does not detect the user syntax error, we could
 	   make this pips_user_error(). */
-	if(!entity_variable_p(e1))
-	  pips_internal_error("Unexpected case. \"%s\" is not a variable"
-			      " and cannot be written\n",
-			      entity_user_name(e1));
-	else if(!entity_variable_p(e2))
-	  pips_internal_error("Unexpected case. \"%s\" is not a variable"
-			      " and cannot be written\n",
-			      entity_user_name(e2));
+	if(!entity_variable_p(e1) || entity_variable_p(e2)) {
+	  /* There are no conflicts between entities of different
+	     kinds */
+	  /* Since this implies e1!=e2, this case could be merged
+	     with the next one, but the spec would be less clear */
+	  conflict_p = FALSE;
+	}
+	else {
+	  /* Environment and type declaration conflicts imply that
+	     the very same entity is involved. */
+	  conflict_p = e1==e2;
+	}
       }
     }
   }

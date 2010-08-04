@@ -54,17 +54,17 @@ bool ref_to_dist_array_p(void * obj)
 
 /* written_effects_to_dist_arrays_p
  */
-bool written_effect_p(
-    entity var,
-    list le)
+bool written_effect_p(entity var,
+		      list le)
 {
-    MAP(EFFECT, e,
+  FOREACH(EFFECT, e, le)
     {
+      if(store_effect_p(e)) {
 	if (reference_variable(effect_any_reference(e))==var &&
 	    action_write_p(effect_action(e)))
 	    return TRUE;
-    },
-	le);
+      }
+    }
 
     return FALSE;
 }
@@ -73,12 +73,15 @@ bool written_effects_to_dist_arrays_p(expression expr)
 {
     list l, leffects_to_dist_arrays = DistArraysEffects(expr);
 
+    // FI: looks like a FOREACH to me...
     for(l=leffects_to_dist_arrays; !ENDP(l); POP(l))
+      if(store_effect_p(EFFECT(CAR(l)))) {
 	if  (action_write_p(effect_action(EFFECT(CAR(l)))))
 	{
 	    gen_free_list(leffects_to_dist_arrays);
 	    return TRUE;
 	}
+      }
 
     gen_free_list(leffects_to_dist_arrays);
     return FALSE;
@@ -241,8 +244,13 @@ expression expr;
 {
     list le = proper_effects_of_expression(expr), lde = NIL;
 
-    MAP(EFFECT, e, if (array_distributed_p(effect_variable(e))) lde=CONS(EFFECT,e,lde), le);
-    
+    FOREACH(EFFECT, e, le) {
+      if(store_effect_p(e)) {
+	if (array_distributed_p(effect_variable(e)))
+	  lde=CONS(EFFECT,e,lde);
+      }
+    }
+
     gen_free_list(le);
     return(lde);
 }

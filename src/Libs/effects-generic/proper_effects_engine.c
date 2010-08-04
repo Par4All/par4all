@@ -486,7 +486,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 
 
 
-/* list generic_proper_effects_of__read_reference(reference ref, bool written_p)
+/* list generic_proper_effects_of_reference(reference ref, bool written_p)
  * input    : a reference and a boolean true if it is a written reference.
  * output   : the corresponding list of effects.
  * modifies : nothing.
@@ -540,6 +540,17 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 	  pips_internal_error("case not handled yet \n");
       (*effects_precondition_composition_op)(le, context);
     }
+
+  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+    /* May not be generic enough altough contexts seem useless for
+       environment effects */
+    /* FI: these effects do not seem to always combine. A statement
+       with a read and a write of v seems to end with two reference
+       effects. See Bootstrap/iand01.f, assuming all effects are
+       computed, of course. */
+    effect re = make_declaration_effect(v, FALSE); // reference effect
+    le = CONS(EFFECT, re, le);
+  }
 
   pips_debug(3, "end\n");
   return(le);
@@ -1823,8 +1834,14 @@ static void proper_effects_of_loop(loop l)
 	pips_debug(2, "end\n");
     }
 
+    ifdebug(1) pips_assert("l_proper is consistent",
+			   effect_list_consistent_p(l_proper));
+
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
+
+    ifdebug(1) pips_assert("l_proper is consistent",
+			   effect_list_consistent_p(l_proper));
 
     if (get_constant_paths_p())
       {
@@ -2013,9 +2030,42 @@ static list generic_proper_effects_of_declaration(entity decl)
   return l_eff;
 }
 
+effect make_declaration_effect(entity e, bool written_p)
+{
+  effect eff = effect_undefined;
+  /* FI: generate a declaration or a type write */
+  reference r = make_reference(e, NIL);
+  action a = action_undefined;
+  action_kind ak = action_kind_undefined;
+  /* FI: I'm not sure this is a very generic decision; I do not
+     foresee how predicates could refine dependences. But we already
+     missed that for scalar variables:-( */
+  descriptor d = make_descriptor_none();
+  cell c = make_cell_reference(r);
+  approximation ap = make_approximation_exact();
+
+  if(typedef_entity_p(e)) {
+    /* FI: more work here; you have to check that other typedefed
+       types or variables are not used in this typedef. Quite a
+       recursive search... */
+    ak = make_action_kind_type_declaration();
+  }
+  else
+    ak = make_action_kind_environment();
+
+  if(written_p)
+    a = make_action_write(ak);
+  else
+    a = make_action_read(ak);
+
+  eff = make_effect(c, a, ap, d);
+
+  return eff;
+}
+
 static void proper_effects_of_statement(statement s)
 {
-  /* Handling of declarations attached to a CONTINUE statement
+  /* Handling of declarations attached to a declaration statement
 
   */
   pips_debug(1, "statement%03zd :\n", statement_number(s));
@@ -2029,6 +2079,10 @@ static void proper_effects_of_statement(statement s)
 
       FOREACH(ENTITY, e, l_decls)
 	{
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    effect de = make_declaration_effect(e, TRUE);
+	    l_eff = gen_nconc(l_eff, CONS(EFFECT, de, NIL));
+	  }
 	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
 	}
       if (get_constant_paths_p())

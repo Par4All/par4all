@@ -220,14 +220,16 @@ loop_regions_normalize(list l_reg, entity index, range l_range,
 		/* eliminate the old index (which is no more a variable,
 		 * but a parameter) */
 		l_tmp = CONS(ENTITY, index, NIL);
-		MAP(EFFECT, reg,
+		FOREACH(EFFECT, reg, l_reg)
 		{
+		  if(store_effect_p(reg)) {
 		    if (!region_rn_p(reg) && !region_empty_p(reg))
 		    {
 			region_sc_append_and_normalize(reg,beta_sc,1);
 			region_exact_projection_along_parameters(reg, l_tmp);
 		    }
-		}, l_reg);
+		  }
+		}
 		gen_free_list(l_tmp);
 
 		/* update the loop preconditions */
@@ -271,16 +273,18 @@ void project_regions_along_loop_index(list l_reg, entity index, range l_range)
     if (must_regions_p() && projection_of_index_safe)
     {
 
-	MAPL(ll_reg, {
-	    region_exact_projection_along_variable(EFFECT(CAR(ll_reg)), index);
-	}, l_reg);
+      FOREACH(EFFECT, reg, l_reg) {
+	  if(store_effect_p(reg))
+	    region_exact_projection_along_variable(reg, index);
+	}
     }
     else
     {
 	list l = CONS(ENTITY, index, NIL);
-	MAP(EFFECT, reg, {
+	FOREACH(EFFECT, reg, l_reg) {
+	  if(store_effect_p(reg))
 	    region_non_exact_projection_along_variables(reg, l);
-	}, l_reg);
+	}
 	gen_free_list(l);
     }
     debug_regions_consistency(l_reg);
@@ -334,15 +338,17 @@ void project_regions_along_parameters(list l_reg, list l_param)
 
     if (must_regions_p())
     {
-	MAP(EFFECT, reg, {
+      FOREACH(EFFECT, reg, l_reg) {
+	if(store_effect_p(reg))
 	    region_exact_projection_along_parameters(reg, l_param);
-	}, l_reg);
+	}
     }
     else
     {
-	MAP(EFFECT, reg, {
+      FOREACH(EFFECT, reg, l_reg) {
+	if(store_effect_p(reg))
 	    region_non_exact_projection_along_parameters(reg, l_param);
-	}, l_reg);
+	}
     }
     debug_regions_consistency(l_reg);
     debug_off();
@@ -427,8 +433,8 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	    sc_list_variables_rename(sc_trans, l_old, l_int);
 	}
 
-	MAP(EFFECT, reg,
-	{
+	FOREACH(EFFECT, reg, l_reg) {
+	  if(store_effect_p(reg)) {
 	    Psysteme sc_reg = region_system(reg);
 
 	    if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
@@ -470,8 +476,8 @@ void regions_transformer_apply(list l_reg, transformer trans,
 			       region_to_string(reg) );
 		}
 	    }
-	},
-	    l_reg);
+	  }
+	}
 
 	/* no memory leaks */
 	gen_free_list(l_int);
@@ -533,8 +539,9 @@ list regions_dynamic_elim(list l_reg)
   debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
   debug_regions_consistency(l_reg);
 
-  MAP(EFFECT, reg,
+  FOREACH(EFFECT, reg, l_reg)
       {
+	if(store_effect_p(reg)) {
         entity reg_ent = region_entity(reg);
         storage reg_s = entity_storage(reg_ent);
         boolean ignore_this_region = FALSE;
@@ -592,8 +599,8 @@ list regions_dynamic_elim(list l_reg)
 	    {
 	      pips_debug_effect(4, "region removed : \n", reg);
 	    }
-      },
-      l_reg);
+	}
+      }
   debug_regions_consistency(l_reg);
   debug_off();
 
@@ -1134,6 +1141,7 @@ Psysteme cell_reference_sc_exact_projection_along_variable(reference ref, Psyste
  */
 void region_exact_projection_along_variable(region reg, entity var)
 {
+  if(store_effect_p(reg)) {
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Psysteme volatile sc;
@@ -1221,6 +1229,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 	    print_region(reg);
 	}
     }
+  }
 }
 
 

@@ -568,7 +568,10 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		  (new_ref, copy_action(effect_action(eff)), false);
 
 		/* this could easily be made generic BC. */
-		if(!anywhere_effect_p(new_eff))
+		/* FI: I add the restriction on store regions, but
+		   they should have been eliminated before translation
+		   is attempted */
+		if(!anywhere_effect_p(new_eff) && store_effect_p(new_eff))
 		  {
 		    effect init_eff = (*effect_dup_func)(eff);
 		    /* we translate the initial region descriptor

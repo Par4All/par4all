@@ -659,9 +659,9 @@ static bool invariant_expression_p(
 	print_expression(e);
     }
 
-    MAP(EFFECT, ef1,
-	MAP(EFFECT, ef2,
-	{
+    FOREACH(EFFECT, ef1, l) {
+      FOREACH(EFFECT, ef2, loe)	{
+	if(store_effect_p(ef1) && store_effect_p(ef2)) {
 	    entity v = effect_variable(ef1);
 	    if ((v==effect_variable(ef2) && effect_write_p(ef2)) ||
 		gen_in_list_p(v, le))
@@ -670,9 +670,9 @@ static bool invariant_expression_p(
 		pips_debug(3, "variant\n");
 		return FALSE;
 	    }
-	},
-	    loe),
-	l);
+	}
+      }
+    }
 
     gen_free_list(l);
     pips_debug(3, "invariant\n");
@@ -787,8 +787,9 @@ static bool loop_flt(loop l)
     s = c_stmt_head();
     loce = effects_effects(load_cumulated_references(s)); 
 
-    MAP(EFFECT, e,
+    FOREACH(EFFECT, e, loce)
     {
+      if(store_effect_p(e)) {
 	reference r = effect_any_reference(e);
 	entity v = reference_variable(r);
 
@@ -798,10 +799,10 @@ static bool loop_flt(loop l)
 	    int p;
 	    entity n;
 
-	    pips_debug(3, "considering reference to %s[%zd]\n", 
+	    pips_debug(3, "considering reference to %s[%zd]\n",
 		       entity_name(v), gen_length(reference_indices(r)));
 
-	    MAP(EXPRESSION, x,
+	    FOREACH(EXPRESSION, x,reference_indices(r))
 	    {
 		dim++;
 		ifdebug(3) {
@@ -817,11 +818,10 @@ static bool loop_flt(loop l)
 		    substitute_and_create(s, n, x);
 		    lsubs = CONS(ENTITY, n, lsubs);
 		}
-	    },
-	        reference_indices(r));
+	    }
 	}
-    },
-        loce);
+      }
+    }
 
     return FALSE;
 }
@@ -911,7 +911,7 @@ void debug_print_referenced_entities(void * obj)
 
 void update_common_references_in_obj(void * obj)
 {
-    gen_multi_recurse(obj, 
+    gen_multi_recurse(obj,
 		      loop_domain, gen_true, update_loop_rewrite,
 		      reference_domain, gen_true, update_common_rewrite,
 		      NULL);
@@ -926,11 +926,12 @@ void update_common_references_in_regions()
 	 {
 	     list lef = effects_effects(effs);
 
-	     debug(3, "update_common_references_in_regions",
-		   "statement %p (%d effects)\n", 
-		   stat, gen_length((list) lef));
-	     
-	     MAP(EFFECT, e, update_common_rewrite(effect_any_reference(e)), 
+	     pips_debug(3, "statement %p (%d effects)\n",
+			stat, gen_length((list) lef));
+
+	     // FI: Let's hope the rw effects do not have to be
+	     // filtered to keep only the store effects...
+	     MAP(EFFECT, e, update_common_rewrite(effect_any_reference(e)),
 		 (list) lef);
 	 },
 	     get_rw_effects());

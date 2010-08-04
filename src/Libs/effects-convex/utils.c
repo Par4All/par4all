@@ -476,23 +476,28 @@ list regions_sc_append_and_normalize(list l_reg, Psysteme sc,
     }
     else
     {
-	MAP(EFFECT, reg,
+      FOREACH(EFFECT, reg, l_reg)
 	    {
 		boolean scalar_p = region_scalar_p(reg);
 
 		if ((scalar_p && !arrays_only) || (!scalar_p && !scalars_only))
 		{
+		  if(store_effect_p(reg)) {
 		    region_sc_append_and_normalize(reg, sc, level);
 		    if (!region_empty_p(reg))
-			l_res = region_add_to_regions(reg, l_res);
+		      l_res = region_add_to_regions(reg, l_res);
 		    else
-			region_free(reg);
+		      region_free(reg);
+		  }
+		  else {
+		    l_res = region_add_to_regions(reg, l_res);
+		  }
 		}
 		else
 		{
 		    l_res = region_add_to_regions(reg, l_res);
 		}
-	    }, l_reg);
+	    }
     gen_free_list(l_reg);
     }
     return(l_res);
@@ -643,48 +648,57 @@ void array_regions_variable_rename(list l_reg, entity old_entity, entity new_ent
  * comment  : in the array regions of l_reg, the variable old_entity
  *            that appears in the predicates is replaced with new_entity.
  */
-void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entity)
+void all_regions_variable_rename(list l_reg,
+				 entity old_entity,
+				 entity new_entity)
 {
-  MAP(EFFECT, reg, {
-    Psysteme sc_reg = region_system(reg);
+  FOREACH(EFFECT, reg, l_reg) {
+    if(store_effect_p(reg)) {
+      Psysteme sc_reg = region_system(reg);
 
-    if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg)) {
-      Pbase b = sc_base(sc_reg);
-      ifdebug(8){
-	pips_debug(8, "current system: \n");
-	sc_syst_debug(sc_reg);
-      }
-
-      /* FI: I do not know if I'm fixing a bug or if I'm correcting a symptom */
-      /* This is done to ocmpute the OUT regions of the routine
-	 COMPUTE_PD3 in the NAS beanchmark md. (Request Alain Muller) */
-      if(base_contains_variable_p(b, (Variable) new_entity)) {
-	Pbase nb = sc_to_minimal_basis(sc_reg);
-	if(base_contains_variable_p(nb, (Variable) new_entity)) {
-	  /* We are in trouble because we cannot perform a simple renaming */
-	  /* The caller may reuse values already used in the
-	     system. This is the case for muller01.f because the
-	     precondition and the region rightly used I#old. Rightly,
-	     but uselessly in that case. */
-	  /* new_entity must/can be projected first although this is
-	     dangerous when dealing with MUST/MAY regions (no other
-	     idea, but use of temporary values t# instead of i#old in
-	     caller, ).. */
-	  region_exact_projection_along_variable(reg, new_entity);
-	  sc_reg = region_system(reg);
-	  pips_user_warning("Unexpected variable renaming in a region\n");
+      if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg)) {
+	Pbase b = sc_base(sc_reg);
+	ifdebug(8){
+	  pips_debug(8, "current system: \n");
+	  sc_syst_debug(sc_reg);
 	}
-	else {
-	  base_rm(b);
-	  sc_base(sc_reg) = nb;
-	  sc_dimension(sc_reg) = base_dimension(nb);
-	}
-      }
 
-      sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity,
+	/* FI: I do not know if I'm fixing a bug or if I'm correcting a symptom */
+	/* This is done to ocmpute the OUT regions of the routine
+	   COMPUTE_PD3 in the NAS beanchmark md. (Request Alain Muller) */
+	if(base_contains_variable_p(b, (Variable) new_entity)) {
+	  Pbase nb = sc_to_minimal_basis(sc_reg);
+	  if(base_contains_variable_p(nb, (Variable) new_entity)) {
+	    /* We are in trouble because we cannot perform a simple renaming */
+	    /* The caller may reuse values already used in the
+	       system. This is the case for muller01.f because the
+	       precondition and the region rightly used I#old. Rightly,
+	       but uselessly in that case. */
+	    /* new_entity must/can be projected first although this is
+	       dangerous when dealing with MUST/MAY regions (no other
+	       idea, but use of temporary values t# instead of i#old in
+	       caller, ).. */
+	    region_exact_projection_along_variable(reg, new_entity);
+	    sc_reg = region_system(reg);
+	    pips_user_warning("Unexpected variable renaming in a region\n");
+	  }
+	  else {
+	    base_rm(b);
+	    sc_base(sc_reg) = nb;
+	    sc_dimension(sc_reg) = base_dimension(nb);
+	  }
+	}
+
+	sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity,
 				    (Variable) new_entity);
+      }
     }
-  },l_reg);
+    else {
+      /* FI: for the time being, other kinds of regions do not have
+	 descriptors */
+      ;
+    }
+  }
 }
 
 /* void region_value_substitute(region reg, entity e1, entity e2)

@@ -547,7 +547,10 @@ effect effect_to_non_pointer_store_independent_effect(effect eff)
      modification abstracted by eff2 preserves the correctness of
      eff1: all memory locations included in eff1 at input are included
      in the memory locations abstracted by the new eff1 after the
-     abstract state transition. */
+     abstract state transition.
+
+     FI: seems to extend naturally to new kinds of effects...
+ */
 effect effect_interference(effect eff1, effect eff2)
 {
   //action ac1 = effect_action(eff1);
@@ -654,6 +657,47 @@ string full_action_to_string(action ac)
   return s;
 }
 
+string full_action_to_short_string(action ac)
+{
+  string s = string_undefined;
+  if(action_read_p(ac)) {
+    action_kind ak = action_read(ac);
+
+    if(action_kind_store_p(ak))
+      s = "R";
+    else if(action_kind_environment_p(ak))
+      s = "RE";
+    else if(action_kind_type_declaration_p(ak))
+      s = "RT";
+  }
+  else {
+    action_kind ak = action_write(ac);
+
+    if(action_kind_store_p(ak))
+      s = "W";
+    else if(action_kind_environment_p(ak))
+      s = "WE";
+    else if(action_kind_type_declaration_p(ak))
+      s = "WT";
+  }
+  return s;
+}
+
+string action_kind_to_string(action_kind ak)
+{
+  string s = string_undefined;
+
+  if(action_kind_store_p(ak))
+    s = "S";
+  else if(action_kind_environment_p(ak))
+    s = "E";
+  else if(action_kind_type_declaration_p(ak))
+    s = "T";
+  else
+    pips_internal_error("Unknown action kind.\n");
+  return s;
+}
+
 /* To ease the extension of action with action_kind */
 action make_action_write_memory(void)
 {
@@ -686,6 +730,47 @@ bool action_equal_p(action a1, action a2)
     }
   }
   return equal_p;
+
+}
+
+/* Without the consistency test, this function would certainly be
+   inlined. Macros are avoided to simplify debugging and
+   maintenance. */
+action_kind action_to_action_kind(action a)
+{
+  action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
+
+  if(!action_read_p(a) && !action_write_p(a))
+    pips_internal_error("Inconsistent action kind.\n");
+
+  return ak;
+}
+
+bool store_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_store_p(ak);
+
+  return store_p;
+}
+
+bool environment_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_environment_p(ak);
+
+  return store_p;
+}
+
+bool type_declaration_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_type_declaration_p(ak);
+
+  return store_p;
 }
 
 bool effects_write_variable_p(list el, entity v)
@@ -836,4 +921,61 @@ bool effect_list_consistent_p(list el)
     ok_p = ok_p && effect_consistent_p(e);
 
   return ok_p;
+}
+
+/* Check compatibility conditions for effect union */
+bool union_compatible_effects_p(effect ef1, effect ef2)
+{
+  action a1 = effect_action(ef1);
+  tag at1 = action_tag(a1);
+  action_kind ak1 = action_to_action_kind(a1);
+  tag akt1 = action_kind_tag(ak1);
+  entity e1 = effect_variable(ef1);
+  descriptor d1 = effect_descriptor(ef1);
+  action a2 = effect_action(ef2);
+  tag at2 = action_tag(a2);
+  action_kind ak2 = action_to_action_kind(a2);
+  tag akt2 = action_kind_tag(ak2);
+  entity e2 = effect_variable(ef2);
+  descriptor d2 = effect_descriptor(ef2);
+  bool compatible_p = TRUE;
+
+  pips_assert("effect e1 is consistent", effect_consistent_p(ef1));
+  pips_assert("effect e2 is consistent", effect_consistent_p(ef2));
+
+  if(at1!=at2) {
+    /* In general, you do not want to union a read and a write, but
+       you might want to do so to generate the set of referenced
+       elements, for instance to generate communications or to
+       allocate memory */
+    compatible_p = FALSE;
+  }
+  else if(akt1!=akt2) {
+    /* You do not want to union an effect on store with an effect on
+       environment or type declaration */
+    compatible_p = FALSE;
+  }
+  else {
+    /* Here we know: at1==at2 and akt1==akt2 */
+    /* The code below could be further unified, but it would not make
+       it easier to understand */
+    if(akt1==is_action_kind_store) {
+      if(e1!=e2)
+	compatible_p = FALSE;
+      else {
+	tag dt1 = descriptor_tag(d1);
+	tag dt2 = descriptor_tag(d2);
+
+	if(dt1!=dt2)
+	  compatible_p = FALSE;
+      }
+    }
+    else {
+      /* For environment and type declaration, the descriptor is
+	 useless for the time being */
+      compatible_p = e1==e2;
+    }
+  }
+
+  return compatible_p;
 }

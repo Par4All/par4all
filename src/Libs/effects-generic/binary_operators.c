@@ -57,9 +57,9 @@
   @param l1 and l2 are two lists of effects.
   @param  r1_r2_combinable_p is a boolean function that takes two
           individual effects as arguments and renders TRUE when they are
-          considered as combinable ; 
+          considered as combinable ;
   @param  r1_r2_binary_op is a binary operator that combines two
-          individual effects; 
+          individual effects;
   @param  r1_unary_op is a unary operators that deal with the remnants of l1,
           that is those effects that are not combinable with any effect of l2;
   @param  r2_unary_op is a unary operators that deal with the remnants of l2,
@@ -95,40 +95,40 @@ list_of_effects_generic_binary_op(
       dump_effects(l2);
     }
 
-    
-    /* we first deal with the effects of l1 : those that are combinable with 
+
+    /* we first deal with the effects of l1 : those that are combinable with
      * the effects of l2, and the others, which we call the remnants of l1 */
     for(cr1 = l1; !ENDP(cr1); POP(cr1)) {
       effect r1 = EFFECT(CAR(cr1));
       list lr2 = l2;
       list prec_lr2 = NIL;
       bool combinable = FALSE;
-      
+
       pips_debug(8, "r1: %s\n", entity_name(effect_variable(r1)));
       ifdebug(8) {
 	fprintf(stderr, "Dump r1 when entering the loop body\n");
 	dump_effect(r1);
       }
-      
+
       while(!combinable && !ENDP(lr2)) {
 	effect r2 = EFFECT(CAR(lr2));
-	
+
 	pips_debug(8, "r2: %s\n", entity_name(effect_variable(r2)));
-	
+
 	if ( (*r1_r2_combinable_p)(r1,r2) ) {
 	  pips_debug(8, "combinable\n");
 	  combinable = TRUE;
 	  l_res = gen_nconc((*r1_r2_binary_op)(r1,r2), l_res);
-	  
+
 	  /* gen_remove(&l2, EFFECT(CAR(lr2))); */
 	  if (prec_lr2 != NIL)
 	    CDR(prec_lr2) = CDR(lr2);
 	  else
 	    l2 = CDR(lr2);
-	  
+
 	  free(lr2); lr2 = NIL;
 	  /* */
-	  free_effect(r1); r1=effect_undefined; 
+	  free_effect(r1); r1=effect_undefined;
 	  free_effect(r2); r2=effect_undefined;
 	}
 	else {
@@ -136,45 +136,44 @@ list_of_effects_generic_binary_op(
 	  lr2 = CDR(lr2);
 	}
       }
-      
+
       pips_debug_effects(2, "intermediate effects 1:\n", l_res);
-      
+
       if(!combinable) {
-	/* r1 belongs to the remnants of l1 : it is combinable 
+	/* r1 belongs to the remnants of l1 : it is combinable
 	 * with no effects of l2 */
-	if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
+	if ( (*r1_r2_combinable_p)(r1,effect_undefined) )
 	  l_res = gen_nconc(l_res, (*r1_unary_op)(r1));
       }
     }
-    
+
     pips_debug_effects(2, "intermediate effects 2:\n", l_res);
-    
+
     /* we must then deal with the remnants of l2 */
     for(cr2 = l2; !ENDP(cr2); POP(cr2)) {
       effect r2 = EFFECT(CAR(cr2));
 
-      if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
+      if ( (*r1_r2_combinable_p)(effect_undefined,r2) )
 	l_res = gen_nconc(l_res, (*r2_unary_op)(r2));
     }
-        
+
     pips_debug_effects(1, "effects before cleaning:\n", l_res);
- 
+
     l_clean_res = clean_anywhere_effects(l_res);
     gen_full_free_list(l_res);
 
     pips_debug_effects(1, "final effects:\n", l_clean_res);
-    
+
     /* no memory leaks: l1 and l2 won't be used anymore */
     gen_free_list(l1);
     gen_free_list(l2);
-    
+
     debug_off();
-    
+
     return l_clean_res;
 }
 
-list 
-proper_to_summary_effects(list l_effects)
+list proper_to_summary_effects(list l_effects)
 {
     return proper_effects_combine(l_effects, FALSE);
 }
@@ -182,14 +181,13 @@ proper_to_summary_effects(list l_effects)
 
 /* list proper_effects_contract(list l_effects)
  * input    : a list of proper effects
- * output   : a list of proper effects in which there is no two identical 
- *            scalar effects. 
- * modifies : the input list. 
+ * output   : a list of proper effects in which there is no two identical
+ *            scalar effects.
+ * modifies : the input list.
  * comment  : This is used to reduce the number of dependence tests.
  */
 
-list 
-proper_effects_contract(list l_effects)
+list proper_effects_contract(list l_effects)
 {
     return(proper_effects_combine(l_effects, TRUE));
 }
@@ -198,11 +196,11 @@ proper_effects_contract(list l_effects)
 /* list proper_effects_combine(list l_effects, bool scalars_only_p)
  * input    : a list of proper effects, and a boolean to know on which
  *            elements to perform the combination.
- * output   : a list of effects, in which the selected elements have been 
+ * output   : a list of effects, in which the selected elements have been
  *            merged.
  * modifies : the input list.
  * comment  : the algorithm is in O(n) (was in (n^2)/2)
- * 
+ *
  * we need "entity/action" -> consp to check for the
  * condition in the second loop directly.
  * or to simplify the hash management, two entity -> consp?
@@ -231,22 +229,28 @@ proper_effects_contract(list l_effects)
  * written pointer and to substitue it where needed. Else, the effects
  * to substitute will be gone.
  */
-list 
-proper_effects_combine(list l_effects, bool scalars_only_p)
+list proper_effects_combine(list l_effects, bool scalars_only_p)
 {
   list cur, pred = NIL;
   /* entity name -> consp in effect list. */
   hash_table all_read_effects, all_write_effects;
-  /* FI: at this level, it's pretty dangerous to combine effects with no constant addresses */
+  /* FI: at this level, it's pretty dangerous to combine effects with
+     no constant addresses */
 
   ifdebug(6) {
     list refl = NIL;
     int i = 0;
     pips_debug(6, "Proper effects to combine: \n");
-    (*effects_prettyprint_func)(l_effects);	
-    pips_assert("The very same effect does not appear twice", gen_once_p(l_effects));
-    MAP(EFFECT, eff, {
+    (*effects_prettyprint_func)(l_effects);
+
+    /* This is a pretty weak assert because it's performed on the
+       addresses */
+    pips_assert("The very same effect does not appear twice",
+		gen_once_p(l_effects));
+
+    FOREACH(EFFECT, eff, l_effects) {
 	cell c = effect_cell(eff);
+	/* FI: the cell tag is not checked here but later a posteriori! */
 	reference ref = cell_reference(c);
 
 	if(cell_reference_p(c)) {
@@ -254,11 +258,13 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 	}
 	i++;
 	fprintf(stderr, "Effect %d: %p\tReference %d: %p (%spersistant)\n",
-		i, eff, i, ref, cell_reference_p(c)? "not ":""); 
-      }, l_effects);
-    pips_assert("The very same reference does not appear twice unless it is persistant", gen_once_p(refl));
+		i, eff, i, ref, cell_reference_p(c)? "not ":"");
+    }
+
+    pips_assert("The very same reference does not appear twice"
+		" unless it is persistant", gen_once_p(refl));
   }
-  
+
   all_read_effects = hash_table_make(hash_string, 10);
   all_write_effects = hash_table_make(hash_string, 10);
   //all_read_pre_effects = hash_table_make(hash_string, 10);
@@ -274,18 +280,23 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     effect current = effect_undefined;
     string n;
     tag a;
+    action ak;
     bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
     /* Summarization before combination: let's be as store independent as possible */
     current = (*proper_to_summary_effect_func)(lcurrent);
- 
+
+    ak = action_to_action_kind(effect_action(current));
    // n = entity_name(effect_entity(current));
     list w;
-    n = words_to_string
+    string rn = words_to_string
       (w=effect_words_reference(effect_any_reference(current)));
     gen_map(free,w);gen_free_list(w);
+    /* Do not combine effects of different kinds */
+    n = strdup(concatenate(rn, " ", action_kind_to_string(ak)));
+    free(rn);
     a = effect_action_tag(current);
 
     pips_debug(8,"key: \"\%s\"\n", n);
@@ -312,7 +323,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 	if (hash_defined_p(all_write_effects, n))
 	{
 	  do_combine = TRUE;
-	  do_combine_item = hash_get(all_write_effects, n); 
+	  do_combine_item = hash_get(all_write_effects, n);
 	}
 	break;
       case is_action_read:
@@ -334,14 +345,16 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
       if(effect_comparable_p(base, current)) {
 	/* compute their union */
 	effect combined = (*effect_union_op)(base, current);
-	
+
+	/* replace the base effect by the new effect */
+	pips_assert("combined is a consistent effect",
+		    effect_consistent_p(combined));
+	EFFECT_(CAR(do_combine_item)) = combined;
+
 	/* free the original effects: no memory leak */
 	free_effect(base);
 	free_effect(current);
-	
-	/* replace the base effect by the new effect */
-	EFFECT_(CAR(do_combine_item)) = combined;
-	
+
 	/* remove the current list element from the global list */
 	/* pred!=NIL as on the first items hash's are empty */
 	CDR(pred) = next; /* pred is not changed! */
@@ -374,9 +387,9 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     cur = next;
     free(n);
   }
-  
+
   ifdebug(6){
-    pips_debug(6, "summary effects: \n"); 
+    pips_debug(6, "summary effects: \n");
     (*effects_prettyprint_func)(l_effects);
   }
 
@@ -404,61 +417,76 @@ bool effects_combinable_p(effect eff1, effect eff2)
   bool same_p = false;
   reference r1 = effect_any_reference(eff1);
   reference r2 = effect_any_reference(eff2);
+  action a1 = effect_action(eff1);
+  action a2 = effect_action(eff2);
+  action_kind ak1 = action_to_action_kind(a1);
+  action_kind ak2 = action_to_action_kind(a2);
 
-  if (anywhere_effect_p(eff1))
-    {
-      pips_debug(8, "eff1 is an anywhere effect\n");
-      if (malloc_effect_p(eff2) || io_effect_p(eff2))
-	same_p = false;
-      else 
-	same_p = true;
-      pips_debug(8, "eff2 is %s a malloc or io effect\n",
-		 same_p? "not": "");
-      
-    }
-  else if (anywhere_effect_p(eff2))
-    {
-      pips_debug(8, "eff2 is an anywhere effect\n");
-      
-      if (malloc_effect_p(eff1) || io_effect_p(eff1))
-	same_p = false;
-      else 
-	same_p = true;
-      pips_debug(8, "eff1 is %s a malloc or io effect\n",
-		 same_p? "not": "");
-    } 
-  else if (same_entity_p(reference_variable(r1), reference_variable(r2)))
-    {
-      string n1 = words_to_string(effect_words_reference(r1));
-      string n2 = words_to_string(effect_words_reference(r2));
-      
-      same_p = same_string_p(n1,n2);
-      free(n1);
-      free(n2);
-    }
+  if(action_kind_tag(ak1)==action_kind_tag(ak2)) {
+    if (anywhere_effect_p(eff1))
+      {
+	pips_debug(8, "eff1 is an anywhere effect\n");
+	if (malloc_effect_p(eff2) || io_effect_p(eff2))
+	  same_p = false;
+	else
+	  same_p = true;
+	pips_debug(8, "eff2 is %s a malloc or io effect\n",
+		   same_p? "not": "");
+
+      }
+    else if (anywhere_effect_p(eff2))
+      {
+	pips_debug(8, "eff2 is an anywhere effect\n");
+
+	if (malloc_effect_p(eff1) || io_effect_p(eff1))
+	  same_p = false;
+	else
+	  same_p = true;
+	pips_debug(8, "eff1 is %s a malloc or io effect\n",
+		   same_p? "not": "");
+      }
+    else if (same_entity_p(reference_variable(r1), reference_variable(r2)))
+      {
+	string n1 = words_to_string(effect_words_reference(r1));
+	string n2 = words_to_string(effect_words_reference(r2));
+
+	same_p = same_string_p(n1,n2);
+	free(n1);
+	free(n2);
+      }
+    else
+      same_p = false;
+  }
   else
-    same_p = false;
-  
-  
+    same_p = false; // redundant but clearer
+
   return same_p;
 }
 
 
-/* FI: same action, but also same variable and same indexing  */
+/* FI: same action, but also same variable and same indexing
+ *
+ * Checking the action kind may sometimes be useless or even wrong.
+  */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
   bool same_p = false;
 
   if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
     same_p = true;
-  else if (effect_action_tag(eff1)!=effect_action_tag(eff2)) 
+  else if (effect_action_tag(eff1)!=effect_action_tag(eff2))
     {
       same_p = false;
     }
-  else 
-    same_p = effects_combinable_p(eff1, eff2);
-  
-	
+  else {
+    action_kind ak1 = action_to_action_kind(effect_action(eff1));
+    action_kind ak2 = action_to_action_kind(effect_action(eff2));
+    if(action_kind_tag(ak1)!=action_kind_tag(ak2))
+      same_p = false;
+    else
+      same_p = effects_combinable_p(eff1, eff2);
+  }
+
   return same_p;
 }
 
@@ -557,20 +585,20 @@ effects_undefined_binary_operator(list l1, list l2,
  * modifies : nothing.
  * comment  : We assume that both effects concern the same entity.
  */
-static list 
+static list
 effect_entities_intersection(effect eff1, effect eff2)
 {
   pips_assert("unused argument", eff2==eff2);
   return CONS(EFFECT, (*effect_dup_func)(eff1), NIL);
 }
 
-/* list effects_entities_intersection(list l1, list l2, 
+/* list effects_entities_intersection(list l1, list l2,
                            bool (*intersection_combinable_p)(effect, effect))
  * input    : two lists of effects.
  * output   : a list of effects containing all the effects of l1 that have
  *            a corresponding effect (i.e. same entity) in l2.
  * modifies : l1 and l2.
- * comment  :	
+ * comment  :
  */
 list
 effects_entities_intersection(list l1, list l2,
@@ -598,12 +626,12 @@ effects_entities_intersection(list l1, list l2,
  *            then it is kept in l1, and in the result.
  * modifies : the effects of l2 may be freed.
  * comment  : we keep the effects of l1 that are not combinable with those
- *            of l2, but we don't keep the effects of l2 that are not 
- *            combinable with those of l_reg1.	
+ *            of l2, but we don't keep the effects of l2 that are not
+ *            combinable with those of l_reg1.
  */
 list
 effects_entities_inf_difference(
-    list l1, 
+    list l1,
     list l2,
     bool (*difference_combinable_p)(effect, effect))
 {

@@ -386,38 +386,59 @@ list region_must_union(region r1, region r2)
     effect r_res;
 
     if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
+      /* Should be a bit more complicated with typed anywhere */
+      /* Should be more generic? */
       r_res = make_anywhere_effect(effect_action(r1));
-    else
+    else if(store_effect_p(r1)) {
+      /* we could check effect_store(r2) */
+      pips_assert("r2 is a store effect", store_effect_p(r2));
       r_res = regions_must_convex_hull(r1, r2);
+    }
+    else {
+      /* we could check r2 */
+      pips_assert("r2 is not a store effect", !store_effect_p(r2));
+      r_res = copy_effect(r1);
+    }
 
     debug_region_consistency(r_res);
 
-    if (!region_empty_p(r_res))
-	l_res = region_to_list(r_res);
-    else
-	/* no memory leak */
-	region_free(r_res);
+    /* FI: does work with anywhere effects? */
+    if (store_effect_p(r_res)) {
+	if(!region_empty_p(r_res))
+	  l_res = region_to_list(r_res);
+	else
+	  /* no memory leak */
+	  region_free(r_res);
+    }
 
     return(l_res);
 }
 
 list region_may_union(region r1, region r2)
 {
-    list l_res = NIL;
-    effect r_res;
+  list l_res = NIL;
+  effect r_res;
 
+  ifdebug(1) pips_assert("Effects r1 and r2 are union compatible",
+			 union_compatible_effects_p(r1,r2));
+
+  if(store_effect_p(r1) && store_effect_p(r2)) {
     if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
       r_res = make_anywhere_effect(effect_action(r1));
     else
       r_res = regions_may_convex_hull(r1, r2);
 
     if (!region_empty_p(r_res))
-	l_res = region_to_list(r_res);
+      l_res = region_to_list(r_res);
     else
-	/* no memory leak */
-	region_free(r_res);
+      /* no memory leak */
+      region_free(r_res);
+  }
+  else {
+    r_res = copy_effect(r1);
+  }
 
-    return(l_res);
+  return(l_res);
 }
 
 
@@ -433,10 +454,18 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2);
  * modifies : the basis of the predicates of r1 and r2
  * comment  : always computes the convex hull, even if it leads to a may
  *            approximation.
+ *
+ * FI: extension to support non-store effects without predicates
  */
 effect regions_must_convex_hull(region r1, region r2)
 {
-    region reg = r1;  /* result */
+  region reg = r1;  /* result */
+
+  if(!store_effect_p(r1)) {
+    /* proper_effects_combine() free the arguments of
+       region_sc_convex_hull() */
+    reg = copy_effect(r1);
+  } else {
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Psysteme volatile s1 = region_system(r1);
@@ -453,79 +482,79 @@ effect regions_must_convex_hull(region r1, region r2)
 		!(SC_UNDEFINED_P(s1) || SC_UNDEFINED_P(s2)));
 
     ifdebug(8)
-    {
+      {
 	pips_debug(8, "syste`mes initiaux\n");
 	sc_syst_debug(s1);
 	sc_syst_debug(s2);
-    }
+      }
 
     /* sc_empty : no part of the array is accessed */
     if (sc_empty_p(s1) && sc_empty_p(s2))
-    {
+      {
 	pips_debug(8, "s1 and s2 sc_empty\n");
 	reg = region_dup(r1);
 	region_approximation_tag(reg) = approximation_or(app1,app2);
 	return(reg);
-    }
+      }
 
     if (sc_empty_p(s1))
-    {
+      {
 	pips_debug(8, "s1 sc_empty\n");
 	reg = region_dup(r1);
 	sc_rm(region_system(reg));
 	region_system_(reg) = newgen_Psysteme(sc_dup(s2));
 	return(reg);
-    }
+      }
 
     if (sc_empty_p(s2))
-    {
+      {
 	pips_debug(8, "s2 sc_empty\n");
 	reg = region_dup(r1);
 	return(reg);
-    }
+      }
 
 
     /* sc_rn : the entire array is accessed */
-     if (sc_rn_p(s1) && sc_rn_p(s2))
-     {
+    if (sc_rn_p(s1) && sc_rn_p(s2))
+      {
 	pips_debug(8, "s1 and s2 sc_rn\n");
 	reg = region_dup(r1);
 	region_approximation_tag(reg) = approximation_or(app1,app2);
 	return(reg);
-    }
+      }
 
     if (sc_rn_p(s1))
-    {
+      {
 	pips_debug(8, "s1 sc_rn\n");
 	reg = region_dup(r1);
 	region_approximation_tag(reg) = is_approximation_may;
 	return(reg);
-    }
+      }
 
     if (sc_rn_p(s2))
-    {
+      {
 	pips_debug(8, "s2 sc_rn\n");
 	reg = region_dup(r1);
 	region_system_(reg) =  newgen_Psysteme(sc_dup(s2));
 	region_approximation_tag(reg) = app2;
 	return(reg);
-    }
+      }
 
 
-     /* otherwise, we have to compute the convex-hull of the two predicates */
+    /* otherwise, we have to compute the convex-hull of the two predicates */
     if (op_statistics_p()) nb_umust++;
 
     CATCH(overflow_error)
     {
-	pips_debug(1, "overflow error\n");
-	sr = sc_rn(base_dup(s1->base));
+      pips_debug(1, "overflow error\n");
+      sr = sc_rn(base_dup(s1->base));
     }
     TRY
-    {
+      {
 	sr = region_sc_convex_hull(s1, s2);
 	sc_nredund(&sr);
 	UNCATCH(overflow_error);
-    }
+      }
 
     /* to avoid problems in case of overflow error */
     appr = is_approximation_may;
@@ -536,122 +565,124 @@ effect regions_must_convex_hull(region r1, region r2)
      * the relations between the two initial systems of constraints */
 
     if(sc_rn_p(sr))
-    {
+      {
 	reference refr = copy_reference(region_any_reference(r1));
 	action acr = region_action(r1);
 
 	pips_debug(1, "sr sc_rn (maybe due to an overflow error)\n");
 
 	if (op_statistics_p())
-	{
+	  {
 	    if ((app1 == is_approximation_must) &&
 		(app2 == is_approximation_must))
-		nb_umust_must_must++;
+	      nb_umust_must_must++;
 	    else
-		if (!((app1 == is_approximation_may)
-		      && (app2 == is_approximation_may)))
-		    nb_umust_must_may++;
+	      if (!((app1 == is_approximation_may)
+		    && (app2 == is_approximation_may)))
+		nb_umust_must_may++;
 	    nb_umust_sc_rn++;
-	}
+	  }
 
 	/* we return a whole array region */
 	appr = is_approximation_may;
 	reg = reference_whole_region(refr, acr);
 	effect_to_may_effect(reg);
 	ifdebug(8)
-	{
+	  {
 	    pips_debug(8, "final region : \n");
 	    print_region(reg);
-	}
+	  }
 	sc_rm(sr);
 	sr = NULL;
 	return(reg);
-    }
+      }
     else
-    {
+      {
 	if(!must_regions_p())
-	{
+	  {
 	    pips_debug(8, "may regions\n");
 	    appr = is_approximation_may;
-	}
+	  }
 	else
-	{
+	  {
 	    switch (app1)
-	    {
-	    case is_approximation_must:
+	      {
+	      case is_approximation_must:
 
 		switch (app2)
-		{
-		case is_approximation_must: /* U_must(must, must) */
+		  {
+		  case is_approximation_must: /* U_must(must, must) */
 		    /* si enveloppe convexe (s1, s2) exacte must sinon may */
 		    if (sc_convex_hull_equals_union_p_ofl(sr,s1,s2))
-		    {
+		      {
 			pips_debug(8,"exact convex hull\n");
 			appr = is_approximation_must;
-		    }
+		      }
 		    else
-		    {
+		      {
 			pips_debug(8,"non exact convex hull\n");
 			appr = is_approximation_may;
-		    }
+		      }
 		    if (op_statistics_p())
-		    {
+		      {
 			nb_umust_must_must++;
 			if (appr == is_approximation_must)
-			    nb_umust_must_must_must++;
-		    }
+			  nb_umust_must_must_must++;
+		      }
 		    break;
 
-		case is_approximation_may: /* U_must(must,may) */
+		  case is_approximation_may: /* U_must(must,may) */
 		    if(sc_inclusion_p_ofl(s2,s1))
-			appr = is_approximation_must;
+		      appr = is_approximation_must;
 		    else
-			appr = is_approximation_may;
+		      appr = is_approximation_may;
 		    if (op_statistics_p())
-		    {
+		      {
 			nb_umust_must_may++;
 			if (appr == is_approximation_must)
-			    nb_umust_must_may_must++;
-		    }
+			  nb_umust_must_may_must++;
+		      }
 		    break;
-		}
+		  }
 		break;
-	    case is_approximation_may:
+	      case is_approximation_may:
 
 		switch (app2)
-		{
-		case is_approximation_must: /* U_must(may,must) */
+		  {
+		  case is_approximation_must: /* U_must(may,must) */
 		    if(sc_inclusion_p_ofl(s1,s2))
-			appr = is_approximation_must;
+		      appr = is_approximation_must;
 		    else
-			appr = is_approximation_may;
+		      appr = is_approximation_may;
 		    if (op_statistics_p())
-		    {
+		      {
 			nb_umust_must_may++;
 			if (appr == is_approximation_must)
-			    nb_umust_must_may_must++;
-		    }
+			  nb_umust_must_may_must++;
+		      }
 		    break;
-		case is_approximation_may:
+		  case is_approximation_may:
 		    appr = is_approximation_may;
 		    break;
-		}
+		  }
 		break;
-	    }
-	}
-    }
+	      }
+	  }
+      }
     reg = region_dup(r1);
     sc_rm(region_system(reg));
     region_system_(reg) = newgen_Psysteme(sr);
     region_approximation_tag(reg) = appr;
+  }
 
-    ifdebug(8)
+  ifdebug(8)
     {
-	pips_debug(8, "final region : \n");
-	print_region(reg);
+      pips_debug(8, "final region : \n");
+      print_region(reg);
+      pips_assert("reg is consistent", effect_consistent_p(reg));
     }
 
-    return(reg);
+  return(reg);
 
 }
 
@@ -669,7 +700,35 @@ effect regions_must_convex_hull(region r1, region r2)
  */
 static effect regions_may_convex_hull(region r1, region r2)
 {
+  /* region is a renaming of effect */
     region reg = r1;  /* result */
+
+    if(!store_effect_p(r1) || !store_effect_p(r2)) {
+      ifdebug(1) {
+	/* Consistency check on regions for action kinds environment
+	   and type declaration which should be put in a specific
+	   function to enlarge region consistency checks. */
+      action a1 = effect_action(r1);
+      action_kind ak1 = action_to_action_kind(a1);
+      action a2 = effect_action(r2);
+      action_kind ak2 = action_to_action_kind(a2);
+      descriptor d1 = effect_descriptor(r1);
+      descriptor d2 = effect_descriptor(r2);
+      entity e1 = effect_variable(r1);
+      entity e2 = effect_variable(r2);
+
+      pips_assert("r1 and r2 have the same action",
+		  action_tag(a1)==action_tag(a2));
+      pips_assert("r1 and r2 have the same action kind",
+		  action_kind_tag(ak1)==action_kind_tag(ak2));
+      pips_assert("r1 and r2 refers to the same variable",
+		  e1==e2);
+      pips_assert("r1 and r2 have no descriptor",
+		  descriptor_none_p(d1) && descriptor_none_p(d2));
+      }
+
+      reg = copy_effect(r1);
+    } else {
     Psysteme s1 = region_system(r1);
     Psysteme s2 = region_system(r2);
     Psysteme sr;
@@ -815,6 +874,7 @@ static effect regions_may_convex_hull(region r1, region r2)
 	    if (appr == is_approximation_must) nb_umay_must++;
 	}
     }
+    }
 
     ifdebug(8)
     {
@@ -854,7 +914,10 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
 list /* of region */
 region_intersection(region reg1, region reg2)
 {
-    list l_res = NIL;
+  list l_res = NIL;
+
+  if(store_effect_p(reg1) && store_effect_p(reg2)) {
+    /* FI: Standard procedure for memory/store regions */
     Psysteme sc1 = region_system(reg1);
     Psysteme sc2 = region_system(reg2);
     tag app1 = region_approximation_tag(reg1);
@@ -929,6 +992,14 @@ region_intersection(region reg1, region reg2)
 	    l_res = NIL;
 	  }
       }
+  } else {
+    /* FI: extensions for the new action kinds on environment and
+       store. Since they are combinable, reg1==reg2 and hence their
+       intersection is equal to reg1 */
+    effect reg = copy_effect(reg1);
+    l_res = CONS(EFFECT, reg, NIL);
+  }
+
     ifdebug(3)
       {
 	pips_debug(3,"final region :\n");
@@ -977,6 +1048,9 @@ static list disjunction_to_list_of_regions(Pdisjunct disjonction, effect reg,
  */
 list region_sup_difference(region reg1, region reg2)
 {
+  list l_reg = NIL;
+  if(store_effect_p(reg1) && store_effect_p(reg2)) {
+    /* This is the traditional case, limited to store/memory regions */
     Psysteme sc1, sc2;
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
@@ -986,19 +1060,18 @@ list region_sup_difference(region reg1, region reg2)
     /* approximation of the resulting regions if the difference is exact */
     tag app = -1;
     region reg;
-    list l_reg = NIL;
 
 
     /* At this point, we are sure that we have array regions */
 
     ifdebug(6)
-    {
+      {
 	pips_debug(6, "Initial regions : \n");
 	fprintf(stderr,"\t reg1 :\n");
 	print_region(reg1);
 	fprintf(stderr,"\t reg2 :\n");
 	print_region(reg2);
-    }
+      }
 
     if (anywhere_effect_p(reg1))
       {
@@ -1009,7 +1082,7 @@ list region_sup_difference(region reg1, region reg2)
       {
 	reg = (*effect_dup_func)(reg1);
 	l_reg = region_to_may_region_list(reg);
-       }
+      }
     else
       {
 
@@ -1112,15 +1185,40 @@ list region_sup_difference(region reg1, region reg2)
 	    break;
 	  }
       }
+  } else {
+    /* FI: Here we do need to extend the concept to environment and
+       type declaration effect. I
+       assume that the effect variable is the same, else the
+       difference would be meaningless. If the action_kind is the
+       same, then the difference must be empty, as I hope is the case
+       for scalara variables in the above code. Else r1 is unchanged. */
+    action a1 = effect_action(reg1);
+    action a2 = effect_action(reg2);
+    action_kind ak1 = action_to_action_kind(a1);
+    action_kind ak2 = action_to_action_kind(a2);
+    if(action_kind_tag(ak1)==action_kind_tag(ak2)) {
+      /* The output list is empty and stays empty */
+      l_reg = NIL; // redundant, but improves readability
+    }
+    else if(action_kind_tag(ak1)==is_action_kind_store
+	    || action_kind_tag(ak2)==is_action_kind_store)
+      pips_internal_error("Unexpected mix of action kinds.\n");
+    else {
+      /* reg1 is not modified by reg2 */
+      /* This also could be considered an internal error */
+      effect reg = copy_effect(reg1);
+      l_reg = CONS(EFFECT, reg, NIL);
+    }
+  }
 
-    ifdebug(6)
-      {
-	pips_debug(6, "Resulting regions : \n");
-	fprintf(stderr,"\t l_reg :\n");
-	print_regions(l_reg);
-      }
+  ifdebug(6)
+    {
+      pips_debug(6, "Resulting regions : \n");
+      fprintf(stderr,"\t l_reg :\n");
+      print_regions(l_reg);
+    }
 
-    return l_reg;
+  return l_reg;
 }
 
 

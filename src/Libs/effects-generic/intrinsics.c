@@ -950,7 +950,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {RAND_FUNCTION_NAME,                     rgs_effects},
   {SRAND_FUNCTION_NAME,                    rgsi_effects},
   {CALLOC_FUNCTION_NAME,                   no_write_effects},
-  {FREE_FUNCTION_NAME,                     any_heap_effects},  
+  {FREE_FUNCTION_NAME,                     any_heap_effects},
   {MALLOC_FUNCTION_NAME,                   any_heap_effects},
   {REALLOC_FUNCTION_NAME,                  any_heap_effects},
   {ABORT_FUNCTION_NAME,                    no_write_effects},
@@ -961,7 +961,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {SYSTEM_FUNCTION_NAME,                   no_write_effects},
   {BSEARCH_FUNCTION_NAME,                  no_write_effects},
   {QSORT_FUNCTION_NAME,                    no_write_effects},
-  {ABS_FUNCTION_NAME,                      no_write_effects},
+  {C_ABS_FUNCTION_NAME,                    no_write_effects},
   {LABS_FUNCTION_NAME,                     no_write_effects},
   {LLABS_FUNCTION_NAME,                    no_write_effects},
   {DIV_FUNCTION_NAME,                      no_write_effects},
@@ -1001,6 +1001,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     no_write_effects},
+  {CLOCK_FUNCTION_NAME,                    no_write_effects},
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_effects},
@@ -1178,41 +1179,6 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
-
-  /*#include <time.h>*/
-  {TIME_FUNCTION_NAME,                           no_write_effects},
-  {CLOCK_FUNCTION_NAME,                           no_write_effects},
-
-  /*#include <wchar.h>*/
-  {FWSCANF_FUNCTION_NAME,                          c_io_effects},
-  {SWSCANF_FUNCTION_NAME,                          c_io_effects},
-  {WSCANF_FUNCTION_NAME,                           c_io_effects},
-
-  /*#include <string.h>*/
-
-  {MEMCPY_FUNCTION_NAME,                           no_write_effects},
-  {MEMMOVE_FUNCTION_NAME,                          no_write_effects},
-  {MEMCMP_FUNCTION_NAME,                           no_write_effects},
-  {MEMSET_FUNCTION_NAME,                           no_write_effects},
-  {STRCMP_FUNCTION_NAME,                           no_write_effects},
-  {STRCPY_FUNCTION_NAME,                           no_write_effects},
-  {STRNCPY_FUNCTION_NAME,                          no_write_effects},
-  {STRCAT_FUNCTION_NAME,                           no_write_effects},
-  {STRNCAT_FUNCTION_NAME,                          no_write_effects},
-  {STRLEN_FUNCTION_NAME,                           no_write_effects},
-  {STRCOLL_FUNCTION_NAME,                          no_write_effects},
-  {STRNCMP_FUNCTION_NAME,                          no_write_effects},
-  {STRXFRM_FUNCTION_NAME,                          no_write_effects},
-  {MEMCHR_FUNCTION_NAME,                           no_write_effects},
-  {STRCHR_FUNCTION_NAME,                           no_write_effects},
-  {STRCSPN_FUNCTION_NAME,                          no_write_effects},
-  {STRPBRK_FUNCTION_NAME,                          no_write_effects},
-  {STRRCHR_FUNCTION_NAME,                          no_write_effects},
-  {STRSPN_FUNCTION_NAME,                           no_write_effects},
-  {STRSTR_FUNCTION_NAME,                           no_write_effects},
-  {STRTOK_FUNCTION_NAME,                           no_write_effects},
-  {STRERROR_FUNCTION_NAME,                         no_write_effects},
-  {STRERROR_R_FUNCTION_NAME,                       no_write_effects},
 
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},

@@ -194,6 +194,26 @@ void prettyprint_dependence_graph( FILE * fd,
       statement s2 = vertex_to_statement( v2 );
       dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
+      /* If we have zero printable conflicts, move on.
+       *
+       * If we have more than one conflict, let's sort them !
+       *
+       * FI: the number of conflicts should take into account the
+       * filtering due to PRETTYPRINT_MEMORY_EFFECTS_ONLY
+       */
+      list cl = dg_arc_label_conflicts(dal);
+      int nb_conflicts = gen_length(cl);
+      if(get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
+	FOREACH(CONFLICT, c, cl) {
+	  effect efsrc = conflict_source(c);
+	  if(!store_effect_p(efsrc))
+	    nb_conflicts--;
+	}
+      }
+
+      if(nb_conflicts==0)
+	continue;
+
       if ( !sru_format_p || statement_undefined_p(mod_stat) ) {
         /* Modification at revision 12484 because statement
          numbers were not initialized by C parser, with no
@@ -208,14 +228,13 @@ void prettyprint_dependence_graph( FILE * fd,
         fprintf( fd, " %02td with conflicts\n", statement_number(s2) );
       }
 
-      /*
-       * If we have more than one conflict, let's sort them !
-       */
-      int nb_conflicts = gen_length(dg_arc_label_conflicts(dal));
       if ( nb_conflicts > 1 ) {
         /*
          * Convert the list to an array for sorting
-         * 20 is the initial size, should be enough for most of the case
+         * 20 is the initial size, should be enough for most cases
+	 *
+	 * FI: should generate a bug anytime when calls are
+	 * involved. At least use dependent types... or pass gen_length()
          */
         gen_array_t conflicts_array = gen_array_make( 20 );
         list_to_array( dg_arc_label_conflicts(dal), conflicts_array );
@@ -234,6 +253,13 @@ void prettyprint_dependence_graph( FILE * fd,
        */
       for ( pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc) ) {
         conflict c = CONFLICT(CAR(pc));
+	effect efsrc = conflict_source(c);
+	effect efsink = conflict_sink(c);
+
+	/* FI: I should use another property, specific to the use-def
+	   chains, but this is quite close */
+	if(store_effect_p(efsrc)
+	   || !get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
 
         /* if (!entity_scalar_p(reference_variable
          (effect_any_reference(conflict_source(c))))) {
@@ -340,6 +366,7 @@ void prettyprint_dependence_graph( FILE * fd,
             fprintf( fd, " levels()" );
         }
         fprintf( fd, "\n" );
+	}
       }
     }
   }
