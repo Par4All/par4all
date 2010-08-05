@@ -1,0 +1,76 @@
+
+Parsed printed file for "malloc01"
+
+int main()
+{
+   int i, n;
+   char *buffer;
+
+   printf("How long do you want the string? ");
+   scanf("%d", &i);
+
+   buffer = (char *) malloc(i+1);
+   if (buffer==(void *) 0) 
+      exit(1);
+
+   for (n = 0;n<i;n++)
+      buffer[n] = rand()%26+'a';
+   buffer[i] = '\0';
+
+   printf("Random string: %s\n", buffer);
+   free(buffer);
+
+   return 0;
+}
+
+Cumulated effetcs for "malloc01"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[1]
+int main()
+{
+   int i, n;
+   char *buffer;
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("How long do you want the string? ");
+//               <must be written>: i
+   scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buffer
+
+   buffer = (char *) malloc(i+1);
+//               <must be read   >: buffer
+   if (buffer==(void *) 0) 
+      exit(1);
+//               <may be read    >: _RANDOM_EFFECTS:GEN_SEED buffer n
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i
+
+   for(n = 0; n <= i-1; n += 1)
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED buffer i 
+//                                  n
+      buffer[n] = rand()%26+'a';
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: buffer i
+   buffer[i] = '\0';
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("Random string: %s\n", buffer);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ buffer
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+   free(buffer);
+
+   return 0;
+}

@@ -1,0 +1,23 @@
+delete const01
+
+create const01 const01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "const01"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "const01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete const01
+quit
+
