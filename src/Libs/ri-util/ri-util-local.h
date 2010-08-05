@@ -1566,6 +1566,9 @@
 
    To sum up, this predicate does not imply that entity e represents a
    variable declared in the source code by the programmer.
+
+   See also the function variable_entity_p() which checks the storage
+   of the entity.
  */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 

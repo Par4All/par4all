@@ -485,7 +485,7 @@ bool entity_abstract_location_p(entity al)
 
    This does not work for formal parameters or, if it works, the
    caller module is not known and the resulting abstract location is
-   very large. A larga abstract location is returned.
+   very large. A large abstract location is returned.
 
    No idea to model return values... even though they are located in
    the stack in real world.

@@ -979,3 +979,15 @@ bool union_compatible_effects_p(effect ef1, effect ef2)
 
   return compatible_p;
 }
+
+/* Returns the entity corresponding to the mutation. It could be
+   called effect_to_variable(), but effects are sometimes summarized
+   with abstract locations, i.e. sets of locations. */
+entity effect_to_entity(effect ef)
+{
+  /* FI unlikely to work with GAPs */
+  reference r = effect_any_reference(ef);
+  entity e = reference_variable(r);
+
+  return e;
+}

@@ -214,12 +214,11 @@ static bool init_one_statement( statement st ) {
   return TRUE;
 }
 
-/* The GENKILL_xxx functions implement the computation of GEN, REF and 
- KILL sets
- from Aho, Sethi and Ullman "Compilers" (p. 612). This is slightly
- more complex since we use a structured control graph, thus fixed
- point computations can be recursively required (the correctness of
- this is probable, although not proven, as far as I can tell). */
+/* The GENKILL_xxx functions implement the computation of GEN, REF and
+ KILL sets from Aho, Sethi and Ullman "Compilers" (p. 612). This is
+ slightly more complex since we use a structured control graph, thus
+ fixed point computations can be recursively required (the correctness
+ of this is probable, although not proven, as far as I can tell). */
 
 /* KILL_STATEMENT updates the KILL set of statement ST on entity LHS. Only
  effects that modify one reference (i.e., assignments) are killed (see
@@ -1123,7 +1122,8 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     _int stin_o = statement_ordering(stin);
     _int stout_o = statement_ordering(stout);
     fprintf( stderr,
-	     "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
+	     "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s"
+	     " for \"%s\"\n",
 	     statement_number(stin),
 	     ORDERING_NUMBER(stin_o),
 	     ORDERING_STATEMENT(stin_o),
@@ -1132,7 +1132,8 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 	     ORDERING_NUMBER(stout_o),
 	     ORDERING_STATEMENT(stout_o),
 	     stout,
-	     ( which == ud ) ? "ud" : "dd_du" );
+	     ( which == ud ) ? "ud" : "dd_du",
+	     entity_local_name(effect_to_entity(fin)));
   }
   vin = vertex_statement( stin );
 
