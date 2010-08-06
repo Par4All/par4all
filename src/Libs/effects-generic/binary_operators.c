@@ -280,7 +280,7 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
     effect current = effect_undefined;
     string n;
     tag a;
-    action ak;
+    action_kind ak;
     bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
@@ -295,7 +295,7 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
       (w=effect_words_reference(effect_any_reference(current)));
     gen_map(free,w);gen_free_list(w);
     /* Do not combine effects of different kinds: use the kind in the key */
-    n = strdup(concatenate(rn, " ", action_kind_to_string(ak)));
+    asprintf(&n,"%s %s",rn,action_kind_to_string(ak));
     free(rn);
     a = effect_action_tag(current);
 

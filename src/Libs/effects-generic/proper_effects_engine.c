@@ -850,7 +850,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    if(typedef_type_p(ct)) {
 	      entity te = basic_typedef(variable_basic(type_variable(ct)));
 	      effect tre = make_declaration_effect(te, FALSE); // type
-	      *pme = gen_nconc(*pme, CONS(EFFECT, tre, NIL));
+	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
 	    }
 	  }
       s_exp = cast_expression(syntax_cast(s));

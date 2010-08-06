@@ -254,7 +254,6 @@ void prettyprint_dependence_graph( FILE * fd,
       for ( pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc) ) {
         conflict c = CONFLICT(CAR(pc));
 	effect efsrc = conflict_source(c);
-	effect efsink = conflict_sink(c);
 
 	/* FI: I should use another property, specific to the use-def
 	   chains, but this is quite close */

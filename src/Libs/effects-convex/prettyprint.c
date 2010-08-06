@@ -360,7 +360,6 @@ get_text_out_regions(string module_name)
  */
 static void print_regions_with_action(list pc, string ifread, string ifwrite)
 {
-  list lr;
   set_action_interpretation(ifread, ifwrite);
 
   if (pc == NIL) {

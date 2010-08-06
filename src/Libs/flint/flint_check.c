@@ -479,7 +479,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
     sefs_list = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
-    pips_debug(7, "summary effects list for %s (%x)\n",
+    pips_debug(7, "summary effects list for %s (%p)\n",
 	       module_name, sefs_list);
 
     for (i = 1; i <= len; i++) {
