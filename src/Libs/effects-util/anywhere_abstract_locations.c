@@ -12,12 +12,12 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
-#include "properties.h" 
+#include "properties.h"
 
 /*
 The ANYWHERE lattice is shown in the figure:
 
-                            *ANYWHERE*:*ANYWHERE*
+                            *ANY_MODULE*:*ANYWHERE*
                                       |
                       --------------------------------------------------
                       |                                 |
@@ -32,10 +32,11 @@ The ANYWHERE lattice is shown in the figure:
                  \    |      /
                   --- --------------------------------------------------
                                       |
-		             *NOWHERE*:*NOWHERE*
+		             *ANY_MODULE*:*NOWHERE*
 
 It is used to modelize the anywhere abstract locations, but some
-lements are missing such as *ANYWHERE*:*HEAP*, *ANYWHERE*:*STACK*, etc.
+elements are missing such as *ANYWHERE*:*HEAP*, *ANYWHERE*:*STACK*,
+etc.
 
 All the generating functions for this lattice return an
 entity, but the API can be easily translated at the reference or the
@@ -116,7 +117,10 @@ bool entity_nowhere_locations_p(entity e)
   return nowhere_p;
 }
 
-/* return the NULL/UNDEFINED POINTER...*/
+/* return the NULL/UNDEFINED POINTER...
+ *
+ * FI: why isn't it called entity_null_location()?
+ */
 entity entity_null_locations()
 {
   entity null_pointer = entity_undefined;
@@ -166,7 +170,8 @@ entity entity_all_module_locations(entity m)
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
-    anywhere = make_entity(ALL_MEMORY_ENTITY_NAME,
+    /* FI: any_name? */
+    anywhere = make_entity(any_name /*ALL_MEMORY_ENTITY_NAME*/,
 			   t, make_storage_rom(), make_value_unknown());
   }
 
@@ -784,7 +789,8 @@ entity entity_locations_dereference(entity al __attribute__ ((__unused__)))
   * @brief Do these two abstract locations MUST share some real memory
   * locations ? Never ! DO NOT USE THIS FUNCTION UNLESS...
   */
- bool abstract_locations_must_conflict_p(entity al1, entity al2)
+bool abstract_locations_must_conflict_p(entity al1 __attribute__ ((__unused__)),
+					entity al2 __attribute__ ((__unused__)))
  {
 
    /* The function is useful in functional drivers to avoid dealing

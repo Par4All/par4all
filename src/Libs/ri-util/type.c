@@ -4176,6 +4176,37 @@ string qualifier_to_string(qualifier q)
   return s;
 }
 
+/* Check that a qualifier list contains the const qualifier */
+bool qualifiers_const_p(list ql)
+{
+  bool const_p = FALSE;
+  FOREACH(QUALIFIER, q, ql) {
+    if(qualifier_const_p(q)) {
+      const_p = TRUE;
+      break;
+    }
+  }
+  return const_p;
+}
+
+/* Is there a const qualifier associated to type t
+ *
+ * FI: this should be extended in case const can be carried by a
+ * typedef, but this first version should be enough for Molka.
+ */
+bool type_with_const_qualifier_p(type t)
+{
+  bool qualifier_p = FALSE;
+
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list ql = variable_qualifiers(v);
+    qualifier_p = qualifiers_const_p(ql);
+  }
+
+  return qualifier_p;
+}
+
 
 /* returns the type associated to se. If se can be evaluated as n,
    returns the type of the nth field in the field list. If se is a

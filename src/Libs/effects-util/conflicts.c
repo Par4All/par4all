@@ -540,8 +540,12 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
     else if ( entity_variable_p(e2) ) {
       if ( variable_return_p( e2 ) )
 	conflict_p = FALSE;
-      else if ( entity_formal_p( e2 ) )
-	conflict_p = FALSE;
+      else if ( entity_formal_p( e2 ) ) {
+	/* FI: Either we need an new abstract location for the formal
+	   parameters or we need to deal explictly with this case
+	   here and declare conflict with *anywhere*. */
+	conflict_p = entity_all_locations_p(e1);
+      }
       else {
 	entity al2 = variable_to_abstract_location( e2 );
 	conflict_p = abstract_locations_conflict_p( e1, al2 );
@@ -555,8 +559,10 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
       if ( entity_variable_p(e1) ) {
 	if ( variable_return_p( e1 ) )
 	  conflict_p = FALSE;
-	else if ( entity_formal_p( e1 ) )
-	  conflict_p = FALSE;
+	else if ( entity_formal_p( e1 ) ) {
+	  /* FI: same comment as above*/
+	  conflict_p = entity_all_locations_p(e1);
+	}
 	else {
 	  entity al1 = variable_to_abstract_location( e1 );
 	  conflict_p = abstract_locations_conflict_p( al1, e2 );
