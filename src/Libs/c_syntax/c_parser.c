@@ -340,11 +340,7 @@ static bool actual_c_parser(string module_name,
 
     /* Predefined type(s): __builtin_va_list */
     built_in_va_list =
-      find_or_create_entity(strdup(concatenate(compilation_unit_name,
-					       MODULE_SEP_STRING,
-					       TYPEDEF_PREFIX,
-					       "__builtin_va_list",
-					       NULL)));
+        FindOrCreateEntity(compilation_unit_name,TYPEDEF_PREFIX "__builtin_va_list" );
     if(storage_undefined_p(entity_storage(built_in_va_list))) {
       entity_storage(built_in_va_list) = make_storage_rom();
       /* Let's lie about the real type */
@@ -356,11 +352,7 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_list) = make_value_unknown();
     }
     built_in_bool =
-      find_or_create_entity(strdup(concatenate(compilation_unit_name,
-					       MODULE_SEP_STRING,
-					       TYPEDEF_PREFIX,
-					       "_Bool",
-					       NULL)));
+        FindOrCreateEntity(compilation_unit_name,TYPEDEF_PREFIX "_Bool");
     if(storage_undefined_p(entity_storage(built_in_bool))) {
       entity_storage(built_in_bool) = make_storage_rom();
       entity_type(built_in_bool) =
@@ -370,11 +362,7 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_bool) = make_value_unknown();
     }
     built_in_complex =
-      find_or_create_entity(concatenate(compilation_unit_name,
-					       MODULE_SEP_STRING,
-					       TYPEDEF_PREFIX,
-					       "_Complex",
-					       NULL));
+        FindOrCreateEntity(compilation_unit_name,TYPEDEF_PREFIX "_Complex");
     if(storage_undefined_p(entity_storage(built_in_complex))) {
       entity_storage(built_in_complex) = make_storage_rom();
       entity_type(built_in_complex) =
@@ -386,10 +374,7 @@ static bool actual_c_parser(string module_name,
 
     /* Predefined functions(s): __builtin_va_end (va_arg() is parsed directly) */
     built_in_va_start =
-      find_or_create_entity(strdup(concatenate(compilation_unit_name,
-					       MODULE_SEP_STRING,
-					       BUILTIN_VA_START,
-					       NULL)));
+      FindOrCreateEntity(compilation_unit_name,BUILTIN_VA_START);
     if(storage_undefined_p(entity_storage(built_in_va_start))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t =
@@ -415,10 +400,8 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_start) = make_value_intrinsic();
     }
 
-    built_in_va_end = find_or_create_entity(concatenate(compilation_unit_name,
-							    MODULE_SEP_STRING,
-							    BUILTIN_VA_END,
-							    NULL));
+    built_in_va_end = 
+        FindOrCreateEntity(compilation_unit_name,BUILTIN_VA_END);
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t =
@@ -436,10 +419,8 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_end) = make_value_intrinsic();
     }
 
-    built_in_va_copy = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-							    MODULE_SEP_STRING,
-							    BUILTIN_VA_COPY,
-							    NULL)));
+    built_in_va_copy = 
+        FindOrCreateEntity(compilation_unit_name,BUILTIN_VA_COPY);
     if(storage_undefined_p(entity_storage(built_in_va_copy))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t =

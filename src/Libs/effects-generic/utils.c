@@ -1301,6 +1301,8 @@ int *result)
 }
 
 
+/* do not reuse l_eff after calling this function
+ */
 list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 {
 
@@ -1371,7 +1373,8 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 	       /* if we have found no modifiying pointer, we keep the effect */
 	       if (!found)
 		 {
-		   /* is the copy necessary ?*/
+		   /* is the copy necessary ?
+            * sg: yes, to be consistent with other branches of the test */
 		   l_res = gen_nconc(l_res, CONS(EFFECT,(*effect_dup_func)(eff) , NIL));
 
 		 }
@@ -1387,7 +1390,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
 	 } /* if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))*/
        else
-	 l_res = l_eff;
+	 l_res = l_eff; 
      } /* if (l_eff !=NIL) */
 
    return l_res;

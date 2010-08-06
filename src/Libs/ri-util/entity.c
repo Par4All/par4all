@@ -1168,6 +1168,8 @@ entity FindEntity( const char* package, const char* name ) {
  * renvoie son indice dans la table des entites, sinon on cree une entite vide
  * qu'on remplit partiellement.
  *
+ * full_name est dupliqué.
+ *
  * Modifications:
  *  - partial link at parse time for global entities (Remi Triolet?)
  *  - partial link limited to non common variables (Francois Irigoin,

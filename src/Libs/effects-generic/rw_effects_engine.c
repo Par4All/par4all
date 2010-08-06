@@ -361,13 +361,13 @@ static void rw_effects_of_loop(loop l)
 	(*effects_prettyprint_func)(l_body);
     }
     /* Loop body must not have a write effect on the loop index */
-    MAP(EFFECT, ef, {
+    FOREACH(EFFECT, ef, l_body) {
       if(effect_entity(ef)==i && action_write_p(effect_action(ef)))
 	pips_user_error("Index %s of loop %s defined in loop body. "
 			"Fortran 77 standard violation, see Section 11.10.5.\n",
 			entity_local_name(i),
 			label_local_name(loop_label(l)));
-    }, l_body);
+    }
 
     /* effects on locals are unconditionnaly masked */
     list tmp = effects_dup_without_variables(l_body, loop_locals(l));
