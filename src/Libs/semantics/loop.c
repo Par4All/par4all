@@ -740,8 +740,11 @@ transformer add_loop_index_initialization(transformer tf,
     transformer post = transformer_undefined;
     transformer t_init = transformer_undefined;
     list lef = expression_to_proper_effects(init);
+    transformer pre_r = transformer_range(pre);
 
-    t_init = any_scalar_assign_to_transformer(i, init, lef, pre);
+    t_init = any_scalar_assign_to_transformer(i, init, lef, pre_r);
+    free_transformer(pre_r);
+
     if(t_init==transformer_undefined)
 	t_init = effects_to_transformer(lef);
     post = transformer_apply(t_init, tf);
