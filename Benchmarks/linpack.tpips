@@ -1,5 +1,8 @@
 delete linpack
-create linpack linpack.c include/clock.c
+create linpack linpack.c 
+
+# clock is a C intrinsics
+# include/clock.c
 
 setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
