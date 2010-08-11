@@ -2536,6 +2536,29 @@ bool standard_long_integer_type_p(type t)
   return long_p;
 }
 
+bool scalar_integer_type_p(type t)
+{
+  bool long_p = FALSE;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_int_p(b)) {
+      int s = basic_int(b);
+
+      long_p = ENDP(variable_dimensions(v));
+      /* The qualifiers do not matter
+	&& ENDP(variable_qualifiers(v))
+      */
+      /* unsigned are as OK as signed */ /*
+	&& (s == DEFAULT_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+	  */
+    }
+  }
+  return long_p;
+}
+
 type make_standard_long_integer_type(type t)
 {
   if (t == type_undefined)

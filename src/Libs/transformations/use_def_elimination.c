@@ -707,6 +707,8 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
  * @param elem  element to check (any gen_recursifiable type is allowded)
  *
  * @return set of referenced entities
+ *
+ * FI: should be moved into ri-util?
  */
 set get_referenced_entities(void* elem)
 {

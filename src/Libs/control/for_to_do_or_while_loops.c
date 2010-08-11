@@ -522,12 +522,16 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
     statement body  = forloop_body(theloop);
 
     set cond_entities = get_referenced_entities(cond);
+    /* This does not filter scalar integers... */
     set incr_entities = get_referenced_entities(incr);
     set cond_inter_incr_entities = set_make(set_pointer);
     cond_inter_incr_entities = set_intersection(cond_inter_incr_entities,incr_entities,cond_entities);
 
     SET_FOREACH(entity,loop_index,cond_inter_incr_entities)
     {
+      /* Consider only scalar integer variables as loop indices */
+      type lit = ultimate_type(entity_type(loop_index));
+      if(scalar_integer_type_p(lit) /* && type_depth(lit)==1*/ ) {
         if(!guess_write_effect_on_entity(body,loop_index))
         {
             bool is_upper_p,is_increasing_p;
@@ -605,6 +609,7 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                 }
             }
         }
+      }
     }
     set_free(cond_entities);
     set_free(incr_entities );
