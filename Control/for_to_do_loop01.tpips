@@ -1,3 +1,5 @@
+delete ftdl01
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create ftdl01 for_to_do_loop01.c

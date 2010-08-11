@@ -1,0 +1,15 @@
+delete forloop-with-float-index
+create forloop-with-float-index forloop-with-float-index.c
+
+echo
+echo // Output from parser (PARSED_PRINTED_FILE)
+echo
+display PARSED_PRINTED_FILE[loop]
+
+echo
+echo // Output from controlizer (PRINTED_FILE)
+echo
+display PRINTED_FILE[loop]
+
+close
+quit
