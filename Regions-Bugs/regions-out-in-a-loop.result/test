@@ -1,0 +1,52 @@
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+void compute(int a[100000], int b[100000], int c[100000])
+{
+   int i;
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+   for(i = 0; i <= 99999; i += 1)
+
+//  <a[PHI1]-OUT-MAY-{PHI1==i, 0<=i, i<=99999}>
+
+      a[i] += b[i]+c[i];
+}
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+void compute_clone(int a[100000], int b[100000], int c[100000])
+{
+   int i;
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+   for(i = 0; i <= 99999; i += 1)
+
+//  <a[PHI1]-OUT-MAY-{PHI1==i, 0<=i, i<=99999}>
+
+      a[i] += b[i]+c[i];
+}
+int main()
+{
+   int a[100000], b[100000], c[100000];
+   int i;
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+
+   compute(a, b, c);
+
+   for(i = 0; i <= 99; i += 0.1)
+
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
+
+      compute_clone(a, b, c);
+}
+void compute(int a[100000], int b[100000], int c[100000]);
+
+void compute_clone(int a[100000], int b[100000], int c[100000]);
+
+
+int main();
