@@ -937,11 +937,11 @@ sc_simplexe_feasibility_ofl_ctrl(
   
     saved_base = sc_base(sc);
     saved_dimension = sc_dimension(sc);
-    sc_base(sc) = BASE_NULLE;   
-    
+    sc_base(sc) = BASE_NULLE;
+
     sc_creer_base(sc);
 
-    
+
     /* Allocation a priori du tableau des egalites.
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
      */
@@ -952,52 +952,51 @@ sc_simplexe_feasibility_ofl_ctrl(
     /* DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
        sc_fprint(stdout, sc, default_variable_to_string);)*/
 
-    
     DEBUG(simplex_sc_counter ++;
-	  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
-	  sc_default_dump(sc);/*sc_default_dump_to_file(); print to file	  */
-    )
+		  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
+		  sc_default_dump(sc);/*sc_default_dump_to_file(); print to file	  */
+	  );
 
     /* the input Psysteme must be consistent; this is not the best way to
      * do this; array bound checks should be added instead in proper places;
      * no time to do it properly for the moment. BC.
      */
-    assert(sc_weak_consistent_p(sc));
+	linear_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
 
     /* Do not allocate place for NULL constraints */
     NB_EQ = 0;
     NB_INEQ = 0;
-    for(pc_tmp = sc->egalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    for(pc_tmp = sc->egalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ)
     {
 	if (pc_tmp->vecteur != NULL)
 	    NB_EQ++;
     }
-    for(pc_tmp = sc->inegalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    for(pc_tmp = sc->inegalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ)
     {
 	if (pc_tmp->vecteur != NULL)
 	    NB_INEQ++;
     }
-    
+
     CATCH(simplex_arithmetic_error|timeout_error|overflow_error)
     {
       /*      ifscdebug(2) {
 	fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
 	}
       */
-      DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n");)
-      
+      DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n"););
+
 	for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ) {
 	  hashtable[i].nom =  VARIABLE_UNDEFINED ;
 	  hashtable[i].numero = 0 ;
 	  hashtable[i].hash = 0 ;
 	  hashtable[i].val = (Value)0 ;
 	}
-      
-      for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
-	free(t[i].colonne); 
-      free(t); 
-      free(nlle_colonne);  
-                  
+
+      for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)
+	free(t[i].colonne);
+      free(t);
+      free(nlle_colonne);
+
       /* restore initial base */
       base_rm(sc_base(sc));
       sc_base(sc) = saved_base;
@@ -1007,7 +1006,7 @@ sc_simplexe_feasibility_ofl_ctrl(
       alarm(0); /*clear the alarm*/
 #endif
 
-      if (ofl_ctrl == FWD_OFL_CTRL) {	
+      if (ofl_ctrl == FWD_OFL_CTRL) {
 	RETHROW(); /*rethrow whatever the exception is*/
       }
       /*THROW(user_exception_error);*/
@@ -1026,8 +1025,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 #ifdef CONTROLING
     /*start the alarm*/
     if (CONTROLING_TIMEOUT_SIMPLEX) {
-      signal(SIGALRM, controling_catch_alarm_Simplex);   
-      alarm(CONTROLING_TIMEOUT_SIMPLEX);    
+      signal(SIGALRM, controling_catch_alarm_Simplex);
+      alarm(CONTROLING_TIMEOUT_SIMPLEX);
     } /*else nothing*/
 #endif
 
@@ -1046,10 +1045,10 @@ sc_simplexe_feasibility_ofl_ctrl(
      * - colonne 1 : le terme constant (composante de poids M)
      * - colonnes 2 et suivantes : les elements initiaux
      *   et les termes d'ecart
-     * Le tableau a une derniere colonne temporaire pour 
+     * Le tableau a une derniere colonne temporaire pour
      *  pivoter un vecteur unitaire.
      *     */
-    
+
     t = (tableau*)malloc((3 + NB_INEQ + NB_EQ + DIMENSION)*sizeof(tableau));
     for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) {
         t[i].colonne= (frac*) malloc((4 + 2*NB_EQ + NB_INEQ)*sizeof(frac)) ;
@@ -1063,26 +1062,26 @@ sc_simplexe_feasibility_ofl_ctrl(
     nbvariables= 0 ;
     /* Initialisation de l'objectif */
 
-    for(i=0;i<=1;i++) 
+    for(i=0;i<=1;i++)
 	objectif[i].num=VALUE_ZERO, objectif[i].den=VALUE_ONE;
-	
+
     DEBUG2(dump_hashtable(hashtable);)
-	
+
     /* Entree des inegalites dans la table */
-    
-    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++) 
+
+    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++)
     {
 	pv=pc->vecteur;
 	if (pv!=NULL) /* skip if empty */
 	{
 	    valeur = VALUE_ZERO ;
 	    poidsM = VALUE_ZERO ;
-	    for(; pv !=0 ; pv=pv->succ) 
+	    for(; pv !=0 ; pv=pv->succ)
 		if(vect_coeff(pv->var,sc_base(sc)))
 		    value_addto(poidsM,pv->val) ;
 		else
 		    valeur = value_uminus(pv->val) ; /* val terme const */
-	    
+
 	    for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
 		if(value_notzero_p(vect_coeff(pv->var,sc_base(sc)))) {
 		    h = hash((Variable)  pv->var) ; trouve=0 ;
@@ -1101,7 +1100,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 			hashtable[h].nom=pv->var ;
 			CREVARVISIBLE ;
 		    }
-		    assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
+		    linear_assert("current NUMERO in bound",
+						  (NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
 		    if (value_neg_p(poidsM) || 
 			(value_zero_p(poidsM) && value_neg_p(valeur)))
 			{value_addto(t[NUMERO].colonne[0].num,pv->val),
@@ -1205,16 +1205,17 @@ sc_simplexe_feasibility_ofl_ctrl(
                     CREVARVISIBLE ;
                     hashtable[h].nom=pv->var ;
                 }
-		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
-                if(value_neg_p(poidsM) || 
+				linear_assert("current NUMERO in bound",
+				  (NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
+                if(value_neg_p(poidsM) ||
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
                     {value_addto(t[NUMERO].colonne[0].num,pv->val),
 		       t[NUMERO].colonne[0].den = VALUE_ONE ;}
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
-                if(value_neg_p(poidsM) || 
+                if(value_neg_p(poidsM) ||
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    tmpval = value_uminus(pv->val); 
+                    tmpval = value_uminus(pv->val);
 		else tmpval = pv->val ;
                 t[NUMERO].colonne[t[NUMERO].taille].num = tmpval ;
                 t[NUMERO].colonne[t[NUMERO].taille].den = VALUE_ONE ;
@@ -1222,7 +1223,7 @@ sc_simplexe_feasibility_ofl_ctrl(
             }
         }
 	/* Creation de variable d'ecart ? */
-        if(value_neg_p(poidsM) || 
+        if(value_neg_p(poidsM) ||
 	   (value_zero_p(poidsM) && value_neg_p(valeur))) {
             i=compteur++ ;
             CREVARVISIBLE ;
