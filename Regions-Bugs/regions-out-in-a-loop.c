@@ -31,9 +31,9 @@ void sequential() {
 
 /* Here we call two time the "compute" function, but with a loop */
 void loop() {
-  int i;
+  float i = 0;
   int a[SIZE],b[SIZE],c[SIZE];
-  for(i = 0; i< 0.2; i+= 0.1 ) {
+  for(i=0;i<0.2;i+=0.1) {
     compute_loop(a,b,c);
   }
 }

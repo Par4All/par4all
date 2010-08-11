@@ -1,9 +1,6 @@
 delete regions-out-in-a-loop
 create regions-out-in-a-loop regions-out-in-a-loop.c
 
-apply OUT_REGIONS[%ALL]
-
-setproperty PRETTYPRINT_REGION TRUE
 apply PRINT_CODE_OUT_REGIONS[%ALL]
 
 display PRINTED_FILE[%ALL]

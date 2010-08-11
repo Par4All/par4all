@@ -21,9 +21,9 @@ void compute_seq(int a[100000], int b[100000], int c[100000])
 }
 void loop()
 {
-   int i;
+   float i = 0;
    int a[100000], b[100000], c[100000];
-   for(i = 0; i <= 0.2-1; i += 0.1)
+   for(i = 0; i <= 0.2; i += 0.1)
 
 //  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=99999}>
 
