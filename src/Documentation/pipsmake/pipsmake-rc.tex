@@ -1798,9 +1798,11 @@ implicitly in the controlizer phase.
 UNSPAGHETTIFY_IN_CONTROLIZER TRUE
 \end{PipsProp}
 
-The next property is used to convert C for loops into C while loops. The
-purpose is to speed up the re-use of Fortran analyses and transformation
-for C code. This property is set to false by default and should ultimately disappear.
+The next property is used to convert C for loops into C while
+loops. The purpose is to speed up the re-use of Fortran analyses and
+transformation for C code. This property is set to false by default
+and should ultimately disappear. But for new user convenience, it is
+set to TRUE by \verb/activate_language()/ when the language is C.
 
 \begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER} 
 FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
@@ -1810,7 +1812,9 @@ The next property is used to convert C for loops into C do loops when
 syntactically possible. The conversion is not safe because the effect of
 the loop body on the loop index is not checked. The purpose is to speed up
 the re-use of Fortran analyses and transformation for C code. This
-property is set to false by default and should disappear soon.
+property is set to false by default and should disappear soon. But for
+new user convenience, it is set to TRUE by \verb/activate_language()/
+when the language is C.
 
 \begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER} 
 FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
@@ -10903,6 +10907,9 @@ added statement.
 \begin{PipsProp}{PRETTYPRINT_STATEMENT_NUMBER} 
 PRETTYPRINT_STATEMENT_NUMBER TRUE
 \end{PipsProp}
+
+Note: this default value is overriden to FALSE by
+\verb/activate_language()/ for C and Fortran~95.
 
 The structured control structure is shown by using an indentation. The
 default value is 3.
