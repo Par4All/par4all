@@ -44,8 +44,7 @@ echo
 echo Parallelized code for "main"
 echo
 
-#activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[main]
+display PRINTED_FILE[main]
 
 echo
 echo Compilation of result
