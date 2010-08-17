@@ -1,11 +1,12 @@
 /* malloc example: string generator*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main ()
 {
   int i,n;
-  char * buffer;
+  char buffer[50];
 
   printf ("How long do you want the string? ");
   scanf ("%d", &i);
@@ -18,6 +19,7 @@ int main ()
   buffer[i]='\0';
 
   printf ("Random string: %s\n",buffer);
+  memmove (buffer,"bonjour",7);
   free (buffer);
 
 

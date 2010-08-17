@@ -4,7 +4,6 @@ create strncat01 strncat01.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-
 echo
 echo Parsed printed file for "strncat01"
 echo
@@ -12,11 +11,27 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 echo
+echo Proper effetcs for "strncat01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+quit
+echo
+echo Proper Pointer effetcs for "strncat01"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
 echo Cumulated effetcs for "strncat01"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
+
 
 close
 delete strncat01

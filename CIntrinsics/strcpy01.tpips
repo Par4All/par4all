@@ -11,11 +11,27 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 echo
+echo Proper effetcs for "strcpy01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+quit
+echo
+echo Proper Pointer effetcs for "strcpy01"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
 echo Cumulated effetcs for "strcpy01"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
+
 
 close
 delete strcpy01

@@ -1,0 +1,23 @@
+
+Parsed printed file for "strxfrm01"
+
+int main()
+{
+   char s[] = "example";
+   char d[10];
+   strxfrm(d, s, 3);
+   return 0;
+}
+
+Proper effetcs for "strxfrm01"
+
+int main()
+{
+//               <may be written >: s[*]
+   char s[] = "example";
+   char d[10];
+//               <must be read   >: s[*]
+//               <must be written>: d[0:3-1]
+   strxfrm(d, s, 3);
+   return 0;
+}

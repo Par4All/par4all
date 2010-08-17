@@ -1,23 +1,22 @@
 
-Parsed printed file for "memmove01"
+Parsed printed file for "memset01"
 
 int main()
 {
-   char str[] = "can be very useful......";
-   memmove(str+20, str+15, 11);
+   char str[] = "almost every programmer should know memset!";
+   memset(str, '-', 6);
    puts(str);
    return 0;
 }
 
-Proper effetcs for "memmove01"
+Proper effetcs for "memset01"
 
 int main()
 {
 //               <may be written >: str[*]
-   char str[] = "can be very useful......";
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
-   memmove(str+20, str+15, 11);
+   char str[] = "almost every programmer should know memset!";
+//               <must be written>: str[0:6-1]
+   memset(str, '-', 6);
 //               <may be read    >: stdout[0] str[*]
 //               <may be written >: stdout[0]
 //               <must be read   >: stdout __IO_EFFECTS:LUNS[1]

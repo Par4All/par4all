@@ -5,7 +5,8 @@
 int main ()
 {
   char str[] = "can be very useful......";
-  memmove (str+20,str+15,11);
-  puts (str);
+  char str2[40];
+  memmove (str2,str+15,11);
+  puts (str2);
   return 0;
 }

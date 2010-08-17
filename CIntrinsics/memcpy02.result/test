@@ -1,0 +1,15 @@
+
+Parsed printed file for "memcpy02"
+
+int main()
+{
+   memcpy(foo(), "toto", 4);
+}
+
+Proper effetcs for "memcpy02"
+
+int main()
+{
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   memcpy(foo(), "toto", 4);
+}
