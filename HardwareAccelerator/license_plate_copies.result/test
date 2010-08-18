@@ -3580,7 +3580,7 @@ freia_status license_plate_copies_helper_0_0(
   int16_t p_65[9];
   const int32_t x_65 = 12;
   const int32_t y_65 = 0;
-  terapix_mcu_instr mcu_instr[73];
+  terapix_mcu_instr mcu_instr[72];
 
   // imagelets definitions:
   // - 7 computation imagelets
@@ -4365,21 +4365,15 @@ freia_status license_plate_copies_helper_0_0(
   mcu_instr[70].macrocode.iter2 = imagelet_size;
   mcu_instr[70].macrocode.addrStart = TERAPIX_UCODE_COPY;
   // 71: =(3) -> 3
-  mcu_instr[71].macrocode.xmin1 = imagelet_3;
+  // in place copy skipped
+  // 71: =(6) -> 5
+  mcu_instr[71].macrocode.xmin1 = imagelet_6;
   mcu_instr[71].macrocode.ymin1 = 0;
-  mcu_instr[71].macrocode.xmin2 = imagelet_3;
+  mcu_instr[71].macrocode.xmin2 = imagelet_5;
   mcu_instr[71].macrocode.ymin2 = 0;
   mcu_instr[71].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[71].macrocode.iter2 = imagelet_size;
   mcu_instr[71].macrocode.addrStart = TERAPIX_UCODE_COPY;
-  // 72: =(6) -> 5
-  mcu_instr[72].macrocode.xmin1 = imagelet_6;
-  mcu_instr[72].macrocode.ymin1 = 0;
-  mcu_instr[72].macrocode.xmin2 = imagelet_5;
-  mcu_instr[72].macrocode.ymin2 = 0;
-  mcu_instr[72].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[72].macrocode.iter2 = imagelet_size;
-  mcu_instr[72].macrocode.addrStart = TERAPIX_UCODE_COPY;
 
   // inputs:
   // - imagelet 1 is i0 for in
