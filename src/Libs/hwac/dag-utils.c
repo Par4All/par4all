@@ -140,7 +140,7 @@ dagvtx_get_producer(const dag d, const dagvtx sink, const entity e)
     vtxcontent c = dagvtx_content(v);
     // the image may be kept within a pipe
     if (vtxcontent_out(c)==e &&
-	(sink==NULL || gen_in_list_p(sink, dagvtx_succs(v))))
+        (sink==NULL || gen_in_list_p(sink, dagvtx_succs(v))))
       return v;
   }
   return NULL; // it is an external parameter?
@@ -163,18 +163,18 @@ void dagvtx_dump(FILE * out, const string name, const dagvtx v)
     return;
   }
   fprintf(out, "vertex %s %" _intFMT " %s (%p)\n",
-	  name? name: "", dagvtx_number(v), dagvtx_operation(v), v);
+    name? name: "", dagvtx_number(v), dagvtx_operation(v), v);
   dagvtx_nb_dump(out, "  succs", dagvtx_succs(v));
   vtxcontent c = dagvtx_content(v);
   statement s = dagvtx_statement(v);
   fprintf(out,
-	  "  optype: %s\n"
-	  "  opid: %" _intFMT "\n"
-	  "  source: %" _intFMT "/%" _intFMT "\n",
-	  what_operation(vtxcontent_optype(c)),
-	  vtxcontent_opid(c),
-	  s? statement_number(s): 0,
-	  s? statement_ordering(s): 0);
+    "  optype: %s\n"
+    "  opid: %" _intFMT "\n"
+    "  source: %" _intFMT "/%" _intFMT "\n",
+    what_operation(vtxcontent_optype(c)),
+    vtxcontent_opid(c),
+    s? statement_number(s): 0,
+    s? statement_ordering(s): 0);
   entity_list_dump(out, "  inputs", vtxcontent_inputs(c));
   fprintf(out, "  output: %s\n", safe_entity_name(vtxcontent_out(c)));
   // to be continued...
@@ -211,7 +211,7 @@ static const char* entity_dot_name(entity e)
 static void dagvtx_dot_node(FILE * out, const string prefix, const dagvtx v)
 {
   fprintf(out, "%s\"%"_intFMT" %s\"", prefix? prefix: "",
-	  dagvtx_number(v), dagvtx_compact_operation(v));
+    dagvtx_number(v), dagvtx_compact_operation(v));
 }
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
@@ -241,7 +241,7 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
       dagvtx_dot_node(out, "  ", vtx);
       dagvtx_dot_node(out, " -> ", succ);
       fprintf(out, "%s%s%s;\n", show_arcs? " [label=\"": "",
-	      show_arcs? vname: "", show_arcs? "\"]": "");
+        show_arcs? vname: "", show_arcs? "\"]": "");
     }
 
     // scalar dependencies anywhere... hmmm...
@@ -249,21 +249,21 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
     {
       list vars = NIL;
       if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
-					dagvtx_statement(v), &vars))
+          dagvtx_statement(v), &vars))
       {
-	dagvtx_dot_node(out, "  ", vtx);
-	dagvtx_dot_node(out, " -> ", v);
-	fprintf(out, " [" SCL_DEP);
+  dagvtx_dot_node(out, "  ", vtx);
+  dagvtx_dot_node(out, " -> ", v);
+  fprintf(out, " [" SCL_DEP);
 
-	if (vars && show_arcs)
-	{
-	  int count = 0;
-	  fprintf(out, ",label=\"");
-	  FOREACH(entity, var, vars)
-	    fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
-	  fprintf(out, "\"");
-	}
-	fprintf(out, "];\n");
+  if (vars && show_arcs)
+  {
+    int count = 0;
+    fprintf(out, ",label=\"");
+    FOREACH(entity, var, vars)
+      fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
+    fprintf(out, "\"");
+  }
+  fprintf(out, "];\n");
       }
       gen_free_list(vars), vars = NIL;
     }
@@ -285,7 +285,7 @@ static void dagvtx_list_dot(FILE * out, const string comment, const list l)
   if (comment) fprintf(out, "  // %s\n", comment);
   FOREACH(dagvtx, v, l)
     fprintf(out, "  \"%s\" [shape=circle];\n",
-	    entity_dot_name(vtxcontent_out(dagvtx_content(v))));
+      entity_dot_name(vtxcontent_out(dagvtx_content(v))));
   fprintf(out, "\n");
 }
 
@@ -328,7 +328,7 @@ void dag_dot_dump(const string module, const string name, const dag d)
 
   FILE * out = safe_fopen(fn, "w");
   fprintf(out, "// graph for dag \"%s\" of module \"%s\" in dot format\n",
-	  name, module);
+    name, module);
   dag_dot(out, name, d);
   safe_fclose(out, fn);
   free(fn);
@@ -348,7 +348,7 @@ static void check_removed(const dagvtx v, const dagvtx removed)
 static int dagvtx_cmp_entity(const dagvtx * v1, const dagvtx * v2)
 {
   return compare_entities(&vtxcontent_out(dagvtx_content(*v1)),
-			  &vtxcontent_out(dagvtx_content(*v2)));
+        &vtxcontent_out(dagvtx_content(*v2)));
 }
 
 static void vertex_list_sorted_by_entities(list l)
@@ -369,7 +369,7 @@ void dag_remove_vertex(dag d, const dagvtx v)
     pips_assert("some variable", var!=entity_undefined);
     dagvtx input =
       make_dagvtx(make_vtxcontent(0, 0, make_pstatement_empty(), NIL, var),
-		  gen_copy_seq(dagvtx_succs(v)));
+      gen_copy_seq(dagvtx_succs(v)));
     dag_inputs(d) = CONS(dagvtx, input, dag_inputs(d));
     dag_vertices(d) = CONS(dagvtx, input, dag_vertices(d));
     vertex_list_sorted_by_entities(dag_inputs(d));
@@ -438,7 +438,7 @@ void dag_append_vertex(dag d, dagvtx nv)
     {
       // side effect, create an input node of type 0 (not a computation)
       pv = make_dagvtx
-	(make_vtxcontent(0, 0, make_pstatement_empty(), NIL, e), NIL);
+        (make_vtxcontent(0, 0, make_pstatement_empty(), NIL, e), NIL);
 
       dag_inputs(d) = CONS(dagvtx, pv, dag_inputs(d));
       vertex_list_sorted_by_entities(dag_inputs(d));
@@ -482,9 +482,9 @@ list dag_vertex_preds(const dag d, const dagvtx target)
     if (v!=target && gen_in_list_p(target, dagvtx_succs(v)))
     {
       if (dagvtx_image(v)==first_img)
-	first_v = v;
+        first_v = v;
       if (dagvtx_image(v)==second_img)
-	second_v = v;
+        second_v = v;
     }
   }
 
@@ -513,7 +513,7 @@ static void
 switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 {
   pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
-	     dagvtx_number(target), dagvtx_number(source));
+       dagvtx_number(target), dagvtx_number(source));
 
   ifdebug(9) {
     dagvtx_dump(stderr, "in source", source);
@@ -535,7 +535,7 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 
   FOREACH(dagvtx, s, dagvtx_succs(target))
     gen_list_patch(vtxcontent_inputs(dagvtx_content(s)),
-		   dagvtx_image(target), src_img);
+       dagvtx_image(target), src_img);
   dagvtx_succs(source) = gen_once(target, dagvtx_succs(source));
   dagvtx_succs(source) = gen_nconc(dagvtx_succs(target), dagvtx_succs(source));
   dagvtx_succs(target) = NIL;
@@ -647,34 +647,34 @@ list /* of statements */ dag_optimize(dag d)
       bool switched = false;
       HASH_MAP(pp, lp,
       {
-	dagvtx p = (dagvtx) pp;
+        dagvtx p = (dagvtx) pp;
 
-	pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
-		   dagvtx_number(vr), dagvtx_number(p));
+        pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
+                   dagvtx_number(vr), dagvtx_number(p));
 
-	// ??? maybe I should not remove all duplicates, because
-	// recomputing them may be chip?
-	if (same_operation_p(vr, p) &&
-	    gen_list_equals_p(preds, (list) lp) &&
-	    same_constant_parameters(vr, p))
-	{
-	  switch_vertex_to_a_copy(vr, p, preds);
-	  switched = true;
-	  break;
-	}
-	else if (commutative_operation_p(vr, p) &&
-		 list_commuted_p(preds, (list) lp))
-	{
-	  switch_vertex_to_a_copy(vr, p, preds);
-	  switched = true;
-	  break;
-	}
+        // ??? maybe I should not remove all duplicates, because
+        // recomputing them may be chip?
+        if (same_operation_p(vr, p) &&
+            gen_list_equals_p(preds, (list) lp) &&
+            same_constant_parameters(vr, p))
+        {
+          switch_vertex_to_a_copy(vr, p, preds);
+          switched = true;
+          break;
+        }
+        else if (commutative_operation_p(vr, p) &&
+                 list_commuted_p(preds, (list) lp))
+        {
+          switch_vertex_to_a_copy(vr, p, preds);
+          switched = true;
+          break;
+        }
       },  previous);
 
       if (switched)
-	gen_free_list(preds);
+        gen_free_list(preds);
       else
-	hash_put(previous, vr, preds);
+        hash_put(previous, vr, preds);
     }
 
     ifdebug(8) {
@@ -700,7 +700,7 @@ list /* of statements */ dag_optimize(dag d)
       vtxcontent c = dagvtx_content(v);
       entity target = vtxcontent_out(c);
       pips_assert("one output and one input to copy",
-	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+              target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
       // replace by its source everywhere it is used
       entity source = ENTITY(CAR(vtxcontent_inputs(c)));
@@ -710,7 +710,7 @@ list /* of statements */ dag_optimize(dag d)
 
       // whether to actually remove v
       if (!gen_in_list_p(v, dag_outputs(d)))
-	set_add_element(remove, remove, v);
+        set_add_element(remove, remove, v);
     }
   }
 
@@ -730,43 +730,43 @@ list /* of statements */ dag_optimize(dag d)
       vtxcontent c = dagvtx_content(w);
       entity target = vtxcontent_out(c);
       pips_assert("one output and one input to copy",
-	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+              target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
       entity source = ENTITY(CAR(vtxcontent_inputs(c)));
       dagvtx prod = dagvtx_get_producer(d, w, source);
 
       if (source==target)
       {
-	// ??? this should not happen?
-	set_add_element(remove, remove, w);
+        // ??? this should not happen?
+        set_add_element(remove, remove, w);
       }
       else if (dagvtx_number(prod)==0)
       {
-	// fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
-	unlink_copy_vertex(d, source, w);
-	set_add_element(remove, remove, w);
-	lstats = CONS(statement, freia_copy_image(source, target), lstats);
+        // fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
+        unlink_copy_vertex(d, source, w);
+        set_add_element(remove, remove, w);
+        lstats = CONS(statement, freia_copy_image(source, target), lstats);
       }
       else // source is not an input, but the result of a internal computation
       {
-	if (all_vertices_are_copies_or_measures_p(dagvtx_succs(prod)))
-	{
-	  // ??? hmmm... there is an implicit assumption here that the
-	  // source of the copy will be an output...
-	  unlink_copy_vertex(d, source, w);
-	  set_add_element(remove, remove, w);
-	  lstats = CONS(statement, freia_copy_image(source, target), lstats);
-	}
-	else if (hash_defined_p(intra_pipe_copies, source))
-	{
-	  unlink_copy_vertex(d, source, w);
-	  set_add_element(remove, remove, w);
-	  lstats = CONS(statement,
-		freia_copy_image((entity) hash_get(intra_pipe_copies, source),
-				 target), lstats);
-	}
-	else // keep first copy
-	  hash_put(intra_pipe_copies, source, target);
+        if (all_vertices_are_copies_or_measures_p(dagvtx_succs(prod)))
+        {
+          // ??? hmmm... there is an implicit assumption here that the
+          // source of the copy will be an output...
+          unlink_copy_vertex(d, source, w);
+          set_add_element(remove, remove, w);
+          lstats = CONS(statement, freia_copy_image(source, target), lstats);
+        }
+        else if (hash_defined_p(intra_pipe_copies, source))
+        {
+          unlink_copy_vertex(d, source, w);
+          set_add_element(remove, remove, w);
+          lstats = CONS(statement,
+               freia_copy_image((entity) hash_get(intra_pipe_copies, source),
+                                target), lstats);
+        }
+        else // keep first copy
+          hash_put(intra_pipe_copies, source, target);
       }
     }
   }
@@ -834,16 +834,16 @@ void dag_compute_outputs(dag d)
     {
       entity out = vtxcontent_out(c);
       if (out!=entity_undefined &&
-	  // no successors
-	  (!dagvtx_succs(v) ||
-	   // all successors are mesures?
-	   all_mesures_p(dagvtx_succs(v)) ||
-	   // new parameter not yet an output
-	   (formal_parameter_p(out) && !set_belong_p(outvars, out))))
+          // no successors
+          (!dagvtx_succs(v) ||
+           // all successors are mesures?
+           all_mesures_p(dagvtx_succs(v)) ||
+           // new parameter not yet an output
+           (formal_parameter_p(out) && !set_belong_p(outvars, out))))
       {
-	// pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
-	set_add_element(outvars, outvars, out);
-	set_add_element(outs, outs, v);
+        // pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
+        set_add_element(outvars, outvars, out);
+        set_add_element(outs, outs, v);
       }
     }
     else
@@ -851,7 +851,7 @@ void dag_compute_outputs(dag d)
       // ??? this aborts with terapix...
       // pips_assert("is an input vertex", gen_in_list_p(v, dag_inputs(d)));
       if (!dagvtx_succs(v))
-	set_add_element(toremove, toremove, v);
+  set_add_element(toremove, toremove, v);
     }
   }
 
@@ -881,7 +881,7 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
     if (dagvtx_number(target)==dagvtx_number(v))
       return v;
   pips_internal_error("twin vertex not found for %" _intFMT "\n",
-		      dagvtx_number(target));
+                      dagvtx_number(target));
   return NULL;
 }
 
@@ -896,11 +896,11 @@ void freia_hack_fix_global_ins_outs(dag dfull, dag d)
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     if (dagvtx_number(v)!=0 &&
-	// the vertex was an output node in the full dag
-	(gen_in_list_p(find_twin_vertex(dfull, v), dag_outputs(dfull)) ||
-	 // OR there were more successors in the full dag
-	 gen_length(dagvtx_succs(v))!=
-	 gen_length(dagvtx_succs(find_twin_vertex(dfull, v)))))
+        // the vertex was an output node in the full dag
+        (gen_in_list_p(find_twin_vertex(dfull, v), dag_outputs(dfull)) ||
+         // OR there were more successors in the full dag
+         gen_length(dagvtx_succs(v))!=
+         gen_length(dagvtx_succs(find_twin_vertex(dfull, v)))))
     {
       pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
       dag_outputs(d) = gen_once(v, dag_outputs(d));
@@ -947,8 +947,8 @@ bool single_image_assignement_p(dag d)
     if (out!=entity_undefined)
     {
       if (set_belong_p(outs, out)) {
-	set_free(outs);
-	return false;
+        set_free(outs);
+        return false;
       }
       set_add_element(outs, outs, out);
     }
@@ -988,7 +988,7 @@ all_previous_stats_with_deps_are_computed(dag d, const set computed, dagvtx v)
     // all previous have been scanned
     if (pv==v) break;
     if (freia_scalar_rw_dep(dagvtx_statement(pv), dagvtx_statement(v), NULL) &&
-	!set_belong_p(computed, pv))
+        !set_belong_p(computed, pv))
     {
       okay = false;
       break;
@@ -1029,24 +1029,24 @@ list /* of dagvtx */ get_computable_vertices
       // I have a problem here... I really need use_defs?
       if (all_previous_stats_with_deps_are_computed(d, computed, v))
       {
-	computable = CONS(dagvtx, v, computable);
-	set_add_element(local_currents, local_currents, v);
+        computable = CONS(dagvtx, v, computable);
+        set_add_element(local_currents, local_currents, v);
       }
     }
     else // we have an image computation
     {
       list preds = dag_vertex_preds(d, v);
       pips_debug(9, "%d predecessors to %" _intFMT "\n",
-		 (int) gen_length(preds), dagvtx_number(v));
+     (int) gen_length(preds), dagvtx_number(v));
 
       if(// no scalar dependencies in the current pipeline
-	 !any_scalar_dep(v, local_currents) &&
-	 // and image dependencies are fulfilled.
-	 list_in_set_p(preds, maybe))
+        !any_scalar_dep(v, local_currents) &&
+        // and image dependencies are fulfilled.
+        list_in_set_p(preds, maybe))
       {
-	computable = CONS(dagvtx, v, computable);
-	// we do not want deps with other currents considered!
-	set_add_element(local_currents, local_currents, v);
+        computable = CONS(dagvtx, v, computable);
+        // we do not want deps with other currents considered!
+        set_add_element(local_currents, local_currents, v);
       }
 
       gen_free_list(preds), preds = NIL;
@@ -1118,7 +1118,7 @@ static void dag_append_freia_call(dag d, statement s)
     pips_assert("some api", api!=NULL);
     list /* of entity */ args =
       fs_expression_list_to_entity_list(call_arguments(c),
-					api->arg_img_in+api->arg_img_out);
+          api->arg_img_in+api->arg_img_out);
 
     // extract arguments
     entity out = entity_undefined;
@@ -1139,7 +1139,7 @@ static void dag_append_freia_call(dag d, statement s)
   {
     dagvtx nv =
       make_dagvtx(make_vtxcontent(spoc_type_oth, 0,
-	  make_pstatement_statement(s), NIL, entity_undefined), NIL);
+    make_pstatement_statement(s), NIL, entity_undefined), NIL);
     dag_vertices(d) = CONS(dagvtx, nv, dag_vertices(d));
   }
 }
