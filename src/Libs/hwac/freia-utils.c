@@ -877,3 +877,46 @@ void freia_add_image_arguments
   gen_free_list(limg), limg = NIL;
   *lparams = gen_nconc(largs, *lparams);
 }
+
+/********************************************************* IMAGE OCCURRENCES */
+
+/* hack to help replace use-def chains which did not work initially with C.
+ * occurrences is: <image entity> -> { set of statements }
+ * this is really a ugly hack, sorry!
+ */
+
+static void check_ref(reference r, hash_table occs)
+{
+  entity v = reference_variable(r);
+  if (freia_image_variable_p(v))
+  {
+    // ensure that target set exists
+    if (!hash_defined_p(occs, v))
+      hash_put(occs, v, set_make(set_pointer));
+    set stats = (set) hash_get(occs, v);
+    // get first containing statement
+    statement up = (statement) gen_get_ancestor(statement_domain, r);
+    // which MUST exist?
+    pips_assert("some containing statement", up);
+    // store result
+    set_add_element(stats, stats, (void*) up);
+  }
+}
+
+/* @return build occurrence hash table
+ */
+hash_table freia_build_image_occurrences(statement s)
+{
+  hash_table occs = hash_table_make(hash_pointer, 0);
+  gen_context_recurse(s, (void*) occs, reference_domain, gen_true, check_ref);
+  return occs;
+}
+
+/* cleanup occurrence data structure
+ */
+void freia_clean_image_occurrences(hash_table occs)
+{
+  HASH_FOREACH(entity, v, set, s, occs)
+    set_free(s);
+  hash_table_free(occs);
+}
