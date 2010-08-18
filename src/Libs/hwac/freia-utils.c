@@ -883,6 +883,8 @@ void freia_add_image_arguments
 /* hack to help replace use-def chains which did not work initially with C.
  * occurrences is: <image entity> -> { set of statements }
  * this is really a ugly hack, sorry!
+ * ??? I should also consider declarations, but as they should only
+ * contain image allocations so there should be no problem.
  */
 
 static void check_ref(reference r, hash_table occs)
