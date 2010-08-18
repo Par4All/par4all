@@ -1077,7 +1077,7 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd);
+      dag_compute_outputs(nd, NULL);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -1103,14 +1103,18 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 }
 
 void freia_trpx_compile_calls
-(string module, list /* of statements */ ls, FILE * helper_file, int number)
+(string module,
+ list /* of statements */ ls,
+ hash_table occs,
+ FILE * helper_file,
+ int number)
 {
   // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
   list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 

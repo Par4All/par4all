@@ -176,28 +176,28 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
       (ls && (freia_skip_op_p(s) || !some_effects_on_images(s)));
 
     pips_debug(7, "statement %"_intFMT": %skeeped\n",
-	       statement_number(s), keep_stat? "": "not ");
+               statement_number(s), keep_stat? "": "not ");
 
     if (keep_stat)
     {
       if (freia_api)
       {
-	ls = gen_nconc(ltail, ls), ltail = NIL;
-	ls = CONS(statement, s, ls);
+        ls = gen_nconc(ltail, ls), ltail = NIL;
+        ls = CONS(statement, s, ls);
       }
       else // else accumulate in the "other list" waiting for something...
       {
-	ltail = CONS(statement, s, ltail);
+        ltail = CONS(statement, s, ltail);
       }
     }
     else
       if (ls!=NIL) {
-	set_assign_list(cmp_subset, ls);
-	gen_sort_list(sequence_statements(sq),
-		      (gen_cmp_func_t) freia_cmp_statement);
-	ls = gen_nreverse(ls);
-	fsip->seqs = CONS(list, ls, fsip->seqs);
-	ls = NIL;
+        set_assign_list(cmp_subset, ls);
+        gen_sort_list(sequence_statements(sq),
+                      (gen_cmp_func_t) freia_cmp_statement);
+        ls = gen_nreverse(ls);
+        fsip->seqs = CONS(list, ls, fsip->seqs);
+        ls = NIL;
       }
   }
 
@@ -240,7 +240,7 @@ string freia_compile(string module, statement mod_stat, string target)
   else // look for sequences
   {
     gen_context_recurse(mod_stat, &fsi,
-			sequence_domain, sequence_flt, gen_null);
+                        sequence_domain, sequence_flt, gen_null);
   }
 
   // output file
@@ -256,16 +256,20 @@ string freia_compile(string module, statement mod_stat, string target)
   else if (freia_terapix_p(target))
     fprintf(helper, FREIA_TRPX_INCLUDES);
 
+  hash_table occs = freia_build_image_occurrences(mod_stat);
+
   int n_dags = 0;
   FOREACH(list, ls, fsi.seqs)
   {
     if (freia_spoc_p(target))
-      freia_spoc_compile_calls(module, ls, helper, n_dags);
+      freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_terapix_p(target))
-      freia_trpx_compile_calls(module, ls, helper, n_dags);
+      freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
     gen_free_list(ls);
     n_dags++;
   }
+
+  freia_clean_image_occurrences(occs);
 
   // cleanup
   gen_free_list(fsi.seqs);

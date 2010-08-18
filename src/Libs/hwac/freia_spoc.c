@@ -1446,7 +1446,7 @@ static void freia_spoc_pipeline
       free_dagvtx(vr);
     }
   }
-  dag_compute_outputs(dpipe);
+  dag_compute_outputs(dpipe, NULL);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -1963,7 +1963,7 @@ static list /* of dags */ split_dag(dag initial)
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd);
+      dag_compute_outputs(nd, NULL);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -2009,6 +2009,7 @@ static list /* of dags */ split_dag(dag initial)
 void freia_spoc_compile_calls
   (string module,
    list /* of statements */ ls,
+   hash_table occs,
    FILE * helper_file,
    int number)
 {
@@ -2017,7 +2018,7 @@ void freia_spoc_compile_calls
   pips_assert("some statements", ls);
 
   list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 

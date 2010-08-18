@@ -96,6 +96,11 @@ _int dagvtx_number(const dagvtx v)
     return 0;
 }
 
+string dagvtx_number_str(const dagvtx v)
+{
+  return itoa(dagvtx_number(v));
+}
+
 _int dagvtx_optype(const dagvtx v)
 {
   return vtxcontent_optype(dagvtx_content(v));
@@ -615,6 +620,7 @@ static bool all_vertices_are_copies_or_measures_p(const list lv)
 /* remove AIPO copies detected as useless.
  * remove identical operations.
  * @return statements to be managed outside (external copies)...
+ * ??? maybe there should be a transitive closure...
  */
 list /* of statements */ dag_optimize(dag d)
 {
@@ -627,7 +633,7 @@ list /* of statements */ dag_optimize(dag d)
   }
 
   // first, look for identical image operations (same inputs, same params)
-  // (that produce image, we do not care about measures??)
+  // (that produce image, we do not care about measures???)
   // the second one is replaced by a copy.
   // also handle commutations.
 
@@ -653,7 +659,7 @@ list /* of statements */ dag_optimize(dag d)
                    dagvtx_number(vr), dagvtx_number(p));
 
         // ??? maybe I should not remove all duplicates, because
-        // recomputing them may be chip?
+        // recomputing them may be cheap?
         if (same_operation_p(vr, p) &&
             gen_list_equals_p(preds, (list) lp) &&
             same_constant_parameters(vr, p))
@@ -688,7 +694,7 @@ list /* of statements */ dag_optimize(dag d)
     gen_free_list(vertices), vertices = NULL;
   }
 
-  // only one pass is needed because we're going backwards
+  // only one pass is needed because we're going backwards?
   // op-> X -copy-> Y images copies are replaced by op-> X & Y
   FOREACH(dagvtx, v, dag_vertices(d))
   {
@@ -814,35 +820,92 @@ static bool all_mesures_p(list lv)
   return only_mes;
 }
 
+/* @return the set of all statements in dag
+ */
+static set dag_stats(dag d)
+{
+  set stats = set_make(set_pointer);
+  statement s;
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if ((s = dagvtx_statement(v)))
+      set_add_element(stats, stats, s);
+  return stats;
+}
+
+#define starts_with(s1, s2) (strncmp(s1, s2, strlen(s2))==0) /* a la java */
+
+/* hmmm... this is poor, should rather rely on use-def chains.
+ */
+static bool any_use_statement(set stats)
+{
+  bool used = false;
+  SET_FOREACH(statement, s, stats)
+  {
+    call c = freia_statement_to_call(s);
+    if (c) {
+      string name = entity_local_name(call_function(c));
+      pips_debug(9, "call to %s\n", name);
+      // some freia utils are considered harmless,
+      // others imply an actual "use"
+      if (!same_string_p(name, "freia_common_destruct_data") &&
+          !same_string_p(name, "freia_common_create_data") &&
+          !same_string_p(name, "freia_common_rx_image"))
+        used = true;
+    }
+  }
+  return used;
+}
+
+/* @return whether there is a significant use of e outside of stats
+ */
+static bool other_significant_uses(entity e, hash_table occs, set stats)
+{
+  if (!occs) return true; // safe
+  set all_stats = (set) hash_get(occs, e);
+  pips_assert("some statement set", all_stats);
+  set others = set_make(set_pointer);
+  set_difference(others, all_stats, stats);
+  // is there something significant in others?
+  bool used = any_use_statement(others);
+  set_free(others);
+  pips_debug(9, "%s is %susefull\n", entity_name(e), used? "": "not ");
+  return used;
+}
+
 /* (re)compute the list of *GLOBAL* input & output images for this dag
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
  * sequence. however, the status of chains and effects on C does not
  * allow it.
  */
-void dag_compute_outputs(dag d)
+void dag_compute_outputs(dag d, hash_table occs)
 {
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
   set toremove = set_make(set_pointer);
+  set stats = dag_stats(d);
 
   FOREACH(dagvtx, v, dag_vertices(d))
   {
-    // pips_debug(8, "considering vertex %" _intFMT "\n", dagvtx_number(v));
+    pips_debug(8, "considering vertex %" _intFMT "\n", dagvtx_number(v));
     vtxcontent c = dagvtx_content(v);
     // skip special input nodes...
     if (dagvtx_number(v)!=0)
     {
+      // get entity produce by vertex
       entity out = vtxcontent_out(c);
+
+      pips_debug(8, "entity is %s\n", entity_name(out));
+
       if (out!=entity_undefined &&
-          // no successors
-          (!dagvtx_succs(v) ||
-           // all successors are mesures?
-           all_mesures_p(dagvtx_succs(v)) ||
-           // new parameter not yet an output
+          // no successors to this vertex BUT it is used somewhere
+          ((!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
+           // all non-empty successors are measures?!
+           (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
+           // new function parameter not yet an output
            (formal_parameter_p(out) && !set_belong_p(outvars, out))))
       {
-        // pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
+        pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
         set_add_element(outvars, outvars, out);
         set_add_element(outs, outs, v);
       }
@@ -859,7 +922,7 @@ void dag_compute_outputs(dag d)
   ifdebug(8)
   {
     dag_dump(stderr, "dag_compute_outputs", d);
-    set_fprint(stderr, "new outs", outs, (gen_string_func_t) dagvtx_number);
+    set_fprint(stderr, "new outs", outs, (gen_string_func_t) dagvtx_number_str);
   }
 
   // cleanup unused node inputs
@@ -870,6 +933,7 @@ void dag_compute_outputs(dag d)
   dag_outputs(d) = set_to_sorted_list(outs, (gen_cmp_func_t) dagvtx_ordering);
 
   // cleanup
+  set_free(stats);
   set_free(outs);
   set_free(outvars);
   set_free(toremove);
@@ -1151,20 +1215,22 @@ static void dag_append_freia_call(dag d, statement s)
  * @param number dag identifier in function
  * @param added_stat list of statements killed by dag optimization
  */
-dag build_freia_dag(string module, list ls, int number, list * added_stats)
+dag build_freia_dag(string module, list ls, int number,
+                    hash_table occurrences, list * added_stats)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
 
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
-  dag_compute_outputs(fulld);
+  dag_compute_outputs(fulld, occurrences);
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
   dag_dot_dump_prefix(module, "dag_", number, fulld);
 
-  // remove copies if possible...
+  // remove copies and duplicates if possible...
+  // ??? maybe there should be an underlying transitive closure? not sure.
   *added_stats = dag_optimize(fulld);
 
   // dump final dag
