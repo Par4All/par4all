@@ -15,8 +15,7 @@
 
 * optimizations
 - min commutes with dilate & max with erode, or vice-versa ?
-- ??? remove useless images (computed but not used...)
-  see licensePlate freia version
++ ??? remove useless images (computed but not used...) see licensePlate
 
 * code
 + cleanup data structures?
