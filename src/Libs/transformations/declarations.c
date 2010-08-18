@@ -172,14 +172,14 @@ clean_declarations(char * module_name)
 
 #define expr_var(e) reference_variable(expression_reference(e))
 
-#define call_assign_p(c)						\
+#define call_assign_p(c) \
   same_string_p(entity_local_name(call_function(c)), ASSIGN_OPERATOR_NAME)
 
 struct helper {
-  string module;
-  string func_malloc;
-  string func_free;
-  set referenced;
+  string module;      // current module being cleaned up
+  string func_malloc; // allocation function
+  string func_free;   // deallocation function
+  set referenced;     // referenced entities
 };
 
 // Pass 1: collect local referenced variables
@@ -197,8 +197,8 @@ static bool ignore_call_flt(call c, struct helper * ctx)
     expression val = EXPRESSION(CAR(CDR(args)));
 
     if (expression_call_p(val) &&
-	same_string_p(entity_local_name(call_function(expression_call(val))),
-		      ctx->func_malloc))
+        same_string_p(entity_local_name(call_function(expression_call(val))),
+                      ctx->func_malloc))
     {
       pips_debug(5, "malloc called\n");
       gen_recurse_stop(EXPRESSION(CAR(args)));
@@ -248,8 +248,8 @@ static void cleanup_call(call c, struct helper * ctx)
     {
       expression arg = EXPRESSION(CAR(args));
       if (expression_reference_p(arg) &&
-	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
-	  replace = true;
+          unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
+        replace = true;
     }
   }
   else if (call_assign_p(c))
@@ -257,13 +257,13 @@ static void cleanup_call(call c, struct helper * ctx)
     list args = call_arguments(c);
     expression val = EXPRESSION(CAR(CDR(args)));
     if (expression_call_p(val) &&
-	same_string_p(entity_local_name(call_function(expression_call(val))),
-		      ctx->func_malloc))
+        same_string_p(entity_local_name(call_function(expression_call(val))),
+                      ctx->func_malloc))
     {
       expression arg = EXPRESSION(CAR(args));
       if (expression_reference_p(arg) &&
-	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
-	replace = true;
+          unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
+        replace = true;
     }
     // var = NULL?
   }
@@ -333,13 +333,14 @@ static void dynamic_cleanup(string module, statement stat)
       value init = entity_initial(var);
       if (value_expression_p(init))
       {
-	free_value(init);
-	entity_initial(var) = make_value_unknown();
+        free_value(init);
+        entity_initial(var) = make_value_unknown();
       }
     }
     else
       kept = CONS(ENTITY, var, kept);
   }
+
   // is it useful? declarations are attached to statements in C.
   entity_declarations(mod) = gen_nreverse(kept);
   gen_free_list(decls), decls = NIL;
