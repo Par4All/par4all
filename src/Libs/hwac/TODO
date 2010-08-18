@@ -51,7 +51,7 @@
 * post
 + remove malloc/free if not used
 + cleanup declarations
-- it seems that some unused image are not removed (license_plate_copies)
++ it seems that some unused image are not removed (license_plate_copies)
 
 * validation
 - check all AIPO
