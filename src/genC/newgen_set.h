@@ -51,10 +51,10 @@ typedef enum {
 // old compatibility, do not use
 #define set_equal(s1,s2) set_equal_p(s1,s2)
 
-#define SET_MAP(element,code,the_set)					\
-  {									\
-    HASH_MAP(_set_map_key, element, code,				\
-	     set_private_get_hash_table(the_set));			\
+#define SET_MAP(element,code,the_set)               \
+  {                                                 \
+    HASH_MAP(_set_map_key, element, code,           \
+             set_private_get_hash_table(the_set));  \
   }
 
 /**
@@ -78,17 +78,17 @@ typedef enum {
  * Ronan, I wish to avoid an ugly double macro expansion hack here.
  * Just change the scalar variable name "var" if need be.
  */
-#define SET_FOREACH(type_name, the_item, the_set)			\
-  hash_table _hash_##the_item =						\
-    set_private_get_hash_table(the_set);				\
-  void * _value_##the_item;						\
-  void * _point_##the_item = NULL;					\
-  type_name the_item;							\
-  for (; (_point_##the_item =						\
-	  hash_table_scan(_hash_##the_item,				\
-			  _point_##the_item,				\
-			  (void **) &the_item,				\
-			  &_value_##the_item));)
+#define SET_FOREACH(type_name, the_item, the_set) \
+  hash_table _hash_##the_item =                   \
+    set_private_get_hash_table(the_set);          \
+  void * _value_##the_item;                       \
+  void * _point_##the_item = NULL;                \
+  type_name the_item;                             \
+  for (; (_point_##the_item =                     \
+          hash_table_scan(_hash_##the_item,				\
+                          _point_##the_item,      \
+                          (void **) &the_item,    \
+                          &_value_##the_item));)
 
 /* what about this replacement?
 #define SET_MAP(the_item, the_code, the_set)		\
