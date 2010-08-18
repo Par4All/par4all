@@ -43,10 +43,10 @@
 + should also detect "duplicate" measurements with a copy of the scalars
 + should detect "included" measurements (maxcoord includes max)?
   (done indirectly by the code generation, but could be done on the DAG?)
++ remove dead code on dag optimization
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
-- it seems that dead code is not (fully/at all) removed (freia_18)
 
 * post
 + remove malloc/free if not used

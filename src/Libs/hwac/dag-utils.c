@@ -256,19 +256,19 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
       if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
           dagvtx_statement(v), &vars))
       {
-  dagvtx_dot_node(out, "  ", vtx);
-  dagvtx_dot_node(out, " -> ", v);
-  fprintf(out, " [" SCL_DEP);
+        dagvtx_dot_node(out, "  ", vtx);
+        dagvtx_dot_node(out, " -> ", v);
+        fprintf(out, " [" SCL_DEP);
 
-  if (vars && show_arcs)
-  {
-    int count = 0;
-    fprintf(out, ",label=\"");
-    FOREACH(entity, var, vars)
-      fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
-    fprintf(out, "\"");
-  }
-  fprintf(out, "];\n");
+        if (vars && show_arcs)
+        {
+          int count = 0;
+          fprintf(out, ",label=\"");
+          FOREACH(entity, var, vars)
+            fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
+          fprintf(out, "\"");
+        }
+        fprintf(out, "];\n");
       }
       gen_free_list(vars), vars = NIL;
     }
@@ -632,23 +632,58 @@ list /* of statements */ dag_optimize(dag d)
     dag_dump(stderr, "input", d);
   }
 
-  // first, look for identical image operations (same inputs, same params)
+  // remove dead image operations
+  // ??? hmmm... measures are kept because of the implicit scalar dependency?
+  if (get_bool_property("FREIA_REMOVE_DEAD_OPERATIONS"))
+  {
+    pips_debug(6, "removing dead code\n");
+    list vertices = gen_copy_seq(dag_vertices(d));
+    FOREACH(dagvtx, v, vertices)
+    {
+      // skip non-image operations
+      if (!vtxcontent_inputs(dagvtx_content(v)) &&
+          (vtxcontent_out(dagvtx_content(v))==entity_undefined ||
+           vtxcontent_out(dagvtx_content(v))==NULL))
+        continue;
+
+      if (// no successors or they are all removed
+          (!dagvtx_succs(v) || list_in_set_p(dagvtx_succs(v), remove)) &&
+          // but we keep output nodes...
+          !gen_in_list_p(v, dag_outputs(d)) &&
+          // and measures...
+          !dagvtx_is_measurement_p(v))
+      {
+        pips_debug(7, "vertex %"_intFMT" is dead\n", dagvtx_number(v));
+        set_add_element(remove, remove, v);
+      }
+      else
+        pips_debug(8, "vertex %"_intFMT" is alive\n", dagvtx_number(v));
+    }
+    gen_free_list(vertices), vertices = NULL;
+  }
+
+  // look for identical image operations (same inputs, same params)
   // (that produce image, we do not care about measures???)
   // the second one is replaced by a copy.
   // also handle commutations.
 
   if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
   {
+    pips_debug(6, "removing duplicate operations\n");
     list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
     hash_table previous = hash_table_make(hash_pointer, 10);
 
     FOREACH(dagvtx, vr, vertices)
     {
-      pips_debug(8, "at vertex %"_intFMT"\n", dagvtx_number(vr));
+      pips_debug(7, "at vertex %"_intFMT"\n", dagvtx_number(vr));
       // skip no-operations
       int op = (int) vtxcontent_optype(dagvtx_content(vr));
       if (op<spoc_type_poc || op>spoc_type_thr) continue;
 
+      // skip already removed ops
+      if (set_belong_p(remove, vr)) continue;
+
+      pips_debug(8, "invesgating...\n");
       list preds = dag_vertex_preds(d, vr);
       bool switched = false;
       HASH_MAP(pp, lp,
