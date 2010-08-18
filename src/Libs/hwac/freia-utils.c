@@ -330,7 +330,7 @@ static string get_var(string prefix, int * params)
 }
 
 /* @return a string which describes the type of operation
- * (i.e. the hardware used by the function).
+ * (i.e. the hardware used by the function for spoc).
  */
 string what_operation(const _int type)
 {
@@ -408,7 +408,7 @@ list freia_get_vertex_params(const dagvtx v)
 {
   const vtxcontent vc = dagvtx_content(v);
   pips_assert("there is a statement",
-	      pstatement_statement_p(vtxcontent_source(vc)));
+              pstatement_statement_p(vtxcontent_source(vc)));
   const statement s = pstatement_statement(vtxcontent_source(vc));
   const call c = freia_statement_to_call(s);
   const freia_api_t * api = dagvtx_freia_api(v);
@@ -422,7 +422,7 @@ list freia_get_vertex_params(const dagvtx v)
  */
 list /* of expression */ freia_extract_params
   (const int napi,     // api function number
-   list args,	       // actual arguments to call
+   list args,          // actual arguments to call
    string_buffer head, // function headers
    hash_table params,  // argument/variable to parameter mapping
    int * nparams)      // current number of parameters
@@ -433,7 +433,7 @@ list /* of expression */ freia_extract_params
   bool merge = get_bool_property("FREIA_MERGE_ARGUMENTS");
 
   pips_assert("number of arguments is okay",
-	      gen_length(args)==api->arg_misc_in+api->arg_misc_out);
+              gen_length(args)==api->arg_misc_in+api->arg_misc_out);
 
   for (unsigned int i = 0; i<api->arg_misc_in; i++)
   {
@@ -447,29 +447,29 @@ list /* of expression */ freia_extract_params
       entity var = expression_to_entity(e);
       if (merge && !entity_undefined_p(var) && entity_variable_p(var))
       {
-	if (!hash_defined_p(params, var))
-	{
-	  // choose new name
-	  string name = get_var("pi", nparams);
-	  if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
-	  hash_put(params, e, name);
-	  res = CONS(expression, copy_expression(e), res);
-	  // keep record for the *variable* as well...
-	  hash_put(params, var, name);
-	}
-	else
-	{
-	  // skip argument, just record its where it is found
-	  hash_put(params, e, hash_get(params, var));
-	}
+        if (!hash_defined_p(params, var))
+        {
+          // choose new name
+          string name = get_var("pi", nparams);
+          if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+          hash_put(params, e, name);
+          res = CONS(expression, copy_expression(e), res);
+          // keep record for the *variable* as well...
+          hash_put(params, var, name);
+        }
+        else
+        {
+          // skip argument, just record its where it is found
+          hash_put(params, e, hash_get(params, var));
+        }
       }
       else
       {
-	// append and record new parameter
-	string name = get_var("pi", nparams);
-	if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
-	hash_put(params, e, name);
-	res = CONS(expression, copy_expression(e), res);
+        // append and record new parameter
+        string name = get_var("pi", nparams);
+        if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+        hash_put(params, e, name);
+        res = CONS(expression, copy_expression(e), res);
       }
     }
     else
@@ -513,8 +513,8 @@ statement freia_copy_image(const entity source, const entity target)
 {
   return call_to_statement(
     make_call(local_name_to_top_level_entity(AIPO "copy"),
-	      CONS(expression, entity_to_expression(target),
-		   CONS(expression, entity_to_expression(source), NIL))));
+              CONS(expression, entity_to_expression(target),
+                   CONS(expression, entity_to_expression(source), NIL))));
 }
 
 /* replace statement contents with call to c, or continue if kill
@@ -579,8 +579,8 @@ bool freia_image_variable_p(const entity var)
       t = basic_pointer(b);
       b = variable_basic(type_variable(t));
       is_image = basic_typedef_p(b) &&
-	same_string_p(entity_local_name(basic_typedef(b)),
-		      "$" FREIA_IMAGE_TYPE);
+        same_string_p(entity_local_name(basic_typedef(b)),
+                      "$" FREIA_IMAGE_TYPE);
     }
   }
 
@@ -630,8 +630,8 @@ bool freia_statement_aipo_call_p(const statement s)
     call c = instruction_call(i);
     entity called = call_function(c);
     if (entity_freia_api_p(called) &&
-	// ??? should be take care later?
-	freia_spoc_optimise(called))
+        // ??? should be take care later?
+        freia_spoc_optimise(called))
       return true;
     else if (freia_assignment_p(called))
     {
@@ -639,19 +639,19 @@ bool freia_statement_aipo_call_p(const statement s)
       pips_assert("2 arguments to assign", gen_length(la));
       syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
       if (syntax_call_p(op2))
-	return entity_freia_api_p(call_function(syntax_call(op2)))
-	  // ??? later?
-	  && freia_spoc_optimise(call_function(syntax_call(op2)));
+        return entity_freia_api_p(call_function(syntax_call(op2)))
+          // ??? later?
+          && freia_spoc_optimise(call_function(syntax_call(op2)));
     }
     else if (ENTITY_C_RETURN_P(called))
     {
       list la = call_arguments(c);
       if (gen_length(la)==1) {
-	syntax op = expression_syntax(EXPRESSION(CAR(la)));
-	if (syntax_call_p(op))
-	  return entity_freia_api_p(call_function(syntax_call(op)))
-	    // ??? later?
-	    && freia_spoc_optimise(call_function(syntax_call(op)));
+        syntax op = expression_syntax(EXPRESSION(CAR(la)));
+        if (syntax_call_p(op))
+          return entity_freia_api_p(call_function(syntax_call(op)))
+            // ??? later?
+            && freia_spoc_optimise(call_function(syntax_call(op)));
       }
     }
   }
@@ -676,12 +676,12 @@ static void set_add_scalars(set s, const statement stat, const bool written)
   FOREACH(effect, e, effects_effects(efs))
   {
     if (!malloc_effect_p(e) &&
-	((written && effect_write_p(e)) || (!written && effect_read_p(e))))
+        ((written && effect_write_p(e)) || (!written && effect_read_p(e))))
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && entity_scalar_p(var) &&
-	  !freia_image_variable_p(var) && var!=skip)
-	set_add_element(s, s, var);
+          !freia_image_variable_p(var) && var!=skip)
+        set_add_element(s, s, var);
     }
   }
 }
@@ -709,7 +709,7 @@ bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
   set_free(writes);
   set_free(inter);
   pips_debug(8, "%" _intFMT " %sdependent from %" _intFMT "\n",
-	     statement_number(t), rw_dep? "": "in", statement_number(s));
+             statement_number(t), rw_dep? "": "in", statement_number(s));
   return rw_dep;
 }
 
@@ -721,7 +721,7 @@ static bool lexpression_equal_p(const list l1, const list l2)
     list p1 = (list) l1, p2 = (list) l2;
     while (equal && p1 && p2) {
       if (!expression_equal_p(EXPRESSION(CAR(p1)), EXPRESSION(CAR(p2))))
-	equal = false;
+        equal = false;
       p1 = CDR(p1), p2 = CDR(p2);
     }
   }
@@ -764,9 +764,9 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
     c2 = freia_statement_to_call(dagvtx_statement(v2));
   list
     lp1 = freia_extract_params
-	(dagvtx_opid(v1), call_arguments(c1), NULL, NULL, NULL),
+    (dagvtx_opid(v1), call_arguments(c1), NULL, NULL, NULL),
     lp2 = freia_extract_params
-	(dagvtx_opid(v1), call_arguments(c2), NULL, NULL, NULL);
+    (dagvtx_opid(v1), call_arguments(c2), NULL, NULL, NULL);
   bool same = lexpression_equal_p(lp1, lp2);
   gen_free_list(lp1), gen_free_list(lp2);
   // should also check that there is no w effects on parameters in between
@@ -809,8 +809,9 @@ void freia_substitute_by_helper_call
       pips_assert("statement is a call", statement_call_p(sc));
       pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
 
-      // substitute by call to helper
-      entity helper = make_empty_subroutine(function_name,make_language_unknown()); // or function?
+      // substitute by call to helper (subroutine or function?)
+      entity helper = make_empty_subroutine(function_name,
+                                            make_language_unknown());
       call c = make_call(helper, lparams);
 
       hwac_replace_statement(sc, c, false);
@@ -840,17 +841,17 @@ void freia_insert_added_stats(list ls, list added_stats)
     statement_number(slast) = STATEMENT_NUMBER_UNDEFINED;
     // pretty ugly because return must be handled especially...
     if (instruction_call_p(ilast) &&
-	ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
+        ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
     {
       call c = instruction_call(ilast);
       if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
       {
-	// must split return...
-	pips_internal_error("return splitting not implemented yet...\n");
+        // must split return...
+        pips_internal_error("return splitting not implemented yet...\n");
       }
       else
       {
-	added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
+        added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
       }
     }
     else
