@@ -614,7 +614,7 @@ static bool all_vertices_are_copies_or_measures_p(const list lv)
 
 /* remove AIPO copies detected as useless.
  * remove identical operations.
- * @return statements to be managed outside...
+ * @return statements to be managed outside (external copies)...
  */
 list /* of statements */ dag_optimize(dag d)
 {
@@ -771,6 +771,7 @@ list /* of statements */ dag_optimize(dag d)
     }
   }
 
+  // cleanup dag
   SET_FOREACH(dagvtx, r, remove)
   {
     pips_debug(7, "removing vertex %" _intFMT "\n", dagvtx_number(r));
@@ -851,7 +852,7 @@ void dag_compute_outputs(dag d)
       // ??? this aborts with terapix...
       // pips_assert("is an input vertex", gen_in_list_p(v, dag_inputs(d)));
       if (!dagvtx_succs(v))
-  set_add_element(toremove, toremove, v);
+        set_add_element(toremove, toremove, v);
     }
   }
 
@@ -1146,7 +1147,7 @@ static void dag_append_freia_call(dag d, statement s)
 
 /* build a full dag from list of statements ls.
  * @param module
- * @param list of statements
+ * @param list of statements in sequence
  * @param number dag identifier in function
  * @param added_stat list of statements killed by dag optimization
  */
