@@ -60,16 +60,12 @@ digraph "copy_01_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
-  "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "33 E8" [shape=box];
   "33 E8" -> "out";
   "30 E8" [shape=box];
-  "30 E8" -> "31 =" [label="open"];
   "30 E8" -> "33 E8" [label="open"];
   "28 E8" [shape=box];
   "28 E8" -> "30 E8" [label="open"];
@@ -81,14 +77,12 @@ digraph "dag_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
   "33 E8" [shape=box];
   "33 E8" -> "out";
   "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
   "30 E8" -> "31 =" [label="open"];
@@ -106,17 +100,13 @@ digraph "dag_cleaned_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
   "33 E8" [shape=box];
   "33 E8" -> "out";
-  "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
-  "30 E8" -> "31 =" [label="open"];
   "28 E8" [shape=box];
   "28 E8" -> "30 E8" [label="open"];
   "in" -> "28 E8";
@@ -130,7 +120,7 @@ digraph "dag_cleaned_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module copy_01
-freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -169,47 +159,26 @@ freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_da
     sp.poc[1][0].kernel[i] = pi0[i];
 
 
-  // STAGE 3
-  // 0`open [1 poc 0] -> [3 poc 0] 33 erode_8c
-  si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`open [2 input 0] -> [3 poc 0] 33 erode_8c
-  si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`open [3 input 0] -> [3 poc 0] 33 erode_8c
-  // nope
-  // poc 33 erode_8c stage 3 side 0
-  si.poc[3][0].op = SPOC_POC_ERODE;
-  si.poc[3][0].grid = SPOC_POC_8_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = pi0[i];
-
-
   // STAGE 2
-  // 0`open [2 poc 0] -> [2 poc 0] 31 copy
+  // 0`open [1 poc 0] -> [2 poc 0] 33 erode_8c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`open [2 input 0] -> [2 poc 0] 33 erode_8c
   // nope
+  // poc 33 erode_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_ERODE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = pi0[i];
 
-  // output image 0`tmp on 1 and image 0`out on 0
-  // 0`tmp [2 poc 0] -> [3 output 1] 0 null
-  si.mux[2][1].op = SPOC_MUX_IN0;
-  si.mux[2][3].op = SPOC_MUX_IN0;
-  // 0`tmp [3 input 1] -> [3 output 1] 0 null
-  si.mux[3][3].op = SPOC_MUX_IN1;
+
+  // output image 0`out on 0
+  // 0`out [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`tmp [3 output 1] -> [7 output 1] 0 null
-  // 0`tmp [4 input 1] -> [7 output 1] 0 null
-  si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`tmp [5 input 1] -> [7 output 1] 0 null
-  si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`tmp [6 input 1] -> [7 output 1] 0 null
-  si.mux[6][3].op = SPOC_MUX_IN1;
-  // 0`tmp [7 input 1] -> [7 output 1] 0 null
-  si.mux[7][3].op = SPOC_MUX_IN1;
-
-  // 0`out [3 poc 0] -> [3 output 0] 0 null
+  // 0`out [2 output 0] -> [7 output 0] 0 null
+  // 0`out [3 input 0] -> [7 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-
-  // fill in to the end...
-  // 0`out [3 output 0] -> [7 output 0] 0 null
   // 0`out [4 input 0] -> [7 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
   // 0`out [5 input 0] -> [7 output 0] 0 null
@@ -232,7 +201,7 @@ freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_da
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
 
   return ret;
 }
@@ -242,7 +211,7 @@ freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_da
 int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
-   freia_data2d *in, *tmp, *out;                                        /*0007*/
+   freia_data2d *in, *out;                                              /*0007*/
    int32_t ret_0;                                                       /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
@@ -253,29 +222,25 @@ int copy_01(void)
    
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0017*/
-   tmp = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0019*/
    out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0020*/
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0023*/
-
-   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0025*/
-
+   
+   
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(tmp, out, in, kernel1x3);              /*0028*/
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
    ret_0 |= 0;                                                          /*0033*/
-
-   freia_common_destruct_data(tmp);                                     /*0035*/
-
+   
+   
    freia_common_tx_image(out, &fdout);                                  /*0037*/
    
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0040*/
-   freia_common_destruct_data(tmp);                                     /*0042*/
    freia_common_destruct_data(out);                                     /*0043*/
    
    /* close videos flow */
@@ -346,16 +311,12 @@ digraph "copy_01_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
-  "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "33 E8" [shape=box];
   "33 E8" -> "out";
   "30 E8" [shape=box];
-  "30 E8" -> "31 =" [label="open"];
   "30 E8" -> "33 E8" [label="open"];
   "28 E8" [shape=box];
   "28 E8" -> "30 E8" [label="open"];
@@ -367,14 +328,12 @@ digraph "dag_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
   "33 E8" [shape=box];
   "33 E8" -> "out";
   "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
   "30 E8" -> "31 =" [label="open"];
@@ -392,17 +351,13 @@ digraph "dag_cleaned_0" {
   "in" [shape=circle];
 
   // outputs
-  "tmp" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
   "33 E8" [shape=box];
   "33 E8" -> "out";
-  "31 =" [shape=circle];
-  "31 =" -> "tmp";
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
-  "30 E8" -> "31 =" [label="open"];
   "28 E8" [shape=box];
   "28 E8" -> "30 E8" [label="open"];
   "in" -> "28 E8";
@@ -417,16 +372,15 @@ digraph "dag_cleaned_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module copy_01
- * 1 input image, 2 output images
- * 5 image operations in dag
- * dag length is 4, dag width is 2
- * cost is 48 cycles per imagelet row
+ * 1 input image, 1 output image
+ * 4 image operations in dag
+ * dag length is 4, dag width is 1
+ * cost is 45 cycles per imagelet row
  */
 freia_status copy_01_helper_0_0(
   freia_data2d * o0,
-  freia_data2d * o1,
   freia_data2d * i0,
-  const int32_t * pi3)
+  const int32_t * pi2)
 {
   // declarations:
   freia_microcode mcode;
@@ -439,16 +393,15 @@ freia_status copy_01_helper_0_0(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
-  terapix_mcu_instr mcu_instr[3];
+  terapix_mcu_instr mcu_instr[4];
 
   // imagelets definitions:
   // - 2 computation imagelets
-  // - 2 double buffer imagelets
-  int imagelet_size = 256;
+  // - 1 double buffer imagelets
+  int imagelet_size = 341;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
-  int imagelet_4 = 768;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // body:
   // mcode param
@@ -469,7 +422,7 @@ freia_status copy_01_helper_0_0(
   mcu_instr[0].macrocode.ymin2 = 0;
   // copy of operation 0 parameters
   for(i=0; i<9; i++)
-    p_0[i] = pi3[i];
+    p_0[i] = pi2[i];
   gram.xoffset = x_0;
   gram.yoffset = y_0;
   gram.width = 3;
@@ -501,19 +454,23 @@ freia_status copy_01_helper_0_0(
   mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[2].macrocode.iter2 = imagelet_size;
   mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 3: =(1) -> 1
-  // in place copy skipped
+  // copy 2 -> 1
+  mcu_instr[3].macrocode.xmin1 = imagelet_2;
+  mcu_instr[3].macrocode.ymin1 = 0;
+  mcu_instr[3].macrocode.xmin2 = imagelet_1;
+  mcu_instr[3].macrocode.ymin2 = 0;
+  mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[3].macrocode.iter2 = imagelet_size;
+  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_COPY;
 
   // inputs:
   // - imagelet 1 is i0 for in
 
   // outputs:
-  // - imagelet 1 is o0 for tmp
-  // - imagelet 2 is o1 for out
+  // - imagelet 1 is o0 for out
 
   // double buffer management:
   // - buffer 1/3
-  // - buffer 2/4
 
   // output imagelet erosion:
   //   north: 0
@@ -521,7 +478,7 @@ freia_status copy_01_helper_0_0(
   //    west: 3
   //    east: 3
 
-  ret = freia_cg_template_process_1i_2o(&param, o0, o1, i0);
+  ret = freia_cg_template_process_1i_1o(&param, o0, i0);
 
 
   return ret;
@@ -533,7 +490,7 @@ freia_status copy_01_helper_0_0(
 int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
-   freia_data2d *in, *tmp, *out;                                        /*0007*/
+   freia_data2d *in, *out;                                              /*0007*/
    int32_t ret_0;                                                       /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
@@ -544,29 +501,25 @@ int copy_01(void)
    
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0017*/
-   tmp = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0019*/
    out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0020*/
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0023*/
-
-   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0025*/
-
+   
+   
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0(tmp, out, in, kernel1x3);                /*0028*/
+   ret_0 |= copy_01_helper_0_0(out, in, kernel1x3);                     /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
    ret_0 |= 0;                                                          /*0033*/
-
-   freia_common_destruct_data(tmp);                                     /*0035*/
-
+   
+   
    freia_common_tx_image(out, &fdout);                                  /*0037*/
    
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0040*/
-   freia_common_destruct_data(tmp);                                     /*0042*/
    freia_common_destruct_data(out);                                     /*0043*/
    
    /* close videos flow */

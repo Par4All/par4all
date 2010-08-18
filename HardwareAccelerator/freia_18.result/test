@@ -45,20 +45,16 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "u2" [shape=circle];
   "o" [shape=circle];
-  "u3" [shape=circle];
 
   // computation vertices
   "25 |" [shape=trapezium,orientation=270];
-  "25 |" -> "u3";
   "24 ^" [shape=trapezium,orientation=270];
   "24 ^" -> "25 |" [label="o"];
   "24 ^" -> "o";
   "23 &" [shape=trapezium,orientation=270];
   "23 &" -> "24 ^" [label="t0"];
   "22 -" [shape=trapezium,orientation=270];
-  "22 -" -> "u2";
   "21 =" [shape=circle];
   "21 =" -> "22 -" [label="u1"];
   "20 +" [shape=trapezium,orientation=270];
@@ -78,20 +74,16 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "u2" [shape=circle];
   "o" [shape=circle];
-  "u3" [shape=circle];
 
   // computation vertices
   "25 |" [shape=trapezium,orientation=270];
-  "25 |" -> "u3";
   "24 ^" [shape=trapezium,orientation=270];
   "24 ^" -> "25 |" [label="o"];
   "24 ^" -> "o";
   "23 &" [shape=trapezium,orientation=270];
   "23 &" -> "24 ^" [label="t0"];
   "22 -" [shape=trapezium,orientation=270];
-  "22 -" -> "u2";
   "20 +" [shape=trapezium,orientation=270];
   "20 +" -> "22 -" [label="u0"];
   "i1" -> "25 |";
@@ -408,20 +400,16 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "u2" [shape=circle];
   "o" [shape=circle];
-  "u3" [shape=circle];
 
   // computation vertices
   "25 |" [shape=trapezium,orientation=270];
-  "25 |" -> "u3";
   "24 ^" [shape=trapezium,orientation=270];
   "24 ^" -> "25 |" [label="o"];
   "24 ^" -> "o";
   "23 &" [shape=trapezium,orientation=270];
   "23 &" -> "24 ^" [label="t0"];
   "22 -" [shape=trapezium,orientation=270];
-  "22 -" -> "u2";
   "21 =" [shape=circle];
   "21 =" -> "22 -" [label="u1"];
   "20 +" [shape=trapezium,orientation=270];
@@ -441,20 +429,16 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "u2" [shape=circle];
   "o" [shape=circle];
-  "u3" [shape=circle];
 
   // computation vertices
   "25 |" [shape=trapezium,orientation=270];
-  "25 |" -> "u3";
   "24 ^" [shape=trapezium,orientation=270];
   "24 ^" -> "25 |" [label="o"];
   "24 ^" -> "o";
   "23 &" [shape=trapezium,orientation=270];
   "23 &" -> "24 ^" [label="t0"];
   "22 -" [shape=trapezium,orientation=270];
-  "22 -" -> "u2";
   "20 +" [shape=trapezium,orientation=270];
   "20 +" -> "22 -" [label="u0"];
   "i1" -> "25 |";
