@@ -465,6 +465,7 @@ static void terapix_macro_code
     // alu: image op cst 1
     // threshold 3x1
     // erode/dilate 3x3
+    // copy
     terapix_mcu_int(code, op, "xmin1", IMG_PTR, INT(CAR(ins)));
     terapix_mcu_int(code, op, "ymin1", "", 0);
     if (out) {
@@ -701,8 +702,18 @@ static void freia_terapix_call
                         freia_extract_params(opid, call_arguments(c),
                                              head, hparams, &nargs));
 
-    terapix_macro_code(body, decl, n_ops, api, used,
-                       hparams, current, ins, choice);
+    if (api==hwac_freia_api(AIPO "copy") && choice==INT(CAR(ins)))
+    {
+      // skip in place copy, which may happen if the selected target
+      // image buffer happens to be the same as the input.
+      sb_cat(body, "  // in place copy skipped\n");
+      n_ops--;
+    }
+    else
+    {
+      terapix_macro_code(body, decl, n_ops, api, used,
+                         hparams, current, ins, choice);
+    }
 
     gen_free_list(ins), ins=NIL;
 
