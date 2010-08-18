@@ -46,10 +46,12 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
+- it seems that dead code is not (fully/at all) removed (freia_18)
 
 * post
 + remove malloc/free if not used
 + cleanup declarations
+- it seems that some unused image are not removed (license_plate_copies)
 
 * validation
 - check all AIPO
