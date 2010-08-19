@@ -1,0 +1,11 @@
+t_real dotp_ptr(const long int size, const t_real *x)
+{
+   long int i;
+   t_real result = 0.0;
+   
+   // compare loop
+#pragma omp parallel for reduction(+:result)
+   for(i = 0; i <= size-1; i += 1)
+      result += x[i]*x[i];
+   return result;
+}
