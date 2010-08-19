@@ -21,6 +21,8 @@ int main () {
   // load vector
   for (i = 0; i < 100; i++) v[i] = 1.0;
 
+  //  dotp_ptr_lib (100, v);
+
   // exit without doing anything
   return 0;
 }
