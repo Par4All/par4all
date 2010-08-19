@@ -1383,9 +1383,10 @@ output code as close as possible to the user source code.
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \end{PipsProp}
 
-Most PIPS analyses work better if loop bounds are affine. It is sometimes
+Most PIPS analyses work better if do loop bounds are affine. It is sometimes
 possible to improve results for non-affine bounds by assigning the bound
-to an integer variables and by using this variable as bound.
+to an integer variables and by using this variable as bound. But this
+is implemented for Fortran, but not for C.
 
 \begin{PipsProp}{PARSER_LINEARIZE_LOOP_BOUNDS}
 PARSER_LINEARIZE_LOOP_BOUNDS FALSE
