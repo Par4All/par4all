@@ -132,7 +132,7 @@ mail-validate: new-validate
 	{ \
 	  cat $(SUM.d)/SUMMARY.diff ; \
 	  echo ; \
-	  cat SUMMARY ; \
+	  grep -v '^passed: ' SUMMARY ; \
 	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
 
 SUMUP	= pips_validation_summary.pl
@@ -146,14 +146,18 @@ SUMMARY: $(HEAD) parallel-validate
 	  echo ; \
           $(SUMUP) $(RESULTS) ; \
           echo ; \
-	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
+	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  failed=$$(egrep '^(failed|changed): ' < $(RESULTS) | wc -l); \
-	  total=$$(egrep '^(failed|changed|passed): ' < $(RESULTS) | wc -l); \
-	  [ $$failed = 0 ] && \
-		status="SUCCEEDED $$total" || \
-		status="FAILED $$failed/$$total"; \
-	  echo "$$failed failed out of $$total on $$(date)"; \
+	  failed=$$(egrep '^failed: ' < $(RESULTS) | wc -l); \
+	  changed=$$(egrep '^changed: ' < $(RESULTS) | wc -l); \
+	  timeout=$$(egrep '^timeout: ' < $(RESULTS) | wc -l); \
+	  passed=$$(egrep '^passed: ' < $(RESULTS) | wc -l); \
+	  total=$$(($$failed+$$changed+$$timeout+$$passed)) ; \
+	  issues=$$(($$total-$$passed)) ; \
+	  [ $$passed = $$total ] && \
+	    status="SUCCEEDED $$total" || \
+	    status="FAILED $$issues/$$total ($$failed+$$changed+$$timeout)"; \
+	  echo "$$issues issues out of $$total on $$(date)"; \
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
 	} > $@
 
