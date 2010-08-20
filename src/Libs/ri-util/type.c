@@ -2638,15 +2638,33 @@ type ultimate_type(type t)
       entity e = basic_typedef(bt);
       type st = entity_type(e);
 
+      // recursion
       nt = ultimate_type(st);
+
+      // FC->SG the following stuff requires more comments to be understandable
+      // FC->SG why this #if ???
 #if 1
-      if( !ENDP(variable_dimensions(vt) ) ) /* without this test, we would erase the dimension ... */
+      /* without this test, we would erase the dimension ... */
+      if( !ENDP(variable_dimensions(vt) ) )
       {
-          /* what should we do ? allocate a new type ... but this breaks the semantic of the function
-           * we still create a leak for this case, which does not appear to often
-           * a warning is printed out, so that we don't forget it
+          /* what should we do ? allocate a new type ...
+           * but this breaks the semantic of the function
+           * we still create a leak for this case, which does not appear to
+           * often a warning is printed out, so that we don't forget it
            */
+          // ??? FC->SG why this static structure?
           static size_t holder_iter = 0;
+          // ??? FC->SG: why 8? why not 314159?
+          //
+          // this is creazy programming and a time bomb:-(
+          //
+          // it seems that the returned allocated type is stored there
+          // so that it may be freed some time later, with the hope that by
+          // the time it is freed it will not be in use anymore.
+          //
+          // I would prefer a memory leak in place of this kludge.
+          // I would rather suggest to memoize the computed types
+          // and not to do this kind of hidden garbage collector.
           static type holder[8] = {// SG: this should avoid the leak
               type_undefined,
               type_undefined,
@@ -2658,11 +2676,13 @@ type ultimate_type(type t)
               type_undefined
           };
           nt=copy_type(nt);
-          holder_iter = 7 & ( 1 + holder_iter );
-          variable_dimensions(type_variable(nt))=gen_nconc(gen_full_copy_list(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
-          if(!type_undefined_p(holder[holder_iter])) free_type(holder[holder_iter]);
+          holder_iter = 7 & ( 1 + holder_iter ); // too much VHDL? :-(
+          variable_dimensions(type_variable(nt)) =
+            gen_nconc(gen_full_copy_list(variable_dimensions(vt)),
+                      variable_dimensions(type_variable(nt)));
+          if (!type_undefined_p(holder[holder_iter]))
+            free_type(holder[holder_iter]);
           holder[holder_iter]=nt;
-
       }
 #endif
     }
