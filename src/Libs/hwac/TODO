@@ -54,12 +54,13 @@
 + it seems that some unused image are not removed (license_plate_copies)
 
 * validation
-- check all AIPO
++ check all AIPO
 + add more (elementary) tests?
 
 * bugs
 + allocs may be in the middle of the calls
-- reuse of images in some cases
+- reuse of images in some cases when nodes are reordered... SSA?
+- license_plate_copies takes too much time to compile?
 
 * terapix
 + must manage memory allocation in tiles
