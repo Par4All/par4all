@@ -617,7 +617,8 @@ static bool all_vertices_are_copies_or_measures_p(const list lv)
   return true;
 }
 
-/* remove AIPO copies detected as useless.
+/* remove dead image operations.
+ * remove AIPO copies detected as useless.
  * remove identical operations.
  * @return statements to be managed outside (external copies)...
  * ??? maybe there should be a transitive closure...
@@ -763,6 +764,7 @@ list /* of statements */ dag_optimize(dag d)
   // is replaced by an external X-copy->Y
   FOREACH(dagvtx, w, dag_vertices(d))
   {
+    // skip already to-remove nodes
     if (set_belong_p(remove, w))
       continue;
 
@@ -811,8 +813,9 @@ list /* of statements */ dag_optimize(dag d)
       }
     }
   }
+  hash_table_free(intra_pipe_copies);
 
-  // cleanup dag
+  // cleanup dag (argh, beware that the order is not deterministic...)
   SET_FOREACH(dagvtx, r, remove)
   {
     pips_debug(7, "removing vertex %" _intFMT "\n", dagvtx_number(r));
@@ -829,8 +832,19 @@ list /* of statements */ dag_optimize(dag d)
   }
 
   set_free(remove);
-  hash_table_free(intra_pipe_copies);
 
+  // further check for unused input nodes
+  // this seems needed because some non determinism in the above cleanup.
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    if (dagvtx_number(v)==0 && !dagvtx_succs(v))
+    {
+      dag_remove_vertex(d, v);
+      free_dagvtx(v);
+    }
+  }
+
+  // show result
   ifdebug(6) {
     pips_debug(4, "resulting dag:\n");
     dag_dump(stderr, "cleaned", d);
