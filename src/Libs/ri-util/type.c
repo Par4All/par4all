@@ -2622,7 +2622,9 @@ type make_standard_long_integer_type(type t)
 type ultimate_type(type t)
 {
   type nt;
-  pips_assert("type consistent",type_consistent_p(t));
+
+  // only under debug, because there is a big impact on performance
+  ifdebug(1) pips_assert("type consistent",type_consistent_p(t));
 
   pips_debug(9, "Begins with type \"%s\"\n", type_to_string(t));
 
@@ -2683,7 +2685,8 @@ type ultimate_type(type t)
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 
-  pips_assert("type consistent",type_consistent_p(nt));
+  // only under debug, because there is a big impact on performance
+  ifdebug(1) pips_assert("type consistent",type_consistent_p(nt));
   return nt;
 }
 
