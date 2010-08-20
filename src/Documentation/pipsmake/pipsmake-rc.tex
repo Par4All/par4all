@@ -7461,6 +7461,17 @@ Should be always beneficial to terapix, but it may depend for spoc.
 FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
 \end{PipsProp}
 
+Whether to remove useless image copies from the expression DAG.
+\begin{PipsProp}{FREIA_REMOVE_USELESS_COPIES}
+FREIA_REMOVE_USELESS_COPIES TRUE
+\end{PipsProp}
+
+Whether to move image copies within an expression DAG outside
+as external copies, if possible.
+\begin{PipsProp}{FREIA_MOVE_DIRECT_COPIES}
+FREIA_MOVE_DIRECT_COPIES TRUE
+\end{PipsProp}
+
 Whether to merge identical arguments, especially kernels, when calling
 an accelerated function:
 \begin{PipsProp}{FREIA_MERGE_ARGUMENTS}

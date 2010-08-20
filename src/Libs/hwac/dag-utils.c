@@ -730,90 +730,98 @@ list /* of statements */ dag_optimize(dag d)
     gen_free_list(vertices), vertices = NULL;
   }
 
-  // only one pass is needed because we're going backwards?
-  // op-> X -copy-> Y images copies are replaced by op-> X & Y
-  FOREACH(dagvtx, v, dag_vertices(d))
+  if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
   {
-    // skip special input nodes
-    if (dagvtx_number(v)==0) break;
-
-    if (dagvtx_is_copy_p(v))
+    // only one pass is needed because we're going backwards?
+    // op-> X -copy-> Y images copies are replaced by op-> X & Y
+    FOREACH(dagvtx, v, dag_vertices(d))
     {
-      vtxcontent c = dagvtx_content(v);
-      entity target = vtxcontent_out(c);
-      pips_assert("one output and one input to copy",
+      // skip special input nodes
+      if (dagvtx_number(v)==0) break;
+
+      if (dagvtx_is_copy_p(v))
+      {
+        vtxcontent c = dagvtx_content(v);
+        entity target = vtxcontent_out(c);
+        pips_assert("one output and one input to copy",
               target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
-      // replace by its source everywhere it is used
-      entity source = ENTITY(CAR(vtxcontent_inputs(c)));
+        // replace by its source everywhere it is used
+        entity source = ENTITY(CAR(vtxcontent_inputs(c)));
 
-      // remove!
-      unlink_copy_vertex(d, source, v);
+        // remove!
+        unlink_copy_vertex(d, source, v);
 
-      // whether to actually remove v
-      if (!gen_in_list_p(v, dag_outputs(d)))
-        set_add_element(remove, remove, v);
+        // whether to actually remove v
+        if (!gen_in_list_p(v, dag_outputs(d)))
+          set_add_element(remove, remove, v);
+      }
     }
   }
 
-  // what copies are kept in the dag
-  hash_table intra_pipe_copies = hash_table_make(hash_pointer, 10);
-
-  // A-copy->B where A is an input is removed from the dag and managed outside
-  // if A-copy->X and A-copy->Y where A is not an input, the second copy
-  // is replaced by an external X-copy->Y
-  FOREACH(dagvtx, w, dag_vertices(d))
+  if (get_bool_property("FREIA_MOVE_DIRECT_COPIES"))
   {
-    // skip already to-remove nodes
-    if (set_belong_p(remove, w))
-      continue;
+    // A-copy->B where A is an input is removed from the dag and
+    // managed outside
+    // if A-copy->X and A-copy->Y where A is not an input, the second copy
+    // is replaced by an external X-copy->Y
 
-    if (dagvtx_is_copy_p(w))
+    // what copies are kept in the dag
+    hash_table intra_pipe_copies = hash_table_make(hash_pointer, 10);
+
+    FOREACH(dagvtx, w, dag_vertices(d))
     {
-      vtxcontent c = dagvtx_content(w);
-      entity target = vtxcontent_out(c);
-      pips_assert("one output and one input to copy",
+      // skip already to-remove nodes
+      if (set_belong_p(remove, w))
+        continue;
+
+      if (dagvtx_is_copy_p(w))
+      {
+        vtxcontent c = dagvtx_content(w);
+        entity target = vtxcontent_out(c);
+        pips_assert("one output and one input to copy",
               target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
-      entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-      dagvtx prod = dagvtx_get_producer(d, w, source);
+        entity source = ENTITY(CAR(vtxcontent_inputs(c)));
+        dagvtx prod = dagvtx_get_producer(d, w, source);
 
-      if (source==target)
-      {
-        // ??? this should not happen?
-        set_add_element(remove, remove, w);
-      }
-      else if (dagvtx_number(prod)==0)
-      {
-        // fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
-        unlink_copy_vertex(d, source, w);
-        set_add_element(remove, remove, w);
-        lstats = CONS(statement, freia_copy_image(source, target), lstats);
-      }
-      else // source is not an input, but the result of a internal computation
-      {
-        if (all_vertices_are_copies_or_measures_p(dagvtx_succs(prod)))
+        if (source==target)
         {
-          // ??? hmmm... there is an implicit assumption here that the
-          // source of the copy will be an output...
+          // ??? this should not happen?
+          set_add_element(remove, remove, w);
+        }
+        else if (dagvtx_number(prod)==0)
+        {
+          // fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
           unlink_copy_vertex(d, source, w);
           set_add_element(remove, remove, w);
           lstats = CONS(statement, freia_copy_image(source, target), lstats);
         }
-        else if (hash_defined_p(intra_pipe_copies, source))
+        else // source not an input, but the result of an internal computation
         {
-          unlink_copy_vertex(d, source, w);
-          set_add_element(remove, remove, w);
-          lstats = CONS(statement,
-               freia_copy_image((entity) hash_get(intra_pipe_copies, source),
-                                target), lstats);
+          if (all_vertices_are_copies_or_measures_p(dagvtx_succs(prod)))
+          {
+            // ??? hmmm... there is an implicit assumption here that the
+            // source of the copy will be an output...
+            unlink_copy_vertex(d, source, w);
+            set_add_element(remove, remove, w);
+            lstats = CONS(statement, freia_copy_image(source, target), lstats);
+          }
+          else if (hash_defined_p(intra_pipe_copies, source))
+          {
+            unlink_copy_vertex(d, source, w);
+            set_add_element(remove, remove, w);
+            lstats = CONS(statement,
+                freia_copy_image((entity) hash_get(intra_pipe_copies, source),
+                                 target), lstats);
+          }
+          else // keep first copy
+            hash_put(intra_pipe_copies, source, target);
         }
-        else // keep first copy
-          hash_put(intra_pipe_copies, source, target);
       }
     }
+    hash_table_free(intra_pipe_copies);
   }
-  hash_table_free(intra_pipe_copies);
 
   // cleanup dag (argh, beware that the order is not deterministic...)
   SET_FOREACH(dagvtx, r, remove)
@@ -835,7 +843,8 @@ list /* of statements */ dag_optimize(dag d)
 
   // further check for unused input nodes
   // this seems needed because some non determinism in the above cleanup.
-  FOREACH(dagvtx, v, dag_vertices(d))
+  list vertices = gen_copy_seq(dag_vertices(d));
+  FOREACH(dagvtx, v, vertices)
   {
     if (dagvtx_number(v)==0 && !dagvtx_succs(v))
     {
@@ -843,6 +852,7 @@ list /* of statements */ dag_optimize(dag d)
       free_dagvtx(v);
     }
   }
+  gen_free_list(vertices);
 
   // show result
   ifdebug(6) {
