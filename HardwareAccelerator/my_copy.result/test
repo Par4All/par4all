@@ -27,7 +27,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=circle];
 
   // outputs
 
@@ -77,7 +76,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=circle];
 
   // outputs
 

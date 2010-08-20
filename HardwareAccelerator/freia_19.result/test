@@ -40,7 +40,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
 
   // outputs
 
@@ -110,7 +109,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
 
   // outputs
 
