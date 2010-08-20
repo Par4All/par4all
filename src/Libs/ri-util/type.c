@@ -2543,7 +2543,6 @@ bool scalar_integer_type_p(type t)
     variable v = type_variable(t);
     basic b = variable_basic(v);
     if(basic_int_p(b)) {
-      int s = basic_int(b);
 
       long_p = ENDP(variable_dimensions(v));
       /* The qualifiers do not matter
