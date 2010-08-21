@@ -189,7 +189,7 @@ orphan:
 	       -f $$base.py -o \
 	       -f default_tpips -o \
 	       -f default_test || \
-	  echo "orphan: $$base" ; \
+	  echo "orphan: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
 # test case with multiple scripts... one is randomly (?) chosen
