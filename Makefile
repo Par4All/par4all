@@ -50,23 +50,6 @@ validate: clean-target
 accept:
 	pips_manual_accept $(TARGET)
 
-# extract private (restricted access) validation
-.PHONY: private
-private:
-	if [ -d private/. ] ; then \
-	  if [ -d private/.svn ] ; then \
-	    svn up private/ ; \
-	  else \
-	    echo "ERROR: cannot update private" >&2 ; \
-	  fi ; \
-	else \
-	  echo "checkout the private validation somewhere:"; \
-	  echo "> svn co https://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk ???"; \
-	  echo "and link it here as 'private':"; \
-	  echo "> ln -s ??? private"; \
-	  echo "CAUTION: it MUST NOT be distributed..." ; \
-	fi
-
 # validate one sub directory
 validate-%: %
 	# test -d $< && $(MAKE) TARGET=$< validate
@@ -190,13 +173,6 @@ parallel-validate-%: parallel-check-%
 parallel-unvalidate-%:
 	[ -d $* -a -f $*/Makefile ] \
 	  && $(MAKE) -C $* unvalidate ; exit 0
-
-## REMOVE ???
-# special handling of private
-PRIV	= $(wildcard private/*)
-PRIV.d	= $(shell for d in $(PRIV) ; do test -d $$d && echo $$d ; done)
-validate-private:
-	$(MAKE) TARGET="$(PRIV.d)" validate
 
 # validate all subdirectories
 ALL	= $(wildcard * private/*)
