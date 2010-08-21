@@ -150,7 +150,7 @@ SUMMARY: $(HEAD) parallel-validate
           echo ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  status=$$(shell egrep '^(SUCCEEDED|FAILED) ' SUMMARY) ; \
+	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
 	} >> $@
 
