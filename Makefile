@@ -145,21 +145,14 @@ SUMMARY: $(HEAD) parallel-validate
 	  echo "end date: $$(date)" ; \
 	  echo ; \
           $(SUMUP) $(RESULTS) ; \
+	} > $@
+	{ \
           echo ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  failed=$$(egrep '^failed: ' < $(RESULTS) | wc -l); \
-	  changed=$$(egrep '^changed: ' < $(RESULTS) | wc -l); \
-	  timeout=$$(egrep '^timeout: ' < $(RESULTS) | wc -l); \
-	  passed=$$(egrep '^passed: ' < $(RESULTS) | wc -l); \
-	  total=$$(($$failed+$$changed+$$timeout+$$passed)) ; \
-	  issues=$$(($$total-$$passed)) ; \
-	  [ $$passed = $$total ] && \
-	    status="SUCCEEDED $$total" || \
-	    status="FAILED $$issues/$$total ($$failed+$$changed+$$timeout)"; \
-	  echo "$$issues issues out of $$total on $$(date)"; \
+	  status=$$(shell egrep '^(SUCCEEDED|FAILED) ' SUMMARY) ; \
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
-	} > $@
+	} >> $@
 
 archive: SUMMARY $(DEST.d)
 	cp SUMMARY $(DEST.d)/$(NOW) ; \
