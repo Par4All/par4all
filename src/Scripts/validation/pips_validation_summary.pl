@@ -135,5 +135,5 @@ if ($n{passed} == $count)
 else
 {
   print "FAILED $not_passed/$count ",
-    "($n{failed}+$n{changed}+$n{timeout})$status_changes";
+    "($n{failed}+$n{changed}+$n{timeout})$status_changes\n";
 }
