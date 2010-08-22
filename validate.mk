@@ -86,6 +86,7 @@ clean-validate:
 	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
 	$(RM) -r *.database $(RESULTS)
 
+.PHONY: validate
 validate:
 	# Parallel validation
 	# run "make validate-test" to generate "test" files.
@@ -108,7 +109,7 @@ endif
 # restore all initial "test" result files if you are unhappy with a validate
 .PHONY: unvalidate
 unvalidate: check-svn
-	svn revert $(F.valid)
+	-[ $(TEST) = 'test' ] && svn revert $(F.valid)
 
 # generate "out" files
 # ??? does not work because of "svn diff"?
@@ -176,6 +177,7 @@ DEFTEST	= default_test
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
 # detect skipped stuff
+.PHONY: skipped
 skipped:
 	for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
 	  if ! test -d $$base.result ; \
