@@ -679,8 +679,8 @@ static void set_add_scalars(set s, const statement stat, const bool written)
         ((written && effect_write_p(e)) || (!written && effect_read_p(e))))
     {
       entity var = reference_variable(effect_any_reference(e));
-      if (entity_variable_p(var) && !freia_image_variable_p(var) &&
-          var!=skip && entity_scalar_p(var))
+      if (entity_variable_p(var) && var!=skip &&
+          !freia_image_variable_p(var) && entity_scalar_p(var))
         set_add_element(s, s, var);
     }
   }
