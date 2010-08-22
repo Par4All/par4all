@@ -127,7 +127,8 @@ SUMMARY: $(HEAD) parallel-validate
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date)" ; \
 	  echo ; \
-          $(SUMUP) $(RESULTS) ; \
+	  [ -f $(SUM.last) ] && last=$(SUM.last) ; \
+          $(SUMUP) $(RESULTS) $$last ; \
 	} > $@
 	{ \
           echo ; \
