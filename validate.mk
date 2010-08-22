@@ -1,7 +1,4 @@
 # $Id$
-#
-# TODO
-# * *.f95 for gfc2pips
 
 # pips exes
 TPIPS	= tpips
@@ -51,12 +48,15 @@ F.valid	= $(F.result:%=%/$(TEST))
 # all base cases
 F.list	= $(F.result:%.result=%)
 
+# where are we?
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
+# get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
-#OK	= exit 0
+# where to store validation results
 RESULTS	= RESULTS
 
+# shell environment to run validation scripts
 SHELL	= /bin/bash
 PF	= set -o pipefail ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
@@ -81,16 +81,19 @@ OK	= status=$$? ; \
 # default target is to clean
 clean: clean-validate
 
+.PHONY: clean-validate
 clean-validate:
 	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
 	$(RM) -r *.database $(RESULTS)
 
 validate:
-	# Experimental parallel validation
-	# run "make validate-out" to generate usual "out" files.
+	# Parallel validation
 	# run "make validate-test" to generate "test" files.
+	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
 
+.PHONY: validate-dir
+# the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
 validate-dir:
@@ -103,16 +106,19 @@ validate-dir:
 endif
 
 # restore all initial "test" result files if you are unhappy with a validate
-unvalidate:
+.PHONY: unvalidate
+unvalidate: check-svn
 	svn revert $(F.valid)
 
 # generate "out" files
 # ??? does not work because of "svn diff"?
+.PHONY: validate-out
 validate-out:
 	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh validate-dir
 
 # generate "test" files
-validate-test:
+.PHONY: validate-test
+validate-test: check-svn
 	$(MAKE) TEST=test validate-dir
 
 # hack: validate depending on prefix?
@@ -120,7 +126,8 @@ validate-%:
 	$(MAKE) F.result="$(wildcard $**.result)" validate-dir
 
 # generate missing "test" files
-test: $(F.valid)
+.PHONY: generate-test
+generate-test: $(F.valid)
 
 # (shell) script
 %.result/$(TEST): %.test
@@ -181,6 +188,7 @@ skipped:
 	done >> $(RESULTS)
 
 # test RESULT directory without any script
+.PHONY: orphan
 orphan:
 	for base in $(sort $(F.list)) ; do \
 	  test -f $$base.tpips -o \
@@ -193,6 +201,7 @@ orphan:
 	done >> $(RESULTS)
 
 # test case with multiple scripts... one is randomly (?) chosen
+.PHONY: multi-script
 multi-script:
 	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
@@ -200,6 +209,7 @@ multi-script:
 	done >> $(RESULTS)
 
 # test case with multiple sources (c/f/F...)
+.PHONY: multi-source
 multi-source:
 	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
@@ -207,10 +217,12 @@ multi-source:
 	done >> $(RESULTS)
 
 # all possible inconsistencies
+.PHONY: inconsistencies
 inconsistencies: skipped orphan multi-source multi-script
 
 # what about nothing?
 # source files without corresponding result directory
+.PHONY: missing
 missing:
 	@echo "# checking for missing (?) result directories"
 	@ n=0; \
@@ -222,9 +234,19 @@ missing:
 	done ; \
 	echo "# $$n missing result(s)"
 
+.PHONY: missing-svn
 missing-svn:
 	@echo "# result directories not under svn"
 	@svn status | grep '\.result'
 
+# check that we are in a subversion working copy
+.PHONY: check-svn
+check-svn:
+	@[ -d .svn ] || { \
+	  echo "error: validation must be an SVN working copy" >&2 ; \
+	  exit 1 ; \
+	}
+
+.PHONY: count
 count:
 	@echo "number of validations:" `echo $(F.result) | wc -w`
