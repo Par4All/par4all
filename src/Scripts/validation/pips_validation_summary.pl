@@ -86,6 +86,7 @@ while (<>)
 	  $diff{$dir}{"$O."}++;
 	}
       }
+      # else the line is not about the validation status, we ignore it
     }
   }
 }
@@ -113,7 +114,6 @@ my $status_changes = '';
 for my $sc (sort keys %changes) {
   $status_changes .= " $sc=$changes{$sc}";
 }
-$status_changes = 'none' unless $status_changes;
 
 # print global summary
 printf
@@ -123,8 +123,8 @@ printf
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
   " - timeout: $n{timeout} (time was out)\n" .
-  # should I hide status changes if it was not computed?
-  " * status changes:$status_changes\n" .
+  # should I hide status changes altogether if it was not computed?
+  " * status changes:" . ($status_changes? $status_changes: " none") . "\n" .
   "   .=None P=passed F=failed C=changed T=timeout\n" .
   "warnings: $warned\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
