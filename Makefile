@@ -64,9 +64,19 @@ SVN.URL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
 SVN.R	= $(shell svnversion)
 SVN.C	= $(shell svnversion -c)
 
+# check for svn working copy early
+.PHONY: check-run-consistency
+check-run-consistency:
+	@[ $(OUTPUT) = 'out' ] && exit 0 ; \
+	[ '$(OUTPUT)' = 'test' -a -d .svn ] || { \
+	  echo "OUTPUT=test parallel validation requires svn" >&2 ; \
+	  echo "try: make OUTPUT=out <your arguments...>" >&2 ; \
+	  exit 1 ; \
+	}
+
 # generate summary header
 # hmmm... not sure that start date is before the validation
-$(HEAD):
+$(HEAD): check-run-consistency
 	{ \
 	  echo "parallel validation" ; \
 	  echo "on: $(TARGET)" ; \
@@ -151,17 +161,14 @@ parallel-check-%: parallel-clean-%
 	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; \
 	  exit 0
 
+# type of validation, may be "out" or "test"
+OUTPUT = test
+
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-test \
+	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(OUTPUT) \
 	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:
 	[ -d $* -a -f $*/Makefile ] \
 	  && $(MAKE) -C $* unvalidate ; exit 0
-
-# validate all subdirectories
-ALL	= $(wildcard *)
-ALL.d	= $(shell for d in $(ALL) ; do test -d $$d && echo $$d ; done)
-validate-all:
-	$(MAKE) TARGET="$(ALL.d)" validate
