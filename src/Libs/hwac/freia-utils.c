@@ -692,7 +692,8 @@ static void set_add_scalars(set s, const statement stat, const bool written)
  * @param t target statement
  * @param vars if set, return list of scalars which hold the dependencies
  */
-bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
+static bool
+real_freia_scalar_rw_dep(const statement s, const statement t, list * vars)
 {
   // pips_assert("distinct statements", s!=t);
   if (s==t || !s || !t) return false;
@@ -711,6 +712,57 @@ bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
   pips_debug(8, "%" _intFMT " %sdependent from %" _intFMT "\n",
              statement_number(t), rw_dep? "": "in", statement_number(s));
   return rw_dep;
+}
+
+// Hmmm...
+// this is called very often and the performance is abysmal
+// even on not so big codes, so here is a cached version...
+
+// { s -> { t -> (vars) } }
+static hash_table dep_cache = NULL;
+
+void freia_init_dep_cache(void)
+{
+  pips_assert("dep_cache is NULL", !dep_cache);
+  dep_cache = hash_table_make(hash_pointer, 0);
+}
+
+void freia_close_dep_cache(void)
+{
+  pips_assert("dep_cache is not NULL", dep_cache);
+
+  HASH_FOREACH(statement, s1, hash_table, h, dep_cache) {
+    HASH_FOREACH(statement, s2, list, l, h)
+      if (l) gen_free_list(l);
+    hash_table_free(h);
+  }
+
+  hash_table_free(dep_cache), dep_cache = NULL;
+}
+
+// cached version
+bool freia_scalar_rw_dep(const statement s, const statement t, list * vars)
+{
+  pips_assert("dep_cache is not NULL", dep_cache);
+
+  // short circuit
+  if (s==t || !s || !t) return false;
+
+  // first level
+  if (!hash_defined_p(dep_cache, s))
+    hash_put(dep_cache, s, hash_table_make(hash_pointer, 0));
+  hash_table h = (hash_table) hash_get(dep_cache, s);
+
+  // second level
+  if (!hash_defined_p(h, t)) {
+    list l = NIL;
+    real_freia_scalar_rw_dep(s, t, &l);
+    hash_put(h, t, l);
+  }
+
+  list l = (list) hash_get(h, t);
+  if (vars) *vars = gen_copy_seq(l);
+  return l!=NIL;
 }
 
 static bool lexpression_equal_p(const list l1, const list l2)

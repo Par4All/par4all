@@ -229,6 +229,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   freia_info fsi;
   fsi.seqs = NIL;
+  freia_init_dep_cache();
 
   // collect freia api functions...
   if (statement_call_p(mod_stat))
@@ -270,6 +271,7 @@ string freia_compile(string module, statement mod_stat, string target)
   }
 
   freia_clean_image_occurrences(occs);
+  freia_close_dep_cache();
 
   // cleanup
   gen_free_list(fsi.seqs);
