@@ -2,10 +2,6 @@
 
 default: clean
 
-# The option used by default for validating. Can be overridden by the
-# command line "make VOPT=..." or the environment variable:
-VOPT	= -v --archive --diff
-
 FIND	= find . -name '.svn' -type d -prune -o
 
 .PHONY: full-clean
@@ -41,32 +37,13 @@ clean-target:
 	done
 	$(RM) properties.rc a.out core *.o
 
-.PHONY: validate
-validate: clean-target
-	$(RM) -r RESULTS
-	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
-
-.PHONY: accept
-accept:
-	pips_manual_accept $(TARGET)
-
-# validate one sub directory
-validate-%: %
-	# test -d $< && $(MAKE) TARGET=$< validate
-	[ -d $< ] && { \
-	  $(MAKE) TARGET=$< clean-target ; \
-	  cd $< ; \
-	  $(RM) -r RESULTS ; \
-	  PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD)/$< -O RESULTS . ; \
-	}
+include old-validate.mk
 
 #
 # PARALLEL VALIDATION
 #
 # directory-parallel validation test
 # may replace the previous entry some day
-
-.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-check
 
 # where results are stored
 RESULTS	= validation.out
@@ -106,11 +83,13 @@ $(HEAD):
 	} > $@
 
 # this target should replace the "validate" target
+.PHONY: new-validate
 new-validate:
 	$(RM) SUMMARY
 	$(MAKE) parallel-clean
 	$(MAKE) archive
 
+.PHONY: mail-validate
 mail-validate: new-validate
 	{ \
 	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
@@ -138,6 +117,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
 	} >> $@
 
+.PHONY: archive
 archive: SUMMARY $(DEST.d)
 	cp SUMMARY $(DEST.d)/$(NOW) ; \
 	$(RM) $(SUM.prev) ; \
@@ -148,23 +128,28 @@ archive: SUMMARY $(DEST.d)
 	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff
 
 # overall targets
+.PHONY: parallel-clean
 parallel-clean: $(TARGET:%=parallel-clean-%)
 	$(RM) $(RESULTS) $(HEAD)
 
+.PHONY: parallel-check
 parallel-check: $(TARGET:%=parallel-check-%)
 
+.PHONY: parallel-validate
 parallel-validate: $(TARGET:%=parallel-validate-%)
 
+.PHONY: parallel-unvalidate
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 
-# generic subdir targets
+# generic subdir parallel targets
 parallel-clean-%:
 	[ -d $* -a -f $*/Makefile ] \
 	  && $(MAKE) -C $* clean unvalidate ; exit 0
 
 parallel-check-%: parallel-clean-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; exit 0
+	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; \
+	  exit 0
 
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
@@ -176,7 +161,7 @@ parallel-unvalidate-%:
 	  && $(MAKE) -C $* unvalidate ; exit 0
 
 # validate all subdirectories
-ALL	= $(wildcard * private/*)
+ALL	= $(wildcard *)
 ALL.d	= $(shell for d in $(ALL) ; do test -d $$d && echo $$d ; done)
 validate-all:
 	$(MAKE) TARGET="$(ALL.d)" validate
