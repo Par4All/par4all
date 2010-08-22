@@ -113,7 +113,7 @@ new-validate:
 
 mail-validate: new-validate
 	{ \
-	  cat $(SUM.d)/SUMMARY.diff ; \
+	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
 	  echo ; \
 	  grep -v '^passed: ' SUMMARY ; \
 	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
