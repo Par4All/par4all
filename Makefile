@@ -2,6 +2,11 @@
 
 default: clean
 
+# I still keep the old "script" validation as the defaults
+validate: old-validate
+validate-all: old-validate-all
+validate-%: old-validate-%
+
 FIND	= find . -name '.svn' -type d -prune -o
 
 .PHONY: full-clean
