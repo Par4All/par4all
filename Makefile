@@ -7,6 +7,10 @@ validate: old-validate
 validate-all: old-validate-all
 validate-%: old-validate-%
 
+# useful variant to be consistent with intra-directory validation
+validate-test: new-validate
+validate-out:; $(MAKE) TEST=out new-validate
+
 FIND	= find . -name '.svn' -type d -prune -o
 
 .PHONY: full-clean
@@ -72,10 +76,10 @@ SVN.C	= $(shell svnversion -c)
 # check for svn working copy early
 .PHONY: check-run-consistency
 check-run-consistency:
-	@[ $(OUTPUT) = 'out' ] && exit 0 ; \
-	[ '$(OUTPUT)' = 'test' -a -d .svn ] || { \
-	  echo "OUTPUT=test parallel validation requires svn" >&2 ; \
-	  echo "try: make OUTPUT=out <your arguments...>" >&2 ; \
+	@[ $(TEST) = 'out' ] && exit 0 ; \
+	[ '$(TEST)' = 'test' -a -d .svn ] || { \
+	  echo "TEST=test parallel validation requires svn" >&2 ; \
+	  echo "try: make TEST=out <your arguments...>" >&2 ; \
 	  exit 1 ; \
 	}
 
@@ -170,11 +174,11 @@ parallel-check-%: parallel-clean-%
 # - "test" requires the validation to be an SVN working copy.
 #   it could also work siwith git with some hocus-pocus
 # - "out" does not, but you must move out to test to accept afterwards.
-OUTPUT = test
+TEST = test
 
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(OUTPUT) \
+	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(TEST) \
 	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:
