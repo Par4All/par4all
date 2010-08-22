@@ -162,6 +162,9 @@ parallel-check-%: parallel-clean-%
 	  exit 0
 
 # type of validation, may be "out" or "test"
+# - "test" requires the validation to be an SVN working copy.
+#   it could also work siwith git with some hocus-pocus
+# - "out" does not, but you must move out to test to accept afterwards.
 OUTPUT = test
 
 parallel-validate-%: parallel-check-%
