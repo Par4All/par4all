@@ -32,7 +32,8 @@ for my $s (split '\|', "$status|$others") {
 }
 
 my %d = (); # per-directory: { dir -> { status -> cnt } }
-my %s = (); # state: { dir/case -> status }
+my %new = (); # new state: { dir/case -> status }
+my %old = (); # old state: { dir/case -> status }
 my %diff = (); # state changes: { dir -> { status/status -> cnt } }
 my %changes = (); # changes: { status/status -> cnt }
 
@@ -48,25 +49,47 @@ while (<>)
     {
       $n{$stat}++;
       $d{$dir}{$stat}++;
-      $s{"$dir$case"} = $stat if $stat =~ /^($status)$/;
+      $new{"$dir$case"} = $stat if $stat =~ /^($status)$/;
     }
     else # we are dealing with the "previous" state
     {
       # extract differential information...
-      if ($stat =~ /^($status)$/ and exists $s{"$dir$case"})
+      if ($stat =~ /^($status)$/)
       {
-	my $previous = $s{"$dir$case"};
-	if ($previous ne $stat)
+	# record previous state
+	$old{"$dir$case"} = $stat;
+	my $O = uc(substr($stat,0,1));
+	if (exists $new{"$dir$case"})
 	{
-	  # old and new state as one letter F C P T
-	  my $O = uc(substr($previous,0,1));
-	  my $N = uc(substr($stat,0,1));
-	  # record status changes
-	  $changes{"$O$N"}++;
-	  $diff{$dir}{"$O$N"}++;
+	  my $news = $new{"$dir$case"};
+	  if ($news ne $stat) # just record state changes
+	  {
+	    # old and new state as one letter F C P T
+	    my $N = uc(substr($news,0,1));
+	    # record status changes
+	    $changes{"$O$N"}++;
+	    $diff{$dir}{"$O$N"}++;
+	  }
+	}
+	else # case does not exist anymore
+	{
+	  $changes{"$O."}++;
+	  $diff{$dir}{"$O."}++;
 	}
       }
     }
+  }
+}
+
+# count new test cases
+for my $c (sort keys %new)
+{
+  if (not exists $old{$c})
+  {
+    my $N = uc(substr($new{$c},0,1));
+    my $dir = (split /\//, $c)[0];
+    $changes{".$N"}++;
+    $diff{$dir}{".$N"}++;
   }
 }
 
@@ -79,6 +102,7 @@ my $status_changes = '';
 for my $sc (sort keys %changes) {
   $status_changes .= " $sc=$changes{$sc}";
 }
+$status_changes = 'none' unless $status_changes;
 
 printf
   "total: $count\n" .
@@ -87,7 +111,9 @@ printf
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
   " - timeout: $n{timeout} (time was out)\n" .
+  # should I hide status changes if it was not computed?
   " * status changes:$status_changes\n" .
+  "   .=None P=passed F=failed C=changed T=timeout\n" .
   "warnings: $warned\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
@@ -112,11 +138,11 @@ for my $dir (sort keys %d)
   my $success_rate = $d{$dir}{passed}*100.0/$dircount;
 
   printf "%-28s %4d  %4d  %5.1f%%", $dir, $dircount, $failures, $success_rate;
-  if ($success_rate!=100.0)
+
+  if ($success_rate!=100.0 or exists $diff{$dir})
   {
     printf " (%d+%d+%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout};
-
     for my $change (sort keys %{$diff{$dir}})
     {
       print " $change=", $diff{$dir}{$change};
