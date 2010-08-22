@@ -8,50 +8,59 @@
 
 use strict;
 
+# manage arguments
 die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
+my $summary = $ARGV[0];
 
 # all possible validation status
 my $status = 'failed|changed|passed|timeout';
-# miscellaneous issues
+
+# other miscellaneous issues
 my $others =
     'missing|skipped|multi-script|multi-source|orphan|broken-directory';
 
+# return ref to zero count status hash
 sub zeroed()
 {
   my $h = {};
   for my $s (split '\|', $status) {
-      $$h{$s} = 0;
+    $$h{$s} = 0;
   }
   return $h;
 }
 
-# counts: status -> overall number of cases encountered
+# case status
+my %new = (); # new state: { dir/case -> status }
+my %old = (); # old state: { dir/case -> status }
+
+# record state changes
+my %diff = (); # per dir state changes: { dir -> { status/status -> cnt } }
+my %changes = (); # state changes: { status/status -> cnt }
+
+# status counts: status -> overall number of cases encountered
 my %n = ();
 for my $s (split '\|', "$status|$others") {
   $n{$s} = 0;
 }
 
+# per directory status counts
 my %d = (); # per-directory: { dir -> { status -> cnt } }
-my %new = (); # new state: { dir/case -> status }
-my %old = (); # old state: { dir/case -> status }
-my %diff = (); # state changes: { dir -> { status/status -> cnt } }
-my %changes = (); # changes: { status/status -> cnt }
 
-my $first = $ARGV[0];
-
+# process input formatted as
+# <status>: dir/case
 while (<>)
 {
   if (/^($status|$others): ([-\w]+)(\/[-\w]+)?$/)
   {
     my ($stat, $dir, $case) = ($1, $2, $3);
     $d{$dir} = zeroed() unless exists $d{$dir};
-    if ($first eq $ARGV)
+    if ($summary eq $ARGV) # this is the current summary
     {
       $n{$stat}++;
       $d{$dir}{$stat}++;
       $new{"$dir$case"} = $stat if $stat =~ /^($status)$/;
     }
-    else # we are dealing with the "previous" state
+    else # we are dealing with the "previous" summary
     {
       # extract differential information...
       if ($stat =~ /^($status)$/)
@@ -93,17 +102,20 @@ for my $c (sort keys %new)
   }
 }
 
+# extract various counts
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
 my $count = $not_passed + $n{passed};
 my $warned = $n{skipped} + $n{orphan} + $n{missing} +
     $n{'multi-script'} + $n{'multi-source'};
 
+# status change summary
 my $status_changes = '';
 for my $sc (sort keys %changes) {
   $status_changes .= " $sc=$changes{$sc}";
 }
 $status_changes = 'none' unless $status_changes;
 
+# print global summary
 printf
   "total: $count\n" .
   " * passed: $n{passed}\n" .
@@ -127,6 +139,7 @@ printf
   "\n",
   $n{passed}*100.0/$count;
 
+# print detailed per-directory summary
 print "directory                   cases  bads success (F+C+T) changes...\n";
 for my $dir (sort keys %d)
 {
@@ -151,9 +164,9 @@ for my $dir (sort keys %d)
 
   printf "\n";
 }
-
-# generate summary line for mail subject
 print "\n";
+
+# generate one summary line for mail subject
 if ($n{passed} == $count)
 {
   print "SUCCEEDED $count\n";
