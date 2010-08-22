@@ -24,7 +24,8 @@ or just for one file:
 	sh> make loopequiv.result/test
 
 
-To change the pips/tpips used for the validatio, fix the PATH:
+To change the pips/tpips used for the validation, fix the PATH,
+and possibly LD_LIBRARY_PATH if you use dynamic linking:
 
 	sh> PATH=/path/to/pips/binaries:$PATH make new-validate
 
