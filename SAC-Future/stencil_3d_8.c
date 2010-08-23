@@ -5,7 +5,7 @@ typedef float t_real;
 // real, dimension(n1,n2,n3) :: u, v
 // real, dimension(-L:L) :: c
 
-//  parameter(L=4, n1=100, n2=100, n3=100, nt=10)
+//  parameter(L=4, n1=100, n2=100, n3=100)
 const int L = 4;
 const int n1 = 100;
 const int n2 = 100;
@@ -87,7 +87,7 @@ int main (void) {
 
   // Simple case
   init (u , 1.0);
-  init (v , 2.0);
+  init (v , 1.0);
   stencil8(u,v,c,is1,ie1,is2,ie2,is3,ie3);
 
   printf ("the sum is : %f\n", sum (u));

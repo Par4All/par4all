@@ -1,8 +1,8 @@
 program main
 
   implicit none
-  integer :: n1,n2,n3,L,i1,i2,i3,is1,ie1,is2,ie2,is3,ie3,nt
-  parameter(L=4, n1=100, n2=100, n3=100, nt=10)
+  integer :: n1,n2,n3,L,i1,i2,i3,is1,ie1,is2,ie2,is3,ie3
+  parameter(L=4, n1=100, n2=100, n3=100)
   real, dimension(:,:,:), allocatable :: u,v,v1,v2,v3
   real, dimension(-L:L) :: c
   real d(3)
