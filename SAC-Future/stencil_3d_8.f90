@@ -1,18 +1,17 @@
 ! sum all the elements of the array
-      function sum_array (array, n1, n2, n3)
-      implicit none
-      integer :: n1,n2,n3,i1,i2,i3
-      real array(n1,n2,n3)
-      real sum_array
+real function sum_array (array, n1, n2, n3)
+  implicit none
+  integer :: n1,n2,n3,i1,i2,i3
+  real array(n1,n2,n3)
 
-      do 300 i3=1, n3
-         do 200 i2=1, n2
-            do 100 i1=1, n1
-               sum_array = sum_array + array(i1,i2,i3)
- 100        continue
- 200     continue
- 300  continue
-      end
+  do i3=1, n3
+     do i2=1, n2
+        do i1=1, n1
+           sum_array = sum_array + array(i1,i2,i3)
+        end do
+     end do
+  end do
+end function sum_array
 
 program main
   implicit none

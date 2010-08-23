@@ -14,11 +14,10 @@
       end
 
 ! sum all the elements of the array
-      function sum_array (array, n1, n2, n3)
+      real function sum_array (array, n1, n2, n3)
       implicit none
       integer n1,n2,n3,i1,i2,i3
       real array(n1,n2,n3)
-      real sum_array
 
       do 300 i3=1, n3
          do 200 i2=1, n2
