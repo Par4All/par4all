@@ -98,7 +98,7 @@ $(HEAD): check-run-consistency
 	  echo "tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
 	  echo "user: $$USERNAME" ; \
-	  echo "start date: $$(date)" ; \
+	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 
 # this target should replace the "validate" target
@@ -123,7 +123,7 @@ SUMMARY: $(HEAD) parallel-validate
 	{ \
 	  unset LANG LC_COLLATE ; \
 	  cat $(HEAD) ; \
-	  echo "end date: $$(date)" ; \
+	  echo "end date: $$(date) [$$(date +%s)]" ; \
 	  echo ; \
 	  [ -f $(SUM.last) ] && last=$(SUM.last) ; \
           $(SUMUP) $(RESULTS) $$last ; \
