@@ -85,7 +85,6 @@
 
       call init (src, n1, n2, n3, 1.0)
       call stencil8 (dst,src,coeff,n1,n2,n3,is1,ie1,is2,ie2,is3,ie3)
-      result = 0
       result = sum_array (dst, n1, n2, n3)
       PRINT *, ("the sum is"), result
       end
