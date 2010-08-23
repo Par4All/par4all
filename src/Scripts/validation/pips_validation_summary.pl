@@ -46,6 +46,8 @@ for my $s (split '\|', "$status|$others") {
 # per directory status counts
 my %d = (); # per-directory: { dir -> { status -> cnt } }
 
+my ($start, $stop);
+
 # process input formatted as
 # <status>: dir/case
 while (<>)
@@ -89,7 +91,29 @@ while (<>)
       # else the line is not about the validation status, we ignore it
     }
   }
+
+  # extract time information
+  if (not defined $start or not defined $stop)
+  {
+    $start = $1 if /^start date: .*\[(\d+)\]$/;
+    $stop = $1 if /^end date: .*\[(\d+)\]$/;
+  }
 }
+
+# compute elapsed time and adjust units
+my $delay = $stop-$start;
+if ($delay<100) {
+  $delay .= 's';
+}
+elsif ($delay < 6000) {
+  $delay /= 60.0;
+  $delay .= 'mn';
+}
+else {
+  $delay /= 3600.0;
+  $delay .= 'h';
+}
+$delay =~ s/(\.\d)\d+/$1/;
 
 # count new test cases
 for my $c (sort keys %new)
@@ -136,6 +160,7 @@ printf
   "broken directory: $n{'broken-directory'} " .
     "(directory without makefile or with makefile errors)\n" .
   "success: %5.1f%%\n" .
+  "delay: $delay\n" .
   "\n",
   $n{passed}*100.0/$count;
 
@@ -169,10 +194,10 @@ print "\n";
 # generate one summary line for mail subject
 if ($n{passed} == $count)
 {
-  print "SUCCEEDED $count\n";
+  print "SUCCEEDED $count $delay\n";
 }
 else
 {
   print "FAILED $not_passed/$count ",
-    "($n{failed}+$n{changed}+$n{timeout})$status_changes\n";
+    "($n{failed}+$n{changed}+$n{timeout})$status_changes $delay\n";
 }
