@@ -160,7 +160,7 @@ printf
   "broken directory: $n{'broken-directory'} " .
     "(directory without makefile or with makefile errors)\n" .
   "success: %5.1f%%\n" .
-  "delay: $delay\n" .
+  "elapsed time: $delay\n" .
   "\n",
   $n{passed}*100.0/$count;
 
