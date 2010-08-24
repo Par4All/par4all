@@ -164,6 +164,7 @@ def done(msg, log = True, bare = False, level = 0):
     '''Log (and print out if verbosity is high enough (cf. level parameter))
     the passed message msg.
     This function is specific to results (for displaying explicit "ok it's done" messages).'''
+    #" <- for Emacs pretty-printer good behaviour
     global msg_prefix
     done_prefix = p4a_term.escape("green", if_tty_fd = 2)
     done_suffix = p4a_term.escape(if_tty_fd = 2)
@@ -321,13 +322,13 @@ class runner(Thread):
             cmd(self.cmd, dir = self.working_dir)
 
         try:
-            self.process = subprocess.Popen(subp_cmd, shell = shell, 
-                stdout = subprocess.PIPE, stderr = subprocess.PIPE, 
+            self.process = subprocess.Popen(subp_cmd, shell = shell,
+                stdout = subprocess.PIPE, stderr = subprocess.PIPE,
                 cwd = self.working_dir, env = self.env)
         except:
             if not can_fail:
                 debug("Environment was: " + repr(env))
-                raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: " 
+                raise p4a_error("Command '" + " ".join(cmd_list) + "' in " + w + " failed: "
                     + str(sys.exc_info()[1]))
 
         self.stdout_handler = stdout_handler
@@ -343,7 +344,7 @@ class runner(Thread):
 
         make_non_blocking(self.process.stdout)
         make_non_blocking(self.process.stderr)
-        self.spin_text = "-=-          " 
+        self.spin_text = "-=-          "
         #spin_text = ".·°·..·°·..·°·."
         self.spin_pos = len(self.spin_text)
         self.spin_back = False
@@ -446,8 +447,8 @@ class runner(Thread):
         #~ stop_master_spinner()
         return [ self.out, self.err, ret ]
 
-def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None, 
-        shell = True, extra_env = {}, silent = False, 
+def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
+        shell = True, extra_env = {}, silent = False,
         stdout_handler = None, stderr_handler = None):
     '''Helper function to spawn an external command and wait for it to finish.'''
     if stdout_handler is None and stderr_handler is None:
@@ -458,8 +459,8 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         else:
             stdout_handler = lambda s: debug(s, bare = True)
             stderr_handler = lambda s: info(s, bare = True)
-    r = runner(cmd_list, can_fail = can_fail, 
-        force_locale = force_locale, working_dir = working_dir, extra_env = extra_env, 
+    r = runner(cmd_list, can_fail = can_fail,
+        force_locale = force_locale, working_dir = working_dir, extra_env = extra_env,
         stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)
     return r.wait()
 
@@ -494,7 +495,7 @@ def get_distro():
     except:
         pass
     if not re.match(r"\w+", distro):
-        raise p4a_error("Could not determine distribution name from this: " + s) 
+        raise p4a_error("Could not determine distribution name from this: " + s)
     debug("distro=" + distro)
     return distro
 
@@ -551,10 +552,10 @@ def rmtree(dir, can_fail = False, remove_top = True):
             warn("Could not remove everything in " + dir)
 
 
-def find(file_re, dir = None, abs_path = True, match_files = True, 
+def find(file_re, dir = None, abs_path = True, match_files = True,
     match_dirs = False, match_whole_path = False, can_fail = True):
     '''Lookup files matching the regular expression file_re underneath dir.
-    If dir is empty, os.getcwd() will be looked up.	
+    If dir is empty, os.getcwd() will be looked up.
     If full_path is true, absolute path names of matching file/dir names will be returned.
     If match_whole_path is True, whole paths will be tested against file_re.'''
     matches = []
@@ -663,6 +664,7 @@ def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext
 
 def file_lastmod(file):
     '''Returns file's last modification date/time.'''
+    #'
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
 
 def utc_datetime(sep = "T", dsep = "", tsep = ""):
@@ -714,7 +716,10 @@ def env(var, default = ""):
 def quote(s):
     '''Quote the string if necessary and escape dangerous characters.
     In other words, make the string suitable for using in a shell command as a single argument.
-    This function could be optimized a little.'''
+    This function could be optimized a little.
+
+    I guess this function already exists...
+    '''
     if not s:
         return '""'
     enclose = False
@@ -742,7 +747,7 @@ def quote(s):
 
 
 def relativize(file_dir = None, dirs = [], base = os.getcwd()):
-    '''Make a file or directory relative to the base directory, 
+    '''Make a file or directory relative to the base directory,
     if they start with this base directory (this is the difference
     with os.path.relpath()).'''
     # Make sure it is absolute first:
@@ -761,7 +766,7 @@ def save_pickle(file, obj):
     f.close()
 
 def load_pickle(file):
-    '''Deserializes/unmarshalls object contained in file, 
+    '''Deserializes/unmarshalls object contained in file,
     previously serialized using pickle or cPickle modules.
     Returns the new object.'''
     f = open(file, "rb")
