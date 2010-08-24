@@ -1,4 +1,4 @@
-/* Check that parallel loops located inside a non-convertibal for foop are parallelized */
+/* effects of non-convertible for loop on loop increment expression */
 
 
 void for02(int n)

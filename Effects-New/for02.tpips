@@ -22,7 +22,7 @@ echo Do not display original number lines as comment:
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+echo If possible, transform simple for-loops into do-loop a la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
 # We need to keep our external for loop

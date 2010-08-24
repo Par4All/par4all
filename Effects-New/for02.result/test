@@ -2,7 +2,7 @@ Select some options to deal with the C Language:
 Parse as C:
 Prettyprint the source as C, of course
 Do not display original number lines as comment:
-If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+If possible, transform simple for-loops into do-loop a la Fortran, simpler to analyze:
 Select the most precise analyses:
 Compute the intraprocedural preconditions at the same time as
 transformers and use them to improve the accuracy of expression
