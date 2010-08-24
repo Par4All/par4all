@@ -74,3 +74,5 @@
 - sequence extraction shouldn't include
   functions not implemented for the target?
 - use global max length/ops/critical path as a decision driver?
+- extension: interface with SG terapix microcode generation
+  hard constraint: 3 pointers are available
