@@ -11,7 +11,7 @@ validate-%: old-validate-%
 validate-test: new-validate
 validate-out:; $(MAKE) TEST=out new-validate
 
-FIND	= find . -name '.svn' -type d -prune -o
+FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 
 .PHONY: full-clean
 full-clean: clean
@@ -97,7 +97,7 @@ $(HEAD): check-run-consistency
 	  pips -v ; \
 	  echo "with tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
-	  echo "by user: $$USERNAME" ; \
+	  echo "by user: $$USER" ; \
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 
@@ -172,7 +172,7 @@ parallel-check-%: parallel-clean-%
 
 # type of validation, may be "out" or "test"
 # - "test" requires the validation to be an SVN working copy.
-#   it could also work siwith git with some hocus-pocus
+#   it could also work with git with some hocus-pocus
 # - "out" does not, but you must move out to test to accept afterwards.
 TEST = test
 
