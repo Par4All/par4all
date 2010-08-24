@@ -12,7 +12,15 @@ TIMEOUT	= 600
 # this can be modified to generate separate files
 # see "validate-out" and "validate-test" targets
 TEST	= test
+
+# is it a subversion working copy?
+IS_SVN	= test -d .svn
+
+# some parametric commands
+CHECK	= $(IS_SVN)
 DIFF	= svn diff
+UNDO	= svn revert
+LIST	= svn status
 
 # prefix of tests to be run, default is all
 PREFIX	=
@@ -31,10 +39,10 @@ F.src	= $(F.c) $(F.f) $(F.F) $(F.f90) $(F.f95)
 F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) \
 	$(F.F:%.F=%.result) $(F.f90:%.f90=%.result) $(F.f95:%.f95=%.result)
 
-# actual result directory
+# actual result directory to validate
 F.result= $(wildcard $(PREFIX)*.result)
 
-# validation scripts
+# various validation scripts
 F.tpips	= $(wildcard *.tpips)
 F.tpips2= $(wildcard *.tpips2)
 F.test	= $(wildcard *.test)
@@ -62,6 +70,7 @@ PF	= set -o pipefail ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # extract validation result for summary
+# four possible outcomes: passed, changed, failed, timeout
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 255 ] ; then \
@@ -108,18 +117,18 @@ endif
 
 # restore all initial "test" result files if you are unhappy with a validate
 .PHONY: unvalidate
-unvalidate: check-svn
-	-[ $(TEST) = 'test' ] && svn revert $(F.valid)
+unvalidate: check-vc
+	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.valid)
 
 # generate "out" files
 # ??? does not work because of "svn diff"?
 .PHONY: validate-out
 validate-out:
-	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh validate-dir
+	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh LIST=: UNDO=: validate-dir
 
 # generate "test" files
 .PHONY: validate-test
-validate-test: check-svn
+validate-test: check-vc
 	$(MAKE) TEST=test validate-dir
 
 # hack: validate depending on prefix?
@@ -236,16 +245,16 @@ missing:
 	done ; \
 	echo "# $$n missing result(s)"
 
-.PHONY: missing-svn
-missing-svn:
-	@echo "# result directories not under svn"
-	@svn status | grep '\.result'
+.PHONY: missing-vc
+missing-vc:
+	@echo "# result directories not under version control"
+	@$(LIST) | grep '\.result'
 
-# check that we are in a subversion working copy
-.PHONY: check-svn
-check-svn:
-	@[ -d .svn ] || { \
-	  echo "error: validation must be an SVN working copy" >&2 ; \
+# check that we are in a working copy
+.PHONY: check-vc
+check-vc:
+	@$(CHECK) || { \
+	  echo "error: validation must be a working copy" >&2 ; \
 	  exit 1 ; \
 	}
 
