@@ -1925,7 +1925,9 @@ static void proper_effects_of_forloop(forloop l)
     /* effects of condition expression */
     lc = generic_proper_effects_of_expression(forloop_condition(l));
     /* effects of incrementation expression  */
+    /* we do not know if the incrementation expression will be evaluated -> may effects (see ticket 446) */
     linc = generic_proper_effects_of_expression(forloop_increment(l));
+    effects_to_may_effects(linc);
 
     l_proper = gen_nconc(li, lc);
     l_proper = gen_nconc(l_proper, linc);
