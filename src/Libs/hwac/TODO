@@ -76,3 +76,7 @@
 - use global max length/ops/critical path as a decision driver?
 - extension: interface with SG terapix microcode generation
   hard constraint: 3 "pointers" are available; border management?
+
+* OpenCL target?
+- whole image computations are okay
+- expensive memory accesses => aggregate computations
