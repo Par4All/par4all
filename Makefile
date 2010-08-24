@@ -88,16 +88,16 @@ check-run-consistency:
 $(HEAD): check-run-consistency
 	{ \
 	  echo "parallel validation" ; \
-	  echo "on: $(TARGET)" ; \
-	  echo "host: $$(hostname)" ; \
-	  echo "directory: $(PWD)" ; \
+	  echo "on dirs: $(TARGET)" ; \
+	  echo "host name: $$(hostname)" ; \
+	  echo "in directory: $(PWD)" ; \
 	  test -d .svn && \
 	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
-	  echo "pips: $(shell which pips)" ; \
+	  echo "with pips: $(shell which pips)" ; \
 	  pips -v ; \
-	  echo "tpips: $(shell which tpips)" ; \
+	  echo "with tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
-	  echo "user: $$USERNAME" ; \
+	  echo "by user: $$USERNAME" ; \
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 
