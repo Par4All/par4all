@@ -133,10 +133,15 @@ def add_module_options(parser):
 def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_opts = [], install = True, reconf = False):
     '''Builds the given package in package_dir using autotools.'''
 
+    # Normalize paths because a relative path makes the configure to fail
+    package_dir = os.path.abspath(package_dir)
+    build_dir = os.path.abspath(build_dir)
+    dest_dir = os.path.abspath(dest_dir)
+    
     configure_script = os.path.join(package_dir, "configure")
     makefile = os.path.join(build_dir, "Makefile")
 
-    if (not os.path.exists(configure_script) 
+    if (not os.path.exists(configure_script)
         or not os.path.isdir(build_dir)
         or not os.path.exists(makefile)):
         reconf = True
@@ -144,9 +149,11 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     if reconf:
         # Call autoconf to generate the configure utility.
         run([ "autoreconf", "--install" ], working_dir = package_dir)
+        print package_dir
         #~ if dest_dir:
             #~ configure_opts += [ "DESTDIR=" + dest_dir ]
         # Call configure to generate the Makefiles.
+        print build_dir
         run([ configure_script ] + configure_opts, working_dir = build_dir)
 
     # Call make all to compile.

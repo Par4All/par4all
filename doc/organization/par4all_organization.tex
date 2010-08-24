@@ -1104,60 +1104,6 @@ differences between different validations.
 
 \input{p4a_validate-help}
 
-\begin{description}
-\item[\texttt{--version}:] show program's version number and exit;
-
-\item[\texttt{-h} or \texttt{--help}:] show this help message and exit;
-
-\item[\texttt{--file=\emph{FILE}}:] Initialize a validation class from a plain
-  line-oriented file of validation case names;
-
-\item[\texttt{--old-diff-file=\emph{FILE}}:] add to a validation class the
-  items from the old differences found in a validation diff output file;
-
-\item[\texttt{--new-diff-file=\emph{FILE}}:] add to a validation class the
-  items from the new differences found in a validation diff output file;
-
-\item[\texttt{-keep-status=\emph{status}}:] filter the current validation
-  class by keeping the elements with the \texttt{\emph{status}} only, in
-  \texttt{changed}, \texttt{failed}, \texttt{skipped} or \texttt{success};
-
-\item[\texttt{-remove-status=\emph{status}}:] filter the current
-  validation class by removing the elements with the given status, in
-  \texttt{changed}, \texttt{failed}, \texttt{skipped} or \texttt{success};
-
-\item[\texttt{-f \emph{REGULAR-EXPRESSION}} or
-  \texttt{--filter=\emph{REGULAR-EXPRESSION}}:] filter the current class
-  by keeping all the validation items with a name matching a regular
-  expression;
-
-\item[\texttt{--filter-out=\emph{REGULAR-EXPRESSION}}:] filter out the
-  current class by removing all the validation items with a name matching
-  a regular expression;
-
-\item[\texttt{-l} or \texttt{--list}:] list the elements of the validation
-  class;
-
-\item[\texttt{-s} or \texttt{--show-diff-files}:] show the output
-  differences for the current class by looking into the \texttt{*.results}
-  directories;
-\item[\texttt{--show-diff-results}:] show the output differences for the
-  current class from the \texttt{RESULTS} directory;
-
-\item[\texttt{-a} or \texttt{--accept}:] accept for the current validation
-  class and add it under git;
-
-\item[\texttt{-c \emph{MESSAGE}} or \texttt{--commit=\emph{MESSAGE}}:]
-  commit in git the accepted modifications with the given message.
-\end{description}
-
-There are also some debug options:
-\begin{description}
-\item[\texttt{-v} or \texttt{--verbose}:] run in verbose mode;
-
-\item[\texttt{-q} or \texttt{--quiet}:] run in quiet mode (default mode).
-\end{description}
-
 
 \subsection{Validation script}
 \label{sec:validation_script}
