@@ -140,6 +140,7 @@ if ($differential) {
   for my $sc (sort keys %changes) {
     $status_changes .= " $sc=$changes{$sc}";
   }
+  $status_changes= ' none' unless $status_changes;
 }
 
 # print global summary
