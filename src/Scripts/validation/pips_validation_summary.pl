@@ -11,6 +11,7 @@ use strict;
 # manage arguments
 die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
 my $summary = $ARGV[0];
+my $differential = @ARGV==2;
 
 # all possible validation status
 my $status = 'failed|changed|passed|timeout';
@@ -135,8 +136,10 @@ my $warned = $n{skipped} + $n{orphan} + $n{missing} +
 
 # status change summary
 my $status_changes = '';
-for my $sc (sort keys %changes) {
-  $status_changes .= " $sc=$changes{$sc}";
+if ($differential) {
+  for my $sc (sort keys %changes) {
+    $status_changes .= " $sc=$changes{$sc}";
+  }
 }
 
 # print global summary
@@ -147,9 +150,9 @@ printf
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
   " - timeout: $n{timeout} (time was out)\n" .
-  # should I hide status changes altogether if it was not computed?
-  " * status changes:" . ($status_changes? $status_changes: " none") . "\n" .
-  "   .=None P=passed F=failed C=changed T=timeout\n" .
+  ($status_changes?
+    " * status changes:$status_changes\n" .
+    "   .=None P=passed F=failed C=changed T=timeout\n": '') .
   "number of warnings: $warned\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
@@ -177,13 +180,15 @@ for my $dir (sort keys %d)
 
   printf "%-28s %4d  %4d  %5.1f%%", $dir, $dircount, $failures, $success_rate;
 
-  if ($success_rate!=100.0 or exists $diff{$dir})
+  if ($success_rate!=100.0 or (exists $diff{$dir} and $differential))
   {
     printf " (%d+%d+%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout};
-    for my $change (sort keys %{$diff{$dir}})
-    {
-      print " $change=", $diff{$dir}{$change};
+
+    if ($differential) {
+      for my $change (sort keys %{$diff{$dir}}) {
+	print " $change=", $diff{$dir}{$change};
+      }
     }
   }
 
