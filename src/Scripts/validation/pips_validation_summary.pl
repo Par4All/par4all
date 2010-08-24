@@ -141,7 +141,7 @@ for my $sc (sort keys %changes) {
 
 # print global summary
 printf
-  "total: $count\n" .
+  "number of tests: $count\n" .
   " * passed: $n{passed}\n" .
   " * not passed: $not_passed\n" .
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
@@ -150,7 +150,7 @@ printf
   # should I hide status changes altogether if it was not computed?
   " * status changes:" . ($status_changes? $status_changes: " none") . "\n" .
   "   .=None P=passed F=failed C=changed T=timeout\n" .
-  "warnings: $warned\n" .
+  "number of warnings: $warned\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
@@ -158,8 +158,8 @@ printf
     "(source files for test with different suffixes)\n" .
   " * orphan: $n{orphan} (result available without source nor script)\n" .
   "broken directory: $n{'broken-directory'} " .
-    "(directory without makefile or with makefile errors)\n" .
-  "success: %5.1f%%\n" .
+    "(directory without makefile or maybe with makefile errors)\n" .
+  "success rate: %5.1f%%\n" .
   "elapsed time: $delay\n" .
   "\n",
   $n{passed}*100.0/$count;
