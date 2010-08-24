@@ -25,7 +25,7 @@ default_install_prefix              = "/usr/local/par4all"
 # Package name. Used for naming the packages.
 package_name                        = "par4all"
 
-# Settings for --publish. There ais currently no command line option to override these defaults.
+# Settings for --publish. There is currently no command line option to override these defaults.
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
 # to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
 default_publish_host                = "download.par4all.org"
@@ -79,7 +79,7 @@ def add_module_options(parser):
         help = "Automatically append current date/time to version string.")
 
     group.add_option("--publish", action = "store_true", default = False,
-        help = "Create a .tar.gz archive.")
+        help = "Publish the produced packages on the server.")
 
     group.add_option("--release", dest = "development", action = "store_false", default = True,
         help = "When publishing, put the packages in release directories instead of development ones.")
