@@ -14,12 +14,12 @@
 - check/remove more implicit hypothesis
 
 * optimizations
++ remove useless images (computed but not used...) see licensePlate
 - min commutes with dilate & max with erode, or vice-versa ?
-+ ??? remove useless images (computed but not used...) see licensePlate
 
 * code
 + cleanup data structures?
-- record scalar deps in dag...
+- record scalar deps in dag?
 - split first on scalar deps, as it is true for any accelerator?
   not that simple with limited depth?
 - remove type ctxcontent?
@@ -59,8 +59,8 @@
 
 * bugs
 + allocs may be in the middle of the calls
++ license_plate_copies takes too much time to compile? 1mn -> 4.5s
 - reuse of images in some cases when nodes are reordered... SSA?
-- license_plate_copies takes too much time to compile? (about 1mn)
 
 * terapix
 + must manage memory allocation in tiles
