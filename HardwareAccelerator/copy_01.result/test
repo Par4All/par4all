@@ -1,4 +1,150 @@
 #
+# AIPO
+#
+
+! initial function
+
+int copy_01(void)
+{
+   freia_dataio fdin, fdout;                                            /*0006*/
+   freia_data2d *in, *open, *tmp, *out;                                 /*0007*/
+   int32_t ret_0;                                                       /*0008*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0013*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0014*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0017*/
+   open = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);             /*0018*/
+   tmp = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0019*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0020*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0023*/
+
+   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0025*/
+
+   ret_0 = freia_aipo_copy(tmp, in);                                    /*0027*/
+   ret_0 |= freia_aipo_erode_8c(open, tmp, kernel1x3);                  /*0028*/
+   ret_0 |= freia_aipo_copy(tmp, open);                                 /*0029*/
+   ret_0 |= freia_aipo_erode_8c(open, tmp, kernel1x3);                  /*0030*/
+   ret_0 |= freia_aipo_copy(tmp, open);                                 /*0031*/
+
+   ret_0 |= freia_aipo_erode_8c(out, open, kernel1x3);                  /*0033*/
+
+   freia_common_destruct_data(tmp);                                     /*0035*/
+
+   freia_common_tx_image(out, &fdout);                                  /*0037*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0040*/
+   freia_common_destruct_data(open);                                    /*0041*/
+   freia_common_destruct_data(tmp);                                     /*0042*/
+   freia_common_destruct_data(out);                                     /*0043*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0046*/
+   freia_common_close_output(&fdout);                                   /*0047*/
+
+   return 0;                                                            /*0049*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "copy_01" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "33 E8" [shape=box];
+  "33 E8" -> "out";
+  "31 =" [shape=circle];
+  "30 E8" [shape=box];
+  "30 E8" -> "33 E8" [label="open"];
+  "30 E8" -> "31 =" [label="open"];
+  "29 =" [shape=circle];
+  "29 =" -> "30 E8" [label="tmp"];
+  "28 E8" [shape=box];
+  "28 E8" -> "29 =" [label="open"];
+  "27 =" [shape=circle];
+  "27 =" -> "28 E8" [label="tmp"];
+  "in" -> "27 =";
+}
+// graph for dag "dag_cleaned_0" of module "copy_01" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "33 E8" [shape=box];
+  "33 E8" -> "out";
+  "30 E8" [shape=box];
+  "30 E8" -> "33 E8" [label="open"];
+  "28 E8" [shape=box];
+  "28 E8" -> "30 E8" [label="open"];
+  "in" -> "28 E8";
+}
+
+! updated function for
+
+int copy_01(void)
+{
+   freia_dataio fdin, fdout;                                            /*0006*/
+   freia_data2d *in, *open, *tmp, *out;                                 /*0007*/
+   int32_t ret_0;                                                       /*0008*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0013*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0014*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0017*/
+   open = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);             /*0018*/
+   tmp = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0019*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0020*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0023*/
+
+   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0025*/
+
+   ret_0 = 0;                                                           /*0027*/
+   ret_0 |= freia_aipo_erode_8c(open, tmp, kernel1x3);                  /*0028*/
+   ret_0 |= 0;                                                          /*0029*/
+   ret_0 |= freia_aipo_erode_8c(open, tmp, kernel1x3);                  /*0030*/
+   ret_0 |= 0;                                                          /*0031*/
+
+   ret_0 |= freia_aipo_erode_8c(out, open, kernel1x3);                  /*0033*/
+
+   freia_common_destruct_data(tmp);                                     /*0035*/
+
+   freia_common_tx_image(out, &fdout);                                  /*0037*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0040*/
+   freia_common_destruct_data(open);                                    /*0041*/
+   freia_common_destruct_data(tmp);                                     /*0042*/
+   freia_common_destruct_data(out);                                     /*0043*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0046*/
+   freia_common_close_output(&fdout);                                   /*0047*/
+
+   return 0;                                                            /*0049*/
+}
+#
 # SPOC
 #
 

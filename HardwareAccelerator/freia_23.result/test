@@ -1,4 +1,86 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
+{
+   // external input variable reuse
+   // o = io ^ i1
+   // io' = o - io
+   // o = o + io'
+   freia_aipo_xor(o, io, i1);                                           /*0010*/
+   freia_aipo_sub(io, o, io);                                           /*0011*/
+   freia_aipo_add(o, o, io);                                            /*0012*/
+
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_23" in dot format
+digraph "dag_0" {
+  // inputs
+  "i1" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "io" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +" [shape=trapezium,orientation=270];
+  "12 +" -> "o";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "12 +" [label="io"];
+  "11 -" -> "io";
+  "10 ^" [shape=trapezium,orientation=270];
+  "10 ^" -> "12 +" [label="o"];
+  "10 ^" -> "11 -" [label="o"];
+  "i1" -> "10 ^";
+  "io" -> "11 -";
+  "io" -> "10 ^";
+}
+// graph for dag "dag_cleaned_0" of module "freia_23" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i1" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "io" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +" [shape=trapezium,orientation=270];
+  "12 +" -> "o";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "12 +" [label="io"];
+  "11 -" -> "io";
+  "10 ^" [shape=trapezium,orientation=270];
+  "10 ^" -> "12 +" [label="o"];
+  "10 ^" -> "11 -" [label="o"];
+  "i1" -> "10 ^";
+  "io" -> "11 -";
+  "io" -> "10 ^";
+}
+
+! updated function for
+
+freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
+{
+   // external input variable reuse
+   // o = io ^ i1
+   // io' = o - io
+   // o = o + io'
+   freia_aipo_xor(o, io, i1);                                           /*0010*/
+   freia_aipo_sub(io, o, io);                                           /*0011*/
+   freia_aipo_add(o, o, io);                                            /*0012*/
+
+   return FREIA_OK;                                                     /*0014*/
+}
+#
 # SPOC
 #
 

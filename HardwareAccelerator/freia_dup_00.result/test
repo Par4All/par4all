@@ -1,4 +1,58 @@
 #
+# AIPO
+#
+
+! initial function
+
+int freia_dup_00(freia_data2d *i)
+{
+   int max1, max2;                                                      /*0005*/
+   // same measure performed twice
+   freia_aipo_global_max(i, &max1);                                     /*0007*/
+   freia_aipo_global_max(i, &max2);                                     /*0008*/
+   return max1+max2;                                                    /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_00" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "8 max" [shape=diamond];
+  "7 max" [shape=diamond];
+  "i" -> "8 max";
+  "i" -> "7 max";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_00" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "8 max" [shape=diamond];
+  "7 max" [shape=diamond];
+  "i" -> "8 max";
+  "i" -> "7 max";
+}
+
+! updated function for
+
+int freia_dup_00(freia_data2d *i)
+{
+   int max1, max2;                                                      /*0005*/
+   // same measure performed twice
+   freia_aipo_global_max(i, &max1);                                     /*0007*/
+   freia_aipo_global_max(i, &max2);                                     /*0008*/
+   return max1+max2;                                                    /*0009*/
+}
+#
 # SPOC
 #
 

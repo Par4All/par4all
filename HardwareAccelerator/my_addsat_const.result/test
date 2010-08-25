@@ -1,4 +1,50 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_addsat_const(o, i0, p0);                           /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_addsat_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 +s." [shape=trapezium,orientation=270];
+  "5 +s." -> "o";
+  "i0" -> "5 +s.";
+}
+// graph for dag "dag_cleaned_0" of module "my_addsat_const" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 +s." [shape=trapezium,orientation=270];
+  "5 +s." -> "o";
+  "i0" -> "5 +s.";
+}
+
+! updated function for
+
+freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_addsat_const(o, i0, p0);                           /*0005*/
+}
+#
 # SPOC
 #
 

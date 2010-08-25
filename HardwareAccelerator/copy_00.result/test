@@ -1,4 +1,142 @@
 #
+# AIPO
+#
+
+! initial function
+
+int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
+{
+   freia_data2d *a, *b, *c, *d;                                         /*0005*/
+   a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
+   b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
+   d = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0009*/
+   
+   // 1
+   freia_aipo_dilate_8c(a, in, freia_morpho_kernel_8c);                 /*0012*/
+   freia_aipo_erode_8c(c, in, freia_morpho_kernel_8c);                  /*0013*/
+   
+   // 2
+   freia_aipo_dilate_8c(d, c, freia_morpho_kernel_8c);                  /*0016*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0017*/
+   freia_aipo_dilate_8c(b, a, freia_morpho_kernel_8c);                  /*0018*/
+   freia_aipo_erode_8c(a, a, freia_morpho_kernel_8c);                   /*0019*/
+   
+   // 3
+   freia_aipo_sub(o0, b, a);                                            /*0022*/
+   freia_aipo_dilate_8c(d, d, freia_morpho_kernel_8c);                  /*0023*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0024*/
+   
+   // 4
+   freia_aipo_sub(o1, d, c);                                            /*0027*/
+
+   return 0;                                                            /*0029*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "copy_00" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "27 -" [shape=trapezium,orientation=270];
+  "27 -" -> "o1";
+  "24 E8" [shape=box];
+  "24 E8" -> "27 -" [label="c"];
+  "23 D8" [shape=box];
+  "23 D8" -> "27 -" [label="d"];
+  "22 -" [shape=trapezium,orientation=270];
+  "22 -" -> "o0";
+  "19 E8" [shape=box];
+  "19 E8" -> "22 -" [label="a"];
+  "18 D8" [shape=box];
+  "18 D8" -> "22 -" [label="b"];
+  "17 E8" [shape=box];
+  "17 E8" -> "24 E8" [label="c"];
+  "16 D8" [shape=box];
+  "16 D8" -> "23 D8" [label="d"];
+  "13 E8" [shape=box];
+  "13 E8" -> "17 E8" [label="c"];
+  "13 E8" -> "16 D8" [label="c"];
+  "12 D8" [shape=box];
+  "12 D8" -> "19 E8" [label="a"];
+  "12 D8" -> "18 D8" [label="a"];
+  "in" -> "13 E8";
+  "in" -> "12 D8";
+}
+// graph for dag "dag_cleaned_0" of module "copy_00" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "27 -" [shape=trapezium,orientation=270];
+  "27 -" -> "o1";
+  "24 E8" [shape=box];
+  "24 E8" -> "27 -" [label="c"];
+  "23 D8" [shape=box];
+  "23 D8" -> "27 -" [label="d"];
+  "22 -" [shape=trapezium,orientation=270];
+  "22 -" -> "o0";
+  "19 E8" [shape=box];
+  "19 E8" -> "22 -" [label="a"];
+  "18 D8" [shape=box];
+  "18 D8" -> "22 -" [label="b"];
+  "17 E8" [shape=box];
+  "17 E8" -> "24 E8" [label="c"];
+  "16 D8" [shape=box];
+  "16 D8" -> "23 D8" [label="d"];
+  "13 E8" [shape=box];
+  "13 E8" -> "17 E8" [label="c"];
+  "13 E8" -> "16 D8" [label="c"];
+  "12 D8" [shape=box];
+  "12 D8" -> "19 E8" [label="a"];
+  "12 D8" -> "18 D8" [label="a"];
+  "in" -> "13 E8";
+  "in" -> "12 D8";
+}
+
+! updated function for
+
+int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
+{
+   freia_data2d *a, *b, *c, *d;                                         /*0005*/
+   a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
+   b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
+   d = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0009*/
+   
+   // 1
+   freia_aipo_dilate_8c(a, in, freia_morpho_kernel_8c);                 /*0012*/
+   freia_aipo_erode_8c(c, in, freia_morpho_kernel_8c);                  /*0013*/
+   
+   // 2
+   freia_aipo_dilate_8c(d, c, freia_morpho_kernel_8c);                  /*0016*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0017*/
+   freia_aipo_dilate_8c(b, a, freia_morpho_kernel_8c);                  /*0018*/
+   freia_aipo_erode_8c(a, a, freia_morpho_kernel_8c);                   /*0019*/
+   
+   // 3
+   freia_aipo_sub(o0, b, a);                                            /*0022*/
+   freia_aipo_dilate_8c(d, d, freia_morpho_kernel_8c);                  /*0023*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0024*/
+   
+   // 4
+   freia_aipo_sub(o1, d, c);                                            /*0027*/
+
+   return 0;                                                            /*0029*/
+}
+#
 # SPOC
 #
 

@@ -1,4 +1,58 @@
 #
+# AIPO
+#
+
+! initial function
+
+void freia_dup_09(freia_data2d *in0, int32_t *x)
+{
+   // artificial WW dependencies, could be merged...
+   freia_aipo_global_min(in0, x);                                       /*0006*/
+   freia_aipo_global_min(in0, x);                                       /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_09" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" [shape=diamond];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
+  "in0" -> "7 min";
+  "in0" -> "6 min";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_09" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" [shape=diamond];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
+  "in0" -> "7 min";
+  "in0" -> "6 min";
+}
+
+! updated function for
+
+void freia_dup_09(freia_data2d *in0, int32_t *x)
+{
+   // artificial WW dependencies, could be merged...
+   freia_aipo_global_min(in0, x);                                       /*0006*/
+   freia_aipo_global_min(in0, x);                                       /*0007*/
+}
+#
 # SPOC
 #
 

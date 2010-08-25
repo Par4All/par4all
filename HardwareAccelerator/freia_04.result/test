@@ -1,4 +1,144 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   
+   
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);       /*0015*/
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t1 - t0
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   freia_aipo_erode_8c(t0, i, k);                                       /*0026*/
+   freia_aipo_dilate_6c(t1, i, k);                                      /*0027*/
+   freia_aipo_sub(t2, t1, t0);                                          /*0028*/
+   freia_aipo_threshold(t3, t2, inf, sup, bin);                         /*0029*/
+   freia_aipo_threshold(t4, t0, inf, sup, bin);                         /*0030*/
+   freia_aipo_global_vol(t3, v);                                        /*0031*/
+   freia_aipo_global_min(t4, m);                                        /*0032*/
+   freia_aipo_add(o, t3, t4);                                           /*0033*/
+
+   freia_common_destruct_data(t0);                                      /*0035*/
+   freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
+   freia_common_destruct_data(t3);                                      /*0038*/
+   freia_common_destruct_data(t4);                                      /*0039*/
+
+   return FREIA_OK;                                                     /*0041*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_04" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "32 min" [shape=diamond];
+  "31 vol" [shape=diamond];
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "33 +" [label="t4"];
+  "30 thr" -> "32 min" [label="t4"];
+  "29 thr" [shape=parallelogram];
+  "29 thr" -> "33 +" [label="t3"];
+  "29 thr" -> "31 vol" [label="t3"];
+  "28 -" [shape=trapezium,orientation=270];
+  "28 -" -> "29 thr" [label="t2"];
+  "27 D6" [shape=box];
+  "27 D6" -> "28 -" [label="t1"];
+  "26 E8" [shape=box];
+  "26 E8" -> "30 thr" [label="t0"];
+  "26 E8" -> "28 -" [label="t0"];
+  "i" -> "27 D6";
+  "i" -> "26 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_04" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "32 min" [shape=diamond];
+  "31 vol" [shape=diamond];
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "33 +" [label="t4"];
+  "30 thr" -> "32 min" [label="t4"];
+  "29 thr" [shape=parallelogram];
+  "29 thr" -> "33 +" [label="t3"];
+  "29 thr" -> "31 vol" [label="t3"];
+  "28 -" [shape=trapezium,orientation=270];
+  "28 -" -> "29 thr" [label="t2"];
+  "27 D6" [shape=box];
+  "27 D6" -> "28 -" [label="t1"];
+  "26 E8" [shape=box];
+  "26 E8" -> "30 thr" [label="t0"];
+  "26 E8" -> "28 -" [label="t0"];
+  "i" -> "27 D6";
+  "i" -> "26 E8";
+}
+
+! updated function for
+
+freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   
+   
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);       /*0015*/
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t1 - t0
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   freia_aipo_erode_8c(t0, i, k);                                       /*0026*/
+   freia_aipo_dilate_6c(t1, i, k);                                      /*0027*/
+   freia_aipo_sub(t2, t1, t0);                                          /*0028*/
+   freia_aipo_threshold(t3, t2, inf, sup, bin);                         /*0029*/
+   freia_aipo_threshold(t4, t0, inf, sup, bin);                         /*0030*/
+   freia_aipo_global_vol(t3, v);                                        /*0031*/
+   freia_aipo_global_min(t4, m);                                        /*0032*/
+   freia_aipo_add(o, t3, t4);                                           /*0033*/
+
+   freia_common_destruct_data(t0);                                      /*0035*/
+   freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
+   freia_common_destruct_data(t3);                                      /*0038*/
+   freia_common_destruct_data(t4);                                      /*0039*/
+
+   return FREIA_OK;                                                     /*0041*/
+}
+#
 # SPOC
 #
 

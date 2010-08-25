@@ -1,4 +1,72 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_30(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = f(i)
+   // o1 = i | i
+   freia_aipo_threshold(o0, i, 10, 20, true);                           /*0009*/
+   freia_aipo_or(o1, i, i);                                             /*0010*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_30" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 |" [shape=trapezium,orientation=270];
+  "10 |" -> "o1";
+  "9 thr" [shape=parallelogram];
+  "9 thr" -> "o0";
+  "i" -> "10 |";
+  "i" -> "10 |";
+  "i" -> "9 thr";
+}
+// graph for dag "dag_cleaned_0" of module "freia_30" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 |" [shape=trapezium,orientation=270];
+  "10 |" -> "o1";
+  "9 thr" [shape=parallelogram];
+  "9 thr" -> "o0";
+  "i" -> "10 |";
+  "i" -> "10 |";
+  "i" -> "9 thr";
+}
+
+! updated function for
+
+freia_status freia_30(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = f(i)
+   // o1 = i | i
+   freia_aipo_threshold(o0, i, 10, 20, true);                           /*0009*/
+   freia_aipo_or(o1, i, i);                                             /*0010*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+#
 # SPOC
 #
 

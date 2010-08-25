@@ -1,4 +1,78 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_13(freia_data2d *o0, freia_data2d *o1, int32_t *kern, int32_t c)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0007*/
+   // two parallel computations without inputs
+   // t = h()
+   // o0 = f(t)
+   // o1 = g(t)
+   freia_aipo_set_constant(t, c);                                       /*0012*/
+   freia_aipo_erode_8c(o0, t, kern);                                    /*0013*/
+   freia_aipo_dilate_8c(o1, t, kern);                                   /*0014*/
+
+   freia_common_destruct_data(t);                                       /*0016*/
+   return FREIA_OK;                                                     /*0017*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_13" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "14 D8" [shape=box];
+  "14 D8" -> "o1";
+  "13 E8" [shape=box];
+  "13 E8" -> "o0";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "14 D8" [label="t"];
+  "12 C" -> "13 E8" [label="t"];
+}
+// graph for dag "dag_cleaned_0" of module "freia_13" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "14 D8" [shape=box];
+  "14 D8" -> "o1";
+  "13 E8" [shape=box];
+  "13 E8" -> "o0";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "14 D8" [label="t"];
+  "12 C" -> "13 E8" [label="t"];
+}
+
+! updated function for
+
+freia_status freia_13(freia_data2d *o0, freia_data2d *o1, int32_t *kern, int32_t c)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0007*/
+   // two parallel computations without inputs
+   // t = h()
+   // o0 = f(t)
+   // o1 = g(t)
+   freia_aipo_set_constant(t, c);                                       /*0012*/
+   freia_aipo_erode_8c(o0, t, kern);                                    /*0013*/
+   freia_aipo_dilate_8c(o1, t, kern);                                   /*0014*/
+
+   freia_common_destruct_data(t);                                       /*0016*/
+   return FREIA_OK;                                                     /*0017*/
+}
+#
 # SPOC
 #
 

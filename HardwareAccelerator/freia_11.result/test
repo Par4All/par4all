@@ -1,4 +1,58 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_11" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_11" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+
+! updated function for
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+#
 # SPOC
 #
 

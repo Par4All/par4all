@@ -1,4 +1,46 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_max(i0, p0);                                /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_global_max" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 max" [shape=diamond];
+  "i0" -> "4 max";
+}
+// graph for dag "dag_cleaned_0" of module "my_global_max" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 max" [shape=diamond];
+  "i0" -> "4 max";
+}
+
+! updated function for
+
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_max(i0, p0);                                /*0004*/
+}
+#
 # SPOC
 #
 

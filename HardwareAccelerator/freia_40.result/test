@@ -1,4 +1,86 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+   freia_aipo_sub(o, d, e);                                             /*0012*/
+
+   freia_common_destruct_data(e);                                       /*0014*/
+   freia_common_destruct_data(d);                                       /*0015*/
+
+   return FREIA_OK;                                                     /*0017*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_40" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "o";
+  "11 D8" [shape=box];
+  "11 D8" -> "12 -" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_40" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "o";
+  "11 D8" [shape=box];
+  "11 D8" -> "12 -" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+
+! updated function for
+
+freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+   freia_aipo_sub(o, d, e);                                             /*0012*/
+
+   freia_common_destruct_data(e);                                       /*0014*/
+   freia_common_destruct_data(d);                                       /*0015*/
+
+   return FREIA_OK;                                                     /*0017*/
+}
+#
 # SPOC
 #
 

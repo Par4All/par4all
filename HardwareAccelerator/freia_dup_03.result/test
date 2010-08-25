@@ -1,4 +1,64 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c)
+{
+   // same operation performed twice
+   // o0 = i +. c
+   // o1 = i +. c
+   freia_aipo_add_const(o0, i, c);                                      /*0009*/
+   freia_aipo_add_const(o1, i, c);                                      /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_03" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 +." [shape=trapezium,orientation=270];
+  "10 +." -> "o1";
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i" -> "10 +.";
+  "i" -> "9 +.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+
+  // computation vertices
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i" -> "9 +.";
+}
+
+! updated function for
+
+freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c)
+{
+   // same operation performed twice
+   // o0 = i +. c
+   // o1 = i +. c
+   freia_aipo_add_const(o0, i, c);
+   freia_aipo_copy(o1, o0);
+   return FREIA_OK;                                                     /*0011*/
+}
+#
 # SPOC
 #
 

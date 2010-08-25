@@ -1,4 +1,74 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // two pipeline calls are necessary
+   // o0 = i0 * i1
+   // o1 = i0 & i1
+   freia_aipo_mul(o0, i0, i1);                                          /*0011*/
+   freia_aipo_and(o1, i0, i1);                                          /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_05" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 &" [shape=trapezium,orientation=270];
+  "12 &" -> "o1";
+  "11 *" [shape=trapezium,orientation=270];
+  "11 *" -> "o0";
+  "i1" -> "12 &";
+  "i1" -> "11 *";
+  "i0" -> "12 &";
+  "i0" -> "11 *";
+}
+// graph for dag "dag_cleaned_0" of module "freia_05" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 &" [shape=trapezium,orientation=270];
+  "12 &" -> "o1";
+  "11 *" [shape=trapezium,orientation=270];
+  "11 *" -> "o0";
+  "i1" -> "12 &";
+  "i1" -> "11 *";
+  "i0" -> "12 &";
+  "i0" -> "11 *";
+}
+
+! updated function for
+
+freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // two pipeline calls are necessary
+   // o0 = i0 * i1
+   // o1 = i0 & i1
+   freia_aipo_mul(o0, i0, i1);                                          /*0011*/
+   freia_aipo_and(o1, i0, i1);                                          /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+#
 # SPOC
 #
 
