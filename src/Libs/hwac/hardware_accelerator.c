@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "callgraph.h"
 
 #include "resources.h"
 #include "pipsdbm.h"
@@ -83,6 +84,10 @@ static int freia_compiler(string module, string hardware)
   else if (freia_terapix_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
   // else no helper file for AIPO target
+
+  // update callees
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module,
+                         (void*) compute_callees(mod_stat));
 
   // release resources
   // ??? free statement_effects? MEMORY LEAK...

@@ -7397,18 +7397,21 @@ accelerators.
 
 \begin{PipsMake}
 freia_spoc_compiler	> MODULE.code
+			> MODULE.callees
 			> MODULE.spoc_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
 
 freia_terapix_compiler	> MODULE.code
+			> MODULE.callees
 			> MODULE.terapix_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
 
 freia_aipo_compiler	> MODULE.code
+			> MODULE.callees
 	< PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
