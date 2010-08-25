@@ -1,0 +1,68 @@
+#
+# first display
+#
+int FOO(void)
+{
+   return 100;
+}
+int Foo(void)
+{
+   return 10;
+}
+int Main(void)
+{
+   return foo()+Foo()+FOO()+1000;
+}
+// function that differ from a case.
+
+int foo(void);
+
+int Foo(void);
+
+int FOO(void);
+
+int Main(void);
+
+int main(void);
+int foo(void)
+{
+   return 1;
+}
+int main(void)
+{
+   return Main()+10000;
+}
+#
+# second display
+#
+int FOO(void)
+{
+   return 100;
+}
+int Foo(void)
+{
+   return 10;
+}
+int Main(void)
+{
+   return foo()+Foo()+FOO()+1000;
+}
+// function that differ from a case.
+
+int foo(void);
+
+int Foo(void);
+
+int FOO(void);
+
+int Main(void);
+
+int main(void);
+int foo(void)
+{
+   return 1;
+}
+int main(void)
+{
+   return Main()+10000;
+}
