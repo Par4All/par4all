@@ -110,11 +110,23 @@ ifdef PARALLEL_VALIDATION
 validate-dir:
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
+	$(MAKE) sort-local-result
 else # sequential validation
 validate-dir:
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
+	$(MAKE) sort-local-result
 endif
+
+# on local validations, sort result & show summary
+.PHONY: sort-local-result
+sort-local-result:
+	if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
+	  mv RESULTS RESULTS.tmp ; \
+	  sort -k 2 RESULTS.tmp > RESULTS ; \
+	  $(RM) RESULTS.tmp ; \
+	  pips_validation_summary.pl RESULTS ; \
+	fi
 
 # restore all initial "test" result files if you are unhappy with a validate
 .PHONY: unvalidate
