@@ -1,4 +1,4 @@
-* pre
+* pre-processing
 + inlining, full_unroll, dead code elim, flatten_code
 + image reuse
 + scalar deps with proper effects
@@ -12,11 +12,14 @@
 - check that there are references where expected?
 - handle different type of images (e.g. distinct BPP)
   issue: it is not clear how the image bpp can be derived from the source
-- check/remove more implicit hypothesis
+- check/remove more implicit hypothesis?
 
 * optimizations
 + remove useless images (computed but not used...) see licensePlate
++ take advantage of commutative operators to remove operations
+- should keep AIPO/software calls if accelerator calls are slower?
 - min commutes with dilate & max with erode, or vice-versa ?
+- other simple or complex algebraic optimization ideas?
 
 * code
 + cleanup data structures?
@@ -26,6 +29,7 @@
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
+- could separate DAG optimization as a separate phase? AIPO -> AIPO
 
 * output
 + symmetry (flipping)
@@ -49,21 +53,23 @@
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
 
-* post
+* post-processing
 + remove malloc/free if not used
 + cleanup declarations
 + it seems that some unused image are not removed (license_plate_copies)
+- should cleanup dead code in generated code (ret |= 0; ...)
 
 * validation
 + check all AIPO
 + add more (elementary) tests?
+- add more application-level tests
 
-* bugs
+* known bugs
 + allocs may be in the middle of the calls
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 - reuse of images in some cases when nodes are reordered... SSA?
 
-* terapix
+* terapix target
 + must manage memory allocation in tiles
 + memory for measures?
 + I/O tiles : read before write
@@ -79,9 +85,12 @@
 - extension: interface with SG terapix microcode generation
   hard constraint: 3 "pointers" are available; border management?
 
-* OpenCL target?
-- whole image computations are okay
+* OpenCL target
+- whole image computations are okay: freia_aipo_compiler
 - could use terapix-like tiling to help with cache?
 - expensive memory accesses => aggregate computations would help?
 - use on-demand image transfers in runtime?
-- compilation benefit: only freia DAG optimizations? well, that IS something!
+- compilation benefit: only freia DAG optimizations? others??
+
+* hardware generation target
+- use optimized expression DAG(s) for hardware generation
