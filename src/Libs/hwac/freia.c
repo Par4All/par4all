@@ -108,9 +108,9 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   if (s1r || s2r) pips_assert("one return in sequence", s1r ^ s2r);
 
   pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s1),
-	     c1? entity_name(call_function(c1)): "", s1r, s1a, s1d);
+             c1? entity_name(call_function(c1)): "", s1r, s1a, s1d);
   pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s2),
-	     c2? entity_name(call_function(c2)): "", s2r, s2a, s2d);
+             c2? entity_name(call_function(c2)): "", s2r, s2a, s2d);
 
   int order = 0;
   string why = "";
@@ -130,7 +130,7 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   pips_assert("total order", order!=0);
 
   pips_debug(7, "%"_intFMT" %s %"_intFMT" (%s)\n", statement_number(*s1),
-	     order==-1? "<": ">", statement_number(*s2), why);
+             order==-1? "<": ">", statement_number(*s2), why);
 
   return order;
 }
@@ -205,7 +205,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
   if (ls!=NIL) {
     set_assign_list(cmp_subset, ls);
     gen_sort_list(sequence_statements(sq),
-		  (gen_cmp_func_t) freia_cmp_statement);
+                  (gen_cmp_func_t) freia_cmp_statement);
     ls = gen_nreverse(ls);
     fsip->seqs = CONS(list, ls, fsip->seqs);
     ls = NIL;
@@ -224,7 +224,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
  */
 string freia_compile(string module, statement mod_stat, string target)
 {
-  if (!(freia_spoc_p(target) || freia_terapix_p(target)))
+  if (!freia_valid_target_p(target))
     pips_internal_error("unexpected target %s", target);
 
   freia_info fsi;
@@ -244,12 +244,18 @@ string freia_compile(string module, statement mod_stat, string target)
                         sequence_domain, sequence_flt, gen_null);
   }
 
-  // output file
-  string file = helper_file_name(module);
-  if (file_readable_p(file))
-    pips_user_error("file '%s' already here, cannot reapply transformation\n");
-  FILE * helper = safe_fopen(file, "w");
-  pips_debug(1, "generating file '%s'\n", file);
+  // output file if any
+  string file = NULL;
+  FILE * helper = NULL;
+  if (freia_spoc_p(target) || freia_terapix_p(target))
+  {
+    file = helper_file_name(module);
+    if (file_readable_p(file))
+      pips_user_error("file '%s' already exists: "
+                      "cannot reapply transformation\n", file);
+    helper = safe_fopen(file, "w");
+    pips_debug(1, "generating file '%s'\n", file);
+  }
 
   // headers
   if (freia_spoc_p(target))
@@ -257,6 +263,7 @@ string freia_compile(string module, statement mod_stat, string target)
   else if (freia_terapix_p(target))
     fprintf(helper, FREIA_TRPX_INCLUDES);
 
+  // hmmm...
   hash_table occs = freia_build_image_occurrences(mod_stat);
 
   int n_dags = 0;
@@ -266,6 +273,8 @@ string freia_compile(string module, statement mod_stat, string target)
       freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_terapix_p(target))
       freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
+    else if (freia_aipo_p(target))
+      freia_aipo_compile_calls(module, ls, occs, n_dags);
     gen_free_list(ls);
     n_dags++;
   }
@@ -275,7 +284,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // cleanup
   gen_free_list(fsi.seqs);
-  safe_fclose(helper, file);
+  if (helper) safe_fclose(helper, file);
 
   return file;
 }

@@ -48,6 +48,8 @@
 #include "freia.h"
 #include "hwac.h"
 
+/* compile FREIA calls for some target.
+ */
 static int freia_compiler(string module, string hardware)
 {
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
@@ -80,6 +82,7 @@ static int freia_compiler(string module, string hardware)
     DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, freia_file);
   else if (freia_terapix_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
+  // else no helper file for AIPO target
 
   // release resources
   // ??? free statement_effects? MEMORY LEAK...
@@ -102,6 +105,11 @@ int freia_spoc_compiler(string module)
 int freia_terapix_compiler(string module)
 {
   return freia_compiler(module, "terapix");
+}
+
+int freia_aipo_compiler(string module)
+{
+  return freia_compiler(module, "aipo");
 }
 
 /* freia_vhdl_compiler(string module) :-)

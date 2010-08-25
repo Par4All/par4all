@@ -7387,9 +7387,9 @@ tiling_sequence      > MODULE.code
 \subsection{Hardware Accelerator}
 \label{hardware-accelerator}
 
-Generate code from a FREIA application targeting a particular
-hardware accelerator, such as SPoC and Terapix.
-I could add resources for the module dags?
+Generate code from a FREIA application possibly targeting hardware
+accelerator, such as SPoC and Terapix.
+%% I could add resources for the module dags?
 I'm unsure about the right granularity (now it is at the function
 level) and the resource which is produced (should it be an accelerated
 file?). The current choice does not allow to easily mix different
@@ -7405,6 +7405,11 @@ freia_spoc_compiler	> MODULE.code
 freia_terapix_compiler	> MODULE.code
 			> MODULE.terapix_file
         < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+
+freia_aipo_compiler	> MODULE.code
+	< PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
@@ -7426,7 +7431,7 @@ HWAC_TERAPIX_RAMPE 1024
 \end{PipsProp}
 
 Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
-(size of which is the number of pe):
+(size of which is necessarily the number of pe):
 \begin{PipsProp}{HWAC_TERAPIX_DMABW}
 HWAC_TERAPIX_DMABW 128
 \end{PipsProp}

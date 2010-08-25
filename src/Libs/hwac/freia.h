@@ -41,6 +41,10 @@
 
 #define freia_spoc_p(s) same_string_p((s), "spoc")
 #define freia_terapix_p(s) same_string_p((s), "terapix")
+#define freia_aipo_p(s) same_string_p((s), "aipo")
+
+#define freia_valid_target_p(s)                               \
+  (freia_spoc_p(s) || freia_terapix_p(s) || freia_aipo_p(s))
 
 /* FREIA API function name -> SPoC hardware description (and others?)
  */

@@ -87,12 +87,13 @@
   hard constraint: 3 "pointers" are available; border management?
 
 * OpenCL target
-- whole image computations are okay: see freia_aipo_compiler
-- compilation benefit: only freia DAG optimizations? others??
++ whole image computations are okay: see freia_aipo_compiler
++ compilation benefit: only freia DAG optimizations
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
 - expensive memory accesses => aggregate computations would help?
-- use on-demand image transfers in runtime?
+- could there be other benefits from a compiler?
+- use on-demand image transfers in "clever" runtime?
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation
