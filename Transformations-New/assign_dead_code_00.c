@@ -7,5 +7,8 @@ int assign_dead_code(int r)
   r /= 1;
   r |= 0;
   r &= r;
+  r |= r;
+  // r = 0;
+  r ^= r;
   return r;
 }
