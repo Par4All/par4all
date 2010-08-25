@@ -95,7 +95,7 @@ new-validate:
 
 .PHONY: mail-validate
 mail-validate: new-validate
-	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 $<)" \
+	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY.short)" \
 		$(EMAIL) < SUMMARY.short
 
 SUMUP	= pips_validation_summary.pl
