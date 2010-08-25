@@ -371,6 +371,7 @@ list generic_c_effects_backward_translation(entity callee,
       expression real_arg = EXPRESSION(CAR(ra));
       parameter formal_arg;
       type te;
+      bool spurious_real_arg_p = false;
 
       pips_debug(5, "current real arg : %s\n",
 		 words_to_string(words_expression(real_arg,NIL)));
@@ -378,11 +379,10 @@ list generic_c_effects_backward_translation(entity callee,
       if (!param_varargs_p)
 	{
 	  if(ENDP(formal_args)) {
-	    pips_user_error("Function \"%s\" is called with at least one real"
-			    " argument by function \"%s\" but its functional"
-			    " type is void -> xxx\n",
+	    pips_user_warning("Function \"%s\" is called with too many arguments\n",
 			    entity_user_name(callee),
 			    entity_user_name(get_current_module_entity()));
+	    spurious_real_arg_p = true;
 	  }
 	  else {
 	    formal_arg = PARAMETER(CAR(formal_args));
@@ -399,7 +399,7 @@ list generic_c_effects_backward_translation(entity callee,
 			    c_actual_argument_to_may_summary_effects(real_arg,
 								     'x'));
 	}
-      else
+      else if (!spurious_real_arg_p)
 	{
 	  list l_eff_on_current_formal = NIL;
 
@@ -473,9 +473,9 @@ list generic_c_effects_backward_translation(entity callee,
 	     (l_eff_on_current_formal, real_arg, context));
 
 	  POP(formal_args);
-	} /* else */
+	} /* else if (!spurious_real_arg_p) */
 
-      /* add the proper effects on the real arg evaluation */
+      /* add the proper effects on the real arg evaluation on any case */
       l_eff = gen_nconc(l_eff, generic_proper_effects_of_c_function_call_argument(real_arg));
     } /* for */
 
