@@ -1,0 +1,14 @@
+int main()
+{
+   int result = 0;
+   int a[100];
+   int i = 0;
+#pragma omp parallel for reduction(+:result)
+
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = i;
+      result += i;
+   }
+
+   return result;
+}
