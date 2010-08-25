@@ -105,7 +105,7 @@ while (<>)
 my $delay = '';
 if (defined $start and defined $stop)
 {
-  my $delay = $stop-$start;
+  $delay = $stop-$start;
   if ($delay<100) {
     $delay .= 's';
   }
@@ -148,29 +148,37 @@ if ($differential) {
 }
 
 # print global summary
-printf
+print
   "number of tests: $count\n" .
   " * passed: $n{passed}\n" .
   " * not passed: $not_passed\n" .
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
-  " - timeout: $n{timeout} (time was out)\n" .
-  ($status_changes?
-    " * status changes:$status_changes\n" .
-    "   .=None P=passed F=failed C=changed T=timeout\n": '') .
+  " - timeout: $n{timeout} (time was out)\n";
+
+print
+  " * status changes:$status_changes\n" .
+  "   .=None P=passed F=failed C=changed T=timeout\n"
+    if $status_changes;
+
+print
   "number of warnings: $warned\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
   " * multi-source: $n{'multi-source'} " .
     "(source files for test with different suffixes)\n" .
-  " * orphan: $n{orphan} (result available without source nor script)\n" .
+  " * orphan: $n{orphan} (result available without source nor script)\n"
+    if $warned;
+
+print
   "broken directory: $n{'broken-directory'} " .
-    "(directory without makefile or maybe with makefile errors)\n" .
-  "success rate: %5.1f%%\n" .
-  ($delay? "elapsed time: $delay\n": '') .
-  "\n",
-  $n{passed}*100.0/$count;
+    "(directory without makefile or maybe with makefile errors)\n"
+    if $n{'broken-directory'};
+
+printf "success rate: %5.1f%%\n", $n{passed}*100.0/$count;
+print "elapsed time: $delay\n" if defined $delay;
+print "\n";
 
 # print detailed per-directory summary
 print "directory                   cases  bads success (F+C+T) changes...\n";
