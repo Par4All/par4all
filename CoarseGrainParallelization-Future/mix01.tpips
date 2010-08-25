@@ -4,6 +4,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create mix01 mix01.c
 
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
 apply PRIVATIZE_MODULE(%ALL)
 
 apply COARSE_GRAIN_PARALLELIZATION
