@@ -58,7 +58,7 @@
 + cleanup declarations
 + it seems that some unused image are not removed (license_plate_copies)
 - should cleanup dead code in generated code (ret |= 0; ...)
-  issue: CALLERS is not updated in the current version, so it fails in effects
+  issue: CALLEES is not updated in the current version, so it fails in effects
 
 * validation
 + check all AIPO
