@@ -88,6 +88,7 @@
 * OpenCL target
 - whole image computations are okay: freia_aipo_compiler
 - could use terapix-like tiling to help with cache?
+  if so, how to tell about the actual image "erosion"?
 - expensive memory accesses => aggregate computations would help?
 - use on-demand image transfers in runtime?
 - compilation benefit: only freia DAG optimizations? others??
