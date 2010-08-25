@@ -19,6 +19,7 @@ full-clean: clean
 	$(FIND) -name 'SUMMARY_Archive' -type d -print0 \
 	     -o -name 'RESULTS' -type d -print0 | \
 	  xargs -0 $(RM) -r
+	$(RM) SUMMARY SUMMARY.short
 
 .PHONY: clean
 clean:
