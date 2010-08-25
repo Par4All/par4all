@@ -105,17 +105,21 @@ $(HEAD): check-run-consistency
 # this target should replace the "validate" target
 .PHONY: new-validate
 new-validate:
-	$(RM) SUMMARY
+	$(RM) SUMMARY SUMMARY.short
 	$(MAKE) parallel-clean
 	$(MAKE) archive
 
-.PHONY: mail-validate
-mail-validate: new-validate
+# mail summary
+SUMMARY.short: new-validate
 	{ \
 	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
 	  echo ; \
 	  grep -v '^passed: ' SUMMARY ; \
-	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
+	} > $@
+
+.PHONY: mail-validate
+mail-validate: SUMMARY.short
+	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 $<)" $(EMAIL) < $<
 
 SUMUP	= pips_validation_summary.pl
 
