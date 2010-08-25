@@ -102,19 +102,23 @@ while (<>)
 }
 
 # compute elapsed time and adjust units
-my $delay = $stop-$start;
-if ($delay<100) {
-  $delay .= 's';
+my $delay = '';
+if (defined $start and defined $stop)
+{
+  my $delay = $stop-$start;
+  if ($delay<100) {
+    $delay .= 's';
+  }
+  elsif ($delay < 6000) {
+    $delay /= 60.0;
+    $delay .= 'mn';
+  }
+  else {
+    $delay /= 3600.0;
+    $delay .= 'h';
+  }
+  $delay =~ s/(\.\d)\d+/$1/;
 }
-elsif ($delay < 6000) {
-  $delay /= 60.0;
-  $delay .= 'mn';
-}
-else {
-  $delay /= 3600.0;
-  $delay .= 'h';
-}
-$delay =~ s/(\.\d)\d+/$1/;
 
 # count new test cases
 for my $c (sort keys %new)
@@ -164,7 +168,7 @@ printf
   "broken directory: $n{'broken-directory'} " .
     "(directory without makefile or maybe with makefile errors)\n" .
   "success rate: %5.1f%%\n" .
-  "elapsed time: $delay\n" .
+  ($delay? "elapsed time: $delay\n": '') .
   "\n",
   $n{passed}*100.0/$count;
 
