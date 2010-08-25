@@ -234,6 +234,9 @@ static void kill_effect( set kill, effect e ) {
   if ( action_write_p(effect_action(e))
       && approximation_must_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
+          /* We only kill store effect */
+          if(!store_effect_p(theEffect)) continue;
+
           /* We avoid a self killing */
           if( e != theEffect ) {
             /* Check if there is a must conflict
