@@ -1,0 +1,28 @@
+#! /bin/bash -vx
+
+# This is a simple generic validation test method to be used as a .test
+# PIPS validation framework for p4a_recover_includes
+
+# Note that .test can have any UNIX content so we use here to validate non
+# PIPS stuff. :-) Ronan.Keryell@hpc-project.com
+
+# The name associated to the .test file:
+file_name=`basename $0 .test`
+
+# The file name to be used to output the cpp processed instrumented content:
+cpp=`mktemp --suffix=.cpp "$file_name"_XXXXXXX`
+
+# The recovered result where we try to find again the #include's:
+recovered=`mktemp --suffix=.c "$file_name"_XXXXXXX`
+
+# Preprocess the example:
+p4a_recover_includes --simple -E $file_name.c > $cpp
+
+# Recover the top-level #include's:
+p4a_recover_includes --simple -o $recovered $cpp
+
+# Output on stdio the result for validation purpose by the PIPS validation
+# framework:
+cat $recovered
+
+rm $cpp $recovered

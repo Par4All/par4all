@@ -230,7 +230,7 @@ class SimpleC99Lexer:
         'LBRACE',
         'RBRACE',
         'SEMICOLON_NL',
-        'std_include',
+        'include',
         'comment',
         'string',
         'char'
@@ -272,9 +272,12 @@ class SimpleC99Lexer:
     # include of the form '# 1 "/usr/include/features.h" 1 3 4'
     # See cpp-4.2 info '9 Preprocessor Output'
 
-    #t_std_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
-    #t_std_include = r'\# .*1 [^\n]+\n'
-    t_std_include = r'\#[ ][1][ ]"/usr/include/[^"]+"[^\n]+\n'
+    #t_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
+    #t_include = r'\# .*1 [^\n]+\n'
+    # For standard includes only:
+    #t_include = r'\#[ ][1][ ]"/usr/include/[^"]+"[^\n]+\n'
+    # For any include:
+    t_include = r'\#[ ][1][ ]"[^"]+"[^\n]+\n'
 
     # For other characters, we store them as the current declaration:
     def t_error(self, t):
@@ -306,7 +309,7 @@ class SimpleC99Lexer_simple:
         'LBRACE',
         'RBRACE',
         'SEMICOLON',
-        'std_include',
+        'include',
         'comment',
         'string',
         'char'
@@ -345,10 +348,10 @@ class SimpleC99Lexer_simple:
     # include of the form '# 1 "/usr/include/features.h" 1 3 4'
     # See cpp-4.2 info '9 Preprocessor Output'
 
-    #t_std_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
-    #t_std_include = r'\# .*1 [^\n]+\n'
-    #t_std_include = r'#[^\n]+\n'
-    t_std_include = r'\#[ ]\d+ [^\n]+\n'
+    #t_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
+    #t_include = r'\# .*1 [^\n]+\n'
+    #t_include = r'#[^\n]+\n'
+    t_include = r'\#[ ]\d+ [^\n]+\n'
 
     # Match the potential end of a declaration:
     t_SEMICOLON = r';'
@@ -563,7 +566,7 @@ def postpreprocess(output_string):
     for tok in l.lexer:
         if verbose:
             print(tok)
-        if tok.type == 'std_include':
+        if tok.type == 'include':
             # Do not forget any pending other characters:
             print(l.lexer.content, end = '')
             l.lexer.content = ""
@@ -584,7 +587,8 @@ def postpreprocess(output_string):
 
 
 # To parse the # pragma from gcc/cpp:
-parse_line_pragma_re = re.compile(r'\# (\d+) "([^"]+)" (\d) ?(\d)? ?(\d)?\n')
+parse_line_pragma_re = re.compile(r'\# (\d+) ([<"][^">]+[">]) (\d) ?(\d)? ?(\d)?\n')
+
 include_stack = []
 
 def postpreprocess_simple(output_string):
@@ -608,12 +612,22 @@ def postpreprocess_simple(output_string):
         if verbose:
             print(tok, include_stack)
         #print(tok, include_stack)
-        if tok.type == 'std_include':
+        if tok.type == 'include':
             #print(tok.value, end = '')
             m = parse_line_pragma_re.match(tok.value)
             if m:
                 file_name = m.group(2)
                 #print(file_name,m.group(3),m.group(4),m.group(5))
+
+                # A preprocessor position information about an included
+                # standard include of the form '# 1
+                # "/usr/include/features.h" 1 3 4' See cpp-4.2 info '9
+                # Preprocessor Output'
+
+                # To normalize standard include names:
+                file_name = re.sub(r'^"/usr/include/(.*)"$',
+                                   r'<\1>', file_name, 0, 0)
+
                 if m.group(3) == "1":
                     include_stack.append(file_name)
                     if verbose:
@@ -621,8 +635,8 @@ def postpreprocess_simple(output_string):
                     if simple_method and len(include_stack) == 1:
                         # In the case of the simple method, just mark
                         # begin of #include that are at the top-level:
-                        flush_lexer_output('/* P4A include "'
-                                           + file_name + '" starts here */\n')
+                        flush_lexer_output('/* P4A include '
+                                           + file_name + ' starts here */\n')
                     #print(include_stack)
                 if m.group(3) == "2":
                     returning_from = include_stack.pop()
@@ -633,9 +647,9 @@ def postpreprocess_simple(output_string):
                     if simple_method and len(include_stack) == 0:
                         # In the case of the simple method, just mark
                         # the end of #include that are at the top-level:
-                        flush_lexer_output('/* P4A include "'
+                        flush_lexer_output('/* P4A include '
                                            + returning_from
-                                           + '" stops here */\n')
+                                           + ' stops here */\n')
         elif include_stack and not simple_method:
             # We are in an inclusion, so decorate only full statements:
             if tok.type == 'comment':
@@ -687,12 +701,17 @@ def recover_header_simple(file_name, output_file_name):
 
 
     if simple_method:
-        content = re.sub(r'/\* P4A include "/usr/include/([^"]+)" starts here \*/.+?/\* P4A include "/usr/include/\1" stops here \*/',
-                r'#include <\1>', content, 0, re.DOTALL)
+        #content = re.sub(r'/\* P4A include "/usr/include/([^"]+)" starts here \*/.+?/\* P4A include "/usr/include/\1" stops here \*/',
+        #        r'#include <\1>', content, 0, re.DOTALL)
+        content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/.+?/\* P4A include \1 stops here \*/',
+                r'#include \1', content, 0, re.DOTALL)
 
         print(content, file = output)
-        print('on ', output_file_name)
+        if verbose:
+            print('on ', output_file_name)
         return
+
+    # Else, the complex method...
 
     # To store the set of found headers:
     found_headers = set()
@@ -760,7 +779,7 @@ def postpreprocess(output_string):
     for tok in l.lexer:
         if verbose:
             print(tok)
-        if tok.type == 'std_include':
+        if tok.type == 'include':
             #print(tok.value, end = '')
             m = parse_line_pragma_re.match(tok.value)
             if m:
