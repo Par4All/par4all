@@ -94,3 +94,8 @@
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation
+
+* multi target ?
+- chose the best hardware depending on the compilations: criterion?
+- possibly add dynamic reconfigurations.
+- quite uneasily to do with the current implementation
