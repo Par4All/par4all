@@ -81,4 +81,7 @@
 
 * OpenCL target?
 - whole image computations are okay
-- expensive memory accesses => aggregate computations
+- could use terapix-like tiling to help with cache?
+- expensive memory accesses => aggregate computations would help?
+- use on-demand image transfers in runtime?
+- compilation benefit: only freia DAG optimizations? well, that IS something!
