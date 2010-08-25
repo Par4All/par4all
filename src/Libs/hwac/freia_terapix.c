@@ -1178,6 +1178,7 @@ void freia_trpx_compile_calls
   }
 
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

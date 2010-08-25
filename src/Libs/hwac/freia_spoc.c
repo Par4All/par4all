@@ -2086,6 +2086,7 @@ void freia_spoc_compile_calls
   // pips_assert("all statements done", set_empty_p(global_remainings));
 
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;
