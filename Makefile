@@ -85,6 +85,20 @@ check-run-consistency:
 	  exit 1 ; \
 	}
 
+# this target should replace the "validate" target
+.PHONY: new-validate
+new-validate:
+	$(RM) SUMMARY SUMMARY.short
+	$(MAKE) parallel-clean
+	$(MAKE) archive
+	$(MAKE) SUMMARY.short
+
+.PHONY: mail-validate
+mail-validate: new-validate
+	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 $<)" $(EMAIL) < $<
+
+SUMUP	= pips_validation_summary.pl
+
 # generate summary header
 # hmmm... not sure that start date is before the validation
 $(HEAD): check-run-consistency
@@ -102,27 +116,6 @@ $(HEAD): check-run-consistency
 	  echo "by user: $$USER" ; \
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
-
-# this target should replace the "validate" target
-.PHONY: new-validate
-new-validate:
-	$(RM) SUMMARY SUMMARY.short
-	$(MAKE) parallel-clean
-	$(MAKE) archive
-
-# mail summary
-SUMMARY.short: new-validate
-	{ \
-	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
-	  echo ; \
-	  grep -v '^passed: ' SUMMARY ; \
-	} > $@
-
-.PHONY: mail-validate
-mail-validate: SUMMARY.short
-	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 $<)" $(EMAIL) < $<
-
-SUMUP	= pips_validation_summary.pl
 
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
@@ -145,6 +138,14 @@ SUMMARY: $(HEAD) parallel-validate
 	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
 	} >> $@
+
+# mail summary
+SUMMARY.short: # SUMMARY
+	{ \
+	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
+	  echo ; \
+	  grep -v '^passed: ' SUMMARY ; \
+	} > $@
 
 .PHONY: archive
 archive: SUMMARY $(DEST.d)
