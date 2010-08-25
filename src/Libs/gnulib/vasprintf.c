@@ -1,5 +1,5 @@
 /* Formatted output to strings.
-   Copyright (C) 1999, 2002, 2006-2008 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2006-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include <pips_config.h>
+#include <config.h>
 
 /* Specification.  */
 #ifdef IN_LIBASPRINTF
