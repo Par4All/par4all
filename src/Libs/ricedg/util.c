@@ -104,29 +104,19 @@ int conflicts_sort_callback( conflict *c1, conflict *c2 ) {
   action a1_source = effect_action(e1_source);
   action a2_source = effect_action(e2_source);
 
-  string s1;
-  if ( action_read_p(a1_source) && action_read_p(a1_sink) ) {
-    s1 = "RR";
-  } else if ( action_read_p(a1_source) && action_write_p(a1_sink) ) {
-    s1 = "RW";
-  } else if ( action_write_p(a1_source) && action_read_p(a1_sink) ) {
-    s1 = "WR";
-  } else {
-    s1 = "WW";
-  }
-  string s2;
-  if ( action_read_p(a2_source) && action_read_p(a2_sink) ) {
-    s2 = "RR";
-  } else if ( action_read_p(a2_source) && action_write_p(a2_sink) ) {
-    s2 = "RW";
-  } else if ( action_write_p(a2_source) && action_read_p(a2_sink) ) {
-    s2 = "WR";
-  } else {
-    s2 = "WW";
-  }
+
+
+  string s1 = strdup(concatenate(full_action_to_short_string(a1_source),
+                                 full_action_to_short_string(a1_sink),
+                                 NULL));
+  string s2 = strdup(concatenate(full_action_to_short_string(a2_source),
+                                 full_action_to_short_string(a2_sink),
+                                 NULL));
 
   // Compare Action in lexical order
   r_value = strcmp( s1, s2 );
+  free( s1 );
+  free( s2 );
 
   if ( r_value == 0 ) {
     // Compare string representing source reference
