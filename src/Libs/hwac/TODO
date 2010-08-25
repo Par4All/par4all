@@ -58,6 +58,7 @@
 + cleanup declarations
 + it seems that some unused image are not removed (license_plate_copies)
 - should cleanup dead code in generated code (ret |= 0; ...)
+  issue: CALLERS is not updated in the current version, so it fails in effects
 
 * validation
 + check all AIPO
@@ -86,12 +87,12 @@
   hard constraint: 3 "pointers" are available; border management?
 
 * OpenCL target
-- whole image computations are okay: freia_aipo_compiler
+- whole image computations are okay: see freia_aipo_compiler
+- compilation benefit: only freia DAG optimizations? others??
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
 - expensive memory accesses => aggregate computations would help?
 - use on-demand image transfers in runtime?
-- compilation benefit: only freia DAG optimizations? others??
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation
