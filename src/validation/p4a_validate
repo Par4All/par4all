@@ -98,11 +98,21 @@ class Validation:
 class ValidationElement:
     "Store information about a validation item"
 
-    # The possible status attributes of a validation item:
+    # The possible status attributes of a validation item when it really runs:
     CHANGED = 'changed'
     FAILED = 'failed'
+    PASSED = 'passed'
+    TIMEOUT = 'timeout'
+
+    # Special cases:
+    MISSING = 'missing'
+    MULTI_SCRIPT = 'multi-script'
+    MULTI_SOURCE = 'multi-source'
+    ORPHAN = 'orphan'
     SKIPPED = 'skipped'
-    SUCCESS = 'success'
+
+    # For the help message:
+    METAVAR = 'changed|failed|passed|timeout|missing|multi-script|multi-source|orphan|skipped'
 
     # To deal with diff validation output:
     OLD_DIFF = "OLD"
@@ -135,8 +145,13 @@ class ValidationElement:
 
         if status == ValidationElement.CHANGED \
            or status == ValidationElement.FAILED \
-           or status == ValidationElement.SKIPPED \
-           or status == ValidationElement.SUCCESS:
+           or status == ValidationElement.PASSED \
+           or status == ValidationElement.TIMEOUT \
+           or status == ValidationElement.MISSING \
+           or status == ValidationElement.MULTI_SCRIPT \
+           or status == ValidationElement.MULTI_SOURCE \
+           or status == ValidationElement.ORPHAN \
+           or status == ValidationElement.SKIPPED:
             pass
         else:
             print('Status', status, 'not allowed.', file = sys.stderr)
@@ -442,38 +457,38 @@ def main():
     vc_file = optparse.OptionGroup(parser,
                                    "Validation class construction from files")
 
-    vc_file.add_option("--file", dest="simple_file_name",
+    vc_file.add_option("--file", dest = "simple_file_name",
                        help = "initialize a validation class from a plain line-oriented file of validation case names;",
-                       metavar="FILE")
+                       metavar = "FILE")
 
-    vc_file.add_option("--old-diff-file", dest="old_diff_file_name",
+    vc_file.add_option("--old-diff-file", dest = "old_diff_file_name",
                        help = "add to a validation class the items from the old differences found in a validation diff output file;",
-                       metavar="FILE")
+                       metavar = "FILE")
 
-    vc_file.add_option("--new-diff-file", dest="new_diff_file_name",
+    vc_file.add_option("--new-diff-file", dest = "new_diff_file_name",
                        help = "add to a validation class the items from the new differences found in a validation diff output file;",
-                       metavar="FILE")
+                       metavar = "FILE")
 
     parser.add_option_group(vc_file)
 
     vc_filtering = optparse.OptionGroup(parser,
                                         "Validation class filtering")
 
-    vc_filtering.add_option("--keep-status", dest="keep_status",
-                            metavar='changed|failed|skipped|success',
+    vc_filtering.add_option("--keep-status", dest = "keep_status",
+                            metavar = ValidationElement.METAVAR,
                             help = 'filter the current validation class by keeping only the elements with the expected status;')
 
-    vc_filtering.add_option("--remove-status", dest="remove_status",
-                            metavar='changed|failed|skipped|success',
+    vc_filtering.add_option("--remove-status", dest = "remove_status",
+                            metavar = ValidationElement.METAVAR,
                             help = 'filter the current validation class by removing the elements with the given status;')
 
     vc_filtering.add_option("-f",  "--filter", dest="filter",
                             help = "filter the current class by keeping all the validation items with a name matching a regular expression;",
-                            metavar="REGULAR-EXPRESSION")
+                            metavar = "REGULAR-EXPRESSION")
 
-    vc_filtering.add_option("--filter-out", dest="filter_out",
+    vc_filtering.add_option("--filter-out", dest = "filter_out",
                             help = "filter out the current class by removing all the validation items with a name matching a regular expression;",
-                            metavar="REGULAR-EXPRESSION")
+                            metavar = "REGULAR-EXPRESSION")
 
     parser.add_option_group(vc_filtering)
 
@@ -500,9 +515,9 @@ def main():
                          action = "store_true", dest = "accept", default = False,
                          help = "accept for the current validation class and add them with git;")
 
-    vc_accept.add_option("-c",  "--commit", dest="message",
+    vc_accept.add_option("-c",  "--commit", dest = "message",
                       help = "commit in git the accepted modifications with the given message;",
-                      metavar="MESSAGE")
+                      metavar = "MESSAGE")
 
     parser.add_option_group(vc_accept)
 
