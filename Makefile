@@ -126,15 +126,19 @@ SUMUP	= pips_validation_summary.pl
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
 	{ \
-	  unset LANG LC_COLLATE ; \
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date) [$$(date +%s)]" ; \
 	  echo ; \
+	} > $@ ;
+	cat $@ $(RESULTS) > $@.tmp ; \
+	{ \
 	  [ -f $(SUM.last) ] && last=$(SUM.last) ; \
-          $(SUMUP) $(RESULTS) $$last ; \
-	} > $@
+	  $(SUMUP) $@.tmp $$last ; \
+	  $(RM) $@.tmp ; \
+	} >> $@ ; \
 	{ \
           echo ; \
+	  unset LANG LC_COLLATE ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
 	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
