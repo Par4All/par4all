@@ -901,7 +901,7 @@ sc_simplexe_feasibility_ofl_ctrl(
      *  pour reinitialiser a 0
      *  en sortie de la procedure.
      */
-    hashtable_t volatile hashtable[MAX_VAR];
+    static hashtable_t volatile hashtable[MAX_VAR];
     Pbase volatile saved_base;
     int volatile saved_dimension;
     // tableau * volatile eg = NULL; /* tableau des egalite's  */
