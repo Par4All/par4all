@@ -6,6 +6,7 @@ Syntax
 Control
 Preprocessor
 C_syntax
+F95_syntax
 Effects
 # To check effects extended to environment and type declarations
 Effects-New
@@ -17,7 +18,6 @@ RegionPrivatization
 Complexity
 Regions
 Reductions
-Hpfc
 Chains
 Rice
 Ricedg
@@ -26,8 +26,6 @@ CoarseGrainParallelization
 Callgraph
 # Transformations, using PIPS initial default options
 Transformations
-# Same kinds of validations, but using 2009 PIPS default option
-Transformations-New
 DemoStd
 Hyperplane
 Icfg
@@ -42,7 +40,6 @@ Step
 SC95
 Flint
 Bootstrap
-HardwareAccelerator
 Privatizing
 Terapix
 Tpips
@@ -57,6 +54,12 @@ Demo-2009
 Gpu
 Inlining
 AcceleratorUtils
+# put intra-directory parallel validations at the end!
+Hpfc
+HardwareAccelerator
+# Same kinds of validations as Transformations,
+# but using 2009 PIPS default option
+Transformations-New
 # should be added?
 # AliasChecking
 # ArrayBoundCheck
@@ -66,4 +69,3 @@ AcceleratorUtils
 # RegionTranslation
 # UseBeforeSet
 # Wp65
-F95_syntax
