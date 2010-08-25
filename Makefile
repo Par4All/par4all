@@ -11,6 +11,7 @@ validate-%: old-validate-%
 validate-test: new-validate
 validate-out:; $(MAKE) TEST=out new-validate
 
+SHELL	= /bin/bash
 FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 
 .PHONY: full-clean
