@@ -53,7 +53,8 @@ echo
 echo ! cleaned up function
 echo
 apply PARTIAL_EVAL[${NAME}]
-apply USE_DEF_ELIMINATIONS[${NAME}]
+# hmmm... too efficient:-)
+#apply USE_DEF_ELIMINATION[${NAME}]
 apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
