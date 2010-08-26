@@ -15,7 +15,7 @@ typedef struct {
 } freia_data2d;
 typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
 typedef struct {
-  int framebpp, framewidth, frameheight;
+  int framebpp, framewidth, frameheight, stuff;
 } freia_dataio;
 
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
