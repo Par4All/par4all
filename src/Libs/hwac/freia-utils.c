@@ -861,12 +861,24 @@ void freia_substitute_by_helper_call
       pips_assert("statement is a call", statement_call_p(sc));
       pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
 
-      // substitute by call to helper
+      // build helper entity
       entity example = local_name_to_top_level_entity("freia_aipo_add");
       pips_assert("example is a function", entity_function_p(example));
       entity helper = make_empty_function(function_name,
         copy_type(functional_result(type_functional(entity_type(example)))),
                                           make_language_c());
+      // update type of parameters
+      list larg_params = NIL;
+      FOREACH(expression, e, lparams)
+        larg_params = CONS(PARAMETER,
+			  make_parameter(expression_to_user_type(e),
+					 make_mode_value(),
+					 make_dummy_unknown()),
+			  larg_params);
+      larg_params = gen_nreverse(larg_params);
+      functional_parameters(type_functional(entity_type(helper))) = larg_params;
+
+      // substitute by call to helper
       call c = make_call(helper, lparams);
 
       hwac_replace_statement(sc, c, false);
