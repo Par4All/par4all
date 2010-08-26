@@ -359,7 +359,7 @@ bool one_liner_p(statement s)
 	      || instruction_call_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
 	      || return_instruction_p(i));
 
-  yes = yes  && ENDP(statement_declarations(s));
+  yes = yes && ENDP(statement_declarations(s));
 
   if(!yes && instruction_sequence_p(i)) {
     list sl = sequence_statements(instruction_sequence(i));
@@ -4182,13 +4182,13 @@ text text_statement_enclosed(entity module,
 	  }
 	  else if(string_undefined_p(cs) || cs == NULL || strcmp(cs, "")==0) {
 	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
-	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	    temp = make_text(CONS(SENTENCE, s, NIL));
 	    //temp = make_text(NIL);
 	  }
 	  else if(strcmp(cs, "\n")==0) {
 	    // MAKE_ONE_WORD_SENTENCE already implies a '\n'
 	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
-	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	    temp = make_text(CONS(SENTENCE, s, NIL));
 	  }
 	  else
 	    temp = text_instruction(module, label, nmargin, i,
