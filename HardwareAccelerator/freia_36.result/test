@@ -229,6 +229,18 @@ freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
    freia_common_destruct_data(t);                                       /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
+
+! cleaned up function
+
+freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t min;                                                         /*0007*/
+   // should t be extracted?
+   freia_36_helper_0_0_0(t, i0, i1, &min);                              /*0009*/
+   freia_common_destruct_data(t);                                       /*0011*/
+   return 0;                                                            /*0012*/
+}
 #
 # TERAPIX
 #
@@ -403,6 +415,18 @@ freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
    freia_36_helper_0_0(t, i0, i1, &min);                                /*0009*/
    freia_common_destruct_data(t);                                       /*0011*/
    return FREIA_OK;                                                     /*0012*/
+}
+
+! cleaned up function
+
+freia_status freia_36(freia_data2d *i0, freia_data2d *i1)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t min;                                                         /*0007*/
+   // should t be extracted?
+   freia_36_helper_0_0(t, i0, i1, &min);                                /*0009*/
+   freia_common_destruct_data(t);                                       /*0011*/
+   return 0;                                                            /*0012*/
 }
 #
 # FREIA COMPILATION DONE

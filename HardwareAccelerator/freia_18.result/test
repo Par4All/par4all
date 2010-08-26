@@ -340,6 +340,33 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    return FREIA_OK;                                                     /*0037*/
 }
+
+! cleaned up function
+
+freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   
+   
+   
+   // useless computations...
+   // u0 = i0 + i1
+   // u1 = u0
+   // u2 = u1 - i0
+   // t0 = i0 & i1
+   // o = t0 ^ i1
+   // u3 = o | i1
+   
+   // deadcode
+   // alive code
+   freia_18_helper_0_0_0(o, i0, i1);                                    /*0026*/
+   // deadcode
+   
+   
+   return 0;                                                            /*0037*/
+}
 #
 # TERAPIX
 #
@@ -569,6 +596,33 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    return FREIA_OK;                                                     /*0037*/
+}
+
+! cleaned up function
+
+freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   
+   
+   
+   // useless computations...
+   // u0 = i0 + i1
+   // u1 = u0
+   // u2 = u1 - i0
+   // t0 = i0 & i1
+   // o = t0 ^ i1
+   // u3 = o | i1
+   
+   // deadcode
+   // alive code
+   freia_18_helper_0_0(o, i0, i1);                                      /*0026*/
+   // deadcode
+   
+   
+   return 0;                                                            /*0037*/
 }
 #
 # FREIA COMPILATION DONE

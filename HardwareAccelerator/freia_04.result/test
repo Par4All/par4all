@@ -428,6 +428,31 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    
    return FREIA_OK;                                                     /*0041*/
 }
+
+! cleaned up function
+
+freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   
+   
+   
+   
+   
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t1 - t0
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0026*/
+   
+   
+   return 0;                                                            /*0041*/
+}
 #
 # TERAPIX
 #
@@ -763,6 +788,31 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    
    
    return FREIA_OK;                                                     /*0041*/
+}
+
+! cleaned up function
+
+freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   
+   
+   
+   
+   
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t1 - t0
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   freia_04_helper_0_0(o, i, k, inf, sup, bin, v, m);                   /*0026*/
+   
+   
+   return 0;                                                            /*0041*/
 }
 #
 # FREIA COMPILATION DONE

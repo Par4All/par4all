@@ -408,6 +408,42 @@ int anr999_03(void)
 
    return 0;                                                            /*0048*/
 }
+
+! cleaned up function
+
+int anr999_03(void)
+{
+   freia_dataio fdin;                                                   /*0012*/
+   freia_dataio fdout;                                                  /*0013*/
+   freia_data2d *in;                                                    /*0014*/
+   freia_data2d *og;                                                    /*0015*/
+   freia_data2d *od;                                                    /*0016*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0019*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0020*/
+
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0022*/
+   od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0023*/
+   og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
+
+   freia_common_rx_image(in, &fdin);                                    /*0027*/
+
+   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
+   
+   
+   freia_common_tx_image(in, &fdout);                                   /*0036*/
+   freia_common_tx_image(od, &fdout);                                   /*0037*/
+   freia_common_tx_image(og, &fdout);                                   /*0038*/
+
+   freia_common_destruct_data(in);                                      /*0041*/
+   freia_common_destruct_data(od);                                      /*0042*/
+   freia_common_destruct_data(og);                                      /*0043*/
+
+   freia_common_close_input(&fdin);                                     /*0045*/
+   freia_common_close_output(&fdout);                                   /*0046*/
+
+   return 0;                                                            /*0048*/
+}
 #
 # TERAPIX
 #
@@ -662,6 +698,42 @@ freia_status anr999_03_helper_0_0(
 
 
 ! updated function
+
+int anr999_03(void)
+{
+   freia_dataio fdin;                                                   /*0012*/
+   freia_dataio fdout;                                                  /*0013*/
+   freia_data2d *in;                                                    /*0014*/
+   freia_data2d *og;                                                    /*0015*/
+   freia_data2d *od;                                                    /*0016*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0019*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0020*/
+
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0022*/
+   od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0023*/
+   og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
+
+   freia_common_rx_image(in, &fdin);                                    /*0027*/
+
+   anr999_03_helper_0_0(od, od, og, in, freia_morpho_kernel_8c);        /*0029*/
+   
+   
+   freia_common_tx_image(in, &fdout);                                   /*0036*/
+   freia_common_tx_image(od, &fdout);                                   /*0037*/
+   freia_common_tx_image(og, &fdout);                                   /*0038*/
+
+   freia_common_destruct_data(in);                                      /*0041*/
+   freia_common_destruct_data(od);                                      /*0042*/
+   freia_common_destruct_data(og);                                      /*0043*/
+
+   freia_common_close_input(&fdin);                                     /*0045*/
+   freia_common_close_output(&fdout);                                   /*0046*/
+
+   return 0;                                                            /*0048*/
+}
+
+! cleaned up function
 
 int anr999_03(void)
 {

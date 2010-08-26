@@ -384,6 +384,19 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
    freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0011*/
    freia_common_destruct_data(t0);                                      /*0013*/
 }
+
+! cleaned up function
+
+void freia_skip_06(freia_data2d *o, freia_data2d *i)
+{
+   freia_data2d *t0;                                                    /*0005*/
+   t0 = freia_common_create_data(16, 128, 128);                         /*0008*/
+   // live allocation in an intermediate statement
+   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0007*/
+   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0011*/
+   freia_common_destruct_data(t0);                                      /*0013*/
+   ;
+}
 #
 # TERAPIX
 #
@@ -626,6 +639,15 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
    freia_skip_06_helper_0_0(i, o, i, 111, 111);                         /*0007*/
+}
+
+! cleaned up function
+
+void freia_skip_06(freia_data2d *o, freia_data2d *i)
+{
+   // live allocation in an intermediate statement
+   freia_skip_06_helper_0_0(i, o, i, 111, 111);                         /*0007*/
+   ;
 }
 #
 # FREIA COMPILATION DONE

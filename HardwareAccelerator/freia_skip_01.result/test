@@ -329,6 +329,20 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
    freia_common_destruct_data(t);                                       /*0013*/
    return ret;                                                          /*0014*/
 }
+
+! cleaned up function
+
+freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
+{
+   freia_status ret = 0;                                                /*0006*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0007*/
+   int32_t max, seuil;                                                  /*0008*/
+   freia_skip_01_helper_0_0_0(t, i, &max, 20);                          /*0009*/
+   seuil = max-10;                                                      /*0011*/
+   freia_skip_01_helper_0_1_0(o, t, 0, seuil, 0);                       /*0012*/
+   freia_common_destruct_data(t);                                       /*0013*/
+   return ret;                                                          /*0014*/
+}
 #
 # TERAPIX
 #
@@ -618,6 +632,20 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
    freia_skip_01_helper_0_1(t, i, &max, 20);                            /*0009*/
    seuil = max-10;                                                      /*0011*/
    freia_skip_01_helper_0_0(o, t, 0, seuil, false);                     /*0012*/
+   freia_common_destruct_data(t);                                       /*0013*/
+   return ret;                                                          /*0014*/
+}
+
+! cleaned up function
+
+freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
+{
+   freia_status ret = 0;                                                /*0006*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0007*/
+   int32_t max, seuil;                                                  /*0008*/
+   freia_skip_01_helper_0_1(t, i, &max, 20);                            /*0009*/
+   seuil = max-10;                                                      /*0011*/
+   freia_skip_01_helper_0_0(o, t, 0, seuil, 0);                         /*0012*/
    freia_common_destruct_data(t);                                       /*0013*/
    return ret;                                                          /*0014*/
 }

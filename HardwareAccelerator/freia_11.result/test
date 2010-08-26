@@ -193,6 +193,16 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
    freia_11_helper_0_0_0(o, i);                                         /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }
+
+! cleaned up function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   return 0;                                                            /*0009*/
+}
 #
 # TERAPIX
 #
@@ -339,6 +349,16 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
    // o = i - i
    freia_11_helper_0_0(o, i);                                           /*0008*/
    return FREIA_OK;                                                     /*0009*/
+}
+
+! cleaned up function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_11_helper_0_0(o, i);                                           /*0008*/
+   return 0;                                                            /*0009*/
 }
 #
 # FREIA COMPILATION DONE

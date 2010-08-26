@@ -273,6 +273,23 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    
    return FREIA_OK;                                                     /*0020*/
 }
+
+! cleaned up function
+
+freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   // 1 stage pipeline
+   // t1 = f(i)
+   // t2 = g(i)
+   // o  = t1 - t2
+   freia_34_helper_0_0_0(o, i, k);                                      /*0013*/
+   
+   
+   return 0;                                                            /*0020*/
+}
 #
 # TERAPIX
 #
@@ -486,6 +503,23 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    
    
    return FREIA_OK;                                                     /*0020*/
+}
+
+! cleaned up function
+
+freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   // 1 stage pipeline
+   // t1 = f(i)
+   // t2 = g(i)
+   // o  = t1 - t2
+   freia_34_helper_0_0(o, i, k);                                        /*0013*/
+   
+   
+   return 0;                                                            /*0020*/
 }
 #
 # FREIA COMPILATION DONE

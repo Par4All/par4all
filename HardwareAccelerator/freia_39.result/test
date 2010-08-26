@@ -319,6 +319,23 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    return FREIA_OK;                                                     /*0021*/
 }
+
+! cleaned up function
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   
+   // preschedule example for terapix tests
+   
+   freia_39_helper_0_0_0(o, i, kern);                                   /*0010*/
+   
+   
+   
+   
+   return 0;                                                            /*0021*/
+}
 #
 # TERAPIX
 #
@@ -566,6 +583,23 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    return FREIA_OK;                                                     /*0021*/
+}
+
+! cleaned up function
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   
+   // preschedule example for terapix tests
+   
+   freia_39_helper_0_0(o, i, kern);                                     /*0010*/
+   
+   
+   
+   
+   return 0;                                                            /*0021*/
 }
 #
 # FREIA COMPILATION DONE

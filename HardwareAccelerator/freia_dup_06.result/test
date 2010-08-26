@@ -218,6 +218,18 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
    return FREIA_OK;                                                     /*0014*/
 }
+
+! cleaned up function
+
+freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   // same operation performed twice, with commutativity
+   // first is dead
+   // t = i0 + i1
+   // o = i1 + i0
+   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
+   return 0;                                                            /*0014*/
+}
 #
 # TERAPIX
 #
@@ -382,6 +394,18 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // o = i1 + i0
    freia_dup_06_helper_0_0(o, i0, i1);                                  /*0012*/
    return FREIA_OK;                                                     /*0014*/
+}
+
+! cleaned up function
+
+freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   // same operation performed twice, with commutativity
+   // first is dead
+   // t = i0 + i1
+   // o = i1 + i0
+   freia_dup_06_helper_0_0(o, i0, i1);                                  /*0012*/
+   return 0;                                                            /*0014*/
 }
 #
 # FREIA COMPILATION DONE

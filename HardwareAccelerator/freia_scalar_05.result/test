@@ -677,6 +677,30 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_common_destruct_data(tC2);                                     /*0029*/
    return FREIA_OK;                                                     /*0031*/
 }
+
+! cleaned up function
+
+freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
+{
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);         /*0011*/
+   int sA, sB, sC;                                                      /*0012*/
+   
+   // look for order issues when reusing a temporary image
+   freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0015*/
+   freia_scalar_05_helper_0_1_0(tC, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);        /*0016*/
+   freia_scalar_05_helper_0_2_0(tC2, tC);                               /*0020*/
+   freia_scalar_05_helper_0_3_0(o, X, tC2, sC-10, sC-1, 0);             /*0023*/
+
+   freia_common_destruct_data(X);                                       /*0026*/
+   freia_common_destruct_data(tC);                                      /*0028*/
+   freia_common_destruct_data(tC2);                                     /*0029*/
+   return 0;                                                            /*0031*/
+}
 #
 # TERAPIX
 #
@@ -1246,6 +1270,28 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_common_destruct_data(X);                                       /*0026*/
    freia_common_destruct_data(tC2);                                     /*0029*/
    return FREIA_OK;                                                     /*0031*/
+}
+
+! cleaned up function
+
+freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
+{
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);          /*0011*/
+   int sA, sB, sC;                                                      /*0012*/
+   
+   // look for order issues when reusing a temporary image
+   freia_scalar_05_helper_0_2(X, i, &sA, k, &sB);                       /*0015*/
+   freia_scalar_05_helper_0_1(tC2, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);         /*0016*/
+   freia_scalar_05_helper_0_0(o, X, tC2, sC-10, sC-1, 0);               /*0023*/
+
+   freia_common_destruct_data(X);                                       /*0026*/
+   freia_common_destruct_data(tC2);                                     /*0029*/
+   return 0;                                                            /*0031*/
 }
 #
 # FREIA COMPILATION DONE

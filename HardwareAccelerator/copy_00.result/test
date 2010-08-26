@@ -524,6 +524,24 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    
    return 0;                                                            /*0029*/
 }
+
+! cleaned up function
+
+int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
+{
+   
+   // 1
+   copy_00_helper_0_0_0(o0, in, freia_morpho_kernel_8c);                /*0012*/
+   copy_00_helper_0_1_0(o1, in, freia_morpho_kernel_8c);                /*0013*/
+   
+   // 2
+   
+   // 3
+   
+   // 4
+   
+   return 0;                                                            /*0029*/
+}
 #
 # TERAPIX
 #
@@ -867,6 +885,23 @@ freia_status copy_00_helper_0_0(
 
 
 ! updated function
+
+int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
+{
+   
+   // 1
+   copy_00_helper_0_0(o0, o1, in, freia_morpho_kernel_8c);              /*0012*/
+   
+   // 2
+   
+   // 3
+   
+   // 4
+   
+   return 0;                                                            /*0029*/
+}
+
+! cleaned up function
 
 int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {

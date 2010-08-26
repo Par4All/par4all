@@ -48,9 +48,13 @@ shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c
 echo
 echo ! updated function
 echo
-#apply PARTIAL_EVAL[${NAME}]
-#apply USE_DEF_ELIMINATIONS[${NAME}]
-#apply SUPPRESS_DEAD_CODE[${NAME}]
+display PRINTED_FILE[${NAME}]
+echo
+echo ! cleaned up function
+echo
+apply PARTIAL_EVAL[${NAME}]
+apply USE_DEF_ELIMINATIONS[${NAME}]
+apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}

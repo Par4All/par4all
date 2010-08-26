@@ -810,6 +810,70 @@ int anr999_02(void)
 
    return 0;                                                            /*0091*/
 }
+
+! cleaned up function
+
+int anr999_02(void)
+{
+   int I_13;                                                            /*0012*/
+   int I_6;                                                             /*0013*/
+   freia_dataio fdin;                                                   /*0014*/
+   freia_dataio fdout;                                                  /*0015*/
+   freia_data2d *in;                                                    /*0016*/
+   freia_data2d *og;                                                    /*0017*/
+   freia_data2d *od;                                                    /*0018*/
+   int32_t measure_min;                                                 /*0019*/
+   int32_t measure_vol;                                                 /*0020*/
+   int i_0;                                                             /*0021*/
+   int I_10_0;                                                          /*0022*/
+   int I_3_0;                                                           /*0023*/
+   freia_status ret_0;                                                  /*0024*/
+   int i_1;                                                             /*0026*/
+   int i_2;                                                             /*0027*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0029*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
+
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0032*/
+   od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
+   og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
+
+   freia_common_rx_image(in, &fdin);                                    /*0036*/
+   
+   
+   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
+
+   i_0 = 10;                                                            /*0047*/
+
+   I_6 = 0;                                                             /*0049*/
+
+   i_1 = 10;                                                            /*0058*/
+
+   I_3_0 = 0;                                                           /*0060*/
+   ret_0 = 0;                                                           /*0061*/
+
+   i_2 = 10;                                                            /*0067*/
+
+   I_10_0 = 0;                                                          /*0069*/
+
+   I_13 = 0;                                                            /*0074*/
+
+   printf("input global min = %d\n", measure_min);                      /*0077*/
+   printf("input global volume = %d\n", measure_vol);                   /*0078*/
+
+   freia_common_tx_image(in, &fdout);                                   /*0080*/
+   freia_common_tx_image(od, &fdout);                                   /*0081*/
+   freia_common_tx_image(og, &fdout);                                   /*0082*/
+
+   freia_common_destruct_data(in);                                      /*0084*/
+   freia_common_destruct_data(od);                                      /*0085*/
+   freia_common_destruct_data(og);                                      /*0086*/
+
+   freia_common_close_input(&fdin);                                     /*0088*/
+   freia_common_close_output(&fdout);                                   /*0089*/
+
+   return 0;                                                            /*0091*/
+}
 #
 # TERAPIX
 #
@@ -1330,6 +1394,70 @@ int anr999_02(void)
 
    I_13 = 0;                                                            /*0074*/
    I_13;                                                                /*0075*/
+
+   printf("input global min = %d\n", measure_min);                      /*0077*/
+   printf("input global volume = %d\n", measure_vol);                   /*0078*/
+
+   freia_common_tx_image(in, &fdout);                                   /*0080*/
+   freia_common_tx_image(od, &fdout);                                   /*0081*/
+   freia_common_tx_image(og, &fdout);                                   /*0082*/
+
+   freia_common_destruct_data(in);                                      /*0084*/
+   freia_common_destruct_data(od);                                      /*0085*/
+   freia_common_destruct_data(og);                                      /*0086*/
+
+   freia_common_close_input(&fdin);                                     /*0088*/
+   freia_common_close_output(&fdout);                                   /*0089*/
+
+   return 0;                                                            /*0091*/
+}
+
+! cleaned up function
+
+int anr999_02(void)
+{
+   int I_13;                                                            /*0012*/
+   int I_6;                                                             /*0013*/
+   freia_dataio fdin;                                                   /*0014*/
+   freia_dataio fdout;                                                  /*0015*/
+   freia_data2d *in;                                                    /*0016*/
+   freia_data2d *og;                                                    /*0017*/
+   freia_data2d *od;                                                    /*0018*/
+   int32_t measure_min;                                                 /*0019*/
+   int32_t measure_vol;                                                 /*0020*/
+   int i_0;                                                             /*0021*/
+   int I_10_0;                                                          /*0022*/
+   int I_3_0;                                                           /*0023*/
+   freia_status ret_0;                                                  /*0024*/
+   int i_1;                                                             /*0026*/
+   int i_2;                                                             /*0027*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0029*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
+
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0032*/
+   od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
+   og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
+
+   freia_common_rx_image(in, &fdin);                                    /*0036*/
+   
+   
+   anr999_02_helper_0_0(od, od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);          /*0038*/
+
+   i_0 = 10;                                                            /*0047*/
+
+   I_6 = 0;                                                             /*0049*/
+
+   i_1 = 10;                                                            /*0058*/
+
+   I_3_0 = 0;                                                           /*0060*/
+   ret_0 = 0;                                                           /*0061*/
+
+   i_2 = 10;                                                            /*0067*/
+
+   I_10_0 = 0;                                                          /*0069*/
+
+   I_13 = 0;                                                            /*0074*/
 
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/

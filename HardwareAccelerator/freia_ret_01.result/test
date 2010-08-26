@@ -231,6 +231,15 @@ freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    ret2 |= 0;                                                           /*0009*/
    return ret1|ret2;                                                    /*0011*/
 }
+
+! cleaned up function
+
+freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   freia_status ret1, ret2 = 0;                                         /*0006*/
+   ret1 = freia_ret_01_helper_0_0_0(o, i0, i1);                         /*0008*/
+   return ret1|ret2;                                                    /*0011*/
+}
 #
 # TERAPIX
 #
@@ -405,6 +414,15 @@ freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    freia_status ret1, ret2 = FREIA_OK;                                  /*0006*/
    ret1 = freia_ret_01_helper_0_0(o, i0, i1);                           /*0008*/
    ret2 |= 0;                                                           /*0009*/
+   return ret1|ret2;                                                    /*0011*/
+}
+
+! cleaned up function
+
+freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   freia_status ret1, ret2 = 0;                                         /*0006*/
+   ret1 = freia_ret_01_helper_0_0(o, i0, i1);                           /*0008*/
    return ret1|ret2;                                                    /*0011*/
 }
 #

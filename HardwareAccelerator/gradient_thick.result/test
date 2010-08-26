@@ -273,6 +273,23 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    
    return FREIA_OK;                                                     /*0020*/
 }
+
+! cleaned up function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   
+   return 0;                                                            /*0020*/
+}
 #
 # TERAPIX
 #
@@ -486,6 +503,23 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    /* images destruction */
    
    return FREIA_OK;                                                     /*0020*/
+}
+
+! cleaned up function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   gradient_thick_helper_0_0(out, in, kernel);                          /*0011*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   
+   return 0;                                                            /*0020*/
 }
 #
 # FREIA COMPILATION DONE

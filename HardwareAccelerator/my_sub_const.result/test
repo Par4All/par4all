@@ -176,6 +176,13 @@ freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
    return my_sub_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }
+
+! cleaned up function
+
+freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_sub_const_helper_0_0_0(o, i0, p0);                         /*0005*/
+}
 #
 # TERAPIX
 #
@@ -322,6 +329,13 @@ freia_status my_sub_const_helper_0_0(
 
 
 ! updated function
+
+freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_sub_const_helper_0_0(o, i0, p0);                           /*0005*/
+}
+
+! cleaned up function
 
 freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {

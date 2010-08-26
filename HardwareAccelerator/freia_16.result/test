@@ -302,6 +302,15 @@ freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32
    freia_16_helper_0_0_0(o0, o1, i, r0, r1, r2, k, c);                  /*0008*/
    return FREIA_OK;                                                     /*0013*/
 }
+
+! cleaned up function
+
+freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
+{
+   // test re ordering of mes
+   freia_16_helper_0_0_0(o0, o1, i, r0, r1, r2, k, c);                  /*0008*/
+   return 0;                                                            /*0013*/
+}
 #
 # TERAPIX
 #
@@ -546,6 +555,15 @@ freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32
    // test re ordering of mes
    freia_16_helper_0_0(o0, o1, i, r0, r1, r2, k, c);                    /*0008*/
    return FREIA_OK;                                                     /*0013*/
+}
+
+! cleaned up function
+
+freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
+{
+   // test re ordering of mes
+   freia_16_helper_0_0(o0, o1, i, r0, r1, r2, k, c);                    /*0008*/
+   return 0;                                                            /*0013*/
 }
 #
 # FREIA COMPILATION DONE

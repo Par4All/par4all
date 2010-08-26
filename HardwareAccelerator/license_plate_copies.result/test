@@ -3350,6 +3350,122 @@ int license_plate_copies(void)
 
    return 0;                                                            /*0263*/
 }
+
+! cleaned up function
+
+int license_plate_copies(void)
+{
+   freia_dataio fdin;                                                   /*0010*/
+   freia_dataio fdout;                                                  /*0011*/
+
+   freia_data2d *in;                                                    /*0013*/
+   freia_data2d *imopen;                                                /*0015*/
+   freia_data2d *imclose;                                               /*0016*/
+   freia_data2d *imcloseth;                                             /*0018*/
+   freia_data2d *imfilt;                                                /*0020*/
+   freia_data2d *imout;                                                 /*0021*/
+   freia_data2d *out;                                                   /*0022*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
+
+   freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
+   freia_status ret_0;                                                  /*0029*/
+   int i_0;                                                             /*0030*/
+   freia_status ret_1;                                                  /*0032*/
+   int i_1;                                                             /*0033*/
+   freia_status ret_2;                                                  /*0035*/
+   int i_2;                                                             /*0036*/
+   freia_status ret_3;                                                  /*0038*/
+   int i_3, i_4;                                                        /*0039*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0042*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0043*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imcloseth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0051*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0055*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0058*/
+   
+   
+   
+   
+   
+   ret_0 = 0;                                                           /*0062*/
+
+   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);           /*0080*/
+   i_0 = 15;                                                            /*0094*/
+
+   ret_0 |= license_plate_copies_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);   /*0098*/
+   ret_0 |= license_plate_copies_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0114*/
+   i_0 = 15;                                                            /*0126*/
+
+   _return1 = ret_0;                                                    /*0130*/
+
+   ret_1 = 0;                                                           /*0134*/
+
+   i_1 = 8;                                                             /*0152*/
+
+   i_1 = 8;                                                             /*0170*/
+
+   _return0 = ret_1;                                                    /*0174*/
+   
+   
+   
+   ret_2 = 0;                                                           /*0183*/
+
+   ret_2 |= license_plate_copies_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);    /*0187*/
+   i_2 = 4;                                                             /*0193*/
+
+   i_2 = 4;                                                             /*0203*/
+
+   _return2 = ret_2;                                                    /*0207*/
+
+   ret_3 = 0;                                                           /*0211*/
+
+   ret_3 |= license_plate_copies_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);         /*0215*/
+   i_3 = 4;                                                             /*0221*/
+
+   i_3 = 4;                                                             /*0231*/
+
+   _return3 = ret_3;                                                    /*0235*/
+
+   license_plate_copies_helper_0_0_6(out, out, freia_morpho_kernel_8c);                /*0238*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
+
+   license_plate_copies_helper_0_1_0(out, in, out);                     /*0244*/
+   
+   
+   
+   
+   freia_common_tx_image(out, &fdout);                                  /*0245*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0248*/
+   freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imcloseth);                               /*0253*/
+   freia_common_destruct_data(imfilt);                                  /*0255*/
+   freia_common_destruct_data(imout);                                   /*0256*/
+   freia_common_destruct_data(out);                                     /*0257*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0260*/
+   freia_common_close_output(&fdout);                                   /*0261*/
+
+   return 0;                                                            /*0263*/
+}
 #
 # TERAPIX
 #
@@ -5274,6 +5390,100 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0228*/
    ret_3 |= 0;                                                          /*0229*/
    ret_3 |= 0;                                                          /*0230*/
+   i_3 = 4;                                                             /*0231*/
+
+   _return3 = ret_3;                                                    /*0235*/
+
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
+   
+   
+   
+   
+   
+   freia_common_tx_image(out, &fdout);                                  /*0245*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0248*/
+   freia_common_destruct_data(out);                                     /*0257*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0260*/
+   freia_common_close_output(&fdout);                                   /*0261*/
+
+   return 0;                                                            /*0263*/
+}
+
+! cleaned up function
+
+int license_plate_copies(void)
+{
+   freia_dataio fdin;                                                   /*0010*/
+   freia_dataio fdout;                                                  /*0011*/
+
+   freia_data2d *in;                                                    /*0013*/
+   freia_data2d *out;                                                   /*0022*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
+
+   freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
+   freia_status ret_0;                                                  /*0029*/
+   int i_0;                                                             /*0030*/
+   freia_status ret_1;                                                  /*0032*/
+   int i_1;                                                             /*0033*/
+   freia_status ret_2;                                                  /*0035*/
+   int i_2;                                                             /*0036*/
+   freia_status ret_3;                                                  /*0038*/
+   int i_3, i_4;                                                        /*0039*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0042*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0043*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0055*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0058*/
+   
+   
+   
+   
+   
+   ret_0 = 0;                                                           /*0062*/
+
+   ret_0 |= license_plate_copies_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);          /*0064*/
+   i_0 = 15;                                                            /*0094*/
+
+   i_0 = 15;                                                            /*0126*/
+
+   _return1 = ret_0;                                                    /*0130*/
+
+   ret_1 = 0;                                                           /*0134*/
+
+   i_1 = 8;                                                             /*0152*/
+
+   i_1 = 8;                                                             /*0170*/
+
+   _return0 = ret_1;                                                    /*0174*/
+   
+   
+   
+   ret_2 = 0;                                                           /*0183*/
+
+   i_2 = 4;                                                             /*0193*/
+
+   i_2 = 4;                                                             /*0203*/
+
+   _return2 = ret_2;                                                    /*0207*/
+
+   ret_3 = 0;                                                           /*0211*/
+
+   i_3 = 4;                                                             /*0221*/
+
    i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
