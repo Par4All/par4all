@@ -686,6 +686,13 @@ generate_domain(
             "#define %s_TYPE %s\n"
             "#define %s_undefined ((%s)gen_chunk_undefined)\n"
             "#define %s_undefined_p(x) ((x)==%s_undefined)\n"
+            // what about assignment with checks?
+            // something like:
+            // #define FOO_assign(r,v) \
+            // { FOO * _p = &(r), _v = (v); \
+            //   FOO_check(r); FOO_check(v); \
+            //   *_p = _v; \
+            // }
             "\n"
             "extern %s copy_%s(%s);\n"
             "extern void free_%s(%s);\n"
