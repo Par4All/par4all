@@ -379,7 +379,7 @@ list generic_c_effects_backward_translation(entity callee,
       if (!param_varargs_p)
 	{
 	  if(ENDP(formal_args)) {
-	    pips_user_warning("Function \"%s\" is called with too many arguments\n",
+	    pips_user_warning("Function \"%s\" is called with too many arguments in function \"%s\" \n",
 			    entity_user_name(callee),
 			    entity_user_name(get_current_module_entity()));
 	    spurious_real_arg_p = true;
@@ -479,6 +479,15 @@ list generic_c_effects_backward_translation(entity callee,
       l_eff = gen_nconc(l_eff, generic_proper_effects_of_c_function_call_argument(real_arg));
     } /* for */
 
+  /* removed because the parser adds arguments to the function (see ticket 452) */
+  /* /\* check if there are too few atual arguments *\/ */
+  /*   if (!param_varargs_p && !ENDP(formal_args) && !type_void_p(parameter_type(PARAMETER(CAR(formal_args))))) */
+  /*     { */
+  /*       pips_user_error("Function \"%s\" is called with too few arguments in function \"%s\" \n", */
+  /* 		      entity_user_name(callee), */
+  /* 		      entity_user_name(get_current_module_entity())); */
+  /*     } */
+  
   (*effects_translation_end_func)();
 
   ifdebug(5)
