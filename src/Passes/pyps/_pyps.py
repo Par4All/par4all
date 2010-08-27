@@ -147,7 +147,7 @@ class modules:
 
 	def capply(self,phase):
 		""" concurrently apply a phase to all contained modules"""
-		self._ws.cpypips.capply(upper(phase),map(lambda m:m.name,self._modules))
+		if self._modules: self._ws.cpypips.capply(upper(phase),map(lambda m:m.name,self._modules))
 
 ### modules_methods /!\ do not touch this line /!\
 
