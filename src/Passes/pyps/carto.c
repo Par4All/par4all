@@ -21,22 +21,22 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
-double get(double f[SIZE],int i);
+
+#define SIZE 200
+
+double get(double f[SIZE],int i)
+{
+    return f[i];
+}
 
 void foo(double A[SIZE], double B[SIZE][SIZE])
 {
     int i,j;
-l0:    for(i=0;i<SIZE;i++)
+    for(i=0;i<SIZE;i++)
        {
-l1:        for(j=0;j<SIZE;j++)
+        for(j=0;j<SIZE;j++)
            {
                A[i] = B[j][i] + get(A,i);
            }
        }
 }
-
-
-

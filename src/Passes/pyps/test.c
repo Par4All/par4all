@@ -41,6 +41,3 @@ void megablast(int n)
     for(i=0;i<n;i++)
         j=foo(i);
 }
-int main(){
-    return 1;
-}
