@@ -702,7 +702,8 @@ static void split_initializations_in_statement(statement s)
 	       && !value_unknown_p(entity_initial(var))
 	       ) {
 	    expression ie = variable_initial_expression(var);
-	    if (expression_is_C_rhs_p(ie)) {
+            if(expression_undefined_p(ie)) {}
+            else if (expression_is_C_rhs_p(ie)) {
 	      statement is = make_assign_statement(entity_to_expression(var), ie);
 	      inits = gen_nconc(inits, CONS(statement, is, NIL));
 	      entity_initial(var) = make_value_unknown();
