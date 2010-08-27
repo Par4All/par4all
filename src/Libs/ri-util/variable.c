@@ -600,6 +600,27 @@ entity make_new_array_variable_with_prefix(const char* prefix, entity module,bas
   return e;
 }
 
+/*
+	Create an pointer to an array simlar to `efrom' initialized with
+	expression `from'
+ */
+entity make_temporary_pointer_to_array_entity(entity efrom,
+					      expression from) {
+  basic pointee = copy_basic(variable_basic(type_variable(entity_type(efrom))));
+  list dims = gen_full_copy_list(variable_dimensions(type_variable(entity_type(efrom))));
+
+  /* Make the pointer type */
+  basic pointer = make_basic_pointer(make_type_variable(make_variable(pointee,
+								      dims,
+								      NIL)));
+  /* Create the variable as a pointer */
+  entity new = make_new_scalar_variable(get_current_module_entity(),
+					pointer);
+  /* Set its initial */
+  entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
+  return new;
+}
 
 
 /* Make a new module integer variable of name X<d>.

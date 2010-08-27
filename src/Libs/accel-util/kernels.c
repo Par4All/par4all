@@ -128,29 +128,6 @@ struct dma_pair {
 };
 
 
-/****** To move somewhere else. May be already exist ?
-
-
-	Create an pointer to an array simlar to `efrom' initialized with
-	expression `from'
- */
-entity make_temporary_pointer_to_array_entity(entity efrom,
-					      expression from) {
-  basic pointee = copy_basic(variable_basic(type_variable(entity_type(efrom))));
-  list dims = gen_full_copy_list(variable_dimensions(type_variable(entity_type(efrom))));
-
-  /* Make the pointer type */
-  basic pointer = make_basic_pointer(make_type_variable(make_variable(pointee,
-								      dims,
-								      NIL)));
-  /* Create the variable as a pointer */
-  entity new = make_new_scalar_variable(get_current_module_entity(),
-					pointer);
-  /* Set its initial */
-  entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
-    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
-  return new;
-}
 
 /* Compute a call to a DMA function from the effects of a statement
 
@@ -242,6 +219,90 @@ statement effects_to_dma(statement stat,
   else
     return make_block_statement(statements);
 }
+
+static void
+kernel_load_store_generator(statement s, string module_name)
+{
+  if(statement_call_p(s))
+    {
+      call c = statement_call(s);
+      if(!call_intrinsic_p(c) &&
+	 same_string_p(module_local_name(call_function(c)),module_name))
+        {
+	  statement allocates, loads, stores, deallocates;
+      /* this hash table holds an entity to (entity + tag ) binding */
+	  hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+	  allocates = effects_to_dma(s,dma_allocate,e2e);
+	  loads = effects_to_dma(s,dma_load,e2e);
+	  stores = effects_to_dma(s,dma_store,e2e);
+	  deallocates = effects_to_dma(s,dma_deallocate,e2e);
+	  HASH_MAP(k,v,free(v),e2e);
+	  hash_table_free(e2e);
+
+	  /* Add the calls now if needed, in the correct order: */
+	  if (loads != statement_undefined)
+	    insert_statement(s, loads,true);
+	  if (allocates != statement_undefined)
+	    insert_statement(s, allocates,true);
+	  if (stores != statement_undefined)
+	    insert_statement(s, stores,false);
+	  if (deallocates != statement_undefined)
+	    insert_statement(s, deallocates,false);
+        }
+    }
+}
+
+/* run kernel load store using either region or effect engine,
+ */
+static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
+    /* generate a load stores on each caller */
+
+    debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
+
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
+    FOREACH(STRING,caller_name,callees_callees(callers)) {
+        /* prelude */
+        set_current_module_entity(module_name_to_entity( caller_name ));
+        set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(enginerc, caller_name, TRUE));
+        /*do the job */
+        gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
+        /* validate */
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
+
+        /*postlude*/
+        reset_cumulated_rw_effects();
+        reset_current_module_entity();
+        reset_current_module_statement();
+    }
+
+    /*flag the module as kernel if not done */
+    callees kernels = (callees)db_get_memory_resource(DBR_KERNELS,"",true);
+    bool found = false;
+    FOREACH(STRING,kernel_name,callees_callees(kernels))
+        if( (found=(same_string_p(kernel_name,module_name))) ) break;
+    if(!found)
+        callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
+    db_put_or_update_memory_resource(DBR_KERNELS,"",kernels,true);
+
+    debug_off();
+
+    return true;
+}
+
+
+/** Generate malloc/copy-in/copy-out on the call sites of this module.
+ * existe for region or effect engine
+ */
+bool kernel_load_store(char *module_name) {
+    return kernel_load_store_engine(module_name,DBR_CUMULATED_EFFECTS);
+}
+bool kernel_load_store_fine_grain(char *module_name) {
+    return kernel_load_store_engine(module_name,DBR_REGIONS);
+}
+
 
 
 /**
@@ -402,86 +463,4 @@ bool bootstrap_kernels(__attribute__((unused)) char * module_name)
   return true;
 }
 
-
-static void
-kernel_load_store_generator(statement s, string module_name)
-{
-  if(statement_call_p(s))
-    {
-      call c = statement_call(s);
-      if(!call_intrinsic_p(c) &&
-	 same_string_p(module_local_name(call_function(c)),module_name))
-        {
-	  statement allocates, loads, stores, deallocates;
-	  hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-	  allocates = effects_to_dma(s,dma_allocate,e2e);
-	  loads = effects_to_dma(s,dma_load,e2e);
-	  stores = effects_to_dma(s,dma_store,e2e);
-	  deallocates = effects_to_dma(s,dma_deallocate,e2e);
-	  HASH_MAP(k,v,free(v),e2e);
-	  hash_table_free(e2e);
-
-	  /* Add the methods now if needed, in the correct order: */
-	  if (loads != statement_undefined)
-	    insert_statement(s, loads,true);
-	  if (allocates != statement_undefined)
-	    insert_statement(s, allocates,true);
-	  if (stores != statement_undefined)
-	    insert_statement(s, stores,false);
-	  if (deallocates != statement_undefined)
-	    insert_statement(s, deallocates,false);
-        }
-    }
-}
-
-/* run kernel load store using either region or effect engine,
- */
-static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
-    /* generate a load stores on each caller */
-
-    debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
-
-    callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
-    FOREACH(STRING,caller_name,callees_callees(callers)) {
-        /* prelude */
-        set_current_module_entity(module_name_to_entity( caller_name ));
-        set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
-        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(enginerc, caller_name, TRUE));
-        /*do the job */
-        gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
-        /* validate */
-        module_reorder(get_current_module_statement());
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
-        DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
-
-        /*postlude*/
-        reset_cumulated_rw_effects();
-        reset_current_module_entity();
-        reset_current_module_statement();
-    }
-
-    /*flag the module as kernel if not done */
-    callees kernels = (callees)db_get_memory_resource(DBR_KERNELS,"",true);
-    bool found = false;
-    FOREACH(STRING,kernel_name,callees_callees(kernels))
-        if( (found=(same_string_p(kernel_name,module_name))) ) break;
-    if(!found)
-        callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
-    db_put_or_update_memory_resource(DBR_KERNELS,"",kernels,true);
-
-    debug_off();
-
-    return true;
-}
-
-
-/** Generate malloc/copy-in/copy-out on the call sites of this module.
- * existe for region or effect engine
- */
-bool kernel_load_store(char *module_name) {
-    return kernel_load_store_engine(module_name,DBR_CUMULATED_EFFECTS);
-}
-bool kernel_load_store_fine_grain(char *module_name) {
-    return kernel_load_store_engine(module_name,DBR_REGIONS);
-}
 
