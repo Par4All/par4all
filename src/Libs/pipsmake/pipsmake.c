@@ -1418,3 +1418,17 @@ bool safe_concurrent_apply(
     debug_off();
     return ok;
 }
+
+bool safe_set_property(char* propname, char* value)
+{
+    size_t len = strlen(propname) + strlen(value) + 2;
+    char* line = calloc(len, sizeof(char));
+    strcat(line, propname);
+    strcat(line, " ");
+    strcat(line, value);
+    user_log("set %s\n", line);
+    parse_properties_string(line);
+    free(line);
+    /* parse_properties_string() doesn't return whether it succeeded */
+    return TRUE;
+}
