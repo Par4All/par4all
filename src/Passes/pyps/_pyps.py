@@ -204,12 +204,14 @@ class workspace(object):
 		exist.
 		"""
 
-	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags='', parents=[], cpypips = None):
-		kwargs = {'name':name, 'activates':activates, 'verboseon':verboseon, 'cppflags':cppflags, 'parents':parents}
+	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags='', parents=[], cpypips = None, recoverInclude=True):
+		kwargs = {'name':name, 'activates':activates, 'verboseon':verboseon, 'cppflags':cppflags, 'parents':parents, 'recoverInclude':parents }
 
 		if cpypips == None:
 			cpypips = pypips
 		self.cpypips = cpypips
+
+		self.recoverInclude=recoverInclude
 
 		#In case the subworkspaces need to add files, the variable passed in parameter will only
 		#be modified here and not in the scope of the caller
@@ -238,16 +240,20 @@ class workspace(object):
 		sources2 = reduce(helper, sources2, [])
 		sources = []
 
-		# add guards around #include's, in order to be able to undo the
-		# inclusion of headers.
-		self.tmpDirName = utils.nameToTmpDirName(name)
-		os.mkdir(self.tmpDirName)
+		if recoverInclude:
+			# add guards around #include's, in order to be able to undo the
+			# inclusion of headers.
+			self.tmpDirName = utils.nameToTmpDirName(name)
+			os.mkdir(self.tmpDirName)
 
-		for f in sources2:
-			newfname = os.path.join(self.tmpDirName,os.path.basename(f))
-			shutil.copy2(f, newfname)
-			sources += [newfname]
-			utils.guardincludes(newfname)
+			for f in sources2:
+				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
+				shutil.copy2(f, newfname)
+				sources += [newfname]
+				utils.guardincludes(newfname)
+		else:
+			sources=sources2
+
 		self._sources = sources
 
 		try:
@@ -385,6 +391,9 @@ class workspace(object):
 				cp=with_prefix+s
 				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
 				saved+=[cp]
+		if self.recoverInclude:
+			for f in saved:
+				utils.unincludes(f)
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
@@ -402,8 +411,6 @@ class workspace(object):
 			self.goingToRunWith(otmpfiles, outdir)
 			command+=["-c"]
 			command+=otmpfiles
-		for f in otmpfiles:
-			utils.unincludes(f)
 		commandline = " ".join(command)
 		#print "running", commandline
 		ret = os.system(commandline)
