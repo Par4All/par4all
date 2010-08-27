@@ -5673,13 +5673,10 @@ scalopragma                    > MODULE.code
                < MODULE.cumulated_effects
 \end{PipsMake}
 \subsubsection{Bufferization}
-The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by KERNEL\_LOAD\_STORE with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
+The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by \PipsPassRef{KERNEL_LOAD_STORE} with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
 A C file with stubs is needed.
 
-This property is used by KERNEL\_LOAD\_STORE to generate LOAD STORE call for task.
-\begin{PipsProp}{SCMP_MODE} 
-SCMP_MODE FALSE
-\end{PipsProp}
+Note that you must also set \PipsPropRef{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION} to \lstinline|""| in order to have it generate relevant code.
 
 The goal of this pass is to keep consistant flows outside the tasks.
 \begin{PipsMake}

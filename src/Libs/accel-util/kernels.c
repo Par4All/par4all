@@ -122,68 +122,6 @@ call range_to_dma(expression from,
 
 }
 
-
-#if 0
-static
-statement region_to_dma(statement stat, enum region_to_dma_switch s)
-{
-  list effects = dma_load_p(s) ?
-    load_statement_in_regions(stat):
-    load_statement_out_regions(stat);
-
-  list ranges = NIL;
-  list statements = NIL;
-  FOREACH(EFFECT,eff,effects)
-    {
-      statement the_dma = statement_undefined;
-      reference r = effect_any_reference(eff);
-      Psysteme sc = sc_dup(region_system(eff));
-      sc_transform_eg_in_ineg(sc);
-
-      FOREACH(EXPRESSION,index,reference_indices(r))
-        {
-	  Variable endex = expression_to_entity(index);
-	  Pcontrainte lower,upper;
-	  constraints_for_bounds(endex,&sc_inegalites(sc),&lower,&upper);
-	  expression lower_bound=expression_undefined, upper_bound=expression_undefined;
-	  if(!CONTRAINTE_UNDEFINED_P(lower)) {
-	    lower_bound= constraints_to_loop_bound(lower,endex,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-	  }
-	  else
-	    pips_internal_error("failed to get lower constraint on %s\n",entity_user_name((entity)endex));
-	  if(!CONTRAINTE_UNDEFINED_P(upper)) {
-	    upper_bound= constraints_to_loop_bound(upper,endex,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-	  }
-	  else
-	    pips_internal_error("failed to get upper constraint on %s\n",entity_user_name((entity)endex));
-
-	  ranges=CONS(RANGE, make_range(lower_bound,upper_bound,int_to_expression(1)), ranges);
-        }
-      if(!ENDP(ranges))
-        {
-
-	  expression from = reference_to_expression( make_reference(reference_variable(r),CDR(reference_indices(r))) );
-	  entity eto = make_temporary_array_entity(reference_variable(r),expression_undefined);
-	  AddEntityToCurrentModule(eto);
-	  expression to = reference_to_expression(make_reference(eto,NIL));
-	  the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,RANGE(CAR(ranges)),s)));
-	  /*FOREACH(RANGE,r,CDR(ranges))
-            {
-	    entity loop_index = make_new_scalar_variable(get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
-	    AddLocalEntityToDeclarations(loop_index,get_current_module_entity(),get_current_module_statement());
-	    loop l =make_loop(loop_index,r,the_dma,entity_empty_label(),make_execution_sequential(),NIL);
-	    the_dma=instruction_to_statement(make_instruction_loop(l));
-            }*/
-        }
-      else
-	pips_internal_error("is this possible ?\n");
-      statements=CONS(STATEMENT,the_dma,statements);
-    }
-  return make_block_statement(statements);
-
-}
-#endif
-
 struct dma_pair {
   entity new_ent;
   enum region_to_dma_switch s;
@@ -217,12 +155,21 @@ entity make_temporary_pointer_to_array_entity(entity efrom,
 /* Compute a call to a DMA function from the effects of a statement
 
    @return a statement of the DMA transfers or statement_undefined if
-   nothing needed
+   nothing needed or if the dma function has been set to "" in the relevant property
  */
 static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
 			 hash_table e2e) {
+    /* if no dma is provided, skip the computation
+     * it is used for scalope at least */
+    if( (dma_load_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION") ) ) ||
+            (dma_store_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION") ) ) ||
+            (dma_allocate_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION") ) ) ||
+            (dma_deallocate_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION") ) )
+      )
+        return statement_undefined;
+
   list rw_effects= load_cumulated_rw_effects_list(stat);
   list effects = NIL;
 
@@ -253,7 +200,7 @@ statement effects_to_dma(statement stat,
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
-      if(!ENDP(variable_dimensions(type_variable(entity_type(re)))) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
+      if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
 	range the_range = make_range(int_to_expression(0),
 				     make_op_exp(MINUS_OPERATOR_NAME,
 						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
@@ -263,12 +210,8 @@ statement effects_to_dma(statement stat,
 	entity eto;
 	if(val == HASH_UNDEFINED_VALUE) {
 
-	  /*initialized with NULL value for runtime manager in SCMP mode*/
-	  expression init;
-	  if(get_bool_property("SCMP_MODE"))
-	    init=int_to_expression(0);
-	  else
-	    init = expression_undefined;
+	  /* initialized with NULL value */
+	  expression init = int_to_expression(0);
 
 	  /* Replace the reference to the array re to *eto: */
 	  eto = make_temporary_pointer_to_array_entity(re,init);
@@ -470,10 +413,6 @@ kernel_load_store_generator(statement s, string module_name)
 	 same_string_p(module_local_name(call_function(c)),module_name))
         {
 	  statement allocates, loads, stores, deallocates;
-#if 0
-	  loads = region_to_dma(s,dma_load);
-	  stores = region_to_dma(s,dma_store);
-#else
 	  hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
 	  allocates = effects_to_dma(s,dma_allocate,e2e);
 	  loads = effects_to_dma(s,dma_load,e2e);
@@ -481,7 +420,7 @@ kernel_load_store_generator(statement s, string module_name)
 	  deallocates = effects_to_dma(s,dma_deallocate,e2e);
 	  HASH_MAP(k,v,free(v),e2e);
 	  hash_table_free(e2e);
-#endif
+
 	  /* Add the methods now if needed, in the correct order: */
 	  if (loads != statement_undefined)
 	    insert_a_statement(s, loads);
@@ -489,58 +428,60 @@ kernel_load_store_generator(statement s, string module_name)
 	    insert_a_statement(s, allocates);
 	  if (stores != statement_undefined)
 	    append_a_statement(s, stores);
-	  if (deallocates != statement_undefined && !get_bool_property("SCMP_MODE"))
+	  if (deallocates != statement_undefined)
 	    append_a_statement(s, deallocates);
         }
     }
 }
 
-
-/** Generate malloc/copy-in/copy-out on the call sites of this module.
-
-    Do not work on global variables.
+/* run kernel load store using either region or effect engine,
  */
-bool kernel_load_store(char *module_name) {
-  /* generate a load stores on each caller */
-  
+static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
+    /* generate a load stores on each caller */
+
     debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
-    
-    /*Filter for the tasking mode*/
-    if((get_bool_property("SCMP_MODE") && (strstr(module_name, get_string_property("GPU_LAUNCHER_PREFIX"))!=NULL)) || !get_bool_property("SCMP_MODE")) {
 
     callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
     FOREACH(STRING,caller_name,callees_callees(callers)) {
-      /* prelude */
-      set_current_module_entity(module_name_to_entity( caller_name ));
-      set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
-      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, TRUE));
-      /*do the job */
-      gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
-      /* validate */
-      module_reorder(get_current_module_statement());
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
-      DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
+        /* prelude */
+        set_current_module_entity(module_name_to_entity( caller_name ));
+        set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(enginerc, caller_name, TRUE));
+        /*do the job */
+        gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
+        /* validate */
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
 
-      /*postlude*/
-      reset_cumulated_rw_effects();
-      reset_current_module_entity();
-      reset_current_module_statement();
+        /*postlude*/
+        reset_cumulated_rw_effects();
+        reset_current_module_entity();
+        reset_current_module_statement();
     }
-  }
 
-  /*flag the module as kernel if not done */
-  {
+    /*flag the module as kernel if not done */
     callees kernels = (callees)db_get_memory_resource(DBR_KERNELS,"",true);
     bool found = false;
     FOREACH(STRING,kernel_name,callees_callees(kernels))
-      if( (found=(same_string_p(kernel_name,module_name))) ) break;
+        if( (found=(same_string_p(kernel_name,module_name))) ) break;
     if(!found)
-      callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
+        callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
     db_put_or_update_memory_resource(DBR_KERNELS,"",kernels,true);
-  }
-  
-  debug_off();
 
-  return true;
+    debug_off();
+
+    return true;
+}
+
+
+/** Generate malloc/copy-in/copy-out on the call sites of this module.
+ * existe for region or effect engine
+ */
+bool kernel_load_store(char *module_name) {
+    return kernel_load_store_engine(module_name,DBR_CUMULATED_EFFECTS);
+}
+bool kernel_load_store_fine_grain(char *module_name) {
+    return kernel_load_store_engine(module_name,DBR_REGIONS);
 }
 
