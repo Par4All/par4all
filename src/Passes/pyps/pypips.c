@@ -87,12 +87,12 @@ void create(char* workspace_name, char ** filenames)
             {
                 db_close_workspace(false);
                 pips_user_error("Could not create workspace %s\n",
-                        workspace_name);
+				workspace_name);
             }
         }
         else {
-            pips_user_error("Cannot create directory for workspace"
-                    ", check rights!\n");
+            pips_user_error("Cannot create directory for workspace, "
+			    "check rights!\n");
         }
     }
 }
@@ -104,13 +104,10 @@ void quit()
 
 void set_property(char* propname, char* value)
 {
-    size_t len =strlen(propname) + strlen(value) + 2;
-    char * line = calloc(len,sizeof(char));
-    strcat(line,propname);
-    strcat(line," ");
-    strcat(line,value);
-    parse_properties_string(line);
-    free(line);
+    if (!safe_set_property(propname, value)) {
+        pips_user_error("error in setting property %s to %s\n",
+			propname, value);
+    }
 }
 
 char* info(char * about)
@@ -239,3 +236,14 @@ char * get_callees_of(char * module_name)
 
     return callees_string;
 }
+
+void checkpoint(void)
+{
+	checkpoint_workspace();
+}
+
+void restore_open_workspace(char* name)
+{
+	make_open_workspace(name);
+}
+

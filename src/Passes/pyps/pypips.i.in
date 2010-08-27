@@ -45,7 +45,18 @@
 }
 
         
+%typemap(in) string {
+    $1 = PyString_AsString($input);
+}
+
+        
+%typemap(out) string {
+    $result = PyString_FromString($1);
+}
 
 extern char* activate(char* );
 extern int delete_workspace(char* );
 extern void db_invalidate_memory_resource(char*, char*);
+
+/* SWIG will generate code for pypips.user_log with up to 10 arguments */
+%varargs(10, char *arg = NULL) user_log;
