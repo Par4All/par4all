@@ -652,23 +652,18 @@ reget:
                             AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
 
                         } break;
+                    case is_syntax_sizeofexpression: {
+                        statement st=statement_undefined;
+                        new = make_temporary_scalar_entity(from,&st);
+                        if(!statement_undefined_p(st))
+                            insert_statement(declaration_holder,st,false);
+                        AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+                        } break;
 
                     case is_syntax_cast:
                         pips_user_warning("ignoring cast\n");
                         from = cast_expression(syntax_cast(expression_syntax(from)));
                         goto reget;
-                    case is_syntax_sizeofexpression:
-                        if(sizeofexpression_type_p(syntax_sizeofexpression(expression_syntax(from))))
-                        {
-                            statement st=statement_undefined;
-                            new = make_temporary_scalar_entity(from,&st);
-                            if(!statement_undefined_p(st))
-                                insert_statement(declaration_holder,st,false);
-                            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-                            break;
-                        }
-                        else
-                            pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
 
                     default:
                         pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
