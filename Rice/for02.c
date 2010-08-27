@@ -7,7 +7,7 @@ void for02(int n)
   float x[100];
   float t, delta_t, t_max;
 
-  for(t = 0.0; t<t_max; t += delta_t) {
+  for(t = 0.0; t<t_max; t = t + delta_t) {
     for(j=0;j<100;j++) {
       x[j] = 0.;
     }

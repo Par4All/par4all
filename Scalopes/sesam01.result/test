@@ -1,13 +1,13 @@
 void P4A_sesam_task_0()
 {
    //PIPS generated variable
+   int i;
+   //PIPS generated variable
    int *P_0;
    sesam_reserve_data((sizeof(int[100])-1+1)/sesam_get_page_size()+1);
    sesam_data_assignation(0, (sizeof(int[100])-1+1)/sesam_get_page_size()+1, 1);
    P_0 = sesam_map_data(0);
    sesam_wait_dispo(0, 0, 1, 0);
-   //PIPS generated variable
-   int i;
    for(i = 1; i <= 100; i += 1)
       P_0[-1+i] = -1+i;
    sesam_send_dispo(0, 0, 0);
@@ -17,6 +17,8 @@ void P4A_sesam_task_0()
 void P4A_sesam_task_1()
 {
    //PIPS generated variable
+   int i;
+   //PIPS generated variable
    int *P_2, *P_1;
    sesam_reserve_data((sizeof(int[100])-1+1)/sesam_get_page_size()+1);
    sesam_data_assignation(1, (sizeof(int[100])-1+1)/sesam_get_page_size()+1, 1);
@@ -24,8 +26,6 @@ void P4A_sesam_task_1()
    P_2 = sesam_map_data(0);
    sesam_wait_dispo(1, 0, 1, 0);
    sesam_wait_dispo(0, 0, 0, 0);
-   //PIPS generated variable
-   int i;
 
    for(i = 1; i <= 100; i += 1)
       P_1[-1+i] = P_2[-1+i]*2+1;

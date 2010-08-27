@@ -1,41 +1,45 @@
 int main()
 {
-   int i = 5;
-   
-   /* The a label */
-a:   i++;
-   /* The b label */
-b:   i--;
-   /* Oh, go to a... */
-   ;
-   goto a;
+   {
+      int i = 5;
+      
+      /* The a label */
+a:      i++;
+      /* The b label */
+b:      i--;
+      /* Oh, go to a... */
+      ;
+      goto a;
+   }
 }
 
 //  P() {}
 
 int main()
 {
+   {
 
 //  P() {}
 
-   int i = 5;
+      int i = 5;
 
 //  P(i) {i==5}
 
-   
-   /* The a label */
-a:   i++;
+      
+      /* The a label */
+a:      i++;
 
 //  P(i) {i==6}
 
-   /* The b label */
-b:   i--;
+      /* The b label */
+b:      i--;
 
 //  P(i) {i==5}
 
-   /* Oh, go to a... */
-   ;
-   goto a;
+      /* Oh, go to a... */
+      ;
+      goto a;
+   }
 }
 
 //  P() {}

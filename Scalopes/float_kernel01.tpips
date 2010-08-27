@@ -13,8 +13,6 @@ activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 
-setproperty SCMP_MODE TRUE
-
 setproperty GPU_LAUNCHER_PREFIX "P4A_scmp_kernel"
 
 setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_scmp_read"
@@ -29,7 +27,10 @@ apply PRIVATIZE_MODULE[main]
 
 apply SCALOPRAGMA[main]
 
-apply KERNEL_LOAD_STORE[%ALLFUNC]
+# by setting this property to empty, we prevent generation of deallocation function
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION ""
+
+#apply KERNEL_LOAD_STORE[%ALLFUNC]
 
 display PRINTED_FILE[%ALLFUNC]
 

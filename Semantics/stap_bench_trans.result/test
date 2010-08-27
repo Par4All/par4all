@@ -38,77 +38,71 @@ int HasNextBurst(FILE *fp, float *Tr)
 //  T(EndOfFile) {EndOfFile==0}
 
    int EndOfFile = 0;
-l99996:   ;
 
-//  T() {}
+//  T(EndOfFile,HasEqual,chara,i,status) {EndOfFile<=0,
+//    EndOfFile#init<=0, HasEqual<=0, HasEqual#init<=0}
 
-   if (!(!HasEqual&&!EndOfFile)) goto l99999;
+   while (!HasEqual&&!EndOfFile) {
 
 //  T(HasEqual) {HasEqual==0}
 
-   HasEqual = 0;
+      HasEqual = 0;
 
 //  T(i) {i==0}
 
-   i = 0;
-l99997:   ;
+      i = 0;
+l99998:      ;
 
 //  T() {}
 
-   if (!(i<255)) goto break_2;
+      if (!(i<255)) goto break_2;
 
 //  T(EndOfFile,HasEqual,chara,i,status) {}
 
-   line[i] = fgetc(fp);
+      line[i] = fgetc(fp);
 
 //  T(chara) {}
 
-   chara = (int) line[i];
+      chara = (int) line[i];
 
 //  T() {}
 
-   if (chara<0) goto l99998;
+      if (chara<0) goto l99999;
 
 //  T(HasEqual) {}
 
-   if (line[i]=='=') 
+      if (line[i]=='=') 
 
 //  T(HasEqual) {HasEqual==1}
 
-      HasEqual = 1;
+         HasEqual = 1;
 
 //  T() {}
 
-   if (line[i]=='\n') goto break_2;
+      if (line[i]=='\n') goto break_2;
 
 //  T(i) {i#init<=i, i<=i#init+1}
 
-   if (line[i]!=' ') 
+      if (line[i]!=' ') 
 
 //  T(i) {i==i#init+1}
 
-      i++;
-   goto l99997;
-
-//  T() {}
-
-break_2:   ;
-
-//  T() {}
-
-   line[i+1] = '\0';
-   goto l99996;
-l99998:   ;
+         i++;
+      goto l99998;
+l99999:      ;
 
 //  T(EndOfFile) {EndOfFile==1}
 
-   EndOfFile = 1;
-   goto break_2;
-l99999:   ;
+      EndOfFile = 1;
 
 //  T() {}
 
+break_2:      ;
 
+//  T() {}
+
+      line[i+1] = '\0';
+   }
 
 //  T(EndOfFile,HasEqual,chara,i,status) {}
 

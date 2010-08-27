@@ -9,11 +9,9 @@ int main()
 
    int i, j, n;
 
-   for(i = 0; i <= 2; i += 1) {
+   for(i = 0; i <= 2; i += 1)
       for(j = 0; j <= 2; j += 1)
          kernel[i][j] = 1;
-      kernel[i][3];
-   }
    
    //     read *, image
    for(i = 0; i <= 511; i += 1)

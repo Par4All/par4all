@@ -69,7 +69,7 @@ if __name__ == "__main__":
 				kernels+=[l2]
 				m.isolate_statement(label=l2.label)
 	m.display()
-	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=1)
+	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.display()
 	m.partial_eval()
 	m.display()

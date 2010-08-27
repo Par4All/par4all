@@ -1,0 +1,20 @@
+setenv WS "detect_red02"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+module main
+display PRINTED_FILE
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+apply REDUCTION_DETECTION
+display PRINTED_FILE
+activate PRINT_CODE_PROPER_REDUCTIONS
+display PRINTED_FILE
+apply UNSPLIT
+close
+
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell ./$WS.database/Tmp/ref
+shell ./$WS.database/Tmp/out
+delete $WS

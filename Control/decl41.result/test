@@ -44,55 +44,57 @@ break_2:   ;
 void decl41(int size)
 {
 // (0,1)
+   {
 // (1,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (1,2)
 // (2,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (2,2)
-   int i;                                                               /*0003*/
+      int i;                                                            /*0003*/
 // (2,3)
-   int x;                                                               /*0004*/
+      int x;                                                            /*0004*/
 // (2,4)
-   for(i = 1; i <= (size-1); i += 1)
+      for(i = 1; i <= (size-1); i += 1)
 // (2,5)
-      x = i;                                                            /*0006*/
-   // END BLOCK
+         x = i;                                                         /*0006*/
+      // END BLOCK
 // (3,1)
 
 // if the switch is removed, the loop index declarations reappears
-   if ((0==0)) goto l99999;
+      if ((0==0)) goto l99999;
 // (12,1)
 
 // (11,1)
 
 // (10,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (10,2)
 
 // (10,3)
 
-   // END BLOCK
+      // END BLOCK
 // (8,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (8,2)
-break_2:   ;
+break_2:      ;
 // (8,3)
-   x = 0;                                                               /*0014*/
-   // END BLOCK
-   goto l99998;
-l99999:   ;
+      x = 0;                                                            /*0014*/
+      // END BLOCK
+      goto l99998;
+l99999:      ;
 // (4,1)
 
 // (5,1)
 
 // (6,1)
-switch_2_case_0:   ;
+switch_2_case_0:      ;
 // (7,1)
-   x = 1;                                                               /*0011*/
-   goto break_2;
-l99998:   ;
+      x = 1;                                                            /*0011*/
+      goto break_2;
+l99998:      ;
 // (9,1)
 
-   // END BLOCK
+      // END BLOCK
+   }
 }

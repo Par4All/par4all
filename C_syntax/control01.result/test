@@ -49,13 +49,14 @@ l99998:   ;
    v = c-'0';                                                           /*0021*/
    goto break_1;
 l99999:   ;
+l99997:   ;
    if (!1) goto break_2;                                                /*0019*/
    if ((c = pnm_getc(in))==-1)                                          /*0013*/
       return -1;                                                        /*0014*/
    if (c=='\n') {                                                       /*0016*/
    }
    else {
-      goto l99999;
+      goto l99997;
    }
 break_2:   ;
    goto l99998;
