@@ -9285,9 +9285,11 @@ split_update_operator > MODULE.code
 
 \subsection{Split Initializations (C code)}
 
+\begin{PipsPass}{split_initializations}
 The purpose of this transformation is to separate the initialization
 part from the declaration part in C code in order to make static code
 analyses simpler.
+\end{PipsPass}
 
 This transformation recurses through all variable declarations, and
 creates a new statement each time an initial value is specified in the

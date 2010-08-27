@@ -150,7 +150,7 @@ bool sesamify (char* module_name) {
 	  counter++;
 	}
 	else{
-		id = (intptr_t) hash_get(shared_mem, re)-1;
+	  id = (intptr_t) hash_get(shared_mem, re)-1;
 	}
 
 	//MAP_DATA + pointer creation +UNMAP + CHMOD
