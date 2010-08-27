@@ -52,32 +52,65 @@
 #include "parser_private.h"
 #include "accel-util.h"
 
+struct dma_pair {
+  entity new_ent;
+  enum region_to_dma_switch s;
+};
 
 /** 
- * converts a loop range to a dma call from a memory @a from to another memory @a to
+ * converts a region_to_dma_switch to coressponding dma name
+ * according top properties
+ */
+static string get_dma_name(enum region_to_dma_switch m) {
+    switch(m) {
+        case dma_load: return get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION");
+        case dma_store: return get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION");
+        case dma_allocate: return get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION");
+        case dma_deallocate: return get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION");
+    }
+    return string_undefined; // should never happen
+}
+
+static dimension simple_effect_to_dimension(effect eff)
+{
+    entity re = reference_variable(effect_any_reference(eff));
+    return make_dimension(int_to_expression(0),
+            make_op_exp(MINUS_OPERATOR_NAME,
+                make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
+                int_to_expression(1))
+            );
+}
+static list region_to_dimensions(region reg) {
+    return NIL;
+}
+
+static list effect_to_dimensions(effect eff) {
+    if(effect_region_p(eff))
+        return region_to_dimensions(eff);
+    else
+        return CONS(DIMENSION,simple_effect_to_dimension(eff),NIL);
+}
+
+/** 
+ * converts dimensions to a dma call from a memory @a from to another memory @a to
  * 
  * @param from expression giving the adress of the input memory
  * @param to expression giving the adress of the output memory
- * @param r range to analyze
+ * @param ld list of dimensions to analyze
  * @param m kind of call to generate
  * 
  * @return 
  */
 static
-call range_to_dma(expression from,
+call dimensions_to_dma(expression from,
 		  expression to,
-		  range r,
+		  list/*of dimensions*/ ld,
 		  enum region_to_dma_switch m)
 {
   expression dest;
-  list args;
-  int scalar_entity=0;
-  string function_name =
-    dma_load_p(m) ? get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION")
-    : dma_store_p(m) ? get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION")
-    : dma_allocate_p(m) ?
-    get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION")
-    : get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION");
+  list args = NIL;
+  bool scalar_entity=false;
+  string function_name = get_dma_name(m);
 
   entity mcpy = module_name_to_entity(function_name);
   if (entity_undefined_p(mcpy))
@@ -87,9 +120,7 @@ call range_to_dma(expression from,
 
 
   /*scalar detection*/
-  if(!entity_array_p(expression_variable(from))) {
-    scalar_entity=1;
- }
+  scalar_entity=entity_scalar_p(expression_to_entity(from));
 
   if (dma_allocate_p(m))
     /* Need the address for the allocator to modify the pointer itself: */
@@ -103,29 +134,31 @@ call range_to_dma(expression from,
     dest=to;
   }
 
-  if (dma_deallocate_p(m))
-    args = make_expression_list(dest);
-  else {
-    expression transfer_size = range_to_expression(r,range_to_distance);
-
-    if (dma_load_p(m) || dma_store_p(m)) {
-      expression source;
-      source = from;
-      if(scalar_entity)
-	source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
-      args = make_expression_list(source, dest, transfer_size);
-    }
-    else
-      args = make_expression_list(dest, transfer_size);
+  switch(m) {
+      case dma_deallocate:
+          args = make_expression_list(dest);
+          break;
+      case dma_allocate:
+          {
+              expression transfer_size = SizeOfDimensions(ld);
+              args = make_expression_list(dest, transfer_size);
+          } break;
+      case dma_load:
+      case dma_store:
+          {
+              expression transfer_size = SizeOfDimensions(ld);
+              expression source;
+              source = from;
+              if(scalar_entity)
+                  source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
+              args = make_expression_list(source, dest, transfer_size);
+          } break;
+      default:
+          pips_internal_error("should not happen");
   }
   return make_call(mcpy, args);
-
 }
 
-struct dma_pair {
-  entity new_ent;
-  enum region_to_dma_switch s;
-};
 
 
 
@@ -140,16 +173,13 @@ statement effects_to_dma(statement stat,
 			 hash_table e2e) {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
-    if( (dma_load_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION") ) ) ||
-            (dma_store_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION") ) ) ||
-            (dma_allocate_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION") ) ) ||
-            (dma_deallocate_p(s) && empty_string_p(get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION") ) )
-      )
-        return statement_undefined;
+  if(empty_string_p(get_dma_name(s)))
+    return statement_undefined;
 
   list rw_effects= load_cumulated_rw_effects_list(stat);
   list effects = NIL;
 
+  /* filter out relevant effects depending on operation mode */
   FOREACH(EFFECT,e,rw_effects) {
 
 
@@ -169,6 +199,7 @@ statement effects_to_dma(statement stat,
       }
   }
 
+  /* builds out transfer from gathered effects */
   list statements = NIL;
   FOREACH(EFFECT,eff,effects) {
     statement the_dma = statement_undefined;
@@ -178,11 +209,7 @@ statement effects_to_dma(statement stat,
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
       if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
-	range the_range = make_range(int_to_expression(0),
-				     make_op_exp(MINUS_OPERATOR_NAME,
-						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
-						 int_to_expression(1)),
-				     int_to_expression(1));
+	list/*of dimensions*/ the_dims = effect_to_dimensions(eff);
 	expression from = entity_to_expression(re);
 	entity eto;
 	if(val == HASH_UNDEFINED_VALUE) {
@@ -208,7 +235,7 @@ statement effects_to_dma(statement stat,
 	  val->s=s;/*to avoid duplicate*/
 	}
 	expression to = reference_to_expression(make_reference(eto,NIL));
-	the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
+	the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(from,to,the_dims,s)));
 	statements=CONS(STATEMENT,the_dma,statements);
       }
     }
