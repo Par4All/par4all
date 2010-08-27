@@ -260,7 +260,7 @@ AC_CONFIG_FILES([pips_config.h
                  src/Libs/static_controlize/Makefile
                  src/Libs/paf-util/Makefile
                  src/Libs/wp65/Makefile
-				 src/Libs/gnulib/Makefile
+		 src/Libs/gnulib/Makefile
                  src/Makefile
                  src/Passes/Makefile
                  src/Passes/fortran95/Makefile
@@ -269,6 +269,8 @@ AC_CONFIG_FILES([pips_config.h
                  src/Passes/pyps/Makefile
 		 src/Passes/pyps/doc/Makefile
 		 src/Passes/pyps/drivers/Makefile
+		 src/Passes/pyps/drivers/sac/Makefile
+		 src/Passes/pyps/drivers/workspace_gettime/Makefile
                  src/Passes/tpips/Makefile
                  src/Runtimes/Makefile
                  src/Scripts/Makefile
@@ -278,14 +280,15 @@ AC_CONFIG_FILES([pips_config.h
                  src/Scripts/simple_tools/pips_c2openmp
                  src/Scripts/simple_tools/pips_f2openmp
                  src/Scripts/validation/Makefile
+                 src/Scripts/misc/Makefile
                  src/Documentation/dev_guide/Makefile
                  src/Documentation/auto_pips/Makefile
                  src/Documentation/tpips-user-manual/Makefile
-				 src/Documentation/linear/Makefile
-				 src/Documentation/bugs_and_wishes/Makefile
-				 src/Documentation/faq/Makefile
-				 src/Documentation/xpomp/Makefile
-				 src/Documentation/manl/Makefile
+		 src/Documentation/linear/Makefile
+		 src/Documentation/bugs_and_wishes/Makefile
+		 src/Documentation/faq/Makefile
+		 src/Documentation/xpomp/Makefile
+		 src/Documentation/manl/Makefile
 ])
 				
 				 #src/Documentation/doxygen/Makefile
