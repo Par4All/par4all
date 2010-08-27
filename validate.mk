@@ -121,7 +121,7 @@ endif
 # on local validations, sort result & show summary
 .PHONY: sort-local-result
 sort-local-result:
-	if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
+	@if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
 	  mv RESULTS RESULTS.tmp ; \
 	  sort -k 2 RESULTS.tmp > RESULTS ; \
 	  $(RM) RESULTS.tmp ; \
