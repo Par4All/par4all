@@ -2035,88 +2035,6 @@ unstructured_does_return(unstructured u)
   return returns;
 }
 
-
-/* Insert some statements before or after a given statement.
-
-   It should not be used with parsed code containing "goto", i.e. before being
-   controllized, because "goto" points to a given statement and here we
-   change the statement that could be pointed to...
-*/
-void insert_or_append_a_statement_list(statement target,
-				       list s_list,
-				       bool after_p)
-{
-  if (statement_block_p(target)) {
-    sequence seq = instruction_sequence(statement_instruction(target));
-    if (after_p) // append
-	sequence_statements(seq) = gen_nconc(sequence_statements(seq), s_list);
-    else // insert
-	sequence_statements(seq) = gen_nconc(s_list, sequence_statements(seq));
-  }
-  else {
-    statement new_statement = instruction_to_statement(statement_instruction(target));
-    /* Create the new statement sequence with s_list first: */
-    if (after_p) // append
-      statement_instruction(target) =
-	make_instruction_block(CONS(STATEMENT,
-				    new_statement,
-				    s_list));
-    else // insert
-      statement_instruction(target) =
-	make_instruction_block(gen_nconc(s_list, CONS(STATEMENT,
-						      new_statement,
-						      NIL)));
-    statement_label(new_statement) = statement_label(target);
-    statement_label(target) = entity_empty_label();
-    statement_number(new_statement) = statement_number(target);
-    statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
-    statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
-    statement_comments(new_statement) = statement_comments(target);
-    statement_comments(target) = empty_comments;
-    statement_extensions(new_statement) = statement_extensions(target);
-    statement_extensions(target) = empty_extensions ();
-  }
-}
-
-void insert_a_statement_list_in_a_statement(statement target,
-					    list s_list)
-{
-  insert_or_append_a_statement_list(target, s_list, FALSE);
-}
-
-void append_a_statement_list_to_a_statement(statement target,
-					    list s_list)
-{
-  insert_or_append_a_statement_list(target, s_list, TRUE);
-}
-
-/* Insert one single statement before or after a target statement.
-
-   It should not be used with parsed code containing "goto", i.e. before being
-   controllized, because "goto" points to a given statement and here we
-   change the statement that could be pointed to...
-*/
-void insert_or_append_a_statement(statement target,
-				  statement new,
-				  bool after_p)
-{
-  list s_list = CONS(STATEMENT, new, NIL);
-  insert_or_append_a_statement_list(target, s_list, after_p);
-}
-
-void insert_a_statement(statement target,
-			statement new)
-{
-  insert_or_append_a_statement(target, new, FALSE);
-}
-
-void append_a_statement(statement target,
-			statement new)
-{
-  insert_or_append_a_statement(target, new, TRUE);
-}
-
-
 void
 gather_and_remove_all_format_statements_rewrite(statement s,list *all_formats)
 {
@@ -2166,7 +2084,9 @@ put_formats_at_module_beginning(statement s)
     ifdebug (1)
 	pips_assert("Incorrect statements...", statement_consistent_p(s));
     /* And put them at the very beginning of the module: */
-    insert_a_statement_list_in_a_statement(s, formats);
+    formats=gen_nreverse(formats);
+    FOREACH(STATEMENT,f,formats)
+        insert_statement(s,f,true);
     ifdebug (1)
 	pips_assert("Incorrect statements...", statement_consistent_p(s));
 }
@@ -2181,7 +2101,8 @@ put_formats_at_module_end(statement s)
     ifdebug (1)
 	pips_assert("Incorrect statements...", statement_consistent_p(s));
     /* And put them at the very beginning of the module: */
-    append_a_statement_list_to_a_statement(s, formats);
+    FOREACH(STATEMENT,f,formats)
+        insert_statement(s,f,false);
     ifdebug (1)
 	pips_assert("Incorrect statements...", statement_consistent_p(s));
 }
@@ -2365,6 +2286,8 @@ void insert_statement(statement s,
        * we would like to move the label to s2 and to clear s
        * however this would lead to incoherency*/
       statement_label(s)=entity_empty_label();
+      if(!string_undefined_p(statement_comments(s))) free(statement_comments(s));
+      statement_comments(s)=string_undefined;
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else

@@ -429,7 +429,7 @@ static bool loop_scalarization(loop l)
 	      statement co_s =
 		make_assign_statement(reference_to_expression(pvr),
 				      entity_to_expression(sv));
-	      append_a_statement(s, co_s);
+	      insert_statement(s, co_s,false);
 	    }
 	    else {
 	      //free_reference(pvr);
@@ -440,7 +440,7 @@ static bool loop_scalarization(loop l)
 	      statement ci_s =
 		make_assign_statement(entity_to_expression(sv),
 				      reference_to_expression(copy_reference(pvr)));
-	      insert_a_statement(s, ci_s);
+	      insert_statement(s, ci_s,false);
 	    }
 	    else {
 	      //free_reference(pvr);

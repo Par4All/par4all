@@ -220,16 +220,16 @@ bool sesamify (char* module_name) {
     }
 
     //insert all statements
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(wait_statements)));
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(map_statements)));
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(malloc_statements)));
-    append_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(send_statements)));
-    append_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(unmap_statements)));
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(wait_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(map_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(malloc_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(send_statements)),false);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(unmap_statements)),false);
 
     //add declaration
     FOREACH(ENTITY,ent,entity_declaration){

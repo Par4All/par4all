@@ -423,13 +423,13 @@ kernel_load_store_generator(statement s, string module_name)
 
 	  /* Add the methods now if needed, in the correct order: */
 	  if (loads != statement_undefined)
-	    insert_a_statement(s, loads);
+	    insert_statement(s, loads,true);
 	  if (allocates != statement_undefined)
-	    insert_a_statement(s, allocates);
+	    insert_statement(s, allocates,true);
 	  if (stores != statement_undefined)
-	    append_a_statement(s, stores);
+	    insert_statement(s, stores,false);
 	  if (deallocates != statement_undefined)
-	    append_a_statement(s, deallocates);
+	    insert_statement(s, deallocates,false);
         }
     }
 }

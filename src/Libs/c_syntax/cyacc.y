@@ -1373,7 +1373,7 @@ block: /* ISO 6.8.2 */
 						      get_current_C_comment(),
 						      get_current_C_line_number());
 			  /* Add the pragmaifyed nop at the end of the block: */
-			  append_a_statement($1, nop);
+			  insert_statement($1, nop,false);
 			  $$ = $1;
 			}
 |   error location TK_RBRACE

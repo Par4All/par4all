@@ -222,7 +222,7 @@ void loop_normalize_statement(statement s) {
 	 final value: */
       statement end_stmt = make_assign_statement(copy_expression(index_exp),
 						 exp_plus);
-      append_a_statement(s, end_stmt);
+      insert_statement(s, end_stmt,false);
     }
     pips_debug( 4, "end LOOP\n");
   }
