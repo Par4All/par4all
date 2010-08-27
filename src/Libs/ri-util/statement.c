@@ -2281,19 +2281,31 @@ void insert_statement(statement s,
     }
   else
     {
-      statement s2 = copy_statement(s);
-      /* SG: s still holds the label
-       * we would like to move the label to s2 and to clear s
-       * however this would lead to incoherency*/
+      statement s2 = make_statement(
+              statement_label(s),
+              statement_number(s),
+              statement_ordering(s),
+              statement_comments(s),
+              statement_instruction(s),
+              statement_declarations(s),
+              statement_decls_text(s),
+              statement_extensions(s)
+              );
+      /* no duplication */
       statement_label(s)=entity_empty_label();
-      if(!string_undefined_p(statement_comments(s))) free(statement_comments(s));
+      statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
+      statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
       statement_comments(s)=string_undefined;
+      statement_instruction(s)=instruction_undefined;
+      statement_declarations(s)=NIL;
+      statement_decls_text(s)=NULL;
+      statement_extensions(s) = empty_extensions();
+
       if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
 	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));
 
-      statement_instruction(s)=instruction_undefined;/* SG: this is important*/
       update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
 }
