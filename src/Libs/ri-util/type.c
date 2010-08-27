@@ -954,21 +954,9 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
       break;
     }
   case is_syntax_sizeofexpression:
-    {
-      sizeofexpression se = syntax_sizeofexpression(sy);
-      if (sizeofexpression_type_p(se))
-	{
-	  type t = sizeofexpression_type(se);
-	  if (type_tag(t) != is_type_variable)
-	    pips_internal_error("Bad reference type tag %d\n",type_tag(t));
-	  b = copy_basic(variable_basic(type_variable(t)));
-	}
-      else
-	{
-	  b = some_basic_of_any_expression(sizeofexpression_expression(se), apply_p, ultimate_p);
-	}
+      b= make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
       break;
-    }
+
   case is_syntax_subscript:
     {
       b = some_basic_of_any_expression(subscript_array(syntax_subscript(sy)), apply_p, ultimate_p);

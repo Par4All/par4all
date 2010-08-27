@@ -348,9 +348,10 @@ class chromosome(object):
 			raise RuntimeError("Workspace already existing")
 
 		if self.sse:
-			w= pyps.workspace(self.sources, parents = [sac.workspace, lazy_workspace.workspace, workspace_gettime.workspace])
+			w= pyrops.pworkspace(self.sources, parents = [sac.workspace, lazy_workspace.workspace, workspace_gettime.workspace])
 		else:
-			w= pyps.workspace(self.sources, parents = [lazy_workspace.workspace, workspace_gettime.workspace])
+			w= pyrops.pworkspace(self.sources, recoverInclude = False, parents = [lazy_workspace.workspace, workspace_gettime.workspace])
+
 		w.activate("MUST_REGIONS")
 		w.activate("PRECONDITIONS_INTER_FULL")
 		w.activate("TRANSFORMERS_INTER_FULL")
@@ -504,10 +505,11 @@ class genetic:
 		if args.module is not '':
 			self.runOnSac = True
 			self.sacModule = args.module
-			w = pyps.workspace(sources, parents=[sac.workspace, lazy_workspace.workspace])
+			w = pyrops.pworkspace(sources, parents=[sac.workspace, lazy_workspace.workspace])
 		else:
 			self.runOnSac = False
-			w = pyps.workspace(sources, parents=[lazy_workspace.workspace])
+			w = pyrops.pworkspace(sources, parents=[lazy_workspace.workspace])
+
 		self.base_genes= generateAllGenes(w, [])
 		w.close()
 		
