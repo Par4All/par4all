@@ -1,4 +1,4 @@
 #!/bin/sh
 
 PATH=`echo $PATH | sed - -e 's@'$PIPS_BINPATH'@@g'`
-python $PIPS_BINPATH/pips-gcc $*
+pips-gcc $*

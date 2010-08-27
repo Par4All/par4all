@@ -72,9 +72,6 @@ class Object:
 		#--- Retrieve command line information ---
 		cflags = argv
 
-		#Retrieve object file name
-		self.objectfile = os.path.relpath(ofile(cflags), getPipsWD())
-
 		#Retrieve source file from arguments
 		for opt in cflags:
 			if fnmatch.fnmatch(opt, "*.c"):
@@ -82,6 +79,12 @@ class Object:
 				sourcefile=opt
 		self.cname = os.path.relpath(sourcefile, getPipsWD())
 
+
+		#Retrieve object file name
+		objfile = ofile(cflags)
+		if objfile == "":
+			objfile = sourcefile[0:sourcefile.rfind(".")] + ".o"
+		self.objectfile = os.path.relpath(objfile, getPipsWD())
 
 		#Clean cflags from some unused flags
 		optRemove(cflags, '-o',True)

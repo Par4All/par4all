@@ -49,8 +49,14 @@ exitcode=sp.wait()
 
 
 #Create object
+def hascopt(argv):
+	for i in argv:
+		if i=="-c":
+			return True
+	return False
+
 obj = None
-if ofile(sys.argv).find(".o") != -1 :
+if ofile(sys.argv).find(".o") != -1 or hascopt(sys.argv):
 	obj = Object(sys.argv[1:])
 else:
 	obj = LinkerObject(sys.argv[1:])
