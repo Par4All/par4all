@@ -270,6 +270,16 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {SWSCANF_FUNCTION_NAME,       "rrW*",    is_action_read, is_approximation_must},
   {WSCANF_FUNCTION_NAME,        "rW*",     is_action_read, is_approximation_must},
 
+  /* BSD err.h */
+  {ERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {ERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {WARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {WARNX_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {VERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {VERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {VWARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {VWARNX_FUNCTION_NAME,	"rR*",	   is_action_read, is_approximation_must},
+
   /* Fortran extensions for asynchronous IO's */
 
   {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
@@ -1185,6 +1195,20 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},
   {ETIME_FUNCTION_NAME,                    no_write_effects},
   {DTIME_FUNCTION_NAME,                    no_write_effects},
+
+  /* BSD <err.h> */
+  /* SG: concerning the err* family of functions, they also exit() from the program
+   * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
+   * but it seems an error to me */
+  {ERR_FUNCTION_NAME,                              c_io_effects},
+  {ERRX_FUNCTION_NAME,                             c_io_effects},
+  {WARN_FUNCTION_NAME,                             c_io_effects},
+  {WARNX_FUNCTION_NAME,                            c_io_effects},
+  {VERR_FUNCTION_NAME,                             c_io_effects},
+  {VERRX_FUNCTION_NAME,                            c_io_effects},
+  {VWARN_FUNCTION_NAME,                            c_io_effects},
+  {VWARNX_FUNCTION_NAME,                           c_io_effects},
+  
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},

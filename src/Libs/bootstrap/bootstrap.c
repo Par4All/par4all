@@ -5374,6 +5374,16 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
 
+  /* BSD <err.h> */
+  {ERR_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
+  {ERRX_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
+  {WARN_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
+  {WARNX_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
+  {VERR_FUNCTION_NAME, 3, overloaded_to_void_type, 0, 0},
+  {VERRX_FUNCTION_NAME, 3, overloaded_to_void_type, 0, 0},
+  {VWARN_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0},
+  {VWARNX_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0},
+
   {NULL, 0, 0, 0, 0}
 };
 

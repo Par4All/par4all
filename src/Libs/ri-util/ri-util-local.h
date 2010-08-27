@@ -380,6 +380,16 @@
 #define ETIME_FUNCTION_NAME             "ETIME"
 #define DTIME_FUNCTION_NAME             "DTIME"
 
+/* BSD <err.h> */
+#define ERR_FUNCTION_NAME		"err"
+#define ERRX_FUNCTION_NAME		"errx"
+#define WARN_FUNCTION_NAME		"warn"
+#define WARNX_FUNCTION_NAME		"warnx"
+#define VERR_FUNCTION_NAME		"verr"
+#define VERRX_FUNCTION_NAME		"verrx"
+#define VWARN_FUNCTION_NAME		"vwarn"
+#define VWARNX_FUNCTION_NAME		"vwarnx"
+
 //to check
 #define DRAND48_FUNCTION_NAME           "drand48"
 #define ERAND48_FUNCTION_NAME           "erand48"
