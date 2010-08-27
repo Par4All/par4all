@@ -16,4 +16,11 @@ inspect-symbols:
 check-properties:
 	$(top_srcdir)/src/Scripts/dev/check_properties.sh src/Documentation/pipsmake/properties.rc $(top_srcdir)
 
+cscope:
+	find $(top_srcdir)/src -name '*.[chly]' -print >  cscope.files && \
+	find $(top_builddir)/src/Documentation -name '*.h' -print >>  cscope.files && \
+	cscope -b && \
+	rm -f cscope.files
 endif
+
+MAINTAINERCLEANFILES=cscope.out

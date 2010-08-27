@@ -353,6 +353,34 @@ directly in you \texttt{.emacs} with stuff like:
 \end{verbatim}
 \end{itemize}
 
+\subsection{Using cscope to navigate source file}
+
+In a way similar to \texttt{ctags}, \texttt{make cscope}
+\footnote{\texttt{make cscope.out} for nlpmake users} creates a database
+suitable for use with the \texttt{cscope} tool.
+This tool make it possible to find callers, definition or declaration of a function,
+enabling advanced code navigation not possible with tags.
+
+Here are the relevant lines for a \texttt{vim} configuration, to be added to
+\texttt{.vim/ftplugin/c.vim}
+\begin{lstlisting}
+" cscope
+if has("cscope")
+	set csto=0
+	set cst
+	set nocsverb
+	" add any database in current directory
+	if filereadable("cscope.out")
+		cs add cscope.out
+		" else add database pointed to by environment
+	elseif $CSCOPE_DB != ""
+		cs add $CSCOPE_DB
+	endif
+	set csverb
+endif
+\end{lstlisting}
+
+
 
 \subsection{Developing PIPS under SVN}
 \label{sec:dev-svn}
@@ -3096,3 +3124,4 @@ keep both versions of PIPS.
 %%% TeX-master: t
 %%% ispell-local-dictionary: "american"
 %%% End:
+% vim:spell spelllang=en
