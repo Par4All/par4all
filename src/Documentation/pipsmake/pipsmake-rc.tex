@@ -2357,11 +2357,19 @@ loop_reductions > MODULE.code
 \subsection{Reduction Propagation}
 \begin{PipsPass}{reduction_propagation}
  tries to transform
+ \begin{lstlisting}
+{
  a = b + c;
  r = r + a;               
+}
+ \end{lstlisting}
  into
+ \begin{lstlisting}
+{
  r = r +b ;                   
  r = r +c ;                   
+}
+ \end{lstlisting}
 \end{PipsPass}
 \begin{PipsMake}
 reduction_propagation > MODULE.code
@@ -2371,6 +2379,32 @@ reduction_propagation > MODULE.code
   < MODULE.dg
 \end{PipsMake}
 
+\subsection{Reduction Detection}
+\begin{PipsPass}{reduction_detection}
+ tries to transform
+ \begin{lstlisting}
+{
+ a = b + c;
+ b = d + a;               
+}
+ \end{lstlisting}
+ which hides a reduction on b
+ into
+ \begin{lstlisting}
+{
+ b = b + c ;                   
+ b = d + b ;                   
+}
+ \end{lstlisting}
+ when possible
+\end{PipsPass}
+
+\begin{PipsMake}
+reduction_detection > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+  < MODULE.dg
+\end{PipsMake}
 
 \section{Chains (Use-Def Chains)}
 \label{subsection-chains}
