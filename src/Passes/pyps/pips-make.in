@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+import os
+import subprocess
+import sys
+import shutil
+
+workingdir=os.getcwd()
+workspace=os.path.join(workingdir, "pips.ws")
+
+os.putenv("PIPS_WORKSPACE", workspace)
+os.putenv("PIPS_WORKINGDIR", workingdir)
+
+binpath="@BINPATH@"
+path=os.getenv("PATH")
+
+os.putenv("PATH", binpath + ":" + path)
+os.putenv("PIPS_BINPATH",binpath)
+
+if len(sys.argv) > 1 and sys.argv[1] == "clean":
+	if os.path.exists(workspace):
+		shutil.rmtree(workspace)
+	os.mkdir(workspace)
+
+if len(sys.argv) > 1 and sys.argv[1] == "-env":
+	sh = os.getenv("SHELL","/bin/sh")
+	sp=subprocess.Popen([sh] + sys.argv[2:])
+else:
+	sp=subprocess.Popen(["make"] + sys.argv[1:])
+exit(sp.wait())
+
