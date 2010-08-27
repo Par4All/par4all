@@ -69,15 +69,8 @@ static bool unique_entity_name_p(const char * name, entity in_module)
     /* everything seems ok, do a last check with gen_fin_tabulated */
     if(strstr(name,MODULE_SEP_STRING))
         return gen_chunk_undefined_p(gen_find_tabulated(name,entity_domain));
-    else {
-      // entity_module_name(in_module) is likely to return TOP-LEVEL...
-      //  return
-      //  gen_chunk_undefined_p(gen_find_tabulated(concatenate(entity_module_name(in_module),
-      //  MODULE_SEP_STRING,name,NULL),entity_domain));
-      // FI: I'm not sure this is the solution for C, but it seems to
-      //  work for Fortran...
-        return gen_chunk_undefined_p(gen_find_tabulated(concatenate(entity_user_name(in_module), MODULE_SEP_STRING,name,NULL),entity_domain));
-    }
+    else
+        return gen_chunk_undefined_p(gen_find_tabulated(concatenate(module_local_name(in_module), MODULE_SEP_STRING,name,NULL),entity_domain));
 }
 
 /* See also macro entity_variable_p()... */
