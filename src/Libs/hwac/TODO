@@ -13,6 +13,8 @@
 - handle different type of images (e.g. distinct BPP)
   issue: it is not clear how the image bpp can be derived from the source
 - check/remove more implicit hypothesis?
+- at least one image operations is not in aipo/cipo: freia_common_draw_line
+  should it be in aipo or cipo? should I consider this operation?
 
 * optimizations
 + remove useless images (computed but not used...) see licensePlate
