@@ -1,7 +1,7 @@
 delete memcpy03
 
 create memcpy03 memcpy03.c
-setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 setproperty ABORT_ON_USER_ERROR TRUE
 
 echo

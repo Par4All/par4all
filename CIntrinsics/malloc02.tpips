@@ -1,7 +1,7 @@
 delete malloc02
 
 create malloc02 malloc02.c
-setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
 setproperty ABORT_ON_USER_ERROR TRUE
 
 echo
