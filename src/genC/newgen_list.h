@@ -134,16 +134,16 @@ typedef struct cons {
     For example, to insert a PIPS statement s at the beginning of a
     statement list sl you can write:
 
-      list new_list = CONS(STATEMENT, s, sl);
+      list new_list = CONS(statement, s, sl);
 
     Another way is to directly use the specialized NewGen list constructor
     for the type:
 
-      list new_list = gen_STATEMENT_cons(s, sl);
+      list new_list = gen_statement_cons(s, sl);
 
-    Note that it also works with just the type name, as:
+    Note that it also works with just the type name in upper case, as:
 
-      list l = CONS(statement, s, l);
+      list l = CONS(STATEMENT, s, l);
 */
 #define CONS(_t_,_i_,_l_) gen_##_t_##_cons((_i_),(_l_))
 
@@ -178,19 +178,19 @@ typedef struct cons {
     it remains line oriented like the C99 for() used to implement it and
     does not choke on some "," in the instruction block.
 
-    @param _fe_CASTER is the caster of the type of elements, that is the
-    newgen type name in uppercase, such as STATEMENT for a PIPS statement
+    @param _fe_CASTER is the type of elements, aka the newgen type
+    name or newgen basic types such as int, string, list.
 
     @param _fe_item is the variable to allocate and use as an iterator on
     the list elements
 
     @param _fe_list is the list parameter to iterate on
 */
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-  list UNIQUE_NAME = (_fe_list);					\
-  for( _fe_CASTER##_TYPE _fe_item;					\
-       !ENDP(UNIQUE_NAME) &&						\
-	 (_fe_item= _fe_CASTER##_CAST(CAR(UNIQUE_NAME) ));		\
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list)             \
+  list UNIQUE_NAME = (_fe_list);                            \
+  for( _fe_CASTER##_TYPE _fe_item;                          \
+       !ENDP(UNIQUE_NAME) &&                                \
+         (_fe_item= _fe_CASTER##_CAST(CAR(UNIQUE_NAME) ));  \
        POP(UNIQUE_NAME))
 
 /** Apply some code on the addresses of all the elements of a list
@@ -203,20 +203,20 @@ typedef struct cons {
 
     @param _l is the list parameter to iterate on
 */
-#define MAPL(_map_list_cp,_code,_l)					\
-  {									\
-    list _map_list_cp = (_l) ;						\
-    for(; !ENDP(_map_list_cp); POP(_map_list_cp))			\
-      _code;								\
+#define MAPL(_map_list_cp,_code,_l)                   \
+  {                                                   \
+    list _map_list_cp = (_l) ;                        \
+    for(; !ENDP(_map_list_cp); POP(_map_list_cp))     \
+      _code;                                          \
   }
 
 /** Apply/map an instruction block on all the elements of a list (old
     fashioned)
-    
+
     Now you should use the more modern FOREACH implementation instead.
-   
+
     @param _map_CASTER is the caster of the type of elements, that is the
-    newgen type name in uppercase, such as STATEMENT for a PIPS statement
+    newgen type name in uppercase, such as STATEMENT for a PIPS statement.
 
     @param _map_item is the variable to allocate and use as an iterator on
     the list elements from _map_code
@@ -226,15 +226,15 @@ typedef struct cons {
 
     @param _map_list is the list parameter to iterate on
 */
-#define MAP(_map_CASTER, _map_item, _map_code, _map_list)		\
-  {									\
-    list _map_item##_list = (_map_list);				\
-    _map_CASTER##_TYPE _map_item;					\
-    for(; _map_item##_list; POP(_map_item##_list))			\
-    {									\
-      _map_item = _map_CASTER(CAR(_map_item##_list));			\
-      _map_code;							\
-    }									\
+#define MAP(_map_CASTER, _map_item, _map_code, _map_list) \
+  {                                                       \
+    list _map_item##_list = (_map_list);                  \
+    _map_CASTER##_TYPE _map_item;                         \
+    for(; _map_item##_list; POP(_map_item##_list))        \
+    {                                                     \
+      _map_item = _map_CASTER(CAR(_map_item##_list));     \
+      _map_code;                                          \
+    }                                                     \
   }
 
 /** Another name to the funtion to insert a boolean element at the start
