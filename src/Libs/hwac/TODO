@@ -87,6 +87,8 @@
   beware: do not extract input, even if live?!
 - extension: interface with SG terapix microcode generation
   hard constraint: 3 "pointers" are available; border management?
+  is there anyway to somehow get the values of these pointers in a register
+  and extract the six parameters independently?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
