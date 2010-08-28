@@ -870,11 +870,11 @@ void freia_substitute_by_helper_call
       // update type of parameters
       list larg_params = NIL;
       FOREACH(expression, e, lparams)
-        larg_params = CONS(PARAMETER,
-			  make_parameter(expression_to_user_type(e),
-					 make_mode_value(),
-					 make_dummy_unknown()),
-			  larg_params);
+        larg_params = CONS(parameter,
+                           make_parameter(expression_to_user_type(e),
+                                          make_mode_value(),
+                                          make_dummy_unknown()),
+                           larg_params);
       larg_params = gen_nreverse(larg_params);
       functional_parameters(type_functional(entity_type(helper))) = larg_params;
 
