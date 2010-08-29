@@ -14,20 +14,27 @@ int use_def_elim02(int i)
 
 Code with cumulated effects for "use_def_elim02"
 
+//               <may be referenced >: i
 //               <must be read   >: i
 int use_def_elim02(int i)
 {
+//               <must be declared>: j
    int j;
+//               <must be declared>: k
    int k;
 //               <must be read   >: i
 //               <must be written>: j
+//               <must be referenced>: i j
 
    j = i+1;
 //               <must be written>: i
+//               <must be referenced>: i
    i = 2;
 //               <must be written>: k
+//               <must be referenced>: k
    k = 3;
 //               <must be read   >: j
+//               <must be referenced>: j
    return j;
 }
 
@@ -36,7 +43,7 @@ Code for "use_def_elim02" after use-def elimination
 int use_def_elim02(int i)
 {
    int j;
-   int k;
+   ;
 
    j = i+1;
    ;

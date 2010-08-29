@@ -4,8 +4,8 @@ setenv FILE $WSPACE.c
 delete $WSPACE
 create $WSPACE $FILE
 setproperty MEMORY_EFFECTS_ONLY=FALSE
-apply USE_DEF_ELIMINATION[data_stuff]
-display PRINTED_FILE[data_stuff]
+apply USE_DEF_ELIMINATION[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
 close
 delete $WSPACE
 quit
