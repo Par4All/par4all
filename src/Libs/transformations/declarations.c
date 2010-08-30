@@ -86,7 +86,7 @@ static void remove_unread_variable(statement s, entity e)
                     }
                 }
                 else {
-                    pips_internal_error("case unhadled yet\nfell free to contribute :-)\n");
+                    pips_internal_error("case unhandled yet\nfell free to contribute :-)\n");
                 }
             }
         }
@@ -108,7 +108,7 @@ static void entity_used_somewhere_walker(statement s, entity_used_somewhere_para
 {
     list effects =load_cumulated_rw_effects_list(s);
     FOREACH(EFFECT,eff,effects)
-        if(effect_read_p(eff) && entities_must_conflict_p(reference_variable(effect_any_reference(eff)),p->e))
+        if(effect_read_p(eff) && entities_may_conflict_p(reference_variable(effect_any_reference(eff)),p->e))
         { p->result = true; gen_recurse_stop(0); }
 }
 
