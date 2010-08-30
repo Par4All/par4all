@@ -276,7 +276,7 @@ interchange = interchange_gen()
 generators = []
 try:
 	parser = ConfigParser.RawConfigParser()
-	parser.readfp(open("pypsearch.cfg"))
+	parser.read("pypsearch.cfg")
 
 	generatorsD = parser.items("generators")
 	basicGeneratorsD = parser.items("basicGenerators")
