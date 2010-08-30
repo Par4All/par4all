@@ -6,6 +6,7 @@ setenv FREIA_TARGET ${FREIA_TARGET:-SPOC}
 # props...
 setproperty ABORT_ON_USER_ERROR=TRUE
 setproperty FREIA_LABEL_ARCS=TRUE
+setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING="generate"
@@ -53,7 +54,7 @@ echo
 echo ! cleaned up function
 echo
 apply PARTIAL_EVAL[${NAME}]
-# hmmm... too efficient:-)
+# no, too efficient, helper functions are removed.
 #apply USE_DEF_ELIMINATION[${NAME}]
 apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
