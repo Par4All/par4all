@@ -197,6 +197,7 @@ digraph "dag_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -206,6 +207,7 @@ digraph "dag_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -216,6 +218,7 @@ digraph "dag_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -225,6 +228,7 @@ digraph "dag_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -241,6 +245,7 @@ digraph "dag_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -258,6 +263,7 @@ digraph "dag_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -276,6 +282,7 @@ digraph "dag_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -307,6 +314,7 @@ digraph "dag_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
@@ -362,6 +370,7 @@ digraph "dag_cleaned_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -371,6 +380,7 @@ digraph "dag_cleaned_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -381,6 +391,7 @@ digraph "dag_cleaned_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -390,6 +401,7 @@ digraph "dag_cleaned_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -406,6 +418,7 @@ digraph "dag_cleaned_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -423,6 +436,7 @@ digraph "dag_cleaned_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -441,6 +455,7 @@ digraph "dag_cleaned_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -472,6 +487,7 @@ digraph "dag_cleaned_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
@@ -874,6 +890,7 @@ digraph "dag_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -883,6 +900,7 @@ digraph "dag_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -893,6 +911,7 @@ digraph "dag_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -902,6 +921,7 @@ digraph "dag_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -918,6 +938,7 @@ digraph "dag_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -935,6 +956,7 @@ digraph "dag_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -953,6 +975,7 @@ digraph "dag_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -984,6 +1007,7 @@ digraph "dag_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
@@ -1039,6 +1063,7 @@ digraph "dag_cleaned_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -1048,6 +1073,7 @@ digraph "dag_cleaned_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -1058,6 +1084,7 @@ digraph "dag_cleaned_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -1067,6 +1094,7 @@ digraph "dag_cleaned_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -1083,6 +1111,7 @@ digraph "dag_cleaned_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -1100,6 +1129,7 @@ digraph "dag_cleaned_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -1118,6 +1148,7 @@ digraph "dag_cleaned_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -1149,6 +1180,7 @@ digraph "dag_cleaned_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
@@ -2878,6 +2910,7 @@ digraph "dag_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -2887,6 +2920,7 @@ digraph "dag_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -2897,6 +2931,7 @@ digraph "dag_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -2906,6 +2941,7 @@ digraph "dag_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -2922,6 +2958,7 @@ digraph "dag_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -2939,6 +2976,7 @@ digraph "dag_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -2957,6 +2995,7 @@ digraph "dag_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -2988,6 +3027,7 @@ digraph "dag_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
@@ -3043,6 +3083,7 @@ digraph "dag_cleaned_0" {
   "145 D8" -> "146 D8" [label="out"];
   "143 ?" [shape=none];
   "141 ?" [shape=none];
+  "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
@@ -3052,6 +3093,7 @@ digraph "dag_cleaned_0" {
   "137 D8" [shape=box];
   "137 D8" -> "138 D8" [label="imout"];
   "135 ?" [shape=none];
+  "135 ?" -> "141 ?" [arrowhead=empty,label="i_3"];
   "134 E8" [shape=box];
   "134 E8" -> "137 D8" [label="imout"];
   "133 E8" [shape=box];
@@ -3062,6 +3104,7 @@ digraph "dag_cleaned_0" {
   "131 E8" -> "132 E8" [label="imout"];
   "129 ?" [shape=none];
   "127 ?" [shape=none];
+  "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
@@ -3071,6 +3114,7 @@ digraph "dag_cleaned_0" {
   "123 D8" [shape=box];
   "123 D8" -> "124 D8" [label="imfilt"];
   "121 ?" [shape=none];
+  "121 ?" -> "127 ?" [arrowhead=empty,label="i_2"];
   "120 E8" [shape=box];
   "120 E8" -> "123 D8" [label="imfilt"];
   "119 E8" [shape=box];
@@ -3087,6 +3131,7 @@ digraph "dag_cleaned_0" {
   "112 thr" -> "115 &" [label="imopenth"];
   "110 ?" [shape=none];
   "107 ?" [shape=none];
+  "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
@@ -3104,6 +3149,7 @@ digraph "dag_cleaned_0" {
   "99 E8" [shape=box];
   "99 E8" -> "100 E8" [label="imclose"];
   "97 ?" [shape=none];
+  "97 ?" -> "107 ?" [arrowhead=empty,label="i_1"];
   "96 D8" [shape=box];
   "96 D8" -> "99 E8" [label="imclose"];
   "95 D8" [shape=box];
@@ -3122,6 +3168,7 @@ digraph "dag_cleaned_0" {
   "89 D8" -> "90 D8" [label="imclose"];
   "87 ?" [shape=none];
   "85 ?" [shape=none];
+  "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
@@ -3153,6 +3200,7 @@ digraph "dag_cleaned_0" {
   "70 D8" [shape=box];
   "70 D8" -> "71 D8" [label="imopen"];
   "68 ?" [shape=none];
+  "68 ?" -> "85 ?" [arrowhead=empty,label="i_0"];
   "67 E8" [shape=box];
   "67 E8" -> "70 D8" [label="imopen"];
   "66 E8" [shape=box];
