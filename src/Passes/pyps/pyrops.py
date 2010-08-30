@@ -87,9 +87,9 @@ class Control(Pyro.core.ObjBase):
 import pyps
 
 class pworkspace(pyps.workspace):
-	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags='', parents=[]):
+	def __init__(self,*args,**kwargs):
 		self.launcher = Launcher()
-		pyps.workspace.__init__(self,sources2,name,activates,verboseon,cppflags,parents,self.launcher.getObj())
+		super(pworkspace, self).__init__(*args, cpypips=self.launcher.getObj(), **kwargs)
        
 	def close(self):
 		pyps.workspace.close(self)

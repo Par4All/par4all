@@ -21,6 +21,8 @@ import os
 import shutil
 import socket
 import cPickle
+import pyrops
+import ConfigParser
 
 """
 This module provide three ways of exploring the transformation space for a given module in a given programm
@@ -270,44 +272,58 @@ inline = inline_gen()
 unroll = unroll_gen()
 red_var_exp = red_var_exp_gen()
 interchange = interchange_gen()
-ompify = not2inarow_gen("OMPIFY_CODE")
-privatize = not2inarow_gen("PRIVATIZE_MODULE")
-substitute = not2inarow_gen("FORWARD_SUBSTITUTE")
-partialeval = not2inarow_gen("PARTIAL_EVAL")
-icm = not2inarow_gen("ICM")
-ipc = not2inarow_gen("INTERNALIZE_PARALLEL_CODE")
 
-sac_gen = not2inarow_gen("SAC")
+generators = []
+try:
+	parser = ConfigParser.RawConfigParser()
+	parser.readfp(open("pypsearch.cfg"))
 
-split_update = not2inarow_gen("SPLIT_UPDATE_OPERATOR")
-if_conv_init = not2inarow_gen("IF_CONVERSION_INIT")
-if_conv = not2inarow_gen("IF_CONVERSION")
-if_conv_compact = not2inarow_gen("IF_CONVERSION_COMPACT")
-simd_atomizer = not2inarow_gen("SIMD_ATOMIZER", sac_simd_register_width=128)
-simdizer_auto_unroll = not2inarow_gen("SIMDIZER_AUTO_UNROLL", sac_simd_register_width=128)
-clean_decl = not2inarow_gen("CLEAN_DECLARATIONS")
-suppress_dead_code = not2inarow_gen("SUPPRESS_DEAD_CODE")
-simd_remove_reductions = not2inarow_gen("SIMD_REMOVE_REDUCTIONS", sac_simd_register_width=128)
-single_assignment = not2inarow_gen("SINGLE_ASSIGNMENT")
-simdizer = not2inarow_gen("SIMDIZER")
-simd_loop_const_elim = not2inarow_gen("SIMD_LOOP_CONST_ELIM")
+	generatorsD = parser.items("generators")
+	basicGeneratorsD = parser.items("basicGenerators")
 
-# REDUCTION_VARIABLE_EXPANSION
-# FORWARD_SUBSTITUTE
-# PARTIAL_EVAL 
-# SIMD_ATOMIZER
-# SINGLE_ASSIGNMENT
-# SIMDIZER
-# SIMD_LOOP_CONST_ELIM
+	corr = {"inline":inline, "unroll":unroll, "red_var_exp":red_var_exp, "interchange":interchange}
+
+	for x in generatorsD:
+		if x[0] not in corr:
+			print "Error when parsing config file, as " + x[0] + " is not a generator"
+		else:
+			generators += [corr[x[0]]]
+
+	for x in basicGeneratorsD:
+		props = x[1].split(',')
+		propvals = {}
+		
+		for propval in props:
+			splitProp = propval.split('=')
+			if len(splitProp) != 2 or len(splitProp[1]) == 0:
+				continue
+			prop = splitProp[0]
+			val = splitProp[1]
+			if val[0] == '"':
+				val = val[1:-1]
+			elif upper(val) == "TRUE" or upper(val) == "FALSE":
+				val = bool(val)
+			else:
+				val = int(val)
+			propvals[prop] = val
+		
+		generators += [not2inarow_gen(x[0], **propvals)]
+except:
+	pass
+
+if generators is []:
+	print "No generator given in the config file (pypsearch.cfg), so using only the inline generator"
+	generators = [inline]
 
 def getGenerators():
 	#return [inline, unroll, partialeval, interchange, ompify]
 	#return [unroll, partialeval, interchange, ompify, privatize, substitute]
 	"""sac_gens = [split_update, if_conv_init, if_conv, if_conv_compact, simd_atomizer, simdizer_auto_unroll, clean_decl,
 		suppress_dead_code, simd_remove_reductions, single_assignment, simdizer, simd_loop_const_elim]"""
-	return [unroll, red_var_exp, substitute, partialeval, simd_atomizer, single_assignment,
-		simdizer, simd_loop_const_elim, inline]
-	#return [inline] + sac_gens
+	"""return [unroll, red_var_exp, substitute, partialeval, simd_atomizer, single_assignment,
+		simdizer, simd_loop_const_elim, inline]"""
+	#return [inline]
+	return generators
 #
 ##
 #
@@ -550,7 +566,7 @@ class genetic:
 			for x in args.sources:
 				with open(x, 'r') as f:
 					content = f.read()
-				sourcesToSend += (x,content)
+				sourcesToSend += [(x,content)]
 			
 			msg = cmd + "||" + cPickle.dumps(sourcesToSend)
 			
@@ -567,6 +583,31 @@ class genetic:
 				print "Sending flags to socket " + str(x)
 				sendNetworkMessage(self.socks[x], msg)
 			print "Flags sent to everyone"
+			
+			cmd = "headers"
+			filesToSend = []
+			# Look for additional header files. For now, header files are only the ones
+			# in the folders specified by '-Ixxx'
+			folders = re.findall(r'(?<=-I)\S+', os.environ["PIPS_CPP_FLAGS"])
+			
+			if not (folders is []):
+				for folder in folders:
+					for root, dirs, files in os.walk(folder):
+						for file in files:
+							#only send header files
+							if file[-2:] == ".h":
+								path = os.path.join(root, file)
+								with open(path, 'r') as f:
+									content = f.read()
+								filesToSend += [(path, content)]
+				if not (filesToSend == []):
+					msg = cmd + "||" + cPickle.dumps(filesToSend)
+
+					for x in range(0, self.totalSocks):
+						print "Sending additional headers to socket " + str(x)
+						sendNetworkMessage(self.socks[x], msg)
+					print "Additional headers sent to all sockets!"
+					
 			
 			cmd = "options"
 			if self.runOnSac:
@@ -644,10 +685,13 @@ class genetic:
 			#The items in generation are already sorted by execution time
 			return generation[0:nb]
 		else:
-			winnersPerRemoteComputer = [nb / self.totalSocks for x in range(0, self.totalSocks)]
-			chromosomesPerRemoteComputer = [len(generation) / self.totalSocks for x in range(0, self.totalSocks)]
-			remains = nb - (nb / self.totalSocks) * self.totalSocks
-			chRemains = len(generation) - (len(generation) / self.totalSocks) * self.totalSocks
+			#Don't put more sockets than there is winners
+			totalSocks = min(self.totalSocks, nb)
+			
+			winnersPerRemoteComputer = [nb / totalSocks for x in range(0, totalSocks)]
+			chromosomesPerRemoteComputer = [len(generation) / totalSocks for x in range(0, totalSocks)]
+			remains = nb - (nb / totalSocks) * totalSocks
+			chRemains = len(generation) - (len(generation) / totalSocks) * totalSocks
 			
 			#As the division might not be perfect, there may be leftovers item that will be given to the first few
 			#chromosomes
@@ -668,7 +712,7 @@ class genetic:
 			
 			absindex = 0
 			#now send the message to the clients, asking for the winners
-			for x in range(0, self.totalSocks):
+			for x in range(0, totalSocks):
 				if chromosomesPerRemoteComputer[x] == 0:
 					continue
 
@@ -680,7 +724,7 @@ class genetic:
 				cmdstring = cmd + "||" + cPickle.dumps((winnersNum, chr))
 				sendNetworkMessage(self.socks[x], cmdstring)
 			#now receiving the results
-			for x in range(0, self.totalSocks):
+			for x in range(0, totalSocks):
 				if winnersPerRemoteComputer[x] == 0:
 					continue
 				answer = recvNetworkMessage(self.socks[x])
@@ -722,9 +766,6 @@ class genetic:
 		print ("adding", str(len(births)), "births")
 		print >> self.file, "End of birthing / " + str(time.time())
 		return births
-
-def pick_algo(name, sources, options):
-	return globals()[name](sources, options)
 	
 def getwdir(sources):
 	return "WDIR_"+"".join("-".join(sources).split('/'))
@@ -765,6 +806,22 @@ def launchClient(host):
 					
 					print name + " added to sources"
 					sources += [name]
+			elif cmd == "headers":
+				for x in obj:
+					name = x[0]
+					content = x[1]
+					namepath = name.rpartition('/')
+					
+					#Making an already existing directory would raise an exception
+					try:
+						os.makedirs(namepath[0])
+					except:
+						pass
+										
+					with open(name, 'w') as f:
+						f.write(content)
+					
+					print name + " added to headers"
 			elif cmd == "options":
 				if "sse" in obj:
 					sse = True
@@ -783,8 +840,7 @@ def launchClient(host):
 				
 				if len(winners) > 0:
 					answer = cPickle.dumps(winners)
-				
-				sendNetworkMessage(sock, answer)
+					sendNetworkMessage(sock, answer)
 			elif cmd == "flags":
 				os.environ["PIPS_CPP_FLAGS"]= obj
 				print "Compilation flags set to " + obj
@@ -836,11 +892,9 @@ def sendNetworkMessage(socket, string):
 def main():
 	parser = OptionParser(description="Pypsearch - Automated exploration of the set of transformations"
 			+" with python.")
-	parser.add_option('--algo', default='genetic', choices=['genetic', 'full', 'greedy'], help='The algorithm to use for the automated search')
 	parser.add_option('--CPPFLAGS', default='', help='Optional added arguments to the compiler')
 	parser.add_option('--restore', default=0, type=int, help='Should we try to reproduce the same result as the session before?')
 	parser.add_option('--log', help='log file to save the best results')
-	parser.add_option('--select', default=3, type=int, help='Number of elements to keep each round for the greedy algorithm')
 	parser.add_option('--gens', default=1, type=int, help='Number of generations for the genetic algorithm')
 	parser.add_option('--crossovers', default=1, type=int, help='Number of crossovers to perform each generation')
 	parser.add_option('--tournaments', default=3, type=int, help='Number of winners of a tournament for the genetic algorithm')
@@ -888,7 +942,7 @@ def main():
 	# launch algo
 	results=[]
 	# full transversal
-	algo=pick_algo(args.algo,args.sources,args)
+	algo=genetic(args.sources,args)
 	results=algo.run()
 	
 

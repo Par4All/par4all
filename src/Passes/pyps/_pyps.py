@@ -11,6 +11,7 @@ import types
 from copy import deepcopy
 from string import split, upper, join
 from subprocess import Popen, PIPE
+import inspect
 
 pypips.atinit()
 
@@ -509,7 +510,7 @@ class workspace(object):
 		# Get rid of attribute (non-method) access
 		try:
 			a = get(name)
-			if not callable(a):
+			if not callable(a) or inspect.isclass(a):
 				return a
 		except AttributeError:
 			pass

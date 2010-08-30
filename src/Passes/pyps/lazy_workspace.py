@@ -15,7 +15,6 @@ class workspace:
 		self.elems = []
 		self.runCount = 0
 		self.loopCount = -1
-		self.buildCount = -1
 		self.ws = ws
 		
 		#PIPS has some problems with some "dummy parameter __x" so we moreve the math during the analysis
@@ -68,9 +67,6 @@ class workspace:
 		
 	def pre__build_module_list(self):
 		self.detach()
-		if self.buildCount == self.runCount:
-			return
-		self.buildCount = self.runCount
 	
 	def pre_filter(self, *args, **kwargs):
 		self.detach()
@@ -103,7 +99,7 @@ class transfo:
 		self.modname = module
 		self.loop = loop
 		self.props = props
-	def __str__(self):return "transformation:"+self.transfo+" on module " + self.modname + "\n"
+	def __str__(self):return "".join([str(property(prop, val)) for (prop, val) in self.props.items()]) + "transformation:"+self.transfo+" on module " + self.modname + "\n"
 	def run(self,wsp):
 		"""run this transformation on module `name'"""
 		print ("running transformation " + self.transfo)

@@ -1,0 +1,42 @@
+Pypsearch.py implémente un algorithme génétique pour trouver la meilleure suite de transformations PIPS à appliquer.
+
+Pour lancer l'algorithme, vous avez besoin de trois fichiers: pypsearch.py, pypsearch.cfg, lazy_workspace.py. Si pypsearch.cfg n'est pas présent, seul l'inlining sera appliqué comme transformation. Pour savoir comment le configurer, les explications sont en commentaires dans le fichier.
+
+La manière la plus simple d'utiliser pypsearch.py est de lui passer en argument les sources sur lesquelles pyps va travailler. Cependant il peux accepter des arguments supplémentaires, visibles en faisant python pypsearch.py --help:
+
+  -h, --help            show this help message and exit
+  --CPPFLAGS=CPPFLAGS   Optional added arguments to the compiler
+  --restore=RESTORE     Should we try to reproduce the same result as the
+                        session before?
+  --log=LOG             log file to save the best results
+  --gens=GENS           Number of generations for the genetic algorithm
+  --crossovers=CROSSOVERS
+                        Number of crossovers to perform each generation
+  --tournaments=TOURNAMENTS
+                        Number of winners of a tournament for the genetic
+                        algorithm
+  --popsize=POPSIZE     Number of individuals for the genetic algorithm
+  --module=MODULE       If specified, will run a SAC optimization on this
+                        module using Frederic Perrin's transformations as a
+                        base
+  --host=HOST           If specified, will try to connect to the host address
+                        given and obey the host to reduce its load. The host
+                        address should be IP:port, likeso: 127.0.0.1:1234
+  --server=SERVER       Acts as a server to use other computers to speed up
+                        the process.
+  --port=PORT           When acting as a server, listens to this port.
+                        --server must be specified too
+  --slaves=SLAVES       Number of clients that will connect to this server.
+
+L'argument restore était utilisé pendant la phase de débuggage et n'est plus utilisable tel quel. L'argument log spécifie le fichier vers lequel les résultats doivent être envoyés, au lieu de les envoyer sur la sortie stdout. gens, crossovers, tournaments, popsize permettent de régler certains paramètres de l'exécution de l'algorithme génétique. Le plus intéressant est 'gens', car il spécifie le nombre d'itérations que l'algorithme génétique aura. Par défaut il vaut un, et donc les résultats proposés ne se composeront que d'une seule transformation.
+
+Pypsearch utilise deux manières de déléguer le travail. Premièrement, et dans tous les cas, il utilise la technologie PYRO (PYthon Remote Object) pour gérer les workspace dans des processus séparés. Cela permet de rétablir l'état de PIPS à zéro à chaque fois et d'éviter les problèmes de trop grosses fuites de mémoire ou alors d'erreurs qui n'apparaissent qu'au bout de plusieurs workspace créés et fermés. 
+
+La deuxième manière est que pypsearch peut aussi se comporter en serveur et client, de sorte que le serveur puisse distribuer le travail sur plusieurs ordinateurs. Chaque client n'a besoin que des fichiers pypsearch.py et lazy_workspace.py, ainsi que d'une installation de pyps. Les fichiers sources, et les headers, devraient être transmis du serveur aux clients, donc il n'y a pas besoin de les déployer à l'avance. Il est aussi recommandé, si vous faites tourner plusieurs client sur la même machine, de ne pas les faire tourner dans le même répertoire. Lorsque le modèle serveur/client est utilisé, le serveur s'occupe d'abord de la génération des individus à évaluer, puis les envoie de manière répartie aux client qui ensuite les compilent et les évalue. En effet, la compilation prend généralement plus de temps que la génération de gènes. Cependant, pour les gros projets, pouvoir repartir à chaque fois de l'état initial après le premier parsage, au lieu de refaire le parsage à chaque fois, lors de la génération des gènes, pourrait faire gagner un temps important et serait une bonne amélioration à apporter au programme. Une fois que les clients ont évalué les chromosomes, ils envoient les "gagnants" aux serveur qui génére la génération suivant à évaluer, et ainsi de suite jusqu'à ce qu'on arrive à la fin. A ce point là, le serveur évalue tous les individus de la génération finale (pour que les temps soit cohérents, seul le serveur procède à l'évaluation), les trie par temps d'exécution en micro secondes, et les affiche ainsi que le résultat original (ou alors dans le fichier de log s'il y en a un spécifié dans les arguments de pypsearch)
+
+Lorsqu'on choisit d'utiliser le modèle client/serveur, voilà le genre de commandes que l'on doit passer côté serveur:
+    python pypsearch.py --CPPFLAGS='-lm -Iinclude/fulguro' --gens=8 --server=1 --port=1080 fulguro_convol_3x3.c --slaves=2
+Et côté client:
+    python pypsearch.py --host=localhost:1080
+
+Lorsqu'on travaille sur le même ordinateur. Sinon, changer localhost par l'IP de l'ordinateur sur le réseau.
