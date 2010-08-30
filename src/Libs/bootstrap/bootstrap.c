@@ -5366,14 +5366,6 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {OMP_PARALLEL_FUNCTION_NAME,         0, default_intrinsic_type, 0, 0},
   {OMP_REDUCTION_FUNCTION_NAME,(INT_MAX), default_intrinsic_type, 0, 0},
 
-#include "STEP_RT_bootstrap.h"
-
-  /* F95 */
-  {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
   /* BSD <err.h> */
   {ERR_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
   {ERRX_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
@@ -5383,6 +5375,24 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {VERRX_FUNCTION_NAME, 3, overloaded_to_void_type, 0, 0},
   {VWARN_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0},
   {VWARNX_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0},
+
+#include "STEP_RT_bootstrap.h"
+
+  /* F95 */
+  {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
+  /* PIPS run-time support for C code generation
+   *
+   * Source code located in validation/Hyperplane/run_time.src for the
+   * time being.
+   */
+  {PIPS_C_MIN_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+   typing_function_int_to_int, 0},
+  {PIPS_C_MAX_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+   typing_function_int_to_int, 0},
 
   {NULL, 0, 0, 0, 0}
 };

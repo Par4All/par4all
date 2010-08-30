@@ -49,10 +49,11 @@
  *      DOALL Kp = ...
  *        ...
  *  ENDDO
- * modification : Keep the code in the sequential version. Let the parallelisation 
- * to generate the parallel code.
- * suggested by BB, modified by Yi-Qing. 17/05/92
- *  
+ *
+ * modification : Keep the code in the sequential version. Let the
+ * parallelisation to generate the parallel code.  suggested by BB,
+ * modified by Yi-Qing. 17/05/92
+ *
  */
 statement code_generation(list lls,
 			  Pvecteur pvg[],

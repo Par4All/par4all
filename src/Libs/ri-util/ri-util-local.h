@@ -444,9 +444,23 @@
 #define SRANDOM_FUNCTION_NAME           "srandom"
 #define MOD_INTRINSIC_NAME              "MOD"
 
+/* PIPS run-time support for C code generation
+ *
+ * The first argument is the number of effective arguments, the second
+ * argument is the first effective argument and other arguments are
+ * passed as varargs. For instance:
+ *
+ * pips_min(5, 1, 2, 3, 4, 5);
+ *
+ * Initially, the source code for these two operators is available in
+ * validation/Hyperplane/run_time.src/pips_run_time.c
+ */
+#define PIPS_C_MIN_OPERATOR_NAME        "pips_min"
+#define PIPS_C_MAX_OPERATOR_NAME        "pips_max"
 
 
- /* Here are C intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
+ /* Here are C intrinsics arranged in the order of the standard
+    ISO/IEC 9899:TC2. MB */
 /* include <assert.h> */
 
 #define ASSERT_FUNCTION_NAME            "__assert"

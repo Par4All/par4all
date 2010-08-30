@@ -957,7 +957,8 @@ entity entity_intrinsic(string name)
 						     NULL),
 					 entity_domain);
 
-  pips_assert("entity_intrinsic", e != entity_undefined  && intrinsic_entity_p(e));
+  pips_assert("entity_intrinsic", e != entity_undefined
+	      && intrinsic_entity_p(e));
   return(e);
 }
 
