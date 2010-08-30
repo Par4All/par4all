@@ -5,6 +5,7 @@ setenv NAME ${NAME:-$WSPACE}
 # props...
 setproperty ABORT_ON_USER_ERROR=TRUE
 setproperty FREIA_LABEL_ARCS=TRUE
+setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
 #setenv PIPS_HWAC_DEBUG_LEVEL=7
@@ -40,8 +41,8 @@ echo ! updated function for ${FREIA_TARGET}
 echo
 # code cleanup does not seem to work well
 #apply PARTIAL_EVAL[${NAME}]
-#apply SUPPRESS_DEAD_CODE[${NAME}]
 #apply USE_DEF_ELIMINATION[${NAME}]
+#apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}
