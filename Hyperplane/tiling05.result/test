@@ -1,0 +1,62 @@
+
+Execution of initial code
+
+
+Initial code before tiling
+
+int main()
+{
+   int n = 10;
+   int i, j;
+   float a[n][n];
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         if (i==0&&j>0&&j<n-1)
+            a[i][j] = (float) j;
+         else
+            a[i][j] = 0.;
+
+   for(i = 0; i <= 0; i += 1)
+      for(j = 1; j <= n-1-1; j += 1)
+         printf("a[%d][%d]=%f\n", i, j, a[i][j]);
+
+   tiling05(n, a);
+
+   for(i = n-1; i <= n-1; i += 1)
+      for(j = 1; j <= n-1-1; j += 1)
+         printf("a[%d][%d]=%f\n", i, j, a[i][j]);
+   return 0;
+}
+void tiling05(int n, float a[n][n])
+{
+   int i, j;
+
+l100:
+   for(i = 1; i <= n-1; i += 1)
+      for(j = 1; j <= n-1-1; j += 1)
+         a[i][j] = 0.25*(a[i-1][j-1]+2*a[i-1][j]+a[i-1][j+1]);
+}
+
+After tiling
+
+void tiling05(int n, float a[n][n])
+{
+   int i, j;
+   //PIPS generated variable
+   int i_t, j_t;
+
+l100:
+   for(i_t = (-n+3)/10; i_t <= (n-2)/10; i_t += 1)
+      for(j_t = pips_max(2, -i_t-1, i_t); j_t <= pips_min(3, (-5*i_t+n-2)/5, (5*i_t+n+1)/5, (n-3)/5); j_t += 1)
+
+         for(i = 1; i <= n-1; i += 1)
+            for(j = pips_max(3, -i+10*j_t+2, i-10*i_t-9, 1); j <= pips_min(3, -i+10*j_t+11, i-10*i_t, n-2); j += 1)
+               a[i][j] = 0.25*(a[i-1][j-1]+2*a[i-1][j]+a[i-1][j+1]);
+}
+
+Execution of tiled code
+
+
+Differences if any
+
