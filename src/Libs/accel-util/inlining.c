@@ -180,28 +180,30 @@ static statement expanded;
 static void
 solve_name_clashes(statement s, entity new)
 {
-    list l = statement_declarations(s);
-    set re = get_referenced_entities(s);
-    for(;!ENDP(l);POP(l))
-    {
-        entity decl_ent = ENTITY(CAR(l));
-        if( same_string_p(entity_user_name(decl_ent), entity_user_name(new)))
+    if(!implicit_c_variable_p(new)) {
+        list l = statement_declarations(s);
+        set re = get_referenced_entities(s);
+        for(;!ENDP(l);POP(l))
         {
-            entity solve_clash = copy_entity(decl_ent);
-            string ename = strdup(entity_name(solve_clash));
-            do {
-                string tmp;
-                asprintf(&tmp,"%s_",ename);
-                free(ename);
-                ename=tmp;
-                entity_name(solve_clash)=ename;
-            } while( has_similar_entity(solve_clash,re));
-            CAR(l).p = (void*)solve_clash;
-            replace_entity(expanded,decl_ent,solve_clash);
-            gen_recurse_stop(0);
+            entity decl_ent = ENTITY(CAR(l));
+            if( same_string_p(entity_user_name(decl_ent), entity_user_name(new)))
+            {
+                entity solve_clash = copy_entity(decl_ent);
+                string ename = strdup(entity_name(solve_clash));
+                do {
+                    string tmp;
+                    asprintf(&tmp,"%s_",ename);
+                    free(ename);
+                    ename=tmp;
+                    entity_name(solve_clash)=ename;
+                } while( has_similar_entity(solve_clash,re));
+                CAR(l).p = (void*)solve_clash;
+                replace_entity(expanded,decl_ent,solve_clash);
+                gen_recurse_stop(0);
+            }
         }
+        set_free(re);
     }
-    set_free(re);
 }
 
 /* return true if an entity declared in `iter' is static to `module'
@@ -419,7 +421,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         bool did_something = false;
         FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
         {
-            if(!entity_area_p(e))
+            if(!entity_area_p(e) && !implicit_c_variable_p(e))
             {
                 entity new;
                 if(entity_variable_p(e)) {
@@ -539,7 +541,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             expression from = EXPRESSION(CAR(c_iter));
 
             /* check if there is a write effect on this parameter */
-            bool need_copy = (!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e);
+            bool need_copy = !implicit_c_variable_p(e) && ((!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e));
 
             /* generate a copy for this parameter */
             entity new = entity_undefined;
@@ -672,7 +674,7 @@ reget:
                 /* check wether the substitution will cause naming clashes
                  * then perform the substitution
                  */
-                    gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
+                    if(!implicit_c_variable_p(e)) gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
                     if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
                     else replace_entity(expanded ,e,new);
                     pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
