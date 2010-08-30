@@ -107,12 +107,11 @@ typedef struct {
 static void entity_used_somewhere_walker(statement s, entity_used_somewhere_param *p)
 {
     list effects =load_cumulated_rw_effects_list(s);
-    FOREACH(EFFECT,eff,effects)
-        if(effect_read_p(eff) && entities_may_conflict_p(reference_variable(effect_any_reference(eff)),p->e))
+    if(effects_read_variable_p(effects,p->e))
         { p->result = true; gen_recurse_stop(0); }
 }
 
-static bool entity_used_somewhere_p(entity e, statement in)
+static bool entity_read_somewhere_p(entity e, statement in)
 {
     entity_used_somewhere_param p = { e, false };
     gen_context_recurse(in,&p,statement_domain,gen_true,entity_used_somewhere_walker);
@@ -126,10 +125,10 @@ static void remove_unread_variables(statement s)
         {
             if(entity_variable_p(e)) {
                 if(!entity_may_conflict_with_a_formal_parameter_p(e,get_current_module_entity()) && /* it is useless to try to remove formal parameters */
-                        !entity_pointer_p(e) ) /* and we cannot afford removing something that may implies aliasing */
+                        entity_scalar_p(e) ) /* and we cannot afford removing something that may implies aliasing */
                 {
-                    bool entity_read = entity_used_somewhere_p(e,s);
-                    if(!entity_read) /* the entity is never read it is disposable */
+                    bool effects_read_variable = entity_read_somewhere_p(e,s);
+                    if(!effects_read_variable)/* the entity is never read it is disposable */
                         gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
                 }
             }
