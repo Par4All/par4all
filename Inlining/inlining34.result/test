@@ -29,7 +29,7 @@ int main()
    _return0;
    {
       //PIPS generated variable
-      char I_0;
+      int I_0;
       I_0 = sizeof(char);
       printf("%d.", I_0);
       _return1 = I_0;

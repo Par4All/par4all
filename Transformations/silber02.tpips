@@ -1,0 +1,91 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete silber02
+create silber02 silber02.c include/adds.c
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+activate REGION_CHAINS
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after transformations to come...
+echo
+
+module transfo
+
+apply UNFOLDING
+display PRINTED_FILE
+
+apply SPLIT_INITIALIZATIONS
+display PRINTED_FILE
+
+apply FORWARD_SUBSTITUTE
+display PRINTED_FILE
+
+#setproperty COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS FALSE
+#apply COMMON_SUBEXPRESSION_ELIMINATION
+#apply PARTIAL_EVAL
+#display PRINTED_FILE
+
+
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+
+# missing loop_fusion
+# missing saturated arith detection
+# missing loop coalescing
+# sould add loop_interchange somewhere
+
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+apply FLAG_LOOPS
+display PRINTED_FILE
+
+setproperty LOOP_LABEL "l99995"
+apply LOOP_FUSION
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+setproperty LOOP_LABEL "l99995"
+apply LOOP_FUSION
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+
+
+setproperty FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN TRUE
+apply FORWARD_SUBSTITUTE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+apply PARTIAL_EVAL[adds]
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "adds"
+apply EXPRESSION_SUBSTITUTION[transfo]
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -O3 silber02.c -o silber02.database/Tmp/ref
+shell cc -O3 include/adds.c silber02.database/Src/silber02.c -o silber02.database/Tmp/out
+shell ./silber02.database/Tmp/ref include/input.pgm include/mapfile.amp silber02.database/Tmp/ref.pgm
+shell ./silber02.database/Tmp/out include/input.pgm include/mapfile.amp silber02.database/Tmp/out.pgm
+shell cmp silber02.database/Tmp/ref.pgm silber02.database/Tmp/out.pgm
+
+close
+delete silber02
+quit
+
