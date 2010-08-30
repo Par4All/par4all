@@ -7168,6 +7168,17 @@ Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give
 % FULL_UNROLL_INTERACTIVELY TRUE
 % \end{PipsProp}
 % }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% fusion
+\subsection{Loop Fusion}
+\begin{PipsPass}{force_loop_fusion}
+Force loop fusion without any check between loop \PipsPropRef{LOOP_LABEL} and following loop,
+that must share an iteration space with it.
+\end{PipsPass}
+\begin{PipsMake}
+force_loop_fusion > MODULE.code
+        < PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% STRIP MINING

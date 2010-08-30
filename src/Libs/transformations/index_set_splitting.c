@@ -228,4 +228,74 @@ bool index_set_splitting(char* module_name)
     return true;
 }
 
+static bool try_loop_fusion(statement s0, statement s1) {
+    loop l0 = statement_loop(s0),
+         l1 = statement_loop(s1);
+    statement base=s1;
+
+    if(range_equal_p(loop_range(l0),loop_range(l1))) {
+        hash_table renaming = hash_table_make(set_pointer,HASH_DEFAULT_SIZE);
+        do {
+            if(!same_entity_p(loop_index(l0), loop_index(l1)))
+                hash_put(renaming,loop_index(l1),loop_index(l0));
+            s0=loop_body(l0);
+            s1=loop_body(l1);
+        } while(statement_loop_p(s0)&&statement_loop_p(s1) && 
+                range_equal_p(loop_range(l0=statement_loop(s0)),loop_range(l1=statement_loop(s1))) );
+        replace_entities(base,renaming);
+        hash_table_free(renaming);
+        insert_statement(s0,s1,false);
+        loop_body(l1)=statement_undefined;
+        return true;
+    }
+    return false;
+}
+
+static void do_loop_fusion_walker(sequence seq, entity lbl) {
+    for(list iter = sequence_statements(seq);!ENDP(iter);POP(iter)) {
+        statement st = STATEMENT(CAR(iter));
+        if(same_entity_p(statement_label(st),lbl)) {
+            /* look for loop to merge */
+            statement next = statement_undefined;
+            if(!ENDP(CDR(iter))) {
+                next = STATEMENT(CAR(CDR(iter)));
+                /* verify it is a good candidate */
+                if(statement_loop_p(next)) {
+                    if(try_loop_fusion(st,next))
+                        update_statement_instruction(next,make_continue_instruction());
+                }
+            }
+            gen_recurse_stop(0);
+        }
+    }
+}
+
+static void do_loop_fusion(entity lbl) {
+    gen_context_recurse(get_current_module_statement(),lbl,sequence_domain,gen_true,do_loop_fusion_walker);
+}
+
+/* loop_fusion */
+bool force_loop_fusion(char * module_name) {
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* get the loop */
+    string loop_label = get_string_property("LOOP_LABEL");
+    entity loop_label_entity = entity_undefined;
+    if( string_undefined_p( loop_label ) || 
+            entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) )
+        pips_user_error("please set LOOP_LABEL property to a valid label\n");
+    /* do the job */
+    do_loop_fusion(loop_label_entity);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+}
 
