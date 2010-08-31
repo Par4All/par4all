@@ -41,6 +41,11 @@
   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
     FI, 25/12/96
   - Fortran specification conformant typing of expressions...
+  
+  Molka Becher (MB), June 2010
+  - Check of C intrinsics already added
+  - Add of missing C intrinsics according to ISO/IEC 9899:TC2
+  - Add of functions handling long double type and long double complex type
 
   Molka Becher (MB), June 2010
   - Check of C intrinsics already added
@@ -284,6 +289,15 @@ static void CreateHeapAbstractState()
 {
   entity as =
     CreateAbstractStateVariable(MALLOC_EFFECTS_PACKAGE_NAME, MALLOC_EFFECTS_NAME);
+
+  add_thread_safe_variable(as);
+  add_abstract_state_variable(as);
+}
+//Molka Becher : Added to handle Memmove function.
+static void CreateMemmoveAbstractState()
+{
+  entity as =
+    CreateAbstractStateVariable(MEMMOVE_EFFECTS_PACKAGE_NAME, MEMMOVE_EFFECTS_NAME);
 
   add_thread_safe_variable(as);
   add_abstract_state_variable(as);
@@ -5554,10 +5568,14 @@ bootstrap(string workspace)
 
      seed for random function package
 
-     heap bastract state
+     heap abstract state
   */
   CreateRandomSeed();
   CreateHeapAbstractState();
+  /* Create hidden variable to modelize the abstract state of :
+     temporary arry for memmove function. Molka Becher
+  */
+  CreateMemmoveAbstractState();
 
   /* Create the empty label */
   (void) make_entity(strdup(concatenate(TOP_LEVEL_MODULE_NAME,
