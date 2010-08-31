@@ -38,10 +38,10 @@
  *
  * Molka Becher (MB), May-June 2010
  *
- * Reordering of the existing intrinsics according to ISO/IEC 9899
- * Add of missing C Intrinsics 
- *
- *
+ * - Reordering of the existing intrinsics according to ISO/IEC 9899
+ * - Add of missing C Intrinsics 
+ * - Add of generic_string_effects and memmove_effects for handling string.h 
+ * effects
  */
 
 #include <stdio.h>
@@ -100,6 +100,11 @@ static list rgs_effects(entity e,list args);
 static list rgsi_effects(entity e,list args);
 static list any_heap_effects(entity e,list args);
 static list va_list_effects(entity e, list args);
+/* MB */
+static list generic_string_effects(entity e,list args);
+static list memmove_effects(entity e, list args);
+
+
 
 /* the following data structure indicates wether an io element generates
 a read effects or a write effect. the kind of effect depends on the
@@ -263,6 +268,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {SELECT_FUNCTION_NAME,        "nrrrr",   is_action_read, is_approximation_must},
   {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_must},
   {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_must},
+
 
   /* wchar.h */
 
@@ -447,8 +453,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ENDFILE_FUNCTION_NAME,                  io_effects},
   {IMPLIED_DO_NAME,                        effects_of_implied_do},
 
-  {SUBSTRING_FUNCTION_NAME,    substring_effect},
-  {ASSIGN_SUBSTRING_FUNCTION_NAME, assign_substring_effects},
+  {SUBSTRING_FUNCTION_NAME,                substring_effect},
+  {ASSIGN_SUBSTRING_FUNCTION_NAME,         assign_substring_effects},
 
   /* These operators are used within the OPTIMIZE transformation in
      order to manipulate operators such as n-ary add and multiply or
@@ -985,17 +991,17 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
    /*#include <string.h>*/
 
-  {MEMCPY_FUNCTION_NAME,                   no_write_effects},
-  {MEMMOVE_FUNCTION_NAME,                  no_write_effects},
-  {STRCPY_FUNCTION_NAME,                   no_write_effects},
-  {STRNCPY_FUNCTION_NAME,                  no_write_effects},
-  {STRCAT_FUNCTION_NAME,                   no_write_effects},
-  {STRNCAT_FUNCTION_NAME,                  no_write_effects},
+  {MEMCPY_FUNCTION_NAME,                   generic_string_effects},
+  {MEMMOVE_FUNCTION_NAME,                  generic_string_effects},
+  {STRCPY_FUNCTION_NAME,                   generic_string_effects},
+  {STRNCPY_FUNCTION_NAME,                  generic_string_effects},
+  {STRCAT_FUNCTION_NAME,                   generic_string_effects},
+  {STRNCAT_FUNCTION_NAME,                  generic_string_effects},
   {MEMCMP_FUNCTION_NAME,                   no_write_effects},
   {STRCMP_FUNCTION_NAME,                   no_write_effects},
   {STRCOLL_FUNCTION_NAME,                  no_write_effects},
   {STRNCMP_FUNCTION_NAME,                  no_write_effects},
-  {STRXFRM_FUNCTION_NAME,                  no_write_effects},
+  {STRXFRM_FUNCTION_NAME,                  generic_string_effects},
   {MEMCHR_FUNCTION_NAME,                   no_write_effects},
   {STRCHR_FUNCTION_NAME,                   no_write_effects},
   {STRCSPN_FUNCTION_NAME,                  no_write_effects},
@@ -1004,7 +1010,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {STRSPN_FUNCTION_NAME,                   no_write_effects},
   {STRSTR_FUNCTION_NAME,                   no_write_effects},
   {STRTOK_FUNCTION_NAME,                   no_write_effects},
-  {MEMSET_FUNCTION_NAME,                   no_write_effects},
+  {MEMSET_FUNCTION_NAME,                   generic_string_effects},
   {STRERROR_FUNCTION_NAME,                 no_write_effects},
   {STRERROR_R_FUNCTION_NAME,               no_write_effects}, 
   {STRLEN_FUNCTION_NAME,                   no_write_effects},
@@ -1894,6 +1900,97 @@ static list c_io_effects(entity e, list args)
   return generic_io_effects(e, args, FALSE);
 }
 
+
+/*Molka Becher: generic_string_effects to encompass the C string.h intrinsics*/
+
+static list 
+generic_string_effects(entity e, list args)
+{
+  list le = NIL, lep = NIL, lep1=NIL;
+  int i=0;
+  effect ef= effect_undefined;
+  expression ie= expression_undefined;
+  reference ref=reference_undefined;
+  action a=action_undefined;
+ 
+  pips_debug(5, "begin\n");
+
+  //if entity is memmove intrinsic
+  if (strcmp(entity_user_name(e),"memmove")==0)
+    { lep1=memmove_effects(e, args);
+      le=gen_nconc(le,lep1);
+    }
+
+  FOREACH(EXPRESSION, arg, args)
+    { 
+
+      if (i==0) // if 1st argument
+	{ ref= copy_reference(expression_reference(copy_expression(arg)));
+ 	  entity et= reference_variable(ref);
+ 	  if (entity_constant_p(et))  //if 1st argument is a constant value
+	    pips_user_error ("First argument of %s shouldn't be a constant value!\n",entity_user_name(e));
+	}
+      if ((i==1 && gen_length(args)==2) || (i==2)) // 3rd argument: arg==arg3
+	{
+	  a= make_action_write_memory();
+
+	  /* Effect is on arg1[0..arg3-1]*/
+
+	  expression arg1 = EXPRESSION(CAR(args));
+	  
+	  if (expression_reference_p(arg1))
+	    {
+	      ref = copy_reference(expression_reference(arg1));
+	      if (gen_length(args)==3)
+		{expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				                copy_expression(arg),
+					        int_to_expression(1));
+		 range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		 ie = make_expression(make_syntax_range(r),make_normalized_complex());
+		}
+	      else // Number of arguments = 2, for processing a function like strcpy (char * restrict s1, const char * restrict s2);
+		{ie= make_unbounded_expression();
+		}
+	      reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
+	      ef= (*reference_to_effect_func)(ref,a,FALSE);
+	    }
+	  else
+	    { //if it's a call of another function & not a reference
+	      ef= make_anywhere_effect(a);
+	    }
+
+	   lep = NIL;
+	   lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
+        }
+      if ((i==1 || i==2) && expression_reference_p(copy_expression(arg))) // if  2nd or 3rd argument are references
+	 {
+	  a= make_action_read_memory();
+	  ref=copy_reference(expression_reference(copy_expression(arg)));
+	  ie=make_unbounded_expression();
+	  reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
+	  ef= (*reference_to_effect_func)(ref,a,FALSE);
+	  lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
+
+	 }
+
+      i=i+1;
+          
+      le = gen_nconc(le, lep);   
+
+      ifdebug(8)
+	{
+	  pips_debug(8, "effects for argument %s :\n",
+		     words_to_string(words_expression(arg,NIL)));
+	  (*effects_prettyprint_func)(lep);
+	}
+    }
+
+
+  pips_debug(5, "end\n");
+
+  return(le);
+}
+
 /* To handle the effects of random functions. Amira Mensi*/
 static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bool init_p)
 {
@@ -1947,7 +2044,8 @@ static list rgs_effects(entity e, list args)
   return any_rgs_effects( e, args, FALSE);
 }
 
-/* To handle the effects of heap related functions. */
+/* To handle the effects of heap related functions. 
+   CreateHeapAbstractState() is done in bootstrap.c */
 static list any_heap_effects(entity e, list args)
 {
   list le = NIL;
@@ -1983,6 +2081,51 @@ static list any_heap_effects(entity e, list args)
   /* Write back. */
   malloc_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
   le = CONS(EFFECT, malloc_effect, le);
+
+  pips_debug_effects(5, "output effects :\n", le);
+
+  return(le);
+}
+
+/* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses 
+   a temporary array to copy characters from one object to another. C99
+   Note : CreateMemmoveAbstractState() is defined in bootstrap.c  */
+static list memmove_effects(entity e, list args)
+{
+  list le = NIL;
+  list lep = NIL;
+  entity memmove_entity = entity_undefined;
+  reference ref;
+  effect memmove_effect;
+
+  pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
+
+/*   MAP(EXPRESSION,exp,{ */
+/*     lep = generic_proper_effects_of_expression(exp); */
+/*     le = gen_nconc(le, lep); */
+/*     //ifdebug(8) print_effects(le); */
+/*     //ifdebug(8) print_effects(lep); */
+/*   }, args); */
+
+  memmove_entity = global_name_to_entity
+    (MEMMOVE_EFFECTS_PACKAGE_NAME,
+     MEMMOVE_EFFECTS_NAME);
+
+  pips_assert("memmove entity pre-exists", !entity_undefined_p(memmove_entity));
+
+  ref = make_reference(memmove_entity, NIL);
+
+  ifdebug(8) print_reference(ref);
+
+  /* Write First. */
+  memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
+  le = CONS(EFFECT, memmove_effect, le);
+
+  /* Read Back. */
+  memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_read_memory(), false);
+
+  le = CONS(EFFECT, memmove_effect, le);
+
 
   pips_debug_effects(5, "output effects :\n", le);
 
