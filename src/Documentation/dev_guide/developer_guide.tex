@@ -553,7 +553,7 @@ svn diff https://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
   First, you must bring your branch up-to-date with respect to the
   \texttt{trunk}, which is the \texttt{merge} described above.
   Then you can reintegrate your changes to the \texttt{trunk}:
-  {\small
+{\small
 \begin{verbatim}
 sh> cd prod/pips  # cd in your pips trunk copy, or better a fresh copy
 sh> svn mergeinfo \
@@ -565,17 +565,24 @@ sh> svn merge \
   --reintegrate
 # consider options -x -b or -x -w
 # to ignore space-related changes
+# there should be no issue found on a reintegration.
 sh> svn status
-# there should be no issue on a reintegration.
+# the status or diff should reflect the branch changes.
+# the ' M .' reflects the changes of branch bookkeeping informations.
+# DO NOT EDIT ANY OF THE FILE
+# DO NOT COMMIT FILES SEPARATELY
+# you may need to do additional "svn up" if there are external
+# commits between the merge & its commit.
 sh> svn commit
 \end{verbatim}
-  }
+}
 
-  \textbf{CAUTION!} it is important to merge at the \texttt{trunk}
-  level. If the merging is done on a subdirectory, it breaks svn merge
-  bookkeeping used my the automatic mergings and reintegration because
-  \texttt{svn:mergeinfo} properties are added on these subdirectories:
-  when set, they must be manually removed in order to fix.
+  \textbf{CAUTION!} it is important to merge and commit at the
+  \texttt{trunk} level, all in one go.
+  If the merging or commit is done on a subdirectory, it breaks svn
+  merge bookkeeping used my the automatic mergings and reintegration
+  because \texttt{svn:mergeinfo} properties are added on these
+  subdirectories: when set, they must be manually removed in order to fix.
 
 \item When your are fully done with your branch, you may remove it.
   {\small
