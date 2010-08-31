@@ -46,6 +46,8 @@
  * --------------
  * Molka Becher (MB), June 2010
  * - Add and Check of definition of C Intrinsics (#define)
+ * - Add of definition of QuadPrecision type and LongDoubleComplex type
+ * - Add of package & variable names for memmove intrinsic (string.h)
  */
 
 
@@ -1822,6 +1824,10 @@ the variable is unsigned, signed or not */
 #define MALLOC_EFFECTS_PACKAGE_NAME "_MALLOC_EFFECTS"
 /* variable name for heap effects */
 #define MALLOC_EFFECTS_NAME "_MALLOC_"
+/* package name for memmove routines */
+#define MEMMOVE_EFFECTS_PACKAGE_NAME "_MEMMOVE_EFFECTS"
+/* variable name for memmove unit */
+#define MEMMOVE_EFFECTS_NAME "_MEMMOVE_"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
 /* To express C IO intrinsics effects */
