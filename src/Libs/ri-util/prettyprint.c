@@ -662,9 +662,29 @@ list words_subscript_range(range obj, list pdl) {
         }
         break;
       }
-      case is_language_c:
-        pips_internal_error("I don't know how to print a range in C !");
+      case is_language_c: 
+	// T is no way to print range in C 
+	// The notation with ":" has been chosen to simplify prettyprint
+      {
+        // Print the lower bound if != *
+        if(!unbounded_expression_p(range_lower(obj))) {
+          pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        }
+
+        // Print the upper bound if != *
+        pc = CHAIN_SWORD(pc,":");
+        if(!unbounded_expression_p(range_upper(obj))) {
+          pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        }
+
+        // Print the increment if != 1
+        call c = syntax_call(expression_syntax(range_increment(obj)));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,":");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
         break;
+      }
       default:
         pips_internal_error("Language unknown !");
         break;
