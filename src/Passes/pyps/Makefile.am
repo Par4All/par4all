@@ -12,6 +12,11 @@ pipsmakeenvdir = $(libdir)/pips-make
 pipsmakeenv_SCRIPTS = gcc ar
 
 dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py utils.py pyrops.py
+
+if WITH_PYPS_EXTRA
+	dist_pkgpython_PYTHON += pyrops.py
+endif
+
 nodist_pkgpython_PYTHON=pypips.py
 pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c

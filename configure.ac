@@ -148,7 +148,9 @@ AX_ARG_ENABLE([pyps-extra],
 			[no],
 			[
 			 AX_CHECK_PROG([ipython])
-			 AX_DEPENDS([pyps-extra],[pyps ipython])
+			 AX_CHECK_PROG([noweave])
+			 AX_CHECK_PROG([pyro-ns]) #Lazy way of checking Pyro existence
+			 AX_DEPENDS([pyps-extra],[pyps ipython noweave pyro-ns])
 			]
 )
 
@@ -202,11 +204,6 @@ AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
 AC_CONFIG_FILES([pips_config.h
 				 Makefile
 				 pips.pc
-				 src/Documentation/Makefile
-				 src/Documentation/constants/Makefile
-				 src/Documentation/help/Makefile
-				 src/Documentation/newgen/Makefile
-				 src/Documentation/pipsmake/Makefile
 				 src/Libs/Makefile
 				 src/Libs/alias-classes/Makefile
 				 src/Libs/atomizer/Makefile
@@ -271,7 +268,6 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/Makefile
 				 src/Passes/pyps/drivers/sac/Makefile
 				 src/Passes/pyps/drivers/workspace_gettime/Makefile
-				 src/Passes/pyps/drivers/pypsearch/Makefile
 				 src/Passes/tpips/Makefile
 				 src/Runtimes/Makefile
 				 src/Scripts/Makefile
@@ -282,6 +278,11 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Scripts/simple_tools/pips_f2openmp
 				 src/Scripts/validation/Makefile
 				 src/Scripts/misc/Makefile
+				 src/Documentation/Makefile
+				 src/Documentation/constants/Makefile
+				 src/Documentation/help/Makefile
+				 src/Documentation/newgen/Makefile
+				 src/Documentation/pipsmake/Makefile
 				 src/Documentation/dev_guide/Makefile
 				 src/Documentation/auto_pips/Makefile
 				 src/Documentation/tpips-user-manual/Makefile
@@ -290,6 +291,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Documentation/faq/Makefile
 				 src/Documentation/xpomp/Makefile
 				 src/Documentation/manl/Makefile
+				 src/Documentation/pyps/Makefile
 				 ])
 				
 				 #src/Documentation/doxygen/Makefile
