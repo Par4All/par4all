@@ -149,8 +149,8 @@ AX_ARG_ENABLE([pyps-extra],
 			[
 			 AX_CHECK_PROG([ipython])
 			 AX_CHECK_PROG([noweave])
-			 AX_CHECK_PROG([pyro-ns]) #Lazy way of checking Pyro existence
-			 AX_DEPENDS([pyps-extra],[pyps ipython noweave pyro-ns])
+			 AX_PYTHON_MODULE([Pyro]) 
+			 AX_DEPENDS([pyps-extra],[pyps ipython noweave Pyro])
 			]
 )
 
@@ -204,6 +204,9 @@ AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
 AC_CONFIG_FILES([pips_config.h
 				 Makefile
 				 pips.pc
+
+				 src/Makefile
+
 				 src/Libs/Makefile
 				 src/Libs/alias-classes/Makefile
 				 src/Libs/atomizer/Makefile
@@ -258,7 +261,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Libs/paf-util/Makefile
 				 src/Libs/wp65/Makefile
 				 src/Libs/gnulib/Makefile
-				 src/Makefile
+
 				 src/Passes/Makefile
 				 src/Passes/fortran95/Makefile
 				 src/Passes/gpips/Makefile
@@ -270,7 +273,9 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/workspace_gettime/Makefile
 				 src/Passes/pyps/drivers/pypsearch/Makefile
 				 src/Passes/tpips/Makefile
+
 				 src/Runtimes/Makefile
+
 				 src/Scripts/Makefile
 				 src/Scripts/drivers/Makefile
 				 src/Scripts/hpfc/Makefile
@@ -279,6 +284,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Scripts/simple_tools/pips_f2openmp
 				 src/Scripts/validation/Makefile
 				 src/Scripts/misc/Makefile
+
 				 src/Documentation/Makefile
 				 src/Documentation/constants/Makefile
 				 src/Documentation/help/Makefile
