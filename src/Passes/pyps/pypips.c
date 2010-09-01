@@ -47,13 +47,44 @@
 
 #include "top-level.h"
 
+static FILE * logstream = NULL;
+static void pyps_log_handler(const char *fmt, va_list args)
+{
+	FILE * log_file = get_log_file();
+
+	/* It goes to stderr to have only displayed files on stdout.
+	 */
+
+	/* To be C99 compliant, a va_list can be used only once...
+		 Also to avoid exploding on x86_64: */
+	va_list args_copy;
+	va_copy (args_copy, args);
+
+	vfprintf(logstream, fmt, args);
+	fflush(logstream);
+
+	if (!log_file || !get_bool_property("USER_LOG_P"))
+		return;
+
+	if (vfprintf(log_file, fmt, args_copy) <= 0) {
+		perror("user_log");
+		abort();
+	}
+	else fflush(log_file);
+}
+
 void atinit()
 {
     /* init various composants */
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
-    pips_log_handler = smart_log_handler;
+    pips_log_handler = pyps_log_handler;
     set_exception_callbacks(push_pips_context, pop_pips_context);
+}
+
+void verbose(int on) {
+    if(on) logstream=stderr;
+    else logstream=fopen("/dev/null","w");
 }
 
 
@@ -104,9 +135,20 @@ void quit()
 
 void set_property(char* propname, char* value)
 {
+    /* nice hack to temporarly redirect stderr */
+    int saved_stderr = dup(STDERR_FILENO);
+    char *buf;
+    freopen("/dev/null","w",stderr);
+    asprintf(&buf, "/dev/fd/%d", saved_stderr);
     if (!safe_set_property(propname, value)) {
+        freopen(buf,"w",stderr);
+        free(buf);
         pips_user_error("error in setting property %s to %s\n",
 			propname, value);
+    }
+    else {
+        freopen(buf,"w",stderr);
+        free(buf);
     }
 }
 

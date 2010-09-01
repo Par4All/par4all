@@ -103,13 +103,13 @@ class module:
 		callers=self._ws.cpypips.get_callers_of(self.name)
 		if not callers:
 			return []
-		return callers.split(" ")
+		return [ self._ws[name] for name in callers.split(" ") ]
 
 	def callees(self):
 		callees=self._ws.cpypips.get_callees_of(self.name)
 		if not callees:
 			return []
-		return callees.split(" ")
+		return [ self._ws[name] for name in callees.split(" ") ]
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
@@ -205,14 +205,17 @@ class workspace(object):
 		exist.
 		"""
 
-	def __init__(self,sources2,name="",activates=[],verboseon=True,cppflags='', parents=[], cpypips = None, recoverInclude=True):
-		kwargs = {'name':name, 'activates':activates, 'verboseon':verboseon, 'cppflags':cppflags, 'parents':parents, 'recoverInclude':parents }
+	def __init__(self,sources2,name="",activates=[],verbose=True,cppflags='', parents=[], cpypips = None, recoverInclude=True):
+		kwargs = {'name':name, 'activates':activates, 'verbose':verbose, 'cppflags':cppflags, 'parents':parents, 'recoverInclude':parents }
 
 		if cpypips == None:
 			cpypips = pypips
 		self.cpypips = cpypips
 
 		self.recoverInclude=recoverInclude
+		self.verbose=verbose
+		if verbose:	self.cpypips.verbose(1)
+		else:	self.cpypips.verbose(0)
 
 		#In case the subworkspaces need to add files, the variable passed in parameter will only
 		#be modified here and not in the scope of the caller
@@ -264,7 +267,7 @@ class workspace(object):
 			cpypips.delete_workspace(name)
 			raise
 
-		if not verboseon:
+		if not verbose:
 			self.props.NO_USER_WARNING = True
 			self.props.USER_LOG_P = False
 		self.props.MAXIMUM_USER_ERROR = 42  # after this number of exceptions the programm will abort
