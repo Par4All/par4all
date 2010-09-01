@@ -122,6 +122,8 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	    && value_unknown_p(entity_initial(nvar))) {
 	  expression ie = variable_initial_expression(var);
 	  statement is = make_assign_statement(entity_to_expression(nvar), ie);
+      gen_context_recurse(ie,renamings,
+                        reference_domain, gen_true, rename_reference);
 
 	  inits = gen_nconc(inits, CONS(statement, is, NIL));
 
@@ -159,6 +161,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 			CONS(statement, instruction_to_statement(old), NIL));
       ifdebug(1)
 	print_statements(inits);
+#if 0
       if(get_bool_property("C89_CODE_GENERATION")) {
 	/* The initializations must be inserted at the right place,
 	   which may prove impossible if some of the initializations
@@ -169,7 +172,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	*/
 	pips_internal_error("C89 flattened code not generated yet\n");
       }
-      else { /* C99*/
+      else
+#endif
+      { /* C99*/
 	statement_instruction(s) =
 	  make_instruction_sequence(make_sequence(inits));
     statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
@@ -177,9 +182,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	  string c = statement_comments(s);
 	  statement fs = STATEMENT(CAR(inits));
 	  statement_comments(fs) = c;
-	  /* FI: should be a call to defined_empty_comments() or
-	     something like it. Currently, empty_comments is a macro
-	     and its value is string_undefined:-( */
+         /* FI: should be a call to defined_empty_comments() or
+            something like it. Currently, empty_comments is a macro
+            and its value is string_undefined:-( */
 	  statement_comments(s) = strdup("");
 	}
       }
