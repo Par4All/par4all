@@ -2093,7 +2093,6 @@ static list any_heap_effects(entity e, list args)
 static list memmove_effects(entity e, list args)
 {
   list le = NIL;
-  list lep = NIL;
   entity memmove_entity = entity_undefined;
   reference ref;
   effect memmove_effect;
