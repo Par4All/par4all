@@ -1,0 +1,20 @@
+just check parsing
+void run(data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range, size_t rangex, size_t rangey, int nb, town pt[rangex][rangey], town t[nb])
+{
+   size_t i, j, k;
+
+   fprintf(stderr, "begin computation ...\n");
+
+   for(i = 0; i <= rangex-1; i += 1)
+      for(j = 0; j <= rangey-1; j += 1) {
+         pt[i][j][0] = (xmin+step*i)*180/3.14159265358979323846;
+         pt[i][j][1] = (ymin+step*j)*180/3.14159265358979323846;
+         pt[i][j][2] = 0.;
+         for(k = 0; k <= nb-1; k += 1) {
+            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(t[k][0])*cos(ymin+step*j-t[k][1])+sin(xmin+step*i)*sin(t[k][0]));
+            if (tmp<range) 
+               pt[i][j][2] += t[k][2]/(1+tmp);
+         }
+      }
+   fprintf(stderr, "end computation ...\n");
+}

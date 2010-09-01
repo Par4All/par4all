@@ -46,15 +46,21 @@ int main()
    int c[10] = {0};
    int a = 2;
    //PIPS generated variable
-   int (*P_0)[10] = (int (*)[10]) 0;
+   int (*P_0)[10] = (int (*)[10]) 0, (*P_1)[10] = (int (*)[10]) 0, (*P_2)[10] = (int (*)[10]) 0, (*P_3)[10] = (int (*)[10]) 0;
 
    a = 0;
    b = 0;
    P4A_scmp_malloc(&P_0, sizeof(int[10])-1+1);
-   P4A_scmp_read(c, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_malloc(&P_1, sizeof(int[10])-1+1);
+   P4A_scmp_read(*P_1, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_malloc(&P_2, sizeof(int[10])-1+1);
+   P4A_scmp_write(*P_2, *P_1, sizeof(int[10])-1+1);
+   P4A_scmp_write(c, *P_2, sizeof(int[10])-1+1);
 
    P4A_scmp_kernel_0(&a, &b, *P_0);
-   P4A_scmp_write(c, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_malloc(&P_3, sizeof(int[10])-1+1);
+   P4A_scmp_write(*P_3, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_write(c, *P_3, sizeof(int[10])-1+1);
 
    P4A_scmp_kernel_1(&a, &b);
 
