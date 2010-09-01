@@ -34,7 +34,6 @@ int main (int argc, char **argv)
 		fprintf(out, "%ld\n", diff);
 		fclose(out);
 	}
-	fprintf(stderr, "time for %s: %ld\n", argv[0], diff);
 
 	return 0;
 }

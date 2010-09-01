@@ -43,9 +43,12 @@ define_MAX0 = """
 #endif
 
 #ifndef DBLE
-# define DBLE(a) (double(a))
+# define DBLE(a) ((double)(a))
 #endif
 
+#ifndef INT
+# define INT(a) ((int)(a))
+#endif
 /* End header automatically inserted by PYPS */
 """
 

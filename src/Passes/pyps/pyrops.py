@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", message="the md5 module is deprecated; use hashlib instead")
 import Pyro.core
 import copy
 import sys
@@ -70,7 +72,7 @@ class Launcher(Pyro.core.ObjBase):
 		if Launcher.daemon != None:
 			return;
 
-		Pyro.core.initServer()
+		Pyro.core.initServer(banner=0)
 		Launcher.daemon=Pyro.core.Daemon()
 	
 class Control(Pyro.core.ObjBase):
@@ -102,7 +104,7 @@ def main():
 	import pypips
 
 	#Create a new server
-	Pyro.core.initServer()
+	Pyro.core.initServer(banner=0)
 	daemon=Pyro.core.Daemon()
 
 	#Retrieve host launcher and give Workspace URI

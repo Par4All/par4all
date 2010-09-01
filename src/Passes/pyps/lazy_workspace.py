@@ -51,7 +51,7 @@ class workspace:
 			x.run(self.ws)
 			self.runCount = self.runCount + 1
 		
-		print ("DETACHED === {0} ===".format(workspace.detach_times))
+		if wsp.verbose:print ("DETACHED === {0} ===".format(workspace.detach_times))
 	
 	def pre_set_property(self, **props):
 		self.detach()
@@ -102,7 +102,7 @@ class transfo:
 	def __str__(self):return "".join([str(property(prop, val)) for (prop, val) in self.props.items()]) + "transformation:"+self.transfo+" on module " + self.modname + "\n"
 	def run(self,wsp):
 		"""run this transformation on module `name'"""
-		print ("running transformation " + self.transfo)
+		if wsp.verbose:print ("running transformation " + self.transfo)
 		#getAllLoops(wsp[self.modname])
 		wsp.getAllLoops()
 		with open("log", 'a') as f:
@@ -135,7 +135,7 @@ class property:
 	def __str__(self):return "property:{0} value:{1}\n".format(self.prop, self.val)
 	def run(self, workspace):
 		"""set the property on current workspace"""
-		print ("setting property " + self.prop + " to " + str(self.val))
+		if wsp.verbose:print ("setting property " + self.prop + " to " + str(self.val))
 		with open("log", 'a') as f:
 			print >> f, "setproperty " + self.prop + " " + str(self.val)
 		
