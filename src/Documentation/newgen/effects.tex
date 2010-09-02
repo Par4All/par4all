@@ -34,7 +34,7 @@
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage[nofancy]{svninfo}
 \usepackage{array}
-
+\usepackage{listings}
 %% To generate an index:
 \usepackage{makeidx}
 \makeindex
@@ -56,11 +56,13 @@
 
 \begin{document}
 \svnInfo $Id: effects.tex 17253 2010-05-31 08:43:19Z creusillet $
+
 \maketitle
 \sloppy
 \newpage
 \tableofcontents
 \newpage
+\lstset{language=C}
 \section*{Introduction}
 Each statement reads and writes several memory locations to retrieve
 stored values and to store new values. Understanding the relationship
@@ -237,7 +239,7 @@ struture field names, can additionally be any subscript expression,
 thus allowing the representation of elements of arrays of linked lists
 of arrays of linked lists... 
 
-For instance $\mathtt{p[i]([0][.next])^(c)[.tab][j]}$ represents the
+For instance \lstinline!p[i]([0][.next])^(c)[.tab][j]! represents the
 j-th element of the \texttt{tab} field of the c-th element of the
 linked list towards which \texttt{p[i]} points.
 
@@ -302,19 +304,18 @@ of effects. For historical reasons, exact effects are labelled
 polyhedral sets, they are either equal to the exact set or to the
 empty set.
 
-\texttt{READ} and \texttt{write} effects are useful for dependence
-analyses. However, it is sometimes interesting to see compound
-statements as black boxes. In this case we only want to known if the
-\emph{initial} value of a memory location is \emph{used} by the
-statement, which is called a \texttt{IN} effect, or if the memory
-location is only used for temporary storage. In the same way, it is
-important to know if the value left by a statement in a memory
-location is dead when leaving a statement or if it is used later by
-another statement execution. In the later case, it is called an
-\texttt{OUT} effect. Currently \texttt{IN} effects are internally
-represented as \texttt{READ} effects, and \texttt{OUT} effects as
-\texttt{WRITE} effects. The programmer must be aware of the type of
-effects he is dealing with.
+Read and write effects are useful for dependence analyses. However, it
+is sometimes interesting to see compound statements as black boxes. In
+this case we only want to known if the \emph{initial} value of a
+memory location is \emph{used} by the statement, which is called a
+\texttt{IN} effect, or if the memory location is only used for
+temporary storage. In the same way, it is important to know if the
+value left by a statement in a memory location is dead when leaving a
+statement or if it is used later by another statement execution. In
+the later case, it is called an \texttt{OUT} effect. Currently
+\texttt{IN} effects are internally represented as \texttt{READ}
+effects, and \texttt{OUT} effects as \texttt{WRITE} effects. The
+programmer must be aware of the type of effects he is dealing with.
 
 Note that spurious effects are added in loop bodies to avoid... and/or
 simulate later a control dependence by a data dependence
@@ -564,17 +565,89 @@ For details about effect analyses available see the Effects Section in the
 PIPS phase descriptions).
 %%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
 
-\subsubsection{Mapping between Expressions and effects}
+\subsubsection{Mapping from Expressions to effects}
 
-\domain{persistant\_expression\_to\_effects = persistant expression -> effects}
+\domain{persistant_expression_to_effects = persistent expression->effects}
 {}
 
-\section{Conclusion}
+\section{Effects and pointer analyses}
+
+In languages involving pointers, elements of symbolic references
+which are store-dependent are not anymore confined to array indices or
+polyhedra describing array indices relations with values of program
+variables, but include the whole memory access path description. 
+
+\lstset{numbers=left, numberstyle=\tiny, captionpos=b, framexleftmargin=5mm, frame=shadowbox}
+\lstset{escapeinside={(*@}{@*)}}
+
+\begin{lstlisting}[float,caption=Varying paths,label=lst:varying_paths]
+int **p, **q, *a, *b;
+a = (int *) malloc(10*sizeof(int)); (*@\label{lst:varying_paths_la}@*) 
+b = (int *) malloc(10*sizeof(int)); (*@\label{lst:varying_paths_lb}@*)
+p = &a;
+p[0][2] = 0; (*@\label{lst:varying_paths_l1}@*)
+p = &b;
+q = p;
+p[0][2] = 0; (*@\label{lst:varying_paths_l2}@*)
+q[0][2] = 0; (*@\label{lst:varying_paths_l3}@*)
+\end{lstlisting}
+%
+For instance, in Listing~\ref{lst:varying_paths}, \lstinline!p[0][2]!
+on line~\ref{lst:varying_paths_l1} refers to \lstinline!a[2]! whereas
+on line~\ref{lst:varying_paths_l2} it refers to \lstinline!b[2]!: in
+the symbolic reference \lstinline!p[0][2]!, \lstinline!p[0]! is a
+varying part that depends on the memory store. On the contrary,
+\lstinline!p[0][2]! on line~\ref{lst:varying_paths_l2} and
+\lstinline!q[0][2]!  on line~\ref{lst:varying_paths_l3} refer to the
+same memory location whereas their symbolic references are
+syntactically different.
+
+Thus taking into account some kind of pointer analysis is necessary to
+be able to disambiguate symbolic references during effect analyses and
+all kind of dependence tests used throughout the parallelization
+processes.
+
+Pointer analyses try to gather the \emph{relations} that exist between
+memory locations, due to pointer values. May alias analyses for
+instance describe the possible overlaps between memory
+locations. Points-to analyses establish the relations existing between
+pointers and the memory locations they point to. We also intend to
+design another analysis (called \emph{Pointer Values}) to gather the
+relations existing between the values of pointers as well as the
+memory locations represented by pointer values.
+
+For all this kind of analyses\footnote{Points-to analyses are
+  currenlty under development using alternative domains described in
+  \texttt{points\_to\_private.pdf}.} we need to know the cells whose
+values, addresses or locations are described, the type of information
+each cell represents (value, address or location), the approximation
+of the relation (exact, may or must) and a compulsory descriptor. It's
+still unclear if some kind of additional information is needed to
+handle casts.
 
 
+\domain{Interpreted_cell = cell x cell_interpretation}
+{} 
+
+\domain{Cell_interpretation = value_of:unit + address_of:unit}
+{}
+
+a \texttt{location} tag could be added for analyses describing relations
+between memory locations, but they are not planned for the moment.
+
+
+\domain{Cell_relation = first:interpreted_cell x second:interpreted_cell x approximation x descriptor}
+{}
+
+\domain{Cell_relations = list:cell_relation*}
+{}
+
+\domain{Statement_cell_relations = persistent statement->cell_relations}
+{}
 
 
 \newpage
+
 
 \section*{Annexe: NewGen Declarations -- effects.newgen --}
 \verbatiminput{effects.newgen}
