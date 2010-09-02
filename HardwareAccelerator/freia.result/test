@@ -235,6 +235,14 @@ freia_status freia_common_destruct_data(freia_data2d *img)
    free(img);
    return FREIA_OK;
 }
+freia_status freia_common_draw_line(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+   image->stuff += color+x1+y1+x2+y2;
+}
+freia_status freia_common_draw_rect(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+   image->stuff += color+x1+y1+x2+y2;
+}
 freia_status freia_common_open_input(freia_dataio *in, uint32_t n)
 {
    in->framebpp = 16;
@@ -728,6 +736,26 @@ freia_status freia_common_destruct_data(freia_data2d *img)
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(img);
    return FREIA_OK;
+}
+//               <must be read   >: color image image[0][.stuff] x1 x2
+//                                  y1 y2
+//               <must be written>: image[0][.stuff]
+freia_status freia_common_draw_line(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+//               <must be read   >: color image image[0][.stuff] x1 x2
+//                                  y1 y2
+//               <must be written>: image[0][.stuff]
+   image->stuff += color+x1+y1+x2+y2;
+}
+//               <must be read   >: color image image[0][.stuff] x1 x2
+//                                  y1 y2
+//               <must be written>: image[0][.stuff]
+freia_status freia_common_draw_rect(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+//               <must be read   >: color image image[0][.stuff] x1 x2
+//                                  y1 y2
+//               <must be written>: image[0][.stuff]
+   image->stuff += color+x1+y1+x2+y2;
 }
 //               <must be read   >: global_io_effect in n
 //               <must be written>: global_io_effect in[0][.stuff] 

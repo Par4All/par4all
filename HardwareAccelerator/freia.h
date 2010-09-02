@@ -10,7 +10,9 @@ typedef enum { false, true } bool;
 typedef int int32_t;
 typedef unsigned int uint32_t; // ??? for convolution & correlation
 typedef struct {
-  int bpp, widthWa, heightWa;
+  int bpp, width, height; // image
+  int widthWa, heightWa, xStartWa, yStartWa; // working area
+  void * raw, **row;
   int stuff;
 } freia_data2d;
 typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
@@ -26,6 +28,9 @@ static const int32_t freia_morpho_kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 extern freia_data2d * freia_common_create_data(uint32_t, uint32_t, uint32_t);
 extern freia_status freia_common_destruct_data(freia_data2d *);
 
+#define freia_common_alloc malloc
+#define freia_common_free free
+
 // IO
 extern freia_status freia_common_open_input(freia_dataio *, uint32_t);
 extern freia_status freia_common_open_output(freia_dataio *, uint32_t, uint32_t, uint32_t, uint32_t);
@@ -33,6 +38,10 @@ extern freia_status freia_common_rx_image(freia_data2d *, freia_dataio *);
 extern freia_status freia_common_tx_image(const freia_data2d *, freia_dataio *);
 extern freia_status freia_common_close_input(freia_dataio *);
 extern freia_status freia_common_close_output(freia_dataio *);
+
+// common functions, should be in AIPO
+extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 
 // 2 CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);

@@ -70,6 +70,19 @@ freia_status freia_common_close_output(freia_dataio * n)
   return FREIA_OK;
 }
 
+freia_status freia_common_draw_line(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+  image->stuff += color+x1+y1+x2+y2;
+}
+
+freia_status freia_common_draw_rect(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
+{
+  image->stuff += color+x1+y1+x2+y2;
+}
+
+
 #define Fbin(name)                                        \
   freia_status                                            \
   name(freia_data2d * o,                                  \
