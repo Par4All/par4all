@@ -137,7 +137,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
     package_dir = os.path.abspath(package_dir)
     build_dir = os.path.abspath(build_dir)
     dest_dir = os.path.abspath(dest_dir)
-    
+
     configure_script = os.path.join(package_dir, "configure")
     makefile = os.path.join(build_dir, "Makefile")
 
@@ -376,6 +376,9 @@ def main(options, args = []):
         nlpmake_src_dir = options.nlpmake_src
     else:
         nlpmake_src_dir = os.path.join(packages_dir, "PIPS/nlpmake")
+    # Normalize the directory so that we can build symbolic links to here
+    # easily later:
+    nlpmake_src_dir = os.path.abspath(nlpmake_src_dir)
     debug("nlpmake source directory: " + nlpmake_src_dir)
     #~ if not os.path.isdir(nlpmake_src_dir):
         #~ die("Directory does not exist: " + nlpmake_src_dir)
