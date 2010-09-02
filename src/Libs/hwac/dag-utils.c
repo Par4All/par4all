@@ -954,7 +954,7 @@ void dag_compute_outputs(dag d, hash_table occs)
       // get entity produce by vertex
       entity out = vtxcontent_out(c);
 
-      pips_debug(8, "entity is %s\n", entity_name(out));
+      pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
       if (out!=entity_undefined &&
           // no successors to this vertex BUT it is used somewhere
