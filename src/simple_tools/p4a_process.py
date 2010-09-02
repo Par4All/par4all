@@ -13,7 +13,7 @@ Par4All processing
 import sys, os, re, shutil
 from p4a_util import *
 
-
+# Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
     ABORT_ON_USER_ERROR = True,
@@ -107,10 +107,14 @@ def process(input):
         # First apply some generic parallelization:
         processor.parallelize(input.fine)
 
-        if input.cuda:
+        if input.accel:
+            # Generate code for a GPU-like accelerator. Note that we can
+            # have an OpenMP implementation of it if OpenMP option is set
+            # too:
             processor.gpuify()
 
-        if input.openmp:
+        if input.openmp and not input.accel:
+            # Parallelize the code in an OpenMP way:
             processor.ompify()
 
         # Write the output files.

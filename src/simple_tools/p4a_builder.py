@@ -3,6 +3,7 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
 
 '''
@@ -37,7 +38,7 @@ def get_cuda_dir():
             warn("CUDA_DIR environment variable undefined. Using '" +
                 cuda_dir + "' as default location for CUDA installation")
         if not os.path.isdir(cuda_dir):
-            raise p4a_error("CUDA directory not found or invalid (" + cuda_dir 
+            raise p4a_error("CUDA directory not found or invalid (" + cuda_dir
                 + "). Please set the CUDA_DIR environment variable correctly")
     return cuda_dir
 
@@ -52,7 +53,7 @@ def get_cuda_sdk_dir():
             warn("CUDA_SDK_DIR environment variable undefined. Using '" +
                 cuda_sdk_dir + "' as default location for CUDA installation")
         if not os.path.isdir(cuda_sdk_dir):
-            raise p4a_error("CUDA SDK directory not found or invalid (" + cuda_sdk_dir 
+            raise p4a_error("CUDA SDK directory not found or invalid (" + cuda_sdk_dir
                 + "). Please set the CUDA_SDK_DIR environment variable correctly")
     return cuda_sdk_dir
 
@@ -166,7 +167,8 @@ class p4a_builder:
                 fortran_flags += [ "-openmp" ]
                 ld_flags += [ "-openmp" ]
             else:
-                c_flags += [ "-fopenmp" ]
+                # Ask for C99 since we generate C99 code:
+                c_flags += [ "-std=c99 -fopenmp" ]
                 fortran_flags += [ "-fopenmp" ]
                 ld_flags += [ "-fopenmp" ]
 
@@ -355,7 +357,7 @@ class p4a_builder:
         for file in rel_files:
             if cuda_file_p(file):
                 cuda_files.append(file)
-                cucpp_file = relativize(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"), base_dir)                
+                cucpp_file = relativize(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"), base_dir)
                 cuda_output_files.append(cucpp_file)
                 source_files.append(cucpp_file)
             elif header_file_p(file):
@@ -476,7 +478,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         cmakelists_file = os.path.join(dir, "CMakeLists.txt")
         if not os.path.exists(cmakelists_file):
             raise p4a_error("Could not find " + cmakelists_file)
-        debug("Generating from " + cmakelists_file) 
+        debug("Generating from " + cmakelists_file)
 
         # Determine generation directory.
         if not gen_dir:
