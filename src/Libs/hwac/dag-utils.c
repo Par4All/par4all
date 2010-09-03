@@ -633,6 +633,17 @@ list /* of statements */ dag_optimize(dag d)
     dag_dump(stderr, "input", d);
   }
 
+  /*
+  if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
+    FOREACH(dagvtx, v, dag_vertices(d))
+    {
+      // if (dagvtx_opid(v)==xor and all args are the same image
+      // replace by freia_aipo_set_constant(output, 0);
+    }
+  }
+  */
+
   // remove dead image operations
   // ??? hmmm... measures are kept because of the implicit scalar dependency?
   if (get_bool_property("FREIA_REMOVE_DEAD_OPERATIONS"))
