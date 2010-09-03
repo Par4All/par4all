@@ -2,6 +2,8 @@ import pyps
 import os
 import sys
 
+STAMPFILE="_pyps_time.tmp"
+
 hfile= r"""#ifndef PYPS_GETTIME_H
 #define PYPS_GETTIME_H
 
@@ -29,7 +31,8 @@ int main (int argc, char **argv)
 	
 	long diff = (time2.tv_sec-time1.tv_sec)*1000000 + (time2.tv_usec-time1.tv_usec);
 	
-	FILE *out = fopen("_pyps_time.tmp", "w");
+	FILE *out = fopen(
+""" + '"' + STAMPFILE + '","w");' + r"""
 	if (out) {
 		fprintf(out, "%ld\n", diff);
 		fclose(out);
