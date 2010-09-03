@@ -548,9 +548,11 @@ compile:
 	$(MAKE) phase3
 	$(MAKE) phase4
 	$(MAKE) phase5
+
+doc-compile: compile
 	$(MAKE) phase6
 
-full-compile: compile
+full-compile: doc-compile
 	$(MAKE) phase7
 
 #install: recompile
@@ -569,7 +571,7 @@ phase0: .build_bootstrap
 phase1:
 phase2:
 phase3:
-phase4::
+phase4:
 phase5:
 phase6:
 phase7:
