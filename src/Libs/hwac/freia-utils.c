@@ -432,6 +432,11 @@ list /* of expression */ freia_extract_params
   list res = NIL;
   bool merge = get_bool_property("FREIA_MERGE_ARGUMENTS");
 
+  // important shortcut, taken when ops are switched to "copy" for
+  // some reason, then the next assert would not be consistent.
+  if (api->arg_misc_in==0 && api->arg_misc_out==0)
+    return NIL;
+
   pips_assert("number of arguments is okay",
               gen_length(args)==api->arg_misc_in+api->arg_misc_out);
 
