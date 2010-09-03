@@ -284,8 +284,9 @@ bool force_loop_fusion(char * module_name) {
     string loop_label = get_string_property("LOOP_LABEL");
     entity loop_label_entity = entity_undefined;
     if( string_undefined_p( loop_label ) || 
-            entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) )
-        pips_user_error("please set LOOP_LABEL property to a valid label\n");
+            entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) ) {
+        pips_user_error("please set LOOP_LABEL property to a valid label, not '%s'\n",loop_label);
+    }
     /* do the job */
     do_loop_fusion(loop_label_entity);
 

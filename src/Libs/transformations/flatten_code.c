@@ -251,7 +251,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	if(!entity_is_argument_p(v, dv)) {
         AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
 	}
-	hash_put(rdcp->renamings, v, v);
+	hash_put_or_update(rdcp->renamings, v, v);
       }
       else { /* This is a block local stack allocated or static
 		variable */
@@ -356,7 +356,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	  AddLocalEntityToDeclarations(nv,
 				       get_current_module_entity(),
 				       rdcp->declaration_statement);
-	  hash_put(rdcp->renamings, v, nv);
+	  hash_put_or_update(rdcp->renamings, v, nv);
 	  pips_debug(1, "Variable %s renamed as %s\n", entity_name(v), entity_name(nv));
 	}
       }
