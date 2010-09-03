@@ -91,9 +91,10 @@ class module:
 
 	def loops(self, label=""):
 		"""return desired loop if label given, an iterator over loops otherwise"""
-		if label: return loop(self,label)
+		self.flag_loops() # do it now to ensure all loops exist
+		if label:
+			return loop(self,label)
 		else:
-			self.flag_loops()
 			loops=self._ws.cpypips.module_loops(self.name,"")
 			if not loops:
 				return []
@@ -491,8 +492,8 @@ class workspace(object):
 		self.hasBeenClosed = True
 
 	def __del__(self):
-		if(not hasattr(self, "hasBeenClosed")):
-			close()
+		if(not hasattr(self, "hasBeenClosed")):pass
+			#self.close()
 
 	def _build_module_list(self):
 		for m in self.info("modules"):
