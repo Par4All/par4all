@@ -23,6 +23,8 @@
 - should keep AIPO/software calls if accelerator calls are slower?
 - min commutes with dilate & max with erode, or vice-versa ?
 - other simple or complex algebraic optimization ideas?
+- freia_43 is not optimal because of a bad choice between three D8/E8
+- idem freia_42?
 
 * code
 + cleanup data structures?
