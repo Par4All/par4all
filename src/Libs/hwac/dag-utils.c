@@ -578,7 +578,7 @@ static bool list_commuted_p(const list l1, const list l2)
     CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
 }
 
-/* subtitude produced or used image in statement
+/* subtitute produced or used image in the statement of vertex v.
  */
 static void substitute_image_in_statement
 (dagvtx v, entity source, entity target, boolean used)
@@ -610,6 +610,7 @@ static void substitute_image_in_statement
   while (subs--)
   {
     expression e = EXPRESSION(CAR(args));
+    // I'm not sure what to do if an image is not a simple reference...
     pips_assert("image argument is a reference", expression_reference_p(e));
     reference r = expression_reference(e);
 
