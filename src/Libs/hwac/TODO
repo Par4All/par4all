@@ -26,6 +26,7 @@
 - other simple or complex algebraic optimization ideas?
 - freia_43 is not optimal because of a bad choice between three D8/E8
 - idem freia_42?
+- copy to remove in freia_46
 
 * code
 + cleanup data structures?
@@ -75,6 +76,7 @@
 + allocs may be in the middle of the calls
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 - reuse of images in some cases when nodes are reordered... SSA?
+- wrong copy extraction order in vs_core_2, and copies not really removed
 
 * terapix target
 + must manage memory allocation in tiles
