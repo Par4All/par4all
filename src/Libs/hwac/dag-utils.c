@@ -578,6 +578,53 @@ static bool list_commuted_p(const list l1, const list l2)
     CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
 }
 
+/* subtitude produced or used image in statement
+ */
+static void substitute_image_in_statement
+(dagvtx v, entity source, entity target, boolean used)
+{
+  int nsubs=0;
+  vtxcontent vc = dagvtx_content(v);
+  pstatement ps = vtxcontent_source(vc);
+  pips_assert("is a statement", pstatement_statement_p(ps));
+
+  // get call
+  call c = freia_statement_to_call(pstatement_statement(ps));
+  list args = call_arguments(c);
+
+  const freia_api_t * api = dagvtx_freia_api(v);
+
+  // how many argument to skip, how many to replace
+  unsigned int skip, subs;
+
+  if (used)
+    skip = api->arg_img_out, subs = api->arg_img_in;
+  else
+    skip = 0, subs = api->arg_img_out;
+
+  pips_assert("call length is okay", gen_length(args)>=skip+subs);
+
+  while (skip--)
+    args = CDR(args);
+
+  while (subs--)
+  {
+    expression e = EXPRESSION(CAR(args));
+    pips_assert("image argument is a reference", expression_reference_p(e));
+    reference r = expression_reference(e);
+
+    fprintf(stderr, "%s->%s on %s\n", entity_name(source),
+            entity_name(target), entity_name(reference_variable(r)));
+
+    if (reference_variable(r)==source)
+      nsubs++, reference_variable(r) = target;
+    args = CDR(args);
+  }
+
+  pips_assert("some image substitutions", nsubs>0);
+}
+
+
 /* "copy" copies "source" image in dag "d".
  * remove it properly.
  */
@@ -595,11 +642,14 @@ static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
       dagvtx_succs(prod) = gen_once(vs, dagvtx_succs(prod));
   }
 
-  // replace target image by source image in all v successors
+  // replace use of target image by source image in all v successors
   FOREACH(dagvtx, succ, dagvtx_succs(copy))
   {
     vtxcontent sc = dagvtx_content(succ);
     gen_list_patch(vtxcontent_inputs(sc), target, source);
+
+    // also in the statement inputs... (needed for AIPO target)
+    substitute_image_in_statement(succ, target, source, true);
   }
 
   // copy has no more successors
@@ -770,9 +820,9 @@ list /* of statements */ dag_optimize(dag d)
       {
         list preds = dag_vertex_preds(d, v);
         vtxcontent c = dagvtx_content(v);
-        entity target = vtxcontent_out(c);
+        entity res = vtxcontent_out(c);
         pips_assert("one output and one input to copy",
-              target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+                res!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
         // check for internal-t -one-copy-> A
         // could be improved to -one-copy-and-others->
@@ -789,19 +839,15 @@ list /* of statements */ dag_optimize(dag d)
           {
             // BACKWARD COPY PROPAGATION
             // that is we want to produce the result directly
+
             vtxcontent pc = dagvtx_content(pred);
-            vtxcontent_out(pc) = target;
 
-            // ??? substitute in call
-            call c = freia_statement_to_call
-              (pstatement_statement(vtxcontent_source(pc)));
-            pips_assert("some arguments", call_arguments(c));
-            expression first = EXPRESSION(CAR(call_arguments(c)));
-            pips_assert("is reference", expression_reference_p(first));
-            reference_variable(expression_reference(first)) = target;
+            // fix statement, needed for AIPO target
+            substitute_image_in_statement(pred, vtxcontent_out(pc), res, false);
 
+            // fix vertex
+            vtxcontent_out(pc) = res;
             gen_remove(& dagvtx_succs(pred), v);
-
             boolean done = gen_replace_in_list(dag_outputs(d), v, pred);
             pips_assert("output node was replaced", done);
             set_add_element(remove, remove, v);
