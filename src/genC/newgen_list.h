@@ -318,6 +318,7 @@ extern void * gen_reduce(void *, void *(*)(void*, const list), const list);
 extern void gen_remove(list *, const void *);
 extern void gen_remove_once(list *, const void *);
 extern list gen_some(gen_filter_func_t, const list);
+extern bool gen_replace_in_list(list, const void *, const void *);
 
 extern void gen_insert_after(const void *, const void *, list);
 extern list gen_insert_before(const void *, const void *, list);
