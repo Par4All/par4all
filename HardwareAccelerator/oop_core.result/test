@@ -334,8 +334,8 @@ int oop_core(void)
    imtmp_7 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);       /*0094*/
    
    
-   freia_aipo_dilate_8c(imtmp_4, imgtt0, freia_morpho_kernel_8c);       /*0067*/
-   freia_aipo_erode_8c(imgtmp, imgtt0, freia_morpho_kernel_8c);         /*0068*/
+   freia_aipo_dilate_8c(imtmp_4, img0, freia_morpho_kernel_8c);         /*0067*/
+   freia_aipo_erode_8c(imgtmp, img0, freia_morpho_kernel_8c);           /*0068*/
    freia_aipo_sub(imgtmp, imtmp_4, imgtmp);                             /*0069*/
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/

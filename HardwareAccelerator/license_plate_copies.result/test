@@ -778,16 +778,12 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_data2d *imtmp_0;                                               /*0028*/
    freia_status ret_0;                                                  /*0029*/
    int i_0;                                                             /*0030*/
-   freia_data2d *imtmp_1;                                               /*0031*/
    freia_status ret_1;                                                  /*0032*/
    int i_1;                                                             /*0033*/
-   freia_data2d *imtmp_2;                                               /*0034*/
    freia_status ret_2;                                                  /*0035*/
    int i_2;                                                             /*0036*/
-   freia_data2d *imtmp_3;                                               /*0037*/
    freia_status ret_3;                                                  /*0038*/
    int i_3, i_4;                                                        /*0039*/
    
@@ -808,78 +804,74 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-
-   imtmp_0 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);                /*0060*/
-
-   imtmp_1 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);             /*0132*/
-
-   imtmp_2 = freia_common_create_data(imfilt->bpp, imfilt->widthWa, imfilt->heightWa);                /*0181*/
-
-   imtmp_3 = freia_common_create_data(imout->bpp, imout->widthWa, imout->heightWa);    /*0209*/
-
+   
+   
+   
+   
+   
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0064*/
+   ret_0 |= freia_aipo_erode_8c(imopen, in, kernel1x3);                 /*0064*/
    ret_0 |= 0;                                                          /*0065*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0066*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0066*/
    ret_0 |= 0;                                                          /*0067*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0068*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0068*/
    ret_0 |= 0;                                                          /*0069*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0070*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0070*/
    ret_0 |= 0;                                                          /*0071*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0072*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0072*/
    ret_0 |= 0;                                                          /*0073*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0074*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0074*/
    ret_0 |= 0;                                                          /*0075*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0076*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0076*/
    ret_0 |= 0;                                                          /*0077*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0078*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0078*/
    ret_0 |= 0;                                                          /*0079*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0080*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0080*/
    ret_0 |= 0;                                                          /*0081*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0082*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0082*/
    ret_0 |= 0;                                                          /*0083*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0084*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0084*/
    ret_0 |= 0;                                                          /*0085*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0086*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0086*/
    ret_0 |= 0;                                                          /*0087*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0088*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0088*/
    ret_0 |= 0;                                                          /*0089*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0090*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0090*/
    ret_0 |= 0;                                                          /*0091*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0092*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0092*/
    ret_0 |= 0;                                                          /*0093*/
    i_0 = 15;                                                            /*0094*/
 
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0096*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0096*/
    ret_0 |= 0;                                                          /*0097*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0098*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0098*/
    ret_0 |= 0;                                                          /*0099*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0100*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0100*/
    ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0102*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0102*/
    ret_0 |= 0;                                                          /*0103*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0104*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0104*/
    ret_0 |= 0;                                                          /*0105*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0106*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0106*/
    ret_0 |= 0;                                                          /*0107*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0108*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0108*/
    ret_0 |= 0;                                                          /*0109*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0110*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0110*/
    ret_0 |= 0;                                                          /*0111*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0112*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0112*/
    ret_0 |= 0;                                                          /*0113*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0114*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0114*/
    ret_0 |= 0;                                                          /*0115*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0116*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0116*/
    ret_0 |= 0;                                                          /*0117*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0118*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0118*/
    ret_0 |= 0;                                                          /*0119*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0120*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0120*/
    ret_0 |= 0;                                                          /*0121*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0122*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0122*/
    ret_0 |= 0;                                                          /*0123*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0124*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0124*/
    ret_0 |= 0;                                                          /*0125*/
    i_0 = 15;                                                            /*0126*/
 
@@ -887,39 +879,39 @@ int license_plate_copies(void)
 
    ret_1 = 0;                                                           /*0134*/
 
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0136*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, in, kernel1x3);               /*0136*/
    ret_1 |= 0;                                                          /*0137*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0138*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0138*/
    ret_1 |= 0;                                                          /*0139*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0140*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0140*/
    ret_1 |= 0;                                                          /*0141*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0142*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0142*/
    ret_1 |= 0;                                                          /*0143*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0144*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0144*/
    ret_1 |= 0;                                                          /*0145*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0146*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0146*/
    ret_1 |= 0;                                                          /*0147*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0148*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0148*/
    ret_1 |= 0;                                                          /*0149*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0150*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0150*/
    ret_1 |= 0;                                                          /*0151*/
    i_1 = 8;                                                             /*0152*/
 
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0154*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0154*/
    ret_1 |= 0;                                                          /*0155*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0156*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0156*/
    ret_1 |= 0;                                                          /*0157*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0158*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0158*/
    ret_1 |= 0;                                                          /*0159*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0160*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0160*/
    ret_1 |= 0;                                                          /*0161*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0162*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0162*/
    ret_1 |= 0;                                                          /*0163*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0164*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0164*/
    ret_1 |= 0;                                                          /*0165*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0166*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0166*/
    ret_1 |= 0;                                                          /*0167*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0168*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0168*/
    ret_1 |= 0;                                                          /*0169*/
    i_1 = 8;                                                             /*0170*/
 
@@ -932,23 +924,23 @@ int license_plate_copies(void)
 
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0185*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imand, kernel3x1);              /*0185*/
    ret_2 |= 0;                                                          /*0186*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0187*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0187*/
    ret_2 |= 0;                                                          /*0188*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0189*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0189*/
    ret_2 |= 0;                                                          /*0190*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0191*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0191*/
    ret_2 |= 0;                                                          /*0192*/
    i_2 = 4;                                                             /*0193*/
 
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0195*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0195*/
    ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0197*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0197*/
    ret_2 |= 0;                                                          /*0198*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0199*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0199*/
    ret_2 |= 0;                                                          /*0200*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0201*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0201*/
    ret_2 |= 0;                                                          /*0202*/
    i_2 = 4;                                                             /*0203*/
 
@@ -956,23 +948,23 @@ int license_plate_copies(void)
 
    ret_3 = 0;                                                           /*0211*/
 
-   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0213*/
+   ret_3 |= freia_aipo_erode_8c(imout, imfilt, kernel1x3);              /*0213*/
    ret_3 |= 0;                                                          /*0214*/
-   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0215*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0215*/
    ret_3 |= 0;                                                          /*0216*/
-   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0217*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0217*/
    ret_3 |= 0;                                                          /*0218*/
-   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0219*/
+   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0219*/
    ret_3 |= 0;                                                          /*0220*/
    i_3 = 4;                                                             /*0221*/
 
-   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0223*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0223*/
    ret_3 |= 0;                                                          /*0224*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0225*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0225*/
    ret_3 |= 0;                                                          /*0226*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0227*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0227*/
    ret_3 |= 0;                                                          /*0228*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0229*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0229*/
    ret_3 |= 0;                                                          /*0230*/
    i_3 = 4;                                                             /*0231*/
 
@@ -986,14 +978,10 @@ int license_plate_copies(void)
    _return4 = 0;                                                        /*0242*/
 
    freia_aipo_and(out, out, in);                                        /*0244*/
-
-   freia_common_destruct_data(imtmp_0);                                 /*0128*/
-
-   freia_common_destruct_data(imtmp_1);                                 /*0172*/
-
-   freia_common_destruct_data(imtmp_2);                                 /*0205*/
-
-   freia_common_destruct_data(imtmp_3);                                 /*0233*/
+   
+   
+   
+   
    freia_common_tx_image(out, &fdout);                                  /*0245*/
    
    /* images destruction */

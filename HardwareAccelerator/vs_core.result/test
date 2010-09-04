@@ -176,7 +176,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    freia_aipo_absdiff(mv, in, bg);                                      /*0014*/
    
    // bg update
-   freia_aipo_mul_const(t0, t0, motion_a);                              /*0018*/
+   freia_aipo_mul_const(t0, in, motion_a);                              /*0018*/
    freia_aipo_mul_const(bg, bg, motion_b);                              /*0019*/
    freia_aipo_add(bg, bg, t0);                                          /*0020*/
    freia_aipo_div_const(bg, bg, motion_a+motion_b);                     /*0021*/
