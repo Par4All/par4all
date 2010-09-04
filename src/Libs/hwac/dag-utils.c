@@ -638,8 +638,11 @@ list /* of statements */ dag_optimize(dag d)
   {
     FOREACH(dagvtx, v, dag_vertices(d))
     {
-      // if (dagvtx_opid(v)==xor and all args are the same image
-      // replace by freia_aipo_set_constant(output, 0);
+      // a=xor(b,b) => a=0 (should change effects...)
+      // a=&.(b,0) => a=0
+      // a=|.(b,0xffff) => a=0xffff
+      // a=+.(b,0) => a=b (copy)
+      // a=+(b,b) => a=b*.2
     }
   }
   */
