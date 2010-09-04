@@ -173,8 +173,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);         /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   freia_aipo_absdiff(mv, in, bg);
-   freia_aipo_copy(t0, in);
+   freia_aipo_absdiff(mv, in, bg);                                      /*0014*/
    
    // bg update
    freia_aipo_mul_const(t0, t0, motion_a);                              /*0018*/
@@ -878,8 +877,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);
-   freia_aipo_copy(t0, in);
+   vs_core_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);             /*0014*/
    
    // bg update
    vs_core_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);       /*0019*/
@@ -910,8 +908,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);
-   freia_aipo_copy(t0, in);
+   vs_core_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);             /*0014*/
    
    // bg update
    vs_core_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);       /*0019*/
@@ -1572,11 +1569,9 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    
    
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);
-   freia_aipo_copy(t0, in);
+   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);                /*0014*/
    
    // bg update
    
@@ -1591,7 +1586,6 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    // gradient
    
    
-   freia_common_destruct_data(t0);                                      /*0045*/
    return FREIA_OK;                                                     /*0048*/
 }
 
@@ -1602,11 +1596,9 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    
    
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);
-   freia_aipo_copy(t0, in);
+   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);                /*0014*/
    
    // bg update
    
@@ -1621,7 +1613,6 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    // gradient
    
    
-   freia_common_destruct_data(t0);                                      /*0045*/
    return 0;                                                            /*0048*/
 }
 #

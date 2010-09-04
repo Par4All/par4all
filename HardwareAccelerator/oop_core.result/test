@@ -332,10 +332,8 @@ int oop_core(void)
    
    
    imtmp_7 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);       /*0094*/
-
-   freia_aipo_copy(img1, img0);
-   freia_aipo_copy(imgtt0, img1);
-
+   
+   
    freia_aipo_dilate_8c(imtmp_4, imgtt0, freia_morpho_kernel_8c);       /*0067*/
    freia_aipo_erode_8c(imgtmp, imgtt0, freia_morpho_kernel_8c);         /*0068*/
    freia_aipo_sub(imgtmp, imtmp_4, imgtmp);                             /*0069*/
@@ -1330,9 +1328,7 @@ int oop_core(void)
    
    
    
-   freia_aipo_copy(img1, img0);
-   freia_aipo_copy(imgtt0, img1);
-
+   
    oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
    oop_core_helper_0_1_0(img1, imgtt2, freia_morpho_kernel_8c);         /*0076*/
@@ -1428,9 +1424,7 @@ int oop_core(void)
    
    
    
-   freia_aipo_copy(img1, img0);
-   freia_aipo_copy(imgtt0, img1);
-
+   
    oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
    oop_core_helper_0_1_0(img1, imgtt2, freia_morpho_kernel_8c);         /*0076*/
@@ -2151,9 +2145,7 @@ int oop_core(void)
    
    
    
-   freia_aipo_copy(img1, img0);
-   freia_aipo_copy(imgtt0, img1);
-
+   
    oop_core_helper_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);         /*0067*/
    
    
@@ -2238,9 +2230,7 @@ int oop_core(void)
    
    
    
-   freia_aipo_copy(img1, img0);
-   freia_aipo_copy(imgtt0, img1);
-
+   
    oop_core_helper_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);         /*0067*/
    
    
