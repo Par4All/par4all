@@ -1612,11 +1612,45 @@ static void freia_spoc_pipeline
 
 /***************************************************************** MISC UTIL */
 
+/* current list of computable that may be used to know about the
+ * global context when comparing to vertices in "dagvtx_spoc_priority".
+ */
+static list dagvtx_spoc_priority_computables = NIL;
+// idem for vertices computed in current pipe
+static list dagvtx_spoc_priority_current = NIL;
+
+/* return the number of poc operations which have the same input node
+ * as ref from the global list, including the ref itself.
+ */
+static int poc_count_same_inputs(const dagvtx ref)
+{
+  pips_assert("global list is defined", dagvtx_spoc_priority_computables);
+  pips_assert("vertex is in list",
+              gen_in_list_p(ref, dagvtx_spoc_priority_computables));
+  pips_assert("vertex is a poc operation", dagvtx_optype(ref)==spoc_type_poc);
+
+  dagvtx src = DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(ref))));
+  int n = 0;
+
+  FOREACH(dagvtx, v, dagvtx_spoc_priority_computables)
+    if (dagvtx_optype(v)==spoc_type_poc &&
+        DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(v)))) == src)
+      n++;
+
+  FOREACH(dagvtx, v, dagvtx_spoc_priority_current)
+    if (dagvtx_optype(v)==spoc_type_poc &&
+        DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(v)))) == src)
+      n++;
+
+  pips_assert("at least myself", n>0);
+  return n;
+}
+
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
  * allowed by dependencies are schedule.
- * tells v1 < v2 => -1
+ * tells v1 < v2  =>  -1  =>  v1 BEFORE v2
  */
 int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
 {
@@ -1663,6 +1697,8 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
     FOREACH(dagvtx, vs2, dagvtx_succs(*v2))
       if (dagvtx_optype(vs2)!=spoc_type_mes) nms2++;
 
+    // the decision process is mostly based on the number of inputs
+    // images to the two compared operations.
     if (l1!=l2 && (l1==0 || l2==0))
       // put image generators at the end, after any other computation
       result = l2-l1, why = "args";
@@ -1682,6 +1718,21 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
       // so that if all is well the pipe is filled in order.
       result = vtxcontent_optype(c1) - vtxcontent_optype(c2), why = "ops";
     else
+      /*
+        // unsuccessful attempt for freia_43
+      if (vtxcontent_optype(c1)==spoc_type_poc)
+    {
+      int
+        same1 = poc_count_same_inputs(*v1),
+        same2 = poc_count_same_inputs(*v2);
+      if (same1!=same2)
+        // chose the one with more inputs
+        result = same1-same2, why = "pocinputs";
+      else
+        // same as last case
+        result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
+    }
+    else */
       // if all else fails, rely on statement numbers.
       result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
   }
@@ -1913,18 +1964,22 @@ static list /* of dags */ split_dag(dag initial)
     ifdebug(4) {
       pips_debug(4, "round %d:\n", count);
       set_fprint(stderr, "computed", computed,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "current", current,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "avails", avails,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "maybe", maybe, (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "sure", sure, (gen_string_func_t) dagvtx_to_string);
     }
 
     list computables = get_computable_vertices(dall, computed, avails, current);
+    dagvtx_spoc_priority_computables = computables;
+    dagvtx_spoc_priority_current = lcurrent;
     gen_sort_list(computables,
 		  (int(*)(const void*,const void*)) dagvtx_spoc_priority);
+    dagvtx_spoc_priority_computables = NIL;
+    dagvtx_spoc_priority_current = NIL;
 
     pips_assert("something must be computable if current is empty",
 		computables || !set_empty_p(current));
