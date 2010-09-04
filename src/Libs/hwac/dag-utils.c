@@ -617,6 +617,17 @@ static bool all_vertices_are_copies_or_measures_p(const list lv)
   return true;
 }
 
+/* @return the number of copies in the vertex list
+ */
+int dagvtx_list_number_of_copies(list /* of dagvtx */ l)
+{
+  int n=0;
+  FOREACH(dagvtx, v, l)
+    if (dagvtx_is_copy_p(v))
+      n++;
+  return n;
+}
+
 /* remove dead image operations.
  * remove AIPO copies detected as useless.
  * remove identical operations.
@@ -746,6 +757,60 @@ list /* of statements */ dag_optimize(dag d)
 
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
   {
+    // op -> X -copy-> A where A is an output is moved backwards
+    FOREACH(dagvtx, v, dag_vertices(d))
+    {
+      // skip special input nodes
+      if (dagvtx_number(v)==0) continue;
+
+      // skip already removed ops
+      if (set_belong_p(remove, v)) continue;
+
+      if (dagvtx_is_copy_p(v))
+      {
+        list preds = dag_vertex_preds(d, v);
+        vtxcontent c = dagvtx_content(v);
+        entity target = vtxcontent_out(c);
+        pips_assert("one output and one input to copy",
+              target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+
+        // check for internal-t -one-copy-> A
+        // could be improved to -one-copy-and-others->
+        // could be improved by dealing with the first copy only?
+        if (gen_in_list_p(v, dag_outputs(d)))
+        {
+          pips_assert("one predecessor to used copy", gen_length(preds)==1);
+          dagvtx pred = DAGVTX(CAR(preds));
+
+          // number_of_copies(dagvtx_succs(pred))==1 &&
+          if (gen_length(dagvtx_succs(pred))==1 &&
+              !gen_in_list_p(pred, dag_outputs(d)) &&
+              dagvtx_number(pred)!=0)
+          {
+            // BACKWARD COPY PROPAGATION
+            // that is we want to produce the result directly
+            vtxcontent pc = dagvtx_content(pred);
+            vtxcontent_out(pc) = target;
+
+            // ??? substitute in call
+            call c = freia_statement_to_call
+              (pstatement_statement(vtxcontent_source(pc)));
+            pips_assert("some arguments", call_arguments(c));
+            expression first = EXPRESSION(CAR(call_arguments(c)));
+            pips_assert("is reference", expression_reference_p(first));
+            reference_variable(expression_reference(first)) = target;
+
+            gen_remove(& dagvtx_succs(pred), v);
+
+            boolean done = gen_replace_in_list(dag_outputs(d), v, pred);
+            pips_assert("output node was replaced", done);
+            set_add_element(remove, remove, v);
+          }
+          gen_free_list(preds);
+        }
+      }
+    }
+
     // only one pass is needed because we're going backwards?
     // op-> X -copy-> Y images copies are replaced by op-> X & Y
     FOREACH(dagvtx, v, dag_vertices(d))
@@ -763,6 +828,7 @@ list /* of statements */ dag_optimize(dag d)
         pips_assert("one output and one input to copy",
               target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
+        // FORWARD COPY PROPAGATION
         // replace by its source everywhere it is used
         entity source = ENTITY(CAR(vtxcontent_inputs(c)));
 
@@ -780,8 +846,10 @@ list /* of statements */ dag_optimize(dag d)
   {
     // A-copy->B where A is an input is removed from the dag and
     // managed outside
+
     // if A-copy->X and A-copy->Y where A is not an input, the second copy
     // is replaced by an external X-copy->Y
+    // ??? BUG: it should be moved after the computation
 
     // what copies are kept in the dag
     hash_table intra_pipe_copies = hash_table_make(hash_pointer, 10);

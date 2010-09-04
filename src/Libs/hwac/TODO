@@ -26,7 +26,8 @@
 - other simple or complex algebraic optimization ideas?
 - freia_43 is not optimal because of a bad choice between three D8/E8
 - idem freia_42?
-- copy to remove in freia_46
++ copy to remove in freia_46
+- copy to remove in freia_47
 
 * code
 + cleanup data structures?
