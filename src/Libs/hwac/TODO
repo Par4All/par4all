@@ -16,6 +16,7 @@
 - check/remove more implicit hypothesis?
 - image operations not in aipo/cipo: freia_common_draw_{line,rect}
   should it be in aipo or cipo? should I consider this operation?
+- freia_aipo_cast: should it be managed as a copy?
 
 * optimizations
 + remove useless images (computed but not used...) see licensePlate
