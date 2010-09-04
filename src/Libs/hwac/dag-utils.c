@@ -624,7 +624,7 @@ static void substitute_image_in_statement
 
 
 /* "copy" copies "source" image in dag "d".
- * remove it properly.
+ * remove it properly (forward copy propagation)
  */
 static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
@@ -667,7 +667,7 @@ static bool all_vertices_are_copies_or_measures_p(const list lv)
 
 /* @return the number of copies in the vertex list
  */
-int dagvtx_list_number_of_copies(list /* of dagvtx */ l)
+static int number_of_copies(list /* of dagvtx */ l)
 {
   int n=0;
   FOREACH(dagvtx, v, l)
@@ -822,16 +822,14 @@ list /* of statements */ dag_optimize(dag d)
         pips_assert("one output and one input to copy",
                 res!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
-        // check for internal-t -one-copy-> A
-        // could be improved to -one-copy-and-others->
+        // check for internal-t -one-copy-and-others-> A (output)
         // could be improved by dealing with the first copy only?
         if (gen_in_list_p(v, dag_outputs(d)))
         {
           pips_assert("one predecessor to used copy", gen_length(preds)==1);
           dagvtx pred = DAGVTX(CAR(preds));
 
-          // number_of_copies(dagvtx_succs(pred))==1 &&
-          if (gen_length(dagvtx_succs(pred))==1 &&
+          if (number_of_copies(dagvtx_succs(pred))==1 &&
               !gen_in_list_p(pred, dag_outputs(d)) &&
               dagvtx_number(pred)!=0)
           {
@@ -839,9 +837,10 @@ list /* of statements */ dag_optimize(dag d)
             // that is we want to produce the result directly
 
             vtxcontent pc = dagvtx_content(pred);
+            entity old = vtxcontent_out(pc);
 
             // fix statement, needed for AIPO target
-            substitute_image_in_statement(pred, vtxcontent_out(pc), res, false);
+            substitute_image_in_statement(pred, old, res, false);
 
             // fix vertex
             vtxcontent_out(pc) = res;
@@ -849,6 +848,13 @@ list /* of statements */ dag_optimize(dag d)
             boolean done = gen_replace_in_list(dag_outputs(d), v, pred);
             pips_assert("output node was replaced", done);
             set_add_element(remove, remove, v);
+
+            // BACK-FORWARD COPY PROPAGATION
+            FOREACH(dagvtx, s, dagvtx_succs(pred))
+            {
+              substitute_image_in_statement(s, old, res, true);
+              gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s)), old, res);
+            }
           }
           gen_free_list(preds);
         }
