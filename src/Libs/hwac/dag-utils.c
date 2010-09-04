@@ -751,7 +751,10 @@ list /* of statements */ dag_optimize(dag d)
     FOREACH(dagvtx, v, dag_vertices(d))
     {
       // skip special input nodes
-      if (dagvtx_number(v)==0) break;
+      if (dagvtx_number(v)==0) continue;
+
+      // skip already removed ops
+      if (set_belong_p(remove, v)) continue;
 
       if (dagvtx_is_copy_p(v))
       {
