@@ -613,9 +613,6 @@ static void substitute_image_in_statement
     pips_assert("image argument is a reference", expression_reference_p(e));
     reference r = expression_reference(e);
 
-    fprintf(stderr, "%s->%s on %s\n", entity_name(source),
-            entity_name(target), entity_name(reference_variable(r)));
-
     if (reference_variable(r)==source)
       nsubs++, reference_variable(r) = target;
     args = CDR(args);
