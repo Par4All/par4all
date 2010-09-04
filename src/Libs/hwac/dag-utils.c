@@ -774,21 +774,6 @@ list /* of statements */ dag_optimize(dag d)
           set_add_element(remove, remove, v);
       }
     }
-
-    // ??? further checks of useless copies
-    // should be integrated in previous loop? why is it not?
-    FOREACH(dagvtx, v, dag_vertices(d))
-    {
-      if (set_belong_p(remove, v))
-        continue;
-
-      if (dagvtx_is_copy_p(v) && !dagvtx_succs(v) &&
-          !gen_in_list_p(v, dag_outputs(d)))
-      {
-        pips_debug(7, "useless copy vertex %"_intFMT"\n", dagvtx_number(v));
-        set_add_element(remove, remove, v);
-      }
-    }
   }
 
   if (get_bool_property("FREIA_MOVE_DIRECT_COPIES"))
