@@ -5444,6 +5444,7 @@ to initialize the new variables and compute the final result.
 alias simd_remove_reductions 'SIMD Remove Reductions'
 
 simd_remove_reductions      > MODULE.code
+                            > MODULE.callees
         < PROGRAM.entities
         < MODULE.cumulated_reductions
         < MODULE.code
@@ -5455,6 +5456,25 @@ SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP TRUE
 \begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_PREFIX}
 SIMD_REMOVE_REDUCTIONS_PREFIX "RED"
 \end{PipsProp}
+\begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_PRELUDE}
+SIMD_REMOVE_REDUCTIONS_PRELUDE ""
+\end{PipsProp}
+\begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_POSTLUDE}
+SIMD_REMOVE_REDUCTIONS_POSTLUDE ""
+\end{PipsProp}
+\begin{PipsPass}{redundant_load_store_elimination}
+Remove useless load store calls
+\end{PipsPass}
+
+\begin{PipsMake}
+
+redundant_load_store_elimination      > MODULE.code
+		> MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.out_regions
+        < MODULE.chains
+\end{PipsMake}
 
 \begin{PipsPass}{deatomizer}
 ...

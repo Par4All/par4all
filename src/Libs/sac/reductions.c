@@ -41,11 +41,13 @@
 
 #include "reductions.h"
 #include "sac.h"
+#include "ricedg.h"
 
 #include "effects-convex.h"
 #include "effects-simple.h"
 
 #include "control.h"
+#include "callgraph.h"
 #include "properties.h"
 
 bool sac_expression_reduction_p(expression e){
@@ -329,24 +331,51 @@ static statement generate_prelude(reductionInfo ri)
             initval = bool_to_expression(FALSE);
             break;
     }
+    string sprelude = get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE");
+    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))) {
+        // For each reductionInfo_vector reference, make an initialization
+        // assign statement and add it to the prelude
+        // do nothing if no init val exist
+        for(i=0; i<reductionInfo_count(ri); i++)
+        {
+            instruction is;
 
-    // For each reductionInfo_vector reference, make an initialization
-    // assign statement and add it to the prelude
-    // do nothing if no init val exist
-    for(i=0; i<reductionInfo_count(ri); i++)
-    {
-        instruction is;
+            is = make_assign_instruction(
+                    reference_to_expression(make_reference(
+                            reductionInfo_vector(ri), CONS(EXPRESSION, 
+                                int_to_expression(reductionInfo_count(ri)-i-1),
+                                NIL))),
+                    copy_expression(initval));
 
-        is = make_assign_instruction(
-                reference_to_expression(make_reference(
-                        reductionInfo_vector(ri), CONS(EXPRESSION, 
-                            int_to_expression(reductionInfo_count(ri)-i-1),
-                            NIL))),
-                copy_expression(initval));
-
-        prelude = CONS(STATEMENT, 
-                instruction_to_statement(is),
-                prelude);
+            prelude = CONS(STATEMENT, 
+                    instruction_to_statement(is),
+                    prelude);
+        }
+    }
+    else{
+        entity eprelude = FindEntity(TOP_LEVEL_MODULE_NAME,sprelude);
+        if(entity_undefined_p(eprelude)) {
+            pips_user_warning("%s not found, using a dummy one",sprelude);
+            eprelude=make_empty_subroutine(sprelude,copy_language(module_language(get_current_module_entity())));
+        }
+        prelude = make_statement_list(
+                call_to_statement(
+                    make_call(
+                        eprelude,
+                        make_expression_list(
+                            MakeUnaryCall(
+                                entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                                reference_to_expression(
+                                    make_reference(
+                                        reductionInfo_vector(ri),
+                                        CONS(EXPRESSION,int_to_expression(0),NIL)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
     }
 
     free_expression(initval);
@@ -381,7 +410,7 @@ static statement generate_compact(reductionInfo ri)
             break;
 
         case is_reduction_operator_sum:
-            operator = entity_intrinsic(PLUS_OPERATOR_NAME);
+                operator = entity_intrinsic(PLUS_OPERATOR_NAME);
             break;
 
         case is_reduction_operator_csum:
@@ -404,11 +433,14 @@ static statement generate_compact(reductionInfo ri)
     // Get the reduction variable
     rightExpr = reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri))));
 
-    // For each reductionInfo_vector reference, add it to the compact statement
-    for(i=0; i<reductionInfo_count(ri); i++)
-    {
-        call c;
-        expression e;
+    string spostlude = get_string_property("SIMD_REMOVE_REDUCTIONS_POSTLUDE");
+    statement postlude = statement_undefined;
+    if(empty_string_p(spostlude) || !(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))) {
+        // For each reductionInfo_vector reference, add it to the compact statement
+        for(i=0; i<reductionInfo_count(ri); i++)
+        {
+            call c;
+            expression e;
 
         e = reference_to_expression(make_reference(
                     reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
@@ -423,7 +455,36 @@ static statement generate_compact(reductionInfo ri)
             reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
             rightExpr);
 
-    return instruction_to_statement(compact);
+        postlude= instruction_to_statement(compact);
+    }
+    else {
+        entity epostlude = FindEntity(TOP_LEVEL_MODULE_NAME,spostlude);
+        if(entity_undefined_p(epostlude)) {
+            pips_user_warning("%s not found, using a dummy one",spostlude);
+            epostlude=make_empty_subroutine(spostlude,copy_language(module_language(get_current_module_entity())));
+        }
+        postlude=call_to_statement(
+                make_call(
+                    epostlude,
+                    make_expression_list(
+                        MakeUnaryCall(
+                            entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                            reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri))))
+                            ),
+                        MakeUnaryCall(
+                            entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                            reference_to_expression(
+                                make_reference(
+                                    reductionInfo_vector(ri),
+                                    CONS(EXPRESSION,int_to_expression(0),NIL)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+    }
+    return postlude;
 }
 
 /*
@@ -542,6 +603,7 @@ bool simd_remove_reductions(char * mod_name)
     /* Reorder the module, because new statements have been added */  
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(get_current_module_statement()));
 
     /* update/release resources */
     reset_cumulated_reductions();
@@ -553,3 +615,168 @@ bool simd_remove_reductions(char * mod_name)
     return true;
 }
 
+static bool statement_reduction_prelude_p(statement s) {
+  if(statement_call_p(s)) {
+    call c =statement_call(s);
+    entity op = call_function(c);
+    if(same_string_p(entity_user_name(op),get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE")))
+      return true;
+  }
+      return false;
+}
+static bool statement_reduction_postlude_p(statement s) {
+  if(statement_call_p(s)) {
+    call c =statement_call(s);
+    entity op = call_function(c);
+    if(same_string_p(entity_user_name(op),get_string_property("SIMD_REMOVE_REDUCTIONS_POSTLUDE")))
+      return true;
+  }
+  return false;
+}
+
+static list strict_successors(vertex v) {
+  list v_successors = vertex_successors(v);
+  list s = gen_copy_seq(v_successors);
+
+  FOREACH(SUCCESSOR,v_successor,v_successors) {
+    vertex vs = successor_vertex(v_successor);
+    FOREACH(SUCCESSOR,vss,vertex_successors(vs)) {
+      FOREACH(SUCCESSOR,su,s) {
+        if(vertex_vertex_label(successor_vertex(su)) == 
+            vertex_vertex_label(successor_vertex(vss)) ) {
+          gen_remove_once(&s,su);
+          break;
+        }
+      }
+    }
+  }
+  return s;
+}
+
+static void redundant_load_store_elimination_move_vectors(statement s, set moved_vectors)
+{
+  if(statement_block_p(s)) {
+    list tmp =gen_copy_seq(statement_declarations(s));
+    FOREACH(ENTITY,e,tmp) {
+      if(set_belong_p(moved_vectors,e)) {
+        RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),s);
+        AddLocalEntityToDeclarations(e,get_current_module_entity(),get_current_module_statement());
+      }
+    }
+  }
+
+}
+
+static void do_sac_reduction_optimizations(graph dg)
+{
+  set moved_vectors = set_make(set_pointer);
+  FOREACH(VERTEX, a_vertex, graph_vertices(dg) )
+  {
+    statement stat0 = vertex_to_statement(a_vertex);
+    if(statement_reduction_prelude_p(stat0)) {
+      list ssuccessors = strict_successors(a_vertex);
+      /* only on successor */
+      if(gen_length(ssuccessors)==1) {
+        successor succ = SUCCESSOR(CAR(ssuccessors));
+        statement stat1 = vertex_to_statement(successor_vertex(succ));
+        if(simd_load_stat_p(stat1)) {
+          call_function(
+              statement_call(stat1) ) =
+            call_function(
+                statement_call(stat0)
+                );
+          gen_full_free_list(CDR(call_arguments(statement_call(stat1))));
+          CDR(call_arguments(statement_call(stat1)))=NIL;
+          update_statement_instruction(stat0,make_continue_instruction());
+        }
+      }
+      gen_free_list(ssuccessors);
+    }
+    else if(simd_store_stat_p(stat0)) {
+      list ssuccessors = strict_successors(a_vertex);
+      /* only on successor */
+      if(gen_length(ssuccessors)==1) {
+        successor succ = SUCCESSOR(CAR(ssuccessors));
+        statement stat1 = vertex_to_statement(successor_vertex(succ));
+        if(statement_reduction_postlude_p(stat1)) {
+          expression loaded_exp = 
+            EXPRESSION(CAR(call_arguments(statement_call(stat0))));
+          if(expression_call_p(loaded_exp))
+            loaded_exp=EXPRESSION(CAR(call_arguments(expression_call(loaded_exp))));
+
+          gen_full_free_list(CDR(call_arguments(statement_call(stat1))));
+          CDR(call_arguments(statement_call(stat1)))=CONS(EXPRESSION,copy_expression(loaded_exp),NIL);
+          set_add_element(moved_vectors,moved_vectors,expression_to_entity(loaded_exp));
+        }
+      }
+      gen_free_list(ssuccessors);
+    }
+  }
+  gen_context_recurse(get_current_module_statement(),moved_vectors,
+      statement_domain,gen_true,redundant_load_store_elimination_move_vectors);
+}
+
+static void do_redundant_load_store_elimination(graph dg) {
+  bool did_something ;
+  set deleted_vertex = set_make(set_pointer);
+  do {
+    did_something=false;
+    statement deleted = statement_undefined;
+    FOREACH(VERTEX,v,graph_vertices(dg) ) {
+      if(!set_belong_p(deleted_vertex,v) && ENDP(vertex_successors(v))) {
+        statement s = vertex_to_statement(v);
+        if(statement_call_p(s) && 
+            !return_statement_p(s) &&
+            !declaration_statement_p(s)) {
+          list out_effects = load_cumulated_rw_effects_list(s);
+          if(ENDP(out_effects)) {
+            update_statement_instruction(s,make_continue_instruction());
+            did_something=true;
+            set_add_element(deleted_vertex,deleted_vertex,v);
+            break;
+          }
+        }
+      }
+    }
+
+    if(!statement_undefined_p(deleted)) {
+      FOREACH(VERTEX,v,graph_vertices(dg) ) {
+        if(!set_belong_p(deleted_vertex,v)) {
+          list tmp = gen_copy_seq(vertex_successors(v));
+          FOREACH(SUCCESSOR,s,tmp) {
+            if(vertex_to_statement(successor_vertex(s)) == deleted )
+              gen_remove(&vertex_successors(v),s);
+          }
+        }
+      }
+    }
+  } while(did_something);
+}
+
+bool redundant_load_store_elimination(char * module_name)
+{
+    /* Get the code of the module. */
+    entity module = module_name_to_entity(module_name);
+    statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
+	set_ordering_to_statement(module_stat);
+    set_current_module_entity( module);
+    set_current_module_statement( module_stat);
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
+
+    graph dependence_graph = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
+
+    do_sac_reduction_optimizations(dependence_graph);
+    do_redundant_load_store_elimination(dependence_graph);
+
+    module_reorder(module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
+
+
+    reset_current_module_entity();
+	reset_ordering_to_statement();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    return TRUE;
+}

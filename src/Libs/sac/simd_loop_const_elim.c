@@ -86,7 +86,7 @@ static bool simd_work_stat_p(statement stat)
         return false;
     }
 }
-static bool simd_load_stat_p(statement stat)
+bool simd_load_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -100,7 +100,7 @@ static bool simd_load_stat_p(statement stat)
         return false;
     }
 }
-static bool simd_store_stat_p(statement stat)
+bool simd_store_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -380,6 +380,7 @@ static void simd_loop_const_elim_rwt(statement s)
 }
 
 
+
 /* This phase looks for load or save statements that can be
  * put out of the loop body and move these statements, if possible.
  */
@@ -397,6 +398,7 @@ bool simd_loop_const_elim(char * module_name)
 
     dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
     push_generated_variable_commenter(sac_commenter);
+
 
     debug_on("SIMD_LOOP_CONST_ELIM_DEBUG_LEVEL");
 
