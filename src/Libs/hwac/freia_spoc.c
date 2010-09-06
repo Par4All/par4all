@@ -1619,6 +1619,7 @@ static list dagvtx_spoc_priority_computables = NIL;
 // idem for vertices computed in current pipe
 static list dagvtx_spoc_priority_current = NIL;
 
+#if 0
 /* return the number of poc operations which have the same input node
  * as ref from the global list, including the ref itself.
  */
@@ -1645,6 +1646,7 @@ static int poc_count_same_inputs(const dagvtx ref)
   pips_assert("at least myself", n>0);
   return n;
 }
+#endif
 
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
