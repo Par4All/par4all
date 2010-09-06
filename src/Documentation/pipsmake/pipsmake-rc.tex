@@ -4813,7 +4813,31 @@ points_to_analysis > MODULE.points_to_list
 The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
 
-\subsection{Points-to  Properties}
+\subsection{Pointer Values Analyses}
+\label{subsection-pointer-values}
+\index{Pointer Values Analyses}
+
+\begin{PipsPass}{simple_pointer_values}
+\end{PipsPass}
+
+Pointer values analysis is another kind of pointer analysis which tries
+to gather \emph{Pointer Values} both in terms of other pointer values
+but also of memory addresses. This phase is under development.
+
+
+\begin{PipsMake}
+alias simple_pointer_values  'Pointer Values Analysis'
+
+simple_pointer_values > MODULE.simple_gen_pointer_values
+                      > MODULE.simple_kill_pointer_values
+                      > MODULE.simple_pointer_values
+           < PROGRAM.entities
+           < MODULE.code
+
+\end{PipsMake}
+
+
+\subsection{Properties for pointer analyses}
 
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
@@ -4927,6 +4951,8 @@ ABSTRACT_HEAP_LOCATIONS "unique"
 % GAP_MAX_LENGTH 0
 % \end{PipsProp}
 % }
+
+
 
 \subsection{Menu for Alias Views}
 
@@ -10460,6 +10486,7 @@ alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
 alias print_code_points_to_list 'Statements & Points To'
+alias print_code_simple_pointer_values 'Statements & Simple Pointer Values'
 
 \end{PipsMake}
 
@@ -10915,6 +10942,32 @@ print_code_points_to_list      > MODULE.printed_file
         < MODULE.proper_effects
         < MODULE.summary_points_to_list
         < MODULE.points_to_list
+\end{PipsMake}
+
+\subsection{Sequential View with Simple Pointer Values}
+
+\begin{PipsPass}{print_code_simple_pointer_values}
+Displays the code with simple pointer values relationships.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_simple_pointer_values      > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.simple_pointer_values
+\end{PipsMake}
+
+\begin{PipsPass}{print_code_genkill_pointer_values}
+Displays the code with simple gen pointer values and kill sets.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_simple_gen_kill_pointer_values      > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.simple_gen_pointer_values
+        < MODULE.simple_kill_pointer_values
+
 \end{PipsMake}
 
 \subsection{Prettyprint properties}

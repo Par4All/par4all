@@ -63,7 +63,7 @@ pipslibs.libs	= \
 	wp65 hpfc hyperplane to_begin_with \
 	instrumentation locality expressions transformations accel-util hwac \
 	movements bootstrap callgraph icfg chains complexity \
-	conversion prettyprint atomizer syntax c_syntax \
+	conversion prettyprint atomizer syntax c_syntax pointer_values \
 	alias-classes effects-simple effects-convex effects-generic \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor effects-util ri-util step properties \

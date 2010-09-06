@@ -991,3 +991,17 @@ entity effect_to_entity(effect ef)
 
   return e;
 }
+
+/* boolean vect_contains_phi_p(Pvecteur v)
+ * input    : a vector
+ * output   : TRUE if v contains a PHI variable, FALSE otherwise
+ * modifies : nothing
+ */
+boolean vect_contains_phi_p(Pvecteur v)
+{
+    for(; !VECTEUR_NUL_P(v); v = v->succ)
+	if (variable_phi_p((entity) var_of(v)))
+	    return(TRUE);
+
+    return(FALSE);
+}
