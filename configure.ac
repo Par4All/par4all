@@ -238,6 +238,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Libs/phrase/Makefile
 				 src/Libs/pipsdbm/Makefile
 				 src/Libs/pipsmake/Makefile
+				 src/Libs/pointer_values/Makefile
 				 src/Libs/preprocessor/Makefile
 				 src/Libs/prettyprint/Makefile
 				 src/Libs/properties/Makefile
