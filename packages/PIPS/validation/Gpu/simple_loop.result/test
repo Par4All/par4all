@@ -86,7 +86,7 @@ int main()
 {
    int i;
    //PIPS generated variable
-   double (*P_0)[N], (*P_1)[N], (*P_2)[N];
+   double (*P_0)[N] = (double (*)[N]) 0, (*P_1)[N] = (double (*)[N]) 0, (*P_2)[N] = (double (*)[N]) 0;
    P4A_accel_malloc(&P_2, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_1, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
@@ -193,7 +193,7 @@ int main()
 {
    int i;
    //PIPS generated variable
-   double (*P_0)[N], (*P_1)[N], (*P_2)[N];
+   double (*P_0)[N] = (double (*)[N]) 0, (*P_1)[N] = (double (*)[N]) 0, (*P_2)[N] = (double (*)[N]) 0;
    P4A_accel_malloc(&P_2, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_1, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);

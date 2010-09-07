@@ -33,30 +33,29 @@ towns read_towns(const  char fname[])
    char c;
    towns the_towns = {1, malloc(sizeof(town))};
    fprintf(stderr, "begin parsing ...\n");
-l99997:   ;
 
-   if (!!feof(fd)) goto l99999;
-   if (the_towns.nb==curr) {
-      the_towns.nb *= 2;
-      the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+   while (!feof(fd)) {
+      if (the_towns.nb==curr) {
+         the_towns.nb *= 2;
+         the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+      }
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
+l99999:         ;
+         if (!!feof(fd)) goto break_2;
+         c = (char) fgetc(fd);
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+break_2:         ;
+      }
+      else {
+         ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
+         ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
+         ++curr;
+      }
    }
-   if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) goto l99998;
-   ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
-   ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
-   ++curr;
-   goto l99997;
-l99998:   ;
-   if (!!feof(fd)) goto break_2;
-   c = (char) fgetc(fd);
-   if (c=='\n'||c=='\r') {
-   }
-   else {
-      goto l99998;
-   }
-break_2:   ;
-   goto l99997;
-l99999:   ;
-
    fclose(fd);
    the_towns.data = realloc(the_towns.data, curr*sizeof(town));
    the_towns.nb = curr;
@@ -141,38 +140,43 @@ towns read_towns(const  char fname[])
    FILE *fd;
    size_t curr;
    char c;
-   towns the_towns = {1, malloc(sizeof(town))};
+   towns the_towns;
+   //PIPS generated variable
+   size_t _PIPS_STRUCT_31_nb_0 = 1;
+   //PIPS generated variable
+   town *_PIPS_STRUCT_31_data_0 = malloc(sizeof(town));
    fd = fopen(fname, "r");
    curr = 0;
    fprintf(stderr, "begin parsing ...\n");
-l99997:   ;
 
-   if (!!feof(fd)) goto l99999;
-   if (the_towns.nb==curr) {
-      the_towns.nb *= 2;
-      the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+   while (!feof(fd)) {
+      if (_PIPS_STRUCT_31_nb_0==curr) {
+         _PIPS_STRUCT_31_nb_0 *= 2;
+         _PIPS_STRUCT_31_data_0 = realloc(_PIPS_STRUCT_31_data_0, _PIPS_STRUCT_31_nb_0*sizeof(town));
+      }
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &_PIPS_STRUCT_31_data_0[curr][0], &_PIPS_STRUCT_31_data_0[curr][1], &_PIPS_STRUCT_31_data_0[curr][2])!=3) {
+l99999:         ;
+         if (!!feof(fd)) goto break_2;
+         c = (char) fgetc(fd);
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+break_2:         ;
+      }
+      else {
+         _PIPS_STRUCT_31_data_0[curr][0] *= 3.14159265358979323846/180;
+         _PIPS_STRUCT_31_data_0[curr][1] *= 3.14159265358979323846/180;
+         ++curr;
+      }
    }
-   if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) goto l99998;
-   ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
-   ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
-   ++curr;
-   goto l99997;
-l99998:   ;
-   if (!!feof(fd)) goto break_2;
-   c = (char) fgetc(fd);
-   if (c=='\n'||c=='\r') {
-   }
-   else {
-      goto l99998;
-   }
-break_2:   ;
-   goto l99997;
-l99999:   ;
-
    fclose(fd);
-   the_towns.data = realloc(the_towns.data, curr*sizeof(town));
-   the_towns.nb = curr;
+   _PIPS_STRUCT_31_data_0 = realloc(_PIPS_STRUCT_31_data_0, curr*sizeof(town));
+   _PIPS_STRUCT_31_nb_0 = curr;
    fprintf(stderr, "parsed %d towns\n", curr);
+   the_towns.nb = _PIPS_STRUCT_31_nb_0;
+   the_towns.data = _PIPS_STRUCT_31_data_0;
    /*
        for(curr=0;curr<the_towns.nb;curr++)
            fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
@@ -187,13 +191,13 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    int nb;
    towns tout;
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb_0 = nb;
+   size_t _PIPS_STRUCT_31_nb_1 = nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data_0 = malloc(sizeof(town)*nb);
+   town *_PIPS_STRUCT_31_data_1 = malloc(sizeof(town)*nb);
    //PIPS generated variable
-   size_t _PIPS_STRUCT_31_nb_1 = t.nb;
+   size_t _PIPS_STRUCT_31_nb_2 = t.nb;
    //PIPS generated variable
-   town *_PIPS_STRUCT_31_data_1 = t.data;
+   town *_PIPS_STRUCT_31_data_2 = t.data;
    rangex = (xmax-xmin)/step;
    rangey = (ymax-ymin)/step;
    nb = 1+rangex*rangey;
@@ -203,22 +207,22 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
    for(i = 0; i <= rangex-1; i += 1)
       for(j = 0; j <= rangey-1; j += 1) {
-         _PIPS_STRUCT_31_data_0[i*rangey+j][0] = (xmin+step*i)*180/3.14159265358979323846;
-         _PIPS_STRUCT_31_data_0[i*rangey+j][1] = (ymin+step*j)*180/3.14159265358979323846;
-         _PIPS_STRUCT_31_data_0[i*rangey+j][2] = 0.;
-         for(k = 0; k <= _PIPS_STRUCT_31_nb_1-1; k += 1) {
+         _PIPS_STRUCT_31_data_1[i*rangey+j][0] = (xmin+step*i)*180/3.14159265358979323846;
+         _PIPS_STRUCT_31_data_1[i*rangey+j][1] = (ymin+step*j)*180/3.14159265358979323846;
+         _PIPS_STRUCT_31_data_1[i*rangey+j][2] = 0.;
+         for(k = 0; k <= _PIPS_STRUCT_31_nb_2-1; k += 1) {
             data_t tmp;
-            tmp = 6368.*acos(cos(xmin+step*i)*cos(_PIPS_STRUCT_31_data_1[k][0])*cos(ymin+step*j-_PIPS_STRUCT_31_data_1[k][1])+sin(xmin+step*i)*sin(_PIPS_STRUCT_31_data_1[k][0]));
+            tmp = 6368.*acos(cos(xmin+step*i)*cos(_PIPS_STRUCT_31_data_2[k][0])*cos(ymin+step*j-_PIPS_STRUCT_31_data_2[k][1])+sin(xmin+step*i)*sin(_PIPS_STRUCT_31_data_2[k][0]));
             if (tmp<range) 
-               _PIPS_STRUCT_31_data_0[i*rangey+j][2] += _PIPS_STRUCT_31_data_1[k][2]/(1+tmp);
+               _PIPS_STRUCT_31_data_1[i*rangey+j][2] += _PIPS_STRUCT_31_data_2[k][2]/(1+tmp);
          }
       }
    fprintf(stderr, "end computation ...\n");
-   tout.nb = _PIPS_STRUCT_31_nb_0;
-   tout.data = _PIPS_STRUCT_31_data_0;
+   tout.nb = _PIPS_STRUCT_31_nb_1;
+   tout.data = _PIPS_STRUCT_31_data_1;
    return tout;
-   t.nb = _PIPS_STRUCT_31_nb_1;
-   t.data = _PIPS_STRUCT_31_data_1;
+   t.nb = _PIPS_STRUCT_31_nb_2;
+   t.data = _PIPS_STRUCT_31_data_2;
 }
 validate result
 

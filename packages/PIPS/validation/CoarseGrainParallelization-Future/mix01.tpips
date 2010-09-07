@@ -1,0 +1,21 @@
+delete mix01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create mix01 mix01.c
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
+apply PRIVATIZE_MODULE(%ALL)
+
+apply COARSE_GRAIN_PARALLELIZATION
+apply OMPIFY_CODE
+display PRINTED_FILE [main]
+
+apply UNSPLIT
+shell gcc -fopenmp -c mix01.database/Src/mix01.c -o mix01.database/Src/mix01.o
+
+close
+delete mix01
+quit
+# EOF

@@ -1,0 +1,18 @@
+delete return01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create return01 return01.c
+
+apply PRIVATIZE_MODULE(find_neg)
+
+apply  COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE [%ALL]
+
+apply UNSPLIT
+shell gcc -fopenmp -c return01.database/Src/return01.c -o return01.database/Src/return01.o
+
+close
+delete return01
+quit
+# EOF

@@ -18,5 +18,5 @@ activate PRINT_CODE
 display PRINTED_FILE[EMPILE]
 
 close
-delete use_def_elim03
+delete use_def_elim04
 quit

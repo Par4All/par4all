@@ -1,0 +1,11 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete unroll11
+create unroll11 unroll11.c
+
+apply UNROLL[esco]
+bar
+2
+display PRINTED_FILE[esco]
+close
+delete unroll11
+quit

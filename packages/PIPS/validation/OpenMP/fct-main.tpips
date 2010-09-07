@@ -1,0 +1,21 @@
+delete      fct-main
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create      fct-main fct-main.c
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
+
+apply       PRIVATIZE_MODULE(%ALL)
+apply       COARSE_GRAIN_PARALLELIZATION(%ALL)
+apply       OMPIFY_CODE(%ALL)
+apply       UNSPLIT(%ALL)
+
+display	    PRINTED_FILE(fct_lib)
+
+shell gcc -fopenmp -c fct-main.database/Src/fct-main.c
+shell rm -f fct-main.o
+
+close
+delete      fct-main
+quit

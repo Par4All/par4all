@@ -1,0 +1,13 @@
+delete loop_bound01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_bound01 loop_bound01.f
+
+setproperty PARSER_LINEARIZE_LOOP_BOUNDS TRUE
+
+display PRINTED_FILE[LOOP_BOUND01]
+
+close
+delete loop_bound01
+

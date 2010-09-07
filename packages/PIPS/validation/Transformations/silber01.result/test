@@ -391,11 +391,11 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
    //PIPS generated variable
    char I_17;
    //PIPS generated variable
-   int I_18, i_0, j_0;
+   int I_18, j_0, i_0;
    //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
-   int i_1, j_1;
+   int j_1, i_1;
    //PIPS generated variable
    unsigned char current_2, current_3;
    I_0 = w-1;

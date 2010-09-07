@@ -1,4 +1,66 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_19(freia_data2d *o, freia_data2d *i)
+{
+
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0007*/
+   
+   // one useless copy
+   // t = i
+   // o = t
+   freia_aipo_copy(t, i);                                               /*0012*/
+   freia_aipo_copy(o, t);                                               /*0013*/
+
+   freia_common_destruct_data(t);                                       /*0015*/
+
+   return FREIA_OK;                                                     /*0017*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_19" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "13 =" [shape=circle];
+  "13 =" -> "o";
+  "12 =" [shape=circle];
+  "12 =" -> "13 =" [label="t"];
+  "i" -> "12 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_19" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+}
+
+! updated function for
+
+freia_status freia_19(freia_data2d *o, freia_data2d *i)
+{
+   
+   
+   // one useless copy
+   // t = i
+   // o = t
+   freia_aipo_copy(o, i);
+   
+   
+   return FREIA_OK;                                                     /*0017*/
+}
+#
 # SPOC
 #
 
@@ -40,7 +102,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
 
   // outputs
 
@@ -67,6 +128,21 @@ freia_status freia_19(freia_data2d *o, freia_data2d *i)
    
    
    return FREIA_OK;                                                     /*0017*/
+}
+
+! cleaned up function
+
+freia_status freia_19(freia_data2d *o, freia_data2d *i)
+{
+   
+   
+   // one useless copy
+   // t = i
+   // o = t
+   freia_aipo_copy(o, i);
+   
+   
+   return 0;                                                            /*0017*/
 }
 #
 # TERAPIX
@@ -110,7 +186,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
 
   // outputs
 
@@ -138,6 +213,21 @@ freia_status freia_19(freia_data2d *o, freia_data2d *i)
    
    
    return FREIA_OK;                                                     /*0017*/
+}
+
+! cleaned up function
+
+freia_status freia_19(freia_data2d *o, freia_data2d *i)
+{
+   
+   
+   // one useless copy
+   // t = i
+   // o = t
+   freia_aipo_copy(o, i);
+   
+   
+   return 0;                                                            /*0017*/
 }
 #
 # FREIA COMPILATION DONE

@@ -232,7 +232,7 @@ FLGR_Data2D * flgr2d_create_fgUINT16(int size_y, int size_x, int spp, FLGR_Shape
       P_2[i]->ref2d = i;
       P_4 = dat->row;
       P_3 = dat->array;
-      P_3[i] = (dat->row)[i]->array;
+      P_3[i] = P_4[i]->array;
    }
    return dat;
 }
@@ -1179,21 +1179,17 @@ FLGR_Ret flgr2d_mirror_vertical_hmorph(FLGR_Data2D *dat)
       tmp = P_29[i];
       P_31 = dat->array;
       P_30 = dat->array;
-      P_30[i] = (dat->array)[j];
+      P_30[i] = P_31[j];
       P_32 = dat->array;
       P_32[j] = tmp;
-
-
       P_33 = dat->row;
 
       row_tmp = P_33[i];
       P_35 = dat->row;
       P_34 = dat->row;
-      P_34[i] = (dat->row)[j];
+      P_34[i] = P_35[j];
       P_36 = dat->row;
       P_36[j] = row_tmp;
-
-
       P_37 = dat->row;
 
       P_37[i]->ref2d = i;
@@ -2469,7 +2465,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2488,161 +2484,127 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
       for(j = 0; j <= w-1; j += 1) {
          nhbrs = i%2==1?nhbOdd:nhbEven;
          {
+            int i_, j_, m;
+            int k, l, n;
+            int nbrow, nbcol;
+            int startrow, stoprow;
+            int startcol, stopcol;
+            int nhbsize_xdiv2;
+            int nhbsize_ydiv2;
+            int spp;
+            fgUINT16 **pnhb;
+            fgUINT16 **pdat;
+            fgUINT16 *list_data;
+            fgUINT16 *list_nhb;
+            int *list_coord_x;
+            int *list_coord_y;
+            int *size;
+            fgUINT16 nhb_val, data_val;
             //PIPS generated variable
-            FLGR_NhbBox2D *extr0;
+            void **P_21;
             //PIPS generated variable
-            FLGR_Data2D *dat0, *nhb0;
+            void **P_22;
             //PIPS generated variable
-            int row0, col0;
-            extr0 = extr;
-            dat0 = imgsrc;
-            nhb0 = nhbrs;
-            row0 = i;
-            col0 = j;
-            {
-               int i, j, m;
-               int k, l, n;
-               int nbrow, nbcol;
-               int startrow, stoprow;
-               int startcol, stopcol;
-               int nhbsize_xdiv2;
-               int nhbsize_ydiv2;
-               int spp;
-               fgUINT16 **pnhb;
-               fgUINT16 **pdat;
-               fgUINT16 *list_data;
-               fgUINT16 *list_nhb;
-               int *list_coord_x;
-               int *list_coord_y;
-               int *size;
-               fgUINT16 nhb_val, data_val;
-               //PIPS generated variable
-               void **P_21;
-               //PIPS generated variable
-               void **P_22;
-               //PIPS generated variable
-               void **P_23;
-               //PIPS generated variable
-               void **P_24;
-               //PIPS generated variable
-               int **P_25, **P_26;
-               spp = dat0->spp;
-               pnhb = (fgUINT16 **) nhb0->array;
-               pdat = (fgUINT16 **) dat0->array;
-               size = extr0->size;
-               nhbsize_xdiv2 = nhb0->size_x>>1;
-               nhbsize_ydiv2 = nhb0->size_y>>1;
-               nbrow = dat0->size_y;
-               nbcol = dat0->size_x;
-               extr0->center_coord_y = row0;
-               extr0->center_coord_x = col0;
-               startrow = row0-nhbsize_ydiv2;
-               startrow = startrow<0?0:startrow;
-               stoprow = row0+nhbsize_ydiv2;
-               stoprow = stoprow>=nbrow?nbrow-1:stoprow;
-               startcol = col0-nhbsize_xdiv2;
-               startcol = startcol<0?0:startcol;
-               stopcol = col0+nhbsize_xdiv2;
-               stopcol = stopcol>=nbcol?nbcol-1:stopcol;
-               P_21 = dat0->array;
-               flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr0->center_data_val->array, (fgUINT16 *) P_21[row0], spp, col0);
-               P_22 = nhb0->array;
-               flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr0->center_nhb_val->array, (fgUINT16 *) P_22[nhbsize_ydiv2], spp, nhbsize_xdiv2);
-               for(n = 0; n <= spp-1; n += 1) {
-                  P_23 = extr0->list_data_val;
-                  list_data = (fgUINT16 *) P_23[n];
-                  P_24 = extr0->list_nhb_val;
-                  list_nhb = (fgUINT16 *) P_24[n];
-                  P_25 = extr0->list_coord_x;
-                  list_coord_x = (int *) P_25[n];
-                  P_26 = extr0->list_coord_y;
-                  list_coord_y = (int *) P_26[n];
-                  m = 0;
-                  k = startrow-row0+nhbsize_ydiv2;
-                  for(i = startrow; i <= stoprow; i += 1) {
-                     l = startcol-col0+nhbsize_xdiv2;
-                     for(j = startcol; j <= stopcol; j += 1) {
+            void **P_23;
+            //PIPS generated variable
+            void **P_24;
+            //PIPS generated variable
+            int **P_25, **P_26;
+            spp = imgsrc->spp;
+            pnhb = (fgUINT16 **) nhbrs->array;
+            pdat = (fgUINT16 **) imgsrc->array;
+            size = extr->size;
+            nhbsize_xdiv2 = nhbrs->size_x>>1;
+            nhbsize_ydiv2 = nhbrs->size_y>>1;
+            nbrow = imgsrc->size_y;
+            nbcol = imgsrc->size_x;
+            extr->center_coord_y = i;
+            extr->center_coord_x = j;
+            startrow = i-nhbsize_ydiv2;
+            startrow = startrow<0?0:startrow;
+            stoprow = i+nhbsize_ydiv2;
+            stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+            startcol = j-nhbsize_xdiv2;
+            startcol = startcol<0?0:startcol;
+            stopcol = j+nhbsize_xdiv2;
+            stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+            P_21 = imgsrc->array;
+            flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr->center_data_val->array, (fgUINT16 *) P_21[i], spp, j);
+            P_22 = nhbrs->array;
+            flgr_get_data_array_vector_fgUINT16((fgUINT16 *) extr->center_nhb_val->array, (fgUINT16 *) P_22[nhbsize_ydiv2], spp, nhbsize_xdiv2);
+            for(n = 0; n <= spp-1; n += 1) {
+               P_23 = extr->list_data_val;
+               list_data = (fgUINT16 *) P_23[n];
+               P_24 = extr->list_nhb_val;
+               list_nhb = (fgUINT16 *) P_24[n];
+               P_25 = extr->list_coord_x;
+               list_coord_x = (int *) P_25[n];
+               P_26 = extr->list_coord_y;
+               list_coord_y = (int *) P_26[n];
+               m = 0;
+               k = startrow-i+nhbsize_ydiv2;
+               for(i_ = startrow; i_ <= stoprow; i_ += 1) {
+                  l = startcol-j+nhbsize_xdiv2;
+                  for(j_ = startcol; j_ <= stopcol; j_ += 1) {
+                     {
+                        //PIPS generated variable
+                        int I_2;
+                        I_2 = l*spp+n;
                         {
                            //PIPS generated variable
-                           int I_2;
-                           I_2 = l*spp+n;
+                           fgUINT16 _return0;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 *P_40;
+                              P_40 = pnhb[k];
+                              _return0 = P_40[I_2];
+                           }
+                           _return1 = _return0;
+                        }
+                     }
+                     nhb_val = _return1;
+                     if (nhb_val!=0) {
+                        {
+                           //PIPS generated variable
+                           int I_3;
+                           I_3 = j_*spp+n;
+                           {
+                              //PIPS generated variable
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
-                                 P_40 = pnhb[k];
-                                 _return0 = P_40[I_2];
+                                 P_40 = pdat[i_];
+                                 _return0 = P_40[I_3];
                               }
-                              _return1 = _return0;
+                              _return2 = _return0;
                            }
                         }
-                        nhb_val = _return1;
-                        if (nhb_val!=0) {
-                           {
-                              //PIPS generated variable
-                              int I_3;
-                              I_3 = j*spp+n;
-                              {
-                                 //PIPS generated variable
-                                 unsigned short _return0;
-                                 {
-                                    //PIPS generated variable
-                                    fgUINT16 *P_40;
-                                    P_40 = pdat[i];
-                                    _return0 = P_40[I_3];
-                                 }
-                                 _return2 = _return0;
-                              }
-                           }
-                           data_val = _return2;
-                           list_coord_x[m] = l;
-                           list_coord_y[m] = k;
-                           list_data[m] = data_val;
-                           list_nhb[m] = nhb_val;
-                           m++;
-                        }
-                        l++;
+                        data_val = _return2;
+                        list_coord_x[m] = l;
+                        list_coord_y[m] = k;
+                        list_data[m] = data_val;
+                        list_nhb[m] = nhb_val;
+                        m++;
                      }
-                     k++;
+                     l++;
                   }
-                  size[n] = m;
+                  k++;
                }
+               size[n] = m;
             }
          }
          (*computeNhb)(result,extr);
          {
-            //PIPS generated variable
-            fgUINT16 *data_array0, *vector_array0;
-            //PIPS generated variable
-            int spp0, pos0;
-            data_array0 = data_array;
-            vector_array0 = vector_array;
-            spp0 = spp;
-            pos0 = j;
-            {
-               register fgUINT16 val;
-               register int i, k;
-               i = pos0*spp0;
+            register fgUINT16 val;
+            register int i, k;
+            i = j*spp;
 
-               for(k = 0; k <= spp0-1; k += 1) {
-                  _return0 = vector_array0[k];
-                  val = _return0;
-                  {
-                     //PIPS generated variable
-                     fgUINT16 *array0;
-                     //PIPS generated variable
-                     int pos1;
-                     //PIPS generated variable
-                     fgUINT16 value0;
-                     array0 = data_array0;
-                     pos1 = i;
-                     value0 = val;
-                     array0[pos1] = value0;
-                  }
-                  i++;
-               }
+            for(k = 0; k <= spp-1; k += 1) {
+               _return0 = vector_array[k];
+               val = _return0;
+               data_array[i] = val;
+               i++;
             }
          }
       }
@@ -2664,7 +2626,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2683,229 +2645,169 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
       for(j = 0; j <= w-1; j += 1) {
          nhbrs = i%2==1?nhbOdd:nhbEven;
          {
+            int i_, j_, m;
+            int k, l, n;
+            int nbrow, nbcol;
+            int startrow, stoprow;
+            int startcol, stopcol;
+            int nhbsize_xdiv2;
+            int nhbsize_ydiv2;
+            int spp;
+            fgUINT16 **pnhb;
+            fgUINT16 **pdat;
+            fgUINT16 *list_data;
+            fgUINT16 *list_nhb;
+            int *list_coord_x;
+            int *list_coord_y;
+            int *size;
+            fgUINT16 nhb_val, data_val;
             //PIPS generated variable
-            FLGR_NhbBox2D *extr0;
+            void **P_21;
             //PIPS generated variable
-            FLGR_Data2D *dat0, *nhb0;
+            void **P_22;
             //PIPS generated variable
-            int row0, col0;
-            extr0 = extr;
-            dat0 = imgsrc;
-            nhb0 = nhbrs;
-            row0 = i;
-            col0 = j;
+            void **P_23;
+            //PIPS generated variable
+            void **P_24;
+            //PIPS generated variable
+            int **P_25, **P_26;
+            spp = imgsrc->spp;
+            pnhb = (fgUINT16 **) nhbrs->array;
+            pdat = (fgUINT16 **) imgsrc->array;
+            size = extr->size;
+            nhbsize_xdiv2 = nhbrs->size_x>>1;
+            nhbsize_ydiv2 = nhbrs->size_y>>1;
+            nbrow = imgsrc->size_y;
+            nbcol = imgsrc->size_x;
+            extr->center_coord_y = i;
+            extr->center_coord_x = j;
+            startrow = i-nhbsize_ydiv2;
+            startrow = startrow<0?0:startrow;
+            stoprow = i+nhbsize_ydiv2;
+            stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+            startcol = j-nhbsize_xdiv2;
+            startcol = startcol<0?0:startcol;
+            stopcol = j+nhbsize_xdiv2;
+            stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+            P_21 = imgsrc->array;
             {
-               int i, j, m;
-               int k, l, n;
-               int nbrow, nbcol;
-               int startrow, stoprow;
-               int startcol, stopcol;
-               int nhbsize_xdiv2;
-               int nhbsize_ydiv2;
-               int spp;
-               fgUINT16 **pnhb;
-               fgUINT16 **pdat;
-               fgUINT16 *list_data;
-               fgUINT16 *list_nhb;
-               int *list_coord_x;
-               int *list_coord_y;
-               int *size;
-               fgUINT16 nhb_val, data_val;
                //PIPS generated variable
-               void **P_21;
+               void *P_46;
                //PIPS generated variable
-               void **P_22;
-               //PIPS generated variable
-               void **P_23;
-               //PIPS generated variable
-               void **P_24;
-               //PIPS generated variable
-               int **P_25, **P_26;
-               spp = dat0->spp;
-               pnhb = (fgUINT16 **) nhb0->array;
-               pdat = (fgUINT16 **) dat0->array;
-               size = extr0->size;
-               nhbsize_xdiv2 = nhb0->size_x>>1;
-               nhbsize_ydiv2 = nhb0->size_y>>1;
-               nbrow = dat0->size_y;
-               nbcol = dat0->size_x;
-               extr0->center_coord_y = row0;
-               extr0->center_coord_x = col0;
-               startrow = row0-nhbsize_ydiv2;
-               startrow = startrow<0?0:startrow;
-               stoprow = row0+nhbsize_ydiv2;
-               stoprow = stoprow>=nbrow?nbrow-1:stoprow;
-               startcol = col0-nhbsize_xdiv2;
-               startcol = startcol<0?0:startcol;
-               stopcol = col0+nhbsize_xdiv2;
-               stopcol = stopcol>=nbcol?nbcol-1:stopcol;
-               P_21 = dat0->array;
+               void *P_47;
+               P_46 = extr->center_data_val->array;
+               P_47 = P_21[i];
                {
+                  register fgUINT16 val;
+                  register int i, k;
                   //PIPS generated variable
-                  fgUINT16 *vector_array1, *data_array1;
-                  //PIPS generated variable
-                  int spp1, pos2;
-                  vector_array1 = (fgUINT16 *) extr0->center_data_val->array;
-                  data_array1 = (fgUINT16 *) P_21[row0];
-                  spp1 = spp;
-                  pos2 = col0;
-                  {
-                     register fgUINT16 val;
-                     register int i, k;
-                     //PIPS generated variable
-                     unsigned short _return0;
-                     i = pos2*spp1;
+                  fgUINT16 _return0;
+                  i = j*spp;
 
-                     for(k = 0; k <= spp1-1; k += 1) {
-                        _return0 = data_array1[i];
-                        val = _return0;
-                        {
-                           //PIPS generated variable
-                           fgUINT16 *array0;
-                           //PIPS generated variable
-                           int pos0;
-                           //PIPS generated variable
-                           fgUINT16 value0;
-                           array0 = vector_array1;
-                           pos0 = k;
-                           value0 = val;
-                           array0[pos0] = value0;
-                        }
-                        i++;
-                     }
+                  for(k = 0; k <= spp-1; k += 1) {
+                     _return0 = P_47[i];
+                     val = _return0;
+                     P_46[k] = val;
+                     i++;
                   }
                }
-               P_22 = nhb0->array;
+            }
+            P_22 = nhbrs->array;
+            {
+               //PIPS generated variable
+               void *P_48;
+               //PIPS generated variable
+               void *P_49;
+               P_48 = extr->center_nhb_val->array;
+               P_49 = P_22[nhbsize_ydiv2];
                {
+                  register fgUINT16 val;
+                  register int i, k;
                   //PIPS generated variable
-                  fgUINT16 *vector_array2, *data_array2;
-                  //PIPS generated variable
-                  int spp2, pos3;
-                  vector_array2 = (fgUINT16 *) extr0->center_nhb_val->array;
-                  data_array2 = (fgUINT16 *) P_22[nhbsize_ydiv2];
-                  spp2 = spp;
-                  pos3 = nhbsize_xdiv2;
-                  {
-                     register fgUINT16 val;
-                     register int i, k;
-                     //PIPS generated variable
-                     unsigned short _return0;
-                     i = pos3*spp2;
+                  fgUINT16 _return0;
+                  i = nhbsize_xdiv2*spp;
 
-                     for(k = 0; k <= spp2-1; k += 1) {
-                        _return0 = data_array2[i];
-                        val = _return0;
-                        {
-                           //PIPS generated variable
-                           fgUINT16 *array0;
-                           //PIPS generated variable
-                           int pos0;
-                           //PIPS generated variable
-                           fgUINT16 value0;
-                           array0 = vector_array2;
-                           pos0 = k;
-                           value0 = val;
-                           array0[pos0] = value0;
-                        }
-                        i++;
-                     }
+                  for(k = 0; k <= spp-1; k += 1) {
+                     _return0 = P_49[i];
+                     val = _return0;
+                     P_48[k] = val;
+                     i++;
                   }
                }
-               for(n = 0; n <= spp-1; n += 1) {
-                  P_23 = extr0->list_data_val;
-                  list_data = (fgUINT16 *) P_23[n];
-                  P_24 = extr0->list_nhb_val;
-                  list_nhb = (fgUINT16 *) P_24[n];
-                  P_25 = extr0->list_coord_x;
-                  list_coord_x = (int *) P_25[n];
-                  P_26 = extr0->list_coord_y;
-                  list_coord_y = (int *) P_26[n];
-                  m = 0;
-                  k = startrow-row0+nhbsize_ydiv2;
-                  for(i = startrow; i <= stoprow; i += 1) {
-                     l = startcol-col0+nhbsize_xdiv2;
-                     for(j = startcol; j <= stopcol; j += 1) {
+            }
+            for(n = 0; n <= spp-1; n += 1) {
+               P_23 = extr->list_data_val;
+               list_data = (fgUINT16 *) P_23[n];
+               P_24 = extr->list_nhb_val;
+               list_nhb = (fgUINT16 *) P_24[n];
+               P_25 = extr->list_coord_x;
+               list_coord_x = (int *) P_25[n];
+               P_26 = extr->list_coord_y;
+               list_coord_y = (int *) P_26[n];
+               m = 0;
+               k = startrow-i+nhbsize_ydiv2;
+               for(i_ = startrow; i_ <= stoprow; i_ += 1) {
+                  l = startcol-j+nhbsize_xdiv2;
+                  for(j_ = startcol; j_ <= stopcol; j_ += 1) {
+                     {
+                        //PIPS generated variable
+                        int I_2;
+                        I_2 = l*spp+n;
                         {
                            //PIPS generated variable
-                           int I_2;
-                           I_2 = l*spp+n;
+                           fgUINT16 _return0;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 *P_40;
+                              P_40 = pnhb[k];
+                              _return0 = P_40[I_2];
+                           }
+                           _return1 = _return0;
+                        }
+                     }
+                     nhb_val = _return1;
+                     if (nhb_val!=0) {
+                        {
+                           //PIPS generated variable
+                           int I_3;
+                           I_3 = j_*spp+n;
+                           {
+                              //PIPS generated variable
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
-                                 P_40 = pnhb[k];
-                                 _return0 = P_40[I_2];
+                                 P_40 = pdat[i_];
+                                 _return0 = P_40[I_3];
                               }
-                              _return1 = _return0;
+                              _return2 = _return0;
                            }
                         }
-                        nhb_val = _return1;
-                        if (nhb_val!=0) {
-                           {
-                              //PIPS generated variable
-                              int I_3;
-                              I_3 = j*spp+n;
-                              {
-                                 //PIPS generated variable
-                                 unsigned short _return0;
-                                 {
-                                    //PIPS generated variable
-                                    fgUINT16 *P_40;
-                                    P_40 = pdat[i];
-                                    _return0 = P_40[I_3];
-                                 }
-                                 _return2 = _return0;
-                              }
-                           }
-                           data_val = _return2;
-                           list_coord_x[m] = l;
-                           list_coord_y[m] = k;
-                           list_data[m] = data_val;
-                           list_nhb[m] = nhb_val;
-                           m++;
-                        }
-                        l++;
+                        data_val = _return2;
+                        list_coord_x[m] = l;
+                        list_coord_y[m] = k;
+                        list_data[m] = data_val;
+                        list_nhb[m] = nhb_val;
+                        m++;
                      }
-                     k++;
+                     l++;
                   }
-                  size[n] = m;
+                  k++;
                }
+               size[n] = m;
             }
          }
          (*computeNhb)(result,extr);
          {
-            //PIPS generated variable
-            fgUINT16 *data_array0, *vector_array0;
-            //PIPS generated variable
-            int spp0, pos0;
-            data_array0 = data_array;
-            vector_array0 = vector_array;
-            spp0 = spp;
-            pos0 = j;
-            {
-               register fgUINT16 val;
-               register int i, k;
-               i = pos0*spp0;
+            register fgUINT16 val;
+            register int i, k;
+            i = j*spp;
 
-               for(k = 0; k <= spp0-1; k += 1) {
-                  _return0 = vector_array0[k];
-                  val = _return0;
-                  {
-                     //PIPS generated variable
-                     fgUINT16 *array0;
-                     //PIPS generated variable
-                     int pos1;
-                     //PIPS generated variable
-                     fgUINT16 value0;
-                     array0 = data_array0;
-                     pos1 = i;
-                     value0 = val;
-                     array0[pos1] = value0;
-                  }
-                  i++;
-               }
+            for(k = 0; k <= spp-1; k += 1) {
+               _return0 = vector_array[k];
+               val = _return0;
+               data_array[i] = val;
+               i++;
             }
          }
       }
@@ -2946,15 +2848,9 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
       if (sum!=0) {
          {
             //PIPS generated variable
-            fgUINT16 *array0;
-            //PIPS generated variable
-            int pos0;
-            //PIPS generated variable
-            fgUINT16 value0;
-            array0 = presult;
-            pos0 = k;
-            value0 = (fgUINT16) (tmp/sum);
-            array0[pos0] = value0;
+            double F_0;
+            F_0 = tmp/sum;
+            presult[k] = F_0;
          }
       }
    }
@@ -2984,7 +2880,7 @@ int main(int argc, char *argv[])
    FLGR_Data2D *imgsrc, *imgref, *img, *nhb;
    FLGR_Ret ret;
    //PIPS generated variable
-   enum {FLGR_RET_OK, FLGR_RET_TYPE_UNKNOWN=-1, FLGR_RET_TYPE_DIFFERENT=-2, FLGR_RET_SIZE_ERROR=-3, FLGR_RET_ALLOCATION_ERROR=-4, FLGR_RET_CONNEXITY_UNKNOWN=-5, FLGR_RET_PARAM_UNKNOWN=-6, FLGR_RET_NOT_IMPLEMENTED=-7, FLGR_RET_UNDEFINED_ERROR=-8, FLGR_RET_NULL_OBJECT=-9, FLGR_RET_VECTOR_SIZE_DIFFERENT=-10, FLGR_RET_VECTOR_SIZE_ERROR=-11, FLGR_RET_PARAM_ERROR=-12} _return0;
+   FLGR_Ret _return0;
 
    imgsrc = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
    imgref = flgr2d_create_pixmap(8, 10, 1, flgr_get_type_from_string("fgUINT16"));
@@ -3037,7 +2933,7 @@ int main(int argc, char *argv[])
                      //PIPS generated variable
                      void **P_39;
                      //PIPS generated variable
-                     unsigned short _return0, _return1, _return2;
+                     fgUINT16 _return0, _return1, _return2;
                      spp = imgsrc0->spp;
                      w = imgsrc0->size_x;
                      h = imgsrc0->size_y;
@@ -3057,155 +2953,117 @@ int main(int argc, char *argv[])
                         for(j = 0; j <= w-1; j += 1) {
                            nhbrs = i%2==1?nhbOdd:nhbEven;
                            {
+                              int i_, j_, m;
+                              int k, l, n;
+                              int nbrow, nbcol;
+                              int startrow, stoprow;
+                              int startcol, stopcol;
+                              int nhbsize_xdiv2;
+                              int nhbsize_ydiv2;
+                              int spp;
+                              fgUINT16 **pnhb;
+                              fgUINT16 **pdat;
+                              fgUINT16 *list_data;
+                              fgUINT16 *list_nhb;
+                              int *list_coord_x;
+                              int *list_coord_y;
+                              int *size;
+                              fgUINT16 nhb_val, data_val;
                               //PIPS generated variable
-                              FLGR_NhbBox2D *extr0;
+                              void **P_21;
                               //PIPS generated variable
-                              FLGR_Data2D *dat0, *nhb0;
+                              void **P_22;
                               //PIPS generated variable
-                              int row0, col0;
-                              extr0 = extr;
-                              dat0 = imgsrc0;
-                              nhb0 = nhbrs;
-                              row0 = i;
-                              col0 = j;
+                              void **P_23;
+                              //PIPS generated variable
+                              void **P_24;
+                              //PIPS generated variable
+                              int **P_25, **P_26;
+                              spp = imgsrc0->spp;
+                              pnhb = (fgUINT16 **) nhbrs->array;
+                              pdat = (fgUINT16 **) imgsrc0->array;
+                              size = extr->size;
+                              nhbsize_xdiv2 = nhbrs->size_x>>1;
+                              nhbsize_ydiv2 = nhbrs->size_y>>1;
+                              nbrow = imgsrc0->size_y;
+                              nbcol = imgsrc0->size_x;
+                              extr->center_coord_y = i;
+                              extr->center_coord_x = j;
+                              startrow = i-nhbsize_ydiv2;
+                              startrow = startrow<0?0:startrow;
+                              stoprow = i+nhbsize_ydiv2;
+                              stoprow = stoprow>=nbrow?nbrow-1:stoprow;
+                              startcol = j-nhbsize_xdiv2;
+                              startcol = startcol<0?0:startcol;
+                              stopcol = j+nhbsize_xdiv2;
+                              stopcol = stopcol>=nbcol?nbcol-1:stopcol;
+                              P_21 = imgsrc0->array;
                               {
-                                 int i, j, m;
-                                 int k, l, n;
-                                 int nbrow, nbcol;
-                                 int startrow, stoprow;
-                                 int startcol, stopcol;
-                                 int nhbsize_xdiv2;
-                                 int nhbsize_ydiv2;
-                                 int spp;
-                                 fgUINT16 **pnhb;
-                                 fgUINT16 **pdat;
-                                 fgUINT16 *list_data;
-                                 fgUINT16 *list_nhb;
-                                 int *list_coord_x;
-                                 int *list_coord_y;
-                                 int *size;
-                                 fgUINT16 nhb_val, data_val;
                                  //PIPS generated variable
-                                 void **P_21;
+                                 void *P_46;
                                  //PIPS generated variable
-                                 void **P_22;
-                                 //PIPS generated variable
-                                 void **P_23;
-                                 //PIPS generated variable
-                                 void **P_24;
-                                 //PIPS generated variable
-                                 int **P_25, **P_26;
-                                 spp = dat0->spp;
-                                 pnhb = (fgUINT16 **) nhb0->array;
-                                 pdat = (fgUINT16 **) dat0->array;
-                                 size = extr0->size;
-                                 nhbsize_xdiv2 = nhb0->size_x>>1;
-                                 nhbsize_ydiv2 = nhb0->size_y>>1;
-                                 nbrow = dat0->size_y;
-                                 nbcol = dat0->size_x;
-                                 extr0->center_coord_y = row0;
-                                 extr0->center_coord_x = col0;
-                                 startrow = row0-nhbsize_ydiv2;
-                                 startrow = startrow<0?0:startrow;
-                                 stoprow = row0+nhbsize_ydiv2;
-                                 stoprow = stoprow>=nbrow?nbrow-1:stoprow;
-                                 startcol = col0-nhbsize_xdiv2;
-                                 startcol = startcol<0?0:startcol;
-                                 stopcol = col0+nhbsize_xdiv2;
-                                 stopcol = stopcol>=nbcol?nbcol-1:stopcol;
-                                 P_21 = dat0->array;
+                                 void *P_47;
+                                 P_46 = extr->center_data_val->array;
+                                 P_47 = P_21[i];
                                  {
+                                    register fgUINT16 val;
+                                    register int i, k;
                                     //PIPS generated variable
-                                    fgUINT16 *vector_array1, *data_array1;
-                                    //PIPS generated variable
-                                    int spp1, pos2;
-                                    vector_array1 = (fgUINT16 *) extr0->center_data_val->array;
-                                    data_array1 = (fgUINT16 *) P_21[row0];
-                                    spp1 = spp;
-                                    pos2 = col0;
-                                    {
-                                       register fgUINT16 val;
-                                       register int i, k;
-                                       //PIPS generated variable
-                                       unsigned short _return0;
-                                       i = pos2*spp1;
+                                    fgUINT16 _return0;
+                                    i = j*spp;
 
-                                       for(k = 0; k <= spp1-1; k += 1) {
-                                          _return0 = data_array1[i];
-                                          val = _return0;
-                                          {
-                                          //PIPS generated variable
-                                          fgUINT16 *array0;
-                                          //PIPS generated variable
-                                          int pos0;
-                                          //PIPS generated variable
-                                          fgUINT16 value0;
-                                          array0 = vector_array1;
-                                          pos0 = k;
-                                          value0 = val;
-                                          array0[pos0] = value0;
-                                          }
-                                          i++;
-                                       }
+                                    for(k = 0; k <= spp-1; k += 1) {
+                                       _return0 = P_47[i];
+                                       val = _return0;
+                                       P_46[k] = val;
+                                       i++;
                                     }
                                  }
-                                 P_22 = nhb0->array;
+                              }
+                              P_22 = nhbrs->array;
+                              {
+                                 //PIPS generated variable
+                                 void *P_48;
+                                 //PIPS generated variable
+                                 void *P_49;
+                                 P_48 = extr->center_nhb_val->array;
+                                 P_49 = P_22[nhbsize_ydiv2];
                                  {
+                                    register fgUINT16 val;
+                                    register int i, k;
                                     //PIPS generated variable
-                                    fgUINT16 *vector_array2, *data_array2;
-                                    //PIPS generated variable
-                                    int spp2, pos3;
-                                    vector_array2 = (fgUINT16 *) extr0->center_nhb_val->array;
-                                    data_array2 = (fgUINT16 *) P_22[nhbsize_ydiv2];
-                                    spp2 = spp;
-                                    pos3 = nhbsize_xdiv2;
-                                    {
-                                       register fgUINT16 val;
-                                       register int i, k;
-                                       //PIPS generated variable
-                                       unsigned short _return0;
-                                       i = pos3*spp2;
+                                    fgUINT16 _return0;
+                                    i = nhbsize_xdiv2*spp;
 
-                                       for(k = 0; k <= spp2-1; k += 1) {
-                                          _return0 = data_array2[i];
-                                          val = _return0;
-                                          {
-                                          //PIPS generated variable
-                                          fgUINT16 *array0;
-                                          //PIPS generated variable
-                                          int pos0;
-                                          //PIPS generated variable
-                                          fgUINT16 value0;
-                                          array0 = vector_array2;
-                                          pos0 = k;
-                                          value0 = val;
-                                          array0[pos0] = value0;
-                                          }
-                                          i++;
-                                       }
+                                    for(k = 0; k <= spp-1; k += 1) {
+                                       _return0 = P_49[i];
+                                       val = _return0;
+                                       P_48[k] = val;
+                                       i++;
                                     }
                                  }
-                                 for(n = 0; n <= spp-1; n += 1) {
-                                    P_23 = extr0->list_data_val;
-                                    list_data = (fgUINT16 *) P_23[n];
-                                    P_24 = extr0->list_nhb_val;
-                                    list_nhb = (fgUINT16 *) P_24[n];
-                                    P_25 = extr0->list_coord_x;
-                                    list_coord_x = (int *) P_25[n];
-                                    P_26 = extr0->list_coord_y;
-                                    list_coord_y = (int *) P_26[n];
-                                    m = 0;
-                                    k = startrow-row0+nhbsize_ydiv2;
-                                    for(i = startrow; i <= stoprow; i += 1) {
-                                       l = startcol-col0+nhbsize_xdiv2;
-                                       for(j = startcol; j <= stopcol; j += 1) {
-                                          {
+                              }
+                              for(n = 0; n <= spp-1; n += 1) {
+                                 P_23 = extr->list_data_val;
+                                 list_data = (fgUINT16 *) P_23[n];
+                                 P_24 = extr->list_nhb_val;
+                                 list_nhb = (fgUINT16 *) P_24[n];
+                                 P_25 = extr->list_coord_x;
+                                 list_coord_x = (int *) P_25[n];
+                                 P_26 = extr->list_coord_y;
+                                 list_coord_y = (int *) P_26[n];
+                                 m = 0;
+                                 k = startrow-i+nhbsize_ydiv2;
+                                 for(i_ = startrow; i_ <= stoprow; i_ += 1) {
+                                    l = startcol-j+nhbsize_xdiv2;
+                                    for(j_ = startcol; j_ <= stopcol; j_ += 1) {
+                                       {
                                           //PIPS generated variable
                                           int I_2;
                                           I_2 = l*spp+n;
                                           {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;
@@ -3214,20 +3072,20 @@ int main(int argc, char *argv[])
                                           }
                                           _return1 = _return0;
                                           }
-                                          }
-                                          nhb_val = _return1;
-                                          if (nhb_val!=0) {
+                                       }
+                                       nhb_val = _return1;
+                                       if (nhb_val!=0) {
                                           {
                                           //PIPS generated variable
                                           int I_3;
-                                          I_3 = j*spp+n;
+                                          I_3 = j_*spp+n;
                                           {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;
-                                          P_40 = pdat[i];
+                                          P_40 = pdat[i_];
                                           _return0 = P_40[I_3];
                                           }
                                           _return2 = _return0;
@@ -3239,47 +3097,25 @@ int main(int argc, char *argv[])
                                           list_data[m] = data_val;
                                           list_nhb[m] = nhb_val;
                                           m++;
-                                          }
-                                          l++;
                                        }
-                                       k++;
+                                       l++;
                                     }
-                                    size[n] = m;
+                                    k++;
                                  }
+                                 size[n] = m;
                               }
                            }
                            (*computeNhb0)(result,extr);
                            {
-                              //PIPS generated variable
-                              fgUINT16 *data_array0, *vector_array0;
-                              //PIPS generated variable
-                              int spp0, pos0;
-                              data_array0 = data_array;
-                              vector_array0 = vector_array;
-                              spp0 = spp;
-                              pos0 = j;
-                              {
-                                 register fgUINT16 val;
-                                 register int i, k;
-                                 i = pos0*spp0;
+                              register fgUINT16 val;
+                              register int i, k;
+                              i = j*spp;
 
-                                 for(k = 0; k <= spp0-1; k += 1) {
-                                    _return0 = vector_array0[k];
-                                    val = _return0;
-                                    {
-                                       //PIPS generated variable
-                                       fgUINT16 *array0;
-                                       //PIPS generated variable
-                                       int pos1;
-                                       //PIPS generated variable
-                                       fgUINT16 value0;
-                                       array0 = data_array0;
-                                       pos1 = i;
-                                       value0 = val;
-                                       array0[pos1] = value0;
-                                    }
-                                    i++;
-                                 }
+                              for(k = 0; k <= spp-1; k += 1) {
+                                 _return0 = vector_array[k];
+                                 val = _return0;
+                                 data_array[i] = val;
+                                 i++;
                               }
                            }
                         }

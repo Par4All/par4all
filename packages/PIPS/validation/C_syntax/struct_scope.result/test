@@ -1,10 +1,127 @@
-int foo()
-{
-   struct key {
-      int node;
-   };
-   return 1;
-}
+
+Symbol table for "struct_scope!"
+
+struct_scope!
+
+Declarations for module "struct_scope!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> int"
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
+	Declared entity "TOP-LEVEL:toto" with type "functional" "() -> int"
+	Declared entity "struct_scope!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "struct_scope!:*HEAP*" with type "area" with size 0
+	Declared entity "struct_scope!:*STACK*" with type "area" with size 0
+	Declared entity "struct_scope!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "struct_scope!:#key"	kind = struct
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module struct_scope!
+
+
+Parsed code for "struct_scope!"
+
+struct key {
+   int node;
+};
+
+int main();
+
+int foo();
+
+int toto();
+
+Symbol table for "main"
+
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 14
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`i" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "struct_scope!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "main:0`#key"	kind = struct
+	Variable "main:0`1`#key"	kind = struct
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 14:
+	Variable "main:0`i"	offset = 10	size = 4
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+
+Parsed code for "main"
+
 int main()
 {
    int i = 1;
@@ -18,15 +135,137 @@ int main()
    }
    printf("Test\n");
 }
-struct key {
-   int node;
-};
 
-int main();
+Symbol table for "foo"
 
-int foo();
+foo
 
-int toto();
+Declarations for module "foo" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 8
+	Declared entity "foo:*HEAP*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "foo:0`__func__" with type "variable" "char *"
+	Declared entity "foo:foo" with type "variable" "int"
+	Declared entity "struct_scope!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "foo:0`#key"	kind = struct
+
+Layout for return variable:
+
+	Variable "foo:foo"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 8:
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module foo
+
+
+Parsed code for "foo"
+
+int foo()
+{
+   struct key {
+      int node;
+   };
+   return 1;
+}
+
+Symbol table for "toto"
+
+toto
+
+Declarations for module "toto" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "struct_scope!:*STATIC*" with type "area" with size 0
+	Declared entity "toto:*DYNAMIC*" with type "area" with size 14
+	Declared entity "toto:*HEAP*" with type "area" with size 0
+	Declared entity "toto:*STACK*" with type "area" with size 0
+	Declared entity "toto:*STATIC*" with type "area" with size 0
+	Declared entity "toto:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "toto:0`__func__" with type "variable" "char *"
+	Declared entity "toto:0`i" with type "variable" "int"
+	Declared entity "toto:toto" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Derived entities:
+
+	Variable "toto:0`1`#test"	kind = struct
+
+Layout for return variable:
+
+	Variable "toto:toto"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "struct_scope!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "toto:*DYNAMIC*" of size 14:
+	Variable "toto:0`i"	offset = 10	size = 4
+	Variable "toto:0`__func__"	offset = 0	size = 5
+	Variable "toto:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "toto:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "toto:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "toto:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module toto
+
+
+Parsed code for "toto"
+
 int toto()
 {
    int i = 1;

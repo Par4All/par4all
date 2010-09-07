@@ -1,14 +1,9 @@
 delete assert01
 
-setenv PIPS_CPP="cpp -C"
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create assert01 assert01.c
 
-activate C_PARSER
+setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_C_CODE TRUE
 
 echo
 echo Parsed printed file for "assert01"

@@ -1,7 +1,4 @@
 # $Id$
-#
-# TODO
-# * *.f95 for gfc2pips
 
 # pips exes
 TPIPS	= tpips
@@ -15,7 +12,15 @@ TIMEOUT	= 600
 # this can be modified to generate separate files
 # see "validate-out" and "validate-test" targets
 TEST	= test
+
+# is it a subversion working copy?
+IS_SVN	= test -d .svn
+
+# some parametric commands
+CHECK	= $(IS_SVN)
 DIFF	= svn diff
+UNDO	= svn revert
+LIST	= svn status
 
 # prefix of tests to be run, default is all
 PREFIX	=
@@ -34,10 +39,10 @@ F.src	= $(F.c) $(F.f) $(F.F) $(F.f90) $(F.f95)
 F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) \
 	$(F.F:%.F=%.result) $(F.f90:%.f90=%.result) $(F.f95:%.f95=%.result)
 
-# actual result directory
+# actual result directory to validate
 F.result= $(wildcard $(PREFIX)*.result)
 
-# validation scripts
+# various validation scripts
 F.tpips	= $(wildcard *.tpips)
 F.tpips2= $(wildcard *.tpips2)
 F.test	= $(wildcard *.test)
@@ -51,17 +56,22 @@ F.valid	= $(F.result:%=%/$(TEST))
 # all base cases
 F.list	= $(F.result:%.result=%)
 
+# where are we?
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
+# get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
-#OK	= exit 0
+# where to store validation results
 RESULTS	= RESULTS
 
+# shell environment to run validation scripts
 SHELL	= /bin/bash
-PF	= set -o pipefail ; \
+PF	= @echo "processing $(SUBDIR)/$+" ; \
+	  set -o pipefail ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # extract validation result for summary
+# four possible outcomes: passed, changed, failed, timeout
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 255 ] ; then \
@@ -81,38 +91,57 @@ OK	= status=$$? ; \
 # default target is to clean
 clean: clean-validate
 
+.PHONY: clean-validate
 clean-validate:
 	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
 	$(RM) -r *.database $(RESULTS)
 
+.PHONY: validate
 validate:
-	# Experimental parallel validation
-	# run "make validate-out" to generate usual "out" files.
+	# Parallel validation
 	# run "make validate-test" to generate "test" files.
+	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
 
+.PHONY: validate-dir
+# the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
 validate-dir:
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
+	$(MAKE) sort-local-result
 else # sequential validation
 validate-dir:
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
+	$(MAKE) sort-local-result
 endif
 
+# on local validations, sort result & show summary
+.PHONY: sort-local-result
+sort-local-result:
+	@if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
+	  mv RESULTS RESULTS.tmp ; \
+	  sort -k 2 RESULTS.tmp > RESULTS ; \
+	  $(RM) RESULTS.tmp ; \
+	  pips_validation_summary.pl RESULTS ; \
+	fi
+
 # restore all initial "test" result files if you are unhappy with a validate
-unvalidate:
-	svn revert $(F.valid)
+.PHONY: unvalidate
+unvalidate: check-vc
+	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.valid)
 
 # generate "out" files
 # ??? does not work because of "svn diff"?
+.PHONY: validate-out
 validate-out:
-	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh validate-dir
+	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh LIST=: UNDO=: validate-dir
 
 # generate "test" files
-validate-test:
+.PHONY: validate-test
+validate-test: check-vc
 	$(MAKE) TEST=test validate-dir
 
 # hack: validate depending on prefix?
@@ -120,7 +149,8 @@ validate-%:
 	$(MAKE) F.result="$(wildcard $**.result)" validate-dir
 
 # generate missing "test" files
-test: $(F.valid)
+.PHONY: generate-test
+generate-test: $(F.valid)
 
 # (shell) script
 %.result/$(TEST): %.test
@@ -169,6 +199,7 @@ DEFTEST	= default_test
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
 # detect skipped stuff
+.PHONY: skipped
 skipped:
 	for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
 	  if ! test -d $$base.result ; \
@@ -181,6 +212,7 @@ skipped:
 	done >> $(RESULTS)
 
 # test RESULT directory without any script
+.PHONY: orphan
 orphan:
 	for base in $(sort $(F.list)) ; do \
 	  test -f $$base.tpips -o \
@@ -189,10 +221,11 @@ orphan:
 	       -f $$base.py -o \
 	       -f default_tpips -o \
 	       -f default_test || \
-	  echo "orphan: $$base" ; \
+	  echo "orphan: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
 # test case with multiple scripts... one is randomly (?) chosen
+.PHONY: multi-script
 multi-script:
 	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
@@ -200,6 +233,7 @@ multi-script:
 	done >> $(RESULTS)
 
 # test case with multiple sources (c/f/F...)
+.PHONY: multi-source
 multi-source:
 	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
@@ -207,10 +241,12 @@ multi-source:
 	done >> $(RESULTS)
 
 # all possible inconsistencies
+.PHONY: inconsistencies
 inconsistencies: skipped orphan multi-source multi-script
 
 # what about nothing?
 # source files without corresponding result directory
+.PHONY: missing
 missing:
 	@echo "# checking for missing (?) result directories"
 	@ n=0; \
@@ -222,9 +258,19 @@ missing:
 	done ; \
 	echo "# $$n missing result(s)"
 
-missing-svn:
-	@echo "# result directories not under svn"
-	@svn status | grep '\.result'
+.PHONY: missing-vc
+missing-vc:
+	@echo "# result directories not under version control"
+	@$(LIST) | grep '\.result'
 
+# check that we are in a working copy
+.PHONY: check-vc
+check-vc:
+	@$(CHECK) || { \
+	  echo "error: validation must be a working copy" >&2 ; \
+	  exit 1 ; \
+	}
+
+.PHONY: count
 count:
 	@echo "number of validations:" `echo $(F.result) | wc -w`

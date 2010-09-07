@@ -1,4 +1,50 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_add_const(o, i0, p0);                              /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_add_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 +." [shape=trapezium,orientation=270];
+  "5 +." -> "o";
+  "i0" -> "5 +.";
+}
+// graph for dag "dag_cleaned_0" of module "my_add_const" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 +." [shape=trapezium,orientation=270];
+  "5 +." -> "o";
+  "i0" -> "5 +.";
+}
+
+! updated function for
+
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_add_const(o, i0, p0);                              /*0005*/
+}
+#
 # SPOC
 #
 
@@ -125,6 +171,13 @@ freia_status my_add_const_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 }
 
 ! updated function
+
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_add_const_helper_0_0_0(o, i0, p0);                         /*0005*/
+}
+
+! cleaned up function
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -276,6 +329,13 @@ freia_status my_add_const_helper_0_0(
 
 
 ! updated function
+
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_add_const_helper_0_0(o, i0, p0);                           /*0005*/
+}
+
+! cleaned up function
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {

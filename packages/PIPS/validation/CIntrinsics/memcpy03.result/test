@@ -1,0 +1,10 @@
+
+Parsed printed file for "memcpy03"
+
+int main()
+{
+   memcpy("question", "réponse", 7);
+}
+
+Proper effetcs for "memcpy03"
+

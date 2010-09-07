@@ -1,5 +1,9 @@
 # WSPACE=foo FILE=foo.c tpips default_tpips
 echo #
+echo # AIPO
+echo #
+source aipo.tpips
+echo #
 echo # SPOC
 echo #
 source spoc.tpips

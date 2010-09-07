@@ -23,8 +23,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-# shell $(PIPS_CC) -c inlining02.database/Src/inlining02.c
-shell cc -c inlining02.database/Src/inlining02.c
+shell cc inlining02.c -o inlining02.database/Tmp/ref
+shell cc inlining02.database/Src/inlining02.c -o inlining02.database/Tmp/seq
+shell ( test "`./inlining02.database/Tmp/seq`" = "`./inlining02.database/Tmp/ref`" && echo ok ) || echo ko
+
 
 close
 delete inlining02

@@ -1,0 +1,21 @@
+void esco()
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, j[10], j0[10], j1[10];
+bar:   LU_NUB0 = 2;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+      j[0] = LU_IND0*1+0;
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+
+      j1[0] = (LU_IND0+0)*1+0;
+
+      j0[0] = (LU_IND0+1)*1+0;
+l99998:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+}

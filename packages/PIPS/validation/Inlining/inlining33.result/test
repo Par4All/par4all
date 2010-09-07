@@ -1,0 +1,53 @@
+
+Initial code
+
+void acuda(int m)
+{
+// (0,1)
+   bar(m);                                                              /*0009*/
+}
+void bar(int n)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int t[n];                                                            /*0003*/
+// (0,3)
+   t[0] = 0;                                                            /*0004*/
+   // END BLOCK
+}
+void acuda(int m)
+{
+// (0,1)
+   // BEGIN BLOCK
+   {
+// (0,2)
+      // BEGIN BLOCK
+      // (0,1)
+      // BEGIN BLOCK
+      // (0,2)
+// (0,3)
+      int t[m];                                                         /*0011*/
+// (0,4)
+      /*0003*/
+      // (0,3)
+      t[0] = 0;                                                         /*0013*/
+// (0,5)
+      /*0004*/
+      // (statement ordering unavailable)
+      ;
+      // END BLOCK
+   }
+   // END BLOCK
+}
+void bar(int n)
+{
+// (0,1)
+   // BEGIN BLOCK
+// (0,2)
+   int t[n];                                                            /*0003*/
+// (0,3)
+   t[0] = 0;                                                            /*0004*/
+   // END BLOCK
+}
+

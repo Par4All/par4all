@@ -12,7 +12,8 @@ activate PRECONDITIONS_INTER_FULL
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_BLOCKS TRUE
+# This clutters the result and makes it hard to understand
+#setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE

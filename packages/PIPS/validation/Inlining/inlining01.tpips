@@ -27,11 +27,11 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-# shell $(PIPS_CC) -c inlining01.database/Src/inlining01.c
-shell cc -c inlining01.database/Src/inlining01.c
-shell rm -f inlining01.o
+shell cc inlining01.c -o inlining01.database/Tmp/ref
+shell cc inlining01.database/Src/inlining01.c -o inlining01.database/Tmp/seq
+shell ( test "`./inlining01.database/Tmp/seq`" = "`./inlining01.database/Tmp/ref`" && echo ok ) || echo ko
 
 close
-delete inlining01
+#delete inlining01
 quit
 

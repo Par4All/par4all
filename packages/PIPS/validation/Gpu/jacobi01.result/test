@@ -10,7 +10,7 @@
 
 void compute(float_t space[501][501], float_t save[501][501])
 {
-   int t;                                                               /*0102*/
+   int t;                                                               /*0106*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -36,7 +36,7 @@ void compute(float_t space[501][501], float_t save[501][501])
 //  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
 //    0<=t, t<=399}>
 
-      iteration(space, save);                                           /*0106*/
+      iteration(space, save);                                           /*0110*/
 }
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
@@ -46,9 +46,9 @@ void compute(float_t space[501][501], float_t save[501][501])
 
 void get_data(char filename[])
 {
-   int i, j, nx, ny;                                                    /*0013*/
-   unsigned char c;                                                     /*0014*/
-   FILE *fp;                                                            /*0015*/
+   int i, j, nx, ny;                                                    /*0017*/
+   unsigned char c;                                                     /*0018*/
+   FILE *fp;                                                            /*0019*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -58,7 +58,7 @@ void get_data(char filename[])
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
-   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0017*/
+   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
@@ -66,8 +66,8 @@ void get_data(char filename[])
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
-      perror("Error loading file");                                     /*0018*/
-      exit(0);                                                          /*0019*/
+      perror("Error loading file");                                     /*0022*/
+      exit(0);                                                          /*0023*/
    }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -78,7 +78,7 @@ void get_data(char filename[])
 
    
    /* Get *.pgm file type */
-   c = fgetc(fp);                                                       /*0023*/
+   c = fgetc(fp);                                                       /*0027*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -86,7 +86,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-   c = fgetc(fp);                                                       /*0024*/
+   c = fgetc(fp);                                                       /*0028*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -94,7 +94,7 @@ void get_data(char filename[])
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-   do {                                                                 /*0029*/
+   do {                                                                 /*0033*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -102,10 +102,10 @@ void get_data(char filename[])
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-      while ((c = fgetc(fp))!='\n')                                     /*0028*/
-         ;                                                              /*0028*/
+      while ((c = fgetc(fp))!='\n')                                     /*0032*/
+         ;                                                              /*0032*/
    }
-   while ((c = fgetc(fp))=='#');                                        /*0029*/
+   while ((c = fgetc(fp))=='#');                                        /*0033*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -115,7 +115,7 @@ void get_data(char filename[])
 
    
    /* Put back good char */
-   ungetc(c, fp);                                                       /*0032*/
+   ungetc(c, fp);                                                       /*0036*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -125,7 +125,7 @@ void get_data(char filename[])
 
    
    /* Get image dimensions */
-   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0035*/
+   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -134,7 +134,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get grey levels */
-   fscanf(fp, "%d", &i);                                                /*0037*/
+   fscanf(fp, "%d", &i);                                                /*0041*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -143,7 +143,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
-   fgetc(fp);                                                           /*0039*/
+   fgetc(fp);                                                           /*0043*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
@@ -151,7 +151,7 @@ void get_data(char filename[])
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
-   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0040*/
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
 
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500}>
 
@@ -167,7 +167,7 @@ void get_data(char filename[])
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
 //    j<=500}>
 
-         space[i][j] = 0;                                               /*0045*/
+         space[i][j] = 0;                                               /*0049*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -197,18 +197,18 @@ void get_data(char filename[])
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-         c = fgetc(fp);                                                 /*0050*/
+         c = fgetc(fp);                                                 /*0054*/
 
 //  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
-         if (i<501&&j<501)                                              /*0052*/
+         if (i<501&&j<501)                                              /*0056*/
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
-            space[i][j] = c;                                            /*0053*/
+            space[i][j] = c;                                            /*0057*/
       }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -218,7 +218,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
 
-   fclose(fp);                                                          /*0056*/
+   fclose(fp);                                                          /*0060*/
 }
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -232,7 +232,7 @@ void get_data(char filename[])
 
 void iteration(float_t space[501][501], float_t save[501][501])
 {
-   int i, j;                                                            /*0083*/
+   int i, j;                                                            /*0087*/
 
 //  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -258,7 +258,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+3, 0<=i, i<=498, 0<=j, j<=498}>
 
 
-         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0090*/
+         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0094*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -282,7 +282,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //    0<=j, j<=498}>
 
 
-         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0096*/
+         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0100*/
 }
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
@@ -292,9 +292,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
 void write_data(char filename[])
 {
-   int i, j;                                                            /*0061*/
-   unsigned char c;                                                     /*0062*/
-   FILE *fp;                                                            /*0063*/
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -304,7 +304,7 @@ void write_data(char filename[])
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0065*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
@@ -312,8 +312,8 @@ void write_data(char filename[])
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
-      perror("Error opening file");                                     /*0066*/
-      exit(0);                                                          /*0067*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
    }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -324,7 +324,7 @@ void write_data(char filename[])
 
    
    /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0071*/
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -349,7 +349,7 @@ void write_data(char filename[])
 //  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
 //    j<=500}>
 
-         c = space[i][j];                                               /*0075*/
+         c = space[i][j];                                               /*0079*/
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -357,7 +357,7 @@ void write_data(char filename[])
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-         fputc(c, fp);                                                  /*0076*/
+         fputc(c, fp);                                                  /*0080*/
       }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -366,7 +366,7 @@ void write_data(char filename[])
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-   fclose(fp);                                                          /*0078*/
+   fclose(fp);                                                          /*0082*/
 }
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
@@ -376,7 +376,7 @@ void write_data(char filename[])
 
 int main(int argc, char *argv[])
 {
-   int i;                                                               /*0112*/
+   int i;                                                               /*0116*/
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
 
-   if (argc!=2) {                                                       /*0114*/
+   if (argc!=2) {                                                       /*0118*/
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
@@ -395,8 +395,8 @@ int main(int argc, char *argv[])
 
       
       
-      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0117*/
-      exit(0);                                                          /*0118*/
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0121*/
+      exit(0);                                                          /*0122*/
    }
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
-   get_data(argv[1]);                                                   /*0120*/
+   get_data(argv[1]);                                                   /*0124*/
 
 //  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500,
 //    argc==2}>
@@ -417,7 +417,7 @@ int main(int argc, char *argv[])
 //  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, i<=PHI1+PHI2,
 //    PHI1+PHI2<=i+500, 0<=PHI2, PHI2<=500, argc==2, 0<=i, i<=500}>
 
-      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0125*/
+      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
 //    argc==2, i==501}>
 
 
-   compute(space, save);                                                /*0127*/
+   compute(space, save);                                                /*0131*/
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
@@ -439,69 +439,69 @@ int main(int argc, char *argv[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
-   write_data("output.pgm");                                            /*0129*/
+   write_data("output.pgm");                                            /*0133*/
 
-   return 0;                                                            /*0131*/
+   return 0;                                                            /*0135*/
 }
 void compute(float_t space[501][501], float_t save[501][501])
 {
-   int t;                                                               /*0102*/
+   int t;                                                               /*0106*/
    
    /* Apply the relaxation T times: */
    for(t = 0; t <= 399; t += 1)
-      iteration(space, save);                                           /*0106*/
+      iteration(space, save);                                           /*0110*/
 }
 void get_data(char filename[])
 {
-   int i, j, nx, ny;                                                    /*0013*/
-   unsigned char c;                                                     /*0014*/
-   FILE *fp;                                                            /*0015*/
-   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0017*/
-      perror("Error loading file");                                     /*0018*/
-      exit(0);                                                          /*0019*/
+   int i, j, nx, ny;                                                    /*0017*/
+   unsigned char c;                                                     /*0018*/
+   FILE *fp;                                                            /*0019*/
+   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
+      perror("Error loading file");                                     /*0022*/
+      exit(0);                                                          /*0023*/
    }
    
    /* Get *.pgm file type */
-   c = fgetc(fp);                                                       /*0023*/
-   c = fgetc(fp);                                                       /*0024*/
-   do {                                                                 /*0029*/
-      while ((c = fgetc(fp))!='\n')                                     /*0028*/
-         ;                                                              /*0028*/
+   c = fgetc(fp);                                                       /*0027*/
+   c = fgetc(fp);                                                       /*0028*/
+   do {                                                                 /*0033*/
+      while ((c = fgetc(fp))!='\n')                                     /*0032*/
+         ;                                                              /*0032*/
    }
-   while ((c = fgetc(fp))=='#');                                        /*0029*/
+   while ((c = fgetc(fp))=='#');                                        /*0033*/
    
    /* Put back good char */
-   ungetc(c, fp);                                                       /*0032*/
+   ungetc(c, fp);                                                       /*0036*/
    
    /* Get image dimensions */
-   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0035*/
+   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
    /* Get grey levels */
-   fscanf(fp, "%d", &i);                                                /*0037*/
+   fscanf(fp, "%d", &i);                                                /*0041*/
    /* Get ONE carriage return */
-   fgetc(fp);                                                           /*0039*/
-   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0040*/
+   fgetc(fp);                                                           /*0043*/
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
 #pragma omp parallel for private(j)
    for(i = 0; i <= 500; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 500; j += 1)
-         space[i][j] = 0;                                               /*0045*/
+         space[i][j] = 0;                                               /*0049*/
    
    /* Read the pixel grey value: */
    for(j = 0; j <= -1+ny; j += 1)
       for(i = 0; i <= -1+nx; i += 1) {
-         c = fgetc(fp);                                                 /*0050*/
+         c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
-         if (i<501&&j<501)                                              /*0052*/
-            space[i][j] = c;                                            /*0053*/
+         if (i<501&&j<501)                                              /*0056*/
+            space[i][j] = c;                                            /*0057*/
       }
 
-   fclose(fp);                                                          /*0056*/
+   fclose(fp);                                                          /*0060*/
 }
 void iteration(float_t space[501][501], float_t save[501][501])
 {
-   int i, j;                                                            /*0083*/
+   int i, j;                                                            /*0087*/
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -510,95 +510,95 @@ void iteration(float_t space[501][501], float_t save[501][501])
 #pragma omp parallel for 
       for(j = 0; j <= 498; j += 1)
 
-         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0090*/
+         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0094*/
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 498; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 498; j += 1)
 
-         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0096*/
+         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0100*/
 }
 void write_data(char filename[])
 {
-   int i, j;                                                            /*0061*/
-   unsigned char c;                                                     /*0062*/
-   FILE *fp;                                                            /*0063*/
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0065*/
-      perror("Error opening file");                                     /*0066*/
-      exit(0);                                                          /*0067*/
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
    }
    
    /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0071*/
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
    for(j = 0; j <= 500; j += 1)
       for(i = 0; i <= 500; i += 1) {
-         c = space[i][j];                                               /*0075*/
-         fputc(c, fp);                                                  /*0076*/
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
       }
-   fclose(fp);                                                          /*0078*/
+   fclose(fp);                                                          /*0082*/
 }
 int main(int argc, char *argv[])
 {
-   int i;                                                               /*0112*/
+   int i;                                                               /*0116*/
 
-   if (argc!=2) {                                                       /*0114*/
+   if (argc!=2) {                                                       /*0118*/
       
       
-      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0117*/
-      exit(0);                                                          /*0118*/
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0121*/
+      exit(0);                                                          /*0122*/
    }
-   get_data(argv[1]);                                                   /*0120*/
+   get_data(argv[1]);                                                   /*0124*/
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
-      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0125*/
+      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
-   compute(space, save);                                                /*0127*/
+   compute(space, save);                                                /*0131*/
 
-   write_data("output.pgm");                                            /*0129*/
+   write_data("output.pgm");                                            /*0133*/
 
-   return 0;                                                            /*0131*/
+   return 0;                                                            /*0135*/
 }
 void compute(float_t space[501][501], float_t save[501][501])
 {
-   int t;                                                               /*0102*/
+   int t;                                                               /*0106*/
    
    /* Apply the relaxation T times: */
    for(t = 0; t <= 399; t += 1)
-      iteration(space, save);                                           /*0106*/
+      iteration(space, save);                                           /*0110*/
 }
 void get_data(char filename[])
 {
-   int i, j, nx, ny;                                                    /*0013*/
-   unsigned char c;                                                     /*0014*/
-   FILE *fp;                                                            /*0015*/
-   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0017*/
-      perror("Error loading file");                                     /*0018*/
-      exit(0);                                                          /*0019*/
+   int i, j, nx, ny;                                                    /*0017*/
+   unsigned char c;                                                     /*0018*/
+   FILE *fp;                                                            /*0019*/
+   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
+      perror("Error loading file");                                     /*0022*/
+      exit(0);                                                          /*0023*/
    }
    
    /* Get *.pgm file type */
-   c = fgetc(fp);                                                       /*0023*/
-   c = fgetc(fp);                                                       /*0024*/
-   do {                                                                 /*0029*/
-      while ((c = fgetc(fp))!='\n')                                     /*0028*/
-         ;                                                              /*0028*/
+   c = fgetc(fp);                                                       /*0027*/
+   c = fgetc(fp);                                                       /*0028*/
+   do {                                                                 /*0033*/
+      while ((c = fgetc(fp))!='\n')                                     /*0032*/
+         ;                                                              /*0032*/
    }
-   while ((c = fgetc(fp))=='#');                                        /*0029*/
+   while ((c = fgetc(fp))=='#');                                        /*0033*/
    
    /* Put back good char */
-   ungetc(c, fp);                                                       /*0032*/
+   ungetc(c, fp);                                                       /*0036*/
    
    /* Get image dimensions */
-   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0035*/
+   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
    /* Get grey levels */
-   fscanf(fp, "%d", &i);                                                /*0037*/
+   fscanf(fp, "%d", &i);                                                /*0041*/
    /* Get ONE carriage return */
-   fgetc(fp);                                                           /*0039*/
-   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0040*/
+   fgetc(fp);                                                           /*0043*/
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_0(space);
@@ -606,17 +606,17 @@ void get_data(char filename[])
    /* Read the pixel grey value: */
    for(j = 0; j <= -1+ny; j += 1)
       for(i = 0; i <= -1+nx; i += 1) {
-         c = fgetc(fp);                                                 /*0050*/
+         c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
-         if (i<501&&j<501)                                              /*0052*/
-            space[i][j] = c;                                            /*0053*/
+         if (i<501&&j<501)                                              /*0056*/
+            space[i][j] = c;                                            /*0057*/
       }
 
-   fclose(fp);                                                          /*0056*/
+   fclose(fp);                                                          /*0060*/
 }
 void iteration(float_t space[501][501], float_t save[501][501])
 {
-   int i, j;                                                            /*0083*/
+   int i, j;                                                            /*0087*/
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -626,46 +626,46 @@ void iteration(float_t space[501][501], float_t save[501][501])
 }
 void write_data(char filename[])
 {
-   int i, j;                                                            /*0061*/
-   unsigned char c;                                                     /*0062*/
-   FILE *fp;                                                            /*0063*/
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0065*/
-      perror("Error opening file");                                     /*0066*/
-      exit(0);                                                          /*0067*/
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
    }
    
    /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0071*/
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
    for(j = 0; j <= 500; j += 1)
       for(i = 0; i <= 500; i += 1) {
-         c = space[i][j];                                               /*0075*/
-         fputc(c, fp);                                                  /*0076*/
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
       }
-   fclose(fp);                                                          /*0078*/
+   fclose(fp);                                                          /*0082*/
 }
 int main(int argc, char *argv[])
 {
-   int i;                                                               /*0112*/
+   int i;                                                               /*0116*/
 
-   if (argc!=2) {                                                       /*0114*/
+   if (argc!=2) {                                                       /*0118*/
       
       
-      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0117*/
-      exit(0);                                                          /*0118*/
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0121*/
+      exit(0);                                                          /*0122*/
    }
-   get_data(argv[1]);                                                   /*0120*/
+   get_data(argv[1]);                                                   /*0124*/
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
-      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0125*/
+      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
-   compute(space, save);                                                /*0127*/
+   compute(space, save);                                                /*0131*/
 
-   write_data("output.pgm");                                            /*0129*/
+   write_data("output.pgm");                                            /*0133*/
 
-   return 0;                                                            /*0131*/
+   return 0;                                                            /*0135*/
 }
 void p4a_kernel_launcher_2(float_t save[501][501], float_t space[501][501])
 {

@@ -1,0 +1,56 @@
+delete env02
+
+#setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create env02 env02.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# To check the environment and type declaration effects
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate MUST_POINTER_REGIONS
+
+# setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Parsed code for "env02"
+echo
+
+display PARSED_PRINTED_FILE[env02]
+
+echo
+echo Code for "env02"
+echo
+
+display PRINTED_FILE[env02]
+
+echo
+echo Proper effects for "env02"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[env02]
+
+echo
+echo Cumulated effects for "env02"
+echo
+
+activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
+display PRINTED_FILE[env02]
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Pointer Regions for "env02"
+echo
+
+activate PRINT_CODE_POINTER_REGIONS
+display PRINTED_FILE[env02]
+
+close
+delete env02
+quit

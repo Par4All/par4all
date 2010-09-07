@@ -2469,7 +2469,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2568,7 +2568,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                            I_2 = l*spp+n;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
@@ -2586,7 +2586,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                               I_3 = j*spp+n;
                               {
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  {
                                     //PIPS generated variable
                                     fgUINT16 *P_40;
@@ -2664,7 +2664,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   unsigned short _return0, _return1, _return2;
+   fgUINT16 _return0, _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2753,7 +2753,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      register fgUINT16 val;
                      register int i, k;
                      //PIPS generated variable
-                     unsigned short _return0;
+                     fgUINT16 _return0;
                      i = pos2*spp1;
 
                      for(k = 0; k <= spp1-1; k += 1) {
@@ -2789,7 +2789,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                      register fgUINT16 val;
                      register int i, k;
                      //PIPS generated variable
-                     unsigned short _return0;
+                     fgUINT16 _return0;
                      i = pos3*spp2;
 
                      for(k = 0; k <= spp2-1; k += 1) {
@@ -2831,7 +2831,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                            I_2 = l*spp+n;
                            {
                               //PIPS generated variable
-                              unsigned short _return0;
+                              fgUINT16 _return0;
                               {
                                  //PIPS generated variable
                                  fgUINT16 *P_40;
@@ -2849,7 +2849,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
                               I_3 = j*spp+n;
                               {
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  {
                                     //PIPS generated variable
                                     fgUINT16 *P_40;
@@ -3000,7 +3000,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                //PIPS generated variable
                void **P_39;
                //PIPS generated variable
-               unsigned short _return0, _return1, _return2;
+               fgUINT16 _return0, _return1, _return2;
                spp = imgsrc0->spp;
                w = imgsrc0->size_x;
                h = imgsrc0->size_y;
@@ -3090,7 +3090,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                                  register fgUINT16 val;
                                  register int i, k;
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  i = pos2*spp1;
 
                                  for(k = 0; k <= spp1-1; k += 1) {
@@ -3126,7 +3126,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                                  register fgUINT16 val;
                                  register int i, k;
                                  //PIPS generated variable
-                                 unsigned short _return0;
+                                 fgUINT16 _return0;
                                  i = pos3*spp2;
 
                                  for(k = 0; k <= spp2-1; k += 1) {
@@ -3168,7 +3168,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                                        I_2 = l*spp+n;
                                        {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;
@@ -3186,7 +3186,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
                                           I_3 = j*spp+n;
                                           {
                                           //PIPS generated variable
-                                          unsigned short _return0;
+                                          fgUINT16 _return0;
                                           {
                                           //PIPS generated variable
                                           fgUINT16 *P_40;

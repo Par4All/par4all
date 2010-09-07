@@ -3,10 +3,10 @@ Inital code
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j, ki, kj;
 
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
@@ -22,7 +22,7 @@ l200:
 l100:
             for(kj = 0; kj <= ksj-1; kj += 1)
                
-
+               
                new_image[i][j] = new_image[i][j]+image[i+ki-ksi/2][j+kj-ksj/2]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/(ksi*ksj);
       }
@@ -32,10 +32,10 @@ After partial evaluation:
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j, ki, kj;
 
    for(i = 0; i <= 511; i += 1)
       for(j = 0; j <= 511; j += 1)
@@ -51,341 +51,598 @@ l200:
 l100:
             for(kj = 0; kj <= 2; kj += 1)
                
-
+               
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;
       }
 }
 
-After strip mining and partial eval
+after privatization
+
+
+after paralellization
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j, ki, kj;
 
+#pragma omp parallel for private(j)
    for(i = 0; i <= 511; i += 1)
+#pragma omp parallel for 
       for(j = 0; j <= 511; j += 1)
          new_image[i][j] = image[i][j];
 
-l400:
-   for(i = 1; i <= 510; i += 1)
+l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
+}
+void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
+{
+   //PIPS generated variable
+   int j, ki, kj;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
 l300:
-      for(j_1 = 1; j_1 <= 510; j_1 += 128)
-         for(j = j_1; j <= MIN(j_1+127, 510); j += 1) {
-            new_image[i][j] = 0.;
+         for(j = 1; j <= 510; j += 1) {
+            new_image[i_1][j] = 0.;
 l200:
             for(ki = 0; ki <= 2; ki += 1)
 l100:
                for(kj = 0; kj <= 2; kj += 1)
                   
-
-                  new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
-            new_image[i][j] = new_image[i][j]/9;
+                  
+                  new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
+            new_image[i_1][j] = new_image[i_1][j]/9;
          }
-}
-
-after outlining
-
-void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
-{
-   int i;
-   int j;
-   int ki;
-   int kj;
-
-   for(i = 0; i <= 511; i += 1)
-      for(j = 0; j <= 511; j += 1)
-         new_image[i][j] = image[i][j];
-
-l400:
-   for(i = 1; i <= 510; i += 1)
-l300:
-      for(j_1 = 1; j_1 <= 510; j_1 += 128)
-         for(j = j_1; j <= MIN(j_1+127, 510); j += 1)
-            macro_instruction(image, kernel, new_image, &i, &j);
-}
-void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
-{
-   int kj;
-   int ki;
-   new_image[*i][*j] = 0.;
-l200:
-   for(ki = 0; ki <= 2; ki += 1)
-l100:
-      for(kj = 0; kj <= 2; kj += 1)
-         
-
-         new_image[*i][*j] = new_image[*i][*j]+image[*i+ki-1][*j+kj-1]*kernel[ki][kj];
-   new_image[*i][*j] = new_image[*i][*j]/9;
+   }
+   ;
 }
 
 After double unrolling
 
-void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+
+after code cleaning
+
+void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   int kj;
-   int ki;
-   new_image[*i][*j] = 0.;
-l200:   ;
+   //PIPS generated variable
+   int j, ki, kj;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
+l300:
+         for(j = 1; j <= 510; j += 1) {
+            new_image[i_1][j] = 0.;
+l200:            ;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+0-1]*kernel[0][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+1-1]*kernel[0][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+2-1]*kernel[0][2];
+            kj = 3;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+0-1]*kernel[1][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+1-1]*kernel[1][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+2-1]*kernel[1][2];
+            kj = 3;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+0-1]*kernel[2][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+1-1]*kernel[2][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+2-1]*kernel[2][2];
+            kj = 3;
+            ki = 3;
+            new_image[i_1][j] = new_image[i_1][j]/9;
+         }
+   }
    ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
-   kj = 3;
-   ki = 3;
-   new_image[*i][*j] = new_image[*i][*j]/9;
 }
-void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   int kj;
-   int ki;
-   new_image[*i][*j] = 0.;
-l200:   ;
+   //PIPS generated variable
+   int j, ki, kj;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
+l300:
+         for(j = 1; j <= 510; j += 1) {
+            new_image[i_1][j] = 0.;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j-1]*kernel[0][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j]*kernel[0][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j+1]*kernel[0][2];
+            kj = 3;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1][j-1]*kernel[1][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1][j]*kernel[1][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1][j+1]*kernel[1][2];
+            kj = 3;
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j-1]*kernel[2][0];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j]*kernel[2][1];
+            new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j+1]*kernel[2][2];
+            kj = 3;
+            ki = 3;
+            new_image[i_1][j] = new_image[i_1][j]/9;
+         }
+   }
    ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
-   kj = 3;
-   ki = 3;
-   new_image[*i][*j] = new_image[*i][*j]/9;
-}
-void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
-{
-   int kj;
-   int ki;
-   new_image[*i][*j] = 0.;
-l200:   ;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+0-1]*kernel[0][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+1-1]*kernel[0][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+0-1][*j+2-1]*kernel[0][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+0-1]*kernel[1][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+1-1]*kernel[1][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+1-1][*j+2-1]*kernel[1][2];
-   kj = 3;
-   ;
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+0-1]*kernel[2][0];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+1-1]*kernel[2][1];
-   
-
-   new_image[*i][*j] = new_image[*i][*j]+image[*i+2-1][*j+2-1]*kernel[2][2];
-   kj = 3;
-   ki = 3;
-   new_image[*i][*j] = new_image[*i][*j]/9;
 }
 
-After atomization
+After atomization of "microcode"
 
-void macro_instruction(float **image, float **kernel, float **new_image, int *i, int *j)
+void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   float F_46;
-   float F_45;
-   float F_44;
-   float F_43;
-   float F_42;
-   float F_41;
-   float F_40;
-   float F_39;
-   float F_38;
-   float F_37;
-   float F_36;
-   float F_35;
-   float F_34;
-   float F_33;
-   float F_32;
-   float F_31;
-   float F_30;
-   float F_29;
-   float F_28;
-   float F_27;
-   float F_26;
-   float F_25;
-   float F_24;
-   float F_23;
-   float F_22;
-   float F_21;
-   float F_20;
-   float F_19;
-   float F_18;
-   float F_17;
-   float F_16;
-   float F_15;
-   float F_14;
-   float F_13;
-   float F_12;
-   float F_11;
-   float F_10;
-   float F_9;
-   float F_8;
-   float F_7;
-   float F_6;
-   float F_5;
-   float F_4;
-   float F_3;
-   float F_2;
-   float F_1;
-   float F_0;
-   int kj;
-   int ki;
-   new_image[*i][*j] = 0.;
-l200:   ;
+   //PIPS generated variable
+   int j, ki, kj;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
+l300:
+         for(j = 1; j <= 510; j += 1) {
+            new_image[i_1][j] = 0.;
+            F_0 = image[i_1-1][j-1]*kernel[0][0];
+            new_image[i_1][j] = new_image[i_1][j]+F_0;
+            F_1 = image[i_1-1][j]*kernel[0][1];
+            new_image[i_1][j] = new_image[i_1][j]+F_1;
+            F_2 = image[i_1-1][j+1]*kernel[0][2];
+            new_image[i_1][j] = new_image[i_1][j]+F_2;
+            kj = 3;
+            F_3 = image[i_1][j-1]*kernel[1][0];
+            new_image[i_1][j] = new_image[i_1][j]+F_3;
+            F_4 = image[i_1][j]*kernel[1][1];
+            new_image[i_1][j] = new_image[i_1][j]+F_4;
+            F_5 = image[i_1][j+1]*kernel[1][2];
+            new_image[i_1][j] = new_image[i_1][j]+F_5;
+            kj = 3;
+            F_6 = image[i_1+1][j-1]*kernel[2][0];
+            new_image[i_1][j] = new_image[i_1][j]+F_6;
+            F_7 = image[i_1+1][j]*kernel[2][1];
+            new_image[i_1][j] = new_image[i_1][j]+F_7;
+            F_8 = image[i_1+1][j+1]*kernel[2][2];
+            new_image[i_1][j] = new_image[i_1][j]+F_8;
+            kj = 3;
+            ki = 3;
+            new_image[i_1][j] = new_image[i_1][j]/9;
+         }
+   }
    ;
-   F_0 = new_image[*i][*j];
-   F_1 = image[*i+0-1][*j+0-1];
-   F_2 = kernel[0][0];
-   F_3 = F_1*F_2;
-   F_4 = F_0+F_3;
-   
+}
 
-   new_image[*i][*j] = F_4;
-   F_5 = new_image[*i][*j];
-   F_6 = image[*i+0-1][*j+1-1];
-   F_7 = kernel[0][1];
-   F_8 = F_6*F_7;
-   F_9 = F_5+F_8;
-   
+After array to pointer conversion of "microcode"
 
-   new_image[*i][*j] = F_9;
-   F_10 = new_image[*i][*j];
-   F_11 = image[*i+0-1][*j+2-1];
-   F_12 = kernel[0][2];
-   F_13 = F_11*F_12;
-   F_14 = F_10+F_13;
-   
+int main()
+{
+   float image[512][512];
+   float new_image[512][512];
+   float kernel[3][3];
 
-   new_image[*i][*j] = F_14;
-   kj = 3;
+   int i, j, n;
+   //PIPS generated variable
+   float (*P_0)[3][3] = (float (*)[3][3]) 0, (*P_1)[512][512] = (float (*)[512][512]) 0, (*P_2)[512][512] = (float (*)[512][512]) 0;
+
+   for(i = 0; i <= 2; i += 1)
+      for(j = 0; j <= 2; j += 1)
+         kernel[i][j] = 1;
+   
+   //     read *, image
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         image[i][j] = 1.;
+   
+   
+   for(n = 0; n <= 19; n += 1) {
+      P4A_accel_malloc(&P_2, sizeof(float[512][512])-1+1);
+      P4A_accel_malloc(&P_1, sizeof(float[512][512])-1+1);
+      P4A_accel_malloc(&P_0, sizeof(float[3][3])-1+1);
+      P4A_copy_to_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+      P4A_copy_to_accel(image, *P_1, sizeof(float[512][512])-1+1);
+      P4A_copy_to_accel(kernel, *P_0, sizeof(float[3][3])-1+1);
+
+      convol(512, 512, *P_2, *P_1, 3, 3, *P_0);
+      P4A_copy_from_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+      P4A_accel_free(*P_2);
+      P4A_accel_free(*P_1);
+      P4A_accel_free(*P_0);
+   }
+
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         printf("%f ", new_image[i][j]);
+   //     print *, new_image
+   //      print *, new_image (image_size/2, image_size/2)
+   
+   return 1;
+}
+void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *kernel, float *new_image)
+{
+   //PIPS generated variable
+   int j, ki, kj;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
+l300:
+         for(j = 1; j <= 510; j += 1) {
+            new_image[j+isj*i_1] = 0.;
+            F_0 = image[j-1+isj*(i_1-1)]*kernel[0];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_0;
+            F_1 = image[j+isj*(i_1-1)]*kernel[1];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_1;
+            F_2 = image[j+1+isj*(i_1-1)]*kernel[2];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_2;
+            kj = 3;
+            F_3 = image[j-1+isj*i_1]*kernel[ksj];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_3;
+            F_4 = image[j+isj*i_1]*kernel[ksj+1];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_4;
+            F_5 = image[j+1+isj*i_1]*kernel[ksj+2];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_5;
+            kj = 3;
+            F_6 = image[j-1+isj*(i_1+1)]*kernel[2*ksj];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_6;
+            F_7 = image[j+isj*(i_1+1)]*kernel[2*ksj+1];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_7;
+            F_8 = image[j+1+isj*(i_1+1)]*kernel[2*ksj+2];
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_8;
+            kj = 3;
+            ki = 3;
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]/9;
+         }
+   }
    ;
-   F_15 = new_image[*i][*j];
-   F_16 = image[*i+1-1][*j+0-1];
-   F_17 = kernel[1][0];
-   F_18 = F_16*F_17;
-   F_19 = F_15+F_18;
+}
+int main()
+{
+   float image[512][512];
+   float new_image[512][512];
+   float kernel[3][3];
+
+   int i, j, n;
+   //PIPS generated variable
+   float (*P_0)[3][3] = (float (*)[3][3]) 0, (*P_1)[512][512] = (float (*)[512][512]) 0, (*P_2)[512][512] = (float (*)[512][512]) 0;
+
+   for(i = 0; i <= 2; i += 1)
+      for(j = 0; j <= 2; j += 1)
+         kernel[i][j] = 1;
+   
+   //     read *, image
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         image[i][j] = 1.;
+   
+   
+   for(n = 0; n <= 19; n += 1) {
+      P4A_accel_malloc(&P_2, sizeof(float[512][512])-1+1);
+      P4A_accel_malloc(&P_1, sizeof(float[512][512])-1+1);
+      P4A_accel_malloc(&P_0, sizeof(float[3][3])-1+1);
+      P4A_copy_to_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+      P4A_copy_to_accel(image, *P_1, sizeof(float[512][512])-1+1);
+      P4A_copy_to_accel(kernel, *P_0, sizeof(float[3][3])-1+1);
+
+      convol(512, 512, *P_2, *P_1, 3, 3, *P_0);
+      P4A_copy_from_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+      P4A_accel_free(*P_2);
+      P4A_accel_free(*P_1);
+      P4A_accel_free(*P_0);
+   }
+
+   for(i = 0; i <= 511; i += 1)
+      for(j = 0; j <= 511; j += 1)
+         printf("%f ", new_image[i][j]);
+   //     print *, new_image
+   //      print *, new_image (image_size/2, image_size/2)
+   
+   return 1;
+}
+
+Printed file for "launch_microcode1!
+
+void launch_microcode1(int isi, int isj, int ksi, int ksj, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
+{
+   //PIPS generated variable
+   int i, j, ki, kj;
+
+l400:
+   for(i = 1; i <= 510; i += 128)
+      microcode(isi, isj, ksi, ksj, i, &image[0][0], &kernel[0][0], &new_image[0][0]);
+}
+
+Transformers for "convol"
+
+
+//  T() {}
+
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
+{
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
    
 
-   new_image[*i][*j] = F_19;
-   F_20 = new_image[*i][*j];
-   F_21 = image[*i+1-1][*j+1-1];
-   F_22 = kernel[1][1];
-   F_23 = F_21*F_22;
-   F_24 = F_20+F_23;
-   
+//  T(i,j,ki,kj) {}
 
-   new_image[*i][*j] = F_24;
-   F_25 = new_image[*i][*j];
-   F_26 = image[*i+1-1][*j+2-1];
-   F_27 = kernel[1][2];
-   F_28 = F_26*F_27;
-   F_29 = F_25+F_28;
-   
+   int i, j, ki, kj;
 
-   new_image[*i][*j] = F_29;
-   kj = 3;
+//  T(i,j) {0<=i}
+
+
+   for(i = 0; i <= 511; i += 1)
+
+//  T(j) {0<=j}
+
+      for(j = 0; j <= 511; j += 1)
+
+//  T() {}
+
+         new_image[i][j] = image[i][j];
+
+//  T() {}
+
+
+l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float image[512][512];
+
+//  P() {}
+
+   float new_image[512][512];
+
+//  P() {}
+
+   float kernel[3][3];
+
+
+//  P() {}
+
+   int i, j, n;
+   //PIPS generated variable
+
+//  P(i,j,n) {}
+
+   float (*P_0)[3][3] = (float (*)[3][3]) 0, (*P_1)[512][512] = (float (*)[512][512]) 0, (*P_2)[512][512] = (float (*)[512][512]) 0;
+
+//  P(i,j,n) {}
+
+
+   for(i = 0; i <= 2; i += 1)
+
+//  P(i,j,n) {0<=i, i<=2}
+
+      for(j = 0; j <= 2; j += 1)
+
+//  P(i,j,n) {0<=i, i<=2, 0<=j, j<=2}
+
+         kernel[i][j] = 1;
+
+//  P(i,j,n) {i==3, j==3}
+
+   
+   //     read *, image
+   for(i = 0; i <= 511; i += 1)
+
+//  P(i,j,n) {0<=i, i<=511}
+
+      for(j = 0; j <= 511; j += 1)
+
+//  P(i,j,n) {0<=i, i<=511, 0<=j, j<=511}
+
+         image[i][j] = 1.;
+
+//  P(i,j,n) {i==512, j==512}
+
+   
+   
+   for(n = 0; n <= 19; n += 1) {
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_malloc(&P_2, sizeof(float[512][512])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_malloc(&P_1, sizeof(float[512][512])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_malloc(&P_0, sizeof(float[3][3])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_copy_to_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_copy_to_accel(image, *P_1, sizeof(float[512][512])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_copy_to_accel(kernel, *P_0, sizeof(float[3][3])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+
+      convol(512, 512, *P_2, *P_1, 3, 3, *P_0);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_copy_from_accel(new_image, *P_2, sizeof(float[512][512])-1+1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_free(*P_2);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_free(*P_1);
+
+//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+
+      P4A_accel_free(*P_0);
+   }
+
+//  P(i,j,n) {i==512, j==512, n==20}
+
+
+   for(i = 0; i <= 511; i += 1)
+
+//  P(i,j,n) {n==20, 0<=i, i<=511}
+
+      for(j = 0; j <= 511; j += 1)
+
+//  P(i,j,n) {n==20, 0<=i, i<=511, 0<=j, j<=511}
+
+         printf("%f ", new_image[i][j]);
+
+//  P(i,j,n) {i==512, j==512, n==20}
+
+   //     print *, new_image
+   //      print *, new_image (image_size/2, image_size/2)
+   
+   return 1;
+}
+
+After a last partial evaluation of "microcode"
+
+
+//  P() {}
+
+void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *kernel, float *new_image)
+{
+   //PIPS generated variable
+
+//  P() {}
+
+   int j, ki, kj;
+   //PIPS generated variable
+
+//  P(j,ki,kj) {}
+
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
+   {
+      //PIPS generated variable
+
+//  P(j,ki,kj) {}
+
+      int i_1;
+
+//  P(i_1,j,ki,kj) {}
+
+      for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
+
+//  P() {}
+
+l300:
+         for(j = 1; j <= 510; j += 1) {
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {1<=j, j<=510}
+
+            new_image[j+isj*i_1] = 0.;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_0 = image[j+isj*(i_1-1)-1]*kernel[0];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_0;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_1 = image[j+isj*(i_1-1)]*kernel[1];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_1;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_2 = image[j+isj*(i_1-1)+1]*kernel[2];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_2;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            kj = 3;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+
+            F_3 = image[j+isj*i_1-1]*kernel[ksj];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_3;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_4 = image[j+isj*i_1]*kernel[ksj+1];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_4;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_5 = image[j+isj*i_1+1]*kernel[ksj+2];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_5;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            kj = 3;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+
+            F_6 = image[j+isj*(i_1+1)-1]*kernel[2*ksj];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_6;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_7 = image[j+isj*(i_1+1)]*kernel[2*ksj+1];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_7;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            F_8 = image[j+isj*(i_1+1)+1]*kernel[2*ksj+2];
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]+F_8;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+
+            kj = 3;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+
+            ki = 3;
+
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {ki==3, kj==3}
+
+            new_image[j+isj*i_1] = new_image[j+isj*i_1]/9;
+         }
+   }
    ;
-   F_30 = new_image[*i][*j];
-   F_31 = image[*i+2-1][*j+0-1];
-   F_32 = kernel[2][0];
-   F_33 = F_31*F_32;
-   F_34 = F_30+F_33;
-   
-
-   new_image[*i][*j] = F_34;
-   F_35 = new_image[*i][*j];
-   F_36 = image[*i+2-1][*j+1-1];
-   F_37 = kernel[2][1];
-   F_38 = F_36*F_37;
-   F_39 = F_35+F_38;
-   
-
-   new_image[*i][*j] = F_39;
-   F_40 = new_image[*i][*j];
-   F_41 = image[*i+2-1][*j+2-1];
-   F_42 = kernel[2][2];
-   F_43 = F_41*F_42;
-   F_44 = F_40+F_43;
-   
-
-   new_image[*i][*j] = F_44;
-   kj = 3;
-   ki = 3;
-   F_45 = new_image[*i][*j];
-   F_46 = F_45/9;
-   new_image[*i][*j] = F_46;
 }

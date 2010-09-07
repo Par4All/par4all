@@ -159,10 +159,10 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, a[LU_IND0][i].re, a[LU_IND0][i].im, a[1+LU_IND0][i].re, a[1+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec0, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec3, a[2+LU_IND0][i].re, a[2+LU_IND0][i].im, a[3+LU_IND0][i].re, a[3+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
-         SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
    }
    ;
@@ -184,10 +184,10 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, a[LU_IND0][i].re, a[LU_IND0][i].im, a[1+LU_IND0][i].re, a[1+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec0, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec3, a[2+LU_IND0][i].re, a[2+LU_IND0][i].im, a[3+LU_IND0][i].re, a[3+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
-         SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
    }
    ;
@@ -209,10 +209,10 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, a[LU_IND0][i].re, a[LU_IND0][i].im, a[1+LU_IND0][i].re, a[1+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec0, v4sf_vec1);
-         SIMD_SAVE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec0, &b[i][LU_IND0].re);
          SIMD_LOAD_GENERIC_V4SF(v4sf_vec3, a[2+LU_IND0][i].re, a[2+LU_IND0][i].im, a[3+LU_IND0][i].re, a[3+LU_IND0][i].im);
          SIMD_CPY(v4sf_vec2, v4sf_vec3);
-         SIMD_SAVE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
+         SIMD_STORE_V4SF(v4sf_vec2, &b[i][2+LU_IND0].re);
       }
    }
    ;

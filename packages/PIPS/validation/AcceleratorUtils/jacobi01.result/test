@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 {
    int t;
    //PIPS generated variable
-   float_t (*P_0)[64][64], (*P_1)[64][64];
+   float_t (*P_0)[64][64] = (float_t (*)[64][64]) 0, (*P_1)[64][64] = (float_t (*)[64][64]) 0;
 
    if (argc!=2) {
       

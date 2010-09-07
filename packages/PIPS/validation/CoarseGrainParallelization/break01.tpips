@@ -1,0 +1,18 @@
+delete break01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create break01 break01.c
+
+apply PRIVATIZE_MODULE(find_neg)
+
+apply  COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE [%ALL]
+
+apply UNSPLIT
+shell gcc -fopenmp -c break01.database/Src/break01.c -o break01.database/Src/break01.o
+
+close
+delete break01
+quit
+# EOF

@@ -7,8 +7,8 @@ int main()
    float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4], v4sf_vec3[4];
    SIMD_LOAD_V4SF(v4sf_vec1, &b[0]);
    SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec1);
-   SIMD_SAVE_V4SF(v4sf_vec0, &a[0]);
+   SIMD_STORE_V4SF(v4sf_vec0, &a[0]);
    SIMD_ADDPS(v4sf_vec2, v4sf_vec0, v4sf_vec1);
-   SIMD_SAVE_V4SF(v4sf_vec2, &a[0]);
+   SIMD_STORE_V4SF(v4sf_vec2, &a[0]);
 }
 

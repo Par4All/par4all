@@ -1,0 +1,59 @@
+#
+delete loop_private
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_private loop_private.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+# To check the environment and type declaration effects
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo Code for "main" after privatization (necessary for loop indices)
+echo
+
+apply PRIVATIZE_MODULE(main)
+
+display PRINTED_FILE(main)
+
+echo
+echo Use-def chains
+echo
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE
+
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+echo
+echo Parallelized code for "main"
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Compilation of result
+echo
+
+apply UNSPLIT
+shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
+
+close
+#delete loop_private
+quit
+# EOF

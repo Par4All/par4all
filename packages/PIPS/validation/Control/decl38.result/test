@@ -60,70 +60,72 @@ Printed file for "decl38"
 void decl38(int size)
 {
 // (0,1)
+   {
 // (1,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (1,2)
 // (2,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (2,2)
-   int i;                                                               /*0003*/
+      int i;                                                            /*0003*/
 // (2,3)
-   int j;                                                               /*0004*/
+      int j;                                                            /*0004*/
 // (2,4)
-   int k;                                                               /*0005*/
+      int k;                                                            /*0005*/
 // (2,5)
-   float x;                                                             /*0006*/
+      float x;                                                          /*0006*/
 // (2,6)
 
-   for(i = 1; i <= (size-1); i += 1)
+      for(i = 1; i <= (size-1); i += 1)
 // (2,7)
-      ;                                                                 /*0009*/
-   // END BLOCK
+         ;                                                              /*0009*/
+      // END BLOCK
 // (3,1)
 
 // if the switch is removed, the loop index declarations reappears
-   if ((0==0)) goto l99999;
+      if ((0==0)) goto l99999;
 // (12,1)
 
 // (11,1)
 
 // (10,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (10,2)
 
 // (10,3)
 
-   // END BLOCK
+      // END BLOCK
 // (8,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (8,2)
-break_2:   ;
+break_2:      ;
 // (8,3)
 
-   for(k = 1; k <= (size-1); k += 1)
+      for(k = 1; k <= (size-1); k += 1)
 // (8,4)
-      ;                                                                 /*0019*/
+         ;                                                              /*0019*/
 // (8,5)
-   x = 0;                                                               /*0020*/
-   // END BLOCK
-   goto l99998;
-l99999:   ;
+      x = 0;                                                            /*0020*/
+      // END BLOCK
+      goto l99998;
+l99999:      ;
 // (4,1)
 
 // (5,1)
 
 // (6,1)
-switch_2_case_0:   ;
+switch_2_case_0:      ;
 // (7,1)
-   // BEGIN BLOCK
+      // BEGIN BLOCK
 // (7,2)
-   for(j = 1; j <= (size-1); j += 1)
+      for(j = 1; j <= (size-1); j += 1)
 // (7,3)
-      ;                                                                 /*0015*/
-   // END BLOCK
-   goto break_2;
-l99998:   ;
+         ;                                                              /*0015*/
+      // END BLOCK
+      goto break_2;
+l99998:      ;
 // (9,1)
 
-   // END BLOCK
+      // END BLOCK
+   }
 }

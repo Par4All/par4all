@@ -446,7 +446,7 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 {
    freia_error ret;
    //PIPS generated variable
-   int _return0;
+   freia_error _return0;
    {
       
       
@@ -500,14 +500,14 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1;
+   freia_error _return0, _return1;
    {
       
       
       
       freia_error ret;
       //PIPS generated variable
-      int _return0;
+      freia_error _return0;
       {
          
          
@@ -559,7 +559,7 @@ int main()
       
       freia_error ret;
       //PIPS generated variable
-      int _return0;
+      freia_error _return0;
       {
          
          
@@ -616,23 +616,13 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1;
+   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
    //PIPS generated variable
-   freia_error ret_0;
+   int i_0, kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
    //PIPS generated variable
-   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   freia_error ret_2, ret_3, _return0_1, ret_4;
    //PIPS generated variable
-   freia_error ret_1;
-   //PIPS generated variable
-   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
-   //PIPS generated variable
-   freia_error ret_2, ret_3;
-   //PIPS generated variable
-   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
-   //PIPS generated variable
-   freia_error ret_4;
-   //PIPS generated variable
-   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   int i_2, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
    //PIPS generated variable
    freia_error ret_5;
    

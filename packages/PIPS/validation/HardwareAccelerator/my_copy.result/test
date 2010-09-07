@@ -1,4 +1,46 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_copy(o, i0);                                       /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_copy" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =" [shape=circle];
+  "4 =" -> "o";
+  "i0" -> "4 =";
+}
+// graph for dag "dag_cleaned_0" of module "my_copy" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+}
+
+! updated function for
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   freia_aipo_copy(o, i0);
+   return 0;
+}
+#
 # SPOC
 #
 
@@ -27,7 +69,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=circle];
 
   // outputs
 
@@ -42,6 +83,14 @@ digraph "dag_cleaned_0" {
 #include <spoc.h>
 
 ! updated function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   freia_aipo_copy(o, i0);
+   return 0;
+}
+
+! cleaned up function
 
 freia_status my_copy(freia_data2d *o, freia_data2d *i0)
 {
@@ -77,7 +126,6 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=circle];
 
   // outputs
 
@@ -93,6 +141,14 @@ digraph "dag_cleaned_0" {
 #include <terapix_ucode.h>
 
 ! updated function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   freia_aipo_copy(o, i0);
+   return 0;
+}
+
+! cleaned up function
 
 freia_status my_copy(freia_data2d *o, freia_data2d *i0)
 {

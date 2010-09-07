@@ -1,0 +1,23 @@
+delete fmodl01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create fmodl01 fmodl01.c
+
+echo
+echo Parsed printed file for "fmodl01"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "fmodl01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete fmodl01
+quit
+

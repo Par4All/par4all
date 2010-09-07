@@ -1,6 +1,6 @@
 from pyps import *
-w = workspace(["loops_loops_loops.c"],verboseon=False)
-m = w["looping"]
+w = workspace(["loops_loops_loops.c"],verbose=False)
+m = w.fun.looping
 
 print "= first level loops"
 for l0 in m.loops():

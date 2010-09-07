@@ -1,4 +1,102 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+
+   freia_aipo_erode_8c(e, e, kern);                                     /*0013*/
+   freia_aipo_dilate_8c(d, d, kern);                                    /*0014*/
+
+   freia_aipo_sub(o, d, e);                                             /*0016*/
+
+   freia_common_destruct_data(e);                                       /*0018*/
+   freia_common_destruct_data(d);                                       /*0019*/
+
+   return FREIA_OK;                                                     /*0021*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_39" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "16 -" [shape=trapezium,orientation=270];
+  "16 -" -> "o";
+  "14 D8" [shape=box];
+  "14 D8" -> "16 -" [label="d"];
+  "13 E8" [shape=box];
+  "13 E8" -> "16 -" [label="e"];
+  "11 D8" [shape=box];
+  "11 D8" -> "14 D8" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "13 E8" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_39" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "16 -" [shape=trapezium,orientation=270];
+  "16 -" -> "o";
+  "14 D8" [shape=box];
+  "14 D8" -> "16 -" [label="d"];
+  "13 E8" [shape=box];
+  "13 E8" -> "16 -" [label="e"];
+  "11 D8" [shape=box];
+  "11 D8" -> "14 D8" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "13 E8" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+
+! updated function for
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+
+   freia_aipo_erode_8c(e, e, kern);                                     /*0013*/
+   freia_aipo_dilate_8c(d, d, kern);                                    /*0014*/
+
+   freia_aipo_sub(o, d, e);                                             /*0016*/
+
+   freia_common_destruct_data(e);                                       /*0018*/
+   freia_common_destruct_data(d);                                       /*0019*/
+
+   return FREIA_OK;                                                     /*0021*/
+}
+#
 # SPOC
 #
 
@@ -220,6 +318,23 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    return FREIA_OK;                                                     /*0021*/
+}
+
+! cleaned up function
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   
+   // preschedule example for terapix tests
+   
+   freia_39_helper_0_0_0(o, i, kern);                                   /*0010*/
+   
+   
+   
+   
+   return 0;                                                            /*0021*/
 }
 #
 # TERAPIX
@@ -468,6 +583,23 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    return FREIA_OK;                                                     /*0021*/
+}
+
+! cleaned up function
+
+freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   
+   // preschedule example for terapix tests
+   
+   freia_39_helper_0_0(o, i, kern);                                     /*0010*/
+   
+   
+   
+   
+   return 0;                                                            /*0021*/
 }
 #
 # FREIA COMPILATION DONE

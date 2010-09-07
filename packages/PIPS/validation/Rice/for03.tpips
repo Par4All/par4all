@@ -50,6 +50,8 @@ echo
 echo Check the proper effects
 echo
 
+#setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY FALSE
+
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[for03]
 

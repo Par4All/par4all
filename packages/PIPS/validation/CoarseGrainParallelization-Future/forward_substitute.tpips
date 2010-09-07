@@ -1,0 +1,22 @@
+delete forward_substitute
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
+create forward_substitute forward_substitute.c
+
+apply PRIVATIZE_MODULE(%ALL)
+
+apply FORWARD_SUBSTITUTE(%ALL)
+apply COARSE_GRAIN_PARALLELIZATION
+apply OMPIFY_CODE
+display PRINTED_FILE [main]
+
+apply UNSPLIT
+shell gcc -fopenmp -c forward_substitute.database/Src/forward_substitute.c -o forward_substitute.database/Src/forward_substitute.o
+
+close
+delete forward_substitute
+quit
+# EOF

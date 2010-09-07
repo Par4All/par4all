@@ -268,12 +268,8 @@ c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
          DO 10 I = 1, SIZE                                              0029
             SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
 10          CONTINUE                                                    0033
       ENDIF
       END
@@ -309,13 +305,9 @@ c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
          DO 10 I = 1, 1000                                              0029
             F_1 = SA*SX(IX)
             SY(IY) = SY(IY)+F_1                                         0030
-            IX = INCX+IX                                                0031
-            IY = INCY+IY                                                0032
 10          CONTINUE                                                    0033
       ENDIF
       END
@@ -515,9 +507,9 @@ c      PRINT *, 'aft'
      &:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), SA0, F_03
      &, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA0 = 3                                                           0017
+      aligned(0) = 3                                                    0017
 c
-      IF (SA0.EQ.0.0) THEN                                              0021
+      IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
 c
 c        code for both increments equal to 1
@@ -535,10 +527,10 @@ c 20   PRINT *, 'bef'
             CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(1+LU_IND0))
             CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
             CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
-            CALL SIMD_SAVE_V4SF(v4sf_vec0, aligned0(0))
+            CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
             CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(1+LU_IND0))
             CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
-            CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(1+LU_IND0))
+            CALL SIMD_STORE_V4SF(v4sf_vec3, SY(1+LU_IND0))
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF
@@ -552,9 +544,9 @@ c      PRINT *, 'aft'
      &:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), SA0, F_03
      &, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA0 = 3                                                           0017
+      aligned(0) = 3                                                    0017
 c
-      IF (SA0.EQ.0.0) THEN                                              0021
+      IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
 c
 c        code for both increments equal to 1
@@ -574,7 +566,7 @@ c 20   PRINT *, 'bef'
             CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
             CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(1+LU_IND0))
             CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
-            CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(1+LU_IND0))
+            CALL SIMD_STORE_V4SF(v4sf_vec3, SY(1+LU_IND0))
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF
@@ -588,9 +580,9 @@ c      PRINT *, 'aft'
      &:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), SA0, F_03
      &, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA0 = 3                                                           0017
+      aligned(0) = 3                                                    0017
 c
-      IF (SA0.EQ.0.0) THEN                                              0021
+      IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
 c
 c        code for both increments equal to 1
@@ -610,7 +602,7 @@ c 20   PRINT *, 'bef'
             CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
             CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(1+LU_IND0))
             CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
-            CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(1+LU_IND0))
+            CALL SIMD_STORE_V4SF(v4sf_vec3, SY(1+LU_IND0))
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF
@@ -620,11 +612,11 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND0
       REAL*4 v4sf_vec3(0:3), aligned(0:3), v4sf_vec2(0:3), v4sf_vec1(
-     &0:3), v4sf_vec0(0:3), SA0, SX(1:SIZE), SY(1:SIZE)
+     &0:3), v4sf_vec0(0:3), SX(1:SIZE), SY(1:SIZE)
 
-      SA0 = 3                                                           0017
+      aligned(0) = 3                                                    0017
 c
-      IF (SA0.EQ.0.0) THEN                                              0021
+      IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
 c
 c        code for both increments equal to 1
@@ -644,7 +636,7 @@ c 20   PRINT *, 'bef'
             CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
             CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(1+LU_IND0))
             CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
-            CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(1+LU_IND0))
+            CALL SIMD_STORE_V4SF(v4sf_vec3, SY(1+LU_IND0))
 99998       CONTINUE
 c      PRINT *, 'aft'
       ENDIF
@@ -707,12 +699,11 @@ saxpy (float sx[1000], float sy[1000])
   float v4sf_vec2[4];
   float v4sf_vec1[4];
   float v4sf_vec0[4];
-  float sa0;
   int lu_ind0;
   static const float size = 1000;
 
-  sa0 = 3;
-  if (sa0 == 0.0)
+  aligned[0] = 3;
+  if (aligned[0] == 0.0)
     {
     }
   else
@@ -726,7 +717,7 @@ saxpy (float sx[1000], float sy[1000])
 	  simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec2);
 	  simd_load_v4sf (v4sf_vec3, sy[(1 + lu_ind0) - 1]);
 	  simd_addps (v4sf_vec3, v4sf_vec3, v4sf_vec0);
-	  simd_save_v4sf (v4sf_vec3, sy[(1 + lu_ind0) - 1]);
+	  simd_store_v4sf (v4sf_vec3, sy[(1 + lu_ind0) - 1]);
 	  continue;
 	}
       ;

@@ -1,0 +1,18 @@
+int main()
+{
+
+   int a[100];
+   int i;
+   p4a_kernel_launcher_0(a);
+
+   return 0;
+}
+void p4a_kernel_launcher_0(int a[100])
+{
+   {
+      int n;
+#pragma   scmp task
+      a[2]++;
+      a[3]++;
+   }
+}

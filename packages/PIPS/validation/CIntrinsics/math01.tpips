@@ -1,0 +1,23 @@
+delete math01
+
+create math01 math01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "math01"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "math01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete math01
+quit
+

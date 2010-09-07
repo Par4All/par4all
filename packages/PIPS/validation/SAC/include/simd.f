@@ -17,7 +17,7 @@
       vdc(1)=vdi(1)
       vdc(2)=vdi(2)
       end
-      subroutine SIMD_SAVE_V2DC_TO_V2DI(vdc,vdi)
+      subroutine SIMD_STORE_V2DC_TO_V2DI(vdc,vdi)
       integer*8 vdi(2)
       complex*8 vdc(2)
       vdc(1)=vdi(1)
@@ -31,7 +31,7 @@
       vsf(2)=vsi(2)
       end
 
-      subroutine SIMD_SAVE_V2SF_TO_V2DF(vdf,vsf)
+      subroutine SIMD_STORE_V2SF_TO_V2DF(vdf,vsf)
       real*4 vsf(2)
       real*8 vdf(2)
       vdf(1)=vsf(1)
@@ -121,7 +121,7 @@
       vec(2) = x2
       end
 
-      subroutine simd_save_v4sf(vec, base)
+      subroutine simd_store_v4sf(vec, base)
       real*4 vec(4)
       real*4 base(4)
       
@@ -130,14 +130,14 @@
       base(3) = vec(3)
       base(4) = vec(4)
       end
-      subroutine simd_save_v2di(vec, base)
+      subroutine simd_store_v2di(vec, base)
       integer*8 vec(2)
       integer*8 base(2)
       
       base(1) = vec(1)
       base(2) = vec(2)
       end
-      subroutine simd_save_v2df(vec, base)
+      subroutine simd_store_v2df(vec, base)
       real*8 vec(2)
       real*8 base(2)
       
@@ -145,7 +145,7 @@
       base(2) = vec(2)
       end
       
-      subroutine simd_save_generic_v4sf(vec, x1, x2, x3, x4)
+      subroutine simd_store_generic_v4sf(vec, x1, x2, x3, x4)
       real*4 vec(4)
       real*4 x1
       real*4 x2
@@ -157,7 +157,7 @@
       x3 = vec(3)
       x4 = vec(4)
       end
-      subroutine simd_save_generic_v2df(vec, x1, x2)
+      subroutine simd_store_generic_v2df(vec, x1, x2)
       real*8 vec(2)
       real*8 x1
       real*8 x2
@@ -352,7 +352,7 @@
       vec(2) = x2
       end
 
-      subroutine simd_save_v2si(vec, base)
+      subroutine simd_store_v2si(vec, base)
       integer*4 vec(2)
       integer*4 base(2)
       integer*4 index
@@ -361,7 +361,7 @@
       base(1) = vec(1)
       base(2) = vec(2)
       end
-      subroutine simd_save_generic_v2di(vec, x1, x2)
+      subroutine simd_store_generic_v2di(vec, x1, x2)
       integer*8 vec(2)
       integer*8 x1
       integer*8 x2
@@ -370,7 +370,7 @@
       x2 = vec(2)
       end
       
-      subroutine simd_save_generic_v2si(vec, x1, x2)
+      subroutine simd_store_generic_v2si(vec, x1, x2)
       integer*4 vec(2)
       integer*4 x1
       integer*4 x2
@@ -404,7 +404,7 @@
       vec(4) = x4
       end
 
-      subroutine simd_save_v4si(vec, base)
+      subroutine simd_store_v4si(vec, base)
       integer*4 vec(4)
       integer*4 base(4)
       integer*4 index
@@ -416,7 +416,7 @@
       base(4) = vec(4)
       end
       
-      subroutine simd_save_generic_v4si(vec, x1, x2, x3, x4)
+      subroutine simd_store_generic_v4si(vec, x1, x2, x3, x4)
       integer*4 vec(4)
       integer*4 x1
       integer*4 x2
@@ -489,8 +489,8 @@
       vec(7) = base(7)
       vec(8) = base(8)
       end
-      subroutine simd_load_generic_v8hi(vec,b0,b1,b2,b3,b4,b5,b6,b7)
-      integer*1 vec(8)
+      subroutine simd_load_generic_v8hi(v,b0,b1,b2,b3,b4,b5,b6,b7)
+      integer*1 v(8)
       integer*1 b0
       integer*1 b1
       integer*1 b2
@@ -500,14 +500,14 @@
       integer*1 b6
       integer*1 b7
       
-      vec(1) = b1
-      vec(2) = b2
-      vec(3) = b3
-      vec(4) = b4
-      vec(5) = b5
-      vec(6) = b6
-      vec(7) = b7
-      vec(8) = b8
+      v(1) = b1
+      v(2) = b2
+      v(3) = b3
+      v(4) = b4
+      v(5) = b5
+      v(6) = b6
+      v(7) = b7
+      v(8) = b8
       end
 
       subroutine simd_load_generic_v4hi(vec, x1, x2, x3, x4)
@@ -523,7 +523,7 @@
       vec(4) = x4
       end
 
-      subroutine simd_save_v4hi(vec, base)
+      subroutine simd_store_v4hi(vec, base)
       integer*2 vec(4)
       integer*2 base(4)
       integer*4 index
@@ -535,7 +535,7 @@
       base(4) = vec(4)
       end
       
-      subroutine simd_save_v8hi(vec, base)
+      subroutine simd_store_v8hi(vec, base)
       integer*1 vec(8)
       integer*1 base(8)
       
@@ -549,8 +549,8 @@
       base(8) = vec(8)
       end
 
-      subroutine simd_save_generic_v8hi(vec, x1, x2, x3, x4,x5,x6,x7,x8)
-      integer*2 vec(8)
+      subroutine simd_store_generic_v8hi(v, x1, x2, x3, x4,x5,x6,x7,x8)
+      integer*2 v(8)
       integer*2 x1
       integer*2 x2
       integer*2 x3
@@ -560,16 +560,16 @@
       integer*2 x7
       integer*2 x8
 
-      x1 = vec(1)
-      x2 = vec(2)
-      x3 = vec(3)
-      x4 = vec(4)
-      x5 = vec(5)
-      x6 = vec(6)
-      x7 = vec(7)
-      x8 = vec(8)
+      x1 = v(1)
+      x2 = v(2)
+      x3 = v(3)
+      x4 = v(4)
+      x5 = v(5)
+      x6 = v(6)
+      x7 = v(7)
+      x8 = v(8)
       end
-      subroutine simd_save_generic_v4hi(vec, x1, x2, x3, x4)
+      subroutine simd_store_generic_v4hi(vec, x1, x2, x3, x4)
       integer*2 vec(4)
       integer*2 x1
       integer*2 x2
@@ -718,7 +718,7 @@
       vec(8) = x8
       end
 
-      subroutine simd_save_v8qi(vec, base)
+      subroutine simd_store_v8qi(vec, base)
       integer*1 vec(8)
       integer*1 base(*)
       integer*4 index
@@ -734,7 +734,7 @@
       base(8) = vec(8)
       end
       
-      subroutine simd_save_generic_v8qi(vec, x1, x2, x3, x4, x5, x6, x7,
+      subroutine simd_store_generic_v8qi(vec, x1, x2, x3, x4, x5, x6, x7,
      & x8)
       integer*1 vec(8)
       integer*1 x1

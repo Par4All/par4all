@@ -10,8 +10,10 @@ atomized code
 int main()
 {
    int a = 0, b = 0;
-   a = --a;
-   a = b+a;
+   //PIPS generated variable
+   int I_0;
+   I_0 = --a;
+   a = b+I_0;
    printf("%d", a);
    return 0;
 }

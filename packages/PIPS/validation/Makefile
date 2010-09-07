@@ -2,17 +2,24 @@
 
 default: clean
 
-# The option used by default for validating. Can be overridden by the
-# command line "make VOPT=..." or the environment variable:
-VOPT	= -v --archive --diff
+# I still keep the old "script" validation as the defaults
+validate: old-validate
+validate-all: old-validate-all
+validate-%: old-validate-%
 
-FIND	= find . -name '.svn' -type d -prune -o
+# useful variant to be consistent with intra-directory validation
+validate-test: new-validate
+validate-out:; $(MAKE) TEST=out new-validate
+
+SHELL	= /bin/bash
+FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 
 .PHONY: full-clean
 full-clean: clean
 	$(FIND) -name 'SUMMARY_Archive' -type d -print0 \
 	     -o -name 'RESULTS' -type d -print0 | \
 	  xargs -0 $(RM) -r
+	$(RM) SUMMARY SUMMARY.short
 
 .PHONY: clean
 clean:
@@ -41,49 +48,13 @@ clean-target:
 	done
 	$(RM) properties.rc a.out core *.o
 
-.PHONY: validate
-validate: clean-target
-	$(RM) -r RESULTS
-	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
-
-.PHONY: accept
-accept:
-	pips_manual_accept $(TARGET)
-
-# extract private (restricted access) validation
-.PHONY: private
-private:
-	if [ -d private/. ] ; then \
-	  if [ -d private/.svn ] ; then \
-	    svn up private/ ; \
-	  else \
-	    echo "ERROR: cannot update private" >&2 ; \
-	  fi ; \
-	else \
-	  echo "checkout the private validation somewhere:"; \
-	  echo "> svn co https://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk ???"; \
-	  echo "and link it here as 'private':"; \
-	  echo "> ln -s ??? private"; \
-	  echo "CAUTION: it MUST NOT be distributed..." ; \
-	fi
-
-# validate one sub directory
-validate-%: %
-	# test -d $< && $(MAKE) TARGET=$< validate
-	[ -d $< ] && { \
-	  $(MAKE) TARGET=$< clean-target ; \
-	  cd $< ; \
-	  $(RM) -r RESULTS ; \
-	  PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD)/$< -O RESULTS . ; \
-	}
+include old-validate.mk
 
 #
 # PARALLEL VALIDATION
 #
 # directory-parallel validation test
 # may replace the previous entry some day
-
-.PHONY: parallel-validate parallel-clean parallel-unvalidate parallel-check
 
 # where results are stored
 RESULTS	= validation.out
@@ -104,105 +75,124 @@ SVN.URL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
 SVN.R	= $(shell svnversion)
 SVN.C	= $(shell svnversion -c)
 
-# generate summary header
-# hmmm... not sure that start date is before the validation
-$(HEAD):
-	{ \
-	  echo "parallel validation" ; \
-	  echo "on: $(TARGET)" ; \
-	  echo "host: $$(hostname)" ; \
-	  echo "directory: $(PWD)" ; \
-	  test -d .svn && \
-	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
-	  echo "pips: $(shell which pips)" ; \
-	  pips -v ; \
-	  echo "tpips: $(shell which tpips)" ; \
-	  tpips -v ; \
-	  echo "user: $$USERNAME" ; \
-	  echo "start date: $$(date)" ; \
-	} > $@
+# check for svn working copy early
+.PHONY: check-run-consistency
+check-run-consistency:
+	@[ $(TEST) = 'out' ] && exit 0 ; \
+	[ '$(TEST)' = 'test' -a -d .svn ] || { \
+	  echo "TEST=test parallel validation requires svn" >&2 ; \
+	  echo "try: make TEST=out <your arguments...>" >&2 ; \
+	  exit 1 ; \
+	}
 
 # this target should replace the "validate" target
+.PHONY: new-validate
 new-validate:
-	$(RM) SUMMARY
+	$(RM) SUMMARY SUMMARY.short
 	$(MAKE) parallel-clean
 	$(MAKE) archive
+	$(MAKE) SUMMARY.short
 
+.PHONY: mail-validate
 mail-validate: new-validate
-	{ \
-	  cat $(SUM.d)/SUMMARY.diff ; \
-	  echo ; \
-	  cat SUMMARY ; \
-	} | Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY)" $(EMAIL)
+	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY.short)" \
+		$(EMAIL) < SUMMARY.short
 
 SUMUP	= pips_validation_summary.pl
+
+# generate summary header
+# hmmm... not sure that start date is before the validation
+$(HEAD): check-run-consistency
+	{ \
+	  echo "parallel validation" ; \
+	  echo "on dirs: $(TARGET)" ; \
+	  echo "host name: $$(hostname)" ; \
+	  echo "in directory: $(PWD)" ; \
+	  test -d .svn && \
+	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
+	  echo "with pips: $(shell which pips)" ; \
+	  pips -v ; \
+	  echo "with tpips: $(shell which tpips)" ; \
+	  tpips -v ; \
+	  echo "by user: $$USER" ; \
+	  echo "start date: $$(date) [$$(date +%s)]" ; \
+	} > $@
 
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
 	{ \
-	  unset LANG LC_COLLATE ; \
 	  cat $(HEAD) ; \
-	  echo "end date: $$(date)" ; \
+	  echo "end date: $$(date) [$$(date +%s)]" ; \
 	  echo ; \
-          $(SUMUP) $(RESULTS) ; \
+	} > $@ ;
+	cat $@ $(RESULTS) > $@.tmp ; \
+	{ \
+	  [ -f $(SUM.last) ] && last=$(SUM.last) ; \
+	  $(SUMUP) $@.tmp $$last ; \
+	  $(RM) $@.tmp ; \
+	} >> $@ ; \
+	{ \
           echo ; \
-	  grep -v '^passed: ' < $(RESULTS) | sort -k 2 ; \
+	  unset LANG LC_COLLATE ; \
+	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  failed=$$(egrep '^(failed|changed): ' < $(RESULTS) | wc -l); \
-	  total=$$(egrep '^(failed|changed|passed): ' < $(RESULTS) | wc -l); \
-	  [ $$failed = 0 ] && \
-		status="SUCCEEDED $$total" || \
-		status="FAILED $$failed/$$total"; \
-	  echo "$$failed failed out of $$total on $$(date)"; \
+	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
 	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
+	} >> $@
+
+# mail summary
+SUMMARY.short: # SUMMARY
+	{ \
+	  [ -f $(SUM.d)/SUMMARY.diff ] && cat $(SUM.d)/SUMMARY.diff ; \
+	  echo ; \
+	  grep -v '^passed: ' SUMMARY ; \
 	} > $@
 
+.PHONY: archive
 archive: SUMMARY $(DEST.d)
 	cp SUMMARY $(DEST.d)/$(NOW) ; \
 	$(RM) $(SUM.prev) ; \
 	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
-	ln -s $(NOW.d)/$(NOW) $(SUM.last) ; \
-	test -f $(SUM.prev) -a -f $(SUM.last) && \
+	ln -s $(NOW.d)/$(NOW) $(SUM.last)
+	-test -f $(SUM.prev) -a -f $(SUM.last) && \
 	  diff $(SUM.prev) $(SUM.last) | \
 	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff
 
 # overall targets
+.PHONY: parallel-clean
 parallel-clean: $(TARGET:%=parallel-clean-%)
 	$(RM) $(RESULTS) $(HEAD)
 
+.PHONY: parallel-check
 parallel-check: $(TARGET:%=parallel-check-%)
 
+.PHONY: parallel-validate
 parallel-validate: $(TARGET:%=parallel-validate-%)
 
+.PHONY: parallel-unvalidate
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 
-# generic subdir targets
+# generic subdir parallel targets
 parallel-clean-%:
 	[ -d $* -a -f $*/Makefile ] \
 	  && $(MAKE) -C $* clean unvalidate ; exit 0
 
 parallel-check-%: parallel-clean-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; exit 0
+	  && $(MAKE) RESULTS=../$(RESULTS) SUBDIR=$* -C $* inconsistencies ; \
+	  exit 0
+
+# type of validation, may be "out" or "test"
+# - "test" requires the validation to be an SVN working copy.
+#   it could also work with git with some hocus-pocus
+# - "out" does not, but you must move out to test to accept afterwards.
+TEST = test
 
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-test \
+	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(TEST) \
 	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:
 	[ -d $* -a -f $*/Makefile ] \
 	  && $(MAKE) -C $* unvalidate ; exit 0
-
-## REMOVE ???
-# special handling of private
-PRIV	= $(wildcard private/*)
-PRIV.d	= $(shell for d in $(PRIV) ; do test -d $$d && echo $$d ; done)
-validate-private:
-	$(MAKE) TARGET="$(PRIV.d)" validate
-
-# validate all subdirectories
-ALL	= $(wildcard * private/*)
-ALL.d	= $(shell for d in $(ALL) ; do test -d $$d && echo $$d ; done)
-validate-all:
-	$(MAKE) TARGET="$(ALL.d)" validate
