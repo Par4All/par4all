@@ -48,17 +48,17 @@ C
 C     Outer unrolling with different labels
 
 Cxxx
-      DO I_0 = 1, N
-         T(1,I_0) = -N*1+I_0
+      DO J0 = 1, N
+         T(1,J0) = -N*1+J0
       ENDDO
-      DO I_1 = 1, N
-         T(2,I_1) = -N*2+I_1
+      DO J1 = 1, N
+         T(2,J1) = -N*2+J1
       ENDDO
-      DO I_2 = 1, N
-         T(3,I_2) = -N*3+I_2
+      DO J2 = 1, N
+         T(3,J2) = -N*3+J2
       ENDDO
-      DO I_3 = 1, N
-         T(4,I_3) = -N*4+I_3
+      DO J3 = 1, N
+         T(4,J3) = -N*4+J3
       ENDDO
 10    CONTINUE
       I = 5
@@ -78,17 +78,17 @@ Cxxx
 C     Outer unrolling with same labels
 
 Cxxx
-      DO I_4 = 1, N
-         T(1,I_4) = -N*1+I_4
+      DO J4 = 1, N
+         T(1,J4) = -N*1+J4
       ENDDO
-      DO I_5 = 1, N
-         T(2,I_5) = -N*2+I_5
+      DO J5 = 1, N
+         T(2,J5) = -N*2+J5
       ENDDO
-      DO I_6 = 1, N
-         T(3,I_6) = -N*3+I_6
+      DO J6 = 1, N
+         T(3,J6) = -N*3+J6
       ENDDO
-      DO I_7 = 1, N
-         T(4,I_7) = -N*4+I_7
+      DO J7 = 1, N
+         T(4,J7) = -N*4+J7
       ENDDO
 11    CONTINUE
       I = 5

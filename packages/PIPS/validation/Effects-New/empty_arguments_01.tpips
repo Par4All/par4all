@@ -1,0 +1,13 @@
+setenv WSPACE=empty_arguments_01
+setenv FILE=$WSPACE.c
+delete $WSPACE
+setproperty ABORT_ON_USER_ERROR=TRUE
+# check syntax
+shell ${PIPS_CC:-cc} -o $WSPACE.out $FILE
+shell rm $WSPACE.out
+create $WSPACE $FILE
+#setproperty PREPROCESSOR_MISSING_FILE_HANDLING="generate"
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALL]
+close
+delete $WSPACE

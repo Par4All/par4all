@@ -1,0 +1,89 @@
+
+Proper effects for "INITIALIZATION01"
+
+C     Check the piece of code added by Ronan to detect uses of
+C     uninitialized variables
+
+C     Results with real codes such as oa118.f and extr.f are garbage,
+C     but it work for toy examples
+
+C     Note that information gathered for the last print is garbage
+
+C     Implicit variables such as __IO_EFFECTS:LUNS are a special case
+C     that is not dealt with. And effects on LUNS are not well defined
+
+      PROGRAM INITIALIZATION01
+C               <must be read   >: I
+C               <must be written>: J
+
+      J = I                                                             0014
+C               <must be written>: I
+      I = 1                                                             0015
+C               <must be read   >: I
+C               <must be written>: J
+      J = I                                                             0016
+C               <must be read   >: J K L __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, J, K, L                                                  0017
+C               <must be read   >: __IO_EFFECTS:LUNS(5)
+C               <must be written>: I J K L __IO_EFFECTS:LUNS(5)
+      READ *, I, J, K, L                                                0018
+C               <must be read   >: J K L __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, J, K, L                                                  0019
+      END
+
+Use-def chains for "INITIALIZATION01"
+
+
+ *********************** Use-Def Chains *********************
+
+	18 --> 19 with conflicts
+		from <L-W-MUST> to <L-R-MUST>
+		from <K-W-MUST> to <K-R-MUST>
+		from <J-W-MUST> to <J-R-MUST>
+	17 --> 19 with conflicts
+		from <__IO_EFFECTS:LUNS(6)-W-MUST> to <__IO_EFFECTS:LUNS(6)-W-MUST>
+		from <__IO_EFFECTS:LUNS(6)-W-MUST> to <__IO_EFFECTS:LUNS(6)-R-MUST>
+		from <__IO_EFFECTS:LUNS(6)-R-MUST> to <__IO_EFFECTS:LUNS(6)-W-MUST>
+	17 --> 18 with conflicts
+		from <L-R-MUST> to <L-W-MUST>
+		from <K-R-MUST> to <K-W-MUST>
+		from <J-R-MUST> to <J-W-MUST>
+	16 --> 18 with conflicts
+		from <J-W-MUST> to <J-W-MUST>
+		from <I-R-MUST> to <I-W-MUST>
+	16 --> 17 with conflicts
+		from <J-W-MUST> to <J-R-MUST>
+	15 --> 18 with conflicts
+		from <I-W-MUST> to <I-W-MUST>
+	15 --> 16 with conflicts
+		from <I-W-MUST> to <I-R-MUST>
+	14 --> 18 with conflicts
+		from <I-R-MUST> to <I-W-MUST>
+	14 --> 16 with conflicts
+		from <J-W-MUST> to <J-W-MUST>
+	14 --> 15 with conflicts
+		from <I-R-MUST> to <I-W-MUST>
+
+****************** End of Dependence Graph ******************
+
+Flinted file
+
+
+
+Non-initialized variables:
+--------------------------
+In statement number 14 (0.2):
+	"I" used but not initialized.
+In statement number 17 (0.5):
+	"K" used but not initialized.
+	"L" used but not initialized.
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 18 (0.6):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 19 (0.7):
+	"J" used but not initialized.
+	"K" used but not initialized.
+
+number of messages from flint for INITIALIZATION01 : 7

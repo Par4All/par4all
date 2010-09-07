@@ -1,4 +1,90 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   freia_data2d *tmp1 = freia_common_create_data(16, 128, 128), *tmp2 = freia_common_create_data(16, 128, 128);      /*0008*/
+   
+   // o = inf(i0 + i1, i0) - i0
+   freia_aipo_add(tmp1, i0, i1);                                        /*0011*/
+   freia_aipo_inf(tmp2, tmp1, i0);                                      /*0012*/
+   freia_aipo_sub(o, tmp2, i0);                                         /*0013*/
+
+   freia_common_destruct_data(tmp1);                                    /*0015*/
+   freia_common_destruct_data(tmp2);                                    /*0016*/
+
+   return FREIA_OK;                                                     /*0018*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_01" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "o";
+  "12 <" [shape=trapezium,orientation=270];
+  "12 <" -> "13 -" [label="tmp2"];
+  "11 +" [shape=trapezium,orientation=270];
+  "11 +" -> "12 <" [label="tmp1"];
+  "i1" -> "11 +";
+  "i0" -> "13 -";
+  "i0" -> "12 <";
+  "i0" -> "11 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_01" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "o";
+  "12 <" [shape=trapezium,orientation=270];
+  "12 <" -> "13 -" [label="tmp2"];
+  "11 +" [shape=trapezium,orientation=270];
+  "11 +" -> "12 <" [label="tmp1"];
+  "i1" -> "11 +";
+  "i0" -> "13 -";
+  "i0" -> "12 <";
+  "i0" -> "11 +";
+}
+
+! updated function for
+
+freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   freia_data2d *tmp1 = freia_common_create_data(16, 128, 128), *tmp2 = freia_common_create_data(16, 128, 128);      /*0008*/
+   
+   // o = inf(i0 + i1, i0) - i0
+   freia_aipo_add(tmp1, i0, i1);                                        /*0011*/
+   freia_aipo_inf(tmp2, tmp1, i0);                                      /*0012*/
+   freia_aipo_sub(o, tmp2, i0);                                         /*0013*/
+
+   freia_common_destruct_data(tmp1);                                    /*0015*/
+   freia_common_destruct_data(tmp2);                                    /*0016*/
+
+   return FREIA_OK;                                                     /*0018*/
+}
+#
 # SPOC
 #
 
@@ -196,6 +282,20 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    return FREIA_OK;                                                     /*0018*/
+}
+
+! cleaned up function
+
+freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   // o = inf(i0 + i1, i0) - i0
+   freia_01_helper_0_0_0(o, i0, i1);                                    /*0011*/
+   
+   
+   return 0;                                                            /*0018*/
 }
 #
 # TERAPIX
@@ -402,6 +502,20 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    return FREIA_OK;                                                     /*0018*/
+}
+
+! cleaned up function
+
+freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   
+   
+   
+   // o = inf(i0 + i1, i0) - i0
+   freia_01_helper_0_0(o, i0, i1);                                      /*0011*/
+   
+   
+   return 0;                                                            /*0018*/
 }
 #
 # FREIA COMPILATION DONE

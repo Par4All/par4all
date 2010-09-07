@@ -1,0 +1,148 @@
+
+Parsed code for "env05"
+
+int env05()
+{
+   typedef int mile;                                                    /*0005*/
+   typedef mile km;                                                     /*0006*/
+   km j;                                                                /*0007*/
+
+   j = (km) 1;                                                          /*0009*/
+   j = sizeof(km);                                                      /*0010*/
+   return j;                                                            /*0011*/
+}
+
+Code for "env05"
+
+int env05()
+{
+   typedef int mile;                                                    /*0005*/
+   typedef mile km;                                                     /*0006*/
+   km j;                                                                /*0007*/
+
+   j = (km) 1;                                                          /*0009*/
+   j = sizeof(km);                                                      /*0010*/
+   return j;                                                            /*0011*/
+}
+
+Proper effects for "env05"
+
+int env05()
+{
+//               <must be declared>: mile
+   typedef int mile;                                                    /*0005*/
+//               <must be referenced>: mile
+//               <must be declared>: km
+   typedef mile km;                                                     /*0006*/
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;                                                                /*0007*/
+//               <must be written>: j
+//               <must be referenced>: km j
+
+   j = (km) 1;                                                          /*0009*/
+//               <must be written>: j
+//               <must be referenced>: km j
+   j = sizeof(km);                                                      /*0010*/
+//               <must be read   >: j
+//               <must be referenced>: j
+   return j;                                                            /*0011*/
+}
+
+Cumulated effects for "env05"
+
+int env05()
+{
+//               <must be declared>: mile
+   typedef int mile;                                                    /*0005*/
+//               <must be referenced>: mile
+//               <must be declared>: km
+   typedef mile km;                                                     /*0006*/
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;                                                                /*0007*/
+//               <must be written>: j
+//               <must be referenced>: km j
+
+   j = (km) 1;                                                          /*0009*/
+//               <must be written>: j
+//               <must be referenced>: km j
+   j = sizeof(km);                                                      /*0010*/
+//               <must be read   >: j
+//               <must be referenced>: j
+   return j;                                                            /*0011*/
+}
+
+Pointer Regions for "env05"
+
+int env05()
+{
+
+//  <mile-WT-EXACT-{}>
+
+   typedef int mile;                                                    /*0005*/
+
+//  <km-WT-EXACT-{}>
+//  <mile-RT-EXACT-{}>
+
+   typedef mile km;                                                     /*0006*/
+
+//  <j-WE-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+   km j;                                                                /*0007*/
+
+//  <j-RE-EXACT-{}>
+//  <j-W-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+
+   j = (km) 1;                                                          /*0009*/
+
+//  <j-RE-EXACT-{}>
+//  <j-W-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+   j = sizeof(km);                                                      /*0010*/
+
+//  <j-RE-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+   return j;                                                            /*0011*/
+}
+
+Use-def chains
+
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 11 with conflicts
+		from <j-W-MUST> to <j-R-MUST>
+	09 --> 10 with conflicts
+		from <j-W-MUST> to <j-W-MUST>
+	07 --> 09 with conflicts
+		from <j-WE-MUST> to <j-RE-MUST>
+	06 --> 10 with conflicts
+		from <km-WT-MUST> to <km-RT-MUST>
+	06 --> 09 with conflicts
+		from <km-WT-MUST> to <km-RT-MUST>
+	06 --> 07 with conflicts
+		from <km-WT-MUST> to <km-RT-MUST>
+	05 --> 06 with conflicts
+		from <mile-WT-MUST> to <mile-RT-MUST>
+
+****************** End of Dependence Graph ******************
+
+Code after use-def elimination
+
+int env05()
+{
+   typedef int mile;                                                    /*0005*/
+   typedef mile km;                                                     /*0006*/
+   {
+   }
+
+
+   j = sizeof(km);                                                      /*0010*/
+   return j;                                                            /*0011*/
+}

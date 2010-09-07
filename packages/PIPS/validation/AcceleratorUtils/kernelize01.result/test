@@ -80,7 +80,7 @@ int foo(int seed[100])
    int c[100];
    int i;
    //PIPS generated variable
-   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
+   int (*P_0)[100] = (int (*)[100]) 0, (*P_1)[100] = (int (*)[100]) 0, (*P_2)[100] = (int (*)[100]) 0;
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
@@ -113,7 +113,7 @@ int foo(int seed[100])
    int c[100];
    int i;
    //PIPS generated variable
-   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
+   int (*P_0)[100] = (int (*)[100]) 0, (*P_1)[100] = (int (*)[100]) 0, (*P_2)[100] = (int (*)[100]) 0;
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {

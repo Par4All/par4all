@@ -1,0 +1,25 @@
+delete assign_dead_code_00
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create assign_dead_code_00 assign_dead_code_00.c
+
+echo
+echo "foo" file
+echo
+
+display PRINTED_FILE
+
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+
+echo
+echo file after cleanup
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete assign_dead_code_00
+quit

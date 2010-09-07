@@ -138,7 +138,7 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &a[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
       //c SIMD_COMMENT_0
       a[5+LU_IND0] = b[1+LU_IND0];
       //c SIMD_COMMENT_0
@@ -162,7 +162,7 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &a[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
       //c SIMD_COMMENT_0
       a[5+LU_IND0] = b[1+LU_IND0];
       //c SIMD_COMMENT_0
@@ -186,7 +186,7 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &a[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
       //c SIMD_COMMENT_0
       a[5+LU_IND0] = b[1+LU_IND0];
       //c SIMD_COMMENT_0
@@ -213,7 +213,7 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
       SIMD_LOAD_V4SF(v4sf_vec2, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &a[LU_IND0]);
       SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(v4sf_vec0, &b[4+LU_IND0]);
       //c SIMD_COMMENT_0
       a[5+LU_IND0] = b[1+LU_IND0];
       //c SIMD_COMMENT_0

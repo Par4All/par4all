@@ -1,0 +1,49 @@
+delete tiling07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create tiling07 tiling07.f
+
+echo
+echo Execution of tiled code
+echo
+
+shell gfortran tiling07.f -o tiling07.database/a.out
+shell ./tiling07.database/a.out >./tiling07.database/initial_results
+
+echo
+echo Initial code before tiling
+echo
+
+display PRINTED_FILE[TILING07]
+
+apply LOOP_TILING[TILING07]
+100
+ 3 0
+-1 2
+
+echo
+echo After tiling
+echo
+
+display PRINTED_FILE[TILING07]
+
+echo
+echo Execution of tiled code
+echo
+
+apply UNSPLIT
+
+close
+
+shell gfortran tiling07.database/Src/tiling07.f -o tiling07.database/a.out
+shell ./tiling07.database/a.out >./tiling07.database/final_results
+
+echo
+echo Differences if any
+echo
+
+shell diff tiling07.database/initial_results  tiling07.database/final_results
+
+#delete tiling07
+quit

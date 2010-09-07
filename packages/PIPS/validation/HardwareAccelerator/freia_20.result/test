@@ -1,4 +1,184 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128), *t6 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128), *t8 = freia_common_create_data(16, 128, 128), *t9 = freia_common_create_data(16, 128, 128), *ta = freia_common_create_data(16, 128, 128), *tb = freia_common_create_data(16, 128, 128);               /*0018*/
+   
+   // long pipeline that must be cut
+   freia_aipo_erode_8c(t0, i, k);                                       /*0021*/
+   freia_aipo_erode_6c(t1, t0, k);                                      /*0022*/
+   freia_aipo_dilate_8c(t2, t1, k);                                     /*0023*/
+   freia_aipo_dilate_6c(t3, t2, k);                                     /*0024*/
+   freia_aipo_erode_8c(t4, t3, k);                                      /*0025*/
+   freia_aipo_erode_6c(t5, t4, k);                                      /*0026*/
+   freia_aipo_dilate_8c(t6, t5, k);                                     /*0027*/
+   freia_aipo_dilate_6c(t7, t6, k);                                     /*0028*/
+   // should cut here
+   freia_aipo_erode_8c(t8, t7, k);                                      /*0030*/
+   freia_aipo_erode_6c(t9, t8, k);                                      /*0031*/
+   freia_aipo_dilate_8c(ta, t9, k);                                     /*0032*/
+   freia_aipo_dilate_6c(tb, ta, k);                                     /*0033*/
+   freia_aipo_erode_8c(o, tb, k);                                       /*0034*/
+
+   freia_common_destruct_data(t0);                                      /*0036*/
+   freia_common_destruct_data(t1);                                      /*0037*/
+   freia_common_destruct_data(t2);                                      /*0038*/
+   freia_common_destruct_data(t3);                                      /*0039*/
+   freia_common_destruct_data(t4);                                      /*0040*/
+   freia_common_destruct_data(t5);                                      /*0041*/
+   freia_common_destruct_data(t6);                                      /*0042*/
+   freia_common_destruct_data(t7);                                      /*0043*/
+   freia_common_destruct_data(t8);                                      /*0044*/
+   freia_common_destruct_data(t9);                                      /*0045*/
+   freia_common_destruct_data(ta);                                      /*0046*/
+   freia_common_destruct_data(tb);                                      /*0047*/
+
+   return FREIA_OK;                                                     /*0049*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_20" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "34 E8" [shape=box];
+  "34 E8" -> "o";
+  "33 D6" [shape=box];
+  "33 D6" -> "34 E8" [label="tb"];
+  "32 D8" [shape=box];
+  "32 D8" -> "33 D6" [label="ta"];
+  "31 E6" [shape=box];
+  "31 E6" -> "32 D8" [label="t9"];
+  "30 E8" [shape=box];
+  "30 E8" -> "31 E6" [label="t8"];
+  "28 D6" [shape=box];
+  "28 D6" -> "30 E8" [label="t7"];
+  "27 D8" [shape=box];
+  "27 D8" -> "28 D6" [label="t6"];
+  "26 E6" [shape=box];
+  "26 E6" -> "27 D8" [label="t5"];
+  "25 E8" [shape=box];
+  "25 E8" -> "26 E6" [label="t4"];
+  "24 D6" [shape=box];
+  "24 D6" -> "25 E8" [label="t3"];
+  "23 D8" [shape=box];
+  "23 D8" -> "24 D6" [label="t2"];
+  "22 E6" [shape=box];
+  "22 E6" -> "23 D8" [label="t1"];
+  "21 E8" [shape=box];
+  "21 E8" -> "22 E6" [label="t0"];
+  "i" -> "21 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_20" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "34 E8" [shape=box];
+  "34 E8" -> "o";
+  "33 D6" [shape=box];
+  "33 D6" -> "34 E8" [label="tb"];
+  "32 D8" [shape=box];
+  "32 D8" -> "33 D6" [label="ta"];
+  "31 E6" [shape=box];
+  "31 E6" -> "32 D8" [label="t9"];
+  "30 E8" [shape=box];
+  "30 E8" -> "31 E6" [label="t8"];
+  "28 D6" [shape=box];
+  "28 D6" -> "30 E8" [label="t7"];
+  "27 D8" [shape=box];
+  "27 D8" -> "28 D6" [label="t6"];
+  "26 E6" [shape=box];
+  "26 E6" -> "27 D8" [label="t5"];
+  "25 E8" [shape=box];
+  "25 E8" -> "26 E6" [label="t4"];
+  "24 D6" [shape=box];
+  "24 D6" -> "25 E8" [label="t3"];
+  "23 D8" [shape=box];
+  "23 D8" -> "24 D6" [label="t2"];
+  "22 E6" [shape=box];
+  "22 E6" -> "23 D8" [label="t1"];
+  "21 E8" [shape=box];
+  "21 E8" -> "22 E6" [label="t0"];
+  "i" -> "21 E8";
+}
+
+! updated function for
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128), *t6 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128), *t8 = freia_common_create_data(16, 128, 128), *t9 = freia_common_create_data(16, 128, 128), *ta = freia_common_create_data(16, 128, 128), *tb = freia_common_create_data(16, 128, 128);               /*0018*/
+   
+   // long pipeline that must be cut
+   freia_aipo_erode_8c(t0, i, k);                                       /*0021*/
+   freia_aipo_erode_6c(t1, t0, k);                                      /*0022*/
+   freia_aipo_dilate_8c(t2, t1, k);                                     /*0023*/
+   freia_aipo_dilate_6c(t3, t2, k);                                     /*0024*/
+   freia_aipo_erode_8c(t4, t3, k);                                      /*0025*/
+   freia_aipo_erode_6c(t5, t4, k);                                      /*0026*/
+   freia_aipo_dilate_8c(t6, t5, k);                                     /*0027*/
+   freia_aipo_dilate_6c(t7, t6, k);                                     /*0028*/
+   // should cut here
+   freia_aipo_erode_8c(t8, t7, k);                                      /*0030*/
+   freia_aipo_erode_6c(t9, t8, k);                                      /*0031*/
+   freia_aipo_dilate_8c(ta, t9, k);                                     /*0032*/
+   freia_aipo_dilate_6c(tb, ta, k);                                     /*0033*/
+   freia_aipo_erode_8c(o, tb, k);                                       /*0034*/
+
+   freia_common_destruct_data(t0);                                      /*0036*/
+   freia_common_destruct_data(t1);                                      /*0037*/
+   freia_common_destruct_data(t2);                                      /*0038*/
+   freia_common_destruct_data(t3);                                      /*0039*/
+   freia_common_destruct_data(t4);                                      /*0040*/
+   freia_common_destruct_data(t5);                                      /*0041*/
+   freia_common_destruct_data(t6);                                      /*0042*/
+   freia_common_destruct_data(t7);                                      /*0043*/
+   freia_common_destruct_data(t8);                                      /*0044*/
+   freia_common_destruct_data(t9);                                      /*0045*/
+   freia_common_destruct_data(ta);                                      /*0046*/
+   freia_common_destruct_data(tb);                                      /*0047*/
+
+   return FREIA_OK;                                                     /*0049*/
+}
+#
 # SPOC
 #
 
@@ -445,6 +625,34 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
 
    return FREIA_OK;                                                     /*0049*/
 }
+
+! cleaned up function
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t7 = freia_common_create_data(16, 128, 128);           /*0018*/
+   
+   // long pipeline that must be cut
+   freia_20_helper_0_0_0(t7, i, k);                                     /*0021*/
+   // should cut here
+   freia_20_helper_0_0_1(o, t7, k);                                     /*0030*/
+
+   freia_common_destruct_data(t7);                                      /*0043*/
+
+   return 0;                                                            /*0049*/
+}
 #
 # TERAPIX
 #
@@ -858,6 +1066,31 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    
    
    return FREIA_OK;                                                     /*0049*/
+}
+
+! cleaned up function
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   // long pipeline that must be cut
+   freia_20_helper_0_0(o, i, k);                                        /*0021*/
+   // should cut here
+   
+   
+   return 0;                                                            /*0049*/
 }
 #
 # FREIA COMPILATION DONE

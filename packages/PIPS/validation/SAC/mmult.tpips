@@ -16,11 +16,13 @@ setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
 
 activate MUST_REGIONS
+activate REGION_CHAINS
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+setproperty CONSTANT_PATH_EFFECTS FALSE
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
 
 setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
-activate RICE_SEMANTICS_DEPENDENCE_GRAPH
 
 setproperty LOOP_LABEL "loop2"
 apply REDUCTION_VARIABLE_EXPANSION
@@ -61,6 +63,7 @@ display PRINTED_FILE
 
 apply UNSPLIT
 shell sed -i -e '1,/Matrix_Mult/ d'  $WS.database/Src/$WS.c
+shell sed -i -e '1 i #define REAL(x) ((float)(x))' $WS.database/Src/$WS.c
 
 shell cc $WS.c include/SIMD.c -o $WS.database/Tmp/ref
 shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
@@ -73,5 +76,5 @@ shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
 shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
 
 close
-delete $WS
+#delete $WS
 quit

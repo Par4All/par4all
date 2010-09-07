@@ -1,4 +1,58 @@
 #
+# AIPO
+#
+
+! initial function
+
+void border_dead(freia_data2d *out, freia_data2d *in)
+{
+   // this kernel is not very useful...
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "border_dead" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "9 E8" [shape=box];
+  "9 E8" -> "out";
+  "in" -> "9 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_dead" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "9 E8" [shape=box];
+  "9 E8" -> "out";
+  "in" -> "9 E8";
+}
+
+! updated function for
+
+void border_dead(freia_data2d *out, freia_data2d *in)
+{
+   // this kernel is not very useful...
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+}
+#
 # SPOC
 #
 
@@ -138,6 +192,18 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
    border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+}
+
+! cleaned up function
+
+void border_dead(freia_data2d *out, freia_data2d *in)
+{
+   // this kernel is not very useful...
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
+   border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+   ;
 }
 #
 # TERAPIX
@@ -307,6 +373,18 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
    border_dead_helper_0_0(out, in, kernel);                             /*0009*/
+}
+
+! cleaned up function
+
+void border_dead(freia_data2d *out, freia_data2d *in)
+{
+   // this kernel is not very useful...
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
+   border_dead_helper_0_0(out, in, kernel);                             /*0009*/
+   ;
 }
 #
 # FREIA COMPILATION DONE

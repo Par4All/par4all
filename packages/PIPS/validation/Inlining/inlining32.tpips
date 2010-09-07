@@ -1,0 +1,28 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS inlining32
+delete $WS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create $WS $WS.c
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+# inline
+apply INLINING[bar]
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+shell cc $WS.database/Src/$WS.c -c -o $WS.database/Tmp/$WS.o
+close
+
+delete $WS
+

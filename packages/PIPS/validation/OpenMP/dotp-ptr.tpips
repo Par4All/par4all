@@ -1,0 +1,18 @@
+delete      dotp-ptr
+create      dotp-ptr dotp-ptr.c
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
+
+apply       PRIVATIZE_MODULE(%ALL)
+apply       COARSE_GRAIN_PARALLELIZATION(dotp_ptr)
+apply       OMPIFY_CODE(%ALL)
+apply       UNSPLIT(%ALL)
+
+display	    PRINTED_FILE(dotp_ptr)
+
+shell gcc -fopenmp -c dotp-ptr.database/Src/dotp-ptr.c
+shell rm -f dotp-ptr.o
+
+close
+delete      dotp-ptr
+quit

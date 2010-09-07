@@ -20,7 +20,6 @@ int main() //      program image_processing
         for( j = 0; j< kernel_size; j++) {
             kernel[i][j] = 1;
         }
-        kernel[i][kernel_size];
     }
 
     //     read *, image

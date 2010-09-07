@@ -1,0 +1,59 @@
+#Test sesamify transformation on a simple program with two loops which are transformed into tasks
+setenv WKS sesam01
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c sesam_stubs.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty CONSTANT_PATH_EFFECTS=FALSE
+setproperty NO_USER_WARNING TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+
+setproperty GPU_USE_WRAPPER FALSE
+setproperty GPU_USE_KERNEL FALSE
+setproperty GPU_LAUNCHER_PREFIX "P4A_sesam_task"
+
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_scmp_read"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_scmp_write"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_scmp_malloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_scmp_dealloc"
+setproperty KERNEL_LOAD_STORE_FORCE_LOAD TRUE
+
+setproperty OUTLINE_ALLOW_GLOBALS TRUE
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 1
+
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT FALSE
+
+# If we do this here, the side effect at the end of a loop on the index
+# break paramemstorellelization. It would require to apply USE_DEF_ELIM...
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+apply COARSE_GRAIN_PARALLELIZATION[main]
+
+apply GPU_IFY[main]
+
+apply SESAMIFY[main]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+close
+delete $WKS
+
+quit

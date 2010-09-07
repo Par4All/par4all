@@ -329,7 +329,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    int L_0;
    //PIPS generated variable
-   float (*P_0)[isi][isj], (*P_1)[3][3], (*P_2)[isi][isj];
+   float (*P_0)[isi][isj] = (float (*)[isi][isj]) 0, (*P_1)[3][3] = (float (*)[3][3]) 0, (*P_2)[isi][isj] = (float (*)[isi][isj]) 0;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:

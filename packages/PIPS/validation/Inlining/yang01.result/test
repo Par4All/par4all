@@ -1,0 +1,207 @@
+
+After inlining/unfolding of "bar"
+
+int bar()
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   //PIPS generated variable
+   int _return0, _return1;
+
+   while (x<=4) {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      y++;
+      {
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+         // BEGIN BLOCK
+         
+         
+         // BEGIN BLOCK
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+         ;
+         // END BLOCK
+      }
+      // END BLOCK
+      x = _return0;
+      // END BLOCK
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      int t = y+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+      // BEGIN BLOCK
+      
+      
+      // BEGIN BLOCK
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+      ;
+      // END BLOCK
+   }
+   // END BLOCK
+   y = _return1;
+   // END BLOCK
+   
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+   return y;
+   // END BLOCK
+}
+
+After unspahettify of "bar"
+
+int bar()
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   //PIPS generated variable
+   int _return0, _return1;
+
+   while (x<=4) {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      y++;
+      {
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+         // BEGIN BLOCK
+         
+         
+         // BEGIN BLOCK
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+         ;
+         // END BLOCK
+      }
+      // END BLOCK
+      x = _return0;
+      // END BLOCK
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      int t = y+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+      // BEGIN BLOCK
+      
+      
+      // BEGIN BLOCK
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+      ;
+      // END BLOCK
+   }
+   // END BLOCK
+   y = _return1;
+   // END BLOCK
+   
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+   return y;
+   // END BLOCK
+}
+
+After dead code elimination of "bar"
+
+int bar()
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+   int x = 3;
+   int y = x-3;
+   //PIPS generated variable
+   int _return0, _return1;
+
+   while (x<=4) {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      y++;
+      {
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         int t = x+2;
+
+         t--;
+         // BEGIN BLOCK
+         
+         
+         // BEGIN BLOCK
+         _return0 = t;
+         // END BLOCK
+         // END BLOCK
+         ;
+         // END BLOCK
+      }
+      // END BLOCK
+      x = _return0;
+      // END BLOCK
+      // Execution: (x,y) = (4,1) and then (5,2) and the loop is exited
+      printf("In loop: x=%d, y=%d\n", x, y);
+      // END BLOCK
+   }
+   {
+      // BEGIN BLOCK
+      // BEGIN BLOCK
+      int t = y+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+      // BEGIN BLOCK
+      
+      
+      // BEGIN BLOCK
+      _return1 = t;
+      // END BLOCK
+      // END BLOCK
+      ;
+      // END BLOCK
+   }
+   // END BLOCK
+   y = _return1;
+   // END BLOCK
+   
+   // Execution: (x,y) = (5,3)
+   printf("At the end: x=%d, y=%d\n", x, y);
+   return y;
+   // END BLOCK
+}

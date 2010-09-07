@@ -1,0 +1,115 @@
+
+Proper effetcs for "dereferencing10"
+
+int main()
+{
+   int ****p, ***p_1, **p_2, *p_3;
+   int i, j;
+   int ***q_1, **q_2, *q_3;
+//               <must be written>: i
+   i = 0;
+//               <must be written>: j
+   j = 1;
+//               <must be written>: p_3
+   p_3 = &i;
+//               <must be written>: q_3
+   q_3 = &j;
+//               <must be written>: p_2
+   p_2 = &p_3;
+//               <must be written>: q_2
+   q_2 = &q_3;
+//               <must be written>: p_1
+   p_1 = &p_2;
+//               <must be written>: q_1
+   q_1 = &q_2;
+//               <must be written>: p
+   p = &p_1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+   ***p = q_3;
+   
+   
+   
+   
+   return 0;
+}
+
+Proper Pointer effetcs for "dereferencing10"
+
+int main()
+{
+   int ****p, ***p_1, **p_2, *p_3;
+   int i, j;
+   int ***q_1, **q_2, *q_3;
+//               <must be written>: i
+   i = 0;
+//               <must be written>: j
+   j = 1;
+//               <must be written>: p_3
+   p_3 = &i;
+//               <must be written>: q_3
+   q_3 = &j;
+//               <must be written>: p_2
+   p_2 = &p_3;
+//               <must be written>: q_2
+   q_2 = &q_3;
+//               <must be written>: p_1
+   p_1 = &p_2;
+//               <must be written>: q_1
+   q_1 = &q_2;
+//               <must be written>: p
+   p = &p_1;
+//               <must be read   >: p p[0] p[0][0] q_3
+//               <must be written>: p[0][0][0]
+   ***p = q_3;
+   
+   
+   
+   
+   return 0;
+}
+
+POINTS TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int ****p, ***p_1, **p_2, *p_3;
+//  points to = {}
+   int i, j;
+//  points to = {}
+   int ***q_1, **q_2, *q_3;
+//  points to = {}
+   i = 0;
+//  points to = {}
+   j = 1;
+//  points to = {}
+   p_3 = &i;
+//  {(p_3,i,-Exact-)}
+   q_3 = &j;
+//  {(p_3,i,-Exact-);(q_3,j,-Exact-)}
+   p_2 = &p_3;
+//  {(p_2,p_3,-Exact-);(p_3,i,-Exact-);(q_3,j,-Exact-)}
+   q_2 = &q_3;
+//  {(p_2,p_3,-Exact-);(p_3,i,-Exact-);(q_2,q_3,-Exact-);(q_3,j,
+//   -Exact-)}
+   p_1 = &p_2;
+//  {(p_1,p_2,-Exact-);(p_2,p_3,-Exact-);(p_3,i,-Exact-);(q_2,q_3,
+//   -Exact-);(q_3,j,-Exact-)}
+   q_1 = &q_2;
+//  {(p_1,p_2,-Exact-);(p_2,p_3,-Exact-);(p_3,i,-Exact-);(q_1,q_2,
+//   -Exact-);(q_2,q_3,-Exact-);(q_3,j,-Exact-)}
+   p = &p_1;
+//  {(p,p_1,-Exact-);(p_1,p_2,-Exact-);(p_2,p_3,-Exact-);(p_3,i,
+//   -Exact-);(q_1,q_2,-Exact-);(q_2,q_3,-Exact-);(q_3,j,-Exact-)}
+   ***p = q_3;
+//  {(p[0][0][0],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,p_1,
+//   -Exact-);(p_1,p_2,-Exact-);(p_2,p_3,-Exact-);(p_3,i,
+//   -Exact-);(q_1,q_2,-Exact-);(q_2,q_3,-Exact-);(q_3,j,-Exact-)}
+   
+   
+   
+   
+   return 0;
+}

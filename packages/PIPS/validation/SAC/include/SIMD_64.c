@@ -15,7 +15,7 @@ SIMD_LOAD_V4SI (short VEC[4], short BASE[4])
     VEC[3] = BASE[3];
 }
 void
-SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1])
+SIMD_STORE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1])
 {
 
     X1 [0]= VEC[0];
@@ -34,7 +34,7 @@ SIMD_LOAD_GENERIC_V4SI (short VEC[4], short X1, short X2, short X3, short X4)
 }
 
 void
-SIMD_SAVE_V4SI (short VEC[4], short BASE[4])
+SIMD_STORE_V4SI (short VEC[4], short BASE[4])
 {  BASE[0] = VEC[0];
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];

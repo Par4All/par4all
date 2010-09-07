@@ -1,0 +1,85 @@
+
+Parsed code for "env04"
+
+void env04()
+{
+   typedef int mile;
+   typedef mile km;
+   km j;
+
+   j = (km) 1;
+}
+
+Code for "env04"
+
+void env04()
+{
+   typedef int mile;
+   typedef mile km;
+   km j;
+
+   j = (km) 1;
+}
+
+Proper effects for "env04"
+
+void env04()
+{
+//               <must be declared>: mile
+   typedef int mile;
+//               <must be referenced>: mile
+//               <must be declared>: km
+   typedef mile km;
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;
+//               <must be written>: j
+//               <must be referenced>: km j
+
+   j = (km) 1;
+}
+
+Cumulated effects for "env04"
+
+void env04()
+{
+//               <must be declared>: mile
+   typedef int mile;
+//               <must be referenced>: mile
+//               <must be declared>: km
+   typedef mile km;
+//               <must be referenced>: km
+//               <must be declared>: j
+   km j;
+//               <must be written>: j
+//               <must be referenced>: km j
+
+   j = (km) 1;
+}
+
+Pointer Regions for "env04"
+
+void env04()
+{
+
+//  <mile-WT-EXACT-{}>
+
+   typedef int mile;
+
+//  <km-WT-EXACT-{}>
+//  <mile-RT-EXACT-{}>
+
+   typedef mile km;
+
+//  <j-WE-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+   km j;
+
+//  <j-RE-EXACT-{}>
+//  <j-W-EXACT-{}>
+//  <km-RT-EXACT-{}>
+
+
+   j = (km) 1;
+}

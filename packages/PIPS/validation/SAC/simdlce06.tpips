@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="simdlce06"
+delete $WS
+create $WS $WS.c include/memcpy.c
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+activate REGION_CHAINS
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+make PRINTED_FILE[%ALL]
+
+setproperty ACCEL_LOAD "my_memcpy"
+setproperty ACCEL_STORE "memstore"
+module caram
+display PRINTED_FILE 
+
+apply SIMD_LOOP_CONST_ELIM
+display PRINTED_FILE
+
+close
+delete $WS

@@ -1,0 +1,6 @@
+delete bad_ideas
+create bad_ideas bad_ideas.c
+display PRINTED_FILE[%ALL]
+close
+delete bad_ideas
+quit

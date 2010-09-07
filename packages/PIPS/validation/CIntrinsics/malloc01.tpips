@@ -1,0 +1,23 @@
+delete malloc01
+
+create malloc01 malloc01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "malloc01"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "malloc01"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete malloc01
+quit
+

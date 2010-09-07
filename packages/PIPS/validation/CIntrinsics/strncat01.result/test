@@ -12,18 +12,18 @@ int main()
    return 0;
 }
 
-Cumulated effetcs for "strncat01"
+Proper effetcs for "strncat01"
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
    char str1[20];
    char str2[20];
+//               <must be written>: str1[*]
    strcpy(str1, "To be ");
+//               <must be written>: str2[*]
    strcpy(str2, "or not to be");
+//               <must be read   >: str2[*]
+//               <must be written>: str1[0:6-1]
    strncat(str1, str2, 6);
 //               <may be read    >: stdout[0] str1[*]
 //               <may be written >: stdout[0]

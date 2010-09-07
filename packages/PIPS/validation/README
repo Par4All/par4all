@@ -1,48 +1,40 @@
 PIPS validation, i.e. non regression tests, bugs and expected enhancements.
 
-
-xxxx: non-regression test for functionality xxx, may or not use PIPS initial default settings
+xxxx: non-regression test for functionality xxx,
+    may or not use PIPS initial default settings
 xxxx-Bugs: known bugs (corrective maintenance)
 xxxx-Future: new functionalities (evolutive maintenance)
-xxxx-New: non-regression test for functionality xxx, using the current defauolt settings for properties and activates
+xxxx-New: non-regression test for functionality xxx,
+    using the current defauolt settings for properties and activates
 
 
-Default validation, i.e. non-regression tests (list of directories in "defaults"):
+Default validation, i.e. non-regression tests
+  (the list of directories in "defaults")
 
-	sh> make validate
+	sh> make new-validate
 
-or just for one directory or one file:
+or just for one directory:
 
-	sh> make TARGET=Semantics validate
-	sh> make TARGET=Semantics/loopequiv.f validate
+	sh> make TARGET=Semantics new-validate
 
+or just for one file:
 
-To tell which tpips/pips should be used, you must give additional options
-to "pips_validate" through the VOPT makefile macro:
-
-	sh> make VOPT='-v -t /path/to/tpips -p /path/to/pips' validate
-
-It can also be done by fixing the PATH environment variable:
-
-	sh> PATH=/path/to/pips/binaries:$PATH make validate
+	sh> cd Semantics
+	sh> rm loopequiv.result/test
+	sh> make loopequiv.result/test
 
 
-Interactive acceptation of differences, possibly for some
-directories or files, and commit:
+To change the pips/tpips used for the validation, fix the PATH,
+and possibly LD_LIBRARY_PATH if you use dynamic linking:
 
-	sh> make accept
-	sh> make TARGET=Semantics accept
-	sh> make TARGET=Semantics/loopequiv.f accept
-	sh> svn ci -m 'what has been done...'
+	sh> PATH=/path/to/pips/binaries:$PATH make new-validate
+
+
+Acceptation of differences, possibly for some directories or files, and commit:
+
+	sh> svn ci -m 'what has been done...' test-files-to-accept
 
 
 Full cleanup of generated files:
 
-	sh> make clean
-
-
-Convenient targets:
-
-	sh> make validate-all
-	sh> make validate-private
-	sh> make validate-<replace-by-some-subdirectory>
+	sh> make clean parallel-clean

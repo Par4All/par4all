@@ -35,7 +35,7 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    int spp = datdest->spp;
    int length = datdest->length*spp;
    //PIPS generated variable
-   int _return0, _return1, _return2, _return3;
+   fgINT32 _return0, _return1, _return2, _return3;
    for(j = 0; j <= length-1; j += 1) {
       _return2 = psrc1[j];
       _return0 = _return2;
@@ -44,23 +44,7 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
       _return1 = _return3;
       v2 = _return1;
       result = flgr_defop_add_fgINT32(v1, v2);
-      {
-         //PIPS generated variable
-         fgINT32 *array0 = pdest;
-         //PIPS generated variable
-         int pos0 = j;
-         //PIPS generated variable
-         fgINT32 value0 = result;
-         {
-            //PIPS generated variable
-            fgINT32 *array1 = array0;
-            //PIPS generated variable
-            int pos1 = pos0;
-            //PIPS generated variable
-            fgINT32 value1 = value0;
-            array1[pos1] = value1;
-         }
-      }
+      pdest[j] = result;
    }
    return;
 }

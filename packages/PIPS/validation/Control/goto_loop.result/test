@@ -1,46 +1,50 @@
 int main()
 {
-   int i = 5;
-   printf("Begin\n");
-   
-   /* The a label */
-a:   printf("a\n");
-   /* The b label */
-b:   printf("b\n");
-   /* Oh, go to a... */
-   ;
-   goto a;
+   {
+      int i = 5;
+      printf("Begin\n");
+      
+      /* The a label */
+a:      printf("a\n");
+      /* The b label */
+b:      printf("b\n");
+      /* Oh, go to a... */
+      ;
+      goto a;
+   }
 }
 
 //  P() {}
 
 int main()
 {
+   {
 
 //  P() {}
 
-   int i = 5;
+      int i = 5;
 
 //  P(i) {i==5}
 
-   printf("Begin\n");
+      printf("Begin\n");
 
 //  P(i) {i==5}
 
-   
-   /* The a label */
-a:   printf("a\n");
+      
+      /* The a label */
+a:      printf("a\n");
 
 //  P(i) {i==5}
 
-   /* The b label */
-b:   printf("b\n");
+      /* The b label */
+b:      printf("b\n");
 
 //  P(i) {i==5}
 
-   /* Oh, go to a... */
-   ;
-   goto a;
+      /* Oh, go to a... */
+      ;
+      goto a;
+   }
 }
 
 //  P() {}

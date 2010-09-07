@@ -11,7 +11,6 @@ void popop()
 
 loops
 
-l99999
 void popop()
 {
    int i, j;
@@ -20,7 +19,6 @@ l99999:
       for (j = 2;j<-2;j /= 4012)
          ;
 }
-l99999
 l99998
 void popop()
 {

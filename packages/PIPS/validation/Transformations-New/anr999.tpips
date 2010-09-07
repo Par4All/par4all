@@ -1,0 +1,105 @@
+#
+# $Id: anr999-pips.tpips 717 2010-06-17 13:56:10Z coelho $
+#
+
+delete anr999
+
+# we show this function
+setenv FCD anr999.database/freia_cipo_dilate
+setenv FCDFCD $FCD/freia_cipo_dilate
+setenv MAIN anr999.database/main
+
+# safe
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv PIPS_CPP_FLAGS="-I ./freia.src/cipo/include -I ./freia.src/common/include/ -I ./freia.src/aipo/include -I ./freia.src/debug/include -DFREIA_ASSUME_CORRECT_CODE "
+
+create anr999 anr999.c \
+        freia.src/cipo/src/freiaComplexOpMorpho.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# source code for aipo modules is not required at this stage
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+# interprocedural stuff not needed after inlining
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+# ALL FUNCTIONS CODE
+activate PRINT_CODE
+make PRINTED_FILE[%ALLFUNC]
+shell cp $FCDFCD.pre.c $FCD/fcd-0-init.c
+#shell cp $MAIN/main.pre.c $MAIN/main-0-init.c
+
+# CG main
+make CALLGRAPH_FILE[main]
+
+# compute ICFG main & save it
+activate PRINT_ICFG_WITH_CONTROL
+setproperty ICFG_INDENTATION 5
+make ICFG_FILE[main]
+shell cp $MAIN/main.icfgc $MAIN/main.icfgc.0
+
+# To avoid problems with unknown initial preconditions due to code synthesis
+make PRINTED_FILE[freia_aipo_addsat_const]
+make PRINTED_FILE[freia_aipo_inf]
+make PRINTED_FILE[freia_aipo_subsat_const]
+make PRINTED_FILE[freia_aipo_sup]
+make PRINTED_FILE[freia_cipo_global_sad]
+make PRINTED_FILE[freia_common_get_wa]
+make PRINTED_FILE[freia_common_set_wa]
+
+activate PRINT_CODE
+make PRINTED_FILE[freia_cipo_dilate]
+make PRINTED_FILE[freia_cipo_erode]
+make PRINTED_FILE[freia_cipo_gradient]
+
+# Inline cipo modules
+apply INLINING[freia_cipo_dilate]
+apply INLINING[freia_cipo_erode]
+apply INLINING[freia_cipo_gradient]
+make PRINTED_FILE[main]
+shell cp $MAIN/main.pre.c $MAIN/main-2-inln.c
+
+# ou avant inlining ?
+activate PRINT_CODE_PRECONDITIONS
+setproperty SYSTEM_NOT_FEASIBLE "NOT FEASIBLE"
+make PRINTED_FILE[main]
+shell cp $MAIN/main.prec.c $MAIN/main-3-prec.c
+
+# cleanup after inlining
+apply PARTIAL_EVAL[main]
+# this prettyprint is necessary...
+activate PRINT_CODE
+# do not show partial eval result
+#shell cp $MAIN/main.pre.c $MAIN/main-4-paev.c
+
+apply SUPPRESS_DEAD_CODE[main]
+make PRINTED_FILE[main]
+shell cp $MAIN/main.pre.c $MAIN/main-5-sdc.c
+
+apply FLATTEN_CODE[main]
+make PRINTED_FILE[main]
+shell cp $MAIN/main.pre.c $MAIN/main-6-fltc.c
+
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#apply CLEAN_UNUSED_DYNAMIC_VARIABLES[main]
+#make PRINTED_FILE[main]
+#shell cp $MAIN/main.pref $MAIN/main-7-cudv.c
+
+# ICFG after inlining and cleaning for "main"
+make ICFG_FILE[main]
+
+display PRINTED_FILE[main]
+
+close
+delete anr999
+quit

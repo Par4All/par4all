@@ -1,0 +1,17 @@
+void caram()
+{
+   int j[4], k[4];
+   while (1) {
+      my_memcpy(&k[0], &j[0], 4*sizeof(int));
+      memstore(&j[0], &k[0], 4*sizeof(int));
+   }
+}
+void caram()
+{
+   int j[4], k[4];
+   my_memcpy(&k[0], &j[0], 4*sizeof(int));
+   while (1) 
+      ;
+   memstore(&j[0], &k[0], 4*sizeof(int));
+}
+

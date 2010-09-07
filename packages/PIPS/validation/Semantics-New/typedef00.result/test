@@ -1,0 +1,29 @@
+boolean bla(void)
+{
+   return foo();
+}
+boolean foo(void)
+{
+   return true;
+}
+
+//  T(foo) {foo==1}
+
+boolean foo(void)
+{
+
+//  T(foo) {foo==1}
+
+   return true;
+}
+
+//  T(bla) {bla==1}
+
+boolean bla(void)
+{
+
+//  T(bla) {bla==1}
+
+   return foo();
+}
+

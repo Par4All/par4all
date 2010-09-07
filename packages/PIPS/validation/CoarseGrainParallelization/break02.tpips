@@ -1,0 +1,18 @@
+delete break02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create break02 break02.c
+
+apply PRIVATIZE_MODULE(find_neg)
+
+apply  COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE [%ALL]
+
+apply UNSPLIT
+shell gcc -fopenmp -c break02.database/Src/break02.c -o break02.database/Src/break02.o
+
+close
+delete break02
+quit
+# EOF

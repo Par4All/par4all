@@ -168,29 +168,25 @@ int HasNextBurst(FILE *fp, float *Tr)
    
    int HasEqual = 0;
    int EndOfFile = 0;
-l99996:   ;
-   if (!(!HasEqual&&!EndOfFile)) goto l99999;
-   HasEqual = 0;
-   i = 0;
-l99997:   ;
-   if (!(i<255)) goto break_2;
-   line[i] = fgetc(fp);
-   chara = (int) line[i];
-   if (chara<0) goto l99998;
-   if (line[i]=='=') 
-      HasEqual = 1;
-   if (line[i]=='\n') goto break_2;
-   if (line[i]!=' ') 
-      i++;
-   goto l99997;
-break_2:   ;
-   line[i+1] = '\0';
-   goto l99996;
-l99998:   ;
-   EndOfFile = 1;
-   goto break_2;
-l99999:   ;
-
+   while (!HasEqual&&!EndOfFile) {
+      HasEqual = 0;
+      i = 0;
+l99998:      ;
+      if (!(i<255)) goto break_2;
+      line[i] = fgetc(fp);
+      chara = (int) line[i];
+      if (chara<0) goto l99999;
+      if (line[i]=='=') 
+         HasEqual = 1;
+      if (line[i]=='\n') goto break_2;
+      if (line[i]!=' ') 
+         i++;
+      goto l99998;
+l99999:      ;
+      EndOfFile = 1;
+break_2:      ;
+      line[i+1] = '\0';
+   }
    if (HasEqual) {
       status = 1;
       variable = strtok(line, "=");

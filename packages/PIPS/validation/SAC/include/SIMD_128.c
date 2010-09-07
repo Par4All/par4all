@@ -31,7 +31,7 @@ void SIMD_LOAD_GENERIC_V8HI(short a[8], short a0[1],short a1[1],short a2[1],shor
     a[6]=a6[0];
     a[7]=a7[0];
 }
-void SIMD_SAVE_GENERIC_V8HI(short a[8], short a0[1],short a1[1],short a2[1],short a3[1],short a4[1],short a5[1],short a6[1],short a7[1])
+void SIMD_STORE_GENERIC_V8HI(short a[8], short a0[1],short a1[1],short a2[1],short a3[1],short a4[1],short a5[1],short a6[1],short a7[1])
 {
     a0[0]=a[0];
     a1[0]=a[1];

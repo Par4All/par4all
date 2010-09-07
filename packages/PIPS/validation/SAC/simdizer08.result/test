@@ -17,6 +17,6 @@ int main()
    SIMD_LOAD_V4SI(v4si_vec2, &b[0]);
    SIMD_LOAD_V4SI(v4si_vec1, &aligned[0]);
    SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
-   SIMD_SAVE_V4SI(v4si_vec0, &a[0]);
+   SIMD_STORE_V4SI(v4si_vec0, &a[0]);
 }
 

@@ -1,0 +1,31 @@
+setenv WSPACE=initialization01
+setenv FILE=initialization01.f
+delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} ${FILE}
+
+echo
+echo Proper effects for "INITIALIZATION01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Use-def chains for "INITIALIZATION01"
+echo
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE
+
+echo
+echo Flinted file
+echo
+
+display FLINTED_FILE[INITIALIZATION01]
+
+close
+delete ${WSPACE}
+quit

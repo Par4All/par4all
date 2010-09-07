@@ -3,22 +3,20 @@ Parsed printed file for "memmove01"
 
 int main()
 {
-   char str[] = "memmove can be very useful......";
+   char str[] = "can be very useful......";
    memmove(str+20, str+15, 11);
    puts(str);
    return 0;
 }
 
-Cumulated effetcs for "memmove01"
+Proper effetcs for "memmove01"
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
 //               <may be written >: str[*]
-   char str[] = "memmove can be very useful......";
+   char str[] = "can be very useful......";
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(str+20, str+15, 11);
 //               <may be read    >: stdout[0] str[*]
 //               <may be written >: stdout[0]

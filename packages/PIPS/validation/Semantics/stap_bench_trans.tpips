@@ -1,0 +1,42 @@
+delete stap_bench_trans
+
+setproperty ABORT_ON_USER_ERROR
+
+create stap_bench_trans stap_bench_trans.c
+
+echo
+echo Transformers for "HasNextBurst"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[HasNextBurst]
+activate PRINT_CODE
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Preconditions for "ModSquare"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[ModSquare]
+activate PRINT_CODE
+
+
+apply PARTIAL_EVAL[ModSquare]
+
+echo
+echo Code for "ModSquare" after partial evaluation
+echo
+
+display PRINTED_FILE[ModSquare]
+
+close
+quit
+

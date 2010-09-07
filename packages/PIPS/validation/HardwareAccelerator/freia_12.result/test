@@ -1,4 +1,70 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_aipo_erode_8c(o0, i0, kern);                                   /*0011*/
+   freia_aipo_dilate_8c(o1, i1, kern);                                  /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_12" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 D8" [shape=box];
+  "12 D8" -> "o1";
+  "i1" -> "12 D8";
+  "11 E8" [shape=box];
+  "11 E8" -> "o0";
+  "i0" -> "11 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_12" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 D8" [shape=box];
+  "12 D8" -> "o1";
+  "i1" -> "12 D8";
+  "11 E8" [shape=box];
+  "11 E8" -> "o0";
+  "i0" -> "11 E8";
+}
+
+! updated function for
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_aipo_erode_8c(o0, i0, kern);                                   /*0011*/
+   freia_aipo_dilate_8c(o1, i1, kern);                                  /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+#
 # SPOC
 #
 
@@ -182,6 +248,17 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // o1 = h(i1)
    freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
    return FREIA_OK;                                                     /*0013*/
+}
+
+! cleaned up function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   return 0;                                                            /*0013*/
 }
 #
 # TERAPIX
@@ -384,6 +461,17 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // o1 = h(i1)
    freia_12_helper_0_0(o0, o1, i0, i1, kern);                           /*0011*/
    return FREIA_OK;                                                     /*0013*/
+}
+
+! cleaned up function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_12_helper_0_0(o0, o1, i0, i1, kern);                           /*0011*/
+   return 0;                                                            /*0013*/
 }
 #
 # FREIA COMPILATION DONE

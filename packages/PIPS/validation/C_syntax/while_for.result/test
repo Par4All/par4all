@@ -1,15 +1,12 @@
 int main()
 {
    int c, i;
-l99998:   ;
-   if (!(c>0)) goto l99999;
-   i = 0;
-   if (!(i<5)) {
+   while (c>0) {
+      i = 0;
+      if (!(i<5)) {
+      }
+break_2:      ;
    }
-break_2:   ;
-   goto l99998;
-l99999:   ;
-
 }
 Try more aggressive restructuring:
 
@@ -18,12 +15,11 @@ printed file after RESTRUCTURE_CONTROL
 int main()
 {
    int c, i;
-break_2:   if (!(c>0)) goto l99999;
-   i = 0;
-   if (!(i<5))
-      ;
-   goto break_2;
-l99999:   ;
-
+   while (c>0) {
+      i = 0;
+      if (!(i<5))
+         ;
+break_2:      ;
+   }
 }
 

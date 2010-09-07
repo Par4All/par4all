@@ -1,4 +1,74 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // the internal difference is performed twice, and the pipeline is broken
+   // o0 = i0 - i1
+   // o1 = |i0 - i1|
+   freia_aipo_absdiff(o0, i0, i1);                                      /*0009*/
+   freia_aipo_sub(o1, i0, i1);                                          /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_05" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 -" [shape=trapezium,orientation=270];
+  "10 -" -> "o1";
+  "9 -|" [shape=trapezium,orientation=270];
+  "9 -|" -> "o0";
+  "i1" -> "10 -";
+  "i1" -> "9 -|";
+  "i0" -> "10 -";
+  "i0" -> "9 -|";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_05" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 -" [shape=trapezium,orientation=270];
+  "10 -" -> "o1";
+  "9 -|" [shape=trapezium,orientation=270];
+  "9 -|" -> "o0";
+  "i1" -> "10 -";
+  "i1" -> "9 -|";
+  "i0" -> "10 -";
+  "i0" -> "9 -|";
+}
+
+! updated function for
+
+freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // the internal difference is performed twice, and the pipeline is broken
+   // o0 = i0 - i1
+   // o1 = |i0 - i1|
+   freia_aipo_absdiff(o0, i0, i1);                                      /*0009*/
+   freia_aipo_sub(o1, i0, i1);                                          /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+#
 # SPOC
 #
 
@@ -237,6 +307,18 @@ freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, 
    freia_dup_05_helper_0_1_0(o1, i0, i1);                               /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
+
+! cleaned up function
+
+freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // the internal difference is performed twice, and the pipeline is broken
+   // o0 = i0 - i1
+   // o1 = |i0 - i1|
+   freia_dup_05_helper_0_0_0(o0, i0, i1);                               /*0009*/
+   freia_dup_05_helper_0_1_0(o1, i0, i1);                               /*0010*/
+   return 0;                                                            /*0011*/
+}
 #
 # TERAPIX
 #
@@ -430,6 +512,17 @@ freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, 
    // o1 = |i0 - i1|
    freia_dup_05_helper_0_0(o0, o1, i0, i1);                             /*0009*/
    return FREIA_OK;                                                     /*0011*/
+}
+
+! cleaned up function
+
+freia_status freia_dup_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // the internal difference is performed twice, and the pipeline is broken
+   // o0 = i0 - i1
+   // o1 = |i0 - i1|
+   freia_dup_05_helper_0_0(o0, o1, i0, i1);                             /*0009*/
+   return 0;                                                            /*0011*/
 }
 #
 # FREIA COMPILATION DONE

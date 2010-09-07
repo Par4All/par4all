@@ -1,0 +1,38 @@
+delete memmove02
+
+create memmove02 memmove02.c
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "memmove02"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Proper effetcs for "memmove02"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+quit
+echo
+echo Proper Pointer effetcs for "memmove02"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "memmove02"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete memmove02
+quit
+

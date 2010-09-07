@@ -59,8 +59,6 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //     The convolution kernel is not applied on the outer part
    //     of the image
    int i, j;
-   //PIPS generated variable
-   int i_1;
 #pragma omp parallel for private(j)
 l99997:
    for(i = 0; i <= 511; i += 1)

@@ -1,0 +1,16 @@
+int foo()
+{
+   int i;
+   if (i>0) goto l12;
+   int j = 1;
+   i += j_;
+l12:   i += j_;
+   if (i>0) goto l13;
+   {
+      int j = 1;
+      i += 1;
+   }
+l13:   ;
+   return 1;
+}
+

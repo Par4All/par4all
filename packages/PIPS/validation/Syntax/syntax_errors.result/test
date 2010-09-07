@@ -24,7 +24,7 @@ Closing workspace.
 Workspace syntax_error closed.
 
 pips error in reset_entity_to_size: hash table should have been allocated
-./syntax_errors.test: line 18:  2356 Aborted                 ${pips_version:-pips} -1 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS -f syntax_errors.f syntax_error
+Aborted
 -- test from the environment
 Registering file syntax_errors.f
 Checking Fortran syntax of ./syntax_errors.f
@@ -51,4 +51,4 @@ Closing workspace.
 Workspace syntax_error closed.
 
 pips error in reset_entity_to_size: hash table should have been allocated
-./syntax_errors.test: line 18:  2360 Aborted                 ${pips_version:-pips} -f syntax_errors.f syntax_error
+Aborted

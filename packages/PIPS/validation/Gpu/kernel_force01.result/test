@@ -28,7 +28,7 @@ int main()
    int a[100] = {0};
    int b[100] = {1};
    //PIPS generated variable
-   int (*P_0)[100], (*P_1)[100];
+   int (*P_0)[100] = (int (*)[100]) 0, (*P_1)[100] = (int (*)[100]) 0;
    P4A_accel_malloc(&P_1, sizeof(int[100])-1+1);
    P4A_accel_malloc(&P_0, sizeof(int[100])-1+1);
    P4A_copy_to_accel(a, *P_1, sizeof(int[100])-1+1);

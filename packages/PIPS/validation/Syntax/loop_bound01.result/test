@@ -1,0 +1,25 @@
+!     Check replacement of non-affine loop bounds
+
+!     Bug found in BU_INTER_su2cor.f, loop 200, subroutine LOOPS
+
+!     The bug is reproduced with property PARSER_LINEARIZE_LOOP_BOUNDS
+
+      PROGRAM LOOP_BOUND01
+
+      REAL A(16)
+
+      N = 4                                                             0011
+!     U_0 is going to be used
+      U_0 = 2**N
+      DO I = 1, U_0
+         A(I) = 0.                                                      0014
+      ENDDO
+
+!     Oops, U_0 is going to be re-used
+      U_1 = 2**N
+      DO I = 1, U_1
+         A(I) = FLOAT(I)                                                0019
+      ENDDO
+
+      END
+
