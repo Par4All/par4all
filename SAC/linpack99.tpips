@@ -1,0 +1,34 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="linpack99"
+delete $WS
+create $WS $WS.c include/SIMD.c
+
+echo
+echo Initial code
+echo
+
+module linpack99!daxpy_r
+
+source include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+
+apply UNSPLIT
+
+#shell cc $WS.c include/SIMD.c -o $WS.database/Tmp/ref
+#shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+#shell cc -Iinclude $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
+#shell sed -i -e '1 d' $WS.database/Src/$WS.c
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
+#
+#shell ./compileC.sh $WS $WS.c $WS.database/Tmp/sse.c
+#shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
+
+close
+delete $WS
+quit
