@@ -1383,9 +1383,10 @@ output code as close as possible to the user source code.
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \end{PipsProp}
 
-Most PIPS analyses work better if loop bounds are affine. It is sometimes
+Most PIPS analyses work better if do loop bounds are affine. It is sometimes
 possible to improve results for non-affine bounds by assigning the bound
-to an integer variables and by using this variable as bound.
+to an integer variables and by using this variable as bound. But this
+is implemented for Fortran, but not for C.
 
 \begin{PipsProp}{PARSER_LINEARIZE_LOOP_BOUNDS}
 PARSER_LINEARIZE_LOOP_BOUNDS FALSE
@@ -1798,9 +1799,11 @@ implicitly in the controlizer phase.
 UNSPAGHETTIFY_IN_CONTROLIZER TRUE
 \end{PipsProp}
 
-The next property is used to convert C for loops into C while loops. The
-purpose is to speed up the re-use of Fortran analyses and transformation
-for C code. This property is set to false by default and should ultimately disappear.
+The next property is used to convert C for loops into C while
+loops. The purpose is to speed up the re-use of Fortran analyses and
+transformation for C code. This property is set to false by default
+and should ultimately disappear. But for new user convenience, it is
+set to TRUE by \verb/activate_language()/ when the language is C.
 
 \begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER} 
 FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
@@ -1810,7 +1813,9 @@ The next property is used to convert C for loops into C do loops when
 syntactically possible. The conversion is not safe because the effect of
 the loop body on the loop index is not checked. The purpose is to speed up
 the re-use of Fortran analyses and transformation for C code. This
-property is set to false by default and should disappear soon.
+property is set to false by default and should disappear soon. But for
+new user convenience, it is set to TRUE by \verb/activate_language()/
+when the language is C.
 
 \begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER} 
 FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
@@ -2228,6 +2233,7 @@ cumulated_references    > MODULE.cumulated_references
 \index{Effects (Memory)}
 \index{Memory Effects}
 \index{EFFECTS\_PRINT\_SDFI}
+\index{MEMORY\_EFFECTS\_ONLY}
 
 % no longer used {
 % Print SDFI just after computation:
@@ -2277,6 +2283,24 @@ leads to less precise effects.
 
 \begin{PipsProp}{USER_EFFECTS_ON_STD_FILES FALSE}
 USER_EFFECTS_ON_STD_FILES FALSE
+\end{PipsProp}
+
+Property \PipsPropRef{MEMORY_EFFECTS_ONLY} is used to restrict the
+action kind of an effect action to \verb/store/. In other words,
+variable declarations and type declarations are not considered to
+alter the execution state when this property is set to TRUE. This is
+fine for Fortran code because variables cannot be declared among
+executable statements and because new type cannot be declared. But
+this leads to wrong result for C code when loop distribution or
+use-def elimination is performed.
+
+Currently, PIPS does not have the capability to store default values
+depending on the source code language. The default value is TRUE to
+avoid disturbing too many phases of PIPS at the same time while
+environment and type declaration effects are introduced.
+
+\begin{PipsProp}{MEMORY_EFFECTS_ONLY}
+MEMORY_EFFECTS_ONLY TRUE
 \end{PipsProp}
  
 
@@ -2333,11 +2357,19 @@ loop_reductions > MODULE.code
 \subsection{Reduction Propagation}
 \begin{PipsPass}{reduction_propagation}
  tries to transform
+ \begin{lstlisting}
+{
  a = b + c;
  r = r + a;               
+}
+ \end{lstlisting}
  into
+ \begin{lstlisting}
+{
  r = r +b ;                   
  r = r +c ;                   
+}
+ \end{lstlisting}
 \end{PipsPass}
 \begin{PipsMake}
 reduction_propagation > MODULE.code
@@ -2347,6 +2379,32 @@ reduction_propagation > MODULE.code
   < MODULE.dg
 \end{PipsMake}
 
+\subsection{Reduction Detection}
+\begin{PipsPass}{reduction_detection}
+ tries to transform
+ \begin{lstlisting}
+{
+ a = b + c;
+ b = d + a;               
+}
+ \end{lstlisting}
+ which hides a reduction on b
+ into
+ \begin{lstlisting}
+{
+ b = b + c ;                   
+ b = d + b ;                   
+}
+ \end{lstlisting}
+ when possible
+\end{PipsPass}
+
+\begin{PipsMake}
+reduction_detection > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+  < MODULE.dg
+\end{PipsMake}
 
 \section{Chains (Use-Def Chains)}
 \label{subsection-chains}
@@ -4755,7 +4813,31 @@ points_to_analysis > MODULE.points_to_list
 The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
 
-\subsection{Points-to  Properties}
+\subsection{Pointer Values Analyses}
+\label{subsection-pointer-values}
+\index{Pointer Values Analyses}
+
+\begin{PipsPass}{simple_pointer_values}
+\end{PipsPass}
+
+Pointer values analysis is another kind of pointer analysis which tries
+to gather \emph{Pointer Values} both in terms of other pointer values
+but also of memory addresses. This phase is under development.
+
+
+\begin{PipsMake}
+alias simple_pointer_values  'Pointer Values Analysis'
+
+simple_pointer_values > MODULE.simple_gen_pointer_values
+                      > MODULE.simple_kill_pointer_values
+                      > MODULE.simple_pointer_values
+           < PROGRAM.entities
+           < MODULE.code
+
+\end{PipsMake}
+
+
+\subsection{Properties for pointer analyses}
 
 The following properties are defined to ensure the safe use
 of \PipsPassRef{points_to_analysis}.
@@ -4869,6 +4951,8 @@ ABSTRACT_HEAP_LOCATIONS "unique"
 % GAP_MAX_LENGTH 0
 % \end{PipsProp}
 % }
+
+
 
 \subsection{Menu for Alias Views}
 
@@ -5279,6 +5363,19 @@ The SAC project aims at generating efficient code for processors with SIMD
 extension instruction set such as VMX, SSE4, etc. For more information,
 see \url{https://info.enstb.org/projets/sac}.
 
+Some phases use \PipsPropRef{DMA_LOAD} and \PipsPropRef{DMA_STORE} to generate DMA calls
+and \PipsPropRef{ACCEL_WORK}.
+
+\begin{PipsProp}{ACCEL_LOAD}
+ACCEL_LOAD "SIMD_LOAD"
+\end{PipsProp}
+\begin{PipsProp}{ACCEL_STORE}
+ACCEL_STORE "SIMD_STORE"
+\end{PipsProp}
+\begin{PipsProp}{ACCEL_WORK}
+ACCEL_WORK "SIMD_"
+\end{PipsProp}
+
 \begin{PipsPass}{simd_atomizer}
   Here is yet another atomizer, based on {\tt new\_atomizer} (see
   Section~\ref{subsubsection:limited-atomizer}), used to reduce
@@ -5347,6 +5444,7 @@ to initialize the new variables and compute the final result.
 alias simd_remove_reductions 'SIMD Remove Reductions'
 
 simd_remove_reductions      > MODULE.code
+                            > MODULE.callees
         < PROGRAM.entities
         < MODULE.cumulated_reductions
         < MODULE.code
@@ -5358,6 +5456,25 @@ SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP TRUE
 \begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_PREFIX}
 SIMD_REMOVE_REDUCTIONS_PREFIX "RED"
 \end{PipsProp}
+\begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_PRELUDE}
+SIMD_REMOVE_REDUCTIONS_PRELUDE ""
+\end{PipsProp}
+\begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_POSTLUDE}
+SIMD_REMOVE_REDUCTIONS_POSTLUDE ""
+\end{PipsProp}
+\begin{PipsPass}{redundant_load_store_elimination}
+Remove useless load store calls
+\end{PipsPass}
+
+\begin{PipsMake}
+
+redundant_load_store_elimination      > MODULE.code
+		> MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.out_regions
+        < MODULE.chains
+\end{PipsMake}
 
 \begin{PipsPass}{deatomizer}
 ...
@@ -5448,6 +5565,7 @@ it into single-assignment form.
 alias single_assignment 'Single Assignment Form'
 
 single_assignment           > MODULE.code
+		! MODULE.split_initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
@@ -5601,13 +5719,10 @@ scalopragma                    > MODULE.code
                < MODULE.cumulated_effects
 \end{PipsMake}
 \subsubsection{Bufferization}
-The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by KERNEL\_LOAD\_STORE with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
+The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by \PipsPassRef{KERNEL_LOAD_STORE} with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
 A C file with stubs is needed.
 
-This property is used by KERNEL\_LOAD\_STORE to generate LOAD STORE call for task.
-\begin{PipsProp}{SCMP_MODE} 
-SCMP_MODE FALSE
-\end{PipsProp}
+Note that you must also set \PipsPropRef{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION} to \lstinline|""| in order to have it generate relevant code.
 
 The goal of this pass is to keep consistant flows outside the tasks.
 \begin{PipsMake}
@@ -7099,6 +7214,17 @@ Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give
 % FULL_UNROLL_INTERACTIVELY TRUE
 % \end{PipsProp}
 % }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% fusion
+\subsection{Loop Fusion}
+\begin{PipsPass}{force_loop_fusion}
+Force loop fusion without any check between loop \PipsPropRef{LOOP_LABEL} and following loop,
+that must share an iteration space with it.
+\end{PipsPass}
+\begin{PipsMake}
+force_loop_fusion > MODULE.code
+        < PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% STRIP MINING
@@ -7349,9 +7475,9 @@ tiling_sequence      > MODULE.code
 \subsection{Hardware Accelerator}
 \label{hardware-accelerator}
 
-Generate code from a FREIA application targeting a particular
-hardware accelerator, such as SPoC and Terapix.
-I could add resources for the module dags?
+Generate code from a FREIA application possibly targeting hardware
+accelerator, such as SPoC and Terapix.
+%% I could add resources for the module dags?
 I'm unsure about the right granularity (now it is at the function
 level) and the resource which is produced (should it be an accelerated
 file?). The current choice does not allow to easily mix different
@@ -7359,14 +7485,22 @@ accelerators.
 
 \begin{PipsMake}
 freia_spoc_compiler	> MODULE.code
+			> MODULE.callees
 			> MODULE.spoc_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
 
 freia_terapix_compiler	> MODULE.code
+			> MODULE.callees
 			> MODULE.terapix_file
         < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+
+freia_aipo_compiler	> MODULE.code
+			> MODULE.callees
+	< PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
@@ -7388,7 +7522,7 @@ HWAC_TERAPIX_RAMPE 1024
 \end{PipsProp}
 
 Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
-(size of which is the number of pe):
+(size of which is necessarily the number of pe):
 \begin{PipsProp}{HWAC_TERAPIX_DMABW}
 HWAC_TERAPIX_DMABW 128
 \end{PipsProp}
@@ -7410,11 +7544,28 @@ FREIA_LABEL_ARCS FALSE
 FREIA_LABEL_NODES TRUE
 \end{PipsProp}
 
+Whether to remove dead image operations in the DAG.
+Should always be beneficial.
+\begin{PipsProp}{FREIA_REMOVE_DEAD_OPERATIONS}
+FREIA_REMOVE_DEAD_OPERATIONS TRUE
+\end{PipsProp}
+
 Whether to remove duplicate operations in the DAG, including
 algebraic optimizations with commutators.
 Should be always beneficial to terapix, but it may depend for spoc.
 \begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS}
 FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to remove useless image copies from the expression DAG.
+\begin{PipsProp}{FREIA_REMOVE_USELESS_COPIES}
+FREIA_REMOVE_USELESS_COPIES TRUE
+\end{PipsProp}
+
+Whether to move image copies within an expression DAG outside
+as external copies, if possible.
+\begin{PipsProp}{FREIA_MOVE_DIRECT_COPIES}
+FREIA_MOVE_DIRECT_COPIES TRUE
 \end{PipsProp}
 
 Whether to merge identical arguments, especially kernels, when calling
@@ -9100,6 +9251,9 @@ scalarization  > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 \end{PipsMake}
+\begin{PipsProp}{SCALARIZATION_PREFIX}
+SCALARIZATION_PREFIX "__scalar__"
+\end{PipsProp}
 
 \begin{PipsPass}{constant_array_scalarization}
 Similar to \PipsPassRef{scalarization}, but with a different criterium:
@@ -9188,9 +9342,11 @@ split_update_operator > MODULE.code
 
 \subsection{Split Initializations (C code)}
 
+\begin{PipsPass}{split_initializations}
 The purpose of this transformation is to separate the initialization
 part from the declaration part in C code in order to make static code
 analyses simpler.
+\end{PipsPass}
 
 This transformation recurses through all variable declarations, and
 creates a new statement each time an initial value is specified in the
@@ -9607,6 +9763,9 @@ constructors.
 
 \begin{PipsProp}{TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION} 
 TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
+\end{PipsProp}
+\begin{PipsProp}{TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION} 
+TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION FALSE
 \end{PipsProp}
 \begin{PipsProp}{TYPE_CHECKER_ADD_SUMMARY} 
 TYPE_CHECKER_ADD_SUMMARY FALSE
@@ -10347,6 +10506,7 @@ alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
 alias print_code_points_to_list 'Statements & Points To'
+alias print_code_simple_pointer_values 'Statements & Simple Pointer Values'
 
 \end{PipsMake}
 
@@ -10804,6 +10964,32 @@ print_code_points_to_list      > MODULE.printed_file
         < MODULE.points_to_list
 \end{PipsMake}
 
+\subsection{Sequential View with Simple Pointer Values}
+
+\begin{PipsPass}{print_code_simple_pointer_values}
+Displays the code with simple pointer values relationships.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_simple_pointer_values      > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.simple_pointer_values
+\end{PipsMake}
+
+\begin{PipsPass}{print_code_genkill_pointer_values}
+Displays the code with simple gen pointer values and kill sets.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_simple_gen_kill_pointer_values      > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.simple_gen_pointer_values
+        < MODULE.simple_kill_pointer_values
+
+\end{PipsMake}
+
 \subsection{Prettyprint properties}
 
 \index{Prettyprinter (Code)}
@@ -10864,6 +11050,9 @@ added statement.
 \begin{PipsProp}{PRETTYPRINT_STATEMENT_NUMBER} 
 PRETTYPRINT_STATEMENT_NUMBER TRUE
 \end{PipsProp}
+
+Note: this default value is overriden to FALSE by
+\verb/activate_language()/ for C and Fortran~95.
 
 The structured control structure is shown by using an indentation. The
 default value is 3.
@@ -10943,6 +11132,7 @@ PRETTYPRINT_SEQUENTIAL_STYLE "omp"
 \subsubsection{Display Analysis Results}
 \index{PRETTYPRINT\_EFFECTS}
 \index{PRETTYPRINT\_IO\_EFFECTS}
+\index{PRETTYPRINT\_MEMORY\_EFFECTS\_ONLY}
 \index{PRETTYPRINT\_REVERSE\_DOALL}
 \index{PRETTYPRINT\_TRANSFORMER}
 \index{PRETTYPRINT\_EXECUTION\_CONTEXT}
@@ -10972,32 +11162,61 @@ output program is no longer guaranteed.
 PRETTYPRINT_IO_EFFECTS TRUE
 \end{PipsProp}
 
+To transform C source code properly, variable and type declarations as
+well as variable and type references must be tracked alhtough standard
+use and def information is restricted to memory loads and stores
+because the optimizations are performed at a lower level. Fortran~77
+analyses do not need information about variable declarations and there
+is not possibility of type definition. So the added information about
+variable declarations and references may be pure noise. It is possible
+to get rid of it by setting this property to TRUE, which is its
+default value before August 2010. For C code, it is better to set it
+to FALSE. For the time being, the default value cannot depend on the
+code language. 
+
+\begin{PipsProp}{PRETTYPRINT_MEMORY_EFFECTS_ONLY}
+PRETTYPRINT_MEMORY_EFFECTS_ONLY FALSE
+\end{PipsProp}
+
+
 Transform DOALL loops into sequential loops with an opposed increment
-not implemented
+to check validity of the parallelization on a sequential machine. This
+property is not implemented.
 
 \begin{PipsProp}{PRETTYPRINT_REVERSE_DOALL} 
 PRETTYPRINT_REVERSE_DOALL FALSE
 \end{PipsProp}
 
-Print statement transformers as comments in code.
+It is possible to print statement transformers as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Transformers can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_TRANSFORMERS/
 
 \begin{PipsProp}{PRETTYPRINT_TRANSFORMER} 
 PRETTYPRINT_TRANSFORMER FALSE
 \end{PipsProp}
 
-Print statement preconditions as comments in code.
+It is possible to print statement preconditions as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Preconditions can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_PRECONDITIONS/
 
 \begin{PipsProp}{PRETTYPRINT_EXECUTION_CONTEXT} 
 PRETTYPRINT_EXECUTION_CONTEXT FALSE
 \end{PipsProp}
 
-Print statement regions as comments in code.
+It is possible to print statement with convex array region information as comments in
+code. This property is not intended for PIPS users, but is used
+internally. Convex array regions can be prettyprinted by using \verb/activate/
+and \verb/PRINT_CODE_REGIONS/ or \verb/PRINT_CODE_PROPER_REGIONS/
 
 \begin{PipsProp}{PRETTYPRINT_REGION} 
 PRETTYPRINT_REGION FALSE
 \end{PipsProp}
 
-Print regions of scalars.
+By default, convex array regions are printed for arrays only, but the
+internal representation includes scalar variables as well. The default
+option can be overriden with this property.
 
 \begin{PipsProp}{PRETTYPRINT_SCALAR_REGIONS} 
 PRETTYPRINT_SCALAR_REGIONS FALSE

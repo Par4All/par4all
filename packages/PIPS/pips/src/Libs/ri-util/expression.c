@@ -1829,6 +1829,10 @@ bool expression_equal_integer_p(expression exp, int i)
  *
  * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
  *       The function make_integer_constant_expression() comes from ri-util.
+ *
+ * Warning: using the same semantic as MakeBinaryCall,
+ * make_op_exp owns the pointer exp1 and exp2 after the call,
+ * beware of not sharing them !
  */
 expression make_op_exp(char *op_name, expression exp1, expression exp2)
 {
@@ -1868,6 +1872,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       else /* ENTITY_DIVIDE_P(op_ent) */
 	/* we compute here as FORTRAN would do */
 	result_exp = make_integer_constant_expression((int) (val1 / val2));
+      free_expression(exp1);
+      free_expression(exp2);
     }
   else
     {
@@ -1885,37 +1891,45 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	}
       else if(expression_equal_integer_p(exp1, 0))
 	{
-	  if (ENTITY_PLUS_P(op_ent))
+	  if (ENTITY_PLUS_P(op_ent)) {
 	    result_exp = exp2;
-	  else if(ENTITY_MINUS_P(op_ent))
+        free_expression(exp1);
+      }
+	  else if(ENTITY_MINUS_P(op_ent)) {
 	    result_exp = MakeUnaryCall(unary_minus_ent, exp2);
-	  else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */
+        free_expression(exp1);
+      }
+	  else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */ {
 	    result_exp = make_integer_constant_expression(0);
+        free_expression(exp1);free_expression(exp2);
+      }
 	}
       else if(expression_equal_integer_p(exp1, 1))
 	{
-	  if(ENTITY_MULTIPLY_P(op_ent))
+	  if(ENTITY_MULTIPLY_P(op_ent)) {
 	    result_exp = exp2;
+        free_expression(exp1);
+      }
 	}
       else if(expression_equal_integer_p(exp2, 0))
 	{
-	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
+      free_expression(exp2);
+	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) 
 	    result_exp = exp1;
-	  else if (ENTITY_MULTIPLY_P(op_ent))
+	  else if (ENTITY_MULTIPLY_P(op_ent)) {
 	    result_exp = make_integer_constant_expression(0);
+        free_expression(exp1);
+      }
 	  else /* ENTITY_DIVIDE_P(op_ent) */
 	    user_error("make_op_exp", "division by zero");
 	}
       else if(expression_equal_integer_p(exp2, 1))
 	{
-	  if(ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent))
+	  if(ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent)) {
 	    result_exp = exp1;
+        free_expression(exp2);
+      }
 	}
-
-      /* Both expressions are unnormalized because they might be reused in
-       * an unnormalized expression. */
-      unnormalize_expression(exp1);
-      unnormalize_expression(exp2);
     }
 
   if(result_exp == expression_undefined)
@@ -1957,6 +1971,8 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
     newV = vect_substract(V1, V2);
   else
     pips_error("make_lin_op_exp", "operation must be : + or -");
+  free_expression(exp1);
+  free_expression(exp2);
 
   return(Pvecteur_to_expression(newV));
 }

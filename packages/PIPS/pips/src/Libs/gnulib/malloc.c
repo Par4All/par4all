@@ -1,6 +1,6 @@
 /* malloc() function that is glibc compatible.
 
-   Copyright (C) 1997, 1998, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1997-1998, 2006-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 /* written by Jim Meyering and Bruno Haible */
 
-#include <pips_config.h>
+#include <config.h>
 /* Only the AC_FUNC_MALLOC macro defines 'malloc' already in config.h.  */
 #ifdef malloc
 # define NEED_MALLOC_GNU

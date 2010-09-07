@@ -16,24 +16,14 @@
 #include "text.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "properties.h"
 #include "misc.h"
-#include "conversion.h"
 #include "control.h"
 #include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-#include "preprocessor.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
-#include "syntax.h"
-#include "c_syntax.h"
-#include "locality.h"
-#include "expressions.h"
-#include "semantics.h"
-#include "transformer.h"
 #include "scalopes.h"
 
 /*Use to store action on entities*/
@@ -48,7 +38,9 @@ hash_table entity_action;
 static type convert_local_to_pointer_array(type local_type){
   list ls        = variable_dimensions(type_variable(local_type));
   size_t size    = gen_length(ls);
-  type pointer_type = make_type_variable(make_variable(copy_basic(variable_basic(type_variable(local_type))),NIL,NIL));
+  type pointer_type = make_type_variable(make_variable(copy_basic(variable_basic(type_variable(local_type))),
+						       NIL,
+						       NIL));
   basic b;
   for(unsigned int i = 0; i<size-1; i++){
     b = make_basic_pointer(pointer_type);
@@ -59,14 +51,10 @@ static type convert_local_to_pointer_array(type local_type){
 
 bool sesamify (char* module_name) {
   debug_on("SESAMIFY_DEBUG_LEVEL");
-  list args = NIL, args2 = NIL, args3 = NIL, args4 = NIL, args5 = NIL;
-  list malloc_statements, map_statements;
-  list unmap_statements, wait_statements, send_statements,  rw_effects;
-  list entity_declaration;
-  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES,
-							  module_name,
-							  true);
-  int id;
+  
+  list args,args2,args3, args4, args5, malloc_statements, map_statements, unmap_statements, wait_statements, send_statements,  rw_effects, entity_declaration;
+  callees callees_list = (callees) db_get_memory_resource(DBR_CALLEES, module_name, true);
+  intptr_t id;
   entity reserve_data     = local_name_to_top_level_entity("sesam_reserve_data");
   entity get_page_size    = local_name_to_top_level_entity("sesam_get_page_size");
   entity data_assignation = local_name_to_top_level_entity("sesam_data_assignation");
@@ -90,8 +78,12 @@ bool sesamify (char* module_name) {
     pips_debug(1,"%s\n", callee_name);
     //Change context
     set_current_module_entity(module_name_to_entity( callee_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, callee_name, true) );
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, callee_name, TRUE));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
+								    callee_name,
+								    true));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+								       callee_name,
+								       TRUE));
 
     //reset tables
     hash_table_clear(entity_action);
@@ -130,26 +122,35 @@ bool sesamify (char* module_name) {
 	  //compute table memory size
 	  range the_range = make_range(int_to_expression(0),
 				     make_op_exp(MINUS_OPERATOR_NAME,
-						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
+						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),
+								 normalized_undefined),
 						 int_to_expression(1)),
 				     int_to_expression(1));
 
 	  expression memory_size  = range_to_expression(the_range,range_to_distance);
-	  expression size = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME), memory_size, call_to_expression(make_call(get_page_size,NIL)));
+	  expression size = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
+					   memory_size,
+					   call_to_expression(make_call(get_page_size,NIL)));
 
-	  size = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), size, int_to_expression(1));
+	  size = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+				size,
+				int_to_expression(1));
 	  args  = make_expression_list(size);
 
 	  args2 = CONS(EXPRESSION, int_to_expression(1), NIL);
 	  args2 = CONS(EXPRESSION, size,args2);
 	  args2 = CONS(EXPRESSION, int_to_expression(counter-1),args2);
 
-	  malloc_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(reserve_data,args))), malloc_statements);
-	  malloc_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(data_assignation,args2))), malloc_statements);
+	  malloc_statements=CONS(STATEMENT,
+				 instruction_to_statement(make_instruction_call(make_call(reserve_data,args))),
+				 malloc_statements);
+	  malloc_statements=CONS(STATEMENT,
+				 instruction_to_statement(make_instruction_call(make_call(data_assignation,args2))),
+				 malloc_statements);
 	  counter++;
 	}
 	else{
-	  id = (int) hash_get(shared_mem, re)-1;
+	  id = (intptr_t) hash_get(shared_mem, re)-1;
 	}
 
 	//MAP_DATA + pointer creation +UNMAP + CHMOD
@@ -164,13 +165,19 @@ bool sesamify (char* module_name) {
 	args4 = CONS(EXPRESSION,map_data_exp, NIL);
 	args4 = CONS(EXPRESSION,new_exp,args4);
 
-	map_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),args4))),map_statements);
-	unmap_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(unmap_data,make_expression_list(new_exp)))),unmap_statements);
+	map_statements=CONS(STATEMENT,
+			    instruction_to_statement(make_instruction_call(make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),args4))),
+			    map_statements);
+	unmap_statements=CONS(STATEMENT,
+			      instruction_to_statement(make_instruction_call(make_call(unmap_data,make_expression_list(new_exp)))),
+			      unmap_statements);
 
 	//change data owner
 	if(num_task < nb_task_total){
 	  args5 =  make_expression_list(int_to_expression(id),int_to_expression(num_task));
-	  unmap_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(chown_data,args5))),unmap_statements);
+	  unmap_statements=CONS(STATEMENT,
+				instruction_to_statement(make_instruction_call(make_call(chown_data,args5))),
+				unmap_statements);
 	}
 
 	//SEND + WAIT dispo
@@ -178,29 +185,51 @@ bool sesamify (char* module_name) {
 	if(action_read_p(effect_action(e))){
 	  print_entities(CONS(ENTITY,re,NIL));
 	  pips_debug(1,"READ\n");
-	  wait_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(wait_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(0),int_to_expression(0))))),wait_statements);
-	  send_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(send_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(1))))),send_statements);
+	  wait_statements=CONS(STATEMENT,
+			       instruction_to_statement(make_instruction_call(make_call(wait_dispo,
+											make_expression_list(int_to_expression(id),
+													     int_to_expression(0),
+													     int_to_expression(0),
+													     int_to_expression(0))))),
+			       wait_statements);
+	  send_statements=CONS(STATEMENT,
+			       instruction_to_statement(make_instruction_call(make_call(send_dispo,
+											make_expression_list(int_to_expression(id),
+													     int_to_expression(0),
+													     int_to_expression(1))))),
+			       send_statements);
 	}
 	else{
 	  print_entities(CONS(ENTITY,re,NIL));
 	  pips_debug(1,"WRITE\n");
-	  wait_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(wait_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(1),int_to_expression(0))))), wait_statements);
-	   send_statements=CONS(STATEMENT,instruction_to_statement(make_instruction_call(make_call(send_dispo,make_expression_list(int_to_expression(id),int_to_expression(0),int_to_expression(0))))), send_statements);
+	  wait_statements=CONS(STATEMENT,
+			       instruction_to_statement(make_instruction_call(make_call(wait_dispo,
+											make_expression_list(int_to_expression(id),
+													     int_to_expression(0),
+													     int_to_expression(1),
+													     int_to_expression(0))))),
+			       wait_statements);
+	   send_statements=CONS(STATEMENT,
+				instruction_to_statement(make_instruction_call(make_call(send_dispo,
+											 make_expression_list(int_to_expression(id),
+													      int_to_expression(0),
+													      int_to_expression(0))))),
+				send_statements);
 	}
       }
     }
 
     //insert all statements
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(wait_statements)));
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(map_statements)));
-    insert_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(malloc_statements)));
-    append_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(send_statements)));
-    append_a_statement(get_current_module_statement(),
-		       make_block_statement(gen_nreverse(unmap_statements)));
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(wait_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(map_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(malloc_statements)),true);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(send_statements)),false);
+    insert_statement(get_current_module_statement(),
+		       make_block_statement(gen_nreverse(unmap_statements)),false);
 
     //add declaration
     FOREACH(ENTITY,ent,entity_declaration){
@@ -209,8 +238,10 @@ bool sesamify (char* module_name) {
 
     /* validate */
     module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, callee_name,get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, callee_name, compute_callees(get_current_module_statement()));
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, callee_name,
+			   get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, callee_name,
+			   compute_callees(get_current_module_statement()));
 
     /*postlude*/
     reset_cumulated_rw_effects();
@@ -218,12 +249,6 @@ bool sesamify (char* module_name) {
     reset_current_module_statement();
     num_task++;
   }
-
-  /*free memory*/
-  gen_free_list(args);
-  gen_free_list(args2);
-  gen_free_list(args3);
-  gen_free_list(args4);
 
   debug_off();
   return TRUE;

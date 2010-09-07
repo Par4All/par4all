@@ -613,16 +613,20 @@ statement MakeContinueStatement(string cmt)
   return cs;
 }
 
+/* e is now owned by returned statement */
 statement ExpressionToStatement(expression e)
 {
   syntax s = expression_syntax(e);
   statement st = statement_undefined;
   string c = get_current_C_comment();
 
-  if (syntax_call_p(s))
+  if (syntax_call_p(s)) {
     st = call_to_statement(syntax_call(s));
+    syntax_call(s)=call_undefined;
+    free_expression(e);
+  }
   else
-    st = instruction_to_statement(make_instruction(is_instruction_expression,e));
+    st = instruction_to_statement(make_instruction_expression(e));
 
   statement_number(st) = get_current_C_line_number();
   if(!string_undefined_p(c)) {

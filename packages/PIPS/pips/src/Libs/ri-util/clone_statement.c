@@ -168,10 +168,19 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
     entity new_entity = entity_undefined;
     if( (new_entity=hash_get(ht,entity_name(e))) == HASH_UNDEFINED_VALUE)
     {
-        new_entity = make_new_scalar_variable(
-                clone_context_new_module(cc),
-                entity_basic(e));
-        AddEntityToCurrentModule(new_entity);
+        if(entity_scalar_p(e))
+            new_entity = make_new_scalar_variable_with_prefix(
+                    entity_user_name(e),
+                    clone_context_new_module(cc),
+                    entity_basic(e)
+                    );
+        else
+            new_entity = make_new_array_variable_with_prefix(
+                    entity_user_name(e),
+                    clone_context_new_module(cc),
+                    entity_basic(e),
+                    gen_full_copy_list(variable_dimensions(type_variable(entity_type(e))))
+                    );
         AddLocalEntityToDeclarations(new_entity,clone_context_new_module(cc),clone_context_new_module_statement(cc));
         hash_put(ht,entity_name(e),new_entity);
     }

@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* package effect: new version by Beatrice Creusillet 
+/* package effect: new version by Beatrice Creusillet
  *
  * This File contains several functions to combine effects
  *
@@ -117,16 +117,14 @@ EffectsMustUnion(list l1, list l2,
     return(lr);
 }
 
-list 
-effects_may_union(effect eff1, effect eff2)
+list effects_may_union(effect eff1, effect eff2)
 {
     list l_res = NIL;
     l_res = CONS(EFFECT, effect_may_union(eff1,eff2), NIL);
     return(l_res);
 }
 
-list 
-effects_must_union(effect eff1, effect eff2)
+list effects_must_union(effect eff1, effect eff2)
 {
     list l_res = NIL;
     l_res = CONS(EFFECT, effect_must_union(eff1,eff2), NIL);
@@ -141,21 +139,21 @@ effect effect_may_union(effect eff1, effect eff2)
     effect eff;
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
-    
+
     if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
-      eff = make_anywhere_effect(effect_action_tag(eff1));
-    
+      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
+
     else if (effect_scalar_p(eff1))
     {
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
-			  make_action(action_tag(effect_action(eff1)), UU), 
+	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+			  copy_action(effect_action(eff1)),
 			  make_approximation(approximation_and(app1,app2), UU));
     }
     else
     {
       /*
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
-			  make_action(action_tag(effect_action(eff1)), UU), 
+	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+			  copy_action(effect_action(eff1)),
 			  make_approximation(is_approximation_may, UU));
       */
       eff = (*effect_dup_func)(eff1);
@@ -171,13 +169,13 @@ effect effect_must_union(effect eff1, effect eff2)
     effect eff;
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
-	
+
     if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
-      eff = make_anywhere_effect(effect_action_tag(eff1));
+      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
     else if (effect_scalar_p(eff1))
     {
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
-			  make_action(action_tag(effect_action(eff1)), UU), 
+	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+			  copy_action(effect_action(eff1)),
 			  make_approximation(approximation_or(app1,app2), UU));
     }
     else
@@ -189,8 +187,8 @@ effect effect_must_union(effect eff1, effect eff2)
       /*pips_assert("The tags for non scalar effects are may",
 	app1==app2 && app1 == is_approximation_may); */
 	/*
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
-			  make_action(action_tag(effect_action(eff1)), UU), 
+	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+			  copy_action(effect_action(eff1)),
 			  make_approximation(is_approximation_may, UU));
 	*/
       eff = (*effect_dup_func)(eff1);

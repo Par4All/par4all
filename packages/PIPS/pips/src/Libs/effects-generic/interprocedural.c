@@ -29,7 +29,7 @@
  * File: interprocedural.c
  * ~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the interprocedural 
+ * This File contains the generic functions necessary for the interprocedural
  * computation of all types of in effects.
  *
  */
@@ -59,13 +59,13 @@
 /**************************************************** FORTRAN */
 
 /**
-   
- This function translates the list of effects l_sum_eff summarizing the 
+
+ This function translates the list of effects l_sum_eff summarizing the
  effects of module callee from its name space to the name space of the
  caller, that is to say the current module being analyzed.
  It is generic, which means that it does not depend on the representation
  of effects. There is another similar function for C modules.
- 
+
  @param callee is the called module
  @param real_args is the list of actual arguments
  @param l_sum_eff is the list of summary effects for function func
@@ -79,16 +79,16 @@ list generic_fortran_effects_backward_translation(
 				 transformer context)
 {
   list le;
-  le = (*fortran_effects_backward_translation_op)(callee, real_args, l_sum_eff, 
+  le = (*fortran_effects_backward_translation_op)(callee, real_args, l_sum_eff,
 						  context);
   return le;
-  
+
 }
 
 /************************************************************ C */
 
 /**
- 
+
  @param real_arg the real argument expression
  @param act is a tag to choose the action of the main effect :
         'r' for read, 'w' for write, and 'x' for read and write.
@@ -111,7 +111,7 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
     {
       context = effects_private_current_context_head();
     }
-  
+
   pips_debug(6,"actual argument %s, with type %s, and type depth %d\n",
 	     words_to_string(words_expression(real_arg,NIL)),
 	     type_to_string(real_arg_t), real_arg_t_d);
@@ -131,14 +131,14 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	    just a special case for :
 	    - the assignment
 	    - and the ADDRESS_OF operator to avoid
-            losing to musch information because we don't know how to 
+            losing to musch information because we don't know how to
             represent &p access path in the general case.
 	  */
 	  {
 	    call real_call = syntax_call(s);
 	    entity real_op = call_function(real_call);
 	    list args = call_arguments(real_call);
-	    	    
+
 	    if (ENTITY_ASSIGN_P(real_op))
 	      {
 		pips_debug(5, "assignment case \n");
@@ -146,17 +146,17 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		  (EXPRESSION(CAR(CDR(args))), act);
 		break;
 	      }
-	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
+	    else if(ENTITY_ADDRESS_OF_P(real_op))
 	      {
 		expression arg1 = EXPRESSION(CAR(args));
-		
+
 		pips_debug(5, "address_of case \n");
 		l_tmp = generic_proper_effects_of_complex_address_expression
 		  (arg1, &real_arg_eff, true);
 		effects_free(l_tmp);
-		
+
 		if (anywhere_effect_p(real_arg_eff))
-		  {		    
+		  {
 		    pips_debug(6, "anywhere effects \n");
 		    l_res = gen_nconc
 		      (l_res,
@@ -167,37 +167,37 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		    type eff_type =  expression_to_type(arg1);
 
 		    if(!ENDP(reference_indices(effect_any_reference(real_arg_eff))))
-		      {					
+		      {
 			/* The operand of & is subcripted */
 			/* the effect last index must be changed to '*' if it's
-                           not already the case 
+                           not already the case
 			*/
 			reference eff_ref;
 			expression last_eff_ind;
 			expression n_exp;
-			
+
 			eff_ref = effect_any_reference(real_arg_eff);
-			last_eff_ind = 
+			last_eff_ind =
 			  EXPRESSION(CAR(gen_last(reference_indices(eff_ref))));
-		  
+
 			if(!unbounded_expression_p(last_eff_ind))
-			  {		
+			  {
 			    n_exp = make_unbounded_expression();
 			    (*effect_change_ith_dimension_expression_func)
-			      (real_arg_eff, n_exp, 
+			      (real_arg_eff, n_exp,
 			       gen_length(reference_indices(eff_ref)));
 			    free_expression(n_exp);
 
 			  }
 		      }
-		    
+
 		    l_res = gen_nconc
 		      (l_res,
-		       effect_to_effects_with_given_tag(real_arg_eff, 
+		       effect_to_effects_with_given_tag(real_arg_eff,
 							act));
-		    
+
 		    /* add effects on accessible paths */
-		    
+
 		    l_res = gen_nconc
 		      (l_res,
 		       generic_effect_generate_all_accessible_paths_effects
@@ -205,7 +205,7 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		  }
 		break;
 	      }
-	  }  
+	  }
 	case is_syntax_reference:
 	case is_syntax_subscript:
 	  {
@@ -213,13 +213,13 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	    l_tmp = generic_proper_effects_of_complex_address_expression
 		  (real_arg, &real_arg_eff, true);
 	    effects_free(l_tmp);
-		
+
 	    if (anywhere_effect_p(real_arg_eff))
-	      {		    
+	      {
 		pips_debug(6, "anywhere effects \n");
 		l_res = gen_nconc
 		  (l_res,
-		   effect_to_effects_with_given_tag(real_arg_eff, 
+		   effect_to_effects_with_given_tag(real_arg_eff,
 							  act));
 	      }
 	    else
@@ -227,13 +227,13 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		l_res = gen_nconc
 		  (l_res,
 		   generic_effect_generate_all_accessible_paths_effects
-		   (real_arg_eff, real_arg_t, act));	
+		   (real_arg_eff, real_arg_t, act));
 	      }
-	  
+
 	  }
-	  break;	  
-	case is_syntax_cast: 
-	  {	    
+	  break;
+	case is_syntax_cast:
+	  {
 	    l_res = c_actual_argument_to_may_summary_effects
 	      (cast_expression(syntax_cast(s)), act);
 	  }
@@ -241,11 +241,11 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	case is_syntax_sizeofexpression:
 	  {
 	    /* generate no effects : this case should never appear because
-	     * of the test if (real_arg_t_d == 0) 
-	     */	       
+	     * of the test if (real_arg_t_d == 0)
+	     */
 	  }
-	  break;	    
-	case is_syntax_va_arg: 
+	  break;
+	case is_syntax_va_arg:
 	  {
 	    list al = syntax_va_arg(s);
 	    sizeofexpression ae = SIZEOFEXPRESSION(CAR(al));
@@ -256,12 +256,12 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	default:
 	  pips_internal_error("case not handled\n");
 	}
-      
+
     } /* else du if (real_arg_t_d == 0) */
-    
+
   if (!transformer_undefined_p(context))
     (*effects_precondition_composition_op)(l_res, context);
- 
+
   ifdebug(6)
     {
       pips_debug(6, "end, resulting effects are :\n");
@@ -371,6 +371,7 @@ list generic_c_effects_backward_translation(entity callee,
       expression real_arg = EXPRESSION(CAR(ra));
       parameter formal_arg;
       type te;
+      bool spurious_real_arg_p = false;
 
       pips_debug(5, "current real arg : %s\n",
 		 words_to_string(words_expression(real_arg,NIL)));
@@ -378,11 +379,10 @@ list generic_c_effects_backward_translation(entity callee,
       if (!param_varargs_p)
 	{
 	  if(ENDP(formal_args)) {
-	    pips_user_error("Function \"%s\" is called with at least one real"
-			    " argument by function \"%s\" but its functional"
-			    " type is void -> xxx\n",
+	    pips_user_warning("Function \"%s\" is called with too many arguments in function \"%s\" \n",
 			    entity_user_name(callee),
 			    entity_user_name(get_current_module_entity()));
+	    spurious_real_arg_p = true;
 	  }
 	  else {
 	    formal_arg = PARAMETER(CAR(formal_args));
@@ -399,7 +399,7 @@ list generic_c_effects_backward_translation(entity callee,
 			    c_actual_argument_to_may_summary_effects(real_arg,
 								     'x'));
 	}
-      else
+      else if (!spurious_real_arg_p)
 	{
 	  list l_eff_on_current_formal = NIL;
 
@@ -419,8 +419,8 @@ list generic_c_effects_backward_translation(entity callee,
 	      if (ith_parameter_p(callee, eff_ent, arg_num))
 		{
 		  bool exact_p = false;
-		  /* Whatever the real_arg may be if there is an effect on 
-		     the sole value of the formal arg, it generates no effect 
+		  /* Whatever the real_arg may be if there is an effect on
+		     the sole value of the formal arg, it generates no effect
 		     on the caller side.
 		  */
 		  if (ENDP(reference_indices(eff_ref))
@@ -473,12 +473,21 @@ list generic_c_effects_backward_translation(entity callee,
 	     (l_eff_on_current_formal, real_arg, context));
 
 	  POP(formal_args);
-	} /* else */
+	} /* else if (!spurious_real_arg_p) */
 
-      /* add the proper effects on the real arg evaluation */
+      /* add the proper effects on the real arg evaluation on any case */
       l_eff = gen_nconc(l_eff, generic_proper_effects_of_c_function_call_argument(real_arg));
     } /* for */
 
+  /* removed because the parser adds arguments to the function (see ticket 452) */
+  /* /\* check if there are too few atual arguments *\/ */
+  /*   if (!param_varargs_p && !ENDP(formal_args) && !type_void_p(parameter_type(PARAMETER(CAR(formal_args))))) */
+  /*     { */
+  /*       pips_user_error("Function \"%s\" is called with too few arguments in function \"%s\" \n", */
+  /* 		      entity_user_name(callee), */
+  /* 		      entity_user_name(get_current_module_entity())); */
+  /*     } */
+  
   (*effects_translation_end_func)();
 
   ifdebug(5)
@@ -501,7 +510,7 @@ list generic_c_effects_forward_translation
   list l_res = NIL;
   list r_args = real_args;
   list l_sum_rw_eff = (*db_get_summary_rw_effects_func)(module_local_name(callee));
-      
+
   ifdebug(2)
     {
       pips_debug(2, "begin for function %s\n", entity_local_name(callee));
@@ -512,16 +521,16 @@ list generic_c_effects_forward_translation
     }
 
   (*effects_translation_init_func)(callee, real_args, false);
-  
-  /* First, global effects : To be done 
+
+  /* First, global effects : To be done
      There is a problem here, since global entities maybe used as
      actual arguments and at the same time as globals.
   */
   FOREACH(EFFECT, eff, l_eff)
     {
       storage eff_s = entity_storage(reference_variable(effect_any_reference((eff))));
-      
-      if(storage_ram_p(eff_s) && 
+
+      if(storage_ram_p(eff_s) &&
 	    !dynamic_area_p(ram_section(storage_ram(eff_s)))
 	    && !heap_area_p(ram_section(storage_ram(eff_s)))
 	    && !stack_area_p(ram_section(storage_ram(eff_s))))
@@ -533,14 +542,14 @@ list generic_c_effects_forward_translation
 	  (*effect_descriptor_interprocedural_translation_op)(eff_tmp);
 	  l_global = gen_nconc(l_global, CONS(EFFECT, eff_tmp, NIL));
 	}
-      
+
     }
-  
+
   /* We should also take care of varargs */
 
   /* Then formal args */
-  
-  for (arg_num = 1; !ENDP(r_args); r_args = CDR(r_args), arg_num++) 
+
+  for (arg_num = 1; !ENDP(r_args); r_args = CDR(r_args), arg_num++)
     {
       expression real_exp = EXPRESSION(CAR(r_args));
       entity formal_ent = find_ith_formal_parameter(callee, arg_num);
@@ -550,29 +559,29 @@ list generic_c_effects_forward_translation
 	     (*c_effects_on_actual_parameter_forward_translation_func)
 	     (callee, real_exp, formal_ent, l_eff, context));
     } /* for */
-  
+
   pips_debug_effects(2,"Formal effects : \n", l_formal);
-  
-  
+
+
   /* It's necessary to take the intersection with the summary regions of the
-   * callee to avoid problems due to multiple usages of the same actual 
+   * callee to avoid problems due to multiple usages of the same actual
    * parameter for different formal ones :
    *
    *      <a(PHI1)-OUT-MUST-{PHI1==i}
    *      foo(a, a, i)
-   *     
+   *
    *      <tab1-R-MUST-{PHI1==i}>, <tab2-W-MUST-{PHI1==i}
    *      void foo(int tab1[], int tab2[], int i)
    *
-   * Without the intersection, we would obtain : 
-   *  
+   * Without the intersection, we would obtain :
+   *
    *      <tab1-OUT-MUST-{PHI1==i}>, <tab2-OUT-MUST-{PHI1==i}
    */
   pips_debug_effects(2, "R/W effects : \n", l_sum_rw_eff);
   l_formal = (*effects_intersection_op)(l_formal, effects_dup(l_sum_rw_eff),
 				 effects_same_action_p);
   pips_debug_effects(2, "l_formal after intersection : \n", l_formal);
-  
+
   l_res = gen_nconc(l_global, l_formal);
   pips_debug_effects(2,"Ending with effects : \n",l_res);
  (*effects_translation_end_func)();
@@ -606,7 +615,7 @@ generic_effects_backward_translation(
 }
 
 
-list generic_effects_forward_translation(entity callee, 
+list generic_effects_forward_translation(entity callee,
 					 list real_args,
 					 list l_eff,
 					 transformer context)

@@ -52,7 +52,7 @@
 
 
 effect
-reference_to_convex_region(reference ref, tag  act /* action tag */ ,
+reference_to_convex_region(reference ref, action act /* action tag */ ,
 			   bool __attribute__((unused)) use_preference_p)
 {
   return make_reference_region(ref, act);
@@ -153,18 +153,16 @@ vector_to_convex_descriptor(Pvecteur v)
 	}
 	d = make_descriptor(is_descriptor_convex, sc);
     }
-    
+
     return d;
 
 }
 
-void
-convex_effects_descriptor_normalize(list l_eff)
+void convex_effects_descriptor_normalize(list l_eff)
 {
-    MAP(REGION, eff,
-	{
-	    region_system_(eff) = 
-		newgen_Psysteme(region_sc_normalize(region_system(eff),1));
-	},
-	    l_eff);
+  FOREACH(REGION, eff, l_eff) {
+    if(store_effect_p(eff))
+      region_system_(eff) =
+	newgen_Psysteme(region_sc_normalize(region_system(eff),1));
+  }
 }

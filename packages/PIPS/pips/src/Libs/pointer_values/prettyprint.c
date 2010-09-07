@@ -3,6 +3,7 @@
   $Id$
 
   Copyright 1989-2010 MINES ParisTech
+  Copyright 2010 HPC Project
 
   This file is part of PIPS.
 
@@ -19,28 +20,23 @@
 
   You should have received a copy of the GNU General Public License
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
-
 */
+
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-int foo(int a) {
-    return a;
-}
 
-void bar(int *c) {
-    *c=foo(2);
-}
-void malabar(int *c) {
-    *c=foo(3);
-}
+#include <stdio.h>
+#include <string.h>
 
-void megablast(int n)
+#include "genC.h"
+
+bool print_code_simple_pointer_values(char * module_name)
 {
-    int i,j;
-    for(i=0;i<n;i++)
-        j=foo(i);
+  return(TRUE);
 }
-int main(){
-    return 1;
+
+bool print_code_simple_gen_kill_pointer_values(char * module_name)
+{
+  return(TRUE);
 }

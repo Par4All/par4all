@@ -50,6 +50,18 @@ email=
 
 setup='https://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
+# compute load & jobs
+# is it portable?
+if [ -f /proc/cpuinfo ]
+then
+  nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
+  load=$(($nproc + 1))
+  jobs=$(($nproc * 2))
+  make="make -j $jobs -l $load"
+else
+  make=make
+fi
+
 while [ "$1" ]
 do
   opt=$1
@@ -80,11 +92,11 @@ do
     -pv|--parallel-validate)
       validate=new-validate
       unvalidate=parallel-unvalidate
-      mopt="$mopt -j 8" ;;
+      ;;
     -mv|--mail-validate)
       validate=mail-validate
       unvalidate=parallel-unvalidate
-      mopt="$mopt -j 8" ;;
+      ;;
     -nv|--no-validate) valids= ;;
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
@@ -133,16 +145,16 @@ source $target/pipsrc.sh
 if [[ $compile && ! $download ]]
 then
   pushd $target/$sdir
-  make $mopt $clean
+  $make $mopt $clean
 
   cd newgen
-  make $mopt $compile
+  $make $mopt $compile
 
   cd ../linear
-  make $mopt $compile
+  $make $mopt $compile
 
   cd ../pips
-  make $mopt $compile
+  $make $mopt $compile
 
   if [ -f bin/$PIPS_ARCH/tpips ]
   then
@@ -160,13 +172,12 @@ if [[ $valids ]] ; then
     if [[ -d $target/$d/. ]] ; then
       echo "### validating $d"
       pushd $target/$d
-      make $mopt clean
-      make $mopt "$vopt" EMAIL="$email" $validate
+      $make $mopt clean
+      $make $mopt "$vopt" EMAIL="$email" $validate
       # full cleanup: the validation directory is cleaned,
       # so that subsequent "svn up" should work properly.
-      # hmmm... this means that there is no point to look
-      # at the validation directory for result details.
-      [ "$unvalidate" ] && make $mopt $unvalidate
+      # *.diff and *.err files still hold validationr results
+      [ "$unvalidate" ] && $make $mopt $unvalidate
       popd
     else
       echo "### skipping validation $d, no such directory"

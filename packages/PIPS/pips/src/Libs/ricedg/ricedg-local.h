@@ -26,7 +26,8 @@
 
 /* maximun number of nested loops */
 #define MAXDEPTH 9
-#define MAXSV 100
+/* maximum number of scalar variables */
+#define MAXSV 1024
 
 
 /*the variables for the statistics of test of dependence and parallelization */

@@ -436,8 +436,7 @@ list declaration_supporting_references(list dl)
 
 list module_all_declarations(entity m)
 {
-  list dl = CONS(ENTITY, m, gen_copy_seq(code_declarations(value_code(entity_initial(m)))));
-
+  list dl = CONS(ENTITY, m, gen_copy_seq(entity_declarations(m)));
   return dl;
 }
 

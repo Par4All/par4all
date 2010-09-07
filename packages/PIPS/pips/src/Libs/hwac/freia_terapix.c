@@ -108,35 +108,35 @@ static void erosion_optimization
       expression ival = value_expression(val);
       if (brace_expression_p(ival))
       {
-	list iargs = call_arguments(syntax_call(expression_syntax(ival)));
-	pips_assert("must be a kernel...", gen_length(iargs)==9);
-	// tell whether kernel element is NULL
-	bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
-	intptr_t i = 0;
-	k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k10 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k20 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k01 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k11 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k21 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k02 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k12 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	k22 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-	iargs = CDR(iargs);
-	pips_assert("end of list reached", iargs==NIL);
+        list iargs = call_arguments(syntax_call(expression_syntax(ival)));
+        pips_assert("must be a kernel...", gen_length(iargs)==9);
+        // tell whether kernel element is NULL
+        bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
+        intptr_t i = 0;
+        k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k10 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k20 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k01 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k11 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k21 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k02 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k12 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        k22 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        iargs = CDR(iargs);
+        pips_assert("end of list reached", iargs==NIL);
 
-	*north = !(k00 && k10 && k20);
-	*south = !(k02 && k12 && k22);
-	*west = !(k00 && k01 && k02);
-	*east = !(k20 && k21 && k22);
+        *north = !(k00 && k10 && k20);
+        *south = !(k02 && k12 && k22);
+        *west = !(k00 && k01 && k02);
+        *east = !(k20 && k21 && k22);
       }
     }
   }
@@ -279,7 +279,7 @@ static list /* of ints */ dag_vertex_pred_imagelets
     pips_assert("some producer found!", prod!=NULL);
     limagelets =
       gen_nconc(limagelets,
-		CONS(int, (int)(_int) hash_get(allocation, prod), NIL));
+                CONS(int, (int)(_int) hash_get(allocation, prod), NIL));
   }
   return limagelets;
 }
@@ -309,16 +309,16 @@ static void terapix_gram_allocate
     {
       boolean ok = true;
       for (int w = 0; ok && w<width; w++)
-	for (int h = 0; ok && h<height; h++)
-	  ok &= !used[(i+w)+(j+h)*row_size];
+        for (int h = 0; ok && h<height; h++)
+          ok &= !used[(i+w)+(j+h)*row_size];
       if (ok)
       {
-	for (int w = 0; w<width; w++)
-	  for (int h = 0; h<height; h++)
-	    used[(i+w)+(j+h)*row_size] = true;
-	*x = i;
-	*y = j;
-	return;
+        for (int w = 0; w<width; w++)
+          for (int h = 0; h<height; h++)
+            used[(i+w)+(j+h)*row_size] = true;
+        *x = i;
+        *y = j;
+        return;
       }
     }
   }
@@ -328,7 +328,7 @@ static void terapix_gram_allocate
 #define IMG_PTR "imagelet_"
 
 static void terapix_mcu_int(string_buffer code, int op, string ref,
-			    string prefix, int val)
+                            string prefix, int val)
 {
   sb_cat(code, "  mcu_instr[", itoa(op), "].macrocode.", ref);
   sb_cat(code, " = ", prefix, itoa(val), ";\n");
@@ -340,10 +340,10 @@ static void terapix_mcu_val(string_buffer code, int op, string ref, string s)
 }
 
 static void terapix_mcu_pval(string_buffer code, int op, string ref,
-			     string p, string s)
+                             string p, string s)
 {
   sb_cat(code, "  mcu_instr[", itoa(op), "].macrocode.", ref,
-	 " = ", p, s, ";\n");
+         " = ", p, s, ";\n");
 }
 
 static void gram_param
@@ -374,14 +374,14 @@ static void gram_param
     sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
     if (size==1) break;
     sb_cat(code, "  p_", name, "[1] = ",
-	   hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
+           hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
     sb_cat(code, "  p_", name, "[2] = ",
-	   hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
+           hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
     break;
   case 9: // kernel
     sb_cat(code,
-	   "  for(i=0; i<9; i++)\n"
-	   "    p_", name, "[i] = ", p1, "[i];\n");
+           "  for(i=0; i<9; i++)\n"
+           "    p_", name, "[i] = ", p1, "[i];\n");
     break;
   default:
     pips_internal_error("unexpected gram size");
@@ -400,11 +400,11 @@ static void gram_param
 static void terapix_gram_management
   (string_buffer code, // generated code
    string_buffer decl, // generated declarations
-   int op,	       // operation
+   int op,             // operation
    const freia_api_t * api,
    const dagvtx v,     // current vertex
    hash_table hparams, // expression -> parameter...
-   bool * used)	       // current usage of GRAM
+   bool * used)        // current usage of GRAM
 {
   if (!api->arg_misc_in) return;
 
@@ -426,10 +426,10 @@ static void terapix_gram_management
       break;
     case 1: // kernel or operation with a constant
       if (api->terapix.north)
-	// let us say it is a kernel...
-	gram_param(code, decl, name, v, hparams, 3, 3, used);
+        // let us say it is a kernel...
+        gram_param(code, decl, name, v, hparams, 3, 3, used);
       else
-	gram_param(code, decl, name, v, hparams, 1, 1, used);
+        gram_param(code, decl, name, v, hparams, 1, 1, used);
       break;
     default:
       pips_internal_error("unexpected number of input image arguments");
@@ -465,6 +465,7 @@ static void terapix_macro_code
     // alu: image op cst 1
     // threshold 3x1
     // erode/dilate 3x3
+    // copy
     terapix_mcu_int(code, op, "xmin1", IMG_PTR, INT(CAR(ins)));
     terapix_mcu_int(code, op, "ymin1", "", 0);
     if (out) {
@@ -533,7 +534,7 @@ static void freia_terapix_call
   // get stats
   int length, width, cost, nops, n, s, w, e;
   length = dag_terapix_measures(thedag, NULL,
-				&width, &cost, &nops, &n, &s, &w, &e);
+                                &width, &cost, &nops, &n, &s, &w, &e);
 
   // show stats in function's comments
   sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
@@ -562,29 +563,29 @@ static void freia_terapix_call
   limg = gen_nreverse(limg);
 
   sb_cat(decl,
-	 "{\n"
-	 "  // declarations:\n"
-	 "  freia_microcode mcode;\n"
-	 "  freia_op_param param;\n"
-	 "  freia_dynamic_param dyn_param;\n"
-	 "  terapix_gram gram;\n"
-	 "  int i;\n"
-	 "  freia_status ret;\n");
+         "{\n"
+         "  // declarations:\n"
+         "  freia_microcode mcode;\n"
+         "  freia_op_param param;\n"
+         "  freia_dynamic_param dyn_param;\n"
+         "  terapix_gram gram;\n"
+         "  int i;\n"
+         "  freia_status ret;\n");
 
   sb_cat(body,
-	 "\n  // body:\n"
-	 "  // mcode param\n"
-	 "  mcode.raw = (void*) terapix_ucode_array;\n"
-	 "  mcode.size = TERAPIX_UCODE_SIZE_T;\n"
-	 "  freia_mg_write_microcode(&mcode);\n"
-	 "\n"
-	 "  // subimage operation\n"
-	 "  param.size = sizeof(mcu_instr);\n"
-	 "  param.raw = (void*) mcu_instr;\n"
-	 "\n"
-	 "  // dyn_param contents"
-	 "  dyn_param.raw = &gram;\n"
-	 "  dyn_param.size = sizeof(terapix_gram);\n");
+         "\n  // body:\n"
+         "  // mcode param\n"
+         "  mcode.raw = (void*) terapix_ucode_array;\n"
+         "  mcode.size = TERAPIX_UCODE_SIZE_T;\n"
+         "  freia_mg_write_microcode(&mcode);\n"
+         "\n"
+         "  // subimage operation\n"
+         "  param.size = sizeof(mcu_instr);\n"
+         "  param.raw = (void*) mcu_instr;\n"
+         "\n"
+         "  // dyn_param contents"
+         "  dyn_param.raw = &gram;\n"
+         "  dyn_param.size = sizeof(terapix_gram);\n");
 
   // string_buffer head, decls, end, settings;
 
@@ -612,8 +613,8 @@ static void freia_terapix_call
       sb_cat(dbio, "  // - imagelet ", itoa(n_imagelets));
       sb_cat(dbio, " is i", itoa(n));
       sb_cat(dbio, " for ",
-	     entity_user_name(vtxcontent_out(dagvtx_content(in))),
-	     "\n");
+             entity_user_name(vtxcontent_out(dagvtx_content(in))),
+             "\n");
       n++;
     }
     sb_cat(dbio, "\n");
@@ -647,7 +648,7 @@ static void freia_terapix_call
 
     vtxcontent vc = dagvtx_content(current);
     pips_assert("there is a statement",
-		pstatement_statement_p(vtxcontent_source(vc)));
+                pstatement_statement_p(vtxcontent_source(vc)));
     statement s = pstatement_statement(vtxcontent_source(vc));
     call c = freia_statement_to_call(s);
     // int optype = dagvtx_optype(current);
@@ -659,16 +660,16 @@ static void freia_terapix_call
     {
       available_memory -= api->terapix.memory;
       sb_cat(body, "  // set measure ", api->compact_name,
-	     " at ", itoa(available_memory), "\n");
+             " at ", itoa(available_memory), "\n");
       sb_cat(tail, "  // get measure ", api->compact_name,
-	     " result from ", itoa(available_memory), "\n");
+             " result from ", itoa(available_memory), "\n");
     }
 
     // if inplace, append freed images to availables
     if (api->terapix.inplace)
     {
       SET_FOREACH(dagvtx, v, deads)
-	set_add_element(avail_img, avail_img, hash_get(allocation, v));
+        set_add_element(avail_img, avail_img, hash_get(allocation, v));
     }
 
     // generate inS -> out computation
@@ -680,7 +681,7 @@ static void freia_terapix_call
     {
       int in_count=0;
       FOREACH(int, i, ins)
-	sb_cat(body, in_count++? ",": "", itoa(i));
+        sb_cat(body, in_count++? ",": "", itoa(i));
     }
     sb_cat(body, ")");
 
@@ -690,7 +691,7 @@ static void freia_terapix_call
     {
       // SELECT one available
       choice = select_imagelet(avail_img, &n_imagelets,
-			       gen_in_list_p(current, dag_outputs(thedag)));
+                               gen_in_list_p(current, dag_outputs(thedag)));
       sb_cat(body, " -> ", itoa((int) choice));
       hash_put(allocation, current, (void*) choice);
     }
@@ -698,11 +699,21 @@ static void freia_terapix_call
 
     // update helper call arguments...
     *params = gen_nconc(*params,
-	   freia_extract_params(opid, call_arguments(c),
-				head, hparams, &nargs));
+                        freia_extract_params(opid, call_arguments(c),
+                                             head, hparams, &nargs));
 
-    terapix_macro_code(body, decl, n_ops, api, used,
-		       hparams, current, ins, choice);
+    if (api==hwac_freia_api(AIPO "copy") && choice==INT(CAR(ins)))
+    {
+      // skip in place copy, which may happen if the selected target
+      // image buffer happens to be the same as the input.
+      sb_cat(body, "  // in place copy skipped\n");
+      n_ops--;
+    }
+    else
+    {
+      terapix_macro_code(body, decl, n_ops, api, used,
+                         hparams, current, ins, choice);
+    }
 
     gen_free_list(ins), ins=NIL;
 
@@ -710,7 +721,7 @@ static void freia_terapix_call
     if (!api->terapix.inplace)
     {
       SET_FOREACH(dagvtx, v, deads)
-	set_add_element(avail_img, avail_img, hash_get(allocation, v));
+        set_add_element(avail_img, avail_img, hash_get(allocation, v));
     }
 
     set_add_element(computed, computed, current);
@@ -729,31 +740,31 @@ static void freia_terapix_call
       int oimg = (int) (_int) hash_get(allocation, out);
       if (oimg>n_double_buffers)
       {
-	// PANIC:
-	// if there is no available "IO" imagelet when an output is
-	// produced, it will have to be put there with a copy later on.
-	int old = oimg;
-	oimg = select_imagelet(avail_img, NULL, true);
-	pips_assert("IO imagelet found for output", oimg<=n_double_buffers);
+        // PANIC:
+        // if there is no available "IO" imagelet when an output is
+        // produced, it will have to be put there with a copy later on.
+        int old = oimg;
+        oimg = select_imagelet(avail_img, NULL, true);
+        pips_assert("IO imagelet found for output", oimg<=n_double_buffers);
 
-	// generate copy code old -> oimg
-	// hmmm... could not generate a test case where this is triggered...
-	// the additional cost which should be reported?
-	sb_cat(body, "  // copy ", itoa(old));
-	sb_cat(body, " -> ", itoa(oimg), "\n");
-	list lic = CONS(int, old, NIL);
-	terapix_macro_code(body, decl, n_ops, hwac_freia_api(AIPO "copy"),
-			   NULL, NULL, NULL, lic, oimg);
-	gen_free_list(lic);
-	n_ops++;
+        // generate copy code old -> oimg
+        // hmmm... could not generate a test case where this is triggered...
+        // the additional cost which should be reported?
+        sb_cat(body, "  // copy ", itoa(old));
+        sb_cat(body, " -> ", itoa(oimg), "\n");
+        list lic = CONS(int, old, NIL);
+        terapix_macro_code(body, decl, n_ops, hwac_freia_api(AIPO "copy"),
+                           NULL, NULL, NULL, lic, oimg);
+        gen_free_list(lic);
+        n_ops++;
       }
       // tell that oimg is an output
       // ??? tell that n_imagelets is an input
       sb_cat(dbio, "  // - imagelet ", itoa(oimg));
       sb_cat(dbio, " is o", itoa(n));
       sb_cat(dbio, " for ",
-	     entity_user_name(vtxcontent_out(dagvtx_content(out))),
-	     "\n");
+             entity_user_name(vtxcontent_out(dagvtx_content(out))),
+             "\n");
       n++;
     }
     sb_cat(dbio, "\n");
@@ -835,8 +846,8 @@ static void freia_terapix_call
     if (set_belong_p(computed, vr))
     {
       if (pstatement_statement_p(vtxcontent_source(dagvtx_content(vr))))
-	hwac_kill_statement(pstatement_statement
-			    (vtxcontent_source(dagvtx_content(vr))));
+        hwac_kill_statement(pstatement_statement
+                            (vtxcontent_source(dagvtx_content(vr))));
       free_dagvtx(vr);
     }
   }
@@ -901,10 +912,10 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
       result = -1, why = "copy";
     // idem with image generation...
     else if (vtxcontent_optype(c1)==spoc_type_alu &&
-	     vtxcontent_inputs(c1)==NIL)
+             vtxcontent_inputs(c1)==NIL)
       result = 1, why = "gen";
     else if (vtxcontent_optype(c2)==spoc_type_alu &&
-	     vtxcontent_inputs(c2)==NIL)
+             vtxcontent_inputs(c2)==NIL)
       result = -1, why = "gen";
     // ??? do inplace last
     // ??? or ONLY if there is a shared input?
@@ -928,8 +939,8 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
       dagvtx_dump(stderr, "v2", *v2);
     }
     pips_assert("erosion is defined",
-		hash_defined_p(erosion, NORTH(*v1)) &&
-		hash_defined_p(erosion, NORTH(*v2)));
+                hash_defined_p(erosion, NORTH(*v1)) &&
+                hash_defined_p(erosion, NORTH(*v2)));
 
     // try to conclude with erosions:
     // not sure about the right partial order to use...
@@ -993,9 +1004,9 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   }
 
   pips_debug(6, "%" _intFMT " %s %s %" _intFMT " %s (%s)\n",
-	     dagvtx_number(*v1), dagvtx_operation(*v1),
-	     result<0? ">": (result==0? "=": "<"),
-	     dagvtx_number(*v2), dagvtx_operation(*v2), why);
+             dagvtx_number(*v1), dagvtx_operation(*v1),
+             result<0? ">": (result==0? "=": "<"),
+             dagvtx_number(*v2), dagvtx_operation(*v2), why);
 
   pips_assert("total order", v1==v2 || result!=0);
   return result;
@@ -1034,22 +1045,22 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 
     // transitive closure
     while ((computables =
-	    get_computable_vertices(dall, computed, computed, current)))
+            get_computable_vertices(dall, computed, computed, current)))
     {
       ifdebug(7) {
-	FOREACH(dagvtx, v, computables)
-	  dagvtx_dump(stderr, "computable", v);
+        FOREACH(dagvtx, v, computables)
+          dagvtx_dump(stderr, "computable", v);
       }
 
       gen_sort_list(computables,
-		    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
+                    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
 
       // choose one while building the schedule?
       dagvtx first = DAGVTX(CAR(computables));
       gen_free_list(computables), computables = NIL;
 
       ifdebug(7)
-	dagvtx_dump(stderr, "choice", first);
+        dagvtx_dump(stderr, "choice", first);
 
       set_add_element(current, current, first);
       set_add_element(computed, computed, first);
@@ -1063,15 +1074,15 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
       dag nd = make_dag(NIL, NIL, NIL);
       FOREACH(dagvtx, v, lcurrent)
       {
-	pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
-	dag_append_vertex(nd, copy_dagvtx_norec(v));
+        pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+        dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd);
+      dag_compute_outputs(nd, NULL);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
-	// dag_dump(stderr, "updated dall", dall);
-	dag_dump(stderr, "pushed dag", nd);
+        // dag_dump(stderr, "updated dall", dall);
+        dag_dump(stderr, "pushed dag", nd);
       }
 
       // update global list of dags to return.
@@ -1079,7 +1090,7 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 
       // cleanup full dag for next round
       FOREACH(dagvtx, w, lcurrent)
-	dag_remove_vertex(dall, w);
+        dag_remove_vertex(dall, w);
 
       gen_free_list(lcurrent), lcurrent = NIL;
     }
@@ -1092,14 +1103,18 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 }
 
 void freia_trpx_compile_calls
-(string module, list /* of statements */ ls, FILE * helper_file, int number)
+(string module,
+ list /* of statements */ ls,
+ hash_table occs,
+ FILE * helper_file,
+ int number)
 {
   // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
   list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -1158,11 +1173,12 @@ void freia_trpx_compile_calls
 
     // - and substitute its call...
     freia_substitute_by_helper_call(d, global_remainings, remainings,
-				    ls, fname_dag, lparams);
+                                    ls, fname_dag, lparams);
     free(fname_dag), fname_dag = NULL;
   }
 
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

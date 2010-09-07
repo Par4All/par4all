@@ -61,33 +61,6 @@
 
 #define REGION_FORESYS_PREFIX "C$REG"
 
-/* char * pips_region_user_name(entity ent)
- * output   : the name of entity.
- * modifies : nothing.
- * comment  : allows to "catch" the PHIs entities, else, it works like
- *            pips_user_value_name() (see semantics.c).
- */
-const char *
-pips_region_user_name(entity ent)
-{
-    /* external_value_name cannot be used because there is no need for
-       the #new suffix, but the #old one is necessary */
-    const char* name;
-    if(ent == NULL)
-	/* take care of the constant term TCST */
-	name = "";
-    else {
-	char *ent_name = entity_name(ent);
-
-	if (strncmp(ent_name, REGIONS_MODULE_NAME, 7) == 0)
-	    /* ent is a PHI entity from the regions module */
-	    name = entity_local_name(ent);
-	else
-	    name = entity_minimal_name(ent);
-    }
-
-    return name;
-}
 
 string
 region_sc_to_string(string __attribute__ ((unused)) s,
@@ -97,44 +70,6 @@ region_sc_to_string(string __attribute__ ((unused)) s,
     return string_undefined;
 }
 
-/** @brief weight function for Pvecteur passed as argument to 
- *         sc_lexicographic_sort in text_region.
- *
- * The strange argument type is required by qsort(), deep down in the calls.
- * This function is an adaptation of is_inferior_pvarval in semantics
- */
-static int
-is_inferior_region_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
-{
-    /* The constant term is given the highest weight to push constant
-       terms at the end of the constraints and to make those easy
-       to compare. If not, constant 0 will be handled differently from
-       other constants. However, it would be nice to give constant terms
-       the lowest weight to print simple constraints first...
-
-       Either I define two comparison functions, or I cheat somewhere else.
-       Let's cheat? */
-    int is_equal = 0;
-
-    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
-      is_equal = 1;
-    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
-      is_equal = 0;
-    else if(term_cst(*pvarval2))
-      is_equal = -1;
-    else if(variable_phi_p((entity) vecteur_var(*pvarval1)) 
-	    && !variable_phi_p((entity) vecteur_var(*pvarval2)))
-      is_equal = -1;
-    else  if(variable_phi_p((entity) vecteur_var(*pvarval2)) 
-	    && !variable_phi_p((entity) vecteur_var(*pvarval1)))
-      is_equal = 1;
-    else
-	is_equal =
-	    strcmp(pips_region_user_name((entity) vecteur_var(*pvarval1)),
-		   pips_region_user_name((entity) vecteur_var(*pvarval2)));
-
-    return is_equal;
-}
 
 
 #define append(s) add_to_current_line(line_buffer, s, str_prefix, t_reg)
@@ -145,78 +80,95 @@ is_inferior_region_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
  *            representing the region
  * modifies : nothing
  */
-text
-text_region(effect reg)
+text text_region(effect reg)
 {
-    text t_reg;
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_prefix = foresys ? FORESYS_CONTINUATION_PREFIX
-                              : get_comment_continuation();
-    char line_buffer[MAX_LINE_LENGTH];
-    reference r;
-    action ac;
-    approximation ap;
-    Psysteme sc;
-    list /* of string */ ls;
+    text t_reg = make_text(NIL);
 
-    if(effect_undefined_p(reg))
-    {
-	user_log("[text_region] unexpected effect undefined\n");
-	return make_text(CONS(SENTENCE,
-			      make_sentence(is_sentence_formatted,
-					    strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))),
-			      NIL));
+    if(store_effect_p(reg)
+       || !get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
+      boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+      string str_prefix =
+	foresys ? FORESYS_CONTINUATION_PREFIX
+	: get_comment_continuation();
+      char line_buffer[MAX_LINE_LENGTH];
+      reference r;
+      action ac;
+      action_kind ak;
+      approximation ap;
+      descriptor ed = effect_descriptor(reg);
+      Psysteme sc;
+      list /* of string */ ls;
+
+      if(effect_undefined_p(reg))
+	{
+	  free_text(t_reg); // t_reg should be used instead of make_text()
+	  user_log("[text_region] unexpected effect undefined\n");
+	  return make_text(CONS(SENTENCE,
+				make_sentence(is_sentence_formatted,
+					      strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))),
+				NIL));
+	}
+      /* else the effect is defined...
+       */
+
+      /* PREFIX
+       */
+      strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: get_comment_sentinel());
+      if (!foresys) append("  <");
+
+      /* REFERENCE
+       */
+      r = effect_any_reference(reg);
+      ls = foresys? words_reference(r, NIL): effect_words_reference(r);
+
+      MAP(STRING, s, append(s), ls);
+      gen_free_string_list(ls); ls = NIL;
+
+      /* ACTION and APPROXIMATION
+       */
+      ac = effect_action(reg);
+      ak = action_to_action_kind(ac);
+      ap = effect_approximation(reg);
+
+      if (foresys)
+	{
+	  append(", RGSTAT(");
+	  append(action_read_p(ac) ? "R," : "W,");
+	  append(approximation_may_p(ap) ? "MAY), " : "EXACT), ");
+	}
+      else /* PIPS prettyprint */
+	{
+	  append("-");
+	  append(action_interpretation(action_tag(ac)));
+	  /* To preserve the current output, actions on store are
+	     implicit, actions on environment and type declaration are
+	     specified */
+	  if(!action_kind_store_p(ak))
+	    append(action_kind_to_string(ak));
+	  append(approximation_may_p(ap) ? "-MAY" : "-EXACT");
+	  append("-");
+	}
+
+      /* SYSTEM
+       * sorts in such a way that constraints with phi variables come first.
+       */
+      if(descriptor_none_p(ed)) {
+	/* FI: there is no system; it's equivalent to an empty one... */
+	  append("{}");
+      } else {
+	sc = sc_copy(region_system(reg));
+	sc_lexicographic_sort(sc, is_inferior_cell_descriptor_pvarval);
+	system_sorted_text_format(line_buffer, str_prefix, t_reg, sc,
+				  (get_variable_name_t) pips_region_user_name,
+				  vect_contains_phi_p, foresys);
+
+	sc_rm(sc);
+      }
+      /* CLOSE
+       */
+      if (!foresys) append(">");
+      close_current_line(line_buffer, t_reg,str_prefix);
     }
-    /* else the effect is defined...
-     */
-
-    /* PREFIX
-     */
-    t_reg = make_text(NIL);
-    strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: get_comment_sentinel());
-    if (!foresys) append("  <");
-
-    /* REFERENCE
-     */
-    r = effect_any_reference(reg);
-    ls = foresys? words_reference(r, NIL): effect_words_reference(r);
-
-    MAP(STRING, s, append(s), ls);
-    gen_free_string_list(ls); ls = NIL;
-
-    /* ACTION and APPROXIMATION
-     */
-    ac = effect_action(reg);
-    ap = effect_approximation(reg);
-
-    if (foresys)
-    {
-	append(", RGSTAT(");
-	append(action_read_p(ac) ? "R," : "W,");
-	append(approximation_may_p(ap) ? "MAY), " : "EXACT), ");
-    }
-    else /* PIPS prettyprint */
-    {
-	append("-");
-	append(action_interpretation(action_tag(ac)));
-	append(approximation_may_p(ap) ? "-MAY" : "-EXACT");
-	append("-");
-    }
-
-    /* SYSTEM
-     * sorts in such a way that constraints with phi variables come first.
-     */
-    sc = sc_copy(region_system(reg));
-    sc_lexicographic_sort(sc, is_inferior_region_pvarval);
-    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
-		       (get_variable_name_t) pips_region_user_name,
-		       vect_contains_phi_p, foresys); 
-    
-    sc_rm(sc);
-    /* CLOSE
-     */
-    if (!foresys) append(">");
-    close_current_line(line_buffer, t_reg,str_prefix);
 
     return t_reg;
 }
@@ -245,9 +197,13 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
       gen_sort_list(l_reg, (int (*)(const void *,const void *)) effect_compare);
 	FOREACH(EFFECT, reg, l_reg)
 	{
+	  if(store_effect_p(reg)
+	     || !get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
 	    entity ent = effect_entity(reg);
-	    if (  anywhere_effect_p(reg) || malloc_effect_p(reg) || get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
-		! entity_non_pointer_scalar_p(ent))
+	    if (  anywhere_effect_p(reg)
+		  || malloc_effect_p(reg)
+		  || get_bool_property("PRETTYPRINT_SCALAR_REGIONS")
+		  || ! entity_non_pointer_scalar_p(ent))
 	    {
 		if (loose_p && !one_p )
 		{
@@ -258,6 +214,7 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 		}
 		MERGE_TEXTS(reg_text, text_region(reg));
 	    }
+	  }
 	}
 
 	if (loose_p && one_p)
@@ -336,24 +293,21 @@ get_text_out_regions(string module_name)
  * modifies : nothing.
  * comment  : prints the list of regions on stderr .
  */
-static void 
-print_regions_with_action(list pc, string ifread, string ifwrite)
+static void print_regions_with_action(list pc, string ifread, string ifwrite)
 {
-    list lr;
-    set_action_interpretation(ifread, ifwrite);
+  set_action_interpretation(ifread, ifwrite);
 
-    if (pc == NIL) {
-	fprintf(stderr,"\t<NONE>\n");
+  if (pc == NIL) {
+    fprintf(stderr,"\t<NONE>\n");
+  }
+  else {
+    FOREACH(EFFECT, ef, pc) {
+      print_region(ef);
+      fprintf(stderr,"\n");
     }
-    else {
-        for (lr = pc ; !ENDP(lr); POP(lr)) {
-            effect ef = EFFECT(CAR(lr));
-	    print_region(ef);
-	    fprintf(stderr,"\n");
-        }
-    }
+  }
 
-    reset_action_interpretation();
+  reset_action_interpretation();
 }
 
 /* external interfaces
@@ -389,12 +343,12 @@ void print_regions(list l) { print_rw_regions(l);}
  *
  * NW:
  * before calling "print_region" or "text_region"
- * 
+ *
  * "module_to_value_mappings" must be called to set up the
  * hash table to translate value into value names
  * (see comment for "module_to_value_mappings" for what must be done
  * before that is called)
- * 
+ *
  * and also "set_action_interpretation" with arguments:
  * ACTION_READ, ACTION_WRITE to label regions as R/W
  * ACTION_IN, ACTION_OUT to label regions as IN/OUT
@@ -416,9 +370,11 @@ void print_regions(list l) { print_rw_regions(l);}
  *
  * reset_action_interpretation();
  * (resets after call to module_to_value_mappings as indicated in its comments)
+ *
+ * FI: Regions/Effects related to store and environment mutations are not
+ * displayed because they have no descriptors, but by two LFs.
  */
-void 
-print_region(effect r)
+void print_region(effect r)
 {
     fprintf(stderr,"\n");
     if(effect_region_p(r)) {
@@ -426,7 +382,25 @@ print_region(effect r)
 	print_text(stderr, t);
 	free_text(t);
     }
+    /* FI: uncommented to introduce environment and type declaration
+       regions/effects */
     /* else print_words(stderr, words_effect(r)); */
+    else {
+      // FI: this is not homogeneous with the regions
+      //print_words(stderr, words_effect(r));
+      // This is even worse
+      /*
+      list el = CONS(EFFECT, r, NIL);
+      text t = simple_rw_effects_to_text(el);
+      print_text(stderr, t);
+      free_text(t);
+      gen_free_list(el);
+      */
+      // FI: let's homogeneize the outputs...
+	text t = text_region(r);
+	print_text(stderr, t);
+	free_text(t);
+    }
     fprintf(stderr,"\n");
 }
 
@@ -481,19 +455,19 @@ effect_compare(effect *peff1, effect *peff2)
     /* same entity case: sort on action */
     if (same_entity_p(ent1,ent2))
     {
-	if (effect_read_p(*peff1)) 
+	if (effect_read_p(*peff1))
 	    return(-1);
 	else
 	    return(1);
     }
-    
+
     /* sort on module name */
     eff1_pos = strcmp(entity_module_name(ent1), entity_module_name(ent2));
-    
+
     /* if same module name: sort on entity local name */
     if (eff1_pos == 0)
     {
-	eff1_pos = strcmp(entity_user_name(ent1), entity_user_name(ent2));	
+	eff1_pos = strcmp(entity_user_name(ent1), entity_user_name(ent2));
     }
     /* else: current module comes first, others in lexicographic order */
     else
@@ -503,7 +477,7 @@ effect_compare(effect *peff1, effect *peff2)
 	if (strcmp(module_local_name(module), entity_module_name(ent1)) == 0)
 	    eff1_pos = -1;
 	if (strcmp(module_local_name(module), entity_module_name(ent2)) == 0)
-	    eff1_pos = 1;	    	
+	    eff1_pos = 1;
     }
 
     return(eff1_pos);

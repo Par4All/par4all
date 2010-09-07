@@ -330,20 +330,12 @@ perform_substitution_in_assign(p_substitution subs, statement s)
         perform_substitution(subs, e);
 }
 
-/* whether there are some conflicts between W cumulated in s2
- * and any proper of s1: this mean that some variable of s1 have
- * their value modified, hence the substitution cannot be carried on.
- * if only_written in true, only W/W conflicts are reported.
- * proper and cumulated effects must be available.
+/* whether there are some conflicts between s1 and s2 
+ * according to successor table successors
  */
 static bool 
 some_conflicts_between(hash_table successors, statement s1, statement s2, p_substitution sub )
 {
-    /*
-       effects efs1, efs2;
-       efs1 = load_proper_rw_effects(s1);
-       efs2 = load_cumulated_rw_effects(s2);
-       */
     pips_debug(2, "looking for conflict with statement\n");
     ifdebug(2) { print_statement(s2); }
     list s1_successors = hash_get(successors,s1);
@@ -357,14 +349,12 @@ some_conflicts_between(hash_table successors, statement s1, statement s2, p_subs
             FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s)))
             {
                 /* if there is a write-* conflict, we cannot do much */
-                if ( reference_equal_p(sub->ref ,effect_any_reference(conflict_source(c))) &&
-                            effect_write_p(conflict_sink(c)) /*&& effect_write_p(conflict_sink(c))*/ )
+                if ( effect_write_p(conflict_sink(c)) /*&& effect_write_p(conflict_sink(c))*/ )
                 {
                     /* this case is safe */
                     if( ENDP(reference_indices(effect_any_reference(conflict_source(c)))) && 
                             !ENDP(reference_indices(effect_any_reference(conflict_sink(c)))))
                         continue;
-
                     pips_debug(2, "conflict found on reference, with") ;
                     ifdebug(2) { print_reference(effect_any_reference(conflict_sink(c)));}
                     ifdebug(2) { print_reference(effect_any_reference(conflict_source(c)));}
@@ -375,23 +365,6 @@ some_conflicts_between(hash_table successors, statement s1, statement s2, p_subs
         }
     }
 
-    /*
-       FOREACH(EFFECT, e2,effects_effects(efs2))
-       {
-       if (effect_write_p(e2))
-       {
-       entity v2 = effect_variable(e2);
-       pips_debug(9, "written variable %s\n", entity_name(v2));
-       FOREACH(EFFECT, e1,effects_effects(efs1))
-       if (entities_may_conflict_p(effect_variable(e1), v2) &&
-       (!(only_written && effect_read_p(e1))))
-       {
-       pips_debug(8, "conflict with %s\n", entity_name(effect_variable(e1)));
-       return TRUE;
-       }
-       }
-       }
-       */
     pips_debug(2, "no conflict\n");
     return false;
 }
@@ -434,7 +407,7 @@ do_substitute(statement anext, struct s_p_s *param)
     return true;
 }
 
-/* top-down forward substitution of scalars in SEQUENCE only.
+/* top-down forward substitution of reference in SEQUENCE only.
  */
 static bool
 fs_filter(statement stat, graph dg)

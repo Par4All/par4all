@@ -178,6 +178,7 @@ static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
     cun = compilation_unit_of_module(mln);
     cu = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cun);
     cudl = code_declarations(value_code(entity_initial(cu)));
+    free(cun);
   }
 
   pips_assert("some current entity", !entity_undefined_p(m));

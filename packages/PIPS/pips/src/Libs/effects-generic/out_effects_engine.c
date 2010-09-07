@@ -186,7 +186,8 @@ summary_out_effects_engine(char *module_name)
 
 
     set_current_module_entity(callee);
-
+    make_effects_private_current_context_stack();
+ 
     debug_on("OUT_EFFECTS_DEBUG_LEVEL");
     ifdebug(1)
     {
@@ -225,6 +226,7 @@ summary_out_effects_engine(char *module_name)
     }
 
     reset_current_module_entity();
+    free_effects_private_current_context_stack();
 
     debug_off();
     return TRUE;

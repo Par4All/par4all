@@ -359,7 +359,7 @@ bool one_liner_p(statement s)
 	      || instruction_call_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
 	      || return_instruction_p(i));
 
-  yes = yes  && ENDP(statement_declarations(s));
+  yes = yes && ENDP(statement_declarations(s));
 
   if(!yes && instruction_sequence_p(i)) {
     list sl = sequence_statements(instruction_sequence(i));
@@ -539,46 +539,75 @@ list words_range(range obj, list pdl) {
     pc = CONS(STRING, MAKE_SWORD("*"), NIL);
   } else {
     switch(get_prettyprint_language_tag()) {
-      case is_language_fortran: {
-        call c = syntax_call(expression_syntax(range_increment(obj)));
+    case is_language_fortran: {
+      call c = syntax_call(expression_syntax(range_increment(obj)));
 
-        pc = CHAIN_SWORD(pc,"(/ (I,I=");
-        pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
-        pc = CHAIN_SWORD(pc,",");
-        pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
-        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
-          pc = CHAIN_SWORD(pc,",");
-          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
-        }
-        pc = CHAIN_SWORD(pc,") /)") ;
-        break;
+      pc = CHAIN_SWORD(pc,"(/ (I,I=");
+      pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+      pc = CHAIN_SWORD(pc,",");
+      pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+      if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+	pc = CHAIN_SWORD(pc,",");
+	pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
       }
-      case is_language_fortran95: {
-        // Print the lower bound if != *
-        if(!unbounded_expression_p(range_lower(obj))) {
-          pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
-        }
-
-        // Print the upper bound if != *
-        pc = CHAIN_SWORD(pc,":");
-        if(!unbounded_expression_p(range_upper(obj))) {
-          pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
-        }
-
-        // Print the increment if != 1
-        call c = syntax_call(expression_syntax(range_increment(obj)));
-        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
-          pc = CHAIN_SWORD(pc,":");
-          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
-        }
-        break;
+      pc = CHAIN_SWORD(pc,") /)") ;
+      break;
+    }
+    case is_language_fortran95: {
+      // Print the lower bound if != *
+      if(!unbounded_expression_p(range_lower(obj))) {
+	pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
       }
-      case is_language_c:
-        pips_internal_error("I don't know how to print a range in C !");
-        break;
-      default:
-        pips_internal_error("Language unknown !");
-        break;
+
+      // Print the upper bound if != *
+      pc = CHAIN_SWORD(pc,":");
+      if(!unbounded_expression_p(range_upper(obj))) {
+	pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+      }
+
+      // Print the increment if != 1
+      call c = syntax_call(expression_syntax(range_increment(obj)));
+      if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+	pc = CHAIN_SWORD(pc,":");
+	pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+      }
+      break;
+    }
+    case is_language_c:
+      /* C does not include ranges, but the PIPS internal
+	 representation does. For instance, constant ranges can be
+	 useful to express effects or regions for intrinsics. To be
+	 discussed with Beatrice: e.g. memcpy(), strncp(). Especially
+	 when they are called with constant arguments. */
+
+      // FI: we might still want a warning, but the compiler will
+      // choke anyway if this is used to prettyprint some C source code
+      // pips_internal_error("I don't know how to print a range in C !");
+
+      // FI: copied from Fortran 95, but we may prefer to see the stars
+
+      // Print the lower bound if != *
+      if(!unbounded_expression_p(range_lower(obj))) {
+	pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+      }
+
+      // Print the upper bound if != *
+      pc = CHAIN_SWORD(pc,":");
+      if(!unbounded_expression_p(range_upper(obj))) {
+	pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+      }
+
+      // Print the increment if != 1
+      call c = syntax_call(expression_syntax(range_increment(obj)));
+      if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+	pc = CHAIN_SWORD(pc,":");
+	pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+      }
+
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
     }
   }
   return pc;
@@ -633,9 +662,29 @@ list words_subscript_range(range obj, list pdl) {
         }
         break;
       }
-      case is_language_c:
-        pips_internal_error("I don't know how to print a range in C !");
+      case is_language_c: 
+	// T is no way to print range in C 
+	// The notation with ":" has been chosen to simplify prettyprint
+      {
+        // Print the lower bound if != *
+        if(!unbounded_expression_p(range_lower(obj))) {
+          pc = gen_nconc(pc, words_expression(range_lower(obj), pdl));
+        }
+
+        // Print the upper bound if != *
+        pc = CHAIN_SWORD(pc,":");
+        if(!unbounded_expression_p(range_upper(obj))) {
+          pc = gen_nconc(pc, words_expression(range_upper(obj), pdl));
+        }
+
+        // Print the increment if != 1
+        call c = syntax_call(expression_syntax(range_increment(obj)));
+        if(strcmp(entity_local_name(call_function(c)), "1") != 0) {
+          pc = CHAIN_SWORD(pc,":");
+          pc = gen_nconc(pc, words_expression(range_increment(obj), pdl));
+        }
         break;
+      }
       default:
         pips_internal_error("Language unknown !");
         break;
@@ -3742,7 +3791,7 @@ static text text_instruction(entity module,
                                  margin,
                                  CHAIN_SWORD(words_call(instruction_call(obj),
                                          0, TRUE, TRUE, pdl),
-                                     strdup(C_STATEMENT_END_STRING)));
+                                     C_STATEMENT_END_STRING));
             break;
           default:
             pips_internal_error("Language unknown !");
@@ -4153,13 +4202,13 @@ text text_statement_enclosed(entity module,
 	  }
 	  else if(string_undefined_p(cs) || cs == NULL || strcmp(cs, "")==0) {
 	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
-	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	    temp = make_text(CONS(SENTENCE, s, NIL));
 	    //temp = make_text(NIL);
 	  }
 	  else if(strcmp(cs, "\n")==0) {
 	    // MAKE_ONE_WORD_SENTENCE already implies a '\n'
 	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
-	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	    temp = make_text(CONS(SENTENCE, s, NIL));
 	  }
 	  else
 	    temp = text_instruction(module, label, nmargin, i,

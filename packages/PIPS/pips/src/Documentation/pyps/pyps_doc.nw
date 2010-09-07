@@ -1,0 +1,257 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{noweb}
+\usepackage{listings}
+\usepackage[margin=3cm]{geometry}
+ 
+\title{A tutorial for Pyps}
+\author{Grégoire Payen de La Garanderie}
+
+\lstset{breaklines=true}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Pyps is the Python interface to Pips source to source compiler. The focus of Pyps is to provide an interface for both high-level scripts for transformation automation ;  and for interactive use of Pips with auto-completion and inline documentation of Pips transformations. Pyps provides iPyps interpreter based on ipython interpreter shell which have a reacher feature set than tpips. Simple scripting with Pyps doesn't require a strong knowledge of Python language and allow you to deal with Pips in a more structured and intuitive way than tpips.
+
+This tutorial will show the functionnality of Pyps using a dummy C sample source file :
+<<test.c>>=
+int foo(int a)
+{
+	return 2*a;
+}
+
+void bar(int* c)
+{
+	*c = foo(2);
+}
+
+void malabar(int* c)
+{
+	*c = foo(3);
+}
+
+void megablast(int n)
+{
+	int i,j;
+	for(i=0; i<n;i++)
+		j = foo(i);
+}
+
+int main()
+{
+	megablast(20);
+	return 1;
+}
+@
+
+\section{First steps in Pyps}
+
+There is two way to work with Pyps, either importing pyps package in Python or using the interactive Pyps environnement based on iPython : iPyps (running command ipyps). The last method should be preferred for interactive use of Pyps.
+
+<<test.py>>=
+from pyps import * #Uneeded when using interactive iPyps environnement
+@
+
+To begin, you should create a new Pips workspace. Pips workspace are represented by Python \emph{workspace} type. To create a new workspace, you need the list of all source files that you want to handle. Note that you can't add source file to the project after its creation. In this example, we have only the [[test.c]] source file.
+
+<<test.py>>=
+ws = workspace(["test.c"])
+#If you have more than one source file, you should use something like :
+#ws = workspace(["somesource.c","someothersource.c","lastsource.c"])
+@
+
+Pips parses files, functions and procedures. Each functions and source files are represented in Python by an object of type \emph{module} :
+
+<<test.py>>=
+ws.fun.foo #Retrieve function foo
+ws.fun.malabar #Retrieve function malabar
+ws.cu.test #Retrieve compilation unit test.c
+@
+
+For iPyps users, completion function and source name completion is available using TAB key after typing [[ws.fun.]] and [[ws.cu.]]
+
+You can print function information and documentation extracted from \LaTeX\  source file [[properties\_rc.tex]] by using ‘?’ :
+<<test.py>>=
+ws.fun.inlining? #Print documentation
+@
+
+This should output something like :
+\footnotesize
+\begin{lstlisting}
+Type:		instancemethod
+Base Class:	<type 'instancemethod'>
+String Form:	<bound method module.inlining of <pyps.module instance at 0x9e0718c>>
+Namespace:	Interactive
+File:		/usr/lib/python2.6/site-packages/pips/pyps.py
+Definition:	ws.fun.foo.inlining(self, callers='', use_initialization_list=True, **props)
+Docstring:
+    Inlining is a well known technique.  Basically, it replaces a function call by the function body. The current implementation does not work if the function has static declarations, access global variables  can be set to define the list of functions where the call sites have to be inlined. By default, all call sites of the inlined function are inlined.
+\end{lstlisting}
+\normalsize
+
+In this brouhaha, the more relevant informations are \emph{Definition} and \emph{Docstring}. Looking at the definition of the function, we know that it takes two arguments. Each argument have a default value, so you can skip a parameter if you are pleased with the default value. For instance :
+<<test.py>>=
+ws.fun.foo.inlining(self,callers="bar")
+#The call is threated as if USE_INITIALIZATION_LIST is set to True 
+#because of the default value
+@
+
+Value of properties are automatically restored after transformation call to their orignal state to avoid side effects onto other transformation, whereas in tpips properties are set at global scope and can interact with transformations sometimes by mistake.
+
+Sometimes, dependency between transformations and properties are not dectected because of missing or implicit relation in [[properties-rc.tex]]. It is still possible to pass a property as parameter even if Pyps don't know about the relation :
+<<test.py>>=
+ws.fun.foo.inlining(self, callers="malabar", purge_labels=False);
+@
+As you can see, we add an extra property purge\_labels which is not listed in Python inlining function prototype. Furthermore, the real Pips name of the property is INLINING\_PURGE\_LABELS. Pyps automatically append transformation’s name at the begining of a property when needed and also automatically convert property name to upper case.
+
+Sometimes, you need to specify which transformations should be used by Pips to get some ressources. This is accomplish by doing the following in Pyps :
+<<test.py>>=
+ws.activate(module.preconditions_inter_fast) #To activate transformation preconditions_inter_fast
+#or alternatively
+ws.activate("preconditions_inter_fast")
+@
+The advantage of the first form over the second is that you can use auto-completion over transformation name.
+
+\section{Looping, filtering and transforming a bench of module}
+It is possible to loop on every module. For instance :
+<<test.py>>=
+for i in ws.fun:
+	ws.fun.foo.inlining(self,callers=i.name())
+@
+The former is equivalent to :
+<<test.py>>=
+ws.all.display()
+@
+
+[[ws.all]] returns an object of type \emph{modules}. \emph{modules} objects have the same interface as \emph{module} : when a function from a \emph{modules} object is called, it calls the same function of every listed module.
+
+It is also possible to find modules using a filter :
+<<test.py>>=
+#Print all functions which call function “foo”.
+m = ws.filter(lambda x: "foo" in x.callees())
+m.display()
+@
+\section{Loop transformations}
+
+Transformations can also be made on loops. In this example, we have a loop in \emph{megablast} function. You can access to a loop either by iterating over each loop with something like :
+<<test.py>>=
+for l in ws.fun.megablast.loops():
+	print "Loop named ",l.name #Do something in the loop
+@
+or by label :
+<<test.py>>=
+l = ws.fun.megablast.loops("theloop")
+#Do something with loop l
+@
+
+When manipulating code for the first time, Pips has not yet assigned labels to loops because Pips delayed it until labels are required (eg. by a transformation). You can ask Pips to insert loop labels in code by using function \emph{flag\_loops} :
+<<test.py>>=
+mt = ws.fun.megablast
+mt.display()
+#There is no loop label
+mt.flag_loops()
+mt.display()
+#You can see loop label and do something with them
+l = mt.loops("l99999")
+l.unroll(rate=3) #Call Unroll transformation
+@
+
+\section{Global properties}
+
+Pips properties can be accessed and modified at global scope using [[ws.props.]]. However, modifying a property at global scope in Pyps is a bad idea, because much of the global properties are overwriting by default value when used. Global properties can lead to unintentionnal side effects and there use is discouraged in Pyps.
+
+For instance, you can get or set property INLINING\_PURGE\_LABELS using :
+
+<<test.py>>=
+print ws.props.INLINING_PURGE_LABELS #Print it
+ws.props.INLINING_PURGE_LABELS = False
+ws.props.INLINING_PURGE_LABELS = True
+@
+
+\section{Checkpoints}
+Pyps provides a basic feature for checkpoints. They can be used to save and then restore back Pyps state when trying to do a potentially wrong transformation. At the time of writing, Pyps does support only one checkpoint at time. Putting checkpoint and restoring state is quite simple :
+<<test.py>>=
+ws.checkpoint()
+l.unroll(rate=3) #Call Unroll transformation
+ws.mt.display()
+ws.restore()
+ws.display()
+@
+
+\section{Pyrops}
+It is not possible to work on several modules in Pips at the same time in a script.
+To bypass this limitation in Pyps, a Python module named Pyrops transparently encapsulate each workspace in a separate program. It’s more an elegant workaround than a true solution however it works well despite it is complicated to debug Pips C libraries through this extension. Pyrops provides a new workspace inherited of Pyps workspace :
+<<test2.py>>=
+import pyrops
+ws = pyrops.pworkspace(["test.c"])
+@
+Here, ws is a remote workspace. You can add a seconde workspace :
+<<test2.py>>=
+ws2 = pyrops.pworkspace(["test.c"])
+@
+
+After creation, you can apply transformations to your remotes workspaces as if they were true Pyps workspace.
+<<test2.py>>=
+ws.all.display()
+#...
+@
+
+To close a workspace, you can do :
+<<test2.py>>=
+ws.close()
+@
+
+And just before to terminate the program :
+<<test2.py>>=
+pyrops.Launcher.shutdown()
+@
+
+Sometimes, some errors occured in Python internals during Python exit. They are not harmeful nor important.
+
+\section{pips-make}
+When having a large project with many GCC options, it can be difficult to create a Pyps workspace. pips-make is a tool which try to create a workspace for you by instrumenting the compilation process.
+
+For instance, if you have a project which use a classic compilation process. You can do :
+
+\begin{lstlisting}
+./configure
+pips-make
+make install
+\end{lstlisting}
+
+Here, the pips-make step do the same thing as make but records also useful informations about the project and put them in a new directory \emph{pips.ws}.
+If your project doesn't use a Makefile, you can use commande \emph{pips-make --env} to open a new shell where GCC calls are recorded. To do the trick, pips-make change PATH variable in such way that calls to GCC are intercepted by pips-make version of them instead of the original. After processing, pips-make forward calls to GCC.
+
+pips-make use the following environnement variables :
+\begin{enumerate}
+  \item PIPS\_WORKSPACE : where to put files (default: directory pips.ws) ;
+  \item PIPS\_WORKINGDIR : base directory used to construct files relative path (default: .) ;
+  \item PIPS\_BINPATH : path to pips-make binaries (default: installation dependant hard-coded in pips-make prefix/lib/pips-make) ;
+  \item PIPS\_CC : compiler which should be called by pips-make (default: gcc) ;
+  \item PIPS\_LD : linker which should be called by pips-make (default: \$PIPS\_CC) ;
+  \item PIPS\_AR : archiver which should be called by pips-make (default: ar).
+\end{enumerate}
+
+Currently, pips-make registers calls to the compiler, the linker and ar.
+After this preprocessing step, you can import your new workspace using the Python class \emph{CCWorkspace} which have the same behaviour as \emph{workspace}.
+<<pmtest.py>>=
+from pipsgcc import CCWorkspace
+import pyps
+
+w = workspace(["pips.ws"], parents = [CCWorkspace]) \footnote{+\nomgen{see section \ref{wpcomposition} for more information on this workspace instanciation syntax}+}
+
+ws.all.display() #Display it
+ws.compile() #Replay compilation
+@
+
+pips-make try to record the whole compilation process of the Makefile. Library makefiles often recompile source files more than once with differents flags, for instance to build static and shared library versions. pips-make store preprocessed versions of the files to avoid dependancy problems or so. When a file is compiled twice or more, pips-make stores the file preprocessed with the last set of flags and emits a warning if preprocessed files are differents. An other problem is that sometimes examples are compiled by the Makefile, this result in having more than once \emph{main} function which of course Pyps dislike. When using Pyps, be sure to deactivate example compilation in the build configuration, otherwise you may encountered problems.
+
+\section{Workspace composition} \label{wpcomposition}
+Pyps is a quite simple interface for Pips usage, furthermore, it is extensible and allow you to develop high level task onto Pips.
+
+
+\end{document}

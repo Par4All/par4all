@@ -1,0 +1,24 @@
+#ifdef HAVE_CONFIG_H
+#include "pips_config.h"
+#endif
+/*CPROTO pypips.h Do not edit this line*/
+#include <unistd.h>
+#include "linear.h"
+#include "genC.h"
+#include "ri.h"
+#include "text.h"
+#include "pipsmake.h"
+#include "top-level.h"
+#include "transformations.h"
+#include "pipsdbm.h"
+#undef _POSIX_C_SOURCE
+#undef _XOPEN_SOURCE
+#undef assert
+/*properties.h*/
+extern bool get_bool_property(const string /*name*/);
+extern string get_string_property(const string /*name*/);
+extern int get_int_property(const string /*name*/);
+
+extern char *activate(char *);
+extern char *module_loops(const char*,const char*);
+extern void user_log(char *, ...);

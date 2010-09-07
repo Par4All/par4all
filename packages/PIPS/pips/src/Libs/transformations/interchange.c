@@ -248,7 +248,7 @@ statement interchange_inner_outermost_loops(list lls,
       entity ll = loop_label(statement_loop(ls));
       if(!entity_empty_label_p(ll) && !gen_in_list_p(ll, lll)) {
 	statement cs = make_continue_statement(ll);
-	append_a_statement(nlb, cs);
+	insert_statement(nlb, cs, false);
 	lll = CONS(ENTITY, ll, lll);
       }
     }

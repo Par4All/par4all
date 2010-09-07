@@ -850,7 +850,7 @@ fortran_user_function_call_to_transformer(
     /* J'ai aussi des free a decommenter */
     /*
       if(ENDP(transformer_arguments(t_caller))) {
-      transformer_arguments(t_caller) = 
+      transformer_arguments(t_caller) =
       gen_nconc(transformer_arguments(t_caller), CONS(ENTITY, e, NIL));
       }
       else {
@@ -858,12 +858,12 @@ fortran_user_function_call_to_transformer(
       }
     */
     /* Not checkable with temporary variables
-       pips_assert("transformer t_caller is consistent", 
+       pips_assert("transformer t_caller is consistent",
        transformer_consistency_p(t_caller));
     */
   }
   else {
-    pips_assert("transformer t_caller is undefined", 
+    pips_assert("transformer t_caller is undefined",
 		transformer_undefined_p(t_caller));
   }
 
@@ -875,8 +875,9 @@ fortran_user_function_call_to_transformer(
   return t_caller;
 }
 
-/* a function call is a call to a non void function in C and to a FUNCTION in Fortran */
-transformer 
+/* a function call is a call to a non void function in C and to a
+   FUNCTION in Fortran */
+transformer
 user_function_call_to_transformer(
 				  entity e, /* a value */
 				  expression expr, /* a call to a function */
@@ -896,10 +897,8 @@ user_function_call_to_transformer(
 
 /* transformer translation
  */
-transformer 
-transformer_intra_to_inter(
-    transformer tf,
-    list le)
+transformer transformer_intra_to_inter(transformer tf,
+				       list le)
 {
   cons * lost_args = NIL;
   /* Filtered TransFormer ftf */
@@ -959,7 +958,7 @@ transformer_intra_to_inter(
       /* Variables with no impact on the caller world are eliminated.
        * However, the return value associated to a function is preserved.
        */
-      if( !effects_read_or_write_entity_p(le, v) &&
+      if( !effects_must_read_or_write_entity_p(le, v) &&
 	  !storage_return_p(entity_storage(v)) &&
 	  !entity_constant_p(v)) {
 	lost_args = arguments_add_entity(lost_args, e);

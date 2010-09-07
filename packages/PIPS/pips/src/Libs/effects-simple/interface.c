@@ -53,7 +53,7 @@
 
 /* SPECIFIC INTERFACES */
 
-bool 
+bool
 cumulated_references(string module_name)
 {
     bool ok;
@@ -64,7 +64,7 @@ cumulated_references(string module_name)
     return ok;
 }
 
-bool 
+bool
 proper_references(string module_name)
 {
     bool ok;
@@ -86,7 +86,7 @@ proper_pointer_effects(string module_name)
     return ok;
 }
 
-bool 
+bool
 summary_pointer_effects(string module_name)
 {
     bool ok;
@@ -96,7 +96,7 @@ summary_pointer_effects(string module_name)
     return ok;
 }
 
-bool 
+bool
 cumulated_pointer_effects(string module_name)
 {
     bool ok;
@@ -106,7 +106,7 @@ cumulated_pointer_effects(string module_name)
     return ok;
 }
 
-bool 
+bool
 cumulated_pointer_effects_with_points_to(string module_name)
 {
     bool ok;
@@ -116,7 +116,7 @@ cumulated_pointer_effects_with_points_to(string module_name)
     return ok;
 }
 
-bool 
+bool
 proper_effects(string module_name)
 {
     bool ok;
@@ -126,7 +126,7 @@ proper_effects(string module_name)
     return ok;
 }
 
-bool 
+bool
 proper_effects_with_points_to(string module_name)
 {
     bool ok;
@@ -138,7 +138,7 @@ proper_effects_with_points_to(string module_name)
     return ok;
 }
 
-bool 
+bool
 summary_effects(string module_name)
 {
     bool ok;
@@ -148,7 +148,7 @@ summary_effects(string module_name)
     return ok;
 }
 
-bool 
+bool
 cumulated_effects(string module_name)
 {
     bool ok;
@@ -205,7 +205,7 @@ out_effects(string module_name)
 
 /************************************************************* PRETTYPRINTS */
 
-static bool 
+static bool
 print_code_effects(
     string module_name,
     bool is_rw,
@@ -235,70 +235,70 @@ print_code_effects(
 bool
 print_code_proper_pointer_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 			      DBR_PROPER_POINTER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_pointer_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 		      DBR_CUMULATED_POINTER_EFFECTS, DBR_SUMMARY_POINTER_EFFECTS, ".cumu");
 }
 
 bool
 print_code_proper_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 			      DBR_PROPER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".cumu");
 }
 
-bool 
+bool
 print_code_proper_references(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 		      DBR_PROPER_REFERENCES, string_undefined, ".propref");
 }
 
-bool 
+bool
 print_code_cumulated_references(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+    return print_code_effects(module_name, TRUE, FALSE, TRUE,
 		      DBR_CUMULATED_REFERENCES, string_undefined, ".cumuref");
 }
 
 bool
 print_code_in_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, FALSE, FALSE, 
+    return print_code_effects(module_name, FALSE, FALSE, FALSE,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".ineff");
 }
 
 bool
 print_code_out_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, FALSE, FALSE, 
+    return print_code_effects(module_name, FALSE, FALSE, FALSE,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".outeff");
 }
 
 bool
 print_source_proper_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, TRUE, TRUE, 
+    return print_code_effects(module_name, TRUE, TRUE, TRUE,
 		      DBR_PROPER_EFFECTS, string_undefined, ".uprop");
 }
 
 bool
 print_source_cumulated_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, TRUE, TRUE, 
+    return print_code_effects(module_name, TRUE, TRUE, TRUE,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".ucumu");
 }
 
@@ -306,14 +306,14 @@ print_source_cumulated_effects(string module_name)
 bool
 print_source_in_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, TRUE, FALSE, 
+    return print_code_effects(module_name, FALSE, TRUE, FALSE,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".uineff");
 }
 
 bool
 print_source_out_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, TRUE, FALSE, 
+    return print_code_effects(module_name, FALSE, TRUE, FALSE,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".uouteff");
 }
 
@@ -387,13 +387,13 @@ get_text_cumulated_effects(string module_name)
  * input    : an expression and the current context
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 proper_effects_of_expression(expression e)
 {
     list le;
-    bool context_stack_defined_p = 
+    bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
     if (!context_stack_defined_p)
@@ -416,7 +416,7 @@ proper_effects_of_expression(expression e)
 
 
 /* Same as above, but with debug control. Used by semantics. */
-list 
+list
 expression_to_proper_effects(expression e)
 {
     list le;
@@ -434,13 +434,13 @@ expression_to_proper_effects(expression e)
  * input    : an expression and the current context
  * output   : the correpsonding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 proper_effects_of_range(range r)
 {
     list le;
-    bool context_stack_defined_p = 
+    bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
     if (!context_stack_defined_p)
@@ -494,25 +494,25 @@ bool expression_invariant_wrt_effects(expression exp, list el)
 /*************************************************** BACKWARD COMPATIBILITY */
 
 /* called from prettyprint CRAY */
-void 
+void
 rproper_effects_of_statement(statement s)
 {
     set_methods_for_proper_simple_effects();
-    proper_effects_of_module_statement(s); 
+    proper_effects_of_module_statement(s);
     return;
 }
 
-void 
+void
 rcumulated_effects_of_statement(statement s)
 {
     init_invariant_rw_effects();
     set_methods_for_simple_effects();
-    rw_effects_of_module_statement(s); 
+    rw_effects_of_module_statement(s);
     close_invariant_rw_effects();
 }
 
 /* called from rice */
-list 
+list
 statement_to_effects(statement s)
 {
     list l_eff;
@@ -525,9 +525,9 @@ statement_to_effects(statement s)
     pips_debug(1, "begin\n");
 
     set_methods_for_proper_simple_effects();
-    proper_effects_of_module_statement(s); 
+    proper_effects_of_module_statement(s);
     set_methods_for_simple_effects();
-    rw_effects_of_module_statement(s); 
+    rw_effects_of_module_statement(s);
     l_eff = effects_dup(load_rw_effects_list(s));
 
     pips_debug(1, "end\n");
@@ -568,20 +568,20 @@ bool simple_cumulated_effects(string module_name, statement current)
   /* Compute the rw effects or references of the module. */
   init_rw_effects();
   init_invariant_rw_effects();
-  
+
   debug_on("EFFECTS_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
-  
+
   rw_effects_of_module_statement(current);
 
   pips_debug(1, "end\n");
   debug_off();
-  
+
   (*db_put_rw_effects_func)(module_name, get_rw_effects());
   (*db_put_invariant_rw_effects_func)(module_name, get_invariant_rw_effects());
 
   (*effects_computation_reset_func)(module_name);
-  
+
   generic_effects_reset_all_methods();
   return ok;
 }
