@@ -1,0 +1,23 @@
+setenv WS=array_to_pointer10
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+display PRINTED_FILE[%ALL]
+
+echo
+echo "/* After apply ARRAY_TO_POINTER[%ALL] */"
+echo
+
+apply ARRAY_TO_POINTER[%ALL]
+display PRINTED_FILE[%ALL]
+
+#quit
+
+apply UNSPLIT[%ALL]
+shell gcc -W -Wall $WS.database/Src/$WS.c
+
+
+quit
+
