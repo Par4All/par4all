@@ -52,3 +52,4 @@ do { \
 #define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
     SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
 
+

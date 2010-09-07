@@ -783,5 +783,20 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
     vec[1]=v1;
 }
 
+void
+SIMD_XOR_V4SF(float vec[4])
+{
+    vec[0]=0.;
+    vec[1]=0.;
+    vec[2]=0.;
+    vec[3]=0.;
+}
+
+void
+SIMD_ADDREDUCE_V4SF(float val[1],float vec[4]){
+    val[0]=vec[0]+vec[1]+vec[2]+vec[3];
+}
+
+
 #undef LOGICAL
 #undef DMAX
