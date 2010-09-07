@@ -78,6 +78,9 @@ static
 list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt);
 
 static
+list forloop_to_post_pv(forloop l, list l_in, pv_context *ctxt);
+
+static
 list unstructured_to_post_pv(unstructured u, list l_in, pv_context *ctxt);
 
 static
@@ -215,6 +218,14 @@ list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
 
 static
 list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
+{
+  list l_out = NIL;
+  pips_internal_error("not yet implemented\n");
+  return (l_out);
+}
+
+static
+list forloop_to_post_pv(forloop l, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   pips_internal_error("not yet implemented\n");
