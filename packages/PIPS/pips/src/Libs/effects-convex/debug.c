@@ -50,12 +50,17 @@
 bool region_consistent_p(region reg)
 {
 #define MY_MAX_CHECK VALUE_CONST(100000000)
-    bool consistent = TRUE;
-    Psysteme sc;
-    Pbase b, t;
-    Pcontrainte c;
+  bool consistent = TRUE;
+  Psysteme sc;
+  Pbase b, t;
+  Pcontrainte c;
 
-    pips_assert("it is a region",  effect_consistent_p(reg));
+  pips_assert("it is a region",  effect_consistent_p(reg));
+
+  /* FI->BC: it might be better to use descriptors even for regions
+     linked to store and type declarations. Not much time to think
+     about it now. */
+  if(!descriptor_none_p(effect_descriptor(reg))) {
     pips_assert("the descriptor is defined",  !descriptor_none_p(effect_descriptor(reg)));
 
     /* the system must be defined */
@@ -70,9 +75,9 @@ bool region_consistent_p(region reg)
     /* the TCST variable must not belong to the base */
     b = sc_base(sc);
     for( t = b; !BASE_UNDEFINED_P(t) && consistent; t = t->succ)
-    {
+      {
 	consistent = consistent && !term_cst(t);
-    }    
+      }
     pips_assert("no TCST variable in the base", consistent);
 
 
@@ -81,36 +86,37 @@ bool region_consistent_p(region reg)
      */
     c = sc_egalites(sc);
     while (c != (Pcontrainte) NULL)
-    {
+      {
 	Pvecteur v;
-	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-	{ 
-	  if (variable_phi_p((entity)vecteur_var(v)))
-	    pips_assert("no high coefficient for PHI variables in region system.\n", 
-			value_lt(vecteur_val(v),MY_MAX_CHECK));
-	}
+	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ)
+	  {
+	    if (variable_phi_p((entity)vecteur_var(v)))
+	      pips_assert("no high coefficient for PHI variables in region system.\n",
+			  value_lt(vecteur_val(v),MY_MAX_CHECK));
+	  }
 	c = c->succ;
-    } 
+      }
     c = sc_inegalites(sc);
     while (c != (Pcontrainte) NULL)
-    {
+      {
 	Pvecteur v;
-	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-	{ 
-	  if (variable_phi_p((entity)vecteur_var(v)))
-	    pips_assert("no high coefficient for PHI variables in region system.\n",
-			value_lt(vecteur_val(v),MY_MAX_CHECK));
-	}
+	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ)
+	  {
+	    if (variable_phi_p((entity)vecteur_var(v)))
+	      pips_assert("no high coefficient for PHI variables in region system.\n",
+			  value_lt(vecteur_val(v),MY_MAX_CHECK));
+	  }
 	c = c->succ;
-    } 
-    return consistent;
+      }
+  }
+  return consistent;
 }
 
 
 bool regions_consistent_p(list l_reg)
 {
     bool consistent = TRUE;
-    MAP(EFFECT, reg, 
+    MAP(EFFECT, reg,
 	consistent = consistent && region_consistent_p(reg),l_reg);
     return consistent;
 }

@@ -1,0 +1,112 @@
+
+Execution of tiled code
+
+
+Initial code before tiling
+
+!     Example 4.1 in Xue 2000
+!
+!     The tiled code by Xue and by Pips give the same correct results,
+!     but they are different.
+
+      PROGRAM TILING07
+
+      REAL A(-2:9,-1:6)
+
+      DO 100 I = -2, 9                                                  0010
+         DO J = -1, 6                                                   0011
+            A(I,J) = 10*(I+2)+J+1                                       0012
+         ENDDO
+100      CONTINUE                                                       0014
+
+      DO I = 1, 9                                                       0016
+         DO J = 1, 5                                                    0017
+            A(I,J) = A(I,J-2)+A(I-3,J+1)                                0018
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,2), A(6,3)                                           0022
+
+!     Reinitialize A
+
+      DO I = -2, 9                                                      0026
+         DO J = -1, 6                                                   0027
+            A(I,J) = 10*(I+2)+J+1                                       0028
+         ENDDO
+      ENDDO
+
+!     Use tiled code from Xue
+
+      DO IT = 0, 2                                                      0034
+         DO JT = MAX(IT-1, 0), (IT+4)/2                                 0035
+            DO I = 3*IT+1, 3*IT+3                                       0036
+               DO J = MAX(-IT+2*JT+1, 1), MIN((-IT+6*JT+9)/3, 5)        0037
+                  A(I,J) = A(I,J-2)+A(I-3,J+1)                          0038
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,2), A(6,3)                                           0044
+
+      END
+
+After tiling
+
+!     Example 4.1 in Xue 2000
+!
+!     The tiled code by Xue and by Pips give the same correct results,
+!     but they are different.
+
+      PROGRAM TILING07
+
+      REAL A(-2:9,-1:6)
+
+      DO I_t = 0, 3                                                     0010
+         DO J_t = I_t/2, (I_t+7)/2
+
+            DO I = 3*I_t-2, 3*I_t                                       0010
+               DO J = MAX((-I+6*J_t-3)/3, -1), MIN((-I+6*J_t)/3, 6)     0011
+                  A(I,J) = 10*I+J+21                                    0012
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      DO I = 1, 9                                                       0016
+         DO J = 1, 5                                                    0017
+            A(I,J) = A(I,J-2)+A(I-3,J+1)                                0018
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,2), A(6,3)                                           0022
+
+!     Reinitialize A
+
+      DO I = -2, 9                                                      0026
+         DO J = -1, 6                                                   0027
+            A(I,J) = 10*(I+2)+J+1                                       0028
+         ENDDO
+      ENDDO
+
+!     Use tiled code from Xue
+
+      DO IT = 0, 2                                                      0034
+         DO JT = MAX(IT-1, 0), (IT+4)/2                                 0035
+            DO I = 3*IT+1, 3*IT+3                                       0036
+               DO J = MAX(-IT+2*JT+1, 1), MIN((-IT+6*JT+9)/3, 5)        0037
+                  A(I,J) = A(I,J-2)+A(I-3,J+1)                          0038
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, A(5,2), A(6,3)                                           0044
+
+      END
+
+Execution of tiled code
+
+
+Differences if any
+

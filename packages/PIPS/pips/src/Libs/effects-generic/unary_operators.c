@@ -191,30 +191,29 @@ effects_to_read_effects(list l_eff)
 void
 array_effects_to_may_effects(list l_eff)
 {
-    MAP(EFFECT, eff, 
+    FOREACH(EFFECT, eff, l_eff)
 	{
 	    if (!effect_scalar_p(eff))
-		effect_to_may_effect(eff);
-	}, 
-	l_eff);      
-
+            effect_to_may_effect(eff);
+	}
 }
 
+/* returned list as no sharing with parameters */
 list
 effects_dup_without_variables(list l_eff, list l_var)
 {
     list l_res = NIL;
     
-    MAP(EFFECT, eff,
+    FOREACH(EFFECT, eff,l_eff)
     {
-	if (gen_find_eq(effect_entity(eff), l_var) == entity_undefined)
-	{
-	  l_res = CONS(EFFECT, (*effect_dup_func)(eff), l_res);
-	}
+        if (gen_find_eq(effect_entity(eff), l_var) == entity_undefined)
+        {
+            l_res = CONS(EFFECT, (*effect_dup_func)(eff), l_res);
+        }
         else
-	    pips_debug(7, "Effect on variable %s removed\n",
-		       entity_local_name(effect_entity(eff)));
-    }, l_eff);
+            pips_debug(7, "Effect on variable %s removed\n",
+                    entity_local_name(effect_entity(eff)));
+    }
     return gen_nreverse(l_res);
 }
 

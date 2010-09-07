@@ -1,0 +1,281 @@
+
+Transformers for "HasNextBurst"
+
+
+//  T(HasNextBurst) {}
+
+int HasNextBurst(FILE *fp, float *Tr)
+{
+
+//  T(status) {status==0}
+
+   int status = 0;
+
+//  T() {}
+
+   char line[256];
+
+//  T() {}
+
+   char *variable;
+
+//  T(chara) {}
+
+   int chara;
+
+//  T(i) {}
+
+   int i;
+   
+   //First significant line should contain pulse repetition period, "Tr=",
+   // and the float value of Tr
+   
+
+//  T(HasEqual) {HasEqual==0}
+
+   int HasEqual = 0;
+
+//  T(EndOfFile) {EndOfFile==0}
+
+   int EndOfFile = 0;
+
+//  T(EndOfFile,HasEqual,chara,i,status) {EndOfFile<=0,
+//    EndOfFile#init<=0, HasEqual<=0, HasEqual#init<=0}
+
+   while (!HasEqual&&!EndOfFile) {
+
+//  T(HasEqual) {HasEqual==0}
+
+      HasEqual = 0;
+
+//  T(i) {i==0}
+
+      i = 0;
+l99998:      ;
+
+//  T() {}
+
+      if (!(i<255)) goto break_2;
+
+//  T(EndOfFile,HasEqual,chara,i,status) {}
+
+      line[i] = fgetc(fp);
+
+//  T(chara) {}
+
+      chara = (int) line[i];
+
+//  T() {}
+
+      if (chara<0) goto l99999;
+
+//  T(HasEqual) {}
+
+      if (line[i]=='=') 
+
+//  T(HasEqual) {HasEqual==1}
+
+         HasEqual = 1;
+
+//  T() {}
+
+      if (line[i]=='\n') goto break_2;
+
+//  T(i) {i#init<=i, i<=i#init+1}
+
+      if (line[i]!=' ') 
+
+//  T(i) {i==i#init+1}
+
+         i++;
+      goto l99998;
+l99999:      ;
+
+//  T(EndOfFile) {EndOfFile==1}
+
+      EndOfFile = 1;
+
+//  T() {}
+
+break_2:      ;
+
+//  T() {}
+
+      line[i+1] = '\0';
+   }
+
+//  T(EndOfFile,HasEqual,chara,i,status) {}
+
+   if (HasEqual) {
+
+//  T(status) {status==1}
+
+      status = 1;
+
+//  T() {}
+
+      variable = strtok(line, "=");
+
+//  T(EndOfFile,HasEqual,chara,i,status) {}
+
+      sscanf(strtok((void *) 0, "\n"), "%f", Tr);
+   }
+
+//  T(HasNextBurst) {HasNextBurst==status}
+
+   return status;
+}
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+   
+   
+
+//  T(Nraf_max) {Nraf_max==10}
+
+   int Nraf_max = 10;
+
+//  T(Nraf) {Nraf==0}
+
+   int Nraf = 0;
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+
+//  T() {}
+
+   Cplfloat out_plot[Nraf_max][100];
+
+//  T() {}
+
+   Cplfloat amb_out[100*4];
+
+//  T() {}
+
+   Cplfloat in_pulse[Nraf_max][5][32][95];
+
+
+//  T() {}
+
+   float Tr[Nraf_max];
+
+//  T() {}
+
+   FILE *fp;
+
+
+//  T() {}
+
+   char *filename = "InputStimuli.txt";
+
+//  T(main) {}
+
+   if ((fp = fopen(filename, "rb"))==(void *) 0) {
+
+//  T() {}
+
+      fprintf(stderr, "couldn't open \"%s\"!\n", filename);
+
+//  T(main) {main==1}
+
+      return 1;
+   }
+   {
+
+//  T() {}
+
+      float Trn = 0.;
+
+//  T(Nraf,Nraf_max,i) {}
+
+      while (HasNextBurst(fp, &Trn)) {
+
+//  T(Nraf,Nraf_max,i) {}
+
+         GetNextBurst(fp, 95, 5, 32, in_pulse[Nraf]);
+
+//  T() {}
+
+         Tr[Nraf] = Trn;
+
+//  T(Nraf) {Nraf==Nraf#init+1}
+
+         Nraf++;
+      }
+   }
+
+//  T(i) {}
+
+   for(i = 0; i <= Nraf-1; i += 1)
+
+//  T() {}
+
+      
+      
+      
+      /*ATL_Tr*/
+      trt_burst(95, 16, 20, 20, 5, 5, 32, 100, 5, 7, 10.0, 10000.0, 0.2, 0.03, 90, 200, 5, 12000, Tr[i], in_pulse[i], out_plot[i]);
+
+//  T() {}
+
+   RemAmbiguity(100, Nraf, out_plot, Tr, 95-16+1, 20, 20, 15, 0.03, amb_out);
+   {
+
+//  T() {}
+
+      float Trmin = Tr[0];
+
+//  T(i) {}
+
+      for(i = 0; i <= Nraf-1; i += 1)
+
+//  T() {}
+
+         if (Tr[i]<Trmin) 
+
+//  T() {}
+
+            Trmin = Tr[i];
+
+//  T(Nraf,Nraf_max,i) {}
+
+
+      RecordPlots("PlotsOut.txt", 100*4, amb_out, 15, 2*20, 0.03/(2.*Trmin), 20, 5);
+   }
+
+//  T() {}
+
+
+   printf("STAP - end of program.\n# file 'PlotsOut.txt' generated.\n");
+
+//  T(main) {main==0}
+
+   return 0;
+}
+
+Preconditions for "ModSquare"
+
+
+//  P() {}
+
+double ModSquare(Cplfloat Z)
+{
+
+//  P() {}
+
+   return Reprodconj((double) Z.re, (double) Z.im, (double) Z.re, (double) Z.im);
+}
+
+Code for "ModSquare" after partial evaluation
+
+double ModSquare(Cplfloat Z)
+{
+   return Reprodconj((double) Z.re, (double) Z.im, (double) Z.re, (double) Z.im);
+}

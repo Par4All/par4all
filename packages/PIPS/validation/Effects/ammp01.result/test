@@ -43,8 +43,9 @@ ATOM * a_m_serial(int serial)
    int i, n, a_number();
 //               <must be read   >: atomUPDATE
    if (atomUPDATE)
-//               <may be read    >: atomNUMBER atomUPDATE first
+//               <may be read    >: first
 //               <may be written >: atomNUMBER atomUPDATE
+//               <must be read   >: atomNUMBER atomUPDATE
 //               <must be written>: n
       n = a_number();
    else
@@ -101,10 +102,10 @@ ATOM * a_m_serial(int serial)
 
 Cumulated effects for "a_m_serial"
 
-//               <may be read    >: atomNUMBER ap[0][.next] 
-//                                  ap[0][.serial]
+//               <may be read    >: ap[0][.next] ap[0][.serial]
 //               <may be written >: atomNUMBER atomUPDATE lastmatched
-//               <must be read   >: atomUPDATE first ap lastmatched 
+//               <must be read   >: atomNUMBER atomUPDATE first ap 
+//                                  lastmatched 
 //                                  lastmatched[0][.serial] serial
 //               <must be written>: ap
 ATOM * a_m_serial(int serial)
@@ -112,13 +113,14 @@ ATOM * a_m_serial(int serial)
    static ATOM *ap = (void *) 0;
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <may be read    >: atomNUMBER first
+//               <may be read    >: first
 //               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomUPDATE
+//               <must be read   >: atomNUMBER atomUPDATE
 //               <must be written>: n
    if (atomUPDATE)
-//               <may be read    >: atomNUMBER atomUPDATE first
+//               <may be read    >: first
 //               <may be written >: atomNUMBER atomUPDATE
+//               <must be read   >: atomNUMBER atomUPDATE
 //               <must be written>: n
       n = a_number();
    else
@@ -223,12 +225,12 @@ int activate(int i1, int i2)
 //               <must be read   >: i2
 
    if (i2==0) {
-//               <may be read    >: atomNUMBER 
-//                                  a_m_serial:0`ap[0][.next] 
+//               <may be read    >: a_m_serial:0`ap[0][.next] 
 //                                  a_m_serial:0`ap[0][.serial]
 //               <may be written >: atomNUMBER atomUPDATE 
 //                                  a_m_serial:0`lastmatched
-//               <must be read   >: atomUPDATE first a_m_serial:0`ap 
+//               <must be read   >: atomNUMBER atomUPDATE first 
+//                                  a_m_serial:0`ap 
 //                                  a_m_serial:0`lastmatched 
 //                                  a_m_serial:0`lastmatched[0][.seria
 //                                  l] i1
@@ -257,8 +259,9 @@ int activate(int i1, int i2)
 //               <must be written>: upper
       upper = i1;
    }
-//               <may be read    >: atomNUMBER atomUPDATE first
+//               <may be read    >: first
 //               <may be written >: atomNUMBER atomUPDATE
+//               <must be read   >: atomNUMBER atomUPDATE
 //               <must be written>: numatm
 
    numatm = a_number();
@@ -282,8 +285,7 @@ int activate(int i1, int i2)
 
 Cumulated effects for "activate"
 
-//               <may be read    >: atomNUMBER atomUPDATE first 
-//                                  a_m_serial:0`ap 
+//               <may be read    >: first a_m_serial:0`ap 
 //                                  a_m_serial:0`ap[0][.next] 
 //                                  a_m_serial:0`ap[0][.serial] 
 //                                  a_m_serial:0`lastmatched 
@@ -294,7 +296,7 @@ Cumulated effects for "activate"
 //                                  a_m_serial:0`ap 
 //                                  a_m_serial:0`lastmatched 
 //                                  a_next:0`ap
-//               <must be read   >: i1 i2
+//               <must be read   >: atomNUMBER atomUPDATE i1 i2
 int activate(int i1, int i2)
 {
    int upper, lower;
@@ -314,12 +316,12 @@ int activate(int i1, int i2)
 //               <must be read   >: i2
 
    if (i2==0) {
-//               <may be read    >: atomNUMBER 
-//                                  a_m_serial:0`ap[0][.next] 
+//               <may be read    >: a_m_serial:0`ap[0][.next] 
 //                                  a_m_serial:0`ap[0][.serial]
 //               <may be written >: atomNUMBER atomUPDATE 
 //                                  a_m_serial:0`lastmatched
-//               <must be read   >: atomUPDATE first a_m_serial:0`ap 
+//               <must be read   >: atomNUMBER atomUPDATE first 
+//                                  a_m_serial:0`ap 
 //                                  a_m_serial:0`lastmatched 
 //                                  a_m_serial:0`lastmatched[0][.seria
 //                                  l] i1
@@ -350,8 +352,9 @@ int activate(int i1, int i2)
 //               <must be written>: upper
       upper = i1;
    }
-//               <may be read    >: atomNUMBER atomUPDATE first
+//               <may be read    >: first
 //               <may be written >: atomNUMBER atomUPDATE
+//               <must be read   >: atomNUMBER atomUPDATE
 //               <must be written>: numatm
 
    numatm = a_number();

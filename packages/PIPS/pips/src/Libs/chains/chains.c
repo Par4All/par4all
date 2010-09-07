@@ -214,12 +214,11 @@ static bool init_one_statement( statement st ) {
   return TRUE;
 }
 
-/* The GENKILL_xxx functions implement the computation of GEN, REF and 
- KILL sets
- from Aho, Sethi and Ullman "Compilers" (p. 612). This is slightly
- more complex since we use a structured control graph, thus fixed
- point computations can be recursively required (the correctness of
- this is probable, although not proven, as far as I can tell). */
+/* The GENKILL_xxx functions implement the computation of GEN, REF and
+ KILL sets from Aho, Sethi and Ullman "Compilers" (p. 612). This is
+ slightly more complex since we use a structured control graph, thus
+ fixed point computations can be recursively required (the correctness
+ of this is probable, although not proven, as far as I can tell). */
 
 /* KILL_STATEMENT updates the KILL set of statement ST on entity LHS. Only
  effects that modify one reference (i.e., assignments) are killed (see
@@ -235,6 +234,9 @@ static void kill_effect( set kill, effect e ) {
   if ( action_write_p(effect_action(e))
       && approximation_must_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
+          /* We only kill store effect */
+          if(!store_effect_p(theEffect)) continue;
+
           /* We avoid a self killing */
           if( e != theEffect ) {
             /* Check if there is a must conflict
@@ -1123,16 +1125,18 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     _int stin_o = statement_ordering(stin);
     _int stout_o = statement_ordering(stout);
     fprintf( stderr,
-             "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
-             statement_number(stin),
-             ORDERING_NUMBER(stin_o),
-             ORDERING_STATEMENT(stin_o),
-             stin,
-             statement_number(stout),
-             ORDERING_NUMBER(stout_o),
-             ORDERING_STATEMENT(stout_o),
-             stout,
-             ( which == ud ) ? "ud" : "dd_du" );
+	     "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s"
+	     " for \"%s\"\n",
+	     statement_number(stin),
+	     ORDERING_NUMBER(stin_o),
+	     ORDERING_STATEMENT(stin_o),
+	     stin,
+	     statement_number(stout),
+	     ORDERING_NUMBER(stout_o),
+	     ORDERING_STATEMENT(stout_o),
+	     stout,
+	     ( which == ud ) ? "ud" : "dd_du",
+	     entity_local_name(effect_to_entity(fin)));
   }
   vin = vertex_statement( stin );
 
@@ -1168,49 +1172,49 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
       if ( pointer_type_p( tin ) && pointer_type_p( tout ) ) {
 
-        /* Second version due to accuracy improvements in effect
-         computation */
-        if ( din == dout ) {
-          /* This is the standard case */
-          add_conflict_p = TRUE;
-        } else if ( din < dout ) {
-          /* a write on the shorter memory access path conflicts
+	/* Second version due to accuracy improvements in effect
+	   computation */
+	if ( din == dout ) {
+	  /* This is the standard case */
+	  add_conflict_p = TRUE;
+	} else if ( din < dout ) {
+	  /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
            depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(effect_action(fin));
-        } else /* dout < din */{
-          /* same explanation as above */
-          add_conflict_p = action_write_p(effect_action(fout));
-        }
+	  add_conflict_p = action_write_p(effect_action(fin));
+	} else /* dout < din */{
+	  /* same explanation as above */
+	  add_conflict_p = action_write_p(effect_action(fout));
+	}
       } else {
-        /* Why should we limit this test to pointers? Structures,
-         structures of arrays and arrays of structures with
-         pointers embedded somewhere must behave in the very same
-         way. Why not unify the two cases? Because we have not
-         spent enough time thinking about memory access paths. */
-        if ( din < dout ) {
-          /* a write on the shorter memory access path conflicts
-           with the longer one. If a[i] is written, then a[i][j]
-           depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(effect_action(fin));
-        } else if ( dout < din ) {
-          /* same explanation as above */
-          add_conflict_p = action_write_p(effect_action(fout));
-        }
+	/* Why should we limit this test to pointers? Structures,
+	   structures of arrays and arrays of structures with
+	   pointers embedded somewhere must behave in the very same
+	   way. Why not unify the two cases? Because we have not
+	   spent enough time thinking about memory access paths. */
+	if ( din < dout ) {
+	  /* a write on the shorter memory access path conflicts
+	     with the longer one. If a[i] is written, then a[i][j]
+	     depends on it. If a[i] is read, no conflict */
+	  add_conflict_p = action_write_p(effect_action(fin));
+	} else if ( dout < din ) {
+	  /* same explanation as above */
+	  add_conflict_p = action_write_p(effect_action(fout));
+	}
       }
 
       if ( add_conflict_p ) {
-        bool remove_this_conflict_p = FALSE;
+	bool remove_this_conflict_p = FALSE;
 
-        /* Here we filter effect on loop indices */
-        list loops = load_statement_enclosing_loops( stout );
-        FOREACH( statement, el, loops ) {
-          entity il = loop_index(statement_loop(el));
-          remove_this_conflict_p |= entities_may_conflict_p( ein, il );
-        }
+	/* Here we filter effect on loop indices */
+	list loops = load_statement_enclosing_loops( stout );
+	FOREACH( statement, el, loops ) {
+	  entity il = loop_index(statement_loop(el));
+	  remove_this_conflict_p |= entities_may_conflict_p( ein, il );
+	}
 
-        if ( !remove_this_conflict_p )
-          cs = pushnew_conflict( fin, fout, cs );
+	if ( !remove_this_conflict_p )
+	  cs = pushnew_conflict( fin, fout, cs );
       }
     }
   }
@@ -1223,15 +1227,15 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     /* Try first to find an existing vertex for this statement */
     FOREACH( successor, s, vertex_successors( vin ) ) {
       if ( successor_vertex(s) == vout ) {
-        sout = s;
-        break;
+	sout = s;
+	break;
       }
     }
     if ( successor_undefined_p(sout) ) {
       /* There is no sink vertex for this statement, create one */
       sout = make_successor( make_dg_arc_label( cs ), vout );
       vertex_successors( vin )
-          = CONS( SUCCESSOR, sout, vertex_successors( vin ));
+	= CONS( SUCCESSOR, sout, vertex_successors( vin ));
     } else {
       /* Use existing vertex for this statement */
       gen_nconc( successor_arc_label(sout), cs );

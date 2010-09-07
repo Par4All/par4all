@@ -1,4 +1,46 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return freia_aipo_global_vol(image, vol);                            /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_global_vol" in dot format
+digraph "dag_0" {
+  // inputs
+  "image" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 vol" [shape=diamond];
+  "image" -> "4 vol";
+}
+// graph for dag "dag_cleaned_0" of module "my_global_vol" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "image" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 vol" [shape=diamond];
+  "image" -> "4 vol";
+}
+
+! updated function for
+
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return freia_aipo_global_vol(image, vol);                            /*0004*/
+}
+#
 # SPOC
 #
 
@@ -102,6 +144,13 @@ freia_status my_global_vol_helper_0_0_0(freia_data2d * i0,
 }
 
 ! updated function
+
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return my_global_vol_helper_0_0_0(image, vol);                       /*0004*/
+}
+
+! cleaned up function
 
 freia_status my_global_vol(freia_data2d *image, int32_t *vol)
 {
@@ -230,6 +279,13 @@ freia_status my_global_vol_helper_0_0(
 
 
 ! updated function
+
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return my_global_vol_helper_0_0(image, vol);                         /*0004*/
+}
+
+! cleaned up function
 
 freia_status my_global_vol(freia_data2d *image, int32_t *vol)
 {

@@ -1,4 +1,46 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return freia_aipo_set_constant(o, p0);                               /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_set_constant" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 C" [shape=trapezium,orientation=270];
+  "4 C" -> "o";
+}
+// graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 C" [shape=trapezium,orientation=270];
+  "4 C" -> "o";
+}
+
+! updated function for
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return freia_aipo_set_constant(o, p0);                               /*0004*/
+}
+#
 # SPOC
 #
 
@@ -117,6 +159,13 @@ freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, ,
 }
 
 ! updated function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+}
+
+! cleaned up function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
@@ -258,6 +307,13 @@ freia_status my_set_constant_helper_0_0(
 
 
 ! updated function
+
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return my_set_constant_helper_0_0(o, p0);                            /*0004*/
+}
+
+! cleaned up function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {

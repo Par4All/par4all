@@ -142,3 +142,34 @@
 		(action), (approximation),				\
 		make_descriptor(is_descriptor_convex,system))
 
+
+/********* CELL_RELATION SHORTHANDS */
+
+#define cell_relation_first_cell(cr)\
+  interpreted_cell_cell(cell_relation_first(cr))
+
+#define cell_relation_first_interpretation_tag(cr)\
+  cell_interpretation_tag(interpreted_cell_cell_interpretation(cell_relation_first(cr)))
+
+#define cell_relation_first_value_of_p(cr)\
+  cell_interpretation_value_of_p(interpreted_cell_cell_interpretation(cell_relation_first(cr)))
+
+#define cell_relation_first_address_of_p(cr)\
+  cell_interpretation_address_of_p(interpreted_cell_cell_interpretation(cell_relation_first(cr)))
+
+#define cell_relation_second_cell(cr)\
+  interpreted_cell_cell(cell_relation_second(cr))
+
+#define cell_relation_second_interpretation_tag(cr)\
+  cell_interpretation_tag(interpreted_cell_cell_interpretation(cell_relation_second(cr)))
+
+#define cell_relation_second_value_of_p(cr)\
+  cell_interpretation_value_of_p(interpreted_cell_cell_interpretation(cell_relation_second(cr)))
+
+#define cell_relation_second_address_of_p(cr)\
+  cell_interpretation_address_of_p(interpreted_cell_cell_interpretation(cell_relation_second(cr)))
+
+#define cell_relation_approximation_tag(cr)\
+  approximation_tag(cell_relation_approximation(cr))
+
+

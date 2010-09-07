@@ -74,24 +74,27 @@ list convex_regions_precondition_compose(list l_reg, transformer context)
   }
 
   FOREACH(EFFECT, reg, l_reg) {
-    /* FI: this leads to problems when the context might become
-       later empty: there won't be any way to find out; in one
-       case I do not remember, the IN effects end up wrong;
-       however, adding descriptors for all scalar references may
-       slow down the region computation a lot. */
-    if (!effect_scalar_p(reg) ) {
-      descriptor reg_d = effect_descriptor(reg);
-      Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
+    /* Only the store effects require preconditions */
+    if(store_effect_p(reg)) {
+      /* FI: this leads to problems when the context might become
+	 later empty: there won't be any way to find out; in one
+	 case I do not remember, the IN effects end up wrong;
+	 however, adding descriptors for all scalar references may
+	 slow down the region computation a lot. */
+      if (!effect_scalar_p(reg) ) {
+	descriptor reg_d = effect_descriptor(reg);
+	Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
 
-      pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-      pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
-      region_sc_append(reg, sc_context, FALSE);
-      reg_sc = region_system(reg);
-      pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-      pips_assert("reg_sc is weakly consistent (2)", sc_weak_consistent_p(reg_sc));
+	pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+	pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
+	region_sc_append(reg, sc_context, FALSE);
+	reg_sc = region_system(reg);
+	pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+	pips_assert("reg_sc is weakly consistent (2)", sc_weak_consistent_p(reg_sc));
+      }
+      if (!region_empty_p(reg))
+	l_res = CONS(EFFECT, reg, l_res);
     }
-    if (!region_empty_p(reg))
-      l_res = CONS(EFFECT, reg, l_res);
   }
 
   return l_res;

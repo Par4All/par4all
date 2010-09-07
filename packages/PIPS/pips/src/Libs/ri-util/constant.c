@@ -269,7 +269,7 @@ Character constants are typed as int.
       if(l != (long long int)(intptr_t)l)
       {
       	pips_user_warning("some data lost in conversion, %lli is not representatble in pips \n",l);
-	l = ~(intptr_t)0;
+        l = ~(intptr_t)0;
       }
       ce = make_constant_int( (intptr_t)l); 
     }

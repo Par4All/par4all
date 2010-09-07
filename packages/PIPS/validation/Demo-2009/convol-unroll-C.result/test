@@ -166,34 +166,16 @@ l300:
          for(j = 1; j <= 510; j += 1) {
             new_image[i][j] = 0.;
 l200:            ;
-            
-            
             new_image[i][j] = new_image[i][j]+image[i-1][j-1]*kernel[0][0];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i-1][j]*kernel[0][1];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i-1][j+1]*kernel[0][2];
             kj = 3;
-            
-            
             new_image[i][j] = new_image[i][j]+image[i][j-1]*kernel[1][0];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i][j]*kernel[1][1];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i][j+1]*kernel[1][2];
             kj = 3;
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+1][j-1]*kernel[2][0];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+1][j]*kernel[2][1];
-            
-            
             new_image[i][j] = new_image[i][j]+image[i+1][j+1]*kernel[2][2];
             kj = 3;
             ki = 3;

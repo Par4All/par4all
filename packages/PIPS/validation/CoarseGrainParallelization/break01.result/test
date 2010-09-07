@@ -1,0 +1,25 @@
+// return the index of the first negative element, size if all positive
+int find_neg(int size, int a[size]);
+
+int main();
+int find_neg(int size, int a[size])
+{
+   int i = 0;
+   i = 0;
+l99999:   ;
+   if (!(i<size)) goto break_1;
+   if (a[i]<0) goto break_1;
+   i++;
+   goto l99999;
+break_1:   ;
+   return i;
+}
+int main()
+{
+   int size = 10, i = 0;
+   int a[size];
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)
+      a[i] = 0;
+   return find_neg(size, a);
+}

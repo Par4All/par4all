@@ -29,9 +29,9 @@ l1:
       for(j_t = 0; j_t <= (nj-1)/10; j_t += 1)
          for(k_t = 0; k_t <= (nk-1)/10; k_t += 1)
 
-            for(i = 10*i_t; i <= MIN(10*i_t+9, ni-1); i += 1)
-               for(j = 10*j_t; j <= MIN(nj-1, 10*j_t+9); j += 1)
-                  for(k = 10*k_t; k <= MIN(10*k_t+9, nk-1); k += 1)
+            for(i = 10*i_t; i <= pips_min(2, 10*i_t+9, ni-1); i += 1)
+               for(j = 10*j_t; j <= pips_min(2, nj-1, 10*j_t+9); j += 1)
+                  for(k = 10*k_t; k <= pips_min(2, 10*k_t+9, nk-1); k += 1)
                      x[i][j][k] = 0.;
 }
 

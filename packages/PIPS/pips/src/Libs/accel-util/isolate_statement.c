@@ -235,8 +235,10 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
                         simplify_minmax_expression(eupper,tr);
                     expression offset = copy_expression(elower);
 
+                    bool compute_upperbound_p = 
+                        !exact && (expression_minmax_p(elower)||expression_minmax_p(eupper));
                     expression dim = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
-                    if(!exact && (expression_minmax_p(elower)||expression_minmax_p(eupper)))
+                    if(compute_upperbound_p)
                         upperbound_of_expression(dim,tr);
 
                     *dims=CONS(DIMENSION,

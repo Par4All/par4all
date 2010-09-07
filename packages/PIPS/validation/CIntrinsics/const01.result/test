@@ -1,0 +1,16 @@
+
+Parsed printed file for "const01"
+
+int main()
+{
+   const char *res;
+   return 0;
+}
+
+Cumulated effetcs for "const01"
+
+int main()
+{
+   const char *res;
+   return 0;
+}

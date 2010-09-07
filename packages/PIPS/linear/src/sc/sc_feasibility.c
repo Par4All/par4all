@@ -82,7 +82,7 @@
 #define FILTERING_DENSITY_FEASIBILITY filtering_density_feasibility
 #define FILTERING_MAGNITUDE_FEASIBILITY (Value) filtering_magnitude_feasibility
 
-#endif
+#endif // FILTERING
 
 #define SWITCH_HEURISTIC_FLAG sc_switch_heuristic_flag
 

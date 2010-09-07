@@ -1,4 +1,4 @@
-* pre
+* pre-processing
 + inlining, full_unroll, dead code elim, flatten_code
 + image reuse
 + scalar deps with proper effects
@@ -8,24 +8,37 @@
 + may skip unrelated statements?
 + deal with |= ||= and similars
 + detect redundant operations? replace them with copies?
+- aliasing pointers img1 = img2 is not really managed
+- images used in the computations must all be "freia_data2d *"
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - handle different type of images (e.g. distinct BPP)
-- check/remove more implicit hypothesis
+  issue: it is not clear how the image bpp can be derived from the source
+- check/remove more implicit hypothesis?
+- image operations not in aipo/cipo: freia_common_draw_{line,rect}
+  should it be in aipo or cipo? should I consider this operation?
+- freia_aipo_cast: should it be managed as a copy?
 
 * optimizations
++ remove useless images (computed but not used...) see licensePlate
++ take advantage of commutative operators to remove operations
++ copy to remove in freia_46 and freia_47
+- should keep AIPO/software calls if accelerator calls are slower?
+  I would I know that?
 - min commutes with dilate & max with erode, or vice-versa ?
-- ??? remove useless images (computed but not used...)
-  see licensePlate freia version
+- other simple or complex algebraic optimization ideas?
+- freia_43 is not optimal because of a bad choice between three D8/E8
+- idem freia_42?
 
 * code
 + cleanup data structures?
-- record scalar deps in dag...
+- record scalar deps in dag?
 - split first on scalar deps, as it is true for any accelerator?
   not that simple with limited depth?
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
+- could separate DAG optimization as a separate phase? AIPO -> AIPO
 
 * output
 + symmetry (flipping)
@@ -44,23 +57,30 @@
 + should also detect "duplicate" measurements with a copy of the scalars
 + should detect "included" measurements (maxcoord includes max)?
   (done indirectly by the code generation, but could be done on the DAG?)
++ remove dead code on dag optimization
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
 
-* post
+* post-processing
 + remove malloc/free if not used
 + cleanup declarations
++ it seems that some unused image are not removed (license_plate_copies)
+- should cleanup dead code in generated code (ret |= 0; ...)
+  issue: some updates may be necessary in transformers and co.
 
 * validation
-- check all AIPO
++ check all AIPO
 + add more (elementary) tests?
+- add more application-level tests
 
-* bugs
+* known bugs
 + allocs may be in the middle of the calls
-- reuse of images in some cases
++ license_plate_copies takes too much time to compile? 1mn -> 4.5s
+- reuse of images in some cases when nodes are reordered... SSA?
+- wrong copy extraction order in vs_core_2, and copies not really removed
 
-* terapix
+* terapix target
 + must manage memory allocation in tiles
 + memory for measures?
 + I/O tiles : read before write
@@ -72,3 +92,25 @@
 - sequence extraction shouldn't include
   functions not implemented for the target?
 - use global max length/ops/critical path as a decision driver?
+  beware: do not extract input, even if live?!
+- extension: interface with SG terapix microcode generation
+  hard constraint: 3 "pointers" are available; border management?
+  is there anyway to somehow get the values of these pointers in a register
+  and extract the six parameters independently?
+
+* OpenCL target
++ whole image computations are okay: see freia_aipo_compiler
++ compilation benefit: only freia DAG optimizations
+- could use terapix-like tiling to help with cache?
+  if so, how to tell about the actual image "erosion"?
+- expensive memory accesses => aggregate computations would help?
+- could there be other benefits from a compiler?
+- use on-demand image transfers in "clever" runtime?
+
+* hardware generation target
+- use optimized expression DAG(s) for hardware generation
+
+* multi target ?
+- chose the best hardware depending on the compilations: criterion?
+- possibly add dynamic reconfigurations.
+- quite uneasily to do with the current implementation

@@ -879,6 +879,7 @@ char ** Pehrhart_string(Pehrhart p, const char *pname[])
         tmpf=fdopen(tmpfd,"r+");
         if(!tmpf) {
             close(tmpfd);
+            unlink(seed);
             perror(strerror(errno));
             return NULL;
         }
@@ -903,6 +904,7 @@ char ** Pehrhart_string(Pehrhart p, const char *pname[])
         enum_strings[i]=NULL;
         if(fclose(tmpf)!=0)
             perror(strerror(errno));
+        unlink(seed);
         return enum_strings;
     }
 }

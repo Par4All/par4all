@@ -1,4 +1,4 @@
-C      Check that effect on COMMON are keeped by use_def_elim
+C      Check that effect on COMMON are preserved by use_def_elim
 
        BLOCK DATA INIT
        COMMON /PILE/ H,T

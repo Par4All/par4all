@@ -70,7 +70,7 @@ list /* of string */ effect_words_reference(reference obj)
 
   if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")
       && entity_in_common_p(e)) {
-    pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
+    pc = CHAIN_SWORD(pc, entity_and_common_name(e));
   } else
     pc = CHAIN_SWORD(pc, entity_minimal_name(e));
 
@@ -120,6 +120,76 @@ list /* of string */ effect_words_reference(reference obj)
 				obj);
   return(pc);
 }
+
+/************* CELL DESCRIPTORS */
+
+/* char * pips_region_user_name(entity ent)
+ * output   : the name of entity.
+ * modifies : nothing.
+ * comment  : allows to "catch" the PHIs entities, else, it works like
+ *            pips_user_value_name() (see semantics.c).
+ */
+const char *
+pips_region_user_name(entity ent)
+{
+    /* external_value_name cannot be used because there is no need for
+       the #new suffix, but the #old one is necessary */
+    const char* name;
+    if(ent == NULL)
+	/* take care of the constant term TCST */
+	name = "";
+    else {
+	char *ent_name = entity_name(ent);
+
+	if (strncmp(ent_name, REGIONS_MODULE_NAME, 7) == 0)
+	    /* ent is a PHI entity from the regions module */
+	    name = entity_local_name(ent);
+	else
+	    name = entity_minimal_name(ent);
+    }
+
+    return name;
+}
+
+/** @brief weight function for Pvecteur passed as argument to 
+ *         sc_lexicographic_sort in prettyprint functions involving cell descriptors.
+ *
+ * The strange argument type is required by qsort(), deep down in the calls.
+ * This function is an adaptation of is_inferior_pvarval in semantics
+ */
+int
+is_inferior_cell_descriptor_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    /* The constant term is given the highest weight to push constant
+       terms at the end of the constraints and to make those easy
+       to compare. If not, constant 0 will be handled differently from
+       other constants. However, it would be nice to give constant terms
+       the lowest weight to print simple constraints first...
+
+       Either I define two comparison functions, or I cheat somewhere else.
+       Let's cheat? */
+    int is_equal = 0;
+
+    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
+      is_equal = 1;
+    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
+      is_equal = 0;
+    else if(term_cst(*pvarval2))
+      is_equal = -1;
+    else if(variable_phi_p((entity) vecteur_var(*pvarval1)) 
+	    && !variable_phi_p((entity) vecteur_var(*pvarval2)))
+      is_equal = -1;
+    else  if(variable_phi_p((entity) vecteur_var(*pvarval2)) 
+	    && !variable_phi_p((entity) vecteur_var(*pvarval1)))
+      is_equal = 1;
+    else
+	is_equal =
+	    strcmp(pips_region_user_name((entity) vecteur_var(*pvarval1)),
+		   pips_region_user_name((entity) vecteur_var(*pvarval2)));
+
+    return is_equal;
+}
+
 
 /********** POINT_TO *************/
 
@@ -274,7 +344,7 @@ list points_to_list_sort(list ptl)
    them or validation will be in trouble sooner or later. The sort
    could occur before storing the points-to information into the hash
    table or just before prettypriting it. */
-list words_points_to_list(string note, points_to_list s)
+list words_points_to_list(__attribute__((unused))string note, points_to_list s)
 {
   list l = NIL;
   int i = 0;
@@ -296,3 +366,278 @@ list words_points_to_list(string note, points_to_list s)
   return l;
 }
 
+
+/************* POINTER VALUES */
+
+int cell_compare(cell *c1, cell *c2)
+{
+  int c1_pos = 0; /* result */
+  pips_assert("gaps not handled yet (ppv1 first)", !cell_gap_p(*c1));
+  pips_assert("gaps not handled yet (ppv2 first)", !cell_gap_p(*c2));
+  
+  reference r1 = cell_reference(*c1);
+  reference r2 = cell_reference(*c2);
+  entity e1 = reference_variable(r1);
+  entity e2 = reference_variable(r2);
+
+  if(same_entity_p(e1, e2))
+    {
+      /* same entity, try to sort on number of dimensions */
+      list dims1 = reference_indices(r1);
+      list dims2 = reference_indices(r2);
+
+      size_t nb_dims1 = gen_length(dims1);
+      size_t nb_dims2 = gen_length(dims2);
+
+      c1_pos = (nb_dims1 < nb_dims2) ? -1 : ( (nb_dims1 > nb_dims2) ? 1 : 0);
+    }
+  else 
+    {
+      /* not same entity, sort on entity name */
+      /* sort on module name */
+      c1_pos = strcmp(entity_module_name(e1), entity_module_name(e2));
+      
+      /* if same module name: sort on entity local name */
+      if (c1_pos == 0)
+	{
+	  c1_pos = strcmp(entity_user_name(e1), entity_user_name(e2));
+	}
+      /* else: current module comes first, others in lexicographic order */
+      else
+	{
+	  entity module = get_current_module_entity();
+	  
+	  if (strcmp(module_local_name(module), entity_module_name(e1)) == 0)
+	    c1_pos = -1;
+	  if (strcmp(module_local_name(module), entity_module_name(e2)) == 0)
+	    c1_pos = 1;
+	}    
+    }
+
+  return c1_pos;
+}
+
+/* Compares two pointer values for sorting. The first criterion is based on names.
+ * Local entities come first; then they are sorted according to the
+ * lexicographic order of the module name, and inside each module name class,
+ * according to the local name lexicographic order. Then for a given
+ * entity name, a read effect comes before a write effect. It is assumed
+ * that there is only one effect of each type per entity. bc.
+ */
+int
+pointer_value_compare(cell_relation *ppv1, cell_relation *ppv2)
+{
+  int ppv1_pos = 0; /* result */
+  /* compare first references of *ppv1 and *ppv2 */
+
+  cell ppv1_first_c = cell_relation_first_cell(*ppv1);
+  cell ppv2_first_c = cell_relation_first_cell(*ppv2);
+
+  pips_assert("there should not be preference cells in pointer values (ppv1 first) \n", !cell_preference_p(ppv1_first_c));
+  pips_assert("there should not be preference cells in pointer values (ppv2 first) \n", !cell_preference_p(ppv2_first_c));
+
+  pips_assert("the first cell must have value_of interpretation (ppv1)\n", cell_relation_first_value_of_p(*ppv1));
+  pips_assert("the first cell must have value_of interpretation (ppv2)\n", cell_relation_first_value_of_p(*ppv2));
+
+  
+  ppv1_pos = cell_compare(&ppv1_first_c, &ppv2_first_c);
+
+  if (ppv1_pos == 0)       /* same first cells */
+    {
+      /* put second cells value_of before address_of */
+      bool ppv1_second_value_of_p = cell_relation_second_value_of_p(*ppv1);
+      bool ppv2_second_value_of_p = cell_relation_second_value_of_p(*ppv2);
+
+      ppv1_pos = (ppv1_second_value_of_p ==  ppv2_second_value_of_p) ? 0 : 
+	(ppv1_second_value_of_p ? -1 : 1);
+
+      if (ppv1_pos == 0) /* both are value_of or address_of*/
+	{
+	  /* compare second cells */
+	  cell ppv1_second_c = cell_relation_second_cell(*ppv1);
+	  cell ppv2_second_c = cell_relation_second_cell(*ppv2);
+	  ppv1_pos = cell_compare(&ppv1_second_c, &ppv2_second_c);
+
+	}    
+    }
+  return(ppv1_pos);
+}
+
+
+list words_pointer_value(cell_relation pv)
+{
+  cell first_c = cell_relation_first_cell(pv);
+  cell second_c = cell_relation_second_cell(pv);
+
+  pips_assert("there should not be preference cells in pointer values (first) \n", !cell_preference_p(first_c));
+  pips_assert("there should not be preference cells in pointer values (second) \n", !cell_preference_p(second_c));
+
+  pips_assert("gaps not handled yet (first)", !cell_gap_p(first_c));
+  pips_assert("gaps not handled yet (second)", !cell_gap_p(second_c));
+
+  pips_assert("the first cell must have value_of interpretation\n", cell_relation_first_value_of_p(pv));
+
+  list w = NIL;
+
+  reference first_r = cell_reference(first_c);
+  reference second_r = cell_reference(second_c);
+  approximation ap = cell_relation_approximation(pv);
+
+  w= gen_nconc(w, effect_words_reference(first_r));
+  w = CHAIN_SWORD(w," == ");
+  w= gen_nconc(w, effect_words_reference(second_r));
+
+  w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
+  
+  return (w);
+}
+
+#define append(s) add_to_current_line(line_buffer, s, str_prefix, tpv)
+
+/* text text_region(effect reg)
+ * input    : a region
+ * output   : a text consisting of several lines of commentaries,
+ *            representing the region
+ * modifies : nothing
+ */
+text text_pointer_value(cell_relation pv)
+{
+  text tpv = text_undefined;
+
+  boolean foresys = FALSE;
+  string str_prefix = get_comment_continuation();
+  char line_buffer[MAX_LINE_LENGTH];
+  Psysteme sc;
+  list /* of string */ ls;
+  
+  if (cell_relation_undefined_p(pv))
+    {
+	pips_user_warning("unexpected pointer value undefined\n");
+	return make_text(CONS(SENTENCE,
+			      make_sentence(is_sentence_formatted,
+					    strdup(concatenate(str_prefix, "undefined pointer value\n", NULL))),
+			      NIL));
+    }
+  else
+    tpv = make_text(NIL);
+
+  cell first_c = cell_relation_first_cell(pv);
+  cell second_c = cell_relation_second_cell(pv);
+
+  pips_assert("there should not be preference cells in pointer values (first) \n", !cell_preference_p(first_c));
+  pips_assert("there should not be preference cells in pointer values (second) \n", !cell_preference_p(second_c));
+
+  pips_assert("gaps not handled yet (first)", !cell_gap_p(first_c));
+  pips_assert("gaps not handled yet (second)", !cell_gap_p(second_c));
+
+  pips_assert("the first cell must have value_of interpretation\n", cell_relation_first_value_of_p(pv));
+
+
+  reference first_r = cell_reference(first_c);
+  reference second_r = cell_reference(second_c);
+  approximation ap = cell_relation_approximation(pv);
+  descriptor d = cell_relation_descriptor(pv);
+
+  
+  /* PREFIX
+   */
+  strcpy(line_buffer, get_comment_sentinel());
+  
+  /* REFERENCES */
+  ls = effect_words_reference(first_r);
+  
+  FOREACH(STRING, s, ls) 
+    {append(s);}
+  gen_free_string_list(ls); ls = NIL;
+
+  append(" == ");
+
+  ls = effect_words_reference(second_r);
+  if (cell_relation_second_address_of_p(pv))
+    append("&");
+  
+  FOREACH(STRING, s, ls) 
+    {append(s);}
+  gen_free_string_list(ls); ls = NIL;
+  
+  /* DESCRIPTOR */
+  /* sorts in such a way that constraints with phi variables come first.
+   */
+  if(descriptor_none_p(d)) {
+    /* FI: there is no system; it's equivalent to an empty one... */
+    append("{}");
+  } else {
+    sc = sc_copy(descriptor_convex(d));
+    sc_lexicographic_sort(sc, is_inferior_cell_descriptor_pvarval);
+    system_sorted_text_format(line_buffer, str_prefix, tpv, sc,
+			      (get_variable_name_t) pips_region_user_name,
+			      vect_contains_phi_p, foresys);
+    
+    sc_rm(sc);
+  }  
+  /* APPROXIMATION */
+  append(approximation_may_p(ap) ? " (may);" : " (exact);");
+
+  /* CLOSE */
+  close_current_line(line_buffer, tpv,str_prefix);
+   
+  return tpv;
+}
+
+/* text text_array_regions(list l_reg, string ifread, string ifwrite)
+ * input    : a list of regions
+ * output   : a text representing this list of regions.
+ * comment  : if the number of array regions is not nul, and if
+ *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
+ *            added before and after the text of the list of regions.
+ */
+text
+text_pointer_values(list lpv)
+{
+    text tpv = make_text(NIL);
+    /* in case of loose_prettyprint, at least one region to print? */
+    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    boolean one_p = FALSE;
+
+    /* GO: No redundant test anymore, see  text_statement_array_regions */
+    if (lpv != (list) HASH_UNDEFINED_VALUE && lpv != list_undefined)
+    {
+      gen_sort_list(lpv, (int (*)(const void *,const void *)) pointer_value_compare);
+      FOREACH(CELL_RELATION, pv, lpv)
+	{
+	  if (loose_p && !one_p )
+	    {
+	      ADD_SENTENCE_TO_TEXT(tpv,
+				   make_sentence(is_sentence_formatted,
+						 strdup("\n")));
+	      one_p = TRUE;
+	    }
+	  MERGE_TEXTS(tpv, text_pointer_value(pv));
+	}
+      
+      if (loose_p && one_p)
+	ADD_SENTENCE_TO_TEXT(tpv,
+			     make_sentence(is_sentence_formatted,
+					   strdup("\n")));
+    }
+    
+    return tpv;
+}
+
+void print_pointer_value(cell_relation pv)
+{
+    text t = text_pointer_value(pv);
+    print_text(stderr, t);
+    free_text(t);
+    fprintf(stderr,"\n");
+}
+
+void print_pointer_values(list lpv)
+{
+  fprintf(stderr,"\n");
+  FOREACH(CELL_RELATION, pv, lpv)
+    {
+      print_pointer_value(pv);
+    }
+    fprintf(stderr,"\n");
+}

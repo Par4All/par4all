@@ -1,4 +1,4 @@
-struct key 
+struct key
   {
     int node;
   };
@@ -6,7 +6,7 @@ struct key
 main()
 {
   int i = 1;
-  struct key 
+  struct key
   {
     int node;
   };
@@ -22,7 +22,7 @@ main()
 
 int foo()
 {
-  struct key 
+  struct key
   {
     int node;
   };
@@ -34,7 +34,7 @@ int toto()
   int i = 1;
   if (i>0)
     {
-      struct test 
+      struct test
       {
 	float a;
       };

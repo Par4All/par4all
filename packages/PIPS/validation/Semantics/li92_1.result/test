@@ -1,4 +1,7 @@
 
+Preconditiosn for "li921"
+
+
 C  P() {}
 
 C CODE FROM THE PAPER "ARRAY PRIVATIZATION FOR PARALLEL
@@ -41,3 +44,7 @@ C  P(I,J,K,M) {1<=I, N+1<=I}
       PRINT *, I, J, K, M                                               0017
 
       END
+
+Wrnings for "li921"
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning LI921 instead

@@ -1,4 +1,97 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   
+   // variable reuse & duplicate operations?
+   freia_aipo_erode_6c(o0, i, k);                                       /*0009*/
+   freia_aipo_erode_6c(t, i, k);                                        /*0010*/
+   freia_aipo_erode_6c(t, t, k);                                        /*0011*/
+   freia_aipo_dilate_6c(o1, i, k);                                      /*0012*/
+   freia_aipo_dilate_6c(o1, o1, k);                                     /*0013*/
+   freia_aipo_sub(o1, o1, t);                                           /*0014*/
+   
+   //freia_common_destruct_data(t);
+   
+   return FREIA_OK;                                                     /*0018*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_reuse_01" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "14 -" [shape=trapezium,orientation=270];
+  "14 -" -> "o1";
+  "13 D6" [shape=box];
+  "13 D6" -> "14 -" [label="o1"];
+  "12 D6" [shape=box];
+  "12 D6" -> "13 D6" [label="o1"];
+  "11 E6" [shape=box];
+  "11 E6" -> "14 -" [label="t"];
+  "10 E6" [shape=box];
+  "10 E6" -> "11 E6" [label="t"];
+  "9 E6" [shape=box];
+  "9 E6" -> "o0";
+  "i" -> "12 D6";
+  "i" -> "10 E6";
+  "i" -> "9 E6";
+}
+// graph for dag "dag_cleaned_0" of module "freia_reuse_01" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "14 -" [shape=trapezium,orientation=270];
+  "14 -" -> "o1";
+  "13 D6" [shape=box];
+  "13 D6" -> "14 -" [label="o1"];
+  "12 D6" [shape=box];
+  "12 D6" -> "13 D6" [label="o1"];
+  "11 E6" [shape=box];
+  "11 E6" -> "14 -" [label="t"];
+  "9 E6" [shape=box];
+  "9 E6" -> "11 E6" [label="o0"];
+  "9 E6" -> "o0";
+  "i" -> "12 D6";
+  "i" -> "9 E6";
+}
+
+! updated function for
+
+freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   
+   // variable reuse & duplicate operations?
+   freia_aipo_erode_6c(o0, i, k);                                       /*0009*/
+   freia_aipo_erode_6c(t, t, k);                                        /*0011*/
+   freia_aipo_dilate_6c(o1, i, k);                                      /*0012*/
+   freia_aipo_dilate_6c(o1, o1, k);                                     /*0013*/
+   freia_aipo_sub(o1, o1, t);                                           /*0014*/
+   
+   //freia_common_destruct_data(t);
+   
+   return FREIA_OK;                                                     /*0018*/
+}
+#
 # SPOC
 #
 
@@ -314,6 +407,21 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    
    return FREIA_OK;                                                     /*0018*/
 }
+
+! cleaned up function
+
+freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   
+   // variable reuse & duplicate operations?
+   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0009*/
+   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0012*/
+   
+   //freia_common_destruct_data(t);
+   
+   return 0;                                                            /*0018*/
+}
 #
 # TERAPIX
 #
@@ -564,6 +672,19 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    //freia_common_destruct_data(t);
    
    return FREIA_OK;                                                     /*0018*/
+}
+
+! cleaned up function
+
+freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
+{
+   
+   // variable reuse & duplicate operations?
+   freia_reuse_01_helper_0_0(o0, o1, i, k);                             /*0009*/
+   
+   //freia_common_destruct_data(t);
+   
+   return 0;                                                            /*0018*/
 }
 #
 # FREIA COMPILATION DONE

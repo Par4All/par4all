@@ -1,4 +1,72 @@
 #
+# AIPO
+#
+
+! initial function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_aipo_add_const(o, i, c);                                       /*0008*/
+   freia_aipo_global_min(i, r0);                                        /*0009*/
+   freia_aipo_global_max(i, r1);                                        /*0010*/
+   freia_aipo_global_vol(i, r2);                                        /*0011*/
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_15" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 vol" [shape=diamond];
+  "10 max" [shape=diamond];
+  "9 min" [shape=diamond];
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 +.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_15" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 vol" [shape=diamond];
+  "10 max" [shape=diamond];
+  "9 min" [shape=diamond];
+  "8 +." [shape=trapezium,orientation=270];
+  "8 +." -> "o";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 +.";
+}
+
+! updated function for
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_aipo_add_const(o, i, c);                                       /*0008*/
+   freia_aipo_global_min(i, r0);                                        /*0009*/
+   freia_aipo_global_max(i, r1);                                        /*0010*/
+   freia_aipo_global_vol(i, r2);                                        /*0011*/
+   return FREIA_OK;                                                     /*0012*/
+}
+#
 # SPOC
 #
 
@@ -179,6 +247,15 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
    // test re ordering of mes
    freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
    return FREIA_OK;                                                     /*0012*/
+}
+
+! cleaned up function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
+   return 0;                                                            /*0012*/
 }
 #
 # TERAPIX
@@ -382,6 +459,15 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
    // test re ordering of mes
    freia_15_helper_0_0(o, i, r0, r1, r2, c);                            /*0008*/
    return FREIA_OK;                                                     /*0012*/
+}
+
+! cleaned up function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_15_helper_0_0(o, i, r0, r1, r2, c);                            /*0008*/
+   return 0;                                                            /*0012*/
 }
 #
 # FREIA COMPILATION DONE

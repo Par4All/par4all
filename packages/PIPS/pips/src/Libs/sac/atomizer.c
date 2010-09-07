@@ -51,8 +51,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "properties.h"
-#include "properties.h"
-
 
 #include "sac.h"
 
@@ -119,7 +117,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
         if (!basic_overloaded_p(bofe))
         {
             entity newvar = (*create)(get_current_module_entity(), bofe);
-            AddEntityToCurrentModule(newvar);
+	    AddEntityToCurrentModule(newvar);
             expression rhs = make_expression(expression_syntax(e), normalized_undefined);
             normalize_all_expressions_of(rhs);
             statement assign = make_assign_statement(entity_to_expression(newvar),rhs);
@@ -171,6 +169,13 @@ static void get_type_max_width(call ca, int* maxWidth)
                     *maxWidth=MAX(*maxWidth , basic_type_size(bas));
                     free_basic(bas);
                 } break;
+            case is_syntax_cast:
+                {
+                    cast ca = syntax_cast(s);
+                    type t = cast_type(ca);
+                    *maxWidth=MAX(*maxWidth ,type_memory_size(t));
+                } break;
+
             default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
 
         }
@@ -261,13 +266,6 @@ entity sac_make_new_variable(entity module, basic b)
     AddLocalEntityToDeclarations(e,module,get_current_module_statement());
     return e;
 }
-static entity sac_get_current_lhs(entity module, basic b)
-{
-    entity current_entity = expression_scalar_p(current_lhs)?
-        expression_to_entity(current_lhs):
-        entity_undefined;
-    return entity_undefined_p(current_entity)? sac_make_new_variable(module,b): current_entity;
-}
 
 static
 void simd_do_atomize(expression ce, statement cs)
@@ -287,11 +285,8 @@ void simd_do_atomize(expression ce, statement cs)
 			 * let's atomize the current argument
              * sg: also try to be smart and make reduction appear if any
              */
-            bool potential_reduction_p = false;
-            FOREACH(EXPRESSION,e,call_arguments(cc))
-                if(same_expression_p(e,current_lhs)) potential_reduction_p = true;
-
-			if( (stat = simd_atomize_this_expression(potential_reduction_p?sac_get_current_lhs:sac_make_new_variable, ce)) )
+			
+			if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
 				simd_insert_statement(cs, stat);
 		}
 	}

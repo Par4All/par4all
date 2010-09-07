@@ -1,4 +1,56 @@
 #
+# AIPO
+#
+
+! initial function
+
+void border_se(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "border_se" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_se" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! updated function for
+
+void border_se(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+#
 # SPOC
 #
 
@@ -136,6 +188,17 @@ void border_se(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
    border_se_helper_0_0_0(out, in, kernel);                             /*0008*/
+}
+
+! cleaned up function
+
+void border_se(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   border_se_helper_0_0_0(out, in, kernel);                             /*0008*/
+   ;
 }
 #
 # TERAPIX
@@ -303,6 +366,17 @@ void border_se(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
    border_se_helper_0_0(out, in, kernel);                               /*0008*/
+}
+
+! cleaned up function
+
+void border_se(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 1, 0, 1, 1};                  /*0007*/
+   border_se_helper_0_0(out, in, kernel);                               /*0008*/
+   ;
 }
 #
 # FREIA COMPILATION DONE

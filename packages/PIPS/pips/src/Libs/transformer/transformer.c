@@ -1591,20 +1591,23 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
   transformer fptf = transformer_undefined;
 
   if(!transformer_undefined_p(p)) {
-  if(FALSE)
-  {
-    fptf = args_to_transformer(transformer_arguments(tf));
-  }
-  else
-  {
-    /* if it is expensive, maybe it should not be computed over and over...
-     */
-    fptf = transformer_derivative_fix_point(tf);
-  }
+    //transformer raw_inv = transformer_undefined;
+    if(FALSE)
+      {
+	fptf = args_to_transformer(transformer_arguments(tf));
+      }
+    else
+      {
+	/* if it is expensive, maybe it should not be computed over and over...
+	 */
+	fptf = transformer_derivative_fix_point(tf);
+      }
 
-  inv = transformer_apply(fptf, p); /* tf? fptf? */
+    inv = transformer_apply(fptf, p); /* tf? fptf? */
+    //inv = transformer_range(raw_inv);
 
-  transformer_free(fptf); /* must be freed, otherwise it is leaked. */
+    //free_transformer(raw_inv); // Newgen syntax
+    transformer_free(fptf); /* must be freed, otherwise it is leaked. */
   }
   else {
     inv = transformer_undefined;

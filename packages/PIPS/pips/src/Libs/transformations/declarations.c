@@ -86,7 +86,7 @@ static void remove_unread_variable(statement s, entity e)
                     }
                 }
                 else {
-                    pips_internal_error("case unhadled yet\nfell free to contribute :-)\n");
+                    pips_internal_error("case unhandled yet\nfell free to contribute :-)\n");
                 }
             }
         }
@@ -107,12 +107,11 @@ typedef struct {
 static void entity_used_somewhere_walker(statement s, entity_used_somewhere_param *p)
 {
     list effects =load_cumulated_rw_effects_list(s);
-    FOREACH(EFFECT,eff,effects)
-        if(effect_read_p(eff) && entities_must_conflict_p(reference_variable(effect_any_reference(eff)),p->e))
+    if(effects_read_variable_p(effects,p->e))
         { p->result = true; gen_recurse_stop(0); }
 }
 
-static bool entity_used_somewhere_p(entity e, statement in)
+static bool entity_read_somewhere_p(entity e, statement in)
 {
     entity_used_somewhere_param p = { e, false };
     gen_context_recurse(in,&p,statement_domain,gen_true,entity_used_somewhere_walker);
@@ -126,10 +125,10 @@ static void remove_unread_variables(statement s)
         {
             if(entity_variable_p(e)) {
                 if(!entity_may_conflict_with_a_formal_parameter_p(e,get_current_module_entity()) && /* it is useless to try to remove formal parameters */
-                        !entity_pointer_p(e) ) /* and we cannot afford removing something that may implies aliasing */
+                        entity_scalar_p(e) ) /* and we cannot afford removing something that may implies aliasing */
                 {
-                    bool entity_read = entity_used_somewhere_p(e,s);
-                    if(!entity_read) /* the entity is never read it is disposable */
+                    bool effects_read_variable = entity_read_somewhere_p(e,s);
+                    if(!effects_read_variable)/* the entity is never read it is disposable */
                         gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
                 }
             }
@@ -172,14 +171,15 @@ clean_declarations(char * module_name)
 
 #define expr_var(e) reference_variable(expression_reference(e))
 
-#define call_assign_p(c)						\
+#define call_assign_p(c) \
   same_string_p(entity_local_name(call_function(c)), ASSIGN_OPERATOR_NAME)
 
 struct helper {
-  string module;
-  string func_malloc;
-  string func_free;
-  set referenced;
+  int removed_vars;   // how many variables where removed
+  string module;      // current module being cleaned up
+  string func_malloc; // allocation function
+  string func_free;   // deallocation function
+  set referenced;     // referenced entities
 };
 
 // Pass 1: collect local referenced variables
@@ -197,8 +197,8 @@ static bool ignore_call_flt(call c, struct helper * ctx)
     expression val = EXPRESSION(CAR(CDR(args)));
 
     if (expression_call_p(val) &&
-	same_string_p(entity_local_name(call_function(expression_call(val))),
-		      ctx->func_malloc))
+        same_string_p(entity_local_name(call_function(expression_call(val))),
+                      ctx->func_malloc))
     {
       pips_debug(5, "malloc called\n");
       gen_recurse_stop(EXPRESSION(CAR(args)));
@@ -213,6 +213,9 @@ static bool ignore_call_flt(call c, struct helper * ctx)
 
 static bool reference_flt(reference r, struct helper * ctx)
 {
+  // pips_debug(9, "%s used in statement %" _intFMT "\n",
+  //   entity_name(reference_variable(r)),
+  //   statement_number((statement) gen_get_ancestor(statement_domain, r)));
   set_add_element(ctx->referenced, ctx->referenced, reference_variable(r));
   return true;
 }
@@ -225,12 +228,15 @@ static bool loop_flt(loop l, struct helper * ctx)
 
 static bool unused_local_variable_p(entity var, set used, string module)
 {
-  return same_string_p(entity_module_name(var), module)
+  bool unused = same_string_p(entity_module_name(var), module)
     // keep function auto-declaration for recursion
     && !same_string_p(entity_local_name(var), module)
     && !set_belong_p(used, var)
     && !formal_parameter_p(var)
     && type_variable_p(ultimate_type(entity_type(var)));
+  pips_debug(8, "%s is %sused (%d)\n",
+             entity_name(var), unused? "UN": "", set_belong_p(used, var));
+  return unused;
 }
 
 // Pass 2:
@@ -242,14 +248,14 @@ static void cleanup_call(call c, struct helper * ctx)
 
   if (same_string_p(entity_local_name(call_function(c)), ctx->func_free))
   {
-    // get FREE-d variable
+    // get FREE-d variable, which is the first and only argument
     list args = call_arguments(c);
     if (gen_length(args)==1)
     {
       expression arg = EXPRESSION(CAR(args));
       if (expression_reference_p(arg) &&
-	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
-	  replace = true;
+          unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
+        replace = true;
     }
   }
   else if (call_assign_p(c))
@@ -257,13 +263,13 @@ static void cleanup_call(call c, struct helper * ctx)
     list args = call_arguments(c);
     expression val = EXPRESSION(CAR(CDR(args)));
     if (expression_call_p(val) &&
-	same_string_p(entity_local_name(call_function(expression_call(val))),
-		      ctx->func_malloc))
+        same_string_p(entity_local_name(call_function(expression_call(val))),
+                      ctx->func_malloc))
     {
       expression arg = EXPRESSION(CAR(args));
       if (expression_reference_p(arg) &&
-	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
-	replace = true;
+          unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
+        replace = true;
     }
     // var = NULL?
   }
@@ -284,6 +290,8 @@ static void cleanup_stat_decls(statement s, struct helper * ctx)
   FOREACH(ENTITY, var, decls)
     if (!unused_local_variable_p(var, ctx->referenced, ctx->module))
       kept = CONS(ENTITY, var, kept);
+    else
+      ctx->removed_vars++;
   statement_declarations(s) = gen_nreverse(kept);
   gen_free_list(decls);
 }
@@ -299,50 +307,59 @@ static void dynamic_cleanup(string module, statement stat)
   help.func_free = get_string_property("DYNAMIC_DEALLOCATION");
   help.referenced = set_make(set_pointer);
 
-  // pass 1: collect references in code
-  gen_context_multi_recurse
-    (stat, &help,
-     reference_domain, reference_flt, gen_null,
-     loop_domain, loop_flt, gen_null,
-     call_domain, ignore_call_flt, gen_null,
-     NULL);
+  // transitive closure as dynamic allocation may depend one from another.
+  // eg in freia, images are create with the size of another...
+  do {
+    help.removed_vars = 0;
+    set_clear(help.referenced);
 
-  // and in initializations
-  FOREACH(ENTITY, var, entity_declarations(mod))
-  {
+    // pass 1: collect references in code
     gen_context_multi_recurse
-      (entity_initial(var), &help,
+      (stat, &help,
        reference_domain, reference_flt, gen_null,
+       loop_domain, loop_flt, gen_null,
        call_domain, ignore_call_flt, gen_null,
        NULL);
-  }
 
-  // pass 2: cleanup calls to  "= malloc" and "free" in code
-  gen_context_multi_recurse
-    (stat, &help,
-     call_domain, gen_true, cleanup_call,
-     statement_domain, gen_true, cleanup_stat_decls,
-     NULL);
+    // and in initializations
+    FOREACH(ENTITY, var, entity_declarations(mod))
+      gen_context_multi_recurse
+        (entity_initial(var), &help,
+         reference_domain, reference_flt, gen_null,
+         call_domain, ignore_call_flt, gen_null,
+         NULL);
 
-  // and in declarations
-  list decls = entity_declarations(mod), kept = NIL;
-  FOREACH(ENTITY, var, decls)
-  {
-    if (unused_local_variable_p(var, help.referenced, module))
+    // pass 2: cleanup calls to  "= malloc" and "free" in code
+    gen_context_multi_recurse
+      (stat, &help,
+       call_domain, gen_true, cleanup_call,
+       statement_domain, gen_true, cleanup_stat_decls,
+       NULL);
+
+    // and in declarations
+    list decls = entity_declarations(mod), kept = NIL;
+    FOREACH(ENTITY, var, decls)
     {
-      value init = entity_initial(var);
-      if (value_expression_p(init))
+      // pips_debug(8, "considering %s\n", entity_name(var));
+      if (unused_local_variable_p(var, help.referenced, module))
       {
-	free_value(init);
-	entity_initial(var) = make_value_unknown();
+        value init = entity_initial(var);
+        if (value_expression_p(init))
+        {
+          free_value(init);
+          entity_initial(var) = make_value_unknown();
+        }
+        help.removed_vars++;
       }
+      else
+        kept = CONS(ENTITY, var, kept);
     }
-    else
-      kept = CONS(ENTITY, var, kept);
-  }
-  // is it useful? declarations are attached to statements in C.
-  entity_declarations(mod) = gen_nreverse(kept);
-  gen_free_list(decls), decls = NIL;
+
+    // is it useful? declarations are attached to statements in C.
+    entity_declarations(mod) = gen_nreverse(kept);
+    gen_free_list(decls), decls = NIL;
+
+  } while (help.removed_vars>0);
 
   set_free(help.referenced);
 }

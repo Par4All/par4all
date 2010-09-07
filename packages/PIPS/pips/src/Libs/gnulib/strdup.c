@@ -1,5 +1,5 @@
-/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004, 2006, 2007 Free
-   Software Foundation, Inc.
+/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004, 2006, 2007, 2009,
+   2010 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -18,7 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _LIBC
-# include <pips_config.h>
+# include <config.h>
 #endif
 
 /* Get specification.  */

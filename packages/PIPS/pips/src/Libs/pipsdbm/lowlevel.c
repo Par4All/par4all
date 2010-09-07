@@ -85,7 +85,7 @@ static methods * get_methods(const char* name)
 
     /* get the methods! */
     m = (methods*) hash_get(cache, name);
-    if (m==(methods*)HASH_UNDEFINED_VALUE) 
+    if (m==(methods*)HASH_UNDEFINED_VALUE)
 	m = &all_methods[dbll_number_of_resources()]; /* last is unexpected */
     return m;
 }
@@ -162,7 +162,7 @@ string db_build_file_resource_name(const char* rname, const char* oname, const c
    */
   result = strdup(concatenate(oname, "/", oname, suffix, NULL));
 
-  pips_debug(8, "file name for %s[%s] with suffix '%s' is '%s'\n", 
+  pips_debug(8, "file name for %s[%s] with suffix '%s' is '%s'\n",
 	     rname, oname, suffix, result);
   return result;
 }
@@ -266,7 +266,7 @@ void dbll_save_resource(const char* rname, const char* oname, void * p)
     dbll_current_module = oname;
     m = get_methods(rname);
     if (m->write_function==no_write) {
-	pips_user_warning("resource %s of %s lost, no unload function\n", 
+	pips_user_warning("resource %s of %s lost, no unload function\n",
 			  rname, oname);
     } else {
 	f = open_resource_file(rname, oname, "w");
@@ -285,7 +285,7 @@ void * dbll_load_resource(const char* rname, const char* oname)
 
     dbll_current_module = oname;
     m = get_methods(rname);
-    if (m->read_function==no_read) 
+    if (m->read_function==no_read)
 	pips_internal_error("cannot load %s of %s, no load function\n",
 			    rname, oname);
     f = open_resource_file(rname, oname, "r");
@@ -297,7 +297,7 @@ void * dbll_load_resource(const char* rname, const char* oname)
 
 void dbll_free_resource(const char* rname, const char* oname, void * p)
 {
-    methods * m; 
+    methods * m;
     pips_debug(7, "freeing resource %s[%s] (0x%p)\n", rname, oname, p);
     m = get_methods(rname);
     m->free_function(p);

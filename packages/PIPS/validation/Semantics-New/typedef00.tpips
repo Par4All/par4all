@@ -1,0 +1,11 @@
+setproperty ABORT_ON_USER_ERROR=TRUE
+setenv WSPACE typedef00
+setenv FILE typedef00.c
+delete $WSPACE
+create $WSPACE $FILE
+display PRINTED_FILE[%ALLFUNC]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+display PRINTED_FILE[bla]
+close
+delete $WSPACE

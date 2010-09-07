@@ -357,7 +357,7 @@ static bool coarse_grain_parallelization_main(string module_name,
     independance.
 
     @param module_name is the name of the module to parallelize
-    @return TRUE in case of success. Indeed, return alway true. :-)
+    @return TRUE in case of success. Indeed, return always true. :-)
  */
 bool coarse_grain_parallelization(string module_name) {
   /* Do not use reductions: */
@@ -374,7 +374,7 @@ bool coarse_grain_parallelization(string module_name) {
     more resources.
 
     @param module_name is the name of the module to parallelize
-    @return TRUE in case of success. Indeed, return alway true. :-)
+    @return TRUE in case of success. Indeed, return always true. :-)
  */
 static bool coarse_grain_parallelization_with_reduction(string module_name) {
   /* Use reductions: */

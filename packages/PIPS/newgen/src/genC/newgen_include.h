@@ -144,7 +144,7 @@ union domain {
 } ;
 
 /* MAX_DOMAIN is the maximum number of entries in the DOMAINS table */
-#define MAX_DOMAIN 250
+#define MAX_DOMAIN 300
 
 /* hack to walk thru tabulateds... */
 extern struct gen_binding *Tabulated_bp ;

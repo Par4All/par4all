@@ -212,14 +212,17 @@ Proposition:
  */
 #define SIMPLIFIE(f) 				\
 {tag("SIMPLIFIE") 				\
-     if (value_zero_p(f.num))			\
+     if (value_zero_p(f.den))			 \
+       { MET_ZERO(f);}				 \
+     else {					 \
+       if (value_zero_p(f.num))			\
 	 f.den = VALUE_ONE;			\
      else					\
-	 SIMPL(f.num,f.den);			\
+       SIMPL(f.num,f.den);	}		\
 }
 
 #define AFF(x,y) {x.num=y.num; x.den=y.den;} /* x=y should be ok:-) */
-
+#define AFF_PX(x,y) {x->num=y.num; x->den=y.den;}
 #define INV(x,y) {x.num=y.den; x.den=y.num;} /* x=1/y */
 /* ??? value_zero_p(y.num)? 
 Then x.num != VALUE_ZERO and x.den = VALUE_ZERO, it's not good at all.(assuming y.den != VALUE_ZERO) 
@@ -502,6 +505,7 @@ We try to avoid the denominator equal to 0.
 
 #define INF(x,y) INF_MACRO(x,y,value_mult)
 #define INFOFL(x,y) INF_MACRO(x,y,value_protected_mult)
+static frac frac0={(Value)0,(Value)1,0} ;
 
 /* this is already too much...
  */
@@ -515,12 +519,301 @@ typedef struct
     intptr_t succ ;
 } hashtable_t;
 
+
+void frac_init(frac *f, int n)
+{
+  int i;
+  for (i=0;i<n;i++) {
+    f[i].num =  (Value)0;
+    f[i].den =  (Value)1;
+    f[i].numero =  0;
+  }
+}
+
+void frac_simpl(Value  *a,Value *b)
+{
+  if (value_notone_p(*b) && value_notone_p(*a) &&
+      value_notmone_p(*b) && value_notmone_p(*a))
+    {
+      register long long int lli = ABS(VALUE_TO_LONG(*a)), llj= ABS(VALUE_TO_LONG(*b)),k;
+      if (lli<llj)  {
+	long long int tmp = lli;
+	lli=llj;llj=tmp;}
+
+      while ((k=lli%llj) !=0)
+	lli=llj, llj=k;
+      value_division(*a,llj), value_division(*b,llj);
+    }
+  if (value_neg_p(*b))
+    value_oppose(*a), value_oppose(*b);
+}
+
+/* simplifie normalizes fraction f
+ */
+void frac_simplifie(frac *f)
+{
+  tag("frac_simplifie")
+    if (value_zero_p(f->den))
+      {
+	MET_ZERO((*f));}
+    else {
+      if (value_zero_p(f->num))
+	f->den = VALUE_ONE;
+      else
+	frac_simpl(&(f->num),&(f->den));
+    }
+}
+
+void frac_div(frac *x,frac y,frac z, boolean ofl_ctrl)
+{tag("FRAC_DIV")
+    if (value_zero_p(y.num))
+      {
+	MET_ZERO((*x));
+      }
+    else
+      {
+	if (value_zero_p(z.num))
+	  {
+	    fprintf(stderr,"ATTENTION : divided by zero number!");
+	    MET_ZERO((*x));
+	  }
+	else
+	  {
+	    if (ofl_ctrl == FWD_OFL_CTRL) {
+	    x->num=value_protected_mult(y.num,z.den);
+	    x->den=value_protected_mult(y.den,z.num);
+	    }
+	    else {
+	      x->num=value_mult(y.num,z.den);
+	      x->den=value_mult(y.den,z.num);
+	    }
+	    frac_simplifie(x);
+	  }
+      }
+}
+
+
+/* computes x = simplify(y*z)
+ */
+void  frac_mul(frac *x,frac y,frac z, boolean ofl_ctrl)
+{tag("FRAC_MUL")
+    if(value_zero_p(y.num) || value_zero_p(z.num))
+      MET_ZERO((*x))
+      else
+	{
+	  if (ofl_ctrl == FWD_OFL_CTRL) {
+	  x->num=value_protected_mult(y.num,z.num);
+	  x->den=value_protected_mult(y.den,z.den);
+	  }
+	  else {
+	    x->num=value_mult(y.num,z.num);
+	    x->den=value_mult(y.den,z.den);
+	  }
+	  frac_simplifie(x);
+	}
+}
+void frac_sub(frac *X,frac A,frac B, boolean ofl_ctrl)
+{ tag("FRAC_SUB")
+    if (value_zero_p(A.num))
+      X->num = value_uminus(B.num),
+	X->den = B.den;
+    else if (value_zero_p(B.num))
+      { AFF_PX(X, A); }
+    else if (value_eq(A.den,B.den))
+      {
+	X->num = value_minus(A.num,B.num);
+	X->den = A.den;
+	if (value_notone_p(A.den))
+	  { frac_simplifie(X);}
+      }
+    else /* must compute the stuff: */
+      {
+	Value ad=A.den, bd=B.den, gd, v;
+	GCD_ZERO_CTRL(gd,ad,bd);
+	if (value_notone_p(gd)) value_division(ad,gd), value_division(bd,gd);
+	if (ofl_ctrl == FWD_OFL_CTRL) {
+	  X->num = value_protected_mult(A.num,bd);
+	  v = value_protected_mult(B.num,ad);
+	  value_substract(X->num,v);
+	  v =value_protected_mult(ad,bd);
+	  X->den = value_protected_mult(v,gd);
+	}
+	else {
+	  X->num = value_mult(A.num,bd);
+	  v = value_mult(B.num,ad);
+	  value_substract(X->num,v);
+	  v =value_mult(ad,bd);
+	  X->den = value_mult(v,gd);
+	}
+	frac_simplifie(X);
+      }
+}
+
+void full_pivot_sioux(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+{
+  frac u,v,w;
+  tag("FULL_PIVOT_SIOUX")
+    AFF(u,B); AFF(v,C); INV_ZERO_CTRL(w,D); /* u*v*w == B*C/D */
+  frac_simpl(&(u.num),&(v.den));
+  frac_simpl(&(u.num),&(w.den));
+  frac_simpl(&(v.num),&(u.den));
+  frac_simpl(&(v.num),&(w.den));
+  frac_simpl(&(w.num),&(u.den));
+  frac_simpl(&(w.num),&(v.den));
+  if (ofl_ctrl == FWD_OFL_CTRL) {
+    u.num = value_protected_mult(u.num,v.num); /* u*=v */
+    u.den = value_protected_mult(u.den,v.den);
+    u.num =value_protected_mult(u.num,w.num); /* u*=w */
+    u.den =value_protected_mult(u.den,w.den);
+  }
+  else {
+    u.num = value_mult(u.num,v.num); /* u*=v */
+    u.den = value_mult(u.den,v.den);
+    u.num =value_mult(u.num,w.num); /* u*=w */
+    u.den =value_mult(u.den,w.den);
+  }
+  frac_sub(X,A,u,ofl_ctrl);
+
+}
+
+/* computes X = A - B*C/D, but does not try to avoid arithmetic exceptions
+ */
+void full_pivot_direct(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+{
+  Value v; tag("FULL_PIVOT_DIRECT") 
+	     if (ofl_ctrl == FWD_OFL_CTRL) {
+	       X->num = value_protected_mult(A.num,B.den);
+	       X->num = value_protected_mult(X->num,C.den);
+	       X->num = value_protected_mult(X->num,D.num);
+	       v = value_protected_mult(A.den,B.num);
+	       v = value_protected_mult(v,C.num);
+	       v = value_protected_mult(v,D.den);
+	       value_substract(X->num,v);
+	       X->den = value_protected_mult(A.den,B.den);
+	       X->den = value_protected_mult(X->den,C.den);
+	       X->den = value_protected_mult(X->den,D.num);
+	     }
+	     else {
+	       X->num = value_mult(A.num,B.den);
+	       X->num = value_mult(X->num,C.den);
+	       X->num = value_mult(X->num,D.num);
+	       v = value_mult(A.den,B.num);
+	       v = value_mult(v,C.num);
+	       v = value_mult(v,D.den);
+	       value_substract(X->num,v);
+	       X->den = value_mult(A.den,B.den);
+	       X->den = value_mult(X->den,C.den);
+	       X->den = value_mult(X->den,D.num);
+	     }
+  frac_simplifie(X);
+}
+void  full_pivot(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+{ tag("FULL_PIVOT")
+
+    if (direct_p(A.den) && direct_p(B.den) &&
+	direct_p(C.den) && direct_p(value_abs(D.num)))
+      {
+	full_pivot_direct(X,A,B,C,D,ofl_ctrl);
+      }
+    else
+      {
+	full_pivot_sioux(X,A,B,C,D,ofl_ctrl);
+      }
+}
+
+/* idem if A==0
+ */
+void partial_pivot_sioux(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+{
+  tag("PARTIAL_PIVOT_SIOUX")
+    frac u =  {(Value)0,(Value)1,0};
+
+  frac_mul(&u,B,C,ofl_ctrl); /* u=simplify(b*c) */
+  frac_div(X,u,D,ofl_ctrl); /* x=simplify(u/d) */
+  value_oppose(X->num);   /* x=-x */
+}
+
+void partial_pivot_direct(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+{ tag("PARTIAL_PIVOT_DIRECT") 
+    if (ofl_ctrl == FWD_OFL_CTRL) {
+      X->num = value_protected_mult(B.num,C.num);
+      X->num = value_protected_mult(X->num,D.den);
+      value_oppose(X->num);
+      X->den =value_protected_mult(B.den,C.den);
+      X->den = value_protected_mult(X->den,D.num);
+    }
+    else {
+      X->num = value_mult(B.num,C.num);
+      X->num = value_mult(X->num,D.den);
+      value_oppose(X->num);
+      X->den =value_mult(B.den,C.den);
+      X->den = value_mult(X->den,D.num);
+    }
+  frac_simplifie(X);
+}
+
+void  partial_pivot(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+{
+
+  if (direct_p(B.den) && direct_p(C.den) && direct_p(D.num))
+    {
+      partial_pivot_direct(X,B,C,D,ofl_ctrl);
+    }
+  else
+    {
+      partial_pivot_sioux(X,B,C,D,ofl_ctrl);
+    }
+}
+
+
+
+void  pivot(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+{
+  if (value_zero_p(D.num))
+    fprintf(stderr,"division of zero!!!");
+  DEBUG3(fprintf(stdout, "pivot on: ");
+	 printfrac(A);
+	 printfrac(B);
+	 printfrac(C);
+	 printfrac(D));
+  if (value_zero_p(A.num))/* a==0? */
+    {
+      if (value_zero_p(B.num) || value_zero_p(C.num) || value_zero_p(D.den))
+	{ MET_ZERO((*X)); }
+      else /* b*c/d != 0, calculons! */
+	{ partial_pivot(X,B,C,D,ofl_ctrl);}
+    }
+  else /* a!=0 */
+    if (value_zero_p(B.num) || value_zero_p(C.num) || value_zero_p(D.den))
+      { AFF_PX(X,A);}
+    else /*  b*c/d != 0, calculons! */
+      if (value_one_p(D.num) && value_one_p(A.den) &&
+	  value_one_p(B.den) && value_one_p(C.den))
+	{ /* no den to compute */
+	  Value v;
+	  if (ofl_ctrl == FWD_OFL_CTRL) {
+	    v= value_protected_mult(B.num,C.num);
+	    v = value_protected_mult(v,D.den);
+	  }
+	  else {
+	    v= value_mult(B.num,C.num);
+	    v = value_mult(v,D.den);
+	  }
+	  X->num=value_minus(A.num,v);
+	  X->den=VALUE_ONE;
+	}
+      else /* well, we must compute the full formula! */
+	{ full_pivot(X,A,B,C,D,ofl_ctrl);}
+  DEBUG3(fprintf(stdout, " = ");
+	 printfrac(X); fprintf(stdout, "\n"));
+}
+
 /* For debugging: */
 static void  __attribute__ ((unused))
 dump_hashtable(hashtable_t hashtable[]) {
   int i;
-  for(i=0;i<MAX_VAR;i++) 
-    if(hashtable[i].nom != 0) 
+  for(i=0;i<MAX_VAR;i++)
+    if(VARIABLE_DEFINED_P(hashtable[i].nom))
       printf("%s %d ", (char *) hashtable[i].nom, hashtable[i].numero),
 	print_Value(hashtable[i].val),
 	printf("\n");
@@ -535,7 +828,6 @@ dump_hashtable(hashtable_t hashtable[]) {
  */
 /* utilise'es par dump_tableau ; a rendre local */
 static int nbvariables, variablescachees[MAX_VAR], variables[MAX_VAR] ; 
-static frac frac0={0,1,0} ;/*DN: change 000 -> 010*/
 
 static void printfrac(frac x) {
     printf(" "); print_Value(x.num);
@@ -562,7 +854,7 @@ dump_tableau(char *msg, tableau *t, int colonnes) {
 	    w=1 ;
 	    for(k=0;k<t[i].taille;k++)
 		if(t[i].colonne[k].numero==j)
-		    printfrac(t[i].colonne[k]) , w=0 ;
+		  printfrac(t[i].colonne[k]) , w=0 ;
 	    if(w!=0)printfrac(frac0) ;
 	}
     }
@@ -612,7 +904,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     static hashtable_t volatile hashtable[MAX_VAR];
     Pbase volatile saved_base;
     int volatile saved_dimension;
-    tableau * volatile eg = NULL; /* tableau des egalite's  */
+    // tableau * volatile eg = NULL; /* tableau des egalite's  */
     tableau * volatile t = NULL; /* tableau des inegalite's  */
     frac * volatile nlle_colonne = NULL;
     /* les colonnes 0 et 1 sont reservees au terme const: */
@@ -624,7 +916,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     frac* colo;
     frac objectif[2] ; /* objectif de max pour simplex : 
 			  somme des (b2,c2) termes constants "inferieurs" */
-    frac rapport1, rapport2, min1, min2, pivot, cc ;
+    frac rapport1, rapport2, min1, min2, piv, cc ;
 
     
     DEBUG(static int simplex_sc_counter = 0;)
@@ -632,7 +924,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 
       soluble=1;/* int soluble = 1;*/
 
-    rapport1 =frac0, rapport2 =frac0, min1 =frac0, min2 =frac0, pivot =frac0, cc =frac0 ;
+    rapport1 =frac0, rapport2 =frac0, min1 =frac0, min2 =frac0, piv=frac0, cc =frac0 ;
     objectif[0] = frac0, objectif[1] = frac0;
     i=-1, j=-1, k=-1, h=-1, trouve=-1, hh=0, ligne=-1, i0=-1, i1=-1, jj=-1, ii=-1;
     poidsM =-1, valeur=-1, tmpval=-1,w=-1;/*DN.*/
@@ -645,11 +937,11 @@ sc_simplexe_feasibility_ofl_ctrl(
   
     saved_base = sc_base(sc);
     saved_dimension = sc_dimension(sc);
-    sc_base(sc) = BASE_NULLE;   
-    
+    sc_base(sc) = BASE_NULLE;
+
     sc_creer_base(sc);
 
-    
+
     /* Allocation a priori du tableau des egalites.
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
      */
@@ -660,53 +952,51 @@ sc_simplexe_feasibility_ofl_ctrl(
     /* DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
        sc_fprint(stdout, sc, default_variable_to_string);)*/
 
-    
     DEBUG(simplex_sc_counter ++;
-	  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
-	  sc_default_dump(sc);/*sc_default_dump_to_file(); print to file	  */
-    )
+		  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
+		  sc_default_dump(sc);/*sc_default_dump_to_file(); print to file	  */
+	  );
 
     /* the input Psysteme must be consistent; this is not the best way to
      * do this; array bound checks should be added instead in proper places;
      * no time to do it properly for the moment. BC.
      */
-    assert(sc_weak_consistent_p(sc));
+	linear_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
 
     /* Do not allocate place for NULL constraints */
     NB_EQ = 0;
     NB_INEQ = 0;
-    for(pc_tmp = sc->egalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    for(pc_tmp = sc->egalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ)
     {
 	if (pc_tmp->vecteur != NULL)
 	    NB_EQ++;
     }
-    for(pc_tmp = sc->inegalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    for(pc_tmp = sc->inegalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ)
     {
 	if (pc_tmp->vecteur != NULL)
 	    NB_INEQ++;
     }
-    
-    CATCH(simplex_arithmetic_error|timeout_error)
+
+    CATCH(simplex_arithmetic_error|timeout_error|overflow_error)
     {
       /*      ifscdebug(2) {
 	fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
 	}
       */
-      DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n");)
-      
-      for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ)
-	hashtable[i].nom = 0 ;
-      if(NB_EQ > 0) {
-	for(i=0 ; i<(3+DIMENSION) ; i++)
-	  free(eg[i].colonne);
-	free(eg);
-      }
-      
-      for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
-	free(t[i].colonne); 
-      free(t); 
-      free(nlle_colonne);  
-                  
+      DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n"););
+
+	for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ) {
+	  hashtable[i].nom =  VARIABLE_UNDEFINED ;
+	  hashtable[i].numero = 0 ;
+	  hashtable[i].hash = 0 ;
+	  hashtable[i].val = (Value)0 ;
+	}
+
+      for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)
+	free(t[i].colonne);
+      free(t);
+      free(nlle_colonne);
+
       /* restore initial base */
       base_rm(sc_base(sc));
       sc_base(sc) = saved_base;
@@ -716,7 +1006,7 @@ sc_simplexe_feasibility_ofl_ctrl(
       alarm(0); /*clear the alarm*/
 #endif
 
-      if (ofl_ctrl == FWD_OFL_CTRL) {	
+      if (ofl_ctrl == FWD_OFL_CTRL) {
 	RETHROW(); /*rethrow whatever the exception is*/
       }
       /*THROW(user_exception_error);*/
@@ -735,75 +1025,13 @@ sc_simplexe_feasibility_ofl_ctrl(
 #ifdef CONTROLING
     /*start the alarm*/
     if (CONTROLING_TIMEOUT_SIMPLEX) {
-      signal(SIGALRM, controling_catch_alarm_Simplex);   
-      alarm(CONTROLING_TIMEOUT_SIMPLEX);    
+      signal(SIGALRM, controling_catch_alarm_Simplex);
+      alarm(CONTROLING_TIMEOUT_SIMPLEX);
     } /*else nothing*/
 #endif
 
-    if(NB_EQ != 0)
-    {
-	eg=(tableau*)malloc((3+DIMENSION)*sizeof(tableau)) ;
-	for(i=0 ; i<(3+DIMENSION) ; i++)
-	{
-	    eg[i].colonne=(frac*)malloc(NB_EQ*sizeof(frac)) ;
-	    eg[i].existe = 0 ;
-	    eg[i].taille = 0 ;
-	}
-    }
 
-    /* Determination d'un numero pour chaque variable
-     */
-    for(pc=sc->egalites, ligne=1 ; pc!=0; pc=pc->succ, ligne++)
-    {
-	pv=pc->vecteur;
-	if (pv!=NULL) /* skip if empty */
-	{
-	    j=0 ; /* compteur du nb de variables de l'equation */
-	    valeur=0 ; /* le terme cst vaut 0 par defaut */
-	    for(; pv !=0 ; pv=pv->succ) {
-		if(vect_coeff(pv->var,sc_base(sc))) {
-		    j++ ;
-		    h = hash((Variable) pv->var) ; trouve=0 ;
-		    while (hashtable[h].nom != 0)  {
-			if (hashtable[h].nom==pv->var) {
-			    trouve=1 ;
-			    break ;
-			}
-			else { h = (h+1) % MAX_VAR ; }
-		    }
-		    if(!trouve) {
-			hashtable[h].succ=premier_hash ;
-			premier_hash = h ;
-			hashtable[h].val = VALUE_NAN ;
-			hashtable[h].numero=compteur++ ;
-			CREVARVISIBLE;
-			hashtable[h].nom=pv->var ;
-		    }
-		    hh = h ;
-		    assert((NUMERO) < (3+DIMENSION));
-		    eg[NUMERO].existe = 1 ;
-		    eg[NUMERO].colonne[eg[NUMERO].taille].numero=ligne ;
-		    eg[NUMERO].colonne[eg[NUMERO].taille].num = pv->val ;
-		    eg[NUMERO].colonne[eg[NUMERO].taille].den = VALUE_ONE ;
-		    eg[NUMERO].taille++ ;
-		} 
-		else { valeur = value_uminus(pv->val); 
-		       eg[0].existe = 1 ;
-		       eg[0].colonne[eg[0].taille].numero=ligne ;
-		       eg[0].colonne[eg[0].taille].num = valeur ;
-		       eg[0].colonne[eg[0].taille].den = VALUE_ONE ;
-		       eg[0].taille++ ;
-		   }
-	    }
-	    /* Cas ou` valeur de variable est connue : */
-	    if(j==1) hashtable[hh].val = valeur ;
-	    DEBUG1(if(sc->egalites!=0)
-		   dump_tableau("eg",eg,compteur);)
-	}
-	else
-	    ligne--;
-    }
-    
+
     /* Allocation a priori du tableau du simplex "t" par
      * colonnes. Soit
      * "dimension" le nombre de variables, la taille maximum
@@ -817,13 +1045,14 @@ sc_simplexe_feasibility_ofl_ctrl(
      * - colonne 1 : le terme constant (composante de poids M)
      * - colonnes 2 et suivantes : les elements initiaux
      *   et les termes d'ecart
-     * Le tableau a une derniere colonne temporaire pour 
+     * Le tableau a une derniere colonne temporaire pour
      *  pivoter un vecteur unitaire.
      *     */
-    
+
     t = (tableau*)malloc((3 + NB_INEQ + NB_EQ + DIMENSION)*sizeof(tableau));
     for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) {
         t[i].colonne= (frac*) malloc((4 + 2*NB_EQ + NB_INEQ)*sizeof(frac)) ;
+	frac_init(t[i].colonne,4 + 2*NB_EQ + NB_INEQ);
         t[i].existe = 0 ;
         t[i].taille = 1 ;
         t[i].colonne[0].numero = 0 ;
@@ -833,30 +1062,30 @@ sc_simplexe_feasibility_ofl_ctrl(
     nbvariables= 0 ;
     /* Initialisation de l'objectif */
 
-    for(i=0;i<=1;i++) 
+    for(i=0;i<=1;i++)
 	objectif[i].num=VALUE_ZERO, objectif[i].den=VALUE_ONE;
-	
+
     DEBUG2(dump_hashtable(hashtable);)
-	
+
     /* Entree des inegalites dans la table */
-    
-    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++) 
+
+    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++)
     {
 	pv=pc->vecteur;
 	if (pv!=NULL) /* skip if empty */
 	{
 	    valeur = VALUE_ZERO ;
 	    poidsM = VALUE_ZERO ;
-	    for(; pv !=0 ; pv=pv->succ) 
+	    for(; pv !=0 ; pv=pv->succ)
 		if(vect_coeff(pv->var,sc_base(sc)))
 		    value_addto(poidsM,pv->val) ;
 		else
 		    valeur = value_uminus(pv->val) ; /* val terme const */
-	    
+
 	    for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
 		if(value_notzero_p(vect_coeff(pv->var,sc_base(sc)))) {
 		    h = hash((Variable)  pv->var) ; trouve=0 ;
-		    while (hashtable[h].nom != 0)  {
+		    while (VARIABLE_DEFINED_P(hashtable[h].nom))  {
 			if (hashtable[h].nom==pv->var) {
 			    trouve=1 ;
 			    break ;
@@ -871,7 +1100,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 			hashtable[h].nom=pv->var ;
 			CREVARVISIBLE ;
 		    }
-		    assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
+		    linear_assert("current NUMERO in bound",
+						  (NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
 		    if (value_neg_p(poidsM) || 
 			(value_zero_p(poidsM) && value_neg_p(valeur)))
 			{value_addto(t[NUMERO].colonne[0].num,pv->val),
@@ -960,7 +1190,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
             if(vect_coeff(pv->var,sc_base(sc))) {
                 h = hash((Variable) pv->var) ; trouve=0 ;
-                while (hashtable[h].nom != 0)  {
+                while (VARIABLE_DEFINED_P(hashtable[h].nom))  {
                     if (hashtable[h].nom==pv->var) {
                         trouve=1 ;
                         break ;
@@ -975,16 +1205,17 @@ sc_simplexe_feasibility_ofl_ctrl(
                     CREVARVISIBLE ;
                     hashtable[h].nom=pv->var ;
                 }
-		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
-                if(value_neg_p(poidsM) || 
+				linear_assert("current NUMERO in bound",
+				  (NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
+                if(value_neg_p(poidsM) ||
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
                     {value_addto(t[NUMERO].colonne[0].num,pv->val),
 		       t[NUMERO].colonne[0].den = VALUE_ONE ;}
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
-                if(value_neg_p(poidsM) || 
+                if(value_neg_p(poidsM) ||
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    tmpval = value_uminus(pv->val); 
+                    tmpval = value_uminus(pv->val);
 		else tmpval = pv->val ;
                 t[NUMERO].colonne[t[NUMERO].taille].num = tmpval ;
                 t[NUMERO].colonne[t[NUMERO].taille].den = VALUE_ONE ;
@@ -992,7 +1223,7 @@ sc_simplexe_feasibility_ofl_ctrl(
             }
         }
 	/* Creation de variable d'ecart ? */
-        if(value_neg_p(poidsM) || 
+        if(value_neg_p(poidsM) ||
 	   (value_zero_p(poidsM) && value_neg_p(valeur))) {
             i=compteur++ ;
             CREVARVISIBLE ;
@@ -1040,7 +1271,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
             if (vect_coeff(pv->var,sc_base(sc))) {
                 h = hash((Variable) pv->var) ; trouve=0 ;
-                while (hashtable[h].nom != 0)  {
+                while (VARIABLE_DEFINED_P(hashtable[h].nom))  {
                     if (hashtable[h].nom==pv->var) {
                         trouve=1 ;
                         break ;
@@ -1144,7 +1375,8 @@ sc_simplexe_feasibility_ofl_ctrl(
      * Structures de donnees : on travaille sur des tableaux
      * de fractions rationnelles.
      */
-    nlle_colonne=(frac *) malloc((4 + 2*NB_EQ + NB_INEQ)*sizeof(frac)) ;
+    nlle_colonne=(frac *) malloc((4 + 2*NB_EQ + NB_INEQ+1)*sizeof(frac)) ;
+    frac_init(nlle_colonne,4 + 2*NB_EQ + NB_INEQ);
     while(1) {
 
         /*  Recherche d'un nombre negatif 1ere ligne  
@@ -1217,14 +1449,9 @@ sc_simplexe_feasibility_ofl_ctrl(
 			 t[jj].colonne[i].numero==t[1].colonne[i1].numero)?
 			     t[1].colonne[i1]:frac0;
 			
-		    if (ofl_ctrl == FWD_OFL_CTRL) {
-			DIVOFL(rapport1,f1,f2);
-			DIVOFL(rapport2,f3,f2);
-		    }
-		    else {
-			DIV(rapport1,f1,f2);
-			DIV(rapport2,f3,f2);
-		    }
+		    frac_div(&rapport1,f1,f2,ofl_ctrl);
+		    frac_div(&rapport2,f3,f2,ofl_ctrl);
+	
     
 		    DEBUG1(fprintf(stdout, "rapports:");
 			  printfrac(rapport1);
@@ -1250,8 +1477,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    if (cond) {
 			AFF(min1,rapport1) ;
 			AFF(min2,rapport2) ;
-			AFF(pivot,t[jj].colonne[i]) ;
-			SIMPLIFIE(pivot);
+			AFF(piv,t[jj].colonne[i]) ;
+			frac_simplifie(&piv);
 			ii=t[jj].colonne[i].numero ;
 		    }
 		} /* POSITIF(t[jj].colonne[i])) */
@@ -1335,7 +1562,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			   if (value_zero_p(t[jj].colonne[i1].den))
 			   printf("ATTENTION fraction 0/0 ");/*DN*/
 			   printfrac(cc);
-			   printfrac(pivot);)
+			   printfrac(piv);)
 		    
 		    if(i<t[j].taille &&  
 		       i1<t[jj].taille && 
@@ -1347,13 +1574,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			    frac *n = &nlle_colonne[k],
                                  *a = &t[j].colonne[i],
                                  *b = &t[jj].colonne[i1];
-			    if (ofl_ctrl == FWD_OFL_CTRL) {
- 
-				PIVOTOFL((*n), (*a), (*b), cc, pivot);
-			    }
-			    else {
-				PIVOT((*n), (*a), (*b), cc, pivot);
-			    }
+			     pivot(n, (*a), (*b), cc, piv,ofl_ctrl);
 			}
 			
 			if(i==0||nlle_colonne[k].num!=0) {
@@ -1390,15 +1611,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			    } else {
 				frac *n = &(nlle_colonne[k]),
 				     *b = &(t[jj].colonne[i1]);
-				
-				if(ofl_ctrl == FWD_OFL_CTRL)
-				{				
-				    PIVOTOFL((*n),frac0,(*b),cc,pivot) ;
-				}
-				else 
-				{
-				    PIVOT((*n),frac0,(*b),cc,pivot) ;
-				}
+				pivot(n,frac0,(*b),cc,piv,ofl_ctrl) ;
 			    }
 
 			    if(i==0||nlle_colonne[k].num!=0)
@@ -1456,14 +1669,13 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     DEBUG(fprintf(stderr,"END SIMPLEX: %d th\n",simplex_sc_counter);)
 
-    for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ)
-      hashtable[i].nom = 0 ;
-    
-    if (NB_EQ > 0) {
-      for(i=0 ; i<(3+DIMENSION) ; i++)
-	free(eg[i].colonne);
-      free(eg);
+    for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ){
+      hashtable[i].nom = VARIABLE_UNDEFINED;
+      hashtable[i].numero = 0 ;
+      hashtable[i].hash = 0 ;
+      hashtable[i].val = (Value)0 ;
     }
+
     
     for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) 
       free(t[i].colonne);
@@ -1473,7 +1685,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 #ifdef CONTROLING
     alarm(0); /*clear the alarm*/
 #endif
-    UNCATCH(simplex_arithmetic_error|timeout_error);
+    UNCATCH(simplex_arithmetic_error|timeout_error|overflow_error);
     
     /* restore initial base */
     vect_rm(sc_base(sc));

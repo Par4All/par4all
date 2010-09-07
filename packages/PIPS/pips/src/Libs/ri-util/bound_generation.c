@@ -58,15 +58,17 @@ expression *upper;
     int rank_index ;
 
     /* compute the rank d of the  index in the basis */
-    rank_index = base_find_variable_rank(base, index, (get_variable_name_t) entity_name_or_TCST);
-    debug(7, "make_bound_expression", "index :%s\n", entity_name_or_TCST(index));
-    debug(8, "make_bound_expression", "rank_index = %d\n", rank_index);
+    rank_index =
+      base_find_variable_rank(base, index,
+			      (get_variable_name_t) entity_name_or_TCST);
+    pips_debug(7, "index :%s\n", entity_name_or_TCST(index));
+    pips_debug(8, "rank_index = %d\n", rank_index);
 
     /*search constraints referencing "index" and create the list of
       expressions for lower and upper bounds */
     for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) {
 	i = level_contrainte(pc, base);
-	debug(8,"make_bound_expression","level: %d\n",i);
+	pips_debug(8,"level: %d\n",i);
 	if (ABS(i)==rank_index){	/* found */
 	    ifdebug(7) {
 		(void) fprintf(stderr, "\n constraint before :");
@@ -88,17 +90,28 @@ expression *upper;
     }
 
     /* make expressions of  lower and  upper  bounds*/
-    min = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						  "MIN"),
-			     entity_domain);
-    max = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						  "MAX"), 
-			     entity_domain);
+    if(c_language_module_p(get_current_module_entity())) {
+      /* To avoid clash with Fortran intrinsics */
+      /* pips_min and pips_max are supposed to be part of PIPS
+	 run-time. They are varargs and their first argument is the
+	 count of arguments */
+      min = entity_intrinsic(PIPS_C_MIN_OPERATOR_NAME);
+      max = entity_intrinsic(PIPS_C_MAX_OPERATOR_NAME);
+    }
+    else { // Fortran case
+      min = entity_intrinsic(MIN_OPERATOR_NAME);
+      max = entity_intrinsic(MAX_OPERATOR_NAME);
+    }
 
-    pips_assert("some entities",
+    pips_assert("entities for min and max are found",
 		min != entity_undefined && max != entity_undefined);
 
     if (gen_length(ll) > 1) {
+      if(c_language_module_p(get_current_module_entity())) {
+	int c = gen_length(ll);
+	expression ce = int_to_expression(c);
+	ll = CONS(EXPRESSION, ce, ll);
+      }
 	*lower = make_expression(make_syntax(is_syntax_call,
 					     make_call(max,ll)),
 				 normalized_undefined);
@@ -109,6 +122,11 @@ expression *upper;
     }
 
     if (gen_length(lu) > 1 ) {
+      if(c_language_module_p(get_current_module_entity())) {
+	int c = gen_length(lu);
+	expression ce = int_to_expression(c);
+	lu = CONS(EXPRESSION, ce, lu);
+      }
 	*upper = make_expression(make_syntax(is_syntax_call,
 					     make_call(min,lu)),
 				 normalized_undefined );

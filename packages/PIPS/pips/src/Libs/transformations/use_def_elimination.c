@@ -164,7 +164,9 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                  statement s2 = vertex_to_statement(v2);
                  dg_arc_label an_arc_label = successor_arc_label(a_successor);
                  ifdebug(7)
-                    fprintf(stderr, "\t%p --> %p with conflicts\n", s1, s2);
+                    fprintf(stderr, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
+                            s1, statement_ordering(s1),
+                            s2, statement_ordering(s2));
                  /* Try to find at least one of the use-def chains between
                     s and a successor: */
                  MAP(CONFLICT, a_conflict,
@@ -184,22 +186,10 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                         /* Something is useful for the current statement if
                            it writes something that is used in the current
                            statement: */
-                        if (action_read_p(effect_action(conflict_source(a_conflict)))
-                            && action_write_p(effect_action(conflict_sink(a_conflict)))) {
-                           use = s1;
-                           def = s2;
-                        }
-                        else if (action_write_p(effect_action(conflict_source(a_conflict)))
+                        if (action_write_p(effect_action(conflict_source(a_conflict)))
                                  && action_read_p(effect_action(conflict_sink(a_conflict)))) {
                            def = s1;
                            use = s2;
-                        }
-                        else
-                           /* The dependance is not a use-def one,
-                              look forward... */
-                           continue;
-                        
-                        {
                            /* Mark that we will visit the node that defined a
                               source for this statement, if not already
                               visited: */
@@ -226,11 +216,11 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                               fprintf(stderr, "\tUse: statement %p (%#zx). Def: statement %p (%#zx).\n",
                                       use, statement_ordering(use),
                                       def, statement_ordering(def));
+                           /* One use-def is enough for this variable
+                              couple: */
+                           break;
                         }
                         
-                        /* One use-def is enough for this variable
-                           couple: */
-                        break;
                      },
                         dg_arc_label_conflicts(an_arc_label));
               },
@@ -386,6 +376,7 @@ use_def_deal_if_useful(statement s)
    bool this_statement_is_a_format;
    bool this_statement_is_an_unstructured_test = FALSE;
    bool this_statement_is_a_c_return;
+   bool outside_effect_p = FALSE;
 
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
@@ -425,9 +416,32 @@ use_def_deal_if_useful(statement s)
 
    this_statement_is_a_c_return = return_statement_p(s);
 
-   if (get_debug_level() >= 6) {
+   /* Check if this statement write some other things than a local variable */
+   list effects_list = load_proper_rw_effects_list(s);
+     MAP(EFFECT, an_effect,
+      {
+        reference a_reference = effect_any_reference(an_effect);
+        entity a_touched_variable =
+        reference_variable(a_reference);
+        string current_function_local_name = entity_local_name(get_current_module_entity());
+        if(!same_string_p(entity_module_name(a_touched_variable),
+                          current_function_local_name)) {
+          outside_effect_p = TRUE;
+          pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
+                     s,
+                     entity_name(a_touched_variable),
+                     current_function_local_name);
+          break;
+        }
+      },
+      effects_list);
+
+
+   ifdebug(6) {
+      if (outside_effect_p)
+        fprintf(stderr, "Statement %p has an outside effect.\n", s);
       if (this_statement_has_an_io_effect)
-         fprintf(stderr, "Statement %p has an io effect.\n", s);
+        fprintf(stderr, "Statement %p has an io effect.\n", s);
       if (this_statement_writes_a_procedure_argument)
          fprintf(stderr,
                  "Statement %p writes an argument of its procedure.\n", s);
@@ -440,6 +454,7 @@ use_def_deal_if_useful(statement s)
    }
    
    if (this_statement_has_an_io_effect
+       || outside_effect_p
        || this_statement_writes_a_procedure_argument
        || this_statement_is_a_format
        || this_statement_is_an_unstructured_test
@@ -447,8 +462,9 @@ use_def_deal_if_useful(statement s)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
-   if (get_debug_level() >= 5)
+   ifdebug(5) {
       fprintf(stderr, "end use_def_deal_if_useful\n");
+   }
 }
 
 
@@ -707,6 +723,8 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
  * @param elem  element to check (any gen_recursifiable type is allowded)
  *
  * @return set of referenced entities
+ *
+ * FI: should be moved into ri-util?
  */
 set get_referenced_entities(void* elem)
 {

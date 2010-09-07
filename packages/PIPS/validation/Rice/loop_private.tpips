@@ -1,4 +1,5 @@
-#
+# Initial bug: distribution of a local variable declaration
+
 delete loop_private
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -14,6 +15,12 @@ create loop_private loop_private.c
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
 
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo Code for "main" after privatization
+echo
+
 apply PRIVATIZE_MODULE(main)
 
 display PRINTED_FILE(main)
@@ -26,10 +33,20 @@ setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
 
+echo
+echo Parallelized code for "main"
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Compilation of result
+echo
+
 apply UNSPLIT
 shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
 
 close
-delete loop_private
+#delete loop_private
 quit
 # EOF

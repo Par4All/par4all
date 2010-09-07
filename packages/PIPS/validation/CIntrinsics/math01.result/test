@@ -1,0 +1,26 @@
+
+Parsed printed file for "math01"
+
+int main()
+{
+   double round(double x);
+   float roundf(float x);
+   long double roundl(long double x);
+   long int lround(double x);
+   long long int llroundl(long double x);
+
+   return 0;
+}
+
+Cumulated effetcs for "math01"
+
+int main()
+{
+   double round(double x);
+   float roundf(float x);
+   long double roundl(long double x);
+   long int lround(double x);
+   long long int llroundl(long double x);
+
+   return 0;
+}

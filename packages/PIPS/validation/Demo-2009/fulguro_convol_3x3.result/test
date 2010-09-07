@@ -76,24 +76,13 @@ void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_
    register fgUINT16 val;
    register int i, k;
    //PIPS generated variable
-   unsigned short _return0;
+   fgUINT16 _return0;
    i = pos*spp;
 
    for(k = 0; k <= spp-1; k += 1) {
       _return0 = data_array[i];
       val = _return0;
-      {
-         //PIPS generated variable
-         fgUINT16 *array0;
-         //PIPS generated variable
-         int pos0;
-         //PIPS generated variable
-         fgUINT16 value0;
-         array0 = vector_array;
-         pos0 = k;
-         value0 = val;
-         array0[pos0] = value0;
-      }
+      vector_array[k] = val;
       i++;
    }
 }
@@ -114,24 +103,13 @@ void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_
    register fgUINT16 val;
    register int i, k;
    //PIPS generated variable
-   unsigned short _return0;
+   fgUINT16 _return0;
    i = pos*spp;
 
    for(k = 0; k <= spp-1; k += 1) {
       _return0 = vector_array[k];
       val = _return0;
-      {
-         //PIPS generated variable
-         fgUINT16 *array0;
-         //PIPS generated variable
-         int pos0;
-         //PIPS generated variable
-         fgUINT16 value0;
-         array0 = data_array;
-         pos0 = i;
-         value0 = val;
-         array0[pos0] = value0;
-      }
+      data_array[i] = val;
       i++;
    }
 }
@@ -157,81 +135,38 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    int w = nhb->size_x;
    int h = nhb->size_y;
    //PIPS generated variable
-   enum {FLGR_RET_OK, FLGR_RET_TYPE_UNKNOWN=-1, FLGR_RET_TYPE_DIFFERENT=-2, FLGR_RET_SIZE_ERROR=-3, FLGR_RET_ALLOCATION_ERROR=-4, FLGR_RET_CONNEXITY_UNKNOWN=-5, FLGR_RET_PARAM_UNKNOWN=-6, FLGR_RET_NOT_IMPLEMENTED=-7, FLGR_RET_UNDEFINED_ERROR=-8, FLGR_RET_NULL_OBJECT=-9, FLGR_RET_VECTOR_SIZE_DIFFERENT=-10, FLGR_RET_VECTOR_SIZE_ERROR=-11, FLGR_RET_PARAM_ERROR=-12} _return0;
+   FLGR_Ret _return0;
    {
-      //PIPS generated variable
-      FLGR_Vector *vctdest0;
-      //PIPS generated variable
-      fgUINT16 scalar0;
-      vctdest0 = vec;
-      scalar0 = 0;
-      {
-         int k;
-         fgUINT16 *vctar = (fgUINT16 *) vctdest0->array;
-         for(k = 0; k <= vctdest0->spp-1; k += 1) {
-            {
-               //PIPS generated variable
-               fgUINT16 *array1;
-               //PIPS generated variable
-               int pos1;
-               //PIPS generated variable
-               fgUINT16 value1;
-               array1 = vctar;
-               pos1 = k;
-               value1 = scalar0;
-               array1[pos1] = value1;
-            }
-         }
-      }
+      int k;
+      fgUINT16 *vctar = (fgUINT16 *) vec->array;
+      for(k = 0; k <= vec->spp-1; k += 1)
+         vctar[k] = 0;
    }
    for(j = w/2+1; j <= w-1; j += 1) {
       {
          //PIPS generated variable
-         FLGR_Data2D *dat0;
-         //PIPS generated variable
-         int row0, col0;
-         //PIPS generated variable
-         FLGR_Vector *vct0;
-         dat0 = nhb;
-         row0 = h/2;
-         col0 = j;
-         vct0 = vec;
+         int I_0;
+         I_0 = h/2;
          {
             fgUINT16 *array_s;
             fgUINT16 *array_d;
-            array_s = (fgUINT16 *) vct0->array;
-            array_d = (fgUINT16 *) (dat0->array)[row0];
+            array_s = (fgUINT16 *) vec->array;
+            array_d = (fgUINT16 *) (nhb->array)[I_0];
             {
                //PIPS generated variable
-               fgUINT16 *data_array0, *vector_array0;
-               //PIPS generated variable
-               int spp0, pos0;
-               data_array0 = array_d;
-               vector_array0 = array_s;
-               spp0 = vct0->spp;
-               pos0 = col0;
+               int I_0_;
+               I_0_ = vec->spp;
                {
                   register fgUINT16 val;
                   register int i, k;
                   //PIPS generated variable
-                  unsigned short _return0;
-                  i = pos0*spp0;
+                  fgUINT16 _return0;
+                  i = j*I_0_;
 
-                  for(k = 0; k <= spp0-1; k += 1) {
-                     _return0 = vector_array0[k];
+                  for(k = 0; k <= I_0_-1; k += 1) {
+                     _return0 = array_s[k];
                      val = _return0;
-                     {
-                        //PIPS generated variable
-                        fgUINT16 *array0;
-                        //PIPS generated variable
-                        int pos0_;
-                        //PIPS generated variable
-                        fgUINT16 value0;
-                        array0 = data_array0;
-                        pos0_ = i;
-                        value0 = val;
-                        array0[pos0_] = value0;
-                     }
+                     array_d[i] = val;
                      i++;
                   }
                }
@@ -242,54 +177,26 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    for(i = h/2+1; i <= h-1; i += 1)
       for(j = 0; j <= w-1; j += 1) {
          {
-            //PIPS generated variable
-            FLGR_Data2D *dat1;
-            //PIPS generated variable
-            int row1, col1;
-            //PIPS generated variable
-            FLGR_Vector *vct1;
-            dat1 = nhb;
-            row1 = i;
-            col1 = j;
-            vct1 = vec;
+            fgUINT16 *array_s;
+            fgUINT16 *array_d;
+            array_s = (fgUINT16 *) vec->array;
+            array_d = (fgUINT16 *) (nhb->array)[i];
             {
-               fgUINT16 *array_s;
-               fgUINT16 *array_d;
-               array_s = (fgUINT16 *) vct1->array;
-               array_d = (fgUINT16 *) (dat1->array)[row1];
+               //PIPS generated variable
+               int I_0;
+               I_0 = vec->spp;
                {
+                  register fgUINT16 val;
+                  register int i_, k;
                   //PIPS generated variable
-                  fgUINT16 *data_array0, *vector_array0;
-                  //PIPS generated variable
-                  int spp0, pos0;
-                  data_array0 = array_d;
-                  vector_array0 = array_s;
-                  spp0 = vct1->spp;
-                  pos0 = col1;
-                  {
-                     register fgUINT16 val;
-                     register int i, k;
-                     //PIPS generated variable
-                     unsigned short _return0;
-                     i = pos0*spp0;
+                  fgUINT16 _return0;
+                  i_ = j*I_0;
 
-                     for(k = 0; k <= spp0-1; k += 1) {
-                        _return0 = vector_array0[k];
-                        val = _return0;
-                        {
-                           //PIPS generated variable
-                           fgUINT16 *array0;
-                           //PIPS generated variable
-                           int pos0_;
-                           //PIPS generated variable
-                           fgUINT16 value0;
-                           array0 = data_array0;
-                           pos0_ = i;
-                           value0 = val;
-                           array0[pos0_] = value0;
-                        }
-                        i++;
-                     }
+                  for(k = 0; k <= I_0-1; k += 1) {
+                     _return0 = array_s[k];
+                     val = _return0;
+                     array_d[i_] = val;
+                     i_++;
                   }
                }
             }
@@ -299,11 +206,11 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    if (vec->array==(void *) 0) goto l99998;
    {
       //PIPS generated variable
-      void *P_0;
-      P_0 = vec->array;
+      void *P_4;
+      P_4 = vec->array;
       
       
-      free(P_0);
+      free(P_4);
    }
    
    

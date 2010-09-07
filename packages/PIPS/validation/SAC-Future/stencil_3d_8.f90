@@ -1,11 +1,25 @@
-program main
-
+! sum all the elements of the array
+real function sum_array (array, n1, n2, n3)
   implicit none
-  integer :: n1,n2,n3,L,i1,i2,i3,is1,ie1,is2,ie2,is3,ie3,nt
-  parameter(L=4, n1=100, n2=100, n3=100, nt=10)
-  real, dimension(:,:,:), allocatable :: u,v,v1,v2,v3
+  integer :: n1,n2,n3,i1,i2,i3
+  real array(n1,n2,n3)
+
+  do i3=1, n3
+     do i2=1, n2
+        do i1=1, n1
+           sum_array = sum_array + array(i1,i2,i3)
+        end do
+     end do
+  end do
+end function sum_array
+
+program main
+  implicit none
+  integer :: n1,n2,n3,L,is1,ie1,is2,ie2,is3,ie3
+  parameter(L=4, n1=100, n2=100, n3=100)
+  real, dimension(:,:,:), allocatable :: u,v
   real, dimension(-L:L) :: c
-  real d(3)
+  real result, sum_array
 
   is1=1;ie1=n1
   is2=1;ie2=n2
@@ -17,8 +31,10 @@ program main
   allocate(u(n1,n2,n3))
 
   ! Simple case
-  u = 1.; v = 2.;
+  u = 1.; v = 1.;
   call stencil8(u,v,c,n1,n2,n3,is1,ie1,is2,ie2,is3,ie3)
+  result = sum_array (u, n1, n2, n3)
+  PRINT *, ("the sum is"), result
   deallocate(v)
   deallocate(u)
 
@@ -28,11 +44,11 @@ subroutine stencil8(u,v,c,n1,n2,n3,is1,ie1,is2,ie2,is3,ie3)
   ! Stencil length : 2*L
 
   implicit none
-  integer :: i1,i2,i3,is1,ie1,is2,ie2,is3,ie3,n1,n2,n3,b,i,s,L
+  integer :: i1,i2,i3,is1,ie1,is2,ie2,is3,ie3,n1,n2,n3,L
   parameter(L=4)
   real, dimension(n1,n2,n3) :: u, v
   real, dimension(-L:L) :: c
-  real c_8,c_7,c_6,c_5,c_4,c_3,c_1, c_2, c0, c1, c2,c3,c4,c5,c6,c7,c8
+  real c_4,c_3,c_1, c_2, c0, c1, c2,c3,c4
 
   c_4 = c(-4); c_3 = c(-3); c_2 = c(-2); c_1 = c(-1);
   c0 = c(0);

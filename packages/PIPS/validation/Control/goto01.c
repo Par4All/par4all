@@ -1,0 +1,17 @@
+foo() {
+    int i;
+    if(i>0) goto l12;
+    {
+        int j=1;
+        i+=j;
+l12:
+        i+=j;
+    }
+    if(i>0) goto l13;
+    else {
+        int j=1;
+        i+=1;
+    }
+l13:;
+    return 1;
+}

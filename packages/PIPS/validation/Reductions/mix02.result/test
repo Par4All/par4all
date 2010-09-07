@@ -1,0 +1,15 @@
+int main()
+{
+   int m = 0;
+   float y = .5;
+   int result = 0;
+//  loop sum[result],
+   for(m = 0; m <= 9; m += 1) {
+//  call sum[result],
+      result += m;
+      y = cos(y);
+   }
+//  call sum[result],
+   result += y*10.0;
+   return result;
+}

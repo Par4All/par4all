@@ -200,7 +200,7 @@ bool gen_equals(const list l0, const list l1,gen_eq_func_t equals)
         POP(iter0);
         POP(iter1);
     }
-    return true;
+    return ENDP(iter0)&&ENDP(iter1);
 
 }
 
@@ -582,6 +582,24 @@ void gen_substitute_chunk_by_list(list * pl, const void * o, list sl)
 	pc = &CDR(*pc);
       }
     }
+}
+
+/* substitute all item s by t in list l
+ * @return whether the substitution was performed
+ */
+bool gen_replace_in_list(list l, const void * s, const void * t)
+{
+  bool done = false;
+  while (l)
+  {
+    if (CHUNK(CAR(l))==s)
+    {
+      CHUNK(CAR(l)) = (gen_chunk*) t;
+      done=true;
+    }
+    l = CDR(l);
+  }
+  return done;
 }
 
 /* remove item o from list *pl which is modified as a side effect.

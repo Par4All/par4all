@@ -72,9 +72,6 @@ class Object:
 		#--- Retrieve command line information ---
 		cflags = argv
 
-		#Retrieve object file name
-		self.objectfile = os.path.relpath(ofile(cflags), getPipsWD())
-
 		#Retrieve source file from arguments
 		for opt in cflags:
 			if fnmatch.fnmatch(opt, "*.c"):
@@ -82,6 +79,12 @@ class Object:
 				sourcefile=opt
 		self.cname = os.path.relpath(sourcefile, getPipsWD())
 
+
+		#Retrieve object file name
+		objfile = ofile(cflags)
+		if objfile == "":
+			objfile = sourcefile[0:sourcefile.rfind(".")] + ".o"
+		self.objectfile = os.path.relpath(objfile, getPipsWD())
 
 		#Clean cflags from some unused flags
 		optRemove(cflags, '-o',True)
@@ -279,8 +282,6 @@ class ArObject:
 		if exitcode != 0:
 			exit(exitcode)
 
-	def __str__(self):
-		return "args : " + " ".join(self.args) + "\nfiles : " + " ".join(self.files) + "\noutput : " + self.output
 
 class _CCWorkspace:
 	def __init__(self):
@@ -297,11 +298,11 @@ class _CCWorkspace:
 			pipsgccLog.write("Diff is :\n%s\n" % Object.equDiff)
 
 
-        def __str__(self):
-		return "Workspace :\n" + "\nObject ".join(map(str,self.objects))
+class CCWorkspace:
+	def __init__(self, ws, sourceList, **kargs):
+		dir = sourceList[0]
+		del sourceList[0]
 
-class CCWorkspace(pyps.workspace):
-	def __init__(self, dir):
 		if not os.path.isdir(dir): raise ValueError("'" + dir + "' is not a directory")
 		filename=os.path.join(dir, "workspace")
 		if not os.path.isfile(filename): raise ValueError("'" + filename + "' doesn't exist")
@@ -312,16 +313,12 @@ class CCWorkspace(pyps.workspace):
 		self.objects = ws.objects
 		self.dir = dir
 
-		sourceList = []
 		for obj in self.objects:
 			if isinstance(obj, Object):
 				sourceList.append(os.path.join(dir,obj.getCName()))
 		sourceList = list(set(sourceList)) #Remove duplicates
 
-		pyps.workspace.__init__(self, sourceList)
-
-        def __str__(self):
-		return "Workspace :\n" + "\nObject ".join(map(str,self.objects))
+		#pyps.workspace.__init__(self, sourceList)
 
 	#Reimplements workspace.compile
 	def compile(self,CC="gcc",CFLAGS="", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):

@@ -1,0 +1,9 @@
+delete regions-out-in-a-loop
+create regions-out-in-a-loop regions-out-in-a-loop.c
+
+apply PRINT_CODE_OUT_REGIONS[%ALL]
+
+display PRINTED_FILE[%ALL]
+
+close
+quit

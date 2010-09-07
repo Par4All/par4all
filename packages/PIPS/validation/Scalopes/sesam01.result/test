@@ -1,0 +1,71 @@
+void P4A_sesam_task_0()
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   int *P_0;
+   sesam_reserve_data((sizeof(int[100])-1+1)/sesam_get_page_size()+1);
+   sesam_data_assignation(0, (sizeof(int[100])-1+1)/sesam_get_page_size()+1, 1);
+   P_0 = sesam_map_data(0);
+   sesam_wait_dispo(0, 0, 1, 0);
+   for(i = 1; i <= 100; i += 1)
+      P_0[-1+i] = -1+i;
+   sesam_send_dispo(0, 0, 0);
+   sesam_unmap_data(P_0);
+   sesam_chown_data(0, 1);
+}
+void P4A_sesam_task_1()
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   int *P_2, *P_1;
+   sesam_reserve_data((sizeof(int[100])-1+1)/sesam_get_page_size()+1);
+   sesam_data_assignation(1, (sizeof(int[100])-1+1)/sesam_get_page_size()+1, 1);
+   P_1 = sesam_map_data(1);
+   P_2 = sesam_map_data(0);
+   sesam_wait_dispo(1, 0, 1, 0);
+   sesam_wait_dispo(0, 0, 0, 0);
+
+   for(i = 1; i <= 100; i += 1)
+      P_1[-1+i] = P_2[-1+i]*2+1;
+   sesam_send_dispo(1, 0, 0);
+   sesam_send_dispo(0, 0, 1);
+   sesam_unmap_data(P_1);
+   sesam_unmap_data(P_2);
+}
+int main()
+{
+   int i;
+   P4A_sesam_task_0();
+   i = 100;
+
+   P4A_sesam_task_1();
+   i = 100;
+}
+void sesam_chown_data(int id_data, int id_task)
+{
+}
+void sesam_data_assignation(int id, int size, int mode)
+{
+}
+int sesam_get_page_size()
+{
+   return 1;
+}
+int * sesam_map_data(int id)
+{
+   return &id;
+}
+void sesam_reserve_data(int size)
+{
+}
+void sesam_send_dispo(int id, int page, int mode)
+{
+}
+void sesam_unmap_data(int *id)
+{
+}
+void sesam_wait_dispo(int id, int page, int mode)
+{
+}

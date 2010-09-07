@@ -329,8 +329,15 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
   if (anywhere_effect_p(f))
     {return;}
 
+  /* Only scalar entities can be privatized */
   if( !entity_scalar_p( e )) {
     return ;
+  }
+
+  /* Only program variables can be privatized. This test may not be
+     strong enough to guarantee that e is a program variable */
+  if(!entity_variable_p(e)) {
+    return;
   }
 
   ls = load_statement_enclosing_loops(st);
@@ -395,42 +402,49 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
     FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) {
       effect sc = conflict_source( c ) ;
       effect sk = conflict_sink( c ) ;
-      cons *prefix ;
 
-      /* Take into account def-def and use-def arcs only */
-      if(!entities_may_conflict_p( e, effect_entity( sc )) ||
-	 !entities_may_conflict_p( e, effect_entity( sk )) ||
-	 action_write_p( effect_action( sk))) {
-	continue ;
-      }
-      /* PC dependance and the sink is a loop index */
-      if(action_read_p( effect_action( sk )) &&
-	 (instruction_loop_p( succ_i) ||
-	  is_implied_do_index( e, succ_i))) {
-	continue ;
-      }
-      pips_debug(5,"Conflict for %s between statements %td and %td\n",
-		 entity_local_name(e),
-		 statement_number(st),
-		 statement_number(succ_st));
+      if(store_effect_p(sc)) {
+	/* Only store effects are considered for privatization */
+	list prefix = list_undefined;
 
-      if (v==succ_v) {
-	/* No decision can be made from this couple of effects alone */
-	;
-	//pips_debug(5,"remove %s from locals in all enclosing loops\n",
-	//	   entity_local_name(e));
-	//update_locals( NIL, ls, e ); /* remove e from all enclosing loops */
-      }
-      else {
-	pips_debug(5,"remove %s from locals in non common enclosing loops\n",
-		   entity_local_name(e));
-	prefix = loop_prefix( ls, succ_ls ) ;
-	/* e cannot be a local variable at a lower level than
-	   the common prefix because of this dependence
-	   arc. */
-	update_locals( prefix, ls, e ) ;
-	update_locals( prefix, succ_ls, e ) ;
-	gen_free_list( prefix ) ;
+	pips_assert("Both effects sc and sk are of the same kind",
+		    store_effect_p(sk));
+
+	/* Take into account def-def and use-def arcs only */
+	if(!entities_may_conflict_p( e, effect_entity( sc )) ||
+	   !entities_may_conflict_p( e, effect_entity( sk )) ||
+	   action_write_p( effect_action( sk))) {
+	  continue ;
+	}
+	/* PC dependance and the sink is a loop index */
+	if(action_read_p( effect_action( sk )) &&
+	   (instruction_loop_p( succ_i) ||
+	    is_implied_do_index( e, succ_i))) {
+	  continue ;
+	}
+	pips_debug(5,"Conflict for %s between statements %td and %td\n",
+		   entity_local_name(e),
+		   statement_number(st),
+		   statement_number(succ_st));
+
+	if (v==succ_v) {
+	  /* No decision can be made from this couple of effects alone */
+	  ;
+	  //pips_debug(5,"remove %s from locals in all enclosing loops\n",
+	  //	   entity_local_name(e));
+	  //update_locals( NIL, ls, e ); /* remove e from all enclosing loops */
+	}
+	else {
+	  pips_debug(5,"remove %s from locals in non common enclosing loops\n",
+		     entity_local_name(e));
+	  prefix = loop_prefix( ls, succ_ls ) ;
+	  /* e cannot be a local variable at a lower level than
+	     the common prefix because of this dependence
+	     arc. */
+	  update_locals( prefix, ls, e ) ;
+	  update_locals( prefix, succ_ls, e ) ;
+	  gen_free_list( prefix ) ;
+	}
       }
     }
   }

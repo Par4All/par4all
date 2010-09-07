@@ -1,48 +1,47 @@
 int main()
 {
-   int i = 5;
-   printf("Begin\n");
-   if ((rand()&1)==0) goto l99999;
+   {
+      int i = 5;
+      printf("Begin\n");
+      if ((rand()&1)==0) goto l99999;
 
 
-   
-   /* The a label */
-   
-a:   printf("a\n");
-   /* The b label */
-   ;
-l99998:   ;
+      
+      /* The a label */
+      
+a:      printf("a\n");
+      /* The b label */
+      ;
+l99998:      ;
 
-   /* The b label */
-b:   printf("b\n");
-   /* Oh, go to a... */
-   ;
-   goto a;
-l99999:   ;
+      /* The b label */
+b:      printf("b\n");
+      /* Oh, go to a... */
+      ;
+      goto a;
+l99999:      ;
 
-   goto l99998;
+      goto l99998;
+   }
 }
 
 //  P() {}
 
 int main()
 {
+   {
 
 //  P() {}
 
-   int i = 5;
+      int i = 5;
 
 //  P(i) {i==5}
 
-   printf("Begin\n");
+      printf("Begin\n");
 
 //  P(i) {i==5}
 
-   if ((rand()&1)==0) goto l99999;
-
-//  P(i) {i==5}
-
-
+      if ((rand()&1)==0) goto l99999;
 
 //  P(i) {i==5}
 
@@ -50,37 +49,42 @@ int main()
 
 //  P(i) {i==5}
 
-   
-   /* The a label */
-   
-a:   printf("a\n");
-
-//  P(i) {i==5}
-
-   /* The b label */
-   ;
-l99998:   ;
-
-//  P(i) {i==5}
-
 
 
 //  P(i) {i==5}
 
-   /* The b label */
-b:   printf("b\n");
+      
+      /* The a label */
+      
+a:      printf("a\n");
 
 //  P(i) {i==5}
 
-   /* Oh, go to a... */
-   ;
-   goto a;
-l99999:   ;
+      /* The b label */
+      ;
+l99998:      ;
 
 //  P(i) {i==5}
 
 
-   goto l99998;
+
+//  P(i) {i==5}
+
+      /* The b label */
+b:      printf("b\n");
+
+//  P(i) {i==5}
+
+      /* Oh, go to a... */
+      ;
+      goto a;
+l99999:      ;
+
+//  P(i) {i==5}
+
+
+      goto l99998;
+   }
 }
 
 //  P() {}

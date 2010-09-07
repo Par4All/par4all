@@ -96,7 +96,7 @@ void give()
    int j = 3;
    double array[N];
    //PIPS generated variable
-   double (*P_0)[N];
+   double (*P_0)[N] = (double (*)[N]) 0;
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
 
    change(&j, *P_0);
@@ -133,7 +133,7 @@ void give()
    int j = 3;
    double array[N];
    //PIPS generated variable
-   double (*P_0)[N];
+   double (*P_0)[N] = (double (*)[N]) 0;
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
 
    change(&j, *P_0);

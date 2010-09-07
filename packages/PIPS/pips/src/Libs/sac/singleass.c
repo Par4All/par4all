@@ -55,6 +55,8 @@ static entity make_replacement_entity(entity e)
             entity_basic(e));
     AddLocalEntityToDeclarations(new_ent,get_current_module_entity(),
 				 get_current_module_statement());
+    free_value(entity_initial(new_ent));
+    entity_initial(new_ent)=copy_value(entity_initial(e));
     return new_ent;
 }
 
@@ -261,9 +263,6 @@ bool single_assignment(char * mod_name)
 
     /* Now do the job */
     single_assign_statement(dg);
-
-    // Restore the warning
-    hash_warn_on_redefinition();
 
     clean_up_sequences(mod_stmt);
 

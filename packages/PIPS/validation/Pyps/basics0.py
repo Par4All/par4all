@@ -8,9 +8,9 @@ from pyps import *
 w = workspace(["basics0.c"])
 
 # you can get module object from the modules table
-foo=w["foo"]
-bar=w["bar"]
-malabar=w["malabar"]
+foo=w.fun.foo
+bar=w.fun.bar
+malabar=w.fun.malabar
 mb=w["megablast"]
 
 # and apply transformation to modules

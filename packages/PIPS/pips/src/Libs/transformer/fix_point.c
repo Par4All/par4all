@@ -1100,11 +1100,6 @@ transformer transformer_derivative_fix_point(transformer tf)
     Pbase bv = BASE_NULLE; /* basis vector */
     Pbase diffb = BASE_NULLE; /* basis of difference vectors */
 
-    ifdebug(8) {
-      pips_debug(8, "Begin for transformer %p:\n", tf);
-      fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
-    }
-
     /* Compute constraints with difference equations */
 
     for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {

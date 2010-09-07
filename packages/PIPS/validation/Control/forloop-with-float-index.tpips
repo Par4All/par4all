@@ -1,0 +1,24 @@
+delete forloop-with-float-index
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create forloop-with-float-index forloop-with-float-index.c
+
+echo
+echo // Output from parser (PARSED_PRINTED_FILE)
+echo
+display PARSED_PRINTED_FILE[loop]
+
+echo
+echo // Output from controlizer (PRINTED_FILE)
+echo
+
+# MA/FI: why do we need to respecify the default value?
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE[loop]
+
+close
+quit

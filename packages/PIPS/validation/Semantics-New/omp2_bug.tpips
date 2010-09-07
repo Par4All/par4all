@@ -1,0 +1,54 @@
+#
+delete omp2_bug
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create omp2_bug omp2_bug.c
+
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# Region chains are too much experimental
+activate REGION_CHAINS
+
+echo Compute the intraprocedural preconditions at the same time as
+echo   transformers and use them to improve the accuracy of expression
+echo   and statement transformers:
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+#display DG_FILE[main]
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+apply PRIVATIZE_MODULE(main)
+
+#apply LOCALIZE_DECLARATION
+
+echo
+echo Transformers for "main" after privatization (i.e. when preconditions are available)
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+quit
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete omp2_bug
+quit
+# EOF

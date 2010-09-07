@@ -1,0 +1,48 @@
+void P4A_scmp_dealloc(void *dest)
+{
+}
+void * P4A_scmp_flow(void **flow)
+{
+}
+void P4A_scmp_kernel_0(int *a, int b[10])
+{
+   //PIPS generated variable
+   int i;
+   for(i = 0; i <= 9; i += 1) {
+      b[i] = i;
+      a[i] = i;
+   }
+}
+void P4A_scmp_malloc(void **dest, size_t n)
+{
+
+   if (*dest==(void *) 0) 
+      *dest = malloc(n);
+}
+void P4A_scmp_read(const int *in_address, int *out_address, size_t n)
+{
+   memcpy(in_address, out_address, n);
+}
+void P4A_scmp_write(void *out_address, const void *buffer_address, size_t n)
+{
+   memcpy(out_address, buffer_address, n);
+}
+int main()
+{
+   int i;
+   int *a;
+   int b[10] = {0};
+   //PIPS generated variable
+   int (*P_0)[10] = (int (*)[10]) 0, (*P_1)[10] = (int (*)[10]) 0;
+
+   a = (int *) malloc(10*sizeof(int));
+   P4A_scmp_malloc(&P_0, sizeof(int[10])-1+1);
+   P4A_scmp_kernel_0(a, *P_0);
+   P4A_scmp_malloc(&*((int (**)[10]) P4A_scmp_flow(&P_1)), sizeof(int[10])-1+1);
+   P4A_scmp_write(*P_1, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_write(b, *P_1, sizeof(int[10])-1+1);
+
+   a[0]++;
+   ((int *) P4A_scmp_flow(b))[0]++;
+   return 0;
+}

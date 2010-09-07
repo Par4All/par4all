@@ -675,70 +675,97 @@ generate_domain(
      * non specific (and/or...) stuff.
      */
     fprintf(header,
-	    "/* %s\n */\n"
-	    "#define %s(x) ((%s)((x).p))\n"
-	    // foo_CAST FOO_CAST
-	    "#define %s_CAST(x) %s(x)\n"
-	    "#define %s_CAST(x) %s(x)\n"
-	    "#define %s_(x) ((x).e)\n"
-	    // foo_TYPE FOO_TYPE
-	    "#define %s_TYPE %s\n"
-	    "#define %s_TYPE %s\n"
-	    "#define %s_undefined ((%s)gen_chunk_undefined)\n"
-	    "#define %s_undefined_p(x) ((x)==%s_undefined)\n"
-	    "\n"
-	    "extern %s copy_%s(%s);\n"
-	    "extern void free_%s(%s);\n"
-	    "extern %s check_%s(%s);\n"
-	    "extern bool %s_consistent_p(%s);\n"
-	    "extern bool %s_defined_p(%s);\n"
-	    "#define gen_%s_cons gen_%s_cons\n"
-	    "extern list gen_%s_cons(%s, list);\n",
-	    Name, /* comments */
-	    Name, name, /* defines... */
-	    name, Name,
-	    Name, Name,
-	    Name,
-	    Name, name, // XXX_TYPE
-	    name, name, // xxx_TYPE
-	    name, name,
-	    name, name,
-	    name, name, name, /* copy */
-	    name, name, /* free */
-	    name, name, name, /* check */
-	    name, name, /* consistent */
-	    name, name, /* defined */
-	    Name, name, /* gen cons */
-	    name, name);
+            "/* %s\n */\n"
+            "#define %s(x) ((%s)((x).p))\n"
+            // foo_CAST FOO_CAST
+            "#define %s_CAST(x) %s(x)\n"
+            "#define %s_CAST(x) %s(x)\n"
+            "#define %s_(x) ((x).e)\n"
+            // foo_TYPE FOO_TYPE
+            "#define %s_TYPE %s\n"
+            "#define %s_TYPE %s\n"
+            "#define %s_undefined ((%s)gen_chunk_undefined)\n"
+            "#define %s_undefined_p(x) ((x)==%s_undefined)\n"
+            // what about assignment with checks?
+            // something like:
+            // #define FOO_assign(r,v) \
+            // { FOO * _p = &(r), _v = (v); \
+            //   FOO_check(r); FOO_check(v); \
+            //   *_p = _v; \
+            // }
+            "\n"
+            "extern %s copy_%s(%s);\n"
+            "extern void free_%s(%s);\n"
+            "extern %s check_%s(%s);\n"
+            "extern bool %s_consistent_p(%s);\n"
+            "extern bool %s_defined_p(%s);\n"
+            "#define gen_%s_cons gen_%s_cons\n"
+            "extern list gen_%s_cons(%s, list);\n"
+            "extern void %s_assign_contents(%s, %s);\n"
+            "extern void %s_non_recursive_free(%s);\n",
+            Name, // comments
+            Name, name, // defines...
+            name, Name,
+            Name, Name,
+            Name,
+            Name, name, // XXX_TYPE
+            name, name, // xxx_TYPE
+            name, name,
+            name, name,
+            name, name, name, // copy
+            name, name, // free
+            name, name, name, // check
+            name, name, // consistent
+            name, name, // defined
+            Name, name, // gen cons
+            name, name,
+            name, name, name, // assign contents
+            name, name // non recursive free
+      );
 
     fprintf(code,
-	    "/* %s\n */\n"
-	    "%s copy_%s(%s p) {\n"
-	    "  return (%s) gen_copy_tree((gen_chunk*) p);\n"
-	    "}\n"
-	    "void free_%s(%s p) {\n"
-	    "  gen_free((gen_chunk*) p);\n"
-	    "}\n"
-	    "%s check_%s(%s p) {\n"
-	    "  return (%s) gen_check((gen_chunk*) p, %s_domain);\n"
-	    "}\n"
-	    "bool %s_consistent_p(%s p) {\n"
-	    "  check_%s(p);\n"
-	    "  return gen_consistent_p((gen_chunk*) p);\n"
-	    "}\n"
-	    "bool %s_defined_p(%s p) {\n"
-	    "  return gen_defined_p((gen_chunk*) p);\n"
-	    "}\n"
-	    "list gen_%s_cons(%s p, list l) {\n"
-	    "  return gen_typed_cons(%s_NEWGEN_DOMAIN, p, l);\n"
-	    "}\n",
-	    Name,
-	    name, name, name, name, /* copy */
-	    name, name, /* free */
-	    name, name, name, name, name, /* check */
-	    name, name, name, /* consistent */
-	    name, name, /* consistent */
-	    name, name, Name /* gen cons */);
+            "/* %s\n */\n"
+            "%s copy_%s(%s p) {\n"
+            "  return (%s) gen_copy_tree((gen_chunk*) p);\n"
+            "}\n"
+            "void free_%s(%s p) {\n"
+            "  gen_free((gen_chunk*) p);\n"
+            "}\n"
+            "%s check_%s(%s p) {\n"
+            "  return (%s) gen_check((gen_chunk*) p, %s_domain);\n"
+            "}\n"
+            "bool %s_consistent_p(%s p) {\n"
+            "  check_%s(p);\n"
+            "  return gen_consistent_p((gen_chunk*) p);\n"
+            "}\n"
+            "bool %s_defined_p(%s p) {\n"
+            "  return gen_defined_p((gen_chunk*) p);\n"
+            "}\n"
+            "list gen_%s_cons(%s p, list l) {\n"
+            "  return gen_typed_cons(%s_NEWGEN_DOMAIN, p, l);\n"
+            "}\n"
+            "void %s_assign_contents(%s r, %s v) {\n"
+            "  check_%s(r);\n"
+            "  check_%s(v);\n"
+            "  message_assert(\"defined references to domain %s\",\n"
+            "                 %s_defined_p(r) && %s_defined_p(v));\n"
+            "  (void*) memcpy(r, v, sizeof(struct " STRUCT "%s_));\n"
+            "}\n"
+            "void %s_non_recursive_free(%s p) {\n"
+            "  // should clear up contents...\n"
+            "  free(p);\n"
+            "}\n",
+            Name, // comments
+            name, name, name, name, // copy
+            name, name, // free
+            name, name, name, name, name, // check
+            name, name, name, // consistent
+            name, name, // consistent
+            name, name, Name, // gen cons
+            name, name, name, // assign contents
+            name, name, name, name, name, name,
+            name, name // non recursive free
+      );
 
     if (IS_TABULATED(bp)) {
       /* tabulated */
@@ -841,11 +868,11 @@ static FILE * fopen_suffix(string prefix, string suffix)
   return f;
 }
 
-#define DONT_TOUCH						\
-  "/*\n"							\
-  " * THIS FILE HAS BEEN AUTOMATICALLY GENERATED BY NEWGEN.\n"	\
-  " *\n"							\
-  " * PLEASE DO NOT MODIFY IT.\n"				\
+#define DONT_TOUCH                                              \
+  "/*\n"                                                        \
+  " * THIS FILE HAS BEEN AUTOMATICALLY GENERATED BY NEWGEN.\n"  \
+  " *\n"                                                        \
+  " * PLEASE DO NOT MODIFY IT.\n"                               \
   " */\n\n"
 
 /* generate the code necessary to manipulate every internal
@@ -879,13 +906,14 @@ void gencode(string file)
   }
 
   fprintf(code,
-	  "\n"
-	  "#include <stdio.h>\n"
-	  "#include <stdlib.h>\n"
-	  "#include \"genC.h\"\n"
-	  "#include \"%s.h\"\n"
-	  "\n",
-	  file);
+          "\n"
+          "#include <stdio.h>\n"
+          "#include <stdlib.h>\n"
+          "#include <string.h>\n"
+          "#include \"genC.h\"\n"
+          "#include \"%s.h\"\n"
+          "\n",
+          file);
 
   /* first generate protected forward declarations.
    */

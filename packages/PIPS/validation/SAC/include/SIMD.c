@@ -2,27 +2,27 @@
 #define DMAX(A,B) (A)>(B)?(A):(B)
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
 {
-    b[0]=a[0];
-    b[1]=a[1];
-    b[2]=a[2];
-    b[3]=a[3];
-}
-void SIMD_SAVE_V4SF_TO_V4SI(float a[4], int b[4])
-{
     a[0]=b[0];
     a[1]=b[1];
     a[2]=b[2];
     a[3]=b[3];
 }
-void SIMD_SAVE_V2SF_TO_V2DF(double a[2],float b[2])
-{
-    a[0]=b[0];
-    a[1]=b[1];
-}
-void SIMD_LOAD_V2SF_TO_V2DF(double a[2],float b[2])
+void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4])
 {
     b[0]=a[0];
     b[1]=a[1];
+    b[2]=a[2];
+    b[3]=a[3];
+}
+void SIMD_STORE_V2DF_TO_V2SF(double a[2],float b[2])
+{
+    b[0]=a[0];
+    b[1]=a[1];
+}
+void SIMD_LOAD_V2SF_TO_V2DF(double a[2],float b[2])
+{
+    a[0]=b[0];
+    a[1]=b[1];
 }
 
 int
@@ -116,7 +116,7 @@ SIMD_LOAD_CONSTANT_V4SI (int VEC[4], int X0, int X1, int X2, int X3)
 }
 
 void
-SIMD_SAVE_V4SI (int VEC[4], int BASE[4])
+SIMD_STORE_V4SI (int VEC[4], int BASE[4])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
@@ -124,7 +124,7 @@ SIMD_SAVE_V4SI (int VEC[4], int BASE[4])
     BASE[3] = VEC[3];
 }
 void
-SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
+SIMD_STORE_V4SF (float VEC[4], float BASE[4])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
@@ -132,14 +132,14 @@ SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
     BASE[3] = VEC[3];
 }
 void
-SIMD_SAVE_V2DF (double VEC[2], double BASE[2])
+SIMD_STORE_V2DF (double VEC[2], double BASE[2])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
 }
 
 void
-SIMD_MASKED_SAVE_V4SF(float VEC[4], float BASE[3])
+SIMD_STORE_MASKED_V4SF(float VEC[4], float BASE[3])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
@@ -148,14 +148,14 @@ SIMD_MASKED_SAVE_V4SF(float VEC[4], float BASE[3])
 
 
 void
-SIMD_SAVE_GENERIC_V2DF (double VEC[2], double X1[1], double X2[1])
+SIMD_STORE_GENERIC_V2DF (double VEC[2], double X1[1], double X2[1])
 {
 
     X1 [0]= VEC[0];
     X2 [0]= VEC[1];
 }
 void
-SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1],
+SIMD_STORE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1],
         int X3[1], int X4[1])
 {
 
@@ -165,7 +165,7 @@ SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1],
     X4 [0]= VEC[3];
 }
 void
-SIMD_SAVE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
+SIMD_STORE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
         float X3[1], float X4[1])
 {
 
@@ -326,7 +326,7 @@ SIMD_LOAD_V2SI_TO_V2SF(int VEC[2], float TO[2])
     TO[1]=VEC[1];
 }
 void
-SIMD_SAVE_V2SI_TO_V2SF(int TO[2], float VEC[2])
+SIMD_STORE_V2SI_TO_V2SF(int TO[2], float VEC[2])
 {
     TO[0]=VEC[0];
     TO[1]=VEC[1];
@@ -364,13 +364,13 @@ SIMD_LOAD_GENERIC_V2SI (int VEC[2], int X1, int X2)
 }
 
 void
-SIMD_SAVE_V2SI (int VEC[2], int BASE[2])
+SIMD_STORE_V2SI (int VEC[2], int BASE[2])
 {  BASE[0] = VEC[0];
     BASE[1] = VEC[1];
 }
 
 void
-SIMD_SAVE_GENERIC_V2SI (int VEC[2], int X1[1], int X2[1])
+SIMD_STORE_GENERIC_V2SI (int VEC[2], int X1[1], int X2[1])
 {
 
     X1 [0]= VEC[0];
@@ -379,7 +379,7 @@ SIMD_SAVE_GENERIC_V2SI (int VEC[2], int X1[1], int X2[1])
 
 
 void
-SIMD_SAVE_V2DI (int VEC[2], int BASE[2])
+SIMD_STORE_V2DI (int VEC[2], int BASE[2])
 {  BASE[0] = VEC[0];
     BASE[1] = VEC[1];
 }
@@ -472,7 +472,7 @@ SIMD_LOAD_V4QI_TO_V4HI (short VEC[4], char BASE[4])
 
 
 void
-SIMD_SAVE_V8HI (short VEC[8], short BASE[8])
+SIMD_STORE_V8HI (short VEC[8], short BASE[8])
 {  
     BASE[0] = VEC[0];
     BASE[1] = VEC[1];
@@ -600,7 +600,7 @@ SIMD_LOAD_GENERIC_V8QI (char VEC[8], char X1,
 }
 
 void
-SIMD_SAVE_V8QI (char VEC[8], char BASE[8])
+SIMD_STORE_V8QI (char VEC[8], char BASE[8])
 {  BASE[0] = VEC[0];
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];
@@ -612,7 +612,7 @@ SIMD_SAVE_V8QI (char VEC[8], char BASE[8])
 }
 
 void
-SIMD_SAVE_GENERIC_V8QI (char VEC[8], char *X0,
+SIMD_STORE_GENERIC_V8QI (char VEC[8], char *X0,
         char X1[1], char X2[1], char X3[1], char X4[1], char X5[1],
         char X6[1], char X7[1])
 {
@@ -782,6 +782,21 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
     vec[0]=v0;
     vec[1]=v1;
 }
+
+void
+SIMD_XOR_V4SF(float vec[4])
+{
+    vec[0]=0.;
+    vec[1]=0.;
+    vec[2]=0.;
+    vec[3]=0.;
+}
+
+void
+SIMD_ADDREDUCE_V4SF(float val[1],float vec[4]){
+    val[0]=vec[0]+vec[1]+vec[2]+vec[3];
+}
+
 
 #undef LOGICAL
 #undef DMAX

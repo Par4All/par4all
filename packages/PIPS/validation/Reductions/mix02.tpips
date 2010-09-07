@@ -1,0 +1,36 @@
+#
+delete mix02
+create mix02 mix02.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv RICE_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv PIPSDBM_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv REDUCTIONS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+activate C_SYMBOL_TABLE
+
+apply PRIVATIZE_MODULE(main)
+
+#activate PRINT_CODE_PROPER_REDUCTIONS
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE(main)
+
+close
+delete mix02
+quit
+# EOF

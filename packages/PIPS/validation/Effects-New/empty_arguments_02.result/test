@@ -1,0 +1,30 @@
+static int count;
+
+void foo();
+
+int main(void);
+//               <must be read   >: count
+//               <must be written>: count
+void foo()
+{
+//               <must be read   >: count
+//               <must be written>: count
+   count++;
+}
+//               <must be read   >: count
+//               <must be written>: count
+int main(void)
+{
+//               <must be read   >: count
+//               <must be written>: count
+   foo();
+//               <must be read   >: count
+//               <must be written>: count
+   foo(1);
+//               <must be read   >: count
+//               <must be written>: count
+   foo(1, 2);
+//               <must be read   >: count
+   return count;
+}
+

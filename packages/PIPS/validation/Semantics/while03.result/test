@@ -16,11 +16,11 @@ int while03()
 
    i = 0;
 
-//  T(j) {j==1}
+//  T(j) {i==0, j==1}
 
    j = 1;
 
-//  T() {2<=n}
+//  T() {i==0, j==1, 2<=n}
 
 
    if (n<=1) 
@@ -29,21 +29,21 @@ int while03()
 
       exit(1);
 
-//  T(i,j) {2i+j#init==2i#init+j, j+1<=n, j#init+1<=n}
+//  T(i,j) {2i==j-1, i#init==0, j#init==1, 0<=i, 2i+2<=n, 2<=n}
 
 
    while (j<n) {
 
-//  T(i) {i==i#init+1}
+//  T(i) {i==i#init+1, j+1<=n, 2<=n}
 
       i++;
 
-//  T(j) {j==j#init+2}
+//  T(j) {j==j#init+2, j<=n+1, 2<=n}
 
       j += 2;
    }
 
-//  T(while03) {i+j==while03}
+//  T(while03) {2i==j-1, 3i==while03-1, 1<=i, n<=2i+1, 2i<=n, 2<=n}
 
    return i+j;
 }
@@ -83,16 +83,16 @@ int while03()
 
    while (j<n) {
 
-//  P(i,j,n) {2i==j-1, 2i+2<=n, 2<=n}
+//  P(i,j,n) {2i==j-1, 0<=i, 2i+2<=n}
 
       i++;
 
-//  P(i,j,n) {2i==j+1, 2i<=n, 2<=n}
+//  P(i,j,n) {2i==j+1, 1<=i, 2i<=n, 2<=n}
 
       j += 2;
    }
 
-//  P(i,j,n) {2i==j-1, n<=2i+1, 2i<=n, 2<=n}
+//  P(i,j,n) {2i==j-1, 1<=i, n<=2i+1, 2i<=n, 2<=n}
 
    return i+j;
 }

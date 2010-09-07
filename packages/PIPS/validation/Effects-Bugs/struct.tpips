@@ -1,0 +1,17 @@
+delete struct
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create struct struct.c
+
+echo
+echo Cumulated effetcs for "STRUCT"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALL]
+
+close
+delete struct
+quit

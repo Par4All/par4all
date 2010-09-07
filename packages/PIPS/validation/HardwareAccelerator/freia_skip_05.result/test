@@ -1,4 +1,79 @@
 #
+# AIPO
+#
+
+! initial function
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   int32_t seuil;                                                       /*0005*/
+   freia_data2d *t;                                                     /*0006*/
+   // allocation in the middle of the stream
+   freia_aipo_sub(i, i, i);                                             /*0008*/
+   t = freia_common_create_data(16, 128, 128);                          /*0009*/
+   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
+   freia_common_destruct_data(t);                                       /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_skip_05" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 thr" [label="t"];
+  "9 ?" [shape=none];
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "10 ^." [label="i"];
+  "8 -" -> "i";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+
+! updated function for
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   freia_data2d *t;                                                     /*0006*/
+   t = freia_common_create_data(16, 128, 128);                          /*0009*/
+   // allocation in the middle of the stream
+   freia_aipo_sub(i, i, i);                                             /*0008*/
+   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
+   freia_common_destruct_data(t);                                       /*0012*/
+}
+#
 # SPOC
 #
 
@@ -199,6 +274,15 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
    // allocation in the middle of the stream
    freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
+}
+
+! cleaned up function
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   // allocation in the middle of the stream
+   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, 1);                 /*0008*/
+   ;
 }
 #
 # TERAPIX
@@ -423,6 +507,15 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
    // allocation in the middle of the stream
    freia_skip_05_helper_0_0(i, o, i, 111, 8, 100, true);                /*0008*/
+}
+
+! cleaned up function
+
+void freia_skip_05(freia_data2d *o, freia_data2d *i)
+{
+   // allocation in the middle of the stream
+   freia_skip_05_helper_0_0(i, o, i, 111, 8, 100, 1);                   /*0008*/
+   ;
 }
 #
 # FREIA COMPILATION DONE

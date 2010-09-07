@@ -6,8 +6,10 @@ setenv FREIA_TARGET ${FREIA_TARGET:-SPOC}
 # props...
 setproperty ABORT_ON_USER_ERROR=TRUE
 setproperty FREIA_LABEL_ARCS=TRUE
+setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING="generate"
 #setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE} freia.c
 shell ${PIPS_CC:-cc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
@@ -26,8 +28,6 @@ setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
 setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
 apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${NAME}]
 touch ${FREIA_TARGET}_FILE[${NAME}]
-touch PROPER_EFFECTS[${NAME}]
-touch CUMULATED_EFFECTS[${NAME}]
 #
 # show FREIA target results
 #
@@ -39,13 +39,24 @@ shell cat ./${WSPACE}.database/${NAME}/*.dot
 echo
 echo ! acceleration function
 echo
-display ${FREIA_TARGET}_FILE[${NAME}]
+# I have an issue here...
+#touch ${FREIA_TARGET}_FILE[${NAME}]
+#display ${FREIA_TARGET}_FILE[${NAME}]
+shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c
 #
 # new function code
 #
 echo
 echo ! updated function
 echo
+display PRINTED_FILE[${NAME}]
+echo
+echo ! cleaned up function
+echo
+apply PARTIAL_EVAL[${NAME}]
+# no, too efficient, helper functions are removed.
+#apply USE_DEF_ELIMINATION[${NAME}]
+apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}

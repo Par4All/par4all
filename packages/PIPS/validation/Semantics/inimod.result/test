@@ -36,7 +36,7 @@ C     PARAMETER  ( XCZ =       30.0D0 )
      &                GZ(MP,NP), GR(MP,NP)
 
 C  T(I,J,MPCON,MPSTR,NPJET) {3<=I, 803<=I+400J, 2I+5J<=811,
-C    NPJET+1<=J, MPCON<=401}
+C    NPJET+1<=J, MPCON<=402}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -213,7 +213,7 @@ C (8,1)
 99999 CONTINUE
 
 C  T(I,J,NPJET) {J#init==161, 3<=I, 803<=I+400J, 2I+5J<=811,
-C    NPJET+1<=J, MPCON<=401}
+C    NPJET+1<=J, MPCON<=402}
 
 C (2,1)
 C     BEGIN BLOCK
@@ -255,7 +255,7 @@ C (2,8)
 10          CONTINUE                                                    0078
 C           END BLOCK
 
-C  T(I,J) {J#init==161, 2<=I#init, I#init<=403, MPCON+1<=I#init, 1<=J}
+C  T(I,J) {J#init==161, 1<=I#init, I#init<=403, MPCON+1<=I#init, 1<=J}
 
 C (2,9)
 *
@@ -294,52 +294,52 @@ C (2,15)
 12          CONTINUE                                                    0087
 C           END BLOCK
 
-C  T() {I==403, J==161, MPCON<=401}
+C  T() {I==403, J==161, MPCON<=402}
 
 C (2,16)
 *
 *
       ENJET = PRJET/CON+0.5D0*ROJET*VJET**2                             0090
 
-C  T() {I==403, J==161, MPCON<=401}
+C  T() {I==403, J==161, MPCON<=402}
 
 C (2,17)
       GZJET = ROJET*VJET                                                0091
 
-C  T(NPJET) {I==403, J==161, MPCON<=401}
+C  T(NPJET) {I==403, J==161, MPCON<=402}
 
 C (2,18)
 *
       NPJET = NINT(NP*XLJET/XLR)                                        0093
 
-C  T(I,J) {I#init==403, J#init==161, 1<=J, MPCON<=401}
+C  T(I,J) {I#init==403, J#init==161, 1<=J, MPCON<=402}
 
 C (2,19)
 *
       DO 20 J = 1, NPJET                                                0095
 
-C  T(I) {1<=I, 1<=J, J<=NPJET, MPCON<=401}
+C  T(I) {1<=I, 1<=J, J<=NPJET, MPCON<=402}
 
 C (2,20)
          DO 20 I = 1, 2                                                 0096
 
-C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=402}
 
 C (2,21)
 C           BEGIN BLOCK
 
-C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=402}
 
 C (2,22)
 C        RO(I,J) =  ROJET
             EN(I,J) = ENJET                                             0098
 
-C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=402}
 
 C (2,23)
             GZ(I,J) = GZJET                                             0099
 
-C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=401}
+C  T() {1<=I, I<=2, 1<=J, J<=160, J<=NPJET, MPCON<=402}
 
 C (2,24)
 20          CONTINUE                                                    0100
@@ -657,48 +657,48 @@ C (2,16)
 *
       ENJET = PRJET/CON+0.5D0*ROJET*VJET**2                             0090
 
-C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=401}
+C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=402}
 
 C (2,17)
       GZJET = ROJET*VJET                                                0091
 
-C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=401}
+C  P(I,J,MPCON,MPSTR) {I==403, J==161, MPCON<=402}
 
 C (2,18)
 *
       NPJET = NINT(NP*XLJET/XLR)                                        0093
 
-C  P(I,J,MPCON,MPSTR,NPJET) {I==403, J==161, MPCON<=401}
+C  P(I,J,MPCON,MPSTR,NPJET) {I==403, J==161, MPCON<=402}
 
 C (2,19)
 *
       DO 20 J = 1, NPJET                                                0095
 
-C  P(I,J,MPCON,MPSTR,NPJET) {1<=J, J<=NPJET, MPCON<=401}
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=J, J<=NPJET, MPCON<=402}
 
 C (2,20)
          DO 20 I = 1, 2                                                 0096
 
-C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=NPJET, MPCON<=401}
+C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=NPJET, MPCON<=402}
 
 C (2,21)
 C           BEGIN BLOCK
 
 C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    MPCON<=402}
 
 C (2,22)
 C        RO(I,J) =  ROJET
             EN(I,J) = ENJET                                             0098
 
 C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    MPCON<=402}
 
 C (2,23)
             GZ(I,J) = GZJET                                             0099
 
 C  P(I,J,MPCON,MPSTR,NPJET) {1<=I, I<=2, 1<=J, J<=160, J<=NPJET,
-C    MPCON<=401}
+C    MPCON<=402}
 
 C (2,24)
 20          CONTINUE                                                    0100

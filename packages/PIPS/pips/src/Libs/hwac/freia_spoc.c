@@ -147,24 +147,22 @@ static void spoc_alu_conf
     {
       spoc_alu_t flipped_alu = get_spoc_alu_conf(alu)->flipped;
       if (alu!=flipped_alu)
-	alu = flipped_alu;
+        alu = flipped_alu;
       else
-	flip = false;
+        flip = false;
     }
     const spoc_alu_op_t * aluop = get_spoc_alu_conf(alu);
     message_assert("alu operation found", alu==aluop->op);
 
     string s_stage = strdup(itoa(stage));
     comment(body, spoc_type_alu, orig, stage, -1, flip);
-    sb_cat(body,
-      "  si.alu[", s_stage, "][0].op = ", aluop->setting, ";\n");
+    sb_cat(body, "  si.alu[", s_stage, "][0].op = ", aluop->setting, ";\n");
     if (aluop->use_cst)
     {
       expression arg = EXPRESSION(CAR(freia_get_vertex_params(orig)));
       string s_var = hash_get(hp, arg);
       // res += "spocinstr.alu[%stage][0].constant = " + var + ";\n";
-      sb_cat(body,
-	"  sp.alu[", s_stage, "][0].constant = ", s_var, ";\n");
+      sb_cat(body, "  sp.alu[", s_stage, "][0].constant = ", s_var, ";\n");
     }
 
     free(s_stage);
@@ -215,9 +213,9 @@ static void spoc_poc_conf
 
     // for(i=0 ; i<9 ; i++) spocparam.poc[0][0].kernel[i] = kernel[i];
     sb_cat(body,
-      "  for(i=0 ; i<9 ; i++)\n"
-      "    sp.poc[", s_stag, "][", s_side, "].kernel[i] = ",
-	      s_var, "[i];\n");
+           "  for(i=0 ; i<9 ; i++)\n"
+           "    sp.poc[", s_stag, "][", s_side, "].kernel[i] = ",
+           s_var, "[i];\n");
 
     free(s_stag);
     free(s_side);
@@ -253,10 +251,10 @@ static void spoc_th_conf
   // spocparam.th[0][0].boundmax = boundsup;
   comment(body, spoc_type_thr, orig, stage, side, false);
   sb_cat(body,
-    "  si.th[", s_stag, "][", s_side, "].op = ",
-		s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
-    "  sp.th[", s_stag, "][", s_side, "].boundmin = ", s_inf, ";\n",
-    "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n");
+         "  si.th[", s_stag, "][", s_side, "].op = ",
+         s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
+         "  sp.th[", s_stag, "][", s_side, "].boundmin = ", s_inf, ";\n",
+         "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n");
 
   free(s_stag);
   free(s_side);
@@ -321,11 +319,11 @@ static void spoc_measure_conf
     if (n>1)
     {
       sb_cat(tail, "  *", v_2, " = (uint32_t) ", reduc,
-	     measure==measure_min||measure==measure_min_coord?
-	     "min": "max", "_coord_x;\n",
-	     "  *", v_3, " = (uint32_t) ", reduc,
-	     measure==measure_min||measure==measure_min_coord?
-	     "min": "max", "_coord_y;\n");
+             measure==measure_min||measure==measure_min_coord?
+             "min": "max", "_coord_x;\n",
+             "  *", v_3, " = (uint32_t) ", reduc,
+             measure==measure_min||measure==measure_min_coord?
+             "min": "max", "_coord_y;\n");
     }
     break;
   case measure_vol:
@@ -434,15 +432,15 @@ static bool image_is_needed(dagvtx prod, dag d, set todo)
     {
       SET_FOREACH(dagvtx, v, todo)
       {
-	list preds = dag_vertex_preds(d, v);
-	needed = gen_in_list_p(prod, preds);
-	gen_free_list(preds), preds = NIL;
-	if (needed)
-	  break;
+        list preds = dag_vertex_preds(d, v);
+        needed = gen_in_list_p(prod, preds);
+        gen_free_list(preds), preds = NIL;
+        if (needed)
+          break;
       }
     }
     pips_debug(7, "\"%"_intFMT"\" is%s needed\n",
-	       dagvtx_number(prod), needed? "": " not");
+               dagvtx_number(prod), needed? "": " not");
   }
   return needed;
 }
@@ -452,13 +450,13 @@ static void
 print_op_schedule(FILE * out, const string name, const op_schedule * op)
 {
   fprintf(out, "sched '%s' = %s (%" _intFMT " %s) %d %s %d %s %sused\n",
-	  name,
-	  op->image? entity_local_name(op->image): "NULL",
-	  dagvtx_number(op->producer),
-	  dagvtx_operation(op->producer),
-	  op->stage, what_operation(op->level), op->side,
-	  (op->level==spoc_type_alu)? (op->flip? "/": "."): "",
-	  op->used? "": "not ");
+          name,
+          op->image? entity_local_name(op->image): "NULL",
+          dagvtx_number(op->producer),
+          dagvtx_operation(op->producer),
+          op->stage, what_operation(op->level), op->side,
+          (op->level==spoc_type_alu)? (op->flip? "/": "."): "",
+          op->used? "": "not ");
 }
 
 static bool check_mux_availibity(hash_table wiring, int stage, int mux)
@@ -645,20 +643,20 @@ where_to_perform_operation
     {
       // we have the same image, chose closest to mes, and prefer in0
       if (in0->level>=in1->level)
-	*out = *in0, in0->used = (in0->level!=spoc_type_mes),
-	  in0->just_used = true, in1->used = false;
+        *out = *in0, in0->used = (in0->level!=spoc_type_mes),
+          in0->just_used = true, in1->used = false;
       else
-	*out = *in1, in1->used = (in0->level!=spoc_type_mes),
-	  in1->just_used = true, in0->used = false;
+        *out = *in1, in1->used = (in0->level!=spoc_type_mes),
+          in1->just_used = true, in0->used = false;
     }
     else // take the available one, whatever
     {
       if (measured==in0->image)
-	*out = *in0, in0->used = (in0->level!=spoc_type_mes),
-	  in0->just_used = true, in1->used = false;
+        *out = *in0, in0->used = (in0->level!=spoc_type_mes),
+          in0->just_used = true, in1->used = false;
       else
-	*out = *in1, in1->used = (in0->level!=spoc_type_mes),
-	  in1->just_used = true, in0->used = false;
+        *out = *in1, in1->used = (in0->level!=spoc_type_mes),
+          in1->just_used = true, in0->used = false;
     }
   }
   else
@@ -676,22 +674,22 @@ where_to_perform_operation
 
       // hmmm... I should also check that the component is not already used...
       if (in0->image && in0->stage == out->stage && in0->level >= spoc_type_alu)
-	out->stage++;
+        out->stage++;
       if (in1->image && in1->stage == out->stage && in1->level >= spoc_type_alu)
-	out->stage++;
+        out->stage++;
 
       // ensure there is at least one path for the output
       while (!(check_wiring_output(wiring, out->stage, 0) ||
 	       check_wiring_output(wiring, out->stage, 1)))
-	out->stage++;
+        out->stage++;
 
       // two paths are required if one of the other image is still needed.
       if ((in0->image && image_is_needed(in0->producer, computed, todo)) ||
-	  (in1->image && image_is_needed(in1->producer, computed, todo)))
+          (in1->image && image_is_needed(in1->producer, computed, todo)))
       {
-	while (! (check_wiring_output(wiring, out->stage, 0) &&
-		  check_wiring_output(wiring, out->stage, 1)))
-	  out->stage++;
+        while (! (check_wiring_output(wiring, out->stage, 0) &&
+                  check_wiring_output(wiring, out->stage, 1)))
+          out->stage++;
       }
 
       in0->used = false, in1->used = false;
@@ -706,33 +704,33 @@ where_to_perform_operation
       // where is the needed image? put it in used
       if (in0->image == in1->image)
       {
-	// if the same image is available,
-	// chose the not already used one
-	if (in0->used)
-	  used = in1, notused = in0;
-	else if (in0->used)
-	  used = in0, notused = in1;
-	// or the one which is already engaged on a side?
-	else if (in0->level >= spoc_type_thr && level <= spoc_type_alu)
-	  used = in0, notused = in1;
-	else if (in1->level >= spoc_type_thr && level <= spoc_type_alu)
-	  used = in1, notused = in0;
-	// or the earliest one, or in0 by default
-	else if (in1->stage<in0->stage ||
-		 (in1->stage==in0->stage && in1->level < in0->level))
-	  used = in1, notused = in0;
-	else
-	  used = in0, notused = in1;
+        // if the same image is available,
+        // chose the not already used one
+        if (in0->used)
+          used = in1, notused = in0;
+        else if (in0->used)
+          used = in0, notused = in1;
+        // or the one which is already engaged on a side?
+        else if (in0->level >= spoc_type_thr && level <= spoc_type_alu)
+          used = in0, notused = in1;
+        else if (in1->level >= spoc_type_thr && level <= spoc_type_alu)
+          used = in1, notused = in0;
+        // or the earliest one, or in0 by default
+        else if (in1->stage<in0->stage ||
+                 (in1->stage==in0->stage && in1->level < in0->level))
+          used = in1, notused = in0;
+        else
+          used = in0, notused = in1;
       }
       else // just take the right one
       {
-	used = dep==in0->image? in0: in1;
-	notused = dep==in0->image? in1: in0;
+        used = dep==in0->image? in0: in1;
+        notused = dep==in0->image? in1: in0;
       }
 
       pips_debug(7, "using %s (%d %s %d)\n",
-		 entity_local_name(used->image),
-		 used->stage, what_operation(used->level), used->side);
+                 entity_local_name(used->image),
+                 used->stage, what_operation(used->level), used->side);
 
       // default stage and side...
       out->stage = used->stage;
@@ -741,71 +739,71 @@ where_to_perform_operation
       used->just_used = true;
 
       bool used_image_still_needed =
-	image_is_needed(used->producer, computed, todo);
+        image_is_needed(used->producer, computed, todo);
 
       // handle copy... if it is still there, it must be needed,
       // so just put it where it is available for later use.
       // ??? output copies should not be handled by the pipeline!
       if (level == spoc_type_nop)
       {
-	// go to the end of the local path
-	switch (used->level)
-	{
-	case spoc_type_inp:
-	case spoc_type_poc:
-	  level = spoc_type_poc;
-	  break;
-	case spoc_type_alu:
-	  level = spoc_type_alu;
-	  break;
-	case spoc_type_thr:
-	case spoc_type_mes:
-	  level = spoc_type_poc;
-	  out->stage++;
-	  break;
-	default:
-	  pips_internal_error("unexpected spoc type %d", used->level);
-	}
+        // go to the end of the local path
+        switch (used->level)
+        {
+        case spoc_type_inp:
+        case spoc_type_poc:
+          level = spoc_type_poc;
+          break;
+        case spoc_type_alu:
+          level = spoc_type_alu;
+          break;
+        case spoc_type_thr:
+        case spoc_type_mes:
+          level = spoc_type_poc;
+          out->stage++;
+          break;
+        default:
+          pips_internal_error("unexpected spoc type %d", used->level);
+        }
 
-	// we need to put some space to extract the other image on another path
-	if (used_image_still_needed)
-	{
-	  if (level==spoc_type_poc)
-	  {
-	    // switch side if straight path is not available?
-	    if (!check_wiring_output(wiring, out->stage, out->side))
-	      out->side = 1 - out->side;
-	    pips_assert("available path",
-			check_wiring_output(wiring, out->stage, out->side));
-	    out->stage++;
-	  }
-	  else if (level==spoc_type_alu)
-	  {
-	    // choose one side, prefer 0
-	    if (check_wiring_output(wiring, out->stage, 0))
-	      out->side = 0;
-	    else if (check_wiring_output(wiring, out->stage, 1))
-	      out->side = 1;
-	    else
-	      pips_internal_error("no available path for copy of needed image");
-	    out->stage++;
-	    level = spoc_type_poc;
-	  }
-	  else
-	    pips_internal_error("should not get there");
-	}
-	else
-	  pips_debug(8, "copied image %s is not needed further\n",
-		     entity_local_name(used->image));
-	break;
+        // we need to put some space to extract the other image on another path
+        if (used_image_still_needed)
+        {
+          if (level==spoc_type_poc)
+          {
+            // switch side if straight path is not available?
+            if (!check_wiring_output(wiring, out->stage, out->side))
+              out->side = 1 - out->side;
+            pips_assert("available path",
+                        check_wiring_output(wiring, out->stage, out->side));
+            out->stage++;
+          }
+          else if (level==spoc_type_alu)
+          {
+            // choose one side, prefer 0
+            if (check_wiring_output(wiring, out->stage, 0))
+              out->side = 0;
+            else if (check_wiring_output(wiring, out->stage, 1))
+              out->side = 1;
+            else
+              pips_internal_error("no available path for copy of needed image");
+            out->stage++;
+            level = spoc_type_poc;
+          }
+          else
+            pips_internal_error("should not get there");
+        }
+        else
+          pips_debug(8, "copied image %s is not needed further\n",
+                     entity_local_name(used->image));
+        break;
       }
 
       pips_assert("not a copy", level!=spoc_type_nop);
 
       find_first_available_component
-	(wiring, used->stage, used->level, used->side,
-	 level, used_image_still_needed && used->image!=notused->image,
-	 &out->stage, &out->side);
+        (wiring, used->stage, used->level, used->side,
+         level, used_image_still_needed && used->image!=notused->image,
+         &out->stage, &out->side);
 
       // tell which image was used
       used->used = true;
@@ -821,9 +819,9 @@ where_to_perform_operation
       in0->used = true, in0->just_used = true;
       in1->used = true, in1->just_used = true;
       if (out->stage==in0->stage && in0->level >= spoc_type_alu)
-	out->stage++;
+        out->stage++;
       if (out->stage==in1->stage && in1->level >= spoc_type_alu)
-	out->stage++;
+        out->stage++;
       break;
     default:
       pips_internal_error("shoud not get there");
@@ -926,15 +924,15 @@ static void generate_wiring
     out_side = strdup(itoa(out->side));
 
   sb_cat(code,
-	 "  // ", entity_local_name(in->image),
-	 " [", in_stage, " ", what_operation(in->level));
+         "  // ", entity_local_name(in->image),
+         " [", in_stage, " ", what_operation(in->level));
   if (in->level!=spoc_type_alu)
     sb_cat(code, " ", in_side);
   sb_cat(code, "] -> [", out_stage, " ", what_operation(out->level));
   if (out->level!=spoc_type_alu)
     sb_cat(code, " ", out_side);
   sb_cat(code, "] ", itoa(dagvtx_number(out->producer)), " ",
-	 dagvtx_operation(out->producer), "\n");
+         dagvtx_operation(out->producer), "\n");
   free(in_stage); free(out_stage); free(in_side); free(out_side);
 
   // let us wire!
@@ -942,45 +940,45 @@ static void generate_wiring
   {
     switch (in->level)
     {
-      case spoc_type_inp:
-      case spoc_type_poc:
-	if (out->level<=spoc_type_poc)
-	  pips_assert("same side if early", in->side==out->side);
-	if (out->level<=spoc_type_alu)
-	  sb_cat(code, "  // nope\n");
-	// ELSE thr or mes...
-	else
-	{
-	  generate_wiring_stage(code, in->stage, in->side, out->side, wiring);
-	  if (in->level == spoc_type_inp)
-	  {
-	    // the poc was passed by wiring...
-	    in->level = spoc_type_poc;
-	    set_component(wiring, in->stage, in->level, in->side);
-	  }
-	}
-	break;
-      case spoc_type_alu:
-	// out->level is after thr, so there is a side
-	if (out->side!=-1)
-	  generate_wiring_stage(code, in->stage, -1, out->side, wiring);
-	// else: X alu -> W alu, possybly because it operation is a copy
-	break;
-      case spoc_type_thr:
-      case spoc_type_mes:
-      case spoc_type_out:
-	// no choice
-	pips_assert("same side", in->side==out->side);
-	sb_cat(code, "  // nope\n");
-	break;
-      case spoc_type_nop:
-      default:
-	pips_internal_error("shoud not get there");
+    case spoc_type_inp:
+    case spoc_type_poc:
+      if (out->level<=spoc_type_poc)
+        pips_assert("same side if early", in->side==out->side);
+      if (out->level<=spoc_type_alu)
+        sb_cat(code, "  // nope\n");
+      // ELSE thr or mes...
+      else
+      {
+        generate_wiring_stage(code, in->stage, in->side, out->side, wiring);
+        if (in->level == spoc_type_inp)
+        {
+          // the poc was passed by wiring...
+          in->level = spoc_type_poc;
+          set_component(wiring, in->stage, in->level, in->side);
+        }
+      }
+      break;
+    case spoc_type_alu:
+      // out->level is after thr, so there is a side
+      if (out->side!=-1)
+        generate_wiring_stage(code, in->stage, -1, out->side, wiring);
+      // else: X alu -> W alu, possybly because it operation is a copy
+      break;
+    case spoc_type_thr:
+    case spoc_type_mes:
+    case spoc_type_out:
+      // no choice
+      pips_assert("same side", in->side==out->side);
+      sb_cat(code, "  // nope\n");
+      break;
+    case spoc_type_nop:
+    default:
+      pips_internal_error("shoud not get there");
     }
 
     // record operation flipping
     if (out->level == spoc_type_alu &&
-	dagvtx_optype(out->producer)==spoc_type_alu) // skip copy
+        dagvtx_optype(out->producer)==spoc_type_alu) // skip copy
     {
       vtxcontent cout = dagvtx_content(out->producer);
       list lins = vtxcontent_inputs(cout);
@@ -988,17 +986,17 @@ static void generate_wiring
       switch (gen_length(lins))
       {
       case 2:
-	if (in->side==0)
-	  out->flip = !(in->image == ENTITY(CAR(lins)));
-	else // in->side==1
-	  out->flip = (in->image == ENTITY(CAR(lins)));
-	break;
+        if (in->side==0)
+          out->flip = !(in->image == ENTITY(CAR(lins)));
+        else // in->side==1
+          out->flip = (in->image == ENTITY(CAR(lins)));
+        break;
       case 1:
-	out->flip = (in->side==1);
-	break;
+        out->flip = (in->side==1);
+        break;
       default:
       case 0:
-	pips_internal_error("should not get there");
+        pips_internal_error("should not get there");
       }
     }
   }
@@ -1015,44 +1013,44 @@ static void generate_wiring
     case spoc_type_alu:
       // chose prefered side
       if (in->level==spoc_type_alu)
-	// try direct, or default to 0
-	prefered = (out->side>=0)? out->side: 0;
+        // try direct, or default to 0
+        prefered = (out->side>=0)? out->side: 0;
       else // take the right side as soon as possible?
-	// ??? what if the path is not possible later?
-	prefered = (out->side==-1)? in->side: out->side;
+        // ??? what if the path is not possible later?
+        prefered = (out->side==-1)? in->side: out->side;
 
       // try both cases
       if (check_wiring_output(wiring, in->stage, prefered))
       {
-	generate_wiring_stage(code, in->stage, in->side, prefered, wiring);
-	set_component(wiring, in->stage, spoc_type_mes, prefered);
-	in->stage++;
-	in->side = prefered;
-	in->level = spoc_type_inp;
-	generate_wiring(code, in, out, wiring);
+        generate_wiring_stage(code, in->stage, in->side, prefered, wiring);
+        set_component(wiring, in->stage, spoc_type_mes, prefered);
+        in->stage++;
+        in->side = prefered;
+        in->level = spoc_type_inp;
+        generate_wiring(code, in, out, wiring);
       }
       else if (check_wiring_output(wiring, in->stage, 1 - prefered))
       {
-	generate_wiring_stage(code, in->stage, in->side, 1 - prefered, wiring);
-	set_component(wiring, in->stage, spoc_type_mes, 1 - prefered);
-	in->stage++;
-	in->side = 1 - prefered;
-	in->level = spoc_type_inp;
-	generate_wiring(code, in, out, wiring);
+        generate_wiring_stage(code, in->stage, in->side, 1 - prefered, wiring);
+        set_component(wiring, in->stage, spoc_type_mes, 1 - prefered);
+        in->stage++;
+        in->side = 1 - prefered;
+        in->level = spoc_type_inp;
+        generate_wiring(code, in, out, wiring);
       }
       else
-	pips_internal_error("no available path...");
+        pips_internal_error("no available path...");
 
       // we may still use the result for something else... others?
       if (saved.level<=spoc_type_alu && out->level<=spoc_type_poc &&
-	  // restore to the previous stage
-	  saved.stage==out->stage-1)
+          // restore to the previous stage
+          saved.stage==out->stage-1)
       {
-	pips_debug(7, "restoring previous schedule...\n");
-	*in = saved;
+        pips_debug(7, "restoring previous schedule...\n");
+        *in = saved;
       }
       if (in->level == spoc_type_inp)
-	in->level = spoc_type_poc; // the poc was passed by wiring
+        in->level = spoc_type_poc; // the poc was passed by wiring
       break;
     case spoc_type_thr:
     case spoc_type_mes:
@@ -1088,9 +1086,9 @@ static void freia_spoc_code_buildup
 {
   // function header: freia_error helper_function(freia_data_2d ...
   sb_cat(code,
-	 "\n"
-	 "// FREIA-SPoC helper function for module ", module, "\n"
-	 "freia_status ", function_name, "(");
+         "\n"
+         "// FREIA-SPoC helper function for module ", module, "\n"
+         "freia_status ", function_name, "(");
   // first, image arguments
   if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
   if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
@@ -1107,17 +1105,17 @@ static void freia_spoc_code_buildup
 
   // generate actual call to the accelerator
   sb_cat(code,
-	 FREIA_SPOC_CALL
-	 "  // actual call of spoc hardware\n"
-	 "  freia_cg_template_process_2i_2o",
-	 "(&param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
-	 NULL);
+         FREIA_SPOC_CALL
+         "  // actual call of spoc hardware\n"
+         "  freia_cg_template_process_2i_2o",
+         "(&param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
+         NULL);
 
   if (some_reductions)
     sb_cat(code,
-	   "\n"
-	   "  // get reductions\n"
-	   "  freia_cg_read_reduction_results(&redres);\n");
+           "\n"
+           "  // get reductions\n"
+           "  freia_cg_read_reduction_results(&redres);\n");
 
   string_buffer_append_sb(code, tail);
 
@@ -1149,7 +1147,7 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
   else
     consummed = false;
   pips_debug(7, "%"_intFMT" is %sconsummed by %"_intFMT"\n",
-	     dagvtx_number(prod), consummed? "": "not ", dagvtx_number(v));
+             dagvtx_number(prod), consummed? "": "not ", dagvtx_number(v));
   return consummed;
 }
 
@@ -1174,8 +1172,8 @@ static void freia_spoc_pipeline
   int pipeline_depth = get_int_property(spoc_depth_prop);
 
   pips_debug(3, "running on '%s' for %d operations\n",
-	     module, (int) (gen_length(dag_vertices(dpipe)) -
-			    gen_length(dag_inputs(dpipe))));
+             module, (int) (gen_length(dag_vertices(dpipe)) -
+                            gen_length(dag_inputs(dpipe))));
   pips_assert("non empty dag", gen_length(dag_vertices(dpipe))>0);
 
   // build list of output entities from the pipe
@@ -1263,25 +1261,25 @@ static void freia_spoc_pipeline
       bool toskip = false;
       SET_FOREACH(dagvtx, sk, skipped)
       {
-	// skip because of missing deps
-	if (gen_in_list_p(v, dagvtx_succs(sk))) {
-	  pips_debug(7, "skipping %"_intFMT", deps on %"_intFMT"\n",
-		     dagvtx_number(v), dagvtx_number(sk));
-	  toskip = true;
-	  break;
-	}
+        // skip because of missing deps
+        if (gen_in_list_p(v, dagvtx_succs(sk))) {
+          pips_debug(7, "skipping %"_intFMT", deps on %"_intFMT"\n",
+                     dagvtx_number(v), dagvtx_number(sk));
+          toskip = true;
+          break;
+        }
       }
       // or no available output path, none created by consumming an image
       if (!toskip && dagvtx_succs(v) && live_images==2 &&
-	  !(is_consummed_by_vertex(in0.producer, v, dpipe, todo) ||
-	    is_consummed_by_vertex(in1.producer, v, dpipe, todo)))
+          !(is_consummed_by_vertex(in0.producer, v, dpipe, todo) ||
+            is_consummed_by_vertex(in1.producer, v, dpipe, todo)))
       {
-	pips_debug(7, "skipping %"_intFMT", no path\n",  dagvtx_number(v));
-	toskip = true;
+        pips_debug(7, "skipping %"_intFMT", no path\n",  dagvtx_number(v));
+        toskip = true;
       }
       if (toskip) {
-	set_add_element(skipped, skipped, v);
-	continue;
+        set_add_element(skipped, skipped, v);
+        continue;
       }
     }
 
@@ -1323,7 +1321,7 @@ static void freia_spoc_pipeline
 
       // get needed parameters if any
       *lparams = gen_nconc(*lparams,
-	  freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
+           freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
 
       some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
 
@@ -1331,81 +1329,81 @@ static void freia_spoc_pipeline
       // add a comment each time a new stage is started.
       if (out.stage!=stage)
       {
-	stage = out.stage;
-	sb_cat(body, "\n  // STAGE ", itoa(stage), "\n");
+        stage = out.stage;
+        sb_cat(body, "\n  // STAGE ", itoa(stage), "\n");
       }
 
       // generate wiring, which may change flip stage on ALU operation
       // special case if in0==in1 is needed? no, rely on just_used
       if (in0.just_used)
-	generate_wiring(body, &in0, &out, wiring);
+        generate_wiring(body, &in0, &out, wiring);
 
       if (in1.just_used)
-	generate_wiring(body, &in1, &out, wiring);
+        generate_wiring(body, &in1, &out, wiring);
 
       // generate stage code
       basic_spoc_conf(optype, body, tail, out.stage, out.side, out.flip,
-		      &(api->spoc), v, hparams);
+                      &(api->spoc), v, hparams);
 
       bool
-	in0_needed = image_is_needed(in0.producer, dpipe, todo),
-	in1_needed = image_is_needed(in1.producer, dpipe, todo);
+        in0_needed = image_is_needed(in0.producer, dpipe, todo),
+        in1_needed = image_is_needed(in1.producer, dpipe, todo);
 
       // first, keep where it is...
       if (in0.stage==out.stage && in0.level==out.level && in0.side==out.side)
-	in0 = out;
-      else
-	if (in1.stage==out.stage && in1.level==out.level && in1.side==out.side)
-	  in1 = out;
+        in0 = out;
+      else if (in1.stage==out.stage &&
+               in1.level==out.level && in1.side==out.side)
+        in1 = out;
       // else overwrite not needed used image
       else if (!in0_needed && in0.used)
-	in0 = out;
+        in0 = out;
       else if (!in1_needed && in1.used)
-	in1 = out;
+        in1 = out;
       // else, overwrite same image if not needed
       else if (!in0_needed || out.image==in0.image)
       {
-	if (in1.image)
-	  in0 = out;
-	else
-	  in1 = out; // rather keep it the available slot?
+        if (in1.image)
+          in0 = out;
+        else
+          in1 = out; // rather keep it the available slot?
       }
       else if (!in1_needed || out.image==in1.image)
       {
-	if (in0.image)
-	  in1 = out;
-	else
-	  in0 = out; // idem
+        if (in0.image)
+          in1 = out;
+        else
+          in0 = out; // idem
       }
       // the image is available twice which is needed
       else if (in0.image && in0.image == in1.image)
       {
-	// we have the same image, overwrite the used one
-	if (in0.used)
-	  in0 = out;
-	else if (in1.used)
-	  in1 = out;
-	// if none where used, overwrite the one on the current side
-	// ??? in0.side == -1 && in1.side==-1 ?
-	else if (in0.side == out.side)
-	  in0 = out;
-	else if (in1.side == out.side)
-	  in1 = out;
-	else if (out.side==-1)
-	  // just choose one?
-	  in0 = out;
-	else
-	  pips_internal_error("should not get there (same image)?");
+        // we have the same image, overwrite the used one
+        if (in0.used)
+          in0 = out;
+        else if (in1.used)
+          in1 = out;
+        // if none where used, overwrite the one on the current side
+        // ??? in0.side == -1 && in1.side==-1 ?
+        else if (in0.side == out.side)
+          in0 = out;
+        else if (in1.side == out.side)
+          in1 = out;
+        else if (out.side==-1)
+          // just choose one?
+          in0 = out;
+        else
+          pips_internal_error("should not get there (same image)?");
       }
       else
-	pips_internal_error("should not get there (3 live images)...");
+        pips_internal_error("should not get there (3 live images)...");
 
       // anyway, we must clean unuseful variables, because
       // the scheduling  on image entities to check deps (still ?)
       if (!in0_needed && in0.producer!=out.producer)
-	init_op_schedule(&in0, NULL, 0);
+        init_op_schedule(&in0, NULL, 0);
       if (!in1_needed && in1.producer!=out.producer)
-	init_op_schedule(&in1, NULL, 0);
+        init_op_schedule(&in1, NULL, 0);
 
       // update count of live images for overflow mode
       live_images = 0;
@@ -1424,10 +1422,10 @@ static void freia_spoc_pipeline
     // what are the effective outputs in the middle of the pipeline
     list new_outs = NIL;
     if (image_is_needed(in1.producer, dpipe, todo) &&
-	!gen_in_list_p(in1.producer, dag_inputs(dpipe)))
+        !gen_in_list_p(in1.producer, dag_inputs(dpipe)))
       new_outs = CONS(entity, in1.image, new_outs);
     if (image_is_needed(in0.producer, dpipe, todo) &&
-	!gen_in_list_p(in0.producer, dag_inputs(dpipe)))
+        !gen_in_list_p(in0.producer, dag_inputs(dpipe)))
       // should also check that in0!=in1?
       new_outs = CONS(entity, in0.image, new_outs);
 
@@ -1443,12 +1441,12 @@ static void freia_spoc_pipeline
     {
       dag_remove_vertex(dpipe, vr);
       if (pstatement_statement_p(vtxcontent_source(dagvtx_content(vr))))
-	hwac_kill_statement(pstatement_statement
-			    (vtxcontent_source(dagvtx_content(vr))));
+        hwac_kill_statement(pstatement_statement
+                            (vtxcontent_source(dagvtx_content(vr))));
       free_dagvtx(vr);
     }
   }
-  dag_compute_outputs(dpipe);
+  dag_compute_outputs(dpipe, NULL);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -1471,7 +1469,7 @@ static void freia_spoc_pipeline
       pips_assert("image found", in0.image==imout);
       // choose the latest
       if (in1.stage>in0.stage || (in1.stage==in0.stage && in1.level>in0.level))
-	out = in0, in0 = in1, in1 = out;
+        out = in0, in0 = in1, in1 = out;
     }
     // else just take the right one
     else if (in1.image==imout && in0.image!=imout)
@@ -1546,7 +1544,7 @@ static void freia_spoc_pipeline
     }
 
     pips_assert("2 images: one output on each side",
-	(out0_side==0 && out1_side==1) || (out0_side==1 && out1_side==0));
+            (out0_side==0 && out1_side==1) || (out0_side==1 && out1_side==0));
 
     limg = CONS(entity, out0, CONS(entity, out1, limg));
     if (out1_side) // out1 on side 1, thus out0 side 0
@@ -1614,11 +1612,47 @@ static void freia_spoc_pipeline
 
 /***************************************************************** MISC UTIL */
 
+/* current list of computable that may be used to know about the
+ * global context when comparing to vertices in "dagvtx_spoc_priority".
+ */
+static list dagvtx_spoc_priority_computables = NIL;
+// idem for vertices computed in current pipe
+static list dagvtx_spoc_priority_current = NIL;
+
+#if 0
+/* return the number of poc operations which have the same input node
+ * as ref from the global list, including the ref itself.
+ */
+static int poc_count_same_inputs(const dagvtx ref)
+{
+  pips_assert("global list is defined", dagvtx_spoc_priority_computables);
+  pips_assert("vertex is in list",
+              gen_in_list_p(ref, dagvtx_spoc_priority_computables));
+  pips_assert("vertex is a poc operation", dagvtx_optype(ref)==spoc_type_poc);
+
+  dagvtx src = DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(ref))));
+  int n = 0;
+
+  FOREACH(dagvtx, v, dagvtx_spoc_priority_computables)
+    if (dagvtx_optype(v)==spoc_type_poc &&
+        DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(v)))) == src)
+      n++;
+
+  FOREACH(dagvtx, v, dagvtx_spoc_priority_current)
+    if (dagvtx_optype(v)==spoc_type_poc &&
+        DAGVTX(CAR(vtxcontent_inputs(dagvtx_content(v)))) == src)
+      n++;
+
+  pips_assert("at least myself", n>0);
+  return n;
+}
+#endif
+
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
  * allowed by dependencies are schedule.
- * tells v1 < v2 => -1
+ * tells v1 < v2  =>  -1  =>  v1 BEFORE v2
  */
 int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
 {
@@ -1665,6 +1699,8 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
     FOREACH(dagvtx, vs2, dagvtx_succs(*v2))
       if (dagvtx_optype(vs2)!=spoc_type_mes) nms2++;
 
+    // the decision process is mostly based on the number of inputs
+    // images to the two compared operations.
     if (l1!=l2 && (l1==0 || l2==0))
       // put image generators at the end, after any other computation
       result = l2-l1, why = "args";
@@ -1684,6 +1720,21 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
       // so that if all is well the pipe is filled in order.
       result = vtxcontent_optype(c1) - vtxcontent_optype(c2), why = "ops";
     else
+      /*
+        // unsuccessful attempt for freia_43
+      if (vtxcontent_optype(c1)==spoc_type_poc)
+    {
+      int
+        same1 = poc_count_same_inputs(*v1),
+        same2 = poc_count_same_inputs(*v2);
+      if (same1!=same2)
+        // chose the one with more inputs
+        result = same1-same2, why = "pocinputs";
+      else
+        // same as last case
+        result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
+    }
+    else */
       // if all else fails, rely on statement numbers.
       result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
   }
@@ -1737,12 +1788,12 @@ static void live_update(dag d, dagvtx v, set sure, set maybe)
       // 1 -> 1
       if (set_size(sure)==1 && !list_in_set_p(preds, sure))
       {
-	set_assign_list(maybe, preds);
-	set_union(maybe, maybe, sure);
+        set_assign_list(maybe, preds);
+        set_union(maybe, maybe, sure);
       }
       else
       {
-	set_append_list(maybe, preds);
+        set_append_list(maybe, preds);
       }
     }
     break;
@@ -1782,18 +1833,18 @@ static set output_arcs(dag d, set vs)
       // it is needed if...
       list succs = dagvtx_succs(v);
       if (gen_in_list_p(v, dag_outputs(d)))
-	  is_needed = true;
+        is_needed = true;
       else if (succs)
       {
-	// some succs are not yet computed...
-	FOREACH(dagvtx, vsucc, succs)
-	  if (!set_belong_p(vs, vsucc))
-	    is_needed = true;
+        // some succs are not yet computed...
+        FOREACH(dagvtx, vsucc, succs)
+          if (!set_belong_p(vs, vsucc))
+            is_needed = true;
       }
       // else there is no successor!?
 
       if (is_needed)
-	set_add_element(out_nodes, out_nodes, v);
+        set_add_element(out_nodes, out_nodes, v);
     }
   }
   return out_nodes;
@@ -1855,11 +1906,11 @@ static dagvtx first_which_may_be_added
     if (npreds==2) // binary alu operations...
     {
       if (!set_inclusion_p(sure, inputs))
-	continue;
+        continue;
       // two lives, but the var reuse will break the pipe by hidding
       // the other live which is not used by the computation of v.
       if (n_outputs==2 && set_size(inputs)==1)
-	continue;
+        continue;
     }
 
     set_add_element(current, current, v);
@@ -1915,18 +1966,22 @@ static list /* of dags */ split_dag(dag initial)
     ifdebug(4) {
       pips_debug(4, "round %d:\n", count);
       set_fprint(stderr, "computed", computed,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "current", current,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "avails", avails,
-		 (gen_string_func_t) dagvtx_to_string);
+                 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "maybe", maybe, (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "sure", sure, (gen_string_func_t) dagvtx_to_string);
     }
 
     list computables = get_computable_vertices(dall, computed, avails, current);
+    dagvtx_spoc_priority_computables = computables;
+    dagvtx_spoc_priority_current = lcurrent;
     gen_sort_list(computables,
 		  (int(*)(const void*,const void*)) dagvtx_spoc_priority);
+    dagvtx_spoc_priority_computables = NIL;
+    dagvtx_spoc_priority_current = NIL;
 
     pips_assert("something must be computable if current is empty",
 		computables || !set_empty_p(current));
@@ -1962,15 +2017,15 @@ static list /* of dags */ split_dag(dag initial)
       dag nd = make_dag(NIL, NIL, NIL);
       FOREACH(dagvtx, v, lcurrent)
       {
-	pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
-	dag_append_vertex(nd, copy_dagvtx_norec(v));
+        pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+        dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd);
+      dag_compute_outputs(nd, NULL);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
-	// dag_dump(stderr, "updated dall", dall);
-	dag_dump(stderr, "pushed dag", nd);
+        // dag_dump(stderr, "updated dall", dall);
+        dag_dump(stderr, "pushed dag", nd);
       }
 
       // update global list of dags to return.
@@ -2011,6 +2066,7 @@ static list /* of dags */ split_dag(dag initial)
 void freia_spoc_compile_calls
   (string module,
    list /* of statements */ ls,
+   hash_table occs,
    FILE * helper_file,
    int number)
 {
@@ -2019,7 +2075,7 @@ void freia_spoc_compile_calls
   pips_assert("some statements", ls);
 
   list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -2061,8 +2117,8 @@ void freia_spoc_compile_calls
       freia_hack_fix_global_ins_outs(fulld, d);
 
       ifdebug(6) {
-	pips_debug(4, "dag for split %d\n", split);
-	dag_dump(stderr, "d", d);
+        pips_debug(4, "dag for split %d\n", split);
+        dag_dump(stderr, "d", d);
       }
 
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
@@ -2074,7 +2130,7 @@ void freia_spoc_compile_calls
       string_buffer_free(&code);
 
       freia_substitute_by_helper_call(d, global_remainings, remainings,
-				      ls, fname_split, lparams);
+                                      ls, fname_split, lparams);
 
       free(fname_split), fname_split = NULL;
     }
@@ -2087,6 +2143,7 @@ void freia_spoc_compile_calls
   // pips_assert("all statements done", set_empty_p(global_remainings));
 
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

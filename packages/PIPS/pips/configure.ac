@@ -148,7 +148,9 @@ AX_ARG_ENABLE([pyps-extra],
 			[no],
 			[
 			 AX_CHECK_PROG([ipython])
-			 AX_DEPENDS([pyps-extra],[pyps ipython])
+			 AX_CHECK_PROG([noweave])
+			 AX_PYTHON_MODULE([Pyro]) 
+			 AX_DEPENDS([pyps-extra],[pyps ipython noweave Pyro])
 			]
 )
 
@@ -202,91 +204,103 @@ AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
 AC_CONFIG_FILES([pips_config.h
 				 Makefile
 				 pips.pc
-                 src/Documentation/Makefile
-                 src/Documentation/constants/Makefile
-                 src/Documentation/help/Makefile
-                 src/Documentation/newgen/Makefile
-                 src/Documentation/pipsmake/Makefile
-                 src/Libs/Makefile
-                 src/Libs/alias-classes/Makefile
-                 src/Libs/atomizer/Makefile
-                 src/Libs/bootstrap/Makefile
-                 src/Libs/c_syntax/Makefile
-                 src/Libs/callgraph/Makefile
-                 src/Libs/chains/Makefile
-                 src/Libs/comp_sections/Makefile
-                 src/Libs/complexity/Makefile
-                 src/Libs/continuation/Makefile
-                 src/Libs/control/Makefile
-                 src/Libs/conversion/Makefile
-                 src/Libs/effects-util/Makefile
-                 src/Libs/effects-convex/Makefile
-                 src/Libs/effects-generic/Makefile
-                 src/Libs/effects-simple/Makefile
-                 src/Libs/expressions/Makefile
-                 src/Libs/flint/Makefile
-                 src/Libs/gpu/Makefile
-                 src/Libs/hpfc/Makefile
-                 src/Libs/hwac/Makefile
-                 src/Libs/hyperplane/Makefile
-                 src/Libs/icfg/Makefile
-                 src/Libs/instrumentation/Makefile
-                 src/Libs/locality/Makefile
-                 src/Libs/misc/Makefile
-                 src/Libs/movements/Makefile
-                 src/Libs/newgen/Makefile
-                 src/Libs/phrase/Makefile
-                 src/Libs/pipsdbm/Makefile
-                 src/Libs/pipsmake/Makefile
-                 src/Libs/preprocessor/Makefile
-                 src/Libs/prettyprint/Makefile
-                 src/Libs/properties/Makefile
-                 src/Libs/reductions/Makefile
-                 src/Libs/ri-util/Makefile
-                 src/Libs/rice/Makefile
-                 src/Libs/ricedg/Makefile
-                 src/Libs/sac/Makefile
-                 src/Libs/safescale/Makefile
-                 src/Libs/scalopes/Makefile
-                 src/Libs/semantics/Makefile
-                 src/Libs/step/Makefile
-                 src/Libs/syntax/Makefile
-                 src/Libs/text-util/Makefile
-                 src/Libs/to_begin_with/Makefile
-                 src/Libs/top-level/Makefile
-                 src/Libs/transformations/Makefile
-                 src/Libs/accel-util/Makefile
-                 src/Libs/transformer/Makefile
-                 src/Libs/static_controlize/Makefile
-                 src/Libs/paf-util/Makefile
-                 src/Libs/wp65/Makefile
+
+				 src/Makefile
+
+				 src/Libs/Makefile
+				 src/Libs/alias-classes/Makefile
+				 src/Libs/atomizer/Makefile
+				 src/Libs/bootstrap/Makefile
+				 src/Libs/c_syntax/Makefile
+				 src/Libs/callgraph/Makefile
+				 src/Libs/chains/Makefile
+				 src/Libs/comp_sections/Makefile
+				 src/Libs/complexity/Makefile
+				 src/Libs/continuation/Makefile
+				 src/Libs/control/Makefile
+				 src/Libs/conversion/Makefile
+				 src/Libs/effects-util/Makefile
+				 src/Libs/effects-convex/Makefile
+				 src/Libs/effects-generic/Makefile
+				 src/Libs/effects-simple/Makefile
+				 src/Libs/expressions/Makefile
+				 src/Libs/flint/Makefile
+				 src/Libs/gpu/Makefile
+				 src/Libs/hpfc/Makefile
+				 src/Libs/hwac/Makefile
+				 src/Libs/hyperplane/Makefile
+				 src/Libs/icfg/Makefile
+				 src/Libs/instrumentation/Makefile
+				 src/Libs/locality/Makefile
+				 src/Libs/misc/Makefile
+				 src/Libs/movements/Makefile
+				 src/Libs/newgen/Makefile
+				 src/Libs/phrase/Makefile
+				 src/Libs/pipsdbm/Makefile
+				 src/Libs/pipsmake/Makefile
+				 src/Libs/pointer_values/Makefile
+				 src/Libs/preprocessor/Makefile
+				 src/Libs/prettyprint/Makefile
+				 src/Libs/properties/Makefile
+				 src/Libs/reductions/Makefile
+				 src/Libs/ri-util/Makefile
+				 src/Libs/rice/Makefile
+				 src/Libs/ricedg/Makefile
+				 src/Libs/sac/Makefile
+				 src/Libs/safescale/Makefile
+				 src/Libs/scalopes/Makefile
+				 src/Libs/semantics/Makefile
+				 src/Libs/step/Makefile
+				 src/Libs/syntax/Makefile
+				 src/Libs/text-util/Makefile
+				 src/Libs/to_begin_with/Makefile
+				 src/Libs/top-level/Makefile
+				 src/Libs/transformations/Makefile
+				 src/Libs/accel-util/Makefile
+				 src/Libs/transformer/Makefile
+				 src/Libs/static_controlize/Makefile
+				 src/Libs/paf-util/Makefile
+				 src/Libs/wp65/Makefile
 				 src/Libs/gnulib/Makefile
-                 src/Makefile
-                 src/Passes/Makefile
-                 src/Passes/fortran95/Makefile
-                 src/Passes/gpips/Makefile
-                 src/Passes/pips/Makefile
-                 src/Passes/pyps/Makefile
-		 src/Passes/pyps/doc/Makefile
-		 src/Passes/pyps/drivers/Makefile
-                 src/Passes/tpips/Makefile
-                 src/Runtimes/Makefile
-                 src/Scripts/Makefile
-                 src/Scripts/drivers/Makefile
-                 src/Scripts/hpfc/Makefile
-                 src/Scripts/simple_tools/Makefile
-                 src/Scripts/simple_tools/pips_c2openmp
-                 src/Scripts/simple_tools/pips_f2openmp
-                 src/Scripts/validation/Makefile
-                 src/Documentation/dev_guide/Makefile
-                 src/Documentation/auto_pips/Makefile
-                 src/Documentation/tpips-user-manual/Makefile
+
+				 src/Passes/Makefile
+				 src/Passes/fortran95/Makefile
+				 src/Passes/gpips/Makefile
+				 src/Passes/pips/Makefile
+				 src/Passes/pyps/Makefile
+				 src/Passes/pyps/doc/Makefile
+				 src/Passes/pyps/drivers/Makefile
+				 src/Passes/pyps/drivers/sac/Makefile
+				 src/Passes/pyps/drivers/workspace_gettime/Makefile
+				 src/Passes/pyps/drivers/pypsearch/Makefile
+				 src/Passes/tpips/Makefile
+
+				 src/Runtimes/Makefile
+
+				 src/Scripts/Makefile
+				 src/Scripts/drivers/Makefile
+				 src/Scripts/hpfc/Makefile
+				 src/Scripts/simple_tools/Makefile
+				 src/Scripts/simple_tools/pips_c2openmp
+				 src/Scripts/simple_tools/pips_f2openmp
+				 src/Scripts/validation/Makefile
+				 src/Scripts/misc/Makefile
+
+				 src/Documentation/Makefile
+				 src/Documentation/constants/Makefile
+				 src/Documentation/help/Makefile
+				 src/Documentation/newgen/Makefile
+				 src/Documentation/pipsmake/Makefile
+				 src/Documentation/dev_guide/Makefile
+				 src/Documentation/auto_pips/Makefile
+				 src/Documentation/tpips-user-manual/Makefile
 				 src/Documentation/linear/Makefile
 				 src/Documentation/bugs_and_wishes/Makefile
 				 src/Documentation/faq/Makefile
 				 src/Documentation/xpomp/Makefile
 				 src/Documentation/manl/Makefile
-])
+				 src/Documentation/pyps/Makefile
+				 ])
 				
 				 #src/Documentation/doxygen/Makefile
 				 #src/Documentation/logo/Makefile

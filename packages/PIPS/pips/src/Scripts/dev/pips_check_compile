@@ -35,6 +35,12 @@ dest=${2:-$LOGNAME@cri.ensmp.fr}
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 
+# compute load & jobs
+nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
+load=$(($nproc + 1))
+jobs=$(($nproc * 2))
+make="make -j $jobs -l $load"
+
 # report current-state compile message
 # current-state: ok skip locked KO:*
 # compile: ok unknown unchanged unbuild build exe
@@ -180,10 +186,10 @@ mv CURRENT PREVIOUS
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  nice make -j 8 -l 2.5 unbuild > out 2> err \
+  nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
   # what about a "timeout"? how to differentiate from a simple failure?
-  nice make -j 8 -l 2.5 build > out 2> err \
+  nice $make build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
   # check that "tpips" executable is there
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips \

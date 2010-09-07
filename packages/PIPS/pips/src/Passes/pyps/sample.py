@@ -22,7 +22,7 @@ bar.display()
 malabar.display()
 bar.apply("print_code")
 
-# you can also preform operations on loops
+# you can also perform operations on loops
 mb.display("loops_file")
 for l in mb.loops():
     l.unroll(rate=2)
@@ -34,9 +34,9 @@ w.all.display()
 
 # recover a list of all labels in the source code ... without pipsing
 ##
-import re # we are gonne use regular expression
+import re # we are going to use regular expressions
 label_re = re.compile("^ *(\w+):")
-# code gives us a list of line view of modue's code
+# code gives us a list of line view of module's code
 lines=foo.code()
 labels=[]
 for line in lines:

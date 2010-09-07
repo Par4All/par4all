@@ -1,0 +1,162 @@
+void P4A_scmp_dealloc(void *dest)
+{
+}
+void * P4A_scmp_flow(void **flow)
+{
+}
+void P4A_scmp_kernel_0(int N, int a[N], int f[N])
+{
+   //PIPS generated variable
+   int j;
+
+   for(j = 0; j <= 99; j += 1)
+      // To be assigned to a call to P4A_vp_0: j
+      p4a_kernel_wrapper_0(N, a, f, j);
+}
+void P4A_scmp_kernel_1(int N, int a[N], int f[N])
+{
+   //PIPS generated variable
+   int j;
+
+   for(j = 0; j <= 99; j += 1)
+      // To be assigned to a call to P4A_vp_0: j
+      p4a_kernel_wrapper_1(N, a, f, j);
+}
+void P4A_scmp_kernel_2(int N, int a[N], int f[N])
+{
+   //PIPS generated variable
+   int j;
+
+   for(j = 0; j <= 99; j += 1)
+      // To be assigned to a call to P4A_vp_0: j
+      p4a_kernel_wrapper_2(N, a, f, j);
+}
+void P4A_scmp_malloc(void **dest, size_t n)
+{
+
+   if (*dest==(void *) 0) 
+      *dest = malloc(n);
+}
+void P4A_scmp_read(const int *in_address, int *out_address, size_t n)
+{
+   memcpy(in_address, out_address, n);
+}
+void P4A_scmp_write(void *out_address, const void *buffer_address, size_t n)
+{
+   memcpy(out_address, buffer_address, n);
+}
+_Bool check(int size, int tab[size], int value)
+{
+   _Bool result = 1;
+   int i;
+   for(i = 0; i <= 99; i += 1)
+      result &= tab[i]==value;
+   return result;
+}
+void init(int size, int tab[size], int value)
+{
+   int i;
+   for(i = 0; i <= 99; i += 1)
+      tab[i] = value;
+}
+int main()
+{
+   int i, j;
+
+   int a[N];
+   int f[N];
+   //PIPS generated variable
+   int (*P_0)[N] = (int (*)[N]) 0, (*P_1)[N] = (int (*)[N]) 0, (*P_2)[N] = (int (*)[N]) 0, (*P_3)[N] = (int (*)[N]) 0, (*P_4)[N] = (int (*)[N]) 0, (*P_5)[N] = (int (*)[N]) 0;
+
+   init(N, (int *) P4A_scmp_flow(a), 0);
+   init(N, (int *) P4A_scmp_flow(f), 2);
+   if (check(N, (int *) P4A_scmp_flow(a), 0)==0) {
+      printf("check init a failed\n");
+      exit(1);
+   }
+   if (check(N, (int *) P4A_scmp_flow(f), 2)==0) {
+      printf("check init f failed\n");
+      exit(1);
+   }
+
+   for(i = 0; i <= nb_tour-1; i += 1) {
+      P4A_scmp_malloc(&P_1, sizeof(int[N])-1+1);
+      P4A_scmp_malloc(&P_0, sizeof(int[N])-1+1);
+      P4A_scmp_read(a, *P_1, sizeof(int[N])-1+1);
+      P4A_scmp_read(f, *P_0, sizeof(int[N])-1+1);
+
+      P4A_scmp_kernel_0(N, *P_1, *P_0);
+      P4A_scmp_write(a, *P_1, sizeof(int[N])-1+1);
+      P4A_scmp_write(f, *P_0, sizeof(int[N])-1+1);
+      P4A_scmp_malloc(&P_3, sizeof(int[N])-1+1);
+      P4A_scmp_malloc(&P_2, sizeof(int[N])-1+1);
+      P4A_scmp_read(a, *P_3, sizeof(int[N])-1+1);
+      P4A_scmp_read(f, *P_2, sizeof(int[N])-1+1);
+
+      P4A_scmp_kernel_1(N, *P_3, *P_2);
+      P4A_scmp_write(a, *P_3, sizeof(int[N])-1+1);
+      P4A_scmp_write(f, *P_2, sizeof(int[N])-1+1);
+
+      ((int *) P4A_scmp_flow(a))[0] = ((int *) P4A_scmp_flow(a))[0]++;
+      P4A_scmp_malloc(&P_5, sizeof(int[N])-1+1);
+      P4A_scmp_malloc(&P_4, sizeof(int[N])-1+1);
+      P4A_scmp_read(a, *P_5, sizeof(int[N])-1+1);
+      P4A_scmp_read(f, *P_4, sizeof(int[N])-1+1);
+
+      P4A_scmp_kernel_2(N, *P_5, *P_4);
+      P4A_scmp_write(a, *P_5, sizeof(int[N])-1+1);
+      P4A_scmp_write(f, *P_4, sizeof(int[N])-1+1);
+
+      if (check(N, (int *) P4A_scmp_flow(a), i+1)==0) {
+         printf("loop %d : check failed\n", i);
+         exit(1);
+      }
+      if (check(N, (int *) P4A_scmp_flow(f), i+3)==0) {
+         printf("loop %d : check failed\n", i);
+         exit(1);
+      }
+   }
+
+   if (check(N, (int *) P4A_scmp_flow(a), nb_tour)==0) {
+      printf("final check a failed\n");
+      exit(1);
+   }
+   if (check(N, (int *) P4A_scmp_flow(f), nb_tour+2)==0) {
+      printf("final check f failed\n");
+      exit(1);
+   }
+
+   printf("success\n");
+
+   return 0;
+}
+void p4a_kernel_0(int N, int a[N], int f[N], int j)
+{
+   a[j] += 3;
+   f[j] += 3;
+}
+void p4a_kernel_1(int N, int a[N], int f[N], int j)
+{
+   a[j] -= 1;
+   f[j] -= 1;
+}
+void p4a_kernel_2(int N, int a[N], int f[N], int j)
+{
+   a[j] -= 1;
+   f[j] -= 1;
+}
+void p4a_kernel_wrapper_0(int N, int a[N], int f[N], int j)
+{
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_0(N, a, f, j);
+}
+void p4a_kernel_wrapper_1(int N, int a[N], int f[N], int j)
+{
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_1(N, a, f, j);
+}
+void p4a_kernel_wrapper_2(int N, int a[N], int f[N], int j)
+{
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_2(N, a, f, j);
+}

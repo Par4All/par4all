@@ -1,0 +1,59 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *p, i;
+//               <must be written>: i
+   i = 1;
+//               <must be read   >: i
+
+   if (i>0)
+//               <must be written>: p
+      p = &i;
+   else
+//               <must be written>: p
+      p = &i;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   int *p, i;
+//  points to = {}
+   i = 1;
+//  points to = {}
+
+   if (i>0)
+//  points to = {}
+      p = &i;
+   else
+//  points to = {}
+      p = &i;
+//  {(p,i,-Exact-)}
+
+   return 0;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int *p, i;
+//               <must be written>: i
+   i = 1;
+//               <must be read   >: i
+
+   if (i>0)
+//               <must be written>: p
+      p = &i;
+   else
+//               <must be written>: p
+      p = &i;
+
+   return 0;
+   // END BLOCK
+}

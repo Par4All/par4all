@@ -546,7 +546,9 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
 
     switch(nsucc) {
       case 0:
-        MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
+	/* Build the statement text with enclosing braces if necessary in
+	   C and skip parasitic continues */
+        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), TRUE, NIL));
         break;
       case 1: {
         control succ = CONTROL(CAR(control_successors(c)));
@@ -564,7 +566,9 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
               !check_io_statement_p(control_statement(succ)));
         }
 
-        MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
+	/* Build the statement text with enclosing braces if necessary in
+	   C and skip parasitic continues */
+        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), TRUE, NIL));
 
         /* If the statement "really" has a continuation (e.g. not a STOP
          * or a RETURN)

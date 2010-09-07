@@ -246,7 +246,7 @@ tile_membership_constraints(Pbase initial_basis,
     sc_creer_base(mc);
 
     ifdebug(8) {
-	debug(8, "tile_membership_constraints", "End with constraint system mc:\n");
+	pips_debug(8, "End with constraint system mc:\n");
 	sc_fprint(stderr, mc, (get_variable_name_t)entity_local_name);
     }
 
@@ -281,8 +281,7 @@ loop_nest_to_offset(list lls)
  * The row-echelon algorithm is called from new_loop_bound().
  */
 
-statement 
-tiling( list lls)
+statement tiling( list lls)
 {
     Psysteme sci;			/* iteration domain */
     Psysteme sc_tile_scan;
@@ -302,7 +301,7 @@ tiling( list lls)
     Value *h;
     statement s_lhyp;
     Pvecteur *pvg;
-    Pbase pb;  
+    Pbase pb;
     expression lower, upper;
     int col;
     Pvecteur to = VECTEUR_NUL; /* Tiling offset: 0 by default */
@@ -329,7 +328,7 @@ tiling( list lls)
     HT = matrice_new(n, n);
     string smatrix = get_string_property("LOOP_TILING_MATRIX");
 
-    if( 
+    if(
             !static_partitioning_matrix(P,n,smatrix) &&
             !interactive_partitioning_matrix(P, n)
       ) {
@@ -337,7 +336,7 @@ tiling( list lls)
     }
 
     ifdebug(8) {
-	debug(8,"tiling","Partitioning matrix P:");
+	pips_debug(8,"Partitioning matrix P:");
 	matrice_fprint(stderr, P, n, n);
 	(void) fprintf(stderr,"\n");
     }
@@ -345,7 +344,7 @@ tiling( list lls)
     matrice_general_inversion(P, HT, n);
 
     ifdebug(8) {
-	debug(8,"tiling","Inverse partitioning matrix HT:");
+	pips_debug(8,"Inverse partitioning matrix HT:");
 	matrice_fprint(stderr, HT, n, n);
 	(void) fprintf(stderr,"\n");
     }
@@ -385,14 +384,15 @@ tiling( list lls)
     }
 
     /* CA: Build the new basis (tile_basis+initial_basis)*/
-    /* base It, Jt, I, J  pour notre exemple */ 
+    /* base It, Jt, I, J  pour notre exemple */
     new_basis = vect_add(vect_dup(initial_basis),vect_dup(tile_basis));
     ifdebug(8) {
 	(void) fprintf(stderr,"new_basis\n");
 	vect_fprint(stderr, new_basis, (get_variable_name_t)entity_local_name);
     }
 
-    /* Build the constraint system sc_tile to scan one tile (BS IN PPoPP'91 paper) */
+    /* Build the constraint system sc_tile to scan one tile (BS IN
+       PPoPP'91 paper) */
     ifdebug(8) {
 	(void) fprintf(stderr,"sc_B_second:\n");
 	sc_fprint(stderr, sc_B_second, (get_variable_name_t)entity_local_name);
@@ -404,17 +404,18 @@ tiling( list lls)
     }
 
 
-    /* computation of the hyperplane tile direction: let's use the default 1 vector */
+    /* computation of the hyperplane tile direction: let's use the
+       default 1 vector */
     h = (Value*)(malloc(n*sizeof(Value)));
     for(col=0; col<n; col++) {
 	h[col] = VALUE_ONE;
     }
-    /* computation of the tile scanning base G: right now, let's assume it's Id.
-     * This is OK to tile parallel loops... or to scan tiles sequentially on a 
-     * monoprocessor.
+    /* computation of the tile scanning base G: right now, let's
+     * assume it's Id.  This is OK to tile parallel loops... or to
+     * scan tiles sequentially on a monoprocessor.
      */
-    G = matrice_new(n,n); 
-    scanning_base_hyperplane(h, n, G);	  
+    G = matrice_new(n,n);
+    scanning_base_hyperplane(h, n, G);
     matrice_identite(G, n, 0);
     ifdebug(8) {
 	(void) fprintf(stderr,"The tile scanning base G is:");
@@ -432,7 +433,8 @@ tiling( list lls)
 
     /* generation of code to scan one tile and update of loop body using pvg */
 
-    s_lhyp = code_generation(lls, pvg, initial_basis, new_basis, sc_tile, FALSE);
+    s_lhyp = code_generation(lls, pvg, initial_basis,
+			     new_basis, sc_tile, FALSE);
 
     /* generation of code for scanning all tiles */
 
@@ -450,8 +452,8 @@ tiling( list lls)
 		       NIL);
 	s_lhyp = instruction_to_statement(make_instruction(is_instruction_loop, tl));
     }
-    
-    debug(8," tiling","End\n");
+
+    pips_debug(8,"End\n");
 
     debug_off();
 

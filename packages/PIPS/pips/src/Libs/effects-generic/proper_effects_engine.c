@@ -29,7 +29,7 @@
  * File: proper_effects_engine.c
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the computation of 
+ * This File contains the generic functions necessary for the computation of
  * all types of proper effects and proper references.
  *
  */
@@ -85,11 +85,11 @@ set_contracted_proper_effects(bool b)
 {
     contract_p = b;
 }
- 
+
 
 /**************************************** LOCAL STACK FOR LOOP RANGE EFFECTS */
 
-/* Effects on loop ranges have to be added to inner statements to model 
+/* Effects on loop ranges have to be added to inner statements to model
  * control dependances (see loop filter for PUSH).
  */
 
@@ -162,11 +162,11 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 
   // we first add as many unbounded indices as there are dimensions in the type.
   for(int i=0; i< (int) gen_length(l_dim); i++)
-    (*effect_add_expression_dimension_func)(input_eff, make_unbounded_expression());   
-  
-  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL))); 
+    (*effect_add_expression_dimension_func)(input_eff, make_unbounded_expression());
+
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
   list l_fields = type_fields(entity_type(basic_derived(b)));
-  
+
   FOREACH(ENTITY, f, l_fields)
     {
       type current_type = basic_concrete_type(entity_type(f));
@@ -175,7 +175,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 
       // we add the field index
       effect_add_field_dimension(current_eff, f);
-  
+
       switch (basic_tag(current_basic))
 	{
 	case is_basic_derived:
@@ -193,8 +193,8 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 	    list l_dim =  variable_dimensions(type_variable(current_type));
 	    pips_debug(8, "default case\n");
 	    for(int i=0; i< (int) gen_length(l_dim); i++)
-	      (*effect_add_expression_dimension_func)(current_eff, make_unbounded_expression());   
-	    
+	      (*effect_add_expression_dimension_func)(current_eff, make_unbounded_expression());
+
 	    le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
 	  }
 	}
@@ -211,11 +211,11 @@ list generic_proper_effects_of_derived_reference(reference ref, bool write_p)
   list le = NIL;
 
   pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
- 
+
   /* should'nt it be something more direct here ? ?*/
   effect eff = (*reference_to_effect_func)
-    (ref, write_p? is_action_write : is_action_read, true);
-  
+    (ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+
   if (type_enum_p(entity_type(basic_derived(b))))
     le = CONS(EFFECT, eff, NIL);
   else
@@ -223,7 +223,7 @@ list generic_proper_effects_of_derived_reference(reference ref, bool write_p)
       le = generic_r_proper_effects_of_derived_reference(eff, t);
       le = gen_nreverse(le);
     }
-  
+
   return le;
 }
 
@@ -234,7 +234,7 @@ list generic_intermediary_proper_effects_of_reference(reference ref)
   type t = basic_concrete_type(entity_type(ent));
   list l_ind_orig = reference_indices(ref);
   list l_ind = l_ind_orig;
-  
+
   pips_debug(7, "begin \n");
   /* there should be a while here, I guess. Well work for tomorrow */
 
@@ -288,7 +288,7 @@ list generic_intermediary_proper_effects_of_reference(reference ref)
 			 words_to_string(words_reference(read_ref,NIL)));
 
 	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref),
-						     is_action_read,
+						     make_action_read_memory(),
 						     false);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
@@ -312,7 +312,7 @@ list generic_intermediary_proper_effects_of_reference(reference ref)
 	    }
 	  free_reference(read_ref);
 	}
-  
+
     }  /* if (type_variable_p(t)) */
   gen_nreverse(le);
   le = gen_nconc(generic_proper_effects_of_expressions(l_ind), le);
@@ -412,7 +412,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 			 words_to_string(words_reference(read_ref,NIL)));
 
 	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref),
-						     is_action_read,
+						     make_action_read_memory(),
 						     false);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
@@ -445,7 +445,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))
 	{
 	  *pme = (*reference_to_effect_func)
-	    (ref, write_p? is_action_write : is_action_read, true);
+	    (ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
 	  pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
 	}
     }
@@ -457,9 +457,9 @@ list generic_p_proper_effect_of_reference(reference ref,
        This should maybe be refined ? */
 
       *pme = (*reference_to_effect_func)
-	(ref, write_p? is_action_write : is_action_read, true);
+	(ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
       if(!effect_undefined_p(*pme))
-	pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
+	pips_assert("*pme is weakly consistent", region_weakly_consistent_p(*pme));
     }
 
   /* we must add the read effects on the indices ; these reads are performed
@@ -471,10 +471,10 @@ list generic_p_proper_effect_of_reference(reference ref,
 
   ifdebug(4)
     {
-      if(effect_undefined_p(*pme)) 
+      if(effect_undefined_p(*pme))
 	pips_debug(4, "ending no main effect "
 		   "(e.g. a non-subscribed reference to an array)\n");
-      else 
+      else
 	pips_debug_effect(4, "ending with main effect : \n", *pme);
 
       pips_debug_effects(4, "and intermediate read effects : \n",le);
@@ -486,7 +486,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 
 
 
-/* list generic_proper_effects_of__read_reference(reference ref, bool written_p)
+/* list generic_proper_effects_of_reference(reference ref, bool written_p)
  * input    : a reference and a boolean true if it is a written reference.
  * output   : the corresponding list of effects.
  * modifies : nothing.
@@ -527,18 +527,42 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 	      le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
 							 FALSE);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
-	      
+
 	      if (!effect_undefined_p(eff))
 		{
 		  le = gen_nconc(le, CONS(EFFECT, eff, NIL));
 		  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 		}
 	    }
+      free_type(ref_type);
 	}
 	else
 	  pips_internal_error("case not handled yet \n");
       (*effects_precondition_composition_op)(le, context);
     }
+
+  /* Environment and declaration type effects */
+  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+    /* May not be generic enough altough contexts seem useless for
+       environment effects */
+    /* FI: these effects do not seem to always combine. A statement
+       with a read and a write of v seems to end with two reference
+       effects. See Bootstrap/iand01.f, assuming all effects are
+       computed, of course. */
+    effect re = make_declaration_effect(v, FALSE); // reference effect
+    //type vt = entity_type(v);
+
+    le = CONS(EFFECT, re, le);
+
+    /*
+    if(typedef_type_p(vt)) {
+      entity te = basic_typedef(variable_basic(type_variable(vt)));
+      effect tre = make_declaration_effect(te, FALSE); // type
+						      // reference effect
+      le = CONS(EFFECT, tre, le);
+    }
+    */
+  }
 
   pips_debug(3, "end\n");
   return(le);
@@ -577,11 +601,11 @@ list generic_proper_effects_of_written_reference(reference ref)
 
 
 /**
- @return : a list of read effects corresponding to intermediate read memory 
+ @return : a list of read effects corresponding to intermediate read memory
          accesses during the evaluation of add_exp.
  @param add_exp is the expression which memory effects we are looking for
  @param pme is a Pointer towards the Main memory Effect of add_exp.
- @param write_p is a boolean set to true if the main effect is write, false 
+ @param write_p is a boolean set to true if the main effect is write, false
          otherwise.
 
  Go down along the first argument till you find a reference or a
@@ -646,7 +670,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    call s_c = syntax_call(expression_syntax(s_exp));
 	    entity s_op = call_function(s_c);
 	    list s_args = call_arguments(s_c);
-	    
+
 	    pips_debug(4,"The dereferenced expression is a call itself (%s)\n",
 		       entity_local_name(s_op));
 	    ifdebug(8)
@@ -685,12 +709,12 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		      {
 			effect eff_read;
 			pips_debug(4, "It's a pointer; we add a read effect \n");
-			
+
 			eff_read = (*effect_dup_func)(*pme);
-			effect_action_tag(eff_read) = is_action_read;
+			effect_action(eff_read) = make_action_read_memory();
 			le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		      }
-		    
+
 		    /* deal with case *(p+(i=exp))
 		     * the effect is equivalent to an effect on *(p+exp)
 		     */
@@ -704,31 +728,31 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 			    e2 =  EXPRESSION(CAR(CDR(s2_args)));
 			  }
 		      }
-		    
+
 		    (*effect_add_expression_dimension_func)(*pme, e2);
 		  }
-		le = gen_nconc(le, 
+		le = gen_nconc(le,
 			       generic_proper_effects_of_expression(e2));
-		
+
 		finished_p = TRUE;
 		result_computed_p = true;
-		 
+
 	      }
 	    /* Other functions to process: p++, ++p, p--, --p */
-	    else if(ENTITY_POST_INCREMENT_P(s_op) || 
-		    ENTITY_POST_DECREMENT_P(s_op)) 
+	    else if(ENTITY_POST_INCREMENT_P(s_op) ||
+		    ENTITY_POST_DECREMENT_P(s_op))
 	      {
 		expression e1 = EXPRESSION(CAR(s_args));
 		syntax s1 = expression_syntax(e1);
 		reference r1 = syntax_reference(s1);
 		entity v1 = reference_variable(r1);
-		
+
 	      /* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE: p[0]! */
-		
+
 		pips_assert("The argument is a reference", syntax_reference_p(s1));
-		
+
 		/* This seems OK for a scalar. How about an indexed reference? */
-		
+
 		le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
 		mr = make_reference(v1, CONS(EXPRESSION, int_to_expression(0), NIL));
 		/* DO NOT go down recursively with this new s_exp since the
@@ -736,32 +760,32 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		   dereferencing. */
 		finished_p = TRUE;
 	      }
-	    else if(ENTITY_PRE_INCREMENT_P(s_op) || 
-		    ENTITY_PRE_DECREMENT_P(s_op)) 
+	    else if(ENTITY_PRE_INCREMENT_P(s_op) ||
+		    ENTITY_PRE_DECREMENT_P(s_op))
 	      {
 		expression e1 = EXPRESSION(CAR(s_args));
 		syntax s1 = expression_syntax(e1);
 		reference r1 = syntax_reference(s1);
 		reference nr1 = reference_undefined;
-		
+
 		/* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE */
-		
+
 		pips_assert("The argument is a reference", syntax_reference_p(s1));
 		pips_assert("The reference is scalar", ENDP(reference_indices(r1)));
-		
+
 		le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
 		nr1 = copy_reference(r1);
 		if(ENTITY_PRE_INCREMENT_P(s_op))
 		  reference_indices(nr1) = CONS(EXPRESSION, int_to_expression(1), NIL);
 		else
 		  reference_indices(nr1) = CONS(EXPRESSION, int_to_expression(-1), NIL);
-		
+
 		/* Too bad for the memory leaks involved... This s_exp
 		   should be freed at exit. */
 		mr = nr1;
 		finished_p = TRUE;
 	      }
-	    else 
+	    else
 	      {
 		/* do nothing, go down recursively to handle other calls */
 		;
@@ -769,26 +793,26 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	  }
 	  else if (syntax_va_arg_p(expression_syntax(s_exp)))
 	    {
-	      /* there could be more work here, but va_arg is very poorly 
-		 handled everywhere for the moment. 
+	      /* there could be more work here, but va_arg is very poorly
+		 handled everywhere for the moment.
 	      */
 	      /* we generated an effect on the va_list, and that is all */
 	      list vararg_list = syntax_va_arg(expression_syntax(s_exp));
 	      sizeofexpression soe = SIZEOFEXPRESSION(CAR(vararg_list));
-	      
+
 	      pips_debug(4,"The dereferenced expression is a va_arg\n");
-	      
-	      le = generic_proper_effects_of_complex_address_expression(sizeofexpression_expression(soe), pme, TRUE); 
+
+	      le = generic_proper_effects_of_complex_address_expression(sizeofexpression_expression(soe), pme, TRUE);
 	      /* and we must add an anywhere effect because we don't know where
-		 the dereferenced location is. 
+		 the dereferenced location is.
 	      */
-	      le = CONS(EFFECT, 
+	      le = CONS(EFFECT,
 			make_anywhere_effect
-			(write_p? is_action_write : is_action_read),
+			(write_p? make_action_write_memory() : make_action_read_memory()),
 			le);
 	      result_computed_p = TRUE;
 	      finished_p = TRUE;
-	      
+
 	    }
 	  else
 	    {
@@ -797,7 +821,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      ;
 	    }
 	}
-      else 
+      else
 	{
 	  /* failure: a user function is called to return a structure or an address */
 	  pips_user_warning("PIPS does not know how to handle precisely this %s: \"%s\"\n",
@@ -807,98 +831,108 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	     the other sub-expressions won't be computed because we've set
 	     up finish_p==TRUE and *pme == effect_undefined */
 	  le = generic_proper_effects_of_expression(add_exp);
-	  
+
 	  finished_p = TRUE;
 	}
     }
-  else if(syntax_cast_p(s)) 
+  else if(syntax_cast_p(s))
     {
       pips_debug(4, "This is a cast\n");
       /* FI: The cast has an impact o pointer arithmetic. I do not know
-	 how to take it into account. */
+	 how to take it into account. The cast may also use a typedef
+	 type. */
       /* BC : it is a translation. The main effect should be translated
 	 accordingly to the cast type on return of the recursion. */
       pips_user_warning("Cast impact on pointer arithmetic and indexing is ignored\n");
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    type ct = cast_type(syntax_cast(s));
+
+	    if(typedef_type_p(ct)) {
+	      entity te = basic_typedef(variable_basic(type_variable(ct)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
+	    }
+	  }
       s_exp = cast_expression(syntax_cast(s));
     }
-  else if(syntax_subscript_p(s)) 
+  else if(syntax_subscript_p(s))
     {
       pips_debug(4,"This is a subscript\n");
       s_exp = subscript_array(syntax_subscript(s));
     }
-  else if(syntax_va_arg_p(s)) 
+  else if(syntax_va_arg_p(s))
     {
       pips_debug(4,"This is a va_arg\n");
       /* The built-in can return a pointer which is dereferenced */
       /* va_args is read... */
       finished_p = TRUE;
     }
-  else 
+  else
     {
       /* sizeofexpression, application. va_arg */
       pips_internal_error("Unexpected case\n");
     }
 
-  if(finished_p) 
+  if(finished_p)
     {
 
       pips_debug(3, "Stop recursing\n");
-      
+
       if (! result_computed_p)
 	{
-	  if(reference_undefined_p(mr)) 
+	  if(reference_undefined_p(mr))
 	    {
 	      pips_debug(4, "mr is undefined -> anywhere effect\n");
 	      *pme = make_anywhere_effect
-		(write_p ? is_action_write : is_action_read);
+		(write_p ? make_action_write_memory() : make_action_read_memory());
 	    }
-	  else 
+	  else
 	    {
 	      effect me;
-	      
+
 	      pips_debug(4,"mr is defined\n");
-	      
+
 	      me = (*reference_to_effect_func)
-		(mr, write_p? is_action_write : is_action_read, false);
-	      *pme = me;	      
+		(mr, write_p? make_action_write_memory() : make_action_read_memory(), false);
+	      *pme = me;
 	    }
 	}
     }
-  else 
+  else
     {
       pips_debug(8, "We go down recursively\n");
       le = gen_nconc
 	(le, generic_proper_effects_of_complex_address_expression
 	 (s_exp, pme, write_p));
-      
+
       pips_debug(8,"Returning from recursive call of generic_proper_effects_of_complex_address_expression : \n");
-      
-      if(!effect_undefined_p(*pme) && !anywhere_effect_p(*pme)) 
+
+      if(!effect_undefined_p(*pme) && !anywhere_effect_p(*pme))
 	{
 	  /* Let's try to refine *pme with the current expression, the
 	     current operator if any and the current second expression
 	     when it exists */
 	  pips_debug(4, "*pme is defined : try to refine it\n");
 
-	  if(syntax_reference_p(s)) 
+	  if(syntax_reference_p(s))
 	    {
 	      pips_internal_error("A reference should lead to the finished state\n");
 	    }
-	  else if(syntax_call_p(s)) 
+	  else if(syntax_call_p(s))
 	    {
 	      call c = syntax_call(s);
 	      entity op = call_function(c);
 	      list args = call_arguments(c);
-	      
-	      if(ENTITY_FIELD_P(op)) 
+
+	      if(ENTITY_FIELD_P(op))
 		{
 		  expression e2 = EXPRESSION(CAR(CDR(args)));
 		  syntax s2 = expression_syntax(e2);
 		  reference r2 = syntax_reference(s2);
 		  entity f = reference_variable(r2);
-		  
+
 		  pips_assert("e2 is a reference", syntax_reference_p(s2));
-		  
+
 		  pips_debug(4, "It's a field operator\n");
 
 		  /* we extend *pme by adding a dimension corresponding
@@ -906,7 +940,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  effect_add_field_dimension(*pme,f);
 		  finished_p = TRUE;
 		}
-	      else if(ENTITY_POINT_TO_P(op)) 
+	      else if(ENTITY_POINT_TO_P(op))
 		{
 		  expression e2 = EXPRESSION(CAR(CDR(args)));
 		  syntax s2 = expression_syntax(e2);
@@ -916,55 +950,57 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  pips_assert("e2 is a reference", syntax_reference_p(s2));
 
 		  f = reference_variable(syntax_reference(s2));
-		  
+
 		  pips_debug(4, "It's a point to operator\n");
-		  
+
 		  /* the pointer is read */
 		  pips_debug(4, "we add a read effect on the pointer. \n");
-		  
+
 		  eff_read = (*effect_dup_func)(*pme);
-		  effect_action_tag(eff_read) = is_action_read;
+		  /* memory leak */
+		  effect_action(eff_read) = make_action_read_memory();
 		  le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 
 
 		  /* We add a dereferencing */
 		   effect_add_dereferencing_dimension(* pme);
-		  
+
 		  /* we add the field dimension */
 		  effect_add_field_dimension(*pme,f);
 		  finished_p = TRUE;
 		}
-	      else if(ENTITY_DEREFERENCING_P(op)) 
+	      else if(ENTITY_DEREFERENCING_P(op))
 		{
 		  effect eff_read;
 		  expression e1 = EXPRESSION(CAR(args));
 		  type e1t = expression_to_type(e1);
 
 		  pips_debug(4,"It's a dereferencing operator\n");
-		  
+
 		  /* we add the read effect on the dereferenced expression
 		     if it's a pointer
 		  */
-		  if (type_variable_p(e1t) && 
+		  if (type_variable_p(e1t) &&
 		      basic_pointer_p(variable_basic(type_variable(e1t))))
 		    {
-		      pips_debug(8, "adding read effect on argument \n"); 
+		      pips_debug(8, "adding read effect on argument \n");
 		      eff_read = (*effect_dup_func)(*pme);
-		      effect_action_tag(eff_read) = is_action_read;
+		      /* memory leak? */
+		      effect_action_(eff_read) = make_action_read_memory();
 		      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		    }
 
-		  pips_debug(8, "adding dereferencing dimension \n"); 
+		  pips_debug(8, "adding dereferencing dimension \n");
 		  effect_add_dereferencing_dimension(*pme);
 
 		  finished_p = true;
 		}
-	      else 
+	      else
 		{
 		  pips_internal_error("Unexpected call to \"\%s\"\n", entity_name(op));
 		}
 	    }
-	  else if(syntax_subscript_p(s)) 
+	  else if(syntax_subscript_p(s))
 	    {
 	      subscript ss = syntax_subscript(s);
 	      list ind = subscript_indices(ss);
@@ -980,7 +1016,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  effect eff_read = (*effect_dup_func)(* pme);
 
 		  pips_debug(5, "adding read effect on array expression\n");
-		  effect_action_tag(eff_read) = is_action_read;
+		  /* memory leak? */
+		  effect_action(eff_read) = make_action_read_memory();
 		  le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		}
 
@@ -998,6 +1035,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    }
 	  else if(syntax_cast_p(s))
 	    {
+	      /* FI->BC: probably a type effect to generate here if a
+		 typedef type is used? */
 	      /* nothing to do */
 	      finished_p = true;
 	    }
@@ -1011,20 +1050,20 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	} /* end of !effect_undefined_p(*pme) */
     } /* */
 
-  if(!finished_p && !effect_undefined_p(*pme)) 
+  if(!finished_p && !effect_undefined_p(*pme))
     {
       /* The sub-effect could not be refined : it's an anywhere effect */
       free_effect(*pme);
       *pme = make_anywhere_effect
-	(write_p?is_action_write:is_action_read);
+	(write_p?make_action_write_memory():make_action_read_memory());
     }
-  
+
   pips_debug_effects(8, "End with le=\n", le);
-  if(effect_undefined_p(*pme)) 
+  if(effect_undefined_p(*pme))
     pips_debug(8, "And *pme: EFFECT UNDEFINED\n");
-  else 
+  else
     pips_debug_effect(8, "And *pme :\n",*pme);
-  
+
   return le;
 }
 
@@ -1036,42 +1075,42 @@ list generic_proper_effects_of_any_lhs(expression lhs)
 
 
 /**
- @return : a list of read effects corresponding to intermediate read memory 
+ @return : a list of read effects corresponding to intermediate read memory
          accesses during the evaluation of add_exp.
  @param add_exp is the expression which memory effects we are looking for
  @param pme is a Pointer towards the Main memory Effect of add_exp.
  @param lpme is a pointer towars the memory effects of the expression if it is
         of type struct or union (but not an array of structs or union).
- @param write_p is a boolean set to true if the main effect is write, false 
+ @param write_p is a boolean set to true if the main effect is write, false
          otherwise.
 
  This function is an interface to generic_proper_effects_of_complex_address_expression
  that also generates effects on paths accessible from struct and union fields down
  to pointers if the expression type is a struct or union (basic derived but not enum, and
  no dimensions).
- If *lpme is not set to NIL, then the main effect has no real sense (effect on a variable name), 
+ If *lpme is not set to NIL, then the main effect has no real sense (effect on a variable name),
  and should be freed.
 */
 list generic_proper_effects_of_complex_memory_access_expression(expression addexp, effect * pme, list *lpme, int write_p)
 {
   list le = NIL;
-  *pme = effect_undefined; /* main data read-write effect: p[*] */ 
+  *pme = effect_undefined; /* main data read-write effect: p[*] */
   *lpme = NIL;
-  
+
   pips_debug(5, "call or subscript case\n");
-  /* Look for a main read-write effect of the lhs and for its 
+  /* Look for a main read-write effect of the lhs and for its
      secondary effects */
   le = generic_proper_effects_of_complex_address_expression(addexp, pme, write_p);
-  
-  if(!effect_undefined_p(*pme)) 
+
+  if(!effect_undefined_p(*pme))
     {
       transformer context = transformer_undefined;
-      
+
       if( !effects_private_current_context_empty_p())
 	context = effects_private_current_context_head();
-      
+
       type addexp_t = expression_to_type(addexp);
-      
+
       if (type_variable_p(addexp_t))
 	{
 	  variable addexp_tv = type_variable(addexp_t);
@@ -1081,12 +1120,12 @@ list generic_proper_effects_of_complex_memory_access_expression(expression addex
 	      if (basic_derived_p(addexp_tvb) && !(type_enum_p(entity_type(basic_derived(addexp_tvb)))))
 		{
 		  *lpme = generic_r_proper_effects_of_derived_reference(*pme, addexp_t);
-		}		    
+		}
 	    }
 	  else
 	    {
 	      pips_debug(8, "main effect is on array name \n");
-	      
+
 	    }
 	}
       else
@@ -1097,8 +1136,8 @@ list generic_proper_effects_of_complex_memory_access_expression(expression addex
       free_type(addexp_t);
       if (!transformer_undefined_p(context))
 	(*effects_precondition_composition_op)(*lpme, context);
-	    
-    }	  
+
+    }
   return le;
 
 }
@@ -1128,13 +1167,13 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
     case is_syntax_subscript:
       {
 	effect e = effect_undefined; /* main data read-write effect: p[*] */
-      
+
 	pips_debug(5, "call or subscript case\n");
-	/* Look for a main read-write effect of the lhs and for its 
+	/* Look for a main read-write effect of the lhs and for its
 	   secondary effects */
 	le = generic_proper_effects_of_complex_address_expression(addexp, &e, write_p);
-      
-	if(!effect_undefined_p(e)) 
+
+	if(!effect_undefined_p(e))
 	  {
 	    transformer context = transformer_undefined;
 
@@ -1142,7 +1181,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	      context = effects_private_current_context_head();
 
 	    type addexp_t = expression_to_type(addexp);
-		  
+
 	    /* we add the read effect if it's not an array name
 	    */
 	    if (type_variable_p(addexp_t))
@@ -1151,12 +1190,12 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 		if (ENDP(variable_dimensions(addexp_tv)))
 		  {
 		    basic addexp_tvb = variable_basic(addexp_tv);
-		    pips_debug(8, "adding main read effect \n"); 
+		    pips_debug(8, "adding main read effect \n");
 		    if (basic_derived_p(addexp_tvb) && !(type_enum_p(entity_type(basic_derived(addexp_tvb)))))
 		      {
 			list l_tmp = generic_r_proper_effects_of_derived_reference(e, addexp_t);
 			le = gen_nconc(le, l_tmp);
-		      }		    
+		      }
 		      else
 			le = CONS(EFFECT, e, le);
 		  }
@@ -1174,8 +1213,8 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	    free_type(addexp_t);
 	    if (!transformer_undefined_p(context))
 	      (*effects_precondition_composition_op)(le, context);
-	    
-	  }	
+
+	  }
 
 	ifdebug(8) {
 	  pips_debug(8, "Effect for a call or a subscripted expression:\n");
@@ -1190,7 +1229,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
       }
     case is_syntax_sizeofexpression:
       {
-	pips_user_error("sizeof cannot be a lhs\n");	
+	pips_user_error("sizeof cannot be a lhs\n");
 	break;
       }
     case is_syntax_application:
@@ -1204,7 +1243,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
       pips_internal_error
 	("lhs is not a reference and is not handled yet: syntax tag=%d\n",
 	 syntax_tag(s));
-      
+
     } /* end switch */
 
 
@@ -1220,7 +1259,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 
 /* TO VERIFY !!!!!!!!!!!!!*/
 /* UNUSED ? */
-list 
+list
 generic_proper_effects_of_subscript(subscript s)
 {
     list inds = subscript_indices(s);
@@ -1236,15 +1275,15 @@ generic_proper_effects_of_subscript(subscript s)
 
 
     pips_debug(3, "begin\n");
-    
+
     if (! (*empty_context_test)(context))
-    {	
+    {
       le = generic_proper_effects_of_expression(subscript_array(s));
-      
-      if (! ENDP(inds)) 
+
+      if (! ENDP(inds))
 	le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
-      
-      
+
+
 	(*effects_precondition_composition_op)(le, context);
     }
 
@@ -1268,9 +1307,9 @@ list generic_proper_effects_of_application(application a __attribute__((__unused
  * input : an expression
  * output   : the correpsonding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 generic_proper_effects_of_expression(expression e)
 {
   list le = NIL;
@@ -1294,24 +1333,36 @@ generic_proper_effects_of_expression(expression e)
 
 	/* first the case of an adressing operator : this could also be done
 	 * by calling generic_r_proper_effects_of_call, but then the expression
-	 * is lost and must be rebuild later to call 
+	 * is lost and must be rebuild later to call
 	 * g_p_e_of_address_expression.
 	 */
-	if (ENTITY_FIELD_P(op) || 
-	    ENTITY_POINT_TO_P(op) || 
+	if (ENTITY_FIELD_P(op) ||
+	    ENTITY_POINT_TO_P(op) ||
 	    ENTITY_DEREFERENCING_P(op))
 	  le = generic_proper_effects_of_address_expression(e, FALSE);
 	else
 	  le = generic_r_proper_effects_of_call(syntax_call(s));
 	break;
       }
-    case is_syntax_cast: 
-      le = generic_proper_effects_of_expression(cast_expression(syntax_cast(s)));
-      break;
+    case is_syntax_cast:
+      {
+	le = generic_proper_effects_of_expression(cast_expression(syntax_cast(s)));
+	if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	  type ct = cast_type(syntax_cast(s));
+
+	  if(typedef_type_p(ct)) {
+	    entity te = basic_typedef(variable_basic(type_variable(ct)));
+	    effect tre = make_declaration_effect(te, FALSE); // type
+	    le = gen_nconc(le, CONS(EFFECT, tre, NIL));
+	  }
+	}
+
+	break;
+      }
     case is_syntax_sizeofexpression:
       {
 	sizeofexpression se = syntax_sizeofexpression(s);
-	if (sizeofexpression_expression_p(se)) 
+	if (sizeofexpression_expression_p(se))
 	  {
 	    /* FI: If the type of the reference is a dependent type, this
 	       may imply the reading of some expressions... See for
@@ -1320,6 +1371,17 @@ generic_proper_effects_of_expression(expression e)
 	    /* le = generic_proper_effects_of_expression(sizeofexpression_expression(se)); */
 	  ;
 	  }
+	else {
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    type sot = sizeofexpression_type(se);
+
+	    if(typedef_type_p(sot)) {
+	      entity te = basic_typedef(variable_basic(type_variable(sot)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
+	    }
+	  }
+	}
 	break;
       }
     case is_syntax_subscript:
@@ -1330,7 +1392,7 @@ generic_proper_effects_of_expression(expression e)
     case is_syntax_application:
       le = generic_proper_effects_of_application(syntax_application(s));
       break;
-    case is_syntax_va_arg: 
+    case is_syntax_va_arg:
       {
 	/* there is first a read of the first argument, and
 	   subsequent write effects on the va_list depths are simulated
@@ -1373,9 +1435,9 @@ generic_proper_effects_of_expression(expression e)
  * input    : a list of expressions and the current context.
  * outpproper_ut   : the correpsonding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 generic_proper_effects_of_expressions(list exprs)
 {
     list le = NIL;
@@ -1428,7 +1490,7 @@ bool check_sdfi_effects_p(entity func, list func_sdfi)
   return check_p;
 }
 
-static list 
+static list
 generic_proper_effects_of_external(entity func, list args)
 {
     list le = NIL;
@@ -1436,17 +1498,17 @@ generic_proper_effects_of_external(entity func, list args)
 
     pips_debug(4, "translating effects for %s\n", func_name);
 
-    if (! entity_module_p(func)) 
+    if (! entity_module_p(func))
     {
-	pips_error("proper_effects_of_external", 
+	pips_error("proper_effects_of_external",
 		   "%s: bad function\n", func_name);
     }
-    else 
+    else
     {
 	list func_eff;
 	transformer context;
 
-        /* Get the summary effects of "func". */	
+        /* Get the summary effects of "func". */
 	func_eff = (*db_get_summary_rw_effects_func)(func_name);
 
 	if(!check_sdfi_effects_p(func, func_eff))
@@ -1461,7 +1523,9 @@ generic_proper_effects_of_external(entity func, list args)
 	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation\n",
 			      entity_name(func));
     }
-    return le;  
+    ifdebug(1) pips_assert("All effects in \"le\" are consistent",
+			     effect_list_consistent_p(le));
+    return le;
 }
 
 list generic_proper_effects_of_c_function_call_argument(expression arg)
@@ -1485,21 +1549,21 @@ list generic_proper_effects_of_c_function_call_argument(expression arg)
     {
       le = generic_proper_effects_of_expression(arg);
     }
-  
+
 
   pips_debug_effects(3, "ouput effects: \n", le);
-  
+
   return le;
 }
 
 
-/** 
+/**
 
  * @return the list of effects found.
  * @param c, a call, which can be a call to a subroutine, but also
  * to an function, or to an intrinsic, or even an assignement.
  */
-list 
+list
 generic_r_proper_effects_of_call(call c)
 {
   list le = NIL;
@@ -1570,7 +1634,7 @@ generic_r_proper_effects_of_call(call c)
 
 /**************************************************************** STATEMENTS */
 
-static void 
+static void
 proper_effects_of_call(call c)
 {
     list l_proper = NIL;
@@ -1627,7 +1691,7 @@ proper_effects_of_call(call c)
 	    l_proper = pointer_effects_to_constant_path_effects(l_proper);
 	    effects_free(l_tmp);
 	  }
-	
+
 	store_proper_rw_effects_list(current_stat, l_proper);
     }
 }
@@ -1720,7 +1784,7 @@ static void proper_effects_of_expression_instruction(instruction i)
       l_proper = proper_effects_contract(l_proper);
     ifdebug(2) {
       pips_debug(2, "Proper effects for statement%03zd:\n",
-		 statement_ordering(current_stat));  
+		 statement_ordering(current_stat));
       (*effects_prettyprint_func)(l_proper);
       pips_debug(2, "end\n");
     }
@@ -1746,7 +1810,7 @@ static void proper_effects_of_expression_instruction(instruction i)
   }
 }
 
-static void 
+static void
 proper_effects_of_unstructured(unstructured u __attribute__((__unused__)))
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -1758,7 +1822,7 @@ loop_filter(loop l)
 {
     list l_proper = generic_proper_effects_of_range(loop_range(l));
     list l_eff = cumu_range_effects();
-    
+
     l_eff = gen_nconc(l_proper, l_eff);
     current_downward_cumulated_range_effects_push(make_effects(l_eff));
     return(TRUE);
@@ -1776,12 +1840,12 @@ static void proper_effects_of_loop(loop l)
     list li = NIL, lb = NIL;
 
     pips_debug(2, "Effects for statement%03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
     free_cumu_range_effects();
     current_downward_cumulated_range_effects_pop();
     l_cumu_range = cumu_range_effects();
-    
+
     /* proper_effects first */
 
     /* Effects of loop on loop index.
@@ -1808,17 +1872,23 @@ static void proper_effects_of_loop(loop l)
 
     l_proper = gen_nconc(li, lb);
     l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-  
+
     ifdebug(2)
     {
 	pips_debug(2, "Proper effects for statement%03zd:\n",
-		   statement_ordering(current_stat));  
+		   statement_ordering(current_stat));
 	(*effects_prettyprint_func)(l_proper);
 	pips_debug(2, "end\n");
     }
 
+    ifdebug(1) pips_assert("l_proper is consistent",
+			   effect_list_consistent_p(l_proper));
+
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
+
+    ifdebug(1) pips_assert("l_proper is consistent",
+			   effect_list_consistent_p(l_proper));
 
     if (get_constant_paths_p())
       {
@@ -1841,13 +1911,13 @@ static void proper_effects_of_forloop(forloop l)
     list li = NIL, lc = NIL, linc = NIL;
 
     pips_debug(2, "Effects for statement%03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
     // What is this about? See Fabien...
     // free_cumu_range_effects();
     //current_downward_cumulated_range_effects_pop();
     //l_cumu_range = cumu_range_effects();
-    
+
     /* proper_effects first */
 
     li = generic_proper_effects_of_expression(forloop_initialization(l));
@@ -1855,16 +1925,18 @@ static void proper_effects_of_forloop(forloop l)
     /* effects of condition expression */
     lc = generic_proper_effects_of_expression(forloop_condition(l));
     /* effects of incrementation expression  */
+    /* we do not know if the incrementation expression will be evaluated -> may effects (see ticket 446) */
     linc = generic_proper_effects_of_expression(forloop_increment(l));
+    effects_to_may_effects(linc);
 
     l_proper = gen_nconc(li, lc);
     l_proper = gen_nconc(l_proper, linc);
     l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-  
+
     ifdebug(2)
     {
 	pips_debug(2, "Proper effects for statement%03zd:\n",
-		   statement_ordering(current_stat));  
+		   statement_ordering(current_stat));
 	(*effects_prettyprint_func)(l_proper);
 	pips_debug(2, "end\n");
     }
@@ -1925,7 +1997,7 @@ static void proper_effects_of_test(test t)
 	l_proper = pointer_effects_to_constant_path_effects(l_proper);
 	effects_free(l_tmp);
       }
-    
+
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
@@ -1937,7 +2009,7 @@ static void proper_effects_of_sequence(sequence block __attribute__((__unused__)
 
 static bool stmt_filter(statement s)
 {
-  pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n", 
+  pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n",
 	     statement_ordering(s), statement_number(s));
   effects_private_current_stmt_push(s);
   effects_private_current_context_push((*load_context_func)(s));
@@ -1946,7 +2018,7 @@ static bool stmt_filter(statement s)
 
 /**
  @param entity is a
- @param 
+ @param
  @return : a list of effects corresponding to the effects of the rhs if there
            is an initialization in the declaration., plus the effects of the lhs
 */
@@ -1958,20 +2030,20 @@ static list generic_proper_effects_of_declaration(entity decl)
   if(type_variable_p(entity_type(decl)))
     {
       value v_init = entity_initial(decl);
-      
+
       pips_debug(1, "begin\n");
-      /* generate effects due to the initialisation */ 
+      /* generate effects due to the initialisation */
       if (value_expression_p(v_init))
 	{
 	  expression exp_init = value_expression(v_init);
-	  l_eff = generic_proper_effects_of_expression(exp_init); 
+	  l_eff = generic_proper_effects_of_expression(exp_init);
 	}
-      
+
       /* if there is an initial value, and if the variable is not a static one,
 	 then there is a write on the entity (well on  the reference constituted
 	 by the entity name with no indices !).
-	 There may be a memory leak here because we do not want a preference in 
-	 the effect. However, I do not have a good solution for the time being 
+	 There may be a memory leak here because we do not want a preference in
+	 the effect. However, I do not have a good solution for the time being
 	 because in declarations, the left hand side is not a reference. BC.
 	 I should may be call generic_proper_effects_of lhs instead, but the case is
 	 slightly different for arrays. Or directly (*reference_to_effect_func) in case of a scalar ?
@@ -1986,43 +2058,92 @@ static list generic_proper_effects_of_declaration(entity decl)
 	{
 	  type decl_t = basic_concrete_type(entity_type(decl));
 	  list l_tmp = NIL;
-	  
+
 	  if (!ENDP(variable_dimensions(type_variable(decl_t))))
 	    {
-	      effect decl_eff = (*reference_to_effect_func)(make_reference(decl,NIL), is_action_write, true);
+	      effect decl_eff = (*reference_to_effect_func)(make_reference(decl,NIL), make_action_write_memory(), true);
 	      l_tmp =  generic_effect_generate_all_accessible_paths_effects(decl_eff, decl_t, is_action_write);
 	    }
 	  else
 	    {
 	      // make sure the make_reference does not create a memory leak
-	      l_tmp = generic_proper_effects_of_reference(make_reference(decl, 
-									 NIL),	
+	      l_tmp = generic_proper_effects_of_reference(make_reference(decl,
+									 NIL),
 							  true);
 	    }
 	  l_eff= gen_nconc(l_eff, l_tmp);
-	  
+
 	}
       pips_debug_effects(1, "ending with:", l_eff);
     }
   return l_eff;
 }
 
+effect make_declaration_effect(entity e, bool written_p)
+{
+  effect eff = effect_undefined;
+  /* FI: generate a declaration or a type write */
+  reference r = make_reference(e, NIL);
+  action a = action_undefined;
+  action_kind ak = action_kind_undefined;
+  /* FI: I'm not sure this is a very generic decision; I do not
+     foresee how predicates could refine dependences. But we already
+     missed that for scalar variables:-( */
+  descriptor d = make_descriptor_none();
+  cell c = make_cell_reference(r);
+  approximation ap = make_approximation_exact();
+
+  if(typedef_entity_p(e)) {
+    /* FI: more work here; you have to check that other typedefed
+       types or variables are not used in this typedef. Quite a
+       recursive search... */
+    ak = make_action_kind_type_declaration();
+  }
+  else
+    ak = make_action_kind_environment();
+
+  if(written_p)
+    a = make_action_write(ak);
+  else
+    a = make_action_read(ak);
+
+  eff = make_effect(c, a, ap, d);
+
+  return eff;
+}
+
 static void proper_effects_of_statement(statement s)
-{ 
-  /* Handling of declarations attached to a CONTINUE statement 
-    
+{
+  /* Handling of declarations attached to a declaration statement
+
   */
   pips_debug(1, "statement%03zd :\n", statement_number(s));
-  if (c_module_p(get_current_module_entity()) && 
+  if (c_module_p(get_current_module_entity()) &&
       (declaration_statement_p(s) /*|| block_statement_p(s)*/ ))
     {
       list l_eff = NIL;
       list l_decls = statement_declarations(s);
-      
+
       pips_debug(1, "declaration statement \n");
 
       FOREACH(ENTITY, e, l_decls)
 	{
+	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    effect de = make_declaration_effect(e, TRUE);
+	    type vt = entity_type(e);
+
+	    l_eff = gen_nconc(l_eff, CONS(EFFECT, de, NIL));
+	    // Should be put first or last?
+	    //l_eff = CONS(EFFECT, re, l_eff);
+
+	    if(typedef_type_p(vt)) {
+	      entity te = basic_typedef(variable_basic(type_variable(vt)));
+	      effect tre = make_declaration_effect(te, FALSE); // type
+	      // reference effect
+	      l_eff = gen_nconc(l_eff, CONS(EFFECT, tre, NIL));
+	      //l_eff = CONS(EFFECT, tre, l_eff);
+	    }
+	  }
 	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
 	}
       if (get_constant_paths_p())
@@ -2030,7 +2151,7 @@ static void proper_effects_of_statement(statement s)
 	  list l_tmp = l_eff;
 	  l_eff = pointer_effects_to_constant_path_effects(l_eff);
 	  effects_free(l_tmp);
-	}      
+	}
 
       if(bound_proper_rw_effects_p(s))
 	{
@@ -2049,9 +2170,9 @@ static void proper_effects_of_statement(statement s)
     }
   effects_private_current_stmt_pop();
   effects_private_current_context_pop();
-  
+
   pips_debug(1, "End statement%03zd :\n", statement_number(s));
-  
+
 }
 
 void proper_effects_of_module_statement(statement module_stat)
@@ -2066,7 +2187,7 @@ void proper_effects_of_module_statement(statement module_stat)
       set_constant_paths_p(false);
 
     gen_multi_recurse
-	(module_stat, 
+	(module_stat,
 	 statement_domain, stmt_filter, proper_effects_of_statement,
 	 sequence_domain, gen_true, proper_effects_of_sequence,
 	 test_domain, gen_true, proper_effects_of_test,
@@ -2080,7 +2201,7 @@ void proper_effects_of_module_statement(statement module_stat)
 	    expression since they are ruled out by the next clause */
 	 instruction_domain, gen_true, proper_effects_of_expression_instruction,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
-	 NULL); 
+	 NULL);
 
     pips_debug(1,"end\n");
     free_effects_private_current_stmt_stack();
@@ -2089,7 +2210,7 @@ void proper_effects_of_module_statement(statement module_stat)
 }
 
 bool proper_effects_engine(char *module_name)
-{    
+{
     /* Get the code of the module. */
     set_current_module_statement( (statement)
 		      db_get_memory_resource(DBR_CODE, module_name, TRUE));
@@ -2104,17 +2225,17 @@ bool proper_effects_engine(char *module_name)
     if (get_use_points_to())
       set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
-  
+
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
-    proper_effects_of_module_statement(get_current_module_statement()); 
+    proper_effects_of_module_statement(get_current_module_statement());
 
     pips_debug(1, "end\n");
     debug_off();
 
     (*db_put_proper_rw_effects_func)(module_name, get_proper_rw_effects());
-    
+
      if (get_use_points_to())
        reset_pt_to_list();
     reset_current_module_entity();
@@ -2122,7 +2243,7 @@ bool proper_effects_engine(char *module_name)
     reset_proper_rw_effects();
 
     (*effects_computation_reset_func)(module_name);
-    
+
     return(TRUE);
 }
 
@@ -2132,16 +2253,16 @@ bool proper_effects_engine(char *module_name)
 /* compute proper effects for both expressions and statements
    WARNING: the functions are set as a side effect.
  */
-void 
+void
 expression_proper_effects_engine(
     string module_name,
     statement current)
-{    
+{
     (*effects_computation_init_func)(module_name);
 
     init_proper_rw_effects();
     init_expr_prw_effects();
-  
+
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
