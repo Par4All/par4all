@@ -2206,6 +2206,7 @@ static void init_gen_quick_recurse_tables(void);
 
 extern void genspec_set_string_to_parse(char*);
 extern void genspec_reset_string_to_parse(void);
+extern void genspec_lex_destroy();
 
 void gen_read_spec(char * spec, ...)
 {
@@ -2234,6 +2235,7 @@ void gen_read_spec(char * spec, ...)
 
     spec = va_arg( ap, char *);
   }
+  genspec_lex_destroy();
 
   compile() ;
 
@@ -2347,26 +2349,24 @@ gen_check(
     gen_chunk *obj,
     int t)
 {
-    extern int max_domain_index() ;
-    int max_index ;
+  extern int max_domain_index() ;
+  int max_index ;
 
-    if( obj == NULL ) {
-	(void) user("gen_check: NULL pointer, expecting type %s\n",
-		    Domains[ t ].name) ;
-	abort() ;
-    }
-    max_index = max_domain_index() ;
-    message_assert("Improper domain_index", max_index >= 0 ) ;
+  if( obj == NULL ) {
+    (void) user("gen_check: NULL pointer, expecting type %s\n",
+                Domains[ t ].name);
+    abort() ;
+  }
+  max_index = max_domain_index() ;
+  message_assert("valid max domain index", max_index >= 0 ) ;
 
-    if( obj != gen_chunk_undefined && t != obj->i ) {
-	user("gen_check: Type clash (expecting %s, getting %s)\n",
-	     Domains[ t ].name,
-	     (obj->i >= 0 && obj->i <= max_index ) ?
-	     Domains[ obj->i ].name :
-	     "???") ;
-	abort() ;
-    }
-    return( obj ) ;
+  if( obj != gen_chunk_undefined && t != obj->i ) {
+    user("gen_check: Type clash (expecting %s, getting %s)\n",
+         Domains[ t ].name,
+         (obj->i >= 0 && obj->i<=max_index )? Domains[ obj->i ].name : "???") ;
+    abort() ;
+  }
+  return obj;
 }
 
 /*************************************************************** CONSISTENCY */

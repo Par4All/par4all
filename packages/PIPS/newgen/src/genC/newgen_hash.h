@@ -58,15 +58,15 @@ typedef int (* hash_equals_t)(const void *, const void *);
 
 #define hash_table_empty_p(htp) (hash_table_entry_count(htp) == 0)
 
-#define HASH_MAP(k,v,code,h)						\
-  {									\
-    hash_table _map_hash_h = (h) ;					\
-    register void * _map_hash_p = NULL;					\
-    void *k, *v;							\
-    while ((_map_hash_p =						\
-	    hash_table_scan(_map_hash_h, _map_hash_p, &k, &v))) {	\
-      code;								\
-    }									\
+#define HASH_MAP(k,v,code,h)                                      \
+  {                                                               \
+    hash_table _map_hash_h = (h) ;                                \
+    register void * _map_hash_p = NULL;                           \
+    void *k, *v;                                                  \
+    while ((_map_hash_p =                                         \
+            hash_table_scan(_map_hash_h, _map_hash_p, &k, &v))) {	\
+      code;                                                       \
+    }                                                             \
   }
 
 /* SG: the UNIQUE_NAME code is duplicated from newgen_list.h
@@ -76,22 +76,22 @@ typedef int (* hash_equals_t)(const void *, const void *);
 #define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
 #define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
 
-#define HASH_FOREACH(key_type,k,value_type, v, h) \
-    register void * UNIQUE_NAME = NULL;\
-    key_type k;\
-    value_type v;\
-    while((UNIQUE_NAME =\
-                 hash_table_scan(h,UNIQUE_NAME,&k,&v)))
+#define HASH_FOREACH(key_type,k,value_type, v, h)                 \
+  register void * UNIQUE_NAME = NULL;                             \
+  key_type k;                                                     \
+  value_type v;                                                   \
+  while((UNIQUE_NAME =                                            \
+         hash_table_scan(h,UNIQUE_NAME,(void**)&k,(void**)&v)))
 
 
 // hash_put_or_update() uses the warn_on_redefinition
-#define hash_put_or_update(h, k, v)			\
-  if (hash_warn_on_redefinition_p())			\
-  {							\
-    hash_dont_warn_on_redefinition();			\
+#define hash_put_or_update(h, k, v)                   \
+  if (hash_warn_on_redefinition_p())                  \
+  {                                                   \
+    hash_dont_warn_on_redefinition();                 \
     hash_put((hash_table) h, (void *) k, (void *) v);	\
-    hash_warn_on_redefinition();			\
-  } else						\
+    hash_warn_on_redefinition();                      \
+  } else                                              \
     hash_put((hash_table) h, (void *) k, (void *) v);
 
 // functions implemented in hash.c

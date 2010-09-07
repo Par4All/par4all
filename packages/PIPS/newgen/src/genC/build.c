@@ -245,7 +245,7 @@ struct gen_binding * new_binding(char * name, union domain * val)
 	}
 	else 
 	    user( "Redeclaration skipped: <%s>\n", name ) ;
-
+        free(val);
     }
 
     return( bp ) ;
