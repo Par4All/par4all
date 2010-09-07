@@ -56,6 +56,10 @@ For the CUDA parallel execution on nVidia GPU:
   make run_cuda : build first if needed, then run the CUDA parallel
   program
 
+    Do not forget to have the CUDA runtime correctly
+    installed. LD_LIBRARY_PATH should contain at least the location of
+    CUDA runtime library.
+
   make display_cuda : build first if needed, run if needed, then display
   the output of the CUDA parallel version with gnuplot
 

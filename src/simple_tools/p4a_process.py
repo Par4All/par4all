@@ -243,7 +243,7 @@ class p4a_processor:
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
                                             activates = activates,
-                                            verboseon = verbose,
+                                            verbose = verbose,
                                             cppflags = cpp_flags)
 
             global default_properties
