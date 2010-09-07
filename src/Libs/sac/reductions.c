@@ -728,7 +728,7 @@ static void do_redundant_load_store_elimination(graph dg) {
         if(statement_call_p(s) && 
             !return_statement_p(s) &&
             !declaration_statement_p(s)) {
-          list out_effects = load_cumulated_rw_effects_list(s);
+          list out_effects = load_cumulated_rw_effects_list(get_current_module_statement());
           if(ENDP(out_effects)) {
             update_statement_instruction(s,make_continue_instruction());
             did_something=true;
