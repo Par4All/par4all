@@ -40,15 +40,96 @@
 
 #include "pointer_values.h"
 
+/******************** MAPPINGS */
+
+/* I don't know how to deal with these mappings if we have to analyse several modules 
+   at the same time when performing an interprocedural analysis.
+   We may need a stack of mappings, or a global mapping for the whole program, 
+   and a temporary mapping to store the resources one module at a time
+*/
+GENERIC_GLOBAL_FUNCTION(pv, statement_cell_relations)
+GENERIC_GLOBAL_FUNCTION(gen_pv, statement_cell_relations)
+GENERIC_GLOBAL_FUNCTION(kill_pv, statement_effects)
+
+
+
+/******************** PIPSDBM INTERFACES */
+
+static statement_cell_relations db_get_simple_pv(char * module_name)
+{
+  return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_POINTER_VALUES, module_name, TRUE);
+}
+
+static void db_put_simple_pv(char * module_name, statement_cell_relations scr)
+{
+   DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_POINTER_VALUES, module_name, (char*) scr);
+}
+
+static statement_cell_relations db_get_simple_gen_pv(char * module_name)
+{
+  return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, TRUE);
+}
+
+static void db_put_simple_gen_pv(char * module_name, statement_cell_relations scr)
+{
+   DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, (char*) scr);
+}
+
+static statement_effects db_get_simple_kill_pv(char * module_name)
+{
+  return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, TRUE);
+}
+
+static void db_put_simple_kill_pv(char * module_name, statement_effects se)
+{
+   DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, (char*) se);
+}
+
+
 /******************** ANALYSIS CONTEXT */
 
 typedef struct {
+  /* PIPSDEBM INTERFACES */
+  statement_cell_relations (*db_get_pv_func)(char *);
+  void (*db_put_pv_func)(char * , statement_cell_relations);
+  statement_cell_relations (*db_get_gen_pv_func)(char *);
+  void (*db_put_gen_pv_func)(char * , statement_cell_relations);
+  statement_effects (*db_get_kill_pv_func)(char *);
+  void (*db_put_kill_pv_func)(char * , statement_effects);
 } pv_context;
 
 static pv_context make_simple_pv_context()
 {
   pv_context ctxt;
+  
+  ctxt.db_get_pv_func = db_get_simple_pv;
+  ctxt.db_put_pv_func = db_put_simple_pv;
+  ctxt.db_get_gen_pv_func = db_get_simple_gen_pv;
+  ctxt.db_put_gen_pv_func = db_put_simple_gen_pv;
+  ctxt.db_get_kill_pv_func = db_get_simple_kill_pv;
+  ctxt.db_put_kill_pv_func = db_put_simple_kill_pv;
+  
   return ctxt;
+}
+
+#define UNDEF abort
+
+typedef void (*void_function)();
+typedef gen_chunk* (*chunks_function)();
+typedef list (*list_function)();
+typedef bool (*bool_function)();
+typedef descriptor (*descriptor_function)();
+typedef statement_cell_relations (*statement_cell_relations_function)();
+typedef statement_effects (*statement_effects_function)();
+
+static void reset_pv_context(pv_context *p_ctxt)
+{
+  p_ctxt->db_get_pv_func = (statement_cell_relations_function) UNDEF;
+  p_ctxt->db_put_pv_func = (void_function) UNDEF;
+  p_ctxt->db_get_gen_pv_func =(statement_cell_relations_function) UNDEF ;
+  p_ctxt->db_put_gen_pv_func = (void_function) UNDEF;
+  p_ctxt->db_get_kill_pv_func = (statement_effects_function) UNDEF;
+  p_ctxt->db_put_kill_pv_func = (void_function) UNDEF;
 }
 
 /******************** LOCAL FUNCTIONS DECLARATIONS */
@@ -104,6 +185,7 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 	{
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
+	      /* beware don't push static variables */
 	      l_locals = CONS(ENTITY, e, l_locals);
 	      l_out = declaration_to_post_pv(e, l_in, ctxt);
 	    }
@@ -270,11 +352,19 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
 				db_get_memory_resource(DBR_CODE, module_name, TRUE));
   
   set_current_module_entity(module_name_to_entity(module_name));
+  init_pv();
+  init_gen_pv();
+  init_kill_pv();
 
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
   
   l_out = statement_to_post_pv(get_current_module_statement(), NIL, ctxt);
+
+  (*ctxt->db_put_pv_func)(module_name, get_pv());
+  (*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());
+  (*ctxt->db_put_kill_pv_func)(module_name, get_kill_pv());
+
   pips_debug(1, "end\n");
   debug_off();
   reset_current_module_entity();
@@ -288,6 +378,6 @@ bool simple_pointer_values(char * module_name)
 {
   pv_context ctxt = make_simple_pv_context();
   generic_module_pointer_values(module_name, &ctxt);
-
+  reset_pv_context(&ctxt);
   return(TRUE);
 }
