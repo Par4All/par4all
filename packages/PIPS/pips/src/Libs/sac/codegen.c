@@ -384,6 +384,7 @@ entity get_function_entity(string name)
     {
         pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
                 "Please feed pips with its definition and source\n",name);
+        e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
     }
 
     return e;
@@ -595,14 +596,13 @@ static string get_simd_vector_type(list lExp)
 /*
    This function returns the name of a vector from the data inside it
    */
-static string get_vect_name_from_data(int argc, expression exp)
+static string get_vect_name_from_data(int argc, list exps)
 {
     char prefix[5];
     string result;
-    basic bas;
     int itemSize;
 
-    bas = basic_of_expression(exp);
+    basic bas = basic_of_expressions(exps,true);
 
     prefix[0] = 'v';
     prefix[1] = '0'+argc;
@@ -629,6 +629,7 @@ static string get_vect_name_from_data(int argc, expression exp)
             break;
 
         default:
+            free_basic(bas);
             return strdup("");
             break;
     }
@@ -659,14 +660,13 @@ void replace_subscript(expression e)
     {
         if(!expression_call_p(e) || expression_field_p(e))
         {
-            unnormalize_expression(e);
-            expression_syntax(e) = make_syntax_call(
-                    make_call(
-                        entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                        make_expression_list(
-                            make_expression(
-                                expression_syntax(e),
-                                normalized_undefined
+            syntax syn = expression_syntax(e);
+            expression_syntax(e)=syntax_undefined;
+            update_expression_syntax(e,make_syntax_call(
+                        make_call(
+                            entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                            make_expression_list(
+                                make_expression(syn,normalized_undefined)
                                 )
                             )
                         )
@@ -679,17 +679,17 @@ void replace_subscript(expression e)
 static statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
-    entity exec_function = module_name_to_entity(ename);
+    entity exec_function = get_function_entity(ename);
     if( c_module_p(exec_function) )
     {
-        if( strstr(ename,SIMD_GEN_LOAD_NAME) )
-        {
+        string pattern0;
+        asprintf(&pattern0,"%s" SIMD_GENERIC_SUFFIX,get_string_property("ACCEL_LOAD"));
+        if( strstr(ename,pattern0) )
             replace_subscript( EXPRESSION(CAR(args)));
-        }
-        else
-        {
+        else {
             FOREACH(EXPRESSION,e,args) replace_subscript(e);
         }
+        free(pattern0);
     }
     return call_to_statement(make_call(get_function_entity(ename), args));
 }
@@ -715,7 +715,6 @@ static bool sac_aligned_expression_p(expression e)
 }
 
 
-
 static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
 {
     enum {
@@ -724,12 +723,17 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         CONSTANT,
         OTHER
     } argsType;
-    const char funcNames[4][2][20] = {
-        { SIMD_SAVE_NAME"_",            SIMD_LOAD_NAME"_"},
-        { SIMD_MASKED_SAVE_NAME"_",     SIMD_MASKED_LOAD_NAME"_"},
-        { SIMD_CONS_SAVE_NAME"_",       SIMD_CONS_LOAD_NAME"_"},
-        { SIMD_GEN_SAVE_NAME"_",        SIMD_GEN_LOAD_NAME"_"}
-    };
+    static  char *funcNames[4][2] = { { NULL,NULL},{NULL,NULL},{NULL,NULL},{NULL,NULL}};
+    if(!funcNames[0][0]) {
+        asprintf(&funcNames[0][0],"%s_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[0][1],"%s_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[1][0],"%s"SIMD_MASKED_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[1][1],"%s"SIMD_MASKED_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[2][0],"%s"SIMD_CONSTANT_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[2][1],"%s"SIMD_CONSTANT_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+        asprintf(&funcNames[3][0],"%s"SIMD_GENERIC_SUFFIX"_",get_string_property("ACCEL_STORE"));
+        asprintf(&funcNames[3][1],"%s"SIMD_GENERIC_SUFFIX"_",get_string_property("ACCEL_LOAD"));
+    }
     int lastOffset = 0;
     char *functionName;
 
@@ -826,20 +830,12 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     {
         list new_statements = NIL;
         size_t nbargs=gen_length(CDR(args));
-        basic shared_basic = basic_undefined;
-        FOREACH(EXPRESSION,e,CDR(args))
-        {
-            shared_basic=basic_of_expression(e);
-            if(basic_overloaded_p(shared_basic))
-                free_basic(shared_basic);
-            else
-                break;
-        }
+        basic shared_basic = basic_of_expressions(CDR(args),true);
         entity scalar_holder = make_new_array_variable_with_prefix(
                 SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
                 CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
                 );
-        AddLocalEntityToDeclarations(scalar_holder,get_current_module_entity(),sac_current_block);
+        AddEntityToCurrentModule(scalar_holder);
         int index=0;
         list inits = NIL;
         list replacements = NIL;
@@ -892,6 +888,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             POP(iter);
             entity e = ENTITY(CAR(iter));
             replace_entity_by_expression(sac_real_current_instruction,e,r);
+            replace_entity_by_expression(get_current_module_statement(),e,r);
         }
         gen_free_list(replacements);
         if(!fortran_module_p(get_current_module_entity()))
@@ -922,25 +919,27 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
      * load instruction.
      */
     list current_args = NIL;
+    char* tofree = NULL;
     switch(argsType)
     {
         case CONSEC_REFS:
         case MASKED_CONSEC_REFS:
             {
 
-                string realVectName = get_vect_name_from_data(argc, EXPRESSION(CAR(CDR(args))));
+                string realVectName = get_vect_name_from_data(argc, CDR(args));
 
-                if(strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
+                if(!same_string_p(realVectName, lsType))
                 {
-                    /*string temp = local_name(lsType);*/
-                    asprintf(&lsType,"%s_TO_%s",realVectName,lsType);
+                    asprintf(&lsType,"%s_TO_%s",
+                            isLoad?realVectName:lsType,
+                            isLoad?lsType:realVectName);
+                    tofree=lsType;
                 }
                 if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
                 {
-                    current_args = gen_make_list( expression_domain, 
-                            EXPRESSION(CAR(args)),
-                            fstExp,
-                            NULL);
+                    current_args = make_expression_list(
+                            copy_expression(EXPRESSION(CAR(args))),
+                            copy_expression(fstExp));
                 }
                 else
                 {
@@ -961,7 +960,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             }
 
         case OTHER:
-            current_args=args;
+            current_args=gen_full_copy_list(args);
         default:
             break;
     }
@@ -969,6 +968,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     update_vector_to_expressions(expression_to_entity(EXPRESSION(CAR(args))),CDR(args));
 
     asprintf(&functionName, "%s%s", funcNames[argsType][isLoad], lsType);
+    if(tofree) free(tofree);
     statement es = make_exec_statement_from_name(functionName, current_args);
     free(functionName);
     return es;

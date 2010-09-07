@@ -24,37 +24,6 @@ struct entity_pair
     entity old;
     entity new;
 };
-#if 0
-/** @brief substitute `thecouple->new' to `thecouple->old' in `exp'
- *  only works if `exp' is a reference
- */
-static void
-replace_entity_expression_walker(expression exp, struct entity_pair* thecouple)
-{
-    if( expression_reference_p(exp) )
-    {
-        reference ref = syntax_reference(expression_syntax(exp));
-        entity referenced_entity = reference_variable(ref);
-		string emn_r = strdup(entity_module_name(referenced_entity));
-		string emn_o = entity_module_name(thecouple->old);
-		string eun_r = entity_user_name(referenced_entity);
-		string eun_o = entity_user_name(thecouple->old);
-        if( same_string_p(emn_r,emn_o) && same_string_p(eun_r,eun_o))
-        {
-            if( entity_constant_p(thecouple->new) )
-            {
-                expression_syntax(exp) = make_syntax_call(make_call(thecouple->new,NIL));
-            }
-            else
-            {
-                reference_variable(ref) = thecouple->new;
-            }
-        }
-		free(emn_r);
-    }
-}
-#endif
-
 
 static void
 replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
@@ -122,7 +91,8 @@ replace_entity(void* s, entity old, entity new) {
 void
 replace_entities(void* s, hash_table ht)
 {
-    HASH_MAP(k, v, replace_entity(s,(entity)k,(entity)v);, ht);
+  HASH_FOREACH(entity, k, entity, v, ht)
+    replace_entity(s,k,v);
 }
 
 /** Replace an old reference by a reference to a new entity in a statement
@@ -134,10 +104,7 @@ replace_reference(void* s, reference old, entity new) {
   if (ENDP(reference_indices(old)))
     replace_entity(s, reference_variable(old), new);
   else {
-    expression e = make_expression(make_syntax_reference(copy_reference(old)),
-				   normalized_undefined);
-    replace_entity_by_expression(s, new, e);
-    free_expression(e);
+    pips_internal_error("not implemented yet");
   }
 }
 

@@ -278,11 +278,15 @@ void EnterScope()
   if(C_scope_identifier>=0) {
     string ns = i2a(C_scope_identifier);
 
+    char * stf = c_parser_context_scope(nc);
     c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
+	free(stf);
     free(ns);
   }
   else {
+    char * stf = c_parser_context_scope(nc);
     c_parser_context_scope(nc) = strdup(cs);
+	free(stf);
   }
 
   stack_push((char *) nc, ContextStack);
@@ -730,7 +734,7 @@ location:
 
 /*** Global Definition ***/
 global:
-declaration         {/* discard_C_comment();*/ ;}
+declaration         {/* discard_C_comment();*/ }
 |   function_def        { $$ = NIL; }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
                         {
@@ -748,6 +752,7 @@ declaration         {/* discard_C_comment();*/ ;}
 |   TK_IDENT TK_LPAREN
                         {
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  free($1);
 			  entity e = oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create function %s with old-style function prototype\n",$1);
 			  if (storage_undefined_p(entity_storage(e))) {
@@ -777,6 +782,7 @@ declaration         {/* discard_C_comment();*/ ;}
 			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
+			  gen_free_list($4);
 			  $$ = NIL;
 			  // FI: commented out while trying to
 			  //retrieve all comments
@@ -853,6 +859,7 @@ expression:
 		        {
 			  /* Create the expression corresponding to this identifier */
 			  $$ = IdentifierToExpression($1);
+			  free($1);
                         }
 |   TK_SIZEOF expression
 		        {
@@ -1130,25 +1137,30 @@ constant:
     TK_INTCON
                         { // Do we know about the size? 2, 4 or 8 bytes?
 			  $$ = make_C_constant_entity($1, is_basic_int, 4);
+			  free($1);
 			}
 |   TK_FLOATCON
                         {
 			  $$ = MakeConstant($1, is_basic_float);
+			  free($1);
 			}
 |   TK_CHARCON
                         {
 			  $$ = make_C_constant_entity($1, is_basic_int, 1);
+			  free($1);
 			}
 |   string_constant
                         {
 			  /* The size will be fixed later, hence 0 here. */
 			  $$ = make_C_constant_entity($1, is_basic_string, 0);
+			  free($1);
                         }
 /*add a nul to strings.  We do this here (rather than in the lexer) to make
   concatenation easy below.*/
 |   wstring_list
                         {
 			  $$ = MakeConstant(list_to_string($1),is_basic_string);
+			  free($1);
                         }
 ;
 
@@ -1361,7 +1373,7 @@ block: /* ISO 6.8.2 */
 						      get_current_C_comment(),
 						      get_current_C_line_number());
 			  /* Add the pragmaifyed nop at the end of the block: */
-			  append_a_statement($1, nop);
+			  insert_statement($1, nop,false);
 			  $$ = $1;
 			}
 |   error location TK_RBRACE
@@ -1400,8 +1412,8 @@ local_labels:
 ;
 
 local_label_names:
-   TK_IDENT             {}
-|  TK_IDENT TK_COMMA local_label_names {}
+   TK_IDENT             {free($1);}
+|  TK_IDENT TK_COMMA local_label_names {free($1);}
 ;
 
 label:
@@ -1479,6 +1491,7 @@ statement_without_pragma:
 			    /* This uses the current comment and
 			       current line number. */
 			    $$ = ExpressionToStatement(EXPRESSION(CAR($1)));
+				gen_free_list($1);
 			  }
 			  else
 			    /* FI: I do not know how
@@ -1609,6 +1622,7 @@ statement_without_pragma:
 			  /* Create the statement with label comment in
 			     front of it: */
 			  $$ = MakeLabeledStatement($1,$2, pop_current_C_comment());
+			  free($1);
 			  ifdebug(8) {
 			    pips_debug(8,"Adding label '%s' to statement:\n", $1);
 			    print_statement($$);
@@ -1677,6 +1691,7 @@ statement_without_pragma:
 |   TK_GOTO TK_IDENT TK_SEMICOLON
 		        {
 			  $$ = MakeGotoStatement($2);
+			  free($2);
 			}
 |   TK_GOTO TK_STAR comma_expression TK_SEMICOLON
                         {
@@ -1737,7 +1752,6 @@ declaration:                               /* ISO 6.7.*/
 			    }
 			    statement_declarations(s) = el2;
 			    s = add_comment_and_line_number(s, sc, sn);
-			    $$ = CONS(STATEMENT,s, NIL);
 			    el12 = el2;
 			    el1 = NIL;
 
@@ -1886,6 +1900,7 @@ decl_spec_list:
 			     */
 			     pips_debug(8, "Reset modified scope \"%s\"\n",
 					c_parser_context_scope(ycontext));
+				 free(c_parser_context_scope(ycontext));
 			     c_parser_context_scope(ycontext) = empty_scope();
 			   }
 			   pips_debug(8, "new context %p with scope \"%s\" copied from context %p (stack size=%d)\n",
@@ -1916,6 +1931,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			     TOP_LEVEL scope is going to be used for
 			     argument types as well... */
 			  pips_debug(8, "Scope of context %p forced to TOP_LEVEL_MODULE_NAME\n", ycontext);
+			  free(c_parser_context_scope(ycontext));
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL));
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
@@ -2079,8 +2095,10 @@ decl_spec_list_opt_no_named:
 			    PushContext(ycontext);
 			  else {
 			    c_parser_context y = GetContext();
+			    string stf = (c_parser_context_scope(ycontext));
 			    c_parser_context_scope(ycontext) =
 			      strdup(c_parser_context_scope(y));
+				free(stf);
 			    PushContext(ycontext);
 			  }
                           $$ = NIL;
@@ -2416,7 +2434,9 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  c_parser_context ycontext = GetContext();
 			  /* Add struct/union name and MEMBER_SEP_STRING to entity name */
 			  string derived = code_decls_text((code) stack_head(StructNameStack));
+			  string stf = (c_parser_context_scope(ycontext));
 			  c_parser_context_scope(ycontext) = CreateMemberScope(derived,is_external);
+			  free(stf);
 			  c_parser_context_storage(ycontext) = make_storage_rom();
 			}
     field_decl_list TK_SEMICOLON struct_decl_list
@@ -2437,6 +2457,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 
 			     For the moment, I reset the changed values of the context, by hoping that in C,
 			     before a STRUCT/UNION declaration, there is no extern, ... */
+			  free(c_parser_context_scope(ycontext));
 			  c_parser_context_scope(ycontext) = empty_scope();
 			  c_parser_context_storage(ycontext) = storage_undefined;
 			}
@@ -2557,6 +2578,7 @@ enumerator:
 			  for ENUM, as in the case of STRUCT and UNION */
 
 			  entity ent = CreateEntityFromLocalNameAndPrefix($1,"",is_external);
+		      free($1);
 			  variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  type rt = make_type(is_type_variable, v);
 			  functional f = make_functional(NIL, rt);
@@ -2579,6 +2601,7 @@ enumerator:
 			  //int i;
 			  value vinit = value_undefined;
 			  entity ent = CreateEntityFromLocalNameAndPrefix($1,"",is_external);
+			  free($1);
 			  variable v =
 			    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  type rt = make_type(is_type_variable, v);
@@ -2888,6 +2911,7 @@ direct_old_proto_decl:
 			  StackPop(OffsetStack);
 			  (void) UpdateFunctionEntity(e, paras);
 			  //CreateReturnEntity(e);
+			  gen_free_list($4);
 			  $$ = e;
 			}
 /* Never used because of conflict
@@ -3135,6 +3159,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 |   TK_IDENT parameter_list_startscope
                         {
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  free($1);
 			  entity e = oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create current module \"%s\" with no return type\n",
 				     entity_name(e));
@@ -3167,6 +3192,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  entity e= oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create current module %s with no return type + old-style parameter list\n",$1);
+			  free($1);
 			  MakeCurrentModule(e);
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
@@ -3177,6 +3203,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     TK_RPAREN old_pardef_list
                         {
 			  list paras = MakeParameterList($3,$6,FunctionStack);
+			  gen_free_list($3);
 			  functional f = make_functional(paras,make_type_unknown());
 			  entity e = GetFunction();
 			  entity_type(e) = make_type_functional(f);

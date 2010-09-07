@@ -28,6 +28,7 @@
  *  - unfolding(char* module) to inline all call in a module
  *
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
+ * I am not proud of this code, it is a real mess !
  * @date 2009-01-07
  */
 #ifdef HAVE_CONFIG_H
@@ -179,28 +180,30 @@ static statement expanded;
 static void
 solve_name_clashes(statement s, entity new)
 {
-    list l = statement_declarations(s);
-    set re = get_referenced_entities(s);
-    for(;!ENDP(l);POP(l))
-    {
-        entity decl_ent = ENTITY(CAR(l));
-        if( same_string_p(entity_user_name(decl_ent), entity_user_name(new)))
+    if(!implicit_c_variable_p(new)) {
+        list l = statement_declarations(s);
+        set re = get_referenced_entities(s);
+        for(;!ENDP(l);POP(l))
         {
-            entity solve_clash = copy_entity(decl_ent);
-            string ename = strdup(entity_name(solve_clash));
-            do {
-                string tmp;
-                asprintf(&tmp,"%s_",ename);
-                free(ename);
-                ename=tmp;
-                entity_name(solve_clash)=ename;
-            } while( has_similar_entity(solve_clash,re));
-            CAR(l).p = (void*)solve_clash;
-            replace_entity(expanded,decl_ent,solve_clash);
-            gen_recurse_stop(0);
+            entity decl_ent = ENTITY(CAR(l));
+            if( same_string_p(entity_user_name(decl_ent), entity_user_name(new)))
+            {
+                entity solve_clash = copy_entity(decl_ent);
+                string ename = strdup(entity_name(solve_clash));
+                do {
+                    string tmp;
+                    asprintf(&tmp,"%s_",ename);
+                    free(ename);
+                    ename=tmp;
+                    entity_name(solve_clash)=ename;
+                } while( has_similar_entity(solve_clash,re));
+                CAR(l).p = (void*)solve_clash;
+                replace_entity(expanded,decl_ent,solve_clash);
+                gen_recurse_stop(0);
+            }
         }
+        set_free(re);
     }
-    set_free(re);
 }
 
 /* return true if an entity declared in `iter' is static to `module'
@@ -234,7 +237,7 @@ entity make_temporary_scalar_entity(expression from,statement * assign)
     /* create the scalar */
 	entity new = make_new_scalar_variable(
 			get_current_module_entity(),
-			basic_of_expression(from)
+                        some_basic_of_any_expression(from,false,false)
 			);
     /* set intial */
     if(!expression_undefined_p(from))
@@ -274,6 +277,53 @@ bool has_entity_with_same_name(entity e, list l) {
     return false;
 }
 
+static void do_slightly_rename_entities(statement s, hash_table old_new) {
+    static const unsigned int magic_block_number = (unsigned int)-1;
+    /* forge a new name with a magical block number */
+    if(declaration_statement_p(s)) {
+        for(list iter=statement_declarations(s);!ENDP(iter);POP(iter)) {
+            entity *e=(entity*)REFCAR(iter);
+            if(!formal_parameter_p(*e)) {
+                entity ebis = copy_entity(*e);
+                char* ename = entity_name(ebis);
+                const char* euname = entity_user_name(ebis);
+                const char* eprefix = strndup(ename,euname-ename);
+                asprintf(&entity_name(ebis),"%s%u"BLOCK_SEP_STRING"%s",eprefix,magic_block_number,euname);
+                free(ename);
+                hash_put(old_new,*e,ebis);
+                *e=ebis;
+            }
+        }
+    }
+    /* beacause of bottom up transversal, 
+     * we are sure old_new has already been fed
+     */
+    else if(statement_block_p(s)) {
+        for(list iter=statement_declarations(s);!ENDP(iter);POP(iter)) {
+            entity *e=(entity*)REFCAR(iter);
+            entity new = (entity)hash_get(old_new,*e);
+            if(new != HASH_UNDEFINED_VALUE) 
+                *e=new;
+        }
+    }
+}
+
+/* sg: this is another inlining mostruosity
+ * it ensures all entities in s have new pointer
+ * and different name (is it usefull ?)
+ * it takes care of dependant types
+ */
+static void slightly_rename_entities(statement s) {
+    hash_table old_new = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    gen_context_recurse(s,old_new,statement_domain,gen_true,do_slightly_rename_entities);
+    HASH_FOREACH(entity,old,entity,new,old_new)
+        replace_entities(new,old_new);
+    replace_entities(s,old_new);
+
+    hash_table_free(old_new);
+}
+
+
 
 /* this should inline the call callee
  * calling module inlined_module
@@ -307,10 +357,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
     /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource later
+     * sg: not so true, beacuase of dependant types
      */
     expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = make_empty_block_statement();
-    //statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* add external declartions for all extern referenced entities it
      * is needed because inlined module and current module may not
@@ -328,6 +378,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         set inlined_referenced_entities = get_referenced_entities(expanded);
         list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
         set_free(inlined_referenced_entities);
+
 
         FOREACH(ENTITY,ref_ent,lire)
         {
@@ -364,15 +415,13 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             }
         }
         gen_free_list(lire);
+        slightly_rename_entities(expanded);
     }
-    /* we have anothe rproblem with fortran, where declaration are  not handled like in C
-     * another side effect of 'declarations as statements' */
-    else
-    {
+    else {
         bool did_something = false;
         FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
         {
-            if(!entity_area_p(e))
+            if(!entity_area_p(e) && !implicit_c_variable_p(e))
             {
                 entity new;
                 if(entity_variable_p(e)) {
@@ -387,7 +436,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 else
                 {
                     /*sg: unsafe
-                     * sg: iam unsure this is ,still needed */
+                     *sg: i am unsure this is still needed */
                     bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
                     new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
                     if(regenerate)
@@ -440,7 +489,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         {
             tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
-            type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module(p)))));
+            type treturn = functional_result(type_functional(entity_type(inlined_module(p))));
             if( type_void_p(treturn) ) /* only replace return statement by gotos */
             {
                 gen_context_recurse(expanded, p,statement_domain, gen_true, &inline_return_remover);
@@ -477,11 +526,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* fix declarations */
     {
         /* retreive formal parameters*/
-        list formal_parameters = NIL;
-        FOREACH(ENTITY,cd,code_declarations(inlined_code))
-            if( entity_formal_p(cd)) formal_parameters=CONS(ENTITY,cd,formal_parameters);
-        formal_parameters = gen_nreverse(formal_parameters);
-
+        list formal_parameters = gen_nreverse(
+                module_formal_parameters(inlined_module(p))
+                );
+        list new_old_pairs = NIL ; /* store association between new and old declarations */
         { /* some basic checks */
             size_t n1 = gen_length(formal_parameters), n2 = gen_length(call_arguments(callee));
             pips_assert("function call has enough arguments",n1 >= n2);
@@ -493,7 +541,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             expression from = EXPRESSION(CAR(c_iter));
 
             /* check if there is a write effect on this parameter */
-            bool need_copy = (!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e);
+            bool need_copy = !implicit_c_variable_p(e) && ((!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e));
 
             /* generate a copy for this parameter */
             entity new = entity_undefined;
@@ -503,7 +551,14 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
                 }
                 else {
-                    new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                    if(formal_parameter_p(e)) {
+                        new = make_temporary_pointer_to_array_entity(e,expression_undefined);
+                        expression etmp = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e));
+                        replace_entity_by_expression(expanded,e,etmp);
+                        free_expression(etmp);
+                    }
+                    else
+                        new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
                             copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
                 }
 
@@ -599,11 +654,19 @@ reget:
                             AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
 
                         } break;
+                    case is_syntax_sizeofexpression: {
+                        statement st=statement_undefined;
+                        new = make_temporary_scalar_entity(from,&st);
+                        if(!statement_undefined_p(st))
+                            insert_statement(declaration_holder,st,false);
+                        AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+                        } break;
 
                     case is_syntax_cast:
                         pips_user_warning("ignoring cast\n");
                         from = cast_expression(syntax_cast(expression_syntax(from)));
                         goto reget;
+
                     default:
                         pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
                 };
@@ -611,16 +674,29 @@ reget:
                 /* check wether the substitution will cause naming clashes
                  * then perform the substitution
                  */
-                    gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
+                    if(!implicit_c_variable_p(e)) gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
                     if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
                     else replace_entity(expanded ,e,new);
                     pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
 
+
             }
+            new_old_pairs=CONS(ENTITY,new,CONS(ENTITY,e,new_old_pairs));
 
         }
         gen_free_list(formal_parameters);
+        /* SG: C dependant types are a pain in the a**,
+           we fix them here, that is perform substitution if needed
+           */
+        for(list iter = new_old_pairs;!ENDP(iter);POP(iter)) {
+            entity new = ENTITY(CAR(iter));
+            POP(iter);
+            entity old = ENTITY(CAR(iter));
+            replace_entity(declaration_holder,old,new);
+        }
+        gen_free_list(new_old_pairs);
     }
+
 
     /* add declaration at the beginning of the statement */
     insert_statement(declaration_holder,expanded,false);

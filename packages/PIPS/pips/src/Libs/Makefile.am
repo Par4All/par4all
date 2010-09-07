@@ -5,7 +5,7 @@ PIPS_SUBDIRS=\
 	syntax c_syntax prettyprint \
 	effects-generic effects-simple semantics complexity \
 	continuation reductions effects-convex alias-classes \
-	callgraph icfg ricedg \
+	pointer_values callgraph icfg ricedg \
 	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util
@@ -64,6 +64,7 @@ libpipslibs_la_LIBADD=\
 	effects-convex/libeffects-convex.la\
 	effects-generic/libeffects-generic.la\
 	alias-classes/libalias-classes.la\
+	pointer_values/libpointer_values.la\
 	comp_sections/libcomp_sections.la\
 	semantics/libsemantics.la\
 	control/libcontrol.la\

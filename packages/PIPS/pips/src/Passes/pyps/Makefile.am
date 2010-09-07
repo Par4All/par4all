@@ -1,6 +1,6 @@
 SUBDIRS  = doc drivers
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
-dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.pl
+dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.py
 
 dist_bin_SCRIPTS = pips-gcc pips-ar pips-make
 
@@ -8,7 +8,15 @@ if WITH_PYPS_EXTRA
 	dist_bin_SCRIPTS += ipyps
 endif
 
-dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py
+pipsmakeenvdir = $(libdir)/pips-make
+pipsmakeenv_SCRIPTS = gcc ar
+
+dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py utils.py pyrops.py
+
+if WITH_PYPS_EXTRA
+	dist_pkgpython_PYTHON += pyrops.py
+endif
+
 nodist_pkgpython_PYTHON=pypips.py
 pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c
@@ -41,38 +49,28 @@ pypips_wrap.c : pypips.i pypips.h
 pypips.i:pypips.i.in pypips.h
 	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
 
-pypips.h:pypips.c Makefile
-	echo "#ifdef HAVE_CONFIG_H" > pypips.h
-	echo '#include "pips_config.h"' >> pypips.h
-	echo '#endif' >> pypips.h
+pypips.h:pypips.c pypips.h.in Makefile
+	sed -n -e '1,/\/\*CPROTO pyips\.h/ p' $(srcdir)/pypips.h.in > pypips.h
 	$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c >> pypips.h
-	echo "#include <unistd.h>" >> pypips.h
-	echo '#include "linear.h"' >> pypips.h
-	echo '#include "genC.h"' >> pypips.h
-	echo '#include "ri.h"' >> pypips.h
-	echo '#include "text.h"' >> pypips.h
-	echo '#include "pipsmake.h"' >> pypips.h
-	echo '#include "pipsdbm.h"' >> pypips.h
-	echo '#include "top-level.h"' >> pypips.h
-	echo '#include "transformations.h"' >> pypips.h
-	echo "#undef _POSIX_C_SOURCE" >> pypips.h
-	echo "#undef _XOPEN_SOURCE" >> pypips.h
-	echo "#undef assert" >> pypips.h
-	echo "extern char *activate(char *);" >> pypips.h
-	echo "extern char *module_loops(const char*,const char*);" >> pypips.h
+	sed -n -e '/\/\*CPROTO pyips\.h/,$$ p' $(srcdir)/pypips.h.in >> pypips.h
 
 
 pypips_aux.c:pypips.h pypips.c
 	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
 
-p2p_cmd= $(srcdir)/pipsmakerc2python.pl $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
+p2p_cmd= $(srcdir)/pipsmakerc2python.py $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
 pyps.py:$(p2p_cmd) _pyps.py 
 	sed -n -e '1,/### loop_methods/ p' $(srcdir)/_pyps.py > pyps.py
-	$(PERL) $(p2p_cmd) -loop >> pyps.py
+	$(PYTHON) $(p2p_cmd) -loop >> pyps.py
 	sed -n -e '/### loop_methods/,/### module_methods/ p' $(srcdir)/_pyps.py >> pyps.py
-	$(PERL) $(p2p_cmd) -module >> pyps.py
+	$(PYTHON) $(p2p_cmd) -module >> pyps.py
 	sed -n -e '/### module_methods/,/### modules_methods/ p' $(srcdir)/_pyps.py >> pyps.py
-	$(PERL) $(p2p_cmd) -modules >> pyps.py
-	sed -n -e '/### modules_methods/,$$ p' $(srcdir)/_pyps.py >> pyps.py
+	$(PYTHON) $(p2p_cmd) -modules >> pyps.py
+	sed -n -e '/### modules_methods/,/### props_methods/ p' $(srcdir)/_pyps.py >> pyps.py
+	$(PYTHON) $(p2p_cmd) -properties >> pyps.py
+	sed -n -e '/### props_methods/,$$ p' $(srcdir)/_pyps.py >> pyps.py
+
+pips-make: pips-make.in
+	sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
 
 CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h

@@ -10,7 +10,7 @@ workspace=os.path.join(workingdir, "pips.ws")
 os.putenv("PIPS_WORKSPACE", workspace)
 os.putenv("PIPS_WORKINGDIR", workingdir)
 
-binpath=os.path.join(os.getenv("CPIPS"), "src/Passes/pyps")
+binpath="@BINPATH@"
 path=os.getenv("PATH")
 
 os.putenv("PATH", binpath + ":" + path)

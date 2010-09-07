@@ -49,6 +49,7 @@
 #include "effects-generic.h"
 #include "effects-convex.h"
 #include "pipsdbm.h"
+#include "properties.h"
 #include "resources.h"
 #include "accel-util.h"
 #include "transformations.h"
@@ -227,14 +228,14 @@ static bool sc_totally_functional_graph_p( Psysteme g, // function graph
 static Pbase loop_indices_b = BASE_NULLE;
 
 // These are needed for callback function reference_substitute
-static entity scalarized_array = entity_undefined;
+static reference scalarized_reference = reference_undefined;
 static entity scalarized_replacement_variable = entity_undefined;
 
 // gen_recurse callback function for statement_substitute_scalarized_array_references
 static bool reference_substitute(reference r) {
   bool result = FALSE;
   entity v = reference_variable(r);
-  if (v == scalarized_array) {
+  if(reference_equal_p(r,scalarized_reference)) {
     // Scalarize only if r refers to an array element and not to a slice
     list inds = reference_indices(r);
     size_t d = type_depth(ultimate_type(entity_type(v)));
@@ -248,13 +249,13 @@ static bool reference_substitute(reference r) {
 }
 
 
-static void statement_substitute_scalarized_array_references(statement st, entity a, entity s)
+static void statement_substitute_scalarized_array_references(statement st, reference pvr, entity s)
 {
   //TODO: create context ansd use gen_multi_recurse_with_context
-  scalarized_array = a;
+  scalarized_reference = pvr;
   scalarized_replacement_variable = s;
   gen_recurse (st, reference_domain, reference_substitute, gen_null);
-  scalarized_array = entity_undefined;
+  scalarized_reference = reference_undefined;
   scalarized_replacement_variable = entity_undefined;
 }
 
@@ -411,7 +412,7 @@ static bool loop_scalarization(loop l)
 
 	    // Create a new variable and add
 	    // its declaration to the current module
-	    entity sv = make_new_scalar_variable_with_prefix("__scalar__", get_current_module_entity(), svb);
+	    entity sv = make_new_scalar_variable_with_prefix(get_string_property("SCALARIZATION_PREFIX"), get_current_module_entity(), svb);
 	    AddEntityToCurrentModule(sv);
 	    scalarized_variables =
 	      arguments_add_entity(scalarized_variables, pv);
@@ -420,7 +421,7 @@ static bool loop_scalarization(loop l)
 			      entity_name(sv), entity_name(pv));
 
 	    // Substitute all references to pv with references to new variable
-	    statement_substitute_scalarized_array_references(s, pv, sv);
+	    statement_substitute_scalarized_array_references(s, pvr, sv);
 
 	    // Take care of copy-in and copy-out code if necessary
 	    if (!entity_undefined_p(ov)) {
@@ -428,7 +429,7 @@ static bool loop_scalarization(loop l)
 	      statement co_s =
 		make_assign_statement(reference_to_expression(pvr),
 				      entity_to_expression(sv));
-	      append_a_statement(s, co_s);
+	      insert_statement(s, co_s,false);
 	    }
 	    else {
 	      //free_reference(pvr);
@@ -439,7 +440,7 @@ static bool loop_scalarization(loop l)
 	      statement ci_s =
 		make_assign_statement(entity_to_expression(sv),
 				      reference_to_expression(copy_reference(pvr)));
-	      insert_a_statement(s, ci_s);
+	      insert_statement(s, ci_s,true);
 	    }
 	    else {
 	      //free_reference(pvr);

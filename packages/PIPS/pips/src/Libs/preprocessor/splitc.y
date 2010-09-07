@@ -1500,6 +1500,7 @@ decl_spec_list_opt_no_named:     /* empty */
 			  /* Cf "Actions in Mid-Rule" in the Bison doc. */
 			  $<string>$ = new_empty();
 			  PushTypedef();
+              free($<string>$);
 			}
     %prec TK_IDENT
                         {

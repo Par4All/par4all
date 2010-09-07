@@ -140,7 +140,7 @@ statement_mapping listmap_to_effectsmap(l_map)
 statement_mapping l_map;
 {
     statement_mapping efs_map = MAKE_STATEMENT_MAPPING();
-    
+
     STATEMENT_MAPPING_MAP(s,val,{
 	hash_put((hash_table) efs_map, (char *) s, (char *) list_to_effects((list) val));
     }, l_map);
@@ -177,7 +177,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
    MAP(EFFECT, an_effect,
        {
           entity a_variable = reference_variable(effect_any_reference(an_effect));
-          
+
           if (action_write_p(effect_action(an_effect))
               && (variable_return_p(a_variable)
 		  || variable_is_a_module_formal_parameter_p(a_variable,
@@ -274,7 +274,7 @@ bool malloc_effect_p(effect e)
 /*************** I/O EFFECTS *****************/
 bool io_effect_entity_p(entity e)
 {
-    return io_entity_p(e) && 
+    return io_entity_p(e) &&
 	same_string_p(entity_local_name(e), IO_EFFECTS_ARRAY_NAME);
 }
 
@@ -286,7 +286,7 @@ bool io_effect_p(effect e)
 bool std_file_effect_p(effect e)
 {
   const char * s = entity_user_name(effect_entity(e));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr")); 
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
 }
 
 /* Can we merge these two effects because they are equal or because
@@ -302,7 +302,7 @@ bool effect_comparable_p(effect e1, effect e2)
   if(v1==v2) {
     action a1 = effect_action(e1);
     action a2 = effect_action(e2);
-    if(action_tag(a1)==action_tag(a2))
+    if(action_equal_p(a1, a2))
       {
 
 	/* Check the subscript lists because p and p[0] do not refer
@@ -547,7 +547,10 @@ effect effect_to_non_pointer_store_independent_effect(effect eff)
      modification abstracted by eff2 preserves the correctness of
      eff1: all memory locations included in eff1 at input are included
      in the memory locations abstracted by the new eff1 after the
-     abstract state transition. */
+     abstract state transition.
+
+     FI: seems to extend naturally to new kinds of effects...
+ */
 effect effect_interference(effect eff1, effect eff2)
 {
   //action ac1 = effect_action(eff1);
@@ -619,9 +622,155 @@ effect effect_interference(effect eff1, effect eff2)
   return n_eff1;
 }
 
+/* Functions dealing with actions */
+
 string action_to_string(action ac)
 {
+  /* This is correct, but imprecise when action_kinds are taken into
+     account */
   return action_read_p(ac)? "read" : "write";
+}
+
+string full_action_to_string(action ac)
+{
+  string s = string_undefined;
+  if(action_read_p(ac)) {
+    action_kind ak = action_read(ac);
+
+    if(action_kind_store_p(ak))
+      s = "read memory";
+    else if(action_kind_environment_p(ak))
+      s = "read environment";
+    else if(action_kind_type_declaration_p(ak))
+      s = "read type";
+  }
+  else {
+    action_kind ak = action_write(ac);
+
+    if(action_kind_store_p(ak))
+      s = "write memory";
+    else if(action_kind_environment_p(ak))
+      s = "write environment";
+    else if(action_kind_type_declaration_p(ak))
+      s = "write type";
+  }
+  return s;
+}
+
+string full_action_to_short_string(action ac)
+{
+  string s = string_undefined;
+  if(action_read_p(ac)) {
+    action_kind ak = action_read(ac);
+
+    if(action_kind_store_p(ak))
+      s = "R";
+    else if(action_kind_environment_p(ak))
+      s = "RE";
+    else if(action_kind_type_declaration_p(ak))
+      s = "RT";
+  }
+  else {
+    action_kind ak = action_write(ac);
+
+    if(action_kind_store_p(ak))
+      s = "W";
+    else if(action_kind_environment_p(ak))
+      s = "WE";
+    else if(action_kind_type_declaration_p(ak))
+      s = "WT";
+  }
+  return s;
+}
+
+string action_kind_to_string(action_kind ak)
+{
+  string s = string_undefined;
+
+  if(action_kind_store_p(ak))
+    s = "S";
+  else if(action_kind_environment_p(ak))
+    s = "E";
+  else if(action_kind_type_declaration_p(ak))
+    s = "T";
+  else
+    pips_internal_error("Unknown action kind.\n");
+  return s;
+}
+
+/* To ease the extension of action with action_kind */
+action make_action_write_memory(void)
+{
+  action a = make_action_write(make_action_kind_store());
+  return a;
+}
+
+action make_action_read_memory(void)
+{
+  action a = make_action_read(make_action_kind_store());
+  return a;
+}
+
+bool action_equal_p(action a1, action a2)
+{
+  bool equal_p = FALSE;
+
+  if(action_tag(a1)==action_tag(a2)) {
+    if(action_read_p(a1)) {
+      action_kind ak1 = action_read(a1);
+      action_kind ak2 = action_read(a2);
+
+      equal_p = action_kind_tag(ak1)==action_kind_tag(ak2);
+    }
+    else /* action_write_p(a1) */ {
+      action_kind ak1 = action_write(a1);
+      action_kind ak2 = action_write(a2);
+
+      equal_p = action_kind_tag(ak1)==action_kind_tag(ak2);
+    }
+  }
+  return equal_p;
+
+}
+
+/* Without the consistency test, this function would certainly be
+   inlined. Macros are avoided to simplify debugging and
+   maintenance. */
+action_kind action_to_action_kind(action a)
+{
+  action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
+
+  if(!action_read_p(a) && !action_write_p(a))
+    pips_internal_error("Inconsistent action kind.\n");
+
+  return ak;
+}
+
+bool store_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_store_p(ak);
+
+  return store_p;
+}
+
+bool environment_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_environment_p(ak);
+
+  return store_p;
+}
+
+bool type_declaration_effect_p(effect e)
+{
+  action a = effect_action(e);
+  action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
+  bool store_p = action_kind_type_declaration_p(ak);
+
+  return store_p;
 }
 
 bool effects_write_variable_p(list el, entity v)
@@ -706,28 +855,28 @@ bool effect_list_can_be_safely_full_freed_p(list el)
 
 /* tag approximation_and(tag t1, tag t2)
  * input    : two approximation tags.
- * output   : the tag representing their "logical and", assuming that 
+ * output   : the tag representing their "logical and", assuming that
  *            must = true and may = false.
- * modifies :  nothing 
+ * modifies :  nothing
  */
 tag approximation_and(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) && (t2 == is_approximation_must)) 
+    if ((t1 == is_approximation_must) && (t2 == is_approximation_must))
 	return(is_approximation_must);
     else
 	return(is_approximation_may);
 }
 
 
-/* tag approximation_or(tag t1, tag t2) 
+/* tag approximation_or(tag t1, tag t2)
  * input    : two approximation tags.
- * output   : the tag representing their "logical or", assuming that 
+ * output   : the tag representing their "logical or", assuming that
  *            must = true and may = false.
  * modifies : nothing
  */
 tag approximation_or(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) || (t2 == is_approximation_must)) 
+    if ((t1 == is_approximation_must) || (t2 == is_approximation_must))
 	return(is_approximation_must);
     else
 	return(is_approximation_may);
@@ -744,7 +893,7 @@ bool cell_equal_p(cell c1, cell c2)
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
 }
- 
+
 
 /* FI: probably to be moved elsewhere in ri-util */
 /* Here, we only know how to cope (for the time being) with
@@ -761,4 +910,98 @@ reference cell_to_reference(cell c) {
     pips_internal_error("unexpected cell tag\n");
 
   return r;
+}
+
+/* Debugging */
+bool effect_list_consistent_p(list el)
+{
+  bool ok_p = TRUE;
+
+  FOREACH(EFFECT, e, el)
+    ok_p = ok_p && effect_consistent_p(e);
+
+  return ok_p;
+}
+
+/* Check compatibility conditions for effect union */
+bool union_compatible_effects_p(effect ef1, effect ef2)
+{
+  action a1 = effect_action(ef1);
+  tag at1 = action_tag(a1);
+  action_kind ak1 = action_to_action_kind(a1);
+  tag akt1 = action_kind_tag(ak1);
+  entity e1 = effect_variable(ef1);
+  descriptor d1 = effect_descriptor(ef1);
+  action a2 = effect_action(ef2);
+  tag at2 = action_tag(a2);
+  action_kind ak2 = action_to_action_kind(a2);
+  tag akt2 = action_kind_tag(ak2);
+  entity e2 = effect_variable(ef2);
+  descriptor d2 = effect_descriptor(ef2);
+  bool compatible_p = TRUE;
+
+  pips_assert("effect e1 is consistent", effect_consistent_p(ef1));
+  pips_assert("effect e2 is consistent", effect_consistent_p(ef2));
+
+  if(at1!=at2) {
+    /* In general, you do not want to union a read and a write, but
+       you might want to do so to generate the set of referenced
+       elements, for instance to generate communications or to
+       allocate memory */
+    compatible_p = FALSE;
+  }
+  else if(akt1!=akt2) {
+    /* You do not want to union an effect on store with an effect on
+       environment or type declaration */
+    compatible_p = FALSE;
+  }
+  else {
+    /* Here we know: at1==at2 and akt1==akt2 */
+    /* The code below could be further unified, but it would not make
+       it easier to understand */
+    if(akt1==is_action_kind_store) {
+      if(e1!=e2)
+	compatible_p = FALSE;
+      else {
+	tag dt1 = descriptor_tag(d1);
+	tag dt2 = descriptor_tag(d2);
+
+	if(dt1!=dt2)
+	  compatible_p = FALSE;
+      }
+    }
+    else {
+      /* For environment and type declaration, the descriptor is
+	 useless for the time being */
+      compatible_p = e1==e2;
+    }
+  }
+
+  return compatible_p;
+}
+
+/* Returns the entity corresponding to the mutation. It could be
+   called effect_to_variable(), but effects are sometimes summarized
+   with abstract locations, i.e. sets of locations. */
+entity effect_to_entity(effect ef)
+{
+  /* FI unlikely to work with GAPs */
+  reference r = effect_any_reference(ef);
+  entity e = reference_variable(r);
+
+  return e;
+}
+
+/* boolean vect_contains_phi_p(Pvecteur v)
+ * input    : a vector
+ * output   : TRUE if v contains a PHI variable, FALSE otherwise
+ * modifies : nothing
+ */
+boolean vect_contains_phi_p(Pvecteur v)
+{
+    for(; !VECTEUR_NUL_P(v); v = v->succ)
+	if (variable_phi_p((entity) var_of(v)))
+	    return(TRUE);
+
+    return(FALSE);
 }

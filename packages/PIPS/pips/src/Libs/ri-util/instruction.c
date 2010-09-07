@@ -334,13 +334,3 @@ list instruction_to_declarations(instruction i)
   return statement_to_all_included_declarations;
 }
 
-/* Returns the declarations contained in a list of statement. */
-list statements_to_declarations(list sl)
-{
-  instruction i = make_instruction_block(sl);
-  list dl = instruction_to_declarations(i);
-  /* The declaration list is reversed by
-     instruction_to_declarations(). */
-  dl = gen_nreverse(dl);
-  return dl;
-}

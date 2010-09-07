@@ -158,8 +158,8 @@ void loop_normalize_statement(statement s) {
     expression nub = make_op_exp(DIVIDE_OPERATOR_NAME,
 				 make_op_exp(PLUS_OPERATOR_NAME,
 					     make_op_exp(MINUS_OPERATOR_NAME,
-							 ru,rl),
-					     ri),
+							 copy_expression(ru),copy_expression(rl)),
+					     copy_expression(ri)),
 				 copy_expression(ri));
     expression nub2 = copy_expression(nub);
 
@@ -222,7 +222,7 @@ void loop_normalize_statement(statement s) {
 	 final value: */
       statement end_stmt = make_assign_statement(copy_expression(index_exp),
 						 exp_plus);
-      append_a_statement(s, end_stmt);
+      insert_statement(s, end_stmt,false);
     }
     pips_debug( 4, "end LOOP\n");
   }

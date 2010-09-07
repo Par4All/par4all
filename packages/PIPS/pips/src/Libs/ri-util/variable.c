@@ -46,13 +46,21 @@
 #include "syntax.h"
 #include "resources.h"
 
+/* Check that "name" can be used as a new variable name in module
+   "in_module". Should work for C and for Fortran. Apparently, should
+   work whether name is already a global name or not, hence the
+   derivation of user_name
+
+   Of course, not really debugged for Fortran:-(.
+.*/
 static bool unique_entity_name_p(const char * name, entity in_module)
 {
     /* first recover a user_name from global_name */
-    const char *user_name=strchr(name,BLOCK_SEP_CHAR)?global_name_to_user_name(name):name;
+    const char *user_name=
+      strchr(name,BLOCK_SEP_CHAR)?global_name_to_user_name(name):name;
     /* first check in entity declaration, where all entities are added
      * At least AddEntityToDeclarations keep this information up to date
-     */ 
+     */
     FOREACH(ENTITY,e,entity_declarations(in_module))
     {
         if(same_string_p(entity_user_name(e),user_name))
@@ -62,8 +70,7 @@ static bool unique_entity_name_p(const char * name, entity in_module)
     if(strstr(name,MODULE_SEP_STRING))
         return gen_chunk_undefined_p(gen_find_tabulated(name,entity_domain));
     else
-        return gen_chunk_undefined_p(gen_find_tabulated(concatenate(entity_module_name(in_module), MODULE_SEP_STRING,name,NULL),entity_domain));
-
+        return gen_chunk_undefined_p(gen_find_tabulated(concatenate(module_local_name(in_module), MODULE_SEP_STRING,name,NULL),entity_domain));
 }
 
 /* See also macro entity_variable_p()... */
@@ -467,8 +474,8 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 
     if (empty_prefix) {
       /* Use a default type-dependent variable name since the programmer
-	 gave none: */
-		basic ub = basic_ultimate(b);
+         gave none: */
+      basic ub = basic_ultimate(b);
       switch(basic_tag(ub)) {
       case is_basic_int:
 	asprintf(&variable_name,  format, DEFAULT_INT_PREFIX,
@@ -495,7 +502,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 		unique_string_number++);
 	break;
       case is_basic_derived: {
-	entity de = basic_derived(b);
+	entity de = basic_derived(ub);
 	type dt = ultimate_type(entity_type(de));
 
 	if(type_struct_p(dt)) {
@@ -506,7 +513,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 	    asprintf(&variable_name, format, DEFAULT_UNION_PREFIX,
 		     unique_string_number++);
 	}
-    else if(type_enum_p(dt)) {
+	else if(type_enum_p(dt)) {
 	   asprintf(&variable_name, format, DEFAULT_ENUM_PREFIX,
 		    unique_string_number++);
 	}
@@ -586,6 +593,27 @@ entity make_new_array_variable_with_prefix(const char* prefix, entity module,bas
   return e;
 }
 
+/*
+	Create an pointer to an array simlar to `efrom' initialized with
+	expression `from'
+ */
+entity make_temporary_pointer_to_array_entity(entity efrom,
+					      expression from) {
+  basic pointee = copy_basic(variable_basic(type_variable(entity_type(efrom))));
+  list dims = gen_full_copy_list(variable_dimensions(type_variable(entity_type(efrom))));
+
+  /* Make the pointer type */
+  basic pointer = make_basic_pointer(make_type_variable(make_variable(pointee,
+								      dims,
+								      NIL)));
+  /* Create the variable as a pointer */
+  entity new = make_new_scalar_variable(get_current_module_entity(),
+					pointer);
+  /* Set its initial */
+  entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
+  return new;
+}
 
 
 /* Make a new module integer variable of name X<d>.

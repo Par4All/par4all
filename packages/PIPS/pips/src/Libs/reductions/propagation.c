@@ -125,14 +125,14 @@ static void do_reduction_propagation(graph dg) {
 bool reduction_propagation(const char * mod_name) {
     /* get the resources */
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt); 
     set_proper_reductions((pstatement_reductions) db_get_memory_resource(DBR_PROPER_REDUCTIONS, mod_name, true));
     set_current_module_entity(module_name_to_entity(mod_name));
 	set_ordering_to_statement(mod_stmt);
     graph dependence_graph = 
-        (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+        (graph) db_get_memory_resource(DBR_DG, mod_name, true);
 
     simplify_c_operator(get_current_module_statement());
 
@@ -149,4 +149,123 @@ bool reduction_propagation(const char * mod_name) {
     reset_current_module_statement();
     reset_current_module_entity();
     return true;
+}
+
+static reference guess_potential_reduction(successor su,conflict * relevant) {
+  reference out = reference_undefined;
+  FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su))) {
+    /* this looks like a potential reduction to me */
+    if( !anywhere_effect_p(conflict_source(c)) && !anywhere_effect_p(conflict_sink(c)) &&
+        effect_read_p(conflict_source(c))&&effect_write_p(conflict_sink(c))) {
+      out = effect_any_reference(conflict_source(c));
+      if ( reference_scalar_p(out) ) {
+          pips_debug(1,"potential reduction: %s\n",entity_user_name(reference_variable(out)));
+          *relevant=c;
+          break;
+      }
+      else out = reference_undefined;
+    }
+  }
+  return out;
+}
+
+static bool potential_reduction_substitution_valid_p(list/*of successors*/ sus, conflict legal_conflict,reference ref) {
+    FOREACH(SUCCESSOR,su,sus) {
+        FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su))) {
+            if( c!=legal_conflict && (reference_equal_p(ref,effect_any_reference(conflict_sink(c))) || reference_equal_p(ref,effect_any_reference(conflict_source(c))))
+              ) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/* sg: this function does a huge pattern matching :) 
+ * and is not very smart 
+ */
+static bool do_reduction_detection(graph dg) {
+    set seen = set_make(set_pointer);
+    FOREACH(VERTEX, v,graph_vertices(dg))
+    {
+        statement s = vertex_to_statement(v);
+        if(!set_belong_p(seen,s) ) {
+            set_add_element(seen,seen,s);
+            /* lazy ... s = f(sigma) */
+            if(assignment_statement_p(s)) {
+                expression assigned_exp = binary_call_lhs(statement_call(s));
+                /* lazier , only scalar on lhs */
+                if(expression_scalar_p(assigned_exp)) {
+                    expression rhs = binary_call_rhs(statement_call(s));
+                    /* lazier, only intrinsic call on rhs */
+                    if(expression_call_p(rhs)) {
+                        reference assigned_ref = expression_reference(assigned_exp);
+                        conflict cculprit = conflict_undefined;
+                        call rhs_call = expression_call(rhs);
+                        entity rhs_op = call_function(rhs_call);
+                        if(intrinsic_entity_p(rhs_op)) {
+                            reference potential_reduction = reference_undefined;
+                            /* look for a potential reduction */
+                            FOREACH(SUCCESSOR,su,vertex_successors(v)) {
+                                vertex sv = successor_vertex(su);
+                                statement ssv = vertex_to_statement(sv);
+                                /* even lazier */
+                                if(assignment_statement_p(ssv)) {
+                                    expression assigned_exp_sv = binary_call_lhs(statement_call(ssv));
+                                    if(expression_scalar_p(assigned_exp_sv)) {
+                                        reference assigned_ref_sv = expression_reference(assigned_exp_sv);
+                                        potential_reduction = guess_potential_reduction(su,&cculprit);
+                                        if(!reference_undefined_p(potential_reduction) &&
+                                                reference_equal_p(potential_reduction,assigned_ref_sv)) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            /* verify validity of the substitution */
+                            if(!reference_undefined_p(potential_reduction)) {
+                                if(potential_reduction_substitution_valid_p(vertex_successors(v),cculprit,potential_reduction)) {
+                                    pips_debug(1,"replacing %s by %s\n",entity_user_name(reference_variable(assigned_ref)),entity_user_name(reference_variable(potential_reduction)));
+                                    RemoveLocalEntityFromDeclarations(reference_variable(assigned_ref),get_current_module_entity(),get_current_module_statement());
+                                    replace_reference(get_current_module_statement(),assigned_ref,reference_variable(potential_reduction));
+                                    set_free(seen);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    set_free(seen);
+    return false;
+}
+
+bool reduction_detection(const char * mod_name) {
+    /* get the resources */
+    statement mod_stmt = (statement)
+        db_get_memory_resource(DBR_CODE, mod_name, true);
+
+    set_current_module_statement(mod_stmt); 
+    set_current_module_entity(module_name_to_entity(mod_name));
+	set_ordering_to_statement(mod_stmt);
+    graph dependence_graph = 
+        (graph) db_get_memory_resource(DBR_DG, mod_name, true);
+
+    /* do the job */
+    debug_on("REDUCTION_DETECTION_DEBUG_LEVEL");
+    bool res = do_reduction_detection(dependence_graph);
+    debug_off();
+    if(res) {
+        /* validate computation */
+        module_reorder(mod_stmt);
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+    }
+
+    /* update/release resources */
+	reset_ordering_to_statement();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    return res;
 }

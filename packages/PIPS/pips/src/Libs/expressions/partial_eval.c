@@ -1080,7 +1080,7 @@ eformat_t partial_eval_min_or_max_operator(int token,
     eformat_t ef;
     bool ok = false;
     {
-        expression fake = make_op_exp(MINUS_OPERATOR_NAME,*ep1,*ep2);
+        expression fake = make_op_exp(MINUS_OPERATOR_NAME,copy_expression(*ep1),copy_expression(*ep2));
         transformer tr = transformer_range(load_statement_precondition(partial_eval_current_statement));
         intptr_t lb,ub;
         if(precondition_minmax_of_expression(fake,tr,&lb,&ub))

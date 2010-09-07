@@ -358,7 +358,11 @@ hash_table declarations_read(FILE * f)
   int c;
   while ((c = getc(f)) && c != EOF)
     {
-      hash_put(result,(char*)safe_readline(f),(char*)safe_readline(f));
+      ungetc(c,f);
+      char* key = safe_readline(f);
+      _int value = atoi(safe_readline(f));
+
+      hash_put(result,key,(void*)value);
     }
   return result;
 }

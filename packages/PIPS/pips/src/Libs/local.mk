@@ -38,7 +38,7 @@ FWD_DIRS	= \
 	misc newgen properties text-util pipsdbm \
 	top-level ri-util conversion movements \
 	comp_sections transformer bootstrap control flint \
-	syntax c_syntax prettyprint alias-classes \
+	syntax c_syntax prettyprint alias-classes pointer_values \
 	effects-generic effects-simple semantics complexity \
 	continuation reductions effects-convex \
 	effects-util callgraph icfg ricedg \

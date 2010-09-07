@@ -21,6 +21,16 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/*
+ * Modifications :
+ * --------------
+ *
+ * Molka Becher (MB), June-July 2010
+ *
+ * Add of functions on Long Int, Long Long Int, Long Double and Long Double Complex types
+ *
+ */
+
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
@@ -133,6 +143,16 @@ parameter MakeIntegerParameter()
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
 }
 
+parameter MakeLongIntegerParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_LONG_INTEGER_TYPE_SIZE);
+}
+
+parameter MakeLongLongIntegerParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+}
+
 parameter MakeRealParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
@@ -141,6 +161,11 @@ parameter MakeRealParameter()
 parameter MakeDoubleprecisionParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+parameter MakeQuadprecisionParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_float, DEFAULT_QUADPRECISION_TYPE_SIZE);
 }
 
 parameter MakeLogicalParameter()
@@ -156,6 +181,11 @@ parameter MakeComplexParameter()
 parameter MakeDoublecomplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+}
+
+parameter MakeLongDoublecomplexParameter() /* MB */
+{
+  return MakeAnyScalarParameter(is_basic_complex, DEFAULT_LONGDOUBLECOMPLEX_TYPE_SIZE);
 }
 
 parameter MakeCharacterParameter()
@@ -190,6 +220,16 @@ type MakeIntegerResult()
     return MakeAnyScalarResult(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
 
+type MakeLongIntegerResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_LONG_INTEGER_TYPE_SIZE);
+}
+
+type MakeLongLongIntegerResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+}
+
 type MakeRealResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
@@ -198,6 +238,11 @@ type MakeRealResult()
 type MakeDoubleprecisionResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+type MakeQuadprecisionResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_float, DEFAULT_QUADPRECISION_TYPE_SIZE);
 }
 
 type MakeLogicalResult()
@@ -214,6 +259,12 @@ type MakeDoublecomplexResult()
 {
     return MakeAnyScalarResult(is_basic_complex,
 			       DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+}
+
+type MakeLongDoublecomplexResult() /* MB */
+{
+    return MakeAnyScalarResult(is_basic_complex,
+			       DEFAULT_LONGDOUBLECOMPLEX_TYPE_SIZE);
 }
 
 type MakeCharacterResult()
@@ -903,21 +954,25 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
       break;
     }
   case is_syntax_sizeofexpression:
+    /* SG: following code fragment seems wrong to me
     {
       sizeofexpression se = syntax_sizeofexpression(sy);
       if (sizeofexpression_type_p(se))
-	{
-	  type t = sizeofexpression_type(se);
-	  if (type_tag(t) != is_type_variable)
-	    pips_internal_error("Bad reference type tag %d\n",type_tag(t));
-	  b = copy_basic(variable_basic(type_variable(t)));
-	}
+       {
+         type t = sizeofexpression_type(se);
+         if (type_tag(t) != is_type_variable)
+           pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+         b = copy_basic(variable_basic(type_variable(t)));
+       }
       else
-	{
-	  b = some_basic_of_any_expression(sizeofexpression_expression(se), apply_p, ultimate_p);
-	}
+       {
+         b = some_basic_of_any_expression(sizeofexpression_expression(se), apply_p, ultimate_p);
+       }
+       */
+
+      b= make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
       break;
-    }
+
   case is_syntax_subscript:
     {
       b = some_basic_of_any_expression(subscript_array(syntax_subscript(sy)), apply_p, ultimate_p);
@@ -1538,6 +1593,33 @@ basic basic_maximum(basic fb1, basic fb2)
     return(b1);
   */
 }
+
+basic basic_of_expressions(list expressions,bool skip_overloaded)
+{
+    if(ENDP(expressions)) return basic_undefined;
+    else if(ENDP(CDR(expressions))) return basic_of_expression(EXPRESSION(CAR(expressions)));
+    else {
+        basic out = basic_of_expression(EXPRESSION(CAR(expressions)));
+        FOREACH(EXPRESSION,exp,CDR(expressions)) {
+            basic b = basic_of_expression(exp);
+            if(skip_overloaded && basic_overloaded_p(out)) {
+                free_basic(out);
+                out=b;
+            }
+            else if( skip_overloaded && basic_overloaded_p(b)) {
+                free_basic(b);
+            }
+            else {
+                basic tmp =basic_maximum(out,b);
+                free_basic(b);
+                free_basic(out);
+                out=tmp;
+            }
+        }
+        return out;
+    }
+}
+
 
 /* END_EOLE */
 
@@ -2458,6 +2540,28 @@ bool standard_long_integer_type_p(type t)
   return long_p;
 }
 
+bool scalar_integer_type_p(type t)
+{
+  bool long_p = FALSE;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_int_p(b)) {
+
+      long_p = ENDP(variable_dimensions(v));
+      /* The qualifiers do not matter
+	&& ENDP(variable_qualifiers(v))
+      */
+      /* unsigned are as OK as signed */ /*
+	&& (s == DEFAULT_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_INTEGER_TYPE_SIZE
+	    || s == DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
+	  */
+    }
+  }
+  return long_p;
+}
+
 type make_standard_long_integer_type(type t)
 {
   if (t == type_undefined)
@@ -2522,7 +2626,9 @@ type make_standard_long_integer_type(type t)
 type ultimate_type(type t)
 {
   type nt;
-  pips_assert("type consistent",type_consistent_p(t));
+
+  // only under debug, because there is a big impact on performance
+  ifdebug(1) pips_assert("type consistent",type_consistent_p(t));
 
   pips_debug(9, "Begins with type \"%s\"\n", type_to_string(t));
 
@@ -2536,15 +2642,33 @@ type ultimate_type(type t)
       entity e = basic_typedef(bt);
       type st = entity_type(e);
 
+      // recursion
       nt = ultimate_type(st);
+
+      // FC->SG the following stuff requires more comments to be understandable
+      // FC->SG why this #if ???
 #if 1
-      if( !ENDP(variable_dimensions(vt) ) ) /* without this test, we would erase the dimension ... */
+      /* without this test, we would erase the dimension ... */
+      if( !ENDP(variable_dimensions(vt) ) )
       {
-          /* what should we do ? allocate a new type ... but this breaks the semantic of the function
-           * we still create a leak for this case, which does not appear to often
-           * a warning is printed out, so that we don't forget it
+          /* what should we do ? allocate a new type ...
+           * but this breaks the semantic of the function
+           * we still create a leak for this case, which does not appear to
+           * often a warning is printed out, so that we don't forget it
            */
+          // ??? FC->SG why this static structure?
           static size_t holder_iter = 0;
+          // ??? FC->SG: why 8? why not 314159?
+          //
+          // this is creazy programming and a time bomb:-(
+          //
+          // it seems that the returned allocated type is stored there
+          // so that it may be freed some time later, with the hope that by
+          // the time it is freed it will not be in use anymore.
+          //
+          // I would prefer a memory leak in place of this kludge.
+          // I would rather suggest to memoize the computed types
+          // and not to do this kind of hidden garbage collector.
           static type holder[8] = {// SG: this should avoid the leak
               type_undefined,
               type_undefined,
@@ -2556,11 +2680,13 @@ type ultimate_type(type t)
               type_undefined
           };
           nt=copy_type(nt);
-          holder_iter = 7 & ( 1 + holder_iter );
-          variable_dimensions(type_variable(nt))=gen_nconc(gen_full_copy_list(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
-          if(!type_undefined_p(holder[holder_iter])) free_type(holder[holder_iter]);
+          holder_iter = 7 & ( 1 + holder_iter ); // too much VHDL? :-(
+          variable_dimensions(type_variable(nt)) =
+            gen_nconc(gen_full_copy_list(variable_dimensions(vt)),
+                      variable_dimensions(type_variable(nt)));
+          if (!type_undefined_p(holder[holder_iter]))
+            free_type(holder[holder_iter]);
           holder[holder_iter]=nt;
-
       }
 #endif
     }
@@ -2583,7 +2709,8 @@ type ultimate_type(type t)
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 
-  pips_assert("type consistent",type_consistent_p(nt));
+  // only under debug, because there is a big impact on performance
+  ifdebug(1) pips_assert("type consistent",type_consistent_p(nt));
   return nt;
 }
 
@@ -4096,6 +4223,37 @@ string qualifier_to_string(qualifier q)
     pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
   }
   return s;
+}
+
+/* Check that a qualifier list contains the const qualifier */
+bool qualifiers_const_p(list ql)
+{
+  bool const_p = FALSE;
+  FOREACH(QUALIFIER, q, ql) {
+    if(qualifier_const_p(q)) {
+      const_p = TRUE;
+      break;
+    }
+  }
+  return const_p;
+}
+
+/* Is there a const qualifier associated to type t
+ *
+ * FI: this should be extended in case const can be carried by a
+ * typedef, but this first version should be enough for Molka.
+ */
+bool type_with_const_qualifier_p(type t)
+{
+  bool qualifier_p = FALSE;
+
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list ql = variable_qualifiers(v);
+    qualifier_p = qualifiers_const_p(ql);
+  }
+
+  return qualifier_p;
 }
 
 

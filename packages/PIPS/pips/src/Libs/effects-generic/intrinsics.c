@@ -28,10 +28,20 @@
  *
  * File: intrinsics.c
  * ~~~~~~~~~~~~~~~~~~
- *
+ *  
  * This File contains the generic functions necessary for the computation of
  * all types of proper effects and proper references of intrinsics.
  *
+ *
+ * Modifications :
+ * --------------
+ *
+ * Molka Becher (MB), May-June 2010
+ *
+ * - Reordering of the existing intrinsics according to ISO/IEC 9899
+ * - Add of missing C Intrinsics 
+ * - Add of generic_string_effects and memmove_effects for handling string.h 
+ * effects
  */
 
 #include <stdio.h>
@@ -90,6 +100,11 @@ static list rgs_effects(entity e,list args);
 static list rgsi_effects(entity e,list args);
 static list any_heap_effects(entity e,list args);
 static list va_list_effects(entity e, list args);
+/* MB */
+static list generic_string_effects(entity e,list args);
+static list memmove_effects(entity e, list args);
+
+
 
 /* the following data structure indicates wether an io element generates
 a read effects or a write effect. the kind of effect depends on the
@@ -168,7 +183,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {"WRITE",     "IOSTAT=",      is_action_write, is_approximation_may},
   {"WRITE",     "IOLIST=",      is_action_read,  is_approximation_must},
 
-  /* C IO intrinsics */
+  /* C IO intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
 
   /* The field IoElementName is used to describe the function's pattern
      defined according to the standard ISO/IEC 9899 (BC, july 2009) :
@@ -186,43 +201,45 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
             to distinguish between read and write effects on the components
             of the va_list).
 
-     The tag fields are not relevant.     
+     The tag fields are not relevant.
   */
 
-  {PRINTF_FUNCTION_NAME,        "rR*",     is_action_read, is_approximation_must},
+  /* Input/Output <stdio.h> */
+
+  {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
+  {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
   {FPRINTF_FUNCTION_NAME,       "srR*",    is_action_read, is_approximation_must},
-  {SCANF_FUNCTION_NAME,         "rW*",     is_action_read, is_approximation_must},
-  {ISOC99_SCANF_FUNCTION_NAME,   "rW*",     is_action_read, is_approximation_must},
   {FSCANF_FUNCTION_NAME,        "srW*",    is_action_read, is_approximation_must},
   {ISOC99_FSCANF_FUNCTION_NAME, "srW*",    is_action_read, is_approximation_must},
-  {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
-  {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_must},
-  {FPUTS_FUNCTION_NAME,         "rs",     is_action_read, is_approximation_must},
-  {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
-  {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
-  {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
-  {SNPRINTF_FUNCTION_NAME,      "wnrR*",    is_action_read, is_approximation_must},
-  {SPRINTF_FUNCTION_NAME,       "wrR*",     is_action_read, is_approximation_must},
+  {PRINTF_FUNCTION_NAME,        "rR*",     is_action_read, is_approximation_must},
+  {SCANF_FUNCTION_NAME,         "rW*",     is_action_read, is_approximation_must},
+  {ISOC99_SCANF_FUNCTION_NAME,   "rW*",    is_action_read, is_approximation_must},
+  {SNPRINTF_FUNCTION_NAME,      "wnrR*",   is_action_read, is_approximation_must},
+  {SPRINTF_FUNCTION_NAME,       "wrR*",    is_action_read, is_approximation_must},
   {SSCANF_FUNCTION_NAME,        "rrW*",    is_action_read, is_approximation_must},
   {ISOC99_SSCANF_FUNCTION_NAME, "rrW*",    is_action_read, is_approximation_must},
-  {VFPRINTF_FUNCTION_NAME,      "srv",      is_action_read, is_approximation_must},
+  {VFPRINTF_FUNCTION_NAME,      "srv",     is_action_read, is_approximation_must},
   {VFSCANF_FUNCTION_NAME,       "srv",     is_action_read, is_approximation_must},
   {ISOC99_VFSCANF_FUNCTION_NAME,"srv",     is_action_read, is_approximation_must},
   {VPRINTF_FUNCTION_NAME,       "rv",      is_action_read, is_approximation_must},
+  {VSCANF_FUNCTION_NAME,        "rv",      is_action_read, is_approximation_must},
+  {ISOC99_VSCANF_FUNCTION_NAME, "rv",      is_action_read, is_approximation_must},
   {VSNPRINTF_FUNCTION_NAME,     "wnrv",    is_action_read, is_approximation_must},
   {VSPRINTF_FUNCTION_NAME,      "wrv",     is_action_read, is_approximation_must},
   {VSSCANF_FUNCTION_NAME,       "rrv",     is_action_read, is_approximation_must},
   {ISOC99_VSSCANF_FUNCTION_NAME,"rrv",     is_action_read, is_approximation_must},
-  {VSCANF_FUNCTION_NAME,        "rv",      is_action_read, is_approximation_must},
-  {ISOC99_VSCANF_FUNCTION_NAME, "rv",      is_action_read, is_approximation_must},
+  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must}, 
+  {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
   {FPUTC_FUNCTION_NAME,         "ns",      is_action_read, is_approximation_must},
+  {FPUTS_FUNCTION_NAME,         "rs",      is_action_read, is_approximation_must},
   {GETC_FUNCTION_NAME,          "s",       is_action_read, is_approximation_must},
   {_IO_GETC_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
-  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
-  {GETCHAR_FUNCTION_NAME,       "",       is_action_read, is_approximation_must},
+  {GETCHAR_FUNCTION_NAME,       "",        is_action_read, is_approximation_must},
+  {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_must},
   {PUTC_FUNCTION_NAME,          "ns",      is_action_read, is_approximation_must},
   {_IO_PUTC_FUNCTION_NAME,      "ns",      is_action_read, is_approximation_must},
   {PUTCHAR_FUNCTION_NAME,       "n",       is_action_read, is_approximation_must},
+  {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
   {UNGETC_FUNCTION_NAME,        "ns",      is_action_read, is_approximation_must},
   {FREAD_FUNCTION_NAME,         "wnns",    is_action_read, is_approximation_must},
   {FWRITE_FUNCTION_NAME,        "rnns",    is_action_read, is_approximation_must},
@@ -236,14 +253,15 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {FERROR_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
   {PERROR_FUNCTION_NAME,        "r",       is_action_read, is_approximation_must},
 
+
   /* UNIX IO system calls */
 
-  {C_OPEN_FUNCTION_NAME,        "nn",     is_action_read, is_approximation_must},
+  {C_OPEN_FUNCTION_NAME,        "nn",      is_action_read, is_approximation_must},
   {CREAT_FUNCTION_NAME,         "nn",      is_action_read, is_approximation_must},
   {C_CLOSE_FUNCTION_NAME,       "f",       is_action_read, is_approximation_must},
   {C_WRITE_FUNCTION_NAME,       "frr",     is_action_read, is_approximation_must},
   {C_READ_FUNCTION_NAME,        "fwn",     is_action_read, is_approximation_must},
-  {FCNTL_FUNCTION_NAME,         "fnn*",     is_action_read, is_approximation_must},
+  {FCNTL_FUNCTION_NAME,         "fnn*",    is_action_read, is_approximation_must},
   {FSYNC_FUNCTION_NAME,         "f",       is_action_read, is_approximation_must},
   {FDATASYNC_FUNCTION_NAME,     "f",       is_action_read, is_approximation_must},
   {IOCTL_FUNCTION_NAME,         "fn*",     is_action_read, is_approximation_must},
@@ -251,17 +269,29 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_must},
   {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_must},
 
+
   /* wchar.h */
-  {FWSCANF_FUNCTION_NAME, "srW*",is_action_read, is_approximation_must},
-  {SWSCANF_FUNCTION_NAME, "rrW*",is_action_read, is_approximation_must},
-  {WSCANF_FUNCTION_NAME, "rW*",is_action_read, is_approximation_must},
+
+  {FWSCANF_FUNCTION_NAME,       "srW*",    is_action_read, is_approximation_must},
+  {SWSCANF_FUNCTION_NAME,       "rrW*",    is_action_read, is_approximation_must},
+  {WSCANF_FUNCTION_NAME,        "rW*",     is_action_read, is_approximation_must},
+
+  /* BSD err.h */
+  {ERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {ERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {WARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {WARNX_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {VERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {VERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
+  {VWARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
+  {VWARNX_FUNCTION_NAME,	"rR*",	   is_action_read, is_approximation_must},
 
   /* Fortran extensions for asynchronous IO's */
 
   {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
   {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_must},
 
- 
+
   {0,                            0,        0,              0}
 };
 
@@ -269,6 +299,8 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
 /* the following data structure describes an intrinsic function: its
 name and the function to apply on a call to this intrinsic to get the
 effects of the call */
+
+/* These intrinsics are arranged in the order of the standard ISO/IEC 9899:TC2. MB */
 
 typedef struct IntrinsicDescriptor
 {
@@ -421,8 +453,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ENDFILE_FUNCTION_NAME,                  io_effects},
   {IMPLIED_DO_NAME,                        effects_of_implied_do},
 
-  {SUBSTRING_FUNCTION_NAME,    substring_effect},
-  {ASSIGN_SUBSTRING_FUNCTION_NAME, assign_substring_effects},
+  {SUBSTRING_FUNCTION_NAME,                substring_effect},
+  {ASSIGN_SUBSTRING_FUNCTION_NAME,         assign_substring_effects},
 
   /* These operators are used within the OPTIMIZE transformation in
      order to manipulate operators such as n-ary add and multiply or
@@ -434,8 +466,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {IMA_OPERATOR_NAME,                      no_write_effects },
   {IMS_OPERATOR_NAME,                      no_write_effects },
 
-  /* Bits manipulation functions. Amira Mensi */
 
+  /* Bit manipulation F90 functions. ISO/IEC 1539 : 1991  Amira Mensi */
 
   {ISHFT_OPERATOR_NAME,                    no_write_effects },
   {ISHFTC_OPERATOR_NAME,                   no_write_effects },
@@ -451,34 +483,67 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /* Here are C intrinsics.*/
 
+  /* ISO 6.5.2.3 structure and union members */
   {FIELD_OPERATOR_NAME,                    address_expression_effects},
   {POINT_TO_OPERATOR_NAME,                 address_expression_effects},
+
+  /* ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand */
   {POST_INCREMENT_OPERATOR_NAME,           unique_update_effects},
   {POST_DECREMENT_OPERATOR_NAME,           unique_update_effects},
+
+  /* ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand */
   {PRE_INCREMENT_OPERATOR_NAME,            unique_update_effects},
   {PRE_DECREMENT_OPERATOR_NAME,            unique_update_effects},
+
+  /* ISO 6.5.3.2 address and indirection operators, add pointer type */
   {ADDRESS_OF_OPERATOR_NAME,               address_of_effects},
   {DEREFERENCING_OPERATOR_NAME,            address_expression_effects},
+
+  /* ISO 6.5.3.3 unary arithmetic operators */
   {UNARY_PLUS_OPERATOR_NAME,               no_write_effects},
   // {"-unary",                            no_write_effects},UNARY_MINUS_OPERATOR already exist (FORTRAN)
   {BITWISE_NOT_OPERATOR_NAME,              no_write_effects},
   {C_NOT_OPERATOR_NAME,                    no_write_effects},
+
   {C_MODULO_OPERATOR_NAME,                 no_write_effects},
+
+  /* ISO 6.5.6 additive operators, arithmetic types or pointer + integer type*/
   {PLUS_C_OPERATOR_NAME,                   no_write_effects},
   {MINUS_C_OPERATOR_NAME,                  no_write_effects},
+
+  /* ISO 6.5.7 bitwise shift operators*/
   {LEFT_SHIFT_OPERATOR_NAME,               no_write_effects},
   {RIGHT_SHIFT_OPERATOR_NAME,              no_write_effects},
+
+  /* ISO 6.5.8 relational operators,arithmetic or pointer types */
   {C_LESS_THAN_OPERATOR_NAME,              no_write_effects},
   {C_GREATER_THAN_OPERATOR_NAME,           no_write_effects},
   {C_LESS_OR_EQUAL_OPERATOR_NAME,          no_write_effects},
   {C_GREATER_OR_EQUAL_OPERATOR_NAME,       no_write_effects},
+
+  /* ISO 6.5.9 equality operators, return 0 or 1*/
   {C_EQUAL_OPERATOR_NAME,                  no_write_effects},
   {C_NON_EQUAL_OPERATOR_NAME,              no_write_effects},
+
+ /* ISO 6.5.10 bitwise AND operator */
   {BITWISE_AND_OPERATOR_NAME,              no_write_effects},
+
+ /* ISO 6.5.11 bitwise exclusive OR operator */
   {BITWISE_XOR_OPERATOR_NAME,              no_write_effects},
+
+  /* ISO 6.5.12 bitwise inclusive OR operator */
   {BITWISE_OR_OPERATOR_NAME,               no_write_effects},
+
+  /* ISO 6.5.13 logical AND operator */
   {C_AND_OPERATOR_NAME,                    no_write_effects},
+
+  /* ISO 6.5.14 logical OR operator */
   {C_OR_OPERATOR_NAME,                     no_write_effects},
+
+  /* ISO 6.5.15 conditional operator */
+  {CONDITIONAL_OPERATOR_NAME,              conditional_effects},
+
+  /* ISO 6.5.16.2 compound assignments*/
   {MULTIPLY_UPDATE_OPERATOR_NAME,          update_effects},
   {DIVIDE_UPDATE_OPERATOR_NAME,            update_effects},
   {MODULO_UPDATE_OPERATOR_NAME,            update_effects},
@@ -489,33 +554,100 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {BITWISE_AND_UPDATE_OPERATOR_NAME,       update_effects},
   {BITWISE_XOR_UPDATE_OPERATOR_NAME,       update_effects},
   {BITWISE_OR_UPDATE_OPERATOR_NAME,        update_effects},
-  {COMMA_OPERATOR_NAME,                    no_write_effects},
-  {CONDITIONAL_OPERATOR_NAME,              conditional_effects},
 
-  {BRACE_INTRINSIC,                        no_write_effects},
+  /* ISO 6.5.17 comma operator */
+  {COMMA_OPERATOR_NAME,                    no_write_effects},
+  
   {BREAK_FUNCTION_NAME,                    no_write_effects},
   {CASE_FUNCTION_NAME,                     no_write_effects},
   {DEFAULT_FUNCTION_NAME,                  no_write_effects},
   {C_RETURN_FUNCTION_NAME,                 no_write_effects},
+ 
+  /* intrinsic to handle C initialization */
 
-  /* stdarg.h */
+  {BRACE_INTRINSIC,                        no_write_effects},
 
-  {BUILTIN_VA_START,                       va_list_effects},
-  {BUILTIN_VA_END,                         va_list_effects},
-  {BUILTIN_VA_COPY,                        va_list_effects},
-  /* va_arg is not a standard call; it is directly represented in PIPS
-     internal representation. */
 
+  /* assert.h */
   /* These intrinsics are added with no_write_effects to work with C.
      The real effects must be studied !!! I do not have time for the moment */
 
-  {"__assert",                             no_write_effects},
-  {"__assert_fail",                        no_write_effects}, /* in fact, IO effect, does not return */
+  {ASSERT_FUNCTION_NAME,                   no_write_effects},
+  {ASSERT_FAIL_FUNCTION_NAME,              no_write_effects}, /* in fact, IO effect, does not return */
+  
+  /* #include <complex.h> */
+  {CACOS_OPERATOR_NAME,                    no_write_effects},
+  {CACOSF_OPERATOR_NAME,                   no_write_effects},
+  {CACOSL_OPERATOR_NAME,                   no_write_effects},
+  {CASIN_OPERATOR_NAME,                    no_write_effects},
+  {CASINF_OPERATOR_NAME,                   no_write_effects},
+  {CASINL_OPERATOR_NAME,                   no_write_effects},
+  {CATAN_OPERATOR_NAME,                    no_write_effects}, 
+  {CATANF_OPERATOR_NAME,                   no_write_effects},
+  {CATANL_OPERATOR_NAME,                   no_write_effects},
+  {C_CCOS_OPERATOR_NAME,                   no_write_effects},
+  {CCOSF_OPERATOR_NAME,                    no_write_effects},
+  {CCOSL_OPERATOR_NAME,                    no_write_effects},
+  {C_CSIN_OPERATOR_NAME,                   no_write_effects},
+  {CSINF_OPERATOR_NAME,                    no_write_effects},
+  {CSINL_OPERATOR_NAME,                    no_write_effects},
+  {CTAN_OPERATOR_NAME,                     no_write_effects},
+  {CTANF_OPERATOR_NAME,                    no_write_effects},
+  {CTANL_OPERATOR_NAME,                    no_write_effects},
+  {CACOSH_OPERATOR_NAME,                   no_write_effects},
+  {CACOSHF_OPERATOR_NAME,                  no_write_effects},
+  {CACOSHL_OPERATOR_NAME,                  no_write_effects},
+  {CASINH_OPERATOR_NAME,                   no_write_effects},
+  {CASINHF_OPERATOR_NAME,                  no_write_effects},
+  {CASINHL_OPERATOR_NAME,                  no_write_effects},
+  {CATANH_OPERATOR_NAME,                   no_write_effects},
+  {CATANHF_OPERATOR_NAME,                  no_write_effects},
+  {CATANHL_OPERATOR_NAME,                  no_write_effects},
+  {CCOSH_OPERATOR_NAME,                    no_write_effects},
+  {CCOSHF_OPERATOR_NAME,                   no_write_effects},
+  {CCOSHL_OPERATOR_NAME,                   no_write_effects},
+  {CSINH_OPERATOR_NAME,                    no_write_effects},
+  {CSINHF_OPERATOR_NAME,                   no_write_effects},
+  {CSINHL_OPERATOR_NAME,                   no_write_effects},
+  {CTANH_OPERATOR_NAME,                    no_write_effects},
+  {CTANHF_OPERATOR_NAME,                   no_write_effects},
+  {CTANHL_OPERATOR_NAME,                   no_write_effects},
+  {C_CEXP_OPERATOR_NAME,                   no_write_effects},
+  {CEXPF_OPERATOR_NAME,                    no_write_effects},
+  {CEXPL_OPERATOR_NAME,                    no_write_effects},
+  {C_CLOG_OPERATOR_NAME,                   no_write_effects},
+  {CLOGF_OPERATOR_NAME,                    no_write_effects},
+  {CLOGL_OPERATOR_NAME,                    no_write_effects},
+  {C_CABS_OPERATOR_NAME,                   no_write_effects},
+  {CABSF_OPERATOR_NAME,                    no_write_effects},
+  {CABSL_OPERATOR_NAME,                    no_write_effects},
+  {CPOW_OPERATOR_NAME,                     no_write_effects},
+  {CPOWF_OPERATOR_NAME,                    no_write_effects},
+  {CPOWL_OPERATOR_NAME,                    no_write_effects},
+  {C_CSQRT_OPERATOR_NAME,                  no_write_effects},
+  {CSQRTF_OPERATOR_NAME,                   no_write_effects},
+  {CSQRTL_OPERATOR_NAME,                   no_write_effects},
+  {CARG_OPERATOR_NAME,                     no_write_effects},
+  {CARGF_OPERATOR_NAME,                    no_write_effects},
+  {CARGL_OPERATOR_NAME,                    no_write_effects},
+  {CIMAG_OPERATOR_NAME,                    no_write_effects},
+  {CIMAGF_OPERATOR_NAME,                   no_write_effects},
+  {CIMAGL_OPERATOR_NAME,                   no_write_effects},
+  {CONJ_OPERATOR_NAME,                     no_write_effects},
+  {CONJF_OPERATOR_NAME,                    no_write_effects},
+  {CONJL_OPERATOR_NAME,                    no_write_effects},
+  {CPROJ_OPERATOR_NAME,                    no_write_effects},
+  {CPROJF_OPERATOR_NAME,                   no_write_effects},
+  {CPROJL_OPERATOR_NAME,                   no_write_effects},
+  {CREAL_OPERATOR_NAME,                    no_write_effects},
+  {CREALF_OPERATOR_NAME,                   no_write_effects},
+  {CREALL_OPERATOR_NAME,                   no_write_effects},
 
   /* #include <ctype.h>*/
 
   {ISALNUM_OPERATOR_NAME,                  no_write_effects},
   {ISALPHA_OPERATOR_NAME,                  no_write_effects},
+  {ISBLANK_OPERATOR_NAME,                  no_write_effects},
   {ISCNTRL_OPERATOR_NAME,                  no_write_effects},
   {ISDIGIT_OPERATOR_NAME,                  no_write_effects},
   {ISGRAPH_OPERATOR_NAME,                  no_write_effects},
@@ -527,181 +659,284 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ISXDIGIT_OPERATOR_NAME,                 no_write_effects},
   {TOLOWER_OPERATOR_NAME,                  no_write_effects},
   {TOUPPER_OPERATOR_NAME,                  no_write_effects},
-  {ISASCII_OPERATOR_NAME,                  no_write_effects},
-  {TOASCII_OPERATOR_NAME,                  no_write_effects},
-  {_TOLOWER_OPERATOR_NAME,                 no_write_effects},
-  {_TOUPPER_OPERATOR_NAME,                 no_write_effects},
-  {CTYPE_B_LOC_OPERATOR_NAME,              no_write_effects},
-
+ 
+  /* errno.h */
+  // MB: errno is usually an extern int variable, but *errno() is allowed (ISO section 7.5 in C99)  
   {"errno",                                no_write_effects},
 
-  {"__flt_rounds",                         no_write_effects},
+  /* fenv.h */
 
-  {"_sysconf",                             no_write_effects},
-  {"setlocale",                            no_write_effects},
+  {FECLEAREXCEPT_FUNCTION_NAME,            no_write_effects},
+  {FERAISEEXCEPT_FUNCTION_NAME,            no_write_effects},
+  {FESETEXCEPTFLAG_FUNCTION_NAME,          no_write_effects},
+  {FETESTEXCEPT_FUNCTION_NAME,             no_write_effects},
+  {FEGETROUND_FUNCTION_NAME,               no_write_effects},
+  {FESETROUND_FUNCTION_NAME,               no_write_effects},
+  // fenv_t *
+  // {FESETENV_FUNCTION_NAME,                 no_write_effects},
+  //{FEUPDATEENV_FUNCTION_NAME,              no_write_effects},
+
+  
+  /* inttypes.h */
+  {IMAXABS_FUNCTION_NAME,                  no_write_effects},
+  {IMAXDIV_FUNCTION_NAME,                  no_write_effects},
+
+  /* locale.h */
+  {SETLOCALE_FUNCTION_NAME,                no_write_effects},
   {"localeconv",                           no_write_effects},
-  {"dcgettext",                            no_write_effects},
-  {"dgettext",                             no_write_effects},
-  {"gettext",                              no_write_effects},
-  {"textdomain",                           no_write_effects},
-  {"bindtextdomain",                       no_write_effects},
-  {"wdinit",                               no_write_effects},
-  {"wdchkind",                             no_write_effects},
-  {"wdbindf",                              no_write_effects},
-  {"wddelim",                              no_write_effects},
-  {"mcfiller",                             no_write_effects},
-  {"mcwrap",                               no_write_effects},
 
   /* #include <math.h>*/
 
-  {C_ACOS_OPERATOR_NAME,                   no_write_effects},
-  {C_ASIN_OPERATOR_NAME,                   no_write_effects},
-  {C_ATAN_OPERATOR_NAME,                   no_write_effects},
-  {C_ATAN2_OPERATOR_NAME,                  no_write_effects},
-  {C_COS_OPERATOR_NAME,                    no_write_effects},
-  {C_SIN_OPERATOR_NAME,                    no_write_effects},
-  {C_TAN_OPERATOR_NAME,                    no_write_effects},
-  {C_COSH_OPERATOR_NAME,                   no_write_effects},
-  {C_SINH_OPERATOR_NAME,                   no_write_effects},
-  {C_TANH_OPERATOR_NAME,                   no_write_effects},
-  {C_EXP_OPERATOR_NAME,                    no_write_effects},
-  {FREXP_OPERATOR_NAME,                    no_write_effects},
-  {LDEXP_OPERATOR_NAME,                    no_write_effects},
-  {C_LOG_OPERATOR_NAME,                    no_write_effects},
-  {C_LOG10_OPERATOR_NAME,                  no_write_effects},
-  {MODF_OPERATOR_NAME,                     no_write_effects},
-  {POW_OPERATOR_NAME,                      no_write_effects},
-  {C_SQRT_OPERATOR_NAME,                   no_write_effects},
-  {C_SQRTF_OPERATOR_NAME,                  no_write_effects},
-  {C_SQRTL_OPERATOR_NAME,                  no_write_effects},
-  {CEIL_OPERATOR_NAME,                     no_write_effects},
-  {FABS_OPERATOR_NAME,                     no_write_effects},
-  {FLOOR_OPERATOR_NAME,                    no_write_effects},
-  {FMOD_OPERATOR_NAME,                     no_write_effects},
-  {ERF_OPERATOR_NAME,                      no_write_effects},
-  {ERFC_OPERATOR_NAME,                     no_write_effects},
-  {GAMMA_OPERATOR_NAME,                    no_write_effects},
-  {HYPOT_OPERATOR_NAME,                    no_write_effects},
+  {FPCLASSIFY_OPERATOR_NAME,               no_write_effects},
+  {ISFINITE_OPERATOR_NAME,                 no_write_effects},
+  {ISINF_OPERATOR_NAME,                    no_write_effects},
   {ISNAN_OPERATOR_NAME,                    no_write_effects},
-  {J0_OPERATOR_NAME,                       no_write_effects},
-  {J1_OPERATOR_NAME,                       no_write_effects},
-  {JN_OPERATOR_NAME,                       no_write_effects},
-  {LGAMMA_OPERATOR_NAME,                   no_write_effects},
-  {Y0_OPERATOR_NAME,                       no_write_effects},
-  {Y1_OPERATOR_NAME,                       no_write_effects},
-  {YN_OPERATOR_NAME,                       no_write_effects},
+  {ISNORMAL_OPERATOR_NAME,                 no_write_effects},
+  {SIGNBIT_OPERATOR_NAME,                  no_write_effects},
+  {C_ACOS_OPERATOR_NAME,                   no_write_effects},
+  {ACOSF_OPERATOR_NAME,                    no_write_effects},
+  {ACOSL_OPERATOR_NAME,                    no_write_effects},
+  {C_ASIN_OPERATOR_NAME,                   no_write_effects},
+  {ASINF_OPERATOR_NAME,                    no_write_effects},
+  {ASINL_OPERATOR_NAME,                    no_write_effects},
+  {C_ATAN_OPERATOR_NAME,                   no_write_effects},
+  {ATANF_OPERATOR_NAME,                    no_write_effects},
+  {ATANL_OPERATOR_NAME,                    no_write_effects},  
+  {C_ATAN2_OPERATOR_NAME,                  no_write_effects},
+  {ATAN2F_OPERATOR_NAME,                   no_write_effects},
+  {ATAN2L_OPERATOR_NAME,                   no_write_effects},
+  {C_COS_OPERATOR_NAME,                    no_write_effects},
+  {COSF_OPERATOR_NAME,                     no_write_effects},
+  {COSL_OPERATOR_NAME,                     no_write_effects},
+  {C_SIN_OPERATOR_NAME,                    no_write_effects},
+  {SINF_OPERATOR_NAME,                     no_write_effects},
+  {SINL_OPERATOR_NAME,                     no_write_effects},
+  {C_TAN_OPERATOR_NAME,                    no_write_effects},
+  {TANF_OPERATOR_NAME,                     no_write_effects},
+  {TANL_OPERATOR_NAME,                     no_write_effects},
   {C_ACOSH_OPERATOR_NAME ,                 no_write_effects},
+  {ACOSHF_OPERATOR_NAME ,                  no_write_effects},
+  {ACOSHL_OPERATOR_NAME ,                  no_write_effects},
   {C_ASINH_OPERATOR_NAME,                  no_write_effects},
+  {ASINHF_OPERATOR_NAME,                   no_write_effects},
+  {ASINHL_OPERATOR_NAME,                   no_write_effects},
   {C_ATANH_OPERATOR_NAME,                  no_write_effects},
-  {CBRT_OPERATOR_NAME,                     no_write_effects},
-  {LOGB_OPERATOR_NAME,                     no_write_effects},
-  {NEXTAFTER_OPERATOR_NAME,                no_write_effects},
-  {REMAINDER_OPERATOR_NAME,                no_write_effects},
-  {SCALB_OPERATOR_NAME,                    no_write_effects},
+  {ATANHF_OPERATOR_NAME,                   no_write_effects},
+  {ATANHL_OPERATOR_NAME,                   no_write_effects},
+  {C_COSH_OPERATOR_NAME,                   no_write_effects},
+  {COSHF_OPERATOR_NAME,                    no_write_effects},
+  {COSHL_OPERATOR_NAME,                    no_write_effects},
+  {C_SINH_OPERATOR_NAME,                   no_write_effects},
+  {SINHF_OPERATOR_NAME,                    no_write_effects},
+  {SINHL_OPERATOR_NAME,                    no_write_effects},
+  {C_TANH_OPERATOR_NAME,                   no_write_effects},
+  {TANHF_OPERATOR_NAME,                    no_write_effects},
+  {TANHL_OPERATOR_NAME,                    no_write_effects},
+  {C_EXP_OPERATOR_NAME,                    no_write_effects},
+  {EXPF_OPERATOR_NAME,                     no_write_effects},
+  {EXPL_OPERATOR_NAME,                     no_write_effects},
+  {EXP2_OPERATOR_NAME,                     no_write_effects},
+  {EXP2F_OPERATOR_NAME,                    no_write_effects},
+  {EXP2L_OPERATOR_NAME,                    no_write_effects},
   {EXPM1_OPERATOR_NAME,                    no_write_effects},
+  {EXPM1F_OPERATOR_NAME,                   no_write_effects},
+  {EXPM1L_OPERATOR_NAME,                   no_write_effects},
+  //frexp has a write effect not defined correctly. MB
+  {FREXP_OPERATOR_NAME,                    no_write_effects},
   {ILOGB_OPERATOR_NAME,                    no_write_effects},
+  {ILOGBF_OPERATOR_NAME,                   no_write_effects},
+  {ILOGBL_OPERATOR_NAME,                   no_write_effects},
+  {LDEXP_OPERATOR_NAME,                    no_write_effects},
+  {LDEXPF_OPERATOR_NAME,                   no_write_effects},
+  {LDEXPL_OPERATOR_NAME,                   no_write_effects},
+  {C_LOG_OPERATOR_NAME,                    no_write_effects},
+  {LOGF_OPERATOR_NAME,                     no_write_effects},
+  {LOGL_OPERATOR_NAME,                     no_write_effects},
+  {C_LOG10_OPERATOR_NAME,                  no_write_effects},
+  {LOG10F_OPERATOR_NAME,                   no_write_effects},
+  {LOG10L_OPERATOR_NAME,                   no_write_effects},
   {LOG1P_OPERATOR_NAME,                    no_write_effects},
-  {RINT_OPERATOR_NAME,                     no_write_effects},
-  {MATHERR_OPERATOR_NAME,                  no_write_effects},
-  {SIGNIFICAND_OPERATOR_NAME,              no_write_effects},
-  {COPYSIGN_OPERATOR_NAME,                 no_write_effects},
-  {SCALBN_OPERATOR_NAME,                   no_write_effects},
+  {LOG1PF_OPERATOR_NAME,                   no_write_effects},
+  {LOG1PL_OPERATOR_NAME,                   no_write_effects},
+  {LOG2_OPERATOR_NAME,                     no_write_effects},
+  {LOG2F_OPERATOR_NAME,                    no_write_effects},
+  {LOG2L_OPERATOR_NAME,                    no_write_effects},
+  {LOGB_OPERATOR_NAME,                     no_write_effects},
+  {LOGBF_OPERATOR_NAME,                    no_write_effects},
+  {LOGBL_OPERATOR_NAME,                    no_write_effects},
+  //modf & modff have write effects not defined correctly. MB
+  {MODF_OPERATOR_NAME,                     no_write_effects},
   {MODFF_OPERATOR_NAME,                    no_write_effects},
-  {SIGFPE_OPERATOR_NAME,                   no_write_effects},
-  {SINGLE_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
-  {DOUBLE_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
-  {EXTENDED_TO_DECIMAL_OPERATOR_NAME,      no_write_effects},
-  {QUADRUPLE_TO_DECIMAL_OPERATOR_NAME,     no_write_effects},
-  {DECIMAL_TO_SINGLE_OPERATOR_NAME,        no_write_effects},
-  {DECIMAL_TO_DOUBLE_OPERATOR_NAME,        no_write_effects},
-  {DECIMAL_TO_EXTENDED_OPERATOR_NAME,      no_write_effects},
-  {DECIMAL_TO_QUADRUPLE_OPERATOR_NAME,     no_write_effects},
-  {STRING_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
-  {FUNC_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
-  {FILE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
-  {SECONVERT_OPERATOR_NAME,                no_write_effects},
-  {SFCONVERT_OPERATOR_NAME,                no_write_effects},
-  {SGCONVERT_OPERATOR_NAME,                no_write_effects},
-  {ECONVERT_OPERATOR_NAME,                 no_write_effects},
-  {FCONVERT_OPERATOR_NAME,                 no_write_effects},
-  {GCONVERT_OPERATOR_NAME,                 no_write_effects},
-  {QECONVERT_OPERATOR_NAME,                no_write_effects},
-  {QFCONVERT_OPERATOR_NAME,                no_write_effects},
-  {QGCONVERT_OPERATOR_NAME,                no_write_effects},
+  {SCALBN_OPERATOR_NAME,                   no_write_effects},
+  {SCALBNF_OPERATOR_NAME,                  no_write_effects},
+  {SCALBNL_OPERATOR_NAME,                  no_write_effects},
+  {SCALB_OPERATOR_NAME,                    no_write_effects}, /* POSIX.1-2001, The scalb function is the BSD name for ldexp */
+  {SCALBLN_OPERATOR_NAME,                  no_write_effects},  
+  {SCALBLNF_OPERATOR_NAME,                 no_write_effects}, 
+  {SCALBLNL_OPERATOR_NAME,                 no_write_effects}, 
+  {CBRT_OPERATOR_NAME,                     no_write_effects},
+  {CBRTF_OPERATOR_NAME,                    no_write_effects},
+  {CBRTL_OPERATOR_NAME,                    no_write_effects},
+  {FABS_OPERATOR_NAME,                     no_write_effects},
+  {FABSF_OPERATOR_NAME,                    no_write_effects},
+  {FABSL_OPERATOR_NAME,                    no_write_effects},
+  {HYPOT_OPERATOR_NAME,                    no_write_effects},
+  {HYPOTF_OPERATOR_NAME,                   no_write_effects},
+  {HYPOTL_OPERATOR_NAME,                   no_write_effects},
+  {POW_OPERATOR_NAME,                      no_write_effects},
+  {POWF_OPERATOR_NAME,                     no_write_effects},
+  {POWL_OPERATOR_NAME,                     no_write_effects},
+  {C_SQRT_OPERATOR_NAME,                   no_write_effects},
+  {SQRTF_OPERATOR_NAME,                    no_write_effects},
+  {SQRTL_OPERATOR_NAME,                    no_write_effects},
+  {ERF_OPERATOR_NAME,                      no_write_effects},
+  {ERFF_OPERATOR_NAME,                     no_write_effects},
+  {ERFL_OPERATOR_NAME,                     no_write_effects},
+  {ERFC_OPERATOR_NAME,                     no_write_effects},
+  {ERFCF_OPERATOR_NAME,                    no_write_effects},
+  {ERFCL_OPERATOR_NAME,                    no_write_effects},
+  {GAMMA_OPERATOR_NAME,                    no_write_effects}, /* GNU C Library */
+  {LGAMMA_OPERATOR_NAME,                   no_write_effects},
+  {LGAMMAF_OPERATOR_NAME,                  no_write_effects},
+  {LGAMMAL_OPERATOR_NAME,                  no_write_effects},
+  {TGAMMA_OPERATOR_NAME,                   no_write_effects},
+  {TGAMMAF_OPERATOR_NAME,                  no_write_effects},
+  {TGAMMAL_OPERATOR_NAME,                  no_write_effects},
+  {CEIL_OPERATOR_NAME,                     no_write_effects},
+  {CEILF_OPERATOR_NAME,                    no_write_effects},
+  {CEILL_OPERATOR_NAME,                    no_write_effects},
+  {FLOOR_OPERATOR_NAME,                    no_write_effects},
+  {FLOORF_OPERATOR_NAME,                   no_write_effects},
+  {FLOORL_OPERATOR_NAME,                   no_write_effects},
+  {NEARBYINT_OPERATOR_NAME,                no_write_effects},
+  {NEARBYINTF_OPERATOR_NAME,               no_write_effects},
+  {NEARBYINTL_OPERATOR_NAME,               no_write_effects},
+  {RINT_OPERATOR_NAME,                     no_write_effects},
+  {RINTF_OPERATOR_NAME,                    no_write_effects},
+  {RINTL_OPERATOR_NAME,                    no_write_effects},
+  {LRINT_OPERATOR_NAME,                    no_write_effects},
+  {LRINTF_OPERATOR_NAME,                   no_write_effects},
+  {LRINTL_OPERATOR_NAME,                   no_write_effects},
+  {LLRINT_OPERATOR_NAME,                   no_write_effects},
+  {LLRINTF_OPERATOR_NAME,                  no_write_effects},
+  {LLRINTL_OPERATOR_NAME,                  no_write_effects},
+  {ROUND_OPERATOR_NAME,                    no_write_effects},
+  {ROUNDF_OPERATOR_NAME,                   no_write_effects},
+  {ROUNDL_OPERATOR_NAME,                   no_write_effects},
+  {LROUND_OPERATOR_NAME,                   no_write_effects},
+  {LROUNDF_OPERATOR_NAME,                  no_write_effects},
+  {LROUNDL_OPERATOR_NAME,                  no_write_effects},
+  {LLROUND_OPERATOR_NAME,                   no_write_effects},
+  {LLROUNDF_OPERATOR_NAME,                  no_write_effects},
+  {LLROUNDL_OPERATOR_NAME,                  no_write_effects},
+  {TRUNC_OPERATOR_NAME,                    no_write_effects},
+  {TRUNCF_OPERATOR_NAME,                   no_write_effects},
+  {TRUNCL_OPERATOR_NAME,                   no_write_effects},
+  {FMOD_OPERATOR_NAME,                     no_write_effects},
+  {FMODF_OPERATOR_NAME,                    no_write_effects},
+  {FMODL_OPERATOR_NAME,                    no_write_effects},
+  {REMAINDER_OPERATOR_NAME,                no_write_effects},
+  {REMAINDERF_OPERATOR_NAME,               no_write_effects},
+  {REMAINDERL_OPERATOR_NAME,               no_write_effects},
+  {COPYSIGN_OPERATOR_NAME,                 no_write_effects},
+  {COPYSIGNF_OPERATOR_NAME,                no_write_effects},
+  {COPYSIGNL_OPERATOR_NAME,                no_write_effects},
+  {NAN_OPERATOR_NAME,                      no_write_effects},
+  {NANF_OPERATOR_NAME,                     no_write_effects},
+  {NANL_OPERATOR_NAME,                     no_write_effects},
+  {NEXTAFTER_OPERATOR_NAME,                no_write_effects},
+  {NEXTAFTERF_OPERATOR_NAME,               no_write_effects},
+  {NEXTAFTERL_OPERATOR_NAME,               no_write_effects},
+  {NEXTTOWARD_OPERATOR_NAME,               no_write_effects},
+  {NEXTTOWARDF_OPERATOR_NAME,              no_write_effects},
+  {NEXTTOWARDL_OPERATOR_NAME,              no_write_effects},
+  {FDIM_OPERATOR_NAME,                     no_write_effects},
+  {FDIMF_OPERATOR_NAME,                    no_write_effects},
+  {FDIML_OPERATOR_NAME,                    no_write_effects},
+  {FMAX_OPERATOR_NAME,                     no_write_effects},
+  {FMAXF_OPERATOR_NAME,                    no_write_effects},
+  {FMAXL_OPERATOR_NAME,                    no_write_effects},
+  {FMIN_OPERATOR_NAME,                     no_write_effects},
+  {FMINF_OPERATOR_NAME,                    no_write_effects},
+  {FMINL_OPERATOR_NAME,                    no_write_effects},
+  {FMA_OPERATOR_NAME,                      no_write_effects},
+  {FMAF_OPERATOR_NAME,                     no_write_effects},
+  {FMAL_OPERATOR_NAME,                     no_write_effects},
+  {ISGREATER_OPERATOR_NAME,                no_write_effects},
+  {ISGREATEREQUAL_OPERATOR_NAME,           no_write_effects},
+  {ISLESS_OPERATOR_NAME,                   no_write_effects},
+  {ISLESSEQUAL_OPERATOR_NAME,              no_write_effects},
+  {ISLESSGREATER_OPERATOR_NAME,            no_write_effects},
+  {ISUNORDERED_OPERATOR_NAME,              no_write_effects},
 
-  /* netdb.h */
-  {__H_ERRNO_LOCATION_OPERATOR_NAME,       no_write_effects},
-
-  /* bits/errno.h */
-  {__ERRNO_LOCATION_OPERATOR_NAME,         no_write_effects},
-
-  /* signal.h */
-  {SIGNAL_OPERATOR_NAME,                   no_write_effects},
-
-  {ECVT_FUNCTION_NAME,                     no_write_effects},
-  {FCVT_FUNCTION_NAME,                     no_write_effects},
-  {GCVT_FUNCTION_NAME,                     no_write_effects},
-  {ATOF_FUNCTION_NAME,                     no_write_effects},
-  {STRTOD_FUNCTION_NAME,                   no_write_effects},
-  /* Random number generators in stdlib.h */
-  {RANDOM_FUNCTION_NAME,                   rgs_effects},
-  {SRANDOM_FUNCTION_NAME,                  rgsi_effects},
-  {RAND_FUNCTION_NAME,                     rgs_effects},
-  {SRAND_FUNCTION_NAME,                    rgsi_effects},
-  {DRAND48_FUNCTION_NAME,                  rgs_effects},
-  {ERAND48_FUNCTION_NAME,                  rgs_effects},
-  {JRAND48_FUNCTION_NAME,                  rgs_effects},
-  {LRAND48_FUNCTION_NAME,                  rgs_effects},
-  {MRAND48_FUNCTION_NAME,                  rgs_effects},
-  {NRAND48_FUNCTION_NAME,                  rgs_effects},
-  {SRAND48_FUNCTION_NAME,                  rgsi_effects},
-  {SEED48_FUNCTION_NAME,                   rgsi_effects},
-  {LCONG48_FUNCTION_NAME,                  rgsi_effects},
 
   /*#include <setjmp.h>*/
-
+  
   {"setjmp",                               no_write_effects},
   {"__setjmp",                             no_write_effects},
-  {"longjmp",                              no_write_effects},
+  {"longjmp",                              no_write_effects}, // control effect 7.13 in C99
   {"__longjmp",                            no_write_effects},
-  {"sigsetjmp",                            no_write_effects},
-  {"siglongjmp",                           no_write_effects},
+  {"sigsetjmp",                            no_write_effects}, //POSIX.1-2001 
+  {"siglongjmp",                           no_write_effects}, //POSIX.1-2001 
+
+
+  /* signal.h 7.14 */
+  {SIGFPE_OPERATOR_NAME,                   no_write_effects}, //macro
+  {SIGNAL_OPERATOR_NAME,                   no_write_effects},
+  {RAISE_FUNCTION_NAME,                    no_write_effects},
+
+
+  /* stdarg.h */
+
+  {BUILTIN_VA_START,                       va_list_effects},
+  {BUILTIN_VA_END,                         va_list_effects},
+  {BUILTIN_VA_COPY,                        va_list_effects},
+  /* va_arg is not a standard call; it is directly represented in PIPS
+     internal representation. */
 
   /*#include <stdio.h>*/
   // IO functions
+  {REMOVE_FUNCTION_NAME,                   no_write_effects},
+  {RENAME_FUNCTION_NAME,                   no_write_effects},
+  {TMPFILE_FUNCTION_NAME,                  no_write_effects},
+  {TMPNAM_FUNCTION_NAME,                   no_write_effects},
   {FCLOSE_FUNCTION_NAME,                   c_io_effects},
+  {FFLUSH_FUNCTION_NAME,                   no_write_effects},
   {FOPEN_FUNCTION_NAME,                    c_io_effects},
+  {FREOPEN_FUNCTION_NAME,                  no_write_effects},
+  {SETBUF_FUNCTION_NAME,                   no_write_effects},
+  {SETVBUF_FUNCTION_NAME ,                 no_write_effects},
   {FPRINTF_FUNCTION_NAME,                  c_io_effects},
   {FSCANF_FUNCTION_NAME,                   c_io_effects},
-  {ISOC99_FSCANF_FUNCTION_NAME,                   c_io_effects},
+  {ISOC99_FSCANF_FUNCTION_NAME,            c_io_effects},
   {PRINTF_FUNCTION_NAME,                   c_io_effects},
   {SCANF_FUNCTION_NAME,                    c_io_effects},
-  {ISOC99_SCANF_FUNCTION_NAME,                    c_io_effects},
+  {ISOC99_SCANF_FUNCTION_NAME,             c_io_effects},
+  {SNPRINTF_FUNCTION_NAME,                 c_io_effects},
   {SPRINTF_FUNCTION_NAME,                  c_io_effects},
   {SSCANF_FUNCTION_NAME,                   c_io_effects},
-  {ISOC99_SSCANF_FUNCTION_NAME,                   c_io_effects},
+  {ISOC99_SSCANF_FUNCTION_NAME,            c_io_effects},
   {VFPRINTF_FUNCTION_NAME,                 c_io_effects},
-  {VPRINTF_FUNCTION_NAME,                  c_io_effects},
   {VFSCANF_FUNCTION_NAME,                  c_io_effects},
-  {ISOC99_VFSCANF_FUNCTION_NAME,                  c_io_effects},
-  {VSPRINTF_FUNCTION_NAME,                 c_io_effects},
-  {VSNPRINTF_FUNCTION_NAME,                c_io_effects},
-  {SNPRINTF_FUNCTION_NAME,                 c_io_effects},
-  {VSSCANF_FUNCTION_NAME,                  c_io_effects},
-  {ISOC99_VSSCANF_FUNCTION_NAME,                  c_io_effects},
+  {ISOC99_VFSCANF_FUNCTION_NAME,           c_io_effects},
+  {VPRINTF_FUNCTION_NAME,                  c_io_effects},
   {VSCANF_FUNCTION_NAME,                   c_io_effects},
-  {ISOC99_VSCANF_FUNCTION_NAME,                   c_io_effects},
+  {ISOC99_VSCANF_FUNCTION_NAME,            c_io_effects},
+  {VSNPRINTF_FUNCTION_NAME,                c_io_effects},
+  {VSPRINTF_FUNCTION_NAME,                 c_io_effects},
+  {VSSCANF_FUNCTION_NAME,                  c_io_effects},
+  {ISOC99_VSSCANF_FUNCTION_NAME,           c_io_effects}, 
   {FGETC_FUNCTION_NAME,                    c_io_effects},
   {FGETS_FUNCTION_NAME,                    c_io_effects},
   {FPUTC_FUNCTION_NAME,                    c_io_effects},
   {FPUTS_FUNCTION_NAME,                    c_io_effects},
   {GETC_FUNCTION_NAME,                     c_io_effects},
   {_IO_GETC_FUNCTION_NAME,                 c_io_effects},
+  {GETCHAR_FUNCTION_NAME,                  c_io_effects},
+  {GETS_FUNCTION_NAME,                     c_io_effects},
   {PUTC_FUNCTION_NAME,                     c_io_effects},
   {_IO_PUTC_FUNCTION_NAME,                 c_io_effects},
-  {GETCHAR_FUNCTION_NAME,                  c_io_effects},
   {PUTCHAR_FUNCTION_NAME,                  c_io_effects},
-  {GETS_FUNCTION_NAME,                     c_io_effects},
   {PUTS_FUNCTION_NAME,                     c_io_effects},
   {UNGETC_FUNCTION_NAME,                   c_io_effects},
   {FREAD_FUNCTION_NAME,                    c_io_effects},
@@ -716,127 +951,270 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FERROR_FUNCTION_NAME,                   c_io_effects},
   {PERROR_FUNCTION_NAME,                   c_io_effects},
 
-  {REMOVE_FUNCTION_NAME,                           no_write_effects},
-  {RENAME_FUNCTION_NAME,                           no_write_effects},
-  {TMPFILE_FUNCTION_NAME,                          no_write_effects},
-  {TMPNAM_FUNCTION_NAME,                           no_write_effects},
-  {FFLUSH_FUNCTION_NAME,                           no_write_effects},
-  {FREOPEN_FUNCTION_NAME,                          no_write_effects},
-  {SETBUF_FUNCTION_NAME,                           no_write_effects},
-  {SETVBUF_FUNCTION_NAME ,                         no_write_effects},
 
-  {__FILBUF_FUNCTION_NAME,                         no_write_effects},
-  {__FILSBUF_FUNCTION_NAME,                        no_write_effects},
-  {SETBUFFER_FUNCTION_NAME,                        no_write_effects},
-  {SETLINEBUF_FUNCTION_NAME,                       no_write_effects},
-  {FDOPEN_FUNCTION_NAME,                           no_write_effects},
-  {CTERMID_FUNCTION_NAME,                          no_write_effects},
-  {FILENO_FUNCTION_NAME,                           no_write_effects},
-  {POPEN_FUNCTION_NAME,                            no_write_effects},
-  {CUSERID_FUNCTION_NAME,                          no_write_effects},
-  {TEMPNAM_FUNCTION_NAME,                          no_write_effects},
-  {GETOPT_FUNCTION_NAME,                           no_write_effects},
-  {GETSUBOPT_FUNCTION_NAME,                        no_write_effects},
-  {GETW_FUNCTION_NAME,                             no_write_effects},
-  {PUTW_FUNCTION_NAME,                             no_write_effects},
-  {PCLOSE_FUNCTION_NAME,                           no_write_effects},
-  {FSEEKO_FUNCTION_NAME,                           no_write_effects},
-  {FTELLO_FUNCTION_NAME,                           no_write_effects},
-  {FOPEN64_FUNCTION_NAME,                          no_write_effects},
-  {FREOPEN64_FUNCTION_NAME,                        no_write_effects},
-  {TMPFILE64_FUNCTION_NAME,                        no_write_effects},
-  {FGETPOS64_FUNCTION_NAME,                        no_write_effects},
-  {FSETPOS64_FUNCTION_NAME,                        no_write_effects},
-  {FSEEKO64_FUNCTION_NAME,                         no_write_effects},
-  {FTELLO64_FUNCTION_NAME,                         no_write_effects},
+  /* #include <stdlib.h> */
+  {ATOF_FUNCTION_NAME,                     no_write_effects},
+  {ATOI_FUNCTION_NAME,                     no_write_effects},
+  {ATOL_FUNCTION_NAME,                     no_write_effects},
+  {ATOLL_FUNCTION_NAME,                    no_write_effects},
+  {STRTOD_FUNCTION_NAME,                   no_write_effects},
+  {STRTOF_FUNCTION_NAME,                   no_write_effects},
+  {STRTOL_FUNCTION_NAME,                   safe_c_effects},
+  {STRTOLL_FUNCTION_NAME,                  safe_c_effects},
+  {STRTOUL_FUNCTION_NAME,                  safe_c_effects},
+  {STRTOULL_FUNCTION_NAME,                 safe_c_effects},
+  {RAND_FUNCTION_NAME,                     rgs_effects},
+  {SRAND_FUNCTION_NAME,                    rgsi_effects},
+  {CALLOC_FUNCTION_NAME,                   no_write_effects},
+  {FREE_FUNCTION_NAME,                     any_heap_effects},
+  {MALLOC_FUNCTION_NAME,                   any_heap_effects},
+  {REALLOC_FUNCTION_NAME,                  any_heap_effects},
+  {ABORT_FUNCTION_NAME,                    no_write_effects},
+  {ATEXIT_FUNCTION_NAME,                   no_write_effects},
+  {EXIT_FUNCTION_NAME,                     no_write_effects},
+  {_EXIT_FUNCTION_NAME,                    no_write_effects},
+  {GETENV_FUNCTION_NAME,                   no_write_effects},
+  {SYSTEM_FUNCTION_NAME,                   no_write_effects},
+  {BSEARCH_FUNCTION_NAME,                  no_write_effects},
+  {QSORT_FUNCTION_NAME,                    no_write_effects},
+  {C_ABS_FUNCTION_NAME,                    no_write_effects},
+  {LABS_FUNCTION_NAME,                     no_write_effects},
+  {LLABS_FUNCTION_NAME,                    no_write_effects},
+  {DIV_FUNCTION_NAME,                      no_write_effects},
+  {LDIV_FUNCTION_NAME,                     no_write_effects},
+  {LLDIV_FUNCTION_NAME,                    no_write_effects},
+  {MBLEN_FUNCTION_NAME,                    no_write_effects},
+  {MBTOWC_FUNCTION_NAME,                   no_write_effects},
+  {WCTOMB_FUNCTION_NAME,                   no_write_effects},
+  {MBSTOWCS_FUNCTION_NAME,                 no_write_effects},
+  {WCSTOMBS_FUNCTION_NAME,                 no_write_effects},
+
+   /*#include <string.h>*/
+
+  {MEMCPY_FUNCTION_NAME,                   generic_string_effects},
+  {MEMMOVE_FUNCTION_NAME,                  generic_string_effects},
+  {STRCPY_FUNCTION_NAME,                   generic_string_effects},
+  {STRNCPY_FUNCTION_NAME,                  generic_string_effects},
+  {STRCAT_FUNCTION_NAME,                   generic_string_effects},
+  {STRNCAT_FUNCTION_NAME,                  generic_string_effects},
+  {MEMCMP_FUNCTION_NAME,                   no_write_effects},
+  {STRCMP_FUNCTION_NAME,                   no_write_effects},
+  {STRCOLL_FUNCTION_NAME,                  no_write_effects},
+  {STRNCMP_FUNCTION_NAME,                  no_write_effects},
+  {STRXFRM_FUNCTION_NAME,                  generic_string_effects},
+  {MEMCHR_FUNCTION_NAME,                   no_write_effects},
+  {STRCHR_FUNCTION_NAME,                   no_write_effects},
+  {STRCSPN_FUNCTION_NAME,                  no_write_effects},
+  {STRPBRK_FUNCTION_NAME,                  no_write_effects},
+  {STRRCHR_FUNCTION_NAME,                  no_write_effects},
+  {STRSPN_FUNCTION_NAME,                   no_write_effects},
+  {STRSTR_FUNCTION_NAME,                   no_write_effects},
+  {STRTOK_FUNCTION_NAME,                   no_write_effects},
+  {MEMSET_FUNCTION_NAME,                   generic_string_effects},
+  {STRERROR_FUNCTION_NAME,                 no_write_effects},
+  {STRERROR_R_FUNCTION_NAME,               no_write_effects}, 
+  {STRLEN_FUNCTION_NAME,                   no_write_effects},
+
+  /*#include <time.h>*/
+  {TIME_FUNCTION_NAME,                     no_write_effects},
+  {CLOCK_FUNCTION_NAME,                    no_write_effects},
+
+  /*#include <wchar.h>*/
+  {FWSCANF_FUNCTION_NAME,                  c_io_effects},
+  {SWSCANF_FUNCTION_NAME,                  c_io_effects},
+  {WSCANF_FUNCTION_NAME,                   c_io_effects},
+
+  /* #include <wctype.h> */
+  {ISWALNUM_OPERATOR_NAME,                 no_write_effects},
+  {ISWALPHA_OPERATOR_NAME,                 no_write_effects},
+  {ISWBLANK_OPERATOR_NAME,                 no_write_effects},
+  {ISWCNTRL_OPERATOR_NAME,                 no_write_effects},
+  {ISWDIGIT_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWGRAPH_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWLOWER_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWPRINT_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWPUNCT_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWSPACE_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWUPPER_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWXDIGIT_OPERATOR_NAME,                no_write_effects},
+  {ISWCTYPE_OPERATOR_NAME,                 no_write_effects}, 
+  {WCTYPE_OPERATOR_NAME,                   no_write_effects}, 
+  {TOWLOWER_OPERATOR_NAME,                 no_write_effects}, 
+  {TOWUPPER_OPERATOR_NAME,                 no_write_effects},  
+  {TOWCTRANS_OPERATOR_NAME,                no_write_effects},
+  {WCTRANS_OPERATOR_NAME,                  no_write_effects},
+
+
+
+  //not found in standard C99 (in GNU C Library)
+  {ISASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension. 
+  {TOASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension. 
+  {_TOLOWER_OPERATOR_NAME,                 no_write_effects}, //This function is provided for compatibility with the SVID
+  {_TOUPPER_OPERATOR_NAME,                 no_write_effects}, //This function is provided for compatibility with the SVID
+  
+  /* Part of the binary standard */
+  {CTYPE_B_LOC_OPERATOR_NAME,              no_write_effects},
+
+
+
+  {"__flt_rounds",                         no_write_effects},
+
+  {"_sysconf",                             no_write_effects}, 
+  {"wdinit",                               no_write_effects},
+  {"wdchkind",                             no_write_effects},
+  {"wdbindf",                              no_write_effects},
+  {"wddelim",                              no_write_effects},
+  {"mcfiller",                             no_write_effects},
+  {"mcwrap",                               no_write_effects},
+ 
+  //GNU C Library
+  {"dcgettext",                            no_write_effects},
+  {"dgettext",                             no_write_effects},
+  {"gettext",                              no_write_effects},
+  {"textdomain",                           no_write_effects},
+  {"bindtextdomain",                       no_write_effects},
+
+
+  /* not found in C99 standard (in GNU C Library) */
+
+  {J0_OPERATOR_NAME,                       no_write_effects},
+  {J1_OPERATOR_NAME,                       no_write_effects},
+  {JN_OPERATOR_NAME,                       no_write_effects},
+  {Y0_OPERATOR_NAME,                       no_write_effects},
+  {Y1_OPERATOR_NAME,                       no_write_effects},
+  {YN_OPERATOR_NAME,                       no_write_effects},
+
+  //In the System V math library
+  {MATHERR_OPERATOR_NAME,                  no_write_effects},
+
+  //This function exists mainly for use in certain standardized tests of IEEE 754 conformance.
+  {SIGNIFICAND_OPERATOR_NAME,              no_write_effects},
+
+  /* netdb.h not in C99 standard (in GNU library) */
+  {__H_ERRNO_LOCATION_OPERATOR_NAME,       no_write_effects},
+
+  /* bits/errno.h */
+  {__ERRNO_LOCATION_OPERATOR_NAME,         no_write_effects},
+
+
+  //Posix LEGACY Std 1003.1
+  {ECVT_FUNCTION_NAME,                     no_write_effects},
+  {FCVT_FUNCTION_NAME,                     no_write_effects},
+  {GCVT_FUNCTION_NAME,                     no_write_effects},
+
+
+  /* Random number generators in stdlib.h Conforming to SVr4, POSIX.1-2001 but not in C99 */
+  
+  {RANDOM_FUNCTION_NAME,                   rgs_effects},
+  {SRANDOM_FUNCTION_NAME,                  rgsi_effects},
+  {DRAND48_FUNCTION_NAME,                  rgs_effects},
+  {ERAND48_FUNCTION_NAME,                  rgs_effects},
+  {JRAND48_FUNCTION_NAME,                  rgs_effects},
+  {LRAND48_FUNCTION_NAME,                  rgs_effects},
+  {MRAND48_FUNCTION_NAME,                  rgs_effects},
+  {NRAND48_FUNCTION_NAME,                  rgs_effects},
+  {SRAND48_FUNCTION_NAME,                  rgsi_effects},
+  {SEED48_FUNCTION_NAME,                   rgsi_effects},
+  {LCONG48_FUNCTION_NAME,                  rgsi_effects},
+
+
+  //Posix
+  {POSIX_MEMALIGN_FUNCTION_NAME,           no_write_effects},
+  {ATOQ_FUNCTION_NAME,                     no_write_effects},
+  {LLTOSTR_FUNCTION_NAME,                  safe_c_effects},
+  {ULLTOSTR_FUNCTION_NAME,                 no_write_effects},
+
+  //MB: not found in C99 standard. POSIX.2
+  {__FILBUF_FUNCTION_NAME,                 no_write_effects},
+  {__FILSBUF_FUNCTION_NAME,                no_write_effects},
+  {SETBUFFER_FUNCTION_NAME,                no_write_effects},
+  {SETLINEBUF_FUNCTION_NAME,               no_write_effects},
+  {FDOPEN_FUNCTION_NAME,                   no_write_effects},
+  {CTERMID_FUNCTION_NAME,                  no_write_effects},
+  {FILENO_FUNCTION_NAME,                   no_write_effects},
+  {POPEN_FUNCTION_NAME,                    no_write_effects},
+  {CUSERID_FUNCTION_NAME,                  no_write_effects},
+  {TEMPNAM_FUNCTION_NAME,                  no_write_effects},
+  {GETOPT_FUNCTION_NAME,                   no_write_effects},
+  {GETSUBOPT_FUNCTION_NAME,                no_write_effects},
+  {GETW_FUNCTION_NAME,                     no_write_effects},
+  {PUTW_FUNCTION_NAME,                     no_write_effects},
+  {PCLOSE_FUNCTION_NAME,                   no_write_effects},
+  {FSEEKO_FUNCTION_NAME,                   no_write_effects},
+  {FTELLO_FUNCTION_NAME,                   no_write_effects},
+  {FOPEN64_FUNCTION_NAME,                  no_write_effects},
+  {FREOPEN64_FUNCTION_NAME,                no_write_effects},
+  {TMPFILE64_FUNCTION_NAME,                no_write_effects},
+  {FGETPOS64_FUNCTION_NAME,                no_write_effects},
+  {FSETPOS64_FUNCTION_NAME,                no_write_effects},
+  {FSEEKO64_FUNCTION_NAME,                 no_write_effects},
+  {FTELLO64_FUNCTION_NAME,                 no_write_effects},
+
+  //MB: not found in C99
+  {SINGLE_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
+  {DOUBLE_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
+  {EXTENDED_TO_DECIMAL_OPERATOR_NAME,      no_write_effects},
+  {QUADRUPLE_TO_DECIMAL_OPERATOR_NAME,     no_write_effects},
+  {DECIMAL_TO_SINGLE_OPERATOR_NAME,        no_write_effects},
+  {DECIMAL_TO_DOUBLE_OPERATOR_NAME,        no_write_effects},
+  {DECIMAL_TO_EXTENDED_OPERATOR_NAME,      no_write_effects},
+  {DECIMAL_TO_QUADRUPLE_OPERATOR_NAME,     no_write_effects},
+  {STRING_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
+  {FUNC_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
+  {FILE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
+  //3bsd
+  {SECONVERT_OPERATOR_NAME,                no_write_effects},
+  {SFCONVERT_OPERATOR_NAME,                no_write_effects},
+  {SGCONVERT_OPERATOR_NAME,                no_write_effects},
+  {ECONVERT_OPERATOR_NAME,                 no_write_effects},
+  {FCONVERT_OPERATOR_NAME,                 no_write_effects},
+  {GCONVERT_OPERATOR_NAME,                 no_write_effects},
+  {QECONVERT_OPERATOR_NAME,                no_write_effects},
+  {QFCONVERT_OPERATOR_NAME,                no_write_effects},
+  {QGCONVERT_OPERATOR_NAME,                no_write_effects},
 
   /* C IO system functions in man -S 2 unistd.h */
 
-  {C_OPEN_FUNCTION_NAME,                           unix_io_effects},
-  {CREAT_FUNCTION_NAME,                            unix_io_effects},
-  {C_CLOSE_FUNCTION_NAME,                          unix_io_effects},
-  {C_WRITE_FUNCTION_NAME,                          unix_io_effects},
-  {C_READ_FUNCTION_NAME,                           unix_io_effects},
-  {FCNTL_FUNCTION_NAME,                            unix_io_effects},
-  {FSYNC_FUNCTION_NAME,                            unix_io_effects},
-  {FDATASYNC_FUNCTION_NAME,                        unix_io_effects},
-  {IOCTL_FUNCTION_NAME,                            unix_io_effects},
-  {SELECT_FUNCTION_NAME,                           unix_io_effects},
-  {PSELECT_FUNCTION_NAME,                          unix_io_effects},
-  {STAT_FUNCTION_NAME,                             no_write_effects}, /* sys/stat.h */
-  {FSTAT_FUNCTION_NAME,                            unix_io_effects},
-  {LSTAT_FUNCTION_NAME,                            no_write_effects},
+  {C_OPEN_FUNCTION_NAME,                   unix_io_effects},
+  {CREAT_FUNCTION_NAME,                    unix_io_effects},
+  {C_CLOSE_FUNCTION_NAME,                  unix_io_effects},
+  {C_WRITE_FUNCTION_NAME,                  unix_io_effects},
+  {C_READ_FUNCTION_NAME,                   unix_io_effects},
+  {FCNTL_FUNCTION_NAME,                    unix_io_effects},
+  {FSYNC_FUNCTION_NAME,                    unix_io_effects},
+  {FDATASYNC_FUNCTION_NAME,                unix_io_effects},
+  {IOCTL_FUNCTION_NAME,                    unix_io_effects},
+  {SELECT_FUNCTION_NAME,                   unix_io_effects},
+  {PSELECT_FUNCTION_NAME,                  unix_io_effects},
+  {STAT_FUNCTION_NAME,                     no_write_effects}, /* sys/stat.h */
+  {FSTAT_FUNCTION_NAME,                    unix_io_effects},
+  {LSTAT_FUNCTION_NAME,                    no_write_effects},
 
-  /*#include <stdlib.h>*/
-  {POSIX_MEMALIGN_FUNCTION_NAME,                   no_write_effects},
-  {ABORT_FUNCTION_NAME,                            no_write_effects},
-  {ABS_FUNCTION_NAME,                              no_write_effects},
-  {ATEXIT_FUNCTION_NAME,                           no_write_effects},
-  {ATOF_FUNCTION_NAME,                             no_write_effects},
-  {ATOI_FUNCTION_NAME,                             no_write_effects},
-  {ATOL_FUNCTION_NAME,                             no_write_effects},
-  {ATOLL_FUNCTION_NAME,                            no_write_effects},
-  {ATOQ_FUNCTION_NAME,                             no_write_effects},
-  {BSEARCH_FUNCTION_NAME,                          no_write_effects},
-  {CALLOC_FUNCTION_NAME,                           no_write_effects},
-  {DIV_FUNCTION_NAME,                              no_write_effects},
-  {EXIT_FUNCTION_NAME,                             no_write_effects},
-  {FREE_FUNCTION_NAME,                             any_heap_effects},
-  {LLABS_FUNCTION_NAME,                            no_write_effects},
-  {LLDIV_FUNCTION_NAME,                            no_write_effects},
-  {LLTOSTR_FUNCTION_NAME,                          safe_c_effects},
-  {STRTOLL_FUNCTION_NAME,                          safe_c_effects},
-  {STRTOULL_FUNCTION_NAME,                         safe_c_effects},
-  {ULLTOSTR_FUNCTION_NAME,                          no_write_effects},
 
 
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
-  {MALLOC_FUNCTION_NAME, any_heap_effects},
-  {REALLOC_FUNCTION_NAME, any_heap_effects},
-
-  /*#include <time.h>*/
-  {TIME_FUNCTION_NAME,                           no_write_effects},
-  {CLOCK_FUNCTION_NAME,                           no_write_effects},
-
-  /*#include <wchar.h>*/
-  {FWSCANF_FUNCTION_NAME,                          c_io_effects},
-  {SWSCANF_FUNCTION_NAME,                          c_io_effects},
-  {WSCANF_FUNCTION_NAME,                           c_io_effects},
-
-  /*#include <string.h>*/
-
-  {MEMCPY_FUNCTION_NAME,                           no_write_effects},
-  {MEMMOVE_FUNCTION_NAME,                          no_write_effects},
-  {MEMCMP_FUNCTION_NAME,                           no_write_effects},
-  {MEMSET_FUNCTION_NAME,                           no_write_effects},
-  {STRCMP_FUNCTION_NAME,                           no_write_effects},
-  {STRCPY_FUNCTION_NAME,                           no_write_effects},
-  {STRNCPY_FUNCTION_NAME,                          no_write_effects},
-  {STRCAT_FUNCTION_NAME,                           no_write_effects},
-  {STRNCAT_FUNCTION_NAME,                          no_write_effects},
-  {STRLEN_FUNCTION_NAME,                           no_write_effects},
-  {STRCOLL_FUNCTION_NAME,                          no_write_effects},
-  {STRNCMP_FUNCTION_NAME,                          no_write_effects},
-  {STRXFRM_FUNCTION_NAME,                          no_write_effects},
-  {MEMCHR_FUNCTION_NAME,                           no_write_effects},
-  {STRCHR_FUNCTION_NAME,                           no_write_effects},
-  {STRCSPN_FUNCTION_NAME,                          no_write_effects},
-  {STRPBRK_FUNCTION_NAME,                          no_write_effects},
-  {STRRCHR_FUNCTION_NAME,                          no_write_effects},
-  {STRSPN_FUNCTION_NAME,                           no_write_effects},
-  {STRSTR_FUNCTION_NAME,                           no_write_effects},
-  {STRTOK_FUNCTION_NAME,                           no_write_effects},
-  {STRERROR_FUNCTION_NAME,                         no_write_effects},
-  {STRERROR_R_FUNCTION_NAME,                       no_write_effects},
-
   /* F95 */
-  {ALLOCATE_FUNCTION_NAME,                         any_heap_effects},
-  {DEALLOCATE_FUNCTION_NAME,                       any_heap_effects},
-  {ETIME_FUNCTION_NAME,                            no_write_effects},
-  {DTIME_FUNCTION_NAME,                            no_write_effects},
+  {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},
+  {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},
+  {ETIME_FUNCTION_NAME,                    no_write_effects},
+  {DTIME_FUNCTION_NAME,                    no_write_effects},
+
+  /* BSD <err.h> */
+  /* SG: concerning the err* family of functions, they also exit() from the program
+   * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
+   * but it seems an error to me */
+  {ERR_FUNCTION_NAME,                              c_io_effects},
+  {ERRX_FUNCTION_NAME,                             c_io_effects},
+  {WARN_FUNCTION_NAME,                             c_io_effects},
+  {WARNX_FUNCTION_NAME,                            c_io_effects},
+  {VERR_FUNCTION_NAME,                             c_io_effects},
+  {VERRX_FUNCTION_NAME,                            c_io_effects},
+  {VWARN_FUNCTION_NAME,                            c_io_effects},
+  {VWARNX_FUNCTION_NAME,                           c_io_effects},
+  
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
@@ -937,7 +1315,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
 
         pid += 1;
     }
-   
+
     pips_error("generic_proper_effects_of_intrinsic", "unknown intrinsic %s\n", s);
 
     return(NIL);
@@ -972,7 +1350,7 @@ safe_c_effects(entity e __attribute__ ((__unused__)),list args)
   pips_debug(5, "end\n");
   lr = gen_nconc(lr, lw);
   return(lr);
-  
+
 }
 
 static list
@@ -1008,7 +1386,7 @@ conditional_effects(entity e __attribute__ ((__unused__)),list args)
   le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
 
   pips_debug_effects(8, "Effects for the two branches:\n", le);
-    
+
   le = (*effects_union_op)(le, lc, effects_same_action_p);
 
   pips_debug(5, "end\n");
@@ -1023,7 +1401,7 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     syntax s = expression_syntax(e);
     pips_debug(5, "begin\n");
     pips_assert("address of has only one argument", gen_length(args)==1);
-    
+
     if( syntax_reference_p(s))
     {
         reference r = syntax_reference(s);
@@ -1038,7 +1416,7 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
 	if (!effect_undefined_p(eff))
 	  free_effect(eff);
       }
-       
+
     pips_debug_effects(5, "end\n", lr);
     return(lr);
 }
@@ -1065,15 +1443,15 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
   if (update_p)
     {
       pips_debug(5, "update_p is true\n");
-      le = generic_proper_effects_of_expression(lhs);      
+      le = generic_proper_effects_of_expression(lhs);
     }
 
   le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
-       
+
   if(!unique_p)
     {
       pips_debug(5, "unique_p is false\n");
-	 
+
       expression rhs = EXPRESSION(CAR(CDR(args)));
       le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
     }
@@ -1406,14 +1784,14 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	  entity std_ent =  local_name_to_top_level_entity("stdout");
 	  pips_assert("stdout must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
 	  std_ref = make_reference(std_ent, NIL);
-	  
+
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDOUT_FILENO); 
+	    unit = int_to_expression(STDOUT_FILENO);
 	  else
 	    /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
-	    unit = make_unbounded_expression();	  
+	    unit = make_unbounded_expression();
 	}
-      else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || 
+      else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) ||
 	       ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
 	{
 	  //The input is obtained from stdin
@@ -1422,7 +1800,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	  std_ref = make_reference(std_ent, NIL);
 
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDIN_FILENO); 
+	    unit = int_to_expression(STDIN_FILENO);
 	  else
 	    /* we cannot use STDIN_FILENO because the stdin variable may have been modified by the user */
 	    unit = make_unbounded_expression();
@@ -1435,24 +1813,24 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
 	  /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDERR_FILENO); 
+	    unit = int_to_expression(STDERR_FILENO);
 	  else
 	    unit = make_unbounded_expression();
 	}
-      
+
       else if(ENTITY_FOPEN_P(e))
 	// the fopen function has the path's file as first argument.
 	unit = make_unbounded_expression();
-      
+
       else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
 	// the first argument is an integer specifying the logical unit
 	// The expression should be evaluated and used if an integer is returned
 	unit = make_unbounded_expression();
-      
+
       if (!reference_undefined_p(std_ref))
 	{
-	  effect fp_eff_w = (*reference_to_effect_func)(std_ref, is_action_write, false);
-	  effect fp_eff_r = (*reference_to_effect_func)(copy_reference(std_ref), is_action_read, false);
+	  effect fp_eff_w = (*reference_to_effect_func)(std_ref, make_action_write_memory(), false);
+	  effect fp_eff_r = (*reference_to_effect_func)(copy_reference(std_ref), make_action_read_memory(), false);
 	  list l_fp_eff = CONS(EFFECT, copy_effect(fp_eff_r), NIL);
 	  effect_add_dereferencing_dimension(fp_eff_w);
 	  effect_to_may_effect(fp_eff_w);
@@ -1461,18 +1839,18 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	  l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_r, CONS(EFFECT, fp_eff_w, NIL)));
 	  le = gen_nconc(le, l_fp_eff);
 	}
-      
+
     }
   else
     {
-      if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e)) 
+      if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e))
 	{
 	  /* Several file descriptors are read */
 	  ;
-	}      
+	}
     }
-  
-  if(!expression_undefined_p(unit)) 
+
+  if(!expression_undefined_p(unit))
     {
     reference ref1 = reference_undefined;
     effect eff1 = effect_undefined;
@@ -1480,11 +1858,11 @@ static list generic_io_effects(entity e, list args, bool system_p)
     effect eff2 = effect_undefined;
 
     indices = CONS(EXPRESSION, unit, NIL);
-    
+
     private_io_entity = global_name_to_entity
       (IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
 
-    pips_assert("private_io_entity is defined", 
+    pips_assert("private_io_entity is defined",
 		private_io_entity != entity_undefined);
 
     ref1 = make_reference(private_io_entity, indices);
@@ -1492,10 +1870,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
     /* FI: I would like not to use "preference" isntead of
        "reference", but this causes a bug in cumulated effects and I
        do not have time to chase it. */
-    eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
-    eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
+    eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+    eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
 
-    if(unbounded_expression_p(unit)) 
+    if(unbounded_expression_p(unit))
       {
 	effect_approximation_tag(eff1) = is_approximation_may;
 	effect_approximation_tag(eff2) = is_approximation_may;
@@ -1504,7 +1882,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
     ifdebug(8) print_reference(ref1);
     le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
   }
-  
+
   pips_debug(5, "end\n");
 
   return(le);
@@ -1522,6 +1900,97 @@ static list c_io_effects(entity e, list args)
   return generic_io_effects(e, args, FALSE);
 }
 
+
+/*Molka Becher: generic_string_effects to encompass the C string.h intrinsics*/
+
+static list 
+generic_string_effects(entity e, list args)
+{
+  list le = NIL, lep = NIL, lep1=NIL;
+  int i=0;
+  effect ef= effect_undefined;
+  expression ie= expression_undefined;
+  reference ref=reference_undefined;
+  action a=action_undefined;
+ 
+  pips_debug(5, "begin\n");
+
+  //if entity is memmove intrinsic
+  if (strcmp(entity_user_name(e),"memmove")==0)
+    { lep1=memmove_effects(e, args);
+      le=gen_nconc(le,lep1);
+    }
+
+  FOREACH(EXPRESSION, arg, args)
+    { 
+
+      if (i==0) // if 1st argument
+	{ ref= copy_reference(expression_reference(copy_expression(arg)));
+ 	  entity et= reference_variable(ref);
+ 	  if (entity_constant_p(et))  //if 1st argument is a constant value
+	    pips_user_error ("First argument of %s shouldn't be a constant value!\n",entity_user_name(e));
+	}
+      if ((i==1 && gen_length(args)==2) || (i==2)) // 3rd argument: arg==arg3
+	{
+	  a= make_action_write_memory();
+
+	  /* Effect is on arg1[0..arg3-1]*/
+
+	  expression arg1 = EXPRESSION(CAR(args));
+	  
+	  if (expression_reference_p(arg1))
+	    {
+	      ref = copy_reference(expression_reference(arg1));
+	      if (gen_length(args)==3)
+		{expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				                copy_expression(arg),
+					        int_to_expression(1));
+		 range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		 ie = make_expression(make_syntax_range(r),make_normalized_complex());
+		}
+	      else // Number of arguments = 2, for processing a function like strcpy (char * restrict s1, const char * restrict s2);
+		{ie= make_unbounded_expression();
+		}
+	      reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
+	      ef= (*reference_to_effect_func)(ref,a,FALSE);
+	    }
+	  else
+	    { //if it's a call of another function & not a reference
+	      ef= make_anywhere_effect(a);
+	    }
+
+	   lep = NIL;
+	   lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
+        }
+      if ((i==1 || i==2) && expression_reference_p(copy_expression(arg))) // if  2nd or 3rd argument are references
+	 {
+	  a= make_action_read_memory();
+	  ref=copy_reference(expression_reference(copy_expression(arg)));
+	  ie=make_unbounded_expression();
+	  reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
+	  ef= (*reference_to_effect_func)(ref,a,FALSE);
+	  lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
+
+	 }
+
+      i=i+1;
+          
+      le = gen_nconc(le, lep);   
+
+      ifdebug(8)
+	{
+	  pips_debug(8, "effects for argument %s :\n",
+		     words_to_string(words_expression(arg,NIL)));
+	  (*effects_prettyprint_func)(lep);
+	}
+    }
+
+
+  pips_debug(5, "end\n");
+
+  return(le);
+}
+
 /* To handle the effects of random functions. Amira Mensi*/
 static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bool init_p)
 {
@@ -1575,7 +2044,8 @@ static list rgs_effects(entity e, list args)
   return any_rgs_effects( e, args, FALSE);
 }
 
-/* To handle the effects of heap related functions. */
+/* To handle the effects of heap related functions. 
+   CreateHeapAbstractState() is done in bootstrap.c */
 static list any_heap_effects(entity e, list args)
 {
   list le = NIL;
@@ -1604,13 +2074,57 @@ static list any_heap_effects(entity e, list args)
   ifdebug(8) print_reference(ref);
 
   /* Read first. */
-  malloc_effect = (*reference_to_effect_func)(ref, is_action_read, false); 
+  malloc_effect = (*reference_to_effect_func)(ref, make_action_read_memory(), false);
 
   le = CONS(EFFECT, malloc_effect, le);
 
   /* Write back. */
-  malloc_effect = (*reference_to_effect_func)(copy_reference(ref), is_action_write, false); 
+  malloc_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
   le = CONS(EFFECT, malloc_effect, le);
+
+  pips_debug_effects(5, "output effects :\n", le);
+
+  return(le);
+}
+
+/* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses 
+   a temporary array to copy characters from one object to another. C99
+   Note : CreateMemmoveAbstractState() is defined in bootstrap.c  */
+static list memmove_effects(entity e, list args)
+{
+  list le = NIL;
+  entity memmove_entity = entity_undefined;
+  reference ref;
+  effect memmove_effect;
+
+  pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
+
+/*   MAP(EXPRESSION,exp,{ */
+/*     lep = generic_proper_effects_of_expression(exp); */
+/*     le = gen_nconc(le, lep); */
+/*     //ifdebug(8) print_effects(le); */
+/*     //ifdebug(8) print_effects(lep); */
+/*   }, args); */
+
+  memmove_entity = global_name_to_entity
+    (MEMMOVE_EFFECTS_PACKAGE_NAME,
+     MEMMOVE_EFFECTS_NAME);
+
+  pips_assert("memmove entity pre-exists", !entity_undefined_p(memmove_entity));
+
+  ref = make_reference(memmove_entity, NIL);
+
+  ifdebug(8) print_reference(ref);
+
+  /* Write First. */
+  memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
+  le = CONS(EFFECT, memmove_effect, le);
+
+  /* Read Back. */
+  memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_read_memory(), false);
+
+  le = CONS(EFFECT, memmove_effect, le);
+
 
   pips_debug_effects(5, "output effects :\n", le);
 
@@ -1658,14 +2172,14 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
-    else { 
+    else {
       pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose\n");
       /* C language */
       /* FI: we lack information about the number of elements written */
       /* This is not generic! */
       entity ioptr = make_dummy_io_ptr();
       reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
-      effect eff = (*reference_to_effect_func)(r, is_action_write,false);
+      effect eff = (*reference_to_effect_func)(r, make_action_write_memory(),false);
       effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! removed because should be useless BC. */
       // le = c_summary_effect_to_proper_effects(eff, exp);
@@ -1673,12 +2187,12 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	 of exp... but I do not know any function available to do
 	 that. generic_proper_effects_of_expression() is ging to
 	 return a bit too much. */
-      
-      
+
+
       if(FALSE) {
 	/* FI: short term simplification... We need pointers for side effects... */
 	syntax s = expression_syntax(exp);
-	
+
 	if(syntax_reference_p(s)) {
 	  /* This is not possible as parameters are passed by value,
 	     except if an address is passed, for instance an array or a
@@ -1687,10 +2201,10 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  entity v = reference_variable(r);
 	  type t = entity_type(v);
 	  type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
-	  
+
 	  if(type_variable_p(ut)) {
 	    variable vt = type_variable(ut);
-	    
+
 	    if(!ENDP(variable_dimensions(vt))) {
 	      /* Fine, this is an array */
 	      le = generic_proper_effects_of_any_lhs(exp);
@@ -1718,13 +2232,13 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  call c = syntax_call(s);
 	  entity op = call_function(c);
 	  list nargs = call_arguments(c);
-	  
+
 	  if(ENTITY_DEREFERENCING_P(op)) {
 	    pips_internal_error("Effects thru dereferenced pointers not implemented yet");
 	  }
 	  if(ENTITY_ADDRESS_OF_P(op)) {
 	    expression e = EXPRESSION(CAR(nargs));
-	    
+
 	    pips_assert("one argument", gen_length(nargs)==1);
 	    le = generic_proper_effects_of_any_lhs(e);
 	  }
@@ -1735,15 +2249,15 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       }
     }
   }
-  
+
   if(act ==  'r' || act == 'x' || act == is_action_read) {
     pips_debug(6, "is_action_read or read-write\n");
     le = gen_nconc(le, generic_proper_effects_of_expression(exp));
   }
-  
+
 
   pips_debug(5, "end\n");
-  
+
   return le;
 }
 
@@ -1792,14 +2306,14 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	(IO_EFFECTS_PACKAGE_NAME,
 	 IO_EFFECTS_ARRAY_NAME);
 
-      pips_assert("private_io_entity is defined\n", 
+      pips_assert("private_io_entity is defined\n",
 		  private_io_entity != entity_undefined);
-       
+
       ref1 = make_reference(private_io_entity, indices);
       ref2 = copy_reference(ref1);
-      eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
-      eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
-      
+      eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+      eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
+
       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
       break;
     case 's':
@@ -1813,21 +2327,21 @@ static list effects_of_C_ioelem(expression arg, tag act)
        list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &fp_eff_r, false);
        if (effect_undefined_p(fp_eff_r))
 	 {
-	   fp_eff_w = make_anywhere_effect(is_action_write);
-	   fp_eff_r = make_anywhere_effect(is_action_read);
+	   fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	   fp_eff_r = make_anywhere_effect(make_action_read_memory());
 	 }
        else
 	 {
 	   if( anywhere_effect_p(fp_eff_r))
-	     fp_eff_w = make_anywhere_effect(is_action_write);
+	     fp_eff_w = make_anywhere_effect(make_action_write_memory());
 	   else
 	     {
 	       /* the read effect on the file pointer will be added later */
 	       /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
 	       effect_add_dereferencing_dimension(fp_eff_r);
-	       effect_to_may_effect(fp_eff_r);	       
+	       effect_to_may_effect(fp_eff_r);
 	       fp_eff_w = copy_effect(fp_eff_r);
-	       effect_action_tag(fp_eff_w) = is_action_write;
+	       effect_action(fp_eff_w) = make_action_write_memory();
 	     }
 	 }
        l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
@@ -1839,7 +2353,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	  it reads it and then writes it ...
 	  We try to identify if the stream points to a std file
        */
- 
+
        if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
 	 {
 	   const char* s = entity_user_name(effect_entity(fp_eff_r));
@@ -1850,29 +2364,29 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	   else /* (same_string_p(s, "stderr")) */
 	     unit = int_to_expression(STDERR_FILENO);
 	   must_p = true;
-	     
+
 	 }
        else
 	 {
 	   unit = make_unbounded_expression();
 	   must_p = false;
 	 }
-       indices = CONS(EXPRESSION, 
-		      unit, 
+       indices = CONS(EXPRESSION,
+		      unit,
 		      NIL);
        private_io_entity = global_name_to_entity
 	 (IO_EFFECTS_PACKAGE_NAME,
 	  IO_EFFECTS_ARRAY_NAME);
 
-       pips_assert("private_io_entity is defined\n", 
+       pips_assert("private_io_entity is defined\n",
 		   private_io_entity != entity_undefined);
-       
+
        ref1 = make_reference(private_io_entity, indices);
        ref2 = copy_reference(ref1);
-       eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
-       eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
-       
-       if(!must_p) 
+       eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+       eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
+
+       if(!must_p)
 	 {
 	   effect_approximation_tag(eff1) = is_approximation_may;
 	   effect_approximation_tag(eff2) = is_approximation_may;
@@ -1880,16 +2394,16 @@ static list effects_of_C_ioelem(expression arg, tag act)
        le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
 
        le = gen_nconc(le, l_fp_eff);
-       
+
        break;
     case 'v':
       pips_debug(5, "va_list case \n");
 
-      /* we generate a read and a write effect on the va_list : 
+      /* we generate a read and a write effect on the va_list :
          this is not really correct, since the va_list itself cannot be
-	 modified, but it's internal fields only. BC. 
+	 modified, but it's internal fields only. BC.
       */
-      
+
       le = gen_nconc(le, generic_proper_effects_of_any_lhs(arg));
       break;
     case 'r':
@@ -1904,17 +2418,17 @@ static list effects_of_C_ioelem(expression arg, tag act)
       /* first check whether the argument is a char *. */
       type t = expression_to_type(arg);
       variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-      if (act == 'W' 
+      if (act == 'W'
 	  ||
-	  (!variable_undefined_p(v) 
-	   && ((basic_pointer_p(variable_basic(v)) 
-		&& ENDP(variable_dimensions(v)) 
+	  (!variable_undefined_p(v)
+	   && ((basic_pointer_p(variable_basic(v))
+		&& ENDP(variable_dimensions(v))
 		&& char_type_p(basic_pointer(variable_basic(v))))
 	       ||
 	       (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1)))))
 	     {
 	  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, tolower(act)));
-	}      
+	}
       break;
     case 'n':
       pips_debug(5, "only effects on actual argument evaluation\n");
@@ -1974,7 +2488,7 @@ effects_of_iolist(list exprs, tag act)
         }
     } /* if (expression_implied_do_p(exp)) */
     pips_debug(5, "end\n");
-    
+
     return lep;
 }
 
@@ -2098,7 +2612,8 @@ effects_of_implied_do(expression exp, tag act)
       {
         if (effect_entity(eff) != index)
           lr =  CONS(EFFECT, eff, lr);
-        else if(act==is_action_write /* This is a read */
+        else if(act==is_action_write /* This is a read (FI: I do not
+					understand this comment) */
                 && action_write_p(effect_action(eff))) {
           pips_user_error("Index %s in implied DO is read. "
                           "Standard violation, see Section 12.8.2.3\n",
@@ -2147,13 +2662,13 @@ static list va_list_effects(entity e, list args)
   list le = NIL;
   expression first_arg;
   pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
- 
+
   /* the first argument is always evaluated (read) and we simulate
      the written effects on the depths of the va_list by a write
      effect on the va_list itself.
   */
   first_arg = EXPRESSION(CAR(args));
-  le = gen_nconc(le, generic_proper_effects_of_expression(first_arg));    
+  le = gen_nconc(le, generic_proper_effects_of_expression(first_arg));
   le = gen_nconc(le, generic_proper_effects_of_any_lhs(first_arg));
 
   /* but it is *may* written for va_end */
@@ -2165,7 +2680,7 @@ static list va_list_effects(entity e, list args)
 	    effect_approximation_tag(eff) = is_approximation_may;
 	}
     }
-  
+
   if (ENTITY_VA_COPY_P(e))
     {
       /* the second argument is only read. In fact, in a more precise
@@ -2174,7 +2689,7 @@ static list va_list_effects(entity e, list args)
       expression second_arg = EXPRESSION(CAR(CDR(args)));
       le = gen_nconc(le, generic_proper_effects_of_expression(second_arg));
     }
-  
+
   ifdebug(5)
     {
       pips_debug(5, "resulting effects: \n");

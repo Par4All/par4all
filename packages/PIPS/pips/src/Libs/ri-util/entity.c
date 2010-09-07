@@ -830,6 +830,19 @@ bool derived_entity_p(entity e)
   return entity_struct_p(e) || entity_union_p(e) || entity_enum_p(e);
 }
 
+/* This test shows that "e" has been declared in "module".
+ *
+ * This does not show in Fortran that e is a variable with effects local
+ * to the module because e can be allocated in a common. Variables with
+ * local effects are allocated either in the static or the dynamic or the
+ * stack area.
+ *
+ * Variables with effects lost on return are allocated either in the
+ * dynamic or stack areas. Effects on static variables may or not escape.
+ *
+ * Of course, this predicate returns false for some variables declared
+ * in "module", extern variables for instance.
+ */
 bool local_entity_of_module_p(entity e, entity module)
 {
   bool
@@ -957,7 +970,8 @@ entity entity_intrinsic(string name)
 						     NULL),
 					 entity_domain);
 
-  pips_assert("entity_intrinsic", e != entity_undefined  && intrinsic_entity_p(e));
+  pips_assert("entity_intrinsic", e != entity_undefined
+	      && intrinsic_entity_p(e));
   return(e);
 }
 
@@ -1167,6 +1181,8 @@ entity FindEntity( const char* package, const char* name ) {
  * du pgm Fortran.  Ce nom est celui d'une entite; si celle-ci existe deja on
  * renvoie son indice dans la table des entites, sinon on cree une entite vide
  * qu'on remplit partiellement.
+ *
+ * full_name est dupliqué.
  *
  * Modifications:
  *  - partial link at parse time for global entities (Remi Triolet?)

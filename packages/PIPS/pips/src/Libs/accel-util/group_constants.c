@@ -136,9 +136,9 @@ static void *do_group_count_elements_reduce(void * v, const list l)
 {
     entity e = ENTITY(CAR(l));
     if( (entity_variable_p(e) && entity_scalar_p(e)) || entity_constant_p(e))
-        return  make_op_exp(PLUS_OPERATOR_NAME,(expression)v,int_to_expression(1));
+        return  make_op_exp(PLUS_OPERATOR_NAME,copy_expression((expression)v),int_to_expression(1));
     else
-        return make_op_exp(PLUS_OPERATOR_NAME,(expression)v,SizeOfDimensions(variable_dimensions(type_variable(ultimate_type(entity_type(e))))));
+        return make_op_exp(PLUS_OPERATOR_NAME,copy_expression((expression)v),SizeOfDimensions(variable_dimensions(type_variable(ultimate_type(entity_type(e))))));
 }
 
 static expression do_group_count_elements(list entities)
@@ -183,7 +183,7 @@ static void do_grouping_replace_reference_by_expression_walker(expression exp,gr
             /* perform substitution */
             reference_variable(ref)=ctxt->new;
             gen_full_free_list(reference_indices(ref));
-            reference_indices(ref)=make_expression_list(make_op_exp(PLUS_OPERATOR_NAME,current_index,ctxt->offset));
+            reference_indices(ref)=make_expression_list(make_op_exp(PLUS_OPERATOR_NAME,current_index,copy_expression(ctxt->offset)));
         }
     }
 }

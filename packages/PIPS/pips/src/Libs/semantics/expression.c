@@ -2488,8 +2488,21 @@ transformer any_expression_to_transformer(
 	pips_internal_error("illegal overloaded type for an expression\n");
       break;
     }
+    case is_basic_derived: {
+      entity de = basic_derived(be);
+      type det = ultimate_type(entity_type(de));
+      if(type_enum_p(det)) {
+	/* enum type are analyzed like int */
+	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+      }
+      else {
+      pips_internal_error("entities of type \"derived\" that are not \"enum\" cannot be analyzed\n");
+      }
+      break;
+    }
     case is_basic_typedef:
       pips_internal_error("entities of type \"typedef\" cannot be analyzed\n");
+      break;
     default:
       pips_internal_error("unknown basic b=%d\n", basic_tag(be));
     }

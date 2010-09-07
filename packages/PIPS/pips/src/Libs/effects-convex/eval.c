@@ -53,9 +53,9 @@
   (we consider that p[1] is a predecessor of p[*], with *exact_p = false.)
 
  */
-bool convex_cell_reference_preceding_p(reference r1, descriptor d1, 
-				       reference r2, descriptor d2, 
-				       transformer current_precondition, 
+bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
+				       reference r2, descriptor d2,
+				       transformer current_precondition,
 				       bool * exact_p)
 {
   bool res = true;
@@ -71,10 +71,12 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	words_to_string(words_reference(r2, NIL)));
 
   *exact_p = true;
-  if (same_entity_p(e1, e2) 
+  if (same_entity_p(e1, e2)
       && (r1_path_length < r2_path_length))
     {
-      /* same entity and the path length of r1 is shorter than the path length of r2.
+      /* same entity and the path length of r1 is shorter than the
+	 path length of r2.
+
          we now have to check that each common index matches
       */
       pips_debug(8,"same entities, and r1 path is shorter than r2 path\n");
@@ -82,27 +84,33 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	{
 	  expression exp1 = EXPRESSION(CAR(ind1));
 	  expression exp2 = EXPRESSION(CAR(ind2));
-	  
+
 	  if(!expression_equal_p(exp1, exp2))
 	    {
 	      res = false;
 	      *exact_p = true;
 	    }
-	  
+
 	  POP(ind1);
 	  POP(ind2);
 	}
       if (res)
 	{
-	  /* only matching reference indices have been found (phi variables or struct field entities).
+	  /* only matching reference indices have been found (phi
+	     variables or struct field entities).
+
 	     we must now check the descriptors.
 	  */
-	  region reg1 = make_effect(make_cell(is_cell_reference, r1), make_action_write(), make_approximation_must(), d1);
-	  region reg2 = make_effect(make_cell(is_cell_reference, r2), make_action_write(), make_approximation_must(), d2);
+	  region reg1 = make_effect(make_cell(is_cell_reference, r1),
+				    make_action_write_memory(),
+				    make_approximation_must(), d1);
+	  region reg2 = make_effect(make_cell(is_cell_reference, r2),
+				    make_action_write_memory(),
+				    make_approximation_must(), d2);
 
 	  pips_debug_effect(6, "reg1 = \n", reg1);
 	  pips_debug_effect(6, "reg2 = \n", reg1);
-	  
+
 	  list li = region_intersection(reg1, reg2);
 	  if (ENDP(li))
 	    {
@@ -111,27 +119,27 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	    }
 	  else
 	    {
-	      
+
 	      pips_debug_effect(8, "reg2 before eliminating phi variables: \n ", reg2);
-	
+
 	      effect reg2_dup = copy_effect(reg2);
 	      list l_reg2 = CONS(EFFECT,reg2_dup,NIL);
-	      list l_phi = phi_entities_list(r1_path_length+1,r2_path_length);    
+	      list l_phi = phi_entities_list(r1_path_length+1,r2_path_length);
 	      project_regions_along_variables(l_reg2, l_phi);
 	      gen_free_list(l_reg2);
 	      gen_free_list(l_phi);
 	      pips_debug_effect(8, "reg2_dup after elimination: \n ", reg2_dup);
-	
+
 	      effect reg1_dup = copy_effect(reg1);
 	      if (!transformer_undefined_p(current_precondition))
 		{
 		  Psysteme sc_context = predicate_system(transformer_relation(current_precondition));
 		  region_sc_append(reg1_dup, sc_context, FALSE);
 		}
-		
+
 	      pips_debug_effect(8, "reg1_dup after adding preconditions: \n ", reg1_dup);
 	      pips_debug_effect(8, "reg1 after adding preconditions: \n ", reg1);
-	
+
 	      list ld = region_sup_difference(reg1_dup, reg2_dup);
 	      if (ENDP(ld))
 		{
@@ -143,10 +151,10 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 		  res = true;
 		  *exact_p = false;
 		}
-	      gen_full_free_list(ld);	   
+	      gen_full_free_list(ld);
 	    }
 	  gen_full_free_list(li);
-	      
+
 	  cell_reference(effect_cell(reg1)) = reference_undefined;
 	  effect_descriptor(reg1) = descriptor_undefined;
 	  free_effect(reg1);
@@ -162,20 +170,22 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
       *exact_p = true;
     }
 
-  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
+  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not");
   return res;
 }
 
 void simple_reference_to_convex_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
 {
 
-  effect reg = make_effect(make_cell(is_cell_reference, make_reference(reference_variable(ref), NIL)),
-			   make_action_write(), make_approximation_must(),
-			   make_descriptor(is_descriptor_convex, sc_new()));
+  effect reg = make_effect(make_cell_reference(make_reference(reference_variable(ref), NIL)),
+			   make_action_write_memory(),
+			   make_approximation_must(),
+			   make_descriptor_convex(sc_new()));
 
   FOREACH(EXPRESSION, exp, reference_indices(ref))
     {
-      if((expression_reference_p(exp) && entity_field_p(reference_variable(expression_reference(exp)))))
+      if((expression_reference_p(exp)
+	  && entity_field_p(reference_variable(expression_reference(exp)))))
 	{
 	  entity e = reference_variable(expression_reference(exp));
 	  effect_add_field_dimension(reg, e);
@@ -197,15 +207,15 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
   @param c is a the convex cell for which we look an equivalent constant path
   @param ptl is the list of points-to in which we search for constant paths
   @param  exact_p is a pointer towards a boolean. It is set to true if
-         the result is exact, and to false if it is an approximation, 
-	 either because the matching points-to sources found in ptl are 
-	 over-approximations of the preceding path of input_ref or because 
+         the result is exact, and to false if it is an approximation,
+	 either because the matching points-to sources found in ptl are
+	 over-approximations of the preceding path of input_ref or because
 	 the matching points-to have MAY approximation tag.
   @return a list of constant path effects. It is a list because at a given
           program point the cell may correspond to several constant paths.
 
 
-  original comment:	  
+  original comment:
   goal: see if cell c can be shortened by replacing its indirections
   by their values when they are defined in ptl. For instance, p[0][0]
   and (p,q,EXACT) is reduced to q[0]. And if (q,i,EXACT) is also
@@ -219,11 +229,11 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
   points-to list. (BC)
 
   This function is called by effects to see if a convex memory access path
-  can be transformed into a constant one. 
+  can be transformed into a constant one.
 */
 list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact_p, transformer current_precondition)
 {
-  
+
   return generic_eval_cell_with_points_to(c, d, ptl, exact_p, current_precondition,
 					  convex_cell_reference_preceding_p,
 					  convex_cell_reference_with_address_of_cell_reference_translation,
