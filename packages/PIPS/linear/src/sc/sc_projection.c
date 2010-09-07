@@ -601,7 +601,7 @@ int ofl_ctrl;
 
       ifscdebug(5) {
 	fprintf(stderr,"\n[sc_fourier_motzkin_variable_elimination_ofl_ctr] overflow or timeoutl!!!\n");}
-      
+
 #ifdef FILTERING
       alarm(0);
 #endif
@@ -614,13 +614,13 @@ int ofl_ctrl;
 	/*return FALSE means system non feasible. return TRUE, mean ok => both wrong		*/
       }
     }
-    TRY 
+    TRY
     {
-      Pcontrainte pc = sc->inegalites;
+      Pcontrainte volatile pc = sc->inegalites;
 #ifdef FILTERING
-	signal(SIGALRM, catch_alarm_projection);   
+	signal(SIGALRM, catch_alarm_projection);
 	alarm(FILTERING_TIMEOUT_PROJECTION);
-#endif      
+#endif
     if (integer_test_p) sc1 = sc_copy(sc);
 
     pos = neg = nul = NULL;
