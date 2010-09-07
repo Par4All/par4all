@@ -22,16 +22,37 @@
 
 */
 
-/* Version "abort" de l'assert de /usr/include/assert.h 
- * Il est installe dans Linear de maniere a masquer /usr/include/assert.h
+/* "abort" version of "/usr/include/assert.h", and assert with a message.
+ * breakpoint on abort() to catch an issue.
+ * put here so as to mask the "/usr/include" version.
  *
  * You need an include of <stdio.h> and <stdlib.h> to use it.
  */
 
-# ifndef NDEBUG
-# define _assert(ex)	{if (!(ex)){(void)fprintf(stderr,"Assertion failed: file \"%s\", line %d\n", __FILE__, __LINE__);(void) abort();}}
-# define assert(ex)	_assert(ex)
-# else
-# define _assert(ex)
-# define assert(ex)
-# endif
+#ifdef __GNUC__
+#define _linear_assert_message                                          \
+  "[%s] (%s:%d) assertion failed\n", __FUNCTION__, __FILE__, __LINE__
+#else
+#define _linear_assert_message                          \
+  "Assertion failed (%s:%d)\n", __FILE__, __LINE__
+#endif
+
+#undef assert
+#ifdef NDEBUG
+#define assert(ex)
+#define linear_assert(msg, ex)
+#else
+#define assert(ex) {                                            \
+    if (!(ex)) {                                                \
+      (void) fprintf(stderr, _linear_assert_message);           \
+      (void) abort();                                           \
+    }                                                           \
+  }
+#define linear_assert(msg, ex) {								\
+    if (!(ex)) {                                                \
+      (void) fprintf(stderr, _linear_assert_message);           \
+      (void) fprintf(stderr, "\n %s not verified\n\n", msg);    \
+      (void) abort();                                           \
+    }                                                           \
+  }
+#endif /* NDEBUG */
