@@ -1958,7 +1958,7 @@ static void ProcessEntry(
      */
     /* By default we use the controlizer that is activated according to
        pipsmake... */
-    bool use_new_controlizer_p = active_phase_p(BUILDER_CONTROLIZER);
+    bool use_new_controlizer_p = active_phase_p(BUILDER_NEW_CONTROLIZER);
     /* ...but we can change it according to special environment variables if
        they are defined: */
     use_new_controlizer_p |=
