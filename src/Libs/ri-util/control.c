@@ -912,13 +912,17 @@ remove_a_control_from_a_list_and_relink(control c,
    The control node is freed and its predecessors are relinked to its
    successor and relink the successor and the predecessor.
 
-   @param c is the control node to unlink and to free
+   If you want to preserve the control statement, do a
+   control_statement(c) = statement_undefined
+   before calling this function.
+
+   @param[in,out] c is the control node to unlink and to free
 
    Assume that it cannot have more than 1 successor (so no test node)
 
-   If the graph is in an unstructured and @param c is either the entry or
+   If the graph is in an unstructured and @p c is either the entry or
    exit node, do not forget to update the entry or exit node.
-   */
+*/
 void
 remove_a_control_from_an_unstructured(control c)
 {

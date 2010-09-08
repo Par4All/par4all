@@ -1563,7 +1563,7 @@ expression make_constraint_expression(Pvecteur v, Variable index)
 }
 
 
-/*  A wrapper around make_contrainte_expression() for compatibility.
+/*  A wrapper around make_constraint_expression() for compatibility.
  */
 expression make_contrainte_expression(Pcontrainte pc, Variable index) {
   /* Simply call the function on the vector in the constrain system: */

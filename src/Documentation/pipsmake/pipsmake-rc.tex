@@ -31,6 +31,9 @@
 % Derivation rules and aliases must be included in verbatim environments.
 % Nothing else should appear in a verbatim environment.
 %
+% Some tourist information from the last century follows... Read the log
+% for fresh news instead!
+%
 % Modifications:
 %  - a dependence on MODULE.cumulated_effects for print_transformers and
 %    print_preconditions
@@ -82,6 +85,8 @@
 \usepackage{amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
+% For the smileys: :-)
+\usepackage{wasysym}
 \usepackage{graphicx,ifpdf}
 % Use classical figure extension if we are in classical LaTeX (instead of
 % pdflatex), necessary for TeX4ht (htlatex):
@@ -1739,7 +1744,32 @@ in the \Pri.
 %% in \externalref{section-code}.
 
 \begin{PipsPass}{controlizer}
-The \PipsPassRef{controlizer} removes \verb+GOTO+
+  The \PipsPassRef{controlizer} is the historical controlizer phase
+  that removes \verb+GOTO+ statements in the parsed code and generates a
+  similar representation with small CFGs.
+\end{PipsPass}
+
+The old controlizer phase was too hacked, undocumented to be improved and
+debugged for C99 code so a new zen version has been developed, documented
+and is designed to be simple and understandable. But for comparison the
+old controlizer phase can still be used.
+\begin{PipsMake}
+controlizer                     > MODULE.code
+        < PROGRAM.entities
+        < MODULE.parsed_code
+\end{PipsMake}
+
+For debugging and validation purpose, by setting \emph{at most} one of the
+\verb|PIPS_USE_OLD_CONTROLIZER| or \verb|PIPS_USE_NEW_CONTROLIZER|
+environment variables, you can force the use of one specific version of
+the controlizer you want.
+
+Note that this choice of controlizer has also some impacts on the HCFG
+computation of entry processing of Fortran too. If you do not know what
+Fortran entries are, it is deprecated stuff anyway... \smiley
+
+\begin{PipsPass}{new_controlizer}
+The \PipsPassRef{new_controlizer} removes \verb+GOTO+
 statements in the parsed code and generates a similar representation
 with small CFGs.
 \end{PipsPass}
@@ -1775,9 +1805,8 @@ transformations may well return any kind of top statement, most likely a
 \texttt{block}. This is no longer true. The top statement of a module may
 contain any kind of instruction.
 
-%Controlizer                     > MODULE.Controlizer_code
 \begin{PipsMake}
-controlizer                     > MODULE.code
+new_controlizer                     > MODULE.code
         < PROGRAM.entities
         < MODULE.parsed_code
 \end{PipsMake}
@@ -1787,7 +1816,7 @@ false branch of structured \verb/IF/. This semantic property of \Pri{}
 is enforced by libraries \verb/effects/,
 \verb/regions/, \verb/hpfc/, \verb/effects-generic/.
 
-\begin{PipsProp}{WARN_ABOUT_EMPTY_SEQUENCES} 
+\begin{PipsProp}{WARN_ABOUT_EMPTY_SEQUENCES}
 WARN_ABOUT_EMPTY_SEQUENCES FALSE
 \end{PipsProp}
 
@@ -1805,7 +1834,7 @@ transformation for C code. This property is set to false by default
 and should ultimately disappear. But for new user convenience, it is
 set to TRUE by \verb/activate_language()/ when the language is C.
 
-\begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER} 
+\begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER}
 FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 \end{PipsProp}
 
@@ -1817,7 +1846,7 @@ property is set to false by default and should disappear soon. But for
 new user convenience, it is set to TRUE by \verb/activate_language()/
 when the language is C.
 
-\begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER} 
+\begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER}
 FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 \end{PipsProp}
 
@@ -1846,7 +1875,7 @@ GATHER_FORMATS_AT_END FALSE
 \index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 To display the statistics about cleaning-up sequences and removing
 useless CONTINUE or empty statement.
-\begin{PipsProp}{CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS} 
+\begin{PipsProp}{CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS}
 CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
 \end{PipsProp}
 
@@ -1855,7 +1884,7 @@ There is a trade-off between keeping the comments associated to labels and
 goto and the cleaning that can be do on the control graph.
 
 By default, do not fuse empty control nodes that have labels or comments:
-\begin{PipsProp}{FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL} 
+\begin{PipsProp}{FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL}
 FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{PipsProp}
 
