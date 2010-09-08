@@ -346,14 +346,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                     break;
                 }
 
-                switch(basic_tag(bas))
-                {
-                    case is_basic_int: width = 8 * basic_int(bas); break;
-                    case is_basic_float: width = 8 * basic_float(bas); break;
-                    case is_basic_complex: width= 8 * basic_complex(bas); break;
-                    case is_basic_logical: width = 1; break;
-                    default: pips_user_error("basic %d not supported",basic_tag(bas));
-                }
+                width = SizeOfElements(bas);
                 free_basic(bas);
 
                 if(width > get_subwordSize_from_opcode(oc, count))
@@ -611,21 +604,17 @@ static string get_vect_name_from_data(int argc, list exps)
     {
         case is_basic_int:
             prefix[3] = 'i';
-            itemSize = 8 * basic_int(bas);
             break;
 
         case is_basic_float:
             prefix[3] = 'f';
-            itemSize = 8 * basic_float(bas);
             break;
 
         case is_basic_logical:
             prefix[3] = 'i';
-            itemSize = 8 * basic_logical(bas);
             break;
         case is_basic_complex:
             prefix[3] = 'c';
-            itemSize = 8 * basic_complex(bas);
             break;
 
         default:
@@ -633,6 +622,7 @@ static string get_vect_name_from_data(int argc, list exps)
             return strdup("");
             break;
     }
+    itemSize=8*SizeOfElements(bas);
     free_basic(bas);
 
     switch(itemSize)
@@ -641,6 +631,7 @@ static string get_vect_name_from_data(int argc, list exps)
         case 16: prefix[2] = 'h'; break;
         case 32: prefix[2] = 's'; break;
         case 64: prefix[2] = 'd'; break;
+        default:pips_internal_error("case not handled");
     }
 
     prefix[4] = 0;

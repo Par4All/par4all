@@ -42,7 +42,8 @@
 
 static bool variables_width_filter(reference r,int *g_varwidth)
 {
-   if (type_variable_p(entity_type(reference_variable(r))))
+    type ut = ultimate_type(entity_type(reference_variable(r)));
+   if (type_variable_p(ut))
    {
        basic b = basic_of_reference(r);
 
@@ -53,11 +54,11 @@ static bool variables_width_filter(reference r,int *g_varwidth)
        switch(basic_tag(b))
        {
            case is_basic_int:
-               width = basic_int(b);
+               width = SizeOfElements(b);
                break;
 
            case is_basic_float:
-               width = basic_float(b);
+               width = SizeOfElements(b);
                break;
 
                /*case is_basic_logical:

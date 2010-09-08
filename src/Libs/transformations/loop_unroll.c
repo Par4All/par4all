@@ -157,7 +157,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         loop il = instruction_loop(statement_instruction(loop_statement));
         range lr = loop_range(il);
         entity ind = loop_index(il);
-        basic indb = variable_basic(type_variable(entity_type(ind)));
+        basic indb = variable_basic(type_variable(ultimate_type(entity_type(ind))));
         expression lb = range_lower(lr),
                    ub = range_upper(lr),
                    inc = range_increment(lr);
