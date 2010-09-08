@@ -1094,6 +1094,8 @@
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
 #define CLOCK_FUNCTION_NAME            "clock"
+#define CLOCK_GETTIME_FUNCTION_NAME    "clock_gettime"
+#define GETTIMEOFDAY_FUNCTION_NAME    "gettimeofday"
 
 /* netdb.h */
 #define __H_ERRNO_LOCATION_OPERATOR_NAME "__h_erno_location"
