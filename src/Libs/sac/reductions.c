@@ -716,6 +716,17 @@ static void do_sac_reduction_optimizations(graph dg)
       statement_domain,gen_true,redundant_load_store_elimination_move_vectors);
 }
 
+static bool no_write_read_conflicts_p(list succs) {
+	FOREACH(SUCCESSOR, succ, succs) {
+		FOREACH(CONFLICT, c, dg_arc_label_conflicts(successor_arc_label(succ))) {
+			if (effect_write_p(conflict_source(c)) &&
+			    effect_read_p(conflict_sink(c)))
+				return false;
+		}
+	}
+	return true;
+}
+
 static void do_redundant_load_store_elimination(graph dg) {
   bool did_something ;
   set deleted_vertex = set_make(set_pointer);
@@ -723,12 +734,12 @@ static void do_redundant_load_store_elimination(graph dg) {
     did_something=false;
     statement deleted = statement_undefined;
     FOREACH(VERTEX,v,graph_vertices(dg) ) {
-      if(!set_belong_p(deleted_vertex,v) && ENDP(vertex_successors(v))) {
+      if(!set_belong_p(deleted_vertex,v) && no_write_read_conflicts_p(vertex_successors(v))) {
         statement s = vertex_to_statement(v);
         if(statement_call_p(s) && 
             !return_statement_p(s) &&
             !declaration_statement_p(s)) {
-          list out_effects = load_cumulated_rw_effects_list(get_current_module_statement());
+          list out_effects = load_cumulated_rw_effects_list(s /* get_current_module_statement() */);
           if(ENDP(out_effects)) {
             update_statement_instruction(s,make_continue_instruction());
             did_something=true;
