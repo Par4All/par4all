@@ -237,10 +237,12 @@ class Individual(object):
 			for i in range(0,self.args.get_time):
 				t=-1
 				while t<0:
-					subprocess.Popen(runner, stdout=file(os.devnull),stderr=subprocess.STDOUT).wait()
-					with open(workspace_gettime.STAMPFILE, "r") as f:
-						t = f.readline()
-					os.remove(workspace_gettime.STAMPFILE)
+					if subprocess.Popen(runner, stdout=file(os.devnull),stderr=subprocess.STDOUT).wait() == 0:
+						with open(workspace_gettime.STAMPFILE, "r") as f:
+							t = f.readline()
+						os.remove(workspace_gettime.STAMPFILE)
+					else:
+						raise Exception("Failed to run test, check your test file")
 				elapsed+=[int(t)]
 			elapsed.sort()
 			self.execution_time=elapsed[len(elapsed)/2]
@@ -591,9 +593,9 @@ def ParseCommandLine():
 	parser.add_option('--algo', default="genetic",type=str, help='search algorithm to use')
 	parser.add_option('--log', help='log file to save the best results')
 	parser.add_option('--gens', default=1, type=int, help='Number of generations for the genetic algorithm')
-	parser.add_option('--crossovers', default=1, type=int, help='Number of crossovers to perform each generation')
-	parser.add_option('--tournaments', default=3, type=int, help='Number of winners of a tournament for the genetic algorithm')
-	parser.add_option('--popsize', type=int, default=1,help='Number of individuals for the genetic algorithm')
+	#parser.add_option('--crossovers', default=1, type=int, help='Number of crossovers to perform each generation')
+	#parser.add_option('--tournaments', default=3, type=int, help='Number of winners of a tournament for the genetic algorithm')
+	parser.add_option('--popsize', type=int, default=4,help='Number of individuals for the genetic algorithm')
 	parser.add_option('--cppflags', default='', help='Optional added arguments to the compiler')
 	parser.add_option('--test',help='Optionnal arguments for benchmarking code',dest='test')
 	parser.add_option('--bench-iter', default=50,type=int, help='Number of iteration for benchmarking',dest="get_time")
