@@ -8630,10 +8630,12 @@ It is used as a preliminary phase to generate terapix assembly.
 alias array_to_pointer 'Array to pointer'
 
 array_to_pointer > MODULE.code
+                 > COMPILATION_UNIT.code
 				 > CALLERS.code
 		         > PROGRAM.entities
 		< PROGRAM.entities
 		< MODULE.code
+        < COMPILATION_UNIT.code
 		< CALLERS.code
 \end{PipsMake}
 

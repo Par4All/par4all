@@ -5175,6 +5175,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {MALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {ALLOCA_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
   {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
   {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},

@@ -895,6 +895,7 @@
 #define FREE_FUNCTION_NAME              "free"
 #define MALLOC_FUNCTION_NAME            "malloc"
 #define REALLOC_FUNCTION_NAME           "realloc"
+#define ALLOCA_FUNCTION_NAME            "alloca"
 #define ABORT_FUNCTION_NAME             "abort"
 #define ATEXIT_FUNCTION_NAME            "atexit"
 #define EXIT_FUNCTION_NAME              "exit"

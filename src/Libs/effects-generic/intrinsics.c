@@ -969,6 +969,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FREE_FUNCTION_NAME,                     any_heap_effects},
   {MALLOC_FUNCTION_NAME,                   any_heap_effects},
   {REALLOC_FUNCTION_NAME,                  any_heap_effects},
+  /* SG: I am setting an any_heap_effects for alloca, which is over pessimistic ... */
+  {ALLOCA_FUNCTION_NAME,                   any_heap_effects},
   {ABORT_FUNCTION_NAME,                    no_write_effects},
   {ATEXIT_FUNCTION_NAME,                   no_write_effects},
   {EXIT_FUNCTION_NAME,                     no_write_effects},
