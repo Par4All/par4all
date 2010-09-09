@@ -1,8 +1,5 @@
 /* There are some TODO !!! RK
 
-
-   Right now there is no longer a call to compact_list, so there are many
-   blocks.
  */
 
 
@@ -83,6 +80,10 @@ char vcid_control_controlizer[] = "$Id$";
    unstructured back instead of building correct unstructured statements
    from scratch or using some CODE dump-and-reparse as it is done in some
    PIPS phases (outliner...).
+
+   TODO: a zen-er version of the recursion that avoid passing along the
+   successor everywhere since we know at entry that it is the only
+   successor of the main control node.
 
    This is the new version of the controlizer version rewritten by
    Ronan.Keryell@hpc-project.com
@@ -438,94 +439,86 @@ static void create_statements_of_labels(statement st) {
 statement unsugared_loop_header(statement sl)
 {
   loop l = statement_loop(sl);
-  statement hs = statement_undefined;
-
-  expression i = make_entity_expression(loop_index(l), NIL);
-
-  hs = make_assign_statement(i, range_lower(loop_range(l)));
-  statement_number(hs) = statement_number(sl);
+  /* Build a reference expression to the loop index: */
+  expression i = entity_to_expression(loop_index(l));
+  /* Assign the lower range to it: */
+  statement hs = make_assign_statement(i, copy_expression(range_lower(loop_range(l))));
 
   return hs;
 }
 
+
+/* Do a crude test of end of do-loop for do-loop unsugaring.
+
+   TODO : indeed the code is wrong since it only works for loops without
+   side effects on the index inside the loop and if the stride is
+   positive, and the upper bound greated than the lower bound
+
+   @param[in] sl is a statement loop of the form "do i = l, u, s"
+
+   @return a test statement "if (i < u)" with empty then and else branches.
+*/
 statement unsugared_loop_test(statement sl)
 {
   loop l = statement_loop(sl);
-  statement ts = statement_undefined;
-  string cs = string_undefined;
-  call c = make_call(entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
-		     CONS(EXPRESSION,
-			  make_entity_expression(loop_index(l), NIL),
-			  CONS(EXPRESSION,
-			       range_upper(loop_range(l)),
-			       NIL)));
-  test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-				     normalized_undefined),
+  /* Build i < u */
+  call c = MakeBinaryCall(entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
+			  entity_to_expression(loop_index(l)),
+			  copy_expression(range_upper(loop_range(l))));
+  /* Build if (i < u) with empty branches: */
+  test t = make_test(call_to_expression(c),
 		     make_plain_continue_statement(),
 		     make_plain_continue_statement());
-  string csl = statement_comments(sl);
-  string prev_comm = empty_comments_p(csl)? /* empty_comments */ strdup("")  : strdup(csl);
-  string lab = string_undefined;
 
-  if(entity_empty_label_p(loop_label(l)))
-    lab = ""; // FI: to be replaced by a symbolic constant
-  else
-    lab = label_local_name(loop_label(l));
-
-  switch(get_prettyprint_language_tag()) {
-    case is_language_fortran:
-    case is_language_fortran95:
-      cs = strdup(concatenate(prev_comm,
-                              get_comment_sentinel(),
-                              "     DO loop ",
-                              lab,
-                              " with exit had to be desugared\n",
-                              NULL));
-      break;
-    case is_language_c:
-      cs = prev_comm;
-      break;
-    default:
-      pips_internal_error("This language is not handled !");
-      break;
-  }
-
-  ts = make_statement(entity_empty_label(),
-		      statement_number(sl),
-		      STATEMENT_ORDERING_UNDEFINED,
-		      cs,
-		      make_instruction(is_instruction_test, t),NIL,NULL,
-		      copy_extensions (statement_extensions(sl)));
+  statement ts = instruction_to_statement(make_instruction_test(t));
   return ts;
 }
 
+
+/* Do an index increment instruction for do-loop unsugaring.
+
+   TODO : indeed the code is wrong since it only works for loops without
+   side effects on the index inside the loop
+
+   @param[in] sl is a statement loop of the form "do i = l, u, s"
+
+   @return a "i = i + s" statement test "if (i < u)" with empty then and
+   else branches.
+*/
 statement unsugared_loop_inc(statement sl)
 {
   loop l = statement_loop(sl);
-  expression I = make_entity_expression(loop_index(l), NIL);
-  expression II = make_entity_expression(loop_index(l), NIL);
-  call c = make_call(entity_intrinsic(PLUS_OPERATOR_NAME), // Even for C code?
-		     CONS(EXPRESSION,
-			  I,
-			  CONS(EXPRESSION,
-			       range_increment(loop_range(l)),
-			       NIL)));
-  expression I_plus_one =
-    make_expression(make_syntax(is_syntax_call, c),
-		    normalized_undefined);
-  statement is = statement_undefined;
+  /* Build "i + s" */
+  call c = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+			  // Even for C code? To verify for pointers...
+			  entity_to_expression(loop_index(l)),
+			  entity_to_expression(range_increment(loop_range(l))));
+  /* Build "i = i +s" */
+  statement s = make_assign_statement(entity_to_expression(loop_index(l)),
+				      call_to_expression(c));
 
-  is = make_assign_statement(II, I_plus_one);
-  statement_number(is) = statement_number(sl);
-
-  return is;
+  return s;
 }
+
 
 /* @} */
 
-/* CONTROLIZE_LOOP computes in C_RES the control graph of the loop L (of
-   statement ST) with PREDecessor and SUCCessor. */
+/* Computes the control graph of a Fortran do-loop statement
 
+   @param[in,out] c_res is the entry control node with the do-loop
+   statement to controlize. If the do-loop has complex control code such
+   as some goto to outside, it is transformed into an equivalent control
+   graph.
+
+   @param[in,out] succ must be the control node successor of @p c_res that
+   will be the current end of the control node sequence and an exit node
+
+   @param[in,out] used_labels is a hash table mapping a label name to a
+   list of statements that use it, as their label or because it is a goto
+   to it
+
+   @return TRUE if the code is not a structured control.
+*/
 static bool controlize_loop(control c_res,
 			    control succ,
 			    hash_table used_labels)
@@ -551,7 +544,25 @@ static bool controlize_loop(control c_res,
      to succ node, we will have trouble to insert it later: */
   control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
   insert_control_in_arc(c_inc, c_body, succ);
-
+  /* TODO
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      cs = strdup(concatenate(prev_comm,
+                              get_comment_sentinel(),
+                              "     DO loop ",
+                              lab,
+                              " with exit had to be desugared\n",
+                              NULL));
+      break;
+    case is_language_c:
+      cs = prev_comm;
+      break;
+    default:
+      pips_internal_error("This language is not handled !");
+      break;
+  }
+  */
   /* Recurse by controlizing inside the loop: */
   bool controlized = controlize_statement(c_body, succ, loop_used_labels);
 
@@ -575,13 +586,17 @@ static bool controlize_loop(control c_res,
        replace the do-loop with a desugared version with an equivalent
        control graph. */
     /* Update the increment control node with the real computation: */
+    /* First remove the dummy statement added above: */
     free_statement(control_statement(c_inc));
+    /* And put "i = i + s" instead: */
     control_statement(c_inc) = unsugared_loop_inc(sl);
     /* Now build the desugared loop: */
-    /* We can replace the former loop statement by the new header: */
+    /* We can replace the former loop statement by the new header. That
+       means that all pragma, comment, extensions, label on the previous
+       loop stay on this. */
     control_statement(c_res) = unsugared_loop_header(sl);
-    /* Add the test between the header and the body that are already
-       connected: */
+    /* Add the continuation test between the header and the body that are
+       already connected: */
     control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
     insert_control_in_arc(c_test, c_res, c_body);
     /* Detach the increment node from the loop exit */
@@ -1489,7 +1504,7 @@ static bool controlize_call(control c_res,
    unstructured entry node.
 
    @param[in,out] succ is the successor control node of @p c_res at
-   entry. It may be no longer the case if for example the code is
+   entry. It may be no longer the case at exit if for example the code is
    unreachable or there is a goto to elsewhere in @p_res. @p succ can be
    seen as a potential unstructured exit node.
 
