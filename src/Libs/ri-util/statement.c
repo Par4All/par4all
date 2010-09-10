@@ -3081,7 +3081,7 @@ bool statement_with_pragma_p(statement s) {
   list exs = extensions_extension(statement_extensions(s));
   FOREACH(EXTENSION, ex, exs) {
     pragma pr = extension_pragma(ex);
-    if(pragma_string_p(pr))
+    if(pragma_string_p(pr) || pragma_expression_p (pr) || pragma_entity_p (pr))
       return true;
   }
   return false;
