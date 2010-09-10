@@ -1,0 +1,14 @@
+// OMP style
+int main()
+{
+   int b[size];
+   int i = 0;
+   int j = 0;
+
+l8787:
+#pragma omp parallel for
+   for(i = 0; i <= size-1; i += 1)
+      b[i] = 0;
+
+   return b[size-1];
+}
