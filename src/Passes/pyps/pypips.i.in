@@ -35,7 +35,9 @@
 %exception {
     CATCH(any_exception_error)
     {
-        SWIG_exception(SWIG_UnknownError,"pips user error");
+        SWIG_exception(SWIG_UnknownError,pyps_last_error);
+        free(pyps_last_error);
+        pyps_last_error=0;
     }
     TRY {
         $action

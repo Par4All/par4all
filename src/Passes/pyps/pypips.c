@@ -72,6 +72,36 @@ static void pyps_log_handler(const char *fmt, va_list args)
 	}
 	else fflush(log_file);
 }
+char * pyps_last_error = NULL;
+static void pyps_error_handler(const char * calling_function_name,
+                   const char * a_message_format,
+                   va_list *some_arguments)
+{
+    if(pyps_last_error) free(pyps_last_error);
+    char * tmp;
+    vasprintf(&tmp,a_message_format,*some_arguments);
+    asprintf(&pyps_last_error,"in %s: %s",calling_function_name,tmp);
+    free(tmp);
+
+   /* terminate PIPS request */
+   /* here is an issue: what if the user error was raised from properties */
+   if (get_bool_property("ABORT_ON_USER_ERROR")) 
+       abort();
+   else {
+      static int user_error_called = 0;
+
+      if (user_error_called > get_int_property("MAXIMUM_USER_ERROR")) {
+         (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
+         exit(1);
+      }
+      else {
+         user_error_called++;
+      }
+
+      /* throw according to linear exception stack! */
+      THROW(user_exception_error);
+   }
+}
 
 void atinit()
 {
@@ -79,6 +109,7 @@ void atinit()
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
     pips_log_handler = pyps_log_handler;
+    pips_error_handler = pyps_error_handler;
     set_exception_callbacks(push_pips_context, pop_pips_context);
 }
 
@@ -198,7 +229,8 @@ char* info(char * about)
 void apply(char * phasename, char * target)
 {
     if (!safe_apply(phasename,target)) {
-        pips_user_error("error in applying transformation %s to module %s\n", phasename, target);
+        if(!pyps_last_error) asprintf(&pyps_last_error,"phase %s on module %s failed" , phasename, target);
+        THROW(user_exception_error);
     }
 }
 
