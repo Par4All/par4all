@@ -57,7 +57,6 @@
 #include "text-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "preprocessor.h"
 
 #define REGION_FORESYS_PREFIX "C$REG"
 
