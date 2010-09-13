@@ -7,6 +7,7 @@ This module provide three ways of exploring the transformation space for a given
 """
 
 import os
+import re
 
 import tempfile
 import pdb
@@ -21,7 +22,7 @@ import shutil
 import ConfigParser
 from string import upper
 
-# must set this first
+# must set this first, it controls the number of pyro server that can be launched
 os.environ['PYRO_PORT_RANGE']='1000'
 import pyrops
 
@@ -39,9 +40,9 @@ class Transfo:
 		self.props = props
 
 	def __str__(self):
-		s= "".join([str(Property(prop, val)) for (prop, val) in self.props.items()]) +\
-				"transformation:"+self.transfo+" on module " + self.modname + "\n"
-		if self.loop:s+= "with loop:" + self.loop + "\n"
+		s= " ".join([str(Property(prop, val)) for (prop, val) in self.props.items()]) +\
+				" transformation:"+self.transfo+" on module " + self.modname
+		if self.loop:s+= " with loop:" + self.loop 
 		return s
 
 	def run(self,wsp):
@@ -63,7 +64,7 @@ class Property:
 		self.prop=prop.upper()
 		self.val=value
 
-	def __str__(self):return "property:{0} value:{1}\n".format(self.prop, self.val)
+	def __str__(self):return "property:{0} value:{1}".format(self.prop, self.val)
 
 	def run(self, workspace):
 		"""set the property on current workspace"""
@@ -77,13 +78,13 @@ class Property:
 		return cmp(self.__hash__(),other.__hash__())
 
 class Mutation:
-	"""a gene contains a transformation with associated properties
+	"""a mutation contains a transformation with associated properties
 	it represents a parametrized transformation on a module"""
 	def __init__(self,*codons):
 		self.codons=codons
 		
 	def run(self, wsp):
-		"""apply all the transformation in the gene on module `name'"""
+		"""apply all the transformation in the mutation on module `name'"""
 		[ x.run(wsp) for x in self.codons ] 
 
 	def __str__(self):
@@ -99,11 +100,11 @@ class Mutation:
 #
 
 def called(self):
-	callers=self.callers()
+	callers=self.callers
 	while callers:
 		caller=callers.pop()
 		if caller.name == "main": return True
-		else: callers+=caller.callers()
+		else: callers+=caller.callers
 	return self.name == "main"
 
 
@@ -118,40 +119,56 @@ class DummyGenerator(Generator):
 		self.properties = args
 	
 	def generate(self, individual):
-		genes = []
+		mutations = []
 		for module in individual.ws.fun:
 			if called(module):
-				genes.append( Mutation (Transfo(module.name, self.name, **self.properties)))
-		return genes
+				mutations.append( Mutation (Transfo(module.name, self.name, **self.properties)))
+		return mutations
 
 class UniqGenerator(DummyGenerator):
 	"""Generates a transformation that was not just applied"""
 	def generate(self, individual):
-		genes = []
+		mutations = []
 		for module in individual.ws.fun:
 			if called(module):
-				gene =Mutation (Transfo(module.name, self.name, **self.properties))
-				if not individual.genes or gene != individual.genes[-1]:
-					genes.append( gene )
-		return genes
+				mutation =Mutation (Transfo(module.name, self.name, **self.properties))
+				if not individual.mutations or mutation != individual.mutations[-1]:
+					mutations.append( mutation )
+		return mutations
 
 class LoopGenerator(DummyGenerator):
-	"""Generates an unroll transformation"""
+	"""Generates a parametrized loop transformation"""
 	def generate(self, individual):
-		genes = []
-		for m in individual.ws.fun:
-			if called(m):
-				loops=m.loops()
+		mutations = []
+		for module in individual.ws.fun:
+			if called(module):
+				loops=module.loops()
 				while loops:
 					loop = loops.pop()
+					#self.properties["LOOP_LABEL"]=loop.label
+					mutations.append(Mutation(Transfo(module.name, self.name, loop=loop.label, **self.properties)))
 					loops+=loop.loops()
-					genes.append(Mutation(Transfo(m.name, self.name, loop=loop.label, **self.properties)))
-		return genes
+		return mutations
+
+class ParallelLoopGenerator(Generator):
+	"""Generates a loop parallelization Transformation"""
+	def generate(self, individual):
+		mutations = []
+		for module in individual.ws.fun:
+			if called(module) and module.loops:
+				mutations.append(
+						Mutation(
+							Transfo(module.name, "privatize_module"),
+							Transfo(module.name, "coarse_grain_parallelization"),
+							Transfo(module.name, "ompify_code"),
+							)
+						)
+		return mutations
 
 class UnrollGenerator(Generator):
 	"""Generates an unroll transformation"""
 	def generate(self, individual):
-		genes = []
+		mutations = []
 		for m in individual.ws.fun:
 			if called(m):
 				loops=m.loops()
@@ -159,38 +176,38 @@ class UnrollGenerator(Generator):
 					loop = loops.pop()
 					loops+=loop.loops()
 					for r in [2,4,8]:
-						genes.append(Mutation(Transfo(m.name, "UNROLL", loop=loop.label, unroll_rate=r)))
-		return genes
+						mutations.append(Mutation(Transfo(m.name, "UNROLL", loop=loop.label, unroll_rate=r)))
+		return mutations
 
 class FusionGenerator(Generator):
 	"""Generates a loop fusion transformation"""
 	def generate(self, individual):
-		genes = []
+		mutations = []
 		for m in individual.ws.fun:
 			if called(m):
 				for l in m.loops()[:-1]:
-					genes.append(Mutation(Transfo(m.name, "FORCE_LOOP_FUSION", loop=l.label)))
-		return genes
+					mutations.append(Mutation(Transfo(m.name, "force_loop_fusion", loop=l.label)))
+		return mutations
 
 class UnfoldGenerator(Generator):
 	def generate(self, individual):
 		""" Otherwise let's lookup everything. """
-		genes = []
+		mutations = []
 		for module in individual.ws.fun:
-			if module.callees() and called(module):
-				genes.append(Mutation(Transfo(module.name, "UNFOLDING")))
-		return genes
+			if module.callees and called(module):
+				mutations.append(Mutation(Transfo(module.name, "unfolding")))
+		return mutations
 
 class InlineGenerator(Generator):
 	def generate(self, individual):
 		""" Otherwise let's lookup everything. """
-		genes = []
+		mutations = []
 		for module in individual.ws.fun:
 			if called(module):
-				for caller in module.callers():
-					genes.append(Mutation(Transfo(module.name, "INLINING", inlining_purge_labels=True,
+				for caller in module.callers:
+					mutations.append(Mutation(Transfo(module.name, "inlining", inlining_purge_labels=True,
 						inlining_callers=caller.name)))
-		return genes
+		return mutations
 
 #
 ##
@@ -206,7 +223,7 @@ def getwdir(sources):
 class Individual(object):
 	def __init__(self,args):
 		self.args=args
-		self.genes=[]
+		self.mutations=[]
 		self.execution_time=0
 		self.min_time = 0
 		self.max_time = 0
@@ -214,7 +231,7 @@ class Individual(object):
 
 		self.foutname="_".join([str(random.randint(0,1000000)) , os.path.basename(args.sources[0])])
 		# create workspace
-		self.ws= pyrops.pworkspace(self.args.sources, verbose=args.verbose,recoverInclude = True, parents = [workspace_gettime.workspace])
+		self.ws= pyrops.pworkspace(self.args.sources, verbose=args.verbose>1,recoverInclude = True, parents = [workspace_gettime.workspace])
 		self.ws.activate("MUST_REGIONS")
 		self.ws.activate("PRECONDITIONS_INTER_FULL")
 		self.ws.activate("TRANSFORMERS_INTER_FULL")
@@ -222,25 +239,33 @@ class Individual(object):
 		self.ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
 		self.ws.activate("REGION_CHAINS")
 
-		self.ws.set_property(RICEDG_STATISTICS_ALL_ARRAYS=True)
-		self.ws.set_property(C89_CODE_GENERATION=True)
-		self.ws.set_property(CONSTANT_PATH_EFFECTS=False)
+		self.ws.props.RICEDG_STATISTICS_ALL_ARRAYS=True
+		self.ws.props.C89_CODE_GENERATION=True
+		self.ws.props.CONSTANT_PATH_EFFECTS=False
+		self.ws.props.PRETTYPRINT_SEQUENTIAL_STYLE="seq"
 
-	def push(self,gene):
+	def push(self,mutation):
+		# as pointed out by eliott, we have to recompute this each time to ensure we always get the same labels
+		[ m.flag_loops() for m in self.ws.fun ]
 		try:
-			gene.run(self.ws)
-			self.genes.append(gene)
-		except:pass
+			if self.args.verbose: print "Running", str(mutation) , "...",
+			mutation.run(self.ws)
+			self.mutations.append(mutation)
+			if self.args.verbose: print "ok"
+		except RuntimeError as re:
+			if self.args.verbose:
+				print "disabled (reason is {0} )".format(re.args[0])
+			if self.args.debug:
+				print "Input code was:"
+				self.ws[mutation.codons[0].modname].display()
 
 	def rate(self):
 		if not self.execution_time :
 			wdir=os.sep.join([getwdir(self.args.sources),self.foutname])
-			self.ws.save(indir=wdir)
-			cflags=os.environ["PIPS_CPP_FLAGS"]+" -I. -O0 -w"
-
 			#random names in case several processes are running at the same time
 			randString = str(random.randint(0, 1000000)) + str(random.randint(0, 1000000))
-			exec_out = self.ws.compile(CC="gcc", CFLAGS=cflags,outdir=wdir,outfile="/tmp/" + randString + ".out")
+			cflags=os.environ["PIPS_CPP_FLAGS"]+" -I. -w"
+			exec_out = self.ws.compile(CC="gcc", CFLAGS=cflags,rep=wdir,outfile="/tmp/" + randString + ".out")
 			if self.args.test: runner = [self.args.test,exec_out]
 			else: runner = [exec_out]
 
@@ -255,7 +280,7 @@ class Individual(object):
 							t = f.readline()
 						os.remove(workspace_gettime.STAMPFILE)
 					else:
-						raise Exception("Failed to run test, check your test file")
+						raise Exception("Failed to run test, check your test file\nRun command was {0}".format(runner))
 				elapsed+=[int(t)]
 			elapsed.sort()
 			self.execution_time=elapsed[len(elapsed)/2]
@@ -265,8 +290,8 @@ class Individual(object):
 
 	def clone(self):
 		individual=Individual(self.args)
-		for igene in self.genes:
-			individual.push(igene)
+		for imutation in self.mutations:
+			individual.push(imutation)
 		return individual
 
 	def rip(self):
@@ -279,12 +304,12 @@ class Individual(object):
 		s+= " out:"+self.foutname+"\n"
 		s+= "workspace:"+self.ws.name+"\n"
 		s+= "execution time:" + str(self.execution_time) + " (min: {0}, max: {1})\n".format(self.min_time, self.max_time)
-		for t in self.genes:
+		for t in self.mutations:
 			s+=str(t)
 		return s
 
 	def __hash__(self):
-		return reduce(xor,[ x.__hash__() for x in self.genes ],42)
+		return reduce(xor,[ x.__hash__() for x in self.mutations ],42)
 
 	def __cmp__(self,other):
 		return cmp(self.__hash__(),other.__hash__())
@@ -301,6 +326,11 @@ class Algo(object):
 		eve=Individual(args)# we start with a dummy individual
 		eve.rate()
 		self.pool=set([eve])# who said eve was dummy ? because she eat the apple, may be ? 
+
+	def __enter__(self): return self
+	def __exit__(self,t,v,tb):
+		[ i.rip() for i in self.pool ]
+		return True
 	
 	def run(self):
 		# process nbgen generation
@@ -316,8 +346,7 @@ class Algo(object):
 		return self.sort()
 
 	def rate(self):
-		for individual in self.pool:
-			individual.rate()
+		[individual.rate() for individual in self.pool ]
 
 	def msg(self):
 		print "Step %d: best element score is '%d'" % (
@@ -333,13 +362,13 @@ class Full(Algo):
 	def populate(self):
 		newpool=set()
 		for individual in self.pool:
-			if len(individual.genes) == self.step:
-				geneCandidates=[]
+			if len(individual.mutations) == self.step:
+				mutationCandidates=[]
 				for generator in self.args.generators:
-					geneCandidates+=generator.generate(individual)
-				for gene in geneCandidates:
+					mutationCandidates+=generator.generate(individual)
+				for mutation in mutationCandidates:
 					newindividual=individual.clone()
-					newindividual.push(gene)
+					newindividual.push(mutation)
 					if newindividual in newpool or newindividual in self.pool:
 						newindividual.rip()
 					else: newpool.add(newindividual)
@@ -358,12 +387,12 @@ class Greedy(Algo):
 	def populate(self):
 		newpool=set()
 		for individual in self.pool:
-			geneCandidates=[]
+			mutationCandidates=[]
 			for generator in self.args.generators:
-				geneCandidates+=generator.generate(individual)
-			for gene in geneCandidates:
+				mutationCandidates+=generator.generate(individual)
+			for mutation in mutationCandidates:
 				newindividual=individual.clone()
-				newindividual.push(gene)
+				newindividual.push(mutation)
 				if newindividual in newpool or newindividual in self.pool:
 					newindividual.rip()
 				else: newpool.add(newindividual)
@@ -384,17 +413,24 @@ class Genetic(Algo):
 		super(Genetic,self).__init__(args)
 		# init population
 		adam=Individual(self.args)
-		geneCandidates=[]
+		self.pool.add(adam)
+		mutationCandidates=[]
+
 		for generator in self.args.generators:
-			geneCandidates+=generator.generate(adam)
-		random.shuffle(geneCandidates)
-		for gene in geneCandidates:
+			mutationCandidates+=generator.generate(adam)
+		random.shuffle(mutationCandidates)
+
+		for mutation in mutationCandidates:
 			individual=adam.clone()
-			individual.push(gene)
+			individual.push(mutation)
 			if individual in self.pool: individual.rip()
 			else: self.pool.add(individual)
 			if len(self.pool) == self.args.popsize:
 				break
+	
+		if len(self.pool) != self.args.popsize:
+			raise Exception("Not enough GeneCandidates, try to increase the number of generators")
+
 		self.rate()
 
 	def best_half(self,individuals):
@@ -406,30 +442,34 @@ class Genetic(Algo):
 			if not i1: return i0
 			# other cases
 			if i0.execution_time < i1.execution_time:
-				if self.args.verbose: print i0,"<<<<<<<<<<",i1
+				if self.args.verbose>1: print i0,"<<<<<<<<<<",i1
 				return i0
 			else:
-				if self.args.verbose: print i0,">>>>>>>>>>",i1
+				if self.args.verbose>1: print i0,">>>>>>>>>>",i1
 				return i1
 		return set(map(select_individual,half_individual,other_half_individual))
 
 	def populate(self):
 		# pick up 2*k elements to renew
-		renewed_individuals = set(random.sample(self.pool,2*self.args.renewal_rate))
+		try: renewed_individuals = set(random.sample(self.pool,2*self.args.renewal_rate))
+		except :
+			print "Sample size is {0} and popsize is {1} (should be {2})".format(2*self.args.renewal_rate,len(self.pool),self.args.popsize)
+			raise
+
 		# make a tournament to keep only k
 		best_individuals=self.best_half(renewed_individuals)
 
 		# make them mutate
 		self.newpool=set()
 		for individual in best_individuals:
-			geneCandidates=[]
+			mutationCandidates=[]
 			for generator in self.args.generators:
-				geneCandidates+=generator.generate(individual)
-			# add a random gene among the existing one
-			random.shuffle(geneCandidates) 
-			for gene in geneCandidates:
+				mutationCandidates+=generator.generate(individual)
+			# add a random mutation among the existing one
+			random.shuffle(mutationCandidates) 
+			for mutation in mutationCandidates:
 				newindividual=individual.clone()
-				newindividual.push(gene)
+				newindividual.push(mutation)
 				if newindividual in self.newpool or newindividual in self.pool:
 					newindividual.rip()
 				else:
@@ -439,11 +479,11 @@ class Genetic(Algo):
 
 	def select(self):
 		tmp=self.sort()
-		baddies=tmp[self.args.renewal_rate-self.args.popsize:]
+		baddies=tmp[self.args.popsize-self.args.renewal_rate:]
 		goodies=tmp[0:self.args.popsize-self.args.renewal_rate]
-		#[ i.rip() for i in baddies ]
+		[ i.rip() for i in baddies ]
 		self.pool=set(goodies)
-		self.pool.update(self.newpool)
+		self.pool|=self.newpool
 		if len(self.pool) != self.args.popsize:
 			raise Exception("Population size invariant changed from {1} to {0}".format(len(self.pool),self.args.popsize))
 	
@@ -471,7 +511,7 @@ class UnitTest:
 		eve=Individual(self.args)
 		try:
 			if adam.__hash__() != eve.__hash__():
-				raise Exception("Individual with no genes have different hash")
+				raise Exception("Individual with no mutations have different hash")
 		finally:
 			adam.rip()
 			eve.rip()
@@ -483,28 +523,28 @@ class UnitTest:
 		if t0.__hash__() != t1.__hash__():
 			raise Exception("Transformations with same parameters have different hash")
 	
-	def check_gene_hash(self):
-		""" check if two gene with same arg have same hash """
+	def check_mutation_hash(self):
+		""" check if two mutation with same arg have same hash """
 		g0=Mutation(Transfo("main", "UNFOLDING"))
 		g1=Mutation(Transfo("main", "UNFOLDING"))
 		if g0.__hash__() != g1.__hash__():
 			raise Exception("Mutations with same parameters have different hash")
 
 	def check_grownup_hash(self):
-		""" check if two individuals with one same gene have similar hashes"""
+		""" check if two individuals with one same mutation have similar hashes"""
 		adam=Individual(self.args)
 		eve=Individual(self.args)
 		adam.push(Mutation(Transfo("main", "UNFOLDING")))
 		eve.push(Mutation(Transfo("main", "UNFOLDING")))
 		try:
 			if adam.__hash__() != eve.__hash__():
-				raise Exception("Individual with same genes have different hash")
+				raise Exception("Individual with same mutations have different hash")
 		finally:
 			adam.rip()
 			eve.rip()
 	
 	def check_grownup_hash2(self):
-		""" check if two individuals with the very same gene have similar hashes"""
+		""" check if two individuals with the very same mutation have similar hashes"""
 		adam=Individual(self.args)
 		eve=Individual(self.args)
 		g0=Mutation(Transfo("main", "UNFOLDING"))
@@ -512,13 +552,13 @@ class UnitTest:
 		eve.push(g0)
 		try:
 			if adam.__hash__() != eve.__hash__():
-				raise Exception("Individual with same genes have different hash")
+				raise Exception("Individual with same mutations have different hash")
 		finally:
 			adam.rip()
 			eve.rip()
 
 	def check_set_behavior(self):
-		""" check if two individuals with one same gene can be inserted in the same set"""
+		""" check if two individuals with one same mutation can be inserted in the same set"""
 		adam=Individual(self.args)
 		eve=Individual(self.args)
 		adam.push(Mutation(Transfo("main", "UNFOLDING")))
@@ -527,7 +567,7 @@ class UnitTest:
 		paradise.add(adam)
 		try:
 			if adam.__hash__() != eve.__hash__():
-				raise Exception("Individual with same genes have different hash")
+				raise Exception("Individual with same mutations have different hash")
 			if eve not in paradise:
 				raise Exception("Individual with same hash can go in the same set")
 		finally:
@@ -539,13 +579,13 @@ class UnitTest:
 		adam=Individual(self.args)
 		adam.push(Mutation(Transfo("main","UNFOLDING")))
 		eve=adam.clone()
-		for gene in adam.genes:eve.push(gene)
+		for mutation in adam.mutations:eve.push(mutation)
 		eve.push(Mutation(Transfo("main","FLATTEN_CODE")))
 		baby=eve.clone()
-		for gene in eve.genes:baby.push(gene)
-		genes=FusionGenerator().generate(baby)
-		for g in genes: print str(g)
-		baby.push(genes[1])
+		for mutation in eve.mutations:baby.push(mutation)
+		mutations=FusionGenerator().generate(baby)
+		for g in mutations: print str(g)
+		baby.push(mutations[1])
 		baby.ws.fun.main.display()
 		sys.exit(2)
 
@@ -564,6 +604,7 @@ def ParseConfigFile(args):
 			"unroll":UnrollGenerator(),
 			"unfold":UnfoldGenerator(),
 			"fusion":FusionGenerator(),
+			"loop_parallelisation":ParallelLoopGenerator()
 			}
 	
 	try:
@@ -621,13 +662,14 @@ def ParseCommandLine():
 	#parser.add_option('--tournaments', default=3, type=int, help='Number of winners of a tournament for the genetic algorithm')
 	parser.add_option('--popsize', type=int, default=4,help='Number of individuals for the genetic algorithm')
 	parser.add_option('--renewal-rate', type=int, default=1,help='Number of individual to renew at each step',dest="renewal_rate")
-	parser.add_option('--cppflags', default='', help='Optional added arguments to the compiler')
-	parser.add_option('--test',help='Optionnal arguments for benchmarking code',dest='test')
+	parser.add_option('--flags', default='-O0', help='Optional added arguments to the compiler')
+	parser.add_option('--test',help='Optionnal test script for benchmarking code',dest='test')
 	parser.add_option('--bench-iter', default=50,type=int, help='Number of iteration for benchmarking',dest="get_time")
 	parser.add_option('--unit-test', action="store_true", help='perform some unit test',dest="unit_test")
 	parser.add_option('--out', help='directory to store result in')
 	parser.add_option('--blork', action="store_true", help='Leave a real mess of temporary files, usefull for debug')
-	parser.add_option('-v', action="store_true", help='be very talkative',dest="verbose")
+	parser.add_option('-v', action="count", help='be very talkative',dest="verbose")
+	parser.add_option('--debug', action="store_true", help='turn on debug messages')
 	
 	(args, files) = parser.parse_args()
 	args.sources = files
@@ -651,7 +693,7 @@ def ParseCommandLine():
 
 	if 2*args.renewal_rate > args.popsize:
 		print "Warning, renewal rate greater than half the population size, adjusting"
-		args.renewal_rate = args.popsize / 2
+		args.renewal_rate = args.popsize /2
 
 	if args.out:
 		outdir=args.out
@@ -671,7 +713,7 @@ def ParseCommandLine():
 	if args.log:
 		args.log = open(args.log, 'w')
 
-	os.environ["PIPS_CPP_FLAGS"]=args.cppflags
+	os.environ["PIPS_CPP_FLAGS"]=args.flags
 
 	ParseConfigFile(args)
 	return args
@@ -691,7 +733,8 @@ def pypsearch():
 	# launch algo
 	results=[]
 	print "Running %s algorithm" %  args.algo.__name__
-	results=args.algo(args).run()
+	with args.algo(args) as algo:
+		results=algo.run()
 	print "Best element in {0} with score {1}".format(args.out,results[0].execution_time)
 
 	
