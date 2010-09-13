@@ -83,7 +83,7 @@ entity first_array;  /* le tableau en entree */
 
 /* J'ai ameliore la fonction make_new_scalar_variable */
 /* afin de l'etendre  a des tableau   */
-static entity make_new_array_variable(int i, int j, entity module,
+static entity internal_make_new_array_variable(int i, int j, entity module,
                          basic b,list lis)
 {
   char *buffer;
@@ -724,7 +724,7 @@ static statement fusion_buffer()
 					    Value_to_expression( sequen[i].surface) );
 	  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
 										      (sequen[i].surface,VALUE_ONE))), NIL);
-	  name= make_new_array_variable(i+1,-1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	  name= internal_make_new_array_variable(i+1,-1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
 	  
 	  lis =CONS(EXPRESSION, exp, NIL);
 	  ref=make_reference(name,lis);
@@ -1441,7 +1441,7 @@ statement Tiling_buffer_allocation ()
 		}
 	      
 	   
-	      name= make_new_array_variable(i+1,j,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	      name= internal_make_new_array_variable(i+1,j,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
 	      buf_ref[i][j-1]=make_reference(name,lis1);
 	      ref[i][j-1]=name;
               scopy[i][j-1]=copy_statement(sequen[i].s);
@@ -1486,7 +1486,7 @@ statement Tiling_buffer_allocation ()
 	      
 	      lis1 =CONS(EXPRESSION, exp,lis1);
 	    }
-	  name= make_new_array_variable(i+1,depth+1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	  name= internal_make_new_array_variable(i+1,depth+1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
 	  buf_ref[i][depth]=make_reference(name,lis1);
 	  ref[i][depth]=name;
 	  scopy[i][depth]=copy_statement(sequen[i].s);
