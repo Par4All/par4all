@@ -317,6 +317,7 @@ static bool covers_labels_p(statement st,
 }
 
 
+#if 0
 /* Register globally a relation between a label and a statement.
 
    It marks the statement as related to a label at the global module level
@@ -354,6 +355,7 @@ static void init_label(string name, statement st) {
     }
   }
 }
+#endif
 
 
 /* Update the global module-level Label_statements table according to the
@@ -993,7 +995,6 @@ hash_table used_labels;
   return(controlized);
 }
 
-#endif
 /* Move all the declarations found in a list of control to a given
    statement
 
@@ -1080,6 +1081,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
     }, old_to_new_variables);
   hash_table_free(old_to_new_variables);
 }
+#endif
 
 
 /* Computes the control graph of a sequence statement

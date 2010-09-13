@@ -59,6 +59,11 @@ static void simplify_subscript(subscript ss)
     }
 }
 
+static void do_simplify_subscripts(statement s) {
+    gen_recurse(s,
+            subscript_domain,gen_true,simplify_subscript);
+}
+
 /* atomize subscript expressions so that thay can be reprsetned as references*/
 bool simplify_subscripts(string module_name)
 {
@@ -67,8 +72,7 @@ bool simplify_subscripts(string module_name)
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
     /* do the job */
-    gen_recurse(get_current_module_statement(),
-            subscript_domain,gen_true,simplify_subscript);
+    do_simplify_subscripts(get_current_module_statement());
 
     /* validate */
     module_reorder(get_current_module_statement());

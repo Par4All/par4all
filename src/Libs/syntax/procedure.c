@@ -48,6 +48,7 @@
 
 /* To be able to test which controlizer is currently used: */
 #include "phases.h"
+#include "pipsmake.h"
 
 #include "syn_yacc.h"
 
