@@ -400,19 +400,6 @@ bool normalize_microcode( char * module_name)
     return true || can_terapixify;
 }
 
-/**
- * have a look to the pipsmake-rc description
- * basically call kernelize then outlining
- *
- * @param module_name name of the module
- *
- * @return true
- */
-bool terapixify(__attribute__((unused)) char * module_name)
-{
-    return true; /* everything is done in pipsmake-rc */
-}
-
 /** 
  * 
  * 
