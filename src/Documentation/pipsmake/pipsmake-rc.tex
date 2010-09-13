@@ -1960,6 +1960,16 @@ PREPEND_CALL "MY_TRACK"
 but it is not.
 
 
+\begin{PipsPass}{remove_useless_label}
+Remove labels that are not usefull
+\end{PipsPass}
+\begin{PipsMake}
+remove_useless_label > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
 \chapter{Analyses}
@@ -3506,6 +3516,7 @@ preconditions_inter_full        > MODULE.preconditions
 By default, summary preconditions are computed intraprocedurally. The
 interprocedural option must be explicitly activated.
 
+\begin{PipsPass}{interprocedural_summary_precondition}
 An interprocedural summary precondition for a module is derived from all
 its call sites. Of course, preconditions must be known for all its
 callers' statements.  The summary precondition is the convex hull of all
@@ -3517,6 +3528,7 @@ memory location. To avoid the problem, the current summary precondition is
 always translated into the {\em caller}'s frame. So each module must first
 translate its summary precondition, when receiving it from the resource
 manager ({\em pipsdbm}) before using it.
+\end{PipsPass}
 
 Note: the previous algorithm was based on a on-the-fly reduction by
 convex hull. Each time a call site was encountered while computing a
@@ -6660,6 +6672,7 @@ kernel_load_store	> CALLERS.code
 		< PROGRAM.kernels
 		< CALLERS.code
    		< CALLERS.cumulated_effects
+        < CALLERS.preconditions
 \end{PipsMake}
 
 The following properties can be used to customized the allocate/load/store
@@ -6689,6 +6702,19 @@ Enable/disable the scalar handling by kernel load store.
 \begin{PipsProp}{KERNEL_LOAD_STORE_SCALAR}
 KERNEL_LOAD_STORE_SCALAR FALSE
 \end{PipsProp}
+
+\begin{PipsPass}{kernel_load_store_fine_grain}
+Same as \PipsPassRef{kernel_load_store} but region-based.
+\end{PipsPass}
+\begin{PipsMake}
+kernel_load_store_fine_grain	> CALLERS.code
+		> CALLERS.callees
+		> PROGRAM.kernels
+		< PROGRAM.kernels
+		< CALLERS.code
+   		< CALLERS.regions
+        < CALLERS.preconditions
+\end{PipsMake}
 
 \begin{PipsPass}{kernelize}
 Split a parallel loop with a local index into three parts: a host side
