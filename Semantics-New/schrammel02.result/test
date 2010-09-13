@@ -1,0 +1,95 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(x1,x2,y) {}
+
+   int x1, y, x2;
+
+//  T() {0<=x1, x1<=x2, x2<=1}
+
+   0<=x1&&x1<=x2&&x2<=1?(void) 0:__assert_fail("0<=x1 && x1<=x2 && x2<=1", "./schrammel02.c", 8, (const char *) 0);
+
+//  T(y) {0<=x1, x1<=x2, x2<=1}
+
+   y = foo();
+
+//  T(x1,x2,y) {0<=x1, x1#init+x2<=x1+x2#init,
+//    2x1+3x2#init<=2x1#init+3x2, x1#init+x2+y#init<=x1+x2#init+y,
+//    2x1+3x2#init+y<=2x1#init+3x2+y#init, x2<=x1+1, x1+x2<=4,
+//    5x1<=7x2, 0<=x1#init, x1#init<=x2#init, x1#init+x2#init<=4,
+//    x2#init<=1, 1<=y, y<=2, 1<=y#init, y#init<=2}
+
+   while (x1+x2<=4&&1<=y&&y<=2) {
+
+//  T(x1) {x1#init+2y==x1+1, x1#init+x2<=4, 1<=y, y<=2}
+
+      x1 = x1+2*y-1;
+
+//  T(x2) {x2#init+y==x2, x1+x2#init<=2y+3, 1<=y, y<=2}
+
+      x2 = x2+y;
+
+//  T(y) {x1+x2<=3y#init+3, 1<=y#init, y#init<=2}
+
+      y = foo();
+   }
+
+//  T(y) {y==y#init, 0<=x1, x2<=2x1+6, x2<=x1+1, 2x2<=x1+4, x1<=2x2,
+//    x1+x2<=9, 2x1<=3x2, 2x1<=x2+12, 4x1<=5x2+6, 5x1<=7x2+1, 0<=x2,
+//    x2<=6}
+
+   // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
+   y = y;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int x1, y, x2;
+
+//  P(x1,x2,y) {}
+
+   0<=x1&&x1<=x2&&x2<=1?(void) 0:__assert_fail("0<=x1 && x1<=x2 && x2<=1", "./schrammel02.c", 8, (const char *) 0);
+
+//  P(x1,x2,y) {0<=x1, x1<=x2, x2<=1}
+
+   y = foo();
+
+//  P(x1,x2,y) {0<=x1, x1<=x2, x2<=1}
+
+   while (x1+x2<=4&&1<=y&&y<=2) {
+
+//  P(x1,x2,y) {0<=x1, x2<=x1+1, x1+x2<=4, 5x1<=7x2, 1<=y, y<=2}
+
+      x1 = x1+2*y-1;
+
+//  P(x1,x2,y) {x2+2y<=x1+2, x1+x2<=2y+3, 5x1+5<=7x2+10y, 2y<=x1+1,
+//    1<=y, y<=2}
+
+      x2 = x2+y;
+
+//  P(x1,x2,y) {x2+y<=x1+2, x1+x2<=3y+3, 5x1+5<=7x2+3y, 2y<=x1+1,
+//    1<=y, y<=2}
+
+      y = foo();
+   }
+
+//  P(x1,x2,y) {0<=x1, x2<=x1+1, 2x2<=x1+4, x1+x2<=9, 2x1<=3x2,
+//    5x1<=7x2+1}
+
+   // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
+   y = y;
+}
