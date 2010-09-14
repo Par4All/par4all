@@ -2827,33 +2827,14 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
          */
         case is_syntax_reference:
             {
-                if( syntax_reference_p(starget) ||
-                        ( syntax_call_p(starget) && call_constant_p(syntax_call(starget))) ||
-                        syntax_sizeofexpression_p(starget) ||
-                        syntax_subscript_p(starget)
-                  )
-                {
-                    reference r = syntax_reference(spattern);
-                    /* simple variable */
-                    if(ENDP(reference_indices(r)))
-                    {
-
-                        expression val = hash_get(symbols,entity_name(reference_variable(r)));
-                        if ( val == HASH_UNDEFINED_VALUE )
-                            hash_put(symbols,entity_name(reference_variable(r)), target);
-                        else
-                            similar = syntax_equal_p(expression_syntax(val),starget);
-                    }
-                    else
-                    {
-                        pips_user_warning("arrays are not supported in expression_similar\n");
-                        similar=false;
-                    }
-                }
-                else
-                {
-                    similar=false;
-                }
+		    reference r = syntax_reference(spattern);
+		    /* scalar reference always matches. allows to match
+		     * malloc(a) with more complex expressions like malloc(1 +
+		     * strlen("...")). Interferes incorrectly with commutativity. */
+		    if (! expression_scalar_p(pattern))
+			    similar = false;
+		    else
+			    hash_put(symbols,entity_name(reference_variable(r)), target);
             } break;
             /* recursively compare each arguments if call do not differ */
         case is_syntax_call:
