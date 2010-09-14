@@ -464,11 +464,11 @@ statement unsugared_loop_test(statement sl)
 {
   loop l = statement_loop(sl);
   /* Build i < u */
-  call c = MakeBinaryCall(entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
+  expression c = MakeBinaryCall(entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
 			  entity_to_expression(loop_index(l)),
 			  copy_expression(range_upper(loop_range(l))));
   /* Build if (i < u) with empty branches: */
-  test t = make_test(call_to_expression(c),
+  test t = make_test(c,
 		     make_plain_continue_statement(),
 		     make_plain_continue_statement());
 
@@ -491,13 +491,13 @@ statement unsugared_loop_inc(statement sl)
 {
   loop l = statement_loop(sl);
   /* Build "i + s" */
-  call c = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+  expression c = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			  // Even for C code? To verify for pointers...
 			  entity_to_expression(loop_index(l)),
-			  entity_to_expression(range_increment(loop_range(l))));
+			  copy_expression(range_increment(loop_range(l))));
   /* Build "i = i +s" */
   statement s = make_assign_statement(entity_to_expression(loop_index(l)),
-				      call_to_expression(c));
+				      c);
 
   return s;
 }
