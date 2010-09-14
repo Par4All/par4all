@@ -392,7 +392,7 @@ entity get_function_entity(string name)
  * @return an expression of the offset, in octets
  */
 static
-expression reference_offset(const reference r)
+expression reference_offset(const reference r, basic refbasic)
 {
     if( ENDP(reference_indices(r)) ) return int_to_expression(0);
     else {
@@ -425,8 +425,8 @@ expression reference_offset(const reference r)
         }
         gen_free_list(indices);
         expression result = make_op_exp(MULTIPLY_OPERATOR_NAME,
-                int_to_expression(SizeOfElements(variable_basic(type_variable(entity_type(reference_variable(r)))))),
-                offset);
+					int_to_expression(SizeOfElements(refbasic)),
+					offset);
         return result;
     }
 }
@@ -503,9 +503,13 @@ expression distance_between_expression(const expression exp0, const expression e
             }
             reference fake0 = make_reference(e0,indices0),
                       fake1 = make_reference(e1,indices1);
-            expression offset0 = reference_offset(fake0),
-                       offset1 = reference_offset(fake1);
+	    basic b0 = basic_of_reference(r0),
+		    b1 = basic_of_reference(r1);
+            expression offset0 = reference_offset(fake0, basic_of_reference(r0)),
+                       offset1 = reference_offset(fake1, basic_of_reference(r1));
             expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
+	    free_basic(b0);
+	    free_basic(b1);
             free_reference(fake0);
             free_reference(fake1);
 
