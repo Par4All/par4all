@@ -570,7 +570,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
      */
     if (statement_block_p(s))
     {
-	graph dependence_graph = sc->dg;
+        graph dependence_graph = sc->dg;
         sac_current_block=s;
         /* we cannot handle anything but sequence of calls */
         list iter = statement_block(s);
@@ -615,7 +615,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
                             {
                                 new_seq=gen_append(new_seq,simdseq);
                                 gen_free_list(seq);
-				sc->result |= true;
+                                sc->result |= true;
                             }
 
                             free_statement_matches_map();
@@ -662,6 +662,7 @@ string sac_commenter(entity e)
 }
 
 
+
 /*
  * main entry function
  * basically run `simdize_simple_statements' on all sequences
@@ -684,8 +685,8 @@ bool simdizer(char * mod_name)
     init_padding_entities();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
-    /* Now do the job */
 
+    /* Now do the job */
     gen_context_recurse(mod_stmt, &sc, statement_domain,
             simd_simple_sequence_filter, simdize_simple_statements);
 
@@ -760,15 +761,48 @@ static void do_simdizer_init(call c)
 #undef SWAP_ARGUMENTS
 #undef NOSWAP_ARGUMENTS
 }
+static void do_split_block_statements(statement s) {
+    if(statement_block_p(s)) {
+        list blocks = NIL;
+        list iter=statement_block(s);
+        while(!ENDP(iter)) {
+            list curr = NIL;
+            while(!ENDP(iter)) {
+                statement st = STATEMENT(CAR(iter));
+                POP(iter);
+                if(entity_empty_label_p(statement_label(st)) ) {
+                    if(!ENDP(curr)) 
+                        blocks=CONS(STATEMENT,make_block_statement(curr),blocks);
+                    blocks=CONS(STATEMENT,st,blocks);
+                    break;
+                }
+                else
+                    curr=CONS(STATEMENT,st,curr);
+            }
+            curr=gen_nreverse(curr);
+            if(ENDP(iter) && !ENDP(curr)) {
+                blocks=CONS(STATEMENT,make_block_statement(curr),blocks);
+            }
+        }
+        gen_free_list(sequence_statements(statement_sequence(s)));
+        sequence_statements(statement_sequence(s))=NIL;
+        sequence_statements(statement_sequence(s))=gen_nreverse(blocks);
+    }
+}
 bool simdizer_init(const char * module_name)
 {
     /* get the resources */
     set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, true));
     set_current_module_entity(module_name_to_entity(module_name));
 
+    /* first split blocks containing labeled statement */
+    gen_recurse(get_current_module_statement(), statement_domain,
+            gen_true, do_split_block_statements);
+
     /* sort commutative operators */
     gen_recurse(get_current_module_statement(),call_domain,gen_true,do_simdizer_init);
 
+    module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
     /* reset */
