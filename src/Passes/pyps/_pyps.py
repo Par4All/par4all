@@ -200,27 +200,28 @@ class workspace(object):
 		exist.
 		"""
 
-	def __init__(self,sources2,name="",verbose=True,cppflags='', parents=[], cpypips = None, recoverInclude=True,deleteOnClose=True):
+	def __init__(self, sources, **kwargs):
+		"""init a workspace from a list of sources"""
 
-		kwargs = {'name':name, 'verbose':verbose, 'cppflags':cppflags, 'parents':parents, 'recoverInclude':recoverInclude, 'deleteOnClose':deleteOnClose }
+		name		   = kwargs.setdefault("name", "")
+		activates	   = kwargs.setdefault("activates", [])
+		verbose		   = kwargs.setdefault("verbose", True)
+		cppflags	   = kwargs.setdefault("cppflags", "")
+		parents		   = kwargs.setdefault("parents", [])
+		cpypips		   = kwargs.setdefault("cpypips", pypips)
+		recoverInclude = kwargs.setdefault("recoverInclude", True)
 
-		if not name :
-			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
-		if os.path.exists(".".join([name,"database"])):
-			raise RuntimeError("Cannot create two workspaces with same database")
-
-		if not cpypips:
-			cpypips = pypips
 		self.cpypips = cpypips
+		self.recoverInclude = recoverInclude
+		self.verbose = verbose
+		if verbose:
+			self.cpypips.verbose(1)
+		else:
+			self.cpypips.verbose(0)
 
-		self.deleteOnClose=deleteOnClose
-		self.recoverInclude=recoverInclude
-		self.verbose=verbose
-		self.cpypips.verbose(verbose)
-
-		#In case the subworkspaces need to add files, the variable passed in parameter will only
-		#be modified here and not in the scope of the caller
-		sources2 = deepcopy(sources2)
+		# In case the subworkspaces need to add files, the variable passed in
+		# parameter will only be modified here and not in the scope of the caller
+		sources2 = deepcopy(sources)
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
 		self.iparents = []
@@ -228,7 +229,6 @@ class workspace(object):
 			pws = p(self, sources2, **kwargs)
 			self.iparents.append(pws)
 
-		"""init a workspace from a list of sources"""
 		self._modules = {}
 		self.props = workspace.props(self)
 		self.fun = workspace.fun(self)
