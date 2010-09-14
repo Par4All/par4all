@@ -10,14 +10,17 @@ from subprocess import *
 import re
 
 benchmarkruns = [
-    {'sources': ["bench/DOTPROD.c"], 'module': "dotprod"},
-    {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod", 'args': "200000"},
-    {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod",
-     'unfold': True, 'args': "200000"},
-    {'sources': ["bench/alphablending.c", "bench/alphablending_main.c"],
-     'module': "alphablending", 'args': "200000"},
-    {'sources': ["bench/jacobi.c"], 'module': "compute", 'args': "bench/bonjour.pgm"},
+    # {'sources': ["bench/DOTPROD.c"], 'module': "dotprod"},
+    # {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod", 'args': "20000000"},
+    # {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod",
+    #  'unfold': True, 'args': "20000000"},
+    # {'sources': ["bench/alphablending.c", "bench/alphablending_main.c"],
+    #  'module': "alphablending", 'args': "20000000"},
+    # jacobi.c disabled: alignment issues ?
+    # {'sources': ["bench/jacobi.c"], 'module': "compute", 'args': "bench/bonjour.pgm"},
     {'sources': ["bench/convol3x3.c"], 'module': "convol"},
+    {'sources': ["bench/average_power.c"], 'module': "average_power"},
+    # {'sources': ["bench/whetstone.c"], 'module': "main", 'EXTRACFLAGS': "-lm"},
     ]
 
 n_iterations = 1
