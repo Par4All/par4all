@@ -549,6 +549,11 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
 statement sac_current_block = statement_undefined;
 instruction sac_real_current_instruction = instruction_undefined;
 
+typedef struct {
+	graph dg;
+	bool result; /* whether simdizer() did something useful */
+} simdizer_context;
+
 /*
  * This function tries to simdize with two algorithms.
  *
@@ -558,13 +563,14 @@ instruction sac_real_current_instruction = instruction_undefined;
  * `simdize_simple_statements_pass2' attempts to simdize by grouping
  * as many statements as possible together.
  */
-static void simdize_simple_statements(statement s,graph dependence_graph)
+static void simdize_simple_statements(statement s, simdizer_context *sc)
 {
     /* not much we can do with a single statement, or with
      * "complex" statements (ie, with tests/loops/...)
      */
     if (statement_block_p(s))
     {
+	graph dependence_graph = sc->dg;
         sac_current_block=s;
         /* we cannot handle anything but sequence of calls */
         list iter = statement_block(s);
@@ -609,6 +615,7 @@ static void simdize_simple_statements(statement s,graph dependence_graph)
                             {
                                 new_seq=gen_append(new_seq,simdseq);
                                 gen_free_list(seq);
+				sc->result |= true;
                             }
 
                             free_statement_matches_map();
@@ -632,7 +639,7 @@ static void simdize_simple_statements(statement s,graph dependence_graph)
  * simple filter for `simdizer'
  * Do not recurse through simple calls, for better performance 
  */
-static bool simd_simple_sequence_filter(statement s,__attribute__((unused)) graph dg )
+static bool simd_simple_sequence_filter(statement s,__attribute__((unused)) simdizer_context *sc)
 {
     return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
@@ -667,9 +674,9 @@ bool simdizer(char * mod_name)
 
     set_current_module_statement(mod_stmt); 
     set_current_module_entity(module_name_to_entity(mod_name));
-	set_ordering_to_statement(mod_stmt);
-    graph dependence_graph = 
-        (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    set_ordering_to_statement(mod_stmt);
+    simdizer_context sc = { .dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE),
+			    .result = false };
     set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
     set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
@@ -679,7 +686,7 @@ bool simdizer(char * mod_name)
     debug_on("SIMDIZER_DEBUG_LEVEL");
     /* Now do the job */
 
-    gen_context_recurse(mod_stmt, dependence_graph, statement_domain,
+    gen_context_recurse(mod_stmt, &sc, statement_domain,
             simd_simple_sequence_filter, simdize_simple_statements);
 
     pips_assert("Statement is consistent after SIMDIZER", 
@@ -704,7 +711,7 @@ bool simdizer(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return sc.result;
 }
 
 
