@@ -1,0 +1,14 @@
+int main()
+{
+
+// Pointer values: none
+
+   mystruct s;
+
+// Pointer values:
+// s[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   return 0;
+}

@@ -218,15 +218,24 @@ int main(char *fmt1, ...)
    nr = fwrite(buf2, sizeof(char), n, fp);
 //               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[0] 
-//                                  fp_pos[*]
+//                                  fp_pos[*] fp_pos[*][.__pos] 
+//                                  fp_pos[*][.__state][.__count] 
+//                                  fp_pos[*][.__state][.__value][.__w
+//                                  ch] 
+//                                  fp_pos[*][.__state][.__value][.__w
+//                                  chb][*]
 //               <must be read   >: fp fp_pos
    
    // file positionning functions
    (void) fgetpos(fp, fp_pos);
 //               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0]
-//               <may be written >: __IO_EFFECTS:LUNS[*] fp[0]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[0] 
+//                                  pos[.__state][.__value][.__wchb][*
+//                                  ]
 //               <must be read   >: fp
-//               <must be written>: pos
+//               <must be written>: pos pos[.__pos] 
+//                                  pos[.__state][.__count] 
+//                                  pos[.__state][.__value][.__wch]
    (void) fgetpos(fp, &pos);
 //               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[0]
@@ -234,7 +243,12 @@ int main(char *fmt1, ...)
 
    (void) fseek(fp, 0L, 0);
 //               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0] 
-//                                  fp_pos[*]
+//                                  fp_pos[*] fp_pos[*][.__pos] 
+//                                  fp_pos[*][.__state][.__count] 
+//                                  fp_pos[*][.__state][.__value][.__w
+//                                  ch] 
+//                                  fp_pos[*][.__state][.__value][.__w
+//                                  chb][*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[0]
 //               <must be read   >: fp fp_pos
 
