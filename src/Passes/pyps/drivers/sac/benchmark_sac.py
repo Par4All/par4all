@@ -3,6 +3,7 @@
 
 import pyps
 import workspace_gettime as gt
+import memalign
 import sac
 
 from subprocess import *
@@ -10,16 +11,16 @@ import re
 
 benchmarkruns = [
     {'sources': ["bench/DOTPROD.c"], 'module': "dotprod"},
-    {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod", 'args': "20000000"},
+    {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod", 'args': "200000"},
     {'sources': ["bench/DOTPROD2.c"], 'module': "dotprod",
-     'unfold': True, 'args': "20000000"},
+     'unfold': True, 'args': "200000"},
     {'sources': ["bench/alphablending.c", "bench/alphablending_main.c"],
-     'module': "alphablending", 'args': "20000000"},
+     'module': "alphablending", 'args': "200000"},
     {'sources': ["bench/jacobi.c"], 'module': "compute", 'args': "bench/bonjour.pgm"},
     {'sources': ["bench/convol3x3.c"], 'module': "convol"},
     ]
 
-n_iterations = 50
+n_iterations = 1
 benchtimes = {}
 
 def gettime(*cmd):
@@ -48,7 +49,8 @@ def benchrun(bench):
         benchname += "-unfold"
     args = bench.get("args", "")
 
-    ws = pyps.workspace(bench["sources"], parents = [gt.workspace, sac.workspace])
+    ws = pyps.workspace(bench["sources"],
+                        parents = [gt.workspace, sac.workspace, memalign.workspace])
     ws.set_property(ABORT_ON_USER_ERROR = True)
 
     # get the result from the initial, reference file, without SIMD'izing anything
