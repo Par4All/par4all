@@ -442,18 +442,18 @@ static statement generate_compact(reductionInfo ri)
             call c;
             expression e;
 
-        e = reference_to_expression(make_reference(
-                    reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
-        c = make_call(operator, CONS(EXPRESSION, e, 
-                    CONS(EXPRESSION, rightExpr, NIL)));
+            e = reference_to_expression(make_reference(
+                        reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
+            c = make_call(operator, CONS(EXPRESSION, e, 
+                        CONS(EXPRESSION, rightExpr, NIL)));
 
-        rightExpr = call_to_expression(c);
-    }
+            rightExpr = call_to_expression(c);
+        }
 
-    // Make the compact assignment statement
-    compact = make_assign_instruction(
-            reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
-            rightExpr);
+        // Make the compact assignment statement
+        compact = make_assign_instruction(
+                reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
+                rightExpr);
 
         postlude= instruction_to_statement(compact);
     }
@@ -727,41 +727,64 @@ static bool no_write_read_conflicts_p(list succs) {
 	return true;
 }
 
-static void do_redundant_load_store_elimination(graph dg) {
-  bool did_something ;
-  set deleted_vertex = set_make(set_pointer);
-  do {
-    did_something=false;
-    statement deleted = statement_undefined;
-    FOREACH(VERTEX,v,graph_vertices(dg) ) {
-      if(!set_belong_p(deleted_vertex,v) && no_write_read_conflicts_p(vertex_successors(v))) {
-        statement s = vertex_to_statement(v);
-        if(statement_call_p(s) && 
-            !return_statement_p(s) &&
-            !declaration_statement_p(s)) {
-          list out_effects = load_cumulated_rw_effects_list(s /* get_current_module_statement() */);
-          if(ENDP(out_effects)) {
-            update_statement_instruction(s,make_continue_instruction());
-            did_something=true;
-            set_add_element(deleted_vertex,deleted_vertex,v);
-            break;
-          }
+static bool potential_out_effects_p(statement s) {
+    if(get_bool_property("REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE")) {
+        list write_effects = effects_write_effects(load_proper_rw_effects_list(s));
+        bool out_effect = false;
+        FOREACH(EFFECT,eff,write_effects) {
+            reference r = effect_any_reference(eff);
+            if( anywhere_effect_p(eff) ||
+                    ( formal_parameter_p(reference_variable(r)) && !ENDP(reference_indices(r)) ) ||
+                    top_level_entity_p(reference_variable(r))
+              ) {
+                out_effect=true;break;
+            }
         }
-      }
+        gen_free_list(write_effects);
+        return out_effect;
+    }
+    else {
+
+        list out_effects = load_cumulated_rw_effects_list(s /* get_current_module_statement() */);
+        return !ENDP(out_effects);
     }
 
-    if(!statement_undefined_p(deleted)) {
-      FOREACH(VERTEX,v,graph_vertices(dg) ) {
-        if(!set_belong_p(deleted_vertex,v)) {
-          list tmp = gen_copy_seq(vertex_successors(v));
-          FOREACH(SUCCESSOR,s,tmp) {
-            if(vertex_to_statement(successor_vertex(s)) == deleted )
-              gen_remove(&vertex_successors(v),s);
-          }
+}
+
+static void do_redundant_load_store_elimination(graph dg) {
+    bool did_something ;
+    set deleted_vertex = set_make(set_pointer);
+    do {
+        did_something=false;
+        statement deleted = statement_undefined;
+        FOREACH(VERTEX,v,graph_vertices(dg) ) {
+            if(!set_belong_p(deleted_vertex,v) && no_write_read_conflicts_p(vertex_successors(v))) {
+                statement s = vertex_to_statement(v);
+                if(statement_call_p(s) && 
+                        !return_statement_p(s) &&
+                        !declaration_statement_p(s) &&
+                        !potential_out_effects_p(s) ) {
+                    update_statement_instruction(s,make_continue_instruction());
+                    did_something=true;
+                    deleted=s;
+                    set_add_element(deleted_vertex,deleted_vertex,v);
+                    break;
+                }
+            }
         }
-      }
-    }
-  } while(did_something);
+
+        if(!statement_undefined_p(deleted)) {
+            FOREACH(VERTEX,v,graph_vertices(dg) ) {
+                if(!set_belong_p(deleted_vertex,v)) {
+                    list tmp = gen_copy_seq(vertex_successors(v));
+                    FOREACH(SUCCESSOR,s,tmp) {
+                        if(vertex_to_statement(successor_vertex(s)) == deleted )
+                            gen_remove(&vertex_successors(v),s);
+                    }
+                }
+            }
+        }
+    } while(did_something);
 }
 
 bool redundant_load_store_elimination(char * module_name)
@@ -772,6 +795,7 @@ bool redundant_load_store_elimination(char * module_name)
 	set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
+    set_proper_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, true));
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
     graph dependence_graph = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
@@ -787,6 +811,7 @@ bool redundant_load_store_elimination(char * module_name)
     reset_current_module_entity();
 	reset_ordering_to_statement();
     reset_current_module_statement();
+    reset_proper_rw_effects();
     reset_cumulated_rw_effects();
 
     return TRUE;

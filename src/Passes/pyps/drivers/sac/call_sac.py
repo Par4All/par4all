@@ -6,111 +6,119 @@
 
 import pyps
 import sac
+import workspace_gettime as gt
 
 from subprocess import *
 from optparse import OptionParser
 import re
+import sys
 
-parser = OptionParser(usage = "%prog -f FUCNTION src1.c src2.c ...",
+parser = OptionParser(usage = "%prog [options] -f FUCNTION src1.c src2.c ...",
 					  epilog = "Try `$0 -f dotprod .../validation/SAC/kernels/DOTPROD/DOTPROD.c'.")
 
-parser.add_option("-f", "--function", dest = "function",
+parser.add_option("-f", "--function", dest = "function", action = "append",
 				  help = "function to optimize")
-parser.add_option("-a", "--args", dest = "args",
+parser.add_option("-a", "--args", dest = "args", action = "append",default = [],
 				  help = "arguments to pass to the compiled program")
-parser.add_option("-t", "--time", dest = "time",
-                  action = "store_true", default = False,
-				  help = "use workspace_gettime to time the ran program")
+parser.add_option("-d", "--driver", dest = "driver",
+				  default = "sse", help =  "sse or 3dnow")
+parser.add_option("-e", "--explore", dest = "explore", default = None,
+				  help = "control the running of SAC\n."
+				  "The syntax is \"option:True,option2:False\"...")
+parser.add_option("-v", "--verbose", dest = "verbose",
+				  default = 0, action = "count",
+				  help = "verbose output; can be specified several times")
+parser.add_option("-s", "--strict", dest = "strict",
+				  help = "check output, and exit when output changes")
+parser.add_option("-m", "--memalign", dest = "memalign", default = False,
+				  action = "store_true", help = "use memalign.workspace")
+parser.add_option("--cppflags", "--CPPFLAGS", dest = "cppflags",
+				  default = "", help = "CPP options")
+parser.add_option("--cflags", "--CFLAGS", dest = "cflags",
+				  default = "", help = "gcc options")
+parser.add_option("--ldflags", "--LDFLAGS", dest = "ldflags",
+				  default = "", help = "linker options")
 (opts, sources) = parser.parse_args()
+
+explorationpath = {}
+if opts.explore:
+	steps = opts.explore.split(",")
+	for s in steps:
+		(k, v) = s.split(":")
+		if v.lower() in ["yes", "true", "t", "1"]:
+			explorationpath[k] = True
+		else:
+			explorationpath[k] = False
 
 if not opts.function:
 	print "The -f argument is mandatory"
 	exit(2)
 
+parents = [sac.workspace, gt.workspace]
 # Run-time composition of workspaces!
-if opts.time:
-	import workspace_gettime as gt
-	ws = pyps.workspace(sources, parents = [gt.workspace, sac.workspace])
-else:
-	ws = pyps.workspace(sources, parents = [sac.workspace])
-	
-ws.set_property(ABORT_ON_USER_ERROR = True)
+if opts.memalign:
+	import memalign
+	parents.insert(0, memalign.workspace)
 
-def getout(*cmd):
-	if opts.args:
-		cmd += (opts.args,)
-	p = Popen(cmd, stdout = PIPE, stderr = PIPE)
-	out = p.stdout.read()
-	err = p.stderr.read()
-	rc = p.wait()
-	if rc != 0:
-		print out
-		print err
-		if rc < 0:
-			print "`%s' was killed with signal" % cmd, -rc
+ws = pyps.workspace(sources, parents = parents, verbose = (opts.verbose >= 2), driver = opts.driver, cppflags = opts.cppflags)
+
+reference = []
+def runws(*args, **kwargs):
+	global ws
+	kwargs["args"]		 = opts.args
+	kwargs["iterations"] = 1
+	kwargs["reference"]	 = reference
+	if "CFLAGS" in kwargs: kwargs["CFLAGS"] += (" " + opts.cflags)
+	else: kwargs["CFLAGS"] = opts.cflags
+	kwargs["LDFLAGS"] = opts.ldflags
+	time = "XXXX"
+	try: time = ws.benchmark(*args, **kwargs)
+	except RuntimeError, e:
+		if opts.strict:
+			raise
 		else:
-			print "`%s' exited with error code" % cmd, rc
-		exit(5)
-	if opts.time:
-		m = re.search(r"^time for .*: (\d+)$", err)
-		if not m:
-			print "cmd:", cmd
-			print "out:", out
-			print "err:", err
-			print "rc:", rc
-			exit(5)
-		time = int(m.group(1))
-		return out, time
-	else:
-		return out, None
+			#print >>sys.stderr, e.args
+			print >>sys.stderr, "Continuing anyway"
+	return time
 
 # get the result from the initial, reference file, without SIMD'izing anything
-wsname = ws.name
-ws.compile(outfile = "%s.database/Tmp/ref" % wsname,
-		   outdir =  "%s.database/Tmp" % wsname,
-		   CFLAGS = "-O0")
-ref, ref_time = getout("./%s.database/Tmp/ref" % wsname)
+ref_time = runws("ref", CFLAGS = "-O3")
+reficc_time = runws("reficc", CFLAGS = "-O3", CC = "icc")
 
-module = ws[opts.function]
-print "Module", module.name, "selected"
-print "Initial code"
-module.display()
+for f in opts.function:
+	module = ws[f]
+	if opts.verbose >= 1:
+		print "Module", module.name, "selected"
+		print "Initial code"
+		module.display()
 
-# Magie ! The "128" is the size of registers
-module.sac(128)
+	# Magie !
+	try:
+		module.sac(verbose = (opts.verbose >= 3), **explorationpath)
+	except:
+		print >>sys.stderr, "Couldn't apply sac on module", f
+		module.display()
 
-print "Simdized code"
-module.display()
+	if opts.verbose >= 1:
+		print "Simdized code"
+		module.display()
 
 # Compile using the sequential (naïve) versions of SIMD instructions
-ws.compile(outfile = "%s.database/Tmp/seq" % (wsname),
-		   outdir =  "%s.database/Tmp" % (wsname))
-seq, seq_time = getout("./%s.database/Tmp/seq" % wsname)
+seq_time = runws("seq", CFLAGS = "-O3")
 
-if seq != ref:
-	print "seq ko"
-	print "seq:", seq
-	print "ref:", ref
-	exit(3)
-else:
-	print "seq ok"
+if opts.memalign:
+	ws.memalign()
+	if opts.verbose >= 1:
+		module.display()
 
-ws.sse_compile(outfile = "%s.database/Tmp/sse" % (wsname),
-			   outdir =  "%s.database/Tmp" % (wsname))
-sse, sse_time = getout("./%s.database/Tmp/sse" % wsname)
+sse_time = runws("sse", compilemethod = ws.simd_compile)
+icc_time = runws("icc", compilemethod = ws.simd_compile, CC = "icc")
 
-if sse != ref:
-	print "sse ko"
-	print "sse:", sse
-	print "ref:", ref
-	exit(3)
-else:
-	print "sse ok"
+#ws.close()
 
-ws.close()
-
-if opts.time:
-    print "Run times: (ref, seq, sse):"
-    print ref_time
-    print seq_time
-    print sse_time
+print "Run times: (ref, reficc, seq, sse, icc):"
+print ref_time
+print reficc_time
+print seq_time
+print sse_time
+print icc_time

@@ -2,15 +2,15 @@
 import re
 import fileinput
 import sys
+import utils
 
 alignsize = 16
 
 # replace lines containing a = malloc(size) with:
 # (posix_memalign(&a, alignsize, size), a)
-mallocre = re.compile(r"(?P<id>\w+)\s*=\s*malloc\s*\((?P<size>.*)\)")
+mallocre = re.compile(r"\s*(?P<id>.+?)\s*=\s*malloc\s*\((?P<size>.*(?:\(.*\).*)*)\)")
 # XXX: doesn't handle a, b = malloc(foo)
-# XXX: return the pointer for people who do error checking
-memalign_tmpl = r"posix_memalign(&(\g<id>), " + str(alignsize) + r", \g<size>)";
+memalign_tmpl = r"(posix_memalign(&(\g<id>), " + str(alignsize) + r", \g<size>), (\g<id>))"
 def malloc2memalign(line):
     return mallocre.sub(memalign_tmpl, line)
 
@@ -28,7 +28,6 @@ def malloc2memalign(line):
 onearraydeclre = re.compile(r"(?:(?P<id>\w+)\s*(?P<size>(?:\[[^]]*\]\s*)+))")
 # same RE as above, but without the named groups
 onearraydecl = re.sub(r"\?P<\w+?>", r"?:", onearraydeclre.pattern)
-print onearraydecl
 
 # match "const float a[2], b[5];" (but this is not sufficient)
 #arraydeclre = re.compile(r"^(?P<type>[a-z 	]+)\s+%s(?:\s*,\s*%s)*\s*;\s*$" % (onearraydecl, onearraydecl))
@@ -46,11 +45,43 @@ def array2arrayalign(line):
     return line
 
 class workspace:
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, ws, sources, *args, **kwargs):
+        # defaults to false, as the user needs to invoke memalign
+        self.memaligned = False
+        self.ws = ws
+        utils.string2file(pattern_c, pattern_tmpfile)
+        sources.append(pattern_tmpfile)
 
-    def post_goingToRunWith(self, files, outdir):
-        for l in fileinput.FileInput(files, inplace = True):
-            l = malloc2memalign(l)
+    def memalign(self):
+        for m in self.ws:
+            if m.name == "pips_memalign":
+                continue
+            m.expression_substitution(pattern = "pips_memalign")
+        self.memaligned = True
+
+    def pre_goingToRunWith(self, files, outdir):
+        for f in files:
+            if re.search(pattern_tmpfile, f):
+                files.remove(f)
+        if not self.memaligned:
+            # the user didn't ask for alignment, so don't do that
+            return
+        finput = fileinput.FileInput(files, inplace = True)
+        for l in finput:
+            if finput.isfirstline():
+                print pips_memalign_h
+                #l = malloc2memalign(l)
             l = array2arrayalign(l)
             print l,
+
+pattern_tmpfile = "_memalign_pattern.c"
+pattern_c = """
+#include <stdlib.h>
+void* pips_memalign(void *memptr, size_t size)
+{
+	return memptr = malloc(size);
+}
+"""
+
+pips_memalign_h = "#define pips_memalign(memptr, size) \
+	({posix_memalign((void **) &(memptr), %d, (size)); memptr;})" % alignsize

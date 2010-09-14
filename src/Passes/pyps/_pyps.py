@@ -203,21 +203,25 @@ class workspace(object):
 	def __init__(self, sources, **kwargs):
 		"""init a workspace from a list of sources"""
 
-		name		   = kwargs.setdefault("name", "")
-		activates	   = kwargs.setdefault("activates", [])
-		verbose		   = kwargs.setdefault("verbose", True)
-		cppflags	   = kwargs.setdefault("cppflags", "")
-		parents		   = kwargs.setdefault("parents", [])
-		cpypips		   = kwargs.setdefault("cpypips", pypips)
+		name           = kwargs.setdefault("name",           "")
+		activates      = kwargs.setdefault("activates",      [])
+		verbose        = kwargs.setdefault("verbose",        True)
+		cppflags       = kwargs.setdefault("cppflags",       "")
+		parents        = kwargs.setdefault("parents",        [])
+		cpypips	       = kwargs.setdefault("cpypips",        pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
+		deleteOnClose  = kwargs.setdefault("deleteOnClose",  True)
+
+		if not name :
+			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
+		if os.path.exists(".".join([name,"database"])):
+			raise RuntimeError("Cannot create two workspaces with same database")
 
 		self.cpypips = cpypips
 		self.recoverInclude = recoverInclude
 		self.verbose = verbose
-		if verbose:
-			self.cpypips.verbose(1)
-		else:
-			self.cpypips.verbose(0)
+		self.cpypips.verbose(int(verbose))
+		self.deleteOnClose=deleteOnClose
 
 		# In case the subworkspaces need to add files, the variable passed in
 		# parameter will only be modified here and not in the scope of the caller
@@ -237,6 +241,7 @@ class workspace(object):
 		# SG: it may be smarter to save /restore the env ?
 		if cppflags != "":
 			os.environ['PIPS_CPP_FLAGS']=cppflags
+		self.cppflags = cppflags
 
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
@@ -313,8 +318,6 @@ class workspace(object):
 		"""Test if the workspace contains a given module"""
 		self._build_module_list()
 		return module_name in self._modules
-
-
 
 	def info(self,topic):
 		return split(self.cpypips.info(topic))
@@ -406,7 +409,7 @@ class workspace(object):
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
 		otmpfiles=self.save(rep=rep)+extrafiles
-		command=[CC,CFLAGS]
+		command=[CC, self.cppflags, CFLAGS]
 		if link:
 			if not outfile:
 				outfile=self._name

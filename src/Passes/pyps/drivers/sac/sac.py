@@ -2,117 +2,205 @@ import os
 import re
 import tempfile
 import shutil
+import utils
+import fileinput
 
-# TODO: some of the top-level functions don't belong here, they should
-# be in a more general toolbox. (string2file(), I'm looking at you.)
+class sacbase(object):
+    @staticmethod
+    def sac(module, **cond):
+        ws = module._ws
+        # Here are the transformations made by benchmark.tpips.h, blindy
+        # translated in pyps.
 
-def string2file(string, fname):
-    f = open(fname, "w")
-    f.write(string)
-    f.close()
+        ws.activate("MUST_REGIONS")
+        ws.activate("REGION_CHAINS")
+        ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
+        ws.activate("PRECONDITIONS_INTER_FULL")
+        ws.activate("TRANSFORMERS_INTER_FULL")
 
-def sac(module, register_width):
-    ws = module._ws
-    # Here are the transformations made by benchmark.tpips.h, blindy
-    # translated in pyps.
-    module.split_update_operator()
+        ws.set_property(CONSTANT_PATH_EFFECTS = False)
+        ws.set_property(RICEDG_STATISTICS_ALL_ARRAYS = True)
+        ws.set_property(C89_CODE_GENERATION = True)
 
-    ws.activate("MUST_REGIONS")
-    ws.activate("REGION_CHAINS")
-    ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
-    ws.activate("PRECONDITIONS_INTER_FULL")
-    ws.activate("TRANSFORMERS_INTER_FULL")
+        # if conf.get("simdizer_allow_padding", False):
+        #     ws.set_property(SIMDIZER_ALLOW_PADDING, True)
+        ws.set_property(SIMD_FORTRAN_MEM_ORGANISATION = False)
+        ws.set_property(SAC_SIMD_REGISTER_WIDTH = cond["register_width"])
+        ws.set_property(SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION = False)
+        ws.set_property(SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL = False)
+        ws.set_property(PRETTYPRINT_ALL_DECLARATIONS = True)
 
-    ws.set_property(CONSTANT_PATH_EFFECTS = False)
-    ws.set_property(RICEDG_STATISTICS_ALL_ARRAYS = True)
-    ws.set_property(C89_CODE_GENERATION = True)
+        if cond.get("verbose"):
+            module.display()
+        module.split_update_operator()
 
-    ws.set_property(SIMD_FORTRAN_MEM_ORGANISATION = False)
-    ws.set_property(SAC_SIMD_REGISTER_WIDTH = register_width)
-    ws.set_property(SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION = False)
-    ws.set_property(SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL = False)
-    ws.set_property(PRETTYPRINT_ALL_DECLARATIONS = True)
+        # if cond.get("verbose"):
+        #     module.display()
+        # module.if_conversion_init()
+        # module.if_conversion()
+        # module.if_conversion_compact()
+        # if cond.get("verbose"):
+        #     module.display()
+        # module.use_def_elimination()
 
-    module.split_update_operator()
+        module.partial_eval()
+        module.simd_atomizer()
+        if cond.get("verbose"):
+            module.display()
+            module.print_dot_dependence_graph()
 
-    module.if_conversion_init()
-    module.if_conversion()
-    module.if_conversion_compact()
-    # module.use_def_elimination()
+        if cond.get("reduction_detection", False):
+            try:
+                ws.set_property(KEEP_READ_READ_DEPENDENCE = True)
+                while True:
+                    module.reduction_detection()
+                    if cond.get("verbose"):
+                        module.display()
+            except:
+                pass
 
-    module.partial_eval()
-    module.simd_atomizer()
+        if cond.get("verbose"):
+            module.display()
 
-    module.simdizer_auto_unroll()
-    module.partial_eval()
-    module.clean_declarations()
-    module.suppress_dead_code()
-    # module.print_dot_dependence_graph()
-    module.simd_remove_reductions()
+        if cond.get("auto_unroll", True):
+            module.simdizer_auto_unroll()
+        module.partial_eval()
+        if cond.get("verbose"):
+            module.display()
+        module.clean_declarations()
+        if cond.get("suppress_dead_code", True):
+            module.suppress_dead_code()
+        # module.print_dot_dependence_graph()
+        module.simd_remove_reductions()
+        if cond.get("verbose"):
+            module.display()
 
-    # module.deatomizer()
-    # module.partial_eval()
-    # module.use_def_elimination()
-    # module.display()
+        # module.deatomizer()
+        # module.partial_eval()
+        # module.use_def_elimination()
+        # module.display()
 
-    # module.print_dot_dependence_graph()
-    module.single_assignment()
+        # module.print_dot_dependence_graph()
+        module.single_assignment()
 
-    module.simdizer()
+        if cond.get("verbose"):
+            module.display()
+        module.simdizer()
+        if cond.get("verbose"):
+            module.display()
 
-    # module.use_def_elimination()
-    # module.display()
+        # module.use_def_elimination()
 
-    module.simd_loop_const_elim()
-    # ws.set_property(EOLE_OPTIMIZATION_STRATEGY = "ICM")
-    # module.optimize_expressions()
-    # module.partial_redundancy_elimination()
+        module.simd_loop_const_elim()
+        # ws.set_property(EOLE_OPTIMIZATION_STRATEGY = "ICM")
+        # module.optimize_expressions()
+        # module.partial_redundancy_elimination()
 
-    # module.use_def_elimination()
-    module.clean_declarations()
-    module.suppress_dead_code()
+        # module.use_def_elimination()
+        if cond.get("suppress_dead_code", True):
+            module.suppress_dead_code()
+        module.redundant_load_store_elimination()
+        if cond.get("suppress_dead_code", True):
+            module.suppress_dead_code()
+        module.clean_declarations()
 
-def addSSE(fname):
-    print "adding sse.h"
-    contents = [sse_h]
-    f = open(fname)
-    for line in f:
-        line = re.sub(r"float (v4sf_[^[]+)", r"__m128 \1", line)
-        line = re.sub(r"float (v4si_[^[]+)", r"__m128i \1", line)
-        line = re.sub(r"v4s[if]_([^,[]+)\[[^]]*\]", r"\1", line)
-        line = re.sub(r"v4s[if]_([^ ,[]+)", r"\1", line)
-        line = re.sub(r"double (v2df_[^[]+)", r"__m128d \1", line)
-        line = re.sub(r"double (v2di_[^[]+)", r"__m128i \1", line)
-        line = re.sub(r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1", line)
-        line = re.sub(r"v2d[if]_([^ ,[]+)", r"\1", line)
-        contents.append(line)
-    f.close()
-    f = open(fname, "w")
-    f.writelines(contents)
-    f.close()
+    @staticmethod
+    def addintrinsics(fname, header, replacements):
+        finput = fileinput.FileInput([fname], inplace = True)
+        for line in finput:
+            if finput.isfirstline():
+                print header
+            for pattern, repl in replacements:
+                line = re.sub(pattern, repl, line)
+            print line,
+
+class sacsse(sacbase):
+    @staticmethod
+    def sac(module, **kwargs):
+        kwargs["register_width"] = 128
+        sacbase.sac(module, **kwargs)
+
+    @staticmethod
+    def addintrinsics(fname):
+        replacements = [
+            # drop the alignement attribute on the __m128 registers
+            (r"(v4s[if]_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
+            # drop the v4s[if] prefix from the declaration; use the type __m128
+            # instead of float[4]
+            (r"float (v4sf_[^[]+)", r"__m128 \1"),
+            (r"int (v4si_[^[]+)", r"__m128i \1"),
+            (r"double (v2df_[^[]+)", r"__m128d \1"),
+            (r"double (v2di_[^[]+)", r"__m128i \1"),
+            # drop the v4s[if] prefix for the usage
+            (r"v4s[if]_([^,[]+)\[[^]]*\]", r"\1"),
+            (r"v4s[if]_([^ ,[]+)", r"\1"),
+            (r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1"),
+            (r"v2d[if]_([^ ,[]+)", r"\1"),
+            ]
+        sacbase.addintrinsics(fname, sse_h, replacements)
+
+    @staticmethod
+    def post_memalign(*args, **kwargs):
+        global sse_h
+        sse_h = re.sub("_mm_loadu", "_mm_load", sse_h)
+        sse_h = re.sub("_mm_storeu", "_mm_store", sse_h)
+
+    CFLAGS = " -msse4.1 -O3"
+
+class sac3dnow(sacbase):
+    @staticmethod
+    def sac(module, *args, **kwargs):
+        kwargs["register_width"] = 64
+        # 3dnow supports only floats. Since doubles are 64-bits wide, a register
+        # can only one of them, we kinda lose the MD in SIMD...
+        for line in module.code():
+            if re.search("double", line):
+                raise RuntimeError("Can't vectorize double operations with 3DNow!")
+        sacbase.sac(module, *args, **kwargs)
+
+    @staticmethod
+    def addintrinsics(fname):
+        replacements = [
+            # drop the alignement attribute on the __m64 registers
+            (r"(v2sf_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
+            # drop the v2sf prefix from the declaration; use the type __m64
+            # instead of float[2]
+            (r"float (v2sf_[^[]+)", r"__m64 \1"),
+            # drop the v2sf prefix for the usage
+            (r"v2sf_([^,[]+)\[[^]]*\]", r"\1"),
+            (r"v2sf_([^ ,[]+)", r"\1"),
+            ]
+        sacbase.addintrinsics(fname, Threednow_h, replacements)
+
+    @staticmethod
+    def post_memalign(*args, **kwargs):
+        pass
+
+    CFLAGS = " -m3dnow -march=athlon -m32 -O3"
 
 class workspace:
     """The SAC subsystem, in Python.
 
     Add a new transformation, for adapting code to SIMD instruction
-    sets (SSE for now)."""
+    sets (SSE for now, 3Dnow coming soon)."""
     def __init__(self, ws, sources, **args):
         # add SIMD.c to the project
         self.tmpdir = tempfile.mkdtemp()
-	print self.tmpdir
         tmpSIMD = self.tmpdir + "/SIMD.c"
-        string2file(simd_c, tmpSIMD)
+        utils.string2file(simd_c, tmpSIMD)
         sources.append(tmpSIMD)
         self.ws = ws
         # Do we want to compile with SSE.h by default? NB: if changing
         # this, invert also the logic in compile() and compile_sse().
         self.compile_sse = False
+        drivers = {"sse": sacsse, "3dnow": sac3dnow}
+        self.driver = drivers[args.get("driver", "sse")]
 
     def post_init(self, sources, **args):
         """Clean the temporary directory used for holding `SIMD.c'."""
         shutil.rmtree(self.tmpdir)
         for m in self.ws:
-            m.__class__.sac = sac
+            m.__class__.sac = self.driver.sac
 
     def pre_goingToRunWith(self, files, outdir):
         """Add sse.h, which replaces general purpose SIMD instructions
@@ -124,15 +212,20 @@ class workspace:
             newfiles = []
             for fname in files:
                 if not re.search(r"SIMD\.c$", fname):
-                    addSSE(fname)
+                    self.driver.addintrinsics(fname)
                     newfiles.append(fname)
             files[:] = []
             files.extend(newfiles)
+        else:
+            simd_h_fname = os.path.abspath(outdir + "/SIMD.h")
+            utils.string2file(simd_h, simd_h_fname)
+            for fname in files:
+                utils.addBeginnning(fname, '#include "'+simd_h_fname+'"')
 
-    def sse_compile(self, **args):
+    def simd_compile(self, **args):
         """Compile the workspace with sse.h."""
         self.compile_sse = True
-        CFLAGS = " -O3 -march=native"
+        CFLAGS = self.driver.CFLAGS
         if args.has_key("CFLAGS"):
             args["CFLAGS"] += CFLAGS
         else:
@@ -141,8 +234,21 @@ class workspace:
         self.compile_sse = False
         return r
 
+    def post_memalign(self, *args, **kwargs):
+        self.driver.post_memalign(self, *args, **kwargs)
+
 # SIMD.c from validation/SAC/include/SIMD.c r2257
 simd_c = """
+#ifdef WITH_TRIGO
+#  include <math.h>
+#  ifndef COS
+#    define COS cos
+#  endif
+#  ifndef SIN
+#    define SIN sin
+#  endif
+#endif
+
 #define LOGICAL int
 #define DMAX(A,B) (A)>(B)?(A):(B)
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
@@ -390,6 +496,7 @@ SIMD_SUBPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[2] = SRC1[2] - SRC2[2];
     DEST[3] = SRC1[3] - SRC2[3];
 }
+
 void
 SIMD_UMINPS (float DEST[4], float SRC1[4])
 {
@@ -419,18 +526,20 @@ SIMD_MULPD (double DEST[2], double SRC1[2], double SRC2[2])
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
 }
+
 #ifdef WITH_TRIGO
+
 void
 SIMD_SINPD (double DEST[2], double SRC1[2])
 {
-    DEST[0] = COS(SRC1[0]);
-    DEST[1] = COS(SRC1[1]);
+    DEST[0] = SIN(SRC1[0]);
+    DEST[1] = SIN(SRC1[1]);
 }
 void
 SIMD_COSPD (double DEST[2], double SRC1[2])
 {
-    DEST[0] = SIN(SRC1[0]);
-    DEST[1] = SIN(SRC1[1]);
+    DEST[0] = COS(SRC1[0]);
+    DEST[1] = COS(SRC1[1]);
 }
 #endif
 void
@@ -444,6 +553,13 @@ SIMD_SUBPD (double DEST[2], double SRC1[2], double SRC2[2])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
+}
+
+void
+SIMD_UMINPD (double DEST[2], double SRC1[2])
+{
+    DEST[0] =  - SRC1[0];
+    DEST[1] =  - SRC1[1];
 }
 
 void
@@ -464,8 +580,12 @@ SIMD_MAXPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[3] = DMAX (SRC1[3], SRC2[3]);
 }
 
+/* Integer manipulation */
+/* V4SI: vector of 4 32-bit integers (standard integers ?)
+   V4HI: vector of 4 16-bit integers (half integers ?) */
+
 void
-SIMD_LOAD_V2SI_TO_V2SF(int VEC[2], float TO[2])
+SIMD_LOAD_V2SI_TO_V2SF(float TO[2], int VEC[2])
 {
     TO[0]=VEC[0];
     TO[1]=VEC[1];
@@ -477,6 +597,19 @@ SIMD_STORE_V2SI_TO_V2SF(int TO[2], float VEC[2])
     TO[1]=VEC[1];
 }
 
+void
+SIMD_STORE_V2SF(float VEC[2], float BASE[2])
+{
+	BASE[0] = VEC[0];
+	BASE[1] = VEC[1];
+}
+
+void
+SIMD_LOAD_V2SF(float VEC[2], float BASE[2])
+{
+	VEC[0] = BASE[0];
+	VEC[1] = BASE[1];
+}
 
 void
 SIMD_LOAD_CONSTANT_V2SF (float VEC[2], float HIGH, float LOW)
@@ -615,6 +748,13 @@ SIMD_LOAD_V4QI_TO_V4HI (short VEC[4], char BASE[4])
     VEC[3] = BASE[3];
 }
 
+void
+SIMD_LOAD_V4HI_TO_V4SI(int DEST[4], short SRC[4]) {
+	DEST[0] = SRC[0];
+	DEST[1] = SRC[1];
+	DEST[2] = SRC[2];
+	DEST[3] = SRC[3];
+}
 
 void
 SIMD_STORE_V8HI (short VEC[8], short BASE[8])
@@ -932,70 +1072,185 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
 #undef DMAX
 """
 
+simd_h = """
+void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4]);
+void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4]);
+void SIMD_STORE_V2DF_TO_V2SF(double a[2], float b[2]);
+void SIMD_LOAD_V2SF_TO_V2DF(double a[2], float b[2]);
+int PHI(int L, int X1, int X2);
+void SIMD_PHIW(int R[4], int L[4], int X1[4], int X2[4]);
+void SIMD_GTD(int R[4], int X1[4], int X2[4]);
+void SIMD_LOAD_V4SI(int VEC[4], int BASE[4]);
+void SIMD_LOAD_V4SF(float VEC[4], float BASE[4]);
+void SIMD_LOAD_V2DF(double VEC[2], double BASE[2]);
+void SIMD_LOAD_GENERIC_V2DF(double VEC[2], double X0, double X1);
+void SIMD_LOAD_GENERIC_V4SI(int VEC[4], int X0, int X1, int X2, int X3);
+void SIMD_LOAD_GENERIC_V4SF(float VEC[4], float X0, float X1, float X2, float X3);
+void SIMD_LOAD_CONSTANT_V4SF(float VEC[4], float X0, float X1, float X2, float X3);
+void SIMD_LOAD_CONSTANT_V4SI(int VEC[4], int X0, int X1, int X2, int X3);
+void SIMD_STORE_V4SI(int VEC[4], int BASE[4]);
+void SIMD_STORE_V4SF(float VEC[4], float BASE[4]);
+void SIMD_STORE_V2DF(double VEC[2], double BASE[2]);
+void SIMD_STORE_MASKED_V4SF(float VEC[4], float BASE[3]);
+void SIMD_STORE_GENERIC_V2DF(double VEC[2], double X1[1], double X2[1]);
+void SIMD_STORE_GENERIC_V4SI(int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1]);
+void SIMD_STORE_GENERIC_V4SF(float VEC[4], float X1[1], float X2[1], float X3[1], float X4[1]);
+void SIMD_STORE_V2SF(float VEC[2], float BASE[2]);
+void SIMD_LOAD_V2SF(float VEC[2], float BASE[2]);
+void SIMD_GTPS(int DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_GTPD(int DEST[2], double SRC1[2], double SRC2[2]);
+void SIMD_PHIPS(float DEST[4], int COND[4], float SRC1[4], float SRC2[4]);
+void SIMD_ADDPS(float DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_SUBPS(float DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_UMINPS(float DEST[4], float SRC1[4]);
+void SIMD_MULPS(float DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_DIVPD(double DEST[2], double SRC1[2], double SRC2[2]);
+void SIMD_MULPD(double DEST[2], double SRC1[2], double SRC2[2]);
+#ifdef WITH_TRIGO
+void SIMD_SINPD(double DEST[2], double SRC1[2]);
+void SIMD_COSPD(double DEST[2], double SRC1[2]);
+#endif
+void SIMD_ADDPD(double DEST[2], double SRC1[2], double SRC2[2]);
+void SIMD_SUBPD(double DEST[2], double SRC1[2], double SRC2[2]);
+void SIMD_UMINPD(double DEST[2], double SRC1[2]);
+void SIMD_DIVPS(float DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_MAXPS(float DEST[4], float SRC1[4], float SRC2[4]);
+void SIMD_LOAD_V2SI_TO_V2SF(float TO[2], int VEC[2]);
+void SIMD_STORE_V2SI_TO_V2SF(int TO[2], float VEC[2]);
+void SIMD_LOAD_CONSTANT_V2SF(float VEC[2], float HIGH, float LOW);
+void SIMD_LOAD_CONSTANT_V2SI(int VEC[2], int HIGH, int LOW);
+void SIMD_LOAD_V2SI(int VEC[2], int BASE[2]);
+void SIMD_LOAD_GENERIC_V2SI(int VEC[2], int X1, int X2);
+void SIMD_STORE_V2SI(int VEC[2], int BASE[2]);
+void SIMD_STORE_GENERIC_V2SI(int VEC[2], int X1[1], int X2[1]);
+void SIMD_STORE_V2DI(int VEC[2], int BASE[2]);
+void SIMD_ADDW(short DEST[8], short SRC1[8], short SRC2[8]);
+void SIMD_SUBW(short DEST[8], short SRC1[8], short SRC2[8]);
+void SIMD_MULW(short DEST[8], short SRC1[8], short SRC2[8]);
+void SIMD_DIVW(short DEST[8], short SRC1[8], short SRC2[8]);
+void SIMD_LOAD_GENERIC_V8HI(short VEC[8], short BASE0, short BASE1, short BASE2, short BASE3, short BASE4, short BASE5, short BASE6, short BASE7);
+void SIMD_LOAD_V8HI(short VEC[8], short BASE[8]);
+void SIMD_LOAD_V4QI_TO_V4HI(short VEC[4], char BASE[4]);
+void SIMD_LOAD_V4HI_TO_V4SI(int DEST[4], short SRC[4]);
+void SIMD_STORE_V8HI(short VEC[8], short BASE[8]);
+void SIMD_PHID(int DEST[4], int COND[4], int SRC1[4], int SRC2[4]);
+void SIMD_ADDD(int DEST[4], int SRC1[4], int SRC2[4]);
+void SIMD_SUBD(int DEST[4], int SRC1[4], int SRC2[4]);
+void SIMD_MULD(int DEST[4], int SRC1[4], int SRC2[4]);
+void SIMD_DIVD(int DEST[4], int SRC1[4], int SRC2[4]);
+void SIMD_LOAD_CONSTANT_V8QI(char VEC[8], int HIGH, int LOW);
+void SIMD_LOAD_V8QI(char VEC[8], char BASE[8]);
+void SIMD_LOAD_GENERIC_V8QI(char VEC[8], char X1, char X2, char X3, char X4, char X5, char X6, char X7, char X8);
+void SIMD_STORE_V8QI(char VEC[8], char BASE[8]);
+void SIMD_STORE_GENERIC_V8QI(char VEC[8], char *X0, char X1[1], char X2[1], char X3[1], char X4[1], char X5[1], char X6[1], char X7[1]);
+void SIMD_ADDB(char DEST[8], char SRC1[8], char SRC2[8]);
+void SIMD_SUBB(char DEST[8], char SRC1[8], char SRC2[8]);
+void SIMD_MULB(char DEST[8], char SRC1[8], char SRC2[8]);
+void SIMD_MOVPS(float DEST[2], float SRC[2]);
+void SIMD_MOVD(int DEST[2], int SRC[2]);
+void SIMD_MOVW(short DEST[4], short SRC[4]);
+void SIMD_MOVB(char DEST[8], char SRC[8]);
+void SIMD_OPPPS(float DEST[2], float SRC[2]);
+void SIMD_OPPD(int DEST[2], int SRC[2]);
+void SIMD_OPPW(short DEST[4], short SRC[4]);
+void SIMD_OPPB(char DEST[8], char SRC[8]);
+void SIMD_SETPS(float DEST[2], float SRC[2]);
+void SIMD_SETD(int DEST[2], int SRC[2]);
+void SIMD_SETW(short DEST[4], short SRC[4]);
+void SIMD_SETB(char DEST[8], char SRC[8]);
+void SIMD_LOAD_CONSTANT_V2DF(double vec[2], double v0, double v1);
+"""
+
 # taken from validation/SAC/include/sse.h r2291
 sse_h = """
 #include <xmmintrin.h>
 
 /* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
+#define SIMD_LOADA_V4SF(vec,arr) vec=_mm_load_ps(arr)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
+/* umin as in unary minus */
+#define SIMD_UMINPS(vec1, vec2)				\
+	do {						\
+		__m128 __pips_tmp;			\
+		__pips_tmp = _mm_setzero_ps();		\
+		vec1 = _mm_sub_ps(__pips_tmp, vec2);	\
+	} while(0)
+
 #define SIMD_STORE_V4SF(vec,arr) _mm_storeu_ps(arr,vec)
-#define SIMD_STORE_GENERIC_V4SF(vec,v0,v1,v2,v3) \
-	do {					 \
-		float tmp[4];			 \
-		SIMD_STORE_V4SF(vec,&tmp[0]);	 \
-		*v0=tmp[0];			 \
-		*v1=tmp[1];			 \
-		*v2=tmp[2];			 \
-		*v3=tmp[3];			 \
+#define SIMD_STOREA_V4SF(vec,arr) _mm_store_ps(arr,vec)
+#define SIMD_STORE_GENERIC_V4SF(vec,v0,v1,v2,v3)			\
+	do {								\
+		float __pips_tmp[4] __attribute__ ((aligned (16)));	\
+		SIMD_STOREA_V4SF(vec,&__pips_tmp[0]);			\
+		*(v0)=__pips_tmp[0];					\
+		*(v1)=__pips_tmp[1];					\
+		*(v2)=__pips_tmp[2];					\
+		*(v3)=__pips_tmp[3];					\
 	} while (0)
 
-#define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)	\
-	do {					\
-		float v[4] = { v0,v1,v2,v3 };	\
-		SIMD_LOAD_V4SF(vec,&v[0]);	\
+#define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)				\
+	do {								\
+		float __pips_v[4] __attribute ((aligned (16)))= { v0,v1,v2,v3 }; \
+		SIMD_LOADA_V4SF(vec,&__pips_v[0]);			\
 	} while(0)
 
 /* handle padded value, this is a very bad implementation ... */
-#define SIMD_MASKED_SAVE_V4SF(vec,arr)		\
-	do {					\
-		float tmp[4];			\
-		SIMD_STORE_V4SF(vec,&tmp[0]);	\
-		(arr)[0] = tmp[0];		\
-		(arr)[1] = tmp[1];		\
-		(arr)[2] = tmp[2];		\
+#define SIMD_MASKED_SAVE_V4SF(vec,arr)			\
+	do {						\
+		float __pips_tmp[4];			\
+		SIMD_STORE_V4SF(vec,&__pips_tmp[0]);	\
+		(arr)[0] = __pips_tmp[0];		\
+		(arr)[1] = __pips_tmp[1];		\
+		(arr)[2] = __pips_tmp[2];		\
 	} while(0)
 
 #define SIMD_LOAD_V4SI_TO_V4SF(v, f)		\
 	do {					\
-		float tmp[4];			\
-		tmp[0] = (f)[0];		\
-		tmp[1] = (f)[1];		\
-		tmp[2] = (f)[2];		\
-		tmp[3] = (f)[3];		\
-		SIMD_LOAD_V4SF(v, tmp);		\
-	} while(0)
-
-/* umin as in unary minus */
-#define SIMD_UMINPS(vec1, vec2)			\
-	do {					\
-		__m128 tmp;			\
-		tmp = _mm_setzero_ps();		\
-		vec1 = _mm_sub_ss(tmp, vec2);	\
+		float __pips_tmp[4];		\
+		__pips_tmp[0] = (f)[0];		\
+		__pips_tmp[1] = (f)[1];		\
+		__pips_tmp[2] = (f)[2];		\
+		__pips_tmp[3] = (f)[3];		\
+		SIMD_LOAD_V4SF(v, __pips_tmp);	\
 	} while(0)
 
 /* double */
 #define SIMD_LOAD_V2DF(vec,arr) vec=_mm_loadu_pd(arr)
 #define SIMD_MULPD(vec1,vec2,vec3) vec1=_mm_mul_pd(vec2,vec3)
 #define SIMD_ADDPD(vec1,vec2,vec3) vec1=_mm_add_pd(vec2,vec3)
+#define SIMD_UMINPD(vec1, vec2)				\
+	do {						\
+		__m128d __pips_tmp;			\
+		__pips_tmp = _mm_setzero_pd();		\
+		vec1 = _mm_sub_pd(__pips_tmp, vec2);	\
+	} while(0)
+
+#define SIMD_COSPD(vec1, vec2)						\
+	do {								\
+		double __pips_tmp[2] __attribute__ ((aligned (16)));	\
+		SIMD_STORE_V2DF(vec2, __pips_tmp);			\
+		__pips_tmp[0] = cos(__pips_tmp[0]);			\
+		__pips_tmp[1] = cos(__pips_tmp[1]);			\
+		SIMD_LOAD_V2DF(vec2, __pips_tmp);			\
+	} while(0)
+
+#define SIMD_SINPD(vec1, vec2)						\
+	do {								\
+		double __pips_tmp[2] __attribute__ ((aligned (16)));	\
+		SIMD_STORE_V2DF(vec2, __pips_tmp);			\
+		__pips_tmp[0] = sin(__pips_tmp[0]);			\
+		__pips_tmp[1] = sin(__pips_tmp[1]);			\
+	} while(0)
+
 #define SIMD_STORE_V2DF(vec,arr) _mm_storeu_pd(arr,vec)
-#define SIMD_STORE_GENERIC_V2DF(vec,v0,v1)	\
+#define SIMD_STORE_GENERIC_V2DF(vec, v0, v1)	\
 	do {					\
-		double tmp[2];			\
-		SIMD_STORE_V2DF(vec,&tmp[0]);	\
-		*(v0)=tmp[0];			\
-		*(v1)=tmp[1];			\
+		double __pips_tmp[2];			\
+		SIMD_STORE_V2DF(vec,&__pips_tmp[0]);	\
+		*(v0)=__pips_tmp[0];			\
+		*(v1)=__pips_tmp[1];			\
 	} while (0)
 #define SIMD_LOAD_GENERIC_V2DF(vec,v0,v1)	\
 	do {					\
@@ -1004,9 +1259,50 @@ sse_h = """
 	} while(0)
 
 /* conversions */
-#define SIMD_STORE_V2DF_TO_V2SF(f,vec) \
-    SIMD_STORE_GENERIC_V2SF(vec,(f),(f)+1)
-#define SIMD_LOAD_V2SF_TO_V2DF(vec,f) \
-    SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
+#define SIMD_STORE_V2DF_TO_V2SF(vec,f)			\
+	do {						\
+		double __pips_tmp[2];			\
+		SIMD_STORE_V2DF(vec, __pips_tmp);	\
+		(f)[0] = __pips_tmp[0];			\
+		(f)[1] = __pips_tmp[1];			\
+	} while(0)
+
+#define SIMD_LOAD_V2SF_TO_V2DF(vec,f)		\
+	SIMD_LOAD_GENERIC_V2DF(vec,(f)[0],(f)[1])
+
+"""
+
+Threednow_h = """
+#include <mm3dnow.h>
+
+#define SIMD_LOAD_V2SF(vec, f)			\
+	vec = *(const __m64 *) &(f)[0]
+
+#define SIMD_STORE_V2SF(vec, f)			\
+	*(__m64 *)(&(f)[0]) = vec
+
+#define SIMD_MULPS(vec1, vec2, vec3)		\
+	vec1 = _m_pfmul(vec2, vec3)
+
+#define SIMD_ADDPS(vec1, vec2, vec3)		\
+	vec1 = _m_pfadd(vec2, vec3)
+
+#define SIMD_SUBPS(vec1, vec2, vec3)		\
+	vec1 = _m_pfsub(vec2, vec3)
+
+#define SIMD_UMINPS(vec1, vec2)					\
+	do {							\
+		__m64 __pips_tmp;				\
+		__pips_tmp = _m_pxor(__pips_tmp, __pips_tmp);	\
+		SIMD_SUBPS(vec1, __pips_tmp, vec2);		\
+	} while(0)
+
+#define SIMD_LOAD_V2SI_TO_V2SF(vec, f)		\
+	do {					\
+		float __pips_f[2];		\
+		__pips_f[0] = (f)[0];		\
+		__pips_f[1] = (f)[1];		\
+		SIMD_LOAD_V2SF(vec, __pips_f);	\
+	} while (0)
 
 """

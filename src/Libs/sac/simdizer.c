@@ -153,94 +153,6 @@ static bool successor_only_has_rr_conflict_p(successor su)
 }
 
 /*
- * This function stores in the hash_table equivalence_table
- * all statement equivalent to those in l
- * 
- * it is done by iterating over the `dependence_graph'
- */
-static void init_statement_equivalence_table(list l,graph dependence_graph)
-{
-    pips_assert("free was called",hash_table_undefined_p(equivalence_table));
-    equivalence_table=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-
-    /* for faster access */
-    set statements = set_make(set_pointer);
-    set_assign_list(statements,l);
-    hash_table counters = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-
-    /* first extract corresponding vertices */
-    FOREACH(VERTEX, a_vertex,graph_vertices(dependence_graph))
-    {
-        statement s = vertex_to_statement(a_vertex);
-        if(set_belong_p(statements,s))
-            hash_put(counters,a_vertex,(void*)0);
-    }
-    /* then count the references between each other */
-    for(void *k,*v,*iter=NULL; (iter=hash_table_scan(counters,iter,&k,&v));)
-    {
-        FOREACH(SUCCESSOR,su,vertex_successors((vertex)k))
-        {
-            /* do not take into account backward references, or R-R conflicts */
-            if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  &&
-                    !successor_only_has_rr_conflict_p(su) )
-            {
-                void* counter = hash_get(counters,successor_vertex(su));
-                if(counter != HASH_UNDEFINED_VALUE)
-                {
-                    intptr_t value = (intptr_t)counter;
-                    ++value;
-                    pips_debug(4,"counter now is %td for\n",value);
-                    ifdebug(4) print_statement(vertex_to_statement(successor_vertex(su)));
-                    pips_debug(4,"referenced by\n");
-                    ifdebug(4) print_statement(vertex_to_statement((vertex)k));
-                    hash_update(counters,successor_vertex(su),(void*)value);
-                }
-            }
-        }
-    }
-
-    /* now  recursievly retreive the head of each vertex with no reference on them */
-    while(!hash_table_empty_p(counters))
-    {
-        set head = set_make(set_pointer);
-        /* fill the head */
-        HASH_MAP(k,v,if((intptr_t)v == 0) set_add_element(head,head,k), counters);
-        /* found nothing, assume we are in the tail */
-        if(set_empty_p(head))
-        {
-            list equivalence_list = NIL;
-            HASH_MAP(k,v,equivalence_list=CONS(STATEMENT,vertex_to_statement((vertex)k),equivalence_list),counters);
-            HASH_MAP(k,v, hash_put(equivalence_table,vertex_to_statement((vertex)k),equivalence_list), counters);
-            hash_table_clear(counters);
-        }
-        /* remove those vertex from the head and decrease references elsewhere */
-        else
-        {
-            list equivalence_list = NIL;
-            { SET_FOREACH(vertex,v,head) equivalence_list=CONS(STATEMENT,vertex_to_statement(v),equivalence_list); }
-
-            SET_FOREACH(vertex,v,head) {
-                FOREACH(SUCCESSOR,su,vertex_successors(v)) {
-                    void* counter = hash_get(counters,successor_vertex(su));
-                    /* do not take into account backward references and ignored statements */
-                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) && !successor_only_has_rr_conflict_p(su))
-                    {
-                        intptr_t value = (intptr_t)counter;
-                        --value;
-                        pips_assert("not missed something",value>=0);
-                        hash_update(counters,successor_vertex(su),(void*)value);
-                    }
-                }
-                hash_put(equivalence_table,vertex_to_statement(v),equivalence_list);
-                hash_del(counters,v);
-            }
-        }
-        set_free(head);
-    }
-    hash_table_free(counters);
-}
-
-/*
  * This function frees the successors list
  */
 static void free_statement_equivalence_table()
@@ -381,6 +293,9 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
     int res = 0;
     FOREACH(EXPRESSION,e0,exp0)
     {
+	if (ENDP(iter)) {
+		break;
+	}
         expression e1 = EXPRESSION(CAR(iter));
         expression distance = distance_between_expression(e1,e0);
         intptr_t val=0;
@@ -432,6 +347,104 @@ static list order_isomorphic_statements(set s)
         out=gen_nconc(l,out);
     gen_free_list(heads);
     return out;
+}
+
+/*
+ * This function stores in the hash_table equivalence_table
+ * all statement equivalent to those in l
+ * 
+ * it is done by iterating over the `dependence_graph'
+ */
+static void init_statement_equivalence_table(list* l,graph dependence_graph)
+{
+    pips_assert("free was called",hash_table_undefined_p(equivalence_table));
+    equivalence_table=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+
+    /* for faster access */
+    set statements = set_make(set_pointer);
+    set_assign_list(statements,*l);
+    hash_table counters = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+
+    /* first extract corresponding vertices */
+    FOREACH(VERTEX, a_vertex,graph_vertices(dependence_graph))
+    {
+        statement s = vertex_to_statement(a_vertex);
+        if(set_belong_p(statements,s))
+            hash_put(counters,a_vertex,(void*)0);
+    }
+    /* then count the references between each other */
+    for(void *k,*v,*iter=NULL; (iter=hash_table_scan(counters,iter,&k,&v));)
+    {
+        FOREACH(SUCCESSOR,su,vertex_successors((vertex)k))
+        {
+            /* do not take into account backward references, or R-R conflicts */
+            if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  &&
+                    !successor_only_has_rr_conflict_p(su) )
+            {
+                void* counter = hash_get(counters,successor_vertex(su));
+                if(counter != HASH_UNDEFINED_VALUE)
+                {
+                    intptr_t value = (intptr_t)counter;
+                    ++value;
+                    pips_debug(4,"counter now is %td for\n",value);
+                    ifdebug(4) print_statement(vertex_to_statement(successor_vertex(su)));
+                    pips_debug(4,"referenced by\n");
+                    ifdebug(4) print_statement(vertex_to_statement((vertex)k));
+                    hash_update(counters,successor_vertex(su),(void*)value);
+                }
+            }
+        }
+    }
+
+    /* now  recursievly retreive the head of each vertex with no reference on them
+     *  and reorder initial statement list */
+    list new_l = NIL;
+    while(!hash_table_empty_p(counters))
+    {
+        set head = set_make(set_pointer);
+        /* fill the head */
+        HASH_MAP(k,v,if((intptr_t)v == 0) set_add_element(head,head,k), counters);
+        /* found nothing, assume we are in the tail */
+        if(set_empty_p(head))
+        {
+            list equivalence_list = NIL;
+            HASH_MAP(k,v,equivalence_list=CONS(STATEMENT,vertex_to_statement((vertex)k),equivalence_list),counters);
+            HASH_MAP(k,v, hash_put(equivalence_table,vertex_to_statement((vertex)k),equivalence_list), counters);
+            hash_table_clear(counters);
+	    new_l = gen_nconc(new_l, equivalence_list);
+        }
+        /* remove those vertex from the head and decrease references elsewhere */
+        else
+        {
+            list equivalence_list = NIL;
+            { SET_FOREACH(vertex,v,head) equivalence_list=CONS(STATEMENT,vertex_to_statement(v),equivalence_list); }
+	    gen_sort_list(equivalence_list, compare_statements_on_ordering);
+
+            SET_FOREACH(vertex,v,head) {
+                FOREACH(SUCCESSOR,su,vertex_successors(v)) {
+                    void* counter = hash_get(counters,successor_vertex(su));
+                    /* do not take into account backward references and ignored statements */
+                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) && !successor_only_has_rr_conflict_p(su))
+                    {
+                        intptr_t value = (intptr_t)counter;
+                        --value;
+                        pips_assert("not missed something",value>=0);
+                        hash_update(counters,successor_vertex(su),(void*)value);
+                    }
+                }
+		if(hash_get(equivalence_table,vertex_to_statement(v))!=HASH_UNDEFINED_VALUE)
+			pips_internal_error("failed");
+                hash_put(equivalence_table,vertex_to_statement(v),gen_copy_seq(equivalence_list));
+                hash_del(counters,v);
+            }
+	    new_l = gen_nconc(new_l, equivalence_list);
+
+        }
+        set_free(head);
+    }
+    hash_table_free(counters);
+    gen_free_list(*l);
+    *l = new_l;
 }
 
 static list simdize_simple_statements_pass2(list seq, float * simdCost)
@@ -598,15 +611,14 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
                             seq=gen_nreverse(seq);
 
                             init_statement_matches_map(seq);
-                            init_statement_equivalence_table(seq,dependence_graph);
+                            init_statement_equivalence_table(&seq,dependence_graph);
 
                             float saveSimdCost = 0;
                             list simdseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
 
-
                             pips_debug(2,"opcode cost1 %f\n", saveSimdCost);
 
-                            if((saveSimdCost >= 0.0001))
+                            if((saveSimdCost >= 0.0))
                             {
                                 new_seq=gen_append(new_seq,seq);
                                 gen_free_list(simdseq);

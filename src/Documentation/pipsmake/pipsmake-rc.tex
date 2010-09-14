@@ -5504,7 +5504,7 @@ SIMD_REMOVE_REDUCTIONS_PRELUDE ""
 SIMD_REMOVE_REDUCTIONS_POSTLUDE ""
 \end{PipsProp}
 \begin{PipsPass}{redundant_load_store_elimination}
-Remove useless load store calls
+Remove useless load store calls (and more)
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5516,6 +5516,12 @@ redundant_load_store_elimination      > MODULE.code
         < MODULE.out_regions
         < MODULE.chains
 \end{PipsMake}
+
+If \PipsPropRef{REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE} is set to false,
+\PipsPassRef{redundant_load_store_elimination} will remove any statement not implied in the computation of out regions, otherwise it will not remove statement that modifies aprameters reference.
+\begin{PipsProp}{REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE}
+REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{deatomizer}
 ...
