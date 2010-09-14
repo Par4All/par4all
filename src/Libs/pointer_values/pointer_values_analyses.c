@@ -1016,15 +1016,30 @@ cell_relation make_simple_pv_from_simple_effects(effect lhs_eff, effect rhs_eff,
 
   if (t == is_approximation_must) t = is_approximation_exact;
   
+  cell lhs_c = effect_cell(lhs_eff);
+  if (cell_preference_p(lhs_c))
+    /* no need to copy the reference, it won't be freed when the effect is freed */
+    lhs_c = make_cell(is_cell_reference, effect_any_reference(lhs_eff));
+  else
+    lhs_c = copy_cell(lhs_c);
+
+  cell rhs_c = effect_cell(rhs_eff);
+  if (cell_preference_p(rhs_c))
+    /* no need to copy the reference, it won't be freed when the effect is freed */
+    rhs_c = make_cell(is_cell_reference, effect_any_reference(rhs_eff));
+  else
+    rhs_c = copy_cell(rhs_c);
+
+
 
   if (cell_interpretation_value_of_p(ci))
-    pv = make_value_of_pointer_value(copy_cell(effect_cell(lhs_eff)),
-				     copy_cell(effect_cell(rhs_eff)),
+    pv = make_value_of_pointer_value(lhs_c,
+				     rhs_c,
 				     t,
 				     make_descriptor_none());	
   else
-    pv = make_address_of_pointer_value(copy_cell(effect_cell(lhs_eff)),
-				       copy_cell(effect_cell(rhs_eff)),
+    pv = make_address_of_pointer_value(lhs_c,
+				       rhs_c,
 				       t,
 				       make_descriptor_none());	
   
