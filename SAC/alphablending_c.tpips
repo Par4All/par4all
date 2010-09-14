@@ -19,6 +19,8 @@ echo
 display PRINTED_FILE
 apply UNSPLIT
 
+shell sed -i -e '1,/alphabledning/ d' $WS.database/Src/alphablending.c
+
 shell ./compileC.sh $WS alphablending.c $WS.database/Tmp/test.c
 shell gcc -O3 -I$. -march=native -c  $WS.database/Tmp/test.c
 

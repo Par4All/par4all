@@ -5,6 +5,9 @@
       INTEGER*8 L
       INTEGER*1 A(0:199)
 
+      LU_NUB0 = 200
+      LU_IB0 = 0
+      LU_IND0 = 0
 99999 CONTINUE
       DO 99998 LU_IND0 = 0, 199, 8
          A(LU_IND0) = LU_IND0
@@ -16,5 +19,6 @@
          A(LU_IND0+6) = LU_IND0+6
          A(LU_IND0+7) = LU_IND0+7
 99998    CONTINUE
+      I = 200
       PRINT *, A                                                        0015
       END

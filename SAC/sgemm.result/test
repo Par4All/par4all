@@ -3614,116 +3614,116 @@ c SIMD_COMMENT_1
 *
       NOTA0 = LSAME(TRANSA, 'N')                                        0042
       NOTB0 = LSAME(TRANSB, 'N')                                        0043
-      NROWA0 = NOTA0?M:K
-      NROWB0 = NOTB0?K:N
 *
 *     Test the input parameters.
 *
       INFO8 = 0                                                         0059
+      NROWA0 = NOTA0?M:K
+      NROWB0 = NOTB0?K:N
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
          INFO7 = 1                                                      0063
       ELSE
          L_911 = .NOT.NOTB0
          L_111 = LSAME(TRANSB, 'C')
-         L_120 = .NOT.L_111
-         L_130 = L_911.AND.L_120
          L_140 = LSAME(TRANSB, 'T')
+         L_500 = M.LT.0
+         L_400 = N.LT.0
+         L_300 = K.LT.0
+         I_00 = MAX(1, NROWA0)
+         I_10 = MAX(1, NROWB0)
+         I_20 = MAX(1, M)
+         L_120 = .NOT.L_111
          L_150 = .NOT.L_140
+         L_200 = LDA.LT.I_00
+         L_100 = LDB.LT.I_10
+         L_000 = LDC.LT.I_20
+         L_130 = L_911.AND.L_120
          L_611 = L_130.AND.L_150
          INFO6 = L_611?2:INFO
-         L_500 = M.LT.0
          L_160 = .NOT.L_611
-         L_511 = L_160?L_500:L_5
          L_170 = .NOT.L_611
-         L_180 = L_170.AND.L_511
-         INFO5 = L_180?3:INFO
-         L_400 = N.LT.0
          L_190 = .NOT.L_611
+         L_230 = .NOT.L_611
+         L_270 = .NOT.L_611
+         L_330 = .NOT.L_611
+         L_390 = .NOT.L_611
+         L_470 = .NOT.L_611
+         L_560 = .NOT.L_611
+         L_650 = .NOT.L_611
+         L_750 = .NOT.L_611
+         L_860 = .NOT.L_611
+         L_511 = L_160?L_500:L_5
+         L_180 = L_170.AND.L_511
          L_211 = .NOT.L_511
+         L_240 = .NOT.L_511
+         L_280 = .NOT.L_511
+         L_340 = .NOT.L_511
+         L_410 = .NOT.L_511
+         L_480 = .NOT.L_511
+         L_570 = .NOT.L_511
+         L_660 = .NOT.L_511
+         L_760 = .NOT.L_511
+         L_870 = .NOT.L_511
+         INFO5 = L_180?3:INFO
          L_220 = L_190.AND.L_211
          L_411 = L_220?L_400:L_4
-         L_230 = .NOT.L_611
-         L_240 = .NOT.L_511
          L_250 = L_240.AND.L_411
-         L_260 = L_230.AND.L_250
-         INFO4 = L_260?4:INFO
-         L_300 = K.LT.0
-         L_270 = .NOT.L_611
-         L_280 = .NOT.L_511
          L_290 = .NOT.L_411
+         L_350 = .NOT.L_411
+         L_420 = .NOT.L_411
+         L_490 = .NOT.L_411
+         L_580 = .NOT.L_411
+         L_670 = .NOT.L_411
+         L_770 = .NOT.L_411
+         L_880 = .NOT.L_411
+         L_260 = L_230.AND.L_250
          L_311 = L_280.AND.L_290
+         INFO4 = L_260?4:INFO
          L_320 = L_270.AND.L_311
          L_310 = L_320?L_300:L_3
-         L_330 = .NOT.L_611
-         L_340 = .NOT.L_511
-         L_350 = .NOT.L_411
          L_360 = L_350.AND.L_310
-         L_370 = L_340.AND.L_360
-         L_380 = L_330.AND.L_370
-         INFO3 = L_380?5:INFO
-         I_00 = MAX(1, NROWA0)
-         L_200 = LDA.LT.I_00
-         L_390 = .NOT.L_611
-         L_410 = .NOT.L_511
-         L_420 = .NOT.L_411
          L_430 = .NOT.L_310
+         L_510 = .NOT.L_310
+         L_590 = .NOT.L_310
+         L_680 = .NOT.L_310
+         L_780 = .NOT.L_310
+         L_890 = .NOT.L_310
+         L_370 = L_340.AND.L_360
          L_440 = L_420.AND.L_430
+         L_380 = L_330.AND.L_370
          L_450 = L_410.AND.L_440
+         INFO3 = L_380?5:INFO
          L_460 = L_390.AND.L_450
          L_210 = L_460?L_200:L_2
-         L_470 = .NOT.L_611
-         L_480 = .NOT.L_511
-         L_490 = .NOT.L_411
-         L_510 = .NOT.L_310
          L_520 = L_510.AND.L_210
-         L_530 = L_490.AND.L_520
-         L_540 = L_480.AND.L_530
-         L_550 = L_470.AND.L_540
-         INFO2 = L_550?8:INFO
-         I_10 = MAX(1, NROWB0)
-         L_100 = LDB.LT.I_10
-         L_560 = .NOT.L_611
-         L_570 = .NOT.L_511
-         L_580 = .NOT.L_411
-         L_590 = .NOT.L_310
          L_600 = .NOT.L_210
+         L_690 = .NOT.L_210
+         L_790 = .NOT.L_210
+         L_900 = .NOT.L_210
+         L_530 = L_490.AND.L_520
          L_610 = L_590.AND.L_600
+         L_540 = L_480.AND.L_530
          L_620 = L_580.AND.L_610
+         L_550 = L_470.AND.L_540
          L_630 = L_570.AND.L_620
+         INFO2 = L_550?8:INFO
          L_640 = L_560.AND.L_630
          L_110 = L_640?L_100:L_1
-         L_650 = .NOT.L_611
-         L_660 = .NOT.L_511
-         L_670 = .NOT.L_411
-         L_680 = .NOT.L_310
-         L_690 = .NOT.L_210
          L_700 = L_690.AND.L_110
-         L_711 = L_680.AND.L_700
-         L_720 = L_670.AND.L_711
-         L_730 = L_660.AND.L_720
-         L_740 = L_650.AND.L_730
-         INFO1 = L_740?10:INFO
-         I_20 = MAX(1, M)
-         L_000 = LDC.LT.I_20
-         L_750 = .NOT.L_611
-         L_760 = .NOT.L_511
-         L_770 = .NOT.L_411
-         L_780 = .NOT.L_310
-         L_790 = .NOT.L_210
          L_800 = .NOT.L_110
+         L_910 = .NOT.L_110
+         L_711 = L_680.AND.L_700
          L_811 = L_790.AND.L_800
+         L_720 = L_670.AND.L_711
          L_820 = L_780.AND.L_811
+         L_730 = L_660.AND.L_720
          L_830 = L_770.AND.L_820
+         L_740 = L_650.AND.L_730
          L_840 = L_760.AND.L_830
+         INFO1 = L_740?10:INFO
          L_850 = L_750.AND.L_840
          L_01 = L_850?L_000:L_0
-         L_860 = .NOT.L_611
-         L_870 = .NOT.L_511
-         L_880 = .NOT.L_411
-         L_890 = .NOT.L_310
-         L_900 = .NOT.L_210
-         L_910 = .NOT.L_110
          L_920 = L_910.AND.L_01
          L_930 = L_900.AND.L_920
          L_940 = L_890.AND.L_930
@@ -3868,8 +3868,8 @@ c SIMD_COMMENT_0
                         DO 110 I = 1, M                                 0142
                            TEMP6 = ZERO0                                0143
                            LU_NUB50 = K
-                           LU_IB50 = MOD(LU_NUB50, 4)
                            RED0(0) = 0.000000
+                           LU_IB50 = MOD(LU_NUB50, 4)
                            DO 99989 LU_IND5 = 0, LU_IB50-1
                               F_14 = A(1+LU_IND5,I)*B(1+LU_IND5,J)
                               RED0(0) = RED0(0)+F_14
@@ -3906,10 +3906,10 @@ c SIMD_COMMENT_0
      &                     v2df_vec16)
                            CALL SIMD_STORE_V2DF_TO_V2SF(v2df_vec14, 
      &                     aligned5(0))
+                           L_980 = .NOT.L_710
                            C(I,J) = L_710?aligned5(0):C(I,J)
                            F_30 = aligned(0)*C(I,J)
                            C10 = aligned5(1)+F_30
-                           L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
 120                     CONTINUE                                        0153
@@ -3994,8 +3994,8 @@ c SIMD_COMMENT_0
                      DO 190 I = 1, M                                    0184
                         TEMP2 = ZERO0                                   0185
                         LU_NUB90 = K
-                        LU_IB90 = MOD(LU_NUB90, 4)
                         RED2(0) = 0.000000
+                        LU_IB90 = MOD(LU_NUB90, 4)
                         DO 99981 LU_IND9 = 0, LU_IB90-1
                            F_54 = A(1+LU_IND9,I)*B(J,1+LU_IND9)
                            RED2(0) = RED2(0)+F_54
@@ -4031,10 +4031,10 @@ c SIMD_COMMENT_0
      &                  v2df_vec31)
                         CALL SIMD_STORE_V2DF_TO_V2SF(v2df_vec29, 
      &                  aligned10(0))
+                        L_990 = .NOT.L_810
                         C(I,J) = L_810?aligned10(0):C(I,J)
                         F_70 = aligned(0)*C(I,J)
                         C30 = aligned10(1)+F_70
-                        L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
 200                  CONTINUE                                           0195
@@ -4125,78 +4125,78 @@ c SIMD_COMMENT_0
 *
       NOTA0 = LSAME(TRANSA, 'N')                                        0042
       NOTB0 = LSAME(TRANSB, 'N')                                        0043
-      NROWA0 = NOTA0?M:K
-      NROWB0 = NOTB0?K:N
 *
 *     Test the input parameters.
 *
+      NROWA0 = NOTA0?M:K
+      NROWB0 = NOTB0?K:N
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
       ELSE
          L_911 = .NOT.NOTB0
          L_111 = LSAME(TRANSB, 'C')
-         L_120 = .NOT.L_111
-         L_130 = L_911.AND.L_120
          L_140 = LSAME(TRANSB, 'T')
-         L_150 = .NOT.L_140
-         L_611 = L_130.AND.L_150
          L_500 = M.LT.0
-         L_160 = .NOT.L_611
-         L_511 = L_160?L_500:L_5
          L_400 = N.LT.0
+         L_300 = K.LT.0
+         I_00 = MAX(1, NROWA0)
+         I_10 = MAX(1, NROWB0)
+         I_20 = MAX(1, M)
+         L_120 = .NOT.L_111
+         L_150 = .NOT.L_140
+         L_200 = LDA.LT.I_00
+         L_100 = LDB.LT.I_10
+         L_000 = LDC.LT.I_20
+         L_130 = L_911.AND.L_120
+         L_611 = L_130.AND.L_150
+         L_160 = .NOT.L_611
          L_190 = .NOT.L_611
+         L_270 = .NOT.L_611
+         L_390 = .NOT.L_611
+         L_560 = .NOT.L_611
+         L_750 = .NOT.L_611
+         L_860 = .NOT.L_611
+         L_511 = L_160?L_500:L_5
          L_211 = .NOT.L_511
+         L_280 = .NOT.L_511
+         L_410 = .NOT.L_511
+         L_570 = .NOT.L_511
+         L_760 = .NOT.L_511
+         L_870 = .NOT.L_511
          L_220 = L_190.AND.L_211
          L_411 = L_220?L_400:L_4
-         L_300 = K.LT.0
-         L_270 = .NOT.L_611
-         L_280 = .NOT.L_511
          L_290 = .NOT.L_411
+         L_420 = .NOT.L_411
+         L_580 = .NOT.L_411
+         L_770 = .NOT.L_411
+         L_880 = .NOT.L_411
          L_311 = L_280.AND.L_290
          L_320 = L_270.AND.L_311
          L_310 = L_320?L_300:L_3
-         I_00 = MAX(1, NROWA0)
-         L_200 = LDA.LT.I_00
-         L_390 = .NOT.L_611
-         L_410 = .NOT.L_511
-         L_420 = .NOT.L_411
          L_430 = .NOT.L_310
+         L_590 = .NOT.L_310
+         L_780 = .NOT.L_310
+         L_890 = .NOT.L_310
          L_440 = L_420.AND.L_430
          L_450 = L_410.AND.L_440
          L_460 = L_390.AND.L_450
          L_210 = L_460?L_200:L_2
-         I_10 = MAX(1, NROWB0)
-         L_100 = LDB.LT.I_10
-         L_560 = .NOT.L_611
-         L_570 = .NOT.L_511
-         L_580 = .NOT.L_411
-         L_590 = .NOT.L_310
          L_600 = .NOT.L_210
+         L_790 = .NOT.L_210
+         L_900 = .NOT.L_210
          L_610 = L_590.AND.L_600
          L_620 = L_580.AND.L_610
          L_630 = L_570.AND.L_620
          L_640 = L_560.AND.L_630
          L_110 = L_640?L_100:L_1
-         I_20 = MAX(1, M)
-         L_000 = LDC.LT.I_20
-         L_750 = .NOT.L_611
-         L_760 = .NOT.L_511
-         L_770 = .NOT.L_411
-         L_780 = .NOT.L_310
-         L_790 = .NOT.L_210
          L_800 = .NOT.L_110
+         L_910 = .NOT.L_110
          L_811 = L_790.AND.L_800
          L_820 = L_780.AND.L_811
          L_830 = L_770.AND.L_820
          L_840 = L_760.AND.L_830
          L_850 = L_750.AND.L_840
          L_01 = L_850?L_000:L_0
-         L_860 = .NOT.L_611
-         L_870 = .NOT.L_511
-         L_880 = .NOT.L_411
-         L_890 = .NOT.L_310
-         L_900 = .NOT.L_210
-         L_910 = .NOT.L_110
          L_920 = L_910.AND.L_01
          L_930 = L_900.AND.L_920
          L_940 = L_890.AND.L_930
@@ -4338,10 +4338,10 @@ c SIMD_COMMENT_0
                      DO 120 J = 1, N                                    0141
                         DO 110 I = 1, M                                 0142
                            L_710 = aligned(0).EQ.ZERO0
+                           L_980 = .NOT.L_710
                            C(I,J) = L_710?aligned5(0):C(I,J)
                            F_30 = aligned(0)*C(I,J)
                            C10 = aligned5(1)+F_30
-                           L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
 120                     CONTINUE                                        0153
@@ -4423,10 +4423,10 @@ c SIMD_COMMENT_0
                   DO 200 J = 1, N                                       0183
                      DO 190 I = 1, M                                    0184
                         L_810 = aligned(0).EQ.ZERO0
+                        L_990 = .NOT.L_810
                         C(I,J) = L_810?aligned10(0):C(I,J)
                         F_70 = aligned(0)*C(I,J)
                         C30 = aligned10(1)+F_70
-                        L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
 200                  CONTINUE                                           0195
@@ -4517,78 +4517,78 @@ c SIMD_COMMENT_0
 *
       NOTA0 = LSAME(TRANSA, 'N')                                        0042
       NOTB0 = LSAME(TRANSB, 'N')                                        0043
-      NROWA0 = NOTA0?M:K
-      NROWB0 = NOTB0?K:N
 *
 *     Test the input parameters.
 *
+      NROWA0 = NOTA0?M:K
+      NROWB0 = NOTB0?K:N
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
       ELSE
          L_911 = .NOT.NOTB0
          L_111 = LSAME(TRANSB, 'C')
-         L_120 = .NOT.L_111
-         L_130 = L_911.AND.L_120
          L_140 = LSAME(TRANSB, 'T')
-         L_150 = .NOT.L_140
-         L_611 = L_130.AND.L_150
          L_500 = M.LT.0
-         L_160 = .NOT.L_611
-         L_511 = L_160?L_500:L_5
          L_400 = N.LT.0
+         L_300 = K.LT.0
+         I_00 = MAX(1, NROWA0)
+         I_10 = MAX(1, NROWB0)
+         I_20 = MAX(1, M)
+         L_120 = .NOT.L_111
+         L_150 = .NOT.L_140
+         L_200 = LDA.LT.I_00
+         L_100 = LDB.LT.I_10
+         L_000 = LDC.LT.I_20
+         L_130 = L_911.AND.L_120
+         L_611 = L_130.AND.L_150
+         L_160 = .NOT.L_611
          L_190 = .NOT.L_611
+         L_270 = .NOT.L_611
+         L_390 = .NOT.L_611
+         L_560 = .NOT.L_611
+         L_750 = .NOT.L_611
+         L_860 = .NOT.L_611
+         L_511 = L_160?L_500:L_5
          L_211 = .NOT.L_511
+         L_280 = .NOT.L_511
+         L_410 = .NOT.L_511
+         L_570 = .NOT.L_511
+         L_760 = .NOT.L_511
+         L_870 = .NOT.L_511
          L_220 = L_190.AND.L_211
          L_411 = L_220?L_400:L_4
-         L_300 = K.LT.0
-         L_270 = .NOT.L_611
-         L_280 = .NOT.L_511
          L_290 = .NOT.L_411
+         L_420 = .NOT.L_411
+         L_580 = .NOT.L_411
+         L_770 = .NOT.L_411
+         L_880 = .NOT.L_411
          L_311 = L_280.AND.L_290
          L_320 = L_270.AND.L_311
          L_310 = L_320?L_300:L_3
-         I_00 = MAX(1, NROWA0)
-         L_200 = LDA.LT.I_00
-         L_390 = .NOT.L_611
-         L_410 = .NOT.L_511
-         L_420 = .NOT.L_411
          L_430 = .NOT.L_310
+         L_590 = .NOT.L_310
+         L_780 = .NOT.L_310
+         L_890 = .NOT.L_310
          L_440 = L_420.AND.L_430
          L_450 = L_410.AND.L_440
          L_460 = L_390.AND.L_450
          L_210 = L_460?L_200:L_2
-         I_10 = MAX(1, NROWB0)
-         L_100 = LDB.LT.I_10
-         L_560 = .NOT.L_611
-         L_570 = .NOT.L_511
-         L_580 = .NOT.L_411
-         L_590 = .NOT.L_310
          L_600 = .NOT.L_210
+         L_790 = .NOT.L_210
+         L_900 = .NOT.L_210
          L_610 = L_590.AND.L_600
          L_620 = L_580.AND.L_610
          L_630 = L_570.AND.L_620
          L_640 = L_560.AND.L_630
          L_110 = L_640?L_100:L_1
-         I_20 = MAX(1, M)
-         L_000 = LDC.LT.I_20
-         L_750 = .NOT.L_611
-         L_760 = .NOT.L_511
-         L_770 = .NOT.L_411
-         L_780 = .NOT.L_310
-         L_790 = .NOT.L_210
          L_800 = .NOT.L_110
+         L_910 = .NOT.L_110
          L_811 = L_790.AND.L_800
          L_820 = L_780.AND.L_811
          L_830 = L_770.AND.L_820
          L_840 = L_760.AND.L_830
          L_850 = L_750.AND.L_840
          L_01 = L_850?L_000:L_0
-         L_860 = .NOT.L_611
-         L_870 = .NOT.L_511
-         L_880 = .NOT.L_411
-         L_890 = .NOT.L_310
-         L_900 = .NOT.L_210
-         L_910 = .NOT.L_110
          L_920 = L_910.AND.L_01
          L_930 = L_900.AND.L_920
          L_940 = L_890.AND.L_930
@@ -4729,10 +4729,10 @@ c SIMD_COMMENT_0
                      DO 120 J = 1, N
                         DO 110 I = 1, M
                            L_710 = aligned(0).EQ.ZERO0
+                           L_980 = .NOT.L_710
                            C(I,J) = L_710?aligned5(0):C(I,J)
                            F_30 = aligned(0)*C(I,J)
                            C10 = aligned5(1)+F_30
-                           L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
 120                     CONTINUE                                        0153
@@ -4813,10 +4813,10 @@ c SIMD_COMMENT_0
                   DO 200 J = 1, N
                      DO 190 I = 1, M
                         L_810 = aligned(0).EQ.ZERO0
+                        L_990 = .NOT.L_810
                         C(I,J) = L_810?aligned10(0):C(I,J)
                         F_70 = aligned(0)*C(I,J)
                         C30 = aligned10(1)+F_70
-                        L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
 200                  CONTINUE                                           0195
@@ -4876,78 +4876,78 @@ c SIMD_COMMENT_0
 *
       NOTA0 = LSAME(TRANSA, 'N')                                        0042
       NOTB0 = LSAME(TRANSB, 'N')                                        0043
-      NROWA0 = NOTA0?M:K
-      NROWB0 = NOTB0?K:N
 *
 *     Test the input parameters.
 *
+      NROWA0 = NOTA0?M:K
+      NROWB0 = NOTB0?K:N
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
       ELSE
          L_911 = .NOT.NOTB0
          L_111 = LSAME(TRANSB, 'C')
-         L_120 = .NOT.L_111
-         L_130 = L_911.AND.L_120
          L_140 = LSAME(TRANSB, 'T')
-         L_150 = .NOT.L_140
-         L_611 = L_130.AND.L_150
          L_500 = M.LT.0
-         L_160 = .NOT.L_611
-         L_511 = L_160?L_500:L_5
          L_400 = N.LT.0
+         L_300 = K.LT.0
+         I_00 = MAX(1, NROWA0)
+         I_10 = MAX(1, NROWB0)
+         I_20 = MAX(1, M)
+         L_120 = .NOT.L_111
+         L_150 = .NOT.L_140
+         L_200 = LDA.LT.I_00
+         L_100 = LDB.LT.I_10
+         L_000 = LDC.LT.I_20
+         L_130 = L_911.AND.L_120
+         L_611 = L_130.AND.L_150
+         L_160 = .NOT.L_611
          L_190 = .NOT.L_611
+         L_270 = .NOT.L_611
+         L_390 = .NOT.L_611
+         L_560 = .NOT.L_611
+         L_750 = .NOT.L_611
+         L_860 = .NOT.L_611
+         L_511 = L_160?L_500:L_5
          L_211 = .NOT.L_511
+         L_280 = .NOT.L_511
+         L_410 = .NOT.L_511
+         L_570 = .NOT.L_511
+         L_760 = .NOT.L_511
+         L_870 = .NOT.L_511
          L_220 = L_190.AND.L_211
          L_411 = L_220?L_400:L_4
-         L_300 = K.LT.0
-         L_270 = .NOT.L_611
-         L_280 = .NOT.L_511
          L_290 = .NOT.L_411
+         L_420 = .NOT.L_411
+         L_580 = .NOT.L_411
+         L_770 = .NOT.L_411
+         L_880 = .NOT.L_411
          L_311 = L_280.AND.L_290
          L_320 = L_270.AND.L_311
          L_310 = L_320?L_300:L_3
-         I_00 = MAX(1, NROWA0)
-         L_200 = LDA.LT.I_00
-         L_390 = .NOT.L_611
-         L_410 = .NOT.L_511
-         L_420 = .NOT.L_411
          L_430 = .NOT.L_310
+         L_590 = .NOT.L_310
+         L_780 = .NOT.L_310
+         L_890 = .NOT.L_310
          L_440 = L_420.AND.L_430
          L_450 = L_410.AND.L_440
          L_460 = L_390.AND.L_450
          L_210 = L_460?L_200:L_2
-         I_10 = MAX(1, NROWB0)
-         L_100 = LDB.LT.I_10
-         L_560 = .NOT.L_611
-         L_570 = .NOT.L_511
-         L_580 = .NOT.L_411
-         L_590 = .NOT.L_310
          L_600 = .NOT.L_210
+         L_790 = .NOT.L_210
+         L_900 = .NOT.L_210
          L_610 = L_590.AND.L_600
          L_620 = L_580.AND.L_610
          L_630 = L_570.AND.L_620
          L_640 = L_560.AND.L_630
          L_110 = L_640?L_100:L_1
-         I_20 = MAX(1, M)
-         L_000 = LDC.LT.I_20
-         L_750 = .NOT.L_611
-         L_760 = .NOT.L_511
-         L_770 = .NOT.L_411
-         L_780 = .NOT.L_310
-         L_790 = .NOT.L_210
          L_800 = .NOT.L_110
+         L_910 = .NOT.L_110
          L_811 = L_790.AND.L_800
          L_820 = L_780.AND.L_811
          L_830 = L_770.AND.L_820
          L_840 = L_760.AND.L_830
          L_850 = L_750.AND.L_840
          L_01 = L_850?L_000:L_0
-         L_860 = .NOT.L_611
-         L_870 = .NOT.L_511
-         L_880 = .NOT.L_411
-         L_890 = .NOT.L_310
-         L_900 = .NOT.L_210
-         L_910 = .NOT.L_110
          L_920 = L_910.AND.L_01
          L_930 = L_900.AND.L_920
          L_940 = L_890.AND.L_930
@@ -5088,10 +5088,10 @@ c SIMD_COMMENT_0
                      DO 120 J = 1, N
                         DO 110 I = 1, M
                            L_710 = aligned(0).EQ.ZERO0
+                           L_980 = .NOT.L_710
                            C(I,J) = L_710?aligned5(0):C(I,J)
                            F_30 = aligned(0)*C(I,J)
                            C10 = aligned5(1)+F_30
-                           L_980 = .NOT.L_710
                            C(I,J) = L_980?C10:C(I,J)
 110                        CONTINUE                                     0152
 120                     CONTINUE                                        0153
@@ -5172,10 +5172,10 @@ c SIMD_COMMENT_0
                   DO 200 J = 1, N
                      DO 190 I = 1, M
                         L_810 = aligned(0).EQ.ZERO0
+                        L_990 = .NOT.L_810
                         C(I,J) = L_810?aligned10(0):C(I,J)
                         F_70 = aligned(0)*C(I,J)
                         C30 = aligned10(1)+F_70
-                        L_990 = .NOT.L_810
                         C(I,J) = L_990?C30:C(I,J)
 190                     CONTINUE                                        0194
 200                  CONTINUE                                           0195
@@ -5447,68 +5447,68 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     {
       l_911 = !notb0;
       l_111 = lsame (transb, 'c');
-      l_120 = !l_111;
-      l_130 = (l_911 && l_120);
       l_140 = lsame (transb, 't');
-      l_150 = !l_140;
-      l_611 = (l_130 && l_150);
       l_500 = (m < 0);
-      l_160 = !l_611;
-      l_511 = __c - conditional__ (l_160, l_500, l_5);
       l_400 = (n < 0);
+      l_300 = (k < 0);
+      i_00 = max (1, nrowa0);
+      i_10 = max (1, nrowb0);
+      i_20 = max (1, m);
+      l_120 = !l_111;
+      l_150 = !l_140;
+      l_200 = (lda < i_00);
+      l_100 = (ldb < i_10);
+      l_000 = (ldc < i_20);
+      l_130 = (l_911 && l_120);
+      l_611 = (l_130 && l_150);
+      l_160 = !l_611;
       l_190 = !l_611;
+      l_270 = !l_611;
+      l_390 = !l_611;
+      l_560 = !l_611;
+      l_750 = !l_611;
+      l_860 = !l_611;
+      l_511 = __c - conditional__ (l_160, l_500, l_5);
       l_211 = !l_511;
+      l_280 = !l_511;
+      l_410 = !l_511;
+      l_570 = !l_511;
+      l_760 = !l_511;
+      l_870 = !l_511;
       l_220 = (l_190 && l_211);
       l_411 = __c - conditional__ (l_220, l_400, l_4);
-      l_300 = (k < 0);
-      l_270 = !l_611;
-      l_280 = !l_511;
       l_290 = !l_411;
+      l_420 = !l_411;
+      l_580 = !l_411;
+      l_770 = !l_411;
+      l_880 = !l_411;
       l_311 = (l_280 && l_290);
       l_320 = (l_270 && l_311);
       l_310 = __c - conditional__ (l_320, l_300, l_3);
-      i_00 = max (1, nrowa0);
-      l_200 = (lda < i_00);
-      l_390 = !l_611;
-      l_410 = !l_511;
-      l_420 = !l_411;
       l_430 = !l_310;
+      l_590 = !l_310;
+      l_780 = !l_310;
+      l_890 = !l_310;
       l_440 = (l_420 && l_430);
       l_450 = (l_410 && l_440);
       l_460 = (l_390 && l_450);
       l_210 = __c - conditional__ (l_460, l_200, l_2);
-      i_10 = max (1, nrowb0);
-      l_100 = (ldb < i_10);
-      l_560 = !l_611;
-      l_570 = !l_511;
-      l_580 = !l_411;
-      l_590 = !l_310;
       l_600 = !l_210;
+      l_790 = !l_210;
+      l_900 = !l_210;
       l_610 = (l_590 && l_600);
       l_620 = (l_580 && l_610);
       l_630 = (l_570 && l_620);
       l_640 = (l_560 && l_630);
       l_110 = __c - conditional__ (l_640, l_100, l_1);
-      i_20 = max (1, m);
-      l_000 = (ldc < i_20);
-      l_750 = !l_611;
-      l_760 = !l_511;
-      l_770 = !l_411;
-      l_780 = !l_310;
-      l_790 = !l_210;
       l_800 = !l_110;
+      l_910 = !l_110;
       l_811 = (l_790 && l_800);
       l_820 = (l_780 && l_811);
       l_830 = (l_770 && l_820);
       l_840 = (l_760 && l_830);
       l_850 = (l_750 && l_840);
       l_01 = __c - conditional__ (l_850, l_000, l_0);
-      l_860 = !l_611;
-      l_870 = !l_511;
-      l_880 = !l_411;
-      l_890 = !l_310;
-      l_900 = !l_210;
-      l_910 = !l_110;
       l_920 = (l_910 && l_01);
       l_930 = (l_900 && l_920);
       l_940 = (l_890 && l_930);
@@ -5691,12 +5691,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  for (i = 1; i <= m; i++)
 			    {
 			      l_710 = (aligned[0] == zero0);
+			      l_980 = !l_710;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_710, aligned5[0],
 						     c[j - 1][i - 1]);
 			      f_30 = (aligned[0] * c[j - 1][i - 1]);
 			      c10 = (aligned5[1] + f_30);
-			      l_980 = !l_710;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_980, c10,
 						     c[j - 1][i - 1]);
@@ -5814,12 +5814,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  for (i = 1; i <= m; i++)
 			    {
 			      l_810 = (aligned[0] == zero0);
+			      l_990 = !l_810;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_810, aligned10[0],
 						     c[j - 1][i - 1]);
 			      f_70 = (aligned[0] * c[j - 1][i - 1]);
 			      c30 = (aligned10[1] + f_70);
-			      l_990 = !l_810;
 			      c[j - 1][i - 1] =
 				__c - conditional__ (l_990, c30,
 						     c[j - 1][i - 1]);

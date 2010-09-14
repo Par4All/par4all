@@ -223,8 +223,8 @@ float dotprod(int n, float b[n], float c[n])
    //SAC generated temporary array
    float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
+   LU_IB00 = MOD(LU_NUB00, 4);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
@@ -264,8 +264,8 @@ float dotprod(int n, float b[n], float c[n])
    //SAC generated temporary array
    float aligned[4] = {0, 0, 0, 0};
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
+   LU_IB00 = MOD(LU_NUB00, 4);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
@@ -305,8 +305,8 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
+   LU_IB00 = MOD(LU_NUB00, 4);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;
@@ -348,8 +348,8 @@ float dotprod(int n, float b[n], float c[n])
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
    RED0[0] = 0.000000;
+   LU_IB00 = MOD(LU_NUB00, 4);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
       _return04 = b[LU_IND0]+c[LU_IND0];
       RED0[0] = RED0[0]+_return04;

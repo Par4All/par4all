@@ -327,11 +327,10 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
-      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER LU_IND0
       INTEGER aligned2(0:3)
-      REAL*4 v4sf_vec11(0:3), aligned4(0:3), v4sf_vec10(0:3), 
-     &v4sf_vec8(0:3), aligned3(0:3), v4sf_vec7(0:3), v4sf_vec5(0:3), 
-     &aligned1(0:3), v4sf_vec3(0:3), aligned0(0:3), aligned(0:3), 
+      REAL*4 v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec8(0:3), 
+     &v4sf_vec7(0:3), v4sf_vec5(0:3), v4sf_vec3(0:3), aligned(0:3), 
      &v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), RESULT(1:SIZE)
      &, SRC(1:SIZE), DEST(1:SIZE), ALPHA
       aligned2(3) = 1
@@ -345,9 +344,6 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 
-      LU_NUB0 = 50000
-      LU_IB0 = 0
-      LU_IND0 = 0
 99999 CONTINUE
       CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
       CALL SIMD_LOAD_V4SI_TO_V4SF(v4sf_vec7, aligned2(0))
@@ -361,11 +357,6 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
          CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
 99998    CONTINUE
-      CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
-      I = 50001
 
       END
 /* C pretty print for module ALPHABLENDING. */
@@ -374,25 +365,18 @@ alphablending (float result[50000], float src[50000], float dest[50000],
 	       float alpha)
 {
   float v4sf_vec11[4];
-  float aligned4[4];
   float v4sf_vec10[4];
   float v4sf_vec8[4];
-  float aligned3[4];
   int aligned2[4];
   float v4sf_vec7[4];
   float v4sf_vec5[4];
-  float aligned1[4];
   float v4sf_vec3[4];
-  float aligned0[4];
   float aligned[4];
   float v4sf_vec2[4];
   float v4sf_vec1[4];
   float v4sf_vec0[4];
   int lu_ind0;
-  int lu_ib0;
-  int lu_nub0;
   static const int size = 50000;
-  int i;
 
   aligned2[3] = 1;
   aligned2[2] = 1;
@@ -402,9 +386,6 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   aligned[2] = alpha;
   aligned[1] = alpha;
   aligned[0] = alpha;
-  lu_nub0 = 50000;
-  lu_ib0 = 0;
-  lu_ind0 = 0;
   ;
   simd_load_v4sf (v4sf_vec1, aligned[0]);
   simd_load_v4si_to_v4sf (v4sf_vec7, aligned2[0]);
@@ -420,11 +401,6 @@ alphablending (float result[50000], float src[50000], float dest[50000],
       simd_store_v4sf (v4sf_vec11, result[(1 + lu_ind0) - 1]);
       continue;
     }
-  simd_store_v4sf (v4sf_vec0, aligned0[0]);
-  simd_store_v4sf (v4sf_vec3, aligned1[0]);
-  simd_store_v4sf (v4sf_vec5, aligned3[0]);
-  simd_store_v4sf (v4sf_vec8, aligned4[0]);
-  i = 50001;
   return;
 }
 

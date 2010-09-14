@@ -1,7 +1,7 @@
 setenv WS="isolate01"
 setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
-create $WS $WS.c
+create $WS $WS.c include/par4all.c
 
 module alphablending
 

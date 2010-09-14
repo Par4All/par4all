@@ -157,8 +157,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 8);
    RED0[0] = 0;
+   LU_IB00 = MOD(LU_NUB00, 8);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
    seed1 = seed+RED0[0];
@@ -190,8 +190,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 8);
    RED0[0] = 0;
+   LU_IB00 = MOD(LU_NUB00, 8);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
    seed1 = seed+RED0[0];
@@ -227,8 +227,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 8);
    RED0[0] = 0;
+   LU_IB00 = MOD(LU_NUB00, 8);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
    seed1 = seed+RED0[0];
@@ -267,8 +267,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    //PIPS generated variable
    int LU_IB00, LU_NUB00;
    LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 8);
    RED0[0] = 0;
+   LU_IB00 = MOD(LU_NUB00, 8);
    for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
       RED0[0] = RED0[0]+a[LU_IND0];
    seed1 = seed+RED0[0];

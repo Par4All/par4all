@@ -1,3 +1,4 @@
+setproperty ABORT_ON_USER_ERROR TRUE
 delete array_to_pointer09
 create array_to_pointer09 array_to_pointer09.c
 
@@ -13,9 +14,14 @@ apply ARRAY_TO_POINTER[%ALL]
 display PRINTED_FILE[atp]
 display PRINTED_FILE[main]
 
-quit
-
 apply UNSPLIT[%ALL]
-shell gcc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c
+close
+
+
+shell gcc array_to_pointer09.c -o array_to_pointer09.database/Tmp/ref
+shell gcc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
+shell test "`./array_to_pointer09.database/Tmp/ref`" = "`./array_to_pointer09.database/Tmp/out`"
+
+delete array_to_pointer09
 
 

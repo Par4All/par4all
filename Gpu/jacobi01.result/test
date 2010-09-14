@@ -1,12 +1,14 @@
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, *SEMANTICS*:o#0==499}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499}>
 
 void compute(float_t space[501][501], float_t save[501][501])
 {
@@ -14,12 +16,14 @@ void compute(float_t space[501][501], float_t save[501][501])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, *SEMANTICS*:o#0==499}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499}>
 
    
    /* Apply the relaxation T times: */
@@ -27,14 +31,14 @@ void compute(float_t space[501][501], float_t save[501][501])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500, 0<=t, t<=399}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    PHI2<=500, *SEMANTICS*:o#0==499, 0<=t, t<=399}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
 //    0<=t, t<=399}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500, 0<=t, t<=399}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
-//    0<=t, t<=399}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499, 0<=t, t<=399}>
 
       iteration(space, save);                                           /*0110*/
 }
@@ -153,13 +157,14 @@ void get_data(char filename[])
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
 
-//  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
 
    
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1)
 
-//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2<=500, 0<=i,
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=500, 0<=i,
 //    i<=500}>
 
       for(j = 0; j <= 500; j += 1)
@@ -172,10 +177,10 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, *SEMANTICS*:o#1==501, i==501, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, *SEMANTICS*:o#1==501, i==501, 1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
-//    PHI2<=500, PHI2+1<=ny}>
+//    PHI2<=500, PHI2+1<=ny, *SEMANTICS*:o#1==501, i==501}>
 
    
    /* Read the pixel grey value: */
@@ -184,8 +189,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 
@@ -223,18 +228,21 @@ void get_data(char filename[])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, *SEMANTICS*:o#0==499}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499}>
 
 void iteration(float_t space[501][501], float_t save[501][501])
 {
    int i, j;                                                            /*0087*/
 
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
@@ -244,7 +252,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
         could use also a flip-flop dimension instead... */
    for(i = 0; i <= 498; i += 1)
 
-//  <save[PHI1][PHI2]-W-MAY-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
+//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
 //    i<=498}>
 //  <space[PHI1][PHI2]-R-MAY-{i+1<=PHI1+PHI2, PHI2+i<=PHI1+499,
 //    PHI1<=PHI2+i+1, PHI1+PHI2<=i+501, i<=PHI1, PHI1<=i+2, 0<=i,
@@ -262,8 +270,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499}>
+//    PHI2<=500, *SEMANTICS*:o#0==499, j==499}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499, j==499}>
 
 
    for(i = 0; i <= 498; i += 1)
@@ -271,7 +280,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //  <save[PHI1][PHI2]-R-MAY-{i+1<=PHI1+PHI2, PHI2+i<=PHI1+499,
 //    PHI1<=PHI2+i+1, PHI1+PHI2<=i+501, i<=PHI1, PHI1<=i+2, 0<=i,
 //    i<=498}>
-//  <space[PHI1][PHI2]-W-MAY-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
 //    i<=498}>
 
       for(j = 0; j <= 498; j += 1)
@@ -331,7 +340,8 @@ void write_data(char filename[])
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
 
 
    for(j = 0; j <= 500; j += 1)
@@ -339,9 +349,9 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <space[PHI1][PHI2]-R-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
 //    j<=500}>
 
       for(i = 0; i <= 500; i += 1) {
@@ -421,14 +431,14 @@ int main(int argc, char *argv[])
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500, argc==2, i==501}>
-//  <save[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
+//    PHI2<=500, *SEMANTICS*:o#0==499, argc==2, i==501}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
 //    argc==2, i==501}>
 //  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500, argc==2, i==501}>
-//  <space[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2, PHI2<=499,
-//    argc==2, i==501}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//    PHI2<=499, *SEMANTICS*:o#0==499, argc==2, i==501}>
 
 
    compute(space, save);                                                /*0131*/

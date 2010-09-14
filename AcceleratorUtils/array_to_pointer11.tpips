@@ -10,7 +10,11 @@ echo
 echo "/* After apply ARRAY_TO_POINTER[%ALL] */"
 echo
 
-apply ARRAY_TO_POINTER[%ALL]
+#apply ARRAY_TO_POINTER[%ALL]
+apply ARRAY_TO_POINTER[init]
+apply ARRAY_TO_POINTER[p4a_kernel_1]
+apply ARRAY_TO_POINTER[p4a_kernel_launcher_1]
+apply ARRAY_TO_POINTER[p4a_kernel_wrapper_1]
 display PRINTED_FILE[%ALL]
 
 #quit

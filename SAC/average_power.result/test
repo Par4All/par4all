@@ -378,9 +378,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       RED2[1] = 0.000000;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
          LU_NUB00 = Nv;
-         LU_IB00 = MOD(LU_NUB00, 4);
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
+         LU_IB00 = MOD(LU_NUB00, 4);
          for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
             //PIPS:SAC generated double vector(s)
             double v2df_vec0[2], v2df_vec1[2], v2df_vec2[2], v2df_vec3[2];
@@ -419,8 +419,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED2[1] = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+RED2[1];
       }
       PP0 = RED2[1]+PP1+RED2[0];
-      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
+      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
    }
    ;
 }
@@ -449,9 +449,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       RED2[1] = 0.000000;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
          LU_NUB00 = Nv;
-         LU_IB00 = MOD(LU_NUB00, 4);
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
+         LU_IB00 = MOD(LU_NUB00, 4);
          {
             //PIPS:SAC generated double vector(s)
             double v2df_vec0[2], v2df_vec2[2];
@@ -498,8 +498,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED2[1] = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+RED2[1];
       }
       PP0 = RED2[1]+PP1+RED2[0];
-      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
+      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
    }
    ;
 }
@@ -514,8 +514,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    int LU_IB00, LU_NUB00;
    //PIPS generated variable
    float PP1;
-   //SAC generated temporary array
-   float aligned[2] = {0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0};
    
    
    for(th = 0; th <= Nth-1; th += 1) {
@@ -524,9 +522,9 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       RED2[1] = 0.000000;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
          LU_NUB00 = Nv;
-         LU_IB00 = MOD(LU_NUB00, 4);
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
+         LU_IB00 = MOD(LU_NUB00, 4);
          {
             //PIPS:SAC generated double vector(s)
             double v2df_vec0[2], v2df_vec2[2];
@@ -538,7 +536,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
                SIMD_MULPD(v2df_vec0, v2df_vec1, v2df_vec1);
                SIMD_ADDPD(v2df_vec2, v2df_vec0, v2df_vec2);
             }
-            SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &aligned[0]);
             SIMD_STORE_GENERIC_V2DF(v2df_vec2, &RED0[1], &RED0[0]);
          }
          RED2[0] = RED0[1]+RED0[0]+RED2[0];
@@ -565,16 +562,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
                SIMD_ADDPS(v4sf_vec8, v4sf_vec4, v4sf_vec8);
                SIMD_ADDPS(v4sf_vec10, v4sf_vec6, v4sf_vec10);
             }
-            SIMD_STORE_V4SF(v4sf_vec4, &aligned0[0]);
-            SIMD_STORE_V4SF(v4sf_vec6, &aligned1[0]);
             SIMD_STORE_GENERIC_V4SF(v4sf_vec8, &RED1[1], &RED1[0], &RED1[3], &RED1[2]);
             SIMD_STORE_GENERIC_V4SF(v4sf_vec10, &RED1[5], &RED1[4], &RED1[7], &RED1[6]);
          }
          RED2[1] = RED1[7]+RED1[6]+RED1[5]+RED1[4]+RED1[3]+RED1[2]+RED1[1]+RED1[0]+RED2[1];
       }
       PP0 = RED2[1]+PP1+RED2[0];
-      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
+      Pow[th].re = (float) (PP0/((float) (Nv*Nrg)));
    }
    ;
 }

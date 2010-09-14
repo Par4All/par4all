@@ -511,17 +511,6 @@ c      PRINT *, 'aft'
 c
       IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-
-
-
-c 20   PRINT *, 'bef'
-20       CONTINUE
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
             CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(1+LU_IND0))
@@ -548,17 +537,6 @@ c      PRINT *, 'aft'
 c
       IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-
-
-
-c 20   PRINT *, 'bef'
-20       CONTINUE
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
             CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(1+LU_IND0))
@@ -584,17 +562,6 @@ c      PRINT *, 'aft'
 c
       IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-
-
-
-c 20   PRINT *, 'bef'
-20       CONTINUE
 99999    CONTINUE
          CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
          DO 99998 LU_IND0 = 0, 999, 4
@@ -618,17 +585,6 @@ c      PRINT *, 'aft'
 c
       IF (aligned(0).EQ.0.0) THEN                                       0021
       ELSE
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-
-
-
-c 20   PRINT *, 'bef'
-20       CONTINUE
 99999    CONTINUE
          CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
          DO 99998 LU_IND0 = 0, 999, 4
@@ -708,7 +664,6 @@ saxpy (float sx[1000], float sy[1000])
     }
   else
     {
-      ;
       ;
       simd_load_v4sf (v4sf_vec1, aligned[0]);
       for (lu_ind0 = 0; lu_ind0 <= 999; lu_ind0 += 4)
