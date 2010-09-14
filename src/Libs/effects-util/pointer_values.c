@@ -36,3 +36,20 @@
 #include "effects.h"
 #include "effects-util.h"
 
+cell_relation make_value_of_pointer_value(cell c1, cell c2, tag app_tag, descriptor d)
+{
+  interpreted_cell ic1 = make_interpreted_cell(c1, make_cell_interpretation_value_of());
+  interpreted_cell ic2 = make_interpreted_cell(c2, make_cell_interpretation_value_of());
+	      
+  cell_relation pv = make_cell_relation(ic1, ic2, make_approximation(app_tag, UU), d);
+  return(pv);
+}
+
+cell_relation make_address_of_pointer_value(cell c1, cell c2, tag app_tag, descriptor d)
+{
+  interpreted_cell ic1 = make_interpreted_cell(c1, make_cell_interpretation_value_of());
+  interpreted_cell ic2 = make_interpreted_cell(c2, make_cell_interpretation_address_of());
+	      
+  cell_relation pv = make_cell_relation(ic1, ic2, make_approximation(app_tag, UU), d);
+  return(pv);
+}
