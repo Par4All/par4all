@@ -57,7 +57,7 @@ static list called_modules = list_undefined;
 
 /* statement of current function */
 static statement function_body = statement_undefined;
-
+
 /*********************************************************** GHOST VARIABLES */
 
 /* list of potential local or top-level variables

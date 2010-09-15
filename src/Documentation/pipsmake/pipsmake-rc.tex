@@ -10196,13 +10196,16 @@ omp_merge_pragma             > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-% no longer used {
-% PIPS merges the omp pragma on the inner or outer loop depending on the property
-% OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|
-% \begin{PipsProp}{OMP_MERGE_POLICY}
-% OMP_MERGE_POLICY "outer"
-% \end{PipsProp}
-% }
+PIPS merges the omp pragma on the inner or outer loop depending on the property
+OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|.
+\begin{PipsProp}{OMP_MERGE_POLICY}
+OMP_MERGE_POLICY "outer"
+\end{PipsProp}
+}
+The OMP\_MERGE\_PRAGMA phase with the \verb|inner| mode can be used after the
+phase limit\_nested\_parallelism (see \S~\ref{sec:manage-parallel-loops}).
+Such a combinaison allows to fine choose the loop depth you
+really want to parallelize with OpenMP.
 
 The merging of the if clause of the omp pragma follows its own rule.
 This clause can be ignore without changing the output of the program,
