@@ -49,7 +49,7 @@
 #include <stdlib.h>
 
 #define MAX_PACK 16
-#define VECTOR_POSTFIX "_vec"
+#define VECTOR_POSTFIX "vec"
 
 
 static float gSimdCost;
@@ -402,8 +402,8 @@ expression reference_offset(const reference r, basic refbasic)
                     EXPRESSION(CAR(reference_indices(r))):
                     EXPRESSION(CAR(gen_last(reference_indices(r)))));
         list dims = get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
-            CDR(variable_dimensions(type_variable(entity_type(reference_variable(r))))):
-            variable_dimensions(type_variable(entity_type(reference_variable(r))));
+            CDR(variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))))):
+            variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
         list indices = NIL;
         if( get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
             indices=gen_copy_seq(CDR(reference_indices(r)));
@@ -571,14 +571,10 @@ static string get_simd_vector_type(list lExp)
 
         if(type_variable_p(t))
         {
-            //        basic bas = variable_basic(type_variable(t));
+            basic bas = variable_basic(type_variable(t));
+            pips_assert("searching in a sac vector",basic_typedef_p(bas));
 
-            result = strdup(entity_name(
-                        reference_variable(syntax_reference(expression_syntax(exp)))
-                        ));
-            string c = strrchr(result,'_');
-            pips_assert("searching in a sec - encoded variable name",c);
-            *c='\0';
+            result = strdup(entity_name(basic_typedef(bas)));
             /* switch to upper cases... */
             result=strupper(result,result);
 
@@ -693,7 +689,7 @@ static statement make_exec_statement_from_opcode(opcode oc, list args)
     return make_exec_statement_from_name( opcode_name(oc) , args );
 }
 
-#define SAC_ALIGNED_VECTOR_NAME "aligned"
+#define SAC_ALIGNED_VECTOR_NAME "pdata"
 bool sac_aligned_entity_p(entity e)
 {
     return same_stringn_p(entity_user_name(e),SAC_ALIGNED_VECTOR_NAME,sizeof(SAC_ALIGNED_VECTOR_NAME)-1);
@@ -826,10 +822,16 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         list new_statements = NIL;
         size_t nbargs=gen_length(CDR(args));
         basic shared_basic = basic_of_expressions(CDR(args),true);
-        entity scalar_holder = make_new_array_variable_with_prefix(
-                SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
-                CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
+        char * tname =strdup(get_vect_name_from_data(nbargs,CDR(args)));
+        tname=strlower(tname,tname);
+        tname[0]='a';/*array*/
+
+        entity scalar_holder = make_new_scalar_variable_with_prefix(
+                SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),
+                get_typedefed_array(tname,shared_basic, CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
+                    )
                 );
+        free(tname);
         AddEntityToCurrentModule(scalar_holder);
         int index=0;
         list inits = NIL;
@@ -980,6 +982,22 @@ static statement make_save_statement(int argc, list args, list padded)
     return make_loadsave_statement(argc, args, FALSE, padded);
 }
 
+basic get_typedefed_array(const char * type_name, basic b, list dims) {
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME,type_name);
+    if(entity_undefined_p(e)) {
+        e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,type_name);
+        entity_type(e)=make_type_variable(
+                make_variable(
+                    b,
+                    dims,NIL
+                    )
+                );
+        entity_storage(e)=make_storage_rom();
+        entity_initial(e)=make_value_unknown();
+    }
+    return make_basic_typedef(e);
+}
+
 
 /*
    This function creates a simd vector.
@@ -1028,10 +1046,12 @@ static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype b
     }
 
     pips_assert("buffer doesnot overflow",number<10000);
-    sprintf(name, "%s%s%u",prefix,VECTOR_POSTFIX,number++);
+    sprintf(name, "%s%u",VECTOR_POSTFIX,number++);
     list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
 
-    new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);
+    basic typedefedSimdVector = get_typedefed_array(prefix,simdVector,lis);
+
+    new_ent = make_new_scalar_variable_with_prefix(name, mod_ent , typedefedSimdVector);
 
 #if 0
     string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
