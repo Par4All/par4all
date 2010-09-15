@@ -3375,8 +3375,9 @@ void gen_multi_recurse(void * o, ...)
 
     @param filter the filter method (function) to apply to an encountered
     object of the good type during the prefix (top-down) visit. If it
-    returns TRUE, the recursion is going on. If it returns FALSE, the visit
-    does not go further inside this object and the rewrite method is not be
+    returns TRUE, the recursion is going on and the rewrite filter will be called
+    during the bottom-up visit. If it returns FALSE, the visit
+    does not go further inside this object and the rewrite method will not be
     called during the bottom-up visit.
 
     @param rewrite is the method (function) to apply to an encountered
