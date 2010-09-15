@@ -517,7 +517,6 @@ static
 list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
-  type t = entity_type(e);
   pips_debug(1, "begin\n");
 
   expression lhs_exp = entity_to_expression(e);

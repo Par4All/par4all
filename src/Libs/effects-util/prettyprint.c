@@ -379,7 +379,6 @@ int cell_compare(cell *c1, cell *c2)
   reference r2 = cell_reference(*c2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
-  int n1, n2;
 
   if(same_entity_p(e1, e2))
     {
@@ -641,7 +640,6 @@ text_pointer_values(list lpv, string header)
     text tpv = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
     boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
-    boolean one_p = FALSE;
 
     /* GO: No redundant test anymore, see  text_statement_array_regions */
     if (lpv != (list) HASH_UNDEFINED_VALUE && lpv != list_undefined)
