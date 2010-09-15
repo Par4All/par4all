@@ -27,6 +27,7 @@ os.environ['PYRO_PORT_RANGE']='1000'
 import pyrops
 
 
+
 #
 ##
 #
@@ -674,6 +675,8 @@ def ParseCommandLine():
 	(args, files) = parser.parse_args()
 	args.sources = files
 
+	if args.blork: blork()
+
 	if args.unit_test:UnitTest(args).check()
 
 	# verify some settings
@@ -760,3 +763,57 @@ def pypsearch():
 
 if __name__ == "__main__":
 	pypsearch()
+
+# nice kid paddle ref
+def blork():
+	print """
+                   ...      IMZ=.  .                                            
+				                      ... .. ..MMMMMZ.                                             
+									                  .. MMMND7:..M . .M                                              
+													                  ...NN~...M:.$~   M.                               . .           
+																	                     .M.  ..M7 M..M..                             ..OM~M          
+																						                     ,MMMM+.M8M$M                             ..MNIIIM,          
+																											                    .... ..MM..M..   .                         M.....M.          
+																																                   ..::,,M .MD+N,,.. .                   .   .Z..$M~. . .       
+																																				                    ..,M.. $.+.+. .. :MO..               ..... ..Z.I  DMNN7 ..     
+																																									                .,DM.  DM  M=MZN.  .M7.  . .        . , NMMMNM..NMM.... MN,..   
+																																													                 .7MMMMM .$$M..~.  :M..  ... .      .=O8,. ....MZ~DNMI,ZN,..    
+																																																	                  . ... ...M.I.  NMMM.  .7O. :.=..~.  M.,.. M?IM8.,N$.., ..      
+																																																					                           Z~$..   ,M?....  :M+~O, M. ... NMM.. N?MM...M          
+																																																											                           .M..8...... ?MMN7=,,$INNMMM~. .......Z.M ::  8          
+																																																																	                             ,M.NN.NMM?. ..   .....   ~MM.   ..M.M.  M7M+          
+																																																																								                           ..$M. Z$.      ... .       .N: .ZO~M..  .DM           
+																																																																														                           ...=MMI8..     ..MMM8,      .  NMMM?O.    .. .          
+																																																																																				                           .:M$::..       .MMMMM.        ..DMMD,                   
+																																																																																										                        .. M,.  ,.      ..MMMMM7,  .~M   $M.M ..                   
+																																																																																																                 .. O8NM.   ..   ... .OMMMMM., .M.  .  .MMMM=...                
+																																																																																																				          ..     .. MIM....  .M,M..O  ,MMMMMMM. M...    . M .,M.                 
+																																																																																																						         . ~~~..   . .M.. M .M ,$  $...MMMMMMMMMM:.     ...OO. +Z                 
+																																																																																																								     ..,M8=:=MM,... M.. .D.:I....~$..MMMMMMMM=MM,.   ..8MMON...M                 
+																																																																																																									     ..N .. . .N$..M~D8M.. .   ..M  ?MMMMMMM MMMZ..   .~MMMNM .M                 
+																																																																																																										      ,..      .8.MM..M.       .8...MMMMMMM.ZZ.MM...   ..,7, .+8                 
+																																																																																																											      . M  :MMMMI.MM.. .M,,,+MN~,M. ?MMMMMM.,M...~M:.. . N8 . OM7D..              
+																																																																																																												        .INM:. .,M OMMMI . .....NM .M  NMMM M+..   ,MDDZ ..:8O .M8..              
+																																																																																																														      ..... ...NZ. ...8N$$8MM: .MM+MM ZN.OM .   . MMMMMN... .,M...              
+																																																																																																															              .. MNM$$M8.   ...=MM .,,...M.N..    .~$:M= M.MMOMM.                 
+																																																																																																																		              ..~M$.  ..      .N. +MO  .=M,Z .    ..+?. .~MD...                   
+																																																																																																																					               .OM=. .......  .M..,MMMMMM7M .       ..   ,.                       
+																																																																																																																								              ...8M.. .,O..NI   7. ZMMMMMM M  . ...                                
+																																																																																																																											            .  MMN.. .M   +M  .~..DMMMMMMMM ..7MD .                               
+																																																																																																																														           .MMMN,. ..MM8..  .~. MMMMMM~,DMMM8,M..        ....                   
+																																																																																																																																             ..MMMN.  ........  8 .8MMMMMM..... DM....     ..MM7    .   .          
+																																																																																																																																			        .. ..MMMM=           .M   NMMM+     .. $M~..     .MZIM..MOZ8MN.          
+																																																																																																																																					           ID8MMM .         .7= ..:..         ..:NN .. .DM7N.M:..M,  N..        
+																																																																																																																																							              MM MMM$. .       ..MD. DM          .~~  MIMD.N=7M:..~OMM: MD.        
+																																																																																																																																										           .:O 8.ZMM=         ...7MMM.,        .D=:DMM~.MM,NM .  . .,MM7M?        
+																																																																																																																																												        MM...N.. I:I=M...          . .             ZO.=MDM NM.  ?+  ..M .          
+																																																																																																																																														 ....OM..:O. ..M ~MMD...                     ... MMD. :+M.. MZ8D+ZMD..          
+																																																																																																																																														   $$MZ8MMM ...N~.OMMMM:. . .                  . MM ..M:M. =8,,  ,O7~..          
+																																																																																																																																														     .NN.,MM=...NM  MMMMM DM                . ..8MD . .? M=,M+ .  .. N..           
+																																																																																																																																															  .   M?.. .MM7..~M.$M.. . IDM7: ........+MMMD ... . D?M M:.                     
+																																																																																																																																															       . .?7:..  .M OM..      . ..:ZMMMMMD7.  .  . .,D~..+M  .                    
+																																																																																																																																																         . . ..   ... ..           .... .. .         .ON. M$..                     
+																																																																																																																																																		                 .   .                             ..DMMM.                       
+																																																																																																																																																						                                                   .  ..                         
+																																																																																																																																																																		                                                        ...    
+																																																																																																																																																																												"""
