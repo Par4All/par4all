@@ -26,6 +26,10 @@ apply PRIVATIZE_MODULE(main)
 echo // OMP style
 apply COARSE_GRAIN_PARALLELIZATION
 apply OMPIFY_CODE
+
+#echo "after merge_pragma"
+display PRINTED_FILE(main)
+
 apply OMP_MERGE_PRAGMA
 
 #echo "after merge_pragma"

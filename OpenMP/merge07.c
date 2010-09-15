@@ -4,6 +4,7 @@ int main (void) {
   int k = 0, i = 0, l = 0;
   int sum = 0;
   int a[size][size][size];
+  int b[size][size][size];
 
   for (l = 0; l < size; l++) {
     for (k = 0; k < size; k++) {
@@ -11,11 +12,12 @@ int main (void) {
 	a[l][k][i] = 10;
       }
       for (i = 0; i < size; i++) {
-	a[l][k][i] += 10;
+	b[l][k][i] = 10;
       }
     }
     for (k = 0; k < size; k++) {
       a[l][k][k] += 10;
+      b[l][k][k] += 10;
     }
   }
 
