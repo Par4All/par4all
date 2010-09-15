@@ -28,17 +28,16 @@ TARGET=$PROJECT_NAME.database/Src/$MODULE_NAME
 	cat << EOF
 	#define MOD(a,b) ((a)%(b))
 	#define MAX0(a,b) (a>b?a:b)
+	typedef __m128 v4sf;
+	typedef __m128d v2df;
+	typedef __m128i v4si;
+	typedef __m128i v8hi;
+	typedef float a4sf[4] __attribute__((aligned(16)));
+	typedef double a2df[4] __attribute__((aligned(16)));
+	typedef int a4si[4] __attribute__((aligned(16)));
+	typedef short a8hi[4] __attribute__((aligned(16)));
 EOF
-	sed -r  \
-			-e 's/float (v4sf_[^[]+)/__m128 \1/g' \
-			-e 's/float (v4si_[^[]+)/__m128i \1/g' \
-            -e 's/v4s[if]_([^,[]+)\[[^]]*\]/\1/g' \
-            -e 's/v4s[if]_([^ ,[]+)/\1/g' \
-			-e 's/double (v2df_[^[]+)/__m128d \1/g' \
-			-e 's/double (v2di_[^[]+)/__m128i \1/g' \
-            -e 's/v2d[if]_([^,[]+)\[[^]]*\]/\1/g' \
-            -e 's/v2d[if]_([^ ,[]+)/\1/g' \
-			$TARGET
+    cat $TARGET
 } > $OUTFILE
 
 cat 1>&2 << EOF
