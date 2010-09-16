@@ -2,10 +2,16 @@
 
 TARGET= hyantes-static-99
 
-# You can set P4A_OPTIONS to pass options to p4a
+ifeq "$(USE_FLOAT)" "1"
+# Use single precision for the OpenMP and GPU version:
+P4A_OPTIONS= -DUSE_FLOAT
+# Use also single precision for the sequential version:
+CFLAGS+= -DUSE_FLOAT
+endif
 
-CFLAGS= -O3 -std=c99 -Wall -D_GNU_SOURCE
-LDLIBS= -lm
+# You can set P4A_OPTIONS to pass options to p4a
+CFLAGS+= -O3 -std=c99 -Wall -D_GNU_SOURCE
+LDLIBS+= -lm
 
 # To play with OpenMP parameters:
 #OMP_SCHEDULE="dynamic"
