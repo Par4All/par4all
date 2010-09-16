@@ -23,8 +23,9 @@ Directory description:
 
 - src: contains the sources of the Par4All infrastructure by itself
 
+- examples: see the README file there that describes some running examples.
 
-Ronan Keryell, 11/11/2009.
+Ronan Keryell, 2010/09/16.
 
 %%% Local Variables:
 %%% mode: text

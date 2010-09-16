@@ -1,23 +1,46 @@
+2010-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.0.2
+
+        * Clean up examples and their README files.
+
+        * Updated to current PIPS and PyPS version
+
+        * --accel without --cuda works again for GPU emulation in OpenMP
+
+        * Do not use new PyPS #include recovery
+
+		* Recover any #include, not only standard ones (useful for Par4All
+    	  Scilab)
+
+        * Do not use PIPS capply by default when running phases
+
+        * Added path normalization in p4a_setup so that configure can
+          take relative path
+
+        * p4a_validate post-processing utility updated to cope with new
+          PIPS validation output
+
 2010-07-23  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-		* Par4All 1.0.1
+        * Par4All 1.0.1
 
-		* Corrected library name issue for libcutil on 32 bit x86
+        * Corrected library name issue for libcutil on 32 bit x86
 
-		* Fixed bugs into array_to_pointer
+        * Fixed bugs into array_to_pointer
 
-		* Corrected behaviour of NULL for nvcc
+        * Corrected behaviour of NULL for nvcc
 
-		* Fixed usage of limit_nested_parallelism in p4a_process.py
+        * Fixed usage of limit_nested_parallelism in p4a_process.py
 
-		* Better error message display
+        * Better error message display
 
-		* Fixed OpenMP prettyprint of C parallel loops with label
+        * Fixed OpenMP prettyprint of C parallel loops with label
 
-		* Deals with clock() intrinsic function
+        * Deals with clock() intrinsic function
 
 2010-07-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-		* Par4All 1.0 released
+        * Par4All 1.0 released
 
-			Initial version
+            Initial version
