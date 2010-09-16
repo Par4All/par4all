@@ -76,6 +76,13 @@ For a full demo:
   make demo : to chain make display_seq, make display_openmp, make display_cuda
 
 
+To run this example on GPU that does not support double precision, you
+should compile it with make USE_FLOAT=1 or the results are just garbage
+(because if nvcc has a single precision fall-back, the communication
+correctly computed by Par4All are still in... double). Of course the
+results are slightly different in single precision compared to double
+precision.
+
 Some results:
 
   We measure the wall-clock time that includes startup time, data load time
@@ -84,11 +91,22 @@ Some results:
   representative of the real application (Amdahl...).
 
   On one of our WildNode with 2 Intel Xeon X5670 @ 2.93GHz (12 cores) and
-  a Tesla C2050 (Fermi), Linux/Ubuntu 10.04, gcc 4.4.3, CUDA 3.1, we
-  measure in production:
+  a nVidia Tesla C2050 (Fermi), Linux/Ubuntu 10.04, gcc 4.4.3, CUDA 3.1,
+  we measure in production:
 
   - Sequential execution time on CPU: 30.355s
 
   - OpenMP parallel execution time on CPUs: 3.859s, speed-up: 7.87
 
   - CUDA parallel execution time on GPU: 0.441s, speed-up: 68.8
+
+  For *single precision* (compiled with make USE_FLOAT=1) on a HP
+  EliteBook 8730w laptop (with an Intel Core2 Extreme Q9300 @ 2.53GHz (4
+  cores) and a nVidia GPU Quadro FX 3700M, 16 multiprocessors, 128 cores,
+  architecture 1.1) with Linux/Debian/sid, gcc 4.4.3, CUDA 3.1:
+
+  - Sequential execution time on CPU: 38s
+
+  - OpenMP parallel execution time on CPUs: 18.9s, speed-up: 2.01
+
+  - CUDA parallel execution time on GPU: 1.57s, speed-up: 24.2

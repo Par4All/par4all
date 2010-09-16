@@ -2,7 +2,10 @@
 
         * Par4All 1.0.2
 
-        * Clean up examples and their README files.
+        * Clean up examples and their README files
+
+            Added an option to run Hyantes example in single precision
+            (for demos on laptops with small GPU)
 
         * Updated to current PIPS and PyPS version
 
@@ -10,8 +13,8 @@
 
         * Do not use new PyPS #include recovery
 
-		* Recover any #include, not only standard ones (useful for Par4All
-    	  Scilab)
+        * Recover any #include, not only standard ones (useful for Par4All
+          Scilab)
 
         * Do not use PIPS capply by default when running phases
 
