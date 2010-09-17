@@ -1,0 +1,63 @@
+#
+# $Id: vs_core-pips.tpips 244 2009-09-07 12:47:29Z coelho $
+#
+
+setenv NAME=median_1
+delete $NAME
+
+# we show this function
+setenv FUNC $NAME.database/$NAME
+
+# safe
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv PIPS_CPP_FLAGS="-I ./freia.src/cipo/include -I ./freia.src/common/include/ -I ./freia.src/aipo/include -I ./freia.src/debug/include -DFREIA_ASSUME_CORRECT_CODE "
+
+create $NAME $NAME.c \
+        ./freia.src/cipo/src/freiaComplexOpMorpho.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+# CG main
+make CALLGRAPH_FILE[%ALLFUNC]
+
+# ALL FUNCTIONS CODE
+activate PRINT_CODE
+make PRINTED_FILE[%ALLFUNC]
+
+# compute ICFG main & save it
+activate PRINT_ICFG_WITH_CONTROL
+setproperty ICFG_INDENTATION 5
+make ICFG_FILE[$NAME]
+
+# To avoid problems with unknown initial preconditions due to code synthesis
+make PRINTED_FILE[freia_aipo_addsat_const]
+make PRINTED_FILE[freia_aipo_inf]
+make PRINTED_FILE[freia_aipo_subsat_const]
+make PRINTED_FILE[freia_aipo_sup]
+make PRINTED_FILE[freia_cipo_global_sad]
+make PRINTED_FILE[freia_common_get_wa]
+make PRINTED_FILE[freia_common_set_wa]
+
+activate PRINT_CODE
+make PRINTED_FILE[freia_cipo_dilate]
+make PRINTED_FILE[freia_cipo_erode]
+make PRINTED_FILE[freia_cipo_gradient]
+make PRINTED_FILE[freia_cipo_open]
+
+setproperty UNFOLDING_CALLEES "freia_cipo_close freia_cipo_close_tophat freia_cipo_dilate freia_cipo_erode freia_cipo_geodesic_dilate freia_cipo_geodesic_erode freia_cipo_geodesic_reconstruct_close freia_cipo_geodesic_reconstruct_close_tophat freia_cipo_geodesic_reconstruct_dilate freia_cipo_geodesic_reconstruct_dual freia_cipo_geodesic_reconstruct_erode freia_cipo_geodesic_reconstruct_open freia_cipo_geodesic_reconstruct_open_tophat freia_cipo_gradient freia_cipo_inner_gradient freia_cipo_open freia_cipo_open_tophat freia_cipo_outer_gradient freia_cipo_regional_hmaxima freia_cipo_regional_hminima freia_open_8c freia_close_8c"
+
+# cleanup after unfolding
+apply UNFOLDING[$NAME]
+apply PARTIAL_EVAL[$NAME]
+apply SUPPRESS_DEAD_CODE[$NAME]
+apply FLATTEN_CODE[$NAME]
+
+activate PRINT_CODE
+make PRINTED_FILE[$NAME]
+display PRINTED_FILE[$NAME]
+
+close
+delete $NAME
+quit
