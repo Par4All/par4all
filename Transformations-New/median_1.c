@@ -6,7 +6,7 @@
 freia_status
 median_1(freia_data2d *o, freia_data2d *i)
 {
-  int32_t c = 1;
+  int32_t c = 6;
   freia_status ret;
   freia_data2d * t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
   ret =  freia_cipo_close(t, i, c, 1);
