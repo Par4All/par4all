@@ -1714,7 +1714,7 @@ transformer expression_effects_to_transformer(expression expr)
   return tf;
 }
 
-transformer 
+transformer
 integer_expression_to_transformer(
     entity v,
     expression expr,
@@ -2627,9 +2627,13 @@ transformer safe_expression_to_transformer(expression exp, transformer pre)
 }
 
 /* To capture side effects and to add C twist for numerical
-   conditions. Argument pre may be undefined. */
-transformer condition_to_transformer(
-				     expression cond,
+ * conditions. Argument pre may be undefined.
+ *
+ * Beware of tricky conditions using the comma or the conditional
+ * operator, although they should be handled as the default case,
+ * using effects.
+ */
+transformer condition_to_transformer(expression cond,
 				     transformer pre,
 				     bool veracity)
 {
@@ -2646,10 +2650,28 @@ transformer condition_to_transformer(
      execution time at the expense of precision. This speed/accuracy
      tradeoff has evolved with CPU technology. */
   bool upwards = FALSE;
+  expression tcond = cond; // By default; not true for the comma operations
+
+  /* If a comma operator is used, the test is the last expression */
+  /* FI: quid of a conditional operator? e.g. "x>0?1<m:1<n" */
+  /* FI: quid of assignment operator? e.g. "i = j = k = 1" */
+  /* FI: we probably need a function tcond = expression_to_condition(cond) */
+  if(expression_call_p(cond)) {
+    call c = syntax_call(expression_syntax(cond));
+    entity op = call_function(c);
+    if(ENTITY_COMMA_P(op)) {
+      list args = call_arguments(c);
+      tcond = EXPRESSION(CAR(gen_last(args)));
+      tf = safe_expression_to_transformer(cond, pre);
+    }
+  }
+  if(transformer_undefined_p(tf)) {
+    tf= transformer_identity();
+  }
 
   /* C comparison operators return an integer value */
-  if(!basic_logical_p(eb) && expression_call_p(cond)) {
-    entity op = call_function(syntax_call(expression_syntax(cond)));
+  if(!basic_logical_p(eb) && expression_call_p(tcond)) {
+    entity op = call_function(syntax_call(expression_syntax(tcond)));
 
     relation_p = ENTITY_LOGICAL_OPERATOR_P(op);
     //relation_p = ENTITY_RELATIONAL_OPERATOR_P(op);
@@ -2664,7 +2686,7 @@ transformer condition_to_transformer(
     //tf = transformer_add_condition_information_updown
     //  (copy_transformer(safe_pre), cond, safe_pre, veracity, upwards);
     transformer ctf = transformer_add_condition_information_updown
-      (transformer_identity(), cond, safe_pre, veracity, upwards);
+      (tf, tcond, safe_pre, veracity, upwards);
     tf = transformer_apply(ctf, safe_pre);
     free_transformer(ctf);
   }
@@ -2673,10 +2695,19 @@ transformer condition_to_transformer(
     //  (transformer_identity(), cond, safe_pre, veracity, upwards);
     //tf = transformer_add_condition_information_updown
     //  (copy_transformer(safe_pre), cond, safe_pre, veracity, upwards);
+    /* In case, there are side-effects in the condition. This is very
+       unlikely for standard code and should be simplified with a
+       test to transformer_identity_p(tf) */
+    transformer new_pre = transformer_apply(tf, safe_pre);
+    transformer new_pre_r = transformer_range(new_pre);
+    new_pre_r = transformer_normalize(new_pre_r, 2);
     transformer ctf = transformer_add_condition_information_updown
-      (transformer_identity(), cond, safe_pre, veracity, upwards);
-    tf = transformer_apply(ctf, safe_pre);
+      (transformer_identity(), tcond, new_pre_r, veracity, upwards);
+    ctf = transformer_normalize(ctf, 2);
+    tf = transformer_combine(tf, ctf);
     free_transformer(ctf);
+    free_transformer(new_pre);
+    free_transformer(new_pre_r);
   }
   else {
     /* Make sure you can handle this kind of variable.
@@ -2687,7 +2718,8 @@ transformer condition_to_transformer(
     */
     if(analyzable_basic_p(eb)) {
       entity tmpv = make_local_temporary_value_entity_with_basic(eb);
-      tf = safe_any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+      transformer ctf = safe_any_expression_to_transformer(tmpv, tcond, safe_pre, TRUE);
+      tf = transformer_combine(tf, ctf);
       if(veracity) {
 	/* tmpv != 0 */
 	transformer tf_plus = transformer_add_sign_information(copy_transformer(tf), tmpv, 1);
@@ -2821,7 +2853,9 @@ transformer expressions_to_transformer(list expl,
     transformer npre = transformer_undefined;
 
     tf = transformer_combine(tf, ctf);
+    tf = transformer_normalize(tf, 2);
     npre = transformer_apply(ctf, cpre);
+    npre = transformer_normalize(npre, 2);
     free_transformer(cpre);
     free_transformer(cpre_r);
     cpre = npre;
@@ -2841,22 +2875,28 @@ transformer any_expressions_to_transformer(entity v,
 {
   transformer tf = transformer_identity();
   transformer cpre = transformer_undefined_p(pre)?
-    transformer_identity() : copy_transformer(pre);
+    transformer_identity() : transformer_range(pre);
   expression l_exp = EXPRESSION(CAR(gen_last(expl)));
 
   FOREACH(EXPRESSION, exp, expl) {
     /* el is an over-appoximation; should be replaced by a
        safe_expression_to_transformer() taking care of computing the
        precise effects of exp instead of using the effects of expl. */
-    transformer ctf = (exp==l_exp)? 
+    transformer ctf = (exp==l_exp)?
       safe_any_expression_to_transformer(v, exp, cpre, FALSE) :
       safe_expression_to_transformer(exp, cpre);
     transformer npre = transformer_undefined;
+    transformer npre_r = transformer_undefined;
 
     tf = transformer_combine(tf, ctf);
+    tf = transformer_normalize(tf, 2);
     npre = transformer_apply(ctf, cpre);
+    npre_r = transformer_range(npre);
+    npre_r = transformer_normalize(npre_r, 2);
     free_transformer(cpre);
-    cpre = npre;
+    free_transformer(npre);
+    free_transformer(ctf);
+    cpre = npre_r;
   }
   free_transformer(cpre);
   return tf;
