@@ -28,8 +28,8 @@ int main()
 	lock =0; y++;
       }
     }
-  
-  
+
+
   if (lock ==1) printf("property  verified\n");
  
 }
