@@ -115,12 +115,12 @@ class workspace:
 			err = p.stderr.read()
 			rc = p.wait()
 			if rc != 0:
-				message = "Program %s failed with return code %d" %(execname, rc)
-				raise RuntimeError(message)
+				message = "Program %s failed with return code %d" %(cmd, rc)
+				#raise RuntimeError(message)
 			time = 0
 			try:
 				time = self.getLastTime()
-			except OSError:
+			except IOError:
 				message  = "cmd: " + str(cmd) + "\n"
 				message += "out: " + out + "\n"
 				message += "err: " + err + "\n"

@@ -435,7 +435,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                 CONS(STATEMENT,
                     instruction_to_statement(inst),
                     NIL ));
-        
+
             /* Generate a statement to reinitialize old index
              * IND = LB + MAX(NUB,0)*INC
              */

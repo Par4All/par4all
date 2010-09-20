@@ -616,6 +616,8 @@ bool simd_remove_reductions(char * mod_name)
 }
 
 static bool statement_reduction_prelude_p(statement s) {
+  if (statement_undefined_p(s))
+    return false;
   if(statement_call_p(s)) {
     call c =statement_call(s);
     entity op = call_function(c);
@@ -625,6 +627,8 @@ static bool statement_reduction_prelude_p(statement s) {
       return false;
 }
 static bool statement_reduction_postlude_p(statement s) {
+  if (statement_undefined_p(s))
+    return false;
   if(statement_call_p(s)) {
     call c =statement_call(s);
     entity op = call_function(c);
@@ -634,23 +638,32 @@ static bool statement_reduction_postlude_p(statement s) {
   return false;
 }
 
-static list strict_successors(vertex v) {
-  list v_successors = vertex_successors(v);
-  list s = gen_copy_seq(v_successors);
-
-  FOREACH(SUCCESSOR,v_successor,v_successors) {
-    vertex vs = successor_vertex(v_successor);
-    FOREACH(SUCCESSOR,vss,vertex_successors(vs)) {
-      FOREACH(SUCCESSOR,su,s) {
-        if(vertex_vertex_label(successor_vertex(su)) == 
-            vertex_vertex_label(successor_vertex(vss)) ) {
-          gen_remove_once(&s,su);
-          break;
-        }
-      }
+static statement the_strict_successor = statement_undefined;
+static void do_strict_successor(statement s, statement target)
+{
+    if (s == target) {
+	statement parent = (statement) gen_get_ancestor(statement_domain, s);
+	if (statement_block_p(parent)) {
+	    for (list iter = statement_block(parent); ! ENDP(iter); POP(iter)) {
+		if (! ENDP(CDR(iter))) {
+		    statement next = STATEMENT(CAR(CDR(iter)));
+		    statement current = STATEMENT(CAR(iter));
+		    if (current == target) {
+			the_strict_successor = next;
+			gen_recurse_stop(0);
+			return;
+		    }
+		}
+	    }
+	}
     }
-  }
-  return s;
+}
+
+static statement strict_successor(statement s) {
+    the_strict_successor = statement_undefined;
+    gen_context_recurse(get_current_module_statement(), s,
+			statement_domain, gen_true, do_strict_successor);
+    return the_strict_successor;
 }
 
 static void redundant_load_store_elimination_move_vectors(statement s, set moved_vectors)
@@ -674,30 +687,20 @@ static void do_sac_reduction_optimizations(graph dg)
   {
     statement stat0 = vertex_to_statement(a_vertex);
     if(statement_reduction_prelude_p(stat0)) {
-      list ssuccessors = strict_successors(a_vertex);
-      /* only on successor */
-      if(gen_length(ssuccessors)==1) {
-        successor succ = SUCCESSOR(CAR(ssuccessors));
-        statement stat1 = vertex_to_statement(successor_vertex(succ));
-        if(simd_load_stat_p(stat1)) {
+      statement stat1 = strict_successor(stat0);
+      if(simd_load_stat_p(stat1)) {
           call_function(
               statement_call(stat1) ) =
-            call_function(
-                statement_call(stat0)
-                );
+	      call_function(
+		  statement_call(stat0)
+		  );
           gen_full_free_list(CDR(call_arguments(statement_call(stat1))));
           CDR(call_arguments(statement_call(stat1)))=NIL;
           update_statement_instruction(stat0,make_continue_instruction());
-        }
       }
-      gen_free_list(ssuccessors);
     }
     else if(simd_store_stat_p(stat0)) {
-      list ssuccessors = strict_successors(a_vertex);
-      /* only on successor */
-      if(gen_length(ssuccessors)==1) {
-        successor succ = SUCCESSOR(CAR(ssuccessors));
-        statement stat1 = vertex_to_statement(successor_vertex(succ));
+        statement stat1 = strict_successor(stat0);
         if(statement_reduction_postlude_p(stat1)) {
           expression loaded_exp = 
             EXPRESSION(CAR(call_arguments(statement_call(stat0))));
@@ -708,8 +711,6 @@ static void do_sac_reduction_optimizations(graph dg)
           CDR(call_arguments(statement_call(stat1)))=CONS(EXPRESSION,copy_expression(loaded_exp),NIL);
           set_add_element(moved_vectors,moved_vectors,expression_to_entity(loaded_exp));
         }
-      }
-      gen_free_list(ssuccessors);
     }
   }
   gen_context_recurse(get_current_module_statement(),moved_vectors,

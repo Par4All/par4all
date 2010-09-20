@@ -321,3 +321,12 @@ void restore_open_workspace(char* name)
 	make_open_workspace(name);
 }
 
+void setenviron(char *name, char *value)
+{
+    setenv(name, value, 1);
+}
+
+char* getenviron(char *name)
+{
+    return getenv(name);
+}

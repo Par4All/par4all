@@ -95,6 +95,16 @@ class module:
 		else:
 			loops=self._ws.cpypips.module_loops(self.name,"")
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
+
+	def inner_loops(self):
+		"""Returns all the inner loops (loops that don't contain further loops)"""
+		inner_loops = []
+		loops = self.loops()
+		while loops:
+			l = loops.pop()
+			if not l.loops(): inner_loops.append(l)
+			else: loops += l.loops()
+		return inner_loops
 	
 	@property
 	def callers(self):
@@ -240,8 +250,10 @@ class workspace(object):
 
 		# SG: it may be smarter to save /restore the env ?
 		if cppflags != "":
-			os.environ['PIPS_CPP_FLAGS']=cppflags
+			self.cpypips.setenviron('PIPS_CPP_FLAGS', cppflags)
 		self.cppflags = cppflags
+		if self.verbose:
+			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
@@ -422,7 +434,8 @@ class workspace(object):
 			command+=["-c"]
 			command+=otmpfiles
 		commandline = " ".join(command)
-		#print "running", commandline
+		if self.verbose:
+			print "Compiling the workspace with", commandline
 		ret = os.system(commandline)
 		if ret:
 			if not link: map(os.remove,otmpfiles)

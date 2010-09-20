@@ -1215,26 +1215,31 @@ simdstatement make_simd_statements(set opkinds, list statements)
                 statement sfirst = STATEMENT(CAR(first));
                 if(assignment_statement_p(sfirst))
                 {
-                    expression neutral_element= entity_to_expression(operator_neutral_element(
+		    entity neutral_entity = operator_neutral_element(
                                 call_function(expression_call(binary_call_rhs(statement_call(sfirst))))
-                                ));
-                    bool first=true;
-                    FOREACH(EXPRESSION,e,args[index-1])
-                    {
-                        free_syntax(expression_syntax(e));
-                        if(first)
-                        {
-                            /* we always use the same padding entity, it proves to be usefull later on */
-                            entity pe = get_padding_entity();
-                            expression_syntax(e)=make_syntax_reference(make_reference(pe,NIL));
-                            first=false;
-                        }
-                        else
-                        {
-                            expression_syntax(e)=copy_syntax(expression_syntax(neutral_element));
-                        }
-                    }
-                    free_expression(neutral_element);
+			    );
+		    expression neutral_element;
+		    if (! entity_undefined_p(neutral_entity))
+			    neutral_element = entity_to_expression(neutral_entity);
+		    else
+			    neutral_element = copy_expression(binary_call_rhs(statement_call(sfirst)));
+		    bool first=true;
+		    FOREACH(EXPRESSION,e,args[index-1])
+		    {
+			    free_syntax(expression_syntax(e));
+			    if(first)
+			    {
+				    /* we always use the same padding entity, it proves to be usefull later on */
+				    entity pe = get_padding_entity();
+				    expression_syntax(e)=make_syntax_reference(make_reference(pe,NIL));
+				    first=false;
+			    }
+			    else
+			    {
+				    expression_syntax(e)=copy_syntax(expression_syntax(neutral_element));
+			    }
+		    }
+		    free_expression(neutral_element);
                 }
                 else
                     pips_user_warning("wrong padding may have been added\n");

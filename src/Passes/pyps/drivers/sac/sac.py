@@ -22,8 +22,6 @@ class sacbase(object):
         ws.set_property(RICEDG_STATISTICS_ALL_ARRAYS = True)
         ws.set_property(C89_CODE_GENERATION = True)
 
-        # if conf.get("simdizer_allow_padding", False):
-        #     ws.set_property(SIMDIZER_ALLOW_PADDING, True)
         ws.set_property(SIMD_FORTRAN_MEM_ORGANISATION = False)
         ws.set_property(SAC_SIMD_REGISTER_WIDTH = cond["register_width"])
         ws.set_property(SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION = False)
@@ -34,17 +32,17 @@ class sacbase(object):
             module.display()
         module.split_update_operator()
 
-        # if cond.get("verbose"):
-        #     module.display()
-        # module.if_conversion_init()
-        # module.if_conversion()
-        # module.if_conversion_compact()
-        # if cond.get("verbose"):
-        #     module.display()
-        # module.use_def_elimination()
+        if cond.get("if_conversion", False):
+            if cond.get("verbose"):
+                module.display()
+            module.if_conversion_init()
+            module.if_conversion()
+            module.if_conversion_compact()
+            if cond.get("verbose"):
+                module.display()
 
-        module.partial_eval()
         module.simd_atomizer()
+        module.partial_eval()
         if cond.get("verbose"):
             module.display()
             module.print_dot_dependence_graph()
@@ -65,13 +63,19 @@ class sacbase(object):
         if cond.get("auto_unroll", True):
             module.simdizer_auto_unroll()
         module.partial_eval()
+        if cond.get("full_unroll_step", 0):
+            rate = cond["full_unroll_step"]
+            loops = module.inner_loops()
+            for l in loops:
+                l.unroll(rate = rate)
+            module.partial_eval()
         if cond.get("verbose"):
             module.display()
         module.clean_declarations()
         if cond.get("suppress_dead_code", True):
             module.suppress_dead_code()
         # module.print_dot_dependence_graph()
-        module.simd_remove_reductions()
+        module.simd_remove_reductions(prelude = "SIMD_ZERO_V4SF")
         if cond.get("verbose"):
             module.display()
 
@@ -85,24 +89,34 @@ class sacbase(object):
 
         if cond.get("verbose"):
             module.display()
-        module.simdizer()
+        module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
         if cond.get("verbose"):
             module.display()
 
         # module.use_def_elimination()
 
-        module.simd_loop_const_elim()
-        # ws.set_property(EOLE_OPTIMIZATION_STRATEGY = "ICM")
-        # module.optimize_expressions()
-        # module.partial_redundancy_elimination()
-
         # module.use_def_elimination()
         if cond.get("suppress_dead_code", True):
             module.suppress_dead_code()
+        module.flatten_code(unroll = False)
         module.redundant_load_store_elimination()
         if cond.get("suppress_dead_code", True):
             module.suppress_dead_code()
         module.clean_declarations()
+
+        try:
+            for i in xrange(3):
+                module.simd_loop_const_elim()
+                module.flatten_code(unroll = False)
+        except RuntimeError: pass
+        # ws.set_property(EOLE_OPTIMIZATION_STRATEGY = "ICM")
+        # module.optimize_expressions()
+        # module.partial_redundancy_elimination()
+        # module.common_subexpression_elimination()
+        if cond.get("verbose"):
+            module.display()
+
+        # module.use_def_elimination()
 
     @staticmethod
     def addintrinsics(fname, header, replacements):
@@ -145,7 +159,7 @@ class sacsse(sacbase):
         sse_h = re.sub("_mm_loadu", "_mm_load", sse_h)
         sse_h = re.sub("_mm_storeu", "_mm_store", sse_h)
 
-    CFLAGS = " -msse4.1 -O3"
+    CFLAGS = "-msse4.2 -march=native -O3 "
 
 class sac3dnow(sacbase):
     @staticmethod
@@ -176,7 +190,7 @@ class sac3dnow(sacbase):
     def post_memalign(*args, **kwargs):
         pass
 
-    CFLAGS = " -m3dnow -march=athlon -m32 -O3"
+    CFLAGS = "-m3dnow -march=athlon -m32 -O3 "
 
 class workspace:
     """The SAC subsystem, in Python.
@@ -227,7 +241,7 @@ class workspace:
         self.compile_sse = True
         CFLAGS = self.driver.CFLAGS
         if args.has_key("CFLAGS"):
-            args["CFLAGS"] += CFLAGS
+            args["CFLAGS"] = CFLAGS + args["CFLAGS"]
         else:
             args["CFLAGS"] = CFLAGS
         r = self.ws.compile(**args)
@@ -424,6 +438,15 @@ SIMD_STORE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
     X2 [0]= VEC[1];
     X3 [0]= VEC[2];
     X4 [0]= VEC[3];
+}
+
+void
+SIMD_ZERO_V4SF(float VEC[4])
+{
+	VEC[0] = 0.0f;
+	VEC[1] = 0.0f;
+	VEC[2] = 0.0f;
+	VEC[3] = 0.0f;
 }
 
 void
@@ -1030,6 +1053,14 @@ SIMD_SETPS (float DEST[2], float SRC[2])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
+    DEST[2] = SRC[2];
+    DEST[3] = SRC[3];
+}
+void
+SIMD_SETPD (double DEST[2], double SRC[2])
+{
+    DEST[0] = SRC[0];
+    DEST[1] = SRC[1];
 }
 
 void
@@ -1073,6 +1104,15 @@ SIMD_LOAD_CONSTANT_V2DF(double vec[2],double v0,double v1)
 """
 
 simd_h = """
+typedef float  a2sf[2];
+typedef float  a4sf[4];
+typedef double a2df[2];
+typedef int    a4si[4];
+
+typedef float  v4sf[4];
+typedef double v2df[2];
+typedef int    v4si[4];
+
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4]);
 void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4]);
 void SIMD_STORE_V2DF_TO_V2SF(double a[2], float b[2]);
@@ -1095,6 +1135,7 @@ void SIMD_STORE_MASKED_V4SF(float VEC[4], float BASE[3]);
 void SIMD_STORE_GENERIC_V2DF(double VEC[2], double X1[1], double X2[1]);
 void SIMD_STORE_GENERIC_V4SI(int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1]);
 void SIMD_STORE_GENERIC_V4SF(float VEC[4], float X1[1], float X2[1], float X3[1], float X4[1]);
+void SIMD_ZERO_V4SF(float VEC[4]);
 void SIMD_STORE_V2SF(float VEC[2], float BASE[2]);
 void SIMD_LOAD_V2SF(float VEC[2], float BASE[2]);
 void SIMD_GTPS(int DEST[4], float SRC1[4], float SRC2[4]);
@@ -1154,7 +1195,8 @@ void SIMD_OPPPS(float DEST[2], float SRC[2]);
 void SIMD_OPPD(int DEST[2], int SRC[2]);
 void SIMD_OPPW(short DEST[4], short SRC[4]);
 void SIMD_OPPB(char DEST[8], char SRC[8]);
-void SIMD_SETPS(float DEST[2], float SRC[2]);
+void SIMD_SETPS(float DEST[4], float SRC[4]);
+void SIMD_SETPD(double DEST[2], double SRC[2]);
 void SIMD_SETD(int DEST[2], int SRC[2]);
 void SIMD_SETW(short DEST[4], short SRC[4]);
 void SIMD_SETB(char DEST[8], char SRC[8]);
@@ -1165,11 +1207,21 @@ void SIMD_LOAD_CONSTANT_V2DF(double vec[2], double v0, double v1);
 sse_h = """
 #include <xmmintrin.h>
 
+typedef float  a2sf[2] __attribute__ ((aligned (16)));
+typedef float  a4sf[4] __attribute__ ((aligned (16)));
+typedef double a2df[2] __attribute__ ((aligned (16)));
+typedef int    a4si[4] __attribute__ ((aligned (16)));
+
+typedef __m128  v4sf;
+typedef __m128d v2df;
+typedef __m128i v4si;
+
 /* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
 #define SIMD_LOADA_V4SF(vec,arr) vec=_mm_load_ps(arr)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
+#define SIMD_SUBPS(vec1, vec2, vec3) vec1 = _mm_sub_ps(vec2, vec3)
 /* umin as in unary minus */
 #define SIMD_UMINPS(vec1, vec2)				\
 	do {						\
@@ -1190,6 +1242,8 @@ sse_h = """
 		*(v3)=__pips_tmp[3];					\
 	} while (0)
 
+#define SIMD_ZERO_V4SF(vec) vec = _mm_setzero_ps()
+
 #define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)				\
 	do {								\
 		float __pips_v[4] __attribute ((aligned (16)))= { v0,v1,v2,v3 }; \
@@ -1197,13 +1251,13 @@ sse_h = """
 	} while(0)
 
 /* handle padded value, this is a very bad implementation ... */
-#define SIMD_MASKED_SAVE_V4SF(vec,arr)			\
-	do {						\
-		float __pips_tmp[4];			\
-		SIMD_STORE_V4SF(vec,&__pips_tmp[0]);	\
-		(arr)[0] = __pips_tmp[0];		\
-		(arr)[1] = __pips_tmp[1];		\
-		(arr)[2] = __pips_tmp[2];		\
+#define SIMD_STORE_MASKED_V4SF(vec,arr)					\
+	do {								\
+		float __pips_tmp[4];					\
+		SIMD_STORE_V4SF(vec,&__pips_tmp[0]);			\
+		(arr)[0] = __pips_tmp[0];				\
+		(arr)[1] = __pips_tmp[1];				\
+		(arr)[2] = __pips_tmp[2];				\
 	} while(0)
 
 #define SIMD_LOAD_V4SI_TO_V4SF(v, f)		\

@@ -28,7 +28,7 @@ parser.add_option("-e", "--explore", dest = "explore", default = None,
 parser.add_option("-v", "--verbose", dest = "verbose",
 				  default = 0, action = "count",
 				  help = "verbose output; can be specified several times")
-parser.add_option("-s", "--strict", dest = "strict",
+parser.add_option("-s", "--strict", dest = "strict", action = "store_true",
 				  help = "check output, and exit when output changes")
 parser.add_option("-m", "--memalign", dest = "memalign", default = False,
 				  action = "store_true", help = "use memalign.workspace")
@@ -38,6 +38,8 @@ parser.add_option("--cflags", "--CFLAGS", dest = "cflags",
 				  default = "", help = "gcc options")
 parser.add_option("--ldflags", "--LDFLAGS", dest = "ldflags",
 				  default = "", help = "linker options")
+parser.add_option("--blork", action = "store_true", default = False,
+				  help = "don't clean the workspace on exit")
 (opts, sources) = parser.parse_args()
 
 explorationpath = {}
@@ -45,10 +47,17 @@ if opts.explore:
 	steps = opts.explore.split(",")
 	for s in steps:
 		(k, v) = s.split(":")
-		if v.lower() in ["yes", "true", "t", "1"]:
-			explorationpath[k] = True
-		else:
-			explorationpath[k] = False
+		v = v.lower()
+		try:
+			explorationpath[k] = int(v)
+		except ValueError:
+			if v == "true":
+				explorationpath[k] = True
+			elif v == "false":
+				explorationpath[k] = False
+
+if opts.verbose >= 2:
+	print explorationpath
 
 if not opts.function:
 	print "The -f argument is mandatory"
@@ -67,17 +76,16 @@ def runws(*args, **kwargs):
 	global ws
 	kwargs["args"]		 = opts.args
 	kwargs["iterations"] = 1
-	kwargs["reference"]	 = reference
+	kwargs["reference"] = (reference if opts.strict else [])
 	if "CFLAGS" in kwargs: kwargs["CFLAGS"] += (" " + opts.cflags)
 	else: kwargs["CFLAGS"] = opts.cflags
 	kwargs["LDFLAGS"] = opts.ldflags
 	time = "XXXX"
 	try: time = ws.benchmark(*args, **kwargs)
 	except RuntimeError, e:
-		if opts.strict:
-			raise
+		if opts.strict: raise
 		else:
-			#print >>sys.stderr, e.args
+			print >>sys.stderr, e.args
 			print >>sys.stderr, "Continuing anyway"
 	return time
 
@@ -95,9 +103,12 @@ for f in opts.function:
 	# Magie !
 	try:
 		module.sac(verbose = (opts.verbose >= 3), **explorationpath)
-	except:
+	except RuntimeError, e:
 		print >>sys.stderr, "Couldn't apply sac on module", f
-		module.display()
+		print >>sys.stderr, e.args
+		if opts.strict:
+			module.display()
+			raise
 
 	if opts.verbose >= 1:
 		print "Simdized code"
@@ -114,7 +125,8 @@ if opts.memalign:
 sse_time = runws("sse", compilemethod = ws.simd_compile)
 icc_time = runws("icc", compilemethod = ws.simd_compile, CC = "icc")
 
-#ws.close()
+if not opts.blork:
+	ws.close()
 
 print "Run times: (ref, reficc, seq, sse, icc):"
 print ref_time
