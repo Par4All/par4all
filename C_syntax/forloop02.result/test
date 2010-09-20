@@ -69,7 +69,7 @@ int main()
 
       a[i] = i;
 
-//  T(i,j) {i==i#init+2, j==j#init+2}
+//  T(i,j) {i==i#init+1, j==j#init+2}
 
       i++, j += 2;
    }
