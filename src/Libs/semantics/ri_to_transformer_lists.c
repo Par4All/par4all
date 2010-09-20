@@ -67,6 +67,7 @@
 
 #include "semantics.h"
 
+#if 0
 
 /* Recursive Descent in Data Structure Statement */
 
@@ -116,6 +117,7 @@ transformer dimensions_to_transformer(entity v, transformer pre)
 
   return dt;
 }
+#endif
 
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
@@ -233,7 +235,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
    Note: initialization of static variables are not taken into
    account. They must be used for summary preconditions.
  */
-list declarations_to_transformer_list(list dl, transformer pre)
+transformer declarations_to_transformer_list(list dl, transformer pre)
 {
   entity v = entity_undefined;
   transformer btf = transformer_undefined;
