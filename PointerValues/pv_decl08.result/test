@@ -7,14 +7,14 @@ int main()
 
 // Pointer values:
 // s[.fs][.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s[.fs][.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s[.fs][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s[.fs][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s[.fs_p] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s[.fs_pt] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s[.fs_t][*][.a] == *ANY_MODULE*:*UNDEFINED* (may);
-// s[.fs_t][*][.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
-// s[.fs_t][*][.c] == *ANY_MODULE*:*UNDEFINED* (may);
-// s[.fs_tp][*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s[.fs_t][*][.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s[.fs_t][*][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s[.fs_t][*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s[.fs_tp][*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
 }

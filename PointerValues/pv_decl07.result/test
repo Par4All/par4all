@@ -7,7 +7,7 @@ int main()
 
 // Pointer values:
 // s[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
