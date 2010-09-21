@@ -166,6 +166,18 @@ effects_to_may_effects(list l_eff)
 }
 
 void
+effect_to_must_effect(effect eff)
+{
+    effect_approximation_tag(eff) = is_approximation_must;
+}
+
+void
+effects_to_must_effects(list l_eff)
+{
+    effects_map(l_eff, effect_to_must_effect);
+}
+
+void
 effect_to_write_effect(effect eff)
 {
     effect_action_tag(eff) = is_action_write;

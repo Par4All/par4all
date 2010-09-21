@@ -173,6 +173,11 @@
 #define cell_relation_approximation_tag(cr)\
   approximation_tag(cell_relation_approximation(cr))
 
+#define cell_relation_may_p(cr)\
+  approximation_tag(cell_relation_approximation(cr))==is_approximation_may
+
+#define cell_relation_exact_p(cr)\
+  approximation_tag(cell_relation_approximation(cr))==is_approximation_exact
 
 #define pips_debug_pv(level, message, pv) \
   ifdebug(level) { pips_debug(level, "%s\n", message); \
