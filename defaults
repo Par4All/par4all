@@ -10,6 +10,8 @@ F95_syntax
 Effects
 # To check effects extended to environment and type declarations
 Effects-New
+# Specific directory for Effects of C intrinsics
+CIntrinsics
 # Preconditions and transformers, using PIPS initial default options
 Semantics
 # Same, but using the 2010 default options
@@ -54,6 +56,7 @@ Demo-2009
 Gpu
 Inlining
 AcceleratorUtils
+PointerValues
 # put intra-directory parallel validations at the end!
 Hpfc
 HardwareAccelerator

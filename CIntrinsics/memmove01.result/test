@@ -15,8 +15,8 @@ int main()
 {
 //               <may be written >: str[*]
    char str[] = "can be very useful......";
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(str+20, str+15, 11);
 //               <may be read    >: stdout[0] str[*]
 //               <may be written >: stdout[0]
