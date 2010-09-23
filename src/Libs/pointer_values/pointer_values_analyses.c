@@ -235,19 +235,55 @@ static effect intrinsic_to_interpreted_path(entity func, list args, cell_interpr
     */
     return(expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt));
 
-  if(ENTITY_FIELD_P(func) || ENTITY_POINT_TO_P(func) || ENTITY_DEREFERENCING_P(func))
+  if(ENTITY_DEREFERENCING_P(func))
     {
-      list l_tmp = generic_proper_effects_of_complex_address_expression(EXPRESSION(CAR(args)), &eff, true);
+      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
+      effect_add_dereferencing_dimension(eff);
       *ci = make_cell_interpretation_value_of();
-      gen_full_free_list(l_tmp);	
+      return eff;
+    }
+
+  if(ENTITY_FIELD_P(func))
+    {
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      syntax s2 = expression_syntax(e2);
+      reference r2 = syntax_reference(s2);
+      entity f = reference_variable(r2);
+
+      pips_assert("e2 is a reference", syntax_reference_p(s2));
+      pips_debug(4, "It's a field operator\n");
+
+      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
+      effect_add_field_dimension(eff,f);
+      *ci = make_cell_interpretation_value_of();
+      return eff;
+    }
+
+  if(ENTITY_POINT_TO_P(func))
+    {
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      syntax s2 = expression_syntax(e2);
+      entity f;
+
+      pips_assert("e2 is a reference", syntax_reference_p(s2));
+      f = reference_variable(syntax_reference(s2));
+
+      pips_debug(4, "It's a point to operator\n");
+      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
+
+      /* We add a dereferencing */
+      effect_add_dereferencing_dimension(eff);
+
+      /* we add the field dimension */
+      effect_add_field_dimension(eff,f);
+      *ci = make_cell_interpretation_value_of();
       return eff;
     }
 
   if(ENTITY_ADDRESS_OF_P(func))
     {
-      list l_tmp = generic_proper_effects_of_complex_address_expression(EXPRESSION(CAR(args)), &eff, true);
+      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
       *ci = make_cell_interpretation_address_of();
-      gen_full_free_list(l_tmp);	
       return eff;      
     }
   
@@ -275,7 +311,8 @@ static effect call_to_interpreted_path(call c, cell_interpretation * ci, pv_cont
 	     if it's a pointer. 
 	     do nothing for the moment, or we could return an anywhere effect....
 	  */
-	  pips_internal_error("not yet implemented\n", entity_name(func));	  
+	  pips_user_warning("external call, not handled yet, returning all locations effect\n");
+	  eff = make_anywhere_effect(make_action_write_memory());	  
 	  break;
       
 	case is_value_intrinsic:
@@ -346,7 +383,7 @@ effect expression_to_interpreted_path(expression exp, cell_interpretation * ci,
 	case is_syntax_reference:
 	  pips_debug(5, "reference case\n");
 	  /* this function name should be stored in ctxt*/
-	  eff = (*reference_to_effect_func)(syntax_reference(exp_syntax), 
+	  eff = (*reference_to_effect_func)(copy_reference(syntax_reference(exp_syntax)), 
 					    make_action_write_memory(), false);
 	  *ci = make_cell_interpretation_value_of();
 	  break;
@@ -373,7 +410,14 @@ effect expression_to_interpreted_path(expression exp, cell_interpretation * ci,
 	  break;
     
 	case is_syntax_subscript:
-	  pips_debug(5, "subscript case\n");	
+	  pips_debug(5, "subscript case\n");
+	  subscript sub = syntax_subscript(exp_syntax);
+	  eff = expression_to_interpreted_path(subscript_array(sub), ci, ctxt);
+
+	  FOREACH(EXPRESSION, sub_ind_exp, subscript_indices(sub))
+	    {
+	      (*effect_add_expression_dimension_func)(eff, sub_ind_exp);
+	    }
 	  list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &eff, true);
 	  *ci = make_cell_interpretation_value_of();
 	  gen_full_free_list(l_tmp);	
@@ -966,7 +1010,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 		      free_type(rhs_type);
 		    }
 		  
-		  /* free_effect(rhs_eff); I don't know why this makes the next prettyprint phase fail in case of an undefined rhs. It's as if a dandling pointer were created, which means that the undefined_pointer_value_entity is freed....  */
+		  free_effect(rhs_eff); 
 		  free_cell_interpretation(rhs_kind);
 
 		} /* if (!ENDP(l_kill)) */
@@ -1145,9 +1189,9 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
   pips_debug_effect(1, "and eff_kill:\n", eff_kill);
 
   /* first, search for the (exact/possible) values of eff_kill cell in l_in */
-  /* we searche for the cell_relations where ref_kill appears
+  /* we search for the cell_relations where ref_kill appears
      as a first cell, or the exact value_of pointer_values where ref_kill appears as 
-     a second cell. If an exact value_of relation is found, it is retained in first_exact_pv     
+     a second cell. If an exact value_of relation is found, it is retained in exact_old_pv     
   */
   list l_in_remnants = NIL;
   cell_relation exact_old_pv = cell_relation_undefined;
@@ -1216,8 +1260,6 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
       size_t nb_ind_in = gen_length(ind_in);
       /******/
 
-      tag app_in = cell_relation_approximation_tag(pv_in);
-	  
       pips_debug_pv(3, "considering pv_in:", pv_in);
       
       if (same_entity_p(e_kill, e_in) && nb_ind_kill <= nb_ind_in)
@@ -1370,21 +1412,17 @@ cell_relation simple_pv_translate(cell_relation pv_in, cell_relation pv_old, pv_
   /* pv_in second cell characteristics */     
   cell cell_in = cell_relation_second_cell(pv_in);
   reference ref_in = cell_reference(cell_in);
-  entity e_in = reference_variable(ref_in);
   list ind_in = reference_indices(ref_in);
-  size_t nb_ind_in = gen_length(ind_in);
   /******/
   
   /* pv_old characteristics */
   reference old_ref1 = 
     cell_reference(cell_relation_first_cell(pv_old));
-  entity old_e1 = reference_variable(old_ref1);
   list old_ind1 = reference_indices(old_ref1);
   size_t old_nb_ind1 = gen_length(old_ind1);
       
   reference old_ref2 = 
     cell_reference(cell_relation_first_cell(pv_old));
-  list old_ind2 = reference_indices(old_ref2);
 			      
   reference new_ref = copy_reference(old_ref2);
   
