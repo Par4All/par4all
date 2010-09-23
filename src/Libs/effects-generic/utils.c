@@ -912,6 +912,13 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 
 	    break;
 	  }
+	case is_type_void:
+	  {
+	    pips_debug(8, "void case\n");
+	    if (add_eff)
+	      l_res = CONS(EFFECT, eff, NIL);
+	    break;
+	  }
 	default:
 	  {
 	    pips_internal_error("case not handled yet\n");
