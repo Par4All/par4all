@@ -1050,27 +1050,45 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
 		    reference eff_ref = effect_any_reference(eff);
+		    action eff_act = effect_action(eff);
 		    list eff_ind = reference_indices(eff_ref);
-
-		    reference new_ref = copy_reference(real_ref);
-		    effect new_eff;
 
 		    pips_debug(8, "pointer type real arg reference\n");
 
-		    /* we add the indices of the effect reference
-		       to the real reference */
-		    pips_debug(8, "effect on the pointed area : \n");
-		    new_eff = (* reference_to_effect_func)
-		      (new_ref,
-		       copy_action(effect_action(eff)), false);
-		    FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
+		    reference n_eff_ref;
+		    descriptor d;
+		    bool exact_translation_p;
+		    simple_cell_reference_with_value_of_cell_reference_translation(eff_ref, descriptor_undefined,
+										   real_ref, descriptor_undefined,
+										   0,
+										   &n_eff_ref, &d,
+										   &exact_translation_p);		    
+			
+		    if (entity_all_locations_p(reference_variable(n_eff_ref)))
 		      {
-			(*effect_add_expression_dimension_func)
-			  (new_eff, eff_ind_exp);
+			effect real_eff = (*reference_to_effect_func)(real_ref, effect_action(eff), true);
+			type real_eff_type = reference_to_type(real_ref);
+			tag act = effect_write_p(eff)? 'w' : 'r' ;
+			list l_tmp = generic_effect_generate_all_accessible_paths_effects(real_eff,
+											  real_eff_type,
+											  act);
+			l_eff = gen_nconc(l_eff, l_tmp);
+			free_effect(real_eff);
+			free_type(real_eff_type);
+			free_reference(n_eff_ref);
+		      }	
+		    else
+		      {
+			effect n_eff = make_effect(make_cell(is_cell_reference, n_eff_ref),
+						   copy_action(effect_action(eff)),
+						   exact_translation_p? copy_approximation(effect_approximation(eff)):
+						   make_approximation_may(),
+						   make_descriptor(is_descriptor_none,UU));
+			l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		      }
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
-		  }
-
+		    
+		  } /* FOREACH */
+		
 	      } /*  if (pointer_type_p(real_arg_t)) */
 	    else
 	      {
@@ -1229,7 +1247,6 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			/* Then we add the indices of the effect reference */
 			/* Well this is valid only in the general case :
 			 * we should verify that types are compatible.
-			 * And it's not GENERIC.
 			 */
 			FOREACH(EXPRESSION, ind, eff_ind)
 			  {

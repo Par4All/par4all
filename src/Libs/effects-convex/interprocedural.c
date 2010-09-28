@@ -555,7 +555,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	      {
 
 		reference new_ref = copy_reference(real_ref);
-		effect new_eff = effect_undefined;
+		effect real_eff = effect_undefined;
 
 		pips_debug(8, "pointer type real arg reference\n");
 
@@ -564,27 +564,40 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		   real argument
 		*/
 		pips_debug(8, "effect on the pointed area : \n");
-		new_eff = (*reference_to_effect_func)
+		real_eff = (*reference_to_effect_func)
 		  (new_ref, copy_action(effect_action(eff)), false);
 
 		/* this could easily be made generic BC. */
 		/* FI: I add the restriction on store regions, but
 		   they should have been eliminated before translation
 		   is attempted */
-		if(!anywhere_effect_p(new_eff) && store_effect_p(new_eff))
+		if(!anywhere_effect_p(real_eff) && store_effect_p(real_eff))
 		  {
+		    reference n_eff_ref;
+		    descriptor n_eff_d;
+		    effect n_eff;
+		    bool exact_translation_p;
 		    effect init_eff = (*effect_dup_func)(eff);
+		    
 		    /* we translate the initial region descriptor
 		       into the caller's name space
 		    */
 		    convex_region_descriptor_translation(init_eff);
-		    /* and we "append" the initial region to the real arg
-		       region.
-		    */
-		    new_eff = region_append(new_eff, init_eff);
+		    /* and then perform the translation */
+		    convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff), 
+										   effect_descriptor(init_eff),
+										   effect_any_reference(real_eff), 
+										   effect_descriptor(real_eff),
+										   0,
+										   &n_eff_ref, &n_eff_d,
+										   &exact_translation_p);
+		    n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff)),
+					exact_translation_p? copy_approximation(effect_approximation(eff)) : make_approximation_may(),
+					n_eff_d);
 		    /* shouldn't it be a union ? BC */
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
+		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		    free_effect(init_eff);
+		    free_effect(real_eff);
 		  }
 
 	      }

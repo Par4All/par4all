@@ -2449,3 +2449,99 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 
 
 }
+
+/** @brief translates a convex memory access path reference from given indices
+           using a value_of memory access path reference
+
+    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref,
+    knowing that a[i] = &value_of_ref. In this case the list of remaning_input_indices is [j][k].
+
+    @param input_ref is the input convex cell reference
+    @param input_desc is the descriptor describing the input reference
+    @param input_remaining_indices is the list of indices from input_ref which have to be translated.
+
+    @param value_of_ref is the convex cell reference giving the output base memory access path.
+    @param value_of_desc is the descriptor describing value_of_ref.
+
+    @param output_ref is a pointer on the resulting convex reference
+    @param output_desc is a pointer on teh resulting descriptor describing output_ref.
+    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+
+    input_remaining_indices does not need to be a copy of a part of the indices of input_ref, because it is not modified.
+    In a first version of this function, it was replaced by a integer giving the rank of the beginning of this list
+    in the input_ref indices list. However, in generic_eval_cell_with_points_to,
+    convex_cell_reference_with_value_of_cell_reference_translation may be called
+    several times with the same input_ref and rank, so it was more efficient to pass the input_remaning_indices list
+    directly as an argument.
+
+ */
+void convex_cell_reference_with_value_of_cell_reference_translation
+(reference input_ref, descriptor input_desc,
+ reference value_of_ref, descriptor value_of_desc,
+ int nb_common_indices,
+ reference *output_ref, descriptor *output_desc,
+ bool *exact_p)
+{
+
+  /* assume exactness */
+  *exact_p = true; 
+
+  /* we do not handle yet the cases where the type of value_of_ref does not match
+     the type of a[i]. I need a special function to test if types are compatible,
+     because type_equal_p is much too strict.
+     moreover the signature of the function may not be adapted in case of the reshaping of a array
+     of structs into an array of char for instance.
+  */
+
+  /* first build the output reference */
+  list input_inds = reference_indices(input_ref);
+  int nb_phi_input = (int) gen_length(input_inds);
+
+  list value_of_inds = reference_indices(value_of_ref);
+  int nb_phi_value_of = (int) gen_length(value_of_inds);
+
+  *output_ref = copy_reference(value_of_ref);
+  
+  /* we add the indices of the input reference past the nb_common_indices
+     (they have already be poped out) to the copy of the value_of reference */
+  
+  for(int i = 0; i<nb_common_indices; i++, POP(input_inds));
+
+  int i = nb_phi_value_of+1; /* current index to be handled */
+  FOREACH(EXPRESSION, input_ind, input_inds)
+    {
+      if (entity_field_p(expression_variable(input_ind)))
+	reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
+						   CONS(EXPRESSION, 
+							copy_expression(input_ind), 
+							NIL));
+      else
+	reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
+						   CONS(EXPRESSION, 
+							 make_phi_expression(i), 
+							NIL));
+      i++;
+    }
+ 
+  /* Then deal with the output descriptor*/
+  Psysteme input_sc2 = sc_dup(descriptor_convex(input_desc));
+  Psysteme value_of_sc = descriptor_convex(value_of_desc);
+
+  Psysteme output_sc = sc_dup(value_of_sc);
+
+  if(nb_phi_value_of - nb_common_indices != 0) /* avoid useless renaming */
+    {
+      
+      for(i= nb_phi_input; i>nb_common_indices; i--)
+	{
+	  entity old_phi = make_phi_entity(i);
+	  entity new_phi = make_phi_entity(nb_phi_value_of+i-nb_common_indices);
+
+	  sc_variable_rename(input_sc2, old_phi, new_phi);
+	}
+    }
+  output_sc = cell_system_sc_append_and_normalize(output_sc, input_sc2, 1);
+
+  *output_desc = make_descriptor_convex(output_sc);
+  sc_rm(input_sc2);
+}
