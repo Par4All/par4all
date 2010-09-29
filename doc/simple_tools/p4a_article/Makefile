@@ -4,6 +4,9 @@ INSTALL_HTM = p4a_script.htdoc
 # Where to install the documentation:
 INSTALL_MACHINE_DIR=$(INSTALL_MACHINE_DOC_DIR)/simple_tools/p4a
 
+TEXINPUTS:=$(TEXINPUTS):$(shell pwd)/../../figures//::
+export TEXINPUTS
+
 # Hide the PDF into the HTML documentation directory
 DOC.subd = $(INSTALL_HTM)
 
@@ -34,9 +37,16 @@ local-clean:
 	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
 		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py
 
+# Often, PDF output of tools (inkscape...) are bad because it is a whole
+# page without cropping.  So rely on .eps output and apply translation and
+# cropping:
+%.pdf: %.eps
+	ps2pdf $< $@
+	pdfcrop $@
+	mv $*-crop.pdf $@
 
 # Add the dependence on some automatically generated help:
-p4a_script.tex: p4a-help.tex
+p4a_script.tex: p4a-help.tex ../../figures/p4a_work_flow.pdf
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
