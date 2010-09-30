@@ -1,15 +1,18 @@
 # convertion of Semantics/all04.tpips into pyps
 # tests usage of capply
-from pyps import *
-w = workspace(['capply01.f'],activates=['TRANSFORMERS_INTER_FULL','INTERPROCEDURAL_SUMMARY_PRECONDITION','PRECONDITIONS_INTER_FULL','PRINT_CODE_CUMULATED_EFFECTS'])
-print " Initial code with preconditions for ALL04 after cleanup"
+from pyps import workspace,module
+with workspace(['capply01.f']) as w:
+	print " Initial code with preconditions for ALL04 after cleanup"
+	w.activate(module.transformers_inter_full)
+	w.activate("interprocedural_summary_precondition")
+	w.activate(module.preconditions_inter_full)
+	w.activate(module.print_code_cumulated_effects)
 
-w.all.display()
-# there is a capply there
-w.all.partial_eval()
-w.all.display()
-# and there
-w.all.suppress_dead_code()
-w.all.display()
-# end
-w.close()
+	w.all.display()
+	# there is a capply there
+	w.all.partial_eval(concurrent=True)
+	w.all.display()
+	# and there
+	w.all.suppress_dead_code(concurrent=True)
+	w.all.display()
+

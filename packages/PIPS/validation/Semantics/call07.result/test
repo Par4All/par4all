@@ -87,7 +87,6 @@ INITIAL_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[call07] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call07] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return

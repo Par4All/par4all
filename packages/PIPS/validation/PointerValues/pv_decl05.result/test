@@ -1,0 +1,12 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *a[10];
+
+// Pointer values:
+// a[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   return 0;
+}

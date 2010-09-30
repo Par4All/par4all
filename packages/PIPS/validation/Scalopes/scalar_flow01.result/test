@@ -46,29 +46,29 @@ int main()
    int c[10] = {0};
    int a = 2;
    //PIPS generated variable
-   int (*P_0)[10] = (int (*)[10]) 0, *P_1 = (int *) 0, *P_2 = (int *) 0, *P_3 = (int *) 0, *P_4 = (int *) 0;
+   int (*c0)[10] = (int (*)[10]) 0, *b0 = (int *) 0, *a0 = (int *) 0, *b1 = (int *) 0, *a1 = (int *) 0;
 
    a = 0;
    b = 0;
-   P4A_scmp_malloc(&P_2, sizeof(int)-1+1);
-   P4A_scmp_malloc(&P_1, sizeof(int)-1+1);
-   P4A_scmp_malloc(&P_0, sizeof(int[10])-1+1);
-   P4A_scmp_read(&a, P_2, sizeof(int)-1+1);
-   P4A_scmp_read(&b, P_1, sizeof(int)-1+1);
-   P4A_scmp_read(c, *P_0, sizeof(int[10])-1+1);
+   P4A_scmp_malloc(&a0, sizeof(int)*1);
+   P4A_scmp_malloc(&b0, sizeof(int)*1);
+   P4A_scmp_malloc(&c0, sizeof(int)*10);
+   P4A_scmp_read(&a, a0, sizeof(int)*1);
+   P4A_scmp_read(&b, b0, sizeof(int)*1);
+   P4A_scmp_read(&c[0], *c0, sizeof(int)*10);
 
-   P4A_scmp_kernel_0(&*P_2, &*P_1, *P_0);
-   P4A_scmp_write(&a, P_2, sizeof(int)-1+1);
-   P4A_scmp_write(&b, P_1, sizeof(int)-1+1);
-   P4A_scmp_write(c, *P_0, sizeof(int[10])-1+1);
-   P4A_scmp_malloc(&P_4, sizeof(int)-1+1);
-   P4A_scmp_malloc(&P_3, sizeof(int)-1+1);
-   P4A_scmp_read(&a, P_4, sizeof(int)-1+1);
-   P4A_scmp_read(&b, P_3, sizeof(int)-1+1);
+   P4A_scmp_kernel_0(&(*a0), &(*b0), (*c0));
+   P4A_scmp_write(&a, a0, sizeof(int)*1);
+   P4A_scmp_write(&b, b0, sizeof(int)*1);
+   P4A_scmp_write(&c[0], *c0, sizeof(int)*10);
+   P4A_scmp_malloc(&a1, sizeof(int)*1);
+   P4A_scmp_malloc(&b1, sizeof(int)*1);
+   P4A_scmp_read(&a, a1, sizeof(int)*1);
+   P4A_scmp_read(&b, b1, sizeof(int)*1);
 
-   P4A_scmp_kernel_1(&*P_4, &*P_3);
-   P4A_scmp_write(&a, P_4, sizeof(int)-1+1);
-   P4A_scmp_write(&b, P_3, sizeof(int)-1+1);
+   P4A_scmp_kernel_1(&(*a1), &(*b1));
+   P4A_scmp_write(&a, a1, sizeof(int)*1);
+   P4A_scmp_write(&b, b1, sizeof(int)*1);
 
    return 0;
 }

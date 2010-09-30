@@ -17,13 +17,13 @@ Proper effetcs for "strcat01"
 int main()
 {
    char str[80];
-//               <must be written>: str[*]
+//               <may be written >: str[*]
    strcpy(str, "these ");
-//               <must be written>: str[*]
+//               <may be written >: str[*]
    strcat(str, "strings ");
-//               <must be written>: str[*]
+//               <may be written >: str[*]
    strcat(str, "are ");
-//               <must be written>: str[*]
+//               <may be written >: str[*]
    strcat(str, "concatenated.");
 //               <may be read    >: stdout[0] str[*]
 //               <may be written >: stdout[0]

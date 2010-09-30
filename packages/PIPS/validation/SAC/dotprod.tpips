@@ -12,7 +12,7 @@ source include/fortran.tpips
 #apply PRINT_C_CODE[DOTPRODREF]
 #apply PRINT_C_CODE[MAIN]
 
-#display C_PRINTED_FILE
+display C_PRINTED_FILE
 
 
 close

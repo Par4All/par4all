@@ -1,0 +1,54 @@
+delete sting_berkeley
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sting_berkeley sting_berkeley.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[sting_berkeley]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[sting_berkeley]
+
+echo
+echo Refinement
+echo
+
+apply REFINE_TRANSFORMERS
+
+echo
+echo TRANSFORMERS after refinement
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[sting_berkeley]
+
+# quit
+
+echo
+echo PRECONDITIONS after refinement
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[sting_berkeley]
+
+close
+# delete sting_berkeley
+quit

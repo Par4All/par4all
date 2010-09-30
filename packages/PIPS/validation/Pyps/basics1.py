@@ -1,3 +1,4 @@
 #!/usr/bin/env python
 from pyps import *
-workspace(["basics1.c"]).close()
+with workspace(["basics1.c"]) as w:
+	pass #do nothing, with statement wil automagically close everything

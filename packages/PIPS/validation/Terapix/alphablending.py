@@ -44,7 +44,7 @@ def microcode_normalizer(ws,module):
 	module.display()
 
 if __name__ == "__main__":
-	w = workspace(["alphablending.c", "include/load.c", "include/terasm.c"], cppflags="-I.")
+	w = workspace(["alphablending.c", "include/par4all.c", "include/terasm.c"], cppflags="-I.")
 	m = w["alphablending"]
 	
 	print "tidy the code just in case of"

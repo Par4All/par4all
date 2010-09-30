@@ -1,0 +1,11 @@
+int main()
+{
+
+// Pointer values: none
+
+   mystruct s;
+
+// Pointer values: none
+
+   return 0;
+}

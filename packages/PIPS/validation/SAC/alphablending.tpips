@@ -4,7 +4,7 @@ create ALPHABLENDING kernels/ALPHABLENDING/ALPHABLENDING.f include/simd.f
 
 module ALPHABLENDING
 
-source include/benchmark.tpips.h
+source include/fortran.tpips
 
 apply PRINT_C_CODE[ALPHABLENDING]
 apply PRINT_C_CODE[ALPHABLENDINGREF]

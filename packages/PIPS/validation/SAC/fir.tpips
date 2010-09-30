@@ -1,0 +1,29 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="fir"
+delete $WS
+create $WS $WS.c include/SIMD.c
+
+echo
+echo Initial code
+echo
+
+module FIRFilter
+display PRINTED_FILE
+
+source include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+apply UNSPLIT
+
+shell sed -i -e '1,/FIRFilter/ d' $WS.database/Src/$WS.c
+
+shell ./compileC.sh $WS $WS.c $WS.database/Tmp/test.c
+shell gcc -O3 -I$. -march=native -c  $WS.database/Tmp/test.c
+
+close
+delete $WS
+quit

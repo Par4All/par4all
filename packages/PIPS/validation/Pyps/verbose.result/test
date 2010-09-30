@@ -1,0 +1,22 @@
+int main()
+{
+   return 1;
+}
+int foo(int a)
+{
+   return a;
+}
+void bar(int *c)
+{
+   *c = foo(2);
+}
+void megablast(int n)
+{
+   int i, j;
+   for(i = 0; i <= n-1; i += 1)
+      j = foo(i);
+}
+void malabar(int *c)
+{
+   *c = foo(3);
+}

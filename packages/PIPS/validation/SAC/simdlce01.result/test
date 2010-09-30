@@ -12,25 +12,25 @@ void foo_l(int a[4], int b[4], int c[4])
 {
    int i;
    for(i = 0; i <= 9; i += 1) {
-      //PIPS:SAC generated int vector(s)
-      int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
-      SIMD_LOAD_V4SI(v4si_vec2, &c[0]);
-      SIMD_LOAD_V4SI(v4si_vec1, &b[0]);
-      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
-      SIMD_STORE_V4SI(v4si_vec0, &a[0]);
+      //PIPS:SAC generated v4si vector(s)
+      v4si vec00, vec10, vec20;
+      SIMD_LOAD_V4SI(vec20, &c[0]);
+      SIMD_LOAD_V4SI(vec10, &b[0]);
+      SIMD_ADDD(vec00, vec10, vec20);
+      SIMD_STORE_V4SI(vec00, &a[0]);
    }
 }
 void foo_l(int a[4], int b[4], int c[4])
 {
    int i;
    {
-      //PIPS:SAC generated int vector(s)
-      int v4si_vec0[4], v4si_vec1[4], v4si_vec2[4];
-      SIMD_LOAD_V4SI(v4si_vec2, &c[0]);
-      SIMD_LOAD_V4SI(v4si_vec1, &b[0]);
+      //PIPS:SAC generated v4si vector(s)
+      v4si vec00, vec10, vec20;
+      SIMD_LOAD_V4SI(vec20, &c[0]);
+      SIMD_LOAD_V4SI(vec10, &b[0]);
       for(i = 0; i <= 9; i += 1)
-         SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
-      SIMD_STORE_V4SI(v4si_vec0, &a[0]);
+         SIMD_ADDD(vec00, vec10, vec20);
+      SIMD_STORE_V4SI(vec00, &a[0]);
    }
 }
 
