@@ -83,5 +83,11 @@ void* pips_memalign(void *memptr, size_t size)
 }
 """
 
-pips_memalign_h = "#define pips_memalign(memptr, size) \
-	({posix_memalign((void **) &(memptr), %d, (size)); memptr;})" % alignsize
+pips_memalign_h = """
+#include <stdlib.h>
+#define pips_memalign(a,b) _pips_memalign((void**)&a,b)
+static void* _pips_memalign(void** memptr, size_t size) {
+	posix_memalign(memptr,%d,size);
+	return *memptr;
+}
+""" %  alignsize
