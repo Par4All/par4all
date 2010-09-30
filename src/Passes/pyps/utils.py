@@ -37,7 +37,7 @@ define_MAX0 = """
 #endif
 
 #ifndef MOD
-# define MOD(a, b) ((b) % (a))
+# define MOD(a, b) ((a) % (b))
 #endif
 
 #ifndef DBLE
