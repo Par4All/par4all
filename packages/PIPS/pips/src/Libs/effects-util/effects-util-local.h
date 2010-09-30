@@ -28,12 +28,13 @@
 #include "effects.h"
 #include "points_to_private.h"
 
-/* The definition of *ANYWHERE*:*ANYWHERE* should be removed from
-   ri-util-local.h */
 #define ANY_MODULE_NAME "*ANY_MODULE*"
 #define ANYWHERE_LOCATION "*ANYWHERE*"
 #define NOWHERE_LOCATION "*NOWHERE*"
 #define NULL_POINTER_NAME "*NULL_POINTER*"
+
+#define UNDEFINED_POINTER_VALUE_NAME "*UNDEFINED*"
+#define NULL_POINTER_VALUE_NAME "*NULL*"
 
 #define PHI_PREFIX "PHI"
 #define PSI_PREFIX "PSI"
@@ -172,4 +173,16 @@
 #define cell_relation_approximation_tag(cr)\
   approximation_tag(cell_relation_approximation(cr))
 
+#define cell_relation_may_p(cr)\
+  approximation_tag(cell_relation_approximation(cr))==is_approximation_may
 
+#define cell_relation_exact_p(cr)\
+  approximation_tag(cell_relation_approximation(cr))==is_approximation_exact
+
+#define pips_debug_pv(level, message, pv) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+    print_pointer_value(pv);}
+
+#define pips_debug_pvs(level, message, l_pv) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  print_pointer_values(l_pv);}

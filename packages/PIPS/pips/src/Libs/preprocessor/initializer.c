@@ -218,9 +218,10 @@ static text stub_text(entity module, bool is_fortran)
 	  ls = CONS(SENTENCE, stub_var_decl(p, n++, is_fortran), ls);
       }
 
-      ls = CONS(SENTENCE, make_sentence(is_sentence_unformatted,
-					make_unformatted(string_undefined, 0, 0,
-							 CONS(STRING, strdup(is_fortran?"END":"{}"), NIL))), ls);
+      ls = CONS(SENTENCE,
+		make_sentence(is_sentence_unformatted,
+			      make_unformatted(string_undefined, 0, 0,
+					       CONS(STRING, strdup("END"), NIL))), ls);
 
       ls = CONS(SENTENCE, warning, CONS(SENTENCE, head, gen_nreverse(ls)));
 

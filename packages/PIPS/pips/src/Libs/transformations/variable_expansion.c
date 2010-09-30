@@ -357,6 +357,7 @@ void do_expand_reference_in_declarations(statement s, entity oni[])
  * too
  */
 bool reduction_variable_expansion(char *module_name) {
+    bool success = false;
     /* prelude */
     set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name,true));
     set_current_module_entity(module_name_to_entity(module_name));
@@ -366,8 +367,9 @@ bool reduction_variable_expansion(char *module_name) {
     string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
     entity elabel = find_label_entity(module_name,slabel);
 
-    if(entity_undefined_p(elabel))
+    if(entity_undefined_p(elabel)) {
         pips_user_error("label %s does not exist !\n", slabel);
+    }
     else {
         statement theloopstatement = find_loop_from_label(get_current_module_statement(),elabel);
         list reductions = reductions_list(load_cumulated_reductions(theloopstatement));
@@ -386,97 +388,101 @@ bool reduction_variable_expansion(char *module_name) {
             /* each reduction will be expanded into a new entity, then a loop will perform the reduction */
             FOREACH(REDUCTION,red,reductions)
             {
-                entity reduction_entity = reference_variable(reduction_reference(red));
-                entity new_entity = entity_undefined;
-                /* check if the reduction entity has already been processed before creating the new entity */
-                if(HASH_UNDEFINED_VALUE == (new_entity = hash_get(new_entities,reduction_entity)) )
-                {
+                if(gen_length(reference_indices(reduction_reference(red))) <= 1 ) {
+                    entity reduction_entity = reference_variable(reduction_reference(red));
+                    entity new_entity = entity_undefined;
+                    /* check if the reduction entity has already been processed before creating the new entity */
+                    if(HASH_UNDEFINED_VALUE == (new_entity = hash_get(new_entities,reduction_entity)) )
+                    {
 
-                    /* the new entity is expanded from the reduction entity */
-                    new_entity = make_new_array_variable_with_prefix(
-                            "RED",
-                            get_current_module_entity(),
-                            entity_basic(reduction_entity),
-                            CONS(DIMENSION,copy_dimension(thedim),NIL)
-                            );
-                    AddEntityToCurrentModule(new_entity);
+                        /* the new entity is expanded from the reduction entity */
+                        new_entity = make_new_array_variable_with_prefix(
+                                "RED",
+                                get_current_module_entity(),
+                                basic_of_reference(reduction_reference(red)),
+                                CONS(DIMENSION,copy_dimension(thedim),NIL)
+                                );
+                        AddEntityToCurrentModule(new_entity);
 
 
-                    /* perform the expansion */
-                    er _er_ = {
-                        reduction_entity,
-                        new_entity,
-                        make_op_exp("-",
-                                make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
-                                copy_expression(range_lower(loop_range(theloop)))
-                               )
+                        /* perform the expansion */
+                        er _er_ = {
+                            reduction_entity,
+                            new_entity,
+                            make_op_exp("-",
+                                    make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
+                                    copy_expression(range_lower(loop_range(theloop)))
+                                    )
 
-                    };
-                    gen_context_multi_recurse(theloop,&_er_,
-                            reference_domain,gen_true,do_expand_reference,
-                            statement_domain,gen_true,do_expand_reference_in_declarations,
-                            NULL);
-                    free_expression(_er_.index);
+                        };
+                        gen_context_multi_recurse(theloop,&_er_,
+                                reference_domain,gen_true,do_expand_reference,
+                                statement_domain,gen_true,do_expand_reference_in_declarations,
+                                NULL);
+                        free_expression(_er_.index);
 
-                    /* register the entity */
-                    hash_put(new_entities,reduction_entity,new_entity);
-                }
+                        /* register the entity */
+                        hash_put(new_entities,reduction_entity,new_entity);
+                    }
 
                     /* create the assigment that put the good value at the beginning of the reduction,
                      * the choice of the good value is not trivial, it should be the neutral element for the reduction operation
                      * if we find a reference to our reduction before any control code, we have nothing to do ! */
-                instruction do_the_assignment = make_instruction_loop(
-                        make_loop(
-                            loop_index(theloop),
-                            make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),int_to_expression(1)),
-                            make_assign_statement(
-                                reference_to_expression(make_reference(new_entity,make_expression_list(entity_to_expression(loop_index(theloop))))),
-                                entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
-                            entity_empty_label(),
-                            make_execution_sequential(),
-                            NIL)
-                        );
-                insert_statement( theloopstatement,instruction_to_statement(do_the_assignment),true);
+                    instruction do_the_assignment = make_instruction_loop(
+                            make_loop(
+                                loop_index(theloop),
+                                make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),int_to_expression(1)),
+                                make_assign_statement(
+                                    reference_to_expression(make_reference(new_entity,make_expression_list(entity_to_expression(loop_index(theloop))))),
+                                    entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
+                                entity_empty_label(),
+                                make_execution_sequential(),
+                                NIL)
+                            );
+                    insert_statement( theloopstatement,instruction_to_statement(do_the_assignment),true);
 
-                /* create  two loops: one for the init, for the reduction */
-                instruction do_the_reduction = make_instruction_loop(
-                        make_loop(
-                            loop_index(theloop),
-                            copy_range(loop_range(theloop)),
-                            make_assign_statement(
-                                reference_to_expression(copy_reference(reduction_reference(red))),
-                                MakeBinaryCall(
-                                    reduction_operator_entity(reduction_op(red)),
+                    /* create  two loops: one for the init, for the reduction */
+                    instruction do_the_reduction = make_instruction_loop(
+                            make_loop(
+                                loop_index(theloop),
+                                copy_range(loop_range(theloop)),
+                                make_assign_statement(
                                     reference_to_expression(copy_reference(reduction_reference(red))),
-                                    reference_to_expression(make_reference(new_entity,
-                                            CONS(EXPRESSION,
-                                                make_op_exp("-",
-                                                    make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
-                                                    copy_expression(range_lower(loop_range(theloop)))
-                                                    )
+                                    MakeBinaryCall(
+                                        reduction_operator_entity(reduction_op(red)),
+                                        reference_to_expression(copy_reference(reduction_reference(red))),
+                                        reference_to_expression(make_reference(new_entity,
+                                                CONS(EXPRESSION,
+                                                    make_op_exp("-",
+                                                        make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
+                                                        copy_expression(range_lower(loop_range(theloop)))
+                                                        )
 
-                                                ,NIL)))
-                                    )
-                                ),
-                            entity_empty_label(),
-                            make_execution_sequential(),
-                            NIL)
-                        );
-                /* append it */
-                trailing_statements=CONS(STATEMENT,instruction_to_statement(do_the_reduction),trailing_statements);
+                                                    ,NIL)))
+                                        )
+                                    ),
+                                entity_empty_label(),
+                                make_execution_sequential(),
+                                NIL)
+                                    );
+                    /* append it */
+                    trailing_statements=CONS(STATEMENT,instruction_to_statement(do_the_reduction),trailing_statements);
 
+                }
             }
-            pips_assert("some entity were created",!hash_table_empty_p(new_entities));
-            pips_assert("new statement were created",!ENDP(trailing_statements));
-            /* create trailing statement and append them */
-            statement all_trailining_statements = make_block_statement(trailing_statements);
-            insert_statement(theloopstatement,all_trailining_statements,false);
 
-            hash_table_free(new_entities);
+            if(!ENDP(trailing_statements)) {
+                /* create trailing statement and append them */
+                statement all_trailining_statements = make_block_statement(trailing_statements);
+                insert_statement(theloopstatement,all_trailining_statements,false);
 
-            /* commit changes */
-            module_reorder(get_current_module_statement());
-            DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+                hash_table_free(new_entities);
+
+                /* commit changes */
+                module_reorder(get_current_module_statement());
+                DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+                success=true;
+            }
         }
     }
 
@@ -484,5 +490,5 @@ bool reduction_variable_expansion(char *module_name) {
     reset_cumulated_reductions();
     reset_current_module_statement();
     reset_current_module_entity();
-    return true;
+    return success;
 }

@@ -1,6 +1,8 @@
 # A small toolbox for various utility functions
 import re
 import os
+import fileinput
+import sys
 
 guard_begin = "PIPS include guard begin:"
 guard_begin_re = re.compile(r"^/\* %s (.+) \*/$" % guard_begin)
@@ -12,20 +14,16 @@ def mkguard(guard, line):
 
 def guardincludes(fname):
     """ Adds guards around includes."""
-    outname = "%s.tmp" % fname
-    with open(outname, "w") as outfile:
-        with open(fname, "r") as infile:
-            for l in infile:
-                is_include = include_re.match(l)
-                if is_include:
-                    outfile.write(mkguard(guard_begin, l))
-                outfile.write(l)
-                if is_include:
-                    outfile.write(mkguard(guard_end, l))
-    os.rename(outname, fname)
+    for l in fileinput.FileInput([fname], inplace = True):
+        is_include = include_re.match(l)
+        if is_include:
+            print mkguard(guard_begin, l),
+        print l,
+        if is_include:
+            print mkguard(guard_end, l),
 
 define_MAX0 = """
-/* Header automatically inserted by PYPS */
+/* Header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
 #ifndef MAX0
 # define MAX0(a, b) ((a) > (b) ? (a) : (b))
 #endif
@@ -39,7 +37,7 @@ define_MAX0 = """
 #endif
 
 #ifndef MOD
-# define MOD(a, b) ((b) % (a))
+# define MOD(a, b) ((a) % (b))
 #endif
 
 #ifndef DBLE
@@ -49,41 +47,60 @@ define_MAX0 = """
 #ifndef INT
 # define INT(a) ((int)(a))
 #endif
-/* End header automatically inserted by PYPS */
+
+#ifdef WITH_TRIGO
+#  include <math.h>
+#  ifndef COS
+#    define COS(a) (cos(a))
+#  endif
+
+#  ifndef SIN
+#    define SIN(a) (sin(a))
+#  endif
+#endif
+/* End header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
 """
 
 def addMAX0(fname):
     """ Adds #define's for MAX0 and MOD."""
-    outname = "%s.tmp" % fname
-    with open(outname, "w") as outfile:
-        outfile.write(define_MAX0)
-        with open(fname, "r") as infile:
-            for l in infile:
-                outfile.write(l)
-    os.rename(outname, fname)
+    addBeginnning(fname, define_MAX0)
 
-# remove the contents of included files
+def addBeginnning(fname, text):
+    """Adds a line of text at the beginning of fname"""
+    fi = fileinput.FileInput([fname], inplace = True)
+    for l in fi:
+        if fi.isfirstline():
+            print text
+        print l,
+    
 def unincludes(fname):
-    with open(fname + ".tmp", "w") as outfile:
-        with open(fname, "r") as infile:
-            # ``Mixing iteration and read methods would lose data'', python
-            # says, so using the while 1: idiom.
-            while 1:
-                l = infile.readline()
-                if not l: break
-                match = guard_begin_re.match(l)
-                if match:
-                    included = match.group(1)
-                    outfile.write(l)
-                    outfile.write(included + "\n")
-                    while 1:
-                        l = infile.readline()
-                        if l == mkguard(guard_end, included):
-                            break
-                    outfile.write(mkguard(guard_end, included))
-                else:
-                    outfile.write(l)
-    os.rename(fname + ".tmp", fname)
+    """remove the contents of included files"""
+    fi = fileinput.FileInput([fname], inplace = True)
+    inside_include = False
+    included = None
+    end_included = None
+    for l in fi:
+        match = guard_begin_re.match(l)
+        if match:
+            included = match.group(1)
+            inside_include = True
+            end_included = mkguard(guard_end, included)
+            print l,
+            print included
+            continue
+        if l == end_included:
+            inside_include = False
+            included = None
+            end_included = None
+            print l,
+            continue
+        if inside_include:
+            continue
+        print l,
+
+def string2file(string, fname):
+    f = open(fname, "w")
+    f.write(string)
+    f.close()
     
 def nameToTmpDirName(name): return "." + name + ".tmp"
-

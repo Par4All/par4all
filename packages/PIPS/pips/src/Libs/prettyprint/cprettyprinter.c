@@ -913,7 +913,7 @@ static string c_reference(reference r)
 {
     string result = strdup(EMPTY), old, svar;
 
-    list l_dim = variable_dimensions(type_variable(entity_type(reference_variable(r)))); 
+    list l_dim = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r))))); 
 
     MAP(EXPRESSION, e,
     {

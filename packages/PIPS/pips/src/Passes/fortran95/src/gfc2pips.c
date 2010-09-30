@@ -2080,6 +2080,7 @@ list gfc2pips_array_ref2indices(gfc_array_ref *ar) {
               indices);
         }
       }
+      indices = gen_nreverse(indices);
       break;
 
     case AR_UNKNOWN:

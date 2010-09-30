@@ -25,6 +25,7 @@
  * store in the RI as extension expression.
  * Here is the list of transformations:
  *   1- add an OpenMP if clause
+ *   2- Merge nested OpenMP clause
  */
 
 #ifdef HAVE_CONFIG_H
@@ -43,7 +44,7 @@
 #include "properties.h"
 #include "control.h"
 
-// The list of outter loop as a list of statements
+// The list of outer loop as a list of statements
 static list l_outer = NIL;
 
 // The list of pragma to be merged
@@ -51,6 +52,9 @@ static list l_pragma = NIL;
 
 // The list of number of iteration (as expression) to be used in the if clause
 static list l_iters = NIL;
+
+// The inner flag
+static bool inner_flag = TRUE;
 
 // build a list of pragma to be merged. Also remove them from the
 // list they currently belongs to.
@@ -72,12 +76,51 @@ static void build_pragma_list (extensions exts) {
   extensions_extension (exts) = l_exts;
 }
 
+//@brief we need to go through all the extensions and reset
+//the flag to true
+static bool inner_filter (loop l) {
+  pips_debug (5, "processing loop : %p.\n", (void*) l);
+  inner_flag = TRUE;
+  return TRUE;
+}
+
+//@brief keep the inner pragma and remove the others. This is the bottum up part
+//of the gen_recuse to merge pragma at the inner level
+static void inner_rewrite (loop l) {
+  statement stmt = (statement) gen_get_ancestor(statement_domain, l);
+  extensions exts = statement_extensions (stmt);
+  list l_exts = extensions_extension (exts);
+  list tmp = NIL;
+
+  FOREACH (EXTENSION, ext, l_exts) {
+    // today extension is only pragma but can be something else in the future
+    // a test will have to be done
+    // if (extension_is_pragma_p ())
+    if (inner_flag == TRUE) {
+      // this is the inner pragma we have to keep it so set the flag to false
+      // to remove next extensions and exit
+      pips_debug (5, "keeping pragma : %s from extensions %p.\n",
+		  pragma_to_string (extension_pragma (ext)), (void*) exts);
+      inner_flag = FALSE;
+      return;
+    } else {
+      // we need to remove that extension because it is not an inner one
+      tmp = gen_extension_cons (ext, tmp);
+      pips_debug (5, "removing pragma : %s from extensions %p.\n",
+		  pragma_to_string (extension_pragma (ext)), (void*) exts);
+    }
+    //}
+  }
+  gen_list_and_not (&l_exts, tmp);
+  // update the extensions field
+  extensions_extension (exts) = l_exts;
+  return;
+}
+
 // keep track of outer loop with pragma and return false
 static bool build_outer (loop l) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   list l_exts = extensions_extension (statement_extensions (stmt));
-  pips_debug (5, "processing extensions : %s\n",
-	      extensions_to_string (statement_extensions (stmt), TRUE));
 
   FOREACH (EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
@@ -88,6 +131,7 @@ static bool build_outer (loop l) {
     // only the pragma as expressions are managed
     if (pragma_expression_p (pr) == TRUE) {
       l_outer = gen_statement_cons (stmt, l_outer);
+      pips_debug (5, "outer pragma as expression found\n");
       return FALSE;
     }
   }
@@ -172,12 +216,28 @@ bool omp_merge_pragma (const string module_name) {
     set_prettyprint_language_from_property(is_language_fortran);
   }
 
-  // build the list of outer loop with pragma
-  //gen_recurse(mod_stmt, loop_domain, gen_true, gen_identity);
+  // getting the properties to configure the phase
+  char* merge_policy = get_string_property ("OMP_MERGE_POLICY");
+  bool outer = (strcmp (merge_policy, "outer") == 0);
+  free (merge_policy);
+
+  // build the list of outer loop with pragma this is also needed by the
+  // inner mode
   gen_recurse(mod_stmt, loop_domain, build_outer, gen_identity);
 
-  // merge the pragma on the outer loop
-  merge_on_outer ();
+  if (outer == true) {
+    pips_debug (3, "outer mode\n");
+    // merge the pragma on the outer loop
+    merge_on_outer ();
+  }
+  else { //inner
+    pips_debug (3, "inner mode\n");
+    FOREACH (statement, stmt, l_outer) {
+      gen_recurse (stmt, loop_domain, inner_filter, inner_rewrite);
+    }
+  }
+
+  // freeing memory
   gen_free_list (l_outer);
   l_outer = NIL;
 

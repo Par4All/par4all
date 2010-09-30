@@ -30,13 +30,66 @@
 #include <string.h>
 
 #include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "ri-util.h"
+#include "effects.h"
+#include "effects-util.h"
+#include "pipsdbm.h"
+#include "misc.h"
+#include "text.h"
+#include "text-util.h"
+#include "prettyprint.h"
+
+#include "pointer_values.h"
+
+text text_pv(entity __attribute__ ((unused)) module, int __attribute__ ((unused)) margin, statement s)
+{
+  list lpv = cell_relations_list(load_pv(s));
+
+  return(text_pointer_values(lpv, "Pointer values:"));
+}
+
+void generic_print_code_pv(char * module_name, pv_context * ctxt)
+{
+  bool success;
+
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, TRUE));  
+  set_current_module_entity(module_name_to_entity(module_name));
+
+  set_pv((*ctxt->db_get_pv_func)(module_name));
+
+
+  init_prettyprint(text_pv);
+  text t = make_text(NIL);
+  MERGE_TEXTS(t, text_module(get_current_module_entity(), 
+			     get_current_module_statement()));
+  success = make_text_resource_and_free(module_name, DBR_PRINTED_FILE, ".pv", t);
+  close_prettyprint();
+  
+  reset_current_module_entity();
+  reset_current_module_statement();
+  reset_pv();
+}
+
 
 bool print_code_simple_pointer_values(char * module_name)
 {
+  pv_context ctxt = make_simple_pv_context();
+  generic_print_code_pv(module_name, &ctxt);
+  reset_pv_context(&ctxt);
   return(TRUE);
+}
+
+void generic_print_code_gen_kill_pv(char * module_name)
+{
 }
 
 bool print_code_simple_gen_kill_pointer_values(char * module_name)
 {
+  pv_context ctxt = make_simple_pv_context();
+  generic_print_code_gen_kill_pv(module_name);
+  reset_pv_context(&ctxt);
   return(TRUE);
 }

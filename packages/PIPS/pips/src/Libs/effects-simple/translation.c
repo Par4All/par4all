@@ -174,3 +174,53 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   return;
 }
 								      
+/** @brief translates a simple memory access path reference from given indices
+           using an value_of memory access path reference 
+
+    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref, 
+    knowing that a[i] = value_of_ref. In this case nb_common_indices is 1 (which corresponds to [i])
+    
+    @param input_ref is the input simple cell reference
+    @param input_desc is here for compatibility with the corresponding convex cells function.
+
+    @param value_of_ref is the simple cell reference giving the output base memory access path.
+    @param value_of_desc is here for compatibility with the corresponding convex cells function.
+
+    @param nb_common_indices is the number of indices of input_ref which must be skipped
+    @param output_ref is a pointer on the resulting reference
+    @param output_desc is here for compatibility with the corresponding convex cells function.
+    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+  
+ */
+void simple_cell_reference_with_value_of_cell_reference_translation
+(reference input_ref, descriptor __attribute__ ((unused)) input_desc,
+ reference value_of_ref, descriptor __attribute__ ((unused)) value_of_desc,
+ int nb_common_indices,
+ reference *output_ref, descriptor __attribute__ ((unused)) * output_desc,
+ bool *exact_p)
+{
+  /* assume exactness */
+  *exact_p = true; 
+
+  /* we do not handle yet the cases where the type of value_of_ref does not match
+     the type of a[i]. I need a special function to test if types are compatible,
+     because type_equal_p is much too strict.
+     moreover the signature of the function may not be adapted in case of the reshaping of a array
+     of structs into an array of char for instance.
+  */
+  list input_inds = reference_indices(input_ref);
+  *output_ref = copy_reference(value_of_ref);
+  
+  /* we add the indices of the input reference past the nb_common_indices
+     (they have already be poped out) to the copy of the value_of reference */
+  
+  for(int i = 0; i<nb_common_indices; i++, POP(input_inds));
+  FOREACH(EXPRESSION, input_ind, input_inds)
+    {
+      reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
+						 CONS(EXPRESSION, 
+						      copy_expression(input_ind), 
+						      NIL));
+    }
+ 
+}

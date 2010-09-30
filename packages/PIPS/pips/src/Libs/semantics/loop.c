@@ -334,6 +334,13 @@ transformer forloop_to_transformer(forloop fl,
   return t_body_star;
 }
 
+list forloop_to_transformer_list(forloop l, transformer pre, list e)
+{
+  list tfl = NIL;
+  pips_internal_error("Not implemented yet.\n");
+  return tfl;
+}
+
 transformer new_whileloop_to_transformer(whileloop wl,
 					 transformer pre,
 					 list wlel) /* effects of whileloop wl */
@@ -342,7 +349,10 @@ transformer new_whileloop_to_transformer(whileloop wl,
   transformer t_body_star = transformer_undefined;
   statement body_s = whileloop_body(wl);
 
-  /* Deal with initialization expression */
+  /* Deal with initialization expression, which may be included in
+     the condition as in while(i++, j=0, i<m)? No because the
+     expression is going to be evaluated at each cycle. The ised
+     effects must be part of the condition transformer, tcond */
   transformer t_init = transformer_identity();
 
   /* Deal with condition expression */
@@ -1319,6 +1329,13 @@ transformer loop_to_transformer(loop l, transformer pre, list e)
 
   return tf;
 }
+
+list loop_to_transformer_list(loop l, transformer pre, list e)
+{
+  list tfl = NIL;
+  pips_internal_error("Not implemented yet.\n");
+  return tfl;
+}
 
 transformer complete_any_loop_transformer(transformer t_init,
 					  transformer __attribute__ ((unused)) t_enter,
@@ -1450,9 +1467,11 @@ transformer complete_forloop_transformer(transformer t_body_star,
   return ct;
 }
 
+/* entered_p is used to for the execution of at least one iteration */
 transformer new_complete_whileloop_transformer(transformer t_body_star,
 					       transformer pre,
-					       whileloop wl)
+					       whileloop wl,
+					       bool entered_p)
 {
   transformer ct = transformer_undefined;
   statement body_s = whileloop_body(wl);
@@ -1462,7 +1481,8 @@ transformer new_complete_whileloop_transformer(transformer t_body_star,
   transformer post_body = transformer_undefined;
   transformer t_init = transformer_identity();
   expression cond_e = whileloop_condition(wl);
-  transformer t_skip = condition_to_transformer(cond_e, pre, FALSE);
+  transformer t_skip = entered_p?
+    transformer_empty() : condition_to_transformer(cond_e, pre, FALSE);
   transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
   /* An effort could be made to compute the preconditions for t_continue and t_exit: see while04.c. */
   //transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
@@ -2069,6 +2089,13 @@ transformer whileloop_to_transformer(whileloop l,
   return t;
 }
 
+list whileloop_to_transformer_list(whileloop l, transformer pre, list e)
+{
+  list tfl = NIL;
+  pips_internal_error("Not implemented yet.\n");
+  return tfl;
+}
+
 transformer whileloop_to_k_transformer(whileloop l,
 				       transformer pre,
 				       list e, /* effects of whileloop
@@ -2591,6 +2618,7 @@ transformer loop_to_total_precondition(
   return t_pre;
 }
 
+/**/
 transformer whileloop_to_postcondition(
     transformer pre,
     whileloop l,
@@ -2633,6 +2661,26 @@ transformer whileloop_to_postcondition(
     transformer tb = load_statement_transformer(s); // body transformer
     int k = get_int_property("SEMANTICS_K_FIX_POINT");
 
+    /* The standard transformer tb is not enough, especially if the
+       loop body s is a loop since then it is not even the statement
+       transformer, but more generally we do not want the identity to
+       be taken into account in tb since it is already added with
+       P0. So we would like to guarantee that at list one state change
+       occurs: we are not interested in identity iterations. For
+       instance, if s is a loop, this means that the loop is entered,
+       except if the loop condition has side effects.
+
+       To recompute this transformer, we use a T*(P0) because we have
+       nothing better.
+
+       complete_statement_transformer() is not really useful here
+       because we usually do not have tighly nested while loops.
+    */
+    transformer pre_fuzzy = transformer_apply(tf, pre);
+    //tb = complete_non_identity_statement_transformer(tb, pre_fuzzy, s);
+    tb = complete_statement_transformer(tb, pre_fuzzy, s);
+    free_transformer(pre_fuzzy);
+
     pips_debug(8, "The loop may be executed and preconditions must"
 	       " be propagated in the loop body\n");
 
@@ -2641,7 +2689,13 @@ transformer whileloop_to_postcondition(
        * set of stores for any number of iterations, including
        * 0. Instead, use T+ and a convex hull with the precondition for
        * the first iteration, which preserves more information when the
-       * fixpoint is not precise.  */
+       * fixpoint is not precise.
+       *
+       * Bertrand Jeannet suggests that we compute P0 U T(P0) U
+       * T^2(P0) U T_3(P0) where T_3 is the transitive closure
+       * obtained for iterations 3 to infinity by setting the initial
+       * iteration number k to 3 before projection. NSAD 2010.
+       */
       pre_next = transformer_combine(pre_next, tf);
       pre_next = precondition_add_condition_information(pre_next, c,
 							pre_next, TRUE);
@@ -2800,7 +2854,7 @@ transformer whileloop_to_total_precondition(
     preb = transformer_combine(preb, tf);
 
     if(false_condition_wrt_precondition_p(c, context)) {
-      debug(8, "whileloop_to_postcondition", "The loop is never executed\n");
+      pips_debug(8, "The loop is never executed\n");
 
       /* propagate an impossible precondition in the loop body */
       (void) statement_to_postcondition(transformer_empty(), s);
@@ -2837,7 +2891,7 @@ transformer whileloop_to_total_precondition(
       transformer post_al = transformer_undefined;
       transformer tb = load_statement_transformer(s);
 
-      debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
+      pips_debug(8, "The loop may be executed or not\n");
 
       /* propagate preconditions in the loop body */
       precondition_add_condition_information(preb, c, preb, TRUE);

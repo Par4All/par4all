@@ -211,19 +211,6 @@ bool expression_double_pointer_p(expression e) {
   return double_pointer_p;
 }
 
-/* given an expression, return the referenced entity in case exp is a
-   reference */
-entity argument_entity(expression exp) {
-  syntax syn = expression_syntax(exp);
-  entity var = entity_undefined;
-
-  if (syntax_reference_p(syn)) {
-    reference ref = syntax_reference(syn);
-    var = reference_variable(ref);
-  }
-  return copy_entity(var);
-}
-
 
 /* Order the two points-to relations according to the alphabetical
    order of the underlying variables. Return -1, 0, or 1. */

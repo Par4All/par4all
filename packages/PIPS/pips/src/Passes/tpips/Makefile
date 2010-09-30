@@ -51,6 +51,7 @@ $(ARCH)/$(LIB_TARGET): completion_list.h
 # revision string...
 include $(MAKE.d)/version.mk
 $(ARCH)/revisions.o: .revisions_h
+tpips.h: .revisions_h
 
 # tpips parser
 YY2TP	= sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g'

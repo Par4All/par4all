@@ -966,7 +966,7 @@ static void equiv_class_debug(list l_equiv)
  * comment  : this is a comparison function for qsort; the purpose
  *            being to order a list of equivalent variables.
  * algorithm: If two variables have the same offset, the longest 
- * one comes first; if they have the same lenght, use a lexicographic
+ * one comes first; if they have the same length, use a lexicographic
  * ordering.
  * author: bc.
  */
@@ -2238,7 +2238,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       type t1 = basic_pointer(variable_basic(type_variable(t)));
       pips_debug(9,"Pointer type with name = %s\n", list_to_string(name));
 
-      pc = CHAIN_SWORD(NIL, space_p? "*":"*");
+      pc = CHAIN_SWORD(NIL, space_p? "*":" *");
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
@@ -2281,7 +2281,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  list iew = words_expression(ie, pdl);
 	  pc = CHAIN_SWORD(pc,":");
 	  pc = gen_nconc(pc, iew);
-	}
+      }
       return pc;
     }
   if (array_type_p(t)){
@@ -2339,7 +2339,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	    /* Do not recurse down if the derived type reference
 	       itself */
 	    list npdl = gen_copy_seq(pdl);
-	      gen_remove(&npdl, (void *) ent);
+	    gen_remove(&npdl, (void *) ent);
 	    epc =
 	      generic_c_words_simplified_entity(t1,
 						CHAIN_SWORD(NIL,name),

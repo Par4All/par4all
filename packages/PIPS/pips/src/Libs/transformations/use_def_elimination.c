@@ -682,7 +682,7 @@ static void statement_clean_declarations_area_walker(area a, set re)
  * @param re set to fill
  *
  */
-void entity_get_referenced_entities(entity e, set re)
+static void entity_get_referenced_entities(entity e, set re)
 {
   /*if(entity_variable_p(e))*/ {
     gen_context_multi_recurse(entity_type(e),re,

@@ -5,7 +5,8 @@ include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libcontrol.la
 libcontrol_la_SOURCES=\
 	clean_up_sequences.c \
-	control.c \
+	controlizer.c \
+	old_controlizer.c \
 	graph.c \
 	hierarchize.c \
 	module.c \

@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
- /* package transformer - IOs 
+ /* package transformer - IOs
   *
   * Francois Irigoin, 21 April 1990
   */
@@ -45,12 +45,17 @@
 #include "transformer.h"
 
 /* print_transformer(tf): not a macro because of dbx */
-transformer
-print_transformer(transformer tf)
+transformer print_transformer(transformer tf)
 {
-    return fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
+    return fprint_transformer(stderr, tf,
+			      (get_variable_name_t) external_value_name);
 }
 
+list print_transformers(list tl)
+{
+    return fprint_transformers(stderr, tl,
+			       (get_variable_name_t) external_value_name);
+}
 
 transformer
 fprint_transformer(FILE * fd,
@@ -82,6 +87,22 @@ fprint_transformer(FILE * fd,
     else
 	(void) fprintf(fd, "TRANSFORMER_UNDEFINED\n");
     return tf;
+}
+
+list fprint_transformers(FILE * fd,
+			 list tl,
+			 get_variable_name_t value_name)
+{
+  if(ENDP(tl)) {
+    pips_internal_error("transformer lists should never be empty.\n");
+    fprintf(fd, "Empty transformer list\n");
+  }
+  else {
+    FOREACH(TRANSFORMER, tf, tl) {
+      fprint_transformer(fd, tf, value_name);
+    }
+  }
+  return tl;
 }
 
 /* char * dump_value_name(e): used as functional argument because

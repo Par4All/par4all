@@ -35,9 +35,7 @@ class loop:
 	def loops(self):
 		self._module.flag_loops()
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
-		if not loops:
-			return []
-		return map(lambda l:loop(self._module,l),str.split(loops," "))
+		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
 
 
 
@@ -96,21 +94,27 @@ class module:
 			return loop(self,label)
 		else:
 			loops=self._ws.cpypips.module_loops(self.name,"")
-			if not loops:
-				return []
-			return map(lambda l:loop(self,l),loops.split(" "))
+			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
+
+	def inner_loops(self):
+		"""Returns all the inner loops (loops that don't contain further loops)"""
+		inner_loops = []
+		loops = self.loops()
+		while loops:
+			l = loops.pop()
+			if not l.loops(): inner_loops.append(l)
+			else: loops += l.loops()
+		return inner_loops
 	
+	@property
 	def callers(self):
 		callers=self._ws.cpypips.get_callers_of(self.name)
-		if not callers:
-			return []
-		return [ self._ws[name] for name in callers.split(" ") ]
+		return [ self._ws[name] for name in callers.split(" ") ] if callers else []
 
+	@property
 	def callees(self):
 		callees=self._ws.cpypips.get_callees_of(self.name)
-		if not callees:
-			return []
-		return [ self._ws[name] for name in callees.split(" ") ]
+		return [ self._ws[name] for name in callees.split(" ") ] if callees else []
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
@@ -206,21 +210,32 @@ class workspace(object):
 		exist.
 		"""
 
-	def __init__(self,sources2,name="",activates=[],verbose=True,cppflags='', parents=[], cpypips = None, recoverInclude=True):
-		kwargs = {'name':name, 'activates':activates, 'verbose':verbose, 'cppflags':cppflags, 'parents':parents, 'recoverInclude':parents }
+	def __init__(self, sources, **kwargs):
+		"""init a workspace from a list of sources"""
 
-		if cpypips == None:
-			cpypips = pypips
+		name           = kwargs.setdefault("name",           "")
+		activates      = kwargs.setdefault("activates",      [])
+		verbose        = kwargs.setdefault("verbose",        True)
+		cppflags       = kwargs.setdefault("cppflags",       "")
+		parents        = kwargs.setdefault("parents",        [])
+		cpypips	       = kwargs.setdefault("cpypips",        pypips)
+		recoverInclude = kwargs.setdefault("recoverInclude", True)
+		deleteOnClose  = kwargs.setdefault("deleteOnClose",  True)
+
+		if not name :
+			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
+		if os.path.exists(".".join([name,"database"])):
+			raise RuntimeError("Cannot create two workspaces with same database")
+
 		self.cpypips = cpypips
+		self.recoverInclude = recoverInclude
+		self.verbose = verbose
+		self.cpypips.verbose(int(verbose))
+		self.deleteOnClose=deleteOnClose
 
-		self.recoverInclude=recoverInclude
-		self.verbose=verbose
-		if verbose:	self.cpypips.verbose(1)
-		else:	self.cpypips.verbose(0)
-
-		#In case the subworkspaces need to add files, the variable passed in parameter will only
-		#be modified here and not in the scope of the caller
-		sources2 = deepcopy(sources2)
+		# In case the subworkspaces need to add files, the variable passed in
+		# parameter will only be modified here and not in the scope of the caller
+		sources2 = deepcopy(sources)
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
 		self.iparents = []
@@ -228,17 +243,17 @@ class workspace(object):
 			pws = p(self, sources2, **kwargs)
 			self.iparents.append(pws)
 
-		"""init a workspace from a list of sources"""
 		self._modules = {}
 		self.props = workspace.props(self)
 		self.fun = workspace.fun(self)
 		self.cu = workspace.cu(self)
 
-		if name == "":
-			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
 		# SG: it may be smarter to save /restore the env ?
 		if cppflags != "":
-			os.environ['PIPS_CPP_FLAGS']=cppflags
+			self.cpypips.setenviron('PIPS_CPP_FLAGS', cppflags)
+		self.cppflags = cppflags
+		if self.verbose:
+			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
@@ -248,11 +263,13 @@ class workspace(object):
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
-			self.tmpDirName = utils.nameToTmpDirName(name)
-			os.mkdir(self.tmpDirName)
+			tmpDirName = utils.nameToTmpDirName(name)
+			try:shutil.rmtree(tmpDirName)
+			except OSError:pass
+			os.mkdir(tmpDirName)
 
 			for f in sources2:
-				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
+				newfname = os.path.join(tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
 				sources += [newfname]
 				utils.guardincludes(newfname)
@@ -264,7 +281,8 @@ class workspace(object):
 		try:
 			cpypips.create(name, self._sources)
 		except RuntimeError:
-			cpypips.quit()
+			try: cpypips.quit()
+			except RuntimeError: pass
 			cpypips.delete_workspace(name)
 			raise
 
@@ -272,7 +290,6 @@ class workspace(object):
 			self.props.NO_USER_WARNING = True
 			self.props.USER_LOG_P = False
 		self.props.MAXIMUM_USER_ERROR = 42  # after this number of exceptions the programm will abort
-		map(lambda x:cpypips.activate(x),activates)
 		self._build_module_list()
 		self._name=self.info("workspace")[0]
 		
@@ -283,6 +300,11 @@ class workspace(object):
 			except AttributeError:
 				pass
 
+	def __enter__(self): return self
+	def __exit__(self,exc_type, exc_val, exc_tb):
+		if exc_type:self.deleteOnClose=False # for easier debugging
+		self.close()
+		return False
 	@property
 	def name(self):return self._name
 
@@ -308,8 +330,6 @@ class workspace(object):
 		"""Test if the workspace contains a given module"""
 		self._build_module_list()
 		return module_name in self._modules
-
-
 
 	def info(self,topic):
 		return split(self.cpypips.info(topic))
@@ -379,55 +399,70 @@ class workspace(object):
 		"""set properties and return a dictionnary containing the old state"""
 		return self.set_properties(props)
 
-	def save(self,indir="",with_prefix=""):
-		"""save workspace back into source either in directory indir or with the prefix with_prefix"""
+	def save(self,rep=""):
+		"""save workspace back into source either in directory rep """
 		self.cpypips.apply("UNSPLIT","%ALL")
+		if not os.path.exists(rep):
+			os.makedirs(rep)
+		if not os.path.isdir(rep):
+			raise ValueError("'{0}' is not a directory".format(rep))
+
 		saved=[]
-		if indir:
-			if not os.path.exists(indir):
-				os.makedirs(indir)
-			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory")
-			for s in os.listdir(self.directory()+"Src"):
-				cp=os.path.join(indir,s)
-				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
-				saved+=[cp]
-		else:
-			for s in os.listdir(self.directory()+"Src"):
-				cp=with_prefix+s
-				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
-				saved+=[cp]
+		for s in os.listdir(self.directory()+"Src"):
+			cp=os.path.join(rep,s)
+			shutil.copy(os.path.join(self.directory(),"Src",s),cp)
+			saved.append(cp)
+
 		if self.recoverInclude:
 			for f in saved:
 				utils.unincludes(f)
 		return saved
 
-	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
+	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
 		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
-		otmpfiles=self.save(indir=outdir)+extrafiles
-		command=[CC,CFLAGS]
+		otmpfiles=self.save(rep=rep)+extrafiles
+		command=[CC, self.cppflags, CFLAGS]
 		if link:
 			if not outfile:
 				outfile=self._name
-			self.goingToRunWith(otmpfiles, outdir)
+			self.goingToRunWith(otmpfiles, rep)
 			command+=otmpfiles
 			command+=[LDFLAGS]
 			command+=["-o", outfile]
 		else:
-			self.goingToRunWith(otmpfiles, outdir)
+			self.goingToRunWith(otmpfiles, rep)
 			command+=["-c"]
 			command+=otmpfiles
 		commandline = " ".join(command)
-		#print "running", commandline
+		if self.verbose:
+			print "Compiling the workspace with", commandline
 		ret = os.system(commandline)
 		if ret:
 			if not link: map(os.remove,otmpfiles)
 			raise RuntimeError("`%s' failed with return code %d" % (commandline, ret >> 8))
 		return outfile
+
 	
 	# allows subclasses to tamper with the files before compiling
-	def goingToRunWith(self, files, outdir):
+	def goingToRunWith(self, files, rep):
 		for f in files:
 			utils.addMAX0(f)
+			# fix bad pragma pretty print
+			lines=[]
+			with open(f,"r") as source:
+				pragma=""
+				for line in source:
+					if re.match(r'^#pragma .*',line):
+						pragma=line
+					elif re.match(r'^\w+:',line) and pragma:
+						lines.append(line)
+						lines.append(pragma)
+						pragma=""
+					else:
+						lines.append(line)
+
+			with open(f,"w") as source:
+				source.writelines(lines)
 
 	def activate(self,phase):
 		"""activate a given phase"""
@@ -487,8 +522,9 @@ class workspace(object):
 		"""force cleaning and deletion of the workspace"""
 		try : self.cpypips.quit()
 		except RuntimeError: pass
-		try : workspace.delete(self._name)
-		except RuntimeError: pass
+		if self.deleteOnClose:
+			try : workspace.delete(self._name)
+			except RuntimeError: pass
 		self.hasBeenClosed = True
 
 	def __del__(self):
@@ -597,12 +633,12 @@ class workspace(object):
 		return l
 
 	class cu(object):
-		'''Allow user to access a module by writing w.fun.modulename'''
+		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
 
 		def __setattr__(self, name, val):
-			raise AttributeError("Module assignement is not allowed.")
+			raise AttributeError("Compilation Unit assignement is not allowed.")
 
 		def __getattr__(self, name):
 			n = name + '!'
@@ -622,7 +658,7 @@ class workspace(object):
 			return d
 
 		def __iter__(self):
-			"""provide an iterator on workspace's module, so that you can write
+			"""provide an iterator on workspace's compilation unit, so that you can write
 				map(do_something,my_workspace)"""
 			return self._cuDict().itervalues()
 	

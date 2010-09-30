@@ -332,7 +332,7 @@ static statement generate_prelude(reductionInfo ri)
             break;
     }
     string sprelude = get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE");
-    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))) {
+    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))|| reductionInfo_count(ri)==1) {
         // For each reductionInfo_vector reference, make an initialization
         // assign statement and add it to the prelude
         // do nothing if no init val exist
@@ -442,18 +442,18 @@ static statement generate_compact(reductionInfo ri)
             call c;
             expression e;
 
-        e = reference_to_expression(make_reference(
-                    reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
-        c = make_call(operator, CONS(EXPRESSION, e, 
-                    CONS(EXPRESSION, rightExpr, NIL)));
+            e = reference_to_expression(make_reference(
+                        reductionInfo_vector(ri), CONS(EXPRESSION, int_to_expression(i), NIL)));
+            c = make_call(operator, CONS(EXPRESSION, e, 
+                        CONS(EXPRESSION, rightExpr, NIL)));
 
-        rightExpr = call_to_expression(c);
-    }
+            rightExpr = call_to_expression(c);
+        }
 
-    // Make the compact assignment statement
-    compact = make_assign_instruction(
-            reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
-            rightExpr);
+        // Make the compact assignment statement
+        compact = make_assign_instruction(
+                reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
+                rightExpr);
 
         postlude= instruction_to_statement(compact);
     }
@@ -616,6 +616,8 @@ bool simd_remove_reductions(char * mod_name)
 }
 
 static bool statement_reduction_prelude_p(statement s) {
+  if (statement_undefined_p(s))
+    return false;
   if(statement_call_p(s)) {
     call c =statement_call(s);
     entity op = call_function(c);
@@ -625,6 +627,8 @@ static bool statement_reduction_prelude_p(statement s) {
       return false;
 }
 static bool statement_reduction_postlude_p(statement s) {
+  if (statement_undefined_p(s))
+    return false;
   if(statement_call_p(s)) {
     call c =statement_call(s);
     entity op = call_function(c);
@@ -634,23 +638,40 @@ static bool statement_reduction_postlude_p(statement s) {
   return false;
 }
 
-static list strict_successors(vertex v) {
-  list v_successors = vertex_successors(v);
-  list s = gen_copy_seq(v_successors);
-
-  FOREACH(SUCCESSOR,v_successor,v_successors) {
-    vertex vs = successor_vertex(v_successor);
-    FOREACH(SUCCESSOR,vss,vertex_successors(vs)) {
-      FOREACH(SUCCESSOR,su,s) {
-        if(vertex_vertex_label(successor_vertex(su)) == 
-            vertex_vertex_label(successor_vertex(vss)) ) {
-          gen_remove_once(&s,su);
-          break;
-        }
-      }
+static statement the_strict_successor = statement_undefined;
+static void do_strict_successor(statement s, statement target)
+{
+    if (s == target) {
+	statement parent = (statement) gen_get_ancestor(statement_domain, s);
+	if (statement_block_p(parent)) {
+	    for (list iter = statement_block(parent); ! ENDP(iter); POP(iter)) {
+		if (! ENDP(CDR(iter))) {
+		    statement next = STATEMENT(CAR(CDR(iter)));
+		    statement current = STATEMENT(CAR(iter));
+            if (current == target ) {
+                list tail = CDR(CDR(iter));
+                while(empty_statement_or_continue_p(next)) {
+                    if(ENDP(tail)) break;
+                    else {
+                        next  = STATEMENT(CAR(tail));
+                        POP(tail);
+                    }
+                }
+                the_strict_successor = next;
+                gen_recurse_stop(0);
+                return;
+            }
+		}
+	    }
+	}
     }
-  }
-  return s;
+}
+
+static statement strict_successor(statement s) {
+    the_strict_successor = statement_undefined;
+    gen_context_recurse(get_current_module_statement(), s,
+			statement_domain, gen_true, do_strict_successor);
+    return the_strict_successor;
 }
 
 static void redundant_load_store_elimination_move_vectors(statement s, set moved_vectors)
@@ -674,30 +695,20 @@ static void do_sac_reduction_optimizations(graph dg)
   {
     statement stat0 = vertex_to_statement(a_vertex);
     if(statement_reduction_prelude_p(stat0)) {
-      list ssuccessors = strict_successors(a_vertex);
-      /* only on successor */
-      if(gen_length(ssuccessors)==1) {
-        successor succ = SUCCESSOR(CAR(ssuccessors));
-        statement stat1 = vertex_to_statement(successor_vertex(succ));
-        if(simd_load_stat_p(stat1)) {
+      statement stat1 = strict_successor(stat0);
+      if(simd_load_stat_p(stat1)) {
           call_function(
               statement_call(stat1) ) =
-            call_function(
-                statement_call(stat0)
-                );
+	      call_function(
+		  statement_call(stat0)
+		  );
           gen_full_free_list(CDR(call_arguments(statement_call(stat1))));
           CDR(call_arguments(statement_call(stat1)))=NIL;
           update_statement_instruction(stat0,make_continue_instruction());
-        }
       }
-      gen_free_list(ssuccessors);
     }
     else if(simd_store_stat_p(stat0)) {
-      list ssuccessors = strict_successors(a_vertex);
-      /* only on successor */
-      if(gen_length(ssuccessors)==1) {
-        successor succ = SUCCESSOR(CAR(ssuccessors));
-        statement stat1 = vertex_to_statement(successor_vertex(succ));
+        statement stat1 = strict_successor(stat0);
         if(statement_reduction_postlude_p(stat1)) {
           expression loaded_exp = 
             EXPRESSION(CAR(call_arguments(statement_call(stat0))));
@@ -708,49 +719,81 @@ static void do_sac_reduction_optimizations(graph dg)
           CDR(call_arguments(statement_call(stat1)))=CONS(EXPRESSION,copy_expression(loaded_exp),NIL);
           set_add_element(moved_vectors,moved_vectors,expression_to_entity(loaded_exp));
         }
-      }
-      gen_free_list(ssuccessors);
     }
   }
   gen_context_recurse(get_current_module_statement(),moved_vectors,
       statement_domain,gen_true,redundant_load_store_elimination_move_vectors);
 }
 
-static void do_redundant_load_store_elimination(graph dg) {
-  bool did_something ;
-  set deleted_vertex = set_make(set_pointer);
-  do {
-    did_something=false;
-    statement deleted = statement_undefined;
-    FOREACH(VERTEX,v,graph_vertices(dg) ) {
-      if(!set_belong_p(deleted_vertex,v) && ENDP(vertex_successors(v))) {
-        statement s = vertex_to_statement(v);
-        if(statement_call_p(s) && 
-            !return_statement_p(s) &&
-            !declaration_statement_p(s)) {
-          list out_effects = load_cumulated_rw_effects_list(get_current_module_statement());
-          if(ENDP(out_effects)) {
-            update_statement_instruction(s,make_continue_instruction());
-            did_something=true;
-            set_add_element(deleted_vertex,deleted_vertex,v);
-            break;
-          }
+static bool no_write_read_conflicts_p(list succs) {
+	FOREACH(SUCCESSOR, succ, succs) {
+		FOREACH(CONFLICT, c, dg_arc_label_conflicts(successor_arc_label(succ))) {
+			if (effect_write_p(conflict_source(c)) &&
+			    effect_read_p(conflict_sink(c)))
+				return false;
+		}
+	}
+	return true;
+}
+
+static bool potential_out_effects_p(statement s) {
+    if(get_bool_property("REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE")) {
+        list write_effects = effects_write_effects(load_proper_rw_effects_list(s));
+        bool out_effect = false;
+        FOREACH(EFFECT,eff,write_effects) {
+            reference r = effect_any_reference(eff);
+            if( anywhere_effect_p(eff) ||
+                    ( formal_parameter_p(reference_variable(r)) && !ENDP(reference_indices(r)) ) ||
+                    top_level_entity_p(reference_variable(r))
+              ) {
+                out_effect=true;break;
+            }
         }
-      }
+        gen_free_list(write_effects);
+        return out_effect;
+    }
+    else {
+
+        list out_effects = load_cumulated_rw_effects_list(s /* get_current_module_statement() */);
+        return !ENDP(out_effects);
     }
 
-    if(!statement_undefined_p(deleted)) {
-      FOREACH(VERTEX,v,graph_vertices(dg) ) {
-        if(!set_belong_p(deleted_vertex,v)) {
-          list tmp = gen_copy_seq(vertex_successors(v));
-          FOREACH(SUCCESSOR,s,tmp) {
-            if(vertex_to_statement(successor_vertex(s)) == deleted )
-              gen_remove(&vertex_successors(v),s);
-          }
+}
+
+static void do_redundant_load_store_elimination(graph dg) {
+    bool did_something ;
+    set deleted_vertex = set_make(set_pointer);
+    do {
+        did_something=false;
+        statement deleted = statement_undefined;
+        FOREACH(VERTEX,v,graph_vertices(dg) ) {
+            if(!set_belong_p(deleted_vertex,v) && no_write_read_conflicts_p(vertex_successors(v))) {
+                statement s = vertex_to_statement(v);
+                if(statement_call_p(s) && 
+                        !return_statement_p(s) &&
+                        !declaration_statement_p(s) &&
+                        !potential_out_effects_p(s) ) {
+                    update_statement_instruction(s,make_continue_instruction());
+                    did_something=true;
+                    deleted=s;
+                    set_add_element(deleted_vertex,deleted_vertex,v);
+                    break;
+                }
+            }
         }
-      }
-    }
-  } while(did_something);
+
+        if(!statement_undefined_p(deleted)) {
+            FOREACH(VERTEX,v,graph_vertices(dg) ) {
+                if(!set_belong_p(deleted_vertex,v)) {
+                    list tmp = gen_copy_seq(vertex_successors(v));
+                    FOREACH(SUCCESSOR,s,tmp) {
+                        if(vertex_to_statement(successor_vertex(s)) == deleted )
+                            gen_remove(&vertex_successors(v),s);
+                    }
+                }
+            }
+        }
+    } while(did_something);
 }
 
 bool redundant_load_store_elimination(char * module_name)
@@ -761,6 +804,7 @@ bool redundant_load_store_elimination(char * module_name)
 	set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
+    set_proper_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, true));
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
     graph dependence_graph = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
@@ -776,6 +820,7 @@ bool redundant_load_store_elimination(char * module_name)
     reset_current_module_entity();
 	reset_ordering_to_statement();
     reset_current_module_statement();
+    reset_proper_rw_effects();
     reset_cumulated_rw_effects();
 
     return TRUE;

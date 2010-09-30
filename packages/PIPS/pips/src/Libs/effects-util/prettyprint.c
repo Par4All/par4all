@@ -379,17 +379,68 @@ int cell_compare(cell *c1, cell *c2)
   reference r2 = cell_reference(*c2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
+  int n1, n2;
 
   if(same_entity_p(e1, e2))
     {
-      /* same entity, try to sort on number of dimensions */
+      /* same entity, sort on indices values */
       list dims1 = reference_indices(r1);
       list dims2 = reference_indices(r2);
 
       size_t nb_dims1 = gen_length(dims1);
       size_t nb_dims2 = gen_length(dims2);
 
-      c1_pos = (nb_dims1 < nb_dims2) ? -1 : ( (nb_dims1 > nb_dims2) ? 1 : 0);
+      
+      for(;!ENDP(dims1) && !ENDP(dims2) && c1_pos == 0; POP(dims1), POP(dims2))
+	{
+	  expression e1 = EXPRESSION(CAR(dims1));
+	  expression e2 = EXPRESSION(CAR(dims2));
+	  
+	  if(unbounded_expression_p(e1))
+	    if(unbounded_expression_p(e2))
+	      c1_pos = 0;
+	    else
+	      c1_pos = 1;
+	  else
+	    if(unbounded_expression_p(e2))
+	      c1_pos = -1;
+	    else 
+	      {
+		syntax s1 = expression_syntax(e1);
+		syntax s2 = expression_syntax(e2);
+		if (syntax_reference_p(s1) && 
+		    entity_field_p(reference_variable(syntax_reference(s1)))
+		    && syntax_reference_p(s2) && 
+		    entity_field_p(reference_variable(syntax_reference(s2))))
+		  {	
+		    entity fe1 = reference_variable(syntax_reference(s1));
+		    entity fe2 = reference_variable(syntax_reference(s2));
+		    
+		    if (!same_entity_p(fe1, fe2))
+		      c1_pos = strcmp(entity_name(fe1),entity_name(fe2));
+		  }
+		else
+		  {      
+		    intptr_t i1 = 0;
+		    intptr_t i2 = 0;
+		    intptr_t diff = 0;
+		    
+		    int r1 = expression_integer_value(e1, &i1);
+		    int r2 = expression_integer_value(e2, &i2);
+		    
+		    
+		    if (r1 && r2) 
+		      {
+			diff = i1 - i2;
+			c1_pos = diff==0? 0 : (diff>0?1:-1);
+		      }
+		  }
+	  
+	      }
+	}
+
+      if (c1_pos == 0)
+	c1_pos = (nb_dims1 < nb_dims2) ? -1 : ( (nb_dims1 > nb_dims2) ? 1 : 0);
     }
   else 
     {
@@ -542,6 +593,7 @@ text text_pointer_value(cell_relation pv)
   /* PREFIX
    */
   strcpy(line_buffer, get_comment_sentinel());
+  append(" ");
   
   /* REFERENCES */
   ls = effect_words_reference(first_r);
@@ -563,59 +615,66 @@ text text_pointer_value(cell_relation pv)
   /* DESCRIPTOR */
   /* sorts in such a way that constraints with phi variables come first.
    */
-  if(descriptor_none_p(d)) {
-    /* FI: there is no system; it's equivalent to an empty one... */
-    append("{}");
-  } else {
-    sc = sc_copy(descriptor_convex(d));
-    sc_lexicographic_sort(sc, is_inferior_cell_descriptor_pvarval);
-    system_sorted_text_format(line_buffer, str_prefix, tpv, sc,
-			      (get_variable_name_t) pips_region_user_name,
-			      vect_contains_phi_p, foresys);
-    
-    sc_rm(sc);
-  }  
+  if(!descriptor_none_p(d))
+    {
+      sc = sc_copy(descriptor_convex(d));
+      sc_lexicographic_sort(sc, is_inferior_cell_descriptor_pvarval);
+      system_sorted_text_format(line_buffer, str_prefix, tpv, sc,
+				(get_variable_name_t) pips_region_user_name,
+				vect_contains_phi_p, foresys);
+      
+      sc_rm(sc);
+    }  
   /* APPROXIMATION */
   append(approximation_may_p(ap) ? " (may);" : " (exact);");
-
+  
   /* CLOSE */
   close_current_line(line_buffer, tpv,str_prefix);
-   
+  
   return tpv;
 }
 
-/* text text_array_regions(list l_reg, string ifread, string ifwrite)
- * input    : a list of regions
- * output   : a text representing this list of regions.
- * comment  : if the number of array regions is not nul, and if
- *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
- *            added before and after the text of the list of regions.
- */
+
 text
-text_pointer_values(list lpv)
+text_pointer_values(list lpv, string header)
 {
     text tpv = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
     boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
-    boolean one_p = FALSE;
 
     /* GO: No redundant test anymore, see  text_statement_array_regions */
     if (lpv != (list) HASH_UNDEFINED_VALUE && lpv != list_undefined)
     {
+      /* header first */
+      char line_buffer[MAX_LINE_LENGTH];
+      string str_prefix = get_comment_continuation();
+      if (loose_p)
+	{	  
+	  strcpy(line_buffer,"\n");
+	  append(get_comment_sentinel());
+	}
+      else
+	{
+	  strcpy(line_buffer,get_comment_sentinel()); 
+	}
+      append(" ");
+      append(header);
+      if(ENDP(lpv)) 
+	append(" none\n"); 
+      else
+	append("\n"); 
+      ADD_SENTENCE_TO_TEXT(tpv,
+			   make_sentence(is_sentence_formatted,
+					 strdup(line_buffer)));
+     
+      
       gen_sort_list(lpv, (int (*)(const void *,const void *)) pointer_value_compare);
       FOREACH(CELL_RELATION, pv, lpv)
 	{
-	  if (loose_p && !one_p )
-	    {
-	      ADD_SENTENCE_TO_TEXT(tpv,
-				   make_sentence(is_sentence_formatted,
-						 strdup("\n")));
-	      one_p = TRUE;
-	    }
 	  MERGE_TEXTS(tpv, text_pointer_value(pv));
 	}
       
-      if (loose_p && one_p)
+      if (loose_p)
 	ADD_SENTENCE_TO_TEXT(tpv,
 			     make_sentence(is_sentence_formatted,
 					   strdup("\n")));
@@ -626,10 +685,9 @@ text_pointer_values(list lpv)
 
 void print_pointer_value(cell_relation pv)
 {
-    text t = text_pointer_value(pv);
-    print_text(stderr, t);
-    free_text(t);
-    fprintf(stderr,"\n");
+  text t = text_pointer_value(pv);
+  print_text(stderr, t);
+  free_text(t);
 }
 
 void print_pointer_values(list lpv)

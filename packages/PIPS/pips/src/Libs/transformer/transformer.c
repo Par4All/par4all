@@ -50,16 +50,14 @@ static Psysteme sc_identity(Psysteme sc)
 }
 
 /* e and f are assumed to be values, Type independent. */
-transformer 
-simple_equality_to_transformer(entity e, entity f, bool assignment)
+transformer simple_equality_to_transformer(entity e, entity f, bool assignment)
 {
   transformer tf = generic_equality_to_transformer(e, f, assignment, FALSE);
 
   return tf;
 }
 
-transformer 
-simple_unary_minus_to_transformer(entity e, entity f)
+transformer simple_unary_minus_to_transformer(entity e, entity f)
 {
   transformer tf = generic_equality_to_transformer(e, f, FALSE, TRUE);
 
@@ -901,6 +899,17 @@ transformer transformer_safe_normalize(transformer t, int level)
   }
   return t;
 }
+
+list transformers_safe_normalize(list tl, int level)
+{
+  list ntl = NIL;
+  FOREACH(TRANSFORMER, tf, tl) {
+    transformer ntf = transformer_safe_normalize(tf, level);
+    ntl = CONS(TRANSFORMER, ntf, ntl);
+  }
+  ntl = gen_nreverse(ntl);
+  return ntl;
+}
 
 transformer transformer_temporary_value_projection(transformer tf)
 {
@@ -1314,6 +1323,17 @@ transformer transformer_apply(transformer tf, transformer pre)
     return post;
 }
 
+list transformer_apply_map(list tl, transformer pre)
+{
+  list ntl = NIL;
+  FOREACH(TRANSFORMER, tf, tl) {
+    transformer post = transformer_apply(tf, pre);
+    ntl = CONS(TRANSFORMER, post, ntl);
+  }
+  gen_nreverse(ntl);
+  return ntl;
+}
+
 transformer transformer_safe_apply(transformer tf, transformer pre)
 {
   transformer post = transformer_undefined;
@@ -1322,6 +1342,18 @@ transformer transformer_safe_apply(transformer tf, transformer pre)
     post = transformer_apply(tf, pre);
 
   return post;
+}
+
+/* returns a list of postconditions, one for each transformer in tl */
+list transformers_safe_apply(list tl, transformer pre)
+{
+  list postl = NIL;
+  FOREACH(TRANSFORMER, tf, tl) {
+    transformer post = transformer_safe_apply(tf, pre);
+    postl = CONS(TRANSFORMER, post, postl);
+  }
+  postl = gen_nreverse(postl);
+  return postl;
 }
 
 /* transformer transformer_inverse_apply(transformer tf, transformer post):

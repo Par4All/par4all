@@ -228,6 +228,7 @@ static bool searchForConstArgs(statement head,statement body, hash_table constAr
 {
     if(statement_block_p(body))
     {
+	    bool result = false;
         FOREACH(STATEMENT, curStat, statement_block(body) )
         {
             pips_debug(1,"examining statement:\n");
@@ -245,13 +246,14 @@ static bool searchForConstArgs(statement head,statement body, hash_table constAr
                 {
                     pips_debug(1,"no conflict ^^\n");
                     hash_put(constArgs, curStat, args);
+		    result = true;
                 }
             }
             else {
                 pips_debug(1,"not a save / load statement !\n");
             }
         }
-        return true;
+        return result;
     }
     else
     {
@@ -341,7 +343,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
 /* This function is called for each statement and performs the
  * simd_loop_const_elim on loop
  */
-static void simd_loop_const_elim_rwt(statement s)
+static void simd_loop_const_elim_rwt(statement s, bool *result)
 {
     instruction i = statement_instruction(s);
 
@@ -374,8 +376,10 @@ static void simd_loop_const_elim_rwt(statement s)
      * Move the statements in constArgs out of the loop body
      */
     hash_table constArgs = hash_table_make(hash_pointer, 0);
-    if(searchForConstArgs(s,body, constArgs, l_reg))
+    if(searchForConstArgs(s,body, constArgs, l_reg)) {
         moveConstArgsStatements(s, body, constArgs);
+	*result = true;
+    }
     hash_table_free(constArgs);
 }
 
@@ -389,7 +393,8 @@ bool simd_loop_const_elim(char * module_name)
     /* Get the code of the module. */
     entity module = module_name_to_entity(module_name);
     statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
-	set_ordering_to_statement(module_stat);
+    bool result = false;
+    set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
     set_cumulated_rw_effects(
@@ -403,8 +408,8 @@ bool simd_loop_const_elim(char * module_name)
     debug_on("SIMD_LOOP_CONST_ELIM_DEBUG_LEVEL");
 
     /* Go through all the statements */
-    gen_recurse(module_stat, statement_domain,
-            gen_true, simd_loop_const_elim_rwt);
+    gen_context_recurse(module_stat, &result, statement_domain,
+			gen_true, simd_loop_const_elim_rwt);
     clean_up_sequences(module_stat);
 
     pips_assert("Statement is consistent after SIMD_LOOP_CONST_ELIM",
@@ -421,5 +426,5 @@ bool simd_loop_const_elim(char * module_name)
     reset_current_module_statement();
     reset_cumulated_rw_effects();
 
-    return TRUE;
+    return result;
 }

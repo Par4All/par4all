@@ -67,16 +67,12 @@ transformer transformer_dup(transformer t_in)
 }
 
 
-void 
-transformer_free(t)
-transformer t;
+void transformer_free(transformer t)
 {
     free_transformer(t);
 }
 
-void 
-old_transformer_free(t)
-transformer t;
+void old_transformer_free(transformer t)
 {
     /* I should use gen_free directly but Psysteme is not yet properly
        interfaced with NewGen */
@@ -96,18 +92,16 @@ transformer t;
     /* end of DRET demo */
 }
 
-transformer 
-transformer_identity()
+transformer transformer_identity()
 {
     /* return make_transformer(NIL, make_predicate(SC_RN)); */
     /* en fait, on voudrait initialiser a "liste de contraintes vide" */
     return make_transformer(NIL,
 			    make_predicate(sc_make(CONTRAINTE_UNDEFINED,
-						   CONTRAINTE_UNDEFINED))); 
+						   CONTRAINTE_UNDEFINED)));
 }
 
-transformer 
-transformer_empty()
+transformer transformer_empty()
 {
     return make_transformer(NIL,
 			    make_predicate(sc_empty(BASE_NULLE)));
@@ -124,9 +118,7 @@ transformer empty_transformer(transformer t)
   return t;
 }
 
-bool 
-transformer_identity_p(t)
-transformer t;
+bool transformer_identity_p(transformer t)
 {
     /* no variables are modified; no constraints exist on their values */
 
@@ -445,10 +437,17 @@ bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
  * inconsistency is detected.
  *
  * But, see final comment... In spite of it, I do not always return any longer.  */
-bool transformer_consistency_p(t)
-transformer t;
+bool transformer_consistency_p(transformer t)
 {
   return transformer_general_consistency_p(t, FALSE);
+}
+bool transformers_consistency_p(list tl)
+{
+  bool consistent_p = TRUE;
+  FOREACH(TRANSFORMER, t, tl) {
+    consistent_p = consistent_p && transformer_general_consistency_p(t, FALSE);
+  }
+  return consistent_p;
 }
 
 /* Interprocedural transformers do not meet all conditions. */
