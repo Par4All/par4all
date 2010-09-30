@@ -332,7 +332,7 @@ static statement generate_prelude(reductionInfo ri)
             break;
     }
     string sprelude = get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE");
-    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))) {
+    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))|| reductionInfo_count(ri)==1) {
         // For each reductionInfo_vector reference, make an initialization
         // assign statement and add it to the prelude
         // do nothing if no init val exist
@@ -648,11 +648,19 @@ static void do_strict_successor(statement s, statement target)
 		if (! ENDP(CDR(iter))) {
 		    statement next = STATEMENT(CAR(CDR(iter)));
 		    statement current = STATEMENT(CAR(iter));
-		    if (current == target) {
-			the_strict_successor = next;
-			gen_recurse_stop(0);
-			return;
-		    }
+            if (current == target ) {
+                list tail = CDR(CDR(iter));
+                while(empty_statement_or_continue_p(next)) {
+                    if(ENDP(tail)) break;
+                    else {
+                        next  = STATEMENT(CAR(tail));
+                        POP(tail);
+                    }
+                }
+                the_strict_successor = next;
+                gen_recurse_stop(0);
+                return;
+            }
 		}
 	    }
 	}
