@@ -23,7 +23,8 @@ TARGET	= control
 
 LIB_CFILES = \
 	clean_up_sequences.c \
-	control.c \
+	controlizer.c \
+	old_controlizer.c \
 	graph.c \
 	hierarchize.c \
 	module.c \

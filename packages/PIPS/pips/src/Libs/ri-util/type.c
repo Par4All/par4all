@@ -2454,6 +2454,23 @@ bool basic_type_p(type t)
   return (type_void_p(t) || type_unknown_p(t)) ;
 }
 
+/*
+ @brief tests whether the basic of the input type is one of the following:
+   void, char, short, int, long, float, double, signed, unsigned.
+   (even if there are array dimensions
+*/
+bool type_fundamental_basic_p(type t)
+{
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      return (basic_int_p(b) || basic_float_p(b) || basic_logical_p(b)
+	       || basic_overloaded_p(b) || basic_complex_p(b) || basic_string_p(b)
+	       || basic_bit_p(b));
+    }
+  return (type_void_p(t) || type_unknown_p(t)) ; 
+}
+
 bool array_type_p(type t)
 {
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));

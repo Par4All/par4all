@@ -31,6 +31,9 @@
 % Derivation rules and aliases must be included in verbatim environments.
 % Nothing else should appear in a verbatim environment.
 %
+% Some tourist information from the last century follows... Read the log
+% for fresh news instead!
+%
 % Modifications:
 %  - a dependence on MODULE.cumulated_effects for print_transformers and
 %    print_preconditions
@@ -82,6 +85,8 @@
 \usepackage{amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
+% For the smileys: :-)
+\usepackage{wasysym}
 \usepackage{graphicx,ifpdf}
 % Use classical figure extension if we are in classical LaTeX (instead of
 % pdflatex), necessary for TeX4ht (htlatex):
@@ -1739,7 +1744,32 @@ in the \Pri.
 %% in \externalref{section-code}.
 
 \begin{PipsPass}{controlizer}
-The \PipsPassRef{controlizer} removes \verb+GOTO+
+  The \PipsPassRef{controlizer} is the historical controlizer phase
+  that removes \verb+GOTO+ statements in the parsed code and generates a
+  similar representation with small CFGs.
+\end{PipsPass}
+
+The old controlizer phase was too hacked, undocumented to be improved and
+debugged for C99 code so a new zen version has been developed, documented
+and is designed to be simple and understandable. But for comparison the
+old controlizer phase can still be used.
+\begin{PipsMake}
+controlizer                     > MODULE.code
+        < PROGRAM.entities
+        < MODULE.parsed_code
+\end{PipsMake}
+
+For debugging and validation purpose, by setting \emph{at most} one of the
+\verb|PIPS_USE_OLD_CONTROLIZER| or \verb|PIPS_USE_NEW_CONTROLIZER|
+environment variables, you can force the use of one specific version of
+the controlizer you want.
+
+Note that this choice of controlizer has also some impacts on the HCFG
+computation of entry processing of Fortran too. If you do not know what
+Fortran entries are, it is deprecated stuff anyway... \smiley
+
+\begin{PipsPass}{new_controlizer}
+The \PipsPassRef{new_controlizer} removes \verb+GOTO+
 statements in the parsed code and generates a similar representation
 with small CFGs.
 \end{PipsPass}
@@ -1775,9 +1805,8 @@ transformations may well return any kind of top statement, most likely a
 \texttt{block}. This is no longer true. The top statement of a module may
 contain any kind of instruction.
 
-%Controlizer                     > MODULE.Controlizer_code
 \begin{PipsMake}
-controlizer                     > MODULE.code
+new_controlizer                     > MODULE.code
         < PROGRAM.entities
         < MODULE.parsed_code
 \end{PipsMake}
@@ -1787,7 +1816,7 @@ false branch of structured \verb/IF/. This semantic property of \Pri{}
 is enforced by libraries \verb/effects/,
 \verb/regions/, \verb/hpfc/, \verb/effects-generic/.
 
-\begin{PipsProp}{WARN_ABOUT_EMPTY_SEQUENCES} 
+\begin{PipsProp}{WARN_ABOUT_EMPTY_SEQUENCES}
 WARN_ABOUT_EMPTY_SEQUENCES FALSE
 \end{PipsProp}
 
@@ -1805,7 +1834,7 @@ transformation for C code. This property is set to false by default
 and should ultimately disappear. But for new user convenience, it is
 set to TRUE by \verb/activate_language()/ when the language is C.
 
-\begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER} 
+\begin{PipsProp}{FOR_TO_WHILE_LOOP_IN_CONTROLIZER}
 FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 \end{PipsProp}
 
@@ -1817,7 +1846,7 @@ property is set to false by default and should disappear soon. But for
 new user convenience, it is set to TRUE by \verb/activate_language()/
 when the language is C.
 
-\begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER} 
+\begin{PipsProp}{FOR_TO_DO_LOOP_IN_CONTROLIZER}
 FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 \end{PipsProp}
 
@@ -1846,7 +1875,7 @@ GATHER_FORMATS_AT_END FALSE
 \index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 To display the statistics about cleaning-up sequences and removing
 useless CONTINUE or empty statement.
-\begin{PipsProp}{CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS} 
+\begin{PipsProp}{CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS}
 CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
 \end{PipsProp}
 
@@ -1855,7 +1884,7 @@ There is a trade-off between keeping the comments associated to labels and
 goto and the cleaning that can be do on the control graph.
 
 By default, do not fuse empty control nodes that have labels or comments:
-\begin{PipsProp}{FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL} 
+\begin{PipsProp}{FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL}
 FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{PipsProp}
 
@@ -1929,6 +1958,16 @@ The called function could be defined by this property:
 PREPEND_CALL "MY_TRACK" 
 \end{PipsProp}
 but it is not.
+
+
+\begin{PipsPass}{remove_useless_label}
+Remove labels that are not usefull
+\end{PipsPass}
+\begin{PipsMake}
+remove_useless_label > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
@@ -3477,6 +3516,7 @@ preconditions_inter_full        > MODULE.preconditions
 By default, summary preconditions are computed intraprocedurally. The
 interprocedural option must be explicitly activated.
 
+\begin{PipsPass}{interprocedural_summary_precondition}
 An interprocedural summary precondition for a module is derived from all
 its call sites. Of course, preconditions must be known for all its
 callers' statements.  The summary precondition is the convex hull of all
@@ -3488,6 +3528,7 @@ memory location. To avoid the problem, the current summary precondition is
 always translated into the {\em caller}'s frame. So each module must first
 translate its summary precondition, when receiving it from the resource
 manager ({\em pipsdbm}) before using it.
+\end{PipsPass}
 
 Note: the previous algorithm was based on a on-the-fly reduction by
 convex hull. Each time a call site was encountered while computing a
@@ -5463,7 +5504,7 @@ SIMD_REMOVE_REDUCTIONS_PRELUDE ""
 SIMD_REMOVE_REDUCTIONS_POSTLUDE ""
 \end{PipsProp}
 \begin{PipsPass}{redundant_load_store_elimination}
-Remove useless load store calls
+Remove useless load store calls (and more)
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5475,6 +5516,12 @@ redundant_load_store_elimination      > MODULE.code
         < MODULE.out_regions
         < MODULE.chains
 \end{PipsMake}
+
+If \PipsPropRef{REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE} is set to false,
+\PipsPassRef{redundant_load_store_elimination} will remove any statement not implied in the computation of out regions, otherwise it will not remove statement that modifies aprameters reference.
+\begin{PipsProp}{REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE}
+REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{deatomizer}
 ...
@@ -6631,6 +6678,7 @@ kernel_load_store	> CALLERS.code
 		< PROGRAM.kernels
 		< CALLERS.code
    		< CALLERS.cumulated_effects
+        < CALLERS.preconditions
 \end{PipsMake}
 
 The following properties can be used to customized the allocate/load/store
@@ -6660,6 +6708,19 @@ Enable/disable the scalar handling by kernel load store.
 \begin{PipsProp}{KERNEL_LOAD_STORE_SCALAR}
 KERNEL_LOAD_STORE_SCALAR FALSE
 \end{PipsProp}
+
+\begin{PipsPass}{kernel_load_store_fine_grain}
+Same as \PipsPassRef{kernel_load_store} but region-based.
+\end{PipsPass}
+\begin{PipsMake}
+kernel_load_store_fine_grain	> CALLERS.code
+		> CALLERS.callees
+		> PROGRAM.kernels
+		< PROGRAM.kernels
+		< CALLERS.code
+   		< CALLERS.regions
+        < CALLERS.preconditions
+\end{PipsMake}
 
 \begin{PipsPass}{kernelize}
 Split a parallel loop with a local index into three parts: a host side
@@ -8601,10 +8662,12 @@ It is used as a preliminary phase to generate terapix assembly.
 alias array_to_pointer 'Array to pointer'
 
 array_to_pointer > MODULE.code
+                 > COMPILATION_UNIT.code
 				 > CALLERS.code
 		         > PROGRAM.entities
 		< PROGRAM.entities
 		< MODULE.code
+        < COMPILATION_UNIT.code
 		< CALLERS.code
 \end{PipsMake}
 
@@ -9971,7 +10034,7 @@ performed earlier.
 \index{Scalar Expansion}
 \index{Reduction Parallelization}
 
-\begin{PipsPass}{scalar_expansion}
+\begin{PipsPass}{variable_expansion}
 Loop private scalar variables are expanded
 \end{PipsPass}
 
@@ -10133,13 +10196,16 @@ omp_merge_pragma             > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-% no longer used {
-% PIPS merges the omp pragma on the inner or outer loop depending on the property
-% OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|
-% \begin{PipsProp}{OMP_MERGE_POLICY}
-% OMP_MERGE_POLICY "outer"
-% \end{PipsProp}
-% }
+PIPS merges the omp pragma on the inner or outer loop depending on the property
+OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|.
+\begin{PipsProp}{OMP_MERGE_POLICY}
+OMP_MERGE_POLICY "outer"
+\end{PipsProp}
+
+The OMP\_MERGE\_PRAGMA phase with the \verb|inner| mode can be used after the
+phase limit\_nested\_parallelism (see \S~\ref{sec:manage-parallel-loops}).
+Such a combinaison allows to fine choose the loop depth you
+really want to parallelize with OpenMP.
 
 The merging of the if clause of the omp pragma follows its own rule.
 This clause can be ignore without changing the output of the program,

@@ -16,7 +16,7 @@ libsemantics_la_SOURCES=	misc.c \
 		unstructured.c \
 		expression.c \
 		loop.c \
-		ri_to_total_preconditions.c
-
+		ri_to_total_preconditions.c \
+		ri_to_transformer_lists.c
 
 include $(srcdir)/../pipslibs_includes.mk

@@ -26,7 +26,7 @@
 #endif
 
 #ifndef lint
-char vcid_control_control[] = "$Id$";
+char vcid_control_old_controlizer[] = "$Id$";
 #endif /* lint */
 
 /* \defgroup controlizer Controlizer phase to build the Hierarchical Control Flow Graph
@@ -407,218 +407,6 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
 }
 
 
-/* Computes in @p c_res the control node of the statement @p st whose
-   predecessor control node is @p pred and successor @p succ.
-
-   The @p used_LABELS is modified to deal with local use of labels.
-
-   The invariant is that it links predecessors and successors of @p c_res,
-   updates the successors of @p pred and the predecessors of @p succ.
-
-   In fact, it cannot update the successors of @p pred because it cannot
-   know which successor of @p pred @p c_RES is when @p pred is associated
-   to a test. @p pred and @p c_res must be linked together when you enter
-   controlize(), or they must be linked later by the caller. But they
-   cannot be linked here thru the successor list of @p pred and, if the
-   consistency is true here, they cannot be linked either by the
-   predecessor list of @p succ. If they are linked later, it is useless to
-   pass @p pred down. If they are linked earlier, they might have to be
-   unlinked when structured code is found.
-
-   @return TRUE if the current statement isn't a structured control.
-*/
-bool controlize(statement st,
-		control pred,
-		control succ,
-		control c_res,
-		hash_table used_labels)
-{
-    instruction i = statement_instruction(st);
-    entity elabel = statement_label(st);
-    string label = entity_name(elabel);
-    bool controlized = FALSE;
-    control n_succ = control_undefined; // To be used in case of goto
-
-    ifdebug(5) {
-	pips_debug(1,
-		   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n"
-		   "st at entry:\n",
-		   st, pred, succ, c_res);
-	statement_consistent_p(st);
-	print_statement(st);
-	/*
-	pips_assert("pred is a predecessor of c_res",
-		    gen_in_list_p(pred, control_predecessors(c_res)));
-	pips_assert("c_res is a successor of pred",
-		    gen_in_list_p(c_res, control_successors(pred)));
-	*/
-	pips_debug(1, "Begin with result c_res %p:\n", c_res);
-	display_linked_control_nodes(c_res);
-	check_control_coherency(pred);
-	check_control_coherency(succ);
-	check_control_coherency(c_res);
-    }
-
-    switch(instruction_tag(i)) {
-    case is_instruction_block: {
-      /* A C block may have a label and even goto from outside on it. */
-      /* A block may only contain declarations with initializations
-	 and side effects on the store */
-      if(ENDP(instruction_block(i))) {
-	/* Empty block */
-	controlized = controlize_call(st, pred, succ, c_res);
-	statement_consistent_p(st);
-      }
-      else {
-	statement_consistent_p(st);
-	scoping_statement_push(st);
-	controlized = controlize_list(st, instruction_block(i),
-				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
-
-	ifdebug(5) {
-	  pips_debug(1, "CFG consistency check before list6 controlization."
-		     " Control \"pred\" %p:\n", pred);
-	  display_linked_control_nodes(pred);
-	  pips_debug(1, "Control \"succ\" %p:\n", succ);
-	  display_linked_control_nodes(succ);
-
-	  check_control_coherency(pred);
-	  check_control_coherency(succ);
-	  check_control_coherency(c_res);
-	}
-	/* If st carries local declarations, so should the statement
-	   associated to c_res. */
-	if(controlized && !ENDP(statement_declarations(st))
-	   && ENDP(statement_declarations(control_statement(c_res)))) {
-	  print_arguments(statement_declarations(st));
-	  pips_user_warning("Some local declarations may have been lost\n");
-	}
-	scoping_statement_pop();
-	statement_consistent_p(st);
-      }
-      break;
-    }
-    case is_instruction_test:
-	controlized = controlize_test(st, instruction_test(i),
-				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
-	break;
-    case is_instruction_loop:
-	controlized = controlize_loop(st, instruction_loop(i),
-				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
-	break;
-    case is_instruction_whileloop:
-	controlized = controlize_whileloop(st, instruction_whileloop(i),
-					   pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
-	break;
-    case is_instruction_goto: {
-      /* Get the label name of the statement the goto point to: */
-	string name = entity_name(statement_label(instruction_goto(i)));
-	statement nop = make_continue_statement(statement_label(st));
-
-	statement_number(nop) = statement_number(st);
-	statement_comments(nop) = statement_comments(st);
-	// Well, let's try this for the time being. What is the scope?!?
-	statement_declarations(nop) = statement_declarations(st);
-	statement_decls_text(nop) = statement_decls_text(st);
-
-	n_succ = get_label_control(name);
-
-	ifdebug(5) {
-	  pips_debug(1, "CFG consistency check before goto controlization."
-		     " Control \"pred\" %p:\n", pred);
-	  display_linked_control_nodes(pred);
-	  pips_debug(1, "Control \"n_succ\" %p:\n", n_succ);
-	  display_linked_control_nodes(n_succ);
-	  check_control_coherency(pred);
-	  check_control_coherency(n_succ);
-	  check_control_coherency(c_res);
-	}
-
-	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
-           unlink the predecessor of the former successor of pred. RK */
-	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
-	add_proper_successor_to_predecessor(pred, c_res);
-	UPDATE_CONTROL(c_res, nop,
-		       CONS(CONTROL, pred, NIL),
-		       CONS(CONTROL, n_succ, NIL));
-	control_predecessors(n_succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, n_succ);
-	/* I do not know why, but my following code does not work. So
-           I put back former one above... :-( RK. */
-#if 0
-	/* Use my procedures instead to set a GOTO from pred to
-           c_res. RK */
-	if (gen_length(control_successors(pred)) == 1)
-	    unlink_2_control_nodes(pred, CONTROL(CAR(control_successors(pred))));
-	link_2_control_nodes(pred, c_res);
-	link_2_control_nodes(c_res, n_succ);
-	/* Hmmm... A memory leak on the previous statement of c_res? */
-	control_statement(c_res) = nop;
-#endif
-	update_used_labels(used_labels, name, st);
-	controlized = TRUE;
-	break;
-    }
-    case is_instruction_call:
-	/* FI: IO calls may have control effects; they should be handled here! */
-	controlized = controlize_call(st, pred, succ, c_res);
-	statement_consistent_p(st);
-	break;
-    case is_instruction_forloop:
-      pips_assert("We are really dealing with a for loop",
-		  instruction_forloop_p(statement_instruction(st)));
-      controlized = controlize_forloop(st, instruction_forloop(i),
-				       pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
-        /* SG+EC:some label may have been lost in the process
-           fix it here instead of understanding why */
-        if(!same_entity_p(statement_label(st),elabel)) {
-            statement_label(st)=elabel;
-        }
-      break;
-    case is_instruction_expression:
-      /* PJ: controlize_call() controlize any "nice" statement */
-      controlized = return_instruction_p(i) || controlize_call(st, pred, succ, c_res);
-
-	statement_consistent_p(st);
-      break;
-    default:
-	pips_error("controlize",
-		   "Unknown instruction tag %d\n", instruction_tag(i));
-    }
-
-    ifdebug(5) {
-	statement_consistent_p(st);
-	pips_debug(1, "st %p at exit:\n", st);
-	print_statement(st);
-	pips_debug(1, "Resulting Control c_res %p at exit:\n", c_res);
-	display_linked_control_nodes(c_res);
-	fprintf(stderr, "---\n");
-	/* The declarations may be preserved at a lower level
-	if(!ENDP(statement_declarations(st))
-	   && ENDP(statement_declarations(control_statement(c_res)))) {
-	  pips_internal_error("Lost local declarations\n");
-	}
-	*/
-	check_control_coherency(pred);
-	if(control_undefined_p(n_succ))
-	  check_control_coherency(succ);
-	else
-	  check_control_coherency(n_succ);
-	check_control_coherency(c_res);
-    }
-
-    /* Update the association between the current statement and its label:
-    */
-    update_used_labels(used_labels, label, st);
-
-    return(controlized);
-}
-
-
 /* CONTROLIZE_CALL controlizes the call C of statement ST in C_RES. The deal
    is to correctly manage STOP; since we don't know how to do it, so we
    assume this is a usual call with a continuation !!
@@ -627,7 +415,7 @@ bool controlize(statement st,
    continuations are not dealt with here. The END= and ERR= clauses are
    simulated by hidden tests. */
 
-bool controlize_call(statement st,
+static bool controlize_call(statement st,
 		     control pred,
 		     control succ,
 		     control c_res)
@@ -737,7 +525,7 @@ statement loop_inc(statement sl)
 /* CONTROLIZE_LOOP computes in C_RES the control graph of the loop L (of
    statement ST) with PREDecessor and SUCCessor. */
 
-bool controlize_loop(st, l, pred, succ, c_res, used_labels)
+static bool controlize_loop(st, l, pred, succ, c_res, used_labels)
 statement st;
 loop l;
 control pred, succ;
@@ -808,7 +596,7 @@ hash_table used_labels;
 /* Generate a test statement ts for exiting loop sl.
  * There should be no sharing between sl and ts.
  */
-statement whileloop_test(statement sl)
+static statement whileloop_test(statement sl)
 {
     whileloop l = instruction_whileloop(statement_instruction(sl));
     statement ts = statement_undefined;
@@ -892,7 +680,7 @@ statement whileloop_test(statement sl)
 
 /* NN : What about other kind of whileloop, evaluation = after ? TO BE IMPLEMENTED   */
 
-bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
+static bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
 statement st;
 whileloop l;
 control pred, succ;
@@ -1022,7 +810,7 @@ statement forloop_inc(statement sl)
 }
 
 
-bool controlize_forloop(st, l, pred, succ, c_res, used_labels)
+static bool controlize_forloop(st, l, pred, succ, c_res, used_labels)
 statement st;
 forloop l;
 control pred, succ;
@@ -1171,7 +959,7 @@ hash_table used_labels;
    It relies on correct calls to push_declarations()/push_declarations()
    before to track where to put the declarations.
 */
-void
+static void
 move_declaration_control_node_declarations_to_statement(list ctls) {
   statement s = scoping_statement_head();
   list declarations = statement_declarations(s);
@@ -1537,12 +1325,12 @@ list controlize_list_1(list sts,
 
    @return TRUE if the code is not a structured control.
    */
-bool controlize_list(statement st,
-		     list sts,
-		     control pred,
-		     control succ,
-		     control c_res,
-		     hash_table used_labels)
+static bool controlize_list(statement st,
+			    list sts,
+			    control pred,
+			    control succ,
+			    control c_res,
+			    hash_table used_labels)
 {
     hash_table block_used_labels = hash_table_make(hash_string, 0);
     control c_block = control_undefined;
@@ -1802,7 +1590,7 @@ bool controlize_list(statement st,
 
    @return TRUE if the control node generated is not structured_.
  */
-bool controlize_test(st, t, pred, succ, c_res, used_labels)
+static bool controlize_test(st, t, pred, succ, c_res, used_labels)
 test t;
 statement st;
 control pred, succ;
@@ -1920,7 +1708,7 @@ hash_table used_labels;
    int the Label_statements table and allocate a slot in the Label_control
    table. */
 
-void init_label(name, st )
+static void init_label(name, st )
 string name;
 statement st;
 {
@@ -1948,7 +1736,7 @@ statement st;
    loops, the label in the DO statement is NOT introduced. Label_control is
    also created. */
 
-void create_statements_of_label(st)
+static void create_statements_of_label(st)
 statement st;
 {
     string name = entity_name(statement_label(st));
@@ -1973,7 +1761,7 @@ statement st;
 }
 
 
-void create_statements_of_labels(st)
+static void create_statements_of_labels(st)
 statement st ;
 {
     gen_recurse(st,
@@ -2091,7 +1879,219 @@ simplified_unstructured(control top,
     return(u);
 }
 
-
+
+/* Computes in @p c_res the control node of the statement @p st whose
+   predecessor control node is @p pred and successor @p succ.
+
+   The @p used_LABELS is modified to deal with local use of labels.
+
+   The invariant is that it links predecessors and successors of @p c_res,
+   updates the successors of @p pred and the predecessors of @p succ.
+
+   In fact, it cannot update the successors of @p pred because it cannot
+   know which successor of @p pred @p c_RES is when @p pred is associated
+   to a test. @p pred and @p c_res must be linked together when you enter
+   controlize(), or they must be linked later by the caller. But they
+   cannot be linked here thru the successor list of @p pred and, if the
+   consistency is true here, they cannot be linked either by the
+   predecessor list of @p succ. If they are linked later, it is useless to
+   pass @p pred down. If they are linked earlier, they might have to be
+   unlinked when structured code is found.
+
+   @return TRUE if the current statement isn't a structured control.
+*/
+bool controlize(statement st,
+		control pred,
+		control succ,
+		control c_res,
+		hash_table used_labels)
+{
+    instruction i = statement_instruction(st);
+    entity elabel = statement_label(st);
+    string label = entity_name(elabel);
+    bool controlized = FALSE;
+    control n_succ = control_undefined; // To be used in case of goto
+
+    ifdebug(5) {
+	pips_debug(1,
+		   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n"
+		   "st at entry:\n",
+		   st, pred, succ, c_res);
+	statement_consistent_p(st);
+	print_statement(st);
+	/*
+	pips_assert("pred is a predecessor of c_res",
+		    gen_in_list_p(pred, control_predecessors(c_res)));
+	pips_assert("c_res is a successor of pred",
+		    gen_in_list_p(c_res, control_successors(pred)));
+	*/
+	pips_debug(1, "Begin with result c_res %p:\n", c_res);
+	display_linked_control_nodes(c_res);
+	check_control_coherency(pred);
+	check_control_coherency(succ);
+	check_control_coherency(c_res);
+    }
+
+    switch(instruction_tag(i)) {
+    case is_instruction_block: {
+      /* A C block may have a label and even goto from outside on it. */
+      /* A block may only contain declarations with initializations
+	 and side effects on the store */
+      if(ENDP(instruction_block(i))) {
+	/* Empty block */
+	controlized = controlize_call(st, pred, succ, c_res);
+	statement_consistent_p(st);
+      }
+      else {
+	statement_consistent_p(st);
+	scoping_statement_push(st);
+	controlized = controlize_list(st, instruction_block(i),
+				      pred, succ, c_res, used_labels);
+	statement_consistent_p(st);
+
+	ifdebug(5) {
+	  pips_debug(1, "CFG consistency check before list6 controlization."
+		     " Control \"pred\" %p:\n", pred);
+	  display_linked_control_nodes(pred);
+	  pips_debug(1, "Control \"succ\" %p:\n", succ);
+	  display_linked_control_nodes(succ);
+
+	  check_control_coherency(pred);
+	  check_control_coherency(succ);
+	  check_control_coherency(c_res);
+	}
+	/* If st carries local declarations, so should the statement
+	   associated to c_res. */
+	if(controlized && !ENDP(statement_declarations(st))
+	   && ENDP(statement_declarations(control_statement(c_res)))) {
+	  print_arguments(statement_declarations(st));
+	  pips_user_warning("Some local declarations may have been lost\n");
+	}
+	scoping_statement_pop();
+	statement_consistent_p(st);
+      }
+      break;
+    }
+    case is_instruction_test:
+	controlized = controlize_test(st, instruction_test(i),
+				      pred, succ, c_res, used_labels);
+	statement_consistent_p(st);
+	break;
+    case is_instruction_loop:
+	controlized = controlize_loop(st, instruction_loop(i),
+				      pred, succ, c_res, used_labels);
+	statement_consistent_p(st);
+	break;
+    case is_instruction_whileloop:
+	controlized = controlize_whileloop(st, instruction_whileloop(i),
+					   pred, succ, c_res, used_labels);
+	statement_consistent_p(st);
+	break;
+    case is_instruction_goto: {
+      /* Get the label name of the statement the goto point to: */
+	string name = entity_name(statement_label(instruction_goto(i)));
+	statement nop = make_continue_statement(statement_label(st));
+
+	statement_number(nop) = statement_number(st);
+	statement_comments(nop) = statement_comments(st);
+	// Well, let's try this for the time being. What is the scope?!?
+	statement_declarations(nop) = statement_declarations(st);
+	statement_decls_text(nop) = statement_decls_text(st);
+
+	n_succ = get_label_control(name);
+
+	ifdebug(5) {
+	  pips_debug(1, "CFG consistency check before goto controlization."
+		     " Control \"pred\" %p:\n", pred);
+	  display_linked_control_nodes(pred);
+	  pips_debug(1, "Control \"n_succ\" %p:\n", n_succ);
+	  display_linked_control_nodes(n_succ);
+	  check_control_coherency(pred);
+	  check_control_coherency(n_succ);
+	  check_control_coherency(c_res);
+	}
+
+	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
+           unlink the predecessor of the former successor of pred. RK */
+	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
+	add_proper_successor_to_predecessor(pred, c_res);
+	UPDATE_CONTROL(c_res, nop,
+		       CONS(CONTROL, pred, NIL),
+		       CONS(CONTROL, n_succ, NIL));
+	control_predecessors(n_succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, n_succ);
+	/* I do not know why, but my following code does not work. So
+           I put back former one above... :-( RK. */
+#if 0
+	/* Use my procedures instead to set a GOTO from pred to
+           c_res. RK */
+	if (gen_length(control_successors(pred)) == 1)
+	    unlink_2_control_nodes(pred, CONTROL(CAR(control_successors(pred))));
+	link_2_control_nodes(pred, c_res);
+	link_2_control_nodes(c_res, n_succ);
+	/* Hmmm... A memory leak on the previous statement of c_res? */
+	control_statement(c_res) = nop;
+#endif
+	update_used_labels(used_labels, name, st);
+	controlized = TRUE;
+	break;
+    }
+    case is_instruction_call:
+	/* FI: IO calls may have control effects; they should be handled here! */
+	controlized = controlize_call(st, pred, succ, c_res);
+	statement_consistent_p(st);
+	break;
+    case is_instruction_forloop:
+      pips_assert("We are really dealing with a for loop",
+		  instruction_forloop_p(statement_instruction(st)));
+      controlized = controlize_forloop(st, instruction_forloop(i),
+				       pred, succ, c_res, used_labels);
+	statement_consistent_p(st);
+        /* SG+EC:some label may have been lost in the process
+           fix it here instead of understanding why */
+        if(!same_entity_p(statement_label(st),elabel)) {
+            statement_label(st)=elabel;
+        }
+      break;
+    case is_instruction_expression:
+      /* PJ: controlize_call() controlize any "nice" statement */
+      controlized = return_instruction_p(i) || controlize_call(st, pred, succ, c_res);
+
+	statement_consistent_p(st);
+      break;
+    default:
+	pips_error("controlize",
+		   "Unknown instruction tag %d\n", instruction_tag(i));
+    }
+
+    ifdebug(5) {
+	statement_consistent_p(st);
+	pips_debug(1, "st %p at exit:\n", st);
+	print_statement(st);
+	pips_debug(1, "Resulting Control c_res %p at exit:\n", c_res);
+	display_linked_control_nodes(c_res);
+	fprintf(stderr, "---\n");
+	/* The declarations may be preserved at a lower level
+	if(!ENDP(statement_declarations(st))
+	   && ENDP(statement_declarations(control_statement(c_res)))) {
+	  pips_internal_error("Lost local declarations\n");
+	}
+	*/
+	check_control_coherency(pred);
+	if(control_undefined_p(n_succ))
+	  check_control_coherency(succ);
+	else
+	  check_control_coherency(n_succ);
+	check_control_coherency(c_res);
+    }
+
+    /* Update the association between the current statement and its label:
+    */
+    update_used_labels(used_labels, label, st);
+
+    return(controlized);
+}
+
+
 /* CONTROL_GRAPH returns the control graph of the statement ST. */
 unstructured control_graph(st)
 statement st;

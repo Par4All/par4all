@@ -113,6 +113,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	pips_debug(1, "Local variable %s is preserved because its initial value "
 		   "is not assignable\n", entity_local_name(var));
 	ndecls = gen_nconc(ndecls, CONS(ENTITY, var, NIL));
+      replace_entities(entity_type(var),renamings);
       }
       else if(var!=nvar) {
 	/* If the new variable declaration does not contain the
@@ -124,6 +125,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	  statement is = make_assign_statement(entity_to_expression(nvar), ie);
       gen_context_recurse(ie,renamings,
                         reference_domain, gen_true, rename_reference);
+      replace_entities(entity_type(nvar),renamings);
 
 	  inits = gen_nconc(inits, CONS(statement, is, NIL));
 

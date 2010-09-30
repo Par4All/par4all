@@ -91,7 +91,7 @@ def printPythonMethod(name,doc):
 	
 	if (has_loop_label and generator == "-loop") or (not has_loop_label and generator != "-loop"):
 		if generator == "-modules":
-			extraparams = extraparams + " concurrent=True,"
+			extraparams = extraparams + " concurrent=False,"
 
 		print '\n\tdef '+name+'(self,'+extraparams+' **props):'
 		print '\t\t"""'+doc+'"""'

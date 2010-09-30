@@ -22,3 +22,14 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+typedef struct {
+  /* PIPSDEBM INTERFACES */
+  statement_cell_relations (*db_get_pv_func)(char *);
+  void (*db_put_pv_func)(char * , statement_cell_relations);
+  statement_cell_relations (*db_get_gen_pv_func)(char *);
+  void (*db_put_gen_pv_func)(char * , statement_cell_relations);
+  statement_effects (*db_get_kill_pv_func)(char *);
+  void (*db_put_kill_pv_func)(char * , statement_effects);
+  cell_relation (*make_pv_from_effects_func)(effect, effect, cell_interpretation);
+} pv_context;

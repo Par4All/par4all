@@ -42,6 +42,12 @@
 /* this function shouldn't be called. 
  * Use macro NORMALIZE_EXPRESSION(e) instead.
  */
+
+static normalized _NormalizeExpression(expression e)
+{
+	return NormalizeSyntax(expression_syntax(e));
+}
+
 normalized NormalizeExpression(expression e)
 {
     normalized n;
@@ -50,7 +56,7 @@ normalized NormalizeExpression(expression e)
 	user_warning("NormalizeExpression", 
 		     "expression is already normalized\n");
 
-    n = NormalizeSyntax(expression_syntax(e));
+    n = _NormalizeExpression(e);
 
     return(n);
 }
@@ -168,7 +174,7 @@ normalized NormalizeIntrinsic(entity e, list la)
     return(make_normalized(is_normalized_complex, UU));
 
   if (ENTITY_UNARY_MINUS_P(e)) {
-    n = NormalizeExpression(EXPRESSION(CAR(la)));
+    n = _NormalizeExpression(EXPRESSION(CAR(la)));
 
     if (normalized_complex_p(n))
       return(n);
@@ -178,11 +184,11 @@ normalized NormalizeIntrinsic(entity e, list la)
   else if (ENTITY_MINUS_P(e) || ENTITY_MINUS_C_P(e) || ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) {
     normalized ng, nd;
 
-    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    ng = _NormalizeExpression(EXPRESSION(CAR(la)));
     if (normalized_complex_p(ng))
       return(ng);
 
-    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    nd = _NormalizeExpression(EXPRESSION(CAR(CDR(la))));
     if (normalized_complex_p(nd)) {
       FreeNormalized(ng);
       return(nd);
@@ -204,18 +210,18 @@ normalized NormalizeIntrinsic(entity e, list la)
        expressed by a normalized expression */
     //normalized nd;
 
-    (void) NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    (void) _NormalizeExpression(EXPRESSION(CAR(CDR(la))));
     return make_normalized_complex();
   }
   else if (ENTITY_MULTIPLY_P(e)) {
     normalized ng, nd;
     int val;
 
-    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    ng = _NormalizeExpression(EXPRESSION(CAR(la)));
     if (normalized_complex_p(ng))
       return(ng);
 
-    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    nd = _NormalizeExpression(EXPRESSION(CAR(CDR(la))));
     if (normalized_complex_p(nd)) {
       FreeNormalized(ng);
       return(nd);
@@ -270,11 +276,11 @@ normalized binary_to_normalized(list la, int op)
 
     pips_assert("binary_to_normalize", gen_length(la) == 2);
 
-    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    ng = _NormalizeExpression(EXPRESSION(CAR(la)));
     if (normalized_complex_p(ng))
 	return(ng);
 
-    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    nd = _NormalizeExpression(EXPRESSION(CAR(CDR(la))));
     if (normalized_complex_p(nd)) {
 	FreeNormalized(ng);
 	return(nd);
@@ -413,7 +419,7 @@ Pvecteur expression_to_affine(expression e)
        to new value entities? */
 
     if(expression_normalized(e)==normalized_undefined)
-	n = NormalizeExpression(e);
+	n = _NormalizeExpression(e);
     else
 	n = expression_normalized(e);
 

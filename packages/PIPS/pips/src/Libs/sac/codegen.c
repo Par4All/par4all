@@ -49,7 +49,7 @@
 #include <stdlib.h>
 
 #define MAX_PACK 16
-#define VECTOR_POSTFIX "_vec"
+#define VECTOR_POSTFIX "vec"
 
 
 static float gSimdCost;
@@ -346,14 +346,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                     break;
                 }
 
-                switch(basic_tag(bas))
-                {
-                    case is_basic_int: width = 8 * basic_int(bas); break;
-                    case is_basic_float: width = 8 * basic_float(bas); break;
-                    case is_basic_complex: width= 8 * basic_complex(bas); break;
-                    case is_basic_logical: width = 1; break;
-                    default: pips_user_error("basic %d not supported",basic_tag(bas));
-                }
+                width = SizeOfElements(bas);
                 free_basic(bas);
 
                 if(width > get_subwordSize_from_opcode(oc, count))
@@ -399,7 +392,7 @@ entity get_function_entity(string name)
  * @return an expression of the offset, in octets
  */
 static
-expression reference_offset(const reference r)
+expression reference_offset(const reference r, basic refbasic)
 {
     if( ENDP(reference_indices(r)) ) return int_to_expression(0);
     else {
@@ -409,8 +402,8 @@ expression reference_offset(const reference r)
                     EXPRESSION(CAR(reference_indices(r))):
                     EXPRESSION(CAR(gen_last(reference_indices(r)))));
         list dims = get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
-            CDR(variable_dimensions(type_variable(entity_type(reference_variable(r))))):
-            variable_dimensions(type_variable(entity_type(reference_variable(r))));
+            CDR(variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))))):
+            variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
         list indices = NIL;
         if( get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
             indices=gen_copy_seq(CDR(reference_indices(r)));
@@ -432,8 +425,8 @@ expression reference_offset(const reference r)
         }
         gen_free_list(indices);
         expression result = make_op_exp(MULTIPLY_OPERATOR_NAME,
-                int_to_expression(SizeOfElements(variable_basic(type_variable(entity_type(reference_variable(r)))))),
-                offset);
+					int_to_expression(SizeOfElements(refbasic)),
+					offset);
         return result;
     }
 }
@@ -510,9 +503,13 @@ expression distance_between_expression(const expression exp0, const expression e
             }
             reference fake0 = make_reference(e0,indices0),
                       fake1 = make_reference(e1,indices1);
-            expression offset0 = reference_offset(fake0),
-                       offset1 = reference_offset(fake1);
+	    basic b0 = basic_of_reference(r0),
+		    b1 = basic_of_reference(r1);
+            expression offset0 = reference_offset(fake0, basic_of_reference(r0)),
+                       offset1 = reference_offset(fake1, basic_of_reference(r1));
             expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
+	    free_basic(b0);
+	    free_basic(b1);
             free_reference(fake0);
             free_reference(fake1);
 
@@ -574,14 +571,10 @@ static string get_simd_vector_type(list lExp)
 
         if(type_variable_p(t))
         {
-            //        basic bas = variable_basic(type_variable(t));
+            basic bas = variable_basic(type_variable(t));
+            pips_assert("searching in a sac vector",basic_typedef_p(bas));
 
-            result = strdup(entity_name(
-                        reference_variable(syntax_reference(expression_syntax(exp)))
-                        ));
-            string c = strrchr(result,'_');
-            pips_assert("searching in a sec - encoded variable name",c);
-            *c='\0';
+            result = strdup(entity_name(basic_typedef(bas)));
             /* switch to upper cases... */
             result=strupper(result,result);
 
@@ -611,21 +604,17 @@ static string get_vect_name_from_data(int argc, list exps)
     {
         case is_basic_int:
             prefix[3] = 'i';
-            itemSize = 8 * basic_int(bas);
             break;
 
         case is_basic_float:
             prefix[3] = 'f';
-            itemSize = 8 * basic_float(bas);
             break;
 
         case is_basic_logical:
             prefix[3] = 'i';
-            itemSize = 8 * basic_logical(bas);
             break;
         case is_basic_complex:
             prefix[3] = 'c';
-            itemSize = 8 * basic_complex(bas);
             break;
 
         default:
@@ -633,6 +622,7 @@ static string get_vect_name_from_data(int argc, list exps)
             return strdup("");
             break;
     }
+    itemSize=8*SizeOfElements(bas);
     free_basic(bas);
 
     switch(itemSize)
@@ -641,6 +631,7 @@ static string get_vect_name_from_data(int argc, list exps)
         case 16: prefix[2] = 'h'; break;
         case 32: prefix[2] = 's'; break;
         case 64: prefix[2] = 'd'; break;
+        default:pips_internal_error("case not handled");
     }
 
     prefix[4] = 0;
@@ -698,7 +689,7 @@ static statement make_exec_statement_from_opcode(opcode oc, list args)
     return make_exec_statement_from_name( opcode_name(oc) , args );
 }
 
-#define SAC_ALIGNED_VECTOR_NAME "aligned"
+#define SAC_ALIGNED_VECTOR_NAME "pdata"
 bool sac_aligned_entity_p(entity e)
 {
     return same_stringn_p(entity_user_name(e),SAC_ALIGNED_VECTOR_NAME,sizeof(SAC_ALIGNED_VECTOR_NAME)-1);
@@ -831,10 +822,16 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         list new_statements = NIL;
         size_t nbargs=gen_length(CDR(args));
         basic shared_basic = basic_of_expressions(CDR(args),true);
-        entity scalar_holder = make_new_array_variable_with_prefix(
-                SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),shared_basic,
-                CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
+        char * tname =strdup(get_vect_name_from_data(nbargs,CDR(args)));
+        tname=strlower(tname,tname);
+        tname[0]='a';/*array*/
+
+        entity scalar_holder = make_new_scalar_variable_with_prefix(
+                SAC_ALIGNED_VECTOR_NAME,get_current_module_entity(),
+                get_typedefed_array(tname,shared_basic, CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(nbargs-1)),NIL)
+                    )
                 );
+        free(tname);
         AddEntityToCurrentModule(scalar_holder);
         int index=0;
         list inits = NIL;
@@ -985,6 +982,22 @@ static statement make_save_statement(int argc, list args, list padded)
     return make_loadsave_statement(argc, args, FALSE, padded);
 }
 
+basic get_typedefed_array(const char * type_name, basic b, list dims) {
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME,type_name);
+    if(entity_undefined_p(e)) {
+        e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,type_name);
+        entity_type(e)=make_type_variable(
+                make_variable(
+                    b,
+                    dims,NIL
+                    )
+                );
+        entity_storage(e)=make_storage_rom();
+        entity_initial(e)=make_value_unknown();
+    }
+    return make_basic_typedef(e);
+}
+
 
 /*
    This function creates a simd vector.
@@ -1033,10 +1046,12 @@ static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype b
     }
 
     pips_assert("buffer doesnot overflow",number<10000);
-    sprintf(name, "%s%s%u",prefix,VECTOR_POSTFIX,number++);
+    sprintf(name, "%s%u",VECTOR_POSTFIX,number++);
     list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
 
-    new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);
+    basic typedefedSimdVector = get_typedefed_array(prefix,simdVector,lis);
+
+    new_ent = make_new_scalar_variable_with_prefix(name, mod_ent , typedefedSimdVector);
 
 #if 0
     string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
@@ -1200,26 +1215,31 @@ simdstatement make_simd_statements(set opkinds, list statements)
                 statement sfirst = STATEMENT(CAR(first));
                 if(assignment_statement_p(sfirst))
                 {
-                    expression neutral_element= entity_to_expression(operator_neutral_element(
+		    entity neutral_entity = operator_neutral_element(
                                 call_function(expression_call(binary_call_rhs(statement_call(sfirst))))
-                                ));
-                    bool first=true;
-                    FOREACH(EXPRESSION,e,args[index-1])
-                    {
-                        free_syntax(expression_syntax(e));
-                        if(first)
-                        {
-                            /* we always use the same padding entity, it proves to be usefull later on */
-                            entity pe = get_padding_entity();
-                            expression_syntax(e)=make_syntax_reference(make_reference(pe,NIL));
-                            first=false;
-                        }
-                        else
-                        {
-                            expression_syntax(e)=copy_syntax(expression_syntax(neutral_element));
-                        }
-                    }
-                    free_expression(neutral_element);
+			    );
+		    expression neutral_element;
+		    if (! entity_undefined_p(neutral_entity))
+			    neutral_element = entity_to_expression(neutral_entity);
+		    else
+			    neutral_element = copy_expression(binary_call_rhs(statement_call(sfirst)));
+		    bool first=true;
+		    FOREACH(EXPRESSION,e,args[index-1])
+		    {
+			    free_syntax(expression_syntax(e));
+			    if(first)
+			    {
+				    /* we always use the same padding entity, it proves to be usefull later on */
+				    entity pe = get_padding_entity();
+				    expression_syntax(e)=make_syntax_reference(make_reference(pe,NIL));
+				    first=false;
+			    }
+			    else
+			    {
+				    expression_syntax(e)=copy_syntax(expression_syntax(neutral_element));
+			    }
+		    }
+		    free_expression(neutral_element);
                 }
                 else
                     pips_user_warning("wrong padding may have been added\n");

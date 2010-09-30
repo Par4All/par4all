@@ -72,7 +72,7 @@
 * validation
 + check all AIPO
 + add more (elementary) tests?
-- add more application-level tests
+- add more application-level tests (promised: 5 CMM, 1 TRT)
 
 * known bugs
 + allocs may be in the middle of the calls
@@ -109,6 +109,12 @@
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation
+
+* general purpose software generation target
+- use optimized DAG
+- generate tiled code which mimics spoc with its delay lines?
+- also reuse automatic image boundary management with constants?
+- what if something different should be done on boundaries?
 
 * multi target ?
 - chose the best hardware depending on the compilations: criterion?

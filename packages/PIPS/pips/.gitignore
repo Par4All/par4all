@@ -14,3 +14,5 @@ makes/
 missing
 py-compile
 *.pyc
+PYPS*.database/
+.PYPS*.tmp/

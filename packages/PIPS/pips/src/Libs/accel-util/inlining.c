@@ -384,7 +384,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         {
             if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
             {
-                ref_ent=entity_field_to_entity_struct(ref_ent);
+                ref_ent=entity_field_to_entity_struct_or_union(ref_ent);
             }
 
             if(!entity_enum_member_p(ref_ent) && /* enum member cannot be added to declarations */

@@ -163,6 +163,9 @@ void unspaghettify_statement( statement mod_stmt ) {
   STUB_ERROR();
 }
 
+statement hcfg(statement st){
+  STUB_ERROR();
+}
 /***********************************************
  * STEP
  */
@@ -223,3 +226,12 @@ void set_string_property( const string name, string s ) {
   fprintf( stderr, "***** Property requested : %s ***** ", name );
   STUB_ERROR();
 }
+
+/*************************************************
+ * PIPSMAKE
+ */
+bool active_phase_p(string phase)
+{
+  STUB_ERROR();
+}
+

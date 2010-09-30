@@ -160,14 +160,11 @@ class pipscc:
 			
 			# run pips with this informations
 			#print "# running pips"
-			ws = self.get_workspace(C_FILES)
-			# add extra operations 
-			self.changes(ws)
-			# commit changes
-			ws.save(indir=WDIR)
-			# the end for pips
-			ws.close()
-			del ws
+			with self.get_workspace(C_FILES) as ws:
+				# add extra operations 
+				self.changes(ws)
+				# commit changes
+				ws.save(rep=WDIR)
 			
 			# now run the compiler
 			self.compile(WDIR,O_FILES)

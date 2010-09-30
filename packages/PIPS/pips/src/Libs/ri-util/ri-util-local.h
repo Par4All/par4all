@@ -895,6 +895,7 @@
 #define FREE_FUNCTION_NAME              "free"
 #define MALLOC_FUNCTION_NAME            "malloc"
 #define REALLOC_FUNCTION_NAME           "realloc"
+#define ALLOCA_FUNCTION_NAME            "alloca"
 #define ABORT_FUNCTION_NAME             "abort"
 #define ATEXIT_FUNCTION_NAME            "atexit"
 #define EXIT_FUNCTION_NAME              "exit"
@@ -1094,6 +1095,8 @@
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
 #define CLOCK_FUNCTION_NAME            "clock"
+#define CLOCK_GETTIME_FUNCTION_NAME    "clock_gettime"
+#define GETTIMEOFDAY_FUNCTION_NAME    "gettimeofday"
 
 /* netdb.h */
 #define __H_ERRNO_LOCATION_OPERATOR_NAME "__h_erno_location"
