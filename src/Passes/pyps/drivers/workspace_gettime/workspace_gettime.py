@@ -52,24 +52,23 @@ class workspace:
 		"""Editing the source files to add the include in them"""
 
 		""" Creating the file containing the new main """
-		gettime_c = "_pyps_main_gettime.c"
+		gettime_c = os.path.join(outdir, "_pyps_main_gettime.c")
 		with open(gettime_c, 'w') as f:
 			f.write(cfile)
 
 		""" Creating the file containing the macro """
 		gettime_h = "_pyps_main_gettime.h"
-		with open(gettime_h, 'w') as f:
+		with open(os.path.join(outdir, gettime_h), 'w') as f:
 			f.write(hfile)
 
-		abspath = os.path.abspath(gettime_h)
 		for file in files:
 			with open(file, 'r') as f:
 				read_data = f.read()
 			#Don't put the include more than once
-			if read_data.find('\n#include "{0}"\n'.format(abspath)) != -1:
+			if read_data.find('\n#include "{0}"\n'.format(gettime_h)) != -1:
 				continue
 			with open(file, 'w') as f:
-				f.write('/* Header automatically inserted by PYPS*/\n#include "{0}"\n\n'.format(abspath))
+				f.write('/* Header automatically inserted by PYPS*/\n#include "{0}"\n\n'.format(gettime_h))
 				f.write(read_data)
 		files.append(gettime_c)
 
@@ -111,9 +110,8 @@ class workspace:
 		cmd = [outfile] + args
 		for i in range(0, iterations):
 			p = Popen(cmd, stdout = PIPE, stderr = PIPE)
-			out = p.stdout.read()
-			err = p.stderr.read()
-			rc = p.wait()
+			(out,err) = p.communicate()
+			rc = p.returncode
 			if rc != 0:
 				message = "Program %s failed with return code %d" %(cmd, rc)
 				#raise RuntimeError(message)
@@ -139,5 +137,5 @@ class workspace:
 			else:
 				if type(reference).__name__ == "list": reference.append(out)
 
-		avg = sum(runtimes) / len(runtimes)
-		return avg
+		runtimes.sort()
+		return runtimes[len(runtimes) / 2]

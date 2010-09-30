@@ -8,7 +8,7 @@ from optparse import OptionParser
 
 conditions = [("simdizer_allow_padding", [False, True]),
               ("auto_unroll", [True, False]),
-              ("full_unroll_step", [0, 3, 2]),
+              ("full_unroll", [False, True]),
               ("reduction_detection", [False, True]),
               ("if_conversion", [False, True]),
               ]

@@ -8,7 +8,7 @@ typedef struct {
     float im;
 } Cplfloat;
 
-void average_power(int Nth, int Nrg, int Nv, Cplfloat ***ptrin, Cplfloat Pow[Nth]) {
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth]) {
 
     float PP;
     int th, v, rg;
@@ -32,31 +32,25 @@ int main(int argc, char *argv[])
     int th,rg,v;
     th=256,rg=256,v=256;
     {
-        Cplfloat ***in, *pow;
-	in = malloc(th * sizeof(Cplfloat **));
-	if (!in)
-	    err(1, "in = malloc(%zu)", th * sizeof(Cplfloat **));
+        Cplfloat (*in)[th][rg][v], (*pow)[th];
+        in = malloc(th * rg * v *sizeof(Cplfloat));
+        if (!in)
+            err(1, "in = malloc(%zu)", th *rg*v* sizeof(Cplfloat));
         for (i=0; i<th; i++) {
-	    in[i] = malloc(rg * sizeof(Cplfloat *));
-	    if (! in[i])
-		err(1, "in[%d] = malloc(%zu)", i, rg * sizeof(Cplfloat *));
-	    for (j=0; j<rg; j++) {
-		in[i][j] = malloc(v * sizeof(Cplfloat));
-		if (! in[i][j])
-		    err(1, "in[%d][%d] = malloc(%zu)", i, j, v * sizeof(Cplfloat));
-		for (k=0;k<v;k++) {
-		    in[i][j][k].re = i*j*k;
-		    in[i][j][k].re = i*j+k;
+            for (j=0; j<rg; j++) {
+                for (k=0;k<v;k++) {
+                    (*in)[i][j][k].re = i*j*k;
+                    (*in)[i][j][k].re = i*j+k;
                 }
-	    }
-	}
-	pow = malloc(th * sizeof(Cplfloat));
-	if (!pow)
-	    err(1, "malloc(%zu)", th * sizeof(Cplfloat));
-        average_power(th,rg,v,in,pow);
+            }
+        }
+        pow = malloc(th * sizeof(Cplfloat));
+        if (!pow)
+            err(1, "malloc(%zu)", th * sizeof(Cplfloat));
+        average_power(th,rg,v,*in,*pow);
         /* only print with bad precision for validation */
         for(i=0;i<th;i++)
-            printf("-%d-%d-\n", ((int)pow[i].re)/10, ((int)pow[i].im)/10);
+            printf("-%d-%d-\n", ((int)(*pow)[i].re)/10, ((int)(*pow)[i].im)/10);
     }
     return 0;
 }
