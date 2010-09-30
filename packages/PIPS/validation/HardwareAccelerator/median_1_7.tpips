@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 7
+setenv WSPACE median_1_7
+setenv FILE $WSPACE.c
+setenv NAME median_1
+source default_tpips

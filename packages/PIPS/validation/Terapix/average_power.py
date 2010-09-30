@@ -19,7 +19,7 @@ def vconv(tiling_vector):
 
 
 if __name__ == "__main__":
-	w = workspace(["average_power.c"], cppflags="-I.")
+	w = workspace(["average_power.c","include/par4all.c"], cppflags="-I.")
 	w.set_property(constant_path_effects=False)
 	w.activate("MUST_REGIONS")
 	w.activate("TRANSFORMERS_INTER_FULL")

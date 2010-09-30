@@ -40,8 +40,8 @@ int main()
 
    old = 1;
 
-//  T(new,old,x,y,z) {new#init==0, old#init==1, y+z==x, x+z#init==y+z,
-//    x#init==0, y#init==0, x<=9, y<=x, 0<=y}
+//  T(new,old,x,y,z) {new#init==0, old#init==1, x+y#init==y+z, y+z==x,
+//    x#init==0, z#init==0, x<=9, y<=x+y#init, y#init<=y}
 
 
    while (x<10) {

@@ -265,9 +265,9 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//               <may be read    >: t t2
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n3
-//               <must be written>: e1[0] e1[1] e1[2] e1[3]
+//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t t2
+//               <may be written >: e1[0] e1[1] e1[2] e1[3]
+//               <must be read   >: n3
       pa(e1);
 //               <must be written>: j
    
@@ -559,9 +559,9 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//               <may be read    >: t t2
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n3
-//               <must be written>: e1[0] e1[1] e1[2] e1[3]
+//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t t2
+//               <may be written >: e1[0] e1[1] e1[2] e1[3]
+//               <must be read   >: n3
       pa(e1);
 //               <must be written>: j
    

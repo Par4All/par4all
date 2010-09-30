@@ -9,10 +9,11 @@ int main()
    int tab[5];
    int r;
 //               <may be read    >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
+//                                  s[0] tab[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] s[0] 
 //                                  tab[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] tab[*]
-//               <must be read   >: ch fmt s s[0]
-//               <must be written>: r s[0]
+//               <must be read   >: ch fmt s
+//               <must be written>: r
    r = varargs03(s, fmt, ch, tab);
 //               <must be read   >: r
    return r;
@@ -55,10 +56,11 @@ int main()
    int tab[5];
    int r;
 //               <may be read    >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
+//                                  s[0] tab[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] s[0] 
 //                                  tab[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] ch[*] tab[*]
-//               <must be read   >: ch fmt s s[0]
-//               <must be written>: r s[0]
+//               <must be read   >: ch fmt s
+//               <must be written>: r
    r = varargs03(s, fmt, ch, tab);
 //               <must be read   >: r
    return r;

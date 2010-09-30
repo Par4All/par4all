@@ -1,6 +1,5 @@
-from pyps import *
+from pyps import workspace
 import sys
-w = workspace(["basics0.c"],verbose=False)
-print >> sys.stderr, "hello"
-for f in w.fun:f.display()
-w.close()
+with workspace(["basics0.c"],verbose=False) as w:
+	print >> sys.stderr, "hello"
+	for f in w.fun:f.display()

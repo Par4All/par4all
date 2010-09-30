@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 6
+setenv WSPACE license_plate_copies_6
+setenv FILE $WSPACE.c
+setenv NAME license_plate_copies
+source default_tpips

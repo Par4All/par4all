@@ -46,6 +46,10 @@
 #include "control.h"
 #include "prettyprint.h"
 
+/* To be able to test which controlizer is currently used: */
+#include "phases.h"
+#include "pipsmake.h"
+
 #include "syn_yacc.h"
 
 /* list of called subroutines or functions */
@@ -53,7 +57,7 @@ static list called_modules = list_undefined;
 
 /* statement of current function */
 static statement function_body = statement_undefined;
-
+
 /*********************************************************** GHOST VARIABLES */
 
 /* list of potential local or top-level variables
@@ -1907,7 +1911,6 @@ static statement BuildStatementForEntry(
 static void ProcessEntry(
     entity cm,
     entity e,
-    entity __attribute__ ((unused)) l,
     statement t)
 {
     statement es = statement_undefined; /* so as not to compute
@@ -1954,14 +1957,26 @@ static void ProcessEntry(
      * to formal parameters undeclared in the current entry an obtain a clean
      * entry statement (ces).
      */
+    /* By default we use the controlizer that is activated according to
+       pipsmake... */
+    bool use_new_controlizer_p = active_phase_p(BUILDER_NEW_CONTROLIZER);
+    /* ...but we can change it according to special environment variables if
+       they are defined: */
+    use_new_controlizer_p |=
+      (getenv(USE_NEW_CONTROLIZER_ENV_VAR_NAME) != NULL);
+    use_new_controlizer_p &=
+      (getenv(USE_OLD_CONTROLIZER_ENV_VAR_NAME) == NULL);
 
-    ces = make_statement(entity_empty_label(),
-			 STATEMENT_NUMBER_UNDEFINED,
-			 MAKE_ORDERING(0,1),
-			 empty_comments,
-			 make_instruction(is_instruction_unstructured,
-					  control_graph(es)),
-			 NIL,NULL, empty_extensions ());
+    if (use_new_controlizer_p)
+      ces = hcfg(es);
+    else
+      ces = make_statement(entity_empty_label(),
+			   STATEMENT_NUMBER_UNDEFINED,
+			   MAKE_ORDERING(0,1),
+			   empty_comments,
+			   make_instruction(is_instruction_unstructured,
+					    control_graph(es)),
+			   NIL,NULL, empty_extensions ());
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.
@@ -2060,7 +2075,7 @@ void ProcessEntries()
 
 	pips_assert("Target and label match", l==statement_label(t));
 
-	ProcessEntry(cm, e, l, t);
+	ProcessEntry(cm, e, t);
     }
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
     set_bool_property("PRETTYPRINT_DATA_STATEMENTS", data_statements_p);

@@ -1,4 +1,40 @@
 original code
+void P4A_accel_free(void **ptr)
+{
+   free(*ptr);
+}
+void P4A_accel_malloc(void **ptr, size_t n)
+{
+   *ptr = malloc(n);
+}
+void * P4A_copy_from_accel(void *dest, const void *src, size_t n)
+{
+   size_t i;
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) dest)[i] = ((const char *) src)[i];
+   return dest;
+}
+void * P4A_copy_from_accel2d(void *dest, const void *src, size_t n)
+{
+   size_t i;
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) dest)[i] = ((const char *) src)[i];
+   return dest;
+}
+void * P4A_copy_to_accel(void *dest, const void *src, size_t n)
+{
+   size_t i;
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) dest)[i] = ((const char *) src)[i];
+   return dest;
+}
+void * P4A_copy_to_accel2d(void *dest, const void *src, size_t n)
+{
+   size_t i;
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) dest)[i] = ((const char *) src)[i];
+   return dest;
+}
 void lonesome_cowboy()
 {
    int i, a[12];

@@ -1,3 +1,12 @@
+typedef float v4sf[4];
+typedef double v2df[2];
+typedef int v4si[4];
+typedef short v8hi[8];
+typedef float a4sf[4] __attribute__((aligned(16)));
+typedef double a2df[4] __attribute__((aligned(16)));
+typedef int a4si[4] __attribute__((aligned(16)));
+typedef int a8hi[8] __attribute__((aligned(16)));
+
 /* SIMD.c */
 int PHI(int L, int X1, int X2);
 void SIMD_PHIW(int R[4], int L[4], int X1[4], int X2[4]);

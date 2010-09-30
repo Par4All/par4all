@@ -82,9 +82,9 @@ endif # use_pdflatex
 	mkdir $@
 	# I guess we have kpathsea to deal with TEXINPUTS
 	# Assume that an eventual index has been managed by the $(MAKEIDX) above.
-	cd $@; TEXINPUTS=.:..:: $(LX2HTM) $*
+	cd $@; TEXINPUTS=$(TEXINPUTS):.:..:: $(LX2HTM) $*
 	# To have a hyperlinked index:
-	cd $@; export TEXINPUTS=.:..:: ; if [ -r $*.idg ]; then \
+	cd $@; export TEXINPUTS=$(TEXINPUTS):.:..:: ; if [ -r $*.idg ]; then \
 		tex "\def\filename{{$*}{idx}{4dx}{ind}} \input  idxmake.4ht" ;\
 		$(MAKEIDX) -o $*.ind $*.4dx; fi ; \
 	$(LX2HTM) $* ; \

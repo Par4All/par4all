@@ -341,7 +341,7 @@ static void atomize_statements(statement cs)
     }
 }
 
-boolean simd_atomizer(char * mod_name)
+bool simd_atomizer(char * mod_name)
 {
     /* get the resources */
     statement mod_stmt = (statement)

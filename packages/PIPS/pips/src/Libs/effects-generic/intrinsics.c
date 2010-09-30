@@ -969,6 +969,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FREE_FUNCTION_NAME,                     any_heap_effects},
   {MALLOC_FUNCTION_NAME,                   any_heap_effects},
   {REALLOC_FUNCTION_NAME,                  any_heap_effects},
+  /* SG: I am setting an any_heap_effects for alloca, which is over pessimistic ... */
+  {ALLOCA_FUNCTION_NAME,                   any_heap_effects},
   {ABORT_FUNCTION_NAME,                    no_write_effects},
   {ATEXIT_FUNCTION_NAME,                   no_write_effects},
   {EXIT_FUNCTION_NAME,                     no_write_effects},
@@ -1017,6 +1019,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     no_write_effects},
+  {GETTIMEOFDAY_FUNCTION_NAME,             no_write_effects},
+  {CLOCK_GETTIME_FUNCTION_NAME,            no_write_effects},
   {CLOCK_FUNCTION_NAME,                    no_write_effects},
 
   /*#include <wchar.h>*/
@@ -1902,90 +1906,147 @@ static list c_io_effects(entity e, list args)
 
 
 /*Molka Becher: generic_string_effects to encompass the C string.h intrinsics*/
-
+/*
+  @brief handles several C intrinsics from string.h.
+ */
 static list 
 generic_string_effects(entity e, list args)
 {
-  list le = NIL, lep = NIL, lep1=NIL;
-  int i=0;
-  effect ef= effect_undefined;
-  expression ie= expression_undefined;
-  reference ref=reference_undefined;
-  action a=action_undefined;
+  list le = NIL;
  
   pips_debug(5, "begin\n");
 
-  //if entity is memmove intrinsic
+  // first read effects for the evaluation of arguments 
+  le = generic_proper_effects_of_expressions(args);
+
+  // then effects on special entities for memmove intrinsic
   if (strcmp(entity_user_name(e),"memmove")==0)
-    { lep1=memmove_effects(e, args);
-      le=gen_nconc(le,lep1);
+    { 
+      le = gen_nconc(le,memmove_effects(e, args));
     }
 
-  FOREACH(EXPRESSION, arg, args)
-    { 
+  // finally write effects on some elements of first argument depending on third argument
+  // if the main effect is not on a char *, or if we don't know the number of copied elements,
+  // we generate may effects on all reachable paths 
+  // from the main effect, without going through pointers.
 
-      if (i==0) // if 1st argument
-	{ ref= copy_reference(expression_reference(copy_expression(arg)));
- 	  entity et= reference_variable(ref);
- 	  if (entity_constant_p(et))  //if 1st argument is a constant value
-	    pips_user_error ("First argument of %s shouldn't be a constant value!\n",entity_user_name(e));
-	}
-      if ((i==1 && gen_length(args)==2) || (i==2)) // 3rd argument: arg==arg3
+  expression arg1 = EXPRESSION(CAR(args));
+
+  if (expression_call_p(arg1) 
+      && call_constant_p(expression_call(arg1)))
+    {
+      pips_user_error(5, "constant expression as first argument not allowed "
+		      "for intrinsic %s\n", entity_name(e));
+    }
+  else
+    {
+      effect eff1; /* main effect on first arg */
+      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &eff1, true);
+      gen_full_free_list(l_tmp);
+      
+      if (!anywhere_effect_p(eff1))
 	{
-	  a= make_action_write_memory();
-
-	  /* Effect is on arg1[0..arg3-1]*/
-
-	  expression arg1 = EXPRESSION(CAR(args));
-	  
-	  if (expression_reference_p(arg1))
+	  if (gen_length(args) == 3) // we may know the number of elements
 	    {
-	      ref = copy_reference(expression_reference(arg1));
-	      if (gen_length(args)==3)
-		{expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-				                copy_expression(arg),
-					        int_to_expression(1));
-		 range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		 ie = make_expression(make_syntax_range(r),make_normalized_complex());
+	      /* first check whether the argument main effect is on a char *. */
+	      type t = simple_effect_reference_type(effect_any_reference(eff1));
+	      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+	      if (!variable_undefined_p(v)
+		  && ((basic_pointer_p(variable_basic(v))
+		       && ENDP(variable_dimensions(v))
+		       && char_type_p(basic_pointer(variable_basic(v))))
+		      ||
+		      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		{
+		  /* Effect is on eff11_ref[0..arg3-1]*/
+		  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+		  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+						    copy_expression(arg3),
+						    int_to_expression(1));
+		  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		  expression ie = make_expression(make_syntax_range(r),
+						  make_normalized_complex());
+		  (*effect_add_expression_dimension_func)(eff1, ie);
+		  le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
 		}
-	      else // Number of arguments = 2, for processing a function like strcpy (char * restrict s1, const char * restrict s2);
-		{ie= make_unbounded_expression();
+	      else
+		{
+		  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+		  free_effect(eff1);
 		}
-	      reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
-	      ef= (*reference_to_effect_func)(ref,a,FALSE);
 	    }
 	  else
-	    { //if it's a call of another function & not a reference
-	      ef= make_anywhere_effect(a);
+	    {
+	      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+	      free_effect(eff1);
 	    }
-
-	   lep = NIL;
-	   lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
-        }
-      if ((i==1 || i==2) && expression_reference_p(copy_expression(arg))) // if  2nd or 3rd argument are references
-	 {
-	  a= make_action_read_memory();
-	  ref=copy_reference(expression_reference(copy_expression(arg)));
-	  ie=make_unbounded_expression();
-	  reference_indices(ref)=gen_nconc(reference_indices(ref),CONS(EXPRESSION,ie,NIL));
-	  ef= (*reference_to_effect_func)(ref,a,FALSE);
-	  lep = gen_nconc(lep, CONS(EFFECT, ef, NIL));
-
-	 }
-
-      i=i+1;
-          
-      le = gen_nconc(le, lep);   
-
-      ifdebug(8)
+	}
+      else
+	le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
+    }
+  
+  // and on the same number of elements of the second one for all handled intrinsics 
+  // except memset.
+  if (strcmp(entity_user_name(e),"memset")!=0)
+    {
+      /* this is almost the same code as for arg1 just before, 
+	 maybe this could be factorized. */
+      expression arg2 = EXPRESSION(CAR(CDR(args)));
+      type t2 = expression_to_type(arg2);
+      if (expression_call_p(arg2) 
+	  && call_constant_p(expression_call(arg2)))
 	{
-	  pips_debug(8, "effects for argument %s :\n",
-		     words_to_string(words_expression(arg,NIL)));
-	  (*effects_prettyprint_func)(lep);
+	  pips_debug(5, "constant expression as ssecond argument -> no effect");
+	}
+      else
+	{
+	  effect eff2; /* main effect on second arg */
+	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &eff2, false);
+	  gen_full_free_list(l_tmp);
+
+	  if (!anywhere_effect_p(eff2))
+	    {
+	      if (gen_length(args) == 3) // we may know the number of elements
+		{
+		  /* first check whether the argument main effect is on a char *. */
+		  type t = simple_effect_reference_type(effect_any_reference(eff2));
+		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+		  if (!variable_undefined_p(v)
+		      && ((basic_pointer_p(variable_basic(v))
+			   && ENDP(variable_dimensions(v))
+			   && char_type_p(basic_pointer(variable_basic(v))))
+			  ||
+			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		    {
+		      /* Effect is on eff12_ref[0..arg3-1]*/
+		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+							copy_expression(arg3),
+							int_to_expression(1));
+		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		      expression ie = make_expression(make_syntax_range(r),
+						      make_normalized_complex());
+		      (*effect_add_expression_dimension_func)(eff2, ie);
+		      le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+		    }
+		  else
+		    {
+		      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+		      free_effect(eff2);
+		    }
+		}
+	      else
+		{
+		  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+		  free_effect(eff2);
+		}
+	    }
+	  else
+	    le = gen_nconc(le, CONS(EFFECT, eff2, NIL)); 
 	}
     }
 
-
+  pips_debug_effects(5,"returning:\n", le);
   pips_debug(5, "end\n");
 
   return(le);

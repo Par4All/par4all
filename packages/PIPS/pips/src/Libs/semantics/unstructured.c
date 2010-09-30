@@ -113,7 +113,7 @@
 static void print_control_node(control c)
 {
   fprintf(stderr,
-	  "ctr %p, %zd preds, %zd succs: %s", 
+	  "ctr %p, %zd preds, %zd succs: %s",
           c,
 	  gen_length(control_predecessors(c)),
 	  gen_length(control_successors(c)),

@@ -34,56 +34,52 @@ simdized code
          DO LU_IND12 = 0, 3, 2
             C(1+LU_IND2,1+LU_IND12) = 0
             DO LU_IND022 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec2, B(1+LU_IND022,1+
-     &         LU_IND12))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec1, A(1+LU_IND2,1+
+               CALL SIMD_LOAD_V2SI(vec20, B(1+LU_IND022,1+LU_IND12))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec10, A(1+LU_IND2,1+
      &         LU_IND022), A(1+LU_IND2,2+LU_IND022))
-               CALL SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2)
-               CALL SIMD_STORE_V2SI(v2si_vec0, aligned(0))
-               C(1+LU_IND2,1+LU_IND12) = aligned(0)+C(1+LU_IND2,1+
+               CALL SIMD_MULD(vec00, vec10, vec20)
+               CALL SIMD_STORE_V2SI(vec00, pdata0(0))
+               C(1+LU_IND2,1+LU_IND12) = pdata0(0)+C(1+LU_IND2,1+
      &         LU_IND12)
-               C(1+LU_IND2,1+LU_IND12) = aligned(1)+C(1+LU_IND2,1+
+               C(1+LU_IND2,1+LU_IND12) = pdata0(1)+C(1+LU_IND2,1+
      &         LU_IND12)
             ENDDO
             C(1+LU_IND2,2+LU_IND12) = 0
             DO LU_IND012 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec5, B(1+LU_IND012,2+
-     &         LU_IND12))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec4, A(1+LU_IND2,1+
+               CALL SIMD_LOAD_V2SI(vec50, B(1+LU_IND012,2+LU_IND12))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec40, A(1+LU_IND2,1+
      &         LU_IND012), A(1+LU_IND2,2+LU_IND012))
-               CALL SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5)
-               CALL SIMD_STORE_V2SI(v2si_vec3, aligned0(0))
-               C(1+LU_IND2,2+LU_IND12) = aligned0(0)+C(1+LU_IND2,2+
+               CALL SIMD_MULD(vec30, vec40, vec50)
+               CALL SIMD_STORE_V2SI(vec30, pdata1(0))
+               C(1+LU_IND2,2+LU_IND12) = pdata1(0)+C(1+LU_IND2,2+
      &         LU_IND12)
-               C(1+LU_IND2,2+LU_IND12) = aligned0(1)+C(1+LU_IND2,2+
+               C(1+LU_IND2,2+LU_IND12) = pdata1(1)+C(1+LU_IND2,2+
      &         LU_IND12)
             ENDDO
          ENDDO
          DO LU_IND11 = 0, 3, 2
             C(2+LU_IND2,1+LU_IND11) = 0
             DO LU_IND021 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec8, B(1+LU_IND021,1+
-     &         LU_IND11))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec7, A(2+LU_IND2,1+
+               CALL SIMD_LOAD_V2SI(vec80, B(1+LU_IND021,1+LU_IND11))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec70, A(2+LU_IND2,1+
      &         LU_IND021), A(2+LU_IND2,2+LU_IND021))
-               CALL SIMD_MULD(v2si_vec6, v2si_vec7, v2si_vec8)
-               CALL SIMD_STORE_V2SI(v2si_vec6, aligned1(0))
-               C(2+LU_IND2,1+LU_IND11) = aligned1(0)+C(2+LU_IND2,1+
+               CALL SIMD_MULD(vec60, vec70, vec80)
+               CALL SIMD_STORE_V2SI(vec60, pdata2(0))
+               C(2+LU_IND2,1+LU_IND11) = pdata2(0)+C(2+LU_IND2,1+
      &         LU_IND11)
-               C(2+LU_IND2,1+LU_IND11) = aligned1(1)+C(2+LU_IND2,1+
+               C(2+LU_IND2,1+LU_IND11) = pdata2(1)+C(2+LU_IND2,1+
      &         LU_IND11)
             ENDDO
             C(2+LU_IND2,2+LU_IND11) = 0
             DO LU_IND011 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(v2si_vec11, B(1+LU_IND011,2+
-     &         LU_IND11))
-               CALL SIMD_LOAD_GENERIC_V2SI(v2si_vec10, A(2+LU_IND2,1+
+               CALL SIMD_LOAD_V2SI(vec110, B(1+LU_IND011,2+LU_IND11))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec100, A(2+LU_IND2,1+
      &         LU_IND011), A(2+LU_IND2,2+LU_IND011))
-               CALL SIMD_MULD(v2si_vec9, v2si_vec10, v2si_vec11)
-               CALL SIMD_STORE_V2SI(v2si_vec9, aligned2(0))
-               C(2+LU_IND2,2+LU_IND11) = aligned2(0)+C(2+LU_IND2,2+
+               CALL SIMD_MULD(vec90, vec100, vec110)
+               CALL SIMD_STORE_V2SI(vec90, pdata3(0))
+               C(2+LU_IND2,2+LU_IND11) = pdata3(0)+C(2+LU_IND2,2+
      &         LU_IND11)
-               C(2+LU_IND2,2+LU_IND11) = aligned2(1)+C(2+LU_IND2,2+
+               C(2+LU_IND2,2+LU_IND11) = pdata3(1)+C(2+LU_IND2,2+
      &         LU_IND11)
             ENDDO
          ENDDO

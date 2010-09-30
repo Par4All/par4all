@@ -1,0 +1,40 @@
+#
+delete merge08
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create merge08 merge08.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRAGMA_TYPE "expr"
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+setproperty OMP_MERGE_POLICY "inner"
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+apply OMP_MERGE_PRAGMA
+
+#echo "after merge_pragma"
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c merge08.database/Src/merge08.c -o merge08.database/Src/merge08.o
+
+close
+delete merge08
+quit
+# EOF

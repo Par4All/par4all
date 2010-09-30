@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 2
+setenv WSPACE vs_core_2_2
+setenv FILE $WSPACE.c
+setenv NAME vs_core_2
+source default_tpips

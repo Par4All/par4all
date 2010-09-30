@@ -75,7 +75,8 @@
 TARGET	= transformer
 
 LIB_CFILES =	basic.c convex_hull.c fix_point.c io.c \
-		transformer.c value.c prettyprint.c
+		transformer.c value.c prettyprint.c \
+		transformer_list.c
 
 INC_TARGET =    $(TARGET).h
 

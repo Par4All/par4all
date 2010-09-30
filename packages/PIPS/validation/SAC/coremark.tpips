@@ -1,18 +1,23 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS="coremark"
 delete $WS
-create $WS core_matrix.c core_util.c include/SIMD.c
+shell rm -rf $WS.tmp
+shell cp -r ${WS}_v1.0 $WS.tmp
+setenv PIPS_CPP_FLAGS "-Icoremark.tmp -Icoremark.tmp/linux -D_IN_PIPS"
+create $WS coremark.tmp/*.c coremark.tmp/linux/*.c include/SIMD.c
 
 echo
 echo Initial code
 echo
+make PRINTED_FILE[%ALL]
+apply SIMPLIFY_SUBSCRIPTS[calc_func]
 
-#module matrix_mul_const
-#source include/benchmark.tpips.h
-#module matrix_add_const
-#source include/benchmark.tpips.h
-#module matrix_mul_vect
-#source include/benchmark.tpips.h
+module matrix_mul_const
+source include/benchmark.tpips.h
+module matrix_add_const
+source include/benchmark.tpips.h
+module matrix_mul_vect
+source include/benchmark.tpips.h
 module matrix_mul_matrix
 source include/benchmark.tpips.h
 

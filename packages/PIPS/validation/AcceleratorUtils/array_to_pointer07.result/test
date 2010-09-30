@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 void atp(float *cdens);
 
-int main(int argc, char *argv);
+int main(int argc, char **argv);
 void atp(float *cdens)
 {
    int i;
@@ -31,10 +31,10 @@ void atp(float *cdens)
       *(cdens+1+i) = 0;
    }
 }
-int main(int argc, char *argv)
+int main(int argc, char **argv)
 {
-   float cdens[2048];
-   float *pdens[2] = (float **) malloc(sizeof(float *)*1024);
+   float *cdens = alloca(sizeof(float[1024][2]));
+   float *pdens = (float *) malloc(sizeof(float *)*1024);
    atp((float *) cdens+0);
-   atp(&(pdens+0));
+   atp(pdens+0);
 }

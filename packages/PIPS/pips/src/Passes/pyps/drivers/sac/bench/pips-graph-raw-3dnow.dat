@@ -1,0 +1,16 @@
+Compilation	gcc	gcc+sac
+jacobi.c 322252 337787
+ddot_r.c 26912 27763
+ddot_ur.c 26849 28298
+daxpy_r.c 2755637 2761931
+daxpy_ur.c 2752320 2762938
+dscal_r.c 2761746 2755265
+dscal_ur.c 2753894 2754985
+alphablending.c 294309 246953
+fir.c 2213293 2778090
+convol3x3.c 9208 5743
+average_power.c 211025 226262
+matrix_mul_const.c 13931 13754
+matrix_add_const.c 13847 13469
+matrix_mul_vect.c 12029 13215
+matrix_mul_matrix.c 10656272 11139276

@@ -1,0 +1,13 @@
+delete $WSPACE
+create $WSPACE $FILE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+module main
+activate PRINT_CODE_SIMPLE_POINTER_VALUES
+display PRINTED_FILE
+
+close
+delete $WSPACE
+quit

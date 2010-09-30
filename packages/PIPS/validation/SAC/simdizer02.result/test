@@ -12,17 +12,17 @@ void foo_l(int a[4], int b[4], int c[4])
 void foo_l(int a[4], int b[4], int c[4])
 {
    int tmp[4];
-   //PIPS:SAC generated int vector(s)
-   int v2si_vec0[2], v2si_vec1[2], v2si_vec2[2], v2si_vec3[2], v2si_vec4[2], v2si_vec5[2], v2si_vec6[2], v2si_vec7[2], v2si_vec8[2];
-   SIMD_LOAD_V2SI(v2si_vec2, &c[0]);
-   SIMD_LOAD_GENERIC_V2SI(v2si_vec1, b[0], b[0]);
-   SIMD_MULD(v2si_vec0, v2si_vec1, v2si_vec2);
-   SIMD_STORE_GENERIC_V2SI(v2si_vec0, &tmp[0], &tmp[2]);
-   SIMD_LOAD_V2SI(v2si_vec5, &c[2]);
-   SIMD_LOAD_GENERIC_V2SI(v2si_vec4, b[1], b[1]);
-   SIMD_MULD(v2si_vec3, v2si_vec4, v2si_vec5);
-   SIMD_STORE_GENERIC_V2SI(v2si_vec3, &tmp[1], &tmp[3]);
-   SIMD_ADDD(v2si_vec6, v2si_vec3, v2si_vec0);
-   SIMD_STORE_V2SI(v2si_vec6, &a[0]);
+   //PIPS:SAC generated v4hi vector(s)
+   v4hi vec00, vec10, vec20;
+   //PIPS:SAC generated v2si vector(s)
+   v2si vec30, vec40, vec50;
+   SIMD_LOAD_V4SI_TO_V4HI(vec20, &c[0]);
+   SIMD_LOAD_GENERIC_V4HI(vec10, b[0], b[0], b[1], b[1]);
+   SIMD_MULW(vec00, vec10, vec20);
+   SIMD_STORE_GENERIC_V4HI(vec00, &tmp[0], &tmp[2], &tmp[1], &tmp[3]);
+   SIMD_LOAD_GENERIC_V2SI(vec50, tmp[0], tmp[2]);
+   SIMD_LOAD_GENERIC_V2SI(vec40, tmp[1], tmp[3]);
+   SIMD_ADDD(vec30, vec40, vec50);
+   SIMD_STORE_V2SI(vec30, &a[0]);
 }
 

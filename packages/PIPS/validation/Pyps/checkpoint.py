@@ -1,6 +1,6 @@
 from pyps import *
 
-w = workspace(["basics0.c"])
+w= workspace(["basics0.c"])
 w.fun.foo.inlining(callers="malabar")
 w.checkpoint()
 w.fun.foo.inlining(callers="bar")
@@ -9,4 +9,4 @@ w.restore()
 w.fun.megablast.display()
 w.fun.foo.inlining(callers="megablast")
 w.fun.megablast.display()
-
+# no close as it makes everything segfault

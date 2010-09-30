@@ -183,6 +183,3 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete05 instead
-TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized
-TRANSFORMERS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized
-PRECONDITIONS_INTER_FULL[complete05] (NormalizeExpression) expression is already normalized

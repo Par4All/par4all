@@ -926,7 +926,7 @@ void update_common_references_in_regions()
 	 {
 	     list lef = effects_effects(effs);
 
-	     pips_debug(3, "statement %p (%d effects)\n",
+	     pips_debug(3, "statement %p (%zu effects)\n",
 			stat, gen_length((list) lef));
 
 	     // FI: Let's hope the rw effects do not have to be

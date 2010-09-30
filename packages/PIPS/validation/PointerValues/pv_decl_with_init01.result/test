@@ -1,0 +1,16 @@
+int main()
+{
+
+// Pointer values: none
+
+   int a;
+
+// Pointer values: none
+
+   int *b = &a;
+
+// Pointer values:
+// b == &a (exact);
+
+   return 0;
+}

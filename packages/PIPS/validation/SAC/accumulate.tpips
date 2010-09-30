@@ -22,8 +22,9 @@ close
 
 shell sed -i -e "1,/${WS}(/ d" $WS.database/Src/$WS.c
 shell sed -i -e "1 i #define MOD(a,b) (a)%(b)\n#define MAX0(a,b) (a>b)?a:b" $WS.database/Src/$WS.c
-shell cc -O3 -I. -march=native  $WS.c -o  $WS.database/Tmp/ref
-shell cc -O3 -I. -march=native  $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
+shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+shell cc -O3 -Iinclude -march=native  $WS.c -o  $WS.database/Tmp/ref
+shell cc -O3 -Iinclude -march=native  $WS.database/Src/$WS.c include/SIMD.c -o $WS.database/Tmp/seq
 shell ( test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/seq`" && echo ok ) || echo ko
 
 delete $WS

@@ -72,7 +72,8 @@ LIB_CFILES=	misc.c \
 		unstructured.c \
 		expression.c \
 		loop.c \
-		ri_to_total_preconditions.c
+		ri_to_total_preconditions.c \
+		ri_to_transformer_lists.c
 
 INC_TARGET =    $(TARGET).h
 

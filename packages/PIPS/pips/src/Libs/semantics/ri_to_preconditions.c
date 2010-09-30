@@ -691,13 +691,19 @@ transformer statement_to_postcondition(
 {
     transformer post = transformer_undefined;
     instruction i = statement_instruction(s);
+    /* FI: if the statement s is a loop, the transformer tf is not the
+       statement transformer but the transformer T* which maps the
+       precondition pre onto the loop body precondition. The real
+       statement transformer is obtained by executing the loop till
+       it is exited. See complete_any_loop_transformer() */
     transformer tf = load_statement_transformer(s);
 
     /* ACHTUNG! "pre" is likely to be misused! FI, Sept. 3, 1990 */
 
-    debug(1,"statement_to_postcondition","begin\n");
+    pips_debug(1,"begin\n");
 
-    pips_assert("The statement precondition is defined", pre != transformer_undefined);
+    pips_assert("The statement precondition is defined",
+		pre != transformer_undefined);
 
     ifdebug(1) {
 	int so = statement_ordering(s);
@@ -707,7 +713,8 @@ transformer statement_to_postcondition(
 	(void) print_transformer(pre) ;
     }
 
-    pips_assert("The statement transformer is defined", tf != transformer_undefined);
+    pips_assert("The statement transformer is defined",
+		tf != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
 	(void) fprintf(stderr, "statement %03td (%d,%d), transformer %p:\n",
@@ -808,14 +815,17 @@ transformer statement_to_postcondition(
 	if(!transformer_consistency_p(pre)) {
 	  ;
 	}
-/* 	pre = transformer_normalize(pre, 4); */
+	/* BC: pre = transformer_normalize(pre, 4); */
+	/* FI->BC: why keep a first normalization before the next
+	   one? */
 	pre = transformer_normalize(pre, 2);
 
 	if(!transformer_consistency_p(pre)) {
 	  ;
 	}
-/* 	pre = transformer_normalize(pre, 2); */
-	if (get_int_property("SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE") == 4)
+	/* pre = transformer_normalize(pre, 2); */
+	if(get_int_property("SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE")
+	   == 4)
 	  pre = transformer_normalize(pre, 4);
 	else
 	  pre = transformer_normalize(pre, 2);
@@ -829,7 +839,8 @@ transformer statement_to_postcondition(
 	    pips_internal_error("Non-consistent precondition after update\n");
 	}
 
-	/* Do not keep too many initial variables in the preconditions: not so smart?
+	/* Do not keep too many initial variables in the
+	 * preconditions: not so smart?
 	 *
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
@@ -845,8 +856,7 @@ transformer statement_to_postcondition(
 	pips_debug(8,"precondition already available\n");
 	/* pre = statement_precondition(s); */
 	(void) print_transformer(pre);
-	pips_error("statement_to_postcondition",
-		   "precondition already computed\n");
+	pips_internal_error("precondition already computed\n");
     }
 
     /* post = instruction_to_postcondition(pre, i, tf); */
@@ -867,9 +877,9 @@ transformer statement_to_postcondition(
 	print_transformer(post) ;
     }
 
-    pips_assert("statement_to_postcondition: unexpected sharing",post!=pre);
+    pips_assert("no sharing",post!=pre);
 
-    debug(1,"statement_to_postcondition","end\n");
+    pips_debug(1, "end\n");
 
     return post;
 }

@@ -7,6 +7,35 @@ void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
     a[2]=b[2];
     a[3]=b[3];
 }
+void SIMD_LOAD_V4HI_TO_V4SI(int a[4],unsigned int b[4])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+    a[3]=b[3];
+}
+void SIMD_STORE_V8HI_TO_V8SI(short a[8],unsigned short b[8])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+    a[3]=b[3];
+    a[4]=b[4];
+    a[5]=b[5];
+    a[6]=b[6];
+    a[7]=b[7];
+}
+void SIMD_LOAD_V8SI_TO_V8HI(unsigned short a[8],short b[8])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+    a[3]=b[3];
+    a[4]=b[4];
+    a[5]=b[5];
+    a[6]=b[6];
+    a[7]=b[7];
+}
 void SIMD_STORE_V4SF_TO_V4SI(float a[4], int b[4])
 {
     b[0]=a[0];

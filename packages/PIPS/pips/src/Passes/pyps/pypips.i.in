@@ -35,12 +35,20 @@
 %exception {
     CATCH(any_exception_error)
     {
-        SWIG_exception(SWIG_UnknownError,"pips user error");
+        SWIG_exception(SWIG_UnknownError,pyps_last_error);
+        free(pyps_last_error);
+        pyps_last_error=0;
     }
     TRY {
         $action
-        if((void*)$symname != (void*)atinit) // this is because atinit creates the exception handler, so it had no exception handler when calling throw
-            UNCATCH(any_exception_error);
+	    if((void*)$symname != (void*)atinit) {
+		// this is because atinit creates the exception handler, so it had no exception handler when calling throw
+		if (pyps_last_error) {
+		    free(pyps_last_error);
+		    pyps_last_error = NULL;
+		}
+		UNCATCH(any_exception_error);
+	    }
     }
 }
 

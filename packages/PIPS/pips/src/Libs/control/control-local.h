@@ -26,4 +26,11 @@
 #ifndef CONTROL_INCLUDED
 #define CONTROL_INCLUDED
 
+/* Define the environment variables used to select which controlizer
+   version to use independently of which one was activated at the pipsmake
+   level: */
+/* The name of the one to force the use of the new controlizer: */
+#define USE_NEW_CONTROLIZER_ENV_VAR_NAME "PIPS_USE_NEW_CONTROLIZER"
+/* The name of the one to force the use of the old controlizer: */
+#define USE_OLD_CONTROLIZER_ENV_VAR_NAME "PIPS_USE_OLD_CONTROLIZER"
 #endif

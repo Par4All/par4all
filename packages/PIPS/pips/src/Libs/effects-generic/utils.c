@@ -789,11 +789,17 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
           access path. This avoids computing it at each step.
    @param act is the action of the generated effects :
               'r' for read, 'w' for write, and 'x' for read and write.
+   @param level represents the maximum number of dereferencing dimensions
+          in the resulting effects.
+   @param pointer_only must be set to true to only generate paths to pointers.
    @return a list of effects on all the accessible paths from eff reference.
  */
-list generic_effect_generate_all_accessible_paths_effects(effect eff,
-							  type eff_type,
-							  tag act)
+list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
+								     type eff_type,
+								     tag act,
+								     bool add_eff,
+								     int level,
+								     bool pointers_only)
 {
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
@@ -807,24 +813,14 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
     }
   else
     {
-      reference ref = effect_any_reference(eff);
-      entity ent = reference_variable(ref);
-      type t = ultimate_type(entity_type(ent));
-      int d = effect_type_depth(t);
       effect eff_write = effect_undefined;
 
       /* this may lead to memory leak if no different access path is
 	 reachable */
       eff_write = (*effect_dup_func)(eff);
 
-      ifdebug(6)
-	{
-	  pips_debug(6, "considering effect : \n");
-	  (*effect_prettyprint_func)(eff);
-	  pips_debug(6, " with entity effect type depth %d \n",
-		     d);
-	}
-
+      pips_debug(6, "level is %d\n", level);
+      pips_debug_effect(6, "considering effect : \n", eff);
 
       switch (type_tag(eff_type))
 	{
@@ -832,7 +828,7 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	  {
 	    variable v = type_variable(eff_type);
 	    basic b = variable_basic(v);
-	    bool add_effect = false;
+	    bool add_array_dims = false;
 
 	    pips_debug(8, "variable case, of dimension %d\n",
 		       (int) gen_length(variable_dimensions(v)));
@@ -843,40 +839,84 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	      {
 		(*effect_add_expression_dimension_func)
 		  (eff_write, make_unbounded_expression());
-		add_effect = true;
+		add_array_dims = true;
 	      }
-	    /* And add the generated effect */
-	    if (add_effect)
-	      {
-		l_res = gen_nconc
-		  (l_res,
-		   effect_to_effects_with_given_tag(eff_write,act));
-		add_effect = false;
-	      }
-
+	    
 	    /* If the basic is a pointer type, we must add an effect
 	       with a supplementary dimension, and then recurse
                on the pointed type.
 	    */
 	    if(basic_pointer_p(b))
 	      {
-		pips_debug(8, "pointer case, \n");
+		if (add_array_dims || add_eff)
+		  l_res = gen_nconc
+		    (l_res,
+		     effect_to_effects_with_given_tag(eff_write,act));
+		if (level > 0)
+		  {
+		    pips_debug(8, "pointer case, \n");
+		    
+		    eff_write = (*effect_dup_func)(eff_write);
+		    (*effect_add_expression_dimension_func)
+		      (eff_write, make_unbounded_expression());
+		    
+		    l_res = gen_nconc
+		      (l_res,
+		       effect_to_effects_with_given_tag(eff_write,act));
+		    
+		    l_res = gen_nconc
+		      (l_res,
+		       generic_effect_generate_all_accessible_paths_effects_with_level
+		       (eff_write,  basic_pointer(b), act, false, level - 1, pointers_only));
+		  }
+		else
+		  {
+		    pips_debug(8, "pointer case with level == 0 -> no additional dimension\n");		    
+		  }
+	      }
+	    else if (basic_derived_p(b))
+	      {		
+		if (!type_enum_p(entity_type(basic_derived(b))))
+		  {
+		    pips_debug(8, "struct or union case\n");
+		    list l_fields = type_fields(entity_type(basic_derived(b)));
+		    FOREACH(ENTITY, f, l_fields)
+		      {
+			type current_type = basic_concrete_type(entity_type(f));
+			effect current_eff = (*effect_dup_func)(eff_write);
 
-		eff_write = (*effect_dup_func)(eff_write);
-		(*effect_add_expression_dimension_func)
-		  (eff_write, make_unbounded_expression());
+			// we add the field index
+			effect_add_field_dimension(current_eff, f);
 
-		l_res = gen_nconc
-		  (l_res,
-		   effect_to_effects_with_given_tag(eff_write,act));
-
-		l_res = gen_nconc
-		  (l_res,
-		   generic_effect_generate_all_accessible_paths_effects
-		   (eff_write,  basic_pointer(b), act));
-
+			// and call ourselves recursively
+			l_res = gen_nconc
+			  (l_res,
+			   generic_effect_generate_all_accessible_paths_effects_with_level
+			   (current_eff,  current_type, act, true, level, pointers_only));
+			free_type(current_type);
+		      }
+		  }
+	      }
+	    else if (!basic_typedef_p(b))
+	      {
+		
+		if (!pointers_only && (add_array_dims || add_eff))
+		  l_res = gen_nconc
+		    (l_res,
+		     effect_to_effects_with_given_tag(eff_write,act));
+	      }
+	    else
+	      {
+		pips_internal_error("unexpected typedef basic\n");
 	      }
 
+	    break;
+	  }
+	case is_type_void:
+	  {
+	    pips_debug(8, "void case\n");
+	    if (add_eff)
+	      l_res = CONS(EFFECT, eff, NIL);
 	    break;
 	  }
 	default:
@@ -887,8 +927,30 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 
     } /* else */
 
+  pips_debug_effects(8, "output effects:\n", l_res);
 
   return(l_res);
+}
+
+/**
+   @param eff is an effect whose reference is the beginning access path.
+          it is not modified or re-used.
+   @param eff_type is the type of the object represented by the effect
+          access path. This avoids computing it at each step.
+   @param act is the action of the generated effects :
+              'r' for read, 'w' for write, and 'x' for read and write.
+   @return a list of effects on all the accessible paths from eff reference.
+ */
+list generic_effect_generate_all_accessible_paths_effects(effect eff,
+							  type eff_type,
+							  tag act)
+{
+  return generic_effect_generate_all_accessible_paths_effects_with_level(eff,
+									 eff_type,
+									 act,
+									 false,
+									 INT_MAX,
+									 false);
 }
 
 /******************************************************************/

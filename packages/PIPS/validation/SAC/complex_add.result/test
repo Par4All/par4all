@@ -142,24 +142,24 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       LU_NUB00 = dim2;
       LU_IB00 = MOD(LU_NUB00, 4);
       for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         //PIPS:SAC generated double vector(s)
-         double v2df_vec0[2], v2df_vec1[2];
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &a[i][LU_IND0].re);
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec0, &b[i][LU_IND0].re);
-         SIMD_ADDPD(v2df_vec0, v2df_vec0, v2df_vec1);
-         SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &b[i][LU_IND0].re);
+         //PIPS:SAC generated v2df vector(s)
+         v2df vec00, vec10;
+         SIMD_LOAD_V2SF_TO_V2DF(vec10, &a[i][LU_IND0].re);
+         SIMD_LOAD_V2SF_TO_V2DF(vec00, &b[i][LU_IND0].re);
+         SIMD_ADDPD(vec00, vec00, vec10);
+         SIMD_STORE_V2DF_TO_V2SF(vec00, &b[i][LU_IND0].re);
       }
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4], v4sf_vec5[4];
-         SIMD_LOAD_V4SF(v4sf_vec3, &a[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec2, v4sf_vec2, v4sf_vec3);
-         SIMD_STORE_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec5, &a[i][2+LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec4, v4sf_vec4, v4sf_vec5);
-         SIMD_STORE_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
+         //PIPS:SAC generated v4sf vector(s)
+         v4sf vec20, vec30, vec40, vec50;
+         SIMD_LOAD_V4SF(vec30, &a[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_ADDPS(vec20, vec20, vec30);
+         SIMD_STORE_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec50, &a[i][2+LU_IND0].re);
+         SIMD_LOAD_V4SF(vec40, &b[i][2+LU_IND0].re);
+         SIMD_ADDPS(vec40, vec40, vec50);
+         SIMD_STORE_V4SF(vec40, &b[i][2+LU_IND0].re);
       }
    }
    ;
@@ -173,24 +173,24 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       LU_NUB00 = dim2;
       LU_IB00 = MOD(LU_NUB00, 4);
       for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         //PIPS:SAC generated double vector(s)
-         double v2df_vec0[2], v2df_vec1[2];
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &a[i][LU_IND0].re);
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec0, &b[i][LU_IND0].re);
-         SIMD_ADDPD(v2df_vec0, v2df_vec0, v2df_vec1);
-         SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &b[i][LU_IND0].re);
+         //PIPS:SAC generated v2df vector(s)
+         v2df vec00, vec10;
+         SIMD_LOAD_V2SF_TO_V2DF(vec10, &a[i][LU_IND0].re);
+         SIMD_LOAD_V2SF_TO_V2DF(vec00, &b[i][LU_IND0].re);
+         SIMD_ADDPD(vec00, vec00, vec10);
+         SIMD_STORE_V2DF_TO_V2SF(vec00, &b[i][LU_IND0].re);
       }
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4], v4sf_vec5[4];
-         SIMD_LOAD_V4SF(v4sf_vec3, &a[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec2, v4sf_vec2, v4sf_vec3);
-         SIMD_STORE_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec5, &a[i][2+LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec4, v4sf_vec4, v4sf_vec5);
-         SIMD_STORE_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
+         //PIPS:SAC generated v4sf vector(s)
+         v4sf vec20, vec30, vec40, vec50;
+         SIMD_LOAD_V4SF(vec30, &a[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_ADDPS(vec20, vec20, vec30);
+         SIMD_STORE_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec50, &a[i][2+LU_IND0].re);
+         SIMD_LOAD_V4SF(vec40, &b[i][2+LU_IND0].re);
+         SIMD_ADDPS(vec40, vec40, vec50);
+         SIMD_STORE_V4SF(vec40, &b[i][2+LU_IND0].re);
       }
    }
    ;
@@ -204,24 +204,24 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       LU_NUB00 = dim2;
       LU_IB00 = MOD(LU_NUB00, 4);
       for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         //PIPS:SAC generated double vector(s)
-         double v2df_vec0[2], v2df_vec1[2];
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec1, &a[i][LU_IND0].re);
-         SIMD_LOAD_V2SF_TO_V2DF(v2df_vec0, &b[i][LU_IND0].re);
-         SIMD_ADDPD(v2df_vec0, v2df_vec0, v2df_vec1);
-         SIMD_STORE_V2DF_TO_V2SF(v2df_vec0, &b[i][LU_IND0].re);
+         //PIPS:SAC generated v2df vector(s)
+         v2df vec00, vec10;
+         SIMD_LOAD_V2SF_TO_V2DF(vec10, &a[i][LU_IND0].re);
+         SIMD_LOAD_V2SF_TO_V2DF(vec00, &b[i][LU_IND0].re);
+         SIMD_ADDPD(vec00, vec00, vec10);
+         SIMD_STORE_V2DF_TO_V2SF(vec00, &b[i][LU_IND0].re);
       }
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //PIPS:SAC generated float vector(s)
-         float v4sf_vec2[4], v4sf_vec3[4], v4sf_vec4[4], v4sf_vec5[4];
-         SIMD_LOAD_V4SF(v4sf_vec3, &a[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec2, v4sf_vec2, v4sf_vec3);
-         SIMD_STORE_V4SF(v4sf_vec2, &b[i][LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec5, &a[i][2+LU_IND0].re);
-         SIMD_LOAD_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
-         SIMD_ADDPS(v4sf_vec4, v4sf_vec4, v4sf_vec5);
-         SIMD_STORE_V4SF(v4sf_vec4, &b[i][2+LU_IND0].re);
+         //PIPS:SAC generated v4sf vector(s)
+         v4sf vec20, vec30, vec40, vec50;
+         SIMD_LOAD_V4SF(vec30, &a[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_ADDPS(vec20, vec20, vec30);
+         SIMD_STORE_V4SF(vec20, &b[i][LU_IND0].re);
+         SIMD_LOAD_V4SF(vec50, &a[i][2+LU_IND0].re);
+         SIMD_LOAD_V4SF(vec40, &b[i][2+LU_IND0].re);
+         SIMD_ADDPS(vec40, vec40, vec50);
+         SIMD_STORE_V4SF(vec40, &b[i][2+LU_IND0].re);
       }
    }
    ;

@@ -1882,7 +1882,26 @@ static transformer instruction_to_transformer(instruction i,
  * statement_to_transformer() returns a transformer which is not the
  * transformer stored for the statement.
  */
-transformer complete_statement_transformer(transformer t, transformer pre, statement s)
+transformer complete_statement_transformer(transformer t,
+					   transformer pre,
+					   statement s)
+{
+  return generic_complete_statement_transformer(t, pre, s, TRUE);
+}
+
+/* FI: only implemented for while loops */
+transformer complete_non_identity_statement_transformer(transformer t,
+							transformer pre,
+							statement s)
+{
+  return generic_complete_statement_transformer(t, pre, s, FALSE);
+}
+
+
+transformer generic_complete_statement_transformer(transformer t,
+						   transformer pre,
+						   statement s,
+						   bool identity_p)
 {
   /* If i is a loop, the expected transformer can be more complex (see
      nga06) because the stores transformer is later used to compute the
@@ -1905,7 +1924,7 @@ transformer complete_statement_transformer(transformer t, transformer pre, state
     evaluation e = whileloop_evaluation(w);
 
     if(evaluation_before_p(e)) {
-      ct = new_complete_whileloop_transformer(t, pre, w);
+      ct = new_complete_whileloop_transformer(t, pre, w, !identity_p);
     }
     else {
       ct = complete_repeatloop_transformer(t, pre, w);
@@ -1915,8 +1934,17 @@ transformer complete_statement_transformer(transformer t, transformer pre, state
     ct = complete_forloop_transformer(t, pre, instruction_forloop(i));
   }
   else {
-    /* No need to ccomplete it */
-    ct = copy_transformer(t);
+    if(identity_p) {
+      /* No need to complete it */
+      ct = copy_transformer(t);
+    }
+    else {
+      /* The search for an non identity execution path must be propagated
+	 downwards */
+      if(instruction_sequence_p(i)) {
+	/* Each component may or not update the state... */
+      }
+    }
   }
   return ct;
 }

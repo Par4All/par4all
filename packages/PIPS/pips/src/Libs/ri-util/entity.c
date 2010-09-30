@@ -1592,10 +1592,7 @@ bool member_entity_p(entity e)
 /* is p a formal parameter? */
 bool entity_formal_p(entity p)
 {
-  storage es = entity_storage(p);
-  bool is_formal = storage_formal_p(es);
-
-  return is_formal;
+    return formal_parameter_p(p);
 }
 
 /* is p a dummy parameter? */
@@ -1725,7 +1722,7 @@ entity entity_to_module_entity(entity e)
   }
 
   pips_assert("entity m is defined", !entity_undefined_p(m));
-  pips_assert("entity m is a module", entity_module_p(m));
+  pips_assert("entity m is a module or top_level_entity", entity_module_p(m)||top_level_entity_p(e) );
 
   return m;
 }
