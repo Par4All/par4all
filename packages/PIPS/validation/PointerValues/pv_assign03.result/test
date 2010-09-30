@@ -1,0 +1,34 @@
+int main()
+{
+
+// Pointer values: none
+
+   mystruct s1;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   mystruct s2;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   s2 = s1;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == s1[.a] (exact);
+// s2[.b][*] == s1[.b][*] (may);
+// s2[.c] == s1[.c] (exact);
+
+   return 0;
+}

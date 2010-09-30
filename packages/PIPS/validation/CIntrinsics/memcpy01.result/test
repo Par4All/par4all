@@ -21,7 +21,7 @@ int main()
    char str1[] = "Sample string";
    char str2[40];
    char str3[40];
-//               <must be read   >: str1[*]
+//               <must be read   >: str1[0:strlen(str1)+1-1]
 //               <must be written>: res str2[0:strlen(str1)+1-1]
    char *res = memcpy(str2, str1, strlen(str1)+1);
 //               <must be written>: str3[0:16-1]

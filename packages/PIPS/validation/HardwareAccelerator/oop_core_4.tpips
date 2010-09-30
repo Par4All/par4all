@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 4
+setenv WSPACE oop_core_4
+setenv FILE $WSPACE.c
+setenv NAME oop_core
+source default_tpips

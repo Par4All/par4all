@@ -75,7 +75,7 @@ l300:      ;
          {
             //PIPS:SAC generated float vector(s)
             float v4sf_vec3[4];
-            //SAC generated temporary array
+            //PIPS:SAC generated variable
             float aligned[4] = {0, 0, 0, 0};
             //PIPS:SAC generated float vector(s)
             float v4sf_vec0[4];

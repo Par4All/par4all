@@ -77,7 +77,5 @@ INITIAL_PRECONDITION[strip_mining01] (add_or_kill_equivalenced_variables) storag
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning strip_mining01 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[strip_mining01] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[strip_mining01] (NormalizeExpression) expression is already normalized
-TRANSFORMERS_INTER_FULL[strip_mining01] (NormalizeExpression) expression is already normalized
 PRECONDITIONS_INTER_FULL[strip_mining01] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[strip_mining01] (add_or_kill_equivalenced_variables) storage return

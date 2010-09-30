@@ -1,0 +1,32 @@
+#
+delete array_2d
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array_2d array_2d.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+apply INTERNALIZE_PARALLEL_CODE
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c array_2d.database/Src/array_2d.c -o array_2d.database/Src/array_2d.o
+
+close
+delete array_2d
+quit
+# EOF

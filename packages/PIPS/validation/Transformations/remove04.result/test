@@ -45,7 +45,7 @@ after array to pointer
 
 int volume()
 {
-   int a[65536];
+   int a[256][256];
    int v = 0;
    int i, j;
    //PIPS generated variable

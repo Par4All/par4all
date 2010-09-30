@@ -1,0 +1,25 @@
+delete array01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array01 array01.f90
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+display PRINTED_FILE(%ALL)
+
+apply UNSPLIT (%ALL)
+shell gcc -fopenmp -c array01.database/Src/array01.f90 -o array01.database/Src/array01.o
+
+close
+delete array01
+quit
+# EOF

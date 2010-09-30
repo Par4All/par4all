@@ -1,0 +1,11 @@
+int main()
+{
+
+// Pointer values: none
+
+   int a[10];
+
+// Pointer values: none
+
+   return 0;
+}

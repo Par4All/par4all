@@ -1,0 +1,11 @@
+PROGRAM ARRAY01
+   INTEGER :: J, I
+   INTEGER :: B(1:100, 1:100)
+   I = 0
+   J = 0
+   DO I = 1, 100
+      DO J = 1, 100
+         B(J,I) = I
+      ENDDO
+   ENDDO
+END PROGRAM ARRAY01

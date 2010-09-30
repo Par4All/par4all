@@ -41,6 +41,58 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER I
+      REAL*4 RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+
+c      INCLUDE 'ALPHABLENDING_INC2.f'
+
+      DO 10 I = 1, SIZE                                                 0015
+         RESULT(I) = ALPHA*SRC(I)+(1-ALPHA)*DEST(I)                     0016
+10       CONTINUE                                                       0017
+
+      END
+      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE = 50000)
+      INTEGER I
+      REAL*4 RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+
+c      INCLUDE 'ALPHABLENDING_INC2.f'
+
+      DO 10 I = 1, SIZE                                                 0015
+         RESULT(I) = ALPHA*SRC(I)+(1-ALPHA)*DEST(I)                     0016
+10       CONTINUE                                                       0017
+
+      END
+      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE = 50000)
+      INTEGER I
+      REAL*4 RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+
+c      INCLUDE 'ALPHABLENDING_INC2.f'
+
+      DO 10 I = 1, SIZE                                                 0015
+         RESULT(I) = ALPHA*SRC(I)+(1-ALPHA)*DEST(I)                     0016
+10       CONTINUE                                                       0017
+
+      END
+      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE = 50000)
+      INTEGER I
+      REAL*4 RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+
+c      INCLUDE 'ALPHABLENDING_INC2.f'
+
+      DO 10 I = 1, SIZE                                                 0015
+         RESULT(I) = ALPHA*SRC(I)+(1-ALPHA)*DEST(I)                     0016
+10       CONTINUE                                                       0017
+
+      END
+      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE = 50000)
+      INTEGER I
       REAL*4 F_3, F_2, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:
      &SIZE), ALPHA
 
@@ -175,15 +227,66 @@ c SIMD_COMMENT_4
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      REAL*4 F_3, F_2, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:
+     &SIZE), ALPHA
+
+c      INCLUDE 'ALPHABLENDING_INC2.f'
+
+99999 CONTINUE
+      DO 99998 LU_IND0 = 0, 49999, 4
+c SIMD_COMMENT_0
+         F_0 = ALPHA*SRC(LU_IND0+1)
+c SIMD_COMMENT_1
+         F_1 = -ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1+1
+c SIMD_COMMENT_3
+         F_3 = F_2*DEST(LU_IND0+1)
+c SIMD_COMMENT_4
+         RESULT(LU_IND0+1) = F_0+F_3
+c SIMD_COMMENT_0
+         F_0 = ALPHA*SRC(LU_IND0+2)
+c SIMD_COMMENT_1
+         F_1 = -ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1+1
+c SIMD_COMMENT_3
+         F_3 = F_2*DEST(LU_IND0+2)
+c SIMD_COMMENT_4
+         RESULT(LU_IND0+2) = F_0+F_3
+c SIMD_COMMENT_0
+         F_0 = ALPHA*SRC(LU_IND0+3)
+c SIMD_COMMENT_1
+         F_1 = -ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1+1
+c SIMD_COMMENT_3
+         F_3 = F_2*DEST(LU_IND0+3)
+c SIMD_COMMENT_4
+         RESULT(LU_IND0+3) = F_0+F_3
+c SIMD_COMMENT_0
+         F_0 = ALPHA*SRC(LU_IND0+4)
+c SIMD_COMMENT_1
+         F_1 = -ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1+1
+c SIMD_COMMENT_3
+         F_3 = F_2*DEST(LU_IND0+4)
+c SIMD_COMMENT_4
+         RESULT(LU_IND0+4) = F_0+F_3
+99998    CONTINUE
+
+      END
+      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
+      INTEGER*4 SIZE
+      PARAMETER (SIZE = 50000)
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       REAL*4 F_03, F_13, F_23, F_33, F_02, F_12, F_22, F_32, F_01, 
      &F_11, F_21, F_31, F_00, F_10, F_20, F_30, F_3, F_2, F_1, F_0, 
      &RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 
-      LU_NUB0 = 50000
-      LU_IB0 = 0
-      LU_IND0 = 0
 99999 CONTINUE
       DO 99998 LU_IND0 = 0, 49999, 4
 c SIMD_COMMENT_0
@@ -227,145 +330,6 @@ c SIMD_COMMENT_3
 c SIMD_COMMENT_4
          RESULT(LU_IND0+4) = F_00+F_30
 99998    CONTINUE
-      I = 50001
-
-      END
-      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
-      INTEGER*4 SIZE
-      PARAMETER (SIZE = 50000)
-      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER aligned2(0:3)
-      REAL*4 v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
-     &aligned4(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3)
-     &, aligned3(0:3), v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3)
-     &, aligned1(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), aligned0(0:3)
-     &, aligned(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3)
-     &, F_03, F_13, F_23, F_33, F_02, F_12, F_22, F_32, F_01, F_11, 
-     &F_21, F_31, F_00, F_10, F_20, F_30, F_3, F_2, F_1, F_0, RESULT(
-     &1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
-      aligned2(3) = 1
-      aligned2(2) = 1
-      aligned2(1) = 1
-      aligned2(0) = 1
-      aligned(3) = ALPHA
-      aligned(2) = ALPHA
-      aligned(1) = ALPHA
-      aligned(0) = ALPHA
-
-c      INCLUDE 'ALPHABLENDING_INC2.f'
-
-      LU_NUB0 = 50000
-      LU_IB0 = 0
-      LU_IND0 = 0
-99999 CONTINUE
-      DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(1+LU_IND0))
-         CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
-         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
-         CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
-         CALL SIMD_UMINPS(v4sf_vec3, v4sf_vec1)
-         CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
-         CALL SIMD_LOAD_V4SI_TO_V4SF(v4sf_vec7, aligned2(0))
-         CALL SIMD_ADDPS(v4sf_vec5, v4sf_vec3, v4sf_vec7)
-         CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
-         CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
-         CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
-         CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
-         CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
-99998    CONTINUE
-      I = 50001
-
-      END
-      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
-      INTEGER*4 SIZE
-      PARAMETER (SIZE = 50000)
-      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER aligned2(0:3)
-      REAL*4 v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
-     &aligned4(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3)
-     &, aligned3(0:3), v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3)
-     &, aligned1(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), aligned0(0:3)
-     &, aligned(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3)
-     &, F_03, F_13, F_23, F_33, F_02, F_12, F_22, F_32, F_01, F_11, 
-     &F_21, F_31, F_00, F_10, F_20, F_30, F_3, F_2, F_1, F_0, RESULT(
-     &1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
-      aligned2(3) = 1
-      aligned2(2) = 1
-      aligned2(1) = 1
-      aligned2(0) = 1
-      aligned(3) = ALPHA
-      aligned(2) = ALPHA
-      aligned(1) = ALPHA
-      aligned(0) = ALPHA
-
-c      INCLUDE 'ALPHABLENDING_INC2.f'
-
-      LU_NUB0 = 50000
-      LU_IB0 = 0
-      LU_IND0 = 0
-99999 CONTINUE
-      CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
-      CALL SIMD_LOAD_V4SI_TO_V4SF(v4sf_vec7, aligned2(0))
-      DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(1+LU_IND0))
-         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
-         CALL SIMD_UMINPS(v4sf_vec3, v4sf_vec1)
-         CALL SIMD_ADDPS(v4sf_vec5, v4sf_vec3, v4sf_vec7)
-         CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
-         CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
-         CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
-99998    CONTINUE
-      CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
-      I = 50001
-
-      END
-      SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
-      INTEGER*4 SIZE
-      PARAMETER (SIZE = 50000)
-      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER aligned2(0:3)
-      REAL*4 v4sf_vec11(0:3), aligned4(0:3), v4sf_vec10(0:3), 
-     &v4sf_vec8(0:3), aligned3(0:3), v4sf_vec7(0:3), v4sf_vec5(0:3), 
-     &aligned1(0:3), v4sf_vec3(0:3), aligned0(0:3), aligned(0:3), 
-     &v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), RESULT(1:SIZE)
-     &, SRC(1:SIZE), DEST(1:SIZE), ALPHA
-      aligned2(3) = 1
-      aligned2(2) = 1
-      aligned2(1) = 1
-      aligned2(0) = 1
-      aligned(3) = ALPHA
-      aligned(2) = ALPHA
-      aligned(1) = ALPHA
-      aligned(0) = ALPHA
-
-c      INCLUDE 'ALPHABLENDING_INC2.f'
-
-      LU_NUB0 = 50000
-      LU_IB0 = 0
-      LU_IND0 = 0
-99999 CONTINUE
-      CALL SIMD_LOAD_V4SF(v4sf_vec1, aligned(0))
-      CALL SIMD_LOAD_V4SI_TO_V4SF(v4sf_vec7, aligned2(0))
-      DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(1+LU_IND0))
-         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
-         CALL SIMD_UMINPS(v4sf_vec3, v4sf_vec1)
-         CALL SIMD_ADDPS(v4sf_vec5, v4sf_vec3, v4sf_vec7)
-         CALL SIMD_LOAD_V4SF(v4sf_vec10, DEST(1+LU_IND0))
-         CALL SIMD_MULPS(v4sf_vec8, v4sf_vec5, v4sf_vec10)
-         CALL SIMD_ADDPS(v4sf_vec11, v4sf_vec0, v4sf_vec8)
-         CALL SIMD_STORE_V4SF(v4sf_vec11, RESULT(1+LU_IND0))
-99998    CONTINUE
-      CALL SIMD_STORE_V4SF(v4sf_vec0, aligned0(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec3, aligned1(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec5, aligned3(0))
-      CALL SIMD_STORE_V4SF(v4sf_vec8, aligned4(0))
-      I = 50001
 
       END
 /* C pretty print for module ALPHABLENDING. */
@@ -373,58 +337,43 @@ void
 alphablending (float result[50000], float src[50000], float dest[50000],
 	       float alpha)
 {
-  float v4sf_vec11[4];
-  float aligned4[4];
-  float v4sf_vec10[4];
-  float v4sf_vec8[4];
-  float aligned3[4];
-  int aligned2[4];
-  float v4sf_vec7[4];
-  float v4sf_vec5[4];
-  float aligned1[4];
-  float v4sf_vec3[4];
-  float aligned0[4];
-  float aligned[4];
-  float v4sf_vec2[4];
-  float v4sf_vec1[4];
-  float v4sf_vec0[4];
+  v4sf vec110;
+  v4sf vec100;
+  v4sf vec80;
+  a4si pdata3;
+  v4sf vec70;
+  v4sf vec50;
+  v4sf vec30;
+  a4sf pdata0;
+  v4sf vec20;
+  v4sf vec10;
+  v4sf vec00;
   int lu_ind0;
-  int lu_ib0;
-  int lu_nub0;
   static const int size = 50000;
-  int i;
 
-  aligned2[3] = 1;
-  aligned2[2] = 1;
-  aligned2[1] = 1;
-  aligned2[0] = 1;
-  aligned[3] = alpha;
-  aligned[2] = alpha;
-  aligned[1] = alpha;
-  aligned[0] = alpha;
-  lu_nub0 = 50000;
-  lu_ib0 = 0;
-  lu_ind0 = 0;
+  pdata3[3] = 1;
+  pdata3[2] = 1;
+  pdata3[1] = 1;
+  pdata3[0] = 1;
+  pdata0[3] = alpha;
+  pdata0[2] = alpha;
+  pdata0[1] = alpha;
+  pdata0[0] = alpha;
   ;
-  simd_load_v4sf (v4sf_vec1, aligned[0]);
-  simd_load_v4si_to_v4sf (v4sf_vec7, aligned2[0]);
+  simd_load_v4sf (vec10, pdata0[0]);
+  simd_load_v4si_to_v4sf (vec70, pdata3[0]);
   for (lu_ind0 = 0; lu_ind0 <= 49999; lu_ind0 += 4)
     {
-      simd_load_v4sf (v4sf_vec2, src[(1 + lu_ind0) - 1]);
-      simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      simd_uminps (v4sf_vec3, v4sf_vec1);
-      simd_addps (v4sf_vec5, v4sf_vec3, v4sf_vec7);
-      simd_load_v4sf (v4sf_vec10, dest[(1 + lu_ind0) - 1]);
-      simd_mulps (v4sf_vec8, v4sf_vec5, v4sf_vec10);
-      simd_addps (v4sf_vec11, v4sf_vec0, v4sf_vec8);
-      simd_store_v4sf (v4sf_vec11, result[(1 + lu_ind0) - 1]);
+      simd_load_v4sf (vec20, src[(1 + lu_ind0) - 1]);
+      simd_mulps (vec00, vec10, vec20);
+      simd_uminps (vec30, vec10);
+      simd_addps (vec50, vec30, vec70);
+      simd_load_v4sf (vec100, dest[(1 + lu_ind0) - 1]);
+      simd_mulps (vec80, vec50, vec100);
+      simd_addps (vec110, vec00, vec80);
+      simd_store_v4sf (vec110, result[(1 + lu_ind0) - 1]);
       continue;
     }
-  simd_store_v4sf (v4sf_vec0, aligned0[0]);
-  simd_store_v4sf (v4sf_vec3, aligned1[0]);
-  simd_store_v4sf (v4sf_vec5, aligned3[0]);
-  simd_store_v4sf (v4sf_vec8, aligned4[0]);
-  i = 50001;
   return;
 }
 

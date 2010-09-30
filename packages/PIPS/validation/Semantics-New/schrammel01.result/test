@@ -1,0 +1,97 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(x1,x2,y) {}
+
+   int x1, y, x2;
+
+//  T() {x1<=1, 1<=x1+x2, x2<=1}
+
+   x1<=1&&x2<=1&&x1+x2>=1?(void) 0:__assert_fail("x1<=1 && x2<=1 && x1+x2>=1", "./schrammel01.c", 10, (const char *) 0);
+
+//  T(y) {x1<=1, 1<=x1+x2, x2<=1}
+
+   y = foo();
+
+//  T(x1,x2,y) {x1#init+x2<=x1+x2#init, x1+2x2#init<=x1#init+2x2,
+//    x1#init+x2+y#init<=x1+x2#init+y,
+//    x1+2x2#init+y<=x1#init+2x2+y#init, 1<=x1+x2, x2<=x1+1,
+//    2x1<=3x2+2, 2x1+y<=2x2+3, 2x1+x2+y<=6, x1#init<=1,
+//    1<=x1#init+x2#init, 2x1#init+x2#init+y#init<=6, x2<=y+2,
+//    x2#init<=1, x2#init<=y#init+2, 0<=y, y<=1, 0<=y#init, y#init<=1}
+
+   while (2*x1+x2+y<=6&&x2-y<=2&&0<=y&&y<=1) {
+
+//  T(x1) {x1#init+y==x1-1, 2x1#init+x2+y<=6, x2<=y+2, 0<=y, y<=1}
+
+      x1 = x1+y+1;
+
+//  T(x2) {x2==x2#init+1, 2x1+x2<=y+9, x2<=y+3, 0<=y, y<=1}
+
+      x2++;
+
+//  T(y) {2x1+x2<=y#init+9, x2<=y#init+3, 0<=y#init, y#init<=1}
+
+      y = foo();
+   }
+
+//  T(y) {y==y#init, 0<=x1+2, x1<=4, 1<=x1+x2, x2<=x1+1, 2x2<=x1+4,
+//    x1<=2x2+1, x1<=x2+2, x1+2x2<=10, 2x1+x2<=10, 3x1+x2<=17,
+//    3x1+2x2<=20, 5x1+2x2<=26, 0<=x2}
+
+   // Expected result: 1<=x1+x2, x1<=x2+2, x2<=x1+1, x1<=2x2+1, x2<=3, 2x1+x2<=10
+   y = y;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int x1, y, x2;
+
+//  P(x1,x2,y) {}
+
+   x1<=1&&x2<=1&&x1+x2>=1?(void) 0:__assert_fail("x1<=1 && x2<=1 && x1+x2>=1", "./schrammel01.c", 10, (const char *) 0);
+
+//  P(x1,x2,y) {x1<=1, 1<=x1+x2, x2<=1}
+
+   y = foo();
+
+//  P(x1,x2,y) {x1<=1, 1<=x1+x2, x2<=1}
+
+   while (2*x1+x2+y<=6&&x2-y<=2&&0<=y&&y<=1) {
+
+//  P(x1,x2,y) {1<=x1+x2, x2<=x1+1, 2x1<=3x2+2, 2x1+y<=2x2+3,
+//    2x1+x2+y<=6, x2<=y+2, 0<=y, y<=1}
+
+      x1 = x1+y+1;
+
+//  P(x1,x2,y) {y+2<=x1+x2, x2+y<=x1, 2x1<=3x2+2y+4, 2x1<=2x2+y+5,
+//    2x1+x2<=y+8, x2<=y+2, 0<=y, y<=1}
+
+      x2++;
+
+//  P(x1,x2,y) {y+3<=x1+x2, x2+y<=x1+1, 2x1<=3x2+2y+1, 2x1<=2x2+y+3,
+//    2x1+x2<=y+9, x2<=y+3, 0<=y, y<=1}
+
+      y = foo();
+   }
+
+//  P(x1,x2,y) {1<=x1+x2, x2<=x1+1, 2x2<=x1+4, x1<=2x2+1, x1<=x2+2,
+//    x1+2x2<=10, 2x1+x2<=10}
+
+   // Expected result: 1<=x1+x2, x1<=x2+2, x2<=x1+1, x1<=2x2+1, x2<=3, 2x1+x2<=10
+   y = y;
+}
