@@ -1,0 +1,99 @@
+int main()
+{
+
+// Pointer values: none
+
+   mystruct s1, s2, *s1p, *s2p;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i = 1;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int j = 2;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int k = 3;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   s1p = &s1;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == &s1 (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   s2p = &s1;
+
+// Pointer values:
+// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1p == &s1 (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == &s1 (exact);
+
+
+   s1.a = &i;
+
+// Pointer values:
+// s1[.a] == &i (exact);
+// s1p == &s1 (exact);
+// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2p == &s1 (exact);
+
+   s2.a = &j;
+
+// Pointer values:
+// s1[.a] == &i (exact);
+// s1p == &s1 (exact);
+// s2[.a] == &j (exact);
+// s2p == &s1 (exact);
+
+
+   s1p->a = s2.a;
+
+// Pointer values:
+// s1p == &s1 (exact);
+// s1p[0][.a] == s2[.a] (exact);
+// s2[.a] == &j (exact);
+// s2p == &s1 (exact);
+
+   s2p->a = &k;
+
+// Pointer values:
+// s1p == &s1 (exact);
+// s2[.a] == &j (exact);
+// s2p == &s1 (exact);
+// s2p[0][.a] == &k (exact);
+
+
+   s2p = &s2;
+
+// Pointer values:
+// s1[.a] == &k (exact);
+// s1p == &s1 (exact);
+// s2[.a] == &j (exact);
+// s2p == &s2 (exact);
+
+   return 0;
+}
