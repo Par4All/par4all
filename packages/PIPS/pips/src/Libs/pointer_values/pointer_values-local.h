@@ -32,4 +32,8 @@ typedef struct {
   statement_effects (*db_get_kill_pv_func)(char *);
   void (*db_put_kill_pv_func)(char * , statement_effects);
   cell_relation (*make_pv_from_effects_func)(effect, effect, cell_interpretation);
+  void (*cell_reference_with_value_of_cell_reference_translation_func)
+  (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
+  void (*cell_reference_with_address_of_cell_reference_translation_func)
+  (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
 } pv_context;

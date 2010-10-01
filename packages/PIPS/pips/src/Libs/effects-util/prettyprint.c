@@ -533,7 +533,8 @@ list words_pointer_value(cell_relation pv)
   reference first_r = cell_reference(first_c);
   reference second_r = cell_reference(second_c);
   approximation ap = cell_relation_approximation(pv);
-
+  pips_assert("approximation is not must\n", !approximation_must_p(ap));
+  
   w= gen_nconc(w, effect_words_reference(first_r));
   w = CHAIN_SWORD(w," == ");
   w= gen_nconc(w, effect_words_reference(second_r));
@@ -562,12 +563,17 @@ text text_pointer_value(cell_relation pv)
   list /* of string */ ls;
   
   if (cell_relation_undefined_p(pv))
-    {
-	pips_user_warning("unexpected pointer value undefined\n");
+    { 
+      ifdebug(1)
+	{
+      
 	return make_text(CONS(SENTENCE,
 			      make_sentence(is_sentence_formatted,
 					    strdup(concatenate(str_prefix, "undefined pointer value\n", NULL))),
 			      NIL));
+	}
+      else
+	pips_user_warning("unexpected pointer value undefined\n");
     }
   else
     tpv = make_text(NIL);
