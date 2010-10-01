@@ -10,19 +10,23 @@ DEMO_EDITOR=gedit
 
 # This can be overriden by CUDA_DIR and CUDA_SDK environment variables:
 CUDA_DIR=/usr/local/cuda
-CUDA_SDK_DIR=$(HOME)/NVIDIA_GPU_Computing_SDK
+#CUDA_SDK_DIR=$(HOME)/NVIDIA_GPU_Computing_SDK
 
 # For debugging, add -g -DP4A_DEBUG
-P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc
+#P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc
+P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include
 
 NVCC=$(CUDA_DIR)/bin/nvcc
 # GT200
 #CUDA_ARCHITECTURE= -arch=sm_13
 # G92
 CUDA_ARCHITECTURE= -arch=sm_11
-CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc -DUNIX -O2
-CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/lib -L$(CUDA_SDK_DIR)/C/common/lib/linux
-CUDA_LIBS= -lcudart -lcutil_x86_64
+#CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc -DUNIX -O2
+CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -DUNIX -O2
+#CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/lib -L$(CUDA_SDK_DIR)/C/common/lib/linux
+CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64
+#CUDA_LIBS= -lcudart -lcutil_x86_64
+CUDA_LIBS= -lcudart
 LD_LIBRARY_PATH=$(CUDA_DIR)/lib64
 export LD_LIBRARY_PATH
 
