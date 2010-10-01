@@ -19,6 +19,38 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+
+# Here are the high level methods to use:
+
+# We generate 2 versions, one without callers/callees graphs, and another full-fledged heavy one:
+doxygen :: doxygen-plain doxygen-graph
+
+ifdef DOXYGEN_PUBLISH_LOCATION
+
+doxygen-publish:: make_destination_dir
+	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
+	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
+
+# Just to avoid publish to complaining if not implemented in the including
+# Makefile:
+make_destination_dir :
+
+# A default implementation method of the previous one, to be used as:
+# make_destination_dir: default_destination_dir
+default_destination_dir :
+	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_MACHINE_DOC_DIR)/$(PROJECT_NAME)
+endif
+
+clean:
+	$(RM) -r plain graph
+
+
+
+
+
+
+# Now the implementation details:
+
 # where are make files
 MAKE.d	= $(ROOT)/makes
 
@@ -58,9 +90,6 @@ endif
 
 .PHONY: doxygen doxygen-plain doxygen-plain do-doxygen-graph do-doxygen-graph do-doxygen publish
 
-# We generate 2 versions, one without callers/callees graphs, and another full-fledged heavy one:
-doxygen :: doxygen-plain doxygen-graph
-
 # To force a different evaluation of varables with different targets (have
 # a look to GNU Make documentation at the end of "6.10 Target-specific
 # Variable Values" for the rationale):
@@ -80,18 +109,3 @@ do-doxygen-graph : do-doxygen
 # Add the PATH to the pips-doxygen-filter too.
 do-doxygen :
 	( cat $(DEFAULT_DOXYGEN_CONFIG); echo "$(DOXYGEN_PARAMETERS_WITHOUT_EOL)$(DOXYGEN_MORE_PARAMETERS)" | sed s/\\\\n/$(bn)/g ) | doxygen -
-
-clean:
-	$(RM) -r plain graph
-
-ifdef DOXYGEN_PUBLISH_LOCATION
-
-doxygen-publish:: make_destination_dir
-	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
-	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
-
-# Just to avoid publish to complaining if not implemented in the including
-# Makefile:
-make_destination_dir :
-
-endif
