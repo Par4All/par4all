@@ -42,7 +42,7 @@ def get_cuda_dir():
                 + "). Please set the CUDA_DIR environment variable correctly")
     return cuda_dir
 
-cuda_sdk_dir = ""
+#cuda_sdk_dir = ""
 def get_cuda_sdk_dir():
     global cuda_sdk_dir
     if not cuda_sdk_dir:
@@ -59,13 +59,13 @@ def get_cuda_sdk_dir():
 
 def get_cuda_cpp_flags():
     return [
-        "-I" + os.path.join(get_cuda_dir(), "include"),
-        "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
+        "-I" + os.path.join(get_cuda_dir(), "include")
+#        "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
     ]
 
-def get_cuda_ld_flags(m64 = True, cutil = True, cublas = False, cufft = False):
+def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
     cuda_dir = get_cuda_dir()
-    cuda_sdk_dir = get_cuda_sdk_dir()
+#    cuda_sdk_dir = get_cuda_sdk_dir()
     lib_arch_suffix = ""
     if m64:
         lib_arch_suffix = "_x86_64"
@@ -74,8 +74,8 @@ def get_cuda_ld_flags(m64 = True, cutil = True, cublas = False, cufft = False):
     flags = [
         "-L" + os.path.join(cuda_dir, "lib64"),
         "-L" + os.path.join(cuda_dir, "lib"),
-        "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
-        "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
+#        "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
+#        "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
         "-Bdynamic", "-lcudart"
     ]
     if cutil:

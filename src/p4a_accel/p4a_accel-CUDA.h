@@ -18,8 +18,38 @@
 #ifndef P4A_ACCEL_CUDA_H
 #define P4A_ACCEL_CUDA_H
 
-#include <cutil_inline.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include <cutil_inline.h>
 #include <cuda.h>
+
+#define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
+#define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
+
+inline void checkErrorInline(cudaError error, const char *currentFile, const int currentLine)
+{
+    if(cudaSuccess != error){
+	fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
+        exit(-1);
+    }
+}
+
+inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
+{
+    cudaError_t error = cudaGetLastError();
+    if(cudaSuccess != error){
+        fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
+        exit(-1);
+    }
+#ifdef P4A_DEBUG
+    error = cudaThreadSynchronize();
+    if(cudaSuccess != error){
+	fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
+        exit(-1);
+    }
+#endif
+}
+
 
 /** @defgroup P4A_cuda_kernel_call Accelerator kernel call
 
@@ -41,11 +71,10 @@
     as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
     --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
 
-    If you get arrors such as "cutilCheckMsg() CUTIL CUDA error : P4A CUDA
-    kernel execution failed : too many resources requested for launch.",
-    there is not enough registers to run all the requested threads of your
-    block. So try to reduce them with -DP4A_CUDA_THREAD_MAX=384 or
-    less. That may need some trimming.
+    If you get arrors such as "P4A CUDA kernel execution failed : too many 
+    resources requested for launch.", there is not enough registers to run
+    all the requested threads of your block. So try to reduce them with 
+    -DP4A_CUDA_THREAD_MAX=384 or less. That may need some trimming.
 
     There are unfortunately some hardware limits on the thread block size
     that appear at the programming level, so we should add another level
@@ -111,8 +140,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 #define P4A_init_accel					\
   do {							\
-    cutilSafeCall(cudaEventCreate(&p4a_start_event));	\
-    cutilSafeCall(cudaEventCreate(&p4a_stop_event));	\
+    toolTestExec(cudaEventCreate(&p4a_start_event));	\
+    toolTestExec(cudaEventCreate(&p4a_stop_event));	\
   } while (0);
 
 
@@ -131,7 +160,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 
 /** Start a timer on the accelerator in CUDA */
-#define P4A_accel_timer_start cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
+#define P4A_accel_timer_start toolTestExec(cudaEventRecord(p4a_start_event, 0))
 
 /** @} */
 
@@ -176,7 +205,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @param[in] size is the size to allocate in bytes
  */
 #define P4A_accel_malloc(address, size)			\
-  cutilSafeCall(cudaMalloc((void **)address, size))
+  toolTestExec(cudaMalloc((void **)address, size))
 
 
 /** Free memory on the hardware accelerator in CUDA
@@ -185,7 +214,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     the hardware accelerator
 */
 #define P4A_accel_free(address)			\
-  cutilSafeCall(cudaFree(address))
+  toolTestExec(cudaFree(address))
 
 
 /** Copy memory from the host to the hardware accelerator in CUDA.
@@ -201,7 +230,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @param[in] size is the size in bytes of the memory zone to copy
 */
 #define P4A_copy_to_accel(host_address, accel_address, size)	\
-  cutilSafeCall(cudaMemcpy(accel_address,			\
+  toolTestExec(cudaMemcpy(accel_address,			\
 			   host_address,			\
 			   size,				\
 			   cudaMemcpyHostToDevice))
@@ -220,7 +249,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @param[in] size is the size in bytes of the memory zone to copy
 */
 #define P4A_copy_from_accel(host_address, accel_address, size)	\
-  cutilSafeCall(cudaMemcpy(host_address,			\
+  toolTestExec(cudaMemcpy(host_address,			\
 			   accel_address,			\
 			   size,				\
 			   cudaMemcpyDeviceToHost))
@@ -246,7 +275,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     into:
 
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); __cutilCheckMsg ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
+    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
@@ -256,7 +285,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 				    #parameters));			\
     P4A_call_accel_kernel_context context				\
     P4A_call_accel_kernel_parameters parameters;			\
-    cutilCheckMsg("P4A CUDA kernel execution failed");			\
+    toolTestExecMessage("P4A CUDA kernel execution failed");			\
   } while (0)
 
 /* @} */

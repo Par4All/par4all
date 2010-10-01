@@ -47,7 +47,7 @@ __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 #ifdef P4A_ACCEL_CUDA
 
-#include <cutil_inline.h>
+//#include <cutil_inline.h>
 
 /** To do basic time measure. Do not nest... */
 
@@ -60,10 +60,10 @@ cudaEvent_t p4a_start_event, p4a_stop_event;
 
 double P4A_accel_timer_stop_and_float_measure() {
   float execution_time;
-  cutilSafeCall(cudaEventRecord(p4a_stop_event, 0));
-  cutilSafeCall(cudaEventSynchronize(p4a_stop_event));
+  toolTestExec(cudaEventRecord(p4a_stop_event, 0));
+  toolTestExec(cudaEventSynchronize(p4a_stop_event));
   /* Get the time in ms: */
-  cutilSafeCall(cudaEventElapsedTime(&execution_time,
+  toolTestExec(cudaEventElapsedTime(&execution_time,
 				     p4a_start_event,
 				     p4a_stop_event));
   /* Return the time in second: */

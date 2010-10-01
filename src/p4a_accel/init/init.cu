@@ -127,7 +127,7 @@ int main() {
 
   // allocate device memory for result
   float (*d_odata)[mem_size];
-  cutilSafeCall( cudaMalloc( (void**) &d_odata, sizeof(h_idata)));
+  toolTestExec( cudaMalloc( (void**) &d_odata, sizeof(h_idata)));
 
   // setup execution parameters
   dim3 grid( 1, 1, 1);

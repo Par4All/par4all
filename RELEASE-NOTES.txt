@@ -197,9 +197,6 @@ environment variables set:
 - ``CUDA_DIR`` to the directory where CUDA has been installed (default to
   ``/usr/local/cuda``)
 
-- ``CUDA_SDK_DIR`` to where the CUDA SDK has been installed (default to
-  ``$HOME/NVIDIA_GPU_Computing_SDK``)
-
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
 
 Sometimes, Par4All generates C99 array parameter declarations in the
