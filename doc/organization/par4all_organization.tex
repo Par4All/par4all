@@ -719,15 +719,32 @@ To debug a \Apyps program, since indeed it is a Python program that uses
 the debugger run the program with \texttt{run \emph{the\_PyPS\_file}.py}
 
 To debug \texttt{p4a}, it is still a Python program, but you need to run
-\texttt{p4a} and passing arguments to it. So you first launch a
-\texttt{gdb python} and then run like:
-\begin{alltt}
-run \emph{the-path-to/}p4a --cuda
-\end{alltt}
+\texttt{p4a} and passing arguments to it. Since \texttt{p4a} itself
+launch many processes, it is difficult to debug a \Apips directly for
+example.
+
+A first way is to ask the debugger to follow the
+\texttt{fork()} and \texttt{exec()} system calls. For example in
+\texttt{gdb}, setting \texttt{detach-on-fork off} and also looking at
+\texttt{follow-exec-mode}.
+
+A second easier way is to avoid \texttt{p4a} launching processes. This is
+done with the \verb/--no-spawn/ option. Avoiding colors and other
+decoration is useful when debugging, so the \verb/--plain/ is useful too.
+
+So a good way to debug \texttt{p4a} from \texttt{gdb} it to launch first a
+\texttt{gdb python} and then run \texttt{p4a} like:
+\begin{verbatim}
+run /usr/local/par4all/bin/p4a --plain --no-spawn
+    -o hyantes-static-99_openmp hyantes-static-99.c -lm
+\end{verbatim}
 
 To run your own version of \texttt{p4a}, you can put the directory
 containing your \texttt{p4a} \texttt{.py} libraries first into the
 \texttt{PYTHONPATH} environment variable.
+
+For memory debugging with Valgrind, look at
+section~\ref{sec:scripts-debugging}.
 
 
 \subsubsection{Internal organization}
@@ -914,7 +931,15 @@ There are scripts to ease the developer and user life.
   the use case;
 \item \verb|p4a_valgrind| launch a command with Valgrind with a memory
   checker in paranoid mode, mainly with the options described in the
-  \Apips development guide.
+  \Apips development guide. As seen in section
+  \ref{sec:debuging-pips-p4a}, to debug \Apips in \texttt{p4a}, it is
+  useful to call it like in:
+\begin{verbatim}
+p4a_valgrind python /usr/local/par4all/bin/p4a --plain --no-spawn
+             -o hyantes-static-99_openmp hyantes-static-99.c -lm
+\end{verbatim}
+  Of course you can also use \texttt{valgrind} instead of
+  \verb/p4a_valgrind/ for less verbosity.
 \end{itemize}
 
 

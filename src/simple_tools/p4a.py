@@ -63,7 +63,7 @@ def add_module_options(parser):
     proc_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
         help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py). There are many properties in PIPS that can be used to modify its behaviour. Have a look to the 'pipsmake-rc' documentation for their descriptions.")
 
-    proc_group.add_option("--here", action = "store_true", default = False,
+    proc_group.add_option("--no-spawn", action = "store_true", default = False,
         help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
 
     parser.add_option_group(proc_group)
@@ -383,7 +383,7 @@ def main(options, args = []):
     else:
         # Craft a p4a_processor_input class instance
         # with all parameters for the processor (pyps).
-        # If --here is not specified, this instance
+        # If --no-spawn is not specified, this instance
         # will be serialized (pickle'd) to ease the
         # passing of parameters to the processor.
         input = p4a_processor_input()
@@ -418,13 +418,13 @@ def main(options, args = []):
 
         # This will hold the output (p4a_processor_output instance)
         # when the processor has been called and its output has been
-        # deserialized (unpickle'd) (unless --here is specified in
+        # deserialized (unpickle'd) (unless --no-spawn is specified in
         # which case the p4a_processor_output instance will be obtained
         # directly):
         output = None
 
-        if options.here:
-            # If --here is specified, run the processor in the current process:
+        if options.no_spawn:
+            # If --no-spawn is specified, run the processor in the current process:
             # no serialization (pickling) neeed.
             output = process(input)
 
@@ -473,7 +473,7 @@ def main(options, args = []):
         # If an exception occurred in the processor script (in pyps)
         # it will have been caught and will have been serialized in the
         # processor output class (or put directly in the p4a_processor_output
-        # instance if --here was specified).
+        # instance if --no-spawn was specified).
         # Raise this exception from our very script if this is the case,
         # so that the normal error catching code is run, so that suggestions
         # are made, so that we can handle --report, etc., etc.
