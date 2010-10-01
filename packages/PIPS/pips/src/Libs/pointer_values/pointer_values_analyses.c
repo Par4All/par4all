@@ -103,6 +103,10 @@ pv_context make_simple_pv_context()
   ctxt.db_get_kill_pv_func = db_get_simple_kill_pv;
   ctxt.db_put_kill_pv_func = db_put_simple_kill_pv;
   ctxt.make_pv_from_effects_func = make_simple_pv_from_simple_effects;
+  ctxt.cell_reference_with_value_of_cell_reference_translation_func = 
+    simple_cell_reference_with_value_of_cell_reference_translation;
+  ctxt.cell_reference_with_address_of_cell_reference_translation_func = 
+    simple_cell_reference_with_address_of_cell_reference_translation;
   return ctxt;
 }
 
@@ -1020,7 +1024,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 		}	
 	    }
 
-	  l_out = l_gen; /* temporary shortcut for testing */
+	  
 	  
 	} /* if (type_variable_p(lhs_type) */
       else if(type_functional_p(lhs_type))
@@ -1159,22 +1163,41 @@ list kill_pointer_values(list /* of cell_relations */ l_in,
 			 pv_context * ctxt)
 {
   list l_cur = l_in;
+  pips_debug_pvs(5, "l_in = ", l_in);
+  pips_debug_effects(5, "l_kill = ", l_kill);
+  
   FOREACH(EFFECT, eff_kill, l_kill)
     {
-      l_cur = kill_pointer_value(l_cur, 
-				 eff_kill,
-				 ctxt);
+      list l_aliased = effect_find_aliased_paths_with_pointer_values(eff_kill, l_cur, ctxt);
+      /* if eff_kill is a may-be-killed, then all aliased effects are also may-be-killed effects */
+      if (effect_may_p(eff_kill))
+	effects_to_may_effects(l_aliased);
+      
+      list l_all_aliased = CONS(EFFECT, eff_kill, l_aliased);
+      
+      FOREACH(EFFECT, eff_alias, l_all_aliased)
+	{
+	  l_cur = kill_pointer_value(eff_alias, l_cur, ctxt); 
+	}
+      
+      CDR(l_all_aliased) = NIL; 
+      gen_full_free_list(l_all_aliased);
+      gen_free_list(l_aliased); 
+       
     }
+
+  pips_debug_pvs(5, "returning : ", l_cur);
   return l_cur;
 }
 
+
 /* Not yet very generic: either should be made generic or a specific version made
    for convex pointer values/effects.  */
-list kill_pointer_value(list /* of cell_relations */ l_in, 
-			effect eff_kill,
+list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in, 
 			pv_context * ctxt)
 {
   list l_out = NIL;
+  
 
   /* eff_kill characteristics */
   cell cell_kill = effect_cell(eff_kill);
@@ -1188,147 +1211,128 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
   pips_debug_pvs(1, "begin with l_in: \n", l_in);
   pips_debug_effect(1, "and eff_kill:\n", eff_kill);
 
-  /* first, search for the (exact/possible) values of eff_kill cell in l_in */
-  /* we search for the cell_relations where ref_kill appears
-     as a first cell, or the exact value_of pointer_values where ref_kill appears as 
-     a second cell. If an exact value_of relation is found, it is retained in exact_old_pv     
-  */
-  list l_in_remnants = NIL;
-  cell_relation exact_old_pv = cell_relation_undefined;
-  list l_old_values = NIL;
-
-  pips_debug(4, "looking for old values\n");
-  FOREACH(CELL_RELATION, pv_in, l_in)
-    {
-      cell first_cell_in = cell_relation_first_cell(pv_in);
-      cell second_cell_in = cell_relation_second_cell(pv_in);
-      bool intersection_test_exact_p = false;
-      bool inclusion_test_exact_p = false;
-      
-      pips_debug_pv(4, "considering: \n", pv_in);
-      if (cell_intersection_p(cell_kill, first_cell_in, &intersection_test_exact_p))
-	{
-	  pips_debug(4, "non empty intersection (%sexact)\n", intersection_test_exact_p? "": "non ");
-	  if (cell_relation_second_value_of_p(pv_in) 
-	      && cell_relation_exact_p(pv_in) 
-	      && intersection_test_exact_p
-	      && cell_inclusion_p(first_cell_in, cell_kill, &inclusion_test_exact_p)
-	      && inclusion_test_exact_p)
-	    {
-	      pips_debug(4, "exact value candidate found\n");
-	      exact_old_pv = pv_in;
-	    }
-	  else
-	    {
-	      pips_debug(5, "potentially non exact value candidate found\n");
-	      l_old_values = CONS(CELL_RELATION, pv_in, l_old_values);
-	    }
-	}
-      else if(cell_relation_second_value_of_p(pv_in) 
-	      && cell_relation_exact_p(pv_in) 
-	      && cell_intersection_p(cell_kill, second_cell_in, &intersection_test_exact_p)
-	      && intersection_test_exact_p
-	      && cell_inclusion_p(second_cell_in, cell_kill, &inclusion_test_exact_p)
-	      && inclusion_test_exact_p)
-	{
-	  pips_debug(4, "exact value candidate found\n");
-	  exact_old_pv = pv_in;
-	}
-      else
-	{
-	  pips_debug(4, "remnant\n");
-	  l_in_remnants = CONS(CELL_RELATION, pv_in, l_in_remnants);	
-	}
-    }
-  pips_debug_pvs(3, "l_in_remnants: \n", l_in_remnants);
-  pips_debug_pvs(3, "l_old_values: \n", l_old_values);
-  pips_debug_pv(3, "exact_old_pv: \n", exact_old_pv);
-
 			
-  /* Then, using old_values, take into account the impact of eff_kill on 
-     l_in_remnants pointer values second cells which must be expressed in terms of 
+  /* using old_values, take into account the impact of eff_kill on 
+     l_in pointer values second cells which must be expressed in terms of 
      unchanged paths. 
   */
+  list l_remnants = NIL;
+  cell_relation exact_old_pv = cell_relation_undefined;
+  list l_old_values = NIL;
+  
+  pips_debug(4, "begin, looking for an exact old value for eff_orig\n");
+  
+  l_old_values = effect_find_equivalent_pointer_values(eff_kill, l_in, 
+						       &exact_old_pv, 
+						       &l_remnants);
+  pips_debug_pvs(3, "l_old_values: \n", l_old_values);
+  pips_debug_pvs(3, "l_remnants: \n", l_remnants);
+  pips_debug_pv(3, "exact_old_pv: \n", exact_old_pv);
+  
       
-  FOREACH(CELL_RELATION, pv_in, l_in_remnants)
+  FOREACH(CELL_RELATION, pv_in, l_remnants)
     {
+      bool first_p = false; /* should we translate the first or the second pv_in cell */
+      bool to_be_translated = false; /* must it be translated ? */
+      bool exact_preceding_test = true;
+
+      /* pv_in first cell characteristics */     
+      cell cell_in_1 = cell_relation_first_cell(pv_in);
+      reference ref_in_1 = cell_reference(cell_in_1);
+      entity e_in_1 = reference_variable(ref_in_1);
+      list ind_in_1 = reference_indices(ref_in_1);
+      size_t nb_ind_in_1 = gen_length(ind_in_1);
+      /******/
+
       /* pv_in second cell characteristics */     
-      cell cell_in = cell_relation_second_cell(pv_in);
-      reference ref_in = cell_reference(cell_in);
-      entity e_in = reference_variable(ref_in);
-      list ind_in = reference_indices(ref_in);
-      size_t nb_ind_in = gen_length(ind_in);
+      cell cell_in_2 = cell_relation_second_cell(pv_in);
+      reference ref_in_2 = cell_reference(cell_in_2);
+      entity e_in_2 = reference_variable(ref_in_2);
+      list ind_in_2 = reference_indices(ref_in_2);
+      size_t nb_ind_in_2 = gen_length(ind_in_2);
       /******/
 
       pips_debug_pv(3, "considering pv_in:", pv_in);
-      
-      if (same_entity_p(e_kill, e_in) && nb_ind_kill <= nb_ind_in)
+
+      if (same_entity_p(e_kill, e_in_2) && nb_ind_kill <= nb_ind_in_2)
 	{
-	  if (cell_relation_second_address_of_p(pv_in) && nb_ind_kill == nb_ind_kill)
+	  if (cell_relation_second_address_of_p(pv_in) && nb_ind_kill == nb_ind_in_2)
 	    {
 	      /* pointer value relation is still valid */
-	      pips_debug(3, "address_of case, and nb_ind_in >= nb_ind_kill\n");
-	    }
+	      pips_debug(3, "address_of case, and nb_ind_in == nb_ind_kill_2\n");
+	      to_be_translated = false;
+	    }  
 	  else
 	    {
-	      bool exact_preceding_test = true;
-	      if (nb_ind_kill == nb_ind_in ||
-		  (nb_ind_kill < nb_ind_in && 
-		   simple_cell_reference_preceding_p(ref_kill, descriptor_undefined, 
-						     ref_in, descriptor_undefined,
-						     transformer_undefined,
-						     &exact_preceding_test)))
-		{
-		  /* This should be made generic */
-		  
-		  /* we must translate ref_in using the old_values */
-		  /* if there is an exact candidate, it is ranked first 
-		     and we can use it */
-		  if (exact_old_pv != cell_relation_undefined)
-		    {
-		      reference ref_old = 
-			cell_reference(cell_relation_second_cell(exact_old_pv));
-		      /* invert if necessary */
-		      if(same_entity_p(reference_variable(ref_old),e_in))
-			{
-			  cell_relation tmp_old_pv = make_value_of_pointer_value
-			    (copy_cell(cell_relation_second_cell(exact_old_pv)), 
-			     copy_cell(cell_relation_first_cell(exact_old_pv)),
-			     cell_relation_approximation_tag(exact_old_pv),
-			     make_descriptor_none()); 
-			  cell_relation new_pv = simple_pv_translate(pv_in, tmp_old_pv, ctxt);
-			  l_out = CONS(CELL_RELATION, new_pv, l_out);		
-			  free_cell_relation(tmp_old_pv);
-			}
-		      else
-			{
-			  cell_relation new_pv = simple_pv_translate(pv_in, exact_old_pv, ctxt);
-			  l_out = CONS(CELL_RELATION, new_pv, l_out);		
-			}
-		    }
-		  
-		  else /* generate a new pv for each element of old_values */
-		    {
-		      FOREACH(CELL_RELATION, old_pv, l_old_values)
-			{
-			  cell_relation new_pv = simple_pv_translate(pv_in, old_pv, ctxt);
-			  l_out = CONS(CELL_RELATION, new_pv, l_out);
-			  
-			} /*  FOREACH(CELL_RELATION, old_pv, l_old_values) */
-		    } /* else branch of if (exact_first_pv) */ 
-		  
-		}
+	      pips_debug(3, "second cell is candidate for translation \n");
+	      first_p = false;
+	      bool inclusion_test_exact_p = false;
+	      if ( (nb_ind_kill == nb_ind_in_2 && 
+		    cell_inclusion_p(cell_in_2, cell_kill, &inclusion_test_exact_p))
+		   ||
+		   (nb_ind_kill < nb_ind_in_2 && 
+		    simple_cell_reference_preceding_p(ref_kill, descriptor_undefined, 
+						      ref_in_2, descriptor_undefined,
+						      transformer_undefined,
+						      &exact_preceding_test)))
+		to_be_translated = true;
+	      else to_be_translated = false;
+	    }
+	}
+      else if (same_entity_p(e_kill, e_in_1) && nb_ind_kill <= nb_ind_in_1)
+	{
+	  pips_debug(3, "first cell is candidate for translation \n");
+	  first_p = true;
+	  bool inclusion_test_exact_p = false;
+	      if ( (nb_ind_kill == nb_ind_in_1 && 
+		cell_inclusion_p(cell_in_1, cell_kill, &inclusion_test_exact_p) )
+	       ||
+	       (nb_ind_kill < nb_ind_in_1 && 
+		simple_cell_reference_preceding_p(ref_kill, descriptor_undefined, 
+						  ref_in_1, descriptor_undefined,
+						  transformer_undefined,
+						  &exact_preceding_test)))
+	    to_be_translated = true;
+	  else to_be_translated = false;	      
+	}
+      else
+	{
+	  to_be_translated = false;
+	}
+      
+      if (to_be_translated)
+	{
+	  pips_debug(3, "%s cell must be translated \n", first_p ? "first" : "second");
 	      
-	    } /* else branch of 
-		 if (cell_relation_second_address_of_p(pv_in) && nb_ind_kill == nb_ind_kill)*/
-	} /*  if (same_entity_p(e_kill, e_in) && nb_ind_kill <= nb_ind_in) */
+	  /* This should be made generic */
+	  
+	  /* we must translate ref_in using the old_values */
+	  /* if there is an exact candidate, it is ranked first 
+	     and we can use it */
+	  if (exact_old_pv != cell_relation_undefined)
+	    {
+	      cell_relation new_pv = simple_pv_translate(pv_in, first_p, exact_old_pv, ctxt);
+	      pips_debug_pv(3, "translated to: \n", new_pv);
+	      l_out = CONS(CELL_RELATION, new_pv, l_out);		
+	    }
+	  
+	  else /* generate a new pv for each element of old_values */
+	    {
+	      FOREACH(CELL_RELATION, old_pv, l_old_values)
+		{
+		  cell_relation new_pv = simple_pv_translate(pv_in, first_p, old_pv, ctxt);		  
+		  l_out = CONS(CELL_RELATION, new_pv, l_out);
+		  
+		} /*  FOREACH(CELL_RELATION, old_pv, l_old_values) */
+	    } /* else branch of if (exact_first_pv) */ 
+	} /*  if (to_be_translated) */
       else
 	{
 	  pips_debug(3, "non matching case, keep as is\n");
 	  l_out = CONS(CELL_RELATION, copy_cell_relation(pv_in), l_out);
 	}
-    } /* FOREACH */
-  
+    } /* FOREACH (CELL_RELATION, pv_in, l_in) */
+   
   
   /* Second, take into account the impact of eff_kill on l_old_values relations. 
      We only have to keep those which are not completely killed by kill_eff, and 
@@ -1351,7 +1355,7 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
 	     make_descriptor_none()); 
 	  FOREACH(CELL_RELATION, old_pv, l_old_values)
 	    {
-	      cell_relation new_pv = simple_pv_translate(tmp_old_pv, old_pv, ctxt);
+	      cell_relation new_pv = simple_pv_translate(tmp_old_pv, false, old_pv, ctxt);
 	      pips_debug_pv(3, "translating to: \n", new_pv);
 	      l_out = CONS(CELL_RELATION, new_pv, l_out);		  
 	    } 
@@ -1386,18 +1390,18 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
 	    pips_debug(3, "first_cell_old exactly included in cell_kill -> pv_old is killed\n");
 	  else
 	    {
-	      /* some more precise work could be done here by computing the difference between
-	         the pv_old first cell and cell_kill. I don't know if it would be really useful.
+	      /* some more precise work could be done here by computing the difference
+		 between the pv_old first cell and cell_kill. I don't know if it would 
+		 be really useful.
 		 So let us avoid too complex things for the moment.
 	      */
 	      cell_relation pv_out = copy_cell_relation(pv_old);
 	      cell_relation_approximation_tag(pv_out) = is_approximation_may;
 	      l_out = CONS(CELL_RELATION, pv_out, l_out);
 	    }
-	}
-      
-      
+	} 
     }
+  gen_free_list(l_old_values);
   
   pips_debug_pvs(1, "returning: \n", l_out);
   
@@ -1405,70 +1409,111 @@ list kill_pointer_value(list /* of cell_relations */ l_in,
 }
 
 
-cell_relation simple_pv_translate(cell_relation pv_in, cell_relation pv_old, pv_context * ctxt)
+cell_relation simple_pv_translate(cell_relation pv_in, bool in_first_p, cell_relation pv_old, pv_context * ctxt)
 {
   cell_relation pv_new;
 
-  /* pv_in second cell characteristics */     
-  cell cell_in = cell_relation_second_cell(pv_in);
+  /* pv_in first or second cell characteristics */     
+  cell cell_in = in_first_p ? cell_relation_first_cell(pv_in) : cell_relation_second_cell(pv_in);
   reference ref_in = cell_reference(cell_in);
+  entity e_in = reference_variable(ref_in);
   list ind_in = reference_indices(ref_in);
   /******/
   
   /* pv_old characteristics */
-  reference old_ref1 = 
+  reference ref_old_1 = 
     cell_reference(cell_relation_first_cell(pv_old));
-  list old_ind1 = reference_indices(old_ref1);
-  size_t old_nb_ind1 = gen_length(old_ind1);
-      
-  reference old_ref2 = 
-    cell_reference(cell_relation_first_cell(pv_old));
-			      
-  reference new_ref = copy_reference(old_ref2);
+  list ind_old_1 = reference_indices(ref_old_1);
+  size_t nb_ind_old_1 = gen_length(ind_old_1);
+
+  reference ref_old_2 = 
+    cell_reference(cell_relation_second_cell(pv_old));
+  list ind_old_2 = reference_indices(ref_old_2);
+  size_t nb_ind_old_2 = gen_length(ind_old_2);
+  /******/
   
-  tag new_t = cell_relation_approximation_tag(pv_in) 
-    && cell_relation_approximation_tag(pv_old);
-			      
-  /* add to new_ref the indices of pv_in second ref 
-     which are not common with old_ref1 */
-  /* not generic, should do smthg as for effect_add_expression_dimension_func */
-  list l =  ind_in;
-  for(size_t i =0; i<old_nb_ind1; i++, POP(l)); 
-  FOREACH(EXPRESSION, exp, l)
+  bool old_first_p = same_entity_p(reference_variable(ref_old_1), e_in);
+
+  reference prefix_ref = old_first_p ? ref_old_1 : ref_old_2;
+  reference target_ref = old_first_p ? ref_old_2 : ref_old_1;
+
+  reference ref;
+  descriptor d;
+  bool exact_translation_p;
+  int nb_common_indices;
+
+  if ( (!old_first_p) && cell_relation_second_address_of_p(pv_old))
     {
-      reference_indices(new_ref) = 
-	gen_nconc(reference_indices(new_ref),
-		  CONS(EXPRESSION,
-		       copy_expression(exp),
-		       NIL));
-      if(unbounded_expression_p(exp))
-	{
-	  new_t = is_approximation_may;
-	}
+      /* act as if there were a [0] indice at the end of ref_old_1 */
+      nb_common_indices = (int) nb_ind_old_1 + 1;
+
+      (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+	(ref_in, descriptor_undefined, /* not generic here */
+	 target_ref, descriptor_undefined, /* not generic here */
+	 nb_common_indices,
+	 &ref, &d, &exact_translation_p);
+      
     }
-  if(cell_relation_second_value_of_p(pv_in))
-    pv_new = make_value_of_pointer_value(copy_cell(cell_relation_first_cell(pv_in)), 
-					 make_cell_reference(new_ref), 
-					 new_t, make_descriptor_none());
-  else 
-    pv_new = make_address_of_pointer_value(copy_cell(cell_relation_first_cell(pv_in)), 
-					   make_cell_reference(new_ref), 
-					   new_t, make_descriptor_none());
-			      			        
+  else
+    {
+      nb_common_indices = old_first_p ? (int) nb_ind_old_1 : (int) nb_ind_old_2;
+      
+      if (cell_relation_second_address_of_p(pv_old))
+	(*ctxt->cell_reference_with_address_of_cell_reference_translation_func)
+	  (ref_in, descriptor_undefined, /* not generic here */
+	   target_ref, descriptor_undefined, /* not generic here */
+	   nb_common_indices,
+	   &ref, &d, &exact_translation_p);
+      else
+	(*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+	  (ref_in, descriptor_undefined, /* not generic here */
+	   target_ref, descriptor_undefined, /* not generic here */
+	   nb_common_indices,
+	   &ref, &d, &exact_translation_p);
+    }
+  
+  tag new_t = (cell_relation_may_p(pv_in) || cell_relation_may_p(pv_old) || !exact_translation_p) 
+    ? is_approximation_may : is_approximation_exact;
+			      
+  if (in_first_p)
+    {
+      if(cell_relation_second_value_of_p(pv_in))
+	pv_new = make_value_of_pointer_value(make_cell_reference(ref),
+					     copy_cell(cell_relation_second_cell(pv_in)), 
+					     new_t, make_descriptor_none());
+      else 
+	pv_new = make_address_of_pointer_value(make_cell_reference(ref), 
+					       copy_cell(cell_relation_second_cell(pv_in)), 
+					       new_t, make_descriptor_none());
+    }
+  else
+    {
+      if(cell_relation_second_value_of_p(pv_in))
+	pv_new = make_value_of_pointer_value(copy_cell(cell_relation_first_cell(pv_in)), 
+					     make_cell_reference(ref), 
+					     new_t, make_descriptor_none());
+      else 
+	pv_new = make_address_of_pointer_value(copy_cell(cell_relation_first_cell(pv_in)), 
+					       make_cell_reference(ref), 
+					       new_t, make_descriptor_none());
+    }
   return pv_new;
 }
 
 bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
 {
-  bool res = true;;
+  bool res = true;
   *exact_inclusion_test_p = true;
 
+  pips_debug(8, "begin\n");
   if (cell_gap_p(c1) || cell_gap_p(c2))
     pips_internal_error("gap case not handled yet \n");
   
-  reference r1 = cell_reference_p(c1) ? cell_reference(c1) : preference_reference(cell_preference(c1));
+  reference r1 = cell_reference_p(c1) 
+    ? cell_reference(c1) : preference_reference(cell_preference(c1));
   entity e1 = reference_variable(r1);
-  reference r2 = cell_reference_p(c2) ? cell_reference(c2) : preference_reference(cell_preference(c2));
+  reference r2 = cell_reference_p(c2) 
+    ? cell_reference(c2) : preference_reference(cell_preference(c2));
   entity e2 = reference_variable(r2);
 
   /* only handle all_locations cells for the moment */
@@ -1496,6 +1541,8 @@ bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
 	{
 	  list inds1 = reference_indices(r1);
 	  list inds2 = reference_indices(r2);
+	  
+	  pips_debug(8, "same entities: %s \n", entity_name(e1));
 	  
 	  if (gen_length(inds1) == gen_length(inds2))
 	    {
@@ -1532,6 +1579,7 @@ bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
 	}
 	
     }
+  pips_debug(8, "end\n");
 
   return res;
 }
@@ -1545,9 +1593,11 @@ bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
   if (cell_gap_p(c1) || cell_gap_p(c2))
     pips_internal_error("gap case not handled yet \n");
   
-  reference r1 = cell_reference_p(c1) ? cell_reference(c1) : preference_reference(cell_preference(c1));
+  reference r1 = cell_reference_p(c1) ? cell_reference(c1) : 
+    preference_reference(cell_preference(c1));
   entity e1 = reference_variable(r1);
-  reference r2 = cell_reference_p(c2) ? cell_reference(c2) : preference_reference(cell_preference(c2));
+  reference r2 = cell_reference_p(c2) ? cell_reference(c2) : 
+    preference_reference(cell_preference(c2));
   entity e2 = reference_variable(r2);
 
   /* only handle all_locations cells for the moment */
@@ -1573,7 +1623,9 @@ bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
 	      expression exp1 = EXPRESSION(CAR(inds1));
 	      expression exp2 = EXPRESSION(CAR(inds2));
 		  
-	      if (!unbounded_expression_p(exp1) && !unbounded_expression_p(exp2) && !expression_equal_p(exp1, exp2) )
+	      if (!unbounded_expression_p(exp1) 
+		  && !unbounded_expression_p(exp2) && 
+		  !expression_equal_p(exp1, exp2) )
 		{
 		  res = false;
 		  *intersection_test_exact_p = true;
@@ -1593,4 +1645,396 @@ bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
     }
 	
   return res;
+}
+
+list simple_effect_intermediary_pointer_paths_effect(effect eff)
+{
+  pips_debug_effect(5, "input effect : \n", eff);
+  list l_res = NIL;
+  reference ref = effect_any_reference(eff);
+  entity e = reference_variable(ref);
+  list ref_inds = reference_indices(ref);
+  reference tmp_ref = make_reference(e, NIL);
+  type t = basic_concrete_type(entity_type(e));
+  bool finished = false;
+
+  while (!finished && !ENDP(ref_inds))
+    {
+      switch (type_tag(t))
+	{
+	  
+	case is_type_variable:
+	  {
+	    pips_debug(5," variable case\n");
+	    basic b = variable_basic(type_variable(t));
+	    size_t nb_dim = gen_length(variable_dimensions(type_variable(t)));
+	    
+	    /* add to tmp_ref as many indices from ref as nb_dim */
+	    for(size_t i = 0; i< nb_dim; i++, POP(ref_inds))
+	      {
+		reference_indices(tmp_ref) = 
+		  gen_nconc(reference_indices(tmp_ref), 
+			    CONS(EXPRESSION, 
+				 copy_expression(EXPRESSION(CAR(ref_inds))), 
+				 NIL));
+	      }
+	  
+	    if (basic_pointer_p(b))
+	      {
+		pips_debug(5," pointer basic \n");
+		if (!ENDP(ref_inds))
+		  {
+		    pips_debug(5,"and ref_inds is not empty \n");
+		    effect tmp_eff = 
+		      make_effect(make_cell_reference(copy_reference(tmp_ref)), 
+				  copy_action(effect_action(eff)),
+				  effect_must_p(eff) ?
+				  make_approximation_exact() :
+				  copy_approximation(effect_approximation(eff)), 
+				  make_descriptor_none());
+		    l_res = CONS(EFFECT, tmp_eff, l_res);
+		    reference_indices(tmp_ref) = 
+		      gen_nconc(reference_indices(tmp_ref), 
+				CONS(EXPRESSION, 
+				     copy_expression(EXPRESSION(CAR(ref_inds))), 
+				     NIL));
+		    POP(ref_inds);
+		  
+		    type new_t = copy_type(basic_pointer(b));		  
+		    free_type(t);
+		    t = new_t;
+		  }
+		else 
+		  finished = true;
+	      }
+	    else if (basic_derived_p(b))
+	      {
+		pips_debug(5,"derived basic \n");
+		/* add the field dimension */
+		/* expression field_exp = EXPRESSION(CAR(ref_inds)); */
+	      
+/* 		reference_indices(tmp_ref) =  */
+/* 		  gen_nconc(reference_indices(tmp_ref),  */
+/* 			    CONS(EXPRESSION,  */
+/* 				 copy_expression(field_exp),  */
+/* 				 NIL)); */
+/* 		POP(ref_inds); */
+		type new_t = basic_concrete_type(entity_type(basic_derived(b)));
+		free_type(t);
+		t = new_t;
+	      }
+	    else
+	      finished = true;
+	  }
+	  break;
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  {
+	    pips_debug(5,"struct union or enum type \n");
+		
+	    /* add next index */
+	    expression field_exp = EXPRESSION(CAR(ref_inds));
+	    reference_indices(tmp_ref) = 
+	      gen_nconc(reference_indices(tmp_ref), 
+			CONS(EXPRESSION, 
+			     copy_expression(field_exp), 
+			     NIL));
+	    POP(ref_inds);
+	    entity field_ent = expression_to_entity(field_exp);
+	    pips_assert("expression is a field entity\n", !entity_undefined_p(field_ent));
+	    type new_t = basic_concrete_type(entity_type(field_ent));
+	    free_type(t);
+	    t = new_t;
+	  }
+	  break;
+	default:
+	    pips_internal_error("unexpected type tag\n");
+      
+	}
+    }
+  free_type(t);
+  
+  return l_res;
+}
+
+/**
+   @brief find pointer_values in l_in which give (possible or exact) paths 
+          equivalent to eff. 
+   @param eff is the considered input path.
+   @param l_in is the input pointer values list.
+   @param exact_aliased_pv gives an exact equivalent path found in l_in if it exists.
+   @param l_in_remnants contains the elemnts of l_in which are neither 
+          exact_aliased_pv nor in the returned list.
+
+   @return a list of elements of l_in which give (possible or exact) paths 
+           equivalent to eff, excluding exact_aliased_pv if one exact equivalent 
+           path can be found in l_in.  
+ */
+list effect_find_equivalent_pointer_values(effect eff, list l_in, 
+					   cell_relation * exact_aliased_pv, 
+					   list * l_in_remnants)
+{
+
+  pips_debug_pvs(1,"begin, l_in = \n", l_in);
+  pips_debug_effect(1, "and eff:\n", eff);
+
+  /* eff characteristics */
+  cell eff_cell = effect_cell(eff);
+  reference ref = effect_any_reference(eff);
+  list ind = reference_indices(ref);
+  /******/
+
+ /* first, search for the (exact/possible) values of eff cell in l_in */
+  /* we search for the cell_relations where ref appears
+     as a first cell, or the exact value_of pointer_values where ref appears as 
+     a second cell. If an exact value_of relation is found, it is retained in 
+     exact_aliased_pv  
+  */
+  *l_in_remnants = NIL;
+  *exact_aliased_pv = cell_relation_undefined;
+  list l_res = NIL;
+
+  FOREACH(CELL_RELATION, pv_in, l_in)
+    {
+      cell first_cell_in = cell_relation_first_cell(pv_in);
+      cell second_cell_in = cell_relation_second_cell(pv_in);
+      bool intersection_test_exact_p = false;
+      bool inclusion_test_exact_p = true;
+      
+      pips_debug_pv(4, "considering: \n", pv_in);
+      if (cell_intersection_p(eff_cell, first_cell_in, &intersection_test_exact_p))
+	{
+	  pips_debug(4, "non empty intersection with first cell (%sexact)\n", 
+		     intersection_test_exact_p? "": "non ");
+	  if (cell_relation_exact_p(pv_in) 
+	      && intersection_test_exact_p
+	      && cell_inclusion_p(first_cell_in, eff_cell, &inclusion_test_exact_p)
+	      && inclusion_test_exact_p)
+	    {
+	      pips_debug(4, "exact value candidate found\n");
+	      *exact_aliased_pv = pv_in;
+	    }
+	  else
+	    {
+	      pips_debug(5, "potentially non exact value candidate found\n");
+	      l_res = CONS(CELL_RELATION, pv_in, l_res);
+	    }
+	}
+      else if(cell_relation_second_value_of_p(pv_in) 
+	      && cell_intersection_p(eff_cell, second_cell_in, &intersection_test_exact_p))
+	{
+	  pips_debug(4, "non empty intersection with second value_of cell (%sexact)\n", 
+		     intersection_test_exact_p? "": "non ");
+	  if(cell_relation_exact_p(pv_in) 
+	      && intersection_test_exact_p
+	      && cell_inclusion_p(second_cell_in, eff_cell, &inclusion_test_exact_p)
+	      && inclusion_test_exact_p)
+	    {
+	      pips_debug(4, "exact value candidate found\n");
+	      *exact_aliased_pv = pv_in;
+	    }
+	  else
+	    {
+	      pips_debug(5, "potentially non exact value candidate found\n");
+	      l_res = CONS(CELL_RELATION, pv_in, l_res);
+	    }
+	}
+      else
+	{
+	  pips_debug(4, "remnant\n");
+	  *l_in_remnants = CONS(CELL_RELATION, pv_in, *l_in_remnants);	
+	}
+    }
+  pips_debug_pvs(3, "l_in_remnants: \n", *l_in_remnants);
+  pips_debug_pvs(3, "l_res: \n", l_res);
+  pips_debug_pv(3, "*exact_aliased_pv: \n", *exact_aliased_pv);
+
+  return l_res;
+  
+}
+
+/**
+   @brief find all paths equivalent to eff_kill cell in l_pv by performing a transitive closure
+   @param eff is the input effect
+   @param l_pv is the list of current pointer_values relations
+   @param ctxt is the pv analysis context
+   @return a list of effects whose cells are equivalent to eff_kill cell according to l_pv.
+           Their approximation does not depend on the approximation of the input effect,
+	   but only on the exactness of the finding process.
+
+ */
+list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_context *ctxt)
+{
+  list l_res = NIL;
+  list l_remnants = l_pv;
+  reference eff_ref = effect_any_reference(eff);
+
+  pips_debug_effect(5, "begin with eff : \n", eff);
+  pips_debug_pvs(5, "and l_pv : \n", l_pv);
+
+  /* first we must find in eff_kill intermediary paths to pointers */
+  /* not generic here */
+  list l_intermediary = simple_effect_intermediary_pointer_paths_effect(eff);
+  pips_debug_effects(5, "intermediary paths to eff: \n", l_intermediary);
+ 
+  /* and find if this gives equivalent paths in l_pv */
+  FOREACH(EFFECT, eff_intermediary, l_intermediary)
+    {
+     pips_debug_effect(5, "considering intermediary path : \n", eff_intermediary);
+      list tmp_l_remnants = NIL;
+      cell_relation pv_exact = cell_relation_undefined;
+      list l_equiv = effect_find_equivalent_pointer_values(eff_intermediary, l_remnants, 
+							   &pv_exact, 
+							   &tmp_l_remnants);
+      l_equiv = CONS(CELL_RELATION, pv_exact, l_equiv);
+      l_remnants = tmp_l_remnants;
+      pips_debug_pvs(5, "list of equivalent pvs \n", l_equiv);
+
+      reference ref_intermediary = effect_any_reference(eff_intermediary);
+      entity ent_intermediary = reference_variable(ref_intermediary);
+      descriptor d_intermediary = effect_descriptor(eff_intermediary);
+      int nb_common_indices = (int) gen_length(reference_indices(ref_intermediary));
+
+      FOREACH(CELL_RELATION, pv_equiv, l_equiv)
+	{
+	  reference ref;
+	  descriptor d;
+	  bool exact_translation_p;
+
+	  pips_debug_pv(5, "translating eff using pv: \n", pv_equiv);
+
+	  /* this is valid only if the first value_of corresponds to eff_intermediary */
+	  reference pv_equiv_first_ref = cell_reference(cell_relation_first_cell(pv_equiv));
+	  reference pv_equiv_second_ref = cell_reference(cell_relation_second_cell(pv_equiv));
+	  
+	  if (same_entity_p(ent_intermediary, reference_variable(pv_equiv_first_ref))
+	      && (gen_length(reference_indices(ref_intermediary)) 
+		  == gen_length(reference_indices(pv_equiv_first_ref))))
+	    {
+	      /* use second cell as equivalent value for intermediary path */
+	      if (cell_relation_second_value_of_p(pv_equiv))
+		{
+		  (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+		    (eff_ref, descriptor_undefined, /* not generic here */
+		     cell_reference(cell_relation_second_cell(pv_equiv)),
+		     descriptor_undefined, /* not generic here */
+		     nb_common_indices,
+		     &ref, &d, &exact_translation_p);
+		}
+	      else /* cell_relation_second_address_of_p is true */
+		{
+		  (*ctxt->cell_reference_with_address_of_cell_reference_translation_func)
+		    (eff_ref, descriptor_undefined, /* not generic here */
+		     cell_reference(cell_relation_second_cell(pv_equiv)),
+		     descriptor_undefined, /* not generic here */
+		     nb_common_indices,
+		     &ref, &d, &exact_translation_p);
+		}
+	    }
+	  else /* use first cell as equivalent value for intermediary path  */
+	    {
+	      pips_assert("pv_equiv must be value_of here\n", 
+			  cell_relation_second_value_of_p(pv_equiv));
+	      
+	      (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+		(eff_ref, descriptor_undefined, /* not generic here */
+		 cell_reference(cell_relation_first_cell(pv_equiv)),
+		 descriptor_undefined, /* not generic here */
+		 nb_common_indices,
+		 &ref, &d, &exact_translation_p);
+	    }
+	  exact_translation_p = exact_translation_p && cell_relation_exact_p(pv_equiv);
+
+	  effect eff_alias = make_effect(make_cell_reference(ref),
+					 copy_action(effect_action(eff_intermediary)),
+					 exact_translation_p ? 
+					 make_approximation_exact()
+					 : make_approximation_may(), make_descriptor_none());
+	  pips_debug_effect(5, "resulting effect \n", eff_alias);
+	  l_res = CONS(EFFECT, eff_alias, l_res);	  
+	  if (!ENDP(l_remnants))
+	    {
+	      pips_debug(5, "recursing to find aliases to aliased effect...\n");
+	      l_res = gen_nconc(l_res, 
+				effect_find_aliased_paths_with_pointer_values(eff_alias, 
+									      l_remnants, 
+									      ctxt));
+	    }
+	}
+    }
+
+    
+  pips_debug_effects(5, "l_res after first phase : \n", l_res);
+
+  /* Then we must find  if there are address_of second cells 
+     which are preceding paths of eff path 
+     in which case they must be used to generate other aliased paths 
+  */
+  FOREACH(CELL_RELATION, pv_remnant, l_remnants)
+    {
+      reference pv_remnant_second_ref = 
+	cell_reference(cell_relation_second_cell(pv_remnant));
+      bool exact_preceding_test = true;
+	      	  
+      pips_debug_pv(5, "considering pv: \n", pv_remnant);
+
+      if (cell_relation_second_address_of_p(pv_remnant) 
+	  && same_entity_p(reference_variable(eff_ref), 
+			   reference_variable(pv_remnant_second_ref))
+	  && (gen_length(reference_indices(eff_ref)) 
+	      >= gen_length(reference_indices(pv_remnant_second_ref)))
+	  && simple_cell_reference_preceding_p(pv_remnant_second_ref, descriptor_undefined, 
+					       eff_ref, descriptor_undefined,
+					       transformer_undefined,
+					       &exact_preceding_test))
+	{
+	  reference ref;
+	  descriptor d;
+	  bool exact_translation_p;
+
+	  pips_debug(5, "good candidate (%sexact)\n",exact_preceding_test? "":"non "); 
+	  /* for the translation, add a dereferencing_dimension to pv_remnant_first_cell */
+	  reference new_ref = copy_reference
+	    (cell_reference(cell_relation_first_cell(pv_remnant)));
+	  int nb_common_indices = (int) gen_length(reference_indices(pv_remnant_second_ref));
+	  /* not generic here */
+	  reference_indices(new_ref) = gen_nconc(reference_indices(new_ref),
+						 CONS(EXPRESSION,
+						      int_to_expression(0),
+						      NIL));
+
+	  (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+	    (eff_ref, descriptor_undefined, /* not generic here */
+	     new_ref,
+	     descriptor_undefined, /* not generic here */
+	     nb_common_indices,
+	     &ref, &d, &exact_translation_p);
+
+	  exact_translation_p = exact_translation_p && cell_relation_exact_p(pv_remnant);
+
+	  effect eff_alias = make_effect(make_cell_reference(ref),
+					 make_action_write_memory(),
+					 exact_translation_p && exact_preceding_test ? 
+					 make_approximation_exact()
+					 : make_approximation_may(), make_descriptor_none());
+	  free_reference(new_ref);
+	  pips_debug_effect(5, "resulting effect \n", eff_alias);
+	  l_res = CONS(EFFECT, eff_alias, l_res);	  
+	  if (!ENDP(l_remnants))
+	    {
+	      pips_debug(5, "recursing to find aliases to aliased effect...\n");
+	      l_res = gen_nconc(l_res, 
+				effect_find_aliased_paths_with_pointer_values(eff_alias, 
+									      l_remnants, 
+									      ctxt));
+	    }
+	}
+    
+    }
+
+
+  pips_debug_effects(5, "returning : \n", l_res);
+  return l_res;
+
 }
