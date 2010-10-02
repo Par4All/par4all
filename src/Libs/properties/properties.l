@@ -313,6 +313,17 @@ static void read_properties(void)
     }
 }
 
+
+/* Get a property
+
+   @param[in] name is the name of the property to look-up
+
+   @param[in] cool is a boolean setting the behaviour if the property does
+   not exist. If the property does not exist and cool is TRUE, it return
+   property_undefined but if FALSE it aborts
+
+   @return the property or abort() if it does not exist and cool is FALSE
+*/
 static property get_property(const string name, bool cool)
 {
     property p = property_undefined;
@@ -336,6 +347,13 @@ static property get_property(const string name, bool cool)
     return p;
 }
 
+
+/* Get the value of a boolean property
+
+   @param[in] name is the name of the property to look-up
+
+   @return the boolean value
+*/
 bool get_bool_property(const string name)
 {
     property p = get_property(name, FALSE);
@@ -344,6 +362,13 @@ bool get_bool_property(const string name)
     return(property_bool(p));
 }
 
+
+/* Set the value of a boolean property
+
+   @param[in] name is the name of the property to set
+
+   @param[in] b is the value to store in the property
+*/
 void set_bool_property(const string name, bool b)
 {
     property p = get_property(name, FALSE);
@@ -352,6 +377,13 @@ void set_bool_property(const string name, bool b)
     property_bool(p) = b;
 }
 
+
+/* Get the value of a string property
+
+   @param[in] name is the name of the property to look-up
+
+   @return the string value, not to be freed
+*/
 string get_string_property(const string name)
 {
     property p = get_property(name, FALSE);
@@ -361,6 +393,16 @@ string get_string_property(const string name)
 }
 
 
+/* Get the value of a string property or ask to the user if it does not
+   has a non null string value
+
+   @param[in] name is the name of the property to look-up
+
+   @param[in] question is the sentence to display when asking for a value
+   because the property has no valid string value
+
+   @return the string value, not to be freed
+*/
 string get_string_property_or_ask(const string name,const char question[])
 {
     property p = get_property(name, FALSE);
@@ -373,6 +415,14 @@ string get_string_property_or_ask(const string name,const char question[])
     return s;
 }
 
+
+/* Set the value of a string property
+
+   @param[in] name is the name of the property to set
+
+   @param[in] s is the value to store in the property. This string is
+   strdup()ed in this function
+*/
 void set_string_property(const string name, string s)
 {
     property p = get_property(name, FALSE);
@@ -382,6 +432,13 @@ void set_string_property(const string name, string s)
     property_string(p) = strdup(s);
 }
 
+
+/* Get the value of an integer property
+
+   @param[in] name is the name of the property to look-up
+
+   @return the integer value
+*/
 int
 get_int_property(const string name)
 {
@@ -391,6 +448,13 @@ get_int_property(const string name)
     return property_int(p);
 }
 
+
+/* Set the value of an integer property
+
+   @param[in] name is the name of the property to set
+
+   @param[in] i is the value to store in the property
+*/
 void set_int_property(const string name, int i)
 {
     property p = get_property(name, FALSE);
