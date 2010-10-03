@@ -1,0 +1,22 @@
+#include<stdio.h>
+typedef struct ListeChainee{
+ struct ListeChainee * next;
+}liste;
+//{(p,p_init,-EXACT-)}
+int count(liste* p)
+{
+  liste* q = p;
+//{(p,p_init,-EXACT-);(q,p_init,-EXACT)}
+  int i = 0;
+//{(p,p_init,-EXACT-);(q,p_init,-EXACT)}
+  while(p != NULL){
+//{(p,p_init,-EXACT-);(q,p_init,-EXACT)}
+    i++;
+//{(p,p_init,-EXACT-);(q,p_init,-EXACT)}
+    p = p->next;
+//{(p,p_init[next],-EXACT-);(q,p_init,-EXACT)}
+  }
+//{(p,p_init[next],-MAY-);(q,p_init,-EXACT)}
+  return i;
+
+}
