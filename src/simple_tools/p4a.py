@@ -22,6 +22,10 @@ from p4a_git import *
 from p4a_version import *
 from p4a_opts import *
 
+# To store some arbitrary Python code to be executed inside p4a_process,
+# since p4a_process itself is normally executed inside another process:
+execute_some_python_code_in_process = None
+
 
 def add_module_options(parser):
 
@@ -375,7 +379,7 @@ def main(options, args = []):
         add_debug_flags = options.debug,
         add_optimization_flags = not options.no_fast,
         no_default_flags = options.no_default_flags
-    )
+      )
 
     # TODO: override cpp exe used by pyps/pips with builder.cpp
 
@@ -409,6 +413,7 @@ def main(options, args = []):
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
         input.recover_includes = not options.skip_recover_includes
+        input.execute_some_python_code_in_process = execute_some_python_code_in_process
 
         # Interpret correctly the True/False strings, and integer strings,
         # for the --property option specifications:

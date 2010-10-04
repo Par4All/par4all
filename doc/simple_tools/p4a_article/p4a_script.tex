@@ -5,6 +5,11 @@
 \usepackage{alltt}
 \usepackage{graphicx}
 \usepackage{libs/tex/abbrev_reactive}
+\usepackage{listings}%[hyper,procnames]
+\lstset{extendedchars=true, language=C++, basicstyle=\scriptsize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=5, numberfirstline=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape}
 
 \let\OldRightarrow=\Rightarrow
 \RequirePackage{marvosym}
@@ -310,12 +315,26 @@ The given code is executed in the \verb|main| function of the \verb|p4a|
 script just after option parsing but just before option handling and the
 call to \verb|p4a::main|.
 
+The \verb|p4a.execute_some_python_code_in_process| Python variable can be
+used to inject code at the beginning of \verb|p4a_process::process|.
+
 The code can access to local variables of the script but not change
 them. It can access to and change global symbols, such as modifying global
 \texttt{p4a} methods for example.
 
 \verb|p4a_process::default_properties| contains the \Apips properties used
 in \texttt{p4a}.
+
+We give here some examples of \texttt{p4a} customization that change the
+behaviour of \Apyps inside \texttt{p4a} by importing some modules for more
+practical modifications.
+
+First an example to change only one method:
+\lstinputlisting[language=Python]{p4a_process_inject.py}
+
+Another example showing how to change a whole class as well:
+\lstinputlisting[language=Python]{p4a_process_inject_class.py}
+
 
 %%ContentEnd
 
