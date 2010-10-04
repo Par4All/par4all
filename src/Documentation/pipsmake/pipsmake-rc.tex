@@ -1720,8 +1720,10 @@ PRETTYPRINT_STATEMENT_NUMBER FALSE
 PRETTYPRINT_BLOCK_IF_ONLY TRUE
 \end{alltt}
 
-
+\begin{PipsPass}{c_symbol_table}
 A prettyprint of the symbol table for a C module can be generated with
+\end{PipsPass}
+
 \begin{PipsMake}
 c_symbol_table      > MODULE.symbol_table_file
         < PROGRAM.entities
@@ -10209,12 +10211,12 @@ really want to parallelize with OpenMP.
 
 The merging of the if clause of the omp pragma follows its own rule.
 This clause can be ignore without changing the output of the program,
-it only changee the program perfomances.
+it only changes the program perfomances.
 Then three policies are offered to manage the if clause merging. The if clause
 can simply be ignored. Or the if clauses can be merged alltogether using the
 boolean opertaion \verb|or| or \verb|and|. When ignored, the if clause can be
 later regenrated using the appropriated PIPS phase :
-OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. To summarize, rmenber that the property
+OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. To summarize, remenber that the property
 can be set to \verb|ignore| \verb|or| or \verb|and|
 \begin{PipsProp}{OMP_IF_MERGE_POLICY}
 OMP_IF_MERGE_POLICY "ignore"
@@ -10527,11 +10529,19 @@ to build the module value basis.
 
 This is intended to be used with PIPS IR Navigator (tm).
 
+\begin{PipsPass}{html_prettyprint}
+Produce a html version of the internal represenation of a PIPS Module
+\end{PipsPass}
+
 \begin{PipsMake}
 html_prettyprint > MODULE.parsed_printed_file
          < PROGRAM.entities
          < MODULE.code
 \end{PipsMake}
+
+\begin{PipsPass}{html_prettyprint_symbol_table}
+Produce a html version of the symbol table
+\end{PipsPass}
 
 \begin{PipsMake}
 html_prettyprint_symbol_table > MODULE.parsed_printed_file
