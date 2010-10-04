@@ -1,5 +1,5 @@
 /*
-7  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -17,6 +17,8 @@
   You should have received a copy of the GNU General Public License
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
+  Pierre.Villalon@hpc-project.com
+  Copyright HPC Project
 */
 
 /**
@@ -217,9 +219,8 @@ bool omp_merge_pragma (const string module_name) {
   }
 
   // getting the properties to configure the phase
-  char* merge_policy = get_string_property ("OMP_MERGE_POLICY");
+  string merge_policy = get_string_property ("OMP_MERGE_POLICY");
   bool outer = (strcmp (merge_policy, "outer") == 0);
-  free (merge_policy);
 
   // build the list of outer loop with pragma this is also needed by the
   // inner mode
