@@ -6,9 +6,11 @@
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
 
-'''
-Par4All frontend
-'''
+""" @mainpage Par4All frontend
+
+This file should disappear and be included into p4a.py and replaced by a
+symbolic link
+"""
 
 import string, sys, os, re, optparse, traceback
 from p4a_util import *
@@ -29,6 +31,13 @@ def main():
     add_common_options(parser)
 
     (options, args) = parser.parse_args()
+
+    if options.execute:
+        local_var = locals()
+        # Execute the Python string given by the user:
+        exec(options.execute, globals(), local_var)
+        # The local variables upwards are not modified
+        #print local_var
 
     if process_common_options(options, args):
         p4a.main(options, args)

@@ -15,3 +15,7 @@ People only interested in quick results should look only at examples using p4a.
   how it works in detail. It shows an example to perform parallelization
   and optimization on a Jacobi iterative solver. It uses pips_c2openmp
   simple script for OpenMP and a specific pyps script for CUDA generation.
+
+- Python contains examples for bleeding edge users that want to tailor
+  Par4All to their own needs by dynamically changing the behaviour with
+  some Python injections.
