@@ -1,12 +1,12 @@
 ###
 ### Par4All Environment
-### 
+###
 #
 #  Run 'source <this file>' from your sh-compatible shell.
 #
 ##########################################################
 
-# Par4All source root. Might point to P4A_DIST if 
+# Par4All source root. Might point to P4A_DIST if
 # sources are not installed.
 export P4A_ROOT='$root'
 
@@ -60,7 +60,7 @@ if [ -d $$PYPS_PATH ]; then
     export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PYPS_PATH)
 fi
 # Update the Python module search path so python can find ply
-PLY_PATH=/usr/shared/pyshared
+PLY_PATH=/usr/share/pyshared
 if [ -d $$PLY_PATH ]; then
     PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
     export PYTHONPATH
@@ -77,5 +77,5 @@ if [ -d $$PLY_PATH/ply ]; then
 fi
 
 # Do not leave our functions defined in user namespace.
-unset update_libs_search_paths 
+unset update_libs_search_paths
 unset prepend_to_path_var

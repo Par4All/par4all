@@ -1,12 +1,12 @@
 ###
 ### Par4All Environment
-### 
+###
 #
 #  Run 'source <this file>' from your csh-compatible shell.
 #
 ##########################################################
 
-# Par4All source root. Might point to P4A_DIST if 
+# Par4All source root. Might point to P4A_DIST if
 # sources are not installed.
 setenv P4A_ROOT '$root'
 
@@ -77,7 +77,7 @@ if ( -d $$PYPS_PATH ) then
 endif
 
 # Update the Python module search path so python can find ply
-set PLY_PATH=/usr/shared/pyshared
+set PLY_PATH=/usr/share/pyshared
 if ( -d $$PLY_PATH ) then
     if ( $$?PYTHONPATH ) then
 	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
