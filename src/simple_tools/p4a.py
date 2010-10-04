@@ -7,7 +7,11 @@
 #
 
 '''
+@file
+
 Par4All frontend implementation
+
+
 '''
 
 import string, sys, os, re, optparse
@@ -148,6 +152,7 @@ def add_module_options(parser):
 
     parser.add_option_group(compile_group)
 
+
     link_group = optparse.OptionGroup(parser, "Back-end linking options")
 
     link_group.add_option("--ld", metavar = "LINKER", default = None,
@@ -166,6 +171,7 @@ def add_module_options(parser):
         help = "Add an additional object file for linking. Several are allowed.")
 
     parser.add_option_group(link_group)
+
 
     cmake_group = optparse.OptionGroup(parser, "CMake file generation options")
 
@@ -225,7 +231,13 @@ def pips_output_filter(s):
 
 
 def main(options, args = []):
+    """Process the options and arguments given to p4a
 
+    @param options[in] the options given to p4a scripts
+
+    @param args[in] the arguments given to p4a scripts
+    """
+    # Delay the PyPS import to be able to give an explicative error message:
     pyps = None
     try:
         pyps = __import__("pyps")

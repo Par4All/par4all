@@ -223,7 +223,7 @@ For more tweaking, look at the \Apfa Accel runtime source on \url{} or
 directly in the \Agit repository.
 
 
-\section{p4a full option list}
+\section{\protect\texttt{p4a} full option list}
 \label{sec:options}
 
 The basic usage is \texttt{p4a [\emph{options}] <\emph{source files}>}
@@ -233,7 +233,7 @@ The following documentation is automatically generated from the
 
 \input{p4a-help}
 
-\section{p4a architecture}
+\section{\protect\texttt{p4a} architecture}
 \label{sec:p4a-architecture}
 
 The global architecture of \Apfa is given on
@@ -244,6 +244,78 @@ figure~\ref{fig:transit_intestinal}.
   \caption{Intestinal view of \texttt{p4a}.}
   \label{fig:transit_intestinal}
 \end{figure}
+
+From the high-level user point of view, the sources follow this journey:
+\begin{itemize}
+\item the sources goes through the preprocessor of \Apips that is followed
+  for C code by \verb|p4a_recover_includes| to instrument the
+  \verb|#include| processing for later recovering;
+\item then the preprocessed files goes in \Apips through the splitter to
+  have one file per function and a compilation unit file that keep track
+  of all the file-global declarations;
+\item then each function file or compilation-unit file can be parsed on
+  demand according to the \Apyps script;
+\item a predefined \Apyps program apply many different \Apips phases on
+  the code and regenerate the transformed sources;
+\item then the \verb|p4a_recover_includes| postprocessor is applied again
+  to recover most of the \verb|#include| work;
+\item the source are postprocessed by \verb|p4a_post_processor.py| to cope
+  with some special syntax (\Acuda, \Aopencl...) that can not be directly
+  represented in \Apips;
+\item the generated final files are copied to the final directory;
+\item if asked for, the final target back-end compilers are called to
+  produce the parallelized executable program.
+\end{itemize}
+
+
+\section{\protect\texttt{p4a} extension for advanced users}
+\label{sec:p4a-extension}
+
+From the internal point of view, the main work flow in \texttt{p4a} is
+defined in \verb|p4a::main| from \verb|p4a.py|:
+\begin{itemize}
+\item loading \Apyps;
+\item normalization of user source file names;
+\item call to \verb|p4a_process| to do the code transformation with \Apyps;
+\item generate \texttt{Cmake} configuration files if asked;
+\item build the final executable with a \verb|p4a_builder|.
+\end{itemize}
+
+Most of the interesting work is done inside \verb|p4a_process::process|,
+in another process (if not using the \verb|--no-spawn| option) so that
+\texttt{p4a} can do some \Apips output message post-processing. The
+interesting steps are:
+\begin{itemize}
+\item \verb|p4a_process::processor::parallelize|;
+\item \verb|p4a_process::processor::gpuify| is called if the
+  \verb|--accel| option is set to generate \Agpu-like code;
+\item \verb|p4a_process::processor::ompify| if called if \Aopenmp output
+  is asked;
+\item \verb|p4a_process::processor::save| regenerate the source files from
+  \Apips internal representation with \verb|unsplit()|, call the
+  \verb|#include| recovering, call the \verb|p4a_post_processor.py| if
+  \Agpu code generation asked. and then the generated files are saved to
+  their destinations with the correct file extensions.
+\end{itemize}
+
+The advantage of the \texttt{p4a} script is that it is a simple tool that
+behaves well on simple programs but an advanced user may want to go
+further without losing the main practical infrastructure.
+
+To specialize \texttt{p4a} to her needs, it is possible to execute
+arbitrary Python code at the start of \texttt{p4a} execution with the
+\verb|--exec| option.
+
+The given code is executed in the \verb|main| function of the \verb|p4a|
+script just after option parsing but just before option handling and the
+call to \verb|p4a::main|.
+
+The code can access to local variables of the script but not change
+them. It can access to and change global symbols, such as modifying global
+\texttt{p4a} methods for example.
+
+\verb|p4a_process::default_properties| contains the \Apips properties used
+in \texttt{p4a}.
 
 %%ContentEnd
 
