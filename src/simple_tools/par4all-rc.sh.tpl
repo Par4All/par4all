@@ -34,12 +34,14 @@ update_libs_search_paths()
 {
     if [ -d $$P4A_DIST/$$1 ]; then
         if [ -d $$P4A_DIST/$$1/pkgconfig ]; then
-            export PKG_CONFIG_PATH=$$(prepend_to_path_var PKG_CONFIG_PATH $$P4A_DIST/$$1/pkgconfig)
+            export PKG_CONFIG_PATH=$$(prepend_to_path_var \
+	      PKG_CONFIG_PATH $$P4A_DIST/$$1/pkgconfig)
         fi
-        # If libs path not in ld.so.conf.d, then ldconfig -p should not have it and
-        # we must add it to LD_LIBRARY_PATH.
+        # If libs path not in ld.so.conf.d, then ldconfig -p should not have
+	# it and we must add it to LD_LIBRARY_PATH.
         if [ `/sbin/ldconfig -p | grep $$P4A_DIST/$$1 | wc -l` = 0 ]; then
-            export LD_LIBRARY_PATH=$$(prepend_to_path_var LD_LIBRARY_PATH $$P4A_DIST/$$1)
+            export LD_LIBRARY_PATH=$$(prepend_to_path_var \
+	      LD_LIBRARY_PATH $$P4A_DIST/$$1)
         fi
     fi
 }
@@ -48,12 +50,31 @@ update_libs_search_paths lib
 update_libs_search_paths lib64
 
 # Update the Python module search path for pyps.
-NEW_PYTHON_PATH=$$(pkg-config pips --variable=pkgpythondir)
-export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$NEW_PYTHON_PATH)
-
-# Update the Python module search path so that python 3.1 locates python-ply.
-PYTHONPATH=$$(prepend_to_path_var PYTHONPATH /usr/share/pyshared)
-export PYTHONPATH
+PYPS_PATH=$$(pkg-config pips --variable=pkgpythondir)
+if [ -d $$PYPS_PATH ]; then
+    export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PYPS_PATH)
+fi
+# check also in lib64 if it exists (for fedora distro)
+PYPS_PATH=`echo $$PYPS_PATH | sed -e 's/lib/lib64/'`
+if [ -d $$PYPS_PATH ]; then
+    export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PYPS_PATH)
+fi
+# Update the Python module search path so python can find ply
+PLY_PATH=/usr/shared/pyshared
+if [ -d $$PLY_PATH ]; then
+    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
+    export PYTHONPATH
+fi
+PLY_PATH=/usr/lib/python2.6/site-packages
+if [ -d $$PLY_PATH/ply ]; then
+    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
+    export PYTHONPATH
+fi
+PLY_PATH=/usr/lib/python3.1/site-packages
+if [ -d $$PLY_PATH/ply ]; then
+    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
+    export PYTHONPATH
+fi
 
 # Do not leave our functions defined in user namespace.
 unset update_libs_search_paths 
