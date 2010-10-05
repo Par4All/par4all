@@ -2646,3 +2646,34 @@ void writeresult(char *mod_name)
     safe_fclose(fp, filename);
     free(filename);
 }
+
+
+
+// have to be done before call :
+// * set_ordering_to_statement
+// * set_enclosing_loops_map( loops_mapping_of_statement( mod_stat ) );
+graph compute_dg_on_statement_from_chains( statement s, graph chains ) {
+  int i,j;
+  dg = copy_graph( chains );
+
+  dg_type = DG_SEMANTICS; //FIXME
+
+  debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
+  quick_privatize_graph( dg );
+  debug_off();
+
+  for ( i = 0; i <= 4; i++ ) {
+    for ( j = 0; j <= 2; j++ ) {
+      deptype[i][j] = 0;
+      constdep[i][j] = 0;
+    }
+  }
+
+  rdg_statement( s );
+
+  ifdebug(1) {
+    mem_spy_end( "After DG computation" );
+  }
+
+  return dg;
+}

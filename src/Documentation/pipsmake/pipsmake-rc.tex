@@ -7157,6 +7157,23 @@ LOOP_EXPANSION_SIZE ""
 LOOP_EXPANSION_OFFSET 0
 \end{PipsProp}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop fusion
+
+\subsection{Loop Fusion}
+
+\begin{PipsMake}
+alias Fusion 'Fusion Loops'
+loop_fusion            > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.chains
+        < MODULE.dg
+\end{PipsMake}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
 
 \subsection{Index Set Splitting}
