@@ -7804,6 +7804,9 @@ transformation that identifies and removes such dead code is called dead
 code elimination. So in fact, Use-def elimination in PIPS is Dead code
 elimination !
 
+This pass require that effects are calculated with property 
+MEMORY_EFFECTS_ONLY set to FALSE.
+
 \end{PipsPass}
 
 \begin{PipsMake}
