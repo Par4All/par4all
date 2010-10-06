@@ -37,7 +37,7 @@
 
 \author{Serge \textsc{Guelton} \and Ronan \textsc{Keryell} \and Grégoire
   \textsc{Péan} \and Claire \textsc{Seguin} \and Mickaël \textsc{Thievent}
-  \and Pierre \textsc{Villalon}}
+  \and Pierre \textsc{Villalon} \and Amaury textsc{Darsch}}
 
 \maketitle
 
@@ -83,18 +83,25 @@ only the \Apfa core developers.
 \label{sec:pack-need-build}
 
 The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
-Debian/unstable.
+Fedora Core 13 and Debian/unstable.
 
-To only run \Apfa, the following packages on Debian or Ubuntu are needed:
+To only run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
   \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
   \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
 \end{quote}
+
+To only run \Apfa with Fedora Core 13, the following packages 13 are needed:
+\begin{quote}
+  \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
+  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran}
+\end{quote}
+
 % To ease copy/paste:
 % libncurses5 libreadline5 python python-ply python3.1 gfortran
 
-If you want to compile \Apfa by your own, you need to have a bigger list
-of packages installed:
+If you want to compile \Apfa by your own with Debian or Ubuntu, you also 
+need to the following packages:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
   \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
@@ -103,14 +110,32 @@ of packages installed:
   \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
   \texttt{git}
 \end{quote}
+
+If you want to compile \Apfa by your own with Fedora Core 13, you also
+need to install the following packages:
+\begin{quote}
+  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
+  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
+  \texttt{readline-devel}, \texttt{python-devel}, \texttt{swig},
+  \texttt{python-ply}, \texttt{python3}, \texttt{gmp-devel},
+  \texttt{mpfr-devel}, \texttt{gcc-gfortran}, \texttt{subversion},
+  \texttt{git}
+\end{quote}
+
 % To ease copy/paste:
 % cproto indent flex bison automake libtool autoconf libreadline5-dev python-dev swig python-ply python3.1 libgmp3-dev libmpfr-dev gfortran subversion git
 
-If you want also to compile the documentation, you need also:
+If you want also to compile the documentation with Debian or Ubuntu, you 
+also need:
 \begin{quote}
   \texttt{texlive-full}, \texttt{tex4ht}
 \end{quote}
 
+If you want also to compile the documentation with Fedora Core 13, you 
+also need:
+\begin{quote}
+  \texttt{texlive-2007}, \texttt{tetex-tex4ht}
+\end{quote}
 
 \subsection{The compilation process}
 \label{sec:compilation-process}
