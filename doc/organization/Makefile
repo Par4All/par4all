@@ -18,7 +18,7 @@ _HAS_HTLATEX_ = 1
 ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
 
-# Some own Par4All stuff:
+# Some own Par4All global config information:
 include $(P4A_ROOT)/doc/libs/par4all.mk
 
 default: full-compile phase7

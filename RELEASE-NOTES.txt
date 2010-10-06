@@ -1,5 +1,5 @@
-Release notes for Par4All 1.0, 2010/07/16
-=========================================
+Release notes for Par4All 1.0.3, 2010/10/06
+===========================================
 
 Ronan Keryell, HPC Project.
 
@@ -140,8 +140,6 @@ The support for Fortran95 is not included in this release since it was not
 mature enough at this release time, so only Fortran 77 with some
 extensions is currently accepted.
 
-Fortran95 support should be in the 2010/09 release.
-
 
 C
 -
@@ -184,8 +182,6 @@ few known limitations :
   within and a ``goto`` to/from outside, it may probably fail. This
   happens also if you have ``break`` or ``continue`` in loops with some local
   variables since those are internally represented with ``goto``.
-
-Full C99 support should be in the 2010/09 release.
 
 
 Cuda
