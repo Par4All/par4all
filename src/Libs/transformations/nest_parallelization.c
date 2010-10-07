@@ -519,12 +519,11 @@ static int look_for_references_in_statement(statement s, reference (*reference_t
 	pips_error("look_for_references_in_statement", 
 		   "case is_instruction_unstructured");
 	break;
-	default : 
-	pips_error("look_for_references_in_statement", 
-		   "Bad instruction tag");
+    default:
+      pips_internal_error("Bad instruction tag");
     }
 
-    debug(5, "look_for_references_in_statement", "end %d\n", count);
+    pips_debug(5, "end %d\n", count);
 
     return count;
 }
@@ -539,45 +538,68 @@ static bool constant_array_reference_p(reference r)
     list li = reference_indices(r);
 
     ifdebug(9) {
-	debug(9, "constant_array_reference_p", "begin: index=%s reference=", 
-	      entity_local_name(current_loop_index));
+	pips_debug(9, "begin: index=%s reference=",
+		   entity_local_name(current_loop_index));
 	print_reference(r);
 	putc('\n', stderr);
     }
 
+    // The scalar references are constant with respect to any loop
+    // FI: this should be upgraded to cope with C structures...
     if(!array_reference_p(r)) {
-	debug(9, "constant_array_reference_p", "end: FALSE\n");
+      pips_debug(9, "end: FALSE\n");
 	return FALSE;
     }
 
-    /* FI: this is a very approximate evaluation that assumes no induction variables */
-    MAPL(ci, {
-	expression i = EXPRESSION(CAR(ci));
-	int count = look_for_references_in_expression(i, reference_identity, current_loop_index_p);
+    /* FI: this is a very approximatw evaluation that assumes no
+       induction variables, affine or not */
+    FOREACH(EXPRESSION, i, li) {
+      int count = look_for_references_in_expression(i, reference_identity,
+						    current_loop_index_p);
 
-	if(count!=0) {
-	    debug(9, "constant_array_reference_p", "end: count=%d FALSE\n", count);
-	    return FALSE;
-	}
-    }, li);
+      if(count!=0) {
+	pips_debug(9, "end: count=%d FALSE\n", count);
+	return FALSE;
+      }
+    }
 
-    debug(9, "constant_array_reference_p", "end: TRUE\n");
+    pips_debug(9, "end: TRUE\n");
     return TRUE;
 }
 
 static bool contiguous_array_reference_p(reference r)
 {
-    /* Uses a static global variable, current_loop_index */
-    list li = reference_indices(r);
-    expression first_index = expression_undefined;
+  /* Uses a static global variable, current_loop_index */
+  list li = reference_indices(r);
+  expression se = expression_undefined; // subscript expression
+  normalized nse = normalized_undefined;
+  bool contiguous_p = FALSE;
 
-    if(!ENDP(li)) {
-	first_index = EXPRESSION(CAR(li));
-	return expression_reference_p(first_index) &&
-	    reference_variable(expression_reference(first_index)) == current_loop_index;
+  /* The test could be improved by checking that the offset with
+     respect to the loop index is constant within the loop nest:
+     e.g. i+n**2 is a contiguous access */
+  if(!ENDP(li)) {
+    if(c_language_module_p(get_current_module_entity())) {
+      se = EXPRESSION(CAR(gen_last(li)));
     }
+    else if(fortran_language_module_p(get_current_module_entity())) {
+      se = EXPRESSION(CAR(li));
+    }
+    nse = NORMALIZE_EXPRESSION(se);
+    if(normalized_linear_p(nse)) {
+      Pvecteur vse = normalized_linear(nse);
+      if(vect_dimension(vse)==1
+	 && vect_coeff((Variable) current_loop_index, vse)==VALUE_ONE)
+	 contiguous_p = TRUE;
+    }
+    // This consider 2*i as a contiguous reference... The above check
+    //on VALUE_ONE might have to be relaxed
+    //return expression_reference_p(first_index) &&
+    //(reference_variable(expression_reference(first_subscript))
+    // == current_loop_index);
+  }
 
-    return FALSE;
+  return contiguous_p;
 }
 
 
@@ -606,10 +628,12 @@ static bool nth_loop_p(__attribute__((unused))statement s)
 
 /* FI: there are at least two problems:
  *
- * - transformations like loop coalescing and full loop unrolling are not considered when
- * the iteration counts are small (although they are considered in one_loop_parallelization!)
+ * - transformations like loop coalescing and full loop unrolling are
+ * not considered when the iteration counts are small (although they
+ * are considered in one_loop_parallelization!)
  *
- * - the cost function should be non-linear (C has conditional expressions:-)
+ * - the cost function should be non-linear (C has conditional
+ * expressions:-)
  *
  * Besides, it's bugged
  */
@@ -629,22 +653,23 @@ static statement loop_nest_parallelization(list lls)
     int vector_loop_number;
     int optimal_performance;
 
-    debug(9, "loop_nest_parallelization", "begin\n");
+    pips_debug(8, "begin\n");
 
     /* gather information about each loop direction */
+    // Allocate arrays to store the parallelism and locality information
     for(i=0; i < CHARACTERISTICS_NUMBER; i++)
 	characteristics[i] = (int *) malloc(loop_count*(sizeof(ln)));
 
+    // Look for contiguous references
     ln = 0;
-    MAPL(cls, {
-	statement ls = STATEMENT(CAR(cls));
-
+    FOREACH(STATEMENT, ls, lls) {
 	current_loop_index = loop_index(statement_loop(ls));
 	*(characteristics[DIRECTION_CONTIGUOUS_COUNT]+ln) = 
 	    look_for_references_in_statement(ls, reference_identity, contiguous_array_reference_p);
 	ln++;
-    }, lls);
+    }
 
+    // Mark all loops as parallel
     ln = 0;
     MAPL(cls, {
 	/* FI: the dependence graph should be used !!! */
@@ -653,77 +678,100 @@ static statement loop_nest_parallelization(list lls)
     }, lls);
 
     ln = 0;
-    MAPL(cls, {
-	statement ls = STATEMENT(CAR(cls));
-
+    FOREACH(STATEMENT, ls, lls) {
 	current_loop_index = loop_index(statement_loop(ls));
-	*(characteristics[DIRECTION_REUSE_COUNT]+ln) = 
-	    look_for_references_in_statement(ls, reference_identity, constant_array_reference_p);
+	*(characteristics[DIRECTION_REUSE_COUNT]+ln) =
+	    look_for_references_in_statement(ls,
+					     reference_identity,
+					     constant_array_reference_p);
 	ln++;
-    }, lls);
+    }
 
     ln = 0;
-    MAPL(cls, {
-	statement ls = STATEMENT(CAR(cls));
-
-	*(characteristics[DIRECTION_ITERATION_COUNT]+ln) = 
+    FOREACH(STATEMENT, ls, lls) {
+	*(characteristics[DIRECTION_ITERATION_COUNT]+ln) =
 	    numerical_loop_iteration_count(statement_loop(ls));
 	ln++;
-    }, lls);
+    }
 
-    ifdebug(9) {
+    ifdebug(8) {
 	ln = 0;
-	MAPL(cls, {
-	    statement ls = STATEMENT(CAR(cls));
-
-	    (void) fprintf(stderr,"index %s\t#contiguous %d\t// %s\t#reuse %d\t#range %d\n",
+	FOREACH(STATEMENT, ls, lls) {
+	    (void) fprintf(stderr,"loop %d index %s\t#contiguous %d\t// %s\t#reuse %d\t#range %d\n",
+			   ln,
 			   entity_local_name(loop_index(statement_loop(ls))),
 			   *(characteristics[DIRECTION_CONTIGUOUS_COUNT]+ln),
 			   bool_to_string(*(characteristics[DIRECTION_PARALLEL_P]+ln)),
 			   *(characteristics[DIRECTION_REUSE_COUNT]+ln),
 			   *(characteristics[DIRECTION_ITERATION_COUNT]+ln));
 	    ln++;
-	}, lls);
+	}
     }
 
-    /* choose and apply a transformation if at least one parallel loop has been found */
+    /* choose and apply a transformation if at least one parallel loop
+       has been found */
 
-    /* choose as vector loop a parallel loop optimizing a tradeoff between contiguity
-     * and iteration count
+    /* choose as vector loop a parallel loop optimizing a tradeoff
+     * between contiguity and iteration count
      */
     optimal_performance = 0;
     vector_loop_number = -1;
     for(ln = 0; ln < loop_count; ln++) {
 	/* FI: these two constants should be provided by the target description (see target.c) */
+#define REUSE_WEIGHT 8
 #define CONTIGUITY_WEIGHT 4
 #define ITERATION_COUNT_WEIGHT 1
-	int performance = CONTIGUITY_WEIGHT*(*(characteristics[DIRECTION_CONTIGUOUS_COUNT]+ln))
-	    + ITERATION_COUNT_WEIGHT*(*(characteristics[DIRECTION_ITERATION_COUNT]+ln));
+	int performance =
+	  REUSE_WEIGHT*(*(characteristics[DIRECTION_REUSE_COUNT]+ln))
+	  + CONTIGUITY_WEIGHT*(*(characteristics[DIRECTION_CONTIGUOUS_COUNT]+ln));
+	int iteration_count = *(characteristics[DIRECTION_ITERATION_COUNT]+ln);
 
-	pips_assert("loop_nest_parallelization", performance > 0);
+	/* If the iteration count is unknown, the iteration count is
+	   -1, which may lead to a negative performance when all
+	   other coefficients are 0, which may happen with complex
+	   subscript expressions */
+	performance += ITERATION_COUNT_WEIGHT*(iteration_count);
+
+	pips_assert("performance is strictly greater than 0", performance > 0);
+
+	// FI: see case nested06, the matrix multiplication
+	// If the best loop is not parallel, then some kind of tiling
+	// and unrolling should be performed to keep the best loop
+	// inside (unrolled) while having a parallel loop around
+	// Rgeister pressure should also be taken into account to
+	// decide the tiling factor, which becomes the unrolling
+	// factor
+
+	// This kind of stuff can be performed at PyPS level or by PoCC
+
+	// Look for the best vector loop
 	if(*(characteristics[DIRECTION_PARALLEL_P]+ln) == TRUE
 	   && performance > optimal_performance) {
 	    optimal_performance = performance;
 	    vector_loop_number = ln;
 	}
     }
-    pips_assert("loop_nest_parallelization", vector_loop_number != -1);
-    ifdebug(9) {
-	debug(9, "loop_nest_parallelization", "Vector loop is loop %d\n",
-	      vector_loop_number);
+    pips_assert("One loop has been selected for vectorization",
+		vector_loop_number != -1);
+    ifdebug(8) {
+	pips_debug(8, "Vector loop is loop %d with performance %d\n",
+		   vector_loop_number, optimal_performance);
     }
 
     if(vector_loop_number != loop_count-1) {
 	/* the vector direction is not the innermost loop: exchange! */
-	debug(9, "loop_nest_parallelization", "Interchange innermost loop with vector loop\n");
+	pips_debug(8, "Interchange innermost loop with vector loop\n");
 	/* lls is expected in the other order :-( */
-	/* interchange_two_loops does not preserve parallel loops; they are all generated
-	 * as sequential loops (FI, 18 January 1993) 
+	/* interchange_two_loops does not preserve parallel loops;
+	 * they are all generated as sequential loops (FI, 18 January
+	 * 1993)
 	 */
-	s = interchange_two_loops(gen_nreverse(lls), vector_loop_number+1, loop_count);
+	s = interchange_two_loops(gen_nreverse(lls),
+				  vector_loop_number+1,
+				  loop_count);
     }
     else {
-	debug(9, "loop_nest_parallelization", "No loop interchange\n");
+	pips_debug(8, "No loop interchange\n");
     }
 
     /* mark vector loop as parallel */
@@ -733,7 +781,7 @@ static statement loop_nest_parallelization(list lls)
     current_loop_depth = loop_count;
     look_for_nested_loop_statements(s, mark_loop_as_parallel, nth_loop_p);
 
-    debug(9, "loop_nest_parallelization", "end\n");
+    pips_debug(8, "end\n");
 
     return s;
 }
@@ -742,9 +790,11 @@ static statement parallelization(list lls, __attribute__((unused)) bool (*loop_p
 {
     statement s = statement_undefined;
 
-    debug(9,"parallelization", "begin\n");
+    // The debug level is reset by the function looking for nested loops
+    debug_on("NEST_PARALLELIZATION_DEBUG_LEVEL");
+    pips_debug(8, "begin\n");
 
-    pips_assert("paralellization", gen_length(lls)!= 0);
+    pips_assert("the loop list is not empty", gen_length(lls)!= 0);
 
     if(gen_length(lls) == 1) {
 	s = one_loop_parallelization(STATEMENT(CAR(lls)));
@@ -753,10 +803,13 @@ static statement parallelization(list lls, __attribute__((unused)) bool (*loop_p
 	s = loop_nest_parallelization(lls);
     }
 
-    debug(9,"parallelization", "end\n");
+    pips_debug(8, "end\n");
+
+    debug_off();
 
     return s;
 }
+
 bool nest_parallelization(string module_name)
 {
     entity module;
@@ -766,7 +819,7 @@ bool nest_parallelization(string module_name)
     set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
 
-    pips_assert("loop_interchange", entity_module_p(module));
+    pips_assert("\"module\" is a module", entity_module_p(module));
 
     /* DBR_CODE will be changed into DBR_PARALLELIZED_CODE */
     set_current_module_statement(
@@ -786,7 +839,10 @@ bool nest_parallelization(string module_name)
 
     look_for_nested_loop_statements(mod_parallel_stat, parallelization,always_select_p);
 
-    /* Regenerate statement_ordering for the parallel code */
+    /* Regenerate statement_ordering for the parallel
+       code. module_body_reorder() checks the unique mapping
+       ordering_to_statement to make sure that no inconsistency is
+       introduced. */
     reset_ordering_to_statement();
     module_body_reorder(mod_parallel_stat);
 
@@ -805,7 +861,8 @@ bool nest_parallelization(string module_name)
 
     reset_current_module_statement();
     reset_current_module_entity();
-	reset_ordering_to_statement();
+    // Already performed befpre the reordering
+    //reset_ordering_to_statement();
 
     return TRUE;
 }
