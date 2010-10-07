@@ -21,6 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Functions to compute the numer of bytes required to store a
+   variable or an object of a given type in memory; used by memory
+   allocation functions in parsers, when allocation is possible
+   (STATIC and DYNAMIC). If the size is unknown, the variable is
+   allocated in the STACK area. See ri.pdf, section about "area". */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
