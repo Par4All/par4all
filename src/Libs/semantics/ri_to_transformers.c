@@ -1922,7 +1922,8 @@ transformer generic_complete_statement_transformer(transformer t,
   else if(instruction_whileloop_p(i)) {
     whileloop w = instruction_whileloop(i);
     evaluation e = whileloop_evaluation(w);
-
+    // This test could be deported by a call to
+    // complete_whileloop_transformer()
     if(evaluation_before_p(e)) {
       ct = new_complete_whileloop_transformer(t, pre, w, !identity_p);
     }

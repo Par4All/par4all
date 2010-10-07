@@ -199,3 +199,80 @@ list clean_up_transformer_list(list tfl)
     ntfl = CONS(TRANSFORMER, transformer_identity(), ntfl);
   return ntfl;
 }
+
+/* Transformer two transformers into a correct transformer list
+ *
+ * Could be generalized to any number of transformers using a
+ * varargs... and more thinking.
+ *
+ * Two transformers are obtained for loops that may be skipped or
+ * entered and for tests who condition is not statically decisable.
+ */
+list two_transformers_to_list(transformer t1, transformer t2)
+{
+  list tl = NIL;
+  if(transformer_empty_p(t1)) {
+    if(transformer_empty_p(t2)) {
+      /* The loop is always entered and never exited */
+      tl = NIL;
+    }
+    else {
+      /* The loop is always entered */
+      tl = CONS(TRANSFORMER, t2, NIL);
+    }
+  }
+  else {
+    if(transformer_empty_p(t2)) {
+      /* The loop is always skipped */
+      tl = CONS(TRANSFORMER, t1, NIL);
+    }
+    else {
+      /* The loop may be entered or not */
+      if(transformer_identity_p(t1)) {
+	if(transformer_identity_p(t2)) {
+	  tl = CONS(TRANSFORMER, t1, NIL);
+	  free_transformer(t2);
+	}
+	else {
+	  tl = CONS(TRANSFORMER, t1,
+		     CONS(TRANSFORMER, t2, NIL));
+	}
+      }
+      else {
+	if(transformer_identity_p(t2)) {
+	  tl = CONS(TRANSFORMER, t2,
+		     CONS(TRANSFORMER, t1, NIL));
+	}
+	else {
+	  tl = CONS(TRANSFORMER, t1,
+		     CONS(TRANSFORMER, t2, NIL));
+	}
+      }
+    }
+  }
+  return tl;
+}
+transformer transformer_list_to_transformer(list ltl)
+{
+  transformer ltf = transformer_undefined;
+  /* FI: an extra effort is needed to handle the general case of n
+     transformers. For the time being, the list can contain at most
+     two transformers. */
+  if(ENDP(ltl))
+    ltf = transformer_empty();
+  else if(ENDP(CDR(ltl)))
+    ltf = TRANSFORMER(CAR(ltl));
+  else if(ENDP(CDR(CDR(ltl)))) {
+    transformer ltf1 = TRANSFORMER(CAR(ltl));
+    transformer ltf2 = TRANSFORMER(CAR(CDR(ltl)));
+    ltf = transformer_convex_hull(ltf1, ltf2);
+    free_transformer(ltf1);
+    free_transformer(ltf2);
+  }
+  else {
+    // loop...
+    pips_internal_error("Two transformers at most expected.\n");
+  }
+
+  return ltf;
+}

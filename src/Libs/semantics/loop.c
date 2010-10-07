@@ -279,6 +279,7 @@ transformer any_loop_to_k_transformer(transformer t_init,
 
   return t_body_star;
 }
+
 transformer any_loop_to_transformer(transformer t_init,
 				    transformer t_enter,
 				    transformer t_next,
@@ -334,7 +335,9 @@ transformer forloop_to_transformer(forloop fl,
   return t_body_star;
 }
 
-list forloop_to_transformer_list(forloop l, transformer pre, list e)
+list forloop_to_transformer_list(forloop l __attribute__ ((unused)),
+				 transformer pre __attribute__ ((unused)),
+				 list e __attribute__ ((unused)))
 {
   list tfl = NIL;
   pips_internal_error("Not implemented yet.\n");
@@ -1330,21 +1333,24 @@ transformer loop_to_transformer(loop l, transformer pre, list e)
   return tf;
 }
 
-list loop_to_transformer_list(loop l, transformer pre, list e)
+list loop_to_transformer_list(loop l __attribute__ ((unused)),
+			      transformer pre __attribute__ ((unused)),
+			      list e __attribute__ ((unused)))
 {
   list tfl = NIL;
   pips_internal_error("Not implemented yet.\n");
   return tfl;
 }
 
-transformer complete_any_loop_transformer(transformer t_init,
-					  transformer __attribute__ ((unused)) t_enter,
-					  transformer t_skip,
-					  transformer t_body_star,
-					  transformer t_body,
-					  transformer __attribute__ ((unused)) t_continue,
-					  transformer t_inc,
-					  transformer t_exit)
+/* FI: used to be complete_any_loop_transformer() with a direct
+   reduction by convex hull.
+*/
+list complete_any_loop_transformer_list(transformer t_init,
+					transformer t_skip,
+					transformer t_body_star,
+					transformer t_body,
+					transformer t_inc,
+					transformer t_exit)
 {
   /* t_loop = t_init ; t_skip + t_bodystar ; t_body ; t_inc; t_exit
    *
@@ -1373,7 +1379,8 @@ transformer complete_any_loop_transformer(transformer t_init,
    * These cases are checked with complete01.c,
    * complete02.c,... complete05.c
    */
-  transformer ct = transformer_undefined;
+  list ltl = NIL;
+  // transformer ct = transformer_undefined;
   /* loop skipped transformer */
   transformer lst = transformer_combine(copy_transformer(t_init), t_skip);
   /* add loop entered transformer/condition: should already be in t_body_star */
@@ -1386,16 +1393,12 @@ transformer complete_any_loop_transformer(transformer t_init,
   ifdebug(8) {
     fprintf(stderr, "t_init:\n");
     print_transformer(t_init);
-    fprintf(stderr, "t_enter:\n");
-    print_transformer(t_enter);
     fprintf(stderr, "t_skip:\n");
     print_transformer(t_skip);
     fprintf(stderr, "t_body_star:\n");
     print_transformer(t_body_star);
     fprintf(stderr, "t_body:inc\n");
     print_transformer(t_body);
-    fprintf(stderr, "t_continue:\n");
-    print_transformer(t_continue);
     fprintf(stderr, "t_inc:\n");
     print_transformer(t_inc);
     fprintf(stderr, "t_exit:\n");
@@ -1406,19 +1409,47 @@ transformer complete_any_loop_transformer(transformer t_init,
   let = transformer_combine(let, t_inc);
   let = transformer_combine(let, t_exit);
 
-  /* combine both cases */
-  ct = transformer_convex_hull(lst, let);
+  /* combine both cases in a transformer list */
+  //ct = transformer_convex_hull(lst, let);
+  ltl = two_transformers_to_list(lst, let);
 
   //free_transformer(post_enter);
   //free_transformer(post_continue);
   //free_transformer(pre_body);
 
   ifdebug(8) {
-    fprintf(stderr, "ct:\n");
-    print_transformer(ct);
+    fprintf(stderr, "ltl:\n");
+    print_transformers(ltl);
   }
 
-  return ct;
+  return ltl;
+}
+
+/* Reduce the transformer list associated to a loop to a unique
+   transformer using a convex hull. An empty list is converted into
+   an empty transformer. The input list is freed. */
+transformer complete_any_loop_transformer(transformer t_init,
+					  transformer __attribute__ ((unused)) t_enter,
+					  transformer t_skip,
+					  transformer t_body_star,
+					  transformer t_body,
+					  transformer __attribute__ ((unused)) t_continue,
+					  transformer t_inc,
+					  transformer t_exit)
+{
+  transformer ltf = transformer_undefined;
+  list ltl = complete_any_loop_transformer_list(t_init,
+						t_skip,
+						t_body_star,
+						t_body,
+						t_inc,
+						t_exit);
+
+  ltf = transformer_list_to_transformer(ltl);
+
+  gen_free_list(ltl);
+
+  return ltf;
 }
 
 transformer complete_forloop_transformer(transformer t_body_star,
@@ -1468,12 +1499,13 @@ transformer complete_forloop_transformer(transformer t_body_star,
 }
 
 /* entered_p is used to for the execution of at least one iteration */
-transformer new_complete_whileloop_transformer(transformer t_body_star,
-					       transformer pre,
-					       whileloop wl,
-					       bool entered_p)
+list new_complete_whileloop_transformer_list(transformer t_body_star,
+					     transformer pre,
+					     whileloop wl,
+					     bool entered_p)
 {
-  transformer ct = transformer_undefined;
+  list tfl = NIL;
+  //transformer ct = transformer_undefined;
   statement body_s = whileloop_body(wl);
   transformer t_body = load_statement_transformer(body_s);
   transformer ct_body = transformer_undefined;
@@ -1494,13 +1526,15 @@ transformer new_complete_whileloop_transformer(transformer t_body_star,
   /* Make sure you have the effective statement transformer: it is not
      stored for loops and this is key for nested loops. */
   pre_body = transformer_apply(t_body_star, pre);
+  /* Should we instead compute recursively a transformer list? */
   ct_body = complete_statement_transformer(t_body, pre_body, body_s);
 
   post_body = transformer_apply(ct_body, pre_body);
   t_continue = condition_to_transformer(cond_e, post_body, TRUE);
   t_exit = condition_to_transformer(cond_e, post_body, FALSE);
 
-  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, ct_body, t_continue, t_inc, t_exit);
+  tfl = complete_any_loop_transformer_list(t_init, t_skip, t_body_star,
+					   ct_body, t_inc, t_exit);
 
   free_transformer(ct_body);
   free_transformer(pre_body);
@@ -1512,13 +1546,27 @@ transformer new_complete_whileloop_transformer(transformer t_body_star,
   free_transformer(t_exit);
   free_transformer(t_inc);
 
+  return tfl;
+}
+
+/* entered_p is used to for the execution of at least one iteration */
+transformer new_complete_whileloop_transformer(transformer t_body_star,
+					       transformer pre,
+					       whileloop wl,
+					       bool entered_p)
+{
+  list tfl =
+    new_complete_whileloop_transformer_list(t_body_star, pre, wl, entered_p);
+  transformer ct = transformer_list_to_transformer(tfl);
+  // tfl is destroyed by transformer_list_to_transformer()
   return ct;
 }
 
-transformer complete_repeatloop_transformer(transformer t_body_star,
-					    transformer __attribute__ ((unused)) pre, 
+list complete_repeatloop_transformer_list(transformer t_body_star,
+					    transformer __attribute__ ((unused)) pre,
 					    whileloop wl)
 {
+  list tfl = NIL;
   transformer ct = transformer_undefined;
   statement body_s = whileloop_body(wl);
   transformer pt_body = load_statement_transformer(body_s);
@@ -1551,7 +1599,7 @@ transformer complete_repeatloop_transformer(transformer t_body_star,
    * t_loop = (t_body ; t_exit) +
    *          (t_body ; t_continue ; t_body_star ; t_body ; t_exit)
    *
-   * where we assume that t_body_star includes the continuation condition. 
+   * where we assume that t_body_star includes the continuation condition.
    */
 
   //  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, t_body, t_continue, t_inc, t_exit);
@@ -1563,7 +1611,8 @@ transformer complete_repeatloop_transformer(transformer t_body_star,
   t_loop_2 = transformer_combine(t_loop_2, t_body);
   t_loop_2 = transformer_combine(t_loop_2, t_exit);
 
-  ct = transformer_convex_hull(t_loop_1, t_loop_2);
+  //ct = transformer_convex_hull(t_loop_1, t_loop_2);
+  tfl = two_transformers_to_list(t_loop_1, t_loop_2);
 
   free_transformer(t_body);
   free_transformer(pre_body);
@@ -1573,9 +1622,18 @@ transformer complete_repeatloop_transformer(transformer t_body_star,
   free_transformer(t_exit);
   free_transformer(t_inc);
 
-  free_transformer(t_loop_1);
-  free_transformer(t_loop_2);
+  //free_transformer(t_loop_1);
+  //free_transformer(t_loop_2);
 
+  return tfl;
+}
+
+transformer complete_repeatloop_transformer(transformer t_body_star,
+					    transformer pre,
+					    whileloop wl)
+{
+  list tl = complete_repeatloop_transformer_list(t_body_star, pre, wl);
+  transformer ct = transformer_list_to_transformer(tl);
   return ct;
 }
 
@@ -1705,7 +1763,38 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
   return tf;
 }
 
+/* FI: I'm not sure this function is useful */
 transformer complete_whileloop_transformer(transformer ltf,
+					   transformer pre,
+					   whileloop wl)
+{
+  transformer t = transformer_undefined;
+  evaluation lt = whileloop_evaluation(wl);
+
+  if(evaluation_before_p(lt))
+    t = new_complete_whileloop_transformer(ltf, pre, wl, FALSE);
+  else
+    t = complete_repeatloop_transformer(ltf, pre, wl);
+
+  return t;
+}
+
+list complete_whileloop_transformer_list(transformer ltf, // loop transformer
+					 transformer pre,
+					 whileloop wl)
+{
+  list tfl = NIL;
+  evaluation lt = whileloop_evaluation(wl);
+
+  if(evaluation_before_p(lt))
+    tfl = new_complete_whileloop_transformer_list(ltf, pre, wl, FALSE);
+  else
+    tfl = complete_repeatloop_transformer_list(ltf, pre, wl);
+
+  return tfl;
+}
+
+transformer old_complete_whileloop_transformer(transformer ltf,
 					   transformer pre,
 					   whileloop l)
 {
@@ -2089,10 +2178,21 @@ transformer whileloop_to_transformer(whileloop l,
   return t;
 }
 
-list whileloop_to_transformer_list(whileloop l, transformer pre, list e)
+list whileloop_to_transformer_list(whileloop l __attribute__ ((unused)),
+				   transformer pre __attribute__ ((unused)),
+				   list e __attribute__ ((unused)))
 {
   list tfl = NIL;
-  pips_internal_error("Not implemented yet.\n");
+  evaluation lt = whileloop_evaluation(l);
+
+  pips_internal_error("This function should never be called.\n");
+
+  /*
+  if(evaluation_before_p(lt))
+    tfl = new_whileloop_to_transformer_list(l, pre, e);
+  else
+    tfl = repeatloop_to_transformer_list(l, pre, e);
+  */
   return tfl;
 }
 

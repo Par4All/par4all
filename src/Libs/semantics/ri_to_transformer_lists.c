@@ -67,57 +67,7 @@
 
 #include "semantics.h"
 
-#if 0
 
-/* Recursive Descent in Data Structure Statement */
-
-/* SHARING : returns the transformer stored in the database. Make a
- * copy before using it. The copy is not made here because the result
- * is not always used after a call to this function, and it would
- * create non reachable structures. Another solution would be to store
- * a copy and free the unused result in the calling function but
- * transformer_free does not really free the transformer. Not very
- * clean.  BC, oct. 94
- */
-
-/* Assumes that entity_has_values_p(v) holds. */
-transformer dimensions_to_transformer(entity v, transformer pre)
-{
-  transformer dt = transformer_identity();
-  type vt = entity_type(v); // Do not use ultimate_type or you'll miss
-			    // the dimensions.
-
-  if(type_variable_p(vt)) {
-    list dl = variable_dimensions(type_variable(vt)); // dimension list
-    if(!ENDP(dl)) { // to save a copy and to simplify debugging
-      transformer cpre = copy_transformer(pre);
-
-      FOREACH(DIMENSION, d, dl) {
-	expression l = dimension_lower(d);
-	expression u = dimension_upper(d);
-	transformer lt = safe_expression_to_transformer(l, cpre);
-	transformer lpre = transformer_apply(lt, pre);
-	transformer lpre_r = transformer_range(lpre);
-	transformer ut = safe_expression_to_transformer(u, lpre_r);
-	transformer upre = transformer_apply(ut, lpre);
-
-	free_transformer(cpre);
-	cpre = transformer_range(upre);
-	free_transformer(upre);
-	free_transformer(lpre);
-	free_transformer(lpre_r);
-
-	dt = transformer_combine(transformer_combine(dt, lt), ut);
-	free_transformer(lt);
-	free_transformer(ut);
-      }
-      free_transformer(cpre);
-    }
-  }
-
-  return dt;
-}
-#endif
 
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
@@ -235,7 +185,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
    Note: initialization of static variables are not taken into
    account. They must be used for summary preconditions.
  */
-transformer declarations_to_transformer_list(list dl, transformer pre)
+list declarations_to_transformer_list(list dl, transformer pre)
 {
   entity v = entity_undefined;
   transformer btf = transformer_undefined;
@@ -920,16 +870,16 @@ static list instruction_to_transformer_list(instruction i,
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    tl = loop_to_transformer_list(l, pre, e);
+    tl = complete_loop_to_transformer_list(l, pre, e);
     break;
   case is_instruction_whileloop: {
     wl = instruction_whileloop(i);
-    tl = whileloop_to_transformer_list(wl, pre, e);
+    tl = complete_whileloop_to_transformer_list(wl, pre, e);
     break;
   }
   case is_instruction_forloop:
     fl = instruction_forloop(i);
-    tl = forloop_to_transformer_list(fl, pre, e);
+    tl = complete_forloop_to_transformer_list(fl, pre, e);
     break;
   case is_instruction_goto:
     pips_internal_error("unexpected goto in semantics analysis");
