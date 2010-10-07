@@ -5322,7 +5322,8 @@ is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
 This algorithm still is in the development stage. Do not use
-it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by IEF.}
+it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by
+  IEF. Or replaced by a call to PoCC.}
 
 \end{PipsPass}
 
@@ -7822,7 +7823,7 @@ code elimination. So in fact, Use-def elimination in PIPS is Dead code
 elimination !
 
 This pass require that effects are calculated with property 
-MEMORY_EFFECTS_ONLY set to FALSE.
+\verb/MEMORY_EFFECTS_ONLY/ set to \verb/FALSE/.
 
 \end{PipsPass}
 
@@ -10154,12 +10155,14 @@ transformation_test    > MODULE.code
 \index{OpenMP}
 
 \begin{PipsPass}{ompify_code}
-The following transformation reads the sequential code and generates OpenMP pragma as
-an extension to statements. The pragmas produced are based on the information
-previously computed by differents phases and already stores in the pips internal
-representation of the sequential code. It might be interesting to use the phase
-internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
-ompify\_code in order to maximize the number of parallel information available.
+  The following transformation reads the sequential code and generates
+  OpenMP pragma as an extension to statements. The pragmas produced
+  are based on the information previously computed by differents
+  phases and already stores in the pips internal representation of the
+  sequential code. It might be interesting to use the phase
+  internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code})
+  before to apply ompify\_code in order to maximize the number of
+  parallel information available.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10208,9 +10211,9 @@ OMP_IF_CLAUSE_RECURSIVE TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{omp_merge_pragma}
-Compiler tends to produce many parallel loops whcih is genrally not optimal for
-performance. The following transformation merges nested omp pragma in a unique
-omp pragma.
+  Compiler tends to produce many parallel loops which is generally not
+  optimal for performance. The following transformation merges nested
+  omp pragma in a unique omp pragma.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10218,8 +10221,9 @@ omp_merge_pragma             > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-PIPS merges the omp pragma on the inner or outer loop depending on the property
-OMP\_MERGE\_POLICY. The property can be set to \verb|outer| or \verb|inner|.
+PIPS merges the omp pragma on the inner or outer loop depending on the
+property OMP\_MERGE\_POLICY. This string property can be set to either
+\verb|outer| or \verb|inner|.
 \begin{PipsProp}{OMP_MERGE_POLICY}
 OMP_MERGE_POLICY "outer"
 \end{PipsProp}
