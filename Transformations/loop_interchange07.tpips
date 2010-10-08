@@ -1,5 +1,7 @@
 delete loop_interchange07
+
 setproperty ABORT_ON_USER_ERROR TRUE
+
 create loop_interchange07 loop_interchange07.f
 
 # We use the winning combination, except TRANSFORMERS_IN_CONTEXT

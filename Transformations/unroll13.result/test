@@ -4,7 +4,7 @@ Code unrolled four times for "UNROLL13"
 C     Example used by Khadija Immadoueddine, p. 7 in her report
 C
 C     It seems that she has unrolled the j loop by hand and the i loop
-C     with PIPS
+C     with PIPS. In fact, she performed an unroll-and-jam
 C
       SUBROUTINE UNROLL13(N1, N2, A, B, C)
 C
@@ -31,7 +31,7 @@ Code after partial eval code for "UNROLL13"
 C     Example used by Khadija Immadoueddine, p. 7 in her report
 C
 C     It seems that she has unrolled the j loop by hand and the i loop
-C     with PIPS
+C     with PIPS. In fact, she performed an unroll-and-jam
 C
       SUBROUTINE UNROLL13(N1, N2, A, B, C)
 C

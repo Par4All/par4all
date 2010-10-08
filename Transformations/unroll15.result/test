@@ -145,7 +145,7 @@ Forward substitute the value of I
 
 
       PROGRAM MAIN
-      PARAMETER (N1=10, N2=11, N3=12)
+      PARAMETER (N1=10, N2=11)
       REAL A(0:N1+1,0:N2+1)
       REAL B(0:N1+1,0:N2+1)
       REAL C(0:N1+1,0:N2+1)
@@ -168,7 +168,7 @@ Get rid of useless assignments with use def elimination
 
 
       PROGRAM MAIN
-      PARAMETER (N1=10, N2=11, N3=12)
+      PARAMETER (N1=10, N2=11)
       REAL A(0:N1+1,0:N2+1)
       REAL B(0:N1+1,0:N2+1)
       REAL C(0:N1+1,0:N2+1)
@@ -191,7 +191,7 @@ Distribute the loops
 
 
       PROGRAM MAIN
-      PARAMETER (N1=10, N2=11, N3=12)
+      PARAMETER (N1=10, N2=11)
       REAL A(0:N1+1,0:N2+1)
       REAL B(0:N1+1,0:N2+1)
       REAL C(0:N1+1,0:N2+1)
@@ -218,7 +218,7 @@ Code after suppress dead code
 
 
       PROGRAM MAIN
-      PARAMETER (N1=10, N2=11, N3=12)
+      PARAMETER (N1=10, N2=11)
       REAL A(0:N1+1,0:N2+1)
       REAL B(0:N1+1,0:N2+1)
       REAL C(0:N1+1,0:N2+1)
@@ -244,7 +244,7 @@ C  P() {}
 
 
       PROGRAM MAIN
-      PARAMETER (N1=10, N2=11, N3=12)
+      PARAMETER (N1=10, N2=11)
       REAL A(0:N1+1,0:N2+1)
       REAL B(0:N1+1,0:N2+1)
       REAL C(0:N1+1,0:N2+1)
