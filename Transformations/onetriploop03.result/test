@@ -85,6 +85,7 @@ void onetriploop03(int n)
 
    i = n;
    foo("i = %d\n", i);
+   i = n+1;
    printf("i = %d\n", i);
    ;
 }

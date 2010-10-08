@@ -1,0 +1,82 @@
+
+Code unrolled twice for "UNROLL12"
+
+C     To try unrolling with epilogue
+C
+      PROGRAM UNROLL12
+C
+      PARAMETER (N=100)
+      REAL T(N+1)
+C
+100   CONTINUE                                                          0008
+      DO I = 1, 1+2*((N-1+1)/2)-1, 2
+         T(I) = -2*I
+         T(I+1) = -2*(I+1)
+      ENDDO
+      DO I = 1+2*((N-1+1)/2), N
+         T(I) = -2*I
+      ENDDO
+      DO I = 1, 1+2*((N+1-1+1)/2)-1, 2
+         T(I) = -2*I
+         T(I+1) = -2*(I+1)
+      ENDDO
+      DO I = 1+2*((N+1-1+1)/2), N+1
+         T(I) = -2*I
+      ENDDO
+C
+      PRINT *, I                                                        0015
+      END
+
+Code after partial eval code for "UNROLL12"
+
+C     To try unrolling with epilogue
+C
+      PROGRAM UNROLL12
+C
+      PARAMETER (N=100)
+      REAL T(N+1)
+C
+100   CONTINUE                                                          0008
+      DO I = 1, 100, 2
+         T(I) = -2*I
+         T(I+1) = -2*I-2
+      ENDDO
+      DO I = 101, 100
+         T(I) = -2*I
+      ENDDO
+      DO I = 1, 100, 2
+         T(I) = -2*I
+         T(I+1) = -2*I-2
+      ENDDO
+      DO I = 101, 101
+         T(101) = -202
+      ENDDO
+C
+      PRINT *, 102                                                      0015
+      END
+
+Code after suppress dead code for "UNROLL12"
+
+C     To try unrolling with epilogue
+C
+      PROGRAM UNROLL12
+C
+      PARAMETER (N=100)
+      REAL T(N+1)
+C
+100   CONTINUE                                                          0008
+      DO I = 1, 100, 2
+         T(I) = -2*I
+         T(I+1) = -2*I-2
+      ENDDO
+      I = 101
+      DO I = 1, 100, 2
+         T(I) = -2*I
+         T(I+1) = -2*I-2
+      ENDDO
+      I = 101
+      T(101) = -202
+      I = 101+1
+C
+      PRINT *, 102                                                      0015
+      END

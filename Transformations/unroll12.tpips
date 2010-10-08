@@ -24,25 +24,37 @@ setproperty ABORT_ON_USER_ERROR TRUE
 # Delete unroll
 # exit $exit_status
 
-delete unroll
-create unroll unroll.f
+delete unroll12
+create unroll12 unroll12.f
 
-apply UNROLL[UNROLL]
+setproperty LOOP_UNROLL_WITH_PROLOGUE FALSE
+
+apply UNROLL[UNROLL12]
 10
 2
+apply UNROLL[UNROLL12]
+20
+2
 echo
-echo Code unrolled twice for "UNROLL"
-echo
-
-display PRINTED_FILE[UNROLL]
-
-echo
-echo Code after partial evaluation for "UNROLL"
+echo Code unrolled twice for "UNROLL12"
 echo
 
-apply PARTIAL_EVAL[UNROLL]
-display PRINTED_FILE[UNROLL]
+display PRINTED_FILE[UNROLL12]
+
+echo
+echo Code after partial eval code for "UNROLL12"
+echo
+
+apply PARTIAL_EVAL[UNROLL12]
+display PRINTED_FILE[UNROLL12]
+
+echo
+echo Code after suppress dead code for "UNROLL12"
+echo
+
+apply SUPPRESS_DEAD_CODE[UNROLL12]
+display PRINTED_FILE[UNROLL12]
 
 close
-delete unroll
+delete unroll12
 quit

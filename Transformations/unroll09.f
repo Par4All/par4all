@@ -1,6 +1,6 @@
 C
 C
-      PROGRAM UNROLL9
+      PROGRAM UNROLL09
 C
       PARAMETER (N=100)
       REAL T(N)

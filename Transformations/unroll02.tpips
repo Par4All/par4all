@@ -33,40 +33,40 @@ setproperty ABORT_ON_USER_ERROR TRUE
 # exit $exit_status
 
 
-delete unroll2
-create unroll2 unroll2.f
+delete unroll02
+create unroll02 unroll02.f
 
-apply UNROLL[UNROLL2]
+apply UNROLL[UNROLL02]
 10
 2
 
 echo
-echo Code unrolled twice for "UNROLL2"
+echo Code unrolled twice for "UNROLL02"
 echo
 
-display PRINTED_FILE[UNROLL2]
+display PRINTED_FILE[UNROLL02]
 
 echo
-echo Code after partial evaluation for "UNROLL2"
+echo Code after partial evaluation for "UNROLL02"
 echo
 
-apply PARTIAL_EVAL[UNROLL2]
-display PRINTED_FILE[UNROLL2]
+apply PARTIAL_EVAL[UNROLL02]
+display PRINTED_FILE[UNROLL02]
 
 echo
-echo Code after dead code elimination for "UNROLL2"
+echo Code after dead code elimination for "UNROLL02"
 echo
 
-apply SUPPRESS_DEAD_CODE[UNROLL2]
-display PRINTED_FILE[UNROLL2]
+apply SUPPRESS_DEAD_CODE[UNROLL02]
+display PRINTED_FILE[UNROLL02]
 
 echo
-echo Code after use-def elimination for "UNROLL2"
+echo Code after use-def elimination for "UNROLL02"
 echo
 
-apply USE_DEF_ELIMINATION[UNROLL2]
-display PRINTED_FILE[UNROLL2]
+apply USE_DEF_ELIMINATION[UNROLL02]
+display PRINTED_FILE[UNROLL02]
 
 close
-delete unroll2
+delete unroll02
 quit

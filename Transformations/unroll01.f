@@ -1,6 +1,6 @@
 C
 C
-      PROGRAM UNROLL2
+      PROGRAM unroll01
 C
       PARAMETER (N=100)
       REAL T(N)
@@ -9,5 +9,4 @@ C
          T(I) = -2*I
  10   CONTINUE
 C
-      PRINT *, T
       END

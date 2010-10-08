@@ -1,4 +1,4 @@
-      PROGRAM unroll6
+      PROGRAM unroll06
 C
       PARAMETER (N=4)
       REAL T(N)

@@ -110,27 +110,35 @@ Code after one trip loop detection and simplification
 
       I = 1
       PRINT *, 'i = ', I                                                0007
+      I = 1+1
 
       I = 2
       PRINT *, 'i = ', I                                                0011
+      I = 2+1
 
       I = -10
       PRINT *, 'i = ', I                                                0015
+      I = -10+1
 
       I = N
       PRINT *, 'i = ', I                                                0019
+      I = N+1
 
       I = 1
       PRINT *, 'i = ', I                                                0023
+      I = 1+1
 
       I = 1
       PRINT *, 'i = ', I                                                0027
+      I = 1+(-1)
 
       I = 2*N+3
       PRINT *, 'i = ', I                                                0031
+      I = 2*N+3+1
 
       I = 100*COS(N)
       PRINT *, 'i = ', I                                                0035
+      I = 100*COS(N)+1
 
 ! loupe...
       DO I = 100*COS(N), COS(N)*100                                     0039
@@ -141,11 +149,13 @@ Code after one trip loop detection and simplification
 
       I = N
       PRINT *, 'i = ', I                                                0046
+      I = N+1
 
       M = N+2                                                           0049
 
       I = N
       PRINT *, 'i = ', I                                                0052
+      I = N+3
 
 ! pas simplifiable
       DO I = N, M+1, 3                                                  0056
@@ -159,6 +169,7 @@ Code after one trip loop detection and simplification
 
       I = M
       PRINT *, 'i = ', I                                                0066
+      I = M+(-3)
 
 ! pas simplifiable
       DO I = M, N, -2                                                   0070
@@ -177,6 +188,7 @@ Code after one trip loop detection and simplification
          ENDDO
          I = N
          PRINT *, 'i = ', I                                             0085
+         I = N+N
       ENDIF
 
       IF (N.LT.0) THEN                                                  0089
@@ -186,6 +198,7 @@ Code after one trip loop detection and simplification
          ENDDO
          I = N
          PRINT *, 'i = ', I                                             0095
+         I = N+N
       ENDIF
 
       END
