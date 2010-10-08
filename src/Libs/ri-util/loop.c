@@ -710,4 +710,62 @@ list copy_loops(list ll)
   return nll;
 }
 
+/* This is an ad'hoc function designed for
+   do_loop_unroll_with_epilogue(). Th expression and execution
+   parameters are reused directly in the new loop, but the body must
+   be cloned. Compared to make_loop(), this function adds the cloning
+   and the wrapping into an instruction and a statement.
+*/
+statement make_new_loop_statement(entity i,
+				  expression low,
+				  expression up,
+				  expression inc,
+				  statement b,
+				  execution e)
+{
+  /* Loop range is created */
+  range rg = make_range(low, up, inc);
+
+  ifdebug(9) {
+    pips_assert("new range is consistent", range_consistent_p(rg));
+  }
+
+  /* Create body of the loop, with updated index */
+  clone_context cc = make_clone_context(
+					get_current_module_entity(),
+					get_current_module_entity(),
+					NIL,
+					get_current_module_statement() );
+  statement body = clone_statement(b, cc);
+  free_clone_context(cc);
+
+  ifdebug(9) {
+    pips_assert("cloned body is consistent", statement_consistent_p(body));
+    /* "gen_copy_tree returns bad statement\n"); */
+  }
+
+  entity label_entity = entity_empty_label();
+
+  ifdebug(9) {
+    pips_assert("the cloned is consistent",
+		statement_consistent_p(body));
+  }
+
+  instruction inst = make_instruction(is_instruction_loop,
+			  make_loop(i,
+				    rg,
+				    body,
+				    label_entity,
+				    e,
+				    NIL));
+
+  ifdebug(9) {
+    pips_assert("inst is consistent",
+		instruction_consistent_p(inst));
+  }
+
+  statement stmt = instruction_to_statement(inst);
+  return stmt;
+}
+
 /* @} */

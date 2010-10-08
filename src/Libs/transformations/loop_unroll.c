@@ -143,6 +143,262 @@ static basic basic_int_to_signed_basic(basic b)
 /* static string current_module_name = NULL; */
 
 
+/* This function unrolls DO loop by a constant factor "rate" if their
+ * increment is statically known equal to 1. The initial loop is
+ * replaced by one unrolled loop followed by an epilogue loop:
+ *
+ * DO I= LOW, UP
+ *
+ * becomes
+ *
+ * DO I = LOW, LOW + RATE * (UP-LOW+1)/RATE -1, RATE
+ *
+ * DO I = LOW+ RATE * (UP-LOW+1)/RATE, UP
+ *
+ * where (UP+LOW-1)/RATE is the number of iteration of the unrolled
+ * loop.
+ *
+ * The initial index is reused to preserve as much readability as
+ * possible. The loop bounds are not simplified. This is left to other
+ * PIPS passes. Partial_eval can (hopefully) simplify the bounds and
+ * suppress_dead_code can eliminate the epilogue loop.
+ *
+ * The upper and lower loop bound expressions are assumed side-effects
+ * free.
+ */
+void do_loop_unroll_with_epilogue(statement loop_statement,
+				  int rate,
+				  void (*statement_post_processor)(statement))
+{
+  loop il = instruction_loop(statement_instruction(loop_statement));
+  range lr = loop_range(il);
+  entity ind = loop_index(il);
+  //basic indb = variable_basic(type_variable(ultimate_type(entity_type(ind))));
+  expression low = range_lower(lr),
+    up = range_upper(lr);
+  //inc = range_increment(lr);
+  //entity nub, ib, lu_ind;
+  //expression rhs_expr, expr;
+  //entity label_entity;
+  statement body = statement_undefined;
+  statement top_stmt = statement_undefined; // block stmt containing the two loops
+  statement loop_stmt1 = statement_undefined; // stmt for loop 1,
+					      // unrolled loop
+  statement loop_stmt2 = statement_undefined; // stmt for loop 2, epilogue
+  instruction block;
+  range rg1 = range_undefined;
+  range rg2 = range_undefined;
+  execution e = loop_execution(il);
+  //intptr_t lbval, ubval, incval;
+  //bool numeric_range_p = FALSE;
+
+  /* Validity of transformation should be checked */
+  /* ie.: - no side effects in replicated expressions */
+
+  /* get rid of labels in loop body */
+  (void) clear_labels (loop_body (il));
+
+  /* Instruction block is created and will contain the two new loops */
+  block = make_instruction_block(NIL);
+  top_stmt = instruction_to_statement(block);
+
+  /* compute the new intermediate loop bounds, nlow and nup=nlow-1 */
+  /* span = up-low+1 */
+  expression span = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+			 MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					copy_expression(up),
+					copy_expression(low) ),
+				   int_to_expression(1));
+  /* count = span/rate */
+  expression count = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
+				    span,
+				    int_to_expression(rate));
+  /* nlow = low + rate*count */
+  expression nlow =
+    MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+		   copy_expression(low),
+		   MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+				  int_to_expression(rate),
+				  count));
+  /* nup = nlow -1 */
+  expression nup = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+				  copy_expression(nlow),
+				  int_to_expression(1));
+
+  /* The first statement gets the label of the initial loop */
+  // This should be postponed and added if necessary to loop_stmt1
+  //statement_label(stmt) = statement_label(loop_statement);
+  //statement_label(loop_statement) = entity_empty_label();
+  //instruction_block(block) = CONS(STATEMENT, stmt, NIL);
+
+
+  //instruction_block(block)= gen_nconc(instruction_block(block),
+  //CONS(STATEMENT,
+  //instruction_to_statement(inst),
+  //NIL ));
+
+  /* The unrolled loop is generated first:
+   *
+   * DO I = low, nup, rate
+   *    BODY(I\(I + 0))
+   *    BODY(I\((I + 1))
+   *    ...
+   *    BODY(I\(I+(rate-1)))
+   * ENDDO
+   */
+  /* First, the loop range is generated */
+  rg1 = make_range(copy_expression(low),
+		   nup,
+		   int_to_expression(rate));
+
+  /* Create body of the loop, with updated index */
+  body = make_empty_block_statement();
+  //label_entity = make_new_label(get_current_module_name());
+  //instruction_block(statement_instruction(body)) =
+  //  CONS(STATEMENT, make_continue_statement(label_entity), NIL);
+  int crate = rate; // FI: I hate modifications of a formal parameter
+		    // because the stack is kind of corrupted when you debug
+  while(--crate>=0) {
+    /* Last transformated old loop added first */
+    //expression tmp_expr;
+    statement transformed_stmt;
+    list body_block = instruction_block(statement_instruction(body));
+
+    clone_context cc = make_clone_context(
+					  get_current_module_entity(),
+					  get_current_module_entity(),
+					  NIL,
+					  get_current_module_statement() );
+    transformed_stmt = clone_statement(loop_body(il), cc);
+    free_clone_context(cc);
+
+    ifdebug(9)
+      pips_assert("the cloned body is consistent",
+		  statement_consistent_p(transformed_stmt));
+
+    // If useful, modify the references to the loop index "ind"
+    if(crate>0) {
+      expression expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+			    make_ref_expr(ind, NIL),
+			    int_to_expression(crate));
+      ifdebug(9) {
+	pips_assert("The expression for the initial index is consistent",
+		    expression_consistent_p(expr));
+      }
+      replace_entity_by_expression(transformed_stmt,ind,expr);
+
+      ifdebug(9) {
+	pips_assert("The new loop body is consistent after index substitution",
+		    statement_consistent_p(transformed_stmt));
+      }
+      free_expression(expr);
+
+      ifdebug(9) {
+	pips_assert("Still true when expr is freed",
+		    statement_consistent_p(transformed_stmt));
+      }
+    }
+    if(statement_post_processor)
+      statement_post_processor(transformed_stmt);
+
+
+    /* Add the transformated old loop body (transformed_stmt) at
+     * the begining of the loop
+     *
+     * For C code, be careful with local declarations and initializations
+     */
+    if( get_bool_property("LOOP_UNROLL_MERGE")
+	&& instruction_block_p(statement_instruction(transformed_stmt)) ) {
+      if(ENDP(statement_declarations(body)))
+	statement_declarations(body)=statement_declarations(transformed_stmt);
+      else {
+	list declaration_initializations = NIL;
+	FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
+	  {
+	    value v = entity_initial(e);
+	    if( value_expression_p(v) )
+	      {
+		statement s =
+		  make_assign_statement(entity_to_expression(e),
+					copy_expression(value_expression(v)));
+		declaration_initializations =
+		  CONS(STATEMENT,s,declaration_initializations);
+	      }
+	  }
+	declaration_initializations=gen_nreverse(declaration_initializations);
+	instruction_block(statement_instruction(transformed_stmt))=
+	  gen_nconc(declaration_initializations,
+		    instruction_block(statement_instruction(transformed_stmt)));
+      }
+      instruction_block(statement_instruction(body)) =
+	gen_nconc( instruction_block(statement_instruction(body)),
+		   instruction_block(statement_instruction(transformed_stmt)));
+    }
+    else {
+      instruction_block(statement_instruction(body)) =
+	CONS(STATEMENT, transformed_stmt, body_block);
+    }
+  }
+
+  /* Create loop and insert it in the top block */
+  /* ?? Should execution be the same as initial loop? */
+  instruction loop_inst1 = make_instruction(is_instruction_loop,
+					    make_loop(ind,
+						      rg1,
+						      body,
+						      entity_empty_label(),
+						      copy_execution(e),
+						      NIL));
+
+  ifdebug(9) {
+    pips_assert("the unrolled loop inst is consistent",
+		instruction_consistent_p(loop_inst1));
+  }
+
+
+  loop_stmt1 = instruction_to_statement(loop_inst1);
+  instruction_block(block)= gen_nconc(instruction_block(block),
+				      CONS(STATEMENT, loop_stmt1, NIL));
+
+  /* The epilogue loop is generated last:
+   *
+   * DO I = nlow, up
+   *    BODY(I)
+   * ENDDO
+   */
+  loop_stmt2 = make_new_loop_statement(ind,
+				       nlow,
+				       copy_expression(up),
+				       int_to_expression(1),
+				       loop_body(il),
+				       copy_execution(e));
+  instruction_block(block)= gen_nconc(instruction_block(block),
+				      CONS(STATEMENT, loop_stmt2, NIL));
+
+  /* Free old instruction and replace with block */
+  /* FI: according to me, gen_copy_tree() does not create a copy sharing nothing
+   * with its actual parameter; if the free is executed, Pvecteur normalized_linear
+   * is destroyed (18 January 1993) */
+  /* gen_free(statement_instruction(loop_statement)); */
+  statement_instruction(loop_statement) = block;
+  /* Do not forget to move forbidden information associated with
+     block: */
+  fix_sequence_statement_attributes(loop_statement);
+
+  ifdebug(9) {
+    print_statement(loop_statement);
+    pips_assert("the unrolled code is consistent",
+		statement_consistent_p(loop_statement));
+  }
+
+  ifdebug(7) {
+    /* Stop debug in Newgen */
+    gen_debug &= ~GEN_DBG_CHECK;
+  }
+
+  pips_debug(3, "done\n");
+}
+
 /* This function unrolls any DO loop by a constant factor "rate". If
    the iteration count n cannot statically determined to be a multiple
    of "rate", a first loop executes modulo(n,rate) iterations and then
@@ -152,6 +408,11 @@ static basic basic_int_to_signed_basic(basic b)
    numbered from 0 to n-1. The initial loop index is replaced by the
    proper expressions. The generated code is general. It must be
    simplified with passes partial_eval and/or suppress dead_code.
+
+   Khadija Imadoueddine experienced a slowdown with this unrolling
+   scheme. She claims that it is due to the prologue loop which leads
+   to unaligned accesses in the unrolled loop when the arrays accessed
+   are aligned and accessed from the first element to the last.
  */
 void do_loop_unroll_with_prologue(statement loop_statement,
 				  int rate,
@@ -216,7 +477,7 @@ void do_loop_unroll_with_prologue(statement loop_statement,
     rhs_expr = int_to_expression(FORTRAN_DIV(ubval-lbval+incval, incval));
   }
   else {
-    expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+    expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			 MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
 					copy_expression(ub),
 					copy_expression(lb) ),
@@ -536,9 +797,22 @@ void do_loop_unroll(statement loop_statement,
   pips_assert("the unrolling factor is strictly positive", rate > 0);
 
   if(rate>1) {
-    do_loop_unroll_with_prologue(loop_statement,
-				 rate,
-				 statement_post_processor);
+    loop il = instruction_loop(statement_instruction(loop_statement));
+    range lr = loop_range(il);
+    expression inc = range_increment(lr);
+    intptr_t incval;
+
+    // FI: a property should be checked because epilogue cannot be
+    // used if backward compatibility must be maintained
+    if(expression_integer_value(inc, &incval) && incval==1
+       && !get_bool_property("LOOP_UNROLL_WITH_PROLOGUE"))
+      do_loop_unroll_with_epilogue(loop_statement,
+				   rate,
+				   statement_post_processor);
+    else
+      do_loop_unroll_with_prologue(loop_statement,
+				   rate,
+				   statement_post_processor);
   }
   pips_debug(3, "done\n");
 }
