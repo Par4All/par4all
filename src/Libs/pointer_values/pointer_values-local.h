@@ -36,4 +36,5 @@ typedef struct {
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
   void (*cell_reference_with_address_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
+  cell_relation (*pv_composition_with_transformer_func)(cell_relation, transformer );
 } pv_context;

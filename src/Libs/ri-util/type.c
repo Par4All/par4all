@@ -2482,6 +2482,84 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+list type_fields(type t)
+{
+  list l_res = NIL;
+
+  switch (type_tag(t))
+    {
+    case is_type_struct:
+      l_res = type_struct(t);
+      break;
+    case is_type_union:
+      l_res = type_union(t);
+      break;
+    case is_type_enum:
+      l_res = type_enum(t);
+      break;
+    default:
+      pips_internal_error("type_fields improperly called\n");
+    }
+  return l_res;
+
+}
+
+bool type_leads_to_pointer_p(type t)
+{
+  bool res = false;
+  type bct = basic_concrete_type(t);
+
+  switch (type_tag(bct))
+    {
+    case is_type_variable :
+      {
+	variable v = type_variable(bct);
+	basic b = variable_basic(v);
+	
+	/* If the basic is a pointer type, return true;
+	*/
+	if(basic_pointer_p(b))
+	  {
+	    res = true;
+	  }
+	else if (basic_derived_p(b))
+	  {		
+	    list l_fields = type_fields(entity_type(basic_derived(b)));
+	    while(!res && !ENDP(l_fields))
+	      {
+		entity f = ENTITY(CAR(l_fields));
+		type current_type = basic_concrete_type(entity_type(f));
+		// we call ourselves recursively
+		res = type_leads_to_pointer_p(current_type);
+		free_type(current_type);
+		POP(l_fields);
+	      }
+	  }
+	else if (!basic_typedef_p(b))
+	  {
+	    res = false;
+	  }
+	else
+	  {
+	    pips_internal_error("unexpected typedef basic\n");
+	  }
+	
+	break;
+      }
+    case is_type_void:
+      {
+	res = false;
+	break;
+      }
+    default:
+      {
+	pips_internal_error("case not handled yet\n");
+      }
+    } /*switch */
+  free_type(bct);
+  return res;
+}
+
 /* Returns TRUE if t is of type struct, union or enum. Need to
    distinguish with the case struct/union/enum in type in RI, these
    are the definitions of the struct/union/enum themselve, not a
