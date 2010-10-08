@@ -21,12 +21,13 @@
       SUBROUTINE LOOP_FUSION04(A,N,F)
       INTEGER N,I
       REAL F(N),A(N), S
+
+      S = 0.                                                            0008
+
+      RETURN
       DO I = 1, N                                                       0004
          A(I) = F(I)                                                    0005
          S = S+A(I)                                                     0011
       ENDDO
-
-      S = 0.                                                            0008
-
       END
 
