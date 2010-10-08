@@ -1,0 +1,116 @@
+
+Initial code for "induction03"
+
+int induction03(int a)
+{
+   /*a,*/
+   int b, i, j;
+
+   scanf("%d", &a);
+
+   for(j = 1; j <= 9; j += 1) {
+      a = a-1;
+      b = j+a;
+      a = a+1;
+   }
+   return b;
+}
+
+Transformers for "induction03"
+
+
+//  T(induction03) {}
+
+int induction03(int a)
+{
+   /*a,*/
+
+//  T(b,i,j) {}
+
+   int b, i, j;
+
+//  T(a) {}
+
+
+   scanf("%d", &a);
+
+//  T(a,b,j) {a==a#init, 1<=j}
+
+
+   for(j = 1; j <= 9; j += 1) {
+
+//  T(a) {a==a#init-1}
+
+      a = a-1;
+
+//  T(b) {a+j==b}
+
+      b = j+a;
+
+//  T(a) {a==a#init+1}
+
+      a = a+1;
+   }
+
+//  T(induction03) {b==induction03}
+
+   return b;
+}
+
+Preconditions for "induction03"
+
+
+//  P() {}
+
+int induction03(int a)
+{
+   /*a,*/
+
+//  P() {}
+
+   int b, i, j;
+
+//  P(b,i,j) {}
+
+
+   scanf("%d", &a);
+
+//  P(a,b,i,j) {}
+
+
+   for(j = 1; j <= 9; j += 1) {
+
+//  P(a,b,i,j) {1<=j, j<=9}
+
+      a = a-1;
+
+//  P(a,b,i,j) {1<=j, j<=9}
+
+      b = j+a;
+
+//  P(a,b,i,j) {a+j==b, 1<=j, j<=9}
+
+      a = a+1;
+   }
+
+//  P(a,b,i,j) {a==b-8, j==10}
+
+   return b;
+}
+
+Code for "induction03" after induction substitution
+
+int induction03(int a)
+{
+   /*a,*/
+   int b, i, j;
+
+   scanf("%d", &a);
+
+   for(j = 1; j <= 9; j += 1) {
+      a = a-1;
+      b = j+a;
+      a = a+1;
+   }
+   return b;
+}
