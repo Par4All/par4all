@@ -7242,15 +7242,32 @@ unroll                          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-Use \PipsPropRef{LOOP_LABEL} and \PipsPropRef{UNROLL_RATE} if you don't want to unroll interactively
-You can also set \PipsPropRef{LOOP_UNROLL_MERGE} to use the same declarations among all the unrolled statement
-(only meaningful in \texttt{C}).
+Use \PipsPropRef{LOOP_LABEL} and \PipsPropRef{UNROLL_RATE} if you do
+not want to unroll interactively You can also set
+\PipsPropRef{LOOP_UNROLL_MERGE} to use the same declarations among all
+the unrolled statement (only meaningful in \texttt{C}).
 \begin{PipsProp}{UNROLL_RATE}
 UNROLL_RATE 0
 \end{PipsProp}
 \begin{PipsProp}{LOOP_UNROLL_MERGE}
 LOOP_UNROLL_MERGE FALSE
 \end{PipsProp}
+
+The unrolling rate does not always divide exactly the number of
+iterations. So an extra loop must be added to execute the remaining
+iterations. This extra loop can be executed with the first iterations
+(prologue option) or the last iterations (epilogue option). Property
+\PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE} can be set to \verb/FALSE/ to
+use the epilogue when possible. The current implementation of the
+unrolling with prologue is general, while the implementation of the
+unrolling with epilogue is restricted to loops with a statically knonw
+increment of one.
+\begin{PipsProp}{LOOP_UNROLL_WITH_PROLOGUE}
+LOOP_UNROLL_WITH_PROLOGUE TRUE
+\end{PipsProp}
+
+Another option might be to require unrolling of the prologue or
+epilogue loop when possible.
 
 
 \subsubsection{Full Loop Unroll}
@@ -7747,7 +7764,7 @@ control flow graph of the module is computed.
 The cumulated effects are used in debug mode to display information.
 
 Note that according to~\cite{Aho86}
-and~\cite{Much97} , there may be confusion between Dead-code elimination
+and~\cite{Much97} , there is confusion between Dead-code elimination
 and Unreachable-code elimination. {\em Unreachable code} is code that
 cannot possibly be executed, regardless of the input data. {\em Dead code}
 elimination removes code that is executable but that has no effect on the
@@ -7790,6 +7807,7 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 \subsection{Use-Def Elimination}
 \label{sec:use-def-elimination}
 \index{Use-Def Elimination}
+\index{Dead code elimination}
 
 \begin{PipsPass}{use_def_elimination}
 Function \PipsPassRef{use_def_elimination} deletes statements whose def
@@ -7807,23 +7825,29 @@ update a formal parameter although this formal parameter is no longer used
 by the callers.
 
 The dependence graph may be used instead of the use-def chains, but
-Ronan \textsc{Keryell}, designer and implementer, did not produce convincing
+Ronan \textsc{Keryell}, designer and implementer of the initial
+Fortran version, did not produce convincing
 evidence of the benefit... The drawback is the additional CPU time
 required.
 
+This pass was extended to C by Mehdi \textsc{Amini} in 2009-2010, but
+it is not yet stabilized. For C code, this pass requires that effects
+are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
+\verb/FALSE/.
+
 Known bug: FORMAT are found useless and eliminated.
 
-Comments from Nga \textsc{Nguyen} : According to~\cite{Aho86} p. 595,  and~\cite{Much97} p. 592, a
-variable is {\it dead} if it is not used on any path from the location in
-the code where it is defined to the exit point of the routine in the
-question ; an instruction is {\it dead} if it computes only values that
-are not used on any executable path leading from the instruction. The
-transformation that identifies and removes such dead code is called dead
-code elimination. So in fact, Use-def elimination in PIPS is Dead code
-elimination !
-
-This pass require that effects are calculated with property 
-\verb/MEMORY_EFFECTS_ONLY/ set to \verb/FALSE/.
+Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} p. 595,
+and~\cite{Much97} p. 592, a variable is {\it dead} if it is not used
+on any path from the location in the code where it is defined to the
+exit point of the routine in the question; an instruction is {\it
+  dead} if it computes only values that are not used on any executable
+path leading from the instruction. The transformation that identifies
+and removes such dead code is called dead code elimination. So in
+fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
+  elimination} pass and the {\em Suppress dead code} pass (see
+Section~\ref{sec:dead-code-elimination}) does not have a standard
+name. It could be {\em If and loop simplification} pass.
 
 \end{PipsPass}
 
