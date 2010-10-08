@@ -31,6 +31,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
+#include "effects-util.h"
 #include "misc.h"
 #include "control.h"
 #include "effects-generic.h"
@@ -58,106 +59,32 @@ static hash_table paths_block;
 static int max_path = 1;
 
 typedef struct fusion_block {
-  int ordering;
-  int end; // last statement ordering
-  set paths; // last statement ordering
+  int num;
+  statement s; // The main statement (header for loops)
+  // statements inside the block (in case of loop, header won't belong to)
+  set statements;
+  set successors; // set of blocks that depend from this one. Precedence constraint
+  set predecessors; // set of blocks this one depends from. Precedence constraint
   bool is_a_loop;
 }*fusion_block;
 
-static int current_block_number = 1;
+// Newgen foreach on list compatibility
+#define fusion_block_TYPE fusion_block
+#define fusion_block_CAST(x) ((fusion_block)((x).p))
+
 static fusion_block current_block = HASH_UNDEFINED_VALUE;
-static hash_table blocks;
 static bool have_found_a_loop = false;
+
+static list block_list = NULL;
 
 static graph dependence_graph;
 static hash_table ordering_to_dg_mapping;
-
-static set to_be_deleted;
 
 // Forward declaration
 static void compute_fusion_on_statement(statement s);
 
 static vertex ordering_to_vertex(int ordering) {
   return (vertex)hash_get(ordering_to_dg_mapping, (void *)ordering);
-}
-
-void prettyprint_paths(FILE * fd) {
-
-  ifdebug(8) {
-    /* There is no guarantee that the ordering_to_statement() hash table is the proper one */
-    print_ordering_to_statement();
-  }
-
-  fprintf(fd, "digraph {\n");
-
-  HASH_MAP ( block_number1, hblock1,
-      {
-        fusion_block block1 = (fusion_block)hblock1;
-        fprintf( fd, "(%d) %d -> %d : ", block_number1, block1->ordering, block1->end );
-        SET_FOREACH( int, path, block1->paths ) {
-          fprintf( fd, " %d ", path );
-        }
-        fprintf( fd, "\n" );
-      }, blocks );
-  fprintf(fd, "\n}\n");
-}
-
-void prettyprint_dot_paths_graph(FILE * fd) {
-
-  ifdebug(8) {
-    /* There is no guarantee that the ordering_to_statement() hash table is the proper one */
-    print_ordering_to_statement();
-  }
-
-  fprintf(fd, "digraph {\n");
-
-  for (int block_number1 = 1; block_number1 <= hash_table_entry_count(blocks); block_number1++) {
-    fusion_block block1 = hash_get(blocks, (void *)block_number1);
-    if(block1 != HASH_UNDEFINED_VALUE) {
-      set seen_paths = set_make(set_pointer);
-      if(set_empty_p(block1->paths)) {
-        fprintf(fd,
-                " %d -> %d [label=\"empty\"]",
-                block1->ordering,
-                block1->ordering);
-      } else {
-        for (int block_number2 = 1; block_number2 <= hash_table_entry_count(blocks); block_number2++) {
-          fusion_block block2 = hash_get(blocks, (void *)block_number2);
-          if(block2 != HASH_UNDEFINED_VALUE) {
-            if(block1->ordering < block2->ordering) {
-              if(!set_empty_p(block2->paths)) {
-                set intersect_path = set_make(set_pointer);
-                set_intersection(intersect_path, block1->paths, block2->paths);
-
-                set difference_path = set_make(set_pointer);
-
-                set_difference(difference_path, intersect_path, seen_paths);
-                if(!set_empty_p(difference_path)) {
-                  fprintf(fd,
-                          "%d->%d [label=\"",
-                          block1->ordering,
-                          block2->ordering);
-                  SET_FOREACH( int, path, difference_path ) {
-                    fprintf(fd, "%d,", path);
-                  }
-                  fprintf(fd, "\"]");
-                }
-                set_union(seen_paths, difference_path, seen_paths);
-                set_free(intersect_path);
-                intersect_path = NULL;
-                set_free(difference_path);
-                difference_path = NULL;
-              }
-              fprintf(fd, ";\n");
-            }
-          }
-        }
-      }
-      set_free(seen_paths);
-      seen_paths = NULL;
-    }
-  }
-  fprintf(fd, "\n}\n");
 }
 
 static void print_graph(graph dependence_graph) {
@@ -201,6 +128,25 @@ static void print_graph(graph dependence_graph) {
 
 }
 
+/**
+ *
+ */
+static void print_block(fusion_block block) {
+  fprintf(stderr, "Block %d , predecessors : ", block->num);
+  SET_FOREACH(fusion_block,pred,block->predecessors) {
+    fprintf(stderr, "%d, ", pred->num);
+  }
+  fprintf(stderr, " | successors : ");
+  SET_FOREACH(fusion_block,succ,block->successors) {
+    fprintf(stderr, "%d, ", succ->num);
+  }
+  fprintf(stderr, "\n");
+}
+
+/**
+ * @brief Check that two loop has the same header (same index variable and
+ * same bounds)
+ */
 static bool loop_has_same_header_p(statement loop1, statement loop2) {
   pips_assert("Previous is not a loop !!", statement_loop_p( loop1 ) );
   pips_assert("Current is not a loop !!", statement_loop_p( loop2 ) );
@@ -219,9 +165,16 @@ static bool loop_has_same_header_p(statement loop1, statement loop2) {
   return false;
 }
 
+// Forward declaration
 extern graph statement_dependence_graph(statement s);
 
-// FIXME High leakage
+/**
+ * @brief Try to fuse the two loop. Dependences are check against the new body
+ * but other constraints such as some statement between the two loops are not
+ * handled and must be enforced outside.
+ *
+ * FIXME High leakage
+ */
 static bool fusion_loops(statement loop1, statement loop2) {
   bool success = false;
   if(loop_has_same_header_p(loop1, loop2)) {
@@ -270,15 +223,23 @@ static bool fusion_loops(statement loop1, statement loop2) {
     set_enclosing_loops_map(loops_mapping_of_statement(loop1));
 
     // Build chains
+    debug_on("CHAINS_DEBUG_LEVEL");
     graph chains = statement_dependence_graph(loop1);
+    debug_off();
+
     // Build DG
+    debug_on("RICEDG_DEBUG_LEVEL");
     graph candidate_dg = compute_dg_on_statement_from_chains(loop1, chains);
-    fprintf(stderr, "DG :\n");
-    print_graph(dependence_graph);
-    fprintf(stderr, "Candidate DG :\n");
-    print_graph(candidate_dg);
-    fprintf(stderr, "Candidate :\n");
-    print_statement(loop1);
+    debug_off();
+
+    ifdebug(6) {
+      pips_debug(6, "DG :\n");
+      print_graph(dependence_graph);
+      pips_debug(6, "Candidate DG :\n");
+      print_graph(candidate_dg);
+      pips_debug(6, "Candidate :\n");
+      print_statement(loop1);
+    }
 
     // Cleaning
     reset_enclosing_loops_map();
@@ -322,241 +283,121 @@ static bool fusion_loops(statement loop1, statement loop2) {
       // Cleaning FIXME
     }
 
-    fprintf(stderr, "End of fusion_loops\n\n");
-    print_statement(loop1);
-    fprintf(stderr, "\n********************\n");
+    ifdebug(3) {
+      pips_debug(3, "End of fusion_loops\n\n");
+      print_statement(loop1);
+      pips_debug(3, "\n********************\n");
+    }
   }
   return success;
 }
 
-static bool block_empty_p(int block_number) {
-  return hash_get(blocks, (char *)block_number) == HASH_UNDEFINED_VALUE;
-}
-
-static fusion_block make_empty_block(int ordering) {
+static fusion_block make_empty_block(int num) {
   fusion_block block = (fusion_block)malloc(sizeof(struct fusion_block));
-  block->ordering = ordering;
-  block->end = -1;
-  block->paths = set_make(set_int);
+  block->num = num;
+  block->s = NULL;
+  block->statements = set_make(set_pointer);
+  block->successors = set_make(set_pointer);
+  block->predecessors = set_make(set_pointer);
   block->is_a_loop = false;
+
+  block_list = gen_cons(block, block_list);
+
   return block;
 }
 
 static void free_block(fusion_block block) {
-  set_free(block->paths);
-  block->paths = NULL;
+  set_free(block->statements);
+  block->statements = NULL;
+  block->successors = NULL;
+  block->s = NULL;
   free(block);
 }
+/*
+ static void free_blocks() {
+ HASH_MAP(key, b, {
+ free_block((fusion_block)b);
+ }, block_list);
+ set_clear(block_list);
+ }*/
 
-static void free_blocks() {
-  HASH_MAP(key, b, {
-        free_block((fusion_block *)b);
-      }, blocks);
-  hash_table_clear(blocks);
-}
+/*
+ // FIXME Leakage
+ static bool clean_statement_to_delete(statement s) {
+ SET_FOREACH( statement, to_delete, to_be_deleted ) {
+ // Find and delete it
+ if(statement_sequence_p(s)) {
+ list
+ seq =
+ sequence_statements( instruction_sequence ( statement_instruction( s ) ) );
+ if(gen_in_list_p(to_delete, seq)) {
+ pips_debug(5,
+ "Has removed statement %d\n",
+ (int)statement_ordering( to_delete ));
+ gen_remove(&seq, to_delete);
+ set_del_element(to_be_deleted, to_be_deleted, to_delete);
+ }
+ }
+ }
+ return true;
+ }
+ */
 
-static void new_block(int ordering) {
-  if(current_block != HASH_UNDEFINED_VALUE) {
-    current_block->end = ordering;
-  }
-  current_block = make_empty_block(ordering);
-  ifdebug(2) {
-    fprintf(stderr,
-            "Statement %d produce block %d\n",
-            ordering,
-            current_block_number);
-  }
-  hash_put(blocks, (char *)current_block_number, (char *)current_block);
-  current_block_number++;
-}
-
-// Leakage
-static bool clean_statement_to_delete(statement s) {
-  SET_FOREACH( statement, to_delete, to_be_deleted ) {
-    // Find and delete it
-    if(statement_sequence_p(s)) {
-      list
-          seq =
-              sequence_statements( instruction_sequence ( statement_instruction( s ) ) );
-      if(gen_in_list_p(to_delete, seq)) {
-        fprintf(stderr,
-                "Has removed statement %d\n",
-                statement_ordering( to_delete ));
-        gen_remove(&seq, to_delete);
-        set_del_element(to_be_deleted, to_be_deleted, to_delete);
-      }
-    }
-  }
+/**
+ * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
+ * to record all statement in a branch of the IR tree.
+ */
+static bool record_statements(statement s, set stmts) {
+  set_add_element(stmts, stmts, s);
   return true;
 }
 
-static int last_statement = 1;
-static bool make_blocks_from_statement(statement s) {
-  bool is_not_a_loop = true;
+/**
+ * Create a block with statement 's' as a root and given the number 'num'.
+ */
+static fusion_block make_block_from_statement(statement s, int num) {
+  // Create the new block
+  fusion_block b = make_empty_block(num);
 
+  // Record the original statement
+  b->s = s;
+
+  // Populate the block statements
+  gen_context_recurse(s,b->statements,statement_domain,record_statements,gen_true);
+
+  // Mark the block a loop if applicable
   if(statement_loop_p(s)) {
-    is_not_a_loop = false;
-    have_found_a_loop = true;
-    new_block(statement_ordering( s ));
-    current_block->is_a_loop = true;
-  } else {
-    if(current_block == HASH_UNDEFINED_VALUE || current_block->is_a_loop) {
-      new_block(statement_ordering( s ));
-    }
-  }
-  return is_not_a_loop;
-}
-
-static bool find_last_statement_ordering(statement s) {
-  last_statement = statement_ordering( s );
-  return true;
-}
-
-
-// Get the list of block that belong to this path
-static set get_blocks_for_path(int path) {
-  pips_assert("Path must be positive", path > 0 );
-  set blocks_in_this_path = (set)hash_get(paths_block, (void *)path);
-  if(blocks_in_this_path == HASH_UNDEFINED_VALUE) {
-    blocks_in_this_path = set_make(set_pointer);
-    hash_put(paths_block, (void *)path, (void *)blocks_in_this_path);
-  }
-  return blocks_in_this_path;
-}
-
-static void add_a_path_to_predecessors(int ordering, set predecessors, int path) {
-  ifdebug(2) {
-    fprintf(stderr, "Retro propagate from %d\nPaths : ", ordering);
-    SET_FOREACH( fusion_block, predecessor, predecessors ) {
-      fprintf(stderr, "%d ", predecessor->ordering);
-    }
-    fprintf(stderr, "\n");
+    b->is_a_loop = true;
+    // Remove loop header from the list of statements
+    set_del_element(b->statements, b->statements, b->s);
   }
 
-  set blocks = get_blocks_for_path(path);
-  SET_FOREACH( fusion_block, block, predecessors )
-  {
-    if(block->ordering <= ordering) {
-
-      // Add the paths to the list of paths this block belongs to
-      pips_assert("Path must be positive", path > 0 );
-      set_add_element(block->paths, block->paths, (void *)path);
-
-      // Add current block to this path
-      set_add_element(blocks, blocks, (void *)block);
-    }
-  }
+  return b;
 }
 
-static fusion_block get_block_from_ordering(int ordering) {
-  fusion_block block = NULL;
+/**
+ * Try to recover the block corresponding to the given statement ordering
+ */
 
-  // Add order dependences constraints
-  HASH_MAP ( block_number, hblock,
-      {
-        block = (fusion_block) hblock;
-        if( ordering >= block->ordering && ordering < block->end ) {
-          break;
-        }
-      }
-      , blocks );
-  pips_assert("Block not found from ordering", block!=NULL );
-  return block;
-}
+/*
+ static fusion_block get_block_from_ordering(int ordering) {
+ fusion_block block = NULL;
 
-static void add_a_block_to_the_path(int path,
-                                    fusion_block block,
-                                    set predecessors) {
-  // Check if this block already belongs to the path
-  if(!set_belong_p(block->paths, (void *)path)) {
+ statement s = ordering_to_statement(ordering);
 
-    // Add the paths to the list of paths this block belongs to
-    ifdebug(2) {
-      fprintf(stderr, "Adding path %d to block %d\n", path, block->ordering);
-    }
-    set_add_element(block->paths, block->paths, (void *)path);
-
-    // Get the list of block that belong to this path
-    set blocks_in_this_path = get_blocks_for_path(path);
-
-    // Add current block to this path
-    ifdebug(2) {
-      fprintf(stderr, "Adding block %d to path %d\n", block->ordering, path);
-    }
-    set_add_element(blocks_in_this_path, blocks_in_this_path, (void *)block);
-
-    // If we have more than one successors, we have to branch current path
-    // so we create a new path for each successor and retro-propagate it to
-    // predecessors
-
-    // Keep the block already added from here
-    set blocks_seen = set_make(set_pointer);
-
-    // Loop over statements in current block
-    for (int s = block->ordering; s < block->end; s++) {
-      vertex v = ordering_to_vertex(s);
-      // Statement has a node in the graph
-      ifdebug(9) {
-        fprintf(stderr, "  > Statement %d ", block->ordering);
-      }
-      if(v != HASH_UNDEFINED_VALUE) {
-        ifdebug(9) {
-          fprintf(stderr, " has a vertex in DG !\n");
-        }
-        // Loop over successors
-        FOREACH( SUCCESSOR, a_successor, vertex_successors( v ) )
-        {
-          // Loop over conflicts between current statement and the successor
-          dg_arc_label an_arc_label = successor_arc_label( a_successor );
-          FOREACH( CONFLICT, a_conflict,dg_arc_label_conflicts(an_arc_label))
-          {
-            // We have a dependence
-            // ... or not, write after write are not real one when
-            // dealing with precedence
-            if(action_write_p( effect_action( conflict_sink( a_conflict ) ) )) {
-              fusion_block
-                  sink_block =
-                      get_block_from_ordering(vertex_to_ordering(successor_vertex( a_successor )));
-
-              // It's a forward pass
-              if(sink_block->ordering > block->ordering
-                  && !set_belong_p(blocks_seen, sink_block)) {
-
-                ifdebug(2) {
-                  fprintf(stderr,
-                          "From %d, Recurse on %d with path %d\n",
-                          block->ordering,
-                          sink_block->ordering,
-                          path);
-                }
-                // Add to blocks seen
-                set_add_element(blocks_seen, blocks_seen, (void *)sink_block);
-
-                // Recurse on this successor
-                set_add_element(predecessors, predecessors, (void *)block);
-                add_a_block_to_the_path(path, sink_block, predecessors);
-
-                // Retro-propagate to predecessors
-                add_a_path_to_predecessors(block->ordering, predecessors, path);
-
-                // New path for next successor
-                max_path++;
-                path = max_path;
-
-                // Get the list of block that belong to this path
-                blocks_in_this_path = get_blocks_for_path(path);
-
-                break; // One conflict with each successor is enough
-              }
-            }
-          }
-        }
-      }
-    }
-    set_free(blocks_seen);
-    blocks_seen = NULL;
-  }
-}
+ // Add order dependences constraints
+ HASH_MAP ( block_number, hblock,
+ {
+ fusion_block candidateBlock = (fusion_block) hblock;
+ if(set_belong_p(candidateBlock,s)) {
+ block=candidateBlock;
+ break;
+ }
+ }
+ , blocks );
+ pips_assert("Block not found from ordering", block!=NULL );
+ return block;
+ }*/
 
 static int min(int a, int b) {
   return (a > b) ? b : a;
@@ -565,163 +406,360 @@ static int max(int a, int b) {
   return (a < b) ? b : a;
 }
 
-static void merge_blocks(fusion_block block1, fusion_block block2) {
-  block1->ordering = min(block1->ordering, block2->ordering);
-  block1->end = max(block1->end, block2->end);
-
-  // Add path
-  set diff = set_make(set_pointer);
-  diff = set_difference(diff, block2->paths, block1->paths);
-  SET_FOREACH( int, new_path, diff ) {
-    //Add the block to the path
-    set blocks_in_new_path = get_blocks_for_path(new_path);
-    set_add_element(blocks_in_new_path, blocks_in_new_path, (void *)block1);
-
-    // Add new path to the block
-    set_add_element(block1->paths, block1->paths, (void *)new_path);
+/**
+ * Find the block owning the statement corresponding to the given ordering
+ */
+static fusion_block get_block_from_ordering(int ordering) {
+  statement s = ordering_to_statement(ordering);
+  FOREACH(fusion_block, b, block_list) {
+    if(set_belong_p(b->statements, s)) {
+      return b;
+    }
   }
-  SET_FOREACH( int, old_path, block2->paths )
+  return NULL;
+}
+
+/**
+ * Update b by computing the set of successors using the dependence graph and
+ * the set of statements inside b
+ */
+static void compute_successors(fusion_block b) {
+  pips_assert("Expect successors list to be initially empty",
+      set_empty_p(b->successors));
+  // Loop over statements that belong to this block
+  SET_FOREACH(statement,s,b->statements)
   {
-    set blocks_in_path = get_blocks_for_path(old_path);
-    set_del_element(blocks_in_path, blocks_in_path, block2);
+    int ordering = statement_ordering(s);
+    vertex v = ordering_to_vertex(ordering); // Using DG
+    pips_debug(5, "  > Statement %d ", ordering);
+
+    if(v != HASH_UNDEFINED_VALUE) {
+      // Statement has a node in the graph
+      pips_debug(5, " has a vertex in DG !\n");
+      // Loop over successors in DG
+      FOREACH( SUCCESSOR, a_successor, vertex_successors( v ) )
+      {
+        // Loop over conflicts between current statement and the successor
+        dg_arc_label an_arc_label = successor_arc_label( a_successor );
+        FOREACH( CONFLICT, a_conflict,dg_arc_label_conflicts(an_arc_label))
+        {
+          // We have a dependence
+          // ... or not, read after read are not real one when
+          // dealing with precedence
+          if(store_effect_p(conflict_sink( a_conflict ))
+              && store_effect_p(conflict_source( a_conflict ))
+              && (action_write_p( effect_action( conflict_sink( a_conflict ) ) )
+                  || action_write_p( effect_action( conflict_source( a_conflict ) ) ))) {
+
+            int sink_ordering =
+                vertex_to_ordering(successor_vertex( a_successor ));
+            pips_debug(5, "Considering dependence to statement %d\n",
+                sink_ordering);
+
+            // Try to recover the sink block for this dependence.
+            // We might not find any, because dependence can be related to
+            // a statement outside from current sequence scope or can be related
+            // to a loop header, which we ignore.
+            fusion_block sink_block = get_block_from_ordering(sink_ordering);
+            if(sink_block == NULL) {
+              pips_debug(2,"No block found for ordering %d, dependence ignored",
+                  sink_ordering);
+            } else {
+              // It's a forward pass, we only add precedence on blocks
+              // with ordering higher to current one
+              if(sink_block->num > b->num) {
+                // We have a successor !
+                set_add_element(b->successors,
+                                b->successors,
+                                (void *)sink_block);
+                // Mark current block as a predecessor ;-)
+                set_add_element(sink_block->predecessors,
+                                sink_block->predecessors,
+                                (void *)b);
+
+                break; // One conflict with each successor is enough
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-static bool fusion_in_sequence(statement s) {
-  if(statement_sequence_p(s)) {
+/**
+ * Prune the graph so that we have a real tree. There won't be anymore more than
+ * one path between two block in the predecessors/successors tree. We keep only
+ * longest path, no shortcut :-)
+ */
+static set prune_successors_tree( fusion_block b ) {
+  set full_succ = set_make(set_pointer);
+  SET_FOREACH(fusion_block, succ, b->successors)
+  {
+    set full_succ_of_succ = prune_successors_tree(succ);
+    full_succ = set_union(full_succ,full_succ,full_succ_of_succ);
+  }
+  SET_FOREACH(fusion_block, succ_of_succ, full_succ )
+  {
+    set_del_element(b->successors,b->successors,succ_of_succ);
+  }
+
+  full_succ = set_union(full_succ,full_succ,b->successors);
+  return full_succ;
+}
 
 
-    // Construct block decomposition for current statement
-    have_found_a_loop = false;
-    current_block_number = 1;
-    current_block = HASH_UNDEFINED_VALUE;
-    blocks = hash_table_make(hash_int, 0);
-//    gen_recurse( s , statement_domain, make_blocks_from_statement, gen_true);
-    list stmts = sequence_statements(statement_sequence(s));
-    FOREACH(statement, st, stmts) {
-      make_blocks_from_statement(st);
+
+/**
+ * Merge two blocks (successors, predecessors, statements).
+ */
+static void merge_blocks(fusion_block block1, fusion_block block2) {
+  pips_assert("block1->num < block2->num expected",block1->num < block2->num);
+
+  ifdebug(3) {
+    pips_debug(3,"Merging blocks :\n");
+    print_block(block1);
+    print_block(block2);
+  }
+
+  // merge predecessors
+  set_union(block1->predecessors, block1->predecessors, block2->predecessors);
+
+  // merge successors
+  set_union(block1->successors, block1->successors, block2->successors);
+
+  // merge statement
+  set_union(block1->statements, block1->statements, block2->statements);
+  // Replace block2 with block1 as a predecessor of his successors
+  SET_FOREACH(fusion_block,succ,block2->successors) {
+    set_add_element(succ->predecessors, succ->predecessors, block1);
+    set_del_element(succ->predecessors, succ->predecessors, block2);
+  }
+  // Replace block2 with block1 as a successor of his predecessors
+  SET_FOREACH(fusion_block,pred,block2->predecessors) {
+    if(pred != block1) {
+      set_add_element(pred->successors, pred->successors, block1);
     }
-    // Find last statement to close block
-    gen_recurse( s , statement_domain, find_last_statement_ordering, gen_true);
-    current_block->end = last_statement;
+    set_del_element(pred->successors, pred->successors, block2);
+  }
+
+  // Remove block1 from predecessors of ... block1
+  set_del_element(block1->predecessors, block1->predecessors, block1);
+
+  block2->num = -1; // Disable block, will be garbage collected
+
+  ifdebug(4) {
+    pips_debug(4,"After merge :\n");
+    print_block(block1);
+    print_block(block2);
+  }
+
+}
+
+/**
+ * This function first try to fuse b with its successors (if b is a loop and if
+ * there's any loop in the successor list) ; then it recurse on each successor.
+ *
+ * @param b is the current block
+ * @param fuse_count is the number of successful fusion done
+ */
+static void try_to_fuse_with_successors(fusion_block b, int *fuse_count) {
+  // First step is to try to fuse with each successor
+  if(b->is_a_loop) {
+    SET_FOREACH(fusion_block, succ, b->successors)
+    {
+      if(succ->is_a_loop) {
+        // Try to fuse
+        if(fusion_loops(b->s, succ->s)) {
+          pips_debug(2, "Loop have been fused\n");
+          // Now fuse the corresponding blocks
+          merge_blocks(b, succ);
+          (*fuse_count)++;
+
+          /* predecessors and successors set have been modified for the current
+           * block... we can no longer continue in this loop, let's restart
+           * current function at the beginning and end this one.
+           *
+           * FIXME : performance impact may be high ! Should not try to fuse
+           * again with the same block
+           *
+           */
+          try_to_fuse_with_successors(b, fuse_count);
+          return;
+        }
+      }
+    }
+  }
+  // Second step is recursion on successors (if any)
+  SET_FOREACH(fusion_block, succ, b->successors) {
+    try_to_fuse_with_successors(succ, fuse_count);
+  }
+
+  return;
+}
+
+static bool order_blocks(fusion_block b1, fusion_block b2) {
+  if(b1->num < b2->num)
+    return -1;
+  else
+    return 1;
+}
+
+/**
+ * Try to fuse every loop in the given sequence
+ */
+static bool fusion_in_sequence(sequence s) {
+
+  /*
+   * Construct "block" decomposition
+   */
+
+  // List of blocks
+  block_list = NIL;
+
+  // We have to give a number to each block. It'll be used for regenerating
+  // the list of statement in the sequence wrt initial order.
+  int current_block_number = 1;
+
+  // Keep track of the number of loop founded, to enable or disable next stage
+  int number_of_loop = 0;
+
+  // Loop over the list of statements in the sequence and compute blocks
+  list stmts = sequence_statements(s);
+  FOREACH(statement, st, stmts) {
+    make_block_from_statement(st, current_block_number);
+    current_block_number++;
+    if(statement_loop_p(st)) {
+      number_of_loop++;
+    }
+  }
+
+  block_list = gen_nreverse(block_list);
+
+  // We only continue now if we have at least 2 loops. What can we fuse else ?
+  if(number_of_loop > 1) {
+    // Construct now predecessors/successors relationships for all blocks
+    FOREACH(fusion_block, block, block_list) {
+      compute_successors(block);
+    }
+
+    /*
+     *  Prune the graph so that we have a real tree
+     */
+    FOREACH(fusion_block, block, block_list) {
+      if(set_empty_p(block->predecessors)) { // Block has no predecessors
+        prune_successors_tree(block);
+      }
+    }
 
 
-    if(have_found_a_loop) {
-      // Record junk loops header that has been fused
-      to_be_deleted = set_make(set_pointer);
+    ifdebug(3) {
+      FOREACH(fusion_block, block, block_list)
+      {
+        pips_debug(3,"Block %d, predecessors : ",block->num);
+        SET_FOREACH(fusion_block,pred,block->predecessors) {
+          fprintf(stderr, "%d, ", pred->num);
+        }
+        fprintf(stderr, "\n");
+      }
+    }
+    // Loop over blocks and find fusion candidate (loop with compatible header)
+    /*
+     * Now we call a recursive method on blocks that don't have any
+     * predecessor. The others will be visited recursively.
+     */
+    int fuse_count = 0;
+    FOREACH(fusion_block, block, block_list) {
+      if(set_empty_p(block->predecessors)) { // Block has no predecessors
+        pips_debug(2,
+            "Operate on block %d (is_a_loop %d)\n",
+            block->num,
+            block->is_a_loop);
 
-      // Graph path
-      paths_block = hash_table_make(hash_int, 0);
+        try_to_fuse_with_successors(block, &fuse_count);
 
-      // Construct the graph
+      }
+    }
 
-      // Add order dependences constraints
-      for (int block_number = 1; block_number <= hash_table_entry_count(blocks); block_number++) {
-        fusion_block block = hash_get(blocks, (void *)block_number);
-        if(!(block == HASH_UNDEFINED_VALUE)) {
-          if(set_empty_p(block->paths)) {
-            ifdebug(2) {
-              fprintf(stderr,
-                      "Block %d is now head of path %d\n",
-                      block_number,
-                      max_path);
+    if(fuse_count > 0) {
+      /*
+       * Cleaning : removing old blocks that have been fused
+       */
+      list block_iter = block_list;
+      list prev_block_iter = NIL;
+      while(block_iter != NULL) {
+        fusion_block block = (fusion_block)REFCAR(block_iter);
+
+        if(block->num < 0) { // to be removed
+          CDR(prev_block_iter) = CDR(block_iter); // prev_block_iter cannot be null
+          free(block_iter);
+          block_iter = CDR(prev_block_iter);
+          continue;
+        }
+        prev_block_iter = block_iter;
+        block_iter = CDR(block_iter);
+      }
+
+      /* Regenerate sequence now
+       *  We will process as follow :
+       *  - find every eligible block WRT to precedence constraint
+       *  - schedule eligible blocks according to their original position
+       *  - loop until there's no longer block to handle
+       */
+      list new_stmts = NIL;
+
+      // Loop until every block have been regenerated
+      int block_count = gen_length(block_list);
+      while(block_count > 0) {
+        block_count = 0;
+        int eligible_block_idx = 0;
+        // First loop, construct eligible blocks
+        FOREACH(fusion_block, block, block_list)
+        {
+          if(block->num < 0) {
+            continue; // block is disabled
+          }
+
+          if(set_empty_p(block->predecessors)) { // Block has no predecessors
+            // Block is eligible
+            ifdebug(3) {
+              pips_debug(3,"Eligible : ");
+              print_block(block);
+            }
+            // Schedule block
+            new_stmts = CONS(statement,block->s,new_stmts);
+            block->num = -1; // Disable block
+
+            // Release precedence constraint on successors
+            SET_FOREACH(fusion_block,succ,block->successors)
+            {
+              set_del_element(succ->predecessors, succ->predecessors, block);
+            }
+          } else {
+            ifdebug(3) {
+              pips_debug(3,"Not eligible : ");
+              print_block(block);
             }
 
-            set predecessors = set_make(set_pointer);
-            add_a_block_to_the_path(max_path, block, predecessors);
-            set_free(predecessors);
-            predecessors = NULL;
-
-            max_path++;
+            // Number of block alive
+            block_count++;
           }
-        } else {
-          pips_debug(1, "No block for number %d\n", block_number);
         }
       }
 
-      prettyprint_dot_paths_graph(stderr);
-      prettyprint_paths(stderr);
-
-      // Loop over blocks and find fusion candidate (loop with compatible header)
-
-      // Loop over precedence paths to fuse adjacent loops first
-
-      fusion_block previous_block = HASH_UNDEFINED_VALUE;
-      for (int block_number = 1; block_number <= hash_table_entry_count(blocks); block_number++) {
-        fusion_block block = hash_get(blocks, (void *)block_number);
-        if(block != HASH_UNDEFINED_VALUE) {
-          fprintf(stderr,
-                  "We have a block, ordering %d, is_a_loop %d\n",
-                  block->ordering,
-                  block->is_a_loop);
-          if(block->is_a_loop) {
-
-            if(previous_block != HASH_UNDEFINED_VALUE) {
-              statement loop1 = ordering_to_statement(previous_block->ordering);
-              statement loop2 = ordering_to_statement(block->ordering);
-              if(fusion_loops(loop1, loop2)) {
-                fprintf(stderr, "Loop have been fused\n");
-                // loops have been fused, now fuse the corresponding blocks
-                merge_blocks(previous_block, block);
-
-                // Add second old loop to be deleted
-                set_add_element(to_be_deleted, to_be_deleted, loop2);
-
-              } else {
-                previous_block = block;
-              }
-            } else {
-              previous_block = block;
-            }
-          }
-        }
-      }
-      // Fusion if possible
-
-      // Keep track of including statement numbering
-
-      // Free blocks
-      free_blocks();
-
-      // Free graph
-      HASH_MAP ( __unused, blocks,
-          {
-            set_free((set)blocks);
-          }
-          , paths_block);
-      hash_table_free(paths_block);
-      paths_block = NULL;
-
-
-      // Do some cleaning :)
-      gen_recurse( s, statement_domain, gen_true, clean_statement_to_delete );
-      pips_assert( "Cleanings list must be empty !", set_empty_p( to_be_deleted ) );
-      set_free(to_be_deleted);
-      to_be_deleted = NULL;
-
-
-      // Recursion stage
-      // if has_fused_at_least_once, self gen_recurse
-      // Return false
-
-
-
+      // Replace original list with the new one
+      sequence_statements(s) = gen_nreverse(new_stmts);
     }
   }
   return true;
 }
 
+/**
+ * Will try to fuse as many loops as possible in the IR subtree rooted by 's'
+ */
 static void compute_fusion_on_statement(statement s) {
-  //    current_loop_level = 1;
-  current_block_number = 1;
-  //    enclosing_loop_blocking = hash_table_make(hash_pointer, 0);
-  //    set_current_block();
-
-
-  // Go on fusion for current block decomposition
-  gen_recurse( s, statement_domain, fusion_in_sequence, gen_true);
-  ;
-
+  // Go on fusion on every sequence of statement founded
+  gen_recurse( s, sequence_domain, fusion_in_sequence, gen_true);
 }
 
 bool loop_fusion(char * module_name) {
