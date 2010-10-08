@@ -38,6 +38,7 @@ int main()
    s2->a = &i;
 
 // Pointer values:
+// s1[.a] == &i (exact);
 // s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s2 == &s1 (exact);
@@ -50,14 +51,17 @@ int main()
 // s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s2 == &s1 (exact);
+// s2[0][.a] == &j (exact);
 
    (s2->b)[0] = &i;
 
 // Pointer values:
 // s1[.a] == &j (exact);
+// s1[.b][0] == &i (exact);
 // s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
 // s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s2 == &s1 (exact);
+// s2[0][.a] == &j (exact);
 // s2[0][.b][0] == &i (exact);
 
    return 0;
