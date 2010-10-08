@@ -8,7 +8,7 @@ void onetriploop03(int n)
 {
   int i;
   int m;
-      
+
   m = n;
 
   for(i = n; i<= m; i++) {

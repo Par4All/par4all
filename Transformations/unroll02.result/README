@@ -1,0 +1,4 @@
+La nouvelle sortie est moins bonne que la precedente. C'est du a une modification
+de SUPPRESS_DEAD_CODE. Dans le cas de boucles imbriquees, il est dangereux
+d'eliminer l'etiquette de fin de boucle parce qu'elle peut etre partagee
+alors que seule la boucle interne est morte.
