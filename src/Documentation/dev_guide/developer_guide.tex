@@ -574,6 +574,11 @@ sh> svn status
 # you may need to do additional "svn up" if there are external
 # commits between the merge & its commit.
 sh> svn commit
+
+# It's mandatory to remove the branch after it has been reintregrated !!
+sh> cd where_the_branch_is
+sh> svn rm my-branch-name
+sh> svn commit my-branch-name
 \end{verbatim}
 }
 
