@@ -295,20 +295,27 @@ dead_loop_p(loop l)
 static void
 remove_loop_statement(statement s, instruction i, loop l)
 {
-  expression index, rl;
-  range lr;
+  range lr = loop_range(l);
+  expression rl = range_lower(lr);
+  expression rincr = range_increment(lr);
+  expression init_val = copy_expression(rl);
+  expression last_val = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+				       copy_expression(init_val),
+				       copy_expression(rincr));
+  expression index;
   statement as;
-  expression init_val;
 
-  init_val = copy_expression (rl = range_lower(lr = loop_range(l)));
   /* Assume here that index is a scalar variable... :-) */
   pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
 
   index = make_factor_expression(1, loop_index(l));
   statement_instruction(s) =
       make_instruction_block(
-              make_statement_list(as = make_assign_statement(index , init_val),loop_body(l))
-              );
+              make_statement_list(as = make_assign_statement(index, init_val),
+				  loop_body(l),
+				  make_assign_statement(copy_expression(index),
+							last_val))
+			     );
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
