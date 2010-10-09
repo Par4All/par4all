@@ -22,6 +22,14 @@ echo
 
 apply PARTIAL_EVAL[UNROLL14]
 display PRINTED_FILE[UNROLL14]
+
+echo
+echo Code after loop fusion for "UNROLL14"
+echo
+
+apply LOOP_FUSION[UNROLL14]
+display PRINTED_FILE[UNROLL14]
+
 quit
 echo
 echo Code after suppress dead code for "UNROLL14"
