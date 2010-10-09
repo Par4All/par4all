@@ -719,7 +719,7 @@ static statement loop_nest_parallelization(list lls)
   /* choose as vector loop a parallel loop optimizing a tradeoff
    * between contiguity and iteration count
    */
-  optimal_performance = 0;
+  optimal_performance = 0; // FI: could now  be -1
   vector_loop_number = -1;
   for(ln = 0; ln < loop_count; ln++) {
     /* FI: these two constants should be provided by the target description (see target.c) */

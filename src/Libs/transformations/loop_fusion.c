@@ -216,7 +216,8 @@ static bool fusion_loops(statement loop1, statement loop2) {
 
     if(index1!=index2) {
       // FI: we should check that index1 is dead on exit of loop1 and
-      // that index2 is dead on exit of loop2
+      // that index2 is dead on exit of loop2 and that index1 does not
+      // appear in the memory effects of loop2
       replace_entity((void *)loop2, index2, index1);
     }
 
@@ -320,7 +321,9 @@ static bool fusion_loops(statement loop1, statement loop2) {
       // assignment here
     } else {
       // FI: this also should be controlled by information about the
-      // liveness of both indices
+      // liveness of both indices; also index1 must not be used in
+      // loop2 as a temporary; so the memory effects of loops 2 should
+      // be checked before attempting the first subtitution
       if(index1!=index2)
 	replace_entity((void *)loop2, index1, index2);
       loop_body( instruction_loop( instr_loop1)) = body_loop1;
