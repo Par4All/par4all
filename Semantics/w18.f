@@ -14,6 +14,7 @@ C     Check refined transformer for while loop with unknownn entry condition
          enddo
       endif
 
+C     Because of the call to alea(), no information about x is available
       print *, i
 
       end

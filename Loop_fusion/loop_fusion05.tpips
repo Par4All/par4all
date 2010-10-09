@@ -1,0 +1,26 @@
+delete loop_fusion05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_fusion05 loop_fusion05.c
+
+echo //
+echo // Code before fusion
+echo //
+display PRINTED_FILE[loop_fusion05]
+
+
+
+#setenv LOOP_FUSION_DEBUG_LEVEL 3
+apply LOOP_FUSION[loop_fusion05]
+
+
+echo //
+echo // Code after fusion
+echo //
+display PRINTED_FILE[loop_fusion05]
+	
+close
+delete loop_fusion05
+quit
+

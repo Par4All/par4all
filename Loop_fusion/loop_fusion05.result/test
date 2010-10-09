@@ -25,9 +25,8 @@ void loop_fusion05(int a[100], int b[100])
    for(i = 0; i <= 99; i += 1)
       a[i] = i;
 
-   for(i = 0; i <= 99; i += 1)
-      b[i] += a[i+1];
+   for(j = 0; j <= 99; j += 1)
+      b[j] += a[j+1];
 
    printf("Is j initialized ? %d\n", j);
 }
-
