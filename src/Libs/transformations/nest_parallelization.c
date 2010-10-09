@@ -756,24 +756,29 @@ static statement loop_nest_parallelization(list lls)
       vector_loop_number = ln;
     }
   }
-  pips_assert("One loop has been selected for vectorization",
-	      vector_loop_number != -1);
-  ifdebug(8) {
-    pips_debug(8, "Vector loop is loop %d with performance %d\n",
-	       vector_loop_number, optimal_performance);
-  }
+  if(vector_loop_number != -1) {
 
-  if(vector_loop_number != loop_count-1) {
-    /* the vector direction is not the innermost loop: exchange! */
-    pips_debug(8, "Interchange innermost loop with vector loop\n");
-    /* lls is expected in the other order :-( */
-    /* interchange_two_loops does not preserve parallel loops;
-     * they are all generated as sequential loops (FI, 18 January
-     * 1993)
-     */
-    s = interchange_two_loops(gen_nreverse(lls),
-			      vector_loop_number+1,
-			      loop_count);
+    ifdebug(8) {
+      pips_debug(8, "Vector loop is loop %d with performance %d\n",
+		 vector_loop_number, optimal_performance);
+    }
+
+    if(vector_loop_number != loop_count-1) {
+      /* the vector direction is not the innermost loop: exchange! */
+      pips_debug(8, "Interchange innermost loop with vector loop\n");
+      /* lls is expected in the other order :-( */
+      /* interchange_two_loops does now preserve parallel
+	 loops; if parallel loops there are: do not forget to
+	 intrernalize the parallelism.
+      */
+      s = interchange_two_loops(gen_nreverse(lls),
+				vector_loop_number+1,
+				loop_count);
+    }
+    else {
+      // No vector loop has been found
+      ;
+    }
   }
   else {
     pips_debug(8, "No loop interchange\n");
@@ -783,8 +788,8 @@ static statement loop_nest_parallelization(list lls)
   /* FI: this is very very bad code; interchange_two_loops() should preserve
    * loop execution
    */
-  current_loop_depth = loop_count;
-  look_for_nested_loop_statements(s, mark_loop_as_parallel, nth_loop_p);
+  //current_loop_depth = loop_count;
+  //look_for_nested_loop_statements(s, mark_loop_as_parallel, nth_loop_p);
 
   pips_debug(8, "end\n");
 

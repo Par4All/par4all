@@ -21,6 +21,7 @@
  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
  */
+/* Functions to perform the greedy loop fusion of a loop sequence */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -314,10 +315,14 @@ static bool fusion_loops(statement loop1, statement loop2) {
       // Fix real DG
       // Fix statement ordering
       // ...
+      // If index2 is different from index 1 and if index2 is live on
+      // exit, its exit value should be restored by an extra
+      // assignment here
     } else {
       // FI: this also should be controlled by information about the
       // liveness of both indices
-      replace_entity((void *)loop2, index1, index2);
+      if(index1!=index2)
+	replace_entity((void *)loop2, index1, index2);
       loop_body( instruction_loop( instr_loop1)) = body_loop1;
       // Cleaning FIXME
     }
@@ -787,10 +792,15 @@ bool loop_fusion(char * module_name) {
   reset_current_module_entity();
   reset_ordering_to_statement();
 
-  debug(2, "loop_fusion", "done for %s\n", module_name);
+  pips_debug(2, "done for %s\n", module_name);
   debug_off();
 
 
-  /* Should have worked: */
+  /* Should have worked:
+   *
+   * Do we want to provide statistics about the number of fused loops?
+   *
+   * How do we let PyPS know the number of loops fused?
+   */
   return TRUE;
 }
