@@ -51,8 +51,8 @@
 
 /* void look_for_nested_loop_statements(statement s)
  * search  the  nested  loops  in the statement s
- *  
-*/
+ *
+ */
 void look_for_nested_loop_statements(statement s,
                                      statement (*loop_transformation)(list, bool (*)(statement)),
                                      bool (*loop_predicate)(statement))

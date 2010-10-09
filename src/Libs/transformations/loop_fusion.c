@@ -55,8 +55,8 @@ typedef dg_vertex_label vertex_label;
 #include "transformations.h"
 
 // Table that map paths to the list of vertex in the paths
-static hash_table paths_block;
-static int max_path = 1;
+//static hash_table paths_block;
+//static int max_path = 1;
 
 typedef struct fusion_block {
   int num;
@@ -72,8 +72,8 @@ typedef struct fusion_block {
 #define fusion_block_TYPE fusion_block
 #define fusion_block_CAST(x) ((fusion_block)((x).p))
 
-static fusion_block current_block = HASH_UNDEFINED_VALUE;
-static bool have_found_a_loop = false;
+//static fusion_block current_block = HASH_UNDEFINED_VALUE;
+//static bool have_found_a_loop = false;
 
 static list block_list = NULL;
 
@@ -84,7 +84,8 @@ static hash_table ordering_to_dg_mapping;
 static void compute_fusion_on_statement(statement s);
 
 static vertex ordering_to_vertex(int ordering) {
-  return (vertex)hash_get(ordering_to_dg_mapping, (void *)ordering);
+  long int lordering = ordering;
+  return (vertex)hash_get(ordering_to_dg_mapping, (void *)lordering);
 }
 
 static void print_graph(graph dependence_graph) {
@@ -144,22 +145,31 @@ static void print_block(fusion_block block) {
 }
 
 /**
- * @brief Check that two loop has the same header (same index variable and
+ * @brief Check that two loop have the same header (same index variable and
  * same bounds)
  */
 static bool loop_has_same_header_p(statement loop1, statement loop2) {
-  pips_assert("Previous is not a loop !!", statement_loop_p( loop1 ) );
-  pips_assert("Current is not a loop !!", statement_loop_p( loop2 ) );
+  pips_assert("Previous is a loop!", statement_loop_p( loop1 ) );
+  pips_assert("Current is a loop", statement_loop_p( loop2 ) );
 
   range r1 = loop_range( statement_loop( loop1 ) );
   range r2 = loop_range( statement_loop( loop2 ) );
   entity index1 = loop_index(statement_loop( loop1 ));
   entity index2 = loop_index(statement_loop( loop2 ));
 
+  // This assumes no side effects of loop iterations on the bound expressions
   if(same_expression_p(range_lower( r1 ), range_lower( r2 ))
       && same_expression_p(range_upper( r1 ), range_upper( r2 ))
       && same_expression_p(range_increment( r1 ), range_increment( r2 ))
-      && index1 == index2) {
+     /*&& index1 == index2*/) {
+    // Of course, PIPS generates different indices when unrolling
+    // loops containing loops...
+    if(index1!=index2) {
+      // Remap the second loop onto the index of the first loop
+      // This is not safe unless index1 does not appear at all in the
+      // second loop
+      replace_entity((void *)loop2, index2, index1);
+    }
     return true;
   }
   return false;
@@ -189,8 +199,8 @@ static bool fusion_loops(statement loop1, statement loop2) {
     //    list seq2 = sequence_statements( instruction_sequence ( instr_body_loop2 ) );
     list fused;
 
-    entity index1 = loop_index( instruction_loop( instr_loop1 ) );
-    entity index2 = loop_index( instruction_loop( instr_loop2 ) );
+    //entity index1 = loop_index( instruction_loop( instr_loop1 ) );
+    //entity index2 = loop_index( instruction_loop( instr_loop2 ) );
 
     if(instruction_sequence_p( instr_body_loop2 )) {
       /*
@@ -211,7 +221,7 @@ static bool fusion_loops(statement loop1, statement loop2) {
       //      free( seq2 );
     }
 
-    // Let's check if fusion is valid
+    // Let's check if the fusion is valid
     statement fused_statement = make_block_statement(fused);
     loop_body( instruction_loop( instr_loop1 ) ) = fused_statement;
     statement_ordering(fused_statement) = 999999999; // FIXME : dirty
@@ -306,6 +316,7 @@ static fusion_block make_empty_block(int num) {
   return block;
 }
 
+/*
 static void free_block(fusion_block block) {
   set_free(block->statements);
   block->statements = NULL;
@@ -313,6 +324,7 @@ static void free_block(fusion_block block) {
   block->s = NULL;
   free(block);
 }
+*/
 /*
  static void free_blocks() {
  HASH_MAP(key, b, {
@@ -399,12 +411,14 @@ static fusion_block make_block_from_statement(statement s, int num) {
  return block;
  }*/
 
+/*
 static int min(int a, int b) {
   return (a > b) ? b : a;
 }
 static int max(int a, int b) {
   return (a < b) ? b : a;
 }
+*/
 
 /**
  * Find the block owning the statement corresponding to the given ordering
@@ -598,12 +612,14 @@ static void try_to_fuse_with_successors(fusion_block b, int *fuse_count) {
   return;
 }
 
+/*
 static bool order_blocks(fusion_block b1, fusion_block b2) {
   if(b1->num < b2->num)
     return -1;
   else
     return 1;
 }
+*/
 
 /**
  * Try to fuse every loop in the given sequence
@@ -712,7 +728,7 @@ static bool fusion_in_sequence(sequence s) {
       int block_count = gen_length(block_list);
       while(block_count > 0) {
         block_count = 0;
-        int eligible_block_idx = 0;
+	//int eligible_block_idx = 0;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
         {

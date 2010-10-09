@@ -768,4 +768,25 @@ statement make_new_loop_statement(entity i,
   return stmt;
 }
 
+/* If statement s is a perfectly loop nest, return the corresponding
+   loop list. If not, the list returned is empty. */
+list statement_to_loop_statement_list(statement s)
+{
+  list l = NIL;
+  statement cs = s;
+
+  while(statement_loop_p(cs)) {
+    l = gen_nconc(l, CONS(STATEMENT,cs, NIL));
+    cs = loop_body(statement_loop(cs));
+    if(statement_block_p(cs)) {
+      list sl = statement_block(cs);
+      if(gen_length(sl)==1)
+	cs = STATEMENT(CAR(sl));
+    }
+  }
+
+  return l;
+}
+
+
 /* @} */
