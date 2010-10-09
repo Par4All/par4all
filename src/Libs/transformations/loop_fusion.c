@@ -178,6 +178,23 @@ static bool loop_has_same_header_p(statement loop1, statement loop2) {
   return false;
 }
 
+/**
+ * @brief Check that two loop statements have the same bounds
+ */
+static bool loops_have_same_bounds_p(statement loop1, statement loop2) {
+  bool same_p = FALSE;
+
+  pips_assert("statement loop1 is a loop", statement_loop_p( loop1 ) );
+  pips_assert("statement loop2 is a loop", statement_loop_p( loop2 ) );
+
+  range r1 = loop_range(statement_loop(loop1));
+  range r2 = loop_range(statement_loop(loop2));
+
+  same_p = range_equal_p(r1, r2);
+
+  return same_p;
+}
+
 
 /**
  * @brief Try to fuse the two loop. Dependences are check against the new body
@@ -188,9 +205,20 @@ static bool loop_has_same_header_p(statement loop1, statement loop2) {
  */
 static bool fusion_loops(statement loop1, statement loop2) {
   bool success = false;
-  if(loop_has_same_header_p(loop1, loop2)) {
+  if(loops_have_same_bounds_p(loop1, loop2)) {
     instruction instr_loop1 = statement_instruction(loop1);
     instruction instr_loop2 = statement_instruction(loop2);
+    loop l1 = instruction_loop(instr_loop1);
+    loop l2 = instruction_loop(instr_loop2);
+    entity index1 = loop_index(l1);
+    entity index2 = loop_index(l2);
+
+    if(index1!=index2) {
+      // FI: we should check that index1 is dead on exit of loop1 and
+      // that index2 is dead on exit of loop2
+      replace_entity((void *)loop2, index2, index1);
+    }
+
     statement body_loop1 = loop_body(instruction_loop(instr_loop1));
     statement body_loop2 = loop_body(instruction_loop(instr_loop2));
     statement new_body = make_block_with_stmt_if_not_already(body_loop1);
@@ -287,6 +315,9 @@ static bool fusion_loops(statement loop1, statement loop2) {
       // Fix statement ordering
       // ...
     } else {
+      // FI: this also should be controlled by information about the
+      // liveness of both indices
+      replace_entity((void *)loop2, index1, index2);
       loop_body( instruction_loop( instr_loop1)) = body_loop1;
       // Cleaning FIXME
     }
