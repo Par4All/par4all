@@ -1,0 +1,58 @@
+!     Example p. 6 Khadija Imadoueddine: loop distribution
+!     
+!     The loops must be distributed and then exchanged, but PIPS prefers
+!     to exploit the constant reference c(i) and keeps the j loop
+!     inside. The cost function should be checked because you have four
+!     contiguous accesses against only one constant access.
+
+      SUBROUTINE DISTRIBUTION(N1, N2, A, B)
+      INTEGER N1, N2, I, J
+      REAL A(1:N1,1:N2), B(1:N1,1:N2), C(N1), D(N1)
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0012
+         C(I) = I                                                       0013
+      ENDDO
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0012
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N2                                                   0015
+            A(I,J) = A(I,J)+B(I,J)*C(I)                                 0016
+         ENDDO
+      ENDDO
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0012
+         D(I) = I                                                       0014
+      ENDDO
+
+      END
+!     Example p. 6 Khadija Imadoueddine: loop distribution
+!     
+!     The loops must be distributed and then exchanged, but PIPS prefers
+!     to exploit the constant reference c(i) and keeps the j loop
+!     inside. The cost function should be checked because you have four
+!     contiguous accesses against only one constant access.
+
+      SUBROUTINE DISTRIBUTION(N1, N2, A, B)
+      INTEGER N1, N2, I, J
+      REAL A(1:N1,1:N2), B(1:N1,1:N2), C(N1), D(N1)
+
+      DOALL I = 1, N1                                                   0012
+         C(I) = I                                                       0013
+      ENDDO
+      DOALL Ip = 1, N2                                                  0012
+         PRIVATE I
+         DOALL Jp = 1, N1                                               0015
+            PRIVATE J
+            A(Jp,Ip) = A(Jp,Ip)+B(Jp,Ip)*C(Jp)                          0016
+         ENDDO
+      ENDDO
+      DOALL I = 1, N1                                                   0012
+         D(I) = I                                                       0014
+      ENDDO
+
+      END
