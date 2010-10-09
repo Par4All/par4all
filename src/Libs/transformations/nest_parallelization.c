@@ -737,7 +737,9 @@ static statement loop_nest_parallelization(list lls)
        subscript expressions */
     performance += ITERATION_COUNT_WEIGHT*(iteration_count);
 
-    pips_assert("performance is strictly greater than 0", performance > 0);
+    // You can have no contiguity and no reuse and no known loop bound
+    // and end up with performance==-1
+    // pips_assert("performance is strictly greater than 0", performance > 0);
 
     // FI: see case nested06, the matrix multiplication
     // If the best loop is not parallel, then some kind of tiling
