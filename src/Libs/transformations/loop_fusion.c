@@ -53,11 +53,14 @@ typedef dg_vertex_label vertex_label;
 #include "ricedg.h"
 #include "semantics.h"
 #include "transformations.h"
+#include "chains.h"
 
-// Table that map paths to the list of vertex in the paths
-//static hash_table paths_block;
-//static int max_path = 1;
 
+/**
+ * Structure to hold block used for the fusion selection algorithm.
+ * It's used in a sequence of statements to keep track of the precedence
+ * constraints between statements while fusing some of them
+ */
 typedef struct fusion_block {
   int num;
   statement s; // The main statement (header for loops)
@@ -68,26 +71,24 @@ typedef struct fusion_block {
   bool is_a_loop;
 }*fusion_block;
 
-// Newgen foreach on list compatibility
+
+/* Newgen list foreach compatibility */
 #define fusion_block_TYPE fusion_block
 #define fusion_block_CAST(x) ((fusion_block)((x).p))
 
-//static fusion_block current_block = HASH_UNDEFINED_VALUE;
-//static bool have_found_a_loop = false;
-
-static list block_list = NULL;
-
-static graph dependence_graph;
+/**
+ * Get node in the DG corresponding to given statement ordering
+ */
 static hash_table ordering_to_dg_mapping;
-
-// Forward declaration
-static void compute_fusion_on_statement(statement s);
-
 static vertex ordering_to_vertex(int ordering) {
   long int lordering = ordering;
   return (vertex)hash_get(ordering_to_dg_mapping, (void *)lordering);
 }
 
+
+/**
+ * Just a debug function, might not be here...
+ */
 static void print_graph(graph dependence_graph) {
 
   MAP(VERTEX,
@@ -129,8 +130,9 @@ static void print_graph(graph dependence_graph) {
 
 }
 
+
 /**
- *
+ * Debug function that print block informations
  */
 static void print_block(fusion_block block) {
   fprintf(stderr, "Block %d , predecessors : ", block->num);
@@ -144,6 +146,7 @@ static void print_block(fusion_block block) {
   fprintf(stderr, "\n");
 }
 
+
 /**
  * @brief Check that two loop have the same header (same index variable and
  * same bounds)
@@ -152,19 +155,19 @@ static bool loop_has_same_header_p(statement loop1, statement loop2) {
   pips_assert("Previous is a loop!", statement_loop_p( loop1 ) );
   pips_assert("Current is a loop", statement_loop_p( loop2 ) );
 
-  range r1 = loop_range( statement_loop( loop1 ) );
-  range r2 = loop_range( statement_loop( loop2 ) );
-  entity index1 = loop_index(statement_loop( loop1 ));
-  entity index2 = loop_index(statement_loop( loop2 ));
+  range r1 = loop_range(statement_loop(loop1));
+  range r2 = loop_range(statement_loop(loop2));
+  entity index1 = loop_index(statement_loop(loop1));
+  entity index2 = loop_index(statement_loop(loop2));
 
   // This assumes no side effects of loop iterations on the bound expressions
-  if(same_expression_p(range_lower( r1 ), range_lower( r2 ))
-      && same_expression_p(range_upper( r1 ), range_upper( r2 ))
-      && same_expression_p(range_increment( r1 ), range_increment( r2 ))
-     /*&& index1 == index2*/) {
+  if(same_expression_p(range_lower(r1), range_lower(r2))
+      && same_expression_p(range_upper(r1), range_upper(r2))
+      && same_expression_p(range_increment(r1), range_increment(r2))
+  /*&& index1 == index2*/) {
     // Of course, PIPS generates different indices when unrolling
     // loops containing loops...
-    if(index1!=index2) {
+    if(index1 != index2) {
       // Remap the second loop onto the index of the first loop
       // This is not safe unless index1 does not appear at all in the
       // second loop
@@ -175,8 +178,6 @@ static bool loop_has_same_header_p(statement loop1, statement loop2) {
   return false;
 }
 
-// Forward declaration
-extern graph statement_dependence_graph(statement s);
 
 /**
  * @brief Try to fuse the two loop. Dependences are check against the new body
@@ -188,29 +189,28 @@ extern graph statement_dependence_graph(statement s);
 static bool fusion_loops(statement loop1, statement loop2) {
   bool success = false;
   if(loop_has_same_header_p(loop1, loop2)) {
-    instruction instr_loop1 = statement_instruction( loop1 );
-    instruction instr_loop2 = statement_instruction( loop2 );
-    statement body_loop1 = loop_body( instruction_loop( instr_loop1 ) );
-    statement body_loop2 = loop_body( instruction_loop( instr_loop2 ) );
+    instruction instr_loop1 = statement_instruction(loop1);
+    instruction instr_loop2 = statement_instruction(loop2);
+    statement body_loop1 = loop_body(instruction_loop(instr_loop1));
+    statement body_loop2 = loop_body(instruction_loop(instr_loop2));
     statement new_body = make_block_with_stmt_if_not_already(body_loop1);
-    instruction instr_body_loop1 = statement_instruction( new_body );
-    instruction instr_body_loop2 = statement_instruction( body_loop2 );
-    list seq1 = sequence_statements( instruction_sequence ( instr_body_loop1 ) );
+    instruction instr_body_loop1 = statement_instruction(new_body);
+    instruction instr_body_loop2 = statement_instruction(body_loop2);
+    list seq1 = sequence_statements(instruction_sequence(instr_body_loop1));
     //    list seq2 = sequence_statements( instruction_sequence ( instr_body_loop2 ) );
     list fused;
 
     //entity index1 = loop_index( instruction_loop( instr_loop1 ) );
     //entity index2 = loop_index( instruction_loop( instr_loop2 ) );
 
-    if(instruction_sequence_p( instr_body_loop2 )) {
+    if(instruction_sequence_p(instr_body_loop2)) {
       /*
        list
        seq2 =
        sequence_statements( copy_sequence( instruction_sequence ( instr_body_loop2 ) ) );
        replace_entity( seq2, index2, index1 );
        */
-      list seq2 =
-          sequence_statements( instruction_sequence ( instr_body_loop2 ) );
+      list seq2 = sequence_statements(instruction_sequence(instr_body_loop2));
       fused = gen_concatenate(seq1, seq2);
     } else {
       //      statement body_loop2_with_loop1_index = copy_statement(body_loop2);
@@ -223,8 +223,8 @@ static bool fusion_loops(statement loop1, statement loop2) {
 
     // Let's check if the fusion is valid
     statement fused_statement = make_block_statement(fused);
-    loop_body( instruction_loop( instr_loop1 ) ) = fused_statement;
-    statement_ordering(fused_statement) = 999999999; // FIXME : dirty
+    loop_body( instruction_loop( instr_loop1)) = fused_statement;
+    statement_ordering( fused_statement) = 999999999; // FIXME : dirty
     add_ordering_of_the_statement_to_current_mapping(fused_statement);
 
     // Fix a little bit proper effects so that chains will be happy with it
@@ -243,11 +243,9 @@ static bool fusion_loops(statement loop1, statement loop2) {
     debug_off();
 
     ifdebug(6) {
-      pips_debug(6, "DG :\n");
-      print_graph(dependence_graph);
       pips_debug(6, "Candidate DG :\n");
       print_graph(candidate_dg);
-      pips_debug(6, "Candidate :\n");
+      pips_debug(6, "Candidate fused loop :\n");
       print_statement(loop1);
     }
 
@@ -258,23 +256,23 @@ static bool fusion_loops(statement loop1, statement loop2) {
     // No write dep between a statement from loop2 to statement from loop1
     success = true;
     FOREACH( vertex, v, graph_vertices(candidate_dg) ) {
-      dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label( v );
+      dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
       int statement_ordering = dg_vertex_label_statement(dvl);
-      if(statement_ordering > statement_ordering( loop2 ) && statement_ordering
+      if(statement_ordering > statement_ordering(loop2) && statement_ordering
           != statement_ordering(fused_statement)) {
         FOREACH( successor, a_successor, vertex_successors(v) )
         {
-          vertex v2 = successor_vertex( a_successor );
-          dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label( v2 );
+          vertex v2 = successor_vertex(a_successor);
+          dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
           arc_label an_arc_label = successor_arc_label(a_successor);
           int statement_ordering2 = dg_vertex_label_statement(dvl2);
 
-          if(statement_ordering2 < statement_ordering( loop2 )
-              && statement_ordering2 != statement_ordering( loop1 )) {
+          if(statement_ordering2 < statement_ordering(loop2)
+              && statement_ordering2 != statement_ordering(loop1)) {
             FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
             {
-              if(action_write_p( effect_action( conflict_sink( c ) ) )
-                  || action_write_p( effect_action( conflict_source( c ) ) )) {
+              if(action_write_p(effect_action(conflict_sink(c)))
+                  || action_write_p(effect_action(conflict_source(c)))) {
                 success = false;
               }
             }
@@ -289,7 +287,7 @@ static bool fusion_loops(statement loop1, statement loop2) {
       // Fix statement ordering
       // ...
     } else {
-      loop_body( instruction_loop( instr_loop1 ) ) = body_loop1;
+      loop_body( instruction_loop( instr_loop1)) = body_loop1;
       // Cleaning FIXME
     }
 
@@ -302,6 +300,10 @@ static bool fusion_loops(statement loop1, statement loop2) {
   return success;
 }
 
+
+/**
+ * Create an empty block
+ */
 static fusion_block make_empty_block(int num) {
   fusion_block block = (fusion_block)malloc(sizeof(struct fusion_block));
   block->num = num;
@@ -311,49 +313,9 @@ static fusion_block make_empty_block(int num) {
   block->predecessors = set_make(set_pointer);
   block->is_a_loop = false;
 
-  block_list = gen_cons(block, block_list);
-
   return block;
 }
 
-/*
-static void free_block(fusion_block block) {
-  set_free(block->statements);
-  block->statements = NULL;
-  block->successors = NULL;
-  block->s = NULL;
-  free(block);
-}
-*/
-/*
- static void free_blocks() {
- HASH_MAP(key, b, {
- free_block((fusion_block)b);
- }, block_list);
- set_clear(block_list);
- }*/
-
-/*
- // FIXME Leakage
- static bool clean_statement_to_delete(statement s) {
- SET_FOREACH( statement, to_delete, to_be_deleted ) {
- // Find and delete it
- if(statement_sequence_p(s)) {
- list
- seq =
- sequence_statements( instruction_sequence ( statement_instruction( s ) ) );
- if(gen_in_list_p(to_delete, seq)) {
- pips_debug(5,
- "Has removed statement %d\n",
- (int)statement_ordering( to_delete ));
- gen_remove(&seq, to_delete);
- set_del_element(to_be_deleted, to_be_deleted, to_delete);
- }
- }
- }
- return true;
- }
- */
 
 /**
  * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
@@ -363,6 +325,7 @@ static bool record_statements(statement s, set stmts) {
   set_add_element(stmts, stmts, s);
   return true;
 }
+
 
 /**
  * Create a block with statement 's' as a root and given the number 'num'.
@@ -387,43 +350,11 @@ static fusion_block make_block_from_statement(statement s, int num) {
   return b;
 }
 
-/**
- * Try to recover the block corresponding to the given statement ordering
- */
-
-/*
- static fusion_block get_block_from_ordering(int ordering) {
- fusion_block block = NULL;
-
- statement s = ordering_to_statement(ordering);
-
- // Add order dependences constraints
- HASH_MAP ( block_number, hblock,
- {
- fusion_block candidateBlock = (fusion_block) hblock;
- if(set_belong_p(candidateBlock,s)) {
- block=candidateBlock;
- break;
- }
- }
- , blocks );
- pips_assert("Block not found from ordering", block!=NULL );
- return block;
- }*/
-
-/*
-static int min(int a, int b) {
-  return (a > b) ? b : a;
-}
-static int max(int a, int b) {
-  return (a < b) ? b : a;
-}
-*/
 
 /**
  * Find the block owning the statement corresponding to the given ordering
  */
-static fusion_block get_block_from_ordering(int ordering) {
+static fusion_block get_block_from_ordering(int ordering, list block_list) {
   statement s = ordering_to_statement(ordering);
   FOREACH(fusion_block, b, block_list) {
     if(set_belong_p(b->statements, s)) {
@@ -433,11 +364,12 @@ static fusion_block get_block_from_ordering(int ordering) {
   return NULL;
 }
 
+
 /**
  * Update b by computing the set of successors using the dependence graph and
  * the set of statements inside b
  */
-static void compute_successors(fusion_block b) {
+static void compute_successors(fusion_block b, list block_list) {
   pips_assert("Expect successors list to be initially empty",
       set_empty_p(b->successors));
   // Loop over statements that belong to this block
@@ -454,19 +386,19 @@ static void compute_successors(fusion_block b) {
       FOREACH( SUCCESSOR, a_successor, vertex_successors( v ) )
       {
         // Loop over conflicts between current statement and the successor
-        dg_arc_label an_arc_label = successor_arc_label( a_successor );
+        dg_arc_label an_arc_label = successor_arc_label(a_successor);
         FOREACH( CONFLICT, a_conflict,dg_arc_label_conflicts(an_arc_label))
         {
           // We have a dependence
           // ... or not, read after read are not real one when
           // dealing with precedence
-          if(store_effect_p(conflict_sink( a_conflict ))
-              && store_effect_p(conflict_source( a_conflict ))
-              && (action_write_p( effect_action( conflict_sink( a_conflict ) ) )
-                  || action_write_p( effect_action( conflict_source( a_conflict ) ) ))) {
+          if(store_effect_p(conflict_sink(a_conflict))
+              && store_effect_p(conflict_source(a_conflict))
+              && (action_write_p(effect_action(conflict_sink(a_conflict)))
+                  || action_write_p(effect_action(conflict_source(a_conflict))))) {
 
             int sink_ordering =
-                vertex_to_ordering(successor_vertex( a_successor ));
+                vertex_to_ordering(successor_vertex(a_successor));
             pips_debug(5, "Considering dependence to statement %d\n",
                 sink_ordering);
 
@@ -474,7 +406,8 @@ static void compute_successors(fusion_block b) {
             // We might not find any, because dependence can be related to
             // a statement outside from current sequence scope or can be related
             // to a loop header, which we ignore.
-            fusion_block sink_block = get_block_from_ordering(sink_ordering);
+            fusion_block sink_block = get_block_from_ordering(sink_ordering,
+                                                              block_list);
             if(sink_block == NULL) {
               pips_debug(2,"No block found for ordering %d, dependence ignored",
                   sink_ordering);
@@ -501,27 +434,25 @@ static void compute_successors(fusion_block b) {
   }
 }
 
+
 /**
  * Prune the graph so that we have a real tree. There won't be anymore more than
  * one path between two block in the predecessors/successors tree. We keep only
  * longest path, no shortcut :-)
  */
-static set prune_successors_tree( fusion_block b ) {
+static set prune_successors_tree(fusion_block b) {
   set full_succ = set_make(set_pointer);
-  SET_FOREACH(fusion_block, succ, b->successors)
-  {
+  SET_FOREACH(fusion_block, succ, b->successors) {
     set full_succ_of_succ = prune_successors_tree(succ);
-    full_succ = set_union(full_succ,full_succ,full_succ_of_succ);
+    full_succ = set_union(full_succ, full_succ, full_succ_of_succ);
   }
-  SET_FOREACH(fusion_block, succ_of_succ, full_succ )
-  {
-    set_del_element(b->successors,b->successors,succ_of_succ);
+  SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
+    set_del_element(b->successors, b->successors, succ_of_succ);
   }
 
-  full_succ = set_union(full_succ,full_succ,b->successors);
+  full_succ = set_union(full_succ, full_succ, b->successors);
   return full_succ;
 }
-
 
 
 /**
@@ -567,8 +498,8 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
     print_block(block1);
     print_block(block2);
   }
-
 }
+
 
 /**
  * This function first try to fuse b with its successors (if b is a loop and if
@@ -612,14 +543,6 @@ static void try_to_fuse_with_successors(fusion_block b, int *fuse_count) {
   return;
 }
 
-/*
-static bool order_blocks(fusion_block b1, fusion_block b2) {
-  if(b1->num < b2->num)
-    return -1;
-  else
-    return 1;
-}
-*/
 
 /**
  * Try to fuse every loop in the given sequence
@@ -630,8 +553,8 @@ static bool fusion_in_sequence(sequence s) {
    * Construct "block" decomposition
    */
 
-  // List of blocks
-  block_list = NIL;
+  /* Keep track of all blocks created */
+  list block_list = NIL;
 
   // We have to give a number to each block. It'll be used for regenerating
   // the list of statement in the sequence wrt initial order.
@@ -643,7 +566,8 @@ static bool fusion_in_sequence(sequence s) {
   // Loop over the list of statements in the sequence and compute blocks
   list stmts = sequence_statements(s);
   FOREACH(statement, st, stmts) {
-    make_block_from_statement(st, current_block_number);
+    fusion_block b = make_block_from_statement(st, current_block_number);
+    block_list = gen_cons(b, block_list);
     current_block_number++;
     if(statement_loop_p(st)) {
       number_of_loop++;
@@ -656,9 +580,8 @@ static bool fusion_in_sequence(sequence s) {
   if(number_of_loop > 1) {
     // Construct now predecessors/successors relationships for all blocks
     FOREACH(fusion_block, block, block_list) {
-      compute_successors(block);
+      compute_successors(block, block_list);
     }
-
     /*
      *  Prune the graph so that we have a real tree
      */
@@ -667,7 +590,6 @@ static bool fusion_in_sequence(sequence s) {
         prune_successors_tree(block);
       }
     }
-
 
     ifdebug(3) {
       FOREACH(fusion_block, block, block_list)
@@ -728,7 +650,6 @@ static bool fusion_in_sequence(sequence s) {
       int block_count = gen_length(block_list);
       while(block_count > 0) {
         block_count = 0;
-	//int eligible_block_idx = 0;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
         {
@@ -764,11 +685,12 @@ static bool fusion_in_sequence(sequence s) {
       }
 
       // Replace original list with the new one
-      sequence_statements(s) = gen_nreverse(new_stmts);
+      sequence_statements( s) = gen_nreverse(new_stmts);
     }
   }
   return true;
 }
+
 
 /**
  * Will try to fuse as many loops as possible in the IR subtree rooted by 's'
@@ -778,6 +700,10 @@ static void compute_fusion_on_statement(statement s) {
   gen_recurse( s, sequence_domain, fusion_in_sequence, gen_true);
 }
 
+
+/**
+ * PIPSMake entry point for loop fusion
+ */
 bool loop_fusion(char * module_name) {
   statement module_statement;
 
@@ -787,7 +713,9 @@ bool loop_fusion(char * module_name) {
                                                        TRUE);
 
   /* Get the data dependence graph (chains) : */
-  dependence_graph = (graph)db_get_memory_resource(DBR_DG, module_name, TRUE);
+  graph dependence_graph = (graph)db_get_memory_resource(DBR_DG,
+                                                         module_name,
+                                                         TRUE);
 
   /* The proper effect to detect the I/O operations: */
   set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,
@@ -808,29 +736,29 @@ bool loop_fusion(char * module_name) {
 
   debug_on("LOOP_FUSION_DEBUG_LEVEL");
 
+  // Here we go ! Let's fuse :-)
   compute_fusion_on_statement(module_statement);
 
-  hash_table_free(ordering_to_dg_mapping);
-  ordering_to_dg_mapping = NULL;
 
-  //  print_graph( dependence_graph );
-
-  /* Reorder the module, because some statements have been deleted.
-   Well, the order on the remaining statements should be the same,
-   but by reordering the statements, the number are consecutive. Just
-   for pretty print... :-) */
+  /* Reorder the module, because some statements have been deleted, and others
+   * have been reordered
+   */
   module_reorder(module_statement);
 
-  debug(2, "loop_fusion", "done for %s\n", module_name);
-
-  debug_off();
-
+  /* Store the new code */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
 
+  // Free resources
+  hash_table_free(ordering_to_dg_mapping);
+  ordering_to_dg_mapping = NULL;
   reset_proper_rw_effects();
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
+
+  debug(2, "loop_fusion", "done for %s\n", module_name);
+  debug_off();
+
 
   /* Should have worked: */
   return TRUE;
