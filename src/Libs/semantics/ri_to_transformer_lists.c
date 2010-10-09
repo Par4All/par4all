@@ -187,6 +187,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
  */
 list declarations_to_transformer_list(list dl, transformer pre)
 {
+  list tfl = list_undefined;
   entity v = entity_undefined;
   transformer btf = transformer_undefined;
   transformer stf = transformer_undefined;
@@ -234,7 +235,7 @@ list declarations_to_transformer_list(list dl, transformer pre)
   }
 
   pips_debug(8, "end\n");
-  return btf;
+  return tfl;
 }
 
 /* Generate all possible linear control paths
@@ -870,16 +871,20 @@ static list instruction_to_transformer_list(instruction i,
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    tl = complete_loop_to_transformer_list(l, pre, e);
+    //tl = complete_loop_transformer_list(l, pre, e);
+    tl = NIL;
     break;
   case is_instruction_whileloop: {
     wl = instruction_whileloop(i);
-    tl = complete_whileloop_to_transformer_list(wl, pre, e);
+    // FI: the complete_xxx functions require a transformer as argument
+    //tl = complete_whileloop_transformer_list(wl, pre, e);
+    tl = NIL;
     break;
   }
   case is_instruction_forloop:
     fl = instruction_forloop(i);
-    tl = complete_forloop_to_transformer_list(fl, pre, e);
+    //tl = complete_forloop_transformer_list(fl, pre, e);
+    tl = NIL;
     break;
   case is_instruction_goto:
     pips_internal_error("unexpected goto in semantics analysis");
