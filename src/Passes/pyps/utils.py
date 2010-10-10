@@ -104,3 +104,12 @@ def string2file(string, fname):
     f.close()
     
 def nameToTmpDirName(name): return "." + name + ".tmp"
+
+def formatprop(value):
+	if type(value) is bool:
+		return str(value).upper()
+	elif type(value) is str:
+		def stringify(s): return '"'+s+'"'
+		return stringify(value)
+	else:
+		return str(value)

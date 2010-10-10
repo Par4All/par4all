@@ -378,13 +378,7 @@ class workspace(object):
 		old = self.get_property(prop)
 		if value == None:
 			return old
-		if type(value) is bool:
-			val=upper(str(value))
-		elif type(value) is str:
-			def stringify(s): return '"'+s+'"'
-			val=stringify(value)
-		else:
-			val=str(value)
+		val=utils.formatprop(value)
 		self.cpypips.set_property(upper(prop),val)
 		return old
 
