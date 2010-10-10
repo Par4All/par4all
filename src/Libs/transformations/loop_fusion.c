@@ -152,7 +152,6 @@ static void print_block(fusion_block block) {
 }
 
 
-#if 0
 /**
  * @brief Check that two loop statements have the same bounds
  */
@@ -166,9 +165,9 @@ static bool loops_have_same_bounds_p(loop loop1, loop loop2) {
 
   return same_p;
 }
-#endif
 
 
+#if 0
 /**
  * @brief Check that two loop have the same header (same index variable and
  * same bounds)
@@ -184,6 +183,7 @@ static bool loop_has_same_header_p(loop loop1, loop loop2) {
   }
   return false;
 }
+#endif
 
 
 /**
@@ -233,7 +233,7 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
 
   statement body_loop1 = loop_body(loop1);
   statement body_loop2 = loop_body(loop2);
-  statement new_body = make_block_with_stmt_if_not_already(body_loop1);
+  //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
   list seq1;
   list fused;
 

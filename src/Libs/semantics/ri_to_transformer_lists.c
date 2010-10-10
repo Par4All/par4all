@@ -88,7 +88,6 @@
 
 #include "semantics.h"
 
-#if 0
 
 
 
@@ -1130,4 +1129,3 @@ list statement_to_transformer_list(statement s,
 
   return tl;
 }
-#endif

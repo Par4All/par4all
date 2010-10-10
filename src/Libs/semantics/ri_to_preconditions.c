@@ -139,7 +139,7 @@ static transformer block_to_postcondition(transformer b_pre,
 	}
     }
 
-    pips_debug(8,"post=%x end\n", post);
+    pips_debug(8,"post=%p end\n", post);
     return post;
 }
 
