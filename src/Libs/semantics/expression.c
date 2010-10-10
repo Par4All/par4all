@@ -839,6 +839,11 @@ static transformer transformer_add_condition_information_updown(
       pips_internal_error("range used as test condition!\n");
       break;
     }
+  case is_syntax_subscript:
+    {
+        pips_internal_error("subscript not handled yet");
+        break;
+    }
   default:
       pips_internal_error("ill. expr. as test condition\n");
   }
