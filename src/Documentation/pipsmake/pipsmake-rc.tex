@@ -7183,12 +7183,11 @@ LOOP_EXPANSION_OFFSET 0
 \begin{PipsPass}{loop_fusion}
   This pass fuses as many loop as possible in a greedy manner. The
   loops must appear in a sequence and have exactly the same loop
-  bounds and if possible the same loop indices. If n loops can be
-  potentially fused, the fusion of first two ones is attempted first,
-  and then more fusions are attempted two. So if a sequence of three
-  loops is processed and if Loop 2 can be fused either with Loop 1 or
-  with Loop3 but not with both, Loop 2 is fused with Loop 1 and Loop 3
-  is left aside.
+  bounds and if possible the same loop indices. We'll try to fuse
+  loops where there is a dependence between their body. We expect
+  that it'll maximize possibilities for further optimizations. A 
+  property will soon allow to control the exact heuristics used in
+  the selection process.
 
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
