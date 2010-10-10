@@ -423,8 +423,8 @@ C    I<=2N, 1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
 12             CONTINUE                                                 0065
 
-C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
-C    M+2MMAX<=I, I<=2MMAX+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C  P(I,ISTEP,IXX,J,M,MMAX,NN) {ISTEP+2J==2I, I+MMAX==ISTEP+J, 2N==NN,
+C    ISTEP+M<=I, I<=ISTEP+2N, 2N+1<=I, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
             WTEMP = WR                                                  0066
@@ -448,8 +448,8 @@ C    MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 13          CONTINUE                                                    0069
 
 C  P(I,ISTEP,IXX,J,M,MMAX,NN) {J+MMAX==I, ISTEP==2MMAX, 2N==NN,
-C    I+M<=J+2MMAX+2, M+2MMAX<=I+2, I<=2MMAX+2N, 2N+1<=I, 3<=M,
-C    MMAX+1<=M, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
+C    M+2MMAX<=I+2, I<=2MMAX+2N, 2N+1<=I, 3<=M, MMAX+1<=M, M<=MMAX+2,
+C    2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
 
          MMAX = ISTEP                                                   0070
       ENDIF

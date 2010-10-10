@@ -17,6 +17,8 @@ echo
 echo TRANSFORMERS
 echo
 
+# FI: This should not be necessary (I do not understand why)
+#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[W02]
 
