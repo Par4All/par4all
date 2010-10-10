@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
- /* low level routines which should be added to other packages 
+ /* low level routines which should be added to other packages
   *
   * Francois Irigoin, April 1990
   *

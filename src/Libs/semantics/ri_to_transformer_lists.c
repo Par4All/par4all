@@ -21,6 +21,27 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Postpone convex hulls by keeping transformer lists instead
+ *
+ * This development was prompted by the last example found in the
+ * paper by Schrammel and Jeannet at NSAD 2010. See test cases
+ * schrammel04, 05 and 06. The minimal goal is to avoid the indentity
+ * transformer when performing the convex hull of several
+ * transformers.
+ *
+ * This could also be useful to automatize the handling of tests
+ * within a loop using the technique presented at NSAD 2010 by Ancourt
+ * & al. The control structure
+ *
+ * "while(c) if(t) T; else F;"
+ *
+ * is replaced by
+ *
+ * "while(c) {while(c&&t) T; while(c&& !t) F;}".
+ *
+ * This replacement could be performed on the equations instead of
+ * requiring a program transformation.
+ */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
@@ -323,8 +344,8 @@ static list block_to_transformer_list(list b, transformer pre)
 	POP(precl);
       }
       /* Now, switch from btfl and postl to nbtfl and npostl */
-      gen_full_free_list(btfl);
-      gen_full_free_list(postl);
+      //gen_full_free_list(btfl);
+      //gen_full_free_list(postl);
       btfl = nbtfl;
       postl = npostl;
     }
@@ -848,6 +869,7 @@ list any_basic_update_to_transformer_list(entity op,
 }
 
 static list instruction_to_transformer_list(instruction i,
+					    transformer tf,
 					    transformer pre,
 					    list e) /* effects associated to instruction i */
 {
@@ -871,20 +893,17 @@ static list instruction_to_transformer_list(instruction i,
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    //tl = complete_loop_transformer_list(l, pre, e);
-    tl = NIL;
+    tl = complete_loop_transformer_list(tf, pre, l);
     break;
   case is_instruction_whileloop: {
     wl = instruction_whileloop(i);
     // FI: the complete_xxx functions require a transformer as argument
-    //tl = complete_whileloop_transformer_list(wl, pre, e);
-    tl = NIL;
+    tl = complete_whileloop_transformer_list(tf, pre, wl);
     break;
   }
   case is_instruction_forloop:
     fl = instruction_forloop(i);
-    //tl = complete_forloop_transformer_list(fl, pre, e);
-    tl = NIL;
+    tl = complete_forloop_transformer_list(tf, pre, fl);
     break;
   case is_instruction_goto:
     pips_internal_error("unexpected goto in semantics analysis");
@@ -922,10 +941,13 @@ static list instruction_to_transformer_list(instruction i,
   return tl;
 }
 
-/* Mostly to deal with declarations */
+/* A transformer is already available for statement s, but it is
+   going to be refined into a list of transformers to isolate at
+   least the identity transformer from effective transformers. */
 list statement_to_transformer_list(statement s,
 				   transformer spre) /* stmt precondition */
 {
+  transformer tf = load_statement_transformer(s);
   instruction i = statement_instruction(s);
   list tl = NIL;
   list e = NIL;
@@ -986,7 +1008,7 @@ list statement_to_transformer_list(statement s,
       tl = CONS(TRANSFORMER, dt, NIL);
     }
     else {
-      tl = instruction_to_transformer_list(i, pre, e);
+      tl = instruction_to_transformer_list(i, tf, pre, e);
       if(ENDP(tl)) {
 	transformer tf = load_statement_transformer(s);
 	tl = CONS(TRANSFORMER, copy_transformer(tf), NIL);
@@ -1098,6 +1120,11 @@ list statement_to_transformer_list(statement s,
   //pips_debug(8,"end for statement %03td (%td,%td) with t=%p, nt=%p and te=%p\n",
   //     statement_number(s), ORDERING_NUMBER(statement_ordering(s)),
   //     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
+
+  ifdebug(1) {
+    pips_debug(1, "Transformer list has %d elements:\n", gen_length(tl));
+    print_transformers(tl);
+  }
 
   return tl;
 }
