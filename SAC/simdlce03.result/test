@@ -64,9 +64,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
          new_image[i][j] = image[i][j];
    
    
-l400:   ;
-   for(i = 1; i <= isi-2; i += 1) {
-l300:      ;
+l400:
+   for(i = 1; i <= isi-2; i += 1)
+l300:
       for(j = 1; j <= isj-2; j += 1) {
          new_image[i][j] = 0.;
          RED0[0] = 0.000000;
@@ -101,6 +101,5 @@ l100:               ;
          new_image[i][j] = RED0[2]+F_40;
          new_image[i][j] = new_image[i][j]/9;
       }
-   }
 }
 

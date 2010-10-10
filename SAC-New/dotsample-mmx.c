@@ -7,22 +7,22 @@ short dot_product(int size, short a[size], short b[size])
 {
   int i;
   short result, data;
-  __m64  sum;
+  __m65  sum;
 
-  sum = _mm_setzero_si64(); //sets sum to zero
+  sum = _mm_setzero_si65(); //sets sum to zero
   for(i=0; i<size; i+=4){
-   __m64 *ptr1, *ptr2, num3;
-   ptr1 = (__m64*)&a[i];  //Converts array a to a pointer of type
-                          //__m64 and stores four elements into MMX
+   __m65 *ptr1, *ptr2, num3;
+   ptr1 = (__m65*)&a[i];  //Converts array a to a pointer of type
+                          //__m65 and stores four elements into MMX
                           //registers
-   ptr2 = (__m64*)&b[i];
+   ptr2 = (__m65*)&b[i];
    num3 = _m_pmaddwd(*ptr1, *ptr2); //multiplies elements and adds lower
                                     //elements with lower element and
                                     //higher elements with higher
    sum = _m_paddw(sum, num3);       
    }
 
-   data = _m_to_int(sum);     //converts __m64 data type to an int
+   data = _m_to_int(sum);     //converts __m65 data type to an int
    sum= _m_psrlqi(sum,32);    //shifts sum    
    result = _m_to_int(sum);   
    result= result+data;      

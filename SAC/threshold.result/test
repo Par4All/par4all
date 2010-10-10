@@ -58,21 +58,13 @@ void threshold(float data[128], float val)
       LU_IB0 = 0;
       LU_IND0 = 0;
       for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          I_0[LU_IND0] = data[LU_IND0]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
       }
       i = 128;
@@ -91,21 +83,13 @@ void threshold(float data[128], float val)
       LU_IB0 = 0;
       LU_IND0 = 0;
       for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          I_0[LU_IND0] = data[LU_IND0]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
       }
       i = 128;
@@ -124,21 +108,13 @@ void threshold(float data[128], float val)
       LU_IB0 = 0;
       LU_IND0 = 0;
       for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          I_0[LU_IND0] = data[LU_IND0]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
       }
       i = 128;
@@ -157,21 +133,13 @@ void threshold(float data[128], float val)
       LU_IB0 = 0;
       LU_IND0 = 0;
       for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          I_0[LU_IND0] = data[LU_IND0]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0] = I_0[LU_IND0]?val:data[LU_IND0];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+1] = data[LU_IND0+1]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+1] = I_0[LU_IND0+1]?val:data[LU_IND0+1];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+2] = data[LU_IND0+2]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+2] = I_0[LU_IND0+2]?val:data[LU_IND0+2];
-         //c SIMD_COMMENT_0
          I_0[LU_IND0+3] = data[LU_IND0+3]>val;
-         //c SIMD_COMMENT_1
          data[LU_IND0+3] = I_0[LU_IND0+3]?val:data[LU_IND0+3];
       }
       i = 128;

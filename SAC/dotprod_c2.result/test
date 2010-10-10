@@ -98,21 +98,13 @@ float dotprod(int n, float b[n], float c[n])
       a = a+_return0;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0]+c[LU_IND0];
-      //c SIMD_COMMENT_1
       a = a+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+1]+c[LU_IND0+1];
-      //c SIMD_COMMENT_1
       a = a+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+2]+c[LU_IND0+2];
-      //c SIMD_COMMENT_1
       a = a+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+3]+c[LU_IND0+3];
-      //c SIMD_COMMENT_1
       a = a+_return0;
    }
    
@@ -141,21 +133,13 @@ float dotprod(int n, float b[n], float c[n])
    RED1[2] = 0.000000;
    RED1[3] = 0.000000;
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0]+c[LU_IND0];
-      //c SIMD_COMMENT_1
       RED1[0] = RED1[0]+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+1]+c[LU_IND0+1];
-      //c SIMD_COMMENT_1
       RED1[1] = RED1[1]+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+2]+c[LU_IND0+2];
-      //c SIMD_COMMENT_1
       RED1[2] = RED1[2]+_return0;
-      //c SIMD_COMMENT_0
       _return0 = b[LU_IND0+3]+c[LU_IND0+3];
-      //c SIMD_COMMENT_1
       RED1[3] = RED1[3]+_return0;
    }
    a = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a;
@@ -187,21 +171,13 @@ float dotprod(int n, float b[n], float c[n])
    RED1[2] = 0.000000;
    RED1[3] = 0.000000;
    for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
       _return03 = b[LU_IND0]+c[LU_IND0];
-      //c SIMD_COMMENT_1
       RED1[0] = RED1[0]+_return03;
-      //c SIMD_COMMENT_0
       _return02 = b[LU_IND0+1]+c[LU_IND0+1];
-      //c SIMD_COMMENT_1
       RED1[1] = RED1[1]+_return02;
-      //c SIMD_COMMENT_0
       _return01 = b[LU_IND0+2]+c[LU_IND0+2];
-      //c SIMD_COMMENT_1
       RED1[2] = RED1[2]+_return01;
-      //c SIMD_COMMENT_0
       _return00 = b[LU_IND0+3]+c[LU_IND0+3];
-      //c SIMD_COMMENT_1
       RED1[3] = RED1[3]+_return00;
    }
    a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;

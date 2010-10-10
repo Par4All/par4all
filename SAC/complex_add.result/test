@@ -47,21 +47,13 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
       }
       for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = b[i][LU_IND0].re+a[i][LU_IND0].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = b[i][LU_IND0+1].re+a[i][LU_IND0+1].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = b[i][LU_IND0+1].im+a[i][LU_IND0+1].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = b[i][LU_IND0+2].re+a[i][LU_IND0+2].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = b[i][LU_IND0+2].im+a[i][LU_IND0+2].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = b[i][LU_IND0+3].re+a[i][LU_IND0+3].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = b[i][LU_IND0+3].im+a[i][LU_IND0+3].im;
       }
    }
@@ -80,21 +72,13 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
       }
       for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = b[i][LU_IND0].re+a[i][LU_IND0].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = b[i][LU_IND0+1].re+a[i][LU_IND0+1].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = b[i][LU_IND0+1].im+a[i][LU_IND0+1].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = b[i][LU_IND0+2].re+a[i][LU_IND0+2].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = b[i][LU_IND0+2].im+a[i][LU_IND0+2].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = b[i][LU_IND0+3].re+a[i][LU_IND0+3].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = b[i][LU_IND0+3].im+a[i][LU_IND0+3].im;
       }
    }
@@ -113,21 +97,13 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
       }
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = b[i][LU_IND0].re+a[i][LU_IND0].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = b[i][LU_IND0].im+a[i][LU_IND0].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = b[i][LU_IND0+1].re+a[i][LU_IND0+1].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = b[i][LU_IND0+1].im+a[i][LU_IND0+1].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = b[i][LU_IND0+2].re+a[i][LU_IND0+2].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = b[i][LU_IND0+2].im+a[i][LU_IND0+2].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = b[i][LU_IND0+3].re+a[i][LU_IND0+3].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = b[i][LU_IND0+3].im+a[i][LU_IND0+3].im;
       }
    }

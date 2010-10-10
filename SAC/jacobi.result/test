@@ -91,37 +91,21 @@ kernel1:
          save[i][LU_IND0+1] = 0.25*F_2;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+1] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+1];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+2] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+4];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+3] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+5];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+4] = 0.25*F_2;
       }
    }
@@ -133,37 +117,21 @@ kernel1:
          space[i][LU_IND1+1] = 0.25*F_5;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+1] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+1];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+2] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+4];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+3] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+5];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+4] = 0.25*F_5;
       }
    }
@@ -179,10 +147,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   ;
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
@@ -192,37 +156,21 @@ kernel1:
          save[i][LU_IND0+1] = 0.25*F_2;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+1] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+1];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+2] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+4];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+3] = 0.25*F_2;
-         //c SIMD_COMMENT_0
          F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
-         //c SIMD_COMMENT_1
          F_1 = F_0+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_2
          F_2 = F_1+space[i][LU_IND0+5];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+4] = 0.25*F_2;
       }
    }
@@ -234,37 +182,21 @@ kernel1:
          space[i][LU_IND1+1] = 0.25*F_5;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+1] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+1];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+2] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+4];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+3] = 0.25*F_5;
-         //c SIMD_COMMENT_0
          F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
-         //c SIMD_COMMENT_1
          F_4 = F_3+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_2
          F_5 = F_4+save[i][LU_IND1+5];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+4] = 0.25*F_5;
       }
    }
@@ -282,9 +214,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
@@ -294,37 +223,21 @@ kernel1:
          save[i][LU_IND0+1] = 0.25*F_24;
       }
       for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          F_03 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
-         //c SIMD_COMMENT_1
          F_13 = F_03+space[i][LU_IND0];
-         //c SIMD_COMMENT_2
          F_23 = F_13+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+1] = 0.25*F_23;
-         //c SIMD_COMMENT_0
          F_02 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
-         //c SIMD_COMMENT_1
          F_12 = F_02+space[i][LU_IND0+1];
-         //c SIMD_COMMENT_2
          F_22 = F_12+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+2] = 0.25*F_22;
-         //c SIMD_COMMENT_0
          F_01 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
-         //c SIMD_COMMENT_1
          F_11 = F_01+space[i][LU_IND0+2];
-         //c SIMD_COMMENT_2
          F_21 = F_11+space[i][LU_IND0+4];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+3] = 0.25*F_21;
-         //c SIMD_COMMENT_0
          F_00 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
-         //c SIMD_COMMENT_1
          F_10 = F_00+space[i][LU_IND0+3];
-         //c SIMD_COMMENT_2
          F_20 = F_10+space[i][LU_IND0+5];
-         //c SIMD_COMMENT_3
          save[i][LU_IND0+4] = 0.25*F_20;
       }
    }
@@ -336,37 +249,21 @@ kernel1:
          space[i][LU_IND1+1] = 0.25*F_54;
       }
       for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
-         //c SIMD_COMMENT_0
          F_33 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
-         //c SIMD_COMMENT_1
          F_43 = F_33+save[i][LU_IND1];
-         //c SIMD_COMMENT_2
          F_53 = F_43+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+1] = 0.25*F_53;
-         //c SIMD_COMMENT_0
          F_32 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
-         //c SIMD_COMMENT_1
          F_42 = F_32+save[i][LU_IND1+1];
-         //c SIMD_COMMENT_2
          F_52 = F_42+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+2] = 0.25*F_52;
-         //c SIMD_COMMENT_0
          F_31 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
-         //c SIMD_COMMENT_1
          F_41 = F_31+save[i][LU_IND1+2];
-         //c SIMD_COMMENT_2
          F_51 = F_41+save[i][LU_IND1+4];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+3] = 0.25*F_51;
-         //c SIMD_COMMENT_0
          F_30 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
-         //c SIMD_COMMENT_1
          F_40 = F_30+save[i][LU_IND1+3];
-         //c SIMD_COMMENT_2
          F_50 = F_40+save[i][LU_IND1+5];
-         //c SIMD_COMMENT_3
          space[i][LU_IND1+4] = 0.25*F_50;
       }
    }
@@ -383,9 +280,6 @@ void compute()
    float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25, 0.25, 0.25, 0.25};
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -456,10 +350,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
-kernel1:   ;
+kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
@@ -532,9 +423,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
+kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
          F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];

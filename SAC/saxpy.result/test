@@ -339,21 +339,13 @@ c 20   PRINT *, 'bef'
          LU_IND0 = 0
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
-c SIMD_COMMENT_1
             SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
-c SIMD_COMMENT_1
             SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
-c SIMD_COMMENT_1
             SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
-c SIMD_COMMENT_1
             SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
          I = 1001
@@ -388,21 +380,13 @@ c 20   PRINT *, 'bef'
          LU_IND0 = 0
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
-c SIMD_COMMENT_1
             SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
-c SIMD_COMMENT_1
             SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
-c SIMD_COMMENT_1
             SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
-c SIMD_COMMENT_1
             SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
          I = 1001
@@ -433,21 +417,13 @@ c 20   PRINT *, 'bef'
 20       CONTINUE
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+1)
-c SIMD_COMMENT_1
             SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+2)
-c SIMD_COMMENT_1
             SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+3)
-c SIMD_COMMENT_1
             SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
-c SIMD_COMMENT_0
             F_0 = SA*SX(LU_IND0+4)
-c SIMD_COMMENT_1
             SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
 99998       CONTINUE
 c      PRINT *, 'aft'
@@ -478,21 +454,13 @@ c 20   PRINT *, 'bef'
 20       CONTINUE
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
-c SIMD_COMMENT_0
             F_03 = SA0*SX(LU_IND0+1)
-c SIMD_COMMENT_1
             SY(LU_IND0+1) = SY(LU_IND0+1)+F_03
-c SIMD_COMMENT_0
             F_02 = SA0*SX(LU_IND0+2)
-c SIMD_COMMENT_1
             SY(LU_IND0+2) = SY(LU_IND0+2)+F_02
-c SIMD_COMMENT_0
             F_01 = SA0*SX(LU_IND0+3)
-c SIMD_COMMENT_1
             SY(LU_IND0+3) = SY(LU_IND0+3)+F_01
-c SIMD_COMMENT_0
             F_00 = SA0*SX(LU_IND0+4)
-c SIMD_COMMENT_1
             SY(LU_IND0+4) = SY(LU_IND0+4)+F_00
 99998       CONTINUE
 c      PRINT *, 'aft'
@@ -565,6 +533,7 @@ saxpy (float sx[1000], float sy[1000])
     }
   else
     {
+      ;
       ;
       simd_load_v4sf (vec10, pdata0[0]);
       for (lu_ind0 = 0; lu_ind0 <= 999; lu_ind0 += 4)
