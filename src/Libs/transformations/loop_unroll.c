@@ -989,6 +989,7 @@ void full_loop_unroll(statement loop_statement)
     /* Do not forget to move forbidden information associated with
        block: */
     fix_sequence_statement_attributes(loop_statement);
+    clean_up_sequences(loop_statement);
 
     ifdebug(9) {
       /* FI: how about a simpler print_statement()? */
