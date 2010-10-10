@@ -421,10 +421,7 @@ string get_string_property_or_ask(const char* name,const char question[])
    @param[in] s is the value to store in the property. This string is
    strdup()ed in this function
 */
-void set_string_property(const string name, string s)
-=======
 void set_string_property(const char* name, string s)
->>>>>>> Improve property managment in pyps.
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
