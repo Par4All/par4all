@@ -1,0 +1,33 @@
+# 
+#
+#
+
+setenv NAME loop_fusion06
+setenv WSPACE loop_fusion06
+setenv FILE loop_fusion06.c
+
+delete ${WSPACE}
+create ${WSPACE} ${FILE} 
+
+// We parallelize so that fusion can prevent breaking parallel loop
+apply COARSE_GRAIN_PARALLELIZATION[${NAME}]
+
+
+echo //
+echo // Code before fusion
+echo //
+display PRINTED_FILE[${NAME}]
+
+
+#setenv LOOP_FUSION_DEBUG_LEVEL 5
+apply LOOP_FUSION[${NAME}]
+
+
+echo //
+echo // Code after fusion
+echo //
+display PRINTED_FILE[${NAME}]
+	
+close ${WSPACE}
+delete ${WSPACE}
+
