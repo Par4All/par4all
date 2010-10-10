@@ -1,15 +1,15 @@
-delete schrammel04
+delete nested01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create schrammel04 schrammel04.c
+create nested01 nested01.c
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 
-#setenv SEMANTICS_DEBUG_LEVEL "0"
+setenv SEMANTICS_DEBUG_LEVEL "8"
 
 echo
 echo TRANSFORMERS
@@ -23,8 +23,6 @@ display PRINTED_FILE[main]
 echo
 echo PRECONDITIONS
 echo
-
-setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
@@ -83,5 +81,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-# delete schrammel04
+# delete nested01
 quit

@@ -1,8 +1,8 @@
-delete schrammel05
+delete schrammel07
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create schrammel05 schrammel05.c
+create schrammel07 schrammel07.c
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
@@ -32,5 +32,5 @@ display PRINTED_FILE[main]
 quit
 
 close
-# delete schrammel05
+# delete schrammel07
 quit
