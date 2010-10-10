@@ -64,6 +64,8 @@
 
 extern char* activate(char* );
 extern int delete_workspace(char* );
+extern int open_workspace(char* );
+extern int close_workspace(int );
 extern void db_invalidate_memory_resource(char*, char*);
 
 /* SWIG will generate code for pypips.user_log with up to 10 arguments */

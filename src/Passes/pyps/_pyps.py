@@ -59,8 +59,8 @@ class module:
 	def run(self,cmd):
 		"""runs command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd 'path/to/module/src' > 'path/to/module/src''"""
 		self.print_code()
-		printcode_rc=os.path.join(self._ws.directory(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-		code_rc=os.path.join(self._ws.directory(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+		printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+		code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
 		thecmd=cmd+[printcode_rc]
 		self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
@@ -85,7 +85,7 @@ class module:
 		"""return module code as a string"""
 		self.apply("print_code")
 		rcfile=self.show("printed_file")
-		return file(self._ws.directory()+rcfile).readlines()
+		return file(self._ws.dirname()+rcfile).readlines()
 
 	def loops(self, label=""):
 		"""return desired loop if label given, an iterator over loops otherwise"""
@@ -142,7 +142,7 @@ class modules:
 
 	def __len__(self):return len(self._modules)
 
-	def __iter__(self):return self._modules.iter()
+	def __iter__(self):return self._modules.__iter__()
 
 
 	def display(self,rc="printed_file", activate="PRINT_CODE", **props):
@@ -236,6 +236,7 @@ class workspace(object):
 		self.verbose = verbose
 		self.cpypips.verbose(int(verbose))
 		self.deleteOnClose=deleteOnClose
+		self.checkpoints=[]
 
 		# In case the subworkspaces need to add files, the variable passed in
 		# parameter will only be modified here and not in the scope of the caller
@@ -285,7 +286,7 @@ class workspace(object):
 		try:
 			cpypips.create(name, self._sources)
 		except RuntimeError:
-			try: cpypips.quit()
+			try: cpypips.close_workspace(0)
 			except RuntimeError: pass
 			cpypips.delete_workspace(name)
 			raise
@@ -306,7 +307,6 @@ class workspace(object):
 
 	def __enter__(self): return self
 	def __exit__(self,exc_type, exc_val, exc_tb):
-		if exc_type:self.deleteOnClose=False # for easier debugging
 		self.close()
 		return False
 	@property
@@ -338,25 +338,25 @@ class workspace(object):
 	def info(self,topic):
 		return split(self.cpypips.info(topic))
 
-	def bckdir(self):
-		return os.path.dirname(self.directory()) + ".bck"
-
-	def directory(self):
+	def dirname(self):
 		"""retrieve workspace database directory"""
 		return self._name+".database/"
 
 	def checkpoint(self):
-		self.cpypips.checkpoint()
-		if os.path.exists(self.bckdir()):
-			shutil.rmtree(self.bckdir())
-		shutil.copytree(self.directory(), self.bckdir())
+		"""checkpoints the workspace and returns a workspace id"""
+		self.cpypips.close_workspace(0)
+		chkdir=".{0}.chk{1}".format(self.dirname()[0:-1],len(self.checkpoints))
+		shutil.copytree(self.dirname(), chkdir)
+		self.checkpoints.append(chkdir)
+		self.cpypips.open_workspace(self.name)
+		return chkdir
 
-	def restore(self):
+	def restore(self,chkdir):
 		self.props.PIPSDBM_RESOURCES_TO_DELETE = "all"
-		self.cpypips.quit()
-		shutil.rmtree(self.directory())
-		shutil.copytree(self.bckdir(), self.directory())
-		self.cpypips.restore_open_workspace(self.name)
+		self.cpypips.close_workspace(0)
+		shutil.rmtree(self.dirname())
+		shutil.copytree(chkdir, self.dirname())
+		self.cpypips.open_workspace(self.name)
 
 	def get_property(self, name):
 		name = upper(name)
@@ -406,9 +406,9 @@ class workspace(object):
 			raise ValueError("'{0}' is not a directory".format(rep))
 
 		saved=[]
-		for s in os.listdir(self.directory()+"Src"):
+		for s in os.listdir(self.dirname()+"Src"):
 			cp=os.path.join(rep,s)
-			shutil.copy(os.path.join(self.directory(),"Src",s),cp)
+			shutil.copy(os.path.join(self.dirname(),"Src",s),cp)
 			saved.append(cp)
 
 		if self.recoverInclude:
@@ -433,7 +433,7 @@ class workspace(object):
 			command+=otmpfiles
 		commandline = " ".join(command)
 		if self.verbose:
-			print "Compiling the workspace with", commandline
+			print >> sys.stderr , "Compiling the workspace with", commandline
 		ret = os.system(commandline)
 		if ret:
 			if not link: map(os.remove,otmpfiles)
@@ -518,7 +518,8 @@ class workspace(object):
 
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
-		try : self.cpypips.quit()
+		map(shutil.rmtree,self.checkpoints)
+		try : self.cpypips.close_workspace(0)
 		except RuntimeError: pass
 		if self.deleteOnClose:
 			try : workspace.delete(self._name)

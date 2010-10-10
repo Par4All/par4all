@@ -163,11 +163,6 @@ void create(char* workspace_name, char ** filenames)
     }
 }
 
-void quit()
-{
-    close_workspace(FALSE);
-}
-
 void set_property(const char* propname, const char* value)
 {
     /* nice hack to temporarly redirect stderr */
@@ -313,16 +308,6 @@ char * get_callees_of(char * module_name)
     gen_array_free(callees);
 
     return callees_string;
-}
-
-void checkpoint(void)
-{
-	checkpoint_workspace();
-}
-
-void restore_open_workspace(char* name)
-{
-	make_open_workspace(name);
 }
 
 void setenviron(char *name, char *value)
