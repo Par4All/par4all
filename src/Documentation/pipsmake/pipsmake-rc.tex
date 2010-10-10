@@ -3994,6 +3994,17 @@ not seem to add much useful information in general.
 SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS FALSE
 \end{PipsProp}
 
+The next property is used to refine the computation of preconditions
+inside nested loops. The loop body is reanalyzed to get one
+transformer for each control path and the identity transformer is left
+aside because it is useless to compute the loop body
+precondition. This development is experimental and turned off by
+default.
+
+\begin{PipsProp}{SEMANTICS_USE_TRANSFORMER_LISTS}
+SEMANTICS_USE_TRANSFORMER_LISTS FALSE
+\end{PipsProp}
+
 \subsubsection{Normalization level}
 \index{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE}
 
@@ -7141,16 +7152,20 @@ loop_expansion_init 	> MODULE.code
 \end{PipsMake}
 
 \begin{PipsPass}{loop_expansion}
-Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.
-An offset can be set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the lower bound too.
-The new loop is guarded to prevent illegal iterations, further transformations can elaborate on this.
+  Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit
+  a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.  An offset can be
+  set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the
+  lower bound too.  The new loop is guarded to prevent illegal
+  iterations, further transformations can elaborate on this.
 \end{PipsPass}
+
 \begin{PipsMake}
 loop_expansion 	> MODULE.code
     < PROGRAM.entities
     < MODULE.code
 	< MODULE.cumulated_effects
 \end{PipsMake}
+
 \begin{PipsProp}{LOOP_EXPANSION_SIZE}
 LOOP_EXPANSION_SIZE ""
 \end{PipsProp}
@@ -7162,15 +7177,26 @@ LOOP_EXPANSION_OFFSET 0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop fusion
 
 \subsection{Loop Fusion}
+\label{subsection:loop-fusion}
+\index{Loop fusion}
 
-Property \PipsPropRef{FUSE_MAXIMISE_PARALLELISM} is used to control if loop fusion
-has to be care about maximizing parallelism while fusing. This means that we won't
-fuse a loop marked as parallel with a sequential loop. 
+\begin{PipsPass}{loop_fusion}
+  This pass fuses as many loop as possible in a greedy manner. The
+  loops must appear in a sequence and have exactly the same loop
+  bounds and if possible the same loop indices. If n loops can be
+  potentially fused, the fusion of first two ones is attempted first,
+  and then more fusions are attempted two. So if a sequence of three
+  loops is processed and if Loop 2 can be fused either with Loop 1 or
+  with Loop3 but not with both, Loop 2 is fused with Loop 1 and Loop 3
+  is left aside.
 
-\begin{PipsProp}{FUSE_MAXIMISE_PARALLELISM}
-FUSION_MAXIMIZE_PARALLELISM TRUE
-\end{PipsProp}
+  The fusion legality is checked in the standard way by comparing the
+  dependence graphs obtained before and after fusion.
 
+  This pass is still in the experimental stage. It may have side
+  effects on the source code when the fusion is attempted but not
+  performed in case loop indices are different.
+\end{PipsPass}
 
 \begin{PipsMake}
 alias Fusion 'Fusion Loops'
@@ -7181,6 +7207,14 @@ loop_fusion            > MODULE.code
         < MODULE.chains
         < MODULE.dg
 \end{PipsMake}
+
+Property \PipsPropRef{FUSE_MAXIMISE_PARALLELISM} is used to control if
+loop fusion has to preserve parallelism while fusing. If this property
+is true, a parallel loop is never fused with a sequential loop.
+
+\begin{PipsProp}{FUSE_MAXIMISE_PARALLELISM}
+FUSION_MAXIMIZE_PARALLELISM TRUE
+\end{PipsProp}
 
 
 
@@ -7324,8 +7358,10 @@ Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% fusion
 \subsection{Loop Fusion}
 \begin{PipsPass}{force_loop_fusion}
-Force loop fusion without any check between loop \PipsPropRef{LOOP_LABEL} and following loop,
-that must share an iteration space with it.
+  This pass applies unconditionnally a loop fusion between the loop
+  designated by the property \PipsPropRef{LOOP_LABEL} and the
+  following loop. They must have the same loop index and the same
+  iteration set. No legality check is performed.
 \end{PipsPass}
 \begin{PipsMake}
 force_loop_fusion > MODULE.code
