@@ -2152,7 +2152,7 @@ transformer statement_to_transformer(
     }
   }
   else {
-    user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
+    pips_user_warning("redefinition for statement %03d (%d,%d)\n",
 		 statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 		 ORDERING_STATEMENT(statement_ordering(s)));
     pips_internal_error("transformer redefinition");
