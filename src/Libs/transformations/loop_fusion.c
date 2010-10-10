@@ -152,6 +152,7 @@ static void print_block(fusion_block block) {
 }
 
 
+#if 0
 /**
  * @brief Check that two loop statements have the same bounds
  */
@@ -165,6 +166,7 @@ static bool loops_have_same_bounds_p(loop loop1, loop loop2) {
 
   return same_p;
 }
+#endif
 
 
 /**

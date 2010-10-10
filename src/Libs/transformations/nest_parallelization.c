@@ -81,7 +81,6 @@ static bool parallel_loop_has_been_selected;
 
 /* No lambda closure in C */
 static entity current_loop_index = entity_undefined;
-static int current_loop_depth = -1;
 
 /* Transformation strategy for an isolated loop */
 
@@ -603,6 +602,7 @@ static bool contiguous_array_reference_p(reference r)
 }
 
 
+#if 0
 static statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*unused)(statement))
 {
     statement ls = STATEMENT(CAR(lls));
@@ -611,6 +611,7 @@ static statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*
     return ls;
 }
 
+static int current_loop_depth = -1;
 static bool nth_loop_p(__attribute__((unused))statement s)
 {
     /* FI: this is *wrong* but should work for a demo :-( */
@@ -619,6 +620,7 @@ static bool nth_loop_p(__attribute__((unused))statement s)
     count++;
     return count == current_loop_depth;
 }
+#endif
 
 
 
