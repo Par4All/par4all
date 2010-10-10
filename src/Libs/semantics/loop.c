@@ -1620,7 +1620,6 @@ list complete_repeatloop_transformer_list(transformer t_body_star,
 					    whileloop wl)
 {
   list tfl = NIL;
-  //transformer ct = transformer_undefined;
   statement body_s = whileloop_body(wl);
   transformer pt_body = load_statement_transformer(body_s);
   transformer t_body = transformer_undefined;
@@ -2352,6 +2351,7 @@ transformer whileloop_to_transformer(whileloop l,
   return t;
 }
 
+#if 0
 list whileloop_to_transformer_list(whileloop l __attribute__ ((unused)),
 				   transformer pre __attribute__ ((unused)),
 				   list e __attribute__ ((unused)))
@@ -2369,6 +2369,7 @@ list whileloop_to_transformer_list(whileloop l __attribute__ ((unused)),
   */
   return tfl;
 }
+#endif
 
 transformer whileloop_to_k_transformer(whileloop l,
 				       transformer pre,

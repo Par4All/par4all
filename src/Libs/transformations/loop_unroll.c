@@ -187,7 +187,7 @@ void do_loop_unroll_with_epilogue(statement loop_statement,
   statement loop_stmt2 = statement_undefined; // stmt for loop 2, epilogue
   instruction block;
   range rg1 = range_undefined;
-  range rg2 = range_undefined;
+  //range rg2 = range_undefined;
   execution e = loop_execution(il);
   //intptr_t lbval, ubval, incval;
   //bool numeric_range_p = FALSE;

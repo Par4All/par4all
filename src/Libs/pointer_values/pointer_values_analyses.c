@@ -1672,7 +1672,7 @@ cell_relation simple_pv_translate(cell_relation pv_in, bool in_first_p, cell_rel
   cell cell_in = in_first_p ? cell_relation_first_cell(pv_in) : cell_relation_second_cell(pv_in);
   reference ref_in = cell_reference(cell_in);
   entity e_in = reference_variable(ref_in);
-  list ind_in = reference_indices(ref_in);
+  //list ind_in = reference_indices(ref_in);
   /******/
   
   /* pv_old characteristics */
@@ -1691,7 +1691,7 @@ cell_relation simple_pv_translate(cell_relation pv_in, bool in_first_p, cell_rel
   
   bool old_first_p = same_entity_p(reference_variable(ref_old_1), e_in); /* is the first cell of pv_old the prefix of ref_in? */
 
-  reference prefix_ref = old_first_p ? ref_old_1 : ref_old_2;
+  //reference prefix_ref = old_first_p ? ref_old_1 : ref_old_2;
   reference target_ref = old_first_p ? ref_old_2 : ref_old_1;
 
   reference ref;
@@ -2046,8 +2046,8 @@ list effect_find_equivalent_pointer_values(effect eff, list l_in,
 
   /* eff characteristics */
   cell eff_cell = effect_cell(eff);
-  reference ref = effect_any_reference(eff);
-  list ind = reference_indices(ref);
+  //reference ref = effect_any_reference(eff);
+  //list ind = reference_indices(ref);
   /******/
 
  /* first, search for the (exact/possible) values of eff cell in l_in */
@@ -2169,7 +2169,7 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 	  
 	  reference ref_intermediary = effect_any_reference(eff_intermediary);
 	  entity ent_intermediary = reference_variable(ref_intermediary);
-	  descriptor d_intermediary = effect_descriptor(eff_intermediary);
+	  //descriptor d_intermediary = effect_descriptor(eff_intermediary);
 	  int nb_common_indices = (int) gen_length(reference_indices(ref_intermediary));
 	  
 	  FOREACH(CELL_RELATION, pv_equiv, l_equiv)
@@ -2182,7 +2182,7 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 	      
 	      /* this is valid only if the first value_of corresponds to eff_intermediary */
 	      reference pv_equiv_first_ref = cell_reference(cell_relation_first_cell(pv_equiv));
-	      reference pv_equiv_second_ref = cell_reference(cell_relation_second_cell(pv_equiv));
+	      //reference pv_equiv_second_ref = cell_reference(cell_relation_second_cell(pv_equiv));
 	      
 	      if (same_entity_p(ent_intermediary, reference_variable(pv_equiv_first_ref))
 		  && (gen_length(reference_indices(ref_intermediary)) 

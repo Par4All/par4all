@@ -88,6 +88,8 @@
 
 #include "semantics.h"
 
+#if 0
+
 
 
 /* Note: initializations of static variables are not used as
@@ -1128,3 +1130,4 @@ list statement_to_transformer_list(statement s,
 
   return tl;
 }
+#endif
