@@ -7163,6 +7163,15 @@ LOOP_EXPANSION_OFFSET 0
 
 \subsection{Loop Fusion}
 
+Property \PipsPropRef{FUSE_MAXIMISE_PARALLELISM} is used to control if loop fusion
+has to be care about maximizing parallelism while fusing. This means that we won't
+fuse a loop marked as parallel with a sequential loop. 
+
+\begin{PipsProp}{FUSE_MAXIMISE_PARALLELISM}
+FUSION_MAXIMIZE_PARALLELISM TRUE
+\end{PipsProp}
+
+
 \begin{PipsMake}
 alias Fusion 'Fusion Loops'
 loop_fusion            > MODULE.code

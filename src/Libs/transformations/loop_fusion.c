@@ -55,6 +55,13 @@ typedef dg_vertex_label vertex_label;
 #include "semantics.h"
 #include "transformations.h"
 #include "chains.h"
+extern bool get_bool_property(string);
+
+/*
+ * This boolean corresponds to the eponym property, intended
+ * to control if we can fuse a sequential loop with a parallel one
+ */
+static bool fuse_maximize_parallelism = true;
 
 
 /**
@@ -72,7 +79,6 @@ typedef struct fusion_block {
   bool is_a_loop;
 }*fusion_block;
 
-
 /* Newgen list foreach compatibility */
 #define fusion_block_TYPE fusion_block
 #define fusion_block_CAST(x) ((fusion_block)((x).p))
@@ -85,7 +91,6 @@ static vertex ordering_to_vertex(int ordering) {
   long int lordering = ordering;
   return (vertex)hash_get(ordering_to_dg_mapping, (void *)lordering);
 }
-
 
 /**
  * Just a debug function, might not be here...
@@ -131,7 +136,6 @@ static void print_graph(graph dependence_graph) {
 
 }
 
-
 /**
  * Debug function that print block informations
  */
@@ -149,51 +153,34 @@ static void print_block(fusion_block block) {
 
 
 /**
- * @brief Check that two loop have the same header (same index variable and
- * same bounds)
- */
-static bool loop_has_same_header_p(statement loop1, statement loop2) {
-  pips_assert("Previous is a loop!", statement_loop_p( loop1 ) );
-  pips_assert("Current is a loop", statement_loop_p( loop2 ) );
-
-  range r1 = loop_range(statement_loop(loop1));
-  range r2 = loop_range(statement_loop(loop2));
-  entity index1 = loop_index(statement_loop(loop1));
-  entity index2 = loop_index(statement_loop(loop2));
-
-  // This assumes no side effects of loop iterations on the bound expressions
-  if(same_expression_p(range_lower(r1), range_lower(r2))
-      && same_expression_p(range_upper(r1), range_upper(r2))
-      && same_expression_p(range_increment(r1), range_increment(r2))
-  /*&& index1 == index2*/) {
-    // Of course, PIPS generates different indices when unrolling
-    // loops containing loops...
-    if(index1 != index2) {
-      // Remap the second loop onto the index of the first loop
-      // This is not safe unless index1 does not appear at all in the
-      // second loop
-      replace_entity((void *)loop2, index2, index1);
-    }
-    return true;
-  }
-  return false;
-}
-
-/**
  * @brief Check that two loop statements have the same bounds
  */
-static bool loops_have_same_bounds_p(statement loop1, statement loop2) {
+static bool loops_have_same_bounds_p(loop loop1, loop loop2) {
   bool same_p = FALSE;
 
-  pips_assert("statement loop1 is a loop", statement_loop_p( loop1 ) );
-  pips_assert("statement loop2 is a loop", statement_loop_p( loop2 ) );
-
-  range r1 = loop_range(statement_loop(loop1));
-  range r2 = loop_range(statement_loop(loop2));
+  range r1 = loop_range(loop1);
+  range r2 = loop_range(loop2);
 
   same_p = range_equal_p(r1, r2);
 
   return same_p;
+}
+
+
+/**
+ * @brief Check that two loop have the same header (same index variable and
+ * same bounds)
+ */
+static bool loop_has_same_header_p(loop loop1, loop loop2) {
+
+  entity index1 = loop_index(loop1);
+  entity index2 = loop_index(loop2);
+
+  // This assumes no side effects of loop iterations on the bound expressions
+  if(loops_have_same_bounds_p(loop1,loop2) && index1 == index2) {
+    return true;
+  }
+  return false;
 }
 
 
@@ -204,141 +191,155 @@ static bool loops_have_same_bounds_p(statement loop1, statement loop2) {
  *
  * FIXME High leakage
  */
-static bool fusion_loops(statement loop1, statement loop2) {
+static bool fusion_loops(statement sloop1, statement sloop2) {
+  pips_assert("Previous is a loop", statement_loop_p( sloop1 ) );
+  pips_assert("Current is a loop", statement_loop_p( sloop2 ) );
   bool success = false;
-  if(loops_have_same_bounds_p(loop1, loop2)) {
-    instruction instr_loop1 = statement_instruction(loop1);
-    instruction instr_loop2 = statement_instruction(loop2);
-    loop l1 = instruction_loop(instr_loop1);
-    loop l2 = instruction_loop(instr_loop2);
-    entity index1 = loop_index(l1);
-    entity index2 = loop_index(l2);
 
-    if(index1!=index2) {
-      // FI: we should check that index1 is dead on exit of loop1 and
-      // that index2 is dead on exit of loop2 and that index1 does not
-      // appear in the memory effects of loop2
-      replace_entity((void *)loop2, index2, index1);
-    }
 
-    statement body_loop1 = loop_body(instruction_loop(instr_loop1));
-    statement body_loop2 = loop_body(instruction_loop(instr_loop2));
-    statement new_body = make_block_with_stmt_if_not_already(body_loop1);
-    instruction instr_body_loop1 = statement_instruction(new_body);
-    instruction instr_body_loop2 = statement_instruction(body_loop2);
-    list seq1 = sequence_statements(instruction_sequence(instr_body_loop1));
-    //    list seq2 = sequence_statements( instruction_sequence ( instr_body_loop2 ) );
-    list fused;
 
-    //entity index1 = loop_index( instruction_loop( instr_loop1 ) );
-    //entity index2 = loop_index( instruction_loop( instr_loop2 ) );
+  loop loop1 = statement_loop(sloop1);
+  loop loop2 = statement_loop(sloop2);
 
-    if(instruction_sequence_p(instr_body_loop2)) {
-      /*
-       list
-       seq2 =
-       sequence_statements( copy_sequence( instruction_sequence ( instr_body_loop2 ) ) );
-       replace_entity( seq2, index2, index1 );
-       */
-      list seq2 = sequence_statements(instruction_sequence(instr_body_loop2));
-      fused = gen_concatenate(seq1, seq2);
-    } else {
-      //      statement body_loop2_with_loop1_index = copy_statement(body_loop2);
-      //      replace_entity( body_loop2_with_loop1_index, index2, index1 );
-      //      list seq2 = CONS(statement, body_loop2_with_loop1_index, NIL );
-      list seq2 = CONS(statement, body_loop2, NIL );
-      fused = gen_concatenate(seq1, seq2);
-      //      free( seq2 );
-    }
+  // Check if loops have fusion compatible headers, else abort
+  if(!loops_have_same_bounds_p(loop1, loop2)) {
+    pips_debug(4,"Fusion aborted because of incompatible loop headers\n");
+    return false;
+  }
 
-    // Let's check if the fusion is valid
-    statement fused_statement = make_block_statement(fused);
-    loop_body( instruction_loop( instr_loop1)) = fused_statement;
-    statement_ordering( fused_statement) = 999999999; // FIXME : dirty
-    add_ordering_of_the_statement_to_current_mapping(fused_statement);
+  // If requested, fuse only look of the same kind (parallel/sequential).
+  if(fuse_maximize_parallelism && ((loop_parallel_p(loop1)
+      && !loop_parallel_p(loop2)) || (!loop_parallel_p(loop1)
+      && loop_parallel_p(loop2)))) {
+    pips_debug(4,"Fusion aborted because of fuse_maximize_parallelism property"
+        ", loop_parallel_p(loop1)=>%d | loop_parallel_p(loop2)=>%d\n"
+        ,loop_parallel_p(loop1),loop_parallel_p(loop2));
 
-    // Fix a little bit proper effects so that chains will be happy with it
-    store_proper_rw_effects_list(fused_statement, NIL);
-    // Stuff for DG
-    set_enclosing_loops_map(loops_mapping_of_statement(loop1));
+    // Abort to preserve parallelism
+    return false;
+  }
 
-    // Build chains
-    debug_on("CHAINS_DEBUG_LEVEL");
-    graph chains = statement_dependence_graph(loop1);
-    debug_off();
 
-    // Build DG
-    debug_on("RICEDG_DEBUG_LEVEL");
-    graph candidate_dg = compute_dg_on_statement_from_chains(loop1, chains);
-    debug_off();
+  entity index1 = loop_index(loop1);
+  entity index2 = loop_index(loop2);
+  if(index1!=index2) {
+    // FI: we should check that index1 is dead on exit of loop1 and
+    // that index2 is dead on exit of loop2 and that index1 does not
+    // appear in the memory effects of loop2
+    replace_entity((void *)loop2, index2, index1);
+  }
 
-    ifdebug(6) {
-      pips_debug(6, "Candidate DG :\n");
-      print_graph(candidate_dg);
-      pips_debug(6, "Candidate fused loop :\n");
-      print_statement(loop1);
-    }
+  statement body_loop1 = loop_body(loop1);
+  statement body_loop2 = loop_body(loop2);
+  statement new_body = make_block_with_stmt_if_not_already(body_loop1);
+  list seq1;
+  list fused;
 
-    // Cleaning
-    reset_enclosing_loops_map();
+  if(statement_sequence_p(body_loop1)) {
+    seq1 = sequence_statements(statement_sequence(body_loop1));
+  } else {
+    seq1 = CONS(statement, body_loop1, NIL );
+  }
 
-    // Let's validate the fusion now
-    // No write dep between a statement from loop2 to statement from loop1
-    success = true;
-    FOREACH( vertex, v, graph_vertices(candidate_dg) ) {
-      dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
-      int statement_ordering = dg_vertex_label_statement(dvl);
-      if(statement_ordering > statement_ordering(loop2) && statement_ordering
-          != statement_ordering(fused_statement)) {
-        FOREACH( successor, a_successor, vertex_successors(v) )
-        {
-          vertex v2 = successor_vertex(a_successor);
-          dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
-          arc_label an_arc_label = successor_arc_label(a_successor);
-          int statement_ordering2 = dg_vertex_label_statement(dvl2);
+  if(statement_sequence_p(body_loop2)) {
+    list seq2 = sequence_statements(statement_sequence(body_loop2));
+    fused = gen_concatenate(seq1, seq2);
+  } else {
+    list seq2 = CONS(statement, body_loop2, NIL );
+    fused = gen_concatenate(seq1, seq2);
+  }
 
-          if(statement_ordering2 < statement_ordering(loop2)
-              && statement_ordering2 != statement_ordering(loop1)) {
-            FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
-            {
-              if(action_write_p(effect_action(conflict_sink(c)))
-                  || action_write_p(effect_action(conflict_source(c)))) {
-                success = false;
-              }
+  // Let's check if the fusion is valid
+
+  // Construct the fused sequence
+  statement fused_statement = make_block_statement(fused);
+  loop_body( loop1 ) = fused_statement;
+  statement_ordering( fused_statement) = 999999999; // FIXME : dirty
+  add_ordering_of_the_statement_to_current_mapping(fused_statement);
+
+  // Fix a little bit proper effects so that chains will be happy with it
+  store_proper_rw_effects_list(fused_statement, NIL);
+  // Stuff for DG
+  set_enclosing_loops_map(loops_mapping_of_statement(sloop1));
+
+  // Build chains
+  debug_on("CHAINS_DEBUG_LEVEL");
+  graph chains = statement_dependence_graph(sloop1);
+  debug_off();
+
+  // Build DG
+  debug_on("RICEDG_DEBUG_LEVEL");
+  graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
+  debug_off();
+
+  ifdebug(6) {
+    pips_debug(6, "Candidate DG :\n");
+    print_graph(candidate_dg);
+    pips_debug(6, "Candidate fused loop :\n");
+    print_statement(sloop1);
+  }
+
+  // Cleaning
+  reset_enclosing_loops_map();
+
+  // Let's validate the fusion now
+  // No write dep between a statement from loop2 to statement from loop1
+  success = true;
+  FOREACH( vertex, v, graph_vertices(candidate_dg) ) {
+    dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
+    int statement_ordering = dg_vertex_label_statement(dvl);
+    if(statement_ordering > statement_ordering(sloop2) && statement_ordering
+        != statement_ordering(fused_statement)) {
+      FOREACH( successor, a_successor, vertex_successors(v) )
+      {
+        vertex v2 = successor_vertex(a_successor);
+        dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
+        arc_label an_arc_label = successor_arc_label(a_successor);
+        int statement_ordering2 = dg_vertex_label_statement(dvl2);
+
+        // FIXME ordering check is no longer valid !!
+        if(statement_ordering2 < statement_ordering(sloop2)
+            && statement_ordering2 != statement_ordering(sloop1)) {
+          FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
+          {
+            if(action_write_p(effect_action(conflict_sink(c)))
+                || action_write_p(effect_action(conflict_source(c)))) {
+              success = false;
             }
           }
         }
       }
     }
+  }
 
-    if(success) {
-      // Cleaning FIXME
-      // Fix real DG
-      // Fix statement ordering
-      // ...
-      // If index2 is different from index 1 and if index2 is live on
-      // exit, its exit value should be restored by an extra
-      // assignment here
-    } else {
-      // FI: this also should be controlled by information about the
-      // liveness of both indices; also index1 must not be used in
-      // loop2 as a temporary; so the memory effects of loops 2 should
-      // be checked before attempting the first subtitution
-      if(index1!=index2)
-	replace_entity((void *)loop2, index1, index2);
-      loop_body( instruction_loop( instr_loop1)) = body_loop1;
-      // Cleaning FIXME
+  if(success) {
+    // Cleaning FIXME
+    // Fix real DG
+    // Fix statement ordering
+    // Fix loop_execution (still parallel ?)
+    // If index2 is different from index 1 and if index2 is live on
+    // exit, its exit value should be restored by an extra
+    // assignment here
+     // ...
+  } else {
+    // FI: this also should be controlled by information about the
+    // liveness of both indices; also index1 must not be used in
+    // loop2 as a temporary; so the memory effects of loops 2 should
+    // be checked before attempting the first subtitution
+    if(index1!=index2) {
+      replace_entity((void *)loop2, index1, index2);
     }
+    loop_body(loop1) = body_loop1;
+    // Cleaning FIXME
+  }
 
-    ifdebug(3) {
-      pips_debug(3, "End of fusion_loops\n\n");
-      print_statement(loop1);
-      pips_debug(3, "\n********************\n");
-    }
+  ifdebug(3) {
+    pips_debug(3, "End of fusion_loops\n\n");
+    print_statement(sloop1);
+    pips_debug(3, "\n********************\n");
   }
   return success;
 }
-
 
 /**
  * Create an empty block
@@ -355,7 +356,6 @@ static fusion_block make_empty_block(int num) {
   return block;
 }
 
-
 /**
  * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
  * to record all statement in a branch of the IR tree.
@@ -364,7 +364,6 @@ static bool record_statements(statement s, set stmts) {
   set_add_element(stmts, stmts, s);
   return true;
 }
-
 
 /**
  * Create a block with statement 's' as a root and given the number 'num'.
@@ -389,7 +388,6 @@ static fusion_block make_block_from_statement(statement s, int num) {
   return b;
 }
 
-
 /**
  * Find the block owning the statement corresponding to the given ordering
  */
@@ -402,7 +400,6 @@ static fusion_block get_block_from_ordering(int ordering, list block_list) {
   }
   return NULL;
 }
-
 
 /**
  * Update b by computing the set of successors using the dependence graph and
@@ -448,7 +445,7 @@ static void compute_successors(fusion_block b, list block_list) {
             fusion_block sink_block = get_block_from_ordering(sink_ordering,
                                                               block_list);
             if(sink_block == NULL) {
-              pips_debug(2,"No block found for ordering %d, dependence ignored",
+              pips_debug(2,"No block found for ordering %d, dependence ignored\n",
                   sink_ordering);
             } else {
               // It's a forward pass, we only add precedence on blocks
@@ -473,7 +470,6 @@ static void compute_successors(fusion_block b, list block_list) {
   }
 }
 
-
 /**
  * Prune the graph so that we have a real tree. There won't be anymore more than
  * one path between two block in the predecessors/successors tree. We keep only
@@ -492,7 +488,6 @@ static set prune_successors_tree(fusion_block b) {
   full_succ = set_union(full_succ, full_succ, b->successors);
   return full_succ;
 }
-
 
 /**
  * Merge two blocks (successors, predecessors, statements).
@@ -539,7 +534,6 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   }
 }
 
-
 /**
  * This function first try to fuse b with its successors (if b is a loop and if
  * there's any loop in the successor list) ; then it recurse on each successor.
@@ -550,10 +544,14 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
 static void try_to_fuse_with_successors(fusion_block b, int *fuse_count) {
   // First step is to try to fuse with each successor
   if(b->is_a_loop) {
+    pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
-      if(succ->is_a_loop) {
+      if(!succ->is_a_loop) {
+        pips_debug(5,"Successors %d is a not a loop, skip !\n",succ->num);
+      } else {
         // Try to fuse
+        pips_debug(4,"Try to fuse %d with succ %d\n",b->num, succ->num);
         if(fusion_loops(b->s, succ->s)) {
           pips_debug(2, "Loop have been fused\n");
           // Now fuse the corresponding blocks
@@ -581,7 +579,6 @@ static void try_to_fuse_with_successors(fusion_block b, int *fuse_count) {
 
   return;
 }
-
 
 /**
  * Try to fuse every loop in the given sequence
@@ -730,15 +727,16 @@ static bool fusion_in_sequence(sequence s) {
   return true;
 }
 
-
 /**
  * Will try to fuse as many loops as possible in the IR subtree rooted by 's'
  */
 static void compute_fusion_on_statement(statement s) {
+  // Get user preferences with some properties
+  fuse_maximize_parallelism = get_bool_property("FUSION_MAXIMIZE_PARALLELISM");
+
   // Go on fusion on every sequence of statement founded
   gen_recurse( s, sequence_domain, fusion_in_sequence, gen_true);
 }
-
 
 /**
  * PIPSMake entry point for loop fusion
@@ -778,7 +776,6 @@ bool loop_fusion(char * module_name) {
   // Here we go ! Let's fuse :-)
   compute_fusion_on_statement(module_statement);
 
-
   /* Reorder the module, because some statements have been deleted, and others
    * have been reordered
    */
@@ -797,7 +794,6 @@ bool loop_fusion(char * module_name) {
 
   pips_debug(2, "done for %s\n", module_name);
   debug_off();
-
 
   /* Should have worked:
    *
