@@ -74,10 +74,10 @@ class module:
 	def apply(self, phase, *args, **kwargs):
 		self._ws.cpypips.apply(upper(phase),self._name)
 
-	def display(self,rc="printed_file",With="PRINT_CODE", **props):
+	def display(self,rc="printed_file",activate="PRINT_CODE", **props):
 		"""display a given resource rc of the module, with the
 		ability to change the properties"""
-		self._ws.activate(With)
+		self._ws.activate(activate)
 		self._ws.set_properties(props)
 		return self._ws.cpypips.display(upper(rc),self._name)
 
@@ -140,11 +140,15 @@ class modules:
 		self._modules=modules
 		self._ws= modules[0]._ws if modules else None
 
+	def __len__(self):return len(self._modules)
 
-	def display(self,rc="printed_file", With="PRINT_CODE", **props):
+	def __iter__(self):return self._modules.iter()
+
+
+	def display(self,rc="printed_file", activate="PRINT_CODE", **props):
 		"""display all modules by default with the code and some
 		eventual property setting"""
-		map(lambda m:m.display(rc, With, **props),self._modules)
+		map(lambda m:m.display(rc, activate, **props),self._modules)
 
 
 	def loops(self):
