@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 # import everything so that a session looks like tpips one
-from pyps import workspace
+from pyrops import pworkspace
+import shutil,os,pyrops
 
-with workspace("properties.c") as w:
+#launcher = pyrops.getWorkspaceLauncher(["properties.c"])
+#w = launcher.getObj()
+with pworkspace("properties.c","cat.c") as w:
 	#Get foo function
 	foo = w.fun.foo
 	
@@ -34,3 +37,6 @@ with workspace("properties.c") as w:
 	foo.inlining(callers="malabar")
 	
 	w.all.display()
+	
+	
+pyrops.Launcher.shutdown()

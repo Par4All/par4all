@@ -7,7 +7,7 @@ import shutil,os
 
 # a worspace ID is automagically created ... may be not a good feature
 # the with statements ensure correct code cleaning
-with workspace(["basics0.c"]) as w:
+with workspace("basics0.c") as w:
 
 	# you can get module object from the modules table
 	foo=w.fun.foo
@@ -22,7 +22,7 @@ with workspace(["basics0.c"]) as w:
 	foo.display()
 	bar.display()
 	malabar.display()
-	bar.apply("print_code")
+	bar.print_code()
 	
 	# you can also preform operations on loops
 	mb.display("loops_file")

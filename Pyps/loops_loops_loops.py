@@ -1,5 +1,5 @@
-from pyps import *
-with workspace(["loops_loops_loops.c"],verbose=False) as w:
+from pyps import workspace
+with workspace("loops_loops_loops.c",verbose=False) as w:
 	m = w.fun.looping
 	
 	print "= first level loops"

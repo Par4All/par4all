@@ -1,6 +1,6 @@
 from pyps import *
 
-with workspace(["basics0.c"]) as w:
+with workspace("basics0.c") as w:
 	w.fun.foo.inlining(callers="malabar")
 	c0=w.checkpoint()
 	w.fun.foo.inlining(callers="bar")
