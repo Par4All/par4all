@@ -61,7 +61,7 @@ extern bool get_bool_property(string);
  * This boolean corresponds to the eponym property, intended
  * to control if we can fuse a sequential loop with a parallel one
  */
-static bool fuse_maximize_parallelism = true;
+static bool loop_fusion_maximize_parallelism = true;
 
 
 /**
@@ -210,7 +210,7 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
   }
 
   // If requested, fuse only look of the same kind (parallel/sequential).
-  if(fuse_maximize_parallelism && ((loop_parallel_p(loop1)
+  if(loop_fusion_maximize_parallelism && ((loop_parallel_p(loop1)
       && !loop_parallel_p(loop2)) || (!loop_parallel_p(loop1)
       && loop_parallel_p(loop2)))) {
     pips_debug(4,"Fusion aborted because of fuse_maximize_parallelism property"
@@ -734,7 +734,7 @@ static bool fusion_in_sequence(sequence s) {
  */
 static void compute_fusion_on_statement(statement s) {
   // Get user preferences with some properties
-  fuse_maximize_parallelism = get_bool_property("FUSION_MAXIMIZE_PARALLELISM");
+  loop_fusion_maximize_parallelism = get_bool_property("LOOP_FUSION_MAXIMIZE_PARALLELISM");
 
   // Go on fusion on every sequence of statement founded
   gen_recurse( s, sequence_domain, fusion_in_sequence, gen_true);
