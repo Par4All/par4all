@@ -841,7 +841,8 @@ static transformer transformer_add_condition_information_updown(
     }
   case is_syntax_subscript:
     {
-        pips_internal_error("subscript not handled yet");
+        /* information may be lost */
+        newpre = pre;
         break;
     }
   default:
