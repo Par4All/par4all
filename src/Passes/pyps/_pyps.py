@@ -1,6 +1,6 @@
 # coding=iso-8859-15
 import pypips
-import utils
+import pypsutils
 import os
 import sys
 import tempfile
@@ -16,7 +16,7 @@ import inspect
 pypips.atinit()
 
 class loop:
-	"""a loop represent a do-loop of a module"""
+	"""do-loop from a module"""
 
 	def __init__(self,module,label):
 		"""[[internal]] bind a loop to its module"""
@@ -25,14 +25,21 @@ class loop:
 		self._ws=module._ws
 
 	@property
-	def label(self): return self._label
+	def label(self):
+		"""loop label, as seen in the source code"""
+		return self._label
 	
 	@property
-	def module(self): return self._module
+	def module(self):
+		"""module containing the loop"""
+		return self._module
 
-	def display(self): self._module.display()
+	def display(self):
+		"""display loop module"""
+		self._module.display()
 
 	def loops(self):
+		"""get outer loops of this loop"""
 		self._module.flag_loops()
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
 		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
@@ -43,9 +50,7 @@ class loop:
 
 
 class module:
-	"""a module represents a function or a procedure, it is the basic
-	element of PyPS you can select modules from the workspace
-	and apply transformations to them"""
+	"""A source code function"""
 
 	def __init__(self,ws,name,source=""):
 		"""[[internal]] bind a module to its workspace"""
@@ -54,41 +59,42 @@ class module:
 		self._ws=ws
 
 	@property
-	def name(self): return self._name
+	def name(self):
+		"""module name"""
+		return self._name
 
 	def run(self,cmd):
-		"""runs command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd 'path/to/module/src' > 'path/to/module/src''"""
-		self.print_code()
-		printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-		code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
-		thecmd=cmd+[printcode_rc]
-		self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
-		pid=Popen(thecmd,stdout=file(code_rc,"w"),stderr=PIPE)
-		if pid.wait() != 0:
-			print sys.stderr > pid.stderr.readlines()
+		"""run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
+		   does nothing on compilation unit ...
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			self.print_code()
+			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+			pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
+			if pid.wait() != 0:
+				print sys.stderr > pid.stderr.readlines()
 
 	def show(self,rc):
-		"""returns the name of resource rc"""
+		"""get name of `rc' resource"""
 		return split(self._ws.cpypips.show(upper(rc),self._name))[-1]
 
-	def apply(self, phase, *args, **kwargs):
-		self._ws.cpypips.apply(upper(phase),self._name)
-
-	def display(self,rc="printed_file",activate="PRINT_CODE", **props):
+	def display(self,rc="printed_file",activate="print_code", **props):
 		"""display a given resource rc of the module, with the
 		ability to change the properties"""
 		self._ws.activate(activate)
-		self._ws.set_properties(props)
+		pypsutils.set_properties(self._ws,props)
 		return self._ws.cpypips.display(upper(rc),self._name)
 
 	def code(self):
-		"""return module code as a string"""
-		self.apply("print_code")
+		"""get module code as a string list"""
+		self._ws.cpypips.apply("PRINT_CODE",self._name)
 		rcfile=self.show("printed_file")
 		return file(self._ws.dirname()+rcfile).readlines()
 
 	def loops(self, label=""):
-		"""return desired loop if label given, an iterator over loops otherwise"""
+		"""get desired loop if label given, an iterator over outermost loops otherwise"""
 		self.flag_loops() # do it now to ensure all loops exist
 		if label:
 			return loop(self,label)
@@ -97,7 +103,7 @@ class module:
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 
 	def inner_loops(self):
-		"""Returns all the inner loops (loops that don't contain further loops)"""
+		"""get all inner loops"""
 		inner_loops = []
 		loops = self.loops()
 		while loops:
@@ -108,11 +114,13 @@ class module:
 	
 	@property
 	def callers(self):
+		"""get module callers as modules"""
 		callers=self._ws.cpypips.get_callers_of(self.name)
 		return modules([ self._ws[name] for name in callers.split(" ") ] if callers else [])
 
 	@property
 	def callees(self):
+		"""get module callees as modules"""
 		callees=self._ws.cpypips.get_callees_of(self.name)
 		return modules([ self._ws[name] for name in callees.split(" ") ] if callees else [])
 
@@ -134,91 +142,48 @@ class module:
 ### module_methods /!\ do not touch this line /!\
 
 class modules:
-	"""high level representation of a module set,
-	its only purpose is to dispatch method calls on contained modules"""
+	"""high level representation of a module set"""
 	def __init__(self,modules):
+		"""initi from a list of module`modules'"""
 		self._modules=modules
 		self._ws= modules[0]._ws if modules else None
 
-	def __len__(self):return len(self._modules)
+	def __len__(self):
+		"""get number of contained module"""
+		return len(self._modules)
 
-	def __iter__(self):return self._modules.__iter__()
+	def __iter__(self):
+		"""iterate over modules"""
+		return self._modules.__iter__()
 
 
-	def display(self,rc="printed_file", activate="PRINT_CODE", **props):
-		"""display all modules by default with the code and some
-		eventual property setting"""
+	def display(self,rc="printed_file", activate="print_code", **props):
+		"""display ressource `rc' of each modules under `activate' rule and properties `props'"""
 		map(lambda m:m.display(rc, activate, **props),self._modules)
 
 
 	def loops(self):
-		""" return a list of all program loops"""
+		""" get concatenation of all outermost loops"""
 		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
-
-	def capply(self,phase):
-		""" concurrently apply a phase to all contained modules"""
-		if self._modules: self._ws.cpypips.capply(upper(phase),map(lambda m:m.name,self._modules))
 
 ### modules_methods /!\ do not touch this line /!\
 
 class workspace(object):
 	"""Top level element of the pyps hierarchy, it represents a set of source
 	   files and provides methods to manipulate them.
-
-	    Of note is the `parents' attribute, which allow to define advices
-		before, around and after the initial functions.
-
-		In order to use this, create a workspace, for instance:
-
-		# File foo.py
-		class workspace:
-			# No need to inherit
-			def __init__(self, ws, sources, **kwargs):
-				# Given the same arguments as pyps.workspace, plus the workspace
-				# itself as the first argument
-				pass # nothing to do, maybe `self.ws = ws' to save the `real'
-					 # workspace if necessary.
-
-			def pre_bar(self, arg...):
-				# Same arguments as pyps.workspace.bar()
-				print "foo.pre_bar: running just before pyps.workspace.bar()"
-
-		The users will need to `import foo', and create their workspace as `ws =
-		pyps.workspace(sources, parents = [foo.workspace])'.
-
-		With a `pre_' suffix, the function will be called before the function of
-		the same name; with a `post_', it will be run after. Without a prefix,
-		it will entirely replace the initial function. In other words, defining
-		pre_bar is similar to saying in emacs:
-
-		(defadvice foo-pre-bar (before bar (arg...) (progn ...)))
-		(ad-activate foo-pre-bar)
-
-		Defining foo.workspace.baz() when pyps.workspace.baz() already exists
-		will *replace* pyps.workspace.baz() (of course, foo's version of baz()
-		may call the initial one, think (defadvice foo-baz (around baz ...) ...)
-		XXX: See comments around foundMain in __getattribute__().
-
-		If the workspace is created as: `ws = pyps.workspace(..., parents =
-		[foo, bar])', a call to ws.quux will call:
-
-		foo.pre_quux
-		bar.pre_quux
-		foo.quux
-			at foo.quux' discretion, bar.quux
-				at bar.quux's discretion, pyps.workspace.quux
-		bar.post_quux
-		foo.post_quux
-
-		This is not an error if any (or even all) intermediate functions don't
-		exist.
 		"""
 
-	def __init__(self, sources, **kwargs):
-		"""init a workspace from a list of sources"""
+	def __init__(self, *sources, **kwargs):
+		"""init a workspace from sources
+			use the string `name' to set workspace name
+			use the boolean `verbose' turn messaging on/off
+			use the string `cppflags' to provide extra preprocessor flags
+			use the list `parents' to customize the workspace
+			use the boolean `recoverInclude' to turn include recoverning on/off
+			use the boolean `deleteOnClose' to turn full workspace deletion on/off
+		"""
 
 		name           = kwargs.setdefault("name",           "")
-		activates      = kwargs.setdefault("activates",      [])
 		verbose        = kwargs.setdefault("verbose",        True)
 		cppflags       = kwargs.setdefault("cppflags",       "")
 		parents        = kwargs.setdefault("parents",        [])
@@ -268,7 +233,7 @@ class workspace(object):
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
-			tmpDirName = utils.nameToTmpDirName(name)
+			tmpDirName = pypsutils.nameToTmpDirName(name)
 			try:shutil.rmtree(tmpDirName)
 			except OSError:pass
 			os.mkdir(tmpDirName)
@@ -277,7 +242,7 @@ class workspace(object):
 				newfname = os.path.join(tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
 				sources += [newfname]
-				utils.guardincludes(newfname)
+				pypsutils.guardincludes(newfname)
 		else:
 			sources=sources2
 
@@ -295,7 +260,7 @@ class workspace(object):
 			self.props.NO_USER_WARNING = True
 			self.props.USER_LOG_P = False
 		self.props.MAXIMUM_USER_ERROR = 42  # after this number of exceptions the programm will abort
-		self._build_module_list()
+		pypsutils.build_module_list(self)
 		self._name=self.info("workspace")[0]
 		
 		"""Call all the functions 'post_init' of the given parents"""
@@ -305,10 +270,14 @@ class workspace(object):
 			except AttributeError:
 				pass
 
-	def __enter__(self): return self
+	def __enter__(self):
+		"""handler for the with keyword"""
+		return self
 	def __exit__(self,exc_type, exc_val, exc_tb):
+		"""handler for the with keyword"""
 		self.close()
 		return False
+
 	@property
 	def name(self):return self._name
 
@@ -321,7 +290,7 @@ class workspace(object):
 
 	def __getitem__(self,module_name):
 		"""retrieve a module of the module from its name"""
-		self._build_module_list()
+		pypsutils.build_module_list(self)
 		return self._modules[module_name]
 
 
@@ -332,7 +301,7 @@ class workspace(object):
 
 	def __contains__(self, module_name):
 		"""Test if the workspace contains a given module"""
-		self._build_module_list()
+		pypsutils.build_module_list(self)
 		return module_name in self._modules
 
 	def info(self,topic):
@@ -358,44 +327,6 @@ class workspace(object):
 		shutil.copytree(chkdir, self.dirname())
 		self.cpypips.open_workspace(self.name)
 
-	def get_property(self, name):
-		name = upper(name)
-		"""return property value"""
-		t = type(self.props.all[name])
-
-		if t == str:     return self.cpypips.get_string_property(name)
-		elif t == int:   return self.cpypips.get_int_property(name)
-		elif t == bool : return self.cpypips.get_bool_property(name)
-		else : 
-			raise TypeError( 'Property type ' + str(t) + ' isn\'t supported')
-
-	def get_properties(self, props):
-		"""return a list of values of props list"""
-		res = []
-		for prop in props.iteritems():
-			res.append(get_property(self, prop))
-		return res
-
-	def _set_property(self, prop,value):
-		"""change property value and return the old one"""
-		prop = upper(prop)
-		old = self.get_property(prop)
-		if value == None:
-			return old
-		val=utils.formatprop(value)
-		self.cpypips.set_property(upper(prop),val)
-		return old
-
-	def set_properties(self,props):
-		"""set properties based on the dictionnary props and returns a dictionnary containing the old state"""
-		old = dict()
-		for prop,value in props.iteritems():
-			old[prop] = self._set_property(prop, value)
-		return old
-
-	def set_property(self, **props):
-		"""set properties and return a dictionnary containing the old state"""
-		return self.set_properties(props)
 
 	def save(self,rep=""):
 		"""save workspace back into source either in directory rep """
@@ -413,11 +344,11 @@ class workspace(object):
 
 		if self.recoverInclude:
 			for f in saved:
-				utils.unincludes(f)
+				pypsutils.unincludes(f)
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
-		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
+		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
 		otmpfiles=self.save(rep=rep)+extrafiles
 		command=[CC, self.cppflags, CFLAGS]
 		if link:
@@ -441,10 +372,10 @@ class workspace(object):
 		return outfile
 
 	
-	# allows subclasses to tamper with the files before compiling
 	def goingToRunWith(self, files, rep):
+		""" hook that happens just before compilation of `files' in `rep'"""
 		for f in files:
-			utils.addMAX0(f)
+			pypsutils.addMAX0(f)
 			# fix bad pragma pretty print
 			lines=[]
 			with open(f,"r") as source:
@@ -474,8 +405,7 @@ class workspace(object):
 	def filter(self,matching=lambda x:True):
 		"""create an object containing current listing of all modules,
 		filtered by the filter argument"""
-		self._build_module_list()
-		#print self._modules.values()
+		pypsutils.build_module_list(self)
 		the_modules=[m for m in self._modules.values() if matching(m)]
 		return modules(the_modules)
 
@@ -484,26 +414,13 @@ class workspace(object):
 	# filter with the default filtering rule: True
 	all = property(filter)
 
-
-	# A regex matching compilation unit names ending with a "!":
-	re_compilation_units = re.compile("^.*!$")
-
-	# Get the list of compilation units:
-	def filter_compilation_units(self):
-		return self.filter(lambda m: workspace.re_compilation_units.match(m.name))
-
 	# Transform it in a pseudo-variable:
-	compilation_units = property(filter_compilation_units)
-
-
-	# A real function is a module that is not a compilation unit:
-	def filter_all_functions(self):
-		return self.filter(lambda m: not workspace.re_compilation_units.match(m.name))
+	compilation_units = property(pypsutils.filter_compilation_units)
 
 	# Transform it in a pseudo-variable.  We should ask PIPS top-level
 	# for it instead of recomputing it here, but it is so simple this
 	# way...
-	all_functions = property(filter_all_functions)
+	all_functions = property(pypsutils.filter_all_functions)
 
 	@staticmethod
 	def delete(name):
@@ -512,7 +429,7 @@ class workspace(object):
 		It is a static method of the class since an open workspace
 		cannot be deleted without creating havoc..."""
 		pypips.delete_workspace(name)
-		try: shutil.rmtree(utils.nameToTmpDirName(name))
+		try: shutil.rmtree(pypsutils.nameToTmpDirName(name))
 		except OSError: pass
 
 
@@ -526,14 +443,6 @@ class workspace(object):
 			except RuntimeError: pass
 		self.hasBeenClosed = True
 
-	def __del__(self):
-		if(not hasattr(self, "hasBeenClosed")):pass
-			#self.close()
-
-	def _build_module_list(self):
-		for m in self.info("modules"):
-			self._modules[m]=module(self,m,self._sources[0])
-	
 	def __getattribute__(self, name):
 		"""Method overrinding the normal attribute access."""
 
@@ -717,8 +626,6 @@ class workspace(object):
 		def __getitem__(self,module_name):
 			"""retrieve a module of the module from its name"""
 			return self._functionDict()[module_name]
-	
-	
 		def __setitem__(self,i):
 			"""change a module of the module from its name"""
 			return self._functionDict()[i]
@@ -737,13 +644,13 @@ class workspace(object):
 
 		def __setattr__(self, name, val):
 			if name in self.all:
-				self.wp._set_property(name,val)
+				pypsutils._set_property(self.wp,name,val)
 			else:
 				raise NameError("Unknow property : " + name)
 
 		def __getattr__(self, name):
 			if name in self.all:
-				return self.wp.get_property(name)
+				return pypsutils.get_property(self.wp,name)
 			else:
 				raise NameError("Unknow property : " + name)
 
@@ -762,7 +669,7 @@ class workspace(object):
 	
 		def __getitem__(self,module_name):
 			"""retrieve a module of the module from its name"""
-			self._build_module_list()
+			pypsutils.build_module_list(self)
 			return self._modules[module_name]
 	
 	
@@ -773,19 +680,8 @@ class workspace(object):
 	
 		def __contains__(self, module_name):
 			"""Test if the workspace contains a given module"""
-			self._build_module_list()
+			pypsutils.build_module_list(self)
 			return module_name in self._modules
-
-		@staticmethod
-		def update_props(passe,props):
-			"""Change a property dictionnary by appending the pass name to the property when needed """
-			for name,val in props.iteritems():
-				if upper(name) not in workspace.props.all:
-					del props[name]
-					props[upper(passe+"_"+name)]=val
-					#print "warning, changing ", name, "into", passe+"_"+name
-			return props
-			
 
 ### props_methods /!\ do not touch this line /!\
 
