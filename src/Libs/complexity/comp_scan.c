@@ -819,6 +819,26 @@ list effects_list;
     return(comp);
 }
 
+complexity subscript_to_complexity(subscript sub,
+        basic * pbasic, transformer precond, list effects_list) {
+
+    complexity cl = expression_to_complexity(
+            subscript_array(sub),
+            pbasic,
+            precond,
+            effects_list);
+    complexity cr = indices_to_complexity(
+            subscript_indices(sub),
+            pbasic,
+            precond,
+            effects_list);
+    complexity_add(&cl,cr);
+    complexity_rm(&cr);
+    complexity_float_add(&cl,1.f);/*SG:let us assume . cost 1 */
+    return cl;
+
+}
+
 /* the only available element of expression */
 complexity syntax_to_complexity(s, pbasic, precond, effects_list)
 syntax s;
@@ -860,7 +880,7 @@ list effects_list;
     break;
   }
   case is_syntax_subscript:
-    pips_internal_error("Not implemented yet\n");
+    comp=subscript_to_complexity(syntax_subscript(s),pbasic,precond,effects_list);
     break;
   case is_syntax_application:
     pips_internal_error("Not implemented yet\n");

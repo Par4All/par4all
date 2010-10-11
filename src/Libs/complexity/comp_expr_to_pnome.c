@@ -376,18 +376,23 @@ int maximize;
 	complexity_float_add(&comp, constant_entity_to_float(f));
 	break;
     case is_value_intrinsic:
-	if (streq(name, PLUS_OP))
+	if (same_string_p(name, PLUS_OP))
 	    comp = plus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (streq(name, MINUS_OP))
+	else if (same_string_p(name, MINUS_OP))
 	    comp = minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (streq(name, MULTIPLY_OP))
+	else if (same_string_p(name, MULTIPLY_OP))
 	    comp = multiply_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (streq(name, DIVIDE_OP))
+	else if (same_string_p(name, DIVIDE_OP))
 	    comp = divide_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (streq(name, POWER_OP))
+	else if (same_string_p(name, POWER_OP))
 	    comp = power_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (streq(name, UNARY_MINUS_OP))
+	else if (same_string_p(name, UNARY_MINUS_OP))
 	    comp = unary_minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
+    else if (same_string_p(name,FIELD_OP))
+        comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
+    else
+        pips_user_warning("operator '%s' skipped\n");
+
 	break;
     default:pips_internal_error("not handled case");
     }
@@ -456,6 +461,21 @@ int maximize;
 					   maximize);
 
     complexity_mult(&c1, c2);
+    complexity_rm(&c2);
+
+    return (c1);
+}
+
+complexity field_op_handler(list args, transformer precond,
+        list effects_list, bool keep_symbols, int maximize) {
+    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+					   precond, effects_list, keep_symbols,
+					   maximize);
+    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+					   precond, effects_list, keep_symbols,
+					   maximize);
+
+    complexity_add(&c1, c2);
     complexity_rm(&c2);
 
     return (c1);

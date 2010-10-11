@@ -100,7 +100,6 @@
 #define hash_contains_common_var_p(htp, key) (hash_get(htp, key) == HASH_COMMON_VARIABLE)
 #define hash_contains_loop_index_p(htp, key) (hash_get(htp, key) == HASH_LOOP_INDEX)
 
-#define streq(s1, s2) (strcmp(s1, s2) == 0)
 
 /* defines for "expression_to_polynome" parameters */
 #define KEEP_SYMBOLS TRUE
@@ -118,6 +117,7 @@
 #define DIVIDE_OP "/"
 #define UNARY_MINUS_OP "--"
 #define POWER_OP "**"
+#define FIELD_OP "."
 
 /* Intrinsics costs defines */
 
