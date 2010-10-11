@@ -146,3 +146,76 @@ cell_relation make_address_of_pointer_value(cell c1, cell c2, tag app_tag, descr
   cell_relation pv = make_cell_relation(ic1, ic2, make_approximation(app_tag, UU), d);
   return(pv);
 }
+
+/***************** UTILS */
+
+/*
+  @brief tests the syntactic equality of two pointer_value relations
+  @param pv1 is a pointer_value
+  @param pv2 is another pointer value
+  @return true if the input pointer values are syntactically equal.
+
+  if both pvs are value_of pvs, they are considered equal if their first cells are equal
+  and second cells are equal but also if the first cell of the first pv is equal to
+  the second cell of the second pv and conversely.
+ */
+bool pv_syntactically_equal_p(cell_relation pv1, cell_relation pv2)
+{
+
+  if (cell_relation_approximation_tag(pv1) != cell_relation_approximation_tag(pv2))
+    return false;
+
+  bool value_of_1_p = cell_relation_second_value_of_p(pv1);
+  bool value_of_2_p = cell_relation_second_value_of_p(pv1);
+
+  if ( (value_of_1_p && !value_of_2_p) || (value_of_2_p && !value_of_1_p))
+    return false;
+
+  cell c_first_1 = cell_relation_first_cell(pv1);
+  cell c_second_1 = cell_relation_second_cell(pv1);
+
+  cell c_first_2 = cell_relation_first_cell(pv2);
+  cell c_second_2 = cell_relation_second_cell(pv2);
+
+  int n_first_first = cell_compare(&c_first_1, &c_first_2);
+
+  if (n_first_first == 0)
+    {
+      int n_second_second = cell_compare(&c_second_1, &c_second_2);
+      
+      if (n_second_second != 0)
+	return false;
+    }
+  else
+    {
+      if (!value_of_1_p)
+	return false;
+      else /* value_of pvs, try to see if their cells are inverted */
+	{
+	  int n_first_second = cell_compare(&c_first_1, &c_second_2);
+	  if (n_first_second == 0)
+	    {
+	      int n_second_first = cell_compare(&c_second_1, &c_first_2);
+	      
+	      if (n_second_first != 0)
+		return false;
+	    }	
+	  else
+	    return false;
+	  
+	}
+    }
+  
+  descriptor d1 = cell_relation_descriptor(pv1);
+  descriptor d2 = cell_relation_descriptor(pv1);
+
+  if (descriptor_none_p(d1) && descriptor_none_p(d2))
+    {
+      return true;
+    }
+  else
+    pips_internal_error("Convex pointer_values not implemented yet\n");
+  
+  return false;
+}
+
