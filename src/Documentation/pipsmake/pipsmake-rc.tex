@@ -9453,9 +9453,10 @@ transformations, such as partial evaluation and dead code elimination
 (including use-def elimination) can be applied to streamline the
 resulting code further.
 
-The transformation \PipsPassRef{flatten_code} firstly moves declarations up
-in the abstract syntax tree, secondly remove useless braces and
-thirdly fully unroll loops when there iteration counts are known.
+The transformation \PipsPassRef{flatten_code} firstly moves declarations
+up in the abstract syntax tree, secondly remove useless braces and thirdly
+fully unroll loops when there iteration counts are known and the
+\verb/FLATTEN_CODE_UNROLL/ property is true..
 
 Inlining(s), which must be performed explicitly by the user with tpips
 or another PIPS interface, can be used first to create lots of
@@ -9479,6 +9480,8 @@ flatten_code > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+If the following property is set, loop unrolling is applied too for loops
+with static bounds.
 \begin{PipsProp}{FLATTEN_CODE_UNROLL}
 FLATTEN_CODE_UNROLL TRUE
 \end{PipsProp}
