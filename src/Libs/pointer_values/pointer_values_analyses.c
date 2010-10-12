@@ -108,6 +108,8 @@ pv_context make_simple_pv_context()
   ctxt.cell_reference_with_address_of_cell_reference_translation_func = 
     simple_cell_reference_with_address_of_cell_reference_translation;
   ctxt.pv_composition_with_transformer_func = simple_pv_composition_with_transformer;
+  ctxt.pvs_must_union_func = simple_pvs_must_union;
+  ctxt.pvs_may_union_func = simple_pvs_must_union;
   return ctxt;
 }
 
@@ -132,6 +134,8 @@ void reset_pv_context(pv_context *p_ctxt)
   p_ctxt->db_put_kill_pv_func = (void_function) UNDEF;
   p_ctxt->make_pv_from_effects_func = (cell_relation_function) UNDEF;
   p_ctxt->pv_composition_with_transformer_func = (cell_relation_function) UNDEF;
+  p_ctxt->pvs_must_union_func = (list_function) UNDEF;
+  p_ctxt->pvs_may_union_func = (list_function) UNDEF;
 }
 
 
@@ -1152,9 +1156,9 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
   pips_debug_pvs(2, "l_out_after kill: ", l_out);
 
   /* and add gen */
-  list l_tmp = pvs_must_union(l_out, l_gen);
-  gen_full_free_list(l_out);
-  gen_full_free_list(l_gen);
+  list l_tmp = (*ctxt->pvs_must_union_func)(l_out, l_gen);
+  //gen_full_free_list(l_out);
+  //gen_full_free_list(l_gen);
   l_out = l_tmp;
   free_type(lhs_type);
   pips_debug_pvs(2, "returning: ", l_out);

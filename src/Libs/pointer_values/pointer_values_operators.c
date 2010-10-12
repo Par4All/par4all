@@ -321,9 +321,9 @@ list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in,
 	    }
 	} /* FOREACH (CELL_RELATION, pv_in, l_in) */
    
-      list l_tmp = pvs_must_union(l_out, l_keep);
-      gen_full_free_list(l_out);
-      gen_full_free_list(l_keep);
+      list l_tmp = (*ctxt->pvs_must_union_func)(l_out, l_keep);
+      //gen_full_free_list(l_out);
+      //gen_full_free_list(l_keep);
       l_out = l_tmp;
       
       /* Second, take into account the impact of eff_kill on l_old_values relations. 
@@ -1131,35 +1131,99 @@ list pvs_composition_with_transformer(list l_pv, transformer t, pv_context * ctx
 }
 
 
+
+list cell_relation_to_list(cell_relation cr)
+{
+  return CONS(CELL_RELATION, cr, NIL);
+}
+
+list cell_relation_to_may_list(cell_relation cr)
+{
+  cell_relation_approximation_tag(cr) = is_approximation_may;
+  return CONS(CELL_RELATION, cr, NIL);
+}
+
+list simple_pv_must_union(cell_relation pv1, cell_relation pv2)
+{
+  tag t1 = cell_relation_approximation_tag(pv1);
+  tag t2 = cell_relation_approximation_tag(pv2);
+  tag t;
+
+  if (t1 == t2) t = t1;
+  else t = is_approximation_exact;
+
+  cell_relation pv = copy_cell_relation(pv1);
+  cell_relation_approximation_tag(pv) = t;
+  
+  return CONS(CELL_RELATION, pv, NIL);  
+}
+
+list simple_pv_may_union(cell_relation pv1, cell_relation pv2)
+{
+  tag t1 = cell_relation_approximation_tag(pv1);
+  tag t2 = cell_relation_approximation_tag(pv2);
+  tag t;
+
+  if (t1 == t2) t = t1;
+  else t = is_approximation_may;
+
+  cell_relation pv = copy_cell_relation(pv1);
+  cell_relation_approximation_tag(pv) = t;
+  
+  return CONS(CELL_RELATION, pv, NIL);  
+}
+
+bool pvs_union_combinable_p(cell_relation pv1, cell_relation pv2)
+{
+  bool undef1 = cell_relation_undefined_p(pv1);
+  bool undef2 = cell_relation_undefined_p(pv2);
+
+  pips_assert("error: there should be no undefined cell_relations in lists\n", !(undef1 && undef2));
+
+  if (undef1 || undef2) return true;
+  return pv_cells_syntactically_equal_p(pv1, pv2);
+
+}
+
+
 /*
-  @brief computes the union of two pointer_values list
+  @brief computes the union of two simple pointer_values list
   @param l_pv1 is the first list of pointer_values
   @param l_pv2 is the second list of pointer_values
   @return a new list of pointer values
 
   
  */
-list pvs_must_union(list l_pv1, list l_pv2)
+list simple_pvs_must_union(list l_pv1, list l_pv2)
 {
-  list l_res = NIL;
-  FOREACH(CELL_RELATION, pv2, l_pv2)
-    {
-      list l1 = l_pv1;
-      bool found = false;
-      while(!found && !ENDP(l1))
-	{
-	  cell_relation pv1 = CELL_RELATION(CAR(l1));
-	  if (pv_syntactically_equal_p(pv1, pv2))
-	    found = true;
-	  POP(l1);	    
-	}
-      if (!found)
-	l_res = CONS(CELL_RELATION, copy_cell_relation(pv2), l_res);
-    }
+
+  list l_res = cell_relations_generic_binary_op(
+    l_pv1,
+    l_pv2,
+    pvs_union_combinable_p,
+    simple_pv_must_union,
+    cell_relation_to_list,
+    cell_relation_to_list);
+  return l_res;
+}
+
+/*
+  @brief computes the may union of two simple pointer_values list
+  @param l_pv1 is the first list of pointer_values
+  @param l_pv2 is the second list of pointer_values
+  @return a new list of pointer values
+
   
-  FOREACH(CELL_RELATION, pv1, l_pv1)
-    {
-      l_res = CONS(CELL_RELATION, copy_cell_relation(pv1), l_res);
-    }
+ */
+list simple_pvs_may_union(list l_pv1, list l_pv2)
+{
+
+  list l_res = cell_relations_generic_binary_op(
+    l_pv1,
+    l_pv2,
+    pvs_union_combinable_p,
+    simple_pv_may_union,
+    cell_relation_to_may_list,
+    cell_relation_to_may_list);
   return l_res;
 }

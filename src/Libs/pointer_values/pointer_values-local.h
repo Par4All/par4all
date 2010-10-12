@@ -31,10 +31,14 @@ typedef struct {
   void (*db_put_gen_pv_func)(char * , statement_cell_relations);
   statement_effects (*db_get_kill_pv_func)(char *);
   void (*db_put_kill_pv_func)(char * , statement_effects);
+
   cell_relation (*make_pv_from_effects_func)(effect, effect, cell_interpretation);
   void (*cell_reference_with_value_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
   void (*cell_reference_with_address_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
   cell_relation (*pv_composition_with_transformer_func)(cell_relation, transformer );
+
+  list (*pvs_must_union_func)(list, list);
+  list (*pvs_may_union_func)(list, list);
 } pv_context;

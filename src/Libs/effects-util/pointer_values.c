@@ -150,7 +150,7 @@ cell_relation make_address_of_pointer_value(cell c1, cell c2, tag app_tag, descr
 /***************** UTILS */
 
 /*
-  @brief tests the syntactic equality of two pointer_value relations
+  @brief tests the syntactic equality of the corresponding cells of two pointer_value relations
   @param pv1 is a pointer_value
   @param pv2 is another pointer value
   @return true if the input pointer values are syntactically equal.
@@ -159,11 +159,9 @@ cell_relation make_address_of_pointer_value(cell c1, cell c2, tag app_tag, descr
   and second cells are equal but also if the first cell of the first pv is equal to
   the second cell of the second pv and conversely.
  */
-bool pv_syntactically_equal_p(cell_relation pv1, cell_relation pv2)
+bool pv_cells_syntactically_equal_p(cell_relation pv1, cell_relation pv2)
 {
 
-  if (cell_relation_approximation_tag(pv1) != cell_relation_approximation_tag(pv2))
-    return false;
 
   bool value_of_1_p = cell_relation_second_value_of_p(pv1);
   bool value_of_2_p = cell_relation_second_value_of_p(pv1);

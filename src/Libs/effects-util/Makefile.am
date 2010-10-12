@@ -7,6 +7,7 @@ libeffects_util_la_SOURCES=effects.c \
 	anywhere_abstract_locations.c \
         abstract_location.c \
         points_to.c \
+        cell_relations.c \
         pointer_values.c \
         prettyprint.c \
         type.c \
