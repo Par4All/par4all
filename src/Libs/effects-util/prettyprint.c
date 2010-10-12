@@ -698,9 +698,14 @@ void print_pointer_value(cell_relation pv)
 void print_pointer_values(list lpv)
 {
   fprintf(stderr,"\n");
-  FOREACH(CELL_RELATION, pv, lpv)
+  if (ENDP(lpv))
+    fprintf(stderr,"<none>");
+  else
     {
-      print_pointer_value(pv);
+      FOREACH(CELL_RELATION, pv, lpv)
+	{
+	  print_pointer_value(pv);
+	}
     }
-    fprintf(stderr,"\n");
+  fprintf(stderr,"\n");
 }

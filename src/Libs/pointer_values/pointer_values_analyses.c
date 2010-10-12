@@ -109,7 +109,7 @@ pv_context make_simple_pv_context()
     simple_cell_reference_with_address_of_cell_reference_translation;
   ctxt.pv_composition_with_transformer_func = simple_pv_composition_with_transformer;
   ctxt.pvs_must_union_func = simple_pvs_must_union;
-  ctxt.pvs_may_union_func = simple_pvs_must_union;
+  ctxt.pvs_may_union_func = simple_pvs_may_union;
   return ctxt;
 }
 
@@ -616,7 +616,18 @@ list test_to_post_pv(test t, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   pips_debug(1, "begin\n");
-  pips_internal_error("not yet implemented\n");
+  
+  expression t_cond = test_condition(t);
+  statement t_true = test_true(t);
+  statement t_false = test_false(t);
+
+  list l_in_branches = expression_to_post_pv(t_cond, l_in, ctxt);
+  
+  list l_out_true = statement_to_post_pv(t_true, l_in_branches, ctxt);
+  list l_out_false = statement_to_post_pv(t_false, l_in_branches, ctxt);
+
+  l_out = (*ctxt->pvs_may_union_func)(l_out_true, l_out_false);
+
   pips_debug_pvs(2, "returning: ", l_out);
   pips_debug(1, "end\n");
   return (l_out);

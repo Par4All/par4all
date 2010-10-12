@@ -916,7 +916,9 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 							       &pv_exact, 
 							       &tmp_l_remnants);
 	  if (!cell_relation_undefined_p(pv_exact))
-	    l_equiv = CONS(CELL_RELATION, pv_exact, l_equiv);
+	    {
+	     l_equiv = CONS(CELL_RELATION, pv_exact, l_equiv);
+	    }
 	  l_remnants = tmp_l_remnants;
 	  pips_debug_pvs(5, "list of equivalent pvs \n", l_equiv);
 	  
@@ -930,69 +932,86 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 	      reference ref;
 	      descriptor d;
 	      bool exact_translation_p;
+	      cell c1 = cell_relation_first_cell(pv_equiv);
+	      cell c2 = cell_relation_second_cell(pv_equiv);
 	      
 	      pips_debug_pv(5, "translating eff using pv: \n", pv_equiv);
 	      
-	      /* this is valid only if the first value_of corresponds to eff_intermediary */
-	      reference pv_equiv_first_ref = cell_reference(cell_relation_first_cell(pv_equiv));
-	      //reference pv_equiv_second_ref = cell_reference(cell_relation_second_cell(pv_equiv));
-	      
-	      if (same_entity_p(ent_intermediary, reference_variable(pv_equiv_first_ref))
-		  && (gen_length(reference_indices(ref_intermediary)) 
-		      == gen_length(reference_indices(pv_equiv_first_ref))))
+	      if (undefined_pointer_value_cell_p(c1) || undefined_pointer_value_cell_p(c2)
+		  || null_pointer_value_cell_p(c1) || null_pointer_value_cell_p(c2))
 		{
-		  /* use second cell as equivalent value for intermediary path */
-		  if (cell_relation_second_value_of_p(pv_equiv))
+		  if (cell_relation_exact_p(pv_equiv))
+		    pips_user_error("\n\tdereferencing an undefined or null pointer (%s)\n",
+				    words_to_string(effect_words_reference(effect_any_reference(eff))));
+		  else
 		    {
-		      (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
-			(eff_ref, descriptor_undefined, /* not generic here */
-			 cell_reference(cell_relation_second_cell(pv_equiv)),
-			 descriptor_undefined, /* not generic here */
-			 nb_common_indices,
-			 &ref, &d, &exact_translation_p);
+		      pips_debug(5,"potential dereferencement of an undefined or null pointer\n");
 		    }
-		  else /* cell_relation_second_address_of_p is true */
-		    {
-		      (*ctxt->cell_reference_with_address_of_cell_reference_translation_func)
-			(eff_ref, descriptor_undefined, /* not generic here */
-			 cell_reference(cell_relation_second_cell(pv_equiv)),
-			 descriptor_undefined, /* not generic here */
-			 nb_common_indices,
-			 &ref, &d, &exact_translation_p);
-		    }
-		}
-	      else /* use first cell as equivalent value for intermediary path  */
-		{
-		  pips_assert("pv_equiv must be value_of here\n", 
-			      cell_relation_second_value_of_p(pv_equiv));
-		  
-		  (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
-		    (eff_ref, descriptor_undefined, /* not generic here */
-		     cell_reference(cell_relation_first_cell(pv_equiv)),
-		     descriptor_undefined, /* not generic here */
-		     nb_common_indices,
-		     &ref, &d, &exact_translation_p);
-		}
-	      exact_translation_p = exact_translation_p && cell_relation_exact_p(pv_equiv);
-	      
-	      effect eff_alias = make_effect(make_cell_reference(ref),
-					     copy_action(effect_action(eff_intermediary)),
-					     exact_translation_p ? 
-					     make_approximation_must()
-					     : make_approximation_may(), make_descriptor_none());
-	      pips_debug_effect(5, "resulting effect \n", eff_alias);
-	      if (anywhere_effect_p(eff_alias))
-		{
-		  gen_full_free_list(l_res);
-		  l_res = CONS(EFFECT, eff_alias, NIL);
-		  anywhere_p = true;
 		}
 	      else
 		{
-		  l_res = CONS(EFFECT, eff_alias, l_res);	  
+	      
+		  /* this is valid only if the first value_of corresponds to eff_intermediary */
+		  reference pv_equiv_first_ref = cell_reference(c1);
+		  reference pv_equiv_second_ref = cell_reference(c2);
+	      
+		  if (same_entity_p(ent_intermediary, reference_variable(pv_equiv_first_ref))
+		      && (gen_length(reference_indices(ref_intermediary)) 
+			  == gen_length(reference_indices(pv_equiv_first_ref))))
+		    {
+		      /* use second cell as equivalent value for intermediary path */
+		      if (cell_relation_second_value_of_p(pv_equiv))
+			{
+			  (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+			    (eff_ref, descriptor_undefined, /* not generic here */
+			     pv_equiv_second_ref,
+			     descriptor_undefined, /* not generic here */
+			     nb_common_indices,
+			     &ref, &d, &exact_translation_p);
+			}
+		      else /* cell_relation_second_address_of_p is true */
+			{
+			  (*ctxt->cell_reference_with_address_of_cell_reference_translation_func)
+			    (eff_ref, descriptor_undefined, /* not generic here */
+			     pv_equiv_second_ref,
+			     descriptor_undefined, /* not generic here */
+			     nb_common_indices,
+			     &ref, &d, &exact_translation_p);
+			}
+		    }
+		  else /* use first cell as equivalent value for intermediary path  */
+		    {
+		      pips_assert("pv_equiv must be value_of here\n", 
+				  cell_relation_second_value_of_p(pv_equiv));
 		  
+		      (*ctxt->cell_reference_with_value_of_cell_reference_translation_func)
+			(eff_ref, descriptor_undefined, /* not generic here */
+			 pv_equiv_first_ref,
+			 descriptor_undefined, /* not generic here */
+			 nb_common_indices,
+			 &ref, &d, &exact_translation_p);
+		    }
+		  exact_translation_p = exact_translation_p && cell_relation_exact_p(pv_equiv);
+	      
+		  effect eff_alias = make_effect(make_cell_reference(ref),
+						 copy_action(effect_action(eff_intermediary)),
+						 exact_translation_p ? 
+						 make_approximation_must()
+						 : make_approximation_may(), make_descriptor_none());
+		  pips_debug_effect(5, "resulting effect \n", eff_alias);
+		  if (anywhere_effect_p(eff_alias))
+		    {
+		      gen_full_free_list(l_res);
+		      l_res = CONS(EFFECT, eff_alias, NIL);
+		      anywhere_p = true;
+		    }
+		  else
+		    {
+		      l_res = CONS(EFFECT, eff_alias, l_res);	  
+		  
+		    }
 		}
-	    }
+	    } /* FOREACH */
 	}
       
       if (!anywhere_p)
