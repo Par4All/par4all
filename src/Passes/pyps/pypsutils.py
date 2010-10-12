@@ -78,7 +78,7 @@ def addBeginnning(fname, text):
         if fi.isfirstline():
             print text
         print l,
-    
+
 def unincludes(fname):
     """remove the contents of included files"""
     fi = fileinput.FileInput([fname], inplace = True)
@@ -108,7 +108,7 @@ def string2file(string, fname):
     f = open(fname, "w")
     f.write(string)
     f.close()
-    
+
 def nameToTmpDirName(name): return "." + name + ".tmp"
 
 def formatprop(value):
@@ -161,7 +161,7 @@ def get_property(ws, name):
 	if t == str:     return ws.cpypips.get_string_property(name)
 	elif t == int:   return ws.cpypips.get_int_property(name)
 	elif t == bool : return ws.cpypips.get_bool_property(name)
-	else : 
+	else :
 		raise TypeError( 'Property type ' + str(t) + ' isn\'t supported')
 
 def get_properties(ws, props):

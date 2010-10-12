@@ -28,7 +28,7 @@ class loop:
 	def label(self):
 		"""loop label, as seen in the source code"""
 		return self._label
-	
+
 	@property
 	def module(self):
 		"""module containing the loop"""
@@ -111,7 +111,7 @@ class module:
 			if not l.loops(): inner_loops.append(l)
 			else: loops += l.loops()
 		return inner_loops
-	
+
 	@property
 	def callers(self):
 		"""get module callers as modules"""
@@ -225,9 +225,10 @@ class workspace(object):
 		if self.verbose:
 			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
-		def helper(x,y):
-			return x+y if isinstance(y,list) else x +[y]
-		sources2 = reduce(helper, sources2, [])
+		def concatenate_list(x, y):
+			"Concatenate as list even if the second one is a simple element"
+			return x + y if isinstance(y,list) else x + [y]
+		sources2 = reduce(concatenate_list, sources2, [])
 		sources = []
 
 		if recoverInclude:
@@ -262,7 +263,7 @@ class workspace(object):
 		self.props.MAXIMUM_USER_ERROR = 42  # after this number of exceptions the programm will abort
 		pypsutils.build_module_list(self)
 		self._name=self.info("workspace")[0]
-		
+
 		"""Call all the functions 'post_init' of the given parents"""
 		for pws in reversed(self.iparents):
 			try:
@@ -371,7 +372,7 @@ class workspace(object):
 			raise RuntimeError("`%s' failed with return code %d" % (commandline, ret >> 8))
 		return outfile
 
-	
+
 	def goingToRunWith(self, files, rep):
 		""" hook that happens just before compilation of `files' in `rep'"""
 		for f in files:
@@ -414,12 +415,13 @@ class workspace(object):
 	# filter with the default filtering rule: True
 	all = property(filter)
 
-	# Transform it in a pseudo-variable:
+	# Transform in the same way the filtered compilation units as a
+	# pseudo-variable:
 	compilation_units = property(pypsutils.filter_compilation_units)
 
-	# Transform it in a pseudo-variable.  We should ask PIPS top-level
-	# for it instead of recomputing it here, but it is so simple this
-	# way...
+	# Build also a pseudo-variable for the set of all the functions of the
+	# workspace.  We should ask PIPS top-level for it instead of
+	# recomputing it here, but it is so simple this way...
 	all_functions = property(pypsutils.filter_all_functions)
 
 	@staticmethod
@@ -444,7 +446,7 @@ class workspace(object):
 		self.hasBeenClosed = True
 
 	def __getattribute__(self, name):
-		"""Method overrinding the normal attribute access."""
+		"""Method overriding the normal attribute access."""
 
 		def get(name):
 			# can't use self.name !
@@ -462,14 +464,14 @@ class workspace(object):
 				return a
 		except AttributeError:
 			pass
-			
-		#Functions with '__' before can't be overloaded (for example __dir__), but they can still have
-		# pre_ and post_ hooks. 
+
+		#Functions with '__' before can't be overloaded (for example
+		# __dir__), but they can still have pre_ and post_ hooks.
 		if name[0:2] == '__':
 			overloadable = False
 		else:
 			overloadable = True
-		
+
 
 		# Build a new function
 		pre_hooks = []
@@ -491,7 +493,7 @@ class workspace(object):
 		# XXX: I may want to do the following in one of the parent class:
 		# class foo_workspace:
 		# 	def compile(self, **args):
-		#		"""a method that compile then launch gdb"""
+		#		"""a method that compiles then launches gdb"""
 		#		args["CFLAGS"] += "-g"
 		#		FIXME: call pyps.workspace.compile with **args
 		#		os.system("gdb ....")
@@ -520,7 +522,7 @@ class workspace(object):
 			if callable(post_hook):
 				post_hooks.append((p, post_hook))
 
-		# If we didn't fund anything, raise an error
+		# If we didn't find anything, raise an error
 		if (not foundMain) and pre_hooks == [] and post_hooks == []:
 			raise AttributeError
 
@@ -539,6 +541,7 @@ class workspace(object):
 		for p in self.iparents:
 			l += dir(p)
 		return l
+
 
 	class cu(object):
 		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
@@ -569,25 +572,24 @@ class workspace(object):
 			"""provide an iterator on workspace's compilation unit, so that you can write
 				map(do_something,my_workspace)"""
 			return self._cuDict().itervalues()
-	
+
 		def __pyropsFakeIter__(self):
 			"""provide an iterator on workspace's module, so that you can write
 				map(do_something,my_workspace)"""
 			return self._cuDict().values()
-	
+
 		def __getitem__(self,module_name):
-			"""retrieve a module of the module from its name"""
+			"""retrieve a module of the workspace from its name"""
 			return self._cuDict()[module_name]
-	
-	
+
 		def __setitem__(self,i):
-			"""change a module of the module from its name"""
+			"""change a module of the workspace from its name"""
 			return self._cuDict()[i]
-	
-	
+
 		def __contains__(self, module_name):
 			"""Test if the workspace contains a given module"""
 			return module_name in self._cuDict()
+
 
 	class fun(object):
 		'''Allow user to access a module by writing w.fun.modulename'''
@@ -607,30 +609,29 @@ class workspace(object):
 			d = {}
 			for k in self._wp._modules:
 				if k[len(k)-1] != '!':
-					d[k] = self._wp._modules[k] 
+					d[k] = self._wp._modules[k]
 			return d
 
 		def __dir__(self):
 			return self._functionDict().keys()
 
 		def __iter__(self):
-			"""provide an iterator on workspace's module, so that you can write
-				map(do_something,my_workspace)"""
+			"""provide an iterator on workspace's funtions, so that you
+				can write map(do_something, my_workspace.fun)"""
 			return self._functionDict().itervalues()
-	
+
 		def __pyropsFakeIter__(self):
-			"""provide an iterator on workspace's module, so that you can write
-				map(do_something,my_workspace)"""
+			"""provide an iterator on workspace's funtions, so that you
+				can write map(do_something, my_workspace.fun)"""
 			return self._functionDict().values()
-	
+
 		def __getitem__(self,module_name):
-			"""retrieve a module of the module from its name"""
+			"""retrieve a module of the workspace by its name"""
 			return self._functionDict()[module_name]
 		def __setitem__(self,i):
-			"""change a module of the module from its name"""
+			"""change a module of the workspace by its name"""
 			return self._functionDict()[i]
-	
-	
+
 		def __contains__(self, module_name):
 			"""Test if the workspace contains a given module"""
 			return module_name in self._functionDict()
@@ -638,7 +639,15 @@ class workspace(object):
 	class props(object):
 		"""Allow user to access a property by writing w.props.PROP,
 		this class contains a static dictionnary of every properties
-		and default value"""
+		and default value
+
+		Provides also iterator and [] methods
+
+		TODO : allows global setting of many properties at once
+		
+		all is a local dictionary with all the properties with their initial
+		values. It is generated externally.
+		"""
 		def __init__(self,wp):
 			self.__dict__['wp'] = wp
 
@@ -655,34 +664,32 @@ class workspace(object):
 				raise NameError("Unknow property : " + name)
 
 		def __dir__(self):
+			"We should use the updated values, not the default ones..."
 			return self.all.keys()
 
 		def __iter__(self):
-			"""provide an iterator on workspace's module, so that you can write
-				map(do_something,my_workspace)"""
-			return self._modules.itervalues()
-	
+			"""provide an iterator on workspace's properties, so that you
+				can write map(do_something, my_workspace.props)"""
+			return self.all.itervalues()
+
 		def __pyropsFakeIter__(self):
 			"""provide an iterator on workspace's module, so that you can write
 				map(do_something,my_workspace)"""
-			return self._modules.values()
-	
-		def __getitem__(self,module_name):
-			"""retrieve a module of the module from its name"""
-			pypsutils.build_module_list(self)
-			return self._modules[module_name]
-	
-	
-		def __setitem__(self,i):
-			"""change a module of the module from its name"""
-			return self._modules[i]
-	
-	
-		def __contains__(self, module_name):
-			"""Test if the workspace contains a given module"""
-			pypsutils.build_module_list(self)
-			return module_name in self._modules
+			return self.all.values()
 
+		def __getitem__(self, property_name):
+			"""retrieve a property of the workspace by its name"""
+			return self.__getattr__(self, property_name)
+
+		def __setitem__(self, property_name, value):
+			"""change the property of the workspace by its name"""
+			self.__setattr__(property_name, value)
+
+		def __contains__(self, property_name):
+			"""Test if the workspace contains a given property"""
+			return property_name in self.all
+
+		# Here the source of the property all attribute will be generated:
 ### props_methods /!\ do not touch this line /!\
 
 # Some Emacs stuff:
