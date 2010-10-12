@@ -100,7 +100,20 @@ static entity expressions_to_vector(list expressions)
 static void update_vector_to_expressions(entity e, list exps)
 {
     pips_assert("entity is ok",entity_consistent_p(e));
+    /* create the enw vector */
     FOREACH(EXPRESSION,exp,exps) pips_assert("expressions are ok",expression_consistent_p(exp));
+    /* remove the old ones */
+    HASH_FOREACH(entity,v,list,expressions,vector_to_expressions) {
+        FOREACH(EXPRESSION,exp,exps) {
+            for(list iter=expressions;!ENDP(iter);POP(iter)) {
+                expression * piter = (expression*) REFCAR(iter);
+                if(expression_equal_p(exp,*piter)) /* invalidate */ {
+                    free_expression(*piter);
+                    *piter=expression_undefined;
+                }
+            }
+        }
+    } 
     hash_put_or_update(vector_to_expressions,e,gen_full_copy_list(exps));
 }
 
@@ -116,7 +129,7 @@ void invalidate_expressions_in_statement(statement s)
         bool invalidate=false;
         FOREACH(EXPRESSION,v,value)
         {
-            if(expression_reference_p(v))
+            if(!expression_undefined_p(v) && expression_reference_p(v))
             {
                 FOREACH(EFFECT,eff,effects)
                     if((invalidate=references_may_conflict_p(expression_reference(v),effect_any_reference(eff))))

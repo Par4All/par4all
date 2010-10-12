@@ -20,6 +20,9 @@
 
 */
 /*
+  Functions dealing with the Newgen objects "extension", which are
+  part of "statement"; they are used to encode pragmas.
+
   Pierre.Villalon@hpc-project.com
   Ronan.Keryell@hpc-project.com
 */

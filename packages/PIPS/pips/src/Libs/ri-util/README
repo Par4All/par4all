@@ -1,0 +1,120 @@
+The ri-util library mostly contains functions (methods) related to objects
+part of PIPS internal representation.
+
+allocatable.c: support functions for the ALLOCATABLE instruction of
+Fortran 95
+
+arguments.c: management of entity lists; it's called "arguments" for
+historical reason; the package was developped within the transformer
+library to handle transformer arguments;
+
+attachment_pretty_print.c: used by the emacs graphical interface to
+display information on demand; TO BE CHECKED BY RONAN KERYELL
+
+bound_generation.c: conversion of Linear constraint systems into
+expressions; should be C anf Fortran compatible
+
+clean.c: fucntions to remove entities from the symbol table; used by
+the parsers when a parser error is encountered
+
+clone_statement.c: unlike copy_statement(), clone_statements takes
+care of concsistency issues with the symbol table and with labels. TO
+BE CHECKED AND DOCUMENTED BY SERGE IN THE C FILE]
+
+cmfortran.c: prettyprint loops with Cray Fortran syntax
+
+constant.c: functions dealing with constant expressions and concstant entities
+
+contrainte_to_text.c:
+
+control.c: utilities to deal with the control graph, e.g. to scan all
+nodes of a graph; used mostly by the controlizer and by unspaghetify
+(see control library), but also by all analysis libraries because they
+need to wlak the control flow graphs
+
+convex_hull.c: should be moved into llinear
+
+craft.c: prettyprint of loops in CRAFT style
+
+declarations.c: prettyprint of declarations based on the text library;
+used for C nd Fortran
+
+entity.c: functions dealing with the Newgen object entity; there all
+kinds of entities in PIPS; see also: constant.c for entities
+representing constants, variable.c for entities representing program
+variables (i.e. not related to the Newgen object called "variables")
+
+eval.c: static evaluation of expressions; fails if the expression's
+value is not statically known
+
+expression.c: functions dealing with expressions (see ri.pdf).
+
+extension.c: functions dealing with the Newgen objects "extension",
+which are part of "statement"; they are used to encode pragmas.
+
+fortran90.c: prettyprint of loops as Fortran 90 array expressions
+
+hpfc.c: handling of special entities for the HPF compiler
+
+instruction.c: functions dealing with the Newgen object "instruction",
+which is part of "statement"; see ri.pdf
+
+loop.c: functions about loops and list of loops, loop being understood
+as DO loops with a Fortran semantics; while, repeat and for loops are
+not (yet) handled in this file.
+
+misc_paf_utils.c: various functions used by the array data flow graph
+libraries to generate code from a schedule; they bridge linear algebra
+and PIPS internal representation, as well as new variable
+declarations, etc. Limited to Fortran for the time being.
+
+module.c: functions dealing with entities representing modules
+9a.k.a. functions) and with their names (i.e. the field name of entity
+in the case the entity represents a module); also consistency checks
+for declarations
+
+normalize.c: functions to build the "normalize" field of "expression"
+from the "syntax" field; see ri.pdf
+
+ordering.c: functions to manage the "ordering" field of "statement";
+ordering is built and used to represent the textual ordering of
+statemsnts; it must be kept consistent explictly (see function
+module_body_reorder()) after program transformation; see also ri.pdf,
+section about statements.
+
+pragma.c: functions dealing with pragmas; they are embedded in
+"extension"; see ri.pdf and extension.c
+
+prettyprint.c: prettyprint many parts of the itnernal representation
+either in Fortran or in C
+
+replace.c: fucntions to substitute a variable o by a variable n in all
+its occurences within a statement
+
+size.c: functions to compute the size in bytes of a variable v or of
+an object of type t; it is not always possible because of dependent
+types
+
+statement.c: functions dealing with the "statement" Newgen object and
+with lists of statements; see ri.pdf and instruction.c
+
+static.c: management of static variables shared by all PIPS
+phases/passes; they are used to store the current function, current
+function name, current statement,... Beware of consistency: these
+variables must be reset at each phase/pass termination
+
+type.c: functions dealing with the "type" Newgen object.
+
+unstructured.c: functions dealing with the "unstructured" Newgen object
+
+util.c: functions dealing with the names of entities; a lot of
+information is stored in an entity name; see ri.pdf, the section about
+entity; functions dealing with filenames are also located in this
+file; functions dealing with label names are also found here; as well
+as functions dealing with formal parameters; and functions dealing
+with comments; most of these functions deal with strings, but it is
+mostly a pot-pourri. It should be broken into entity_name.c,
+comment.c,...
+
+variable.c: functions dealing with entities representing program
+variables; see entity.c

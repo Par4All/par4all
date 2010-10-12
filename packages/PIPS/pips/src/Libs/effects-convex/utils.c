@@ -1856,26 +1856,59 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
   }
   else /* the expression is not linear */ {
     if(is_eg) {
+      /* try to see if expression is i++, i--, ++i, --i */
+      
+      if(expression_call_p(expr)) 
+	{
+	  call c = syntax_call(expression_syntax(expr));
+	  entity op = call_function(c);
+	  list args = call_arguments(c);
+	  
+	  if(ENTITY_POST_INCREMENT_P(op) ||
+	     ENTITY_POST_DECREMENT_P(op))
+	    {
+	      return sc_add_phi_equation(psc, EXPRESSION(CAR(args)), dim, is_eg, is_phi_first);
+	    }
+	  else if (ENTITY_PRE_INCREMENT_P(op) )
+	    {
+	      expression new_exp = MakeBinaryCall(CreateIntrinsic("+"),
+						  copy_expression(EXPRESSION(CAR(args))),int_to_expression(1));
+	      must_p = sc_add_phi_equation(psc, new_exp, dim, is_eg, is_phi_first);
+	      free_expression(new_exp);
+	      return must_p;
+	    }
+	  else if (ENTITY_PRE_DECREMENT_P(op))
+	    {
+	      expression new_exp = MakeBinaryCall(CreateIntrinsic("-"),
+						  copy_expression(EXPRESSION(CAR(args))),int_to_expression(1));
+	      must_p = sc_add_phi_equation(psc, new_exp, dim, is_eg, is_phi_first);
+	      free_expression(new_exp);
+	      return must_p;
+	    }
+	  
+	}
+      
+	  
       /* Nga Nguyen: 29 August 2001
 	 If the expression expr is not a linear expression, we try to retrieve more
 	 information by using function any_expression_to_transformer, for cases like:
-
+	     
 	 ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
 	 ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
-
+	     
 	 The function any_expression_to_transformer() returns a transformer that may
 	 contain temporary variables so we have to project these variables.
-
+	     
 	 The approximation will become MAY (although in some cases, it is MUST) */
-
+	  
       entity phi = make_phi_entity(dim);
       transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
-
+	  
       /* Careful: side-effects are lost */
       if (!transformer_undefined_p(trans)) {
 	transformer new_trans = transformer_temporary_value_projection(trans);
 	Psysteme p_trans = sc_copy(predicate_system(transformer_relation(new_trans)));
-
+	    
 	/* trans has been transformed into new_trans by the
 	   projection */
 	//free_transformer(trans);
@@ -1885,6 +1918,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	sc = sc_safe_append(sc, p_trans);
       }
       must_p = FALSE;
+	
     }
     else {
       /* An inequation should be generated.

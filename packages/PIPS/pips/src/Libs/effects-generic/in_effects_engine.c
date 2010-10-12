@@ -640,6 +640,10 @@ in_effects_of_call(call c)
 
     pips_debug(1, "begin\n");
     switch (t) {
+      case is_value_constant:
+        pips_debug(5, "constant %s\n", n);
+        /* consnant have no in effects, do they ? */
+        break;
       case is_value_code:
         pips_debug(5, "external function %s\n", n);
         l_in = in_effects_of_external(e, pc);

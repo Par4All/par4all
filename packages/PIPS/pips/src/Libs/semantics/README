@@ -1,0 +1,52 @@
+Semantics library
+
+
+It is based on the transformer library.
+
+It is used to compute convex preconditions and transformers, as well
+as total preconditions. Total preconditions are not fully implemented:
+only the intraprocedural part is available.
+
+It is sometimes broken down according to analyses, and some times
+according to the internal representation structure.
+
+Source file list:
+
+dbm_interface.c: top layer, interface with pipsmake and pipsdbm
+
+expression.c: everything that deals with expressions for all analyses; the number of
+functions has increased a lot with C because side effects must be
+taken into account
+
+initial.c: handling of static initial values
+
+interprocedural.c: handling of call sites for all analyses
+
+loop.c: handling of loops for all analyses
+
+mappings.c: relationship between variables and their values (old,
+intermediate, new and temporary)
+
+misc.c: functions to be moved elsewhere
+
+postcondition.c: used to compute the postcondition of a statement instead ot its precondition (?)
+
+prettyprint.c: functions to prettyprint preconditions and transformers
+
+ri_to_preconditions.c: functions to compute postconditions from
+preconditions and transformers; deals with sequences and tests
+
+ri_to_total_preconditions.c: functions to compute total preconditions from
+transformers; deals with sequences and tests
+
+ri_to_transformer_lists.c: functions to refine transformers into
+transformer lists used to improve preconditions in nested loops
+
+ri_to_transformers.c: functions to compute transformers; deals with
+sequences and tests
+
+unstructured.c: functions to deal specifically with control flow graphs
+
+utils.c: contains functions based on semantics but used by other
+passes such as suppress_dead_code; static evaluation of an expression
+or of a condition or of a variable

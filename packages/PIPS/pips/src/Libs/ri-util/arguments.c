@@ -21,6 +21,13 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Functions dealing with entity lists
+ *
+ * Called "arguments" because the package was developped within the
+ * transformer library where entity lists were used to represent
+ * transformer arguments. No specific link with transformers. Now used
+ * here and there and moved into ri-util.
+ */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif

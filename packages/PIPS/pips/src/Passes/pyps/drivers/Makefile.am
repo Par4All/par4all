@@ -1,4 +1,4 @@
-SUBDIRS = sac workspace_gettime memalign sacexplore
+SUBDIRS = sac workspace_gettime memalign sacexplore p3
 if WITH_PYPS_EXTRA
 SUBDIRS+= pypsearch
 endif

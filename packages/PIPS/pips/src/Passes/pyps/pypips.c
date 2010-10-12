@@ -29,6 +29,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+#include <string.h>
 
 #include "linear.h"
 #include "genC.h"
@@ -103,6 +105,7 @@ static void pyps_error_handler(const char * calling_function_name,
    }
 }
 
+DEFINE_LOCAL_STACK(properties,property);
 void atinit()
 {
     /* init various composants */
@@ -111,6 +114,7 @@ void atinit()
     pips_log_handler = pyps_log_handler;
     pips_error_handler = pyps_error_handler;
     set_exception_callbacks(push_pips_context, pop_pips_context);
+    make_properties_stack();
 }
 
 void verbose(int on) {
@@ -159,12 +163,7 @@ void create(char* workspace_name, char ** filenames)
     }
 }
 
-void quit()
-{
-    close_workspace(FALSE);
-}
-
-void set_property(char* propname, char* value)
+void set_property(const char* propname, const char* value)
 {
     /* nice hack to temporarly redirect stderr */
     int saved_stderr = dup(STDERR_FILENO);
@@ -311,16 +310,6 @@ char * get_callees_of(char * module_name)
     return callees_string;
 }
 
-void checkpoint(void)
-{
-	checkpoint_workspace();
-}
-
-void restore_open_workspace(char* name)
-{
-	make_open_workspace(name);
-}
-
 void setenviron(char *name, char *value)
 {
     setenv(name, value, 1);
@@ -330,3 +319,22 @@ char* getenviron(char *name)
 {
     return getenv(name);
 }
+
+
+void push_property(const char* name, const char * value) {
+    property p = copy_property(get_property(name,false));
+    set_property(strdup(name),value);
+    properties_push(p);
+}
+
+void pop_property(const char* name) {
+    property p = properties_pop();
+    if(property_bool_p(p))
+        set_bool_property(name,property_bool(p));
+    else if(property_string_p(p))
+        set_string_property(name,property_string(p));
+    else
+        set_int_property(name,property_int(p));
+}
+
+
