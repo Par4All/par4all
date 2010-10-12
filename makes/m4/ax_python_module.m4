@@ -38,7 +38,8 @@ AC_DEFUN([AX_PYTHON_MODULE],[
 		eval AS_TR_CPP(HAVE_PYMOD_$1)=yes
 	else
 		AC_MSG_RESULT(no)
-		AX_WITH([$1])="failed to find required module $1"
+		AX_WITH([$1])=no
+        AX_MSG([$1])="failed to find required module $1"
 		eval AS_TR_CPP(HAVE_PYMOD_$1)=no
 	fi
 ])
