@@ -1,0 +1,22 @@
+!     Example p.4 Khadija Imadoueddine: matrix multiply
+!     
+!     The k loop must be moved inside
+
+!     But it is not parallel, which PIPS does not detect (wrong code is
+!     generated) This should lead to some register tiling
+!
+!     Legality of interchange is not ested either
+
+      SUBROUTINE INTERCHANGE(N, A, B, C)
+      INTEGER N, I, J, K
+      REAL A(1:N,A1:N), B(1:N,1:N), C(1:N,1:N)
+
+      DO K = 1, N                                                       0014
+         DOALL J = 1, N                                                 0015
+            DOALL I = 1, N                                              0016
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0017
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END

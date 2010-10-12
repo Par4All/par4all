@@ -1,0 +1,21 @@
+original code
+void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
+{
+   unsigned int i;
+   for(i = 0; i <= n-1; i += 1)
+      result[i] = alpha*src1[i]+(1-alpha)*src2[i];
+}
+atomized code
+void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
+{
+   unsigned int i;
+   //PIPS generated variable
+   float F_0, F_1, F_2;
+   for(i = 0; i <= n-1; i += 1) {
+      F_0 = alpha*src1[i];
+      F_1 = 1-alpha;
+      F_2 = F_1*src2[i];
+      result[i] = F_0+F_2;
+   }
+}
+

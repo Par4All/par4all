@@ -1,0 +1,25 @@
+setproperty ABORT_ON_USER_ERROR
+
+setenv WS scilab01
+
+create $WS $WS.c
+
+display PRINTED_FILE
+
+apply FLATTEN_CODE
+
+apply PRIVATIZE_MODULE
+
+apply COARSE_GRAIN_PARALLELIZATION
+
+display PRINTED_FILE
+
+apply LOOP_FUSION
+
+display PRINTED_FILE
+
+close
+
+delete $WS
+
+quit

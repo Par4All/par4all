@@ -35,6 +35,7 @@ Pipsmake
 Examples
 Prettyprint
 LoopRecovering
+Loop_fusion
 OpenMP
 Outlining
 # ngspice_bug:

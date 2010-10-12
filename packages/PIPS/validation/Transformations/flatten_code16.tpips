@@ -1,0 +1,15 @@
+setenv WS flatten_code16
+
+create $WS $WS.c
+
+display PRINTED_FILE
+
+apply FLATTEN_CODE
+
+display PRINTED_FILE
+
+close
+
+delete $WS
+
+quit

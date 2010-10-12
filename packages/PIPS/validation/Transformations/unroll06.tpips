@@ -1,0 +1,12 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete unroll06
+create unroll06 unroll06.f
+
+module UNROLL06
+display PRINTED_FILE[UNROLL06]
+apply FULL_UNROLL_PRAGMA[UNROLL06]
+display PRINTED_FILE[UNROLL06]
+close
+delete unroll06
+quit
+# EOF

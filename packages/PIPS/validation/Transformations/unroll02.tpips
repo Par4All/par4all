@@ -1,0 +1,72 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+#!/bin/sh
+#
+# unroll2.f test script
+#
+# if Pips -f unroll2.f -w unroll2 -m unroll2 -p unroll -b PF >&2 <<EndOfInput
+# 10
+# 2
+# EndOfInput
+# then
+# 	echo "--- Code unrolled twice for UNROLL2"
+# 	Display -l code
+# # 	if Pips -w unroll2 -m unroll2 -p partial_eval -b PF >&2
+# 	then
+# 		echo "--- Code after partial evaluation for UNROLL2"
+# 		Display -l code
+# 		exit_status=$?
+# 		if Pips -w unroll2 -m unroll2 -p suppress_dead_code -b PF >&2
+# 		then
+# 			echo "--- Code after dead code elimination for UNROLL2"
+# 			Display -l code
+# 			exit_status=$?
+# 		else
+# 			exit_status=3
+# 		fi
+# 	else
+# 		exit_status=2
+# 	fi
+# else
+# 	exit_status=1
+# fi
+# Delete unroll2
+# exit $exit_status
+
+
+delete unroll02
+create unroll02 unroll02.f
+
+apply UNROLL[UNROLL02]
+10
+2
+
+echo
+echo Code unrolled twice for "UNROLL02"
+echo
+
+display PRINTED_FILE[UNROLL02]
+
+echo
+echo Code after partial evaluation for "UNROLL02"
+echo
+
+apply PARTIAL_EVAL[UNROLL02]
+display PRINTED_FILE[UNROLL02]
+
+echo
+echo Code after dead code elimination for "UNROLL02"
+echo
+
+apply SUPPRESS_DEAD_CODE[UNROLL02]
+display PRINTED_FILE[UNROLL02]
+
+echo
+echo Code after use-def elimination for "UNROLL02"
+echo
+
+apply USE_DEF_ELIMINATION[UNROLL02]
+display PRINTED_FILE[UNROLL02]
+
+close
+delete unroll02
+quit

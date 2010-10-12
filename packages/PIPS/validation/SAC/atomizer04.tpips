@@ -1,0 +1,17 @@
+setenv WS="atomizer04"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+echo original code
+display PRINTED_FILE
+
+echo atomized code
+apply SPLIT_UPDATE_OPERATOR
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+apply UNSPLIT
+close
+
+delete $WS

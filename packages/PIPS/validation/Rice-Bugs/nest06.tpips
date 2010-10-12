@@ -1,0 +1,13 @@
+delete nest06
+
+setenv ABORT_ON_USER_ERROR TRUE
+
+create nest06 nest06.f
+
+activate NEST_PARALLELIZATION
+
+display PARALLELPRINTED_FILE
+
+close
+
+quit

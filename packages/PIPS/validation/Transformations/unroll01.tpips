@@ -1,0 +1,48 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+#!/bin/sh
+
+# unroll.f test script
+#
+# if Pips -f unroll.f -w unroll -m unroll -p unroll -b PF >&2 <<EndOfInput
+# 10
+# 2
+# EndOfInput
+# then
+# 	echo "--- Code unrolled twice for UNROLL"
+# 	Display -l code
+# 	if Pips -w unroll -m unroll -p partial_eval -b PF >&2
+# 	then
+# 		echo "--- Code after partial evaluation for UNROLL"
+# 		Display -l code
+# 		exit_status=$?
+# 	else
+# 		exit_status=2
+# 	fi
+# else
+# 	exit_status=1
+# fi
+# Delete unroll
+# exit $exit_status
+
+delete unroll01
+create unroll01 unroll01.f
+
+apply UNROLL[UNROLL01]
+10
+2
+echo
+echo Code unrolled twice for "UNROLL01"
+echo
+
+display PRINTED_FILE[UNROLL01]
+
+echo
+echo Code after partial evaluation for "UNROLL01"
+echo
+
+apply PARTIAL_EVAL[UNROLL01]
+display PRINTED_FILE[UNROLL01]
+
+close
+delete unroll01
+quit
