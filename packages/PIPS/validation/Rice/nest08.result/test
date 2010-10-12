@@ -1,0 +1,54 @@
+!     Example p. 6 Khadija Imadoueddine: loop distribution, modified by
+!     forward substitution of c(i)
+!     
+!     The loops must be distributed and then exchanged
+
+      SUBROUTINE DISTRIBUTION(N1, N2, A, B)
+      INTEGER N1, N2, I, J
+      REAL A(1:N1,1:N2), B(1:N1,1:N2), C(N1), D(N1)
+
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0010
+         C(I) = I                                                       0011
+      ENDDO
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0010
+         D(I) = I                                                       0012
+      ENDDO
+
+!$OMP PARALLEL DO 
+      DO I = 1, N1                                                      0010
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N2                                                   0013
+            A(I,J) = A(I,J)+B(I,J)*I                                    0014
+         ENDDO
+      ENDDO
+
+      END
+!     Example p. 6 Khadija Imadoueddine: loop distribution, modified by
+!     forward substitution of c(i)
+!     
+!     The loops must be distributed and then exchanged
+
+      SUBROUTINE DISTRIBUTION(N1, N2, A, B)
+      INTEGER N1, N2, I, J
+      REAL A(1:N1,1:N2), B(1:N1,1:N2), C(N1), D(N1)
+
+      DOALL I = 1, N1                                                   0010
+         C(I) = I                                                       0011
+      ENDDO
+      DOALL I = 1, N1                                                   0010
+         D(I) = I                                                       0012
+      ENDDO
+      DOALL Ip = 1, N2                                                  0010
+         PRIVATE I
+         DOALL Jp = 1, N1                                               0013
+            PRIVATE J
+            A(Jp,Ip) = A(Jp,Ip)+B(Jp,Ip)*Jp                             0014
+         ENDDO
+      ENDDO
+
+      END

@@ -1,4 +1,6 @@
 C     Structured version of four3.f
+C
+C     The loop here is never entered... since J is initialized to 1
 
       SUBROUTINE FOUR4(N)
 

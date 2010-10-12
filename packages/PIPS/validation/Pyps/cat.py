@@ -3,7 +3,7 @@ from subprocess import call
 from os import remove
 from shutil import rmtree
 
-with workspace(["cat.c"]) as w:
+with workspace("cat.c") as w:
 	w.fun.main.display()
 	binary=w.compile(rep="toto")
 	call("./"+binary)

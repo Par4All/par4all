@@ -1,0 +1,58 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *a;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int b = 0;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int c = 1;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   if (1)
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      a = &b;
+   else
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      a = &c;
+
+// Pointer values:
+// a == &b (may);
+// a == &c (may);
+
+
+   if (1)
+
+// Pointer values:
+// a == &b (may);
+// a == &c (may);
+
+      a = &b;
+   else
+
+// Pointer values:
+// a == &b (may);
+// a == &c (may);
+
+      a = &b;
+
+// Pointer values:
+// a == &b (exact);
+
+   return 0;
+}

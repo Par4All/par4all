@@ -1,0 +1,50 @@
+C     Make sure than parallel loops are preserved
+
+      PROGRAM LOOP_INTERCHANGE08
+      REAL A(10,11)
+
+      DOALL I = 1, 10                                                   0006
+         DOALL J = 1, 11                                                0007
+            A(I,J) = 0.                                                 0008
+         ENDDO
+      ENDDO
+
+      END
+
+Source code before loop interchange
+
+C     Make sure than parallel loops are preserved
+
+      PROGRAM LOOP_INTERCHANGE08
+      REAL A(10,11)
+
+
+!$OMP PARALLEL DO 
+99998 DO I = 1, 10                                                      0006
+
+!$OMP    PARALLEL DO 
+99999    DO J = 1, 11                                                   0007
+            A(I,J) = 0.                                                 0008
+         ENDDO
+      ENDDO
+
+      END
+
+Source code after loop interchange
+
+C     Make sure than parallel loops are preserved
+
+      PROGRAM LOOP_INTERCHANGE08
+      REAL A(10,11)
+
+
+!$OMP PARALLEL DO PRIVATE(I)
+99998 DO Ip = 1, 11                                                     0006
+
+!$OMP    PARALLEL DO PRIVATE(J)
+         DO Jp = 1, 10                                                  0007
+            A(Jp,Ip) = 0.                                               0008
+         ENDDO
+      ENDDO
+
+      END

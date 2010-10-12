@@ -56,21 +56,13 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = a[LU_IND0][i].im;
       }
       for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = a[LU_IND0][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = a[LU_IND0][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = a[LU_IND0+1][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = a[LU_IND0+1][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = a[LU_IND0+2][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = a[LU_IND0+2][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = a[LU_IND0+3][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
    }
@@ -89,21 +81,13 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = a[LU_IND0][i].im;
       }
       for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = a[LU_IND0][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = a[LU_IND0][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = a[LU_IND0+1][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = a[LU_IND0+1][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = a[LU_IND0+2][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = a[LU_IND0+2][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = a[LU_IND0+3][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
    }
@@ -122,21 +106,13 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][LU_IND0].im = a[LU_IND0][i].im;
       }
       for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //c SIMD_COMMENT_0
          b[i][LU_IND0].re = a[LU_IND0][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0].im = a[LU_IND0][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+1].re = a[LU_IND0+1][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+1].im = a[LU_IND0+1][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+2].re = a[LU_IND0+2][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+2].im = a[LU_IND0+2][i].im;
-         //c SIMD_COMMENT_0
          b[i][LU_IND0+3].re = a[LU_IND0+3][i].re;
-         //c SIMD_COMMENT_1
          b[i][LU_IND0+3].im = a[LU_IND0+3][i].im;
       }
    }

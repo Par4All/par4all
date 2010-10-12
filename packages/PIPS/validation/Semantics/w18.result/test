@@ -63,7 +63,8 @@ C  T() {}
 
 C (0,9)
 
-      PRINT *, I                                                        0017
+C     Because of the call to alea(), no information about x is available
+      PRINT *, I                                                        0018
 
 C     END BLOCK
       END
@@ -131,7 +132,8 @@ C  P(L,T,X) {}
 
 C (0,9)
 
-      PRINT *, I                                                        0017
+C     Because of the call to alea(), no information about x is available
+      PRINT *, I                                                        0018
 
 C     END BLOCK
       END

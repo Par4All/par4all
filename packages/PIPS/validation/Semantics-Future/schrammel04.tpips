@@ -9,7 +9,7 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 
-setenv SEMANTICS_DEBUG_LEVEL "0"
+#setenv SEMANTICS_DEBUG_LEVEL "0"
 
 echo
 echo TRANSFORMERS
@@ -24,10 +24,12 @@ echo
 echo PRECONDITIONS
 echo
 
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
-# quit
+quit
 
 echo
 echo Try to refine the transformers: first refinement

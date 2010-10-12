@@ -1,0 +1,35 @@
+delete unroll13
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unroll13 unroll13.f
+
+setproperty LOOP_UNROLL_WITH_PROLOGUE FALSE
+
+apply UNROLL[UNROLL13]
+300
+4
+
+echo
+echo Code unrolled four times for "UNROLL13"
+echo
+
+display PRINTED_FILE[UNROLL13]
+#quit
+echo
+echo Code after partial eval code for "UNROLL13"
+echo
+
+apply PARTIAL_EVAL[UNROLL13]
+display PRINTED_FILE[UNROLL13]
+quit
+echo
+echo Code after suppress dead code for "UNROLL13"
+echo
+
+apply SUPPRESS_DEAD_CODE[UNROLL13]
+display PRINTED_FILE[UNROLL13]
+
+close
+delete unroll13
+quit

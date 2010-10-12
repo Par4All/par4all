@@ -29,7 +29,7 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
 activate TRANSFORMERS_INTER_FULL
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[FOUR4]
-
+#quit
 echo
 echo Preconditions for "FOUR4"
 echo

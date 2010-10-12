@@ -121,13 +121,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float RED0[3];
 
-
-
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
-
 
 l400:
    for(i = 1; i <= isi-2; i += 1)
@@ -159,13 +155,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float RED0[3], F_0, F_1, F_2, F_3, F_4;
 
-
-
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-
-
 
 l400:
    for(i = 1; i <= isi-2; i += 1)
@@ -201,13 +193,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int i, j, ki, kj;
    //PIPS generated variable
    float RED0[3], F_0, F_1, F_2, F_3, F_4, F_40, F_30, F_20, F_10, F_00;
-   
-   
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-   
-   
+
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:
@@ -246,13 +236,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    overloaded PADDING_VALUE;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   
-   
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-   
-   
+
 l400:
    for(i = 1; i <= isi-2; i += 1)
 l300:
@@ -294,16 +282,14 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    overloaded PADDING_VALUE;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   
-   
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-   
-   
-l400:   ;
-   for(i = 1; i <= isi-2; i += 1) {
-l300:      ;
+
+l400:
+   for(i = 1; i <= isi-2; i += 1)
+l300:
       for(j = 1; j <= isj-2; j += 1) {
          new_image[i][j] = 0.;
          RED0[0] = 0.000000;
@@ -332,7 +318,6 @@ l100:               ;
          new_image[i][j] = RED0[2]+F_40;
          new_image[i][j] = new_image[i][j]/9;
       }
-   }
    ;
 }
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
@@ -345,16 +330,14 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    float RED0[3], F_40, F_30;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   
-   
+
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];
-   
-   
-l400:   ;
-   for(i = 1; i <= isi-2; i += 1) {
-l300:      ;
+
+l400:
+   for(i = 1; i <= isi-2; i += 1)
+l300:
       for(j = 1; j <= isj-2; j += 1) {
          new_image[i][j] = 0.;
          RED0[0] = 0.000000;
@@ -383,7 +366,6 @@ l100:               ;
          new_image[i][j] = RED0[2]+F_40;
          new_image[i][j] = new_image[i][j]/9;
       }
-   }
    ;
 }
 

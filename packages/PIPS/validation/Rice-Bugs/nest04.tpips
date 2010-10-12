@@ -1,0 +1,13 @@
+delete nest04
+
+setenv ABORT_ON_USER_ERROR TRUE
+
+create nest04 nest04.c
+
+activate NEST_PARALLELIZATION
+
+display PARALLELPRINTED_FILE
+
+close
+
+quit

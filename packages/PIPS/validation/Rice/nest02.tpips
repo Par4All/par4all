@@ -1,0 +1,14 @@
+delete nest02
+
+setenv ABORT_ON_USER_ERROR TRUE
+
+create nest02 nest02.c
+
+apply INTERNALIZE_PARALLEL_CODE
+activate NEST_PARALLELIZATION
+
+display PARALLELPRINTED_FILE
+
+close
+
+quit

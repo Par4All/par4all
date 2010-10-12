@@ -1,0 +1,105 @@
+
+Code unrolled four times for "UNROLL14"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13, unroll the j loop as Khadija
+
+      SUBROUTINE UNROLL14(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO J = 1, 1+4*((N2-1+1)/4)-1, 4
+         DO I3 = 1, N1
+            A(I3,J) = A(I3+1,J)*B(I3,J)+A(I3,J+1)*C(I3,J)
+         ENDDO
+         DO I2 = 1, N1
+            A(I2,J+1) = A(I2+1,J+1)*B(I2,J+1)+A(I2,J+1+1)*C(I2,J+1)
+         ENDDO
+         DO I1 = 1, N1
+            A(I1,J+2) = A(I1+1,J+2)*B(I1,J+2)+A(I1,J+2+1)*C(I1,J+2)
+         ENDDO
+         DO I0 = 1, N1
+            A(I0,J+3) = A(I0+1,J+3)*B(I0,J+3)+A(I0,J+3+1)*C(I0,J+3)
+         ENDDO
+      ENDDO
+      DO J = 1+4*((N2-1+1)/4), N2
+         DO I4 = 1, N1
+            A(I4,J) = A(I4+1,J)*B(I4,J)+A(I4,J+1)*C(I4,J)
+         ENDDO
+      ENDDO
+
+      END
+
+Code after partial eval code for "UNROLL14"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13, unroll the j loop as Khadija
+
+      SUBROUTINE UNROLL14(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO J = 1, 4*(N2/4), 4
+         DO I3 = 1, N1
+            A(I3,J) = A(I3+1,J)*B(I3,J)+A(I3,J+1)*C(I3,J)
+         ENDDO
+         DO I2 = 1, N1
+            A(I2,J+1) = A(I2+1,J+1)*B(I2,J+1)+A(I2,J+2)*C(I2,J+1)
+         ENDDO
+         DO I1 = 1, N1
+            A(I1,J+2) = A(I1+1,J+2)*B(I1,J+2)+A(I1,J+3)*C(I1,J+2)
+         ENDDO
+         DO I0 = 1, N1
+            A(I0,J+3) = A(I0+1,J+3)*B(I0,J+3)+A(I0,J+4)*C(I0,J+3)
+         ENDDO
+      ENDDO
+      DO J = 4*(N2/4)+1, N2
+         DO I4 = 1, N1
+            A(I4,J) = A(I4+1,J)*B(I4,J)+A(I4,J+1)*C(I4,J)
+         ENDDO
+      ENDDO
+
+      END
+
+Code after loop fusion for "UNROLL14"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13, unroll the j loop as Khadija
+
+      SUBROUTINE UNROLL14(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO J = 1, 4*(N2/4), 4
+         DO I3 = 1, N1
+            A(I3,J) = A(I3+1,J)*B(I3,J)+A(I3,J+1)*C(I3,J)
+            A(I3,J+1) = A(I3+1,J+1)*B(I3,J+1)+A(I3,J+2)*C(I3,J+1)
+            A(I3,J+2) = A(I3+1,J+2)*B(I3,J+2)+A(I3,J+3)*C(I3,J+2)
+            A(I3,J+3) = A(I3+1,J+3)*B(I3,J+3)+A(I3,J+4)*C(I3,J+3)
+         ENDDO
+      ENDDO
+      DO J = 4*(N2/4)+1, N2
+         DO I4 = 1, N1
+            A(I4,J) = A(I4+1,J)*B(I4,J)+A(I4,J+1)*C(I4,J)
+         ENDDO
+      ENDDO
+
+      END

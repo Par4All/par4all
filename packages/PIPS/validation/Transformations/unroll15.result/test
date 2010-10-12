@@ -1,0 +1,288 @@
+
+Tiled code for "UNROLL15"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13 and 14, try tiling and unroll to emulate her
+C     unroll-and-jam
+
+      SUBROUTINE UNROLL15(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO J_t = 0, (N2-1)/4                                              0015
+         DO I_t = 0, N1-1
+
+            DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+               DO I = I_t+1, I_t+1                                      0016
+                  A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)              0017
+300               CONTINUE                                              0018
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+The tiled code is not really code because partial tiles
+are not generated apart from full tiles.
+
+
+Get rid of the internal loop with one iteration
+
+Code after suppress dead code for "UNROLL15"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13 and 14, try tiling and unroll to emulate her
+C     unroll-and-jam
+
+      SUBROUTINE UNROLL15(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO J_t = 0, (N2-1)/4                                              0015
+         DO I_t = 0, N1-1
+
+            DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+               I = I_t+1
+               A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)                 0017
+300            CONTINUE                                                 0018
+               I = I_t+1+1
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+Code after loop flagging for "UNROLL15"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13 and 14, try tiling and unroll to emulate her
+C     unroll-and-jam
+
+      SUBROUTINE UNROLL15(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+99997 DO J_t = 0, (N2-1)/4                                              0015
+99998    DO I_t = 0, N1-1
+
+99999       DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+               I = I_t+1
+               A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)                 0017
+300            CONTINUE                                                 0018
+               I = I_t+1+1
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+Code after loop unrolling for "UNROLL15"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS; in fact, she's used an unroll-and-jam
+C
+C     Unlike unroll13 and 14, try tiling and unroll to emulate her
+C     unroll-and-jam
+
+      SUBROUTINE UNROLL15(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+99997 DO J_t = 0, (N2-1)/4                                              0015
+99998    DO I_t = 0, N1-1
+
+99999       CONTINUE                                                    0015
+            DO J = 4*J_t+1, 4*J_t+1+4*((MIN(N2, 4*J_t+4)-(4*J_t+1)+1)
+     &      /4)-1, 4
+               I = I_t+1
+               A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+               I = I_t+1+1
+               I = I_t+1
+               A(I,J+1) = A(I+1,J+1)*B(I,J+1)+A(I,J+1+1)*C(I,J+1)
+               I = I_t+1+1
+               I = I_t+1
+               A(I,J+2) = A(I+1,J+2)*B(I,J+2)+A(I,J+2+1)*C(I,J+2)
+               I = I_t+1+1
+               I = I_t+1
+               A(I,J+3) = A(I+1,J+3)*B(I,J+3)+A(I,J+3+1)*C(I,J+3)
+               I = I_t+1+1
+            ENDDO
+            DO J = 4*J_t+1+4*((MIN(N2, 4*J_t+4)-(4*J_t+1)+1)/4), MIN(
+     &      N2, 4*J_t+4)
+               I = I_t+1
+               A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+               I = I_t+1+1
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+Forward substitute the value of I
+
+
+      PROGRAM MAIN
+      PARAMETER (N1=10, N2=11)
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO I = 0, N1+1                                                    0008
+         DO J = 0, N2+1                                                 0009
+            A(I,J) = 3*I*(N1+2)+J                                       0010
+            B(I,J) = 3*I*(N1+2)+J+1                                     0011
+            C(I,J) = 3*I*(N1+2)+J+2                                     0012
+         ENDDO
+      ENDDO
+
+      CALL UNROLL15(N1, N2, A, B, C)                                    0016
+
+      PRINT *, A(0,0), A(0,N2+1), A(N1+1,0), A(N1+1,N2+1)               0018
+
+      END
+
+Get rid of useless assignments with use def elimination
+
+
+      PROGRAM MAIN
+      PARAMETER (N1=10, N2=11)
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO I = 0, N1+1                                                    0008
+         DO J = 0, N2+1                                                 0009
+            A(I,J) = 3*I*(N1+2)+J                                       0010
+            B(I,J) = 3*I*(N1+2)+J+1                                     0011
+            C(I,J) = 3*I*(N1+2)+J+2                                     0012
+         ENDDO
+      ENDDO
+
+      CALL UNROLL15(N1, N2, A, B, C)                                    0016
+
+      PRINT *, A(0,0), A(0,N2+1), A(N1+1,0), A(N1+1,N2+1)               0018
+
+      END
+
+Distribute the loops
+
+
+      PROGRAM MAIN
+      PARAMETER (N1=10, N2=11)
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO I = 0, N1+1                                                    0008
+         DO J = 0, N2+1                                                 0009
+            A(I,J) = 3*I*(N1+2)+J                                       0010
+            B(I,J) = 3*I*(N1+2)+J+1                                     0011
+            C(I,J) = 3*I*(N1+2)+J+2                                     0012
+         ENDDO
+      ENDDO
+
+      CALL UNROLL15(N1, N2, A, B, C)                                    0016
+
+      PRINT *, A(0,0), A(0,N2+1), A(N1+1,0), A(N1+1,N2+1)               0018
+
+      END
+
+The loop distribution fails, maybe because f the loop bounds?
+
+The unrolling generates a useless new loop on J
+
+Code after suppress dead code
+
+
+      PROGRAM MAIN
+      PARAMETER (N1=10, N2=11)
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO I = 0, N1+1                                                    0008
+         DO J = 0, N2+1                                                 0009
+            A(I,J) = 3*I*(N1+2)+J                                       0010
+            B(I,J) = 3*I*(N1+2)+J+1                                     0011
+            C(I,J) = 3*I*(N1+2)+J+2                                     0012
+         ENDDO
+      ENDDO
+
+      CALL UNROLL15(N1, N2, A, B, C)                                    0016
+
+      PRINT *, A(0,0), A(0,N2+1), A(N1+1,0), A(N1+1,N2+1)               0018
+
+      END
+
+The loop bounds are now to complex for the semantics analysis
+
+
+C  P() {}
+
+
+      PROGRAM MAIN
+      PARAMETER (N1=10, N2=11)
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+C  P() {}
+
+
+      DO I = 0, N1+1                                                    0008
+
+C  P(I,J) {0<=I, I<=11}
+
+         DO J = 0, N2+1                                                 0009
+
+C  P(I,J) {0<=I, I<=11, 0<=J, J<=12}
+
+            A(I,J) = 3*I*(N1+2)+J                                       0010
+
+C  P(I,J) {0<=I, I<=11, 0<=J, J<=12}
+
+            B(I,J) = 3*I*(N1+2)+J+1                                     0011
+
+C  P(I,J) {0<=I, I<=11, 0<=J, J<=12}
+
+            C(I,J) = 3*I*(N1+2)+J+2                                     0012
+         ENDDO
+      ENDDO
+
+C  P(I,J) {I==12, J==13}
+
+
+      CALL UNROLL15(N1, N2, A, B, C)                                    0016
+
+C  P(I,J) {I==12, J==13}
+
+
+      PRINT *, A(0,0), A(0,N2+1), A(N1+1,0), A(N1+1,N2+1)               0018
+
+      END
+
+The expected result is:    0.0000000       12.000000       396.00000       408.00000
+

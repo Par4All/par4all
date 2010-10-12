@@ -58,30 +58,38 @@ int main()
 // Pointer values:
 // s1[.a] == &i (exact);
 // s1p == &s1 (exact);
+// s1p[0][.a] == &i (exact);
 // s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s2p == &s1 (exact);
+// s2p[0][.a] == &i (exact);
 
    s2.a = &j;
 
 // Pointer values:
 // s1[.a] == &i (exact);
 // s1p == &s1 (exact);
+// s1p[0][.a] == &i (exact);
 // s2[.a] == &j (exact);
 // s2p == &s1 (exact);
+// s2p[0][.a] == &i (exact);
 
 
    s1p->a = s2.a;
 
 // Pointer values:
+// s1[.a] == s2[.a] (exact);
 // s1p == &s1 (exact);
 // s1p[0][.a] == s2[.a] (exact);
 // s2[.a] == &j (exact);
 // s2p == &s1 (exact);
+// s2p[0][.a] == s2[.a] (exact);
 
    s2p->a = &k;
 
 // Pointer values:
+// s1[.a] == &k (exact);
 // s1p == &s1 (exact);
+// s1p[0][.a] == &k (exact);
 // s2[.a] == &j (exact);
 // s2p == &s1 (exact);
 // s2p[0][.a] == &k (exact);
@@ -92,6 +100,7 @@ int main()
 // Pointer values:
 // s1[.a] == &k (exact);
 // s1p == &s1 (exact);
+// s1p[0][.a] == &k (exact);
 // s2[.a] == &j (exact);
 // s2p == &s2 (exact);
 

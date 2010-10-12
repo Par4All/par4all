@@ -1,0 +1,12 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete unroll08
+create unroll08 unroll08.f
+
+module UNROLL08
+display PRINTED_FILE[UNROLL08]
+apply FULL_UNROLL_PRAGMA[UNROLL08]
+display PRINTED_FILE[UNROLL08]
+close
+delete unroll08
+quit
+# EOF

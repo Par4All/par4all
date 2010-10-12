@@ -11,7 +11,7 @@ import shutil,os,pyrops
 #cp = launcher.getObj()
 #w = workspace(["basics0.c"], cpypips = cp)
 
-with pworkspace(["basics0.c"]) as w:
+with pworkspace("basics0.c") as w:
 	# you can get module object from the modules table
 	foo=w.fun.foo
 	bar=w.fun.bar
@@ -25,7 +25,7 @@ with pworkspace(["basics0.c"]) as w:
 	foo.display()
 	bar.display()
 	malabar.display()
-	bar.apply("print_code")
+	bar.print_code()
 	
 	# you can also preform operations on loops
 	mb.display("loops_file")

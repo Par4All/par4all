@@ -1,0 +1,14 @@
+delete nest05
+
+setenv ABORT_ON_USER_ERROR TRUE
+
+create nest05 nest05.c
+
+apply INTERNALIZE_PARALLEL_CODE
+activate NEST_PARALLELIZATION
+
+display PARALLELPRINTED_FILE
+
+close
+
+quit
