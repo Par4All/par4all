@@ -284,7 +284,7 @@ list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in,
 	    }
 	  else
 	    {
-	      to_be_translated = false;
+	      to_be_translated = false; 
 	    }
       
 	  if (to_be_translated)
@@ -512,7 +512,10 @@ cell_relation simple_pv_translate(cell_relation pv_in, bool in_first_p, cell_rel
   return pv_new;
 }
 
-
+/* This one is not generic at all and it's name should reflect the fact 
+   that it only concerns simple cells. The API should evolve as well: descriptors 
+   should be added or effects passed as arguments instead of cells.
+*/
 bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
 {
   bool res = true;
@@ -597,6 +600,10 @@ bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
   return res;
 }
 
+/* This one is not generic at all and it's name should reflect the fact 
+   that it only concerns simple cells. The API should evolve as well: descriptors 
+   should be added or effects passed as arguments instead of cells.
+*/
 bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
 {
 
@@ -661,10 +668,11 @@ bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
 }
 
 
-/*
+/**
   @input eff is an input effect describing a memory path
   @return a list of effects corresponding to effects on eff cell prefix pointer paths
 */
+/* This one could be made generic */
 list simple_effect_intermediary_pointer_paths_effect(effect eff)
 {
   pips_debug_effect(5, "input effect : \n", eff);
