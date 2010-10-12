@@ -1364,7 +1364,7 @@ block: /* ISO 6.8.2 */
 			  /* Since pragmas cannot be attached to nothing,
 			     add a CONTINUE to attach them: */
 			  statement nop = make_plain_continue_statement();
-			  add_pragma_strings_to_statement(nop, $2, FALSE /* Do not reallocate the strings*/);
+			  add_pragma_strings_to_statement(nop, gen_nreverse($2), FALSE /* Do not reallocate the strings*/);
 			  /* Free the pragma list structure: */
 			  gen_free_list($2);
 			  /* Since we can also attach a comment, try to
@@ -1458,7 +1458,7 @@ pragma { /* No pragma... The common case, return the empty list */
    pragma: */
 statement: pragmas statement_without_pragma
 {
-  add_pragma_strings_to_statement($2, $1,
+  add_pragma_strings_to_statement($2, gen_nreverse($1),
   				  FALSE /* Do not reallocate the strings*/);
   /* Reduce the CO2 impact of this code, even there is huge memory leaks
      everywhere around in this file: */

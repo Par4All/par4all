@@ -25,6 +25,7 @@ LIB_CFILES = effects.c \
        anywhere_abstract_locations.c \
        abstract_location.c \
        points_to.c \
+       cell_relations.c \
        pointer_values.c \
        prettyprint.c \
        type.c \

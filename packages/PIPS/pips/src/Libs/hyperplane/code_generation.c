@@ -76,7 +76,7 @@ statement code_generation(list lls,
     bl = loop_body(instruction_loop(statement_instruction(STATEMENT(CAR(lls)))));
     statement_newbase(bl,pvg,base_oldindex);
     /* make the parallel loops from inner loop to outermost loop*/
-   
+
     for(pb=base_reversal(base_newindex);lls!=NIL; lls=CDR(lls), pb = pb->succ) {
 	/* handling of current loop */
 	s_loop = STATEMENT(CAR(lls));

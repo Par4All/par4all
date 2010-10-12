@@ -21,6 +21,27 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Postpone convex hulls by keeping transformer lists instead
+ *
+ * This development was prompted by the last example found in the
+ * paper by Schrammel and Jeannet at NSAD 2010. See test cases
+ * schrammel04, 05 and 06. The minimal goal is to avoid the indentity
+ * transformer when performing the convex hull of several
+ * transformers.
+ *
+ * This could also be useful to automatize the handling of tests
+ * within a loop using the technique presented at NSAD 2010 by Ancourt
+ * & al. The control structure
+ *
+ * "while(c) if(t) T; else F;"
+ *
+ * is replaced by
+ *
+ * "while(c) {while(c&&t) T; while(c&& !t) F;}".
+ *
+ * This replacement could be performed on the equations instead of
+ * requiring a program transformation.
+ */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
@@ -67,57 +88,8 @@
 
 #include "semantics.h"
 
-#if 0
+
 
-/* Recursive Descent in Data Structure Statement */
-
-/* SHARING : returns the transformer stored in the database. Make a
- * copy before using it. The copy is not made here because the result
- * is not always used after a call to this function, and it would
- * create non reachable structures. Another solution would be to store
- * a copy and free the unused result in the calling function but
- * transformer_free does not really free the transformer. Not very
- * clean.  BC, oct. 94
- */
-
-/* Assumes that entity_has_values_p(v) holds. */
-transformer dimensions_to_transformer(entity v, transformer pre)
-{
-  transformer dt = transformer_identity();
-  type vt = entity_type(v); // Do not use ultimate_type or you'll miss
-			    // the dimensions.
-
-  if(type_variable_p(vt)) {
-    list dl = variable_dimensions(type_variable(vt)); // dimension list
-    if(!ENDP(dl)) { // to save a copy and to simplify debugging
-      transformer cpre = copy_transformer(pre);
-
-      FOREACH(DIMENSION, d, dl) {
-	expression l = dimension_lower(d);
-	expression u = dimension_upper(d);
-	transformer lt = safe_expression_to_transformer(l, cpre);
-	transformer lpre = transformer_apply(lt, pre);
-	transformer lpre_r = transformer_range(lpre);
-	transformer ut = safe_expression_to_transformer(u, lpre_r);
-	transformer upre = transformer_apply(ut, lpre);
-
-	free_transformer(cpre);
-	cpre = transformer_range(upre);
-	free_transformer(upre);
-	free_transformer(lpre);
-	free_transformer(lpre_r);
-
-	dt = transformer_combine(transformer_combine(dt, lt), ut);
-	free_transformer(lt);
-	free_transformer(ut);
-      }
-      free_transformer(cpre);
-    }
-  }
-
-  return dt;
-}
-#endif
 
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
@@ -235,8 +207,9 @@ list declaration_to_transformer_list(entity v, transformer pre)
    Note: initialization of static variables are not taken into
    account. They must be used for summary preconditions.
  */
-transformer declarations_to_transformer_list(list dl, transformer pre)
+list declarations_to_transformer_list(list dl, transformer pre)
 {
+  list tfl = list_undefined;
   entity v = entity_undefined;
   transformer btf = transformer_undefined;
   transformer stf = transformer_undefined;
@@ -284,7 +257,7 @@ transformer declarations_to_transformer_list(list dl, transformer pre)
   }
 
   pips_debug(8, "end\n");
-  return btf;
+  return tfl;
 }
 
 /* Generate all possible linear control paths
@@ -372,8 +345,8 @@ static list block_to_transformer_list(list b, transformer pre)
 	POP(precl);
       }
       /* Now, switch from btfl and postl to nbtfl and npostl */
-      gen_full_free_list(btfl);
-      gen_full_free_list(postl);
+      //gen_full_free_list(btfl);
+      //gen_full_free_list(postl);
       btfl = nbtfl;
       postl = npostl;
     }
@@ -897,6 +870,7 @@ list any_basic_update_to_transformer_list(entity op,
 }
 
 static list instruction_to_transformer_list(instruction i,
+					    transformer tf,
 					    transformer pre,
 					    list e) /* effects associated to instruction i */
 {
@@ -920,16 +894,17 @@ static list instruction_to_transformer_list(instruction i,
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    tl = loop_to_transformer_list(l, pre, e);
+    tl = complete_loop_transformer_list(tf, pre, l);
     break;
   case is_instruction_whileloop: {
     wl = instruction_whileloop(i);
-    tl = whileloop_to_transformer_list(wl, pre, e);
+    // FI: the complete_xxx functions require a transformer as argument
+    tl = complete_whileloop_transformer_list(tf, pre, wl);
     break;
   }
   case is_instruction_forloop:
     fl = instruction_forloop(i);
-    tl = forloop_to_transformer_list(fl, pre, e);
+    tl = complete_forloop_transformer_list(tf, pre, fl);
     break;
   case is_instruction_goto:
     pips_internal_error("unexpected goto in semantics analysis");
@@ -967,10 +942,13 @@ static list instruction_to_transformer_list(instruction i,
   return tl;
 }
 
-/* Mostly to deal with declarations */
+/* A transformer is already available for statement s, but it is
+   going to be refined into a list of transformers to isolate at
+   least the identity transformer from effective transformers. */
 list statement_to_transformer_list(statement s,
 				   transformer spre) /* stmt precondition */
 {
+  transformer tf = load_statement_transformer(s);
   instruction i = statement_instruction(s);
   list tl = NIL;
   list e = NIL;
@@ -1031,7 +1009,7 @@ list statement_to_transformer_list(statement s,
       tl = CONS(TRANSFORMER, dt, NIL);
     }
     else {
-      tl = instruction_to_transformer_list(i, pre, e);
+      tl = instruction_to_transformer_list(i, tf, pre, e);
       if(ENDP(tl)) {
 	transformer tf = load_statement_transformer(s);
 	tl = CONS(TRANSFORMER, copy_transformer(tf), NIL);
@@ -1143,6 +1121,11 @@ list statement_to_transformer_list(statement s,
   //pips_debug(8,"end for statement %03td (%td,%td) with t=%p, nt=%p and te=%p\n",
   //     statement_number(s), ORDERING_NUMBER(statement_ordering(s)),
   //     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
+
+  ifdebug(1) {
+    pips_debug(1, "Transformer list has %d elements:\n", gen_length(tl));
+    print_transformers(tl);
+  }
 
   return tl;
 }

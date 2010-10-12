@@ -456,6 +456,60 @@ list simple_effects_union_over_range(list l_eff,
 }
 
 
+/* 
+   @brief change the reference indices into store independent expressions
+   
+   @param r is an input reference, and may be modified by side effect.
+   @return true if an element of the reference has been changed into an unbounded expression.
+*/
+reference simple_reference_to_store_independent_reference(reference r, bool * changed_p)
+{
+  *changed_p = false;
+  
+  list l_inds = reference_indices(r);
+  list cind = list_undefined;
+
+  for(cind = l_inds; !ENDP(cind); POP(cind)) 
+    {
+      expression se = EXPRESSION(CAR(cind));
+      
+      if(!extended_integer_constant_expression_p(se)) 
+	{
+	  if(!unbounded_expression_p(se)) 
+	    {	      
+	      /* it may still be a field entity */
+	      if (!(expression_reference_p(se) &&
+		    entity_field_p(expression_variable(se))))
+		{
+		  *changed_p = true;
+		  free_expression(se);
+		  EXPRESSION_(CAR(cind)) = make_unbounded_expression();
+		}
+	    }
+	}
+    }
+  
+  return r;
+}
+
+
+/* 
+   @brief change the cell indices into store independent expressions
+   
+   @param c is an input cell, and may be modified by side effect.
+   @return true if an element of the cell has been changed into an unbounded expression.
+*/
+cell simple_cell_to_store_independent_cell(cell c, bool * changed_p)
+{
+  pips_assert("gaps not handled yet\n", !cell_gap_p(c));
+  reference r = cell_reference_p(c) ? cell_reference(c) : preference_reference(cell_preference(c));
+
+  cell_reference(c) = simple_reference_to_store_independent_reference(r, changed_p);
+  return c;
+  
+}
+
+
 /* FI: instead of simply getting rid of indices, I preserve constant
    indices for the semantics analysis. Instead of stripping the
    indices, they are replaced by unbounded expressions to keep the

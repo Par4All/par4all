@@ -125,6 +125,17 @@ static bool add_ordering_of_the_statement(statement stat, hash_table ots)
   return true;
 }
 
+
+/* Add the statement for its ordering, if any, in the hash-map. */
+bool add_ordering_of_the_statement_to_current_mapping( statement stat )
+{
+  pips_assert("ordering is defined",
+        statement_ordering(stat) != STATEMENT_ORDERING_UNDEFINED);
+  hash_put(OrderingToStatement, (void *) statement_ordering(stat), (void *) stat);
+  return true;
+}
+
+
 /* Initialize the ordering to statement mapping by iterating from a given
    statement
 

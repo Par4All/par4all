@@ -1922,7 +1922,8 @@ transformer generic_complete_statement_transformer(transformer t,
   else if(instruction_whileloop_p(i)) {
     whileloop w = instruction_whileloop(i);
     evaluation e = whileloop_evaluation(w);
-
+    // This test could be deported by a call to
+    // complete_whileloop_transformer()
     if(evaluation_before_p(e)) {
       ct = new_complete_whileloop_transformer(t, pre, w, !identity_p);
     }
@@ -2151,7 +2152,7 @@ transformer statement_to_transformer(
     }
   }
   else {
-    user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
+    pips_user_warning("redefinition for statement %03d (%d,%d)\n",
 		 statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 		 ORDERING_STATEMENT(statement_ordering(s)));
     pips_internal_error("transformer redefinition");

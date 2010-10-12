@@ -1935,7 +1935,7 @@ generic_string_effects(entity e, list args)
   if (expression_call_p(arg1) 
       && call_constant_p(expression_call(arg1)))
     {
-      pips_user_error(5, "constant expression as first argument not allowed "
+      pips_user_error("constant expression as first argument not allowed "
 		      "for intrinsic %s\n", entity_name(e));
     }
   else
@@ -1992,7 +1992,7 @@ generic_string_effects(entity e, list args)
       /* this is almost the same code as for arg1 just before, 
 	 maybe this could be factorized. */
       expression arg2 = EXPRESSION(CAR(CDR(args)));
-      type t2 = expression_to_type(arg2);
+      //type t2 = expression_to_type(arg2);
       if (expression_call_p(arg2) 
 	  && call_constant_p(expression_call(arg2)))
 	{

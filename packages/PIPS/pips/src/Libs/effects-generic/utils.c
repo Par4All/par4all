@@ -955,27 +955,6 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 
 /******************************************************************/
 
-list type_fields(type t)
-{
-  list l_res = NIL;
-
-  switch (type_tag(t))
-    {
-    case is_type_struct:
-      l_res = type_struct(t);
-      break;
-    case is_type_union:
-      l_res = type_union(t);
-      break;
-    case is_type_enum:
-      l_res = type_enum(t);
-      break;
-    default:
-      pips_internal_error("type_fields improperly called\n");
-    }
-  return l_res;
-
-}
 
 /**
  NOT YET IMPLEMENTED FOR VARARGS AND FUNCTIONAL TYPES.

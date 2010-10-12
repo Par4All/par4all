@@ -63,7 +63,7 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 }
 
 /**
- * @brief Recursievly substitute an entity to an old one in a statement
+ * @brief Recursively substitute an entity for an old one in a statement
  *
  * @param s newgen type where the substitution must be done
  * @param old old entity

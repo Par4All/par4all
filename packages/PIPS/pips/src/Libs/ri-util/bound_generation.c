@@ -21,6 +21,8 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Generation of bound expressions from constraint systems of the
+   Linear library */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif

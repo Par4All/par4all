@@ -21,11 +21,28 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* Functions to deal with transformer lists.
+ *
+ * Tansformer lists are used to delay convex hulls and to refine the
+ * precondition computation of loops by putting aside the identity
+ * transformer.
+ *
+ * If there is an identity transformer in the list, it is supposed to
+ * be the first one in the list.
+ *
+ * However, some control paths are almost identity transformers
+ * because the store is apparently unchanged. However, they contain
+ * predicates on the possible values. Although they have no arguments,
+ * and hence, the store is left unchanged, they are different from the
+ * identity transformer bebcause the relation is smaller.
+ *
+ * So it should be up to the function using the transformer list to
+ * decide how to cope with transformers that restrict the identity
+ * transition.
+ */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
- /* Predicate transformer package:
-  */
 
 #include <stdio.h>
 
@@ -67,6 +84,21 @@ list merge_transformer_lists(list tl1, list tl2)
     /* Do we have to worry about different bases in transformers? */
     transformer t1 = TRANSFORMER(CAR(tl1));
     transformer t2 = TRANSFORMER(CAR(tl2));
+
+    /* Too much information is sometimes lost with this
+       simplification */
+    /*
+    if(ENDP(transformer_arguments(t1))) {
+      free_transformer(t1);
+      t1 = transformer_identity();
+    }
+
+    if(ENDP(transformer_arguments(t2))) {
+      free_transformer(t2);
+      t2 = transformer_identity();
+    }
+    */
+
     if(transformer_identity_p(t1) || transformer_identity_p(t2)) {
       ntl = CONS(TRANSFORMER, transformer_identity(), NIL);
     }
@@ -79,7 +111,7 @@ list merge_transformer_lists(list tl1, list tl2)
     else
       ntl2 = gen_full_copy_list(tl2);
     ntl1 = gen_nconc(ntl1, ntl2);
-    ntl = gen_nconc(ntl1, ntl);
+    ntl = gen_nconc(ntl, ntl1);
   }
 
   ifdebug(1) {
@@ -88,6 +120,8 @@ list merge_transformer_lists(list tl1, list tl2)
     int tl2l = gen_length(tl2);
     pips_assert("The new list is about the sum of the input lists.\n",
 		ntll>=tl1l+tl2l-1 && ntll<=tl1l+tl2l);
+    pips_assert("The new transformer list is legal",
+		check_transformer_list(ntl));
   }
   return ntl;
 }
@@ -198,4 +232,159 @@ list clean_up_transformer_list(list tfl)
   if(identity_p)
     ntfl = CONS(TRANSFORMER, transformer_identity(), ntfl);
   return ntfl;
+}
+
+/* Transformer two transformers into a correct transformer list
+ *
+ * Could be generalized to any number of transformers using a
+ * varargs... and more thinking.
+ *
+ * Two transformers are obtained for loops that may be skipped or
+ * entered and for tests whose condition is not statically decidable.
+ */
+list two_transformers_to_list(transformer t1, transformer t2)
+{
+  list tl = NIL;
+  if(transformer_empty_p(t1)) {
+    if(transformer_empty_p(t2)) {
+      tl = NIL;
+    }
+    else {
+      tl = CONS(TRANSFORMER, t2, NIL);
+    }
+  }
+  else {
+    if(transformer_empty_p(t2)) {
+      tl = CONS(TRANSFORMER, t1, NIL);
+    }
+    else {
+
+      /* This is a very dangerous step that should not always be
+	 taken. It is useful to ease the detection of identity
+	 paths, but it looses a lot of information. So almost
+	 identity path might simply be better identified elsewhere */
+      /*
+      if(ENDP(transformer_arguments(t1))) {
+	free_transformer(t1);
+	t1 = transformer_identity();
+      }
+
+      if(ENDP(transformer_arguments(t2))) {
+	free_transformer(t2);
+	t2 = transformer_identity();
+      }
+      */
+
+      if(transformer_identity_p(t1)) {
+	if(transformer_identity_p(t2)) {
+	  tl = CONS(TRANSFORMER, t1, NIL);
+	  free_transformer(t2);
+	}
+	else {
+	  tl = CONS(TRANSFORMER, t1,
+		    CONS(TRANSFORMER, t2, NIL));
+	}
+      }
+      else {
+	if(transformer_identity_p(t2)) {
+	  tl = CONS(TRANSFORMER, t2,
+		    CONS(TRANSFORMER, t1, NIL));
+	}
+	else {
+	  tl = CONS(TRANSFORMER, t1,
+		    CONS(TRANSFORMER, t2, NIL));
+	}
+      }
+    }
+  }
+  return tl;
+}
+
+/* Reduce the transformer list with the convex hull operator.
+ *
+ * If active_p is true, skip transformers that do not update the
+ * state. Beyond the identity transformer, any transformer without
+ * arguments does not really update the state, although it may
+ * restrict it.
+ *
+ * A new transformer is always allocated. The transformers in the
+ * transformer list ltl are freed.
+ */
+transformer generic_transformer_list_to_transformer(list ltl, bool active_p)
+{
+  transformer ltf = transformer_undefined; // list transformer
+
+  /* FI: an extra effort is needed to handle the general case of n
+     transformers. For the time being, the list can contain at most
+     two transformers. */
+
+  if(ENDP(ltl))
+    ltf = transformer_empty();
+  else if(ENDP(CDR(ltl))) { // One element list
+    ltf = TRANSFORMER(CAR(ltl));
+    if(active_p && ENDP(transformer_arguments(ltf))) {
+      free_transformer(ltf);
+      ltf = transformer_empty();
+    }
+    else {
+      transformer tf = ltf;
+      ltf = copy_transformer(ltf);
+      free_transformer(tf);
+    }
+  }
+  else if(ENDP(CDR(CDR(ltl)))) { // Two-element list
+    transformer ltf1 = TRANSFORMER(CAR(ltl));
+    transformer ltf2 = TRANSFORMER(CAR(CDR(ltl)));
+
+    if(active_p && ENDP(transformer_arguments(ltf1))) {
+      if(active_p && ENDP(transformer_arguments(ltf2))) {
+	free_transformer(ltf1);
+	free_transformer(ltf2);
+	ltf = transformer_empty();
+      }
+      else {
+	ltf = copy_transformer(ltf2);
+	free_transformer(ltf1);
+	free_transformer(ltf2);
+      }
+    }
+    else if(active_p && ENDP(transformer_arguments(ltf2))) {
+	ltf = copy_transformer(ltf1);
+	free_transformer(ltf1);
+	free_transformer(ltf2);
+    }
+    else {
+      ltf = transformer_convex_hull(ltf1, ltf2);
+      free_transformer(ltf1);
+      free_transformer(ltf2);
+    }
+  }
+  else { // General case...
+    // loop... it might be easier than the disjunction performed for
+    // lists of length two!
+    pips_internal_error("Two transformers at most expected.\n");
+  }
+
+  return ltf;
+}
+
+/* Reduce the transformer list ltl to one transformer using the convex
+ *  hull operator.
+ */
+transformer transformer_list_to_transformer(list ltl)
+{
+  return generic_transformer_list_to_transformer(ltl, FALSE);
+}
+
+/* Reduce the sublist of active transformers in the transformer list
+ * ltl to one transformer using the convex hull operator. An active
+ * transformer is a transformer with argument(s): at least one value
+ * is changed.
+ *
+ * Note: a hidden identity transformer such as T(i) {i==i#init} is not
+ * detected.
+ */
+transformer active_transformer_list_to_transformer(list ltl)
+{
+  return generic_transformer_list_to_transformer(ltl, TRUE);
 }

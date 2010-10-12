@@ -23,6 +23,7 @@ TARGET = pointer_values
 
 LIB_CFILES = \
 	pointer_values_analyses.c \
+	pointer_values_operators.c \
 	prettyprint.c
 
 INC_TARGET =    $(TARGET).h

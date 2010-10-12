@@ -379,7 +379,6 @@ int cell_compare(cell *c1, cell *c2)
   reference r2 = cell_reference(*c2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
-  int n1, n2;
 
   if(same_entity_p(e1, e2))
     {
@@ -699,9 +698,14 @@ void print_pointer_value(cell_relation pv)
 void print_pointer_values(list lpv)
 {
   fprintf(stderr,"\n");
-  FOREACH(CELL_RELATION, pv, lpv)
+  if (ENDP(lpv))
+    fprintf(stderr,"<none>");
+  else
     {
-      print_pointer_value(pv);
+      FOREACH(CELL_RELATION, pv, lpv)
+	{
+	  print_pointer_value(pv);
+	}
     }
-    fprintf(stderr,"\n");
+  fprintf(stderr,"\n");
 }
