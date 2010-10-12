@@ -414,30 +414,29 @@ class workspace:
 The users will need to `import foo', and create their workspace as `ws =
 pyps.workspace(sources, parents = [foo.workspace])'.
 
-With a `pre_' suffix, the function will be called before the function of
-the same name; with a `post_', it will be run after. Without a prefix,
+With a `pre\_' suffix, the function will be called before the function of
+the same name; with a `post\_', it will be run after. Without a prefix,
 it will entirely replace the initial function. In other words, defining
-pre_bar is similar to saying in emacs:
-
+pre\_bar is similar to saying in emacs:
+\begin{lstlisting}
 (defadvice foo-pre-bar (before bar (arg...) (progn ...)))
 (ad-activate foo-pre-bar)
+\end{lstlisting}
 
-Defining foo.workspace.baz() when pyps.workspace.baz() already exists
-will *replace* pyps.workspace.baz() (of course, foo's version of baz()
-may call the initial one, think (defadvice foo-baz (around baz ...) ...)
-XXX: See comments around foundMain in __getattribute__().
+Defining \lstinline|foo.workspace.baz()| when \lstinline|pyps.workspace.baz()| already exists
+will \emph{replace} \lstinline|pyps.workspace.baz()| (of course, foo's version of baz()
+may call the initial one.
 
-If the workspace is created as: `ws = pyps.workspace(..., parents =
-[foo, bar])', a call to ws.quux will call:
+If the workspace is created as: \lstinline|ws = pyps.workspace(..., parents = [foo, bar])|, a call to ws.quux will call:
 
 \begin{enumerate}
-\item foo.pre_quux
-\item bar.pre_quux
+\item foo.pre\_quux
+\item bar.pre\_quux
 \item foo.quux
 \item at foo.quux' discretion, bar.quux
 \item at bar.quux's discretion, pyps.workspace.quux
-\item bar.post_quux
-\item foo.post_quux
+\item bar.post\_quux
+\item foo.post\_quux
 \end{enumerate}
 
 This is not an error if any (or even all) intermediate functions don't
