@@ -127,12 +127,17 @@ def process(input):
         output.files = processor.save()
 
     except:
-        e = sys.exc_info()[1]
-        if e.__class__.__name__ == "RuntimeError" and str(e).find("pips") != -1:
+        # Get the exception description:
+        e = sys.exc_info()
+        exception = e[1]
+        if exception.__class__.__name__ == "RuntimeError" and str(exception).find("pips") != -1:
             output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
         else:
-            #~ error("Processing of " + ", ".join(input.files) + " failed")
-            output.exception = e
+            # Since the traceback object cannot be serialized, display
+            # here the exec_info for more information on stderr:
+            sys.excepthook(*e)
+            # And only push the exception further for information:
+            output.exception = exception
 
     return output
 
