@@ -127,12 +127,17 @@ def process(input):
         output.files = processor.save()
 
     except:
-        e = sys.exc_info()[1]
-        if e.__class__.__name__ == "RuntimeError" and str(e).find("pips") != -1:
+        # Get the exception description:
+        e = sys.exc_info()
+        exception = e[1]
+        if exception.__class__.__name__ == "RuntimeError" and str(exception).find("pips") != -1:
             output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
         else:
-            #~ error("Processing of " + ", ".join(input.files) + " failed")
-            output.exception = e
+            # Since the traceback object cannot be serialized, display
+            # here the exec_info for more information on stderr:
+            sys.excepthook(*e)
+            # And only push the exception further for information:
+            output.exception = exception
 
     return output
 
@@ -266,7 +271,8 @@ class p4a_processor(object):
                 all_properties[k] = properties[k]
             for k in all_properties:
                 debug("Property " + k + " = " + str(all_properties[k]))
-            self.workspace.set_property(**all_properties)
+                self.workspace.props[k] = all_properties[k]
+
 
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
@@ -289,7 +295,7 @@ class p4a_processor(object):
 
     def get_database_directory(self):
         "Return the directory of the current PIPS database"
-        return os.path.abspath(self.workspace.directory())
+        return os.path.abspath(self.workspace.dirname())
 
 
     def filter_modules(self, filter_select = None, filter_exclude = None, other_filter = lambda x: True):
@@ -364,9 +370,14 @@ class p4a_processor(object):
         # it... :-( But anyway, since we've normalized the code, we
         # changed it so it is to be parallelized again...
         #kernel_launchers.privatize_module()
-        kernel_launchers.capply("privatize_module")
-        #kernel_launchers.coarse_grain_parallelization()
-        kernel_launchers.capply("coarse_grain_parallelization")
+
+        # Since the privatization of a module does not change
+        # privatization of other modules, use concurrent=True (capply) to
+        # apply them without requiring pipsmake to carefully rebuild
+        # dependent resources:
+        kernel_launchers.privatize_module(concurrent=True)
+        # Idem for this phase:
+        kernel_launchers.coarse_grain_parallelization(concurrent=True)
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
@@ -480,7 +491,7 @@ class p4a_processor(object):
                 continue
             (dir, name) = os.path.split(file)
             # Where the file does dwell in the .database workspace:
-            pips_file = os.path.join(self.workspace.directory(), "Src", name)
+            pips_file = os.path.join(self.workspace.dirname(), "Src", name)
 
             # Recover the includes in the given file only if the flag has
             # been previously set and this is a C program. Do not do it
@@ -508,10 +519,10 @@ class p4a_processor(object):
                 # We generate code for P4A Accel, so first post process
                 # the output:
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.directory(), "P4A"))
+                                os.path.join(self.workspace.dirname(), "P4A"))
                 # Where the P4A output file does dwell in the .database
                 # workspace:
-                p4a_file = os.path.join(self.workspace.directory(), "P4A", name)
+                p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
                 if self.cuda:

@@ -5,7 +5,6 @@ INSTALL_HTM = p4a_script.htdoc
 INSTALL_MACHINE_DIR=$(INSTALL_MACHINE_DOC_DIR)/simple_tools/p4a
 
 TEXINPUTS:=$(TEXINPUTS):$(shell pwd)/../../figures//::$(shell pwd)/../../../examples/Python::
-export TEXINPUTS
 
 # Hide the PDF into the HTML documentation directory
 DOC.subd = $(INSTALL_HTM)
