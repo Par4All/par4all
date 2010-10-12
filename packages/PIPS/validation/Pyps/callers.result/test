@@ -1,4 +1,9 @@
 pyps
 on
 tenant
-main
+int main()
+{
+   tenant();
+   on();
+   pyps();
+}

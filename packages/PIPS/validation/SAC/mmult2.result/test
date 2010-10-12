@@ -102,13 +102,9 @@ l99999:
                LU_IB0 = 0;
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
                }
                k = 17;
@@ -141,13 +137,9 @@ l99999:
                LU_IB0 = 0;
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
                }
                k = 17;
@@ -183,16 +175,12 @@ l99999:
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
                   F_0 = a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_0;
                   F_1 = a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_1;
                   F_2 = a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_2;
                   F_3 = a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_3;
                }
                k = 17;
@@ -228,16 +216,12 @@ l99999:
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
                   F_00 = a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_00;
                   F_10 = a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_10;
                   F_20 = a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_20;
                   F_30 = a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
-                  //c SIMD_COMMENT_0
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_30;
                }
                k = 17;
@@ -263,7 +247,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
    //SAC generated temporary array
-   float aligned[4] = {0, 0, 0, 0};
+   a4sf pdata0 = {0, 0, 0, 0};
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -277,20 +261,16 @@ l99999:
                LU_IB0 = 0;
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  //PIPS:SAC generated float vector(s)
-                  float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
-                  SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
-                  SIMD_LOAD_V4SF(v4sf_vec1, &a[i+4*i_t-5][LU_IND0]);
-                  SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-                  SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[0];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[1];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[2];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[3];
+                  //PIPS:SAC generated v4sf vector(s)
+                  v4sf vec00, vec10, vec20;
+                  SIMD_LOAD_GENERIC_V4SF(vec20, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
+                  SIMD_LOAD_V4SF(vec10, &a[i+4*i_t-5][LU_IND0]);
+                  SIMD_MULPS(vec00, vec10, vec20);
+                  SIMD_STORE_V4SF(vec00, &pdata0[0]);
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[0];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[1];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[2];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[3];
                }
                k = 17;
                k = 16;
@@ -312,34 +292,30 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
    //SAC generated temporary array
-   float aligned[4] = {0, 0, 0, 0};
-loop0:   ;
+   a4sf pdata0 = {0, 0, 0, 0};
+loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
-l99997:      ;
+l99997:
       for(j_t = 1; j_t <= 4; j_t += 1) {
-l99998:         ;
+l99998:
          for(i = 1; i <= 4; i += 1) {
-l99999:            ;
+l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
                LU_NUB0 = 16;
                LU_IB0 = 0;
                LU_IND0 = 0;
                for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  //PIPS:SAC generated float vector(s)
-                  float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
-                  SIMD_LOAD_GENERIC_V4SF(v4sf_vec2, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
-                  SIMD_LOAD_V4SF(v4sf_vec1, &a[i+4*i_t-5][LU_IND0]);
-                  SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-                  SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[0];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[1];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[2];
-                  //c SIMD_COMMENT_0
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+aligned[3];
+                  //PIPS:SAC generated v4sf vector(s)
+                  v4sf vec00, vec10, vec20;
+                  SIMD_LOAD_GENERIC_V4SF(vec20, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
+                  SIMD_LOAD_V4SF(vec10, &a[i+4*i_t-5][LU_IND0]);
+                  SIMD_MULPS(vec00, vec10, vec20);
+                  SIMD_STORE_V4SF(vec00, &pdata0[0]);
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[0];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[1];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[2];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[3];
                }
                k = 17;
                k = 16;

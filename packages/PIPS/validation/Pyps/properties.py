@@ -3,7 +3,7 @@
 # import everything so that a session looks like tpips one
 from pyps import workspace
 
-with workspace(["properties.c"]) as w:
+with workspace("properties.c") as w:
 	#Get foo function
 	foo = w.fun.foo
 	

@@ -1,0 +1,19 @@
+delete nest08
+
+setenv ABORT_ON_USER_ERROR TRUE
+
+create nest08 nest08.f
+
+#display PARALLELPRINTED_FILE
+#quit
+apply DISTRIBUTER
+
+display PRINTED_FILE
+#quit
+
+activate NEST_PARALLELIZATION
+display PARALLELPRINTED_FILE
+
+close
+
+quit

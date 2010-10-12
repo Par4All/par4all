@@ -74,6 +74,7 @@ display PRINTED_FILE
 echo
 echo simdized code
 echo
+make TRANSFORMERS
 apply SIMDIZER
 display PRINTED_FILE
 

@@ -1,0 +1,106 @@
+delete unroll15
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unroll15 unroll15.f
+
+setproperty LOOP_UNROLL_WITH_PROLOGUE FALSE
+
+echo
+echo Tiled code for "UNROLL15"
+echo
+
+apply LOOP_TILING[UNROLL15]
+200
+4 0
+0 1
+
+display PRINTED_FILE[UNROLL15]
+
+echo
+echo The tiled code is not really code because partial tiles
+echo are not generated apart from full tiles.
+echo
+
+#quit
+echo
+echo Get rid of the internal loop with one iteration
+echo
+echo Code after suppress dead code for "UNROLL15"
+echo
+
+apply SUPPRESS_DEAD_CODE[UNROLL15]
+display PRINTED_FILE[UNROLL15]
+# quit
+
+echo
+echo Code after loop flagging for "UNROLL15"
+echo
+
+apply FLAG_LOOPS[UNROLL15]
+display PRINTED_FILE[UNROLL15]
+#quit
+
+echo
+echo Code after loop unrolling for "UNROLL15"
+echo
+
+apply UNROLL[UNROLL15]
+99999
+4
+display PRINTED_FILE[UNROLL15]
+
+echo
+echo Forward substitute the value of I
+echo
+
+apply FORWARD_SUBSTITUTE[UNROLL15]
+display PRINTED_FILE
+
+echo
+echo Get rid of useless assignments with use def elimination
+echo
+
+apply USE_DEF_ELIMINATION[UNROLL15]
+display PRINTED_FILE
+
+echo
+echo Distribute the loops
+echo
+
+apply DISTRIBUTER[UNROLL15]
+display PRINTED_FILE
+
+echo
+echo The loop distribution fails, maybe because f the loop bounds?
+#quit
+
+echo
+echo The unrolling generates a useless new loop on J
+echo
+echo Code after suppress dead code
+echo
+
+apply SUPPRESS_DEAD_CODE[UNROLL15]
+display PRINTED_FILE
+
+echo
+echo The loop bounds are now to complex for the semantics analysis
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo The expected result is:    0.0000000       12.000000       396.00000       408.00000
+echo
+
+# Preserve the execution in case of change
+#apply UNSPLIT
+
+#shell gfortran unroll15.database/Src/unroll15.f -o unroll15.database/unroll15
+#shell ./unroll15.database/unroll15
+
+close
+delete unroll15
+quit

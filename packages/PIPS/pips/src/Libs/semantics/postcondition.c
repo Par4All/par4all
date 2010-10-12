@@ -21,15 +21,16 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* filtering of postconditions */
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
 
 /* Standard includes
  */
- 
+
 #include <stdio.h>
-#include <string.h> 
+#include <string.h>
 
 /* Psystems stuff
  */
@@ -44,15 +45,15 @@
 
 #include "genC.h"
 #include "linear.h"
-#include "ri.h" 
+#include "ri.h"
 #include "effects.h"
 
 /* PIPS stuff
  */
 
-#include "ri-util.h" 
+#include "ri-util.h"
 #include "effects-util.h"
-#include "misc.h" 
+#include "misc.h"
 #include "semantics.h"
 #include "transformer.h"
 
@@ -89,7 +90,7 @@ static bool postcondition_filter(statement stat)
     transformer post = LoadPost(stat);
 
     pips_debug(5, "statement %p (post %p)\n", stat, post);
-    
+
     ifdebug(9) {
 	pips_debug(9, "statement is\n");
 	print_statement(stat);

@@ -1,0 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete unroll09
+create unroll09 unroll09.f
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+apply FULL_UNROLL
+10
+display PRINTED_FILE
+
+close
+delete unroll09
+quit

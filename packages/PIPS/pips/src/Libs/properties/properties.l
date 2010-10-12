@@ -162,8 +162,6 @@ static string property_tag_to_string(tag t)
     }
 }
 
-static property get_property(string, bool);
-
 static void parse_properties(void)
 {
     int tok;
@@ -324,7 +322,7 @@ static void read_properties(void)
 
    @return the property or abort() if it does not exist and cool is FALSE
 */
-static property get_property(const string name, bool cool)
+property get_property(const char* name, bool cool)
 {
     property p = property_undefined;
     property u = (property) HASH_UNDEFINED_VALUE;
@@ -354,7 +352,7 @@ static property get_property(const string name, bool cool)
 
    @return the boolean value
 */
-bool get_bool_property(const string name)
+bool get_bool_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -369,7 +367,7 @@ bool get_bool_property(const string name)
 
    @param[in] b is the value to store in the property
 */
-void set_bool_property(const string name, bool b)
+void set_bool_property(const char* name, bool b)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -384,7 +382,7 @@ void set_bool_property(const string name, bool b)
 
    @return the string value, not to be freed
 */
-string get_string_property(const string name)
+string get_string_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
@@ -403,7 +401,7 @@ string get_string_property(const string name)
 
    @return the string value, not to be freed
 */
-string get_string_property_or_ask(const string name,const char question[])
+string get_string_property_or_ask(const char* name,const char question[])
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
@@ -423,7 +421,7 @@ string get_string_property_or_ask(const string name,const char question[])
    @param[in] s is the value to store in the property. This string is
    strdup()ed in this function
 */
-void set_string_property(const string name, string s)
+void set_string_property(const char* name, string s)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
@@ -440,7 +438,7 @@ void set_string_property(const string name, string s)
    @return the integer value
 */
 int
-get_int_property(const string name)
+get_int_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p))
@@ -455,7 +453,7 @@ get_int_property(const string name)
 
    @param[in] i is the value to store in the property
 */
-void set_int_property(const string name, int i)
+void set_int_property(const char* name, int i)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p))
@@ -463,7 +461,7 @@ void set_int_property(const string name, int i)
     property_int(p) = i;
 }
 
-void fprint_property_direct(FILE * fd, const string pname)
+void fprint_property_direct(FILE * fd, const char* pname)
 {
     property p = get_property(pname, TRUE);
     if (property_undefined_p(p))
@@ -485,7 +483,7 @@ void fprint_property_direct(FILE * fd, const string pname)
 
 }
 
-void fprint_property(FILE * fd, const string pname)
+void fprint_property(FILE * fd, const char* pname)
 {
     property p = get_property(pname, TRUE);
     if (property_undefined_p(p))

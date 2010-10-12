@@ -8,9 +8,9 @@ from pyps import *
 if os.path.isdir("loop_tiling.database"):
     shutil.rmtree("loop_tiling.database", True)
 
-ws = workspace(["loop_tiling.c"], name="loop_tiling")
+ws = workspace("loop_tiling.c", name="loop_tiling")
 
-ws.set_property(ABORT_ON_USER_ERROR = True)
+ws.props.ABORT_ON_USER_ERROR = True
 
 fct = ws.fun.main
 # try a basic function

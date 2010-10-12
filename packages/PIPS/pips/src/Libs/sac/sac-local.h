@@ -47,8 +47,6 @@ typedef dg_vertex_label vertex_label;
 #define ENTITY_FUNCTION_P(f) (type_functional_p(entity_type(f)) && \
 			    (gen_length(functional_parameters(type_functional(entity_type(f)))) != 0))
 
-#define SIMD_PHI_NAME "PHI"
-
 /* simd_loop_const_elim.c */
 
 #define SIMD_MASKED_SUFFIX "_MASKED"
@@ -64,9 +62,6 @@ typedef dg_vertex_label vertex_label;
     pips_assert("vector Index seems legal",vectorElement_vectorIndex(ve) >= 0 && vectorElement_vectorIndex(ve) < simdStatementInfo_nbArgs(vectorElement_statement(ve)));\
     } while(0)
 
-/* simd_loop_unroll.c */
-
-#define SIMD_COMMENT "SIMD_COMMENT_"
 
 /* symbols exported by the parser */
 extern FILE *patterns_yyin;

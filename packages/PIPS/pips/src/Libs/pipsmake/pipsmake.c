@@ -1419,7 +1419,7 @@ bool safe_concurrent_apply(
     return ok;
 }
 
-bool safe_set_property(char* propname, char* value)
+bool safe_set_property(const char* propname, const char* value)
 {
     size_t len = strlen(propname) + strlen(value) + 2;
     char* line = calloc(len, sizeof(char));

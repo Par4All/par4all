@@ -1021,7 +1021,8 @@ void update_cycle_temporary_precondition(control c,
 
 transformer load_cycle_temporary_precondition(control c,
 					      control_mapping cycle_temporary_precondition_map,
-					      hash_table ancestor_map, hash_table scc_map)
+					      hash_table ancestor_map,
+					      hash_table scc_map __attribute__ ((__unused__)))
 {
   transformer t_pre = transformer_undefined;
   control c_a = control_undefined;
@@ -1036,7 +1037,7 @@ transformer load_cycle_temporary_precondition(control c,
     */
     c_a = c;
   }
-  
+
   t_pre = (transformer) hash_get(cycle_temporary_precondition_map, (void *) c_a);
 
   pips_assert("The cycle precondition is available",
@@ -2014,7 +2015,7 @@ transformer unstructured_to_flow_sensitive_postconditions
 
   forward_control_map_get_blocs(head, &succs);
 
-  if(gen_length(succs)>get_int_property("SEMANTICS_MAX_CFG_SIZE1")) {
+  if(((int)gen_length(succs))>get_int_property("SEMANTICS_MAX_CFG_SIZE1")) {
       pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
 			"Have you fully restructured your code?\n", gen_length(succs));
     post = unstructured_to_postconditions(pre, pre_u, u);
@@ -2320,7 +2321,7 @@ transformer unstructured_to_transformer(unstructured u,
     }
 
     /* These tests should be performed at the scc level */
-    if(gen_length(succs)>get_int_property("SEMANTICS_MAX_CFG_SIZE2")) {
+    if(((int)gen_length(succs))>get_int_property("SEMANTICS_MAX_CFG_SIZE2")) {
       pips_user_warning("\nControl flow graph too large for any analysis (%d nodes)\n"
 			"Have you fully restructured your code?\n", gen_length(succs));
       unstructured_to_transformers(u, pre);
@@ -2332,7 +2333,7 @@ transformer unstructured_to_transformer(unstructured u,
 	tf = effects_to_transformer(e);
       }
     }
-    else if(gen_length(succs)>get_int_property("SEMANTICS_MAX_CFG_SIZE1")) {
+    else if(((int)gen_length(succs))>get_int_property("SEMANTICS_MAX_CFG_SIZE1")) {
       pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
 			"Have you fully restructured your code?\n", gen_length(succs));
       unstructured_to_transformers(u, pre);

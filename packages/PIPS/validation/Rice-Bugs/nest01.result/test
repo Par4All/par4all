@@ -1,0 +1,19 @@
+!     Check nest parallelization: the two loops are parallel, but they
+!     must also be interchanged
+
+!     The number of iterations is one of the decision criteria, so we
+!     use 10 and 11 to be close to obtain the interchance while
+!     different to be able to analyze the results easily
+
+      PROGRAM NEST01
+
+      REAL A(10,20)
+
+      DO Ip = 1, 11                                                     0012
+         DOALL Jp = 1, 10                                               0013
+            PRIVATE J
+            A(Jp,Ip) = 0.                                               0014
+         ENDDO
+      ENDDO
+
+      END

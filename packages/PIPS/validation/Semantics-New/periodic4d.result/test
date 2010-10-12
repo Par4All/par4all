@@ -133,18 +133,18 @@ int main()
    while (x<10) {
 
 //  P(k,new,old,x,y,z) {new+old==1, y+z==x, 0<=new, new<=1, new<=x,
-//    x<=9, z<=x, 0<=z}
+//    x<=9, y<=x, 0<=y}
 
       if (new==0)
 
-//  P(k,new,old,x,y,z) {new==0, old==1, y+z==x, 0<=x, x<=9, z<=x,
-//    0<=z}
+//  P(k,new,old,x,y,z) {new==0, old==1, y+z==x, 0<=x, x<=9, y<=x,
+//    0<=y}
 
          y++;
       else
 
-//  P(k,new,old,x,y,z) {new==1, old==0, y+z==x, 1<=x, x<=9, z<=x,
-//    0<=z}
+//  P(k,new,old,x,y,z) {new==1, old==0, y+z==x, 1<=x, x<=9, y<=x,
+//    0<=y}
 
          z++;
 

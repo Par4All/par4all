@@ -546,7 +546,7 @@ float file_factor;
 		       &complex_cost, &dcomplex_cost);
 		recognized = FALSE;
 		for (p = intrinsic_cost_table; p->name != NULL; p++) {
-		    if (streq(p->name, intrinsic_name)) {
+		    if (same_string_p(p->name, intrinsic_name)) {
 			p->int_cost = (int)
 			    (int_cost * scale_factor * file_factor + 0.5);
 			p->float_cost = (int)
@@ -588,10 +588,10 @@ basic *pargsbasic;
   basic b;
 
   for (p = intrinsic_cost_table; p->name != NULL; p++) {
-    if (streq(p->name, s)) {
+    if (same_string_p(p->name, s)) {
 
       /* Inserted by AP, oct 24th 1995 */
-      if (streq(p->name, "LOG") || streq(p->name, "LOG10")) {
+      if (same_string_p(p->name, "LOG") || same_string_p(p->name, "LOG10")) {
 	user_warning("intrinsic_cost", "LOG or LOG10 functions used\n");
       }
 

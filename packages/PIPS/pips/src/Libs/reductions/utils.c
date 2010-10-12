@@ -42,6 +42,16 @@ static syntax make_star_syntax()
 				  expression_undefined,
 				  expression_undefined));
 }
+bool reduction_star_p(reduction r) {
+    reference ref = reduction_reference(r);
+    FOREACH(EXPRESSION,exp,reference_indices(ref))
+        if( syntax_range_p(expression_syntax(exp)) ) {
+            range ran = syntax_range(expression_syntax(exp));
+            if(expression_undefined_p(range_upper(ran)))
+                return true;
+        }
+    return false;
+}
 
 /***************************************************** REFERENCED ENTITIES */
 /* returns the list of referenced variables

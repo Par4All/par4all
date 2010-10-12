@@ -1,0 +1,54 @@
+
+Code unrolled four times for "UNROLL13"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS. In fact, she performed an unroll-and-jam
+C
+      SUBROUTINE UNROLL13(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO 200 J = 1, N2                                                  0012
+         DO I = 1, 1+4*((N1-1+1)/4)-1, 4
+            A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+            A(I+1,J) = A(I+1+1,J)*B(I+1,J)+A(I+1,J+1)*C(I+1,J)
+            A(I+2,J) = A(I+2+1,J)*B(I+2,J)+A(I+2,J+1)*C(I+2,J)
+            A(I+3,J) = A(I+3+1,J)*B(I+3,J)+A(I+3,J+1)*C(I+3,J)
+         ENDDO
+         DO I = 1+4*((N1-1+1)/4), N1
+            A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+         ENDDO
+200      CONTINUE                                                       0016
+
+      END
+
+Code after partial eval code for "UNROLL13"
+
+C     Example used by Khadija Immadoueddine, p. 7 in her report
+C
+C     It seems that she has unrolled the j loop by hand and the i loop
+C     with PIPS. In fact, she performed an unroll-and-jam
+C
+      SUBROUTINE UNROLL13(N1, N2, A, B, C)
+C
+      REAL A(0:N1+1,0:N2+1)
+      REAL B(0:N1+1,0:N2+1)
+      REAL C(0:N1+1,0:N2+1)
+
+      DO 200 J = 1, N2                                                  0012
+         DO I = 1, 4*(N1/4), 4
+            A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+            A(I+1,J) = A(I+2,J)*B(I+1,J)+A(I+1,J+1)*C(I+1,J)
+            A(I+2,J) = A(I+3,J)*B(I+2,J)+A(I+2,J+1)*C(I+2,J)
+            A(I+3,J) = A(I+4,J)*B(I+3,J)+A(I+3,J+1)*C(I+3,J)
+         ENDDO
+         DO I = 4*(N1/4)+1, N1
+            A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
+         ENDDO
+200      CONTINUE                                                       0016
+
+      END

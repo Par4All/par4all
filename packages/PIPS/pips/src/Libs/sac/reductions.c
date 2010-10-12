@@ -165,6 +165,7 @@ static bool reduction_in_statement_p(reduction red, statement stat)
     return p.has_reduction_p;
 }
 
+
 /* This function gets the possible reduction thanks to load_cumulated_reductions() function. 
    Then, for each possible reduction, the function call add_reduction() to know if 
    the reduction is allowed and if it is, the function calls rename_reduction_ref()
@@ -182,8 +183,9 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
             print_reference(reduction_reference(r));
             fprintf(stderr,"\n");
         }
-
-        if(reduction_in_statement_p(r,s))
+        if(reduction_star_p(r))
+            pips_debug(3,"can do nothing with star reductions ...\n");
+        else if(reduction_in_statement_p(r,s))
         {
             pips_debug(3,"found in the statement ! rewriting ...\n");
             basic b = basic_of_reference(reduction_reference(r));
@@ -486,6 +488,22 @@ static statement generate_compact(reductionInfo ri)
     }
     return postlude;
 }
+static
+bool simd_gather_reduction(statement body, list reductions, list *reductions_info) {
+        instruction ibody = statement_instruction(body);
+        switch(instruction_tag(ibody))
+        {
+            case is_instruction_sequence:
+                {
+                    FOREACH(STATEMENT, curStat,sequence_statements(instruction_sequence(ibody)))
+                        rename_statement_reductions(curStat, reductions_info, reductions);
+                } break;
+
+            default:
+                return false;
+        }
+        return !ENDP(*reductions_info);
+}
 
 /*
    This function attempts to find reductions for each loop
@@ -510,11 +528,6 @@ static void reductions_rewrite(statement s)
             body = forloop_body(instruction_forloop(i));
             break;
 
-        case is_instruction_call:
-            if(get_bool_property("SIMD_REMOVE_REDUCTIONS_ONLY_IN_LOOP")) return;
-            else body = s;
-            break;
-
         default:
             return;
     }
@@ -533,24 +546,14 @@ static void reductions_rewrite(statement s)
                 pips_debug(2,"no reduction for loop:\n");
             print_statement(s);
         }
-
         //Lookup the reductions in the loop's body, and change the loop body accordingly
-        instruction ibody = statement_instruction(body);
-        switch(instruction_tag(ibody))
-        {
-            case is_instruction_sequence:
-                {
-                    FOREACH(STATEMENT, curStat,sequence_statements(instruction_sequence(ibody)))
-                        rename_statement_reductions(curStat, &reductions_info, reductions);
-                } break;
-
-            case is_instruction_call:
-                rename_statement_reductions(s, &reductions_info, reductions);
-                break;
-
-            default:
-                return;
+        if(!simd_gather_reduction(body,reductions,&reductions_info)) {
+            /* we may have failed to find any reduction info, in that case try again with the inner reductions */
+            reductions =  reductions_list(load_cumulated_reductions(body));
+            simd_gather_reduction(body,reductions,&reductions_info);
+            s=body;
         }
+
 
         //Generate prelude and compact code for each of the reductions
         FOREACH(REDUCTIONINFO, ri,reductions_info)

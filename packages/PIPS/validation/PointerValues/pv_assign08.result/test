@@ -1,0 +1,17 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *a;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   a = foo();
+
+// Pointer values:
+// a == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}

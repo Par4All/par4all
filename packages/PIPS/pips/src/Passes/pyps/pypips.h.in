@@ -15,9 +15,9 @@
 #undef _XOPEN_SOURCE
 #undef assert
 /*properties.h*/
-extern bool get_bool_property(const string /*name*/);
-extern string get_string_property(const string /*name*/);
-extern int get_int_property(const string /*name*/);
+extern bool get_bool_property(const char* /*name*/);
+extern string get_string_property(const char* /*name*/);
+extern int get_int_property(const char* /*name*/);
 
 extern char *activate(char *);
 extern char *module_loops(const char*,const char*);

@@ -1050,8 +1050,8 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
 		    reference eff_ref = effect_any_reference(eff);
-		    action eff_act = effect_action(eff);
-		    list eff_ind = reference_indices(eff_ref);
+		    //action eff_act = effect_action(eff);
+		    //list eff_ind = reference_indices(eff_ref);
 
 		    pips_debug(8, "pointer type real arg reference\n");
 

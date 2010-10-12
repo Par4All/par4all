@@ -64,11 +64,11 @@ def printPythonMethod(name,doc):
 
 			if prop == "loop_label":
 				has_loop_label = True;
-				extraparamsetter = '\t\tif self._ws:self._ws._set_property("' + prop.upper() + '", self._label)\n' + extraparamsetter
+				extraparamsetter = '\t\tif self._ws:pypsutils._set_property(self._ws,"' + prop.upper() + '", self._label)\n' + extraparamsetter
 			else:
 				props.append(arg)
-				extraparamsetter = '\t\tif self._ws:old_'+prop.upper()+'= self._ws._set_property("' + prop.upper() + '", ' + short_prop + ')\n' + extraparamsetter
-				extraparamresetter = '\t\tif self._ws:self._ws._set_property("' + prop.upper() + '", old_'+prop.upper()+')\n' + extraparamresetter
+				extraparamsetter = '\t\tif self._ws:self._ws.cpypips.push_property("{0}",pypsutils.formatprop({1}))\n'.format(prop.upper(),short_prop) + extraparamsetter
+				extraparamresetter = extraparamresetter + '\t\tif self._ws:self._ws.cpypips.pop_property("{0}")\n'.format(prop.upper()) 
 
 		if len(props) > 0:
 			extraparams = ",".join(props) + ","
@@ -96,17 +96,17 @@ def printPythonMethod(name,doc):
 		print '\n\tdef '+name+'(self,'+extraparams+' **props):'
 		print '\t\t"""'+doc+'"""'
 		print extraparamsetter
-		print '\t\tif '+mself+'._ws: old_props = self._ws.set_properties(workspace.props.update_props("'+name.upper()+'",props))'
+		print '\t\tif '+mself+'._ws: old_props = pypsutils.set_properties(self._ws,pypsutils.update_props("'+name.upper()+'",props))'
 
 		if generator != "-modules":
-			print '\t\t'+mself+'.apply(\"'+name+'\")'
+			print '\t\tpypsutils.apply('+mself+',\"'+name+'\")'
 		else:
 			print '\t\tif concurrent:'
-			print '\t\t\tself.capply(\"'+name+'\")'
+			print '\t\t\tpypsutils.capply(self,\"'+name+'\")'
 			print '\t\telse:'
 			print '\t\t\tfor m in self._modules:'
-			print '\t\t\t\tm.apply(\"'+name+'\")'
-		print '\t\tif '+mself+'._ws: '+mself+'._ws.set_properties(old_props)'
+			print '\t\t\t\tpypsutils.apply(m,\"'+name+'\")'
+		print '\t\tif '+mself+'._ws: pypsutils.set_properties('+mself+'._ws,old_props)'
 		print '\n' + extraparamresetter + '\n'
 
 #Print workspace properties

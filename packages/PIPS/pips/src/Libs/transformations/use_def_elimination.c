@@ -163,8 +163,7 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                  vertex v2 = successor_vertex(a_successor);
                  statement s2 = vertex_to_statement(v2);
                  dg_arc_label an_arc_label = successor_arc_label(a_successor);
-                 ifdebug(7)
-                    fprintf(stderr, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
+                 pips_debug(7, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
                             s1, statement_ordering(s1),
                             s2, statement_ordering(s2));
                  /* Try to find at least one of the use-def chains between
@@ -174,7 +173,7 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                         statement use;
                         statement def;
                         
-                        ifdebug(7) 
+                        ifdebug(7)
                            {
                               fprintf(stderr, "\t\tfrom ");
                               print_words(stderr, words_effect(conflict_source(a_conflict)));

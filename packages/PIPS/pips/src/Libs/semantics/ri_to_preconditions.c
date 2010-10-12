@@ -133,10 +133,13 @@ static transformer block_to_postcondition(transformer b_pre,
 	    /* the precondition has been allocated as post */
 	    s_pre = post;
 	    post = statement_to_postcondition(s_pre, s);
+	    // FI: within a long loop body, do not replicate the loop
+	    // bound constraints
+	    post = transformer_normalize(post, 2);
 	}
     }
 
-    debug(8,"block_to_postcondition","post=%x end\n", post);
+    pips_debug(8,"post=%p end\n", post);
     return post;
 }
 

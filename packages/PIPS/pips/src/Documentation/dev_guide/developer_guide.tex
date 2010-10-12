@@ -574,6 +574,11 @@ sh> svn status
 # you may need to do additional "svn up" if there are external
 # commits between the merge & its commit.
 sh> svn commit
+
+# It's mandatory to remove the branch after it has been reintregrated !!
+sh> cd where_the_branch_is
+sh> svn rm my-branch-name
+sh> svn commit my-branch-name
 \end{verbatim}
 }
 
@@ -634,7 +639,8 @@ Here is a typical behaviour you should follow:
   congratulate you;
 \item if the merge fails because someone insidiously committed her
   valuable work just since your last synchronization from the trunk, go to
-  step \ref{item:pull}.
+  step \ref{item:pull}, else you have to delete your branch, it can't be use
+  anymore after having been reintegrated !
 \end{enumerate}
 
 For more information about the validation process, have a look to

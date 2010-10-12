@@ -839,6 +839,12 @@ static transformer transformer_add_condition_information_updown(
       pips_internal_error("range used as test condition!\n");
       break;
     }
+  case is_syntax_subscript:
+    {
+        /* information may be lost */
+        newpre = pre;
+        break;
+    }
   default:
       pips_internal_error("ill. expr. as test condition\n");
   }

@@ -1,0 +1,31 @@
+# 
+# To be run like that : 
+#
+# FILE=loop_fusion02.c WSPACE=loop_fusion02 tpips default_tpips
+#
+#
+
+setenv NAME ${NAME:-$WSPACE}
+
+delete ${WSPACE}
+create ${WSPACE} ${FILE} 
+
+echo //
+echo // Code before fusion
+echo //
+display PRINTED_FILE[${NAME}]
+
+
+
+#setenv LOOP_FUSION_DEBUG_LEVEL 3
+apply LOOP_FUSION[${NAME}]
+
+
+echo //
+echo // Code after fusion
+echo //
+display PRINTED_FILE[${NAME}]
+	
+close ${WSPACE}
+delete ${WSPACE}
+

@@ -1,0 +1,44 @@
+
+Code unrolled twice for "UNROLL01"
+
+C
+C
+      PROGRAM UNROLL01
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      LU_NUB0 = 100
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, LU_IB0-1
+         T(LU_IND0*1+1) = -2*(LU_IND0*1+1)
+99999    CONTINUE
+      DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 2
+         T((LU_IND0+0)*1+1) = -2*((LU_IND0+0)*1+1)
+         T((LU_IND0+1)*1+1) = -2*((LU_IND0+1)*1+1)
+99998    CONTINUE
+      I = 1+MAX0(LU_NUB0, 0)*1
+C
+      END
+
+Code after partial evaluation for "UNROLL01"
+
+C
+C
+      PROGRAM UNROLL01
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      LU_NUB0 = 100
+      LU_IB0 = 0
+      DO 99999 LU_IND0 = 0, -1
+         T(LU_IND0+1) = -2*LU_IND0-2
+99999    CONTINUE
+      DO 99998 LU_IND0 = 0, 99, 2
+         T(LU_IND0+1) = -2*LU_IND0-2
+         T(LU_IND0+2) = -2*LU_IND0-4
+99998    CONTINUE
+      I = 101
+C
+      END

@@ -773,27 +773,29 @@ static void do_simdizer_init(call c)
 #undef SWAP_ARGUMENTS
 #undef NOSWAP_ARGUMENTS
 }
+
 static void do_split_block_statements(statement s) {
     if(statement_block_p(s)) {
         list blocks = NIL;
         list iter=statement_block(s);
         while(!ENDP(iter)) {
             list curr = NIL;
-            while(!ENDP(iter)) {
+            bool block_created = false;
+            do  {
                 statement st = STATEMENT(CAR(iter));
                 POP(iter);
                 if(entity_empty_label_p(statement_label(st)) ) {
                     if(!ENDP(curr)) 
                         blocks=CONS(STATEMENT,make_block_statement(curr),blocks);
                     blocks=CONS(STATEMENT,st,blocks);
-                    break;
+                    block_created=true;
                 }
                 else
                     curr=CONS(STATEMENT,st,curr);
-            }
-            curr=gen_nreverse(curr);
-            if(ENDP(iter) && !ENDP(curr)) {
-                blocks=CONS(STATEMENT,make_block_statement(curr),blocks);
+            } while(!ENDP(iter)&&!block_created);
+            if(!block_created) {
+              curr=gen_nreverse(curr);
+              blocks=CONS(STATEMENT,make_block_statement(curr),blocks);
             }
         }
         gen_free_list(sequence_statements(statement_sequence(s)));
@@ -801,6 +803,7 @@ static void do_split_block_statements(statement s) {
         sequence_statements(statement_sequence(s))=gen_nreverse(blocks);
     }
 }
+
 bool simdizer_init(const char * module_name)
 {
     /* get the resources */

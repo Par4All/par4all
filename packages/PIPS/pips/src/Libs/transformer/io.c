@@ -94,7 +94,9 @@ list fprint_transformers(FILE * fd,
 			 get_variable_name_t value_name)
 {
   if(ENDP(tl)) {
-    pips_internal_error("transformer lists should never be empty.\n");
+    // FI: I changed my mind; this is a way to represent a non
+    //feasible transformer
+    //pips_internal_error("transformer lists should never be empty.\n");
     fprintf(fd, "Empty transformer list\n");
   }
   else {

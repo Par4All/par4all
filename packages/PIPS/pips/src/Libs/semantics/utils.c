@@ -354,7 +354,7 @@ expression_and_precondition_to_integer_interval(expression e,
       Value lb = VALUE_ZERO, ub = VALUE_ZERO;
       entity var = (entity) vecteur_var(v);
 
-      if(sc_minmax_of_variable(s, (Variable) var, 
+      if(sc_minmax_of_variable(s, (Variable) var,
 			       &lb, &ub)) {
 	*plb = value_min_p(lb)? INT_MIN : VALUE_TO_INT(lb);
 	*pub = value_max_p(ub)? INT_MAX : VALUE_TO_INT(ub);
@@ -378,7 +378,7 @@ expression_and_precondition_to_integer_interval(expression e,
     *plb = INT_MIN;
     *pub = INT_MAX;
   }
-    
+
 }
 
 /* Could be used for boolean expressions too? Extended to any kind of expression? */

@@ -97,36 +97,17 @@ static void compute_variable_size(statement s, MinMaxVar* varwidth)
         varwidth->min = width;
 }
 
-static void addSimdCommentToStat(statement s, int num)
-{
-
-    char comment[sizeof("c " SIMD_COMMENT) + 8*sizeof(int) ];
-
-    sprintf(comment, "c " SIMD_COMMENT "%d\n", num);
-
-    insert_comments_to_statement(s, comment);
-}
-
-static void addSimdCommentToStats(statement s)
-{
-    if(instruction_sequence_p(statement_instruction(s)))
-    {
-        sequence seq = instruction_sequence(statement_instruction(s));
-        int num = 0;
-        FOREACH(STATEMENT, curStat, sequence_statements(seq) )
-        {
-            addSimdCommentToStat(curStat, num++);
-        }
-    }
-    else
-    {
-        addSimdCommentToStat(s, 0);
-    }
-}
-
 static void simd_loop_unroll(statement loop_statement, int rate)
 {
-    do_loop_unroll(loop_statement,rate,addSimdCommentToStats);
+  range r = loop_range(statement_loop(loop_statement));
+  expression erange = range_to_expression(r,range_to_nbiter);
+  int irange;
+  if(expression_integer_value(erange,&irange) && irange <=rate) {
+    full_loop_unroll(loop_statement);
+  }
+  else
+    do_loop_unroll(loop_statement,rate,NULL);
+  free_expression(erange);
 }
 
 static bool simple_simd_unroll_loop_filter(statement s)
