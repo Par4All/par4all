@@ -27,7 +27,6 @@
 # - report is sent by mail if the status changed.
 # - if there is a persistant LOCK, investigate by hand...
 
-# this script runs every minute on fabien@canapville
 # this script runs every minute on fabien@compiegne
 
 prod=${1:-.}
