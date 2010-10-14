@@ -1299,12 +1299,16 @@ static void reset_current_optimization_strategy(void)
 }
 
 
-/************************************************** DAVINCI DUMP EXPRESSIONS */
+/************************************************** DAVINCI DUMP EXPRESSIONS
+
+This seems to be largely redundant with some functions in
+ri-utils/expression.c such as davinci_dump_expression()
+*/
 
 #define GRAPH_PREFIX "optimize_expressions_"
 #define GRAPH_SUFFIX ".daVinci"
 
-/* dump all expressions in s as davinci graphs. 
+/* dump all expressions in s as davinci graphs.
  */
 static void davinci_dump_expressions(
    string module_name, string phase, statement s)
@@ -1326,10 +1330,28 @@ static void davinci_dump_expressions(
   free(filename), filename = NULL;
 }
 
-/*************************************************** INTERFACE FROM PIPSMAKE */
 
-/* pipsmake interface.
- */
+/* pipsmake interface to apply expression optimization according to
+   various strategy.
+
+   The strategy to use is specified with the EOLE_OPTIMIZATION_STRATEGY
+   property. The strategies themselves are defined into the strategies[]
+   array.
+
+   In general, strategies involve an external optimization tool that is
+   not provided with PIPS, so they cannot be used...
+
+   At least the CSE, ICM and ICMCSE work without this tool and can be
+   safely used. See the common_subexpression_elimination and icm phase to
+   have a direct access to these 2 common working case. Well, it is not
+   clear that ICMCSE would work since it would need to refresh the
+   effects, which is not done. So the safe way is to use separately these
+   2 phases.
+
+   @param[in] module_name
+
+   @return TRUE since it is supposed to always work
+*/
 bool optimize_expressions(string module_name)
 {
     statement s;
@@ -1369,7 +1391,7 @@ bool optimize_expressions(string module_name)
      */
 
     if (strategy->apply_gcm)
-      perform_icm_association(module_name, s); 
+      perform_icm_association(module_name, s);
 
     if (strategy->apply_cse)
       perform_ac_cse(module_name, s);
@@ -1384,13 +1406,13 @@ bool optimize_expressions(string module_name)
 
     if (strategy->apply_balancing)
       switch_nary_to_binary(s);
-    
+
     if (strategy->apply_simplify)
       optimize_simplify_patterns(s);
 
     /* others?
      */
-          
+
     /* check consistency after optimizations */
     clean_up_sequences(s);
     pips_assert("consistency checking after optimizations",
@@ -1401,7 +1423,7 @@ bool optimize_expressions(string module_name)
     module_reorder(s);
 
     /* return result to pipsdbm
-     */    
+     */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, s);
 
     reset_current_module_entity();

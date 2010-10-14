@@ -1835,6 +1835,8 @@ static bool seq_flt(sequence s)
     gen_full_free_list(*top_of_w_effects);
     return true;
 }
+
+
 /* handle all calls not in a sequence */
 static bool call_flt(call c)
 {
@@ -1864,7 +1866,7 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
   /* make_current_statement_stack(); */
   init_inserted();
 
-  gen_multi_recurse(s, 
+  gen_multi_recurse(s,
           sequence_domain, seq_flt, gen_null,
           call_domain, call_flt, gen_null,
           0);
@@ -1883,7 +1885,12 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
 
 
 /* Pipsmake phase: Common Subexpression Elimination
- */
+
+   @param[in] module_name is the name of the module we want to apply the
+   Common Subexpression Elimination on
+
+   @return TRUE if everything goes fine.
+*/
 bool common_subexpression_elimination(string module_name)
 {
   bool   result;
@@ -1901,8 +1908,15 @@ bool common_subexpression_elimination(string module_name)
 
 
 /* Pipsmake phase: Invariant Code Motion
- * beware, invraiant_code_motion phase already exist !
- */
+
+   @param[in] module_name is the name of the module we want to apply the
+   Invariant Code Motion on
+
+   @return TRUE if everything goes file.
+
+   Beware, invariant_code_motion phase already exists too but deal with
+   loop invariant code motion...
+*/
 bool icm(string module_name)
 {
   bool   result;
