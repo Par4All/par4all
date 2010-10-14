@@ -138,244 +138,38 @@ void reset_pv_context(pv_context *p_ctxt)
   p_ctxt->pvs_may_union_func = (list_function) UNDEF;
 }
 
+/************* RESULTS HOOK */
 
-/******************** CONVERSION FROM EXPRESSIONS TO PATHS AND CELL_INTERPRETATION */
-
-static effect intrinsic_to_interpreted_path(entity func, list args, cell_interpretation * ci, pv_context * ctxt);
-static effect call_to_interpreted_path(call c, cell_interpretation * ci, pv_context * ctxt);
-static 
-effect expression_to_interpreted_path(expression exp, cell_interpretation * ci, pv_context * ctxt);
-
-
-static effect intrinsic_to_interpreted_path(entity func, list args, cell_interpretation * ci, pv_context * ctxt)
+pv_results make_pv_results()
 {
-  effect eff = effect_undefined;
-  
-  if(ENTITY_ASSIGN_P(func))
-    /* if the call is an assignement, return the lhs path because the relation
-       between the lhs and the rhs has been treated elsewhere
-    */
-    return(expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt));
-
-  if(ENTITY_DEREFERENCING_P(func))
-    {
-      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
-      effect_add_dereferencing_dimension(eff);
-      *ci = make_cell_interpretation_value_of();
-      return eff;
-    }
-
-  if(ENTITY_FIELD_P(func))
-    {
-      expression e2 = EXPRESSION(CAR(CDR(args)));
-      syntax s2 = expression_syntax(e2);
-      reference r2 = syntax_reference(s2);
-      entity f = reference_variable(r2);
-
-      pips_assert("e2 is a reference", syntax_reference_p(s2));
-      pips_debug(4, "It's a field operator\n");
-
-      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
-      effect_add_field_dimension(eff,f);
-      *ci = make_cell_interpretation_value_of();
-      return eff;
-    }
-
-  if(ENTITY_POINT_TO_P(func))
-    {
-      expression e2 = EXPRESSION(CAR(CDR(args)));
-      syntax s2 = expression_syntax(e2);
-      entity f;
-
-      pips_assert("e2 is a reference", syntax_reference_p(s2));
-      f = reference_variable(syntax_reference(s2));
-
-      pips_debug(4, "It's a point to operator\n");
-      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
-
-      /* We add a dereferencing */
-      effect_add_dereferencing_dimension(eff);
-
-      /* we add the field dimension */
-      effect_add_field_dimension(eff,f);
-      *ci = make_cell_interpretation_value_of();
-      return eff;
-    }
-
-  if(ENTITY_ADDRESS_OF_P(func))
-    {
-      eff = expression_to_interpreted_path(EXPRESSION(CAR(args)), ci, ctxt);
-      *ci = make_cell_interpretation_address_of();
-      return eff;      
-    }
-  
-  return eff;
+  pv_results pv_res;
+  pv_res.l_out = NIL;
+  pv_res.result_path = effect_undefined;
+  pv_res.result_path_interpretation = cell_interpretation_undefined;
+  return pv_res;
 }
 
-static effect call_to_interpreted_path(call c, cell_interpretation * ci, pv_context * ctxt)
+void free_pv_results_path(pv_results *pv_res)
 {
-  effect eff = effect_undefined;
-
-  entity func = call_function(c);
-  value func_init = entity_initial(func);
-  tag t = value_tag(func_init);
-  string n = module_local_name(func);
-  list func_args = call_arguments(c);
-  type uet = ultimate_type(entity_type(func));
-  
-  if(type_functional_p(uet)) 
-    {
-      switch (t) 
-	{
-	case is_value_code:
-	  pips_debug(5, "external function %s\n", n);
-	  /* If it's an external call, we should try to retrieve the returned value 
-	     if it's a pointer. 
-	     for the moment, just return an anywhere effect....
-	  */
-	  pips_user_warning("external call, not handled yet, returning all locations effect\n");
-	  eff = make_anywhere_effect(make_action_write_memory());
-	  *ci = make_cell_interpretation_address_of();		  
-	  break;
-      
-	case is_value_intrinsic:
-	  pips_debug(5, "intrinsic function %s\n", n);
-	  eff = intrinsic_to_interpreted_path(func, func_args, ci, ctxt);
-	  break;
-      
-	case is_value_symbolic:
-	  pips_debug(5, "symbolic\n");
-	  pips_internal_error("symbolic case, not yet implemented\n", entity_name(func));
-	  break;
-	    
-	case is_value_constant:
-	  pips_debug(5, "constant\n");
-	  constant func_const = value_constant(func_init);
-	  /* We should be here only in case of a pointer value rhs, and the value should be 0 */
-	  if (constant_int_p(func_const))
-	    {
-	      if (constant_int(func_const) == 0)
-		{
-		  *ci = make_cell_interpretation_value_of();
-		  cell path = make_null_pointer_value_cell();
-		  /* use approximation_must to be consistent with effects, should be approximation_exact */
-		  eff = make_effect(path, make_action_read_memory(), make_approximation_must(), make_descriptor_none());
-		}
-	      else
-		pips_internal_error("unexpected integer constant value\n", entity_name(func));
-	    }
-	  else
-	    pips_internal_error("unexpected constant case\n", entity_name(func));
-	  break;
-	    
-	case is_value_unknown:
-	  pips_internal_error("unknown function %s\n", entity_name(func));
-	    
-	default:
-	  pips_internal_error("unknown tag %d\n", t);
-	  break;
-	}
-    }
-  return eff;
+  if (! effect_undefined_p(pv_res->result_path)) 
+    free_effect(pv_res->result_path);
+  if (!cell_interpretation_undefined_p(pv_res->result_path_interpretation))
+    free_cell_interpretation(pv_res->result_path_interpretation);
 }
 
-static 
-effect expression_to_interpreted_path(expression exp, cell_interpretation * ci, 
-				      pv_context * ctxt)
+void print_pv_results(pv_results pv_res)
 {
-  effect eff = effect_undefined;
-  *ci = cell_interpretation_undefined;
-
-  if (expression_undefined_p(exp))
+  fprintf(stderr, "l_out = \n");
+  print_pointer_values(pv_res.l_out);
+  if (effect_undefined_p(pv_res.result_path))
+    fprintf(stderr, "result_path is undefined \n");
+  else 
     {
-      eff = make_effect(make_undefined_pointer_value_cell(), 
-			make_action_write_memory(), 
-			make_approximation_must(), 
-			make_descriptor_none());  
-      *ci = make_cell_interpretation_value_of();
+      fprintf(stderr, "result_path is %s: \n", 
+	      cell_interpretation_value_of_p(pv_res.result_path_interpretation)
+	      ? "value of" : "address of");
+      (*effect_prettyprint_func)(pv_res.result_path);
     }
-  else
-    {
-      pips_debug(1, "begin with_expression : %s\n", 
-		 words_to_string(words_expression(exp,NIL)));
-
-      syntax exp_syntax = expression_syntax(exp);
-
-      switch(syntax_tag(exp_syntax))
-	{
-	case is_syntax_reference:
-	  pips_debug(5, "reference case\n");
-	  reference exp_ref = syntax_reference(exp_syntax);
-	  if (same_string_p(entity_local_name(reference_variable(exp_ref)), "NULL"))
-	    {
-	      *ci = make_cell_interpretation_value_of();
-	      cell path = make_null_pointer_value_cell();
-	      /* use approximation_must to be consistent with effects, should be approximation_exact */
-	      eff = make_effect(path, make_action_read_memory(), make_approximation_must(), make_descriptor_none());
-	    }
-	  else
-	    {
-	      /* this function name should be stored in ctxt*/
-	      eff = (*reference_to_effect_func)(copy_reference(exp_ref), 
-						make_action_write_memory(), false);
-	      *ci = make_cell_interpretation_value_of();
-	    }
-	  break;
-
-	case is_syntax_range:
-	  pips_debug(5, "range case\n");
-	  pips_internal_error("not yet implemented\n");
-	  break;
-
-	case is_syntax_call:
-	  pips_debug(5, "call case\n");
-	  eff = call_to_interpreted_path(syntax_call(exp_syntax), ci, ctxt);
-	  break;
-
-	case is_syntax_cast:
-	  pips_debug(5, "cast case\n");
-	  eff = expression_to_interpreted_path(cast_expression(syntax_cast(exp_syntax)), 
-					       ci, ctxt);
-	  break;
-
-	case is_syntax_sizeofexpression:
-	  pips_debug(5, "sizeof case\n");
-	  pips_internal_error("sizeof not expected\n");
-	  break;
-    
-	case is_syntax_subscript:
-	  pips_debug(5, "subscript case\n");
-	  subscript sub = syntax_subscript(exp_syntax);
-	  eff = expression_to_interpreted_path(subscript_array(sub), ci, ctxt);
-
-	  FOREACH(EXPRESSION, sub_ind_exp, subscript_indices(sub))
-	    {
-	      (*effect_add_expression_dimension_func)(eff, sub_ind_exp);
-	    }
-	  list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &eff, true);
-	  *ci = make_cell_interpretation_value_of();
-	  gen_full_free_list(l_tmp);	
-	  break;
-
-	case is_syntax_application:
-	  pips_debug(5, "application case\n");		
-	  pips_internal_error("not yet implemented\n");
-	  break;
-
-	case is_syntax_va_arg:
-	  pips_debug(5, "va_arg case\n");		
-	  pips_internal_error("va_arg not expected\n");
-	  break;
-      
-	default:
-	  pips_internal_error("unexpected tag %d\n", syntax_tag(exp_syntax));
-	}
-    }
-  pips_debug_effect(2, "returning path :",eff);
-  pips_debug(2, "with %s interpretation\n", 
-	     cell_interpretation_value_of_p(*ci)? "value_of": "address_of");
-  pips_debug(1,"end\n");
-  return eff;
 }
 
 
@@ -413,16 +207,16 @@ static
 list unstructured_to_post_pv(unstructured u, list l_in, pv_context *ctxt);
 
 static
-list expression_to_post_pv(expression exp, list l_in, pv_context *ctxt);
+void expression_to_post_pv(expression exp, list l_in, pv_results *pv_res, pv_context *ctxt);
 
 static
-list call_to_post_pv(call c, list l_in, pv_context *ctxt);
+void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt);
 
 static
-list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ctxt);
+void intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results *pv_res, pv_context *ctxt);
 
 static 
-list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context *ctxt);
+void assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_results *pv_res, pv_context *ctxt);
 
 
 
@@ -552,13 +346,14 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 	}
     }
 
-  l_out = assignment_to_post_pv(lhs_exp, rhs_exp, l_in, ctxt);
-  
+  pv_results pv_res = make_pv_results();
+  assignment_to_post_pv(lhs_exp, rhs_exp, l_in, &pv_res, ctxt);
+  l_out = pv_res.l_out;
+  free_pv_results_path(&pv_res);
+
   free_expression(lhs_exp);
   if (free_rhs_exp) free_expression(rhs_exp);
   
-
-
   pips_debug_pvs(2, "returning: ", l_out);
   pips_debug(1, "end\n");
   return (l_out);
@@ -591,10 +386,20 @@ list instruction_to_post_pv(instruction inst, list l_in, pv_context *ctxt)
       l_out = unstructured_to_post_pv(instruction_unstructured(inst), l_in, ctxt);
       break;
     case is_instruction_expression:
-      l_out = expression_to_post_pv(instruction_expression(inst), l_in, ctxt);
+      {
+	pv_results pv_res = make_pv_results();
+	expression_to_post_pv(instruction_expression(inst), l_in, &pv_res, ctxt);
+	l_out = pv_res.l_out;
+	free_pv_results_path(&pv_res);
+      }
       break;
     case is_instruction_call:
-      l_out = call_to_post_pv(instruction_call(inst), l_in, ctxt);
+      {
+	pv_results pv_res = make_pv_results();
+	call_to_post_pv(instruction_call(inst), l_in, &pv_res, ctxt);
+	l_out = pv_res.l_out;
+	free_pv_results_path(&pv_res);
+      }
       break;
     case is_instruction_goto:
       pips_internal_error("unexpected goto in pointer values analyses\n");
@@ -621,12 +426,17 @@ list test_to_post_pv(test t, list l_in, pv_context *ctxt)
   statement t_true = test_true(t);
   statement t_false = test_false(t);
 
-  list l_in_branches = expression_to_post_pv(t_cond, l_in, ctxt);
+  pv_results pv_res = make_pv_results();
+  expression_to_post_pv(t_cond, l_in, &pv_res, ctxt);
+
+  list l_in_branches = pv_res.l_out;
   
-  list l_out_true = statement_to_post_pv(t_true, l_in_branches, ctxt);
+  list l_out_true = statement_to_post_pv(t_true, gen_full_copy_list(l_in_branches), ctxt);
   list l_out_false = statement_to_post_pv(t_false, l_in_branches, ctxt);
 
   l_out = (*ctxt->pvs_may_union_func)(l_out_true, l_out_false);
+
+  free_pv_results_path(&pv_res);
 
   pips_debug_pvs(2, "returning: ", l_out);
   pips_debug(1, "end\n");
@@ -677,63 +487,106 @@ list unstructured_to_post_pv(unstructured u, list l_in, pv_context *ctxt)
 }
 
 static
-list expression_to_post_pv(expression exp, list l_in, pv_context *ctxt)
+void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
-  list l_out = NIL;
-  pips_debug(1, "begin\n");
-  syntax s = expression_syntax(exp);
-
-  switch(syntax_tag(s))
+  if (expression_undefined_p(exp))
     {
-    case is_syntax_reference:
-      pips_internal_error("not yet implemented\n");
-      break;
-    case is_syntax_range:
-      pips_internal_error("not yet implemented\n");
-      break;
-    case is_syntax_call:
-      {
-	l_out = call_to_post_pv(syntax_call(s), l_in, ctxt);
-	break;
-      }
-    case is_syntax_cast:
-      {
-	pips_internal_error("not yet implemented\n");
-	break;
-      }
-    case is_syntax_sizeofexpression:
-      {
-	pips_internal_error("not yet implemented\n");
-	break;
-      }
-    case is_syntax_subscript:
-      {
-	pips_internal_error("not yet implemented\n");
-	break;
-      }
-    case is_syntax_application:
-      pips_internal_error("not yet implemented\n");
-      break;
-    case is_syntax_va_arg:
-      {
-	pips_internal_error("not yet implemented\n");
-	break;
-      }
-    default:
-      pips_internal_error("unexpected tag %d\n", syntax_tag(s));
+      pips_debug(1, "begin for undefined expression, returning undefined pointer_value\n");
+      pv_res->l_out = l_in;
+      pv_res->result_path = make_effect(make_undefined_pointer_value_cell(), 
+					make_action_write_memory(), 
+					make_approximation_must(), 
+					make_descriptor_none());  
+      pv_res->result_path_interpretation = make_cell_interpretation_value_of();
+    }
+  else
+    {
+      pips_debug(1, "begin for expression : %s\n", 
+		 words_to_string(words_expression(exp,NIL)));
+
+      syntax exp_syntax = expression_syntax(exp);
+      
+      switch(syntax_tag(exp_syntax))
+	{
+	case is_syntax_reference:
+	  pips_debug(5, "reference case\n");
+	  reference exp_ref = syntax_reference(exp_syntax);
+	  if (same_string_p(entity_local_name(reference_variable(exp_ref)), "NULL"))
+	    {
+	      pv_res->result_path = make_effect(make_null_pointer_value_cell(), 
+						make_action_read_memory(), 
+						make_approximation_must(), 
+						make_descriptor_none());
+	      pv_res->result_path_interpretation = make_cell_interpretation_value_of();
+	    }
+	  else
+	    {
+	      pv_res->result_path = (*reference_to_effect_func)(copy_reference(exp_ref), 
+								    make_action_write_memory(), 
+								    false);
+	      pv_res->result_path_interpretation = make_cell_interpretation_value_of();
+	
+	    }
+	  /* we assume no effects on aliases due to subscripts evaluations for the moment */
+	  pv_res->l_out = l_in; 
+	  break;
+	case is_syntax_range:
+	  pips_internal_error("not yet implemented\n");
+	  break;
+	case is_syntax_call:
+	  {
+	    call_to_post_pv(syntax_call(exp_syntax), l_in, pv_res, ctxt);
+	    break;
+	  }
+	case is_syntax_cast:
+	  {
+	    expression_to_post_pv(cast_expression(syntax_cast(exp_syntax)), 
+				  l_in, pv_res, ctxt);
+	    pips_debug(5, "cast case\n");
+	  break;
+	  }
+	case is_syntax_sizeofexpression:
+	  {
+	    /* we assume no effects on aliases due to sizeof argument expression for the moment */
+	    pv_res->l_out = l_in; 
+	    break;
+	  }
+	case is_syntax_subscript:
+	  {
+	    pips_debug(5, "subscript case\n");
+	    effect eff;
+	    list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &eff, true);
+	    gen_full_free_list(l_tmp);
+	    pv_res->result_path = eff;
+	    pv_res->result_path_interpretation  = make_cell_interpretation_value_of();
+	    /* we assume no effects on aliases due to subscripts evaluations for the moment */
+	    pv_res->l_out = l_in; 
+	    break;
+	  }
+	case is_syntax_application:
+	  pips_internal_error("not yet implemented\n");
+	  break;
+	case is_syntax_va_arg:
+	  {
+	    pips_internal_error("not yet implemented\n");
+	    break;
+	  }
+	default:
+	  pips_internal_error("unexpected tag %d\n", syntax_tag(exp_syntax));
+	}
     }
 
-  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug_pv_results(1, "end with pv_results =\n", *pv_res);
   pips_debug(1, "end\n");
-  return (l_out);
+  return;
 }
 
 static
-list call_to_post_pv(call c, list l_in, pv_context *ctxt)
+void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 {
-  list l_out = NIL;
   entity func = call_function(c);
-  tag t = value_tag(entity_initial(func));
+  value func_init = entity_initial(func);
+  tag t = value_tag(func_init);
   list func_args = call_arguments(c);
   type func_type = ultimate_type(entity_type(func));
 
@@ -748,23 +601,49 @@ list call_to_post_pv(call c, list l_in, pv_context *ctxt)
 	  /* the expression that denotes the called function and the arguments
 	     are evaluated; then there is a sequence point, and the function is called
 	  */
+	  pips_user_warning("external call, not handled yet, returning all locations effect and assuming no effects on pointer_values \n");
+	  pv_res->l_out = l_in;
+	  pv_res->result_path = make_anywhere_effect(make_action_write_memory());
+	  pv_res->result_path_interpretation = make_cell_interpretation_address_of();		  
 	  
-	  pips_internal_error("not yet implemented\n");
 	  break;
 	  
 	case is_value_intrinsic:
 	  pips_debug(5, "intrinsic function\n");
-	  l_out = intrinsic_to_post_pv(func, func_args, l_in, ctxt);
+	  intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 	  break;
 	  
 	case is_value_symbolic:
 	  pips_debug(5, "symbolic\n");
-	  l_out = l_in;
+	  pv_res->l_out = l_in;
+	  pv_res->result_path = effect_undefined;
+	  pv_res->result_path_interpretation = cell_interpretation_undefined;
 	  break;
 	  
 	case is_value_constant:
 	  pips_debug(5, "constant\n");
-	  l_out = l_in;
+	  pv_res->l_out = l_in;
+
+	  constant func_const = value_constant(func_init);
+	  /* We should be here only in case of a pointer value rhs, and the value should be 0 */
+	  if (constant_int_p(func_const) && (constant_int(func_const) == 0))
+	    {
+	      
+	      /* use approximation_must to be consistent with effects, should be approximation_exact */
+	      pv_res->result_path = make_effect(make_null_pointer_value_cell(), 
+						make_action_read_memory(), 
+						make_approximation_must(), 
+						make_descriptor_none());
+	      pv_res->result_path_interpretation = make_cell_interpretation_value_of();
+	      
+	    }
+	  else
+	    {
+	      pv_res->l_out = l_in;
+	      pv_res->result_path = effect_undefined;
+	      pv_res->result_path_interpretation = cell_interpretation_undefined;
+	    }
+	  
 	  break;
 	  
 	case is_value_unknown:
@@ -789,15 +668,14 @@ list call_to_post_pv(call c, list l_in, pv_context *ctxt)
       pips_internal_error("Unexpected case\n");
     }
 
-  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug_pvs(2, "returning pv_res->l_out: ", pv_res->l_out);
   pips_debug(1, "end\n");
-  return (l_out);
+  return;
 }
 
 static
-list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ctxt)
+void intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
-  list l_out = NIL;
   pips_debug(1, "begin for %s\n", entity_local_name(func));
 
   /* only few intrinsics are currently handled : we should have a way to 
@@ -808,7 +686,7 @@ list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ct
     {
       expression lhs = EXPRESSION(CAR(func_args));
       expression rhs = EXPRESSION(CAR(CDR(func_args)));
-      l_out = assignment_to_post_pv(lhs, rhs, l_in, ctxt);
+      assignment_to_post_pv(lhs, rhs, l_in, pv_res, ctxt);
     }
   else if((ENTITY_STOP_P(func) || ENTITY_ABORT_SYSTEM_P(func)
 	   || ENTITY_EXIT_SYSTEM_P(func))) 
@@ -816,7 +694,9 @@ list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ct
       /* The call is never returned from. No information is available
 	 for the dead code that follows.
       */
-      l_out = NIL;
+      pv_res->l_out = NIL;
+      pv_res->result_path = effect_undefined;
+      pv_res->result_path_interpretation = cell_interpretation_undefined;
     }
   else if (ENTITY_C_RETURN_P(func))
     {
@@ -824,14 +704,59 @@ list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ct
 	 of the argument evaluation on pointer values
 	 eliminate local variables, retrieve the value of the returned pointer if any...
       */
-      l_out = expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, ctxt);
+      expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+    }
+  else if(ENTITY_DEREFERENCING_P(func))
+    {
+      expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+      if (cell_interpretation_value_of_p(pv_res->result_path_interpretation))
+	effect_add_dereferencing_dimension(pv_res->result_path);
+      else
+	cell_interpretation_tag(pv_res->result_path_interpretation) = is_cell_interpretation_value_of;
+      
+    }
+  else if(ENTITY_FIELD_P(func))
+    {
+      expression e2 = EXPRESSION(CAR(CDR(func_args)));
+      syntax s2 = expression_syntax(e2);
+      reference r2 = syntax_reference(s2);
+      entity f = reference_variable(r2);
+
+      pips_assert("e2 is a reference", syntax_reference_p(s2));
+      pips_debug(4, "It's a field operator\n");
+
+      expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+      effect_add_field_dimension(pv_res->result_path,f);
+    }
+  else if(ENTITY_POINT_TO_P(func))
+    {
+      expression e2 = EXPRESSION(CAR(CDR(func_args)));
+      syntax s2 = expression_syntax(e2);
+      entity f;
+
+      pips_assert("e2 is a reference", syntax_reference_p(s2));
+      f = reference_variable(syntax_reference(s2));
+
+      pips_debug(4, "It's a point to operator\n");
+      expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+
+      /* We add a dereferencing */
+      effect_add_dereferencing_dimension(pv_res->result_path);
+
+      /* we add the field dimension */
+      effect_add_field_dimension(pv_res->result_path,f);
+    }
+  else if(ENTITY_ADDRESS_OF_P(func))
+    {
+      expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+      cell_interpretation_tag(pv_res->result_path_interpretation) = is_cell_interpretation_address_of;
     }
   else
     pips_internal_error("not yet implemented\n");
 
-  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug_pv_results(2, "returning: ", *pv_res);
   pips_debug(1, "end\n");
-  return (l_out);
+  return;
 }
 
 
@@ -845,12 +770,14 @@ list intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_context *ct
           computed. 
  */
 static 
-list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context *ctxt) 
+void assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_results *pv_res, pv_context *ctxt) 
 {
   list l_out = NIL;
   list l_aliased = NIL;
   list l_kill = NIL;
   list l_gen = NIL;
+  list l_in_cur = NIL;
+
   effect lhs_eff = effect_undefined;
   cell_interpretation lhs_kind;
   effect rhs_eff = effect_undefined;
@@ -862,20 +789,29 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
   if (type_fundamental_basic_p(lhs_type) || !type_leads_to_pointer_p(lhs_type))
     {
       pips_debug(2, "non-pointer assignment \n");
+      l_in_cur = l_in;
     }
   else
     {
-		    
-
+      
       if(type_variable_p(lhs_type))
 	{
 	  bool anywhere_lhs_p = false;
 
-	  /* first convert the rhs and lhs into memory paths */
-	  rhs_eff = expression_to_interpreted_path(rhs, &rhs_kind, ctxt);
-	  lhs_eff = expression_to_interpreted_path(lhs, &lhs_kind, ctxt);
-	  free_cell_interpretation(lhs_kind);
-      
+	  /* first convert the rhs and lhs into memory paths, rhs is evaluated first */
+	  pv_results lhs_pv_res = make_pv_results();
+	  pv_results rhs_pv_res = make_pv_results();
+
+	  expression_to_post_pv(rhs, l_in, &rhs_pv_res, ctxt);
+	  rhs_eff = rhs_pv_res.result_path;
+	  rhs_kind = rhs_pv_res.result_path_interpretation;
+	  l_in_cur = rhs_pv_res.l_out;
+
+	  expression_to_post_pv(lhs, l_in_cur, &lhs_pv_res, ctxt);
+	  lhs_eff = lhs_pv_res.result_path;
+	  pv_res->result_path = copy_effect(lhs_eff);
+	  pv_res->result_path_interpretation = make_cell_interpretation_value_of();
+
 	  /* we could be more precise here on abstract locations */
 	  if (anywhere_effect_p(lhs_eff))
 	    {
@@ -890,7 +826,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 	      /* simple case first: lhs is a pointer */
 	      if (!anywhere_lhs_p)
 		{
-		  l_aliased = effect_find_aliased_paths_with_pointer_values(lhs_eff, l_in, ctxt);
+		  l_aliased = effect_find_aliased_paths_with_pointer_values(lhs_eff, l_in_cur, ctxt);
 		  if (!ENDP(l_aliased) && anywhere_effect_p(EFFECT(CAR(l_aliased))))
 		    {
 		      pips_debug(3, "anywhere lhs (from aliases)\n");
@@ -902,15 +838,15 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 		      /* if lhs_eff is a may-be-killed, then all aliased effects are also 
 			 may-be-killed effects */
 		      if (effect_may_p(lhs_eff)) effects_to_may_effects(l_aliased);
-		      l_kill = CONS(EFFECT, lhs_eff, l_aliased);
+		      l_kill = CONS(EFFECT, copy_effect(lhs_eff), l_aliased);
 		      pips_debug_effects(2, "pointer case, l_kill = ", l_kill);		      
 		    }
 		}
 
 	      if (anywhere_lhs_p)
 		{
-		  /* we must find in l_in all pointers p and generate p == rhs */
-		  FOREACH(CELL_RELATION, pv_in, l_in)
+		  /* we must find in l_in_cur all pointers p and generate p == rhs */
+		  FOREACH(CELL_RELATION, pv_in, l_in_cur)
 		    {
 		      if (cell_relation_second_address_of_p(pv_in) 
 			  || undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
@@ -937,8 +873,6 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 		      l_gen = CONS(CELL_RELATION, gen_pv, l_gen);	      
 		    }
 		  pips_debug_pvs(2, "l_gen = ", l_gen);
-		  free_effect(rhs_eff);
-		  free_cell_interpretation(rhs_kind);
 		}
 	      
 	    }
@@ -974,7 +908,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 			  while (!anywhere_lhs_p && !ENDP(l_lhs_tmp))
 			    {
 			      effect eff = EFFECT(CAR(l_lhs_tmp));
-			      l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_in, ctxt);
+			      l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_in_cur, ctxt);
 			      if (!ENDP(l_aliased) && anywhere_effect_p(EFFECT(CAR(l_aliased))))
 				{
 				  pips_debug(3, "anywhere lhs (from aliases)\n");
@@ -985,7 +919,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 				  /* we must find in l_in all pointers p and generate p == rhs */
 				  effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
 				  cell_interpretation ci = make_cell_interpretation_address_of();
-				  FOREACH(CELL_RELATION, pv_in, l_in)
+				  FOREACH(CELL_RELATION, pv_in, l_in_cur)
 				    {
 				      if (cell_relation_second_address_of_p(pv_in) 
 					  || undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
@@ -1057,7 +991,7 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 				    }
 				  
 				  /* find aliases */
-				  l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_in, ctxt);
+				  l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_in_cur, ctxt);
 				  if (!ENDP(l_aliased) && anywhere_effect_p(EFFECT(CAR(l_aliased))))
 				    {
 				      pips_debug(3, "anywhere lhs (from aliases)\n");
@@ -1065,10 +999,10 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 				      gen_full_free_list(l_kill);
 				      l_kill = l_aliased;
 				      gen_full_free_list(l_gen);
-				      /* we must find in l_in all pointers p and generate p == rhs */
+				      /* we must find in l_in_cur all pointers p and generate p == rhs */
 				      effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
 				      cell_interpretation ci = make_cell_interpretation_address_of();
-				      FOREACH(CELL_RELATION, pv_in, l_in)
+				      FOREACH(CELL_RELATION, pv_in, l_in_cur)
 					{
 					  if (cell_relation_second_address_of_p(pv_in) 
 					      || undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
@@ -1120,17 +1054,14 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 			  free_type(rhs_type);
 			}
 		      
-		      free_effect(rhs_eff); 
-		      free_cell_interpretation(rhs_kind);
-
 		    } /* if (!ENDP(l_lhs)) */
 		}
 	      else
 		{
-		  /* we must find in l_in all pointers p and generate p == &*anywhere* */
+		  /* we must find in l_in_cur all pointers p and generate p == &*anywhere* */
 		  effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
 		  cell_interpretation ci = make_cell_interpretation_address_of();
-		  FOREACH(CELL_RELATION, pv_in, l_in)
+		  FOREACH(CELL_RELATION, pv_in, l_in_cur)
 		    {
 		      if (cell_relation_second_address_of_p(pv_in) 
 			  || undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
@@ -1151,7 +1082,8 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
 		}	
 	    }
 
-	  
+	  free_pv_results_path(&lhs_pv_res);
+	  free_pv_results_path(&rhs_pv_res);
 	  
 	} /* if (type_variable_p(lhs_type) */
       else if(type_functional_p(lhs_type))
@@ -1163,19 +1095,18 @@ list assignment_to_post_pv(expression lhs, expression rhs, list l_in, pv_context
     }
 
   /* now take kills into account */
-  l_out = kill_pointer_values(l_in, l_kill, ctxt);
+  l_out = kill_pointer_values(l_in_cur, l_kill, ctxt);
   pips_debug_pvs(2, "l_out_after kill: ", l_out);
 
   /* and add gen */
-  list l_tmp = (*ctxt->pvs_must_union_func)(l_out, l_gen);
-  //gen_full_free_list(l_out);
-  //gen_full_free_list(l_gen);
-  l_out = l_tmp;
-  free_type(lhs_type);
-  pips_debug_pvs(2, "returning: ", l_out);
-  pips_debug(1, "end\n");
-  return (l_out);
-  
+  l_out = (*ctxt->pvs_must_union_func)(l_out, l_gen);
+
+  pv_res->l_out = l_out;
+
+  gen_full_free_list(l_in_cur);
+
+  pips_debug_pv_results(1, "end with pv_res = \n", *pv_res);
+  return;
 }
 
 /* 

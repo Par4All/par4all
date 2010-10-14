@@ -71,8 +71,7 @@ cell_relation make_simple_pv_from_simple_effects(effect lhs_eff, effect rhs_eff,
 
   if (t == is_approximation_must) t = is_approximation_exact;
   
-  cell lhs_c = effect_cell(lhs_eff);
-  lhs_c = make_cell(is_cell_reference, copy_reference(effect_any_reference(lhs_eff)));
+  cell lhs_c = make_cell(is_cell_reference, copy_reference(effect_any_reference(lhs_eff)));
 
 
   cell rhs_c = effect_cell(rhs_eff);
@@ -140,17 +139,27 @@ list kill_pointer_values(list /* of cell_relations */ l_in,
 			 list /* of effects */ l_kill,
 			 pv_context * ctxt)
 {
-  list l_cur = l_in;
+  list l_res = NIL;
   pips_debug_pvs(5, "l_in = ", l_in);
   pips_debug_effects(5, "l_kill = ", l_kill);
   
-  FOREACH(EFFECT, eff_kill, l_kill)
+  if (ENDP(l_kill))
     {
-      l_cur = kill_pointer_value(eff_kill, l_cur, ctxt); 
+      l_res = gen_full_copy_list(l_in);
+    }
+  else
+    {
+      l_res = l_in;
+      FOREACH(EFFECT, eff_kill, l_kill)
+	{
+	  list l_cur = kill_pointer_value(eff_kill, l_res, ctxt); 
+	  if (l_res != l_in) gen_full_free_list(l_res);
+	  l_res = l_cur;
+	}
     }
 
-  pips_debug_pvs(5, "returning : ", l_cur);
-  return l_cur;
+  pips_debug_pvs(5, "returning : ", l_res);
+  return l_res;
 }
 
 
