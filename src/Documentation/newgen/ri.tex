@@ -299,7 +299,7 @@ value names used in the semantics analysis. Note the use of star,
 \verb+*+, to avoid name collision with user defined name.
 
 To sum up, an entity name is unique whithin an application and known
-internally as a \emph{global} name. It is made of a \emph{local} name
+internally by its \emph{global} name. It is made of a \emph{local} name
 and a \emph{module} name. The local name contains the user source name.
 
 Several other tricks are used to store information in local names. To spot
@@ -837,6 +837,23 @@ initiale contenue dans le sous-domaine \verb/constant/. Le sous-domaine
 source fidèle.
 \end{comment}
 
+\subsubsection{Program Variables}
+
+Program variables are entities with specific fields, but they must
+also be declared.
+
+Fortran variables are only declared in the declaration field of data
+structure \verb/code/.
+
+A C variable is supposed to be declared in one declaration statement,
+in its own block and in the declaration field of \verb/code/. These
+three declarations have to be kept consistent, which is a pain, but
+each of the declarations is useful at a different time: prettyprint of
+source code, block exit, and function exit respectively. The
+consistency check is not part of Newgen.
+
+
+
 \subsubsection{Constant Value}
 \label{subsubsection-constant}
 \index{Constant}\index{DATA}\index{PARAMETER}
@@ -1099,24 +1116,32 @@ information of this kind is needed, it should be attached to the first
 statement of the sequence or to a CONTINUE (for an empty sequence)
 instead.
 
-Member \texttt{declarations} is used to declare local variables. If
+Member \texttt{declarations} is used in C to declare local variables. If
 the instruction is a block, the declarations are local to the
-block. If the instruction is a CONTINUE (i.e. the predicate
-\verb/declaration_statement_p/holds true), then the declared variables
-are declared till the end of the current block. The variables declared
-in a CONTINUE statement are also declared at the enclosing block
-level. They are also declared in the symbol table, in the
-\verb/declarations/ field of \verb/code/. The prettyprinter only takes
-into account the CONTINUE statements. So implicitly declared variables
-and functions, such as functions returning an \verb/int/ in C, only
-appear at the block level. Other statements, that are neither a block
-nor a CONTINUE, cannot have declarations.
+block. If the instruction is a \verb/CONTINUE/, or better if the
+predicate \verb/declaration_statement_p/holds true, then the declared
+variables are declared till the end of the current block. The
+variables declared in a CONTINUE statement are also declared at the
+directly enclosing block level. They are also declared in the symbol
+table, in the \verb/declarations/ field of \verb/code/. The
+prettyprinter only takes into account the \verb/CONTINUE/ or
+declaration statements. So implicitly declared variables and
+functions, such as functions returning an \verb/int/ in C, only appear
+at the block level. Other statements, that are neither a block nor a
+declaration statement, cannot have declarations. This is not enforced
+by Newgen. To sum up, a C program variable is declared three times in C:
+in the declaration field of code, in the block enclosing its
+declaration and in a declaration statement.
 
 Note that local variables declared in a loop as \verb/loop_locals/ are
 local to the loop body. This seems redundant with
 \verb/statement_declarations/, but making it obsolete would require a
 refactoring of the use-def chains, dependence graph and
-parallelization algorithms.
+parallelization algorithms. Also, the semantics is slightly different
+and there are rationals\footnote{FI: I do not remember them all and I
+  do not know where it is explained.} to preserve this local field in
+loops. Among them, the last value may escape the loop, the first value
+may be imported.
 
 Member \texttt{decls\_text} can be used to keep track to the exact text
 used to declare variables. This field is not currently used.
