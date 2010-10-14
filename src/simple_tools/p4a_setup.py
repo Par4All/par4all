@@ -101,7 +101,9 @@ def add_module_options(parser):
 
     global default_pips_conf_opts
     group.add_option("--pips-conf-opts", "--pips-conf-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts))
+        help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts) +
+                     ". Setting this option will reset the default value. Note that several flags can be set like this : " +
+                     ' --pips-conf-opts "--enable-tpips --enable-pyps --enable-doc"')
 
     group.add_option("--make-opts", "--make-flags", "-m", metavar = "OPTS", action = "append", default = [],
         help = "Specify global make opts.")
@@ -151,7 +153,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
         run([ "autoreconf", "--install" ], working_dir = package_dir)
         print package_dir
         #~ if dest_dir:
-            #~ configure_opts += [ "DESTDIR=" + dest_dir ]
+            #~ configure_opts.append ("DESTDIR=" + dest_dir)
         # Call configure to generate the Makefiles.
         print build_dir
         run([ configure_script ] + configure_opts, working_dir = build_dir)
@@ -386,17 +388,17 @@ def main(options, args = []):
     # Global configure flags:
     configure_opts = [ "--prefix=" + prefix ]
     if options.configure_opts:
-        configure_opts += options.configure_opts
+        configure_opts.extend(options.configure_opts)
     else:
         if options.debug:
-            configure_opts += default_debug_configure_opts
+            configure_opts.extend(default_debug_configure_opts)
         else:
-            configure_opts += default_configure_opts
+            configure_opts.extend(default_configure_opts)
 
     # Global make flags:
     make_opts = []
     if options.make_opts:
-        make_opts.append(options.make_opts)
+        make_opts.extend(options.make_opts)
     if options.jobs:
         make_opts.append("-j" + options.jobs)
 
@@ -421,10 +423,10 @@ def main(options, args = []):
 
         polylib_conf_opts = configure_opts
         if options.polylib_conf_opts:
-            polylib_conf_opts.append(options.polylib_conf_opts)
+            polylib_conf_opts.extend(options.polylib_conf_opts)
         polylib_make_opts = make_opts
         if options.polylib_make_opts:
-            polylib_make_opts.append(options.polylib_make_opts)
+            polylib_make_opts.extend(options.polylib_make_opts)
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir,
@@ -433,13 +435,13 @@ def main(options, args = []):
     ##############################
 
     # This was used for testing with DESTDIR...
-    configure_opts += [
-        #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
-        #'POLYLIB64_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lpolylib64"',
-        #'CFLAGS="-g -O2 -I' + os.path.join(install_dir, "include") + '"',
-        #'CPPFLAGS="' + '-I' + os.path.join(install_dir, "include") + '"',
-        #'LDFLAGS="-Wl,-z,defs -L' + os.path.join(install_dir, "lib") + '"'
-        ]
+    #configure_opts.extend ([
+    #'POLYLIB64_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
+    #'POLYLIB64_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lpolylib64"',
+    #'CFLAGS="-g -O2 -I' + os.path.join(install_dir, "include") + '"',
+    #'CPPFLAGS="' + '-I' + os.path.join(install_dir, "include") + '"',
+    #'LDFLAGS="-Wl,-z,defs -L' + os.path.join(install_dir, "lib") + '"'
+    #])
 
     ############################## newgen
 
@@ -463,10 +465,10 @@ def main(options, args = []):
 
         newgen_conf_opts = configure_opts
         if options.newgen_conf_opts:
-            newgen_conf_opts.append(options.newgen_conf_opts)
+            newgen_conf_opts.extend(options.newgen_conf_opts)
         newgen_make_opts = make_opts
         if options.newgen_make_opts:
-            newgen_make_opts.append(options.newgen_make_opts)
+            newgen_make_opts.extend(options.newgen_make_opts)
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir,
@@ -475,9 +477,9 @@ def main(options, args = []):
     ##############################
 
     # This was used for testing with DESTDIR...
-    #configure_opts += [ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
-    #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ]
-    configure_opts += [ "PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")) ]
+    #configure_opts.extend ([ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
+    #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ])
+    configure_opts.append ("PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")))
 
     ############################## linear
 
@@ -501,10 +503,10 @@ def main(options, args = []):
         linear_conf_opts = configure_opts
 
         if options.linear_conf_opts:
-            linear_conf_opts.append(options.linear_conf_opts)
+            linear_conf_opts.extend(options.linear_conf_opts)
         linear_make_opts = make_opts
         if options.linear_make_opts:
-            linear_make_opts.append(options.linear_make_opts)
+            linear_make_opts.extend(options.linear_make_opts)
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir,
@@ -513,10 +515,10 @@ def main(options, args = []):
     ##############################
 
     # This was used for testing with DESTDIR...
-    #configure_opts += [ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
-    #    'LINEARLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -llinearlibs"' ]
-    #~ configure_opts += [ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
-        #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ]
+    #configure_opts.extend([ 'LINEARLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + ' -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"',
+    #    'LINEARLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -llinearlibs"' ])
+    #~ configure_opts.extend([ 'PATH="' + os.path.join(install_dir, "bin") + ':' + env("PATH") + '"',
+        #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ])
 
     # Update the PATH. Needed because PIPS relies on utilities built by newgen.
     add_to_path(os.path.join(install_dir, "bin"))
@@ -575,13 +577,13 @@ def main(options, args = []):
 
         pips_conf_opts = configure_opts
         if options.pips_conf_opts:
-            pips_conf_opts.append(options.pips_conf_opts)
+            pips_conf_opts.extend(options.pips_conf_opts)
         else:
             global default_pips_conf_opts
-            pips_conf_opts += default_pips_conf_opts
+            pips_conf_opts.extend(default_pips_conf_opts)
         pips_make_opts = make_opts
         if options.pips_make_opts:
-            pips_make_opts.append(options.pips_make_opts)
+            pips_make_opts.extend(options.pips_make_opts)
 
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
