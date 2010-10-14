@@ -104,7 +104,7 @@ mail-diff-validate: new-validate
 	diff=$$(grep '^ \* status changes: ' SUMMARY.short | grep -v 'none') ; \
 	[ "$$diff" ] && \
 	   Mail -a "Reply-To: $(EMAIL)" \
-		-s "$(shell tail -1 SUMMARY.summary)" \
+		-s "$(shell tail -1 SUMMARY.short)" \
 			$(EMAIL) < SUMMARY.short
 
 SUMUP	= pips_validation_summary.pl
