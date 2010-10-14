@@ -8728,9 +8728,14 @@ expression_substitution > MODULE.code
         < ALL.code
 \end{PipsMake}
 
-Set \PipsPropRef{RELAX_FLOAT_COMMUTATIVITY} to TRUE if you wan to consider some floating point operation as commutative
-\begin{PipsProp}{RELAX_FLOAT_COMMUTATIVITY}
-RELAX_FLOAT_COMMUTATIVITY FALSE
+Set \PipsPropRef{RELAX_FLOAT_ASSOCIATIVITY} to TRUE if you want to
+consider all floating point operations as really
+associative\footnote{Floating point computations are not associative in
+  real hardware because of finite precision and rounding errors. For
+  example $(10^{50} \ominus 10^{-60}) \oplus 1 = 1$ but $10^{50} \oplus
+  (-10^{-60} \oplus 1) = 0$.}:
+\begin{PipsProp}{RELAX_FLOAT_ASSOCIATIVITY}
+RELAX_FLOAT_ASSOCIATIVITY FALSE
 \end{PipsProp}
 
 This property is used to set the one-liner module used during

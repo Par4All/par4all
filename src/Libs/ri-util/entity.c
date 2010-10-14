@@ -286,7 +286,7 @@ bool label_string_defined_in_statement_p(string ls, statement s)
   return defined_p;
 }
 
-/* predicates and functions for entities 
+/* predicates and functions for entities
  */
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
@@ -487,7 +487,7 @@ string entity_name_or_TCST(entity e)
 
 /* See next function! */
 /*
-string 
+string
 entity_relative_name(e)
 entity e;
 {
@@ -496,7 +496,7 @@ entity e;
 
     pips_assert("entity_relative_name", !entity_undefined_p(m));
 
-    s = (strcmp(module_local_name(m), entity_module_name(m)) == 0) ? 
+    s = (strcmp(module_local_name(m), entity_module_name(m)) == 0) ?
 	entity_local_name(e) : entity_name(e) ;
 
     return s;
@@ -615,18 +615,18 @@ bool array_entity_p(entity e)
 }
 
 bool assumed_size_array_p(entity e)
-{  
-  /* return TRUE if e has an assumed-size array declarator  
+{
+  /* return TRUE if e has an assumed-size array declarator
      (the upper bound of the last dimension is equal to * : REAL A(*) )*/
   if (entity_variable_p(e))
     {
-      variable v = type_variable(entity_type(e));   
+      variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
 	{
 	  int length = gen_length(l_dims);
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
-	  if (unbounded_dimension_p(last_dim)) 
+	  if (unbounded_dimension_p(last_dim))
 	    return TRUE;
 	}
     }
@@ -634,19 +634,19 @@ bool assumed_size_array_p(entity e)
 }
 
 bool pointer_type_array_p(entity e)
-{  
-  /* return TRUE if e has a pointer-type array declarator  
+{
+  /* return TRUE if e has a pointer-type array declarator
      (the upper bound of the last dimension is  equal to 1: REAL A(1) )*/
   if (entity_variable_p(e))
     {
-      variable v = type_variable(entity_type(e));   
+      variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
 	{
 	  int length = gen_length(l_dims);
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
 	  expression exp = dimension_upper(last_dim);
-	  if (expression_equal_integer_p(exp,1)) 
+	  if (expression_equal_integer_p(exp,1))
 	    return TRUE;
 	}
     }
@@ -2095,7 +2095,7 @@ entity make_entity_copy_with_new_name(entity e,
 /* FI: it is assumed that thread safe entities are invariant with
    respect to workspaces. Another mechanism will be needed if user
    variables updated within a critical section also are added to the
-   thread safe variable set. 
+   thread safe variable set.
 
    Thread safe entities are supposed to be updated within critical
    sections. Hence their dependence arcs may be ignored during
@@ -2135,7 +2135,7 @@ bool thread_safe_variable_p(entity v)
    rand or malloc. However, there is no useful information to be
    computed about them. Except perhard, the number of frees wrt the
    number of malloc. Hence, they are not taken into account by the
-   semantics analysis. 
+   semantics analysis.
 
    This set may not be a superset of the set of thread-safe variables.
 */
@@ -2232,6 +2232,18 @@ entity operator_neutral_element(entity op)
     return entity_undefined;
 }
 
+
+/* Test if we are allowed to commute operations
+
+   @param[in] c is the operation call
+
+   @return true if we can commute operations
+
+   Note that floating point operations are commutative, but since they are
+   not associative due to rounding error , in a chain of operations, we
+   cannot commute them. Of course, we should test whether an operation is
+   alone or not to see if we are in this case...
+*/
 bool
 commutative_call_p(call c)
 {
@@ -2244,7 +2256,7 @@ commutative_call_p(call c)
         {
             case is_basic_float:
             case is_basic_complex:
-                if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
+                if(!get_bool_property("RELAX_FLOAT_ASSOCIATIVITY"))
                     break;
             case is_basic_logical:
             case is_basic_overloaded:
@@ -2259,6 +2271,7 @@ commutative_call_p(call c)
     }
     return commut_p;
 }
+
 
 /**
  * @brief build a list of expression from a list of entities
@@ -2438,7 +2451,7 @@ list l;
 {
     list l2 = gen_nreverse(gen_copy_seq(l));
     Pbase result = BASE_NULLE;
-	
+
     MAP(ENTITY, e,
     {
 	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
