@@ -54,7 +54,9 @@ class p4a_processor_output(object):
 
 
 class p4a_processor_input(object):
-    "Store options given to the process engine, mainly digested by PyPS"
+    """Store options given to the process engine, mainly digested by PyPS.
+    Some of the options are used during the output file generation.
+    """
     project_name = ""
     accel = False
     cuda = False
@@ -66,6 +68,9 @@ class p4a_processor_input(object):
     files = []
     recover_includes = True
     properties = {}
+    output_dir=None
+    output_suffix=""
+    output_prefix=""
     # To store some arbitrary Python code to be executed inside p4a_process:
     execute_some_python_code_in_process = None
 
@@ -84,6 +89,8 @@ def add_module_options(parser):
 
 
 def process(input):
+    """process the input files with PIPS and return the list ot produced files
+    """
 
     output = p4a_processor_output()
 
@@ -124,7 +131,9 @@ def process(input):
             processor.ompify()
 
         # Write the output files.
-        output.files = processor.save()
+        output.files = processor.save(input.output_dir,
+                                      input.output_prefix,
+                                      input.output_suffix)
 
     except:
         # Get the exception description:
@@ -472,10 +481,20 @@ class p4a_processor(object):
         #~ subprocess.call(args)
 
 
-    def save(self, in_dir = None, prefix = "", suffix = ".p4a"):
+    def save(self, dest_dir = None, prefix = "", suffix = "p4a"):
         """Final post-processing and save the files of the workspace"""
 
         output_files = []
+
+        #Set the suffix if needed to avoid file destruction
+        if (dest_dir == None) and ( prefix == "") and (suffix == ""):
+            suffix = "p4a"
+
+        #append or prepend the . to prefix or suffix
+        if not (suffix == ""):
+            suffix = "." + suffix
+        if not (prefix == ""):
+            prefix = prefix + "."
 
         # Regenerate the sources file in the workspace. Do not generate
         # OpenMP-style output since we have already added OpenMP
@@ -502,8 +521,10 @@ class p4a_processor(object):
                                   '--simple', pips_file ])
 
             # Update the destination directory if one was given:
-            if in_dir:
-                dir = in_dir
+            if dest_dir:
+                dir = dest_dir
+                if not (os.path.isdir(dir)):
+                    os.makedirs (dir)
 
             if prefix is None:
                 prefix = ""
