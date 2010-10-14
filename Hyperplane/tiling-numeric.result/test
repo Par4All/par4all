@@ -273,8 +273,9 @@ C    1<=J, J<=100, 0<=M+1, M<=1}>
 
                      DO N = -1, 1                                       0015
 
-C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=0}>
+C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==K, PHI2==L, I<=PHI1, PHI1<=I+9,
+C    PHI1+9M+9N<=118, J<=PHI2, PHI2<=J+9, PHI2+9M+9N<=118, 1<=I,
+C    I<=100, 1<=J, J<=100, 0<=M+1, M<=1, 0<=N+1, N<=1}>
 
                         A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0016
                      ENDDO
