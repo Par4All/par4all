@@ -46,3 +46,5 @@ FWD_DIRS	= \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu pipslibs scalopes \
 	static_controlize paf-util
+
+FWD_PARALLEL	= 1
