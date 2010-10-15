@@ -644,8 +644,8 @@ bin-unbuild:
 		echo "uninstalling $$F" ; \
 		$(RM) -r $${BIN}/$$F ;\
 	done ;\
-	-test ! -d $${BIN}/$(ARCH) || $(RMDIR) --ignore-fail-on-non-empty $${BIN}/$(ARCH) ;\
-	-test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
+	test ! -d $${BIN}/$(ARCH) || $(RMDIR) --ignore-fail-on-non-empty $${BIN}/$(ARCH) ;\
+	test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
 
 endif # INSTALL_BIN
 
