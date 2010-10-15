@@ -1,0 +1,3 @@
+# $Id$
+PATH = /usr/local/bin:/usr/bin:/bin
+* * * * * /home/fabien/pips_check_compile pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
