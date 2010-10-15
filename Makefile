@@ -27,7 +27,8 @@ clean:
 	$(MAKE) TARGET=. clean-target
 
 # subdirectories to consider
-TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
+TARGET	:= $(shell grep '^[a-zA-Z]' defaults | grep -v "$${PIPS_VALIDATION_SKIP:-keep-all}")
+show-target:; @echo $(TARGET)
 
 .PHONY: clean-target
 clean-target:
