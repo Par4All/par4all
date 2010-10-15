@@ -1,6 +1,7 @@
 echo 'initial exec'
-shell ${PIPS_F77:-f77} chaine01.f && ./a.out
-shell rm a.out
+shell ${PIPS_F77:-f77} -o chaine01.out chaine01.f
+shell ./chaine01.out
+shell rm chaine01.out
 
 delete chaine01
 create chaine01 chaine01.f
@@ -23,8 +24,9 @@ apply UNSPLIT
 close
 
 echo 'optimized exec'
-shell ${PIPS_F77:-f77} chaine01.database/Src/chaine01.f && ./a.out
-shell rm a.out
+shell ${PIPS_F77:-f77} -o chaine01.out chaine01.database/Src/chaine01.f
+shell ./chaine01.out
+shell rm chaine01.out
 
 delete chaine01
 
