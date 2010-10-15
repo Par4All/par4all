@@ -1,5 +1,6 @@
 # $Id$
 PATH = /usr/local/bin:/usr/bin:/bin
+PIPS_VALIDATION_SKIP = Pyps
 PIPS_F77 = gfortran
 PIPS_F90 = gfortran
 * * * * * /home/fabien/pips_check_compile pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
