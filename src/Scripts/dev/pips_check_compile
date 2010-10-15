@@ -25,7 +25,7 @@
 # - designed to be run from cron.
 # - check that pips does still compile.
 # - report is sent by mail if the status changed.
-# - run the validation and send a mail on any changes.
+# - run the validation and send a mail on any changes if third arg.
 # - if there is a persistant LOCK, investigate by hand...
 
 # this script runs every minute on fabien@compiegne
@@ -251,6 +251,7 @@ else
       {
         $nice $make -C $valid parallel-clean
         $nice $make -C $valid EMAIL=$dest mail-diff-validate
+        # cleanup to help next "svn up" run smoothly
         $nice $make -C $valid parallel-clean
       } > out 2> err
     fi
