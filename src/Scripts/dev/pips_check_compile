@@ -134,7 +134,7 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -s "PIPS compilation status is $current" $dest
+  } | mailx -a "Reply-To: $dest" -s "PIPS compilation status is $current" $dest
 
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
