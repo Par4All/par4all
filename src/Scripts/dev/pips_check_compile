@@ -237,6 +237,7 @@ then
     } > out 2> err
   fi
 
+  # the report is delayed so as to keep the lock
   report 'ok' 'ok' 'pips is fine'
 
 else
@@ -257,6 +258,7 @@ else
     fi
   fi
 
+  # the report is delayed so as to keep the lock
   report 'skip' 'unchanged' 'no commit since last check'
 
 fi
