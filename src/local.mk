@@ -32,3 +32,5 @@ FWD_DIRS = \
 #	plint \
 #	janusvalue \
 #	Tests
+
+FWD_PARALLEL	= 1
