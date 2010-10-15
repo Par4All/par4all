@@ -66,7 +66,7 @@ function report()
   test -f STATE && read previous prevcomp < STATE
 
   # log report anyway...
-  echo "$(date +%Y%m%d%H%M%S): $current $compile ($SECONDS seconds) $msg" >> LOG
+  echo "$(date +%Y%m%d%H%M%S): $current $compile (${COMPILE_SECONDS:-$SECONDS} seconds) $msg" >> LOG
 
   # out if locked
   [ $current = 'locked' ] && {
@@ -96,7 +96,8 @@ function report()
     echo new state: $current
     echo new compile: $compile
     echo message: $msg
-    echo run time: $SECONDS
+    echo run time: ${COMPILE_SECONDS:-$SECONDS}
+    echo full time: $SECONDS
 
     # revisions
     echo
@@ -218,11 +219,15 @@ then
   # what about a "timeout"? how to differentiate from a simple failure?
   $nice $make build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
+
+  # record compilation time, for "report"
+  COMPILE_SECONDS=$SECONDS
+
   # check that "tpips" executable is there
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
 
-  # clean up
+  # clean up if no error
   rm -f out err
 
   # run the validation with new tpips
