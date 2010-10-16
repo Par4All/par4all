@@ -15,6 +15,6 @@ export PIPS_CHECK_FORTRAN
 ${pips_version:-pips} \
 	-f syntax_errors.f \
  	syntax_error 
-} 2>&1
+} 2>&1 | sed -e 's/.*Aborted.*/Aborted/'
 
 Delete syntax_error
