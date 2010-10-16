@@ -256,7 +256,7 @@ else
       PATH=$prod/pips/bin:$prod/pips/utils:$PATH
       {
         $nice $make -C $valid parallel-clean
-        $nice $make -C $valid NAME=CHECK EMAIL=$dest mail-diff-validate
+        $nice $make -C $valid VNAME=CHECK EMAIL=$dest mail-diff-validate
         # cleanup to help next "svn up" run smoothly
         $nice $make -C $valid parallel-clean
       } > out 2> err
