@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-from sys import argv
+from sys import argv, stdin
 from re import compile,sub
 from subprocess import Popen, PIPE
 
-fd=file(argv[1])
 pragma=compile(r'#pragma psolve \'([^\']+)\' +\'([^\']+)\'')
 answer=compile(r'\(\%o1\)\s+\[(.*)\]')
 
-for line in fd.readlines():
+for line in stdin.readlines():
 	match = pragma.match(line)
 	if match:
 		poly = match.groups()[0]
