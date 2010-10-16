@@ -116,13 +116,13 @@ class module:
 	def callers(self):
 		"""get module callers as modules"""
 		callers=self._ws.cpypips.get_callers_of(self.name)
-		return modules([ self._ws[name] for name in callers.split(" ") ] if callers else [])
+		return [ self._ws[name] for name in callers.split(" ") ] if callers else []
 
 	@property
 	def callees(self):
 		"""get module callees as modules"""
 		callees=self._ws.cpypips.get_callees_of(self.name)
-		return modules([ self._ws[name] for name in callees.split(" ") ] if callees else [])
+		return [ self._ws[name] for name in callees.split(" ") ] if callees else []
 
 	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
