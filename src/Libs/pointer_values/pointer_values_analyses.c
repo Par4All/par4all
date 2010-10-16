@@ -774,7 +774,7 @@ void assignment_to_post_pv(expression lhs, expression rhs, bool declaration_p,
   list l_in_cur = NIL;
 
   effect lhs_eff = effect_undefined;
-  cell_interpretation lhs_kind;
+  //cell_interpretation lhs_kind;
   effect rhs_eff = effect_undefined;
   cell_interpretation rhs_kind;
   pips_debug(1, "begin\n");
