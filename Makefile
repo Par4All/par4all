@@ -14,6 +14,7 @@ validate-out:; $(MAKE) TEST=out new-validate
 SHELL	= /bin/bash
 FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 ARCH	= $(shell uname -m)
+# if provided, used to start the mail subject line
 VNAME	=
 
 .PHONY: full-clean
@@ -96,9 +97,11 @@ new-validate:
 	$(MAKE) archive
 	$(MAKE) SUMMARY.short
 
+# send the summary by email
 .PHONY: mail-validate
 mail-validate: new-validate
-	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY.short)" \
+	Mail -a "Reply-To: $(EMAIL)" \
+	     -s "$(shell tail -1 SUMMARY.short)" \
 		$(EMAIL) < SUMMARY.short
 
 # send an email only if there were changes
