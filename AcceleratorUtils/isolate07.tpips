@@ -1,7 +1,7 @@
 setenv WS="isolate07"
 setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
-create $WS $WS.c
+create $WS $WS.c include/par4all.c
 
 module lonesome_cowboy
 
@@ -17,9 +17,10 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell sed -i -e '1,/lonesome_cowboy(/ d' $WS.database/Src/$WS.c
 shell cc $WS.c -o $WS.database/Tmp/ref
-shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/candidate
-shell ( test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/candidate` && echo "ok" ) || echo "ko"
+shell cc $WS.database/Src/*.c -o $WS.database/Tmp/candidate
+shell ./$WS.database/Tmp/ref > ./$WS.database/Tmp/ref-out
+shell ./$WS.database/Tmp/candidate > ./$WS.database/Tmp/candidate-out
+shell cmp ./$WS.database/Tmp/candidate-out ./$WS.database/Tmp/ref-out
 
 delete $WS

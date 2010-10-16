@@ -5,9 +5,6 @@ import os,sys
 save_dir="tera.out"
 
 def microcode_normalizer(ws,module):
-	ws.activate("must_regions")
-	ws.activate("transformers_inter_full")
-	ws.set_property(array_priv_false_dep_only=False)
 
 	# remove ifs
 	#module.if_conversion_init()
@@ -29,7 +26,7 @@ def microcode_normalizer(ws,module):
 	#module.display()
 	#module.clean_declarations()
 	#module.display()
-	module.array_to_pointer(convert_parameters="POINTER",flatten_only=True)
+	module.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
 	module.display()
 	module.normalize_microcode()
 	module.display()
@@ -45,6 +42,12 @@ def microcode_normalizer(ws,module):
 
 if __name__ == "__main__":
 	w = workspace(["alphablending.c", "include/par4all.c", "include/terasm.c"], cppflags="-I.")
+	w.activate(module.must_regions)
+	w.activate(module.transformers_inter_full)
+	w.props.ARRAY_PRIV_FALSE_DEP_ONLY=False
+	w.props.CONSTANT_PATH_EFFECTS=False
+	for m in w.fun: m.display(activate="PRINT_CODE_REGIONS")
+
 	m = w["alphablending"]
 	
 	print "tidy the code just in case of"
@@ -75,7 +78,7 @@ if __name__ == "__main__":
 	m.display()
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
-	#m.display(With="PRINT_CODE_PROPER_EFFECTS")
+	#m.display(activate="PRINT_CODE_PROPER_EFFECTS")
 	#m.common_subexpression_elimination(skip_lhs=False)
 	#m.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 	#m.invariant_code_motion(CONSTANT_PATH_EFFECTS=False)
@@ -88,10 +91,11 @@ if __name__ == "__main__":
 	for k in kernels:
 		name=seed+str(nb)
 		nb+=1
+		m.display(activate="PRINT_CODE_REGIONS")
 		m.outline(module_name=name,label=k.label,smart_reference_computation=True,loop_bound_as_parameter=k.loops()[0].label)
 		launchers+=[w[name]]
 	m.display()
-	for l in launchers:l.display(With='PRINT_CODE_REGIONS')
+	for l in launchers:l.display(activate='PRINT_CODE_REGIONS')
 	
 	print "outlining to microcode"
 	microcodes=[]

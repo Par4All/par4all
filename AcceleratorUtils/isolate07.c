@@ -20,4 +20,5 @@ isolate:
 int main(int argv, char *argc[])
 {
     lonesome_cowboy();
+    return 0;
 }

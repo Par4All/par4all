@@ -34,7 +34,7 @@ echo Microcode After array conversion
 echo
 
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
-setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
 apply ARRAY_TO_POINTER
 display PRINTED_FILE
 apply PARTIAL_EVAL

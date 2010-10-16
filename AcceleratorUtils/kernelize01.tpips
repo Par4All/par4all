@@ -1,8 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete kernelize01
-create kernelize01 kernelize01.c include/load.c
+create kernelize01 kernelize01.c include/par4all.c
 
-display PRINTED_FILE[memload]
 module foo
 
 echo
@@ -20,14 +19,11 @@ setproperty KERNELIZE_NBNODES 10
 setproperty KERNELIZE_KERNEL_NAME "kernel"
 setproperty KERNELIZE_HOST_CALL_NAME "run_kernel"
 apply KERNELIZE
+
 display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
 
-setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
-setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
-setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
-setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
 apply KERNEL_LOAD_STORE[run_kernel]
 display PRINTED_FILE
 
