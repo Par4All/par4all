@@ -124,7 +124,6 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
     }
 }
 
-/*
 static expression entity_to_address(entity e) {
     size_t n = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(e)))));
     list indices = NIL;
@@ -132,7 +131,7 @@ static expression entity_to_address(entity e) {
     reference r = make_reference(e,indices);
     return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
 }
-*/
+
 /** 
  * converts dimensions to a dma call from a memory @a from to another memory @a to
  * 
@@ -253,7 +252,7 @@ call dimensions_to_dma(entity from,
                   offsets=CONS(EXPRESSION,e,offsets);
               offsets=gen_nreverse(offsets);
 
-              expression source = entity_to_expression(from);
+              expression source = entity_to_address(from);
               if(scalar_entity)
                   source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
               args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
