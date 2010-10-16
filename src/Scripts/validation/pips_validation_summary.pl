@@ -188,6 +188,7 @@ print "directory                   cases  bads success (F+C+T|K) changes...\n";
 for my $dir (sort keys %d)
 {
   my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
+  # dircount may be null if all tests are kept out
   my $dircount = $d{$dir}{passed} + $failures;
 
   my $success_rate = 100;
@@ -195,7 +196,9 @@ for my $dir (sort keys %d)
 
   printf "%-28s %4d  %4d  %5.1f%%", $dir, $dircount, $failures, $success_rate;
 
-  if ($success_rate!=100.0 or (exists $diff{$dir} and $differential))
+  # show some details
+  if ($success_rate!=100.0 or $d{$dir}{keptout} or
+      (exists $diff{$dir} and $differential))
   {
     printf " (%d+%d+%d|%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout}, $d{$dir}{keptout};
