@@ -2330,7 +2330,7 @@ entity find_enum_of_member(entity m)
     fprintf(stderr, "\"\n");
   }
 
-  MAP(ENTITY, e, {
+  FOREACH(ENTITY, e,fdl) {
     if(entity_enum_p(e)) {
       list ml = type_enum(entity_type(e));
 
@@ -2351,7 +2351,7 @@ entity find_enum_of_member(entity m)
 	}
       }
     }
-  }, fdl);
+  }
 
   pips_assert("enum entity is found", !entity_undefined_p(ee));
   gen_free_list(fdl);
@@ -2423,16 +2423,15 @@ list extract_references_from_declarations(list decls)
   list arrays = NIL;
   deux_listes lref = { NIL, NIL };
 
-  MAPL(le,{
-    entity e= ENTITY(CAR(le));
+  FOREACH(ENTITY,e,decls) {
     type t = entity_type(e);
 
     if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
       arrays = CONS(VARIABLE,type_variable(t), arrays);
-  }, decls );
+  }
 
-  MAPL(array,
-  { variable v = VARIABLE(CAR(array));
+  FOREACH(VARIABLE,v,arrays)
+  {
   list ldim = variable_dimensions(v);
   while (!ENDP(ldim))
     {
@@ -2441,7 +2440,7 @@ list extract_references_from_declarations(list decls)
       ldim=CDR(ldim);
 
     }
-  }, arrays);
+  }
   gen_free_list(lref.le);
 
   return(lref.lr);
@@ -2451,15 +2450,175 @@ list l;
 {
     list l2 = gen_nreverse(gen_copy_seq(l));
     Pbase result = BASE_NULLE;
-
-    MAP(ENTITY, e,
+	
+    FOREACH(ENTITY, e, l2)
     {
 	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
 	new->succ = result;
 	result = new;
-    },
-	l2);
+    }
 
     gen_free_list(l2);
     return(result);
+}
+/**
+ * @name declarations updater
+ * @{ */
+
+/**
+ * helper looking in a reference for referenced entities
+ *
+ * @param r reference to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_reference_walker(reference r, set re)
+{
+  entity e = reference_variable(r);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a call for referenced entities
+ *
+ * @param c call to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_call_walker(call c, set re)
+{
+  entity e = call_function(c);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a loop for referenced entities
+ *
+ * @param l loop to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_loop_walker(loop l, set re)
+{
+  entity e = loop_index(l);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+
+/**
+ * helper looking in a list for referenced entities
+ *
+ * @param l list to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_list_walker(list l, set re)
+{
+  FOREACH(ENTITY,e,l)
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+      set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a ram for referenced entities
+ *
+ * @param r ram to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_ram_walker(ram r, set re)
+{
+  statement_clean_declarations_list_walker(ram_shared(r),re);
+}
+
+/**
+ * helper looking in an area for referenced entities
+ *
+ * @param a area to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_area_walker(area a, set re)
+{
+    statement_clean_declarations_list_walker(area_layout(a),re);
+}
+
+/**
+ * helper diving into an entity to find referenced entities
+ *
+ * @param e entity to dive into
+ * @param re set to fill
+ *
+ */
+void entity_get_referenced_entities(entity e, set re)
+{
+  /*if(entity_variable_p(e))*/ {
+    gen_context_multi_recurse(entity_type(e),re,
+			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			      call_domain,gen_true,statement_clean_declarations_call_walker,
+			      NULL
+			      );
+    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+    if( !value_undefined_p(entity_initial(e) ) ) {
+      gen_context_multi_recurse(entity_initial(e),re,
+				call_domain,gen_true,statement_clean_declarations_call_walker,
+				reference_domain,gen_true,statement_clean_declarations_reference_walker,
+				area_domain,gen_true,statement_clean_declarations_area_walker,
+				ram_domain,gen_true,statement_clean_declarations_ram_walker,
+				NULL);
+    }
+  }
+}
+
+/**
+ * helper iterating over statement declaration to find referenced entities
+ *
+ * @param s statement to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_statement_walker(statement s, set re)
+{
+  FOREACH(ENTITY,e,statement_declarations(s))
+    entity_get_referenced_entities(e,re);
+}
+
+
+/**
+ * retrieves the set of entites used in elem
+ * beware that this entites may be formal parameters, functions etc
+ * so please filter this set depending on your need
+ *
+ * @param elem  element to check (any gen_recursifiable type is allowded)
+ *
+ * @return set of referenced entities
+ *
+ * FI: should be moved into ri-util?
+ */
+set get_referenced_entities(void* elem)
+{
+  set referenced_entities = set_make(set_pointer);
+
+  /* if s is an entity it self, add it */
+  if(INSTANCE_OF(entity,(gen_chunkp)elem))
+      set_add_element(referenced_entities,referenced_entities,elem);
+
+  /* gather entities from s*/
+  gen_context_multi_recurse(elem,referenced_entities,
+			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
+			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			    call_domain,gen_true,statement_clean_declarations_call_walker,
+			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
+			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
+			    NULL);
+
+  /* gather all entities referenced by referenced entities */
+  set other_referenced_entities = set_make(set_pointer);
+  SET_FOREACH(entity,e,referenced_entities)
+    {
+      entity_get_referenced_entities(e,other_referenced_entities);
+    }
+
+  /* merge results */
+  set_union(referenced_entities,other_referenced_entities,referenced_entities);
+  set_free(other_referenced_entities);
+
+  return referenced_entities;
 }
