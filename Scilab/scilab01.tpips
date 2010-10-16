@@ -1,5 +1,7 @@
 setenv WS scilab01
 
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create $WS $WS.c
 
 display PRINTED_FILE
@@ -9,6 +11,14 @@ apply RESTRUCTURE_CONTROL
 display PRINTED_FILE
 
 apply FLATTEN_CODE
+
+display PRINTED_FILE
+
+#apply FORWARD_SUBSTITUTE
+
+#display PRINTED_FILE
+
+apply ICM
 
 display PRINTED_FILE
 
