@@ -14,7 +14,7 @@ my $summary = $ARGV[0];
 my $differential = @ARGV==2;
 
 # all possible validation status
-my $status = 'failed|changed|passed|timeout';
+my $status = 'failed|changed|passed|timeout|keptout';
 
 # other miscellaneous issues
 my $others =
@@ -136,7 +136,7 @@ for my $c (sort keys %new)
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
 my $count = $not_passed + $n{passed};
 my $warned = $n{skipped} + $n{orphan} + $n{missing} +
-    $n{'multi-script'} + $n{'multi-source'};
+    $n{'multi-script'} + $n{'multi-source'} + $n{keptout};
 
 # status change summary
 my $status_changes = '';
@@ -158,11 +158,12 @@ print
 
 print
   " * status changes:$status_changes\n" .
-  "   .=None P=passed F=failed C=changed T=timeout\n"
+  "   .=None P=passed F=failed C=changed T=timeout K=keptout\n"
     if $status_changes;
 
 print
   "number of warnings: $warned\n" .
+  " * keptout: $n{keptout} (cannot run test)\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
@@ -176,27 +177,28 @@ print
     "(directory without makefile or maybe with makefile errors)\n"
     if $n{'broken-directory'};
 
-printf "success rate: %5.1f%%\n", $n{passed}*100.0/$count;
+my $rate = 100;
+$rate = $n{passed}*100.0/$count if $count;
+printf "success rate: %5.1f%%\n", $rate;
 print "elapsed time: $delay\n" if defined $delay;
 print "\n";
 
 # print detailed per-directory summary
-print "directory                   cases  bads success (F+C+T) changes...\n";
+print "directory                   cases  bads success (F+C+T+K) changes...\n";
 for my $dir (sort keys %d)
 {
   my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
   my $dircount = $d{$dir}{passed} + $failures;
 
-  printf "%-28s skipped?\n", $dir and next unless $dircount;
-
-  my $success_rate = $d{$dir}{passed}*100.0/$dircount;
+  my $success_rate = 100;
+  $success_rate = $d{$dir}{passed}*100.0/$dircount if $dircount;
 
   printf "%-28s %4d  %4d  %5.1f%%", $dir, $dircount, $failures, $success_rate;
 
   if ($success_rate!=100.0 or (exists $diff{$dir} and $differential))
   {
-    printf " (%d+%d+%d)",
-      $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout};
+    printf " (%d+%d+%d+%d)",
+      $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout}, $d{$dir}{keptout};
 
     if ($differential) {
       for my $change (sort keys %{$diff{$dir}}) {
