@@ -652,13 +652,13 @@ class workspace(object):
 			self.__dict__['wp'] = wp
 
 		def __setattr__(self, name, val):
-			if name in self.all:
+			if name.upper() in self.all:
 				pypsutils._set_property(self.wp,name,val)
 			else:
 				raise NameError("Unknow property : " + name)
 
 		def __getattr__(self, name):
-			if name in self.all:
+			if name.upper() in self.all:
 				return pypsutils.get_property(self.wp,name)
 			else:
 				raise NameError("Unknow property : " + name)
