@@ -151,6 +151,7 @@ class LoopGenerator(DummyGenerator):
 					loops+=loop.loops()
 		return mutations
 
+
 class ParallelLoopGenerator(Generator):
 	"""Generates a loop parallelization Transformation"""
 	def generate(self, individual):
