@@ -212,16 +212,42 @@ call dimensions_to_dma(entity from,
                           SizeOfDimension(d));
                   transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
               }
+              list/* of expressions*/ from_dims = NIL;
+              FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
+                  expression tmp=
+                      MakeBinaryCall(
+                          entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                          make_expression(
+                              make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))),
+                              normalized_undefined
+                              ),
+                          SizeOfDimension(d));
+                  from_dims=CONS(EXPRESSION,tmp,from_dims);
+              }
+              list/* of expressions*/ offsets = NIL;
+              FOREACH(EXPRESSION,e,lo)
+                  offsets=CONS(EXPRESSION,
+                          MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                              make_expression(
+                                  make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))), normalized_undefined
+                                  ),
+                              e),
+                          offsets);
               expression source;
               if(scalar_entity)
                   source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), entity_to_expression(from));
-              else
+              else {
                   source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), 
                           reference_to_expression(
-                              make_reference(from,lo)
+                              make_reference(from,NIL)
                               )
                           );
-              args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,gen_nreverse(transfer_sizes)));
+              }
+              args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+              from_dims= gen_append(from_dims,offsets);
+              from_dims= gen_append(from_dims, gen_nreverse(transfer_sizes));
+              args= gen_append(args,from_dims);
+
           } break;
       default:
           pips_internal_error("should not happen");
