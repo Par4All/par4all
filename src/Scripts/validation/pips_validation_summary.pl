@@ -184,7 +184,7 @@ print "elapsed time: $delay\n" if defined $delay;
 print "\n";
 
 # print detailed per-directory summary
-print "directory                   cases  bads success (F+C+T+K) changes...\n";
+print "directory                   cases  bads success (F+C+T|K) changes...\n";
 for my $dir (sort keys %d)
 {
   my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
@@ -197,7 +197,7 @@ for my $dir (sort keys %d)
 
   if ($success_rate!=100.0 or (exists $diff{$dir} and $differential))
   {
-    printf " (%d+%d+%d+%d)",
+    printf " (%d+%d+%d|%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout}, $d{$dir}{keptout};
 
     if ($differential) {
@@ -219,5 +219,5 @@ if ($n{passed} == $count)
 else
 {
   print "FAILED $not_passed/$count ",
-    "($n{failed}+$n{changed}+$n{timeout})$status_changes $delay\n";
+    "($n{failed}+$n{changed}+$n{timeout}|$n{keptout})$status_changes $delay\n";
 }
