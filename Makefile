@@ -14,7 +14,7 @@ validate-out:; $(MAKE) TEST=out new-validate
 SHELL	= /bin/bash
 FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 ARCH	= $(shell uname -m)
-NAME	=
+VNAME	=
 
 .PHONY: full-clean
 full-clean: clean
@@ -149,7 +149,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
 	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
-	  echo $(NAME) "validation $(ARCH) $$status" ; \
+	  echo $(VNAME) "validation $(ARCH) $$status" ; \
 	} >> $@
 
 # mail summary
