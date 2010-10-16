@@ -2450,7 +2450,6 @@ list l;
 {
     list l2 = gen_nreverse(gen_copy_seq(l));
     Pbase result = BASE_NULLE;
-	
     FOREACH(ENTITY, e, l2)
     {
 	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);

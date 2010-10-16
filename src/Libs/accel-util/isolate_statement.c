@@ -388,10 +388,7 @@ isolate_statement(const char* module_name)
 
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
-    if(0)
-        do_isolate_statement_old(statement_to_isolate);
-    else
-        do_isolate_statement(statement_to_isolate);
+    do_isolate_statement(statement_to_isolate);
 
 
 
