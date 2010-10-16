@@ -740,6 +740,7 @@ static bool no_write_read_conflicts_p(list succs) {
 }
 
 static bool potential_out_effects_p(statement s) {
+    FOREACH(EFFECT,eff,load_proper_rw_effects_list(s)) if(io_effect_p(eff)) return true;
     if(get_bool_property("REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE")) {
         list write_effects = effects_write_effects(load_proper_rw_effects_list(s));
         bool out_effect = false;
