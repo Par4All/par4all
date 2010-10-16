@@ -51,6 +51,7 @@
 #include "parser_private.h"
 #include "semantics.h"
 #include "transformer.h"
+#include "callgraph.h"
 #include "accel-util.h"
 
 
@@ -71,9 +72,9 @@ static void isolate_patch_reference(reference r, isolate_param * p)
 {
     if(same_entity_p(reference_variable(r),p->old))
     {
-        reference_variable(r)=p->new;
         list offsets = p->offsets;
-        FOREACH(EXPRESSION,index,reference_indices(r))
+        list indices = reference_indices(r);
+        FOREACH(EXPRESSION,index,indices)
         {
             if(!ENDP(offsets)) {
                 expression offset = EXPRESSION(CAR(offsets));
@@ -93,10 +94,21 @@ static void isolate_patch_reference(reference r, isolate_param * p)
                 POP(offsets);
             }
         }
+        syntax snew = make_syntax_subscript(
+                make_subscript(
+                    MakeUnaryCall(
+                        entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                        entity_to_expression(p->new)
+                        ),
+                    indices)
+                );
+        expression parent = (expression)gen_get_ancestor(expression_domain,r);
+        expression_syntax(parent)=syntax_undefined;
+        update_expression_syntax(parent,snew);
+
     }
 }
 
-static void isolate_patch_entities(void * ,entity , entity ,list );
 /** 
  * run isolate_patch_entities on all declared entities from @p s
  */
@@ -112,7 +124,7 @@ static void isolate_patch_statement(statement s, isolate_param *p)
 /** 
  * replace all references on entity @p old by references on entity @p new and adds offset @p offsets to its indices
  */
-static void isolate_patch_entities(void * where,entity old, entity new,list offsets)
+void isolate_patch_entities(void * where,entity old, entity new,list offsets)
 {
     isolate_param p = { old,new,offsets };
     gen_context_multi_recurse(where,&p,
@@ -121,8 +133,8 @@ static void isolate_patch_entities(void * where,entity old, entity new,list offs
             0);
 }
 
-bool
-expression_minmax_p(expression e)
+static
+bool expression_minmax_p(expression e)
 {
     if(expression_call_p(e))
     {
@@ -201,7 +213,6 @@ void simplify_minmax_expression(expression e,transformer tr)
  * 
  * @return false if we were enable to gather enough informations
  */
-static
 bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *offsets,bool exact)
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
@@ -531,7 +542,7 @@ static list filter_regions(list regions) {
 /** 
  * isolate statement @p s from the outer memory, generating appropriate local array copy and copy code
  */
-static void do_isolate_statement(statement s)
+static void do_isolate_statement_old(statement s)
 {
     list regions = load_cumulated_rw_effects_list(s);
     list pregions = filter_regions(regions);
@@ -647,13 +658,17 @@ isolate_statement(string module_name)
 
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
-    do_isolate_statement(statement_to_isolate);
+    if(0)
+        do_isolate_statement_old(statement_to_isolate);
+    else
+        do_isolate_statement(statement_to_isolate);
 
 
 
     /* validate */
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     reset_current_module_entity();
     reset_current_module_statement();

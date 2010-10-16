@@ -119,7 +119,7 @@ static size_t pointer_depth(type t) {
     else return 0;
 }
 
-static size_t type_dereferencement_depth(type t) {
+size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
         variable v = type_variable(t);

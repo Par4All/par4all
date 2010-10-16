@@ -6624,6 +6624,7 @@ Transfer are generated using either loops or \PipsPropRef{ISOLATE_STATEMENT_LOAD
 \end{PipsPass}
 \begin{PipsMake}
 isolate_statement > MODULE.code
+	> MODULE.callees
 	< MODULE.code
 	< MODULE.regions
 	< PROGRAM.entities
@@ -6704,8 +6705,14 @@ KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
 \begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION}
 KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 \end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_2D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel2d"
+\end{PipsProp}
 \begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION}
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
+\end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_2D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_2D "P4A_copy_from_accel2d"
 \end{PipsProp}
 
 Due to the current limitation of the effects, PIPS provides this property to
