@@ -1,0 +1,172 @@
+
+Proper effects for "initialize"
+
+list * initialize()
+{
+   int *pi, i;
+//               <must be written>: l
+   list *l = (void *) 0, *nl;
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+   
+   
+   if (!feof(stdin)) {
+//               <must be written>: i
+      scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+      pi = malloc(sizeof(int));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i pi
+      *pi = i;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+      nl = malloc(sizeof(list *));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: nl pi
+      nl->val = pi;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: l nl
+      nl->next = l;
+   }
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+   if (!feof(stdin)) {
+//               <must be written>: i
+      scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+      pi = malloc(sizeof(int));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i pi
+      *pi = i;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+      nl = malloc(sizeof(list *));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: nl pi
+      nl->val = pi;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: l nl
+      nl->next = l;
+   }
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+
+   if (!feof(stdin)) {
+//               <must be written>: i
+      scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+      pi = malloc(sizeof(int));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i pi
+      *pi = i;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+      nl = malloc(sizeof(list *));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: nl pi
+      nl->val = pi;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: l nl
+      nl->next = l;
+   }
+//               <must be read   >: l
+   
+   
+   return l;
+}
+
+POINTS TO for "initialize"
+
+//  {}
+list * initialize()
+{
+//  points to = {}
+   int *pi, i;
+//  points to = {}
+   list *l = (void *) 0, *nl;
+//  points to = {}
+   
+   
+   if (!feof(stdin)) {
+//  points to = {}
+      scanf("%d", &i);
+//  points to = {}
+      pi = malloc(sizeof(int));
+//  {(pi,*HEAP*_l_18,-Exact-)}
+      *pi = i;
+//  {(pi,*HEAP*_l_18,-Exact-)}
+      nl = malloc(sizeof(list *));
+//  {(nl,*HEAP*_l_20,-Exact-);(pi,*HEAP*_l_18,-Exact-)}
+      nl->val = pi;
+//  {(nl[0][val],*HEAP*_l_18,-Exact-);(nl,*HEAP*_l_20,-Exact-);(pi,
+//   *HEAP*_l_18,-Exact-)}
+      nl->next = l;
+   }
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-)}
+   if (!feof(stdin)) {
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-)}
+      scanf("%d", &i);
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-)}
+      pi = malloc(sizeof(int));
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
+//   *HEAP*_l_26,-Exact-)}
+      *pi = i;
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
+//   *HEAP*_l_26,-Exact-)}
+      nl = malloc(sizeof(list *));
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_28,-Exact-);(pi,
+//   *HEAP*_l_26,-Exact-)}
+      nl->val = pi;
+//  {(nl[0][val],*HEAP*_l_26,-Exact-);(nl,*HEAP*_l_28,-Exact-);(pi,
+//   *HEAP*_l_26,-Exact-)}
+      nl->next = l;
+   }
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+
+   if (!feof(stdin)) {
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+      scanf("%d", &i);
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+      pi = malloc(sizeof(int));
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
+//   *HEAP*_l_35,-Exact-)}
+      *pi = i;
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
+//   *HEAP*_l_35,-Exact-)}
+      nl = malloc(sizeof(list *));
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl[0][val],*HEAP*_l_26,
+//   -MAY-);(nl,*HEAP*_l_37,-Exact-);(pi,*HEAP*_l_35,-Exact-)}
+      nl->val = pi;
+//  {(nl[0][val],*HEAP*_l_35,-Exact-);(nl,*HEAP*_l_37,-Exact-);(pi,
+//   *HEAP*_l_35,-Exact-)}
+      nl->next = l;
+   }
+//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
+//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,
+//   -MAY-);(nl[0][val],*HEAP*_l_35,-MAY-);(nl,*HEAP*_l_37,-MAY-);(pi,
+//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-);(pi,*HEAP*_l_35,-MAY-)}
+   
+   
+   return l;
+}
+
