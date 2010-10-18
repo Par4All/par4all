@@ -2,6 +2,7 @@
 delete loop_private
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 create loop_private loop_private.c
 
@@ -24,6 +25,10 @@ echo
 apply PRIVATIZE_MODULE(main)
 
 display PRINTED_FILE(main)
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE(main)
+
 
 echo
 echo Use-def chains
