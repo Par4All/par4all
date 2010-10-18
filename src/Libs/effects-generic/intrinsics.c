@@ -28,7 +28,7 @@
  *
  * File: intrinsics.c
  * ~~~~~~~~~~~~~~~~~~
- *  
+ *
  * This File contains the generic functions necessary for the computation of
  * all types of proper effects and proper references of intrinsics.
  *
@@ -39,8 +39,8 @@
  * Molka Becher (MB), May-June 2010
  *
  * - Reordering of the existing intrinsics according to ISO/IEC 9899
- * - Add of missing C Intrinsics 
- * - Add of generic_string_effects and memmove_effects for handling string.h 
+ * - Add of missing C Intrinsics
+ * - Add of generic_string_effects and memmove_effects for handling string.h
  * effects
  */
 
@@ -228,7 +228,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {VSPRINTF_FUNCTION_NAME,      "wrv",     is_action_read, is_approximation_must},
   {VSSCANF_FUNCTION_NAME,       "rrv",     is_action_read, is_approximation_must},
   {ISOC99_VSSCANF_FUNCTION_NAME,"rrv",     is_action_read, is_approximation_must},
-  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must}, 
+  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
   {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
   {FPUTC_FUNCTION_NAME,         "ns",      is_action_read, is_approximation_must},
   {FPUTS_FUNCTION_NAME,         "rs",      is_action_read, is_approximation_must},
@@ -1795,8 +1795,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	    /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
 	    unit = make_unbounded_expression();
 	}
-      else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) ||
-	       ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
+      else if (ENTITY_SCANF_P(e) || ENTITY_ISOC99_SCANF_P(e)
+	       || ENTITY_VSCANF_P(e) || ENTITY_ISOC99_VSCANF_P(e)
+	       || ENTITY_GETS_P(e)
+	       || ENTITY_GETCHAR_P(e))
 	{
 	  //The input is obtained from stdin
 	  entity std_ent =  local_name_to_top_level_entity("stdin");
@@ -1984,16 +1986,16 @@ generic_string_effects(entity e, list args)
       else
 	le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
     }
-  
-  // and on the same number of elements of the second one for all handled intrinsics 
+
+  // and on the same number of elements of the second one for all handled intrinsics
   // except memset.
   if (strcmp(entity_user_name(e),"memset")!=0)
     {
-      /* this is almost the same code as for arg1 just before, 
+      /* this is almost the same code as for arg1 just before,
 	 maybe this could be factorized. */
       expression arg2 = EXPRESSION(CAR(CDR(args)));
       //type t2 = expression_to_type(arg2);
-      if (expression_call_p(arg2) 
+      if (expression_call_p(arg2)
 	  && call_constant_p(expression_call(arg2)))
 	{
 	  pips_debug(5, "constant expression as ssecond argument -> no effect");
@@ -2042,7 +2044,7 @@ generic_string_effects(entity e, list args)
 		}
 	    }
 	  else
-	    le = gen_nconc(le, CONS(EFFECT, eff2, NIL)); 
+	    le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
 	}
     }
 
@@ -2105,7 +2107,7 @@ static list rgs_effects(entity e, list args)
   return any_rgs_effects( e, args, FALSE);
 }
 
-/* To handle the effects of heap related functions. 
+/* To handle the effects of heap related functions.
    CreateHeapAbstractState() is done in bootstrap.c */
 static list any_heap_effects(entity e, list args)
 {
@@ -2148,7 +2150,7 @@ static list any_heap_effects(entity e, list args)
   return(le);
 }
 
-/* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses 
+/* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses
    a temporary array to copy characters from one object to another. C99
    Note : CreateMemmoveAbstractState() is defined in bootstrap.c  */
 static list memmove_effects(entity e, list args)
