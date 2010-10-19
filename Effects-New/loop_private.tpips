@@ -28,6 +28,7 @@ display PRINTED_FILE(main)
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE(main)
+activate PRINT_CODE
 
 
 echo
