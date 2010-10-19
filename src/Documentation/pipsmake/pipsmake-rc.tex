@@ -1730,6 +1730,15 @@ c_symbol_table      > MODULE.symbol_table_file
         < MODULE.parsed_code
 \end{PipsMake}
 
+The \{PipsPropRef} property can be used to extend the information available
+for varibales. By default the entity name, the offset and the size are printed.
+Using this property the type and the user name are added.
+
+\begin{PipsProp}{EXTENDED_VARIABLE_INFORMATION}
+EXTENDED_VARIABLE_INFORMATION FALSE
+\end{PipsProp}
+
+
 
 \section{Controlized Code (hierarchical control flow graph)}
 \label{subsection-controlized-code}
@@ -11598,11 +11607,20 @@ PRETTYPRINT_BLOCK_IF_ONLY FALSE
 \end{PipsProp}
 
 Effects give data that may be read and written in a procedure. These data
-are represented by their entity name (module name+local name). In order to
-have information on the scope of commons, we need to know the common in
-which the entity is declared if any.
+are represented by their entity name. By default the entity name used is
+the shortest nom-ambiguous one. The
+\PipsPropRef{PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME} property can be used to
+force the usage of full entity name (module name + scope + local name).
 
-\begin{PipsProp}{PRETTYPRINT_WITH_COMMON_NAMES} 
+\begin{PipsProp}{PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME}
+PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME FALSE
+\end{PipsProp}
+
+In order to have information on the scope of commons, we need to know the
+common in which the entity is declared if any. To get this information the
+\PipsPropRef {PRETTYPRINT_WITH_COMMON_NAMES} property has to set to TRUE.
+
+\begin{PipsProp}{PRETTYPRINT_WITH_COMMON_NAMES}
 PRETTYPRINT_WITH_COMMON_NAMES FALSE
 \end{PipsProp}
 
