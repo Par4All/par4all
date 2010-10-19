@@ -428,6 +428,7 @@ bool step_analyse(string module_name)
   out_l = effects_to_list((effects)db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, entity_user_name(module), TRUE));
 
   set_methods_for_convex_effects();
+  init_convex_rw_prettyprint(module_name);
 
   read_l = regions_read_regions(region_l);
   write_l = regions_write_regions(region_l);
@@ -482,6 +483,7 @@ bool step_analyse(string module_name)
   free_value_mappings();
 
   generic_effects_reset_all_methods();
+  reset_convex_prettyprint(module_name);
   global_directives_save();
   global_step_analyses_save();
   

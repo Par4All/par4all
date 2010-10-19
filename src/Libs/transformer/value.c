@@ -221,6 +221,12 @@ static hash_table hash_entity_to_old_value = hash_table_undefined;
 static hash_table hash_entity_to_intermediate_value = hash_table_undefined;
 static hash_table hash_value_to_name = hash_table_undefined;
 
+bool hash_entity_to_values_undefined_p()
+{
+  return (hash_table_undefined_p(hash_entity_to_new_value));
+}
+
+
 /* Two counters used to assign meaningless value entities to local variables.
  * A special global prefix, SEMANTICS_MODULE_NAME, and two special local
  * prefixes, OLD_VALUE_PREFIX and INTERMEDIATE_VALUE_PREFIX, are also used

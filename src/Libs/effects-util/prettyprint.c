@@ -53,6 +53,7 @@
 #include "properties.h"
 #include "preprocessor.h"
 #include "misc.h"
+#include "transformer.h"
 
 
 
@@ -145,7 +146,12 @@ pips_region_user_name(entity ent)
 	    /* ent is a PHI entity from the regions module */
 	    name = entity_local_name(ent);
 	else
-	    name = entity_minimal_name(ent);
+	  {
+	    if (!hash_entity_to_values_undefined_p() && !entity_has_values_p(ent))
+	      name = external_value_name(ent);
+	    else
+	      name = entity_minimal_name(ent);
+	  }
     }
 
     return name;
