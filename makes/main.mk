@@ -643,9 +643,10 @@ bin-unbuild:
 		F=`echo $$f | sed -e 's,$(ARCH)/,,'` ;\
 		echo "uninstalling $$F" ; \
 		$(RM) -r $${BIN}/$$F ;\
-	done ;\
-	test ! -d $${BIN}/$(ARCH) || $(RMDIR) --ignore-fail-on-non-empty $${BIN}/$(ARCH) ;\
-	test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
+	done
+	-test ! -d $(BIND.d) || $(RMDIR) --ignore-fail-on-non-empty $(BIN.d)
+	-BIN="`echo $(BIN.d) | sed -e 's,/$(ARCH),,'`" ;\
+	 test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
 
 endif # INSTALL_BIN
 
