@@ -9,7 +9,7 @@ typedef struct LinkedList{
 
 list* initialize()
 {
-  int *pi, i;
+  int *pi, i, som=0;
   list *l=NULL, *nl, al;
   l = &al;
   if(!feof(stdin)){
@@ -34,6 +34,15 @@ list* initialize()
     ;;
    }
   }
- 
+  if(!feof(stdin)){
+    nl = nl->next;
+    som =som+1;
+    ;;
+   if(!feof(stdin)){
+     nl = nl->next;
+     som =som+1;
+    ;;
+   }
+  }
   return l;
 }

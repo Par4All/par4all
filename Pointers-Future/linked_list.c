@@ -19,6 +19,7 @@ list* initialize()
     nl = malloc(sizeof(list*));
     nl->val = pi;
     nl->next = l;
+    l = nl;
     }
 
   return l;
