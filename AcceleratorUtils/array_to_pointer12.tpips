@@ -1,27 +1,19 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS "array_to_pointer03"
+setenv WS "array_to_pointer12"
 delete $WS
 create $WS $WS.c
 
 echo
 echo Initial code
 echo
-
-display PRINTED_FILE[duck]
+display PRINTED_FILE[main]
 
 echo
 echo Code after array conversion
 echo
 
-apply LINEARIZE_ARRAY[duck]
-display PRINTED_FILE[duck]
-
-echo
-echo Code after partial eval
-echo
-
-apply PARTIAL_EVAL[duck]
-display PRINTED_FILE[duck]
+apply LINEARIZE_ARRAY[main]
+display PRINTED_FILE[main]
 
 echo
 echo Unsplit resulting code

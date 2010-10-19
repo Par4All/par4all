@@ -19,289 +19,193 @@ void microcode(short (*image)[512], short kernel[1], short (*new_image)[512], sh
 
 Microcode After array conversion
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    for(j = 1; j <= iter; j += 1)
-      *(new_image+0+-1+j) = *(kernel+0)**(image+0+-1+j);
+      new_image[-1+j] = kernel[0]*image[-1+j];
 }
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void fake_copy_out(short image[512][512], short kernel[1], short new_image[512][512], short N1, short N2)
+{
+   microcode(*&image[N1], kernel, *&new_image[N1], N2);
+   for(N2 = 0; N2 <= 511; N2 += 1)
+      printf("%d", new_image[N1][N2]);
+}
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    for(j = 1; j <= iter; j += 1)
-      *(new_image+j-1) = *kernel**(image+j-1);
+      new_image[j-1] = kernel[0]*image[j-1];
 }
 
 Microcode after CSE
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    for(j = 1; j <= iter; j += 1)
-      *(new_image+j-1) = *kernel**(image+j-1);
+      new_image[j-1] = kernel[0]*image[j-1];
    ;
 }
 
 Microcode after ICM
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    for(j = 1; j <= iter; j += 1)
-      *(new_image+j-1) = *kernel**(image+j-1);
+      new_image[j-1] = kernel[0]*image[j-1];
    ;
 }
 
 Microcode After atomization
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
+   int I_4, I_5;
    for(j = 1; j <= iter; j += 1) {
       I_4 = j-1;
-      P_1 = image+I_4;
       I_5 = j-1;
-      P_2 = new_image+I_5;
-      *P_2 = *kernel**P_1;
+      new_image[I_5] = kernel[0]*image[I_4];
    }
    ;
 }
 
 Atomized code
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
+   int I_4, I_5;
    for(j = 1; j <= iter; j += 1) {
       I_4 = j-1;
-      P_1 = image+I_4;
       I_5 = j-1;
-      P_2 = new_image+I_5;
-      *P_2 = *kernel**P_1;
+      new_image[I_5] = kernel[0]*image[I_4];
    }
    ;
 }
 
 Tidy code
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
-   //PIPS generated variable
-   int I_6;
-   //PIPS generated variable
-   short *P_3, *P_4;
+   int I_4, I_5, I_6;
    //PIPS generated variable
    short I_7, I_8, I_9;
    for(j = 1; j <= iter; j += 1) {
       I_6 = j-1;
       I_4 = I_6;
-      P_1 = image+I_4;
       I_5 = I_6;
-      P_2 = new_image+I_5;
-      *P_2 = *kernel**P_1;
+      new_image[I_5] = kernel[0]*image[I_4];
    }
    ;
 }
 
 Code in a two adress fashion
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
-   //PIPS generated variable
-   int I_6;
-   //PIPS generated variable
-   short *P_3, *P_4;
+   int I_4, I_5, I_6;
    //PIPS generated variable
    short I_7, I_8, I_9;
    for(j = 1; j <= iter; j += 1) {
       I_6 = j;
       I_6 = I_6-1;
       I_4 = I_6;
-      P_1 = image;
-      P_1 = P_1+I_4;
       I_5 = I_6;
-      P_2 = new_image;
-      P_2 = P_2+I_5;
-      *P_2 = *kernel;
-      *P_2 = *P_2**P_1;
+      new_image[I_5] = kernel[0];
+      new_image[I_5] = new_image[I_5]*image[I_4];
    }
    ;
 }
 
 Code after flattening
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
-   //PIPS generated variable
-   int I_6;
-   //PIPS generated variable
-   short *P_3, *P_4;
+   int I_4, I_5, I_6;
    //PIPS generated variable
    short I_7, I_8, I_9;
    for(j = 1; j <= iter; j += 1) {
       I_6 = j;
       I_6 = I_6-1;
       I_4 = I_6;
-      P_1 = image;
-      P_1 = P_1+I_4;
       I_5 = I_6;
-      P_2 = new_image;
-      P_2 = P_2+I_5;
-      *P_2 = *kernel;
-      *P_2 = *P_2**P_1;
+      new_image[I_5] = kernel[0];
+      new_image[I_5] = new_image[I_5]*image[I_4];
    }
    ;
 }
 
 Code after some cleaning
 
-void microcode(short *image, short *kernel, short *new_image, short iter)
+void microcode(short image[512], short kernel[1], short new_image[512], short iter)
 {
    short j;
    //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   short *P_2;
-   //PIPS generated variable
-   int I_6;
+   int I_4, I_5, I_6;
    for(j = 1; j <= iter; j += 1) {
       I_6 = j;
       I_6 = I_6-1;
       I_4 = I_6;
-      P_1 = image;
-      P_1 = P_1+I_4;
       I_5 = I_6;
-      P_2 = new_image;
-      P_2 = P_2+I_5;
-      *P_2 = *kernel;
-      *P_2 = *P_2**P_1;
+      new_image[I_5] = kernel[0];
+      new_image[I_5] = new_image[I_5]*image[I_4];
    }
    ;
 }
 
 Microcode after normalization
 
-image seems a mask
-kernel seems a mask
-new_image seems a mask
+parameter image is not valid
+parameter kernel is not valid
+parameter new_image is not valid
 iter belongs to a loop bound
-void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short N0)
+void microcode(short image[512], short kernel[1], short new_image[512], short N0)
 {
    //PIPS generated variable
-   int re0;
+   int re0, re1, re2;
    //PIPS generated variable
-   short *re1;
-   //PIPS generated variable
-   int re2;
-   //PIPS generated variable
-   short *re3;
-   //PIPS generated variable
-   int re4;
-   //PIPS generated variable
-   short *ma0, *ma1, *ma2;
-   //PIPS generated variable
-   short re5;
-   ma2 = FIFO2;
-   FIFO1;
-   ma0 = FIFO0;
-   re5 = 1;
-   while (re5<=N0) {
-      re0 = re5;
+   short re3;
+   re3 = 1;
+   while (re3<=N0) {
+      re0 = re3;
       re0 = re0-1;
-      re4 = re0;
-      re3 = ma0;
-      re3 = re3+re4;
       re2 = re0;
-      re1 = ma2;
-      re1 = re1+re2;
-      *re1 = *ma1;
-      *re1 = *re1**re3;
-      re5 = 1+re5;
+      re1 = re0;
+      new_image[re1] = kernel[0];
+      new_image[re1] = new_image[re1]*image[re2];
+      re3 = 1+re3;
    }
    ;
 }
 
 Code after expression substitution
 
-void microcode(short *FIFO0, short *FIFO1, short *FIFO2, short N0)
+void microcode(short image[512], short kernel[1], short new_image[512], short N0)
 {
    //PIPS generated variable
-   int re0;
+   int re0, re1, re2;
    //PIPS generated variable
-   short *re1;
-   //PIPS generated variable
-   int re2;
-   //PIPS generated variable
-   short *re3;
-   //PIPS generated variable
-   int re4;
-   //PIPS generated variable
-   short *ma0, *ma1, *ma2;
-   //PIPS generated variable
-   short re5;
-   seti(ma2, FIFO2);
-   FIFO1;
-   seti(ma0, FIFO0);
-   seti(re5, 1);
-   while (re5<=N0) {
-      seti(re0, re5);
+   short re3;
+   seti(re3, 1);
+   while (re3<=N0) {
+      seti(re0, re3);
       subi(re0, 1);
-      seti(re4, re0);
-      seti(re3, ma0);
-      seti(re3, re3+re4);
       seti(re2, re0);
-      seti(re1, ma2);
-      seti(re1, re1+re2);
-      seti(*re1, *ma1);
-      muli(*re1, *re3);
-      addi(1, re5);
+      seti(re1, re0);
+      seti(new_image[re1], kernel[0]);
+      muli(new_image[re1], image[re2]);
+      addi(1, re3);
    }
    ;
 }

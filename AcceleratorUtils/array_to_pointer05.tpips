@@ -16,9 +16,7 @@ echo
 echo Code after array conversion
 echo
 
-setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "1D"
-apply ARRAY_TO_POINTER
+apply LINEARIZE_ARRAY
 display PRINTED_FILE
 
 echo

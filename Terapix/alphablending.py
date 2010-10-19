@@ -26,7 +26,7 @@ def microcode_normalizer(ws,module):
 	#module.display()
 	#module.clean_declarations()
 	#module.display()
-	module.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
+	module.linearize_array(use_pointers=True)
 	module.display()
 	module.normalize_microcode()
 	module.display()

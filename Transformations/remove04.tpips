@@ -21,9 +21,9 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 echo
-echo after array to pointer
+echo after array linearization
 echo
-apply ARRAY_TO_POINTER
+apply LINEARIZE_ARRAY
 display PRINTED_FILE
 
 echo

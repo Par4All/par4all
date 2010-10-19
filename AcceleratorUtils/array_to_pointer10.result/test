@@ -13,19 +13,19 @@ int main(int argc, char *argv[])
    return size;
 }
 
-/* After apply ARRAY_TO_POINTER[%ALL] */
+/* After apply LINEARIZE_ARRAY[%ALL] */
 
-int get_mat_size(int argc, char *argv);
+int get_mat_size(int argc, char **argv);
 
-int main(int argc, char *argv[]);
-int get_mat_size(int argc, char *argv)
+int main(int argc, char **argv);
+int get_mat_size(int argc, char **argv)
 {
    int result = 0;
-   result = *(argv+1);
+   result = *(*(argv+0)+1);
    return result;
 }
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-   int size = get_mat_size(argc, &argv[0][0]);
+   int size = get_mat_size(argc, argv);
    return size;
 }

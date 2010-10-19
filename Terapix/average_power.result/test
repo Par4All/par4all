@@ -198,9 +198,9 @@ l99997:
    for(tht = 0; tht <= 127; tht += 128)
 
 //  <Pow[PHI1]-R-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, tht<=127, 1<=Nv}>
 //  <Pow[PHI1]-W-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1<=127, tht<=PHI1,
 //    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, 0<=N, 0<=tht, tht<=127}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-MAY-{PHI1<=127, tht<=PHI1,
@@ -210,9 +210,9 @@ l99998:
       for(rgt = 0; rgt <= N*((N+12)/N)-1; rgt += N)
 
 //  <Pow[PHI1]-R-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, tht<=127, 1<=Nv}>
 //  <Pow[PHI1]-W-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1<=127, tht<=PHI1,
 //    PHI2<=N+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
 //    0<=tht, tht<=127}>
@@ -224,10 +224,10 @@ l99998:
 l99992:
          for(th = tht; th <= MIN(tht+128, 127); th += 1)
 
-//  <Pow[PHI1]-R-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, 1<=Nv,
-//    th<=127, tht<=th, 0<=tht, tht<=127}>
-//  <Pow[PHI1]-W-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, 1<=Nv,
-//    th<=127, tht<=th, 0<=tht, tht<=127}>
+//  <Pow[PHI1]-R-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, th<=127,
+//    tht<=th, 0<=tht, tht<=127, 1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, th<=127,
+//    tht<=th, 0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1==th, PHI2<=N+rgt,
 //    rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, th<=127,
 //    tht<=th, 0<=tht, tht<=127}>
@@ -239,10 +239,10 @@ l99992:
 l99993:
             for(rg = rgt; rg <= MIN(rgt+N, N*((N+12)/N)-1); rg += 1)
 
-//  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt, 1<=Nv,
-//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127}>
-//  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt, 1<=Nv,
-//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127}>
+//  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 1<=Nv}>
+//  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
 //    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg,
 //    th<=127, tht<=th, 0<=tht, tht<=127}>
@@ -254,15 +254,15 @@ l99999:
                for(v = 0; v <= Nv-1; v += 1)
 
 //  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
-//    v+1<=Nv, rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
-//    v+1<=Nv, rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, v+1<=Nv, rgt<=rg, th<=127,
-//    tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg, th<=127, tht<=th,
+//    0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, v+1<=Nv, rgt<=rg, th<=127,
-//    tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg, th<=127, tht<=th,
+//    0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 
                   Pow[th] += CplAbs(&ptrin[th][rg][v]);
 }
@@ -356,37 +356,37 @@ l99997:
       N = -(((Nv+1)*tht-128*Nv+3968)/(Nv*tht-128*Nv));
 
 //  <Pow[PHI1]-R-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, 1<=Nv}>
 //  <Pow[PHI1]-W-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1<=127, tht<=PHI1,
-//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, 0<=N, 0<=tht, tht<=127}>
+//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, 0<=N, 0<=tht}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-MAY-{PHI1<=127, tht<=PHI1,
-//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, 0<=N, 0<=tht, tht<=127}>
+//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, 0<=N, 0<=tht}>
 
 
 l99998:
       for(rgt = 0; rgt <= N*((N+12)/N)-1; rgt += N)
 
 //  <Pow[PHI1]-R-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, 1<=Nv}>
 //  <Pow[PHI1]-W-MAY-{PHI1<=127, tht<=PHI1, Nrg==13, Nth==12, 0<=N,
-//    1<=Nv, 0<=tht, tht<=127}>
+//    0<=tht, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1<=127, tht<=PHI1,
 //    PHI2<=N+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
-//    0<=tht, tht<=127}>
+//    0<=tht}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-MAY-{PHI1<=127, tht<=PHI1,
 //    PHI2<=N+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
-//    0<=tht, tht<=127}>
+//    0<=tht}>
 
 l99992:
 #pragma  omp parallel for 
          for(th = tht; th <= MIN(tht+128, 127); th += 1)
 
-//  <Pow[PHI1]-R-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, 1<=Nv,
-//    th<=127, tht<=th, 0<=tht, tht<=127}>
-//  <Pow[PHI1]-W-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, 1<=Nv,
-//    th<=127, tht<=th, 0<=tht, tht<=127}>
+//  <Pow[PHI1]-R-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, th<=127,
+//    tht<=th, 0<=tht, tht<=127, 1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{PHI1==th, Nrg==13, Nth==12, 0<=N, th<=127,
+//    tht<=th, 0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-MAY-{PHI1==th, PHI2<=N+rgt,
 //    rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, th<=127,
 //    tht<=th, 0<=tht, tht<=127}>
@@ -398,10 +398,10 @@ l99993:
 #pragma  omp parallel for 
             for(rg = rgt; rg <= MIN(rgt+N, N*((N+12)/N)-1); rg += 1)
 
-//  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt, 1<=Nv,
-//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127}>
-//  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt, 1<=Nv,
-//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127}>
+//  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 1<=Nv}>
+//  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
 //    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg,
 //    th<=127, tht<=th, 0<=tht, tht<=127}>
@@ -413,15 +413,15 @@ l99999:
                for(v = 0; v <= Nv-1; v += 1)
 
 //  <Pow[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
-//    v+1<=Nv, rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <Pow[PHI1]-W-EXACT-{PHI1==th, Nrg==13, Nth==12, rg<=N+rgt,
-//    v+1<=Nv, rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    rgt<=rg, th<=127, tht<=th, 0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, v+1<=Nv, rgt<=rg, th<=127,
-//    tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg, th<=127, tht<=th,
+//    0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, PHI2==rg,
-//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, v+1<=Nv, rgt<=rg, th<=127,
-//    tht<=th, 0<=tht, tht<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, rg<=N+rgt, rgt<=rg, th<=127, tht<=th,
+//    0<=tht, tht<=127, 0<=v, v+1<=Nv}>
 
                   Pow[th] += CplAbs(&ptrin[th][rg][v]);
    }
@@ -564,10 +564,10 @@ l99992:
    for(th = 0; th <= 127; th += 1)
 
 //  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=I_0, 1<=Nv, 0<=th, th<=127}>
+//    Nth==12, tht==0, 0<=th, th<=127, 0<=I_0, 1<=Nv}>
 //  <Pow0-R-EXACT-{}>
 //  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=I_0, 1<=Nv, 0<=th, th<=127}>
+//    Nth==12, tht==0, 0<=th, th<=127, 0<=I_0, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2<=I_0+rgt,
 //    rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, 0<=th,
 //    th<=127}>
@@ -580,31 +580,31 @@ l99993:
       for(rg = 0; rg <= I_0; rg += 1)
 
 //  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, rg<=I_0, 1<=Nv, 0<=rg, 0<=th, th<=127}>
+//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
 //  <Pow0-R-EXACT-{}>
 //  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, rg<=I_0, 1<=Nv, 0<=rg, 0<=th, th<=127}>
+//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
-//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, rg<=I_0, 0<=rg,
+//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0,
 //    0<=th, th<=127}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
-//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, rg<=I_0, 0<=rg,
+//    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0,
 //    0<=th, th<=127}>
 
 l99999:
          for(v = 0; v <= Nv-1; v += 1)
 
 //  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, rg<=I_0, v+1<=Nv, 0<=rg, 0<=th, th<=127, 0<=v}>
+//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
 //  <Pow0-R-EXACT-{}>
 //  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, rg<=I_0, v+1<=Nv, 0<=rg, 0<=th, th<=127, 0<=v}>
+//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
-//    PHI3==v, Nrg==13, Nth==12, tht==0, rg<=I_0, v+1<=Nv, 0<=rg,
-//    0<=th, th<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th,
+//    th<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.re]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
-//    PHI3==v, Nrg==13, Nth==12, tht==0, rg<=I_0, v+1<=Nv, 0<=rg,
-//    0<=th, th<=127, 0<=v}>
+//    PHI3==v, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th,
+//    th<=127, 0<=v, v+1<=Nv}>
 
             (*Pow0)[th+128*tht-0] += CplAbs(&ptrin[th][rg+rgt][v]);
 }

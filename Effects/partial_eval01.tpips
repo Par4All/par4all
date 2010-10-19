@@ -62,7 +62,8 @@ echo
 echo Code after array conversion
 echo
 
-apply ARRAY_TO_POINTER[duck]
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[duck]
 display PRINTED_FILE[duck]
 
 echo
