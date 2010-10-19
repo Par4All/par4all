@@ -36,18 +36,18 @@ char isme(int elligent)
 donne:
    for(rovertit = 0; rovertit <= elligent-1; rovertit += N)
 
-//  <repide[PHI1]-R-MAY-{PHI1<=N+rovertit+1, PHI1<=elligent,
-//    rovertit+1<=PHI1}>
-//  <repide[PHI1]-W-MAY-{PHI1<=N+rovertit, PHI1+1<=elligent,
-//    rovertit<=PHI1}>
+//  <repide[PHI1]-R-MAY-{PHI1<=N+rovertit+1, rovertit+1<=PHI1,
+//    PHI1<=elligent}>
+//  <repide[PHI1]-W-MAY-{PHI1<=N+rovertit, rovertit<=PHI1,
+//    PHI1+1<=elligent}>
 
 #pragma omp parallel for 
       for(roverti = rovertit; roverti <= MIN(rovertit+N, elligent-1); roverti += 2)
 
 //  <repide[PHI1]-R-EXACT-{PHI1==roverti+1, roverti<=N+rovertit,
-//    roverti+1<=elligent, rovertit<=roverti}>
+//    rovertit<=roverti, roverti+1<=elligent}>
 //  <repide[PHI1]-W-EXACT-{PHI1==roverti, roverti<=N+rovertit,
-//    roverti+1<=elligent, rovertit<=roverti}>
+//    rovertit<=roverti, roverti+1<=elligent}>
 
          repide[roverti] = repide[roverti+1]*2;
 }
