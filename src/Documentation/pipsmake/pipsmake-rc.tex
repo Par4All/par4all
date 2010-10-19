@@ -8776,19 +8776,13 @@ EXPRESSION_SUBSTITUTION_PATTERN ""
 
 \subsection{Array to pointer conversion}
 
-\begin{PipsPass}{array_to_pointer}
-This transformation replaces all arrays in the module by equivalent pointer operations
-For example \lstinline|float a [2][6]; a[1][3]=1.f;| becomes \lstinline|float a [2][6]; *(a+(6*1+3)*sizeof(float)|.
-It is used as a preliminary phase to generate terapix assembly.
+\begin{PipsPass}{linearize_array}
+This transformation replaces all arrays in the module by equivalent linearized arrays.
+Eventually using array/ pointer equivalence.
 \end{PipsPass}
 
-Note that since function prototypes are also changed accordingly, it is
-more general than a pure expression transformation.
-
 \begin{PipsMake}
-alias array_to_pointer 'Array to pointer'
-
-array_to_pointer > MODULE.code
+linearize_array > MODULE.code
                  > COMPILATION_UNIT.code
 				 > CALLERS.code
 		         > PROGRAM.entities
@@ -8798,17 +8792,9 @@ array_to_pointer > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-The property \PipsPropRef{ARRAY_TO_POINTER_CONVERT_PARAMETERS} can be used to change the signature of the module, either not changing it,
-or using pointers \lstinline|POINTER| or \lstinline|1D|.
-If \lstinline|POINTER| is chosen, call sites are modified to keep proper signature.
-Module similar to \lstinline|int foo(int a[20][2]);| will be turned into \lstinline|int foo(int *a);|
- The property \PipsPropRef{ARRAY_TO_POINTER_FLATTEN_ONLY} can be set to true to reduce (<>flatten) the number of dimensions of the arrays to 1, while keeping use of the \verb+[]+ operator.
-
-\begin{PipsProp}{ARRAY_TO_POINTER_CONVERT_PARAMETERS}
-ARRAY_TO_POINTER_CONVERT_PARAMETERS ""
-\end{PipsProp}
-\begin{PipsProp}{ARRAY_TO_POINTER_FLATTEN_ONLY}
-ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are declared as 1D arrays or pointers. Pointers are accessed using dereferencement and arrays using subscripts.
+\begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
+LINEARIZE_ARRAY_USE_POINTERS FALSE
 \end{PipsProp}
 
 

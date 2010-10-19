@@ -604,7 +604,7 @@ bool entity_array_p(entity e)
 {
   if (entity_variable_p(e))
     {
-      variable var = type_variable(entity_type(e));
+      variable var = type_variable(ultimate_type(entity_type(e)));
       if (!ENDP(variable_dimensions(var)))  return TRUE;
     }
   return FALSE;

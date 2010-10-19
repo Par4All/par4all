@@ -48,7 +48,7 @@
 #include "effects-convex.h"
 //#include "preprocessor.h"
 //#include "text-util.h"
-//#include "transformations.h"
+#include "transformations.h"
 //#include "parser_private.h"
 //#include "semantics.h"
 //#include "transformer.h"
