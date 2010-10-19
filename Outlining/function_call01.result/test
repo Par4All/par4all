@@ -37,4 +37,4 @@ kernel:
 
 unsplit
 
-./function_call01.database/Src
+$VDIR/function_call01.database/Src
