@@ -150,9 +150,9 @@ pips_region_user_name(entity ent)
 	    name = entity_local_name(ent);
 	else
 	  {
-	    if (!hash_entity_to_values_undefined_p() && !entity_has_values_p(ent))
-	      name = external_value_name(ent);
-	    else
+	    /* if (!hash_entity_to_values_undefined_p() && !entity_has_values_p(ent)) */
+/* 	      name = external_value_name(ent); */
+/* 	    else */
 	      name = entity_minimal_name(ent);
 	  }
     }
@@ -193,8 +193,8 @@ is_inferior_cell_descriptor_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
       is_equal = 1;
     else
 	is_equal =
-	    strcmp(pips_region_user_name((entity) vecteur_var(*pvarval1)),
-		   pips_region_user_name((entity) vecteur_var(*pvarval2)));
+	    strcmp(entity_name((entity) vecteur_var(*pvarval1)),
+		   entity_name((entity) vecteur_var(*pvarval2)));
 
     return is_equal;
 }
