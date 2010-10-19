@@ -391,7 +391,7 @@ int maximize;
     else if (same_string_p(name,FIELD_OP))
         comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
     else
-        pips_user_warning("operator '%s' skipped\n");
+        pips_user_warning("operator '%s' skipped\n",name);
 
 	break;
     default:pips_internal_error("not handled case");
