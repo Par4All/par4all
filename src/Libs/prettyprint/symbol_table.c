@@ -47,6 +47,7 @@
 #include "resources.h"
 #include "database.h"
 
+#include "properties.h"
 #include "misc.h"
 #include "pipsdbm.h"
 

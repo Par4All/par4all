@@ -59,6 +59,7 @@
 #include "polyedre.h"
 #include "matrix.h"
 #include "matrice.h"
+#include "transformer.h"
 #include "sparse_sc.h"
 #include "pipsdbm.h"
 
