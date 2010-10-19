@@ -1,0 +1,15 @@
+delete symbol_table
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty EXTENDED_VARIABLE_INFORMATION TRUE
+
+create symbol_table symbol_table.c
+
+apply C_SYMBOL_TABLE (%ALL)
+
+shell more symbol_table.database/symbol_table\!add_comp_output/symbol_table\!add_comp_output
+
+close
+delete symbol_table
+quit
