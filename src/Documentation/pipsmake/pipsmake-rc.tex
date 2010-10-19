@@ -1730,9 +1730,11 @@ c_symbol_table      > MODULE.symbol_table_file
         < MODULE.parsed_code
 \end{PipsMake}
 
-The \{PipsPropRef} property can be used to extend the information available
-for varibales. By default the entity name, the offset and the size are printed.
-Using this property the type and the user name are added.
+The \PipsPropRef{EXTENDED_VARIABLE_INFORMATION} property can be used
+to extend the information available for variables. By default the
+entity name, the offset and the size are printed.  Using this property
+the type and the user name, which may be different from the internal
+name, are also displayed.
 
 \begin{PipsProp}{EXTENDED_VARIABLE_INFORMATION}
 EXTENDED_VARIABLE_INFORMATION FALSE
