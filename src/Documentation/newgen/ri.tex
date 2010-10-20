@@ -1742,7 +1742,14 @@ is an extension of the reference expression, which includes other more
 complicated array objects such as pointer, function, structure or
 union member... The same extension is made to call expression, named
 function application, because the called function is not necessarily
-an entity but can be any expression that denotes the address of a function.
+an entity but can be any expression that denotes the address of a
+function.
+
+The field \verb/va_arg/ is added only to cope with the call
+\verb/va_arg(t,e)/ where \verb/t/ is a type and \verb/e/ is an
+expression. The domain \verb/sizeofexpression/ is reused, in spite of
+its name, because it combines types and expressions. The number of
+arguments is left unspecified as well their respective kinds.
 
 
 \subsubsection{Reference}
@@ -1895,10 +1902,12 @@ useful to be able to encode pseudo-affine operators such as \verb+/+,
 
 Type \verb/transformer/ defines a relationship between two stores,
 i.e. two memory states, associated to two control points (i.e. two
-statements). This relation is limited to \emph{integer scalar} variables
-in the \emph{dynamic} scope of a module: global and static integer scalar
-variables are taken into account. Note that the data structure does not
-enforce the integer and scalar conditions.
+statements). This relation is limited by default to \emph{integer
+  scalar} variables in the \emph{dynamic} scope of a module: global
+and static integer scalar variables are taken into account. Note that
+the data structure does not enforce the integer and scalar conditions
+and that some properties can be set to process also boolean, string
+and floating point scalar variables.
 
 \begin{comment}
 Le domaine \texttt{transformer} définit une relation entre deux états
@@ -1916,6 +1925,9 @@ the variable entities, in order to decrease the total number of pure
 values. Variables that do not appear in the \verb/arguments/ list
 \emph{must} have the same initial and final values, by definition. This unique
 value is considered a final value and no value entity is allocated.
+
+Intermediate and temporary values are also represented by entities and
+used internally. They are never used or displayed in prettyprinted files.
 
 \begin{comment}
 Les variables qui apparaissent dans la liste des arguments sont celles
@@ -1936,13 +1948,16 @@ La relation est définie par des égalités et des inégalités
 linéaires entre valeurs.
 \end{comment}
 
-Two kinds of transformers are used in PIPS. The first kind is linked to
-a statement and is an abstraction of the corresponding command, limited
-to integer scalar variables. Such transformers are called
-\emph{transformers}. The second kind of transformer, also associated to a
-statement, abstracts the relationship between the initial store of a
-module or of a whole program and the store just before the execution of
-this statement. Such a transformer si called a \emph{precondition}.
+Two kinds of transformers are used in PIPS. The first kind is linked
+to a statement or an expression, possibly with side effects, and is an
+abstraction of the corresponding command, limited to integer scalar
+variables and to other scalar variables according to properties.
+%
+Such transformers are called \emph{transformers}. The
+second kind of transformer, also associated to a statement, abstracts
+the relationship between the initial store of a module or of a whole
+program and the store just before the execution of this
+statement. Such a transformer si called a \emph{precondition}.
 
 \begin{comment}
 Deux types de transformers sont utilisés. Le premier est propre à un
