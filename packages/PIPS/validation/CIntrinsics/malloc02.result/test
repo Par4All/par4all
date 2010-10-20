@@ -37,7 +37,10 @@ int main()
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
    printf("How long do you want the string? ");
-//               <must be written>: i
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0] i
    scanf("%d", &i);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_

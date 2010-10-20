@@ -11,7 +11,7 @@ void alphablending(int n,short src0[n][n], short src1[n][n], short result[n][n])
                     )/100;
 }
 
-caller()
+int main()
 {
     int n;
     short a[n][n],b[n][n],c[n][n];

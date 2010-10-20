@@ -59,12 +59,12 @@ Out regions for SUB
       INTEGER  I
       INTEGER A(10)
 
-C  <A(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=10, init==4}>
+C  <A(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=10}>
 
 
       DO I = 1, 10                                                      0007
 
-C  <A(PHI1)-OUT-EXACT-{PHI1==I, init==4, 1<=I, I<=10}>
+C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=10}>
 
          A(I) = I                                                       0008
       ENDDO

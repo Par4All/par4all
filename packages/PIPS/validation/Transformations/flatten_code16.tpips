@@ -1,12 +1,20 @@
 setenv WS flatten_code16
 
+delete $WS
 create $WS $WS.c
 
-display PRINTED_FILE
+echo
+echo Initial code
+echo
+display PRINTED_FILE[$WS]
 
-apply FLATTEN_CODE
+echo
+echo Code after flatten_code
+echo
+apply FLATTEN_CODE[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
 
-display PRINTED_FILE
 
 close
 

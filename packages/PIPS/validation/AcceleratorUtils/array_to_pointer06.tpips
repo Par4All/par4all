@@ -13,8 +13,8 @@ echo
 echo Code after array conversion
 echo
 
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
-apply ARRAY_TO_POINTER[duck]
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[duck]
 display PRINTED_FILE[%ALLFUNC]
 
 #echo
@@ -31,7 +31,7 @@ echo
 apply UNSPLIT
 shell cc $WS.c -o  $WS.database/Tmp/ref
 shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
-shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
+shell test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`
 
 close
 delete $WS

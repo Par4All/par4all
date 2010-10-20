@@ -13,6 +13,9 @@ validate-out:; $(MAKE) TEST=out new-validate
 
 SHELL	= /bin/bash
 FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
+ARCH	= $(shell uname -m)
+# if provided, used to start the mail subject line
+VNAME	=
 
 .PHONY: full-clean
 full-clean: clean
@@ -26,7 +29,8 @@ clean:
 	$(MAKE) TARGET=. clean-target
 
 # subdirectories to consider
-TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
+TARGET	:= $(shell grep '^[a-zA-Z]' defaults | grep -v "$${PIPS_VALIDATION_SKIP:-keep-all}")
+show-target:; @echo $(TARGET)
 
 .PHONY: clean-target
 clean-target:
@@ -93,10 +97,21 @@ new-validate:
 	$(MAKE) archive
 	$(MAKE) SUMMARY.short
 
+# send the summary by email
 .PHONY: mail-validate
 mail-validate: new-validate
-	Mail -a "Reply-To: $(EMAIL)" -s "$(shell tail -1 SUMMARY.short)" \
+	Mail -a "Reply-To: $(EMAIL)" \
+	     -s "$(shell tail -1 SUMMARY.short)" \
 		$(EMAIL) < SUMMARY.short
+
+# send an email only if there were changes
+.PHONY: mail-diff-validate
+mail-diff-validate: new-validate
+	diff=$$(grep '^ \* status changes: ' SUMMARY.short | grep -v 'none') ; \
+	[ "$$diff" ] && \
+	   Mail -a "Reply-To: $(EMAIL)" \
+		-s "$(shell tail -1 SUMMARY.short)" \
+			$(EMAIL) < SUMMARY.short
 
 SUMUP	= pips_validation_summary.pl
 
@@ -137,7 +152,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
 	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
-	  echo "validation $(shell arch) $$status ($(TARGET))" ; \
+	  echo $(VNAME) "validation $(ARCH) $$status" ; \
 	} >> $@
 
 # mail summary

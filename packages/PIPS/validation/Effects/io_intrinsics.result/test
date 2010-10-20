@@ -65,9 +65,10 @@ int main(char *fmt1, ...)
 //               <may be written >: vl
 //               <must be read   >: vl
    va_end(vl);
-//               <may be written >: i_name[*]
-//               <must be read   >: i_name
-//               <must be written>: i
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0] i_name[*]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0] i_name
+//               <must be written>: __IO_EFFECTS:LUNS[0] i
 
    (void) scanf("%s%d", i_name, &i);
 //               <may be read    >: stdout[0] fmt2[*] i_name[*]
@@ -80,9 +81,10 @@ int main(char *fmt1, ...)
 //               <must be written>: vl
 
    va_start(vl, fmt1);
-//               <may be read    >: fmt1[*]
-//               <must be read   >: fmt1 vl
-//               <must be written>: vl
+//               <may be read    >: stdin[0] fmt1[*]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0] fmt1 vl
+//               <must be written>: __IO_EFFECTS:LUNS[0] vl
    (void) vscanf(fmt1, vl);
 //               <may be written >: vl
 //               <must be read   >: vl

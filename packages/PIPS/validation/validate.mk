@@ -163,9 +163,14 @@ generate-test: $(F.valid)
 %.result/$(TEST): %.tpips2
 	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $@ ; $(OK)
 
-# python scripts (could be a .test)
+# python scripts
+ifdef PIPS_VALIDATION_NO_PYPS
+%.result/$(TEST): %.py
+	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+else
 %.result/$(TEST): %.py
 	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
+endif
 
 # default_tpips
 # FILE could be $<

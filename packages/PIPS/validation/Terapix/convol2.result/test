@@ -328,8 +328,6 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int i_t, j_t;
    //PIPS generated variable
    int L_0;
-   //PIPS generated variable
-   float (*P_0)[isi][isj] = (float (*)[isi][isj]) 0, (*P_1)[3][3] = (float (*)[3][3]) 0, (*P_2)[isi][isj] = (float (*)[isi][isj]) 0;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -340,18 +338,21 @@ l99993:
    for(i_t = 1; i_t <= 5; i_t += 1)
 l99990:
       for(j_t = 1; j_t <= 102; j_t += 1) {
-         memalloc(&P_2, sizeof(float[isi][isj])-1+1);
-         memalloc(&P_1, sizeof(float[3][3])-1+1);
-         memalloc(&P_0, sizeof(float[isi][isj])-1+1);
-         memload(image, *P_2, sizeof(float[isi][isj])-1+1);
-         memload(kernel, *P_1, sizeof(float[3][3])-1+1);
-         memload(new_image, *P_0, sizeof(float[isi][isj])-1+1);
+         //PIPS generated variable
+         float (*new_image0)[isi][isj] = (float (*)[isi][isj]) 0, (*kernel0)[3][3] = (float (*)[3][3]) 0, (*image0)[isi][isj] = (float (*)[isi][isj]) 0;
+         P4A_accel_malloc((void **) &image0, sizeof(float)*isi*isj);
+         P4A_accel_malloc((void **) &kernel0, sizeof(float)*9);
+         P4A_accel_malloc((void **) &new_image0, sizeof(float)*isi*isj);
+         P4A_copy_to_accel2d(*image0, &image[0][0], sizeof(float), isi, isj, 0, 0, isi, isj);
+         P4A_copy_to_accel2d(*kernel0, &kernel[0][0], sizeof(float), 3, 3, 0, 0, 3, 3);
+         P4A_copy_to_accel2d(*new_image0, &new_image[0][0], sizeof(float), isi, isj, 0, 0, isi, isj);
 
-l99991:         microcode_launcher(isi, isj, i_t, j_t, *P_2, *P_1, *P_0);
-         memstore(new_image, *P_0, sizeof(float[isi][isj])-1+1);
-         memfree(*P_2);
-         memfree(*P_1);
-         memfree(*P_0);
+
+l99991:         microcode_launcher(isi, isj, i_t, j_t, (*image0), (*kernel0), (*new_image0));
+         P4A_copy_from_accel2d(&new_image[0][0], *new_image0, sizeof(float), isi, isj, 0, 0, isi, isj);
+         P4A_accel_free((void **) &image0);
+         P4A_accel_free((void **) &kernel0);
+         P4A_accel_free((void **) &new_image0);
       }
 }
 void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])

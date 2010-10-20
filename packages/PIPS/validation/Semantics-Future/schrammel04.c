@@ -39,6 +39,8 @@ void main()
 	// Also, we may skip the loop at any time because of y
 	//
 	// The information published by Bertrand
+	float z = 0.;
+
 	while(2*x1+2*x2<=p && alea()>0.5) {
 	  if(1) {
 	    x1 = x1 + y + 1;
@@ -47,7 +49,9 @@ void main()
 	  }
 	}
 	// To get the loop postcondition
-	y = y;
+	//y = y;
+	// without generating an indentity transformer
+	z = z;
       }
       else {
 	// do nothing at all, not even read y? Read y on every transition
@@ -82,7 +86,8 @@ int foo()
     // after talking with Bertrand
     int x = 3;
     //int y = x*x*x/54; // returns 0
-    int y = x*x*x/27; // returns 1
+    //int y = x*x*x/27; // returns 1
+    int y = alea()+0.5;
     assert(0<=y && y<=1);
     return y;
   }

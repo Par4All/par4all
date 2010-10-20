@@ -1,0 +1,56 @@
+
+Proper effetcs for "CUMU_EFFECTS_STRUCT"
+
+typedef struct {
+   int var1;
+   int var2;
+   int var3;
+} SomeStruct;
+
+int titi = 4;
+SomeStruct toto = {1, 2, 3};
+
+int main();
+int main()
+{
+//               <must be written>: main:0`result
+   int result = 0;
+//               <must be read   >: TOP-LEVEL:titi 
+//                                  TOP-LEVEL:toto[.var3] 
+//                                  TOP-LEVEL:toto[.var2] 
+//                                  TOP-LEVEL:toto[.var1]
+//               <must be written>: main:0`result
+   result = toto.var1+toto.var2+toto.var3+titi;
+//               <must be read   >: main:0`result
+   return result;
+}
+
+Cumulated effetcs for "CUMU_EFFECTS_STRUCT"
+
+typedef struct {
+   int var1;
+   int var2;
+   int var3;
+} SomeStruct;
+
+int titi = 4;
+SomeStruct toto = {1, 2, 3};
+
+int main();
+//               <must be read   >: TOP-LEVEL:titi 
+//                                  TOP-LEVEL:toto[.var3] 
+//                                  TOP-LEVEL:toto[.var2] 
+//                                  TOP-LEVEL:toto[.var1]
+int main()
+{
+//               <must be written>: main:0`result
+   int result = 0;
+//               <must be read   >: TOP-LEVEL:titi 
+//                                  TOP-LEVEL:toto[.var3] 
+//                                  TOP-LEVEL:toto[.var2] 
+//                                  TOP-LEVEL:toto[.var1]
+//               <must be written>: main:0`result
+   result = toto.var1+toto.var2+toto.var3+titi;
+//               <must be read   >: main:0`result
+   return result;
+}

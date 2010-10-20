@@ -1,6 +1,6 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete convol2
-create convol2 convol.c include/load.c
+create convol2 convol.c include/par4all.c
 
 echo
 echo Inital code
@@ -74,10 +74,6 @@ apply OUTLINE
 module microcode_launcher
 display PRINTED_FILE
 
-setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
-setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
-setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
-setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
 apply KERNEL_LOAD_STORE
 display PRINTED_FILE[convol]
 

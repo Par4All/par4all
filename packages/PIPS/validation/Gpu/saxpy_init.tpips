@@ -19,10 +19,9 @@ capply GPU_IFY[init]
 #capply GPU_IFY[p4a_kernel_launcher_0]
 capply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
 
-setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
 
-capply ARRAY_TO_POINTER[init]
+capply LINEARIZE_ARRAY[init]
 display PRINTED_FILE[init]
 #apply UNSPLIT[%PROGRAM]
 

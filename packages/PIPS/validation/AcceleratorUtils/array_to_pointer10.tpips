@@ -3,20 +3,20 @@ delete $WS
 create $WS $WS.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
 display PRINTED_FILE[%ALL]
 
 echo
-echo "/* After apply ARRAY_TO_POINTER[%ALL] */"
+echo "/* After apply LINEARIZE_ARRAY[%ALL] */"
 echo
 
-apply ARRAY_TO_POINTER[%ALL]
+apply LINEARIZE_ARRAY[%ALL]
 display PRINTED_FILE[%ALL]
 
 #quit
 
 apply UNSPLIT[%ALL]
-shell gcc -W -Wall $WS.database/Src/$WS.c
+shell cc -W -Wall $WS.database/Src/$WS.c
 
 
 quit

@@ -1,0 +1,29 @@
+delete linked_list_if_iter
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create linked_list_if_iter linked_list_if_iter.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+
+echo
+echo Proper effects for "initialize"
+echo
+display PRINTED_FILE[initialize]
+
+activate PRINT_CODE_POINTS_TO_LIST
+
+echo
+echo POINTS TO for "initialize"
+echo
+display PRINTED_FILE[initialize]
+
+ 
+
+close
+delete linked_list_if_iter

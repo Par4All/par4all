@@ -89,9 +89,8 @@ echo After array to pointer conversion of "microcode"
 echo
 
 display PRINTED_FILE[main]
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
-setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
-apply ARRAY_TO_POINTER[microcode]
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[microcode]
 display PRINTED_FILE[microcode]
 display PRINTED_FILE[main]
 

@@ -13,10 +13,12 @@ void main()
 
 Cumulated effetcs for "fmodl01"
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//               <may be read    >: stdin[0] stdout[0]
+//               <may be written >: stdin[0] stdout[0]
+//               <must be read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
+//                                  __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[0] 
+//                                  __IO_EFFECTS:LUNS[1]
 void main()
 {
    long double d1, d2, r;
@@ -25,7 +27,10 @@ void main()
 //               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
    printf("Enter two long doubles: ");
-//               <must be written>: d1 d2
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0] d1 d2
    scanf("%lf %lf", &d1, &d2);
 //               <must be read   >: d1 d2
 //               <must be written>: r

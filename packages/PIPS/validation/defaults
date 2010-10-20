@@ -61,6 +61,7 @@ PointerValues
 # put intra-directory parallel validations at the end!
 Hpfc
 HardwareAccelerator
+Scilab
 # Same kinds of validations as Transformations,
 # but using 2009 PIPS default option
 Transformations-New

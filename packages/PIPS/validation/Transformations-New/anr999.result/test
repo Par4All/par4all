@@ -10,13 +10,13 @@ int main(void)
    //PIPS generated variable
    int i_0;
    //PIPS generated variable
-   freia_status ret_0;
+   freia_status ret;
    //PIPS generated variable
-   freia_data2d *imtmp_0;
+   freia_data2d *imtmp;
    //PIPS generated variable
    freia_status _return1_0, _return0_0;
    //PIPS generated variable
-   int i_1, i_2, i_3, i_4;
+   int i_1, i_2;
 
    freia_common_open_input(&fdin, 0);
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
@@ -49,24 +49,24 @@ int main(void)
    _return0 = 0;
    //PIPS generated variable
    
-   imtmp_0 = freia_common_create_data(imout_gradient->bpp, imout_gradient->widthWa, imout_gradient->heightWa);
+   imtmp = freia_common_create_data(imout_gradient->bpp, imout_gradient->widthWa, imout_gradient->heightWa);
    
    
-   freia_aipo_dilate_8c(imtmp_0, imin, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   freia_aipo_dilate_8c(imtmp_0, imtmp_0, freia_morpho_kernel_8c);
-   i_3 = 10;
+   freia_aipo_dilate_8c(imtmp, imin, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
+   i_1 = 10;
    
    
    _return0_0 = 0;
-   ret_0 = 0;
+   ret = 0;
    
    
    freia_aipo_erode_8c(imout_gradient, imin, freia_morpho_kernel_8c);
@@ -79,13 +79,13 @@ int main(void)
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
-   i_4 = 10;
+   i_2 = 10;
    
    
    _return1_0 = 0;
-   ret_0 |= freia_aipo_sub(imout_gradient, imtmp_0, imout_gradient);
+   ret |= freia_aipo_sub(imout_gradient, imtmp, imout_gradient);
 
-   freia_common_destruct_data(imtmp_0);
+   freia_common_destruct_data(imtmp);
    _return1_0 = 0;
 
    printf("input global min = %d\n", measure_min);

@@ -1,7 +1,7 @@
 setenv WS="isolate08"
 setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
-create $WS $WS.c
+create $WS $WS.c include/par4all.c
 
 module alphablending
 
@@ -33,6 +33,10 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc -c $WS.database/Src/$WS.c -o /dev/null
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
+shell ./$WS.database/Tmp/ref > $WS.database/Tmp/ref-out
+shell ./$WS.database/Tmp/test > $WS.database/Tmp/test-out
+shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
 
 delete $WS

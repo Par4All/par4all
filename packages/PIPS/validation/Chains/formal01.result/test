@@ -1,0 +1,20 @@
+
+Source code with statement numbers and proper effects
+
+void formal01(int *a, int *b)
+{
+//               <must be read   >: a
+//               <must be written>: a[0]
+   *a = 1;                                                              /*0009*/
+//               <must be read   >: b
+//               <must be written>: b[0]
+   *b = 1;                                                              /*0010*/
+}
+
+Default dependence graph: it should be empty
+
+
+Aliasing assumed between formal parameters: the dependence graph should not be empty
+
+1 2 W W <a[0]> - <b[0]> levels()
+

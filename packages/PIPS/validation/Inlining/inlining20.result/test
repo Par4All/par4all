@@ -31,13 +31,13 @@ void inlining20(int j)
 void inlining20(int j)
 {
    //PIPS generated variable
-   int i0_0 = 2, i1_0;
+   int i0_0 = 2, i1;
    //PIPS generated variable
    i0_0 = i0_0+1;                                                       /*0006*/
    /*0003*/
    //PIPS generated variable
-   i1_0 = j;
-   i1_0 = i1_0+1;                                                       /*0013*/
+   i1 = j;
+   i1 = i1+1;                                                           /*0013*/
    /*0003*/
    ;
 }

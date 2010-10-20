@@ -1,0 +1,25 @@
+delete cumu_effects_struct
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME TRUE
+
+create cumu_effects_struct cumu_effects_struct.c
+
+echo
+echo Proper effetcs for "CUMU_EFFECTS_STRUCT"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALL]
+
+echo
+echo Cumulated effetcs for "CUMU_EFFECTS_STRUCT"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALL]
+
+close
+delete cumu_effects_struct
+quit

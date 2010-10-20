@@ -46,15 +46,16 @@ echo
 echo Code after array conversion
 echo
 
-apply ARRAY_TO_POINTER[duck]
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[duck]
 display PRINTED_FILE[duck]
 
 echo
 echo Code after partial eval
 echo
 
-#apply PARTIAL_EVAL[duck]
-#display PRINTED_FILE[duck]
+apply PARTIAL_EVAL[duck]
+display PRINTED_FILE[duck]
 
 echo
 echo Unsplit resulting code

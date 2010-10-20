@@ -1,0 +1,31 @@
+
+Initial code
+
+void flatten_code16()
+{
+   double U[2];
+   double _return391;
+   {
+      {
+         {
+            {
+               double F_212;
+               F_212 = U[1];
+               _return391 = F_212;
+            }
+         }
+      }
+   }
+}
+
+Code after flatten_code
+
+void flatten_code16()
+{
+   double U[2];
+   double _return391;
+   //PIPS generated variable
+   double F_212;
+   F_212 = U[1];
+   _return391 = F_212;
+}
