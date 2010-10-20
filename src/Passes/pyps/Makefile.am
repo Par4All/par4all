@@ -9,7 +9,7 @@ if WITH_PYPS_EXTRA
 endif
 
 pipsmakeenvdir = $(libdir)/pips-make
-pipsmakeenv_SCRIPTS = gcc ar
+dist_pipsmakeenv_SCRIPTS = gcc ar
 
 dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py 
 
