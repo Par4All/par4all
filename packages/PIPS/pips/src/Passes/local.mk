@@ -64,6 +64,9 @@ ifdef PIPS_ENABLE_FORTRAN95
         FWD_DIRS        += fortran95
 endif
 
-
 # after its dependencies
 FWD_DIRS	+= fpips
+
+FWD_PARALLEL	= 1
+
+fwd-fpips: fwd-pips fwd-tpips

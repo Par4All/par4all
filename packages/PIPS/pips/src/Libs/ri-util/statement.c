@@ -2477,6 +2477,8 @@ statement update_statement_instruction(statement s,instruction i)
          * maybe we should regenerate the new one if any to keep global coherency ?*/
         gen_free_list(statement_declarations(s));
         statement_declarations(s)=NIL;
+        free_extensions(statement_extensions(s));
+        statement_extensions(s)=empty_extensions();
         if(entity_return_label_p(statement_label(s)) && !return_statement_p(s))
             statement_label(s)=entity_empty_label();
     }

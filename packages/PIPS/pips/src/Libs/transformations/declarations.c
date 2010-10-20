@@ -27,14 +27,6 @@
 /*
  * clean the declarations of a module.
  * to be called from pipsmake.
- *
- * its not really a transformation, because declarations
- * are associated to the entity, not to the code.
- * the code is put so as to reinforce the prettyprint...
- *
- * clean_declarations > ## MODULE.code
- *     < PROGRAM.entities
- *     < MODULE.code
  */
 
 #include <stdio.h>
@@ -128,7 +120,7 @@ static void remove_unread_variables(statement s)
                         entity_scalar_p(e) ) /* and we cannot afford removing something that may implies aliasing */
                 {
                     bool effects_read_variable = entity_read_somewhere_p(e,s);
-                    if(!effects_read_variable)/* the entity is never read it is disposable */
+                    if(!effects_read_variable)/* the entity is never read, it is disposable */
                         gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
                 }
             }
@@ -136,16 +128,20 @@ static void remove_unread_variables(statement s)
     }
 }
 
-/**
- * recursively call statement_remove_unused_declarations on all module statement
- *
- * @param module_name name of the processed module
- * @return always successful
- */
+
+/* A phase to remove the declaration of useless variables
+
+   It recursively calls statement_remove_unused_declarations on all module
+   statement
+
+   @param[in] module_name is the name of the module to process
+
+   @return TRUE because always successful
+*/
 bool
-clean_declarations(char * module_name)
+clean_declarations(string module_name)
 {
-  /* prelude*/
+  /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
@@ -166,6 +162,7 @@ clean_declarations(char * module_name)
   reset_current_module_statement();
   return true;
 }
+
 
 /****************************************************** DYNAMIC DECLARATIONS */
 
@@ -308,7 +305,7 @@ static void dynamic_cleanup(string module, statement stat)
   help.referenced = set_make(set_pointer);
 
   // transitive closure as dynamic allocation may depend one from another.
-  // eg in freia, images are create with the size of another...
+  // eg in FREIA, images are created with the size of another...
   do {
     help.removed_vars = 0;
     set_clear(help.referenced);
@@ -364,7 +361,16 @@ static void dynamic_cleanup(string module, statement stat)
   set_free(help.referenced);
 }
 
-/* function called by pipsmake.
+/* A phase to remove useless dynamic heap variables that are not used but
+   with malloc()/free()
+
+   The names of the functions used to allocate/deallocate the variable can
+   be specified by the DYNAMIC_ALLOCATION and DYNAMIC_DEALLOCATION
+   properties.
+
+   @param[in] module is the module name we want to clean
+
+   @return TRUE since everything should behave well...
  */
 bool clean_unused_dynamic_variables(string module)
 {

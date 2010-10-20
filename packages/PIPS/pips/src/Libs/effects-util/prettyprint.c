@@ -53,6 +53,7 @@
 #include "properties.h"
 #include "preprocessor.h"
 #include "misc.h"
+#include "transformer.h"
 
 
 
@@ -71,8 +72,11 @@ list /* of string */ effect_words_reference(reference obj)
   if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")
       && entity_in_common_p(e)) {
     pc = CHAIN_SWORD(pc, entity_and_common_name(e));
-  } else
+  } else if (get_bool_property("PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME")) {
+    pc = CHAIN_SWORD(pc, entity_name(e));
+  } else {
     pc = CHAIN_SWORD(pc, entity_minimal_name(e));
+  }
 
   begin_attachment = STRING(CAR(pc));
 
@@ -103,10 +107,10 @@ list /* of string */ effect_words_reference(reference obj)
       {
 	expression ind_exp = EXPRESSION(CAR(pi));
 	syntax s = expression_syntax(ind_exp);
-	if (syntax_reference_p(s) && 
+	if (syntax_reference_p(s) &&
 	    entity_field_p(reference_variable(syntax_reference(s))))
 	  {
-	    // add a '.' to disambiguate field names from variable names 
+	    // add a '.' to disambiguate field names from variable names
 	    pc = CHAIN_SWORD(pc, ".");
 	  }
 	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
@@ -145,13 +149,18 @@ pips_region_user_name(entity ent)
 	    /* ent is a PHI entity from the regions module */
 	    name = entity_local_name(ent);
 	else
-	    name = entity_minimal_name(ent);
+	  {
+	    /* if (!hash_entity_to_values_undefined_p() && !entity_has_values_p(ent)) */
+/* 	      name = external_value_name(ent); */
+/* 	    else */
+	      name = entity_minimal_name(ent);
+	  }
     }
 
     return name;
 }
 
-/** @brief weight function for Pvecteur passed as argument to 
+/** @brief weight function for Pvecteur passed as argument to
  *         sc_lexicographic_sort in prettyprint functions involving cell descriptors.
  *
  * The strange argument type is required by qsort(), deep down in the calls.
@@ -176,16 +185,16 @@ is_inferior_cell_descriptor_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
       is_equal = 0;
     else if(term_cst(*pvarval2))
       is_equal = -1;
-    else if(variable_phi_p((entity) vecteur_var(*pvarval1)) 
+    else if(variable_phi_p((entity) vecteur_var(*pvarval1))
 	    && !variable_phi_p((entity) vecteur_var(*pvarval2)))
       is_equal = -1;
-    else  if(variable_phi_p((entity) vecteur_var(*pvarval2)) 
+    else  if(variable_phi_p((entity) vecteur_var(*pvarval2))
 	    && !variable_phi_p((entity) vecteur_var(*pvarval1)))
       is_equal = 1;
     else
 	is_equal =
-	    strcmp(pips_region_user_name((entity) vecteur_var(*pvarval1)),
-		   pips_region_user_name((entity) vecteur_var(*pvarval2)));
+	    strcmp(entity_name((entity) vecteur_var(*pvarval1)),
+		   entity_name((entity) vecteur_var(*pvarval2)));
 
     return is_equal;
 }
@@ -374,7 +383,7 @@ int cell_compare(cell *c1, cell *c2)
   int c1_pos = 0; /* result */
   pips_assert("gaps not handled yet (ppv1 first)", !cell_gap_p(*c1));
   pips_assert("gaps not handled yet (ppv2 first)", !cell_gap_p(*c2));
-  
+
   reference r1 = cell_reference(*c1);
   reference r2 = cell_reference(*c2);
   entity e1 = reference_variable(r1);
@@ -389,12 +398,11 @@ int cell_compare(cell *c1, cell *c2)
       size_t nb_dims1 = gen_length(dims1);
       size_t nb_dims2 = gen_length(dims2);
 
-      
       for(;!ENDP(dims1) && !ENDP(dims2) && c1_pos == 0; POP(dims1), POP(dims2))
 	{
 	  expression e1 = EXPRESSION(CAR(dims1));
 	  expression e2 = EXPRESSION(CAR(dims2));
-	  
+
 	  if(unbounded_expression_p(e1))
 	    if(unbounded_expression_p(e2))
 	      c1_pos = 0;
@@ -403,65 +411,60 @@ int cell_compare(cell *c1, cell *c2)
 	  else
 	    if(unbounded_expression_p(e2))
 	      c1_pos = -1;
-	    else 
+	    else
 	      {
 		syntax s1 = expression_syntax(e1);
 		syntax s2 = expression_syntax(e2);
-		if (syntax_reference_p(s1) && 
-		    entity_field_p(reference_variable(syntax_reference(s1)))
-		    && syntax_reference_p(s2) && 
-		    entity_field_p(reference_variable(syntax_reference(s2))))
-		  {	
+		if (syntax_reference_p(s1)
+		    && entity_field_p(reference_variable(syntax_reference(s1)))
+		    && syntax_reference_p(s2)
+		    && entity_field_p(reference_variable(syntax_reference(s2))))
+		  {
 		    entity fe1 = reference_variable(syntax_reference(s1));
 		    entity fe2 = reference_variable(syntax_reference(s2));
-		    
 		    if (!same_entity_p(fe1, fe2))
 		      c1_pos = strcmp(entity_name(fe1),entity_name(fe2));
 		  }
 		else
-		  {      
+		  {
 		    intptr_t i1 = 0;
 		    intptr_t i2 = 0;
 		    intptr_t diff = 0;
-		    
+
 		    int r1 = expression_integer_value(e1, &i1);
 		    int r2 = expression_integer_value(e2, &i2);
-		    
-		    
-		    if (r1 && r2) 
+
+		    if (r1 && r2)
 		      {
 			diff = i1 - i2;
 			c1_pos = diff==0? 0 : (diff>0?1:-1);
 		      }
 		  }
-	  
 	      }
 	}
 
       if (c1_pos == 0)
 	c1_pos = (nb_dims1 < nb_dims2) ? -1 : ( (nb_dims1 > nb_dims2) ? 1 : 0);
     }
-  else 
+  else
     {
       /* not same entity, sort on entity name */
       /* sort on module name */
       c1_pos = strcmp(entity_module_name(e1), entity_module_name(e2));
-      
+
       /* if same module name: sort on entity local name */
       if (c1_pos == 0)
-	{
 	  c1_pos = strcmp(entity_user_name(e1), entity_user_name(e2));
-	}
       /* else: current module comes first, others in lexicographic order */
       else
 	{
 	  entity module = get_current_module_entity();
-	  
+
 	  if (strcmp(module_local_name(module), entity_module_name(e1)) == 0)
 	    c1_pos = -1;
 	  if (strcmp(module_local_name(module), entity_module_name(e2)) == 0)
 	    c1_pos = 1;
-	}    
+	}
     }
 
   return c1_pos;
@@ -483,13 +486,16 @@ pointer_value_compare(cell_relation *ppv1, cell_relation *ppv2)
   cell ppv1_first_c = cell_relation_first_cell(*ppv1);
   cell ppv2_first_c = cell_relation_first_cell(*ppv2);
 
-  pips_assert("there should not be preference cells in pointer values (ppv1 first) \n", !cell_preference_p(ppv1_first_c));
-  pips_assert("there should not be preference cells in pointer values (ppv2 first) \n", !cell_preference_p(ppv2_first_c));
+  pips_assert("there should not be preference cells in pointer values (ppv1 first) \n",
+	      !cell_preference_p(ppv1_first_c));
+  pips_assert("there should not be preference cells in pointer values (ppv2 first) \n",
+	      !cell_preference_p(ppv2_first_c));
 
-  pips_assert("the first cell must have value_of interpretation (ppv1)\n", cell_relation_first_value_of_p(*ppv1));
-  pips_assert("the first cell must have value_of interpretation (ppv2)\n", cell_relation_first_value_of_p(*ppv2));
+  pips_assert("the first cell must have value_of interpretation (ppv1)\n",
+	      cell_relation_first_value_of_p(*ppv1));
+  pips_assert("the first cell must have value_of interpretation (ppv2)\n",
+	      cell_relation_first_value_of_p(*ppv2));
 
-  
   ppv1_pos = cell_compare(&ppv1_first_c, &ppv2_first_c);
 
   if (ppv1_pos == 0)       /* same first cells */
@@ -498,7 +504,7 @@ pointer_value_compare(cell_relation *ppv1, cell_relation *ppv2)
       bool ppv1_second_value_of_p = cell_relation_second_value_of_p(*ppv1);
       bool ppv2_second_value_of_p = cell_relation_second_value_of_p(*ppv2);
 
-      ppv1_pos = (ppv1_second_value_of_p ==  ppv2_second_value_of_p) ? 0 : 
+      ppv1_pos = (ppv1_second_value_of_p ==  ppv2_second_value_of_p) ? 0 :
 	(ppv1_second_value_of_p ? -1 : 1);
 
       if (ppv1_pos == 0) /* both are value_of or address_of*/
@@ -508,7 +514,7 @@ pointer_value_compare(cell_relation *ppv1, cell_relation *ppv2)
 	  cell ppv2_second_c = cell_relation_second_cell(*ppv2);
 	  ppv1_pos = cell_compare(&ppv1_second_c, &ppv2_second_c);
 
-	}    
+	}
     }
   return(ppv1_pos);
 }
@@ -519,13 +525,16 @@ list words_pointer_value(cell_relation pv)
   cell first_c = cell_relation_first_cell(pv);
   cell second_c = cell_relation_second_cell(pv);
 
-  pips_assert("there should not be preference cells in pointer values (first) \n", !cell_preference_p(first_c));
-  pips_assert("there should not be preference cells in pointer values (second) \n", !cell_preference_p(second_c));
+  pips_assert("there should not be preference cells in pointer values (first) \n",
+	      !cell_preference_p(first_c));
+  pips_assert("there should not be preference cells in pointer values (second) \n",
+	      !cell_preference_p(second_c));
 
   pips_assert("gaps not handled yet (first)", !cell_gap_p(first_c));
   pips_assert("gaps not handled yet (second)", !cell_gap_p(second_c));
 
-  pips_assert("the first cell must have value_of interpretation\n", cell_relation_first_value_of_p(pv));
+  pips_assert("the first cell must have value_of interpretation\n",
+	      cell_relation_first_value_of_p(pv));
 
   list w = NIL;
 
@@ -533,13 +542,11 @@ list words_pointer_value(cell_relation pv)
   reference second_r = cell_reference(second_c);
   approximation ap = cell_relation_approximation(pv);
   pips_assert("approximation is not must\n", !approximation_must_p(ap));
-  
+
   w= gen_nconc(w, effect_words_reference(first_r));
   w = CHAIN_SWORD(w," == ");
   w= gen_nconc(w, effect_words_reference(second_r));
-
   w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
-  
   return (w);
 }
 
@@ -560,16 +567,17 @@ text text_pointer_value(cell_relation pv)
   char line_buffer[MAX_LINE_LENGTH];
   Psysteme sc;
   list /* of string */ ls;
-  
+
   if (cell_relation_undefined_p(pv))
-    { 
+    {
       ifdebug(1)
 	{
-      
-	return make_text(CONS(SENTENCE,
-			      make_sentence(is_sentence_formatted,
-					    strdup(concatenate(str_prefix, "undefined pointer value\n", NULL))),
-			      NIL));
+	  return make_text(CONS(SENTENCE,
+				make_sentence(is_sentence_formatted,
+					      strdup(concatenate(str_prefix,
+								 "undefined pointer value\n",
+								 NULL))),
+				NIL));
 	}
       else
 	pips_user_warning("unexpected pointer value undefined\n");
@@ -580,13 +588,16 @@ text text_pointer_value(cell_relation pv)
   cell first_c = cell_relation_first_cell(pv);
   cell second_c = cell_relation_second_cell(pv);
 
-  pips_assert("there should not be preference cells in pointer values (first) \n", !cell_preference_p(first_c));
-  pips_assert("there should not be preference cells in pointer values (second) \n", !cell_preference_p(second_c));
+  pips_assert("there should not be preference cells in pointer values (first) \n",
+	      !cell_preference_p(first_c));
+  pips_assert("there should not be preference cells in pointer values (second) \n",
+	      !cell_preference_p(second_c));
 
   pips_assert("gaps not handled yet (first)", !cell_gap_p(first_c));
   pips_assert("gaps not handled yet (second)", !cell_gap_p(second_c));
 
-  pips_assert("the first cell must have value_of interpretation\n", cell_relation_first_value_of_p(pv));
+  pips_assert("the first cell must have value_of interpretation\n",
+	      cell_relation_first_value_of_p(pv));
 
 
   reference first_r = cell_reference(first_c);
@@ -594,17 +605,15 @@ text text_pointer_value(cell_relation pv)
   approximation ap = cell_relation_approximation(pv);
   descriptor d = cell_relation_descriptor(pv);
 
-  
   /* PREFIX
    */
   strcpy(line_buffer, get_comment_sentinel());
   append(" ");
-  
+
   /* REFERENCES */
   ls = effect_words_reference(first_r);
-  
-  FOREACH(STRING, s, ls) 
-    {append(s);}
+
+  FOREACH(STRING, s, ls) {append(s);}
   gen_free_string_list(ls); ls = NIL;
 
   append(" == ");
@@ -612,11 +621,10 @@ text text_pointer_value(cell_relation pv)
   ls = effect_words_reference(second_r);
   if (cell_relation_second_address_of_p(pv))
     append("&");
-  
-  FOREACH(STRING, s, ls) 
-    {append(s);}
+
+  FOREACH(STRING, s, ls) {append(s);}
   gen_free_string_list(ls); ls = NIL;
-  
+
   /* DESCRIPTOR */
   /* sorts in such a way that constraints with phi variables come first.
    */
@@ -627,15 +635,15 @@ text text_pointer_value(cell_relation pv)
       system_sorted_text_format(line_buffer, str_prefix, tpv, sc,
 				(get_variable_name_t) pips_region_user_name,
 				vect_contains_phi_p, foresys);
-      
       sc_rm(sc);
-    }  
+    }
+
   /* APPROXIMATION */
   append(approximation_may_p(ap) ? " (may);" : " (exact);");
-  
+
   /* CLOSE */
   close_current_line(line_buffer, tpv,str_prefix);
-  
+
   return tpv;
 }
 
@@ -654,37 +662,34 @@ text_pointer_values(list lpv, string header)
       char line_buffer[MAX_LINE_LENGTH];
       string str_prefix = get_comment_continuation();
       if (loose_p)
-	{	  
+	{
 	  strcpy(line_buffer,"\n");
 	  append(get_comment_sentinel());
 	}
       else
 	{
-	  strcpy(line_buffer,get_comment_sentinel()); 
+	  strcpy(line_buffer,get_comment_sentinel());
 	}
       append(" ");
       append(header);
-      if(ENDP(lpv)) 
-	append(" none\n"); 
+      if(ENDP(lpv))
+	append(" none\n");
       else
-	append("\n"); 
+	append("\n");
       ADD_SENTENCE_TO_TEXT(tpv,
 			   make_sentence(is_sentence_formatted,
 					 strdup(line_buffer)));
-     
-      
       gen_sort_list(lpv, (int (*)(const void *,const void *)) pointer_value_compare);
       FOREACH(CELL_RELATION, pv, lpv)
 	{
 	  MERGE_TEXTS(tpv, text_pointer_value(pv));
 	}
-      
+
       if (loose_p)
 	ADD_SENTENCE_TO_TEXT(tpv,
 			     make_sentence(is_sentence_formatted,
 					   strdup("\n")));
     }
-    
     return tpv;
 }
 

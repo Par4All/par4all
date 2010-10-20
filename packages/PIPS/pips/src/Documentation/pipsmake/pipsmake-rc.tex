@@ -1730,6 +1730,17 @@ c_symbol_table      > MODULE.symbol_table_file
         < MODULE.parsed_code
 \end{PipsMake}
 
+The \PipsPropRef{EXTENDED_VARIABLE_INFORMATION} property can be used
+to extend the information available for variables. By default the
+entity name, the offset and the size are printed.  Using this property
+the type and the user name, which may be different from the internal
+name, are also displayed.
+
+\begin{PipsProp}{EXTENDED_VARIABLE_INFORMATION}
+EXTENDED_VARIABLE_INFORMATION FALSE
+\end{PipsProp}
+
+
 
 \section{Controlized Code (hierarchical control flow graph)}
 \label{subsection-controlized-code}
@@ -2322,7 +2333,7 @@ global variables. When set to {\tt TRUE}, they are considered as user
 variables, and dereferencing them through calls to stdio functions
 leads to less precise effects.
 
-\begin{PipsProp}{USER_EFFECTS_ON_STD_FILES FALSE}
+\begin{PipsProp}{USER_EFFECTS_ON_STD_FILES}
 USER_EFFECTS_ON_STD_FILES FALSE
 \end{PipsProp}
 
@@ -3408,7 +3419,7 @@ clear. Intra-procedural preconditions may be computed with {\em
 inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination}.
+transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -4845,15 +4856,13 @@ intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
 \label{subsection-points-to-analysis}
 \index{Points to Analysis}
 
-points\_to\_analysis phase.
-
 This function is being implemented by Amira \textsc{Mensi}.
 The \PipsPassRef{points_to_analysis} is implemented in order to
 compute points-to relations, based on Emami algorithm. \textsc{Emami} algorithm
 is a top-down analysis which calcules the points-to relations by
 applying specific rules to each assignement pattern identified.
 This phase requires another resource which
-is \PipsPassRef{Intraprocedural Summary Points To Analysis}.
+is \PipsPassRef{intraprocedural_summary_points_to_analysis}.
 \begin{PipsMake}
 alias points_to_analysis  'Points To Analysis'
 
@@ -5418,7 +5427,7 @@ The SAC project aims at generating efficient code for processors with SIMD
 extension instruction set such as VMX, SSE4, etc. For more information,
 see \url{https://info.enstb.org/projets/sac}.
 
-Some phases use \PipsPropRef{DMA_LOAD} and \PipsPropRef{DMA_STORE} to generate DMA calls
+Some phases use \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE} to generate DMA calls
 and \PipsPropRef{ACCEL_WORK}.
 
 \begin{PipsProp}{ACCEL_LOAD}
@@ -5780,7 +5789,7 @@ scalopragma                    > MODULE.code
                < MODULE.cumulated_effects
 \end{PipsMake}
 \subsubsection{Bufferization}
-The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by \PipsPassRef{KERNEL_LOAD_STORE} with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
+The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generate by \PipsPassRef{kernel_load_store} with a special property. To keep flows consistant outside the module SCALOPIFY surround variable call with a special function too.
 A C file with stubs is needed.
 
 Note that you must also set \PipsPropRef{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION} to \lstinline|""| in order to have it generate relevant code.
@@ -6626,6 +6635,7 @@ Transfer are generated using either loops or \PipsPropRef{ISOLATE_STATEMENT_LOAD
 \end{PipsPass}
 \begin{PipsMake}
 isolate_statement > MODULE.code
+	> MODULE.callees
 	< MODULE.code
 	< MODULE.regions
 	< PROGRAM.entities
@@ -6706,8 +6716,14 @@ KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
 \begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION}
 KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 \end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_2D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel2d"
+\end{PipsProp}
 \begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION}
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
+\end{PipsProp}
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_2D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_2D "P4A_copy_from_accel2d"
 \end{PipsProp}
 
 Due to the current limitation of the effects, PIPS provides this property to
@@ -6917,8 +6933,8 @@ GPU_KERNEL_PREFIX "p4a_kernel"
 \end{PipsProp}
 For Fortran output you may need to have these prefix name in uppercase.
 
-Indeed, each level of outlining can be enabled or disabled according
-According to the following properties:
+Indeed, each level of outlining can be enabled or disabled according to
+the following properties:
 \begin{PipsProp}{GPU_USE_LAUNCHER}
 GPU_USE_LAUNCHER TRUE
 \end{PipsProp}
@@ -7268,7 +7284,7 @@ INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
-\PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination} after this
+\PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
 transformation.
 
 Labels in the body are deleted. To unroll nested loops, start with the
@@ -7723,15 +7739,18 @@ FREIA_MERGE_ARGUMENTS TRUE
 
 \section{Redundancy Elimination}
 
-\subsection{Invariant Code Motion}
+\subsection{Loop Invariant Code Motion}
 \label{subsection-invariant_code_motion}
 
 
 \begin{PipsPass}{invariant_code_motion}
-This is a test to implement a loop-invariant code motion.
+This is a test to implement a loop-invariant code motion. This phase hoist
+loop-invariant code out of the loop.
 
-A side effect of this transformation is that the code is parallelized too.
-If you don't want this side effect, you can check \ref{subsection-expression-optimizations} which does a pretty nice job too.
+A side effect of this transformation is that the code is parallelized too
+with some loop distribution. If you don't want this side effect, you can
+check section~\ref{subsection-expression-optimizations} which does a
+pretty nice job too.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7757,8 +7776,10 @@ precondition analyses.
 This transformation is implemented by Thi Viet Nga \textsc{Nguyen}.
 \end{PipsPass}
 
-\begin{PipsMake}
+See also the transformation in \S~{sec:comm-subexpr-elim-1}, the partial
+evaluation, and so on.
 
+\begin{PipsMake}
 alias partial_redundancy_elimination 'Partial Redundancy Elimination'
 
 partial_redundancy_elimination             > MODULE.code
@@ -7768,6 +7789,7 @@ partial_redundancy_elimination             > MODULE.code
 \end{PipsMake}
 
 %-----------End of Redundancy Elimination -------------------------
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL FLOW
 
@@ -7815,7 +7837,7 @@ elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
 $18.10$ of~\cite{Much97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
-phase \PipsPassRef{use_def_elimination}.
+phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Much97}.
@@ -7842,19 +7864,19 @@ suppress_dead_code          > MODULE.code
 Since it is useful to display statistics on what has been found
 useless and removed in a program, this property is used to ask for
 statistics displaying:
-\begin{PipsProp}{DEAD_CODE_DISPLAY_STATISTICS} 
+\begin{PipsProp}{DEAD_CODE_DISPLAY_STATISTICS}
 DEAD_CODE_DISPLAY_STATISTICS TRUE
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% USE-DEF ELIMINATION
 
-\subsection{Use-Def Elimination}
+\subsection{Dead Code Elimination (a.k.a. Use-Def Elimination)}
 \label{sec:use-def-elimination}
 \index{Use-Def Elimination}
 \index{Dead code elimination}
 
-\begin{PipsPass}{use_def_elimination}
-Function \PipsPassRef{use_def_elimination} deletes statements whose def
+\begin{PipsPass}{dead_code_elimination}
+Function \PipsPassRef{dead_code_elimination} deletes statements whose def
 references are all dead, i.e. are not used by later executions of
 statements. It was developed by Ronan K{\sc eryell}. The algorithm compute
 the set of live statements without fix-point. An initial set of live
@@ -7894,6 +7916,17 @@ Section~\ref{sec:dead-code-elimination}) does not have a standard
 name. It could be {\em If and loop simplification} pass.
 
 \end{PipsPass}
+
+\begin{PipsMake}
+alias dead_code_elimination 'Dead Code Elimination'
+dead_code_elimination          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.chains
+\end{PipsMake}
+
+For backward compatibility, the previous pass name is preserved.
 
 \begin{PipsMake}
 alias use_def_elimination 'Use-Def elimination'
@@ -8495,6 +8528,7 @@ simplify_subscripts > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 \begin{PipsPass}{simplify_complex}
 This pass performs a conversion from complex to real.
 \PipsPropRef{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS} controls the new layout
@@ -8504,6 +8538,7 @@ simplify_complex > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 \begin{PipsProp}{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS}
 SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS TRUE
 \end{PipsProp}
@@ -8511,6 +8546,7 @@ SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS TRUE
 \begin{PipsPass}{split_structures}
 Split structures in separated variables when possible, that is remove the structure variable and replaces all fields by different variables.
 \end{PipsPass}
+
 \begin{PipsMake}
 split_structures > MODULE.code
     < PROGRAM.entities
@@ -8543,14 +8579,14 @@ Section~\ref{subsubsection-shared-memory-emulation})
 This transformation only atomizes indirect references of array access
 functions.
 
-\begin{PipsProp}{ATOMIZE_INDIRECT_REF_ONLY} 
+\begin{PipsProp}{ATOMIZE_INDIRECT_REF_ONLY}
 ATOMIZE_INDIRECT_REF_ONLY FALSE
 \end{PipsProp}
 
 By default, simple array accesses such as \verb/X(I+2)/ are atomized,
 although it is not necessary to generate assembly code:
 
-\begin{PipsProp}{ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS} 
+\begin{PipsProp}{ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS}
 ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS TRUE
 \end{PipsProp}
 
@@ -8581,6 +8617,7 @@ GENERATE_TWO_ADDRESSES_CODE_SKIP_DEREFERENCING TRUE
 %	< MODULE.cumulated_effects
 %\end{PipsMake}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARTIAL EVAL
 
 \subsection{Partial Evaluation}
@@ -8603,7 +8640,7 @@ sometimes replaced in the middle of an expression but not when the whole
 expression was a reference to a symbolic constant. Symbolic integer
 constants are now replaced by their values systematically.
 
-Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination} should be
+Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} should be
 performed after partial evaluation. It is sometimes important to run
 more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
@@ -8704,6 +8741,7 @@ Use cautiously !
 FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN FALSE
 \end{PipsProp}
 
+
 \subsection{Expression Substitution}
 
 \begin{PipsPass}{expression_substitution}
@@ -8728,9 +8766,14 @@ expression_substitution > MODULE.code
         < ALL.code
 \end{PipsMake}
 
-Set \PipsPropRef{RELAX_FLOAT_COMMUTATIVITY} to TRUE if you wan to consider some floating point operation as commutative
-\begin{PipsProp}{RELAX_FLOAT_COMMUTATIVITY}
-RELAX_FLOAT_COMMUTATIVITY FALSE
+Set \PipsPropRef{RELAX_FLOAT_ASSOCIATIVITY} to TRUE if you want to
+consider all floating point operations as really
+associative\footnote{Floating point computations are not associative in
+  real hardware because of finite precision and rounding errors. For
+  example $(10^{50} \ominus 10^{-60}) \oplus 1 = 1$ but $10^{50} \oplus
+  (-10^{-60} \oplus 1) = 0$.}:
+\begin{PipsProp}{RELAX_FLOAT_ASSOCIATIVITY}
+RELAX_FLOAT_ASSOCIATIVITY FALSE
 \end{PipsProp}
 
 This property is used to set the one-liner module used during
@@ -8741,18 +8784,16 @@ instruction to be matched).
 EXPRESSION_SUBSTITUTION_PATTERN ""
 \end{PipsProp}
 
+
 \subsection{Array to pointer conversion}
 
-\begin{PipsPass}{array_to_pointer}
-This transformation replaces all arrays in the module by equivalent pointer operations
-For example \lstinline|float a [2][6]; a[1][3]=1.f;| becomes \lstinline|float a [2][6]; *(a+(6*1+3)*sizeof(float)|.
-It is used as a preliminary phase to generate terapix assembly.
+\begin{PipsPass}{linearize_array}
+This transformation replaces all arrays in the module by equivalent linearized arrays.
+Eventually using array/ pointer equivalence.
 \end{PipsPass}
 
 \begin{PipsMake}
-alias array_to_pointer 'Array to pointer'
-
-array_to_pointer > MODULE.code
+linearize_array > MODULE.code
                  > COMPILATION_UNIT.code
 				 > CALLERS.code
 		         > PROGRAM.entities
@@ -8762,18 +8803,11 @@ array_to_pointer > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-The property \PipsPropRef{ARRAY_TO_POINTER_CONVERT_PARAMETERS} can be used to change the signature of the module, either not changing it,
-or using pointers \lstinline|POINTER| or \lstinline|1D|.
-If \lstinline|POINTER| is chosen, call sites are modified to keep proper signature.
-Module similar to \lstinline|int foo(int a[20][2]);| will be turned into \lstinline|int foo(int *a);|
- The property \PipsPropRef{ARRAY_TO_POINTER_FLATTEN_ONLY} can be set to true to reduce (<>flatten) the number of dimensions of the arrays to 1, while keeping use of the \verb+[]+ operator.
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are declared as 1D arrays or pointers. Pointers are accessed using dereferencement and arrays using subscripts.
+\begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
+LINEARIZE_ARRAY_USE_POINTERS FALSE
+\end{PipsProp}
 
-\begin{PipsProp}{ARRAY_TO_POINTER_CONVERT_PARAMETERS}
-ARRAY_TO_POINTER_CONVERT_PARAMETERS ""
-\end{PipsProp}
-\begin{PipsProp}{ARRAY_TO_POINTER_FLATTEN_ONLY}
-ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
-\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE
 
@@ -8786,6 +8820,9 @@ ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
 \index{EOLE}
 \index{EOLE\_FLAGS}
 \index{EOLE\_OPTIONS}
+
+\subsubsection{Expression optimization using algebraic properties}
+\label{sec:expr-optim-using}
 
 \begin{PipsPass}{optimize_expressions}
 This is an experimental section developed by Julien \textsc{Zory} as PhD work.
@@ -8817,15 +8854,11 @@ expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 
 \textbf{Warning}: this phase relies on an external (and unavailable) binary.
-To make it work, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to \verb+"CSE"+ or \verb+"ICM"+
-This will only activate common subexpressions elimination or invariant code motion.
-
-\end{PipsPass}
-
-\begin{PipsPass}{common_subexpression_elimination}
-Run common sub-expression elimination.
-One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} to skip expression of the form \lstinline|a+2| and
-\PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
+To make it work, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to
+\verb+"CSE"+ or \verb+"ICM"+, or even \texttt{ICMCSE} to have both.
+This will only activate common subexpressions elimination or invariant
+code motion. Since it is a quite common use case, they have been defined
+as independent phase too. See~\ref{sec:comm-subexpr-elim-1}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8842,7 +8875,44 @@ alias instruction_selection 'Select Instructions'
 instruction_selection > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+\end{PipsMake}
 
+EOLE: Evaluation Optimization of Loops and Expressions.
+Julien Zory stuff integrated within pips. It relies on an external tool
+named \texttt{eole}. The version and options set can be controlled from
+the following properties. The status is experimental. See the
+\PipsPassRef{optimize_expressions} pass for more details about the advanced
+transformations performed.
+
+\begin{PipsProp}{EOLE}
+EOLE "newgen_eole"
+\end{PipsProp}
+\begin{PipsProp}{EOLE_FLAGS}
+EOLE_FLAGS "-nfd"
+\end{PipsProp}
+\begin{PipsProp}{EOLE_OPTIONS}
+EOLE_OPTIONS ""
+\end{PipsProp}
+\begin{PipsProp}{EOLE_OPTIMIZATION_STRATEGY}
+EOLE_OPTIMIZATION_STRATEGY "P2SC"
+\end{PipsProp}
+
+
+\subsubsection{Common subexpression elimination}
+\label{sec:comm-subexpr-elim-1}
+
+Here are described 2 interesting cases of the one in
+\S~\ref{sec:expr-optim-using}.
+
+\begin{PipsPass}{common_subexpression_elimination}
+Run common sub-expression elimination to factorize out some redundant
+expressions in the code.
+
+One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} to skip expression of the form \lstinline|a+2| and
+\PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
+\end{PipsPass}
+
+\begin{PipsMake}
 alias common_subexpression_elimination 'Common Subexpression Elimination'
 
 common_subexpression_elimination > MODULE.code
@@ -8861,26 +8931,6 @@ icm > MODULE.code
 \end{PipsMake}
 
 
-EOLE: Evaluation Optimization of Loops and Expressions.
-Julien Zory stuff integrated within pips. It relies on an external tool
-named \texttt{eole}. The version and options set can be controlled from
-the following properties. The status is experimental. See the
-\PipsPassRef{optimize_expressions} pass for more details about the advanced
-transformations performed.
-
-\begin{PipsProp}{EOLE} 
-EOLE "newgen_eole"
-\end{PipsProp}
-\begin{PipsProp}{EOLE_FLAGS} 
-EOLE_FLAGS "-nfd"
-\end{PipsProp}
-\begin{PipsProp}{EOLE_OPTIONS} 
-EOLE_OPTIONS ""
-\end{PipsProp}
-\begin{PipsProp}{EOLE_OPTIMIZATION_STRATEGY}
-EOLE_OPTIMIZATION_STRATEGY "P2SC"
-\end{PipsProp}
-
 Following property is used in sac to limit the subexpressions:
 When set to true, only subexpressions without "+constant" terms are eligible.
 \begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT}
@@ -8892,10 +8942,11 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{icm}
-performs invariant code motion over sub expressions
+Performs invariant code motion over sub expressions
 \end{PipsPass}
 
 %-----------End of Expression Transformations -------------------------
+
 
 \section{Function Level transformations}
 
@@ -8918,8 +8969,8 @@ Property \PipsPropRef{INLINING_CALLERS} can be set to define the list of
 functions where the call sites have to be inlined. By default, all
 call sites of the inlined function are inlined.
 \end{PipsPass}
-\begin{PipsMake}
 
+\begin{PipsMake}
 inlining      > CALLERS.parsed_code
 		! MODULE.split_initializations
         < PROGRAM.entities
@@ -9073,7 +9124,7 @@ not. Normally, this should be addressed by a previous privatization.
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
 \end{PipsProp}
-\begin{PipsProp}{OUTLINE_LABEL} 
+\begin{PipsProp}{OUTLINE_LABEL}
 OUTLINE_LABEL ""
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_ALLOW_GLOBALS}
@@ -9086,6 +9137,7 @@ OUTLINE_SMART_REFERENCE_COMPUTATION FALSE
 OUTLINE_LOOP_BOUND_AS_PARAMETER ""
 \end{PipsProp}
 
+
 \subsection{Cloning}
 \index{Cloning}
 \index{TRANSFORMATION\_CLONE\_ON\_ARGUMENT}
@@ -9097,6 +9149,7 @@ call sites must be updated to refer to the desired version.
 User assisted cloning.See examples in clone validation
 suite. \marginpar{RK: terse; to be improved by FC}
 \end{PipsPass}
+
 \begin{PipsMake}
 
 alias clone 'Manual Clone'
@@ -9154,6 +9207,7 @@ it just perform the cloning without any substitution
 Use the \PipsPropRef{CLONE_NAME} property if you want a particular clone name.
 It's up to another phase to perform the substitution.
 \end{PipsPass}
+
 \begin{PipsMake}
 
 alias clone_only 'Simple Clone'
@@ -9184,15 +9238,14 @@ CLONE_NAME ""
 \subsection{Declarations cleaning}
 
 Clean the declarations of unused variables and commons and so.
-It is not really a code transformation, since only the module entity is
-updated by the process, but it is put as so since it should affect the
-prettyprint.
+It is also a code transformation, since not only the module entity are
+updated by the process, but also the declaration statements, some useless writes...
 
 \begin{PipsPass}{clean_declarations}
 Clean the declarations of unused variables and commons and so.
 \end{PipsPass}
-\begin{PipsMake}
 
+\begin{PipsMake}
 alias clean_declarations 'Clean Declarations'
 
 clean_declarations      > MODULE.code
@@ -9216,12 +9269,13 @@ clean_unused_dynamic_variables > MODULE.code
 \end{PipsMake}
 
 It may be a regular expression instead of a function name?
-\begin{PipsProp}{DYNAMIC_ALLOCATION} 
+\begin{PipsProp}{DYNAMIC_ALLOCATION}
 DYNAMIC_ALLOCATION "malloc"
 \end{PipsProp}
-\begin{PipsProp}{DYNAMIC_DEALLOCATION} 
+\begin{PipsProp}{DYNAMIC_DEALLOCATION}
 DYNAMIC_DEALLOCATION "free"
 \end{PipsProp}
+
 
 \subsection{Array Resizing}
 \label{subsubsection-array-resizing}
@@ -9248,6 +9302,7 @@ How to use these approaches: after generating new declarations in the
 logfile, you have to use the script
 \$PIPS\_ROOT/Src/Script/misc/array\_resizing\_instrumentation.pl to replace the unnormalized
 declarations and add new assignments in the source code.
+
 
 \subsubsection{Top Down Array Resizing}
 \begin{PipsPass}{array_resizing_top_down}
@@ -9319,7 +9374,7 @@ There are three different options:
 \begin{itemize}
 \item Using information from the MAIN program or not (1 or 0). If you use
   this option, modules that are never called by the MAIN program are not
-  taken into account. By default, we do not use this information (0). 
+  taken into account. By default, we do not use this information (0).
 \item Compute new declarations for all kinds of formal array arguments,
   not only assumed-size and one declarations (1 or 0). By default, we
   compute for assumed-size and one only (0).
@@ -9334,7 +9389,7 @@ MAIN program to compute new declarations for assumed-size and one array
 declarations, both of them, the option is 4 (100). The default option is 0
 (000).
 
-\begin{PipsProp}{ARRAY_RESIZING_TOP_DOWN_OPTION} 
+\begin{PipsProp}{ARRAY_RESIZING_TOP_DOWN_OPTION}
 ARRAY_RESIZING_TOP_DOWN_OPTION 0
 \end{PipsProp}
 
@@ -9346,7 +9401,7 @@ There are also three different options:
   top-down approach or not (1 or 0). This is a special option because we
   want to combine the two approaches: apply top-down first and then
   bottom-up on the instrumented arrays (their declarations are of from:
-  I\_PIPS\_MODULE\_ARRAY). By default, we do not use this option (0). 
+  I\_PIPS\_MODULE\_ARRAY). By default, we do not use this option (0).
 \item Compute new declarations for all kinds of array arguments,
   not only assumed-size and one declarations (1 or 0). By default, we
   compute for assumed-size and one only (0).
@@ -9360,7 +9415,7 @@ the option to compute new declarations for instrumented array
 (I\_PIPS\_MODULE\_ARRAY). The default option is 0
 (000).
 
-\begin{PipsProp}{ARRAY_RESIZING_BOTTOM_UP_OPTION} 
+\begin{PipsProp}{ARRAY_RESIZING_BOTTOM_UP_OPTION}
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{PipsProp}
 
@@ -9423,8 +9478,8 @@ constant_array_scalarization > MODULE.code
 
 \subsection{Induction substitution}
 
-Induction substitution is the process of replacing scalar variables 
-by linear expression of loop indices. 
+Induction substitution is the process of replacing scalar variables
+by a linear expression of the loop indices.
 
 
 \begin{PipsMake}
@@ -9486,16 +9541,22 @@ with static bounds.
 FLATTEN_CODE_UNROLL TRUE
 \end{PipsProp}
 
+
 \subsection{Split Update Operator}
 
 \begin{PipsPass}{split_update_operator}
 Split C operators such as +=, *= >>= into their expanded form = ... +
 \end{PipsPass}
+
+Note that if you have side effects in the destination, since the
+destination is evaluated twice, it is not equivalent in the general case.
+
 \begin{PipsMake}
 split_update_operator > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 
 \subsection{Split Initializations (C code)}
 
@@ -9559,6 +9620,7 @@ These two dynamic analyses are implemented for Fortran. They are
 described in Nga Nguyen's PhD\marginpar{reference to be added}. They
 may work for C code, but this has not been validated.
 
+
 \subsection{Elimination of Redundant Tests: Bottom-Up Approach}
 \label{subsection-array-bound-check_bottom_up}
 
@@ -9576,8 +9638,9 @@ Associated with each test is a bound violation error message and in case
 of real access violation, a STOP statement will be put before the current
 statement.
 
-This phase is always followed by the \PipsPassRef{partial_redundancy_elimination} for logical
-expression in order to reduce the number of bound checks. 
+This phase should always be followed by the
+\PipsPassRef{partial_redundancy_elimination} for logical expression in
+order to reduce the number of bound checks.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9630,6 +9693,7 @@ array_bound_check_top_down   > MODULE.code
         < MODULE.regions
 \end{PipsMake}
 
+
 \subsection{Interprocedural Array Bound Checking}
 \label{subsection-array-bound-check_interprocedural}
 
@@ -9647,6 +9711,7 @@ array_bound_check_interprocedural             > MODULE.code
         < MODULE.code
         < MODULE.preconditions
 \end{PipsMake}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY BOUND CHECK
 
@@ -9676,10 +9741,10 @@ array bounds checking options for code instrumentation, in order to
 compute the number of bound checks added. We can use only one property for
 these two case, but the meaning is not clear. To be changed ?
 
-\begin{PipsProp}{INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION} 
+\begin{PipsProp}{INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
 \end{PipsProp}
-\begin{PipsProp}{PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION} 
+\begin{PipsProp}{PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
 PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
 \end{PipsProp}
 
@@ -9690,7 +9755,7 @@ The following property deals with this kind of bad programming practice. If the
 array is a common variable, it checks if the reference goes beyond the
 size of the common block or not.
 
-\begin{PipsProp}{ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE} 
+\begin{PipsProp}{ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE}
 ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE FALSE
 \end{PipsProp}
 
@@ -9705,7 +9770,7 @@ out-of-bound or used-before-set errors, but not
 to stop the program. In this case, a PRINT message is chosen. By default,
 we use the STOP message.
 
-\begin{PipsProp}{PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE} 
+\begin{PipsProp}{PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE}
 PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
 \end{PipsProp}
 
@@ -10491,7 +10556,7 @@ print_source_inv_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\
+
 \subsection{User View with IN Regions}
 
 \begin{PipsPass}{print_source_in_regions}
@@ -10802,7 +10867,6 @@ print_code_continuation_conditions   > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsection{Sequential view with regions}
 \subsection{Sequential view with regions}
 
 \subsubsection{Sequential view with plain pointer regions}
@@ -11542,11 +11606,20 @@ PRETTYPRINT_BLOCK_IF_ONLY FALSE
 \end{PipsProp}
 
 Effects give data that may be read and written in a procedure. These data
-are represented by their entity name (module name+local name). In order to
-have information on the scope of commons, we need to know the common in
-which the entity is declared if any.
+are represented by their entity name. By default the entity name used is
+the shortest nom-ambiguous one. The
+\PipsPropRef{PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME} property can be used to
+force the usage of full entity name (module name + scope + local name).
 
-\begin{PipsProp}{PRETTYPRINT_WITH_COMMON_NAMES} 
+\begin{PipsProp}{PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME}
+PRETTYPRINT_EFFECT_WITH_FULL_ENTITY_NAME FALSE
+\end{PipsProp}
+
+In order to have information on the scope of commons, we need to know the
+common in which the entity is declared if any. To get this information the
+\PipsPropRef {PRETTYPRINT_WITH_COMMON_NAMES} property has to set to TRUE.
+
+\begin{PipsProp}{PRETTYPRINT_WITH_COMMON_NAMES}
 PRETTYPRINT_WITH_COMMON_NAMES FALSE
 \end{PipsProp}
 
@@ -13557,7 +13630,7 @@ The transformation menu is displayed as here:
   unspaghettify
   suppress_dead_code
   partial_eval
-  use_def_elimination
+  dead_code_elimination
   stf
   freeze_variables
   partial_redundancy_elimination

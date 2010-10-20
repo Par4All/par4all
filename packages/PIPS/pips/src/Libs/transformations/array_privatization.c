@@ -661,7 +661,7 @@ print_code_privatized_regions(string module_name)
 			      print_private_regions,
 			      (generic_attachment_function) abort);
 
-    ok = print_source_or_code_effects_engine(module_name, ".privreg");
+    ok = print_source_or_code_effects_engine(module_name, ".privreg", true);
 
     reset_generic_prettyprints();
 

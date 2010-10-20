@@ -73,6 +73,7 @@ do
 
   case $opt in
     -m|--mail) vopt="$vopt -m '$1'" ; email=$1 ; shift ;;
+    -n|--name) mopt="$mopt VNAME='$1'" ; shift ;;
     # what to do
     -d|--download) download=1 ;;
     -nd|--no-download) download= ;;

@@ -224,7 +224,7 @@ print_code_effects(
     set_prettyprint_with_attachments(is_attached);
 
     ok = print_source_or_code_with_any_effects_engine
-	(module_name, resource_name, summary_resource_name, suffix);
+      (module_name, resource_name, summary_resource_name, suffix, false);
 
     reset_methods_for_effects_prettyprint(module_name);
 

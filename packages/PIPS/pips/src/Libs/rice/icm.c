@@ -1456,9 +1456,14 @@ statement icm_codegen(statement stat,
 /*************************************************************** ENTRY POINT */
 
 
-/*
- * Prepare some stuffs and call icm_codegen...
- */
+/* Phase that hoists loop invariant code out of loops.
+
+   @param[in] module_name
+
+   @return TRUE because everything should go fine
+
+   Prepare some stuffs and call icm_codegen...
+*/
 bool
 invariant_code_motion(string module_name)
 {
@@ -1469,13 +1474,13 @@ invariant_code_motion(string module_name)
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE );
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE );
 
-    set_current_module_statement((statement) 
-				 db_get_memory_resource(DBR_CODE, 
-							module_name, 
+    set_current_module_statement((statement)
+				 db_get_memory_resource(DBR_CODE,
+							module_name,
 							TRUE));
 
     mod_stat = get_current_module_statement();
-    
+
     set_ordering_to_statement(mod_stat);
 
     current_module_name = module_name;
@@ -1484,7 +1489,7 @@ invariant_code_motion(string module_name)
 
     ifdebug(7)
     {
-	fprintf(stderr, 
+	fprintf(stderr,
 		"\nTesting NewGen consistency for initial code %s:\n",
 		module_name);
 	if (statement_consistent_p((statement)mod_stat))
@@ -1504,7 +1509,7 @@ invariant_code_motion(string module_name)
     }
 
     enclosing = 0;
-    rice_statement(mod_stat, 1, &icm_codegen);   
+    rice_statement(mod_stat, 1, &icm_codegen);
 
     ifdebug(7) {
  	fprintf(stderr, "\ntransformed code %s:",module_name);

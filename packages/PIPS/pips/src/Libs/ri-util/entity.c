@@ -286,7 +286,7 @@ bool label_string_defined_in_statement_p(string ls, statement s)
   return defined_p;
 }
 
-/* predicates and functions for entities 
+/* predicates and functions for entities
  */
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
@@ -487,7 +487,7 @@ string entity_name_or_TCST(entity e)
 
 /* See next function! */
 /*
-string 
+string
 entity_relative_name(e)
 entity e;
 {
@@ -496,7 +496,7 @@ entity e;
 
     pips_assert("entity_relative_name", !entity_undefined_p(m));
 
-    s = (strcmp(module_local_name(m), entity_module_name(m)) == 0) ? 
+    s = (strcmp(module_local_name(m), entity_module_name(m)) == 0) ?
 	entity_local_name(e) : entity_name(e) ;
 
     return s;
@@ -604,7 +604,7 @@ bool entity_array_p(entity e)
 {
   if (entity_variable_p(e))
     {
-      variable var = type_variable(entity_type(e));
+      variable var = type_variable(ultimate_type(entity_type(e)));
       if (!ENDP(variable_dimensions(var)))  return TRUE;
     }
   return FALSE;
@@ -615,18 +615,18 @@ bool array_entity_p(entity e)
 }
 
 bool assumed_size_array_p(entity e)
-{  
-  /* return TRUE if e has an assumed-size array declarator  
+{
+  /* return TRUE if e has an assumed-size array declarator
      (the upper bound of the last dimension is equal to * : REAL A(*) )*/
   if (entity_variable_p(e))
     {
-      variable v = type_variable(entity_type(e));   
+      variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
 	{
 	  int length = gen_length(l_dims);
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
-	  if (unbounded_dimension_p(last_dim)) 
+	  if (unbounded_dimension_p(last_dim))
 	    return TRUE;
 	}
     }
@@ -634,19 +634,19 @@ bool assumed_size_array_p(entity e)
 }
 
 bool pointer_type_array_p(entity e)
-{  
-  /* return TRUE if e has a pointer-type array declarator  
+{
+  /* return TRUE if e has a pointer-type array declarator
      (the upper bound of the last dimension is  equal to 1: REAL A(1) )*/
   if (entity_variable_p(e))
     {
-      variable v = type_variable(entity_type(e));   
+      variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
 	{
 	  int length = gen_length(l_dims);
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
 	  expression exp = dimension_upper(last_dim);
-	  if (expression_equal_integer_p(exp,1)) 
+	  if (expression_equal_integer_p(exp,1))
 	    return TRUE;
 	}
     }
@@ -2095,7 +2095,7 @@ entity make_entity_copy_with_new_name(entity e,
 /* FI: it is assumed that thread safe entities are invariant with
    respect to workspaces. Another mechanism will be needed if user
    variables updated within a critical section also are added to the
-   thread safe variable set. 
+   thread safe variable set.
 
    Thread safe entities are supposed to be updated within critical
    sections. Hence their dependence arcs may be ignored during
@@ -2135,7 +2135,7 @@ bool thread_safe_variable_p(entity v)
    rand or malloc. However, there is no useful information to be
    computed about them. Except perhard, the number of frees wrt the
    number of malloc. Hence, they are not taken into account by the
-   semantics analysis. 
+   semantics analysis.
 
    This set may not be a superset of the set of thread-safe variables.
 */
@@ -2232,6 +2232,18 @@ entity operator_neutral_element(entity op)
     return entity_undefined;
 }
 
+
+/* Test if we are allowed to commute operations
+
+   @param[in] c is the operation call
+
+   @return true if we can commute operations
+
+   Note that floating point operations are commutative, but since they are
+   not associative due to rounding error , in a chain of operations, we
+   cannot commute them. Of course, we should test whether an operation is
+   alone or not to see if we are in this case...
+*/
 bool
 commutative_call_p(call c)
 {
@@ -2244,7 +2256,7 @@ commutative_call_p(call c)
         {
             case is_basic_float:
             case is_basic_complex:
-                if(!get_bool_property("RELAX_FLOAT_COMMUTATIVITY"))
+                if(!get_bool_property("RELAX_FLOAT_ASSOCIATIVITY"))
                     break;
             case is_basic_logical:
             case is_basic_overloaded:
@@ -2259,6 +2271,7 @@ commutative_call_p(call c)
     }
     return commut_p;
 }
+
 
 /**
  * @brief build a list of expression from a list of entities
@@ -2317,7 +2330,7 @@ entity find_enum_of_member(entity m)
     fprintf(stderr, "\"\n");
   }
 
-  MAP(ENTITY, e, {
+  FOREACH(ENTITY, e,fdl) {
     if(entity_enum_p(e)) {
       list ml = type_enum(entity_type(e));
 
@@ -2338,7 +2351,7 @@ entity find_enum_of_member(entity m)
 	}
       }
     }
-  }, fdl);
+  }
 
   pips_assert("enum entity is found", !entity_undefined_p(ee));
   gen_free_list(fdl);
@@ -2410,16 +2423,15 @@ list extract_references_from_declarations(list decls)
   list arrays = NIL;
   deux_listes lref = { NIL, NIL };
 
-  MAPL(le,{
-    entity e= ENTITY(CAR(le));
+  FOREACH(ENTITY,e,decls) {
     type t = entity_type(e);
 
     if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
       arrays = CONS(VARIABLE,type_variable(t), arrays);
-  }, decls );
+  }
 
-  MAPL(array,
-  { variable v = VARIABLE(CAR(array));
+  FOREACH(VARIABLE,v,arrays)
+  {
   list ldim = variable_dimensions(v);
   while (!ENDP(ldim))
     {
@@ -2428,7 +2440,7 @@ list extract_references_from_declarations(list decls)
       ldim=CDR(ldim);
 
     }
-  }, arrays);
+  }
   gen_free_list(lref.le);
 
   return(lref.lr);
@@ -2438,15 +2450,174 @@ list l;
 {
     list l2 = gen_nreverse(gen_copy_seq(l));
     Pbase result = BASE_NULLE;
-	
-    MAP(ENTITY, e,
+    FOREACH(ENTITY, e, l2)
     {
 	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
 	new->succ = result;
 	result = new;
-    },
-	l2);
+    }
 
     gen_free_list(l2);
     return(result);
+}
+/**
+ * @name declarations updater
+ * @{ */
+
+/**
+ * helper looking in a reference for referenced entities
+ *
+ * @param r reference to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_reference_walker(reference r, set re)
+{
+  entity e = reference_variable(r);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a call for referenced entities
+ *
+ * @param c call to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_call_walker(call c, set re)
+{
+  entity e = call_function(c);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a loop for referenced entities
+ *
+ * @param l loop to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_loop_walker(loop l, set re)
+{
+  entity e = loop_index(l);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
+}
+
+
+/**
+ * helper looking in a list for referenced entities
+ *
+ * @param l list to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_list_walker(list l, set re)
+{
+  FOREACH(ENTITY,e,l)
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+      set_add_element(re,re,e);
+}
+
+/**
+ * helper looking in a ram for referenced entities
+ *
+ * @param r ram to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_ram_walker(ram r, set re)
+{
+  statement_clean_declarations_list_walker(ram_shared(r),re);
+}
+
+/**
+ * helper looking in an area for referenced entities
+ *
+ * @param a area to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_area_walker(area a, set re)
+{
+    statement_clean_declarations_list_walker(area_layout(a),re);
+}
+
+/**
+ * helper diving into an entity to find referenced entities
+ *
+ * @param e entity to dive into
+ * @param re set to fill
+ *
+ */
+void entity_get_referenced_entities(entity e, set re)
+{
+  /*if(entity_variable_p(e))*/ {
+    gen_context_multi_recurse(entity_type(e),re,
+			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			      call_domain,gen_true,statement_clean_declarations_call_walker,
+			      NULL
+			      );
+    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+    if( !value_undefined_p(entity_initial(e) ) ) {
+      gen_context_multi_recurse(entity_initial(e),re,
+				call_domain,gen_true,statement_clean_declarations_call_walker,
+				reference_domain,gen_true,statement_clean_declarations_reference_walker,
+				area_domain,gen_true,statement_clean_declarations_area_walker,
+				ram_domain,gen_true,statement_clean_declarations_ram_walker,
+				NULL);
+    }
+  }
+}
+
+/**
+ * helper iterating over statement declaration to find referenced entities
+ *
+ * @param s statement to check
+ * @param re set to fill
+ */
+static void statement_clean_declarations_statement_walker(statement s, set re)
+{
+  FOREACH(ENTITY,e,statement_declarations(s))
+    entity_get_referenced_entities(e,re);
+}
+
+
+/**
+ * retrieves the set of entites used in elem
+ * beware that this entites may be formal parameters, functions etc
+ * so please filter this set depending on your need
+ *
+ * @param elem  element to check (any gen_recursifiable type is allowded)
+ *
+ * @return set of referenced entities
+ *
+ * FI: should be moved into ri-util?
+ */
+set get_referenced_entities(void* elem)
+{
+  set referenced_entities = set_make(set_pointer);
+
+  /* if s is an entity it self, add it */
+  if(INSTANCE_OF(entity,(gen_chunkp)elem))
+      set_add_element(referenced_entities,referenced_entities,elem);
+
+  /* gather entities from s*/
+  gen_context_multi_recurse(elem,referenced_entities,
+			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
+			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			    call_domain,gen_true,statement_clean_declarations_call_walker,
+			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
+			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
+			    NULL);
+
+  /* gather all entities referenced by referenced entities */
+  set other_referenced_entities = set_make(set_pointer);
+  SET_FOREACH(entity,e,referenced_entities)
+    {
+      entity_get_referenced_entities(e,other_referenced_entities);
+    }
+
+  /* merge results */
+  set_union(referenced_entities,other_referenced_entities,referenced_entities);
+  set_free(other_referenced_entities);
+
+  return referenced_entities;
 }

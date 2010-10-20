@@ -1914,7 +1914,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       else if(expression_equal_integer_p(exp2, 0))
 	{
       free_expression(exp2);
-	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) 
+	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
 	    result_exp = exp1;
 	  else if (ENTITY_MULTIPLY_P(op_ent)) {
 	    result_exp = make_integer_constant_expression(0);
@@ -2385,8 +2385,8 @@ void davinci_dump_all_expressions(FILE * out, statement s)
   out_flt = NULL;
 }
 
-/* This function replaces all the occurences of an old entity in the 
- * expression exp by the new entity. It returns the expression modified.  
+/* This function replaces all the occurences of an old entity in the
+ * expression exp by the new entity. It returns the expression modified.
  * I think we  can write this function by using gen_context_multi_recurse  ... * To do .... NN */
 expression substitute_entity_in_expression(entity old, entity new, expression e)
 {
@@ -3003,7 +3003,7 @@ bool brace_expression_p(expression e)
     }
     return FALSE;
 }
-/* This function returns TRUE if Reference r is scalar 
+/* This function returns TRUE if Reference r is scalar
 */
 
 boolean reference_scalar_p(reference r)

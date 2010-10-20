@@ -763,6 +763,7 @@ bool loop_fusion(char * module_name) {
   set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS,
                                                                  module_name,
                                                                  TRUE));
+  /* Mandatory for DG construction */
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                                      module_name,
                                                                      TRUE));
@@ -790,6 +791,8 @@ bool loop_fusion(char * module_name) {
   hash_table_free(ordering_to_dg_mapping);
   ordering_to_dg_mapping = NULL;
   reset_proper_rw_effects();
+  reset_cumulated_rw_effects();
+  reset_precondition_map();
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
