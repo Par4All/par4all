@@ -1303,12 +1303,15 @@ list generic_proper_effects_of_application(application a __attribute__((__unused
 
 
 
-/* list generic_proper_effects_of_expression(expression e)
- * input : an expression
- * output   : the correpsonding list of effects.
- * modifies : nothing.
- * comment  :
- */
+/* Compute the proper effects of an expression
+
+   @param[in] e is the expression we want the effects
+
+   @return the corresponding list of effects.
+
+   It calls store_expr_prw_effects() to keep track of expression effects
+   if needed
+*/
 list
 generic_proper_effects_of_expression(expression e)
 {

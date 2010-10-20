@@ -61,42 +61,9 @@
 
 #include "eole_private.h"
 
-/******************************************************************* FLATTEN */
-
-/* This function only applies to Fortran code because it does not
-   take local declarations and scope issues into consideration. */
-static void
-flatten_sequence(sequence sq)
-{
-  list /* of statement */ nsl = NIL;
-  FOREACH(STATEMENT, s,sequence_statements(sq))
-  {
-    instruction i = statement_instruction(s);
-    if (instruction_sequence_p(i))
-    {
-      sequence included = instruction_sequence(i);
-      nsl = gen_nconc(nsl, sequence_statements(included));
-      sequence_statements(included) = NIL;
-      free_statement(s);
-    }
-    else
-    {
-      nsl = gen_nconc(nsl, CONS(STATEMENT, s, NIL));
-    }
-  }
-
-  gen_free_list(sequence_statements(sq));
-  sequence_statements(sq) = nsl;
-}
-
-void flatten_sequences(statement s)
-{
-  gen_recurse(s, sequence_domain, gen_true, flatten_sequence);
-}
-
 /***************************************** COMMUTATIVE ASSOCIATIVE OPERATORS */
 
-/* List of Associatif commutatif n-ary operators */
+/* List of associative and commutative n-ary operators */
 static char * table_of_AC_operators[] =
 { EOLE_SUM_OPERATOR_NAME,
   EOLE_PROD_OPERATOR_NAME,
@@ -108,7 +75,7 @@ static char * table_of_AC_operators[] =
   NULL
 };
 
-static bool Is_Associatif_Commutatif(entity e)
+static bool Is_Associative_Commutative(entity e)
 {
   string local_name = entity_local_name(e);
   int i = 0;
@@ -116,14 +83,15 @@ static bool Is_Associatif_Commutatif(entity e)
   while (table_of_AC_operators[i])
     {
       if (same_string_p(local_name,table_of_AC_operators[i])){
-	pips_debug(3," %s is Associatif Commutatif \n", local_name);
+	pips_debug(3," %s is Associative Commutative \n", local_name);
 	return TRUE;
       }
       i++;
     }
-  pips_debug(3," %s is NOT Associatif Commutatif \n", local_name);
+  pips_debug(3," %s is NOT Associative Commutative \n", local_name);
   return FALSE;
 }
+
 
 /*********************************************************** ICM ASSOCIATION */
 
@@ -153,13 +121,14 @@ static statement current_statement = statement_undefined;
  */
 static list *w_effects;
 
-/* Keep track of nesting.
+/* Keep track of statement nesting.
  */
 static void push_nesting(statement s)
 {
   nesting = CONS(STATEMENT, s, nesting);
 }
 
+/* Pop the current statement from nesting list. */
 static void pop_nesting(statement s)
 {
   list old = nesting;
@@ -167,6 +136,12 @@ static void pop_nesting(statement s)
   nesting = CDR(nesting);
   CDR(old) = NIL;
   gen_free_list(old);
+}
+
+/* The nesting depth of the current statement */
+static int current_level(void)
+{
+  return gen_length(nesting);
 }
 
 /* There is a side effect if there is a W effect in the expression.
@@ -185,21 +160,31 @@ static bool side_effects_p(expression e)
     return FALSE;
 }
 
-/* Some effect in les interfere with var.
+/* Compute if an effect list Some effect in les interfere with var.
+
+   @param[in] var is the variable to test interference with the effects
+
+   @param[in] les is the effect list to look for var
+
+   @return true if there may be a write effect on var
  */
 static bool interference_on(entity var, list /* of effect */ les)
 {
-  FOREACH(EFFECT, ef, les)
-  {
-      if (entity_all_locations_p(effect_entity(ef))
-              || (effect_write_p(ef) &&
-	  entities_may_conflict_p(var, reference_variable(effect_any_reference(ef)))))
-      {
+  FOREACH(EFFECT, ef, les) {
+    /* There is an interference only if there is a write effect: */
+    if (effect_write_p(ef)) {
+      if (entity_all_locations_p(effect_entity(ef)))
+	/* If an effect can write anywhere, it may be also on var: */
 	return TRUE;
-      }
+
+      if (entities_may_conflict_p(var, reference_variable(effect_any_reference(ef))))
+	/* If we may have a write effect on var, mark a conflict: */
+	return TRUE;
+    }
   }
   return FALSE;
 }
+
 
 /* Whether sg with effects le can be moved up to s.
  */
@@ -224,17 +209,13 @@ static int level_of(list /* of effects */ le)
   FOREACH(STATEMENT, s,up_nesting)
   {
       if (moveable_to(le, s))
-      {
-          gen_free_list(up_nesting);
-          return level;
-      }
+	break;
       else
-      {
-          level++;
-      }
+	level++;
   }
   gen_free_list(up_nesting);
   return level;
+
 }
 
 /* The level can be queried for a sub expression. */
@@ -256,11 +237,6 @@ static int stat_level_of(statement s)
 }
 */
 
-static int current_level(void)
-{
-  return gen_length(nesting);
-}
-
 /* Returns the statement of the specified level
    should returns current_statement_head() to avoid ICM directly.
  */
@@ -276,6 +252,7 @@ static statement statement_of_level(int level)
     return current_statement_head();
 }
 
+/* Test if the current statement is not the top one: */
 static bool currently_nested_p(void)
 {
 #if defined(PUSH_BODY)
@@ -571,6 +548,7 @@ static void do_atomize_if_different_level(expression e, int level)
         pips_debug(1,"not atomize\n");
 }
 
+
 static void atomize_call(call c, int level)
 {
   list /* of expression */ args;
@@ -585,6 +563,7 @@ static void atomize_call(call c, int level)
         do_atomize_if_different_level(sube, level);
   }
 }
+
 
 static void atomize_or_associate_for_level(expression e, int level)
 {
@@ -619,7 +598,7 @@ static void atomize_or_associate_for_level(expression e, int level)
   lenargs = gen_length(args);
   exprlevel = expr_level_of(e);
 
-  if (Is_Associatif_Commutatif(func) && lenargs>2)
+  if (Is_Associative_Commutative(func) && lenargs>2)
   {
     /* Reassociation + atomization maybe needed.
      * code taken from JZ.
@@ -685,12 +664,22 @@ static bool icm_atom_call_flt(call c)
   return !(io_intrinsic_p(called) || ENTITY_IMPLIEDDO_P(called));
 }
 
-/* Maybe I could consider moving the call as a whole?
+/* Atomize an instruction with call
+
+   Maybe I could consider moving the call as a whole?
  */
 static void atomize_instruction(instruction i)
 {
-  if (!currently_nested_p()) return;
-  if (!instruction_call_p(i)) return;
+  if (!currently_nested_p())
+    /* Since we are at the top level statement, impossible to move
+       something outside... */
+    return;
+
+  if (!instruction_call_p(i))
+    /* Should have been dealt by other means in the gen_multi_recurse()
+       from gen_multi_recurse() before */
+    return;
+
   /* stat_level_of(current_statement_head())); */
   atomize_call(instruction_call(i), current_level());
 }
@@ -717,6 +706,7 @@ static bool loop_flt(loop l)
   statement sofl = current_statement_head();
   pips_assert("statement of loop",
 	      instruction_loop(statement_instruction(sofl))==l);
+  /* RK: Why ? */
   push_nesting(sofl);
   return TRUE;
 }
@@ -726,13 +716,17 @@ static void loop_rwt(loop l)
   range bounds;
   int level;
   statement sofl = current_statement_head();
+  /* RK: Why ? */
   pop_nesting(sofl);
 
   /* Deal with loop bound expressions
    */
-  if (!currently_nested_p()) return;
+  if (!currently_nested_p())
+    /* Nothing to do if we are in the top-level statement */
+    return;
   bounds = loop_range(l);
   level = current_level();
+  /* Atomize the loop bound expressions: */
   do_atomize_if_different_level(range_lower(bounds), level);
   do_atomize_if_different_level(range_upper(bounds), level);
   do_atomize_if_different_level(range_increment(bounds), level);
@@ -987,11 +981,15 @@ static void insert_rwt(statement s)
 }
 
 /* Perform ICM and association on operators.
-   this is kind of an atomization.
+   This is kind of an atomization.
    many side effects: modifies the code, uses simple effects
+
+   @param[in] name specified the module name to work on
+
+   @param[in,out] s is the statement of the module
  */
 void perform_icm_association(string name, /* of the module */
-			statement s  /* of the module */)
+			     statement s  /* of the module */)
 {
   pips_assert("clean static structures on entry",
 	      (get_current_statement_stack() == stack_undefined) &&
@@ -1011,7 +1009,9 @@ void perform_icm_association(string name, /* of the module */
   set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
 
+  /* Initialize the "inserted" mapping: */
   init_inserted();
+  /* Create the stack to track current statement: */
   make_current_statement_stack();
 
 #if defined(PUSH_BODY)
@@ -1021,8 +1021,17 @@ void perform_icm_association(string name, /* of the module */
   /* ATOMIZE and REASSOCIATE by level.
    */
   gen_multi_recurse(s,
+		    /* On each statement, we push the statement top-down
+		       on the current_statement stack, and when climbing
+		       bottom-up, we pull back the statement and verify it
+		       was the same on the stack. Nowadays we could use
+		       statement parent information directly from
+		       NewGen... */
       statement_domain, current_statement_filter, current_statement_rewrite,
+		    /* Atomize instructions with calls during bottom-up
+		       phase: */
       instruction_domain, gen_true, atomize_instruction,
+		    /* */
       loop_domain, loop_flt, loop_rwt,
       test_domain, gen_true, atomize_test,
       whileloop_domain, gen_true, atomize_whileloop,
@@ -1032,7 +1041,7 @@ void perform_icm_association(string name, /* of the module */
       //reference_domain, gen_false, gen_null,
       call_domain, icm_atom_call_flt, gen_null, /* skip IO calls */
 		    NULL);
-  /* insert moved code in statement. */
+  /* Insert moved code in statement at the right place: */
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
 
 
@@ -1044,6 +1053,7 @@ void perform_icm_association(string name, /* of the module */
 	      (nesting==NIL) &&
 	      (current_statement_size()==0));
 
+  /* Delete the stack used to track current statement: */
   free_current_statement_stack();
   close_inserted();
 
@@ -1304,7 +1314,7 @@ static int similarity(expression e, available_scalar_pt aspt)
 
     /* same function...
      */
-    if (Is_Associatif_Commutatif(cf))
+    if (Is_Associative_Commutative(cf))
     {
       /* similarity is the number of args in common.
 	 inversion is not tested at the time.
@@ -1391,7 +1401,7 @@ static available_scalar_pt make_available_scalar(entity scalar,
   {
     call c = syntax_call(s);
     aspt->operator = call_function(c);
-    if (Is_Associatif_Commutatif(aspt->operator))
+    if (Is_Associative_Commutative(aspt->operator))
       aspt->available_contents = gen_copy_seq(call_arguments(c));
     else
       aspt->available_contents = NIL;
@@ -1518,7 +1528,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                             list /* of expression */ in_common, linit, lo1, lo2, old;
 
                             pips_assert("AC operator",
-                                    Is_Associatif_Commutatif(op) && op==aspt->operator);
+                                    Is_Associative_Commutative(op) && op==aspt->operator);
                             pips_assert("contents is a call", syntax_call_p(sa));
                             call ca = syntax_call(sa);
 
@@ -1874,7 +1884,7 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
   /* insert moved code in statement. */
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
   cleanup_subscripts((gen_chunkp)s);
-
+  /* Remove the "inserted" mapping: */
   close_inserted();
   /*
   close_expr_prw_effects();
