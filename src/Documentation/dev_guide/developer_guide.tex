@@ -1957,6 +1957,18 @@ validation run:
 \section{Debugging: NewGen, macros, debug levels,...}
 \label{sec:newgen}
 
+This section describes some issues and tricks about debugging PIPS.
+
+Displaying a textual resource from PIPS use a pager (by default the
+\texttt{more} command) that may interfere badly with the debugger. A way
+to avoid this is to set the \verb|PIPS_MORE| environment variable to the
+\texttt{cat} command. A way to do this from the \texttt{gdb} debugger is
+to do:
+\begin{verbatim}
+set env PIPS_MORE=cat
+\end{verbatim}
+
+
 \subsection{Debugging PIPS C source code for the compiler}
 
 PIPS use a lot of macro processing to ease the programmer life with
@@ -1971,6 +1983,7 @@ make a preprocessed version of the file \texttt{ricedg.c}. To help
 debugging, gcc-specific options are added to have the macro
 definitions at the beginning of the file too, to keep the comments and
 display the list of included files.
+
 
 \subsection{Debugging PIPS C source code dynamically}
 \label{sec:pips_dynamic_debug}
@@ -2105,8 +2118,11 @@ call print_expression(e)
 \end{verbatim}
 \end{itemize}
 
-\marginpar{Fabien: NewGen should be simplified to use
-  \texttt{stmt->label->name}}
+Note that NewGen cannot be simplified to use \texttt{stmt->label->name} in
+the general case because of potential clashes with C reserved keywords. In
+our case, since we represent C code in the RI, we would have naming
+conflicts on \texttt{for}, \texttt{while}, \texttt{to}, \texttt{return}
+and so on.
 
 It should be also possible to use PIPS and NewGen macros (accessors and so
 on) from GDB instead of these NewGen internals, if the sources are
@@ -2118,10 +2134,11 @@ achieve this is to use:
 make CFLAGS='-ggdb -g3 -Wall -std=c99'
 \end{verbatim}
 
-In the future, {\tt gdb} functions compatible with Newgen generated C
-macros will be provided\footnote{Well, we just need GNU people to add
-  interactive functions to \texttt{gdb} and then we will provide the
-  macros.}.
+Now \texttt{gdb} (7.2 at the time of writing) can be easily extended with
+scripts (\emph{sequences}) and even Python with an API to program directly
+in GDB and inspecting the binary. So we could imagine that NewGen or PyPS
+could provide functions compatible with NewGen generated C macros and
+functions.
 
 To ease this kind of inspection, some keyboard accelerators can be defined
 inside the Emacs debugger mode by adding into your \texttt{.emacs} such as:
