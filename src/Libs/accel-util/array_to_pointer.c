@@ -637,25 +637,35 @@ static void do_array_to_pointer(entity m, statement s) {
 }
 
 
-/* linearize cceeses to an array, and use pointers if asked to */
+/* linearize accesses to an array, and use pointers if asked to */
 bool linearize_array(char *module_name)
 {
     debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
+
+    /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
+
         set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
         /* just linearize accesses and change signature from n-D arrays to 1-D arrays */
         do_linearize_array(get_current_module_entity(),get_current_module_statement());
-        if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS"))
-            do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
-        cleanup_subscripts(get_current_module_statement());
+
+        /* additionnaly perform array-to-pointer conversion for c modules only */
+        if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS")) {
+            if(c_module_p(get_current_module_entity())) {
+                do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
+                cleanup_subscripts(get_current_module_statement());
+            }
+            else pips_user_warning("no pointers in fortran !,LINEARIZE_ARRAY_USE_POINTERS ignored\n");
+        }
+
+        /* validate */
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
         db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
-
 
         /*postlude*/
         reset_current_module_statement();
