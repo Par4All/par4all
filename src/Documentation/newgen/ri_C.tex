@@ -1243,10 +1243,10 @@ New kinds of syntax are added to handle C language. They are {\it cast},
  {\it sizeof}, {\it subscripting array} and
 {\it function application} expressions. The subscripting array expression
 is an extension of the reference expression, which includes other
-more complicated array objects such as pointer, function, 
+more complicated array objects such as pointer, function,
 structure or union member... The same extension is made to call
 expression, named function application, because the called function is
-not necessarily an entity but can be any expression that denotes a function.   
+not necessarily an entity but can be any expression that denotes a function.
 
 \verb/syntax += cast + sizeofexpression + subscript + application/
 
@@ -1254,8 +1254,8 @@ not necessarily an entity but can be any expression that denotes a function.
 
 \verb/cast = type x expression/
 
-Cast cannot be reprenseted easily as intrinsicss as in Fortran,
- because their number is unbounded due to the typedef mechanism.
+Cast cannot be represented easily as intrinsics as in Fortran, because
+their number is unbounded due to the typedef mechanism.
 
 \section{Sizeof}
 \verb/sizeofexpression = type + expression/
@@ -1268,13 +1268,13 @@ In C, pointer expressions can be subscripted, not arrays only.
 
 \section{Application}
 
-C is mot flexible than Fortran about functional pointer. Such pointers
- can be stored in data structures isntead of being restricted to
- function call.
+C is more flexible than Fortran about functional pointers. Such pointers
+can be stored in data structures instead of being restricted to function
+call.
 
 \verb/application = function:expression x arguments:expression*/
 
-For example, we have such a function call in C::
+For example, we have such a function call in C:
 \begin{lstlisting}
   (*ctx->Driver.RendererString)()
 \end{lstlisting}

@@ -37,6 +37,15 @@
 \usepackage{makeidx}
 \makeindex
 
+%% For nice rendering of source codes:
+\usepackage[hyper,procnames]{listings}
+\lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
+  showstringspaces=false, showtabs=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
+  index=[1][keywords],indexprocnames=true}
+
 \title{PIPS: Internal Representation of Fortran and C Code}
 \author{Fabien Coelho\\
   Béatrice Creusillet\\
@@ -1783,12 +1792,25 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-cast}
 \index{Cast}
 
+This is used to represent expressions in C such as:
+\begin{lstlisting}
+  (type) e;
+\end{lstlisting}
+
 \domain{Cast = type x expression}
 {}
 
 \subsubsection{Sizeof}
 \label{subsubsection-sizeof}
 \index{Sizeof}
+
+This is used to represent expressions such as:
+\begin{lstlisting}
+  sizeof(e);
+  sizeof(type);
+\end{lstlisting}
+Since it can be applied on a type, it cannot be represented in the RI as a
+classical function call to a \texttt{sizeof()} operator.
 
 \domain{Sizeofexpression = type + expression}
 {}
@@ -1797,6 +1819,8 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-subscript}
 \index{Subscript}
 
+In C, pointer expressions can be subscripted, not only arrays, so there is
+a subscript expression:
 \domain{Subscript = array:expression x indices:expression*}
 {}
 
@@ -1804,6 +1828,8 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-application}
 \index{Application}
 
+Since in C not only functions can be called but also any function
+pointers, there is a need to represent these function calls:
 \domain{Application = function:expression x arguments:expression*}
 {}
 
@@ -1825,7 +1851,7 @@ expression linéaire construite sur les variables simples entières
 (sous-domaine \texttt{linear}) ou non (sous-domaine \texttt{complex}).
 \end{comment}
 
-Field \verb/complex/ is used if the expression is not affine, e.g. 
+Field \verb/complex/ is used if the expression is not affine, e.g.
 \texttt{I*J+4}, or if it is affine but contains references to non integer scalar
 variables, e.g. \texttt{T(I-1) + T(I) + T(I+1)}.
 
@@ -1881,13 +1907,13 @@ porte sur les valeurs des variables scalaires entières d'un module ou
 des variables globales au programme.
 \end{comment}
 
-Variables in the list \verb/arguments/ are variables whose values 
+Variables in the list \verb/arguments/ are variables whose values
 \emph{may} have changed between the two control points. Two values are denoted
 for each variable in the \verb/arguments/ list, the initial value and
 the final value. The initial values are pure values, i.e. entities
 specific to the semantics library. The final values are identified with
 the variable entities, in order to decrease the total number of pure
-values. Variables that do not appear in the \verb/arguments/ list 
+values. Variables that do not appear in the \verb/arguments/ list
 \emph{must} have the same initial and final values, by definition. This unique
 value is considered a final value and no value entity is allocated.
 
@@ -1912,7 +1938,7 @@ linéaires entre valeurs.
 
 Two kinds of transformers are used in PIPS. The first kind is linked to
 a statement and is an abstraction of the corresponding command, limited
-to integer scalar variables. Such transformers are called 
+to integer scalar variables. Such transformers are called
 \emph{transformers}. The second kind of transformer, also associated to a
 statement, abstracts the relationship between the initial store of a
 module or of a whole program and the store just before the execution of
