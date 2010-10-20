@@ -109,26 +109,26 @@ void write_data(char filename[])
 REGIONS for all modules
 
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 void compute()
 {
    int i, j;
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
@@ -136,45 +136,43 @@ void compute()
 kernel1:
    for(i = 1; i <= 499; i += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499,
-//    1<=i, i<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{i<=PHI1+1, PHI1<=1+i,
-//    i<=PHI1+PHI2, PHI2+i<=PHI1+500, PHI1<=PHI2+i, PHI1+PHI2<=500+i,
-//    1<=i, i<=499}>
+//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
+//    i<=499}>
+//  <space[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
+//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//    i<=499}>
 
       for(j = 1; j <= 499; j += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i,
-//    i<=499, 1<=j, j<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1,
-//    PHI2+i<=PHI1+1+j, PHI1+j<=PHI2+1+i, PHI1+PHI2<=1+i+j, 1<=i,
-//    i<=499, 1<=j, j<=499}>
+//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
+//    j<=499}>
+//  <space[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
+//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 kernel2:
    for(i = 1; i <= 499; i += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{i<=PHI1+1, PHI1<=1+i,
-//    i<=PHI1+PHI2, PHI2+i<=PHI1+500, PHI1<=PHI2+i, PHI1+PHI2<=500+i,
-//    1<=i, i<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499,
-//    1<=i, i<=499}>
+//  <save[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
+//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//    i<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
+//    i<=499}>
 
       for(j = 1; j <= 499; j += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1,
-//    PHI2+i<=PHI1+1+j, PHI1+j<=PHI2+1+i, PHI1+PHI2<=1+i+j, 1<=i,
-//    i<=499, 1<=j, j<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i,
-//    i<=499, 1<=j, j<=499}>
+//  <save[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
+//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
+//    j<=499}>
 
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
@@ -183,8 +181,14 @@ kernel2:
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 void get_data(char filename[])
 {
@@ -196,11 +200,17 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       perror("Error loading file");
       exit(0);
@@ -209,8 +219,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get *.pgm file type */
@@ -219,24 +229,24 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    do {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n') 
          ;
@@ -246,8 +256,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Put back good char */
@@ -256,8 +266,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get image dimensions */
@@ -266,8 +276,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
@@ -275,41 +285,44 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
    
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1)
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=500,
-//    0<=i, i<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=500, 0<=i,
+//    i<=500}>
 
       for(j = 0; j <= 500; j += 1)
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=500, 0<=j, j<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
+//    j<=500}>
 
          space[i][j] = 0;
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{1<=nx, 1<=ny}>
-//  <fp[PHI1]-W-MAY-{1<=nx, 1<=ny}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=nx,
-//    PHI1<=500, 0<=PHI2, PHI2+1<=ny, PHI2<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
+//    PHI2<=500, PHI2+1<=ny}>
 
    
    /* Read the pixel grey value: */
@@ -318,29 +331,29 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=j, 1+j<=ny, 1<=nx}>
-//  <fp[PHI1]-W-MAY-{0<=j, 1+j<=ny, 1<=nx}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1+1<=nx,
-//    PHI1<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <fp[PHI1]-W-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
          c = fgetc(fp);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
          if (i<501&&j<501) 
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
             space[i][j] = c;
       }
@@ -348,8 +361,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{501<=i+501j, 0<=i, ny<=j, 0<=j}>
-//  <fp[PHI1]-W-MAY-{501<=i+501j, 0<=i, ny<=j, 0<=j}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
 
    fclose(fp);
@@ -358,40 +371,44 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <argv[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
-//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <argv[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
-//  <TOP-LEVEL:stderr-R-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-W-MAY-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 int main(int argc, char *argv[])
 {
    int t, i;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
 //  <argv[PHI1]-R-MAY-{PHI1==0}>
-//  <TOP-LEVEL:stderr-R-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-W-MAY-{}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
 
    if (argc!=2) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <argv[PHI1]-R-EXACT-{PHI1==0}>
-//  <TOP-LEVEL:stderr-R-EXACT-{}>
-//  <TOP-LEVEL:stderr[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:stderr[PHI1]-W-MAY-{}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       
       
@@ -401,58 +418,66 @@ int main(int argc, char *argv[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1, argc==2}>
 //  <argv[PHI1]-R-EXACT-{PHI1==1, argc==2}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
    get_data(argv[1]);
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, argc==2}>
+//  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500,
+//    argc==2}>
 
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
    for(i = 0; i <= 500; i += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, i<=PHI1+PHI2, PHI1+PHI2<=500+i, argc==2, 0<=i,
-//    i<=500}>
+//  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, i<=PHI1+PHI2,
+//    PHI1+PHI2<=i+500, 0<=PHI2, PHI2<=500, argc==2, 0<=i, i<=500}>
 
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 
    for(t = 0; t <= 399; t += 1)
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
       compute();
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
 
    write_data("output.pgm");
@@ -463,8 +488,11 @@ int main(int argc, char *argv[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
 void write_data(char filename[])
 {
@@ -476,11 +504,17 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
    if ((fp = fopen(filename, "w"))==(void *) 0) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       perror("Error opening file");
       exit(0);
@@ -489,8 +523,8 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Write the PGM header: */
@@ -499,9 +533,9 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
 
@@ -510,23 +544,23 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=j, j<=500}>
-//  <fp[PHI1]-W-MAY-{0<=j, j<=500}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500,
-//    0<=j, j<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
+//    j<=500}>
 
       for(i = 0; i <= 500; i += 1) {
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    i<=500, 0<=j, j<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
+//    j<=500}>
 
          c = space[i][j];
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=i, i<=500, 0<=j, j<=500}>
-//  <fp[PHI1]-W-MAY-{0<=i, i<=500, 0<=j, j<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
          fputc(c, fp);
       }
@@ -534,8 +568,8 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{i==501, j==501}>
-//  <fp[PHI1]-W-MAY-{i==501, j==501}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    fclose(fp);
 }
@@ -725,31 +759,25 @@ void p4a_kernel_launcher_2(float_t space[501][501])
 void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
    p4a_kernel_0(save, space, i, j);
-   // END BLOCK
 }
 void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
-   // BEGIN BLOCK
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
    p4a_kernel_1(save, space, i, j);
-   // END BLOCK
 }
 void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    p4a_kernel_2(space, i, j);
-   // END BLOCK
 }
 void write_data(char filename[])
 {
@@ -781,49 +809,49 @@ void write_data(char filename[])
 REGIONS for compute and get_data
 
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 void compute()
 {
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_0(save, space);
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 kernel2:   p4a_kernel_launcher_1(save, space);
@@ -833,8 +861,14 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
 void get_data(char filename[])
 {
@@ -842,12 +876,14 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp-W-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
@@ -858,16 +894,25 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       // BEGIN BLOCK
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       perror("Error loading file");
       exit(0);
@@ -877,8 +922,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get *.pgm file type */
@@ -887,24 +932,24 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    do {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n') 
          ;
@@ -914,8 +959,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Put back good char */
@@ -924,8 +969,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get image dimensions */
@@ -934,8 +979,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
@@ -943,18 +988,21 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
    
@@ -964,10 +1012,10 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{1<=nx, 1<=ny}>
-//  <fp[PHI1]-W-MAY-{1<=nx, 1<=ny}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=nx,
-//    PHI1<=500, 0<=PHI2, PHI2+1<=ny, PHI2<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
+//    PHI2<=500, PHI2+1<=ny}>
 
    
    /* Read the pixel grey value: */
@@ -976,39 +1024,39 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=j, 1+j<=ny, 1<=nx}>
-//  <fp[PHI1]-W-MAY-{0<=j, 1+j<=ny, 1<=nx}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1+1<=nx,
-//    PHI1<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <fp[PHI1]-W-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
          // BEGIN BLOCK
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <fp[PHI1]-W-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
          c = fgetc(fp);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
          if (i<501&&j<501) 
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
             space[i][j] = c;
          // END BLOCK
@@ -1017,8 +1065,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{ny<=j, 0<=j}>
-//  <fp[PHI1]-W-MAY-{ny<=j, 0<=j}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
 
    fclose(fp);
@@ -1032,21 +1080,21 @@ void compute()
    // BEGIN BLOCK
    int i, j;
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <space[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_0(save, space);
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 kernel2:   p4a_kernel_launcher_1(save, space);
@@ -1069,6 +1117,9 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 
       perror("Error loading file");
       exit(0);
@@ -1078,8 +1129,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get *.pgm file type */
@@ -1088,24 +1139,24 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    do {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n') 
          ;
@@ -1115,8 +1166,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Put back good char */
@@ -1125,8 +1176,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    
    /* Get image dimensions */
@@ -1135,8 +1186,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
@@ -1144,18 +1195,21 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{}>
-//  <fp[PHI1]-W-MAY-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
    
@@ -1170,15 +1224,15 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <fp[PHI1]-W-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
          if (i<501&&j<501) 
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
             space[i][j] = c;
          // END BLOCK
@@ -1187,8 +1241,8 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{ny<=j, 0<=j}>
-//  <fp[PHI1]-W-MAY-{ny<=j, 0<=j}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
 
    fclose(fp);
@@ -1198,38 +1252,38 @@ void get_data(char filename[])
 IN REGIONS for compute and get_data
 
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
 void compute()
 {
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
+//  <space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_0(save, space);
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500}>
 
 kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
@@ -1237,13 +1291,21 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
+//  <stderr-IN-MAY-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 
 void get_data(char filename[])
 {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <stderr-IN-MAY-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
@@ -1254,14 +1316,20 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 //  <fp-OUT-EXACT-{}>
+//  <stderr-IN-MAY-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
+//  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 
       // BEGIN BLOCK
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
+//  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 
       perror("Error loading file");
       exit(0);
@@ -1270,7 +1338,7 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    
    /* Get *.pgm file type */
@@ -1278,19 +1346,19 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <fp-IN-MAY-{}>
 
    do {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <fp-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{}>
 
       while ((c = fgetc(fp))!='\n') 
          ;
@@ -1299,7 +1367,7 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    
    /* Put back good char */
@@ -1307,7 +1375,7 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    
    /* Get image dimensions */
@@ -1315,19 +1383,21 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
@@ -1335,7 +1405,7 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{1<=nx, 1<=ny}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <fp-IN-EXACT-{}>
 
    
@@ -1343,20 +1413,20 @@ void get_data(char filename[])
    for(j = 0; j <= ny-1; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{0<=j, 1+j<=ny, 1<=nx}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx}>
 //  <fp-IN-EXACT-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
          // BEGIN BLOCK
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
@@ -1367,7 +1437,7 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
-//  <fp[PHI1]-IN-MAY-{ny<=j, 0<=j}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 
 
    fclose(fp);
@@ -1377,53 +1447,55 @@ void get_data(char filename[])
 OUT REGIONS for compute and get_data
 
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
 
 void compute()
 {
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <TOP-LEVEL:save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
 
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_0(save, space);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
-//    PHI1+PHI2<=999}>
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//    PHI2<=499}>
 
 kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 
 void get_data(char filename[])
 {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
@@ -1432,14 +1504,17 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp-OUT-EXACT-{}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 
       // BEGIN BLOCK
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
+//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 
       perror("Error loading file");
       exit(0);
@@ -1447,24 +1522,24 @@ void get_data(char filename[])
    }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    do {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n') 
          ;
@@ -1472,27 +1547,27 @@ void get_data(char filename[])
    while ((c = fgetc(fp))=='#');
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
    /* Get ONE carriage return */
    fgetc(fp);
@@ -1501,7 +1576,7 @@ void get_data(char filename[])
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
    
@@ -1509,41 +1584,41 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
-//  <fp[PHI1]-OUT-MAY-{1<=nx, 1<=ny}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1+1<=nx,
-//    PHI1<=500, 0<=PHI2, PHI2+1<=ny, PHI2<=500}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx,
+//    0<=PHI2, PHI2<=500, PHI2+1<=ny}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, 1+j<=ny}>
-//  <fp[PHI1]-OUT-MAY-{0<=j, 1+j<=ny, 1<=nx}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{PHI2==j, 0<=PHI1,
-//    PHI1+1<=nx, PHI1<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, j+1<=ny}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <space[PHI1][PHI2]-OUT-MAY-{PHI2==j, 0<=PHI1, PHI1<=500,
+//    PHI1+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, 1+i<=nx}>
-//  <fp[PHI1]-OUT-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=i, i+1<=nx}>
+//  <space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
          // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, 1+i<=nx}>
-//  <fp[PHI1]-OUT-MAY-{0<=i, 1+i<=nx, 0<=j, 1+j<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=i, i+1<=nx}>
 
          c = fgetc(fp);
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
          if (i<501&&j<501) 
 
-//  <TOP-LEVEL:space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i,
-//    1+i<=nx, i<=500, 0<=j, 1+j<=ny, j<=500}>
+//  <space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
             space[i][j] = c;
          // END BLOCK
@@ -1571,14 +1646,6 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 }
 void get_data(char filename[])
 {
-
-//  <c-PRIVATE-EXACT-{}>
-//  <fp-PRIVATE-EXACT-{}>
-//  <i-PRIVATE-EXACT-{}>
-//  <j-PRIVATE-EXACT-{}>
-//  <nx-PRIVATE-EXACT-{}>
-//  <ny-PRIVATE-EXACT-{}>
-
    // BEGIN BLOCK
    int i, j, nx, ny;
    unsigned char c;
@@ -1614,16 +1681,10 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
    
    /* Read the pixel grey value: */
-#pragma omp for private(c,j)
+#pragma omp for private(j)
    for(j = 0; j <= ny-1; j += 1)
-
-//  <c-PRIVATE-EXACT-{}>
-
-#pragma omp for private(c,i)
+#pragma omp for private(i)
       for(i = 0; i <= nx-1; i += 1) {
-
-//  <c-PRIVATE-EXACT-{}>
-
          // BEGIN BLOCK
          c = fgetc(fp);
          /* Truncate the image if too big: */

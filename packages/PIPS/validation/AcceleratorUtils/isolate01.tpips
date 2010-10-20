@@ -12,7 +12,7 @@ display PRINTED_FILE[%ALLFUNC]
 echo tiled code
 apply FLAG_LOOPS
 setproperty LOOP_LABEL "l99998"
-setproperty LOOP_TILING_MATRIX "10 0,0 10"
+setproperty LOOP_TILING_MATRIX "2 0,0 2"
 apply LOOP_TILING
 apply FLAG_LOOPS
 display PRINTED_FILE
@@ -31,6 +31,10 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc -c $WS.database/Src/$WS.c -o /dev/null
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
+shell ./$WS.database/Tmp/ref > $WS.database/Tmp/ref-out
+shell ./$WS.database/Tmp/test > $WS.database/Tmp/test-out
+shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
 
 delete $WS

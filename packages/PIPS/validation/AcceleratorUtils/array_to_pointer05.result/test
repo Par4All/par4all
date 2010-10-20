@@ -18,7 +18,7 @@ void vector_product(size_t n, double a[n*n], double b[n], double c[n])
    double res = 0.;
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
-         c[i] += a[j+n*i]*b[j];
+         c[i] += a[j+i*n]*b[j];
 }
 
 Code after partial eval
@@ -29,7 +29,7 @@ void vector_product(size_t n, double a[n*n], double b[n], double c[n])
    double res = 0.;
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
-         c[i] += a[j+n*i]*b[j];
+         c[i] += a[j+i*n]*b[j];
 }
 
 Unsplit resulting code

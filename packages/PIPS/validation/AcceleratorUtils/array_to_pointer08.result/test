@@ -32,15 +32,15 @@ typedef struct {
 int main(int argc, char **argv);
 int main(int argc, char **argv)
 {
-   fftw_complex cdens[1024];
-   mystruct m[1024];
+   double *cdens = alloca(sizeof(double[2048]));
+   mystruct *m = alloca(sizeof(mystruct[1024]));
    int i;
    for(i = 0; i <= 1023; i += 1) {
-      *((double *) cdens+2*i) = 1;
-      *((double *) cdens+2*i+1) = 0;
+      *(cdens+2*i) = 1;
+      *(cdens+2*i+1) = 0;
 
-      (*((mystruct *) m+i)).a = 1;
-      (*((mystruct *) m+i)).b = 0;
+      (*(m+i)).a = 1;
+      (*(m+i)).b = 0;
    }
    return 0;
 }

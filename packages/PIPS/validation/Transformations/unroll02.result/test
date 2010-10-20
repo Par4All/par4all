@@ -45,7 +45,7 @@ C
       PRINT *, T                                                        0012
       END
 
-Code after dead code elimination for "UNROLL02"
+Code after suppress dead code for "UNROLL02"
 
 C
 C
@@ -67,7 +67,7 @@ C
       PRINT *, T                                                        0012
       END
 
-Code after use-def elimination for "UNROLL02"
+Code after dead code elimination for "UNROLL02"
 
 C
 C

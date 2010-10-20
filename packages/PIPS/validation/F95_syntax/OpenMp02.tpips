@@ -24,7 +24,7 @@ apply OMPIFY_CODE
 display PRINTED_FILE(%ALL)
 
 apply UNSPLIT (%ALL)
-shell gcc -fopenmp -c OpenMp02.database/Src/OpenMp02.f90 -o OpenMp02.database/Src/OpenMp02.o
+shell ${PIPS_F90:-gcc} -fopenmp -c OpenMp02.database/Src/OpenMp02.f90 -o OpenMp02.database/Src/OpenMp02.o
 
 close
 delete OpenMp02

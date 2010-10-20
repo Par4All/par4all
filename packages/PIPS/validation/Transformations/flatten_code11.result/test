@@ -79,17 +79,17 @@ void flatten_code11(void)
    // BEGIN BLOCK
    int i;                                                               /*0007*/
    //PIPS generated variable
-   static int foo_0 = 0;
+   static int foo = 0;
    
    /* Let's execute this loop four times! */
-   foo_0++;
-   fprintf(stdout, "foo=%d\n", foo_0);
-   foo_0++;
-   fprintf(stdout, "foo=%d\n", foo_0);
-   foo_0++;
-   fprintf(stdout, "foo=%d\n", foo_0);
-   foo_0++;
-   fprintf(stdout, "foo=%d\n", foo_0);
+   foo++;
+   fprintf(stdout, "foo=%d\n", foo);
+   foo++;
+   fprintf(stdout, "foo=%d\n", foo);
+   foo++;
+   fprintf(stdout, "foo=%d\n", foo);
+   foo++;
+   fprintf(stdout, "foo=%d\n", foo);
    i = 4;
    // END BLOCK
 }

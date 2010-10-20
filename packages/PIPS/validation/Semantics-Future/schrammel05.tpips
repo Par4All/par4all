@@ -18,7 +18,7 @@ echo
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
-# quit
+#quit
 
 echo
 echo PRECONDITIONS

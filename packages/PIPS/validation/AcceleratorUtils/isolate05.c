@@ -18,4 +18,5 @@ isolate:
 main()
 {
     lonesome_cowboy();
+    return 0;
 }

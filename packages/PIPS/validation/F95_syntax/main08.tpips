@@ -11,7 +11,7 @@ apply UNSPLIT[%ALL]
 echo
 echo "compile sources produced by pips"
 echo
-shell gcc -c -o main08.database/Src/main08.o main08.database/Src/main08.f90
+shell ${PIPS_F90:-gcc} -c -o main08.database/Src/main08.o main08.database/Src/main08.f90
 
 close
 quit

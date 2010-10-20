@@ -1,0 +1,33 @@
+setenv WS cse01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv PIPS_CPP_FLAGS "-I Scilab2C-2/includes -I Scilab2C-2/interfaces"
+
+delete $WS
+
+create $WS $WS.c Scilab2C-2/src/c/dcosa.c Scilab2C-2/src/c/dcoss.c Scilab2C-2/src/c/dabss.c Scilab2C-2/src/c/dfloors.c
+
+module scilab2c
+
+display PRINTED_FILE
+
+apply ICM
+
+display PRINTED_FILE
+
+apply COMMON_SUBEXPRESSION_ELIMINATION
+
+display PRINTED_FILE
+
+apply CLEAN_DECLARATIONS
+
+display PRINTED_FILE
+
+display PRINTED_FILE[dcosa]
+
+close
+
+delete $WS
+
+quit

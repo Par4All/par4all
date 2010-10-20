@@ -6,7 +6,7 @@ create $WS $WS.c include/SIMD.c
 
 module kernel_
 
-setproperty RELAX_FLOAT_COMMUTATIVITY TRUE 
+setproperty RELAX_FLOAT_ASSOCIATIVITY TRUE 
 
 activate MUST_REGIONS
 activate REGION_CHAINS

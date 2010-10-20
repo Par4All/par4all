@@ -1,0 +1,49 @@
+delete formal02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create formal02 formal02.c
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+setproperty ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo Source code with statement numbers and proper effects
+echo
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Default dependence graph: it should be empty
+echo
+
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+activate  PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE[formal02]
+
+close formal02
+delete formal02
+
+create formal02 formal02.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+echo
+echo Aliasing assumed between formal parameters: the dependence graph should not be empty
+echo
+
+setproperty ALIASING_ACROSS_FORMAL_PARAMETERS TRUE
+setproperty ALIASING_ACROSS_TYPES TRUE
+
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+activate  PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE[formal02]
+
+close formal02
+delete formal02

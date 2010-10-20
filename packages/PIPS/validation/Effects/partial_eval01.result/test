@@ -1,0 +1,106 @@
+
+Initial code
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Initial code with proper effects for "main"
+
+int main()
+{
+//               <may be written >: riri[*]
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//               <may be written >: fifi[*][*]
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+//               <must be written>: size
+   int size = 2;
+   int loulou[1][size][6];
+   int i;
+   int j;
+//               <must be written>: k
+   int k = 16;
+//               <must be read   >: size
+//               <must be written>: i
+   for(i = 0; i <= size-1; i += 1)
+//               <must be read   >: size
+//               <must be written>: j
+      for(j = 0; j <= 5; j += 1)
+//               <must be read   >: i j k size
+//               <must be written>: k loulou[0][i][j]
+         loulou[0][i][j] = k++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1] riri[2]
+   printf("%d\n", duck(riri, fifi, size, loulou));
+   return 0;
+}
+
+Initial code with proper effects for "duck"
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Initial code with cumulated effects for "main"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <may be written >: stdout[0]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//               <may be written >: riri[*]
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//               <may be written >: fifi[*][*]
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+//               <must be written>: size
+   int size = 2;
+   int loulou[1][size][6];
+   int i;
+   int j;
+//               <must be written>: k
+   int k = 16;
+//               <may be read    >: i j k
+//               <may be written >: j k loulou[0][*][*]
+//               <must be read   >: size
+//               <must be written>: i
+   for(i = 0; i <= size-1; i += 1)
+//               <may be read    >: i j k
+//               <may be written >: k loulou[0][*][*]
+//               <must be read   >: size
+//               <must be written>: j
+      for(j = 0; j <= 5; j += 1)
+//               <may be written >: loulou[0][*][*]
+//               <must be read   >: i j k size
+//               <must be written>: k
+         loulou[0][i][j] = k++;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1] riri[2]
+   printf("%d\n", duck(riri, fifi, size, loulou));
+   return 0;
+}
+
+Initial code with cumulated effects for "duck"
+
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: size
+//               <must be written>: riri[2]
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+//               <must be written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}

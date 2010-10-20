@@ -45,12 +45,12 @@ with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program) as w:
 	
 	mn.privatize_module()
 	
-	mn.display(With="PRINT_CODE_REGIONS")
+	mn.display(activate="PRINT_CODE_REGIONS")
 	
 	
 	# mn.localize_declaration()
 	
-	# mn.display(With="PRINT_CODE_PRECONDITIONS")
+	# mn.display(activate="PRINT_CODE_PRECONDITIONS")
 	
 	mn.coarse_grain_parallelization()
 	mn.display()

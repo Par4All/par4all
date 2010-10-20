@@ -259,8 +259,8 @@ int main()
          }
       }
 
-//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, foo:0`l==2, i==j-3, n==3,
-//    i<=15}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, foo:0`l+i==j-1, i==j-3,
+//    n==3, i<=15}
 
       i <<= 2;
    }

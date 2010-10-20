@@ -1,4 +1,58 @@
 original code
+void P4A_accel_free(void **ptr)
+{
+   free(*ptr);
+   *ptr = (void *) 0;
+}
+void P4A_accel_malloc(void **ptr, size_t n)
+{
+   if (n)
+      *ptr = malloc(n);
+   else
+      *ptr = (void *) 0;
+}
+void * P4A_copy_from_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+{
+   size_t i, l;
+
+   char *cdest = (char *) dest, *csrc = (char *) src;
+   for(i = 0; i <= d1_block_length-1; i += 1)
+      for(l = 0; l <= size-1; l += 1)
+         cdest[(i+d1_offset)*size+l] = csrc[i*size+l];
+   return dest;
+}
+void * P4A_copy_from_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+{
+   size_t i, j, l;
+
+   char *cdest = (char *) dest, *csrc = (char *) src;
+   for(i = 0; i <= d1_block_length-1; i += 1)
+      for(j = 0; j <= d2_block_length-1; j += 1)
+         for(l = 0; l <= size-1; l += 1)
+            cdest[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l] = csrc[i*size*d2_block_length+j*size+l];
+   return dest;
+}
+void * P4A_copy_to_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+{
+   size_t i, l;
+
+   char *cdest = (char *) dest, *csrc = (char *) src;
+   for(i = 0; i <= d1_block_length-1; i += 1)
+      for(l = 0; l <= size-1; l += 1)
+         cdest[i*size+l] = csrc[(i+d1_offset)*size+l];
+   return dest;
+}
+void * P4A_copy_to_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+{
+   size_t i, j, l;
+
+   char *cdest = (char *) dest, *csrc = (char *) src;
+   for(i = 0; i <= d1_block_length-1; i += 1)
+      for(j = 0; j <= d2_block_length-1; j += 1)
+         for(l = 0; l <= size-1; l += 1)
+            cdest[i*size*d2_block_length+j*size+l] = csrc[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l];
+   return dest;
+}
 void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
 {
    unsigned int i, j;
@@ -6,10 +60,20 @@ void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
       for(j = 0; j <= 39; j += 1)
          result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }
-int caller()
+int main(int argc, char *argv[])
 {
    short a[40][40], b[40][40], c[40][40];
+   int i, j;
+   for(i = 0; i <= 39; i += 1)
+      for(j = 0; j <= 39; j += 1)
+         a[i][j] = b[i][j] = i*j;
    alphablending(a, b, c);
+   for(i = 0; i <= 39; i += 1) {
+      for(j = 0; j <= 39; j += 1)
+         printf("%hd ", c[i][j]);
+      puts("\n");
+   }
+   return 0;
 }
 tiled code
 void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
@@ -97,16 +161,22 @@ l99998:
 l99995:
       for(j_t = 0; j_t <= 3; j_t += 1) {
          //PIPS generated variable
-         short result0[10][10], src00[10][10], src10[10][10];
-         chaaaaaaarge(src10, 2, 10, 10, &src1[10*i_t][10*j_t], 2, 40, 40);
-         chaaaaaaarge(src00, 2, 10, 10, &src0[10*i_t][10*j_t], 2, 40, 40);
+         short (*src10)[10][10] = (short (*)[10][10]) 0, (*src00)[10][10] = (short (*)[10][10]) 0, (*result0)[10][10] = (short (*)[10][10]) 0;
+         P4A_accel_malloc((void **) &result0, sizeof(short)*100);
+         P4A_accel_malloc((void **) &src00, sizeof(short)*100);
+         P4A_accel_malloc((void **) &src10, sizeof(short)*100);
+         P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 40, 40, 10*i_t, 10*j_t, 10, 10);
+         P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 40, 40, 10*i_t, 10*j_t, 10, 10);
 
 l99996:
          for(i = 10*i_t; i <= 10*i_t+9; i += 1)
 l99997:
             for(j = 10*j_t; j <= 10*j_t+9; j += 1)
-               result0[i-10*i_t][j-10*j_t] = (40*src00[i-10*i_t][j-10*j_t]+60*src10[i-10*i_t][j-10*j_t])/100;
-         retreaaaaaat(result, 2, 40, 40, &result0[10*i_t][10*j_t], 2, 10, 10);
+               (*result0)[i-10*i_t][j-10*j_t] = (40*(*src00)[i-10*i_t][j-10*j_t]+60*(*src10)[i-10*i_t][j-10*j_t])/100;
+         P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 40, 40, 10*i_t, 10*j_t, 10, 10);
+         P4A_accel_free((void **) &result0);
+         P4A_accel_free((void **) &src00);
+         P4A_accel_free((void **) &src10);
       }
 }
 

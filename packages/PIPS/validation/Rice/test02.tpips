@@ -4,6 +4,7 @@
 delete test02
 
 setproprety ABORT_ON_USER_ERROR TRUE
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 create test02 test02.c
 

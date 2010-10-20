@@ -9,6 +9,7 @@ display PRINTED_FILE
 apply FORWARD_SUBSTITUTE
 echo !! After forward substitution
 display PRINTED_FILE
+apply REDUNDANT_LOAD_STORE_ELIMINATION
 apply USE_DEF_ELIMINATION
 echo !! After use-def elimination
 display PRINTED_FILE

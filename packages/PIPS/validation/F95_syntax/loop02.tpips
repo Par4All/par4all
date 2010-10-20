@@ -10,7 +10,7 @@ apply UNSPLIT (%ALL)
 echo
 echo "compile sources produced by pips"
 echo
-shell gcc -c -o loop02.database/Src/loop02.o loop02.database/Src/loop02.f90
+shell ${PIPS_F90:-gcc} -c -o loop02.database/Src/loop02.o loop02.database/Src/loop02.f90
 
 close
 #delete loop02

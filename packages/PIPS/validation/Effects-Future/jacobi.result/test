@@ -1,0 +1,212 @@
+
+Privatization of function "jacobi" and "main"
+
+
+Cumulated effects for function "jacobi"
+
+//               <may be read    >: a a[*] b b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+int jacobi(int nb, int **a, int **b)
+{
+   int indice_i, indice_j;                                              /*0008*/
+//               <may be read    >: a a[*] b b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+//               <must be written>: indice_i
+
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)
+//               <may be read    >: a a[*] b b[*] b[*][*] indice_i
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+//               <must be written>: indice_j
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)
+//               <may be read    >: a[*] b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: a b indice_i indice_j nb
+         
+         
+         
+         
+         
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0017*/
+   
+   
+   return 0;                                                            /*0022*/
+}
+
+Cumulated effects for function "main"
+
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ argv[1]
+//               <may be written >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be read   >: argc
+int main(int argc, char *argv[])
+{
+   //int i;for(i=0;i<argc;i++) printf("_%s_\n",argv[i]);
+   int **a;                                                             /*0028*/
+   int **b;                                                             /*0029*/
+   int indice_i;                                                        /*0030*/
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ a a[*] 
+//                                  argv[1] b b[*] b[*][*]
+//               <may be written >: _MALLOC_EFFECTS:_MALLOC_ a a[*] 
+//                                  a[*][*] b b[*] indice_i
+//               <must be read   >: argc
+   if (argc>1) {                                                        /*0031*/
+//               <must be read   >: argv[1]
+//               <must be written>: nb
+      int nb = atol(argv[1]);                                           /*0032*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ nb
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+      b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ nb
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a
+      a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ a b
+//               <may be written >: _MALLOC_EFFECTS:_MALLOC_ a[*] b[*]
+//               <must be read   >: nb
+//               <must be written>: indice_i
+
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {
+//               <may be written >: a[*]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a 
+//                                  indice_i nb
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+         a[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0037*/
+//               <may be written >: b[*]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ b 
+//                                  indice_i nb
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+         b[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0038*/
+      }
+//               <may be read    >: a[*] b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: a b nb
+      return jacobi(nb, a, b);                                          /*0040*/
+   }
+   return 0;                                                            /*0042*/
+}
+
+Dependence graph for function "jacobi"
+
+
+ **************** Effective Dependence Graph ****************
+
+	17 --> 17 with conflicts
+		from <a[indice_i][indice_j]-W-MUST> to <b[indice_i][indice_j-1]-R-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <a[indice_i][indice_j]-W-MUST> to <b[indice_i][indice_j+1]-R-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <a[indice_i][indice_j]-W-MUST> to <b[indice_i-1][indice_j]-R-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <a[indice_i][indice_j]-W-MUST> to <b[indice_i+1][indice_j]-R-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <b[indice_i][indice_j-1]-R-MUST> to <a[indice_i][indice_j]-W-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <b[indice_i][indice_j+1]-R-MUST> to <a[indice_i][indice_j]-W-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <b[indice_i-1][indice_j]-R-MUST> to <a[indice_i][indice_j]-W-MUST> at levels  1 2
+	17 --> 17 with conflicts
+		from <b[indice_i+1][indice_j]-R-MUST> to <a[indice_i][indice_j]-W-MUST> at levels  1 2
+	17 --> -1 with conflicts
+		from <a[indice_i][indice_j]-W-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i][indice_j-1]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i][indice_j+1]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i-1][indice_j]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i-1]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i+1][indice_j]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <b[indice_i+1]-R-MUST> to <indice_j-W-MUST> at levels  1
+	17 --> -1 with conflicts
+		from <a[indice_i]-R-MUST> to <indice_j-W-MUST> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Dependence graph for function "main"
+
+
+ **************** Effective Dependence Graph ****************
+
+	38 --> 38 with conflicts
+		from <b[indice_i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	38 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <b[indice_i]-W-MUST> to <a[indice_i]-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <b[indice_i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <a[indice_i]-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	37 --> 38 with conflicts
+		from <a[indice_i]-W-MUST> to <b[indice_i]-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <a[indice_i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <b[indice_i]-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1 2
+	37 --> 37 with conflicts
+		from <a[indice_i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	37 --> 37 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Parallel code for function "jacobi"
+
+int jacobi(int nb, int **a, int **b)
+{
+   int indice_i, indice_j;                                              /*0008*/
+
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)
+         
+         
+         
+         
+         
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0017*/
+   
+   
+   return 0;                                                            /*0022*/
+}
+
+Parallel code for function "main"
+
+int main(int argc, char *argv[])
+{
+   //int i;for(i=0;i<argc;i++) printf("_%s_\n",argv[i]);
+   int **a;                                                             /*0028*/
+   int **b;                                                             /*0029*/
+   int indice_i;                                                        /*0030*/
+   if (argc>1) {                                                        /*0031*/
+      int nb = atol(argv[1]);                                           /*0032*/
+      b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
+      a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
+
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {
+         a[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0037*/
+         b[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0038*/
+      }
+      return jacobi(nb, a, b);                                          /*0040*/
+   }
+   return 0;                                                            /*0042*/
+}

@@ -54,17 +54,17 @@ apply PARTIAL_EVAL[UNROLL02]
 display PRINTED_FILE[UNROLL02]
 
 echo
-echo Code after dead code elimination for "UNROLL02"
+echo Code after suppress dead code for "UNROLL02"
 echo
 
 apply SUPPRESS_DEAD_CODE[UNROLL02]
 display PRINTED_FILE[UNROLL02]
 
 echo
-echo Code after use-def elimination for "UNROLL02"
+echo Code after dead code elimination for "UNROLL02"
 echo
 
-apply USE_DEF_ELIMINATION[UNROLL02]
+apply DEAD_CODE_ELIMINATION[UNROLL02]
 display PRINTED_FILE[UNROLL02]
 
 close
