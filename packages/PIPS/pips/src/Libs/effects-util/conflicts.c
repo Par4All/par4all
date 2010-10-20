@@ -248,8 +248,12 @@ bool array_references_may_conflict_p( list sl1, list sl2 ) {
  * access the same memory locations?
  *
  * Subscript list sl1 and sl2 can be evaluated in two different stores.
+ *
+ * FI: this code seems to assume that ALIASING_ACROSS_DATA_STRUCTURES
+ * is set to FALSE.
  */
-bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
+bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
+{
   bool conflict_p = TRUE;
   type t = entity_type(v);
   int sl1n = gen_length( sl1 );
@@ -265,48 +269,48 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
       list cind2 = list_undefined;
       /* FI: this is new not really designed (!) code */
       for ( cind1 = sl1, cind2 = sl2; !ENDP(cind1) && !ENDP(cind2)
-          && conflict_p; POP(cind1), POP(cind2) ) {
-        expression e1 = EXPRESSION(CAR(cind1));
-        expression e2 = EXPRESSION(CAR(cind2));
-        if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
-          conflict_p = TRUE;
-        else if ( expression_reference_p( e1 ) && expression_reference_p( e2 ) ) {
-          /* Because of heap modelization functions can be used as
-           subscript. Because of struct and union modelization,
-           fields can be used as subscripts. */
-          entity s1 = expression_variable( e1 ); // first subscript
-          entity s2 = expression_variable( e2 ); // second subscript
-          type s1t = entity_type(s1);
-          type s2t = entity_type(s2);
+	      && conflict_p; POP(cind1), POP(cind2) ) {
+	expression e1 = EXPRESSION(CAR(cind1));
+	expression e2 = EXPRESSION(CAR(cind2));
+	if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
+	  conflict_p = TRUE;
+	else if ( expression_reference_p( e1 ) && expression_reference_p( e2 ) ) {
+	  /* Because of heap modelization functions can be used as
+	     subscript. Because of struct and union modelization,
+	     fields can be used as subscripts. */
+	  entity s1 = expression_variable( e1 ); // first subscript
+	  entity s2 = expression_variable( e2 ); // second subscript
+	  type s1t = entity_type(s1);
+	  type s2t = entity_type(s2);
 
-          if ( type_equal_p( s1t, s2t ) ) {
-            if ( type_functional_p(s1t) ) {
-              /* context sensitive heap modelization */
-              conflict_p = same_string_p(entity_name(s1), entity_name(s2));
-            }
-            else if( entity_field_p(s1) &&  entity_field_p(s2))
-            {
-                if(type_struct_variable_p(t)) conflict_p=same_entity_p(s1,s2);
-                else if(type_union_variable_p(t)) conflict_p=true;
-            }
-          } else {
-            /* assume the code is correct... Assume no floating
-             point index... a[i] vs a[x]... */
-            conflict_p = FALSE;
-          }
-        } else {
-          intptr_t i1 = -1;
-          intptr_t i2 = -1;
-          bool i1_p = FALSE;
-          bool i2_p = FALSE;
+	  if ( type_equal_p( s1t, s2t ) ) {
+	    if ( type_functional_p(s1t) ) {
+	      /* context sensitive heap modelization */
+	      conflict_p = same_string_p(entity_name(s1), entity_name(s2));
+	    }
+	    else if( entity_field_p(s1) &&  entity_field_p(s2))
+	      {
+		if(type_struct_variable_p(t)) conflict_p=same_entity_p(s1,s2);
+		else if(type_union_variable_p(t)) conflict_p=true;
+	      }
+	  } else {
+	    /* assume the code is correct... Assume no floating
+	       point index... a[i] vs a[x]... */
+	    conflict_p = FALSE;
+	  }
+	} else {
+	  intptr_t i1 = -1;
+	  intptr_t i2 = -1;
+	  bool i1_p = FALSE;
+	  bool i2_p = FALSE;
 
-          i1_p = expression_integer_value( e1, &i1 );
-          i2_p = expression_integer_value( e2, &i2 );
-          if ( i1_p && i2_p )
-            conflict_p = ( i1 == i2 );
-          else
-            conflict_p = TRUE;
-        }
+	  i1_p = expression_integer_value( e1, &i1 );
+	  i2_p = expression_integer_value( e2, &i2 );
+	  if ( i1_p && i2_p )
+	    conflict_p = ( i1 == i2 );
+	  else
+	    conflict_p = TRUE;
+	}
       }
     } else
       conflict_p = TRUE;
@@ -317,13 +321,14 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
 /**
  * @brief Check if two references may conflict
  *
- * @description Can the two references r1 and r2 access the same memory location
- * when evaluated in two different stores?
+ * @description Can the two references r1 and r2 access the same
+ * memory location when evaluated in two different stores?
  *
  * We have to deal with static aliasing for Fortran and with
  * dynamic aliasing for C and Fortran95.
  *
- * We have to deal with abstract locations.
+ * We have to deal with abstract locations used to represent sets of
+ * memory locations.
  *
  * A PIPS reference is a memory access path rather than a reference as
  * understood in programming languages:
@@ -344,16 +349,20 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 ) {
  * - context-sensitive heap modelization can also use function
  *   reference to record the call path
  *
- * Two boolean properties are involved:
+ * Three boolean properties are involved:
  *
  * - ALIASING_ACROSS_TYPES: if false objects of different types cannot
  *   be aliased
  *
  * - ALIASING_INSIDE_DATA_STRUCTURE: if false, access paths starting
- *   from the same data structure are assumed disjoint. This property
- *   holds even after pointer dereferencement. It is extremely strong
- *   and wrong for PIPS source code, unless persistant is taken into
- *   account.
+ *   from the same data structure are assumed disjoint as soon as they
+ *   differ. This property holds even after pointer
+ *   dereferencement. It is extremely strong and wrong for PIPS source
+ *   code, unless persistant is taken into account.
+ *
+ * - ALIASING_ACROSS_FORMAL_PARAMETERS: if false, access paths
+     starting from different parameters cannot conflict.
+
  */
 bool references_may_conflict_p( reference r1, reference r2 ) {
   bool conflict_p = TRUE; // In doubt, conflict is assumed
@@ -371,6 +380,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
       conflict_p = TRUE;
     } else {
       /* v1 == v2 */
+      /* Is ALIASING_ACROSS_DATA_STRUCTURES taken into account? */
       conflict_p = variable_references_may_conflict_p( v1, ind1, ind2 );
     }
   } else {
@@ -387,11 +397,22 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        * FIXME : really ?
        */
       if ( !entity_abstract_location_p( reference_variable(r1) )
-          && !entity_abstract_location_p( reference_variable(r2) ) ) {
-        type t1 = cell_reference_to_type( r1 );
-        type t2 = cell_reference_to_type( r2 );
+	   && !entity_abstract_location_p( reference_variable(r2) ) ) {
+	type t1 = cell_reference_to_type( r1 );
+	type t2 = cell_reference_to_type( r2 );
 
-        conflict_p = type_equal_p( t1, t2 );
+	conflict_p = type_equal_p( t1, t2 );
+      }
+    }
+
+    /* Do we use formal parameters? */
+    if ( !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" ) ) {
+      /* No type check for abstract location
+       * FIXME : really ?
+       */
+      if ( entity_formal_p( reference_variable(r1) )
+	   && entity_formal_p( reference_variable(r2) ) ) {
+	conflict_p = FALSE;
       }
     }
 

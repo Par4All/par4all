@@ -49,7 +49,10 @@
 #include "effects-convex.h"
 #include "text-util.h"
 #include "transformations.h"
+#include "transformer.h"
+#include "semantics.h"
 #include "parser_private.h"
+#include "preprocessor.h"
 #include "accel-util.h"
 
 struct dma_pair {
@@ -57,38 +60,76 @@ struct dma_pair {
   enum region_to_dma_switch s;
 };
 
+typedef enum {
+    dma1D=1,
+    dma2D,
+    dma3D
+} dma_dimension;
+
+static dma_dimension get_dma_dimension(entity to) {
+    size_t n = type_dereferencement_depth(entity_type(to)) - 1; /* -1 because we always have pointer to area ... in our case*/
+    switch(n) {
+        case 1:return dma1D;
+        case 2:return dma2D;
+        case 3:return dma3D;
+        default: pips_internal_error("no dma for dimension %zd\n",n);
+                 return dma1D;
+    };
+}
+
 /** 
  * converts a region_to_dma_switch to coressponding dma name
  * according top properties
  */
-static string get_dma_name(enum region_to_dma_switch m) {
-    switch(m) {
-        case dma_load: return get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION");
-        case dma_store: return get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION");
-        case dma_allocate: return get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION");
-        case dma_deallocate: return get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION");
-    }
-    return string_undefined; // should never happen
+static string get_dma_name(enum region_to_dma_switch m,dma_dimension d) {
+    char *seeds[] = {
+        "KERNEL_LOAD_STORE_LOAD_FUNCTION",
+        "KERNEL_LOAD_STORE_STORE_FUNCTION",
+        "KERNEL_LOAD_STORE_ALLOCATE_FUNCTION",
+        "KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"
+    };
+    char * propname = seeds[(int)m];
+    if(d!=dma1D && (int)m <2)
+        asprintf(&propname,"%s_%dD",seeds[(int)m],(int)d);
+    string dmaname = get_string_property(propname);
+    if(d!=dma1D && (int)m <2) free(propname);
+    return dmaname;
 }
 
-static dimension simple_effect_to_dimension(effect eff)
+static list simple_effect_to_dimensions(effect eff)
 {
     entity re = reference_variable(effect_any_reference(eff));
-    return make_dimension(int_to_expression(0),
-            make_op_exp(MINUS_OPERATOR_NAME,
-                make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
-                int_to_expression(1))
-            );
+    type te= ultimate_type(entity_type(re));
+    return gen_full_copy_list(variable_dimensions(type_variable(te)));
 }
-static list region_to_dimensions(region reg) {
-    return NIL;
+static bool region_to_dimensions(region reg, transformer tr, list *dimensions, list * offsets, expression* condition) {
+    if(region_to_minimal_dimensions(reg,tr,dimensions,offsets,true,condition)) {
+        return true;
+    }
+    else
+    {
+        pips_user_warning("failed to convert regions to minimal array dimensions, using whole array instead\n");
+        return false;
+    }
 }
 
-static list effect_to_dimensions(effect eff) {
-    if(effect_region_p(eff))
-        return region_to_dimensions(eff);
-    else
-        return CONS(DIMENSION,simple_effect_to_dimension(eff),NIL);
+static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, list * offsets, expression *condition) {
+    if(effect_region_p(eff) && region_to_dimensions(eff,tr,dimensions,offsets,condition)) {
+        /* ok */
+    }
+    else {
+        *dimensions= simple_effect_to_dimensions(eff);
+        FOREACH(DIMENSION,d,*dimensions)
+            *offsets = CONS(EXPRESSION,int_to_expression(0),*offsets);
+    }
+}
+
+static expression entity_to_address(entity e) {
+    size_t n = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(e)))));
+    list indices = NIL;
+    while(n--) indices = CONS(EXPRESSION,int_to_expression(0),indices);
+    reference r = make_reference(e,indices);
+    return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
 }
 
 /** 
@@ -102,37 +143,75 @@ static list effect_to_dimensions(effect eff) {
  * @return 
  */
 static
-call dimensions_to_dma(expression from,
-		  expression to,
+call dimensions_to_dma(entity from,
+		  entity to,
 		  list/*of dimensions*/ ld,
+		  list/*of offsets*/    lo,
 		  enum region_to_dma_switch m)
 {
   expression dest;
   list args = NIL;
   bool scalar_entity=false;
-  string function_name = get_dma_name(m);
+  dma_dimension function_dimension = get_dma_dimension(to);
+  string function_name = get_dma_name(m,function_dimension);
 
   entity mcpy = module_name_to_entity(function_name);
-  if (entity_undefined_p(mcpy))
-    pips_user_error("Cannot find \"%s\" method. Are you sure you have set\n"
+  if (entity_undefined_p(mcpy)) {
+      mcpy=make_empty_subroutine(function_name,copy_language(module_language(get_current_module_entity())));
+    pips_user_warning("Cannot find \"%s\" method. Are you sure you have set\n"
 		    "KERNEL_LOAD_STORE_..._FUNCTION "
-		    "set to a defined entity and added the correct .c file?\n",function_name);
+		    "to a defined entity and added the correct .c file?\n",function_name);
+  }
+  else {
+      AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
+  }
 
 
   /*scalar detection*/
-  scalar_entity=entity_scalar_p(expression_to_entity(from));
+  scalar_entity=entity_scalar_p(from);
 
-  if (dma_allocate_p(m))
-    /* Need the address for the allocator to modify the pointer itself: */
-    dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), to);
- 
+
+  if (dma_allocate_p(m)||dma_deallocate_p(m)) {
+      /* Need the address for the allocator to modify the pointer itself: */
+      dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),entity_to_expression(to));
+      type voidpp = make_type_variable(
+              make_variable(
+                  make_basic_pointer(
+                      make_type_variable(
+                          make_variable(
+                              make_basic_pointer(
+                                  make_type_void(NIL)
+                                  ),
+                              NIL,NIL
+                              )
+                          )
+                      ),
+                  NIL,NIL
+                  )
+              );
+      dest = make_expression(
+              make_syntax_cast(
+                  make_cast(voidpp,dest)
+                  ),
+              normalized_undefined);
+  }
   else if (!dma_allocate_p(m) && !scalar_entity)
     /* Except for the deallocation, the original array is referenced
        throudh pointer dereferencing: */
-    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), to);
+    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), entity_to_expression(to));
   else if(!dma_allocate_p(m) && scalar_entity){
-    dest=to;
+    dest=entity_to_expression(to);
   }
+
+  reference rtmp = make_reference(from,lo);
+  type element_type = make_type_variable(
+          make_variable(
+              copy_basic(basic_of_reference(rtmp)),
+              NIL,NIL)
+          );
+  reference_indices(rtmp)=NIL;
+  free_reference(rtmp);
+
 
   switch(m) {
       case dma_deallocate:
@@ -141,17 +220,51 @@ call dimensions_to_dma(expression from,
       case dma_allocate:
           {
               expression transfer_size = SizeOfDimensions(ld);
+              transfer_size=MakeBinaryCall(
+                      entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                      make_expression(
+                          make_syntax_sizeofexpression(make_sizeofexpression_type(element_type)),
+                          normalized_undefined
+                          ),
+                      transfer_size);
+
               args = make_expression_list(dest, transfer_size);
           } break;
       case dma_load:
       case dma_store:
           {
-              expression transfer_size = SizeOfDimensions(ld);
-              expression source;
-              source = from;
+              list /*of expressions*/ transfer_sizes = NIL;
+              FOREACH(DIMENSION,d,ld) {
+                  expression transfer_size=
+                          SizeOfDimension(d);
+                  transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
+              }
+              transfer_sizes=gen_nreverse(transfer_sizes);
+
+              list/* of expressions*/ from_dims = NIL;
+              FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
+                  from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
+              }
+              from_dims=gen_nreverse(from_dims);
+
+              list/* of expressions*/ offsets = NIL;
+              FOREACH(EXPRESSION,e,lo)
+                  offsets=CONS(EXPRESSION,e,offsets);
+              offsets=gen_nreverse(offsets);
+
+              expression source = entity_to_address(from);
               if(scalar_entity)
                   source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
-              args = make_expression_list(source, dest, transfer_size);
+              args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+              if(dma_load_p(m))
+                  args=gen_nreverse(args);
+              args=gen_append(args,CONS(EXPRESSION,make_expression(
+                              make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))), normalized_undefined
+                              ),NIL));
+              from_dims= gen_append(from_dims,offsets);
+              from_dims= gen_append(from_dims, transfer_sizes);
+              args= gen_append(args,from_dims);
+
           } break;
       default:
           pips_internal_error("should not happen");
@@ -159,7 +272,18 @@ call dimensions_to_dma(expression from,
   return make_call(mcpy, args);
 }
 
+static bool effect_on_non_local_variable_p(effect eff) {
+    return !same_string_p(
+            entity_module_name(reference_variable(effect_any_reference(eff))),
+            get_current_module_name()
+            );
+}
 
+static bool effects_on_non_local_variable_p(list effects) {
+    FOREACH(EFFECT,eff,effects)
+        if( effect_on_non_local_variable_p(eff)) return true;
+    return false;
+}
 
 
 /* Compute a call to a DMA function from the effects of a statement
@@ -170,13 +294,15 @@ call dimensions_to_dma(expression from,
 static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
-			 hash_table e2e) {
+			 hash_table e2e, expression * condition) {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
-  if(empty_string_p(get_dma_name(s)))
+  if(empty_string_p(get_dma_name(s,dma1D)))
     return statement_undefined;
 
   list rw_effects= load_cumulated_rw_effects_list(stat);
+  transformer tr = transformer_range(load_statement_precondition(stat));
+
   list effects = NIL;
 
   /* filter out relevant effects depending on operation mode */
@@ -199,6 +325,12 @@ statement effects_to_dma(statement stat,
       }
   }
 
+
+  if(effects_on_non_local_variable_p(effects)){
+      pips_user_warning("Cannont handle non local variables in isolated statement\n");
+      return statement_undefined;
+  }
+
   /* builds out transfer from gathered effects */
   list statements = NIL;
   FOREACH(EFFECT,eff,effects) {
@@ -209,8 +341,10 @@ statement effects_to_dma(statement stat,
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
       if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
-	list/*of dimensions*/ the_dims = effect_to_dimensions(eff);
-	expression from = entity_to_expression(re);
+    list /*of dimensions*/ the_dims = NIL,
+         /*of expressions*/the_offsets = NIL;
+	effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
+
 	entity eto;
 	if(val == HASH_UNDEFINED_VALUE) {
 
@@ -218,13 +352,11 @@ statement effects_to_dma(statement stat,
 	  expression init = int_to_expression(0);
 
 	  /* Replace the reference to the array re to *eto: */
-	  eto = make_temporary_pointer_to_array_entity(re,init);
-	  AddEntityToCurrentModule(eto);
-	  expression exp =
-	    MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-			  entity_to_expression(eto));
-	  replace_entity_by_expression(stat, re, exp);
-	    //replace_entity(stat,re,eto);
+      entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
+	  eto = make_temporary_pointer_to_array_entity_with_prefix(entity_local_name(re),renew,init);
+	  AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
+      isolate_patch_entities(stat,re,eto,the_offsets);
+
 	  val=malloc(sizeof(*val));
 	  val->new_ent=eto;
 	  val->s=s;
@@ -234,8 +366,7 @@ statement effects_to_dma(statement stat,
 	  eto = val->new_ent;
 	  val->s=s;/*to avoid duplicate*/
 	}
-	expression to = reference_to_expression(make_reference(eto,NIL));
-	the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(from,to,the_dims,s)));
+	the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(re,eto,the_dims,the_offsets,s)));
 	statements=CONS(STATEMENT,the_dma,statements);
       }
     }
@@ -247,34 +378,81 @@ statement effects_to_dma(statement stat,
     return make_block_statement(statements);
 }
 
+static bool do_isolate_statement_preconditions(statement s)
+{
+    callees c = compute_callees(s);
+    bool nocallees = ENDP(callees_callees(c));
+    free_callees(c);
+    if(! nocallees) {
+        pips_user_warning("cannot isolate statement with callees\n");
+        return false;
+    }
+    return true;
+}
+
+void do_isolate_statement(statement s) {
+    statement allocates, loads, stores, deallocates;
+    /* this hash table holds an entity to (entity + tag ) binding */
+    hash_table e2e ;
+    if(!do_isolate_statement_preconditions(s)) {
+        pips_user_warning("isolated statement has callees, falling back to effect engines\n");
+        reset_cumulated_rw_effects();
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
+    }
+    e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    expression condition = expression_undefined;
+    allocates = effects_to_dma(s,dma_allocate,e2e,&condition);
+    loads = effects_to_dma(s,dma_load,e2e,NULL);
+    stores = effects_to_dma(s,dma_store,e2e,NULL);
+    deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL);
+    HASH_MAP(k,v,free(v),e2e);
+    hash_table_free(e2e);
+
+    /* Add the calls now if needed, in the correct order: */
+    if (loads != statement_undefined)
+        insert_statement(s, loads,true);
+    if (stores != statement_undefined)
+        insert_statement(s, stores,false);
+    if (deallocates != statement_undefined)
+        insert_statement(s, deallocates,false);
+    if (allocates != statement_undefined)
+        insert_statement(s, allocates,true);
+    /* guard the whole block by according conditions */
+    if(!expression_undefined_p(condition)) {
+
+        /* prends ton couteau suisse et viens jouer avec moi dans pips */
+        pips_assert("statement is a block",statement_block_p(s));
+        for(list prev=NIL,iter=statement_block(s);!ENDP(iter);POP(iter)) {
+            if(declaration_statement_p(STATEMENT(CAR(iter)))) prev=iter;
+            else {
+                pips_assert("there must be at least one declaration",!ENDP(prev));
+                statement cond = 
+                    instruction_to_statement(
+                            make_instruction_test(
+                                make_test(
+                                    condition,
+                                    make_block_statement(iter),
+                                    make_empty_statement()
+                                    )
+                                )
+                            );
+                CDR(prev)=CONS(STATEMENT,cond,NIL);
+                break;
+            }
+        }
+    }
+}
+
 static void
 kernel_load_store_generator(statement s, string module_name)
 {
-  if(statement_call_p(s))
+    if(statement_call_p(s))
     {
-      call c = statement_call(s);
-      if(!call_intrinsic_p(c) &&
-	 same_string_p(module_local_name(call_function(c)),module_name))
+        call c = statement_call(s);
+        if(!call_intrinsic_p(c) &&
+                same_string_p(module_local_name(call_function(c)),module_name))
         {
-	  statement allocates, loads, stores, deallocates;
-      /* this hash table holds an entity to (entity + tag ) binding */
-	  hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-	  allocates = effects_to_dma(s,dma_allocate,e2e);
-	  loads = effects_to_dma(s,dma_load,e2e);
-	  stores = effects_to_dma(s,dma_store,e2e);
-	  deallocates = effects_to_dma(s,dma_deallocate,e2e);
-	  HASH_MAP(k,v,free(v),e2e);
-	  hash_table_free(e2e);
-
-	  /* Add the calls now if needed, in the correct order: */
-	  if (loads != statement_undefined)
-	    insert_statement(s, loads,true);
-	  if (allocates != statement_undefined)
-	    insert_statement(s, allocates,true);
-	  if (stores != statement_undefined)
-	    insert_statement(s, stores,false);
-	  if (deallocates != statement_undefined)
-	    insert_statement(s, deallocates,false);
+            do_isolate_statement(s);
         }
     }
 }
@@ -291,7 +469,9 @@ static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
         /* prelude */
         set_current_module_entity(module_name_to_entity( caller_name ));
         set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
-        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(enginerc, caller_name, TRUE));
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(enginerc, caller_name, true));
+        module_to_value_mappings(get_current_module_entity());
+        set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, caller_name, true) );
         /*do the job */
         gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
         /* validate */
@@ -300,6 +480,8 @@ static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
         DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
 
         /*postlude*/
+        reset_precondition_map();
+        free_value_mappings();
         reset_cumulated_rw_effects();
         reset_current_module_entity();
         reset_current_module_statement();

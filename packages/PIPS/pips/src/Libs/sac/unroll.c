@@ -97,11 +97,11 @@ static void compute_variable_size(statement s, MinMaxVar* varwidth)
         varwidth->min = width;
 }
 
-static void simd_loop_unroll(statement loop_statement, int rate)
+static void simd_loop_unroll(statement loop_statement, intptr_t rate)
 {
   range r = loop_range(statement_loop(loop_statement));
   expression erange = range_to_expression(r,range_to_nbiter);
-  int irange;
+  intptr_t irange;
   if(expression_integer_value(erange,&irange) && irange <=rate) {
     full_loop_unroll(loop_statement);
   }

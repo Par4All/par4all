@@ -151,6 +151,7 @@ class LoopGenerator(DummyGenerator):
 					loops+=loop.loops()
 		return mutations
 
+
 class ParallelLoopGenerator(Generator):
 	"""Generates a loop parallelization Transformation"""
 	def generate(self, individual):
@@ -166,19 +167,6 @@ class ParallelLoopGenerator(Generator):
 						)
 		return mutations
 
-class UnrollGenerator(Generator):
-	"""Generates an unroll transformation"""
-	def generate(self, individual):
-		mutations = []
-		for m in individual.ws.fun:
-			if called(m):
-				loops=m.loops()
-				while loops:
-					loop = loops.pop()
-					loops+=loop.loops()
-					for r in [2,4,8]:
-						mutations.append(Mutation(Transfo(m.name, "UNROLL", loop=loop.label, unroll_rate=r)))
-		return mutations
 
 class FusionGenerator(Generator):
 	"""Generates a loop fusion transformation"""

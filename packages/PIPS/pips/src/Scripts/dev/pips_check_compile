@@ -21,24 +21,30 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# usage: $0 /path/to/prod email.address@somewhere
-# - check that pips does still compile.
+# usage: $0 email.address@somewhere /path/to/prod [/path/to/valid]
 # - designed to be run from cron.
+# - check that pips does still compile.
 # - report is sent by mail if the status changed.
+# - run the validation and send a mail on any changes if third arg.
 # - if there is a persistant LOCK, investigate by hand...
 
-# this script runs very minutes on canapville under login coelho
+# this script runs every minute on fabien@compiegne
 
-prod=${1:-.}
-dest=${2:-$LOGNAME@cri.ensmp.fr}
+dest=${1:-$LOGNAME@cri.ensmp.fr}
+prod=${2:-.}
+valid=$3
+
+#nice=nice
+nice=
 
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 
-# compute load & jobs
+# compute load & jobs depending on the available hardware
 nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
-load=$(($nproc + 1))
-jobs=$(($nproc * 2))
+# hmmm... it seems that HT slows down the validation on compiegne
+#load=$(($nproc + 1)) jobs=$(($nproc * 2))
+load=$(($nproc + 2)) jobs=$nproc
 make="make -j $jobs -l $load"
 
 # report current-state compile message
@@ -60,7 +66,7 @@ function report()
   test -f STATE && read previous prevcomp < STATE
 
   # log report anyway...
-  echo "$(date +%Y%m%d%H%M%S): $current $compile ($SECONDS seconds) $msg" >> LOG
+  echo "$(date +%Y%m%d%H%M%S): $current $compile (${COMPILE_SECONDS:-$SECONDS} seconds) $msg" >> LOG
 
   # out if locked
   [ $current = 'locked' ] && {
@@ -90,15 +96,18 @@ function report()
     echo new state: $current
     echo new compile: $compile
     echo message: $msg
-    echo run time: $SECONDS
+    echo run time: ${COMPILE_SECONDS:-$SECONDS}
+    echo full time: $SECONDS
 
     # revisions
     echo
     echo version:
     cat CURRENT
+    [ -f CURRENT_VALID ] && cat CURRENT_VALID
     echo
     echo previous:
     cat PREVIOUS
+    [ -f PREVIOUS_VALID ] && cat PREVIOUS_VALID
 
     if [ $current != 'ok' ]
     then
@@ -125,7 +134,7 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -s "PIPS compilation status is $current" $dest
+  } | mailx -a "Reply-To: $dest" -s "PIPS compilation status is $current" $dest
 
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
@@ -145,18 +154,28 @@ function report()
 [ -d $prod ] || \
     report 'KO:no-dir' 'unknown' "working copy directory '$prod' not found"
 [ -d $prod/.svn ] || \
-    report 'KO:no-wc' 'unknown' "'$prod' is not a working copy '$prod'"
+    report 'KO:no-wc' 'unknown' "'$prod' is not a working copy"
+
+# idem for validation if required
+if [ "$valid" ]
+then
+  [ -d $valid ] || \
+    report 'KO:no-dir' 'unknown' "working copy directory '$valid' not found"
+  [ -d $valid/.svn ] || \
+    report 'KO:no-wc' 'unknown' "'$valid' is not a working copy"
+fi
+
 cd $prod || \
     report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
 mkdir LOCK > /dev/null 2>&1 ||
 {
-  # warn after 1200 seconds (20mn) locking
+  # warn after 1800 seconds (30mn) locking
   created=$(stat -c %Y LOCK)
   now=$(date +%s)
   delay=$(($now - $created))
-  if [ $delay -gt 1200 ]
+  if [ $delay -gt 1800 ]
   then
     report 'locked' 'unknown' "working copy '$prod' is already locked..."
     touch LOCK
@@ -166,13 +185,14 @@ mkdir LOCK > /dev/null 2>&1 ||
 }
 
 rm -f out err
-nice svn up >> out 2>> err || {
+$nice svn up $prod $valid >> out 2>> err || {
   # possible failures: network dns svn...
   # hmmm... try to cleanup after svn up failure
-  svn cleanup >> out 2>> err
+  svn cleanup $prod $valid >> out 2>> err
   report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
 }
 
+# source state
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
 {
@@ -183,22 +203,67 @@ mv CURRENT PREVIOUS
   echo nlpmake: $(svnversion -c pips/makes)
 } > CURRENT
 
+# validation state
+if [ "$valid" ]
+then
+  [ -f CURRENT_VALID ] || touch CURRENT_VALID
+  mv CURRENT_VALID PREVIOUS_VALID
+  echo validation: $(svnversion -c $valid) > CURRENT_VALID
+fi
+
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  nice $make unbuild > out 2> err \
+  $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
   # what about a "timeout"? how to differentiate from a simple failure?
-  nice $make build > out 2> err \
+  $nice $make build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
+
+  # record compilation time, for "report"
+  COMPILE_SECONDS=$SECONDS
+
   # check that "tpips" executable is there
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
 
-  # clean up
+  # clean up if no error
   rm -f out err
+
+  # run the validation with new tpips
+  if [ "$valid" ]
+  then
+    # set path to use generated pips
+    PATH=$prod/pips/bin:$prod/pips/utils:$PATH
+    {
+      $nice $make -C $valid parallel-clean
+      $nice $make -C $valid VNAME=CHECK EMAIL=$dest mail-diff-validate
+      $nice $make -C $valid parallel-clean
+    } > out 2> err
+  fi
+
+  # the report is delayed so as to keep the lock
   report 'ok' 'ok' 'pips is fine'
+
 else
-  # no updates
+  # no source updates, but maybe a validation update?
+  if [ "$valid" ]
+  then
+    if ! cmp -s CURRENT_VALID PREVIOUS_VALID
+    then
+      # the validation changed, run it with current tpips
+      # set path to use generated pips
+      PATH=$prod/pips/bin:$prod/pips/utils:$PATH
+      {
+        $nice $make -C $valid parallel-clean
+        $nice $make -C $valid VNAME=CHECK EMAIL=$dest mail-diff-validate
+        # cleanup to help next "svn up" run smoothly
+        $nice $make -C $valid parallel-clean
+      } > out 2> err
+    fi
+  fi
+
+  # the report is delayed so as to keep the lock
   report 'skip' 'unchanged' 'no commit since last check'
+
 fi

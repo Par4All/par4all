@@ -50,7 +50,7 @@ pips_at_night=$target/pan
 cp $target/prod/pips/src/Scripts/dev/pips_at_night $pips_at_night
 chmod a+rx $pips_at_night
 
-$pips_at_night -t $target -m "$email" -u -b -v \
+$pips_at_night -t $target -m "$email" -n PRIVE -u -b -v \
     -T $timeout -av private -mv "$@" \
     > out.$$ 2> err.$$
 status=$?

@@ -513,12 +513,12 @@ use_def_elimination_on_a_statement(statement s)
 
    /* Mark as useful the seed statements: */
    gen_recurse(s, statement_domain,
-               gen_true,
-               use_def_deal_if_useful);
+	       gen_true,
+	       use_def_deal_if_useful);
 
    /* Propagate the usefulness through all the predecessor graph: */
    propagate_the_usefulness_through_the_predecessor_graph();
-   
+
    remove_all_the_non_marked_statements(s);
 
    hash_table_free(ordering_to_dg_mapping);
@@ -529,8 +529,11 @@ use_def_elimination_on_a_statement(statement s)
 }
 
 
-bool
-use_def_elimination(char * module_name)
+/* Obsolete name: it should be called dead_code_eliminiation()
+ *
+ * Maintained for backward compatibility.
+ */
+bool use_def_elimination(char * module_name)
 {
    statement module_statement;
 
@@ -574,7 +577,7 @@ use_def_elimination(char * module_name)
       for pretty print... :-) */
    module_reorder(module_statement);
 
-   debug(2, "use_def_elimination", "done for %s\n", module_name);
+   pips_debug(2, "done for %s\n", module_name);
 
    debug_off();
 
@@ -589,172 +592,16 @@ use_def_elimination(char * module_name)
    return TRUE;
 }
 
+bool dead_code_elimination(char * module_name)
+{
+  return use_def_elimination(module_name);
+}
+
 /* moved from ri-util/statements.c */
 
 
 /**  @} */
 
-/**
- * @name declarations updater
- * @{ */
-
-/**
- * helper looking in a reference for referenced entities
- *
- * @param r reference to check
- * @param re set to fill
- */
-static void statement_clean_declarations_reference_walker(reference r, set re)
-{
-  entity e = reference_variable(r);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
-}
-
-/**
- * helper looking in a call for referenced entities
- *
- * @param c call to check
- * @param re set to fill
- */
-static void statement_clean_declarations_call_walker(call c, set re)
-{
-  entity e = call_function(c);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
-}
-
-/**
- * helper looking in a loop for referenced entities
- *
- * @param l loop to check
- * @param re set to fill
- */
-static void statement_clean_declarations_loop_walker(loop l, set re)
-{
-  entity e = loop_index(l);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
-}
-
-
-/**
- * helper looking in a list for referenced entities
- *
- * @param l list to check
- * @param re set to fill
- */
-static
-void statement_clean_declarations_list_walker(list l, set re)
-{
-  FOREACH(ENTITY,e,l)
-    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-      set_add_element(re,re,e);
-}
-
-/**
- * helper looking in a ram for referenced entities
- *
- * @param r ram to check
- * @param re set to fill
- */
-static void statement_clean_declarations_ram_walker(ram r, set re)
-{
-  statement_clean_declarations_list_walker(ram_shared(r),re);
-}
-
-/**
- * helper looking in an area for referenced entities
- *
- * @param a area to check
- * @param re set to fill
- */
-static void statement_clean_declarations_area_walker(area a, set re)
-{
-    statement_clean_declarations_list_walker(area_layout(a),re);
-}
-
-/**
- * helper diving into an entity to find referenced entities
- *
- * @param e entity to dive into
- * @param re set to fill
- *
- */
-static void entity_get_referenced_entities(entity e, set re)
-{
-  /*if(entity_variable_p(e))*/ {
-    gen_context_multi_recurse(entity_type(e),re,
-			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
-			      call_domain,gen_true,statement_clean_declarations_call_walker,
-			      NULL
-			      );
-    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
-    if( !value_undefined_p(entity_initial(e) ) ) {
-      gen_context_multi_recurse(entity_initial(e),re,
-				call_domain,gen_true,statement_clean_declarations_call_walker,
-				reference_domain,gen_true,statement_clean_declarations_reference_walker,
-				area_domain,gen_true,statement_clean_declarations_area_walker,
-				ram_domain,gen_true,statement_clean_declarations_ram_walker,
-				NULL);
-    }
-  }
-}
-
-/**
- * helper iterating over statement declaration to find referenced entities
- *
- * @param s statement to check
- * @param re set to fill
- */
-static void statement_clean_declarations_statement_walker(statement s, set re)
-{
-  FOREACH(ENTITY,e,statement_declarations(s))
-    entity_get_referenced_entities(e,re);
-}
-
-
-/**
- * retrieves the set of entites used in elem
- * beware that this entites may be formal parameters, functions etc
- * so please filter this set depending on your need
- *
- * @param elem  element to check (any gen_recursifiable type is allowded)
- *
- * @return set of referenced entities
- *
- * FI: should be moved into ri-util?
- */
-set get_referenced_entities(void* elem)
-{
-  set referenced_entities = set_make(set_pointer);
-
-  /* if s is an entity it self, add it */
-  if(INSTANCE_OF(entity,(gen_chunkp)elem))
-      set_add_element(referenced_entities,referenced_entities,elem);
-
-  /* gather entities from s*/
-  gen_context_multi_recurse(elem,referenced_entities,
-			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
-			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
-			    call_domain,gen_true,statement_clean_declarations_call_walker,
-			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
-			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
-			    NULL);
-
-  /* gather all entities referenced by referenced entities */
-  set other_referenced_entities = set_make(set_pointer);
-  SET_FOREACH(entity,e,referenced_entities)
-    {
-      entity_get_referenced_entities(e,other_referenced_entities);
-    }
-
-  /* merge results */
-  set_union(referenced_entities,other_referenced_entities,referenced_entities);
-  set_free(other_referenced_entities);
-
-  return referenced_entities;
-}
 
 /**
  * remove useless entities from declarations
