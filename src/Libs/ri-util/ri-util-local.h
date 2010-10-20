@@ -948,6 +948,7 @@
 
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME              "time"
+#define DIFFTIME_FUNCTION_NAME          "difftime"
 
 
 /* #include <wchar.h> */
