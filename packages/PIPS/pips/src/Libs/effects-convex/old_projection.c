@@ -59,6 +59,7 @@
 #include "polyedre.h"
 #include "matrix.h"
 #include "matrice.h"
+#include "transformer.h"
 #include "sparse_sc.h"
 #include "pipsdbm.h"
 
@@ -393,10 +394,9 @@ void regions_transformer_apply(list l_reg, transformer trans,
 
     ifdebug(3)
     {
-	pips_debug(3, "regions before transformation:\n");
-	print_regions(l_reg);
-	pips_debug(3, "elimination of variables: \n");
-	print_arguments(l_var);
+      pips_debug_effects(3, "regions before transformation:\n", l_reg);
+      pips_debug(3, "elimination of variables: \n");
+      print_arguments(l_var);
     }
 
     if (!must_regions_p())
@@ -433,51 +433,50 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	    sc_list_variables_rename(sc_trans, l_old, l_int);
 	}
 
-	FOREACH(EFFECT, reg, l_reg) {
-	  if(store_effect_p(reg)) {
-	    Psysteme sc_reg = region_system(reg);
-
-	    if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
+	FOREACH(EFFECT, reg, l_reg)
+	  {
+	  if(store_effect_p(reg))
 	    {
-		debug_region_consistency(reg);
+	      Psysteme sc_reg = region_system(reg);
 
-		ifdebug(8)
+	      if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
 		{
-		    pips_debug(8, "region before transformation: \n\t%s\n",
-			       region_to_string(reg) );
-		}
-		sc_list_variables_rename(sc_reg, l_var, l_int);
-		ifdebug(8)
-		{
-		    pips_debug(8, "region after renaming: \n\t%s\n",
-			       region_to_string(reg) );
-		}
+		  debug_region_consistency(reg);
 
-		/* addition of the predicate of the transformer,
-		   and elimination of redundances */
-		region_sc_append_and_normalize(reg, sc_trans, 1);
+		  pips_debug_effect(8, "region before transformation: \n", reg);
 
-		debug_region_consistency(reg);
+		  sc_list_variables_rename(sc_reg, l_var, l_int);
+		  pips_debug_effect(8, "region after renaming: \n", reg);
 
-		ifdebug(8)
-		{
-		    pips_debug(8, "region after addition of the transformer: "
-			       "\n\t%s\n", region_to_string(reg) );
-		}
+		  /* addition of the predicate of the transformer,
+		     and elimination of redundances */
+		  region_sc_append_and_normalize(reg, sc_trans, 1);
 
-		/* projection along intermediate variables */
-		region_exact_projection_along_parameters(reg, l_int);
-		debug_region_consistency(reg);
+		  debug_region_consistency(reg);
 
+		  pips_debug_effect(8, "region after addition of the transformer: ", reg);
 
-		ifdebug(8)
-		{
-		    pips_debug(8, "region after transformation: \n\t%s\n",
-			       region_to_string(reg) );
+		  /* projection along intermediate variables */
+		  region_exact_projection_along_parameters(reg, l_int);
+		  debug_region_consistency(reg);
+		  pips_debug_effect(8, "region after projection along parameters: \n", reg );
+
+		  /* remove potential old values that may be found in transformer */
+		  list l_old_values = NIL;
+		  sc_reg = region_system(reg);
+		  for(Pbase b = sc_base(sc_reg); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+		    entity e = (entity) vecteur_var(b);
+		    if(local_old_value_entity_p(e)) {
+		      l_old_values = CONS(ENTITY, e, l_old_values);
+		    }
+		  }
+		  region_exact_projection_along_parameters(reg, l_old_values);
+		  gen_free_list(l_old_values);
+		  debug_region_consistency(reg);
+		  pips_debug_effect(8, "region after transformation: \n", reg );
 		}
 	    }
 	  }
-	}
 
 	/* no memory leaks */
 	gen_free_list(l_int);
@@ -485,11 +484,7 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	sc_rm(sc_trans);
     }
 
-    ifdebug(3)
-    {
-	pips_debug(3, "regions after transformation:\n");
-	print_regions(l_reg);
-    }
+    pips_debug_effects(3, "regions after transformation:\n", l_reg);
 
     gen_free_list(l_var);
     debug_regions_consistency(l_reg);

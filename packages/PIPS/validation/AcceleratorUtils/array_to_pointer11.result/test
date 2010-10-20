@@ -42,7 +42,7 @@ void p4a_kernel_wrapper_1(size_t size, size_t i, size_t j, t_precision ptr[size]
    p4a_kernel_1(size, i, j, ptr, val);
 }
 
-/* After apply ARRAY_TO_POINTER[%ALL] */
+/* After apply LINEARIZE_ARRAY[%ALL] */
 
 typedef double t_precision;
 
@@ -64,19 +64,19 @@ void init(t_precision val)
 {
    //PIPS generated variable
    t_precision *P_3 = (t_precision *) 0;
-   p4a_kernel_launcher_1(size, P_3+0, val);
+   p4a_kernel_launcher_1(size, P_3, val);
 }
 void p4a_kernel_1(size_t size, size_t i, size_t j, t_precision *ptr, t_precision val)
 {
    // Loop nest P4A end
    if (i<=-1+size&&j<=-1+size) 
-      *(ptr+j+size*i) = val;
+      *(ptr+j+i*size) = val;
 }
 void p4a_kernel_launcher_1(size_t size, t_precision *ptr, t_precision val)
 {
    //PIPS generated variable
    size_t i, j;
-   p4a_kernel_wrapper_1(size, i, j, &ptr[0], val);
+   p4a_kernel_wrapper_1(size, i, j, ptr, val);
 }
 void p4a_kernel_wrapper_1(size_t size, size_t i, size_t j, t_precision *ptr, t_precision val)
 {
@@ -85,5 +85,5 @@ void p4a_kernel_wrapper_1(size_t size, size_t i, size_t j, t_precision *ptr, t_p
    // Index has been replaced by P4A_vp_1:
    j = 1;
    // Loop nest P4A end
-   p4a_kernel_1(size, i, j, ptr+0, val);
+   p4a_kernel_1(size, i, j, ptr, val);
 }

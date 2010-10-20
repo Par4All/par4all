@@ -246,7 +246,7 @@ PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
 
 echo
 echo "### checking useful softwares"
-for exe in bash m4 wish latex htlatex javac emacs
+for exe in bash m4 wish latex htlatex javac emacs indent
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done

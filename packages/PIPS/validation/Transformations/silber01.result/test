@@ -393,11 +393,11 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
    //PIPS generated variable
    int I_18, j_0, i_0;
    //PIPS generated variable
-   unsigned char current_0, current_1;
+   unsigned char current_0;
    //PIPS generated variable
    int j_1, i_1;
    //PIPS generated variable
-   unsigned char current_2, current_3;
+   unsigned char current_1;
    I_0 = w-1;
    int i, j;
 
@@ -414,7 +414,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          //3
          I_7 = i_0+I_6;
          I_8 = dest[I_7];
-         current_1 = I_8;
+         current_0 = I_8;
          dest[I_7] = lut[I_8];
       }
 
@@ -425,7 +425,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          //4
          I_12 = i_1+I_11;
          I_13 = dest[I_12];
-         current_3 = I_13;
+         current_1 = I_13;
          dest[I_12] = (int) I_13+val>255?255:I_13+val;
       }
 }

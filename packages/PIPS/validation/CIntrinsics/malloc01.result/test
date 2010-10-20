@@ -29,8 +29,10 @@ Cumulated effetcs for "malloc01"
 //               <may be read    >: *ANY_MODULE*:*ANYWHERE*
 //               <may be written >: *ANY_MODULE*:*ANYWHERE*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[0] 
 //                                  __IO_EFFECTS:LUNS[1]
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                                  __IO_EFFECTS:LUNS[0] 
 //                                  __IO_EFFECTS:LUNS[1]
 int main()
 {
@@ -42,7 +44,10 @@ int main()
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 
    printf("How long do you want the string? ");
-//               <must be written>: i
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0] i
    scanf("%d", &i);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buffer

@@ -150,7 +150,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 
    for(m = 0; m <= 5; m += 1)
 
-//  <X[PHI1][PHI2]-R-EXACT-{i+m==PHI1, PHI2==j, 0<=m, m<=5}>
+//  <X[PHI1][PHI2]-R-EXACT-{m+i==PHI1, PHI2==j, 0<=m, m<=5}>
 //  <coeff[PHI1]-R-EXACT-{PHI1==m, 0<=m, m<=5}>
 
       res = res+coeff[m]*X[i+m][j];

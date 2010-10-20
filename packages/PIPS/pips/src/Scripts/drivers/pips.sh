@@ -82,4 +82,8 @@ PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH} \
 # fix path according to pips architecture
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
 
+# should it also fix ld library path if dynamically linking is used?
+# what about linear, newgen, extern dependencies?
+#LD_LIBRARY_PATH=${PIPS_ROOT}/lib/${PIPS_ARCH}:${LD_LIBRARY_PATH}
+
 exec "${what}" "$@"

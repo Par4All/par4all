@@ -1,0 +1,71 @@
+
+Proper effects for "count"
+
+int count()
+{
+//               <must be written>: i
+   int i = 0, j;
+   int tab[10];
+   liste *q, *p, p_formal;
+//               <must be written>: p
+   p = &p_formal;
+//               <must be read   >: p
+//               <must be written>: q
+   q = p;
+//               <must be written>: j
+   
+   
+   for(j = 0; j <= 9; j += 1)
+//               <must be read   >: j
+//               <must be written>: tab[j]
+      tab[j] = j;
+//               <must be read   >: p
+   while (p!=(void *) 0) {
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i p
+      p->val = &tab[i];
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: p
+      p = p->next;
+//               <must be read   >: i
+//               <must be written>: i
+      i++;
+   }
+//               <must be read   >: i
+   return i;
+}
+
+POINTS TO for "count"
+
+//  {}
+int count()
+{
+//  points to = {}
+   int i = 0, j;
+//  points to = {}
+   int tab[10];
+//  points to = {}
+   liste *q, *p, p_formal;
+//  points to = {}
+   p = &p_formal;
+//  {(p,p_formal,-Exact-)}
+   q = p;
+//  {(p,p_formal,-Exact-);(q,p_formal,-Exact-)}
+   
+   
+   for(j = 0; j <= 9; j += 1)
+//  {(p,p_formal,-Exact-);(q,p_formal,-Exact-)}
+      tab[j] = j;
+//  {(p,p_formal,-Exact-);(q,p_formal,-Exact-)}
+   while (p!=(void *) 0) {
+//  points to = {}
+      p->val = &tab[i];
+//  points to = {}
+      p = p->next;
+//  points to = {}
+      i++;
+   }
+//  {(p,p_formal,-MAY-);(p[0][val],tab[i],-MAY-);(q,p_formal,-Exact-)}
+   return i;
+}
+

@@ -23,7 +23,7 @@ int foo(float (*b)[M])
 }
 
 int foo2(float b[N][M])
-{ 
+{
   float c;
   (*b)[3] = 2.0;
   c = (*b)[3];
@@ -39,7 +39,7 @@ int foo2(float b[N][M])
 }
 
 int foo3()
-{ 
+{
   float c;
   (*d)[3] = 2.0;
   c = (*d)[3];

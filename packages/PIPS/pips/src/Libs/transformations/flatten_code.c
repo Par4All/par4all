@@ -113,7 +113,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	pips_debug(1, "Local variable %s is preserved because its initial value "
 		   "is not assignable\n", entity_local_name(var));
 	ndecls = gen_nconc(ndecls, CONS(ENTITY, var, NIL));
-      replace_entities(entity_type(var),renamings);
+	replace_entities(entity_type(var),renamings);
       }
       else if(var!=nvar) {
 	/* If the new variable declaration does not contain the
@@ -244,6 +244,11 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
       string vn = entity_name(v);
       string vmn = module_name(vn);
 
+      if (hash_defined_p(rdcp->renamings, v)) {
+	pips_debug(5, "Skipping the already processed variable \"%s\" \n", entity_user_name(v)); 
+	continue;
+      }
+
       if(strcmp(mn, vmn)!=0) {
 	/* This is not a local variable. Its declaration can be
 	   moved if not already there. */
@@ -251,7 +256,8 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	list dv = statement_declarations(ds);
 
 	if(!entity_is_argument_p(v, dv)) {
-        AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
+        	pips_debug(5, "Entity is not an argument\n");
+		AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
 	}
 	hash_put_or_update(rdcp->renamings, v, v);
       }
@@ -265,6 +271,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	/* Can we move or transform the initialization? */
 	if(expression_undefined_p(ie)) {
+
 	  /* No initialization issue, let's move the declaration */
 	  redeclare_p = TRUE;
 	  move_initialization_p = TRUE;
@@ -293,7 +300,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	else {
 	  /* We are not in a control cycle. The initial value
 	     expression, if constant, can be moved with the
-	     new declaration. This avoids problem with non-assignale
+	     new declaration. This avoids problem with non-assignable
 	     expressions such as brace expressions used in
 	     initializations at declaration. */
 	  if(extended_expression_constant_p(ie)) {
@@ -327,7 +334,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	  statement ds = rdcp->declaration_statement;
 	  list dselist = statement_to_referenced_entities(ds);
-	  bool ok_p    = TRUE;
+	  bool is_same_name    = FALSE;
 
 	  ifdebug(8) {
 	    pips_debug(8, "Entities found in declaration statement: ");
@@ -340,18 +347,25 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	  do {
 	    nv = make_entity_copy_with_new_name(v, negn, move_initialization_p);
 	    FOREACH(ENTITY, dv, dselist) {
-	      ok_p = strcmp(entity_user_name(dv), entity_user_name(nv)) != 0;
-	      if (!ok_p) {
+	      
+	      if (dv == v)
+	      {
+		pips_debug(8, "Skipping the variable \"%s\" we are working on\n", entity_user_name(v)); 
+		continue;
+	      }
+	      
+	      is_same_name = strcmp(entity_user_name(dv), entity_user_name(nv)) == 0;
+	      if (is_same_name) {
 		pips_debug(1, "Proposed variable \"%s\" conflicts with references in declaration statement\n",
 			   entity_name(nv));
 		break;
 	      }
 	    }
-	    if (!ok_p) {
+	    if (is_same_name) {
 	      // WARNING: We must remember to free the newly declared nv when it's not used!
 	      //unused_nvs = CONS(ENTITY, nv, unused_nvs);
 	    }
-	  } while (!ok_p);
+	  } while (is_same_name);
 
 	  /* FI: what happens to external entities whose declarations
 	     is moved, but the name unchanged? */
@@ -369,7 +383,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 }
 
 /* Keep track of cycle exit in the hierarchical control flow graph */
-static bool redeclaration_exit_statement(statement s,
+static void redeclaration_exit_statement(statement s,
 				  redeclaration_context_t * rdcp)
 {
   instruction i = statement_instruction(s);
@@ -380,8 +394,6 @@ static bool redeclaration_exit_statement(statement s,
      || instruction_forloop_p(i)
      || instruction_unstructured_p(i))
     rdcp->cycle_depth--;
-
-  return TRUE;
 }
 
 /* FI: added to wrap up the use of redeclaration context... */

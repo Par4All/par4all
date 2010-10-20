@@ -269,7 +269,7 @@ etc-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(ETC.d)/$$f ;\
 	done
-	test ! -d $(ETC.d) || $(RMDIR) --ignore-fail-on-non-empty $(ETC.d)
+	-test ! -d $(ETC.d) || $(RMDIR) --ignore-fail-on-non-empty $(ETC.d)
 
 etc-clean:
 	$(RM) .build_etc
@@ -311,7 +311,7 @@ py-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(PY.d)/$$f ;\
 	done
-	test ! -d $(PY.d) || $(RMDIR) --ignore-fail-on-non-empty $(PY.d)
+	-test ! -d $(PY.d) || $(RMDIR) --ignore-fail-on-non-empty $(PY.d)
 
 py-clean:
 	$(RM) .build_py
@@ -401,7 +401,7 @@ inc-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(INC.d)/$$f ;\
 	done
-	test ! -d $(INC.d) || $(RMDIR) --ignore-fail-on-non-empty $(INC.d)
+	-test ! -d $(INC.d) || $(RMDIR) --ignore-fail-on-non-empty $(INC.d)
 
 inc-clean:
 	$(RM) .build_inc
@@ -500,7 +500,7 @@ dynlib-unbuild:
 		echo "uninstalling $$f.*" ; \
 	  	$(RM)  $(LIB.d)/$$f.* ;\
 	done
-	test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
+	-test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
 
 endif # DYNLIB_TARGET
 
@@ -533,7 +533,7 @@ lib-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(LIB.d)/$$f ;\
 	done
-	test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
+	-test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
 
 endif # INSTALL_LIB
 
@@ -604,7 +604,7 @@ exe-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(EXE.d)/$$f ;\
 	done
-	test ! -d $(EXE.d) || $(RMDIR) --ignore-fail-on-non-empty $(EXE.d)
+	-test ! -d $(EXE.d) || $(RMDIR) --ignore-fail-on-non-empty $(EXE.d)
 
 
 endif # INSTALL_EXE
@@ -643,9 +643,10 @@ bin-unbuild:
 		F=`echo $$f | sed -e 's,$(ARCH)/,,'` ;\
 		echo "uninstalling $$F" ; \
 		$(RM) -r $${BIN}/$$F ;\
-	done ;\
-	test ! -d $${BIN}/$(ARCH) || $(RMDIR) --ignore-fail-on-non-empty $${BIN}/$(ARCH) ;\
-	test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
+	done
+	-test ! -d $(BIND.d) || $(RMDIR) --ignore-fail-on-non-empty $(BIN.d)
+	-BIN="`echo $(BIN.d) | sed -e 's,/$(ARCH),,'`" ;\
+	 test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
 
 endif # INSTALL_BIN
 
@@ -680,9 +681,9 @@ doc-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(DOC.dest)/$$f ;\
 	done
-	test ! -d $(DOC.dest) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.dest)
-	test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
-	test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
+	-test ! -d $(DOC.dest) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.dest)
+	-test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
+	-test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
 
 endif # INSTALL_DOC
 
@@ -710,7 +711,7 @@ man-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(MAN.d)/$$f ;\
 	done
-	test ! -d $(MAN.d) || $(RMDIR) --ignore-fail-on-non-empty $(MAN.d)
+	-test ! -d $(MAN.d) || $(RMDIR) --ignore-fail-on-non-empty $(MAN.d)
 
 endif # INSTALL_MAN
 
@@ -752,8 +753,8 @@ htm-unbuild:
 		echo "uninstalling $$f" ; \
 		$(RM) -r $(HTM.d)/$(HTM.subd)/$$f ; \
 	done
-	test ! -d $(HTM.d)/$(HTM.subd) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)/$(HTM.subd)
-	test ! -d $(HTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)
+	-test ! -d $(HTM.d)/$(HTM.subd) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)/$(HTM.subd)
+	-test ! -d $(HTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)
 
 endif # INSTALL_HTM
 
@@ -781,7 +782,7 @@ shr-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(SHR.d)/$$f ;\
 	done
-	test ! -d $(SHR.d) || $(RMDIR) --ignore-fail-on-non-empty $(SHR.d)
+	-test ! -d $(SHR.d) || $(RMDIR) --ignore-fail-on-non-empty $(SHR.d)
 
 endif # INSTALL_SHR
 
@@ -809,7 +810,7 @@ utl-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(UTL.d)/$$f ;\
 	done
-	test ! -d $(UTL.d) || $(RMDIR) --ignore-fail-on-non-empty $(UTL.d)
+	-test ! -d $(UTL.d) || $(RMDIR) --ignore-fail-on-non-empty $(UTL.d)
 
 endif # INSTALL_UTL
 
@@ -827,7 +828,7 @@ main-unbuild:
 		echo "uninstalling $$f" ; \
 	  	$(RM) -r $(RTM.d)/$$f ;\
 	done
-	test ! -d $(RTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(RTM.d)
+	-test ! -d $(RTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(RTM.d)
 
 
 # Doxygen documentation:

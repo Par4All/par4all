@@ -48,3 +48,5 @@ endif
 ifndef PIPS_NO_JPIPS
 	FWD_DIRS += jpips
 endif
+
+FWD_PARALLEL = 1

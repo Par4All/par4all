@@ -192,24 +192,24 @@ void flatten_code12(void)
    int i = foo_0;                                                       /*0011*/
    //PIPS generated variable
 // (0,3)
-   static int foo_1 = 0;
+   static int foo = 0;
 // (0,4)
 
-   foo_1++;
+   foo++;
 // (0,5)
-   fprintf(stdout, "foo=%d\n", foo_1);
+   fprintf(stdout, "foo=%d\n", foo);
 // (0,6)
-   foo_1++;
+   foo++;
 // (0,7)
-   fprintf(stdout, "foo=%d\n", foo_1);
+   fprintf(stdout, "foo=%d\n", foo);
 // (0,8)
-   foo_1++;
+   foo++;
 // (0,9)
-   fprintf(stdout, "foo=%d\n", foo_1);
+   fprintf(stdout, "foo=%d\n", foo);
 // (0,10)
-   foo_1++;
+   foo++;
 // (0,11)
-   fprintf(stdout, "foo=%d\n", foo_1);
+   fprintf(stdout, "foo=%d\n", foo);
 // (0,12)
    i = 4;
    // END BLOCK

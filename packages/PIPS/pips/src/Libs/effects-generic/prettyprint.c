@@ -57,6 +57,8 @@
 #include "text-util.h"
 #include "prettyprint.h"
 
+#include "transformer.h"
+#include "semantics.h"
 #include "effects-convex.h"
 #include "effects-generic.h"
 
@@ -276,7 +278,7 @@ text_statement_any_effect_type(
 static text
 get_any_effects_text(
     string module_name,
-    bool give_code_p)
+    bool give_code_p, bool use_values)
 {
     entity module;
     statement module_stat, user_stat = statement_undefined;
@@ -298,6 +300,15 @@ get_any_effects_text(
      */
     load_resources(module_name);
 
+    if (use_values)
+      {
+	/* To set up the hash table to translate value into value names */
+	set_cumulated_rw_effects((statement_effects)
+				 db_get_memory_resource
+				 (DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	module_to_value_mappings(module);
+      }
+
    /* Since we want to prettyprint with a sequential syntax, save the
        PRETTYPRINT_PARALLEL property that may select the parallel output
        style before overriding it: */
@@ -310,7 +321,7 @@ get_any_effects_text(
 
     debug_on("EFFECTS_DEBUG_LEVEL");
 
-    if(is_user_view_p) 
+    if(is_user_view_p)
     {
 	user_stat =  (statement)
 	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
@@ -325,8 +336,6 @@ get_any_effects_text(
     /* prepare the prettyprinting */
     init_prettyprint(text_statement_any_effect_type);
 
-
- 
     /* summary regions first */
     MERGE_TEXTS(txt, text_summary_any_effect_type(module));
 
@@ -351,6 +360,13 @@ get_any_effects_text(
     set_string_property("PRETTYPRINT_PARALLEL", pp);
     free(pp);
 
+    if (use_values)
+      {
+	free_value_mappings();
+	reset_cumulated_rw_effects();
+
+      }
+
     reset_current_module_entity();
     reset_current_module_statement();
 
@@ -362,7 +378,8 @@ get_any_effects_text(
 bool
 print_source_or_code_effects_engine(
     string module_name,
-    string file_suffix)
+    string file_suffix,
+    bool use_values)
 {
     char *file_name, *file_resource_name;
     bool success = TRUE;
@@ -399,7 +416,7 @@ print_source_or_code_effects_engine(
 	(module_name,
 	 file_resource_name,
 	 file_name,
-	 get_any_effects_text(module_name, TRUE));
+	 get_any_effects_text(module_name, TRUE, use_values));
 
     if (prettyprint_with_attachments_p)
 	end_attachment_prettyprint();
@@ -445,7 +462,7 @@ get_any_effect_type_text(
 {
     text txt;
     push_prettyprints(resource_name, summary_resource_name);
-    txt = get_any_effects_text(module_name, give_code_p);
+    txt = get_any_effects_text(module_name, give_code_p, false);
     reset_generic_prettyprints();
     return txt;
 }
@@ -457,11 +474,12 @@ print_source_or_code_with_any_effects_engine(
     string module_name,
     string resource_name,
     string summary_resource_name,
-    string file_suffix)
+    string file_suffix,
+    bool use_values)
 {
     bool ok;
     push_prettyprints(resource_name, summary_resource_name);
-    ok = print_source_or_code_effects_engine(module_name, file_suffix);
+    ok = print_source_or_code_effects_engine(module_name, file_suffix, use_values);
     reset_generic_prettyprints();
     return ok;
 }

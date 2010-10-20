@@ -2,15 +2,15 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete array_to_pointer09
 create array_to_pointer09 array_to_pointer09.c
 
-setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS "POINTER"
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
 display PRINTED_FILE[atp]
 display PRINTED_FILE[main]
 
 echo
-echo "/* After apply ARRAY_TO_POINTER[%ALL] */"
+echo "/* After apply LINEARIZE_ARRAY[%ALL] */"
 echo
 
-apply ARRAY_TO_POINTER[%ALL]
+apply LINEARIZE_ARRAY[%ALLFUNC]
 display PRINTED_FILE[atp]
 display PRINTED_FILE[main]
 
@@ -18,8 +18,8 @@ apply UNSPLIT[%ALL]
 close
 
 
-shell gcc array_to_pointer09.c -o array_to_pointer09.database/Tmp/ref
-shell gcc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
+shell cc array_to_pointer09.c -o array_to_pointer09.database/Tmp/ref
+shell cc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
 shell test "`./array_to_pointer09.database/Tmp/ref`" = "`./array_to_pointer09.database/Tmp/out`"
 
 delete array_to_pointer09

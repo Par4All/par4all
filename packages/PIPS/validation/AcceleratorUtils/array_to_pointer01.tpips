@@ -13,8 +13,9 @@ echo
 echo Code after array conversion
 echo
 
-apply ARRAY_TO_POINTER[duck]
+apply LINEARIZE_ARRAY[duck]
 display PRINTED_FILE[duck]
+display PRINTED_FILE[main]
 
 #echo
 #echo Code after partial eval
@@ -30,7 +31,7 @@ echo
 apply UNSPLIT
 shell cc $WS.c -o  $WS.database/Tmp/ref
 shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
-shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
+shell test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`
 
 close
 delete $WS

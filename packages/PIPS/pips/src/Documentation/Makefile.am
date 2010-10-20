@@ -25,7 +25,7 @@ if WITH_DOC
 SUBDIRS+=dev_guide auto_pips linear bugs_and_wishes faq tpips-user-manual xpomp manl
 
 if WITH_PYPS_EXTRA
-	SUBDIRS+=pyps
+SUBDIRS+=pyps
 endif
 
 # Not yet supported:

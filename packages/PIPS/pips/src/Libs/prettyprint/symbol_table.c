@@ -47,6 +47,7 @@
 #include "resources.h"
 #include "database.h"
 
+#include "properties.h"
 #include "misc.h"
 #include "pipsdbm.h"
 
@@ -165,6 +166,19 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 			       concatenate
 				      ("\tVariable \"", entity_name(m),"\"\toffset = ",
 				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
+	  if (get_bool_property("EXTENDED_VARIABLE_INFORMATION")) {
+	    type t = entity_type (m);
+	    if (type_variable_p(t)) {
+	      variable v = type_variable(t);
+	      basic b = variable_basic(v);
+	      string_buffer_append(result,
+				   concatenate("\ttype = \"",
+					       basic_to_string(b), "\"",
+					       "\tuser name = \"",
+					       entity_user_name (m), "\"",
+					       NULL));
+	    }
+	  }
 	  string_buffer_append(result,
 			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}

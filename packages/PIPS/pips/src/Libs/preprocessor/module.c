@@ -374,6 +374,14 @@ AddEntityToCompilationUnit(entity e, entity cu)
         }
         s=(statement)db_get_memory_resource(DBR_CODE,cum,TRUE);
     }
+    /* SG: when adding a new entity to compilation unit,
+     * one should check the entity is not already present
+     * but an entity with the same name may already be defiend there
+     * so check this with a avery costly test*/
+    list cu_entities = entity_declarations(cu);
+    FOREACH(ENTITY,cue,cu_entities)
+        if(same_string_p(entity_user_name(e),entity_user_name(cue)))
+            return;
     AddLocalEntityToDeclarations(e,cu,s);
     if( c_module_p(cu) ) {
         module_reorder(s);
@@ -384,7 +392,10 @@ AddEntityToCompilationUnit(entity e, entity cu)
 void
 AddEntityToModuleCompilationUnit(entity e, entity module)
 {
+    list tse = type_supporting_entities(NIL,entity_type(e));
     entity cu = module_entity_to_compilation_unit_entity(module);
+    FOREACH(ENTITY,se,tse) AddEntityToCompilationUnit(se,cu);
+    gen_free_list(tse);
     AddEntityToCompilationUnit(e,cu);
 }
 

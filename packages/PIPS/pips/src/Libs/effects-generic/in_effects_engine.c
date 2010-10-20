@@ -140,27 +140,35 @@ in_effects_of_statement(statement s)
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
-static list 
+static list
 r_in_effects_of_sequence(list l_inst)
 {
     statement first_statement;
     list remaining_block = NIL;
-    
+
     list s1_lin; /* in effects of first statement */
     list rb_lin; /* in effects of remaining block */
     list l_in = NIL; /* resulting in effects */
     list s1_lr; /* rw effects of first statement */
     transformer t1; /* transformer of first statement */
- 
+
+    pips_debug(3," begin\n");
+
     first_statement = STATEMENT(CAR(l_inst));
+    ifdebug(3)
+      {
+	pips_debug(3," first statement is (ordering %03zd): \n",
+		   statement_ordering(first_statement));
+	print_statement(first_statement);
+      }
     remaining_block = CDR(l_inst);
-	    
+
     s1_lin = effects_dup(load_in_effects_list(first_statement));
-	
+
     /* Is it the last instruction of the block */
     if (!ENDP(remaining_block))
     {
-	
+
 	s1_lr = load_rw_effects_list(first_statement);
 	ifdebug(6) 
 	    {
@@ -168,42 +176,42 @@ r_in_effects_of_sequence(list l_inst)
 		(*effects_prettyprint_func)(s1_lr);
 	    }
 
-	t1 = (*load_transformer_func)(first_statement);    
-	
+	t1 = (*load_transformer_func)(first_statement);
+
 	/* Nga Nguyen, 25/04/2002. Bug found in fct.f about the transformer of loops
-	   Preconditions added to regions take into account the loop exit preconditions 
+	   Preconditions added to regions take into account the loop exit preconditions
 	   but the corresponding loop transformers do not. This may give false results
 	   when applying transformers to regions. So we have to add loop exit conditions
 	   to the transformers. */
-	
+
 	//	if (statement_loop_p(first_statement))
 	// {
 	//  loop l = statement_loop(first_statement);
 	//   t1 = (*add_loop_exit_condition_func)(t1,l);
 	// }
-	
+
 	rb_lin = r_in_effects_of_sequence(remaining_block);
-	    
-	(*effects_transformer_composition_op)(rb_lin, t1); 
-	
+
+	(*effects_transformer_composition_op)(rb_lin, t1);
+
 	/* Nga Nguyen, 25/04/2002.rb_lin may contain regions with infeasible system {0==-1}
 	   => remove them from rb_lin*/
 
 	// rb_lin = (*remove_effects_with_infeasible_system_func)(rb_lin);
-	
+
 	/* IN(block) = (IN(rest_of_block) - W(S1)) U IN(S1) */
 	l_in = (*effects_union_op)(
 	    s1_lin,
 	    (*effects_sup_difference_op)(rb_lin, effects_dup(s1_lr),
 					 r_w_combinable_p),
 	    effects_same_action_p);
-    }	
-    else 
+    }
+    else
     {
 	l_in = s1_lin;
     }
-    
-    ifdebug(6) 
+
+    ifdebug(6)
     {
 	pips_debug(6,"cumulated_in_effects:\n");
 	(*effects_prettyprint_func)(l_in);
@@ -639,6 +647,11 @@ in_effects_of_call(call c)
     list pc = call_arguments(c);
 
     pips_debug(1, "begin\n");
+    ifdebug(3)
+      {
+	pips_debug(3, "for current statement \n");
+	print_statement(current_stat);
+      }
     switch (t) {
       case is_value_constant:
         pips_debug(5, "constant %s\n", n);
@@ -661,16 +674,16 @@ in_effects_of_call(call c)
 	    pips_debug(2, "R/W effects: \n");
 	    (*effects_prettyprint_func)(l_in);
 	}
-	
+
 	l_in = effects_read_effects_dup(l_in);
-	
-	/* Nga Nguyen 25/04/2002 : what about READ *,NDIM,(LSIZE(N), N=1,NDIM) ? 
+
+	/* Nga Nguyen 25/04/2002 : what about READ *,NDIM,(LSIZE(N), N=1,NDIM) ?
 	   Since NDIM is written before read => no IN effect on NDIM.
-	   
+
 	   So I add tests for the READ statement case. But this is only true for scalar variables :-)
 
 	   READ *,M,N,L,A(M*N),B(A(L)) ==> MAY-IN A ???*/
-	
+
 	if (strcmp(entity_local_name(e),READ_FUNCTION_NAME)==0)
 	  {
 	    list args = call_arguments(c);
@@ -678,7 +691,7 @@ in_effects_of_call(call c)
 	    MAP(EFFECT,reg,
 	    {
 	      entity ent = effect_entity(reg);
-	      if (entity_scalar_p(ent) && written_before_read_p(ent,args)) 
+	      if (entity_scalar_p(ent) && written_before_read_p(ent,args))
 		gen_remove(&l_in,reg);
 	    },l_in);
 	  }
@@ -701,6 +714,31 @@ in_effects_of_call(call c)
     pips_debug(1, "end\n");
 }
 
+/* Just to handle one kind of instruction, expressions which are not
+   calls.  As we do not distinguish between Fortran and C, this
+   function is called for Fortran module although it does not have any
+   effect.
+ */
+static void in_effects_of_expression_instruction(instruction i)
+{
+  //list l_proper = NIL;
+  statement current_stat = effects_private_current_stmt_head();
+  //instruction inst = statement_instruction(current_stat);
+  pips_debug(2, "begin for expression instruction in statement%03zd\n",
+	     statement_ordering(current_stat));
+
+  /* Is the call an instruction, or a sub-expression? */
+  if (instruction_expression_p(i))
+    {
+      list lin = load_rw_effects_list(current_stat);
+      lin = effects_read_effects_dup(lin);
+      store_in_effects_list(current_stat, lin);
+    }
+
+  pips_debug(2, "end for expression instruction in statement%03zd\n",
+	     statement_ordering(current_stat));
+
+}
 
 
 static void 
@@ -758,6 +796,9 @@ in_effects_of_module_statement(statement module_stat)
 	whileloop_domain, gen_true, in_effects_of_whileloop,
 	forloop_domain, gen_true, in_effects_of_forloop,
 	 unstructured_domain, gen_true, in_effects_of_unstructured,
+	/* Just to retrieve effects of instructions with kind
+	   expression since they are ruled out by the next clause */
+	instruction_domain, gen_true, in_effects_of_expression_instruction,
 	expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	NULL);     
 

@@ -8,15 +8,12 @@ void f() {
   double __temp4[__USize[0]*__USize[1]];
 
   {
-    //PIPS generated variable
     int I_30;
     I_30 = __USize[0]*__USize[1];
     {
       int i = 0;
-#pragma omp parallel for private(_return391)
       for(i = 0; i <= I_30-1; i += 1) {
 	{
-	  //PIPS generated variable
 	  double F_212;
 	  F_212 = U[i];
 	  _return391 = cos(F_212);
@@ -27,7 +24,6 @@ void f() {
   }
   {
     int i = 0;
-#pragma omp parallel for
     for(i = 0; i <= __USize[0]*__USize[1]-1; i += 1)
       __temp4[i] = U[i]/2;
   }

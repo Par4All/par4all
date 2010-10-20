@@ -753,13 +753,13 @@ void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
          
          p4a_kernel_wrapper_1(i, j, save, space);                       /*0013*/
 }
-void p4a_kernel_wrapper_1(int i, int j, float_t save[501][501], float_t space[501][501])
+void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[501][501])
 {
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
    
-   save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);   /*0008*/
+   space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);      /*0008*/
    /*0004*/
    ;
 }
@@ -771,13 +771,13 @@ void p4a_kernel_wrapper_0(float_t space[501][501], int i, int j)
    /*0003*/
    ;
 }
-void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[501][501])
+void p4a_kernel_wrapper_1(int i, int j, float_t save[501][501], float_t space[501][501])
 {
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    
    
-   space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);      /*0008*/
+   save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);   /*0008*/
    /*0004*/
    ;
 }

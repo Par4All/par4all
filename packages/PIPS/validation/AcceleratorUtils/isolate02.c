@@ -11,4 +11,5 @@ void lonesome_cowboy()
 main()
 {
     lonesome_cowboy();
+    return 0;
 }

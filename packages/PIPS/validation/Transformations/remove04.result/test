@@ -41,25 +41,25 @@ volume:
    return v;
 }
 
-after array to pointer
+after array linearization
 
 int volume()
 {
-   int a[256][256];
+   int a[65536];
    int v = 0;
    int i, j;
    //PIPS generated variable
    int RED[256];
    for(i = 0; i <= 255; i += 1)
-      *((int *) RED+i) = 0;
+      RED[i] = 0;
 volume:
    for(i = 0; i <= 255; i += 1) {
-      *((int *) RED+i) = *((int *) RED+i)+1;
+      RED[i] = RED[i]+1;
       for(j = 0; j <= 255; j += 1)
-         *((int *) RED+i) = *((int *) RED+i)+*((int *) a+256*i+j);
+         RED[i] = RED[i]+a[256*i+j];
    }
    for(i = 0; i <= 255; i += 1)
-      v = v+*((int *) RED+i);
+      v = v+RED[i];
    return v;
 }
 

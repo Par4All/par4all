@@ -37,6 +37,15 @@
 \usepackage{makeidx}
 \makeindex
 
+%% For nice rendering of source codes:
+\usepackage[hyper,procnames]{listings}
+\lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
+  showstringspaces=false, showtabs=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
+  index=[1][keywords],indexprocnames=true}
+
 \title{PIPS: Internal Representation of Fortran and C Code}
 \author{Fabien Coelho\\
   Béatrice Creusillet\\
@@ -299,7 +308,7 @@ value names used in the semantics analysis. Note the use of star,
 \verb+*+, to avoid name collision with user defined name.
 
 To sum up, an entity name is unique whithin an application and known
-internally as a \emph{global} name. It is made of a \emph{local} name
+internally by its \emph{global} name. It is made of a \emph{local} name
 and a \emph{module} name. The local name contains the user source name.
 
 Several other tricks are used to store information in local names. To spot
@@ -837,6 +846,23 @@ initiale contenue dans le sous-domaine \verb/constant/. Le sous-domaine
 source fidèle.
 \end{comment}
 
+\subsubsection{Program Variables}
+
+Program variables are entities with specific fields, but they must
+also be declared.
+
+Fortran variables are only declared in the declaration field of data
+structure \verb/code/.
+
+A C variable is supposed to be declared in one declaration statement,
+in its own block and in the declaration field of \verb/code/. These
+three declarations have to be kept consistent, which is a pain, but
+each of the declarations is useful at a different time: prettyprint of
+source code, block exit, and function exit respectively. The
+consistency check is not part of Newgen.
+
+
+
 \subsubsection{Constant Value}
 \label{subsubsection-constant}
 \index{Constant}\index{DATA}\index{PARAMETER}
@@ -1099,24 +1125,32 @@ information of this kind is needed, it should be attached to the first
 statement of the sequence or to a CONTINUE (for an empty sequence)
 instead.
 
-Member \texttt{declarations} is used to declare local variables. If
+Member \texttt{declarations} is used in C to declare local variables. If
 the instruction is a block, the declarations are local to the
-block. If the instruction is a CONTINUE (i.e. the predicate
-\verb/declaration_statement_p/holds true), then the declared variables
-are declared till the end of the current block. The variables declared
-in a CONTINUE statement are also declared at the enclosing block
-level. They are also declared in the symbol table, in the
-\verb/declarations/ field of \verb/code/. The prettyprinter only takes
-into account the CONTINUE statements. So implicitly declared variables
-and functions, such as functions returning an \verb/int/ in C, only
-appear at the block level. Other statements, that are neither a block
-nor a CONTINUE, cannot have declarations.
+block. If the instruction is a \verb/CONTINUE/, or better if the
+predicate \verb/declaration_statement_p/holds true, then the declared
+variables are declared till the end of the current block. The
+variables declared in a CONTINUE statement are also declared at the
+directly enclosing block level. They are also declared in the symbol
+table, in the \verb/declarations/ field of \verb/code/. The
+prettyprinter only takes into account the \verb/CONTINUE/ or
+declaration statements. So implicitly declared variables and
+functions, such as functions returning an \verb/int/ in C, only appear
+at the block level. Other statements, that are neither a block nor a
+declaration statement, cannot have declarations. This is not enforced
+by Newgen. To sum up, a C program variable is declared three times in C:
+in the declaration field of code, in the block enclosing its
+declaration and in a declaration statement.
 
 Note that local variables declared in a loop as \verb/loop_locals/ are
 local to the loop body. This seems redundant with
 \verb/statement_declarations/, but making it obsolete would require a
 refactoring of the use-def chains, dependence graph and
-parallelization algorithms.
+parallelization algorithms. Also, the semantics is slightly different
+and there are rationals\footnote{FI: I do not remember them all and I
+  do not know where it is explained.} to preserve this local field in
+loops. Among them, the last value may escape the loop, the first value
+may be imported.
 
 Member \texttt{decls\_text} can be used to keep track to the exact text
 used to declare variables. This field is not currently used.
@@ -1708,7 +1742,16 @@ is an extension of the reference expression, which includes other more
 complicated array objects such as pointer, function, structure or
 union member... The same extension is made to call expression, named
 function application, because the called function is not necessarily
-an entity but can be any expression that denotes the address of a function.
+an entity but can be any expression that denotes the address of a
+function.
+
+The field \verb/va_arg/ is added only to cope with the call
+\verb/va_arg(e,t)/ where \verb/e/ is an expression and \verb/t/ is a
+type. The domain \verb/sizeofexpression/ is reused, in spite of its
+name, because it combines types and expressions. The number of
+arguments is left unspecified as well their respective kinds so as not
+to add yet another domain in the internal representation for such a
+peculiar case of C syntax.
 
 
 \subsubsection{Reference}
@@ -1758,12 +1801,25 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-cast}
 \index{Cast}
 
+This is used to represent expressions in C such as:
+\begin{lstlisting}
+  (type) e;
+\end{lstlisting}
+
 \domain{Cast = type x expression}
 {}
 
 \subsubsection{Sizeof}
 \label{subsubsection-sizeof}
 \index{Sizeof}
+
+This is used to represent expressions such as:
+\begin{lstlisting}
+  sizeof(e);
+  sizeof(type);
+\end{lstlisting}
+Since it can be applied on a type, it cannot be represented in the RI as a
+classical function call to a \texttt{sizeof()} operator.
 
 \domain{Sizeofexpression = type + expression}
 {}
@@ -1772,6 +1828,8 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-subscript}
 \index{Subscript}
 
+In C, pointer expressions can be subscripted, not only arrays, so there is
+a subscript expression:
 \domain{Subscript = array:expression x indices:expression*}
 {}
 
@@ -1779,6 +1837,8 @@ with side effect. See Section~\ref{subsubsection-call}.
 \label{subsubsection-application}
 \index{Application}
 
+Since in C not only functions can be called but also any function
+pointers, there is a need to represent these function calls:
 \domain{Application = function:expression x arguments:expression*}
 {}
 
@@ -1800,7 +1860,7 @@ expression linéaire construite sur les variables simples entières
 (sous-domaine \texttt{linear}) ou non (sous-domaine \texttt{complex}).
 \end{comment}
 
-Field \verb/complex/ is used if the expression is not affine, e.g. 
+Field \verb/complex/ is used if the expression is not affine, e.g.
 \texttt{I*J+4}, or if it is affine but contains references to non integer scalar
 variables, e.g. \texttt{T(I-1) + T(I) + T(I+1)}.
 
@@ -1844,10 +1904,12 @@ useful to be able to encode pseudo-affine operators such as \verb+/+,
 
 Type \verb/transformer/ defines a relationship between two stores,
 i.e. two memory states, associated to two control points (i.e. two
-statements). This relation is limited to \emph{integer scalar} variables
-in the \emph{dynamic} scope of a module: global and static integer scalar
-variables are taken into account. Note that the data structure does not
-enforce the integer and scalar conditions.
+statements). This relation is limited by default to \emph{integer
+  scalar} variables in the \emph{dynamic} scope of a module: global
+and static integer scalar variables are taken into account. Note that
+the data structure does not enforce the integer and scalar conditions
+and that some properties can be set to process also boolean, string
+and floating point scalar variables.
 
 \begin{comment}
 Le domaine \texttt{transformer} définit une relation entre deux états
@@ -1856,15 +1918,18 @@ porte sur les valeurs des variables scalaires entières d'un module ou
 des variables globales au programme.
 \end{comment}
 
-Variables in the list \verb/arguments/ are variables whose values 
+Variables in the list \verb/arguments/ are variables whose values
 \emph{may} have changed between the two control points. Two values are denoted
 for each variable in the \verb/arguments/ list, the initial value and
 the final value. The initial values are pure values, i.e. entities
 specific to the semantics library. The final values are identified with
 the variable entities, in order to decrease the total number of pure
-values. Variables that do not appear in the \verb/arguments/ list 
+values. Variables that do not appear in the \verb/arguments/ list
 \emph{must} have the same initial and final values, by definition. This unique
 value is considered a final value and no value entity is allocated.
+
+Intermediate and temporary values are also represented by entities and
+used internally. They are never used or displayed in prettyprinted files.
 
 \begin{comment}
 Les variables qui apparaissent dans la liste des arguments sont celles
@@ -1885,13 +1950,16 @@ La relation est définie par des égalités et des inégalités
 linéaires entre valeurs.
 \end{comment}
 
-Two kinds of transformers are used in PIPS. The first kind is linked to
-a statement and is an abstraction of the corresponding command, limited
-to integer scalar variables. Such transformers are called 
-\emph{transformers}. The second kind of transformer, also associated to a
-statement, abstracts the relationship between the initial store of a
-module or of a whole program and the store just before the execution of
-this statement. Such a transformer si called a \emph{precondition}.
+Two kinds of transformers are used in PIPS. The first kind is linked
+to a statement or an expression, possibly with side effects, and is an
+abstraction of the corresponding command, limited to integer scalar
+variables and to other scalar variables according to properties.
+%
+Such transformers are called \emph{transformers}. The
+second kind of transformer, also associated to a statement, abstracts
+the relationship between the initial store of a module or of a whole
+program and the store just before the execution of this
+statement. Such a transformer si called a \emph{precondition}.
 
 \begin{comment}
 Deux types de transformers sont utilisés. Le premier est propre à un

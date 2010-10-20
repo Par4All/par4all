@@ -173,8 +173,9 @@ Moreover the \texttt{pips} repository includes
 \label{sec:building-pips}
 
 
-A crude script \texttt{setup\_pips.sh} on the web site and in
-\texttt{pips/trunk/makes} allows to download \texttt{polylib},
+A crude script \texttt{setup\_pips.sh} on the web site 
+(\url{http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh})
+and in \texttt{pips/trunk/makes} allows to download \texttt{polylib},
 \texttt{newgen}, \texttt{linear} and \texttt{pips} and to build a local
 installation of the softwares.  For instance developer \texttt{calvin} can
 do the following to setup its own PIPS environment:
@@ -932,9 +933,24 @@ There are also PIPS specific instructions to \verb|pips_git|:
 \section{Coding style and conventions}
 \label{sec:coding}
 
+The code is Open Source, every one can peek into what you write, in the
+source code, in the comments, in the message logs... Just think about how
+frightening it is. Just scaring!
 
 All the source code should be documented with Doxygen. It is far from this
-state right now, but the new code should be documented.
+state right now, but the new code should be documented. So Doxygen
+documentation is supposed to be known.
+
+Development language is in US English. Even if most developers are not
+native English speakers, they do some effort. \smiley{} That means that
+the English words should exist in some reference dictionaries, have at
+least their letters in the correct order and so on... \smiley{}
+Fortunately, there are some on-the-fly spell checkers that are quite
+helpful\footnote{For example in Emacs in menu \texttt{Tools/Spell
+    Checking/Automatic spell checking (Flyspell)} and \texttt{Select
+    American Dict}. Make sure you have the right tools and dictionaries
+  installed.}. So, do not commit something without proof reading and using
+a spell checker, even on the commit message!
 
 All the code should be heavily documented. It is still not the
 case... PIPS is already a quite old and huge project and more than 20
@@ -961,26 +977,32 @@ can be quite generalized.
 Try to do more small commits instead of big ones to ease bug tracking in
 case of problems.
 
-\emph{You should not do memory leaks}. First because it is wicked and secondly
-because it often hides (or exhibits? \smiley) nasty bugs that will be
-discovered by some other people or your children may be 20 years later and
-who will want to kill you during your retirement\footnote{Ronan
-  \textsc{Keryell} is just thinking to the \texttt{controlizer} right
+You should avoid to spoil the code with trailing blanks. Yes it is in
+visible so why to bother since the character storage is almost zero?
+Because it is not clean and, if you set the
+\texttt{show-trailing-whitespace} Emacs variable, you can see them every
+where in flashy red. Set your own text editor accordingly.
+
+\emph{You should not do memory leaks}. First because it is wicked and
+secondly because it often hides (or exhibits? \smiley) nasty bugs that
+will be discovered by some other people or your children may be 20 years
+later and who will want to kill you during your retirement\footnote{Ronan
+  \textsc{Keryell} is just thinking to the old \texttt{controlizer} right
   now. \smiley}. \smiley{} Now we have memory debugging tools such as
 Valgrind (see \S~\ref{sec:debugg-memory-issu}), adding some
 \texttt{free()} in the code and tracking where the allocation and
 deallocation of objects happen is a very powerful tool.
 
 Libraries are named \verb|libXXX.a| where \verb|XXX| is the logical name of
-the library: {\tt vecteur}, {\tt prettyprint}, {\tt misc},etc.
+the library: {\tt vecteur}, {\tt prettyprint}, {\tt misc}, etc.
 
-It is theoretically unuseful to put libraries in the Makefile dependencies,
-because header files which are automatically generated are in these
-dependencies, and are systematically modified each time an installation is
-performed. However, this does not work if the pass {\tt p} calls the library
-{\tt a} which needs the library {\tt b}, and if {\tt p} does not directly
-needs the library {\tt b}: modifications to {\tt b} will not provoke the
-link of {\tt p}.
+(Is this paragraph still valuable?) It is theoretically unuseful to put
+libraries in the Makefile dependencies, because header files which are
+automatically generated are in these dependencies, and are systematically
+modified each time an installation is performed. However, this does not
+work if the pass {\tt p} calls the library {\tt a} which needs the library
+{\tt b}, and if {\tt p} does not directly needs the library {\tt b}:
+modifications to {\tt b} will not provoke the link of {\tt p}.
 
 Each important library uses an environment variable \verb+XXX_DEBUG_LEVEL+
 to control debugging messages. This rule hase an exception:
@@ -1935,6 +1957,18 @@ validation run:
 \section{Debugging: NewGen, macros, debug levels,...}
 \label{sec:newgen}
 
+This section describes some issues and tricks about debugging PIPS.
+
+Displaying a textual resource from PIPS use a pager (by default the
+\texttt{more} command) that may interfere badly with the debugger. A way
+to avoid this is to set the \verb|PIPS_MORE| environment variable to the
+\texttt{cat} command. A way to do this from the \texttt{gdb} debugger is
+to do:
+\begin{verbatim}
+set env PIPS_MORE=cat
+\end{verbatim}
+
+
 \subsection{Debugging PIPS C source code for the compiler}
 
 PIPS use a lot of macro processing to ease the programmer life with
@@ -1949,6 +1983,7 @@ make a preprocessed version of the file \texttt{ricedg.c}. To help
 debugging, gcc-specific options are added to have the macro
 definitions at the beginning of the file too, to keep the comments and
 display the list of included files.
+
 
 \subsection{Debugging PIPS C source code dynamically}
 \label{sec:pips_dynamic_debug}
@@ -2083,8 +2118,11 @@ call print_expression(e)
 \end{verbatim}
 \end{itemize}
 
-\marginpar{Fabien: NewGen should be simplified to use
-  \texttt{stmt->label->name}}
+Note that NewGen cannot be simplified to use \texttt{stmt->label->name} in
+the general case because of potential clashes with C reserved keywords. In
+our case, since we represent C code in the RI, we would have naming
+conflicts on \texttt{for}, \texttt{while}, \texttt{to}, \texttt{return}
+and so on.
 
 It should be also possible to use PIPS and NewGen macros (accessors and so
 on) from GDB instead of these NewGen internals, if the sources are
@@ -2096,10 +2134,11 @@ achieve this is to use:
 make CFLAGS='-ggdb -g3 -Wall -std=c99'
 \end{verbatim}
 
-In the future, {\tt gdb} functions compatible with Newgen generated C
-macros will be provided\footnote{Well, we just need GNU people to add
-  interactive functions to \texttt{gdb} and then we will provide the
-  macros.}.
+Now \texttt{gdb} (7.2 at the time of writing) can be easily extended with
+scripts (\emph{sequences}) and even Python with an API to program directly
+in GDB and inspecting the binary. So we could imagine that NewGen or PyPS
+could provide functions compatible with NewGen generated C macros and
+functions.
 
 To ease this kind of inspection, some keyboard accelerators can be defined
 inside the Emacs debugger mode by adding into your \texttt{.emacs} such as:

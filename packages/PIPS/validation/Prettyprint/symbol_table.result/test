@@ -1,0 +1,55 @@
+symbol_table!add_comp_output
+
+Declarations for module "symbol_table!add_comp_output" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 16
+	Declared entity "symbol_table!:*STATIC*" with type "area" with size 0
+	Declared entity "symbol_table!add_comp_output:*DYNAMIC*" with type "area" with size 44
+	Declared entity "symbol_table!add_comp_output:*HEAP*" with type "area" with size 0
+	Declared entity "symbol_table!add_comp_output:*STACK*" with type "area" with size 0
+	Declared entity "symbol_table!add_comp_output:*STATIC*" with type "area" with size 0
+	Declared entity "symbol_table!add_comp_output:0`1`k" with type "variable" "int"
+	Declared entity "symbol_table!add_comp_output:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "symbol_table!add_comp_output:0`__func__" with type "variable" "char *"
+	Declared entity "symbol_table!add_comp_output:0`dst" with type "variable" "int"
+	Declared entity "symbol_table!add_comp_output:0`i" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 16:
+	Variable "TOP-LEVEL:in1"	offset = 0	type = "int"	user name = "in1"	size = 4
+	Variable "TOP-LEVEL:in2"	offset = 4	type = "int"	user name = "in2"	size = 4
+	Variable "TOP-LEVEL:in3"	offset = 8	type = "int"	user name = "in3"	size = 4
+	Variable "TOP-LEVEL:out1"	offset = 12	type = "int"	user name = "out1"	size = 4
+
+
+Layout for memory area "symbol_table!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "symbol_table!add_comp_output:*DYNAMIC*" of size 44:
+	Variable "symbol_table!add_comp_output:0`dst"	offset = 32	type = "int"	user name = "dst"	size = 4
+	Variable "symbol_table!add_comp_output:0`i"	offset = 36	type = "int"	user name = "i"	size = 4
+	Variable "symbol_table!add_comp_output:0`1`k"	offset = 40	type = "int"	user name = "k"	size = 4
+	Variable "symbol_table!add_comp_output:0`__func__"	offset = 0	type = "char *"	user name = "__func__"	size = 16
+	Variable "symbol_table!add_comp_output:0`__FUNCTION__"	offset = 16	type = "char *"	user name = "__FUNCTION__"	size = 16
+
+
+Layout for memory area "symbol_table!add_comp_output:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "symbol_table!add_comp_output:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "symbol_table!add_comp_output:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module symbol_table!add_comp_output
+

@@ -23,6 +23,7 @@
 
 */
 
+/* pv_context is a structure holding the methods to use during pointer values analyses */
 typedef struct {
   /* PIPSDEBM INTERFACES */
   statement_cell_relations (*db_get_pv_func)(char *);
@@ -33,12 +34,28 @@ typedef struct {
   void (*db_put_kill_pv_func)(char * , statement_effects);
 
   cell_relation (*make_pv_from_effects_func)(effect, effect, cell_interpretation);
+
+  /* TRANSLATION OPERATORS */
   void (*cell_reference_with_value_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
   void (*cell_reference_with_address_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);
+
+  /* UNARY OPERATORS */
   cell_relation (*pv_composition_with_transformer_func)(cell_relation, transformer );
 
+  /* BINARY OPERATORS */
   list (*pvs_must_union_func)(list, list);
   list (*pvs_may_union_func)(list, list);
 } pv_context;
+
+/* pv_results is a structure holding the different results of an expression pointer values analysis */
+typedef struct {
+  list l_out; /* resulting pointer_values */
+  effect result_path; /* resulting pointer path of the expression evaluation */
+  cell_interpretation result_path_interpretation; /* interpretation of the resulting pointer path */
+} pv_results;
+  
+#define pips_debug_pv_results(level, message, pv_res) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  print_pv_results(pv_res);}

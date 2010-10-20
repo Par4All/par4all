@@ -287,8 +287,8 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       }
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, *SEMANTICS*:o#1==11}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0, *SEMANTICS*:o#1==11}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-EXACT-{}>
 
 int main()
@@ -305,12 +305,10 @@ int main()
 
    func1(10, 10, a, b, h);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, *SEMANTICS*:o#1==11,
-//    2.0==h, j==11}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, 2.0==h, j==11}>
 //  <a[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#1==11, 2.0==h, j==11}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0, *SEMANTICS*:o#1==11, 2.0==h,
-//    j==11}>
+//    2.0==h, j==11}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0, 2.0==h, j==11}>
 //  <stderr-IN-EXACT-{}>
 
    for(i = 1; i <= 10; i += 1)
@@ -333,7 +331,7 @@ int main()
 }
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -341,18 +339,18 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10}>
+//    2.0==h, m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m,
-//    *SEMANTICS*:o#1==11, 2.0==h, m==10, n==10, 1<=i, i<=n}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h,
+//    m==10, n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, *SEMANTICS*:o#1==11,
-//    2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
       }
@@ -378,7 +376,7 @@ int main()
    h = 2.0;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    *SEMANTICS*:o#1==11, 2.0==h, i==11, j==11}>
+//    2.0==h, i==11, j==11}>
 
    func1(10, 10, a, b, h);
    for(i = 1; i <= 10; i += 1)

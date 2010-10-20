@@ -1,0 +1,217 @@
+
+Proper effects for "initialize"
+
+list * initialize()
+{
+//               <must be written>: som
+   int *pi, i, som = 0;
+//               <must be written>: l
+   list *l = (void *) 0, *nl, al;
+//               <must be written>: l
+   l = &al;
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+   if (!feof(stdin)) {
+//               <must be written>: i
+      scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+      pi = malloc(sizeof(int));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i pi
+      *pi = i;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+      nl = malloc(sizeof(list *));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: nl pi
+      nl->val = pi;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: l nl
+      nl->next = l;
+//               <must be read   >: nl
+//               <must be written>: l
+      l = nl;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: nl
+      nl = nl->next;
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+      if (!feof(stdin)) {
+//               <must be written>: i
+         scanf("%d", &i);
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+         pi = malloc(sizeof(int));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: i pi
+         *pi = i;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+         nl = malloc(sizeof(list *));
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: nl pi
+         nl->val = pi;
+//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//               <must be read   >: l nl
+         nl->next = l;
+//               <must be read   >: nl
+//               <must be written>: l
+         l = nl;
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: nl
+         nl = nl->next;
+      }
+   }
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+   if (!feof(stdin)) {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: nl
+      nl = nl->next;
+//               <must be read   >: som
+//               <must be written>: som
+      som = som+1;
+//               <may be read    >: stdin[0]
+//               <may be written >: stdin[0]
+//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
+      if (!feof(stdin)) {
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+//               <must be written>: nl
+         nl = nl->next;
+//               <must be read   >: som
+//               <must be written>: som
+         som = som+1;
+      }
+   }
+//               <must be read   >: l
+   return l;
+}
+
+POINTS TO for "initialize"
+
+//  {}
+list * initialize()
+{
+//  points to = {}
+   int *pi, i, som = 0;
+//  points to = {}
+   list *l = (void *) 0, *nl, al;
+//  points to = {}
+   l = &al;
+//  {(l,al,-Exact-)}
+   if (!feof(stdin)) {
+//  {(l,al,-Exact-)}
+      scanf("%d", &i);
+//  {(l,al,-Exact-)}
+      pi = malloc(sizeof(int));
+//  {(l,al,-Exact-);(pi,*HEAP*_l_17,-Exact-)}
+      *pi = i;
+//  {(l,al,-Exact-);(pi,*HEAP*_l_17,-Exact-)}
+      nl = malloc(sizeof(list *));
+//  {(l,al,-Exact-);(nl,*HEAP*_l_19,-Exact-);(pi,*HEAP*_l_17,-Exact-)}
+      nl->val = pi;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(l,al,-Exact-);(nl,
+//   *HEAP*_l_19,-Exact-);(pi,*HEAP*_l_17,-Exact-)}
+      nl->next = l;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,al,-Exact-);(nl,*HEAP*_l_19,-Exact-);(pi,*HEAP*_l_17,
+//   -Exact-)}
+      l = nl;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,*HEAP*_l_19,-Exact-);(pi,
+//   *HEAP*_l_17,-Exact-)}
+      nl = nl->next;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,al,-Exact-);(pi,*HEAP*_l_17,
+//   -Exact-)}
+      if (!feof(stdin)) {
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,al,-Exact-);(pi,*HEAP*_l_17,
+//   -Exact-)}
+         scanf("%d", &i);
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,al,-Exact-);(pi,*HEAP*_l_17,
+//   -Exact-)}
+         pi = malloc(sizeof(int));
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,al,-Exact-);(pi,*HEAP*_l_27,
+//   -Exact-)}
+         *pi = i;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,al,-Exact-);(pi,*HEAP*_l_27,
+//   -Exact-)}
+         nl = malloc(sizeof(list *));
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(l,*HEAP*_l_19,-Exact-);(nl,*HEAP*_l_29,-Exact-);(pi,
+//   *HEAP*_l_27,-Exact-)}
+         nl->val = pi;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(*HEAP*_l_29[val],*HEAP*_l_27,-Exact-);(l,*HEAP*_l_19,
+//   -Exact-);(nl,*HEAP*_l_29,-Exact-);(pi,*HEAP*_l_27,-Exact-)}
+         nl->next = l;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(*HEAP*_l_29[next],*HEAP*_l_19,
+//   -Exact-);(*HEAP*_l_29[val],*HEAP*_l_27,-Exact-);(l,*HEAP*_l_19,
+//   -Exact-);(nl,*HEAP*_l_29,-Exact-);(pi,*HEAP*_l_27,-Exact-)}
+         l = nl;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-Exact-);(*HEAP*_l_19[next],al,
+//   -Exact-);(*HEAP*_l_29[next],*HEAP*_l_19,
+//   -Exact-);(*HEAP*_l_29[val],*HEAP*_l_27,-Exact-);(l,*HEAP*_l_29,
+//   -Exact-);(nl,*HEAP*_l_29,-Exact-);(pi,*HEAP*_l_27,-Exact-)}
+         nl = nl->next;
+      }
+   }
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,*HEAP*_l_19,-MAY-);(nl,al,-MAY-);(pi,
+//   *HEAP*_l_17,-MAY-);(pi,*HEAP*_l_27,-MAY-)}
+   if (!feof(stdin)) {
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,*HEAP*_l_19,-MAY-);(nl,al,-MAY-);(pi,
+//   *HEAP*_l_17,-MAY-);(pi,*HEAP*_l_27,-MAY-)}
+      nl = nl->next;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,al,-MAY-);(pi,*HEAP*_l_17,-MAY-);(pi,
+//   *HEAP*_l_27,-MAY-)}
+      som = som+1;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,al,-MAY-);(pi,*HEAP*_l_17,-MAY-);(pi,
+//   *HEAP*_l_27,-MAY-)}
+      if (!feof(stdin)) {
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,al,-MAY-);(pi,*HEAP*_l_17,-MAY-);(pi,
+//   *HEAP*_l_27,-MAY-)}
+         nl = nl->next;
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(pi,*HEAP*_l_17,-MAY-);(pi,*HEAP*_l_27,
+//   -MAY-)}
+         som = som+1;
+      }
+   }
+//  {(*HEAP*_l_19[val],*HEAP*_l_17,-MAY-);(*HEAP*_l_19[next],al,
+//   -MAY-);(*HEAP*_l_29[next],*HEAP*_l_19,-MAY-);(*HEAP*_l_29[val],
+//   *HEAP*_l_27,-MAY-);(l,*HEAP*_l_19,-MAY-);(l,*HEAP*_l_29,
+//   -MAY-);(l,al,-Exact-);(nl,*HEAP*_l_19,-MAY-);(nl,al,-MAY-);(pi,
+//   *HEAP*_l_17,-MAY-);(pi,*HEAP*_l_27,-MAY-)}
+   return l;
+}
+
