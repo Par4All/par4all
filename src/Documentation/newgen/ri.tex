@@ -1746,10 +1746,12 @@ an entity but can be any expression that denotes the address of a
 function.
 
 The field \verb/va_arg/ is added only to cope with the call
-\verb/va_arg(t,e)/ where \verb/t/ is a type and \verb/e/ is an
-expression. The domain \verb/sizeofexpression/ is reused, in spite of
-its name, because it combines types and expressions. The number of
-arguments is left unspecified as well their respective kinds.
+\verb/va_arg(e,t)/ where \verb/e/ is an expression and \verb/t/ is a
+type. The domain \verb/sizeofexpression/ is reused, in spite of its
+name, because it combines types and expressions. The number of
+arguments is left unspecified as well their respective kinds so as not
+to add yet another domain in the internal representation for such a
+peculiar case of C syntax.
 
 
 \subsubsection{Reference}
