@@ -1,6 +1,6 @@
 SUBDIRS  = doc drivers
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
-dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.py
+dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in
 
 dist_bin_SCRIPTS = pips-gcc pips-ar pips-make
 
