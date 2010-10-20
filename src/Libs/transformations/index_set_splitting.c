@@ -263,8 +263,11 @@ static void do_loop_fusion_walker(sequence seq, entity lbl) {
                 if(statement_loop_p(next)) {
                     if(try_loop_fusion(st,next))
                         update_statement_instruction(next,make_continue_instruction());
+                    else pips_user_error("loop fusion failed");
                 }
+                else pips_user_error("loop fusion failed");
             }
+            else pips_user_error("loop fusion failed");
             gen_recurse_stop(0);
         }
     }
