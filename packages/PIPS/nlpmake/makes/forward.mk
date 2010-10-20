@@ -50,6 +50,8 @@
 #   the default value is "." (current directory).
 # FWD_STOP_ON_ERROR:
 #   if set, stop on the first failure met.
+# FWD_PARALLEL:
+#   if set, run in parallel
 #
 # These variables may be overwritten on the command line as
 # gmake FWD_DIRS="foo" FWD_MSG="argh!" FWD_REPORT="> /dev/null" FWD_ROOT=$PWD
@@ -73,6 +75,7 @@ FWD_ROOT	= .
 FWD_OUT		=
 FWD_STOP_ON_ERROR = 1
 FWD_MKFLAGS	=
+FWD_PARALLEL	=
 
 la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
@@ -80,6 +83,15 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 -include *.mk
 
 # Forward any command to the specified directories (if any).
+ifdef FWD_PARALLEL
+.DEFAULT:
+	$(MAKE) $(FWD_DIRS:%=fwd-%) FWD_TARGET=$@
+
+fwd-%: %
+	$(MAKE) -C $< $(FWD_MKFLAGS) \
+		FWD_ROOT="$(FWD_ROOT)/$$d" \
+		FWD_STOP_ON_ERROR="$(FWD_STOP_ON_ERROR)" $(FWD_TARGET)
+else
 # Report the result of the forward.
 .DEFAULT doxygen:
 	@echo Making $@ in $(FWD_ROOT) >&2;\
@@ -92,6 +104,7 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	  echo "FWD_REPORT=$(FWD_REPORT)"; \
 	  echo "FWD_OUT=$(FWD_OUT)"; \
 	  echo "FWD_STOP_ON_ERROR=$(FWD_STOP_ON_ERROR)"; \
+          echo "FWD_PARALLEL=$(FWD_PARALLEL)" ; \
 	fi;\
 	for d in $(FWD_DIRS) ; do \
 	  if test -d $$d && test -f $$d/Makefile ; \
@@ -115,3 +128,4 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 			"some making in `pwd` failed" $(FWD_REPORT);\
 	 [ "$(FWD_STOP_ON_ERROR)" ] && exit $$globally_failed;\
 	 exit 0
+endif
