@@ -26,6 +26,14 @@ apply LOOP_FUSION
 
 display PRINTED_FILE
 
+#apply LOCALIZE_DECLARATION
+
+apply PRIVATIZE_MODULE
+
+apply COARSE_GRAIN_PARALLELIZATION
+
+display PRINTED_FILE
+
 close
 
 delete $WS
