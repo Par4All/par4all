@@ -3419,7 +3419,7 @@ clear. Intra-procedural preconditions may be computed with {\em
 inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination}.
+transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -7284,7 +7284,7 @@ INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
-\PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination} after this
+\PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
 transformation.
 
 Labels in the body are deleted. To unroll nested loops, start with the
@@ -7837,7 +7837,7 @@ elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
 $18.10$ of~\cite{Much97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
-phase \PipsPassRef{use_def_elimination}.
+phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Much97}.
@@ -7870,13 +7870,13 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% USE-DEF ELIMINATION
 
-\subsection{Use-Def Elimination}
+\subsection{Dead Code Elimination (a.k.a. Use-Def Elimination)}
 \label{sec:use-def-elimination}
 \index{Use-Def Elimination}
 \index{Dead code elimination}
 
-\begin{PipsPass}{use_def_elimination}
-Function \PipsPassRef{use_def_elimination} deletes statements whose def
+\begin{PipsPass}{dead_code_elimination}
+Function \PipsPassRef{dead_code_elimination} deletes statements whose def
 references are all dead, i.e. are not used by later executions of
 statements. It was developed by Ronan K{\sc eryell}. The algorithm compute
 the set of live statements without fix-point. An initial set of live
@@ -7916,6 +7916,17 @@ Section~\ref{sec:dead-code-elimination}) does not have a standard
 name. It could be {\em If and loop simplification} pass.
 
 \end{PipsPass}
+
+\begin{PipsMake}
+alias dead_code_elimination 'Dead Code Elimination'
+dead_code_elimination          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.chains
+\end{PipsMake}
+
+For backward compatibility, the previous pass name is preserved.
 
 \begin{PipsMake}
 alias use_def_elimination 'Use-Def elimination'
@@ -8629,7 +8640,7 @@ sometimes replaced in the middle of an expression but not when the whole
 expression was a reference to a symbolic constant. Symbolic integer
 constants are now replaced by their values systematically.
 
-Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination} should be
+Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} should be
 performed after partial evaluation. It is sometimes important to run
 more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
@@ -13619,7 +13630,7 @@ The transformation menu is displayed as here:
   unspaghettify
   suppress_dead_code
   partial_eval
-  use_def_elimination
+  dead_code_elimination
   stf
   freeze_variables
   partial_redundancy_elimination

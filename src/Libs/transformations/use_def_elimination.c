@@ -513,12 +513,12 @@ use_def_elimination_on_a_statement(statement s)
 
    /* Mark as useful the seed statements: */
    gen_recurse(s, statement_domain,
-               gen_true,
-               use_def_deal_if_useful);
+	       gen_true,
+	       use_def_deal_if_useful);
 
    /* Propagate the usefulness through all the predecessor graph: */
    propagate_the_usefulness_through_the_predecessor_graph();
-   
+
    remove_all_the_non_marked_statements(s);
 
    hash_table_free(ordering_to_dg_mapping);
@@ -529,8 +529,11 @@ use_def_elimination_on_a_statement(statement s)
 }
 
 
-bool
-use_def_elimination(char * module_name)
+/* Obsolete name: it should be called dead_code_eliminiation()
+ *
+ * Maintained for backward compatibility.
+ */
+bool use_def_elimination(char * module_name)
 {
    statement module_statement;
 
@@ -574,7 +577,7 @@ use_def_elimination(char * module_name)
       for pretty print... :-) */
    module_reorder(module_statement);
 
-   debug(2, "use_def_elimination", "done for %s\n", module_name);
+   pips_debug(2, "done for %s\n", module_name);
 
    debug_off();
 
@@ -587,6 +590,11 @@ use_def_elimination(char * module_name)
 
    /* Should have worked: */
    return TRUE;
+}
+
+bool dead_code_elimination(char * module_name)
+{
+  return use_def_elimination(module_name);
 }
 
 /* moved from ri-util/statements.c */
