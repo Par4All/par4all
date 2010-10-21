@@ -1652,7 +1652,11 @@ void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
 	      pips_user_warning
 		("Multiple declarations of variable \"%s\" in different files\n",
 		 entity_local_name(var));
-	      if(top_level_entity_p(a)) {
+	      if(top_level_entity_p(a)
+		 && (value_unknown_p(entity_initial(var))
+		     /* No way to know if a pointer is initialized or
+			not */
+		     ||value_code_p(entity_initial(var)))) {
 		/* This may happen with variables such as
 		   "__morecore" which is a functional pointer to a
 		   malloc like function and which is declared in a
