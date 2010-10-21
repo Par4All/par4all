@@ -1505,16 +1505,16 @@ invariant_code_motion(string module_name)
 	dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
     }
     else {
-	pips_error("invariant_code_motion", "dg should be undefined\n");
+	pips_internal_error("dg should be undefined\n");
     }
 
     enclosing = 0;
     rice_statement(mod_stat, 1, &icm_codegen);
 
     ifdebug(7) {
- 	fprintf(stderr, "\ntransformed code %s:",module_name);
-	if (statement_consistent_p((statement)mod_stat))
-	    fprintf(stderr," gen consistent ");
+      fprintf(stderr, "\ntransformed code %s:",module_name);
+      if (statement_consistent_p((statement)mod_stat))
+	fprintf(stderr," gen consistent ");
     }
 
     // Uselessly reinitialize ordering_to_statement, even if it not set...
