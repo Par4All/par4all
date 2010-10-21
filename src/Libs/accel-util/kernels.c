@@ -61,7 +61,8 @@ struct dma_pair {
 };
 
 typedef enum {
-    dma1D=1,
+    dmaScalar=0,
+    dma1D,
     dma2D,
     dma3D
 } dma_dimension;
@@ -69,6 +70,7 @@ typedef enum {
 static dma_dimension get_dma_dimension(entity to) {
     size_t n = type_dereferencement_depth(entity_type(to)) - 1; /* -1 because we always have pointer to area ... in our case*/
     switch(n) {
+        case 0:return dmaScalar; /* it means we have a single scalar to dl */
         case 1:return dma1D;
         case 2:return dma2D;
         case 3:return dma3D;
@@ -89,10 +91,10 @@ static string get_dma_name(enum region_to_dma_switch m,dma_dimension d) {
         "KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"
     };
     char * propname = seeds[(int)m];
-    if(d!=dma1D && (int)m <2)
+    if(d>dma1D && (int)m <2)
         asprintf(&propname,"%s_%dD",seeds[(int)m],(int)d);
     string dmaname = get_string_property(propname);
-    if(d!=dma1D && (int)m <2) free(propname);
+    if(d>dma1D && (int)m <2) free(propname);
     return dmaname;
 }
 
@@ -151,7 +153,6 @@ call dimensions_to_dma(entity from,
 {
   expression dest;
   list args = NIL;
-  bool scalar_entity=false;
   dma_dimension function_dimension = get_dma_dimension(to);
   string function_name = get_dma_name(m,function_dimension);
 
@@ -168,7 +169,7 @@ call dimensions_to_dma(entity from,
 
 
   /*scalar detection*/
-  scalar_entity=entity_scalar_p(from);
+  bool scalar_entity=entity_scalar_p(from);
 
 
   if (dma_allocate_p(m)||dma_deallocate_p(m)) {
@@ -197,7 +198,7 @@ call dimensions_to_dma(entity from,
   }
   else if (!dma_allocate_p(m) && !scalar_entity)
     /* Except for the deallocation, the original array is referenced
-       throudh pointer dereferencing: */
+       through pointer dereferencing: */
     dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), entity_to_expression(to));
   else if(!dma_allocate_p(m) && scalar_entity){
     dest=entity_to_expression(to);
@@ -253,8 +254,11 @@ call dimensions_to_dma(entity from,
               offsets=gen_nreverse(offsets);
 
               expression source = entity_to_address(from);
-              if(scalar_entity)
-                  source = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), source);
+              if(scalar_entity) {
+                  transfer_sizes=make_expression_list(int_to_expression(1));
+                  from_dims=make_expression_list(int_to_expression(1));
+                  offsets=make_expression_list(int_to_expression(0));
+              }
               args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
               if(dma_load_p(m))
                   args=gen_nreverse(args);
@@ -281,7 +285,12 @@ static bool effect_on_non_local_variable_p(effect eff) {
 
 static bool effects_on_non_local_variable_p(list effects) {
     FOREACH(EFFECT,eff,effects)
-        if( effect_on_non_local_variable_p(eff)) return true;
+        if( effect_on_non_local_variable_p(eff)) {
+            char * seffect = effect_to_string(eff);
+            pips_user_warning("effect on non local variable: %s\n",seffect);
+            free(seffect);
+            return true;
+        }
     return false;
 }
 
@@ -327,7 +336,7 @@ statement effects_to_dma(statement stat,
 
 
   if(effects_on_non_local_variable_p(effects)){
-      pips_user_warning("Cannont handle non local variables in isolated statement\n");
+      pips_user_warning("Cannot handle non local variables in isolated statement\n");
       return statement_undefined;
   }
 
@@ -340,35 +349,35 @@ statement effects_to_dma(statement stat,
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
-      if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
-    list /*of dimensions*/ the_dims = NIL,
-         /*of expressions*/the_offsets = NIL;
-	effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
+        if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
+            list /*of dimensions*/ the_dims = NIL,
+                 /*of expressions*/the_offsets = NIL;
+            effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
 
-	entity eto;
-	if(val == HASH_UNDEFINED_VALUE) {
+            entity eto;
+            if(val == HASH_UNDEFINED_VALUE) {
 
-	  /* initialized with NULL value */
-	  expression init = int_to_expression(0);
+                /* initialized with NULL value */
+                expression init = int_to_expression(0);
 
-	  /* Replace the reference to the array re to *eto: */
-      entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
-	  eto = make_temporary_pointer_to_array_entity_with_prefix(entity_local_name(re),renew,init);
-	  AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
-      isolate_patch_entities(stat,re,eto,the_offsets);
+                /* Replace the reference to the array re to *eto: */
+                entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
+                eto = make_temporary_pointer_to_array_entity_with_prefix(entity_local_name(re),renew,init);
+                AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
+                isolate_patch_entities(stat,re,eto,the_offsets);
 
-	  val=malloc(sizeof(*val));
-	  val->new_ent=eto;
-	  val->s=s;
-	  hash_put(e2e,re,val);
-	}
-	else {
-	  eto = val->new_ent;
-	  val->s=s;/*to avoid duplicate*/
-	}
-	the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(re,eto,the_dims,the_offsets,s)));
-	statements=CONS(STATEMENT,the_dma,statements);
-      }
+                val=malloc(sizeof(*val));
+                val->new_ent=eto;
+                val->s=s;
+                hash_put(e2e,re,val);
+            }
+            else {
+                eto = val->new_ent;
+                val->s=s;/*to avoid duplicate*/
+            }
+            the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(re,eto,the_dims,the_offsets,s)));
+            statements=CONS(STATEMENT,the_dma,statements);
+        }
     }
   }
   gen_free_list(effects);
