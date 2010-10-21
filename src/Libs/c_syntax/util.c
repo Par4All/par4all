@@ -1650,9 +1650,20 @@ void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
 	     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
 	    if(first_p) {
 	      pips_user_warning
-		("Multiple declarations of variable %s in different files\n"
-		 ,entity_local_name(var));
-	      CParserError("Fix your source code!\n");
+		("Multiple declarations of variable \"%s\" in different files\n",
+		 entity_local_name(var));
+	      if(top_level_entity_p(a)) {
+		/* This may happen with variables such as
+		   "__morecore" which is a functional pointer to a
+		   malloc like function and which is declared in a
+		   header file. */
+		;
+	      }
+	      else
+		CParserError("Fix your source code!\n");
+
+	      /* Do not modify the initial allocation */
+	      ;
 	    }
 	  }
 	  else {
