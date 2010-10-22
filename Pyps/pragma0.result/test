@@ -19,23 +19,23 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    unsigned char current_1;
 
-l99992:
+l99998:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99993:
+l99999:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1)
          dest[j_0*w+i_0] = bytes[j_0*w+i_0];
 
-l99995:
+l99992:
    for(i_1 = 0; i_1 <= w-1; i_1 += 1)
-l99996:
+l99993:
       for(j_1 = 0; j_1 <= h-1; j_1 += 1) {
          current_0 = dest[j_1*w+i_1];
          dest[j_1*w+i_1] = lut[current_0];
       }
 
-l99998:
+l99995:
    for(i_2 = 0; i_2 <= w-1; i_2 += 1)
-l99999:
+l99996:
       for(j_2 = 0; j_2 <= h-1; j_2 += 1) {
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
