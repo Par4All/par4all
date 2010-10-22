@@ -140,8 +140,14 @@ parameter MakeOverloadedParameter()
 
 parameter MakeIntegerParameter()
 {
-  return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
+
+parameter MakeUnsignedIntegerParameter()
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE+ DEFAULT_UNSIGNED_TYPE_SIZE*10);
+}
+
 
 parameter MakeLongIntegerParameter() /* MB */
 {
@@ -213,6 +219,16 @@ parameter MakeAnyScalarParameter(tag t, _int size)
 type MakeOverloadedResult()
 {
     return MakeAnyScalarResult(is_basic_overloaded, 0);
+}
+type MakeUnsignedIntegerResult()
+{
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_UNSIGNED_TYPE_SIZE*10+
+                                                DEFAULT_INTEGER_TYPE_SIZE);
+}
+
+type MakeVoidPointerResult()
+{
+    return MakeTypeArray(make_basic_pointer(make_type_void(NIL)), NIL);
 }
 
 type MakeIntegerResult()

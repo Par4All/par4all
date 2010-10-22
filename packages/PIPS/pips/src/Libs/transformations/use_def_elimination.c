@@ -367,6 +367,21 @@ propagate_the_usefulness_through_the_predecessor_graph()
 }
 
 
+/**
+ * Check if a variable is local to a function
+ * FIXME : should be declared somewhere else
+ */
+static bool entity_local_variable_p(entity var, entity func) {
+  bool local = false;
+  if(storage_ram_p(entity_storage(var))) {
+    ram r = storage_ram(entity_storage(var));
+    if(same_entity_p(func,ram_function(r))) {
+      local=true;
+    }
+  }
+  return local;
+}
+
 static void
 use_def_deal_if_useful(statement s)
 {
@@ -377,10 +392,13 @@ use_def_deal_if_useful(statement s)
    bool this_statement_is_a_c_return;
    bool outside_effect_p = FALSE;
 
-   if (get_debug_level() >= 5) {
+   ifdebug(5) {
+      int debugLevel = get_debug_level();
+      set_debug_level(0);
       fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
               s, statement_ordering(s));
       print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
+      set_debug_level(debugLevel);
    }
 
    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
@@ -417,23 +435,19 @@ use_def_deal_if_useful(statement s)
 
    /* Check if this statement write some other things than a local variable */
    list effects_list = load_proper_rw_effects_list(s);
-     MAP(EFFECT, an_effect,
-      {
-        reference a_reference = effect_any_reference(an_effect);
-        entity a_touched_variable =
-        reference_variable(a_reference);
-        string current_function_local_name = entity_local_name(get_current_module_entity());
-        if(!same_string_p(entity_module_name(a_touched_variable),
-                          current_function_local_name)) {
-          outside_effect_p = TRUE;
-          pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
-                     s,
-                     entity_name(a_touched_variable),
-                     current_function_local_name);
-          break;
-        }
-      },
-      effects_list);
+   entity current_func = get_current_module_entity();
+   FOREACH(EFFECT, eff,effects_list) {
+    reference a_reference = effect_any_reference(eff);
+    entity touched = reference_variable(a_reference);
+    if(effect_write_p(eff) && !entity_local_variable_p(touched,current_func)) {
+      outside_effect_p = TRUE;
+      pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
+          s,
+          entity_name(touched),
+          entity_local_name(current_func));
+      break;
+    }
+  }
 
 
    ifdebug(6) {

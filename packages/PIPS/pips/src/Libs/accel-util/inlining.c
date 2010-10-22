@@ -1055,10 +1055,12 @@ bool do_unfolding(inlining_parameters p, char* module_name)
         /* there is something to inline */
         if( (statement_has_callee=!set_empty_p(calls_name)) )
         {
-            SET_FOREACH(string,call_name,calls_name) {
+            list sorted = set_to_sorted_list(calls_name,(gen_cmp_func_t)strcmp);
+            FOREACH(STRING,call_name,sorted) {
                 if(!run_inlining(module_name,call_name,p))
                     set_add_element(unfolding_filters,unfolding_filters,call_name);
             }
+            free(sorted);
             recompile_module(module_name);
             /* we can try to remove some labels now*/
             if( get_bool_property("INLINING_PURGE_LABELS"))
