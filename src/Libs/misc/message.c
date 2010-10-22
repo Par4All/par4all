@@ -187,14 +187,14 @@ void close_warning_file(void)
     }
 }
 
-static void 
-append_to_warning_file(const char * calling_function_name,
-		       const char * a_message_format,
-		       va_list * some_arguments)
+/* To be used in error handling functions */
+void append_to_warning_file(const char * calling_function_name,
+			    const char * a_message_format,
+			    va_list * some_arguments)
 {
-   if (warning_file) 
+   if (warning_file)
    {
-     fprintf(warning_file, "%s[%s] (%s) ", 
+     fprintf(warning_file, "%s[%s] (%s) ",
 	     current_phase? current_phase: "unknown",
 	     current_module? current_module: "unknown",
 	     calling_function_name);
@@ -204,8 +204,8 @@ append_to_warning_file(const char * calling_function_name,
 
 static void
 default_user_warning(const char * calling_function_name,
-                     const char * a_message_format,
-                     va_list * some_arguments)
+		     const char * a_message_format,
+		     va_list * some_arguments)
 {
    /* print name of function causing warning
     * print out remainder of message 
@@ -338,11 +338,20 @@ default_user_error(const char * calling_function_name,
                    const char * a_message_format,
                    va_list *some_arguments)
 {
+  va_list save;
+  va_copy(save, *some_arguments);
+
    /* print name of function causing error */
    (void) fprintf(stderr, "user error in %s: ", calling_function_name);
+   /* FI: no impact on some_arguments because of format content */
+	append_to_warning_file(calling_function_name, "user error\n",
+			       *some_arguments);
 
    /* print out remainder of message */
    (void) vfprintf(stderr, a_message_format, * some_arguments);
+	append_to_warning_file(calling_function_name,
+			       a_message_format,
+			       &save);
 
    /* terminate PIPS request */
    /* here is an issue: what if the user error was raised from properties */
