@@ -32,21 +32,12 @@ echo Proper effetcs for "memcpy03"
 Proper effetcs for "memcpy03"
 echo
 
-Selecting rule: PRINT_CODE_PROPER_EFFECTS
-Module main already active.
-Request: build resource PRINTED_FILE for module main.
-  CONTROLIZER                    building   CODE(main)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(main)
-user error in generic_string_effects: constant expression as first argument not allowed for intrinsic TOP-LEVEL:memcpy
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module main.
-user error in display_a_resource: Cannot build view file PRINTED_FILE
-Deletion of obsolete resources:
-none destroyed.
-Closing all modules.
-  Closing module main.
-  Closing module memcpy03!.
-Closing program.
-Closing workspace.
-Workspace memcpy03 closed.
 
+Warnings should include a user error
+
+PROPER_EFFECTS[main] (generic_string_effects) user error
+PROPER_EFFECTS[main] (generic_string_effects) constant expression as first argument not allowed for intrinsic TOP-LEVEL:memcpy
+PROPER_EFFECTS[main] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

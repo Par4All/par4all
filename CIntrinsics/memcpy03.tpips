@@ -1,0 +1,45 @@
+delete memcpy03
+
+create memcpy03 memcpy03.c
+
+# setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "memcpy03"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Proper effetcs for "memcpy03"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+#quit
+#echo
+#echo Proper Pointer effects for "memcpy03"
+#echo
+
+#activate PRINT_CODE_PROPER_POINTER_EFFECTS
+#display PRINTED_FILE[main]
+
+#echo
+#echo Cumulated effects for "memcpy03"
+#echo
+
+#activate PRINT_CODE_CUMULATED_EFFECTS
+#display PRINTED_FILE[main]
+
+close
+
+echo
+echo Warnings should include a user error
+echo
+
+shell cat memcpy03.database/Warnings
+#delete memcpy03
+quit
+
