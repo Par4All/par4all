@@ -345,7 +345,7 @@ default_user_error(const char * calling_function_name,
    (void) fprintf(stderr, "user error in %s: ", calling_function_name);
    /* FI: no impact on some_arguments because of format content */
 	append_to_warning_file(calling_function_name, "user error\n",
-			       *some_arguments);
+			       some_arguments);
 
    /* print out remainder of message */
    (void) vfprintf(stderr, a_message_format, * some_arguments);

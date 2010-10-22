@@ -595,7 +595,7 @@ static void tpips_user_error(
 	 */
 	fprintf(stderr, "user error in %s: ", calling_function_name);
 	append_to_warning_file(calling_function_name, "user error\n",
-			       *some_arguments);
+			       some_arguments);
 	vfprintf(stderr, a_message_format, *some_arguments);
 	append_to_warning_file(calling_function_name,
 			       a_message_format,
