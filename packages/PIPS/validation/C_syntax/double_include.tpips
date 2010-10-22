@@ -1,0 +1,19 @@
+# The same variable "__morecore" is declared twice and this is OK in a
+# header file...
+
+delete double_include
+
+set env PIPS_CPP_FLAGS=" -Idouble_include.src "
+
+setproperty  ABORT_ON_USER_ERROR TRUE
+
+create double_include double_include.src/double_include.c \
+       double_include.src/double_include2.c
+
+display PRINTED_FILE[%ALLFUNC]
+
+#apply PRIVATIZE_MODULE (%ALL)
+
+close
+delete double_include
+quit

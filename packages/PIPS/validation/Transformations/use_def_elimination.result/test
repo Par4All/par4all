@@ -252,36 +252,36 @@ C  P() {}
 C     Added to avoid empty summary preconditions
 
 
-      J = 3                                                             0014
+      CONTINUE                                                          0014
 
-C  P(J) {J==3}
+C  P() {}
 
 
 
       WRITE (*, 9001) 'salut'                                           0018
 
-C  P(J) {J==3}
+C  P() {}
 
 9001  FORMAT('j = ',I3)                                                 0019
 
-C  P(J) {J==3}
+C  P() {}
 
-31    A = 9                                                             0020
+31    CONTINUE                                                          0020
 
-C  P(A,J) {A==9, J==3}
+C  P() {}
 
 
 1     PRINT *, 'Vrai 1'                                                 0028
 
-C  P(A,J) {A==9, J==3}
+C  P() {}
 
       PRINT *, 'Vrai'                                                   0032
 
-C  P(A,J) {A==9, J==3}
+C  P() {}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(A,J) {A==9, J==3}
+C  P() {}
 
 
 3     PRINT *, 'Faux 3'                                                 0035

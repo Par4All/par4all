@@ -33,7 +33,7 @@ apply SCALOPRAGMA[main]
 # by setting this property to empty, we prevent generation of deallocation function
 setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION ""
 
-apply KERNEL_LOAD_STORE[%ALLFUNC]
+apply KERNEL_LOAD_STORE[P4A_scmp_kernel_0]
 
 apply SCALOPIFY[main]
 

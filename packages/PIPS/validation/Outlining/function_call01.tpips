@@ -27,7 +27,7 @@ echo
 
 apply UNSPLIT
 # Verify the output compile:
-shell cd $WS.database/Src; cc -c *
+shell cc -c $WS.database/Src/$WS.c -o $WS.database/Tmp/$WS.o
 
 close
 delete $WS
