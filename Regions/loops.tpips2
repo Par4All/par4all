@@ -1,0 +1,9 @@
+delete loops
+create loops loops.f
+setproperty ABORT_ON_USER_ERROR FALSE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+quit
