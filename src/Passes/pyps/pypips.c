@@ -288,6 +288,7 @@ char* show(char * rname, char *mname)
    separated by ' '. */
 char * get_callers_of(char * module_name)
 {
+    safe_make("CALLERS",module_name);
     gen_array_t callers = get_callers(module_name);
 
     char * callers_string = strdup(string_array_join(callers, " "));
@@ -301,6 +302,7 @@ char * get_callers_of(char * module_name)
    separated by ' '. */
 char * get_callees_of(char * module_name)
 {
+    safe_make("CALLERS",module_name);
     gen_array_t callees = get_callees(module_name);
 
     char * callees_string = strdup(string_array_join(callees, " "));
