@@ -41,6 +41,7 @@
 #include "misc.h"
 #include "control.h"
 #include "expressions.h"
+#include "preprocessor.h"
 #include "accel-util.h"
 
 
@@ -579,6 +580,8 @@ list initialization_list_to_statements(entity e) {
                         )
                     )
                 );
+        AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
+               get_current_module_entity());
     }
     return gen_nreverse(stats);
 }

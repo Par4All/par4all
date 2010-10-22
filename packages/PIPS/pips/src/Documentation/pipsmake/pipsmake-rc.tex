@@ -7741,7 +7741,7 @@ FREIA_MERGE_ARGUMENTS TRUE
 
 \subsection{Loop Invariant Code Motion}
 \label{subsection-invariant_code_motion}
-
+\index{invariant code motion}
 
 \begin{PipsPass}{invariant_code_motion}
 This is a test to implement a loop-invariant code motion. This phase hoist
@@ -7751,6 +7751,9 @@ A side effect of this transformation is that the code is parallelized too
 with some loop distribution. If you don't want this side effect, you can
 check section~\ref{subsection-expression-optimizations} which does a
 pretty nice job too.
+
+The original algorithm used is described in Chapters 12, 13 and 14 of
+Julien Zory's PhD dissertation.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7759,6 +7762,9 @@ invariant_code_motion             > MODULE.code
         < MODULE.proper_effects
         < MODULE.code MODULE.dg
 \end{PipsMake}
+
+Note: this pass deals with loop invariant code motion while the
+\verb/icm/ pass deals with expressions.
 
 
 \subsection{Partial Redundancy Elimination}
@@ -8900,6 +8906,7 @@ EOLE_OPTIMIZATION_STRATEGY "P2SC"
 
 \subsubsection{Common subexpression elimination}
 \label{sec:comm-subexpr-elim-1}
+\index{common subexpression elimination}
 
 Here are described 2 interesting cases of the one in
 \S~\ref{sec:expr-optim-using}.
@@ -8910,6 +8917,9 @@ expressions in the code.
 
 One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} to skip expression of the form \lstinline|a+2| and
 \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
+
+The heuristic used for common subexpression elimination is described
+in Chapter 15 of Julien Zory's PhD dissertation.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8930,8 +8940,10 @@ icm > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+Note: the \verb/icm/ deals with expressions while
+the \verb/invariant_code_motion/ deals with loop invariant code.
 
-Following property is used in sac to limit the subexpressions:
+The following property is used in sac to limit the subexpressions:
 When set to true, only subexpressions without "+constant" terms are eligible.
 \begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT}
 COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT FALSE

@@ -21,31 +21,66 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# usage: $0 email.address@somewhere /path/to/prod [/path/to/valid]
+# usage: $0 [options] email.address@somewhere /path/to/prod [/path/to/valid]
 # - designed to be run from cron.
 # - check that pips does still compile.
 # - report is sent by mail if the status changed.
 # - run the validation and send a mail on any changes if third arg.
 # - if there is a persistant LOCK, investigate by hand...
 
-# this script runs every minute on fabien@compiegne
+# default settings
+nice=
+wait=
+force=
+parallel=1
+validate=mail-diff-validate
 
+# get options
+while [[ $1 == -* ]]
+do
+  case $1 in
+    -n|--nice) nice=nice ;;
+    -f|--force) validate=mail-validate ; force=1 ;;
+    -w|--wait) wait=1200 ;;
+    --wait=*) wait=${1//*=/} ;;
+    -s|--sequential) parallel= ;;
+    -p|--parallel) parallel=1 ;;
+    -h|--help)
+      echo -e \
+        "Usage: $0 [options] em@il /path/to/prod [/path/to/validation]\n" \
+        "check pips compilation and validation health\n" \
+	"available options:\n" \
+	"  -n: run with nice\n" \
+	"  -f: force even if not needed\n" \
+	"  -w: wait for lock\n" \
+	"  -s: do not run in parallel\n" \
+	"  -p: run in parallel (the default)\n" \
+	"  -h: show this help and exit\n"
+      exit 0
+      ;;
+    *) echo "$0 unexpected option: $1" >&2 ; exit 1 ;;
+  esac
+  shift
+done
+
+# get arguments (destination email & directories)
 dest=${1:-$LOGNAME@cri.ensmp.fr}
 prod=${2:-.}
 valid=$3
 
-#nice=nice
-nice=
-
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 
-# compute load & jobs depending on the available hardware
-nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
-# hmmm... it seems that HT slows down the validation on compiegne
-#load=$(($nproc + 1)) jobs=$(($nproc * 2))
-load=$(($nproc + 2)) jobs=$nproc
-make="make -j $jobs -l $load"
+if [ "$parallel" ]
+then
+  # compute load & jobs depending on the available hardware
+  # note that the reported hardware can be somehow virtual
+  nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
+  load=$(($nproc + 2)) jobs=$nproc
+  make="make -j $jobs -l $load"
+else
+  make=make
+fi
 
 # report current-state compile message
 # current-state: ok skip locked KO:*
@@ -169,20 +204,35 @@ cd $prod || \
     report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
-mkdir LOCK > /dev/null 2>&1 ||
-{
-  # warn after 1800 seconds (30mn) locking
-  created=$(stat -c %Y LOCK)
-  now=$(date +%s)
-  delay=$(($now - $created))
-  if [ $delay -gt 1800 ]
-  then
-    report 'locked' 'unknown' "working copy '$prod' is already locked..."
-    touch LOCK
-  else
-    report 'skip-lock' 'unknown' "working copy '$prod' is locked"
-  fi
-}
+if [ "$wait" ]
+then
+  while ! mkdir LOCK > /dev/null 2>&1 ; do
+    [ $wait -eq 0 ] && break
+    let wait--
+    sleep 1
+  done
+  # did we get the lock?
+  test -d LOCK ||
+  {
+    report 'locked' 'unknown' "waiting for copy '$prod', but still locked..."
+    exit 2
+  }
+else
+  mkdir LOCK > /dev/null 2>&1 ||
+  {
+    # warn after 1800 seconds (30mn) locking
+    created=$(stat -c %Y LOCK)
+    now=$(date +%s)
+    delay=$(($now - $created))
+    if [ $delay -gt 1800 ]
+    then
+      report 'locked' 'unknown' "working copy '$prod' is already locked..."
+      touch LOCK
+    else
+      report 'skip-lock' 'unknown' "working copy '$prod' is locked"
+    fi
+  }
+fi
 
 rm -f out err
 $nice svn up $prod $valid >> out 2>> err || {
@@ -211,7 +261,8 @@ then
   echo validation: $(svnversion -c $valid) > CURRENT_VALID
 fi
 
-if ! cmp -s CURRENT PREVIOUS
+# recompilation, possibly forced
+if [ "$force" ] || ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
   $nice $make unbuild > out 2> err \
@@ -237,7 +288,7 @@ then
     PATH=$prod/pips/bin:$prod/pips/utils:$PATH
     {
       $nice $make -C $valid parallel-clean
-      $nice $make -C $valid VNAME=CHECK EMAIL=$dest mail-diff-validate
+      $nice $make -C $valid VNAME=CHECK EMAIL=$dest $validate
       $nice $make -C $valid parallel-clean
     } > out 2> err
   fi
