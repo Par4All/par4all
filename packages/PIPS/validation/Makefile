@@ -16,6 +16,7 @@ FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 ARCH	= $(shell uname -m)
 # if provided, used to start the mail subject line
 VNAME	=
+DIRNAME	= validation
 
 .PHONY: full-clean
 full-clean: clean
@@ -152,7 +153,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
 	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
-	  echo $(VNAME) "validation $(ARCH) $$status" ; \
+	  echo $(VNAME) "$(DIRNAME) $(ARCH) $$status" ; \
 	} >> $@
 
 # mail summary

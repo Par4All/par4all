@@ -30,6 +30,8 @@ typedef struct {
 } mystruct;
 
 int main(int argc, char **argv);
+//PIPS generated variable
+void *alloca(unsigned int);
 int main(int argc, char **argv)
 {
    double *cdens = alloca(sizeof(double[2048]));

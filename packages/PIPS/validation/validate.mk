@@ -67,7 +67,7 @@ RESULTS	= RESULTS
 # shell environment to run validation scripts
 SHELL	= /bin/bash
 PF	= @echo "processing $(SUBDIR)/$+" ; \
-	  set -o pipefail ; \
+	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # extract validation result for summary

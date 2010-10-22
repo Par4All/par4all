@@ -90,20 +90,20 @@ apply UNSPLIT
 
 shell echo Generating P4A code:
 shell echo
-shell cd $WKS.database; ../../../P4A_CUDA/p4a_post_processor.py Src/*.c
+shell cd $WKS.database &> /dev/null ; ../../../P4A_CUDA/p4a_post_processor.py Src/*.c
 shell echo
 shell echo Compiling CUDA version
-shell cd $WKS.database/P4A; /usr/local/cuda/bin/nvcc   --compiler-options -fno-strict-aliasing  --ptxas-options=-v  -arch=sm_13 -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I/usr/local/cuda/include -I/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/inc -DUNIX -O2 -c *.cu ../../../../P4A_CUDA/p4a_accel.cu ; g++ -fPIC -o $WKS-cuda   *.o     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcudart     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcutil
+shell cd $WKS.database/P4A &> /dev/null ; /usr/local/cuda/bin/nvcc   --compiler-options -fno-strict-aliasing  --ptxas-options=-v  -arch=sm_13 -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I/usr/local/cuda/include -I/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/inc -DUNIX -O2 -c *.cu ../../../../P4A_CUDA/p4a_accel.cu ; g++ -fPIC -o $WKS-cuda   *.o     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcudart     -L/usr/local/cuda/lib64 -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../lib -L/home/keryell/NVIDIA_GPU_Computing_SDK/C/src/../common/lib/linux  -lcutil
 shell echo
 shell echo Running CUDA version
-shell cd $WKS.database/P4A; time ./$WKS-cuda  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
+shell cd $WKS.database/P4A &> /dev/null ; time ./$WKS-cuda  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
 shell echo
 shell echo Compiling OpenMP version
 # -g -DP4A_DEBUG
 shell gcc -std=c99 -O3 -fopenmp -I../../P4A_CUDA -DP4A_ACCEL_OPENMP -DP4A_DEBUG -I/usr/local/cuda/include -I$HOME/NVIDIA_GPU_Computing_SDK/C/common/inc $WKS.database/P4A/*.c ../../P4A_CUDA/p4a_accel.c -o $WKS.database/P4A/$WKS -lm
 shell echo
 shell echo Running OpenMP version
-shell cd $WKS.database/P4A; time ./$WKS  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
+shell cd $WKS.database/P4A &> /dev/null ; time ./$WKS  ../../Logo_HPC-Project-512x247-crop.pgm 2000 amplitude.pgm phase.pgm; diff amplitude.pgm ../../amplitude-ref.pgm; diff phase.pgm ../../phase-ref.pgm
 #shell rm -rf $WKS.database/Src/kernelize.o
 
 close
