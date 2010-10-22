@@ -35,13 +35,14 @@ do
 	    repos=$(svn info | sed -n -e 's/^URL: //p')
 	    revision=$(svnversion)
 	    committed=$(svnversion -c)
-	    echo "$repos@$revision ($committed)"
+            author=$(svn info | sed -n -e 's/^Last Changed Author: //p')
+	    echo "$repos@$revision ($committed) [$author]"
 	else
 	    # not a working copy
-	    echo 'unknown@unknown (unknown)'
+	    echo 'unknown@unknown (unknown) [unknown]'
 	fi
     else
 	# svnversion not found
-	echo 'unknown@unknown (unknown)'
+	echo 'unknown@unknown (unknown) [unknown]'
     fi
 done

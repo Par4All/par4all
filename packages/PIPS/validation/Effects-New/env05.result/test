@@ -120,6 +120,10 @@ Use-def chains
 		from <j-W-MUST> to <j-R-MUST>
 	09 --> 10 with conflicts
 		from <j-W-MUST> to <j-W-MUST>
+	07 --> 11 with conflicts
+		from <j-WE-MUST> to <j-RE-MUST>
+	07 --> 10 with conflicts
+		from <j-WE-MUST> to <j-RE-MUST>
 	07 --> 09 with conflicts
 		from <j-WE-MUST> to <j-RE-MUST>
 	06 --> 10 with conflicts
@@ -139,8 +143,7 @@ int env05()
 {
    typedef int mile;                                                    /*0005*/
    typedef mile km;                                                     /*0006*/
-   {
-   }
+   km j;                                                                /*0007*/
 
 
    j = sizeof(km);                                                      /*0010*/

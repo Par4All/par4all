@@ -492,6 +492,18 @@ static type integer_to_integer_type(int n)
 
   return t;
 }
+static type unsigned_integer_to_void_pointer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeVoidPointerResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeUnsignedIntegerParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
 
 /* Can be used for C or Fortran functions. E.g. abort() */
 static type void_to_void_type(int n __attribute__ ((unused)))
@@ -5173,9 +5185,9 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {MALLOC_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
   {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {ALLOCA_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ALLOCA_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
   {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
   {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
   {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},

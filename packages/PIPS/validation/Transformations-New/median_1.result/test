@@ -33,7 +33,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i__0 = 1;
    
    
-   _return12 = 0;
+   _return6 = 0;
    ret_0 = 0;
    
    
@@ -41,18 +41,18 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_0 = 1;
    
    
-   _return6 = 0;
+   _return12 = 0;
    
    
-   _return0 = ret_0;
-   ret = _return0;
+   _return3 = ret_0;
+   ret = _return3;
    
    
    freia_aipo_erode_6c(t, t, freia_morpho_kernel_6c);
    i_1 = 1;
    
    
-   _return7 = 0;
+   _return13 = 0;
    ret_1 = 0;
    
    
@@ -60,18 +60,18 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_2 = 1;
    
    
-   _return13 = 0;
+   _return7 = 0;
    
    
-   _return3 = ret_1;
-   ret |= _return3;
+   _return0 = ret_1;
+   ret |= _return0;
    
    
    freia_aipo_dilate_6c(t, t, freia_morpho_kernel_6c);
    i_3 = 1;
    
    
-   _return14 = 0;
+   _return8 = 0;
    ret_2 = 0;
    
    
@@ -79,11 +79,11 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_4 = 1;
    
    
-   _return8 = 0;
+   _return14 = 0;
    
    
-   _return1 = ret_2;
-   ret |= _return1;
+   _return4 = ret_2;
+   ret |= _return4;
 
    ret |= freia_aipo_inf(o, t, i);
    
@@ -92,7 +92,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i__1 = 1;
    
    
-   _return9 = 0;
+   _return15 = 0;
    ret_3 = 0;
    
    
@@ -100,18 +100,18 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_5 = 1;
    
    
-   _return15 = 0;
+   _return9 = 0;
    
    
-   _return4 = ret_3;
-   ret |= _return4;
+   _return1 = ret_3;
+   ret |= _return1;
    
    
    freia_aipo_dilate_6c(t, t, freia_morpho_kernel_6c);
    i_6 = 1;
    
    
-   _return16 = 0;
+   _return10 = 0;
    ret_4 = 0;
    
    
@@ -119,18 +119,18 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_7 = 1;
    
    
-   _return10 = 0;
+   _return16 = 0;
    
    
-   _return2 = ret_4;
-   ret |= _return2;
+   _return5 = ret_4;
+   ret |= _return5;
    
    
    freia_aipo_erode_6c(t, t, freia_morpho_kernel_6c);
    i_8 = 1;
    
    
-   _return11 = 0;
+   _return17 = 0;
    ret_5 = 0;
    
    
@@ -138,11 +138,11 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    i_9 = 1;
    
    
-   _return17 = 0;
+   _return11 = 0;
    
    
-   _return5 = ret_5;
-   ret |= _return5;
+   _return2 = ret_5;
+   ret |= _return2;
 
    ret |= freia_aipo_sup(o, o, t);
    ret |= freia_common_destruct_data(t);

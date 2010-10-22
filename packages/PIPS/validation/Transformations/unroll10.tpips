@@ -11,6 +11,10 @@ apply PARTIAL_EVAL
 apply SUPPRESS_DEAD_CODE
 apply USE_DEF_ELIMINATION
 display PRINTED_FILE[UNROLL10]
+
+apply UNSPLIT
+shell gfortran unroll10.database/Src/unroll10.f  -o unroll10.database/unroll10
+shell unroll10.database/unroll10
 close
 delete unroll10
 quit
