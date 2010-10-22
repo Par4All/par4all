@@ -7,16 +7,36 @@ Privatize scalar variables
 
  **************** Effective Dependence Graph ****************
 
+	18 --> -1 with conflicts
+		from <Matrix[i][j]-W-MUST> to <j-W-MUST> at levels  1
+	18 --> -1 with conflicts
+		from <Matrix[i]-R-MUST> to <j-W-MUST> at levels  1
+	18 --> 15 with conflicts
+		from <Matrix[i][j]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	18 --> 15 with conflicts
+		from <Matrix[i]-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	-1 --> 15 with conflicts
+		from <j-W-MUST> to <Matrix[i]-W-MUST> at levels  1
 	15 --> 18 with conflicts
-		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i,j)-W-MUST> at levels  2
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i][j]-W-MUST> at levels  1 2
 	15 --> 18 with conflicts
-		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i)-R-MUST> at levels  2
-	15 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <Matrix[i]-W-MUST> to <Matrix[i][j]-W-MUST> at levels  2
+	15 --> 18 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i]-R-MUST> at levels  1 2
+	15 --> 18 with conflicts
+		from <Matrix[i]-W-MUST> to <Matrix[i]-R-MUST> at levels  2
+	15 --> -1 with conflicts
+		from <Matrix[i]-W-MUST> to <j-W-MUST> at levels  1 2
 	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	15 --> 15 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i]-W-MUST> at levels  1
+	15 --> 15 with conflicts
+		from <Matrix[i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
+	15 --> 15 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 
@@ -27,13 +47,12 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1)
+   for(i = 0; i <= N-1; i += 1) {
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
-#pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0018*/
+   }
    return 0;                                                            /*0021*/
 }
 
@@ -44,13 +63,12 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1)
+   for(i = 0; i <= N-1; i += 1) {
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
-#pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0018*/
+   }
    return 0;                                                            /*0021*/
 }
 
@@ -61,13 +79,12 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1)
+   for(i = 0; i <= N-1; i += 1) {
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
-#pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for
       for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0018*/
+   }
    return 0;                                                            /*0021*/
 }
 
