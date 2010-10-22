@@ -1,36 +1,12 @@
-user warning in tp_parse: memcpy03: No such workspace
-Registering file memcpy03.c
-Preprocessing file ./memcpy03.c
-Splitting file    ./memcpy03.database/Tmp/memcpy03.cpp_processed.c
-  Module         main
-  Module         memcpy03!
-Workspace memcpy03 created and opened.
-Module main selected
-Main module PROGRAM "main" selected.
-Module main already active.
-echo
 
-echo Parsed printed file for "memcpy03"
 Parsed printed file for "memcpy03"
-echo
 
-Module main already active.
-Request: build resource PARSED_PRINTED_FILE for module main.
-  BOOTSTRAP                      building   ENTITIES()
-  COMPILATION_UNIT_PARSER        building   DECLARATIONS(memcpy03!)
-  C_PARSER                       building   PARSED_CODE(main)
-                                 building   CALLEES(main)
-  PRINT_SOURCE                   building   PARSED_PRINTED_FILE(main)
-PARSED_PRINTED_FILE made for main.
 int main()
 {
    memcpy("question", "réponse", 7);
 }
-echo
 
-echo Proper effetcs for "memcpy03"
 Proper effetcs for "memcpy03"
-echo
 
 
 Warnings should include a user error
