@@ -1,0 +1,13 @@
+setenv FILE=incorrect_distribution.c
+setenv WSPACE=incorrect_distribution
+
+delete $WSPACE
+create $WSPACE $FILE
+
+apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
+
+display PRINTED_FILE(%ALLFUNC)
+
+
+close
+quit
