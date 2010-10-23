@@ -145,7 +145,7 @@ bugs-list:
 		sort -u >> $(RESULTS)
 
 # generate & archive validation summary
-SUMMARY: $(HEAD) parallel-validate
+SUMMARY: $(HEAD) parallel-validate future-list bugs-list
 	{ \
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date) [$$(date +%s)]" ; \
