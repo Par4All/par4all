@@ -1,3 +1,4 @@
+
 initial functions
 void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step)
 {
