@@ -1,3 +1,4 @@
+
 End of property settings
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
