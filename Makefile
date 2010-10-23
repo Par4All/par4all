@@ -136,7 +136,7 @@ $(HEAD): check-run-consistency
 
 .PHONY: future-list
 future-list:
-	ls -d *-Future/*.* | sed -n 's/-Future//;s/^/future: /;s/\..*//p' | \
+	ls -d *-Future/*.* | sed -n 's/-Future//;s/^/later: /;s/\..*//p' | \
 		sort -u >> $(RESULTS)
 
 .PHONY: bugs-list
