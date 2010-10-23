@@ -2238,7 +2238,12 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       type t1 = basic_pointer(variable_basic(type_variable(t)));
       pips_debug(9,"Pointer type with name = %s\n", list_to_string(name));
 
-      pc = CHAIN_SWORD(NIL, space_p? "*":" *");
+      /*
+       *  No space : it's only "after a comma to separate items in lists such as
+       *  declaration lists or parameter lists in order to improve readability"
+       */
+//      pc = CHAIN_SWORD(NIL, space_p? "*":"*");
+      pc = CHAIN_SWORD(NIL, "*");
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
