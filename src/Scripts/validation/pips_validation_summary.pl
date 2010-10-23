@@ -225,7 +225,7 @@ print "\n";
 if ($n{passed} == $count)
 {
   print "SUCCEEDED $count",
-    ($n{keptout}+$n{bug}+$n{later})? "($n{keptout}+$n{bug}+$n{later})": "",
+    ($n{keptout}+$n{bug}+$n{later})? " ($n{keptout}+$n{bug}+$n{later})": "",
     "$status_changes $delay\n";
 }
 else
