@@ -134,6 +134,16 @@ $(HEAD): check-run-consistency
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 
+.PHONY: future-list
+future-list:
+	ls -d *-Future/*.* | sed -n 's/-Future//;s/^/future: /;s/\..*//p' | \
+		sort -u >> $(RESULTS)
+
+.PHONY: bugs-list
+bugs-list:
+	ls -d *-Bugs/*.* | sed -n 's/-Bugs//;s/^/bug: /;s/\..*//p' | \
+		sort -u >> $(RESULTS)
+
 # generate & archive validation summary
 SUMMARY: $(HEAD) parallel-validate
 	{ \
