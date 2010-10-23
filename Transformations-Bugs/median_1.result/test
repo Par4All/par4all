@@ -1,4 +1,3 @@
-
 freia_status median_1(freia_data2d *o, freia_data2d *i)
 {
    int32_t c = 6;
