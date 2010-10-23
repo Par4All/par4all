@@ -992,6 +992,15 @@ run_inlining(string caller_name, string module_name, inlining_parameters p)
 
 
 /**
+ * This is a callback for qsort to compare string
+ */
+static int qsort_strcmp(const void *a, const void *b) {
+ return strcmp(*(char **)a, *(char **)b);
+}
+
+
+
+/**
  * this should inline all call in module `module_name'
  * it does not works recursievly, so multiple pass may be needed
  * returns true if at least one function has been inlined
@@ -1055,7 +1064,7 @@ bool do_unfolding(inlining_parameters p, char* module_name)
         /* there is something to inline */
         if( (statement_has_callee=!set_empty_p(calls_name)) )
         {
-            list sorted = set_to_sorted_list(calls_name,(gen_cmp_func_t)strcmp);
+            list sorted = set_to_sorted_list(calls_name,(gen_cmp_func_t)qsort_strcmp);
             FOREACH(STRING,call_name,sorted) {
                 if(!run_inlining(module_name,call_name,p))
                     set_add_element(unfolding_filters,unfolding_filters,call_name);
