@@ -1,4 +1,3 @@
-
 int test(int c)
 {
    c = 1+c;
