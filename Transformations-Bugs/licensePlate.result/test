@@ -1,3 +1,4 @@
+
 int main(void)
 {
    freia_dataio fdin;
@@ -185,7 +186,7 @@ int main(void)
    freia_common_destruct_data(imtmp_1);
    
    
-   _return4 = ret_1;
+   _return3 = ret_1;
 
    freia_aipo_threshold(imopenth, imopen, 1, 50, 1);
    freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);
@@ -259,7 +260,7 @@ int main(void)
    i_4 = 3;
    
    
-   _return3 = 0;
+   _return4 = 0;
 
    freia_aipo_and(imoutrepl, imoutrepl, imin);
    freia_common_tx_image(imoutrepl, &fdout);
