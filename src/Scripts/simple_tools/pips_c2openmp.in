@@ -28,7 +28,7 @@ datarootdir="@datarootdir@"
 SHR_d="@datadir@"
 
 # work around...
-[ -d "$SHR_d" ] || SHR_d=${0%/*/*}/share
+[ "$SHR_d" -a -d "$SHR_d" ] || SHR_d=${0%/*/*}/share
 [ -d "$SHR_d" ] || { echo "no $SHR_d directory" >&2 ; exit 1 ; }
 
 function display_usage_and_exit () {
