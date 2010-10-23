@@ -26,10 +26,9 @@ SCRIPTS =	pips_c2openmp pips_f2openmp
 INSTALL_EXE =	$(SCRIPTS)
 INSTALL_SHR = simple_tools.bash
 
-pips_c2openmp:pips_c2openmp.in
+%: %.in
 	sed -e 's,@datadir@,$${INSTALL_DIR:-$$PIPS_ROOT}/share,g' $< > $@
-pips_f2openmp:pips_f2openmp.in
-	sed -e 's,@datadir@,$${INSTALL_DIR:-$$PIPS_ROOT}/share,g' $< > $@
+	chmod +x $@
 
 clean: local-clean
 local-clean:
