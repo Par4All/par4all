@@ -224,7 +224,8 @@ print "\n";
 # generate one summary line for mail subject
 if ($n{passed} == $count)
 {
-  print "SUCCEEDED $count",
+  # PASSED?
+  print "SUCCESS $count",
     ($n{keptout}+$n{bug}+$n{later})? " ($n{keptout}+$n{bug}+$n{later})": "",
     "$status_changes $delay\n";
 }
