@@ -1,8 +1,8 @@
-delete nested01
+delete nested02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create nested01 nested01.c
+create nested02 nested02.c
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
@@ -81,5 +81,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-# delete nested01
+# delete nested02
 quit
