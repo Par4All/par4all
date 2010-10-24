@@ -1,4 +1,4 @@
-setenv WKS=goto01
+setenv WKS=goto03
 delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
