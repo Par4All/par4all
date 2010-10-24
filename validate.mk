@@ -66,7 +66,10 @@ RESULTS	= RESULTS
 
 # shell environment to run validation scripts
 SHELL	= /bin/bash
+# setup run
 PF	= @echo "processing $(SUBDIR)/$+" ; \
+	  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
+	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0 ; \
 	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
@@ -107,7 +110,7 @@ validate:
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
-validate-dir:
+validate-dir: bug-list later-list
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
 	$(MAKE) sort-local-result
@@ -202,6 +205,29 @@ DEFTEST	= default_test
 %.result/$(TEST): %.F $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
+
+# bug & later handling
+.PHONY: bug-list
+ifdef DO_BUG
+bug-list:
+	@echo "# bug-list: nothing to do" >&2
+else
+bug-list:
+	for f in $(wildcard *.bug) ; do \
+	  echo "bug: $(SUBDIR)/$${f%.*}" ; \
+	done >> $(RESULTS)
+endif
+
+.PHONY: later-list
+ifdef DO_LATER
+later-list:
+	@echo "# later-list: nothing to do" >&2
+else
+later-list:
+	for f in $(wildcard *.later) ; do \
+	  echo "later: $(SUBDIR)/$${f%.*}" ; \
+	done >> $(RESULTS)
+endif
 
 # detect skipped stuff
 .PHONY: skipped
