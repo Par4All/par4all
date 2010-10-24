@@ -1,4 +1,4 @@
 #!/bin/sh
 run_step.script -f -g src pi.f
-for f in `ls pi/src/* | sort` ; do echo "###################### $f ######################"; cat $f; done
+for f in `ls -d pi/src/* | grep -v _rt | sort` ; do echo "###################### $f ######################"; cat $f; done
 rm -rf pi
