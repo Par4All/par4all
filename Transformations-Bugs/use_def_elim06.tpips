@@ -1,6 +1,6 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete use_def_elim05
-create use_def_elim05 use_def_elim05.f
+delete use_def_elim06
+create use_def_elim06 use_def_elim06.f
 
 echo
 echo Code for "COUNT"
@@ -18,5 +18,5 @@ activate PRINT_CODE
 display PRINTED_FILE[COUNT]
 
 close
-delete use_def_elim05
+delete use_def_elim06
 quit
