@@ -115,7 +115,7 @@ validate-dir: bug-list later-list
 	$(MAKE) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation
-validate-dir:
+validate-dir: bug-list later-list
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
 	$(MAKE) sort-local-result
@@ -170,10 +170,10 @@ generate-test: $(F.valid)
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.py
 	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-else
+else # else we have pyps
 %.result/$(TEST): %.py
 	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
-endif
+endif # PIPS_VALIDATION_NO_PYPS
 
 # default_tpips
 # FILE could be $<
@@ -211,23 +211,23 @@ DEFTEST	= default_test
 ifdef DO_BUG
 bug-list:
 	@echo "# bug-list: nothing to do" >&2
-else
+else # include bug list
 bug-list:
 	for f in $(wildcard *.bug) ; do \
 	  echo "bug: $(SUBDIR)/$${f%.*}" ; \
 	done >> $(RESULTS)
-endif
+endif # DO_BUG
 
 .PHONY: later-list
 ifdef DO_LATER
 later-list:
 	@echo "# later-list: nothing to do" >&2
-else
+else # include later list
 later-list:
 	for f in $(wildcard *.later) ; do \
 	  echo "later: $(SUBDIR)/$${f%.*}" ; \
 	done >> $(RESULTS)
-endif
+endif # DO_LATER
 
 # detect skipped stuff
 .PHONY: skipped
