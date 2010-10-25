@@ -100,11 +100,12 @@ cscope-clean:
 
 # autoconf compilation
 # --enable-doc
-INSTALL.dir	= $(PWD)/../../install
-DOWNLOAD.dir	= $(PWD)/../..
 BUILD.dir	= _build
+HERE	:= $(shell pwd)
+INSTALL.dir	= $(HERE)/../../install
+DOWNLOAD.dir	= $(HERE)/../..
 ifndef EXTERN_ROOT
-EXTERN_ROOT	= $(PWD)/../extern
+EXTERN_ROOT	= $(HERE)/../extern
 endif
 
 .PHONY: auto-clean
