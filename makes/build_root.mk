@@ -103,11 +103,16 @@ cscope-clean:
 INSTALL.dir	= $(PWD)/../../install
 DOWNLOAD.dir	= $(PWD)/../..
 BUILD.dir	= _build
-auto:
+
+.PHONY: auto-clean
+auto-clean:
 	$(RM) -r $(BUILD.dir) autom4te.cache
 	$(RM) configure depcomp config.guess config.sub ltmain.sh \
 	       config.h.in missing aclocal.m4 install-sh
 	find . -name .svn -prune -o -name Makefile.in -print0 | xargs -0 rm -f
+
+.PHONY: auto
+auto: auto-clean
 	autoreconf -vi
 	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
 	../configure --disable-static --prefix=$(INSTALL.dir) \
