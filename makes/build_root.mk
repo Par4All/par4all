@@ -99,15 +99,14 @@ cscope-clean:
 	$(RM) cscope.out
 
 # autoconf compilation
+# --enable-doc
 INSTALL.dir	= $(PWD)/../../install
 DOWNLOAD.dir	= $(PWD)/../..
 BUILD.dir	= _build
 auto:
-	autoreconf -vi --force
 	$(RM) -r $(BUILD.dir)
-	mkdir $(BUILD.dir)
-	# --enable-doc
-	cd $(BUILD.dir) ; \
+	autoreconf -vi
+	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(PWD)/../extern/lib/pkgconfig \
