@@ -103,6 +103,9 @@ cscope-clean:
 INSTALL.dir	= $(PWD)/../../install
 DOWNLOAD.dir	= $(PWD)/../..
 BUILD.dir	= _build
+ifndef EXTERN_ROOT
+EXTERN_ROOT	= $(PWD)/../extern
+endif
 
 .PHONY: auto-clean
 auto-clean:
@@ -117,7 +120,7 @@ auto: auto-clean
 	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
-		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(PWD)/../extern/lib/pkgconfig \
+		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
 		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
