@@ -103,7 +103,7 @@ INSTALL.dir	= $(PWD)/../../install
 DOWNLOAD.dir	= $(PWD)/../..
 BUILD.dir	= _build
 auto:
-	autoreconf -vi
+	autoreconf -vi --force
 	$(RM) -r $(BUILD.dir)
 	mkdir $(BUILD.dir)
 	# --enable-doc
