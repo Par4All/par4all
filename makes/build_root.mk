@@ -98,6 +98,20 @@ cscope.out:cscope-clean
 cscope-clean:
 	$(RM) cscope.out
 
+INSTALL.dir	= $(PWD)/../../install
+auto:
+	autoreconf -vi
+	# check cleanup
+	$(RM) -r _build
+	mkdir _build
+	# --enable-doc
+	cd _build ; \
+	../configure --disable-static --prefix=$(INSTALL.dir) \
+		PATH=$(INSTALL.dir)/bin:$$PATH \
+		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(PWD)/../extern/lib/pkgconfig \
+		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
+	$(MAKE) -C _build
+	$(MAKE) -C _build install
 
 # force tags target
 tags: tags-clean
