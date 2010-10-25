@@ -286,6 +286,14 @@ then
     # check availability of "tpips" executable
     test -x ../install/bin/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    # argh... hardcoded path... fixme!
+    ldpips=$(ls -d $prod/../install/lib/python*/site-packages/pips)
+    # check availabity of "pyps" dynamic library
+    test -d $ldpips -a -f $ldpips/_pypips.so \
+      || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
+    # set path to use generated pips
+    PATH=$prod/../install/bin:$PATH
+    export LD_LIBRARY_PATH=$ldpips:$LD_LIBRARY_PATH
   else
     # NLPMAKE compilation
     # something may have changed, let us recompile
@@ -297,6 +305,8 @@ then
     # check that "tpips" executable is there
     test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    # set path to use generated pips
+    PATH=$prod/pips/bin:$prod/pips/utils:$PATH
   fi
 
   # record compilation time, for "report"
@@ -308,8 +318,6 @@ then
   # run the validation with new tpips
   if [ "$valid" ]
   then
-    # set path to use generated pips
-    PATH=$prod/pips/bin:$prod/pips/utils:$PATH
     {
       $nice $make -C $valid parallel-clean
       $nice $make -C $valid VNAME=$vname EMAIL=$dest $validate
@@ -327,13 +335,6 @@ else
     if ! cmp -s CURRENT_VALID PREVIOUS_VALID
     then
       # the validation changed, run it with current tpips
-      # set path to use generated pips
-      if [ "$autoconf" ]
-      then
-        PATH=$prod/../install/bin:$PATH
-      else
-        PATH=$prod/pips/bin:$prod/pips/utils:$PATH
-      fi
       # run the validation
       {
         $nice $make -C $valid parallel-clean
