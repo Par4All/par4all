@@ -98,21 +98,22 @@ cscope.out:cscope-clean
 cscope-clean:
 	$(RM) cscope.out
 
+# autoconf compilation
 INSTALL.dir	= $(PWD)/../../install
 DOWNLOAD.dir	= $(PWD)/../..
+BUILD.dir	= _build
 auto:
 	autoreconf -vi
-	# check cleanup
-	$(RM) -r _build
-	mkdir _build
+	$(RM) -r $(BUILD.dir)
+	mkdir $(BUILD.dir)
 	# --enable-doc
-	cd _build ; \
+	cd $(BUILD.dir) ; \
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(PWD)/../extern/lib/pkgconfig \
 		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
-	$(MAKE) -C DL.d=$(DOWNLOAD.dir) _build
-	$(MAKE) -C _build install
+	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
+	$(MAKE) -C $(BUILD.dir) install
 
 # force tags target
 tags: tags-clean
