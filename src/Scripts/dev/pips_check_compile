@@ -281,19 +281,23 @@ then
     # ???
     $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
+
+    #ldpips=$(ls -d $prod/../install/lib/python*/site-packages/pips)
+    # argh... hardcoded path... fixme!
+    ldpips=$prod/../install/lib/python2.5/site-packages/pips
+    export LD_LIBRARY_PATH=$ldpips:$LD_LIBRARY_PATH
+    # set path to use generated pips
+    PATH=$prod/../install/bin:$PATH
+
     $nice $make auto > out 2> err \
       || report 'KO:make' 'auto' 'cannot "make auto"'
     # check availability of "tpips" executable
     test -x ../install/bin/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
-    # argh... hardcoded path... fixme!
-    ldpips=$(ls -d $prod/../install/lib/python*/site-packages/pips)
+
     # check availabity of "pyps" dynamic library
     test -d $ldpips -a -f $ldpips/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
-    # set path to use generated pips
-    PATH=$prod/../install/bin:$PATH
-    export LD_LIBRARY_PATH=$ldpips:$LD_LIBRARY_PATH
   else
     # NLPMAKE compilation
     # something may have changed, let us recompile
