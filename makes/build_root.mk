@@ -99,6 +99,7 @@ cscope-clean:
 	$(RM) cscope.out
 
 INSTALL.dir	= $(PWD)/../../install
+DOWNLOAD.dir	= $(PWD)/../..
 auto:
 	autoreconf -vi
 	# check cleanup
@@ -110,7 +111,7 @@ auto:
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(PWD)/../extern/lib/pkgconfig \
 		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
-	$(MAKE) -C _build
+	$(MAKE) -C DL.d=$(DOWNLOAD.dir) _build
 	$(MAKE) -C _build install
 
 # force tags target
