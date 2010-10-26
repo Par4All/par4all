@@ -139,7 +139,8 @@ AX_ARG_ENABLE([pyps],
 			[
 			 AC_PROG_SWIG
 			 AC_PYTHON_DEVEL([2.5])
-			 AX_DEPENDS([pyps],[swig python_devel])
+			 AX_CHECK_PROG([ipython])
+			 AX_DEPENDS([pyps],[swig python_devel ipython])
 			]
 )
 
@@ -147,10 +148,8 @@ AX_ARG_ENABLE([pyps-extra],
 			[enable extra python tools],
 			[no],
 			[
-			 AX_CHECK_PROG([ipython])
-			 AX_CHECK_PROG([noweave])
 			 AX_PYTHON_MODULE([Pyro]) 
-			 AX_DEPENDS([pyps-extra],[pyps ipython noweave Pyro])
+			 AX_DEPENDS([pyps-extra],[pyps Pyro])
 			]
 )
 
