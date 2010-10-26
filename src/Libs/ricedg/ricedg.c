@@ -2651,7 +2651,8 @@ void writeresult(char *mod_name)
 
 // have to be done before call :
 // * set_ordering_to_statement
-// * set_enclosing_loops_map( loops_mapping_of_statement( mod_stat ) );
+// * set_enclosing_loops_map
+// * loading cumulated effects
 graph compute_dg_on_statement_from_chains( statement s, graph chains ) {
   int i,j;
   dg = copy_graph( chains );
