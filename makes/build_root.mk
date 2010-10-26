@@ -122,7 +122,8 @@ auto: auto-clean
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
-		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
+		--enable-hpfc --enable-pyps --enable-fortran95 \
+		--enable-gpips --enable-devel-mode
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
 
