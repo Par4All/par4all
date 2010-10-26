@@ -32,6 +32,7 @@
 nice=
 wait=
 force=
+source=
 autoconf=
 parallel=1
 validate=mail-diff-validate
@@ -211,6 +212,13 @@ then
     report 'KO:no-wc' 'unknown' "'$valid' is not a working copy"
 fi
 
+# environment
+if [ "$source" ]
+then
+  source $source || \
+    report 'KO:source' 'unknown' "cannot 'source $source'"
+fi
+
 cd $prod || \
     report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
 
@@ -286,12 +294,14 @@ then
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     $nice $make auto > out 2> err \
       || report 'KO:make' 'auto' 'cannot "make auto"'
-    # check availability of "tpips" executable
+    # check exe, script & lib
     test -x ../install/bin/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
-
-    # check availabity of "pyps" dynamic library
-    test -d $ldpips -a -f $ldpips/_pypips.so \
+    test -x ../install/bin/pips_validation_summary.pl \
+      || report 'KO:make' 'script' 'missing script...'
+    # hmmm...
+    ldpips=$prod/../install/lib/python*/site-packages/pips
+    test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
   else
     # NLPMAKE compilation
@@ -301,9 +311,11 @@ then
     # what about a "timeout"? how to differentiate from a simple failure?
     $nice $make build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
-    # check that "tpips" executable is there
+    # check executable & script
     test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    test -x pips/utils/pips_validation_summary.pl \
+      || report 'KO:make' 'script' 'missing script!'
   fi
 
   # record compilation time, for "report"
