@@ -40,7 +40,6 @@ class loop:
 
 	def loops(self):
 		"""get outer loops of this loop"""
-		self._module.flag_loops()
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
 		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
 
@@ -95,11 +94,11 @@ class module:
 
 	def loops(self, label=""):
 		"""get desired loop if label given, an iterator over outermost loops otherwise"""
-		self.flag_loops() # do it now to ensure all loops exist
+		loops=self._ws.cpypips.module_loops(self.name,"")
 		if label:
-			return loop(self,label)
+			if label in loops: return loop(self,label)
+			else: raise Exception("Loop label invalid")
 		else:
-			loops=self._ws.cpypips.module_loops(self.name,"")
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 
 	def inner_loops(self):

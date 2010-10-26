@@ -47,7 +47,7 @@
 #include "control.h"
 #include "conversion.h"
 #include "properties.h"
-/* #include "generation.h" */
+#include "pipsmake.h"
 
 #include "transformations.h"
 
@@ -138,19 +138,25 @@ bool interactive_loop_transformation
   return return_status;
 }
 
-static void flag_loop(statement st, list *loops)
+typedef struct {
+    list loops;
+    bool new_label_created;
+} flag_loop_param_t;
+
+static void flag_loop(statement st, flag_loop_param_t *flp)
 {
   instruction i = statement_instruction(st);
   if(instruction_loop_p(i) && entity_empty_label_p(statement_label(st)))
     {
         statement_label(st) = make_new_label(get_current_module_name());
+        flp->new_label_created=true;
     }
   if( !get_bool_property("FLAG_LOOPS_DO_LOOPS_ONLY")
       && instruction_forloop_p(i))
     {
       if(entity_empty_label_p(statement_label(st)))
 	statement_label(st)=make_new_label(get_current_module_name());
-      *loops=CONS(STRING,strdup(entity_user_name(statement_label(st))),*loops);
+      flp->loops=CONS(STRING,strdup(entity_user_name(statement_label(st))),flp->loops);
     }
 }
 
@@ -200,16 +206,16 @@ bool flag_loops(char *module_name)
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement
     ((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-  list loops = NIL;
+  flag_loop_param_t flp = { .loops = NIL, .new_label_created = false };
 
   /* run loop labeler */
   gen_context_recurse(get_current_module_statement(),
-		      &loops,
+		      &flp,
 		      statement_domain,gen_true,flag_loop);
 
   /* validate */
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-  DB_PUT_MEMORY_RESOURCE(DBR_LOOPS, module_name,make_callees(loops));
+  if( flp.new_label_created) DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+  DB_PUT_MEMORY_RESOURCE(DBR_LOOPS, module_name,make_callees(flp.loops));
 
   /*postlude*/
   reset_current_module_entity();
@@ -240,6 +246,9 @@ static bool module_loops_walker(statement s, list *l)
  */
 char* module_loops(const char* module_name, const char* parent_loop)
 {
+  /* ensure pipsmake is ok with what we ask for */
+  safe_make(DBR_LOOPS,module_name);
+
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement
