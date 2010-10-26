@@ -1,0 +1,84 @@
+
+Initial code for "induction04"
+
+C Looking for an example. Taken from apsi.f
+
+      SUBROUTINE COSTI_SIMPLIFIED (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+      NP1 = N+1                                                         0007
+      NS2 = N/2                                                         0008
+      DT = PI/FLOAT(NM1)                                                0009
+      KC = NP1-1                                                        0010
+      DO 101 K = 2, NS2                                                 0011
+         KC = KC-1                                                      0012
+         WSAVE(KC) = 2.D0*DCOS(DT)                                      0013
+101      CONTINUE                                                       0014
+      END
+
+Preconditions for "induction04"
+
+
+C  P() {}
+
+C Looking for an example. Taken from apsi.f
+
+      SUBROUTINE COSTI_SIMPLIFIED (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+
+C  P() {}
+
+      NP1 = N+1                                                         0007
+
+C  P(NP1) {N==NP1-1}
+
+      NS2 = N/2                                                         0008
+
+C  P(NP1,NS2) {N==NP1-1, 2NS2<=N, N<=2NS2+1}
+
+      DT = PI/FLOAT(NM1)                                                0009
+
+C  P(NP1,NS2) {N==NP1-1, 2NS2<=N, N<=2NS2+1}
+
+      KC = NP1-1                                                        0010
+
+C  P(KC,NP1,NS2) {KC==N, KC==NP1-1, 2NS2<=KC, KC<=2NS2+1}
+
+      DO 101 K = 2, NS2                                                 0011
+
+C  P(K,KC,NP1,NS2) {K+KC==N+2, N==NP1-1, K<=NS2, KC<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+         KC = KC-1                                                      0012
+
+C  P(K,KC,NP1,NS2) {K+KC==N+1, N==NP1-1, K<=NS2, KC+1<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+         WSAVE(KC) = 2.D0*DCOS(DT)                                      0013
+
+C  P(K,KC,NP1,NS2) {K+KC==N+1, N==NP1-1, K<=NS2, KC+1<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+101      CONTINUE                                                       0014
+      END
+
+Code for "induction04" after induction substitution
+
+C Looking for an example. Taken from apsi.f
+
+      SUBROUTINE COSTI_SIMPLIFIED (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+      NP1 = N+1                                                         0007
+      NS2 = N/2                                                         0008
+      DT = PI/FLOAT(NM1)                                                0009
+      KC = NP1-1                                                        0010
+      DO 101 K = 2, NS2                                                 0011
+         KC = -(K+-2+(-N))-1                                            0012
+         WSAVE(KC) = 2.D0*DCOS(DT)                                      0013
+101      CONTINUE                                                       0014
+      END
