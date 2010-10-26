@@ -18,13 +18,13 @@ class sacbase(object):
 		ws.activate("PRECONDITIONS_INTER_FULL")
 		ws.activate("TRANSFORMERS_INTER_FULL")
 
-		ws.set_property(CONSTANT_PATH_EFFECTS = False)
-		ws.set_property(RICEDG_STATISTICS_ALL_ARRAYS = True)
-		ws.set_property(C89_CODE_GENERATION = True)
+		ws.props.constant_path_effects = False
+		ws.props.ricedg_statistics_all_arrays = True
+		ws.props.c89_code_generation = True
 
-		ws.set_property(SIMD_FORTRAN_MEM_ORGANISATION = False)
-		ws.set_property(SAC_SIMD_REGISTER_WIDTH = cond["register_width"])
-		ws.set_property(PRETTYPRINT_ALL_DECLARATIONS = True)
+		ws.props.simd_fortran_mem_organisation = False
+		ws.props.sac_simd_register_width = cond["register_width"]
+		ws.props.prettyprint_all_declarations = True
 
 		if cond.get("verbose"):
 			module.display()
@@ -55,8 +55,8 @@ class sacbase(object):
 			except:
 				pass
 
-		if cond.get("verbose"):
-			module.display()
+			if cond.get("verbose"):
+				module.display()
 
 		if cond.get("auto_unroll", True):
 			module.simdizer_auto_unroll(minimize_unroll=False,simple_calculation=False)
@@ -210,7 +210,7 @@ class workspace:
 		self.tmpdir = tempfile.mkdtemp()
 		tmpSIMD = self.tmpdir + "/SIMD.c"
 		utils.string2file(simd_c, tmpSIMD)
-		sources.append(tmpSIMD)
+		ws._sources.append(tmpSIMD)
 		self.ws = ws
 		# Do we want to compile with SSE.h by default? NB: if changing
 		# this, invert also the logic in compile() and compile_sse().

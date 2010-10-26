@@ -168,6 +168,7 @@ class modules:
 ### modules_methods /!\ do not touch this line /!\
 
 class workspace(object):
+
 	"""Top level element of the pyps hierarchy, it represents a set of source
 	   files and provides methods to manipulate them.
 		"""
@@ -201,6 +202,7 @@ class workspace(object):
 		self.cpypips.verbose(int(verbose))
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
+		self._sources=[]
 
 		# In case the subworkspaces need to add files, the variable passed in
 		# parameter will only be modified here and not in the scope of the caller
@@ -246,7 +248,7 @@ class workspace(object):
 		else:
 			sources=sources2
 
-		self._sources = sources
+		self._sources += sources
 
 		try:
 			cpypips.create(name, self._sources)
