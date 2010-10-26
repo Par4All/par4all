@@ -36,5 +36,9 @@ gfc2pips: build
 	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./gfc2pips
 
 clean-local:
-	chmod -R u+rw gcc-4.4.3 gcc-fortran-4.4.3.tar.bz2 build gcc-core-4.4.3.tar.bz2 gcc-4.4.3.md5
-	rm -rf gcc-4.4.3 gcc-fortran-4.4.3.tar.bz2 build gcc-core-4.4.3.tar.bz2 gcc-4.4.3.md5
+	chmod -R u+rw gcc-$(PIPS_GFC2PIPS_GCC_VERSION) 
+	rm -rf gcc-$(PIPS_GFC2PIPS_GCC_VERSION) 
+
+distclean-local:
+	chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
+	rm -rf  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5)
