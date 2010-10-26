@@ -112,7 +112,7 @@ endif
 auto-clean:
 	$(RM) -r $(BUILD.dir) autom4te.cache
 	$(RM) configure depcomp config.guess config.sub ltmain.sh \
-	       config.h.in missing aclocal.m4 install-sh
+	       config.h.in missing aclocal.m4 install-sh compile py-compile
 	find . -name .svn -prune -o -name Makefile.in -print0 | xargs -0 rm -f
 
 .PHONY: auto
