@@ -60,8 +60,48 @@ typedef struct {
 } substitute_ctx;
 
 
+/** \fn static bool is_modified_entity_in_transformer( transformer T, entity ent )
+ *  \brief Check in transformer if the entity ent is not (potentially) modified
+ *  \param T the transformer that will be checked
+ *  \param ent the entity we are looking for
+ *  \return true if entity ent has been found in the transformer T
+ */
+static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
+    bool is_modified = FALSE;
+
+    list entities = transformer_arguments( T );
+
+    for ( list el = entities; !ENDP( el ); POP( el ) ) {
+        if ( ENTITY( CAR( el ) ) == ent ) {
+            is_modified = TRUE;
+            break;
+        }
+    }
+    return is_modified;
+}
+
+
 /**
- * Check if a variable is an indice for an enclosing loop
+ * Use transformer associated to the loop to check that variable v is invariant
+ */
+static bool loop_invariant_p( Variable v, list /* of statements */ loops ) {
+  bool result = false;
+  FOREACH(statement, s, loops) {
+    transformer t = load_statement_transformer( s );
+    if( !is_modified_entity_in_transformer(t,(entity)v ) ) {
+      result = true;
+    }
+  }
+
+  if(result) pips_debug(4,"%s is a loop invariant !\n",entity_name((entity)v));
+  else pips_debug(4,"%s is not a loop invariant !\n",entity_name((entity)v));
+
+  return result;
+}
+
+
+/**
+ * Check if variable v is an index for an enclosing loop
  */
 static bool index_of_a_loop_p( Variable v, list /* of statements */ loops ) {
   bool result = false;
@@ -193,25 +233,6 @@ static expression get_right_part_of_assignment( instruction i ) {
     return e;
 }
 
-/** \fn static bool is_modified_entity_in_transformer( transformer T, entity ent )
- *  \brief Check in transformer if the entity ent is not (potentially) modified
- *  \param T the transformer that will be checked
- *  \param ent the entity we are looking for
- *  \return true if entity ent has been found in the transformer T
- */
-static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
-    bool is_modified = FALSE;
-
-    list entities = transformer_arguments( T );
-
-    for ( list el = entities; !ENDP( el ); POP( el ) ) {
-        if ( ENTITY( CAR( el ) ) == ent ) {
-            is_modified = TRUE;
-            break;
-        }
-    }
-    return is_modified;
-}
 
 /** \fn static bool subtitute_induction_statement_in( statement s )
  *  \brief Call during top-down phase while recursing on statements
@@ -255,7 +276,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                 dump_text( tmp );
                 free_text( tmp );
                 print_statement( s );
-                pips_debug( 5, "Nb of enclosing loops : %d\n", gen_length(loops) );
+                pips_debug( 5, "Nb of enclosing loops : %d\n", (int)gen_length(loops) );
             }
 
             /* Get the set of preconditions equations from which we'll build substitution expressions  */
@@ -292,7 +313,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                     } else {
                         /* We have a variable */
 
-                        if ( index_of_a_loop_p( v, loops ) ) {
+                        if(index_of_a_loop_p(v, loops) || loop_invariant_p(v, loops)) {
                             /* We have found a loop index */
                             found_loop_index = TRUE;
                             /* We build an expression "coeff*v" */
