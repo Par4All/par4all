@@ -205,13 +205,13 @@ If you get at runtime some error message such as:
 CUTIL CUDA error : P4A CUDA kernel execution failed :
 too many resources requested for launch
 \end{verbatim}
-there is not enough registers to run all the requested threads in a block,
+there are not enough registers to run all the requested threads in a block,
 so you can try by relaunching \texttt{p4a} with a
 \verb|--nvcc=-DP4A_CUDA_THREAD_MAX=384| or even less, instead the default
 value of 512 threads per block.
 
 You can select the maximum number of threads in a block of thread for 1D
-kernels with a \verb|--nvcc-flags='-DP4A_CUDA_THREAD_PER_BLOCK_IN_1D=...|
+kernels with a \verb|--nvcc-flags='-DP4A_CUDA_THREAD_PER_BLOCK_IN_1D=...'|
 
 For 2D kernels, you can set the \verb|P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D|
 and \verb|P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D| in the same way. For
@@ -237,6 +237,7 @@ The following documentation is automatically generated from the
 \texttt{p4a} source code.
 
 \input{p4a-help}
+
 
 \section{\protect\texttt{p4a} architecture}
 \label{sec:p4a-architecture}

@@ -89,9 +89,8 @@ def add_module_options(parser):
 
 
 def process(input):
-    """process the input files with PIPS and return the list ot produced files
+    """Process the input files with PIPS and return the list ot produced files
     """
-
     output = p4a_processor_output()
 
     # Execute some arbitrary Python code here if asked:
@@ -110,9 +109,7 @@ def process(input):
             accel = input.accel,
             cuda = input.cuda,
             recover_includes = input.recover_includes,
-            properties = input.properties,
-            # Regions are a must! :-) Ask for most precise regions:
-            activates = [ "MUST_REGIONS" ]
+            properties = input.properties
         )
 
         output.database_dir = processor.get_database_directory()
@@ -176,8 +173,8 @@ def main(options, args = []):
 
 
 class p4a_processor(object):
-    """Process program files with PIPS and other tools"""
-
+    """Process program files with PIPS and other tools
+    """
     # If the main language is Fortran, set to True:
     fortran = None
 
@@ -266,13 +263,16 @@ class p4a_processor(object):
             # Create the PyPS workspace.
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
-                                            activates = activates,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
                                             # Do not use PYPS #include
                                             # recovering since we have
                                             # ours that is better:
                                             recoverInclude=False)
+
+            # Array regions are a must! :-) Ask for most precise array
+            # regions:
+            self.workspace.activate("MUST_REGIONS")
 
             global default_properties
             all_properties = default_properties
@@ -337,6 +337,8 @@ class p4a_processor(object):
 
 
     def parallelize(self, fine = False, filter_select = None, filter_exclude = None):
+        """Apply transformations to parallelize the code in the workspace
+        """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # Try to privatize all the scalar variables in loops:
@@ -351,6 +353,9 @@ class p4a_processor(object):
 
 
     def gpuify(self, filter_select = None, filter_exclude = None):
+        """Apply transformations to the parallel loop nested found in the
+        workspace to generate GPU-oriented code
+        """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # First, only generate the launchers to work on them later. They are
@@ -420,8 +425,7 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
-        kernels.array_to_pointer(ARRAY_TO_POINTER_FLATTEN_ONLY = True,
-                                 ARRAY_TO_POINTER_CONVERT_PARAMETERS= "POINTER")
+        kernels.linearize_array()
 
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
@@ -458,7 +462,8 @@ class p4a_processor(object):
 
 
     def ompify(self, filter_select = None, filter_exclude = None):
-        """Add OpenMP #pragma from internal representation"""
+        """Add OpenMP #pragma from loop-parallel flag internal
+        representation to generate... OpenMP code!"""
 
         modules = self.filter_modules(filter_select, filter_exclude);
         modules.ompify_code(concurrent=True)
