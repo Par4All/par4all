@@ -1138,7 +1138,7 @@ freia_status freia_scalar_07_helper_0_0(
   mcu_instr[1].macrocode.ymin3 = 0;
   mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[1].macrocode.iter2 = imagelet_size;
-  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ADD3;
 
   // inputs:
   // - imagelet 1 is i0 for X
@@ -1295,7 +1295,7 @@ freia_status freia_scalar_07_helper_0_1(
   mcu_instr[3].macrocode.ymin3 = 0;
   mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[3].macrocode.iter2 = imagelet_size;
-  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_ADD3;
   // 4: *(3,2) -> 2
   mcu_instr[4].macrocode.xmin1 = imagelet_3;
   mcu_instr[4].macrocode.ymin1 = 0;
@@ -1305,7 +1305,7 @@ freia_status freia_scalar_07_helper_0_1(
   mcu_instr[4].macrocode.ymin3 = 0;
   mcu_instr[4].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[4].macrocode.iter2 = imagelet_size;
-  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_MUL;
+  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_MUL3;
   // set measure vol at 1022
   // 5: vol(2)
   mcu_instr[5].macrocode.xmin1 = imagelet_2;

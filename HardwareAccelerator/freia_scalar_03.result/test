@@ -583,7 +583,7 @@ freia_status freia_scalar_03_helper_0_1(
   mcu_instr[0].macrocode.ymin3 = 0;
   mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[0].macrocode.iter2 = imagelet_size;
-  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD3;
   // set measure max at 1023
   // 1: max(1)
   mcu_instr[1].macrocode.xmin1 = imagelet_1;

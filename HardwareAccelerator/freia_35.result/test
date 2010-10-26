@@ -401,7 +401,7 @@ freia_status freia_35_helper_0_0(
   mcu_instr[0].macrocode.ymin3 = 0;
   mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[0].macrocode.iter2 = imagelet_size;
-  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD3;
   // 1: -(1,2) -> 1
   mcu_instr[1].macrocode.xmin1 = imagelet_1;
   mcu_instr[1].macrocode.ymin1 = 0;
@@ -411,7 +411,7 @@ freia_status freia_35_helper_0_0(
   mcu_instr[1].macrocode.ymin3 = 0;
   mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[1].macrocode.iter2 = imagelet_size;
-  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_SUB;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_SUB3;
   // set measure min at 1023
   // 2: min(1)
   mcu_instr[2].macrocode.xmin1 = imagelet_1;

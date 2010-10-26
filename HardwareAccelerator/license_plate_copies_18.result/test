@@ -4833,7 +4833,7 @@ freia_status license_plate_copies_helper_0_0(
   mcu_instr[48].macrocode.ymin3 = 0;
   mcu_instr[48].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[48].macrocode.iter2 = imagelet_size;
-  mcu_instr[48].macrocode.addrStart = TERAPIX_UCODE_AND;
+  mcu_instr[48].macrocode.addrStart = TERAPIX_UCODE_AND3;
   // 49: E8(4) -> 3
   mcu_instr[49].macrocode.xmin1 = imagelet_4;
   mcu_instr[49].macrocode.ymin1 = 0;
@@ -5051,7 +5051,7 @@ freia_status license_plate_copies_helper_0_0(
   mcu_instr[68].macrocode.ymin3 = 0;
   mcu_instr[68].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[68].macrocode.iter2 = imagelet_size;
-  mcu_instr[68].macrocode.addrStart = TERAPIX_UCODE_AND;
+  mcu_instr[68].macrocode.addrStart = TERAPIX_UCODE_AND3;
 
   // inputs:
   // - imagelet 1 is i0 for in

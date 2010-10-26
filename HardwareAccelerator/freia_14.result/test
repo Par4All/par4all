@@ -372,7 +372,7 @@ freia_status freia_14_helper_0_0(
   mcu_instr[1].macrocode.ymin3 = 0;
   mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[1].macrocode.iter2 = imagelet_size;
-  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ADD3;
 
   // no input
 

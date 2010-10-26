@@ -310,7 +310,7 @@ freia_status my_add_helper_0_0(
   mcu_instr[0].macrocode.ymin3 = 0;
   mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[0].macrocode.iter2 = imagelet_size;
-  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADD3;
 
   // inputs:
   // - imagelet 1 is i0 for i0

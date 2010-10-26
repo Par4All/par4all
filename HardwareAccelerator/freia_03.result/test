@@ -752,7 +752,7 @@ freia_status freia_03_helper_0_0(
   mcu_instr[2].macrocode.ymin3 = 0;
   mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[2].macrocode.iter2 = imagelet_size;
-  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_ADD;
+  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_ADD3;
   // 3: *.(1) -> 1
   mcu_instr[3].macrocode.xmin1 = imagelet_1;
   mcu_instr[3].macrocode.ymin1 = 0;
@@ -798,7 +798,7 @@ freia_status freia_03_helper_0_0(
   mcu_instr[5].macrocode.ymin3 = 0;
   mcu_instr[5].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[5].macrocode.iter2 = imagelet_size;
-  mcu_instr[5].macrocode.addrStart = TERAPIX_UCODE_AND;
+  mcu_instr[5].macrocode.addrStart = TERAPIX_UCODE_AND3;
   // 6: C() -> 1
   mcu_instr[6].macrocode.xmin??? = imagelet_1;
   mcu_instr[6].macrocode.ymin??? = 0;
@@ -824,7 +824,7 @@ freia_status freia_03_helper_0_0(
   mcu_instr[7].macrocode.ymin3 = 0;
   mcu_instr[7].macrocode.iter1 = TERAPIX_PE_NUMBER;
   mcu_instr[7].macrocode.iter2 = imagelet_size;
-  mcu_instr[7].macrocode.addrStart = TERAPIX_UCODE_MUL;
+  mcu_instr[7].macrocode.addrStart = TERAPIX_UCODE_MUL3;
 
   // inputs:
   // - imagelet 1 is i0 for i0
