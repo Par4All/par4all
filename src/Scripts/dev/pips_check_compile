@@ -51,19 +51,22 @@ do
     -p|--parallel) parallel=1 ;;
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) wait=${1//*=/} ;;
+    -S|--source) source=$2; shift ;;
+    --source=*) source=${1//*=/} ;;
     -h|--help)
       echo -e \
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation]\n" \
         "check pips compilation and validation health\n" \
 	"available options:\n" \
 	"  -a: compile with autoconf\n" \
-	"  -n: run with nice\n" \
 	"  -f: force even if not needed\n" \
-	"  -s: do not run in parallel\n" \
+	"  -h: show this help and exit\n"
+	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
+	"  -s: do not run in parallel\n" \
+	"  -S file: source file for environment\n" \
 	"  -v name: validation name\n" \
 	"  -w: wait for lock\n" \
-	"  -h: show this help and exit\n"
       exit 0
       ;;
     *) echo "$0 unexpected option: $1" >&2 ; exit 1 ;;
@@ -281,14 +284,6 @@ then
     # ???
     $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
-
-    #ldpips=$(ls -d $prod/../install/lib/python*/site-packages/pips)
-    # argh... hardcoded path... fixme!
-    ldpips=$prod/../install/lib/python2.5/site-packages/pips
-    export LD_LIBRARY_PATH=$ldpips:$LD_LIBRARY_PATH
-    # set path to use generated pips
-    PATH=$prod/../install/bin:$PATH
-
     $nice $make auto > out 2> err \
       || report 'KO:make' 'auto' 'cannot "make auto"'
     # check availability of "tpips" executable
@@ -309,8 +304,6 @@ then
     # check that "tpips" executable is there
     test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
-    # set path to use generated pips
-    PATH=$prod/pips/bin:$prod/pips/utils:$PATH
   fi
 
   # record compilation time, for "report"
