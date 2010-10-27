@@ -54,7 +54,6 @@
 #include "effects-convex.h"
 #include "preprocessor.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
 #include "pipsmake.h"
 #include "accel-util.h"
