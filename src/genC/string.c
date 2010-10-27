@@ -328,6 +328,6 @@ list strsplit(const char *s,const char *d)
  * Callback for sorting string with qsort
  * @return see man strcmp
  */
-int gen_qsort_string_cmp(void * s1, void *s2) {
+int gen_qsort_string_cmp(const void * s1,const  void *s2) {
   return strcmp(*(char **)s1, *(char **)s2);
 }

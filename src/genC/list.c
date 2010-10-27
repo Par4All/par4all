@@ -641,7 +641,7 @@ void gen_remove_once(list * pl, const void * o)
  *  was:  return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
  *  if n>gen_length(l), NIL is returned.
  */
-list gen_nthcdr(int n, const list lx)
+list gen_nthcdr(intptr_t n, const list lx)
 {
   list l = (list) lx;
   message_assert("valid n", n>=0);
@@ -651,7 +651,7 @@ list gen_nthcdr(int n, const list lx)
 
 /* to be used as ENTITY(gen_nth(3, l))...
  */
-gen_chunk gen_nth(int n, const list l)
+gen_chunk gen_nth(intptr_t n, const list l)
 {
   list r = gen_nthcdr(n, l);
   message_assert("not NIL", r);
