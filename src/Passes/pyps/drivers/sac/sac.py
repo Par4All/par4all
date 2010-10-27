@@ -2,7 +2,7 @@ import os
 import re
 import tempfile
 import shutil
-import utils
+import pypsutils
 import fileinput
 
 class sacbase(object):
@@ -209,7 +209,7 @@ class workspace:
 		# add SIMD.c to the project
 		self.tmpdir = tempfile.mkdtemp()
 		tmpSIMD = self.tmpdir + "/SIMD.c"
-		utils.string2file(simd_c, tmpSIMD)
+		pypsutils.string2file(simd_c, tmpSIMD)
 		ws._sources.append(tmpSIMD)
 		self.ws = ws
 		# Do we want to compile with SSE.h by default? NB: if changing
@@ -240,9 +240,9 @@ class workspace:
 			files.extend(newfiles)
 		else:
 			simd_h_fname = os.path.abspath(outdir + "/SIMD.h")
-			utils.string2file(simd_h, simd_h_fname)
+			pypsutils.string2file(simd_h, simd_h_fname)
 			for fname in files:
-				utils.addBeginnning(fname, '#include "'+simd_h_fname+'"')
+				pypsutils.addBeginnning(fname, '#include "'+simd_h_fname+'"')
 
 	def simd_compile(self, **args):
 		"""Compile the workspace with sse.h."""
