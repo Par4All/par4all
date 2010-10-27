@@ -8982,14 +8982,19 @@ functions where the call sites have to be inlined. By default, all
 call sites of the inlined function are inlined.
 \end{PipsPass}
 
+\textbf{Only for C because of pipsmake output declaration !}
 \begin{PipsMake}
-inlining      > CALLERS.parsed_code
+inlining      > CALLERS.c_source_file
+              > PROGRAM.entities
+              > MODULE.callers
 		! MODULE.split_initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
 		< MODULE.code
         < MODULE.cumulated_effects
+        * ALL.restructure_control
+		* ALL.remove_useless_label
 \end{PipsMake}
 
 Use following property to control how generated variables are initialized
@@ -9000,34 +9005,37 @@ INLINING_USE_INITIALIZATION_LIST TRUE
 \begin{PipsPass}{inlining_simple}
 Same as inlining but always simulate the by-copy argument passing
 \end{PipsPass}
+
+\textbf{Only for C because of pipsmake output declaration !}
 \begin{PipsMake}
-inlining_simple      > CALLERS.parsed_code
+inlining_simple      > CALLERS.c_source_file
+                     > PROGRAM.entities
+                     > MODULE.callers
 		! MODULE.split_initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
 		< MODULE.code
         < MODULE.callers
+        * ALL.restructure_control
+		* ALL.remove_useless_label
 \end{PipsMake}
 
 \begin{PipsPass}{recompile_module}
 Regenerate the ri from the ri ...
 \end{PipsPass}
 
+\textbf{Only for C because of pipsmake output declaration !}
 \begin{PipsMake}
-recompile_module > MODULE.parsed_code
+recompile_module > MODULE.c_source_file
 	< MODULE.code
 \end{PipsMake}
 
 
 The default behavior of inlining is to inline the given module in \textbf{all} call sites.
 Use \PipsPropRef{INLINING_CALLERS} property to filter the call sites: only given module names will be considered.
-Use \PipsPropRef{INLINING_PURGE_LABELS} to clean useless labels after inlining.
 \begin{PipsProp}{INLINING_CALLERS}
 INLINING_CALLERS ""
-\end{PipsProp}
-\begin{PipsProp}{INLINING_PURGE_LABELS}
-INLINING_PURGE_LABELS TRUE
 \end{PipsProp}
 
 %%%%%%%%%%
@@ -9044,28 +9052,39 @@ INLINING_PURGE_LABELS TRUE
   any call anymore.
   If you run it recursievly, you should set \PipsPropRef{INLINING_USE_INITIALIZATION_LIST} to false.
 \end{PipsPass}
-\begin{PipsMake}
 
-unfolding      > MODULE.parsed_code
+\textbf{Only for C because of pipsmake output declaration !}
+\begin{PipsMake}
+unfolding      > MODULE.c_source_file
+               > MODULE.callees
+               > PROGRAM.entities
 		! CALLERS.split_initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.printed_file
         < MODULE.cumulated_effects
-        < CALLERS.code
+        < CALLEES.code
+        * ALL.restructure_control
+		* ALL.remove_useless_label
 \end{PipsMake}
 
 \begin{PipsPass}{unfolding_simple}
 Same as unfolding, but cumulated effects are not used, and the
 resulting code always simulates the by-copy argument passing:
 \end{PipsPass}
-\begin{PipsMake}
 
-unfolding_simple      > MODULE.parsed_code
+\textbf{Only for C because of pipsmake output declaration !}
+\begin{PipsMake}
+unfolding_simple      > MODULE.c_source_file
+                      > MODULE.callees
+                      > PROGRAM.entities
+		! CALLERS.split_initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.printed_file
-        < CALLERS.code
+        < CALLEES.code
+		* ALL.restructure_control
+		* ALL.remove_useless_label
 \end{PipsMake}
 
 Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which modules
