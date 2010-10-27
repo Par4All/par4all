@@ -741,7 +741,7 @@ freia_status freia_03_helper_0_0(
   int16_t p_6[1];
   const int32_t x_6 = 4;
   const int32_t y_6 = 0;
-  terapix_mcu_instr mcu_instr[8];
+  terapix_mcu_instr mcu_instr[2][8];
 
   // imagelets definitions:
   // - 2 computation imagelets
@@ -751,6 +751,12 @@ freia_status freia_03_helper_0_0(
   int imagelet_2 = 256;
   int imagelet_3 = 512;
   int imagelet_4 = 768;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_3;
+  int imagelet_io_2_0 = imagelet_2;
+  int imagelet_io_2_1 = imagelet_4;
 
   // body:
   // mcode param
@@ -765,10 +771,14 @@ freia_status freia_03_helper_0_0(
   // dyn_param contents  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: +s.(2) -> 2
-  mcu_instr[0].macrocode.xmin1 = imagelet_2;
-  mcu_instr[0].macrocode.ymin1 = 0;
-  mcu_instr[0].macrocode.xmin2 = imagelet_2;
-  mcu_instr[0].macrocode.ymin2 = 0;
+  mcu_instr[0][0].macrocode.xmin1 = imagelet_io_2_0;
+  mcu_instr[1][0].macrocode.xmin1 = imagelet_io_2_1;
+  mcu_instr[0][0].macrocode.ymin1 = 0;
+  mcu_instr[1][0].macrocode.ymin1 = 0;
+  mcu_instr[0][0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[1][0].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0][0].macrocode.ymin2 = 0;
+  mcu_instr[1][0].macrocode.ymin2 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi3;
   gram.xoffset = x_0;
@@ -777,16 +787,25 @@ freia_status freia_03_helper_0_0(
   gram.height = 1;
   gram.params = p_0;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_instr[0].macrocode.xmin3 = x_0;
-  mcu_instr[0].macrocode.ymin3 = y_0;
-  mcu_instr[0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[0].macrocode.iter2 = imagelet_size;
-  mcu_instr[0].macrocode.addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
+  mcu_instr[0][0].macrocode.xmin3 = x_0;
+  mcu_instr[1][0].macrocode.xmin3 = x_0;
+  mcu_instr[0][0].macrocode.ymin3 = y_0;
+  mcu_instr[1][0].macrocode.ymin3 = y_0;
+  mcu_instr[0][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][0].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][0].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][0].macrocode.addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
+  mcu_instr[1][0].macrocode.addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
   // 1: +.(1) -> 1
-  mcu_instr[1].macrocode.xmin1 = imagelet_1;
-  mcu_instr[1].macrocode.ymin1 = 0;
-  mcu_instr[1].macrocode.xmin2 = imagelet_1;
-  mcu_instr[1].macrocode.ymin2 = 0;
+  mcu_instr[0][1].macrocode.xmin1 = imagelet_io_1_0;
+  mcu_instr[1][1].macrocode.xmin1 = imagelet_io_1_1;
+  mcu_instr[0][1].macrocode.ymin1 = 0;
+  mcu_instr[1][1].macrocode.ymin1 = 0;
+  mcu_instr[0][1].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1][1].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0][1].macrocode.ymin2 = 0;
+  mcu_instr[1][1].macrocode.ymin2 = 0;
   // copy of operation 1 parameters
   p_1[0] = pi4;
   gram.xoffset = x_1;
@@ -795,26 +814,44 @@ freia_status freia_03_helper_0_0(
   gram.height = 1;
   gram.params = p_1;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_instr[1].macrocode.xmin3 = x_1;
-  mcu_instr[1].macrocode.ymin3 = y_1;
-  mcu_instr[1].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[1].macrocode.iter2 = imagelet_size;
-  mcu_instr[1].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_instr[0][1].macrocode.xmin3 = x_1;
+  mcu_instr[1][1].macrocode.xmin3 = x_1;
+  mcu_instr[0][1].macrocode.ymin3 = y_1;
+  mcu_instr[1][1].macrocode.ymin3 = y_1;
+  mcu_instr[0][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][1].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][1].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][1].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_instr[1][1].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
   // 2: +(1,2) -> 2
-  mcu_instr[2].macrocode.xmin1 = imagelet_1;
-  mcu_instr[2].macrocode.ymin1 = 0;
-  mcu_instr[2].macrocode.xmin2 = imagelet_2;
-  mcu_instr[2].macrocode.ymin2 = 0;
-  mcu_instr[2].macrocode.xmin3 = imagelet_2;
-  mcu_instr[2].macrocode.ymin3 = 0;
-  mcu_instr[2].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[2].macrocode.iter2 = imagelet_size;
-  mcu_instr[2].macrocode.addrStart = TERAPIX_UCODE_ADD3;
+  mcu_instr[0][2].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1][2].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0][2].macrocode.ymin1 = 0;
+  mcu_instr[1][2].macrocode.ymin1 = 0;
+  mcu_instr[0][2].macrocode.xmin2 = imagelet_2;
+  mcu_instr[1][2].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0][2].macrocode.ymin2 = 0;
+  mcu_instr[1][2].macrocode.ymin2 = 0;
+  mcu_instr[0][2].macrocode.xmin3 = imagelet_2;
+  mcu_instr[1][2].macrocode.xmin3 = imagelet_2;
+  mcu_instr[0][2].macrocode.ymin3 = 0;
+  mcu_instr[1][2].macrocode.ymin3 = 0;
+  mcu_instr[0][2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][2].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][2].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][2].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][2].macrocode.addrStart = TERAPIX_UCODE_ADD3;
+  mcu_instr[1][2].macrocode.addrStart = TERAPIX_UCODE_ADD3;
   // 3: *.(1) -> 1
-  mcu_instr[3].macrocode.xmin1 = imagelet_1;
-  mcu_instr[3].macrocode.ymin1 = 0;
-  mcu_instr[3].macrocode.xmin2 = imagelet_1;
-  mcu_instr[3].macrocode.ymin2 = 0;
+  mcu_instr[0][3].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1][3].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0][3].macrocode.ymin1 = 0;
+  mcu_instr[1][3].macrocode.ymin1 = 0;
+  mcu_instr[0][3].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1][3].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0][3].macrocode.ymin2 = 0;
+  mcu_instr[1][3].macrocode.ymin2 = 0;
   // copy of operation 3 parameters
   p_3[0] = pi5;
   gram.xoffset = x_3;
@@ -823,16 +860,25 @@ freia_status freia_03_helper_0_0(
   gram.height = 1;
   gram.params = p_3;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_instr[3].macrocode.xmin3 = x_3;
-  mcu_instr[3].macrocode.ymin3 = y_3;
-  mcu_instr[3].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[3].macrocode.iter2 = imagelet_size;
-  mcu_instr[3].macrocode.addrStart = TERAPIX_UCODE_MUL_CONST;
+  mcu_instr[0][3].macrocode.xmin3 = x_3;
+  mcu_instr[1][3].macrocode.xmin3 = x_3;
+  mcu_instr[0][3].macrocode.ymin3 = y_3;
+  mcu_instr[1][3].macrocode.ymin3 = y_3;
+  mcu_instr[0][3].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][3].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][3].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][3].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][3].macrocode.addrStart = TERAPIX_UCODE_MUL_CONST;
+  mcu_instr[1][3].macrocode.addrStart = TERAPIX_UCODE_MUL_CONST;
   // 4: /.(2) -> 2
-  mcu_instr[4].macrocode.xmin1 = imagelet_2;
-  mcu_instr[4].macrocode.ymin1 = 0;
-  mcu_instr[4].macrocode.xmin2 = imagelet_2;
-  mcu_instr[4].macrocode.ymin2 = 0;
+  mcu_instr[0][4].macrocode.xmin1 = imagelet_2;
+  mcu_instr[1][4].macrocode.xmin1 = imagelet_2;
+  mcu_instr[0][4].macrocode.ymin1 = 0;
+  mcu_instr[1][4].macrocode.ymin1 = 0;
+  mcu_instr[0][4].macrocode.xmin2 = imagelet_2;
+  mcu_instr[1][4].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0][4].macrocode.ymin2 = 0;
+  mcu_instr[1][4].macrocode.ymin2 = 0;
   // copy of operation 4 parameters
   p_4[0] = pi6;
   gram.xoffset = x_4;
@@ -841,24 +887,40 @@ freia_status freia_03_helper_0_0(
   gram.height = 1;
   gram.params = p_4;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_instr[4].macrocode.xmin3 = x_4;
-  mcu_instr[4].macrocode.ymin3 = y_4;
-  mcu_instr[4].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[4].macrocode.iter2 = imagelet_size;
-  mcu_instr[4].macrocode.addrStart = TERAPIX_UCODE_DIV_CONST;
+  mcu_instr[0][4].macrocode.xmin3 = x_4;
+  mcu_instr[1][4].macrocode.xmin3 = x_4;
+  mcu_instr[0][4].macrocode.ymin3 = y_4;
+  mcu_instr[1][4].macrocode.ymin3 = y_4;
+  mcu_instr[0][4].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][4].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][4].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][4].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][4].macrocode.addrStart = TERAPIX_UCODE_DIV_CONST;
+  mcu_instr[1][4].macrocode.addrStart = TERAPIX_UCODE_DIV_CONST;
   // 5: &(1,2) -> 2
-  mcu_instr[5].macrocode.xmin1 = imagelet_1;
-  mcu_instr[5].macrocode.ymin1 = 0;
-  mcu_instr[5].macrocode.xmin2 = imagelet_2;
-  mcu_instr[5].macrocode.ymin2 = 0;
-  mcu_instr[5].macrocode.xmin3 = imagelet_2;
-  mcu_instr[5].macrocode.ymin3 = 0;
-  mcu_instr[5].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[5].macrocode.iter2 = imagelet_size;
-  mcu_instr[5].macrocode.addrStart = TERAPIX_UCODE_AND3;
+  mcu_instr[0][5].macrocode.xmin1 = imagelet_1;
+  mcu_instr[1][5].macrocode.xmin1 = imagelet_1;
+  mcu_instr[0][5].macrocode.ymin1 = 0;
+  mcu_instr[1][5].macrocode.ymin1 = 0;
+  mcu_instr[0][5].macrocode.xmin2 = imagelet_2;
+  mcu_instr[1][5].macrocode.xmin2 = imagelet_2;
+  mcu_instr[0][5].macrocode.ymin2 = 0;
+  mcu_instr[1][5].macrocode.ymin2 = 0;
+  mcu_instr[0][5].macrocode.xmin3 = imagelet_2;
+  mcu_instr[1][5].macrocode.xmin3 = imagelet_2;
+  mcu_instr[0][5].macrocode.ymin3 = 0;
+  mcu_instr[1][5].macrocode.ymin3 = 0;
+  mcu_instr[0][5].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][5].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][5].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][5].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][5].macrocode.addrStart = TERAPIX_UCODE_AND3;
+  mcu_instr[1][5].macrocode.addrStart = TERAPIX_UCODE_AND3;
   // 6: C() -> 1
-  mcu_instr[6].macrocode.xmin??? = imagelet_1;
-  mcu_instr[6].macrocode.ymin??? = 0;
+  mcu_instr[0][6].macrocode.xmin??? = imagelet_1;
+  mcu_instr[1][6].macrocode.xmin??? = imagelet_1;
+  mcu_instr[0][6].macrocode.ymin??? = 0;
+  mcu_instr[1][6].macrocode.ymin??? = 0;
   // copy of operation 6 parameters
   p_6[0] = pi7;
   gram.xoffset = x_6;
@@ -867,21 +929,35 @@ freia_status freia_03_helper_0_0(
   gram.height = 1;
   gram.params = p_6;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_instr[6].macrocode.xmin3 = x_6;
-  mcu_instr[6].macrocode.ymin3 = y_6;
-  mcu_instr[6].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[6].macrocode.iter2 = imagelet_size;
-  mcu_instr[6].macrocode.addrStart = TERAPIX_UCODE_SET_CONST?;
+  mcu_instr[0][6].macrocode.xmin3 = x_6;
+  mcu_instr[1][6].macrocode.xmin3 = x_6;
+  mcu_instr[0][6].macrocode.ymin3 = y_6;
+  mcu_instr[1][6].macrocode.ymin3 = y_6;
+  mcu_instr[0][6].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][6].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][6].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][6].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][6].macrocode.addrStart = TERAPIX_UCODE_SET_CONST?;
+  mcu_instr[1][6].macrocode.addrStart = TERAPIX_UCODE_SET_CONST?;
   // 7: *(2,1) -> 1
-  mcu_instr[7].macrocode.xmin1 = imagelet_2;
-  mcu_instr[7].macrocode.ymin1 = 0;
-  mcu_instr[7].macrocode.xmin2 = imagelet_1;
-  mcu_instr[7].macrocode.ymin2 = 0;
-  mcu_instr[7].macrocode.xmin3 = imagelet_1;
-  mcu_instr[7].macrocode.ymin3 = 0;
-  mcu_instr[7].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[7].macrocode.iter2 = imagelet_size;
-  mcu_instr[7].macrocode.addrStart = TERAPIX_UCODE_MUL3;
+  mcu_instr[0][7].macrocode.xmin1 = imagelet_2;
+  mcu_instr[1][7].macrocode.xmin1 = imagelet_2;
+  mcu_instr[0][7].macrocode.ymin1 = 0;
+  mcu_instr[1][7].macrocode.ymin1 = 0;
+  mcu_instr[0][7].macrocode.xmin2 = imagelet_1;
+  mcu_instr[1][7].macrocode.xmin2 = imagelet_1;
+  mcu_instr[0][7].macrocode.ymin2 = 0;
+  mcu_instr[1][7].macrocode.ymin2 = 0;
+  mcu_instr[0][7].macrocode.xmin3 = imagelet_io_1_0;
+  mcu_instr[1][7].macrocode.xmin3 = imagelet_io_1_1;
+  mcu_instr[0][7].macrocode.ymin3 = 0;
+  mcu_instr[1][7].macrocode.ymin3 = 0;
+  mcu_instr[0][7].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[1][7].macrocode.iter1 = TERAPIX_PE_NUMBER;
+  mcu_instr[0][7].macrocode.iter2 = imagelet_size;
+  mcu_instr[1][7].macrocode.iter2 = imagelet_size;
+  mcu_instr[0][7].macrocode.addrStart = TERAPIX_UCODE_MUL3;
+  mcu_instr[1][7].macrocode.addrStart = TERAPIX_UCODE_MUL3;
 
   // inputs:
   // - imagelet 1 is i0 for i0
@@ -902,6 +978,7 @@ freia_status freia_03_helper_0_0(
 
   ret = freia_cg_template_process_2i_1o(&param, o0, i0, i1);
 
+  // extract measures
 
   return ret;
 }
