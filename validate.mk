@@ -93,6 +93,7 @@ OK	= status=$$? ; \
 
 # default target is to clean
 clean: clean-validate
+LOCAL_CLEAN	= clean-validate
 
 .PHONY: clean-validate
 clean-validate:
@@ -110,12 +111,12 @@ validate:
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
-validate-dir: bug-list later-list
+validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation
-validate-dir: bug-list later-list
+validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
 	$(MAKE) sort-local-result

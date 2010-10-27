@@ -2,10 +2,14 @@
 
 default: clean
 
-# I still keep the old "script" validation as the defaults
-validate: old-validate
-validate-all: old-validate-all
-validate-%: old-validate-%
+# use new validation without implicit accept
+validate: validate-out
+validate-%: parallel-validate-%
+
+# old targets:
+# old-validate
+# old-validate-%
+# validate-all: old-validate-all
 
 # useful variant to be consistent with intra-directory validation
 validate-test: new-validate
@@ -216,7 +220,7 @@ TEST = test
 
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(TEST) \
+	  && $(MAKE) RESULTS=../$(RESULTS) LOCAL_CLEAN= -C $* validate-$(TEST) \
 	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:
