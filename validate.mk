@@ -102,7 +102,7 @@ clean-validate:
 .PHONY: validate
 validate:
 	# Parallel validation
-	# run "make validate-test" to generate "test" files.
+	# run "make validate-test" to generate "test" files directly.
 	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
 
@@ -110,12 +110,12 @@ validate:
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 # regenerate files: svn diff show the diffs!
-validate-dir: bug-list later-list
+validate-dir: clean bug-list later-list
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation
-validate-dir: bug-list later-list
+validate-dir: clean bug-list later-list
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
 	$(MAKE) sort-local-result
