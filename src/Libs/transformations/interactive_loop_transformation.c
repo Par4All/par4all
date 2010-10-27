@@ -154,8 +154,10 @@ static void flag_loop(statement st, flag_loop_param_t *flp)
   if( !get_bool_property("FLAG_LOOPS_DO_LOOPS_ONLY")
       && instruction_forloop_p(i))
     {
-      if(entity_empty_label_p(statement_label(st)))
-	statement_label(st)=make_new_label(get_current_module_name());
+        if(entity_empty_label_p(statement_label(st))) {
+            statement_label(st)=make_new_label(get_current_module_name());
+            flp->new_label_created=true;
+        }
       flp->loops=CONS(STRING,strdup(entity_user_name(statement_label(st))),flp->loops);
     }
 }
