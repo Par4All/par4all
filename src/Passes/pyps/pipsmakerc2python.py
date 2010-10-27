@@ -67,8 +67,8 @@ def printPythonMethod(name,doc):
 				extraparamsetter = '\t\tif self._ws:pypsutils._set_property(self._ws,"' + prop.upper() + '", self._label)\n' + extraparamsetter
 			else:
 				props.append(arg)
-				extraparamsetter = '\t\tif self._ws:self._ws.cpypips.push_property("{0}",pypsutils.formatprop({1}))\n'.format(prop.upper(),short_prop) + extraparamsetter
-				extraparamresetter = extraparamresetter + '\t\tif self._ws:self._ws.cpypips.pop_property("{0}")\n'.format(prop.upper()) 
+				extraparamsetter = '\t\tif self._ws:self._ws.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop) + extraparamsetter
+				extraparamresetter = extraparamresetter + '\t\tif self._ws:self._ws.cpypips.pop_property("%s")\n' % (prop.upper()) 
 
 		if len(props) > 0:
 			extraparams = ",".join(props) + ","

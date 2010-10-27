@@ -117,7 +117,7 @@ void atinit()
     make_properties_stack();
 }
 
-void verbose(int on) {
+void verbose(bool on) {
     if(on) logstream=stderr;
     else logstream=fopen("/dev/null","w");
 }

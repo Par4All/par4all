@@ -27,7 +27,6 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 AM_INIT_AUTOMAKE([gnu 1.0])
 AM_PROG_CC_C_O
-AM_PATH_PYTHON(2.5)
 
 # Checks for programs.
 AX_PROG_YACC
@@ -181,9 +180,8 @@ AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps
 
 
 
-# this takes care of the gnulib stuff, the CPPFLAGS change is mandatory
+# this takes care of the gnulib stuff
 gl_INIT
-CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/Libs/gnulib"
 
 # devel mode, sets various compiler flags and so on
 # this must be the last check because it modifies CFLAGS
