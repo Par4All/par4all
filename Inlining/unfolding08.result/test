@@ -12,21 +12,18 @@ int main()
 int main()
 {
    int j;                                                               /*0003*/
-   /*0003*/
+   /*0027*/
    //PIPS generated variable
    int _return0;                                                        /*0005*/
    {
-      /*0003*/
-      /*0027*/
-      
-      int ret;                                                          /*0011*/
+      int ret;                                                          /*0009*/
       /*0019*/
       
-      ret = foo(4);                                                     /*0013*/
+      ret = foo(4);                                                     /*0011*/
       /*0021*/
-      ret |= bar(4);                                                    /*0014*/
+      ret |= bar(4);                                                    /*0012*/
       /*0022*/
       ;
    }
-   j = _return0;                                                        /*0017*/
+   j = _return0;                                                        /*0015*/
 }

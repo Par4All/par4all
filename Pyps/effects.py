@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 #!/usr/bin/env python
 
 import sys, os, shutil
