@@ -261,6 +261,8 @@ static int dag_terapix_measures
   return dlength;
 }
 
+/* fill in erosion hash table from dag d.
+ */
 static void dag_terapix_erosion(const dag d, hash_table erosion)
 {
   int i = 0;
@@ -284,6 +286,8 @@ static list /* of ints */ dag_vertex_pred_imagelets
   return limagelets;
 }
 
+/* allocate bitfield to described used cells in global memory.
+ */
 static bool * terapix_gram_init(void)
 {
   int row_size = get_int_property(trpx_gram_width);
@@ -327,22 +331,46 @@ static void terapix_gram_allocate
 
 #define IMG_PTR "imagelet_"
 
-static void terapix_mcu_int(string_buffer code, int op, string ref,
-                            string prefix, int val)
+static void terapix_image(string_buffer sb, int ff, int n)
 {
-  sb_cat(code, "  mcu_instr[", itoa(op), "].macrocode.", ref);
-  sb_cat(code, " = ", prefix, itoa(val), ";\n");
+  pips_assert("valid flip-flop", ff==0 || ff==1);
+  pips_assert("valid image number", n!=0);
+  if (n>0)
+    sb_cat(sb, IMG_PTR, itoa(n));
+  else
+    sb_cat(sb, IMG_PTR "io_", itoa(-n), ff? "_1": "_0");
 }
 
-static void terapix_mcu_val(string_buffer code, int op, string ref, string s)
+static void terapix_mcu_img(string_buffer code, int op, string ref, int n)
 {
-  sb_cat(code, "  mcu_instr[", itoa(op), "].macrocode.", ref, " = ", s, ";\n");
+  sb_cat(code, "  mcu_instr[0][", itoa(op), "].macrocode.", ref, " = ");
+  terapix_image(code, 0, n);
+  sb_cat(code, ";\n");
+  sb_cat(code, "  mcu_instr[1][", itoa(op), "].macrocode.", ref, " = ");
+  terapix_image(code, 1, n);
+  sb_cat(code, ";\n");
+}
+
+static void terapix_mcu_int(string_buffer code, int op, string ref, int val)
+{
+  sb_cat(code, "  mcu_instr[0][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, " = ", itoa(val), ";\n");
+  sb_cat(code, "  mcu_instr[1][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, " = ", itoa(val), ";\n");
+}
+
+static void terapix_mcu_val(string_buffer code, int op, string r, string s)
+{
+  sb_cat(code, "  mcu_instr[0][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
+  sb_cat(code, "  mcu_instr[1][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
 }
 
 static void terapix_mcu_pval(string_buffer code, int op, string ref,
                              string p, string s)
 {
-  sb_cat(code, "  mcu_instr[", itoa(op), "].macrocode.", ref,
+  sb_cat(code, "  mcu_instr[0][", itoa(op), "].macrocode.", ref,
+         " = ", p, s, ";\n");
+  sb_cat(code, "  mcu_instr[1][", itoa(op), "].macrocode.", ref,
          " = ", p, s, ";\n");
 }
 
@@ -454,31 +482,31 @@ static void terapix_macro_code
   {
   case 2:
     pips_assert("2 ins, alu operation...", out);
-    terapix_mcu_int(code, op, "xmin1", IMG_PTR, INT(CAR(ins)));
-    terapix_mcu_int(code, op, "ymin1", "", 0);
-    terapix_mcu_int(code, op, "xmin2", IMG_PTR, INT(CAR(CDR(ins))));
-    terapix_mcu_int(code, op, "ymin2", "", 0);
-    terapix_mcu_int(code, op, "xmin3", IMG_PTR, out);
-    terapix_mcu_int(code, op, "ymin3", "", 0);
+    terapix_mcu_img(code, op, "xmin1", INT(CAR(ins)));
+    terapix_mcu_int(code, op, "ymin1", 0);
+    terapix_mcu_img(code, op, "xmin2", INT(CAR(CDR(ins))));
+    terapix_mcu_int(code, op, "ymin2", 0);
+    terapix_mcu_img(code, op, "xmin3", out);
+    terapix_mcu_int(code, op, "ymin3", 0);
     break;
   case 1:
     // alu: image op cst 1
     // threshold 3x1
     // erode/dilate 3x3
     // copy
-    terapix_mcu_int(code, op, "xmin1", IMG_PTR, INT(CAR(ins)));
-    terapix_mcu_int(code, op, "ymin1", "", 0);
+    terapix_mcu_img(code, op, "xmin1", INT(CAR(ins)));
+    terapix_mcu_int(code, op, "ymin1", 0);
     if (out) {
-      terapix_mcu_int(code, op, "xmin2", IMG_PTR, out);
-      terapix_mcu_int(code, op, "ymin2", "", 0);
+      terapix_mcu_img(code, op, "xmin2", out);
+      terapix_mcu_int(code, op, "ymin2", 0);
     }
     terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 0:
     pips_assert("no input, one output image", out);
     // const image generation... NSP
-    terapix_mcu_int(code, op, "xmin???", IMG_PTR, out);
-    terapix_mcu_int(code, op, "ymin???", "", 0);
+    terapix_mcu_img(code, op, "xmin???", out);
+    terapix_mcu_int(code, op, "ymin???", 0);
     terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   default:
@@ -593,6 +621,7 @@ static void freia_terapix_call
   // use a named pointer the value of which will be known later,
   // depending on the number of needed imagelets
   // operation -> imagelet number
+  // the imagelet number is inverted if it is an I/O
   hash_table allocation = hash_table_make(hash_pointer, 0);
   set computed = set_make(set_pointer);
 
@@ -605,9 +634,10 @@ static void freia_terapix_call
     sb_cat(dbio, "  // inputs:\n");
     FOREACH(dagvtx, in, dag_inputs(thedag))
     {
+      // update primary imagelet number
       n_imagelets++;
       set_add_element(computed, computed, in);
-      hash_put(allocation, in, (void*) (_int) n_imagelets);
+      hash_put(allocation, in, (void*) (_int) -n_imagelets);
 
       // ??? tell that n_imagelets is an input
       sb_cat(dbio, "  // - imagelet ", itoa(n_imagelets));
@@ -669,7 +699,11 @@ static void freia_terapix_call
     if (api->terapix.inplace)
     {
       SET_FOREACH(dagvtx, v, deads)
-        set_add_element(avail_img, avail_img, hash_get(allocation, v));
+      {
+        _int img = (_int) hash_get(allocation, v);
+        if (img<0) img=-img;
+        set_add_element(avail_img, avail_img, (void*) img);
+      }
     }
 
     // generate inS -> out computation
@@ -681,7 +715,7 @@ static void freia_terapix_call
     {
       int in_count=0;
       FOREACH(int, i, ins)
-        sb_cat(body, in_count++? ",": "", itoa(i));
+        sb_cat(body, in_count++? ",": "", itoa(i>0? i: -i));
     }
     sb_cat(body, ")");
 
@@ -689,10 +723,11 @@ static void freia_terapix_call
     _int choice = 0;
     if (api->arg_img_out==1)
     {
+      bool is_output = gen_in_list_p(current, dag_outputs(thedag));
       // SELECT one available
-      choice = select_imagelet(avail_img, &n_imagelets,
-                               gen_in_list_p(current, dag_outputs(thedag)));
+      choice = select_imagelet(avail_img, &n_imagelets, is_output);
       sb_cat(body, " -> ", itoa((int) choice));
+      if (is_output) choice = -choice;
       hash_put(allocation, current, (void*) choice);
     }
     sb_cat(body, "\n");
@@ -721,7 +756,11 @@ static void freia_terapix_call
     if (!api->terapix.inplace)
     {
       SET_FOREACH(dagvtx, v, deads)
-        set_add_element(avail_img, avail_img, hash_get(allocation, v));
+      {
+        _int img = (_int) hash_get(allocation, v);
+        if (img<0) img=-img;
+        set_add_element(avail_img, avail_img, (void*) img);
+      }
     }
 
     set_add_element(computed, computed, current);
@@ -738,6 +777,7 @@ static void freia_terapix_call
     FOREACH(dagvtx, out, dag_outputs(thedag))
     {
       int oimg = (int) (_int) hash_get(allocation, out);
+      if (oimg<0) oimg=-oimg;
       if (oimg>n_double_buffers)
       {
         // PANIC:
@@ -761,10 +801,8 @@ static void freia_terapix_call
       // tell that oimg is an output
       // ??? tell that n_imagelets is an input
       sb_cat(dbio, "  // - imagelet ", itoa(oimg));
-      sb_cat(dbio, " is o", itoa(n));
-      sb_cat(dbio, " for ",
-             entity_user_name(vtxcontent_out(dagvtx_content(out))),
-             "\n");
+      sb_cat(dbio, " is o", itoa(n), " for ");
+      sb_cat(dbio, entity_user_name(vtxcontent_out(dagvtx_content(out))), "\n");
       n++;
     }
     sb_cat(dbio, "\n");
@@ -780,7 +818,7 @@ static void freia_terapix_call
   int imagelet_rows = available_memory/total_imagelets; // round down
 
   // last declarations
-  sb_cat(decl, "  terapix_mcu_instr mcu_instr[", itoa(n_ops), "];\n");
+  sb_cat(decl, "  terapix_mcu_instr mcu_instr[2][", itoa(n_ops), "];\n");
 
   // computed values
   sb_cat(decl, "\n  // imagelets definitions:\n");
@@ -798,12 +836,18 @@ static void freia_terapix_call
     sb_cat(decl, itoa(imagelet_rows * (i-1)), ";\n");
   }
 
-  // tell about double buffers...
+  // generate imagelet double buffer pointers
   sb_cat(dbio, "  // double buffer management:\n");
+  sb_cat(decl, "\n  // double buffer assignment\n");
   for (int i=1; i<=n_double_buffers; i++)
   {
     sb_cat(dbio, "  // - buffer ", itoa(i), "/");
     sb_cat(dbio, itoa(i+n_imagelets), "\n");
+
+    sb_cat(decl, "  int " IMG_PTR "io_", itoa(i), "_0 = ");
+    sb_cat(decl, IMG_PTR, itoa(i), ";\n");
+    sb_cat(decl, "  int " IMG_PTR "io_", itoa(i), "_1 = ");
+    sb_cat(decl, IMG_PTR, itoa(i+n_imagelets), ";\n");
   }
 
   // tell about imagelet erosion...
@@ -835,6 +879,7 @@ static void freia_terapix_call
   string_buffer_append_sb(code, decl);
   string_buffer_append_sb(code, body);
   sb_cat(code, "\n");
+  sb_cat(code, "  // extract measures\n");
   string_buffer_append_sb(code, tail);
   sb_cat(code, "\n  return ret;\n}\n\n");
 
