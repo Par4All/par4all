@@ -898,9 +898,9 @@ bool do_inlining(inlining_parameters p,char *module_name)
         callers_l = CONS(STRING, c_name, callers_l);
     }
     /*  or get module's callers */
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
     if(ENDP(callers_l))
     {
-        callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
         callers_l = callees_callees(callers);
     }
 
@@ -909,11 +909,17 @@ bool do_inlining(inlining_parameters p,char *module_name)
     {
         inline_calls(p, caller_name );
         recompile_module(caller_name);
-        /* we can try to remove some labels now*/
-        if( get_bool_property("INLINING_PURGE_LABELS"))
-            if(!remove_useless_label(caller_name))
-                pips_user_warning("failed to remove useless labels after restructure_control in inlining");
     }
+    FOREACH(STRING,c0,callers_l)  {
+      FOREACH(STRING,c1,callees_callees(callers)) {
+        if(same_string_p(c0,c1)) {
+          gen_remove_once(&callees_callees(callers),c1);
+          break;
+        }
+      }
+    }
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLERS,module_name,callers);
 
     if(use_effects(p)) reset_cumulated_rw_effects();
 
@@ -1014,10 +1020,6 @@ bool do_unfolding(inlining_parameters p, char* module_name)
     {
         set_add_element(unfolding_filters, unfolding_filters, filter_name);
         recompile_module(module_name);
-        /* we can try to remove some labels now*/
-        if( get_bool_property("INLINING_PURGE_LABELS"))
-            if(!remove_useless_label(module_name))
-                pips_user_warning("failed to remove useless labels after restructure_control in inlining");
     }
     gen_map(free,filtersname);gen_free_list(filtersname);
 
@@ -1062,10 +1064,12 @@ bool do_unfolding(inlining_parameters p, char* module_name)
             }
             free(sorted);
             recompile_module(module_name);
+#if 0
             /* we can try to remove some labels now*/
             if( get_bool_property("INLINING_PURGE_LABELS"))
                 if(!remove_useless_label(module_name))
                     pips_user_warning("failed to remove useless labels after restructure_control in inlining");
+#endif
         }
         set_free(calls_name);
         free_callees(cc);
