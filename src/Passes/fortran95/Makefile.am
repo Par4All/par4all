@@ -36,8 +36,8 @@ gfc2pips: build
 	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./gfc2pips
 
 clean-local:
-	chmod -R u+rw gcc-$(PIPS_GFC2PIPS_GCC_VERSION) 
-	rm -rf gcc-$(PIPS_GFC2PIPS_GCC_VERSION) 
+	chmod -R u+rw gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
+	rm -rf gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
 
 distclean-local:
 	chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
