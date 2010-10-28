@@ -343,18 +343,21 @@ class workspace(object):
 
 		saved=[]
 		for s in os.listdir(self.dirname()+"Src"):
-		    if rep:
-			    # Save to the given directory if any:
-			    cp=os.path.join(rep,s)
-			    shutil.copy(os.path.join(self.dirname(),"Src",s),cp)
-			# Keep track of the file name:
-			saved.append(cp)
-
-		if self.recoverInclude:
-		    # Recover includes on all the files.
-			# Guess that nothing is done on Fortran files... :-/
-			for f in saved:
+			f = os.path.join(self.dirname(),"Src",s)
+			if self.recoverInclude:
+				# Recover includes on all the files.
+				# Guess that nothing is done on Fortran files... :-/
 				pypsutils.unincludes(f)
+			if rep:
+				# Save to the given directory if any:
+				cp=os.path.join(rep,s)
+				shutil.copy(f,cp)
+				# Keep track of the file name:
+				saved.append(cp)
+			else:
+				saved.append(f)
+		print saved
+
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
@@ -707,5 +710,4 @@ class workspace(object):
 ### mode: flyspell
 ### ispell-local-dictionary: "american"
 ### tab-width: 4
-### python-indent: 4
 ### End:
