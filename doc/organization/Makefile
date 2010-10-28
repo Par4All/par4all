@@ -18,6 +18,10 @@ _HAS_HTLATEX_ = 1
 ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
 
+# To be able to easily include sample scripts:
+TEXINPUTS:=$(shell pwd)/../../src/simple_tools:$(TEXINPUTS)
+
+
 # Some own Par4All global config information:
 include $(P4A_ROOT)/doc/libs/par4all.mk
 
@@ -25,6 +29,8 @@ default: full-compile phase7
 
 include $(ROOT)/makes/main.mk
 
+# Where to find commands we want generate documentation:
+VPATH = ../../src/dev:../../src/p4a_accel:../../src/postprocessor:../../src/simple_tools:../../src/validation
 
 publish:
 	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_MACHINE_DIR)
@@ -39,7 +45,7 @@ local-clean:
 
 
 # Add the dependence on some automatically generated help:
-par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex p4a_coffee-help.tex release-notes-extract.tex
+par4all_organization.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_processor.py-help.tex p4a_recover_includes-help.tex optparse_help_to_tex-help.tex p4a_validate-help.tex p4a_coffee-help.tex release-notes-extract.tex ../../src/simple_tools/p4a_setup_with_my_PIPS
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
@@ -56,9 +62,6 @@ p4a_validate-help.tex: p4a_validate.help Makefile
 # p4a_coffee-help is included at a deeper sectioning level:
 p4a_coffee-help.tex: p4a_coffee.help Makefile
 	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
-
-# Where to find commands we want generate documentation:
-VPATH = ../../src/dev:../../src/p4a_accel:../../src/postprocessor:../../src/simple_tools:../../src/validation
 
 # Match commands into the directories specified in the VPATH above
 %.help:% Makefile

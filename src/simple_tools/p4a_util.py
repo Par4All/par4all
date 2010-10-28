@@ -209,6 +209,12 @@ def die(msg, exit_code = 254, log = True, bare = False, level = 0):
     error(msg, log = log, bare = bare, level = level)
     sys.exit(exit_code)
 
+def p4a_die_env(message):
+    "Display a message and die with a message about misconfiguration"
+
+    die(message + "\nIt looks like the Par4All environment has not been properly set.\n Have you sourced par4all-rc.sh?")
+
+
 default_log_file = os.path.join(os.getcwd(), program_name + ".log")
 log_file_handler = None
 

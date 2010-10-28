@@ -8,6 +8,12 @@
 % Hmmm... Do not work with UTF-8:
 % \usepackage{verbatim}
 
+\usepackage{listings}%[hyper,procnames]
+\lstset{extendedchars=true, language=C++, basicstyle=\scriptsize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=5, numberfirstline=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape}
+
 \usepackage{abbrev_reactive}
 \let\OldRightarrow=\Rightarrow
 \RequirePackage{marvosym}
@@ -731,6 +737,10 @@ of typical \Apfa things, with a:
 src/simple_tools/p4a_setup -vvv --pips-src=<where the wanted PIPS is> \
    --debug --only=pips --no-final --jobs=4
 \end{verbatim}
+
+An example of script that does this is
+\verb|src/simple_tools/p4a_setup_with_my_PIPS|:
+\lstinputlisting[language=bash]{p4a_setup_with_my_PIPS}
 
 
 \subsubsection{Debuging PIPS and p4a}

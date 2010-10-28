@@ -67,6 +67,7 @@ class p4a_processor_input(object):
     cpp_flags = ""
     files = []
     recover_includes = True
+    native_recover_includes = False
     properties = {}
     output_dir=None
     output_suffix=""
@@ -89,9 +90,8 @@ def add_module_options(parser):
 
 
 def process(input):
-    """process the input files with PIPS and return the list ot produced files
+    """Process the input files with PIPS and return the list ot produced files
     """
-
     output = p4a_processor_output()
 
     # Execute some arbitrary Python code here if asked:
@@ -110,9 +110,8 @@ def process(input):
             accel = input.accel,
             cuda = input.cuda,
             recover_includes = input.recover_includes,
+            native_recover_includes = input.native_recover_includes,
             properties = input.properties,
-            # Regions are a must! :-) Ask for most precise regions:
-            activates = [ "MUST_REGIONS" ]
         )
 
         output.database_dir = processor.get_database_directory()
@@ -176,8 +175,8 @@ def main(options, args = []):
 
 
 class p4a_processor(object):
-    """Process program files with PIPS and other tools"""
-
+    """Process program files with PIPS and other tools
+    """
     # If the main language is Fortran, set to True:
     fortran = None
 
@@ -190,6 +189,7 @@ class p4a_processor(object):
 
     # Set to True to try to do some #include tracking and recovering
     recover_includes = None
+    native_recover_includes = None
 
     files = []
     accel_files = []
@@ -197,17 +197,20 @@ class p4a_processor(object):
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 recover_includes = True, properties = {}, activates = []):
+                 recover_includes = True, native_recover_includes = False,
+                 properties = {}, activates = []):
 
         self.recover_includes = recover_includes
+        self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
 
         if workspace:
+            # There is one provided: use it!
             self.workspace = workspace
         else:
             # This is because pyps.workspace.__init__ will test for empty
-            # strings
+            # strings...
             if cpp_flags is None:
                 cpp_flags = ""
 
@@ -216,7 +219,7 @@ class p4a_processor(object):
 
             self.project_name = project_name
 
-            if self.recover_includes:
+            if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
                 # man-in-the-middle attack :-) :
                 os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
@@ -252,10 +255,7 @@ class p4a_processor(object):
                 # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
 
-            # Use a special preprocessor to track #include:
-            os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
-
-            # Late import of pyps to avoid importing until
+            # Late import of pyps to avoid importing it until
             # we really need it.
             global pyps
             try:
@@ -263,16 +263,19 @@ class p4a_processor(object):
             except:
                 raise
 
-            # Create the PyPS workspace.
+            # Create the PyPS workspace:
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
-                                            activates = activates,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
-                                            # Do not use PYPS #include
-                                            # recovering since we have
-                                            # ours that is better:
-                                            recoverInclude=False)
+                                            # If we have #include recovery
+                                            # and want to use the native
+                                            # one:
+                                            recoverInclude = self.recover_includes and self.native_recover_includes)
+
+            # Array regions are a must! :-) Ask for most precise array
+            # regions:
+            self.workspace.activate("MUST_REGIONS")
 
             global default_properties
             all_properties = default_properties
@@ -337,6 +340,8 @@ class p4a_processor(object):
 
 
     def parallelize(self, fine = False, filter_select = None, filter_exclude = None):
+        """Apply transformations to parallelize the code in the workspace
+        """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # Try to privatize all the scalar variables in loops:
@@ -351,6 +356,9 @@ class p4a_processor(object):
 
 
     def gpuify(self, filter_select = None, filter_exclude = None):
+        """Apply transformations to the parallel loop nested found in the
+        workspace to generate GPU-oriented code
+        """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
         # First, only generate the launchers to work on them later. They are
@@ -420,8 +428,7 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
-        kernels.array_to_pointer(ARRAY_TO_POINTER_FLATTEN_ONLY = True,
-                                 ARRAY_TO_POINTER_CONVERT_PARAMETERS= "POINTER")
+        kernels.linearize_array()
 
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
@@ -458,7 +465,8 @@ class p4a_processor(object):
 
 
     def ompify(self, filter_select = None, filter_exclude = None):
-        """Add OpenMP #pragma from internal representation"""
+        """Add OpenMP #pragma from loop-parallel flag internal
+        representation to generate... OpenMP code!"""
 
         modules = self.filter_modules(filter_select, filter_exclude);
         modules.ompify_code(concurrent=True)
@@ -499,7 +507,9 @@ class p4a_processor(object):
         # Regenerate the sources file in the workspace. Do not generate
         # OpenMP-style output since we have already added OpenMP
         # decorations:
-        self.workspace.all.unsplit(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+        self.workspace.props.PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+        # The default place is fine for us since we work later on the files:
+        self.workspace.save()
 
         # For all the registered files from the workspace:
         for file in self.files:
@@ -512,11 +522,9 @@ class p4a_processor(object):
             # Where the file does dwell in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname(), "Src", name)
 
-            # Recover the includes in the given file only if the flag has
-            # been previously set and this is a C program. Do not do it
-            # twice in accel mode since it is already done in
-            # p4a_post_processor.py:
-            if self.recover_includes and c_file_p(file) and not self.accel:
+            # Recover the includes in the given file only if the flags have
+            # been previously set and this is a C program:
+            if self.recover_includes and not self.native_recover_includes and c_file_p(file):
                 subprocess.call([ 'p4a_recover_includes',
                                   '--simple', pips_file ])
 
