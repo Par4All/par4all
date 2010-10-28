@@ -67,6 +67,7 @@ class p4a_processor_input(object):
     cpp_flags = ""
     files = []
     recover_includes = True
+    native_recover_includes = False
     properties = {}
     output_dir=None
     output_suffix=""
@@ -109,7 +110,8 @@ def process(input):
             accel = input.accel,
             cuda = input.cuda,
             recover_includes = input.recover_includes,
-            properties = input.properties
+            native_recover_includes = input.native_recover_includes,
+            properties = input.properties,
         )
 
         output.database_dir = processor.get_database_directory()
@@ -187,6 +189,7 @@ class p4a_processor(object):
 
     # Set to True to try to do some #include tracking and recovering
     recover_includes = None
+    native_recover_includes = None
 
     files = []
     accel_files = []
@@ -194,17 +197,20 @@ class p4a_processor(object):
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 recover_includes = True, properties = {}, activates = []):
+                 recover_includes = True, native_recover_includes = False,
+                 properties = {}, activates = []):
 
         self.recover_includes = recover_includes
+        self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
 
         if workspace:
+            # There is one provided: use it!
             self.workspace = workspace
         else:
             # This is because pyps.workspace.__init__ will test for empty
-            # strings
+            # strings...
             if cpp_flags is None:
                 cpp_flags = ""
 
@@ -213,7 +219,7 @@ class p4a_processor(object):
 
             self.project_name = project_name
 
-            if self.recover_includes:
+            if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
                 # man-in-the-middle attack :-) :
                 os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
@@ -249,10 +255,7 @@ class p4a_processor(object):
                 # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
 
-            # Use a special preprocessor to track #include:
-            os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
-
-            # Late import of pyps to avoid importing until
+            # Late import of pyps to avoid importing it until
             # we really need it.
             global pyps
             try:
@@ -260,15 +263,15 @@ class p4a_processor(object):
             except:
                 raise
 
-            # Create the PyPS workspace.
+            # Create the PyPS workspace:
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
-                                            # Do not use PYPS #include
-                                            # recovering since we have
-                                            # ours that is better:
-                                            recoverInclude=False)
+                                            # If we have #include recovery
+                                            # and want to use the native
+                                            # one:
+                                            recoverInclude = self.recover_includes and self.native_recover_includes)
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
@@ -504,7 +507,9 @@ class p4a_processor(object):
         # Regenerate the sources file in the workspace. Do not generate
         # OpenMP-style output since we have already added OpenMP
         # decorations:
-        self.workspace.all.unsplit(PRETTYPRINT_SEQUENTIAL_STYLE = "do")
+        self.workspace.props.PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+        # The default place is fine for us since we work later on the files:
+        self.workspace.save()
 
         # For all the registered files from the workspace:
         for file in self.files:
@@ -517,11 +522,9 @@ class p4a_processor(object):
             # Where the file does dwell in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname(), "Src", name)
 
-            # Recover the includes in the given file only if the flag has
-            # been previously set and this is a C program. Do not do it
-            # twice in accel mode since it is already done in
-            # p4a_post_processor.py:
-            if self.recover_includes and c_file_p(file) and not self.accel:
+            # Recover the includes in the given file only if the flags have
+            # been previously set and this is a C program:
+            if self.recover_includes and not self.native_recover_includes and c_file_p(file):
                 subprocess.call([ 'p4a_recover_includes',
                                   '--simple', pips_file ])
 
