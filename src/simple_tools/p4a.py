@@ -45,6 +45,7 @@ def add_module_options(parser):
 
     parser.add_option_group(proj_group)
 
+
     proc_group = optparse.OptionGroup(parser, "PIPS processing options")
 
     proc_group.add_option("--accel", "-A", action = "store_true", default = False,
@@ -79,6 +80,7 @@ def add_module_options(parser):
 
     parser.add_option_group(proc_group)
 
+
     cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
 
     cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
@@ -99,7 +101,11 @@ def add_module_options(parser):
     cpp_group.add_option("--skip-recover-includes", action = "store_true", default = False,
         help = "By default, try to recover standard #include. To skip this phase, use this option.")
 
+    cpp_group.add_option("--native-recover-includes", action = "store_true", default = False,
+        help = "Use the PyPS default #include recovery method that is less correct if you use complex CPP syntax but is faster. Since it does not rely on the preprocessor that normalized all the included file names, it may be easier to use Par4All in harder context, such as a virtual machine on Windows... By default, use the more complex method of Par4All.")
+
     parser.add_option_group(cpp_group)
+
 
     compile_group = optparse.OptionGroup(parser, "Back-end compilation options")
 
@@ -202,6 +208,7 @@ def add_module_options(parser):
 
     parser.add_option_group(cmake_group)
 
+
     output_group = optparse.OptionGroup(parser, "Output options")
 
     output_group.add_option("--output-dir", "--od", metavar = "DIR", default = None,
@@ -263,12 +270,16 @@ def main(options, args = []):
     except:
         pass
 
-    if (pyps is None
-        or "P4A_ROOT" not in os.environ
-        or "P4A_ACCEL_DIR" not in os.environ
-        or not os.path.exists(os.environ["P4A_ROOT"])
-        or not os.path.exists(os.environ["P4A_ACCEL_DIR"])):
-        die("The Par4All environment has not been properly set (through par4all-rc.sh)")
+    if pyps is None:
+        p4a_die_env("Cannot find PyPS!")
+    if "P4A_ROOT" not in os.environ:
+        p4a_die_env("P4A_ROOT environment variable is not set!")
+    if "P4A_ACCEL_DIR" not in os.environ:
+        p4a_die_env("P4A_ACCEL_DIR environment variable is not set!")
+    if not os.path.isdir(os.environ["P4A_ROOT"]):
+        p4a_die_env("Directory pointed by P4A_ROOT environment variable does not exist!")
+    if not os.path.isdir(os.environ["P4A_ACCEL_DIR"]):
+        p4a_die_env("Directory pointed by P4A_ACCEL_DIR environment variable does not exist!")
 
     # Check options and set up defaults.
     if len(args) == 0:
@@ -429,6 +440,7 @@ def main(options, args = []):
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
         input.recover_includes = not options.skip_recover_includes
+        input.native_recover_includes = options.native_recover_includes
         input.execute_some_python_code_in_process = execute_some_python_code_in_process
         input.output_dir = options.output_dir
         input.output_prefix = options.output_prefix

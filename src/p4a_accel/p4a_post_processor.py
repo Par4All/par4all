@@ -49,12 +49,8 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # Where we will rewrite the result:
     dest_file_name = os.path.join(dir_name, file_base_name)
 
-    # Recover the standard #include from file_name to dest_file_name:
-    subprocess.call([ 'p4a_recover_includes', '--simple',
-                      '--output', dest_file_name, file_name ])
-
-    # Read the PIPS output with #include that will be written later:
-    f = open(dest_file_name)
+    # Read the PIPS output:
+    f = open(file_name)
     # slurp all the file in a string:
     content = f.read()
     f.close()
@@ -116,7 +112,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ### content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
     ###                 insert_kernel_launcher_declaration, content)
 
-    # NULL is preprocessed differently in C and C++ ; 
+    # NULL is preprocessed differently in C and C++ ;
     # PIPS generated code for NULL is "(void *) 0"
     # This will break cuda compilation !
     # So here is a quick hack to recover NULL symbolic

@@ -16,6 +16,8 @@ so that pips use this program to preprocess all the C PIPS input.
 
 Initialize the database by analyzing all the standard .h with:
 p4a_recover_includes --init
+This is right now no longer used.
+
 
 To recover #include in some PIPS output.c, use:
 p4a_recover_includes output.c
