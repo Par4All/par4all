@@ -802,7 +802,7 @@ static void freia_terapix_call
       // ??? tell that n_imagelets is an input
       sb_cat(dbio, "  // - imagelet ", itoa(oimg));
       sb_cat(dbio, " is o", itoa(n), " for ");
-      sb_cat(dbio, entity_user_name(vtxcontent_out(dagvtx_content(out))), "\n");
+      sb_cat(dbio, (char*)entity_user_name(vtxcontent_out(dagvtx_content(out))), "\n");
       n++;
     }
     sb_cat(dbio, "\n");
