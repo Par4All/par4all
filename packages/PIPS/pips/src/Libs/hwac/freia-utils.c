@@ -93,19 +93,19 @@ static const freia_api_t FREIA_AIPO_API[] = {
       alu_add,
       // global measures
       NO_MES
-    }, TRPX_OP(4, "ADD")
+    }, TRPX_OP(4, "ADD3")
   },
   { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sub_01, NO_MES }, TRPX_OP(4, "SUB")
+      NO_POC, alu_sub_01, NO_MES }, TRPX_OP(4, "SUB3")
   },
   { AIPO "mul", "*",  AIPO "mul", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_mul, NO_MES }, TRPX_OP(4, "MUL")
+      NO_POC, alu_mul, NO_MES }, TRPX_OP(4, "MUL3")
   },
   { AIPO "div", "/", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_div_01, NO_MES }, TRPX_OP(4, "DIV")
+      NO_POC, alu_div_01, NO_MES }, TRPX_OP(4, "DIV3")
   },
   { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
@@ -117,27 +117,27 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_abssub_01, NO_MES }, TRPX_OP(4, "ABS_DIFF")
+      NO_POC, alu_abssub_01, NO_MES }, TRPX_OP(4, "ABS_DIFF3")
   },
   { AIPO "inf", "<", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_inf_01, NO_MES }, TRPX_OP(4, "INF")
+      NO_POC, alu_inf_01, NO_MES }, TRPX_OP(4, "INF3")
   },
   { AIPO "sup", ">", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sup_01, NO_MES }, TRPX_OP(4, "SUP")
+      NO_POC, alu_sup_01, NO_MES }, TRPX_OP(4, "SUP3")
   },
   { AIPO "and", "&", AIPO "and", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_and, NO_MES }, TRPX_OP(4, "AND")
+      NO_POC, alu_and, NO_MES }, TRPX_OP(4, "AND3")
   },
   { AIPO "or", "|", AIPO "or", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_or, NO_MES }, TRPX_OP(4, "OR")
+      NO_POC, alu_or, NO_MES }, TRPX_OP(4, "OR3")
   },
   { AIPO "xor", "^", AIPO "xor", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR")
+      NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR3")
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,

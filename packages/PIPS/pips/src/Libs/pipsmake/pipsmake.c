@@ -611,6 +611,7 @@ static rule safe_find_rule_by_resource(const char* rname)
 }
 
 static bool make_pre_transformation(const char*, rule);
+static bool make_post_transformation(const char*, rule);
 static bool make_required(const char*, rule);
 
 /* Apply do NOT activate the rule applied. 
@@ -643,59 +644,69 @@ static bool apply_without_reseting_up_to_date_resources(
     if (!make_required(oname, ru))
 	return FALSE;
 
-    return apply_a_rule(oname, ru);
+    if(! apply_a_rule(oname, ru))
+        return FALSE;
+
+    return make_post_transformation(oname, ru);
 }
 
-/* compute all pre-transformations to apply a rule on an object 
+
+/* compute all post-transformations to apply a rule on an object 
  */
-static bool make_pre_transformation(const char* oname, rule ru)
+static bool make_pre_post_transformation(const char* oname, rule ru, list transformations)
 {
     list reals;
     bool success_p = TRUE;
 
     /* we select some resources */
-    MAP(VIRTUAL_RESOURCE, vr, 
+    FOREACH(VIRTUAL_RESOURCE, vr, transformations)
     {
-	string vrn = virtual_resource_name(vr);
-	tag vrt = owner_tag(virtual_resource_owner(vr));
-	
-	if (vrt == is_owner_select) {
-	    
-	    pips_debug(3, "rule %s : selecting phase %s\n",
-		       rule_phase(ru), vrn);
-	    
-	    if (activate (vrn) == NULL) {
-		success_p = FALSE;
-		break;
-	    }
-	}
-    }, rule_pre_transformation(ru));
-    
+        string vrn = virtual_resource_name(vr);
+        owner vro = virtual_resource_owner(vr);
+
+        if (owner_select_p(vro)) {
+
+            pips_debug(3, "rule %s : selecting phase %s\n",
+                    rule_phase(ru), vrn);
+
+            if (activate (vrn) == NULL) {
+                success_p = FALSE;
+                break;
+            }
+        }
+    }
+
     if (success_p) {
-	/* we build the list of pre transformation real_resources */
-	reals = build_real_resources(oname, rule_pre_transformation(ru));
-	
-	/* we recursively make the resources */
-	MAP(REAL_RESOURCE, rr, {
-	    string rron = real_resource_owner_name(rr);
-	    /* actually the resource name is a phase name !! */
-	    string rrpn = real_resource_resource_name(rr);
-	    
-	    pips_debug(3, "rule %s : applying %s to %s - recursive call\n",
-		       rule_phase(ru), rrpn, rron);
-	    
-	    if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-		success_p = FALSE;
-	    
-	    /* now we must drop the up_to_date cache.
-	     * maybe not that often? Or one should perform the transforms
-	     * Top-down to avoid recomputations, with ALL...
-	     */
-	    reset_make_cache();
-	    init_make_cache();
-	}, reals);
+        /* we build the list of pre transformation real_resources */
+        reals = build_real_resources(oname, transformations);
+
+        /* we recursively make the resources */
+        FOREACH(REAL_RESOURCE, rr, reals) {
+            string rron = real_resource_owner_name(rr);
+            /* actually the resource name is a phase name !! */
+            string rrpn = real_resource_resource_name(rr);
+
+            pips_debug(3, "rule %s : applying %s to %s - recursive call\n",
+                    rule_phase(ru), rrpn, rron);
+
+            if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
+                success_p = FALSE;
+
+            /* now we must drop the up_to_date cache.
+             * maybe not that often? Or one should perform the transforms
+             * Top-down to avoid recomputations, with ALL...
+             */
+            reset_make_cache();
+            init_make_cache();
+        }
     }
     return TRUE;
+}
+static bool make_pre_transformation(const char* oname, rule ru) {
+    return make_pre_post_transformation(oname,ru,rule_pre_transformation(ru));
+}
+static bool make_post_transformation(const char* oname, rule ru) {
+    return make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
 }
 
 static bool make(const char* rname, const char* oname)
@@ -815,6 +826,10 @@ bool rmake(const char* rname, const char* oname)
       
       gen_full_free_list(lr);
     }
+
+    /* we recursively make the post transformations. */
+    if (!make_post_transformation(oname, ru))
+	return FALSE;
     
     return TRUE;
 }
@@ -875,6 +890,14 @@ static bool concurrent_apply(
 		      },
 		      modules);
     }
+    if(okay) {
+    GEN_ARRAY_MAP(oname,
+		  if (!make_post_transformation(oname, ru)) {
+		    okay = FALSE;
+		    break;
+		  },
+		  modules);
+    }
 
     reset_make_cache();
     retrieve_active_phases();
@@ -891,26 +914,26 @@ static bool make_required(const char* oname, rule ru)
     reals = build_real_resources(oname, rule_required(ru));
 
     /* we recursively make required resources */
-    MAP(REAL_RESOURCE, rr, 
+    FOREACH(REAL_RESOURCE, rr, reals)
     {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-	
-	pips_debug(3, "rule %s : %s(%s) - recursive call\n",
-		   rule_phase(ru), rrrn, rron);
-	
-	if (!rmake(rrrn, rron)) {
-	    success_p = FALSE;
-	    /* Want to free the list ... */
-	    break;
-	}
-	
-	/* In french:
-	   ici nous devons  tester si un des regles modified
-	   fait partie des required. Dans ce cas on la fabrique
-	   de suite. */
-	
-    }, reals);
+        string rron = real_resource_owner_name(rr);
+        string rrrn = real_resource_resource_name(rr);
+
+        pips_debug(3, "rule %s : %s(%s) - recursive call\n",
+                rule_phase(ru), rrrn, rron);
+
+        if (!rmake(rrrn, rron)) {
+            success_p = FALSE;
+            /* Want to free the list ... */
+            break;
+        }
+
+        /* In french:
+           ici nous devons  tester si un des regles modified
+           fait partie des required. Dans ce cas on la fabrique
+           de suite. */
+
+    }
 
     gen_full_free_list (reals);
     return success_p;

@@ -1,10 +1,24 @@
+#
+# Copyright 1989-2010 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-pyps_doc.tex: pyps_doc.nw
-	$(NOWEAVE) -delay $< > $@
-
-dist_noinst_DATA=pyps_doc.nw
-doc_DATA=pyps_doc.pdf
-
-CLEANFILES=$(doc_DATA) pyps_doc.tex
+dist_noinst_DATA=pyps.tex
+doc_DATA=pyps.pdf
 include $(top_srcdir)/makes/latex.mk
 

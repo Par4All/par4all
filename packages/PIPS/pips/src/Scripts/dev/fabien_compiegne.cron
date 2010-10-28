@@ -1,11 +1,7 @@
 # $Id$
-# use manually install fortran & runtime
-# for debian/ubuntu compatibility in some tests
-PATH = /usr/local/bin:/usr/bin:/bin
-LD_LIBRARY_PATH=/usr/local/lib64
-#PIPS_VALIDATION_SKIP = Pyps
-PIPS_VALIDATION_NO_PYPS = 1
-PIPS_F77 = gfortran
-PIPS_F90 = gfortran
-* * * * * /home/fabien/pips_check_compile pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
-@daily /home/fabien/pips_check_compile --wait --force pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+# check on commit runs on every minute
+* * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+# force once a day
+@daily /home/fabien/CHECK/pips_check_compile --wait --force --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+# test autoconf version
+@daily /home/fabien/AUTO/pips_check_compile --autoconf --vname=AUTO --source=/home/fabien/AUTO/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation

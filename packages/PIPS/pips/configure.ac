@@ -27,7 +27,6 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 AM_INIT_AUTOMAKE([gnu 1.0])
 AM_PROG_CC_C_O
-AM_PATH_PYTHON(2.5)
 
 # Checks for programs.
 AX_PROG_YACC
@@ -139,7 +138,8 @@ AX_ARG_ENABLE([pyps],
 			[
 			 AC_PROG_SWIG
 			 AC_PYTHON_DEVEL([2.5])
-			 AX_DEPENDS([pyps],[swig python_devel])
+			 AX_CHECK_PROG([ipython])
+			 AX_DEPENDS([pyps],[swig python_devel ipython])
 			]
 )
 
@@ -147,10 +147,8 @@ AX_ARG_ENABLE([pyps-extra],
 			[enable extra python tools],
 			[no],
 			[
-			 AX_CHECK_PROG([ipython])
-			 AX_CHECK_PROG([noweave])
 			 AX_PYTHON_MODULE([Pyro]) 
-			 AX_DEPENDS([pyps-extra],[pyps ipython noweave Pyro])
+			 AX_DEPENDS([pyps-extra],[pyps Pyro])
 			]
 )
 
@@ -182,9 +180,8 @@ AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps
 
 
 
-# this takes care of the gnulib stuff, the CPPFLAGS change is mandatory
+# this takes care of the gnulib stuff
 gl_INIT
-CPPFLAGS="${CPPFLAGS} -I\$(top_builddir)/src/Libs/gnulib"
 
 # devel mode, sets various compiler flags and so on
 # this must be the last check because it modifies CFLAGS

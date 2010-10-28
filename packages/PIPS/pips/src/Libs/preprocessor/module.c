@@ -399,40 +399,25 @@ AddEntityToModuleCompilationUnit(entity e, entity module)
     AddEntityToCompilationUnit(e,cu);
 }
 
-static bool recompile_module_removable_entity_p(gen_chunkp obj)
-{
-    entity e = (entity)obj;
-    return same_string_p(entity_module_name(e),get_current_module_name()) && !entity_area_p(e) && !entity_label_p(e) ;
-}
-
-/* build a textual representation of the modified module and update db
- */
-void
-recompile_module(char* module)
-{
-    entity modified_module = module_name_to_entity(module);
-    statement modified_module_statement =
-        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
-    bool controlizer(string);
-
-    set_current_module_entity( modified_module );
-    set_current_module_statement( modified_module_statement );
+static void do_recompile_module(entity module, statement module_statement) {
 
     /* build and register textual representation */
-    text t = text_module(get_current_module_entity(), modified_module_statement);
+    text t = text_module(module, module_statement);
     //add_new_module_from_text(module,t,fortran_module_p(modified_module),compilation_unit_of_module(module));
     string dirname = db_get_current_workspace_directory();
-    string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-    string filename = db_get_file_resource(res,module,TRUE);
+    string res = fortran_module_p(module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+    string filename = db_get_file_resource(res,module_local_name(module),TRUE);
     string fullname = strdup(concatenate(dirname, "/",filename, NULL));
     FILE* f = safe_fopen(fullname,"w");
+    free(fullname);
     print_text(f,t);
     fclose(f);
     free_text(t);
 
-    DB_PUT_FILE_RESOURCE(res,module,filename);
+    DB_PUT_FILE_RESOURCE(res,module_local_name(module),filename);
 
     /* the module will be reparsed, so fix(=delete) all its previous entites */
+#if 0
     {
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
@@ -445,36 +430,20 @@ recompile_module(char* module)
         entity_declarations(modified_module) = gen_nreverse(p);
         code_initializations(value_code(entity_initial(modified_module)))=make_sequence(NIL);
     }
+#endif
+}
 
-    reset_current_module_entity();
-    reset_current_module_statement();
 
-    /* the ugliest glue ever produced by SG
-     * needed to get all the declarations etc right
-     * unfortunetly we do it without calling pipsmake, so handle it by hand
-     * signed: SG
-     */
-    //string compilation_unit_of_module(string);
-    //string cu = compilation_unit_of_module(module);
-    {
-        gen_array_t modules = db_get_module_list_initial_order();
-        int n = gen_array_nitems(modules), i;
-        for (i=0; i<n; i++)
-        {
-            string m = gen_array_item(modules, i);
-	    if(!db_resource_required_or_available_p(DBR_CODE,m)) {
-	      (void) controlizer(m);
-	    }
-//            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
-//                print_code(m);
-        }
-    }
+/* build a textual representation of the modified module and update db
+ */
+bool
+recompile_module(char* module)
+{
+    entity modified_module = module_name_to_entity(module);
+    statement modified_module_statement =
+        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+    do_recompile_module(modified_module,modified_module_statement);
+    return true;
 
-    bool parser(string); // Fortran parser
-    bool c_parser(string); // C parser
-    bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
-    if(!parsing_ok)
-        pips_user_error("failed to recompile module");
-    if(!controlizer(module))
-        pips_user_warning("failed to apply controlizer after recompilation");
+
 }

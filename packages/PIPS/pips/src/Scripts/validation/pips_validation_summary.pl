@@ -6,6 +6,8 @@
 #
 # Usage: $0 SUMMARY [previous-summary]
 
+# Bug: homonymous issue with bug & future
+
 use strict;
 
 # manage arguments
@@ -14,7 +16,7 @@ my $summary = $ARGV[0];
 my $differential = @ARGV==2;
 
 # all possible validation status
-my $status = 'failed|changed|passed|timeout|keptout';
+my $status = 'failed|changed|passed|timeout|keptout|bug|later';
 
 # other miscellaneous issues
 my $others =
@@ -136,7 +138,8 @@ for my $c (sort keys %new)
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
 my $count = $not_passed + $n{passed};
 my $warned = $n{skipped} + $n{orphan} + $n{missing} +
-    $n{'multi-script'} + $n{'multi-source'} + $n{keptout};
+    $n{'multi-script'} + $n{'multi-source'} +
+    $n{keptout} + $n{bug} + $n{later};
 
 # status change summary
 my $status_changes = '';
@@ -158,11 +161,13 @@ print
 
 print
   " * status changes:$status_changes\n" .
-  "   .=None P=passed F=failed C=changed T=timeout K=keptout\n"
+  "   .=None P=passed F=failed C=changed T=timeout K=keptout B=bug L=later\n"
     if $status_changes;
 
 print
   "number of warnings: $warned\n" .
+  " * bug: $n{bug} (bugged case)\n" .
+  " * later: $n{later} (future test case)\n" .
   " * keptout: $n{keptout} (cannot run test)\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
@@ -197,11 +202,13 @@ for my $dir (sort keys %d)
   printf "%-28s %4d  %4d  %5.1f%%", $dir, $dircount, $failures, $success_rate;
 
   # show some details
-  if ($success_rate!=100.0 or $d{$dir}{keptout} or
+  if ($success_rate!=100.0 or
+      $d{$dir}{keptout} or $d{$dir}{bug} or $d{$dir}{later} or
       (exists $diff{$dir} and $differential))
   {
-    printf " (%d+%d+%d|%d)",
-      $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout}, $d{$dir}{keptout};
+    printf " (%d+%d+%d|%d+%d+%d)",
+      $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout},
+      $d{$dir}{keptout}, $d{$dir}{bug}, $d{$dir}{later};
 
     if ($differential) {
       for my $change (sort keys %{$diff{$dir}}) {
@@ -217,10 +224,13 @@ print "\n";
 # generate one summary line for mail subject
 if ($n{passed} == $count)
 {
-  print "SUCCEEDED $count$status_changes $delay\n";
+  # PASSED?
+  print "SUCCESS $count",
+    ($n{keptout}+$n{bug}+$n{later})? " ($n{keptout}+$n{bug}+$n{later})": "",
+    "$status_changes $delay\n";
 }
 else
 {
   print "FAILED $not_passed/$count ",
-    "($n{failed}+$n{changed}+$n{timeout}|$n{keptout})$status_changes $delay\n";
+    "($n{failed}+$n{changed}+$n{timeout}|$n{keptout}+$n{bug}+$n{later})$status_changes $delay\n";
 }
