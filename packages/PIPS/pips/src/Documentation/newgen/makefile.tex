@@ -104,7 +104,7 @@ rules). }
 
 \section{Definition of a particular rule}
 
-\domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource* x pre\_transformation:virtual\_resource*}
+\domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource* x pre\_transformation:virtual\_resource* x  post\_transformation:virtual\_resource*}
 {The domain {\tt rule} permits the description of the actions of the phases of
   Pips on the resources managed by pips-db. Each phase
   requires that certain resources by available disponibles ({\tt
@@ -114,6 +114,7 @@ rules). }
   modified}). The difference between the resources produced and 
   and those modified permit the driver to successively manifest the phases on the 
   correct order. 
+  Post processing phases are stored in {\tt post\_transformation}
 
 The transformation phases act on the code of the modules, which 
 generally implies that the information which describe this module

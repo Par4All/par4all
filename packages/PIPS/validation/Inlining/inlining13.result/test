@@ -126,34 +126,28 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          freia_aipo_copy(imout, imin);
          ret = 0;
       }
-      else {
-         if (connexity==4) goto l99998;
-         if (connexity==6) goto l99997;
-         if (connexity==8) goto l99996;
-
-         ret = 2;
-         goto l99995;
-l99996:         ;
-
-         freia_aipo_dilate_8c(imout, imin, kernel_8c);
+      else if (connexity==4) {
+         freia_aipo_dilate_8c(imout, imin, kernel_4c);
          for (i = 1;i<size;i++)
-            freia_aipo_dilate_8c(imout, imout, kernel_8c);
-         goto l99995;
-l99997:         ;
+            freia_aipo_dilate_8c(imout, imout, kernel_4c);
+         ret = 0;
+      }
+      else if (connexity==6) {
 
          freia_aipo_dilate_6c(imout, imin, kernel_6c);
          for (i = 1;i<size;i++)
             freia_aipo_dilate_6c(imout, imout, kernel_6c);
          ret = 0;
-         goto l99995;
-l99998:         ;
-         freia_aipo_dilate_8c(imout, imin, kernel_4c);
-         for (i = 1;i<size;i++)
-            freia_aipo_dilate_8c(imout, imout, kernel_4c);
-         ret = 0;
-l99995:         ;
-
       }
+      else if (connexity==8) {
+
+         freia_aipo_dilate_8c(imout, imin, kernel_8c);
+         for (i = 1;i<size;i++)
+            freia_aipo_dilate_8c(imout, imout, kernel_8c);
+      }
+      else
+
+         ret = 2;
       
       
       _return0 = ret;

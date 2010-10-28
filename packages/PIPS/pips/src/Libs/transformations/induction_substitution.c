@@ -53,9 +53,6 @@
 #include "resources.h"
 #include "transformations.h"
 
-/* We use a set to accumulate loop indices during loop traversal */
-static set loop_indices_b = HASH_UNDEFINED_VALUE;
-
 /* Context used for substitution with gen_context_recurse */
 typedef struct {
     entity to_substitute; /* The induction variable */
@@ -63,8 +60,64 @@ typedef struct {
 } substitute_ctx;
 
 
+/** \fn static bool is_modified_entity_in_transformer( transformer T, entity ent )
+ *  \brief Check in transformer if the entity ent is not (potentially) modified
+ *  \param T the transformer that will be checked
+ *  \param ent the entity we are looking for
+ *  \return true if entity ent has been found in the transformer T
+ */
+static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
+    bool is_modified = FALSE;
+
+    list entities = transformer_arguments( T );
+
+    for ( list el = entities; !ENDP( el ); POP( el ) ) {
+        if ( ENTITY( CAR( el ) ) == ent ) {
+            is_modified = TRUE;
+            break;
+        }
+    }
+    return is_modified;
+}
 
 
+/**
+ * Use transformer associated to the loop to check that variable v is invariant
+ */
+static bool loop_invariant_p( Variable v, list /* of statements */ loops ) {
+  bool result = false;
+  FOREACH(statement, s, loops) {
+    transformer t = load_statement_transformer( s );
+    if( !is_modified_entity_in_transformer(t,(entity)v ) ) {
+      result = true;
+    }
+  }
+
+  if(result) pips_debug(4,"%s is a loop invariant !\n",entity_name((entity)v));
+  else pips_debug(4,"%s is not a loop invariant !\n",entity_name((entity)v));
+
+  return result;
+}
+
+
+/**
+ * Check if variable v is an index for an enclosing loop
+ */
+static bool index_of_a_loop_p( Variable v, list /* of statements */ loops ) {
+  bool result = false;
+  FOREACH(statement, s, loops) {
+    loop l = statement_loop(s);
+    pips_debug(5,"Enclosed loop with index : %s\n",entity_name(loop_index(l)));
+    if( same_entity_p((entity)v,loop_index(l) ) ) {
+      result = true;
+    }
+  }
+
+  if(result) pips_debug(4,"%s is a loop index !\n",entity_name((entity)v));
+  else pips_debug(4,"%s is not a loop index !\n",entity_name((entity)v));
+
+  return result;
+}
 
 /** \fn static bool inc_or_de_crement_instruction_p( instruction i ) {
  * \brief check if the instruction is a ++ or --
@@ -180,30 +233,10 @@ static expression get_right_part_of_assignment( instruction i ) {
     return e;
 }
 
-/** \fn static bool is_modified_entity_in_transformer( transformer T, entity ent )
- *  \brief Check in transformer if the entity ent is not (potentially) modified
- *  \param T the transformer that will be checked
- *  \param ent the entity we are looking for
- *  \return true if entity ent has been found in the transformer T
- */
-static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
-    bool is_modified = FALSE;
-
-    list entities = transformer_arguments( T );
-
-    for ( list el = entities; !ENDP( el ); POP( el ) ) {
-        if ( ENTITY( CAR( el ) ) == ent ) {
-            is_modified = TRUE;
-            break;
-        }
-    }
-    return is_modified;
-}
 
 /** \fn static bool subtitute_induction_statement_in( statement s )
  *  \brief Call during top-down phase while recursing on statements
- *  Will push loop indices in global static variable loop_indices_b
- *  and will use precondition on each assignment statement to construct
+ *  Will use precondition on each assignment statement to construct
  *  substitution expression when possible
  *  \param s the statement that will be checked
  *  \return always true
@@ -216,16 +249,9 @@ static bool subtitute_induction_statement_in( statement s ) {
         print_statement( s );
     }
 
-    if ( statement_loop_p( s ) ) {
-        /* We have a loop, we keep track of the index */
-        entity i = loop_index( statement_loop( s ) );
-        
-        pips_debug( 3, "Entering level-%d loop, index=%s\n", set_size( loop_indices_b ), entity_name( i ) );
-        
-        // Add current loop index
-        set_add_element( loop_indices_b, loop_indices_b, (Variable) i );
-        
-    } else if ( !set_empty_p( loop_indices_b ) ) {
+    // Get enclosing loops
+    list loops = load_statement_enclosing_loops(s);
+    if ( !ENDP( loops ) && !statement_loop_p(s) ) {
         /* s is not a loop, but we must be somewhere inside a loop since we have some (useful) loop_indices */
 
         /* For the moment, we will only work on assignment */
@@ -250,6 +276,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                 dump_text( tmp );
                 free_text( tmp );
                 print_statement( s );
+                pips_debug( 5, "Nb of enclosing loops : %d\n", (int)gen_length(loops) );
             }
 
             /* Get the set of preconditions equations from which we'll build substitution expressions  */
@@ -286,7 +313,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                     } else {
                         /* We have a variable */
 
-                        if ( set_belong_p( loop_indices_b, v ) ) {
+                        if(index_of_a_loop_p(v, loops) || loop_invariant_p(v, loops)) {
                             /* We have found a loop index */
                             found_loop_index = TRUE;
                             /* We build an expression "coeff*v" */
@@ -471,25 +498,6 @@ static bool subtitute_induction_statement_in( statement s ) {
     return result;
 }
 
-/** \fn static bool subtitute_induction_statement_out( statement s )
- *  \brief During Bottom-up we pop out loop indices
- *  \param s the statement that will be checked
- *  \return always true
- */
-static void subtitute_induction_statement_out( statement s ) {
-    if ( statement_loop_p( s ) ) {
-        entity i = loop_index( statement_loop( s ) );
-
-        pips_debug( 3, "Exiting loop with index %s, size=%d\n",
-                entity_name( i ), set_size( loop_indices_b ) );
-
-        /* Sanity check */
-        pips_assert( "Current loop indices was not in the base", set_belong_p( loop_indices_b, (Variable)i ) );
-
-        set_del_element( loop_indices_b, loop_indices_b, (Variable) i );
-    }
-}
-
 /** \fn bool induction_substitution( char * module_name )
  *  \brief This pass implement the detection and the substitution
  *  of induction variable in loop
@@ -516,13 +524,15 @@ bool induction_substitution( char * module_name ) {
     debug_on( "INDUCTION_SUBSTITUTION_DEBUG_LEVEL" );
     pips_debug( 1, "begin\n" );
 
+
+    pips_debug(6, "finding enclosing loops ...\n");
+    set_enclosing_loops_map( loops_mapping_of_statement( module_stat ) );
+
     /* We now traverse our module's statements. */
-    loop_indices_b = set_make( set_pointer );
     gen_recurse( module_stat, statement_domain, subtitute_induction_statement_in,
-            subtitute_induction_statement_out );
+            gen_true );
 
     /* Sanity checks */
-    pips_assert("Loop index Pbase is empty", set_empty_p(loop_indices_b));
     pips_assert( "Consistent final check\n", gen_consistent_p( (gen_chunk *)module_stat ) );
 
     pips_debug( 1, "end\n" );
@@ -531,6 +541,8 @@ bool induction_substitution( char * module_name ) {
     /* Save modified code to database */
     module_reorder( module_stat );
     DB_PUT_MEMORY_RESOURCE( DBR_CODE, strdup( module_name ), module_stat );
+
+    clean_enclosing_loops( );
 
     reset_current_module_entity( );
     reset_current_module_statement( );

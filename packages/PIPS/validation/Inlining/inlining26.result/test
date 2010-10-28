@@ -29,15 +29,12 @@ int gradient(void)
    int _return0, _return1;
    {
       int i;
-      if (0) goto l99999;
-      _return0 = 1;
-      goto l99995;
-l99999:      ;
-      
-      
-      _return0 = 0;
-l99995:      ;
-
+      if (0)
+         
+         
+         _return0 = 0;
+      else
+         _return0 = 1;
    }
    _return0;
    _return1 = 0;

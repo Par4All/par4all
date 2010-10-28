@@ -57,6 +57,7 @@
 <TEXT>\#		{return MODIFIED;}
 <TEXT>=		        {return PRESERVED;}
 <TEXT>\!	        {return PRE_TRANSFORMATION;}
+<TEXT>\*	        {return POST_TRANSFORMATION;}
 <TEXT>\.		{return DOT;}
 <TEXT>[-_a-zA-Z0-9]+	{ yylval.name=strdup(yytext); return NAME;}
 <TEXT,COMMENT>.               	{

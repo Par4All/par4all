@@ -44,6 +44,7 @@
 %token MODIFIED
 %token PRESERVED
 %token PRE_TRANSFORMATION
+%token POST_TRANSFORMATION
 %token DOT
 %token <name> NAME
 
@@ -132,6 +133,11 @@ deps:		deps dir virtuals
 			    gen_nconc(rule_pre_transformation($1), $3);
 			
 		    }
+		    else if ($2 == POST_TRANSFORMATION) {
+			rule_post_transformation($1) = 
+			    gen_nconc(rule_post_transformation($1), $3);
+			
+		    }
 		    else {	
 			fprintf(stderr, 
 				"[readmakefile] unknown dir: %d\n", $2);
@@ -142,7 +148,7 @@ deps:		deps dir virtuals
 		}
 				
 	|
-		{ $$ = make_rule(string_undefined, NIL, NIL, NIL, NIL, NIL); }
+		{ $$ = make_rule(string_undefined, NIL, NIL, NIL, NIL, NIL,NIL); }
 	;
 
 dir:		REQUIRED
@@ -155,6 +161,8 @@ dir:		REQUIRED
 		{ $$ = PRESERVED; }
 	|	PRE_TRANSFORMATION
 		{ $$ = PRE_TRANSFORMATION; }
+	|	POST_TRANSFORMATION
+		{ $$ = POST_TRANSFORMATION; }
 	;
 
 virtuals:	virtuals virtual

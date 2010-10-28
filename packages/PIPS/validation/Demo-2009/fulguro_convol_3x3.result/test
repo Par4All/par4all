@@ -202,38 +202,38 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
             }
          }
       }
-   if (vec==(void *) 0) goto l99999;
-   if (vec->array==(void *) 0) goto l99998;
    {
-      //PIPS generated variable
-      void *P_4;
-      P_4 = vec->array;
-      
-      
-      free(P_4);
+      if (vec==(void *) 0) {
+         
+         
+         fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null object\n", "./fulguro-included.h", 1060, __FUNCTION__);
+         _return0 = FLGR_RET_NULL_OBJECT;
+      }
+      else if (vec->array==(void *) 0) {
+
+         fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Vector array is null\n", "./fulguro-included.h", 1065, __FUNCTION__);
+         _return0 = FLGR_RET_NULL_OBJECT;
+      }
+      else {
+         {
+            //PIPS generated variable
+            void *P_4;
+            P_4 = vec->array;
+            
+            
+            free(P_4);
+         }
+         
+         
+         
+         
+         free(vec);
+         
+         
+         
+         _return0 = FLGR_RET_OK;
+      }
    }
-   
-   
-   
-   
-   free(vec);
-   
-   
-   
-   _return0 = FLGR_RET_OK;
-   goto l99997;
-l99998:   ;
-
-   fprintf(stderr, "Vector array is null\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1065, __FUNCTION__);
-   _return0 = FLGR_RET_NULL_OBJECT;
-l99999:   ;
-   
-   
-   fprintf(stderr, "Null object\n""ERROR: File %s, Line %d, Function %s: ", "./fulguro-included.h", 1060, __FUNCTION__);
-   _return0 = FLGR_RET_NULL_OBJECT;
-l99997:   ;
-
-
    _return0;
    return;
 }

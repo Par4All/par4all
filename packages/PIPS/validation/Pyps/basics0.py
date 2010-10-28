@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 #!/usr/bin/env python
 
 # import everything so that a session looks like tpips one
@@ -16,7 +17,7 @@ with workspace("basics0.c") as w:
 	mb=w["megablast"]
 	
 	# and apply transformation to modules
-	foo.inlining(callers="bar",PURGE_LABELS=False)
+	foo.inlining(callers="bar",USE_INITIALIZATION_LIST=False)
 	
 	#the good old display, default to PRINTED_FILE, but you can give args
 	foo.display()

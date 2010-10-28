@@ -5,6 +5,7 @@ int main()
     a=a+1;
     b=a;
     c=a;
+    c=b;
     a=a+2;
     printf("%d",a);
     printf("%d",a);

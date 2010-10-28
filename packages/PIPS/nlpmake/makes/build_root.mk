@@ -98,6 +98,33 @@ cscope.out:cscope-clean
 cscope-clean:
 	$(RM) cscope.out
 
+# autoconf compilation
+# --enable-doc --enable-devel-mode
+BUILD.dir	= _build
+HERE	:= $(shell pwd)
+INSTALL.dir	= $(HERE)/../../install
+DOWNLOAD.dir	= $(HERE)/../..
+ifndef EXTERN_ROOT
+EXTERN_ROOT	= $(HERE)/../extern
+endif
+
+.PHONY: auto-clean
+auto-clean:
+	$(RM) -r $(BUILD.dir) autom4te.cache
+	$(RM) configure depcomp config.guess config.sub ltmain.sh \
+	       config.h.in missing aclocal.m4 install-sh compile py-compile
+	find . -name .svn -prune -o -name Makefile.in -print0 | xargs -0 rm -f
+
+.PHONY: auto
+auto: auto-clean
+	autoreconf -vi
+	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
+	../configure --disable-static --prefix=$(INSTALL.dir) \
+		PATH=$(INSTALL.dir)/bin:$$PATH \
+		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
+		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
+	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
+	$(MAKE) -C $(BUILD.dir) install
 
 # force tags target
 tags: tags-clean

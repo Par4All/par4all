@@ -140,7 +140,7 @@ int main(void)
    freia_common_destruct_data(imtmp_0);
    
    
-   _return0 = ret_0;
+   _return2 = ret_0;
 
    imtmp_1 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
 
@@ -185,7 +185,7 @@ int main(void)
    freia_common_destruct_data(imtmp_1);
    
    
-   _return4 = ret_1;
+   _return1 = ret_1;
 
    freia_aipo_threshold(imopenth, imopen, 1, 50, 1);
    freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);
@@ -220,7 +220,7 @@ int main(void)
    freia_common_destruct_data(imtmp_2);
    
    
-   _return1 = ret_2;
+   _return3 = ret_2;
 
    imtmp_3 = freia_common_create_data(imout->bpp, imout->widthWa, imout->heightWa);
    
@@ -250,7 +250,7 @@ int main(void)
    freia_common_destruct_data(imtmp_3);
    
    
-   _return2 = ret_3;
+   _return4 = ret_3;
    
    
    freia_aipo_dilate_8c(imoutrepl, imout, freia_morpho_kernel_8c);
@@ -259,7 +259,7 @@ int main(void)
    i_4 = 3;
    
    
-   _return3 = 0;
+   _return0 = 0;
 
    freia_aipo_and(imoutrepl, imoutrepl, imin);
    freia_common_tx_image(imoutrepl, &fdout);

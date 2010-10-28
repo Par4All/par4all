@@ -1,0 +1,27 @@
+void dscal_r(int n, float da, float dx[n])
+{
+   int i;
+   for(i = 0; i <= n-1; i += 1)
+      dx[i] = da*dx[i];
+}
+void dscal_r(int n, float da, float dx[n])
+{
+   //PIPS generated variable
+   int LU_IND0, LU_IB00, LU_NUB00;
+   //SAC generated temporary array
+   a4sf pdata0 = {da, da, da, da};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0;
+   LU_NUB00 = n;
+   LU_IB00 = MOD(LU_NUB00, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
+      dx[LU_IND0] = pdata0[0]*dx[LU_IND0];
+   SIMD_LOAD_V4SF(vec10_0, &pdata0[0]);
+   for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec00_0, &dx[LU_IND0]);
+      SIMD_MULPS(vec00_0, vec10_0, vec00_0);
+      SIMD_STORE_V4SF(vec00_0, &dx[LU_IND0]);
+   }
+   ;
+}

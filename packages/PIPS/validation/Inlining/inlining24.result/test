@@ -185,31 +185,25 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          freia_aipo_copy(imout, imin);
          ret = 0;
       }
-      else {
-         if (connexity==4) goto l99998;
-         if (connexity==6) goto l99997;
-         if (connexity==8) goto l99996;
-         ret = 2;
-         goto l99995;
-l99996:         ;
-         freia_aipo_dilate_8c(imout, imin, kernel_8c);
-         for(i = 1; i <= size-1; i += 1)
-            freia_aipo_dilate_8c(imout, imout, kernel_8c);
-         goto l99995;
-l99997:         ;
-         freia_aipo_dilate_6c(imout, imin, kernel_6c);
-         for(i = 1; i <= size-1; i += 1)
-            freia_aipo_dilate_6c(imout, imout, kernel_6c);
-         ret = 0;
-         goto l99995;
-l99998:         ;
+      else if (connexity==4) {
          freia_aipo_dilate_8c(imout, imin, kernel_4c);
          for(i = 1; i <= size-1; i += 1)
             freia_aipo_dilate_8c(imout, imout, kernel_4c);
          ret = 0;
-l99995:         ;
-
       }
+      else if (connexity==6) {
+         freia_aipo_dilate_6c(imout, imin, kernel_6c);
+         for(i = 1; i <= size-1; i += 1)
+            freia_aipo_dilate_6c(imout, imout, kernel_6c);
+         ret = 0;
+      }
+      else if (connexity==8) {
+         freia_aipo_dilate_8c(imout, imin, kernel_8c);
+         for(i = 1; i <= size-1; i += 1)
+            freia_aipo_dilate_8c(imout, imout, kernel_8c);
+      }
+      else
+         ret = 2;
       
       
       _return0 = ret;
@@ -269,31 +263,25 @@ int main()
             freia_aipo_copy(imout, imin);
             ret = 0;
          }
-         else {
-            if (connexity==4) goto l99989;
-            if (connexity==6) goto l99988;
-            if (connexity==8) goto l99987;
-            ret = 2;
-            goto l99986;
-l99987:            ;
-            freia_aipo_dilate_8c(imout, imin, kernel_8c);
-            for(i = 1; i <= size-1; i += 1)
-               freia_aipo_dilate_8c(imout, imout, kernel_8c);
-            goto l99986;
-l99988:            ;
-            freia_aipo_dilate_6c(imout, imin, kernel_6c);
-            for(i = 1; i <= size-1; i += 1)
-               freia_aipo_dilate_6c(imout, imout, kernel_6c);
-            ret = 0;
-            goto l99986;
-l99989:            ;
+         else if (connexity==4) {
             freia_aipo_dilate_8c(imout, imin, kernel_4c);
             for(i = 1; i <= size-1; i += 1)
                freia_aipo_dilate_8c(imout, imout, kernel_4c);
             ret = 0;
-l99986:            ;
-
          }
+         else if (connexity==6) {
+            freia_aipo_dilate_6c(imout, imin, kernel_6c);
+            for(i = 1; i <= size-1; i += 1)
+               freia_aipo_dilate_6c(imout, imout, kernel_6c);
+            ret = 0;
+         }
+         else if (connexity==8) {
+            freia_aipo_dilate_8c(imout, imin, kernel_8c);
+            for(i = 1; i <= size-1; i += 1)
+               freia_aipo_dilate_8c(imout, imout, kernel_8c);
+         }
+         else
+            ret = 2;
          
          
          _return0 = ret;
@@ -344,31 +332,25 @@ l99986:            ;
             freia_aipo_copy(imout, imin);
             ret = 0;
          }
-         else {
-            if (connexity==4) goto l99985;
-            if (connexity==6) goto l99984;
-            if (connexity==8) goto l99983;
-            ret = 2;
-            goto l99982;
-l99983:            ;
-            freia_aipo_dilate_8c(imout, imin, kernel_8c);
-            for(i = 1; i <= size-1; i += 1)
-               freia_aipo_dilate_8c(imout, imout, kernel_8c);
-            goto l99982;
-l99984:            ;
-            freia_aipo_dilate_6c(imout, imin, kernel_6c);
-            for(i = 1; i <= size-1; i += 1)
-               freia_aipo_dilate_6c(imout, imout, kernel_6c);
-            ret = 0;
-            goto l99982;
-l99985:            ;
+         else if (connexity==4) {
             freia_aipo_dilate_8c(imout, imin, kernel_4c);
             for(i = 1; i <= size-1; i += 1)
                freia_aipo_dilate_8c(imout, imout, kernel_4c);
             ret = 0;
-l99982:            ;
-
          }
+         else if (connexity==6) {
+            freia_aipo_dilate_6c(imout, imin, kernel_6c);
+            for(i = 1; i <= size-1; i += 1)
+               freia_aipo_dilate_6c(imout, imout, kernel_6c);
+            ret = 0;
+         }
+         else if (connexity==8) {
+            freia_aipo_dilate_8c(imout, imin, kernel_8c);
+            for(i = 1; i <= size-1; i += 1)
+               freia_aipo_dilate_8c(imout, imout, kernel_8c);
+         }
+         else
+            ret = 2;
          
          
          _return0 = ret;
@@ -428,31 +410,25 @@ int main()
       freia_aipo_copy(imout, imin);
       ret_1 = 0;
    }
-   else {
-      if (connexity==4) goto l99989;
-      if (connexity==6) goto l99988;
-      if (connexity==8) goto l99987;
-      ret_1 = 2;
-      goto l99986;
-l99987:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      goto l99986;
-l99988:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-      ret_1 = 0;
-      goto l99986;
-l99989:      ;
+   else if (connexity==4) {
       freia_aipo_dilate_8c(imout, imin, kernel_4c_0);
       for(i_0 = 1; i_0 <= size-1; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
       ret_1 = 0;
-l99986:      ;
-
    }
+   else if (connexity==6) {
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
+      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
+      ret_1 = 0;
+   }
+   else if (connexity==8) {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
+      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+   }
+   else
+      ret_1 = 2;
    
    
    _return0_0 = ret_1;
@@ -492,31 +468,25 @@ l99986:      ;
       freia_aipo_copy(imout, imin);
       ret_3 = 0;
    }
-   else {
-      if (connexity==4) goto l99985;
-      if (connexity==6) goto l99984;
-      if (connexity==8) goto l99983;
-      ret_3 = 2;
-      goto l99982;
-l99983:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
-      goto l99982;
-l99984:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
-      ret_3 = 0;
-      goto l99982;
-l99985:      ;
+   else if (connexity==4) {
       freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
       for(i_1 = 1; i_1 <= size-1; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
       ret_3 = 0;
-l99982:      ;
-
    }
+   else if (connexity==6) {
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
+      ret_3 = 0;
+   }
+   else if (connexity==8) {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+   }
+   else
+      ret_3 = 2;
    
    
    _return0_1 = ret_3;
@@ -638,63 +608,7 @@ int main()
 
       ret_1 = 0;
    }
-   else {
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
-
-      if (connexity==4) goto l99989;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
-
-      if (connexity==6) goto l99988;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
-
-      if (connexity==8) goto l99987;
-
-//  P() {0==-1}
-
-      ret_1 = 2;
-      goto l99986;
-l99987:      ;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
-
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
-
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4, 1<=i_0, i_0<=3}
-
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      goto l99986;
-l99988:      ;
-
-//  P() {0==-1}
-
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-
-//  P() {0==-1}
-
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-
-//  P() {0==-1}
-
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-
-//  P() {0==-1}
-
-      ret_1 = 0;
-      goto l99986;
-l99989:      ;
+   else if (connexity==4) {
 
 //  P() {0==-1}
 
@@ -711,13 +625,47 @@ l99989:      ;
 //  P() {0==-1}
 
       ret_1 = 0;
-l99986:      ;
+   }
+   else if (connexity==6) {
+
+//  P() {0==-1}
+
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
+
+//  P() {0==-1}
+
+      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
+
+//  P() {0==-1}
+
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
+
+//  P() {0==-1}
+
+      ret_1 = 0;
+   }
+   else if (connexity==8) {
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4, 4<=i_0}
+//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
 
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
 
+//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
+//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
+
+      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
+
+//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
+//    ret_1,ret_2,ret_3,size) {connexity==8, size==4, 1<=i_0, i_0<=3}
+
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
    }
+   else
+
+//  P() {0==-1}
+
+      ret_1 = 2;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
@@ -822,31 +770,43 @@ l99986:      ;
 
       ret_3 = 0;
    }
-   else {
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
-
-      if (connexity==4) goto l99985;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
-
-      if (connexity==6) goto l99984;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
-
-      if (connexity==8) goto l99983;
+   else if (connexity==4) {
 
 //  P() {0==-1}
 
-      ret_3 = 2;
-      goto l99982;
-l99983:      ;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
+
+//  P() {0==-1}
+
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+
+//  P() {0==-1}
+
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
+
+//  P() {0==-1}
+
+      ret_3 = 0;
+   }
+   else if (connexity==6) {
+
+//  P() {0==-1}
+
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
+
+//  P() {0==-1}
+
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+
+//  P() {0==-1}
+
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
+
+//  P() {0==-1}
+
+      ret_3 = 0;
+   }
+   else if (connexity==8) {
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
@@ -865,50 +825,12 @@ l99983:      ;
 //    size==4, 1<=i_1, i_1<=3}
 
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
-      goto l99982;
-l99984:      ;
-
-//  P() {0==-1}
-
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
-
-//  P() {0==-1}
-
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-
-//  P() {0==-1}
-
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
-
-//  P() {0==-1}
-
-      ret_3 = 0;
-      goto l99982;
-l99985:      ;
-
-//  P() {0==-1}
-
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
-
-//  P() {0==-1}
-
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-
-//  P() {0==-1}
-
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
-
-//  P() {0==-1}
-
-      ret_3 = 0;
-l99982:      ;
-
-//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4, 4<=i_1}
-
-
    }
+   else
+
+//  P() {0==-1}
+
+      ret_3 = 2;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
@@ -991,31 +913,25 @@ int main()
       freia_aipo_copy(imout, imin);
       ret_1 = 0;
    }
-   else {
-      if (8==4) goto l99989;
-      if (8==6) goto l99988;
-      if (8==8) goto l99987;
-      ret_1 = 2;
-      goto l99986;
-l99987:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      for(i_0 = 1; i_0 <= 3; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      goto l99986;
-l99988:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-      ret_1 = 0;
-      goto l99986;
-l99989:      ;
+   else if (8==4) {
       freia_aipo_dilate_8c(imout, imin, kernel_4c_0);
       for(i_0 = 1; i_0 <= size-1; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
       ret_1 = 0;
-l99986:      ;
-
    }
+   else if (8==6) {
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
+      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
+      ret_1 = 0;
+   }
+   else if (8==8) {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
+      for(i_0 = 1; i_0 <= 3; i_0 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+   }
+   else
+      ret_1 = 2;
    
    
    _return0_0 = ret_1;
@@ -1055,31 +971,25 @@ l99986:      ;
       freia_aipo_copy(imout, imin);
       ret_3 = 0;
    }
-   else {
-      if (8==4) goto l99985;
-      if (8==6) goto l99984;
-      if (8==8) goto l99983;
-      ret_3 = 2;
-      goto l99982;
-l99983:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
-      for(i_1 = 1; i_1 <= 3; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
-      goto l99982;
-l99984:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
-      ret_3 = 0;
-      goto l99982;
-l99985:      ;
+   else if (8==4) {
       freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
       for(i_1 = 1; i_1 <= size-1; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
       ret_3 = 0;
-l99982:      ;
-
    }
+   else if (8==6) {
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
+      ret_3 = 0;
+   }
+   else if (8==8) {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
+      for(i_1 = 1; i_1 <= 3; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+   }
+   else
+      ret_3 = 2;
    
    
    _return0_1 = ret_3;

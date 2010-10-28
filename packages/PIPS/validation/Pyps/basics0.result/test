@@ -8,7 +8,6 @@ void bar(int *c)
    int _return0;
 
    _return0 = 2;
-l99999:   ;
    *c = _return0;
 }
 void malabar(int *c)
@@ -43,7 +42,6 @@ void bar(int *c)
    int _return0;
 
    _return0 = 2;
-l99999:   ;
    *c = _return0;
 }
 void megablast(int n)

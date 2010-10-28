@@ -89,10 +89,10 @@ void GenericCleanLocalEntities(entity function, bool fortran_p)
     if(!storage_undefined_p(s) && storage_ram_p(s)) {
       entity sec = ram_section(storage_ram(s));
       type t = entity_type(sec);
-
-      pips_assert("t is an area", type_area_p(t));
-
-      gen_remove(&(area_layout(type_area(t))),e);
+      if(!type_undefined_p(t)) {
+          pips_assert("t is an area", type_area_p(t));
+          gen_remove(&(area_layout(type_area(t))),e);
+      }
     }
 
     /* In C, parameter typing may have already occured and the return

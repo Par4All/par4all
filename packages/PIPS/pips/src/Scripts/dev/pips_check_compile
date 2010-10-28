@@ -32,30 +32,42 @@
 nice=
 wait=
 force=
+source=
+autoconf=
 parallel=1
 validate=mail-diff-validate
+vname=CHECK
 
 # get options
 while [[ $1 == -* ]]
 do
   case $1 in
+    -a|--autoconf) autoconf=1 ;;
+    --nlpmake) autoconf= ;;
     -n|--nice) nice=nice ;;
     -f|--force) validate=mail-validate ; force=1 ;;
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1//*=/} ;;
     -s|--sequential) parallel= ;;
     -p|--parallel) parallel=1 ;;
+    -v|--vname) vname=$2 ; shift ;;
+    --vname=*) wait=${1//*=/} ;;
+    -S|--source) source=$2; shift ;;
+    --source=*) source=${1//*=/} ;;
     -h|--help)
       echo -e \
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation]\n" \
         "check pips compilation and validation health\n" \
 	"available options:\n" \
-	"  -n: run with nice\n" \
+	"  -a: compile with autoconf\n" \
 	"  -f: force even if not needed\n" \
-	"  -w: wait for lock\n" \
-	"  -s: do not run in parallel\n" \
-	"  -p: run in parallel (the default)\n" \
 	"  -h: show this help and exit\n"
+	"  -n: run with nice\n" \
+	"  -p: run in parallel (the default)\n" \
+	"  -s: do not run in parallel\n" \
+	"  -S file: source file for environment\n" \
+	"  -v name: validation name\n" \
+	"  -w: wait for lock\n" \
       exit 0
       ;;
     *) echo "$0 unexpected option: $1" >&2 ; exit 1 ;;
@@ -200,6 +212,13 @@ then
     report 'KO:no-wc' 'unknown' "'$valid' is not a working copy"
 fi
 
+# environment
+if [ "$source" ]
+then
+  source $source || \
+    report 'KO:source' 'unknown' "cannot 'source $source'"
+fi
+
 cd $prod || \
     report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
 
@@ -264,19 +283,43 @@ fi
 # recompilation, possibly forced
 if [ "$force" ] || ! cmp -s CURRENT PREVIOUS
 then
-  # something may have changed, let us recompile
-  $nice $make unbuild > out 2> err \
+  if [ "$autoconf" ]
+  then
+    # AUTOCONF compilation
+    # polylib is assumed to be available somewhere
+    # aggressive cleanup
+    rm -rf ../install
+    # ???
+    $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
-  # what about a "timeout"? how to differentiate from a simple failure?
-  $nice $make build > out 2> err \
+    $nice $make auto > out 2> err \
+      || report 'KO:make' 'auto' 'cannot "make auto"'
+    # check exe, script & lib
+    test -x ../install/bin/tpips \
+      || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    test -x ../install/bin/pips_validation_summary.pl \
+      || report 'KO:make' 'script' 'missing script...'
+    # hmmm...
+    ldpips=$prod/../install/lib/python*/site-packages/pips
+    test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
+      || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
+  else
+    # NLPMAKE compilation
+    # something may have changed, let us recompile
+    $nice $make unbuild > out 2> err \
+      || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
+    # what about a "timeout"? how to differentiate from a simple failure?
+    $nice $make build > out 2> err \
       || report 'KO:make' 'build' 'cannot "make build"'
+    # check executable & script
+    test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
+      || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    test -x pips/utils/pips_validation_summary.pl \
+      || report 'KO:make' 'script' 'missing script!'
+  fi
 
   # record compilation time, for "report"
   COMPILE_SECONDS=$SECONDS
-
-  # check that "tpips" executable is there
-  test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
-      || report 'KO:make' 'executable' 'no "tpips" executable found!'
 
   # clean up if no error
   rm -f out err
@@ -284,11 +327,9 @@ then
   # run the validation with new tpips
   if [ "$valid" ]
   then
-    # set path to use generated pips
-    PATH=$prod/pips/bin:$prod/pips/utils:$PATH
     {
       $nice $make -C $valid parallel-clean
-      $nice $make -C $valid VNAME=CHECK EMAIL=$dest $validate
+      $nice $make -C $valid VNAME=$vname EMAIL=$dest $validate
       $nice $make -C $valid parallel-clean
     } > out 2> err
   fi
@@ -303,11 +344,10 @@ else
     if ! cmp -s CURRENT_VALID PREVIOUS_VALID
     then
       # the validation changed, run it with current tpips
-      # set path to use generated pips
-      PATH=$prod/pips/bin:$prod/pips/utils:$PATH
+      # run the validation
       {
         $nice $make -C $valid parallel-clean
-        $nice $make -C $valid VNAME=CHECK EMAIL=$dest mail-diff-validate
+        $nice $make -C $valid VNAME=$vname EMAIL=$dest mail-diff-validate
         # cleanup to help next "svn up" run smoothly
         $nice $make -C $valid parallel-clean
       } > out 2> err
