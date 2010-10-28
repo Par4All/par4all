@@ -38,6 +38,8 @@
 
 \usepackage{xspace,makeidx}
 \usepackage{wasysym}
+\usepackage{graphicx}
+
 
 %% For nice rendering of source codes:
 \usepackage[hyper,procnames]{listings}
@@ -256,6 +258,133 @@ same line and cannot be split !
 
 A good practice should be to present main useful functions and concepts to
 know by a PIPS programmer as modules and submodules.
+
+\subsection{Developing with Eclipse}
+\label{sec:developing-with-eclipse}
+\newcommand{\inclEclipse}[2]{
+  \begin{center}
+  \noindent
+  \includegraphics[scale=#1]{eclipse/#2}
+  \end{center}
+}
+
+Eclipse is a multi-language software development environment comprising an 
+integrated development environment (IDE) and an extensible plug-in system. 
+
+You have to use an eclipse installation with CDT plugin 
+(have a look at http://www.eclipse.org/cdt/) to be able to use eclipse for C/C++
+development.
+
+
+\subsubsection{Workspace/Project creation}
+
+In eclipse you have workspace and project concept. The latter is like a 
+repository, or a subtree of a source location. In PIPS it can be a pass, whole
+pips or linear or newgen, or all of them in one shot !
+
+A workspace is a set of projects that are usually related, loaded in memory, and
+indexed while working. For instance if you want Eclipse to provide some 
+navigation features in newgen source code while working on PIPS project, you 
+need to have both project in the same workspace.
+
+The creation of a project in a workspace is easy and suppose that you already 
+have PIPS sources somewhere on you hard drive.
+
+\inclEclipse{0.4}{eclipse-project-creation-1}
+\inclEclipse{0.35}{eclipse-project-creation-2}
+
+First use menu \textit{File} $=>$ \textit{New} $=>$ \textit{Project} or 
+right-click and contextual menu as shown on 
+the screenshot, then five a project name, uncheck the checkbox to enable browsing
+an existing location, and find your PIPS source directory. Click finish and you
+have now a fresh new PIPS project in Eclipse. It may overload your computer for 
+a little while indexing the whole project, you can see the progression in the
+status bar down the Eclipse window. Index can be rebuild at any time using 
+right click on project root.
+
+You should really repeat this operation for Newgen and Linear project.
+
+\subsubsection{Missing includes}
+
+Try to open some source files, for instance src/Libs/chains/chains.c and scroll
+a little. You'll find some part of the underlined by Eclipse. Eclipse just like
+your favorite compiler detect undefined symbol and report it to you in a 
+friendly way.
+
+\inclEclipse{0.4}{eclipse-missing-includes}
+
+We are missing Newgen and Linear includes, we have only default Eclipse includes :
+
+\inclEclipse{0.4}{eclipse-missing-includes-2}
+
+Select project root and push \textit{alt+enter} or right click on it and select properties 
+item in the contextual menu. Then go to C/C++ General submenu and select Paths 
+and Symbols. In the Includes tab select language GNU C in the left part and click
+add. Then choose \textit{Workspace...} and find you pips/include/ dir. Repeat 
+the same operation for including Newgen and Linear include dirs.
+
+\inclEclipse{0.35}{eclipse-project-creation-add-includes}
+
+Validate two times and accept to rebuild the index when Eclipse ask. After index
+rebuilding you can observe that the code is no longer underlined :-)
+
+\subsubsection{Benefits from Eclipse power}
+
+Eclipse provide many features to help you becoming more productive. Firstly is
+the vertical bar just right to the code :
+
+\inclEclipse{0.4}{eclipse-shortcut-vertical-bar}
+
+Clicking on this bar make you move inside a source file quickly, there is kind
+of colored \textit{post it} that are shortcut. Color informs you from what's
+going on at this point of the source. For instance red is an error, white is 
+occurence of currently focused variable (very useful !), and blue are occurence
+of \textit{FIXME} stickers in comments (use it !). Yes I know that there's a lot 
+of blue post it in chains ;-)
+
+\inclEclipse{0.4}{eclipse-completion}
+
+Eclipse provide you some completion capabilities, try to write the begin of a 
+symbol at some place in the code and hit \textit{ctrl+enter}
+
+You can easily find the definition of a symbol, even if it's located in another 
+source file or even another project. The magic key is F3, try it on 
+\textit{set\_make} for instance, the first press will bring you to the header
+in Newgen/include and the second press will bring you to the definition of the 
+function. You can always go back using \textit{alt+left arrow}
+
+Another very pleasant feature is the lookup windows, which you can get using 
+\textit{ctrl+alt+t} or menu \textit{Navigate} $=>$ \textit{Open element}. You 
+can use the star as a joker for searching symbol by their name.
+
+\inclEclipse{0.35}{eclipse-symbol-lookup}
+
+PIPS/Newgen make high usage of macro, Eclipse has a powerful macro expansion 
+step-by-step. You can have a quick view by moving your pointer over the macro. 
+Or you can interactively develop the macro with a right click on it and 
+\textit{Explore Macro Expansion} or pressing \textit{ctrl+=} after having 
+selected it.
+
+\textit{ctrl+shift+g} is one of my favorite feature :-). Used on a function it'll
+show you every call site in the workspace !
+
+Others entries in the menu \textit{Navigate} provide also intersting features, 
+try them !
+
+Eclipse provide also some refactoring power, use the right click or the menu and
+select \textit{Rename...}. You can rename a variable so as a function ! Every 
+usage and declaration in the workspace will be updated. Obviously, it'll be 
+longer for a widely used newgen function than for a static function !
+
+
+
+\subsubsection{Using team working plugin, aka. SVN/GIT for Eclipse}
+
+TODO
+
+\subsubsection{Building from Eclipse}
+
+TODO
 
 
 \subsection{Developing with the Emacs editor}

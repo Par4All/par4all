@@ -22,7 +22,7 @@
 
 bin_PROGRAMS=gfc2pips
 gfc2pips_SOURCES = 
-dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src/gfc2pips.c src/gfc2pips.h src/gfc2pips-stubs.c src/gfc2pips-util.c gfc2pips-autotools.mk gfc2pips-common.mk
+dist_noinst_DATA = patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src gfc2pips-autotools.mk gfc2pips-common.mk
 
 
 include Makefile.mk
@@ -35,3 +35,10 @@ build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
 gfc2pips: build
 	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./gfc2pips
 
+clean-local:
+	chmod -R u+rw gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
+	rm -rf gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
+
+distclean-local:
+	chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
+	rm -rf  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5)

@@ -36,7 +36,6 @@
 #include "effects.h"
 #include "effects-util.h"
 #include "pipsdbm.h"
-#include "misc.h"
 #include "text.h"
 #include "text-util.h"
 #include "prettyprint.h"

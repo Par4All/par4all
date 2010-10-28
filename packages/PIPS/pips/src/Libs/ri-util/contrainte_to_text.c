@@ -473,12 +473,6 @@ void system_text_format(
     (line, prefix, txt, ps, variable_name, NULL, a_la_fortran);
 }
 
-/* for qsort */
-static int wordcmp(const void * s1, const void * s2)
-{
-  return strcmp(*(char**)s1, *(char**)s2);
-}
-
 /* appends the list of entity...
  */
 void
@@ -498,7 +492,7 @@ entity_list_text_format(
     FOREACH(entity, e, le)
       provi[j++] = entity_undefined_p(e)? "undefined...": var_name(e);
 
-    qsort(provi, len, sizeof(char**), wordcmp);
+    qsort(provi, len, sizeof(char**), gen_qsort_string_cmp);
 
     for(j=0; j<len; j++)
     {

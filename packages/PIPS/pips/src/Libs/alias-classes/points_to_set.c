@@ -42,7 +42,7 @@ int compare_entities_without_scope(const entity *pe1, const entity *pe2)
     string s1 = entity_name(*pe1);
     string s2 = entity_name(*pe2);
 
-    return strcmp(strdup(s1),strdup(s2));
+    return strcmp(s1,s2);
   }
 }
 

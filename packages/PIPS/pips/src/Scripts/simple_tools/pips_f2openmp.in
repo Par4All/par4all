@@ -29,6 +29,11 @@ prefix="@prefix@"
 datarootdir="@datarootdir@"
 SimpleTool_dir="@datadir@"
 
+# work around
+[ "$SHR_d" -a -d "$SHR_d" ] || SHR_d=${0%/*/*}/share
+[ -d "$SHR_d" ] || { echo "no $SHR_d directory" >&2 ; exit 1 ; }
+
+
 function display_usage_and_exit () {
     cat <<EOF
 $0 [-h|--help] file.f ...

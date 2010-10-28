@@ -1,4 +1,5 @@
 # coding=iso-8859-15
+from __future__ import with_statement # to cope with python2.5
 import pypips
 import pypsutils
 import os
@@ -40,7 +41,6 @@ class loop:
 
 	def loops(self):
 		"""get outer loops of this loop"""
-		self._module.flag_loops()
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
 		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
 
@@ -95,11 +95,11 @@ class module:
 
 	def loops(self, label=""):
 		"""get desired loop if label given, an iterator over outermost loops otherwise"""
-		self.flag_loops() # do it now to ensure all loops exist
+		loops=self._ws.cpypips.module_loops(self.name,"")
 		if label:
-			return loop(self,label)
+			if label in loops: return loop(self,label)
+			else: raise Exception("Loop label invalid")
 		else:
-			loops=self._ws.cpypips.module_loops(self.name,"")
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 
 	def inner_loops(self):
@@ -169,6 +169,7 @@ class modules:
 ### modules_methods /!\ do not touch this line /!\
 
 class workspace(object):
+
 	"""Top level element of the pyps hierarchy, it represents a set of source
 	   files and provides methods to manipulate them.
 		"""
@@ -202,6 +203,7 @@ class workspace(object):
 		self.cpypips.verbose(int(verbose))
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
+		self._sources=[]
 
 		# In case the subworkspaces need to add files, the variable passed in
 		# parameter will only be modified here and not in the scope of the caller
@@ -247,7 +249,7 @@ class workspace(object):
 		else:
 			sources=sources2
 
-		self._sources = sources
+		self._sources += sources
 
 		try:
 			cpypips.create(name, self._sources)
@@ -329,23 +331,33 @@ class workspace(object):
 		self.cpypips.open_workspace(self.name)
 
 
-	def save(self,rep=""):
-		"""save workspace back into source either in directory rep """
+	def save(self, rep=None):
+		"""save workspace back into source form in directory rep if given.
+		By default, keep it into the .database/Src PIPS default"""
 		self.cpypips.apply("UNSPLIT","%ALL")
-		if not os.path.exists(rep):
-			os.makedirs(rep)
-		if not os.path.isdir(rep):
-			raise ValueError("'{0}' is not a directory".format(rep))
+		if rep:
+			if not os.path.exists(rep):
+				os.makedirs(rep)
+			if not os.path.isdir(rep):
+				raise ValueError("'{0}' is not a directory".format(rep))
 
 		saved=[]
 		for s in os.listdir(self.dirname()+"Src"):
-			cp=os.path.join(rep,s)
-			shutil.copy(os.path.join(self.dirname(),"Src",s),cp)
-			saved.append(cp)
-
-		if self.recoverInclude:
-			for f in saved:
+			f = os.path.join(self.dirname(),"Src",s)
+			if self.recoverInclude:
+				# Recover includes on all the files.
+				# Guess that nothing is done on Fortran files... :-/
 				pypsutils.unincludes(f)
+			if rep:
+				# Save to the given directory if any:
+				cp=os.path.join(rep,s)
+				shutil.copy(f,cp)
+				# Keep track of the file name:
+				saved.append(cp)
+			else:
+				saved.append(f)
+		print saved
+
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
@@ -644,7 +656,7 @@ class workspace(object):
 		Provides also iterator and [] methods
 
 		TODO : allows global setting of many properties at once
-		
+
 		all is a local dictionary with all the properties with their initial
 		values. It is generated externally.
 		"""
@@ -698,5 +710,4 @@ class workspace(object):
 ### mode: flyspell
 ### ispell-local-dictionary: "american"
 ### tab-width: 4
-### python-indent: 4
 ### End:
