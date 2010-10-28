@@ -6710,23 +6710,30 @@ KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_accel_malloc"
 \begin{PipsProp}{KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION}
 KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
 \end{PipsProp}
+
+The following properties are used to name the \textsc{dma} functions to
+use in one dimension:
 \begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION}
 KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 \end{PipsProp}
-\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_2D}
-KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel2d"
-\end{PipsProp}
+
 \begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION}
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
 \end{PipsProp}
+
+and in 2 dimensions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_2D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel2d"
+\end{PipsProp}
+
 \begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_2D}
 KERNEL_LOAD_STORE_STORE_FUNCTION_2D "P4A_copy_from_accel2d"
 \end{PipsProp}
 
-Due to the current limitation of the effects, PIPS provides this property to
-force the load of any array that is writed in the kernel. This actually
-fixes the problem of partially writed array. A better solution using the region
-is under implementation.
+Due to the current limitation of the effects, PIPS provides this property
+to force the load of any array that is written in the kernel. This
+actually fixes the problem of partially written array. A better solution
+using the region is under implementation.
 \begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
 KERNEL_LOAD_STORE_FORCE_LOAD FALSE
 \end{PipsProp}
