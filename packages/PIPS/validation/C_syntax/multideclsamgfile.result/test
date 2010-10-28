@@ -18,15 +18,8 @@ Request: build resource PARSED_CODE for module bar!.
 PARSED_CODE made for bar!.
 Request: build resource PARSED_CODE for module foo!.
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(foo!)
-user warning in CCompilationUnitMemoryAllocations: Multiple declarations of variable a in different files
-user warning in CParserError: 
-Recovery from C parser failure not (fully) implemented yet.
-C parser is likely to fail later if re-used.
-user error in CParserError: 
-Fix your source code!
- at user line 2 (local line 6) in file "./multideclsamgfile.database/foo!/foo!.c"
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_CODE for module foo!.
+user warning in CCompilationUnitMemoryAllocations: Multiple declarations of variable "a" in different files
+PARSED_CODE made for foo!.
 Deletion of obsolete resources:
 none destroyed.
 Closing all modules.

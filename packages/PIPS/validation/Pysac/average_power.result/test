@@ -1,0 +1,59 @@
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+
+   float PP;
+   int th, v, rg;
+
+   for(th = 0; th <= Nth-1; th += 1) {
+      PP = 0.;
+      for(rg = 0; rg <= Nrg-1; rg += 1)
+         for(v = 0; v <= Nv-1; v += 1)
+
+            PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
+      Pow[th].im = 0.;
+   }
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+   int th, rg;
+   //PIPS generated variable
+   int LU_IND0;
+   //PIPS generated variable
+   float RED0[4], RED1[1], PP0, PP1;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0;
+
+   for(th = 0; th <= 255; th += 1) {
+      PP1 = 0.;
+      RED1[0] = 0.000000;
+      for(rg = 0; rg <= 255; rg += 1) {
+         RED0[0] = 0.000000;
+         RED0[1] = 0.000000;
+         RED0[2] = 0.000000;
+         RED0[3] = 0.000000;
+         SIMD_LOAD_GENERIC_V4SF(vec60_0, pdata0[1], pdata0[3], pdata1[1], pdata1[3]);
+         SIMD_LOAD_GENERIC_V4SF(vec50_0, pdata0[0], pdata0[2], pdata1[0], pdata1[2]);
+         SIMD_LOAD_V4SF(vec70_0, &RED0[0]);
+         for(LU_IND0 = 0; LU_IND0 <= 255; LU_IND0 += 4) {
+            //PIPS:SAC generated v4sf vector(s)
+            SIMD_LOAD_V4SF(vec10_0, &ptrin[th][rg][LU_IND0].re);
+            SIMD_MULPS(vec00_0, vec10_0, vec10_0);
+            SIMD_LOAD_V4SF(vec30_0, &ptrin[th][rg][2+LU_IND0].re);
+            SIMD_MULPS(vec20_0, vec30_0, vec30_0);
+            SIMD_ADDPS(vec40_0, vec50_0, vec60_0);
+            SIMD_ADDPS(vec70_0, vec70_0, vec40_0);
+         }
+         SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+         SIMD_STORE_V4SF(vec20_0, &pdata1[0]);
+         SIMD_STORE_V4SF(vec70_0, &RED0[0]);
+         RED1[0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+RED1[0];
+      }
+      PP0 = RED1[0]+PP1;
+      Pow[th].im = 0.;
+      Pow[th].re = (float) (PP0/((float) 65536));
+   }
+   ;
+}

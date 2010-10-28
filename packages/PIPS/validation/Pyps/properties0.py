@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 from pyps import workspace
 with workspace("properties0.c",verbose=False) as w:
 	print w.props.KERNEL_LOAD_STORE_FORCE_LOAD

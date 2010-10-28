@@ -11,7 +11,7 @@ void loop_fusion03(int a[100][100], int b[100][100])
    for(i = 0; i <= 99; i += 1) {
       for(j = 0; j <= 99; j += 1)
          a[i][j] = i+j;
-      k += a[i][j];
+      k += a[i][j-1];
       for(j = 0; j <= 99; j += 1)
          b[i][j] += a[i][j];
    }
@@ -31,7 +31,7 @@ void loop_fusion03(int a[100][100], int b[100][100])
          a[i][j] = i+j;
          b[i][j] += a[i][j];
       }
-      k += a[i][j];
+      k += a[i][j-1];
    }
 }
 

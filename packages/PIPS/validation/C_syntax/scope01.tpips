@@ -1,6 +1,7 @@
 delete scope01
 create scope01 scope01/scope01_a.c  scope01/scope01_b.c
 
+setenv PIPS_CPP_FLAGS=" -Iscope01 "
 
 #setenv C_SYNTAX_DEBUG_LEVEL 6
 

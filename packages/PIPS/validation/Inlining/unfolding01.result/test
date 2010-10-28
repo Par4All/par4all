@@ -38,13 +38,13 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    fgINT32 _return0, _return1, _return2, _return3, _return4;
    for(j = 0; j <= length-1; j += 1) {
       _return3 = psrc1[j];
-      _return1 = _return3;
-      v1 = _return1;
+      _return0 = _return3;
+      v1 = _return0;
       _return4 = psrc2[j];
-      _return2 = _return4;
-      v2 = _return2;
-      _return0 = v1+v2;
-      result = _return0;
+      _return1 = _return4;
+      v2 = _return1;
+      _return2 = v1+v2;
+      result = _return2;
       pdest[j] = result;
    }
    return;

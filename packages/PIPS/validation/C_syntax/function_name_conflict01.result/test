@@ -11,8 +11,14 @@ This is not supported by PIPS. Please rename "rand"
 C_PARSER[rand] (CParserError) 
 Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
+C_PARSER[rand] (CParserError) user error
+C_PARSER[rand] (CParserError) 
+Name conflict between a function and an intrinsic
+ at user line 2 (local line 3) in file "./function_name_conflict01.database/rand/rand.c"
 C_PARSER[rand] (set_debug_stack_pointer) debug level stack is set to 2
 unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module rand.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PARSED_PRINTED_FILE
 
 Parsed printed file for "function_name_conflict01"
 

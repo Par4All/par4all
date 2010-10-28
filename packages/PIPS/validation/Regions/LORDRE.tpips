@@ -1,7 +1,7 @@
-delete f
-create f LORDRE.f
+delete LORDRE
+create LORDRE LORDRE.f
 activate PRINT_CODE_REGIONS
 activate MUST_REGIONS
 display PRINTED_FILE[%ALL]
 close
-delete f
+delete LORDRE
