@@ -2,10 +2,14 @@
 
 default: clean
 
-# I still keep the old "script" validation as the defaults
-validate: old-validate
-validate-all: old-validate-all
-validate-%: old-validate-%
+# use new validation without implicit accept
+validate: validate-out
+validate-%: parallel-validate-%
+
+# old targets:
+# old-validate
+# old-validate-%
+# validate-all: old-validate-all
 
 # useful variant to be consistent with intra-directory validation
 validate-test: new-validate
@@ -134,8 +138,18 @@ $(HEAD): check-run-consistency
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 
+.PHONY: future-list
+future-list:
+	ls -d *-Future/*.* | sed -n 's/-Future//;s/^/later: /;s/\..*//p' | \
+		sort -u >> $(RESULTS)
+
+.PHONY: bugs-list
+bugs-list:
+	ls -d *-Bugs/*.* | sed -n 's/-Bugs//;s/^/bug: /;s/\..*//p' | \
+		sort -u >> $(RESULTS)
+
 # generate & archive validation summary
-SUMMARY: $(HEAD) parallel-validate
+SUMMARY: $(HEAD) parallel-validate future-list bugs-list
 	{ \
 	  cat $(HEAD) ; \
 	  echo "end date: $$(date) [$$(date +%s)]" ; \
@@ -152,7 +166,7 @@ SUMMARY: $(HEAD) parallel-validate
 	  unset LANG LC_COLLATE ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  status=$$(egrep '^(SUCCEEDED|FAILED) ' $@) ; \
+	  status=$$(egrep '^(SUCCESS|FAILED) ' $@) ; \
 	  echo $(VNAME) "$(DIRNAME) $(ARCH) $$status" ; \
 	} >> $@
 
@@ -206,7 +220,7 @@ TEST = test
 
 parallel-validate-%: parallel-check-%
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) RESULTS=../$(RESULTS) -C $* validate-$(TEST) \
+	  && $(MAKE) RESULTS=../$(RESULTS) LOCAL_CLEAN= -C $* validate-$(TEST) \
 	  || echo "broken-directory: $*" >> $(RESULTS)
 
 parallel-unvalidate-%:

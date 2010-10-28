@@ -1,0 +1,28 @@
+Request: build phase/rule SUPPRESS_DEAD_CODE for module alphablending.
+user warning in build_real_resources: No source code for module SIMD_ADDPS.
+user warning in build_real_resources: No source code for module SIMD_ADDPS.
+  C_INITIALIZER                  building   C_SOURCE_FILE(SIMD_ADDPS)
+                                 building   C_SOURCE_FILE(SIMD_ADDPS!)
+user warning in set_debug_stack_pointer: debug level stack is set to 1
+user warning in safe_do_something: Request aborted under pipsmake: build phase/rule SUPPRESS_DEAD_CODE for mo('alphablending.c', 'alphablending_main.c')
+('alphabuser warning in build_real_resources: No source code for module SIMD_ADDPS.
+resource CODE[SIMD_ADDPS] is in 'required' status since 142
+resource C_SOURCE_FILE[SIMD_ADDPS] is in 'required' status since 142
+resource PARSED_CODE[SIMD_ADDPS] is in 'required' status since 142
+resource SUMMARY_EFFECTS[SIMD_ADDPS] is in 'required' status since 142
+resource CALLEES[SIMD_ADDPS] is in 'required' status since 143
+user warning in set_debug_stack_pointer: debug level stack is set to 0
+Traceback (most recent call last):
+  File "alphablending.py", line 6, in <module>
+    w.fun.alphablending.sac()
+  File "/home/serge/sources/pips/pips_root/lib/python2.6/site-packages/pips/sac.py", line 143, in sac
+    sacbase.sac(module, **kwargs)
+  File "/home/serge/sources/pips/pips_root/lib/python2.6/site-packages/pips/sac.py", line 104, in sac
+    module.suppress_dead_code()
+  File "/home/serge/sources/pips/pips_root/lib/python2.6/site-packages/pips/pyps.py", line 2593, in suppress_dead_code
+    pypsutils.apply(self,"suppress_dead_code")
+  File "/home/serge/sources/pips/pips_root/lib/python2.6/site-packages/pips/pypsutils.py", line 130, in apply
+    m._ws.cpypips.apply(phase.upper(),m._name)
+RuntimeError: in generic_initializer: no source file for SIMD_ADDPS (might be an ENTRY point)
+set PREPROCESSOR_MISSING_FILE_HANDLING to "query" or "generate"...
+

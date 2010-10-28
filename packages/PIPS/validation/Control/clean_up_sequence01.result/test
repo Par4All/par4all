@@ -7,6 +7,7 @@ int main(int argc, char *argv[]);                                       /*0001*/
 int main(int argc, char *argv[])
 {
 // (0,1)
+//:   BEGIN UNSTRUCTURED
    {
 // (1,1)
       // BEGIN BLOCK
@@ -25,4 +26,5 @@ int main(int argc, char *argv[])
       return 0;                                                         /*0011*/
       // END BLOCK
    }
+//:   END UNSTRUCTURED
 }

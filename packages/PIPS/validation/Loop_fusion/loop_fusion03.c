@@ -10,7 +10,7 @@ void loop_fusion03( int a[N][N], int b[N][N] ) {
     for ( j = 0; j < N; j++ ) {
       a[i][j] = i + j;
     }
-    k += a[i][j];
+    k += a[i][j-1];
     for ( j = 0; j < N; j++ ) {
       b[i][j] += a[i][j];
     }

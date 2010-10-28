@@ -2,10 +2,6 @@
 
 Source files copied in : pi/Source/
 Generated source files : pi/src
-###################### Makefile ######################
-# $Id: Makefile 1049 2009-09-01 17:34:17Z coelho $
-
-include ../validate.mk
 ###################### pi/src/Makefile ######################
 #Default Makefile to compile generated files
 
@@ -121,7 +117,6 @@ C$STEP !$omp parallel do reduction (+:contrib)
       PRINT *, MY_PI                                                    0020
       CALL STEP_FINALIZE
       END
-###################### pi/src/step_rt: ######################
 ###################### pi/src/steprt_f.h ######################
 !*******************************************************************************
 !*                                                                             *
@@ -214,12 +209,3 @@ C$STEP !$omp parallel do reduction (+:contrib)
       PARAMETER (STEP_MINLOC =	10)
       PARAMETER (STEP_MAXLOC =	11)
 
-###################### steprt.c ######################
-###################### steprt.h ######################
-###################### steprt_comm_alg.c ######################
-###################### steprt_comm_alg.h ######################
-###################### steprt_common.h ######################
-###################### steprt_private.c ######################
-###################### steprt_private.h ######################
-###################### steprt_wrapper.c ######################
-###################### util ######################

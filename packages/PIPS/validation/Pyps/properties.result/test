@@ -1,7 +1,7 @@
-Prop INLINING_PURGE_LABELS  is True
-Prop INLINING_PURGE_LABELS  is True
-Prop INLINING_PURGE_LABELS  is False
-Prop INLINING_PURGE_LABELS  is True
+Prop INLINING_USE_INITIALIZATION_LIST  is True
+Prop INLINING_USE_INITIALIZATION_LIST  is True
+Prop INLINING_USE_INITIALIZATION_LIST  is False
+Prop INLINING_USE_INITIALIZATION_LIST  is True
 True
 void foobar(int *c)
 {
@@ -9,7 +9,6 @@ void foobar(int *c)
    int _return0;
 
    _return0 = 1;
-l99999:   ;
    *c = _return0;
 }
 int foo(int a)
@@ -22,7 +21,6 @@ void bar(int *c)
    int _return0;
 
    _return0 = 2;
-l99999:   ;
    *c = _return0;
 }
 void malabar(int *c)

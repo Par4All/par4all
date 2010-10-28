@@ -44,8 +44,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return12 = 0;
    
    
-   _return3 = ret_0;
-   ret = _return3;
+   _return0 = ret_0;
+   ret = _return0;
    
    
    freia_aipo_erode_6c(t, t, freia_morpho_kernel_6c);
@@ -63,8 +63,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return7 = 0;
    
    
-   _return0 = ret_1;
-   ret |= _return0;
+   _return3 = ret_1;
+   ret |= _return3;
    
    
    freia_aipo_dilate_6c(t, t, freia_morpho_kernel_6c);
@@ -82,8 +82,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return14 = 0;
    
    
-   _return4 = ret_2;
-   ret |= _return4;
+   _return1 = ret_2;
+   ret |= _return1;
 
    ret |= freia_aipo_inf(o, t, i);
    
@@ -103,8 +103,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return9 = 0;
    
    
-   _return1 = ret_3;
-   ret |= _return1;
+   _return4 = ret_3;
+   ret |= _return4;
    
    
    freia_aipo_dilate_6c(t, t, freia_morpho_kernel_6c);
@@ -122,8 +122,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return16 = 0;
    
    
-   _return5 = ret_4;
-   ret |= _return5;
+   _return2 = ret_4;
+   ret |= _return2;
    
    
    freia_aipo_erode_6c(t, t, freia_morpho_kernel_6c);
@@ -141,8 +141,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    _return11 = 0;
    
    
-   _return2 = ret_5;
-   ret |= _return2;
+   _return5 = ret_5;
+   ret |= _return5;
 
    ret |= freia_aipo_sup(o, o, t);
    ret |= freia_common_destruct_data(t);

@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete use_def_elim06
+create use_def_elim06 use_def_elim06.f
+
+echo
+echo Code for "COUNT"
+echo
+
+display PRINTED_FILE[COUNT]
+
+echo
+echo Code for "COUNT" after use-def elimination
+echo
+
+apply USE_DEF_ELIMINATION[COUNT]
+
+activate PRINT_CODE
+display PRINTED_FILE[COUNT]
+
+close
+delete use_def_elim06
+quit

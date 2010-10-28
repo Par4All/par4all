@@ -1,9 +1,9 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete flag_kernel01
-create flag_kernel01 flag_kernel01.c
+delete flag_kernel02
+create flag_kernel02 flag_kernel01.c
 
 apply FLAG_KERNEL[bar]
 
 close
-delete flag_kernel01
+delete flag_kernel02
 quit
