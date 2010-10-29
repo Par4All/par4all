@@ -32,6 +32,7 @@
 nice=
 wait=
 force=
+report=
 source=
 autoconf=
 parallel=1
@@ -45,7 +46,10 @@ do
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
     -n|--nice) nice=nice ;;
+    # force compilation & validation & mail
     -f|--force) validate=mail-validate ; force=1 ;;
+    # force compilation status report even if unchanged
+    -r|--report) report=1 ;;
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1//*=/} ;;
     -s|--sequential) parallel= ;;
@@ -129,8 +133,10 @@ function report()
   # it is nice to report that it is up again...
   [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
 
-  # no change, no report
-  [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
+  # no change, no report, unless forced
+  [ ! "$report" -a "$previous" -a $current = "$previous" ] && {
+    rmdir LOCK; exit 0;
+  }
 
   # else generate report
   {
