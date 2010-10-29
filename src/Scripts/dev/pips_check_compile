@@ -37,7 +37,7 @@ source=
 autoconf=
 parallel=1
 validate=mail-diff-validate
-vname=CHECK
+vname=
 
 # get options
 while [[ $1 == -* ]]
@@ -83,6 +83,10 @@ done
 dest=${1:-$LOGNAME@cri.ensmp.fr}
 prod=${2:-.}
 valid=$3
+
+# set default vname with some guessing
+[ "$vname" ] || { vname=${prod%/*} ; vname=${vname##*/} ; }
+[ "$vname" ] || vname=CHECK
 
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
