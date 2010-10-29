@@ -1,0 +1,56 @@
+float main()
+{
+   static float A[16], B[16], C[16], D[16];
+
+   int i;
+
+   pin_down(A, B, C, D);
+   {
+      ticks start, stop;
+      start = clock();
+
+      for(i = 0; i <= 15; i += 1)
+         D[i] = C[i]+A[i]*B[i];
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(A, B, C, D);
+   return 0;
+}
+float main()
+{
+   static float A[16], B[16], C[16], D[16];
+   //PIPS generated variable
+   int LU_IND0;
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   ticks start0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0;
+
+   pin_down(A, B, C, D);
+   start0 = clock();
+
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec20_0, &B[LU_IND0]);
+      SIMD_LOAD_V4SF(vec10_0, &A[LU_IND0]);
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+      SIMD_LOAD_V4SF(vec40_0, &C[LU_IND0]);
+      SIMD_ADDPS(vec30_0, vec40_0, vec00_0);
+      SIMD_STORE_V4SF(vec30_0, &D[LU_IND0]);
+   }
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return 0;
+}
+['d.out/SIMD.c', 'd.out/n_real_updates.c']
