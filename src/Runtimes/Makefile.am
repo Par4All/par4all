@@ -4,5 +4,6 @@ install-data-local:
 	cp -r $(srcdir)/step/* $(datadir)/step
 
 uninstall-local:
+	chmod -R u+w $(datadir)/step
 	rm -rf $(datadir)/step
 
