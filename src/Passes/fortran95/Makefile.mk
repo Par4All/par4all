@@ -53,7 +53,7 @@ CONFIGURE_OPT 	= --disable-bootstrap --enable-languages=fortran \
 	--enable-stage1-languages=fortran --disable-libssp --disable-libada \
 	--disable-libgomp --disable-stage1-checking --without-ppl \
 	--without-cloog --disable-multilib --disable-checking \
-	--with-build-config='bootstrap-O1'
+	--with-build-config='bootstrap-O1' CFLAGS=""
 
 #file to flag if sources have been patched
 PATCHED = $(SRC.d)/.patched
