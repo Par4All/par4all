@@ -24,3 +24,7 @@ cscope:
 endif
 
 MAINTAINERCLEANFILES=cscope.out
+
+# do not package svn files
+dist-hook:
+	rm -rf `find $(distdir) -name .svn`
