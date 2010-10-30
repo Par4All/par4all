@@ -43,6 +43,7 @@ vname=
 while [[ $1 == -* ]]
 do
   case $1 in
+    # how to compile pips
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
     -n|--nice) nice=nice ;;
@@ -50,14 +51,19 @@ do
     -f|--force) validate=mail-validate ; force=1 ;;
     # force compilation status report even if unchanged
     -r|--report) report=1 ;;
+    # how long to wait for lock
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1//*=/} ;;
+    # whether to run in parallel
     -s|--sequential) parallel= ;;
     -p|--parallel) parallel=1 ;;
+    # compilation & validation name
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) wait=${1//*=/} ;;
+    # environment setup
     -S|--source) source=$2; shift ;;
     --source=*) source=${1//*=/} ;;
+    # this help
     -h|--help)
       echo -e \
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation]\n" \
@@ -68,6 +74,7 @@ do
 	"  -h: show this help and exit\n"
 	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
+	"  -r: report compilation result even if not changed\n" \
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
 	"  -v name: validation name\n" \
@@ -145,7 +152,7 @@ function report()
   # else generate report
   {
     # summary
-    echo PIPS compilation status has changed to $current
+    echo $vname compilation status has changed to $current
 
     # some details
     echo previous state: $previous
@@ -191,7 +198,7 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -a "Reply-To: $dest" -s "PIPS compilation status is $current" $dest
+  } | mailx -a "Reply-To: $dest" -s "$vname compilation status is $current" $dest
 
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
