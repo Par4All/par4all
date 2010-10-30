@@ -20,6 +20,9 @@
 # You should have received a copy of the GNU General Public License
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
+# TODO
+# - allow building the documentation? doxygen?
+#
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
 # - designed to be run from cron.
