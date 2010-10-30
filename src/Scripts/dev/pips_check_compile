@@ -294,9 +294,10 @@ mv CURRENT PREVIOUS
 
 # validation state
 for valid in "$@" ; do
-  [ -f CURRENT_$valid ] || touch CURRENT_$valid
-  mv CURRENT_$valid PREVIOUS_$valid
-  echo validation: $(svnversion -c $valid) > CURRENT_$valid
+  svalid=${valid##*/}
+  [ -f CURRENT_$svalid ] || touch CURRENT_$svalid
+  mv CURRENT_$svalid PREVIOUS_$svalid
+  echo validation: $(svnversion -c $valid) > CURRENT_$svalid
 done
 
 # recompilation, possibly forced
@@ -358,7 +359,8 @@ then
 else
   # no source updates, but maybe a validation update?
   for valid in "$@" ; do
-    if ! cmp -s CURRENT_$valid PREVIOUS_$valid
+    svalid=${valid##*/}
+    if ! cmp -s CURRENT_$svalid PREVIOUS_$svalid
     then
       # the validation changed, run it with current tpips
       # run the validation
