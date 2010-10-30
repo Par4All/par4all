@@ -792,7 +792,7 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
 	    {
 	      cell_interpretation rhs_kind =
 		CELL_INTERPRETATION(CAR(l_rhs_kind_tmp));
-	      bool exact_preceding_p = true;
+	      //bool exact_preceding_p = true;
 	      list l_gen_pv = (* ctxt->make_pv_from_effects_func)
 		(eff_alias, rhs_eff, rhs_kind, l_in);
 	      l_gen = gen_nconc(l_gen_pv, l_gen);

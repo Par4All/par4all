@@ -63,7 +63,7 @@ static void unix_io_function_to_post_pv(entity func, list func_args, list l_in, 
 static void string_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void va_list_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
-static void stop_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
+//static void stop_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void c_return_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 
 static void safe_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
@@ -1401,6 +1401,7 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv
 {
   pips_internal_error("not yet implemented\n");
 }
+#if 0
 static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   /* The call is never returned from. No information is available
@@ -1410,6 +1411,7 @@ static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args,
   pv_res->result_paths = NIL;
   pv_res->result_paths_interpretations = NIL;
 }
+#endif
 
 static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
