@@ -338,7 +338,7 @@ then
     $nice $make $build > out 2> err \
       || report 'KO:make' $build "cannot \"make $build\""
     # check executable & script
-    test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
+    test -x pips/bin/${PIPS_ARCH:-$(./pips/makes/arch.sh)}/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x pips/utils/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script!'
