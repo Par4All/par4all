@@ -21,7 +21,8 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 # TODO
-# - allow building the documentation? doxygen?
+# - doxygen?
+# - check documentation generation? I recall that latex errors are ignored in nlpmake.
 #
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
@@ -41,6 +42,7 @@ autoconf=
 parallel=1
 validate=mail-diff-validate
 vname=
+build=compile
 
 # get options
 while [[ $1 == -* ]]
@@ -49,6 +51,7 @@ do
     # how to compile pips
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
+    --nlpmake=*) autoconf= ; build=${1//*=/} ;;
     -n|--nice) nice=nice ;;
     # force compilation & validation & mail
     -f|--force) validate=mail-validate ; force=1 ;;
@@ -332,8 +335,8 @@ then
     $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     # what about a "timeout"? how to differentiate from a simple failure?
-    $nice $make build > out 2> err \
-      || report 'KO:make' 'build' 'cannot "make build"'
+    $nice $make $build > out 2> err \
+      || report 'KO:make' $build "cannot \"make $build\""
     # check executable & script
     test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
