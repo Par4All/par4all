@@ -1,0 +1,83 @@
+int main(int argc, char **argv)
+{
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   double t_start, t_end;
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, k;
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   for(i = 0; i <= 2047; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//		<   tests   >
+      for(j = 0; j <= 2047; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//                            0 <= 0`j <= 2047
+//		<   tests   >
+         C[i][j] = C[i][j]*alpha;
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//                            0 <= 0`j <= 2047
+//		<   tests   >
+         for(k = 0; k <= 2047; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//                            0 <= 0`j <= 2047
+//                            0 <= 0`k <= 2047
+//		<   tests   >
+            C[i][j] += beta*A[i][k]*B[k][j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   for(i = 0; i <= 2047; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//		<   tests   >
+      for(j = 0; j <= 2047; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= 2047
+//                            0 <= 0`j <= 2047
+//		<   tests   >
+         A[i][j] = C[i][j];
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   
+   print_array(argv);
+//		< is static > TRUE
+//		< parameter > 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   return 0;
+}
