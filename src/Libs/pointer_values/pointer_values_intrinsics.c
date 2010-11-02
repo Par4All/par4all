@@ -1075,15 +1075,19 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
 
 /******************************************/
 
-static void assignment_intrinsic_to_post_pv(entity  __attribute__ ((unused))func, list func_args,
-					    list l_in, pv_results * pv_res, pv_context *ctxt)
+static void assignment_intrinsic_to_post_pv(entity  __attribute__ ((unused))func,
+					    list func_args,
+					    list l_in, pv_results * pv_res,
+					    pv_context *ctxt)
 {
   expression lhs = EXPRESSION(CAR(func_args));
   expression rhs = EXPRESSION(CAR(CDR(func_args)));
   assignment_to_post_pv(lhs, rhs, false, l_in, pv_res, ctxt);
 }
 
-static void binary_arithmetic_operator_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
+						  list l_in, pv_results * pv_res,
+						  pv_context *ctxt)
 {
   list l_in_cur;
 
@@ -1120,11 +1124,14 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args, l
      - For substraction, one of the following shall hold :
 
        - both operands have arithmetic types
-       - both operands are pointers to qualified or unqualified versions of compatible object types;
-         (in this case, both pointers shall point to elements of the same array object, or one past the last
-	 element of the array object; the result is the difference of the subscripts of the two array elements)
+       - both operands are pointers to qualified or unqualified versions of
+         compatible object types;
+         (in this case, both pointers shall point to elements of the same array object,
+	 or one past the last element of the array object; the result is the difference
+         of the subscripts of the two array elements)
 	 (as a consequence the result is not of a pointer type)
-       - the left operand is a pointer to an object type and the right operand has integer type
+       - the left operand is a pointer to an object type and the right operand has
+         integer type
   */
   list l_eff1 = pv_res1.result_paths;
   list l_eff2 = pv_res2.result_paths;
@@ -1133,7 +1140,8 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args, l
   list l_eff_pointer = NIL;
   expression other_arg = expression_undefined;
 
-  if (pointer_t1 && !pointer_t2 ) /* pointer arithmetic, the pointer is in the first expression */
+  if (pointer_t1 && !pointer_t2 )
+    /* pointer arithmetic, the pointer is in the first expression */
     {
       pointer_arithmetic = true;
       l_eff_pointer = l_eff1;
@@ -1170,7 +1178,8 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args, l
 	      effect new_eff = copy_effect(eff);
 	      (*effect_add_expression_dimension_func)(new_eff, new_arg);
 	      l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
-	      l_new_eff_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+	      l_new_eff_kind = CONS(CELL_INTERPRETATION,
+				    make_cell_interpretation_address_of(), NIL);
 	    }
 	  gen_nreverse(l_new_eff);
 	  gen_nreverse(l_new_eff_kind);
@@ -1185,20 +1194,24 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args, l
   pips_debug_pv_results(1, "end with pv_res = \n", *pv_res);
 }
 
-static void unary_arithmetic_operator_to_post_pv(entity __attribute__ ((unused))func, list func_args,
-						 list l_in, pv_results * pv_res, pv_context *ctxt)
+static void unary_arithmetic_operator_to_post_pv(entity __attribute__ ((unused))func,
+						 list func_args,
+						 list l_in, pv_results * pv_res,
+						 pv_context *ctxt)
 {
   expression arg = EXPRESSION(CAR(func_args));
   expression_to_post_pv(arg, l_in, pv_res, ctxt);
   ifdebug(1)
     {
       type t = expression_to_type(arg);
-      pips_assert("unary arithmetic operators should not have pointer arguments", !pointer_type_p(t));
+      pips_assert("unary arithmetic operators should not have pointer arguments",
+		  !pointer_type_p(t));
       free_type(t);
     }
 }
 
-static void update_operator_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void update_operator_to_post_pv(entity func, list func_args, list l_in,
+				       pv_results * pv_res, pv_context *ctxt)
 {
   pips_debug(1, "begin for update operator\n");
 
@@ -1214,11 +1227,13 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in, p
       list l_lhs_kind = pv_res->result_paths_interpretations;
       string func_name = entity_local_name(func);
 
-      pips_assert("update operators admit a single path\n", gen_length(l_lhs_eff) == (size_t) 1);
+      pips_assert("update operators admit a single path\n",
+		  gen_length(l_lhs_eff) == (size_t) 1);
 
       effect lhs_eff = EFFECT(CAR(l_lhs_eff));
       effect rhs_eff = copy_effect(lhs_eff);
-      list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+      list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
+			     NIL);
 
       if (!anywhere_effect_p(lhs_eff))
 	{
@@ -1239,15 +1254,19 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in, p
 	    pips_internal_error("unexpected update operator on pointers\n");
 
 	  (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
-	  l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+	  l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
+			    NIL);
 	}
       list l_rhs_eff = CONS(EFFECT, rhs_eff, NIL);
-      single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false, l_in_cur, pv_res, ctxt);
+      single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false,
+					   l_in_cur, pv_res, ctxt);
     }
   pips_debug_pv_results(1, "end with pv_res : \n", *pv_res);
 }
 
-static void logical_operator_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void logical_operator_to_post_pv(entity __attribute__ ((unused))func,
+					list func_args, list l_in,
+					pv_results *pv_res, pv_context *ctxt)
 {
   expression e1 = EXPRESSION(CAR(func_args));
   expression e2 = EXPRESSION(CAR(CDR(func_args)));
@@ -1274,8 +1293,9 @@ static void logical_operator_to_post_pv(entity __attribute__ ((unused))func, lis
   pv_res->result_paths_interpretations = NIL;
 }
 
-static void conditional_operator_to_post_pv(entity __attribute__ ((unused)) func, list func_args,
-					    list l_in, pv_results * pv_res, pv_context *ctxt)
+static void conditional_operator_to_post_pv(entity __attribute__ ((unused)) func,
+					    list func_args, list l_in,
+					    pv_results * pv_res, pv_context *ctxt)
 {
   pips_debug(1, "begin for conditional operator\n");
 
@@ -1301,13 +1321,17 @@ static void conditional_operator_to_post_pv(entity __attribute__ ((unused)) func
   if (pv_res_false.l_out != l_in_false) gen_full_free_list(l_in_false);
 
 
-  pv_res->l_out = (*ctxt->pvs_may_union_func)(pv_res_true.l_out, gen_full_copy_list(pv_res_false.l_out));
+  pv_res->l_out = (*ctxt->pvs_may_union_func)(pv_res_true.l_out,
+					      gen_full_copy_list(pv_res_false.l_out));
 
   /* well, it should be a union, but there may not be such stupid things as (..)? a:a;
-   I cannot use the effects test union operator because I must also merge interpretations */
+   I cannot use the effects test union operator because I must also merge
+   interpretations */
   pv_res->result_paths = gen_nconc(pv_res_true.result_paths, pv_res_false.result_paths);
   effects_to_may_effects(pv_res->result_paths);
-  pv_res->result_paths_interpretations = gen_nconc(pv_res_true.result_paths_interpretations, pv_res_false.result_paths_interpretations);
+  pv_res->result_paths_interpretations =
+    gen_nconc(pv_res_true.result_paths_interpretations,
+	      pv_res_false.result_paths_interpretations);
 
   pips_debug_pv_results(1, "end with pv_results =\n", *pv_res);
   pips_debug(1, "end\n");
@@ -1316,7 +1340,8 @@ static void conditional_operator_to_post_pv(entity __attribute__ ((unused)) func
 
 
 
-static void dereferencing_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void dereferencing_to_post_pv(entity __attribute__ ((unused))func, list func_args,
+				     list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
   list l_eff_ci = pv_res->result_paths_interpretations;
@@ -1331,7 +1356,8 @@ static void dereferencing_to_post_pv(entity __attribute__ ((unused))func, list f
     }
 }
 
-static void field_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void field_to_post_pv(entity __attribute__ ((unused))func, list func_args,
+			     list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   expression e2 = EXPRESSION(CAR(CDR(func_args)));
   syntax s2 = expression_syntax(e2);
@@ -1370,7 +1396,8 @@ static void point_to_to_post_pv(entity __attribute__ ((unused))func, list func_a
     }
 }
 
-static void address_of_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void address_of_to_post_pv(entity __attribute__ ((unused))func, list func_args,
+				  list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
   FOREACH(CELL_INTERPRETATION, ci, pv_res->result_paths_interpretations)
@@ -1379,30 +1406,88 @@ static void address_of_to_post_pv(entity __attribute__ ((unused))func, list func
     }
 }
 
-static void c_io_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
+				     pv_results * pv_res, pv_context *ctxt)
 {
-  pips_internal_error("not yet implemented\n");
+  string func_name = entity_local_name(func);
+  list general_args = NIL;
+  bool free_general_args = false;
+  expression file_star_arg = expression_undefined;
+  list l_in_cur = l_in;
+
+  /* first argument is a FILE*  */
+  if (same_string_p(func_name,FCLOSE_FUNCTION_NAME)
+      || same_string_p(func_name,FPRINTF_FUNCTION_NAME)
+      || same_string_p(func_name,FSCANF_FUNCTION_NAME)
+      || same_string_p(func_name,VFPRINTF_FUNCTION_NAME)
+      || same_string_p(func_name,VFSCANF_FUNCTION_NAME)
+      || same_string_p(func_name,ISOC99_VFSCANF_FUNCTION_NAME)
+      || same_string_p(func_name,FGETC_FUNCTION_NAME)
+      || same_string_p(func_name,GETC_FUNCTION_NAME)
+      || same_string_p(func_name,_IO_GETC_FUNCTION_NAME)
+      || same_string_p(func_name,FGETPOS_FUNCTION_NAME)
+      || same_string_p(func_name,FSEEK_FUNCTION_NAME)
+      || same_string_p(func_name,FSETPOS_FUNCTION_NAME)
+      || same_string_p(func_name,FTELL_FUNCTION_NAME)
+      || same_string_p(func_name,C_REWIND_FUNCTION_NAME)
+      || same_string_p(func_name,CLEARERR_FUNCTION_NAME)
+      || same_string_p(func_name,FEOF_FUNCTION_NAME)
+      || same_string_p(func_name,FERROR_FUNCTION_NAME))
+    {
+      file_star_arg = EXPRESSION(CAR(func_args));
+      general_args = CDR(func_args);
+    }
+  /* last argument is a FILE*  */
+  else if (same_string_p(func_name,FGETS_FUNCTION_NAME)
+	   || same_string_p(func_name,FPUTC_FUNCTION_NAME)
+	   || same_string_p(func_name,FPUTS_FUNCTION_NAME)
+	   || same_string_p(func_name,PUTC_FUNCTION_NAME)
+	   || same_string_p(func_name,_IO_PUTC_FUNCTION_NAME)
+	   || same_string_p(func_name,UNGETC_FUNCTION_NAME)
+	   || same_string_p(func_name,FREAD_FUNCTION_NAME)
+	   || same_string_p(func_name,FWRITE_FUNCTION_NAME))
+    {
+      for(; !ENDP(CDR(func_args)); POP(func_args))
+	{
+	  general_args = CONS(EXPRESSION, EXPRESSION(CAR(func_args)), general_args);
+	}
+      free_general_args = true;
+      file_star_arg = EXPRESSION(CAR(func_args));
+    }
+
+  /* we assume that there is no effects on aliasing due to FILE* argument if any */
+
+  safe_intrinsic_to_post_pv(func, general_args, l_in_cur, pv_res, ctxt);
+
+  if (free_general_args)
+    gen_free_list(general_args);
 }
 
-static void unix_io_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void unix_io_function_to_post_pv(entity func, list func_args, list l_in,
+					pv_results * pv_res, pv_context *ctxt)
 {
+  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 
-static void string_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void string_function_to_post_pv(entity func, list func_args, list l_in,
+				       pv_results * pv_res, pv_context *ctxt)
 {
-  pips_internal_error("not yet implemented\n");
+  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 
-static void va_list_function_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void va_list_function_to_post_pv(entity func, list func_args, list l_in,
+					pv_results * pv_res, pv_context *ctxt)
 {
-  pips_internal_error("not yet implemented\n");
+  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
-static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
+				      pv_results * pv_res, pv_context *ctxt)
 {
-  pips_internal_error("not yet implemented\n");
+  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 #if 0
-static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args,
+			    list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   /* The call is never returned from. No information is available
      for the dead code that follows.
@@ -1413,7 +1498,8 @@ static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args,
 }
 #endif
 
-static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_args,
+				list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   /* but we have to evaluate the impact
      of the argument evaluation on pointer values
@@ -1422,37 +1508,94 @@ static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_
   expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
 }
 
-static void safe_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
+				      list func_args, list l_in,
+				      pv_results * pv_res, pv_context *ctxt)
 {
-  /* first assume that all pointers reachable from arguments are written and set to anywhere */
+  /* first assume that all pointers reachable from arguments are written and set to
+     anywhere */
   /* this should be quickly refined */
-  list lw = NIL;
-  FOREACH(EXPRESSION, arg, func_args)
+  list l_anywhere_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
+			     NIL);
+  list l_rhs_kind = CONS(CELL_INTERPRETATION,
+			 make_cell_interpretation_address_of(), NIL);
+
+  pips_debug(1, "begin");
+
+  if (!ENDP(func_args))
     {
-      lw = gen_nconc(lw, c_actual_argument_to_may_summary_effects(arg, 'w'));
+      list lw = NIL;
+      list l_in_cur = l_in;
+      FOREACH(EXPRESSION, arg, func_args)
+	{
+	  pv_results pv_res_arg = make_pv_results();
+	  expression_to_post_pv(arg, l_in_cur, &pv_res_arg, ctxt);
+	  free_pv_results_paths(&pv_res_arg);
+	  if (pv_res_arg.l_out != l_in_cur)
+	    {
+	      gen_full_free_list(l_in_cur);
+	      l_in_cur = pv_res_arg.l_out;
+	    }
+	  /* well this is not safe in case of arguments with external function calls
+	     I should use the result paths of pv_res_arg, but there is a lot of work
+	     done in c_actual_argument_to_may_ summary_effect about arrays, and I'm not
+	     sure expression_to_post_pv does the same job
+	  */
+	  lw = gen_nconc(lw, c_actual_argument_to_may_summary_effects(arg, 'w'));
+	}
+
+      pips_debug_effects(3, "effects to be killed: \n", lw);
+
+      /* assume all pointers now point to anywhere */
+
+      FOREACH(EFFECT, eff, lw)
+	{
+	  type t = cell_to_type(effect_cell(eff));
+	  if (pointer_type_p(t))
+	    {
+	      single_pointer_assignment_to_post_pv(eff,
+						   l_anywhere_eff, l_rhs_kind,
+						   false, l_in_cur,
+						   pv_res, ctxt);
+	      if (pv_res->l_out != l_in_cur)
+		{
+		  gen_full_free_list(l_in_cur);
+		  l_in_cur = pv_res->l_out;
+		}
+	      free_pv_results_paths(pv_res);
+	    }
+	}
+      pv_res->l_out = l_in_cur;
     }
-  /* we lack an assignment_effects_to_post_pv here */
-
+  else
+    pv_res->l_out = l_in;
   /* then retrieve the return value type to set pv_res->result_paths */
-  /* if it is a pointer type, set it to anywhere for the moment */
+  /* if it is a pointer type, set it to anywhere for the moment
+     specific work should be done for each intrinsic
+  */
+  pv_res->result_paths = l_anywhere_eff;
+  pv_res->result_paths_interpretations = l_rhs_kind;
 
-  pips_internal_error("not yet implemented\n");
 }
 
-static void intrinsic_to_identical_post_pv(entity __attribute__ ((unused)) func, list __attribute__ ((unused)) func_args,
+static void intrinsic_to_identical_post_pv(entity __attribute__ ((unused)) func,
+					   list __attribute__ ((unused)) func_args,
 					   list l_in, pv_results * pv_res, pv_context __attribute__ ((unused)) *ctxt)
 {
   pv_res->l_out = l_in;
 }
 
-static void unknown_intrinsic_to_post_pv(entity __attribute__ ((unused)) func, list __attribute__ ((unused)) func_args,
-					 list __attribute__ ((unused)) l_in, pv_results __attribute__ ((unused)) *pv_res,
+static void unknown_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
+					 list __attribute__ ((unused)) func_args,
+					 list __attribute__ ((unused)) l_in,
+					 pv_results __attribute__ ((unused)) *pv_res,
 					 pv_context __attribute__ ((unused)) *ctxt)
 {
   pips_internal_error("not a C intrinsic\n");
 }
 
-void intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt)
+void intrinsic_to_post_pv(entity func, list func_args, list l_in,
+			  pv_results * pv_res, pv_context *ctxt)
 {
   string func_name = entity_local_name(func);
   pips_debug(1, "begin for %s\n", func_name);

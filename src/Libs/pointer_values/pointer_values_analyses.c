@@ -639,7 +639,8 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 	  /* We should be here only in case of a pointer value rhs, and the value should be 0 */
 	  if (constant_int_p(func_const) && (constant_int(func_const) == 0))
 	    {
-	      /* use approximation_must to be consistent with effects, should be approximation_exact */
+	      /* use approximation_must to be consistent with effects,
+		 should be approximation_exact */
 	      pv_res->result_paths = CONS(EFFECT,
 					  make_effect(make_null_pointer_value_cell(),
 						      make_action_read_memory(),
@@ -648,12 +649,31 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 					  NIL);
 	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 							  make_cell_interpretation_value_of(),
-							  NIL);;
+							  NIL);
 	    }
 	  else
 	    {
-	      pv_res->l_out = l_in;
+	      type tt = functional_result(type_functional(func_type));
+	      if (type_variable_p(tt))
+		{
+		  variable v = type_variable(tt);
+		  basic b = variable_basic(v);
+		  if (basic_string_p(b))/* constant strings */
+		    {
+		      /* not generic here */
+		      effect eff = make_effect(make_cell_reference(make_reference(func, NIL)),
+					       make_action_read_memory(),
+					       make_approximation_must(),
+					       make_descriptor_none());
+		      effect_add_dereferencing_dimension(eff);
+		      pv_res->result_paths = CONS(EFFECT, eff, NIL);
+		      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+							  make_cell_interpretation_address_of(),
+							  NIL);
+		    }
+		}
 	    }
+	  pv_res->l_out = l_in;
 	  break;
 
 	case is_value_unknown:
