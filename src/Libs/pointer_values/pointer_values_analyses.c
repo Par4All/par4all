@@ -1004,7 +1004,7 @@ void assignment_to_post_pv(expression lhs, expression rhs, bool declaration_p,
   list l_rhs_eff = rhs_pv_res.result_paths;
   list l_rhs_kind = rhs_pv_res.result_paths_interpretations;
   l_in_cur = rhs_pv_res.l_out;
-  if (l_in != l_in_cur) gen_full_free_list(l_in);
+  //if (l_in != l_in_cur) gen_full_free_list(l_in); should have been freed in expression_to_post_pv
 
 
   expression_to_post_pv(lhs, l_in_cur, &lhs_pv_res, ctxt);

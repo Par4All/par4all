@@ -1520,7 +1520,7 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
   list l_rhs_kind = CONS(CELL_INTERPRETATION,
 			 make_cell_interpretation_address_of(), NIL);
 
-  pips_debug(1, "begin");
+  pips_debug(1, "begin\n");
 
   if (!ENDP(func_args))
     {
@@ -1575,6 +1575,8 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
   */
   pv_res->result_paths = l_anywhere_eff;
   pv_res->result_paths_interpretations = l_rhs_kind;
+
+  pips_debug_pv_results(1, "ending with pv_res: \n", *pv_res);
 
 }
 
