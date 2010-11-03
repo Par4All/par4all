@@ -11,58 +11,74 @@ void P4A_accel_malloc(void **ptr, size_t n)
    else
       *ptr = (void *) 0;
 }
-void * P4A_copy_from_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+void * P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
 {
-   size_t i, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(l = 0; l <= size-1; l += 1)
-         cdest[(i+d1_offset)*size+l] = csrc[i*size+l];
-   return dest;
+   size_t i;
+   char *cdest = host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+   return host_address;
 }
-void * P4A_copy_from_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void * P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
 {
-   size_t i, j, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l] = csrc[i*size*d2_block_length+j*size+l];
-   return dest;
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+   return host_address;
 }
-void * P4A_copy_to_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+void * P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
 {
-   size_t i, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(l = 0; l <= size-1; l += 1)
-         cdest[i*size+l] = csrc[(i+d1_offset)*size+l];
-   return dest;
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+   return host_address;
 }
-void * P4A_copy_to_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void * P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
 {
-   size_t i, j, l;
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = host_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+   return accel_address;
+}
+void * P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+   return accel_address;
+}
+void * P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
 
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[i*size*d2_block_length+j*size+l] = csrc[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l];
-   return dest;
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
+   return accel_address;
 }
 void lonesome_cowboy()
 {
-   int i, j, n = 12;
-   int a[n][n];
+   /* Use n & m to trace down dimensions in the generated code... */
+   int i, j, n = 12, m = 24;
+   int a[n][m];
    for(i = 0; i <= n-1; i += 1)
-      for(j = 0; j <= n-1; j += 1)
+      for(j = 0; j <= m-1; j += 1)
          a[i][j] = 0;
    for(i = 1; i <= n-1-1; i += 1)
 isolate:
-      for(j = 1; j <= n-1-1; j += 1)
+      for(j = 1; j <= m-1-1; j += 1)
          a[i][j] = 1;
    j = 0;
    /* compute trace */
@@ -78,20 +94,21 @@ int main()
 isolated code
 void lonesome_cowboy()
 {
-   int i, j, n = 12;
-   int a[n][n];
+   /* Use n & m to trace down dimensions in the generated code... */
+   int i, j, n = 12, m = 24;
+   int a[n][m];
    for(i = 0; i <= n-1; i += 1)
-      for(j = 0; j <= n-1; j += 1)
+      for(j = 0; j <= m-1; j += 1)
          a[i][j] = 0;
    for(i = 1; i <= n-1-1; i += 1) {
       //PIPS generated variable
-      int (*a0)[1][10] = (int (*)[1][10]) 0;
-      P4A_accel_malloc((void **) &a0, sizeof(int)*10);
+      int (*a0)[1][22] = (int (*)[1][22]) 0;
+      P4A_accel_malloc((void **) &a0, sizeof(int)*22);
 
 isolate:
-      for(j = 1; j <= n-1-1; j += 1)
+      for(j = 1; j <= m-1-1; j += 1)
          (*a0)[i-i][j-1] = 1;
-      P4A_copy_from_accel2d(&a[0][0], *a0, sizeof(int), n, n, i, 1, 1, 10);
+      P4A_copy_from_accel_2d(sizeof(int), n, m, 1, 22, i, 1, &a[0][0], *a0);
       P4A_accel_free((void **) &a0);
    }
    j = 0;

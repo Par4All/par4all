@@ -79,12 +79,12 @@ int foo(int seed[100])
       P4A_accel_malloc((void **) &a0, sizeof(int)*100);
       P4A_accel_malloc((void **) &b0, sizeof(int)*100);
       P4A_accel_malloc((void **) &c0, sizeof(int)*100);
-      P4A_copy_to_accel(*a0, &a[0], sizeof(int), 100, 0, 100);
-      P4A_copy_to_accel(*b0, &b[0], sizeof(int), 100, 0, 100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *a0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *b0);
 
       /* compute */
 kernel:      run_kernel((*a0), (*b0), (*c0));
-      P4A_copy_from_accel(&c[0], *c0, sizeof(int), 100, 0, 100);
+      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
       P4A_accel_free((void **) &a0);
       P4A_accel_free((void **) &b0);
       P4A_accel_free((void **) &c0);
@@ -115,11 +115,11 @@ int foo(int seed[100])
       P4A_accel_malloc((void **) &a0, sizeof(int)*100);
       P4A_accel_malloc((void **) &b0, sizeof(int)*100);
       P4A_accel_malloc((void **) &c0, sizeof(int)*100);
-      P4A_copy_to_accel(*a0, &a[0], sizeof(int), 100, 0, 100);
-      P4A_copy_to_accel(*b0, &b[0], sizeof(int), 100, 0, 100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *a0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *b0);
       /* compute */
       run_kernel((*a0), (*b0), (*c0));
-      P4A_copy_from_accel(&c[0], *c0, sizeof(int), 100, 0, 100);
+      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
       P4A_accel_free((void **) &a0);
       P4A_accel_free((void **) &b0);
       P4A_accel_free((void **) &c0);
