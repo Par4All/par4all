@@ -74,6 +74,9 @@ This document describes also some internal details about how \Apfa works
 and this can be useful to power user wanting to get more from \Apfa, not
 only the \Apfa core developers.
 
+It first describes inside the release notes how to install \Apfa without
+compiling it and later from section~\ref{sec:compilation} how to compile
+it, if you want to dig into the infrastructure.
 
 \tableofcontents{}
 
@@ -94,19 +97,21 @@ Fedora Core 13 and Debian/unstable.
 To only run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
   \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
-  \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran}
+  \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran},
+  \texttt{ipython}.
 \end{quote}
 
-To only run \Apfa with Fedora Core 13, the following packages 13 are needed:
+To only run \Apfa with Fedora Core 13, the following packages are needed:
 \begin{quote}
   \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
-  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran}
+  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
+  \texttt{ipython}.
 \end{quote}
 
 % To ease copy/paste:
 % libncurses5 libreadline5 python python-ply python3.1 gfortran
 
-If you want to compile \Apfa by your own with Debian or Ubuntu, you also 
+If you want to compile \Apfa by your own with Debian or Ubuntu, you also
 need to the following packages:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
@@ -162,6 +167,15 @@ git checkout -b p4a remotes/origin/p4a
 src/simple_tools/p4a_setup [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%
 Everything will be installed into \verb|/usr/local/par4all| by default.
+So we should make the target directory writable by you, either by running
+as \texttt{root} with \texttt{sudo} for example, or better (to limit
+running things as \texttt{root} which may be dangerous) create the target
+directory with the good right access, for example with a:
+\begin{alltt}
+mkdir /usr/local/par4all
+chown \emph{your_login_name} /usr/local/par4all
+\end{alltt}
+
 If you want to install in another location, use the \verb|--prefix|
 option.  If you need more installation options (such as if you want to
 specify the location for the various packages), run \verb|p4a_setup -h| to

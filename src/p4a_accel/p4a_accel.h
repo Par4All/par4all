@@ -26,6 +26,9 @@
 #ifndef P4A_ACCEL_H
 #define P4A_ACCEL_H
 
+/* For size_t: */
+#include <stddef.h>
+
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
 
@@ -34,6 +37,85 @@ extern double P4A_accel_timer_stop_and_float_measure();
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
+
+/* Some common function prototypes. */
+
+/** Prototype for allocating memory on the hardware accelerator.
+
+    @param[out] address is the address of a variable that is updated by
+    this macro to contains the address of the allocated memory block
+
+    @param[in] size is the size to allocate in bytes
+*/
+void P4A_accel_malloc(void **address, size_t size);
+
+
+/** Prototype for freeing memory on the hardware accelerator/
+
+    @param[in] address points to a previously allocated memory zone for
+    the hardware accelerator
+*/
+void P4A_accel_free(void *address);
+
+
+/** Prototype for copying a scalar from the host to a memory zone in the
+    hardware accelerator.
+*/
+void P4A_copy_to_accel(size_t element_size,
+		       const void *host_address,
+		       void *accel_address);
+
+
+/** Prototype for copying a scalar from the hardware accelerator memory to
+    the host.
+*/
+void P4A_copy_from_accel(size_t element_size,
+			 void *host_address,
+			 const void *accel_address);
+
+
+/** Prototype for copying a 1D memory zone from the host to a compact
+    memory zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_1d(size_t element_size,
+			  size_t d1_size,
+			  size_t d1_block_size,
+			  size_t d1_offset,
+			  const void *host_address,
+			  void *accel_address);
+
+
+/** Prototype for copying memory from the hardware accelerator to a 1D
+    array in the host.
+*/
+void P4A_copy_from_accel_1d(size_t element_size,
+			    size_t d1_size,
+			    size_t d1_block_size,
+			    size_t d1_offset,
+			    void *host_address,
+			    const void *accel_address);
+
+
+/** Prototype for copying a 2D memory zone from the host to a compact
+    memory zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_2d(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address);
+
+
+/** Prototype for copying memory from the hardware accelerator to a 2D
+    array in the host.
+*/
+void P4A_copy_from_accel_2d(size_t element_size,
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address);
 
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>
@@ -73,6 +155,6 @@ extern double P4A_accel_timer_stop_and_float_measure();
 
     Since it is a macro, beware of side effects...
 */
-#define P4A_min(a, b) ((a > b) ? b : a)
+#define P4A_min(a, b) ((a) > (b) ? (b) : (a))
 
 #endif //P4A_ACCEL_H

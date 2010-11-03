@@ -416,7 +416,10 @@ class p4a_processor(object):
                                  concurrent=True)
 
         # Add communication around all the call site of the kernels:
-        kernel_launchers.kernel_load_store(concurrent=True)
+        kernel_launchers.kernel_load_store(concurrent=True,
+                                           KERNEL_LOAD_STORE_LOAD_FUNCTION_2D = "P4A_copy_to_accel_2d",
+                                           KERNEL_LOAD_STORE_STORE_FUNCTION_2D = "P4A_copy_from_accel_2d"
+                                           )
 
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
