@@ -167,6 +167,15 @@ git checkout -b p4a remotes/origin/p4a
 src/simple_tools/p4a_setup [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%
 Everything will be installed into \verb|/usr/local/par4all| by default.
+So we should make the target directory writable by you, either by running
+as \texttt{root} with \texttt{sudo} for example, or better (to limit
+running things as \texttt{root} which may be dangerous) create the target
+directory with the good right access, for example with a:
+\begin{alltt}
+mkdir /usr/local/par4all
+chown \emph{your_login_name} /usr/local/par4all
+\end{alltt}
+
 If you want to install in another location, use the \verb|--prefix|
 option.  If you need more installation options (such as if you want to
 specify the location for the various packages), run \verb|p4a_setup -h| to
