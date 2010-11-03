@@ -94,80 +94,6 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 #define P4A_vp_2 P4A_vp_coordinate[2]
 
 
-/** @defgroup P4A_memory_allocation_copy Memory allocation and copy
-
-    @{
-*/
-
-/** Allocate memory on the hardware accelerator in OpenMP emulation.
-
-    For OpenMP it is on the host too
-
-    @param[out] address is the address of a variable that is updated by
-    this macro to contains the address of the allocated memory block
-
-    @param[in] size is the size to allocate in bytes
-*/
-#define P4A_accel_malloc(address, size)		\
-  *(void **)address = malloc(size)
-
-
-/** Free memory on the hardware accelerator in OpenMP emulation.
-
-    It is on the host too
-
-    @param[in] address is the address of a previously allocated memory zone on
-    the hardware accelerator
-*/
-#define P4A_accel_free(address)			\
-  free(address)
-
-
-/** Copy memory from the host to the hardware accelerator in OpenMP
-    emulation.
-
-    Since it is an OpenMP implementation, use standard memory copy
-    operations
-
-    Do not change the place of the pointers in the API. The host address
-    is always in the first position...
-
-    @param[in] host_address is the address of a source zone in the host memory
-
-    @param[out] accel_address is the address of a destination zone in the
-    accelerator memory
-
-    @param[in] size is the size in bytes of the memory zone to copy
-*/
-#define P4A_copy_to_accel(host_address, accel_address, size)		\
-  /* We can use memcpy() since we are sure there is no overlap */	\
-  memcpy(accel_address, host_address, size)
-
-
-/** Copy memory from the hardware accelerator to the host in OpenMP
-    emulation.
-
-    Since it is an OpenMP implementation, use standard memory copy
-    operations
-
-    Do not change the place of the pointers in the API. The host address
-    is always in the first position...
-
-    @param[out] host_address is the address of a destination zone in the
-    host memory
-
-    @param[in] accel_address is the address of a source zone in the
-    accelerator memory
-
-    @param[in] size is the size in bytes of the memory zone to copy
-*/
-#define P4A_copy_from_accel(host_address, accel_address, size)	\
-  /* Easy implementation since memcpy is symetrical :-) */	\
-  P4A_copy_to_accel(accel_address, host_address, size)
-
-
-/* @} */
-
 /** @addtogroup P4A_cuda_kernel_call
 
     @{
@@ -185,7 +111,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     implemented.
 */
 #define P4A_call_accel_kernel(context, parameters) \
-  error "P4A_call_accel_kernel not yet implemented"
+  error "P4A_call_accel_kernel not yet implemented in OpenMP"
 /* @} */
 
 
@@ -196,7 +122,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     This is not yet implemented.
 */
 #define P4A_call_accel_kernel_context(kernel, ...) \
-  error "P4A_call_accel_kernel_context not yet implemented"
+  error "P4A_call_accel_kernel_context not yet implemented in OpenMP"
 
 
 /** Add CUDA kernel parameters for invocation with an OpenMP
@@ -205,7 +131,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     This is not yet implemented.
 */
 #define P4A_call_accel_kernel_parameters(...) \
-  error "P4A_call_accel_kernel_parameters not yet implemented"
+  error "P4A_call_accel_kernel_parameters not yet implemented in OpenMP"
 
 
 /** Creation of block and thread descriptors */
@@ -215,8 +141,8 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 */
 #define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 size) \
-  error "P4A_create_1d_thread_descriptors not yet implemented"
+					 size)				\
+  error "P4A_create_1d_thread_descriptors not yet implemented in OpenMP"
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -224,27 +150,27 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 */
 #define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 n_x_iter, n_y_iter) \
-  error "P4A_create_2d_thread_descriptors not yet implemented"
+					 n_x_iter, n_y_iter)		\
+  error "P4A_create_2d_thread_descriptors not yet implemented in OpenMP"
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message with an
     OpenMP implementation.
 */
 #define P4A_dump_descriptor(message, descriptor_name) \
-  error "P4A_dump_descriptor not yet implemented"
+  error "P4A_dump_descriptor not yet implemented in OpenMP"
 
 
 /** Dump a CUDA dim3 block descriptor with an OpenMP implementation.
 */
 #define P4A_dump_block_descriptor(descriptor_name) \
-  error "P4A_dump_block_descriptort not yet implemented"
+  error "P4A_dump_block_descriptort not yet implemented in OpenMP"
 
 
 /** Dump a CUDA dim3 grid descriptor with an OpenMP implementation.
 */
 #define P4A_dump_grid_descriptor(descriptor_name) \
-  error "P4A_dump_grid_descriptor not yet implemented"
+  error "P4A_dump_grid_descriptor not yet implemented in OpenMP"
 
 
 /** @addtogroup P4A_cuda_kernel_call

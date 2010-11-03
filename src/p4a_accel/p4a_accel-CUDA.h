@@ -192,7 +192,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 #define P4A_vp_2 (blockIdx.z*blockDim.z + threadIdx.z)
 
 
-/** @defgroup P4A_memory_allocation_copy Memory allocation and copy
+/** @defgroup P4A_CUDA_memory_allocation_copy Memory allocation and copy for CUDA acceleration
 
     @{
 */

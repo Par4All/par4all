@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 /** @defgroup p4a_accel_stubs Equivalent stubs of Par4All runtime to have
-    PIPS analyzes happy
+    PIPS analyzis happy
 
     The main idea is that PIPS is interprocedural and needs to know
     everything about the program to be analysed. Since the generated
@@ -26,6 +26,43 @@
  */
 
 
+/** Stub for copying a scalar from the hardware accelerator memory to
+    the host.
+
+    @param[in] element_size is the size of one element of the array in
+    byte
+
+    @param[out] host_address point to the element on the host to write
+    into
+
+    @param[in] accel_address refer to the compact memory area to read
+    data. In the general case, accel_address may be seen as a unique idea (FIFO)
+    and not some address in some memory space.
+*/
+void P4A_copy_from_accel(size_t element_size,
+			 void *host_address,
+			 const void *accel_address) {
+  size_t i;
+  char * cdest = host_address;
+  const char * csrc = accel_address;
+  for(i = 0; i < element_size; i++)
+    cdest[i] = csrc[i];
+}
+
+
+/** Stub for copying a scalar from the host to a memory zone in the
+    hardware accelerator.
+*/
+void P4A_copy_to_accel(size_t element_size,
+		       const void *host_address,
+		       void *accel_address) {
+  size_t i;
+  char * cdest = accel_address;
+  const char * csrc = host_address;
+  for(i = 0; i < element_size; i++)
+    cdest[i] = csrc[i];
+}
+
 /** Stub for copying memory from the host to the hardware accelerator.
 
     Since it is a stub so that PIPS can understand it, use simple
@@ -34,45 +71,119 @@
     Do not change the place of the pointers in the API. The host address
     is always in the first position...
 
-    @param[in] host_address is the address of a source zone in the host memory
+    This function could be quite simpler but is designed by symmetry with
+    other functions.
 
-    @param[out] accel_address is the address of a destination zone in the
-    accelerator memory
+    @param[in] element_size is the size of one element of the array in
+    byte
 
-    @param[in] size is the size in bytes of the memory zone to copy
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+
+    @param[in] d1_block_size is the number of element to transfer
+
+    @param[in] d1_offset is element order to start the transfer from
+
+    @param[out] host_address point to the array on the host to write into
+
+    @param[in] accel_address refer to the compact memory area to read
+    data. In the general case, accel_address may be seen as a unique idea (FIFO)
+    and not some address in some memory space.
 */
-void * P4A_copy_to_accel(const void * host_address,
-			 void * accel_address,
-			 size_t size) {
+void P4A_copy_from_accel_1d(size_t element_size,
+			    size_t d1_size,
+			    size_t d1_block_size,
+			    size_t d1_offset,
+			    void *host_address,
+			    const void *accel_address) {
   size_t i;
-
-  for(i = 0 ; i < size; i++)
-    ((char*)accel_address)[i] = ((const char*)host_address)[i];
-  return accel_address;
+  char * cdest = d1_offset*element_size + (char *)host_address;
+  const char * csrc = accel_address;
+  for(i = 0; i < d1_block_size*element_size; i++)
+    cdest[i] = csrc[i];
 }
 
 
-/** Stub for copying memory from the hardware accelerator to the host.
+/** Stub for copying a 1D memory zone from the hardware accelerator to the
+    host.
 
     Do not change the place of the pointers in the API. The host address
     is always in the first position...
 
-    @param[out] host_address is the address of a destination zone in the
-    host memory
+    This function could be quite simpler but is designed by symmetry with
+    other functions.
 
-    @param[in] accel_address is the address of a source zone in the
-    accelerator memory
+    @param[in] element_size is the size of one element of the array in
+    byte
 
-    @param[in] size is the size in bytes of the memory zone to copy
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+
+    @param[in] d1_block_size is the number of element to transfer
+
+    @param[in] d1_offset is element order to start the transfer from
+
+    @param[in] host_address point to the array on the host to read
+
+    @param[out] accel_address refer to the compact memory area to write
+    data. In the general case, accel_address may be seen as a unique idea
+    (FIFO) and not some address in some memory space.
 */
-void * P4A_copy_from_accel(void * host_address,
-			   const void * accel_address,
-			   size_t size) {
+void P4A_copy_to_accel_1d(size_t element_size,
+			  size_t d1_size,
+			  size_t d1_block_size,
+			  size_t d1_offset,
+			  const void *host_address,
+			  void *accel_address) {
   size_t i;
+  char * cdest = accel_address;
+  const char * csrc = d1_offset*element_size + (char *)host_address;
+  for(i = 0; i < d1_block_size*element_size; i++)
+    cdest[i] = csrc[i];
+}
 
-  for(i = 0; i < size; i++)
-    ((char*)host_address)[i] = ((const char*)accel_address)[i];
-  return host_address;
+
+/** Stub for copying a 2D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_2d(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address) {
+  size_t i, j;
+  char * cdest = (char *)accel_address;
+  const char * csrc = d2_offset*element_size + (char *)host_address;
+  for(i = 0; i < d1_block_size; i++)
+    for(j = 0; j < d2_block_size*element_size; j++)
+      cdest[i*element_size*d2_block_size + j] =
+        csrc[(i + d1_offset)*element_size*d2_size + j];
+}
+
+
+/** Stub for copying memory from the hardware accelerator to a 2D array in
+    the host.
+*/
+void P4A_copy_from_accel_2d(size_t element_size,
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address) {
+  size_t i, j;
+  char * cdest = d2_offset*element_size + (char*)host_address;
+  char * csrc = (char*)accel_address;
+  for(i = 0; i < d1_block_size; i++)
+    for(j = 0; j < d2_block_size*element_size; j++)
+      cdest[(i + d1_offset)*element_size*d2_size + j] =
+        csrc[i*element_size*d2_block_size + j];
 }
 
 
