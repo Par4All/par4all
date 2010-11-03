@@ -1,0 +1,17 @@
+int main()
+{
+
+// Pointer values: none
+
+   char *s;
+
+// Pointer values:
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   s = "hello\n";
+
+// Pointer values:
+// s == &"hello\n"[0] (exact);
+
+   return 0;
+}
