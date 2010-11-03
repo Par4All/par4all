@@ -79,11 +79,11 @@ static dma_dimension get_dma_dimension(entity to) {
     };
 }
 
-/** 
- * converts a region_to_dma_switch to coressponding dma name
- * according top properties
+/**
+ * converts a region_to_dma_switch to corresponding dma name
+ * according to properties
  */
-static string get_dma_name(enum region_to_dma_switch m,dma_dimension d) {
+static string get_dma_name(enum region_to_dma_switch m, dma_dimension d) {
     char *seeds[] = {
         "KERNEL_LOAD_STORE_LOAD_FUNCTION",
         "KERNEL_LOAD_STORE_STORE_FUNCTION",
@@ -91,10 +91,12 @@ static string get_dma_name(enum region_to_dma_switch m,dma_dimension d) {
         "KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"
     };
     char * propname = seeds[(int)m];
-    if(d>dma1D && (int)m <2)
-        asprintf(&propname,"%s_%dD",seeds[(int)m],(int)d);
+    /* If the DMA is not scalar, the DMA function name is in the property
+       of the form KERNEL_LOAD_STORE_LOAD/STORE_FUNCTION_dD: */
+    if(d > dmaScalar && (int)m < 2)
+        asprintf(&propname,"%s_%dD", seeds[(int)m], (int)d);
     string dmaname = get_string_property(propname);
-    if(d>dma1D && (int)m <2) free(propname);
+    if(d > dmaScalar && (int)m <2) free(propname);
     return dmaname;
 }
 
@@ -134,15 +136,15 @@ static expression entity_to_address(entity e) {
     return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
 }
 
-/** 
+/**
  * converts dimensions to a dma call from a memory @a from to another memory @a to
- * 
+ *
  * @param from expression giving the adress of the input memory
  * @param to expression giving the adress of the output memory
  * @param ld list of dimensions to analyze
  * @param m kind of call to generate
- * 
- * @return 
+ *
+ * @return
  */
 static
 call dimensions_to_dma(entity from,
@@ -233,43 +235,67 @@ call dimensions_to_dma(entity from,
           } break;
       case dma_load:
       case dma_store:
-          {
-              list /*of expressions*/ transfer_sizes = NIL;
-              FOREACH(DIMENSION,d,ld) {
-                  expression transfer_size=
-                          SizeOfDimension(d);
-                  transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
-              }
-              transfer_sizes=gen_nreverse(transfer_sizes);
+	/* Generate communication functions: */
+	{
+	  //if(!scalar_entity) {
+	    /* Build the sizes of the array block to transfer: */
+	    list /*of expressions*/ transfer_sizes = NIL;
+	    FOREACH(DIMENSION,d,ld) {
+	      expression transfer_size=
+		SizeOfDimension(d);
+	      transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
+	    }
+	    transfer_sizes=gen_nreverse(transfer_sizes);
 
-              list/* of expressions*/ from_dims = NIL;
-              FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
-                  from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
-              }
-              from_dims=gen_nreverse(from_dims);
+	    /* Build the sizes of the array with element to transfer: */
+	    list/* of expressions*/ from_dims = NIL;
+	    /* We may skip the size of the first dimension since it is not
+	       used in adress calculation. But since it depends of Fortran
+	       or C in the runtime, postpone this micro-optimization... */
+	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
+	      from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
+	    }
+	    from_dims=gen_nreverse(from_dims);
 
-              list/* of expressions*/ offsets = NIL;
-              FOREACH(EXPRESSION,e,lo)
-                  offsets=CONS(EXPRESSION,e,offsets);
-              offsets=gen_nreverse(offsets);
+	    /* Build the offsets of the array block to transfer: */
+	    list/* of expressions*/ offsets = NIL;
+	    FOREACH(EXPRESSION,e,lo)
+	      offsets=CONS(EXPRESSION,e,offsets);
+	    offsets=gen_nreverse(offsets);
+	/* Use a special transfert function for scalars instead of reusing
+	   the 1D function. It may useful for example if it is implemented
+	   as a FIFO at the hardware level: */
+	//} else {
+	//    /* If we have a scalar variable to transfert, generate
+	//       synthetic transfer parameters: */
+	//    /* 1 element to transfert */
+	//    transfer_sizes = make_expression_list(int_to_expression(1));
+	//    /* 1 dimension */
+	//    from_dims = make_expression_list(int_to_expression(1));
+	//    /* At the begining of the « array »: */
+	//    offsets = make_expression_list(int_to_expression(0));
+	//  }
 
-              expression source = entity_to_address(from);
-              if(scalar_entity) {
-                  transfer_sizes=make_expression_list(int_to_expression(1));
-                  from_dims=make_expression_list(int_to_expression(1));
-                  offsets=make_expression_list(int_to_expression(0));
-              }
-              args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
-              if(dma_load_p(m))
-                  args=gen_nreverse(args);
-              args=gen_append(args,CONS(EXPRESSION,make_expression(
-                              make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))), normalized_undefined
-                              ),NIL));
-              from_dims= gen_append(from_dims,offsets);
-              from_dims= gen_append(from_dims, transfer_sizes);
-              args= gen_append(args,from_dims);
-
-          } break;
+	  expression source = entity_to_address(from);
+	  /* Generate host and accel adresses: */
+	  args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+	  //if(dma_load_p(m))
+	  //    args=gen_nreverse(args);
+	  /* Output parameters in an order compatible with some C99
+	     implementation of the runtime: size and block size first, so
+	     that some arguments can be defined with them: */
+	  /* Insert offset: */
+	  args = gen_append(offsets, args);
+	  /* Insert the block size to transfert: */
+	  args = gen_append(transfer_sizes, args);
+	  /* Insert the array sizes: */
+	  args = gen_append(from_dims, args);
+	  /* Insert the element size expression: */
+	  args = CONS(EXPRESSION,
+		      make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))),
+				      normalized_undefined),
+		      args);
+	} break;
       default:
           pips_internal_error("should not happen");
   }

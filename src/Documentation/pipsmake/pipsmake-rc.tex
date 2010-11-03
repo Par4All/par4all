@@ -6702,8 +6702,13 @@ kernel_load_store	> CALLERS.code
         < CALLERS.preconditions
 \end{PipsMake}
 
-The following properties can be used to customized the allocate/load/store
-functions:
+The following properties are used to specify the names of runtime
+functions. Since they are used in Par4All, their default names begin with
+\verb|P4A_|. To have an idea about their prototype, have a look to the
+Par4All accelerator runtime or in
+\textttvalidation/AcceleratorUtils/include/par4all.c} The following.
+
+The properties that can be used to customized the allocate/load/store functions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}
 KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_accel_malloc"
 \end{PipsProp}
@@ -6712,7 +6717,7 @@ KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
 \end{PipsProp}
 
 The following properties are used to name the \textsc{dma} functions to
-use in one dimension:
+use for scalars:
 \begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION}
 KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 \end{PipsProp}
@@ -6721,13 +6726,58 @@ KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
 \end{PipsProp}
 
+and for 1-dimension arrays:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_1D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_1D "P4A_copy_to_accel_1d"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_1D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_1D "P4A_copy_from_accel_1d"
+\end{PipsProp}
+
 and in 2 dimensions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_2D}
-KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel2d"
+KERNEL_LOAD_STORE_LOAD_FUNCTION_2D "P4A_copy_to_accel_2d"
 \end{PipsProp}
 
 \begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_2D}
-KERNEL_LOAD_STORE_STORE_FUNCTION_2D "P4A_copy_from_accel2d"
+KERNEL_LOAD_STORE_STORE_FUNCTION_2D "P4A_copy_from_accel_2d"
+\end{PipsProp}
+
+and in 3 dimensions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_3D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_3D "P4A_copy_to_accel_3d"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_3D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_3D "P4A_copy_from_accel_3d"
+\end{PipsProp}
+
+and in 4 dimensions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_4D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_4D "P4A_copy_to_accel_4d"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_4D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_4D "P4A_copy_from_accel_4d"
+\end{PipsProp}
+
+and in 5 dimensions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_5D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_5D "P4A_copy_to_accel_5d"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_5D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_5D "P4A_copy_from_accel_5d"
+\end{PipsProp}
+
+and in 6 dimensions:
+\begin{PipsProp}{KERNEL_LOAD_STORE_LOAD_FUNCTION_6D}
+KERNEL_LOAD_STORE_LOAD_FUNCTION_6D "P4A_copy_to_accel_6d"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_STORE_FUNCTION_6D}
+KERNEL_LOAD_STORE_STORE_FUNCTION_6D "P4A_copy_from_accel_6d"
 \end{PipsProp}
 
 Due to the current limitation of the effects, PIPS provides this property
