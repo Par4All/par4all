@@ -1,0 +1,82 @@
+float main()
+{
+   static float A[16][2], B[16][2], C[16][2], D[16][2];
+
+   int i;
+
+   pin_down(A, B, C, D);
+   {
+      ticks start, stop;
+      start = clock();
+
+      for(i = 0; i <= 15; i += 1) {
+         D[i][0] = C[i][0]+A[i][0]*B[i][0];
+         D[i][0] -= A[i][1]+B[i][1];
+
+         D[i][1] = C[i][1]+A[i][1]*B[i][0];
+         D[i][1] += A[i][0]+B[i][1];
+      }
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(A, B, C, D);
+   return 0;
+}
+float main()
+{
+   static float A[16][2], B[16][2], C[16][2], D[16][2];
+   //PIPS generated variable
+   int LU_IND0;
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   ticks start0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec80_0, vec90_0, vec110_0, vec120_0, vec130_0, vec150_0, vec160_0, vec180_0, vec190_0, vec200_0, vec210_0;
+
+   pin_down(A, B, C, D);
+   start0 = clock();
+
+   LU_IND0 = 0;
+   SIMD_LOAD_GENERIC_V4SF(vec190_0, pdata2[1], pdata2[3], pdata3[1], pdata3[3]);
+   SIMD_LOAD_GENERIC_V4SF(vec210_0, pdata2[0], pdata2[2], pdata3[0], pdata3[2]);
+   for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_GENERIC_V4SF(vec20_0, B[LU_IND0][0], B[LU_IND0][0], B[1+LU_IND0][0], B[1+LU_IND0][0]);
+      SIMD_LOAD_GENERIC_V4SF(vec10_0, A[LU_IND0][0], A[LU_IND0][1], A[1+LU_IND0][0], A[1+LU_IND0][1]);
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+      SIMD_LOAD_GENERIC_V4SF(vec50_0, B[2+LU_IND0][0], B[2+LU_IND0][0], B[3+LU_IND0][0], B[3+LU_IND0][0]);
+      SIMD_LOAD_GENERIC_V4SF(vec40_0, A[2+LU_IND0][0], A[2+LU_IND0][1], A[3+LU_IND0][0], A[3+LU_IND0][1]);
+      SIMD_MULPS(vec30_0, vec40_0, vec50_0);
+      SIMD_LOAD_GENERIC_V4SF(vec80_0, B[LU_IND0][1], B[LU_IND0][1], B[1+LU_IND0][1], B[1+LU_IND0][1]);
+      SIMD_ADDPS(vec60_0, vec10_0, vec80_0);
+      SIMD_LOAD_GENERIC_V4SF(vec110_0, B[2+LU_IND0][1], B[2+LU_IND0][1], B[3+LU_IND0][1], B[3+LU_IND0][1]);
+      SIMD_ADDPS(vec90_0, vec40_0, vec110_0);
+      SIMD_LOAD_GENERIC_V4SF(vec130_0, C[LU_IND0][0], C[LU_IND0][1], C[1+LU_IND0][0], C[1+LU_IND0][1]);
+      SIMD_ADDPS(vec120_0, vec130_0, vec00_0);
+      SIMD_STORE_GENERIC_V4SF(vec120_0, &D[LU_IND0][0], &D[LU_IND0][1], &D[1+LU_IND0][0], &D[1+LU_IND0][1]);
+      SIMD_LOAD_GENERIC_V4SF(vec160_0, C[2+LU_IND0][0], C[2+LU_IND0][1], C[3+LU_IND0][0], C[3+LU_IND0][1]);
+      SIMD_ADDPS(vec150_0, vec160_0, vec30_0);
+      SIMD_STORE_GENERIC_V4SF(vec150_0, &D[2+LU_IND0][0], &D[2+LU_IND0][1], &D[3+LU_IND0][0], &D[3+LU_IND0][1]);
+      SIMD_LOAD_GENERIC_V4SF(vec180_0, D[LU_IND0][0], D[1+LU_IND0][0], D[2+LU_IND0][0], D[3+LU_IND0][0]);
+      SIMD_SUBPS(vec180_0, vec180_0, vec190_0);
+      SIMD_STORE_GENERIC_V4SF(vec180_0, &D[LU_IND0][0], &D[1+LU_IND0][0], &D[2+LU_IND0][0], &D[3+LU_IND0][0]);
+      SIMD_LOAD_GENERIC_V4SF(vec200_0, D[LU_IND0][1], D[1+LU_IND0][1], D[2+LU_IND0][1], D[3+LU_IND0][1]);
+      SIMD_ADDPS(vec200_0, vec200_0, vec210_0);
+      SIMD_STORE_GENERIC_V4SF(vec200_0, &D[LU_IND0][1], &D[1+LU_IND0][1], &D[2+LU_IND0][1], &D[3+LU_IND0][1]);
+   }
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+   SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
+   SIMD_STORE_V4SF(vec60_0, &pdata2[0]);
+   SIMD_STORE_V4SF(vec90_0, &pdata3[0]);
+
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return 0;
+}
+['d.out/n_complex_updates.c', 'd.out/SIMD.c']

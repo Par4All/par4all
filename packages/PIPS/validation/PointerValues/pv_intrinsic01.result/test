@@ -1,0 +1,448 @@
+int main()
+{
+
+// Pointer values: none
+
+   FILE *fp;
+
+// Pointer values:
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   size_t n, nr;
+
+// Pointer values:
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   char buf1[200];
+
+// Pointer values:
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   char *buf2 = malloc(200*sizeof(char));
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   char *fmt;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   char *i_name;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i, r, c, max;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   fpos_t *fp_pos, pos;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   long int fp_pos_indic;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   va_list vl;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   // formatted IO functions
+   fmt = "%s%d";
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   max = 100;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   n = 200;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   fp = fopen("file.txt", "rb");
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fscanf(fp, fmt, i_name, &i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fprintf(fp, "%s%d", i_name, i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   (void) scanf("%s%d", i_name, &i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) printf(fmt, i_name, i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   (void) sscanf(buf1, fmt, i_name, &i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) sprintf(buf2, fmt, i_name, i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) snprintf(buf2, 100, fmt, i_name, i);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fgets(buf1, max, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fputc(c, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fputs(buf1, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   c = _IO_getc(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) _IO_putc(c, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) ungetc(c, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   c = getchar();
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) putchar(c);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   (void) gets(buf1);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) puts(buf1);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   nr = fwrite(buf2, sizeof(char), n, fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   // file positionning functions
+   fp_pos = &pos;
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fgetpos(fp, fp_pos);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   (void) fgetpos(fp, &pos);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   (void) fseek(fp, 0L, 0);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   (void) fsetpos(fp, fp_pos);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   fp_pos_indic = ftell(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   rewind(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   // error handling functions
+   
+   clearerr(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   r = feof(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   r = ferror(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   perror(buf1);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   fclose(fp);
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   fprintf(stderr, "The END\n");
+
+// Pointer values:
+// buf2 == &*ANY_MODULE*:*ANYWHERE* (may);
+// fmt == &"%s%d"[0] (exact);
+// fp == &*ANY_MODULE*:*ANYWHERE* (may);
+// fp_pos == &pos (exact);
+// i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   return 0;
+}

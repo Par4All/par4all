@@ -1,0 +1,43 @@
+void main()
+{
+   static float ar, ai;
+   static float br, bi;
+   static float cr, ci;
+
+   pin_down(&ar, &ai, &br, &bi, &cr, &ci);
+   {
+      ticks start, stop;
+      start = clock();
+
+      cr = ar*br-ai*bi;
+      ci = ar*bi+ai*br;
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(&ar, &ai, &br, &bi, &cr, &ci);
+}
+void main()
+{
+   static float cr, ci;
+   //PIPS generated variable
+   ticks stop0, start0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0;
+
+   pin_down(&pdata1[0], &pdata1[1], &pdata0[0], &pdata0[1], &cr, &ci);
+   //PIPS:SAC generated v4sf vector(s)
+   start0 = clock();
+   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   SIMD_LOAD_V4SF(vec10_0, &pdata1[0]);
+   SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+   SIMD_STORE_V4SF(vec00_0, &pdata2[0]);
+
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+}
+['d.out/SIMD.c', 'd.out/complex_multiply.c']

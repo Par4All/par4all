@@ -1,0 +1,23 @@
+int main()
+{
+
+// Pointer values: none
+
+   char *end;
+
+// Pointer values:
+// end == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   long int li;
+
+// Pointer values:
+// end == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   li = strtol("32445667 is a number", &end, 0);
+
+// Pointer values:
+// end == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}

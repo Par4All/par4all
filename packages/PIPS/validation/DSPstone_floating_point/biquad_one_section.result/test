@@ -1,0 +1,74 @@
+float main()
+{
+
+   register float y, w;
+
+   static float x = 7, w1 = 7, w2 = 7;
+   static float b0 = 7, b1 = 7, b2 = 7;
+   static float a1 = 7, a2 = 7;
+   {
+      ticks start, stop;
+      start = clock();
+
+      w = x-a1*w1;
+      w -= a2*w2;
+      y = b0*w;
+      y += b1*w1;
+      y += b2*w2;
+
+      w2 = w1;
+      w1 = w;
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   x = pin_down(x);
+   w1 = pin_down(w1);
+   w2 = pin_down(w2);
+   return (float) y;
+}
+float main()
+{
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float y0, y1, y2, w0, w3;
+   //PIPS generated variable
+   ticks start0;
+   //PIPS generated variable
+   float b00, x0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0;
+   x0 = 7;
+   pdata0[0] = 7;
+   pdata0[1] = 7;
+   b00 = 7;
+   pdata1[2] = 7;
+   pdata1[3] = 7;
+   pdata1[0] = 7;
+   pdata1[1] = 7;
+   //PIPS:SAC generated v4sf vector(s)
+   start0 = clock();
+   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   SIMD_LOAD_V4SF(vec10_0, &pdata1[0]);
+   SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+   SIMD_STORE_V4SF(vec00_0, &pdata2[0]);
+
+   pdata0[0];
+
+   stop0 = clock();
+
+   w3 = x0-pdata2[0];
+   w0 = w3-pdata2[1];
+   y2 = b00*w0;
+   w0;
+   y1 = y2+pdata2[2];
+   y0 = y1+pdata2[3];
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return (float) y0;
+}
+['d.out/biquad_one_section.c', 'd.out/SIMD.c']

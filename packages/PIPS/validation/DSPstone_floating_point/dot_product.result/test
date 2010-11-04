@@ -1,0 +1,54 @@
+float main()
+{
+   static float A[2];
+   static float B[2];
+   static float Z;
+
+   int f;
+
+   pin_down(&Z, A, B);
+   {
+      ticks start, stop;
+      start = clock();
+
+      for(f = 0; f <= 1; f += 1)
+         Z += A[f]*B[f];
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(&Z, A, B);
+   return 0;
+}
+float main()
+{
+   static float A[2];
+   static float B[2];
+   static float Z;
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   ticks start0;
+   //PIPS generated variable
+   float Z1;
+   //SAC generated temporary array
+   a2sf pdata0 = {0, 0};
+   //PIPS generated variable
+   v2df vec00_0, vec10_0, vec20_0;
+
+   pin_down(&Z1, A, B);
+   //PIPS:SAC generated v2df vector(s)
+   start0 = clock();
+   SIMD_LOAD_V2SF_TO_V2DF(vec20_0, &B[0]);
+   SIMD_LOAD_V2SF_TO_V2DF(vec10_0, &A[0]);
+   SIMD_MULPD(vec00_0, vec10_0, vec20_0);
+   SIMD_STORE_V2DF_TO_V2SF(vec00_0, &pdata0[0]);
+
+   stop0 = clock();
+   Z+pdata0[1];
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return 0;
+}
+['d.out/dot_product.c', 'd.out/SIMD.c']

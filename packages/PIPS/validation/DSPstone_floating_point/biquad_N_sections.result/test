@@ -1,0 +1,113 @@
+float main()
+{
+
+   register float w;
+   int f;
+   
+   /*STORAGE_CLASS*/
+   float wi[4][2];
+
+   static float coefficients[4][5];
+   register float x, y;
+
+   x = pin_down(x, coefficients, wi);
+   {
+      ticks start, stop;
+      start = clock();
+
+      y = x;
+
+      for(f = 0; f <= 3; f += 1) {
+         w = y-coefficients[f][0]*wi[f][0];
+         w -= coefficients[f][1]*wi[f][1];
+
+         y = coefficients[f][2]*w;
+         y += coefficients[f][3]*wi[f][0];
+         y += coefficients[f][4]*wi[f][1];
+
+         wi[f][1] = wi[f][0];
+         wi[f][0] = w;
+      }
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(y, coefficients, wi);
+   return (float) y;
+}
+float main()
+{
+   
+   /*STORAGE_CLASS*/
+   float wi[4][2];
+
+   static float coefficients[4][5];
+   register float x;
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float y0, y1, y2, w0, w1, y3, y4, y5, w2, w3, y6, y7, y8, w4, w5, y9, y10, y11, w6, w7, y12;
+   //PIPS generated variable
+   ticks start0;
+   //PIPS generated variable
+   float x0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0;
+
+   x0 = pin_down(x, coefficients, wi);
+   //PIPS:SAC generated v4sf vector(s)
+   start0 = clock();
+
+   y12 = x0;
+   SIMD_LOAD_GENERIC_V4SF(vec20_0, wi[0][0], wi[0][0], wi[0][1], wi[0][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec10_0, coefficients[0][0], coefficients[0][3], coefficients[0][1], coefficients[0][4]);
+   SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+
+   stop0 = clock();
+   w7 = y12-pdata0[0];
+   wi[0][1] = wi[0][0];
+   w6 = w7-pdata0[2];
+   y11 = coefficients[0][2]*w6;
+   wi[0][0] = w6;
+   y10 = y11+pdata0[1];
+   SIMD_LOAD_GENERIC_V4SF(vec50_0, wi[1][0], wi[1][0], wi[1][1], wi[1][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec40_0, coefficients[1][0], coefficients[1][3], coefficients[1][1], coefficients[1][4]);
+   SIMD_MULPS(vec30_0, vec40_0, vec50_0);
+   SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
+   y9 = y10+pdata0[3];
+   wi[1][1] = wi[1][0];
+   w5 = y9-pdata1[0];
+   w4 = w5-pdata1[2];
+   y8 = coefficients[1][2]*w4;
+   wi[1][0] = w4;
+   y7 = y8+pdata1[1];
+   SIMD_LOAD_GENERIC_V4SF(vec80_0, wi[2][0], wi[2][0], wi[2][1], wi[2][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec70_0, coefficients[2][0], coefficients[2][3], coefficients[2][1], coefficients[2][4]);
+   SIMD_MULPS(vec60_0, vec70_0, vec80_0);
+   SIMD_STORE_V4SF(vec60_0, &pdata2[0]);
+   y6 = y7+pdata1[3];
+   wi[2][1] = wi[2][0];
+   w3 = y6-pdata2[0];
+   w2 = w3-pdata2[2];
+   y5 = coefficients[2][2]*w2;
+   wi[2][0] = w2;
+   y4 = y5+pdata2[1];
+   SIMD_LOAD_GENERIC_V4SF(vec110_0, wi[3][0], wi[3][0], wi[3][1], wi[3][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec100_0, coefficients[3][0], coefficients[3][3], coefficients[3][1], coefficients[3][4]);
+   SIMD_MULPS(vec90_0, vec100_0, vec110_0);
+   SIMD_STORE_V4SF(vec90_0, &pdata3[0]);
+   y3 = y4+pdata2[3];
+   w1 = y3-pdata3[0];
+   w0 = w1-pdata3[2];
+   y2 = coefficients[3][2]*w0;
+   y1 = y2+pdata3[1];
+   y0 = y1+pdata3[3];
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return (float) y0;
+}
+['d.out/biquad_N_sections.c', 'd.out/SIMD.c']

@@ -1,0 +1,98 @@
+float main()
+{
+   static float x[16];
+   static float h[16];
+
+   static float x0 = 100;
+   float y;
+
+   int i;
+
+   pin_down(x, h, &y);
+   {
+      ticks start, stop;
+      start = clock();
+
+      y = 0;
+
+      for(i = 0; i <= 14; i += 1) {
+         y += h[16-1-i]*x[16-1-i];
+         x[16-1-i] = x[16-2-i];
+      }
+
+      y += h[0]*x[0];
+      x[0] = x0;
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(x, h, &y);
+   return (float) y;
+}
+float main()
+{
+   static float x[16];
+   static float h[16];
+   float y;
+   //PIPS generated variable
+   int LU_IND0;
+   //PIPS generated variable
+   float RED0[1], RED1[4];
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float y0, F_10, y1, y2, F_04, y3;
+   //PIPS generated variable
+   ticks start0;
+   //PIPS generated variable
+   float x00;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
+   x00 = 100;
+
+   pin_down(x, h, &y);
+   start0 = clock();
+
+   y3 = 0;
+
+   RED0[0] = 0.000000;
+
+   for(LU_IND0 = 0; LU_IND0 <= 2; LU_IND0 += 1) {
+      F_04 = h[15+(-LU_IND0)]*x[15+(-LU_IND0)];
+      RED0[0] = RED0[0]+F_04;
+      x[15+(-LU_IND0)] = x[14+(-LU_IND0)];
+   }
+   y2 = RED0[0]+y3;
+   RED1[0] = 0.000000;
+   RED1[1] = 0.000000;
+   RED1[2] = 0.000000;
+   RED1[3] = 0.000000;
+   SIMD_LOAD_GENERIC_V4SF(vec30_0, RED1[3], RED1[2], RED1[1], RED1[0]);
+   for(LU_IND0 = 3; LU_IND0 <= 14; LU_IND0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec20_0, &x[12+(-LU_IND0)]);
+      SIMD_LOAD_V4SF(vec10_0, &h[12+(-LU_IND0)]);
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+      SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
+      x[15+(-LU_IND0)] = x[14+(-LU_IND0)];
+      x[14+(-LU_IND0)] = x[13+(-LU_IND0)];
+      x[13+(-LU_IND0)] = x[12+(-LU_IND0)];
+      x[12+(-LU_IND0)] = x[11+(-LU_IND0)];
+   }
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+   SIMD_STORE_GENERIC_V4SF(vec30_0, &RED1[3], &RED1[2], &RED1[1], &RED1[0]);
+   y1 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y2;
+   F_10 = h[0]*x[0];
+
+   stop0 = clock();
+
+   y0 = y1+F_10;
+   x[0] = x00;
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return (float) y0;
+}
+['d.out/SIMD.c', 'd.out/fir.c']
