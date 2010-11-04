@@ -262,7 +262,7 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
          This can happen if and only if the current basic is a pointer or a derived 
          (typedef have been eliminated by the use of basic_concrete_type).
       */
-      switch (basic_tag(current_basic)) 
+      switch (basic_tag(current_basic))
 	{
 	case is_basic_pointer:
 	  {

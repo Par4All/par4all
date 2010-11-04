@@ -186,3 +186,11 @@
 #define pips_debug_pvs(level, message, l_pv) \
   ifdebug(level) { pips_debug(level, "%s\n", message); \
   print_pointer_values(l_pv);}
+
+/********* CONTEXT AND FLOW SENSITIVITY INFORMATION */
+typedef struct
+{
+    statement current_stmt;
+    entity current_module;
+    list enclosing_flow; /* not used yet, we don't know if it should retain enclosing loops and/or modules */
+} sensitivity_information;
