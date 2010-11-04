@@ -1887,7 +1887,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	{
 	  pips_debug(6, "Linear operation\n");
 
-	  result_exp = make_lin_op_exp(op_ent, exp1, exp2);
+	  result_exp = make_lin_op_exp(op_ent, copy_expression(exp1), copy_expression(exp2));
 	}
       else if(expression_equal_integer_p(exp1, 0))
 	{
@@ -1948,6 +1948,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
  * between two integer linear expressions "exp1" and "exp2".
  *
  * This function uses the linear library for manipulating Pvecteurs.
+ * exp1 and exp2 are freed
  *
  * Pvecteur_to_expression() is a function that rebuilds an expression
  * from a Pvecteur.
@@ -3052,6 +3053,8 @@ void update_expression_syntax(expression e, syntax s)
  */
 entity string_to_entity(const char * s,entity module)
 {
+    if(empty_string_p(s)) return entity_undefined;
+
     /* try float conversion */
     string endptr,module_name=module_local_name(module);
     long int l = strtol(s,&endptr,10);
@@ -3076,12 +3079,145 @@ entity string_to_entity(const char * s,entity module)
     /* try at top level */
     if(entity_undefined_p(candidate))
         candidate=FindEntity(TOP_LEVEL_MODULE_NAME,s);
-    return entity_undefined_p(candidate)?
-        entity_undefined:
-        candidate;
+    /* filter out results */
+    if(!entity_undefined_p(candidate) && !entity_variable_p(candidate))
+        return entity_undefined;
+    else
+        return candidate;
 }
+
+/* try to parse @p s in the context of module @p module
+ * only simple expressions are found */
 expression string_to_expression(const char * s,entity module)
 {
     entity e = string_to_entity(s,module);
-    return entity_undefined_p(e)?expression_undefined:entity_to_expression(e);
+    if(entity_undefined_p(e)) {
+        /* try to find simple expression */
+        static const char* seeds[] = {   PLUS_OPERATOR_NAME, MINUS_OPERATOR_NAME,MULTIPLY_OPERATOR_NAME, DIVIDE_OPERATOR_NAME};
+        for(int i=0;i< sizeof(seeds)/sizeof(seeds[0]); i++) {
+            char *where = strchr(s,seeds[i][0]);
+            if(where) {
+                char * head = strdup(s);
+                char * tail = head + (where -s) +1 ;
+                head[where-s]='\0';
+                expression e0 = string_to_expression(head,module);
+                expression e1 = string_to_expression(tail,module);
+                free(head);
+                if(!expression_undefined_p(e0) &&!expression_undefined_p(e1)) {
+                    return MakeBinaryCall(
+                            entity_intrinsic(seeds[i]),
+                            e0,
+                            e1
+                            );
+                }
+                else {
+                    free_expression(e0);
+                    free_expression(e1);
+                }
+            }
+        }
+        return expression_undefined;
+    }
+    else
+        return entity_to_expression(e);
+}
+
+/* call maxima to simplify an expression */
+bool maxima_simplify(expression *presult) {
+    bool success = true;
+    expression result = *presult;
+    /* try to call maxima to simplify this expression */
+    if(!expression_undefined_p(result) ) {
+        list w = words_expression(result,NIL);
+        string str = words_to_string(w);
+        gen_free_list(w);
+        char * cmd;
+        asprintf(&cmd,"maxima -q --batch-string \"string(fullratsimp(%s));\"\n",str);
+        free(str);
+        FILE* pout = popen(cmd,"r");
+        if(pout) {
+            /* strip out banner */
+            fgetc(pout);fgetc(pout);
+            /* look for first % */
+            while(!feof(pout) && fgetc(pout)!='%');
+            if(!feof(pout)) {
+                /* skip the three next chars */
+                fgetc(pout);fgetc(pout);fgetc(pout);
+                /* parse the output */
+                char bufline[strlen(cmd)];
+                if(fscanf(pout," %s\n",&bufline[0]) == 1 ) {
+                    expression exp = string_to_expression(bufline,get_current_module_entity());
+                    if(!expression_undefined_p(exp)) {
+                        free_expression(result);
+                        *presult=exp;
+                    }
+                    else
+                        success= false;
+                }
+            }
+            else
+                success= false;
+            fclose(pout);
+        }
+        else
+            success= false;
+        free(cmd);
+    }
+    return success;
+}
+
+/* computes the offset of a C reference with its origin
+ */
+expression reference_offset(reference ref)
+{
+    if(ENDP(reference_indices(ref))) return int_to_expression(0);
+    else {
+        expression address_computation = copy_expression(EXPRESSION(CAR(reference_indices(ref))));
+
+        /* iterate on the dimensions & indices to create the index expression */
+        list dims = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(ref)))));
+        list indices = reference_indices(ref);
+        POP(indices);
+        if(!ENDP(dims)) POP(dims); // the first dimension is unused
+        FOREACH(DIMENSION,dim,dims)
+        {
+            expression dimension_size = make_op_exp(
+                    PLUS_OPERATOR_NAME,
+                    make_op_exp(
+                        MINUS_OPERATOR_NAME,
+                        copy_expression(dimension_upper(dim)),
+                        copy_expression(dimension_lower(dim))
+                        ),
+                    int_to_expression(1));
+
+            if( !ENDP(indices) ) { /* there may be more dimensions than indices */
+                expression index_expression = EXPRESSION(CAR(indices));
+                address_computation = make_op_exp(
+                        PLUS_OPERATOR_NAME,
+                        copy_expression(index_expression),
+                        make_op_exp(
+                            MULTIPLY_OPERATOR_NAME,
+                            dimension_size,address_computation
+                            )
+                        );
+                POP(indices);
+            }
+            else {
+                address_computation = make_op_exp(
+                        MULTIPLY_OPERATOR_NAME,
+                        dimension_size,address_computation
+                        );
+            }
+        }
+
+        /* there may be more indices than dimensions */
+        FOREACH(EXPRESSION,e,indices)
+        {
+            address_computation = make_op_exp(
+                    PLUS_OPERATOR_NAME,
+                    address_computation,copy_expression(e)
+                    );
+        }
+        return address_computation ;
+    }
 }
