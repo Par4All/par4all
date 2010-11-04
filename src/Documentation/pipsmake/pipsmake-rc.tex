@@ -5623,20 +5623,17 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.proper_effects
 
 
-\begin{PipsPass}{single_assignment}
-This phase tries to minimize dependencies in the code by transforming
-it into single-assignment form.
+\begin{PipsPass}{scalar_renaming}
+This phase tries to minimize dependencies in the code by renaming scalars
+when legal.
 \end{PipsPass}
 
 \begin{PipsMake}
-alias single_assignment 'Single Assignment Form'
-
-single_assignment           > MODULE.code
-		! MODULE.split_initializations
+scalar_renaming           > MODULE.code
         < PROGRAM.entities
-        < MODULE.code
         < MODULE.dg
-\end{PipsMake}%$
+        < MODULE.proper_effects
+\end{PipsMake}
 
 \begin{PipsPass}{simd_treematcher}
 This function initialize a treematch used by \PipsPassRef{simdizer} for simd-oriented pattern matching

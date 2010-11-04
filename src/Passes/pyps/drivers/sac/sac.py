@@ -89,7 +89,7 @@ class sacbase(object):
 		# module.display()
 
 		# module.print_dot_dependence_graph()
-		module.single_assignment()
+		module.scalar_renaming()
 
 		if cond.get("verbose"):
 			module.display()
