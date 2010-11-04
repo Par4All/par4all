@@ -174,9 +174,10 @@ call dimensions_to_dma(entity from,
   bool scalar_entity=entity_scalar_p(from);
 
 
-  if (dma_allocate_p(m)||dma_deallocate_p(m)) {
+  if (dma_allocate_p(m)) {
       /* Need the address for the allocator to modify the pointer itself: */
       dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),entity_to_expression(to));
+      /* Generate a "void **" type: */
       type voidpp = make_type_variable(
               make_variable(
                   make_basic_pointer(
@@ -192,19 +193,20 @@ call dimensions_to_dma(entity from,
                   NIL,NIL
                   )
               );
+      /* dest = "(void **) &to" */
       dest = make_expression(
               make_syntax_cast(
                   make_cast(voidpp,dest)
                   ),
               normalized_undefined);
   }
-  else if (!dma_allocate_p(m) && !scalar_entity)
+  else if (!dma_deallocate_p(m))
     /* Except for the deallocation, the original array is referenced
        through pointer dereferencing: */
-    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), entity_to_expression(to));
-  else if(!dma_allocate_p(m) && scalar_entity){
+    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+			 entity_to_expression(to));
+  else
     dest=entity_to_expression(to);
-  }
 
   reference rtmp = make_reference(from,lo);
   type element_type = make_type_variable(
@@ -222,6 +224,7 @@ call dimensions_to_dma(entity from,
           break;
       case dma_allocate:
           {
+	    /* sizeof(element)*number elements of the array: */
               expression transfer_size = SizeOfDimensions(ld);
               transfer_size=MakeBinaryCall(
                       entity_intrinsic(MULTIPLY_OPERATOR_NAME),
