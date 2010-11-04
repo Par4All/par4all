@@ -208,41 +208,43 @@ void P4A_copy_to_accel_1d(size_t element_size,
 }
 
 
-/** Function for copying memory from the hardware accelerator to a 2D array in
+/** Function for copying memory from the hardware accelerator to a 3D array in
     the host.
 */
-void P4A_copy_from_accel_2d(size_t element_size,
-			    size_t d1_size, size_t d2_size,
-			    size_t d1_block_size, size_t d2_block_size,
-			    size_t d1_offset, size_t d2_offset,
+void P4A_copy_from_accel_3d(size_t element_size,
+			    size_t d1_size, size_t d2_size, size_t d3_size,
+			    size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+			    size_t d1_offset, size_t d2_offset, size_t d3_offset,
 			    void *host_address,
 			    const void *accel_address) {
-  size_t i, j;
-  char * cdest = d2_offset*element_size + (char*)host_address;
+  size_t i, j, k;
+  char * cdest = d3_offset*element_size + (char*)host_address;
   const char * csrc = (char*)accel_address;
   for(i = 0; i < d1_block_size; i++)
-    for(j = 0; j < d2_block_size*element_size; j++)
-      cdest[(i + d1_offset)*element_size*d2_size + j] =
-        csrc[i*element_size*d2_block_size + j];
+    for(j = 0; j < d2_block_size; j++)
+      for(k = 0; k < d3_block_size*element_size; k++)
+	cdest[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k] =
+	      csrc[(i*d2_block_size + j)*d3_block_size*element_size + k];
 }
 
 
-/** Function for copying a 2D memory zone from the host to a compact memory
+/** Function for copying a 3D memory zone from the host to a compact memory
     zone in the hardware accelerator.
 */
-void P4A_copy_to_accel_2d(size_t element_size,
-			  size_t d1_size, size_t d2_size,
-			  size_t d1_block_size, size_t d2_block_size,
-			  size_t d1_offset,   size_t d2_offset,
+void P4A_copy_to_accel_3d(size_t element_size,
+			  size_t d1_size, size_t d2_size, size_t d3_size,
+			  size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+			  size_t d1_offset,   size_t d2_offset, size_t d3_offset,
 			  const void *host_address,
 			  void *accel_address) {
-  size_t i, j;
+  size_t i, j, k;
   char * cdest = (char *)accel_address;
-  const char * csrc = d2_offset*element_size + (char *)host_address;
+  const char * csrc = d3_offset*element_size + (char *)host_address;
   for(i = 0; i < d1_block_size; i++)
-    for(j = 0; j < d2_block_size*element_size; j++)
-      cdest[i*element_size*d2_block_size + j] =
-        csrc[(i + d1_offset)*element_size*d2_size + j];
+    for(j = 0; j < d2_block_size; j++)
+      for(k = 0; k < d3_block_size*element_size; k++)
+	cdest[(i*d2_block_size + j)*d3_block_size*element_size + k] =
+	  csrc[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k];
 }
 
 /* @} */
