@@ -67,7 +67,11 @@ extern int the_current_debug_level;
 #define STEP_OMP_SUFFIX "_OMP"
 #define STEP_HYB_SUFFIX "_HYBRID"
 
-#define STEP_DEFAULT_RT_H "src/Runtimes/step"
+#ifdef PIPS_RUNTIME_DIR
+    #define STEP_DEFAULT_RT_H "step"
+#else
+    #define STEP_DEFAULT_RT_H "src/Runtimes/step"
+#endif
 
 enum {DO_DIRECTIVE,
       SECTION_DIRECTIVE};

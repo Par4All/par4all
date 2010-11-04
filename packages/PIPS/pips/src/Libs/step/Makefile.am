@@ -27,4 +27,6 @@ libstep_la_SOURCES=	step.c \
 		compile_barrier.c \
 		compile_private.c
 
+AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
+
 include $(srcdir)/../pipslibs_includes.mk

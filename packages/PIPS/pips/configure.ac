@@ -280,6 +280,8 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Scripts/Makefile
 				 src/Scripts/drivers/Makefile
 				 src/Scripts/hpfc/Makefile
+                 src/Scripts/step/Makefile
+                 src/Scripts/step/step_install
 				 src/Scripts/simple_tools/Makefile
 				 src/Scripts/simple_tools/pips_c2openmp
 				 src/Scripts/simple_tools/pips_f2openmp

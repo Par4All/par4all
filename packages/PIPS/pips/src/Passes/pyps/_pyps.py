@@ -205,6 +205,10 @@ class workspace(object):
 		self.checkpoints=[]
 		self._sources=[]
 
+		# because of the way we recover include, relative paths are changed, which could be a proplem for #includes
+		if recoverInclude: cppflags=pypsutils.patchIncludes(cppflags)
+
+
 		# In case the subworkspaces need to add files, the variable passed in
 		# parameter will only be modified here and not in the scope of the caller
 		sources2 = deepcopy(sources)

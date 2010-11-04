@@ -39,7 +39,7 @@
 #include "top-level.h"
 
 #include "ri-util.h"
-#include "preprocessor.h"
+//#include "preprocessor.h"
 
 /* functions on strings for entity names */
 
@@ -483,41 +483,6 @@ bool comment_string_p(const string comment)
   return c != '\0' && c != ' ' && c != '\t';
 }
 
-/* Choose a language if all filenames in "files" have the same C or
-   Fortran extensions. */
-language workspace_language(gen_array_t files)
-{
-  int i, argc = gen_array_nitems(files);
-  language l = language_undefined;
-  int n_fortran = 0;
-  int n_fortran95 = 0;
-  int n_c = 0;
-
-  for (i = 0; i < argc; i++) {
-    string fn = gen_array_item(files, i);
-    if(dot_F_file_p(fn) || dot_f_file_p(fn))
-      n_fortran++;
-    else if(dot_c_file_p(fn))
-      n_c++;
-    else if(dot_f90_file_p(fn) || dot_f95_file_p(fn)){
-      n_fortran95++;
-    } else {
-      ;
-    }
-  }
-
-  if(n_fortran>0 && n_fortran95==0 && n_c==0) {
-    l = make_language_fortran();
-  } else if(n_fortran==0 && n_fortran95>0 && n_c==0) {
-    l = make_language_fortran95();
-  } else if(n_fortran==0 && n_fortran95==0 && n_c>0) {
-    l = make_language_c();
-  } else {
-    l = make_language_unknown();
-  }
-
-  return l;
-}
 
 /* Remove trailing line feeds */
 string string_remove_trailing_line_feeds(string s)

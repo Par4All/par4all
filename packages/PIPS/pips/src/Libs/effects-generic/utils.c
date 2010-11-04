@@ -805,6 +805,14 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
 
 
+  if (type_with_const_qualifier_p(eff_type))
+    {
+      if (act == 'w')
+	return NIL;
+      else if (act == 'x')
+	act = 'r';
+    }
+
   if (anywhere_effect_p(eff))
     {
       /* there is no other accessible path */
@@ -949,7 +957,7 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 									 eff_type,
 									 act,
 									 false,
-									 INT_MAX,
+									 10, /* to avoid too long paths until GAPS are handled */
 									 false);
 }
 

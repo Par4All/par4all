@@ -53,8 +53,8 @@
   (we consider that p[1] is a predecessor of p[*], with *exact_p = false.)
 
  */
-bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1, 
-			     reference r2, descriptor __attribute__ ((unused)) d2, 
+bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1,
+			     reference r2, descriptor __attribute__ ((unused)) d2,
 			     transformer __attribute__ ((unused)) current_precondition,
 			     bool * exact_p)
 {
@@ -71,7 +71,7 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
 	words_to_string(words_reference(r2, NIL)));
 
   *exact_p = true;
-  if (same_entity_p(e1, e2) 
+  if (same_entity_p(e1, e2)
       && (r1_path_length < r2_path_length))
     {
       /* same entity and the path length of r1 is shorter than the path length of r2.
@@ -82,18 +82,18 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
 	{
 	  expression exp1 = EXPRESSION(CAR(ind1));
 	  expression exp2 = EXPRESSION(CAR(ind2));
-	  
+
 	  if (unbounded_expression_p(exp1) || unbounded_expression_p(exp2))
 	    {
 	      res = true;
 	      *exact_p = false;
-	    }	    
+	    }
 	  else if(!expression_equal_p(exp1, exp2))
 	    {
 	      res = false;
 	      *exact_p = true;
 	    }
-	  
+
 	  POP(ind1);
 	  POP(ind2);
 	}
@@ -104,8 +104,20 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
       *exact_p = true;
     }
 
-  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not"); 
+  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not");
   return res;
+}
+
+bool path_preceding_p(effect eff1, effect eff2,
+		      transformer current_precondition,
+		      bool * exact_p)
+{
+  reference r1 = effect_any_reference(eff1);
+  descriptor d1 = effect_descriptor(eff1);
+  reference r2 = effect_any_reference(eff2);
+  descriptor d2 = effect_descriptor(eff2);
+
+  return simple_cell_reference_preceding_p(r1, d1, r2, d2, current_precondition, exact_p);
 }
 
 void simple_reference_to_simple_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
@@ -118,15 +130,15 @@ void simple_reference_to_simple_reference_conversion(reference ref, reference * 
   @param c is a the simple cell for which we look an equivalent constant path
   @param ptl is the list of points-to in which we search for constant paths
   @param  exact_p is a pointer towards a boolean. It is set to true if
-         the result is exact, and to false if it is an approximation, 
-	 either because the matching points-to sources found in ptl are 
-	 over-approximations of the preceding path of input_ref or because 
+         the result is exact, and to false if it is an approximation,
+	 either because the matching points-to sources found in ptl are
+	 over-approximations of the preceding path of input_ref or because
 	 the matching points-to have MAY approximation tag.
   @return a list of constant path cells. It is a list because at a given
           program point the cell may correspond to several constant paths.
 
 
-  original comment:	  
+  original comment:
   goal: see if cell c can be shortened by replacing its indirections
   by their values when they are defined in ptl. For instance, p[0][0]
   and (p,q,EXACT) is reduced to q[0]. And if (q,i,EXACT) is also
@@ -148,7 +160,7 @@ void simple_reference_to_simple_reference_conversion(reference ref, reference * 
 */
 list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p, transformer __attribute__ ((unused)) t)
 {
-  
+
   return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
 					  transformer_undefined,
 					  simple_cell_reference_preceding_p,
@@ -171,4 +183,4 @@ list eval_cell_with_points_to(cell c, list ptl, bool *exact_p)
     }
   gen_full_free_list(l_eff);
   return l;
-} 
+}

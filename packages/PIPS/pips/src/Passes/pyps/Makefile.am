@@ -2,11 +2,7 @@ SUBDIRS  = doc drivers
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
 
-dist_bin_SCRIPTS = pips-gcc pips-ar pips-make
-
-if WITH_PYPS_EXTRA
-	dist_bin_SCRIPTS += ipyps
-endif
+dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 
 pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar

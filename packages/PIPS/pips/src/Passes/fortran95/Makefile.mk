@@ -26,7 +26,7 @@
 GFC2PIPS_SRC.d = src
 GFC2PIPS_SRCS = $(GFC2PIPS_SRC.d)/gfc2pips.c $(GFC2PIPS_SRC.d)/gfc2pips-stubs.c
 #VERSION USED
-PIPS_GFC2PIPS_GCC_VERSION = 4.4.3
+PIPS_GFC2PIPS_GCC_VERSION = 4.4.5
 BUILD.d	= build/$(PIPS_GFC2PIPS_GCC_VERSION)
 
 ARCHIVE_EXT=.tar.bz2
@@ -53,7 +53,7 @@ CONFIGURE_OPT 	= --disable-bootstrap --enable-languages=fortran \
 	--enable-stage1-languages=fortran --disable-libssp --disable-libada \
 	--disable-libgomp --disable-stage1-checking --without-ppl \
 	--without-cloog --disable-multilib --disable-checking \
-	--with-build-config='bootstrap-O1'
+	--with-build-config='bootstrap-O1' CFLAGS=""
 
 #file to flag if sources have been patched
 PATCHED = $(SRC.d)/.patched
