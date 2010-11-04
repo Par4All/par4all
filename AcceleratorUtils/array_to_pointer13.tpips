@@ -22,7 +22,8 @@ echo
 
 apply UNSPLIT
 shell cc $WS.c -o  $WS.database/Tmp/ref
-shell cc -Dalloca=__builtin_alloca $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+#alloca -> malloc for validation
+shell cc -Dalloca=malloc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
 shell test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`
 
 close
