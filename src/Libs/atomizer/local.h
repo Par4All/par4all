@@ -50,6 +50,7 @@ typedef dg_vertex_label vertex_label;
 #include "conversion.h" 
 #include "control.h"
 #include "transformations.h"
+#include "ricedg.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"

@@ -45,11 +45,19 @@ vertex v;
 }
 
 int 
-vertex_to_ordering(v)
+vertex_ordering(v)
 vertex v;
 {
     dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
     return dg_vertex_label_statement(dvl);
+}
+
+/* compare two vertices based on their ordering */
+int compare_vertex(const void *v0, const void *v1) {
+    const vertex V0 = *(const vertex *)v0,
+                 V1 = *(const vertex *)v1;
+    if(V0==V1) return 0;
+    return vertex_ordering(V0) > vertex_ordering(V1);
 }
 
 
@@ -1088,5 +1096,6 @@ hash_table statements_to_successors(list statements, graph dg)
     }
     return successors;
 }
+
 
 /* That's all */
