@@ -85,9 +85,9 @@ int foo(int seed[100])
       /* compute */
 kernel:      run_kernel((*a0), (*b0), (*c0));
       P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
-      P4A_accel_free((void **) &a0);
-      P4A_accel_free((void **) &b0);
-      P4A_accel_free((void **) &c0);
+      P4A_accel_free(&a0);
+      P4A_accel_free(&b0);
+      P4A_accel_free(&c0);
    }
    /* print result */
    for(i = 0; i <= 99; i += 1)
@@ -120,9 +120,9 @@ int foo(int seed[100])
       /* compute */
       run_kernel((*a0), (*b0), (*c0));
       P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
-      P4A_accel_free((void **) &a0);
-      P4A_accel_free((void **) &b0);
-      P4A_accel_free((void **) &c0);
+      P4A_accel_free(&a0);
+      P4A_accel_free(&b0);
+      P4A_accel_free(&c0);
    }
    /* print result */
    for(i = 0; i <= 99; i += 1)

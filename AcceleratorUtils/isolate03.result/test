@@ -98,7 +98,7 @@ void lonesome_cowboy()
 isolate:
       for(i = 1; i <= 10; i += 1)
          j += (*a0)[i-1];
-      P4A_accel_free((void **) &a0);
+      P4A_accel_free(&a0);
    }
    printf("%d", j);
 }
