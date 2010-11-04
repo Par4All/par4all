@@ -20,8 +20,12 @@
 # You should have received a copy of the GNU General Public License
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
+# TODO
+# - doxygen?
+# - check documentation generation? I recall that latex errors are ignored in nlpmake.
+#
 
-# usage: $0 [options] email.address@somewhere /path/to/prod [/path/to/valid]
+# usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
 # - designed to be run from cron.
 # - check that pips does still compile.
 # - report is sent by mail if the status changed.
@@ -32,31 +36,43 @@
 nice=
 wait=
 force=
+report=
 source=
 autoconf=
 parallel=1
 validate=mail-diff-validate
-vname=CHECK
+vname=
+build=compile
 
 # get options
 while [[ $1 == -* ]]
 do
   case $1 in
+    # how to compile pips
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
+    --nlpmake=*) autoconf= ; build=${1//*=/} ;;
     -n|--nice) nice=nice ;;
+    # force compilation & validation & mail
     -f|--force) validate=mail-validate ; force=1 ;;
+    # force compilation status report even if unchanged
+    -r|--report) report=1 ;;
+    # how long to wait for lock
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1//*=/} ;;
+    # whether to run in parallel
     -s|--sequential) parallel= ;;
     -p|--parallel) parallel=1 ;;
+    # compilation & validation name
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) wait=${1//*=/} ;;
+    # environment setup
     -S|--source) source=$2; shift ;;
     --source=*) source=${1//*=/} ;;
+    # this help
     -h|--help)
       echo -e \
-        "Usage: $0 [options] em@il /path/to/prod [/path/to/validation]\n" \
+        "Usage: $0 [options] em@il /path/to/prod [/path/to/validation ...]\n" \
         "check pips compilation and validation health\n" \
 	"available options:\n" \
 	"  -a: compile with autoconf\n" \
@@ -64,6 +80,7 @@ do
 	"  -h: show this help and exit\n"
 	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
+	"  -r: report compilation result even if not changed\n" \
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
 	"  -v name: validation name\n" \
@@ -78,7 +95,13 @@ done
 # get arguments (destination email & directories)
 dest=${1:-$LOGNAME@cri.ensmp.fr}
 prod=${2:-.}
-valid=$3
+shift 2
+
+# set default vname with some guessing
+[ "$vname" ] || { vname=${prod%/*} ; vname=${vname##*/} ; }
+[ "$vname" ] || vname=CHECK
+
+arch=$(uname -m)
 
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
@@ -129,13 +152,15 @@ function report()
   # it is nice to report that it is up again...
   [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
 
-  # no change, no report
-  [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
+  # no change, no report, unless forced
+  [ ! "$report" -a "$previous" -a $current = "$previous" ] && {
+    rmdir LOCK; exit 0;
+  }
 
   # else generate report
   {
     # summary
-    echo PIPS compilation status has changed to $current
+    echo $vname $arch compilation status has changed to $current
 
     # some details
     echo previous state: $previous
@@ -181,7 +206,7 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -a "Reply-To: $dest" -s "PIPS compilation status is $current" $dest
+  } | mailx -a "Reply-To: $dest" -s "$vname $arch compilation status is $current" $dest
 
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
@@ -204,13 +229,12 @@ function report()
     report 'KO:no-wc' 'unknown' "'$prod' is not a working copy"
 
 # idem for validation if required
-if [ "$valid" ]
-then
+for valid in "$@" ; do
   [ -d $valid ] || \
     report 'KO:no-dir' 'unknown' "working copy directory '$valid' not found"
   [ -d $valid/.svn ] || \
     report 'KO:no-wc' 'unknown' "'$valid' is not a working copy"
-fi
+done
 
 # environment
 if [ "$source" ]
@@ -254,12 +278,14 @@ else
 fi
 
 rm -f out err
-$nice svn up $prod $valid >> out 2>> err || {
-  # possible failures: network dns svn...
-  # hmmm... try to cleanup after svn up failure
-  svn cleanup $prod $valid >> out 2>> err
-  report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
-}
+for valid in "$@" ; do
+  $nice svn up $prod $valid >> out 2>> err || {
+    # possible failures: network dns svn...
+    # hmmm... try to cleanup after svn up failure
+    svn cleanup $prod $valid >> out 2>> err
+    report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
+  }
+done
 
 # source state
 [ -f CURRENT ] || touch CURRENT
@@ -273,12 +299,12 @@ mv CURRENT PREVIOUS
 } > CURRENT
 
 # validation state
-if [ "$valid" ]
-then
-  [ -f CURRENT_VALID ] || touch CURRENT_VALID
-  mv CURRENT_VALID PREVIOUS_VALID
-  echo validation: $(svnversion -c $valid) > CURRENT_VALID
-fi
+for valid in "$@" ; do
+  svalid=${valid##*/}
+  [ -f CURRENT_$svalid ] || touch CURRENT_$svalid
+  mv CURRENT_$svalid PREVIOUS_$svalid
+  echo validation: $(svnversion -c $valid) > CURRENT_$svalid
+done
 
 # recompilation, possibly forced
 if [ "$force" ] || ! cmp -s CURRENT PREVIOUS
@@ -299,7 +325,7 @@ then
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
-    # hmmm...
+    # hmmm... this is installation dependent:-( pkgconfig?
     ldpips=$prod/../install/lib/python*/site-packages/pips
     test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
@@ -309,10 +335,10 @@ then
     $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     # what about a "timeout"? how to differentiate from a simple failure?
-    $nice $make build > out 2> err \
-      || report 'KO:make' 'build' 'cannot "make build"'
+    $nice $make $build > out 2> err \
+      || report 'KO:make' $build "cannot \"make $build\""
     # check executable & script
-    test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
+    test -x pips/bin/${PIPS_ARCH:-$(./pips/makes/arch.sh)}/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x pips/utils/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script!'
@@ -325,34 +351,33 @@ then
   rm -f out err
 
   # run the validation with new tpips
-  if [ "$valid" ]
-  then
+  for valid in "$@" ; do
     {
       $nice $make -C $valid parallel-clean
-      $nice $make -C $valid VNAME=$vname EMAIL=$dest $validate
+      $nice $make -C $valid VNAME="$vname $arch" EMAIL=$dest $validate
       $nice $make -C $valid parallel-clean
     } > out 2> err
-  fi
+  done
 
   # the report is delayed so as to keep the lock
   report 'ok' 'ok' 'pips is fine'
 
 else
   # no source updates, but maybe a validation update?
-  if [ "$valid" ]
-  then
-    if ! cmp -s CURRENT_VALID PREVIOUS_VALID
+  for valid in "$@" ; do
+    svalid=${valid##*/}
+    if ! cmp -s CURRENT_$svalid PREVIOUS_$svalid
     then
       # the validation changed, run it with current tpips
       # run the validation
       {
         $nice $make -C $valid parallel-clean
-        $nice $make -C $valid VNAME=$vname EMAIL=$dest mail-diff-validate
+        $nice $make -C $valid VNAME="$vname $arch" EMAIL=$dest mail-diff-validate
         # cleanup to help next "svn up" run smoothly
         $nice $make -C $valid parallel-clean
       } > out 2> err
     fi
-  fi
+  done
 
   # the report is delayed so as to keep the lock
   report 'skip' 'unchanged' 'no commit since last check'

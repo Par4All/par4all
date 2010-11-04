@@ -191,3 +191,9 @@ def set_properties(ws,props):
 def set_property(ws, **props):
 	"""set properties and return a dictionnary containing the old state"""
 	return ws.set_properties(props)
+
+def patchIncludes(s):
+	if not re.search(r"-I.\s",s) and not re.search(r"-I.$",s):
+		s+=" -I."
+	return s
+

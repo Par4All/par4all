@@ -2,7 +2,7 @@ Source: pips
 Section: devel
 Priority: extra
 Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
-Build-Depends: debhelper (>= 7), cproto, flex, bison, libreadline5-dev, autotools-dev, newgen, liblinearlibs-dev, swig, python-all-dev, python-support, pkg-config
+Build-Depends: debhelper (>= 7), cproto, flex, bison, libreadline5-dev, autotools-dev, newgen, liblinearlibs-dev, swig, python-all-dev, python-support, pkg-config, ipython
 Standards-Version: 3.8.1
 Homepage: https://pips.enstb.org
 
@@ -47,7 +47,7 @@ Description: PIPS interactive shell
 Package: python-pips
 Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},${python:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},${python:Depends}, ipython
 Provides: ${python:Provides}
 Description: PIPS python interface
  Python interface to PIPS

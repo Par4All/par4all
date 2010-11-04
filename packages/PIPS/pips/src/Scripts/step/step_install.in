@@ -25,12 +25,13 @@ step_filtre_include $DEST_DIR $DEFAULT_STEP_HEADER $STEP_HEADER $SRC_DIR/*
 #installation des fichiers de la runtime
 mkdir -p $DEST_DIR/$STEP_RT
 
-cp $PIPS_ROOT/src/Runtimes/step/$RUNTIME/* $DEST_DIR/$STEP_RT
-cp -r $PIPS_ROOT/src/Runtimes/step/util $DEST_DIR/$STEP_RT
+prefix=@prefix@
+cp @datadir@/step/$RUNTIME/* $DEST_DIR/$STEP_RT
+cp -r @datadir@/step/util $DEST_DIR/$STEP_RT
 
 #installation des fichiers .h
-cp $PIPS_ROOT/src/Runtimes/step/STEP.h $DEST_DIR
-cp $PIPS_ROOT/src/Runtimes/step/steprt_f.h $DEST_DIR
+cp @datadir@/step/STEP.h $DEST_DIR
+cp @datadir@/step/steprt_f.h $DEST_DIR
 
 #installation du Makefile par defaut
-cp $PIPS_ROOT/src/Runtimes/step/Makefile $DEST_DIR
+cp @datadir@/step/Makefile $DEST_DIR

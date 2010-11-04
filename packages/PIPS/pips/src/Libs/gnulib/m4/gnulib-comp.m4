@@ -297,6 +297,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
+  m4/asm-underscore.m4
   m4/errno_h.m4
   m4/extensions.m4
   m4/float_h.m4

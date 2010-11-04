@@ -20,4 +20,5 @@
 
 dist_noinst_DATA=developer_guide.tex
 doc_DATA=developer_guide.pdf
+EXTRA_DIST=eclipse
 include $(top_srcdir)/makes/latex.mk
