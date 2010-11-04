@@ -1,7 +1,7 @@
 EXTRA_DIST=step
 install-data-local:
 	@test -z $(datadir)/step || $(MKDIR_P) $(datadir)/step
-	tar --exclude='.svn' -c -f - $(srcdir)/step/* | (cd $(datadir)/step ; tar xfp -)
+	cd $(srcdir) ; tar --exclude='.svn' -c -f - step/* | (cd $(datadir) ; tar xfp -)
 
 uninstall-local:
 	chmod -R u+w $(datadir)/step
