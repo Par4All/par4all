@@ -126,7 +126,67 @@ static set get_statement_matching_types(statement s)
 
 static hash_table equivalence_table = hash_table_undefined;
 
-static bool successor_only_has_rr_conflict_p(successor su)
+/* this code is here because levels information seems inaccurate
+ * so it checks all the possible conflict between @p source and  @p sink
+ * that could have generated @p c
+ * and then instead of using references_may_conflict, it assumes we are in ssa form
+ * which should be ok thanks to scalar renaming, 
+ * and symbolically computes the distance between each reference
+ */
+static bool conflict_is_a_real_conflict_p(conflict c, statement source, statement sink, size_t loop_level) {
+    cone co = conflict_cone(c);
+    if(!cone_undefined_p(co)) {
+        bool no_intra_loop_dep = true;
+        FOREACH(INT,i,cone_levels(co))
+            if(i == loop_level +1 )
+                no_intra_loop_dep = false;
+        if(!no_intra_loop_dep) /* there seems to be an intra loop dep, verify this */ {
+            reference sink_ref = effect_any_reference(conflict_sink(c)),
+                      source_ref = effect_any_reference(conflict_source(c));
+            if(same_entity_p(reference_variable(sink_ref),reference_variable(source_ref))) {
+                list sink_effects =  load_proper_rw_effects_list(sink),
+                     source_effects = load_proper_rw_effects_list(source);
+                sink_effects = effect_read_p(conflict_sink(c))?
+                    effects_read_effects(sink_effects):
+                    effects_write_effects(sink_effects);
+                source_effects = effect_read_p(conflict_source(c))?
+                    effects_read_effects(source_effects):
+                    effects_write_effects(source_effects);
+                set sink_refs = set_make(set_pointer),
+                    source_refs = set_make(set_pointer);
+
+                FOREACH(EFFECT,eff,sink_effects)
+                    if(effects_may_conflict_p(eff,conflict_source(c)))
+                        set_add_element(sink_refs,sink_refs,effect_any_reference(eff));
+                FOREACH(EFFECT,eff,source_effects)
+                    if(effects_may_conflict_p(eff,conflict_sink(c)))
+                        set_add_element(source_refs,source_refs,effect_any_reference(eff));
+                no_intra_loop_dep = true;
+                SET_FOREACH(reference,rsink,sink_refs) {
+                    expression esink = reference_to_expression(rsink);
+                    SET_FOREACH(reference,rsource,source_refs) {
+                        expression esource = reference_to_expression(rsource);
+                        expression d = distance_between_expression(esink,esource);
+                        intptr_t val;
+                        if(expression_undefined_p(d) ||
+                                !expression_integer_value(d,&val) ||
+                                val == 0) {
+                            no_intra_loop_dep = false;
+                        }
+                    }
+                }
+                set_free(sink_refs);
+                set_free(source_refs);
+                gen_free_list(sink_effects);
+                gen_free_list(source_effects);
+            }
+        }
+        return !no_intra_loop_dep;
+    }
+    return true;
+}
+
+static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_level)
 {
     bool all_rr = true;
     FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su)))
@@ -141,11 +201,23 @@ static bool successor_only_has_rr_conflict_p(successor su)
                     words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
         }
         else {
-            all_rr = false;
-            pips_debug(3,"conflict found :\n");
-            ifdebug(3) {
-                print_effect(conflict_sink(c));
-                print_effect(conflict_source(c));
+            /* regions tell us there is a conflict.
+             * check if the dependence is loop carried or not
+             * */
+            all_rr=!conflict_is_a_real_conflict_p(c,vertex_to_statement(v),vertex_to_statement(successor_vertex(su)),loop_level);
+
+            if(!all_rr) {
+                pips_debug(3,"conflict found :\n");
+                ifdebug(3) {
+                    print_region(conflict_sink(c));
+                    print_region(conflict_source(c));
+                }
+            }
+            else {
+                pips_debug(3,
+                        "conflict skipped between:\n");
+                print_region(conflict_sink(c));
+                print_region(conflict_source(c));
             }
         }
     }
@@ -355,7 +427,7 @@ static list order_isomorphic_statements(set s)
  * 
  * it is done by iterating over the `dependence_graph'
  */
-static void init_statement_equivalence_table(list* l,graph dependence_graph)
+static void init_statement_equivalence_table(list* l,graph dependence_graph,size_t loop_level)
 {
     pips_assert("free was called",hash_table_undefined_p(equivalence_table));
     equivalence_table=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
@@ -379,7 +451,7 @@ static void init_statement_equivalence_table(list* l,graph dependence_graph)
         {
             /* do not take into account backward references, or R-R conflicts */
             if(vertex_ordering(successor_vertex(su)) > vertex_ordering((vertex)k)  &&
-                    !successor_only_has_rr_conflict_p(su) )
+                    !successor_only_has_rr_conflict_p((vertex)k,su,loop_level) )
             {
                 void* counter = hash_get(counters,successor_vertex(su));
                 if(counter != HASH_UNDEFINED_VALUE)
@@ -424,7 +496,7 @@ static void init_statement_equivalence_table(list* l,graph dependence_graph)
                 FOREACH(SUCCESSOR,su,vertex_successors(v)) {
                     void* counter = hash_get(counters,successor_vertex(su));
                     /* do not take into account backward references and ignored statements */
-                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) && !successor_only_has_rr_conflict_p(su))
+                    if(counter != HASH_UNDEFINED_VALUE && vertex_ordering(successor_vertex(su)) > vertex_ordering(v) && !successor_only_has_rr_conflict_p(v,su,loop_level))
                     {
                         intptr_t value = (intptr_t)counter;
                         --value;
@@ -564,6 +636,7 @@ instruction sac_real_current_instruction = instruction_undefined;
 
 typedef struct {
 	graph dg;
+    size_t nb_enclosing_loops;
 	bool result; /* whether simdizer() did something useful */
 } simdizer_context;
 
@@ -611,7 +684,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
                             seq=gen_nreverse(seq);
 
                             init_statement_matches_map(seq);
-                            init_statement_equivalence_table(&seq,dependence_graph);
+                            init_statement_equivalence_table(&seq,dependence_graph,sc->nb_enclosing_loops);
 
                             float saveSimdCost = 0;
                             list simdseq = simdize_simple_statements_pass2(seq, &saveSimdCost);
@@ -673,6 +746,30 @@ string sac_commenter(entity e)
         return strdup("PIPS:SAC generated variable");
 }
 
+static bool incr_counter(loop l, simdizer_context *sc) {
+    sc->nb_enclosing_loops++;
+    return true;
+}
+static void decr_counter(loop l, simdizer_context *sc) {
+    sc->nb_enclosing_loops--;
+}
+
+/* helper to transform preferences in references */
+static void do_remove_preference(cell c){
+    if(cell_preference_p(c)) {
+        reference r = copy_reference(
+                preference_reference(cell_preference(c))
+                );
+        free_preference(cell_preference(c));
+        cell_tag(c)=is_cell_reference;
+        cell_reference(c)=r;
+    }
+}
+
+/* entry point to transform preferences in references */
+static void remove_preferences(void * obj) {
+    gen_recurse(obj,cell_domain,do_remove_preference,gen_null);
+}
 
 
 /*
@@ -689,18 +786,23 @@ bool simdizer(char * mod_name)
     set_current_module_entity(module_name_to_entity(mod_name));
     set_ordering_to_statement(mod_stmt);
     simdizer_context sc = { .dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE),
+        .nb_enclosing_loops = 0,
 			    .result = false };
     set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
     set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
+    statement_effects se = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,mod_name,TRUE);
+    remove_preferences(se);
+    set_proper_rw_effects(se);
     push_generated_variable_commenter(sac_commenter);
     init_padding_entities();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
 
     /* Now do the job */
-    gen_context_recurse(mod_stmt, &sc, statement_domain,
-            simd_simple_sequence_filter, simdize_simple_statements);
+    gen_context_multi_recurse(mod_stmt, &sc, statement_domain,
+            simd_simple_sequence_filter, simdize_simple_statements,
+            loop_domain, incr_counter,decr_counter,
+            NULL);
 
     pips_assert("Statement is consistent after SIMDIZER", 
             statement_consistent_p(mod_stmt));
@@ -714,7 +816,7 @@ bool simdizer(char * mod_name)
 
     /* update/release resources */
     reset_padding_entities();
-    reset_cumulated_rw_effects();
+    reset_proper_rw_effects();
     reset_simd_operator_mappings();
     reset_simd_treematch();
 	reset_ordering_to_statement();
@@ -810,7 +912,7 @@ bool simdizer_init(const char * module_name)
     set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, true));
     set_current_module_entity(module_name_to_entity(module_name));
 
-    /* noramlize blocks */
+    /* normalize blocks */
     clean_up_sequences(get_current_module_statement());
 
     /* then split blocks containing labeled statement */

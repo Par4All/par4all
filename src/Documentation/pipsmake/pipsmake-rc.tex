@@ -3049,8 +3049,6 @@ parallelization phase.
 COMPUTE_ALL_DEPENDENCES FALSE
 \end{PipsProp}
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLINTER
 
 \section{Flinter}
@@ -5666,11 +5664,14 @@ alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
                             > MODULE.callees
+                            > PROGRAM.entities
 		! MODULE.simdizer_init
 		< PROGRAM.simd_treematch
 		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
         < MODULE.dg
 \end{PipsMake}
 
@@ -6703,7 +6704,7 @@ The following properties are used to specify the names of runtime
 functions. Since they are used in Par4All, their default names begin with
 \verb|P4A_|. To have an idea about their prototype, have a look to the
 Par4All accelerator runtime or in
-\textttvalidation/AcceleratorUtils/include/par4all.c} The following.
+\texttt{validation/AcceleratorUtils/include/par4all.c} The following.
 
 The properties that can be used to customized the allocate/load/store functions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}

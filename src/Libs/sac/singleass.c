@@ -47,160 +47,239 @@
 #include "sac.h"
 #include "ricedg.h"
 
-/* collect the first vertex that writes an entity, for each local sclar entity
- * and store it into the returned table entity -> first writing vertex
- * Note: I a musing ordering to now what is the first statement, it may be unreliable ..
- */
-static hash_table graph_to_definition(graph dg) {
-    hash_table ht = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-    FOREACH(VERTEX,v,graph_vertices(dg)) {
-        statement st = vertex_to_statement(v);
-        list effects = load_proper_rw_effects_list(st);
-        list weffects = effects_write_effects(effects);
-        FOREACH(EFFECT,eff,weffects) {
-            entity e = effect_any_entity(eff);
-            if(entity_scalar_p(e) && local_entity_of_module_p(e,get_current_module_entity())) {
-                vertex def = (vertex) hash_get(ht,e);
-                if(def == HASH_UNDEFINED_VALUE )
-                    hash_put(ht,e,v);
-                else if(statement_ordering(vertex_to_statement(v)) < statement_ordering(vertex_to_statement(def)))
-                    hash_update(ht,e,v);
-            }
-        }
-        gen_free_list(weffects);
+/* helper thats checks if entity @p e is involved in a conflict of successor @p s
+ * */
+static bool successor_conflicts_on_entity_p(successor s, entity e) {
+    FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s))) {
+        if(same_entity_p(e,effect_any_entity(conflict_source(c))) ||
+                same_entity_p(e,effect_any_entity(conflict_sink(c)))
+          )
+            return true;
     }
-    return ht;
+    return false;
+}
+/* helper that checks if there is a cycle from @p curr back to @p v following chains of @p e */
+static bool vertex_in_cycle_aux_p(vertex v, entity e, vertex curr,set visited) {
+    if(v==curr) return true;
+    if(set_belong_p(visited,curr)) return false;
+    set_add_element(visited,visited,curr);
+    FOREACH(SUCCESSOR,s,vertex_successors(v)){
+        if(successor_conflicts_on_entity_p(s,e) &&
+                vertex_in_cycle_aux_p(v,e,successor_vertex(s),visited))
+            return true;
+    }
+    return false;
 }
 
-/* apply scalar renaming of @p e into @p replacment and follow def-use @p chain
- */
-static void do_scalar_renaming_in_def_use(entity e, list chain) {
-    entity new= make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
-    AddEntityToCurrentModule(new);
-    FOREACH(VERTEX,v,chain) {
-        replace_entity(vertex_to_statement(v),e,new);
-    }
-}
-static list vertex_to_full_chain(entity e, vertex v) {
-    list chain = CONS(VERTEX,v,NIL);
+/* check if there is a cycle from @pv to @p v following chains from @p e */
+static bool vertex_in_cycle_p(vertex v, entity e ) {
     set visited = set_make(set_pointer);
-    while(!ENDP(vertex_successors(v))) {
-        /* among all successors, choose the first non backward */
-        successor suc = successor_undefined;
-        FOREACH(SUCCESSOR,s,vertex_successors(v)) {
-            list effects = load_proper_rw_effects_list(
-                    vertex_to_statement(successor_vertex(s))
-                    );
-            if(!set_belong_p(visited,successor_vertex(s)) &&
-                    (effects_write_variable_p(effects,e) ||effects_read_variable_p(effects,e) ) ) 
-            {
-                if(successor_undefined_p(suc))
-                    suc=s;
-                else if(statement_ordering(vertex_to_statement(successor_vertex(s))) <
-                        statement_ordering(vertex_to_statement(successor_vertex(suc))))
-                    suc=s;
+    FOREACH(SUCCESSOR,s,vertex_successors(v)){
+        if(successor_conflicts_on_entity_p(s,e) &&
+                vertex_in_cycle_aux_p(v,e,successor_vertex(s),visited)) {
+                set_free(visited);
+                return true;
             }
-        }
-        if(successor_undefined_p(suc))
-            break;
-        else {
-            v=successor_vertex(suc);
-            chain=CONS(VERTEX,v,chain);
-        }
-        set_add_element(visited,visited,v);
     }
     set_free(visited);
-
-    return gen_nreverse(chain);
+    return false;
 }
 
-static list vertex_to_def_uses(entity e, vertex v) {
-    list chains = NIL;
-    list chain=vertex_to_full_chain(e,v);
-    set visited = set_make(set_pointer);
-    /* chain now holds the longest def-use chain, 
-     * we will split on each write without cycle */
-    set_clear(visited);
-    list curr = NIL;
-    FOREACH(VERTEX,v,chain) {
-        bool backward_dep_p = false;
-        set_add_element(visited,visited,v);
-        /* get source effects */
-        list veffects = load_proper_rw_effects_list(
-                vertex_to_statement(v)
-                );
-        bool vread_p=effects_read_variable_p(veffects,e),
-             vwrite_p = effects_write_variable_p(veffects,e);
-        /* look for a backward dep, we could use conflicts, indeed */
-        FOREACH(SUCCESSOR,s,vertex_successors(v)) {
-            list effects = load_proper_rw_effects_list(
-                    vertex_to_statement(successor_vertex(s))
-                    );
-            bool read_p=effects_read_variable_p(effects,e),
-                 write_p = effects_write_variable_p(effects,e);
-            if(set_belong_p(visited,successor_vertex(s)) && 
-                    ( (read_p&&vwrite_p)||(write_p&vread_p) ) 
-              )/* got a backward dep */
-            {
-                backward_dep_p=true;
-                break;
-            }
-        }
-        /* split the chain if possible */
-        if(vwrite_p && !vread_p && !backward_dep_p) {
-            if(!ENDP(curr)) {
-                chains=CONS(LIST,gen_nreverse(curr),chains);
-                curr=NIL;
-            }
-        }
-        curr=CONS(VERTEX,v,curr);
-    }
-    if(!ENDP(curr))
-        chains=CONS(LIST,gen_nreverse(curr),chains);
-    /* drop first chain, it has the side effect of being compliant with replace_entity that cannot change entity declaration */
-    for(list iter=chains;!ENDP(iter);POP(iter)) {
-        if(ENDP(CDR(iter))) { /* the last */
-            list* car = (list*)REFCAR(iter);
-            gen_free_list(*car);
-            *car=NIL;
-        }
-    }
-    return chains;
-}
-
-
-static void do_scalar_renaming_in_chain(entity e, vertex v) {
-    list chains = vertex_to_def_uses(e,v);
-    FOREACH(LIST,chain,chains) {
-        do_scalar_renaming_in_def_use(e,chain);
-        gen_free_list(chain);
-    }
-    gen_free_list(chains);
-}
-
-
-/* do scalar renaming for graph @p dg
- *
- * the algorithm is simple:
- * first collect all entity -> first write mapping
- * then follow the chain and rename each time you find a write
- * backward dependencies stop the process.
+/* @return the list of vertices for which a write on @p e leads to a new declaration
+ * that is writes without reductions or cycles
  */
-static void do_scalar_renaming_statement(graph dg) {
+static set graph_to_live_writes(graph g, entity e) {
+    set live_writes = set_make(set_pointer);
+    FOREACH(VERTEX,v,graph_vertices(g)){
+        list effects = load_proper_rw_effects_list(vertex_to_statement(v));
+        bool read_p = effects_read_variable_p(effects,e),
+             write_p = effects_write_variable_p(effects,e);
+        if( write_p && !read_p && !vertex_in_cycle_p(v,e) )
+            set_add_element(live_writes,live_writes,v);
+    }
+    return live_writes;
+}
 
-    hash_table def = graph_to_definition(dg);
-    /* we follow the def - use chain for each entity */
+static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set live_writes, hash_table visited)
+{
+    FOREACH(SUCCESSOR,s,vertex_successors(v)) {
+        if(successor_conflicts_on_entity_p(s,e)) {
+            vertex v2 = successor_vertex(s);
+            bool read_p = false;
+            /* check if sink is read */
+            FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s))) {
+                if(effect_read_p(conflict_sink(c))) {
+                    read_p= true;
+                    break;
+                }
+            }
+            /* this successor belongs to the def-use chain */
+            if(read_p && !set_belong_p(live_writes,v2)) {
+                /* was it already renamed ? */
+                entity renamed = (entity)hash_get(visited,v2);
+                /* no -> proceeed */
+                if(renamed == HASH_UNDEFINED_VALUE) {
+                    hash_put(visited,v2,new);
+                    replace_entity(vertex_to_statement(v2),e,new);
+                    do_scalar_renaming_in_successors(v2,e,new,live_writes,visited);
+                }
+                /* yes, but no conflict */
+                else if (same_entity_p(renamed,new) ) {
+                    continue;
+                }
+                /* yes and a conbflict -> fix it by adding an assign */
+                else { 
+                    insert_statement(vertex_to_statement(v2),
+                            make_assign_statement(entity_to_expression(renamed),entity_to_expression(new)),
+                            true);
+                    continue;
+                }
+            }
+        }
+    }
+}
+
+static void do_scalar_renaming_in_vertex(vertex v, entity e, set live_writes, hash_table visited) {
+
+    /* create new assigned value */
+    entity new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+    AddEntityToCurrentModule(new);
+    replace_entity(vertex_to_statement(v),e,new);
+    /* propagate it to each reading successor */
+    do_scalar_renaming_in_successors(v,e,new,live_writes,visited);
+}
+
+
+static void do_scalar_renaming_in_graph(graph g, entity e) {
+    set live_writes = graph_to_live_writes(g, e);
+    hash_table visited = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    list l = set_to_sorted_list(live_writes,compare_vertex);
+    FOREACH(VERTEX,v,l) {
+        statement s = vertex_to_statement(v);
+        if(!declaration_statement_p(s) ||
+                    gen_chunk_undefined_p(gen_find_eq(e,statement_declarations(s)))) 
+            do_scalar_renaming_in_vertex(v,e,live_writes,visited);
+    }
+    hash_table_free(visited);
+    gen_free_list(l);
+    set_free(live_writes);
+}
+
+/* do scalar renaming for graph @p dg of module @p module and statements @p module_statement
+ */
+static void do_scalar_renaming(entity module, statement module_statement, graph dg) {
+
+    FOREACH(ENTITY,e,entity_declarations(module)) {
+        /* only local scalar entities */
+        if(local_entity_of_module_p(e,module) && entity_scalar_p(e) )
+            do_scalar_renaming_in_graph(dg,e);
+    }
+    module_clean_declarations(module,module_statement);
+}
+
+/* recursievly computes the set of all chains involving e starting from v */
+static set vertex_to_chains(vertex v, entity e, set visited) {
+    set all = set_make(set_pointer);
+    if(!set_belong_p(visited,v)) {
+        set_add_element(visited,visited,v);
+        list effects = load_proper_rw_effects_list(vertex_to_statement(v));
+        bool read_p = effects_read_variable_p(effects,e),
+             write_p = effects_write_variable_p(effects,e);
+        if(read_p||write_p) {
+            list this = CONS(VERTEX,v,NIL);
+            set_add_element(all,all,this);
+            FOREACH(SUCCESSOR,s,vertex_successors(v)) {
+                if(successor_conflicts_on_entity_p(s,e)) {
+                    vertex v2 = successor_vertex(s);
+                    if(statement_ordering(vertex_to_statement(v2)) >
+                            statement_ordering(vertex_to_statement(v)))
+                    {
+                        set tmp2=vertex_to_chains(v2,e,visited);
+                        SET_FOREACH(list,ltmp,tmp2)
+                            set_add_element(all,all,CONS(VERTEX,v,ltmp));
+                        set_free(tmp2);
+                    }
+                }
+            }
+        }
+    }
+    return all;
+}
+
+/* we know l is included in l2, let's remove redundant arcs */
+static void do_prune_arcs(list l, list l2) {
+    bool same_chain_p = false;
+    vertex prev = vertex_undefined;
+    for(;!ENDP(l)&&!ENDP(l2);POP(l2)) {
+        vertex v = VERTEX(CAR(l)),
+               v2=VERTEX(CAR(l2));
+        if(v==v2) {
+            same_chain_p=true;
+            prev=v;
+            POP(l);
+        }
+        else if(same_chain_p) {
+            /* arc between prev and v are not needed */
+            set remove = set_make(set_pointer);
+            FOREACH(SUCCESSOR,s,vertex_successors(prev))
+                if(v==successor_vertex(s))
+                    set_add_element(remove,remove,s);
+            SET_FOREACH(successor,s,remove)
+                gen_remove_once(&vertex_successors(prev),s);
+            set_free(remove);
+        }
+    }
+}
+
+/* remove all conflicts that involve entity e
+ * and that can be regenerated from another conflict chain
+ */
+static void do_simplify_dg(graph g, entity e) {
+    set chains = set_make(set_pointer);
+    /* SG: I am not sure it is ok to prune the exploration space like this */
+    set visited = set_make(set_pointer);
+    FOREACH(VERTEX,v,graph_vertices(g)) {
+        set tmp = vertex_to_chains(v,e,visited);
+        set_union(chains,chains,tmp);
+        set_free(tmp);
+    }
+    set_free(visited);
+    /* arcs now holds all possible arcs of g that impact e
+     * let's remove the chains that are not needed, that is those that have an englobing chain */
+    SET_FOREACH(list,l,chains) {
+        SET_FOREACH(list,l2,chains) {
+            /* if s is included in s2, arcs in s not is s2 are not needed */
+            if(l!=l2) {
+                set s = set_make(set_pointer);
+                set_assign_list(s,l);
+                set s2 = set_make(set_pointer);
+                set_assign_list(s2,l2);
+                /* prune some arcs */
+                if(set_inclusion_p(s,s2))
+                    do_prune_arcs(l,l2);
+                set_free(s);
+                set_free(s2);
+            }
+        }
+    }
+#if 0 //that's some ugly debug !
+    FILE * fd = fopen("/tmp/a.dot","w");
+    prettyprint_dot_dependence_graph(fd,get_current_module_statement(),g);
+    fclose(fd);
+#endif
+
+}
+/* removes redundant arcs from dg.
+ * An arc from v to v' is redundant if there exist a chain in dg that 
+ * goes from v to v'
+ */
+static void simplify_dg(entity module, graph dg) {
     FOREACH(ENTITY,e,entity_declarations(get_current_module_entity())) {
         /* only local entity */
-        if(local_entity_of_module_p(e,get_current_module_entity()) &&
-                entity_scalar_p(e)
-                ) {
-            vertex v = (vertex)hash_get(def,e);
-            if(v!= HASH_UNDEFINED_VALUE)
-                do_scalar_renaming_in_chain(e,v);
+        if(local_entity_of_module_p(e,module) && entity_scalar_p(e) ) {
+            do_simplify_dg(dg,e);
         }
     }
-    hash_table_free(def);
 }
 
 
@@ -222,8 +301,11 @@ bool scalar_renaming(char * mod_name)
 
     debug_on("SCALAR_RENAMING_DEBUG_LEVEL");
 
+    /* prune graph */
+    simplify_dg(get_current_module_entity(),dg);
+
     /* Now do the job */
-    do_scalar_renaming_statement(dg);
+    do_scalar_renaming(get_current_module_entity(),get_current_module_statement(),dg);
 
     pips_assert("Statement is consistent after SCALAR_RENAMING",
             statement_consistent_p(mod_stmt));
