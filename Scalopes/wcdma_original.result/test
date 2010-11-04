@@ -1,24 +1,37 @@
-void * P4A_copy_from_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address)
 {
-   size_t i, j, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l] = csrc[i*size*d2_block_length+j*size+l];
-   return dest;
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   const char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
 }
-void * P4A_copy_to_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, const void *accel_address)
 {
-   size_t i, j, l;
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   const char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   const char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   const char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
 
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[i*size*d2_block_length+j*size+l] = csrc[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l];
-   return dest;
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void P4A_scmp_dealloc(void *dest)
 {
@@ -464,14 +477,15 @@ void P4A_scmp_malloc(void **dest, size_t n)
    if (*dest==(void *) 0) 
       *dest = malloc(n);
 }
-void P4A_scmp_read(const int *in_address, int *out_address, size_t type_size, size_t nmemb, size_t offset, size_t dim1_size)
+void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)
 {
-
-   memcpy(in_address, out_address+offset*type_size, nmemb*type_size);
+   /* We can use memcpy() since we are sure there is no overlap */
+   memcpy(accel_address, host_address, element_size);
 }
-void P4A_scmp_write(void *out_address, const void *buffer_address, size_t type_size, size_t nmemb, size_t offset, size_t dim1_size)
+void P4A_scmp_write(size_t element_size, void *host_address, const void *accel_address)
 {
-   memcpy(out_address+offset*type_size, buffer_address, nmemb*type_size);
+   /* We can use memcpy() since we are sure there is no overlap */
+   memcpy(host_address, accel_address, element_size);
 }
 int main()
 {
@@ -657,27 +671,40 @@ int main()
    }
    return 0;
 }
-void * P4A_copy_from_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address)
 {
-   size_t i, j, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l] = csrc[i*size*d2_block_length+j*size+l];
-   return dest;
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   const char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
 }
-void * P4A_copy_to_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, const void *accel_address)
 {
-   size_t i, j, l;
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   const char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   const char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   const char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
 
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[i*size*d2_block_length+j*size+l] = csrc[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l];
-   return dest;
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void P4A_scmp_dealloc(void *dest)
 {
@@ -1123,14 +1150,15 @@ void P4A_scmp_malloc(void **dest, size_t n)
    if (*dest==(void *) 0) 
       *dest = malloc(n);
 }
-void P4A_scmp_read(const int *in_address, int *out_address, size_t type_size, size_t nmemb, size_t offset, size_t dim1_size)
+void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)
 {
-
-   memcpy(in_address, out_address+offset*type_size, nmemb*type_size);
+   /* We can use memcpy() since we are sure there is no overlap */
+   memcpy(accel_address, host_address, element_size);
 }
-void P4A_scmp_write(void *out_address, const void *buffer_address, size_t type_size, size_t nmemb, size_t offset, size_t dim1_size)
+void P4A_scmp_write(size_t element_size, void *host_address, const void *accel_address)
 {
-   memcpy(out_address+offset*type_size, buffer_address, nmemb*type_size);
+   /* We can use memcpy() since we are sure there is no overlap */
+   memcpy(host_address, accel_address, element_size);
 }
 int main()
 {
@@ -1217,13 +1245,13 @@ int main()
          int32_t (*spreading_signals0)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0, (*spreading_signal10)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signal10, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &spreading_signals0, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signal10, &spreading_signal1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*spreading_signals0, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signal1[0], *spreading_signal10);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals0);
 
          //generate multipath
          //main path
          P4A_scmp_kernel_1((*spreading_signal10), (*spreading_signals0));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals0, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals0);
       }
 
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
@@ -1232,13 +1260,13 @@ int main()
          //PIPS generated variable
          int32_t (*spreading_signals1)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signals1, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signals1, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals1);
 
          //printf("\n");
          
          //initialisation
          P4A_scmp_kernel_2((*spreading_signals1));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals1, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals1);
       }
 
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
@@ -1248,15 +1276,15 @@ int main()
          int32_t (*spreading_signals2)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0, (*spreading_signal11)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signal11, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &spreading_signals2, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signal11, &spreading_signal1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*spreading_signals2, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signal1[0], *spreading_signal11);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals2);
 
          //printf("\n");
          
          
          //other path
          P4A_scmp_kernel_3(channel_delay1, (*spreading_signal11), (*spreading_signals2));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals2, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals2);
       }
 
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
@@ -1266,13 +1294,13 @@ int main()
          int32_t (*spreading_signals3)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0, (*spreading_signal12)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signal12, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &spreading_signals3, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signal12, &spreading_signal1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*spreading_signals3, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signal1[0], *spreading_signal12);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals3);
 
          //printf("\n");
          
          P4A_scmp_kernel_4(channel_delay2, (*spreading_signal12), (*spreading_signals3));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals3, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals3);
       }
 
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
@@ -1282,13 +1310,13 @@ int main()
          int32_t (*spreading_signals4)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0, (*spreading_signal13)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signal13, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &spreading_signals4, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signal13, &spreading_signal1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*spreading_signals4, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signal1[0], *spreading_signal13);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals4);
 
          //printf("\n");
          
          P4A_scmp_kernel_5(channel_delay3, (*spreading_signal13), (*spreading_signals4));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals4, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals4);
       }
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
@@ -1297,15 +1325,15 @@ int main()
          int32_t (*spreading_signals5)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0, (*spreading_signal14)[8*8*sizeof(int32_t)+6] = (int32_t (*)[8*8*sizeof(int32_t)+6]) 0;
          P4A_scmp_malloc((void **) &spreading_signal14, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &spreading_signals5, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*spreading_signal14, &spreading_signal1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*spreading_signals5, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signal1[0], *spreading_signal14);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals5);
 
          //printf("\n");
          
          
          
          P4A_scmp_kernel_6(channel_delay4, (*spreading_signal14), (*spreading_signals5));
-         P4A_scmp_write(&spreading_signals[0], *spreading_signals5, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals5);
       }
 
       for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
@@ -1317,9 +1345,9 @@ int main()
          P4A_scmp_malloc((void **) &I_user0, sizeof(int)*(8/2*8*sizeof(int32_t)+6/2-1+1));
          P4A_scmp_malloc((void **) &Q_user0, sizeof(int)*(8/2*8*sizeof(int32_t)+6/2-1+1));
          P4A_scmp_malloc((void **) &spreading_signals6, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*I_user0, &I_user[0], sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
-         P4A_scmp_read(*Q_user0, &Q_user[0], sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
-         P4A_scmp_read(*spreading_signals6, &spreading_signals[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &I_user[0], *I_user0);
+         P4A_copy_to_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &Q_user[0], *Q_user0);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &spreading_signals[0], *spreading_signals6);
 
          //printf("\n");
          
@@ -1328,8 +1356,8 @@ int main()
          //------------------------------------------ SEND FRAME -----------------------------------------------
          //---- Conversion serial to parallel
          P4A_scmp_kernel_7((*I_user0), (*Q_user0), &j, (*spreading_signals6));
-         P4A_scmp_write(&I_user[0], *I_user0, sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
-         P4A_scmp_write(&Q_user[0], *Q_user0, sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &I_user[0], *I_user0);
+         P4A_copy_from_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &Q_user[0], *Q_user0);
       }
       {
          //PIPS generated variable
@@ -1338,12 +1366,12 @@ int main()
          int32_t (*I_user1)[8/2*8*sizeof(int32_t)+6/2] = (int32_t (*)[8/2*8*sizeof(int32_t)+6/2]) 0;
          P4A_scmp_malloc((void **) &I_user1, sizeof(int)*(8/2*8*sizeof(int32_t)+6/2-1+1));
          P4A_scmp_malloc((void **) &Signal_I0, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*I_user1, &I_user[0], sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
-         P4A_scmp_read(*Signal_I0, &Signal_I[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &I_user[0], *I_user1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_I[0], *Signal_I0);
 
          //---- Modulation QPSK on I
          P4A_scmp_kernel_8((*I_user1), (*Signal_I0));
-         P4A_scmp_write(&Signal_I[0], *Signal_I0, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_I[0], *Signal_I0);
       }
       {
          //PIPS generated variable
@@ -1352,19 +1380,19 @@ int main()
          int32_t (*Q_user1)[8/2*8*sizeof(int32_t)+6/2] = (int32_t (*)[8/2*8*sizeof(int32_t)+6/2]) 0;
          P4A_scmp_malloc((void **) &Q_user1, sizeof(int)*(8/2*8*sizeof(int32_t)+6/2-1+1));
          P4A_scmp_malloc((void **) &Signal_Q0, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*Q_user1, &Q_user[0], sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 0, 8/2*8*sizeof(int32_t)+6/2-1+1);
-         P4A_scmp_read(*Signal_Q0, &Signal_Q[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 8/2*8*sizeof(int32_t)+6/2-1+1, 8/2*8*sizeof(int32_t)+6/2-1+1, 0, &Q_user[0], *Q_user1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_Q[0], *Signal_Q0);
 
          
          //---- Modulation QPSK on Q -- we suppose that we dephase it after of PI/2
          P4A_scmp_kernel_9((*Q_user1), (*Signal_Q0));
-         P4A_scmp_write(&Signal_Q[0], *Signal_Q0, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_Q[0], *Signal_Q0);
       }
       {
          //PIPS generated variable
          float (*channel_I0)[(8/2*8*sizeof(int32_t)+6/2)*4] = (float (*)[(8/2*8*sizeof(int32_t)+6/2)*4]) 0;
          P4A_scmp_malloc((void **) &channel_I0, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*channel_I0, &channel_I[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_I[0], *channel_I0);
 
          
          
@@ -1373,16 +1401,16 @@ int main()
          
          //initialisation
          P4A_scmp_kernel_10((*channel_I0));
-         P4A_scmp_write(&channel_I[0], *channel_I0, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_I[0], *channel_I0);
       }
       {
          //PIPS generated variable
          float (*x_buffer_user10)[8] = (float (*)[8]) 0;
          P4A_scmp_malloc((void **) &x_buffer_user10, sizeof(float)*8);
-         P4A_scmp_read(*x_buffer_user10, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user10);
 
          P4A_scmp_kernel_11(&ptr_x_buffer_user1, (*x_buffer_user10));
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user10, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user10);
       }
       {
          //PIPS generated variable
@@ -1391,36 +1419,36 @@ int main()
          P4A_scmp_malloc((void **) &Signal_I1, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &channel_I1, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &x_buffer_user11, sizeof(float)*8);
-         P4A_scmp_read(*FIR_COEFF0, &FIR_COEFF[0], sizeof(float), 8, 0, 8);
-         P4A_scmp_read(*Signal_I1, &Signal_I[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*channel_I1, &channel_I[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*x_buffer_user11, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &FIR_COEFF[0], *FIR_COEFF0);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_I[0], *Signal_I1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_I[0], *channel_I1);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user11);
 
          
          //convolution par la réponse impultionelle du filtre (FIR_COEFF)
          P4A_scmp_kernel_12((*FIR_COEFF0), (*Signal_I1), (*channel_I1), &ptr_x_buffer_user1, (*x_buffer_user11));
-         P4A_scmp_write(&channel_I[0], *channel_I1, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user11, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_I[0], *channel_I1);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user11);
       }
       {
          //PIPS generated variable
          float (*channel_Q0)[(8/2*8*sizeof(int32_t)+6/2)*4] = (float (*)[(8/2*8*sizeof(int32_t)+6/2)*4]) 0;
          P4A_scmp_malloc((void **) &channel_Q0, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*channel_Q0, &channel_Q[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_Q[0], *channel_Q0);
 
          
          //initialisation
          P4A_scmp_kernel_13((*channel_Q0));
-         P4A_scmp_write(&channel_Q[0], *channel_Q0, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_Q[0], *channel_Q0);
       }
       {
          //PIPS generated variable
          float (*x_buffer_user12)[8] = (float (*)[8]) 0;
          P4A_scmp_malloc((void **) &x_buffer_user12, sizeof(float)*8);
-         P4A_scmp_read(*x_buffer_user12, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user12);
 
          P4A_scmp_kernel_14(&ptr_x_buffer_user1, (*x_buffer_user12));
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user12, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user12);
       }
       {
          //PIPS generated variable
@@ -1429,20 +1457,20 @@ int main()
          P4A_scmp_malloc((void **) &Signal_Q1, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &channel_Q1, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &x_buffer_user13, sizeof(float)*8);
-         P4A_scmp_read(*FIR_COEFF1, &FIR_COEFF[0], sizeof(float), 8, 0, 8);
-         P4A_scmp_read(*Signal_Q1, &Signal_Q[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*channel_Q1, &channel_Q[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*x_buffer_user13, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &FIR_COEFF[0], *FIR_COEFF1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &Signal_Q[0], *Signal_Q1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_Q[0], *channel_Q1);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user13);
 
          P4A_scmp_kernel_15((*FIR_COEFF1), (*Signal_Q1), (*channel_Q1), &ptr_x_buffer_user1, (*x_buffer_user13));
-         P4A_scmp_write(&channel_Q[0], *channel_Q1, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user13, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_Q[0], *channel_Q1);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user13);
       }
       {
          //PIPS generated variable
          float (*FIR2_I_user10)[(8/2*8*sizeof(int32_t)+6/2)*4] = (float (*)[(8/2*8*sizeof(int32_t)+6/2)*4]) 0;
          P4A_scmp_malloc((void **) &FIR2_I_user10, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*FIR2_I_user10, &FIR2_I_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_I_user1[0], *FIR2_I_user10);
 
          
          
@@ -1452,25 +1480,25 @@ int main()
          //---- FIR for I and Q after channel
          
          P4A_scmp_kernel_16((*FIR2_I_user10));
-         P4A_scmp_write(&FIR2_I_user1[0], *FIR2_I_user10, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_I_user1[0], *FIR2_I_user10);
       }
       {
          //PIPS generated variable
          float (*FIR2_Q_user10)[(8/2*8*sizeof(int32_t)+6/2)*4] = (float (*)[(8/2*8*sizeof(int32_t)+6/2)*4]) 0;
          P4A_scmp_malloc((void **) &FIR2_Q_user10, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
-         P4A_scmp_read(*FIR2_Q_user10, &FIR2_Q_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_Q_user1[0], *FIR2_Q_user10);
 
          P4A_scmp_kernel_17((*FIR2_Q_user10));
-         P4A_scmp_write(&FIR2_Q_user1[0], *FIR2_Q_user10, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_Q_user1[0], *FIR2_Q_user10);
       }
       {
          //PIPS generated variable
          float (*x_buffer_user14)[8] = (float (*)[8]) 0;
          P4A_scmp_malloc((void **) &x_buffer_user14, sizeof(float)*8);
-         P4A_scmp_read(*x_buffer_user14, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user14);
 
          P4A_scmp_kernel_18(&ptr_x_buffer_user1, (*x_buffer_user14));
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user14, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user14);
       }
       {
          //PIPS generated variable
@@ -1479,24 +1507,24 @@ int main()
          P4A_scmp_malloc((void **) &FIR_COEFF2, sizeof(float)*8);
          P4A_scmp_malloc((void **) &channel_I2, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &x_buffer_user15, sizeof(float)*8);
-         P4A_scmp_read(*FIR2_I_user11, &FIR2_I_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*FIR_COEFF2, &FIR_COEFF[0], sizeof(float), 8, 0, 8);
-         P4A_scmp_read(*channel_I2, &channel_I[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*x_buffer_user15, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_I_user1[0], *FIR2_I_user11);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &FIR_COEFF[0], *FIR_COEFF2);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_I[0], *channel_I2);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user15);
 
          //convolution par la réponse impultionelle du filtre (FIR_COEFF)
          P4A_scmp_kernel_19((*FIR2_I_user11), (*FIR_COEFF2), (*channel_I2), &ptr_x_buffer_user1, (*x_buffer_user15));
-         P4A_scmp_write(&FIR2_I_user1[0], *FIR2_I_user11, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user15, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_I_user1[0], *FIR2_I_user11);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user15);
       }
       {
          //PIPS generated variable
          float (*x_buffer_user16)[8] = (float (*)[8]) 0;
          P4A_scmp_malloc((void **) &x_buffer_user16, sizeof(float)*8);
-         P4A_scmp_read(*x_buffer_user16, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user16);
 
          P4A_scmp_kernel_20(&ptr_x_buffer_user1, (*x_buffer_user16));
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user16, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user16);
       }
       {
          //PIPS generated variable
@@ -1505,14 +1533,14 @@ int main()
          P4A_scmp_malloc((void **) &FIR_COEFF3, sizeof(float)*8);
          P4A_scmp_malloc((void **) &channel_Q2, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &x_buffer_user17, sizeof(float)*8);
-         P4A_scmp_read(*FIR2_Q_user11, &FIR2_Q_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*FIR_COEFF3, &FIR_COEFF[0], sizeof(float), 8, 0, 8);
-         P4A_scmp_read(*channel_Q2, &channel_Q[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*x_buffer_user17, &x_buffer_user1[0], sizeof(float), 8, 0, 8);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_Q_user1[0], *FIR2_Q_user11);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &FIR_COEFF[0], *FIR_COEFF3);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &channel_Q[0], *channel_Q2);
+         P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user17);
 
          P4A_scmp_kernel_21((*FIR2_Q_user11), (*FIR_COEFF3), (*channel_Q2), &ptr_x_buffer_user1, (*x_buffer_user17));
-         P4A_scmp_write(&FIR2_Q_user1[0], *FIR2_Q_user11, sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_write(&x_buffer_user1[0], *x_buffer_user17, sizeof(float), 8, 0, 8);
+         P4A_copy_from_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_Q_user1[0], *FIR2_Q_user11);
+         P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *x_buffer_user17);
       }
       {
          //PIPS generated variable
@@ -1523,14 +1551,14 @@ int main()
          P4A_scmp_malloc((void **) &FIR2_Q_user12, sizeof(float)*((8/2*8*sizeof(int32_t)+6/2)*4-1+1));
          P4A_scmp_malloc((void **) &R_pilot0, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &inv_qpsk_user10, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
-         P4A_scmp_read(*FIR2_I_user12, &FIR2_I_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*FIR2_Q_user12, &FIR2_Q_user1[0], sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, (8/2*8*sizeof(int32_t)+6/2)*4-1+1);
-         P4A_scmp_read(*R_pilot0, &R_pilot[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*inv_qpsk_user10, &inv_qpsk_user1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_I_user1[0], *FIR2_I_user12);
+         P4A_copy_to_accel_1d(sizeof(float), (8/2*8*sizeof(int32_t)+6/2)*4-1+1, (8/2*8*sizeof(int32_t)+6/2)*4-1+1, 0, &FIR2_Q_user1[0], *FIR2_Q_user12);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &R_pilot[0], *R_pilot0);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &inv_qpsk_user1[0], *inv_qpsk_user10);
 
          P4A_scmp_kernel_22((*FIR2_I_user12), (*FIR2_Q_user12), (*R_pilot0), (*inv_qpsk_user10), &j, t);
-         P4A_scmp_write(&R_pilot[0], *R_pilot0, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_write(&inv_qpsk_user1[0], *inv_qpsk_user10, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &R_pilot[0], *R_pilot0);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &inv_qpsk_user1[0], *inv_qpsk_user10);
       }
       {
          //PIPS generated variable
@@ -1540,17 +1568,17 @@ int main()
          P4A_scmp_malloc((void **) &coeff0, sizeof(int)*6);
          P4A_scmp_malloc((void **) &coeff20, sizeof(int)*6);
          P4A_scmp_malloc((void **) &finger_mat0, sizeof(int)*(8*sizeof(int32_t)-1+1)*6);
-         P4A_scmp_read(*R_pilot1, &R_pilot[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*S_pilot0, &S_pilot[0], sizeof(int), 8*sizeof(int32_t)-1+1, 0, 8*sizeof(int32_t)-1+1);
-         P4A_scmp_read(*coeff0, &coeff[0], sizeof(int), 6, 0, 6);
-         P4A_scmp_read(*coeff20, &coeff2[0], sizeof(int), 6, 0, 6);
-         P4A_copy_to_accel2d(*finger_mat0, &finger_mat[0][0], sizeof(int), 8*sizeof(int32_t)-1+1, 6, 0, 0, 8*sizeof(int32_t)-1+1, 6);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &R_pilot[0], *R_pilot1);
+         P4A_copy_to_accel_1d(sizeof(int), 8*sizeof(int32_t)-1+1, 8*sizeof(int32_t)-1+1, 0, &S_pilot[0], *S_pilot0);
+         P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *coeff0);
+         P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &coeff2[0], *coeff20);
+         P4A_copy_to_accel_2d(sizeof(int), 8*sizeof(int32_t)-1+1, 6, 8*sizeof(int32_t)-1+1, 6, 0, 0, &finger_mat[0][0], *finger_mat0);
 
          P4A_scmp_kernel_23((*R_pilot1), (*S_pilot0), (*coeff0), (*coeff20), (*finger_mat0), &flag, &j_bkp, &max, &retro_loop_count, t);
-         P4A_scmp_write(&R_pilot[0], *R_pilot1, sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_write(&coeff[0], *coeff0, sizeof(int), 6, 0, 6);
-         P4A_scmp_write(&coeff2[0], *coeff20, sizeof(int), 6, 0, 6);
-         P4A_copy_from_accel2d(&finger_mat[0][0], *finger_mat0, sizeof(int), 8*sizeof(int32_t)-1+1, 6, 0, 0, 8*sizeof(int32_t)-1+1, 6);
+         P4A_copy_from_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &R_pilot[0], *R_pilot1);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *coeff0);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff2[0], *coeff20);
+         P4A_copy_from_accel_2d(sizeof(int), 8*sizeof(int32_t)-1+1, 6, 8*sizeof(int32_t)-1+1, 6, 0, 0, &finger_mat[0][0], *finger_mat0);
       }
       {
          //PIPS generated variable
@@ -1560,15 +1588,15 @@ int main()
          P4A_scmp_malloc((void **) &inv_qpsk_user11, sizeof(int)*(8*8*sizeof(int32_t)+6-1+1));
          P4A_scmp_malloc((void **) &ovsf_code_user10, sizeof(int)*8);
          P4A_scmp_malloc((void **) &symbole_flow0, sizeof(int)*(8*sizeof(int32_t)-1+1));
-         P4A_scmp_read(*coeff1, &coeff[0], sizeof(int), 6, 0, 6);
-         P4A_scmp_read(*finger0, &finger[0], sizeof(int), 6, 0, 6);
-         P4A_scmp_read(*inv_qpsk_user11, &inv_qpsk_user1[0], sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 0, 8*8*sizeof(int32_t)+6-1+1);
-         P4A_scmp_read(*ovsf_code_user10, &ovsf_code_user1[0], sizeof(int), 8, 0, 8);
-         P4A_scmp_read(*symbole_flow0, &symbole_flow[0], sizeof(int), 8*sizeof(int32_t)-1+1, 0, 8*sizeof(int32_t)-1+1);
+         P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *coeff1);
+         P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *finger0);
+         P4A_copy_to_accel_1d(sizeof(int), 8*8*sizeof(int32_t)+6-1+1, 8*8*sizeof(int32_t)+6-1+1, 0, &inv_qpsk_user1[0], *inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *ovsf_code_user10);
+         P4A_copy_to_accel_1d(sizeof(int), 8*sizeof(int32_t)-1+1, 8*sizeof(int32_t)-1+1, 0, &symbole_flow[0], *symbole_flow0);
 
          P4A_scmp_kernel_24((*coeff1), &data, (*finger0), (*inv_qpsk_user11), (*ovsf_code_user10), (*symbole_flow0), t);
-         P4A_scmp_write(&finger[0], *finger0, sizeof(int), 6, 0, 6);
-         P4A_scmp_write(&symbole_flow[0], *symbole_flow0, sizeof(int), 8*sizeof(int32_t)-1+1, 0, 8*sizeof(int32_t)-1+1);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *finger0);
+         P4A_copy_from_accel_1d(sizeof(int), 8*sizeof(int32_t)-1+1, 8*sizeof(int32_t)-1+1, 0, &symbole_flow[0], *symbole_flow0);
       }
       
       //---- Store result
