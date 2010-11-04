@@ -117,16 +117,6 @@ void P4A_copy_from_accel_2d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address);
 
-#ifdef P4A_ACCEL_CUDA
-#include <p4a_accel-CUDA.h>
-#else
-#ifdef P4A_ACCEL_OPENMP
-#include <p4a_accel-OpenMP.h>
-#else
-#error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
-#endif
-#endif
-
 /** A macro to enable or skip debug instructions
 
     Just define P4A_DEBUG to have debug information at runtime
@@ -156,5 +146,15 @@ void P4A_copy_from_accel_2d(size_t element_size,
     Since it is a macro, beware of side effects...
 */
 #define P4A_min(a, b) ((a) > (b) ? (b) : (a))
+
+#ifdef P4A_ACCEL_CUDA
+#include <p4a_accel-CUDA.h>
+#else
+#ifdef P4A_ACCEL_OPENMP
+#include <p4a_accel-OpenMP.h>
+#else
+#error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
+#endif
+#endif
 
 #endif //P4A_ACCEL_H

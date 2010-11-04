@@ -137,7 +137,7 @@ def add_module_options(parser):
         help = "Automatically switch to Intel's icc/xild/xiar for --cc/--ld/--ar.")
 
     compile_group.add_option("--debug", "-g", action = "store_true", default = False,
-        help = "Add debug flags (-g compiler flag).")
+        help = "Add debug flags (-g compiler flag). Have a look to the --no-fast if you want to remove any optimization that would blur the debug.")
 
     compile_group.add_option("--no-fast", "--not-fast", action = "store_true", default = False,
         help = "Do not add optimized compilation flags automatically.")

@@ -184,17 +184,19 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] kernel to call
 
-    @param[in] size is the number of iterations
+    @param[in] P4A_n_iter_0 is the number of iterations
 
     @param ... the following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_1d(kernel, size, ...)		\
-  _Pragma("omp parallel for")					\
-  for(int P4A_index_x = 0; P4A_index_x < size; P4A_index_x++) {	\
-    P4A_vp_0 = P4A_index_x;					\
-    P4A_vp_1 = 0;						\
-    P4A_vp_2 = 0;						\
-    kernel(__VA_ARGS__);					\
+#define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
+  P4A_skip_debug(P4A_dump_location();)					\
+  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_1d(%d) of \"%s\"\n", P4A_n_iter_0, #kernel);)	\
+  _Pragma("omp parallel for")						\
+  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
+    P4A_vp_0 = P4A_index_0;						\
+    P4A_vp_1 = 0;							\
+    P4A_vp_2 = 0;							\
+    kernel(__VA_ARGS__);						\
   }
 
 
@@ -204,19 +206,22 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] kernel to call
 
-    @param[in] n_x_iter is the number of iterations in the first dimension
+    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
 
-    @param[in] n_y_iter is the number of iterations in the second dimension
+    @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_2d(kernel, n_x_iter, n_y_iter, ...)	\
+#define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
+  P4A_skip_debug(P4A_dump_location();)					\
+  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_2d(%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, #kernel);)	\
   _Pragma("omp parallel for")						\
-  for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	\
-    for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
-      P4A_vp_0 = P4A_index_x;						\
-      P4A_vp_1 = P4A_index_y;						\
+  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
+    for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+      P4A_vp_0 = P4A_index_0;						\
+      P4A_vp_1 = P4A_index_1;						\
       P4A_vp_2 = 0;							\
+      P4A_skip_debug(P4A_dump_message("%d %d\n", P4A_vp_0, P4A_vp_1));	\
       kernel(__VA_ARGS__);						\
     }									\
   }
@@ -236,7 +241,9 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1,  P4A_n_iter_2, ...) \
+#define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
+  P4A_skip_debug(P4A_dump_location();)					\
+  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_3d(%d,%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, #kernel);)	\
   _Pragma("omp parallel for")						\
   for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
     for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
