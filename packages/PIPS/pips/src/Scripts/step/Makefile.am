@@ -1,0 +1,2 @@
+dist_bin_SCRIPTS=step_directives run_step.script step_filtre_include
+bin_SCRIPTS=step_install

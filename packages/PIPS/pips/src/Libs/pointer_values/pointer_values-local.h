@@ -33,7 +33,7 @@ typedef struct {
   statement_effects (*db_get_kill_pv_func)(char *);
   void (*db_put_kill_pv_func)(char * , statement_effects);
 
-  cell_relation (*make_pv_from_effects_func)(effect, effect, cell_interpretation);
+  list (*make_pv_from_effects_func)(effect, effect, cell_interpretation, list);
 
   /* TRANSLATION OPERATORS */
   void (*cell_reference_with_value_of_cell_reference_translation_func)
@@ -52,10 +52,10 @@ typedef struct {
 /* pv_results is a structure holding the different results of an expression pointer values analysis */
 typedef struct {
   list l_out; /* resulting pointer_values */
-  effect result_path; /* resulting pointer path of the expression evaluation */
-  cell_interpretation result_path_interpretation; /* interpretation of the resulting pointer path */
+  list result_paths; /* resulting pointer path of the expression evaluation */
+  list result_paths_interpretations; /* interpretation of the resulting pointer path */
 } pv_results;
-  
+
 #define pips_debug_pv_results(level, message, pv_res) \
   ifdebug(level) { pips_debug(level, "%s\n", message); \
   print_pv_results(pv_res);}

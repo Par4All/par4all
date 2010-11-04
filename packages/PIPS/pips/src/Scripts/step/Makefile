@@ -2,6 +2,15 @@
 
 F.sh = 	step_directives run_step.script	step_install step_filtre_include
 
+step_install:step_install.in
+	sed -e 's,@datadir@,$$PIPS_ROOT/src/Runtimes,g' $< > $@
+	chmod +x $@
+
+clean: local-clean
+local-clean:
+	$(RM) step_install
+
+
 INSTALL_EXE = $(F.sh)
 
 # common stuff

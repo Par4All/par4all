@@ -29,7 +29,11 @@ bool step_init(string program_name)
   DB_PUT_MEMORY_RESOURCE(DBR_STEP_STATUS, "", make_step_status(NIL,NIL));
   global_step_analyse_init();
 
+#ifdef PIPS_RUNTIME_DIR
+  srcpath=strdup(PIPS_RUNTIME_DIR "/" STEP_DEFAULT_RT_H);
+#else
   srcpath=strdup(concatenate(getenv("PIPS_ROOT"),"/",STEP_DEFAULT_RT_H,NULL));
+#endif
   string old_path=pips_srcpath_append(srcpath);
   free(old_path);
   free(srcpath);

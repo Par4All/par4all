@@ -67,6 +67,8 @@
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
 
 
+
+
 /* Return a sorted arg list of workspace names. (For each name, there
    is a name.database directory in the current directory): */
 void pips_get_workspace_list(gen_array_t array)
@@ -652,6 +654,41 @@ bool dot_c_file_p(string name) {
   return !!find_suffix(name, C_FILE_SUFFIX);
 }
 
+/* Choose a language if all filenames in "files" have the same C or
+   Fortran extensions. */
+language workspace_language(gen_array_t files)
+{
+  int i, argc = gen_array_nitems(files);
+  language l = language_undefined;
+  int n_fortran = 0;
+  int n_fortran95 = 0;
+  int n_c = 0;
+
+  for (i = 0; i < argc; i++) {
+    string fn = gen_array_item(files, i);
+    if(dot_F_file_p(fn) || dot_f_file_p(fn))
+      n_fortran++;
+    else if(dot_c_file_p(fn))
+      n_c++;
+    else if(dot_f90_file_p(fn) || dot_f95_file_p(fn)){
+      n_fortran95++;
+    } else {
+      ;
+    }
+  }
+
+  if(n_fortran>0 && n_fortran95==0 && n_c==0) {
+    l = make_language_fortran();
+  } else if(n_fortran==0 && n_fortran95>0 && n_c==0) {
+    l = make_language_fortran95();
+  } else if(n_fortran==0 && n_fortran95==0 && n_c>0) {
+    l = make_language_c();
+  } else {
+    l = make_language_unknown();
+  }
+
+  return l;
+}
 
 /* Returns the newly allocated name if preprocessing succeeds.
  * Returns NULL if preprocessing fails.

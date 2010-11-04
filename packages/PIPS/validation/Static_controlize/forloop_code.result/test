@@ -1,0 +1,33 @@
+int main()
+{
+//		< is static > TRUE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, k, N;
+//		< is static > TRUE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		<   loops   >
+//		<   tests   >
+   NSP1 = 0;
+//		< is static > FALSE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		<   loops   >
+//		<   tests   >
+   for (i = 0, j = 0;i<N, j<N;i++, j += i)
+//		< is static > FALSE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		<   loops   >
+//		<   tests   >
+      for (NSP1 = 0;NSP1<N;NSP1++)
+//		< is static > FALSE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		<   loops   >
+//		<   tests   >
+         A[i][j] = C[i][j];
+//		< is static > TRUE
+//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		<   loops   >
+//		<   tests   >
+   return 0;
+}

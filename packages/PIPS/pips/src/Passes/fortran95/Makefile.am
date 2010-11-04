@@ -35,10 +35,12 @@ build-stage2:  $(BUILD.d)/.configure-fortran $(GFC2PIPS_SRCS)
 gfc2pips: build
 	cp build/$(PIPS_GFC2PIPS_GCC_VERSION)/gcc/f951 ./gfc2pips
 
+# this removes all the temporary repositories
 clean-local:
-	chmod -R u+rw gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
-	rm -rf gcc-$(PIPS_GFC2PIPS_GCC_VERSION) build
+	chmod -R u+rw $(SRC.d) build
+	rm -rf $(SRC.d) build
 
+# this removes all the donwloaded files
 distclean-local:
 	chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
 	rm -rf  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5)

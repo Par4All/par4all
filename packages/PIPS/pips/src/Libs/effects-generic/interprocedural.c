@@ -105,7 +105,8 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
   int real_arg_t_d = effect_type_depth(real_arg_t);
   transformer context;
 
-  if (effects_private_current_context_empty_p())
+  if (!effects_private_current_context_stack_initialized_p()
+      || effects_private_current_context_empty_p())
     context = transformer_undefined;
   else
     {
@@ -487,7 +488,7 @@ list generic_c_effects_backward_translation(entity callee,
   /* 		      entity_user_name(callee), */
   /* 		      entity_user_name(get_current_module_entity())); */
   /*     } */
-  
+
   (*effects_translation_end_func)();
 
   ifdebug(5)

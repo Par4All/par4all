@@ -1,0 +1,150 @@
+float main()
+{
+   static float H[16];
+   /* Filter Coefficient Vector */
+   static float X[16];
+   /* Filter State Variable Vector */
+   
+   float delta;
+   /* Adaption Gain */
+   float d;
+   /* Desired signal */
+   float x;
+   /* Input Sample */
+   float y;
+   /* FIR LMS Filter Output */
+   register float error;
+   /* FIR error */
+   
+   int f;
+   
+   
+   pin_down(&d, &x, &delta, H, X);
+   {
+      ticks start, stop;
+      start = clock();
+
+      y = 0;
+      
+      /* FIR filtering and State Variable Update */
+      
+      for(f = 1; f <= 15; f += 1)
+         y += H[16-1-f]*(X[16-1-f] = X[16-2-f]);
+      
+      /* last convolution tap, get input sample */
+      
+      y += H[0]*(X[0] = x);
+      
+      /* 
+         *  error as the weighted difference 
+         *  between desired and calculated signal 
+         *
+         */
+      
+      error = (d-y)*delta;
+
+      for(f = 0; f <= 15; f += 1)
+         H[f] += error*X[f];
+      /* update the coefficients */
+      
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(&d, &x, &y, H, X);
+   return 0;
+}
+float main()
+{
+   static float H[16];
+   /* Filter Coefficient Vector */
+   static float X[16];
+   //PIPS generated variable
+   int LU_IND0, LU_IND1;
+   //PIPS generated variable
+   float RED0[1], RED1[4];
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float F_40, y0, F_30, F_20, y1, F_10, F_00, F_11, F_01, F_12, F_02, F_13, F_03, y2, F_14, F_04, y3;
+   //PIPS generated variable
+   ticks start0;
+   //PIPS generated variable
+   float d0, x0, delta0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
+   
+   
+   pin_down(&d0, &x0, &delta0, H, X);
+   start0 = clock();
+
+   y3 = 0;
+   
+   /* FIR filtering and State Variable Update */
+   
+   RED0[0] = 0.000000;
+   
+   /* FIR filtering and State Variable Update */
+   
+   for(LU_IND0 = 0; LU_IND0 <= 2; LU_IND0 += 1) {
+      F_04 = X[14+(-LU_IND0)] = X[13+(-LU_IND0)];
+      F_14 = H[14+(-LU_IND0)]*F_04;
+      RED0[0] = RED0[0]+F_14;
+   }
+   y2 = RED0[0]+y3;
+   RED1[0] = 0.000000;
+   RED1[1] = 0.000000;
+   RED1[2] = 0.000000;
+   RED1[3] = 0.000000;
+   for(LU_IND0 = 3; LU_IND0 <= 14; LU_IND0 += 4) {
+      F_03 = X[14+(-LU_IND0)] = X[13+(-LU_IND0)];
+      F_13 = H[14+(-LU_IND0)]*F_03;
+      F_02 = X[13+(-LU_IND0)] = X[12+(-LU_IND0)];
+      RED1[0] = RED1[0]+F_13;
+      F_12 = H[13+(-LU_IND0)]*F_02;
+      F_01 = X[12+(-LU_IND0)] = X[11+(-LU_IND0)];
+      RED1[1] = RED1[1]+F_12;
+      F_11 = H[12+(-LU_IND0)]*F_01;
+      F_00 = X[11+(-LU_IND0)] = X[10+(-LU_IND0)];
+      RED1[2] = RED1[2]+F_11;
+      F_10 = H[11+(-LU_IND0)]*F_00;
+      RED1[3] = RED1[3]+F_10;
+   }
+   y1 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+y2;
+   F_20 = X[0] = x0;
+
+   LU_IND1 = 0;
+   F_30 = H[0]*F_20;
+   
+   /* last convolution tap, get input sample */
+   
+   y0 = y1+F_30;
+   F_40 = d0-y0;
+   
+   /* 
+      *  error as the weighted difference 
+      *  between desired and calculated signal 
+      *
+      */
+   
+   pdata0[0] = F_40*delta0;
+   SIMD_LOAD_V4SF(vec10_0, &pdata0[0]);
+   for(LU_IND1 = 0; LU_IND1 <= 15; LU_IND1 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec20_0, &X[LU_IND1]);
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+      SIMD_LOAD_V4SF(vec30_0, &H[LU_IND1]);
+      SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
+      SIMD_STORE_V4SF(vec30_0, &H[LU_IND1]);
+   }
+   SIMD_STORE_V4SF(vec00_0, &pdata1[0]);
+   /* update the coefficients */
+   
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+   return 0;
+}
+['d.out/lms.c', 'd.out/SIMD.c']

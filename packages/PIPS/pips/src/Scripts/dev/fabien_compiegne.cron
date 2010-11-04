@@ -4,4 +4,4 @@
 # force once a day
 @daily /home/fabien/CHECK/pips_check_compile --wait --force --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # test autoconf version
-@daily /home/fabien/AUTO/pips_check_compile --autoconf --vname=AUTO --source=/home/fabien/AUTO/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation
+@daily /home/fabien/AUTO/pips_check_compile --force --report --autoconf --source=/home/fabien/AUTO/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation

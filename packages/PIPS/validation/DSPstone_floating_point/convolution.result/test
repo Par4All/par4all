@@ -1,0 +1,73 @@
+float main()
+{
+
+   static float x[16];
+   static float h[16];
+
+   register float y;
+   int i;
+   
+   
+   pin_down(x, h);
+   {
+      ticks start, stop;
+      start = clock();
+
+      y = 0;
+
+      for(i = 0; i <= 15; i += 1)
+         y += x[i]*h[16-1-i];
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+   return (float) y;
+}
+float main()
+{
+
+   static float x[16];
+   static float h[16];
+   //PIPS generated variable
+   int LU_IND0;
+   //PIPS generated variable
+   float RED0[4];
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float y0, y1;
+   //PIPS generated variable
+   ticks start0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
+   
+   
+   pin_down(x, h);
+   start0 = clock();
+
+   y1 = 0;
+
+   LU_IND0 = 0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+   SIMD_LOAD_GENERIC_V4SF(vec30_0, RED0[3], RED0[2], RED0[1], RED0[0]);
+   for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec20_0, &h[12+(-LU_IND0)]);
+      SIMD_LOAD_GENERIC_V4SF(vec10_0, x[3+LU_IND0], x[2+LU_IND0], x[1+LU_IND0], x[LU_IND0]);
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
+      SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
+   }
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+   SIMD_STORE_GENERIC_V4SF(vec30_0, &RED0[3], &RED0[2], &RED0[1], &RED0[0]);
+   y0 = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y1;
+
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+   return (float) y0;
+}
+['d.out/convolution.c', 'd.out/SIMD.c']

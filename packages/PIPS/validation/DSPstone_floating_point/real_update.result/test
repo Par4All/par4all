@@ -1,0 +1,22 @@
+float main()
+{
+   static float A = 10;
+   static float B = 2;
+   static float C = 1;
+   static float D = 0;
+   
+   
+   pin_down(&A, &B, &C, &D);
+   {
+      ticks start, stop;
+      start = clock();
+
+      D = C+A*B;
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(&A, &B, &C, &D);
+   return 0;
+}
