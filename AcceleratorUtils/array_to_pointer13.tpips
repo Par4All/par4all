@@ -22,7 +22,7 @@ echo
 
 apply UNSPLIT
 shell cc $WS.c -o  $WS.database/Tmp/ref
-shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+shell cc -Dalloca=__builtin_alloca $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
 shell test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`
 
 close
