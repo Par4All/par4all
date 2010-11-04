@@ -51,6 +51,11 @@
 
 // Preprocessor
 #include "preprocessor.h"
+
+const char* entity_minimal_user_name(entity e) {
+  STUB_ERROR();
+}
+
 /* Test if a name ends with .F */
 bool dot_F_file_p( string name ) {
   STUB_WARNING();
