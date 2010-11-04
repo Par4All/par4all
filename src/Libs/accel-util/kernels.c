@@ -202,7 +202,9 @@ call dimensions_to_dma(entity from,
     dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
 			 entity_to_expression(to));
   else
-    dest=entity_to_expression(to);
+      /* for deallocation pass the address of the pointer to deallocate. */
+    dest= MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+            entity_to_expression(to));
 
   reference rtmp = make_reference(from,lo);
   type element_type = make_type_variable(
