@@ -11,21 +11,21 @@
 #define SIMD_STORE_V4SF(vec,arr) _mm_storeu_ps(arr,vec)
 #define SIMD_STORE_GENERIC_V4SF(vec,v0,v1,v2,v3) \
 do { \
-    float tmp[4]; \
-    SIMD_STORE_V4SF(vec,&tmp[0]);\
-    *v0=tmp[0];\
-    *v1=tmp[1];\
-    *v2=tmp[2];\
-    *v3=tmp[3];\
+    float __tmp[4]; \
+    SIMD_STORE_V4SF(vec,&__tmp[0]);\
+    *v0=__tmp[0];\
+    *v1=__tmp[1];\
+    *v2=__tmp[2];\
+    *v3=__tmp[3];\
 } while (0)
 #define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)\
 do { \
-    float v[4] = { v0,v1,v2,v3 };\
-    SIMD_LOAD_V4SF(vec,&v[0]); \
+    float __tmp[4] = { v0,v1,v2,v3 };\
+    SIMD_LOAD_V4SF(vec,&__tmp[0]); \
 } while(0)
 
 /* handle padded value, this is a very bad implementation ... */
-#define SIMD_STORE_MASKED_V4SF(vec,arr) do { float tmp[4] ; SIMD_STORE_V4SF(vec,&tmp[0]); (arr)[0]=tmp[0];(arr)[1]=tmp[1];(arr)[2]=tmp[2]; } while(0)
+#define SIMD_STORE_MASKED_V4SF(vec,arr) do { float __tmp[4] ; SIMD_STORE_V4SF(vec,&__tmp[0]); (arr)[0]=__tmp[0];(arr)[1]=__tmp[1];(arr)[2]=__tmp[2]; } while(0)
 
 
 /* double */
@@ -35,15 +35,15 @@ do { \
 #define SIMD_STORE_V2DF(vec,arr) _mm_storeu_pd(arr,vec)
 #define SIMD_STORE_GENERIC_V2DF(vec,v0,v1) \
 do { \
-    double tmp[2]; \
-    SIMD_STORE_V2DF(vec,&tmp[0]);\
-    *(v0)=tmp[0];\
-    *(v1)=tmp[1];\
+    double __tmp[2]; \
+    SIMD_STORE_V2DF(vec,&__tmp[0]);\
+    *(v0)=__tmp[0];\
+    *(v1)=__tmp[1];\
 } while (0)
 #define SIMD_LOAD_GENERIC_V2DF(vec,v0,v1)\
 do { \
-    double v[2] = { v0,v1};\
-    SIMD_LOAD_V2DF(vec,&v[0]); \
+    double __tmp[2] = { v0,v1};\
+    SIMD_LOAD_V2DF(vec,&__tmp[0]); \
 } while(0)
 
 /* conversions */

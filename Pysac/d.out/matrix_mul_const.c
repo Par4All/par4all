@@ -115,25 +115,23 @@ void matrix_mul_const(size_t N, float C[N][N], float A[N][N], float val);
 int main(int argc, char **argv);
 void matrix_mul_const(size_t N, float C[N][N], float A[N][N], float val)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   int LU_IND0, LU_IB00, LU_NUB00;
+   size_t i0, j0;
    //SAC generated temporary array
    a4sf pdata0 = {val, val, val, val};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0;
    //PIPS:SAC generated v4sf vector(s)
    SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
-   for(i = 0; i <= N-1; i += 1) {
-      LU_NUB00 = N;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1)
-         C[i][LU_IND0] = A[i][LU_IND0]*pdata0[0];
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         SIMD_LOAD_V4SF(vec10_0, &A[i][LU_IND0]);
+   for(i0 = 0; i0 <= N-1; i0 += 1) {
+      for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
+         SIMD_LOAD_V4SF(vec10_0, &A[i0][j0]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-         SIMD_STORE_V4SF(vec00_0, &C[i][LU_IND0]);
+         SIMD_STORE_V4SF(vec00_0, &C[i0][j0]);
       }
+      for(j = 4*(N/4); j <= N-1; j += 1)
+         C[i0][j] = A[i0][j]*pdata0[0];
    }
    ;
 }
