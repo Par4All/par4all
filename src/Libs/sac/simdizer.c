@@ -810,7 +810,10 @@ bool simdizer_init(const char * module_name)
     set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, true));
     set_current_module_entity(module_name_to_entity(module_name));
 
-    /* first split blocks containing labeled statement */
+    /* noramlize blocks */
+    clean_up_sequences(get_current_module_statement());
+
+    /* then split blocks containing labeled statement */
     gen_recurse(get_current_module_statement(), statement_domain,
             gen_true, do_split_block_statements);
 
