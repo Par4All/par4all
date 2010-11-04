@@ -202,9 +202,7 @@ call dimensions_to_dma(entity from,
     dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
 			 entity_to_expression(to));
   else
-      /* for deallocation pass the address of the pointer to deallocate. */
-    dest= MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-            entity_to_expression(to));
+    dest=entity_to_expression(to);
 
   reference rtmp = make_reference(from,lo);
   type element_type = make_type_variable(
@@ -238,6 +236,9 @@ call dimensions_to_dma(entity from,
       case dma_store:
 	/* Generate communication functions: */
 	{
+	  // /*scalar detection*/
+	  //bool scalar_entity=entity_scalar_p(from);
+
 	  //if(!scalar_entity) {
 	    /* Build the sizes of the array block to transfer: */
 	    list /*of expressions*/ transfer_sizes = NIL;
