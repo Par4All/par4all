@@ -1,0 +1,13 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete forloop_code
+create forloop_code forloop_code.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+
+activate PRINT_CODE_STATIC_CONTROL
+display PRINTED_FILE (main)
+close
+delete forloop_code
+quit

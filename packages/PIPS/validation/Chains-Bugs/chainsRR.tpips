@@ -1,0 +1,9 @@
+delete chainsRR
+create chainsRR chainsRR.c
+
+setproperty KEEP_READ_READ_DEPENDENCE TRUE
+
+setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+activate  PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE[chainsRR]
+

@@ -110,7 +110,7 @@ int main()
    l = l->next;
 
 // Pointer values:
-// l == &*ANY_MODULE*:*ANYWHERE* (may);
+// l == l1[.next] (exact);
 // l1[.next] == &l2 (exact);
 // l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
 // l2[.next] == *ANY_MODULE*:*NULL* (exact);
@@ -120,46 +120,31 @@ int main()
    *l = l3;
 
 // Pointer values:
-// l == &*ANY_MODULE*:*ANYWHERE* (may);
-// l1[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l1[.next] == &l2 (may);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (may);
-// l1[.next][0][.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l2[.next] == *ANY_MODULE*:*NULL* (may);
-// l2[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l3[.next] == *ANY_MODULE*:*NULL* (may);
-// l3[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l4[.next] == *ANY_MODULE*:*NULL* (may);
-// l4[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
+// l == l1[.next] (exact);
+// l[0][.next] == l3[.next] (exact);
+// l1[.next] == &l2 (exact);
+// l1[.next][0][.next] == l3[.next] (exact);
+// l2[.next] == l3[.next] (exact);
+// l3[.next] == *ANY_MODULE*:*NULL* (exact);
+// l4[.next] == *ANY_MODULE*:*NULL* (exact);
 
    l = &l4;
 
 // Pointer values:
 // l == &l4 (exact);
-// l1[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l1[.next] == &l2 (may);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (may);
-// l1[.next][0][.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l2[.next] == *ANY_MODULE*:*NULL* (may);
-// l2[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l3[.next] == *ANY_MODULE*:*NULL* (may);
-// l3[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l4[.next] == *ANY_MODULE*:*NULL* (may);
-// l4[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
+// l1[.next] == &l2 (exact);
+// l1[.next][0][.next] == l3[.next] (exact);
+// l2[.next] == l3[.next] (exact);
+// l3[.next] == *ANY_MODULE*:*NULL* (exact);
+// l4[.next] == *ANY_MODULE*:*NULL* (exact);
 
    l3.next = (my_list) NULL;
 
 // Pointer values:
 // l == &l4 (exact);
-// l1[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l1[.next] == &l2 (may);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (may);
-// l1[.next][0][.next] == &*ANY_MODULE*:*ANYWHERE* (may);
-// l2[.next] == *ANY_MODULE*:*NULL* (may);
-// l2[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
+// l1[.next] == &l2 (exact);
 // l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (may);
-// l4[.next] == &*ANY_MODULE*:*ANYWHERE* (may);
+// l4[.next] == *ANY_MODULE*:*NULL* (exact);
 
    return 0;
 }

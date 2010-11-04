@@ -1,0 +1,65 @@
+      PROGRAM CHOLES
+      INTEGER N
+      REAL*8 A(N,N), P(N), X
+      INTEGER I, J, K
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   >
+C		<   tests   >
+      DO I = 1, N
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+         X = A(I,I)                                                     0001
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+         DO K = 1, I-1                                                  0002
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C                             1 <= K <= I-1
+C		<   tests   >
+            X = X-A(I,K)**2                                             0003
+         ENDDO
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+         P(I) = 1.0/SQRT(X)                                             0004
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C		<   tests   >
+         DO J = I+1, N                                                  0005
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C                             I+1 <= J <= N
+C		<   tests   >
+            X = A(I,J)                                                  0006
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C                             I+1 <= J <= N
+C		<   tests   >
+            DO K = 1, I-1                                               0007
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C                             I+1 <= J <= N
+C                             1 <= K <= I-1
+C		<   tests   >
+               X = X-A(J,K)*A(I,K)                                      0008
+            ENDDO
+C		< is static > TRUE
+C		< parameter > K, J, I, N, 
+C		<   loops   > 1 <= I <= N
+C                             I+1 <= J <= N
+C		<   tests   >
+            A(J,I) = X*P(I)                                             0009
+         ENDDO
+      ENDDO
+      END

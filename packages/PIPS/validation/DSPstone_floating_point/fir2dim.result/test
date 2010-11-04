@@ -1,0 +1,90 @@
+void main()
+{
+
+   static float coefficients[3][3];
+   static float image[4][4];
+   static float array[4+2][4+2];
+   static float output[4][4];
+
+   int k, f, i, j;
+
+   pin_down(image, array, coefficients, output);
+   {
+      ticks start, stop;
+      start = clock();
+
+      for(k = 0; k <= 3; k += 1)
+
+         for(f = 0; f <= 3; f += 1) {
+
+            output[k][f] = 0;
+
+            for(j = 0; j <= 2; j += 1)
+               for(i = 0; i <= 2; i += 1)
+                  output[k][f] += coefficients[j][i]*array[k*j][f+i];
+         }
+
+      stop = clock();
+      printf("%llu\n", (unsigned long long int) (stop-start));
+   }
+
+   pin_down(image, array, coefficients, output);
+}
+void main()
+{
+
+   static float coefficients[3][3];
+   static float image[4][4];
+   static float array[6][6];
+   static float output[4][4];
+
+   int k, f, j;
+   //PIPS generated variable
+   float RED0[3];
+   //PIPS generated variable
+   ticks stop0;
+   //PIPS generated variable
+   float F_00;
+   //PIPS generated variable
+   ticks start0;
+   //SAC generated temporary array
+   a2sf pdata0 = {0, 0};
+   //PIPS generated variable
+   v2df vec00_0, vec10_0, vec20_0, vec30_0;
+
+   pin_down(image, array, coefficients, output);
+   start0 = clock();
+
+   for(k = 0; k <= 3; k += 1)
+      
+      
+      for(f = 0; f <= 3; f += 1) {
+
+         output[k][f] = 0;
+
+         RED0[0] = 0.000000;
+         RED0[1] = 0.000000;
+         RED0[2] = 0.000000;
+
+         for(j = 0; j <= 2; j += 1) {
+            //PIPS:SAC generated v2df vector(s)
+            SIMD_LOAD_V2SF_TO_V2DF(vec20_0, &array[k*j][f]);
+            SIMD_LOAD_V2SF_TO_V2DF(vec10_0, &coefficients[j][0]);
+            SIMD_MULPD(vec00_0, vec10_0, vec20_0);
+            SIMD_STORE_V2DF_TO_V2SF(vec00_0, &pdata0[0]);
+            pdata0[0] = coefficients[j][0]*array[k*j][f];
+            F_00 = coefficients[j][2]*array[k*j][2+f];
+            SIMD_LOAD_V2SF_TO_V2DF(vec30_0, &RED0[0]);
+            SIMD_ADDPD(vec30_0, vec30_0, vec00_0);
+            SIMD_STORE_V2DF_TO_V2SF(vec30_0, &RED0[0]);
+            RED0[0] = RED0[0]+pdata0[0];
+            RED0[2] = RED0[2]+F_00;
+         }
+         output[k][f] = RED0[2]+RED0[1]+RED0[0]+output[k][f];
+      }
+
+   stop0 = clock();
+   printf("%llu\n", (unsigned long long int) (stop0-start0));
+
+}
+['d.out/fir2dim.c', 'd.out/SIMD.c']
