@@ -102,7 +102,6 @@ void P4A_accel_malloc(void **ptr, size_t n) {
 }
 
 /* Deallocate memory on the accelerator */
-void P4A_accel_free(void **ptr) {
-    free(*ptr);
-    *ptr=NULL;
+void P4A_accel_free(void *ptr) {
+    free(ptr);
 }
