@@ -211,6 +211,8 @@ bool effects_conflict_p( effect eff1, effect eff2 ) {
  * If the nth subscript expression can be statically evaluated in both sl1
  * and sl2 and if the subscript values are different, there is not
  * conflict. For instance a[i][0] does not conflict with a[j][1].
+ * SG: this is only true if you assume no out-of-bound indices
+ * e.g int a[2][2]; a[1][0] conflict with a[0][2] ..
  *
  * This is about the old references_conflict_p()
  */
@@ -219,7 +221,7 @@ bool array_references_may_conflict_p( list sl1, list sl2 ) {
 
   list cind1 = list_undefined;
   list cind2 = list_undefined;
-  for ( cind1 = sl1, cind2 = sl2; !ENDP(cind1) && !ENDP(cind2); POP(cind1), POP(cind2) ) {
+  for ( cind1 = sl1, cind2 = sl2; conflict_p && !ENDP(cind1) && !ENDP(cind2); POP(cind1), POP(cind2) ) {
     expression e1 = EXPRESSION(CAR(cind1));
     expression e2 = EXPRESSION(CAR(cind2));
     if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
