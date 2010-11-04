@@ -170,10 +170,6 @@ call dimensions_to_dma(entity from,
   }
 
 
-  /*scalar detection*/
-  bool scalar_entity=entity_scalar_p(from);
-
-
   if (dma_allocate_p(m)) {
       /* Need the address for the allocator to modify the pointer itself: */
       dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),entity_to_expression(to));
