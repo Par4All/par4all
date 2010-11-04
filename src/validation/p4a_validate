@@ -279,12 +279,14 @@ class ValidationClass:
                 if args[0] == 'date:':
                     # Record the date
                     self.date = ' '.join(args[1:])
-                    # Switch back to normal mode:
-                    validation_output = False
                 elif args[0] == 'output':
                     self.output_directory = args[2]
                 elif args[0] == 'running':
                     self.running_directory = args[2]
+                elif args[0] == 'SUCCESS':
+                    # Since it is the last header line, switch back to
+                    # normal mode:
+                    validation_output = False
                 # See next line:
                 continue
             # Should be in normal mode now:
