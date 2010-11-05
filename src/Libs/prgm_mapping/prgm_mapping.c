@@ -541,12 +541,12 @@ void plc_make_distance()
 	  expression trans = EXPRESSION(CAR(trans_l));
 
           polynome_add(&pp_dist,
-	    polynome_mult(pu_expression_to_polynome(trans),
+	    polynome_mult(expression_to_polynome(trans),
 		       	  vecteur_to_polynome(prototype_factorize(aux_pp,
 								  (Variable) var))));
 /*
           polynome_add(&pp_dist,
-	    polynome_mult(pu_expression_to_polynome(trans),
+	    polynome_mult(expression_to_polynome(trans),
 		       	  polynome_factorize(aux_pp, (Variable) var, 1)));
 */
 

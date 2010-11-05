@@ -554,7 +554,7 @@ list effects_list;
 			param_rank, param_name);
 	    }
 
-	    carg = expression_to_polynome(EXPRESSION(CAR(argument)),
+	    carg = expression_to_complexity_polynome(EXPRESSION(CAR(argument)),
 					  precond,
 					  effects_list,
 					  KEEP_SYMBOLS,

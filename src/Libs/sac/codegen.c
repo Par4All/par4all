@@ -464,7 +464,8 @@ expression distance_between_expression(const expression exp0, const expression e
         result = make_op_exp(MINUS_OPERATOR_NAME,lhs_distance,rhs_distance);
     }
     set_bool_property("EVAL_SIZEOF",eval_sizeof);
-    maxima_simplify(&result);
+    //maxima_simplify(&result);
+    simplify_expression(&result);
     return result;
 }
 

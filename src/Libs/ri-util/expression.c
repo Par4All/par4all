@@ -3122,7 +3122,186 @@ expression string_to_expression(const char * s,entity module)
         return entity_to_expression(e);
 }
 
-/* call maxima to simplify an expression */
+/* converts a monome to an expression */
+expression monome_to_expression(Pmonome pm)
+{
+    if (MONOME_UNDEFINED_P(pm))
+        return expression_undefined;
+    else {
+        expression coeff;
+        float x= monome_coeff(pm);
+        if(x == (int)x)
+            coeff = (x==1.f)? expression_undefined:int_to_expression((int)x);
+        else
+            coeff = float_to_expression(x);
+        expression term = Pvecteur_to_expression(monome_term(pm));
+        return expression_undefined_p(coeff)?term:
+            make_op_exp(MULTIPLY_OPERATOR_NAME, coeff, term);
+    }
+}
+
+/* converts a polynomial to expression */
+expression polynome_to_expression(Ppolynome pp)
+{
+    expression r =expression_undefined;
+
+    if (POLYNOME_UNDEFINED_P(pp))
+        r = expression_undefined;
+    else if (POLYNOME_NUL_P(pp))
+        r = int_to_expression(0);
+    else {
+        while (!POLYNOME_NUL_P(pp)) {
+            expression s =	monome_to_expression(polynome_monome(pp));
+            if(expression_undefined_p(r)) r=s;
+            else
+                r=MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), r, s);
+            pp = polynome_succ(pp);
+        }
+    }
+    return r;
+}
+/*============================================================================*/
+/* Ppolynome expression_to_polynome(expression exp): translates "exp" into a
+ * polynome. This transformation is feasible if "exp" contains only scalars and
+ * the four classical operations (+, -, *, /).
+ *
+ * The translation is done straightforwardly and recursively.
+ *
+ * it returns a POLYNOME_UNDEFINED if the conversion failed
+ */
+Ppolynome expression_to_polynome(expression exp)
+{
+#define ENTITY_FOUR_OPERATION_P(s) (ENTITY_PLUS_P(s) || ENTITY_MINUS_P(s) || ENTITY_MULTIPLY_P(s) || ENTITY_DIVIDE_P(s))
+    Ppolynome pp_new=POLYNOME_UNDEFINED; /* This the resulting polynome */
+    syntax sy = expression_syntax(exp);
+
+    switch(syntax_tag(sy))
+    {
+        case is_syntax_reference:
+            {
+                entity en = reference_variable(syntax_reference(sy));
+
+                if(entity_scalar_p(en))
+                    pp_new = make_polynome(1.0, (Variable) en, (Value) 1);
+                break;
+            }
+        case is_syntax_call:
+            {
+                /* Two cases : _ a constant
+                 *             _ a "real" call, ie an intrinsic or external function
+                 */
+                if (expression_constant_p(exp)) {
+                    int	etoi = expression_to_int(exp);
+                    pp_new = make_polynome((float) etoi,
+                            (Variable) entity_undefined, (Value) 0);
+                    /* We should have a real null polynome : 0*TCST^1 AL, AC 04 11 93
+                     *else  {
+                     *  Pmonome pm = (Pmonome) malloc(sizeof(Smonome));
+                     * monome_coeff(pm) = 0;
+                     *  monome_term(pm) = vect_new(TCST, 1);
+                     *  pp_new = monome_to_new_polynome(pm);
+                     *}
+                     */
+                }
+                else
+                {
+                    int cl;
+                    expression arg1, arg2 = expression_undefined;
+                    entity op_ent = call_function(syntax_call(sy));
+
+                    /* The call must be one of the four classical operations:
+                     *	+, - (unary or binary), *, /
+                     */
+                    if(ENTITY_FOUR_OPERATION_P(op_ent))
+                    {
+                        /* This call has one (unary minus) or two (binary plus, minus,
+                         * multiply or divide) arguments, no less and no more.
+                         */
+                        cl = gen_length(call_arguments(syntax_call(sy)));
+                        if( (cl != 2) && (cl != 1) )
+                            pips_internal_error("%s call with %d argument(s)",
+                                    entity_local_name(op_ent), cl);
+
+                        arg1 = EXPRESSION(CAR(call_arguments(syntax_call(sy))));
+                        if(cl == 2)
+                            arg2 = EXPRESSION(CAR(CDR(call_arguments(syntax_call(sy)))));
+
+                        if (ENTITY_PLUS_P(op_ent)) /* arg1 + arg2 */
+                        {
+                            pp_new = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(pp_new))
+                                polynome_add(&pp_new, expression_to_polynome(arg2));
+                        }
+                        else if(ENTITY_MINUS_P(op_ent)) /* -arg2 + arg1 */
+                        {
+                            pp_new = expression_to_polynome(arg2);
+                            if(!POLYNOME_UNDEFINED_P(pp_new)) {
+                                polynome_negate(&pp_new);
+                                Ppolynome parg1 = expression_to_polynome(arg1);
+                                if(!POLYNOME_UNDEFINED_P(parg1))
+                                    polynome_add(&pp_new, parg1);
+                                else {
+                                    polynome_rm(&pp_new);
+                                    pp_new=POLYNOME_UNDEFINED;
+                                }
+                            }
+                        }
+                        else if(ENTITY_MULTIPLY_P(op_ent)) /* arg1 * arg2 */ {
+                            Ppolynome p1 = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(p1)) {
+                                Ppolynome p2 = expression_to_polynome(arg2);
+                                if(!POLYNOME_UNDEFINED_P(p2)) {
+                                    pp_new = polynome_mult(p1,p2);
+                                }
+                            }
+                        }
+                        else if(ENTITY_DIVIDE_P(op_ent)) /* arg1 / arg2 */ {
+                            Ppolynome p1 = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(p1)) {
+                                Ppolynome p2 = expression_to_polynome(arg2);
+                                if(!POLYNOME_UNDEFINED_P(p2)) {
+                                    pp_new = polynome_div(p1,p2);
+                                }
+                            }
+                        }
+                        else /* (ENTITY_UNARY_MINUS_P(op_ent)) : -arg1 */
+                        {
+                            pp_new = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(pp_new)) {
+                                polynome_negate(&pp_new);
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+        default :
+            {
+                pp_new=POLYNOME_UNDEFINED;
+            }
+    }
+    return(pp_new);
+#undef ENTITY_FOUR_OPERATION_P
+}
+
+/* use polynomials to simplify an expression */
+bool simplify_expression(expression * pexp) {
+    expression exp = *pexp;
+    bool result =false;
+    if(!expression_undefined_p(exp)) {
+        Ppolynome pu = expression_to_polynome(exp);
+        if((result=!POLYNOME_UNDEFINED_P(pu))) {
+            free_expression(exp);
+            *pexp=polynome_to_expression(pu);
+            polynome_rm(&pu);
+        }
+    }
+    return result;
+}
+
+/* call maxima to simplify an expression 
+ * prefer simplify_expression !*/
 bool maxima_simplify(expression *presult) {
     bool success = true;
     expression result = *presult;

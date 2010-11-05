@@ -517,7 +517,7 @@ list effects_list;
 	user_warning("loop_to_complexity", "DOALL not implemented yet\n");
     }
 
-    clower = expression_to_polynome(range_lower(rng),
+    clower = expression_to_complexity_polynome(range_lower(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MINIMUM_VALUE);
     if ( complexity_unknown_p(clower) ) {
@@ -530,7 +530,7 @@ list effects_list;
         clower = make_single_var_complexity(1.0,var);
     }
 
-    cupper = expression_to_polynome(range_upper(rng),
+    cupper = expression_to_complexity_polynome(range_upper(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MAXIMUM_VALUE);
     if ( complexity_unknown_p(cupper) ) {
@@ -543,7 +543,7 @@ list effects_list;
         cupper = make_single_var_complexity(1.0,var);
     }
 
-    cincr  = expression_to_polynome(range_increment(rng),
+    cincr  = expression_to_complexity_polynome(range_increment(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MINIMUM_VALUE);
 

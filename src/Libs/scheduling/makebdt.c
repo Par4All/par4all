@@ -874,7 +874,7 @@ Ppolynome include_trans_in_poly(s, p, l, d)
     {
       exp = EXPRESSION(CAR(lexp));
       analyze_expression(&exp, &den);
-      poly_trans = pu_expression_to_polynome(exp);
+      poly_trans = expression_to_polynome(exp);
       v = (Variable)ENTITY(CAR(lv));
       if (polynome_contains_var(p, v))
 	p = prototype_var_subst(p, v, poly_trans); 
@@ -2855,7 +2855,7 @@ static bdt search_scc_bdt(s)
 		    exp = EXPRESSION(CAR(lexp));
                     analyze_expression(&exp,&den);
 
-		    poly_source = pu_expression_to_polynome(exp);
+		    poly_source = expression_to_polynome(exp);
 
 		    if (get_debug_level() > 5)
 		       {
