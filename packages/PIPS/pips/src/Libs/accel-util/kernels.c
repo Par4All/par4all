@@ -169,10 +169,8 @@ call dimensions_to_dma(entity from,
       AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
   }
 
-
-  /*scalar detection*/
-  bool scalar_entity=entity_scalar_p(from);
-
+  /* Scalar detection: */
+  bool scalar_entity = entity_scalar_p(from);
 
   if (dma_allocate_p(m)) {
       /* Need the address for the allocator to modify the pointer itself: */
@@ -200,8 +198,9 @@ call dimensions_to_dma(entity from,
                   ),
               normalized_undefined);
   }
-  else if (!dma_deallocate_p(m))
-    /* Except for the deallocation, the original array is referenced
+  else if (!dma_deallocate_p(m) && !scalar_entity)
+    /* Except for the deallocation or if we have a scalar and then we have
+       already created a pointer to it, the original array is referenced
        through pointer dereferencing: */
     dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
 			 entity_to_expression(to));

@@ -436,7 +436,7 @@ static void compute_successors(fusion_block b, list block_list) {
                   || action_write_p(effect_action(conflict_source(a_conflict))))) {
 
             int sink_ordering =
-                vertex_to_ordering(successor_vertex(a_successor));
+                vertex_ordering(successor_vertex(a_successor));
             pips_debug(5, "Considering dependence to statement %d\n",
                 sink_ordering);
 

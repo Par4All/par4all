@@ -128,6 +128,11 @@ static void remove_unread_variables(statement s)
     }
 }
 
+void module_clean_declarations(entity module, statement module_statement) {
+  entity_clean_declarations(module,module_statement);
+
+  gen_recurse(module_statement,statement_domain, gen_true, statement_clean_declarations);
+}
 
 /* A phase to remove the declaration of useless variables
 
@@ -150,9 +155,7 @@ clean_declarations(string module_name)
   gen_recurse(get_current_module_statement(),statement_domain,gen_true,remove_unread_variables);
 
   /* body*/
-  entity_clean_declarations(get_current_module_entity(),get_current_module_statement());
-
-  gen_recurse(get_current_module_statement(),statement_domain, gen_true, statement_clean_declarations);
+  module_clean_declarations(get_current_module_entity(),get_current_module_statement());
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 

@@ -745,7 +745,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {STRTOULL_FUNCTION_NAME,                 safe_intrinsic_to_post_pv},
   {RAND_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
   {SRAND_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
-  {CALLOC_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+  {CALLOC_FUNCTION_NAME,                   heap_intrinsic_to_post_pv},
   {FREE_FUNCTION_NAME,                     heap_intrinsic_to_post_pv},
   {MALLOC_FUNCTION_NAME,                   heap_intrinsic_to_post_pv},
   {REALLOC_FUNCTION_NAME,                  heap_intrinsic_to_post_pv},
@@ -1480,11 +1480,86 @@ static void va_list_function_to_post_pv(entity func, list func_args, list l_in,
 {
   safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
+
+
+
 static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 				      pv_results * pv_res, pv_context *ctxt)
 {
-  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
+  string func_name = entity_local_name(func);
+  expression malloc_arg = expression_undefined;
+  bool free_malloc_arg = false;
+  list l_in_cur = l_in;
+
+  /* first, impact of argument evaluation on pointer values */
+  FOREACH(EXPRESSION, arg, func_args)
+    {
+      pv_results pv_res_arg = make_pv_results();
+      expression_to_post_pv(arg, l_in_cur, &pv_res_arg, ctxt);
+      free_pv_results_paths(&pv_res_arg);
+      if (pv_res_arg.l_out != l_in_cur)
+	{
+	  gen_full_free_list(l_in_cur);
+	  l_in_cur = pv_res_arg.l_out;
+	}
+    }
+
+  /* free the previously allocated path if need be */
+  if (same_string_p(func_name, FREE_FUNCTION_NAME)
+      || same_string_p(func_name, REALLOC_FUNCTION_NAME))
+    {
+      pips_internal_error("free or realloc not handled yet");
+    }
+
+  /* Then retrieve the allocated path if any */
+  if(same_string_p(func_name, MALLOC_FUNCTION_NAME))
+    {
+      malloc_arg = EXPRESSION(CAR(func_args));
+    }
+  else if(same_string_p(func_name, CALLOC_FUNCTION_NAME))
+    {
+      malloc_arg =
+	make_op_exp("*",
+		   copy_expression(EXPRESSION(CAR(func_args))),
+		   copy_expression(EXPRESSION(CAR(CDR(func_args)))));
+      free_malloc_arg = true;
+    }
+  else if (same_string_p(func_name, REALLOC_FUNCTION_NAME))
+    {
+      malloc_arg = EXPRESSION(CAR(CDR(func_args)));
+    }
+
+  if (!expression_undefined_p(malloc_arg))
+    {
+      sensitivity_information si =
+	make_sensitivity_information(pv_context_statement_head(ctxt),
+				     get_current_module_entity(),
+				     NIL);
+      entity e = malloc_to_abstract_location(malloc_arg, &si);
+
+      effect eff = make_effect(make_cell_reference(make_reference(e, NIL)),
+			       make_action_write_memory(),
+			       make_approximation_must(),
+			       make_descriptor_none());
+
+      if (!entity_heap_location_p(e))
+	{
+	  effect_add_dereferencing_dimension(eff);
+	}
+      else
+	effect_to_may_effect(eff);
+      pv_res->result_paths = CONS(EFFECT, eff, NIL);
+      pv_res->result_paths_interpretations =
+	CONS(CELL_INTERPRETATION,
+	     make_cell_interpretation_address_of(),
+	     NIL);
+      if (free_malloc_arg)
+	free_expression(malloc_arg);
+    }
+
+  pv_res->l_out = l_in_cur;
 }
+
 #if 0
 static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args,
 			    list l_in, pv_results * pv_res, pv_context *ctxt)

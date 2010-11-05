@@ -962,7 +962,7 @@ bool symbolic_entity_p(entity e)
  * be returned.
  * FI: assert condition made stronger (18 December 1998)
  */
-entity entity_intrinsic(string name)
+entity entity_intrinsic(const char* name)
 {
   entity e = (entity) gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
 						     MODULE_SEP_STRING,

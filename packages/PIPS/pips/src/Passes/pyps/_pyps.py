@@ -360,7 +360,6 @@ class workspace(object):
 				saved.append(cp)
 			else:
 				saved.append(f)
-		print saved
 
 		return saved
 

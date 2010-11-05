@@ -12,15 +12,17 @@ class sacbase(object):
 		# Here are the transformations made by benchmark.tpips.h, blindy
 		# translated in pyps.
 
+		ws.activate("PRECONDITIONS_INTER_FULL")
+		ws.activate("TRANSFORMERS_INTER_FULL")
 		ws.activate("MUST_REGIONS")
 		ws.activate("REGION_CHAINS")
 		ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
-		ws.activate("PRECONDITIONS_INTER_FULL")
-		ws.activate("TRANSFORMERS_INTER_FULL")
 
 		ws.props.constant_path_effects = False
 		ws.props.ricedg_statistics_all_arrays = True
 		ws.props.c89_code_generation = True
+
+		ws.props.loop_unroll_with_prologue = False
 
 		ws.props.simd_fortran_mem_organisation = False
 		ws.props.sac_simd_register_width = cond["register_width"]
@@ -89,7 +91,7 @@ class sacbase(object):
 		# module.display()
 
 		# module.print_dot_dependence_graph()
-		module.single_assignment()
+		module.scalar_renaming()
 
 		if cond.get("verbose"):
 			module.display()

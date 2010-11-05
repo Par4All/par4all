@@ -353,9 +353,27 @@ void cleanup_subscript(expression e)
         }
     }
 }
+static void cleanup_subscript_pre(expression exp) {
+    if(expression_call_p(exp)) {
+        call c = expression_call(exp);
+        if(ENTITY_DEREFERENCING_P(call_function(c))) {
+            expression lhs = binary_call_lhs(c);
+            if(expression_call_p(lhs)) {
+                call c = expression_call(lhs);
+                if(ENTITY_ADDRESS_OF_P(call_function(c))) {
+                    expression lhs = binary_call_lhs(c);
+                    syntax syn = expression_syntax(lhs);
+                    expression_syntax(lhs)=syntax_undefined;
+                    update_expression_syntax(exp,syn);
+                }
+            }
+        }
+    }
+}
 
 void cleanup_subscripts(void* obj)
 {
+    gen_recurse(obj,expression_domain,gen_true,cleanup_subscript_pre);
     gen_recurse(obj,expression_domain,gen_true,cleanup_subscript);
 }
 

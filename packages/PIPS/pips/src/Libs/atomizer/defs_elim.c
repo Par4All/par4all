@@ -35,18 +35,6 @@
 
 #include "local.h"
 
-/*============================================================================*/
-/* static int vertex_ordering(vertex v): returns the "ordering" of "v".
- *
- * The "ordering" is an integer. To each statement is associated a different
- * number.
- */
-int 
-vertex_ordering(v)
-vertex v;
-{
-    return(dg_vertex_label_statement((dg_vertex_label) vertex_vertex_label(v)));
-}
 
 
 /*============================================================================*/

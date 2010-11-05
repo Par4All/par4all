@@ -588,59 +588,6 @@ typedef struct {
 
 
 
-expression reference_offset(reference ref)
-{
-    if(ENDP(reference_indices(ref))) return int_to_expression(0);
-    else {
-        expression address_computation = copy_expression(EXPRESSION(CAR(reference_indices(ref))));
-
-        /* iterate on the dimensions & indices to create the index expression */
-        list dims = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(ref)))));
-        list indices = reference_indices(ref);
-        POP(indices);
-        if(!ENDP(dims)) POP(dims); // the first dimension is unused
-        FOREACH(DIMENSION,dim,dims)
-        {
-            expression dimension_size = make_op_exp(
-                    PLUS_OPERATOR_NAME,
-                    make_op_exp(
-                        MINUS_OPERATOR_NAME,
-                        copy_expression(dimension_upper(dim)),
-                        copy_expression(dimension_lower(dim))
-                        ),
-                    int_to_expression(1));
-
-            if( !ENDP(indices) ) { /* there may be more dimensions than indices */
-                expression index_expression = EXPRESSION(CAR(indices));
-                address_computation = make_op_exp(
-                        PLUS_OPERATOR_NAME,
-                        copy_expression(index_expression),
-                        make_op_exp(
-                            MULTIPLY_OPERATOR_NAME,
-                            dimension_size,address_computation
-                            )
-                        );
-                POP(indices);
-            }
-            else {
-                address_computation = make_op_exp(
-                        MULTIPLY_OPERATOR_NAME,
-                        dimension_size,address_computation
-                        );
-            }
-        }
-
-        /* there may be more indices than dimensions */
-        FOREACH(EXPRESSION,e,indices)
-        {
-            address_computation = make_op_exp(
-                    PLUS_OPERATOR_NAME,
-                    address_computation,copy_expression(e)
-                    );
-        }
-        return address_computation ;
-    }
-}
 static void all_array_references_constant_walker(reference ref, references_constant_param* p)
 {
     if(same_entity_p(p->array,reference_variable(ref)))
