@@ -40,154 +40,129 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
+   unsigned int i;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
-   //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_0 = alpha*src1[LU_IND0];
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      F_0 = alpha*src1[i];
       F_1 = -alpha;
       F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0];
-      result[LU_IND0] = F_0+F_3;
+      F_3 = F_2*src2[i];
+      result[i] = F_0+F_3;
+      F_0 = alpha*src1[i+1];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i+1];
+      result[i+1] = F_0+F_3;
+      F_0 = alpha*src1[i+2];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i+2];
+      result[i+2] = F_0+F_3;
+      F_0 = alpha*src1[i+3];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i+3];
+      result[i+3] = F_0+F_3;
    }
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      F_0 = alpha*src1[LU_IND0];
+   for(i = 4*(n/4); i <= n-1; i += 1) {
+      F_0 = alpha*src1[i];
       F_1 = -alpha;
       F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0];
-      result[LU_IND0] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+1];
+      F_3 = F_2*src2[i];
+      result[i] = F_0+F_3;
+   }
+   ;
+}
+void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
+{
+   unsigned int i;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3;
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      F_0 = alpha*src1[i];
       F_1 = -alpha;
       F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+1];
-      result[LU_IND0+1] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+2];
+      F_3 = F_2*src2[i];
+      result[i] = F_0+F_3;
+      F_0 = alpha*src1[i+1];
       F_1 = -alpha;
       F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+2];
-      result[LU_IND0+2] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+3];
+      F_3 = F_2*src2[i+1];
+      result[i+1] = F_0+F_3;
+      F_0 = alpha*src1[i+2];
       F_1 = -alpha;
       F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+3];
-      result[LU_IND0+3] = F_0+F_3;
+      F_3 = F_2*src2[i+2];
+      result[i+2] = F_0+F_3;
+      F_0 = alpha*src1[i+3];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i+3];
+      result[i+3] = F_0+F_3;
+   }
+   for(i = 4*(n/4); i <= n-1; i += 1) {
+      F_0 = alpha*src1[i];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i];
+      result[i] = F_0+F_3;
    }
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3;
+   float F_0, F_1, F_2, F_3, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   LU_NUB0 = n;
-   LU_IB0 = MOD(LU_NUB0, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-      F_0 = alpha*src1[LU_IND0];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0];
-      result[LU_IND0] = F_0+F_3;
-   }
-   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-      F_0 = alpha*src1[LU_IND0];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0];
-      result[LU_IND0] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+1];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+1];
-      result[LU_IND0+1] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+2];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+2];
-      result[LU_IND0+2] = F_0+F_3;
-      F_0 = alpha*src1[LU_IND0+3];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      F_3 = F_2*src2[LU_IND0+3];
-      result[LU_IND0+3] = F_0+F_3;
-   }
-   ;
-}
-void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
-{
-   //PIPS generated variable
-   float F_0, F_1, F_2, F_3;
-   //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_30, F_20, F_10, F_00, F_31, F_21, F_11, F_01, F_32, F_22, F_12, F_02, F_33, F_23, F_13, F_03, F_34, F_24, F_14, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = alpha*src1[LU_IND0];
-      F_14 = -alpha;
-      F_24 = F_14+1;
-      F_34 = F_24*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_34;
-   }
-   for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-      F_03 = alpha*src1[LU_IND0];
-      F_13 = -alpha;
-      F_23 = F_13+1;
-      F_33 = F_23*src2[LU_IND0];
-      result[LU_IND0] = F_03+F_33;
-      F_02 = alpha*src1[LU_IND0+1];
-      F_12 = -alpha;
-      F_22 = F_12+1;
-      F_32 = F_22*src2[LU_IND0+1];
-      result[LU_IND0+1] = F_02+F_32;
-      F_01 = alpha*src1[LU_IND0+2];
-      F_11 = -alpha;
-      F_21 = F_11+1;
-      F_31 = F_21*src2[LU_IND0+2];
-      result[LU_IND0+2] = F_01+F_31;
-      F_00 = alpha*src1[LU_IND0+3];
+   unsigned int i0, i1;
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+      F_00 = alpha*src1[i0];
       F_10 = -alpha;
       F_20 = F_10+1;
-      F_30 = F_20*src2[LU_IND0+3];
-      result[LU_IND0+3] = F_00+F_30;
+      F_30 = F_20*src2[i0];
+      result[i0] = F_00+F_30;
+      F_01 = alpha*src1[i0+1];
+      F_11 = -alpha;
+      F_21 = F_11+1;
+      F_31 = F_21*src2[i0+1];
+      result[i0+1] = F_01+F_31;
+      F_02 = alpha*src1[i0+2];
+      F_12 = -alpha;
+      F_22 = F_12+1;
+      F_32 = F_22*src2[i0+2];
+      result[i0+2] = F_02+F_32;
+      F_03 = alpha*src1[i0+3];
+      F_13 = -alpha;
+      F_23 = F_13+1;
+      F_33 = F_23*src2[i0+3];
+      result[i0+3] = F_03+F_33;
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = alpha*src1[i1];
+      F_1 = -alpha;
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i1];
+      result[i1] = F_0+F_3;
    }
    ;
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3;
+   float F_0, F_1, F_2, F_3, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_30, F_20, F_10, F_00, F_31, F_21, F_11, F_01, F_32, F_22, F_12, F_02, F_33, F_23, F_13, F_03, F_34, F_24, F_14, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   unsigned int i0, i1;
    //SAC generated temporary array
    a4sf pdata0 = {alpha, alpha, alpha, alpha}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0};
    //SAC generated temporary array
    a4si pdata3 = {1, 1, 1, 1};
    //SAC generated temporary array
    a4sf pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0};
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = pdata0[0]*src1[LU_IND0];
-      F_14 = -pdata0[0];
-      F_24 = F_14+1;
-      F_34 = F_24*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_34;
-   }
-   for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80, vec90, vec100, vec110, vec120, vec130;
-      SIMD_LOAD_V4SF(vec20, &src1[LU_IND0]);
+      SIMD_LOAD_V4SF(vec20, &src1[i0]);
       SIMD_LOAD_V4SF(vec10, &pdata0[0]);
       SIMD_MULPS(vec00, vec10, vec20);
       SIMD_STORE_V4SF(vec00, &pdata1[0]);
@@ -196,11 +171,61 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata3[0]);
       SIMD_ADDPS(vec50, vec30, vec70);
       SIMD_STORE_V4SF(vec50, &pdata4[0]);
-      SIMD_LOAD_V4SF(vec100, &src2[LU_IND0]);
+      SIMD_LOAD_V4SF(vec100, &src2[i0]);
       SIMD_MULPS(vec80, vec50, vec100);
       SIMD_STORE_V4SF(vec80, &pdata5[0]);
       SIMD_ADDPS(vec110, vec00, vec80);
-      SIMD_STORE_V4SF(vec110, &result[LU_IND0]);
+      SIMD_STORE_V4SF(vec110, &result[i0]);
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = pdata0[0]*src1[i1];
+      F_1 = -pdata0[0];
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i1];
+      result[i1] = F_0+F_3;
+   }
+   ;
+}
+void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
+{
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
+   //PIPS generated variable
+   unsigned int i0, i1;
+   //SAC generated temporary array
+   a4sf pdata0 = {alpha, alpha, alpha, alpha}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0};
+   //SAC generated temporary array
+   a4si pdata3 = {1, 1, 1, 1};
+   //SAC generated temporary array
+   a4sf pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0};
+   {
+      //PIPS:SAC generated v4sf vector(s)
+      v4sf vec00, vec10, vec30, vec50, vec70, vec80;
+      SIMD_LOAD_V4SF(vec10, &pdata0[0]);
+      SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata3[0]);
+      for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+         //PIPS:SAC generated v4sf vector(s)
+         v4sf vec20, vec40, vec60, vec90, vec100, vec110, vec120, vec130;
+         SIMD_LOAD_V4SF(vec20, &src1[i0]);
+         SIMD_MULPS(vec00, vec10, vec20);
+         SIMD_UMINPS(vec30, vec10);
+         SIMD_ADDPS(vec50, vec30, vec70);
+         SIMD_LOAD_V4SF(vec100, &src2[i0]);
+         SIMD_MULPS(vec80, vec50, vec100);
+         SIMD_ADDPS(vec110, vec00, vec80);
+         SIMD_STORE_V4SF(vec110, &result[i0]);
+      }
+      SIMD_STORE_V4SF(vec00, &pdata1[0]);
+      SIMD_STORE_V4SF(vec30, &pdata2[0]);
+      SIMD_STORE_V4SF(vec50, &pdata4[0]);
+      SIMD_STORE_V4SF(vec80, &pdata5[0]);
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = pdata0[0]*src1[i1];
+      F_1 = -pdata0[0];
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i1];
+      result[i1] = F_0+F_3;
    }
    ;
 }
@@ -209,88 +234,35 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float F_30, F_20, F_10, F_00, F_31, F_21, F_11, F_01, F_32, F_22, F_12, F_02, F_33, F_23, F_13, F_03, F_34, F_24, F_14, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   //SAC generated temporary array
-   a4sf pdata0 = {alpha, alpha, alpha, alpha}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0};
-   //SAC generated temporary array
-   a4si pdata3 = {1, 1, 1, 1};
-   //SAC generated temporary array
-   a4sf pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0};
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = pdata0[0]*src1[LU_IND0];
-      F_14 = -pdata0[0];
-      F_24 = F_14+1;
-      F_34 = F_24*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_34;
-   }
-   {
-      //PIPS:SAC generated v4sf vector(s)
-      v4sf vec00, vec10, vec30, vec50, vec70, vec80;
-      SIMD_LOAD_V4SF(vec10, &pdata0[0]);
-      SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata3[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //PIPS:SAC generated v4sf vector(s)
-         v4sf vec20, vec40, vec60, vec90, vec100, vec110, vec120, vec130;
-         SIMD_LOAD_V4SF(vec20, &src1[LU_IND0]);
-         SIMD_MULPS(vec00, vec10, vec20);
-         SIMD_UMINPS(vec30, vec10);
-         SIMD_ADDPS(vec50, vec30, vec70);
-         SIMD_LOAD_V4SF(vec100, &src2[LU_IND0]);
-         SIMD_MULPS(vec80, vec50, vec100);
-         SIMD_ADDPS(vec110, vec00, vec80);
-         SIMD_STORE_V4SF(vec110, &result[LU_IND0]);
-      }
-      SIMD_STORE_V4SF(vec00, &pdata1[0]);
-      SIMD_STORE_V4SF(vec30, &pdata2[0]);
-      SIMD_STORE_V4SF(vec50, &pdata4[0]);
-      SIMD_STORE_V4SF(vec80, &pdata5[0]);
-   }
-   ;
-}
-void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
-{
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float F_34, F_24, F_14, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   unsigned int i0, i1;
    //SAC generated temporary array
    a4sf pdata0 = {alpha, alpha, alpha, alpha};
    //SAC generated temporary array
    a4si pdata3 = {1, 1, 1, 1};
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = pdata0[0]*src1[LU_IND0];
-      F_14 = -pdata0[0];
-      F_24 = F_14+1;
-      F_34 = F_24*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_34;
-   }
    {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec30, vec50, vec70, vec80;
       SIMD_LOAD_V4SF(vec10, &pdata0[0]);
       SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata3[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec20, vec40, vec60, vec90, vec100, vec110, vec120, vec130;
-         SIMD_LOAD_V4SF(vec20, &src1[LU_IND0]);
+         SIMD_LOAD_V4SF(vec20, &src1[i0]);
          SIMD_MULPS(vec00, vec10, vec20);
          SIMD_UMINPS(vec30, vec10);
          SIMD_ADDPS(vec50, vec30, vec70);
-         SIMD_LOAD_V4SF(vec100, &src2[LU_IND0]);
+         SIMD_LOAD_V4SF(vec100, &src2[i0]);
          SIMD_MULPS(vec80, vec50, vec100);
          SIMD_ADDPS(vec110, vec00, vec80);
-         SIMD_STORE_V4SF(vec110, &result[LU_IND0]);
+         SIMD_STORE_V4SF(vec110, &result[i0]);
       }
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = pdata0[0]*src1[i1];
+      F_1 = -pdata0[0];
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i1];
+      result[i1] = F_0+F_3;
    }
    ;
 }
@@ -300,41 +272,37 @@ simdized code
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, F_1, F_2, F_3;
    //PIPS generated variable
-   float F_34, F_24, F_14, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   unsigned int i0, i1;
    //SAC generated temporary array
    a4sf pdata0 = {alpha, alpha, alpha, alpha};
    //SAC generated temporary array
    a4si pdata3 = {1, 1, 1, 1};
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = pdata0[0]*src1[LU_IND0];
-      F_14 = -pdata0[0];
-      F_24 = F_14+1;
-      F_34 = F_24*src2[LU_IND0];
-      result[LU_IND0] = F_04+F_34;
-   }
    {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec30, vec50, vec70, vec80;
       SIMD_LOAD_V4SF(vec10, &pdata0[0]);
       SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata3[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec20, vec40, vec60, vec90, vec100, vec110, vec120, vec130;
-         SIMD_LOAD_V4SF(vec20, &src1[LU_IND0]);
+         SIMD_LOAD_V4SF(vec20, &src1[i0]);
          SIMD_MULPS(vec00, vec10, vec20);
          SIMD_UMINPS(vec30, vec10);
          SIMD_ADDPS(vec50, vec30, vec70);
-         SIMD_LOAD_V4SF(vec100, &src2[LU_IND0]);
+         SIMD_LOAD_V4SF(vec100, &src2[i0]);
          SIMD_MULPS(vec80, vec50, vec100);
          SIMD_ADDPS(vec110, vec00, vec80);
-         SIMD_STORE_V4SF(vec110, &result[LU_IND0]);
+         SIMD_STORE_V4SF(vec110, &result[i0]);
       }
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = pdata0[0]*src1[i1];
+      F_1 = -pdata0[0];
+      F_2 = F_1+1;
+      F_3 = F_2*src2[i1];
+      result[i1] = F_0+F_3;
    }
    ;
 }

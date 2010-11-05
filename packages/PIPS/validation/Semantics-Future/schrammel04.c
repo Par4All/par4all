@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 // I assume it returns a value between 0. and 1., but I haven't
-// checked that rand(0 was always positive
+// checked that rand(0) was always positive
 float alea(void)
 {
   float fr = ((float) rand())/((float)RAND_MAX);

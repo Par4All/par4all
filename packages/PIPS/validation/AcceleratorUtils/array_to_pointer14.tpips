@@ -1,0 +1,31 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "array_to_pointer14"
+delete $WS
+create $WS $WS.c
+module p4a_kernel_wrapper_0
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after array conversion
+echo
+
+#setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[p4a_kernel_0]
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c $WS.c -o  $WS.database/Tmp/ref.o
+shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/out.o
+
+close
+delete $WS
+quit
+

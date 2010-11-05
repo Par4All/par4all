@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
       int c[4];
    } __;
    int b = atoi(argv[1]);
+   __.a = malloc(sizeof(int)*4);
    do {
-      __.a = malloc(sizeof(int)*4);
       (__.a)[0] = b*2;
       (__.a)[1] = b*3;
       (__.a)[2] = b*4;
@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
    int *__a;
    //PIPS generated variable
    int __c[4];
+   __a = malloc(sizeof(int)*4);
    do {
-      __a = malloc(sizeof(int)*4);
       __a[0] = b*2;
       __a[1] = b*3;
       __a[2] = b*4;
@@ -68,21 +68,21 @@ int main(int argc, char *argv[])
    int __c[4];
    //SAC generated temporary array
    a4si pdata0 = {2, 3, 4, 5};
-   do {
-      __a = malloc(4*sizeof(int));
-      __a[0] = 2*b;
-      __a[1] = 3*b;
-      __a[2] = 4*b;
-      __a[3] = 5*b;
-   }
-   while (0);
+   __a = malloc(4*sizeof(int));
    do {
       //PIPS:SAC generated v4si vector(s)
       v4si vec00, vec10, vec20;
-      SIMD_LOAD_V4SI(vec20, &__a[0]);
+      SIMD_LOAD_GENERIC_V4SI(vec20, b, b, b, b);
       SIMD_LOAD_V4SI(vec10, &pdata0[0]);
       SIMD_MULD(vec00, vec10, vec20);
-      SIMD_STORE_V4SI(vec00, &__c[0]);
+      SIMD_STORE_V4SI(vec00, &__a[0]);
+   }
+   while (0);
+   do {
+      __c[0] = 2*__a[0];
+      __c[1] = 3*__a[1];
+      __c[2] = 4*__a[2];
+      __c[3] = 5*__a[3];
    }
    while (0);
    free(__a);

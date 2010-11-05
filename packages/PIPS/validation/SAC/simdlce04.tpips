@@ -3,6 +3,7 @@ setenv WS="simdlce04"
 delete $WS
 create $WS $WS.c include/memcpy.c
 
+setproperty LOOP_UNROLL_WITH_PROLOGUE FALSE
 setproperty CONSTANT_PATH_EFFECTS FALSE
 activate REGION_CHAINS
 activate RICE_REGIONS_DEPENDENCE_GRAPH

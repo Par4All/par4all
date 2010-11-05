@@ -7,6 +7,7 @@ make PRINTED_FILE[%ALL]
 module main
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 echo raw file
 display PRINTED_FILE

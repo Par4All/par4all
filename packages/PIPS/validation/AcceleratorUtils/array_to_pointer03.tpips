@@ -14,7 +14,7 @@ echo Code after array conversion
 echo
 
 apply LINEARIZE_ARRAY[duck]
-display PRINTED_FILE[duck]
+display PRINTED_FILE[%ALLFUNC]
 
 echo
 echo Code after partial eval

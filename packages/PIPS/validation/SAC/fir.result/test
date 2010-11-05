@@ -52,27 +52,23 @@ void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksiz
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t i, j;
    //PIPS generated variable
    float F_0;
-   //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
    for(i = 0; i <= n-ksize; i += 1) {
       out[i] = 0.0;
-      LU_NUB0 = ksize;
-      LU_IB0 = MOD(LU_NUB0, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-         F_0 = in[LU_IND0+i]*kernel[LU_IND0];
+      for(j = 0; j <= 4*(ksize/4)-1; j += 4) {
+         F_0 = in[i+j]*kernel[j];
+         out[i] = out[i]+F_0;
+         F_0 = in[i+j+1]*kernel[j+1];
+         out[i] = out[i]+F_0;
+         F_0 = in[i+j+2]*kernel[j+2];
+         out[i] = out[i]+F_0;
+         F_0 = in[i+j+3]*kernel[j+3];
          out[i] = out[i]+F_0;
       }
-      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         F_0 = in[LU_IND0+i]*kernel[LU_IND0];
-         out[i] = out[i]+F_0;
-         F_0 = in[LU_IND0+i+1]*kernel[LU_IND0+1];
-         out[i] = out[i]+F_0;
-         F_0 = in[LU_IND0+i+2]*kernel[LU_IND0+2];
-         out[i] = out[i]+F_0;
-         F_0 = in[LU_IND0+i+3]*kernel[LU_IND0+3];
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i+j]*kernel[j];
          out[i] = out[i]+F_0;
       }
    }
@@ -80,206 +76,178 @@ void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksiz
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t i, j;
    //PIPS generated variable
-   float F_0;
-   //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float RED0[1], RED1[4];
+   float F_0, RED0[4], RED1[1];
    for(i = 0; i <= n-ksize; i += 1) {
       out[i] = 0.0;
-      LU_NUB0 = ksize;
-      LU_IB0 = MOD(LU_NUB0, 4);
       RED0[0] = 0.000000;
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
-         F_0 = in[LU_IND0+i]*kernel[LU_IND0];
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      for(j = 0; j <= 4*(ksize/4)-1; j += 4) {
+         F_0 = in[i+j]*kernel[j];
          RED0[0] = RED0[0]+F_0;
+         F_0 = in[i+j+1]*kernel[j+1];
+         RED0[1] = RED0[1]+F_0;
+         F_0 = in[i+j+2]*kernel[j+2];
+         RED0[2] = RED0[2]+F_0;
+         F_0 = in[i+j+3]*kernel[j+3];
+         RED0[3] = RED0[3]+F_0;
       }
-      out[i] = RED0[0]+out[i];
+      out[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i];
       RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
-         F_0 = in[LU_IND0+i]*kernel[LU_IND0];
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i+j]*kernel[j];
          RED1[0] = RED1[0]+F_0;
-         F_0 = in[LU_IND0+i+1]*kernel[LU_IND0+1];
-         RED1[1] = RED1[1]+F_0;
-         F_0 = in[LU_IND0+i+2]*kernel[LU_IND0+2];
-         RED1[2] = RED1[2]+F_0;
-         F_0 = in[LU_IND0+i+3]*kernel[LU_IND0+3];
-         RED1[3] = RED1[3]+F_0;
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i] = RED1[0]+out[i];
    }
    ;
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   float F_0;
+   float F_0, RED0[4], RED1[1], F_00, F_01, F_02, F_03;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
-      LU_IB00 = MOD(LU_NUB00, 4);
+   size_t i0, j0;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
+         F_00 = in[i0+j0]*kernel[j0];
+         RED0[0] = RED0[0]+F_00;
+         F_01 = in[i0+j0+1]*kernel[j0+1];
+         RED0[1] = RED0[1]+F_01;
+         F_02 = in[i0+j0+2]*kernel[j0+2];
+         RED0[2] = RED0[2]+F_02;
+         F_03 = in[i0+j0+3]*kernel[j0+3];
+         RED0[3] = RED0[3]+F_03;
       }
-      out[i] = RED0[0]+out[i];
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
       RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         F_03 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED1[0] = RED1[0]+F_03;
-         F_02 = in[LU_IND0+i+1]*kernel[LU_IND0+1];
-         RED1[1] = RED1[1]+F_02;
-         F_01 = in[LU_IND0+i+2]*kernel[LU_IND0+2];
-         RED1[2] = RED1[2]+F_01;
-         F_00 = in[LU_IND0+i+3]*kernel[LU_IND0+3];
-         RED1[3] = RED1[3]+F_00;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   float F_0;
+   float F_0, RED0[4], RED1[1], F_00, F_01, F_02, F_03;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   size_t i0, j0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      out[i] = RED0[0]+out[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec00, vec10, vec20, vec30, vec40;
-         SIMD_LOAD_V4SF(vec20, &kernel[LU_IND0]);
-         SIMD_LOAD_V4SF(vec10, &in[LU_IND0+i]);
+         SIMD_LOAD_V4SF(vec20, &kernel[j0]);
+         SIMD_LOAD_V4SF(vec10, &in[i0+j0]);
          SIMD_MULPS(vec00, vec10, vec20);
          SIMD_STORE_V4SF(vec00, &pdata0[0]);
-         SIMD_LOAD_V4SF(vec30, &RED1[0]);
+         SIMD_LOAD_V4SF(vec30, &RED0[0]);
          SIMD_ADDPS(vec30, vec30, vec00);
-         SIMD_STORE_V4SF(vec30, &RED1[0]);
+         SIMD_STORE_V4SF(vec30, &RED0[0]);
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   float F_0;
+   float F_0, RED0[4], RED1[1], F_00, F_01, F_02, F_03;
    //PIPS generated variable
-   int LU_NUB0, LU_IB0, LU_IND0;
-   //PIPS generated variable
-   float RED0[1], RED1[4], F_00, F_01, F_02, F_03, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   size_t i0, j0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      out[i] = RED0[0]+out[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
       {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec00, vec30;
-         SIMD_LOAD_V4SF(vec30, &RED1[0]);
-         for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(vec30, &RED0[0]);
+         for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             v4sf vec10, vec20, vec40;
-            SIMD_LOAD_V4SF(vec20, &kernel[LU_IND0]);
-            SIMD_LOAD_V4SF(vec10, &in[LU_IND0+i]);
+            SIMD_LOAD_V4SF(vec20, &kernel[j0]);
+            SIMD_LOAD_V4SF(vec10, &in[i0+j0]);
             SIMD_MULPS(vec00, vec10, vec20);
             SIMD_ADDPS(vec30, vec30, vec00);
          }
          SIMD_STORE_V4SF(vec00, &pdata0[0]);
-         SIMD_STORE_V4SF(vec30, &RED1[0]);
+         SIMD_STORE_V4SF(vec30, &RED0[0]);
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[4], RED1[1];
    //PIPS generated variable
-   float RED0[1], RED1[4], F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
+   size_t i0, j0;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      out[i] = RED0[0]+out[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
       {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec00, vec30;
-         SIMD_LOAD_V4SF(vec30, &RED1[0]);
-         for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(vec30, &RED0[0]);
+         for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             v4sf vec10, vec20, vec40;
-            SIMD_LOAD_V4SF(vec20, &kernel[LU_IND0]);
-            SIMD_LOAD_V4SF(vec10, &in[LU_IND0+i]);
+            SIMD_LOAD_V4SF(vec20, &kernel[j0]);
+            SIMD_LOAD_V4SF(vec10, &in[i0+j0]);
             SIMD_MULPS(vec00, vec10, vec20);
             SIMD_ADDPS(vec30, vec30, vec00);
          }
-         SIMD_STORE_V4SF(vec30, &RED1[0]);
+         SIMD_STORE_V4SF(vec30, &RED0[0]);
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }
@@ -288,42 +256,38 @@ simdized code
 
 void FIRFilter(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[4], RED1[1];
    //PIPS generated variable
-   float RED0[1], RED1[4], F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
+   size_t i0, j0;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      out[i] = RED0[0]+out[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
       {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec00, vec30;
-         SIMD_LOAD_V4SF(vec30, &RED1[0]);
-         for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(vec30, &RED0[0]);
+         for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             v4sf vec10, vec20, vec40;
-            SIMD_LOAD_V4SF(vec20, &kernel[LU_IND0]);
-            SIMD_LOAD_V4SF(vec10, &in[LU_IND0+i]);
+            SIMD_LOAD_V4SF(vec20, &kernel[j0]);
+            SIMD_LOAD_V4SF(vec10, &in[i0+j0]);
             SIMD_MULPS(vec00, vec10, vec20);
             SIMD_ADDPS(vec30, vec30, vec00);
          }
-         SIMD_STORE_V4SF(vec30, &RED1[0]);
+         SIMD_STORE_V4SF(vec30, &RED0[0]);
       }
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }

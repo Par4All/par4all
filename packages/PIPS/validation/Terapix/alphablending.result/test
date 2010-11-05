@@ -52,14 +52,23 @@ int psubi(int *lhs, int rhs)
 {
    return lhs = lhs-rhs;
 }
-void P4A_accel_free(void **ptr)
+void P4A_accel_free(void *ptr)
 {
-   free(*ptr);
-   *ptr = (void *) 0;
+   free(ptr);
 }
 float subf(float lhs, float rhs)
 {
    return lhs = lhs-rhs;
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 int subi(int lhs, int rhs)
 {
@@ -89,15 +98,13 @@ float setpf(float lhs, float *rhs)
 {
    return lhs = *rhs;
 }
-void * P4A_copy_from_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+void P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
 {
-   size_t i, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(l = 0; l <= size-1; l += 1)
-         cdest[(i+d1_offset)*size+l] = csrc[i*size+l];
-   return dest;
+   size_t i;
+   char *cdest = host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
 }
 int main()
 {
@@ -114,15 +121,13 @@ int setpi(int lhs, int *rhs)
 {
    return lhs = *rhs;
 }
-void * P4A_copy_to_accel(void *dest, const void *src, size_t size, size_t d1_length, size_t d1_offset, size_t d1_block_length)
+void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
 {
-   size_t i, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(l = 0; l <= size-1; l += 1)
-         cdest[i*size+l] = csrc[(i+d1_offset)*size+l];
-   return dest;
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = host_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
 }
 int addi(int lhs, int rhs)
 {
@@ -144,6 +149,15 @@ float divf(float lhs, float rhs)
 {
    return lhs = lhs/rhs;
 }
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
 float mulf(float lhs, float rhs)
 {
    return lhs = lhs*rhs;
@@ -152,6 +166,14 @@ int addri(int lhs, int *rhs)
 {
    return lhs = lhs+*rhs;
 }
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
 float lshiftf(float lhs, float rhs)
 {
    return lhs = lhs<<rhs;
@@ -159,17 +181,6 @@ float lshiftf(float lhs, float rhs)
 float psetf(float *lhs, float rhs)
 {
    return *lhs = rhs;
-}
-void * P4A_copy_to_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
-{
-   size_t i, j, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[i*size*d2_block_length+j*size+l] = csrc[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l];
-   return dest;
 }
 int prshifti(int *lhs, int rhs)
 {
@@ -195,17 +206,6 @@ float subrf(float lhs, float *rhs)
 {
    return lhs = lhs-*rhs;
 }
-void * P4A_copy_from_accel2d(void *dest, const void *src, size_t size, size_t d1_length, size_t d2_length, size_t d1_offset, size_t d2_offset, size_t d1_block_length, size_t d2_block_length)
-{
-   size_t i, j, l;
-
-   char *cdest = (char *) dest, *csrc = (char *) src;
-   for(i = 0; i <= d1_block_length-1; i += 1)
-      for(j = 0; j <= d2_block_length-1; j += 1)
-         for(l = 0; l <= size-1; l += 1)
-            cdest[(i+d1_offset)*size*d2_length+(j+d2_offset)*size+l] = csrc[i*size*d2_block_length+j*size+l];
-   return dest;
-}
 int subri(int lhs, int *rhs)
 {
    return lhs = lhs-*rhs;
@@ -213,6 +213,14 @@ int subri(int lhs, int *rhs)
 int seti(int lhs, int rhs)
 {
    return lhs = rhs;
+}
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
 }
 float mulrf(float lhs, float *rhs)
 {
@@ -287,20 +295,20 @@ l99995:
             P4A_accel_malloc((void **) &caillou0, sizeof(int)*4);
             P4A_accel_malloc((void **) &src10, sizeof(short)*1024);
             P4A_accel_malloc((void **) &src00, sizeof(short)*1024);
-            P4A_copy_to_accel(*caillou0, &caillou[0], sizeof(int), 5-caillou[0]+1, 0, 4);
-            P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 512, 512, 128*i_t, 8*j_t, 128, 8);
-            P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 512, 512, 128*i_t, 8*j_t, 128, 8);
+            P4A_copy_to_accel_1d(sizeof(int), 5-caillou[0]+1, 4, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &src0[0][0], *src00);
 
 l99996:
             for(i = 128*i_t; i <= 128*i_t+127; i += 1)
 l99997:
                for(j = 8*j_t; j <= 8*j_t+7; j += 1)
                   (*result0)[i-128*i_t][j-8*j_t] = ((*caillou0)[2-0]*(*src00)[i-128*i_t][j-8*j_t]+(*caillou0)[3-0]*(*src10)[i-128*i_t][j-8*j_t])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 512, 512, 128*i_t, 8*j_t, 128, 8);
-            P4A_accel_free((void **) &result0);
-            P4A_accel_free((void **) &caillou0);
-            P4A_accel_free((void **) &src10);
-            P4A_accel_free((void **) &src00);
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -333,20 +341,20 @@ l99995:
             P4A_accel_malloc((void **) &caillou0, sizeof(int)*4);
             P4A_accel_malloc((void **) &src10, sizeof(short)*1024);
             P4A_accel_malloc((void **) &src00, sizeof(short)*1024);
-            P4A_copy_to_accel(*caillou0, &caillou[0], sizeof(int), 5-caillou[0]+1, 0, 4);
-            P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 512, 512, 128*(-1+i_t), 8*(-1+j_t), 128, 8);
-            P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 512, 512, 128*(-1+i_t), 8*(-1+j_t), 128, 8);
+            P4A_copy_to_accel_1d(sizeof(int), 5-caillou[0]+1, 4, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &src0[0][0], *src00);
 
 l99996:
             for(i = 1; i <= 128; i += 1)
 l99997:
                for(j = 1; j <= 8; j += 1)
                   (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 512, 512, 128*(-1+i_t), 8*(-1+j_t), 128, 8);
-            P4A_accel_free((void **) &result0);
-            P4A_accel_free((void **) &caillou0);
-            P4A_accel_free((void **) &src10);
-            P4A_accel_free((void **) &src00);
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -379,20 +387,20 @@ l99995:
             P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
             P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
             P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
-            P4A_copy_to_accel(*caillou0, &caillou[0], sizeof(int), -caillou[0]+6, 0, 4);
-            P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
-            P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
+            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+6, 4, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
 l99996:
             for(i = 1; i <= 128; i += 1)
 l99997:
                for(j = 1; j <= 8; j += 1)
                   (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
-            P4A_accel_free((void **) &result0);
-            P4A_accel_free((void **) &caillou0);
-            P4A_accel_free((void **) &src10);
-            P4A_accel_free((void **) &src00);
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -401,8 +409,6 @@ outlining to launcher
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
 
 void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
 {
@@ -413,8 +419,6 @@ void alphablending(short src0[512][512], short src1[512][512], short result[512]
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
 
 l99998:
    for(i_t = 1; i_t <= 4; i_t += 1)
@@ -422,8 +426,6 @@ l99998:
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
 
 l99995:
       for(j_t = 1; j_t <= 64; j_t += 1) {
@@ -496,34 +498,30 @@ l99995:
 
             P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
 
-//  <caillou[PHI1]-R-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <caillou[PHI1]-R-EXACT-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <caillou0-R-EXACT-{}>
 //  <caillou0[PHI1][PHI2]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 
-            P4A_copy_to_accel(*caillou0, &caillou[0], sizeof(int), -caillou[0]+6, 0, 4);
+            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+6, 4, 0, &caillou[0], *caillou0);
 
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
 //  <src10[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src10-R-EXACT-{}>
 //  <src10[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 
-            P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
 
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
 //  <src00[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src00-R-EXACT-{}>
 //  <src00[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 
-            P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
 
 //  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i_t,
@@ -573,39 +571,37 @@ l99997:
 
                   (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
 
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t, i_t<=4,
-//    1<=j_t, j_t<=64}>
 //  <result0[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
 //    i_t<=4, 1<=j_t, j_t<=64}>
 //  <result0-R-EXACT-{}>
 //  <result0[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
 //    i_t<=4, 1<=j_t, j_t<=64}>
 
-            P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <result0-R-EXACT-{}>
 
-            P4A_accel_free((void **) &result0);
+            P4A_accel_free(result0);
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <caillou0-R-EXACT-{}>
 
-            P4A_accel_free((void **) &caillou0);
+            P4A_accel_free(caillou0);
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <src10-R-EXACT-{}>
 
-            P4A_accel_free((void **) &src10);
+            P4A_accel_free(src10);
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <src00-R-EXACT-{}>
 
-            P4A_accel_free((void **) &src00);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -638,155 +634,134 @@ l99995:
             P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
             P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
             P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
-            P4A_copy_to_accel(*caillou0, &caillou[0], sizeof(int), -caillou[0]+6, 0, 4);
-            P4A_copy_to_accel2d(*src10, &src1[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
-            P4A_copy_to_accel2d(*src00, &src0[0][0], sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
+            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+6, 4, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
-l99996:            launcher_0(8, caillou0, i_t, j_t, result0, src00, src10);
-            P4A_copy_from_accel2d(&result[0][0], *result0, sizeof(short), 512, 512, 128*i_t-128, 8*j_t-8, 128, 8);
-            P4A_accel_free((void **) &result0);
-            P4A_accel_free((void **) &caillou0);
-            P4A_accel_free((void **) &src10);
-            P4A_accel_free((void **) &src00);
+l99996:            launcher_0(8, *caillou0, i_t, j_t, *result0, *src00, *src10);
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
 
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, I_0==8,
-//    1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <caillou0-R-EXACT-{}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i_t, i_t<=4,
+//    1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
-void launcher_0(int I_0, int (*caillou0)[4], unsigned int i_t, unsigned int j_t, short (*result0)[128][8], short (*src00)[128][8], short (*src10)[128][8])
+void launcher_0(int I_0, int caillou0[4], unsigned int i_t, unsigned int j_t, short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
 
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, I_0==8,
-//    1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <caillou0-R-EXACT-{}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i_t, i_t<=4,
+//    1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
+//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
 l99996:
    for(i = 1; i <= 128; i += 1)
 
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, I_0==8,
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i, i<=128,
+//    1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
 //    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <caillou0-R-EXACT-{}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
+//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
+//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
 l99997:
       for(j = 1; j <= I_0; j += 1)
 
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, I_0==8,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
-//  <caillou0-R-EXACT-{}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t,
-//    j_t<=64}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t,
-//    j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    I_0==8, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t,
-//    j_t<=64}>
-//  <src10-R-EXACT-{}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i, i<=128,
+//    1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
+//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
+//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
+//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
-         ((*result0)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)] = ((*caillou0)[2-0]*((*src00)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)]+(*caillou0)[3-0]*((*src10)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+         result0[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)] = (caillou0[2-0]*src00[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)]+caillou0[3-0]*src10[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)])*(caillou0[0-0]<<caillou0[1-0])>>caillou0[1-0];
 }
 outlining to microcode
 label: l99997
-void launcher_0(int I_0, int (*caillou0)[4], unsigned int i_t, unsigned int j_t, short (*result0)[128][8], short (*src00)[128][8], short (*src10)[128][8])
+void launcher_0(int I_0, int caillou0[4], unsigned int i_t, unsigned int j_t, short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
 l99996:
    for(i = 1; i <= 128; i += 1)
-l99997:      launcher_0_microcode(i, I_0, caillou0, i_t, j_t, result0, src00, src10);
+l99997:      launcher_0_microcode(caillou0, *&result0[-1+i], *&src00[-1+i], *&src10[-1+i]);
 }
-void launcher_0_microcode(unsigned int i, int I_0, int (*caillou0)[4], unsigned int i_t, unsigned int j_t, short (*result0)[128][8], short (*src00)[128][8], short (*src10)[128][8])
+void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
-   for(j = 1; j <= I_0; j += 1)
-      ((*result0)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)] = ((*caillou0)[2-0]*((*src00)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)]+(*caillou0)[3-0]*((*src10)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+8*((-1)+j_t)-8*((-1)+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+   for(j = 1; j <= 8; j += 1)
+      result00[j-1] = (caillou0[2]*src000[j-1]+caillou0[3]*src100[j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
 normalize microcode launcher_0_microcode
-void launcher_0_microcode(unsigned int i, int I_0, int (*caillou0)[4], unsigned int i_t, unsigned int j_t, short (*result0)[128][8], short (*src00)[128][8], short (*src10)[128][8])
+void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
-   for(j = 0; j <= -1+I_0; j += 1)
-      ((*result0)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)] = ((*caillou0)[2-0]*((*src00)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)]+(*caillou0)[3-0]*((*src10)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+   for(j = 0; j <= 7; j += 1)
+      result00[j+1-1] = (caillou0[2]*src000[j+1-1]+caillou0[3]*src100[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
-void launcher_0_microcode(unsigned int i, int I_0, int (*caillou0)[4], unsigned int i_t, unsigned int j_t, short (*result0)[128][8], short (*src00)[128][8], short (*src10)[128][8])
+void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
-   for(j = 0; j <= -1+I_0; j += 1)
-      ((*result0)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)] = ((*caillou0)[2-0]*((*src00)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)]+(*caillou0)[3-0]*((*src10)[-1+i+128*((-1)+i_t)-128*((-1)+i_t)])[-1+j+1+8*((-1)+j_t)-8*((-1)+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+   for(j = 0; j <= 7; j += 1)
+      result00[j+1-1] = (caillou0[2]*src000[j+1-1]+caillou0[3]*src100[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
-void launcher_0_microcode(unsigned int i, int I_0, int *caillou0, unsigned int i_t, unsigned int j_t, short *result0, short *src00, short *src10)
+void launcher_0_microcode(int *caillou0, short *result00, short *src000, short *src100)
 {
    //PIPS generated variable
    unsigned int j;
 l99997:
-   for(j = 0; j <= -1+I_0; j += 1)
-      *(result0+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+j+1+8*((-1)+j_t)-8*((-1)+j_t)) = (*(caillou0+0+2-0)**(src00+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+j+1+8*((-1)+j_t)-8*((-1)+j_t))+*(caillou0+0+3-0)**(src10+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+j+1+8*((-1)+j_t)-8*((-1)+j_t)))*(*(caillou0+0+0-0)<<*(caillou0+0+1-0))>>*(caillou0+0+1-0);
+   for(j = 0; j <= 7; j += 1)
+      *(result00+j+1-1) = (*(caillou0+2)**(src000+j+1-1)+*(caillou0+3)**(src100+j+1-1))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
 }
-parameter i is not valid
-I_0 belongs to a loop bound
 caillou0 seems a mask
-parameter i_t is not valid
-parameter j_t is not valid
-result0 seems a mask
-src00 seems a mask
-src10 seems a mask
-void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, unsigned int j_t, short *FIFO1, short *FIFO2, short *FIFO3)
+result00 seems a mask
+src000 seems a mask
+src100 seems a mask
+void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
    char * re0, re1;
    //PIPS generated variable
-   int *caillou0, *ma0;
+   int *caillou0 = alloca(sizeof(int[4])), *ma0;
    //PIPS generated variable
-   short *result0, *ma1, *src00, *ma2, *src10, *ma3;
+   short *result00 = alloca(sizeof(short[8])), *ma1, *src000 = alloca(sizeof(short[8])), *ma2, *src100 = alloca(sizeof(short[8])), *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
    int *im4;
    //PIPS generated variable
    short *im5, *im6, *im7;
+   //PIPS generated variable
+   int N0 = 8;
    ma3 = FIFO3;
    ma2 = FIFO2;
    ma1 = FIFO1;
@@ -794,20 +769,20 @@ void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, 
 l99997:   ;
    re2 = 1;
    while (re2<=N0) {
-      *(ma1+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+re2+1+8*((-1)+j_t)-8*((-1)+j_t)) = (*(ma0+0+2-0)**(ma2+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+re2+1+8*((-1)+j_t)-8*((-1)+j_t))+*(ma0+0+3-0)**(ma3+0+(-1)+i+128*((-1)+i_t)-128*((-1)+i_t)+(-1)+re2+1+8*((-1)+j_t)-8*((-1)+j_t)))*(*(ma0+0+0-0)<<*(ma0+0+1-0))>>*(ma0+0+1-0);
+      *(ma1+re2+1-1) = (*(ma0+2)**(ma2+re2+1-1)+*(ma0+3)**(ma3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
       re2 = 1+re2;
    }
 }
-void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, unsigned int j_t, short *FIFO1, short *FIFO2, short *FIFO3)
+void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
    char * re0, re1;
    //PIPS generated variable
-   int *caillou0, *ma0;
+   int *caillou0 = alloca(sizeof(int[4])), *ma0;
    //PIPS generated variable
-   short *result0, *ma1, *src00, *ma2, *src10, *ma3;
+   short *result00 = alloca(sizeof(short[8])), *ma1, *src000 = alloca(sizeof(short[8])), *ma2, *src100 = alloca(sizeof(short[8])), *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
@@ -815,69 +790,33 @@ void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
+   int N0 = 8;
+   //PIPS generated variable
    int *P_0;
    //PIPS generated variable
-   int I_1;
+   int I_1, I_2;
    //PIPS generated variable
-   int *P_1;
+   short *P_1;
    //PIPS generated variable
-   short *P_2;
+   int I_3;
    //PIPS generated variable
-   int I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11;
+   int *P_2;
+   //PIPS generated variable
+   int I_4, I_5;
    //PIPS generated variable
    short *P_3;
    //PIPS generated variable
-   int I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22;
+   int I_6, I_7;
    //PIPS generated variable
-   short *P_4;
+   int *P_4, *P_5;
    //PIPS generated variable
-   int I_23;
-   //PIPS generated variable
-   int *P_5;
-   //PIPS generated variable
-   int I_24;
+   int I_8, I_9;
    //PIPS generated variable
    int *P_6;
    //PIPS generated variable
+   int I_10, I_11;
+   //PIPS generated variable
    short *P_7;
-   //PIPS generated variable
-   int I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34;
-   //PIPS generated variable
-   short *P_8;
-   //PIPS generated variable
-   int I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45;
-   //PIPS generated variable
-   short *P_9;
-   //PIPS generated variable
-   int I_46, I_47;
-   //PIPS generated variable
-   int *P_10;
-   //PIPS generated variable
-   int I_48;
-   //PIPS generated variable
-   int *P_11, *P_12;
-   //PIPS generated variable
-   int I_49;
-   //PIPS generated variable
-   int *P_13;
-   //PIPS generated variable
-   int I_50, I_51;
-   //PIPS generated variable
-   int *P_14;
-   //PIPS generated variable
-   int I_52;
-   //PIPS generated variable
-   int *P_15;
-   //PIPS generated variable
-   short *P_16;
-   //PIPS generated variable
-   int I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62;
-   //PIPS generated variable
-   short *P_17;
-   //PIPS generated variable
-   int I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73;
-   //PIPS generated variable
-   short *P_18;
    ma3 = FIFO3;
    ma2 = FIFO2;
    ma1 = FIFO1;
@@ -885,112 +824,39 @@ void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, 
 l99997:   ;
    re2 = 1;
    while (re2<=N0) {
-      P_0 = ma0+0;
-      I_1 = 2-0;
-      P_1 = P_0+I_1;
-      P_2 = ma2+0;
-      I_2 = -1;
-      I_3 = I_2+i;
-      I_4 = -1;
-      I_5 = I_4+i_t;
-      I_6 = 128*I_5;
+      P_0 = ma0+2;
+      I_1 = re2+1;
+      I_2 = I_1-1;
+      P_1 = ma2+I_2;
+      I_3 = *P_0**P_1;
+      P_2 = ma0+3;
+      I_4 = re2+1;
+      I_5 = I_4-1;
+      P_3 = ma3+I_5;
+      I_6 = *P_2**P_3;
       I_7 = I_3+I_6;
-      I_8 = -1;
-      I_9 = I_8+i_t;
-      I_10 = 128*I_9;
-      I_11 = I_7-I_10;
-      P_3 = P_2+I_11;
-      I_12 = -1;
-      I_13 = re2+1;
-      I_14 = I_12+I_13;
-      I_15 = -1;
-      I_16 = I_15+j_t;
-      I_17 = 8*I_16;
-      I_18 = I_14+I_17;
-      I_19 = -1;
-      I_20 = I_19+j_t;
-      I_21 = 8*I_20;
-      I_22 = I_18-I_21;
-      P_4 = P_3+I_22;
-      I_23 = *P_1**P_4;
-      P_5 = ma0+0;
-      I_24 = 3-0;
-      P_6 = P_5+I_24;
-      P_7 = ma3+0;
-      I_25 = -1;
-      I_26 = I_25+i;
-      I_27 = -1;
-      I_28 = I_27+i_t;
-      I_29 = 128*I_28;
-      I_30 = I_26+I_29;
-      I_31 = -1;
-      I_32 = I_31+i_t;
-      I_33 = 128*I_32;
-      I_34 = I_30-I_33;
-      P_8 = P_7+I_34;
-      I_35 = -1;
-      I_36 = re2+1;
-      I_37 = I_35+I_36;
-      I_38 = -1;
-      I_39 = I_38+j_t;
-      I_40 = 8*I_39;
-      I_41 = I_37+I_40;
-      I_42 = -1;
-      I_43 = I_42+j_t;
-      I_44 = 8*I_43;
-      I_45 = I_41-I_44;
-      P_9 = P_8+I_45;
-      I_46 = *P_6**P_9;
-      I_47 = I_23+I_46;
-      P_10 = ma0+0;
-      I_48 = 0-0;
-      P_11 = P_10+I_48;
-      P_12 = ma0+0;
-      I_49 = 1-0;
-      P_13 = P_12+I_49;
-      I_50 = *P_11<<*P_13;
-      I_51 = I_47*I_50;
-      P_14 = ma0+0;
-      I_52 = 1-0;
-      P_15 = P_14+I_52;
-      P_16 = ma1+0;
-      I_53 = -1;
-      I_54 = I_53+i;
-      I_55 = -1;
-      I_56 = I_55+i_t;
-      I_57 = 128*I_56;
-      I_58 = I_54+I_57;
-      I_59 = -1;
-      I_60 = I_59+i_t;
-      I_61 = 128*I_60;
-      I_62 = I_58-I_61;
-      P_17 = P_16+I_62;
-      I_63 = -1;
-      I_64 = re2+1;
-      I_65 = I_63+I_64;
-      I_66 = -1;
-      I_67 = I_66+j_t;
-      I_68 = 8*I_67;
-      I_69 = I_65+I_68;
-      I_70 = -1;
-      I_71 = I_70+j_t;
-      I_72 = 8*I_71;
-      I_73 = I_69-I_72;
-      P_18 = P_17+I_73;
-      *P_18 = I_51>>*P_15;
+      P_4 = ma0+0;
+      P_5 = ma0+1;
+      I_8 = *P_4<<*P_5;
+      I_9 = I_7*I_8;
+      P_6 = ma0+1;
+      I_10 = re2+1;
+      I_11 = I_10-1;
+      P_7 = ma1+I_11;
+      *P_7 = I_9>>*P_6;
       re2 = 1+re2;
    }
 }
-void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, unsigned int j_t, short *FIFO1, short *FIFO2, short *FIFO3)
+void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
    unsigned int j;
    //PIPS generated variable
    char * re0, re1;
    //PIPS generated variable
-   int *caillou0, *ma0;
+   int *caillou0 = alloca(sizeof(int[4])), *ma0;
    //PIPS generated variable
-   short *result0, *ma1, *src00, *ma2, *src10, *ma3;
+   short *result00 = alloca(sizeof(short[8])), *ma1, *src000 = alloca(sizeof(short[8])), *ma2, *src100 = alloca(sizeof(short[8])), *ma3;
    //PIPS generated variable
    unsigned int re2, re3;
    //PIPS generated variable
@@ -998,69 +864,33 @@ void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
+   int N0 = 8;
+   //PIPS generated variable
    int *P_0;
    //PIPS generated variable
-   int I_1;
+   int I_1, I_2;
    //PIPS generated variable
-   int *P_1;
+   short *P_1;
    //PIPS generated variable
-   short *P_2;
+   int I_3;
    //PIPS generated variable
-   int I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11;
+   int *P_2;
+   //PIPS generated variable
+   int I_4, I_5;
    //PIPS generated variable
    short *P_3;
    //PIPS generated variable
-   int I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22;
+   int I_6, I_7;
    //PIPS generated variable
-   short *P_4;
+   int *P_4, *P_5;
    //PIPS generated variable
-   int I_23;
-   //PIPS generated variable
-   int *P_5;
-   //PIPS generated variable
-   int I_24;
+   int I_8, I_9;
    //PIPS generated variable
    int *P_6;
    //PIPS generated variable
+   int I_10, I_11;
+   //PIPS generated variable
    short *P_7;
-   //PIPS generated variable
-   int I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34;
-   //PIPS generated variable
-   short *P_8;
-   //PIPS generated variable
-   int I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45;
-   //PIPS generated variable
-   short *P_9;
-   //PIPS generated variable
-   int I_46, I_47;
-   //PIPS generated variable
-   int *P_10;
-   //PIPS generated variable
-   int I_48;
-   //PIPS generated variable
-   int *P_11, *P_12;
-   //PIPS generated variable
-   int I_49;
-   //PIPS generated variable
-   int *P_13;
-   //PIPS generated variable
-   int I_50, I_51;
-   //PIPS generated variable
-   int *P_14;
-   //PIPS generated variable
-   int I_52;
-   //PIPS generated variable
-   int *P_15;
-   //PIPS generated variable
-   short *P_16;
-   //PIPS generated variable
-   int I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62;
-   //PIPS generated variable
-   short *P_17;
-   //PIPS generated variable
-   int I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73;
-   //PIPS generated variable
-   short *P_18;
    ma3 = FIFO3;
    ma2 = FIFO2;
    ma1 = FIFO1;
@@ -1069,267 +899,85 @@ l99997:   ;
    re2 = 1;
    while (re2<=N0) {
       P_0 = ma0;
-      P_0 = P_0+0;
-      I_1 = 2;
-      I_1 = I_1-0;
-      P_1 = P_0;
-      P_1 = P_1+I_1;
-      P_2 = ma2;
-      P_2 = P_2+0;
-      I_2 = 1;
-      I_2 = -I_2;
-      I_3 = I_2;
-      I_3 = I_3+i;
-      I_4 = 1;
-      I_4 = -I_4;
+      P_0 = P_0+2;
+      I_1 = re2;
+      I_1 = I_1+1;
+      I_2 = I_1;
+      I_2 = I_2-1;
+      P_1 = ma2;
+      P_1 = P_1+I_2;
+      I_3 = *P_0;
+      I_3 = I_3**P_1;
+      P_2 = ma0;
+      P_2 = P_2+3;
+      I_4 = re2;
+      I_4 = I_4+1;
       I_5 = I_4;
-      I_5 = I_5+i_t;
-      I_6 = 128;
-      I_6 = I_6*I_5;
+      I_5 = I_5-1;
+      P_3 = ma3;
+      P_3 = P_3+I_5;
+      I_6 = *P_2;
+      I_6 = I_6**P_3;
       I_7 = I_3;
       I_7 = I_7+I_6;
-      I_8 = 1;
-      I_8 = -I_8;
-      I_9 = I_8;
-      I_9 = I_9+i_t;
-      I_10 = 128;
-      I_10 = I_10*I_9;
-      I_11 = I_7;
-      I_11 = I_11-I_10;
-      P_3 = P_2;
-      P_3 = P_3+I_11;
-      I_12 = 1;
-      I_12 = -I_12;
-      I_13 = re2;
-      I_13 = I_13+1;
-      I_14 = I_12;
-      I_14 = I_14+I_13;
-      I_15 = 1;
-      I_15 = -I_15;
-      I_16 = I_15;
-      I_16 = I_16+j_t;
-      I_17 = 8;
-      I_17 = I_17*I_16;
-      I_18 = I_14;
-      I_18 = I_18+I_17;
-      I_19 = 1;
-      I_19 = -I_19;
-      I_20 = I_19;
-      I_20 = I_20+j_t;
-      I_21 = 8;
-      I_21 = I_21*I_20;
-      I_22 = I_18;
-      I_22 = I_22-I_21;
-      P_4 = P_3;
-      P_4 = P_4+I_22;
-      I_23 = *P_1;
-      I_23 = I_23**P_4;
+      P_4 = ma0;
+      P_4 = P_4+0;
       P_5 = ma0;
-      P_5 = P_5+0;
-      I_24 = 3;
-      I_24 = I_24-0;
-      P_6 = P_5;
-      P_6 = P_6+I_24;
-      P_7 = ma3;
-      P_7 = P_7+0;
-      I_25 = 1;
-      I_25 = -I_25;
-      I_26 = I_25;
-      I_26 = I_26+i;
-      I_27 = 1;
-      I_27 = -I_27;
-      I_28 = I_27;
-      I_28 = I_28+i_t;
-      I_29 = 128;
-      I_29 = I_29*I_28;
-      I_30 = I_26;
-      I_30 = I_30+I_29;
-      I_31 = 1;
-      I_31 = -I_31;
-      I_32 = I_31;
-      I_32 = I_32+i_t;
-      I_33 = 128;
-      I_33 = I_33*I_32;
-      I_34 = I_30;
-      I_34 = I_34-I_33;
-      P_8 = P_7;
-      P_8 = P_8+I_34;
-      I_35 = 1;
-      I_35 = -I_35;
-      I_36 = re2;
-      I_36 = I_36+1;
-      I_37 = I_35;
-      I_37 = I_37+I_36;
-      I_38 = 1;
-      I_38 = -I_38;
-      I_39 = I_38;
-      I_39 = I_39+j_t;
-      I_40 = 8;
-      I_40 = I_40*I_39;
-      I_41 = I_37;
-      I_41 = I_41+I_40;
-      I_42 = 1;
-      I_42 = -I_42;
-      I_43 = I_42;
-      I_43 = I_43+j_t;
-      I_44 = 8;
-      I_44 = I_44*I_43;
-      I_45 = I_41;
-      I_45 = I_45-I_44;
-      P_9 = P_8;
-      P_9 = P_9+I_45;
-      I_46 = *P_6;
-      I_46 = I_46**P_9;
-      I_47 = I_23;
-      I_47 = I_47+I_46;
-      P_10 = ma0;
-      P_10 = P_10+0;
-      I_48 = 0;
-      I_48 = I_48-0;
-      P_11 = P_10;
-      P_11 = P_11+I_48;
-      P_12 = ma0;
-      P_12 = P_12+0;
-      I_49 = 1;
-      I_49 = I_49-0;
-      P_13 = P_12;
-      P_13 = P_13+I_49;
-      I_50 = *P_11;
-      I_50 = I_50<<*P_13;
-      I_51 = I_47;
-      I_51 = I_51*I_50;
-      P_14 = ma0;
-      P_14 = P_14+0;
-      I_52 = 1;
-      I_52 = I_52-0;
-      P_15 = P_14;
-      P_15 = P_15+I_52;
-      P_16 = ma1;
-      P_16 = P_16+0;
-      I_53 = 1;
-      I_53 = -I_53;
-      I_54 = I_53;
-      I_54 = I_54+i;
-      I_55 = 1;
-      I_55 = -I_55;
-      I_56 = I_55;
-      I_56 = I_56+i_t;
-      I_57 = 128;
-      I_57 = I_57*I_56;
-      I_58 = I_54;
-      I_58 = I_58+I_57;
-      I_59 = 1;
-      I_59 = -I_59;
-      I_60 = I_59;
-      I_60 = I_60+i_t;
-      I_61 = 128;
-      I_61 = I_61*I_60;
-      I_62 = I_58;
-      I_62 = I_62-I_61;
-      P_17 = P_16;
-      P_17 = P_17+I_62;
-      I_63 = 1;
-      I_63 = -I_63;
-      I_64 = re2;
-      I_64 = I_64+1;
-      I_65 = I_63;
-      I_65 = I_65+I_64;
-      I_66 = 1;
-      I_66 = -I_66;
-      I_67 = I_66;
-      I_67 = I_67+j_t;
-      I_68 = 8;
-      I_68 = I_68*I_67;
-      I_69 = I_65;
-      I_69 = I_69+I_68;
-      I_70 = 1;
-      I_70 = -I_70;
-      I_71 = I_70;
-      I_71 = I_71+j_t;
-      I_72 = 8;
-      I_72 = I_72*I_71;
-      I_73 = I_69;
-      I_73 = I_73-I_72;
-      P_18 = P_17;
-      P_18 = P_18+I_73;
-      *P_18 = I_51;
-      *P_18 = *P_18>>*P_15;
+      P_5 = P_5+1;
+      I_8 = *P_4;
+      I_8 = I_8<<*P_5;
+      I_9 = I_7;
+      I_9 = I_9*I_8;
+      P_6 = ma0;
+      P_6 = P_6+1;
+      I_10 = re2;
+      I_10 = I_10+1;
+      I_11 = I_10;
+      I_11 = I_11-1;
+      P_7 = ma1;
+      P_7 = P_7+I_11;
+      *P_7 = I_9;
+      *P_7 = *P_7>>*P_6;
       re2 = 1;
       re2 = re2+re2;
    }
 }
-void launcher_0_microcode(unsigned int i, int N0, int *FIFO0, unsigned int i_t, unsigned int j_t, short *FIFO1, short *FIFO2, short *FIFO3)
+void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
 {
    //PIPS generated variable
-   int *ma0;
+   int *caillou0 = alloca(sizeof(int[4])), *ma0;
    //PIPS generated variable
-   short *ma1, *ma2, *ma3;
+   short *result00 = alloca(sizeof(short[8])), *ma1, *src000 = alloca(sizeof(short[8])), *ma2, *src100 = alloca(sizeof(short[8])), *ma3;
    //PIPS generated variable
    unsigned int re2;
    //PIPS generated variable
+   int N0 = 8;
+   //PIPS generated variable
    int *P_0;
    //PIPS generated variable
-   int I_1;
+   int I_1, I_2;
    //PIPS generated variable
-   int *P_1;
+   short *P_1;
    //PIPS generated variable
-   short *P_2;
+   int I_3;
    //PIPS generated variable
-   int I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11;
+   int *P_2;
+   //PIPS generated variable
+   int I_4, I_5;
    //PIPS generated variable
    short *P_3;
    //PIPS generated variable
-   int I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22;
+   int I_6, I_7;
    //PIPS generated variable
-   short *P_4;
+   int *P_4, *P_5;
    //PIPS generated variable
-   int I_23;
-   //PIPS generated variable
-   int *P_5;
-   //PIPS generated variable
-   int I_24;
+   int I_8, I_9;
    //PIPS generated variable
    int *P_6;
    //PIPS generated variable
+   int I_10, I_11;
+   //PIPS generated variable
    short *P_7;
-   //PIPS generated variable
-   int I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34;
-   //PIPS generated variable
-   short *P_8;
-   //PIPS generated variable
-   int I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45;
-   //PIPS generated variable
-   short *P_9;
-   //PIPS generated variable
-   int I_46, I_47;
-   //PIPS generated variable
-   int *P_10;
-   //PIPS generated variable
-   int I_48;
-   //PIPS generated variable
-   int *P_11, *P_12;
-   //PIPS generated variable
-   int I_49;
-   //PIPS generated variable
-   int *P_13;
-   //PIPS generated variable
-   int I_50, I_51;
-   //PIPS generated variable
-   int *P_14;
-   //PIPS generated variable
-   int I_52;
-   //PIPS generated variable
-   int *P_15;
-   //PIPS generated variable
-   short *P_16;
-   //PIPS generated variable
-   int I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62;
-   //PIPS generated variable
-   short *P_17;
-   //PIPS generated variable
-   int I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73;
-   //PIPS generated variable
-   short *P_18;
    seti(ma3, FIFO3);
    seti(ma2, FIFO2);
    seti(ma1, FIFO1);
@@ -1338,191 +986,45 @@ l99997:   ;
    seti(re2, 1);
    while (re2<=N0) {
       seti(P_0, ma0);
-      seti(P_0, P_0+0);
-      seti(I_1, 2);
-      subi(I_1, 0);
-      seti(P_1, P_0);
-      seti(P_1, P_1+I_1);
-      seti(P_2, ma2);
-      seti(P_2, P_2+0);
-      seti(I_2, 1);
-      seti(I_2, -I_2);
-      seti(I_3, I_2);
-      seti(I_3, I_3+i);
-      seti(I_4, 1);
-      seti(I_4, -I_4);
+      seti(P_0, P_0+2);
+      seti(I_1, re2);
+      addi(I_1, 1);
+      seti(I_2, I_1);
+      subi(I_2, 1);
+      seti(P_1, ma2);
+      seti(P_1, P_1+I_2);
+      seti(I_3, *P_0);
+      muli(I_3, *P_1);
+      seti(P_2, ma0);
+      seti(P_2, P_2+3);
+      seti(I_4, re2);
+      addi(I_4, 1);
       seti(I_5, I_4);
-      seti(I_5, I_5+i_t);
-      seti(I_6, 128);
-      muli(I_6, I_5);
+      subi(I_5, 1);
+      seti(P_3, ma3);
+      seti(P_3, P_3+I_5);
+      seti(I_6, *P_2);
+      muli(I_6, *P_3);
       seti(I_7, I_3);
-      seti(I_7, I_7+I_6);
-      seti(I_8, 1);
-      seti(I_8, -I_8);
-      seti(I_9, I_8);
-      seti(I_9, I_9+i_t);
-      seti(I_10, 128);
-      muli(I_10, I_9);
-      seti(I_11, I_7);
-      seti(I_11, I_11-I_10);
-      seti(P_3, P_2);
-      seti(P_3, P_3+I_11);
-      seti(I_12, 1);
-      seti(I_12, -I_12);
-      seti(I_13, re2);
-      addi(I_13, 1);
-      seti(I_14, I_12);
-      seti(I_14, I_14+I_13);
-      seti(I_15, 1);
-      seti(I_15, -I_15);
-      seti(I_16, I_15);
-      seti(I_16, I_16+j_t);
-      seti(I_17, 8);
-      muli(I_17, I_16);
-      seti(I_18, I_14);
-      seti(I_18, I_18+I_17);
-      seti(I_19, 1);
-      seti(I_19, -I_19);
-      seti(I_20, I_19);
-      seti(I_20, I_20+j_t);
-      seti(I_21, 8);
-      muli(I_21, I_20);
-      seti(I_22, I_18);
-      seti(I_22, I_22-I_21);
-      seti(P_4, P_3);
-      seti(P_4, P_4+I_22);
-      seti(I_23, *P_1);
-      muli(I_23, *P_4);
+      addi(I_7, I_6);
+      seti(P_4, ma0);
+      seti(P_4, P_4+0);
       seti(P_5, ma0);
-      seti(P_5, P_5+0);
-      seti(I_24, 3);
-      subi(I_24, 0);
-      seti(P_6, P_5);
-      seti(P_6, P_6+I_24);
-      seti(P_7, ma3);
-      seti(P_7, P_7+0);
-      seti(I_25, 1);
-      seti(I_25, -I_25);
-      seti(I_26, I_25);
-      seti(I_26, I_26+i);
-      seti(I_27, 1);
-      seti(I_27, -I_27);
-      seti(I_28, I_27);
-      seti(I_28, I_28+i_t);
-      seti(I_29, 128);
-      muli(I_29, I_28);
-      seti(I_30, I_26);
-      seti(I_30, I_30+I_29);
-      seti(I_31, 1);
-      seti(I_31, -I_31);
-      seti(I_32, I_31);
-      seti(I_32, I_32+i_t);
-      seti(I_33, 128);
-      muli(I_33, I_32);
-      seti(I_34, I_30);
-      seti(I_34, I_34-I_33);
-      seti(P_8, P_7);
-      seti(P_8, P_8+I_34);
-      seti(I_35, 1);
-      seti(I_35, -I_35);
-      seti(I_36, re2);
-      addi(I_36, 1);
-      seti(I_37, I_35);
-      seti(I_37, I_37+I_36);
-      seti(I_38, 1);
-      seti(I_38, -I_38);
-      seti(I_39, I_38);
-      seti(I_39, I_39+j_t);
-      seti(I_40, 8);
-      muli(I_40, I_39);
-      seti(I_41, I_37);
-      seti(I_41, I_41+I_40);
-      seti(I_42, 1);
-      seti(I_42, -I_42);
-      seti(I_43, I_42);
-      seti(I_43, I_43+j_t);
-      seti(I_44, 8);
-      muli(I_44, I_43);
-      seti(I_45, I_41);
-      seti(I_45, I_45-I_44);
-      seti(P_9, P_8);
-      seti(P_9, P_9+I_45);
-      seti(I_46, *P_6);
-      muli(I_46, *P_9);
-      seti(I_47, I_23);
-      seti(I_47, I_47+I_46);
-      seti(P_10, ma0);
-      seti(P_10, P_10+0);
-      seti(I_48, 0);
-      subi(I_48, 0);
-      seti(P_11, P_10);
-      seti(P_11, P_11+I_48);
-      seti(P_12, ma0);
-      seti(P_12, P_12+0);
-      seti(I_49, 1);
-      subi(I_49, 0);
-      seti(P_13, P_12);
-      seti(P_13, P_13+I_49);
-      seti(I_50, *P_11);
-      seti(I_50, I_50<<*P_13);
-      seti(I_51, I_47);
-      muli(I_51, I_50);
-      seti(P_14, ma0);
-      seti(P_14, P_14+0);
-      seti(I_52, 1);
-      subi(I_52, 0);
-      seti(P_15, P_14);
-      seti(P_15, P_15+I_52);
-      seti(P_16, ma1);
-      seti(P_16, P_16+0);
-      seti(I_53, 1);
-      seti(I_53, -I_53);
-      seti(I_54, I_53);
-      seti(I_54, I_54+i);
-      seti(I_55, 1);
-      seti(I_55, -I_55);
-      seti(I_56, I_55);
-      seti(I_56, I_56+i_t);
-      seti(I_57, 128);
-      muli(I_57, I_56);
-      seti(I_58, I_54);
-      seti(I_58, I_58+I_57);
-      seti(I_59, 1);
-      seti(I_59, -I_59);
-      seti(I_60, I_59);
-      seti(I_60, I_60+i_t);
-      seti(I_61, 128);
-      muli(I_61, I_60);
-      seti(I_62, I_58);
-      seti(I_62, I_62-I_61);
-      seti(P_17, P_16);
-      seti(P_17, P_17+I_62);
-      seti(I_63, 1);
-      seti(I_63, -I_63);
-      seti(I_64, re2);
-      addi(I_64, 1);
-      seti(I_65, I_63);
-      seti(I_65, I_65+I_64);
-      seti(I_66, 1);
-      seti(I_66, -I_66);
-      seti(I_67, I_66);
-      seti(I_67, I_67+j_t);
-      seti(I_68, 8);
-      muli(I_68, I_67);
-      seti(I_69, I_65);
-      seti(I_69, I_69+I_68);
-      seti(I_70, 1);
-      seti(I_70, -I_70);
-      seti(I_71, I_70);
-      seti(I_71, I_71+j_t);
-      seti(I_72, 8);
-      muli(I_72, I_71);
-      seti(I_73, I_69);
-      seti(I_73, I_73-I_72);
-      seti(P_18, P_17);
-      seti(P_18, P_18+I_73);
-      seti(*P_18, I_51);
-      seti(*P_18, *P_18>>*P_15);
+      seti(P_5, P_5+1);
+      seti(I_8, *P_4);
+      seti(I_8, I_8<<*P_5);
+      seti(I_9, I_7);
+      muli(I_9, I_8);
+      seti(P_6, ma0);
+      seti(P_6, P_6+1);
+      seti(I_10, re2);
+      addi(I_10, 1);
+      seti(I_11, I_10);
+      subi(I_11, 1);
+      seti(P_7, ma1);
+      seti(P_7, P_7+I_11);
+      seti(*P_7, I_9);
+      seti(*P_7, *P_7>>*P_6);
       seti(re2, 1);
       addi(re2, re2);
    }

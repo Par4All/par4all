@@ -118,75 +118,71 @@ int main(int argc, char *argv[]);
 void daxpy_ur(int n, float da, float dx[n], float dy[n])
 {
    //PIPS generated variable
-   int LU_IND0, LU_IND1;
+   float F_0;
    //PIPS generated variable
    float RED0[1];
    //PIPS generated variable
-   int LU_IB10, LU_NUB10;
+   int LU_IND00, LU_IND01, LU_IB00, LU_NUB00;
    //PIPS generated variable
-   float F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00, m0;
+   int i0, i1, m0;
    //SAC generated temporary array
    a4sf pdata0 = {da, da, da, da};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec60_0, vec70_0, vec80_0, vec100_0, vec110_0, vec120_0, vec130_0, vec150_0, vec160_0, vec180_0, vec190_0, vec210_0, vec220_0, vec240_0, vec260_0, vec280_0;
    m0 = n%4;
    if (m0!=0) {
-      LU_NUB00 = m0;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         RED0[0] = 0.000000;
-         F_04 = pdata0[0]*dx[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-         dy[LU_IND0] = RED0[0]+dy[LU_IND0];
-      }
       SIMD_LOAD_V4SF(vec10_0, &pdata0[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      for(i0 = 0; i0 <= 4*(m0/4)-1; i0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &dx[LU_IND0]);
+         SIMD_LOAD_V4SF(vec20_0, &dx[i0]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-         SIMD_LOAD_V4SF(vec30_0, &dy[LU_IND0]);
+         SIMD_LOAD_V4SF(vec30_0, &dy[i0]);
          SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
-         SIMD_STORE_V4SF(vec30_0, &dy[LU_IND0]);
+         SIMD_STORE_V4SF(vec30_0, &dy[i0]);
+      }
+      for(i1 = 4*(m0/4); i1 <= m0-1; i1 += 1) {
+         RED0[0] = 0.000000;
+         F_0 = pdata0[0]*dx[i1];
+         RED0[0] = RED0[0]+F_0;
+         dy[i1] = RED0[0]+dy[i1];
       }
       if (n<4) 
          return;
    }
-   LU_NUB10 = (3+n-m0)/4;
-   LU_IB10 = MOD(LU_NUB10, 4);
+   LU_NUB00 = (3+n-m0)/4;
+   LU_IB00 = MOD(LU_NUB00, 4);
    SIMD_LOAD_V4SF(vec60_0, &pdata0[0]);
-   for(LU_IND1 = 0; LU_IND1 <= LU_IB10-1; LU_IND1 += 1) {
+   for(LU_IND00 = 0; LU_IND00 <= LU_IB00-1; LU_IND00 += 1) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec70_0, &dx[m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec70_0, &dx[m0+4*LU_IND00]);
       SIMD_MULPS(vec50_0, vec60_0, vec70_0);
-      SIMD_LOAD_V4SF(vec80_0, &dy[m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec80_0, &dy[m0+4*LU_IND00]);
       SIMD_ADDPS(vec80_0, vec80_0, vec50_0);
-      SIMD_STORE_V4SF(vec80_0, &dy[m0+4*LU_IND1]);
+      SIMD_STORE_V4SF(vec80_0, &dy[m0+4*LU_IND00]);
    }
    SIMD_LOAD_V4SF(vec110_0, &pdata0[0]);
-   for(LU_IND1 = LU_IB10; LU_IND1 <= LU_NUB10-1; LU_IND1 += 4) {
+   for(LU_IND01 = LU_IB00; LU_IND01 <= LU_NUB00-1; LU_IND01 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec120_0, &dx[m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec120_0, &dx[m0+4*LU_IND01]);
       SIMD_MULPS(vec100_0, vec110_0, vec120_0);
-      SIMD_LOAD_V4SF(vec150_0, &dx[4+m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec150_0, &dx[4+m0+4*LU_IND01]);
       SIMD_MULPS(vec130_0, vec110_0, vec150_0);
-      SIMD_LOAD_V4SF(vec180_0, &dx[8+m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec180_0, &dx[8+m0+4*LU_IND01]);
       SIMD_MULPS(vec160_0, vec110_0, vec180_0);
-      SIMD_LOAD_V4SF(vec210_0, &dx[12+m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec210_0, &dx[12+m0+4*LU_IND01]);
       SIMD_MULPS(vec190_0, vec110_0, vec210_0);
-      SIMD_LOAD_V4SF(vec220_0, &dy[m0+4*LU_IND1]);
+      SIMD_LOAD_V4SF(vec220_0, &dy[m0+4*LU_IND01]);
       SIMD_ADDPS(vec220_0, vec220_0, vec100_0);
-      SIMD_STORE_V4SF(vec220_0, &dy[m0+4*LU_IND1]);
-      SIMD_LOAD_V4SF(vec240_0, &dy[4+m0+4*LU_IND1]);
+      SIMD_STORE_V4SF(vec220_0, &dy[m0+4*LU_IND01]);
+      SIMD_LOAD_V4SF(vec240_0, &dy[4+m0+4*LU_IND01]);
       SIMD_ADDPS(vec240_0, vec240_0, vec130_0);
-      SIMD_STORE_V4SF(vec240_0, &dy[4+m0+4*LU_IND1]);
-      SIMD_LOAD_V4SF(vec260_0, &dy[8+m0+4*LU_IND1]);
+      SIMD_STORE_V4SF(vec240_0, &dy[4+m0+4*LU_IND01]);
+      SIMD_LOAD_V4SF(vec260_0, &dy[8+m0+4*LU_IND01]);
       SIMD_ADDPS(vec260_0, vec260_0, vec160_0);
-      SIMD_STORE_V4SF(vec260_0, &dy[8+m0+4*LU_IND1]);
-      SIMD_LOAD_V4SF(vec280_0, &dy[12+m0+4*LU_IND1]);
+      SIMD_STORE_V4SF(vec260_0, &dy[8+m0+4*LU_IND01]);
+      SIMD_LOAD_V4SF(vec280_0, &dy[12+m0+4*LU_IND01]);
       SIMD_ADDPS(vec280_0, vec280_0, vec190_0);
-      SIMD_STORE_V4SF(vec280_0, &dy[12+m0+4*LU_IND1]);
+      SIMD_STORE_V4SF(vec280_0, &dy[12+m0+4*LU_IND01]);
    }
    ;
 }

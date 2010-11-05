@@ -104,6 +104,7 @@ if __name__ == "__main__":
 		name=l.name+"_microcode"
 		loop_to_outline=theloop.loops()[0]
 		print "label:" , loop_to_outline.label
+		l.partial_eval()
 		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
 		mc=w[name]
 		l.display()

@@ -19,7 +19,8 @@ close
 
 
 shell cc array_to_pointer09.c -o array_to_pointer09.database/Tmp/ref
-shell cc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
+# alloca -> malloc for validation
+shell cc -Dalloca=malloc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
 shell test "`./array_to_pointer09.database/Tmp/ref`" = "`./array_to_pointer09.database/Tmp/out`"
 
 delete array_to_pointer09

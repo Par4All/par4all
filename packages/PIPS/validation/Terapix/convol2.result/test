@@ -343,16 +343,16 @@ l99990:
          P4A_accel_malloc((void **) &image0, sizeof(float)*isi*isj);
          P4A_accel_malloc((void **) &kernel0, sizeof(float)*9);
          P4A_accel_malloc((void **) &new_image0, sizeof(float)*isi*isj);
-         P4A_copy_to_accel2d(*image0, &image[0][0], sizeof(float), isi, isj, 0, 0, isi, isj);
-         P4A_copy_to_accel2d(*kernel0, &kernel[0][0], sizeof(float), 3, 3, 0, 0, 3, 3);
-         P4A_copy_to_accel2d(*new_image0, &new_image[0][0], sizeof(float), isi, isj, 0, 0, isi, isj);
+         P4A_copy_to_accel_2d(sizeof(float), isi, isj, isi, isj, 0, 0, &image[0][0], *image0);
+         P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kernel[0][0], *kernel0);
+         P4A_copy_to_accel_2d(sizeof(float), isi, isj, isi, isj, 0, 0, &new_image[0][0], *new_image0);
 
 
 l99991:         microcode_launcher(isi, isj, i_t, j_t, (*image0), (*kernel0), (*new_image0));
-         P4A_copy_from_accel2d(&new_image[0][0], *new_image0, sizeof(float), isi, isj, 0, 0, isi, isj);
-         P4A_accel_free((void **) &image0);
-         P4A_accel_free((void **) &kernel0);
-         P4A_accel_free((void **) &new_image0);
+         P4A_copy_from_accel_2d(sizeof(float), isi, isj, isi, isj, 0, 0, &new_image[0][0], *new_image0);
+         P4A_accel_free(image0);
+         P4A_accel_free(kernel0);
+         P4A_accel_free(new_image0);
       }
 }
 void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])

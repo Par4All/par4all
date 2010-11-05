@@ -236,8 +236,8 @@
       SUBROUTINE DOTPROD(A, B, C)
       INTEGER*2 SIZE
       PARAMETER (SIZE = 10000)
-      INTEGER*2 I_07, I_06, I_05, I_04, I_03, I_02, I_01, I_00, I_0
-      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 I_07, I_06, I_05, I_04, I_03, I_02, I_01, I_00
+      INTEGER LU_IND00
       INTEGER*2 RED0(0:7), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0012
@@ -250,23 +250,23 @@
       RED0(5) = 0
       RED0(6) = 0
       RED0(7) = 0
-      DO 99998 LU_IND0 = 0, 9999, 8
-         I_07 = B(LU_IND0+1)*C(LU_IND0+1)
-         RED0(0) = RED0(0)+I_07
-         I_06 = B(LU_IND0+2)*C(LU_IND0+2)
-         RED0(1) = RED0(1)+I_06
-         I_05 = B(LU_IND0+3)*C(LU_IND0+3)
-         RED0(2) = RED0(2)+I_05
-         I_04 = B(LU_IND0+4)*C(LU_IND0+4)
-         RED0(3) = RED0(3)+I_04
-         I_03 = B(LU_IND0+5)*C(LU_IND0+5)
-         RED0(4) = RED0(4)+I_03
-         I_02 = B(LU_IND0+6)*C(LU_IND0+6)
-         RED0(5) = RED0(5)+I_02
-         I_01 = B(LU_IND0+7)*C(LU_IND0+7)
-         RED0(6) = RED0(6)+I_01
-         I_00 = B(LU_IND0+8)*C(LU_IND0+8)
-         RED0(7) = RED0(7)+I_00
+      DO 99998 LU_IND00 = 0, 9999, 8
+         I_00 = B(LU_IND00+1)*C(LU_IND00+1)
+         RED0(0) = RED0(0)+I_00
+         I_01 = B(LU_IND00+2)*C(LU_IND00+2)
+         RED0(1) = RED0(1)+I_01
+         I_02 = B(LU_IND00+3)*C(LU_IND00+3)
+         RED0(2) = RED0(2)+I_02
+         I_03 = B(LU_IND00+4)*C(LU_IND00+4)
+         RED0(3) = RED0(3)+I_03
+         I_04 = B(LU_IND00+5)*C(LU_IND00+5)
+         RED0(4) = RED0(4)+I_04
+         I_05 = B(LU_IND00+6)*C(LU_IND00+6)
+         RED0(5) = RED0(5)+I_05
+         I_06 = B(LU_IND00+7)*C(LU_IND00+7)
+         RED0(6) = RED0(6)+I_06
+         I_07 = B(LU_IND00+8)*C(LU_IND00+8)
+         RED0(7) = RED0(7)+I_07
 99998    CONTINUE
       A(1) = RED0(7)+RED0(6)+RED0(5)+RED0(4)+RED0(3)+RED0(2)+RED0(1)+
      &RED0(0)+A(1)
@@ -280,8 +280,8 @@ dotprod (short a[1], short b[10000], short c[10000])
   v8hi vec20;
   v8hi vec10;
   v8hi vec00;
+  int lu_ind00;
   short red0[8];
-  int lu_ind0;
   static const short size = 10000;
 
   a[0] = 0;
@@ -295,10 +295,10 @@ dotprod (short a[1], short b[10000], short c[10000])
   red0[6] = 0;
   red0[7] = 0;
   simd_load_v8hi (vec30, red0[0]);
-  for (lu_ind0 = 0; lu_ind0 <= 9999; lu_ind0 += 8)
+  for (lu_ind00 = 0; lu_ind00 <= 9999; lu_ind00 += 8)
     {
-      simd_load_v8hi (vec20, c[(1 + lu_ind0) - 1]);
-      simd_load_v8hi (vec10, b[(1 + lu_ind0) - 1]);
+      simd_load_v8hi (vec20, c[(1 + lu_ind00) - 1]);
+      simd_load_v8hi (vec10, b[(1 + lu_ind00) - 1]);
       simd_mulw (vec00, vec10, vec20);
       simd_addw (vec30, vec00, vec30);
       continue;
