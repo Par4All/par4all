@@ -9,39 +9,35 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 }
 void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[4], RED1[1];
    //PIPS generated variable
-   float RED0[1], RED1[4], F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   size_t i0, j0;
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0;
-   for(i = 0; i <= n-ksize; i += 1) {
-      out[i] = 0.0;
-      LU_NUB00 = ksize;
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = in[LU_IND0+i]*kernel[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      out[i] = RED0[0]+out[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      SIMD_LOAD_V4SF(vec30_0, &RED1[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
+      for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &kernel[LU_IND0]);
-         SIMD_LOAD_V4SF(vec10_0, &in[LU_IND0+i]);
+         SIMD_LOAD_V4SF(vec20_0, &kernel[j0]);
+         SIMD_LOAD_V4SF(vec10_0, &in[i0+j0]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
          SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
       }
-      SIMD_STORE_V4SF(vec30_0, &RED1[0]);
-      out[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+out[i];
+      SIMD_STORE_V4SF(vec30_0, &RED0[0]);
+      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
+         F_0 = in[i0+j]*kernel[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      out[i0] = RED1[0]+out[i0];
    }
    ;
 }

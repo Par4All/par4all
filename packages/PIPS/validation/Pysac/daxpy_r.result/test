@@ -9,33 +9,29 @@ void daxpy_r(int n, float da, float dx[n], float dy[n])
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[1];
    //PIPS generated variable
-   float RED0[1], F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   int i0, i1;
    //SAC generated temporary array
    a4sf pdata0 = {da, da, da, da};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0;
    /* code for both increments equal to 1 */
    
-   LU_NUB00 = n;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      RED0[0] = 0.000000;
-      F_04 = pdata0[0]*dx[LU_IND0];
-      RED0[0] = RED0[0]+F_04;
-      dy[LU_IND0] = RED0[0]+dy[LU_IND0];
-   }
    SIMD_LOAD_V4SF(vec10_0, &pdata0[0]);
-   for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec20_0, &dx[LU_IND0]);
+      SIMD_LOAD_V4SF(vec20_0, &dx[i0]);
       SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-      SIMD_LOAD_V4SF(vec30_0, &dy[LU_IND0]);
+      SIMD_LOAD_V4SF(vec30_0, &dy[i0]);
       SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
-      SIMD_STORE_V4SF(vec30_0, &dy[LU_IND0]);
+      SIMD_STORE_V4SF(vec30_0, &dy[i0]);
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      RED0[0] = 0.000000;
+      F_0 = pdata0[0]*dx[i1];
+      RED0[0] = RED0[0]+F_0;
+      dy[i1] = RED0[0]+dy[i1];
    }
    ;
 }

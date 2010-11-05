@@ -9,39 +9,35 @@ void matrix_mul_vect(size_t N, float C[N], float A[N][N], float B[N])
 }
 void matrix_mul_vect(size_t N, float C[N], float A[N][N], float B[N])
 {
-   size_t i;
+   size_t j;
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[4], RED1[1];
    //PIPS generated variable
-   float RED0[1], RED1[4], F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   size_t i0, j0;
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0;
-   for(i = 0; i <= N-1; i += 1) {
-      C[i] = 0;
-      LU_NUB00 = N;
+   for(i0 = 0; i0 <= N-1; i0 += 1) {
+      C[i0] = 0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = A[i][LU_IND0]*B[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      C[i] = RED0[0]+C[i];
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      SIMD_LOAD_V4SF(vec30_0, &RED1[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
+      for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &B[LU_IND0]);
-         SIMD_LOAD_V4SF(vec10_0, &A[i][LU_IND0]);
+         SIMD_LOAD_V4SF(vec20_0, &B[j0]);
+         SIMD_LOAD_V4SF(vec10_0, &A[i0][j0]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
          SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
       }
-      SIMD_STORE_V4SF(vec30_0, &RED1[0]);
-      C[i] = RED1[3]+RED1[2]+RED1[1]+RED1[0]+C[i];
+      SIMD_STORE_V4SF(vec30_0, &RED0[0]);
+      C[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+C[i0];
+      RED1[0] = 0.000000;
+      for(j = 4*(N/4); j <= N-1; j += 1) {
+         F_0 = A[i0][j]*B[j];
+         RED1[0] = RED1[0]+F_0;
+      }
+      C[i0] = RED1[0]+C[i0];
    }
    ;
 }

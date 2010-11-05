@@ -48,114 +48,112 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   //PIPS generated variable
-   int LU_IND0;
+   int i;
    // icc cannot vectorize this
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
-      a[LU_IND0+4] = b[LU_IND0];
-      b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
-      a[LU_IND0+5] = b[LU_IND0+1];
-      b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
-      a[LU_IND0+6] = b[LU_IND0+2];
-      b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
-      a[LU_IND0+7] = b[LU_IND0+3];
-      b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
+   for(i = 0; i <= 99; i += 4) {
+      a[i+4] = b[i];
+      b[i+4] = a[i]+c[i];
+      a[i+5] = b[i+1];
+      b[i+5] = a[i+1]+c[i+1];
+      a[i+6] = b[i+2];
+      b[i+6] = a[i+2]+c[i+2];
+      a[i+7] = b[i+3];
+      b[i+7] = a[i+3]+c[i+3];
    }
+   i = 100;
+   ;
+}
+void shrink(float a[100+4], float b[100+4], float c[100+4])
+{
+   int i;
+   // icc cannot vectorize this
+   for(i = 0; i <= 99; i += 4) {
+      a[i+4] = b[i];
+      b[i+4] = a[i]+c[i];
+      a[i+5] = b[i+1];
+      b[i+5] = a[i+1]+c[i+1];
+      a[i+6] = b[i+2];
+      b[i+6] = a[i+2]+c[i+2];
+      a[i+7] = b[i+3];
+      b[i+7] = a[i+3]+c[i+3];
+   }
+   i = 100;
    ;
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
    //PIPS generated variable
-   int LU_IND0;
+   int i0, i1;
    // icc cannot vectorize this
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
-      a[LU_IND0+4] = b[LU_IND0];
-      b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
-      a[LU_IND0+5] = b[LU_IND0+1];
-      b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
-      a[LU_IND0+6] = b[LU_IND0+2];
-      b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
-      a[LU_IND0+7] = b[LU_IND0+3];
-      b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
+   for(i0 = 0; i0 <= 99; i0 += 4) {
+      a[i0+4] = b[i0];
+      b[i0+4] = a[i0]+c[i0];
+      a[i0+5] = b[i0+1];
+      b[i0+5] = a[i0+1]+c[i0+1];
+      a[i0+6] = b[i0+2];
+      b[i0+6] = a[i0+2]+c[i0+2];
+      a[i0+7] = b[i0+3];
+      b[i0+7] = a[i0+3]+c[i0+3];
    }
+   i1 = 100;
    ;
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
    //PIPS generated variable
-   int LU_IND0;
+   int i0, i1;
    // icc cannot vectorize this
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
-      a[LU_IND0+4] = b[LU_IND0];
-      b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
-      a[LU_IND0+5] = b[LU_IND0+1];
-      b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
-      a[LU_IND0+6] = b[LU_IND0+2];
-      b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
-      a[LU_IND0+7] = b[LU_IND0+3];
-      b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
-   }
-   ;
-}
-void shrink(float a[100+4], float b[100+4], float c[100+4])
-{
-   //PIPS generated variable
-   int LU_IND0;
-   // icc cannot vectorize this
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 99; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
-      a[4+LU_IND0] = b[LU_IND0];
-      a[5+LU_IND0] = b[1+LU_IND0];
-      a[6+LU_IND0] = b[2+LU_IND0];
-      a[7+LU_IND0] = b[3+LU_IND0];
-      SIMD_LOAD_V4SF(vec20, &c[LU_IND0]);
-      SIMD_LOAD_V4SF(vec10, &a[LU_IND0]);
+      a[4+i0] = b[i0];
+      SIMD_LOAD_V4SF(vec20, &c[i0]);
+      SIMD_LOAD_V4SF(vec10, &a[i0]);
       SIMD_ADDPS(vec00, vec10, vec20);
-      SIMD_STORE_V4SF(vec00, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(vec00, &b[4+i0]);
+      a[5+i0] = b[1+i0];
+      a[6+i0] = b[2+i0];
+      a[7+i0] = b[3+i0];
    }
+   i1 = 100;
    ;
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
    //PIPS generated variable
-   int LU_IND0;
+   int i0, i1;
    // icc cannot vectorize this
-   LU_IND0 = 0;
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 99; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
-      a[4+LU_IND0] = b[LU_IND0];
-      a[5+LU_IND0] = b[1+LU_IND0];
-      a[6+LU_IND0] = b[2+LU_IND0];
-      a[7+LU_IND0] = b[3+LU_IND0];
-      SIMD_LOAD_V4SF(vec20, &c[LU_IND0]);
-      SIMD_LOAD_V4SF(vec10, &a[LU_IND0]);
+      a[4+i0] = b[i0];
+      SIMD_LOAD_V4SF(vec20, &c[i0]);
+      SIMD_LOAD_V4SF(vec10, &a[i0]);
       SIMD_ADDPS(vec00, vec10, vec20);
-      SIMD_STORE_V4SF(vec00, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(vec00, &b[4+i0]);
+      a[5+i0] = b[1+i0];
+      a[6+i0] = b[2+i0];
+      a[7+i0] = b[3+i0];
    }
+   i1 = 100;
    ;
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
    //PIPS generated variable
-   int LU_IND0;
+   int i0;
    // icc cannot vectorize this
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 99; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
-      a[4+LU_IND0] = b[LU_IND0];
-      a[5+LU_IND0] = b[1+LU_IND0];
-      a[6+LU_IND0] = b[2+LU_IND0];
-      a[7+LU_IND0] = b[3+LU_IND0];
-      SIMD_LOAD_V4SF(vec20, &c[LU_IND0]);
-      SIMD_LOAD_V4SF(vec10, &a[LU_IND0]);
+      a[4+i0] = b[i0];
+      SIMD_LOAD_V4SF(vec20, &c[i0]);
+      SIMD_LOAD_V4SF(vec10, &a[i0]);
       SIMD_ADDPS(vec00, vec10, vec20);
-      SIMD_STORE_V4SF(vec00, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(vec00, &b[4+i0]);
+      a[5+i0] = b[1+i0];
+      a[6+i0] = b[2+i0];
+      a[7+i0] = b[3+i0];
    }
    ;
 }
@@ -165,19 +163,19 @@ simdized code
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
    //PIPS generated variable
-   int LU_IND0;
+   int i0;
    // icc cannot vectorize this
-   for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
+   for(i0 = 0; i0 <= 99; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
-      a[4+LU_IND0] = b[LU_IND0];
-      a[5+LU_IND0] = b[1+LU_IND0];
-      a[6+LU_IND0] = b[2+LU_IND0];
-      a[7+LU_IND0] = b[3+LU_IND0];
-      SIMD_LOAD_V4SF(vec20, &c[LU_IND0]);
-      SIMD_LOAD_V4SF(vec10, &a[LU_IND0]);
+      a[4+i0] = b[i0];
+      SIMD_LOAD_V4SF(vec20, &c[i0]);
+      SIMD_LOAD_V4SF(vec10, &a[i0]);
       SIMD_ADDPS(vec00, vec10, vec20);
-      SIMD_STORE_V4SF(vec00, &b[4+LU_IND0]);
+      SIMD_STORE_V4SF(vec00, &b[4+i0]);
+      a[5+i0] = b[1+i0];
+      a[6+i0] = b[2+i0];
+      a[7+i0] = b[3+i0];
    }
    ;
 }

@@ -120,198 +120,192 @@ double distance(double X[2], double Y[2])
 }
 double distance(double X[2], double Y[2])
 {
-// (0,2)
-   double tmp;
    //PIPS generated variable
+// (0,2)
+   double F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00, tmp0;
 // (0,3)
-   double F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, tmp0, F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00;
-// (0,4)
    F_00 = cos(X[0]);
-// (0,5)
+// (0,4)
    F_10 = cos(Y[0]);
-// (0,6)
+// (0,5)
    F_20 = F_00*F_10;
-// (0,7)
+// (0,6)
    F_30 = X[1]-Y[0];
-// (0,8)
+// (0,7)
    F_40 = cos(F_30);
-// (0,9)
+// (0,8)
    F_50 = F_20*F_40;
-// (0,10)
+// (0,9)
    F_60 = sin(X[0]);
-// (0,11)
+// (0,10)
    F_70 = sin(Y[0]);
-// (0,12)
+// (0,11)
    F_80 = F_60*F_70;
-// (0,13)
+// (0,12)
    tmp0 = F_50+F_80;
-// (0,14)
+// (0,13)
    return 6368.*acos(tmp0);
 }
 double distance(double X[2], double Y[2])
 {
+   //PIPS generated variable
 // (0,2)
-   double tmp;
-   //PIPS generated variable
-// (0,3)
-   double F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, tmp0, F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00;
+   double F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00, tmp0;
    //PIPS:SAC generated v2df vector(s)
-// (0,4)
+// (0,3)
    v2df vec00, vec10;
    //SAC generated temporary array
-// (0,5)
+// (0,4)
    a2df pdata0 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,6)
+// (0,5)
    v2df vec20, vec30;
    //SAC generated temporary array
-// (0,7)
+// (0,6)
    a2df pdata1 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,8)
+// (0,7)
    v2df vec40, vec50, vec60;
    //SAC generated temporary array
-// (0,9)
+// (0,8)
    a2df pdata2 = {0, 0};
-// (0,10)
+// (0,9)
    SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
-// (0,11)
+// (0,10)
    SIMD_COSPD(vec00, vec10);
-// (0,12)
+// (0,11)
    SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,13)
+// (0,12)
    F_30 = X[1]-Y[0];
-// (0,14)
+// (0,13)
    SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,15)
+// (0,14)
    SIMD_SINPD(vec20, vec30);
-// (0,16)
+// (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
-// (0,17)
+// (0,16)
    SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,18)
+// (0,17)
    SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
-// (0,19)
+// (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
-// (0,20)
+// (0,19)
    SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,21)
+// (0,20)
    F_40 = cos(F_30);
-// (0,22)
+// (0,21)
    F_50 = pdata2[0]*F_40;
-// (0,23)
+// (0,22)
    tmp0 = F_50+pdata2[1];
-// (0,24)
+// (0,23)
    return 6368.*acos(tmp0);
 }
 double distance(double X[2], double Y[2])
 {
+   //PIPS generated variable
 // (0,2)
-   double tmp;
-   //PIPS generated variable
-// (0,3)
-   double F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, tmp0, F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00;
+   double F_80, F_70, F_60, F_50, F_40, F_30, F_20, F_10, F_00, tmp0;
    //PIPS:SAC generated v2df vector(s)
-// (0,4)
+// (0,3)
    v2df vec00, vec10;
    //SAC generated temporary array
-// (0,5)
+// (0,4)
    a2df pdata0 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,6)
+// (0,5)
    v2df vec20, vec30;
    //SAC generated temporary array
-// (0,7)
+// (0,6)
    a2df pdata1 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,8)
+// (0,7)
    v2df vec40, vec50, vec60;
    //SAC generated temporary array
-// (0,9)
+// (0,8)
    a2df pdata2 = {0, 0};
-// (0,10)
+// (0,9)
    SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
-// (0,11)
+// (0,10)
    SIMD_COSPD(vec00, vec10);
-// (0,12)
+// (0,11)
    SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,13)
+// (0,12)
    F_30 = X[1]-Y[0];
-// (0,14)
+// (0,13)
    SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,15)
+// (0,14)
    SIMD_SINPD(vec20, vec30);
-// (0,16)
+// (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
-// (0,17)
+// (0,16)
    SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,18)
+// (0,17)
    SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
-// (0,19)
+// (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
-// (0,20)
+// (0,19)
    SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,21)
+// (0,20)
    F_40 = cos(F_30);
-// (0,22)
+// (0,21)
    F_50 = pdata2[0]*F_40;
-// (0,23)
+// (0,22)
    tmp0 = F_50+pdata2[1];
-// (0,24)
+// (0,23)
    return 6368.*acos(tmp0);
 }
 double distance(double X[2], double Y[2])
 {
    //PIPS generated variable
-// (0,3)
-   double tmp0, F_50, F_40, F_30;
+// (0,2)
+   double F_50, F_40, F_30, tmp0;
    //PIPS:SAC generated v2df vector(s)
-// (0,4)
+// (0,3)
    v2df vec00, vec10;
    //SAC generated temporary array
-// (0,5)
+// (0,4)
    a2df pdata0 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,6)
+// (0,5)
    v2df vec20, vec30;
    //SAC generated temporary array
-// (0,7)
+// (0,6)
    a2df pdata1 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,8)
+// (0,7)
    v2df vec40, vec50, vec60;
    //SAC generated temporary array
-// (0,9)
+// (0,8)
    a2df pdata2 = {0, 0};
-// (0,10)
+// (0,9)
    SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
-// (0,11)
+// (0,10)
    SIMD_COSPD(vec00, vec10);
-// (0,12)
+// (0,11)
    SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,13)
+// (0,12)
    F_30 = X[1]-Y[0];
-// (0,14)
+// (0,13)
    SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,15)
+// (0,14)
    SIMD_SINPD(vec20, vec30);
-// (0,16)
+// (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
-// (0,17)
+// (0,16)
    SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,18)
+// (0,17)
    SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
-// (0,19)
+// (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
-// (0,20)
+// (0,19)
    SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,21)
+// (0,20)
    F_40 = cos(F_30);
-// (0,22)
+// (0,21)
    F_50 = pdata2[0]*F_40;
-// (0,23)
+// (0,22)
    tmp0 = F_50+pdata2[1];
-// (0,24)
+// (0,23)
    return 6368.*acos(tmp0);
 }
 
@@ -320,55 +314,55 @@ simdized code
 double distance(double X[2], double Y[2])
 {
    //PIPS generated variable
-// (0,3)
-   double tmp0, F_50, F_40, F_30;
+// (0,2)
+   double F_50, F_40, F_30, tmp0;
    //PIPS:SAC generated v2df vector(s)
-// (0,4)
+// (0,3)
    v2df vec00, vec10;
    //SAC generated temporary array
-// (0,5)
+// (0,4)
    a2df pdata0 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,6)
+// (0,5)
    v2df vec20, vec30;
    //SAC generated temporary array
-// (0,7)
+// (0,6)
    a2df pdata1 = {0, 0};
    //PIPS:SAC generated v2df vector(s)
-// (0,8)
+// (0,7)
    v2df vec40, vec50, vec60;
    //SAC generated temporary array
-// (0,9)
+// (0,8)
    a2df pdata2 = {0, 0};
-// (0,10)
+// (0,9)
    SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
-// (0,11)
+// (0,10)
    SIMD_COSPD(vec00, vec10);
-// (0,12)
+// (0,11)
    SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,13)
+// (0,12)
    F_30 = X[1]-Y[0];
-// (0,14)
+// (0,13)
    SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,15)
+// (0,14)
    SIMD_SINPD(vec20, vec30);
-// (0,16)
+// (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
-// (0,17)
+// (0,16)
    SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,18)
+// (0,17)
    SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
-// (0,19)
+// (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
-// (0,20)
+// (0,19)
    SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,21)
+// (0,20)
    F_40 = cos(F_30);
-// (0,22)
+// (0,21)
    F_50 = pdata2[0]*F_40;
-// (0,23)
+// (0,22)
    tmp0 = F_50+pdata2[1];
-// (0,24)
+// (0,23)
    return 6368.*acos(tmp0);
 }
 

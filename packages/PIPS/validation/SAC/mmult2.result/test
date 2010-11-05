@@ -88,7 +88,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
    int i, j, k;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int i_t, j_t;
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -98,14 +98,11 @@ l99998:
 l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
+               for(k = 1; k <= 16; k += 4) {
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k-1]*b[k-1][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k]*b[k][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k+1]*b[k+1][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k+2]*b[k+2][j+4*j_t-5];
                }
                k = 17;
                k = 16;
@@ -123,7 +120,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
    int i, j, k;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int i_t, j_t;
 loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
 l99997:
@@ -133,14 +130,11 @@ l99998:
 l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
+               for(k = 1; k <= 16; k += 4) {
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k-1]*b[k-1][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k]*b[k][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k+1]*b[k+1][j+4*j_t-5];
+                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+a[i+4*i_t-5][k+2]*b[k+2][j+4*j_t-5];
                }
                k = 17;
                k = 16;
@@ -158,7 +152,7 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
    int i, j, k;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int i_t, j_t;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
 loop0:
@@ -170,17 +164,14 @@ l99998:
 l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  F_0 = a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
+               for(k = 1; k <= 16; k += 4) {
+                  F_0 = a[i+4*i_t-5][k-1]*b[k-1][j+4*j_t-5];
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_0;
-                  F_1 = a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
+                  F_1 = a[i+4*i_t-5][k]*b[k][j+4*j_t-5];
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_1;
-                  F_2 = a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
+                  F_2 = a[i+4*i_t-5][k+1]*b[k+1][j+4*j_t-5];
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_2;
-                  F_3 = a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
+                  F_3 = a[i+4*i_t-5][k+2]*b[k+2][j+4*j_t-5];
                   c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_3;
                }
                k = 17;
@@ -197,43 +188,42 @@ l99999:
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
-   int i, j, k;
+   int i, j;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int j_t;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
+   float F_0, F_1, F_2, F_3;
+   //PIPS generated variable
+   int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
 loop0:
-   for(i_t = 1; i_t <= 4; i_t += 1) {
+   for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
 l99997:
-      for(j_t = 1; j_t <= 4; j_t += 1) {
+      for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
 l99998:
-         for(i = 1; i <= 4; i += 1) {
+         for(i0 = 1; i0 <= 4; i0 += 1) {
 l99999:
-            for(j = 1; j <= 4; j += 1) {
-               c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
-                  F_00 = a[i+4*i_t-5][LU_IND0]*b[LU_IND0][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_00;
-                  F_10 = a[i+4*i_t-5][LU_IND0+1]*b[LU_IND0+1][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_10;
-                  F_20 = a[i+4*i_t-5][LU_IND0+2]*b[LU_IND0+2][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_20;
-                  F_30 = a[i+4*i_t-5][LU_IND0+3]*b[LU_IND0+3][j+4*j_t-5];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+F_30;
+            for(j0 = 1; j0 <= 4; j0 += 1) {
+               c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
+               for(k0 = 1; k0 <= 16; k0 += 4) {
+                  F_0 = a[i0+4*i_t0-5][k0-1]*b[k0-1][j0+4*j_t0-5];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+F_0;
+                  F_1 = a[i0+4*i_t0-5][k0]*b[k0][j0+4*j_t0-5];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+F_1;
+                  F_2 = a[i0+4*i_t0-5][k0+1]*b[k0+1][j0+4*j_t0-5];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+F_2;
+                  F_3 = a[i0+4*i_t0-5][k0+2]*b[k0+2][j0+4*j_t0-5];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+F_3;
                }
-               k = 17;
-               k = 16;
+               k1 = 17;
+               k2 = 16;
             }
-            j = 4*j_t;
+            j = 4*j_t0;
          }
-         i = 4*i_t;
+         i = 4*i_t0;
       }
       j_t = 4;
    }
-   i_t = 4;
+   i_t1 = 4;
    ;
 }
 
@@ -241,92 +231,90 @@ simdized code
 
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
-   int i, j, k;
+   int i, j;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int j_t;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
+   float F_0, F_1, F_2, F_3;
+   //PIPS generated variable
+   int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
 loop0:
-   for(i_t = 1; i_t <= 4; i_t += 1) {
+   for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
 l99997:
-      for(j_t = 1; j_t <= 4; j_t += 1) {
+      for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
 l99998:
-         for(i = 1; i <= 4; i += 1) {
+         for(i0 = 1; i0 <= 4; i0 += 1) {
 l99999:
-            for(j = 1; j <= 4; j += 1) {
-               c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
+            for(j0 = 1; j0 <= 4; j0 += 1) {
+               c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
+               for(k0 = 1; k0 <= 16; k0 += 4) {
                   //PIPS:SAC generated v4sf vector(s)
                   v4sf vec00, vec10, vec20;
-                  SIMD_LOAD_GENERIC_V4SF(vec20, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
-                  SIMD_LOAD_V4SF(vec10, &a[i+4*i_t-5][LU_IND0]);
+                  SIMD_LOAD_GENERIC_V4SF(vec20, b[k0-1][j0+4*j_t0-5], b[k0][j0+4*j_t0-5], b[1+k0][j0+4*j_t0-5], b[2+k0][j0+4*j_t0-5]);
+                  SIMD_LOAD_V4SF(vec10, &a[i0+4*i_t0-5][k0-1]);
                   SIMD_MULPS(vec00, vec10, vec20);
                   SIMD_STORE_V4SF(vec00, &pdata0[0]);
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[0];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[1];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[2];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[3];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[0];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[1];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[2];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[3];
                }
-               k = 17;
-               k = 16;
+               k1 = 17;
+               k2 = 16;
             }
-            j = 4*j_t;
+            j = 4*j_t0;
          }
-         i = 4*i_t;
+         i = 4*i_t0;
       }
       j_t = 4;
    }
-   i_t = 4;
+   i_t1 = 4;
    ;
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
-   int i, j, k;
+   int i, j;
    //PIPS generated variable
-   int i_t, j_t, LU_NUB0, LU_IB0, LU_IND0;
+   int j_t;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_30, F_20, F_10, F_00;
+   float F_0, F_1, F_2, F_3;
+   //PIPS generated variable
+   int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
 loop0:
-   for(i_t = 1; i_t <= 4; i_t += 1) {
+   for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
 l99997:
-      for(j_t = 1; j_t <= 4; j_t += 1) {
+      for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
 l99998:
-         for(i = 1; i <= 4; i += 1) {
+         for(i0 = 1; i0 <= 4; i0 += 1) {
 l99999:
-            for(j = 1; j <= 4; j += 1) {
-               c[i+4*i_t-5][j+4*j_t-5] = 0;
-               LU_NUB0 = 16;
-               LU_IB0 = 0;
-               LU_IND0 = 0;
-               for(LU_IND0 = 0; LU_IND0 <= 15; LU_IND0 += 4) {
+            for(j0 = 1; j0 <= 4; j0 += 1) {
+               c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
+               for(k0 = 1; k0 <= 16; k0 += 4) {
                   //PIPS:SAC generated v4sf vector(s)
                   v4sf vec00, vec10, vec20;
-                  SIMD_LOAD_GENERIC_V4SF(vec20, b[LU_IND0][j+4*j_t-5], b[1+LU_IND0][j+4*j_t-5], b[2+LU_IND0][j+4*j_t-5], b[3+LU_IND0][j+4*j_t-5]);
-                  SIMD_LOAD_V4SF(vec10, &a[i+4*i_t-5][LU_IND0]);
+                  SIMD_LOAD_GENERIC_V4SF(vec20, b[k0-1][j0+4*j_t0-5], b[k0][j0+4*j_t0-5], b[1+k0][j0+4*j_t0-5], b[2+k0][j0+4*j_t0-5]);
+                  SIMD_LOAD_V4SF(vec10, &a[i0+4*i_t0-5][k0-1]);
                   SIMD_MULPS(vec00, vec10, vec20);
                   SIMD_STORE_V4SF(vec00, &pdata0[0]);
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[0];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[1];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[2];
-                  c[i+4*i_t-5][j+4*j_t-5] = c[i+4*i_t-5][j+4*j_t-5]+pdata0[3];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[0];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[1];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[2];
+                  c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[3];
                }
-               k = 17;
-               k = 16;
+               k1 = 17;
+               k2 = 16;
             }
-            j = 4*j_t;
+            j = 4*j_t0;
          }
-         i = 4*i_t;
+         i = 4*i_t0;
       }
       j_t = 4;
    }
-   i_t = 4;
+   i_t1 = 4;
    ;
 }
 seq-ok

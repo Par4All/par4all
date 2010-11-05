@@ -12,16 +12,15 @@ int main()
 }
 int main()
 {
-   int a, b, c;
    //PIPS generated variable
-   int c0, a0, b0, a1;
-   a = 1;
+   int a0, a1, a2, b0, c0;
+   a0 = 1;
    a1 = 2;
-   b = a1;
-   b0 = b+a1;
-   a0 = 3;
-   c0 = a0;
-   printf("%d-%d-%d", a0, b0, c0);
+   b0 = a1;
+   b0 = b0+a1;
+   a2 = 3;
+   c0 = a2;
+   printf("%d-%d-%d", a2, b0, c0);
    return 0;
 }
 ok

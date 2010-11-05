@@ -27,7 +27,7 @@ int main()
    for(i = 0; i <= size-1; i += 1)
       for(j = 0; j <= 5; j += 1)
          loulou[0][i][j] = k++;
-   printf("%d\n", duck(riri, *((int (*)[6]) &fifi), size, *((int (*)[-1+6*size+1]) &loulou)));
+   printf("%d\n", duck(riri, fifi, size, loulou));
    return 0;
 }
 

@@ -65,58 +65,64 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int k;
    //PIPS generated variable
-   float F_0, RED0[4], F_00, F_01, F_02, F_03;
-   for(i = 3; i <= 99; i += 1) {
+   float RED0[4], F_00, F_01, F_02, F_03;
+   //PIPS generated variable
+   int i0;
+   for(i0 = 3; i0 <= 99; i0 += 1) {
       RED0[0] = 0.000000;
       RED0[1] = 0.000000;
       RED0[2] = 0.000000;
       RED0[3] = 0.000000;
-      F_03 = x[i]*h[0];
-      RED0[0] = RED0[0]+F_03;
-      F_02 = x[i-1]*h[1];
-      RED0[1] = RED0[1]+F_02;
-      F_01 = x[i-2]*h[2];
-      RED0[2] = RED0[2]+F_01;
-      F_00 = x[i-3]*h[3];
-      RED0[3] = RED0[3]+F_00;
+      F_00 = x[i0]*h[0];
+      RED0[0] = RED0[0]+F_00;
+      F_01 = x[i0-1]*h[1];
+      RED0[1] = RED0[1]+F_01;
+      F_02 = x[i0-2]*h[2];
+      RED0[2] = RED0[2]+F_02;
+      F_03 = x[i0-3]*h[3];
+      RED0[3] = RED0[3]+F_03;
       k = 4;
-      y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+      y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
    }
    ;
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int k;
    //PIPS generated variable
-   float F_0, RED0[4], F_00, F_01, F_02, F_03;
-   for(i = 3; i <= 99; i += 1) {
+   float RED0[4], F_00, F_01, F_02, F_03;
+   //PIPS generated variable
+   int i0;
+   for(i0 = 3; i0 <= 99; i0 += 1) {
       RED0[0] = 0.000000;
       RED0[1] = 0.000000;
       RED0[2] = 0.000000;
       RED0[3] = 0.000000;
-      F_03 = x[i]*h[0];
-      RED0[0] = RED0[0]+F_03;
-      F_02 = x[i-1]*h[1];
-      RED0[1] = RED0[1]+F_02;
-      F_01 = x[i-2]*h[2];
-      RED0[2] = RED0[2]+F_01;
-      F_00 = x[i-3]*h[3];
-      RED0[3] = RED0[3]+F_00;
+      F_00 = x[i0]*h[0];
+      RED0[0] = RED0[0]+F_00;
+      F_01 = x[i0-1]*h[1];
+      RED0[1] = RED0[1]+F_01;
+      F_02 = x[i0-2]*h[2];
+      RED0[2] = RED0[2]+F_02;
+      F_03 = x[i0-3]*h[3];
+      RED0[3] = RED0[3]+F_03;
       k = 4;
-      y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+      y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
    }
    ;
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int k;
    //PIPS generated variable
-   float F_0, RED0[4], F_00, F_01, F_02, F_03;
+   float RED0[4], F_00, F_01, F_02, F_03;
+   //PIPS generated variable
+   int i0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-   for(i = 3; i <= 99; i += 1) {
+   for(i0 = 3; i0 <= 99; i0 += 1) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20, vec30, vec40;
       RED0[0] = 0.000000;
@@ -124,42 +130,44 @@ void filtre(float x[100], float y[100], float h[4])
       RED0[2] = 0.000000;
       RED0[3] = 0.000000;
       SIMD_LOAD_V4SF(vec20, &h[0]);
-      SIMD_LOAD_GENERIC_V4SF(vec10, x[i], x[i-1], x[i-2], x[i-3]);
+      SIMD_LOAD_GENERIC_V4SF(vec10, x[i0], x[i0-1], x[i0-2], x[i0-3]);
       SIMD_MULPS(vec00, vec10, vec20);
       SIMD_STORE_V4SF(vec00, &pdata0[0]);
       k = 4;
       SIMD_LOAD_V4SF(vec30, &RED0[0]);
       SIMD_ADDPS(vec30, vec30, vec00);
       SIMD_STORE_V4SF(vec30, &RED0[0]);
-      y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+      y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
    }
    ;
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i, k;
+   int k;
    //PIPS generated variable
-   float F_0, RED0[4], F_00, F_01, F_02, F_03;
+   float RED0[4], F_00, F_01, F_02, F_03;
+   //PIPS generated variable
+   int i0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
    {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec20;
       SIMD_LOAD_V4SF(vec20, &h[0]);
-      for(i = 3; i <= 99; i += 1) {
+      for(i0 = 3; i0 <= 99; i0 += 1) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec10, vec30, vec40;
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
          RED0[2] = 0.000000;
          RED0[3] = 0.000000;
-         SIMD_LOAD_GENERIC_V4SF(vec10, x[i], x[i-1], x[i-2], x[i-3]);
+         SIMD_LOAD_GENERIC_V4SF(vec10, x[i0], x[i0-1], x[i0-2], x[i0-3]);
          SIMD_MULPS(vec00, vec10, vec20);
          k = 4;
          SIMD_LOAD_V4SF(vec30, &RED0[0]);
          SIMD_ADDPS(vec30, vec30, vec00);
          SIMD_STORE_V4SF(vec30, &RED0[0]);
-         y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+         y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
       }
       SIMD_STORE_V4SF(vec00, &pdata0[0]);
    }
@@ -167,29 +175,30 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i;
    //PIPS generated variable
    float RED0[4];
+   //PIPS generated variable
+   int i0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
    {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec20;
       SIMD_LOAD_V4SF(vec20, &h[0]);
-      for(i = 3; i <= 99; i += 1) {
+      for(i0 = 3; i0 <= 99; i0 += 1) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec10, vec30, vec40;
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
          RED0[2] = 0.000000;
          RED0[3] = 0.000000;
-         SIMD_LOAD_GENERIC_V4SF(vec10, x[i], x[i-1], x[i-2], x[i-3]);
+         SIMD_LOAD_GENERIC_V4SF(vec10, x[i0], x[i0-1], x[i0-2], x[i0-3]);
          SIMD_MULPS(vec00, vec10, vec20);
 
          SIMD_LOAD_V4SF(vec30, &RED0[0]);
          SIMD_ADDPS(vec30, vec30, vec00);
          SIMD_STORE_V4SF(vec30, &RED0[0]);
-         y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+         y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
       }
 
    }
@@ -200,29 +209,30 @@ simdized code
 
 void filtre(float x[100], float y[100], float h[4])
 {
-   int i;
    //PIPS generated variable
    float RED0[4];
+   //PIPS generated variable
+   int i0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
    {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec20;
       SIMD_LOAD_V4SF(vec20, &h[0]);
-      for(i = 3; i <= 99; i += 1) {
+      for(i0 = 3; i0 <= 99; i0 += 1) {
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec10, vec30, vec40;
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
          RED0[2] = 0.000000;
          RED0[3] = 0.000000;
-         SIMD_LOAD_GENERIC_V4SF(vec10, x[i], x[i-1], x[i-2], x[i-3]);
+         SIMD_LOAD_GENERIC_V4SF(vec10, x[i0], x[i0-1], x[i0-2], x[i0-3]);
          SIMD_MULPS(vec00, vec10, vec20);
 
          SIMD_LOAD_V4SF(vec30, &RED0[0]);
          SIMD_ADDPS(vec30, vec30, vec00);
          SIMD_STORE_V4SF(vec30, &RED0[0]);
-         y[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i];
+         y[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+y[i0];
       }
 
    }

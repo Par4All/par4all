@@ -189,11 +189,11 @@ void write_data(char filename[])
 }
 void jacobi()
 {
-   int i;
+   int j;
    //PIPS generated variable
-   int LU_IND0, LU_IND1;
+   float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
-   float F_54, F_44, F_34, F_24, F_14, F_04;
+   int i0, i1, j0, j1;
    //SAC generated temporary array
    a4sf pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata7 = {0.25, 0.25, 0.25, 0.25};
    //PIPS generated variable
@@ -203,45 +203,45 @@ void jacobi()
         could use also a flip-flop dimension instead... */
 kernel1:   ;
    SIMD_LOAD_V4SF(vec100_0, &pdata3[0]);
-   for(i = 1; i <= 830; i += 1) {
-      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
-         F_04 = space[i-1][1+LU_IND0]+space[1+i][1+LU_IND0];
-         F_14 = F_04+space[i][LU_IND0];
-         F_24 = F_14+space[i][2+LU_IND0];
-         save[i][1+LU_IND0] = 0.25*F_24;
-      }
-      for(LU_IND0 = 2; LU_IND0 <= 829; LU_IND0 += 4) {
+   for(i0 = 1; i0 <= 830; i0 += 1) {
+      for(j0 = 1; j0 <= 828; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &space[1+i][1+LU_IND0]);
-         SIMD_LOAD_V4SF(vec10_0, &space[i-1][1+LU_IND0]);
+         SIMD_LOAD_V4SF(vec20_0, &space[1+i0][j0]);
+         SIMD_LOAD_V4SF(vec10_0, &space[i0-1][j0]);
          SIMD_ADDPS(vec00_0, vec10_0, vec20_0);
-         SIMD_LOAD_V4SF(vec50_0, &space[i][LU_IND0]);
+         SIMD_LOAD_V4SF(vec50_0, &space[i0][j0-1]);
          SIMD_ADDPS(vec30_0, vec00_0, vec50_0);
-         SIMD_LOAD_V4SF(vec80_0, &space[i][2+LU_IND0]);
+         SIMD_LOAD_V4SF(vec80_0, &space[i0][1+j0]);
          SIMD_ADDPS(vec60_0, vec30_0, vec80_0);
          SIMD_MULPS(vec90_0, vec100_0, vec60_0);
-         SIMD_STORE_V4SF(vec90_0, &save[i][1+LU_IND0]);
+         SIMD_STORE_V4SF(vec90_0, &save[i0][j0]);
+      }
+      for(j = 829; j <= 830; j += 1) {
+         F_0 = space[i0-1][j]+space[1+i0][j];
+         F_1 = F_0+space[i0][j-1];
+         F_2 = F_1+space[i0][1+j];
+         save[i0][j] = 0.25*F_2;
       }
    }
    SIMD_LOAD_V4SF(vec220_0, &pdata7[0]);
-   for(i = 1; i <= 830; i += 1) {
-      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
-         F_34 = save[i-1][1+LU_IND1]+save[1+i][1+LU_IND1];
-         F_44 = F_34+save[i][LU_IND1];
-         F_54 = F_44+save[i][2+LU_IND1];
-         space[i][1+LU_IND1] = 0.25*F_54;
-      }
-      for(LU_IND1 = 2; LU_IND1 <= 829; LU_IND1 += 4) {
+   for(i1 = 1; i1 <= 830; i1 += 1) {
+      for(j1 = 1; j1 <= 828; j1 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec140_0, &save[1+i][1+LU_IND1]);
-         SIMD_LOAD_V4SF(vec130_0, &save[i-1][1+LU_IND1]);
+         SIMD_LOAD_V4SF(vec140_0, &save[1+i1][j1]);
+         SIMD_LOAD_V4SF(vec130_0, &save[i1-1][j1]);
          SIMD_ADDPS(vec120_0, vec130_0, vec140_0);
-         SIMD_LOAD_V4SF(vec170_0, &save[i][LU_IND1]);
+         SIMD_LOAD_V4SF(vec170_0, &save[i1][j1-1]);
          SIMD_ADDPS(vec150_0, vec120_0, vec170_0);
-         SIMD_LOAD_V4SF(vec200_0, &save[i][2+LU_IND1]);
+         SIMD_LOAD_V4SF(vec200_0, &save[i1][1+j1]);
          SIMD_ADDPS(vec180_0, vec150_0, vec200_0);
          SIMD_MULPS(vec210_0, vec220_0, vec180_0);
-         SIMD_STORE_V4SF(vec210_0, &space[i][1+LU_IND1]);
+         SIMD_STORE_V4SF(vec210_0, &space[i1][j1]);
+      }
+      for(j = 829; j <= 830; j += 1) {
+         F_3 = save[i1-1][j]+save[1+i1][j];
+         F_4 = F_3+save[i1][j-1];
+         F_5 = F_4+save[i1][1+j];
+         space[i1][j] = 0.25*F_5;
       }
    }
    ;

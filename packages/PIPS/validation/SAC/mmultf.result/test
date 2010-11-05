@@ -29,59 +29,50 @@ simdized code
       INTEGER*4 A(SIZE,SIZE), B(SIZE,SIZE), C(SIZE,SIZE)
       INTEGER I, J,K
 
-99995 CONTINUE
-      DO 99994 LU_IND2 = 0, 3, 2
-         DO LU_IND12 = 0, 3, 2
-            C(1+LU_IND2,1+LU_IND12) = 0
-            DO LU_IND022 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(vec20, B(1+LU_IND022,1+LU_IND12))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec10, A(1+LU_IND2,1+
-     &         LU_IND022), A(1+LU_IND2,2+LU_IND022))
+      DO I0 = 1, 4, 2
+         DO J1 = 1, 4, 2
+            C(I0,J1) = 0
+            DO K11 = 1, 4, 2
+               CALL SIMD_LOAD_V2SI(vec20, B(K11,J1))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec10, A(I0,K11), A(I0,1+
+     &         K11))
                CALL SIMD_MULD(vec00, vec10, vec20)
                CALL SIMD_STORE_V2SI(vec00, pdata0(0))
-               C(1+LU_IND2,1+LU_IND12) = pdata0(0)+C(1+LU_IND2,1+
-     &         LU_IND12)
-               C(1+LU_IND2,1+LU_IND12) = pdata0(1)+C(1+LU_IND2,1+
-     &         LU_IND12)
+               C(I0,J1) = pdata0(0)+C(I0,J1)
+               C(I0,J1) = pdata0(1)+C(I0,J1)
             ENDDO
-            C(1+LU_IND2,2+LU_IND12) = 0
-            DO LU_IND012 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(vec50, B(1+LU_IND012,2+LU_IND12))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec40, A(1+LU_IND2,1+
-     &         LU_IND012), A(1+LU_IND2,2+LU_IND012))
+            C(I0,1+J1) = 0
+            DO K01 = 1, 4, 2
+               CALL SIMD_LOAD_V2SI(vec50, B(K01,1+J1))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec40, A(I0,K01), A(I0,1+
+     &         K01))
                CALL SIMD_MULD(vec30, vec40, vec50)
                CALL SIMD_STORE_V2SI(vec30, pdata1(0))
-               C(1+LU_IND2,2+LU_IND12) = pdata1(0)+C(1+LU_IND2,2+
-     &         LU_IND12)
-               C(1+LU_IND2,2+LU_IND12) = pdata1(1)+C(1+LU_IND2,2+
-     &         LU_IND12)
+               C(I0,1+J1) = pdata1(0)+C(I0,1+J1)
+               C(I0,1+J1) = pdata1(1)+C(I0,1+J1)
             ENDDO
          ENDDO
-         DO LU_IND11 = 0, 3, 2
-            C(2+LU_IND2,1+LU_IND11) = 0
-            DO LU_IND021 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(vec80, B(1+LU_IND021,1+LU_IND11))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec70, A(2+LU_IND2,1+
-     &         LU_IND021), A(2+LU_IND2,2+LU_IND021))
+         DO J0 = 1, 4, 2
+            C(1+I0,J0) = 0
+            DO K10 = 1, 4, 2
+               CALL SIMD_LOAD_V2SI(vec80, B(K10,J0))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec70, A(1+I0,K10), A(1+I0
+     &         ,1+K10))
                CALL SIMD_MULD(vec60, vec70, vec80)
                CALL SIMD_STORE_V2SI(vec60, pdata2(0))
-               C(2+LU_IND2,1+LU_IND11) = pdata2(0)+C(2+LU_IND2,1+
-     &         LU_IND11)
-               C(2+LU_IND2,1+LU_IND11) = pdata2(1)+C(2+LU_IND2,1+
-     &         LU_IND11)
+               C(1+I0,J0) = pdata2(0)+C(1+I0,J0)
+               C(1+I0,J0) = pdata2(1)+C(1+I0,J0)
             ENDDO
-            C(2+LU_IND2,2+LU_IND11) = 0
-            DO LU_IND011 = 0, 3, 2
-               CALL SIMD_LOAD_V2SI(vec110, B(1+LU_IND011,2+LU_IND11))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec100, A(2+LU_IND2,1+
-     &         LU_IND011), A(2+LU_IND2,2+LU_IND011))
+            C(1+I0,1+J0) = 0
+            DO K00 = 1, 4, 2
+               CALL SIMD_LOAD_V2SI(vec110, B(K00,1+J0))
+               CALL SIMD_LOAD_GENERIC_V2SI(vec100, A(1+I0,K00), A(1+
+     &         I0,1+K00))
                CALL SIMD_MULD(vec90, vec100, vec110)
                CALL SIMD_STORE_V2SI(vec90, pdata3(0))
-               C(2+LU_IND2,2+LU_IND11) = pdata3(0)+C(2+LU_IND2,2+
-     &         LU_IND11)
-               C(2+LU_IND2,2+LU_IND11) = pdata3(1)+C(2+LU_IND2,2+
-     &         LU_IND11)
+               C(1+I0,1+J0) = pdata3(0)+C(1+I0,1+J0)
+               C(1+I0,1+J0) = pdata3(1)+C(1+I0,1+J0)
             ENDDO
          ENDDO
-99994    CONTINUE
+      ENDDO
       END
