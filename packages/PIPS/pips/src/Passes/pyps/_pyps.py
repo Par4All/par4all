@@ -1,5 +1,6 @@
 # coding=iso-8859-15
 import pypips
+import pypsutils
 import utils
 import os
 import sys
@@ -379,26 +380,32 @@ class workspace(object):
 		"""set properties and return a dictionnary containing the old state"""
 		return self.set_properties(props)
 
-	def save(self,indir="",with_prefix=""):
-		"""save workspace back into source either in directory indir or with the prefix with_prefix"""
+	def save(self, rep=None):
+		"""save workspace back into source form in directory rep if given.
+		By default, keep it into the .database/Src PIPS default"""
 		self.cpypips.apply("UNSPLIT","%ALL")
+		if rep:
+			if not os.path.exists(rep):
+				os.makedirs(rep)
+			if not os.path.isdir(rep):
+				raise ValueError("'{0}' is not a directory".format(rep))
+
 		saved=[]
-		if indir:
-			if not os.path.exists(indir):
-				os.makedirs(indir)
-			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory")
-			for s in os.listdir(self.directory()+"Src"):
-				cp=os.path.join(indir,s)
-				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
-				saved+=[cp]
-		else:
-			for s in os.listdir(self.directory()+"Src"):
-				cp=with_prefix+s
-				shutil.copy(os.path.join(self.directory(),"Src",s),cp)
-				saved+=[cp]
-		if self.recoverInclude:
-			for f in saved:
-				utils.unincludes(f)
+		for s in os.listdir(self.directory()+"Src"):
+			f = os.path.join(self.directory(),"Src",s)
+			if self.recoverInclude:
+				# Recover includes on all the files.
+				# Guess that nothing is done on Fortran files... :-/
+				pypsutils.unincludes(f)
+			if rep:
+				# Save to the given directory if any:
+				cp=os.path.join(rep,s)
+				shutil.copy(f,cp)
+				# Keep track of the file name:
+				saved.append(cp)
+			else:
+				saved.append(f)
+
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
