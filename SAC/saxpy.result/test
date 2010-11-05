@@ -518,22 +518,22 @@ void
 saxpy (float sx[1000], float sy[1000])
 {
   v4sf vec30;
-  a4sf pdata0;
   v4sf vec20;
   v4sf vec10;
   v4sf vec00;
+  float sa0;
   int lu_ind00;
   static const float size = 1000;
 
-  pdata0[0] = 3;
-  if (pdata0[0] == 0.0)
+  sa0 = 3;
+  if (sa0 == 0.0)
     {
     }
   else
     {
       ;
       ;
-      simd_load_v4sf (vec10, pdata0[0]);
+      simd_load_generic_v4sf (vec10, sa0, sa0, sa0, sa0);
       for (lu_ind00 = 0; lu_ind00 <= 999; lu_ind00 += 4)
 	{
 	  simd_load_v4sf (vec20, sx[(1 + lu_ind00) - 1]);

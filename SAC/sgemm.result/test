@@ -3397,17 +3397,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
        float a[10][10], int lda, float b[10][10], int ldb, float beta,
        float c[10][10], int ldc)
 {
-  a2sf pdata10;
+  a2sf pdata7;
   v4sf vec220;
   v4sf vec210;
   v4sf vec200;
   v4sf vec190;
   v4sf vec180;
   v4sf vec170;
-  a2sf pdata6;
-  a2sf pdata5;
+  a2sf pdata4;
+  a2sf pdata3;
   v4sf vec70;
-  a4sf pdata1;
   v4sf vec60;
   v4sf vec50;
   v4sf vec40;
@@ -3478,9 +3477,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   static const float size = 10;
   int i;
   int l;
+  float temp;
 
-  pdata5[1] = alpha;
-  pdata5[0] = alpha;
+  pdata3[1] = alpha;
+  pdata3[0] = alpha;
   pdata0[3] = beta;
   pdata0[2] = beta;
   pdata0[1] = beta;
@@ -3501,12 +3501,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   else
     {
       if (((m == 0) || (n == 0))
-	  || (((pdata5[0] == zero0) || (k == 0)) && (pdata0[0] == one0)))
+	  || (((pdata3[0] == zero0) || (k == 0)) && (pdata0[0] == one0)))
 	{
 	}
       else
 	{
-	  if (pdata5[0] == zero0)
+	  if (pdata3[0] == zero0)
 	    {
 	      if (pdata0[0] == zero0)
 		{
@@ -3625,7 +3625,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (b[j2 - 1][l - 1] != zero0)
 				{
-				  pdata1[0] = (pdata5[0] * b[j2 - 1][l - 1]);
+				  temp = (pdata3[0] * b[j2 - 1][l - 1]);
 				  lu_nub4 = m;
 				  lu_ib4 = mod (lu_nub4, 4);
 				  for (lu_ind40 = 0; lu_ind40 <= lu_ib4 - 1;
@@ -3633,15 +3633,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				    {
 				      red2[0] = 0.000000;
 				      f_0 =
-					(pdata1[0] *
-					 a[l - 1][(1 + lu_ind40) - 1]);
+					(temp * a[l - 1][(1 + lu_ind40) - 1]);
 				      red2[0] = (red2[0] + f_0);
 				      continue;
 				      c[j2 - 1][(1 + lu_ind40) - 1] =
 					(red2[0] +
 					 c[j2 - 1][(1 + lu_ind40) - 1]);
 				    }
-				  simd_load_v4sf (vec50, pdata1[0]);
+				  simd_load_generic_v4sf (vec50, temp, temp,
+							  temp, temp);
 				  for (lu_ind4 = lu_ib4;
 				       lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
 				    {
@@ -3675,10 +3675,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      l_7 = (pdata0[0] == zero0);
 			      l_98 = !l_7;
 			      c[j3 - 1][i - 1] =
-				__c - conditional__ (l_7, pdata6[0],
+				__c - conditional__ (l_7, pdata4[0],
 						     c[j3 - 1][i - 1]);
 			      f_3 = (pdata0[0] * c[j3 - 1][i - 1]);
-			      c1 = (pdata6[1] + f_3);
+			      c1 = (pdata4[1] + f_3);
 			      c[j3 - 1][i - 1] =
 				__c - conditional__ (l_98, c1,
 						     c[j3 - 1][i - 1]);
@@ -3751,7 +3751,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (b[l - 1][j4 - 1] != zero0)
 				{
-				  pdata1[0] = (pdata5[0] * b[l - 1][j4 - 1]);
+				  temp = (pdata3[0] * b[l - 1][j4 - 1]);
 				  lu_nub8 = m;
 				  lu_ib8 = mod (lu_nub8, 4);
 				  for (lu_ind80 = 0; lu_ind80 <= lu_ib8 - 1;
@@ -3759,15 +3759,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				    {
 				      red6[0] = 0.000000;
 				      f_4 =
-					(pdata1[0] *
-					 a[l - 1][(1 + lu_ind80) - 1]);
+					(temp * a[l - 1][(1 + lu_ind80) - 1]);
 				      red6[0] = (red6[0] + f_4);
 				      continue;
 				      c[j4 - 1][(1 + lu_ind80) - 1] =
 					(red6[0] +
 					 c[j4 - 1][(1 + lu_ind80) - 1]);
 				    }
-				  simd_load_v4sf (vec200, pdata1[0]);
+				  simd_load_generic_v4sf (vec200, temp, temp,
+							  temp, temp);
 				  for (lu_ind8 = lu_ib8;
 				       lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
 				    {
@@ -3801,10 +3801,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      l_8 = (pdata0[0] == zero0);
 			      l_99 = !l_8;
 			      c[j5 - 1][i - 1] =
-				__c - conditional__ (l_8, pdata10[0],
+				__c - conditional__ (l_8, pdata7[0],
 						     c[j5 - 1][i - 1]);
 			      f_7 = (pdata0[0] * c[j5 - 1][i - 1]);
-			      c3 = (pdata10[1] + f_7);
+			      c3 = (pdata7[1] + f_7);
 			      c[j5 - 1][i - 1] =
 				__c - conditional__ (l_99, c3,
 						     c[j5 - 1][i - 1]);

@@ -4,8 +4,8 @@ int main(int argc, char *argv[])
 {
     struct _ { int *a ; int c[4]; } __;
     int b = atoi(argv[1]);
+    __.a = malloc(sizeof(int)*4);
     do {
-        __.a = malloc(sizeof(int)*4);
         __.a[0]=b*2;
         __.a[1]=b*3;
         __.a[2]=b*4;
