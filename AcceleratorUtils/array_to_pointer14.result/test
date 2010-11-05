@@ -47,7 +47,7 @@ void p4a_kernel_wrapper_0(int m, int n, int i, int j, double a[n][m])
    // Index has been replaced by P4A_vp_1:
    j = P4A_vp_1;
    // Loop nest P4A end
-   p4a_kernel_0(m, n, i, j, (double (*)[n*m]) a);
+   p4a_kernel_0(m, n, i, j, a);
 }
 
 Unsplit resulting code

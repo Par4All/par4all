@@ -52,16 +52,15 @@ int psubi(int *lhs, int rhs)
 {
    return lhs = lhs-rhs;
 }
-void P4A_accel_free(void **ptr)
+void P4A_accel_free(void *ptr)
 {
-   free(*ptr);
-   *ptr = (void *) 0;
+   free(ptr);
 }
 float subf(float lhs, float rhs)
 {
    return lhs = lhs-rhs;
 }
-void * P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
 {
    size_t i, j;
    char *cdest = (char *) accel_address;
@@ -70,7 +69,6 @@ void * P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size,
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
 
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
-   return accel_address;
 }
 int subi(int lhs, int rhs)
 {
@@ -100,14 +98,13 @@ float setpf(float lhs, float *rhs)
 {
    return lhs = *rhs;
 }
-void * P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
+void P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
 {
    size_t i;
    char *cdest = host_address;
    char *csrc = accel_address;
    for(i = 0; i <= element_size-1; i += 1)
       cdest[i] = csrc[i];
-   return host_address;
 }
 int main()
 {
@@ -124,14 +121,13 @@ int setpi(int lhs, int *rhs)
 {
    return lhs = *rhs;
 }
-void * P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
+void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
 {
    size_t i;
    char *cdest = accel_address;
    char *csrc = host_address;
    for(i = 0; i <= element_size-1; i += 1)
       cdest[i] = csrc[i];
-   return accel_address;
 }
 int addi(int lhs, int rhs)
 {
@@ -153,7 +149,7 @@ float divf(float lhs, float rhs)
 {
    return lhs = lhs/rhs;
 }
-void * P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
 {
    size_t i, j;
    char *cdest = d2_offset*element_size+(char *) host_address;
@@ -161,7 +157,6 @@ void * P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_siz
    for(i = 0; i <= d1_block_size-1; i += 1)
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
          cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
-   return host_address;
 }
 float mulf(float lhs, float rhs)
 {
@@ -171,14 +166,13 @@ int addri(int lhs, int *rhs)
 {
    return lhs = lhs+*rhs;
 }
-void * P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
 {
    size_t i;
    char *cdest = accel_address;
    char *csrc = d1_offset*element_size+(char *) host_address;
    for(i = 0; i <= d1_block_size*element_size-1; i += 1)
       cdest[i] = csrc[i];
-   return accel_address;
 }
 float lshiftf(float lhs, float rhs)
 {
@@ -220,14 +214,13 @@ int seti(int lhs, int rhs)
 {
    return lhs = rhs;
 }
-void * P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
 {
    size_t i;
    char *cdest = d1_offset*element_size+(char *) host_address;
    char *csrc = accel_address;
    for(i = 0; i <= d1_block_size*element_size-1; i += 1)
       cdest[i] = csrc[i];
-   return host_address;
 }
 float mulrf(float lhs, float *rhs)
 {
@@ -312,10 +305,10 @@ l99997:
                for(j = 8*j_t; j <= 8*j_t+7; j += 1)
                   (*result0)[i-128*i_t][j-8*j_t] = ((*caillou0)[2-0]*(*src00)[i-128*i_t][j-8*j_t]+(*caillou0)[3-0]*(*src10)[i-128*i_t][j-8*j_t])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &result[0][0], *result0);
-            P4A_accel_free(&result0);
-            P4A_accel_free(&caillou0);
-            P4A_accel_free(&src10);
-            P4A_accel_free(&src00);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -358,10 +351,10 @@ l99997:
                for(j = 1; j <= 8; j += 1)
                   (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &result[0][0], *result0);
-            P4A_accel_free(&result0);
-            P4A_accel_free(&caillou0);
-            P4A_accel_free(&src10);
-            P4A_accel_free(&src00);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -404,10 +397,10 @@ l99997:
                for(j = 1; j <= 8; j += 1)
                   (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
-            P4A_accel_free(&result0);
-            P4A_accel_free(&caillou0);
-            P4A_accel_free(&src10);
-            P4A_accel_free(&src00);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -589,30 +582,26 @@ l99997:
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <result0-R-EXACT-{}>
-//  <result0-W-EXACT-{}>
 
-            P4A_accel_free(&result0);
+            P4A_accel_free(result0);
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <caillou0-R-EXACT-{}>
-//  <caillou0-W-EXACT-{}>
 
-            P4A_accel_free(&caillou0);
+            P4A_accel_free(caillou0);
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <src10-R-EXACT-{}>
-//  <src10-W-EXACT-{}>
 
-            P4A_accel_free(&src10);
+            P4A_accel_free(src10);
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <src00-R-EXACT-{}>
-//  <src00-W-EXACT-{}>
 
-            P4A_accel_free(&src00);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -651,10 +640,10 @@ l99995:
 
 l99996:            launcher_0(8, *caillou0, i_t, j_t, *result0, *src00, *src10);
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
-            P4A_accel_free(&result0);
-            P4A_accel_free(&caillou0);
-            P4A_accel_free(&src10);
-            P4A_accel_free(&src00);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
