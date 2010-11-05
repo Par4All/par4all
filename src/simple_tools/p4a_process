@@ -8,6 +8,8 @@
 '''
 Par4All intermediate processing script.
 Do not use this script directly unless you know what you are doing.
+
+This file should disappear and be included into p4a_process.py
 '''
 
 import string, sys, os, re, optparse, traceback

@@ -7,7 +7,11 @@
 #
 
 '''
+@file
+
 Par4All frontend implementation
+
+
 '''
 
 import string, sys, os, re, optparse
@@ -17,6 +21,10 @@ from p4a_builder import *
 from p4a_git import *
 from p4a_version import *
 from p4a_opts import *
+
+# To store some arbitrary Python code to be executed inside p4a_process,
+# since p4a_process itself is normally executed inside another process:
+execute_some_python_code_in_process = None
 
 
 def add_module_options(parser):
@@ -63,7 +71,7 @@ def add_module_options(parser):
     proc_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
         help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py). There are many properties in PIPS that can be used to modify its behaviour. Have a look to the 'pipsmake-rc' documentation for their descriptions.")
 
-    proc_group.add_option("--here", action = "store_true", default = False,
+    proc_group.add_option("--no-spawn", action = "store_true", default = False,
         help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
 
     parser.add_option_group(proc_group)
@@ -148,6 +156,7 @@ def add_module_options(parser):
 
     parser.add_option_group(compile_group)
 
+
     link_group = optparse.OptionGroup(parser, "Back-end linking options")
 
     link_group.add_option("--ld", metavar = "LINKER", default = None,
@@ -166,6 +175,7 @@ def add_module_options(parser):
         help = "Add an additional object file for linking. Several are allowed.")
 
     parser.add_option_group(link_group)
+
 
     cmake_group = optparse.OptionGroup(parser, "CMake file generation options")
 
@@ -225,7 +235,13 @@ def pips_output_filter(s):
 
 
 def main(options, args = []):
+    """Process the options and arguments given to p4a
 
+    @param options[in] the options given to p4a scripts
+
+    @param args[in] the arguments given to p4a scripts
+    """
+    # Delay the PyPS import to be able to give an explicative error message:
     pyps = None
     try:
         pyps = __import__("pyps")
@@ -363,7 +379,7 @@ def main(options, args = []):
         add_debug_flags = options.debug,
         add_optimization_flags = not options.no_fast,
         no_default_flags = options.no_default_flags
-    )
+      )
 
     # TODO: override cpp exe used by pyps/pips with builder.cpp
 
@@ -383,7 +399,7 @@ def main(options, args = []):
     else:
         # Craft a p4a_processor_input class instance
         # with all parameters for the processor (pyps).
-        # If --here is not specified, this instance
+        # If --no-spawn is not specified, this instance
         # will be serialized (pickle'd) to ease the
         # passing of parameters to the processor.
         input = p4a_processor_input()
@@ -397,6 +413,7 @@ def main(options, args = []):
         input.cpp_flags = " ".join(builder.cpp_flags)
         input.files = files
         input.recover_includes = not options.skip_recover_includes
+        input.execute_some_python_code_in_process = execute_some_python_code_in_process
 
         # Interpret correctly the True/False strings, and integer strings,
         # for the --property option specifications:
@@ -418,13 +435,13 @@ def main(options, args = []):
 
         # This will hold the output (p4a_processor_output instance)
         # when the processor has been called and its output has been
-        # deserialized (unpickle'd) (unless --here is specified in
+        # deserialized (unpickle'd) (unless --no-spawn is specified in
         # which case the p4a_processor_output instance will be obtained
         # directly):
         output = None
 
-        if options.here:
-            # If --here is specified, run the processor in the current process:
+        if options.no_spawn:
+            # If --no-spawn is specified, run the processor in the current process:
             # no serialization (pickling) neeed.
             output = process(input)
 
@@ -473,7 +490,7 @@ def main(options, args = []):
         # If an exception occurred in the processor script (in pyps)
         # it will have been caught and will have been serialized in the
         # processor output class (or put directly in the p4a_processor_output
-        # instance if --here was specified).
+        # instance if --no-spawn was specified).
         # Raise this exception from our very script if this is the case,
         # so that the normal error catching code is run, so that suggestions
         # are made, so that we can handle --report, etc., etc.

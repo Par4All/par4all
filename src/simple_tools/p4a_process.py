@@ -47,13 +47,13 @@ default_properties = dict(
 pyps = None
 
 
-class p4a_processor_output:
+class p4a_processor_output(object):
     files = []
     database_dir = ""
     exception = None
 
 
-class p4a_processor_input:
+class p4a_processor_input(object):
     "Store options given to the process engine, mainly digested by PyPS"
     project_name = ""
     accel = False
@@ -66,6 +66,8 @@ class p4a_processor_input:
     files = []
     recover_includes = True
     properties = {}
+    # To store some arbitrary Python code to be executed inside p4a_process:
+    execute_some_python_code_in_process = None
 
 
 def add_module_options(parser):
@@ -84,6 +86,10 @@ def add_module_options(parser):
 def process(input):
 
     output = p4a_processor_output()
+
+    # Execute some arbitrary Python code here if asked:
+    if input.execute_some_python_code_in_process:
+        exec(input.execute_some_python_code_in_process)
 
     try:
         # Create a workspace with PIPS:
@@ -105,7 +111,7 @@ def process(input):
         output.database_dir = processor.get_database_directory()
 
         # First apply some generic parallelization:
-        processor.parallelize(input.fine)
+        processor.parallelize(fine = input.fine)
 
         if input.accel:
             # Generate code for a GPU-like accelerator. Note that we can
@@ -121,12 +127,17 @@ def process(input):
         output.files = processor.save()
 
     except:
-        e = sys.exc_info()[1]
-        if e.__class__.__name__ == "RuntimeError" and str(e).find("pips") != -1:
+        # Get the exception description:
+        e = sys.exc_info()
+        exception = e[1]
+        if exception.__class__.__name__ == "RuntimeError" and str(exception).find("pips") != -1:
             output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
         else:
-            #~ error("Processing of " + ", ".join(input.files) + " failed")
-            output.exception = e
+            # Since the traceback object cannot be serialized, display
+            # here the exec_info for more information on stderr:
+            sys.excepthook(*e)
+            # And only push the exception further for information:
+            output.exception = exception
 
     return output
 
@@ -138,7 +149,11 @@ def process_file(input_file, output_file):
 
 
 def main(options, args = []):
+    """Process the workspace with PIPS
 
+    The description of the input and the output are given as 2 pickled
+    object files with names given as parameters
+    """
     if not options.input_file:
         die("Missing --input-file")
 
@@ -151,7 +166,7 @@ def main(options, args = []):
     process_file(options.input_file, options.output_file)
 
 
-class p4a_processor:
+class p4a_processor(object):
     """Process program files with PIPS and other tools"""
 
     # If the main language is Fortran, set to True:

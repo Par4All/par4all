@@ -3,6 +3,7 @@
 #
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
+# - Ronan Keryell <Ronan Keryell@hpc-project.com>
 #
 
 
@@ -64,6 +65,14 @@ def add_common_options(parser):
 
     group.add_option("--plain", "--no-color", "--no-fancy", "-z", action = "store_true", default = False,
         help = "Disable coloring of terminal output and disable all fancy tickers and spinners and this kind of eye-candy things :-)")
+
+    # Interestingly, if I use --exec instead of --execute, later I get a
+    # syntax error on options.exec... Strange.
+    group.add_option("--execute", metavar = "PYTHON-CODE", default = None,
+            help = """Execute the given Python code in order to change
+            the behaviour of this script.
+            It is useful to extend dynamically Par4All.
+            The execution is done at the end of the common option processing""")
 
     group.add_option("--script-version", "--version", "-V", action = "store_true", default = False,
         help = "Display script version and exit.")
