@@ -140,6 +140,7 @@ static bool conflict_is_a_real_conflict_p(conflict c, statement source, statemen
         FOREACH(INT,i,cone_levels(co))
             if(i == loop_level +1 )
                 no_intra_loop_dep = false;
+#if 0 /* hack no longer needed , simple is beautiful */
         if(!no_intra_loop_dep) /* there seems to be an intra loop dep, verify this */ {
             reference sink_ref = effect_any_reference(conflict_sink(c)),
                       source_ref = effect_any_reference(conflict_source(c));
@@ -181,9 +182,11 @@ static bool conflict_is_a_real_conflict_p(conflict c, statement source, statemen
                 gen_free_list(source_effects);
             }
         }
+#endif
         return !no_intra_loop_dep;
     }
-    return true;
+    else
+        return true;
 }
 
 static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_level)
@@ -215,9 +218,11 @@ static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_
             }
             else {
                 pips_debug(3,
-                        "conflict skipped between:\n");
-                print_region(conflict_sink(c));
-                print_region(conflict_source(c));
+                        "conflict not relevant between:\n");
+                ifdebug(3) {
+                    print_region(conflict_sink(c));
+                    print_region(conflict_source(c));
+                }
             }
         }
     }

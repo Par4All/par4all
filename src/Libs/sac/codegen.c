@@ -712,7 +712,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         expression real_e = expression_field_p(e)?binary_call_rhs(expression_call(e)):e;
         if (argsType == OTHER)
         {
-            all_scalar = all_scalar && expression_scalar_p(e);
+            all_scalar = all_scalar && expression_scalar_p(e) &&
+                (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
             continue;
         }
         else if (argsType == CONSTANT)
@@ -720,7 +721,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             if (!expression_constant_p(real_e))
             {
                 argsType = OTHER;
-                all_scalar = all_scalar && expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e) &&
+                    (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
                 continue;
             }
         }
@@ -747,7 +749,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             {
                 argsType = OTHER;
                 all_same_aligned_ref = all_same_aligned_ref && same_expression_p(e,fstExp);
-                all_scalar = all_scalar && expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e) &&
+                    (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
                 continue;
             }
         }
