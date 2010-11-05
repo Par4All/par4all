@@ -223,10 +223,27 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                     ),
                                 NIL,NIL)
                             );
-                    *arg = 
-                        MakeUnaryCall(
+                    type argt = expression_to_type(*arg);
+                    if(array_type_p(argt)) {
+#if 0 /* disabled as long as effects can not take care of this */
+                        *arg = 
+                            make_expression(
+                                    make_syntax_cast(
+                                        make_cast(
+                                            t,
+                                            *arg
+                                            )
+                                        ),
+                                    normalized_undefined
+                                    );
+                        *arg=MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                make_expression(
+                                *arg);
+#endif
+                    }
+                    else {
+                        *arg = 
+                            make_expression(
                                     make_syntax_cast(
                                         make_cast(
                                             t,
@@ -237,8 +254,12 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                             )
                                         ),
                                     normalized_undefined
-                                    )
-                                );
+                                    );
+                        *arg=MakeUnaryCall(
+                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                                *arg);
+                    }
+                    free_type(argt);
                 }
                 else if(!type_equal_p(t,t2)) {
                     *arg =

@@ -706,7 +706,11 @@ static bool make_pre_transformation(const char* oname, rule ru) {
     return make_pre_post_transformation(oname,ru,rule_pre_transformation(ru));
 }
 static bool make_post_transformation(const char* oname, rule ru) {
-    return make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
+  if(!ENDP(rule_post_transformation(ru))) {
+    reset_make_cache();
+    init_make_cache();
+  }
+  return make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
 }
 
 static bool make(const char* rname, const char* oname)

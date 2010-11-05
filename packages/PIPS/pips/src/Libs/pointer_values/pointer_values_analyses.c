@@ -110,6 +110,7 @@ pv_context make_simple_pv_context()
   ctxt.pv_composition_with_transformer_func = simple_pv_composition_with_transformer;
   ctxt.pvs_must_union_func = simple_pvs_must_union;
   ctxt.pvs_may_union_func = simple_pvs_may_union;
+  ctxt.stmt_stack = stack_make(statement_domain, 0, 0);
   return ctxt;
 }
 
@@ -136,6 +137,21 @@ void reset_pv_context(pv_context *p_ctxt)
   p_ctxt->pv_composition_with_transformer_func = (cell_relation_function) UNDEF;
   p_ctxt->pvs_must_union_func = (list_function) UNDEF;
   p_ctxt->pvs_may_union_func = (list_function) UNDEF;
+}
+
+void pv_context_statement_push(statement s, pv_context * ctxt)
+{
+  stack_push((void *) s, ctxt->stmt_stack);
+}
+
+void pv_context_statement_pop(pv_context * ctxt)
+{
+  (void) stack_pop( ctxt->stmt_stack);
+}
+
+statement pv_context_statement_head(pv_context * ctxt)
+{
+  return ((statement) stack_head(ctxt->stmt_stack));
 }
 
 /************* RESULTS HOOK */
@@ -242,6 +258,7 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
       /* keep local variables in declaration reverse order */
       if (declaration_statement_p(stmt))
 	{
+	  pv_context_statement_push(stmt, ctxt);
 	  store_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
@@ -251,6 +268,7 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 	    }
 	  store_gen_pv(stmt, make_cell_relations(NIL));
 	  store_kill_pv(stmt, make_effects(NIL));
+	  pv_context_statement_pop(ctxt);
 	}
       else
 	l_cur = statement_to_post_pv(stmt, l_cur, ctxt);
@@ -269,6 +287,7 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   pips_debug(1, "begin\n");
+  pv_context_statement_push(stmt, ctxt);
   pips_debug_pvs(2, "input pvs: ", l_in);
 
   store_pv(stmt, make_cell_relations(gen_full_copy_list(l_in)));
@@ -290,6 +309,7 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
   store_kill_pv(stmt, make_effects(NIL));
   pips_debug_pvs(2, "returning: ", l_out);
   pips_debug(1, "end\n");
+  pv_context_statement_pop(ctxt);
 
   return (l_out);
 }

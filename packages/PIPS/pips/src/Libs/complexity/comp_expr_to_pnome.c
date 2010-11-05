@@ -78,7 +78,7 @@ entity e;
 
 /* Entry point routine of this file:
  *
- * complexity expression_to_polynome(expression expr,
+ * complexity expression_to_complexity_polynome(expression expr,
  *                                   transformer precond,
  *                                   list effects_list,
  *                                   boolean keep_symbols,
@@ -104,7 +104,7 @@ entity e;
  * FI:
  * - better symbol generation for unknown complexities
  */
-complexity expression_to_polynome(expr, precond, effects_list, keep_symbols, maximize)
+complexity expression_to_complexity_polynome(expr, precond, effects_list, keep_symbols, maximize)
 expression expr;
 transformer precond;
 list effects_list;
@@ -118,10 +118,10 @@ int maximize;
     trace_on("expression -> pnome");
 
     if ( expr == expression_undefined ) {
-	pips_error("expression_to_polynome", "undefined expression\n");
+	pips_error("expression_to_complexity_polynome", "undefined expression\n");
     }
     if ( sy == syntax_undefined ) {
-	pips_error("expression_to_polynome","wrong expression\n");
+	pips_error("expression_to_complexity_polynome","wrong expression\n");
     }
 
     if ( normalized_linear_p(no) ) {
@@ -133,7 +133,7 @@ int maximize;
     }
 
     if ( complexity_unknown_p(comp) ) {
-	pips_error("complexity expression_to_polynome",
+	pips_error("complexity expression_to_complexity_polynome",
 		   "Better unknown value name generation required!\n");
 	/*
 	return(make_single_var_complexity(1.0,UNKNOWN_RANGE));
@@ -413,10 +413,10 @@ list effects_list;
 boolean keep_symbols;
 int maximize;
 {
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, keep_symbols,
 					   maximize);
 
@@ -433,10 +433,10 @@ list effects_list;
 boolean keep_symbols;
 int maximize;
 {
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, keep_symbols,
 					   -maximize);
 
@@ -453,10 +453,10 @@ list effects_list;
 boolean keep_symbols;
 int maximize;
 {
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, keep_symbols,
 					   maximize);
 
@@ -468,10 +468,10 @@ int maximize;
 
 complexity field_op_handler(list args, transformer precond,
         list effects_list, bool keep_symbols, int maximize) {
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, keep_symbols,
 					   maximize);
 
@@ -488,7 +488,7 @@ list effects_list;
 boolean keep_symbols;
 int maximize;
 {
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   -maximize);
     complexity c1 = make_zero_complexity();
@@ -507,10 +507,10 @@ boolean keep_symbols;
 int maximize;
 {
     float denominateur;
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, DONT_KEEP_SYMBOLS,
 					   -maximize);
     if (complexity_constant_p(c2)) {
@@ -536,10 +536,10 @@ boolean keep_symbols;
 int maximize;
 {
     float power;
-    complexity c1 = expression_to_polynome(EXPRESSION(CAR(args)),
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
 					   precond, effects_list, keep_symbols,
 					   maximize);
-    complexity c2 = expression_to_polynome(EXPRESSION(CAR(CDR(args))),
+    complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(CDR(args))),
 					   precond, effects_list, DONT_KEEP_SYMBOLS,
 					   maximize);
 
