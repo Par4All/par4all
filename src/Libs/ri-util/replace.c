@@ -36,8 +36,16 @@ replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
 static void
 replace_entity_reference_walker(reference r,struct entity_pair* thecouple)
 {
-  if(same_entity_p(thecouple->old,reference_variable(r)))
+  if(same_entity_p(thecouple->old,reference_variable(r))) {
     reference_variable(r)=thecouple->new;
+    expression next=(expression)r,parent=NULL;
+    /* we need to unormalize the uppermost parent of this expression
+     * otherwise its normalized field gets incorrect */
+    while((next=(expression) gen_get_ancestor(expression_domain,next)))
+        parent=next;
+    if(parent)
+        unnormalize_expression(parent); /* otherwise field normalized get wrong */
+  }
 }
 
 static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
@@ -137,20 +145,14 @@ void replace_entity_by_expression_expression_walker(expression e, struct param *
                     syn = make_syntax_subscript(make_subscript(make_expression(syn,normalized_undefined),indices));
                 }
             }
-            free_syntax(expression_syntax(e));
-            expression_syntax(e) = syn;
-            unnormalize_expression(e);
+            update_expression_syntax(e,syn);
         }
     }
     else if(expression_call_p(e))
     {
         call c = expression_call(e);
         if(call_constant_p(c) && same_entity_p(p->ent,call_function(c)))
-        {
-            unnormalize_expression(e);
-            free_syntax(expression_syntax(e));
-            expression_syntax(e)=copy_syntax(expression_syntax(p->exp));
-        }
+            update_expression_syntax(e,copy_syntax(expression_syntax(p->exp)));
 
     }
 }
