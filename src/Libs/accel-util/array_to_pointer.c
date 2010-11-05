@@ -238,22 +238,22 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                     }
                     else {
                         *arg = 
-                            MakeUnaryCall(
-                                    entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                    make_expression(
-                                        make_syntax_cast(
-                                            make_cast(
-                                                t,
-                                                MakeUnaryCall(
-                                                    entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                                                    *arg
-                                                    )
+                            make_expression(
+                                    make_syntax_cast(
+                                        make_cast(
+                                            t,
+                                            MakeUnaryCall(
+                                                entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                                                *arg
                                                 )
-                                            ),
-                                        normalized_undefined
-                                        )
+                                            )
+                                        ),
+                                    normalized_undefined
                                     );
                     }
+                    *arg=MakeUnaryCall(
+                            entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                            *arg);
                     free_type(argt);
                 }
                 else if(!type_equal_p(t,t2)) {
