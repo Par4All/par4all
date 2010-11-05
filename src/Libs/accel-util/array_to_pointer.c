@@ -225,6 +225,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                             );
                     type argt = expression_to_type(*arg);
                     if(array_type_p(argt)) {
+#if 0 /* disabled as long as effects can not take care of this */
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
@@ -235,6 +236,10 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
+                        *arg=MakeUnaryCall(
+                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                                *arg);
+#endif
                     }
                     else {
                         *arg = 
@@ -250,10 +255,10 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
+                        *arg=MakeUnaryCall(
+                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                                *arg);
                     }
-                    *arg=MakeUnaryCall(
-                            entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                            *arg);
                     free_type(argt);
                 }
                 else if(!type_equal_p(t,t2)) {
