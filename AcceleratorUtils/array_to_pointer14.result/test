@@ -1,6 +1,9 @@
 
 Initial code
 
+void P4A_call_accel_kernel_2d(void (*w)(int m, int n, int i, int j, double a[n][m]), int n, int m, int m0, int n0, int i, int j, double a[n][m])
+{
+}
 void p4a_kernel_0(int m, int n, int i, int j, double a[n][m])
 {
    // Loop nest P4A end
@@ -25,7 +28,7 @@ void p4a_kernel_wrapper_0(int m, int n, int i, int j, double a[n][m])
 
 Code after array conversion
 
-int P4A_call_accel_kernel_2d(void (*f1)(int m, int n, int i, int j, double a[n][m]), int f2, int f3, int f4, int f5, int f6, int f7, double **f8)
+void P4A_call_accel_kernel_2d(void (*w)(int m, int n, int i, int j, double a[n][m]), int n, int m, int m0, int n0, int i, int j, double a[n][m])
 {
 }
 void p4a_kernel_0(int m, int n, int i, int j, double a[n*m])

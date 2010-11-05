@@ -17,6 +17,9 @@ void p4a_kernel_wrapper_0(int m, int n, int i,
     // Loop nest P4A end
     p4a_kernel_0(m, n, i, j, a);
  }
+void P4A_call_accel_kernel_2d(void (*w)(int m, int n, int i, int j, double a[n][m]),
+        int n, int m, int m0, int n0, int i, int j, double a[n][m]) {
+}
  void p4a_kernel_launcher_0(int m, int n, double a[n][m])
  {
     //PIPS generated variable

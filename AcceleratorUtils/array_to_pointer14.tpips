@@ -1,7 +1,6 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS "array_to_pointer14"
 delete $WS
-setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 create $WS $WS.c
 module p4a_kernel_wrapper_0
 
