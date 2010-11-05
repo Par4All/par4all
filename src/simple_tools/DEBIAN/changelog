@@ -1,3 +1,23 @@
+2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.0.3 is a base version to be used from Windows in a
+		  Wild Cruncher
+
+		* NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
+		  code for nVidia GPU
+
+		* Can now compile on Fedora
+
+        * New option to use simpler #include recovery
+
+		* Can move produced files to a given directory
+
+        * Improved documentation
+
+        * New options for Python code injection
+
+        * Better error messages
+
 2010-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.2
