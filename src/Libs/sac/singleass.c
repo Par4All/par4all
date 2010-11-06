@@ -129,9 +129,9 @@ static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set
                 }
                 /* yes and a conbflict -> fix it by adding an assign */
                 else { 
-                    insert_statement(vertex_to_statement(v2),
+                    insert_statement(vertex_to_statement(v),
                             make_assign_statement(entity_to_expression(renamed),entity_to_expression(new)),
-                            true);
+                            false);
                     continue;
                 }
             }
@@ -143,6 +143,7 @@ static void do_scalar_renaming_in_vertex(vertex v, entity e, set live_writes, ha
 
     /* create new assigned value */
     entity new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+    entity_initial(new)=copy_value(entity_initial(e));
     AddEntityToCurrentModule(new);
     replace_entity(vertex_to_statement(v),e,new);
     /* propagate it to each reading successor */
