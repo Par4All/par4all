@@ -9,7 +9,6 @@ int main(int argc, char **argv)
       a = 3;
       printf("%d", a);
    }
-   printf("%d", a);
    return 0;
 }
 int main(int argc, char **argv)
@@ -22,10 +21,8 @@ int main(int argc, char **argv)
    }
    else {
       a1 = 3;
-      a0 = a1;
       printf("%d", a1);
    }
-   printf("%d", a0);
    return 0;
 }
 
