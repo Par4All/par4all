@@ -100,7 +100,7 @@ static set graph_to_live_writes(graph g, entity e) {
     return live_writes;
 }
 
-static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set live_writes, hash_table visited)
+static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set live_writes, hash_table visited, hash_table renamings)
 {
     FOREACH(SUCCESSOR,s,vertex_successors(v)) {
         if(successor_conflicts_on_entity_p(s,e)) {
@@ -121,7 +121,7 @@ static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set
                 if(renamed == HASH_UNDEFINED_VALUE) {
                     hash_put(visited,v2,new);
                     replace_entity(vertex_to_statement(v2),e,new);
-                    do_scalar_renaming_in_successors(v2,e,new,live_writes,visited);
+                    do_scalar_renaming_in_successors(v2,e,new,live_writes,visited,renamings);
                 }
                 /* yes, but no conflict */
                 else if (same_entity_p(renamed,new) ) {
@@ -129,9 +129,16 @@ static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set
                 }
                 /* yes and a conbflict -> fix it by adding an assign */
                 else { 
-                    insert_statement(vertex_to_statement(v),
-                            make_assign_statement(entity_to_expression(renamed),entity_to_expression(new)),
-                            false);
+                    set renaming = (set) hash_get(renamings,v);
+                    if(renaming == HASH_UNDEFINED_VALUE || !set_belong_p(renaming,new)) {
+                        insert_statement(vertex_to_statement(v),
+                                make_assign_statement(entity_to_expression(renamed),entity_to_expression(new)),
+                                false);
+                        if(renaming == HASH_UNDEFINED_VALUE)
+                            renaming=set_make(set_pointer);
+                        set_add_element(renaming,renaming,new);
+                        hash_put_or_update(renamings,v,renaming);
+                    }
                     continue;
                 }
             }
@@ -139,7 +146,7 @@ static void do_scalar_renaming_in_successors(vertex v, entity e, entity new, set
     }
 }
 
-static void do_scalar_renaming_in_vertex(vertex v, entity e, set live_writes, hash_table visited) {
+static void do_scalar_renaming_in_vertex(vertex v, entity e, set live_writes, hash_table visited, hash_table renamings) {
 
     /* create new assigned value */
     entity new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
@@ -147,21 +154,24 @@ static void do_scalar_renaming_in_vertex(vertex v, entity e, set live_writes, ha
     AddEntityToCurrentModule(new);
     replace_entity(vertex_to_statement(v),e,new);
     /* propagate it to each reading successor */
-    do_scalar_renaming_in_successors(v,e,new,live_writes,visited);
+    do_scalar_renaming_in_successors(v,e,new,live_writes,visited,renamings);
 }
 
 
 static void do_scalar_renaming_in_graph(graph g, entity e) {
     set live_writes = graph_to_live_writes(g, e);
     hash_table visited = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    hash_table renamings = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     list l = set_to_sorted_list(live_writes,compare_vertex);
     FOREACH(VERTEX,v,l) {
         statement s = vertex_to_statement(v);
         if(!declaration_statement_p(s) ||
                     gen_chunk_undefined_p(gen_find_eq(e,statement_declarations(s)))) 
-            do_scalar_renaming_in_vertex(v,e,live_writes,visited);
+            do_scalar_renaming_in_vertex(v,e,live_writes,visited,renamings);
     }
     hash_table_free(visited);
+    HASH_FOREACH(entity,k,set,v,renamings) set_free(v);
+    hash_table_free(renamings);
     gen_free_list(l);
     set_free(live_writes);
 }
