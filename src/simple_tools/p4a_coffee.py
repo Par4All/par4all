@@ -31,6 +31,10 @@ def add_module_options(parser):
     group.add_option("--here", action = "store_true", default = False,
         help = "Do not clone the repository, assume we are building from the Git tree where the script " + sys.argv[0] + " lies.")
 
+    group.add_option("--git-revision", metavar = "VERSION",
+                     action = "store", default = None,
+                     help = "By default Par4All is built from the 'p4a' branch when cloning or the current one if the option --here is used. With this option you can precise something else, such as 'p4a-1.0.3' or 'p4a@{yesterday}'")
+
     parser.add_option_group(group)
 
     p4a_setup.add_module_options(parser)
@@ -56,6 +60,10 @@ def main(options, args = []):
             p4a_setup.main(setup_options)
 
             pack_options = options
+
+            if options.git_revision:
+                run([ "git", "checkout", options.git_revision ])
+
             #~ options.pack_dir = work_dir_p4a_version
             #~ warn("Forcing --pack-dir=" + options.pack_dir)
             p4a_pack.main(pack_options)
@@ -75,7 +83,11 @@ def main(options, args = []):
             #~ else:
             run([ "git", "clone", "git://git.hpc-project.com/par4all", "p4a" ])
             os.chdir(work_dir_p4a)
-            run([ "git", "checkout", "-b", "p4a", "remotes/origin/p4a" ])
+
+            if not options.git_revision:
+                # The revision by default:
+                options.git_revision = 'p4a'
+            run([ "git", "checkout", options.git_revision ])
 
             suffix = utc_datetime()
             revision = p4a_git(work_dir_p4a).current_revision()
@@ -95,7 +107,7 @@ def main(options, args = []):
             # which come with the git repos which was just cloned:
             os.environ["PYTHONPATH"] = os.path.join(work_dir_p4a_version, "src/simple_tools")
 
-            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee") 
+            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee")
                 + " --here " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
