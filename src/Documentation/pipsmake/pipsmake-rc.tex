@@ -7355,7 +7355,9 @@ Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
 \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
-transformation.
+transformation. When the number of iterations cannot be proven to be a
+multiple of the unrolling factor, the extra iterations can be executed
+first or last (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}). 
 
 Labels in the body are deleted. To unroll nested loops, start with the
 innermost loop.
@@ -7389,7 +7391,7 @@ iterations. This extra loop can be executed with the first iterations
 use the epilogue when possible. The current implementation of the
 unrolling with prologue is general, while the implementation of the
 unrolling with epilogue is restricted to loops with a statically knonw
-increment of one.
+increment of one. The epilogue option may reduce misalignments.
 \begin{PipsProp}{LOOP_UNROLL_WITH_PROLOGUE}
 LOOP_UNROLL_WITH_PROLOGUE TRUE
 \end{PipsProp}
@@ -7884,7 +7886,10 @@ partial_redundancy_elimination             > MODULE.code
 Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
 such as empty loop nests or zero-trip loops, for example after
 strip-mining or partial evaluation. Preconditions are used to find always
-true conditions in tests and to eliminate such tests. One-trip loops are
+true conditions in tests and to eliminate such tests. In some cases,
+tests cannot be eliminated, but test conditions can be simplified.
+%%
+One-trip loops are
 replaced by an index initialization and the loop body. Zero-trip loops are
 replaced by an index initialization. Effects in bound computations are
 preserved.
