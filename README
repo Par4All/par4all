@@ -5,19 +5,31 @@ xxxx: non-regression test for functionality xxx,
 xxxx-Bugs: known bugs (corrective maintenance)
 xxxx-Future: new functionalities (evolutive maintenance)
 xxxx-New: non-regression test for functionality xxx,
-    using the current defauolt settings for properties and activates
+    using the current default settings for properties and activates
 
 
 Default validation, i.e. non-regression tests
   (the list of directories in "defaults")
 
-	sh> make new-validate
+	sh> make validate
+or
+        sh> make validate-out
 
-or just for one directory:
+The same by replacing "test" files instead of generating
+adjoining "out" files:
 
-	sh> make TARGET=Semantics new-validate
+	sh> make validate-test
 
-or just for one file:
+For one directory:
+
+	sh> make TARGET=Semantics validate
+
+or
+
+	sh> cd Semantics
+	sh> make validate-out
+
+Just for one file:
 
 	sh> cd Semantics
 	sh> rm loopequiv.result/test
@@ -27,7 +39,7 @@ or just for one file:
 To change the pips/tpips used for the validation, fix the PATH,
 and possibly LD_LIBRARY_PATH if you use dynamic linking:
 
-	sh> PATH=/path/to/pips/binaries:$PATH make new-validate
+	sh> PATH=/path/to/pips/binaries:$PATH make validate
 
 
 Acceptation of differences, possibly for some directories or files, and commit:
