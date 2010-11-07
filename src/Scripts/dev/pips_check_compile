@@ -249,6 +249,7 @@ cd $prod || \
 # manual locking based on mkdir
 if [ "$wait" ]
 then
+  # we DO want to wait for the lock for some time
   while ! mkdir LOCK > /dev/null 2>&1 ; do
     [ $wait -eq 0 ] && break
     let wait--
@@ -257,20 +258,21 @@ then
   # did we get the lock?
   test -d LOCK ||
   {
+    # we report unconditionnaly, as --wait should be rare
     report 'locked' 'unknown' "waiting for copy '$prod', but still locked..."
     exit 2
   }
 else
   mkdir LOCK > /dev/null 2>&1 ||
   {
-    # warn after 1800 seconds (30mn) locking
+    # warn after 3600 seconds (1h) locking
     created=$(stat -c %Y LOCK)
     now=$(date +%s)
     delay=$(($now - $created))
-    if [ $delay -gt 1800 ]
+    if [ $delay -gt 3600 ]
     then
-      report 'locked' 'unknown' "working copy '$prod' is already locked..."
       touch LOCK
+      report 'locked' 'unknown' "working copy '$prod' is already locked..."
     else
       report 'skip-lock' 'unknown' "working copy '$prod' is locked"
     fi
