@@ -35,12 +35,11 @@ default_deb_publish_dir             = "/srv/www-par4all/download/apt/$DISTRO/dis
 default_deb_development_publish_dir = "/srv/www-par4all/download/apt/$DISTRO/dists/development/main"
 
 # Some useful variables:
-actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
-script_dir = os.path.split(actual_script)[0]
+actual_script = os.path.abspath(sys.argv[0])
+script_dir = os.path.dirname(actual_script)
 
 # Where are the .deb settings files? (i.e. the control, postinst, etc. files).
 debian_dir = os.path.join(script_dir, "DEBIAN")
-
 # Put temp directories in this array to make sure no temp dir remains after script exits.
 temp_dirs = []
 
@@ -198,8 +197,8 @@ def create_stgz(pack_dir, install_prefix, version, gitrev, keep_temp = False):
         os.remove(package_file)
     git = p4a_git(script_dir)
     current_branch = git.current_branch()
-    if current_branch != "p4a":
-        die("Not on branch p4a (" + current_branch + "), cannot create a source package")
+    #if current_branch != "p4a":
+    #    die("Not on branch p4a (" + current_branch + "), cannot create a source package")
     prefix = package_name + "-" + versiond + "_src"
     git.archive(package_file_tar, prefix = prefix + "/")
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
@@ -251,7 +250,7 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         publish_dir = default_publish_dir
         deb_publish_dir = default_deb_publish_dir
 
-    # Subsistute placeholders such as $DISTRO, $DATE etc.
+    # Substitute placeholders such as $DISTRO, $DATE etc.
     publish_dir = string.Template(publish_dir).substitute(
         DISTRO = distro, ARCH = arch, DATE = utc_date())
     deb_publish_dir = string.Template(deb_publish_dir).substitute(
@@ -272,7 +271,6 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
 
 
 def main(options, args = []):
-
     # Determine architecture for binary packages (and special arch name for debs).
     deb_arch = arch = options.arch
     if not arch:

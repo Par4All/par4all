@@ -43,6 +43,9 @@ def add_module_options(parser):
 
 def main(options, args = []):
 
+    # To be able to execute the very same version of this command later:
+    exec_path_name = os.path.abspath(sys.argv[0])
+
     #~ work_dir = ""
     #~ if options.work_dir:
         #~ work_dir = os.path.abspath(os.path.expanduser(options.work_dir))
@@ -66,6 +69,10 @@ def main(options, args = []):
 
             #~ options.pack_dir = work_dir_p4a_version
             #~ warn("Forcing --pack-dir=" + options.pack_dir)
+
+            # Unset P4A_ROOT environment variable if set, to avoid using
+            # the packages from somewhere else:
+            os.environ.pop("P4A_ROOT", None)
             p4a_pack.main(pack_options)
 
         else:
@@ -103,12 +110,12 @@ def main(options, args = []):
 
             os.chdir(prev_cwd)
 
-            # Make sure child coffee maker will be using the python modules
-            # which come with the git repos which was just cloned:
-            os.environ["PYTHONPATH"] = os.path.join(work_dir_p4a_version, "src/simple_tools")
-
-            ret = os.system(os.path.join(work_dir_p4a_version, "src/simple_tools/p4a_coffee")
-                + " --here " + " ".join(sys.argv[1:]))
+            ## Make sure child coffee maker will be using the python modules
+            ## which come with the git repos which was just cloned:
+            #os.environ["PYTHONPATH"] = os.path.join(work_dir_p4a_version, "src/simple_tools")
+            # To be able to build old version, use current p4_coffee instead.
+            os.environ["PYTHONPATH"] = os.path.join(os.path.dirname(exec_path_name))
+            ret = os.system(exec_path_name + " --here " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
 
