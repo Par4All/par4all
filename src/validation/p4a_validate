@@ -105,6 +105,8 @@ class ValidationElement:
     TIMEOUT = 'timeout'
 
     # Special cases:
+    BUG = 'bug'
+    LATER = 'later'
     MISSING = 'missing'
     MULTI_SCRIPT = 'multi-script'
     MULTI_SOURCE = 'multi-source'
@@ -112,7 +114,7 @@ class ValidationElement:
     SKIPPED = 'skipped'
 
     # For the help message:
-    METAVAR = 'changed|failed|passed|timeout|missing|multi-script|multi-source|orphan|skipped'
+    METAVAR = 'bug|changed|failed|later|missing|multi-script|multi-source|orphan|passed|skipped|timeout'
 
     # To deal with diff validation output:
     OLD_DIFF = "OLD"
@@ -143,15 +145,17 @@ class ValidationElement:
     def verify_status(status):
         "Verify it is a valid status"
 
-        if status == ValidationElement.CHANGED \
-           or status == ValidationElement.FAILED \
-           or status == ValidationElement.PASSED \
-           or status == ValidationElement.TIMEOUT \
-           or status == ValidationElement.MISSING \
-           or status == ValidationElement.MULTI_SCRIPT \
-           or status == ValidationElement.MULTI_SOURCE \
-           or status == ValidationElement.ORPHAN \
-           or status == ValidationElement.SKIPPED:
+        if status == ValidationElement.BUG \
+            or status == ValidationElement.CHANGED \
+            or status == ValidationElement.FAILED \
+            or status == ValidationElement.LATER \
+            or status == ValidationElement.MISSING \
+            or status == ValidationElement.MULTI_SCRIPT \
+            or status == ValidationElement.MULTI_SOURCE \
+            or status == ValidationElement.ORPHAN \
+            or status == ValidationElement.PASSED \
+            or status == ValidationElement.SKIPPED \
+            or status == ValidationElement.TIMEOUT :
             pass
         else:
             print('Status', status, 'not allowed.', file = sys.stderr)
@@ -270,7 +274,7 @@ class ValidationClass:
                 # Blank line
                 continue
             if first_line:
-                if len(args) > 2:
+                if len(args) > 2 or (args[0] == "parallel" and args[1] == "validation"):
                     # It is a validation output, in file or mail format:
                     validation_output = True
                 first_line = False
@@ -283,7 +287,7 @@ class ValidationClass:
                     self.output_directory = args[2]
                 elif args[0] == 'running':
                     self.running_directory = args[2]
-                elif args[0] == 'SUCCESS':
+                elif args[0] == 'SUCCESS' or args[0] == 'FAILED':
                     # Since it is the last header line, switch back to
                     # normal mode:
                     validation_output = False
