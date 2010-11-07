@@ -176,28 +176,26 @@ l99999:
             int (*caillou0)[5] = (int (*)[5]) 0;
             //PIPS generated variable
             short (*result0)[MIN(n+126, it+128)-it+1][MIN(n+6, jt+8)-jt+1] = (short (*)[MIN(n+126, it+128)-it+1][MIN(n+6, jt+8)-jt+1]) 0;
-            if (MIN(n+126, it+128)-it>0&&MIN(n+6, jt+8)-jt>0&&MIN(n+126, it+128)-it>0&&MIN(n+6, jt+8)-jt>0&&MIN(n+126, it+128)-it>0&&MIN(n+6, jt+8)-jt>0) {
-               P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
-               P4A_accel_malloc((void **) &caillou0, sizeof(int)*5);
-               P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
-               P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
-               P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &src1[0][0], *src10);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &src0[0][0], *src00);
+            P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
+            P4A_accel_malloc((void **) &caillou0, sizeof(int)*5);
+            P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
+            P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, it+128)-it+1)*(MIN(n+6, jt+8)-jt+1));
+            P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &src0[0][0], *src00);
 
 #pragma omp parallel for 
 l99995:
-               for(i = it; i <= MIN(it+128, 128*((127+n)/128)-1); i += 1)
+            for(i = it; i <= MIN(it+128, 128*((127+n)/128)-1); i += 1)
 #pragma omp parallel for 
 l99996:
-                  for(j = jt; j <= MIN(jt+8, 8*((7+n)/8)-1); j += 1)
-                     (*result0)[i-it][j-jt] = ((*caillou0)[3-0]*(*src00)[i-it][j-jt]+(*caillou0)[4-0]*(*src10)[i-it][j-jt])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
-               P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &result[0][0], *result0);
-               P4A_accel_free(result0);
-               P4A_accel_free(caillou0);
-               P4A_accel_free(src10);
-               P4A_accel_free(src00);
-            }
+               for(j = jt; j <= MIN(jt+8, 8*((7+n)/8)-1); j += 1)
+                  (*result0)[i-it][j-jt] = ((*caillou0)[3-0]*(*src00)[i-it][j-jt]+(*caillou0)[4-0]*(*src10)[i-it][j-jt])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
+            P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, it+128)-it+1, MIN(n+6, jt+8)-jt+1, it, jt, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -230,28 +228,26 @@ l99999:
             int (*caillou0)[5] = (int (*)[5]) 0;
             //PIPS generated variable
             short (*result0)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1] = (short (*)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1]) 0;
-            if (MIN(n+126, -128+128*it+128)-(-128+128*it)>0&&MIN(n+6, -8+8*jt+8)-(-8+8*jt)>0&&MIN(n+126, -128+128*it+128)-(-128+128*it)>0&&MIN(n+6, -8+8*jt+8)-(-8+8*jt)>0&&MIN(n+126, -128+128*it+128)-(-128+128*it)>0&&MIN(n+6, -8+8*jt+8)-(-8+8*jt)>0) {
-               P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
-               P4A_accel_malloc((void **) &caillou0, sizeof(int)*5);
-               P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
-               P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
-               P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &src1[0][0], *src10);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &src0[0][0], *src00);
+            P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
+            P4A_accel_malloc((void **) &caillou0, sizeof(int)*5);
+            P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
+            P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, -128+128*it+128)-(-128+128*it)+1)*(MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1));
+            P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &src0[0][0], *src00);
 
 #pragma omp parallel for 
 l99995:
-               for(i = 1; i <= MIN(-128+128*it+128, 128*((127+n)/128)-1)-(-128+128*it)+1; i += 1)
+            for(i = 1; i <= MIN(-128+128*it+128, 128*((127+n)/128)-1)-(-128+128*it)+1; i += 1)
 #pragma omp parallel for 
 l99996:
-                  for(j = 1; j <= MIN(-8+8*jt+8, 8*((7+n)/8)-1)-(-8+8*jt)+1; j += 1)
-                     (*result0)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)] = ((*caillou0)[3-0]*(*src00)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)]+(*caillou0)[4-0]*(*src10)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
-               P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &result[0][0], *result0);
-               P4A_accel_free(result0);
-               P4A_accel_free(caillou0);
-               P4A_accel_free(src10);
-               P4A_accel_free(src00);
-            }
+               for(j = 1; j <= MIN(-8+8*jt+8, 8*((7+n)/8)-1)-(-8+8*jt)+1; j += 1)
+                  (*result0)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)] = ((*caillou0)[3-0]*(*src00)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)]+(*caillou0)[4-0]*(*src10)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
+            P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, -128+128*it+128)-(-128+128*it)+1, MIN(n+6, -8+8*jt+8)-(-8+8*jt)+1, -128+128*it, -8+8*jt, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -284,28 +280,26 @@ l99999:
             int (*caillou0)[5] = (int (*)[5]) 0;
             //PIPS generated variable
             short (*result0)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1] = (short (*)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1]) 0;
-            if (MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0&&MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0&&MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0) {
-               P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_accel_malloc((void **) &caillou0, 5*sizeof(int));
-               P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src1[0][0], *src10);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src0[0][0], *src00);
+            P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_accel_malloc((void **) &caillou0, 5*sizeof(int));
+            P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src0[0][0], *src00);
 
 #pragma omp parallel for 
 l99995:
-               for(i = 1; i <= MIN(128*it, 128*((n+127)/128)-1)-128*it+129; i += 1)
+            for(i = 1; i <= MIN(128*it, 128*((n+127)/128)-1)-128*it+129; i += 1)
 #pragma omp parallel for 
 l99996:
-                  for(j = 1; j <= MIN(8*jt, 8*((n+7)/8)-1)-8*jt+9; j += 1)
-                     (*result0)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)] = ((*caillou0)[3-0]*(*src00)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)]+(*caillou0)[4-0]*(*src10)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
-               P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &result[0][0], *result0);
-               P4A_accel_free(result0);
-               P4A_accel_free(caillou0);
-               P4A_accel_free(src10);
-               P4A_accel_free(src00);
-            }
+               for(j = 1; j <= MIN(8*jt, 8*((n+7)/8)-1)-8*jt+9; j += 1)
+                  (*result0)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)] = ((*caillou0)[3-0]*(*src00)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)]+(*caillou0)[4-0]*(*src10)[-1+i+-128+128*it-(-128+128*it)][-1+j+-8+8*jt-(-8+8*jt)])*((*caillou0)[0-0]/(*caillou0)[1-0]<<(*caillou0)[2-0])>>(*caillou0)[2-0];
+            P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
@@ -339,37 +333,32 @@ l99999:
             int (*caillou0)[5] = (int (*)[5]) 0;
             //PIPS generated variable
             short (*result0)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1] = (short (*)[MIN(n+126, -128+128*(-128+128*it)+128)-(-128+128*(-128+128*it))+1][MIN(n+6, -8+8*(-8+8*jt)+8)-(-8+8*(-8+8*jt))+1]) 0;
-            if (MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0&&MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0&&MIN(n+126, 128*it)-128*it+128>0&&MIN(n+6, 8*jt)-8*jt+8>0) {
-               P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_accel_malloc((void **) &caillou0, 5*sizeof(int));
-               P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
-               P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src1[0][0], *src10);
-               P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src0[0][0], *src00);
+            P4A_accel_malloc((void **) &result0, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_accel_malloc((void **) &caillou0, 5*sizeof(int));
+            P4A_accel_malloc((void **) &src10, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_accel_malloc((void **) &src00, sizeof(short)*(MIN(n+126, 128*it)-128*it+129)*(MIN(n+6, 8*jt)-8*jt+9));
+            P4A_copy_to_accel_1d(sizeof(int), 8, 5, 0, &caillou[0], *caillou0);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &src0[0][0], *src00);
 
-l99995:               launcher_0(it, jt, n, MIN(8*jt, 8*((n+7)/8)-1)-8*jt+9, *caillou0, *result0, *src00, *src10);
-               P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &result[0][0], *result0);
-               P4A_accel_free(result0);
-               P4A_accel_free(caillou0);
-               P4A_accel_free(src10);
-               P4A_accel_free(src00);
-            }
+l99995:            launcher_0(it, jt, n, MIN(8*jt, 8*((n+7)/8)-1)-8*jt+9, *caillou0, *result0, *src00, *src10);
+            P4A_copy_from_accel_2d(sizeof(short), n, n, MIN(n+126, 128*it)-128*it+129, MIN(n+6, 8*jt)-8*jt+9, 128*it-128, 8*jt-8, &result[0][0], *result0);
+            P4A_accel_free(result0);
+            P4A_accel_free(caillou0);
+            P4A_accel_free(src10);
+            P4A_accel_free(src00);
          }
       }
 }
 
 //  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_0, I_0<=9,
-//    I_0+8jt<=n+15, 128it<=n+253, 8jt<=n+13}>
+//    I_0+8jt<=n+15, 128it<=n+254}>
 //  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 
 void launcher_0(unsigned int it, unsigned int jt, int n, int I_0, int caillou0[5], short result0[MIN(n+126, -128+128*((-128)+128*it)+128)-((-128)+128*((-128)+128*it))+1][MIN(n+6, -8+8*((-8)+8*jt)+8)-((-8)+8*((-8)+8*jt))+1], short src00[MIN(n+126, -128+128*((-128)+128*it)+128)-((-128)+128*((-128)+128*it))+1][MIN(n+6, -8+8*((-8)+8*jt)+8)-((-8)+8*((-8)+8*jt))+1], short src10[MIN(n+126, -128+128*((-128)+128*it)+128)-((-128)+128*((-128)+128*it))+1][MIN(n+6, -8+8*((-8)+8*jt)+8)-((-8)+8*((-8)+8*jt))+1])
 {
@@ -377,48 +366,37 @@ void launcher_0(unsigned int it, unsigned int jt, int n, int I_0, int caillou0[5
    unsigned int i, j;
 
 //  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=I_0, I_0<=9,
-//    I_0+8jt<=n+15, 128it<=n+253, 8jt<=n+13}>
+//    I_0+8jt<=n+15, 128it<=n+254}>
 //  <result0[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src00[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src10[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=128, PHI1+128it<=n+254,
-//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    0<=PHI2, PHI2+1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 
 l99995:
    for(i = 1; i <= MIN(128*it, 128*((n+127)/128)-1)-128*it+129; i += 1)
 
 //  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=i, i<=129,
-//    i+128it<=n+255, 1<=I_0, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    i+128it<=n+255, 1<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0,
-//    1<=i, i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15,
-//    128it<=n+253, 8jt<=n+13}>
+//    1<=i, i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15}>
 //  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0, 1<=i,
-//    i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15}>
 //  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2+1<=I_0, 1<=i,
-//    i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15, 128it<=n+253,
-//    8jt<=n+13}>
+//    i<=129, i+128it<=n+255, I_0<=9, I_0+8jt<=n+15}>
 
 l99996:
       for(j = 1; j <= I_0; j += 1)
 
 //  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=4, 1<=i, i<=129,
-//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15,
-//    128it<=n+253, 8jt<=n+13}>
+//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, 1<=i, i<=129,
-//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15,
-//    128it<=n+253, 8jt<=n+13}>
+//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, 1<=i, i<=129,
-//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15,
-//    128it<=n+253, 8jt<=n+13}>
+//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15}>
 //  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, 1<=i, i<=129,
-//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15,
-//    128it<=n+253, 8jt<=n+13}>
+//    i+128it<=n+255, 1<=j, j<=I_0, I_0<=9, I_0+8jt<=n+15}>
 
          result0[-1+i+(-128)+128*it-((-128)+128*it)][-1+j+(-8)+8*jt-((-8)+8*jt)] = (caillou0[3-0]*src00[-1+i+(-128)+128*it-((-128)+128*it)][-1+j+(-8)+8*jt-((-8)+8*jt)]+caillou0[4-0]*src10[-1+i+(-128)+128*it-((-128)+128*it)][-1+j+(-8)+8*jt-((-8)+8*jt)])*(caillou0[0-0]/caillou0[1-0]<<caillou0[2-0])>>caillou0[2-0];
 }
