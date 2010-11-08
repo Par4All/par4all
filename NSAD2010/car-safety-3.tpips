@@ -1,0 +1,47 @@
+delete car-safety-3
+create car-safety-3 car-safety-3.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+#setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+#setproperty PRETTYPRINT_ALL_LABELS TRUE
+#setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo AFTER DEAD CODE ELIMINATION
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+# delete car-safety-3
+quit

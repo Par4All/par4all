@@ -1,0 +1,103 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T() {}
+
+   double x[2][10];
+
+//  T(i,new,old,t,temp) {new==1, old==0}
+
+   int old = 0, new = 1, i, t, temp;
+
+//  T(t) {new==1, old==0, t==0}
+
+
+   t = 0;
+
+//  T(i,new,old,t,temp) {new+old==1, new#init==1, old#init==0,
+//    t#init==0, 0<=t, t<=999}
+
+   while (t<1000) {
+
+//  T(i) {0<=i, t<=999}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  T() {0<=i, i<=9, t<=999}
+
+         x[new][i] = g(x[old][i]);
+
+//  T(temp) {i==10, new==temp, t<=999}
+
+      temp = new;
+
+//  T(new) {i==10, new==old, new#init==temp, t<=999}
+
+      new = old;
+
+//  T(old) {i==10, new==old#init, old==temp, t<=999}
+
+      old = temp;
+
+//  T(t) {i==10, old==temp, t==t#init+1, t<=1000}
+
+      t++;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   double x[2][10];
+
+//  P() {}
+
+   int old = 0, new = 1, i, t, temp;
+
+//  P(i,new,old,t,temp) {new==1, old==0}
+
+
+   t = 0;
+
+//  P(i,new,old,t,temp) {new==1, old==0, t==0}
+
+   while (t<1000) {
+
+//  P(i,new,old,t,temp) {new+old==1, 0<=t, t<=999}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  P(i,new,old,t,temp) {new+old==1, 0<=i, i<=9, 0<=t, t<=999}
+
+         x[new][i] = g(x[old][i]);
+
+//  P(i,new,old,t,temp) {i==10, new+old==1, 0<=t, t<=999}
+
+      temp = new;
+
+//  P(i,new,old,t,temp) {i==10, new+old==1, new==temp, 0<=t, t<=999}
+
+      new = old;
+
+//  P(i,new,old,t,temp) {i==10, new==old, new+temp==1, 0<=t, t<=999}
+
+      old = temp;
+
+//  P(i,new,old,t,temp) {i==10, new+old==1, new+temp==1, 0<=t, t<=999}
+
+      t++;
+   }
+}

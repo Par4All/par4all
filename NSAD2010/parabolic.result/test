@@ -1,0 +1,487 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+TRANSFORMERS after refinment
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=j, 2i<=j+1, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, 1<=i, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, 1<=i, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS after refinment
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+TRANSFORMERS after second refinment
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=j, 2i<=j+1, 3i<=j+3,
+//    4i<=j+6, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, 1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, 1<=i, i<=j#init+1, 2i<=j#init+3, 3i<=j#init+6,
+//    i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS after second refinment
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10, i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10, 5i<=j+15,
+//    i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+TRANSFORMERS after third refinment
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=j, 2i<=j+1, 3i<=j+3,
+//    4i<=j+6, 5i<=j+10, 6i<=j+15, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, 1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10,
+//    5i<=j+15, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, 1<=i, i<=j#init+1, 2i<=j#init+3, 3i<=j#init+6,
+//    4i<=j#init+10, 5i<=j#init+15, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10, 6i<=j+15,
+//    7i<=j+21}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS after third refinment
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10, 5i<=j+15,
+//    6i<=j+21, 7i<=j+28, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+TRANSFORMERS after fourth refinment
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=j, 2i<=j+1, 3i<=j+3,
+//    4i<=j+6, 5i<=j+10, 6i<=j+15, 7i<=j+21, 8i<=j+28, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, 1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10,
+//    5i<=j+15, 6i<=j+21, 7i<=j+28, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, 1<=i, i<=j#init+1, 2i<=j#init+3, 3i<=j#init+6,
+//    4i<=j#init+10, 5i<=j#init+15, 6i<=j#init+21, 7i<=j#init+28,
+//    i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10, 6i<=j+15,
+//    7i<=j+21, 8i<=j+28, 9i<=j+36}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS after fourth refinment
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10, 5i<=j+15,
+//    6i<=j+21, 7i<=j+28, 8i<=j+36, 9i<=j+45, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, 10i<=j+45}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+TRANSFORMERS after fifth refinment
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,n) {i==0, j==0}
+
+   int i = 0, j = 0, n;
+
+//  T() {i==0, j==0, 0<=n}
+
+   if (n<0) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i#init==0, j#init==0, 0<=i, i<=j, 2i<=j+1, 3i<=j+3,
+//    4i<=j+6, 5i<=j+10, 6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36,
+//    10i<=j+45, i<=n, 0<=n}
+
+   while (i<=n) {
+
+//  T(i) {i==i#init+1, 1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10,
+//    5i<=j+15, 6i<=j+21, 7i<=j+28, 8i<=j+36, 9i<=j+45, i<=n+1, 0<=n}
+
+      i++;
+
+//  T(j) {i+j#init==j, 1<=i, i<=j#init+1, 2i<=j#init+3, 3i<=j#init+6,
+//    4i<=j#init+10, 5i<=j#init+15, 6i<=j#init+21, 7i<=j#init+28,
+//    8i<=j#init+36, 9i<=j#init+45, i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  T() {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10, 6i<=j+15,
+//    7i<=j+21, 8i<=j+28, 9i<=j+36, 10i<=j+45, 11i<=j+55}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS after fifth refinment
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+   if (n<0) 
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+   while (i<=n) {
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, 10i<=j+45, 11i<=j+55,
+//    i<=n}
+
+      i++;
+
+//  P(i,j,n) {1<=i, i<=j+1, 2i<=j+3, 3i<=j+6, 4i<=j+10, 5i<=j+15,
+//    6i<=j+21, 7i<=j+28, 8i<=j+36, 9i<=j+45, 10i<=j+55, 11i<=j+66,
+//    i<=n+1, 0<=n}
+
+      j += i;
+   }
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, 10i<=j+45, 11i<=j+55,
+//    12i<=j+66}
+
+   printf("i=%d, j=%d\n", i, j);
+}

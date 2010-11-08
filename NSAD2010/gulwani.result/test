@@ -1,0 +1,133 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(x,y,z) {}
+
+   int x, y, z;
+
+//  T(x) {x==0}
+
+
+   x = 0;
+
+//  T(y) {x==0, y==50}
+
+   y = 50;
+
+//  T(x,y) {x#init==0, y#init==50, x<=99, y<=x+50, x+2450<=50y, 50<=y}
+
+
+   while (x<100) 
+
+//  T(x,y) {x==x#init+1, x+50y#init<=50y+50, y#init<=y, y<=y#init+1}
+
+      if (x<50)
+
+//  T(x) {x==x#init+1, x<=50}
+
+         x++;
+      else {
+
+//  T(x) {x==x#init+1, 51<=x, x<=100}
+
+         x++;
+
+//  T(y) {y==y#init+1, 51<=x, x<=100}
+
+         y++;
+      }
+
+//  T() {x==100, 52<=y, y<=150}
+
+
+   if (y==100) 
+
+//  T() {x==100, y==100}
+
+      printf("property  verified\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x, y, z;
+
+//  P(x,y,z) {}
+
+
+   x = 0;
+
+//  P(x,y,z) {x==0}
+
+   y = 50;
+
+//  P(x,y,z) {x==0, y==50}
+
+
+   while (x<100) 
+
+//  P(x,y,z) {x<=99, y<=x+50, x+1200<=25y, 50<=y}
+
+      if (x<50)
+
+//  P(x,y,z) {x<=49, y<=x+50, x+1200<=25y, 50<=y}
+
+         x++;
+      else {
+
+//  P(x,y,z) {50<=x, x<=99, y<=x+50, x+1200<=25y, 50<=y}
+
+         x++;
+
+//  P(x,y,z) {51<=x, x<=100, y<=x+49, x+1199<=25y, 50<=y}
+
+         y++;
+      }
+
+//  P(x,y,z) {x==100, 53<=y, y<=150}
+
+
+   if (y==100) 
+
+//  P(x,y,z) {x==100, y==100}
+
+      printf("property  verified\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x, y, z;
+
+   x = 0;
+   y = 50;
+
+   while (x<100) 
+      if (x<50)
+         x++;
+      else {
+         x++;
+         y++;
+      }
+
+   if (y==100) 
+      printf("property  verified\n");
+   ;
+}

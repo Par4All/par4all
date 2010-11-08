@@ -1,0 +1,131 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=n}
+
+void main(int n)
+{
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   int s = 0, t = 0, d = 0;
+
+//  T() {d==0, s==0, t==0, 0<=n}
+
+   n>=0?(void) 0:__assert_fail("n>=0", "./car-safety-3.c", 17, (const char *) 0);
+
+//  T(d,s,t) {d#init==0, s#init==0, t#init==0, 0<=d, d<=s+2t, 0<=n,
+//    t<=n, s<=2, 0<=t}
+
+   while (s<=2&&t<=n) {
+
+//  T(s,t) {0<=n, t<=n, t#init<=n, s<=2, s#init+2t#init<=s+2t,
+//    s#init<=2, t#init<=t}
+
+      while (s<=2&&t<=n&&alea()>0.) 
+
+//  T(s,t) {s==0, t==t#init+1, 0<=n, t<=n+1, s#init<=2}
+
+         t++, s = 0;
+
+//  T(d,s) {d+s#init==d#init+s, 0<=n, s#init+2t<=2n+2, t<=n, s<=2,
+//    s#init<=s, s#init<=2}
+
+
+      while (s<=2&&t<=n&&alea()<=0.) 
+
+//  T(d,s) {d==d#init+1, s==s#init+1, 0<=n, t<=n, s<=3}
+
+         d++, s++;
+   }
+
+//  T() {0<=d, s<=3d, d<=s+2t, s+3t<=3n+3, t<=n+1, s<=3, 3<=s+5t}
+
+   if (d<=2*n+3)
+
+//  T() {0<=d, d<=2n+3, d<=2n+s+2, s+2t<=d+2n+2, d<=2n+s+2t, s<=3d,
+//    s<=d+2, d<=s+4t, d<=s+2t, 1<=d+t, 0<=n, s+3t<=3n+3, t<=n+1,
+//    s<=3, 3<=s+5t, 0<=t}
+
+      printf("healthy");
+   else
+
+//  T() {0<=d, 2n+4<=d, d<=2n+s+2, s+2t<=d+2n+2, d<=2n+s+2t, s<=3d,
+//    s<=d+2, d<=s+4t, d<=s+2t, 1<=d+t, 0<=n, s+3t<=3n+3, t<=n+1,
+//    s<=3, 3<=s+5t, 0<=t}
+
+      printf("crashed!");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void main(int n)
+{
+
+//  P() {}
+
+   int s = 0, t = 0, d = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+   n>=0?(void) 0:__assert_fail("n>=0", "./car-safety-3.c", 17, (const char *) 0);
+
+//  P(d,s,t) {d==0, s==0, t==0, 0<=n}
+
+   while (s<=2&&t<=n) {
+
+//  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
+
+      while (s<=2&&t<=n&&alea()>0.) 
+
+//  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
+
+         t++, s = 0;
+
+//  P(d,s,t) {0<=d, d<=s+2t, 0<=n, 0<=2n+s, s+2t<=2n+2, t<=n+1, s<=2,
+//    0<=t}
+
+
+      while (s<=2&&t<=n&&alea()<=0.) 
+
+//  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
+
+         d++, s++;
+   }
+
+//  P(d,s,t) {0<=d, s<=3d, d<=s+2t, s+3t<=3n+3, t<=n+1, s<=3, 3<=s+3t,
+//    2<=s+2t}
+
+   if (d<=2*n+3)
+
+//  P(d,s,t) {0<=d, d<=2n+3, s<=3d, d<=s+2t, s+3t<=3n+3, t<=n+1, s<=3,
+//    3<=s+3t, 2<=s+2t}
+
+      printf("healthy");
+   else
+
+//  P() {0==-1}
+
+      printf("crashed!");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+void main(int n)
+{
+   int s = 0, t = 0, d = 0;
+   n>=0?(void) 0:__assert_fail("n>=0", "./car-safety-3.c", 17, (const char *) 0);
+   while (s<=2&&t<=n) {
+      while (s<=2&&t<=n&&alea()>0.) 
+         t++, s = 0;
+
+      while (s<=2&&t<=n&&alea()<=0.) 
+         d++, s++;
+   }
+   printf("healthy");
+   ;
+}

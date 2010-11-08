@@ -1,0 +1,133 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(lock,x,y) {}
+
+   int x, y, lock;
+
+//  T(x) {x==1}
+
+
+   x = 1;
+
+//  T(lock) {lock==0, x==1}
+
+   lock = 0;
+
+//  T(y) {lock==0, x==1, y==0}
+
+   y = 0;
+
+//  T(lock,x,y) {lock#init==0, x#init==1, y#init==0, 0<=lock,
+//    1<=lock+x+y, lock+y<=x+1, lock+x<=y+1, 0<=y}
+
+
+   while (x!=y) {
+
+//  T(lock) {lock==1}
+
+      lock = 1;
+
+//  T(x) {lock==1, x==y}
+
+      x = y;
+
+//  T(lock,y) {lock+y==x+1, lock#init==1, x==y#init, 0<=lock, lock<=1}
+
+      if (alea()) {
+
+//  T(lock) {lock==0, lock#init==1, x==y}
+
+         lock = 0;
+
+//  T(y) {lock==0, x==y-1, x==y#init}
+
+         y++;
+      }
+   }
+
+//  T() {lock==1, x==y, 0<=x}
+
+
+   if (lock==1) 
+
+//  T() {lock==1, x==y, 0<=x}
+
+      printf("property  verified\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int x, y, lock;
+
+//  P(lock,x,y) {}
+
+
+   x = 1;
+
+//  P(lock,x,y) {x==1}
+
+   lock = 0;
+
+//  P(lock,x,y) {lock==0, x==1}
+
+   y = 0;
+
+//  P(lock,x,y) {lock==0, x==1, y==0}
+
+
+   while (x!=y) {
+
+//  P(lock,x,y) {lock==0, 1<=x+y, y<=x+1, x<=y+1}
+
+      lock = 1;
+
+//  P(lock,x,y) {lock==1, 1<=x+y, y<=x+1, x<=y+1}
+
+      x = y;
+
+//  P(lock,x,y) {lock==1, x==y, 0<=x}
+
+      if (alea()) {
+
+//  P(lock,x,y) {lock==1, x==y, 0<=x}
+
+         lock = 0;
+
+//  P(lock,x,y) {lock==0, x==y, 0<=x}
+
+         y++;
+      }
+   }
+
+//  P(lock,x,y) {lock==1, x==y, 0<=x}
+
+
+   if (lock==1) 
+
+//  P(lock,x,y) {lock==1, x==y, 0<=x}
+
+      printf("property  verified\n");
+}
