@@ -328,8 +328,8 @@ then
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
-    # hmmm... this is installation dependent:-( pkgconfig?
-    ldpips=$prod/../install/lib/python*/site-packages/pips
+    # get python directory, which depends on python version
+    ldpips=$(pkg-config --variable=pythondir pips)
     test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
   else
