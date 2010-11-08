@@ -329,7 +329,7 @@ then
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
     # get python directory, which depends on python version
-    ldpips=$(pkg-config --variable=pythondir pips)
+    ldpips=$(pkg-config --variable=pythondir pips)/pips
     test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
   else
