@@ -525,7 +525,7 @@ management of branches.
 
 The development policy within the PIPS-related software is that the
 \texttt{trunk} version should hold a production quality software which
-should pass all non-regression tests that run nightly at CRI and elsewhere.
+should pass all non-regression tests that run daily at CRI and elsewhere.
 Thus day-to-day development should not occur within this part, but in
 independent per-developer \texttt{branches} which should be validated
 before being merged back into the \texttt{trunk}.
@@ -1585,9 +1585,6 @@ the \texttt{make} invocation.
 \section{Validation}
 \label{sec:validation}
 
-\textbf{TODO: Fabien, update this section for \texttt{Makefile}-based
-  validation.}
-
 The validation is stored in a separate subversion repository
 \url{https://svn.cri.ensmp.fr/svn/validation}
 
@@ -1595,14 +1592,22 @@ For an overview of the validation daily use case, you should also have a
 look to \S~\ref{sec:devel-branch-valid}.
 
 Different phases are validated in distinct sub-directories.
-Running the validation uses the \texttt{pips\_validate} script (old
-sequential version) or a local \texttt{Makefile} (new parallel version).
+Running the validation uses the a set of makefiles which allow
+to parallelize the validation inter-directory or even intra-directory.
 
 See the \texttt{README} at the root of the \texttt{trunk} for details on
 how to run the validation. Basically, one must simply type
-\texttt{make} with some target.
+\texttt{make} with some target, either at the root of the validation
+or within a subdirectory. There are two main targets:
+\begin{description}
+\item[validate-out] generate \texttt{out} files in \texttt{.result}
+directories, which are to be compared to corresponding \texttt{test} file.
+\item[validate-test] overwrite \texttt{test} file, so that
+\texttt{svn diff} show the changes.
+\item[validate] same as \texttt{validate-out}.
+\end{description}
 
-See various examples around to add new validation files.  The preferred
+See various examples around to add new validation files. The preferred
 way is to provide a source file \texttt{MyTest.f} or \texttt{MyTest.c}, a
 corresponding \texttt{MyTest.tpips} script, and store the standard output
 of the \texttt{.tpips} script into \texttt{MyTest.result/test}.
@@ -1612,12 +1617,14 @@ the validation output, wich is stored in \texttt{MyTest.result/out},
 is compared against the
 reference \texttt{MyTest.result/test} to know if the validation is
 correct. So to install a new validation item, you need to create the
-reference \texttt{MyTest.result/test}. \texttt{pips\_validate -a} (see
-afterwards) can help to install a new validation reference file and
-directory. Note that an additional transformation on output and/or 
-reference file is possible for special cases. In fact depending on
-the compiler used for example, you can get floating point numbers in
-different formats. Then you might want to post process the output to
+reference \texttt{MyTest.result/test}.
+
+\texttt{pips\_validate -a} (see afterwards) can help to install a new
+validation reference file and directory. Note that an additional transformation
+on output and/or reference file is possible for special cases.
+%%
+In fact depending on the compiler used for example, you can get floating point
+numbers in different formats. Then you might want to post process the output to
 make it compliant with the reference. To make this possible a filtering
 phase is included in the validation process and is explained in
 \S~\ref{sec:filtering}.
@@ -1629,15 +1636,40 @@ location is also possible.
 \textbf{CAUTION:} use a relative and local path in the \texttt{.tpips}
 file to reference the source file.
 
-To do more subtle things (nightly validation with mail notification, etc)
-it is possible to use validation scripts instead.
-
 But it is best \textbf{not} using the following validation scripts
 directly, but rather to rely on the \texttt{Makefile} in the validation
 directory, which has very convenient targets including \texttt{validate
 accept clean}.  Using this approach does not require the validation
 directory to be under \texttt{\$PIPS\_ROOT}.
 
+\subsection{Validations}
+\label{sec:validation}
+
+Several validations run at CRI:
+
+\begin{description}
+\item[CHECK] on every commit (down to the few minute scale) compilation and
+  validation based on the old but fast \texttt{nlpmake} makefiles
+  on Debian Lenny (compiegne).
+
+  If a commit changes the result of the validation or break the compilation,
+  the author of the commit is in charge of fixing it quickly.
+  %%
+  A fast solution is to reverse the commit and investigate off-line.
+  %%
+  Note that this should never happen because the validation be run before
+  committing anything to the \texttt{trunk}.
+
+\item[AUTOC] compilation and validation with the \texttt{autoconf}
+  infrastructure, including python and fortran95, on Debian Lenny (compiegne).
+
+\item[CROSS] 32-bit cross-compilation, on Debian Lenny (compiegne).
+
+\item[NIGHT] compilation and validation on Ubuntu Karmic (canapville).
+
+\item[PRIVE] compilation and validation on Ubuntu Karmic, including
+  private/restricted stuff (hendaye).
+\end{description}
 
 \subsection{Validation Makefile}
 \label{sec:validation-makefile}
@@ -1645,16 +1677,8 @@ directory to be under \texttt{\$PIPS\_ROOT}.
 The main user interface is from the \texttt{Makefile} at the validation
 top directory and is usable through few \texttt{make} targets:
 \begin{description}
-\item[validate] to clean and run the validation;
-\item[validate-\emph{target}] to clean and run the validation only on the
-  \texttt{\emph{target}} directory;
-\item[validate-private:] run the private validation at CRI. It should be in the
-  \texttt{private} directory;
-\item[validate-all:] run the normal and private validation;
-\item[clean:] to remove the results and output from the previous validation;
-\item[private] extract from the private CRI svn the private validation
-  collection at CRI. It goes into the \texttt{private} directory;
-\item [accept:] run the accept script on the previous validation;
+\item[validate-out validate-test] run the validation;
+\item[clean] to remove the results and output from the previous validation;
 \end{description}
 
 The validation can also be restricted to some directories by setting the
@@ -1663,17 +1687,19 @@ The validation can also be restricted to some directories by setting the
 make TARGET=LoopRecovering validate
 \end{verbatim}
 
-The \texttt{VOPT} \texttt{make} variable can be used to pass and modify
-default options for the validation.
-
-
 \subsection{Validation output}
 \label{sec:validation-output}
 
-As an output the make validate creates a RESULTS directory. This
-directory contains:
-a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.diff} and
-\texttt{.out}). Those files are named using the following rule : \texttt{FolderName\_TestCaseName.xxx}
+The validation scripts are run locally in each subdirectory.
+If differences are found, \texttt{.err} and \texttt{.diff} files
+are generated for each failing test, while the output is kept
+in the \texttt{.result} directory as \texttt{out} (or \texttt{test}).
+
+A \texttt{SUMMARY.short} file is created at the root
+which summarizes the results.
+
+When run at the root, the history of the results is kept under
+the \texttt{SUMMARY\_Archive} directory.
 
 \begin{itemize}
 \item Obviously the \texttt{SUMMARY} file contains a summary of the previous validation.
@@ -1688,13 +1714,13 @@ a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.dif
 \subsection{Validation scripts}
 \label{sec:validation-scripts}
 
+\textbf{Note that these scripts are more or less obsolete.
+They are superseded by local \texttt{Makefile} targets which do the same
+but also parallelize the process per directory or per file.}
+
 Three validation scripts are available:
 \begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
-
-  \textbf{Note that this script is now in obsolation, it is superseded by
-  local \texttt{Makefile} targets which do the same but also
-  parallelize the process per directory or per file.}
 
   The arguments are names of subdirectories in
   \texttt{\$PIPS\_ROOT/../../validation} or source files within these
