@@ -53,7 +53,7 @@ do
     --nlpmake) autoconf= ;;
     --nlpmake=*) autoconf= ; build=${1//*=/} ;;
     -n|--nice) nice=nice ;;
-    # force compilation & validation & mail
+    # force compilation & validation & validation mail
     -f|--force) validate=mail-validate ; force=1 ;;
     # force compilation status report even if unchanged
     -r|--report) report=1 ;;
@@ -120,6 +120,7 @@ fi
 # report current-state compile message
 # current-state: ok skip locked KO:*
 # compile: ok unknown unchanged unbuild build exe
+# side effect: the function exits!
 function report()
 {
   [ $# -eq 3 ] || {
