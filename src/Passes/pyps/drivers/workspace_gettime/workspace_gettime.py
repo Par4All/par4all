@@ -1,3 +1,4 @@
+from __future__ import with_statement # to cope with python2.5
 import pyps
 import os
 import sys
