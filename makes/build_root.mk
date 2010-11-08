@@ -126,7 +126,7 @@ auto: auto-clean
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
 	# manual fix...
-	[ -d $(BUILD.dir)/src/Scripts/validation ] && \
+	-[ -d $(BUILD.dir)/src/Scripts/validation ] && \
 	  $(MAKE) -C $(BUILD.dir)/src/Scripts/validation install
 
 # force tags target
