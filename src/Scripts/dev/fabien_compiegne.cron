@@ -2,6 +2,10 @@
 # check on commit runs on every minute
 * * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # force once a day
-@daily /home/fabien/CHECK/pips_check_compile --wait --force --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # test autoconf version
-@daily /home/fabien/AUTO/pips_check_compile --force --report --autoconf --source=/home/fabien/AUTO/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation
+@hourly /home/fabien/AUTO/pips_check_compile --autoconf --source=/home/fabien/AUTO/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation
+# force once a day
+7 1 * * * /home/fabien/AUTO/pips_check_compile --wait --force --report --autoconf --source=/home/fabien/AUTO/pipsrc.sh pips-commit@cri.ensmp.fr /home/fabien/AUTO/prod /home/fabien/AUTO/validation
+# 32 bit cross compilation
+7 2 * * * /home/fabien/CROSS/pips_check_compile --force --report --source=/home/fabien/CROSS/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/CROSS/prod
