@@ -217,42 +217,146 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   toolTestExec(cudaFree(address))
 
 
-/** Copy memory from the host to the hardware accelerator in CUDA.
+/** Copy a scalar from the hardware accelerator to the host
 
-    Do not change the place of the pointers in the API. The host address
-    is always in the first position...
+ It's a wrapper around CudaMemCopy*.
 
-    @param[in] host_address is the address of a source zone in the host memory
+ Do not change the place of the pointers in the API. The host address
+ is always first...
 
-    @param[out] accel_address is the address of a destination zone in the
-    accelerator memory
+ @param[in] element_size is the size of one element of the array in
+ byte
 
-    @param[in] size is the size in bytes of the memory zone to copy
+ @param[out] host_address point to the element on the host to write
+ into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+ */
+void P4A_copy_from_accel(size_t element_size,
+    void *host_address,
+    const void *accel_address);
+
+/** Copy a scalar from the host to the hardware accelerator
+
+ It's a wrapper around CudaMemCopy*.
+
+ Do not change the place of the pointers in the API. The host address
+ is always before the accel address...
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[out] host_address point to the element on the host to write
+ into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+ */
+void P4A_copy_to_accel(size_t element_size,
+    const void *host_address,
+    void *accel_address);
+
+/** Function for copying memory from the hardware accelerator to a 1D array in
+ the host.
+
+ It's a wrapper around CudaMemCopy*.
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[in] d1_size is the number of elements in the array. It is not
+ used but here for symmetry with functions of higher dimensionality
+
+ @param[in] d1_block_size is the number of element to transfer
+
+ @param[in] d1_offset is element order to start the transfer from (host side)
+
+ @param[out] host_address point to the array on the host to write into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+
+ @return the host_address, by compatibility with memcpy().
+ */
+void P4A_copy_from_accel_1d(size_t element_size,
+    size_t d1_size,
+    size_t d1_block_size,
+    size_t d1_offset,
+    void *host_address,
+    const void *accel_address);
+
+/** Function for copying a 1D memory zone from the host to a compact memory
+ zone in the hardware accelerator.
+
+ This function could be quite simpler but is designed by symmetry with
+ other functions.
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[in] d1_size is the number of elements in the array. It is not
+ used but here for symmetry with functions of higher dimensionality
+
+ @param[in] d1_block_size is the number of element to transfer
+
+ @param[in] d1_offset is element order to start the transfer from
+
+ @param[in] host_address point to the array on the host to read
+
+ @param[out] accel_address refer to the compact memory area to write
+ data. In the general case, accel_address may be seen as a unique idea
+ (FIFO) and not some address in some memory space.
+ */
+void P4A_copy_to_accel_1d(size_t element_size,
+    size_t d1_size,
+    size_t d1_block_size,
+    size_t d1_offset,
+    const void *host_address,
+    void *accel_address);
+
+/** Function for copying memory from the hardware accelerator to a 2D array in
+ the host.
+ */
+void P4A_copy_from_accel_2d(size_t element_size,
+    size_t d1_size, size_t d2_size,
+    size_t d1_block_size, size_t d2_block_size,
+    size_t d1_offset, size_t d2_offset,
+    void *host_address,
+    const void *accel_address);
+
+/** Function for copying a 2D memory zone from the host to a compact memory
+ zone in the hardware accelerator.
+ */
+void P4A_copy_to_accel_2d(size_t element_size,
+    size_t d1_size, size_t d2_size,
+    size_t d1_block_size, size_t d2_block_size,
+    size_t d1_offset, size_t d2_offset,
+    const void *host_address,
+    void *accel_address);
+
+/** Function for copying memory from the hardware accelerator to a 3D array in
+    the host.
 */
-#define P4A_copy_to_accel(host_address, accel_address, size)	\
-  toolTestExec(cudaMemcpy(accel_address,			\
-			   host_address,			\
-			   size,				\
-			   cudaMemcpyHostToDevice))
+void P4A_copy_from_accel_3d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset,
+          void *host_address,
+          const void *accel_address);
 
-/** Copy memory from the hardware accelerator to the host in CUDA.
-
-    Do not change the place of the pointers in the API. The host address
-    is always in the first position...
-
-    @param[out] host_address is the address of a destination zone in the
-    host memory
-
-    @param[in] accel_address is the address of a source zone in the
-    accelerator memory
-
-    @param[in] size is the size in bytes of the memory zone to copy
+/** Function for copying a 3D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
 */
-#define P4A_copy_from_accel(host_address, accel_address, size)	\
-  toolTestExec(cudaMemcpy(host_address,			\
-			   accel_address,			\
-			   size,				\
-			   cudaMemcpyDeviceToHost))
+void P4A_copy_to_accel_3d(size_t element_size,
+        size_t d1_size, size_t d2_size, size_t d3_size,
+        size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+        size_t d1_offset,   size_t d2_offset, size_t d3_offset,
+        const void *host_address,
+        void *accel_address);
 
 /* @} */
 
