@@ -44,6 +44,12 @@
 #include "preprocessor.h"
 #include "accel-util.h"
 
+/**
+ * This boolean is controlled by "LINEARIZE_ARRAY_CAST_AT_CALL_SITE" property
+ * Turning it on break further effects analysis, but without the cast it might
+ * break compilation or at least generate warnings for type mismatch
+ */
+static bool cast_at_call_site_p = FALSE;
 
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
@@ -224,8 +230,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                 NIL,NIL)
                             );
                     type argt = expression_to_type(*arg);
-                    if(array_type_p(argt)) {
-#if 0 /* disabled as long as effects can not take care of this */
+                    if(cast_at_call_site_p && array_type_p(argt)) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
@@ -239,7 +244,6 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                         *arg=MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                                 *arg);
-#endif
                     }
                     else {
                         *arg = 
@@ -667,6 +671,9 @@ bool linearize_array(char *module_name)
     debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
+
+    /* Do we have to cast the array at call site ? */
+    cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {

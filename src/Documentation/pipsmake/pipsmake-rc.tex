@@ -8869,7 +8869,8 @@ EXPRESSION_SUBSTITUTION_PATTERN ""
 \subsection{Array to pointer conversion}
 
 \begin{PipsPass}{linearize_array}
-This transformation replaces all arrays in the module by equivalent linearized arrays.
+This transformation replaces all arrays in the module by equivalent linearized 
+arrays.
 Eventually using array/ pointer equivalence.
 \end{PipsPass}
 
@@ -8884,9 +8885,19 @@ linearize_array > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are declared as 1D arrays or pointers. Pointers are accessed using dereferencement and arrays using subscripts.
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are 
+declared as 1D arrays or pointers. Pointers are accessed using dereferencement 
+and arrays using subscripts.
 \begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
 LINEARIZE_ARRAY_USE_POINTERS FALSE
+\end{PipsProp}
+
+Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control wether a cast is
+ inserted at call sites. Turning it on break further effects analysis, but 
+without the cast it might break compilation or at least generate warnings for 
+type mismatch
+\begin{PipsProp}{LINEARIZE_ARRAY_CAST_AT_CALL_SITE}
+LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
 
 
