@@ -530,6 +530,40 @@ Thus day-to-day development should not occur within this part, but in
 independent per-developer \texttt{branches} which should be validated
 before being merged back into the \texttt{trunk}.
 
+SVN can manage properties about files which help portability by
+declaring the end-of-line policy, the mime-type and so on.
+We recommand that you add the following to your
+\texttt{.subversion/config} file:
+{\scriptsize
+\begin{verbatim}
+# in section [miscellany]
+enable-auto-props = yes
+
+[auto-props]
+# pips-related props
+*.f = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-fortran
+*.F = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-fortran
+*.f77 = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-fortran
+*.f90 = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-fortran
+*.c = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-c
+*.h = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-c
+*.sh = svn:eol-style=native;svn:executable;svn:keywords=Id URL;svn:mime-type=text/x-sh
+*.pl = svn:eol-style=native;svn:executable;svn:keywords=Id URL;svn:mime-type=text/x-script.perl
+Makefile = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-make
+*.mk = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-make
+*.tex = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-tex
+*.bib = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-bibtex
+*.txt = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/plain
+*.py = svn:eol-style=native;svn:keywords=Id;svn:mime-type=text/x-python
+*.tpips = svn:eol-style=native;svn:mime-type=text/x-tpips
+# and other property settings that you could find useful
+*.png = svn:mime-type=image/png
+*.jpg = svn:mime-type=image/jpeg
+*.csv = svn:eol-style=native;svn:mime-type=text/csv
+*.sql = svn:eol-style=native;svn:keywords=Id URL;svn:mime-type=text/x-sql
+\end{verbatim}
+}
+
 
 \subsubsection{PIPS development branches}
 \label{sec:pips-devel-branch}
@@ -876,7 +910,7 @@ Why not switch all this stuff to \texttt{git}, which is so
 \end{description}
 
 At HPC Project we use GIT with central servers, so the previous points of
-view from CRI are rather out-of-focus...
+view from CRI are rather out-of-focus\ldots
 
 \subsubsection{Keeping a local copy of PIPS repositories with \texttt{svnsync}}
 \label{sec:svnsync}
