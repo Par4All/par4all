@@ -378,7 +378,15 @@ list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in,
 	    }
 	  else
 	    {
-	      pips_debug(3, "exact_old_pv is not inverted -> not need to translate\n");
+	      pips_debug(3, "exact_old_pv is not inverted -> no need to translate\n");
+	    }
+	  if (app_kill == is_approximation_may)
+	    {
+	      pips_debug(3,
+			 "may kill, keep exact_old_pv with may approximation\n");
+	      cell_relation pv_out = copy_cell_relation(exact_old_pv);
+	      cell_relation_approximation_tag(pv_out) = is_approximation_may;
+	      l_out = CONS(CELL_RELATION, pv_out, l_out);
 	    }
 	}
 
@@ -1118,6 +1126,75 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 
   pips_debug_effects(5, "returning : \n", l_res);
   return l_res;
+}
+
+
+void pointer_values_remove_var(entity e, bool may_p, list l_in,
+			       pv_results *pv_res, pv_context *ctxt)
+{
+  pips_debug(5, "begin for entity %s\n", entity_name(e));
+  pips_debug_pvs(5, "input l_in\n", l_in);
+
+  /* possibly assign an undefined value to pointers reachable
+     from e without dereferencements) */
+  expression exp = entity_to_expression(e);
+  assignment_to_post_pv(exp, may_p,
+			expression_undefined,
+			false, l_in, pv_res, ctxt);
+  free_expression(exp);
+  if (l_in != pv_res->l_out)
+    {
+      gen_full_free_list(l_in);
+      l_in = pv_res->l_out;
+    }
+
+  /* Then replace all occurrences of e by an
+     undefined value if it's not a may kill */
+  if (!may_p)
+    {
+      list l_out = NIL;
+      FOREACH(CELL_RELATION, pv, l_in)
+	{
+	  cell_relation new_pv = copy_cell_relation(pv);
+	  cell c1 = cell_relation_first_cell(new_pv);
+	  entity e1 = reference_variable(cell_reference(c1));
+
+	  cell c2 = cell_relation_second_cell(new_pv);
+	  entity e2 = reference_variable(cell_reference(c2));
+	  bool keep = true;
+
+	  if (same_entity_p(e1, e))
+	    {
+	      if (!undefined_pointer_value_cell_p(c2))
+		{
+		  free_cell(c1);
+		  cell_relation_first_cell(pv)
+		    = make_undefined_pointer_value_cell();
+		}
+	      else
+		keep = false;
+	    }
+	  else if (same_entity_p(e2, e))
+	    {
+	      if (!undefined_pointer_value_cell_p(c1))
+		{
+		  free_cell(c2);
+		  cell_relation_second_cell(pv)
+		    = make_undefined_pointer_value_cell();
+		  cell_relation_second_interpretation_tag(pv)
+		    = is_cell_interpretation_value_of;
+		}
+	      else keep = false;
+	    }
+	  if (keep)
+	    l_out = CONS(CELL_RELATION, new_pv, l_out);
+	  else
+	    free_cell_relation(new_pv);
+	}
+      gen_full_free_list(l_in);
+      pv_res->l_out = l_out;
+    }
+  pips_debug_pvs(5, "end with pv_res->l_out = \n", pv_res->l_out );
 }
 
 
