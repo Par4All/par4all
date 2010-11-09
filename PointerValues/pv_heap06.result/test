@@ -1,0 +1,39 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *p, *q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a = 1;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   p = (int *) malloc(2*sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = (int *) malloc(2*sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == &*HEAP*_l_8[0] (exact);
+
+   free(a==0?p:q);
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (may);
+// p == &*HEAP*_l_7[0] (may);
+// q == *ANY_MODULE*:*UNDEFINED* (may);
+// q == &*HEAP*_l_8[0] (may);
+
+   return 0;
+}

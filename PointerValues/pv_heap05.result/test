@@ -1,0 +1,64 @@
+int main()
+{
+
+// Pointer values: none
+
+   int ***p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int **q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a = 0;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = (int **) malloc(sizeof(int *));
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &*HEAP*_l_9[0] (exact);
+
+   q[0] = &a;
+
+// Pointer values:
+// *HEAP*_l_9[0] == &a (exact);
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// q[0] == &a (exact);
+
+   p = (int ***) malloc(sizeof(int * *));
+
+// Pointer values:
+// *HEAP*_l_9[0] == &a (exact);
+// p == &*HEAP*_l_11[0] (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// q[0] == &a (exact);
+
+   p[0] = q;
+
+// Pointer values:
+// *HEAP*_l_11[0] == q (exact);
+// *HEAP*_l_9[0] == &a (exact);
+// p == &*HEAP*_l_11[0] (exact);
+// p[0] == q (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// q[0] == &a (exact);
+
+   free(p);
+
+// Pointer values:
+// *HEAP*_l_9[0] == &a (exact);
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// q[0] == &a (exact);
+
+   return 0;
+}
