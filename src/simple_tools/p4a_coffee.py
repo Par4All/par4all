@@ -57,6 +57,8 @@ def main(options, args = []):
 
     try:
         if options.here:
+            #os.system("env")
+
             setup_options = options
             #~ options.packages_dir = os.path.join(work_dir_p4a_version, "packages")
             #~ warn("Forcing --packages-dir=" + options.packages_dir)
@@ -109,13 +111,12 @@ def main(options, args = []):
             run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
 
             os.chdir(prev_cwd)
-
             ## Make sure child coffee maker will be using the python modules
             ## which come with the git repos which was just cloned:
             #os.environ["PYTHONPATH"] = os.path.join(work_dir_p4a_version, "src/simple_tools")
             # To be able to build old version, use current p4_coffee instead.
             os.environ["PYTHONPATH"] = os.path.join(os.path.dirname(exec_path_name))
-            ret = os.system(exec_path_name + " --here " + " ".join(sys.argv[1:]))
+            ret = os.system(exec_path_name + " --here --root " + work_dir_p4a_version + " " + " ".join(sys.argv[1:]))
             if ret:
                 raise p4a_error("Child p4a_coffee failed")
 
