@@ -223,9 +223,10 @@ list clean_up_transformer_list(list tfl)
   bool identity_p = FALSE;
 
   FOREACH(TRANSFORMER, tf, tfl) {
-    identity_p = transformer_identity_p(tf);
-    if(!identity_p && !transformer_empty_p(tf))
+    bool tf_identity_p = transformer_identity_p(tf);
+    if(!tf_identity_p && !transformer_empty_p(tf))
       ntfl = CONS(TRANSFORMER, copy_transformer(tf), ntfl);
+    identity_p = identity_p || tf_identity_p;
   }
   gen_full_free_list(tfl);
   ntfl = gen_nreverse(ntfl);
@@ -320,49 +321,34 @@ transformer generic_transformer_list_to_transformer(list ltl, bool active_p)
 
   if(ENDP(ltl))
     ltf = transformer_empty();
-  else if(ENDP(CDR(ltl))) { // One element list
-    ltf = TRANSFORMER(CAR(ltl));
-    if(active_p && ENDP(transformer_arguments(ltf))) {
-      free_transformer(ltf);
-      ltf = transformer_empty();
-    }
-    else {
-      transformer tf = ltf;
-      ltf = copy_transformer(ltf);
-      free_transformer(tf);
-    }
-  }
-  else if(ENDP(CDR(CDR(ltl)))) { // Two-element list
-    transformer ltf1 = TRANSFORMER(CAR(ltl));
-    transformer ltf2 = TRANSFORMER(CAR(CDR(ltl)));
-
-    if(active_p && ENDP(transformer_arguments(ltf1))) {
-      if(active_p && ENDP(transformer_arguments(ltf2))) {
-	free_transformer(ltf1);
-	free_transformer(ltf2);
-	ltf = transformer_empty();
+  else {
+    list ctl = ltl;
+    /* Look for the first useful transformer in the list */
+    FOREACH(TRANSFORMER, tf, ltl) {
+      if(!active_p || !ENDP(transformer_arguments(tf))) {
+	ltf = copy_transformer(tf);
+	free_transformer(tf);
+	POP(ctl);
+	break;
       }
-      else {
-	ltf = copy_transformer(ltf2);
-	free_transformer(ltf1);
-	free_transformer(ltf2);
+      POP(ctl);
+    }
+    /* Take care of the following useful transformers */
+    while(!ENDP(ctl)) {
+      /* Look for the next useful transformer in the list */
+      FOREACH(TRANSFORMER, tf, ctl) {
+	if(!active_p || !ENDP(transformer_arguments(tf))) {
+	  transformer ntf = copy_transformer(tf);
+	  transformer ptf = ltf;
+	  ltf = transformer_convex_hull(ptf, ntf);
+	  free_transformer(ntf);
+	  free_transformer(ptf);
+	  POP(ctl);
+	  break;
+	}
+	POP(ctl);
       }
     }
-    else if(active_p && ENDP(transformer_arguments(ltf2))) {
-	ltf = copy_transformer(ltf1);
-	free_transformer(ltf1);
-	free_transformer(ltf2);
-    }
-    else {
-      ltf = transformer_convex_hull(ltf1, ltf2);
-      free_transformer(ltf1);
-      free_transformer(ltf2);
-    }
-  }
-  else { // General case...
-    // loop... it might be easier than the disjunction performed for
-    // lists of length two!
-    pips_internal_error("Two transformers at most expected.\n");
   }
 
   return ltf;

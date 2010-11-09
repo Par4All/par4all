@@ -122,9 +122,9 @@ bool entity_flow_or_context_sentitive_heap_location_p(entity e)
 	{
 	  size_t found_n = strspn(found, HEAP_AREA_LOCAL_NAME);
 	  ln = &found[found_n];
-	  pips_debug(0, "ln : %s\n", ln);
+	  pips_debug(9, "ln : %s\n", ln);
 	  found = strstr(ln, "_l_");
-	  pips_debug(0, "found (3) = : %s\n", found);
+	  pips_debug(9, "found (3) = : %s\n", found);
 	  result = (found != NULL);
 	}
       else
@@ -136,7 +136,15 @@ bool entity_flow_or_context_sentitive_heap_location_p(entity e)
   return result;
 }
 
+/**
+   @brief generate the type of the allocated area from the malloc argument
+   @param e is the malloc argument expression
+   @return a new type (no sharing)
 
+   Store dependent types are not generated. It means that whenever the
+   size of the allocated space is store dependent, the returned type
+   is an array of unbounded_dimension.
+ */
 type malloc_arg_to_type(expression e)
 {
   type t = type_undefined;
@@ -190,6 +198,15 @@ type malloc_arg_to_type(expression e)
     }
   else
     n = make_op_exp("-", copy_expression(e), int_to_expression(1));
+
+  if (!expression_undefined_p(n) && !unbounded_expression_p(n)
+      && !expression_constant_p(n))
+    {
+      pips_debug(5, "non constant number of elements "
+		 "-> generating unbounded dimension\n");
+      free_expression(n);
+      n = make_unbounded_expression();
+    }
 
   if (sizeofexpression_undefined_p(sizeof_exp))
     {
@@ -249,6 +266,13 @@ type malloc_arg_to_type(expression e)
   return t;
 }
 
+/**
+   @brief generate an abstract heap location entity
+   @param t is type of the allocated space
+   @param psi is a pointer towards a structure which contains context
+               and/or flow sensitivity information
+   @return an abstract heap location entity
+ */
 entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
 {
     entity e = entity_undefined;
@@ -307,6 +331,13 @@ entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
   return e;
 }
 
+/**
+   @brief generate an abstract heap location entity
+   @param malloc_exp is the argument expression of the call to malloc
+   @param psi is a pointer towards a structure which contains context
+               and/or flow sensitivity information
+   @return an abstract heap location entity
+ */
 entity malloc_to_abstract_location(expression malloc_exp,
 				   sensitivity_information *psi)
 {
@@ -323,6 +354,14 @@ entity malloc_to_abstract_location(expression malloc_exp,
   return e;
 }
 
+/**
+   @brief generate an abstract heap location entity
+   @param n is the first argument expression of the call to calloc
+   @param size is the second argument expression of the call to calloc
+   @param psi is a pointer towards a structure which contains context
+               and/or flow sensitivity information
+   @return an abstract heap location entity
+ */
 entity calloc_to_abstract_location(expression n, expression size,
 				   sensitivity_information *psi)
 {

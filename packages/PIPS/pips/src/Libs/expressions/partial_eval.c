@@ -48,7 +48,7 @@ Si une information est ajoutee a eformat_undefined, alors l'expression
 est RECOPIEE. Pourtant, eformat.simpler reste FALSE et l'expression
 d'origine n'est pas freee, car une seule information ne permet aucune
 simplification. A partir de la prise en compte de la seconde
-information, de`s qu'eformat est simplife', alors eformat.simpler
+information, des qu'eformat est simplife', alors eformat.simpler
 devient vrai. L'expression d'origine sera alors free'e lorsque
 regenerate_expression().
 
@@ -64,6 +64,9 @@ comments below in partial_eval_expression(). Also, I did not take time
 to understand the invariant for expression allocation and free. I'm
 very likely to have introduced memory leaks via the changes in
 partial_eval_expression().
+
+Note FI: the interface is based on Psystemes instead of transformers,
+which makes maintenance and evolution harder.
  */
 
 #include <stdio.h>
@@ -1707,8 +1710,8 @@ void partial_eval_statement(statement stmt)
       partial_eval_expression_and_regenerate(&test_condition(t),
 					     stmt_prec(stmt),
 					     stmt_to_fx(stmt,fx_map));
-      if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
+      ifdebug(9) {
+	print_statement(stmt);
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1733,8 +1736,8 @@ void partial_eval_statement(statement stmt)
       add_live_loop_index(loop_index(l));
       rm_live_loop_index(loop_index(l));
 
-      if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
+      ifdebug(9) {
+	print_statement(stmt);
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1776,8 +1779,8 @@ void partial_eval_statement(statement stmt)
 	 SC_UNDEFINED, stmt_to_fx(stmt,fx_map));
       */
 
-      if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
+      ifdebug(9) {
+	print_statement(stmt);
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;

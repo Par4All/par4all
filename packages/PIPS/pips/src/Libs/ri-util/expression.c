@@ -387,6 +387,7 @@ bool expression_equal_in_list_p(expression e, list le)
   return FALSE;
 }
 
+/* C xor is missing */
 bool logical_operator_expression_p(expression e)
 {
   /* Logical operators are : .NOT.,.AND.,.OR.,.EQV.,.NEQV.*/
@@ -892,7 +893,7 @@ string op_name;
 	return FALSE;
 }
 
-expression  make_true_expression()
+expression make_true_expression()
 {
   return make_call_expression(MakeConstant(TRUE_OPERATOR_NAME,is_basic_logical),NIL);
 }
@@ -3399,4 +3400,25 @@ expression reference_offset(reference ref)
         }
         return address_computation ;
     }
+}
+
+/* Use side effects to move the content of e2, s2 and n2, into e1; s1
+   and n1 are freed, as well as e2. This is useful if you need to
+   keep the handle on e1. e1 is returned, although it is redundant. */
+expression replace_expression_content(expression e1, expression e2)
+{
+  syntax s1 = expression_syntax(e1);
+  normalized n1 = expression_normalized(e1);
+  syntax s2 = expression_syntax(e2);
+  normalized n2 = expression_normalized(e2);
+
+  expression_syntax(e1) = s2;
+  expression_normalized(e1) = n2;
+  expression_syntax(e2) = syntax_undefined;
+  expression_normalized(e2) = normalized_undefined;
+  free_syntax(s1);
+  free_normalized(n1);
+  free_expression(e2);
+
+  return e1;
 }

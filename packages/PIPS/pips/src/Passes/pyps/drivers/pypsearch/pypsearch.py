@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import with_statement # to cope with python2.5
 """
 This module provide three ways of exploring the transformation space for a given module in a given programm
 - brute force exploration
