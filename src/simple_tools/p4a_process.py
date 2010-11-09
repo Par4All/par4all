@@ -431,7 +431,7 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
-        kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True)
+        kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_CAST_AT_CALL_SITE=True)
 
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
