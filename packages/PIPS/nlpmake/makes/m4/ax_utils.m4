@@ -292,6 +292,9 @@ AC_DEFUN([AX_PROG_LEX],[
 		AX_WITH([lex])="yes"
 		AX_MSG([lex])=""
 	])
+	AS_IF([test x"$LEXLIB" != x],[
+		AC_DEFINE([HAVE_LEXLIB],[1],[Defined if lexlib is used])
+		])
 ])
 
 dnl checks how to checks for undefined symbols
