@@ -230,7 +230,8 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                 NIL,NIL)
                             );
                     type argt = expression_to_type(*arg);
-                    if(cast_at_call_site_p && array_type_p(argt)) {
+                    if(array_type_p(argt)) {
+                      if(cast_at_call_site_p) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
@@ -244,6 +245,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                         *arg=MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                                 *arg);
+                      }
                     }
                     else {
                         *arg = 
