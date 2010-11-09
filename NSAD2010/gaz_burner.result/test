@@ -51,7 +51,7 @@ int main()
 
       x = 0;
 
-//  T(t,x) {t#init+x==t, x#init==0, t#init<=t}
+//  T(t,x) {t+x#init==t#init+x, t#init<=t, 0<=x}
 
       while (x<=49||alea()) {
 
