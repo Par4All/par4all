@@ -57,7 +57,7 @@ Ronan.Keryell@hpc-project.com
 
 #import string, re, sys, os, types, optparse
 
-import re, optparse, pickle, os, shutil, subprocess
+import re, optparse, pickle, os, shutil, subprocess, locale
 import ply.lex as lex
 
 #from pyps import *
@@ -850,7 +850,9 @@ def preprocess(args):
     # Well, add a postprocess phase in the... preprocessor phase :-)
     # Transform the byte array into string before
     #postpreprocess(output_string.decode())
-    postpreprocess_simple(output_string.decode())
+
+    encoding = locale.getdefaultlocale()[1]
+    postpreprocess_simple(output_string.decode(encoding))
 
 
 def record_preprocess_options(option, opt_str, value, parser):
