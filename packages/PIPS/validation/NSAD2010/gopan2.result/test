@@ -1,0 +1,152 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(k,x,y,z) {}
+
+   int x, y, z, k;
+
+//  T(x) {x==0}
+
+
+   x = 0;
+
+//  T(y) {x==0, y==0}
+
+   y = 0;
+
+//  T() {x==0, y==0}
+
+
+   while (y>=0) {
+
+//  T(x,y) {x+y#init==x#init+y, x<=50, x#init<=50, 0<=y, y#init<=y,
+//    0<=y#init}
+
+      while (y>=0&&x<=50) {
+
+//  T(x) {x==x#init+1, x<=51, 0<=y}
+
+         x++;
+
+//  T(y) {y==y#init+1, x<=51, 1<=y}
+
+         y++;
+      }
+
+//  T(x,y) {x+y==x#init+y#init, 51<=x, x#init<=x, 51<=x#init, 0<=y,
+//    0<=y#init}
+
+      while (y>=0&&x>50) {
+
+//  T(y) {y==y#init-1, 51<=x, 0<=y+1}
+
+         y--;
+
+//  T(x) {x==x#init+1, 52<=x, 0<=y+1}
+
+         x++;
+      }
+   }
+
+//  T() {y==-1, 103<=x}
+
+   if (x==103) 
+
+//  T() {x==103, y==-1}
+
+      printf("property  verified\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x, y, z, k;
+
+//  P(k,x,y,z) {}
+
+
+   x = 0;
+
+//  P(k,x,y,z) {x==0}
+
+   y = 0;
+
+//  P(k,x,y,z) {x==0, y==0}
+
+
+   while (y>=0) {
+
+//  P(k,x,y,z) {x==0, y==0}
+
+      while (y>=0&&x<=50) {
+
+//  P(k,x,y,z) {x==y, 0<=x, x<=50}
+
+         x++;
+
+//  P(k,x,y,z) {x==y+1, 1<=x, x<=51}
+
+         y++;
+      }
+
+//  P(k,x,y,z) {x==51, x==y}
+
+      while (y>=0&&x>50) {
+
+//  P(k,x,y,z) {x+y==102, 51<=x, x<=102}
+
+         y--;
+
+//  P(k,x,y,z) {x+y==101, 51<=x, x<=102}
+
+         x++;
+      }
+   }
+
+//  P(k,x,y,z) {x==103, x+y==102}
+
+   if (x==103) 
+
+//  P(k,x,y,z) {x==103, y==-1}
+
+      printf("property  verified\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x, y, z, k;
+
+   x = 0;
+   y = 0;
+
+   while (y>=0) {
+      while (y>=0&&x<=50) {
+         x++;
+         y++;
+      }
+      while (y>=0&&x>50) {
+         y--;
+         x++;
+      }
+   }
+   printf("property  verified\n");
+   ;
+}

@@ -1,0 +1,146 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x,y) {x==0, y==0}
+
+
+   x = y = 0;
+l99999:   ;
+
+//  T() {}
+
+
+   if (!true) goto break_1;
+
+//  T(y) {y#init<=y+1, y<=y#init+1}
+
+   if (x<=50)
+
+//  T(y) {y==y#init+1, x<=50}
+
+      y++;
+   else
+
+//  T(y) {y==y#init-1, 51<=x}
+
+      y--;
+
+//  T() {}
+
+   if (y<0) goto break_1;
+
+//  T(x) {x==x#init+1, 0<=y}
+
+   x++;
+   goto l99999;
+
+//  T() {0<=x+51y, y<=x, 0<=y+1}
+
+break_1:   ;
+
+//  T() {0<=x+51y, y<=x, 0<=y+1}
+
+
+   if (x==102) 
+
+//  T() {x==102, 0<=y+1, y<=102}
+
+      printf("property  verified\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+
+   x = y = 0;
+l99999:   ;
+
+//  P(x,y) {y<=x, 0<=y}
+
+
+   if (!true) goto break_1;
+
+//  P(x,y) {y<=x, 0<=y}
+
+   if (x<=50)
+
+//  P(x,y) {x<=50, y<=x, 0<=y}
+
+      y++;
+   else
+
+//  P(x,y) {51<=x, y<=x, 0<=y}
+
+      y--;
+
+//  P(x,y) {0<=x, y<=x+1, 0<=y+1}
+
+   if (y<0) goto break_1;
+
+//  P(x,y) {0<=x, y<=x+1, 0<=y}
+
+   x++;
+   goto l99999;
+
+//  P(x,y) {0<=x, y<=x, 0<=y+1}
+
+break_1:   ;
+
+//  P(x,y) {0<=x, 0<=x+51y, y<=x, 0<=y+1}
+
+
+   if (x==102) 
+
+//  P(x,y) {x==102, 0<=y+1, y<=102}
+
+      printf("property  verified\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int x, y;
+
+   x = y = 0;
+l99998:   ;
+
+   if (!true) goto l99999;
+   if (x<=50)
+      y++;
+   else
+      y--;
+   if (y<0) goto l99999;
+   x++;
+   goto l99998;
+l99999:   ;
+
+
+   if (x==102) 
+      printf("property  verified\n");
+   ;
+}

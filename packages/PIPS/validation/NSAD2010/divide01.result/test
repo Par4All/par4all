@@ -1,0 +1,86 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void divide01()
+{
+
+//  T(m) {}
+
+   int m;
+
+//  T(m) {2<=m, m<=m#init, 2<=m#init}
+
+   while (m>1) {
+
+//  T(m) {m#init<=2m+1, 2m<=m#init, 2<=m#init}
+
+      m = m/2;
+
+//  T(m) {m==m#init, 1<=m}
+
+      m = m;
+   }
+
+//  T(m) {m+2<=0, m#init<=m, m#init+2<=0}
+
+   while (m<-1) {
+
+//  T(m) {m#init<=2m+1, 2m<=m#init, m#init+2<=0}
+
+      m = m/2;
+
+//  T(m) {m==m#init, m+1<=0}
+
+      m = m;
+   }
+
+//  T() {0<=m+1, m<=1}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void divide01()
+{
+
+//  P() {}
+
+   int m;
+
+//  P(m) {}
+
+   while (m>1) {
+
+//  P(m) {2<=m}
+
+      m = m/2;
+
+//  P(m) {1<=m}
+
+      m = m;
+   }
+
+//  P(m) {m<=1}
+
+   while (m<-1) {
+
+//  P(m) {m+2<=0}
+
+      m = m/2;
+
+//  P(m) {m+1<=0}
+
+      m = m;
+   }
+
+//  P(m) {0<=m+1, m<=1}
+
+   return;
+}

@@ -143,6 +143,8 @@ int main()
 // Pointer values:
 // l == &l4 (exact);
 // l1[.next] == &l2 (exact);
+// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
+// l2[.next] == *ANY_MODULE*:*NULL* (exact);
 // l3[.next] == *ANY_MODULE*:*NULL* (exact);
 // l4[.next] == *ANY_MODULE*:*NULL* (exact);
 

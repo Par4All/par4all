@@ -1,0 +1,66 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void multiply01()
+{
+
+//  T(m) {m==1}
+
+   int m = 1;
+
+//  T(m) {m#init==1, m<=10}
+
+   while (m<=10) 
+
+//  T(m) {m==2m#init, m#init<=10}
+
+      m = 2*m;
+
+//  T(m) {11<=m, m#init<=m, 11<=m#init, m#init<=20}
+
+   while (m>=1) 
+
+//  T(m) {m==2m#init, 1<=m#init}
+
+      m = 2*m;
+
+//  T() {0==-1}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void multiply01()
+{
+
+//  P() {}
+
+   int m = 1;
+
+//  P(m) {m==1}
+
+   while (m<=10) 
+
+//  P(m) {m<=10}
+
+      m = 2*m;
+
+//  P(m) {11<=m, m<=20}
+
+   while (m>=1) 
+
+//  P(m) {11<=m}
+
+      m = 2*m;
+
+//  P() {0==-1}
+
+   return;
+}

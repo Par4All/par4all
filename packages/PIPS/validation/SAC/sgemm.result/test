@@ -2930,6 +2930,7 @@
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
          INFO1 = 1                                                      0063
+         INFO0 = INFO1
       ELSE
          L_911 = .NOT.NOTB0
          L_110 = LSAME(TRANSB, 'C')
@@ -3039,7 +3040,6 @@
          L_970 = L_860.AND.L_960
          INFO0 = L_970?13:INFO0
       ENDIF
-      INFO0 = INFO1
       IF (INFO0.NE.0) THEN                                              0081
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
@@ -3417,6 +3417,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   v4sf vec00;
   float zero0;
   float one0;
+  int nrowb0;
+  int nrowa0;
   int j5;
   int j4;
   int j3;
@@ -3427,6 +3429,100 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int info0;
   int notb0;
   int nota0;
+  int l_611;
+  int l_500;
+  int l_400;
+  int l_300;
+  int l_200;
+  int l_100;
+  int l_000;
+  int l_911;
+  int l_110;
+  int l_120;
+  int l_130;
+  int l_140;
+  int l_150;
+  int l_160;
+  int l_170;
+  int l_180;
+  int l_190;
+  int l_210;
+  int l_220;
+  int l_230;
+  int l_240;
+  int l_250;
+  int l_260;
+  int l_270;
+  int l_280;
+  int l_290;
+  int l_310;
+  int l_320;
+  int l_330;
+  int l_340;
+  int l_350;
+  int l_360;
+  int l_370;
+  int l_380;
+  int i_00;
+  int l_390;
+  int l_410;
+  int l_420;
+  int l_430;
+  int l_440;
+  int l_450;
+  int l_460;
+  int l_470;
+  int l_480;
+  int l_490;
+  int l_510;
+  int l_520;
+  int l_530;
+  int l_540;
+  int l_550;
+  int i_10;
+  int l_560;
+  int l_570;
+  int l_580;
+  int l_590;
+  int l_600;
+  int l_610;
+  int l_620;
+  int l_630;
+  int l_640;
+  int l_650;
+  int l_660;
+  int l_670;
+  int l_680;
+  int l_690;
+  int l_700;
+  int l_710;
+  int l_720;
+  int l_730;
+  int l_740;
+  int i_20;
+  int l_750;
+  int l_760;
+  int l_770;
+  int l_780;
+  int l_790;
+  int l_800;
+  int l_810;
+  int l_820;
+  int l_830;
+  int l_840;
+  int l_850;
+  int l_860;
+  int l_870;
+  int l_880;
+  int l_890;
+  int l_900;
+  int l_910;
+  int l_920;
+  int l_930;
+  int l_940;
+  int l_950;
+  int l_960;
+  int l_970;
   int lu_ind00;
   int lu_ind10;
   int lu_ind20;
@@ -3474,6 +3570,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   float c1;
   int l_8;
   int l_7;
+  int l_5;
+  int l_4;
+  int l_3;
+  int l_2;
+  int l_1;
+  int l_0;
   static const float size = 10;
   int i;
   int l;
@@ -3489,11 +3591,124 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   zero0 = 0.0e+0;
   nota0 = lsame (transa, 'n');
   notb0 = lsame (transb, 'n');
+  info0 = 0;
+  nrowa0 = __c - conditional__ (nota0, m, k);
+  nrowb0 = __c - conditional__ (notb0, k, n);
   if ((!nota0 && !lsame (transa, 'c')) && !lsame (transa, 't'))
     {
       info1 = 1;
+      info0 = info1;
     }
-  info0 = info1;
+  else
+    {
+      l_911 = !notb0;
+      l_110 = lsame (transb, 'c');
+      l_140 = lsame (transb, 't');
+      l_500 = (m < 0);
+      l_400 = (n < 0);
+      l_300 = (k < 0);
+      i_00 = max (1, nrowa0);
+      i_10 = max (1, nrowb0);
+      i_20 = max (1, m);
+      l_120 = !l_110;
+      l_150 = !l_140;
+      l_200 = (lda < i_00);
+      l_100 = (ldb < i_10);
+      l_000 = (ldc < i_20);
+      l_130 = (l_911 && l_120);
+      l_611 = (l_130 && l_150);
+      info0 = __c - conditional__ (l_611, 2, info0);
+      l_160 = !l_611;
+      l_170 = !l_611;
+      l_190 = !l_611;
+      l_230 = !l_611;
+      l_270 = !l_611;
+      l_330 = !l_611;
+      l_390 = !l_611;
+      l_470 = !l_611;
+      l_560 = !l_611;
+      l_650 = !l_611;
+      l_750 = !l_611;
+      l_860 = !l_611;
+      l_5 = __c - conditional__ (l_160, l_500, l_5);
+      l_180 = (l_170 && l_5);
+      l_210 = !l_5;
+      l_240 = !l_5;
+      l_280 = !l_5;
+      l_340 = !l_5;
+      l_410 = !l_5;
+      l_480 = !l_5;
+      l_570 = !l_5;
+      l_660 = !l_5;
+      l_760 = !l_5;
+      l_870 = !l_5;
+      info0 = __c - conditional__ (l_180, 3, info0);
+      l_220 = (l_190 && l_210);
+      l_4 = __c - conditional__ (l_220, l_400, l_4);
+      l_250 = (l_240 && l_4);
+      l_290 = !l_4;
+      l_350 = !l_4;
+      l_420 = !l_4;
+      l_490 = !l_4;
+      l_580 = !l_4;
+      l_670 = !l_4;
+      l_770 = !l_4;
+      l_880 = !l_4;
+      l_260 = (l_230 && l_250);
+      l_310 = (l_280 && l_290);
+      info0 = __c - conditional__ (l_260, 4, info0);
+      l_320 = (l_270 && l_310);
+      l_3 = __c - conditional__ (l_320, l_300, l_3);
+      l_360 = (l_350 && l_3);
+      l_430 = !l_3;
+      l_510 = !l_3;
+      l_590 = !l_3;
+      l_680 = !l_3;
+      l_780 = !l_3;
+      l_890 = !l_3;
+      l_370 = (l_340 && l_360);
+      l_440 = (l_420 && l_430);
+      l_380 = (l_330 && l_370);
+      l_450 = (l_410 && l_440);
+      info0 = __c - conditional__ (l_380, 5, info0);
+      l_460 = (l_390 && l_450);
+      l_2 = __c - conditional__ (l_460, l_200, l_2);
+      l_520 = (l_510 && l_2);
+      l_600 = !l_2;
+      l_690 = !l_2;
+      l_790 = !l_2;
+      l_900 = !l_2;
+      l_530 = (l_490 && l_520);
+      l_610 = (l_590 && l_600);
+      l_540 = (l_480 && l_530);
+      l_620 = (l_580 && l_610);
+      l_550 = (l_470 && l_540);
+      l_630 = (l_570 && l_620);
+      info0 = __c - conditional__ (l_550, 8, info0);
+      l_640 = (l_560 && l_630);
+      l_1 = __c - conditional__ (l_640, l_100, l_1);
+      l_700 = (l_690 && l_1);
+      l_800 = !l_1;
+      l_910 = !l_1;
+      l_710 = (l_680 && l_700);
+      l_810 = (l_790 && l_800);
+      l_720 = (l_670 && l_710);
+      l_820 = (l_780 && l_810);
+      l_730 = (l_660 && l_720);
+      l_830 = (l_770 && l_820);
+      l_740 = (l_650 && l_730);
+      l_840 = (l_760 && l_830);
+      info0 = __c - conditional__ (l_740, 10, info0);
+      l_850 = (l_750 && l_840);
+      l_0 = __c - conditional__ (l_850, l_000, l_0);
+      l_920 = (l_910 && l_0);
+      l_930 = (l_900 && l_920);
+      l_940 = (l_890 && l_930);
+      l_950 = (l_880 && l_940);
+      l_960 = (l_870 && l_950);
+      l_970 = (l_860 && l_960);
+      info0 = __c - conditional__ (l_970, 13, info0);
+    }
   if (info0 != 0)
     {
       ;

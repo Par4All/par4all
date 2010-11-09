@@ -1,0 +1,35 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete suppress_dead_code05
+create suppress_dead_code05 suppress_dead_code05.c
+
+echo
+echo Initial code for "suppress_dead_code05"
+echo
+
+display PRINTED_FILE[suppress_dead_code05]
+
+echo
+echo Initial code for "suppress_dead_code05" with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[suppress_dead_code05]
+
+echo
+echo Initial code for "suppress_dead_code05" with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[suppress_dead_code05]
+
+echo
+echo Code for "suppress_dead_code05" after dead code elimination
+echo
+
+activate PRINT_CODE
+apply SUPPRESS_DEAD_CODE[suppress_dead_code05]
+display PRINTED_FILE[suppress_dead_code05]
+close
+delete suppress_dead_code05
+quit
+
