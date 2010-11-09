@@ -942,6 +942,7 @@ static bool dead_statement_filter(statement s)
   bool retour;
   effects crwe = load_cumulated_rw_effects(s);
   list crwl = effects_effects(crwe);
+  transformer pre = load_statement_precondition(s);
 
   pips_assert("statement s is consistent", statement_consistent_p(s));
 
@@ -952,7 +953,6 @@ static bool dead_statement_filter(statement s)
 	     ORDERING_STATEMENT(statement_ordering(s)));
   ifdebug(8)
     {
-      transformer pre = load_statement_precondition(s);
       sc_fprint(stderr,
 		predicate_system(transformer_relation(pre)),
 		(char* (*)(Variable)) entity_local_name);
@@ -1065,8 +1065,15 @@ static bool dead_statement_filter(statement s)
       }
     }
 
+    /* FI: nothing for while loops, repeat loops and for loops;
+     should always entered while loops be converted into repeat
+     loops? Should while loop body postcondition be used to transform
+     a while loop into a test? */
+
     if (instruction_test_p(i)) {
       test t = instruction_test(i);
+      expression c = test_condition(t);
+      (void) simplify_boolean_expression_with_precondition(c, pre);
       retour = dead_deal_with_test(s, t);
       break;
     }

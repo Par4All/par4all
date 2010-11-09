@@ -2298,6 +2298,17 @@ bool string_type_p(type t)
   return FALSE;
 }
 
+bool logical_type_p(type t)
+{
+  if (!type_undefined_p(t) && type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (!basic_undefined_p(b) && basic_logical_p(b))
+	return TRUE;
+    }
+  return FALSE;
+}
+
 bool char_type_p(type t)
 {
   bool is_char = FALSE;

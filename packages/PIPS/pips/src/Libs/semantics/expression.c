@@ -59,6 +59,9 @@
   * process. For example:
   *
   * j = 2; i = j + (j = 0) + j;
+  *
+  * but such a case is forbidden by the C99 standard. The result of
+  * the evaluation of such an expression is undefined.
   */
 #include <stdio.h>
 #include <string.h>
@@ -329,7 +332,7 @@ static transformer addition_operation_to_transformer(entity v,
   /* Too early: you are projecting v and loosing all useful information
      within an expression! */
   /* tf = transformer_temporary_value_projection(tf); */
-    
+
   free_transformer(tf2);
   free_transformer(tf12);
   free_transformer(tf_op);
@@ -573,7 +576,7 @@ transformer_add_anded_conditions_updown(
       pips_debug(9, "pre=%p:\n", pre);
       dump_transformer(pre);
     }
-	  
+
     pre1 = transformer_add_condition_information_updown
       (pre, c1, context, veracity, upwards);
 
@@ -581,7 +584,7 @@ transformer_add_anded_conditions_updown(
       pips_debug(9, "pre1=%p:\n", pre1);
       dump_transformer(pre1);
     }
-	  
+
     newpre = transformer_add_condition_information_updown
       (pre1, c2, context, veracity, upwards);
 
@@ -602,7 +605,7 @@ transformer_add_anded_conditions_updown(
     pre2 = transformer_add_condition_information_updown
       (pre2, c2, context, FALSE, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
-		  
+
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
       pips_debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 		 "pre1 =\n");
@@ -670,7 +673,7 @@ static transformer transformer_add_ored_conditions_updown(
     pre2 = transformer_add_condition_information_updown
       (pre2, c2, context, TRUE, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
-		      
+
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
       pips_debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 	    "pre1 =\n");
@@ -925,10 +928,13 @@ transformer transformer_add_range_condition(transformer tf,
 /* INTEGER EXPRESSIONS */
 
 /* FI: I do no longer understand the semantics of
-   "is_internal"... although I designed it.
+   "is_internal"... although I designed it. The intent was probably to
+   manage temporary values: they should be preserved as long as the
+   analysis is internal and else projected.
 
    Furthermore, this function is no longer very useful as
-   normalization can be performed dynamically again and again at a low cost.
+   normalization can be performed dynamically again and again at a low
+   cost.
  */
 transformer simple_affine_to_transformer(entity e, Pvecteur a, bool is_internal)
 {
@@ -1156,12 +1162,11 @@ static transformer generic_abs_to_transformer(entity v, /* assumed to be a value
 
 /* More could be done along the line of
    integer_multiply_to_transformer()... when need arises.*/
-static transformer 
-integer_divide_to_transformer(entity e,
-			      expression arg1,
-			      expression arg2,
-			      transformer pre,
-			      bool is_internal)
+static transformer integer_divide_to_transformer(entity e,
+						 expression arg1,
+						 expression arg2,
+						 transformer pre,
+						 bool is_internal)
 {
   transformer tf = transformer_undefined;
   normalized n1 = NORMALIZE_EXPRESSION(arg1);
@@ -1208,12 +1213,11 @@ integer_divide_to_transformer(entity e,
    vice-versa as can occur when convex hulls generate coupling between
    variables. See non_linear11.f, 22L1=9L2+40, 1<=L1<=10. The smallest
    possible value is -2 and not -20. */
-static transformer 
-integer_multiply_to_transformer(entity v,
-				expression e1,
-				expression e2,
-				transformer ipre,
-				bool is_internal)
+static transformer integer_multiply_to_transformer(entity v,
+						   expression e1,
+						   expression e2,
+						   transformer ipre,
+						   bool is_internal)
 {
   transformer tf = transformer_undefined;
   entity v1 = make_local_temporary_value_entity(entity_type(v));
@@ -1475,12 +1479,11 @@ static transformer integer_power_to_transformer(entity e,
   return tf;
 }
 
-static transformer 
-integer_minmax_to_transformer(entity v, /* value for minmax */
-			      list args,
-			      transformer pre,
-			      bool is_min,
-			      bool is_internal)
+static transformer integer_minmax_to_transformer(entity v, /*value for minmax*/
+						 list args,
+						 transformer pre,
+						 bool is_min,
+						 bool is_internal)
 {
   transformer tf = transformer_identity();
   list cexpr;
@@ -1492,7 +1495,8 @@ integer_minmax_to_transformer(entity v, /* value for minmax */
   for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
     expression arg = EXPRESSION(CAR(cexpr));
     entity tv = make_local_temporary_value_entity(entity_type(v));
-    transformer etf = integer_expression_to_transformer(tv, arg, pre, is_internal);
+    transformer etf = integer_expression_to_transformer(tv, arg, pre,
+							is_internal);
     Pvecteur vineq = vect_new((Variable) tv, (Value) VALUE_ONE);
 
     vect_add_elem(&vineq, (Variable) v, VALUE_MONE);
@@ -1515,14 +1519,18 @@ integer_minmax_to_transformer(entity v, /* value for minmax */
   return tf;
 }
 
-static transformer 
-min0_to_transformer(entity e, list args, transformer pre, bool is_internal)
+static transformer min0_to_transformer(entity e,
+				       list args,
+				       transformer pre,
+				       bool is_internal)
 {
   return integer_minmax_to_transformer(e, args, pre, TRUE, is_internal);
 }
 
-static transformer 
-max0_to_transformer(entity e, list args, transformer pre, bool is_internal)
+static transformer max0_to_transformer(entity e,
+				       list args,
+				       transformer pre,
+				       bool is_internal)
 {
   return integer_minmax_to_transformer(e, args, pre, FALSE, is_internal);
 }
@@ -1771,8 +1779,7 @@ integer_expression_to_transformer(
 }
 
 /* Always return a defined transformer, using effects in case a more precise analysis fails */
-transformer 
-safe_integer_expression_to_transformer(
+transformer safe_integer_expression_to_transformer(
     entity v,
     expression expr,
     transformer pre,
@@ -2980,8 +2987,7 @@ bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool verac
 /* It is supposed to be obsolete but is still called. Maybe, it's only
    partly obsolete... If upwards is false, it is worth performing more
    convex hulls because the precondition on entry may restrain the space. */
-transformer 
-transformer_add_integer_relation_information(
+transformer transformer_add_integer_relation_information(
     transformer pre,
     entity relop,
     expression e1,
@@ -3107,9 +3113,125 @@ transformer_add_integer_relation_information(
     pips_debug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION,
 	       "end newpre=\n");
     print_transformer(newpre);
-    pips_assert("Transformer is internally consistent", 
+    pips_assert("Transformer is internally consistent",
 		transformer_internal_consistency_p(newpre));
   }
 
   return newpre;
+}
+
+/* Simplification of boolean expressions with precondition
+ *
+ * Expression e is modified, if necessary, by side effect.
+ *
+ * The value returned is 1 if the expression e is always true (never
+ * false) under condition p, 0 if is the expression is always false
+ * (never true), and -1 otherwise.
+ *
+ * This function is not used within the semantics library. It is
+ * exported for partial_eval and suppress_dead_code or similar passes.
+ *
+ * Because of C flexibility, all kinds of "boolean" expressions may
+ * arise. Think of the conditional and comma operators, think of all
+ * kinds of side effects, think of integer expressions,...
+ *
+ * FI: In the short term, I only need to deal with boolean operators
+ * and, or and not.
+ */
+int simplify_boolean_expression_with_precondition(expression e,
+						  transformer p)
+{
+  int validity = -1; // unknown
+
+  if(logical_operator_expression_p(e)) {
+    // We could try the global simplification as in the other case...
+    syntax s = expression_syntax(e);
+    call c = syntax_call(s);
+    entity op = call_function(c);
+    if(ENTITY_NOT_P(op)) {
+      expression a = EXPRESSION(CAR(call_arguments(c)));
+      validity = simplify_boolean_expression_with_precondition(a,p);
+      if(validity>=0)
+	validity = 1 - validity;
+    }
+    else if(ENTITY_OR_P(op)) {
+      expression a1 = EXPRESSION(CAR(call_arguments(c)));
+      int v1 = simplify_boolean_expression_with_precondition(a1,p);
+      if(v1==1)
+	validity = 1;
+      else {
+	expression a2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	int v2 = simplify_boolean_expression_with_precondition(a2,p);
+	if(v2==1)
+	  validity = 1;
+	else if(v2==0) { // a2 has no impact
+	  if(v1==0)
+	    validity = 0;
+	  else {
+	    validity = -1;
+	    replace_expression_content(e, copy_expression(a1));
+	  }
+	}
+	else // v2==-1
+	  if(v1==0) { // a1 has no impact
+	    validity = -1;
+	    replace_expression_content(e, copy_expression(a2));
+	  }
+	  else
+	    validity = -1;
+      }
+    }
+    else if(ENTITY_AND_P(op)) {
+      expression a1 = EXPRESSION(CAR(call_arguments(c)));
+      int v1 = simplify_boolean_expression_with_precondition(a1,p);
+      if(v1==0)
+	validity = 0;
+      else { // v1 == -1 or 1, no conclusion yet
+	expression a2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	int v2 = simplify_boolean_expression_with_precondition(a2,p);
+	if(v2==0)
+	  validity = 0;
+	else if(v2==1) {
+	  if(v1==1)
+	    validity = 1;
+	  else { // get rid of a2
+	    validity = -1;
+	    replace_expression_content(e, copy_expression(a1));
+	  }
+	}
+	else { // v2==-1
+	  if(v1==1) {// a1 is useless
+	    validity = -1;
+	    replace_expression_content(e, copy_expression(a2));
+	  }
+	  else {
+	    validity = -1;
+	  }
+	}
+      }
+    }
+  }
+  else {
+    transformer tt = condition_to_transformer(e,p, TRUE);
+    transformer ft = condition_to_transformer(e,p, FALSE);
+
+    if(transformer_empty_p(tt)) {
+      // Then the condition is always false
+      validity = 0;
+    }
+    if(transformer_empty_p(ft)) {
+      // Then the condition is always true
+      validity = 1;
+    }
+    // Both can be true simultaneously when the precondition p is
+    // empty... but it does not matter
+  }
+
+  if(validity==0||validity==1) {
+    // e must be replaced by a call to true or false
+    expression ne = validity?make_true_expression():make_false_expression();
+    replace_expression_content(e, ne);
+  }
+
+  return validity;
 }

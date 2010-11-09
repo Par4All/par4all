@@ -53,7 +53,7 @@ do
     --nlpmake) autoconf= ;;
     --nlpmake=*) autoconf= ; build=${1//*=/} ;;
     -n|--nice) nice=nice ;;
-    # force compilation & validation & mail
+    # force compilation & validation & validation mail
     -f|--force) validate=mail-validate ; force=1 ;;
     # force compilation status report even if unchanged
     -r|--report) report=1 ;;
@@ -120,6 +120,7 @@ fi
 # report current-state compile message
 # current-state: ok skip locked KO:*
 # compile: ok unknown unchanged unbuild build exe
+# side effect: the function exits!
 function report()
 {
   [ $# -eq 3 ] || {
@@ -249,6 +250,7 @@ cd $prod || \
 # manual locking based on mkdir
 if [ "$wait" ]
 then
+  # we DO want to wait for the lock for some time
   while ! mkdir LOCK > /dev/null 2>&1 ; do
     [ $wait -eq 0 ] && break
     let wait--
@@ -257,20 +259,21 @@ then
   # did we get the lock?
   test -d LOCK ||
   {
+    # we report unconditionnaly, as --wait should be rare
     report 'locked' 'unknown' "waiting for copy '$prod', but still locked..."
     exit 2
   }
 else
   mkdir LOCK > /dev/null 2>&1 ||
   {
-    # warn after 1800 seconds (30mn) locking
+    # warn after 3600 seconds (1h) locking
     created=$(stat -c %Y LOCK)
     now=$(date +%s)
     delay=$(($now - $created))
-    if [ $delay -gt 1800 ]
+    if [ $delay -gt 3600 ]
     then
-      report 'locked' 'unknown' "working copy '$prod' is already locked..."
       touch LOCK
+      report 'locked' 'unknown' "working copy '$prod' is already locked..."
     else
       report 'skip-lock' 'unknown' "working copy '$prod' is locked"
     fi
@@ -325,8 +328,8 @@ then
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
-    # hmmm... this is installation dependent:-( pkgconfig?
-    ldpips=$prod/../install/lib/python*/site-packages/pips
+    # get python directory, which depends on python version
+    ldpips=$(pkg-config --variable=pythondir pips)/pips
     test -d "$ldpips" -a -f "$ldpips"/_pypips.so \
       || report 'KO:make' 'library' 'no "pyps" dynamic library found!'
   else
