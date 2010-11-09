@@ -110,6 +110,7 @@ pv_context make_simple_pv_context()
   ctxt.pv_composition_with_transformer_func = simple_pv_composition_with_transformer;
   ctxt.pvs_must_union_func = simple_pvs_must_union;
   ctxt.pvs_may_union_func = simple_pvs_may_union;
+  ctxt.stmt_stack = stack_make(statement_domain, 0, 0);
   return ctxt;
 }
 
@@ -136,6 +137,21 @@ void reset_pv_context(pv_context *p_ctxt)
   p_ctxt->pv_composition_with_transformer_func = (cell_relation_function) UNDEF;
   p_ctxt->pvs_must_union_func = (list_function) UNDEF;
   p_ctxt->pvs_may_union_func = (list_function) UNDEF;
+}
+
+void pv_context_statement_push(statement s, pv_context * ctxt)
+{
+  stack_push((void *) s, ctxt->stmt_stack);
+}
+
+void pv_context_statement_pop(pv_context * ctxt)
+{
+  (void) stack_pop( ctxt->stmt_stack);
+}
+
+statement pv_context_statement_head(pv_context * ctxt)
+{
+  return ((statement) stack_head(ctxt->stmt_stack));
 }
 
 /************* RESULTS HOOK */
@@ -242,6 +258,7 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
       /* keep local variables in declaration reverse order */
       if (declaration_statement_p(stmt))
 	{
+	  pv_context_statement_push(stmt, ctxt);
 	  store_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
@@ -251,6 +268,7 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 	    }
 	  store_gen_pv(stmt, make_cell_relations(NIL));
 	  store_kill_pv(stmt, make_effects(NIL));
+	  pv_context_statement_pop(ctxt);
 	}
       else
 	l_cur = statement_to_post_pv(stmt, l_cur, ctxt);
@@ -269,6 +287,7 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   pips_debug(1, "begin\n");
+  pv_context_statement_push(stmt, ctxt);
   pips_debug_pvs(2, "input pvs: ", l_in);
 
   store_pv(stmt, make_cell_relations(gen_full_copy_list(l_in)));
@@ -290,6 +309,7 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
   store_kill_pv(stmt, make_effects(NIL));
   pips_debug_pvs(2, "returning: ", l_out);
   pips_debug(1, "end\n");
+  pv_context_statement_pop(ctxt);
 
   return (l_out);
 }
@@ -349,7 +369,7 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
     }
 
   pv_results pv_res = make_pv_results();
-  assignment_to_post_pv(lhs_exp, rhs_exp, true, l_in, &pv_res, ctxt);
+  assignment_to_post_pv(lhs_exp, false, rhs_exp, true, l_in, &pv_res, ctxt);
   l_out = pv_res.l_out;
   free_pv_results_paths(&pv_res);
 
@@ -977,13 +997,15 @@ void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
 
 /*
   @brief computes the gen, post and kill pointer values of an assignment
-  @param lhs is the left hand side expression of the assignment
+  @param lhs is the left hand side expression of the assignment*
+  @param may_lhs_p is true if it's only a possible assignment
   @param rhs is the right hand side of the assignement
   @param l_in is a list of the input pointer values
   @param ctxt gives the functions specific to the kind of pointer values to be
           computed.
  */
-void assignment_to_post_pv(expression lhs, expression rhs, bool declaration_p,
+void assignment_to_post_pv(expression lhs, bool may_lhs_p,
+			   expression rhs, bool declaration_p,
 			   list l_in, pv_results *pv_res, pv_context *ctxt)
 {
   list l_in_cur = NIL;
@@ -1012,6 +1034,7 @@ void assignment_to_post_pv(expression lhs, expression rhs, bool declaration_p,
      well is it correct? can a relational operator expression be a lhs ?
   */
   lhs_eff = EFFECT(CAR(lhs_pv_res.result_paths));
+  if (may_lhs_p) effect_to_may_effect(lhs_eff);
   pv_res->result_paths = CONS(EFFECT, copy_effect(lhs_eff), NIL);
   pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 					      make_cell_interpretation_value_of(), NIL);

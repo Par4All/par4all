@@ -60,7 +60,7 @@ with pworkspace("basics0.c") as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	w.compile(rep="basics0", link=False)
+	a_out=w.compile(rep="basics0", link=False)
 
 # tidy ..
 shutil.rmtree("basics0")

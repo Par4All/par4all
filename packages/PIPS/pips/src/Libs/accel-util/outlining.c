@@ -51,6 +51,7 @@
 #include "effects-generic.h"
 #include "effects-convex.h"
 #include "preprocessor.h"
+#include "expressions.h"
 #include "text-util.h"
 #include "parser_private.h"
 #include "accel-util.h"
@@ -428,6 +429,67 @@ static void outliner_extract_loop_bound(statement sloop, hash_table entity_to_ef
         range_upper(r)=entity_to_expression(holder);
     }
 }
+static void convert_pointer_to_array_aux(expression exp,entity e) {
+    if(expression_reference_p(exp)) {
+        reference r = expression_reference(exp);
+        if(same_entity_p(reference_variable(r),e)) {
+            syntax syn = expression_syntax(exp);
+            expression_syntax(exp)=syntax_undefined;
+            syntax syn2=make_syntax_call(
+                    make_call(
+                        entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                        CONS(EXPRESSION,
+                            make_expression(
+                                syn,normalized_undefined
+                                ),
+                            NIL)
+                        )
+                    );
+            update_expression_syntax(exp,syn2);
+        }
+    }
+}
+static void convert_pointer_to_array_aux2(statement s, entity e){
+    FOREACH(ENTITY,en,statement_declarations(s))
+    gen_context_recurse(entity_initial(en),e,expression_domain,gen_true,convert_pointer_to_array_aux);
+}
+
+static void convert_pointer_to_array(entity e,entity re, expression x, list statements) {
+    type t =entity_type(e);
+    type pointed_type = basic_pointer(
+            variable_basic(
+                type_variable(t)
+                )
+            );
+    basic_pointer(
+            variable_basic(
+                type_variable(t)
+                )
+            )=type_undefined;
+    free_type(t);
+    entity_type(e)=pointed_type;
+    FOREACH(STATEMENT,s,statements) {
+        gen_context_multi_recurse(s,re,expression_domain,gen_true,convert_pointer_to_array_aux,
+                statement_domain,gen_true,convert_pointer_to_array_aux2,
+                NULL);
+        cleanup_subscripts(s);
+    }
+
+    /* crado */
+    syntax syn = expression_syntax(x);
+    expression_syntax(x)=syntax_undefined;
+    syntax syn2=make_syntax_call(
+            make_call(
+                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                CONS(EXPRESSION,
+                    make_expression(
+                        syn,normalized_undefined
+                        ),
+                    NIL)
+                )
+            );
+    update_expression_syntax(x,syn2);
+}
 
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
@@ -489,7 +551,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
     {
-        /* function should be add to compilation unit */
+        /* function should be added to compilation unit */
         if(entity_function_p(e))
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
         else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
@@ -527,6 +589,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
 
 
+
     intptr_t i=0;
 
 	/* all variables are promoted parameters */
@@ -535,9 +598,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     FOREACH(ENTITY,e,referenced_entities)
     {
         type t = entity_type(e);
-        bool is_parameter_p = false;
-        if( type_variable_p(t) ||
-                /* for parameter case */ (is_parameter_p=(entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t))) )
+        bool is_parameter_p = /* != formal parameter */ (entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t));
+        if( type_variable_p(t) || is_parameter_p )
         {
             /* this create the dummy parameter */
             entity dummy_entity = FindOrCreateEntity(
@@ -581,13 +643,18 @@ statement outliner(string outline_module_name, list statements_to_outline)
      */
     if(c_module_p(get_current_module_entity()))
     {
-		list iter = effective_parameters;
+		list iter = effective_parameters,
+             riter = referenced_entities;
         FOREACH(PARAMETER,p,formal_parameters)
         {
 			expression x = EXPRESSION(CAR(iter));
-            entity ex = reference_variable(expression_reference(x));
+            entity re = ENTITY(CAR(riter));
+            entity ex = entity_undefined;
+            if(expression_reference_p(x))
+                ex = reference_variable(expression_reference(x));
+
             entity e = dummy_identifier(parameter_dummy(p));
-            if( type_variable_p(entity_type(ex)) ) {
+            if(!entity_undefined_p(ex)&& type_variable_p(entity_type(ex)) ) {
                 variable v = type_variable(entity_type(ex));
                 bool entity_written=false;
                 FOREACH(STATEMENT,stmt,statements_to_outline)
@@ -616,7 +683,16 @@ statement outliner(string outline_module_name, list statements_to_outline)
                             0);
                 }
             }
+            if(type_variable_p(entity_type(re))) {
+                variable v = type_variable(entity_type(re));
+                if( basic_pointer_p(variable_basic(v)) &&
+                        array_type_p(basic_pointer(variable_basic(v)))) {
+                    convert_pointer_to_array(e,re,x,statements_to_outline);
+
+                }
+            }
 			POP(iter);
+            POP(riter);
         }
 		pips_assert("no effective parameter left", ENDP(iter));
     }

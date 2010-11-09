@@ -1,0 +1,22 @@
+int main(int argc, char **argv)
+{
+   int a = 1;
+   if (argc>1) {
+      a = 2;
+      printf("%d", a);
+   }
+   printf("%d", a);
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   //PIPS generated variable
+   int a0 = 1;
+   if (argc>1) {
+      a0 = 2;
+      printf("%d", a0);
+   }
+   printf("%d", a0);
+   return 0;
+}
+

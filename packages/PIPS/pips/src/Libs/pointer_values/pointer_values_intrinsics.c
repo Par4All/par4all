@@ -40,6 +40,7 @@
 #include "effects-generic.h"
 #include "pipsdbm.h"
 #include "misc.h"
+#include "properties.h"
 
 #include "pointer_values.h"
 
@@ -745,7 +746,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {STRTOULL_FUNCTION_NAME,                 safe_intrinsic_to_post_pv},
   {RAND_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
   {SRAND_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
-  {CALLOC_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+  {CALLOC_FUNCTION_NAME,                   heap_intrinsic_to_post_pv},
   {FREE_FUNCTION_NAME,                     heap_intrinsic_to_post_pv},
   {MALLOC_FUNCTION_NAME,                   heap_intrinsic_to_post_pv},
   {REALLOC_FUNCTION_NAME,                  heap_intrinsic_to_post_pv},
@@ -1082,7 +1083,7 @@ static void assignment_intrinsic_to_post_pv(entity  __attribute__ ((unused))func
 {
   expression lhs = EXPRESSION(CAR(func_args));
   expression rhs = EXPRESSION(CAR(CDR(func_args)));
-  assignment_to_post_pv(lhs, rhs, false, l_in, pv_res, ctxt);
+  assignment_to_post_pv(lhs, false, rhs, false, l_in, pv_res, ctxt);
 }
 
 static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
@@ -1480,11 +1481,247 @@ static void va_list_function_to_post_pv(entity func, list func_args, list l_in,
 {
   safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
+
+
+static void free_to_post_pv(list l_free_eff, list l_in,
+			    pv_results * pv_res, pv_context *ctxt)
+{
+  pips_debug_effects(5, "begin with input effects :\n", l_free_eff);
+
+  FOREACH(EFFECT, eff, l_free_eff)
+    {
+      /* for each freed pointer, find it's targets */
+
+      list l_remnants = NIL;
+      cell_relation exact_eff_pv = cell_relation_undefined;
+      list l_values = NIL;
+
+      pips_debug_effect(4, "begin, looking for an exact target for eff:\n",
+			eff);
+
+      l_values = effect_find_equivalent_pointer_values(eff, l_in,
+						       &exact_eff_pv,
+						       &l_remnants);
+      pips_debug_pvs(3, "l_values: \n", l_values);
+      pips_debug_pvs(3, "l_remnants: \n", l_remnants);
+      pips_debug_pv(3, "exact_eff_pv: \n", exact_eff_pv);
+
+      list l_heap_eff = NIL;
+
+      if (exact_eff_pv != cell_relation_undefined)
+	{
+	  cell heap_c = cell_undefined;
+	  /* try to find the heap location */
+	  cell c1 = cell_relation_first_cell(exact_eff_pv);
+	  entity e1 = reference_variable(cell_reference(c1));
+
+	  cell c2 = cell_relation_second_cell(exact_eff_pv);
+	  entity e2 = reference_variable(cell_reference(c2));
+
+	  if (entity_flow_or_context_sentitive_heap_location_p(e1))
+	    heap_c = c1;
+	  else if (entity_flow_or_context_sentitive_heap_location_p(e2))
+	    heap_c = c2;
+	  if (!cell_undefined_p(heap_c))
+	    l_heap_eff =
+	      CONS(EFFECT,
+		   make_effect(copy_cell(heap_c),
+			       make_action_write_memory(),
+			       copy_approximation(effect_approximation(eff)),
+			       make_descriptor_none()),
+		   NIL);
+	  else
+	    {
+	      /* try to find the heap target in remants */
+	      cell other_c = cell_undefined;
+	      if (same_entity_p(effect_entity(eff), e1))
+		other_c = c2;
+	      else other_c = c1;
+	      list l_tmp =
+		CONS(EFFECT,
+		     make_effect(copy_cell(other_c),
+				 make_action_write_memory(),
+				 copy_approximation(effect_approximation(eff)),
+				 make_descriptor_none()),
+		     NIL);
+	      free_to_post_pv(l_tmp, l_remnants, pv_res, ctxt);
+	      pv_res->l_out = CONS(CELL_RELATION,
+				   copy_cell_relation(exact_eff_pv),
+				   pv_res->l_out);
+	      gen_free_list(l_tmp);
+	      return;
+	    }
+	}
+      else
+	{
+	  /* try first to find another target */
+	  FOREACH(CELL_RELATION, pv_tmp, l_values)
+	    {
+	      cell heap_c = cell_undefined;
+	      /* try to find the heap location */
+	      cell c1 = cell_relation_first_cell(pv_tmp);
+	      entity e1 = reference_variable(cell_reference(c1));
+
+	      cell c2 = cell_relation_second_cell(pv_tmp);
+	      entity e2 = reference_variable(cell_reference(c2));
+
+	      if (entity_flow_or_context_sentitive_heap_location_p(e1))
+		heap_c = c1;
+	      else if (entity_flow_or_context_sentitive_heap_location_p(e2))
+		heap_c = c2;
+	      if (!cell_undefined_p(heap_c))
+		l_heap_eff =
+		  CONS(EFFECT,
+		       make_effect(copy_cell(heap_c),
+				   make_action_write_memory(),
+				   cell_relation_exact_p(pv_tmp)
+				   ? copy_approximation
+				   (effect_approximation(eff))
+				   :make_approximation_may(),
+				   make_descriptor_none()),
+		       NIL);
+
+	    }
+	}
+
+      if (!ENDP(l_heap_eff))
+	{
+	  /* assign an undefined_value to freed pointer */
+	  list l_rhs =
+	    CONS(EFFECT,
+		 make_effect( make_undefined_pointer_value_cell(),
+			      make_action_write_memory(),
+			      make_approximation_must(),
+			      make_descriptor_none()),
+		 NIL);
+	  list l_kind = CONS(CELL_INTERPRETATION,
+			     make_cell_interpretation_value_of(),
+			     NIL);
+	  single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
+					       false, l_in, pv_res, ctxt);
+	  gen_full_free_list(l_rhs);
+	  gen_full_free_list(l_kind);
+	  free_pv_results_paths(pv_res);
+	  if (l_in != pv_res->l_out)
+	    {
+	      gen_full_free_list(l_in);
+	      l_in = pv_res->l_out;
+	    }
+	  pips_debug_pvs(5, "l_in after assigning "
+			 "undefined value to freed pointer:\n",
+			 l_in);
+
+	  FOREACH(EFFECT, heap_eff, l_heap_eff)
+	    {
+	      entity heap_e =
+		reference_variable(effect_any_reference(heap_eff));
+	      pips_debug(5, "heap entity found (%s)\n", entity_name(heap_e));
+
+	      pointer_values_remove_var(heap_e,
+					effect_may_p(eff)
+					|| effect_may_p(heap_eff),
+					l_in,
+					pv_res, ctxt);
+	      l_in= pv_res->l_out;
+	    }
+	}
+      else /* no flow or context sensitive variable found */
+	{
+	  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+	  if (same_string_p(opt, "unique"))
+	    pips_user_error("trying to free a non-heap pointer\n");
+	  else
+	    pips_internal_error("case not handled yet");
+	}
+
+    } /* FOREACH */
+  pips_debug_pvs(5, "end with pv_res->l_out: \n", pv_res->l_out);
+}
+
 static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 				      pv_results * pv_res, pv_context *ctxt)
 {
-  safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
+  string func_name = entity_local_name(func);
+  expression malloc_arg = expression_undefined;
+  bool free_malloc_arg = false;
+  list l_in_cur = l_in;
+
+
+  /* free the previously allocated path if need be */
+  if (same_string_p(func_name, FREE_FUNCTION_NAME)
+      || same_string_p(func_name, REALLOC_FUNCTION_NAME))
+    {
+      expression free_ptr_exp = EXPRESSION(CAR(func_args));
+
+      pv_results pv_res_arg = make_pv_results();
+      expression_to_post_pv(free_ptr_exp, l_in_cur, &pv_res_arg, ctxt);
+      if (pv_res_arg.l_out != l_in_cur)
+	{
+	  gen_full_free_list(l_in_cur);
+	  l_in_cur = pv_res_arg.l_out;
+	}
+      free_to_post_pv(pv_res_arg.result_paths, l_in_cur, pv_res, ctxt);
+      l_in_cur = pv_res->l_out;
+    }
+
+  /* Then retrieve the allocated path if any */
+  if(same_string_p(func_name, MALLOC_FUNCTION_NAME))
+    {
+      malloc_arg = EXPRESSION(CAR(func_args));
+    }
+  else if(same_string_p(func_name, CALLOC_FUNCTION_NAME))
+    {
+      malloc_arg =
+	make_op_exp("*",
+		   copy_expression(EXPRESSION(CAR(func_args))),
+		   copy_expression(EXPRESSION(CAR(CDR(func_args)))));
+      free_malloc_arg = true;
+    }
+  else if (same_string_p(func_name, REALLOC_FUNCTION_NAME))
+    {
+      malloc_arg = EXPRESSION(CAR(CDR(func_args)));
+    }
+
+  if (!expression_undefined_p(malloc_arg))
+    {
+
+      /* first, impact of argument evaluation on pointer values */
+      pv_results pv_res_arg = make_pv_results();
+      expression_to_post_pv(malloc_arg, l_in_cur, &pv_res_arg, ctxt);
+      free_pv_results_paths(&pv_res_arg);
+      if (pv_res_arg.l_out != l_in_cur)
+	{
+	  gen_full_free_list(l_in_cur);
+	  l_in_cur = pv_res_arg.l_out;
+	}
+
+      sensitivity_information si =
+	make_sensitivity_information(pv_context_statement_head(ctxt),
+				     get_current_module_entity(),
+				     NIL);
+      entity e = malloc_to_abstract_location(malloc_arg, &si);
+
+      effect eff = make_effect(make_cell_reference(make_reference(e, NIL)),
+			       make_action_write_memory(),
+			       make_approximation_must(),
+			       make_descriptor_none());
+
+      if (!entity_heap_location_p(e))
+	  effect_add_dereferencing_dimension(eff);
+      else
+	effect_to_may_effect(eff);
+      pv_res->result_paths = CONS(EFFECT, eff, NIL);
+      pv_res->result_paths_interpretations =
+	CONS(CELL_INTERPRETATION,
+	     make_cell_interpretation_address_of(),
+	     NIL);
+      if (free_malloc_arg)
+	free_expression(malloc_arg);
+    }
+
+  pv_res->l_out = l_in_cur;
 }
+
 #if 0
 static void stop_to_post_pv(entity __attribute__ ((unused))func, list func_args,
 			    list l_in, pv_results * pv_res, pv_context *ctxt)

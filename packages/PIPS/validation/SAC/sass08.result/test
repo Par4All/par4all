@@ -1,0 +1,23 @@
+int main()
+{
+   int i, a = 0, b = 1;
+   for(i = 0; i <= 9; i += 1) {
+      b = a;
+      b += i;
+      a = b;
+   }
+   printf("%d\n", a);
+}
+int main()
+{
+   int a = 0;
+   //PIPS generated variable
+   int i0, b0 = 1;
+   for(i0 = 0; i0 <= 9; i0 += 1) {
+      b0 = a;
+      b0 += i0;
+      a = b0;
+   }
+   printf("%d\n", a);
+}
+

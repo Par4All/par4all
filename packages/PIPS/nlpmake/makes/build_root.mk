@@ -125,6 +125,9 @@ auto: auto-clean
 		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
+	# manual fix...
+	-[ -d $(BUILD.dir)/src/Scripts/validation ] && \
+	  $(MAKE) -C $(BUILD.dir)/src/Scripts/validation install
 
 # force tags target
 tags: tags-clean

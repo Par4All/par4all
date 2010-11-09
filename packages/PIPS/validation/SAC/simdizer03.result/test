@@ -24,22 +24,24 @@ int main(int argc, char *argv[])
 {
    int b, *a, c[4];
    //SAC generated temporary array
-   a4si pdata0 = {0, 0, 0, 0}, pdata1 = {2, 3, 4, 5};
+   a4si pdata0 = {2, 3, 4, 5}, pdata1 = {2, 3, 4, 5};
    do {
+      //PIPS:SAC generated v4si vector(s)
+      v4si vec00, vec10, vec20;
       a = malloc(4*sizeof(int));
-      a[0] = 2*pdata0[0];
-      a[1] = 3*pdata0[0];
-      a[2] = 4*pdata0[0];
-      a[3] = 5*pdata0[0];
+      SIMD_LOAD_GENERIC_V4SI(vec20, b, b, b, b);
+      SIMD_LOAD_V4SI(vec10, &pdata0[0]);
+      SIMD_MULD(vec00, vec10, vec20);
+      SIMD_STORE_V4SI(vec00, &a[0]);
    }
    while (0);
    do {
       //PIPS:SAC generated v4si vector(s)
-      v4si vec00, vec10, vec20;
-      SIMD_LOAD_V4SI(vec20, &pdata0[0]);
-      SIMD_LOAD_V4SI(vec10, &pdata1[0]);
-      SIMD_MULD(vec00, vec10, vec20);
-      SIMD_STORE_V4SI(vec00, &c[0]);
+      v4si vec30, vec40, vec50;
+      SIMD_LOAD_GENERIC_V4SI(vec50, b, b, b, b);
+      SIMD_LOAD_V4SI(vec40, &pdata1[0]);
+      SIMD_MULD(vec30, vec40, vec50);
+      SIMD_STORE_V4SI(vec30, &c[0]);
    }
    while (0);
    return 0;

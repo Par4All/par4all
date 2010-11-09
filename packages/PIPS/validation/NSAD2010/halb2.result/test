@@ -1,0 +1,130 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x,y) {x==0, y==0}
+
+
+   x = y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, x<=100, 2y<=x, 0<=y}
+
+
+   while (x<=100) {
+
+//  T(x,y) {x+2y==x#init+2y#init+4, x#init+2<=x, x<=x#init+4,
+//    x#init<=100}
+
+      if (alea())
+
+//  T(x) {x==x#init+4, x<=104}
+
+         x = x+4;
+      else {
+
+//  T(x) {x==x#init+2, x<=102}
+
+         x = x+2;
+
+//  T(y) {y==y#init+1, x<=102}
+
+         y++;
+      }
+
+//  T() {x<=104}
+
+      if (x+2*y<=204) 
+
+//  T() {x<=104, x+2y<=204}
+
+         printf("property verified\n");
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+
+   x = y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+
+   while (x<=100) {
+
+//  P(x,y) {x<=100, 2y<=x, 0<=y}
+
+      if (alea())
+
+//  P(x,y) {x<=100, 2y<=x, 0<=y}
+
+         x = x+4;
+      else {
+
+//  P(x,y) {x<=100, 2y<=x, 0<=y}
+
+         x = x+2;
+
+//  P(x,y) {x<=102, 2y+2<=x, 0<=y}
+
+         y++;
+      }
+
+//  P(x,y) {x<=104, 4<=x+2y, 2y<=x, x+2y<=204, 0<=y}
+
+      if (x+2*y<=204) 
+
+//  P(x,y) {x<=104, 4<=x+2y, 2y<=x, x+2y<=204, 0<=y}
+
+         printf("property verified\n");
+   }
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+   float z;
+   int x, y;
+
+   x = y = 0;
+
+   while (x<=100) {
+      if (alea())
+         x = x+4;
+      else {
+         x = x+2;
+         y++;
+      }
+      printf("property verified\n");
+   }
+   ;
+}

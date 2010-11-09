@@ -56,35 +56,6 @@ const char* entity_minimal_user_name(entity e) {
   STUB_ERROR();
 }
 
-/* Test if a name ends with .F */
-bool dot_F_file_p( string name ) {
-  STUB_WARNING();
-  return !!find_suffix( name, RATFOR_FILE_SUFFIX );
-}
-
-/* Test if a name ends with .f */
-bool dot_f_file_p( string name ) {
-  STUB_WARNING();
-  return !!find_suffix( name, FORTRAN_FILE_SUFFIX );
-}
-
-/* Test if a name ends with .c */
-bool dot_c_file_p( string name ) {
-  STUB_WARNING();
-  return !!find_suffix( name, C_FILE_SUFFIX );
-}
-
-/* Test if a name ends with .f90 */
-bool dot_f90_file_p( string name ) {
-  STUB_WARNING();
-  return !!find_suffix( name, FORTRAN90_FILE_SUFFIX );
-}
-
-/* Test if a name ends with .f95 */
-bool dot_f95_file_p( string name ) {
-  STUB_WARNING();
-  return !!find_suffix( name, FORTRAN95_FILE_SUFFIX );
-}
 
 const char* entity_minimal_name(entity e) {
   STUB_ERROR();

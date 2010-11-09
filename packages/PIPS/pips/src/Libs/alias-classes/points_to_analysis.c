@@ -1875,7 +1875,7 @@ set basic_ref_heap(set pts_to_set, expression lhs, expression rhs __attribute__ 
   effects_free(l1);
   generic_effects_reset_all_methods();
   ref1 = effect_any_reference(e1);
-  ref2 = malloc_to_abstract_location(copy_reference(ref1), pt, type_undefined,
+  ref2 = original_malloc_to_abstract_location(copy_reference(ref1), pt, type_undefined,
 				     expression_undefined, get_current_module_entity(),
 				     statement_number(current));
 

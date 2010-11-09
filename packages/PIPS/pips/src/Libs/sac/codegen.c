@@ -119,7 +119,7 @@ static void update_vector_to_expressions(entity e, list exps)
 
 void invalidate_expressions_in_statement(statement s)
 {
-    list effects = load_cumulated_rw_effects_list( s );
+    list effects = load_proper_rw_effects_list( s );
     void * hiter = NULL;
     entity key;
     list value;
@@ -297,28 +297,6 @@ opcode generate_opcode(string name, list types, float cost)
             "to partially filled register\n", name);
     return oc;
 }
-#if 0
-static int get_subwordSize_from_vector(entity vec)
-{
-    char * name = entity_local_name(vec);
-
-    switch(name[2])
-    {
-        case 'q':
-            return 8;
-        case 'h':
-            return 16;
-        case 's':
-            return 32;
-        case 'd':
-            return 64;
-        default:
-            pips_internal_error("subword size unknown.\n");
-    }
-
-    return 8;
-}
-#endif
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
@@ -405,43 +383,17 @@ entity get_function_entity(string name)
  * @return an expression of the offset, in octets
  */
 static
-expression reference_offset(const reference r, basic refbasic)
+expression sreference_offset(reference r)
 {
-    if( ENDP(reference_indices(r)) ) return int_to_expression(0);
-    else {
-        expression offset = 
-            copy_expression(
-                    get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
-                    EXPRESSION(CAR(reference_indices(r))):
-                    EXPRESSION(CAR(gen_last(reference_indices(r)))));
-        list dims = get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION") ?
-            CDR(variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))))):
-            variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
-        list indices = NIL;
-        if( get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-            indices=gen_copy_seq(CDR(reference_indices(r)));
-        else {
-            /* list without last element */
-            indices=gen_copy_seq(reference_indices(r));
-            gen_remove(&indices,EXPRESSION(CAR(gen_last(indices))));
-        }
-        FOREACH(EXPRESSION,exp,indices)
-        {
-            dimension d = DIMENSION(CAR(dims));
-            expression d_exp = SizeOfDimension(d);
-            offset = make_op_exp(PLUS_OPERATOR_NAME,
-                    make_op_exp(MULTIPLY_OPERATOR_NAME,
-                        copy_expression(exp),
-                        d_exp),
-                    offset
-                    );
-        }
-        gen_free_list(indices);
-        expression result = make_op_exp(MULTIPLY_OPERATOR_NAME,
-					int_to_expression(SizeOfElements(refbasic)),
-					offset);
-        return result;
+    if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION")) {
+        reference cr = copy_reference(r);
+        reference_indices(cr)=gen_nreverse(reference_indices(cr));
+        expression out = reference_offset(cr);
+        free_reference(cr);
+        return out;
     }
+    else
+        return reference_offset(r);
 }
 
 static expression offset_of_struct(entity e)
@@ -493,39 +445,13 @@ expression distance_between_expression(const expression exp0, const expression e
         expression edistance = distance_between_entity(e0,e1);
         if(!expression_undefined_p(edistance))
         {
-            list indices0 = gen_full_copy_list(reference_indices(r0)),
-                 indices1 = gen_full_copy_list(reference_indices(r1));
-            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-            {
-                indices0=gen_nreverse(indices0);
-                indices1=gen_nreverse(indices1);
-            }
-            while(!ENDP(indices0) && !ENDP(indices1))
-            {
-                expression i0 = EXPRESSION(CAR(indices0)),
-                           i1 = EXPRESSION(CAR(indices1));
-                if(!same_expression_p(i0,i1))
-                    break;
-                POP(indices0);
-                POP(indices1);
-            }
-            if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
-            {
-                indices0=gen_nreverse(indices0);
-                indices1=gen_nreverse(indices1);
-            }
-            reference fake0 = make_reference(e0,indices0),
-                      fake1 = make_reference(e1,indices1);
-	    basic b0 = basic_of_reference(r0),
-		    b1 = basic_of_reference(r1);
-            expression offset0 = reference_offset(fake0, basic_of_reference(r0)),
-                       offset1 = reference_offset(fake1, basic_of_reference(r1));
+            basic b = basic_of_reference(r0);
+            expression offset0 = sreference_offset(r0),
+                       offset1 = sreference_offset(r1);
             expression distance =  make_op_exp(MINUS_OPERATOR_NAME,offset1,offset0);
-	    free_basic(b0);
-	    free_basic(b1);
-            free_reference(fake0);
-            free_reference(fake1);
-
+            distance = make_op_exp(MULTIPLY_OPERATOR_NAME,
+                    distance,int_to_expression(SizeOfElements(b)));
+            free_basic(b);
             result= make_op_exp(PLUS_OPERATOR_NAME,distance,edistance);
         }
     }
@@ -538,6 +464,8 @@ expression distance_between_expression(const expression exp0, const expression e
         result = make_op_exp(MINUS_OPERATOR_NAME,lhs_distance,rhs_distance);
     }
     set_bool_property("EVAL_SIZEOF",eval_sizeof);
+    //maxima_simplify(&result);
+    simplify_expression(&result);
     return result;
 }
 
@@ -784,7 +712,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         expression real_e = expression_field_p(e)?binary_call_rhs(expression_call(e)):e;
         if (argsType == OTHER)
         {
-            all_scalar = all_scalar && expression_scalar_p(e);
+            all_scalar = all_scalar && expression_scalar_p(e) &&
+                (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
             continue;
         }
         else if (argsType == CONSTANT)
@@ -792,7 +721,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             if (!expression_constant_p(real_e))
             {
                 argsType = OTHER;
-                all_scalar = all_scalar && expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e) &&
+                    (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
                 continue;
             }
         }
@@ -819,7 +749,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             {
                 argsType = OTHER;
                 all_same_aligned_ref = all_same_aligned_ref && same_expression_p(e,fstExp);
-                all_scalar = all_scalar && expression_scalar_p(e);
+                all_scalar = all_scalar && expression_scalar_p(e) &&
+                    (!isLoad || (expression_constant_p(e) || formal_parameter_p(expression_to_entity(e))));
                 continue;
             }
         }

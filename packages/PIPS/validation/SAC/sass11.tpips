@@ -1,0 +1,18 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="sass11"
+delete $WS
+create $WS $WS.c
+module main
+display PRINTED_FILE
+#make DOTDG_FILE
+apply SCALAR_RENAMING
+display PRINTED_FILE
+
+apply UNSPLIT
+close
+
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+shell test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/out`"
+
+delete $WS

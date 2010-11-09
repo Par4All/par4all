@@ -1,0 +1,20 @@
+delete wspace
+create wspace pv_heap01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+#setproperty ABSTRACT_HEAP_LOCATIONS "context_sensitive"
+#setproperty ABSTRACT_HEAP_LOCATIONS "unique"
+setproperty ABSTRACT_HEAP_LOCATIONS "insensitive"
+#setproperty ABSTRACT_HEAP_LOCATIONS "flow_sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 5
+#setenv CELL_RELATIONS_OPERATORS_DEBUG_LEVEL 5
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 5
+
+module main
+activate PRINT_CODE_SIMPLE_POINTER_VALUES
+display PRINTED_FILE
+
+close
+delete wspace
+quit

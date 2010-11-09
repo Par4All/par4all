@@ -530,7 +530,7 @@ ONE_TRIP_DO FALSE
 is useful for use/def and semantics analysis but is not used for
 region analyses. This dangerous property should be set to FALSE. It is
 not consistently checked by {\tt PIPS} phases, because nobody seems to
-use this obsolete Fortran feature.
+use this obsolete Fortran feature anymore.
 
 \section{Logging}
 \index{Logging}
@@ -1992,7 +1992,7 @@ remove_useless_label > MODULE.code
 Analyses encompass the computations of call graphs, the memory effects,
 reductions, use-def chains, dependence graphs, interprocedural checks
 ({\em flinter}), semantics information (transformers and preconditions),
-continuations, complexities, array regions, dynamic aliases and
+continuations, complexities, convex array regions, dynamic aliases and
 complementary regions.
 
 \section{Call Graph}
@@ -2069,7 +2069,7 @@ effects in which intermediary access paths may refer to different
 memory locations at different program points; regular {\tt effects}
 are constant path effects, which means that their intermediary access
 paths all refer to unique memory locations. The same distinction holds
-for regions (see section~\ref{subsection-array-regions}). 
+for convex array regions (see section~\ref{subsection-array-regions}). 
 
 {\tt proper\_effects\_with\_points\_to} is an alternative to compute
 constant path proper effects using points-to analysis (see
@@ -2305,7 +2305,7 @@ EFFECTS_FILTER_ON_VARIABLE ""
 When set to {\tt TRUE},
 \PipsPropRef{EFFECTS_POINTER_MODIFICATION_CHECKING} enables pointer
 modification checking during the computation of cumulated effects
-and/or RW regions. Since this is still at experimentation level, it's
+and/or RW covex array regions. Since this is still at experimentation level, it's
 default value is FALSE. This property should disappear when pointer
 modification analyses are more mature.
 
@@ -2320,7 +2320,7 @@ transformation is skipped. Effects are then equivalent to
 pointer\_effects. This property is available for backward compatibility
 and experimental purpose. It must be borne in mind that analyses and
 transformations using the resulting effects may yield uncorrect
-results. This property also affects the computation of regions.
+results. This property also affects the computation of convex array regions.
 
 \begin{PipsProp}{CONSTANT_PATH_EFFECTS}
 CONSTANT_PATH_EFFECTS TRUE
@@ -2468,11 +2468,11 @@ reduction_detection > MODULE.code
 \begin{PipsPass}{chains}
 Use-def and def-use chains are a standard data structure in optimizing
 compilers~\cite{Aho86}. These chains are used as a first approximation of
-the dependence graph. Chains based on regions (see
+the dependence graph. Chains based on convex array regions (see
 Section~\ref{subsection-array-regions}) are more effective for
 interprocedural parallelization.
 
-If chains based on regions have been selected, the simplest dependence
+If chains based on convex array regions have been selected, the simplest dependence
 test must be used because regions carry more information than any kind
 of preconditions. Preconditions and loop bound information already are
 included in the region predicate.
@@ -2507,7 +2507,7 @@ because loop indices are not privatized. A prettyprint option,
 \PipsPropRef{PRETTYPRINT_ALL_PRIVATE_VARIABLES}
 \end{center}
 must be set to true to see if the loop index is privatized or
-not). The problem disappears when some loop indices are renamed.
+not. The problem disappears when some loop indices are renamed.
 
 The problem is due to the internal representation of DO loops: \Pips{} has
 no way to distinguish between initialization effects and increment
@@ -2568,14 +2568,16 @@ Sections~\ref{subsubsection-in-regions} and
 READ and WRITE regions. For all other statements, usual READ and WRITE
 regions are used. 
 
-As a consequence, arrays and scalars which could be declared as
-local in callees, but are exposed to callers because they are
-statically allocated or are formal parameters, are ignored, increasing
-the opportunities to detect parallel loops. But as the program
+As a consequence, arrays and scalars which could be declared as local
+in callees, but are exposed to callers because they are statically
+allocated or are formal parameters, are ignored, increasing the
+opportunities to detect parallel loops. But as the program
 transformation which consists in {\em privatizing} variables in
 modules is not yet implemented in \Pips{}, the code resulting from the
 parallelization with \PipsPassRef{in_out_regions_chains} may not be
-equivalent to the original sequential code. 
+equivalent to the original sequential code. The privatization here is
+non-standard: for instance, variables declared in commons or static
+should be stack allocated to avoid conflicts.
 
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
@@ -2706,13 +2708,13 @@ results.
 Three different dependence tests are available, all based on
 \textsc{Fourier}-\textsc{Motzkin} elimination improved with a
 heuristics for the integer domain. The \verb+fast+ version uses
-subscript expressions only (unless regions were used to compute
+subscript expressions only (unless convex array regions were used to compute
 use-def chains, in which case regions are used instead). The
 \verb+full+ version uses subscript expressions and loop bounds. The
 \verb+semantics+ version uses subscript expressions and preconditions
 (see~\ref{subsection-semantics-analysis}).
 
-Note that for interprocedural parallelization precise array regions
+Note that, for interprocedural parallelization, precise array regions
 only are used by the fast dependence test if the proper kind of
 use-def chains has been previously selected (see
 Section~\ref{subsubsection-read-write-region-based-chains}).
@@ -2776,8 +2778,8 @@ alias rice_regions_dependence_graph 'Regions Used'
 \index{dependence test!fast}
 
 \begin{PipsPass}{rice_fast_dependence_graph}
-Use subscript expressions only (unless regions were used to compute
-use-def chains, in which case regions are used instead). {\tt
+Use subscript expressions only, unless convex array regions were used to compute
+use-def chains, in which case regions are used instead. {\tt
   rice\_regions\_dependence\_graph} is a synonym for this rule, but emits a
 warning if {\tt region\_chains} is not selected.
 \end{PipsPass}
@@ -2826,7 +2828,7 @@ rice_semantics_dependence_graph > MODULE.dg
 \end{PipsMake}
 
 
-\subsection{Dependence Test with Array Regions}
+\subsection{Dependence Test with Convex Array Regions}
 \label{subsubsection-regions-dependence-test}
 \index{dependence test!regions}
 
@@ -3048,8 +3050,6 @@ parallelization phase.
 \begin{PipsProp}{COMPUTE_ALL_DEPENDENCES} 
 COMPUTE_ALL_DEPENDENCES FALSE
 \end{PipsProp}
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLINTER
 
@@ -4383,7 +4383,7 @@ COMPLEXITY_EARLY_EVALUATION FALSE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY REGIONS
 
-\section{Array Regions}
+\section{Convex Array Regions}
 \label{subsection-array-regions}
 \index{Region}
 \index{Array Region}
@@ -4391,11 +4391,13 @@ COMPLEXITY_EARLY_EVALUATION FALSE
 \begin{PipsPass}{regions}
 
 
-Array regions are functions mapping a memory store onto a convex set
+Convex array regions are functions mapping a memory store onto a convex set
 of array elements. They are used to represent the memory effects of
 modules or statements. Hence, they are expressed with respect to the
 initial store of the module or to the store immediately preceding the
-execution of the statement they are associated with. 
+execution of the statement they are associated with. The latter is now
+standard in PIPS. Comprehensive information about convex array regions
+and their associated algorithms is available in Creusillet's PhD Dissertation~\cite{C96}.
 
 Apart from the array name and its dimension descriptors (or
 $\phi$ variables), an array region contains three additional informations:
@@ -4426,7 +4428,7 @@ and \verb+OUT+ to represent the flow of array elements.
   to the values of the program integer scalar variables. 
 \end{itemize}
  
-For instance, the region:
+For instance, the convex array region:
 \begin{alltt}
   \begin{center}
   <A(\phik{1},\phik{2})-W-EXACT-\{\phik{1}==I, \phik{1}==\phik{2}\}>
@@ -4437,7 +4439,7 @@ the first and second dimensions of \verb+A+, corresponds to an assignment
 of the element \verb+A(I,I)+.
 
 
-Internally, regions are of type \texttt{effect} and as such can be used to build
+Internally, convex array regions are of type \texttt{effect} and as such can be used to build
 use-def chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}). Regions
 chains are built using {\em proper regions} which are particular
@@ -4475,7 +4477,7 @@ Array regions for C programs are currently under development.
 
 \end{PipsPass}
 
-\subsection{Menu for Array Regions}
+\subsection{Menu for Convex Array Regions}
 
 \begin{PipsMake}
 alias regions 'Array regions'
@@ -4484,7 +4486,7 @@ alias may_regions 'MAY regions'
 alias must_regions 'EXACT or MAY regions'
 \end{PipsMake}
 
-\subsection{MAY READ/WRITE Regions}
+\subsection{MAY READ/WRITE Convex Array Regions}
 \label{subsubsection-may-regions}
 \index{MAY Region}
 
@@ -4519,7 +4521,7 @@ may_regions                     > MODULE.proper_regions
         < CALLEES.summary_regions
 \end{PipsMake}
 
-\subsection{MUST READ/WRITE Regions}
+\subsection{MUST READ/WRITE Convex Array Regions}
 \label{subsubsection-must-regions}
 \index{MUST Region}
 
@@ -4541,7 +4543,7 @@ must_pointer_regions            > MODULE.proper_pointer_regions
 
 \begin{PipsPass}{must_pointer_regions_with_points_to}
   This function computes the \verb|MUST| pointer regions in a module
-  using simple points\_to to disambiguate dereferencing paths. 
+  using simple points\_to information to disambiguate dereferencing paths. 
 \end{PipsPass}
 \begin{PipsMake}
 must_pointer_regions_with_points_to > MODULE.proper_pointer_regions
@@ -4587,7 +4589,7 @@ must_regions_with_points_to     > MODULE.proper_regions
         < CALLEES.summary_regions
 \end{PipsMake}
 
-\subsection{Summary READ/WRITE Regions}
+\subsection{Summary READ/WRITE Convex Array Regions}
 \label{subsubsection-summary-regions}
 \index{Summary Region}
 \index{Region (Summary)}
@@ -4609,12 +4611,12 @@ summary_regions                 > MODULE.summary_regions
         < MODULE.regions  
 \end{PipsMake}
 
-\subsection{IN Regions}
+\subsection{IN Convex Array Regions}
 \label{subsubsection-in-regions}
 \index{IN Regions}
 \index{Regions (IN)}
 
-\verb+IN+ regions are flow sensitive regions. They are read regions not
+\verb+IN+ convex array regions are flow sensitive regions. They are read regions not
 covered (i.e. not previously written) by assignments in the local
 hierarchical control-flow graph. There is no way with the current
 pipsmake-rc and \Pipsmake{} to express the fact that \verb+IN+ (and \verb+OUT+)
@@ -4637,10 +4639,14 @@ in_regions                      > MODULE.in_regions
         < CALLEES.in_summary_regions
 \end{PipsMake}
 
-\subsection{IN Summary Regions}
+\subsection{IN Summary Convex Array Regions}
 \label{subsubsection-in-summary-regions}
 \index{IN Summary Regions}
 \index{Summary Regions (IN)}
+
+This pass computes the IN convex array regions of a module. They
+contain the array elements and scalars whose values impact the output
+of the module.
 
 \begin{PipsMake}
 in_summary_regions              > MODULE.in_summary_regions
@@ -4652,10 +4658,14 @@ in_summary_regions              > MODULE.in_summary_regions
 \end{PipsMake}
 
 
-\subsection{OUT Summary Regions}
+\subsection{OUT Summary Convex Array Regions}
 \label{subsubsection-out-summary-regions}
 \index{OUT Summary Regions}
 \index{Summary Regions (OUT)}
+
+This pass computes the OUT convex array regions of a module. They
+contain the array elements and scalars whose values impact the
+continuation of the module.
 
 See Section~\ref{subsubsection-out-regions}.
 
@@ -4666,12 +4676,12 @@ out_summary_regions             > MODULE.out_summary_regions
 \end{PipsMake}
 
 
-\subsection{OUT Regions}
+\subsection{OUT Convex Array Regions}
 \label{subsubsection-out-regions}
 \index{OUT Regions}
 \index{Regions (OUT)}
 
-\verb+OUT+ regions are also flow sensitive regions. They are downward
+\verb+OUT+ convex array regions are also flow sensitive regions. They are downward
 exposed written regions which are also used (i.e. imported) in the
 continuation of the program. They are also called {\em exported\/} regions.
 Unlike \verb+READ+, \verb+WRITE+ and \verb+IN+ regions, they are propagated
@@ -4693,7 +4703,7 @@ out_regions                     > MODULE.out_regions
         < MODULE.out_summary_regions
 \end{PipsMake}
 
-\subsection{Regions properties}
+\subsection{Properties for Convex Array Regions}
 \label{subsection-regions}
 \index{Array Region}
 \index{Region (Array)}
@@ -4705,7 +4715,7 @@ out_regions                     > MODULE.out_regions
 \index{REGIONS\_OP\_STATISTICS}
 \index{REGIONS\_TRANSLATION\_STATISTICS}
 
-if {\tt MUST\_REGIONS} is true, then it computes regions using the
+If {\tt MUST\_REGIONS} is true, then it computes convex array regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
 algorithm}. It provides more accurate regions, and preserve MUST
 approximations more often. As it is more costly, its default value
@@ -4730,8 +4740,8 @@ REGIONS_WITH_ARRAY_BOUNDS FALSE
 \end{PipsProp}
 
 
-The current implementation of effects (simple effects as well as
-convex array regions) relies on a generic engine which is independent
+The current implementation of effects, simple effects as well as
+convex array regions, relies on a generic engine which is independent
 of the effect descriptor representation. The current representation
 for array regions, parameterized integer convex polyhedra, allows
 various patterns an provides the ability to exploit context
@@ -4757,7 +4767,7 @@ DISJUNCT_REGIONS FALSE
 DISJUNCT_IN_OUT_REGIONS FALSE
 \end{PipsProp}
 
-Statistics may be obtained about the computation of array
+Statistics may be obtained about the computation of convex array
 regions. When the next 
 property ({\tt REGIONS\_OP\_STATISTICS}) is set to {\tt TRUE} statistics are
 provided about operators on regions (union, intersection,
@@ -4784,7 +4794,8 @@ REGIONS_TRANSLATION_STATISTICS FALSE
 \index{Dynamic Aliases}
 \index{Alias Classes}
 
-Dynamic aliases are pairs (formal parameter, actual parameter) of regions
+Dynamic aliases are pairs (formal parameter, actual parameter) of
+convex array regions
 generated at call sites. An ``IN alias pair'' is generated for each IN
 region of
 a called module and an ``OUT alias pair'' for each OUT region. For EXACT
@@ -5305,18 +5316,20 @@ rice_cray                   > MODULE.parallelized_code
 \label{subsubsection-coarse-grain-parallelization}
 
 \begin{PipsPass}{coarse_grain_parallelization}
-Function \PipsPassRef{coarse_grain_parallelization} implements a loop parallelization
-algorithm based on array regions. It considers only one loop at a time, its
-body being abstracted by its invariant read and write regions. No loop
-distribution is performed, but any kind of loop body is acceptable
-whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
+  Function \PipsPassRef{coarse_grain_parallelization} implements a
+  loop parallelization algorithm based on convex array regions. It
+  considers only one loop at a time, its body being abstracted by its
+  invariant read and write regions. No loop distribution is performed,
+  but any kind of loop body is acceptable whereas \textsc{Allen} \&
+  \textsc{Kennedy} algorithm only copes with very simple loop bodies.
 \end{PipsPass}
 
 For nasty reasons about effects that are statement addresses to effects
-mapping, it changes the code instead of producing a
+mapping, this pass changes the code instead of producing a
 \verb|parallelized_code| resource. It is not a big deal since often we
 want to modify the code again and we should use
-\PipsPassRef{internalize_parallel_code} just after.
+\PipsPassRef{internalize_parallel_code} just after if its behavior
+were modified.
 \begin{PipsMake}
 coarse_grain_parallelization > MODULE.code
         < PROGRAM.entities
@@ -5354,7 +5367,7 @@ nest_parallelization                    > MODULE.parallelized_code
 \end{PipsMake}
 
 
-\subsection{Coerce parallel code into sequential code}
+\subsection{Coerce Parallel Code into Sequential Code}
 \label{sec:cons-parall-code}
 
 \begin{PipsPass}{internalize_parallel_code}
@@ -5390,7 +5403,7 @@ internalize_parallel_code             > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Limit parallelism in parallel loop nests}
+\subsection{Limit Parallelism in Parallel Loop Nests}
 \label{sec:manage-parallel-loops}
 
 \begin{PipsPass}{limit_nested_parallelism}
@@ -5419,16 +5432,19 @@ NESTED_PARALLELISM_THRESHOLD 0
 \end{PipsProp}
 
 
-\section{SIMDizer for SIMD multimedia instruction set}
+\section{SIMDizer for SIMD Multimedia Instruction Set}
 \index{Superword parallelism}
 \index{Atomizer}
+\index{SLP}
+\index{SSE}
 
 The SAC project aims at generating efficient code for processors with SIMD
-extension instruction set such as VMX, SSE4, etc. For more information,
+extension instruction set such as VMX, SSE4, etc. which are also
+refered to as Superword Level Parallelism (SLP). For more information,
 see \url{https://info.enstb.org/projets/sac}.
 
-Some phases use \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE} to generate DMA calls
-and \PipsPropRef{ACCEL_WORK}.
+Some phases use \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
+to generate DMA calls and \PipsPropRef{ACCEL_WORK}.
 
 \begin{PipsProp}{ACCEL_LOAD}
 ACCEL_LOAD "SIMD_LOAD"
@@ -5623,20 +5639,17 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.proper_effects
 
 
-\begin{PipsPass}{single_assignment}
-This phase tries to minimize dependencies in the code by transforming
-it into single-assignment form.
+\begin{PipsPass}{scalar_renaming}
+This phase tries to minimize dependencies in the code by renaming scalars
+when legal.
 \end{PipsPass}
 
 \begin{PipsMake}
-alias single_assignment 'Single Assignment Form'
-
-single_assignment           > MODULE.code
-		! MODULE.split_initializations
+scalar_renaming           > MODULE.code
         < PROGRAM.entities
-        < MODULE.code
         < MODULE.dg
-\end{PipsMake}%$
+        < MODULE.proper_effects
+\end{PipsMake}
 
 \begin{PipsPass}{simd_treematcher}
 This function initialize a treematch used by \PipsPassRef{simdizer} for simd-oriented pattern matching
@@ -5669,11 +5682,14 @@ alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
                             > MODULE.callees
+                            > PROGRAM.entities
 		! MODULE.simdizer_init
 		< PROGRAM.simd_treematch
 		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
         < MODULE.dg
 \end{PipsMake}
 
@@ -6141,7 +6157,7 @@ HPFC_BUFFER_SIZE 1000000
 HPFC_USE_BUFFERS TRUE
 \end{PipsProp}
 
-Whether to use in and out regions for input/output compiling
+Whether to use in and out convex array regions for input/output compiling
 
 \begin{PipsProp}{HPFC_IGNORE_IN_OUT_REGIONS} 
 HPFC_IGNORE_IN_OUT_REGIONS TRUE
@@ -6320,7 +6336,7 @@ step_atomize                > MODULE.code
 \end{PipsMake}
 
 \begin{PipsPass}{step_analyse}
-The \PipsPassRef{step_analyse} phase triggers the regions analyses to
+The \PipsPassRef{step_analyse} phase triggers the convex array regions analyses to
 compute SEND regions leading to MPI messages.
 \end{PipsPass}
 
@@ -6706,7 +6722,7 @@ The following properties are used to specify the names of runtime
 functions. Since they are used in Par4All, their default names begin with
 \verb|P4A_|. To have an idea about their prototype, have a look to the
 Par4All accelerator runtime or in
-\textttvalidation/AcceleratorUtils/include/par4all.c} The following.
+\texttt{validation/AcceleratorUtils/include/par4all.c} The following.
 
 The properties that can be used to customized the allocate/load/store functions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}
@@ -6783,7 +6799,7 @@ KERNEL_LOAD_STORE_STORE_FUNCTION_6D "P4A_copy_from_accel_6d"
 Due to the current limitation of the effects, PIPS provides this property
 to force the load of any array that is written in the kernel. This
 actually fixes the problem of partially written array. A better solution
-using the region is under implementation.
+using the convex array regions is under implementation.
 \begin{PipsProp}{KERNEL_LOAD_STORE_FORCE_LOAD}
 KERNEL_LOAD_STORE_FORCE_LOAD FALSE
 \end{PipsProp}
@@ -6794,7 +6810,7 @@ KERNEL_LOAD_STORE_SCALAR FALSE
 \end{PipsProp}
 
 \begin{PipsPass}{kernel_load_store_fine_grain}
-Same as \PipsPassRef{kernel_load_store} but region-based.
+Same as \PipsPassRef{kernel_load_store} but convex array region-based.
 \end{PipsPass}
 \begin{PipsMake}
 kernel_load_store_fine_grain	> CALLERS.code
@@ -7339,7 +7355,9 @@ Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
 \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
-transformation.
+transformation. When the number of iterations cannot be proven to be a
+multiple of the unrolling factor, the extra iterations can be executed
+first or last (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}). 
 
 Labels in the body are deleted. To unroll nested loops, start with the
 innermost loop.
@@ -7373,7 +7391,7 @@ iterations. This extra loop can be executed with the first iterations
 use the epilogue when possible. The current implementation of the
 unrolling with prologue is general, while the implementation of the
 unrolling with epilogue is restricted to loops with a statically knonw
-increment of one.
+increment of one. The epilogue option may reduce misalignments.
 \begin{PipsProp}{LOOP_UNROLL_WITH_PROLOGUE}
 LOOP_UNROLL_WITH_PROLOGUE TRUE
 \end{PipsProp}
@@ -7868,7 +7886,10 @@ partial_redundancy_elimination             > MODULE.code
 Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
 such as empty loop nests or zero-trip loops, for example after
 strip-mining or partial evaluation. Preconditions are used to find always
-true conditions in tests and to eliminate such tests. One-trip loops are
+true conditions in tests and to eliminate such tests. In some cases,
+tests cannot be eliminated, but test conditions can be simplified.
+%%
+One-trip loops are
 replaced by an index initialization and the loop body. Zero-trip loops are
 replaced by an index initialization. Effects in bound computations are
 preserved.
@@ -8848,7 +8869,8 @@ EXPRESSION_SUBSTITUTION_PATTERN ""
 \subsection{Array to pointer conversion}
 
 \begin{PipsPass}{linearize_array}
-This transformation replaces all arrays in the module by equivalent linearized arrays.
+This transformation replaces all arrays in the module by equivalent linearized 
+arrays.
 Eventually using array/ pointer equivalence.
 \end{PipsPass}
 
@@ -8863,9 +8885,19 @@ linearize_array > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are declared as 1D arrays or pointers. Pointers are accessed using dereferencement and arrays using subscripts.
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are 
+declared as 1D arrays or pointers. Pointers are accessed using dereferencement 
+and arrays using subscripts.
 \begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
 LINEARIZE_ARRAY_USE_POINTERS FALSE
+\end{PipsProp}
+
+Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control wether a cast is
+ inserted at call sites. Turning it on break further effects analysis, but 
+without the cast it might break compilation or at least generate warnings for 
+type mismatch
+\begin{PipsProp}{LINEARIZE_ARRAY_CAST_AT_CALL_SITE}
+LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
 
 
@@ -9395,7 +9427,7 @@ declarations and add new assignments in the source code.
 The  method uses the relationship between actual and formal arguments from parameter-passing
 rules. New array declarations in the called procedure are
 computed with respect to the declarations in the calling procedures.
-It is  faster than the first one because array regions are not needed.
+It is  faster than the first one because convex array regions are not needed.
 
 This phase is implemented by Thi Viet Nga \textsc{Nguyen}.
 \end{PipsPass}
@@ -9414,7 +9446,7 @@ array_resizing_top_down         > MODULE.new_declarations
 
 \begin{PipsPass}{array_resizing_bottom_up}
 
-The approach is based on an array region analysis that gives
+The approach is based on an convex array region analysis that gives
   information about the set of array elements accessed during the
   execution of code. The regions READ and WRITE of each
 array in each module are merged and a new value for the upper bound of the last
@@ -10503,7 +10535,7 @@ representation presently is not detected. Solution: do not use user views.
 
 The Fortran statements may be
 decorated with preconditions or transformers or complexities or any kind
-of effects, including regions,... depending on the
+of effects, including convex array regions,... depending on the
 prettyprinter selected used to produce this file.
 
 Transformers and preconditions require cumulated effects to build the
@@ -10607,7 +10639,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{User View with Regions}
+\subsection{User View with Convex Array Regions}
 
 \begin{PipsPass}{print_source_regions}
 Display the code decorated with the regions.
@@ -10624,7 +10656,7 @@ print_source_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{User View with Invariant Regions}
+\subsection{User View with Invariant Convex Array  Regions}
 
 \begin{PipsPass}{print_source_inv_regions}
 Display the code decorated with the regions.
@@ -10642,7 +10674,7 @@ print_source_inv_regions              > MODULE.parsed_printed_file
 \end{PipsMake}
 
 
-\subsection{User View with IN Regions}
+\subsection{User View with IN Convex Array Regions}
 
 \begin{PipsPass}{print_source_in_regions}
 Display the code decorated with the IN regions.
@@ -10659,7 +10691,7 @@ print_source_in_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{User View with OUT Regions}
+\subsection{User View with OUT Convex Array Regions}
 
 \begin{PipsPass}{print_source_out_regions}
 Display the code decorated with the OUT regions.
@@ -10755,7 +10787,7 @@ These are files containing a pretty-printed version of the internal
 representation, \verb+code+.
 
 The statements may be decorated with the result of any analysis,
-e.g.complexities, preconditions, transformers, regions,\ldots{} depending on
+e.g.complexities, preconditions, transformers, convex array regions,\ldots{} depending on
 the pretty printer used to produce this file.
 
 To view C programs, it is a good idea to select a C pretty printer, for
@@ -10952,9 +10984,9 @@ print_code_continuation_conditions   > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsection{Sequential view with regions}
+\subsection{Sequential View with Convex Array Regions}
 
-\subsubsection{Sequential view with plain pointer regions}
+\subsubsection{Sequential View with Plain Pointer Regions}
 \label{sec:plain-regions}
 
 \begin{PipsPass}{print_code_pointer_regions}
@@ -10972,7 +11004,7 @@ print_code_pointer_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsubsection{Sequential view with proper pointer regions}
+\subsubsection{Sequential View with Proper Pointer Regions}
 
 \begin{PipsPass}{print_code_proper_pointer_regions}
 Display the code decorated with the proper pointer regions.
@@ -10990,7 +11022,7 @@ print_code_proper_pointer_regions          > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsubsection{Sequential view with invariant pointer regions}
+\subsubsection{Sequential View with Invariant Pointer Regions}
 
 \begin{PipsPass}{print_code_inv_regions}
 Display the code decorated with the invariant read/write pointer regions.
@@ -11008,7 +11040,7 @@ print_code_inv_pointer_regions              > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsubsection{Sequential view with plain regions}
+\subsubsection{Sequential View with Plain Convex Array Regions}
 \label{sec:plain-regions}
 
 \begin{PipsPass}{print_code_regions}
@@ -11026,7 +11058,7 @@ print_code_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsubsection{Sequential view with proper regions}
+\subsubsection{Sequential View with Proper Convex Array Regions}
 
 \begin{PipsPass}{print_code_proper_regions}
 Display the code decorated with the proper regions.
@@ -11044,7 +11076,7 @@ print_code_proper_regions              > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsubsection{Sequential view with invariant regions}
+\subsubsection{Sequential View with Invariant Convex Array Regions}
 
 \begin{PipsPass}{print_code_inv_regions}
 Display the code decorated with the invariant read/write regions.
@@ -11062,7 +11094,7 @@ print_code_inv_regions              > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsubsection{Sequential view with IN regions}
+\subsubsection{Sequential View with IN Convex Array Regions}
 
 \begin{PipsPass}{print_code_in_regions}
 Display the code decorated with the IN regions.
@@ -11079,7 +11111,7 @@ print_code_in_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsubsection{Sequential view with OUT regions}
+\subsubsection{Sequential View with OUT Convex Array Regions}
 
 \begin{PipsPass}{print_code_out_regions}
 Display the code decorated with the OUT regions.
@@ -11096,7 +11128,7 @@ print_code_out_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsubsection{Sequential view with privatized regions}
+\subsubsection{Sequential View with Privatized Convex Array Regions}
 
 \begin{PipsPass}{print_code_privatized_regions}
 Display the code decorated with the privatized regions.
@@ -11112,7 +11144,7 @@ print_code_privatized_regions       > MODULE.printed_file
         < MODULE.copy_out_regions
 \end{PipsMake}
 
-\subsection{Sequential view with complementary sections}
+\subsection{Sequential View with Complementary Sections}
 
 \begin{PipsPass}{print_code_complementary_sections}
 Display the code decorated with complementary sections.
@@ -11269,7 +11301,7 @@ print_code_static_control       > MODULE.printed_file
         < MODULE.static_control
 \end{PipsMake}
 
-\subsection{Sequential View with Points To  Information}
+\subsection{Sequential View with Points-To  Information}
 
 %%@UserManualDocumentation: print_code_points_to_sets
 Display the code decorated with the points to information.

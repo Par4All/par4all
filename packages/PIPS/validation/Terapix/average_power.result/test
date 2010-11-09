@@ -449,7 +449,7 @@ l99993:
 l99999:
                for(v = 0; v <= Nv-1; v += 1)
                   (*Pow0)[th-0] += CplAbs(&ptrin[th][rg][v]);
-         P4A_copy_from_accel(&Pow[0], *Pow0, sizeof(float), Nth, 0, Nth);
+         P4A_copy_from_accel_1d(sizeof(float), Nth, Nth, 0, &Pow[0], *Pow0);
       }
    }
 }
@@ -476,7 +476,7 @@ l99993:
 l99999:
                for(v = 0; v <= -1+Nv; v += 1)
                   (*Pow0)[th+128*tht-0] += CplAbs(&ptrin[th+128*tht][rg+rgt][v]);
-         P4A_copy_from_accel(&Pow[0], *Pow0, sizeof(float), Nth, 0, Nth);
+         P4A_copy_from_accel_1d(sizeof(float), Nth, Nth, 0, &Pow[0], *Pow0);
       }
    }
 }
@@ -503,7 +503,7 @@ l99993:
 l99999:
                for(v = 0; v <= Nv-1; v += 1)
                   (*Pow0)[th+128*tht-0] += CplAbs(&ptrin[th][rg+rgt][v]);
-         P4A_copy_from_accel(&Pow[0], *Pow0, sizeof(float), 12, 0, 12);
+         P4A_copy_from_accel_1d(sizeof(float), 12, 12, 0, &Pow[0], *Pow0);
       }
    }
 }
@@ -524,17 +524,16 @@ l99998:
 
 l99992:
 #pragma  omp parallel for 
-         launcher_0(Nrg, Nth, Nv, MIN(N+rgt, N*((N+12)/N)-1)-rgt, Pow0, rgt, tht, ptrin);
-         P4A_copy_from_accel(&Pow[0], *Pow0, sizeof(float), 12, 0, 12);
+         launcher_0(Nrg, Nth, Nv, MIN(N+rgt, N*((N+12)/N)-1)-rgt, *Pow0, rgt, tht, ptrin);
+         P4A_copy_from_accel_1d(sizeof(float), 12, 12, 0, &Pow[0], *Pow0);
       }
    }
 }
 
-//  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, 128tht<=PHI2,
-//    PHI2<=128tht+127, Nrg==13, Nth==12, tht==0, 0<=I_0, 1<=Nv}>
-//  <Pow0-R-EXACT-{}>
-//  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, 128tht<=PHI2,
-//    PHI2<=128tht+127, Nrg==13, Nth==12, tht==0, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-R-EXACT-{128tht<=PHI1, PHI1<=128tht+127, Nrg==13,
+//    Nth==12, tht==0, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-W-EXACT-{128tht<=PHI1, PHI1<=128tht+127, Nrg==13,
+//    Nth==12, tht==0, 0<=I_0, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{0<=PHI1, PHI1<=127,
 //    PHI2<=I_0+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
 //    tht==0}>
@@ -542,16 +541,15 @@ l99992:
 //    PHI2<=I_0+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
 //    tht==0}>
 
-void launcher_0(int Nrg, int Nth, int Nv, int I_0, float (*Pow0)[Nth], int rgt, int tht, Cplfloat ptrin[Nth][Nrg][Nv])
+void launcher_0(int Nrg, int Nth, int Nv, int I_0, float Pow0[Nth], int rgt, int tht, Cplfloat ptrin[Nth][Nrg][Nv])
 {
    //PIPS generated variable
    int rg, th, v;
 
-//  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, 128tht<=PHI2,
-//    PHI2<=128tht+127, Nrg==13, Nth==12, tht==0, 0<=I_0, 1<=Nv}>
-//  <Pow0-R-EXACT-{}>
-//  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, 128tht<=PHI2,
-//    PHI2<=128tht+127, Nrg==13, Nth==12, tht==0, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-R-EXACT-{128tht<=PHI1, PHI1<=128tht+127, Nrg==13,
+//    Nth==12, tht==0, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-W-EXACT-{128tht<=PHI1, PHI1<=128tht+127, Nrg==13,
+//    Nth==12, tht==0, 0<=I_0, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{0<=PHI1, PHI1<=127,
 //    PHI2<=I_0+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12,
 //    tht==0}>
@@ -563,11 +561,10 @@ l99992:
 #pragma   omp parallel for 
    for(th = 0; th <= 127; th += 1)
 
-//  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=th, th<=127, 0<=I_0, 1<=Nv}>
-//  <Pow0-R-EXACT-{}>
-//  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=th, th<=127, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-R-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=th, th<=127, 0<=I_0, 1<=Nv}>
+//  <Pow0[PHI1]-W-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=th, th<=127, 0<=I_0, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, PHI2<=I_0+rgt,
 //    rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, 0<=th,
 //    th<=127}>
@@ -579,11 +576,10 @@ l99993:
 #pragma   omp parallel for 
       for(rg = 0; rg <= I_0; rg += 1)
 
-//  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
-//  <Pow0-R-EXACT-{}>
-//  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
+//  <Pow0[PHI1]-R-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
+//  <Pow0[PHI1]-W-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=rg, rg<=I_0, 0<=th, th<=127, 1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
 //    0<=PHI3, PHI3+1<=Nv, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0,
 //    0<=th, th<=127}>
@@ -594,11 +590,10 @@ l99993:
 l99999:
          for(v = 0; v <= Nv-1; v += 1)
 
-//  <Pow0[PHI1][PHI2]-R-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
-//  <Pow0-R-EXACT-{}>
-//  <Pow0[PHI1][PHI2]-W-EXACT-{PHI1==0, th+128tht==PHI2, Nrg==13,
-//    Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
+//  <Pow0[PHI1]-R-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
+//  <Pow0[PHI1]-W-EXACT-{th+128tht==PHI1, Nrg==13, Nth==12, tht==0,
+//    0<=rg, rg<=I_0, 0<=th, th<=127, 0<=v, v+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3][.im]-R-EXACT-{PHI1==th, rg+rgt==PHI2,
 //    PHI3==v, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th,
 //    th<=127, 0<=v, v+1<=Nv}>
@@ -606,7 +601,7 @@ l99999:
 //    PHI3==v, Nrg==13, Nth==12, tht==0, 0<=rg, rg<=I_0, 0<=th,
 //    th<=127, 0<=v, v+1<=Nv}>
 
-            (*Pow0)[th+128*tht-0] += CplAbs(&ptrin[th][rg+rgt][v]);
+            Pow0[th+128*tht-0] += CplAbs(&ptrin[th][rg+rgt][v]);
 }
 outlining to microcode
 label: l99993
@@ -626,12 +621,12 @@ l99998:
 
 l99992:
 #pragma  omp parallel for 
-         launcher_0(Nrg, Nth, Nv, MIN(N+rgt, N*((N+12)/N)-1)-rgt, Pow0, rgt, tht, ptrin);
-         P4A_copy_from_accel(&Pow[0], *Pow0, sizeof(float), 12, 0, 12);
+         launcher_0(Nrg, Nth, Nv, MIN(N+rgt, N*((N+12)/N)-1)-rgt, *Pow0, rgt, tht, ptrin);
+         P4A_copy_from_accel_1d(sizeof(float), 12, 12, 0, &Pow[0], *Pow0);
       }
    }
 }
-void launcher_0(int Nrg, int Nth, int Nv, int I_0, float (*Pow0)[Nth], int rgt, int tht, Cplfloat ptrin[Nth][Nrg][Nv])
+void launcher_0(int Nrg, int Nth, int Nv, int I_0, float Pow0[Nth], int rgt, int tht, Cplfloat ptrin[Nth][Nrg][Nv])
 {
    //PIPS generated variable
    int rg, th, v;
@@ -640,9 +635,9 @@ l99992:
    for(th = 0; th <= 127; th += 1)
 l99993:
 #pragma   omp parallel for 
-      launcher_0_microcode(Nrg, Nth, Nv, th, I_0, Pow0, rgt, tht, &ptrin[th]);
+      launcher_0_microcode(Nrg, Nv, I_0, rgt, &Pow0[th+128*tht], *&ptrin[th]);
 }
-void launcher_0_microcode(int Nrg, int Nth, int Nv, int th, int I_0, float (*Pow0)[Nth], int rgt, int tht, Cplfloat (*ptrin0)[Nrg][Nv])
+void launcher_0_microcode(int Nrg, int Nv, int I_0, int rgt, float *Pow00, Cplfloat ptrin0[Nrg][Nv])
 {
    //PIPS generated variable
    int rg, v;
@@ -651,5 +646,5 @@ l99993:
    for(rg = 0; rg <= I_0; rg += 1)
 l99999:
       for(v = 0; v <= Nv-1; v += 1)
-         (*Pow0)[th+128*tht-0] += CplAbs(&((*ptrin0)[rg+rgt])[v]);
+         *Pow00 += CplAbs(&ptrin0[rg+rgt][v]);
 }

@@ -47,6 +47,9 @@ typedef struct {
   /* BINARY OPERATORS */
   list (*pvs_must_union_func)(list, list);
   list (*pvs_may_union_func)(list, list);
+
+  /* STACKS */
+  stack stmt_stack;
 } pv_context;
 
 /* pv_results is a structure holding the different results of an expression pointer values analysis */
@@ -54,6 +57,7 @@ typedef struct {
   list l_out; /* resulting pointer_values */
   list result_paths; /* resulting pointer path of the expression evaluation */
   list result_paths_interpretations; /* interpretation of the resulting pointer path */
+
 } pv_results;
 
 #define pips_debug_pv_results(level, message, pv_res) \

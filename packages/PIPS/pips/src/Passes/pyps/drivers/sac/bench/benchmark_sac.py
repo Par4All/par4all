@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+from __future__ import with_statement # to cope with python2.5
 
 import pyrops
 import workspace_gettime as gt

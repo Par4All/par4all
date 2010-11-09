@@ -387,6 +387,7 @@ bool expression_equal_in_list_p(expression e, list le)
   return FALSE;
 }
 
+/* C xor is missing */
 bool logical_operator_expression_p(expression e)
 {
   /* Logical operators are : .NOT.,.AND.,.OR.,.EQV.,.NEQV.*/
@@ -892,7 +893,7 @@ string op_name;
 	return FALSE;
 }
 
-expression  make_true_expression()
+expression make_true_expression()
 {
   return make_call_expression(MakeConstant(TRUE_OPERATOR_NAME,is_basic_logical),NIL);
 }
@@ -1887,7 +1888,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	{
 	  pips_debug(6, "Linear operation\n");
 
-	  result_exp = make_lin_op_exp(op_ent, exp1, exp2);
+	  result_exp = make_lin_op_exp(op_ent, copy_expression(exp1), copy_expression(exp2));
 	}
       else if(expression_equal_integer_p(exp1, 0))
 	{
@@ -1948,6 +1949,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
  * between two integer linear expressions "exp1" and "exp2".
  *
  * This function uses the linear library for manipulating Pvecteurs.
+ * exp1 and exp2 are freed
  *
  * Pvecteur_to_expression() is a function that rebuilds an expression
  * from a Pvecteur.
@@ -3052,6 +3054,8 @@ void update_expression_syntax(expression e, syntax s)
  */
 entity string_to_entity(const char * s,entity module)
 {
+    if(empty_string_p(s)) return entity_undefined;
+
     /* try float conversion */
     string endptr,module_name=module_local_name(module);
     long int l = strtol(s,&endptr,10);
@@ -3076,12 +3080,345 @@ entity string_to_entity(const char * s,entity module)
     /* try at top level */
     if(entity_undefined_p(candidate))
         candidate=FindEntity(TOP_LEVEL_MODULE_NAME,s);
-    return entity_undefined_p(candidate)?
-        entity_undefined:
-        candidate;
+    /* filter out results */
+    if(!entity_undefined_p(candidate) && !entity_variable_p(candidate))
+        return entity_undefined;
+    else
+        return candidate;
 }
+
+/* try to parse @p s in the context of module @p module
+ * only simple expressions are found */
 expression string_to_expression(const char * s,entity module)
 {
     entity e = string_to_entity(s,module);
-    return entity_undefined_p(e)?expression_undefined:entity_to_expression(e);
+    if(entity_undefined_p(e)) {
+        /* try to find simple expression */
+        static const char* seeds[] = {   PLUS_OPERATOR_NAME, MINUS_OPERATOR_NAME,MULTIPLY_OPERATOR_NAME, DIVIDE_OPERATOR_NAME};
+        for(int i=0;i< sizeof(seeds)/sizeof(seeds[0]); i++) {
+            char *where = strchr(s,seeds[i][0]);
+            if(where) {
+                char * head = strdup(s);
+                char * tail = head + (where -s) +1 ;
+                head[where-s]='\0';
+                expression e0 = string_to_expression(head,module);
+                expression e1 = string_to_expression(tail,module);
+                free(head);
+                if(!expression_undefined_p(e0) &&!expression_undefined_p(e1)) {
+                    return MakeBinaryCall(
+                            entity_intrinsic(seeds[i]),
+                            e0,
+                            e1
+                            );
+                }
+                else {
+                    free_expression(e0);
+                    free_expression(e1);
+                }
+            }
+        }
+        return expression_undefined;
+    }
+    else
+        return entity_to_expression(e);
+}
+
+/* converts a monome to an expression */
+expression monome_to_expression(Pmonome pm)
+{
+    if (MONOME_UNDEFINED_P(pm))
+        return expression_undefined;
+    else {
+        expression coeff;
+        float x= monome_coeff(pm);
+        if(x == (int)x)
+            coeff = (x==1.f)? expression_undefined:int_to_expression((int)x);
+        else
+            coeff = float_to_expression(x);
+        expression term = Pvecteur_to_expression(monome_term(pm));
+        return expression_undefined_p(coeff)?term:
+            make_op_exp(MULTIPLY_OPERATOR_NAME, coeff, term);
+    }
+}
+
+/* converts a polynomial to expression */
+expression polynome_to_expression(Ppolynome pp)
+{
+    expression r =expression_undefined;
+
+    if (POLYNOME_UNDEFINED_P(pp))
+        r = expression_undefined;
+    else if (POLYNOME_NUL_P(pp))
+        r = int_to_expression(0);
+    else {
+        while (!POLYNOME_NUL_P(pp)) {
+            expression s =	monome_to_expression(polynome_monome(pp));
+            if(expression_undefined_p(r)) r=s;
+            else
+                r=MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), r, s);
+            pp = polynome_succ(pp);
+        }
+    }
+    return r;
+}
+/*============================================================================*/
+/* Ppolynome expression_to_polynome(expression exp): translates "exp" into a
+ * polynome. This transformation is feasible if "exp" contains only scalars and
+ * the four classical operations (+, -, *, /).
+ *
+ * The translation is done straightforwardly and recursively.
+ *
+ * it returns a POLYNOME_UNDEFINED if the conversion failed
+ */
+Ppolynome expression_to_polynome(expression exp)
+{
+#define ENTITY_FOUR_OPERATION_P(s) (ENTITY_PLUS_P(s) || ENTITY_MINUS_P(s) || ENTITY_MULTIPLY_P(s) || ENTITY_DIVIDE_P(s))
+    Ppolynome pp_new=POLYNOME_UNDEFINED; /* This the resulting polynome */
+    syntax sy = expression_syntax(exp);
+
+    switch(syntax_tag(sy))
+    {
+        case is_syntax_reference:
+            {
+                entity en = reference_variable(syntax_reference(sy));
+
+                if(entity_scalar_p(en))
+                    pp_new = make_polynome(1.0, (Variable) en, (Value) 1);
+                break;
+            }
+        case is_syntax_call:
+            {
+                /* Two cases : _ a constant
+                 *             _ a "real" call, ie an intrinsic or external function
+                 */
+                if (expression_constant_p(exp)) {
+                    int	etoi = expression_to_int(exp);
+                    pp_new = make_polynome((float) etoi,
+                            (Variable) entity_undefined, (Value) 0);
+                    /* We should have a real null polynome : 0*TCST^1 AL, AC 04 11 93
+                     *else  {
+                     *  Pmonome pm = (Pmonome) malloc(sizeof(Smonome));
+                     * monome_coeff(pm) = 0;
+                     *  monome_term(pm) = vect_new(TCST, 1);
+                     *  pp_new = monome_to_new_polynome(pm);
+                     *}
+                     */
+                }
+                else
+                {
+                    int cl;
+                    expression arg1, arg2 = expression_undefined;
+                    entity op_ent = call_function(syntax_call(sy));
+
+                    /* The call must be one of the four classical operations:
+                     *	+, - (unary or binary), *, /
+                     */
+                    if(ENTITY_FOUR_OPERATION_P(op_ent))
+                    {
+                        /* This call has one (unary minus) or two (binary plus, minus,
+                         * multiply or divide) arguments, no less and no more.
+                         */
+                        cl = gen_length(call_arguments(syntax_call(sy)));
+                        if( (cl != 2) && (cl != 1) )
+                            pips_internal_error("%s call with %d argument(s)",
+                                    entity_local_name(op_ent), cl);
+
+                        arg1 = EXPRESSION(CAR(call_arguments(syntax_call(sy))));
+                        if(cl == 2)
+                            arg2 = EXPRESSION(CAR(CDR(call_arguments(syntax_call(sy)))));
+
+                        if (ENTITY_PLUS_P(op_ent)) /* arg1 + arg2 */
+                        {
+                            pp_new = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(pp_new))
+                                polynome_add(&pp_new, expression_to_polynome(arg2));
+                        }
+                        else if(ENTITY_MINUS_P(op_ent)) /* -arg2 + arg1 */
+                        {
+                            pp_new = expression_to_polynome(arg2);
+                            if(!POLYNOME_UNDEFINED_P(pp_new)) {
+                                polynome_negate(&pp_new);
+                                Ppolynome parg1 = expression_to_polynome(arg1);
+                                if(!POLYNOME_UNDEFINED_P(parg1))
+                                    polynome_add(&pp_new, parg1);
+                                else {
+                                    polynome_rm(&pp_new);
+                                    pp_new=POLYNOME_UNDEFINED;
+                                }
+                            }
+                        }
+                        else if(ENTITY_MULTIPLY_P(op_ent)) /* arg1 * arg2 */ {
+                            Ppolynome p1 = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(p1)) {
+                                Ppolynome p2 = expression_to_polynome(arg2);
+                                if(!POLYNOME_UNDEFINED_P(p2)) {
+                                    pp_new = polynome_mult(p1,p2);
+                                }
+                            }
+                        }
+                        else if(ENTITY_DIVIDE_P(op_ent)) /* arg1 / arg2 */ {
+                            Ppolynome p1 = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(p1)) {
+                                Ppolynome p2 = expression_to_polynome(arg2);
+                                if(!POLYNOME_UNDEFINED_P(p2)) {
+                                    pp_new = polynome_div(p1,p2);
+                                }
+                            }
+                        }
+                        else /* (ENTITY_UNARY_MINUS_P(op_ent)) : -arg1 */
+                        {
+                            pp_new = expression_to_polynome(arg1);
+                            if(!POLYNOME_UNDEFINED_P(pp_new)) {
+                                polynome_negate(&pp_new);
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+        default :
+            {
+                pp_new=POLYNOME_UNDEFINED;
+            }
+    }
+    return(pp_new);
+#undef ENTITY_FOUR_OPERATION_P
+}
+
+/* use polynomials to simplify an expression */
+bool simplify_expression(expression * pexp) {
+    expression exp = *pexp;
+    bool result =false;
+    if(!expression_undefined_p(exp)) {
+        Ppolynome pu = expression_to_polynome(exp);
+        if((result=!POLYNOME_UNDEFINED_P(pu))) {
+            free_expression(exp);
+            *pexp=polynome_to_expression(pu);
+            polynome_rm(&pu);
+        }
+    }
+    return result;
+}
+
+/* call maxima to simplify an expression 
+ * prefer simplify_expression !*/
+bool maxima_simplify(expression *presult) {
+    bool success = true;
+    expression result = *presult;
+    /* try to call maxima to simplify this expression */
+    if(!expression_undefined_p(result) ) {
+        list w = words_expression(result,NIL);
+        string str = words_to_string(w);
+        gen_free_list(w);
+        char * cmd;
+        asprintf(&cmd,"maxima -q --batch-string \"string(fullratsimp(%s));\"\n",str);
+        free(str);
+        FILE* pout = popen(cmd,"r");
+        if(pout) {
+            /* strip out banner */
+            fgetc(pout);fgetc(pout);
+            /* look for first % */
+            while(!feof(pout) && fgetc(pout)!='%');
+            if(!feof(pout)) {
+                /* skip the three next chars */
+                fgetc(pout);fgetc(pout);fgetc(pout);
+                /* parse the output */
+                char bufline[strlen(cmd)];
+                if(fscanf(pout," %s\n",&bufline[0]) == 1 ) {
+                    expression exp = string_to_expression(bufline,get_current_module_entity());
+                    if(!expression_undefined_p(exp)) {
+                        free_expression(result);
+                        *presult=exp;
+                    }
+                    else
+                        success= false;
+                }
+            }
+            else
+                success= false;
+            fclose(pout);
+        }
+        else
+            success= false;
+        free(cmd);
+    }
+    return success;
+}
+
+/* computes the offset of a C reference with its origin
+ */
+expression reference_offset(reference ref)
+{
+    if(ENDP(reference_indices(ref))) return int_to_expression(0);
+    else {
+        expression address_computation = copy_expression(EXPRESSION(CAR(reference_indices(ref))));
+
+        /* iterate on the dimensions & indices to create the index expression */
+        list dims = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(ref)))));
+        list indices = reference_indices(ref);
+        POP(indices);
+        if(!ENDP(dims)) POP(dims); // the first dimension is unused
+        FOREACH(DIMENSION,dim,dims)
+        {
+            expression dimension_size = make_op_exp(
+                    PLUS_OPERATOR_NAME,
+                    make_op_exp(
+                        MINUS_OPERATOR_NAME,
+                        copy_expression(dimension_upper(dim)),
+                        copy_expression(dimension_lower(dim))
+                        ),
+                    int_to_expression(1));
+
+            if( !ENDP(indices) ) { /* there may be more dimensions than indices */
+                expression index_expression = EXPRESSION(CAR(indices));
+                address_computation = make_op_exp(
+                        PLUS_OPERATOR_NAME,
+                        copy_expression(index_expression),
+                        make_op_exp(
+                            MULTIPLY_OPERATOR_NAME,
+                            dimension_size,address_computation
+                            )
+                        );
+                POP(indices);
+            }
+            else {
+                address_computation = make_op_exp(
+                        MULTIPLY_OPERATOR_NAME,
+                        dimension_size,address_computation
+                        );
+            }
+        }
+
+        /* there may be more indices than dimensions */
+        FOREACH(EXPRESSION,e,indices)
+        {
+            address_computation = make_op_exp(
+                    PLUS_OPERATOR_NAME,
+                    address_computation,copy_expression(e)
+                    );
+        }
+        return address_computation ;
+    }
+}
+
+/* Use side effects to move the content of e2, s2 and n2, into e1; s1
+   and n1 are freed, as well as e2. This is useful if you need to
+   keep the handle on e1. e1 is returned, although it is redundant. */
+expression replace_expression_content(expression e1, expression e2)
+{
+  syntax s1 = expression_syntax(e1);
+  normalized n1 = expression_normalized(e1);
+  syntax s2 = expression_syntax(e2);
+  normalized n2 = expression_normalized(e2);
+
+  expression_syntax(e1) = s2;
+  expression_normalized(e1) = n2;
+  expression_syntax(e2) = syntax_undefined;
+  expression_normalized(e2) = normalized_undefined;
+  free_syntax(s1);
+  free_normalized(n1);
+  free_expression(e2);
+
+  return e1;
 }

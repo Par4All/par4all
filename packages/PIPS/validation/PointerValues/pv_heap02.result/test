@@ -1,0 +1,61 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *p, *q, *r;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   void *s;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   p = (int *) calloc(2, sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = (int *) calloc(2, sizeof(a));
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   r = (int *) calloc(1, sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// r == &*HEAP*_l_10[0] (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   s = calloc(1, 15);
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_9[0] (exact);
+// r == &*HEAP*_l_10[0] (exact);
+// s == &*HEAP*_l_11[0] (exact);
+
+   return 0;
+}

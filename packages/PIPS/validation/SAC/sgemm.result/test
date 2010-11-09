@@ -2881,51 +2881,34 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 XERBLA
-      EXTERNAL XERBLA
       REAL*4 SIZE
       PARAMETER (SIZE = 10)
-      INTEGER NROWA0, NROWB0, INFO8, INFO7, INFO6, INFO5, INFO4, 
-     &INFO3, I_00, INFO2, I_10, INFO1, I_20, INFO0, LU_NUB00, LU_IB00
-     &, LU_NUB10, LU_IB10, LU_NUB20, LU_IB20, LU_NUB30, LU_IB30, 
-     &LU_NUB40, LU_IB40, LU_NUB50, LU_IB50, LU_NUB60, LU_IB60, 
-     &LU_NUB70, LU_IB70, LU_NUB80, LU_IB80, LU_NUB90, LU_IB90, 
+      INTEGER NROWB0, NROWA0, J5, J4, J3, J2, J1, J0, INFO1, INFO0, 
+     &I_00, I_10, I_20, LU_IND00, LU_IND10, LU_IND20, LU_IND30, 
+     &LU_IND40, LU_IND50, LU_IND60, LU_IND70, LU_IND80, LU_IND90, 
      &LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, 
      &LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, 
      &LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, 
      &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
-     &LU_IB0, LU_NUB0, I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO
-     &, J, L, NCOLA, NROWA, NROWB
-      REAL*4 ONE0, ZERO0, TEMP7, F_04, F_03, F_02, F_01, F_00, TEMP6
-     &, F_14, TEMP5, F_13, F_12, F_11, F_10, TEMP4, C00, F_20, F_30, 
-     &C10, TEMP3, F_44, F_43, F_42, F_41, F_40, TEMP2, F_54, TEMP1, 
-     &F_53, F_52, F_51, F_50, TEMP0, C20, F_60, F_70, C30, RED8(0:3)
-     &, RED7(0:0), RED6(0:0), RED5(0:0), RED4(0:3), RED3(0:0), RED2(0
-     &:0), RED1(0:0), RED0(0:0), F_7, F_6, F_5, F_4, F_3, F_2, F_1, 
-     &F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE
-     &), BETA, C(1:SIZE, 1:SIZE), TEMP, ONE, ZERO
-      LOGICAL NOTA0, NOTB0, L_911, L_111, L_120, L_130, L_140, L_150
-     &, L_611, L_500, L_160, L_511, L_170, L_180, L_400, L_190, L_211
-     &, L_220, L_411, L_230, L_240, L_250, L_260, L_300, L_270, L_280
-     &, L_290, L_311, L_320, L_310, L_330, L_340, L_350, L_360, L_370
-     &, L_380, L_200, L_390, L_410, L_420, L_430, L_440, L_450, L_460
-     &, L_210, L_470, L_480, L_490, L_510, L_520, L_530, L_540, L_550
-     &, L_100, L_560, L_570, L_580, L_590, L_600, L_610, L_620, L_630
-     &, L_640, L_110, L_650, L_660, L_670, L_680, L_690, L_700, L_711
-     &, L_720, L_730, L_740, L_000, L_750, L_760, L_770, L_780, L_790
-     &, L_800, L_811, L_820, L_830, L_840, L_850, L_01, L_860, L_870
-     &, L_880, L_890, L_900, L_910, L_920, L_930, L_940, L_950, L_960
-     &, L_970, L_710, L_980, L_810, L_990, L_99, L_98, L_97, L_96, 
-     &L_95, L_94, L_93, L_92, L_91, L_90, L_89, L_88, L_87, L_86, 
-     &L_85, L_84, L_83, L_82, L_81, L_80, L_79, L_78, L_77, L_76, 
-     &L_75, L_74, L_73, L_72, L_71, L_70, L_69, L_68, L_67, L_66, 
-     &L_65, L_64, L_63, L_62, L_61, L_60, L_59, L_58, L_57, L_56, 
-     &L_55, L_54, L_53, L_52, L_51, L_49, L_48, L_47, L_46, L_45, 
-     &L_44, L_43, L_42, L_41, L_39, L_38, L_37, L_36, L_35, L_34, 
-     &L_33, L_32, L_31, L_29, L_28, L_27, L_26, L_25, L_24, L_23, 
-     &L_22, L_21, L_19, L_18, L_17, L_16, L_15, L_14, L_13, L_12, 
-     &L_11, L_9, L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, 
-     &L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
+     &LU_IB0, LU_NUB0, M, N, K, LDA, LDB, LDC, I, L
+      REAL*4 ZERO0, ONE0, TEMP1, TEMP0, F_03, F_02, F_01, F_00, F_13
+     &, F_12, F_11, F_10, F_43, F_42, F_41, F_40, F_53, F_52, F_51, 
+     &F_50, RED8(0:3), RED7(0:0), RED6(0:0), RED5(0:0), RED4(0:3), 
+     &RED3(0:0), RED2(0:0), RED1(0:0), RED0(0:0), F_7, F_6, F_5, F_4
+     &, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE)
+     &, B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP
+      LOGICAL NOTB0, NOTA0, L_611, L_500, L_400, L_300, L_200, L_100
+     &, L_000, L_911, L_110, L_120, L_130, L_140, L_150, L_160, L_170
+     &, L_180, L_190, L_210, L_220, L_230, L_240, L_250, L_260, L_270
+     &, L_280, L_290, L_310, L_320, L_330, L_340, L_350, L_360, L_370
+     &, L_380, L_390, L_410, L_420, L_430, L_440, L_450, L_460, L_470
+     &, L_480, L_490, L_510, L_520, L_530, L_540, L_550, L_560, L_570
+     &, L_580, L_590, L_600, L_610, L_620, L_630, L_640, L_650, L_660
+     &, L_670, L_680, L_690, L_700, L_710, L_720, L_730, L_740, L_750
+     &, L_760, L_770, L_780, L_790, L_800, L_810, L_820, L_830, L_840
+     &, L_850, L_860, L_870, L_880, L_890, L_900, L_910, L_920, L_930
+     &, L_940, L_950, L_960, L_970, L_99, L_98, L_8, L_7, L_5, L_4, 
+     &L_3, L_2, L_1, L_0
       CHARACTER TRANSA, TRANSB
       ONE0 = 1.0E+0                                                     0033
       ZERO0 = 0.0E+0                                                    0034
@@ -2943,118 +2926,119 @@
 *
 *     Test the input parameters.
 *
-      INFO8 = 0                                                         0059
+      INFO0 = 0                                                         0059
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
      &TRANSA, 'T')) THEN                                                0060
-         INFO7 = 1                                                      0063
+         INFO1 = 1                                                      0063
+         INFO0 = INFO1
       ELSE
          L_911 = .NOT.NOTB0
-         L_111 = LSAME(TRANSB, 'C')
-         L_120 = .NOT.L_111
+         L_110 = LSAME(TRANSB, 'C')
+         L_120 = .NOT.L_110
          L_130 = L_911.AND.L_120
          L_140 = LSAME(TRANSB, 'T')
          L_150 = .NOT.L_140
          L_611 = L_130.AND.L_150
-         INFO6 = L_611?2:INFO
+         INFO0 = L_611?2:INFO0
          L_500 = M.LT.0
          L_160 = .NOT.L_611
-         L_511 = L_160?L_500:L_5
+         L_5 = L_160?L_500:L_5
          L_170 = .NOT.L_611
-         L_180 = L_170.AND.L_511
-         INFO5 = L_180?3:INFO
+         L_180 = L_170.AND.L_5
+         INFO0 = L_180?3:INFO0
          L_400 = N.LT.0
          L_190 = .NOT.L_611
-         L_211 = .NOT.L_511
-         L_220 = L_190.AND.L_211
-         L_411 = L_220?L_400:L_4
+         L_210 = .NOT.L_5
+         L_220 = L_190.AND.L_210
+         L_4 = L_220?L_400:L_4
          L_230 = .NOT.L_611
-         L_240 = .NOT.L_511
-         L_250 = L_240.AND.L_411
+         L_240 = .NOT.L_5
+         L_250 = L_240.AND.L_4
          L_260 = L_230.AND.L_250
-         INFO4 = L_260?4:INFO
+         INFO0 = L_260?4:INFO0
          L_300 = K.LT.0
          L_270 = .NOT.L_611
-         L_280 = .NOT.L_511
-         L_290 = .NOT.L_411
-         L_311 = L_280.AND.L_290
-         L_320 = L_270.AND.L_311
-         L_310 = L_320?L_300:L_3
+         L_280 = .NOT.L_5
+         L_290 = .NOT.L_4
+         L_310 = L_280.AND.L_290
+         L_320 = L_270.AND.L_310
+         L_3 = L_320?L_300:L_3
          L_330 = .NOT.L_611
-         L_340 = .NOT.L_511
-         L_350 = .NOT.L_411
-         L_360 = L_350.AND.L_310
+         L_340 = .NOT.L_5
+         L_350 = .NOT.L_4
+         L_360 = L_350.AND.L_3
          L_370 = L_340.AND.L_360
          L_380 = L_330.AND.L_370
-         INFO3 = L_380?5:INFO
+         INFO0 = L_380?5:INFO0
          I_00 = MAX(1, NROWA0)
          L_200 = LDA.LT.I_00
          L_390 = .NOT.L_611
-         L_410 = .NOT.L_511
-         L_420 = .NOT.L_411
-         L_430 = .NOT.L_310
+         L_410 = .NOT.L_5
+         L_420 = .NOT.L_4
+         L_430 = .NOT.L_3
          L_440 = L_420.AND.L_430
          L_450 = L_410.AND.L_440
          L_460 = L_390.AND.L_450
-         L_210 = L_460?L_200:L_2
+         L_2 = L_460?L_200:L_2
          L_470 = .NOT.L_611
-         L_480 = .NOT.L_511
-         L_490 = .NOT.L_411
-         L_510 = .NOT.L_310
-         L_520 = L_510.AND.L_210
+         L_480 = .NOT.L_5
+         L_490 = .NOT.L_4
+         L_510 = .NOT.L_3
+         L_520 = L_510.AND.L_2
          L_530 = L_490.AND.L_520
          L_540 = L_480.AND.L_530
          L_550 = L_470.AND.L_540
-         INFO2 = L_550?8:INFO
+         INFO0 = L_550?8:INFO0
          I_10 = MAX(1, NROWB0)
          L_100 = LDB.LT.I_10
          L_560 = .NOT.L_611
-         L_570 = .NOT.L_511
-         L_580 = .NOT.L_411
-         L_590 = .NOT.L_310
-         L_600 = .NOT.L_210
+         L_570 = .NOT.L_5
+         L_580 = .NOT.L_4
+         L_590 = .NOT.L_3
+         L_600 = .NOT.L_2
          L_610 = L_590.AND.L_600
          L_620 = L_580.AND.L_610
          L_630 = L_570.AND.L_620
          L_640 = L_560.AND.L_630
-         L_110 = L_640?L_100:L_1
+         L_1 = L_640?L_100:L_1
          L_650 = .NOT.L_611
-         L_660 = .NOT.L_511
-         L_670 = .NOT.L_411
-         L_680 = .NOT.L_310
-         L_690 = .NOT.L_210
-         L_700 = L_690.AND.L_110
-         L_711 = L_680.AND.L_700
-         L_720 = L_670.AND.L_711
+         L_660 = .NOT.L_5
+         L_670 = .NOT.L_4
+         L_680 = .NOT.L_3
+         L_690 = .NOT.L_2
+         L_700 = L_690.AND.L_1
+         L_710 = L_680.AND.L_700
+         L_720 = L_670.AND.L_710
          L_730 = L_660.AND.L_720
          L_740 = L_650.AND.L_730
-         INFO1 = L_740?10:INFO
+         INFO0 = L_740?10:INFO0
          I_20 = MAX(1, M)
          L_000 = LDC.LT.I_20
          L_750 = .NOT.L_611
-         L_760 = .NOT.L_511
-         L_770 = .NOT.L_411
-         L_780 = .NOT.L_310
-         L_790 = .NOT.L_210
-         L_800 = .NOT.L_110
-         L_811 = L_790.AND.L_800
-         L_820 = L_780.AND.L_811
+         L_760 = .NOT.L_5
+         L_770 = .NOT.L_4
+         L_780 = .NOT.L_3
+         L_790 = .NOT.L_2
+         L_800 = .NOT.L_1
+         L_810 = L_790.AND.L_800
+         L_820 = L_780.AND.L_810
          L_830 = L_770.AND.L_820
          L_840 = L_760.AND.L_830
          L_850 = L_750.AND.L_840
-         L_01 = L_850?L_000:L_0
+         L_0 = L_850?L_000:L_0
          L_860 = .NOT.L_611
-         L_870 = .NOT.L_511
-         L_880 = .NOT.L_411
-         L_890 = .NOT.L_310
-         L_900 = .NOT.L_210
-         L_910 = .NOT.L_110
-         L_920 = L_910.AND.L_01
+         L_870 = .NOT.L_5
+         L_880 = .NOT.L_4
+         L_890 = .NOT.L_3
+         L_900 = .NOT.L_2
+         L_910 = .NOT.L_1
+         L_920 = L_910.AND.L_0
          L_930 = L_900.AND.L_920
          L_940 = L_890.AND.L_930
          L_950 = L_880.AND.L_940
          L_960 = L_870.AND.L_950
          L_970 = L_860.AND.L_960
-         INFO0 = L_970?13:INFO
+         INFO0 = L_970?13:INFO0
       ENDIF
       IF (INFO0.NE.0) THEN                                              0081
 *         CALL XERBLA( 'SGEMM ', INFO )
@@ -3070,33 +3054,33 @@
 *
             IF (ALPHA.EQ.ZERO0) THEN                                    0094
                IF (BETA.EQ.ZERO0) THEN                                  0095
-                  DO 20 J = 1, N                                        0096
-                     LU_NUB00 = M
-                     LU_IB00 = MOD(LU_NUB00, 4)
-                     DO 99999 LU_IND0 = 0, LU_IB00-1
-                        C(LU_IND0+1,J) = ZERO0
+                  DO 20 J0 = 1, N                                       0096
+                     LU_NUB0 = M
+                     LU_IB0 = MOD(LU_NUB0, 4)
+                     DO 99999 LU_IND00 = 0, LU_IB0-1
+                        C(LU_IND00+1,J0) = ZERO0
 99999                   CONTINUE
-                     DO 99998 LU_IND0 = LU_IB00, LU_NUB00-1, 4
-                        C(LU_IND0+1,J) = ZERO0
-                        C(LU_IND0+2,J) = ZERO0
-                        C(LU_IND0+3,J) = ZERO0
-                        C(LU_IND0+4,J) = ZERO0
+                     DO 99998 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+                        C(LU_IND0+1,J0) = ZERO0
+                        C(LU_IND0+2,J0) = ZERO0
+                        C(LU_IND0+3,J0) = ZERO0
+                        C(LU_IND0+4,J0) = ZERO0
 99998                   CONTINUE
 20                   CONTINUE                                           0100
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     LU_NUB10 = M
-                     LU_IB10 = MOD(LU_NUB10, 4)
-                     DO 99997 LU_IND1 = 0, LU_IB10-1
+                  DO 40 J1 = 1, N                                       0102
+                     LU_NUB1 = M
+                     LU_IB1 = MOD(LU_NUB1, 4)
+                     DO 99997 LU_IND10 = 0, LU_IB1-1
                         RED0(0) = 1.000000
                         RED0(0) = BETA*RED0(0)
 99997                   CONTINUE
-                        C(LU_IND1+1,J) = RED0(0)*C(LU_IND1+1,J)
-                     DO 99996 LU_IND1 = LU_IB10, LU_NUB10-1, 4
-                        C(LU_IND1+1,J) = BETA*C(LU_IND1+1,J)
-                        C(LU_IND1+2,J) = BETA*C(LU_IND1+2,J)
-                        C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)
-                        C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)
+                        C(LU_IND10+1,J1) = RED0(0)*C(LU_IND10+1,J1)
+                     DO 99996 LU_IND1 = LU_IB1, LU_NUB1-1, 4
+                        C(LU_IND1+1,J1) = BETA*C(LU_IND1+1,J1)
+                        C(LU_IND1+2,J1) = BETA*C(LU_IND1+2,J1)
+                        C(LU_IND1+3,J1) = BETA*C(LU_IND1+3,J1)
+                        C(LU_IND1+4,J1) = BETA*C(LU_IND1+4,J1)
 99996                   CONTINUE
 40                   CONTINUE                                           0106
                ENDIF
@@ -3109,56 +3093,60 @@
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
+                     DO 90 J2 = 1, N                                    0118
                         IF (BETA.EQ.ZERO0) THEN                         0119
-                           LU_NUB20 = M
-                           LU_IB20 = MOD(LU_NUB20, 4)
-                           DO 99995 LU_IND2 = 0, LU_IB20-1
-                              C(LU_IND2+1,J) = ZERO0
+                           LU_NUB2 = M
+                           LU_IB2 = MOD(LU_NUB2, 4)
+                           DO 99995 LU_IND20 = 0, LU_IB2-1
+                              C(LU_IND20+1,J2) = ZERO0
 99995                         CONTINUE
-                           DO 99994 LU_IND2 = LU_IB20, LU_NUB20-1, 4
-                              C(LU_IND2+1,J) = ZERO0
-                              C(LU_IND2+2,J) = ZERO0
-                              C(LU_IND2+3,J) = ZERO0
-                              C(LU_IND2+4,J) = ZERO0
+                           DO 99994 LU_IND2 = LU_IB2, LU_NUB2-1, 4
+                              C(LU_IND2+1,J2) = ZERO0
+                              C(LU_IND2+2,J2) = ZERO0
+                              C(LU_IND2+3,J2) = ZERO0
+                              C(LU_IND2+4,J2) = ZERO0
 99994                         CONTINUE
                         ELSEIF (BETA.NE.ONE0) THEN                      0119
-                           LU_NUB30 = M
-                           LU_IB30 = MOD(LU_NUB30, 4)
-                           DO 99993 LU_IND3 = 0, LU_IB30-1
+                           LU_NUB3 = M
+                           LU_IB3 = MOD(LU_NUB3, 4)
+                           DO 99993 LU_IND30 = 0, LU_IB3-1
                               RED1(0) = 1.000000
                               RED1(0) = BETA*RED1(0)
 99993                         CONTINUE
-                              C(LU_IND3+1,J) = RED1(0)*C(LU_IND3+1,J)
-                           DO 99992 LU_IND3 = LU_IB30, LU_NUB30-1, 4
-                              C(LU_IND3+1,J) = BETA*C(LU_IND3+1,J)
-                              C(LU_IND3+2,J) = BETA*C(LU_IND3+2,J)
-                              C(LU_IND3+3,J) = BETA*C(LU_IND3+3,J)
-                              C(LU_IND3+4,J) = BETA*C(LU_IND3+4,J)
+                              C(LU_IND30+1,J2) = RED1(0)*C(LU_IND30+1
+     &                        ,J2)
+                           DO 99992 LU_IND3 = LU_IB3, LU_NUB3-1, 4
+                              C(LU_IND3+1,J2) = BETA*C(LU_IND3+1,J2)
+                              C(LU_IND3+2,J2) = BETA*C(LU_IND3+2,J2)
+                              C(LU_IND3+3,J2) = BETA*C(LU_IND3+3,J2)
+                              C(LU_IND3+4,J2) = BETA*C(LU_IND3+4,J2)
 99992                         CONTINUE
                         ENDIF
                         DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO0) THEN                    0129
-                              TEMP7 = ALPHA*B(L,J)                      0130
-                              LU_NUB40 = M
-                              LU_IB40 = MOD(LU_NUB40, 4)
-                              DO 99991 LU_IND4 = 0, LU_IB40-1
+                           IF (B(L,J2).NE.ZERO0) THEN                   0129
+                              TEMP = ALPHA*B(L,J2)                      0130
+                              LU_NUB4 = M
+                              LU_IB4 = MOD(LU_NUB4, 4)
+                              DO 99991 LU_IND40 = 0, LU_IB4-1
                                  RED2(0) = 0.000000
-                                 F_04 = TEMP7*A(LU_IND4+1,L)
-                                 RED2(0) = RED2(0)+F_04
+                                 F_0 = TEMP*A(LU_IND40+1,L)
+                                 RED2(0) = RED2(0)+F_0
 99991                            CONTINUE
-                                 C(LU_IND4+1,J) = RED2(0)+C(LU_IND4+1
-     &                           ,J)
-                              DO 99990 LU_IND4 = LU_IB40, LU_NUB40-1
-     &                        , 4
-                                 F_03 = TEMP7*A(LU_IND4+1,L)
-                                 C(LU_IND4+1,J) = C(LU_IND4+1,J)+F_03
-                                 F_02 = TEMP7*A(LU_IND4+2,L)
-                                 C(LU_IND4+2,J) = C(LU_IND4+2,J)+F_02
-                                 F_01 = TEMP7*A(LU_IND4+3,L)
-                                 C(LU_IND4+3,J) = C(LU_IND4+3,J)+F_01
-                                 F_00 = TEMP7*A(LU_IND4+4,L)
-                                 C(LU_IND4+4,J) = C(LU_IND4+4,J)+F_00
+                                 C(LU_IND40+1,J2) = RED2(0)+C(
+     &                           LU_IND40+1,J2)
+                              DO 99990 LU_IND4 = LU_IB4, LU_NUB4-1, 4
+                                 F_00 = TEMP*A(LU_IND4+1,L)
+                                 C(LU_IND4+1,J2) = C(LU_IND4+1,J2)+
+     &                           F_00
+                                 F_01 = TEMP*A(LU_IND4+2,L)
+                                 C(LU_IND4+2,J2) = C(LU_IND4+2,J2)+
+     &                           F_01
+                                 F_02 = TEMP*A(LU_IND4+3,L)
+                                 C(LU_IND4+3,J2) = C(LU_IND4+3,J2)+
+     &                           F_02
+                                 F_03 = TEMP*A(LU_IND4+4,L)
+                                 C(LU_IND4+4,J2) = C(LU_IND4+4,J2)+
+     &                           F_03
 99990                            CONTINUE
                            ENDIF
 80                         CONTINUE                                     0135
@@ -3167,41 +3155,41 @@
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
+                     DO 120 J3 = 1, N                                   0141
                         DO 110 I = 1, M                                 0142
-                           TEMP6 = ZERO0                                0143
-                           LU_NUB50 = K
-                           LU_IB50 = MOD(LU_NUB50, 4)
+                           TEMP0 = ZERO0                                0143
+                           LU_NUB5 = K
+                           LU_IB5 = MOD(LU_NUB5, 4)
                            RED3(0) = 0.000000
-                           DO 99989 LU_IND5 = 0, LU_IB50-1
-                              F_14 = A(LU_IND5+1,I)*B(LU_IND5+1,J)
-                              RED3(0) = RED3(0)+F_14
+                           DO 99989 LU_IND50 = 0, LU_IB5-1
+                              F_1 = A(LU_IND50+1,I)*B(LU_IND50+1,J3)
+                              RED3(0) = RED3(0)+F_1
 99989                         CONTINUE
-                           TEMP5 = RED3(0)+TEMP6
+                           TEMP0 = RED3(0)+TEMP0
                            RED4(0) = 0.000000
                            RED4(1) = 0.000000
                            RED4(2) = 0.000000
                            RED4(3) = 0.000000
-                           DO 99988 LU_IND5 = LU_IB50, LU_NUB50-1, 4
-                              F_13 = A(LU_IND5+1,I)*B(LU_IND5+1,J)
-                              RED4(0) = RED4(0)+F_13
-                              F_12 = A(LU_IND5+2,I)*B(LU_IND5+2,J)
-                              RED4(1) = RED4(1)+F_12
-                              F_11 = A(LU_IND5+3,I)*B(LU_IND5+3,J)
-                              RED4(2) = RED4(2)+F_11
-                              F_10 = A(LU_IND5+4,I)*B(LU_IND5+4,J)
-                              RED4(3) = RED4(3)+F_10
+                           DO 99988 LU_IND5 = LU_IB5, LU_NUB5-1, 4
+                              F_10 = A(LU_IND5+1,I)*B(LU_IND5+1,J3)
+                              RED4(0) = RED4(0)+F_10
+                              F_11 = A(LU_IND5+2,I)*B(LU_IND5+2,J3)
+                              RED4(1) = RED4(1)+F_11
+                              F_12 = A(LU_IND5+3,I)*B(LU_IND5+3,J3)
+                              RED4(2) = RED4(2)+F_12
+                              F_13 = A(LU_IND5+4,I)*B(LU_IND5+4,J3)
+                              RED4(3) = RED4(3)+F_13
 99988                         CONTINUE
-                           TEMP4 = RED4(3)+RED4(2)+RED4(1)+RED4(0)+
-     &                     TEMP5
-                           L_710 = BETA.EQ.ZERO0
-                           C00 = ALPHA*TEMP4
-                           C(I,J) = L_710?C00:C(I,J)
-                           F_20 = ALPHA*TEMP4
-                           F_30 = BETA*C(I,J)
-                           C10 = F_20+F_30
-                           L_980 = .NOT.L_710
-                           C(I,J) = L_980?C10:C(I,J)
+                           TEMP0 = RED4(3)+RED4(2)+RED4(1)+RED4(0)+
+     &                     TEMP0
+                           L_7 = BETA.EQ.ZERO0
+                           C0 = ALPHA*TEMP0
+                           C(I,J3) = L_7?C0:C(I,J3)
+                           F_2 = ALPHA*TEMP0
+                           F_3 = BETA*C(I,J3)
+                           C1 = F_2+F_3
+                           L_98 = .NOT.L_7
+                           C(I,J3) = L_98?C1:C(I,J3)
 110                        CONTINUE                                     0152
 120                     CONTINUE                                        0153
                   ENDIF
@@ -3209,54 +3197,56 @@
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
+                  DO 170 J4 = 1, N                                      0160
                      IF (BETA.EQ.ZERO0) THEN                            0161
-                        LU_NUB60 = M
-                        LU_IB60 = MOD(LU_NUB60, 4)
-                        DO 99987 LU_IND6 = 0, LU_IB60-1
-                           C(LU_IND6+1,J) = ZERO0
+                        LU_NUB6 = M
+                        LU_IB6 = MOD(LU_NUB6, 4)
+                        DO 99987 LU_IND60 = 0, LU_IB6-1
+                           C(LU_IND60+1,J4) = ZERO0
 99987                      CONTINUE
-                        DO 99986 LU_IND6 = LU_IB60, LU_NUB60-1, 4
-                           C(LU_IND6+1,J) = ZERO0
-                           C(LU_IND6+2,J) = ZERO0
-                           C(LU_IND6+3,J) = ZERO0
-                           C(LU_IND6+4,J) = ZERO0
+                        DO 99986 LU_IND6 = LU_IB6, LU_NUB6-1, 4
+                           C(LU_IND6+1,J4) = ZERO0
+                           C(LU_IND6+2,J4) = ZERO0
+                           C(LU_IND6+3,J4) = ZERO0
+                           C(LU_IND6+4,J4) = ZERO0
 99986                      CONTINUE
                      ELSEIF (BETA.NE.ONE0) THEN                         0161
-                        LU_NUB70 = M
-                        LU_IB70 = MOD(LU_NUB70, 4)
-                        DO 99985 LU_IND7 = 0, LU_IB70-1
+                        LU_NUB7 = M
+                        LU_IB7 = MOD(LU_NUB7, 4)
+                        DO 99985 LU_IND70 = 0, LU_IB7-1
                            RED5(0) = 1.000000
                            RED5(0) = BETA*RED5(0)
 99985                      CONTINUE
-                           C(LU_IND7+1,J) = RED5(0)*C(LU_IND7+1,J)
-                        DO 99984 LU_IND7 = LU_IB70, LU_NUB70-1, 4
-                           C(LU_IND7+1,J) = BETA*C(LU_IND7+1,J)
-                           C(LU_IND7+2,J) = BETA*C(LU_IND7+2,J)
-                           C(LU_IND7+3,J) = BETA*C(LU_IND7+3,J)
-                           C(LU_IND7+4,J) = BETA*C(LU_IND7+4,J)
+                           C(LU_IND70+1,J4) = RED5(0)*C(LU_IND70+1,J4
+     &                     )
+                        DO 99984 LU_IND7 = LU_IB7, LU_NUB7-1, 4
+                           C(LU_IND7+1,J4) = BETA*C(LU_IND7+1,J4)
+                           C(LU_IND7+2,J4) = BETA*C(LU_IND7+2,J4)
+                           C(LU_IND7+3,J4) = BETA*C(LU_IND7+3,J4)
+                           C(LU_IND7+4,J4) = BETA*C(LU_IND7+4,J4)
 99984                      CONTINUE
                      ENDIF
                      DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO0) THEN                       0171
-                           TEMP3 = ALPHA*B(J,L)                         0172
-                           LU_NUB80 = M
-                           LU_IB80 = MOD(LU_NUB80, 4)
-                           DO 99983 LU_IND8 = 0, LU_IB80-1
+                        IF (B(J4,L).NE.ZERO0) THEN                      0171
+                           TEMP = ALPHA*B(J4,L)                         0172
+                           LU_NUB8 = M
+                           LU_IB8 = MOD(LU_NUB8, 4)
+                           DO 99983 LU_IND80 = 0, LU_IB8-1
                               RED6(0) = 0.000000
-                              F_44 = TEMP3*A(LU_IND8+1,L)
-                              RED6(0) = RED6(0)+F_44
+                              F_4 = TEMP*A(LU_IND80+1,L)
+                              RED6(0) = RED6(0)+F_4
 99983                         CONTINUE
-                              C(LU_IND8+1,J) = RED6(0)+C(LU_IND8+1,J)
-                           DO 99982 LU_IND8 = LU_IB80, LU_NUB80-1, 4
-                              F_43 = TEMP3*A(LU_IND8+1,L)
-                              C(LU_IND8+1,J) = C(LU_IND8+1,J)+F_43
-                              F_42 = TEMP3*A(LU_IND8+2,L)
-                              C(LU_IND8+2,J) = C(LU_IND8+2,J)+F_42
-                              F_41 = TEMP3*A(LU_IND8+3,L)
-                              C(LU_IND8+3,J) = C(LU_IND8+3,J)+F_41
-                              F_40 = TEMP3*A(LU_IND8+4,L)
-                              C(LU_IND8+4,J) = C(LU_IND8+4,J)+F_40
+                              C(LU_IND80+1,J4) = RED6(0)+C(LU_IND80+1
+     &                        ,J4)
+                           DO 99982 LU_IND8 = LU_IB8, LU_NUB8-1, 4
+                              F_40 = TEMP*A(LU_IND8+1,L)
+                              C(LU_IND8+1,J4) = C(LU_IND8+1,J4)+F_40
+                              F_41 = TEMP*A(LU_IND8+2,L)
+                              C(LU_IND8+2,J4) = C(LU_IND8+2,J4)+F_41
+                              F_42 = TEMP*A(LU_IND8+3,L)
+                              C(LU_IND8+3,J4) = C(LU_IND8+3,J4)+F_42
+                              F_43 = TEMP*A(LU_IND8+4,L)
+                              C(LU_IND8+4,J4) = C(LU_IND8+4,J4)+F_43
 99982                         CONTINUE
                         ENDIF
 160                     CONTINUE                                        0177
@@ -3265,40 +3255,40 @@
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
+                  DO 200 J5 = 1, N                                      0183
                      DO 190 I = 1, M                                    0184
-                        TEMP2 = ZERO0                                   0185
-                        LU_NUB90 = K
-                        LU_IB90 = MOD(LU_NUB90, 4)
+                        TEMP1 = ZERO0                                   0185
+                        LU_NUB9 = K
+                        LU_IB9 = MOD(LU_NUB9, 4)
                         RED7(0) = 0.000000
-                        DO 99981 LU_IND9 = 0, LU_IB90-1
-                           F_54 = A(LU_IND9+1,I)*B(J,LU_IND9+1)
-                           RED7(0) = RED7(0)+F_54
+                        DO 99981 LU_IND90 = 0, LU_IB9-1
+                           F_5 = A(LU_IND90+1,I)*B(J5,LU_IND90+1)
+                           RED7(0) = RED7(0)+F_5
 99981                      CONTINUE
-                        TEMP1 = RED7(0)+TEMP2
+                        TEMP1 = RED7(0)+TEMP1
                         RED8(0) = 0.000000
                         RED8(1) = 0.000000
                         RED8(2) = 0.000000
                         RED8(3) = 0.000000
-                        DO 99980 LU_IND9 = LU_IB90, LU_NUB90-1, 4
-                           F_53 = A(LU_IND9+1,I)*B(J,LU_IND9+1)
-                           RED8(0) = RED8(0)+F_53
-                           F_52 = A(LU_IND9+2,I)*B(J,LU_IND9+2)
-                           RED8(1) = RED8(1)+F_52
-                           F_51 = A(LU_IND9+3,I)*B(J,LU_IND9+3)
-                           RED8(2) = RED8(2)+F_51
-                           F_50 = A(LU_IND9+4,I)*B(J,LU_IND9+4)
-                           RED8(3) = RED8(3)+F_50
+                        DO 99980 LU_IND9 = LU_IB9, LU_NUB9-1, 4
+                           F_50 = A(LU_IND9+1,I)*B(J5,LU_IND9+1)
+                           RED8(0) = RED8(0)+F_50
+                           F_51 = A(LU_IND9+2,I)*B(J5,LU_IND9+2)
+                           RED8(1) = RED8(1)+F_51
+                           F_52 = A(LU_IND9+3,I)*B(J5,LU_IND9+3)
+                           RED8(2) = RED8(2)+F_52
+                           F_53 = A(LU_IND9+4,I)*B(J5,LU_IND9+4)
+                           RED8(3) = RED8(3)+F_53
 99980                      CONTINUE
-                        TEMP0 = RED8(3)+RED8(2)+RED8(1)+RED8(0)+TEMP1
-                        L_810 = BETA.EQ.ZERO0
-                        C20 = ALPHA*TEMP0
-                        C(I,J) = L_810?C20:C(I,J)
-                        F_60 = ALPHA*TEMP0
-                        F_70 = BETA*C(I,J)
-                        C30 = F_60+F_70
-                        L_990 = .NOT.L_810
-                        C(I,J) = L_990?C30:C(I,J)
+                        TEMP1 = RED8(3)+RED8(2)+RED8(1)+RED8(0)+TEMP1
+                        L_8 = BETA.EQ.ZERO0
+                        C2 = ALPHA*TEMP1
+                        C(I,J5) = L_8?C2:C(I,J5)
+                        F_6 = ALPHA*TEMP1
+                        F_7 = BETA*C(I,J5)
+                        C3 = F_6+F_7
+                        L_99 = .NOT.L_8
+                        C(I,J5) = L_99?C3:C(I,J5)
 190                     CONTINUE                                        0194
 200                  CONTINUE                                           0195
                ENDIF
@@ -3407,18 +3397,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
        float a[10][10], int lda, float b[10][10], int ldb, float beta,
        float c[10][10], int ldc)
 {
-  a2sf pdata11;
+  a2sf pdata7;
   v4sf vec220;
-  a4sf pdata7;
   v4sf vec210;
   v4sf vec200;
   v4sf vec190;
   v4sf vec180;
   v4sf vec170;
-  a2sf pdata6;
-  a2sf pdata5;
+  a2sf pdata4;
+  a2sf pdata3;
   v4sf vec70;
-  a4sf pdata1;
   v4sf vec60;
   v4sf vec50;
   v4sf vec40;
@@ -3427,36 +3415,55 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   a4sf pdata0;
   v4sf vec10;
   v4sf vec00;
-  float one0;
   float zero0;
-  int nota0;
-  int notb0;
-  int nrowa0;
+  float one0;
   int nrowb0;
+  int nrowa0;
+  int j5;
+  int j4;
+  int j3;
+  int j2;
+  int j1;
+  int j0;
+  int info1;
+  int info0;
+  int notb0;
+  int nota0;
+  int l_611;
+  int l_500;
+  int l_400;
+  int l_300;
+  int l_200;
+  int l_100;
+  int l_000;
   int l_911;
-  int l_111;
+  int l_110;
   int l_120;
   int l_130;
   int l_140;
   int l_150;
-  int l_611;
-  int l_500;
   int l_160;
-  int l_511;
-  int l_400;
+  int l_170;
+  int l_180;
   int l_190;
-  int l_211;
+  int l_210;
   int l_220;
-  int l_411;
-  int l_300;
+  int l_230;
+  int l_240;
+  int l_250;
+  int l_260;
   int l_270;
   int l_280;
   int l_290;
-  int l_311;
-  int l_320;
   int l_310;
+  int l_320;
+  int l_330;
+  int l_340;
+  int l_350;
+  int l_360;
+  int l_370;
+  int l_380;
   int i_00;
-  int l_200;
   int l_390;
   int l_410;
   int l_420;
@@ -3464,9 +3471,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l_440;
   int l_450;
   int l_460;
-  int l_210;
+  int l_470;
+  int l_480;
+  int l_490;
+  int l_510;
+  int l_520;
+  int l_530;
+  int l_540;
+  int l_550;
   int i_10;
-  int l_100;
   int l_560;
   int l_570;
   int l_580;
@@ -3476,21 +3489,28 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l_620;
   int l_630;
   int l_640;
-  int l_110;
+  int l_650;
+  int l_660;
+  int l_670;
+  int l_680;
+  int l_690;
+  int l_700;
+  int l_710;
+  int l_720;
+  int l_730;
+  int l_740;
   int i_20;
-  int l_000;
   int l_750;
   int l_760;
   int l_770;
   int l_780;
   int l_790;
   int l_800;
-  int l_811;
+  int l_810;
   int l_820;
   int l_830;
   int l_840;
   int l_850;
-  int l_01;
   int l_860;
   int l_870;
   int l_880;
@@ -3503,46 +3523,53 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l_950;
   int l_960;
   int l_970;
-  int info0;
-  int lu_nub00;
-  int lu_ib00;
-  int lu_nub10;
-  int lu_ib10;
-  int lu_nub20;
-  int lu_ib20;
-  int lu_nub30;
-  int lu_ib30;
-  int lu_nub40;
-  int lu_ib40;
-  float f_04;
-  int l_710;
-  float f_30;
-  float c10;
-  int l_980;
-  int lu_nub60;
-  int lu_ib60;
-  int lu_nub70;
-  int lu_ib70;
-  int lu_nub80;
-  int lu_ib80;
-  float f_44;
-  int l_810;
-  float f_70;
-  float c30;
-  int l_990;
+  int lu_ind00;
+  int lu_ind10;
+  int lu_ind20;
+  int lu_ind30;
+  int lu_ind40;
+  int lu_ind60;
+  int lu_ind70;
+  int lu_ind80;
   float red6[1];
   float red5[1];
   float red2[1];
   float red1[1];
   float red0[1];
   int lu_ind8;
+  int lu_ib8;
+  int lu_nub8;
   int lu_ind7;
+  int lu_ib7;
+  int lu_nub7;
   int lu_ind6;
+  int lu_ib6;
+  int lu_nub6;
   int lu_ind4;
+  int lu_ib4;
+  int lu_nub4;
   int lu_ind3;
+  int lu_ib3;
+  int lu_nub3;
   int lu_ind2;
+  int lu_ib2;
+  int lu_nub2;
   int lu_ind1;
+  int lu_ib1;
+  int lu_nub1;
   int lu_ind0;
+  int lu_ib0;
+  int lu_nub0;
+  int l_99;
+  float f_7;
+  float f_4;
+  int l_98;
+  float f_3;
+  float f_0;
+  float c3;
+  float c1;
+  int l_8;
+  int l_7;
   int l_5;
   int l_4;
   int l_3;
@@ -3551,12 +3578,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int l_0;
   static const float size = 10;
   int i;
-  int info;
-  int j;
   int l;
+  float temp;
 
-  pdata5[1] = alpha;
-  pdata5[0] = alpha;
+  pdata3[1] = alpha;
+  pdata3[0] = alpha;
   pdata0[3] = beta;
   pdata0[2] = beta;
   pdata0[1] = beta;
@@ -3565,15 +3591,18 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   zero0 = 0.0e+0;
   nota0 = lsame (transa, 'n');
   notb0 = lsame (transb, 'n');
+  info0 = 0;
   nrowa0 = __c - conditional__ (nota0, m, k);
   nrowb0 = __c - conditional__ (notb0, k, n);
   if ((!nota0 && !lsame (transa, 'c')) && !lsame (transa, 't'))
     {
+      info1 = 1;
+      info0 = info1;
     }
   else
     {
       l_911 = !notb0;
-      l_111 = lsame (transb, 'c');
+      l_110 = lsame (transb, 'c');
       l_140 = lsame (transb, 't');
       l_500 = (m < 0);
       l_400 = (n < 0);
@@ -3581,68 +3610,104 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       i_00 = max (1, nrowa0);
       i_10 = max (1, nrowb0);
       i_20 = max (1, m);
-      l_120 = !l_111;
+      l_120 = !l_110;
       l_150 = !l_140;
       l_200 = (lda < i_00);
       l_100 = (ldb < i_10);
       l_000 = (ldc < i_20);
       l_130 = (l_911 && l_120);
       l_611 = (l_130 && l_150);
+      info0 = __c - conditional__ (l_611, 2, info0);
       l_160 = !l_611;
+      l_170 = !l_611;
       l_190 = !l_611;
+      l_230 = !l_611;
       l_270 = !l_611;
+      l_330 = !l_611;
       l_390 = !l_611;
+      l_470 = !l_611;
       l_560 = !l_611;
+      l_650 = !l_611;
       l_750 = !l_611;
       l_860 = !l_611;
-      l_511 = __c - conditional__ (l_160, l_500, l_5);
-      l_211 = !l_511;
-      l_280 = !l_511;
-      l_410 = !l_511;
-      l_570 = !l_511;
-      l_760 = !l_511;
-      l_870 = !l_511;
-      l_220 = (l_190 && l_211);
-      l_411 = __c - conditional__ (l_220, l_400, l_4);
-      l_290 = !l_411;
-      l_420 = !l_411;
-      l_580 = !l_411;
-      l_770 = !l_411;
-      l_880 = !l_411;
-      l_311 = (l_280 && l_290);
-      l_320 = (l_270 && l_311);
-      l_310 = __c - conditional__ (l_320, l_300, l_3);
-      l_430 = !l_310;
-      l_590 = !l_310;
-      l_780 = !l_310;
-      l_890 = !l_310;
+      l_5 = __c - conditional__ (l_160, l_500, l_5);
+      l_180 = (l_170 && l_5);
+      l_210 = !l_5;
+      l_240 = !l_5;
+      l_280 = !l_5;
+      l_340 = !l_5;
+      l_410 = !l_5;
+      l_480 = !l_5;
+      l_570 = !l_5;
+      l_660 = !l_5;
+      l_760 = !l_5;
+      l_870 = !l_5;
+      info0 = __c - conditional__ (l_180, 3, info0);
+      l_220 = (l_190 && l_210);
+      l_4 = __c - conditional__ (l_220, l_400, l_4);
+      l_250 = (l_240 && l_4);
+      l_290 = !l_4;
+      l_350 = !l_4;
+      l_420 = !l_4;
+      l_490 = !l_4;
+      l_580 = !l_4;
+      l_670 = !l_4;
+      l_770 = !l_4;
+      l_880 = !l_4;
+      l_260 = (l_230 && l_250);
+      l_310 = (l_280 && l_290);
+      info0 = __c - conditional__ (l_260, 4, info0);
+      l_320 = (l_270 && l_310);
+      l_3 = __c - conditional__ (l_320, l_300, l_3);
+      l_360 = (l_350 && l_3);
+      l_430 = !l_3;
+      l_510 = !l_3;
+      l_590 = !l_3;
+      l_680 = !l_3;
+      l_780 = !l_3;
+      l_890 = !l_3;
+      l_370 = (l_340 && l_360);
       l_440 = (l_420 && l_430);
+      l_380 = (l_330 && l_370);
       l_450 = (l_410 && l_440);
+      info0 = __c - conditional__ (l_380, 5, info0);
       l_460 = (l_390 && l_450);
-      l_210 = __c - conditional__ (l_460, l_200, l_2);
-      l_600 = !l_210;
-      l_790 = !l_210;
-      l_900 = !l_210;
+      l_2 = __c - conditional__ (l_460, l_200, l_2);
+      l_520 = (l_510 && l_2);
+      l_600 = !l_2;
+      l_690 = !l_2;
+      l_790 = !l_2;
+      l_900 = !l_2;
+      l_530 = (l_490 && l_520);
       l_610 = (l_590 && l_600);
+      l_540 = (l_480 && l_530);
       l_620 = (l_580 && l_610);
+      l_550 = (l_470 && l_540);
       l_630 = (l_570 && l_620);
+      info0 = __c - conditional__ (l_550, 8, info0);
       l_640 = (l_560 && l_630);
-      l_110 = __c - conditional__ (l_640, l_100, l_1);
-      l_800 = !l_110;
-      l_910 = !l_110;
-      l_811 = (l_790 && l_800);
-      l_820 = (l_780 && l_811);
+      l_1 = __c - conditional__ (l_640, l_100, l_1);
+      l_700 = (l_690 && l_1);
+      l_800 = !l_1;
+      l_910 = !l_1;
+      l_710 = (l_680 && l_700);
+      l_810 = (l_790 && l_800);
+      l_720 = (l_670 && l_710);
+      l_820 = (l_780 && l_810);
+      l_730 = (l_660 && l_720);
       l_830 = (l_770 && l_820);
+      l_740 = (l_650 && l_730);
       l_840 = (l_760 && l_830);
+      info0 = __c - conditional__ (l_740, 10, info0);
       l_850 = (l_750 && l_840);
-      l_01 = __c - conditional__ (l_850, l_000, l_0);
-      l_920 = (l_910 && l_01);
+      l_0 = __c - conditional__ (l_850, l_000, l_0);
+      l_920 = (l_910 && l_0);
       l_930 = (l_900 && l_920);
       l_940 = (l_890 && l_930);
       l_950 = (l_880 && l_940);
       l_960 = (l_870 && l_950);
       l_970 = (l_860 && l_960);
-      info0 = __c - conditional__ (l_970, 13, info);
+      info0 = __c - conditional__ (l_970, 13, info0);
     }
   if (info0 != 0)
     {
@@ -3651,31 +3716,31 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   else
     {
       if (((m == 0) || (n == 0))
-	  || (((pdata5[0] == zero0) || (k == 0)) && (pdata0[0] == one0)))
+	  || (((pdata3[0] == zero0) || (k == 0)) && (pdata0[0] == one0)))
 	{
 	}
       else
 	{
-	  if (pdata5[0] == zero0)
+	  if (pdata3[0] == zero0)
 	    {
 	      if (pdata0[0] == zero0)
 		{
-		  for (j = 1; j <= n; j++)
+		  for (j0 = 1; j0 <= n; j0++)
 		    {
-		      lu_nub00 = m;
-		      lu_ib00 = mod (lu_nub00, 4);
-		      for (lu_ind0 = 0; lu_ind0 <= lu_ib00 - 1; lu_ind0++)
+		      lu_nub0 = m;
+		      lu_ib0 = mod (lu_nub0, 4);
+		      for (lu_ind00 = 0; lu_ind00 <= lu_ib0 - 1; lu_ind00++)
 			{
-			  c[j - 1][(1 + lu_ind0) - 1] = zero0;
+			  c[j0 - 1][(1 + lu_ind00) - 1] = zero0;
 			  continue;
 			}
-		      for (lu_ind0 = lu_ib00; lu_ind0 <= lu_nub00 - 1;
+		      for (lu_ind0 = lu_ib0; lu_ind0 <= lu_nub0 - 1;
 			   lu_ind0 += 4)
 			{
-			  c[j - 1][(1 + lu_ind0) - 1] = zero0;
-			  c[j - 1][(2 + lu_ind0) - 1] = zero0;
-			  c[j - 1][(3 + lu_ind0) - 1] = zero0;
-			  c[j - 1][(4 + lu_ind0) - 1] = zero0;
+			  c[j0 - 1][(1 + lu_ind0) - 1] = zero0;
+			  c[j0 - 1][(2 + lu_ind0) - 1] = zero0;
+			  c[j0 - 1][(3 + lu_ind0) - 1] = zero0;
+			  c[j0 - 1][(4 + lu_ind0) - 1] = zero0;
 			  continue;
 			}
 		      continue;
@@ -3683,26 +3748,27 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		}
 	      else
 		{
-		  for (j = 1; j <= n; j++)
+		  for (j1 = 1; j1 <= n; j1++)
 		    {
-		      lu_nub10 = m;
-		      lu_ib10 = mod (lu_nub10, 4);
-		      for (lu_ind1 = 0; lu_ind1 <= lu_ib10 - 1; lu_ind1++)
+		      lu_nub1 = m;
+		      lu_ib1 = mod (lu_nub1, 4);
+		      for (lu_ind10 = 0; lu_ind10 <= lu_ib1 - 1; lu_ind10++)
 			{
 			  red0[0] = 1.000000;
 			  red0[0] = (pdata0[0] * red0[0]);
 			  continue;
-			  c[j - 1][(1 + lu_ind1) - 1] =
-			    (red0[0] * c[j - 1][(1 + lu_ind1) - 1]);
+			  c[j1 - 1][(1 + lu_ind10) - 1] =
+			    (red0[0] * c[j1 - 1][(1 + lu_ind10) - 1]);
 			}
 		      simd_load_v4sf (vec10, pdata0[0]);
-		      for (lu_ind1 = lu_ib10; lu_ind1 <= lu_nub10 - 1;
+		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
 			   lu_ind1 += 4)
 			{
-			  simd_load_v4sf (vec00, c[j - 1][(1 + lu_ind1) - 1]);
+			  simd_load_v4sf (vec00,
+					  c[j1 - 1][(1 + lu_ind1) - 1]);
 			  simd_mulps (vec00, vec10, vec00);
 			  simd_store_v4sf (vec00,
-					   c[j - 1][(1 + lu_ind1) - 1]);
+					   c[j1 - 1][(1 + lu_ind1) - 1]);
 			  continue;
 			}
 		      continue;
@@ -3715,25 +3781,25 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		{
 		  if (nota0)
 		    {
-		      for (j = 1; j <= n; j++)
+		      for (j2 = 1; j2 <= n; j2++)
 			{
 			  if (pdata0[0] == zero0)
 			    {
-			      lu_nub20 = m;
-			      lu_ib20 = mod (lu_nub20, 4);
-			      for (lu_ind2 = 0; lu_ind2 <= lu_ib20 - 1;
-				   lu_ind2++)
+			      lu_nub2 = m;
+			      lu_ib2 = mod (lu_nub2, 4);
+			      for (lu_ind20 = 0; lu_ind20 <= lu_ib2 - 1;
+				   lu_ind20++)
 				{
-				  c[j - 1][(1 + lu_ind2) - 1] = zero0;
+				  c[j2 - 1][(1 + lu_ind20) - 1] = zero0;
 				  continue;
 				}
-			      for (lu_ind2 = lu_ib20; lu_ind2 <= lu_nub20 - 1;
+			      for (lu_ind2 = lu_ib2; lu_ind2 <= lu_nub2 - 1;
 				   lu_ind2 += 4)
 				{
-				  c[j - 1][(1 + lu_ind2) - 1] = zero0;
-				  c[j - 1][(2 + lu_ind2) - 1] = zero0;
-				  c[j - 1][(3 + lu_ind2) - 1] = zero0;
-				  c[j - 1][(4 + lu_ind2) - 1] = zero0;
+				  c[j2 - 1][(1 + lu_ind2) - 1] = zero0;
+				  c[j2 - 1][(2 + lu_ind2) - 1] = zero0;
+				  c[j2 - 1][(3 + lu_ind2) - 1] = zero0;
+				  c[j2 - 1][(4 + lu_ind2) - 1] = zero0;
 				  continue;
 				}
 			    }
@@ -3741,28 +3807,29 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (pdata0[0] != one0)
 				{
-				  lu_nub30 = m;
-				  lu_ib30 = mod (lu_nub30, 4);
-				  for (lu_ind3 = 0; lu_ind3 <= lu_ib30 - 1;
-				       lu_ind3++)
+				  lu_nub3 = m;
+				  lu_ib3 = mod (lu_nub3, 4);
+				  for (lu_ind30 = 0; lu_ind30 <= lu_ib3 - 1;
+				       lu_ind30++)
 				    {
 				      red1[0] = 1.000000;
 				      red1[0] = (pdata0[0] * red1[0]);
 				      continue;
-				      c[j - 1][(1 + lu_ind3) - 1] =
+				      c[j2 - 1][(1 + lu_ind30) - 1] =
 					(red1[0] *
-					 c[j - 1][(1 + lu_ind3) - 1]);
+					 c[j2 - 1][(1 + lu_ind30) - 1]);
 				    }
 				  simd_load_v4sf (vec30, pdata0[0]);
-				  for (lu_ind3 = lu_ib30;
-				       lu_ind3 <= lu_nub30 - 1; lu_ind3 += 4)
+				  for (lu_ind3 = lu_ib3;
+				       lu_ind3 <= lu_nub3 - 1; lu_ind3 += 4)
 				    {
 				      simd_load_v4sf (vec20,
-						      c[j - 1][(1 + lu_ind3) -
-							       1]);
+						      c[j2 -
+							1][(1 + lu_ind3) -
+							   1]);
 				      simd_mulps (vec20, vec30, vec20);
 				      simd_store_v4sf (vec20,
-						       c[j -
+						       c[j2 -
 							 1][(1 + lu_ind3) -
 							    1]);
 				      continue;
@@ -3771,38 +3838,39 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    }
 			  for (l = 1; l <= k; l++)
 			    {
-			      if (b[j - 1][l - 1] != zero0)
+			      if (b[j2 - 1][l - 1] != zero0)
 				{
-				  pdata1[0] = (pdata5[0] * b[j - 1][l - 1]);
-				  lu_nub40 = m;
-				  lu_ib40 = mod (lu_nub40, 4);
-				  for (lu_ind4 = 0; lu_ind4 <= lu_ib40 - 1;
-				       lu_ind4++)
+				  temp = (pdata3[0] * b[j2 - 1][l - 1]);
+				  lu_nub4 = m;
+				  lu_ib4 = mod (lu_nub4, 4);
+				  for (lu_ind40 = 0; lu_ind40 <= lu_ib4 - 1;
+				       lu_ind40++)
 				    {
 				      red2[0] = 0.000000;
-				      f_04 =
-					(pdata1[0] *
-					 a[l - 1][(1 + lu_ind4) - 1]);
-				      red2[0] = (red2[0] + f_04);
+				      f_0 =
+					(temp * a[l - 1][(1 + lu_ind40) - 1]);
+				      red2[0] = (red2[0] + f_0);
 				      continue;
-				      c[j - 1][(1 + lu_ind4) - 1] =
+				      c[j2 - 1][(1 + lu_ind40) - 1] =
 					(red2[0] +
-					 c[j - 1][(1 + lu_ind4) - 1]);
+					 c[j2 - 1][(1 + lu_ind40) - 1]);
 				    }
-				  simd_load_v4sf (vec50, pdata1[0]);
-				  for (lu_ind4 = lu_ib40;
-				       lu_ind4 <= lu_nub40 - 1; lu_ind4 += 4)
+				  simd_load_generic_v4sf (vec50, temp, temp,
+							  temp, temp);
+				  for (lu_ind4 = lu_ib4;
+				       lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
 				    {
 				      simd_load_v4sf (vec60,
 						      a[l - 1][(1 + lu_ind4) -
 							       1]);
 				      simd_mulps (vec40, vec50, vec60);
 				      simd_load_v4sf (vec70,
-						      c[j - 1][(1 + lu_ind4) -
-							       1]);
+						      c[j2 -
+							1][(1 + lu_ind4) -
+							   1]);
 				      simd_addps (vec70, vec70, vec40);
 				      simd_store_v4sf (vec70,
-						       c[j -
+						       c[j2 -
 							 1][(1 + lu_ind4) -
 							    1]);
 				      continue;
@@ -3815,20 +3883,20 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		    }
 		  else
 		    {
-		      for (j = 1; j <= n; j++)
+		      for (j3 = 1; j3 <= n; j3++)
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      l_710 = (pdata0[0] == zero0);
-			      l_980 = !l_710;
-			      c[j - 1][i - 1] =
-				__c - conditional__ (l_710, pdata6[0],
-						     c[j - 1][i - 1]);
-			      f_30 = (pdata0[0] * c[j - 1][i - 1]);
-			      c10 = (pdata6[1] + f_30);
-			      c[j - 1][i - 1] =
-				__c - conditional__ (l_980, c10,
-						     c[j - 1][i - 1]);
+			      l_7 = (pdata0[0] == zero0);
+			      l_98 = !l_7;
+			      c[j3 - 1][i - 1] =
+				__c - conditional__ (l_7, pdata4[0],
+						     c[j3 - 1][i - 1]);
+			      f_3 = (pdata0[0] * c[j3 - 1][i - 1]);
+			      c1 = (pdata4[1] + f_3);
+			      c[j3 - 1][i - 1] =
+				__c - conditional__ (l_98, c1,
+						     c[j3 - 1][i - 1]);
 			      continue;
 			    }
 			  continue;
@@ -3839,25 +3907,25 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		{
 		  if (nota0)
 		    {
-		      for (j = 1; j <= n; j++)
+		      for (j4 = 1; j4 <= n; j4++)
 			{
 			  if (pdata0[0] == zero0)
 			    {
-			      lu_nub60 = m;
-			      lu_ib60 = mod (lu_nub60, 4);
-			      for (lu_ind6 = 0; lu_ind6 <= lu_ib60 - 1;
-				   lu_ind6++)
+			      lu_nub6 = m;
+			      lu_ib6 = mod (lu_nub6, 4);
+			      for (lu_ind60 = 0; lu_ind60 <= lu_ib6 - 1;
+				   lu_ind60++)
 				{
-				  c[j - 1][(1 + lu_ind6) - 1] = zero0;
+				  c[j4 - 1][(1 + lu_ind60) - 1] = zero0;
 				  continue;
 				}
-			      for (lu_ind6 = lu_ib60; lu_ind6 <= lu_nub60 - 1;
+			      for (lu_ind6 = lu_ib6; lu_ind6 <= lu_nub6 - 1;
 				   lu_ind6 += 4)
 				{
-				  c[j - 1][(1 + lu_ind6) - 1] = zero0;
-				  c[j - 1][(2 + lu_ind6) - 1] = zero0;
-				  c[j - 1][(3 + lu_ind6) - 1] = zero0;
-				  c[j - 1][(4 + lu_ind6) - 1] = zero0;
+				  c[j4 - 1][(1 + lu_ind6) - 1] = zero0;
+				  c[j4 - 1][(2 + lu_ind6) - 1] = zero0;
+				  c[j4 - 1][(3 + lu_ind6) - 1] = zero0;
+				  c[j4 - 1][(4 + lu_ind6) - 1] = zero0;
 				  continue;
 				}
 			    }
@@ -3865,28 +3933,29 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    {
 			      if (pdata0[0] != one0)
 				{
-				  lu_nub70 = m;
-				  lu_ib70 = mod (lu_nub70, 4);
-				  for (lu_ind7 = 0; lu_ind7 <= lu_ib70 - 1;
-				       lu_ind7++)
+				  lu_nub7 = m;
+				  lu_ib7 = mod (lu_nub7, 4);
+				  for (lu_ind70 = 0; lu_ind70 <= lu_ib7 - 1;
+				       lu_ind70++)
 				    {
 				      red5[0] = 1.000000;
 				      red5[0] = (pdata0[0] * red5[0]);
 				      continue;
-				      c[j - 1][(1 + lu_ind7) - 1] =
+				      c[j4 - 1][(1 + lu_ind70) - 1] =
 					(red5[0] *
-					 c[j - 1][(1 + lu_ind7) - 1]);
+					 c[j4 - 1][(1 + lu_ind70) - 1]);
 				    }
 				  simd_load_v4sf (vec180, pdata0[0]);
-				  for (lu_ind7 = lu_ib70;
-				       lu_ind7 <= lu_nub70 - 1; lu_ind7 += 4)
+				  for (lu_ind7 = lu_ib7;
+				       lu_ind7 <= lu_nub7 - 1; lu_ind7 += 4)
 				    {
 				      simd_load_v4sf (vec170,
-						      c[j - 1][(1 + lu_ind7) -
-							       1]);
+						      c[j4 -
+							1][(1 + lu_ind7) -
+							   1]);
 				      simd_mulps (vec170, vec180, vec170);
 				      simd_store_v4sf (vec170,
-						       c[j -
+						       c[j4 -
 							 1][(1 + lu_ind7) -
 							    1]);
 				      continue;
@@ -3895,38 +3964,39 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			    }
 			  for (l = 1; l <= k; l++)
 			    {
-			      if (b[l - 1][j - 1] != zero0)
+			      if (b[l - 1][j4 - 1] != zero0)
 				{
-				  pdata7[0] = (pdata5[0] * b[l - 1][j - 1]);
-				  lu_nub80 = m;
-				  lu_ib80 = mod (lu_nub80, 4);
-				  for (lu_ind8 = 0; lu_ind8 <= lu_ib80 - 1;
-				       lu_ind8++)
+				  temp = (pdata3[0] * b[l - 1][j4 - 1]);
+				  lu_nub8 = m;
+				  lu_ib8 = mod (lu_nub8, 4);
+				  for (lu_ind80 = 0; lu_ind80 <= lu_ib8 - 1;
+				       lu_ind80++)
 				    {
 				      red6[0] = 0.000000;
-				      f_44 =
-					(pdata7[0] *
-					 a[l - 1][(1 + lu_ind8) - 1]);
-				      red6[0] = (red6[0] + f_44);
+				      f_4 =
+					(temp * a[l - 1][(1 + lu_ind80) - 1]);
+				      red6[0] = (red6[0] + f_4);
 				      continue;
-				      c[j - 1][(1 + lu_ind8) - 1] =
+				      c[j4 - 1][(1 + lu_ind80) - 1] =
 					(red6[0] +
-					 c[j - 1][(1 + lu_ind8) - 1]);
+					 c[j4 - 1][(1 + lu_ind80) - 1]);
 				    }
-				  simd_load_v4sf (vec200, pdata7[0]);
-				  for (lu_ind8 = lu_ib80;
-				       lu_ind8 <= lu_nub80 - 1; lu_ind8 += 4)
+				  simd_load_generic_v4sf (vec200, temp, temp,
+							  temp, temp);
+				  for (lu_ind8 = lu_ib8;
+				       lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
 				    {
 				      simd_load_v4sf (vec210,
 						      a[l - 1][(1 + lu_ind8) -
 							       1]);
 				      simd_mulps (vec190, vec200, vec210);
 				      simd_load_v4sf (vec220,
-						      c[j - 1][(1 + lu_ind8) -
-							       1]);
+						      c[j4 -
+							1][(1 + lu_ind8) -
+							   1]);
 				      simd_addps (vec220, vec220, vec190);
 				      simd_store_v4sf (vec220,
-						       c[j -
+						       c[j4 -
 							 1][(1 + lu_ind8) -
 							    1]);
 				      continue;
@@ -3939,20 +4009,20 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		    }
 		  else
 		    {
-		      for (j = 1; j <= n; j++)
+		      for (j5 = 1; j5 <= n; j5++)
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      l_810 = (pdata0[0] == zero0);
-			      l_990 = !l_810;
-			      c[j - 1][i - 1] =
-				__c - conditional__ (l_810, pdata11[0],
-						     c[j - 1][i - 1]);
-			      f_70 = (pdata0[0] * c[j - 1][i - 1]);
-			      c30 = (pdata11[1] + f_70);
-			      c[j - 1][i - 1] =
-				__c - conditional__ (l_990, c30,
-						     c[j - 1][i - 1]);
+			      l_8 = (pdata0[0] == zero0);
+			      l_99 = !l_8;
+			      c[j5 - 1][i - 1] =
+				__c - conditional__ (l_8, pdata7[0],
+						     c[j5 - 1][i - 1]);
+			      f_7 = (pdata0[0] * c[j5 - 1][i - 1]);
+			      c3 = (pdata7[1] + f_7);
+			      c[j5 - 1][i - 1] =
+				__c - conditional__ (l_99, c3,
+						     c[j5 - 1][i - 1]);
 			      continue;
 			    }
 			  continue;

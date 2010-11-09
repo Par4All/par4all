@@ -1,3 +1,4 @@
+from __future__ import with_statement # to cope with python2.5
 import random
 
 """Allows the user to save the calls to random to a file, and get the exact same back later"""

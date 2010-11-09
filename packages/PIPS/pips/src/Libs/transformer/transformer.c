@@ -631,6 +631,7 @@ transformer transformer_range(transformer tf)
 
   return rtf;
 }
+
 transformer transformer_safe_range(transformer tf)
 {
   transformer rtf = transformer_undefined;
@@ -639,6 +640,19 @@ transformer transformer_safe_range(transformer tf)
     rtf = transformer_range(tf);
   }
   return rtf;
+}
+
+/* Substitute each transformer in list tfl by its range */
+list transformers_range(list tfl)
+{
+  // The substitution in the list cannot be performed by a FOREACH
+  MAPL(ctf, {
+      transformer tf = TRANSFORMER(CAR(ctf));
+      transformer tfr = transformer_range(tf);
+      free_transformer(tf);
+      TRANSFORMER_(CAR(ctf)) = tfr;
+    }, tfl);
+  return tfl;
 }
 
 /* Return the domain of relation tf in a newly allocated transformer.
@@ -1328,7 +1342,11 @@ list transformer_apply_map(list tl, transformer pre)
   list ntl = NIL;
   FOREACH(TRANSFORMER, tf, tl) {
     transformer post = transformer_apply(tf, pre);
-    ntl = CONS(TRANSFORMER, post, ntl);
+
+    // Be careful with empty transformers than may creep out
+
+    if(!transformer_empty_p(post))
+      ntl = CONS(TRANSFORMER, post, ntl);
   }
   gen_nreverse(ntl);
   return ntl;

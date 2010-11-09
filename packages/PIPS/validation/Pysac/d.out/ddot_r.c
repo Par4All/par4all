@@ -116,40 +116,34 @@ float ddot_r(int n, float b[n], float c[n]);
 int main(int argc, char **argv);
 float ddot_r(int n, float b[n], float c[n])
 {
+   float a = 0;
    //PIPS generated variable
-   int LU_IND0;
+   float F_0, RED0[4], RED1[1];
    //PIPS generated variable
-   float RED0[1], RED1[4], a0, a1, F_04;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
-   //PIPS generated variable
-   float a2;
+   int i0, i1;
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0;
-   a2 = 0;
-   LU_NUB00 = n;
    RED0[0] = 0.000000;
-   LU_IB00 = MOD(LU_NUB00, 4);
-   for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-      F_04 = b[LU_IND0]*c[LU_IND0];
-      RED0[0] = RED0[0]+F_04;
-   }
-   a1 = RED0[0]+a2;
-   RED1[0] = 0.000000;
-   RED1[1] = 0.000000;
-   RED1[2] = 0.000000;
-   RED1[3] = 0.000000;
-   SIMD_LOAD_V4SF(vec30_0, &RED1[0]);
-   for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+   SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec20_0, &c[LU_IND0]);
-      SIMD_LOAD_V4SF(vec10_0, &b[LU_IND0]);
+      SIMD_LOAD_V4SF(vec20_0, &c[i0]);
+      SIMD_LOAD_V4SF(vec10_0, &b[i0]);
       SIMD_MULPS(vec00_0, vec10_0, vec20_0);
       SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
    }
-   SIMD_STORE_V4SF(vec30_0, &RED1[0]);
-   a0 = RED1[3]+RED1[2]+RED1[1]+RED1[0]+a1;
-   return a0;
+   SIMD_STORE_V4SF(vec30_0, &RED0[0]);
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
+   RED1[0] = 0.000000;
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_0 = b[i1]*c[i1];
+      RED1[0] = RED1[0]+F_0;
+   }
+   a = RED1[0]+a;
+   return a;
 }
 int main(int argc, char **argv)
 {

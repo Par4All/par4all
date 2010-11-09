@@ -116,110 +116,109 @@ float ddot_ur(int n, float dx[n], float dy[n]);
 int main(int argc, char **argv);
 float ddot_ur(int n, float dx[n], float dy[n])
 {
-   float dtemp;
+   float dtemp = 0;
    //PIPS generated variable
-   int LU_IND0, LU_IND1;
+   float F_0, F_2, F_4, F_6, F_8, F_9;
    //PIPS generated variable
-   float RED0[1], RED1[4], F_80, F_60, F_40, F_20, F_81, F_61, F_41, F_21, F_82, F_62, F_42, F_22, F_83, F_63, F_43, F_23, F_94, F_84, F_64, F_44, F_24;
+   float RED0[4], RED1[1];
    //PIPS generated variable
-   int LU_IB10, LU_NUB10;
+   int LU_IND00, LU_IND01, LU_IB00, LU_NUB00;
    //PIPS generated variable
-   float F_04;
+   float F_80, F_81, F_82, F_83, F_60, F_61, F_62, F_63, F_40, F_41, F_42, F_43, F_20, F_21, F_22, F_23;
    //PIPS generated variable
-   int LU_IB00, LU_NUB00, m0;
+   int i0, i1, m0;
+   //PIPS generated variable
+   float dtemp0, dtemp1, dtemp2, dtemp3;
    //SAC generated temporary array
    a4sf pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0;
-   dtemp = 0;
    m0 = n%5;
    if (m0!=0) {
-      LU_NUB00 = m0;
       RED0[0] = 0.000000;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
-         F_04 = dx[LU_IND0]*dy[LU_IND0];
-         RED0[0] = RED0[0]+F_04;
-      }
-      dtemp = RED0[0]+dtemp;
-      RED1[0] = 0.000000;
-      RED1[1] = 0.000000;
-      RED1[2] = 0.000000;
-      RED1[3] = 0.000000;
-      SIMD_LOAD_V4SF(vec30_0, &RED1[0]);
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
+      RED0[1] = 0.000000;
+      RED0[2] = 0.000000;
+      RED0[3] = 0.000000;
+      SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
+      for(i0 = 0; i0 <= 4*(m0/4)-1; i0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &dy[LU_IND0]);
-         SIMD_LOAD_V4SF(vec10_0, &dx[LU_IND0]);
+         SIMD_LOAD_V4SF(vec20_0, &dy[i0]);
+         SIMD_LOAD_V4SF(vec10_0, &dx[i0]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
          SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
       }
-      SIMD_STORE_V4SF(vec30_0, &RED1[0]);
-      dtemp = RED1[3]+RED1[2]+RED1[1]+RED1[0]+dtemp;
+      SIMD_STORE_V4SF(vec30_0, &RED0[0]);
+      dtemp = RED0[3]+RED0[2]+RED0[1]+RED0[0]+dtemp;
+      RED1[0] = 0.000000;
+      for(i1 = 4*(m0/4); i1 <= m0-1; i1 += 1) {
+         F_0 = dx[i1]*dy[i1];
+         RED1[0] = RED1[0]+F_0;
+      }
+      dtemp = RED1[0]+dtemp;
       if (n<5) 
          return dtemp;
    }
-   LU_NUB10 = (4+n-m0)/5;
-   LU_IB10 = MOD(LU_NUB10, 4);
-   for(LU_IND1 = 0; LU_IND1 <= LU_IB10-1; LU_IND1 += 1) {
+   LU_NUB00 = (4+n-m0)/5;
+   LU_IB00 = MOD(LU_NUB00, 4);
+   for(LU_IND00 = 0; LU_IND00 <= LU_IB00-1; LU_IND00 += 1) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec70_0, &dy[m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec60_0, &dx[m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec70_0, &dy[m0+5*LU_IND00]);
+      SIMD_LOAD_V4SF(vec60_0, &dx[m0+5*LU_IND00]);
       SIMD_MULPS(vec50_0, vec60_0, vec70_0);
       SIMD_STORE_V4SF(vec50_0, &pdata1[0]);
-      pdata1[0] = dx[m0+5*LU_IND1]*dy[m0+5*LU_IND1];
-      F_94 = dx[4+m0+5*LU_IND1]*dy[4+m0+5*LU_IND1];
-      F_24 = dtemp+pdata1[0];
-      F_44 = F_24+pdata1[1];
-      F_64 = F_44+pdata1[2];
-      F_84 = F_64+pdata1[3];
-      dtemp = F_84+F_94;
+      pdata1[0] = dx[m0+5*LU_IND00]*dy[m0+5*LU_IND00];
+      F_9 = dx[4+m0+5*LU_IND00]*dy[4+m0+5*LU_IND00];
+      F_2 = dtemp+pdata1[0];
+      F_4 = F_2+pdata1[1];
+      F_6 = F_4+pdata1[2];
+      F_8 = F_6+pdata1[3];
+      dtemp = F_8+F_9;
    }
-   for(LU_IND1 = LU_IB10; LU_IND1 <= LU_NUB10-1; LU_IND1 += 4) {
+   for(LU_IND01 = LU_IB00; LU_IND01 <= LU_NUB00-1; LU_IND01 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec100_0, &dy[m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec90_0, &dx[m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec100_0, &dy[m0+5*LU_IND01]);
+      SIMD_LOAD_V4SF(vec90_0, &dx[m0+5*LU_IND01]);
       SIMD_MULPS(vec80_0, vec90_0, vec100_0);
       SIMD_STORE_V4SF(vec80_0, &pdata2[0]);
-      SIMD_LOAD_V4SF(vec130_0, &dy[4+m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec120_0, &dx[4+m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec130_0, &dy[4+m0+5*LU_IND01]);
+      SIMD_LOAD_V4SF(vec120_0, &dx[4+m0+5*LU_IND01]);
       SIMD_MULPS(vec110_0, vec120_0, vec130_0);
       SIMD_STORE_V4SF(vec110_0, &pdata3[0]);
-      SIMD_LOAD_V4SF(vec160_0, &dy[8+m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec150_0, &dx[8+m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec160_0, &dy[8+m0+5*LU_IND01]);
+      SIMD_LOAD_V4SF(vec150_0, &dx[8+m0+5*LU_IND01]);
       SIMD_MULPS(vec140_0, vec150_0, vec160_0);
       SIMD_STORE_V4SF(vec140_0, &pdata4[0]);
-      SIMD_LOAD_V4SF(vec190_0, &dy[12+m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec180_0, &dx[12+m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec190_0, &dy[12+m0+5*LU_IND01]);
+      SIMD_LOAD_V4SF(vec180_0, &dx[12+m0+5*LU_IND01]);
       SIMD_MULPS(vec170_0, vec180_0, vec190_0);
       SIMD_STORE_V4SF(vec170_0, &pdata5[0]);
-      SIMD_LOAD_V4SF(vec220_0, &dy[16+m0+5*LU_IND1]);
-      SIMD_LOAD_V4SF(vec210_0, &dx[16+m0+5*LU_IND1]);
+      SIMD_LOAD_V4SF(vec220_0, &dy[16+m0+5*LU_IND01]);
+      SIMD_LOAD_V4SF(vec210_0, &dx[16+m0+5*LU_IND01]);
       SIMD_MULPS(vec200_0, vec210_0, vec220_0);
       SIMD_STORE_V4SF(vec200_0, &pdata6[0]);
-      F_23 = dtemp+pdata2[0];
-      F_43 = F_23+pdata2[1];
-      F_63 = F_43+pdata2[2];
-      F_83 = F_63+pdata2[3];
-      dtemp = F_83+pdata3[0];
-      F_22 = dtemp+pdata3[1];
-      F_42 = F_22+pdata3[2];
-      F_62 = F_42+pdata3[3];
-      F_82 = F_62+pdata4[0];
-      dtemp = F_82+pdata4[1];
-      F_21 = dtemp+pdata4[2];
-      F_41 = F_21+pdata4[3];
-      F_61 = F_41+pdata5[0];
-      F_81 = F_61+pdata5[1];
-      dtemp = F_81+pdata5[2];
-      F_20 = dtemp+pdata5[3];
-      F_40 = F_20+pdata6[0];
-      F_60 = F_40+pdata6[1];
-      F_80 = F_60+pdata6[2];
-      dtemp = F_80+pdata6[3];
+      F_20 = dtemp3+pdata2[0];
+      F_40 = F_20+pdata2[1];
+      F_60 = F_40+pdata2[2];
+      F_80 = F_60+pdata2[3];
+      dtemp0 = F_80+pdata3[0];
+      F_21 = dtemp0+pdata3[1];
+      F_41 = F_21+pdata3[2];
+      F_61 = F_41+pdata3[3];
+      F_81 = F_61+pdata4[0];
+      dtemp1 = F_81+pdata4[1];
+      F_22 = dtemp1+pdata4[2];
+      F_42 = F_22+pdata4[3];
+      F_62 = F_42+pdata5[0];
+      F_82 = F_62+pdata5[1];
+      dtemp2 = F_82+pdata5[2];
+      F_23 = dtemp2+pdata5[3];
+      F_43 = F_23+pdata6[0];
+      F_63 = F_43+pdata6[1];
+      F_83 = F_63+pdata6[2];
+      dtemp3 = F_83+pdata6[3];
    }
 
-   return dtemp;
+   return dtemp3;
 }
 int main(int argc, char **argv)
 {

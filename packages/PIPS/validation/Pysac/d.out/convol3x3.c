@@ -157,106 +157,102 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    //     The convolution kernel is not applied on the outer part
    //     of the image
    
-   int i, j;
+   int j;
    //PIPS generated variable
-   int LU_IND0;
+   float F_8;
    //PIPS generated variable
-   float F_84;
-   //PIPS generated variable
-   int LU_IB00, LU_NUB00;
+   int i0, i1, j0;
    //SAC generated temporary array
-   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
+   a4si pdata9 = {9, 9, 9, 9};
    //SAC generated temporary array
-   a4si pdata11 = {9, 9, 9, 9};
+   a4sf pdata10 = {0, 0, 0, 0}, pdata11 = {0, 0, 0, 0};
    //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0, vec230_0, vec240_0, vec250_0, vec260_0, vec270_0, vec280_0, vec290_0, vec300_0, vec310_0, vec320_0, vec330_0, vec350_0, vec370_0, vec390_0, vec410_0, vec430_0, vec450_0, vec470_0, vec490_0, vec510_0, vec520_0;
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0, vec230_0, vec240_0, vec250_0, vec260_0, vec270_0, vec290_0, vec310_0, vec330_0, vec350_0, vec370_0, vec390_0, vec410_0, vec430_0, vec450_0, vec460_0, vec470_0, vec480_0, vec490_0, vec500_0, vec510_0, vec520_0;
 
-   for(i = 0; i <= isi-1; i += 1)
+   for(i0 = 0; i0 <= isi-1; i0 += 1)
       for(j = 0; j <= isj-1; j += 1)
-         new_image[i][j] = image[i][j];
+         new_image[i0][j] = image[i0][j];
 
-   SIMD_LOAD_V4SF(vec20_0, &kernel[0][0]);
-   SIMD_LOAD_V4SF(vec50_0, &kernel[1][1]);
-   SIMD_LOAD_GENERIC_V4SF(vec80_0, kernel[0][0], kernel[0][0], kernel[0][0], kernel[0][0]);
-   SIMD_LOAD_GENERIC_V4SF(vec110_0, kernel[0][1], kernel[0][1], kernel[0][1], kernel[0][1]);
-   SIMD_LOAD_GENERIC_V4SF(vec140_0, kernel[0][2], kernel[0][2], kernel[0][2], kernel[0][2]);
-   SIMD_LOAD_GENERIC_V4SF(vec170_0, kernel[1][0], kernel[1][0], kernel[1][0], kernel[1][0]);
-   SIMD_LOAD_GENERIC_V4SF(vec200_0, kernel[1][1], kernel[1][1], kernel[1][1], kernel[1][1]);
-   SIMD_LOAD_GENERIC_V4SF(vec230_0, kernel[1][2], kernel[1][2], kernel[1][2], kernel[1][2]);
-   SIMD_LOAD_GENERIC_V4SF(vec260_0, kernel[2][0], kernel[2][0], kernel[2][0], kernel[2][0]);
-   SIMD_LOAD_GENERIC_V4SF(vec290_0, kernel[2][1], kernel[2][1], kernel[2][1], kernel[2][1]);
-   SIMD_LOAD_GENERIC_V4SF(vec320_0, kernel[2][2], kernel[2][2], kernel[2][2], kernel[2][2]);
-   SIMD_LOAD_V4SI_TO_V4SF(vec520_0, &pdata11[0]);
-   for(i = 1; i <= isi-2; i += 1) {
-      LU_NUB00 = isj-2;
-      LU_IB00 = MOD(LU_NUB00, 4);
-      for(LU_IND0 = 0; LU_IND0 <= LU_IB00-1; LU_IND0 += 1) {
+   SIMD_LOAD_GENERIC_V4SF(vec20_0, kernel[0][0], kernel[0][0], kernel[0][0], kernel[0][0]);
+   SIMD_LOAD_GENERIC_V4SF(vec50_0, kernel[0][1], kernel[0][1], kernel[0][1], kernel[0][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec80_0, kernel[0][2], kernel[0][2], kernel[0][2], kernel[0][2]);
+   SIMD_LOAD_GENERIC_V4SF(vec110_0, kernel[1][0], kernel[1][0], kernel[1][0], kernel[1][0]);
+   SIMD_LOAD_GENERIC_V4SF(vec140_0, kernel[1][1], kernel[1][1], kernel[1][1], kernel[1][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec170_0, kernel[1][2], kernel[1][2], kernel[1][2], kernel[1][2]);
+   SIMD_LOAD_GENERIC_V4SF(vec200_0, kernel[2][0], kernel[2][0], kernel[2][0], kernel[2][0]);
+   SIMD_LOAD_GENERIC_V4SF(vec230_0, kernel[2][1], kernel[2][1], kernel[2][1], kernel[2][1]);
+   SIMD_LOAD_GENERIC_V4SF(vec260_0, kernel[2][2], kernel[2][2], kernel[2][2], kernel[2][2]);
+   SIMD_LOAD_V4SI_TO_V4SF(vec460_0, &pdata9[0]);
+   SIMD_LOAD_V4SF(vec490_0, &kernel[0][0]);
+   SIMD_LOAD_V4SF(vec520_0, &kernel[1][1]);
+   for(i1 = 1; i1 <= isi-2; i1 += 1) {
+      for(j0 = 1; j0 <= 4*((isj-2)/4); j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         new_image[i][1+LU_IND0] = 0.;
-         SIMD_LOAD_GENERIC_V4SF(vec10_0, image[i-1][LU_IND0], image[i-1][1+LU_IND0], image[i-1][2+LU_IND0], image[i][LU_IND0]);
+         new_image[i1][j0] = 0.;
+         SIMD_LOAD_V4SF(vec10_0, &image[i1-1][j0-1]);
          SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-         SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
-         SIMD_LOAD_GENERIC_V4SF(vec40_0, image[i][1+LU_IND0], image[i][2+LU_IND0], image[1+i][LU_IND0], image[1+i][1+LU_IND0]);
+         SIMD_LOAD_V4SF(vec40_0, &image[i1-1][j0]);
          SIMD_MULPS(vec30_0, vec40_0, vec50_0);
-         SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
-         pdata0[0] = image[i-1][LU_IND0]*kernel[0][0];
-         F_84 = image[1+i][2+LU_IND0]*kernel[2][2];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata0[0];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata0[1];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata0[2];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata0[3];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata1[0];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata1[1];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata1[2];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+pdata1[3];
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]+F_84;
-         new_image[i][1+LU_IND0] = new_image[i][1+LU_IND0]/9;
-      }
-      for(LU_IND0 = LU_IB00; LU_IND0 <= LU_NUB00-1; LU_IND0 += 4) {
-         //PIPS:SAC generated v4sf vector(s)
-         new_image[i][1+LU_IND0] = 0.;
-         SIMD_LOAD_V4SF(vec70_0, &image[i-1][LU_IND0]);
+         SIMD_LOAD_V4SF(vec70_0, &image[i1-1][1+j0]);
          SIMD_MULPS(vec60_0, vec70_0, vec80_0);
-         SIMD_LOAD_V4SF(vec100_0, &image[i-1][1+LU_IND0]);
+         SIMD_LOAD_V4SF(vec100_0, &image[i1][j0-1]);
          SIMD_MULPS(vec90_0, vec100_0, vec110_0);
-         SIMD_LOAD_V4SF(vec130_0, &image[i-1][2+LU_IND0]);
+         SIMD_LOAD_V4SF(vec130_0, &image[i1][j0]);
          SIMD_MULPS(vec120_0, vec130_0, vec140_0);
-         SIMD_LOAD_V4SF(vec160_0, &image[i][LU_IND0]);
+         SIMD_LOAD_V4SF(vec160_0, &image[i1][1+j0]);
          SIMD_MULPS(vec150_0, vec160_0, vec170_0);
-         SIMD_LOAD_V4SF(vec190_0, &image[i][1+LU_IND0]);
+         SIMD_LOAD_V4SF(vec190_0, &image[1+i1][j0-1]);
          SIMD_MULPS(vec180_0, vec190_0, vec200_0);
-         SIMD_LOAD_V4SF(vec220_0, &image[i][2+LU_IND0]);
+         SIMD_LOAD_V4SF(vec220_0, &image[1+i1][j0]);
          SIMD_MULPS(vec210_0, vec220_0, vec230_0);
-         SIMD_LOAD_V4SF(vec250_0, &image[1+i][LU_IND0]);
+         SIMD_LOAD_V4SF(vec250_0, &image[1+i1][1+j0]);
          SIMD_MULPS(vec240_0, vec250_0, vec260_0);
-         SIMD_LOAD_V4SF(vec280_0, &image[1+i][1+LU_IND0]);
-         SIMD_MULPS(vec270_0, vec280_0, vec290_0);
-         SIMD_LOAD_V4SF(vec310_0, &image[1+i][2+LU_IND0]);
-         SIMD_MULPS(vec300_0, vec310_0, vec320_0);
-         new_image[i][2+LU_IND0] = 0.;
-         new_image[i][3+LU_IND0] = 0.;
-         new_image[i][4+LU_IND0] = 0.;
-         SIMD_LOAD_V4SF(vec330_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec330_0, vec330_0, vec60_0);
-         SIMD_STORE_V4SF(vec330_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec350_0, vec330_0, vec90_0);
-         SIMD_STORE_V4SF(vec350_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec370_0, vec350_0, vec120_0);
-         SIMD_STORE_V4SF(vec370_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec390_0, vec370_0, vec150_0);
-         SIMD_STORE_V4SF(vec390_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec410_0, vec390_0, vec180_0);
-         SIMD_STORE_V4SF(vec410_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec430_0, vec410_0, vec210_0);
-         SIMD_STORE_V4SF(vec430_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec450_0, vec430_0, vec240_0);
-         SIMD_STORE_V4SF(vec450_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec470_0, vec450_0, vec270_0);
-         SIMD_STORE_V4SF(vec470_0, &new_image[i][1+LU_IND0]);
-         SIMD_ADDPS(vec490_0, vec470_0, vec300_0);
-         SIMD_STORE_V4SF(vec490_0, &new_image[i][1+LU_IND0]);
-         SIMD_DIVPS(vec510_0, vec490_0, vec520_0);
-         SIMD_STORE_V4SF(vec510_0, &new_image[i][1+LU_IND0]);
+         new_image[i1][1+j0] = 0.;
+         new_image[i1][2+j0] = 0.;
+         new_image[i1][3+j0] = 0.;
+         SIMD_LOAD_V4SF(vec270_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec270_0, vec270_0, vec00_0);
+         SIMD_STORE_V4SF(vec270_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec290_0, vec270_0, vec30_0);
+         SIMD_STORE_V4SF(vec290_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec310_0, vec290_0, vec60_0);
+         SIMD_STORE_V4SF(vec310_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec330_0, vec310_0, vec90_0);
+         SIMD_STORE_V4SF(vec330_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec350_0, vec330_0, vec120_0);
+         SIMD_STORE_V4SF(vec350_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec370_0, vec350_0, vec150_0);
+         SIMD_STORE_V4SF(vec370_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec390_0, vec370_0, vec180_0);
+         SIMD_STORE_V4SF(vec390_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec410_0, vec390_0, vec210_0);
+         SIMD_STORE_V4SF(vec410_0, &new_image[i1][j0]);
+         SIMD_ADDPS(vec430_0, vec410_0, vec240_0);
+         SIMD_STORE_V4SF(vec430_0, &new_image[i1][j0]);
+         SIMD_DIVPS(vec450_0, vec430_0, vec460_0);
+         SIMD_STORE_V4SF(vec450_0, &new_image[i1][j0]);
+      }
+      for(j = 1+4*((isj-2)/4); j <= isj-2; j += 1) {
+         //PIPS:SAC generated v4sf vector(s)
+         new_image[i1][j] = 0.;
+         SIMD_LOAD_GENERIC_V4SF(vec480_0, image[i1-1][j-1], image[i1-1][j], image[i1-1][1+j], image[i1][j-1]);
+         SIMD_MULPS(vec470_0, vec480_0, vec490_0);
+         SIMD_STORE_V4SF(vec470_0, &pdata10[0]);
+         SIMD_LOAD_GENERIC_V4SF(vec510_0, image[i1][j], image[i1][1+j], image[1+i1][j-1], image[1+i1][j]);
+         SIMD_MULPS(vec500_0, vec510_0, vec520_0);
+         SIMD_STORE_V4SF(vec500_0, &pdata11[0]);
+         pdata10[0] = image[i1-1][j-1]*kernel[0][0];
+         F_8 = image[1+i1][1+j]*kernel[2][2];
+         new_image[i1][j] = new_image[i1][j]+pdata10[0];
+         new_image[i1][j] = new_image[i1][j]+pdata10[1];
+         new_image[i1][j] = new_image[i1][j]+pdata10[2];
+         new_image[i1][j] = new_image[i1][j]+pdata10[3];
+         new_image[i1][j] = new_image[i1][j]+pdata11[0];
+         new_image[i1][j] = new_image[i1][j]+pdata11[1];
+         new_image[i1][j] = new_image[i1][j]+pdata11[2];
+         new_image[i1][j] = new_image[i1][j]+pdata11[3];
+         new_image[i1][j] = new_image[i1][j]+F_8;
+         new_image[i1][j] = new_image[i1][j]/9;
       }
    }
    ;
