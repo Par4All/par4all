@@ -2206,7 +2206,13 @@ static void init_gen_quick_recurse_tables(void);
 
 extern void genspec_set_string_to_parse(char*);
 extern void genspec_reset_string_to_parse(void);
-extern void genspec_lex_destroy();
+#ifdef HAVE_LEXLIB
+    /* not compatible with multiple lex calls ... */
+    #define genspec_lex_destroy() 
+#else
+    extern void genspec_lex_destroy();
+#endif
+
 
 void gen_read_spec(char * spec, ...)
 {
