@@ -50,8 +50,8 @@ AX_ARG_ENABLE([doc],
 			   AX_CHECK_PROG([kpsepath])
 			   AX_CHECK_PROG([epstopdf])
 			   AX_LATEX_PACKAGE([pstricks])
-			   AX_LATEX_PACKAGE([html])
-			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf pstricks html])
+			   AX_LATEX_PACKAGE([hyperref])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf pstricks hyperref])
 			  ]
 )
 AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
