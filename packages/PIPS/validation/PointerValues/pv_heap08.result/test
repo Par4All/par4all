@@ -1,0 +1,51 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   if (a==1)
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      p = (int *) malloc(2*sizeof(int));
+   else
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      p = (int *) malloc(3*sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_10[0] (may);
+// p == &*HEAP*_l_8[0] (may);
+
+   p[0] = 0;
+
+// Pointer values:
+// p == &*HEAP*_l_10[0] (may);
+// p == &*HEAP*_l_8[0] (may);
+
+   p[1] = 1;
+
+// Pointer values:
+// p == &*HEAP*_l_10[0] (may);
+// p == &*HEAP*_l_8[0] (may);
+
+   free(p);
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   return 0;
+}

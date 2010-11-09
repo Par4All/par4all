@@ -1,0 +1,30 @@
+delete multiply01
+create multiply01 multiply01.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_K_FIX_POINT 1
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[multiply01]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[multiply01]
+
+close
+delete multiply01
+quit

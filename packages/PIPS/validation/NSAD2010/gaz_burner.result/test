@@ -1,0 +1,173 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(l,t,x) {}
+
+   int x, l, t;
+
+//  T(l,t,x) {l==0, t==0, x==0}
+
+
+   t = l = x = 0;
+
+//  T(l,t,x) {l#init==0, t#init==0, x#init==0, 0<=l, 6l<=t, l+x<=t,
+//    6l+x<=t+50, 0<=x}
+
+   while (1) {
+
+//  T(x) {x==0}
+
+      x = 0;
+
+//  T(l,t,x) {l+t#init==l#init+t, l#init+x==l, x#init==0, l#init<=l,
+//    x<=9}
+
+      while (x<=9&&alea()) {
+
+//  T(x) {x==x#init+1, x<=10}
+
+         x++;
+
+//  T(t) {t==t#init+1, x<=10}
+
+         t++;
+
+//  T(l) {l==l#init+1, x<=10}
+
+         l++;
+      }
+
+//  T(x) {x==0, 0<=x#init, x#init<=10}
+
+      x = 0;
+
+//  T(t,x) {t+x#init==t#init+x, t#init<=t, 0<=x}
+
+      while (x<=49||alea()) {
+
+//  T(x) {x==x#init+1}
+
+         x++;
+
+//  T(t) {t==t#init+1}
+
+         t++;
+      }
+
+//  T() {50<=x}
+
+      if (6*l<=t+5*x) 
+
+//  T() {6l<=t+5x, 50<=x}
+
+         printf("property verified\n");
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int x, l, t;
+
+//  P(l,t,x) {}
+
+
+   t = l = x = 0;
+
+//  P(l,t,x) {l==0, t==0, x==0}
+
+   while (1) {
+
+//  P(l,t,x) {0<=l, 6l<=t, l+x<=t, 6l+x<=t+50, 0<=x}
+
+      x = 0;
+
+//  P(l,t,x) {x==0, 0<=l, l<=t, 6l<=t}
+
+      while (x<=9&&alea()) {
+
+//  P(l,t,x) {6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         x++;
+
+//  P(l,t,x) {6l+5<=t+5x, x<=l+1, 1<=x, x<=10}
+
+         t++;
+
+//  P(l,t,x) {6l+6<=t+5x, x<=l+1, 1<=x, x<=10}
+
+         l++;
+      }
+
+//  P(l,t,x) {6l<=t+5x, x<=l, 0<=x, x<=10}
+
+      x = 0;
+
+//  P(l,t,x) {x==0, 0<=l, l<=t, 6l<=t+50}
+
+      while (x<=49||alea()) {
+
+//  P(l,t,x) {0<=l, l+x<=t, 6l+x<=t+50, 0<=x}
+
+         x++;
+
+//  P(l,t,x) {0<=l, l+x<=t+1, 6l+x<=t+51, 1<=x}
+
+         t++;
+      }
+
+//  P(l,t,x) {0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+      if (6*l<=t+5*x) 
+
+//  P(l,t,x) {0<=l, l+x<=t, 6l<=t+5x, 6l+x<=t+50, 50<=x}
+
+         printf("property verified\n");
+   }
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+   float z;
+   int x, l, t;
+
+   t = l = x = 0;
+   while (1) {
+      x = 0;
+      while (x<=9&&alea()) {
+         x++;
+         t++;
+         l++;
+      }
+      x = 0;
+      while (x<=49||alea()) {
+         x++;
+         t++;
+      }
+      printf("property verified\n");
+   }
+   ;
+}

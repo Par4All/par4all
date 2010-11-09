@@ -1,0 +1,118 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   int s = 0, t = 0, d = 0;
+
+//  T(d,s,t) {d#init==0, s#init==0, t#init==0, 0<=d, s<=3d, s<=2d+2t,
+//    d<=s+2t, s<=2, 0<=t, t<=3}
+
+
+   while (s<=2&&t<=3) 
+
+//  T(d,s,t) {d+t==d#init+t#init+1, s#init+3t#init+1<=s+3t,
+//    s+3t<=3t#init+3, t#init<=t, t<=t#init+1, t#init<=3}
+
+      if (alea())
+
+//  T(s,t) {s==0, t==t#init+1, s#init<=2, t<=4}
+
+         t++, s = 0;
+      else
+
+//  T(d,s) {d==d#init+1, s==s#init+1, s<=3, t<=3}
+
+         d++, s++;
+
+//  T() {s<=3d, d<=s+2t, 4<=4d+t, s<=3, 12<=4s+11t, s+3t<=12, t<=4}
+
+   
+   
+   if (d<=10)
+
+//  T() {0<=d, d<=10, s<=3d, d<=s+2t, 4<=4d+t, 1<=d+4t, 1<=d+t,
+//    d<=2t+3, d+t<=12, s<=3, 12<=4s+11t, s+3t<=12, 0<=t, t<=4}
+
+      printf("healthy");
+   else
+
+//  T() {11<=d, s<=3d, d<=s+2t, 4<=4d+t, 1<=d+4t, 1<=d+t, d<=2t+3,
+//    d+t<=12, s<=3, 12<=4s+11t, s+3t<=12, 0<=t, t<=4}
+
+      printf("crashed!");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+
+//  P() {}
+
+   int s = 0, t = 0, d = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+
+   while (s<=2&&t<=3) 
+
+//  P(d,s,t) {0<=d, s<=3d, s<=2d+2t, d<=s+2t, s<=2, 0<=t, t<=3}
+
+      if (alea())
+
+//  P(d,s,t) {0<=d, s<=3d, s<=2d+2t, d<=s+2t, s<=2, 0<=t, t<=3}
+
+         t++, s = 0;
+      else
+
+//  P(d,s,t) {0<=d, s<=3d, s<=2d+2t, d<=s+2t, s<=2, 0<=t, t<=3}
+
+         d++, s++;
+
+//  P(d,s,t) {5s<=9d, 12<=3d+2s+3t, d<=s+2t, s<=3, 12<=4s+3t,
+//    s+3t<=12}
+
+   
+   
+   if (d<=10)
+
+//  P(d,s,t) {d<=10, 5s<=9d, 12<=3d+2s+3t, d<=s+2t, s<=3, 12<=4s+3t,
+//    s+3t<=12}
+
+      printf("healthy");
+   else
+
+//  P() {0==-1}
+
+      printf("crashed!");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+
+   int s = 0, t = 0, d = 0;
+
+   while (s<=2&&t<=3) 
+      if (alea())
+         t++, s = 0;
+      else
+         d++, s++;
+   
+   
+   printf("healthy");
+   ;
+}

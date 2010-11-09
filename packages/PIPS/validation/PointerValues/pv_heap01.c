@@ -1,3 +1,4 @@
+/* malloc with various arguments */
 #include <stdlib.h>
 int main()
 {

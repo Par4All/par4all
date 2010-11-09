@@ -1,0 +1,66 @@
+int main()
+{
+
+// Pointer values: none
+
+   int *p, *q, *r;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a, b, c;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = &a;
+
+// Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = &b;
+
+// Pointer values:
+// p == &a (exact);
+// q == &b (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   r = q;
+
+// Pointer values:
+// p == &a (exact);
+// q == &b (exact);
+// r == q (exact);
+
+   q = p;
+
+// Pointer values:
+// p == &a (exact);
+// q == p (exact);
+// r == &b (exact);
+
+   p = r;
+
+// Pointer values:
+// p == r (exact);
+// q == &a (exact);
+// r == &b (exact);
+
+   r = (int *) NULL;
+
+// Pointer values:
+// p == &b (exact);
+// q == &a (exact);
+// r == *ANY_MODULE*:*NULL* (exact);
+
+
+   return 0;
+}
