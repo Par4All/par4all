@@ -30,5 +30,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete halb2
+delete halb2
 quit

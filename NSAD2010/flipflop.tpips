@@ -31,5 +31,5 @@ echo
 display PARALLEL_PRINTED_FILE
 
 close
-# delete flipflop
+delete flipflop
 quit

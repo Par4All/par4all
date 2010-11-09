@@ -111,5 +111,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete second_order
+delete second_order
 quit

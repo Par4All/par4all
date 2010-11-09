@@ -24,4 +24,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[divide01]
 
 close
+delete divide01
 quit

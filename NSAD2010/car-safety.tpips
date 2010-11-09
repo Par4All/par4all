@@ -30,5 +30,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete car-safety
+delete car-safety
 quit

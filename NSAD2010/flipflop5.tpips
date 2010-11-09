@@ -25,5 +25,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-# delete flipflop5
+delete flipflop5
 quit

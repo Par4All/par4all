@@ -114,5 +114,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete parabolic
+delete parabolic
 quit

@@ -26,4 +26,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[multiply01]
 
 close
+delete multiply01
 quit

@@ -31,5 +31,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete gopan2
+delete gopan2
 quit
