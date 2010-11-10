@@ -446,6 +446,14 @@ class p4a_processor(object):
         #    concurrent=False
         #    )
 
+        # Select wrappers by using the fact that all the generated wrappers
+        # have their names of this form:
+        wrapper_filter_re = re.compile("p4a_wrapper_\\d+$")
+        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
+
+        # set return type for wrappers
+        wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
+
         #self.workspace.all_functions.display()
 
         # To be able to inject Par4All accelerator run time initialization
