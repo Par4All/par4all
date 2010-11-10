@@ -51,6 +51,12 @@
  */
 static bool cast_at_call_site_p = FALSE;
 
+/**
+ * This boolean is controlled by "LINEARIZE_ARRAY_USE_POINTERS" property
+ */
+static bool use_pointers_p = FALSE;
+
+
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
@@ -242,9 +248,11 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        *arg=MakeUnaryCall(
-                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                *arg);
+                        if(!use_pointers_p) {
+                          *arg=MakeUnaryCall(
+                              entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                              *arg);
+                        }
                       }
                     }
                     else {
@@ -261,13 +269,15 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        *arg=MakeUnaryCall(
-                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                *arg);
+                        if(!use_pointers_p) {
+                          *arg=MakeUnaryCall(
+                              entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                              *arg);
+                        }
                     }
                     free_type(argt);
                 }
-                else if(!type_equal_p(t,t2)) {
+                else if(!use_pointers_p && !type_equal_p(t,t2)) {
                     *arg =
                         MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
@@ -482,8 +492,7 @@ static void do_linearize_array(entity m, statement s) {
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
-    if(!get_bool_property("LINEARIZE_ARRAY_USE_POINTERS"))
-        do_linearize_array_manage_callers(m,linearized_param);
+    do_linearize_array_manage_callers(m,linearized_param);
     set_free(linearized_param);
 
     /* final step: fix expressions if we have disturbed typing in the process */
@@ -676,6 +685,7 @@ bool linearize_array(char *module_name)
 
     /* Do we have to cast the array at call site ? */
     cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
+    use_pointers_p = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
@@ -686,7 +696,7 @@ bool linearize_array(char *module_name)
         do_linearize_array(get_current_module_entity(),get_current_module_statement());
 
         /* additionnaly perform array-to-pointer conversion for c modules only */
-        if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS")) {
+        if(use_pointers_p) {
             if(c_module_p(get_current_module_entity())) {
                 do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
                 cleanup_subscripts(get_current_module_statement());
