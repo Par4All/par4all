@@ -238,7 +238,6 @@ static void html_print_basic(basic b) {
       case is_basic_pointer:
         html_output("pointer", false);
         html_print_type(basic_pointer(b));
-        html_output("unimplemented", false);
         break;
       case is_basic_derived:
         html_output("derived", false);
