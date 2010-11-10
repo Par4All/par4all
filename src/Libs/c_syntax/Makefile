@@ -30,7 +30,8 @@ LOPT	= --prefix=c_
 
 INC_CFILES =	c_parser.c \
 		statement.c \
-		util.c
+		util.c \
+		return.c
 INC_YFILES=cyacc.y clex.l
 
 DERIVED_HEADERS = cyacc.h clexer.h

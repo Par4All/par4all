@@ -65,6 +65,7 @@
 #include "ri-util.h"
 #include "text-util.h"
 #include "misc.h"
+#include "properties.h"
 
 #include "c_parser_private.h"
 
@@ -1643,12 +1644,29 @@ statement_without_pragma:
 |   TK_RETURN TK_SEMICOLON
                         {
 			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)); */
+			  if(!get_bool_property("C_PARSER_RETURN_SUBSTITUTION"))
                           $$ = make_statement(entity_empty_label(),
 			                      get_current_C_line_number(),
 			                      STATEMENT_ORDERING_UNDEFINED,
 			                      get_current_C_comment(),
 			                      call_to_instruction(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)),
-					      NIL, string_undefined, empty_extensions ());
+					      NIL, string_undefined,
+			                      empty_extensions ());
+			  else
+			    $$ = C_MakeReturnStatement(NIL,
+						       get_current_C_line_number(),
+						       get_current_C_comment());
+			  /*
+			    $$ = make_statement(entity_empty_label(),
+						get_current_C_line_number(),
+						STATEMENT_ORDERING_UNDEFINED,
+						get_current_C_comment(),
+						C_MakeReturn(NIL),
+						NIL,
+						string_undefined,
+						empty_extensions());
+			  */
+
 			  statement_consistent_p($$);
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
@@ -1671,6 +1689,7 @@ statement_without_pragma:
 			      */
 			    }
 			  }
+			  if(!get_bool_property("C_PARSER_RETURN_SUBSTITUTION"))
                           $$ = make_statement(entity_empty_label(),
 			                      get_current_C_line_number(),
 			                      STATEMENT_ORDERING_UNDEFINED,
@@ -1678,6 +1697,20 @@ statement_without_pragma:
 			                      make_instruction(is_instruction_call,
 					      make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME), $2)),
 					      NIL, string_undefined, empty_extensions ());
+			  else
+			    $$ = C_MakeReturnStatement($2,
+						       get_current_C_line_number(),
+						       get_current_C_comment());
+			  /*
+			    $$ = make_statement(entity_empty_label(),
+						get_current_C_line_number(),
+						STATEMENT_ORDERING_UNDEFINED,
+						get_current_C_comment(),
+						C_MakeReturn($2),
+						NIL,
+						string_undefined,
+						empty_extensions());
+			  */
 			  statement_consistent_p($$);
 			}
 |   TK_BREAK TK_SEMICOLON
