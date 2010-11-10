@@ -354,7 +354,9 @@ static void html_print_functional(functional f) {
     html_print_parameter(param);
   }
 
+  begin_block("return", false);
   html_print_type(functional_result( f ));
+  end_block("return", false);
 
   end_block("functional", true);
 }
