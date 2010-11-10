@@ -219,15 +219,19 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
     list callers_statement = callers_to_statements(callers);
     list call_sites = callers_to_call_sites(callers_statement);
 
+    pips_debug(0,"m = %s\n",entity_name(m));
     /* we may have to change the call sites, prepare iterators over call sites arguments here */
     FOREACH(CALL,c,call_sites) {
         list args = call_arguments(c);
         FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
             if(set_belong_p(linearized_param,p)) {
                 expression * arg = (expression*)REFCAR(args);
-                type t = expression_to_type(*arg);
-                type t2 = parameter_type(p);
-                if(!pointer_type_p(t)) {
+                type type_at_call_site = expression_to_type(*arg);
+                type type_in_func_prototype = parameter_type(p);
+                print_type(type_at_call_site);
+                print_type(type_in_func_prototype);
+                if(!pointer_type_p(type_at_call_site)) {
+                  /*
                     type t = make_type_variable(
                             make_variable(
                                 make_basic_pointer(
@@ -235,14 +239,14 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                     ),
                                 NIL,NIL)
                             );
-                    type argt = expression_to_type(*arg);
-                    if(array_type_p(argt)) {
+                            */
+                    if(array_type_p(type_at_call_site)) {
                       if(cast_at_call_site_p) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
                                         make_cast(
-                                            t,
+                                            type_in_func_prototype,
                                             *arg
                                             )
                                         ),
@@ -260,7 +264,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                             make_expression(
                                     make_syntax_cast(
                                         make_cast(
-                                            t,
+                                            type_in_func_prototype,
                                             MakeUnaryCall(
                                                 entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
                                                 *arg
@@ -275,14 +279,13 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                               *arg);
                         }
                     }
-                    free_type(argt);
                 }
-                else if(!use_pointers_p && !type_equal_p(t,t2)) {
+                else if(!use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
                     *arg =
                         MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
                 }
-                free_type(t);
+                free_type(type_at_call_site);
             }
             POP(args);
         }
@@ -485,9 +488,19 @@ static void do_linearize_array(entity m, statement s) {
         {
             entity di = dummy_identifier(d);
             do_linearize_type(&entity_type(di),NULL);
+
         }
         if(do_linearize_type(&parameter_type(p),NULL))
             set_add_element(linearized_param,linearized_param,p);
+
+        // Convert to pointer if requested
+        if(use_pointers_p) {
+          if(dummy_identifier_p(d)) {
+            entity di = dummy_identifier(d);
+            do_array_to_pointer_type(&entity_type(di));
+          }
+          do_array_to_pointer_type(&parameter_type(p));
+        }
         pips_assert("everything went well",parameter_consistent_p(p));
     }
 
