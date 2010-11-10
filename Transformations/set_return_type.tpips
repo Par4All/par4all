@@ -1,0 +1,10 @@
+
+delete set_return_type
+create set_return_type set_return_type.c
+
+set SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "MY_TYPEDEF"
+apply SET_RETURN_TYPE_AS_TYPEDEF[my_function]
+
+display PRINTED_FILE[my_function]
+
+
