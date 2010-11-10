@@ -3289,6 +3289,50 @@ bool statement_in_statements_p(statement s, list l)
         if(statement_in_statement_p(s,st)) return true;
     return false;
 }
+
+/* A simplified version of find_last_statement() located in
+ * prettyprint.c and designed to be used within the prettyprinter
+ */
+statement last_statement(statement s)
+{
+    statement last = statement_undefined;
+
+    pips_assert("statement is defined", !statement_undefined_p(s));
+
+    if(statement_sequence_p(s)) {
+	list ls = instruction_block(statement_instruction(s));
+
+	last = (ENDP(ls)? statement_undefined :
+		last_statement(STATEMENT(CAR(gen_last(ls)))));
+    }
+    else if(statement_unstructured_p(s)) {
+	unstructured u = statement_unstructured(s);
+	list trail = unstructured_to_trail(u);
+
+	last = control_statement(CONTROL(CAR(trail)));
+
+	gen_free_list(trail);
+    }
+    else if(statement_call_p(s)) {
+	/* Hopefully it is a return statement.
+	 * Since the semantics of STOP is ignored by the parser, a
+	 * final STOp should be followed by a RETURN.
+	 */
+	last = s;
+    }
+    else if(statement_goto_p(s))
+      last = s;
+    else if(statement_expression_p(s))
+      last = s;
+    else if(statement_loop_p(s))
+      last = s;
+    else if(statement_whileloop_p(s))
+      last = s;
+    else if(statement_forloop_p(s))
+      last = s;
+
+    return last;
+}
 
 /* That's all folks */
 
