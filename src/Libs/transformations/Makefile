@@ -57,6 +57,7 @@ LIB_CFILES =	\
 		flatten_code.c \
 		induction_substitution.c \
     loop_fusion.c \
+		set_return_type.c \
 		manage_parallel_loops.c
 
 INC_TARGET =    $(TARGET).h

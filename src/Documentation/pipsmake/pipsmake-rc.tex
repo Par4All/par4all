@@ -9731,6 +9731,40 @@ This transformation uses the \verb/C89_CODE_GENERATION/ property to
 generate either C89 or C99 code.
 
 
+
+\subsection{Set return type}
+
+\begin{PipsPass}{set_return_type_as_typedef}
+The purpose of this transformation is to change the return type of a function.
+The new type will be a typedef whose name is controlled by 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. The corresponding typedef
+must exist in the symbol table.
+\end{PipsPass}
+
+This transformation loop over the symbol table, and for each of them which is
+a typedef, compare the local name to the property 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure 
+because there can be differents typedef with same in different compilation unit, 
+resulting in differents entries in the symbol table for a same local name. The
+return type can also be incoherent with the return statement, thus it's not sure
+to run it on a non void function.
+
+However this pass has been created for special need in par4all, and considering
+previously described restrictions, it'll do the job !
+
+\begin{PipsProp}{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}
+SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "P4A_accel_kernel_wrapper"
+\end{PipsProp}
+
+\begin{PipsMake}
+alias set_return_type_as_typedef 'Set return type as typedef'
+set_return_type_as_typedef > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
+
 %-----------End of Declaration Transformations -------------------------
 
 \section{Array Bound Checking}
