@@ -1,0 +1,19 @@
+
+Parsed printed file
+
+int return06()
+{
+   int i = 1;
+   i++;
+
+   return i;
+}
+
+Printed file
+
+int return06()
+{
+   int i = 1;
+   i++;
+   return i;
+}
