@@ -303,6 +303,29 @@ double P4A_accel_timer_stop_and_float_measure() {
 }
 
 
+
+/** Allocate memory on the hardware accelerator in Cuda mode.
+
+    @param[out] address is the address of a variable that is updated by
+    this function to contains the address of the allocated memory block
+
+    @param[in] size is the size to allocate in bytes
+*/
+void P4A_accel_malloc(void **address, size_t size) {
+  toolTestExec(cudaMalloc(address, size));
+}
+
+
+/** Free memory on the hardware accelerator in Cuda mode
+
+    @param[in] address points to a previously allocated memory zone for
+    the hardware accelerator
+*/
+void P4A_accel_free(void *address) {
+  toolTestExec(cudaFree(address));
+}
+
+
 /** Copy a scalar from the hardware accelerator to the host
 
  It's a wrapper around CudaMemCopy*.
@@ -575,7 +598,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
 
 
-#endif P4A_ACCEL_CUDA
+#endif //P4A_ACCEL_CUDA
 
 #ifdef P4A_iACCEL
 #include <stdio.h>

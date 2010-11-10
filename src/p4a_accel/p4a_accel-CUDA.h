@@ -21,12 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#include <cutil_inline.h>
+#include <cuda_runtime_api.h>
 #include <cuda.h>
-
 #define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
 #define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
 
-inline void checkErrorInline(cudaError error, const char *currentFile, const int currentLine)
+inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
 {
     if(cudaSuccess != error){
 	fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
@@ -196,26 +196,6 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @{
 */
-
-/** Allocate memory on the hardware accelerator in CUDA.
-
-    @param[out] address is the address of a variable that is updated by
-    this macro to contains the address of the allocated memory block
-
-    @param[in] size is the size to allocate in bytes
- */
-#define P4A_accel_malloc(address, size)			\
-  toolTestExec(cudaMalloc((void **)address, size))
-
-
-/** Free memory on the hardware accelerator in CUDA
-
-    @param[in] address is the address of a previously allocated memory zone on
-    the hardware accelerator
-*/
-#define P4A_accel_free(address)			\
-  toolTestExec(cudaFree(address))
-
 
 /** Copy a scalar from the hardware accelerator to the host
 
