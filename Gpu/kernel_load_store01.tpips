@@ -23,7 +23,7 @@ display PRINTED_FILE[give,change]
 apply KERNEL_LOAD_STORE[change]
 
 activate PRINT_CODE
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[give,change]
 
 echo
 echo Unsplit resulting code

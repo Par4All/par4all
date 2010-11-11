@@ -27,7 +27,7 @@ setproperty KERNEL_LOAD_STORE_FORCE_LOAD FALSE
 
 apply KERNEL_LOAD_STORE[myKernel]
 
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main,myKernel]
 
 apply UNSPLIT
 
