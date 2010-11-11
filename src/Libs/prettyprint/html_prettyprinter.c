@@ -591,7 +591,18 @@ static void html_print_expression(expression e, bool cr) {
     case is_syntax_subscript:
       html_print_subscript(syntax_subscript( s ));
       break;
-      /* add cast, sizeof here FIXME*/
+    case is_syntax_cast:
+      html_output("cast unimplemented", false);
+      break;
+    case is_syntax_sizeofexpression:
+      html_output("sizeofexpression unimplemented", false);
+      break;
+    case is_application:
+      html_output("sizeofexpression unimplemented", false);
+      break;
+    case is_va_arg:
+      html_output("va_arg unimplemented", false);
+      break;
     default:
       pips_internal_error("unexpected syntax tag");
   }
