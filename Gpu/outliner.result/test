@@ -45,14 +45,15 @@ void p4a_kernel_launcher_0(float force[128][128][128])
    //PIPS generated variable
    int i, j, k;
    // Loop nest P4A begin,2D(128,128)
-#pragma omp parallel for private(x,j,k)
-   for(i = 0; i <= 127; i += 1)
-#pragma omp parallel for private(k)
+#pragma omp parallel for private(j,k)
+   for(i = 0; i <= 127; i += 1) {
+#pragma omp parallel for private(x,k)
       for(j = 0; j <= 127; j += 1)
          // To be assigned to a call to P4A_vp_0: i
          // To be assigned to a call to P4A_vp_1: j
          // Loop nest P4A end
          p4a_kernel_wrapper_0(i, j, force);
+   }
 }
 
 void p4a_kernel_wrapper_0(int i, int j, float force[128][128][128])
@@ -68,10 +69,11 @@ void p4a_kernel_0(int i, int j, float force[128][128][128])
    //PIPS generated variable
    int k;
    // Loop nest P4A end
-   if (i<=127&&j<=127)
+   if (i<=127&&j<=127) {
       for(k = 0; k <= 127; k += 1) {
          // This scalar cause GPU_IFY to badly outline the kernel
          int x = 0;
          force[i][j][k] = 0;
       }
+   }
 }
