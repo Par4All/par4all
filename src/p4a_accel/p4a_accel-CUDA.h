@@ -169,11 +169,11 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** A declaration attribute of a hardware-accelerated kernel in CUDA
     called from the GPU it-self
 */
-#define P4A_accel_kernel __device__
+#define P4A_accel_kernel __device__ void
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in CUDA */
-#define P4A_accel_kernel_wrapper __global__
+#define P4A_accel_kernel_wrapper __global__ void
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
