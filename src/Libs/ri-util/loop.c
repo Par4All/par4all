@@ -429,6 +429,7 @@ bool parallel_loop_statement_p(statement s) {
 int depth_of_parallel_perfect_loop_nest(statement s) {
   // We can have blocks surrounding loops
   while(statement_block_p(s)) {
+    if(statement_block(s) == NIL) return 0;
     s = STATEMENT(CAR(statement_block(s)));
   }
 
