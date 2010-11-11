@@ -429,7 +429,7 @@ bool parallel_loop_statement_p(statement s) {
 int depth_of_parallel_perfect_loop_nest(statement s) {
   // We can have blocks surrounding loops
   while(statement_block_p(s)) {
-    if(statement_block(s) == NIL) return 0;
+    if(gen_length(statement_block(s))!=1) return 0;
     s = STATEMENT(CAR(statement_block(s)));
   }
 
@@ -565,7 +565,7 @@ perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
   for(int i = 0; i < depth; i++) {
 
     // We can have blocks surrounding loops
-    while(statement_block_p(body)) {
+    while(statement_block_p(body) && gen_length(statement_block(body))==1) {
       body = STATEMENT(CAR(statement_block(body)));
     }
 
@@ -580,7 +580,7 @@ perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
   }
 
   // We can have blocks surrounding loops
-  while(statement_block_p(body)) {
+  while(statement_block_p(body) && gen_length(statement_block(body))==1) {
     body = STATEMENT(CAR(statement_block(body)));
   }
 
