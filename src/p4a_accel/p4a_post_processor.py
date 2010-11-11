@@ -94,8 +94,8 @@ def patch_to_use_p4a_methods(file_name, dir_name):
 #   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
-    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);",
-                     "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);", content)
+    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);.*?\n}",
+                     "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);\n}", content)
 
     # Get the virtual processor coordinates:
     ## Change
