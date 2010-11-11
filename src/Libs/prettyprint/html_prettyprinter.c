@@ -597,10 +597,10 @@ static void html_print_expression(expression e, bool cr) {
     case is_syntax_sizeofexpression:
       html_output("sizeofexpression unimplemented", false);
       break;
-    case is_application:
+    case is_syntax_application:
       html_output("sizeofexpression unimplemented", false);
       break;
-    case is_va_arg:
+    case is_syntax_va_arg:
       html_output("va_arg unimplemented", false);
       break;
     default:
