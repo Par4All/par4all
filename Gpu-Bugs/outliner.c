@@ -8,7 +8,8 @@ void updateBug(float force[NCELL][NCELL][NCELL]) {
   for (i = 0; i < NCELL; i++) {
     for (j = 0; j < NCELL; j++) {
       for (k = 0; k < NCELL; k++) {
-        int x = 0; // This cause GPU_IFY to badly outline the kernel
+	// This scalar cause GPU_IFY to badly outline the kernel
+        int x = 0;
         force[i][j][k] = 0;
       }
     }
