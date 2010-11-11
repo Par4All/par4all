@@ -28,6 +28,14 @@
     @{
 */
 
+
+/** Stub for P4A_accel_kernel_wrapper #define in p4a_accel, which has to be
+ * parsed as a typedef in pips
+ */
+typedef void P4A_accel_kernel_wrapper;
+typedef void P4A_accel_kernel;
+
+
 /** Stub for copying a scalar from the hardware accelerator memory to
     the host.
 
