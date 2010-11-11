@@ -35,6 +35,7 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "properties.h"
+#include "preprocessor.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
@@ -75,6 +76,12 @@ bool set_return_type_as_typedef( const char *mod_name ) {
 
   functional f = type_functional(entity_type(func));
   functional_result(f) = new_return_type;
+
+
+  entity cu = module_entity_to_compilation_unit_entity(func);
+  RemoveEntityFromCompilationUnit(func,cu);
+  AddEntityToCompilationUnit(func,cu);
+
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
