@@ -81,21 +81,27 @@ def patch_to_use_p4a_methods(file_name, dir_name):
 
     # Generate accelerated kernel calls:
     ## Replace
-    ## // Loop nest P4A begin,2D(500,500)
-    ## for(i = 0; i <= 500; i += 1)
-    ##   for(j = 0; j <= 500; j += 1)
-    ##      // Loop nest P4A end
-    ##      if (i<=500&&j<=500)
+    ##   // Loop nest P4A begin,2D(500,500)
+    ##   for(i = 0; i <= 500; i += 1)
+    ##     for(j = 0; j <= 500; j += 1)
+    ##       // Loop nest P4A end
+    ##       if (i<=500&&j<=500)
     ##         p4a_kernel_wrapper_2(space, i, j);
-    ##
+    ## }
     ## with
-    ## P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
-
+    ##   P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
+    ## }
 #   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
-    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);.*?\n}",
-                     "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);\n}", content)
+    content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?(?#
+          to skip to the next "Loop nest P4A end", not the last one...
+        )// Loop nest P4A end\n.*?(?#
+          to skip to "the p4a_kernel_wrapper", not the last one...
+        )(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);.*?(?#
+          no slurp to the next "}" at the begin of a line
+        )\n}""",
+      "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);\n}", content)
 
     # Get the virtual processor coordinates:
     ## Change
