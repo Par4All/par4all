@@ -1,4 +1,4 @@
-Release notes for Par4All 1.0.3, 2010/10/06
+Release notes for Par4All 1.0.4, 2010/11/12
 ===========================================
 
 Ronan Keryell, HPC Project.
@@ -13,7 +13,7 @@ performance computer and GPU.
 Introduction
 ------------
 
-This is the first public version of Par4All. It parallelizes C programs to
+This is the public version of Par4All. It parallelizes C programs to
 OpenMP and CUDA, and Fortran programs to OpenMP.
 
 More documentation and information is available on http://par4all.org.
@@ -30,7 +30,7 @@ compilation or automatic ``CMakeFile`` generation.
 
 But the other commands from the PIPS project included in Par4All are also
 available: ``tpips`` and ``ipyps``. Of course, they are reserved for quite
-more advised users. For more information, look at http://pips4u.org
+more advanced users. For more information, look at http://pips4u.org
 
 Since ``p4a`` is a script that interacts with PIPS to automatically
 parallelize the source code in an average way, it is of course interesting
@@ -196,7 +196,7 @@ environment variables set:
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
 
 Sometimes, Par4All generates C99 array parameter declarations in the
-generated CUDA kernels that are not yet dealt with ``nvcc`` 3.1. To avoid this,
+generated CUDA kernels that are not yet dealt with ``nvcc`` 3.2. To avoid this,
 we apply an array to pointer transformation on generated kernels. We hope
 nVidia will release soon a CUDA version that is C99-compliant as OpenCL
 is. That means that in the mean time, the entry code should not contain
@@ -215,7 +215,7 @@ this kind of C99 function declaration::
 with ``n`` and ``m`` that may be global variables, ``enum`` value or
 ``#define``.
 
-There is another limitation in the nVidia CUDA 3.1 compiler that does not
+There is another limitation in the nVidia CUDA 3.2 compiler that does not
 accept function declarations with incomplete types such as::
 
   void saxpy (long long size, t_precision dst[], t_precision src[], t_precision alpha) {
@@ -226,7 +226,8 @@ accept function declarations with incomplete types such as::
 
 In this release the shared memory is not used yet, so to get the best
 performance, loop nests need to be quite compute intensive, typically with
-regular accesses to memory.
+regular accesses to memory. Hopefully, the new cache architecture in Fermi
+GPU is interesting to balance this limitation.
 
 Par4All does not generate additional tiling yet, so right now the
 iteration spaces of the 2 outer loops of a parallel loop nest are limited
@@ -253,7 +254,7 @@ SIMD and multimedia extensions
 ------------------------------
 
 The SIMD (SSE) output is not included in this release yet since it was not
-ready at release time but should be in the 2010/09 release.
+ready at release time but should be in a next release.
 
 
 Python
