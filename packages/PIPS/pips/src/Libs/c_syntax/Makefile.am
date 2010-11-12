@@ -8,7 +8,8 @@ libc_syntax_la_SOURCES=\
 		clex.l \
 		c_parser.c \
 		statement.c \
-		util.c
+		util.c \
+		return.c
 
 AM_YFLAGS=-d -p c_
 AM_LFLAGS=-p c_

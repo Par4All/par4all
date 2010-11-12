@@ -70,7 +70,7 @@ SubstituteAlternateReturns(string option)
 	ParserError("SubstituteAlternateReturns", "Illegal property value");
     }
 
-    if((substitute_rc_p || substitute_stop_p) 
+    if((substitute_rc_p || substitute_stop_p)
        && !get_bool_property("PRETTYPRINT_ALL_DECLARATIONS"))
 	user_warning("SubstituteAlternateReturns",
 		     "Module declarations should be regenerated."
@@ -123,11 +123,11 @@ static entity GetFullyDefinedReturnCodeVariable()
        variable. */
     string module_name = get_current_module_name();
     entity f = local_name_to_top_level_entity(module_name);
-    entity a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
+    entity a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
 
     entity_type(rc) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
 
-    entity_storage(rc) = 
+    entity_storage(rc) =
       make_storage(is_storage_ram,
 		   make_ram(f, a,
 			    add_variable_to_area(a, rc),
@@ -137,7 +137,7 @@ static entity GetFullyDefinedReturnCodeVariable()
   }
 
   pips_assert("rc is defined", !entity_undefined_p(rc));
-  
+
   return rc;
 }
 
@@ -180,7 +180,7 @@ void uses_alternate_return(bool use)
   }
 
   current_number_of_alternate_returns++;
-    
+
   current_module_uses_alternate_returns = use;
 }
 
@@ -228,7 +228,7 @@ list add_actual_return_code(list apl)
 
     new_apl = gen_nconc(apl, CONS(EXPRESSION, entity_to_expression(frc), NIL));
   }
-    
+
   return new_apl;
 }
 
@@ -300,9 +300,9 @@ static statement make_get_rc_statement(expression rc_ref)
   if(entity_undefined_p(get_rc)) {
     get_rc = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, get_rc_name);
     /* get_rc takes an argument and returns void */
-    entity_type(get_rc) = 
+    entity_type(get_rc) =
       make_type(is_type_functional,
-		make_functional(CONS(PARAMETER, 
+		make_functional(CONS(PARAMETER,
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
 									    NIL,NIL)),
@@ -322,9 +322,9 @@ static statement make_get_rc_statement(expression rc_ref)
     entity_initial(get_rc) = make_value(is_value_code, code_undefined);
     update_called_modules(get_rc);
   }
-  
+
   pips_assert("Function get_rc is defined", !entity_undefined_p(get_rc));
-  
+
   i_get = make_instruction(is_instruction_call,
 			   make_call(get_rc, CONS(EXPRESSION, rc_ref, NIL)));
   s_get = instruction_to_statement(i_get);
@@ -343,7 +343,7 @@ instruction generate_return_code_checks(list labels)
 
     pips_assert("The label list is not empty", !ENDP(labels));
 
-    
+
 
     ercv = entity_to_expression(rcv);
 
@@ -385,7 +385,7 @@ instruction generate_return_code_checks(list labels)
 
 LOCAL entity end_label = entity_undefined;
 LOCAL char *end_label_local_name = RETURN_LABEL_NAME;
-	  
+
 static entity set_rc_function()
 {
   string set_rc_name = strdup(concatenate(SET_RC_PREFIX,
@@ -396,9 +396,9 @@ static entity set_rc_function()
   if(entity_undefined_p(set_rc)) {
     set_rc = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, set_rc_name);
     /* set_rc takes no argument and returns a scalar int */
-    entity_type(set_rc) = 
+    entity_type(set_rc) =
       make_type(is_type_functional,
-		make_functional(CONS(PARAMETER, 
+		make_functional(CONS(PARAMETER,
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
 									    NIL,NIL)),
@@ -410,7 +410,7 @@ static entity set_rc_function()
     entity_initial(set_rc) = make_value(is_value_code, code_undefined);
     update_called_modules(set_rc);
   }
-  
+
   pips_assert("Function set_rc is defined", !entity_undefined_p(set_rc));
 
   return set_rc;
@@ -427,7 +427,7 @@ static statement make_set_rc_statement(expression e)
     instruction isrc = make_instruction(is_instruction_call,
 					make_call(set_rc_function(),
 						  CONS(EXPRESSION, rc, NIL)));
-	  
+
     src = instruction_to_statement(isrc);
   }
   else {
@@ -438,7 +438,7 @@ static statement make_set_rc_statement(expression e)
     pips_debug(2, "Statement generated: ");
     print_statement(src);
   }
-  
+
   return src;
 }
 
@@ -447,7 +447,7 @@ instruction MakeReturn(expression e)
   instruction inst = instruction_undefined;
 
   if(!expression_undefined_p(e) && !substitute_rc_p && !substitute_stop_p) {
-    user_error("MakeReturn", 
+    user_error("MakeReturn",
 	       "Lines %d-%d: Alternate return not supported. "
 	       "Standard return generated\n",
 	       line_b_I,line_e_I);
@@ -466,7 +466,7 @@ instruction MakeReturn(expression e)
      */
     statement src = make_set_rc_statement(e);
     statement jmp = instruction_to_statement(MakeGotoInst(end_label_local_name));
-	
+
     statement_number(src) = get_statement_number();
     statement_number(jmp) = get_statement_number();
     //    (void) get_next_statement_number();
@@ -479,9 +479,9 @@ instruction MakeReturn(expression e)
     if(expression_call_p(e)) {
       string mn = get_current_module_name();
       string sn = entity_local_name(call_function(syntax_call(expression_syntax(e))));
-      
+
       inst = MakeZeroOrOneArgCallInst
-	("STOP", 
+	("STOP",
 	 MakeCharacterConstantExpression(strdup(concatenate("\"", sn, " in ", mn, "\"", NULL))));
     }
     else {
@@ -496,8 +496,7 @@ instruction MakeReturn(expression e)
 }
 
 /* Generate a unique call to RETURN per module */
-void 
-GenerateReturn()
+void GenerateReturn()
 {
     instruction inst = instruction_undefined;
     /* statement c = MakeStatement(l, make_continue_instruction()); */

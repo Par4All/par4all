@@ -1,0 +1,35 @@
+delete return05
+create return05 return05.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+#activate C_PARSER
+#activate C_SYMBOL_TABLE
+
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+##setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[return05]
+
+#quit
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[return05]
+
+
+close
+delete return05
+
+quit

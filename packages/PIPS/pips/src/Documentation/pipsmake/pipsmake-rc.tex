@@ -1687,8 +1687,8 @@ keywords and typedef names defined in each compilation unit.
 In fact phase compilation\_unit\_parser also produces parsed\_code and
 callees resources for the compilation unit. This is done to work
 around the fact that rule c\_parser was invoked on compilation units
-by later phases (in particular for the computation of initial
-preconditions), breaking the declarations of function
+by later phases, in particular for the computation of initial
+preconditions, breaking the declarations of function
 prototypes. These two resources are not declared here because pipsmake
 gets confused between the different rules to compute parsed code :
 there is no simple way to distinguish between compilation units and
@@ -1707,12 +1707,14 @@ c_parser                        > MODULE.parsed_code
         < COMPILATION_UNIT.declarations
 \end{PipsMake}
 
-If you want to parse some C code using \texttt{tpips}, it is necessary to
+If you want to parse some C code using \texttt{tpips}, it is possible to
 select the C parser with
 \begin{alltt}
 activate C_PARSER
 \end{alltt}
-Some good properties of interest (have a look at \PROPERTIES) to deal with
+but this is not necessary as the parser is selected according to the
+source file extension.
+Some properties useful (have a look at \PROPERTIES) to deal with
 a C program are
 \begin{alltt}
 PRETTYPRINT_C_CODE TRUE
@@ -1738,6 +1740,22 @@ name, are also displayed.
 
 \begin{PipsProp}{EXTENDED_VARIABLE_INFORMATION}
 EXTENDED_VARIABLE_INFORMATION FALSE
+\end{PipsProp}
+
+The \PipsPropRef{C_PARSER_RETURN_SUBSTITUTION} property can be used to
+handle properly multiple returns within one function. The current
+default value is false, which preserves best the source aspect but
+modifies the control flow because the calls to return are assumed to
+flow in sequence. If the property is set to true, C return statement
+are replaced, when necessary, either by a simple goto for void
+functions, or by an assignment of the returned value to a special
+variable and a goto. A unique return statement is placed at the
+syntactic end of the function. For functions with no return statement
+or with a unique return statement placed at the end of their bodies,
+this property is useless.
+
+\begin{PipsProp}{C_PARSER_RETURN_SUBSTITUTION}
+C_PARSER_RETURN_SUBSTITUTION FALSE
 \end{PipsProp}
 
 
@@ -9711,6 +9729,40 @@ split_initializations > MODULE.code
 
 This transformation uses the \verb/C89_CODE_GENERATION/ property to
 generate either C89 or C99 code.
+
+
+
+\subsection{Set return type}
+
+\begin{PipsPass}{set_return_type_as_typedef}
+The purpose of this transformation is to change the return type of a function.
+The new type will be a typedef whose name is controlled by 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. The corresponding typedef
+must exist in the symbol table.
+\end{PipsPass}
+
+This transformation loop over the symbol table, and for each of them which is
+a typedef, compare the local name to the property 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure 
+because there can be differents typedef with same in different compilation unit, 
+resulting in differents entries in the symbol table for a same local name. The
+return type can also be incoherent with the return statement, thus it's not sure
+to run it on a non void function.
+
+However this pass has been created for special need in par4all, and considering
+previously described restrictions, it'll do the job !
+
+\begin{PipsProp}{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}
+SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "P4A_accel_kernel_wrapper"
+\end{PipsProp}
+
+\begin{PipsMake}
+alias set_return_type_as_typedef 'Set return type as typedef'
+set_return_type_as_typedef > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 
 
 %-----------End of Declaration Transformations -------------------------

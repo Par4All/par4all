@@ -51,6 +51,12 @@
  */
 static bool cast_at_call_site_p = FALSE;
 
+/**
+ * This boolean is controlled by "LINEARIZE_ARRAY_USE_POINTERS" property
+ */
+static bool use_pointers_p = FALSE;
+
+
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
@@ -219,9 +225,10 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
         FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
             if(set_belong_p(linearized_param,p)) {
                 expression * arg = (expression*)REFCAR(args);
-                type t = expression_to_type(*arg);
-                type t2 = parameter_type(p);
-                if(!pointer_type_p(t)) {
+                type type_at_call_site = expression_to_type(*arg);
+                type type_in_func_prototype = parameter_type(p);
+                if(!pointer_type_p(type_at_call_site)) {
+                  /*
                     type t = make_type_variable(
                             make_variable(
                                 make_basic_pointer(
@@ -229,22 +236,24 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                     ),
                                 NIL,NIL)
                             );
-                    type argt = expression_to_type(*arg);
-                    if(array_type_p(argt)) {
+                            */
+                    if(array_type_p(type_at_call_site)) {
                       if(cast_at_call_site_p) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
                                         make_cast(
-                                            t,
+                                            type_in_func_prototype,
                                             *arg
                                             )
                                         ),
                                     normalized_undefined
                                     );
-                        *arg=MakeUnaryCall(
-                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                *arg);
+                        if(!use_pointers_p) {
+                          *arg=MakeUnaryCall(
+                              entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                              *arg);
+                        }
                       }
                     }
                     else {
@@ -252,7 +261,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                             make_expression(
                                     make_syntax_cast(
                                         make_cast(
-                                            t,
+                                            type_in_func_prototype,
                                             MakeUnaryCall(
                                                 entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
                                                 *arg
@@ -261,18 +270,19 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        *arg=MakeUnaryCall(
-                                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                                *arg);
+                        if(!use_pointers_p) {
+                          *arg=MakeUnaryCall(
+                              entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                              *arg);
+                        }
                     }
-                    free_type(argt);
                 }
-                else if(!type_equal_p(t,t2)) {
+                else if(!use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
                     *arg =
                         MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
                 }
-                free_type(t);
+                free_type(type_at_call_site);
             }
             POP(args);
         }
@@ -475,15 +485,24 @@ static void do_linearize_array(entity m, statement s) {
         {
             entity di = dummy_identifier(d);
             do_linearize_type(&entity_type(di),NULL);
+
         }
         if(do_linearize_type(&parameter_type(p),NULL))
             set_add_element(linearized_param,linearized_param,p);
+
+        // Convert to pointer if requested
+        if(use_pointers_p) {
+          if(dummy_identifier_p(d)) {
+            entity di = dummy_identifier(d);
+            do_array_to_pointer_type(&entity_type(di));
+          }
+          do_array_to_pointer_type(&parameter_type(p));
+        }
         pips_assert("everything went well",parameter_consistent_p(p));
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
-    if(!get_bool_property("LINEARIZE_ARRAY_USE_POINTERS"))
-        do_linearize_array_manage_callers(m,linearized_param);
+    do_linearize_array_manage_callers(m,linearized_param);
     set_free(linearized_param);
 
     /* final step: fix expressions if we have disturbed typing in the process */
@@ -676,6 +695,7 @@ bool linearize_array(char *module_name)
 
     /* Do we have to cast the array at call site ? */
     cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
+    use_pointers_p = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
@@ -686,7 +706,7 @@ bool linearize_array(char *module_name)
         do_linearize_array(get_current_module_entity(),get_current_module_statement());
 
         /* additionnaly perform array-to-pointer conversion for c modules only */
-        if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS")) {
+        if(use_pointers_p) {
             if(c_module_p(get_current_module_entity())) {
                 do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
                 cleanup_subscripts(get_current_module_statement());

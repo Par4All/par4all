@@ -426,16 +426,22 @@ bool parallel_loop_statement_p(statement s) {
     @return the depth of parallel perfect loop-nest found. If there is no
     loop here, return 0
  */
-int
-depth_of_parallel_perfect_loop_nest(statement s) {
-  if (parallel_loop_statement_p(s)) {
+int depth_of_parallel_perfect_loop_nest(statement s) {
+  // We can have blocks surrounding loops
+  while(statement_block_p(s)) {
+    if(gen_length(statement_block(s))!=1) return 0;
+    s = STATEMENT(CAR(statement_block(s)));
+  }
+
+  if(parallel_loop_statement_p(s)) {
+    // Get the loop
     loop l = statement_loop(s);
     // Count the current one and dig into the statement of the loop:
     return 1 + depth_of_parallel_perfect_loop_nest(loop_body(l));
-  }
-  else
+  } else {
     /* No parallel loop found here */
     return 0;
+  }
 }
 
 
@@ -557,14 +563,27 @@ perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
     print_statement(body);
   }
   for(int i = 0; i < depth; i++) {
+
+    // We can have blocks surrounding loops
+    while(statement_block_p(body) && gen_length(statement_block(body))==1) {
+      body = STATEMENT(CAR(statement_block(body)));
+    }
+
     pips_assert("The statement is a loop", statement_loop_p(body));
     // Dive into one loop:
     body = loop_body(statement_loop(body));
+
     ifdebug(2) {
       pips_debug(1, "Look at statement at depth %d:\n", i + 1);
       print_statement(body);
     }
   }
+
+  // We can have blocks surrounding loops
+  while(statement_block_p(body) && gen_length(statement_block(body))==1) {
+    body = STATEMENT(CAR(statement_block(body)));
+  }
+
   return body;
 }
 
