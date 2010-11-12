@@ -34,14 +34,31 @@ activate PRINT_CODE
 
 apply COARSE_GRAIN_PARALLELIZATION[main]
 
+echo 
+echo "After COARSE_GRAIN_PARALLELIZATION"
+echo 
 display PRINTED_FILE[main]
 
 apply GPU_IFY[main]
 
-display PRINTED_FILE[%ALLFUNC]
+echo 
+echo "After GPU_IFY"
+echo 
+display PRINTED_FILE[main]
+display PRINTED_FILE[p4a_kernel_launcher_0]
+display PRINTED_FILE[p4a_kernel_wrapper_0]
+display PRINTED_FILE[p4a_kernel_0]
+
 
 apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
-display PRINTED_FILE[%ALLFUNC]
+echo 
+echo "After KERNEL_LOAD_STORE"
+echo 
+display PRINTED_FILE[main]
+display PRINTED_FILE[p4a_kernel_launcher_0]
+display PRINTED_FILE[p4a_kernel_wrapper_0]
+display PRINTED_FILE[p4a_kernel_0]
+
 
 apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
 
@@ -55,7 +72,7 @@ shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g'
 shell grep '//pips_begin' $WKS.database/Src/p4a_stubs.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/p4a_stubs.c ; done
 
 echo [after unsplit and recovering]
-shell cat $WKS.database/Src/*.c
+shell cat $WKS.database/Src/simple_loop.c
 
 shell gcc -o $WKS.database/Src/$WKS $WKS.database/Src/*.c
 
