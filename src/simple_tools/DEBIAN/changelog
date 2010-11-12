@@ -1,3 +1,36 @@
+2010-11-12  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+		* Par4All 1.0.4 introduces a new P4A Accel runtime.
+
+		* In previous months, PIPS and PyPS has evolved a lot, specially
+		  in the code generation for various accelerators. This version
+		  cope with these evolutions.
+
+		* Now the runtime can deal with subarray transfers between the
+		  host and the accelerator, up to 4D arrays.
+
+		* The code generation for CUDA pre-C99 is better/
+
+2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.0.3 is a base version to be used from Windows in a
+		  Wild Cruncher
+
+		* NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
+		  code for nVidia GPU
+
+		* Can now compile on Fedora
+
+        * New option to use simpler #include recovery
+
+		* Can move produced files to a given directory
+
+        * Improved documentation
+
+        * New options for Python code injection
+
+        * Better error messages
+
 2010-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.2

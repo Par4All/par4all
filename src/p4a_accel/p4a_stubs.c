@@ -28,6 +28,14 @@
     @{
 */
 
+
+/** Stub for P4A_accel_kernel_wrapper #define in p4a_accel, which has to be
+ * parsed as a typedef in pips
+ */
+typedef void P4A_accel_kernel_wrapper;
+typedef void P4A_accel_kernel;
+
+
 /** Stub for copying a scalar from the hardware accelerator memory to
     the host.
 
@@ -193,19 +201,19 @@ void P4A_copy_from_accel_2d(size_t element_size,
     the host.
 */
 void P4A_copy_from_accel_3d(size_t element_size,
-			    size_t d1_size, size_t d2_size, size_t d3_size,
-			    size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-			    size_t d1_offset, size_t d2_offset, size_t d3_offset,
-			    void *host_address,
-			    const void *accel_address) {
+                            size_t d1_size, size_t d2_size, size_t d3_size,
+                            size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+                            size_t d1_offset, size_t d2_offset, size_t d3_offset,
+                            void *host_address,
+                            const void *accel_address) {
   size_t i, j, k;
   char * cdest = d3_offset*element_size + (char*)host_address;
   const char * csrc = (char*)accel_address;
   for(i = 0; i < d1_block_size; i++)
     for(j = 0; j < d2_block_size; j++)
       for(k = 0; k < d3_block_size*element_size; k++)
-	cdest[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k] =
-	      csrc[(i*d2_block_size + j)*d3_block_size*element_size + k];
+        cdest[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k] =
+            csrc[(i*d2_block_size + j)*d3_block_size*element_size + k];
 }
 
 
@@ -213,20 +221,85 @@ void P4A_copy_from_accel_3d(size_t element_size,
     zone in the hardware accelerator.
 */
 void P4A_copy_to_accel_3d(size_t element_size,
-			  size_t d1_size, size_t d2_size, size_t d3_size,
-			  size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-			  size_t d1_offset,   size_t d2_offset, size_t d3_offset,
-			  const void *host_address,
-			  void *accel_address) {
+                          size_t d1_size, size_t d2_size, size_t d3_size,
+                          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
+                          size_t d1_offset,   size_t d2_offset, size_t d3_offset,
+                          const void *host_address,
+                          void *accel_address) {
   size_t i, j, k;
   char * cdest = (char *)accel_address;
   const char * csrc = d3_offset*element_size + (char *)host_address;
   for(i = 0; i < d1_block_size; i++)
     for(j = 0; j < d2_block_size; j++)
       for(k = 0; k < d3_block_size*element_size; k++)
-	cdest[(i*d2_block_size + j)*d3_block_size*element_size + k] =
-	  csrc[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k];
+        cdest[(i*d2_block_size + j)*d3_block_size*element_size + k] =
+            csrc[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k];
 }
+
+
+/** Stub for copying memory from the hardware accelerator to a 4D array in
+    the host.
+*/
+void P4A_copy_from_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          void *host_address,
+          const void *accel_address) {
+  size_t i, j, k,l;
+  char * cdest = (char*)host_address;
+  const char * csrc = (char*)accel_address;
+  for(i = 0; i < d1_block_size; i++) {
+    for(j = 0; j < d2_block_size; j++) {
+      for(k = 0; k < d3_block_size; k++) {
+        for(l = 0; l < d4_block_size; l++) {
+          int h_index = (i+d1_offset)*d2_size*d3_size*d4_size
+              + (j + d2_offset )*d3_size*d4_size
+              + (k + d3_offset )*d4_size
+              + (l + d4_offset);
+          int a_index = i*d2_block_size*d3_block_size*d4_block_size
+              + j*d3_block_size*d4_block_size
+              + k*d4_block_size
+              + l;
+          cdest[h_index] = csrc[a_index];
+        }
+      }
+    }
+  }
+}
+
+
+/** Stub for copying a 4D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_4d(size_t element_size,
+        size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+        size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+        size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+        const void *host_address,
+        void *accel_address) {
+  size_t i, j, k,l;
+  char * cdest = (char *)accel_address;
+  const char * csrc = (char *)host_address;
+  for(i = 0; i < d1_block_size; i++) {
+    for(j = 0; j < d2_block_size; j++) {
+      for(k = 0; k < d3_block_size; k++) {
+        for(l = 0; l < d4_block_size; l++) {
+          int h_index = (i+d1_offset)*d2_size*d3_size*d4_size
+              + (j + d2_offset )*d3_size*d4_size
+              + (k + d3_offset )*d4_size
+              + (l + d4_offset);
+          int a_index = i*d2_block_size*d3_block_size*d4_block_size
+              + j*d3_block_size*d4_block_size
+              + k*d4_block_size
+              + l;
+          cdest[a_index] = csrc[h_index];
+        }
+      }
+    }
+  }
+}
+
 /** Stub for allocating memory on the hardware accelerator.
 
     @param[out] address is the address of a variable that is updated by

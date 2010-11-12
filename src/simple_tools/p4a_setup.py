@@ -343,7 +343,7 @@ def main(options, args = []):
     else:
         polylib_src_dir = os.path.join(packages_dir, "polylib")
     debug("polylib source directory: " + polylib_src_dir)
-    if not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
+    if not options.skip_polylib and not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
         die("polylib source directory does not exist: " + polylib_src_dir)
 
     newgen_src_dir = ""
@@ -664,19 +664,22 @@ def main(options, args = []):
             run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
 
     # Install stuff still lacking from PIPS install.
-    info("Installing pips scripts")
-    dir = os.path.join(pips_src_dir, "src/Scripts/validation")
-    for file in os.listdir(dir):
-        if file.startswith("pips"):
-            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
-    run([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+    if not options.skip_pips:
+        info("Installing pips scripts")
+        dir = os.path.join(pips_src_dir, "src/Scripts/validation")
+        for file in os.listdir(dir):
+            if file.startswith("pips"):
+                run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
+            run([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+    
 
     # Fix validation.
-    info("Fixing validation")
-    dir = os.path.join(nlpmake_src_dir, "makes")
-    for file in os.listdir(dir):
-        if file == "arch.sh" or file == "version.sh":
-            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
+    if not options.skip_pips and not options.skip_linear and not options.skip_newgen:
+        info("Fixing validation")
+        dir = os.path.join(nlpmake_src_dir, "makes")
+        for file in os.listdir(dir):
+            if file == "arch.sh" or file == "version.sh":
+                run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
 
     # Install various files.
     info("Installing release notes")

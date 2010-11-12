@@ -303,6 +303,29 @@ double P4A_accel_timer_stop_and_float_measure() {
 }
 
 
+
+/** Allocate memory on the hardware accelerator in Cuda mode.
+
+    @param[out] address is the address of a variable that is updated by
+    this function to contains the address of the allocated memory block
+
+    @param[in] size is the size to allocate in bytes
+*/
+void P4A_accel_malloc(void **address, size_t size) {
+  toolTestExec(cudaMalloc(address, size));
+}
+
+
+/** Free memory on the hardware accelerator in Cuda mode
+
+    @param[in] address points to a previously allocated memory zone for
+    the hardware accelerator
+*/
+void P4A_accel_free(void *address) {
+  toolTestExec(cudaFree(address));
+}
+
+
 /** Copy a scalar from the hardware accelerator to the host
 
  It's a wrapper around CudaMemCopy*.
@@ -572,10 +595,85 @@ void P4A_copy_to_accel_3d(size_t element_size,
   }
 }
 
+/** Function for copying memory from the hardware accelerator to a 4D array in
+    the host.
+*/
+void P4A_copy_from_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          void *host_address,
+          const void *accel_address) {
+
+  if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
+    // We transfer all in one shot !
+    P4A_copy_from_accel_3d(element_size,
+                         d1_size,d2_size,d3_size * d4_size,
+                         d1_block_size, d2_block_size, d3_block_size * d4_size,
+                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
+                         host_address,
+                         accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_from_accel_3d(element_size,
+                           d2_size,d3_size,d4_size,
+                           d2_block_size, d3_block_size, d4_block_size,
+                           d2_offset, d3_offset, d4_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d4_size*element_size;
+      accel_row += d4_block_size*element_size;
+    }
+  }
+}
+
+/** Function for copying a 4D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          const void *host_address,
+          void *accel_address) {
+  if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
+    // We transfer all in one shot !
+    P4A_copy_to_accel_3d(element_size,
+                         d1_size,d2_size,d3_size * d4_size,
+                         d1_block_size, d2_block_size, d3_block_size * d4_size,
+                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
+                         host_address,
+                         accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_to_accel_3d(element_size,
+                           d2_size,d3_size,d4_size,
+                           d2_block_size, d3_block_size, d4_block_size,
+                           d2_offset, d3_offset, d4_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d4_size*element_size;
+      accel_row += d4_block_size*element_size;
+    }
+  }
+}
 
 
-
-#endif P4A_ACCEL_CUDA
+#endif //P4A_ACCEL_CUDA
 
 #ifdef P4A_iACCEL
 #include <stdio.h>
