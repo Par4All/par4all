@@ -4375,15 +4375,18 @@ text text_statement(
   return text_statement_enclosed(module, margin, stmt, TRUE, TRUE, pdl);
 }
 
-/* Keep track of the last statement to decide if a final return can be omitted
- * or not. If no last statement can be found for sure, for instance because it
- * depends on the prettyprinter, last_statement is set to statement_undefined
- * which is safe.
+/* Keep track of the last statement to decide if a final return can be
+ * omitted or not. If no last statement can be found for sure, for
+ * instance because it depends on the prettyprinter, last_statement_found is
+ * set to statement_undefined which is safe.
+ *
+ * FI: for purposes unrelated to prettyprint, see
+ * last_statement(). This function is part of the prettyprinter and
+ * probably only useful for Fortran code.
  */
-static statement last_statement = statement_undefined;
+static statement last_statement_found = statement_undefined;
 
-statement
-find_last_statement(statement s)
+statement find_last_statement(statement s)
 {
     statement last = statement_undefined;
 
@@ -4453,21 +4456,21 @@ set_last_statement(statement s)
 {
     statement ls = statement_undefined;
     pips_assert("last statement is undefined",
-		statement_undefined_p(last_statement));
+		statement_undefined_p(last_statement_found));
     ls = find_last_statement(s);
-    last_statement = ls;
+    last_statement_found = ls;
 }
 
 void reset_last_statement()
 {
-    last_statement = statement_undefined;
+    last_statement_found = statement_undefined;
 }
 
 bool last_statement_p(statement s) {
     pips_assert("statement is defined\n", !statement_undefined_p(s));
-    return s == last_statement;
+    return s == last_statement_found;
 }
-
+
 /* Build the text of a module.
 
    The original text of the declarations is used if possible in

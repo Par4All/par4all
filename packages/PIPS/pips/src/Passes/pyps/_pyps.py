@@ -190,7 +190,7 @@ class workspace(object):
 		parents        = kwargs.setdefault("parents",        [])
 		cpypips	       = kwargs.setdefault("cpypips",        pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
-		deleteOnClose  = kwargs.setdefault("deleteOnClose",  True)
+		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
 
 		if not name :
 			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
@@ -260,7 +260,8 @@ class workspace(object):
 		except RuntimeError:
 			try: cpypips.close_workspace(0)
 			except RuntimeError: pass
-			cpypips.delete_workspace(name)
+			if self.deleteOnClose:
+					cpypips.delete_workspace(name)
 			raise
 
 		if not verbose:

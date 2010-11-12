@@ -237,7 +237,7 @@ static void html_print_basic(basic b) {
         break;
       case is_basic_pointer:
         html_output("pointer", false);
-        html_output("unimplemented", false);
+        html_print_type(basic_pointer(b));
         break;
       case is_basic_derived:
         html_output("derived", false);
@@ -354,7 +354,9 @@ static void html_print_functional(functional f) {
     html_print_parameter(param);
   }
 
+  begin_block("return", false);
   html_print_type(functional_result( f ));
+  end_block("return", false);
 
   end_block("functional", true);
 }
@@ -589,7 +591,18 @@ static void html_print_expression(expression e, bool cr) {
     case is_syntax_subscript:
       html_print_subscript(syntax_subscript( s ));
       break;
-      /* add cast, sizeof here FIXME*/
+    case is_syntax_cast:
+      html_output("cast unimplemented", false);
+      break;
+    case is_syntax_sizeofexpression:
+      html_output("sizeofexpression unimplemented", false);
+      break;
+    case is_syntax_application:
+      html_output("sizeofexpression unimplemented", false);
+      break;
+    case is_syntax_va_arg:
+      html_output("va_arg unimplemented", false);
+      break;
     default:
       pips_internal_error("unexpected syntax tag");
   }

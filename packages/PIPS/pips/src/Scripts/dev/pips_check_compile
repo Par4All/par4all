@@ -35,6 +35,7 @@
 # default settings
 nice=
 wait=
+tail=
 force=
 report=
 source=
@@ -61,8 +62,11 @@ do
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1//*=/} ;;
     # whether to run in parallel
-    -s|--sequential) parallel= ;;
     -p|--parallel) parallel=1 ;;
+    -s|--sequential) parallel= ;;
+    # trace length to include on compilation error
+    -t|--tail) tail=$2 ; shift ;;
+    --tail=*) tail=${1//*=/} ;;
     # compilation & validation name
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) wait=${1//*=/} ;;
@@ -83,6 +87,7 @@ do
 	"  -r: report compilation result even if not changed\n" \
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
+        "  -t len: trace length on compilation error\n" \
 	"  -v name: validation name\n" \
 	"  -w: wait for lock\n" \
       exit 0
@@ -113,8 +118,10 @@ then
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
   make="make -j $jobs -l $load"
+  tail=$((12 + 3 * $nproc))
 else
   make=make
+  tail=15
 fi
 
 # report current-state compile message
@@ -188,13 +195,13 @@ function report()
       test -f err && {
         echo
         echo err:
-        tail -15 err
+        tail -$tail err
       }
 
       test -f out && {
         echo
         echo out:
-        tail -10 out
+        tail -$tail out
       }
 
       # show recent commits

@@ -276,6 +276,7 @@ void CParserError(char *msg)
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
   reset_expression_comment();
+  Reset_C_ReturnStatement();
 
   //debug_off();
 
@@ -400,7 +401,7 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_start) = make_value_intrinsic();
     }
 
-    built_in_va_end = 
+    built_in_va_end =
         FindOrCreateEntity(compilation_unit_name,BUILTIN_VA_END);
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
@@ -419,7 +420,7 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_end) = make_value_intrinsic();
     }
 
-    built_in_va_copy = 
+    built_in_va_copy =
         FindOrCreateEntity(compilation_unit_name,BUILTIN_VA_COPY);
     if(storage_undefined_p(entity_storage(built_in_va_copy))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
@@ -462,6 +463,8 @@ static bool actual_c_parser(string module_name,
     c_parse();
 
     safe_fclose(c_in, file_name);
+
+    FixCReturnStatements(ModuleStatement);
 
     pips_assert("Module statement is consistent",
 		statement_consistent_p(ModuleStatement));
