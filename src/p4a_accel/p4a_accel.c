@@ -158,10 +158,9 @@ void P4A_copy_from_accel_1d(size_t element_size,
   // Compute the destination address on host side
   char * cdest = d1_offset*element_size + (char *)host_address;
   const char * csrc = (char*)accel_address;
-
   // Copy element by element
   for(size_t i = 0; i < d1_block_size*element_size; i++)
-    csrc[i] = accel_address[i];
+    cdest[i] = csrc[i];
 }
 
 /** Function for copying a 1D memory zone from the host to a compact memory
@@ -194,7 +193,7 @@ void P4A_copy_to_accel_1d(size_t element_size,
     void *accel_address) {
   // Compute the destination address on host side
   const char * csrc = d1_offset*element_size + (char *)host_address;
-  const char * cdest = (char*)accel_address;
+  char * cdest = (char*)accel_address;
 
   // Copy element by element
   for(size_t i = 0; i < d1_block_size*element_size; i++)
