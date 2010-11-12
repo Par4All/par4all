@@ -1,0 +1,61 @@
+
+Parsed printed file
+
+a_t return07()
+{
+   int i, j;
+   a_t a1;
+   //PIPS generated variable
+   a_t return07;
+   if (i) {
+      j = 1;
+      return07 = a1;
+      goto l0000;
+   }
+   else {
+      j = 2;
+      return07 = a1;
+      goto l0000;
+   }
+   j = 3;
+   return07 = a1;
+   goto l0000;
+l0000:   return return07;
+}
+
+Printed file
+
+a_t return07()
+{
+   int i, j;
+   a_t a1;
+   //PIPS generated variable
+   a_t return07;
+   if (i) goto l99999;
+   j = 2;
+   return07 = a1;
+   goto l0000;
+l99999:   ;
+   j = 1;
+   return07 = a1;
+l0000:   return return07;
+}
+
+Printed file after control restructuring
+
+a_t return07()
+{
+   int i, j;
+   a_t a1;
+   //PIPS generated variable
+   a_t return07;
+   if (i) {
+      j = 1;
+      return07 = a1;
+   }
+   else {
+      j = 2;
+      return07 = a1;
+   }
+l0000:   return return07;
+}

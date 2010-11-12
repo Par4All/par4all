@@ -1,0 +1,82 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,k) {j==2}
+
+   int i, j = 2, k;
+
+//  T() {j==2}
+
+   float x;
+
+//  T(j) {j#init==2}
+
+
+   while (i*i>1) {
+
+//  T(j) {}
+
+      while (k*k>1) 
+
+//  T(j) {j==1}
+
+         j = 1;
+
+//  T() {}
+
+      // Oops, this generate an indentity transformer that is not identified
+      //    j = j;
+      x = 0.;
+   }
+
+//  T(j) {j==j#init}
+
+   j = j;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j = 2, k;
+
+//  P(i,j,k) {j==2}
+
+   float x;
+
+//  P(i,j,k) {j==2}
+
+
+   while (i*i>1) {
+
+//  P(i,j,k) {1<=j, j<=2}
+
+      while (k*k>1) 
+
+//  P(i,j,k) {1<=j, j<=2}
+
+         j = 1;
+
+//  P(i,j,k) {1<=j, j<=2}
+
+      // Oops, this generate an indentity transformer that is not identified
+      //    j = j;
+      x = 0.;
+   }
+
+//  P(i,j,k) {1<=j, j<=2}
+
+   j = j;
+}
