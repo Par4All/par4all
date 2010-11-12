@@ -227,8 +227,6 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                 expression * arg = (expression*)REFCAR(args);
                 type type_at_call_site = expression_to_type(*arg);
                 type type_in_func_prototype = parameter_type(p);
-                print_type(type_at_call_site);
-                print_type(type_in_func_prototype);
                 if(!pointer_type_p(type_at_call_site)) {
                   /*
                     type t = make_type_variable(
