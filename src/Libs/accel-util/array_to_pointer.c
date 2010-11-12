@@ -219,7 +219,6 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
     list callers_statement = callers_to_statements(callers);
     list call_sites = callers_to_call_sites(callers_statement);
 
-    pips_debug(0,"m = %s\n",entity_name(m));
     /* we may have to change the call sites, prepare iterators over call sites arguments here */
     FOREACH(CALL,c,call_sites) {
         list args = call_arguments(c);
