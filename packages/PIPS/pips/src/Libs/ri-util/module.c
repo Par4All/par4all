@@ -503,7 +503,37 @@ bool fortran95_language_module_p(entity m)
 {
   return x_language_module_p(m, is_language_fortran95);
 }
+
+/* Returns the entity rv that carries the value returned by module m,
+ * when m is not a C void function or a Fortran subroutine.
+ *
+ * rv is supposed to be allocated early by the parser.
+ */
+entity function_to_return_value(entity m)
+{
+  type ft = ultimate_type(entity_type(m));
+  entity rv = entity_undefined;
 
+  if(type_functional_p(ft)) {
+    functional f = type_functional(ft);
+    type r = functional_result(f);
+    if(type_void_p(r)) {
+      pips_user_error("A return value is used for void function \"%s\".\n",
+		      entity_user_name(m));
+    }
+    else {
+      string mn = entity_local_name(m);
+      rv = global_name_to_entity(mn, mn);
+
+      pips_assert("rv is defined", entity_defined_p(rv));
+    }
+  }
+  else
+    pips_internal_error("Return value requested for non-functional object"
+			" \"%s\".\n", entity_user_name(m));
+
+  return rv;
+}
 /*
  *  that is all
  */

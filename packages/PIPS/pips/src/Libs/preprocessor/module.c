@@ -346,22 +346,23 @@ bool language_module_p(entity m, string lid)
   return c_p;
 }
 
-/* Add an entity to the current's module compilation unit declarations
+/** Add an entity to the current's module compilation unit declarations
  * we have to generate its statement if none cerated before
  * due to limitation of pipsmake, it is not always possible to make sure from pipsmake
  * that this ressource is created
  * for example in INLINING (!) we would like to tell pipsmake
  * we need the CODE resource from all module callers
+ *
+ * @param[in] e is the entity to add
+ * @param[in] cu is the compilation unit
  */
-void
-AddEntityToCompilationUnit(entity e, entity cu)
-{
+void AddEntityToCompilationUnit(entity e, entity cu ) {
     statement s = statement_undefined;
     string cum = module_local_name(cu);
     if( c_module_p(cu) ) {
         if(!db_resource_required_or_available_p(DBR_CODE,cum))
         {
-	  bool controlizer(string);
+            bool controlizer(string);
             entity tmp = get_current_module_entity();
             statement stmt = get_current_module_statement();
             reset_current_module_entity();
@@ -389,6 +390,47 @@ AddEntityToCompilationUnit(entity e, entity cu)
         db_touch_resource(DBR_CODE,cum);
     }
 }
+
+/** Remove an entity from the current's module compilation unit declarations
+ *
+ * @param[in] e is the entity to remove
+ * @param[in] cu is the compilation unit
+ */
+void RemoveEntityFromCompilationUnit(entity e, entity cu ) {
+    statement s = statement_undefined;
+    string cum = module_local_name(cu);
+    if( c_module_p(cu) ) {
+        if(!db_resource_required_or_available_p(DBR_CODE,cum))
+        {
+            bool controlizer(string);
+            entity tmp = get_current_module_entity();
+            statement stmt = get_current_module_statement();
+            reset_current_module_entity();
+            reset_current_module_statement();
+            controlizer(cum);
+            if(!entity_undefined_p(tmp))
+                set_current_module_entity(tmp);
+            if(!statement_undefined_p(stmt))
+                set_current_module_statement(stmt);
+        }
+        s=(statement)db_get_memory_resource(DBR_CODE,cum,TRUE);
+    }
+
+    // Remove entity from global declaration lists
+    gen_remove(&entity_declarations(cu),e);
+    // FIXME : s is only defined for c_module !!
+    gen_remove(&statement_declarations(s),e);
+
+    remove_declaration_statement(s, e);
+    if( c_module_p(cu) ) {
+        module_reorder(s);
+        db_put_or_update_memory_resource(DBR_CODE,cum,s,TRUE);
+        db_touch_resource(DBR_CODE,cum);
+    }
+}
+
+
+
 void
 AddEntityToModuleCompilationUnit(entity e, entity module)
 {

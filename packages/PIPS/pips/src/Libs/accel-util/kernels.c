@@ -60,30 +60,21 @@ struct dma_pair {
   enum region_to_dma_switch s;
 };
 
-typedef enum {
-    dmaScalar=0,
-    dma1D,
-    dma2D,
-    dma3D
-} dma_dimension;
 
-static dma_dimension get_dma_dimension(entity to) {
+/* Some constant intended to have a more readable code */
+static const int dmaScalar = 0;
+static const int dma1D = 1;
+
+static size_t get_dma_dimension(entity to) {
     size_t n = type_dereferencement_depth(entity_type(to)) - 1; /* -1 because we always have pointer to area ... in our case*/
-    switch(n) {
-        case 0:return dmaScalar; /* it means we have a single scalar to dl */
-        case 1:return dma1D;
-        case 2:return dma2D;
-        case 3:return dma3D;
-        default: pips_internal_error("no dma for dimension %zd\n",n);
-                 return dma1D;
-    };
+    return n;
 }
 
 /**
  * converts a region_to_dma_switch to corresponding dma name
  * according to properties
  */
-static string get_dma_name(enum region_to_dma_switch m, dma_dimension d) {
+static string get_dma_name(enum region_to_dma_switch m, size_t d) {
     char *seeds[] = {
         "KERNEL_LOAD_STORE_LOAD_FUNCTION",
         "KERNEL_LOAD_STORE_STORE_FUNCTION",
@@ -93,10 +84,10 @@ static string get_dma_name(enum region_to_dma_switch m, dma_dimension d) {
     char * propname = seeds[(int)m];
     /* If the DMA is not scalar, the DMA function name is in the property
        of the form KERNEL_LOAD_STORE_LOAD/STORE_FUNCTION_dD: */
-    if(d > dmaScalar && (int)m < 2)
+    if(d > 0 /* not scalar*/ && (int)m < 2)
         asprintf(&propname,"%s_%dD", seeds[(int)m], (int)d);
     string dmaname = get_string_property(propname);
-    if(d > dmaScalar && (int)m <2) free(propname);
+    if(d > 0 /* not scalar*/ && (int)m <2) free(propname);
     return dmaname;
 }
 
@@ -155,8 +146,7 @@ call dimensions_to_dma(entity from,
 {
   expression dest;
   list args = NIL;
-  dma_dimension function_dimension = get_dma_dimension(to);
-  string function_name = get_dma_name(m,function_dimension);
+  string function_name = get_dma_name(m,get_dma_dimension(to));
 
   entity mcpy = module_name_to_entity(function_name);
   if (entity_undefined_p(mcpy)) {

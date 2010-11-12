@@ -2417,6 +2417,60 @@ statement add_declaration_statement(statement s, entity e)
     return s;
 }
 
+
+/* Declarations are not only lists of entities, but also statement to
+   carry the line number, comments,... For the time begin, a
+   declaration statement is a continue statement. */
+statement remove_declaration_statement(statement s, entity e)
+{
+    if(statement_block_p(s)) {
+        list sl = statement_block(s); //statement list
+        list cl = list_undefined; // current statement list
+        list pl = NIL; // previous statement list
+        list nsl = list_undefined; // new statement list
+        string comment = generated_variable_comment(e);
+        statement ds = make_declaration_statement(e,
+                STATEMENT_NUMBER_UNDEFINED,
+                comment);
+
+        /* Look for the last declaration: it is pointed to by pl */
+        for(cl=sl; !ENDP(cl); POP(cl)) {
+            statement cs = STATEMENT(CAR(cl));
+            if(declaration_statement_p(cs)) {
+              // We don't use FOREACH because we aim to delete an element while iterating
+              list prev=NULL;
+              for(list current = statement_declarations(cs);
+                  !ENDP(current);
+                  POP(current)) {
+                if(e == ENTITY(CAR(current))) {
+                  pips_debug(0,"Removing %s\n",entity_name(e));
+                  // For replacing it, we have first to remove the old one from the list
+                  if(prev == NULL) {
+                    statement_declarations(cs) = CDR(current);
+                  } else {
+                    CDR(prev) = CDR(current);
+                  }
+                  free(current);
+                  break;
+                }
+                prev=current; // Save current iterator, because we might remove the next one
+              }
+            }
+        }
+    }
+    else
+    {
+        pips_internal_error("can only add declarations to statement blocks\n");
+    }
+
+    ifdebug(8) {
+        pips_debug(8, "Statement after declaration insertion:\n");
+        print_statement(s);
+    }
+
+    return s;
+}
+
 /* Replace the instruction in statement s by instruction i.
  *
  * Free the old instruction.
@@ -3288,6 +3342,50 @@ bool statement_in_statements_p(statement s, list l)
     FOREACH(STATEMENT,st,l)
         if(statement_in_statement_p(s,st)) return true;
     return false;
+}
+
+/* A simplified version of find_last_statement() located in
+ * prettyprint.c and designed to be used within the prettyprinter
+ */
+statement last_statement(statement s)
+{
+    statement last = statement_undefined;
+
+    pips_assert("statement is defined", !statement_undefined_p(s));
+
+    if(statement_sequence_p(s)) {
+	list ls = instruction_block(statement_instruction(s));
+
+	last = (ENDP(ls)? statement_undefined :
+		last_statement(STATEMENT(CAR(gen_last(ls)))));
+    }
+    else if(statement_unstructured_p(s)) {
+	unstructured u = statement_unstructured(s);
+	list trail = unstructured_to_trail(u);
+
+	last = control_statement(CONTROL(CAR(trail)));
+
+	gen_free_list(trail);
+    }
+    else if(statement_call_p(s)) {
+	/* Hopefully it is a return statement.
+	 * Since the semantics of STOP is ignored by the parser, a
+	 * final STOp should be followed by a RETURN.
+	 */
+	last = s;
+    }
+    else if(statement_goto_p(s))
+      last = s;
+    else if(statement_expression_p(s))
+      last = s;
+    else if(statement_loop_p(s))
+      last = s;
+    else if(statement_whileloop_p(s))
+      last = s;
+    else if(statement_forloop_p(s))
+      last = s;
+
+    return last;
 }
 
 /* That's all folks */
