@@ -98,10 +98,10 @@ def patch_to_use_p4a_methods(file_name, dir_name):
           to skip to the next "Loop nest P4A end", not the last one...
         )// Loop nest P4A end\n.*?(?#
           to skip to "the p4a_kernel_wrapper", not the last one...
-        )(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);.*?(?#
+        )(p4a_kernel_wrapper_\\d+)\\(([^;]*)\\;.*?(?#
           no slurp to the next "}" at the begin of a line
         )\n}""",
-      "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4);\n}", content)
+      "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4;\n}", content)
 
     # Get the virtual processor coordinates:
     ## Change
