@@ -1066,10 +1066,7 @@ basic basic_of_expression(expression exp)
  */
 basic basic_of_reference(reference r)
 {
-    static expression sexp = expression_undefined;
-    if(expression_undefined_p(sexp)) sexp=make_expression(make_syntax_reference(reference_undefined),normalized_undefined);
-    syntax_reference(expression_syntax(sexp)) = r;
-    return basic_of_expression(sexp);
+    return basic_of_expression(make_expression(r,normalized_undefined));
 }
 
 
