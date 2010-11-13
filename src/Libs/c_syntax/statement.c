@@ -155,7 +155,7 @@ statement MakeBlock(list decls, list stmts)
      C99 allows declarations anywhere in the block. So some
      declaration statements may be located in stms. */
   list sl = gen_nconc(decls, stmts);
-  list dl = statements_to_declarations(sl);
+  list dl = statements_to_direct_declarations(sl);
 
   statement s = make_statement(entity_empty_label(),
 			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */,
