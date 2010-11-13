@@ -54,7 +54,7 @@ Layout for memory area "decl48!flat_color_z_triangle:*STATIC*" of size 0:
 End of declarations for module decl48!flat_color_z_triangle
 
 
-Code
+Parsed code
 
 static void flat_color_z_triangle()
 {
@@ -67,4 +67,17 @@ static void flat_color_z_triangle()
 
       eMaj.v0 = 1;                                                      /*0013*/
    }
+}
+
+Code
+
+static void flat_color_z_triangle()
+{
+   typedef struct {                                                     /*0009*/
+      int v0;
+   } EdgeT;
+
+   EdgeT eMaj;                                                          /*0011*/
+
+   eMaj.v0 = 1;                                                         /*0013*/
 }
