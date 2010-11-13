@@ -889,60 +889,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
   switch(syntax_tag(sy)) {
   case is_syntax_reference:
     {
-      entity v = reference_variable(syntax_reference(sy));
-      type vt = entity_type(v);
-
-      /* When called from the parser, the entity type may not yet be
-	 stored in the field type. This happens when
-	 simplify_C_expression is called for initialization
-	 expressions which are grouped in one statement. */
-      if(!type_undefined_p(vt)) {
-	type exp_type = ultimate_p? ultimate_type(vt) : copy_type(entity_type(v));
-	list l_dim = NIL;
-
-	if(apply_p) {
-	  if(!type_functional_p(exp_type))
-	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
-				type_tag(exp_type));
-	  else {
-	    type rt = functional_result(type_functional(exp_type));
-	    type urt = ultimate_p? ultimate_type(rt):copy_type(rt);
-
-	    if(type_variable_p(urt))
-	      b = copy_basic(variable_basic(type_variable(urt)));
-	    else
-	      pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
-	  }
-	}
-	else {
-	  if(type_variable_p(exp_type))
-	    {
-	      b = copy_basic(variable_basic(type_variable(exp_type)));
-
-	      /* BC : if the variable has dimensions, then it's an array name which is converted
-		 into a pointer itself. And each dimension is converted into a pointer on the next one.
-		 (except in a few cases which should be handled in basic_of_call)
-		 to be verified or done
-	      */
-
-	      for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
-		{
-		  b = make_basic_pointer(make_type_variable(make_variable(b, NIL, NIL)));
-		}
-	    }
-	  else if(type_functional_p(exp_type))
-	    {
-            /* A reference to a function returns a pointer to a function of the very same time */
-            b = make_basic_pointer(copy_type(exp_type));
-	    }
-	  else
-	    {
-	      pips_internal_error("Bad reference type tag %d \"%s\"\n",
-				  type_tag(exp_type), type_to_string(exp_type));
-	    }
-	}
-    b = basic_and_indices_to_basic(b,reference_indices(syntax_reference(sy)),ultimate_p);
-      }
+      b = basic_of_reference(syntax_reference(sy));
       break;
     }
   case is_syntax_call:
@@ -1058,19 +1005,78 @@ basic basic_of_expression(expression exp)
 }
 
 /** 
- * retreives the basic of a reference in a newly allocated bsaic object
+ * Retrieves the basic of a reference in a newly allocated basic object
  * 
  * @param r reference we want the basic of
  * 
  * @return allocated basic of the reference
  */
-basic basic_of_reference(reference r)
-{
-    return basic_of_expression(make_expression(r,normalized_undefined));
+basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {
+  basic b = basic_undefined;
+  entity v = reference_variable(r);
+  type vt = entity_type(v);
+
+  /* When called from the parser, the entity type may not yet be
+   stored in the field type. This happens when
+   simplify_C_expression is called for initialization
+   expressions which are grouped in one statement. */
+  if(!type_undefined_p(vt)) {
+    type exp_type = ultimate_p ? ultimate_type(vt) : copy_type(entity_type(v));
+    list l_dim = NIL;
+
+    if(apply_p) {
+      if(!type_functional_p(exp_type))
+        pips_internal_error("Bad reference type tag %d \"%s\"\n",
+            type_tag(exp_type));
+      else {
+        type rt = functional_result(type_functional(exp_type));
+        type urt = ultimate_p ? ultimate_type(rt) : copy_type(rt);
+
+        if(type_variable_p(urt))
+          b = copy_basic(variable_basic(type_variable(urt)));
+          else
+          pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
+      }
+    } else {
+      if(type_variable_p(exp_type)) {
+        b = copy_basic(variable_basic(type_variable(exp_type)));
+
+        /* BC : if the variable has dimensions, then it's an array name which is converted
+         into a pointer itself. And each dimension is converted into a pointer on the next one.
+         (except in a few cases which should be handled in basic_of_call)
+         to be verified or done
+         */
+
+        for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim)) {
+          b
+              = make_basic_pointer(make_type_variable(make_variable(b, NIL, NIL)));
+        }
+      } else if(type_functional_p(exp_type)) {
+        /* A reference to a function returns a pointer to a function of the very same time */
+        b = make_basic_pointer(copy_type(exp_type));
+      } else {
+        pips_internal_error("Bad reference type tag %d \"%s\"\n",
+            type_tag(exp_type), type_to_string(exp_type));
+      }
+    }
+    b = basic_and_indices_to_basic(b,
+                                   reference_indices(r),
+                                   ultimate_p);
+  }
+  return b;
 }
 
 
-
+/**
+ * Retrieves the basic of a reference in a newly allocated basic object
+ *
+ * @param r reference we want the basic of
+ *
+ * @return allocated basic of the reference
+ */
+basic basic_of_reference(reference r) {
+  basic_of_any_reference(r,false,true);
+}
 
 /* basic basic_of_call(call c): returns the basic of the result given
  * by the call "c". If ultimate_p is true, replaced typdef'ed types by
