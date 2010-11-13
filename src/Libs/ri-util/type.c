@@ -889,7 +889,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
   switch(syntax_tag(sy)) {
   case is_syntax_reference:
     {
-      b = basic_of_reference(syntax_reference(sy));
+      b = basic_of_any_reference(syntax_reference(sy),apply_p,ultimate_p);
       break;
     }
   case is_syntax_call:
