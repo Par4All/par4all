@@ -425,8 +425,9 @@ effects_to_arguments(list fx) /* list of effects */
 }
 
 
-static transformer 
-test_to_transformer(test t, transformer pre, list ef) /* effects of t */
+static transformer test_to_transformer(test t,
+				       transformer pre,
+				       list ef) /* effects of t */
 {
   statement st = test_true(t);
   statement sf = test_false(t);
@@ -461,7 +462,7 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
     tffwc = transformer_dup(statement_to_transformer(sf));
     */
 
-    
+
     /* tftwc = precondition_add_condition_information(tftwc, e, context, TRUE); */
     tftwc = transformer_apply(tct, context);
     ifdebug(8) {
@@ -1898,15 +1899,29 @@ transformer complete_non_identity_statement_transformer(transformer t,
 }
 
 
+/* Loops, do, for, while or repeat, have transformers linked to their
+   body preconditions so as to compute those. But the real loop
+   transformer includes also the possible loop skip and the possible
+   loop exit. This function completes transformer t, which is linked
+   to the loop body precondition, and use additional information
+   carried by statement s, analyzed with precondition pre to return
+   the global loop transformer. If statement s is not a loop, a copy
+   of t is returned.
+
+   Parameter identity_p is likely to be useless. It was added to track
+   identity transformers before they were dealt with by transformer
+   lists.
+ */
 transformer generic_complete_statement_transformer(transformer t,
 						   transformer pre,
 						   statement s,
 						   bool identity_p)
 {
   /* If i is a loop, the expected transformer can be more complex (see
-     nga06) because the stores transformer is later used to compute the
-     loop body precondition. It cannot take into account the exit
-     condition. */
+     nga06) because the stores transformer is later used to compute
+     the loop body precondition. It cannot take into account the exit
+     condition. So the exit condition is added by the complete_xxx
+     functions. */
   transformer ct = transformer_undefined;
   instruction i = statement_instruction(s);
 
