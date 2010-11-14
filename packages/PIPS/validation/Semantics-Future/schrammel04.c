@@ -6,14 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// I assume it returns a value between 0. and 1., but I haven't
-// checked that rand(0) was always positive
-float alea(void)
+int alea(void)
 {
-  float fr = ((float) rand())/((float)RAND_MAX);
-  //printf("fr=%f\n", fr);
-  return fr;
-  //return 1.;
+  return rand() % 2;
 }
 
 void main()
@@ -41,7 +36,7 @@ void main()
 	// The information published by Bertrand
 	float z = 0.;
 
-	while(2*x1+2*x2<=p && alea()>0.5) {
+	while(2*x1+2*x2<=p && alea()) {
 	  if(1) {
 	    x1 = x1 + y + 1;
 	    x2 = y;
@@ -72,23 +67,5 @@ void main()
 
 int foo()
 {
-  /* FI: I should use rand() as for alias code */
-
-  if(0) {
-    // To confuse the analyzer
-    int x = 3;
-    return x*x*x/54;
-  }
-  else if(0)
-    // To make it easier
-    return 1;
-  else {
-    // after talking with Bertrand
-    int x = 3;
-    //int y = x*x*x/54; // returns 0
-    //int y = x*x*x/27; // returns 1
-    int y = alea()+0.5;
-    assert(0<=y && y<=1);
-    return y;
-  }
+  return alea();
 }

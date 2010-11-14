@@ -6,18 +6,18 @@
 // value after the loop are 2 and 3. This information is only found if
 // the test k>=3 is removed
 
-// Variation on schrammel06: the initialization is guarded by a loop
-// instead of a test
+// Like 06, but with an extra test in sequence to debug
+// block_to_transformer_list()
 
 main()
 {
   int i, j = 2, k;
 
   while(i*i>1) {
-    while(k>=3) {
+    if(k>=3)
       j = 3;
-      k--;
-    }
+    if(k>=4)
+      j = 4;
   }
   j = j;
 }

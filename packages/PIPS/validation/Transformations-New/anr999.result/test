@@ -14,7 +14,7 @@ int main(void)
    //PIPS generated variable
    freia_data2d *imtmp;
    //PIPS generated variable
-   freia_status _return1_0, _return0_0;
+   freia_status _return0_0, _return1_0;
    //PIPS generated variable
    int i_1, i_2;
 

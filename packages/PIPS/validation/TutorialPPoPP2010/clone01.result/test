@@ -169,10 +169,8 @@ int clone01_1(int n, int s)
 int clone01_1(int n, int s)
 {
    {
-      {
-      }
-      return 1;
    }
+   return 1;
 }
 int clone01(int n, int s)
 {
@@ -186,26 +184,20 @@ int clone01(int n, int s)
 int clone01_0(int n, int s)
 {
    {
-      {
-      }
-      return 0;
    }
+   return 0;
 }
 int clone01_1(int n, int s)
 {
    {
-      {
-      }
-      return 1;
    }
+   return 1;
 }
 int clone01_2(int n, int s)
 {
    {
-      {
-      }
-      return 1;
    }
+   return 1;
 }
 int main()
 {

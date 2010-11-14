@@ -16,6 +16,12 @@ echo
 display SYMBOL_TABLE_FILE
 
 echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
 echo Code
 echo
 
