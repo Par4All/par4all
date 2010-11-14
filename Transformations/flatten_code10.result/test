@@ -29,7 +29,8 @@ void flatten_code10(void)
 // (0,2)
    int i = 2;                                                           /*0008*/
 // (0,3)
-
+   //PIPS generated variable
+   
    fprintf(stderr, "Hello world!\n");                                   /*0013*/
    // END BLOCK
 }

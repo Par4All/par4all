@@ -39,16 +39,14 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
    for(i = 1; i <= 510; i += 1)
       for(j = 1; j <= 510; j += 1) {
-         {
-            int ki, kj;
-            new_image[i][j] = 0.;
-            for(ki = 0; ki <= 2; ki += 1)
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  new_image[i][j] = new_image[i][j]+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
-            new_image[i][j] = new_image[i][j]/(3*3);
-         }
+         int ki, kj;
+         new_image[i][j] = 0.;
+         for(ki = 0; ki <= 2; ki += 1)
+            for(kj = 0; kj <= 2; kj += 1)
+               
+               
+               new_image[i][j] = new_image[i][j]+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
+         new_image[i][j] = new_image[i][j]/(3*3);
       }
 }
 
@@ -67,16 +65,14 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
    for(i = 1; i <= 510; i += 1)
       for(j = 1; j <= 510; j += 1) {
-         {
-            int ki, kj;
-            __scalar__0 = 0.;
-            for(ki = 0; ki <= 2; ki += 1)
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
-            __scalar__0 = __scalar__0/(3*3);
-         }
+         int ki, kj;
+         __scalar__0 = 0.;
+         for(ki = 0; ki <= 2; ki += 1)
+            for(kj = 0; kj <= 2; kj += 1)
+               
+               
+               __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
+         __scalar__0 = __scalar__0/(3*3);
          new_image[i][j] = __scalar__0;
       }
 }
@@ -100,18 +96,16 @@ l99993:
    for(i = 1; i <= 630; i += 1)
 l99994:
       for(j = 1; j <= 510; j += 1) {
-         {
-            int ki, kj;
-            __scalar__0 = 0.;
+         int ki, kj;
+         __scalar__0 = 0.;
 l99995:
-            for(ki = 0; ki <= 2; ki += 1)
+         for(ki = 0; ki <= 2; ki += 1)
 l99996:
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
-            __scalar__0 = __scalar__0/(3*3);
-         }
+            for(kj = 0; kj <= 2; kj += 1)
+               
+               
+               __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
+         __scalar__0 = __scalar__0/(3*3);
          if (i>=1&&i<=510) 
             new_image[i][j] = __scalar__0;
       }
@@ -140,18 +134,16 @@ l99993:
 
          for(i = 126*i_t+1; i <= 126*i_t+126; i += 1)
             for(j = 5*j_t+1; j <= 5*j_t+5; j += 1) {
-               {
-                  int ki, kj;
-                  __scalar__0 = 0.;
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-                  for(ki = 0; ki <= 2; ki += 1)
+               for(ki = 0; ki <= 2; ki += 1)
 l99996:
-                     for(kj = 0; kj <= 2; kj += 1)
-                        
-                        
-                        __scalar__0 = __scalar__0+image[ki+i-1][kj+j-1]*kernel[ki][kj];
-                  __scalar__0 = __scalar__0/9;
-               }
+                  for(kj = 0; kj <= 2; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[ki+i-1][kj+j-1]*kernel[ki][kj];
+               __scalar__0 = __scalar__0/9;
                if (i>=1&&i<=510) 
                   new_image[i][j] = __scalar__0;
             }
@@ -183,18 +175,16 @@ l99991:
          for(i = 1; i <= 126; i += 1)
 l99992:
             for(j = 1; j <= 5; j += 1) {
-               {
-                  int ki, kj;
-                  __scalar__0 = 0.;
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-                  for(ki = 1; ki <= 3; ki += 1)
+               for(ki = 1; ki <= 3; ki += 1)
 l99996:
-                     for(kj = 1; kj <= 3; kj += 1)
-                        
-                        
-                        __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
-                  __scalar__0 = __scalar__0/9;
-               }
+                  for(kj = 1; kj <= 3; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
+               __scalar__0 = __scalar__0/9;
                if (i+126*i_t-126>=1&&i+126*i_t-126<=510) 
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
@@ -226,18 +216,16 @@ l99991:
          for(i = 0; i <= 127; i += 1)
 l99992:
             for(j = 1; j <= 5; j += 1) {
-               {
-                  int ki, kj;
-                  __scalar__0 = 0.;
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-                  for(ki = 1; ki <= 3; ki += 1)
+               for(ki = 1; ki <= 3; ki += 1)
 l99996:
-                     for(kj = 1; kj <= 3; kj += 1)
-                        
-                        
-                        __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
-                  __scalar__0 = __scalar__0/9;
-               }
+                  for(kj = 1; kj <= 3; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
+               __scalar__0 = __scalar__0/9;
                if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510) 
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
@@ -268,18 +256,16 @@ l99991:
          for(i = 0; i <= 127; i += 1)
 l99992:
             for(j = 1; j <= 5; j += 1) {
-               {
-                  int ki, kj;
-                  __scalar__0 = 0.;
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-                  for(ki = 1; ki <= 3; ki += 1)
+               for(ki = 1; ki <= 3; ki += 1)
 l99996:
-                     for(kj = 1; kj <= 3; kj += 1)
-                        
-                        
-                        __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
-                  __scalar__0 = __scalar__0/9;
-               }
+                  for(kj = 1; kj <= 3; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
+               __scalar__0 = __scalar__0/9;
                L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
                new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
                ;
@@ -301,18 +287,16 @@ l99991:
    for(i = 0; i <= 127; i += 1)
 l99992:
       for(j = 1; j <= 5; j += 1) {
-         {
-            int ki, kj;
-            __scalar__0 = 0.;
+         int ki, kj;
+         __scalar__0 = 0.;
 l99995:
-            for(ki = 1; ki <= 3; ki += 1)
+         for(ki = 1; ki <= 3; ki += 1)
 l99996:
-               for(kj = 1; kj <= 3; kj += 1)
-                  
-                  
-                  __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
-            __scalar__0 = __scalar__0/9;
-         }
+            for(kj = 1; kj <= 3; kj += 1)
+               
+               
+               __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
+         __scalar__0 = __scalar__0/9;
          L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
          new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
       }
@@ -378,18 +362,16 @@ void convol_microcode(int isi, int isj, int i, int i_t, float image[isi][isj], i
    int j;
 l99992:
    for(j = 1; j <= 5; j += 1) {
-      {
-         int ki, kj;
-         __scalar__0 = 0.;
+      int ki, kj;
+      __scalar__0 = 0.;
 l99995:
-         for(ki = 1; ki <= 3; ki += 1)
+      for(ki = 1; ki <= 3; ki += 1)
 l99996:
-            for(kj = 1; kj <= 3; kj += 1)
-               
-               
-               __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
-         __scalar__0 = __scalar__0/9;
-      }
+         for(kj = 1; kj <= 3; kj += 1)
+            
+            
+            __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
+      __scalar__0 = __scalar__0/9;
       L_0 = i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510;
       new_image[i+126*i_t-126][j+5*j_t-5] = L_0?__scalar__0:new_image[i+126*i_t-126][j+5*j_t-5];
    }
