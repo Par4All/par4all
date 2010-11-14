@@ -285,7 +285,9 @@ list declarations_to_transformer_list(list dl, transformer pre)
  * block size n. Assume that each statement returns two transformers:
  * 2**n transformers are returned by this function.
  *
- * More thinking about memory management probably useful
+ * More thinking about memory management probably useful. Also
+ * postconditions are automatically available in the transformers. The
+ * simultaneous computation of postconditions seem redundant.
  */
 static list block_to_transformer_list(list b, transformer pre)
 {
@@ -299,7 +301,9 @@ static list block_to_transformer_list(list b, transformer pre)
   pips_debug(8,"begin\n");
 
   if(ENDP(l)) {
-    btf = transformer_identity();
+    //btf = transformer_identity();
+    // pre must be a range, hence a subset of identity
+    btf = copy_transformer(pre);
     btfl = CONS(TRANSFORMER, btf, NIL);
   }
   else {
@@ -308,7 +312,8 @@ static list block_to_transformer_list(list b, transformer pre)
     list postl = NIL;
     btfl = statement_to_transformer_list(s, pre);
     postl = transformers_safe_apply(btfl, pre);
-    postl = transformers_safe_normalize(postl, 2); // used to be 4
+    postl = transformers_range(postl);
+    postl = transformers_safe_normalize(postl, 2);
     // Useless if no storage occurs; stfl should replace btfl above
     //btfl = gen_full_sequence_copy(stfl);
     pips_assert("One postcondition for each transformer",
@@ -326,25 +331,30 @@ static list block_to_transformer_list(list b, transformer pre)
 	list stfl = statement_to_transformer_list(s, next_pre);
 	FOREACH(TRANSFORMER, stf, stfl) {
 	  post = transformer_safe_apply(stf, next_pre);
-	  post = transformer_safe_normalize(post, 2); // used to be 4
-	  btf = transformer_combine(btf, stf);
-	  btf = transformer_normalize(btf, 2); // used to be 4
+	  post = transformer_safe_normalize(post, 2);
+	  transformer post_r = transformer_range(post);
+	  free_transformer(post);
+	  transformer nbtf = copy_transformer(btf); // preserve outer
+						    // loop variable
+	  nbtf = transformer_combine(nbtf, stf);
+	  nbtf = transformer_normalize(nbtf, 2);
 	  ifdebug(1) {
 	    pips_assert("btf is a consistent transformer",
 			transformer_consistency_p(btf));
-	    pips_assert("post is a consistent transformer if pre is defined",
+	    pips_assert("post_r is a consistent transformer if pre is defined",
 			transformer_undefined_p(pre)
-			|| transformer_consistency_p(post));
+			|| transformer_consistency_p(post_r));
 	  }
-	  if(!transformer_empty_p(btf)) {
-	    nbtfl = gen_nconc(nbtfl, CONS(TRANSFORMER, btf, NIL));
-	    npostl = gen_nconc(npostl, CONS(TRANSFORMER, post, NIL));
+	  if(!transformer_empty_p(nbtf)) {
+	    nbtfl = gen_nconc(nbtfl, CONS(TRANSFORMER, nbtf, NIL));
+	    npostl = gen_nconc(npostl, CONS(TRANSFORMER, post_r, NIL));
 	  }
 	}
 	gen_full_free_list(stfl);
 	POP(precl);
       }
       /* Now, switch from btfl and postl to nbtfl and npostl */
+      // The transformers are updated and moved into the new list nbtfl
       //gen_full_free_list(btfl);
       //gen_full_free_list(postl);
       btfl = nbtfl;
@@ -352,14 +362,17 @@ static list block_to_transformer_list(list b, transformer pre)
     }
     /* Postconditions are discarded */
     gen_full_free_list(postl);
+
+    /* Clean up the transformer list: reduce identity transformers to
+       one if any and move it ahead of the list */
+
+    btfl = clean_up_transformer_list(btfl);
+    btfl = transformers_safe_normalize(btfl, 2);
   }
 
-  /* Clean up the transformer list: reduce identity transformers to
-     one if any and move it ahead of the list */
-
-  btfl = clean_up_transformer_list(btfl);
-
   pips_debug(8, "ends with %zd transformers\n", gen_length(btfl));
+  ifdebug(8)
+    print_transformers(btfl);
   return btfl;
 }
 
@@ -1123,7 +1136,7 @@ list statement_to_transformer_list(statement s,
   //     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
 
   ifdebug(1) {
-    pips_debug(1, "Transformer list has %d elements:\n", gen_length(tl));
+    pips_debug(1, "Transformer list has %zd elements:\n", gen_length(tl));
     print_transformers(tl);
   }
 

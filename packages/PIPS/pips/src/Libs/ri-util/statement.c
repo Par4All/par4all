@@ -2684,12 +2684,23 @@ list statement_to_declarations(statement s)
 
   return statement_to_all_included_declarations;
 }
+
 /* Returns the declarations contained in a list of statement. */
 list statements_to_declarations(list sl)
 {
     list  dl = NIL;
     FOREACH(STATEMENT,st,sl)
         dl=gen_nconc(dl,statement_to_declarations(st));
+    return dl;
+}
+
+/* Returns the declarations contained directly in a list of statement. */
+list statements_to_direct_declarations(list sl)
+{
+    list  dl = NIL;
+    FOREACH(STATEMENT,st,sl)
+      if(declaration_statement_p(st))
+	dl=gen_nconc(dl,gen_copy_seq(statement_declarations(st)));
     return dl;
 }
 
