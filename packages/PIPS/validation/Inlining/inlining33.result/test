@@ -20,24 +20,19 @@ void acuda(int m)
 {
 // (0,1)
    // BEGIN BLOCK
-   {
+   // (0,1)
+   // BEGIN BLOCK
+   // (0,2)
 // (0,2)
-      // BEGIN BLOCK
-      // (0,1)
-      // BEGIN BLOCK
-      // (0,2)
+   int t[m];                                                            /*0011*/
 // (0,3)
-      int t[m];                                                         /*0011*/
+   /*0003*/
+   // (0,3)
+   t[0] = 0;                                                            /*0013*/
 // (0,4)
-      /*0003*/
-      // (0,3)
-      t[0] = 0;                                                         /*0013*/
-// (0,5)
-      /*0004*/
-      // (statement ordering unavailable)
-      ;
-      // END BLOCK
-   }
+   /*0004*/
+   // (statement ordering unavailable)
+   ;
    // END BLOCK
 }
 void bar(int n)

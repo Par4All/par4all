@@ -428,16 +428,16 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
       int a, b, c;
       pl = 0;
 
-      for(rg = RG_WINDOW; rg <= Nrg-RG_WINDOW-1; rg += 1) {
-         for(v = V_WINDOW; v <= 2*Nv-V_WINDOW-1; v += 1) {
-            for(th = TH_WINDOW; th <= Nth-TH_WINDOW-1; th += 1) {
+      for(rg = RG_WINDOW; rg <= Nrg-RG_WINDOW-1; rg += 1)
+         for(v = V_WINDOW; v <= 2*Nv-V_WINDOW-1; v += 1)
+            for(th = TH_WINDOW; th <= Nth-TH_WINDOW-1; th += 1)
                if (TAB_NBHIT[rg][v][th]>0) {
                   int isMax = 1;
                   int nb_hits = TAB_NBHIT[rg][v][th];
                   float pow = TAB_RGVTH[rg][v][th];
                   float add_pow = 0.;
-                  for(a = -RG_WINDOW; a <= RG_WINDOW; a += 1) {
-                     for(b = -V_WINDOW; b <= V_WINDOW; b += 1) {
+                  for(a = -RG_WINDOW; a <= RG_WINDOW; a += 1)
+                     for(b = -V_WINDOW; b <= V_WINDOW; b += 1)
                         for(c = -TH_WINDOW; c <= TH_WINDOW; c += 1) {
                            float pow_a = TAB_RGVTH[rg+a][v+b][th+c];
                            int h = TAB_NBHIT[rg+a][v+b][th+c];
@@ -448,8 +448,6 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
                                  isMax = 0;
                            }
                         }
-                     }
-                  }
                   if (isMax>0&&nb_hits>=.8*Nraf) {
                      NEW_PLOT.re = 10000.*rg+100.*v+1.*th;
                      NEW_PLOT.im = pow+add_pow;
@@ -457,9 +455,6 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
                      pl++;
                   }
                }
-            }
-         }
-      }
 
       while (pl<2*nbplots) {
          NEW_PLOT.re = 0.;

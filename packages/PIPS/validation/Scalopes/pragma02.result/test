@@ -9,10 +9,8 @@ int main()
 }
 void p4a_kernel_launcher_0(int a[100])
 {
-   {
-      int n;
+   int n;
 #pragma   scmp task
-      a[2]++;
-      a[3]++;
-   }
+   a[2]++;
+   a[3]++;
 }

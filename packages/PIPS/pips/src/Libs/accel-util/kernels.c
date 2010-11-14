@@ -54,6 +54,7 @@
 #include "parser_private.h"
 #include "preprocessor.h"
 #include "accel-util.h"
+#include "c_syntax.h"
 
 struct dma_pair {
   entity new_ent;
@@ -127,6 +128,28 @@ static expression entity_to_address(entity e) {
     return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
 }
 
+
+static expression get_sizeofexpression_for_reference(entity variable, list indices) {
+  expression sizeof_exp;
+
+  // Never free'd but unclear when we can/should
+  reference r = make_reference(variable,indices);
+
+  type element_type = make_type_variable(make_variable(basic_of_reference(r),
+                                                       NIL,
+                                                       NIL));
+
+  if(type_struct_variable_p(element_type)) {
+    expression r_exp = reference_to_expression(r);
+    sizeof_exp = MakeSizeofExpression(r_exp);
+    free_type(element_type);
+  } else {
+    sizeof_exp = MakeSizeofType(element_type);
+  }
+  return sizeof_exp;
+}
+
+
 /**
  * converts dimensions to a dma call from a memory @a from to another memory @a to
  *
@@ -197,14 +220,6 @@ call dimensions_to_dma(entity from,
   else
     dest=entity_to_expression(to);
 
-  reference rtmp = make_reference(from,lo);
-  type element_type = make_type_variable(
-          make_variable(
-              copy_basic(basic_of_reference(rtmp)),
-              NIL,NIL)
-          );
-  reference_indices(rtmp)=NIL;
-  free_reference(rtmp);
 
 
   switch(m) {
@@ -213,14 +228,13 @@ call dimensions_to_dma(entity from,
           break;
       case dma_allocate:
           {
-	    /* sizeof(element)*number elements of the array: */
+            expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
+
+            /* sizeof(element)*number elements of the array: */
               expression transfer_size = SizeOfDimensions(ld);
               transfer_size=MakeBinaryCall(
                       entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-                      make_expression(
-                          make_syntax_sizeofexpression(make_sizeofexpression_type(element_type)),
-                          normalized_undefined
-                          ),
+                      sizeof_exp,
                       transfer_size);
 
               args = make_expression_list(dest, transfer_size);
@@ -283,10 +297,10 @@ call dimensions_to_dma(entity from,
 	  /* Insert the array sizes: */
 	  args = gen_append(from_dims, args);
 	  /* Insert the element size expression: */
+	  expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
 	  args = CONS(EXPRESSION,
-		      make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(copy_type(element_type))),
-				      normalized_undefined),
-		      args);
+                sizeof_exp,
+                args);
 	} break;
       default:
           pips_internal_error("should not happen");

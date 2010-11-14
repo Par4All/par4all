@@ -8,14 +8,14 @@ int main()
    float x;
    x = 2.12;
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1)
       for(j = 0; j <= 9; j += 1) {
          // comments 2
          float z = 0.0;
          z = 0.0;
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
-            for(l = 0; l <= 9; l += 1) {
+            for(l = 0; l <= 9; l += 1)
                for(m = 0; m <= 9; m += 1) {
                   //comments 3
                   float y;
@@ -24,10 +24,8 @@ int main()
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
    return 0;
 }
 // OMP style
@@ -39,7 +37,7 @@ int main()
    x = 2.12;
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 9; j += 1) {
          // comments 2
@@ -49,7 +47,7 @@ int main()
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
 #pragma omp parallel for private(m)
-            for(l = 0; l <= 9; l += 1) {
+            for(l = 0; l <= 9; l += 1)
 #pragma omp parallel for 
                for(m = 0; m <= 9; m += 1) {
                   //comments 3
@@ -59,10 +57,8 @@ int main()
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
    return 0;
 }
 
@@ -76,7 +72,7 @@ int main()
    x = 2.12;
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 9; j += 1) {
          // comments 2
@@ -86,7 +82,7 @@ int main()
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
 #pragma omp parallel for private(m)
-            for(l = 0; l <= 9; l += 1) {
+            for(l = 0; l <= 9; l += 1)
 #pragma omp parallel for
                for(m = 0; m <= 9; m += 1) {
                   //comments 3
@@ -96,10 +92,8 @@ int main()
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
    return 0;
 }
 
