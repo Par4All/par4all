@@ -123,23 +123,21 @@ select_fix_point_operator()
     */
 }
 
-static void add_declaration_information(transformer pre, entity m, bool precondition_p)
+void add_declaration_list_information(transformer pre,
+				      list dl,
+				      bool precondition_p)
 {
-  //list decls = code_declarations(value_code(entity_initial(m)));
-  list decls = current_module_declarations();
+  entity m = get_current_module_entity();
+  code c = value_code(entity_initial(m));
+  language l = code_language(c);
 
-  ifdebug(8) {
-      pips_debug(8, "Begin for module %s with precondition\n", module_local_name(m));
-      print_transformer(pre);
-  }
-
-  MAP(ENTITY, v, {
+  FOREACH(ENTITY, v, dl) {
     type t = entity_type(v);
 
     if(type_variable_p(t)) {
       variable tv = type_variable(t);
 
-      MAP(DIMENSION, d, {
+      FOREACH(DIMENSION, d, variable_dimensions(tv)) {
 	normalized nl = NORMALIZE_EXPRESSION(dimension_lower(d));
 	normalized nu = NORMALIZE_EXPRESSION(dimension_upper(d));
 
@@ -151,6 +149,9 @@ static void add_declaration_information(transformer pre, entity m, bool precondi
 	     value_mappings_compatible_vector_p(vu)) {
 	    Pvecteur cv = vect_substract(vl, vu);
 
+	    if(language_c_p(l))
+	      vect_add_elem(&cv, TCST, VALUE_MONE);
+
 	    if(!precondition_p) {
 	      upwards_vect_rename(cv, pre);
 	    }
@@ -160,10 +161,23 @@ static void add_declaration_information(transformer pre, entity m, bool precondi
 	    }
 	  }
 	}
-      }, variable_dimensions(tv));
+      }
 
     }
-  }, decls);
+  }
+}
+
+static void add_declaration_information(transformer pre, entity m, bool precondition_p)
+{
+  //list decls = code_declarations(value_code(entity_initial(m)));
+  list decls = current_module_declarations();
+
+  ifdebug(8) {
+      pips_debug(8, "Begin for module %s with precondition\n", module_local_name(m));
+      print_transformer(pre);
+  }
+
+  add_declaration_list_information(pre, decls, precondition_p);
 
   ifdebug(8) {
       pips_debug(8, "End for module %s with precondition\n", module_local_name(m));
