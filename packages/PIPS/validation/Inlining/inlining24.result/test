@@ -373,13 +373,15 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
+   freia_error _return0, _return1, ret_0, _return0_0;
    //PIPS generated variable
-   int i_0, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
-   freia_error ret_2, _return0_1, ret_3;
+   freia_error ret_1, ret_2, _return0_1;
    //PIPS generated variable
-   int i_1, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_3;
    
    
    
@@ -525,25 +527,31 @@ int main()
 
 //  P(connexity,size) {connexity==8, size==4}
 
-   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
+   freia_error _return0, _return1, ret_0, _return0_0;
    //PIPS generated variable
 
-//  P(_return0,_return0_0,_return1,connexity,ret_0,ret_1,size)
+//  P(_return0,_return0_0,_return1,connexity,ret_0,size)
 //    {connexity==8, size==4}
 
-   int i_0, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
 
-//  P(_return0,_return0_0,_return1,connexity,i_0,ret_0,ret_1,size)
+//  P(_return0,_return0_0,_return1,connexity,i_0,ret_0,size)
 //    {connexity==8, size==4}
 
-   freia_error ret_2, _return0_1, ret_3;
+   freia_error ret_1, ret_2, _return0_1;
    //PIPS generated variable
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
+//    ret_1,ret_2,size) {connexity==8, size==4}
 
-   int i_1, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+
+//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
+//    ret_1,ret_2,size) {connexity==8, size==4}
+
+   freia_error ret_3;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
@@ -876,13 +884,15 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
+   freia_error _return0, _return1, ret_0, _return0_0;
    //PIPS generated variable
-   int i_0, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
-   freia_error ret_2, _return0_1, ret_3;
+   freia_error ret_1, ret_2, _return0_1;
    //PIPS generated variable
-   int i_1, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_3;
    
    
    
@@ -1010,13 +1020,15 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
+   freia_error _return0, _return1, ret_0, _return0_0;
    //PIPS generated variable
-   int i_0, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
-   freia_error ret_2, _return0_1, ret_3;
+   freia_error ret_1, ret_2, _return0_1;
    //PIPS generated variable
-   int i_1, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_3;
    
    
    
@@ -1107,13 +1119,15 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   freia_error _return0, _return1, ret_0, _return0_0, ret_1;
+   freia_error _return0, _return1, ret_0, _return0_0;
    //PIPS generated variable
-   int i_0, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
-   freia_error ret_2, _return0_1, ret_3;
+   freia_error ret_1, ret_2, _return0_1;
    //PIPS generated variable
-   int i_1, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_3;
    
    
    

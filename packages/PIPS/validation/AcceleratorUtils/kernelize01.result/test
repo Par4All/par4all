@@ -54,12 +54,10 @@ kernel:
 }
 void kernel(int a[100], int b[100], int c[100], int i)
 {
-   {
-      //PIPS generated variable
-      int i_1;
-      for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
-         c[i_1] = a[i_1]+b[i_1];
-   }
+   //PIPS generated variable
+   int i_1;
+   for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
+      c[i_1] = a[i_1]+b[i_1];
 }
 int foo(int seed[100])
 {

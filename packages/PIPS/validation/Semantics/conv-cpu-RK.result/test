@@ -22,7 +22,7 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
 //  T(i,j) {0<=i}
 
-   for(i = 0; i <= n-1; i += 1) {
+   for(i = 0; i <= n-1; i += 1)
 
 //  T(j) {0<=i, i+1<=n, 0<=j}
 
@@ -53,7 +53,6 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
-   }
 }
 Check preconditions for "conv_cpu"
 
@@ -71,7 +70,7 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 //               <may be written >: c[*] j
 //               <must be read   >: n
 //               <must be written>: i
-   for(i = 0; i <= n-1; i += 1) {
+   for(i = 0; i <= n-1; i += 1)
 //               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
 //                                  a21 a22 c i j
 //               <may be written >: c[*]
@@ -101,7 +100,6 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 //                                  top
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
-   }
 }
 
 Preconditions for "main"
@@ -182,7 +180,7 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
 //  P(i,j) {n==10000}
 
-   for(i = 0; i <= n-1; i += 1) {
+   for(i = 0; i <= n-1; i += 1)
 
 //  P(i,j) {n==10000, 0<=i, i<=9999}
 
@@ -218,6 +216,5 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
-   }
 }
 Privatize scalar variables on all the modules of the program:

@@ -1,0 +1,6 @@
+delete decl56
+create decl56 decl56.c
+display PARSED_PRINTED_FILE
+close
+#delete decl56
+quit

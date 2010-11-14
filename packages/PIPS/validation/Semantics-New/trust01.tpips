@@ -1,13 +1,14 @@
-delete schrammel05
+delete trust01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create schrammel05 schrammel05.c
+create trust01 trust01.c
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 
 #setenv SEMANTICS_DEBUG_LEVEL "0"
 
@@ -16,9 +17,9 @@ echo TRANSFORMERS
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[main]
+display PRINTED_FILE[trust01]
 
-#quit
+# quit
 
 echo
 echo PRECONDITIONS
@@ -27,10 +28,10 @@ echo
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[main]
+display PRINTED_FILE[trust01]
 
 quit
 
 close
-# delete schrammel05
+# delete trust01
 quit

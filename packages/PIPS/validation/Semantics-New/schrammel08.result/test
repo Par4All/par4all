@@ -1,0 +1,78 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,k) {j==2}
+
+   int i, j = 2, k;
+
+//  T(j) {j#init==2}
+
+
+   while (i*i>1) {
+
+//  T(j) {}
+
+      if (k>=3) 
+
+//  T(j) {j==3, 3<=k}
+
+         j = 3;
+
+//  T(j) {}
+
+      if (k>=4) 
+
+//  T(j) {j==4, 4<=k}
+
+         j = 4;
+   }
+
+//  T(j) {j==j#init}
+
+   j = j;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j = 2, k;
+
+//  P(i,j,k) {j==2}
+
+
+   while (i*i>1) {
+
+//  P(i,j,k) {2<=j, j<=4}
+
+      if (k>=3) 
+
+//  P(i,j,k) {2<=j, j<=4, 3<=k}
+
+         j = 3;
+
+//  P(i,j,k) {2<=j, j<=4}
+
+      if (k>=4) 
+
+//  P(i,j,k) {2<=j, j<=4, 4<=k}
+
+         j = 4;
+   }
+
+//  P(i,j,k) {2<=j, j<=4}
+
+   j = j;
+}

@@ -15,7 +15,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 void conv_cpu(float a[100000LL*100000LL], float c[100000LL*100000LL], float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
    int i, j;
-   for(i = 0; i <= 99999; i += 1) {
+   for(i = 0; i <= 99999; i += 1)
       for(j = 0; j <= 99999; j += 1) {
          int idx = i*100000LL+j;
          if (0<i&&i<100000LL-1&&0<j&&j<100000LL-1)
@@ -37,7 +37,6 @@ void conv_cpu(float a[100000LL*100000LL], float c[100000LL*100000LL], float a00,
          else if (j==100000LL-1&&0<i&&i<100000LL-1)
             c[idx] = a00*a[idx-100000LL-1]+a10*a[idx-1]+a20*a[idx+100000LL-1]+a01*a[idx-100000LL]+a11*a[idx]+a21*a[idx+100000LL];
       }
-   }
 }
 int main(int argc, char *argv[])
 {
@@ -69,7 +68,7 @@ void conv_cpu(float a[100000LL*100000LL], float c[100000LL*100000LL], float a00,
 {
    int i, j;
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 99999; i += 1) {
+   for(i = 0; i <= 99999; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 99999; j += 1) {
          int idx = i*100000LL+j;
@@ -92,7 +91,6 @@ void conv_cpu(float a[100000LL*100000LL], float c[100000LL*100000LL], float a00,
          else if (j==100000LL-1&&0<i&&i<100000LL-1)
             c[idx] = a00*a[idx-100000LL-1]+a10*a[idx-1]+a20*a[idx+100000LL-1]+a01*a[idx-100000LL]+a11*a[idx]+a21*a[idx+100000LL];
       }
-   }
 }
 int main(int argc, char *argv[])
 {

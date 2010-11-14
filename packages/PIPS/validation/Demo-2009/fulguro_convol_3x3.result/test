@@ -143,32 +143,30 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
          vctar[k] = 0;
    }
    for(j = w/2+1; j <= w-1; j += 1) {
+      //PIPS generated variable
+      int I_0;
+      I_0 = h/2;
       {
-         //PIPS generated variable
-         int I_0;
-         I_0 = h/2;
+         fgUINT16 *array_s;
+         fgUINT16 *array_d;
+         array_s = (fgUINT16 *) vec->array;
+         array_d = (fgUINT16 *) (nhb->array)[I_0];
          {
-            fgUINT16 *array_s;
-            fgUINT16 *array_d;
-            array_s = (fgUINT16 *) vec->array;
-            array_d = (fgUINT16 *) (nhb->array)[I_0];
+            //PIPS generated variable
+            int I_0_;
+            I_0_ = vec->spp;
             {
+               register fgUINT16 val;
+               register int i, k;
                //PIPS generated variable
-               int I_0_;
-               I_0_ = vec->spp;
-               {
-                  register fgUINT16 val;
-                  register int i, k;
-                  //PIPS generated variable
-                  fgUINT16 _return0;
-                  i = j*I_0_;
+               fgUINT16 _return0;
+               i = j*I_0_;
 
-                  for(k = 0; k <= I_0_-1; k += 1) {
-                     _return0 = array_s[k];
-                     val = _return0;
-                     array_d[i] = val;
-                     i++;
-                  }
+               for(k = 0; k <= I_0_-1; k += 1) {
+                  _return0 = array_s[k];
+                  val = _return0;
+                  array_d[i] = val;
+                  i++;
                }
             }
          }
@@ -176,63 +174,59 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    }
    for(i = h/2+1; i <= h-1; i += 1)
       for(j = 0; j <= w-1; j += 1) {
+         fgUINT16 *array_s;
+         fgUINT16 *array_d;
+         array_s = (fgUINT16 *) vec->array;
+         array_d = (fgUINT16 *) (nhb->array)[i];
          {
-            fgUINT16 *array_s;
-            fgUINT16 *array_d;
-            array_s = (fgUINT16 *) vec->array;
-            array_d = (fgUINT16 *) (nhb->array)[i];
+            //PIPS generated variable
+            int I_0;
+            I_0 = vec->spp;
             {
+               register fgUINT16 val;
+               register int i_, k;
                //PIPS generated variable
-               int I_0;
-               I_0 = vec->spp;
-               {
-                  register fgUINT16 val;
-                  register int i_, k;
-                  //PIPS generated variable
-                  fgUINT16 _return0;
-                  i_ = j*I_0;
+               fgUINT16 _return0;
+               i_ = j*I_0;
 
-                  for(k = 0; k <= I_0-1; k += 1) {
-                     _return0 = array_s[k];
-                     val = _return0;
-                     array_d[i_] = val;
-                     i_++;
-                  }
+               for(k = 0; k <= I_0-1; k += 1) {
+                  _return0 = array_s[k];
+                  val = _return0;
+                  array_d[i_] = val;
+                  i_++;
                }
             }
          }
       }
-   {
-      if (vec==(void *) 0) {
-         
-         
-         fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null object\n", "./fulguro-included.h", 1060, __FUNCTION__);
-         _return0 = FLGR_RET_NULL_OBJECT;
-      }
-      else if (vec->array==(void *) 0) {
+   if (vec==(void *) 0) {
+      
+      
+      fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null object\n", "./fulguro-included.h", 1060, __FUNCTION__);
+      _return0 = FLGR_RET_NULL_OBJECT;
+   }
+   else if (vec->array==(void *) 0) {
 
-         fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Vector array is null\n", "./fulguro-included.h", 1065, __FUNCTION__);
-         _return0 = FLGR_RET_NULL_OBJECT;
+      fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Vector array is null\n", "./fulguro-included.h", 1065, __FUNCTION__);
+      _return0 = FLGR_RET_NULL_OBJECT;
+   }
+   else {
+      {
+         //PIPS generated variable
+         void *P_4;
+         P_4 = vec->array;
+         
+         
+         free(P_4);
       }
-      else {
-         {
-            //PIPS generated variable
-            void *P_4;
-            P_4 = vec->array;
-            
-            
-            free(P_4);
-         }
-         
-         
-         
-         
-         free(vec);
-         
-         
-         
-         _return0 = FLGR_RET_OK;
-      }
+      
+      
+      
+      
+      free(vec);
+      
+      
+      
+      _return0 = FLGR_RET_OK;
    }
    _return0;
    return;
