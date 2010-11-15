@@ -1,6 +1,6 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete convol2
-create convol2 convol.c include/par4all.c
+create convol2 convol.c include/terapix_runtime.c
 
 echo
 echo Inital code

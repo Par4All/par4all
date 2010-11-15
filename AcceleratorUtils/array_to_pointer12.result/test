@@ -28,7 +28,7 @@ int main()
    
    int fifi[6] = {10, 11, 12, 13, 14, 15};
    int size = 2;
-   int loulou[-1+6*size+1];
+   int loulou[6*size];
    int i, j, k = 16;
    for(i = 0; i <= size-1; i += 1)
       for(j = 0; j <= 5; j += 1)

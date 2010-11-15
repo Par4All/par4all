@@ -58,9 +58,11 @@ module.smart_loop_expansion=smart_loop_expansion
 
 
 if __name__ == "__main__":
-	with workspace(["alphablending2.c", "include/par4all.c", "include/terasm.c"], cppflags="-I.") as w:
+	with workspace(["alphablending2.c", "include/terapix_runtime.c", "include/terasm.c"], cppflags="-I.") as w:
 		m = w["alphablending"]
 		w.activate(module.must_regions)
+		w.activate(module.region_chains)
+		w.activate(module.rice_regions_dependence_graph)
 		w.activate(module.transformers_inter_full)
 		w.props.ARRAY_PRIV_FALSE_DEP_ONLY=False
 		w.props.CONSTANT_PATH_EFFECTS=False

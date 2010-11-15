@@ -327,8 +327,8 @@ l99995:
          caillou[1] = 4;
          caillou[2] = 40;
          caillou[3] = 60;
-         caillou[4] = -1+i_t;
-         caillou[5] = -1+j_t;
+         caillou[4] = i_t-1;
+         caillou[5] = j_t-1;
 
          {
             //PIPS generated variable
@@ -342,15 +342,15 @@ l99995:
             P4A_accel_malloc((void **) &src10, sizeof(short)*1024);
             P4A_accel_malloc((void **) &src00, sizeof(short)*1024);
             P4A_copy_to_accel_1d(sizeof(int), 5-caillou[0]+1, 4, 0, &caillou[0], *caillou0);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &src1[0][0], *src10);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &src0[0][0], *src00);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &src1[0][0], *src10);
+            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &src0[0][0], *src00);
 
 l99996:
             for(i = 1; i <= 128; i += 1)
 l99997:
                for(j = 1; j <= 8; j += 1)
-                  (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(-1+i_t), 8*(-1+j_t), &result[0][0], *result0);
+                  (*result0)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)] = ((*caillou0)[2-0]*(*src00)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)]+(*caillou0)[3-0]*(*src10)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &result[0][0], *result0);
             P4A_accel_free(result0);
             P4A_accel_free(caillou0);
             P4A_accel_free(src10);
@@ -395,7 +395,7 @@ l99996:
             for(i = 1; i <= 128; i += 1)
 l99997:
                for(j = 1; j <= 8; j += 1)
-                  (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+                  (*result0)[i-1][j-1] = ((*caillou0)[2]*(*src00)[i-1][j-1]+(*caillou0)[3]*(*src10)[i-1][j-1])*((*caillou0)[0]<<(*caillou0)[1])>>(*caillou0)[1];
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
             P4A_accel_free(result0);
             P4A_accel_free(caillou0);
@@ -569,7 +569,7 @@ l99997:
 //    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
 //  <src10-R-EXACT-{}>
 
-                  (*result0)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)] = ((*caillou0)[2-0]*(*src00)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)]+(*caillou0)[3-0]*(*src10)[-1+i+128*(-1+i_t)-128*(-1+i_t)][-1+j+8*(-1+j_t)-8*(-1+j_t)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
+                  (*result0)[i-1][j-1] = ((*caillou0)[2]*(*src00)[i-1][j-1]+(*caillou0)[3]*(*src10)[i-1][j-1])*((*caillou0)[0]<<(*caillou0)[1])>>(*caillou0)[1];
 
 //  <result0[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
 //    i_t<=4, 1<=j_t, j_t<=64}>
@@ -638,7 +638,7 @@ l99995:
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
-l99996:            launcher_0(8, *caillou0, i_t, j_t, *result0, *src00, *src10);
+l99996:            launcher_0(8, *caillou0, *result0, *src00, *src10);
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
             P4A_accel_free(result0);
             P4A_accel_free(caillou0);
@@ -648,64 +648,61 @@ l99996:            launcher_0(8, *caillou0, i_t, j_t, *result0, *src00, *src10);
       }
 }
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i_t, i_t<=4,
-//    1<=j_t, j_t<=64}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8}>
 //  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    PHI2<=7, I_0==8}>
 //  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    I_0==8}>
 //  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    I_0==8}>
 
-void launcher_0(int I_0, int caillou0[4], unsigned int i_t, unsigned int j_t, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0(int I_0, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i_t, i_t<=4,
-//    1<=j_t, j_t<=64}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8}>
 //  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=7, I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    PHI2<=7, I_0==8}>
 //  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    I_0==8}>
 //  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    I_0==8}>
 
 l99996:
    for(i = 1; i <= 128; i += 1)
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i, i<=128,
-//    1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i, i<=128}>
 //  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    1<=i, i<=128}>
 //  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    1<=i, i<=128}>
 //  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==8,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    1<=i, i<=128}>
 
 l99997:
       for(j = 1; j <= I_0; j += 1)
 
 //  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==8, 1<=i, i<=128,
-//    1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    1<=j, j<=8}>
 //  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
-//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    i<=128, 1<=j, j<=8}>
 //  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
-//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    i<=128, 1<=j, j<=8}>
 //  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==8, 1<=i,
-//    i<=128, 1<=j, j<=8, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//    i<=128, 1<=j, j<=8}>
 
-         result0[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)] = (caillou0[2-0]*src00[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)]+caillou0[3-0]*src10[-1+i+128*((-1)+i_t)-128*((-1)+i_t)][-1+j+8*((-1)+j_t)-8*((-1)+j_t)])*(caillou0[0-0]<<caillou0[1-0])>>caillou0[1-0];
+         result0[i-1][j-1] = (caillou0[2]*src00[i-1][j-1]+caillou0[3]*src10[i-1][j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
 }
 outlining to microcode
 label: l99997
-void launcher_0(int I_0, int caillou0[4], unsigned int i_t, unsigned int j_t, short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0(int I_0, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
 {
    //PIPS generated variable
    unsigned int i, j;
 l99996:
    for(i = 1; i <= 128; i += 1)
-l99997:      launcher_0_microcode(caillou0, *&result0[-1+i], *&src00[-1+i], *&src10[-1+i]);
+l99997:      launcher_0_microcode(caillou0, *&result0[i-1], *&src00[i-1], *&src10[i-1]);
 }
 void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
 {
@@ -770,7 +767,7 @@ l99997:   ;
    re2 = 1;
    while (re2<=N0) {
       *(ma1+re2+1-1) = (*(ma0+2)**(ma2+re2+1-1)+*(ma0+3)**(ma3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
-      re2 = 1+re2;
+      re2 = re2+1;
    }
 }
 void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
@@ -844,7 +841,7 @@ l99997:   ;
       I_11 = I_10-1;
       P_7 = ma1+I_11;
       *P_7 = I_9>>*P_6;
-      re2 = 1+re2;
+      re2 = re2+1;
    }
 }
 void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
@@ -938,8 +935,7 @@ l99997:   ;
       P_7 = P_7+I_11;
       *P_7 = I_9;
       *P_7 = *P_7>>*P_6;
-      re2 = 1;
-      re2 = re2+re2;
+      re2 = re2+1;
    }
 }
 void launcher_0_microcode(int *FIFO0, short *FIFO1, short *FIFO2, short *FIFO3)
@@ -1025,7 +1021,6 @@ l99997:   ;
       seti(P_7, P_7+I_11);
       seti(*P_7, I_9);
       seti(*P_7, *P_7>>*P_6);
-      seti(re2, 1);
-      addi(re2, re2);
+      addi(re2, 1);
    }
 }

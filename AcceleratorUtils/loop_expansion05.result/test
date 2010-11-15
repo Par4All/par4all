@@ -31,8 +31,11 @@ here:
 int main(int argc, char *argv[])
 {
    int i, a[16];
+   //PIPS generated variable
+   int I_0;
+   I_0 = 1;
 here:
-   for(i = 0; i <= 15; i += 1)
+   for(i = 0; i <= 16*I_0-1; i += 1)
       a[i] = 0;
 
    return 0;

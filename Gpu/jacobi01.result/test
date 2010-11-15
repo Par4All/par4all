@@ -184,7 +184,7 @@ void get_data(char filename[])
 
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= -1+ny; j += 1)
+   for(j = 0; j <= ny-1; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -194,7 +194,7 @@ void get_data(char filename[])
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 
-      for(i = 0; i <= -1+nx; i += 1) {
+      for(i = 0; i <= nx-1; i += 1) {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -499,8 +499,8 @@ void get_data(char filename[])
          space[i][j] = 0;                                               /*0049*/
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= -1+ny; j += 1)
-      for(i = 0; i <= -1+nx; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
@@ -614,8 +614,8 @@ void get_data(char filename[])
    p4a_kernel_launcher_0(space);
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= -1+ny; j += 1)
-      for(i = 0; i <= -1+nx; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/

@@ -3,9 +3,9 @@ void outline14(int W, int H, int R, float Dst[W][H], float Src[W][H], float Kern
    int y, x, k;
    float sum = 0;
 #pragma omp parallel for private(x)
-   for(y = 0; y <= -1+H; y += 1)
+   for(y = 0; y <= H-1; y += 1)
 #pragma omp parallel for private(k,sum)
-      for(x = 0; x <= -1+W; x += 1) {
+      for(x = 0; x <= W-1; x += 1) {
          sum = 0;
 here:
          for(k = 0; k <= 2*R; k += 1) {
@@ -32,9 +32,9 @@ void outline14(int W, int H, int R, float Dst[W][H], float Src[W][H], float Kern
    int y, x, k;
    float sum = 0;
 #pragma omp parallel for private(x)
-   for(y = 0; y <= -1+H; y += 1)
+   for(y = 0; y <= H-1; y += 1)
 #pragma omp parallel for private(k,sum)
-      for(x = 0; x <= -1+W; x += 1) {
+      for(x = 0; x <= W-1; x += 1) {
          sum = 0;
 here:         kernel(H, R, W, &sum, x, y, Kernel, Src);
          Dst[y][x] = sum;

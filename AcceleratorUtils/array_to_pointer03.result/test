@@ -9,7 +9,7 @@ int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 
 Code after array conversion
 
-int duck(int riri[10], int fifi[6], int size, int loulou[-1+6*size+1])
+int duck(int riri[10], int fifi[6], int size, int loulou[6*size])
 {
    int *zaza = &fifi[3];
    return riri[2] = zaza[1]+loulou[9];
@@ -33,7 +33,7 @@ int main()
 
 Code after partial eval
 
-int duck(int riri[10], int fifi[6], int size, int loulou[-1+6*size+1])
+int duck(int riri[10], int fifi[6], int size, int loulou[6*size])
 {
    int *zaza = &fifi[3];
    return riri[2] = zaza[1]+loulou[9];
