@@ -1575,110 +1575,17 @@ expression make_contrainte_expression(Pcontrainte pc, Variable index) {
 /* AP, sep 25th 95 : some usefull functions moved from
    static_controlize/utils.c */
 
-/*=================================================================*/
-/* expression Pvecteur_to_expression(Pvecteur vect): returns an
- * expression equivalent to "vect".
- *
- * A Pvecteur is a list of variables, each with an associated value.
- * Only one term of the list may have an undefined variables, it is the
- * constant term of the vector :
- *     (var1,val1) , (var2,val2) , (var3,val3) , ...
- *
- * An equivalent expression is the addition of all the variables, each
- * multiplied by its associated value :
- *     (...((val1*var1 + val2*var2) + val3*var3) +...)
- *
- * Two special cases are treated in order to get a more simple expression :
- *       _ if the sign of the value associated to the variable is
- *         negative, the addition is replaced by a substraction and we
- *         change the sign of the value (e.g. 2*Y + (-3)*X == 2*Y - 3*X).
- *         This optimization is of course not done for the first variable.
- *       _ the values equal to one are eliminated (e.g. 1*X == X).
- *
- * Note (IMPORTANT): if the vector is equal to zero, then it returns an
- * "expression_undefined", not an expression equal to zero.
- *
- */
 /* rather use make_vecteur_expression which was already there */
 expression Pvecteur_to_expression(Pvecteur vect)
 {
-  Pvecteur Vs;
-  expression aux_exp, new_exp;
-  entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
-
-  new_exp = expression_undefined;
-  Vs = vect;
-
-  debug( 7, "Pvecteur_to_expression", "doing\n");
-  if(!VECTEUR_NUL_P(Vs))
-    {
-      entity var = (entity) Vs->var;
-      int val = VALUE_TO_INT(Vs->val);
-
-      /* We get the entities corresponding to the three operations +, - and *. */
-      plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							 PLUS_OPERATOR_NAME),
-				    entity_domain);
-      minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							  MINUS_OPERATOR_NAME),
-				     entity_domain);
-      mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							 MULTIPLY_OPERATOR_NAME),
-				    entity_domain);
-      unary_minus_ent =
-	gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						UNARY_MINUS_OPERATOR_NAME),
-			   entity_domain);
-
-      /* Computation of the first variable of the vector. */
-      if(term_cst(Vs))
-	/* Special case of the constant term. */
-	new_exp = make_integer_constant_expression(val);
-      else if( (val != 1) && (val != -1) )
-	new_exp = MakeBinaryCall(mult_ent,
-				 make_integer_constant_expression(val),
-				 make_entity_expression(var, NIL));
-      else if (val == 1)
-	/* We eliminate this value equal to one. */
-	new_exp = make_entity_expression(var, NIL);
-      else /* val == -1 */
-	new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
-
-      /* Computation of the rest of the vector. */
-      for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
-	{
-	  var = (entity) Vs->var;
-	  val = VALUE_TO_INT(Vs->val);
-
-	  if (val < 0)
-	    {
-	      op_ent = minus_ent;
-	      val = -val;
-	    }
-	  else
-	    op_ent = plus_ent;
-
-	  if(term_cst(Vs))
-	    /* Special case of the constant term. */
-	    aux_exp = make_integer_constant_expression(val);
-	  else if(val != 1)
-	    aux_exp = MakeBinaryCall(mult_ent,
-				     make_integer_constant_expression(val),
-				     make_entity_expression(var, NIL));
-	  else
-	    /* We eliminate this value equal to one. */
-	    aux_exp = make_entity_expression(var, NIL);
-
-	  new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
-	}
-    }
-  return(new_exp);
+    return make_vecteur_expression(vect);
 }
 
 
 /* Short cut, meaningful only if expression_reference_p(e) holds. */
 reference expression_reference(expression e)
 {
+    pips_assert("e is a reference\n",expression_reference_p(e));
     return syntax_reference(expression_syntax(e));
 }
 
@@ -3048,6 +2955,13 @@ void update_expression_syntax(expression e, syntax s)
     expression_syntax(e)=s;
 }
 
+expression syntax_to_expression(syntax s) {
+  return make_expression(
+      s,
+      normalized_undefined
+      );
+}
+
 /**
  * very simple conversion from string to expression
  * only handles entities and numeric values at the time being
@@ -3080,11 +2994,7 @@ entity string_to_entity(const char * s,entity module)
     /* try at top level */
     if(entity_undefined_p(candidate))
         candidate=FindEntity(TOP_LEVEL_MODULE_NAME,s);
-    /* filter out results */
-    if(!entity_undefined_p(candidate) && !entity_variable_p(candidate))
-        return entity_undefined;
-    else
-        return candidate;
+    return candidate;
 }
 
 /* try to parse @p s in the context of module @p module
@@ -3121,6 +3031,41 @@ expression string_to_expression(const char * s,entity module)
     }
     else
         return entity_to_expression(e);
+}
+/* split a string using @p seed as separator
+ * and call string_to_expression on each chunk */
+list string_to_expressions(const char * str, const char * seed, entity module) {
+    list strings = strsplit(str,seed);
+    list expressions = NIL;
+    FOREACH(STRING,s,strings) {
+        expression expr = string_to_expression(s,module);
+        if(!expression_undefined_p(expr)) {
+            expressions = CONS(EXPRESSION,
+                    expr,
+                    expressions);
+        }
+    }
+    gen_map(free,strings);
+    gen_free_list(strings);
+    return gen_nreverse(expressions);
+}
+/* split a string using @p seed as separator
+ * and call string_to_expression on each chunk */
+list string_to_entities(const char * str, const char * seed, entity module) {
+    list strings = strsplit(str,seed);
+    list entities = NIL;
+    FOREACH(STRING,s,strings) {
+        entity e = string_to_entity(s,module);
+        if(!entity_undefined_p(e)) {
+            entities = CONS(ENTITY,
+                    e,
+                    entities);
+        }
+    }
+    gen_map(free,strings);
+    gen_free_list(strings);
+    return gen_nreverse(entities);
+
 }
 
 /* converts a monome to an expression */
@@ -3422,3 +3367,4 @@ expression replace_expression_content(expression e1, expression e2)
 
   return e1;
 }
+
