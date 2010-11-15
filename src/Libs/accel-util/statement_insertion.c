@@ -346,6 +346,23 @@ static void do_array_expansion(statement s) {
             gen_full_free_list(variable_dimensions(type_variable(entity_type(e))));
             variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
             gen_free_list(phis);
+            if(formal_parameter_p(e)) {
+                formal f = storage_formal(entity_storage(e));
+                intptr_t i=0,offset = formal_offset(f);
+                FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity())))) {
+                    if(i++ == offset) {
+                        dummy d = parameter_dummy(p);
+                        if(dummy_identifier_p(d))
+                        {
+                            entity di = dummy_identifier(d);
+                            variable v = type_variable(entity_type(di));
+                            gen_full_free_list(variable_dimensions(v));
+                            variable_dimensions(v)=gen_full_copy_list(new_dimensions);
+                        }
+                    }
+                }
+
+            }
         }
     }
     set_free(declarations);

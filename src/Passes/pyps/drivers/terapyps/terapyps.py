@@ -51,6 +51,9 @@ def terapix_code_generation(m):
 	m.run(["sed","-e","3 i     int "+unknown+";"])
 	m.display()
 	tiling_vector=["128",unknown]
+	a_out=w.compile()
+	print "*****************************"
+	os.system("./"+a_out)
 	
 	print "tiling"
 	for l in m.loops():
@@ -81,9 +84,12 @@ def terapix_code_generation(m):
 				m.redundant_load_store_elimination()
 	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 				m.display(activate="PRINT_CODE_REGIONS")
+				m.array_expansion()
 				for k in all_callers(m):
 					k.display(activate="PRINT_CODE_REGIONS")
 					k.array_expansion()
+				a_out=w.compile()
+				os.system("./"+a_out)
 				m.display(activate="PRINT_CODE_REGIONS")
 				kernels+=[l2]
 				m.isolate_statement(label=l2.label)
