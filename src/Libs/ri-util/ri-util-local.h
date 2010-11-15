@@ -1172,6 +1172,7 @@
 #define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
 #define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
 #define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)
+#define ENTITY_C_MIN_P(e) entity_an_operator_p(e,PIPS_C_MIN)
 #define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
 #define ENTITY_MIN0_P(e) entity_an_operator_p(e, MIN0)
 #define ENTITY_MAX0_P(e) entity_an_operator_p(e, MAX0)

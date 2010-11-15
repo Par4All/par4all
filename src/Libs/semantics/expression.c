@@ -1680,6 +1680,11 @@ integer_call_expression_to_transformer(
   if(ENTITY_MIN0_P(f) || ENTITY_MIN_P(f)) {
     tf = min0_to_transformer(e, args, pre, is_internal);
   }
+  else if(ENTITY_C_MIN_P(f)) {
+    args=CDR(args);
+    --arity;
+    tf = min0_to_transformer(e,args,pre,is_internal);
+  }
   else if(ENTITY_MAX0_P(f) || ENTITY_MAX_P(f)) {
     tf = max0_to_transformer(e, args, pre, is_internal);
   }
@@ -2177,6 +2182,11 @@ float_call_expression_to_transformer(
   int arity = gen_length(args);
 
   if(ENTITY_AMIN1_P(op)||ENTITY_DMIN1_P(op)||ENTITY_MIN_P(op)) {
+    tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
+  }
+  if(ENTITY_C_MIN_P(op)) {
+    args=CDR(args);
+    --arity;
     tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
   }
   else if(ENTITY_AMAX1_P(op)||ENTITY_DMAX1_P(op)||ENTITY_MAX_P(op)) {

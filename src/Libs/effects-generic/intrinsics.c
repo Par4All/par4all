@@ -387,6 +387,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {DMIN1_OPERATOR_NAME,                    no_write_effects},
   {AMIN0_OPERATOR_NAME,                    no_write_effects},
   {MIN1_OPERATOR_NAME,                     no_write_effects},
+  {PIPS_C_MIN_OPERATOR_NAME,               no_write_effects},
   {LENGTH_OPERATOR_NAME,                   no_write_effects},
   {INDEX_OPERATOR_NAME,                    no_write_effects},
   {AIMAG_CONVERSION_NAME,                  no_write_effects},
