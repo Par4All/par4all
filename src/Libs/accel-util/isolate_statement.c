@@ -78,7 +78,7 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         {
             if(!ENDP(offsets)) {
                 expression offset = EXPRESSION(CAR(offsets));
-                if(!entity_field_p(reference_variable(expression_reference(offset)))){
+                if(!expression_reference_p(offset) || !entity_field_p(reference_variable(expression_reference(offset)))){
                     update_expression_syntax(index,
                             make_syntax_call(
                                 make_call(
@@ -169,35 +169,54 @@ static void bounds_of_expression(expression e, transformer tr,bool is_max)
         free_expression(new);
     }
 }
-static void upperbound_of_expression(expression e, transformer tr)
+void upperbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,true);
 }
-static void lowerbound_of_expression(expression e, transformer tr)
+void lowerbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,false);
 }
 
+
 void simplify_minmax_expression(expression e,transformer tr)
 {
-    call c =expression_call(e);
-    bool is_max = ENTITY_MAX_P(call_function(c));
+    if(expression_minmax_p(e)) {
+        call c =expression_call(e);
+        bool is_max = ENTITY_MAX_P(call_function(c));
 
-    expression lhs = binary_call_lhs(c);
-    expression rhs = binary_call_rhs(c);
-    intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound;
-    if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
-            precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
-    {
-        if(is_max)
-        {
-            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
-            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        expression diff = make_op_exp(
+                MINUS_OPERATOR_NAME,
+                copy_expression(lhs),
+                copy_expression(rhs)
+                );
+        intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound,diff_lbound,diff_ubound;
+        if(precondition_minmax_of_expression(diff,tr,&diff_lbound,&diff_ubound) &&
+            (diff_lbound>=0 || diff_ubound<=0)) {
+            if(is_max) {
+                if(diff_lbound>=0) local_assign_expression(e,lhs);
+                else local_assign_expression(e,rhs);
+            }
+            else {
+                if(diff_lbound>=0) local_assign_expression(e,rhs);
+                else local_assign_expression(e,lhs);
+            }
         }
-        else
+        else if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
+                precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
         {
-            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
-            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
+            if(is_max)
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
+            }
+            else
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
+            }
         }
     }
 }
@@ -242,10 +261,8 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
 
                     expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
                     expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                    if(expression_minmax_p(elower))
-                        simplify_minmax_expression(elower,tr);
-                    if(expression_minmax_p(eupper))
-                        simplify_minmax_expression(eupper,tr);
+                    simplify_minmax_expression(elower,tr);
+                    simplify_minmax_expression(eupper,tr);
                     expression offset = copy_expression(elower);
 
                     bool compute_upperbound_p = 
@@ -388,7 +405,10 @@ isolate_statement(const char* module_name)
 
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
-    do_isolate_statement(statement_to_isolate);
+    if(!statement_undefined_p(statement_to_isolate))
+        do_isolate_statement(statement_to_isolate);
+    else 
+        pips_user_error("statement labeled '%s' not found\n",stmt_label);
 
 
 
