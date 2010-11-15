@@ -87,14 +87,11 @@ char* region_enumerate(region reg)
             base_names);
     if(er) {
         char ** ps = Pehrhart_string(er,base_names);
-        expression fake_expression = region_reference_to_expression(region_any_reference(reg));
-        type fake_type = expression_to_type(fake_expression);
-        /* use first ... */
-        asprintf(&volume_used,"%d * ( %s )",
-                type_memory_size(fake_type),ps[0]);
-        free_expression(fake_expression);
-        free_type(fake_type);
-        for(char ** iter = ps; *iter; iter++) free(*iter);
+        /* use the smallest ... */
+        volume_used = *ps;
+        for(char **iter=ps +1;*iter ; ++iter)
+            if(strlen(volume_used) > strlen(*iter)) volume_used=*iter;
+        for(char ** iter = ps; *iter; iter++) if(*iter!=volume_used) free(*iter);
         free(ps);
     }
     return volume_used;
@@ -102,6 +99,7 @@ char* region_enumerate(region reg)
 
 #define SCILAB_PSOLVE "psolve"
 
+#if 0
 static bool statement_parent_walker(statement s, statement *param)
 {
     if(s == param[0]) {
@@ -116,6 +114,7 @@ static statement statement_parent(statement root, statement s)
     gen_context_recurse(root,args,statement_domain,statement_parent_walker,gen_null);
     return args[1] == NULL || statement_undefined_p(args[1]) ? s : args[1];
 }
+#endif
 
 /* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
 static bool do_solve_hardware_constraints(statement s)
@@ -176,11 +175,11 @@ static bool do_solve_hardware_constraints(statement s)
     /* call an external solver */
     char *scilab_cmd;
     asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s' '%s'",full_poly,entity_user_name(e));
-    /* must put the pragma on anew statement, because the pragma will be changed into a statement later */
+    /* must put the pragma on a new statement, because the pragma will be changed into a statement later */
     statement holder = make_continue_statement(entity_empty_label());
     add_pragma_str_to_statement(holder,scilab_cmd,false);
-    statement parent = statement_parent(get_current_module_statement(),s);
-    insert_statement(parent,holder,true);
+    //statement parent = statement_parent(get_current_module_statement(),s);
+    insert_statement(get_current_module_statement(),holder,true);
 
     set_free(visited_entities);
     gen_free_list(read_regions);
