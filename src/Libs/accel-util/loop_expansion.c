@@ -152,7 +152,7 @@ void guard_expanded_statement_if_needed(statement s,expression guard, loop paren
 }
 
 static
-void do_loop_expansion(statement st, expression size,int offset,bool apply_guard)
+void do_loop_expansion(statement st, expression size,bool center,bool apply_guard)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -184,8 +184,22 @@ void do_loop_expansion(statement st, expression size,int offset,bool apply_guard
                     copy_expression(size),
                     entity_to_expression(efactor)
                     );
-        expression new_range_lower_value=
-            make_op_exp(MINUS_OPERATOR_NAME,copy_expression(range_lower(r)),int_to_expression(offset));
+        expression new_range_lower_value=expression_undefined;
+        if(center)
+          new_range_lower_value=make_op_exp(PLUS_OPERATOR_NAME,
+              copy_expression(range_lower(r)),
+              make_op_exp(
+                DIVIDE_OPERATOR_NAME,
+                make_op_exp(
+                  MINUS_OPERATOR_NAME,
+                  copy_expression(expanded_nb_iter),
+                  copy_expression(nb_iter)
+                  ),
+                int_to_expression(2)
+                )
+              );
+        else
+          new_range_lower_value=copy_expression(range_lower(r));
         /* we must check for loop_index() in range_lower*/
         set ents = get_referenced_entities(new_range_lower_value);
         entity new_range_lower_value_entity = entity_undefined;
@@ -289,7 +303,7 @@ bool loop_expansion(const string module_name)
                 string srate = get_string_property("LOOP_EXPANSION_SIZE");
                 expression rate = string_to_expression(srate,get_current_module_entity());
                 /* ok for the ui part, let's do something !*/
-                do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"),apply_guard);
+                do_loop_expansion(loop_statement,rate,get_bool_property("LOOP_EXPANSION_CENTER"),apply_guard);
                 /* commit changes */
                 module_reorder(get_current_module_statement()); ///< we may have add statements
                 DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
@@ -314,7 +328,7 @@ bool loop_expansion(const string module_name)
 /* creates a new statement that perfom the expansion of the loop
  * this statement is flagged for further processing */
 static
-void do_loop_expansion_init(statement st, expression size,int offset)
+void do_loop_expansion_init(statement st, expression size)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -404,7 +418,7 @@ bool loop_expansion_init(const char* module_name)
                 string srate = get_string_property("LOOP_EXPANSION_SIZE");
                 expression rate =string_to_expression(srate,get_current_module_entity());
                 /* ok for the ui part, let's do something !*/
-                do_loop_expansion_init(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
+                do_loop_expansion_init(loop_statement,rate);
                 /* commit changes */
                 module_reorder(get_current_module_statement()); ///< we may have add statements
                 DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
