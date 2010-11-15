@@ -345,7 +345,7 @@ void P4A_accel_free(void *address) {
 void P4A_copy_from_accel(size_t element_size,
     void *host_address,
     void *accel_address) {
-  cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
+  cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -368,7 +368,7 @@ void P4A_copy_from_accel(size_t element_size,
 void P4A_copy_to_accel(size_t element_size,
     void *host_address,
     void *accel_address) {
-  cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
+  cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
 }
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
