@@ -43,6 +43,7 @@
 #include "properties.h"
 #include "misc.h"
 #include "control.h"
+#include "conversion.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -115,10 +116,113 @@ static statement statement_parent(statement root, statement s)
     return args[1] == NULL || statement_undefined_p(args[1]) ? s : args[1];
 }
 #endif
+static bool do_solve_hardware_constraints_on_nb_proc(entity e, statement s) {
+    list regions = load_cumulated_rw_effects_list(s);
 
-/* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
-static bool do_solve_hardware_constraints(statement s)
-{
+    list read_regions = regions_read_regions(regions);
+    list write_regions = regions_write_regions(regions);
+    transformer tr = transformer_range(load_statement_precondition(s));
+
+    set visited_entities = set_make(set_pointer);
+
+    expression max_dim = expression_undefined;
+    FOREACH(REGION,reg,regions)
+    {
+        reference r = region_any_reference(reg);
+        entity e = reference_variable(r);
+        /* check we have not already dealt with this variable */
+        if(!set_belong_p(visited_entities,e))
+        {
+            set_add_element(visited_entities,visited_entities,e);
+            if(entity_array_p(e)) {
+                /* get the associated read and write regions */
+                region read_region = find_region_on_entity(e,read_regions);
+                region write_region = find_region_on_entity(e,write_regions);
+                /* compute their convex hull */
+                region rw_region = 
+                    region_undefined_p(read_region)?write_region:
+                    region_undefined_p(write_region)?read_region:
+                    regions_must_convex_hull(read_region,write_region);
+
+                region hregion = rw_region;//region_hypercube(rw_region);
+                entity phi = expression_to_entity(EXPRESSION(CAR(reference_indices(r))));
+                list ephis = expressions_to_entities(reference_indices(r));
+                Pbase phis = list_to_base(ephis);
+                gen_free_list(ephis);
+                Psysteme hsc = sc_rectangular_hull(region_system(hregion),phis);
+                base_rm(phis);
+
+                Pcontrainte lower,upper;
+                constraints_for_bounds(phi,&sc_inegalites(hsc),&lower,&upper);
+                if(!CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
+                {
+                    expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    simplify_minmax_expression(elower,tr);
+                    expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    simplify_minmax_expression(eupper,tr);
+                    expression dist = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
+                    dist=make_op_exp(PLUS_OPERATOR_NAME,dist,int_to_expression(1));
+
+                    if(expression_undefined_p(max_dim))
+                        max_dim = dist;
+                    else {
+                        max_dim = MakeBinaryCall(
+                                entity_intrinsic(MAX_OPERATOR_NAME),
+                                max_dim,
+                                dist
+                                );
+                        simplify_minmax_expression(max_dim,tr);
+                    }
+
+                }
+                else
+                    pips_user_error("failed to gather enough information for entity %s\n",entity_user_name(e));
+            }
+        }
+    }
+    int max_volume= get_int_property("SOLVE_HARDWARE_CONSTRAINTS_LIMIT");
+    if(max_volume<=0) pips_user_error("constraint limit must be greater than 0\n");
+    /* solve the equation if it is linear */
+    NORMALIZE_EXPRESSION(max_dim);
+    normalized n = expression_normalized(max_dim);
+    expression soluce = expression_undefined;
+    if(normalized_linear_p(n)) {
+        Pvecteur pv = VECTEUR_NUL;
+        Value coeff = VALUE_ZERO;
+        for(Pvecteur v = normalized_linear(n);!VECTEUR_NUL_P(v); v=vecteur_succ(v)) {
+            if(vecteur_var(v) == e ) {
+                coeff = vecteur_val(v);
+            }
+            else {
+                pv = vect_chain(pv,vecteur_var(v),vecteur_val(v));
+            }
+        }
+        soluce=Pvecteur_to_expression(pv);
+        soluce=make_op_exp(
+                MINUS_OPERATOR_NAME,
+                int_to_expression(max_volume),
+                soluce);
+        soluce=make_op_exp(
+                DIVIDE_OPERATOR_NAME,
+                soluce,
+                int_to_expression((_int)coeff)
+                );
+        /* SG: this is over optimistic, 
+         * we should verify all elements of soluce are store-independant
+         */
+        free_value(entity_initial(e));
+        entity_initial(e)=make_value_expression(
+                soluce);
+    }
+
+    set_free(visited_entities);
+    gen_free_list(read_regions);
+    gen_free_list(write_regions);
+    free_transformer(tr);
+    return true;
+}
+
+static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
     list regions = load_cumulated_rw_effects_list(s);
 
     list read_regions = regions_read_regions(regions);
@@ -128,12 +232,6 @@ static bool do_solve_hardware_constraints(statement s)
     set visited_entities = set_make(set_pointer);
     char * volume_used[gen_length(regions)];
     size_t volume_index=0;
-
-    /* retreive the unknown variable { */
-    entity e = string_to_entity(get_string_property("SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN"),get_current_module_entity());
-    if(entity_undefined_p(e))
-        pips_user_error("must provide the unknown value\n");
-    /* } */
 
     FOREACH(REGION,reg,regions)
     {
@@ -186,6 +284,26 @@ static bool do_solve_hardware_constraints(statement s)
     gen_free_list(write_regions);
     free_transformer(tr);
     return true;
+}
+
+/* the equation is given by sum(e) { | REGION_READ(e) U REGION_WRITE(e) | } < VOLUME */
+static bool do_solve_hardware_constraints(statement s)
+{
+
+    /* retreive the unknown variable { */
+    entity unknown = string_to_entity(get_string_property("SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN"),get_current_module_entity());
+    if(entity_undefined_p(unknown))
+        pips_user_error("must provide the unknown value\n");
+    /* } */
+    string constraint_type = get_string_property("SOLVE_HARDWARE_CONSTRAINTS_TYPE");
+    if(same_string_p(constraint_type, "VOLUME"))
+        return do_solve_hardware_constraints_on_volume(unknown,s);
+    else if(same_string_p(constraint_type, "NB_PROC"))
+        return do_solve_hardware_constraints_on_nb_proc(unknown,s);
+    else {
+        pips_user_error("constraint type '%s' unknown\n",constraint_type);
+        return false;
+    }
 }
 
 bool solve_hardware_constraints(const char * module_name)
