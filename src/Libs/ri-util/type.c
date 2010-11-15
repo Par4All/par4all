@@ -1075,7 +1075,7 @@ basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {
  * @return allocated basic of the reference
  */
 basic basic_of_reference(reference r) {
-  basic_of_any_reference(r,false,true);
+  return basic_of_any_reference(r,false,true);
 }
 
 /* basic basic_of_call(call c): returns the basic of the result given
