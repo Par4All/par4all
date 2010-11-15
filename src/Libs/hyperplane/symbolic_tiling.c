@@ -62,12 +62,20 @@ generate_tile:;
                 make_instruction_loop(
                     make_loop(
                         loop_index(l),
-                        make_range(entity_to_expression(index),
-                            binary_intrinsic_expression(MIN_OPERATOR_NAME,
-                                binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-                                    entity_to_expression(index),copy_expression(tile_size)
+                        make_range(
+                            entity_to_expression(index),
+                            binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                                binary_intrinsic_expression(MIN_OPERATOR_NAME,
+                                    binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+                                        entity_to_expression(index),
+                                        copy_expression(tile_size)
+                                        ),
+                                    binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+                                        copy_expression(range_upper(loop_range(l))),
+                                        copy_expression(range_increment(loop_range(l)))
+                                        )
                                     ),
-                                copy_expression(range_upper(loop_range(l)))
+                                int_to_expression(1)
                                 ),
                             copy_expression(range_increment(loop_range(l)))
                             ),
@@ -82,7 +90,15 @@ generate_tile:;
         statement outer = sloop;
         loop_index(l)=index;
         range_increment(loop_range(l))=tile_size;
-
+        /* will help partial_eval */
+        range_upper(loop_range(l))=
+            binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                    range_upper(loop_range(l)),
+                    binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                        copy_expression(tile_size),
+                        int_to_expression(1)
+                        )
+                    );
         /* save */
         tiled_loops_outer=CONS(STATEMENT,outer,tiled_loops_outer);
         tiled_loops_inner=CONS(STATEMENT,inner,tiled_loops_inner);
