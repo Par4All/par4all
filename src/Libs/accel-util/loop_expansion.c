@@ -177,7 +177,8 @@ void do_loop_expansion(statement st, expression size,bool center,bool apply_guar
                 basic_of_expression(factor)
                 );
         AddEntityToCurrentModule(efactor);
-        insert_statement(st,make_assign_statement(entity_to_expression(efactor),factor),true);
+        /* get_current_module_statement is inaccurate here, but if factor is store independant ... icm should work better ! st would be better */
+        insert_statement(get_current_module_statement(),make_assign_statement(entity_to_expression(efactor),factor),true);
 
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,

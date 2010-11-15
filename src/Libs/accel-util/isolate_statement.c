@@ -133,6 +133,7 @@ void isolate_patch_entities(void * where,entity old, entity new,list offsets)
             0);
 }
 
+/* @return true if expression @p e is a min or a max */
 static
 bool expression_minmax_p(expression e)
 {
@@ -144,7 +145,7 @@ bool expression_minmax_p(expression e)
     return false;
 }
 
-/* replace caller by field , where field is conatianed by caller */
+/* replace expression @p caller by expression @p field , where @p field is contained by @p caller */
 static void local_assign_expression(expression caller, expression field)
 {
      syntax s = expression_syntax(field) ;
@@ -154,14 +155,16 @@ static void local_assign_expression(expression caller, expression field)
      free_normalized(expression_normalized(caller));
 }
 
-static void bounds_of_expression(expression e, transformer tr,bool is_max)
+/* replaces expression @p e by its upper or lower bound under preconditions @p tr
+ * @p is_upper is used to choose among lower and upperbound*/
+static void bounds_of_expression(expression e, transformer tr,bool is_upper)
 {
     intptr_t lbound, ubound;
     if(precondition_minmax_of_expression(e,tr,&lbound,&ubound))
     {
         free_syntax(expression_syntax(e));
         free_normalized(expression_normalized(e));
-        expression new = int_to_expression(is_max ? ubound : lbound);
+        expression new = int_to_expression(is_upper ? ubound : lbound);
         expression_syntax(e)=expression_syntax(new);
         expression_normalized(e)=expression_normalized(new);
         expression_syntax(new)=syntax_undefined;
@@ -169,16 +172,26 @@ static void bounds_of_expression(expression e, transformer tr,bool is_max)
         free_expression(new);
     }
 }
+
+/* replaces expression @p e by its upperbound under preconditions @p tr*/
 void upperbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,true);
 }
+
+/* replaces expression @p e by its lowerbound under preconditions @p tr*/
 void lowerbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,false);
 }
 
 
+/* tries ahrd to simplify expression @p e if it is a min or a max
+ * operator, by evaluating it under preconditions @p tr.
+ * Two approaches are tested:
+ * check bounds of lhs-rhs,
+ * or compare bounds of lhs and rhs
+ */
 void simplify_minmax_expression(expression e,transformer tr)
 {
     if(expression_minmax_p(e)) {
@@ -348,14 +361,6 @@ range dimension_to_range(dimension d)
             int_to_expression(1));
 }
 
-typedef enum {
-    transfer_in,
-    transfer_out
-} isolate_transfer;
-#define transfer_in_p(e) ( (e) == transfer_in )
-#define transfer_out_p(e) ( (e) == transfer_out )
-
-
 /* because of the way we build offsets list, it may contains struct field
  * so we cannot rely on make_reference only
  * fixes entity type as well ...
@@ -397,18 +402,22 @@ expression region_reference_to_expression(reference r)
 bool
 isolate_statement(const char* module_name)
 {
+    /* init stuff */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
     module_to_value_mappings(get_current_module_entity());
     set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
+
+    /* get user input */
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
-    if(!statement_undefined_p(statement_to_isolate))
-        do_isolate_statement(statement_to_isolate);
-    else 
+    /* and proceed */
+    if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
+    else 
+        do_isolate_statement(statement_to_isolate);
 
 
 

@@ -189,7 +189,7 @@ expression make_entity_expression(entity e, cons *inds)
       reference r = make_reference(e, inds);
       s = make_syntax_reference(r);
     }
-  return make_expression(s, normalized_undefined);
+  return syntax_to_expression(s);
 }
 
 /*
@@ -1330,21 +1330,10 @@ bool call_equal_p(call c1, call c2)
   return TRUE;
 }
 
-/* expression make_integer_constant_expression(int c)
- *  make expression for integer
- */
+/* proxy to int_to_expression */
 expression make_integer_constant_expression(int c)
 {
-  expression ex_cons;
-  entity ce;
-
-  ce = make_integer_constant_entity(c);
-  /* make expression for the constant c*/
-  ex_cons = make_expression(
-			    make_syntax(is_syntax_call,
-					make_call(ce,NIL)),
-			    normalized_undefined);
-  return (ex_cons);
+    return int_to_expression(c);
 }
 
 int integer_constant_expression_value(expression e)
@@ -1397,9 +1386,7 @@ expression make_factor_expression(int coeff, entity vari)
   if (vari==NULL)
     return(e1);			/* a constant only */
   else {
-    e2 = make_expression(make_syntax(is_syntax_reference,
-				     make_reference(vari, NIL)),
-			 normalized_undefined);
+    e2 = entity_to_expression(vari);
     if (coeff == 1) return(e2);
     else {
       operateur_multi = gen_find_tabulated("TOP-LEVEL:*",entity_domain);
@@ -2946,7 +2933,8 @@ expression expressions_to_operation (const list l_exprs, entity op) {
 }
 
 /**
- *  @brief frees expression synatx and repalce it by the new syntax
+ *  frees expression syntax of @p e
+ *  and replace it by the new syntax @p s
  */
 void update_expression_syntax(expression e, syntax s)
 {
@@ -2955,6 +2943,7 @@ void update_expression_syntax(expression e, syntax s)
     expression_syntax(e)=s;
 }
 
+/* generates an expression from a syntax */
 expression syntax_to_expression(syntax s) {
   return make_expression(
       s,

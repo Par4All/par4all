@@ -431,6 +431,10 @@ static bool do_isolate_statement_preconditions(statement s)
     return true;
 }
 
+/* perform statement isolation on statement @p s
+ * that is make sure that all access to variables in @p s 
+ * are made either on private variables or on new entities declared on a new memory space
+ */
 void do_isolate_statement(statement s) {
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
