@@ -3,39 +3,92 @@ import os,sys
 
 save_dir="tera.out"
 
+""" smart loop expasion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
+def smart_loop_expansion(m,l,sz):
+	l.loop_expansion_init(loop_expansion_size=sz)
+	m.display()
+	m.statement_insertion()
+	m.display()
+	l.loop_expansion(size=sz)
+	m.display()
+	m.invariant_code_motion()
+	m.redundant_load_store_elimination()
+	m.display()
+
+module.smart_loop_expansion=smart_loop_expansion
+
+def vconv(tiling_vector):
+	return ",".join(tiling_vector)
+
+def all_callers(m):
+	callers=[]
+	for i in m.callers:
+		if i not in callers:
+			callers.append(i)
+			for j in all_callers(i):
+				callers.append(j)
+	return callers
+
 
 def terapix_code_generation(m):
 	w=m._ws
+	w.props.constant_path_effects=False
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
-	w.props.ARRAY_PRIV_FALSE_DEP_ONLY=False
-	w.props.CONSTANT_PATH_EFFECTS=False
-	
+	w.activate(module.interprocedural_summary_precondition)
+	w.activate(module.preconditions_inter_full)
+	w.activate(module.region_chains)
+
 	print "tidy the code just in case of"
 	m.partial_eval()
-	m.display()
 	 
-	print "I have to do this early"
-	m.terapix_remove_divide()
+	#print "I have to do this early"
 	m.display()
-
+	m.recover_for_loop()
+	m.for_loop_to_do_loop()
+	m.display()
+	unknown="N"
+	m.run(["sed","-e","3 i     int "+unknown+";"])
+	m.display()
+	tiling_vector=["128",unknown]
 	
 	print "tiling"
 	for l in m.loops():
 		if l.loops():
-				l.loop_tiling(matrix="128 0,0 8")
-	m.display()
+				# this take care of expanding the loop in order to match number of processor constraint
+				m.smart_loop_expansion(l,tiling_vector[0])
+				# this take care of expanding the loop in order to match memory size constraint
+				m.smart_loop_expansion(l.loops()[0],tiling_vector[1])
+				l.symbolic_tiling(force=True,vector=vconv(tiling_vector))
+				m.display()
+				#m.icm()
+				m.display()
+
 	print "group constants and isolate"
 	kernels=[]
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
-				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
-				m.display(activate="print_code_regions")
+				m.display(activate="PRINT_CODE_REGIONS")
+				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=512*128)
+				m.display()
+				m.run(["psolve"])
+				m.display(activate="PRINT_CODE_REGIONS")
+				m.partial_eval()
+				m.display()
+				#m.forward_substitute()
+				#m.display()
+				m.redundant_load_store_elimination()
+	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+				m.display(activate="PRINT_CODE_REGIONS")
+				for k in all_callers(m):
+					k.display(activate="PRINT_CODE_REGIONS")
+					k.array_expansion()
+				m.display(activate="PRINT_CODE_REGIONS")
 				kernels+=[l2]
 				m.isolate_statement(label=l2.label)
 	m.display()
-	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=1)
+	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.display()
 	m.partial_eval()
 	m.display()
@@ -54,7 +107,6 @@ def terapix_code_generation(m):
 	for k in kernels:
 		name=seed+str(nb)
 		nb+=1
-		m.display(activate="PRINT_CODE_REGIONS")
 		m.outline(module_name=name,label=k.label,smart_reference_computation=True,loop_bound_as_parameter=k.loops()[0].label)
 		launchers+=[w[name]]
 	m.display()
@@ -67,26 +119,13 @@ def terapix_code_generation(m):
 		name=l.name+"_microcode"
 		loop_to_outline=theloop.loops()[0]
 		print "label:" , loop_to_outline.label
-		l.partial_eval()
 		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
+		m.display()
 		mc=w[name]
 		l.display()
 		mc.display()
 		microcodes+=[mc]
 
-		print "normalize microcode", mc.name
-#		microcode_normalizer(w,mc)
 
 module.terapix_code_generation=terapix_code_generation
 
-#	print "saving everything in", save_dir
-#	w.save(indir=save_dir)
-#	for m in microcodes:
-#		path=save_dir+"/"+m.name
-#		mc.saveas(path+".c")
-#		terapips.conv(path+".c",file(path+".tera","w"))
-#		os.remove(path+".c")
-#		print "terapix microcode"
-#		for line in file(path+".tera"):
-#			print line,
-#
