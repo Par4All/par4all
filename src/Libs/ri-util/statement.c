@@ -2426,12 +2426,6 @@ statement remove_declaration_statement(statement s, entity e)
     if(statement_block_p(s)) {
         list sl = statement_block(s); //statement list
         list cl = list_undefined; // current statement list
-        list pl = NIL; // previous statement list
-        list nsl = list_undefined; // new statement list
-        string comment = generated_variable_comment(e);
-        statement ds = make_declaration_statement(e,
-                STATEMENT_NUMBER_UNDEFINED,
-                comment);
 
         /* Look for the last declaration: it is pointed to by pl */
         for(cl=sl; !ENDP(cl); POP(cl)) {
