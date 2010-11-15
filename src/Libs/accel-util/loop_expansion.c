@@ -160,20 +160,29 @@ void do_loop_expansion(statement st, expression size,int offset,bool apply_guard
     {
         /* this gets (e-b)/i , that is the number of iterations in the loop */
         expression nb_iter = range_to_expression(r,range_to_nbiter);
-        /* this gets the expanded nb_iter */
-        expression expanded_nb_iter = 
-            make_op_exp(MULTIPLY_OPERATOR_NAME,
-                    copy_expression(size),
+        /* the expanded nb_iter will be refered as efactor = factor* size */
+        expression factor = 
                     make_op_exp(DIVIDE_OPERATOR_NAME,
                         make_op_exp(PLUS_OPERATOR_NAME,
-                            nb_iter,
+                            copy_expression(nb_iter),
                             make_op_exp(MINUS_OPERATOR_NAME,
                                 copy_expression(size),
                                 int_to_expression(1)
                                 )
                             ),
                         copy_expression(size)
-                        )
+                        );
+        entity efactor = make_new_scalar_variable(
+                get_current_module_entity(),
+                basic_of_expression(factor)
+                );
+        AddEntityToCurrentModule(efactor);
+        insert_statement(st,make_assign_statement(entity_to_expression(efactor),factor),true);
+
+        expression expanded_nb_iter = 
+            make_op_exp(MULTIPLY_OPERATOR_NAME,
+                    copy_expression(size),
+                    entity_to_expression(efactor)
                     );
         expression new_range_lower_value=
             make_op_exp(MINUS_OPERATOR_NAME,copy_expression(range_lower(r)),int_to_expression(offset));
@@ -318,6 +327,7 @@ void do_loop_expansion_init(statement st, expression size,int offset)
         /* this gets (e-b)/i , that is the number of iterations in the loop */
         expression nb_iter = range_to_expression(r,range_to_nbiter);
         /* this gets the expanded nb_iter */
+
         expression expanded_nb_iter = 
             make_op_exp(MULTIPLY_OPERATOR_NAME,
                     copy_expression(size),
@@ -414,3 +424,4 @@ bool loop_expansion_init(const char* module_name)
     return true;;
 
 }
+
