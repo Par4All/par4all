@@ -316,6 +316,7 @@ perform_substitution(
             expression_domain, gen_true, perform_substitution_in_expression,
             call_domain,call_flt,gen_null,
             NULL);
+    unnormalize_expression(s);
 }
 
 static void
