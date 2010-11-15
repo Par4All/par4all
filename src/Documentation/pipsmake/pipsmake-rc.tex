@@ -6686,10 +6686,13 @@ ISOLATE_STATEMENT_STORE_FUNCTION ""
 
 \subsubsection{Hardware Constraints Solver}
 \begin{PipsPass}{solve_hardware_constraints}
+if \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_TYPE} is set to \textbf{VOLUME},
 Given a loop label, a maximum memory footprint and an unknown entity,
 try to find the best value for \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN}
 to make memory footprint of \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_LABEL}
-reach but not exceed \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_LIMIT}
+reach but not exceed \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_LIMIT}.
+If it is set to \textbf{NB\_PROC}, it tries to find the best value for \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN}
+to make the maximum range of first dimension of all regions accessed by \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_LABEL} equals to \PipsPropRef{SOLVE_HARDWARE_CONSTRAINTS_LIMIT}.
 \end{PipsPass}
 \begin{PipsMake}
 solve_hardware_constraints > MODULE.code
@@ -6705,6 +6708,9 @@ SOLVE_HARDWARE_CONSTRAINTS_LIMIT 0
 \end{PipsProp}
 \begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN}
 SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN ""
+\end{PipsProp}
+\begin{PipsProp}{SOLVE_HARDWARE_CONSTRAINTS_TYPE}
+SOLVE_HARDWARE_CONSTRAINTS_TYPE ""
 \end{PipsProp}
 
 \subsubsection{kernelize}
@@ -6956,7 +6962,6 @@ Use this property for accuracy of divide to multiply conversion.
 \begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
 TERAPIX_REMOVE_DIVIDE_ACCURACY 4
 \end{PipsProp}
-
 
 \subsection{Code distribution on GPU}
 \label{sec:code-distr-gpu}
@@ -7258,8 +7263,8 @@ loop_expansion_init 	> MODULE.code
 \begin{PipsPass}{loop_expansion}
   Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit
   a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.  An offset can be
-  set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the
-  lower bound too.  The new loop is guarded to prevent illegal
+  set if \PipsPropRef{LOOP_EXPANSION_CENTER} is set to True.
+  The new loop is guarded to prevent illegal
   iterations, further transformations can elaborate on this.
 \end{PipsPass}
 
@@ -7273,8 +7278,8 @@ loop_expansion 	> MODULE.code
 \begin{PipsProp}{LOOP_EXPANSION_SIZE}
 LOOP_EXPANSION_SIZE ""
 \end{PipsProp}
-\begin{PipsProp}{LOOP_EXPANSION_OFFSET}
-LOOP_EXPANSION_OFFSET 0
+\begin{PipsProp}{LOOP_EXPANSION_CENTER}
+LOOP_EXPANSION_CENTER FALSE
 \end{PipsProp}
 
 \begin{PipsPass}{array_expansion}
