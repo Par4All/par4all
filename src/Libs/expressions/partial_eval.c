@@ -381,6 +381,8 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
   case is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
     partial_eval_expression_and_regenerate(&(subscript_array(sub)), ps, fx);
+    for(list iter=subscript_indices(sub);!ENDP(iter);POP(iter))
+        partial_eval_expression_and_regenerate((expression*)REFCAR(iter), ps, fx);
 
     /*
       MAPL(ce, {
