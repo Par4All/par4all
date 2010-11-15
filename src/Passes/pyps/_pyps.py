@@ -59,6 +59,11 @@ class module:
 		self._ws=ws
 
 	@property
+	def cu(self):
+		"""compilation unit"""
+		return self._ws.cpypips.compilation_unit_of_module(self._name)[:-1]
+
+	@property
 	def name(self):
 		"""module name"""
 		return self._name
