@@ -747,6 +747,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
             statement_instruction(old_statement)=make_continue_instruction();
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
+        /* trash any extensions, they may not be valid now */
+        free_extensions(statement_extensions(old_statement));
+        statement_extensions(old_statement)=empty_extensions();
+
     }
     free_text(t);
     return new_stmt;
