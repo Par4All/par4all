@@ -118,6 +118,7 @@ static void statement_insertion_fix_access_in_callers(const char * module_name, 
     intptr_t new_formal_offset=formal_offset(storage_formal(entity_storage(new_formal)));
     size_t new_formal_dimensions=gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(new_formal)))));
     FOREACH(STRING,caller_name,callees_callees(callers)) {
+
         statement caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,true);
         list calls = find_calls_to_function(caller_statement,module_name_to_entity(module_name));
         FOREACH(CALL,c,calls) {
@@ -130,7 +131,7 @@ static void statement_insertion_fix_access_in_callers(const char * module_name, 
                 if(nb_dimensions - nb_indices == new_formal_dimensions)
                 {
                     list *iter = &variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
-                    for(size_t i=nb_indices;i;i--) POP(*iter);
+                    for(size_t i=1;i<nb_indices;i++) POP(*iter);
                     gen_full_free_list(*iter);
                     *iter=gen_full_copy_list(variable_dimensions(type_variable(ultimate_type(entity_type(new_formal)))));
                     statement_insertion_fix_access_in_callers(caller_name,reference_variable(r));
@@ -292,3 +293,83 @@ bool statement_insertion(const char *module_name)
     return true;
 }
 
+static void do_array_expansion(statement s) {
+    list regions = load_cumulated_rw_effects_list(s);
+    set declarations =set_make(set_pointer);
+    set_assign_list(declarations,entity_declarations(get_current_module_entity()));
+    FOREACH(REGION,reg,regions)
+    {
+        reference r = region_any_reference(reg);
+        entity e = reference_variable(r);
+        if(set_belong_p(declarations,e) && array_entity_p(e) ) {
+
+            list phis = expressions_to_entities(reference_indices(r));
+            Pcontrainte dims_sc = dimensions_to_psysteme(variable_dimensions(type_variable(entity_type(e))), phis);
+            Psysteme access_syst = region_system(reg);
+
+            volatile Psysteme stmp ,sr;
+            CATCH(overflow_error)
+            {
+                pips_debug(1, "overflow error\n");
+                return ;
+            }
+            TRY
+            {
+                stmp = sc_make(contrainte_new(),CONTRAINTE_UNDEFINED);
+                for(Pcontrainte iter=dims_sc;!CONTRAINTE_UNDEFINED_P(iter);iter=contrainte_succ(iter)) {
+                    Pcontrainte toadd = contrainte_make(vect_dup(contrainte_vecteur(iter)));
+                    sc_add_inegalite(stmp,toadd);// there should not be any basis issue, they share the same ... */
+                }
+                sr = sc_cute_convex_hull(access_syst, stmp);
+                sc_rm(stmp);
+                contrainte_rm(dims_sc);
+                sc_nredund(&sr);
+                UNCATCH(overflow_error);
+            }
+            /* if we reach this point, we are ready for backward translation from vecteur to dimensions :) */
+            list new_dimensions = NIL;
+            FOREACH(ENTITY,phi,phis)
+            {
+                Pcontrainte lower,upper;
+                constraints_for_bounds(phi, &sc_inegalites(sr), &lower, &upper);
+                if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
+                {
+                    expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    new_dimensions=CONS(DIMENSION, make_dimension(elower,eupper),new_dimensions);
+                }
+                else {
+                    pips_user_warning("failed to translate region\n");
+                }
+            }
+            new_dimensions=gen_nreverse(new_dimensions);
+            gen_full_free_list(variable_dimensions(type_variable(entity_type(e))));
+            variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
+            gen_free_list(phis);
+        }
+    }
+    set_free(declarations);
+}
+
+bool array_expansion(const char *module_name)
+{
+    /* init */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+    debug_on("ARRAY_EXPANSION_DEBUG_LEVEL");
+
+    /* do */
+    gen_recurse(get_current_module_statement(),
+            statement_domain,gen_true,do_array_expansion);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    debug_off();
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    return true;
+}

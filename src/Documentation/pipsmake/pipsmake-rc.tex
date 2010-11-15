@@ -7277,6 +7277,16 @@ LOOP_EXPANSION_SIZE ""
 LOOP_EXPANSION_OFFSET 0
 \end{PipsProp}
 
+\begin{PipsPass}{array_expansion}
+Extends the dimension of all declared arrays so that no access is illegal.
+\end{PipsPass}
+\begin{PipsMake}
+array_expansion > PROGRAM.entities
+    < PROGRAM.entities
+	< MODULE.code
+	< MODULE.regions
+\end{PipsMake}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop fusion
 
