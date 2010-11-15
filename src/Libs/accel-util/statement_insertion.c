@@ -41,6 +41,8 @@
 #include "properties.h"
 #include "misc.h"
 #include "conversion.h"
+#include "semantics.h"
+#include "transformer.h"
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -48,42 +50,7 @@
 #include "text-util.h"
 #include "parser_private.h"
 #include "accel-util.h"
-/* generate a pcontrainte corresponding to dimensions, with a preset list of phis
- * ex: int a[10][n]; and (phi0,phi1)
- * will result in 0<=phi0<=9 and 0<=phi1<=n-1
- */
-static Pcontrainte dimensions_to_psysteme(list dims,list phis)
-{
-    pips_assert("as many dimensions as phis",gen_length(dims) == gen_length(phis));
-    Pcontrainte pc = NULL;
-    FOREACH(DIMENSION,dim,dims)
-    {
-        entity phi = ENTITY(CAR(phis));
-        expression lower = dimension_lower(dim);
-        expression upper = dimension_upper(dim);
-        NORMALIZE_EXPRESSION(lower);
-        NORMALIZE_EXPRESSION(upper);
 
-        if(normalized_linear_p(expression_normalized(lower)) && normalized_linear_p(expression_normalized(upper)))
-        {
-
-            Pvecteur vlower = vect_dup(normalized_linear(expression_normalized(lower)));
-            Pvecteur vupper = vect_dup(normalized_linear(expression_normalized(upper)));
-            vect_add_elem(&vlower,phi,1);
-            vect_add_elem(&vupper,phi,-1);
-            vect_chg_sgn(vlower);
-            vect_chg_sgn(vupper);
-            pc=contrainte_append(pc,contrainte_make(vlower));
-            pc=contrainte_append(pc,contrainte_make(vupper));
-        }
-        else {
-            contrainte_rm(pc);
-            return NULL;
-        }
-        POP(phis);
-    }
-    return pc;
-}
 typedef struct {
     entity to;
     list found;
@@ -158,10 +125,10 @@ static void statement_insertion_fix_access(list regions)
             break;
         }
         list phis = expressions_to_entities(reference_indices(r));
-        Pcontrainte dims_sc = dimensions_to_psysteme(variable_dimensions(type_variable(entity_type(e))), phis);
+        Psysteme dims_syst = entity_declaration_sc(e);
         Psysteme access_syst = region_system(reg);
 
-        volatile Psysteme stmp ,sr;
+        volatile Psysteme sr;
         CATCH(overflow_error)
         {
             pips_debug(1, "overflow error\n");
@@ -169,14 +136,8 @@ static void statement_insertion_fix_access(list regions)
         }
         TRY
         {
-            stmp = sc_make(contrainte_new(),CONTRAINTE_UNDEFINED);
-            for(Pcontrainte iter=dims_sc;!CONTRAINTE_UNDEFINED_P(iter);iter=contrainte_succ(iter)) {
-                Pcontrainte toadd = contrainte_make(vect_dup(contrainte_vecteur(iter)));
-                sc_add_inegalite(stmp,toadd);// there should not be any basis issue, they share the same ... */
-            }
-            sr = sc_cute_convex_hull(access_syst, stmp);
-            sc_rm(stmp);
-            contrainte_rm(dims_sc);
+            sr = sc_cute_convex_hull(access_syst, dims_syst);
+            sc_rm(dims_syst);
             sc_nredund(&sr);
             UNCATCH(overflow_error);
         }
@@ -292,8 +253,48 @@ bool statement_insertion(const char *module_name)
     reset_proper_rw_effects();
     return true;
 }
+typedef struct {
+    entity e;
+    statement s;
+} entity_to_declaring_statement_t;
 
-static void do_array_expansion(statement s) {
+static void entity_to_declaring_statement_aux(statement s, entity_to_declaring_statement_t *param) {
+    if(statement_block_p(s)) {
+        if(entity_in_list_p(param->e,statement_declarations(s))) {
+            param->s=s;
+            gen_recurse_stop(0);
+        }
+    }
+}
+
+
+/* returns the statement block declaring entity @p e among all thoses in @p top
+ * assumes the entity *is* declared locally
+ * c only
+ */
+static statement entity_to_declaring_statement(entity e, statement top) {
+    entity_to_declaring_statement_t param = { e, statement_undefined };
+    if(formal_parameter_p(e))
+        return top;
+    else {
+        gen_context_recurse(top,&param,statement_domain,gen_true,entity_to_declaring_statement_aux);
+        pips_assert("entity not a local entity ?",!statement_undefined_p(param.s));
+        return param.s;
+    }
+}
+
+static void do_array_expansion_aux(statement s, hash_table expanded) {
+    list remove = NIL;
+    HASH_FOREACH(entity,e,statement,sp,expanded) {
+        if(s==sp)
+            remove=CONS(ENTITY,e,remove);
+    }
+    FOREACH(ENTITY,e,remove)
+        hash_del(expanded,e);
+    gen_free_list(remove);
+}
+
+static bool do_array_expansion(statement s, hash_table expanded) {
     list regions = load_cumulated_rw_effects_list(s);
     set declarations =set_make(set_pointer);
     set_assign_list(declarations,entity_declarations(get_current_module_entity()));
@@ -301,33 +302,39 @@ static void do_array_expansion(statement s) {
     {
         reference r = region_any_reference(reg);
         entity e = reference_variable(r);
-        if(set_belong_p(declarations,e) && array_entity_p(e) ) {
+        if(set_belong_p(declarations,e) &&
+                hash_get(expanded,e)==HASH_UNDEFINED_VALUE &&
+                array_entity_p(e) ) {
+
+            statement sdecl = entity_to_declaring_statement(e,get_current_module_statement());
+            transformer tr = transformer_range(
+                    load_statement_precondition(sdecl));
 
             list phis = expressions_to_entities(reference_indices(r));
-            Pcontrainte dims_sc = dimensions_to_psysteme(variable_dimensions(type_variable(entity_type(e))), phis);
             Psysteme access_syst = region_system(reg);
+            Psysteme decl = entity_declaration_sc(e);
 
-            volatile Psysteme stmp ,sr;
+            volatile Psysteme sr;
             CATCH(overflow_error)
             {
                 pips_debug(1, "overflow error\n");
-                return ;
+                return true;
             }
             TRY
             {
-                stmp = sc_make(contrainte_new(),CONTRAINTE_UNDEFINED);
-                for(Pcontrainte iter=dims_sc;!CONTRAINTE_UNDEFINED_P(iter);iter=contrainte_succ(iter)) {
-                    Pcontrainte toadd = contrainte_make(vect_dup(contrainte_vecteur(iter)));
-                    sc_add_inegalite(stmp,toadd);// there should not be any basis issue, they share the same ... */
-                }
-                sr = sc_cute_convex_hull(access_syst, stmp);
-                sc_rm(stmp);
-                contrainte_rm(dims_sc);
-                sc_nredund(&sr);
+                Psysteme tmp = sc_cute_convex_hull(access_syst,decl);
+                tmp=
+                    sc_safe_append(tmp,
+                            predicate_system(transformer_relation(tr)));
+                sc_nredund(&tmp);
+                Pbase pb = list_to_base(phis);
+                sr = sc_rectangular_hull(tmp,pb);
+                sc_rm(tmp);
                 UNCATCH(overflow_error);
             }
             /* if we reach this point, we are ready for backward translation from vecteur to dimensions :) */
             list new_dimensions = NIL;
+            bool ok=true;
             FOREACH(ENTITY,phi,phis)
             {
                 Pcontrainte lower,upper;
@@ -335,37 +342,44 @@ static void do_array_expansion(statement s) {
                 if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
                 {
                     expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    simplify_minmax_expression(elower,tr);
                     expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    simplify_minmax_expression(eupper,tr);
                     new_dimensions=CONS(DIMENSION, make_dimension(elower,eupper),new_dimensions);
                 }
                 else {
                     pips_user_warning("failed to translate region\n");
+                    ok=false;
                 }
             }
-            new_dimensions=gen_nreverse(new_dimensions);
-            gen_full_free_list(variable_dimensions(type_variable(entity_type(e))));
-            variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
-            gen_free_list(phis);
-            if(formal_parameter_p(e)) {
-                formal f = storage_formal(entity_storage(e));
-                intptr_t i=0,offset = formal_offset(f);
-                FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity())))) {
-                    if(i++ == offset) {
-                        dummy d = parameter_dummy(p);
-                        if(dummy_identifier_p(d))
-                        {
-                            entity di = dummy_identifier(d);
-                            variable v = type_variable(entity_type(di));
-                            gen_full_free_list(variable_dimensions(v));
-                            variable_dimensions(v)=gen_full_copy_list(new_dimensions);
+            transformer_free(tr);
+            if(ok) {
+                hash_put(expanded,e,s);
+                new_dimensions=gen_nreverse(new_dimensions);
+                gen_full_free_list(variable_dimensions(type_variable(entity_type(e))));
+                variable_dimensions(type_variable(entity_type(e)))=new_dimensions;
+                gen_free_list(phis);
+                if(formal_parameter_p(e)) {
+                    formal f = storage_formal(entity_storage(e));
+                    intptr_t i=0,offset = formal_offset(f);
+                    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity())))) {
+                        if(i++ == offset) {
+                            dummy d = parameter_dummy(p);
+                            if(dummy_identifier_p(d))
+                            {
+                                entity di = dummy_identifier(d);
+                                variable v = type_variable(entity_type(di));
+                                gen_full_free_list(variable_dimensions(v));
+                                variable_dimensions(v)=gen_full_copy_list(new_dimensions);
+                            }
                         }
                     }
                 }
-
             }
         }
     }
     set_free(declarations);
+    return true;
 }
 
 bool array_expansion(const char *module_name)
@@ -374,11 +388,15 @@ bool array_expansion(const char *module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+    module_to_value_mappings(get_current_module_entity());
+    set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
     debug_on("ARRAY_EXPANSION_DEBUG_LEVEL");
 
     /* do */
-    gen_recurse(get_current_module_statement(),
-            statement_domain,gen_true,do_array_expansion);
+    hash_table expanded = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    gen_context_recurse(get_current_module_statement(),expanded,
+            statement_domain,do_array_expansion,do_array_expansion_aux);
+    hash_table_free(expanded);
 
     /* validate */
     module_reorder(get_current_module_statement());
@@ -388,5 +406,7 @@ bool array_expansion(const char *module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_precondition_map();
+    free_value_mappings();
     return true;
 }
