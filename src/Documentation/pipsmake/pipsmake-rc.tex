@@ -4920,9 +4920,7 @@ but also of memory addresses. This phase is under development.
 \begin{PipsMake}
 alias simple_pointer_values  'Pointer Values Analysis'
 
-simple_pointer_values > MODULE.simple_gen_pointer_values
-                      > MODULE.simple_kill_pointer_values
-                      > MODULE.simple_pointer_values
+simple_pointer_values > MODULE.simple_pointer_values
            < PROGRAM.entities
            < MODULE.code
 

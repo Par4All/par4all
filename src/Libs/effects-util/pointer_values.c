@@ -48,8 +48,9 @@ entity undefined_pointer_value_entity()
 				     NULL));
   u = gen_find_tabulated(u_name, entity_domain);
   if(entity_undefined_p(u)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
+    type tv = make_type_void(NIL);
+    variable v = make_variable(make_basic_pointer(tv), NIL, NIL);
+    type t = make_type_variable(v);
     u = make_entity(u_name,
 		    t, make_storage_rom(), make_value_unknown());
   }
@@ -65,8 +66,9 @@ entity null_pointer_value_entity()
 				     NULL));
   u = gen_find_tabulated(u_name, entity_domain);
   if(entity_undefined_p(u)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
+    type tv = make_type_void(NIL);
+    variable v = make_variable(make_basic_pointer(tv), NIL, NIL);
+    type t = make_type_variable(v);
     u = make_entity(u_name,
 		    t, make_storage_rom(), make_value_unknown());
   }
@@ -77,7 +79,7 @@ entity null_pointer_value_entity()
 cell make_undefined_pointer_value_cell()
 {
   entity u = undefined_pointer_value_entity();
-  return make_cell_reference(make_reference(u, NIL)); 
+  return make_cell_reference(make_reference(u, NIL));
 }
 
 bool undefined_pointer_value_entity_p(entity e)
@@ -85,7 +87,7 @@ bool undefined_pointer_value_entity_p(entity e)
   bool res;
   res = same_string_p(entity_local_name(e), UNDEFINED_POINTER_VALUE_NAME);
   res = res && same_string_p(entity_module_name(e), ANY_MODULE_NAME);
-  return res;  
+  return res;
 }
 
 bool undefined_pointer_value_cell_p(cell c)
@@ -94,7 +96,7 @@ bool undefined_pointer_value_cell_p(cell c)
   if (cell_gap_p(c)) return false;
   else if (cell_reference_p(c))
     r = cell_reference(c);
-  else 
+  else
     r = preference_reference(cell_preference(c));
   return(undefined_pointer_value_entity_p(reference_variable(r)));
 }
@@ -110,7 +112,7 @@ bool null_pointer_value_entity_p(entity e)
   bool res;
   res = same_string_p(entity_local_name(e), NULL_POINTER_VALUE_NAME);
   res = res && same_string_p(entity_module_name(e), ANY_MODULE_NAME);
-  return res;  
+  return res;
 }
 
 bool null_pointer_value_cell_p(cell c)
@@ -124,7 +126,16 @@ bool null_pointer_value_cell_p(cell c)
   return(null_pointer_value_entity_p(reference_variable(r)));
 }
 
+bool abstract_pointer_value_entity_p(entity e)
+{
+  return (undefined_pointer_value_entity_p(e)
+	  || null_pointer_value_entity_p(e));
+}
 
+bool abstract_pointer_value_cell_p(cell c)
+{
+  return (abstract_pointer_value_entity_p(cell_entity(c)));
+}
 
 /***************** SHORTCUTS FOR MAKING POINTER_VALUES CELL_RELATIONS */
 

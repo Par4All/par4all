@@ -23,15 +23,18 @@
 
 */
 
-/* pv_context is a structure holding the methods to use during pointer values analyses */
+/* pv_context is a structure holding the methods to use during
+   pointer values analyses */
 typedef struct {
+
   /* PIPSDEBM INTERFACES */
   statement_cell_relations (*db_get_pv_func)(char *);
   void (*db_put_pv_func)(char * , statement_cell_relations);
-  statement_cell_relations (*db_get_gen_pv_func)(char *);
-  void (*db_put_gen_pv_func)(char * , statement_cell_relations);
-  statement_effects (*db_get_kill_pv_func)(char *);
-  void (*db_put_kill_pv_func)(char * , statement_effects);
+
+/*   statement_cell_relations (*db_get_gen_pv_func)(char *); */
+/*   void (*db_put_gen_pv_func)(char * , statement_cell_relations); */
+/*   statement_effects (*db_get_kill_pv_func)(char *); */
+/*   void (*db_put_kill_pv_func)(char * , statement_effects); */
 
   list (*make_pv_from_effects_func)(effect, effect, cell_interpretation, list);
 
@@ -47,6 +50,7 @@ typedef struct {
   /* BINARY OPERATORS */
   list (*pvs_must_union_func)(list, list);
   list (*pvs_may_union_func)(list, list);
+  bool (*pvs_equal_p_func)(list, list);
 
   /* STACKS */
   stack stmt_stack;

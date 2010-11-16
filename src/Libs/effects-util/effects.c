@@ -49,10 +49,25 @@
 /* functions for entity */
 entity effect_entity(effect e)
 {
-  return(reference_variable(effect_any_reference(e)));
+  return(cell_entity(effect_cell(e)));
+}
+
+entity cell_entity(cell c)
+{
+  if (cell_gap_p(c)) return entity_undefined;
+
+  else return(reference_variable(cell_any_reference(c)));
 }
 
 /* API for reference */
+
+reference cell_any_reference(cell c)
+{
+  if (cell_gap_p(c)) return reference_undefined;
+
+  return (cell_reference_p(c)) ? cell_reference(c) :
+    preference_reference(cell_preference(c));
+}
 
 /* Does the set of locations referenced by r depend on a pointer
    dereferencing?
