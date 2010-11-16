@@ -1,0 +1,54 @@
+int main()
+{
+
+// Pointer values: none
+
+   float t;
+
+// Pointer values: none
+
+   float *a;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   a = (float *) malloc(10*sizeof(float));
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+
+   t = 1.0;
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+   while (t<2.0) {
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+      for(i = 0; i <= 9; i += 1)
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+         a[i] = a[i]+t*0, 5;
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+      t+0, 01;
+   }
+
+// Pointer values:
+// a == &*HEAP*_l_9[0] (exact);
+
+   return 0;
+}

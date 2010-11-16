@@ -1,0 +1,63 @@
+int main()
+{
+
+// Pointer values: none
+
+   int i = 0;
+
+// Pointer values: none
+
+   int *p, *q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = (int *) malloc(10*sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = p;
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == p (exact);
+
+   do {
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+      *q = i;
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+      q++;
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == *ANY_MODULE*:*ANYWHERE* (may);
+
+      i++;
+   }
+   while (i<5);
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+   free(p);
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}
