@@ -99,4 +99,5 @@ shell sed -i -r -e 's,^\s*SIMD_STORE_V2DF_TO_V2SF,//,g' ${WS}.database/Tmp/sse.c
 shell cc -O0 -I. -march=native ${WS}.database/Tmp/sse.c  -o ${WS}.database/Tmp/sse
 shell if test "`./${WS}.database/Tmp/sse`" = "`./${WS}.database/Tmp/ref`" ; then echo sse-ok ; else echo sse-ko ; fi
 
-#delete $WS
+delete $WS
+quit
