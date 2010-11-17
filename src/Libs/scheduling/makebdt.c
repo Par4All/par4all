@@ -2479,7 +2479,7 @@ static bdt analyze_quast(q, stat, lunk, lsys, b, lxe, me)
  lsf = NIL;
 
  if (quast_undefined_p(q))
-    pips_error("analyze quast","Quast should not be undefined!\n");
+    pips_internal_error("Quast should not be undefined!");
 
  if (bdt_undefined_p(b))
      {

@@ -137,7 +137,7 @@ void print_distribution(distribution d)
 	(void) fprintf(stderr,"), ");
 	break;
     default:
-	pips_internal_error("unexpected style tag\n");
+	pips_internal_error("unexpected style tag");
 	break;
     }
     (void) fprintf(stderr,"\n");

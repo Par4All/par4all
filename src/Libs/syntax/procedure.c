@@ -333,7 +333,7 @@ entity e;
 	       should be more precise (storage, initial value, etc...);
 	       for the time being, I choose to ignore the potential
 	       problems with other executions of the parser and the linker */
-	    /* pips_error("update_called_modules","unexpected case\n"); */
+	    /* pips_internal_error("unexpected case"); */
 	}
 	else if(value_intrinsic_p(entity_initial(e)))
 	    return;
@@ -798,7 +798,7 @@ static void store_initial_value(entity var, expression val)
       pips_internal_error("A Fortran variable cannot have the OVERLOADED internal type");
       break;
     default:
-      pips_internal_error("Unexpected basic tag=%d\n", basic_tag(var_bt));
+      pips_internal_error("Unexpected basic tag=%d", basic_tag(var_bt));
       break;
     }
   }
@@ -1598,7 +1598,7 @@ static void MakeEntryCommon(
 
     members = common_members_of_module(a, m, FALSE);
     if(ENDP(members)) {
-	pips_error("MakeEntryCommon", "No local static variables in module %s: impossible!\n",
+	pips_internal_error("No local static variables in module %s: impossible!",
 		   entity_name(m));
     }
     gen_free_list(members);
@@ -1785,7 +1785,7 @@ instruction MakeEntry(
 		code_declarations(c) = lefp;
 	    }
 	    else {
-		pips_error("MakeEntry", "Code should not (yet) be defined for entry fe...");
+		pips_internal_error("Code should not (yet) be defined for entry fe...");
 	    }
 	}
     }
@@ -2159,7 +2159,7 @@ type MakeResultType(
 	    new_r = functional_result(type_functional(te));
 	}
 	else {
-	    pips_error("MakeResultType", "Unexpected type %s for entity %s\n",
+	    pips_internal_error("Unexpected type %s for entity %s",
 		       type_to_string(te), entity_name(e));
 	}
     }
@@ -2244,7 +2244,7 @@ entity SafeLocalToGlobal(entity e, type r)
 	    fe = e;
 	}
 	else {
-	    pips_internal_error("entity %s has an unexpected storage %d\n",
+	    pips_internal_error("entity %s has an unexpected storage %d",
 				entity_name(e), storage_tag(s));
 	}
     }
@@ -2327,10 +2327,10 @@ void TypeFunctionalEntity(entity fe,
 				    make_functional(NIL, r));
       }
       else {
-	pips_internal_error("Fortran does not support global variables\n");
+	pips_internal_error("Fortran does not support global variables");
       }
     } else {
-	pips_internal_error("Unexpected type for a global name %s\n",
+	pips_internal_error("Unexpected type for a global name %s",
 			    entity_name(fe));
     }
 }
@@ -2547,7 +2547,7 @@ void UpdateFormalStorages(
 			fpo==formal_offset(storage_formal(fps)));
 	}
 	else {
-	    pips_internal_error("Unexpected storage for entity %s\n",
+	    pips_internal_error("Unexpected storage for entity %s",
 				entity_name(fp));
 	}
     }

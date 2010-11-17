@@ -219,7 +219,7 @@ build_trail(list l, control c)
 		l = build_trail(l, succ);
 		break;
 	    default:
-		pips_error("build_trail", "Too many successors (%d) for a control node\n",
+		pips_internal_error("Too many successors (%d) for a control node",
 			   nsucc);
 	    }
 	}
@@ -390,7 +390,7 @@ decorate_trail(entity module, list trail, hash_table labels)
 	    break;
 	}
 	default:
-	    pips_internal_error("Too many successors for a control node\n");
+	    pips_internal_error("Too many successors for a control node");
 	}
     }
 }
@@ -772,7 +772,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
         break;
       }
       default:
-        pips_internal_error("Too many successors for a control node\n");
+        pips_internal_error("Too many successors for a control node");
     }
   }
 

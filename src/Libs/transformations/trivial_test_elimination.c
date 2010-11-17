@@ -284,7 +284,7 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
    case is_instruction_unstructured:
      break;
    default:
-     pips_error("", "Unexpected instruction tag %d\n", t);
+     pips_internal_error("Unexpected instruction tag %d", t);
      break;
    }
 }

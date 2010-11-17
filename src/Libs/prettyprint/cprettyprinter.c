@@ -286,7 +286,7 @@ static string c_basic_string(basic b)
             result = "_Complex" SPACE; /* c99 style */
             break;
         default:
-            pips_internal_error("unhandled case\n");
+            pips_internal_error("unhandled case");
     }
     return allocated ? result : strdup(result);
 }
@@ -1134,7 +1134,7 @@ static string c_unstructured(unstructured u,bool breakable)
                     break;
                 }
             default:
-                pips_internal_error("Too many successors for a control node\n");
+                pips_internal_error("Too many successors for a control node");
         }
     }
 

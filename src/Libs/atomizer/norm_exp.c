@@ -112,7 +112,7 @@ else if(syntax_tag(sy) == is_syntax_range)
 	      words_to_string(words_expression(exp, NIL)));
   }
 else
-  pips_error("normal_expression_of_expression", "Bad expression tag");
+  pips_internal_error("Bad expression tag");
 }
 
 
@@ -163,7 +163,7 @@ switch(instruction_tag(inst))
   case is_instruction_unstructured :
   { normal_expression_of_unstructured(instruction_unstructured(inst));
     break; }
-  default : pips_error("normal_expression_of_statement", "Bad instruction tag");
+  default : pips_internal_error("Bad instruction tag");
   }
 debug(4, "normal_expression_of_statement", "end STATEMENT\n");
 }

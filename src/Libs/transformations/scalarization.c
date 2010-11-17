@@ -618,7 +618,7 @@ static void replace_constant_array_references_walker(reference ref, replace_refe
         expression offset = reference_offset(ref);
         intptr_t value;
         if(!expression_integer_value(offset,&value))
-            pips_internal_error("reference index should be constants\n");
+            pips_internal_error("reference index should be constants");
         /* add one to the value, because 0 seems reserved */
         entity var = (entity)hash_get(p->mapping,(void*)(1+value));
         if(var == HASH_UNDEFINED_VALUE)

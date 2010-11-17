@@ -117,7 +117,7 @@ const char* global_name_to_user_name(const char* global_name)
     else if (strstr(global_name,FILE_SEP_STRING) != NULL)
       user_name = strstr(global_name,FILE_SEP_STRING) + 1;
     else {
-      pips_internal_error("no seperator ?\n");
+      pips_internal_error("no seperator ?");
       user_name = NULL;
     }
 
@@ -223,8 +223,7 @@ string module_name(const char * s)
     strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
     local[MAXIMAL_MODULE_NAME_SIZE] = 0;
     if (((p_sep = strchr(local, MODULE_SEP)) == NULL) /* && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL ) */ )
-      pips_error("module_name",
-		   "module name too long, or illegal: \"%s\"\n", s);
+      pips_internal_error("module name too long, or illegal: \"%s\"", s);
     else
 	*p_sep = '\0';
     return(local);
@@ -358,7 +357,7 @@ string new_label_name(entity module)
     /* loop */
   }
   if(init == 0) {
-    pips_internal_error("no more available labels\n");
+    pips_internal_error("no more available labels");
   }
   return(name);
 }
@@ -368,7 +367,7 @@ entity find_ith_parameter(entity e, int i)
   cons *pv = code_declarations(value_code(entity_initial(e)));
 
   if (! entity_module_p(e)) {
-    pips_internal_error( "entity %s is not a module\n",
+    pips_internal_error("entity %s is not a module",
 			 entity_name(e));
   }
   while (pv != NIL) {

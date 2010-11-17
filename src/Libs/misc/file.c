@@ -62,7 +62,7 @@ FILE * safe_fopen(const char *filename, const char *what)
 {
     FILE * f;
     if((f = fopen( filename, what)) == (FILE *) NULL) {
-	pips_internal_error("fopen failed on file %s\n%s\n",
+	pips_internal_error("fopen failed on file %s\n%s",
 		   filename, strerror(errno));
     }
     return(f);
@@ -78,7 +78,7 @@ safe_fclose(FILE * stream, char *filename)
 				     filename,
 				     strerror(errno));
 	else
-	    pips_internal_error("fclose failed on file %s (%s)\n",
+	    pips_internal_error("fclose failed on file %s (%s)",
 		       filename,
 		       strerror(errno));
     }
@@ -89,7 +89,7 @@ int
 safe_fflush(FILE * stream, char *filename)
 {
     if(fflush(stream) == EOF) {
-	pips_internal_error("fflush failed on file %s (%s)\n",
+	pips_internal_error("fflush failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -102,7 +102,7 @@ safe_freopen(char *filename, char *what, FILE * stream)
     FILE *f;
 
     if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
-	pips_internal_error("freopen failed on file %s (%s)\n",
+	pips_internal_error("freopen failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -113,7 +113,7 @@ int
 safe_fseek(FILE * stream, long int offset, int wherefrom, char *filename)
 {
     if( fseek( stream, offset, wherefrom) != 0) {
-	pips_internal_error("fseek failed on file %s (%s)\n",
+	pips_internal_error("fseek failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -126,7 +126,7 @@ safe_ftell(FILE * stream, char *filename)
     long int pt;
     pt = ftell( stream);
     if((pt == -1L) && (errno != 0)) {
-	pips_internal_error("ftell failed on file %s (%s)\n",
+	pips_internal_error("ftell failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -138,7 +138,7 @@ safe_rewind(FILE * stream, char *filename)
 {
     rewind( stream );
     if(errno != 0) {
-	pips_internal_error("rewind failed on file %s (%s)\n",
+	pips_internal_error("rewind failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -149,7 +149,7 @@ safe_fgetc(FILE * stream, char *filename)
 {
     int value;
     if((value = fgetc( stream)) == EOF) {
-	pips_internal_error("fgetc failed on file %s (%s)\n",
+	pips_internal_error("fgetc failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(value);
@@ -160,7 +160,7 @@ safe_getc(FILE * stream, char *filename)
 {
     int value;
     if((value = getc( stream)) == EOF ) {
-	pips_internal_error("getc failed on file %s (%s)\n",
+	pips_internal_error("getc failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -174,7 +174,7 @@ int n;
 FILE * stream;
 {
     if (fgets( s, n, stream) == (char *) NULL) {
-	pips_internal_error("gets failed on file %s (%s)\n",
+	pips_internal_error("gets failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(s);
@@ -186,7 +186,7 @@ FILE * stream;
 char * filename;
 {
     if(fputc( c, stream) == EOF) {
-	pips_internal_error("fputc failed on file %s (%s)\n",
+	pips_internal_error("fputc failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(c);
@@ -198,7 +198,7 @@ FILE * stream;
 char * filename;
 {
     if(putc( c, stream) == EOF) {
-	pips_internal_error("putc failed on file %s (%s)\n",
+	pips_internal_error("putc failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(c);
@@ -209,7 +209,7 @@ char * s, * filename;
 FILE * stream;
 {
     if(fputs( s, stream) == EOF) {
-	pips_internal_error("fputs failed on file %s (%s)\n",
+	pips_internal_error("fputs failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(1);
@@ -222,7 +222,7 @@ int count;
 FILE * stream;
 {
     if(((int)fread(ptr, element_size, count, stream)) != count) {
-	pips_internal_error("fread failed on file %s (%s)\n",
+	pips_internal_error("fread failed on file %s (%s)",
 		   filename, strerror(errno));
     }
     return(count);
@@ -235,7 +235,7 @@ int count;
 FILE * stream;
 {
     if(((int)fwrite(ptr, element_size, count, stream)) != count) {
-	pips_internal_error("fwrite failed on file %s (%s)\n",
+	pips_internal_error("fwrite failed on file %s (%s)",
 		   filename,
 		   strerror(errno));
     }
@@ -418,7 +418,7 @@ create_directory(char *name)
     bool success = TRUE;
 
     if (directory_exists_p(name)) {
-	pips_internal_error("existing directory : %s\n", name);
+	pips_internal_error("existing directory : %s", name);
     }
 
     if (mkdir(name, 0777) == -1) {
@@ -600,7 +600,7 @@ safe_display(char *fname)
 			if (!pager)
 				pager = "more";
 			execlp(pager, pager, fname, NULL);
-			pips_internal_error("running %s %s: %s\n",
+			pips_internal_error("running %s %s: %s",
 					    pager, fname, strerror(errno));
 			exit(127);
 		}
@@ -702,7 +702,7 @@ safe_unlink(char *file_name)
     if (unlink(file_name))
     {
 	perror("[safe_unlink] ");
-	pips_internal_error("unlink %s failed\n", file_name);
+	pips_internal_error("unlink %s failed", file_name);
     }
 }
 
@@ -712,7 +712,7 @@ safe_symlink(char *topath, char *frompath)
     if (symlink(topath, frompath))
     {
 	perror("[safe_symlink] ");
-	pips_internal_error("symlink(%s, %s) failed\n", topath, frompath);
+	pips_internal_error("symlink(%s, %s) failed", topath, frompath);
     }
 }
 
@@ -728,7 +728,7 @@ safe_link(char *topath, char *frompath)
     if (link(frompath, topath))
     {
 	perror("[safe_link] ");
-	pips_internal_error("link(%s,%s) failed\n", frompath, topath);
+	pips_internal_error("link(%s,%s) failed", frompath, topath);
     }
 }
 
@@ -744,7 +744,7 @@ safe_system_output(char * what)
 
     if (in==NULL) {
 	perror("[safe_system_output] ");
-	pips_internal_error("popen failed: %s\n", what);
+	pips_internal_error("popen failed: %s", what);
     }
 
     result = safe_readfile(in);

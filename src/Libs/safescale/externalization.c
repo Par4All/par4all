@@ -231,7 +231,7 @@ static list compute_regions_union(list l_in, list l_out)
 
 	                if (gen_length(new_regions) > 1) 
                         {
-	                  pips_internal_error("Regions union must refer to only ONE region !\n");
+	                  pips_internal_error("Regions union must refer to only ONE region !");
 	                }
 	                else 
                         {
@@ -391,7 +391,7 @@ static boolean compute_distribution_context(list l_stats, statement module_stat,
                       }
                       else 
                       {
-                        pips_internal_error("Strange externalized code!\n");
+                        pips_internal_error("Strange externalized code!");
                       }
 
                       /* Register new externalized function */
@@ -437,7 +437,7 @@ static entity create_parameter_variable_for_new_module(entity a_variable, string
   }
   else 
   {
-    pips_error("Entity already exist: %s\n", new_name);
+    pips_internal_error("Entity already exist: %s", new_name);
   
     return NULL;
   }
@@ -468,7 +468,7 @@ static entity create_private_variable_for_new_module(entity a_variable, string n
   }
   else 
   {
-    pips_error("Entity already exist: %s\n", new_name);
+    pips_internal_error("Entity already exist: %s", new_name);
 
     return NULL;
   }

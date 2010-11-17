@@ -119,7 +119,7 @@ normalized NormalizeSyntax(syntax s)
 	n = make_normalized_complex();
       break;
       default:
-	pips_error("NormalizeSyntax", "cas default");
+	pips_internal_error("cas default");
     }
 
     return(n);
@@ -149,7 +149,7 @@ normalized NormalizeCall(call c)
 	n = make_normalized(is_normalized_complex, UU);
 	break;
       default:
-	pips_error("NormalizeCall", "case default");
+	pips_internal_error("case default");
     }
 
     return(n);
@@ -359,7 +359,7 @@ normalized binary_to_normalized(list la, int op)
 	    }
 	    break;
 	default:
-	    pips_error("", "Unknown binary operator %d\n", op);
+	    pips_internal_error("Unknown binary operator %d", op);
 	}
 	if(succeed) {
 	    n = make_normalized(is_normalized_linear,
@@ -600,7 +600,7 @@ normalize_call(call c)
 	n = make_normalized(is_normalized_complex, UU);
 	break;
       default:
-	pips_error("normalize_call", "unexpected value tag (%d)\n", t);
+	pips_internal_error("unexpected value tag (%d)", t);
     }
 
     return(n);
@@ -634,7 +634,7 @@ static void norm_all_rewrite(expression e)
       n = make_normalized(is_normalized_complex, UU);
       break;
     default:
-      (pips_internal_error("undefined syntax tag (%d)\n", t),
+      (pips_internal_error("undefined syntax tag (%d)", t),
        normalized_undefined);
     }
     expression_normalized(e) = n;

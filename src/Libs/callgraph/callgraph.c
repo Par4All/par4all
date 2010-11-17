@@ -147,7 +147,7 @@ callgraph_module_name(
 	MERGE_TEXTS(r,get_text_out_regions(module_name));
 	break;
     default:
-	pips_internal_error("unknown callgraph decoration for module %s\n",
+	pips_internal_error("unknown callgraph decoration for module %s",
 			    module_name);
     }
 
@@ -260,7 +260,7 @@ static void transitive_positions(set vertices,
       list destinations = list_undefined;
 
       if(c == (callees) HASH_UNDEFINED_VALUE) {
-	pips_internal_error("Arcs undefined for module %s\n", source_module);
+	pips_internal_error("Arcs undefined for module %s", source_module);
       }
       else {
 	destinations = callees_callees(c);

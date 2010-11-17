@@ -1062,7 +1062,7 @@ fprintf(stderr, "\n");
       first = (entity) pv->var;
     }
     if(pv != NULL)
-      pips_error("prototype_dimension", "Not a prototype polynome\n");
+      pips_internal_error("Not a prototype polynome");
 
     if( (first != entity_undefined) && (second != entity_undefined) ) {
       if(in_list_p(first, ind_l)) {
@@ -1845,7 +1845,7 @@ int dim;
   par_b = list_to_base(par_l);
 
   if(dim < crt_dim)
-    pips_error("completer_n_base", "There should not be so much dims\n");
+    pips_internal_error("There should not be so much dims");
   else if(dim == crt_dim)
     return(ps);
 
@@ -2262,10 +2262,10 @@ char*   module_name;
 						       module_name, TRUE);
   stco     = (static_control) GET_STATEMENT_MAPPING(STS, mod_stat);
   if ( stco == static_control_undefined) {
-    pips_error("prgm_mapping", "This is an undefined static control !\n");
+    pips_internal_error("This is an undefined static control !");
   }
   if ( !static_control_yes( stco )) {
-    pips_error("prgm_mapping", "This is not a static control program !\n");
+    pips_internal_error("This is not a static control program !");
   }
 
   set_current_stco_map(STS);

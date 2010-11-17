@@ -919,7 +919,7 @@ void freia_insert_added_stats(list ls, list added_stats)
       if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
       {
         // must split return...
-        pips_internal_error("return splitting not implemented yet...\n");
+        pips_internal_error("return splitting not implemented yet...");
       }
       else
       {

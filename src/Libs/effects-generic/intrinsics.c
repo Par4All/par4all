@@ -1322,7 +1322,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
         pid += 1;
     }
 
-    pips_error("generic_proper_effects_of_intrinsic", "unknown intrinsic %s\n", s);
+    pips_internal_error("unknown intrinsic %s", s);
 
     return(NIL);
 }
@@ -1502,7 +1502,7 @@ assign_substring_effects(entity e __attribute__ ((__unused__)), list args)
     pips_debug(5, "begin\n");
 
     if (! syntax_reference_p(s))
-            pips_error("assign_substring_effects", "not a reference\n");
+            pips_internal_error("not a reference");
 
 
     le = generic_proper_effects_of_written_reference(syntax_reference(s));
@@ -1526,7 +1526,7 @@ substring_effect(entity e __attribute__ ((__unused__)), list args)
     pips_debug(5, "begin\n");
 
     if (! syntax_reference_p(expression_syntax(expr)))
-            pips_error("substring_effect", "not a reference\n");
+            pips_internal_error("not a reference");
 
     le = generic_proper_effects_of_expression(expr);
     le = gen_nconc(le, generic_proper_effects_of_expression(l));
@@ -1549,7 +1549,7 @@ SearchIoElement(char *s, char *i)
         p += 1;
     }
 
-    pips_error("SearchIoElement", "unknown io element %s %s\n", s, i);
+    pips_internal_error("unknown io element %s %s", s, i);
     /* Never reaches this point. Only to avoid a warning at compile time. BC. */
     return(&IoElementDescriptorUndefined);
 }
@@ -1567,7 +1567,7 @@ SearchCIoElement(char *s)
         p += 1;
     }
 
-    pips_error("SearchCIoElement", "unknown io element %s\n", s);
+    pips_internal_error("unknown io element %s", s);
 
     return(&IoElementDescriptorUndefined);
 }
@@ -1697,7 +1697,7 @@ static list io_effects(entity e, list args)
                 else if(same_string_p(entity_local_name(e), WRITE_FUNCTION_NAME))
                     unit = int_to_expression(STDOUT_LUN);
                 else
-                    pips_error("io_effects", "Which logical unit?\n");
+                    pips_internal_error("Which logical unit?");
             }
 
             indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
@@ -2238,7 +2238,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
     else {
-      pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose\n");
+      pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose");
       /* C language */
       /* FI: we lack information about the number of elements written */
       /* This is not generic! */
@@ -2308,7 +2308,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	    le = generic_proper_effects_of_any_lhs(e);
 	  }
 	  else {
-	    pips_internal_error("Operator \"\%s\" not handled\n", entity_name(op));
+	    pips_internal_error("Operator \"\%s\" not handled", entity_name(op));
 	  }
 	}
       }
@@ -2499,7 +2499,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
       pips_debug(5, "only effects on actual argument evaluation\n");
       break;
     default :
-      pips_internal_error("unknown tag\n");
+      pips_internal_error("unknown tag");
     }
 
   return le;

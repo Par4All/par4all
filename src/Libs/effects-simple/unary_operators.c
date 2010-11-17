@@ -79,7 +79,7 @@ effect reference_to_simple_effect(reference ref, action act,
 	     words_to_string(words_reference(ref,NIL)));
 
   if (dummy_parameter_entity_p(ent))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)\n",
+    pips_internal_error("the input reference entity is a dummy parameter (%s)",
 			entity_name(ent));
 
   if (entity_all_locations_p(ent))

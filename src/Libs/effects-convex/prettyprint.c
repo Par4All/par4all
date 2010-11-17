@@ -65,7 +65,7 @@ string
 region_sc_to_string(string __attribute__ ((unused)) s,
 		    Psysteme __attribute__ ((unused)) ps)
 {
-    pips_internal_error("implementation dropped\n");
+    pips_internal_error("implementation dropped");
     return string_undefined;
 }
 

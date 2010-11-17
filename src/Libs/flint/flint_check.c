@@ -613,7 +613,7 @@ bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
 	    break;
 	}
     default:
-	pips_error("position_in_the_area", "unknown basic tag %d\n", basic_tag(base));
+	pips_internal_error("unknown basic tag %d", basic_tag(base));
     }
 
     *inf = ram_offset(storage_ram(entity_storage(the_var)));

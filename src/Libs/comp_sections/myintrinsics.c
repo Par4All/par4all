@@ -304,7 +304,7 @@ transformer context;
         pid += 1;
     }
 
-    pips_error("proper_comp_regions_of_intrinsic", "unknown intrinsic %s\n", s);
+    pips_internal_error("unknown intrinsic %s", s);
 
     return(NIL);
 }
@@ -343,7 +343,7 @@ affect_comp_regions(entity __attribute__ ((unused)) e,
     debug(5, "affect_comp_regions", "begin\n");
 
     if (! syntax_reference_p(s))
-            pips_error("affect_comp_regions", "not a reference\n");
+            pips_internal_error("not a reference");
 
 
     le = comp_regions_of_write(syntax_reference(s), context);
@@ -369,7 +369,7 @@ char *s, *i;
         p += 1;
     }
 
-    pips_error("SearchIoElement", "unknown io element %s %s\n", s, i);
+    pips_internal_error("unknown io element %s %s", s, i);
     /* Never reaches this point. Only to avoid a warning at compile time. BC. */
     return(&IoElementDescriptorUndefined);
 }

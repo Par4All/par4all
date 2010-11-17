@@ -601,7 +601,7 @@ hpfcompile (string module_name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "module: %s\n", module_name);
-    pips_internal_error("obsolete\n");
+    pips_internal_error("obsolete");
     debug_off();
 }
 

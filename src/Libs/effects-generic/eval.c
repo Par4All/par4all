@@ -126,7 +126,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
     input_ref = preference_reference(cell_preference(input_cell));
   }
   else { /* Should be the gap case */
-    pips_internal_error("GAPs not implemented yet\n");
+    pips_internal_error("GAPs not implemented yet");
   }
 
   /* iterer sur le path p[0][1][2][0] et tester chaque fois si on peut
@@ -178,7 +178,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	      else if (cell_preference_p(source_cell))
 		tmp_ref = preference_reference(cell_preference(source_cell));
 	      else
-		pips_internal_error("GAP case not implemented yet\n");
+		pips_internal_error("GAP case not implemented yet");
 
 	      (*cell_reference_conversion_func)(tmp_ref, &source_ref, &source_desc);
 
@@ -264,7 +264,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	      else if (cell_preference_p(sink_cell))
 		tmp_ref = preference_reference(cell_preference(sink_cell));
 	      else
-		pips_internal_error("GAP case not implemented yet\n");
+		pips_internal_error("GAP case not implemented yet");
 
 	      (*cell_reference_conversion_func)(tmp_ref, &sink_ref, &sink_desc);
 	      reference build_ref = reference_undefined;

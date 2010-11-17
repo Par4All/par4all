@@ -415,7 +415,7 @@ gen_array_t get_callers (string module)
     callees caller_modules;
 
     if (!safe_make(DBR_CALLERS, module))
-            pips_internal_error("Cannot make callers for %s\n", module);
+            pips_internal_error("Cannot make callers for %s", module);
 
     caller_modules = (callees)
             db_get_memory_resource(DBR_CALLERS, module,TRUE);
@@ -430,7 +430,7 @@ gen_array_t get_callees (string module)
     callees callee_modules;
 
     if (!safe_make(DBR_CALLEES, module))
-            pips_internal_error("Cannot make callees for %s\n", module);
+            pips_internal_error("Cannot make callees for %s", module);
 
     callee_modules = (callees)
             db_get_memory_resource(DBR_CALLEES, module,TRUE);

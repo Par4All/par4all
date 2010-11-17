@@ -304,7 +304,7 @@ static expression make_special_value(entity ent)
   case 5: /*string*/
     return make_call_expression(MakeConstant("\'Nga Nguyen\'",is_basic_string),NIL);
   default:
-    pips_error("", "Unexpected basic tag\n");
+    pips_internal_error("Unexpected basic tag");
     return expression_undefined; // just to avoid gcc warning
   }
 }
@@ -655,7 +655,7 @@ static void verify_used_before_set_expression(expression exp,statement s)
     }
   default:
     {
-      pips_error("", "Unexpected expression tag %d \n", t );
+      pips_internal_error("Unexpected expression tag %d ", t );
       break;
     } 
   }	

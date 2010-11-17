@@ -267,7 +267,7 @@ static string step_type_suffix(string name, type t)
     case is_basic_complex: type_sufix=strdup("_C");
       break;
     default:
-      pips_error("step_type_suffix","unexpected basic type : %i",basic_tag(b));
+      pips_internal_error("unexpected basic type : %i",basic_tag(b));
       break;
     }
   size=i2a(basic_int(b));

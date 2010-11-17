@@ -372,7 +372,7 @@ static void basic_spoc_conf
     // copy, no code
     break;
   default:
-    pips_internal_error("unexpected op type %s\n", what_operation(op));
+    pips_internal_error("unexpected op type %s", what_operation(op));
   }
   if (op!=spoc_type_nop)
     sb_cat(body, "\n");

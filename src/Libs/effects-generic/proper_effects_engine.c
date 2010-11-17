@@ -185,7 +185,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 	  break;
 	case is_basic_typedef:
 	  // should not happen
-	  pips_internal_error("typedef case should not be possible here! \n");
+	  pips_internal_error("typedef case should not be possible here! ");
 	  break;
 	default:
 	  {
@@ -537,7 +537,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
       free_type(ref_type);
 	}
 	else
-	  pips_internal_error("case not handled yet \n");
+	  pips_internal_error("case not handled yet ");
       (*effects_precondition_composition_op)(le, context);
     }
 
@@ -870,7 +870,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
   else
     {
       /* sizeofexpression, application. va_arg */
-      pips_internal_error("Unexpected case\n");
+      pips_internal_error("Unexpected case");
     }
 
   if(finished_p)
@@ -916,7 +916,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 	  if(syntax_reference_p(s))
 	    {
-	      pips_internal_error("A reference should lead to the finished state\n");
+	      pips_internal_error("A reference should lead to the finished state");
 	    }
 	  else if(syntax_call_p(s))
 	    {
@@ -997,7 +997,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		}
 	      else
 		{
-		  pips_internal_error("Unexpected call to \"\%s\"\n", entity_name(op));
+		  pips_internal_error("Unexpected call to \"\%s\"", entity_name(op));
 		}
 	    }
 	  else if(syntax_subscript_p(s))
@@ -1130,7 +1130,7 @@ list generic_proper_effects_of_complex_memory_access_expression(expression addex
 	}
       else
 	{
-	  pips_internal_error("case not handled yet \n");
+	  pips_internal_error("case not handled yet ");
 	}
 
       free_type(addexp_t);
@@ -1207,7 +1207,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	      }
 	    else
 	      {
-		pips_internal_error("case not handled yet \n");
+		pips_internal_error("case not handled yet ");
 	      }
 
 	    free_type(addexp_t);
@@ -1408,7 +1408,7 @@ generic_proper_effects_of_expression(expression e)
 	break;
       }
     default:
-      pips_internal_error("unexpected tag %d\n", syntax_tag(s));
+      pips_internal_error("unexpected tag %d", syntax_tag(s));
     }
 
   ifdebug(8)
@@ -1503,8 +1503,7 @@ generic_proper_effects_of_external(entity func, list args)
 
     if (! entity_module_p(func))
     {
-	pips_error("proper_effects_of_external",
-		   "%s: bad function\n", func_name);
+	pips_internal_error("%s: bad function", func_name);
     }
     else
     {
@@ -1515,7 +1514,7 @@ generic_proper_effects_of_external(entity func, list args)
 	func_eff = (*db_get_summary_rw_effects_func)(func_name);
 
 	if(!check_sdfi_effects_p(func, func_eff))
-	  pips_internal_error("SDFI effects for \"%s\" are corrupted in the data base\n",
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted in the data base",
 			      entity_name(func));
 
 	/* Translate them using context information. */
@@ -1523,7 +1522,7 @@ generic_proper_effects_of_external(entity func, list args)
 	le = generic_effects_backward_translation(func, args, func_eff, context);
 
 	if(!check_sdfi_effects_p(func, func_eff))
-	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation\n",
+	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation",
 			      entity_name(func));
     }
     ifdebug(1) pips_assert("All effects in \"le\" are consistent",
@@ -1603,11 +1602,11 @@ generic_r_proper_effects_of_call(call c)
 	/* hpfc specials are managed here... */
 	le = NIL;
       else
-	pips_internal_error("unknown function %s\n", entity_name(e));
+	pips_internal_error("unknown function %s", entity_name(e));
       break;
 
     default:
-      pips_internal_error("unknown tag %d\n", t);
+      pips_internal_error("unknown tag %d", t);
       break;
     }
   }
@@ -1626,7 +1625,7 @@ generic_r_proper_effects_of_call(call c)
     le = NIL;
   }
   else {
-    pips_internal_error("Unexpected case\n");
+    pips_internal_error("Unexpected case");
   }
 
   pips_debug(2, "end\n");
@@ -1732,7 +1731,7 @@ static void proper_effects_of_expression_instruction(instruction i)
 	  l_proper = generic_proper_effects_of_read_reference(r);
 	}
 	else {
-	  pips_internal_error("Cast case not implemented\n");
+	  pips_internal_error("Cast case not implemented");
 	}
 	break;
       }
@@ -1774,7 +1773,7 @@ static void proper_effects_of_expression_instruction(instruction i)
     case is_syntax_sizeofexpression:
     case is_syntax_subscript:
     default :
-      pips_internal_error("Instruction expression case %d not implemented\n",
+      pips_internal_error("Instruction expression case %d not implemented",
 			  syntax_tag(is));
     }
 

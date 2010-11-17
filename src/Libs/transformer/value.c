@@ -465,7 +465,7 @@ entity make_local_temporary_value_entity(type t)
   if(analyzable_type_p(t))
     tv = make_local_value_entity(local_temporary_value_counter++, 2, t);
   else
-    pips_internal_error("Request for a temporary value with a non analyzable type\n");
+    pips_internal_error("Request for a temporary value with a non analyzable type");
 
   return tv;
 }
@@ -624,7 +624,7 @@ string external_value_name(entity e)
       }
       else {
 	/* This should never occur. Please core dump! */
-	pips_internal_error("Unexpected value %s for current module %s\n",
+	pips_internal_error("Unexpected value %s for current module %s",
 			    entity_name(e),
 			    module_local_name(get_current_module_entity()));
       }
@@ -646,7 +646,7 @@ entity entity_to_new_value(entity e)
   entity n;
   if((n = (entity) hash_get(hash_entity_to_new_value, (char *) e))
      == entity_undefined)
-    pips_internal_error("unbounded entity %s\n",
+    pips_internal_error("unbounded entity %s",
 			entity_name(e));
   return n;
 }
@@ -656,7 +656,7 @@ entity entity_to_old_value(entity e)
   entity o;
   if((o = (entity) hash_get(hash_entity_to_old_value, (char *) e))
      == entity_undefined)
-    pips_internal_error("unbounded entity %s\n",
+    pips_internal_error("unbounded entity %s",
 			entity_name(e));
   return o;
 }
@@ -666,7 +666,7 @@ entity entity_to_intermediate_value(entity e)
   entity i;
   if((i = (entity) hash_get(hash_entity_to_intermediate_value, (char *) e))
      == entity_undefined)
-    pips_internal_error("unbounded entity %s\n",
+    pips_internal_error("unbounded entity %s",
 			entity_name(e));
   return i;
 }
@@ -1254,8 +1254,7 @@ entity value_to_variable(entity val)
       l_suffix = 0;
     }
     else
-      pips_error("value_to_variable",
-		 "%s is not a non-local value\n", entity_name(val));
+      pips_internal_error("%s is not a non-local value", entity_name(val));
 
     s = val_name;
   }
@@ -1269,7 +1268,7 @@ entity value_to_variable(entity val)
     else
       /* It can be an equivalenced variable... Additional testing
 	 should be performed! */
-      pips_internal_error("%s is not a locally visible value\n",
+      pips_internal_error("%s is not a locally visible value",
 			  entity_name(val));
   }
 
@@ -1279,7 +1278,7 @@ entity value_to_variable(entity val)
   free(var_name);
 
   if( var == entity_undefined )
-    pips_internal_error("no related variable for val=%s\n",
+    pips_internal_error("no related variable for val=%s",
 			entity_name(val));
 
   return var;

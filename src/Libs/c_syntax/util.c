@@ -383,7 +383,7 @@ expression MakeFunctionExpression(expression e, list le)
       break;
     default:
       {
-	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+	pips_internal_error("unexpected syntax tag: %d", syntax_tag(s));
       }
     }
   return exp;
@@ -554,7 +554,7 @@ expression MemberIdentifierToExpression(expression e, string m)
       }
     default:
       {
-	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+	pips_internal_error("unexpected syntax tag: %d", syntax_tag(s));
       }
     }
   CParserError("Cannot find the field identifier from current expression\n");
@@ -661,7 +661,7 @@ expression MakeArrayExpression(expression exp, list lexp)
     }
   default:
     {
-      pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+      pips_internal_error("unexpected syntax tag: %d", syntax_tag(s));
     }
   }
   return e;
@@ -1635,7 +1635,7 @@ void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
       // Make sure that the ultimate type is variable */
       if(!type_variable_p(ut) &&storage_ram_p(s)) {
 	/* We are in trouble */
-	pips_internal_error("Variable %s has not a variable type\n",
+	pips_internal_error("Variable %s has not a variable type",
 			    entity_user_name(var));
       }
 
@@ -1899,7 +1899,7 @@ void UseFormalArguments(entity f)
 	  if(dummy_parameter_entity_p(v)) {
 	    pips_debug(8, "Substitution failed for reference %p and variable \"%s\"\n",
 		       r, entity_name(v));
-	    pips_internal_error("Failed substitution\n");
+	    pips_internal_error("Failed substitution");
 	  }
 	}, refs);
       gen_free_list(dl);
@@ -1939,7 +1939,7 @@ void UseFormalArguments(entity f)
 /*
 //static void clean_up_dummy_parameter_type(type t, list fpl)
 //{
-//  pips_internal_error("This function should not be called\n");
+//  pips_internal_error("This function should not be called");
 //  dummy_formal_list = fpl;
 //  gen_multi_recurse(t, reference_domain, gen_true, cancel_dummy_reference, NULL);
 //}
@@ -2138,7 +2138,7 @@ void CreateReturnEntity(entity f)
       }
     }
     else
-      pips_internal_error("This function should only be called with a function entity\n");
+      pips_internal_error("This function should only be called with a function entity");
   }
 }
 
@@ -2511,7 +2511,7 @@ void CleanUpEntities(list le)
 	}
       }
       if(!found)
-	pips_internal_error("Entity to be replaced not declared\n");
+	pips_internal_error("Entity to be replaced not declared");
 
       /* Update storage area */
       found = FALSE;
@@ -2529,10 +2529,10 @@ void CleanUpEntities(list le)
 	  }
 	}
 	if(!found)
-	  pips_internal_error("Entity to be replaced not allocated in its ram area\n");
+	  pips_internal_error("Entity to be replaced not allocated in its ram area");
       }
       else {
-	pips_internal_error("Unexpected storage kind\n");
+	pips_internal_error("Unexpected storage kind");
       }
 
       /* Update entity in current entity list */
@@ -2705,7 +2705,7 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	  }
 	}
 	else
-	  pips_internal_error("unexpected type\n");
+	  pips_internal_error("unexpected type");
 	/* Although it should be popped from the stack, the current
 	   context seems to be used later in case of typedef, such as
 	   seen in decl24.c */
@@ -3305,7 +3305,7 @@ void set_entity_initial(entity v, expression nie)
 	else {
 	  fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
 	}
-	pips_internal_error("Scoping might be the reason\n");
+	pips_internal_error("Scoping might be the reason");
       }
     }
   }
@@ -3333,7 +3333,7 @@ bool check_declaration_uniqueness_p(statement s)
     }
   }
   if(failure_p)
-    pips_internal_error("Module declarations are not unique\n");
+    pips_internal_error("Module declarations are not unique");
 
   return !failure_p;
 }

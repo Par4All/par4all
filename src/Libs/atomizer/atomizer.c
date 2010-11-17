@@ -427,7 +427,7 @@ Block *cb;
     case is_instruction_unstructured :
     { atomizer_of_unstructured(instruction_unstructured(inst));
 	break; }
-    default : pips_error("atomizer_of_statement", "Bad instruction tag");
+    default : pips_internal_error("Bad instruction tag");
     }
 
     /* Updates of the control graph, if the generated statements are not put in
@@ -681,9 +681,9 @@ Block *cb;
     case is_value_symbolic: break;
     case is_value_constant: break;
     case is_value_unknown:
-	    pips_error("atomizer_of_call", "unknown function %s\n", n);
+	    pips_internal_error("unknown function %s", n);
 	    break;
-    default: pips_error("atomizer_of_call", "unknown tag %d\n", t);
+    default: pips_internal_error("unknown tag %d", t);
     }
 }
 
@@ -912,7 +912,7 @@ int mem_var;
 	ret_exp = exp;;
 	break;
     }
-    default : pips_error("atomizer_of_expression", "Bad syntax tag");
+    default : pips_internal_error("Bad syntax tag");
     }
     debug(5, "atomizer_of_expression", "end   : %s\n",
 	  words_to_string(words_expression(ret_exp, NIL)));

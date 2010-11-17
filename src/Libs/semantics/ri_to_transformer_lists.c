@@ -101,7 +101,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
   list tfl = NIL;
   transformer tf = transformer_undefined;
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_debug(8, "Transformer for declaration of \"%s\"\n", entity_name(v));
 
@@ -140,12 +140,12 @@ list declaration_to_transformer_list(entity v, transformer pre)
       tf = transformer_identity();
     }
     else if (value_symbolic_p(vv)) {
-      pips_internal_error("Unexpected value tag: symbolic\n");
+      pips_internal_error("Unexpected value tag: symbolic");
     }
     else if (value_constant_p(vv)) {
       tf = transformer_identity();
       //  SG: quickly fix this, unsure about the meaning
-      //pips_internal_error("Unexpected value tag: constant\n");
+      //pips_internal_error("Unexpected value tag: constant");
     }
     else if (value_expression_p(vv)) {
       expression e = value_expression(vv);
@@ -185,7 +185,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
       }
     }
     else {
-      pips_internal_error("Unexpected value tag\n");
+      pips_internal_error("Unexpected value tag");
     }
   }
   else {
@@ -218,7 +218,7 @@ list declarations_to_transformer_list(list dl, transformer pre)
   list l = dl;
 
   // May never be useful
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_debug(8,"begin\n");
 
@@ -478,7 +478,7 @@ list  intrinsic_to_transformer_list(entity e,
   list tl = NIL;
   transformer tf = transformer_undefined;
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_debug(8, "begin\n");
 
@@ -547,7 +547,7 @@ list assigned_expression_to_transformer_list(entity v,
   list tl = NIL;
   transformer tf = transformer_undefined;
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_debug(8, "begin\n");
 
@@ -606,7 +606,7 @@ list safe_assigned_expression_to_transformer_list(entity v,
   list tl = NIL;
   transformer tf = transformer_undefined;
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   if(expression_undefined_p(expr)) {
     ; // That is fixed below
@@ -657,7 +657,7 @@ list integer_assign_to_transformer_list(expression lhs,
   transformer tf = transformer_undefined;
   normalized n = NORMALIZE_EXPRESSION(lhs);
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_debug(8,"begin\n");
 
@@ -706,7 +706,7 @@ list any_scalar_assign_to_transformer_list(entity v,
   list tl = NIL;
   transformer tf = transformer_undefined;
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   if(entity_has_values_p(v)) {
     entity v_new = entity_to_new_value(v);
@@ -775,7 +775,7 @@ list any_assign_to_transformer_list(list args, /* arguments for assign */
   expression rhs = EXPRESSION(CAR(CDR(args)));
   syntax slhs = expression_syntax(lhs);
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_assert("2 args to assign", CDR(CDR(args))==NIL);
 
@@ -809,7 +809,7 @@ list any_update_to_transformer_list(entity op,
   expression rhs = EXPRESSION(CAR(CDR(args)));
   syntax slhs = expression_syntax(lhs);
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_assert("2 args for regular update", CDR(CDR(args))==NIL);
 
@@ -847,7 +847,7 @@ list any_basic_update_to_transformer_list(entity op,
   expression lhs = EXPRESSION(CAR(args));
   syntax slhs = expression_syntax(lhs);
 
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
 
   pips_assert("1 arg for basic_update", CDR(args)==NIL);
 
@@ -947,7 +947,7 @@ static list instruction_to_transformer_list(instruction i,
     tl = NIL;
     break;
   default:
-    pips_internal_error("unexpected tag %d\n", instruction_tag(i));
+    pips_internal_error("unexpected tag %d", instruction_tag(i));
   }
   pips_debug(9, "resultat:\n");
   ifdebug(9) (void) print_transformers(tl);
@@ -1058,7 +1058,7 @@ list statement_to_transformer_list(statement s,
 	/* (void) print_transformer(load_statement_transformer(s)); */
 	(void) print_transformer(nt);
 	dump_transformer(nt);
-	pips_internal_error("Inconsistent transformer detected\n");
+	pips_internal_error("Inconsistent transformer detected");
       }
       ifdebug(1) {
 	pips_assert("Transformer is internally consistent",

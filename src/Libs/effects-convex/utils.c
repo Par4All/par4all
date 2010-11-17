@@ -396,7 +396,7 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	    break;
 
 	default:
-	    pips_error("region_sc_normalize", "unknown level %d\n", level);
+	    pips_internal_error("unknown level %d", level);
 	}
 
 	if (SC_EMPTY_P(sc_reg))
@@ -738,8 +738,7 @@ region_value_substitute(region reg, entity e1, entity e2)
 	}
 	else
 	{
-	    pips_error("region_value_substitute",
-		       "conflict between e1=%s and e2=%s\n",
+	    pips_internal_error("conflict between e1=%s and e2=%s",
 		       entity_name(e1), entity_name(e2));
 	}
     }
@@ -1151,7 +1150,7 @@ effect make_reference_region(reference ref, action tac)
     }
 
   if (dummy_parameter_entity_p(e))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)\n",
+    pips_internal_error("the input reference entity is a dummy parameter (%s)",
 			entity_name(e));
 
   /* FI: If t is a pointer type, then d should depend on the type_depth
@@ -2911,8 +2910,7 @@ bool same_common_variables_p(entity e1, entity e2)
 	ty2 = entity_type(e2);
 	if ((! (type_tag(ty1) == is_type_variable)) ||
 	    (! (type_tag(ty2) == is_type_variable))) {
-	    pips_error("same_common_variables__p",
-		       "arrays entities with not variable type : %s %s",
+	    pips_internal_error("arrays entities with not variable type : %s %s",
 		       entity_name(e1), entity_name(e2));
 	}
 

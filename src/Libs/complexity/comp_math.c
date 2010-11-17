@@ -92,7 +92,7 @@ complexity clower, cupper;
     Ppolynome ppupper = POLYNOME_NUL;
 
     if (COMPLEXITY_UNDEFINED_P(comp))
-	pips_error("complexity_sigma", "complexity undefined\n");
+	pips_internal_error("complexity undefined");
 
     if (complexity_zero_p(comp))
 	return (cresult);
@@ -161,7 +161,7 @@ complexity compsubst;
     complexity cresult = make_zero_complexity();
 
     if (COMPLEXITY_UNDEFINED_P(comp) || COMPLEXITY_UNDEFINED_P(compsubst)) 
-	pips_error("complexity_var_subst", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr,"complexity_var_subst, variable name=%s\n",
@@ -245,7 +245,7 @@ boolean complexity_zero_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
-	pips_error("complexity_zero_p", "undefined complexity");
+	pips_internal_error("undefined complexity");
 
     if ( POLYNOME_NUL_P((Ppolynome)complexity_eval(comp)) )
 	return (TRUE);
@@ -257,7 +257,7 @@ boolean complexity_constant_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
-	pips_error("complexity_constant_p", "undefined complexity");
+	pips_internal_error("undefined complexity");
 
     if ( complexity_zero_p(comp) ) 
 	return (TRUE);
@@ -270,7 +270,7 @@ boolean complexity_unknown_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
-	pips_error("complexity_unknown_p", "undefined complexity");
+	pips_internal_error("undefined complexity");
 
     /* FI: Management of unknown complexities, when polynomes are in
        fact used to represent the value of a variables or an expression,
@@ -289,7 +289,7 @@ float complexity_TCST(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) )
-	pips_error("complexity_TCST", "undefined complexity\n");
+	pips_internal_error("undefined complexity");
 
     if ( complexity_zero_p(comp) ) 
 	return ((float) 0);
@@ -305,7 +305,7 @@ complexity *pcomp;
 float f;
 {
     if ( COMPLEXITY_UNDEFINED_P(*pcomp) )
-	pips_error("complexity_scalar_mult", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( f == 0.00 ) {
 	complexity_rm(pcomp);	
@@ -329,7 +329,7 @@ complexity *pcomp1, comp2;
     }
 
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
-	pips_error("complexity_stats_add", "complexity undefined\n");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(*pcomp1) ) {
 	*pcomp1 = complexity_dup(comp2);
@@ -373,7 +373,7 @@ void complexity_add(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
-	pips_error("complexity_add", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(*pcomp1) ) {
 	*pcomp1 = complexity_dup(comp2);
@@ -395,7 +395,7 @@ void complexity_sub(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
-	pips_error("complexity_sub", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(*pcomp1) ) 
 	*pcomp1 = complexity_dup(comp2);
@@ -419,7 +419,7 @@ void complexity_mult(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
-	pips_error("complexity_mult", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(comp2) ) {
 	complexity_rm(pcomp1);
@@ -446,10 +446,10 @@ void complexity_div(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
-	pips_error("complexity_div", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(comp2) ) {
-	pips_error("complexity_div", "complexity divider is zero\n");
+	pips_internal_error("complexity divider is zero");
     }
     else if ( !complexity_zero_p(*pcomp1) ) {
 	Ppolynome ppdiv;
@@ -465,9 +465,9 @@ complexity *pcomp;
 Ppolynome pp;
 {
     if ( COMPLEXITY_UNDEFINED_P(*pcomp) ) 
-	pips_error("complexity_polynome_add", "complexity undefined\n");
+	pips_internal_error("complexity undefined");
     else if ( POLYNOME_UNDEFINED_P(pp)  )
-	pips_error("complexity_polynome_add", "polynome undefined\n");
+	pips_internal_error("polynome undefined");
     else {
 	complexity_eval_(*pcomp) = 
 	    newgen_Ppolynome(polynome_addition(complexity_eval(*pcomp), pp));
@@ -482,7 +482,7 @@ complexity *pcomp;
 float f;
 {
     if ( COMPLEXITY_UNDEFINED_P(*pcomp) ) 
-	pips_error("complexity_float_add", "complexity undefined");
+	pips_internal_error("complexity undefined");
     
     if ( complexity_zero_p(*pcomp) ) 
     {
@@ -507,7 +507,7 @@ Ppolynome complexity_polynome(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
-	pips_error("complexity_polynome", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(comp) ) 
 	return (POLYNOME_NUL);

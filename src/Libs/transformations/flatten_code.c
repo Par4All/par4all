@@ -172,7 +172,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	   int a[] = {1, 2, 3};
 	   int i = a[1];
 	*/
-	pips_internal_error("C89 flattened code not generated yet\n");
+	pips_internal_error("C89 flattened code not generated yet");
       }
       else
 #endif
@@ -493,7 +493,7 @@ static void statement_flatten_declarations(entity module, statement s)
     }
 
     else
-        pips_internal_error("Input assumptions not met.\n");
+        pips_internal_error("Input assumptions not met.");
 }
 
 

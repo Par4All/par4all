@@ -365,7 +365,7 @@ fprintf(stderr, "\n");
  }
 
       if(!egalite_normalize(eq))
-        pips_error("new_elim_var_with_eg", "Egalite bizarre\n");
+        pips_internal_error("Egalite bizarre");
 
       sc_nbre_egalites(ps)--;
       if (eq == (ps->egalites)) ps->egalites = eq->succ;
@@ -993,7 +993,7 @@ entity var;
       first = (entity) pv->var;
     }
     if(pv != NULL)
-      pips_error("di_polynome_var_subst_null", "Vecteur should contains 2 var\n");
+      pips_internal_error("Vecteur should contains 2 var");
     else if(same_entity_p(first, var) || same_entity_p(second, var)) {
       if(POLYNOME_UNDEFINED_P(p)) {
 	*pp = ppp->succ;
@@ -1323,7 +1323,7 @@ Variable var;
         first = (entity) vec->var;
       }
       if(vec != NULL)
-        pips_error("prototype_factorize", "Vecteur should contains 2 var\n");
+        pips_internal_error("Vecteur should contains 2 var");
       else if(same_entity_p(first,  (entity) var))
 	if(second == entity_undefined)
 	  newvar = TCST;

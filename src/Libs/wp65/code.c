@@ -748,8 +748,7 @@ tiling tile;
 	return(*lt);
 	break;
     case is_instruction_test:
-	pips_error("reference_conversion_statement", 
-		   "Reference conversion not implemented for tests\n");
+	pips_internal_error("Reference conversion not implemented for tests");
 	break;
     case is_instruction_loop: 
 
@@ -762,8 +761,7 @@ tiling tile;
 	 return(*lt);
 	break;
     case is_instruction_goto:
-	pips_error("reference_conversion_statement", 
-		   "Unexpected goto (in restructured code)\n");
+	pips_internal_error("Unexpected goto (in restructured code)");
 	break;
     case is_instruction_call:
 	/* the function is assumed to be unchanged */
@@ -781,8 +779,7 @@ tiling tile;
 	 return(*lt);
 	break;
     case is_instruction_unstructured:
-	pips_error("reference_conversion_statement", 
-		   "Reference conversion not implemented for unstructureds\n");
+	pips_internal_error("Reference conversion not implemented for unstructureds");
 	break;
     default:
 	break;
@@ -844,8 +841,7 @@ list reference_conversion_computation(
 	     return (*lt);
 	break;
     default:
-	pips_error("reference_conversion_expression",
-		   "Unexpected syntax tag %d\n", syntax_tag(s));
+	pips_internal_error("Unexpected syntax tag %d", syntax_tag(s));
 	break;
     }
     return(*lt);
@@ -906,8 +902,7 @@ Pbase local_basis;
 	break;
     }
     case is_syntax_range:
-	pips_error("reference_conversion_expression", 
-		   "Ranges are not (yet) handled\n");
+	pips_internal_error("Ranges are not (yet) handled");
 	break;
     case is_syntax_call:
 	/* the called function is assumed to be unchanged */
@@ -919,8 +914,7 @@ Pbase local_basis;
 	     call_arguments(syntax_call(s)));
 	break;
     default:
-	pips_error("reference_conversion_expression",
-		   "Unexpected syntax tag %d\n", syntax_tag(s));
+	pips_internal_error("Unexpected syntax tag %d", syntax_tag(s));
 	break;
     }
 
@@ -1069,8 +1063,7 @@ Pbase *new_index_base;
 	    sc_array_function->nb_ineq ++;
 	}
 	else {
-	    pips_error("build_sc_with_several_uniform_ref",
-		       "Non-linear subscript expression\n");
+	    pips_internal_error("Non-linear subscript expression");
 	}
     }
     sc_creer_base(sc_array_function);
@@ -1108,8 +1101,7 @@ Pbase *new_index_base;
 		}
 	    }
 	    else if (vect_size(pv3) >1) 
-		pips_error("build_sc_with_several_uniform_ref",
-			   "Non uniform dependent references\n");
+		pips_internal_error("Non uniform dependent references");
 	}
     }
 

@@ -839,7 +839,7 @@ static transformer transformer_add_condition_information_updown(
     }
   case is_syntax_range:
     {
-      pips_internal_error("range used as test condition!\n");
+      pips_internal_error("range used as test condition!");
       break;
     }
   case is_syntax_subscript:
@@ -849,7 +849,7 @@ static transformer transformer_add_condition_information_updown(
         break;
     }
   default:
-      pips_internal_error("ill. expr. as test condition\n");
+      pips_internal_error("ill. expr. as test condition");
   }
 
   ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
@@ -1829,7 +1829,7 @@ static transformer logical_constant_to_transformer(entity v,
     ;
   }
   else {
-    pips_internal_error("Unknown logical constant %s\n",
+    pips_internal_error("Unknown logical constant %s",
 	       entity_name(f));
   }
   c = contrainte_make(eq);
@@ -1858,8 +1858,7 @@ static transformer logical_unary_operation_to_transformer(entity v,
     vect_add_elem(&eq, TCST , VALUE_MONE);
   }
   else {
-    pips_error("logical_constant_to_transformer",
-	       "Unknown logical constant %s\n",
+    pips_internal_error("Unknown logical constant %s",
 	       entity_name(op));
   }
   tf = transformer_equality_add(tf, eq);
@@ -1944,7 +1943,7 @@ static transformer logical_binary_operation_to_transformer(entity v,
       vect_add_elem(&eq2, TCST , VALUE_MONE+VALUE_MONE);
     }
     else {
-      pips_internal_error("Unexpected binary logical operator %s\n",
+      pips_internal_error("Unexpected binary logical operator %s",
 			  entity_name(op));
     }
     tf = transformer_inequality_add(tf, eq1);
@@ -2057,7 +2056,7 @@ transformer logical_expression_to_transformer(entity v,
       tf = logical_binary_function_to_transformer(v, syntax_call(srhs), pre, is_internal);
       break;
     default:
-      pips_internal_error("Too many logical arguments, %d, for operator %s\n",
+      pips_internal_error("Too many logical arguments, %d, for operator %s",
 			  gen_length(call_arguments(syntax_call(srhs))),
 			  entity_name(call_function(syntax_call(srhs))));
     }
@@ -2067,10 +2066,10 @@ transformer logical_expression_to_transformer(entity v,
 					  is_internal);
     break;
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
   return tf;
 }
@@ -2095,7 +2094,7 @@ transformer string_expression_to_transformer(entity v,
     case 3:
       break;
     default:
-      pips_internal_error("Too many arguments, %d, for operator %s\n",
+      pips_internal_error("Too many arguments, %d, for operator %s",
 			  gen_length(call_arguments(syntax_call(srhs))),
 			  entity_name(call_function(syntax_call(srhs))));
     }
@@ -2125,10 +2124,10 @@ transformer string_expression_to_transformer(entity v,
     break;
     }
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
 
   return tf;
@@ -2250,10 +2249,10 @@ transformer float_expression_to_transformer(entity v,
       break;
     }
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
 
   return tf;
@@ -2366,7 +2365,7 @@ transformer transformer_add_any_relation_information(
 	break;
       }
     case is_basic_overloaded:
-      pips_internal_error("illegal overloaded type for operator %s\n",
+      pips_internal_error("illegal overloaded type for operator %s",
 		 entity_name(op));
       break;
     case is_basic_bit:
@@ -2381,11 +2380,11 @@ transformer transformer_add_any_relation_information(
       /* Nothing to be done wit hsturct and union */
       break;
     case is_basic_typedef:
-      pips_internal_error("typedef should ne converted to concrete types for operator %s\n",
+      pips_internal_error("typedef should ne converted to concrete types for operator %s",
 			entity_name(op));
       break;
     default:
-      pips_internal_error("unknown basic b=%d\n", basic_tag(b1));
+      pips_internal_error("unknown basic b=%d", basic_tag(b1));
     }
   }
 
@@ -2508,7 +2507,7 @@ transformer any_expression_to_transformer(
       if(expression_call_p(expr) && ENTITY_CONTINUE_P(call_function(expression_call(expr))))
 	tf = transformer_identity();
       else
-	pips_internal_error("illegal overloaded type for an expression\n");
+	pips_internal_error("illegal overloaded type for an expression");
       break;
     }
     case is_basic_derived: {
@@ -2519,15 +2518,15 @@ transformer any_expression_to_transformer(
 	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
       }
       else {
-      pips_internal_error("entities of type \"derived\" that are not \"enum\" cannot be analyzed\n");
+      pips_internal_error("entities of type \"derived\" that are not \"enum\" cannot be analyzed");
       }
       break;
     }
     case is_basic_typedef:
-      pips_internal_error("entities of type \"typedef\" cannot be analyzed\n");
+      pips_internal_error("entities of type \"typedef\" cannot be analyzed");
       break;
     default:
-      pips_internal_error("unknown basic b=%d\n", basic_tag(be));
+      pips_internal_error("unknown basic b=%d", basic_tag(be));
     }
   }
   else {
@@ -2619,7 +2618,7 @@ transformer expression_to_transformer(
     }
     else {
       /* Wait till it happpens... */
-      pips_internal_error("This case is not handled yet\n");
+      pips_internal_error("This case is not handled yet");
     }
   }
   else if(analyzable_type_p(et)) {

@@ -827,7 +827,7 @@ string print_variables(expression e)
     }
   default:
     {
-      pips_error("", "Unexpected expression tag %d \n", t );
+      pips_internal_error("Unexpected expression tag %d ", t );
       break;
     }
   }
@@ -1049,7 +1049,7 @@ static void bottom_up_abc_statement_rwt(
        * we don't have to check unstructured  instruction here*/
       break;
     default:
-      pips_error("", "Unexpected instruction tag %d \n", t );
+      pips_internal_error("Unexpected instruction tag %d ", t );
       break;
     }
 }

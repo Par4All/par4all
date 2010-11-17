@@ -174,7 +174,7 @@ statement C_MakeReturnStatement(list el, int ln, string c)
       ainst = make_assign_instruction(entity_to_expression(rv), e);
     }
     else {
-      pips_internal_error("This case is not implemented yet.\n");
+      pips_internal_error("This case is not implemented yet.");
     }
   }
 

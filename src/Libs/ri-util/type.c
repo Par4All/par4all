@@ -118,7 +118,7 @@ int the_tag;
 	return(make_basic(is_basic_string, string_undefined));
 	break;
     default:
-	pips_error("MakeBasic", "unexpected basic tag: %d\n",
+	pips_internal_error("unexpected basic tag: %d",
 		   the_tag);
 	break;
     }
@@ -388,7 +388,7 @@ bool type_equal_p(type t1, type t2)
   case is_type_void:
     return TRUE;
   default:
-    pips_error("type_equal_p", "unexpected tag %d\n", type_tag(t1));
+    pips_internal_error("unexpected tag %d", type_tag(t1));
   }
 
   return FALSE; /* just to avoid a warning */
@@ -531,8 +531,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
      * I do not think so
      */
     /*
-      pips_error("basic_equal_p",
-      "string type comparison not implemented\n");
+      pips_internal_error("string type comparison not implemented");
     */
     /* could be a star or an expression; a value_equal_p() is needed! */
     return TRUE;
@@ -540,7 +539,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
     /* FI->BC (?): suffixes _p should be removed */
     return basic_typedef_p(b2)
       && same_entity_p(basic_typedef(b1),basic_typedef(b2));
-  default: pips_internal_error("unexpected tag %d\n", basic_tag(b1));
+  default: pips_internal_error("unexpected tag %d", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
 }
@@ -626,7 +625,7 @@ int string_type_size(basic b)
       if(constant_int_p(c))
 	size = constant_int(c);
       else
-	pips_internal_error("Non-integer constant to size a string\n");
+	pips_internal_error("Non-integer constant to size a string");
       break;
     case is_value_unknown:
       /* The size may be unknown as in CHARACTER*(*) */
@@ -634,7 +633,7 @@ int string_type_size(basic b)
 	size = -1;
       break;
     default:
-	pips_internal_error("Non-constant value to size a string\n");
+	pips_internal_error("Non-constant value to size a string");
     }
 
     return size;
@@ -653,19 +652,19 @@ int basic_type_size(basic b)
     case is_basic_logical: size = basic_logical(b);
 	break;
     case is_basic_overloaded:
-	pips_error("basic_type_size", "undefined for type overloaded\n");
+	pips_internal_error("undefined for type overloaded");
 	break;
     case is_basic_complex: size = basic_complex(b);
 	break;
     case is_basic_string:
-      /* pips_error("basic_type_size", "undefined for type string\n"); */
+      /* pips_internal_error("undefined for type string"); */
       size = string_type_size(b);
 	break;
     case is_basic_pointer:
       size = DEFAULT_POINTER_TYPE_SIZE;
       break;
     default: size = basic_int(b);
-	pips_error("basic_type_size", "ill. tag %d\n", basic_tag(b));
+	pips_internal_error("ill. tag %d", basic_tag(b));
 	break;
     }
 
@@ -719,7 +718,7 @@ basic expression_basic(expression expr)
       break;
       }
     default:
-	pips_internal_error("unexpected syntax tag\n");
+	pips_internal_error("unexpected syntax tag");
 	break;
     }
 
@@ -751,10 +750,10 @@ dimension FindIthDimension(entity e, int i)
     cons * pc;
 
     if (!type_variable_p(entity_type(e)))
-	pips_error("FindIthDimension", "not a variable\n");
+	pips_internal_error("not a variable");
 
     if (i <= 0)
-	pips_error("FindIthDimension", "invalid dimension\n");
+	pips_internal_error("invalid dimension");
 
     pc = variable_dimensions(type_variable(entity_type(e)));
 
@@ -762,7 +761,7 @@ dimension FindIthDimension(entity e, int i)
 	pc = CDR(pc);
 
     if (pc == NULL)
-	pips_internal_error("not enough dimensions\n");
+	pips_internal_error("not enough dimensions");
 
     return(DIMENSION(CAR(pc)));
 }
@@ -853,7 +852,7 @@ static basic basic_and_indices_to_basic(basic b, list indices,bool ultimate_p)
                 ;
             }
             else
-                pips_internal_error("Unexpected basic kind\n");
+                pips_internal_error("Unexpected basic kind");
         }
         else
         {
@@ -910,7 +909,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	  /* FI: I cannot think of anything better... */
 	  b = basic_undefined;
 	else
-	  pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	  pips_internal_error("Bad reference type tag %d",type_tag(t));
       }
       else
 	b = copy_basic(variable_basic(type_variable(t)));
@@ -924,7 +923,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
        {
          type t = sizeofexpression_type(se);
          if (type_tag(t) != is_type_variable)
-           pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+           pips_internal_error("Bad reference type tag %d",type_tag(t));
          b = copy_basic(variable_basic(type_variable(t)));
        }
       else
@@ -959,17 +958,17 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	if(type_variable_p(t))
 	  b = copy_basic(variable_basic(type_variable(t)));
 	else
-	  pips_internal_error("Not implemented\n");
+	  pips_internal_error("Not implemented");
       }
       else {
 	expression e = sizeofexpression_expression(sofe);
 	b = basic_of_any_expression(e, TRUE);
-	pips_internal_error("expression not expected here\n");
+	pips_internal_error("expression not expected here");
       }
       break;
     }
   default:
-    pips_internal_error("Bad syntax tag %d\n", syntax_tag(sy));
+    pips_internal_error("Bad syntax tag %d", syntax_tag(sy));
     /* Never go there... */
     b = make_basic(is_basic_overloaded, UUINT(4));
   }
@@ -1026,7 +1025,7 @@ basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {
 
     if(apply_p) {
       if(!type_functional_p(exp_type))
-        pips_internal_error("Bad reference type tag %d \"%s\"\n",
+        pips_internal_error("Bad reference type tag %d \"%s\"",
             type_tag(exp_type));
       else {
         type rt = functional_result(type_functional(exp_type));
@@ -1035,7 +1034,7 @@ basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {
         if(type_variable_p(urt))
           b = copy_basic(variable_basic(type_variable(urt)));
           else
-          pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
+          pips_internal_error("Unexpected type tag %s", type_to_string(urt));
       }
     } else {
       if(type_variable_p(exp_type)) {
@@ -1055,7 +1054,7 @@ basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {
         /* A reference to a function returns a pointer to a function of the very same time */
         b = make_basic_pointer(copy_type(exp_type));
       } else {
-        pips_internal_error("Bad reference type tag %d \"%s\"\n",
+        pips_internal_error("Bad reference type tag %d \"%s\"",
             type_tag(exp_type), type_to_string(exp_type));
       }
     }
@@ -1111,7 +1110,7 @@ basic basic_of_call(call c, bool apply_p, bool ultimate_p)
 	      entity_name(e));
 	b = copy_basic(basic_of_external(c));
 	break;
-    default: pips_internal_error("unknown tag %d\n", t);
+    default: pips_internal_error("unknown tag %d", t);
 	/* Never go there... */
     }
     return b;
@@ -1134,7 +1133,7 @@ basic basic_of_external(call c)
     pips_debug(7, "External call to %s\n", entity_name(f));
 
     if (type_tag(call_type) != is_type_functional)
-	pips_error("basic_of_external", "Bad call type tag");
+	pips_internal_error("Bad call type tag");
 
     return_type = functional_result(type_functional(call_type));
 
@@ -1143,7 +1142,7 @@ basic basic_of_external(call c)
 	pips_user_error("A subroutine or void returning function is used as an expression\n");
       }
       else {
-	pips_internal_error("Bad return call type tag \"%s\"\n", type_to_string(return_type));
+	pips_internal_error("Bad return call type tag \"%s\"", type_to_string(return_type));
       }
     }
 
@@ -1241,7 +1240,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                             rb = copy_basic(variable_basic(type_variable(rt)));
                         else {
                             /* Too bad for "void"... */
-                            pips_internal_error("result type of a functional type must be a variable type\n");
+                            pips_internal_error("result type of a functional type must be a variable type");
                         }
                     }
                     else {
@@ -1249,7 +1248,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                     }
                 }
                 else {
-                    pips_internal_error("unhandled case\n");
+                    pips_internal_error("unhandled case");
                 }
             }
             else {
@@ -1279,14 +1278,14 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                     /* This can also be a user error, but if the function is
                        called from the parser, a CParserError() should be called:
                        how to guess what to do? */
-                    pips_internal_error("Dereferencing of a non-pointer, non array expression\n"
+                    pips_internal_error("Dereferencing of a non-pointer, non array expression"
                             "Please use gcc to check that your source code is legal\n");
                 }
                 if(ultimate_p) free_type(et);
             }
         }
         else if(ENTITY_POINT_TO_P(f)) {
-            //pips_internal_error("Point to case not implemented yet\n");
+            //pips_internal_error("Point to case not implemented yet");
             expression e1 = EXPRESSION(CAR(args));
             expression e2 = EXPRESSION(CAR(CDR(args)));
             free_basic(rb);
@@ -1362,12 +1361,12 @@ basic basic_of_constant(call c)
     call_type = entity_type(call_function(c));
 
     if (type_tag(call_type) != is_type_functional)
-	pips_error("basic_of_constant", "Bad call type tag");
+	pips_internal_error("Bad call type tag");
 
     return_type = functional_result(type_functional(call_type));
 
     if (type_tag(return_type) != is_type_variable)
-	pips_error("basic_of_constant", "Bad return call type tag");
+	pips_internal_error("Bad return call type tag");
 
     return(variable_basic(type_variable(return_type)));
 }
@@ -1423,7 +1422,7 @@ basic basic_maximum(basic fb1, basic fb2)
       return b;
     }
     else
-      pips_internal_error("Unanalyzed derived basic b1\n");
+      pips_internal_error("Unanalyzed derived basic b1");
   }
 
   if(basic_derived_p(fb2)) {
@@ -1436,7 +1435,7 @@ basic basic_maximum(basic fb1, basic fb2)
       return b;
     }
     else
-      pips_internal_error("Unanalyzed derived basic b2\n");
+      pips_internal_error("Unanalyzed derived basic b2");
   }
 
   /* FI: I do not believe this is correct for all intrinsics! */
@@ -1549,7 +1548,7 @@ basic basic_maximum(basic fb1, basic fb2)
 	  b = copy_basic(b1);
 	else if(basic_pointer_p(b2)) {
 	  /* How can we compare two pointer types? Equality? Comparison of the pointed types? */
-	  /* pips_internal_error("Comparison of two pointer types not implemented\n"); */
+	  /* pips_internal_error("Comparison of two pointer types not implemented"); */
 	  type t1 = basic_pointer(b1);
 	  type t2 = basic_pointer(b2);
 
@@ -1566,25 +1565,25 @@ basic basic_maximum(basic fb1, basic fb2)
 	  else if (type_void_p(t1) && type_void_p(t2) )
           b = copy_basic(b1);
       else
-	    pips_internal_error("Comparison of two pointer types not meaningful\n");
+	    pips_internal_error("Comparison of two pointer types not meaningful");
 	}
 	else if(basic_derived_p(b2))
-	  pips_internal_error("Comparison between pointer and struct/union not implemented\n");
+	  pips_internal_error("Comparison between pointer and struct/union not implemented");
 	else if(basic_typedef_p(b2))
-	  pips_internal_error("b2 cannot be a typedef basic\n");
+	  pips_internal_error("b2 cannot be a typedef basic");
 	else
-	  pips_internal_error("unknown tag %d for basic b2\n", basic_tag(b2));
+	  pips_internal_error("unknown tag %d for basic b2", basic_tag(b2));
       break;
        }
      case is_basic_derived:
       /* How do you compare a structure or a union to another type?
 	 The only case which seems to make sense is equality. */
-      pips_internal_error("Derived basic b1 it not comparable to another basic\n");
+      pips_internal_error("Derived basic b1 it not comparable to another basic");
       break;
     case is_basic_typedef:
-      pips_internal_error("b1 cannot be a typedef basic\n");
+      pips_internal_error("b1 cannot be a typedef basic");
       break;
-    default: pips_internal_error("Ill. basic tag %d\n", basic_tag(b1));
+    default: pips_internal_error("Ill. basic tag %d", basic_tag(b1));
     }
   }
 
@@ -1594,8 +1593,7 @@ basic basic_maximum(basic fb1, basic fb2)
     if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
     (t1 != is_basic_int) && (t2 != is_basic_complex) &&
     (t2 != is_basic_float) && (t2 != is_basic_int) )
-    pips_error("basic_union",
-    "Bad basic tag for expression in numerical function");
+    pips_internal_error("Bad basic tag for expression in numerical function");
 
     if(t1 == is_basic_complex)
     return(b1);
@@ -1727,7 +1725,7 @@ type intrinsic_call_to_type(call c)
 	      }
 	    else
 	      {
-		pips_internal_error("dereferencing of a non-variable : not handled yet\n");
+		pips_internal_error("dereferencing of a non-variable : not handled yet");
 	      }
 	  }
 	else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f))
@@ -1803,7 +1801,7 @@ type intrinsic_call_to_type(call c)
     }
   }
   else
-    pips_internal_error("Unexpected return type.\n");
+    pips_internal_error("Unexpected return type.");
 
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" "
 	     "with a posteriori result type \"%s\"\n",
@@ -1848,7 +1846,7 @@ type call_to_type(call c)
 		    make_variable(copy_basic(basic_of_external(c)),
 				  NIL, NIL));
       break;
-    default: pips_internal_error("unknown tag %d\n", t);
+    default: pips_internal_error("unknown tag %d", t);
       /* Never go there... */
     }
 
@@ -1919,7 +1917,7 @@ type reference_to_type(reference ref)
     }
   else
     {
-      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s\n",
+      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
 			  type_tag(exp_type),
 			  type_to_string(exp_type),
 			  entity_name(reference_variable(ref)));
@@ -1979,7 +1977,7 @@ type expression_to_type(expression exp)
 	pips_debug(6, "cast case \n");
 	t = copy_type(cast_type(syntax_cast(s_exp)));
 	if (!type_void_p(t) && type_tag(t) != is_type_variable)
-	  pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	  pips_internal_error("Bad reference type tag %d",type_tag(t));
 	break;
       }
     case is_syntax_sizeofexpression:
@@ -1991,7 +1989,7 @@ type expression_to_type(expression exp)
 	  {
 	    t = copy_type(sizeofexpression_type(se));
 	    if (type_tag(t) != is_type_variable)
-	      pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	      pips_internal_error("Bad reference type tag %d",type_tag(t));
 	  }
 	else
 	  {
@@ -2027,7 +2025,7 @@ type expression_to_type(expression exp)
 		  cd = variable_dimensions(type_variable(ct));
 		}
 		else {
-		  pips_internal_error("unhandled case\n");
+		  pips_internal_error("unhandled case");
 		}
 	      }
 	    POP(l_inds);	
@@ -2059,7 +2057,7 @@ type expression_to_type(expression exp)
       }
       
     default:
-      pips_internal_error("Bad syntax tag %d\n", syntax_tag(s_exp));
+      pips_internal_error("Bad syntax tag %d", syntax_tag(s_exp));
       /* Never go there... */
     }
 
@@ -2138,9 +2136,9 @@ is_inferior_basic(b1, b2)
 basic b1, b2;
 {
     if ( b1 == basic_undefined )
-	pips_error("is_inferior_basic", "first  basic_undefined\n");
+	pips_internal_error("first  basic_undefined");
     else if ( b2 == basic_undefined )
-	pips_error("is_inferior_basic", "second basic_undefined\n");
+	pips_internal_error("second basic_undefined");
 
     if (basic_overloaded_p(b1))
 	return (TRUE);
@@ -2177,7 +2175,7 @@ basic b1, b2;
 	    return (TRUE);
     }
     else
-	pips_error("is_inferior_basic", "Case never occurs.\n");
+	pips_internal_error("Case never occurs.");
     return (TRUE);
 }
 
@@ -2404,7 +2402,7 @@ list type_fields(type t)
       l_res = type_enum(t);
       break;
     default:
-      pips_internal_error("type_fields improperly called\n");
+      pips_internal_error("type_fields improperly called");
     }
   return l_res;
 
@@ -2447,7 +2445,7 @@ bool type_leads_to_pointer_p(type t)
 	  }
 	else
 	  {
-	    pips_internal_error("unexpected typedef basic\n");
+	    pips_internal_error("unexpected typedef basic");
 	  }
 	
 	break;
@@ -2459,7 +2457,7 @@ bool type_leads_to_pointer_p(type t)
       }
     default:
       {
-	pips_internal_error("case not handled yet\n");
+	pips_internal_error("case not handled yet");
       }
     } /*switch */
   free_type(bct);
@@ -2950,7 +2948,7 @@ int number_of_fields(type t)
     }
   }
   else
-    pips_internal_error("Illegal type argument\n");
+    pips_internal_error("Illegal type argument");
 
   return n;
 }
@@ -2990,7 +2988,7 @@ int number_of_items(type t)
     }
   }
   else
-    pips_internal_error("Illegal type argument\n");
+    pips_internal_error("Illegal type argument");
 
   return n;
 }
@@ -3216,7 +3214,7 @@ list basic_supporting_entities(list sel, set vt, basic b)
     sel = gen_nconc(sel, CONS(ENTITY, se, NIL));
   }
   else
-    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+    pips_internal_error("Unrecognized basic tag %d", basic_tag(b));
 
   ifdebug(8) {
     pips_debug(8, "End: ");
@@ -3309,7 +3307,7 @@ list recursive_type_supporting_entities(list sel, set vt, type t)
       /* This is weird, but labels also are declared*/
       ;
     else
-      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+      pips_internal_error("Unexpected type with tag %d", type_tag(t));
   }
   ifdebug(8) {
     pips_debug(8, "End: ");
@@ -3491,7 +3489,7 @@ list basic_supporting_references(list srl, basic b)
     srl = recursive_type_supporting_references(srl, entity_type(se));
   }
   else
-    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+    pips_internal_error("Unrecognized basic tag %d", basic_tag(b));
 
   ifdebug(9) {
     pips_debug(8, "End: ");
@@ -3556,7 +3554,7 @@ list fortran_type_supporting_entities(list srl, type t)
   else if(type_void_p(t))
     ;
   else
-    pips_internal_error("Unexpected Fortran type with tag %d\n", type_tag(t));
+    pips_internal_error("Unexpected Fortran type with tag %d", type_tag(t));
 
   ifdebug(9) {
     pips_debug(8, "End: ");
@@ -3619,10 +3617,10 @@ static list recursive_type_supporting_references(list srl, type t)
 	}, ese);
     }
     else if(type_unknown_p(t)) {
-      pips_internal_error("unknown type left in a declaration\n");
+      pips_internal_error("unknown type left in a declaration");
     }
     else
-      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+      pips_internal_error("Unexpected type with tag %d", type_tag(t));
 
     ifdebug(9) {
       pips_debug(8, "End: ");
@@ -3796,7 +3794,7 @@ int basic_depth(basic b)
       break;
     }
   default:
-    pips_internal_error("Unexpected basic tag %d\n", basic_tag(b));
+    pips_internal_error("Unexpected basic tag %d", basic_tag(b));
   }
 
   return d;
@@ -3878,7 +3876,7 @@ int effect_basic_depth(basic b)
       break;
     }
   default:
-    pips_internal_error("Unexpected basic tag %d\n", basic_tag(b));
+    pips_internal_error("Unexpected basic tag %d", basic_tag(b));
   }
 
   return d;
@@ -3985,7 +3983,7 @@ static list basic_supporting_types(list stl, set vt, basic b)
     stl = recursive_type_supporting_entities(stl, vt, st);
   }
   else
-    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+    pips_internal_error("Unrecognized basic tag %d", basic_tag(b));
 
   ifdebug(8) {
     pips_debug(8, "End: ");
@@ -4069,7 +4067,7 @@ static list recursive_type_supporting_types(list stl, set vt, type t)
       /* This is weird, but labels also are declared*/
       ;
     else
-      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+      pips_internal_error("Unexpected type with tag %d", type_tag(t));
   }
   ifdebug(8) {
     pips_debug(8, "End: ");
@@ -4221,7 +4219,7 @@ string qualifier_to_string(qualifier q)
     s = "auto";
     break;
   default :
-    pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
+    pips_internal_error("unexpected tag %d", qualifier_tag(q));
   }
   return s;
 }
@@ -4287,7 +4285,7 @@ static type subscripted_field_list_to_type(list fl, expression se)
       ft = entity_type(f);
     }
     else {
-      pips_internal_error("Field f is not in field list fl.\n");
+      pips_internal_error("Field f is not in field list fl.");
     }
   }
   else {
@@ -4300,12 +4298,12 @@ static type subscripted_field_list_to_type(list fl, expression se)
       ft = entity_type(f);
     }
     else {
-      pips_internal_error("Unusable subscript expression for a derived type.\n");
+      pips_internal_error("Unusable subscript expression for a derived type.");
     }
   }
 
   if(type_undefined_p(ft))
-    pips_internal_error("Ill. arguments\n");
+    pips_internal_error("Ill. arguments");
 
   return ft;
 }
@@ -4351,25 +4349,25 @@ type subscripted_type_to_type(type t, expression se)
 	}
 	else if(type_enum_p(det)) {
 	  /* enum cannot be subscripted */
-	  pips_internal_error("enum type cannot be subscripted.\n");
+	  pips_internal_error("enum type cannot be subscripted.");
 	}
 	else {
-	  pips_internal_error("This type cannot be subscripted.\n");
+	  pips_internal_error("This type cannot be subscripted.");
 	}
 	st = copy_type(subscripted_field_list_to_type(fl, se));
       }
       else {
 	/* Other basics are incompatible with subscripts */
-	pips_internal_error("This type cannot be subscripted\n");
+	pips_internal_error("This type cannot be subscripted");
       }
     }
     else {
       /* array case */
-      pips_internal_error("Not implemented yet.\n");
+      pips_internal_error("Not implemented yet.");
     }
   }
   else {
-    pips_internal_error("Type t is not a variable type.\n");
+    pips_internal_error("Type t is not a variable type.");
   }
   return st;
 }

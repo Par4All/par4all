@@ -322,10 +322,9 @@ range r ;
 	break;
     }
     case is_syntax_range:
-	pips_error("expand_expression",
-		   "Range expansion not implemented\n" ) ;
+	pips_internal_error("Range expansion not implemented" ) ;
     default:
-	pips_error("expand_expression", "unexpected syntax tag (%d)\n",
+	pips_internal_error("unexpected syntax tag (%d)",
 		   syntax_tag(s));
     }
 

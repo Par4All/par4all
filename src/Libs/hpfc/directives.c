@@ -535,7 +535,7 @@ extract_the_distribute(reference distributee, reference proc)
 		parameter = expression_undefined;
 		break;
 	    default:
-		pips_internal_error("unexpected style tag (%d)\n", format);
+		pips_internal_error("unexpected style tag (%d)", format);
 	    }
 	    
 	    ldist = CONS(DISTRIBUTION, 

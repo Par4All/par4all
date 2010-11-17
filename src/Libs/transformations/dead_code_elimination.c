@@ -921,7 +921,7 @@ dead_statement_rewrite(statement s)
      break;
 
    default:
-       pips_error("", "Unexpected instruction tag %d\n", t);
+       pips_internal_error("Unexpected instruction tag %d", t);
        break;
    }
 

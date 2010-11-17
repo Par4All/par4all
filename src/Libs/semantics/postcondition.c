@@ -133,7 +133,7 @@ static bool postcondition_filter(statement stat)
         break;
     case is_instruction_goto:
 	/* ??? may be false... */
-	pips_internal_error("unexpected goto encountered\n");
+	pips_internal_error("unexpected goto encountered");
         break;
     case is_instruction_call:
         break;
@@ -163,8 +163,7 @@ static bool postcondition_filter(statement stat)
         break;
     }
     default:
-        pips_error("postcondition_filter",
-		   "unexpected instruction tag\n");
+        pips_internal_error("unexpected instruction tag");
         break;
     }
 

@@ -290,7 +290,7 @@ string step_find_new_module_name(entity original, int step_transformation)
     case STEP_TRANSFORMATION_SEQ :
       suffix = "";
     default:
-      pips_internal_error("unexpected transformation :%d\n",step_transformation);
+      pips_internal_error("unexpected transformation :%d",step_transformation);
     }
   newname = strdup(concatenate(original_name,suffix,NULL));
   

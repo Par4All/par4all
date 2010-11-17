@@ -1202,7 +1202,7 @@ list region_sup_difference(region reg1, region reg2)
     }
     else if(action_kind_tag(ak1)==is_action_kind_store
 	    || action_kind_tag(ak2)==is_action_kind_store)
-      pips_internal_error("Unexpected mix of action kinds.\n");
+      pips_internal_error("Unexpected mix of action kinds.");
     else {
       /* reg1 is not modified by reg2 */
       /* This also could be considered an internal error */

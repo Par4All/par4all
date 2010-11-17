@@ -194,7 +194,7 @@ char *module_name;
     debug_on("COMPLEXITY_DEBUG_LEVEL");
 
     if ( summary_comp == COMPLEXITY_NOT_FOUND )
-	pips_error("summary_complexity","No summary complexity!\n");
+	pips_internal_error("No summary complexity!");
     else {
 	/* summary_comp_dup = complexity_dup(summary_comp); */
 	summary_comp_dup = copy_complexity(summary_comp);
@@ -252,7 +252,7 @@ complexity statement_to_complexity(statement stat,
     if (instr != instruction_undefined)
 	comp = instruction_to_complexity(instr, precond, effects_list);
     else {
-	pips_error("statement_to_complexity", "instruction undefined\n");
+	pips_internal_error("instruction undefined");
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
@@ -295,7 +295,7 @@ list effects_list;
 	break;
     case is_instruction_whileloop:
       pips_user_warning("Try to convert your code to use do loops only\n");
-      pips_internal_error("Complexity for while loops not implemented yet.\n");
+      pips_internal_error("Complexity for while loops not implemented yet.");
 	break;
     case is_instruction_goto:
 	comp = goto_to_complexity(instruction_goto(instr), precond, effects_list);
@@ -318,8 +318,7 @@ list effects_list;
 	break;
     }
     default:
-	pips_error("instruction_to_complexity",
-		   "instruction tag %d isn't in 14->19.\n",
+	pips_internal_error("instruction tag %d isn't in 14->19.",
 		   (int) instruction_tag(instr));
     }
     complexity_check_and_warn("instruction_to_complexity", comp);
@@ -688,7 +687,7 @@ complexity goto_to_complexity(statement st __attribute__ ((__unused__)),
 			      transformer precond __attribute__ ((__unused__)),
 			      list effects_list __attribute__ ((__unused__)))
 {
-    pips_error("goto_to_complexity", "A GOTO is remaining.\n");
+    pips_internal_error("A GOTO is remaining.");
     return(make_zero_complexity());
 }
 
@@ -742,8 +741,7 @@ list effects_list;
     case is_value_unknown:
 	user_error("call_to_complexity", "unknown value");
     default:
-	pips_error("call_to_complexity",
-		   "value_tag is %d not in 37->41\n", (int)value_tag(v));
+	pips_internal_error("value_tag is %d not in 37->41", (int)value_tag(v));
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
@@ -811,7 +809,7 @@ list effects_list;
     if ( s != syntax_undefined )
 	comp = syntax_to_complexity(s, pbasic, precond, effects_list);
     else
-	pips_error("expression_to_complexity", "syntax undefined\n");
+	pips_internal_error("syntax undefined");
 
     complexity_check_and_warn("expression_to_complexity", comp);    
 
@@ -875,7 +873,7 @@ list effects_list;
 				      pbasic, precond, effects_list);
     else {
       /* Compiler generated constant: equivalent to a constant load... */
-      pips_internal_error("Not implemented yet\n");
+      pips_internal_error("Not implemented yet");
     }
     break;
   }
@@ -883,14 +881,13 @@ list effects_list;
     comp=subscript_to_complexity(syntax_subscript(s),pbasic,precond,effects_list);
     break;
   case is_syntax_application:
-    pips_internal_error("Not implemented yet\n");
+    pips_internal_error("Not implemented yet");
     break;
   case is_syntax_va_arg:
-    pips_internal_error("Not implemented yet\n");
+    pips_internal_error("Not implemented yet");
     break;
   default: 
-    pips_error("syntax_to_complexity", 
-	       "syntax_tag %d, not in %d->%d\n", (int)syntax_tag(s),
+    pips_internal_error("syntax_tag %d, not in %d->%d", (int)syntax_tag(s),
 	       is_syntax_reference, is_syntax_va_arg);
   }
 
@@ -1054,19 +1051,19 @@ list effects_list;
 	compl = expression_to_complexity(lower, &rngbasic, precond,
 					 effects_list);
     else 
-	pips_error("range_to_complexity", "lower undefined\n");
+	pips_internal_error("lower undefined");
 
     if (!expression_undefined_p(upper))
 	compu = expression_to_complexity(upper, &rngbasic, precond,
 					 effects_list);
     else 
-	pips_error("range_to_complexity", "upper undefined\n");
+	pips_internal_error("upper undefined");
 
     if (!expression_undefined_p(incr))
 	compi = expression_to_complexity(incr, &rngbasic, precond,
 					 effects_list);
     else 
-	pips_error("range_to_complexity", "increment undefined\n");
+	pips_internal_error("increment undefined");
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");

@@ -194,7 +194,7 @@ effects stmt_to_fx(statement stmt, statement_effects fx_map)
 bool entity_written_p(entity ent, effects fx)
 {
   if(fx==effects_undefined)
-    pips_error("entity_written_p", "effects undefined\n");
+    pips_internal_error("effects undefined");
 
   MAPL(ftl, {
       effect ft = EFFECT(CAR(ftl));
@@ -410,7 +410,7 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
     ef =  eformat_undefined;
     break;
   default:
-    pips_error( "partial_eval_syntax", "case default\n");
+    pips_internal_error("case default");
     abort();
   }
 
@@ -455,7 +455,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 
   if (SC_UNDEFINED_P(ps)) {
     pips_debug(9, "No precondition information\n");
-    pips_error("partial_eval_reference", "Probably corrupted precondition\n");
+    pips_internal_error("Probably corrupted precondition");
     return(eformat_undefined);
   }
 
@@ -652,7 +652,7 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
         ef = eformat_undefined;
     } break;
   default:
-    pips_internal_error("Default case reached.\n");
+    pips_internal_error("Default case reached.");
   }
   return(ef);
 }
@@ -1603,7 +1603,7 @@ void regenerate_call(eformat_t *efp, call ca)
   }
   else {
     /* We are even more in trouble */
-    pips_internal_error("Unexpected case.\n");
+    pips_internal_error("Unexpected case.");
   }
 }
 
@@ -1802,7 +1802,7 @@ void partial_eval_statement(statement stmt)
 					   stmt_to_fx(stmt,fx_map));
     break;
   default :
-    pips_internal_error("Bad instruction tag %d\n", instruction_tag(inst));
+    pips_internal_error("Bad instruction tag %d", instruction_tag(inst));
   }
   partial_eval_current_statement=statement_undefined;
 }

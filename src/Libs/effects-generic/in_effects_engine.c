@@ -589,7 +589,7 @@ in_effects_of_external(entity func, list real_args)
 
     if (! entity_module_p(func)) 
     {
-	pips_error("in_effects_of_external", "%s: bad function\n", func_name);
+	pips_internal_error("%s: bad function", func_name);
     }
     else 
     {
@@ -700,7 +700,7 @@ in_effects_of_call(call c)
         break;
 
       default:
-        pips_error("in_regions_of_call", "unknown tag %d\n", t);
+        pips_internal_error("unknown tag %d", t);
     }
 
     ifdebug(2){

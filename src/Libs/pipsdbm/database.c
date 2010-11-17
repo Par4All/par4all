@@ -169,7 +169,7 @@ static string db_status_string(db_status s)
   case is_db_status_loaded_and_stored:
     return "loaded&stored";
   default:
-    pips_internal_error("unexpected db_status tag %d\n", db_status_tag(s));
+    pips_internal_error("unexpected db_status tag %d", db_status_tag(s));
     return NULL;
   }
 }
@@ -245,7 +245,7 @@ static db_resource get_db_resource(const char * rname, const char * oname)
     pips_debug(1, "creating or for %s...\n", oname);
     init_owned_resources_if_necessary(oname);
     or = get_db_owned_resources(oname);
-  } /* pips_internal_error("no owned resources for %s\n", oname, rname);*/
+  } /* pips_internal_error("no owned resources for %s", oname, rname);*/
   return get_resource(rname, or);
 }
 
@@ -253,7 +253,7 @@ static db_resource get_real_db_resource(const char* rname, const char* oname)
 {
   db_resource r = get_db_resource(rname, oname);
   if (db_resource_undefined_p(r) || db_resource_required_p(r))
-    pips_internal_error("no resource %s of %s\n", rname, oname);
+    pips_internal_error("no resource %s of %s", rname, oname);
   return r;
 }
 
@@ -624,7 +624,7 @@ static void db_save_resource(const char* rname, const char* oname, db_resource r
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
 
     if (!dbll_storable_p(rname))
-      pips_internal_error("cannot store %s\n",rname);
+      pips_internal_error("cannot store %s",rname);
 
     /* already saved */
     if (db_resource_loaded_and_stored_p(r))
@@ -757,7 +757,7 @@ string db_get_memory_resource(const char* rname, const char* oname, bool pure)
     r = get_db_resource(rname, oname);
     debug_db_resource(9, rname, oname, r);
     if (db_resource_undefined_p(r) || db_resource_required_p(r))
-      pips_internal_error("requested resource %s for %s not available\n",
+      pips_internal_error("requested resource %s for %s not available",
 			  rname, oname);
     /* else we have something. */
 
@@ -865,7 +865,7 @@ void db_put_or_update_memory_resource(const char* rname, const char* oname,
     /* The resource already exists... */
     if (!update_is_ok && !db_resource_required_p(r))
       /* If the resource is not required and we do not want to update it: */
-      pips_internal_error("resource %s[%s] already there\n",
+      pips_internal_error("resource %s[%s] already there",
 			  rname, oname);
 
   /* Store data */

@@ -384,7 +384,7 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
       }
     }
     else {
-      pips_internal_error("Two or more successors for non-test node %p\n",
+      pips_internal_error("Two or more successors for non-test node %p",
 			  pred);
     }
   }
@@ -914,7 +914,7 @@ hash_table used_labels;
     {
       /* NN : I do not know how to deal with this, the following code does not always work
 
-	 pips_internal_error("Forloop with goto not implemented yet\n");*/
+	 pips_internal_error("Forloop with goto not implemented yet");*/
 
       free_statement(control_statement(c_test));
       control_statement(c_test) = forloop_test(st);
@@ -2059,7 +2059,7 @@ bool controlize(statement st,
 	statement_consistent_p(st);
       break;
     default:
-	pips_internal_error("Unknown instruction tag %d\n", instruction_tag(i));
+	pips_internal_error("Unknown instruction tag %d", instruction_tag(i));
     }
 
     ifdebug(5) {
@@ -2072,7 +2072,7 @@ bool controlize(statement st,
 	/* The declarations may be preserved at a lower level
 	if(!ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
-	  pips_internal_error("Lost local declarations\n");
+	  pips_internal_error("Lost local declarations");
 	}
 	*/
 	check_control_coherency(pred);

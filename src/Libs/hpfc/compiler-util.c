@@ -170,14 +170,14 @@ syntax syn;
 	     l = CONS(SYNTAX, s, l);
 	     break;
 	 case is_syntax_range:
-	     pips_internal_error("don't konw what to do with a range\n");
+	     pips_internal_error("don't konw what to do with a range");
 	     break;
 	 case is_syntax_call:
 	     /*     ??? could check that the given call is a constant.
 	      */
 	     break;
 	 default:
-	     pips_internal_error("unexpected syntax tag\n");
+	     pips_internal_error("unexpected syntax tag");
 	 }	 
      },
 	 reference_indices(syntax_reference(syn)));
@@ -321,7 +321,7 @@ static void sequence_rewrite(sequence s)
 	return;
 
     if (n_loops-n_levels!=1)
-	pips_internal_error("block within a block encountered\n");
+	pips_internal_error("block within a block encountered");
 
     n_levels++, blocks = CONS(LIST, sequence_statements(s), blocks);
 }

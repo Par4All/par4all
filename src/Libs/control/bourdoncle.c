@@ -113,7 +113,7 @@ static void copy_dfn(control new_c, control old_c)
   _int d = 0;
   
   if((d = (_int) hash_get(dfn, (void *) old_c)) == (_int) (HASH_UNDEFINED_VALUE))
-    pips_internal_error("No dfn value for control %p\n", old_c);
+    pips_internal_error("No dfn value for control %p", old_c);
   
   hash_put(dfn, (void *) new_c, (void *) d);
 }
@@ -123,7 +123,7 @@ static _int get_dfn(control c)
   _int d = 0;
   
   if((d = (_int) hash_get(dfn, (void *) c)) == (_int) (HASH_UNDEFINED_VALUE))
-    pips_internal_error("No dfn value for control %p\n", c);
+    pips_internal_error("No dfn value for control %p", c);
 
   return d;
 }
@@ -1269,7 +1269,7 @@ static void update_successors_of_predecessor(control pred, control new_c, contro
     bool insert_p = FALSE; /* A meaningless control node must be inserted? */
     
     if((r=gen_position(old_c, control_successors(pred)))==0) {
-      pips_internal_error("old_c %p must be a successor of pred %p\n", old_c, pred);
+      pips_internal_error("old_c %p must be a successor of pred %p", old_c, pred);
     }
     else if(r%2==1) {
       /* TRUE successor */
@@ -1854,7 +1854,7 @@ static void replicate_cycles(unstructured u_main, hash_table scc_map, hash_table
       unstructured u_u = unstructured_undefined;
       u_u = (unstructured) hash_delget(scc_map, (void *) c, (void **) &key);
       if(unstructured_undefined_p(u_u)) {
-	pips_internal_error("No scc for control %p\n", c);
+	pips_internal_error("No scc for control %p", c);
       }
       else {
 	/* we really need a shallow_free_unstructured() */
@@ -2107,7 +2107,7 @@ static void update_partition(control root,
 
       switch(gen_length(replacement_list)) {
       case 0: 
-	/* pips_internal_error("No replacement for node %p\n", c); */
+	/* pips_internal_error("No replacement for node %p", c); */
 	/* This node must be eliminated since it is no longer part of the
            partition, probably because it has disappeared in an inner
            cycle. */
@@ -2131,7 +2131,7 @@ static void update_partition(control root,
 		       gen_length(replacement_list), c);
 	print_control_node(c);
 	print_control_nodes(replacement_list);
-	pips_internal_error("Too many replacement nodes\n");
+	pips_internal_error("Too many replacement nodes");
 	*/
 	break;
       }

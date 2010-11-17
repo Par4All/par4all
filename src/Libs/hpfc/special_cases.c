@@ -302,7 +302,7 @@ static string new_reduction_name(reduction_operator op)
     else if (reduction_operator_or_p(op))
 	return "OR";
     else
-	pips_internal_error("unexpected reduction_operator tag (%d)\n",
+	pips_internal_error("unexpected reduction_operator tag (%d)",
 			    reduction_operator_tag(op));
 
     return "unknown";

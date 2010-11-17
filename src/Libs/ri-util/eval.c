@@ -110,7 +110,7 @@ value EvalCall(call c)
   vin = entity_initial(f);
 
   if (value_undefined_p(vin))
-    pips_internal_error("undefined value for %s\n", entity_name(f));
+    pips_internal_error("undefined value for %s", entity_name(f));
 
   switch (value_tag(vin)) {
   case is_value_intrinsic:
@@ -134,7 +134,7 @@ value EvalCall(call c)
     vout = make_value_unknown();
     break;
   default:
-    pips_internal_error("Unexpected default case.\n");
+    pips_internal_error("Unexpected default case.");
   }
 
   return(vout);

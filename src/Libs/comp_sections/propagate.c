@@ -545,11 +545,11 @@ list comp_regions_of_call(call c, transformer context, list *plpropreg)
          break;
      
      case is_value_unknown:
-         pips_internal_error("unknown function %s\n", n);
+         pips_internal_error("unknown function %s", n);
          break;
      
      default:
-         pips_internal_error("unknown tag %d\n", t);
+         pips_internal_error("unknown tag %d", t);
      /* }}} */
     }
 
@@ -653,7 +653,7 @@ list comp_regions_of_syntax(syntax s, transformer context)
 	        /* comp_desc_free(lpropreg);  */
           break;
       default:
-          pips_internal_error("unexpected tag %d\n", syntax_tag(s));
+          pips_internal_error("unexpected tag %d", syntax_tag(s));
       /* }}} */
     }
 

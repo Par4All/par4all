@@ -319,7 +319,7 @@ entity module_entity_to_compilation_unit_entity(entity m)
       free(cun);
     }
     else
-      pips_internal_error("Not implemented yet\n");
+      pips_internal_error("Not implemented yet");
   }
   pips_assert("cu is a compilation unit", compilation_unit_entity_p(cu));
   return cu;

@@ -159,7 +159,7 @@ tag suggest_basic_for_expression(expression e)
 
 expression expression_mult(expression ex)
 {
-  pips_error("expression_mult", "not implemented\n");
+  pips_internal_error("not implemented");
   return ex;
 }
 
@@ -475,7 +475,7 @@ bool logical_expression_p(expression e)
     }
   case is_syntax_range:
     return FALSE;
-  default: pips_error("basic_of_expression", "Bad syntax tag");
+  default: pips_internal_error("Bad syntax tag");
     return FALSE;
   }
 
@@ -964,8 +964,7 @@ expression find_ith_expression(list le, int r)
 	;
 
     if(ENDP(cle))
-	pips_error("find_ith_expression",
-		   "not enough elements in expresion list\n");
+	pips_internal_error("not enough elements in expresion list");
 
     return EXPRESSION(CAR(cle));
 }
@@ -1095,7 +1094,7 @@ list syntax_to_reference_list(syntax s, list lr)
       break;
     }
     default:
-	pips_error("syntax_to_reference_list","illegal tag %d\n",
+	pips_internal_error("illegal tag %d",
 		   syntax_tag(s));
 
     }
@@ -1273,7 +1272,7 @@ bool syntax_equal_p(syntax s1, syntax s2)
     break;
   }
 
-  pips_internal_error("illegal. syntax tag %d\n", t1);
+  pips_internal_error("illegal. syntax tag %d", t1);
   return FALSE;
 }
 
@@ -1291,7 +1290,7 @@ bool reference_equal_p(reference r1, reference r2)
   if(gen_length(dims1) != gen_length(dims2))
     return FALSE;
   /*
-    pips_internal_error("Different dimensions for %s: %d and %d\n",
+    pips_internal_error("Different dimensions for %s: %d and %d",
     entity_local_name(v1), gen_length(dims1), gen_length(dims2));
   */
 
@@ -1361,10 +1360,10 @@ int signed_integer_constant_expression_value(expression e)
       val = VALUE_TO_INT(x);
     }
     else
-      pips_internal_error("non constant expression\n");
+      pips_internal_error("non constant expression");
   }
   else
-    pips_internal_error("non affine expression\n");
+    pips_internal_error("non affine expression");
 
   return val;
 }
@@ -1866,7 +1865,7 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
   else if (ENTITY_MINUS_P(op_ent))
     newV = vect_substract(V1, V2);
   else
-    pips_error("make_lin_op_exp", "operation must be : + or -");
+    pips_internal_error("operation must be : + or -");
   free_expression(exp1);
   free_expression(exp2);
 
@@ -1902,8 +1901,7 @@ int expression_to_int(expression exp)
       break;
     }
     default:
-      pips_error("expression_to_int",
-		 "expression is not an integer constant");
+      pips_internal_error("expression is not an integer constant");
     }
   }
   else if(expression_call_p(exp)) {
@@ -1915,13 +1913,11 @@ int expression_to_int(expression exp)
       rv = constant_int(symbolic_constant(value_symbolic(v)));
     }
     else {
-      pips_error("expression_to_int",
-		 "expression is not an integer constant");
+      pips_internal_error("expression is not an integer constant");
     }
   }
   else
-    pips_error("expression_to_int",
-	       "expression is not an integer constant");
+    pips_internal_error("expression is not an integer constant");
   return(rv);
 }
 
@@ -2168,7 +2164,7 @@ bool same_syntax_name_p(syntax s1, syntax s2)
     case is_syntax_sizeofexpression:
       return same_sizeofexpression_name_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
     default:
-      pips_internal_error("unexpected syntax tag\n");
+      pips_internal_error("unexpected syntax tag");
     }
   return FALSE;
 }
@@ -2226,7 +2222,7 @@ static bool  davinci_dump_expression_rc(
     name = "";
     shape = "";
     color = "";
-    pips_internal_error("unexpected syntax tag (%d)\n", syntax_tag(s));
+    pips_internal_error("unexpected syntax tag (%d)", syntax_tag(s));
   }
 
     /* daVinci node prolog. */

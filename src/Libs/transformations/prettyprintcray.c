@@ -145,8 +145,7 @@ static list all_enclosed_scope_variables(statement stmt)
 	break;
       case is_instruction_goto :
 	default : 
-	pips_error("all_enclosed_scope_variables", 
-		   "Bad instruction tag");
+	pips_internal_error("Bad instruction tag");
     }
     return(ent_l);
 }

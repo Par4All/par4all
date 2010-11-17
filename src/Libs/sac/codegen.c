@@ -244,7 +244,7 @@ static enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
         case DC_REF_TOK:
             return is_basic_complex;
         default:
-            pips_internal_error("subword size unknown.\n");
+            pips_internal_error("subword size unknown.");
     }
 
     return is_basic_int;
@@ -274,7 +274,7 @@ int get_subwordSize_from_opcode(opcode oc, int argNum)
         case DC_REF_TOK:
             return 128;
         default:
-            pips_internal_error("subword size unknown.\n");
+            pips_internal_error("subword size unknown.");
     }
 
     return 8;

@@ -118,10 +118,10 @@ int maximize;
     trace_on("expression -> pnome");
 
     if ( expr == expression_undefined ) {
-	pips_error("expression_to_complexity_polynome", "undefined expression\n");
+	pips_internal_error("undefined expression");
     }
     if ( sy == syntax_undefined ) {
-	pips_error("expression_to_complexity_polynome","wrong expression\n");
+	pips_internal_error("wrong expression");
     }
 
     if ( normalized_linear_p(no) ) {
@@ -133,8 +133,7 @@ int maximize;
     }
 
     if ( complexity_unknown_p(comp) ) {
-	pips_error("complexity expression_to_complexity_polynome",
-		   "Better unknown value name generation required!\n");
+	pips_internal_error("Better unknown value name generation required!");
 	/*
 	return(make_single_var_complexity(1.0,UNKNOWN_RANGE));
 	*/
@@ -178,8 +177,7 @@ int maximize;
 				precond, effects_list, keep_symbols, maximize);
 	break;
     default:
-	pips_error("syntax_to_polynome",
-		   "This tag:%d is not in 28->30\n", syntax_tag(synt));
+	pips_internal_error("This tag:%d is not in 28->30", syntax_tag(synt));
     }
 
     trace_off();
@@ -203,7 +201,7 @@ int maximize;
 	comp =  pvecteur_to_polynome(pvect, precond, effects_list, keep_symbols, maximize);
     }
     else
-	pips_error("normalized_to_polynome", "vecteur undefined\n");
+	pips_internal_error("vecteur undefined");
 
     trace_off();
     return(comp);
@@ -339,7 +337,7 @@ complexity range_to_polynome(range rg __attribute__ ((__unused__)),
     
     trace_on("range -> pnome");
 
-    pips_error("range_to_polynome", "Don't you know\n");    
+    pips_internal_error("Don't you know");    
 
     trace_off();
     return(comp);
@@ -364,8 +362,7 @@ int maximize;
 
     if (!type_functional_p(t) ||
 	(value_intrinsic_p(v) && value_code_p(v) && value_constant_p(v)))
-	pips_error("call_to_polynome",
-		   "'%s' isn't an expected entity (type %d, value %d)\n",
+	pips_internal_error("'%s' isn't an expected entity (type %d, value %d)",
 		   type_tag(t), value_tag(v), name);
 
     switch (value_tag(v)) {

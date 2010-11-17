@@ -431,11 +431,9 @@ char *mod_name;
 
   lparams = static_control_params(stco); 
   if (stco == static_control_undefined)  
-    pips_error("print_parallelizedCMF_code", 
-	       "This is an undefined static control !\n");  
+    pips_internal_error("This is an undefined static control !");  
   if (!static_control_yes(stco))  
-    pips_error("print_parallelizedCMF_code", 
-	       "This is not a static control program !\n");  
+    pips_internal_error("This is not a static control program !");  
   
   /* The DFG, the BDT and the PLC */
   current_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG,
@@ -514,11 +512,9 @@ char *mod_name;
 
   lparams = static_control_params(stco); 
   if (stco == static_control_undefined)  
-    pips_error("print_parallelizedCRAFT_code", 
-	       "This is an undefined static control !\n");  
+    pips_internal_error("This is an undefined static control !");  
   if (!static_control_yes(stco))  
-    pips_error("print_parallelizedCRAFT_code", 
-	       "This is not a static control program !\n");  
+    pips_internal_error("This is not a static control program !");  
   
   /* The DFG, the BDT and the PLC */
   current_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG,

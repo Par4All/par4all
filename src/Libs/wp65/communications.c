@@ -245,16 +245,13 @@ void statement_to_communications(statement stmt, statement st_level1, statement 
 	break; 
     }
     case is_instruction_goto: {
-	pips_error("statement_to_communications", 
-		   "Unexpected goto\n");
+	pips_internal_error("Unexpected goto");
 	break;}
     case is_instruction_unstructured: {
-	pips_error("statement_to_communications", 
-		   "Sorry: unstructured not implemented\n");
+	pips_internal_error("Sorry: unstructured not implemented");
 	break;}
     default: 
-	pips_error("statement_to_communications", 
-		   "Bad instruction tag\n");
+	pips_internal_error("Bad instruction tag");
     }
 }
 

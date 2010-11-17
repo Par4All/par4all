@@ -1017,7 +1017,7 @@ static void check_new_arc_for_structured_statement(statement s)
         check_for_effected_statement(s, statement_to_effects(s));
 	break;
     default:
-	pips_error("check_new_arc_statement", "case default reached\n");
+	pips_internal_error("case default reached");
         break;
     }
 }

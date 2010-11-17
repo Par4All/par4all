@@ -154,13 +154,12 @@ bool assignment_block_or_statement_p(statement s)
     case is_instruction_whileloop:
 	break;
     case is_instruction_goto:
-	pips_error("assignment_block_p", "unexpected GO TO\n");
+	pips_internal_error("unexpected GO TO");
     case is_instruction_call:
 	return assignment_statement_p(s);
     case is_instruction_unstructured:
 	break;
-    default: pips_error("assignment_block_or_statement_p",
-			"ill. instruction tag %d\n", instruction_tag(i));
+    default: pips_internal_error("ill. instruction tag %d", instruction_tag(i));
     }
     return FALSE;
 }
@@ -1890,7 +1889,7 @@ statement_to_label(statement s)
     case is_instruction_expression:
       break;
     default:
-      pips_error("statement_to_label", "Ill. tag %d for instruction",
+      pips_internal_error("Ill. tag %d for instruction",
 		  instruction_tag(i));
     }
   }
@@ -2009,7 +2008,7 @@ statement_does_return(statement s)
     case is_instruction_expression:
       break;
     default:
-	pips_error("statement_does_return", "Ill. tag %d for instruction",
+	pips_internal_error("Ill. tag %d for instruction",
 		   instruction_tag(i));
     }
 
@@ -2406,7 +2405,7 @@ statement add_declaration_statement(statement s, entity e)
     }
     else
     {
-        pips_internal_error("can only add declarations to statement blocks\n");
+        pips_internal_error("can only add declarations to statement blocks");
     }
 
     ifdebug(8) {
@@ -2454,7 +2453,7 @@ statement remove_declaration_statement(statement s, entity e)
     }
     else
     {
-        pips_internal_error("can only add declarations to statement blocks\n");
+        pips_internal_error("can only add declarations to statement blocks");
     }
 
     ifdebug(8) {

@@ -114,7 +114,7 @@ static sentence stub_var_decl(parameter p, int n, bool is_fortran)
 							    strdup("..."), NULL)));
   }
   else {
-    pips_internal_error("Unexpected type tag %d.\n", type_tag(t));
+    pips_internal_error("Unexpected type tag %d.", type_tag(t));
   }
   return result;
 }

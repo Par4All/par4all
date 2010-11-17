@@ -758,7 +758,7 @@ int entity_field_rank(entity f)
   else if(type_union_p(st))
     fl = type_union(st);
   else
-    pips_internal_error("Unexpected type tag %d\n", type_tag(st));
+    pips_internal_error("Unexpected type tag %d", type_tag(st));
 
   pips_assert("st is a struct or union type",
 	      type_struct_p(st) || type_union_p(st));
@@ -767,7 +767,7 @@ int entity_field_rank(entity f)
   rank = gen_position((void *) f, fl);
 
   if(rank==0) {
-    pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"\n",
+    pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"",
 			entity_name(f), type_struct_p(st)?"structure":"union" , entity_name(su));
   }
 
@@ -1331,8 +1331,7 @@ list /* of entity */ common_members_of_module(entity common,
 	  }
 	  else {
 	    if(!SizeOfArray(v, &size)) {
-	      pips_error("common_members_of_module",
-			 "Varying size array \"%s\"\n", entity_name(v));
+	      pips_internal_error("Varying size array \"%s\"", entity_name(v));
 	    }
 	  }
 
@@ -1516,7 +1515,7 @@ entity find_ith_formal_parameter(entity the_fnct, int rank)
 	return current;
     }
 
-  pips_internal_error("cannot find the %d dummy argument of %s\n",
+  pips_internal_error("cannot find the %d dummy argument of %s",
 		      rank, entity_name(the_fnct));
 
   return entity_undefined;
@@ -1700,7 +1699,7 @@ string storage_to_string(storage s)
   else if(storage_rom_p(s))
     desc = "rom";
   else
-    pips_internal_error("Unknown storage tag\n");
+    pips_internal_error("Unknown storage tag");
 
   return desc;
 }
@@ -2114,7 +2113,7 @@ void add_thread_safe_variable(entity v)
   if(gen_in_list_p(v, thread_safe_entities)) {
     /* This might happen when a workspace is closed and another one
        open or created within one session. */
-    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared", entity_name(v));
     ;
   }
   else {
@@ -2147,7 +2146,7 @@ void add_abstract_state_variable(entity v)
   if(gen_in_list_p(v, abstract_state_entities)) {
     /* This might happen when a workspace is closed and another one
        open or created within one session. */
-    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared", entity_name(v));
     ;
   }
   else {
@@ -2265,7 +2264,7 @@ commutative_call_p(call c)
             case is_basic_pointer:
                 break;
             default:
-                pips_internal_error("unhandled case\n");
+                pips_internal_error("unhandled case");
         }
         free_basic(b);
     }

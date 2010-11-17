@@ -80,7 +80,7 @@ set formal_points_to_parameter(cell c)
 			break;
 		case is_basic_bit:
 			break;
-		default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
+		default: pips_internal_error("unexpected tag %d", basic_tag(fpb));
 		}
 	}
 	return pt_in;
@@ -191,7 +191,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 				(void*) pt_to );
 	break;
       }
-      default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(fpb));
+      default: pips_internal_error("unexpected tag %d", basic_tag(fpb));
       }
     }
   }
@@ -205,7 +205,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
   }
   else
     //we don't know how to handle other types
-    pips_internal_error("Unexpected type\n");
+    pips_internal_error("Unexpected type");
 
   return pt_in;
 

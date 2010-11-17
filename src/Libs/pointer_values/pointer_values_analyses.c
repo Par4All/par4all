@@ -409,7 +409,7 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 	case is_value_constant:
 	case is_value_intrinsic:
 	default:
-	  pips_internal_error("unexpected tag\n");
+	  pips_internal_error("unexpected tag");
 	}
     }
 
@@ -470,13 +470,13 @@ list instruction_to_post_pv(instruction inst, list l_in, pv_context *ctxt)
       }
       break;
     case is_instruction_goto:
-      pips_internal_error("unexpected goto in pointer values analyses\n");
+      pips_internal_error("unexpected goto in pointer values analyses");
       break;
     case is_instruction_multitest:
-      pips_internal_error("unexpected multitest in pointer values analyses\n");
+      pips_internal_error("unexpected multitest in pointer values analyses");
       break;
     default:
-      pips_internal_error("unknown instruction tag\n");
+      pips_internal_error("unknown instruction tag");
     }
   pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
@@ -771,7 +771,7 @@ static
 list unstructured_to_post_pv(unstructured __attribute__ ((unused))u, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused)) *ctxt)
 {
   list l_out = NIL;
-  pips_internal_error("not yet implemented\n");
+  pips_internal_error("not yet implemented");
    pips_debug_pvs(2, "returning: ", l_out);
  pips_debug(1, "end\n");
   return (l_out);
@@ -845,7 +845,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	  pv_res->l_out = l_in;
 	  break;
 	case is_syntax_range:
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	  break;
 	case is_syntax_call:
 	  {
@@ -882,15 +882,15 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	    break;
 	  }
 	case is_syntax_application:
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	  break;
 	case is_syntax_va_arg:
 	  {
-	    pips_internal_error("not yet implemented\n");
+	    pips_internal_error("not yet implemented");
 	    break;
 	  }
 	default:
-	  pips_internal_error("unexpected tag %d\n", syntax_tag(exp_syntax));
+	  pips_internal_error("unexpected tag %d", syntax_tag(exp_syntax));
 	}
     }
 
@@ -985,25 +985,25 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 	  break;
 
 	case is_value_unknown:
-	  pips_internal_error("unknown function \n");
+	  pips_internal_error("unknown function ");
 	  break;
 
 	default:
-	  pips_internal_error("unknown tag %d\n", t);
+	  pips_internal_error("unknown tag %d", t);
 	  break;
 	}
     }
   else if(type_variable_p(func_type))
     {
-      pips_internal_error("not yet implemented\n");
+      pips_internal_error("not yet implemented");
     }
   else if(type_statement_p(func_type))
     {
-      pips_internal_error("not yet implemented\n");
+      pips_internal_error("not yet implemented");
     }
   else
     {
-      pips_internal_error("Unexpected case\n");
+      pips_internal_error("Unexpected case");
     }
 
   pips_debug_pvs(2, "returning pv_res->l_out:", pv_res->l_out);
@@ -1366,10 +1366,10 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
 	} /* if (type_variable_p(lhs_type) */
       else if(type_functional_p(lhs_type))
 	{
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	}
       else
-	pips_internal_error("unexpected_type\n");
+	pips_internal_error("unexpected_type");
     }
 
 

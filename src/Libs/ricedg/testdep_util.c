@@ -418,7 +418,7 @@ action ac1,ac2;
     else if (action_read_p(ac1)&&action_read_p(ac2))
 	return (3);
     else
-	pips_error("dep_type","A undefined chain ---chains fault");
+	pips_internal_error("A undefined chain ---chains fault");
 
     /* to please gcc */
     return -1;

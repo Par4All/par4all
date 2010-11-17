@@ -91,12 +91,12 @@ apply_ordering_to_statement(hash_table ots, _int o)
 		ots != NULL && ots != hash_table_undefined);
 
     if(o == STATEMENT_ORDERING_UNDEFINED)
-	pips_internal_error("Illegal ordering %td\n", o);
+	pips_internal_error("Illegal ordering %td", o);
 
     s = (statement) hash_get(ots, (char *) o);
 
     if(s == statement_undefined)
-	pips_internal_error("no statement for order %td=(%td,%td)\n",
+	pips_internal_error("no statement for order %td=(%td,%td)",
 			    o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
 
     return s;

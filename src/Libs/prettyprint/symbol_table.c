@@ -85,8 +85,7 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 			 entity_module_name(c));
 	  }
 	  else {
-	    pips_error("dump_common_layout",
-		       "Non-empty area %s should have a size greater than 0\n",
+	    pips_internal_error("Non-empty area %s should have a size greater than 0",
 		       entity_module_name(c));
 	  }
 	}
@@ -108,8 +107,7 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	  int s;
 
 	  if(ram_section(storage_ram(entity_storage(m)))!=c) {
-	    pips_error("print_common_layout",
-		       "Variable %s declared in area %s but allocated in area %s\n",
+	    pips_internal_error("Variable %s declared in area %s but allocated in area %s",
 		       entity_local_name(m), entity_module_name(c),
 		       entity_module_name(ram_section(storage_ram(entity_storage(m)))));
 	  }
@@ -289,7 +287,7 @@ void dump_functional(functional f, string_buffer result)
   }
   else
     /* An argument can be functional, but not (yet) a result. */
-    pips_internal_error("Ill. type %d\n", type_tag(tr));
+    pips_internal_error("Ill. type %d", type_tag(tr));
 }
 
 string get_symbol_table(entity m, bool isfortran)
@@ -481,7 +479,7 @@ string get_symbol_table(entity m, bool isfortran)
 	string_buffer_append(result, "\"void\"" NL);
       }
       else {
-	pips_internal_error("unexpected type for a typedef\n");
+	pips_internal_error("unexpected type for a typedef");
       }
     }
   }

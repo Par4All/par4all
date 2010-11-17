@@ -241,12 +241,12 @@ transformer declaration_to_transformer(entity v, transformer pre)
       tf = transformer_identity();
     }
     else if (value_symbolic_p(vv)) {
-      pips_internal_error("Unexpected value tag: symbolic\n");
+      pips_internal_error("Unexpected value tag: symbolic");
     }
     else if (value_constant_p(vv)) {
       tf = transformer_identity();
       //  SG: quickly fix this, unsure about the meaning
-      //pips_internal_error("Unexpected value tag: constant\n");
+      //pips_internal_error("Unexpected value tag: constant");
     }
     else if (value_expression_p(vv)) {
       expression e = value_expression(vv);
@@ -286,7 +286,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
       }
     }
     else {
-      pips_internal_error("Unexpected value tag\n");
+      pips_internal_error("Unexpected value tag");
     }
   }
   else {
@@ -632,14 +632,14 @@ transformer call_to_transformer(call c,
     tf = transformer_identity();
     break;
   case is_value_unknown:
-    pips_internal_error("function %s has an unknown value\n", entity_name(e));
+    pips_internal_error("function %s has an unknown value", entity_name(e));
     break;
   case is_value_intrinsic:
     pips_debug(5, "intrinsic function %s\n", entity_name(e));
     tf = intrinsic_to_transformer(e, pc, pre, ef);
     break;
   default:
-    pips_internal_error("unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d", tt);
   }
   pips_assert("transformer tf is consistent",
 	      transformer_consistency_p(tf));
@@ -1839,8 +1839,7 @@ static transformer instruction_to_transformer(instruction i,
     tf = forloop_to_transformer(fl, pre, e);
     break;
   case is_instruction_goto:
-    pips_error("instruction_to_transformer",
-	       "unexpected goto in semantics analysis");
+    pips_internal_error("unexpected goto in semantics analysis");
     tf = transformer_identity();
     break;
   case is_instruction_call:
@@ -1854,7 +1853,7 @@ static transformer instruction_to_transformer(instruction i,
     tf = expression_to_transformer(instruction_expression(i), pre, e);
     break;
   default:
-    pips_error("instruction_to_transformer","unexpected tag %d\n",
+    pips_internal_error("unexpected tag %d",
 	       instruction_tag(i));
   }
   pips_debug(9, "resultat:\n");
@@ -2031,7 +2030,7 @@ transformer statement_to_transformer(
     if(!ENDP(statement_declarations(s)) && !statement_block_p(s)
        && !declaration_statement_p(s)) {
       // FI: Just to gain some time before dealing with controlizer and declarations updates
-      //pips_internal_error("Statement %p carries declarations\n");
+      //pips_internal_error("Statement %p carries declarations");
       pips_user_warning("Statement %d (%p) carries declarations\n",
 			statement_number(s), s);
     }
@@ -2119,7 +2118,7 @@ transformer statement_to_transformer(
       /* (void) print_transformer(load_statement_transformer(s)); */
       (void) print_transformer(nt);
       dump_transformer(nt);
-      pips_internal_error("Inconsistent transformer detected\n");
+      pips_internal_error("Inconsistent transformer detected");
     }
     ifdebug(1) {
       pips_assert("Transformer is internally consistent",

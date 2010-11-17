@@ -482,8 +482,7 @@ hash_table r_to_ud;
 		       */
 		    pips_assert("reference_conflicting_test_and_update",
 				current_llv != llv);
-		    pips_error("reference_conflicting_test_and_update",
-			       "local variable merge not implemented\n");
+		    pips_internal_error("local variable merge not implemented");
 		}
 		else {
 		    conflicting = TRUE;
@@ -770,14 +769,12 @@ int dimn;
 
 		if(!sc_minmax_of_variable(s, (Variable) phi, 
 					  &min, &max))
-		    pips_error("set_dimensions_of_local_variable_family",
-			       "empty domain for phi\n");
+		    pips_internal_error("empty domain for phi");
 
 		if(value_min_p(min) || value_max_p(max)) {
 		    Value divis= ACCESS(P,dimn,d,d);
 		    /* parameter ==> min = max = 1 */
-		    /*pips_error("set_dimensions_of_local_variable_family",
-		      "unbounded domain for phi, %s\n",
+		    /*pips_internal_error("unbounded domain for phi, %s",
 		      "check tile bounds and subscript expressions"); */
 		    min= VALUE_ZERO;
 		    max= value_lt(divis,VALUE_CONST(999)) && 

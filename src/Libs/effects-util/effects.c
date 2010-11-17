@@ -91,7 +91,7 @@ bool memory_dereferencing_p(reference r)
     /* cycle with alias-classes library: import explictly */
     bool entity_abstract_location_p(entity);
     if(entity_abstract_location_p(v)) {
-      pips_internal_error("Do we want to subscript abstract locations?\n");
+      pips_internal_error("Do we want to subscript abstract locations?");
     }
     else if(FALSE /* entity_heap_variable_p(v)*/) {
       /* Heap modelization is behind*/
@@ -253,7 +253,7 @@ effect heap_effect(entity m, action ac)
   effect any = effect_undefined;
 
   if(entity_undefined_p(heap)) {
-    pips_internal_error("Heap for module \"%s\" not found\n", entity_name(m));
+    pips_internal_error("Heap for module \"%s\" not found", entity_name(m));
   }
 
   any = make_effect(make_cell_reference(make_reference(heap, NIL)),
@@ -709,7 +709,7 @@ string action_kind_to_string(action_kind ak)
   else if(action_kind_type_declaration_p(ak))
     s = "T";
   else
-    pips_internal_error("Unknown action kind.\n");
+    pips_internal_error("Unknown action kind.");
   return s;
 }
 
@@ -756,7 +756,7 @@ action_kind action_to_action_kind(action a)
   action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
 
   if(!action_read_p(a) && !action_write_p(a))
-    pips_internal_error("Inconsistent action kind.\n");
+    pips_internal_error("Inconsistent action kind.");
 
   return ak;
 }
@@ -922,7 +922,7 @@ reference cell_to_reference(cell c) {
   else if (cell_preference_p(c))
     r = preference_reference(cell_preference(c));
   else
-    pips_internal_error("unexpected cell tag\n");
+    pips_internal_error("unexpected cell tag");
 
   return r;
 }

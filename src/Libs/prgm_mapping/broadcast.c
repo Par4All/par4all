@@ -127,7 +127,7 @@ base_find_var_with_rank(b, r)
   Pvecteur        v = (Pvecteur) b;
 
   if (r > base_dimension(b))
-    pips_error("[base_find_var_with_rank]", "rank %d too high", r);
+    pips_internal_error("rank %d too high", r);
 
   for (i = 1; i < r; v = v->succ, i++);
 

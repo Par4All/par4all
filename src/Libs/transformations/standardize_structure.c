@@ -80,7 +80,7 @@ stf(char *mod_name)
     debug (9,"stf", "temporary filename for output %s\n", tmpfile);
 
     if (!(*tmpfile))
-	pips_error("stf","unable to make a temporary file\n");
+	pips_internal_error("unable to make a temporary file");
 
     status = safe_system_no_abort(concatenate
 				  ("stf-module ",

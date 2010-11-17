@@ -573,9 +573,9 @@ list regions_dynamic_elim(list l_reg)
 	      if(!entity_special_area_p(reg_ent) && !anywhere_effect_p(reg))
 		ignore_this_region = TRUE;
 	      break;
-	      /* pips_internal_error("bad tag for %s (rom)\n", entity_name(reg_ent)); */
+	      /* pips_internal_error("bad tag for %s (rom)", entity_name(reg_ent)); */
 	    default:
-	      pips_internal_error("case default reached\n");
+	      pips_internal_error("case default reached");
 	    }
 	}
 

@@ -645,7 +645,7 @@ bool cell_inclusion_p(cell c1, cell c2, bool * exact_inclusion_test_p)
   *exact_inclusion_test_p = true;
 
   if (cell_gap_p(c1) || cell_gap_p(c2))
-    pips_internal_error("gap case not handled yet \n");
+    pips_internal_error("gap case not handled yet ");
 
   reference r1 = cell_reference_p(c1)
     ? cell_reference(c1) : preference_reference(cell_preference(c1));
@@ -745,7 +745,7 @@ bool cell_intersection_p(cell c1, cell c2, bool * intersection_test_exact_p)
   *intersection_test_exact_p = true;
 
   if (cell_gap_p(c1) || cell_gap_p(c2))
-    pips_internal_error("gap case not handled yet \n");
+    pips_internal_error("gap case not handled yet ");
 
   reference r1 = cell_reference_p(c1) ? cell_reference(c1) :
     preference_reference(cell_preference(c1));
@@ -901,7 +901,7 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
 	  }
 	  break;
 	default:
-	    pips_internal_error("unexpected type tag\n");
+	    pips_internal_error("unexpected type tag");
 
 	}
     }

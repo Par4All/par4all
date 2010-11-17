@@ -299,7 +299,6 @@ Pbase base_oldindex;
     case is_instruction_unstructured:
 	break;
     default:
-	pips_error("statement_newbase",
-		   "unexpected tag %d\n",instruction_tag(i));
+	pips_internal_error("unexpected tag %d",instruction_tag(i));
     }
 }

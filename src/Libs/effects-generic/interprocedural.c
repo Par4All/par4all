@@ -255,7 +255,7 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	    break;
 	  }
 	default:
-	  pips_internal_error("case not handled\n");
+	  pips_internal_error("case not handled");
 	}
 
     } /* else du if (real_arg_t_d == 0) */

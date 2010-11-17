@@ -226,7 +226,7 @@ bool pv_cells_syntactically_equal_p(cell_relation pv1, cell_relation pv2)
       return true;
     }
   else
-    pips_internal_error("Convex pointer_values not implemented yet\n");
+    pips_internal_error("Convex pointer_values not implemented yet");
   
   return false;
 }

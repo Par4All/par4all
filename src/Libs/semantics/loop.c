@@ -342,7 +342,7 @@ list forloop_to_transformer_list(forloop l __attribute__ ((unused)),
 				 list e __attribute__ ((unused)))
 {
   list tfl = NIL;
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
   return tfl;
 }
 
@@ -1340,7 +1340,7 @@ list loop_to_transformer_list(loop l __attribute__ ((unused)),
 			      list e __attribute__ ((unused)))
 {
   list tfl = NIL;
-  pips_internal_error("Not implemented yet.\n");
+  pips_internal_error("Not implemented yet.");
   return tfl;
 }
 
@@ -1826,7 +1826,7 @@ list complete_loop_transformer_list(transformer ltf, transformer pre, loop l)
   range r = loop_range(l);
   statement s = loop_body(l);
 
-  pips_internal_error("Function not implemented.\n");
+  pips_internal_error("Function not implemented.");
 
   pips_debug(8,"begin with loop precondition\n");
   ifdebug(8) {
@@ -2359,7 +2359,7 @@ list whileloop_to_transformer_list(whileloop l __attribute__ ((unused)),
   list tfl = NIL;
   //evaluation lt = whileloop_evaluation(l);
 
-  pips_internal_error("This function should never be called.\n");
+  pips_internal_error("This function should never be called.");
 
   /*
   if(evaluation_before_p(lt))
@@ -2383,7 +2383,7 @@ transformer whileloop_to_k_transformer(whileloop l,
   if(evaluation_before_p(lt))
     t = new_whileloop_to_k_transformer(l, pre, e, k);
   else
-    pips_internal_error("repeatloop_to_k_transformer() not implemented.\n");
+    pips_internal_error("repeatloop_to_k_transformer() not implemented.");
     //t = repeatloop_to_k_transformer(l, pre, e);
   return t;
 }
@@ -2604,11 +2604,10 @@ transformer loop_to_postcondition(transformer pre,
   pips_debug(8,"begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-    pips_internal_error("Halbwachs not implemented\n");
+    pips_internal_error("Halbwachs not implemented");
   }
   else {
-    /* pips_error("loop_to_postcondition",
-       "Equality option not implemented\n"); */
+    /* pips_internal_error("Equality option not implemented"); */
     /* the standard version should be OK for SEMANTICS_EQUALITY_INVARIANTS... */
 
     /* basic cheap version: add information on loop index in pre
@@ -2907,7 +2906,7 @@ transformer whileloop_to_postcondition(
 
   if(pips_flag_p(SEMANTICS_FIX_POINT)
      && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-    pips_internal_error("Halbwachs not implemented\n");
+    pips_internal_error("Halbwachs not implemented");
   }
 
   if(false_condition_wrt_precondition_p(c, pre)) {
@@ -3145,7 +3144,7 @@ transformer whileloop_to_total_precondition(
   pips_debug(8,"begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-    pips_internal_error("Halbwachs not implemented\n");
+    pips_internal_error("Halbwachs not implemented");
   }
   else {
     transformer preb /*= transformer_dup(pre)*/ ;
