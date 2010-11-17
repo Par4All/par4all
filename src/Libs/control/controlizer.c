@@ -398,7 +398,7 @@ static void create_statements_of_label(statement st) {
   }
 
   case is_instruction_unstructured:
-    pips_error("create_statement_of_labels", "Found unstructured", "");
+    pips_internal_error("Found unstructured", "");
 
   default:
     /* Do nothing special for other kind of instructions */
@@ -1609,8 +1609,7 @@ bool controlize_statement(control c_res,
     break;
 #endif
   default:
-    pips_error("controlize",
-	       "Unknown instruction tag %d\n", instruction_tag(i));
+    pips_internal_error("Unknown instruction tag %d\n", instruction_tag(i));
   }
 
     statement_consistent_p(st);

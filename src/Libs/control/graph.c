@@ -225,7 +225,7 @@ static void statement_arrows(statement s, /* statement */ list next)
     }
     case is_instruction_goto:
     default:
-	pips_error("statement_arrows", "unexpected instruction tag (%d)\n", t);
+	pips_internal_error("unexpected instruction tag (%d)\n", t);
     }
 }
 
