@@ -237,7 +237,7 @@ static bool has_call_stat_inside_flt(statement stat, bool * bHasCallStat)
       }
     default:
       {
-	pips_error("has_call_stat_inside_flt", "unsupported tag");
+	pips_internal_error("unsupported tag");
 	break;
       }
     }
@@ -618,7 +618,7 @@ static bool has_loop_inside_flt(statement stat, bool * bHasLoop)
       }
     default:
       {
-	pips_error("has_call_stat_inside_flt", "unsupported tag");
+	pips_internal_error("unsupported tag");
 	break;
       }
     }

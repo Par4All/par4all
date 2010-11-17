@@ -126,7 +126,7 @@ static void opt_loop_interchange_fill_lists(statement stat)
       }
     default:
       {
-	pips_error("opt_loop_interchange_fill_lists", "impossible");
+	pips_internal_error("impossible");
 	break;
       }
     }
@@ -215,7 +215,7 @@ static void move_statements(statement stat, entity ind,
       }
     default:
       {
-	pips_error("move_statements", "impossible");
+	pips_internal_error("impossible");
 	break;
       }
     }

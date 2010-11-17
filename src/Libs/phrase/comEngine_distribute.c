@@ -223,7 +223,7 @@ static void do_HRE_memory_mapping(statement stat)
       }
     default:
       {
-	pips_error("do_HRE_memory_mapping", "impossible");
+	pips_internal_error("impossible");
 	break;
       }
     }

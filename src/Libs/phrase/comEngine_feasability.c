@@ -134,7 +134,7 @@ list lr;
 	     call_arguments(syntax_call(s)));
 	break;
     default:
-	pips_error("local_syntax_to_reference_list","illegal tag %d\n", 
+	pips_internal_error("illegal tag %d\n", 
 		   syntax_tag(s));
 
     }
@@ -472,7 +472,7 @@ static bool check_loop_distribution_feasability(statement stat)
   // The same index cannot be used in several loops
   if(gen_in_list_p(index, glIndUsed))
     {
-      pips_error("", "loop index used in several loops: %s\n",
+      pips_internal_error("loop index used in several loops: %s\n",
 		 entity_user_name(index));
       return FALSE;
     }
@@ -922,7 +922,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
 
 	if(gIfCount != 0)
 	  {
-	    pips_error("", "conflict with reference: %s\n",
+	    pips_internal_error("conflict with reference: %s\n",
 		       words_to_string(words_reference(callRef, NIL)));
 
 	    return FALSE;
@@ -971,7 +971,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	  if(same_entity_p(loop_index(statement_loop(loopStat)),
 			   reference_variable(callRef)))
 	    {
-	      pips_error("", "loop index must not vary in the code: %s\n",
+	      pips_internal_error("loop index must not vary in the code: %s\n",
 			 words_to_string(words_reference(callRef, NIL)));
 
 	      return FALSE;
@@ -1016,7 +1016,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	{
 	  gen_free_list(lIndRef);
 
-	  pips_error("", "%s is not a valid reference\n",
+	  pips_internal_error("%s is not a valid reference\n",
 		     words_to_string(words_reference(callRef, NIL)));
 
 	  return FALSE;
