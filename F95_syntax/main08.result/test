@@ -1,0 +1,9 @@
+PROGRAM MAIN
+   INTEGER :: A
+   A = 0
+   OPEN (UNIT=1,FILE='main08.f90',STATUS='old',ACCESS='direct',FORM='unformatted',RECL=1000) 
+   READ (UNIT=1,REC=1) A
+END PROGRAM MAIN
+
+"compile sources produced by pips"
+

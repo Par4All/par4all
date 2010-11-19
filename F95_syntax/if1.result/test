@@ -1,0 +1,17 @@
+PROGRAM MAIN
+   INTEGER :: A
+   A = 0
+   IF (A.EQ.0) A = 1
+   IF (A.EQ.0) THEN
+      A = 1
+   ELSE
+      A = 3
+   ENDIF
+   IF (A.EQ.0) THEN
+      A = 1
+   ELSEIF (A.EQ.1) THEN
+      A = 2
+   ELSE
+      A = 3
+   ENDIF
+END PROGRAM MAIN

@@ -1,0 +1,14 @@
+SUBROUTINE ADD(A, B)
+   INTEGER :: C, A, B
+   C = A+B
+   PRINT *, C
+END SUBROUTINE ADD
+PROGRAM MAIN
+   INTEGER :: A, B
+   A = 10
+   B = 20
+   CALL ADD(A, B)
+END PROGRAM MAIN
+
+"compile sources produced by pips"
+
