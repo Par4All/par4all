@@ -79,45 +79,70 @@ list /* of string */ effect_words_reference(reference obj)
 
   begin_attachment = STRING(CAR(pc));
 
-  if (reference_indices(obj) != NIL) {
-    string beg = string_undefined;
-    string mid = string_undefined;
-    string end = string_undefined;
+  if (reference_indices(obj) != NIL)
+    {
+      string before_first_index = string_undefined;
+      string before_index = string_undefined;
+      string after_index = string_undefined;
+      string after_last_index = string_undefined;
+      string before_field = string_undefined;
+      string after_field = string_undefined;
 
-    switch(get_prettyprint_language_tag()) {
-      case is_language_fortran95:
-      case is_language_fortran:
-        beg = "(";
-        mid = ",";
-        end = ")";
-        break;
-      case is_language_c:
-        beg = "[";
-        mid = "][";
-        end = "]";
-        break;
-      default:
-        pips_internal_error("Language unknown !");
-        break;
+      switch(get_prettyprint_language_tag())
+	{
+	case is_language_fortran95:
+	case is_language_fortran:
+	  before_first_index = "(";
+	  before_index = "";
+	  after_index = ",";
+	  after_last_index = ")";
+	  before_field = "";
+	  after_field = "";
+	  break;
+	case is_language_c:
+	  before_first_index = "[";
+	  before_index = "[";
+	  after_index = "]";
+	  after_last_index = "]";
+	  before_field = ".";
+	  after_field = "";
+	  break;
+	default:
+	  pips_internal_error("Language unknown !");
+	  break;
+	}
+
+      bool first = true;
+      for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
+	{
+	  expression ind_exp = EXPRESSION(CAR(pi));
+	  syntax s = expression_syntax(ind_exp);
+	  if (syntax_reference_p(s) &&
+	      entity_field_p(reference_variable(syntax_reference(s))))
+	    {
+	      // add a '.' to disambiguate field names from variable names
+	      pc = CHAIN_SWORD(pc, before_field);
+	      pc = gen_nconc(pc, words_expression(ind_exp,NIL));
+	      pc = CHAIN_SWORD(pc, after_field);
+	    }
+	  else
+	    {
+	      if (first)
+		{
+		  pc = CHAIN_SWORD(pc,before_first_index);
+		  first = false;
+		}
+	      else
+		pc = CHAIN_SWORD(pc,before_index);
+
+	      pc = gen_nconc(pc, words_expression(ind_exp,NIL));
+	      if (CDR(pi) != NIL)
+		pc = CHAIN_SWORD(pc,after_index);
+	      else
+		pc = CHAIN_SWORD(pc,after_last_index);
+	    }
+	}
     }
-
-    pc = CHAIN_SWORD(pc,beg);
-    for(list pi = reference_indices(obj); !ENDP(pi); POP(pi))
-      {
-	expression ind_exp = EXPRESSION(CAR(pi));
-	syntax s = expression_syntax(ind_exp);
-	if (syntax_reference_p(s) &&
-	    entity_field_p(reference_variable(syntax_reference(s))))
-	  {
-	    // add a '.' to disambiguate field names from variable names
-	    pc = CHAIN_SWORD(pc, ".");
-	  }
-	pc = gen_nconc(pc, words_expression(ind_exp,NIL));
-	if (CDR(pi) != NIL)
-	  pc = CHAIN_SWORD(pc,mid);
-      }
-    pc = CHAIN_SWORD(pc,end);
-  }
 
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
 				obj);
