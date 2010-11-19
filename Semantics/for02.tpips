@@ -1,5 +1,5 @@
-delete for01
-create for01 for01.c
+delete for02
+create for02 for02.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
@@ -64,7 +64,7 @@ echo
 echo Warnings
 echo
 
-shell cat for01.database/Warnings
+shell cat for02.database/Warnings
 
 quit
 
