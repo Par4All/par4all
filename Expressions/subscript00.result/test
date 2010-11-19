@@ -8,3 +8,16 @@ struct a {
 };
 
 int foo();
+int foo()
+{
+   struct a b;
+   //PIPS generated variable
+   int *P_0;
+   P_0 = b.c;
+   P_0[0] = 1;
+}
+struct a {
+   int c[10];
+};
+
+int foo();
