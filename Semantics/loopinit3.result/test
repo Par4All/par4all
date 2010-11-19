@@ -2,6 +2,20 @@
 
 C  P() {}
 
+      
+      INTEGER FUNCTION INC(K)
+
+C  P() {}
+
+      K = K+1                                                           0003
+
+C  P(K) {K==K#init+1}
+
+      INC = K                                                           0004
+      END
+
+C  P() {}
+
       PROGRAM LOOPINIT3
 
 c     Check that loop index initialization is performed correctly: the initial
