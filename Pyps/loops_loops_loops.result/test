@@ -1,0 +1,39 @@
+= first level loops
+l99998
+l99997
+l99993
+= second level loops
+== loops of l99998
+l99999
+== loops of l99997
+== loops of l99993
+l99995
+l99994
+= third level loops
+== loops of l99999
+== loops of l99995
+l99996
+== loops of l99994
+void looping()
+{
+   int i, j, k, l;
+l99998:
+   for(i = 0; i <= 2; i += 1)
+l99999:
+      for(j = 0; j <= 2; j += 1)
+         ;
+l99997:
+   for(k = 0; k <= 2; k += 1)
+      ;
+l99993:
+   for(l = 0; l <= 2; l += 1) {
+l99995:
+      for(i = 0; i <= 2; i += 1)
+l99996:
+         for(j = 0; j <= 2; j += 1)
+            ;
+l99994:
+      for(i = 0; i <= 2; i += 1)
+         ;
+   }
+}

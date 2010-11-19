@@ -1,0 +1,12 @@
+I like cats
+I like dogs
+int main()
+{
+   printf("I like cats\n");
+   return 0;
+}
+int main()
+{
+   printf("I like dogs\n");
+   return 0;
+}

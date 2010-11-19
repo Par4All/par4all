@@ -1,0 +1,9 @@
+cumulated effects on only one function
+//             <    is read   >: in1 in2 in3
+//             <    is written>: out1
+void add_comp()
+{
+//             <    is read   >: in1 in2 in3
+//             <    is written>: out1
+   out1 = in1+in2>in3;
+}
