@@ -9,11 +9,11 @@ int main(int argc, char *argv[])
 {
    Cplfloat cpl[10];
    int i;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i
-//               <must be written>: cpl[i][.re]
+//             <    is read   >: i
+//             <    is written>: cpl[i].re
       call19(&cpl[i].re);
    return 0;
 }
@@ -24,13 +24,13 @@ int main(int argc, char *argv[])
 {
    Cplfloat cpl[10];
    int i;
-//               <may be read    >: i
-//               <may be written >: cpl[*][.re]
-//               <must be written>: i
+//             <may be read   >: i
+//             <may be written>: cpl[*].re
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be written >: cpl[*][.re]
-//               <must be read   >: i
+//             <may be written>: cpl[*].re
+//             <    is read   >: i
       call19(&cpl[i].re);
    return 0;
 }
@@ -42,12 +42,12 @@ int main(int argc, char *argv[])
    Cplfloat cpl[10];
    int i;
 
-//  <cpl[PHI1][.re]-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <cpl[PHI1].re-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
-//  <cpl[PHI1][.re]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <cpl[PHI1].re-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       call19(&cpl[i].re);
    return 0;

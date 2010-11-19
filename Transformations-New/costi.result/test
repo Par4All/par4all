@@ -144,25 +144,25 @@ Dependence graph
  **************** Effective Dependence Graph ****************
 
 	22 --> 20 with conflicts
-		from <FK-R-MUST> to <FK-W-MUST> at levels  1
+		from <FK-R-EXACT> to <FK-W-EXACT> at levels  1
 	22 --> 18 with conflicts
-		from <KC-R-MUST> to <KC-W-MUST> at levels  1
+		from <KC-R-EXACT> to <KC-W-EXACT> at levels  1
 	21 --> 20 with conflicts
-		from <FK-R-MUST> to <FK-W-MUST> at levels  1
+		from <FK-R-EXACT> to <FK-W-EXACT> at levels  1
 	20 --> 22 with conflicts
-		from <FK-W-MUST> to <FK-R-MUST> at levels  1 2
+		from <FK-W-EXACT> to <FK-R-EXACT> at levels  1 2
 	20 --> 21 with conflicts
-		from <FK-W-MUST> to <FK-R-MUST> at levels  1 2
+		from <FK-W-EXACT> to <FK-R-EXACT> at levels  1 2
 	20 --> 20 with conflicts
-		from <FK-W-MUST> to <FK-W-MUST> at levels  1
+		from <FK-W-EXACT> to <FK-W-EXACT> at levels  1
 	18 --> 22 with conflicts
-		from <KC-W-MUST> to <KC-R-MUST> at levels  1 2
+		from <KC-W-EXACT> to <KC-R-EXACT> at levels  1 2
 	18 --> 18 with conflicts
-		from <KC-W-MUST> to <KC-W-MUST> at levels  1
+		from <KC-W-EXACT> to <KC-W-EXACT> at levels  1
 	18 --> 18 with conflicts
-		from <KC-W-MUST> to <KC-R-MUST> at levels  1
+		from <KC-W-EXACT> to <KC-R-EXACT> at levels  1
 	18 --> 18 with conflicts
-		from <KC-R-MUST> to <KC-W-MUST> at levels  1
+		from <KC-R-EXACT> to <KC-W-EXACT> at levels  1
 
 ****************** End of Dependence Graph ******************
 

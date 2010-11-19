@@ -3,22 +3,22 @@ Source code with proper effects
 
 int call06(int i)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;                                                                 /*0005*/
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0006*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: i
+//             <    is read   >: i
 int call06(int i)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;                                                                 /*0005*/
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0006*/
 }
 

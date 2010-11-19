@@ -14,20 +14,20 @@ int use_def_elim02(int i)
 
 Code with cumulated effects for "use_def_elim02"
 
-//               <must be read   >: i
+//             <    is read   >: i
 int use_def_elim02(int i)
 {
    int j;
    int k;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 
    j = i+1;
-//               <must be written>: i
+//             <    is written>: i
    i = 2;
-//               <must be written>: k
+//             <    is written>: k
    k = 3;
-//               <must be read   >: j
+//             <    is read   >: j
    return j;
 }
 

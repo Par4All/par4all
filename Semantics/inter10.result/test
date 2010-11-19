@@ -1,8 +1,8 @@
-C               <must be read   >: I
+C             <    is read   >: I
 
       INTEGER FUNCTION INTER10(I)
-C               <must be read   >: I
-C               <must be written>: INTER10
+C             <    is read   >: I
+C             <    is written>: INTER10
       INTER10 = I+1                                                     0003
       END
 

@@ -3,30 +3,30 @@ Source code with proper effects
 
 int pointer03()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 3;                                                           /*0005*/
-//               <must be written>: ip
+//             <    is written>: ip
    int *ip = &i;                                                        /*0006*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ip
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ip
    *ip = 4;                                                             /*0007*/
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0008*/
 }
 
 Source code with cumulated effects
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int pointer03()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 3;                                                           /*0005*/
-//               <must be written>: ip
+//             <    is written>: ip
    int *ip = &i;                                                        /*0006*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ip
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ip
    *ip = 4;                                                             /*0007*/
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0008*/
 }
 

@@ -1,11 +1,11 @@
 # proper effects
       
       INTEGER FUNCTION INC(K)
-C               <must be read   >: K
-C               <must be written>: K
+C             <    is read   >: K
+C             <    is written>: K
       K = K+1                                                           0003
-C               <must be read   >: K
-C               <must be written>: INC
+C             <    is read   >: K
+C             <    is written>: INC
       INC = K                                                           0004
       END
       PROGRAM LOOPINIT
@@ -13,64 +13,64 @@ C               <must be written>: INC
 c     Check that loop index initialization is performed correctly
 
       REAL T(10)
-C               <must be written>: J
+C             <    is written>: J
 
       J = 2                                                             0007
-C               <must be read   >: J N
-C               <must be written>: I J
+C             <    is read   >: J N
+C             <    is written>: I J
 
       DO I = INC(J), N                                                  0009
-C               <must be read   >: I J N
-C               <must be written>: J T(I)
+C             <    is read   >: I J N
+C             <    is written>: J T(I)
          T(I) = 0.                                                      0010
-C               <must be read   >: J N
-C               <must be written>: J
+C             <    is read   >: J N
+C             <    is written>: J
          J = J+2                                                        0011
       ENDDO
-C               <must be read   >: I J __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I J __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, I, J                                                     0014
 
       END
 # cumulated effects
-C               <must be read   >: K
-C               <must be written>: K
+C             <    is read   >: K
+C             <    is written>: K
       
       INTEGER FUNCTION INC(K)
-C               <must be read   >: K
-C               <must be written>: K
+C             <    is read   >: K
+C             <    is written>: K
       K = K+1                                                           0003
-C               <must be read   >: K
-C               <must be written>: INC
+C             <    is read   >: K
+C             <    is written>: INC
       INC = K                                                           0004
       END
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PROGRAM LOOPINIT
 
 c     Check that loop index initialization is performed correctly
 
       REAL T(10)
-C               <must be written>: J
+C             <    is written>: J
 
       J = 2                                                             0007
-C               <may be read    >: I
-C               <may be written >: T(*)
-C               <must be read   >: J N
-C               <must be written>: I J
+C             <may be read   >: I
+C             <may be written>: T(*)
+C             <    is read   >: J N
+C             <    is written>: I J
 
       DO I = INC(J), N                                                  0009
-C               <may be written >: T(*)
-C               <must be read   >: I J N
-C               <must be written>: J
+C             <may be written>: T(*)
+C             <    is read   >: I J N
+C             <    is written>: J
          T(I) = 0.                                                      0010
-C               <must be read   >: J N
-C               <must be written>: J
+C             <    is read   >: J N
+C             <    is written>: J
          J = J+2                                                        0011
       ENDDO
-C               <must be read   >: I J __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I J __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, I, J                                                     0014
 

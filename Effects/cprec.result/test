@@ -1,19 +1,19 @@
       SUBROUTINE VS
       COMMON /COMPOSI/ JPOINT
       COMMON /COMPOS/ EFF(401)
-C               <must be read   >: JPOINT
-C               <must be written>: EFF(JPOINT)
+C             <    is read   >: JPOINT
+C             <    is written>: EFF(JPOINT)
 
       EFF(JPOINT) = 0.0                                                 0005
 
       END
-C               <may be written >: EFF(*)
-C               <must be read   >: JPOINT
+C             <may be written>: EFF(*)
+C             <    is read   >: JPOINT
       SUBROUTINE VS
       COMMON /COMPOSI/ JPOINT
       COMMON /COMPOS/ EFF(401)
-C               <may be written >: EFF(*)
-C               <must be read   >: JPOINT
+C             <may be written>: EFF(*)
+C             <    is read   >: JPOINT
 
       EFF(JPOINT) = 0.0                                                 0005
 
@@ -27,15 +27,15 @@ C     check that regions are passed upwards correctly
 
       COMMON /COMPOSI/ JPOINT
       COMMON /COMPOS/ EFF(401)
-C               <must be read   >: N
-C               <must be written>: J
+C             <    is read   >: N
+C             <    is written>: J
 
       DO J = 1, N                                                       0011
-C               <must be read   >: J N
-C               <must be written>: JPOINT
+C             <    is read   >: J N
+C             <    is written>: JPOINT
          JPOINT = J                                                     0012
-C               <may be written >: EFF(*)
-C               <must be read   >: JPOINT N
+C             <may be written>: EFF(*)
+C             <    is read   >: JPOINT N
          CALL VS                                                        0013
       ENDDO
 

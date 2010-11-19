@@ -9,26 +9,26 @@ int main()
    y[0] = 0.;
    printf(fmt, i, i+j, x);
 }
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: stdout[0]
-//               <must be read   >: __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 5;
-//               <must be written>: j
+//             <    is written>: j
    int j = 6;
    float x;
    double y[10];
-//               <must be written>: fmt
+//             <    is written>: fmt
    char *fmt = "i=%d, %d, %f\n";
-//               <must be written>: y[0]
+//             <    is written>: y[0]
 
    y[0] = 0.;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
 }

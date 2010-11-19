@@ -41,60 +41,60 @@ ATOM * a_m_serial(int serial)
    static ATOM *ap = (void *) 0;
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <must be read   >: atomUPDATE
+//             <    is read   >: atomUPDATE
    if (atomUPDATE)
-//               <may be read    >: first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomNUMBER atomUPDATE
-//               <must be written>: n
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: n
       n = a_number();
    else
-//               <must be read   >: atomNUMBER
-//               <must be written>: n
+//             <    is read   >: atomNUMBER
+//             <    is written>: n
       n = atomNUMBER;
-//               <must be read   >: first
-//               <must be written>: ap
+//             <    is read   >: first
+//             <    is written>: ap
 
    ap = first;
-//               <must be read   >: ap
+//             <    is read   >: ap
    if (ap==(void *) 0) 
       return (void *) 0;
-//               <must be read   >: lastmatched
+//             <    is read   >: lastmatched
    if (lastmatched==(void *) 0) 
-//               <must be read   >: first
-//               <must be written>: lastmatched
+//             <    is read   >: first
+//             <    is written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
 
    if (serial==lastmatched->serial) 
-//               <must be read   >: lastmatched
+//             <    is read   >: lastmatched
       return lastmatched;
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
    if (serial>lastmatched->serial) 
-//               <must be read   >: lastmatched
-//               <must be written>: ap
+//             <    is read   >: lastmatched
+//             <    is written>: ap
       ap = lastmatched;
-//               <must be read   >: n
-//               <must be written>: i
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 0; i <= n-1; i += 1) {
-//               <must be read   >: ap ap[0][.serial] n serial
+//             <    is read   >: ap ap[0].serial n serial
       if (ap->serial==serial) {
-//               <must be read   >: ap n
-//               <must be written>: lastmatched
+//             <    is read   >: ap n
+//             <    is written>: lastmatched
          lastmatched = ap;
-//               <must be read   >: ap n
+//             <    is read   >: ap n
          return ap;
       }
-//               <must be read   >: ap ap[0][.next] n
+//             <    is read   >: ap ap[0].next n
       if (ap==ap->next)
-//               <must be read   >: first n
-//               <must be written>: ap
+//             <    is read   >: first n
+//             <    is written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][.next] n
-//               <must be written>: ap
+//             <    is read   >: ap ap[0].next n
+//             <    is written>: ap
          ap = ap->next;
    }
    return (void *) 0;
@@ -102,83 +102,83 @@ ATOM * a_m_serial(int serial)
 
 Cumulated effects for "a_m_serial"
 
-//               <may be read    >: ap[0][.next] ap[0][.serial]
-//               <may be written >: atomNUMBER atomUPDATE lastmatched
-//               <must be read   >: atomNUMBER atomUPDATE first ap 
-//                                  lastmatched 
-//                                  lastmatched[0][.serial] serial
-//               <must be written>: ap
+//             <may be read   >: ap[0].next ap[0].serial
+//             <may be written>: atomNUMBER atomUPDATE lastmatched
+//             <    is read   >: atomNUMBER atomUPDATE first ap 
+//                               lastmatched lastmatched[0].serial 
+//                               serial
+//             <    is written>: ap
 ATOM * a_m_serial(int serial)
 {
    static ATOM *ap = (void *) 0;
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <may be read    >: first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomNUMBER atomUPDATE
-//               <must be written>: n
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: n
    if (atomUPDATE)
-//               <may be read    >: first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomNUMBER atomUPDATE
-//               <must be written>: n
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: n
       n = a_number();
    else
-//               <must be read   >: atomNUMBER
-//               <must be written>: n
+//             <    is read   >: atomNUMBER
+//             <    is written>: n
       n = atomNUMBER;
-//               <must be read   >: first
-//               <must be written>: ap
+//             <    is read   >: first
+//             <    is written>: ap
 
    ap = first;
-//               <must be read   >: ap
+//             <    is read   >: ap
    if (ap==(void *) 0) 
       return (void *) 0;
-//               <may be read    >: first
-//               <may be written >: lastmatched
-//               <must be read   >: lastmatched
+//             <may be read   >: first
+//             <may be written>: lastmatched
+//             <    is read   >: lastmatched
    if (lastmatched==(void *) 0) 
-//               <must be read   >: first
-//               <must be written>: lastmatched
+//             <    is read   >: first
+//             <    is written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
 
    if (serial==lastmatched->serial) 
-//               <must be read   >: lastmatched
+//             <    is read   >: lastmatched
       return lastmatched;
-//               <may be written >: ap
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
+//             <may be written>: ap
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
    if (serial>lastmatched->serial) 
-//               <must be read   >: lastmatched
-//               <must be written>: ap
+//             <    is read   >: lastmatched
+//             <    is written>: ap
       ap = lastmatched;
-//               <may be read    >: first ap ap[0][.next] 
-//                                  ap[0][.serial] serial
-//               <may be written >: ap lastmatched
-//               <must be read   >: n
-//               <must be written>: i
+//             <may be read   >: first ap ap[0].next ap[0].serial 
+//                               serial
+//             <may be written>: ap lastmatched
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 0; i <= n-1; i += 1) {
-//               <may be written >: lastmatched
-//               <must be read   >: ap ap[0][.serial] n serial
+//             <may be written>: lastmatched
+//             <    is read   >: ap ap[0].serial n serial
       if (ap->serial==serial) {
-//               <must be read   >: ap n
-//               <must be written>: lastmatched
+//             <    is read   >: ap n
+//             <    is written>: lastmatched
          lastmatched = ap;
-//               <must be read   >: ap n
+//             <    is read   >: ap n
          return ap;
       }
-//               <may be read    >: first
-//               <must be read   >: ap ap[0][.next] n
-//               <must be written>: ap
+//             <may be read   >: first
+//             <    is read   >: ap ap[0].next n
+//             <    is written>: ap
       if (ap==ap->next)
-//               <must be read   >: first n
-//               <must be written>: ap
+//             <    is read   >: first n
+//             <    is written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][.next] n
-//               <must be written>: ap
+//             <    is read   >: ap ap[0].next n
+//             <    is written>: ap
          ap = ap->next;
    }
    return (void *) 0;
@@ -222,62 +222,61 @@ int activate(int i1, int i2)
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int flag);
    int i, numatm, a_number();
-//               <must be read   >: i2
+//             <    is read   >: i2
 
    if (i2==0) {
-//               <may be read    >: a_m_serial:0`ap[0][.next] 
-//                                  a_m_serial:0`ap[0][.serial]
-//               <may be written >: atomNUMBER atomUPDATE 
-//                                  a_m_serial:0`lastmatched
-//               <must be read   >: atomNUMBER atomUPDATE first 
-//                                  a_m_serial:0`ap 
-//                                  a_m_serial:0`lastmatched 
-//                                  a_m_serial:0`lastmatched[0][.seria
-//                                  l] i1
-//               <must be written>: a_m_serial:0`ap ap
+//             <may be read   >: a_m_serial:0`ap[0].next 
+//                               a_m_serial:0`ap[0].serial
+//             <may be written>: atomNUMBER atomUPDATE 
+//                               a_m_serial:0`lastmatched
+//             <    is read   >: atomNUMBER atomUPDATE first 
+//                               a_m_serial:0`ap 
+//                               a_m_serial:0`lastmatched 
+//                               a_m_serial:0`lastmatched[0].serial i1
+//             <    is written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
-//               <must be read   >: ap
+//             <    is read   >: ap
       if (ap!=(void *) 0) 
-//               <must be read   >: ap
-//               <must be written>: ap[0][.active]
+//             <    is read   >: ap
+//             <    is written>: ap[0].active
          ap->active = 1;
       return 0;
    }
-//               <must be read   >: i2
-//               <must be written>: upper
+//             <    is read   >: i2
+//             <    is written>: upper
 
    upper = i2;
-//               <must be read   >: i1
-//               <must be written>: lower
+//             <    is read   >: i1
+//             <    is written>: lower
    lower = i1;
-//               <must be read   >: i1 i2
+//             <    is read   >: i1 i2
    if (i2<i1) {
-//               <must be read   >: i2
-//               <must be written>: lower
+//             <    is read   >: i2
+//             <    is written>: lower
       lower = i2;
-//               <must be read   >: i1
-//               <must be written>: upper
+//             <    is read   >: i1
+//             <    is written>: upper
       upper = i1;
    }
-//               <may be read    >: first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomNUMBER atomUPDATE
-//               <must be written>: numatm
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: numatm
 
    numatm = a_number();
-//               <must be read   >: numatm
-//               <must be written>: i
+//             <    is read   >: numatm
+//             <    is written>: i
    for(i = 0; i <= numatm-1; i += 1) {
-//               <may be read    >: first
-//               <must be read   >: a_next:0`ap a_next:0`ap[0][.next] 
-//                                  i numatm
-//               <must be written>: a_next:0`ap ap
+//             <may be read   >: first
+//             <    is read   >: a_next:0`ap a_next:0`ap[0].next i 
+//                               numatm
+//             <    is written>: a_next:0`ap ap
       ap = a_next(i);
-//               <must be read   >: ap ap[0][.serial] ap[0][.serial] 
-//                                  lower numatm upper
+//             <    is read   >: ap ap[0].serial ap[0].serial lower 
+//                               numatm upper
       if (ap->serial>=lower&&ap->serial<=upper) 
-//               <must be read   >: ap numatm
-//               <must be written>: ap[0][.active]
+//             <    is read   >: ap numatm
+//             <    is written>: ap[0].active
          ap->active = 1;
    }
    return 0;
@@ -285,97 +284,90 @@ int activate(int i1, int i2)
 
 Cumulated effects for "activate"
 
-//               <may be read    >: first a_m_serial:0`ap 
-//                                  a_m_serial:0`ap[0][.next] 
-//                                  a_m_serial:0`ap[0][.serial] 
-//                                  a_m_serial:0`lastmatched 
-//                                  a_m_serial:0`lastmatched[0][.seria
-//                                  l] a_next:0`ap 
-//                                  a_next:0`ap[0][.next]
-//               <may be written >: atomNUMBER atomUPDATE 
-//                                  a_m_serial:0`ap 
-//                                  a_m_serial:0`lastmatched 
-//                                  a_next:0`ap
-//               <must be read   >: atomNUMBER atomUPDATE i1 i2
+//             <may be read   >: first a_m_serial:0`ap 
+//                               a_m_serial:0`ap[0].next 
+//                               a_m_serial:0`ap[0].serial 
+//                               a_m_serial:0`lastmatched 
+//                               a_m_serial:0`lastmatched[0].serial 
+//                               a_next:0`ap a_next:0`ap[0].next
+//             <may be written>: atomNUMBER atomUPDATE a_m_serial:0`ap
+//                               a_m_serial:0`lastmatched a_next:0`ap
+//             <    is read   >: atomNUMBER atomUPDATE i1 i2
 int activate(int i1, int i2)
 {
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int flag);
    int i, numatm, a_number();
-//               <may be read    >: atomNUMBER atomUPDATE first 
-//                                  a_m_serial:0`ap 
-//                                  a_m_serial:0`ap[0][.next] 
-//                                  a_m_serial:0`ap[0][.serial] 
-//                                  a_m_serial:0`lastmatched 
-//                                  a_m_serial:0`lastmatched[0][.seria
-//                                  l] ap i1
-//               <may be written >: atomNUMBER atomUPDATE 
-//                                  a_m_serial:0`ap 
-//                                  a_m_serial:0`lastmatched ap 
-//                                  ap[0][.active]
-//               <must be read   >: i2
+//             <may be read   >: atomNUMBER atomUPDATE first 
+//                               a_m_serial:0`ap 
+//                               a_m_serial:0`ap[0].next 
+//                               a_m_serial:0`ap[0].serial 
+//                               a_m_serial:0`lastmatched 
+//                               a_m_serial:0`lastmatched[0].serial ap
+//                               i1
+//             <may be written>: atomNUMBER atomUPDATE a_m_serial:0`ap
+//                               a_m_serial:0`lastmatched ap 
+//                               ap[0].active
+//             <    is read   >: i2
 
    if (i2==0) {
-//               <may be read    >: a_m_serial:0`ap[0][.next] 
-//                                  a_m_serial:0`ap[0][.serial]
-//               <may be written >: atomNUMBER atomUPDATE 
-//                                  a_m_serial:0`lastmatched
-//               <must be read   >: atomNUMBER atomUPDATE first 
-//                                  a_m_serial:0`ap 
-//                                  a_m_serial:0`lastmatched 
-//                                  a_m_serial:0`lastmatched[0][.seria
-//                                  l] i1
-//               <must be written>: a_m_serial:0`ap ap
+//             <may be read   >: a_m_serial:0`ap[0].next 
+//                               a_m_serial:0`ap[0].serial
+//             <may be written>: atomNUMBER atomUPDATE 
+//                               a_m_serial:0`lastmatched
+//             <    is read   >: atomNUMBER atomUPDATE first 
+//                               a_m_serial:0`ap 
+//                               a_m_serial:0`lastmatched 
+//                               a_m_serial:0`lastmatched[0].serial i1
+//             <    is written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
-//               <may be written >: ap[0][.active]
-//               <must be read   >: ap
+//             <may be written>: ap[0].active
+//             <    is read   >: ap
       if (ap!=(void *) 0) 
-//               <must be read   >: ap
-//               <must be written>: ap[0][.active]
+//             <    is read   >: ap
+//             <    is written>: ap[0].active
          ap->active = 1;
       return 0;
    }
-//               <must be read   >: i2
-//               <must be written>: upper
+//             <    is read   >: i2
+//             <    is written>: upper
 
    upper = i2;
-//               <must be read   >: i1
-//               <must be written>: lower
+//             <    is read   >: i1
+//             <    is written>: lower
    lower = i1;
-//               <may be written >: lower upper
-//               <must be read   >: i1 i2
+//             <may be written>: lower upper
+//             <    is read   >: i1 i2
    if (i2<i1) {
-//               <must be read   >: i2
-//               <must be written>: lower
+//             <    is read   >: i2
+//             <    is written>: lower
       lower = i2;
-//               <must be read   >: i1
-//               <must be written>: upper
+//             <    is read   >: i1
+//             <    is written>: upper
       upper = i1;
    }
-//               <may be read    >: first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be read   >: atomNUMBER atomUPDATE
-//               <must be written>: numatm
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: numatm
 
    numatm = a_number();
-//               <may be read    >: first a_next:0`ap 
-//                                  a_next:0`ap[0][.next] ap 
-//                                  ap[0][.serial] i lower upper
-//               <may be written >: a_next:0`ap ap ap[0][.active]
-//               <must be read   >: numatm
-//               <must be written>: i
+//             <may be read   >: first a_next:0`ap a_next:0`ap[0].next
+//                               ap ap[0].serial i lower upper
+//             <may be written>: a_next:0`ap ap ap[0].active
+//             <    is read   >: numatm
+//             <    is written>: i
    for(i = 0; i <= numatm-1; i += 1) {
-//               <may be read    >: first
-//               <must be read   >: a_next:0`ap a_next:0`ap[0][.next] 
-//                                  i numatm
-//               <must be written>: a_next:0`ap ap
+//             <may be read   >: first
+//             <    is read   >: a_next:0`ap a_next:0`ap[0].next i 
+//                               numatm
+//             <    is written>: a_next:0`ap ap
       ap = a_next(i);
-//               <may be written >: ap[0][.active]
-//               <must be read   >: ap ap[0][.serial] lower numatm 
-//                                  upper
+//             <may be written>: ap[0].active
+//             <    is read   >: ap ap[0].serial lower numatm upper
       if (ap->serial>=lower&&ap->serial<=upper) 
-//               <must be read   >: ap numatm
-//               <must be written>: ap[0][.active]
+//             <    is read   >: ap numatm
+//             <    is written>: ap[0].active
          ap->active = 1;
    }
    return 0;

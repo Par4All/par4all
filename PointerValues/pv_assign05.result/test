@@ -6,83 +6,83 @@ int main()
    mystruct s1, s2;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    mystruct tab_s[2];
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].a == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    s2.a = s1.a;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == s1[.a] (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == s1.a (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].a == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (s2.b)[0] = (s1.b)[0];
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == s1[.a] (exact);
-// s2[.b][0] == s1[.b][0] (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == s1.a (exact);
+// s2.b[0] == s1.b[0] (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].a == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    tab_s[0].a = s1.a;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == s1[.a] (exact);
-// s2[.b][0] == s1[.b][0] (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[0][.a] == s1[.a] (exact);
-// tab_s[*][.a] == *ANY_MODULE*:*UNDEFINED* (may);
-// tab_s[*][.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == s1.a (exact);
+// s2.b[0] == s1.b[0] (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[0].a == s1.a (exact);
+// tab_s[*].a == *ANY_MODULE*:*UNDEFINED* (may);
+// tab_s[*].b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[*].c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (tab_s[0].b)[0] = (s1.b)[0];
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == s1[.a] (exact);
-// s2[.b][0] == s1[.b][0] (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// tab_s[0][.a] == s1[.a] (exact);
-// tab_s[0][.b][0] == s1[.b][0] (exact);
-// tab_s[*][.a] == *ANY_MODULE*:*UNDEFINED* (may);
-// tab_s[*][.b][*] == *ANY_MODULE*:*UNDEFINED* (may);
-// tab_s[*][.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == s1.a (exact);
+// s2.b[0] == s1.b[0] (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// tab_s[0].a == s1.a (exact);
+// tab_s[0].b[0] == s1.b[0] (exact);
+// tab_s[*].a == *ANY_MODULE*:*UNDEFINED* (may);
+// tab_s[*].b[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// tab_s[*].c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
 }

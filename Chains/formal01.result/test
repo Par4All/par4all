@@ -3,11 +3,11 @@ Source code with statement numbers and proper effects
 
 void formal01(int *a, int *b)
 {
-//               <must be read   >: a
-//               <must be written>: a[0]
+//             <    is read   >: a
+//             <    is written>: a[0]
    *a = 1;                                                              /*0009*/
-//               <must be read   >: b
-//               <must be written>: b[0]
+//             <    is read   >: b
+//             <    is written>: b[0]
    *b = 1;                                                              /*0010*/
 }
 

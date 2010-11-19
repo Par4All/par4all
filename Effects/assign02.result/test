@@ -22,39 +22,39 @@ s_t make_s(int i, float x)
 {
    s_t *p;
    char *malloc(int);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
 
    p = (s_t *) malloc(sizeof(s_t));
-//               <must be read   >: i p
-//               <must be written>: p[0][.entier]
+//             <    is read   >: i p
+//             <    is written>: p[0].entier
    p->entier = i;
-//               <must be read   >: p x
-//               <must be written>: p[0][.reel]
+//             <    is read   >: p x
+//             <    is written>: p[0].reel
    p->reel = x;
-//               <must be read   >: p p[0][.reel] p[0][.entier]
+//             <    is read   >: p p[0].reel p[0].entier
    return *p;
 }
 
 Cumulated pointer effects for "make_s"
 
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i x
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i x
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 s_t make_s(int i, float x)
 {
    s_t *p;
    char *malloc(int);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
 
    p = (s_t *) malloc(sizeof(s_t));
-//               <must be read   >: i p
-//               <must be written>: p[0][.entier]
+//             <    is read   >: i p
+//             <    is written>: p[0].entier
    p->entier = i;
-//               <must be read   >: p x
-//               <must be written>: p[0][.reel]
+//             <    is read   >: p x
+//             <    is written>: p[0].reel
    p->reel = x;
-//               <must be read   >: p p[0][.reel] p[0][.entier]
+//             <    is read   >: p p[0].reel p[0].entier
    return *p;
 }
 
@@ -64,16 +64,16 @@ void assign02()
 {
    s_t s;
    int j;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  s[.entier] s[.reel]
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ s.entier 
+//                               s.reel
 
    s = make_s(1, 2.);
-//               <must be written>: s[.entier]
+//             <    is written>: s.entier
    s.entier = 4;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ j
    
    /* invalid lvalue in assignment */
    /* make_s(1, 2.).entier = 4; */
@@ -84,23 +84,23 @@ void assign02()
 
 Cumulated pointer effects for "assign02"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 void assign02()
 {
    s_t s;
    int j;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  s[.entier] s[.reel]
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ s.entier 
+//                               s.reel
 
    s = make_s(1, 2.);
-//               <must be written>: s[.entier]
+//             <    is written>: s.entier
    s.entier = 4;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ j
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ j
    
    /* invalid lvalue in assignment */
    /* make_s(1, 2.).entier = 4; */

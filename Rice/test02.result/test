@@ -14,45 +14,45 @@ int main(int argc, char **argv)
    int a_d1, a_d2;
    int i, j;
    double *toto;
-//               <must be written>: a_d1 a_d2
+//             <    is written>: a_d1 a_d2
 
    a_d1 = a_d2 = 5;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ toto
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
-//               <must be read   >: a_d1
-//               <must be written>: i
+//             <    is read   >: a_d1
+//             <    is written>: i
 
    for(i = 0; i <= a_d1-1; i += 1)
-//               <must be read   >: a_d1 a_d2
-//               <must be written>: j
+//             <    is read   >: a_d1 a_d2
+//             <    is written>: j
       for(j = 0; j <= a_d2-1; j += 1)
-//               <must be read   >: a_d1 a_d2 i j toto
-//               <must be written>: toto[i+j*a_d1]
+//             <    is read   >: a_d1 a_d2 i j toto
+//             <    is written>: toto[i+j*a_d1]
          toto[i+j*a_d1] = i+j*a_d2;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ toto
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    free(toto);
-//               <must be written>: a_d1 a_d2
+//             <    is written>: a_d1 a_d2
    
    
    a_d1 = a_d2 = 10;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ toto
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
-//               <must be read   >: a_d1
-//               <must be written>: i
+//             <    is read   >: a_d1
+//             <    is written>: i
 
    for(i = 0; i <= a_d1-1; i += 1)
-//               <must be read   >: a_d1 a_d2
-//               <must be written>: j
+//             <    is read   >: a_d1 a_d2
+//             <    is written>: j
       for(j = 0; j <= a_d2-1; j += 1)
-//               <must be read   >: a_d1 a_d2 i j toto
-//               <must be written>: toto[i+j*a_d1]
+//             <    is read   >: a_d1 a_d2 i j toto
+//             <    is written>: toto[i+j*a_d1]
          toto[i+j*a_d1] = i+j*a_d2;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ toto
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    free(toto);
    

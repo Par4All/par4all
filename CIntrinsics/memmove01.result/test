@@ -13,15 +13,15 @@ Proper effetcs for "memmove01"
 
 int main()
 {
-//               <may be written >: str[*]
+//             <may be written>: str[*]
    char str[] = "can be very useful......";
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    memmove(str+20, str+15, 11);
-//               <may be read    >: stdout[0] str[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(str);
    return 0;
 }

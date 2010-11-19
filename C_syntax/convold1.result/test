@@ -50,17 +50,17 @@ Effects for convold1
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
    int m, res;
-//               <must be written>: res
+//             <    is written>: res
    
    /* for  (m = 0; m<= 5; m++) */
    
    res = 0;
-//               <must be written>: m
+//             <    is written>: m
    for(m = 0; m <= 5; m += 1)
-//               <must be read   >: X[i+m][j] coeff[m] i j m res
-//               <must be written>: res
+//             <    is read   >: X[i+m][j] coeff[m] i j m res
+//             <    is written>: res
       res = res+coeff[m]*X[i+m][j];
-//               <must be read   >: res
+//             <    is read   >: res
 
    return res;
 }

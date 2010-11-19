@@ -16,24 +16,24 @@ Proper effects for "decl01"
 
 void decl01()
 {
-//               <must be written>: i
+//             <    is written>: i
 // (0,2)
    int i = 2;                                                           /*0005*/
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 // (0,3)
    int j = i;                                                           /*0006*/
 // (0,4)
    int a[sizeof(i)];                                                    /*0007*/
-//               <must be written>: i
+//             <    is written>: i
 // (0,5)
 
    i = 2;                                                               /*0009*/
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 // (0,6)
    j = i;                                                               /*0010*/
-//               <must be written>: j
+//             <    is written>: j
 // (0,7)
    j = sizeof(i);                                                       /*0011*/
 }
@@ -42,24 +42,24 @@ Cumulated effects for "decl01"
 
 void decl01()
 {
-//               <must be written>: i
+//             <    is written>: i
 // (0,2)
    int i = 2;                                                           /*0005*/
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 // (0,3)
    int j = i;                                                           /*0006*/
 // (0,4)
    int a[sizeof(i)];                                                    /*0007*/
-//               <must be written>: i
+//             <    is written>: i
 // (0,5)
 
    i = 2;                                                               /*0009*/
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 // (0,6)
    j = i;                                                               /*0010*/
-//               <must be written>: j
+//             <    is written>: j
 // (0,7)
    j = sizeof(i);                                                       /*0011*/
 }

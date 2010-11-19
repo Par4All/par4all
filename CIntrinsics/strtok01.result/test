@@ -28,41 +28,41 @@ int main()
 
    static char str[] = "?a???b,,,#c";
    char *t;
-//               <may be read    >: stdout[0] str[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("debut: str=%s", str);
-//               <must be written>: t
+//             <    is written>: t
    t = strtok(str, "?");
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    // t points to the token "a"
    printf("\nresultat strtok(str,\"?\")= %s", t);
-//               <must be written>: t
+//             <    is written>: t
    t = strtok((void *) 0, ",");
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    // t points to the token "??b"
    printf("\nresultat strtok(NULL,\",\")= %s", t);
-//               <must be written>: t
+//             <    is written>: t
    t = strtok((void *) 0, "#,");
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    // t points to the token "c"
    printf("\nresultat strtok(NULL,\"#,\")= %s", t);
-//               <must be written>: t
+//             <    is written>: t
    t = strtok((void *) 0, "?");
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    // t is a null pointer
    printf("\nresultat strtok(NULL,\"?\")= %s", t);
 }

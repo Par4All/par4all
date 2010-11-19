@@ -30,12 +30,12 @@ int main()
 {
    int a[100];                                                          /*0002*/
    int i, j;                                                            /*0003*/
-//               <must be written>: j
+//             <    is written>: j
    
    // A do loop ! Should be parallel.
    for(j = 10; j >= 1; j += -4)
-//               <must be read   >: j
-//               <must be written>: a[j]
+//             <    is read   >: j
+//             <    is written>: a[j]
       a[j] = 2;                                                         /*0007*/
 
    return 0;                                                            /*0009*/
@@ -47,14 +47,14 @@ int main()
 {
    int a[100];                                                          /*0002*/
    int i, j;                                                            /*0003*/
-//               <may be read    >: j
-//               <may be written >: a[*]
-//               <must be written>: j
+//             <may be read   >: j
+//             <may be written>: a[*]
+//             <    is written>: j
    
    // A do loop ! Should be parallel.
    for(j = 10; j >= 1; j += -4)
-//               <may be written >: a[*]
-//               <must be read   >: j
+//             <may be written>: a[*]
+//             <    is read   >: j
       a[j] = 2;                                                         /*0007*/
 
    return 0;                                                            /*0009*/

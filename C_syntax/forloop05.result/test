@@ -50,25 +50,25 @@ int foo(int i)
 {
    /* Default type is int */
    static int l;
-//               <must be read   >: i
-//               <must be written>: l
+//             <    is read   >: i
+//             <    is written>: l
    l = i;
-//               <must be read   >: i
+//             <    is read   >: i
    return i;
 }
 
 Printed file with cumulated effects for "foo"
 
-//               <must be read   >: i
-//               <must be written>: l
+//             <    is read   >: i
+//             <    is written>: l
 int foo(int i)
 {
    /* Default type is int */
    static int l;
-//               <must be read   >: i
-//               <must be written>: l
+//             <    is read   >: i
+//             <    is written>: l
    l = i;
-//               <must be read   >: i
+//             <    is read   >: i
    return i;
 }
 
@@ -76,38 +76,38 @@ Printed file with proper effects for "main"
 
 int main()
 {
-//               <must be written>: BlockEnd
+//             <    is written>: BlockEnd
    int i, j, n, BlockEnd = 3;
-//               <must be written>: i
+//             <    is written>: i
 
    i = 1;
-//               <must be read   >: i
+//             <    is read   >: i
    while (i<16) {
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
       j = i;
-//               <must be read   >: BlockEnd
-//               <must be written>: n
+//             <    is read   >: BlockEnd
+//             <    is written>: n
       for(n = 0; n <= BlockEnd-1; n += 1) {
          int k, l;
-//               <must be read   >: BlockEnd j n
-//               <must be written>: foo:0`l k
+//             <    is read   >: BlockEnd j n
+//             <    is written>: foo:0`l k
          k = foo((j, n));
-//               <must be read   >: BlockEnd k
-//               <must be written>: l
+//             <    is read   >: BlockEnd k
+//             <    is written>: l
          l = k;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  BlockEnd l
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] BlockEnd 
+//                               l
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("%d\n", l);
-//               <must be read   >: BlockEnd j
-//               <must be written>: j
+//             <    is read   >: BlockEnd j
+//             <    is written>: j
          j++;
       }
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
       i <<= 2;
    }
 }

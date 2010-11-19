@@ -53,52 +53,52 @@ int main()
 {
    int X[13][13], Y[8][8], H[8][13], K[8][8];
    int OUT[8][8], COEFF[6], i, j;
-//               <must be written>: COEFF[0] COEFF[1] COEFF[2] 
-//                                  COEFF[3] COEFF[4] COEFF[5]
+//             <    is written>: COEFF[0] COEFF[1] COEFF[2] COEFF[3] 
+//                               COEFF[4] COEFF[5]
 
    init_coeff(COEFF);
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 12; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 12; j += 1)
-//               <must be read   >: i j
-//               <must be written>: X[i][j]
+//             <    is read   >: i j
+//             <    is written>: X[i][j]
          X[i][j] = j*(j+i)/2;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 7; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 12; j += 1)
-//               <may be read    >: COEFF[*] X[*][*]
-//               <must be read   >: i j
-//               <must be written>: H[i][j]
+//             <may be read   >: COEFF[*] X[*][*]
+//             <    is read   >: i j
+//             <    is written>: H[i][j]
          H[i][j] = convold1(X, COEFF, i, j);
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 7; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 7; j += 1)
-//               <may be read    >: COEFF[*] H[*][*]
-//               <must be read   >: i j
-//               <must be written>: K[i][j]
+//             <may be read   >: COEFF[*] H[*][*]
+//             <    is read   >: i j
+//             <    is written>: K[i][j]
          K[i][j] = convold2(H, COEFF, i, j);
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 7; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 7; j += 1)
-//               <may be read    >: H[*][*] K[*][*]
-//               <must be read   >: i j
-//               <must be written>: Y[i][j]
+//             <may be read   >: H[*][*] K[*][*]
+//             <    is read   >: i j
+//             <    is written>: Y[i][j]
          Y[i][j] = filtre(H, K, i, j);
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 7; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 7; j += 1)
-//               <must be read   >: Y[i][j] i j
-//               <must be written>: OUT[i][j]
+//             <    is read   >: Y[i][j] i j
+//             <    is written>: OUT[i][j]
          OUT[i][j] = Y[i][j];
 }
 

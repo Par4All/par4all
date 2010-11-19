@@ -3,34 +3,34 @@ Source code with proper effects
 
 double call10(int i)
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 3.;                                                       /*0009*/
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i += 10;                                                             /*0010*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0011*/
-//               <must be read   >: x
+//             <    is read   >: x
 
    return x;                                                            /*0013*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: j i
-//               <must be written>: j
+//             <    is read   >: j i
+//             <    is written>: j
 double call10(int i)
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 3.;                                                       /*0009*/
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i += 10;                                                             /*0010*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0011*/
-//               <must be read   >: x
+//             <    is read   >: x
 
    return x;                                                            /*0013*/
 }

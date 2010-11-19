@@ -32,39 +32,39 @@ Initial code for "suppress_dead_code05" with proper effects
 
 void suppress_dead_code05(int *x)
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1, j, k;
-//               <must be read   >: i j
+//             <    is read   >: i j
 
    if (i>0&&j>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
+//             <    is read   >: i j
 
    if (j>0&&i>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
+//             <    is read   >: i j
 
    if (i<0||j>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
+//             <    is read   >: i j
 
    if (j>0||i<0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
 
    return;
@@ -74,43 +74,43 @@ Initial code for "suppress_dead_code05" with cumulated effects
 
 void suppress_dead_code05(int *x)
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1, j, k;
-//               <must be read   >: i j
-//               <must be written>: k
+//             <    is read   >: i j
+//             <    is written>: k
 
    if (i>0&&j>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
-//               <must be written>: k
+//             <    is read   >: i j
+//             <    is written>: k
 
    if (j>0&&i>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
-//               <must be written>: k
+//             <    is read   >: i j
+//             <    is written>: k
 
    if (i<0||j>0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be read   >: i j
-//               <must be written>: k
+//             <    is read   >: i j
+//             <    is written>: k
 
    if (j>0||i<0)
-//               <must be written>: k
+//             <    is written>: k
       k = 2;
    else
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
 
    return;

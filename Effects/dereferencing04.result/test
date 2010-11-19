@@ -16,8 +16,8 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-//               <must be read   >: p q r
-//               <must be written>: p[q-r]
+//             <    is read   >: p q r
+//             <    is written>: p[q-r]
    *(p+q-r) = 0.;
 }
 
@@ -28,8 +28,8 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-//               <may be written >: p[*]
-//               <must be read   >: p q r
+//             <may be written>: p[*]
+//             <    is read   >: p q r
    *(p+q-r) = 0.;
 }
 
@@ -40,20 +40,20 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p q r
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p q r
    *(p+q-r) = 0.;
 }
 
 Cumulated effects for "dereferencing04"
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing04()
 {
    double *p;
    double *q;
    double *r;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p q r
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p q r
    *(p+q-r) = 0.;
 }

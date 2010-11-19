@@ -15,37 +15,37 @@ Proper effetcs for "dereferencing01"
 
 void dereferencing01()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <must be written>: q
+//             <    is written>: q
    double *q = 0;
-//               <must be read   >: p
-//               <must be written>: q
+//             <    is read   >: p
+//             <    is written>: q
 
    q = p;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p = 2.;
 }
 
 Cumulated effetcs for "dereferencing01"
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing01()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <must be written>: q
+//             <    is written>: q
    double *q = 0;
-//               <must be read   >: p
-//               <must be written>: q
+//             <    is read   >: p
+//             <    is written>: q
 
    q = p;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p = 2.;
 }

@@ -16,20 +16,20 @@ Proper effects for "update01"
 
 void update01()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    
    //i = (i+= 2);
    i += 3;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i--;
-//               <must be read   >: i
+//             <    is read   >: i
    foo(i);
 }
 
@@ -37,20 +37,20 @@ Cumulated effects for "update01"
 
 void update01()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    
    //i = (i+= 2);
    i += 3;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i--;
-//               <must be read   >: i
+//             <    is read   >: i
    foo(i);
 }
 

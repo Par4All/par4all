@@ -1,4 +1,4 @@
- *some* pips -f unknownrule.f unknownrule
+/home/creusil/pips/MYPIPS/dev/Prettyprint/bin/LINUX_x86_64_LL/pips -f unknownrule.f unknownrule
 Registering file unknownrule.f
 Splitting file    ./unknownrule.f
   Module         UNKNOWNRULE
@@ -14,7 +14,7 @@ Closing workspace.
 Workspace unknownrule closed.
 
 Workspace unknownrule (default)
- *some* pips -m UNKNOWNRULE -s PRINT_CODE -b PRINTED_FILE unknownrule
+/home/creusil/pips/MYPIPS/dev/Prettyprint/bin/LINUX_x86_64_LL/pips -m UNKNOWNRULE -s PRINT_CODE -b PRINTED_FILE unknownrule
 Workspace unknownrule opened.
 Module UNKNOWNRULE selected
 Module UNKNOWNRULE selected
@@ -46,7 +46,7 @@ C     rule name.
 
       END
 Workspace unknownrule (default)
- *some* pips -m UNKNOWNRULE -p FOO unknownrule
+/home/creusil/pips/MYPIPS/dev/Prettyprint/bin/LINUX_x86_64_LL/pips -m UNKNOWNRULE -p FOO unknownrule
 Workspace unknownrule opened.
 Module UNKNOWNRULE selected
 Module UNKNOWNRULE selected
@@ -62,7 +62,7 @@ Workspace unknownrule closed.
 
 Exit code for pips: 1; exiting Pips
 Workspace unknownrule (default)
- *some* pips -m UNKNOWNRULE -b BAR unknownrule
+/home/creusil/pips/MYPIPS/dev/Prettyprint/bin/LINUX_x86_64_LL/pips -m UNKNOWNRULE -b BAR unknownrule
 Workspace unknownrule opened.
 Module UNKNOWNRULE selected
 Module UNKNOWNRULE selected

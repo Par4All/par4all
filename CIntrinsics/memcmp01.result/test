@@ -25,66 +25,66 @@ int main()
 
 Cumulated effetcs for "memcmp01"
 
-//               <may be read    >: stdin[0] stdout[0]
-//               <may be written >: stdin[0] stdout[0]
-//               <must be read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[0] 
-//                                  __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdin[0] stdout[0]
+//             <may be written>: stdin[0] stdout[0]
+//             <    is read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
 int main()
 {
    char str1[256];
    char str2[256];
    int n;
    size_t len1, len2;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("Enter a sentence: ");
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0] str1[*]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] str1[*]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
    gets(str1);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("Enter another sentence: ");
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0] str2[*]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] str2[*]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
    gets(str2);
-//               <must be written>: len1
+//             <    is written>: len1
    len1 = strlen(str1);
-//               <must be written>: len2
+//             <    is written>: len2
    len2 = strlen(str2);
-//               <must be read   >: len1 len2
-//               <must be written>: n
+//             <    is read   >: len1 len2
+//             <    is written>: n
    n = memcmp(str1, str2, len1>len2?len1:len2);
-//               <may be read    >: stdout[0] str1[*] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] n
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str1[*] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] n
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    if (n>0)
-//               <may be read    >: stdout[0] str1[*] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str1[*] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("'%s' is greater than '%s'.\n", str1, str2);
    else if (n<0)
-//               <may be read    >: stdout[0] str1[*] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str1[*] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("'%s' is less than '%s'.\n", str1, str2);
    else
-//               <may be read    >: stdout[0] str1[*] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str1[*] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("'%s' is the same as '%s'.\n", str1, str2);
    return 0;
 }

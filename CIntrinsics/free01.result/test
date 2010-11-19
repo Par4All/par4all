@@ -14,24 +14,24 @@ int main()
 
 Cumulated effetcs for "free01"
 
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
    int *buffer1, *buffer2, *buffer3;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buffer1
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer1
    buffer1 = (int *) malloc(100*sizeof(int));
-//               <must be written>: buffer2
+//             <    is written>: buffer2
    buffer2 = (int *) calloc(100, sizeof(int));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ buffer2
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buffer3
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer2
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer3
    buffer3 = (int *) realloc(buffer2, 500*sizeof(int));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ buffer1
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer1
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer1);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ buffer3
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer3
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer3);
    return 0;
 }

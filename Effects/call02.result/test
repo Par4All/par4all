@@ -31,52 +31,52 @@ Proper effects for "call02"
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
-//               <must be read   >: j
-//               <must be written>: i
+//             <    is read   >: j
+//             <    is written>: i
    /* i can be modified locally, but it won't show in the summary
         effects... which creates a problem for transformer and
         precondition computation. */
    i = j+1;
-//               <must be read   >: i
-//               <must be written>: y[i]
+//             <    is read   >: i
+//             <    is written>: y[i]
    y[i] = 0;
-//               <must be read   >: p
-//               <must be written>: p[0][.one]
+//             <    is read   >: p
+//             <    is written>: p[0].one
    p->one = 1;
-//               <must be read   >: j p
-//               <must be written>: p[0][.two][j]
+//             <    is read   >: j p
+//             <    is written>: p[0].two[j]
    (p->two)[j] = 2.;
-//               <must be read   >: i q[i]
-//               <must be written>: q[i][0]
+//             <    is read   >: i q[i]
+//             <    is written>: q[i][0]
    *q[i] = 3;
 }
 
 Cumulated effects for "call02"
 
-//               <may be read    >: q[*]
-//               <may be written >: p[0][.two][*] q[*][0] y[*]
-//               <must be read   >: i j p
-//               <must be written>: p[0][.one]
+//             <may be read   >: q[*]
+//             <may be written>: p[0].two[*] q[*][0] y[*]
+//             <    is read   >: i j p
+//             <    is written>: p[0].one
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
-//               <must be read   >: j
-//               <must be written>: i
+//             <    is read   >: j
+//             <    is written>: i
    /* i can be modified locally, but it won't show in the summary
         effects... which creates a problem for transformer and
         precondition computation. */
    i = j+1;
-//               <may be written >: y[*]
-//               <must be read   >: i
+//             <may be written>: y[*]
+//             <    is read   >: i
    y[i] = 0;
-//               <must be read   >: p
-//               <must be written>: p[0][.one]
+//             <    is read   >: p
+//             <    is written>: p[0].one
    p->one = 1;
-//               <may be written >: p[0][.two][*]
-//               <must be read   >: j p
+//             <may be written>: p[0].two[*]
+//             <    is read   >: j p
    (p->two)[j] = 2.;
-//               <may be read    >: q[*]
-//               <may be written >: q[*][0]
-//               <must be read   >: i
+//             <may be read   >: q[*]
+//             <may be written>: q[*][0]
+//             <    is read   >: i
    *q[i] = 3;
 }
 
@@ -89,12 +89,12 @@ int main()
    int x[10];
    int *ap[10];
    tf_t s;
-//               <must be written>: sp
+//             <    is written>: sp
    tf_t *sp = &s;
-//               <may be read    >: ap[*]
-//               <may be written >: ap[*][0] sp[0][.two][*] x[*]
-//               <must be read   >: a b sp
-//               <must be written>: sp[0][.one]
+//             <may be read   >: ap[*]
+//             <may be written>: ap[*][0] sp[0].two[*] x[*]
+//             <    is read   >: a b sp
+//             <    is written>: sp[0].one
 
    call02(a, b, x, ap, sp);
 }
@@ -106,8 +106,8 @@ Pointer Regions for "call02"
 //  <i-W-EXACT-{}>
 //  <j-R-EXACT-{}>
 //  <p-R-EXACT-{}>
-//  <p[PHI1][.one]-W-EXACT-{PHI1==0}>
-//  <p[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==j}>
+//  <p[PHI1].one-W-EXACT-{PHI1==0}>
+//  <p[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==j}>
 //  <q[PHI1]-R-EXACT-{PHI1==j+1}>
 //  <q[PHI1][PHI2]-W-EXACT-{PHI1==j+1, PHI2==0}>
 //  <y[PHI1]-W-EXACT-{PHI1==j+1}>
@@ -129,13 +129,13 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
    y[i] = 0;
 
 //  <p-R-EXACT-{}>
-//  <p[PHI1][.one]-W-EXACT-{PHI1==0, i==j+1}>
+//  <p[PHI1].one-W-EXACT-{PHI1==0, i==j+1}>
 
    p->one = 1;
 
 //  <j-R-EXACT-{}>
 //  <p-R-EXACT-{}>
-//  <p[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==j, i==j+1}>
+//  <p[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==j, i==j+1}>
 
    (p->two)[j] = 2.;
 
@@ -165,8 +165,8 @@ int main()
 //  <ap[PHI1][PHI2]-W-EXACT-{PHI1==b+1, PHI2==0}>
 //  <b-R-EXACT-{}>
 //  <sp-R-EXACT-{}>
-//  <sp[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==b}>
-//  <sp[PHI1][.one]-W-EXACT-{PHI1==0}>
+//  <sp[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==b}>
+//  <sp[PHI1].one-W-EXACT-{PHI1==0}>
 //  <x[PHI1]-W-EXACT-{PHI1==b+1}>
 
 

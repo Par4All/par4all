@@ -42,37 +42,37 @@ Proper effects
 
 void malloc01()
 {
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i p
-//               <must be written>: p[i]
+//             <    is read   >: i p
+//             <    is written>: p[i]
       p[i] = (double) i;
 }
 
 Cumulated effects
 
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 void malloc01()
 {
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
-//               <may be read    >: i p
-//               <may be written >: p[*]
-//               <must be written>: i
+//             <may be read   >: i p
+//             <may be written>: p[*]
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be written >: p[*]
-//               <must be read   >: i p
+//             <may be written>: p[*]
+//             <    is read   >: i p
       p[i] = (double) i;
 }
 

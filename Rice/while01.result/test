@@ -14,16 +14,16 @@ void while01(int n)
 {
    int i, j;
    float x[100];
-//               <must be read   >: i n
+//             <    is read   >: i n
 
    while (i<n) {
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 99; j += 1)
-//               <must be read   >: j
-//               <must be written>: x[j]
+//             <    is read   >: j
+//             <    is written>: x[j]
          x[j] = 0.;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
       i++;
    }
 }

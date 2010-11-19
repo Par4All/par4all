@@ -56,29 +56,29 @@ C
       SUBROUTINE MM(N, A, B, C)
 C     
       REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
-C               <must be read   >: N
-C               <must be written>: I
+C             <    is read   >: N
+C             <    is written>: I
 C     
       DO I = 1, N                                                       0012
-C               <must be read   >: N
-C               <must be written>: J
+C             <    is read   >: N
+C             <    is written>: J
          DO J = 1, N                                                    0013
-C               <must be read   >: I J N
-C               <must be written>: C(I,J)
+C             <    is read   >: I J N
+C             <    is written>: C(I,J)
             C(I,J) = 0.0                                                0014
          ENDDO
       ENDDO
-C               <must be read   >: N
-C               <must be written>: J
+C             <    is read   >: N
+C             <    is written>: J
 C     
       DO J = 1, N                                                       0018
-C               <must be read   >: N
-C               <must be written>: K
+C             <    is read   >: N
+C             <    is written>: K
          DO K = 1, N                                                    0019
-C               <may be read    >: A((/ (I,I=1,N) /),K) B(K,J)
-C                                  C((/ (I,I=1,N) /),J)
-C               <may be written >: C((/ (I,I=1,N) /),J)
-C               <must be read   >: N
+C             <may be read   >: A((/ (I,I=1,N) /),K) B(K,J)
+C                               C((/ (I,I=1,N) /),J)
+C             <may be written>: C((/ (I,I=1,N) /),J)
+C             <    is read   >: N
             CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0020
          ENDDO
       ENDDO

@@ -34,46 +34,43 @@ void flatten_code12(void)
 
 Code with cumulated effects
 
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: foo_0
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: foo_0
 void flatten_code12(void)
 {
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: foo_0
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: foo_0
 // (0,1)
    // BEGIN BLOCK
-//               <must be read   >: foo_0
-//               <must be written>: i
+//             <    is read   >: foo_0
+//             <    is written>: i
 // (0,2)
    int i = foo_0;                                                       /*0011*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be written>: i
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
 // (0,3)
 
    for(i = 0; i <= 3; i += 1) {
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] foo
-//               <must be written>: __IO_EFFECTS:LUNS[1] foo
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] foo
+//             <    is written>: __IO_EFFECTS:LUNS[1] foo
 // (0,4)
       // BEGIN BLOCK
 // (0,5)
       static int foo = 0;                                               /*0014*/
-//               <must be read   >: foo
-//               <must be written>: foo
+//             <    is read   >: foo
+//             <    is written>: foo
 // (0,6)
 
       foo++;                                                            /*0016*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] foo
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] foo
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 // (0,7)
 
       fprintf(stdout, "foo=%d\n", foo);                                 /*0018*/

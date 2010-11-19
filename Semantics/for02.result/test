@@ -5,28 +5,28 @@ int main()
 {
    int i, j, k;                                                         /*0003*/
    int a[500];                                                          /*0004*/
-//               <must be written>: i
+//             <    is written>: i
 
    i = 0;                                                               /*0006*/
-//               <must be written>: j
+//             <    is written>: j
    j = 1;                                                               /*0007*/
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 499; i += 1) {
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
       j++;                                                              /*0010*/
-//               <must be read   >: i
-//               <must be written>: a[i]
+//             <    is read   >: i
+//             <    is written>: a[i]
       // Cumulated effects should be a[i] here and not a[*]
       a[i] = i;                                                         /*0012*/
    }
-//               <must be written>: k
+//             <    is written>: k
    /* We would have j==501 in the preconditions here... if we'd use
       // the proper activate and properties: the fast analysis exclude
       // fix points (see for01.tpips) */
    k = 2;                                                               /*0017*/
-//               <must be read   >: k
+//             <    is read   >: k
    return k;                                                            /*0018*/
 }
 
@@ -36,30 +36,30 @@ int main()
 {
    int i, j, k;                                                         /*0003*/
    int a[500];                                                          /*0004*/
-//               <must be written>: i
+//             <    is written>: i
 
    i = 0;                                                               /*0006*/
-//               <must be written>: j
+//             <    is written>: j
    j = 1;                                                               /*0007*/
-//               <may be read    >: i j
-//               <may be written >: a[*] j
-//               <must be written>: i
+//             <may be read   >: i j
+//             <may be written>: a[*] j
+//             <    is written>: i
 
    for(i = 0; i <= 499; i += 1) {
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
       j++;                                                              /*0010*/
-//               <may be written >: a[*]
-//               <must be read   >: i
+//             <may be written>: a[*]
+//             <    is read   >: i
       // Cumulated effects should be a[i] here and not a[*]
       a[i] = i;                                                         /*0012*/
    }
-//               <must be written>: k
+//             <    is written>: k
    /* We would have j==501 in the preconditions here... if we'd use
       // the proper activate and properties: the fast analysis exclude
       // fix points (see for01.tpips) */
    k = 2;                                                               /*0017*/
-//               <must be read   >: k
+//             <    is read   >: k
    return k;                                                            /*0018*/
 }
 
@@ -69,19 +69,19 @@ Dependence graph
  ******** Whole Dependence Graph with Dependence Cones ******
 
 	17 --> 18 with conflicts
-		from <k-W-MUST> to <k-R-MUST>
+		from <k-W-EXACT> to <k-R-EXACT>
 	10 --> 10 with conflicts
-		from <j-W-MUST> to <j-W-MUST> at levels  1
+		from <j-W-EXACT> to <j-W-EXACT> at levels  1
 
-		from <j-W-MUST> to <j-R-MUST> at levels  1
+		from <j-W-EXACT> to <j-R-EXACT> at levels  1
 
-		from <j-R-MUST> to <j-W-MUST> at levels  1
+		from <j-R-EXACT> to <j-W-EXACT> at levels  1
 
 	07 --> 10 with conflicts
-		from <j-W-MUST> to <j-W-MUST>
-		from <j-W-MUST> to <j-R-MUST>
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
 	06 --> -1 with conflicts
-		from <i-W-MUST> to <i-W-MUST>
+		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 

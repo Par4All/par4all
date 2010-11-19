@@ -26,56 +26,55 @@ int main()
 
 Cumulated effetcs for "malloc01"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  __IO_EFFECTS:LUNS[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  __IO_EFFECTS:LUNS[0] 
-//                                  __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
 int main()
 {
    int i, n;
    char *buffer;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("How long do you want the string? ");
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0] i
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0] i
    scanf("%d", &i);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ buffer
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer
 
    buffer = (char *) malloc(i+1);
-//               <must be read   >: buffer
+//             <    is read   >: buffer
    if (buffer==(void *) 0) 
       exit(1);
-//               <may be read    >: _RANDOM_EFFECTS:GEN_SEED buffer n
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i
+//             <may be read   >: _RANDOM_EFFECTS:GEN_SEED buffer n
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
 
    for(n = 0; n <= i-1; n += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED buffer i 
-//                                  n
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED buffer i n
       buffer[n] = rand()%26+'a';
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: buffer i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: buffer i
    buffer[i] = '\0';
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("Random string: %s\n", buffer);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ buffer
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
    
    

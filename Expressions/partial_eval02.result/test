@@ -35,20 +35,20 @@ int main()
 
 Cumulated effects for "partial_eval02"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: size
-//               <must be written>: riri[2]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: size
+//             <    is written>: riri[2]
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
-//               <must be written>: zaza
+//             <    is written>: zaza
    int *zaza = (int *) fifi+(3-1-0+1)*1;
    int i;
-//               <must be read   >: size
-//               <must be written>: i
+//             <    is read   >: size
+//             <    is written>: i
 
    i = size;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: riri[2]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: riri[2]
    return *((int *) riri+2) = *(zaza+1)+*(&loulou[0][0][0]+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 

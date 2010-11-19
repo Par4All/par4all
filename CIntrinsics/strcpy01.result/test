@@ -16,14 +16,14 @@ Proper effetcs for "strcpy01"
 
 int main()
 {
-//               <may be written >: str1[*]
+//             <may be written>: str1[*]
    char str1[] = "Sample string";
    char str2[40];
    char str3[40];
-//               <may be read    >: str1[*]
-//               <may be written >: str2[*]
+//             <may be read   >: str1[*]
+//             <may be written>: str2[*]
    strcpy(str2, str1);
-//               <may be written >: str3[*]
+//             <may be written>: str3[*]
    strcpy(str3, "copy successful");
    //printf ("str1: %s\nstr2: %s\nstr3: %s\n",str1,str2,str3);
    return 0;

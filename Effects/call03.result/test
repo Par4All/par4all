@@ -23,37 +23,37 @@ Proper effects for "call03"
 
 void call03()
 {
-//               <must be read   >: pi
-//               <must be written>: pi[0]
+//             <    is read   >: pi
+//             <    is written>: pi[0]
    *pi = 1;
-//               <must be read   >: pi
-//               <must be written>: pi
+//             <    is read   >: pi
+//             <    is written>: pi
    pi++;
-//               <must be read   >: q
-//               <must be written>: q[0][.one]
+//             <    is read   >: q
+//             <    is written>: q[0].one
    q->one = 1;
-//               <must be read   >: q
-//               <must be written>: q[0][.two][4]
+//             <    is read   >: q
+//             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
 }
 
 Cumulated effects for "call03"
 
-//               <must be read   >: pi q
-//               <must be written>: pi pi[0] q[0][.one] q[0][.two][4]
+//             <    is read   >: pi q
+//             <    is written>: pi pi[0] q[0].one q[0].two[4]
 void call03()
 {
-//               <must be read   >: pi
-//               <must be written>: pi[0]
+//             <    is read   >: pi
+//             <    is written>: pi[0]
    *pi = 1;
-//               <must be read   >: pi
-//               <must be written>: pi
+//             <    is read   >: pi
+//             <    is written>: pi
    pi++;
-//               <must be read   >: q
-//               <must be written>: q[0][.one]
+//             <    is read   >: q
+//             <    is written>: q[0].one
    q->one = 1;
-//               <must be read   >: q
-//               <must be written>: q[0][.two][4]
+//             <    is read   >: q
+//             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
 }
 
@@ -61,8 +61,8 @@ Proper effects for "main"
 
 int main()
 {
-//               <must be read   >: pi q
-//               <must be written>: pi pi[0] q[0][.one] q[0][.two][4]
+//             <    is read   >: pi q
+//             <    is written>: pi pi[0] q[0].one q[0].two[4]
    call03();
 }
 
@@ -73,8 +73,8 @@ Regions for "call03"
 //  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <pi-W-EXACT-{}>
 //  <q-R-EXACT-{}>
-//  <q[PHI1][.one]-W-EXACT-{PHI1==0}>
-//  <q[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1].one-W-EXACT-{PHI1==0}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
 void call03()
 {
@@ -90,12 +90,12 @@ void call03()
    pi++;
 
 //  <q-R-EXACT-{}>
-//  <q[PHI1][.one]-W-EXACT-{PHI1==0}>
+//  <q[PHI1].one-W-EXACT-{PHI1==0}>
 
    q->one = 1;
 
 //  <q-R-EXACT-{}>
-//  <q[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
    (q->two)[4] = 2;
 }
@@ -107,8 +107,8 @@ Regions for "main"
 //  <pi-W-EXACT-{}>
 //  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <q[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
-//  <q[PHI1][.one]-W-EXACT-{PHI1==0}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1].one-W-EXACT-{PHI1==0}>
 
 int main()
 {
@@ -117,8 +117,8 @@ int main()
 //  <pi-W-EXACT-{}>
 //  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <q[PHI1][.two][PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
-//  <q[PHI1][.one]-W-EXACT-{PHI1==0}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
+//  <q[PHI1].one-W-EXACT-{PHI1==0}>
 
    call03();
 }

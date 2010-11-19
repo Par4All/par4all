@@ -24,31 +24,31 @@ Proper effects for "call05"
 void call05(int r, int m, int *x)
 {
    int j;
-//               <must be read   >: m
-//               <must be written>: j
+//             <    is read   >: m
+//             <    is written>: j
 
    for(j = 0; j <= m-1; j += 1)
-//               <must be read   >: j m r x
-//               <must be written>: x[j]
+//             <    is read   >: j m r x
+//             <    is written>: x[j]
       x[j] = 10*r+j;
 }
 
 Cumulated effects for "call05"
 
-//               <may be read    >: r x
-//               <may be written >: x[*]
-//               <must be read   >: m
+//             <may be read   >: r x
+//             <may be written>: x[*]
+//             <    is read   >: m
 void call05(int r, int m, int *x)
 {
    int j;
-//               <may be read    >: j r x
-//               <may be written >: x[*]
-//               <must be read   >: m
-//               <must be written>: j
+//             <may be read   >: j r x
+//             <may be written>: x[*]
+//             <    is read   >: m
+//             <    is written>: j
 
    for(j = 0; j <= m-1; j += 1)
-//               <may be written >: x[*]
-//               <must be read   >: j m r x
+//             <may be written>: x[*]
+//             <    is read   >: j m r x
       x[j] = 10*r+j;
 }
 
@@ -56,86 +56,83 @@ Proper effects for "main"
 
 int main()
 {
-//               <must be written>: d1
+//             <    is written>: d1
    int d1 = 4;
-//               <must be written>: d2
+//             <    is written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;
-//               <must be read   >: d1
-//               <must be written>: i
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <may be written >: y[i][*]
-//               <must be read   >: d1 d2 i
+//             <may be written>: y[i][*]
+//             <    is read   >: d1 d2 i
       call05(i, d2, y[i]);
-//               <must be read   >: d1
-//               <must be written>: i
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1) {
-//               <must be read   >: d1 d2
-//               <must be written>: j
+//             <    is read   >: d1 d2
+//             <    is written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 
-//                                  i j y[i][j]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 i j
+//                               y[i][j]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] d1
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
 }
 
 Cumulated effects for "main"
 
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 int main()
 {
-//               <must be written>: d1
+//             <    is written>: d1
    int d1 = 4;
-//               <must be written>: d2
+//             <    is written>: d2
    int d2 = 4;
    int y[d1][d2];
    int i, j;
-//               <may be read    >: d2 i
-//               <may be written >: y[*][*]
-//               <must be read   >: d1
-//               <must be written>: i
+//             <may be read   >: d2 i
+//             <may be written>: y[*][*]
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <may be written >: y[*][*]
-//               <must be read   >: d1 d2 i
+//             <may be written>: y[*][*]
+//             <    is read   >: d1 d2 i
       call05(i, d2, y[i]);
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] d2 i j 
-//                                  y[*][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] j
-//               <must be read   >: d1
-//               <must be written>: i
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               d2 i j y[*][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] j
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1) {
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] i j y[*][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: d1 d2
-//               <must be written>: j
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               i j y[*][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: d1 d2
+//             <    is written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <may be read    >: stdout[0] y[*][*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 
-//                                  i j
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] y[*][*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] d1 d2 i j
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] d1
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] d1
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
 }

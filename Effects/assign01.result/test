@@ -13,7 +13,7 @@ Cumulated effetcs for "assign01"
 void assign01()
 {
    int i, j;
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = j = 1;
 }

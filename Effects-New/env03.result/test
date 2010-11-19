@@ -23,13 +23,13 @@ Proper effects for "env03"
 
 void env03()
 {
-//               <must be declared>: km
+//             <    is declared>: km
    typedef int km;
-//               <must be referenced>: km
-//               <must be declared>: j
+//             <    is referenced>: km
+//             <    is declared>: j
    km j;
-//               <must be written>: j
-//               <must be referenced>: km j
+//             <    is written>: j
+//             <    is referenced>: km j
 
    j = (km) 1;
 }
@@ -38,13 +38,13 @@ Cumulated effects for "env03"
 
 void env03()
 {
-//               <must be declared>: km
+//             <    is declared>: km
    typedef int km;
-//               <must be referenced>: km
-//               <must be declared>: j
+//             <    is referenced>: km
+//             <    is declared>: j
    km j;
-//               <must be written>: j
-//               <must be referenced>: km j
+//             <    is written>: j
+//             <    is referenced>: km j
 
    j = (km) 1;
 }

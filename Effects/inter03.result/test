@@ -4,11 +4,11 @@ Proper effects for "foo"
 void foo(int *p)
 {
    int i;                                                               /*0011*/
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i p
-//               <must be written>: p[i]
+//             <    is read   >: i p
+//             <    is written>: p[i]
       p[i] = i;                                                         /*0014*/
    return;                                                              /*0015*/
 }
@@ -24,79 +24,79 @@ int main()
    int tab5[15];                                                        /*0033*/
 
    int i;                                                               /*0035*/
-//               <may be written >: tab[*]
+//             <may be written>: tab[*]
 
    foo(tab);                                                            /*0037*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s\n", "tab");                                               /*0038*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
    myprint(tab);                                                        /*0039*/
-//               <may be written >: tab2[4][*]
-//               <must be read   >: tab2[4]
+//             <may be written>: tab2[4][*]
+//             <    is read   >: tab2[4]
    
    
    foo(tab2[4]);                                                        /*0042*/
-//               <may be written >: tab3[5][*]
+//             <may be written>: tab3[5][*]
    foo(tab3[5]);                                                        /*0043*/
-//               <may be written >: tab4[6][*]
-//               <must be read   >: tab4 tab4[6]
+//             <may be written>: tab4[6][*]
+//             <    is read   >: tab4 tab4[6]
    foo(tab4[6]);                                                        /*0044*/
-//               <may be written >: tab[*]
+//             <may be written>: tab[*]
    foo(&tab[0]);                                                        /*0045*/
-//               <may be written >: tab5[*]
+//             <may be written>: tab5[*]
    foo(&tab5[3]);                                                       /*0046*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("%s:\n", "tab2[4]");                                          /*0048*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab2[4][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: tab2[4]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab2[4][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: tab2[4]
    myprint(tab2[4]);                                                    /*0049*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s\n", "tab3[5]");                                           /*0050*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab3[5][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab3[5][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
    myprint(tab3[5]);                                                    /*0051*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s\n", "tab4[6]");                                           /*0052*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab4[6][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: tab4 tab4[6]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab4[6][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: tab4 tab4[6]
    myprint(tab4[6]);                                                    /*0053*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s\n", "tab");                                               /*0054*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
    myprint(&tab[0]);                                                    /*0055*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s\n", "tab5");                                              /*0056*/
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] tab5[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               tab5[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
    myprint(&tab5[3]);                                                   /*0057*/
    return 1;                                                            /*0058*/
 }

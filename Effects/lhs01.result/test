@@ -39,109 +39,109 @@ Proper effects for "lhs01"
 
 void lhs01()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 2;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be written>: k
+//             <    is written>: k
    int k = 2;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
    
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i:j=3;
    //(i>2?i:j)=3;
    
    *(i>2?&i:&j) = 3;
-//               <must be written>: i j
+//             <    is written>: i j
    /* printf("i=%d, j=%d\n", i, j); */
    
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i=3:j=3;
    /* This is OK*/
    i = j = 2;
-//               <may be written >: i j
-//               <must be read   >: i
+//             <may be written>: i j
+//             <    is read   >: i
    i>2?(i = 3):(j = 3);
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = j = 2;
-//               <must be read   >: i
+//             <    is read   >: i
    if (i>2)
-//               <must be written>: i
+//             <    is written>: i
       i = 3;
    else
-//               <must be written>: j
+//             <    is written>: j
       j = 3;
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = j = 2;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    i>2?(j = 4):(j = 3);
-//               <must be read   >: i
+//             <    is read   >: i
 
    if (i>2)
-//               <must be written>: j
+//             <    is written>: j
       j = 4;
    else
-//               <must be written>: j
+//             <    is written>: j
       j = 3;
 }
 
 Cumulated effects for "lhs01"
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void lhs01()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 2;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be written>: k
+//             <    is written>: k
    int k = 2;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
    
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i:j=3;
    //(i>2?i:j)=3;
    
    *(i>2?&i:&j) = 3;
-//               <must be written>: i j
+//             <    is written>: i j
    /* printf("i=%d, j=%d\n", i, j); */
    
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i=3:j=3;
    /* This is OK*/
    i = j = 2;
-//               <may be written >: i j
-//               <must be read   >: i
+//             <may be written>: i j
+//             <    is read   >: i
    i>2?(i = 3):(j = 3);
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = j = 2;
-//               <may be written >: i j
-//               <must be read   >: i
+//             <may be written>: i j
+//             <    is read   >: i
    if (i>2)
-//               <must be written>: i
+//             <    is written>: i
       i = 3;
    else
-//               <must be written>: j
+//             <    is written>: j
       j = 3;
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = j = 2;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    i>2?(j = 4):(j = 3);
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
 
    if (i>2)
-//               <must be written>: j
+//             <    is written>: j
       j = 4;
    else
-//               <must be written>: j
+//             <    is written>: j
       j = 3;
 }

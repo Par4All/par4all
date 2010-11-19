@@ -28,12 +28,12 @@ Proper effects for "comma07"
 int comma07()
 {
    int i, j;
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = (j = 1, 2);
-//               <must be written>: i j
+//             <    is written>: i j
    i = 3, j = 4;
-//               <must be read   >: i
+//             <    is read   >: i
 
    return i;
 }

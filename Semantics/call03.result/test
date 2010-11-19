@@ -3,31 +3,31 @@ Source code with proper effects
 
 void call03(int i, float x)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0008*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x++;                                                                 /*0009*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: j i x
-//               <must be written>: j
+//             <    is read   >: j i x
+//             <    is written>: j
 void call03(int i, float x)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;                                                                 /*0007*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0008*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x++;                                                                 /*0009*/
 }
 

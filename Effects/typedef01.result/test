@@ -1,30 +1,30 @@
 void compute()
 {
    int i, j;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 1; j <= 62; j += 1)
-//               <must be read   >: i j
-//               <must be written>: tab[i][j]
+//             <    is read   >: i j
+//             <    is written>: tab[i][j]
          tab[i][j] = i*j;
 }
-//               <may be written >: tab[*][*]
+//             <may be written>: tab[*][*]
 void compute()
 {
    int i, j;
-//               <may be read    >: i j
-//               <may be written >: tab[*][*] j
-//               <must be written>: i
+//             <may be read   >: i j
+//             <may be written>: tab[*][*] j
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <may be read    >: i j
-//               <may be written >: tab[*][*]
-//               <must be written>: j
+//             <may be read   >: i j
+//             <may be written>: tab[*][*]
+//             <    is written>: j
       for(j = 1; j <= 62; j += 1)
-//               <may be written >: tab[*][*]
-//               <must be read   >: i j
+//             <may be written>: tab[*][*]
+//             <    is read   >: i j
          tab[i][j] = i*j;
 }
 

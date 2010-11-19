@@ -1,61 +1,61 @@
 void give()
 {
-//               <must be written>: j
+//             <    is written>: j
    int j = 3;
    double array[N];
-//               <may be written >: array[*]
-//               <must be read   >: j
-//               <must be written>: j
+//             <may be written>: array[*]
+//             <    is read   >: j
+//             <    is written>: j
 
    change(&j, array);
 }
-//               <may be written >: array[*]
-//               <must be read   >: i i[0]
-//               <must be written>: i[0]
+//             <may be written>: array[*]
+//             <    is read   >: i i[0]
+//             <    is written>: i[0]
 void change(int *i, double array[N])
 {
    int k;
-//               <must be read   >: i i[0]
-//               <must be written>: i[0]
+//             <    is read   >: i i[0]
+//             <    is written>: i[0]
 
    (*i)++;
-//               <may be read    >: k
-//               <may be written >: array[*]
-//               <must be written>: k
+//             <may be read   >: k
+//             <may be written>: array[*]
+//             <    is written>: k
 
    for(k = 0; k <= 99; k += 1)
-//               <may be written >: array[*]
-//               <must be read   >: k
+//             <may be written>: array[*]
+//             <    is read   >: k
       array[k] = 0;
 }
 void give()
 {
-//               <must be written>: j
+//             <    is written>: j
    int j = 3;
    double array[N];
-//               <may be written >: array[*]
-//               <must be read   >: j
-//               <must be written>: j
+//             <may be written>: array[*]
+//             <    is read   >: j
+//             <    is written>: j
 
    change(&j, array);
 }
-//               <may be written >: array[*]
-//               <must be read   >: i i[0]
-//               <must be written>: i[0]
+//             <may be written>: array[*]
+//             <    is read   >: i i[0]
+//             <    is written>: i[0]
 void change(int *i, double array[N])
 {
    int k;
-//               <must be read   >: i i[0]
-//               <must be written>: i[0]
+//             <    is read   >: i i[0]
+//             <    is written>: i[0]
 
    (*i)++;
-//               <may be read    >: k
-//               <may be written >: array[*]
-//               <must be written>: k
+//             <may be read   >: k
+//             <may be written>: array[*]
+//             <    is written>: k
 
    for(k = 0; k <= 99; k += 1)
-//               <may be written >: array[*]
-//               <must be read   >: k
+//             <may be written>: array[*]
+//             <    is read   >: k
       array[k] = 0;
 }
 void give()

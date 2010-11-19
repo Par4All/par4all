@@ -15,25 +15,25 @@ int main()
 int main()
 {
    int i;
-//               <must be written>: n2
+//             <    is written>: n2
    int n2 = 3;
-//               <must be written>: n1
+//             <    is written>: n1
    n1 = 0;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    zero(&i);
-//               <must be read   >: n1
-//               <must be written>: i
+//             <    is read   >: n1
+//             <    is written>: i
    i = n1;
 }
 
 "zero" file with cumulated effects
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: px
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: px
 void zero(int *px)
 {
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: px
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: px
    /* Without points-to information, this should generate a
         transformer "T(n1) {}" but function zero() does not know much
         about its compilation unit and the compilation unit does not know

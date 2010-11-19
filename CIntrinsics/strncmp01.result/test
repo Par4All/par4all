@@ -14,34 +14,34 @@ int main()
 
 Cumulated effetcs for "strncmp01"
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
-//               <may be written >: str[*][*]
+//             <may be written>: str[*][*]
    char str[][5] = {"R2D2", "C3PO", "R2A6"};
    int n;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    puts("Looking for R2 astromech droids...");
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] n str[*][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be written>: n
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               n str[*][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: n
    for(n = 0; n <= 2; n += 1)
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] str[*][*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: n
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               str[*][*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: n
       if (strncmp(str[n], "R2xx", 2)==0) 
-//               <may be read    >: stdout[0] str[*][*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] n
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str[*][*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] n
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("found %s\n", str[n]);
    return 0;
 }

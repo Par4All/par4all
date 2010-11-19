@@ -1,44 +1,44 @@
 void compute()
 {
    int i, j;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 1; j <= 62; j += 1) {
-//               <must be read   >: i j
-//               <must be written>: tab1[i][j]
+//             <    is read   >: i j
+//             <    is written>: tab1[i][j]
          tab1[i][j] = i*j;
-//               <must be read   >: i j
-//               <must be written>: tab2[i][j]
+//             <    is read   >: i j
+//             <    is written>: tab2[i][j]
          tab2[i][j] = i*j;
-//               <must be read   >: tab3 i j
-//               <must be written>: tab3[i][j]
+//             <    is read   >: tab3 i j
+//             <    is written>: tab3[i][j]
          tab3[i][j] = i*j;
       }
 }
-//               <may be read    >: tab3
-//               <may be written >: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <may be read   >: tab3
+//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
 void compute()
 {
    int i, j;
-//               <may be read    >: tab3 i j
-//               <may be written >: tab1[*][*] tab2[*][*] tab3[*][*] j
-//               <must be written>: i
+//             <may be read   >: tab3 i j
+//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*] j
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <may be read    >: tab3 i j
-//               <may be written >: tab1[*][*] tab2[*][*] tab3[*][*]
-//               <must be written>: j
+//             <may be read   >: tab3 i j
+//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <    is written>: j
       for(j = 1; j <= 62; j += 1) {
-//               <may be written >: tab1[*][*]
-//               <must be read   >: i j
+//             <may be written>: tab1[*][*]
+//             <    is read   >: i j
          tab1[i][j] = i*j;
-//               <may be written >: tab2[*][*]
-//               <must be read   >: i j
+//             <may be written>: tab2[*][*]
+//             <    is read   >: i j
          tab2[i][j] = i*j;
-//               <may be written >: tab3[*][*]
-//               <must be read   >: tab3 i j
+//             <may be written>: tab3[*][*]
+//             <    is read   >: tab3 i j
          tab3[i][j] = i*j;
       }
 }
