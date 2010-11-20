@@ -10,7 +10,7 @@ int main()
    scanf("%d", &i);
 
    buffer = (char *) malloc(i+1);
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
 
    for (n = 0;n<i;n++)
@@ -46,7 +46,7 @@ int main()
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    buffer = (char *) malloc(i+1);
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
 //             <    is read   >: i
 //             <    is written>: n

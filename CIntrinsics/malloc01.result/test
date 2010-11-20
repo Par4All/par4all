@@ -10,7 +10,7 @@ int main()
    scanf("%d", &i);
 
    buffer = (char *) malloc(i+1);
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
 
    for (n = 0;n<i;n++)
@@ -54,7 +54,7 @@ int main()
 
    buffer = (char *) malloc(i+1);
 //             <    is read   >: buffer
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
 //             <may be read   >: _RANDOM_EFFECTS:GEN_SEED buffer n
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

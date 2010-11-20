@@ -37,7 +37,7 @@ int main()
 //                               str[*][*]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is read   >: n
-      if (strncmp(str[n], "R2xx", 2)==0) 
+      if (strncmp(str[n], "R2xx", 2)==0)
 //             <may be read   >: stdout[0] str[*][*]
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1] n
