@@ -6,6 +6,6 @@ int main()
       /* true branch */
       i = 2;
 
-   if (i<2) 
+   if (i<2)
       i = 2;
 }
