@@ -329,7 +329,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             //calculating max power received
             *max = 0;
             for(j = 0; j <= 5; j += 1)
-               if (coeff2[j]>*max) 
+               if (coeff2[j]>*max)
                   *max = coeff2[j];
             if (*max>=8*8*sizeof(int32_t)) {
                
@@ -474,7 +474,7 @@ void P4A_scmp_kernel_9(int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], float Signal_Q
 void P4A_scmp_malloc(void **dest, size_t n)
 {
 
-   if (*dest==(void *) 0) 
+   if (*dest==(void *) 0)
       *dest = malloc(n);
 }
 void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)
@@ -1002,7 +1002,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             //calculating max power received
             *max = 0;
             for(j = 0; j <= 5; j += 1)
-               if (coeff2[j]>*max) 
+               if (coeff2[j]>*max)
                   *max = coeff2[j];
             if (*max>=8*8*sizeof(int32_t)) {
                
@@ -1147,7 +1147,7 @@ void P4A_scmp_kernel_9(int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], float Signal_Q
 void P4A_scmp_malloc(void **dest, size_t n)
 {
 
-   if (*dest==(void *) 0) 
+   if (*dest==(void *) 0)
       *dest = malloc(n);
 }
 void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)

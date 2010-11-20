@@ -63,7 +63,7 @@ void P4A_scmp_kernel_1(int *a, int *b)
 void P4A_scmp_malloc(void **dest, size_t n)
 {
 
-   if (*dest==(void *) 0) 
+   if (*dest==(void *) 0)
       *dest = malloc(n);
 }
 void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)
