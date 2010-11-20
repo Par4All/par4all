@@ -10,7 +10,7 @@ void outline14(int W, int H, int R, float Dst[W][H], float Src[W][H], float Kern
 here:
          for(k = 0; k <= 2*R; k += 1) {
             int d = y+k-R;
-            if (d>=0&&d<H) 
+            if (d>=0&&d<H)
                sum += Src[y][x]*Kernel[R-(k-R)];
          }
          Dst[y][x] = sum;
@@ -23,7 +23,7 @@ void kernel(int H, int R, int W, float *sum, int x, int y, float Kernel[R], floa
 here:
    for(k = 0; k <= 2*R; k += 1) {
       int d = y+k-R;
-      if (d>=0&&d<H) 
+      if (d>=0&&d<H)
          *sum += Src[y][x]*Kernel[R-(k-R)];
    }
 }
