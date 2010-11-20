@@ -18,8 +18,10 @@ validate-out:; $(MAKE) TEST=out new-validate
 SHELL	= /bin/bash
 FIND	= find . -name '.svn' -type d -prune -o -name '.git' -type d -prune -o
 ARCH	= $(shell uname -m)
-# if provided, used to start the mail subject line
-VNAME	=
+ifndef VNAME
+# used to start the mail subject line
+VNAME	= $(ARCH)
+endif
 DIRNAME	= validation
 
 .PHONY: full-clean
@@ -167,7 +169,7 @@ SUMMARY: $(HEAD) parallel-validate future-list bugs-list
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
 	  status=$$(egrep '^(SUCCESS|FAILED) ' $@) ; \
-	  echo $(VNAME) "$(DIRNAME) $(ARCH) $$status" ; \
+	  echo $(VNAME) "$(DIRNAME) $$status" ; \
 	} >> $@
 
 # mail summary
