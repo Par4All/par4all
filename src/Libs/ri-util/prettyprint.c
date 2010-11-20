@@ -3193,7 +3193,7 @@ static text text_whileloop(entity module,
         if(one_liner_p(body)) {
           pc = CHAIN_SWORD(NIL,"while (");
           pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-          pc = CHAIN_SWORD(pc,") ");
+          pc = CHAIN_SWORD(pc,")");
           u = make_unformatted(strdup(label), n, margin, pc);
           ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
           MERGE_TEXTS(r, text_statement_enclosed(module,
@@ -3309,13 +3309,13 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
   }
 
   pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-  pc = CHAIN_SWORD(pc, ") ");
   instruction ti = instruction_undefined;
   call c = call_undefined;
   text t = text_undefined;
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, ") ");
       ti = statement_instruction(tb);
       c = instruction_call(ti);
       pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
@@ -3325,6 +3325,7 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
                   margin, pc)));
       break;
     case is_language_c:
+      pc = CHAIN_SWORD(pc, ")"); // Do not add a useless SPACE
       t = text_statement(module, margin + INDENTATION, tb, pdl);
       ADD_SENTENCE_TO_TEXT(r,
           make_sentence(is_sentence_unformatted,
