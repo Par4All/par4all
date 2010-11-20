@@ -9,7 +9,7 @@ static Bool unRLE_obuf_to_output_FAST(DState *s)
       while ((Bool) 1) {
 l99999:         ;
          if (!((Bool) 1)) goto break_2;
-         if (s->strm->avail_out==0) 
+         if (s->strm->avail_out==0)
             return (Bool) 0;
          if (s->state_out_len==0) goto break_2;
          *((UChar *) s->strm->next_out) = s->state_out_ch;
@@ -17,11 +17,11 @@ l99999:         ;
 break_2:         ;
          
          /* can a new run be started? */
-         if (s->nblock_used==s->save_nblock+1) 
+         if (s->nblock_used==s->save_nblock+1)
             return (Bool) 0;
          
          /* Only caused by corrupt data stream? */
-         if (s->nblock_used>s->save_nblock+1) 
+         if (s->nblock_used>s->save_nblock+1)
             return (Bool) 1;
 
          s->state_out_len = 1;
@@ -32,7 +32,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -48,7 +48,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -64,7 +64,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -79,7 +79,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -92,7 +92,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -133,7 +133,7 @@ l99990:      ;
       if (c_state_out_len>0) goto l99995;
 l99988:      ;
       /* Only caused by corrupt data stream? */
-      if (c_nblock_used>s_save_nblockPP) 
+      if (c_nblock_used>s_save_nblockPP)
          return (Bool) 1;
 
 /* can a new run be started? */
@@ -211,7 +211,7 @@ break_4:      ;
 return_notr:      ;
       total_out_lo32_old = s->strm->total_out_lo32;
       s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;
-      if (s->strm->total_out_lo32<total_out_lo32_old) 
+      if (s->strm->total_out_lo32<total_out_lo32_old)
          s->strm->total_out_hi32++;
       
       /* save */
@@ -238,7 +238,7 @@ static Bool unRLE_obuf_to_output_FAST(DState *s)
       while ((Bool) 1) {
 l99999:         ;
          if (!((Bool) 1)) goto break_2;
-         if (s->strm->avail_out==0) 
+         if (s->strm->avail_out==0)
             return (Bool) 0;
          if (s->state_out_len==0) goto break_2;
          *((UChar *) s->strm->next_out) = s->state_out_ch;
@@ -246,11 +246,11 @@ l99999:         ;
 break_2:         ;
          
          /* can a new run be started? */
-         if (s->nblock_used==s->save_nblock+1) 
+         if (s->nblock_used==s->save_nblock+1)
             return (Bool) 0;
          
          /* Only caused by corrupt data stream? */
-         if (s->nblock_used>s->save_nblock+1) 
+         if (s->nblock_used>s->save_nblock+1)
             return (Bool) 1;
 
          s->state_out_len = 1;
@@ -261,7 +261,7 @@ break_2:         ;
          if (s->rNToGo==0) {
             s->rNToGo = BZ2_rNums[s->rTPos];
             s->rTPos++;
-            if (s->rTPos==512) 
+            if (s->rTPos==512)
                s->rTPos = 0;
          }
          s->rNToGo--;
@@ -280,7 +280,7 @@ break_2:         ;
             if (s->rNToGo==0) {
                s->rNToGo = BZ2_rNums[s->rTPos];
                s->rTPos++;
-               if (s->rTPos==512) 
+               if (s->rTPos==512)
                   s->rTPos = 0;
             }
             s->rNToGo--;
@@ -299,7 +299,7 @@ break_2:         ;
                if (s->rNToGo==0) {
                   s->rNToGo = BZ2_rNums[s->rTPos];
                   s->rTPos++;
-                  if (s->rTPos==512) 
+                  if (s->rTPos==512)
                      s->rTPos = 0;
                }
                s->rNToGo--;
@@ -317,7 +317,7 @@ break_2:         ;
                   if (s->rNToGo==0) {
                      s->rNToGo = BZ2_rNums[s->rTPos];
                      s->rTPos++;
-                     if (s->rTPos==512) 
+                     if (s->rTPos==512)
                         s->rTPos = 0;
                   }
                   s->rNToGo--;
@@ -330,7 +330,7 @@ break_2:         ;
                   if (s->rNToGo==0) {
                      s->rNToGo = BZ2_rNums[s->rTPos];
                      s->rTPos++;
-                     if (s->rTPos==512) 
+                     if (s->rTPos==512)
                         s->rTPos = 0;
                   }
                   s->rNToGo--;
@@ -365,7 +365,7 @@ l99995:      ;
       if (c_state_out_len>0) goto l99998;
 l99993:      ;
       /* Only caused by corrupt data stream? */
-      if (c_nblock_used>s_save_nblockPP) 
+      if (c_nblock_used>s_save_nblockPP)
          return (Bool) 1;
 
 /* can a new run be started? */
@@ -445,7 +445,7 @@ break_4:      ;
 return_notr:      ;
       total_out_lo32_old = s->strm->total_out_lo32;
       s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;
-      if (s->strm->total_out_lo32<total_out_lo32_old) 
+      if (s->strm->total_out_lo32<total_out_lo32_old)
          s->strm->total_out_hi32++;
       
       /* save */
