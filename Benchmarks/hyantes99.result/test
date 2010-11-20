@@ -12,7 +12,7 @@ void run(data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t
          pt[i][j][2] = 0.;
          for(k = 0; k <= nb-1; k += 1) {
             data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(t[k][0])*cos(ymin+step*j-t[k][1])+sin(xmin+step*i)*sin(t[k][0]));
-            if (tmp<range) 
+            if (tmp<range)
                pt[i][j][2] += t[k][2]/(1+tmp);
          }
       }
