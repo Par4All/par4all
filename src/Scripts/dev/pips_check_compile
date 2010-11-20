@@ -178,6 +178,7 @@ function report()
     echo message: $msg
     echo run time: ${COMPILE_SECONDS:-$SECONDS}
     echo full time: $SECONDS
+    echo host: $(hostname)
 
     # revisions
     echo
