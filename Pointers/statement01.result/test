@@ -18,13 +18,13 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *i, j, k;
-//  points to = {}
+//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    k = 0;
-//  points to = {}
+//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    j = k;
-//  points to = {}
+//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    i = &j;
 //  {(i,j,-Exact-)}
 

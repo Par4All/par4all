@@ -25,19 +25,23 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int **x, *y, k, h;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    k = 1;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    h = 2;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    y = &h;
-//  {(y,h,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
    *x = y;
-//  {(y,h,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
    printf("x = %p \n", x);
-//  {(y,h,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
    return 0;
    // END BLOCK
 }
