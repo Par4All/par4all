@@ -29,7 +29,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -116,7 +116,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');

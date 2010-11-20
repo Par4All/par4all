@@ -23,7 +23,7 @@ void init(t_precision val)
 void p4a_kernel_1(size_t size, size_t i, size_t j, t_precision ptr[size][size], t_precision val)
 {
    // Loop nest P4A end
-   if (i<=-1+size&&j<=-1+size) 
+   if (i<=-1+size&&j<=-1+size)
       ptr[i][j] = val;
 }
 void p4a_kernel_launcher_1(size_t size, t_precision ptr[size][size], t_precision val)
@@ -71,7 +71,7 @@ void init(t_precision val)
 void p4a_kernel_1(size_t size, size_t i, size_t j, t_precision *ptr, t_precision val)
 {
    // Loop nest P4A end
-   if (i<=-1+size&&j<=-1+size) 
+   if (i<=-1+size&&j<=-1+size)
       *(ptr+j+i*size) = val;
 }
 void p4a_kernel_launcher_1(size_t size, t_precision *ptr, t_precision val)
