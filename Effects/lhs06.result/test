@@ -10,7 +10,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    int i32;
    static char buffer[2000];
 
-   if (!my_fputc) 
+   if (!my_fputc)
       return 0;
 
    nbout = 0;
@@ -32,7 +32,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    static char buffer[2000];
 //             <    is read   >: my_fputc
 
-   if (!my_fputc) 
+   if (!my_fputc)
       return 0;
 //             <    is written>: nbout
 
@@ -58,7 +58,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    static char buffer[2000];
 //             <    is read   >: my_fputc
 
-   if (!my_fputc) 
+   if (!my_fputc)
       return 0;
 //             <    is written>: nbout
 
@@ -85,7 +85,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    static char buffer[2000];
 //             <    is read   >: my_fputc
 
-   if (!my_fputc) 
+   if (!my_fputc)
       return 0;
 //             <    is written>: nbout
 

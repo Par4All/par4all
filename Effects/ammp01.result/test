@@ -12,14 +12,14 @@ ATOM * a_m_serial(int serial)
       n = atomNUMBER;
 
    ap = first;
-   if (ap==(void *) 0) 
+   if (ap==(void *) 0)
       return (void *) 0;
-   if (lastmatched==(void *) 0) 
+   if (lastmatched==(void *) 0)
       lastmatched = first;
 
-   if (serial==lastmatched->serial) 
+   if (serial==lastmatched->serial)
       return lastmatched;
-   if (serial>lastmatched->serial) 
+   if (serial>lastmatched->serial)
       ap = lastmatched;
    for (i = 0;i<n;i++) {
       if (ap->serial==serial) {
@@ -57,22 +57,22 @@ ATOM * a_m_serial(int serial)
 
    ap = first;
 //             <    is read   >: ap
-   if (ap==(void *) 0) 
+   if (ap==(void *) 0)
       return (void *) 0;
 //             <    is read   >: lastmatched
-   if (lastmatched==(void *) 0) 
+   if (lastmatched==(void *) 0)
 //             <    is read   >: first
 //             <    is written>: lastmatched
       lastmatched = first;
 //             <    is read   >: lastmatched lastmatched[0].serial 
 //                               serial
 
-   if (serial==lastmatched->serial) 
+   if (serial==lastmatched->serial)
 //             <    is read   >: lastmatched
       return lastmatched;
 //             <    is read   >: lastmatched lastmatched[0].serial 
 //                               serial
-   if (serial>lastmatched->serial) 
+   if (serial>lastmatched->serial)
 //             <    is read   >: lastmatched
 //             <    is written>: ap
       ap = lastmatched;
@@ -132,25 +132,25 @@ ATOM * a_m_serial(int serial)
 
    ap = first;
 //             <    is read   >: ap
-   if (ap==(void *) 0) 
+   if (ap==(void *) 0)
       return (void *) 0;
 //             <may be read   >: first
 //             <may be written>: lastmatched
 //             <    is read   >: lastmatched
-   if (lastmatched==(void *) 0) 
+   if (lastmatched==(void *) 0)
 //             <    is read   >: first
 //             <    is written>: lastmatched
       lastmatched = first;
 //             <    is read   >: lastmatched lastmatched[0].serial 
 //                               serial
 
-   if (serial==lastmatched->serial) 
+   if (serial==lastmatched->serial)
 //             <    is read   >: lastmatched
       return lastmatched;
 //             <may be written>: ap
 //             <    is read   >: lastmatched lastmatched[0].serial 
 //                               serial
-   if (serial>lastmatched->serial) 
+   if (serial>lastmatched->serial)
 //             <    is read   >: lastmatched
 //             <    is written>: ap
       ap = lastmatched;
@@ -194,7 +194,7 @@ int activate(int i1, int i2)
 
    if (i2==0) {
       ap = a_m_serial(i1);
-      if (ap!=(void *) 0) 
+      if (ap!=(void *) 0)
          ap->active = 1;
       return 0;
    }
@@ -209,7 +209,7 @@ int activate(int i1, int i2)
    numatm = a_number();
    for (i = 0;i<numatm;i++) {
       ap = a_next(i);
-      if (ap->serial>=lower&&ap->serial<=upper) 
+      if (ap->serial>=lower&&ap->serial<=upper)
          ap->active = 1;
    }
    return 0;
@@ -236,7 +236,7 @@ int activate(int i1, int i2)
 //             <    is written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
 //             <    is read   >: ap
-      if (ap!=(void *) 0) 
+      if (ap!=(void *) 0)
 //             <    is read   >: ap
 //             <    is written>: ap[0].active
          ap->active = 1;
@@ -274,7 +274,7 @@ int activate(int i1, int i2)
       ap = a_next(i);
 //             <    is read   >: ap ap[0].serial ap[0].serial lower 
 //                               numatm upper
-      if (ap->serial>=lower&&ap->serial<=upper) 
+      if (ap->serial>=lower&&ap->serial<=upper)
 //             <    is read   >: ap numatm
 //             <    is written>: ap[0].active
          ap->active = 1;
@@ -323,7 +323,7 @@ int activate(int i1, int i2)
       ap = a_m_serial(i1);
 //             <may be written>: ap[0].active
 //             <    is read   >: ap
-      if (ap!=(void *) 0) 
+      if (ap!=(void *) 0)
 //             <    is read   >: ap
 //             <    is written>: ap[0].active
          ap->active = 1;
@@ -365,7 +365,7 @@ int activate(int i1, int i2)
       ap = a_next(i);
 //             <may be written>: ap[0].active
 //             <    is read   >: ap ap[0].serial lower numatm upper
-      if (ap->serial>=lower&&ap->serial<=upper) 
+      if (ap->serial>=lower&&ap->serial<=upper)
 //             <    is read   >: ap numatm
 //             <    is written>: ap[0].active
          ap->active = 1;

@@ -8,12 +8,12 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
    buffer = (char *) calloc(80, sizeof(char));
    file = fopen(filename, "rb");
-   if (file==(void *) 0) 
+   if (file==(void *) 0)
       nrerror("ouverture du fichier impossible\n");
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
    //readitem(file, buffer);
-   if (strcmp(buffer, "P5")!=0) 
+   if (strcmp(buffer, "P5")!=0)
       nrerror("entete du fichier %s invalide\n");
    
    //width  = atoi(readitem(file, buffer));
@@ -80,13 +80,13 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //             <    is written>: file
    file = fopen(filename, "rb");
 //             <    is read   >: file
-   if (file==(void *) 0) 
+   if (file==(void *) 0)
       nrerror("ouverture du fichier impossible\n");
 //             <    is read   >: buffer
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
    //readitem(file, buffer);
-   if (strcmp(buffer, "P5")!=0) 
+   if (strcmp(buffer, "P5")!=0)
       nrerror("entete du fichier %s invalide\n");
 //             <    is read   >: nrl
 //             <    is written>: nrl[0]
@@ -155,13 +155,13 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //             <    is written>: file
    file = fopen(filename, "rb");
 //             <    is read   >: file
-   if (file==(void *) 0) 
+   if (file==(void *) 0)
       nrerror("ouverture du fichier impossible\n");
 //             <    is read   >: buffer
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
    //readitem(file, buffer);
-   if (strcmp(buffer, "P5")!=0) 
+   if (strcmp(buffer, "P5")!=0)
       nrerror("entete du fichier %s invalide\n");
 //             <    is read   >: nrl
 //             <    is written>: nrl[0]
