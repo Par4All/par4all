@@ -3,7 +3,7 @@ int erminable(char isme)
    int the, follow, ce, luke;
    follow = the;
    ce;
-   while (luke) 
+   while (luke)
       ;
 
    for(the = 2; the <= 1; the += 1) {
@@ -16,7 +16,7 @@ int erminable(char isme)
    int the, follow, ce, luke;
    follow = the;
    ce;
-   while (luke) 
+   while (luke)
       ;
 
 #pragma omp for private(ce,luke,the)
