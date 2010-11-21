@@ -16,7 +16,7 @@ l2:
          for(k = 0; k <= 99; k += 1)
 l3:
             for(l = 0; l <= 99; l += 1)
-               if (i!=k&&j!=l) 
+               if (i!=k&&j!=l)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
       }
 }
@@ -40,11 +40,11 @@ l2:
          for(k = 0; k <= 99; k += 1) {
 l3:
             for(l = 0; l <= j-1; l += 1)
-               if (i!=k&&j!=l) 
+               if (i!=k&&j!=l)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
 l99999:
             for(l0 = j; l0 <= 99; l0 += 1)
-               if (i!=k&&j!=l0) 
+               if (i!=k&&j!=l0)
                   result[i][j] += towns[k][l0]/dist(i, j, k, l0);
          }
       }
@@ -66,15 +66,15 @@ l2:
          for(k = 0; k <= 99; k += 1) {
 l3:
             for(l = 0; l <= j-1; l += 1)
-               if (i!=k&&j!=l) 
+               if (i!=k&&j!=l)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
 l99999:
             for(l0 = j; l0 <= j; l0 += 1)
-               if (i!=k&&j!=l0) 
+               if (i!=k&&j!=l0)
                   result[i][j] += towns[k][l0]/dist(i, j, k, l0);
 l99998:
             for(l00 = j+1; l00 <= 99; l00 += 1)
-               if (i!=k&&j!=l00) 
+               if (i!=k&&j!=l00)
                   result[i][j] += towns[k][l00]/dist(i, j, k, l00);
          }
       }
@@ -99,13 +99,13 @@ l2:
          for(k = 0; k <= 99; k += 1) {
 l3:
             for(l = 0; l <= j-1; l += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
             l0 = j;
             l0 = j+1;
 l99998:
             for(l00 = j+1; l00 <= 99; l00 += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l00]/dist(i, j, k, l00);
          }
       }
@@ -131,26 +131,26 @@ l2:
          for(k = 0; k <= i-1; k += 1) {
 l3:
             for(l = 0; l <= j-1; l += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
             l0 = j;
             l0 = j+1;
 l99998:
             for(l00 = j+1; l00 <= 99; l00 += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l00]/dist(i, j, k, l00);
          }
 l99997:
          for(k0 = i; k0 <= 99; k0 += 1) {
 l99996:
             for(l1 = 0; l1 <= j-1; l1 += 1)
-               if (i!=k0) 
+               if (i!=k0)
                   result[i][j] += towns[k0][l1]/dist(i, j, k0, l1);
             l0 = j;
             l0 = j+1;
 l99995:
             for(l000 = j+1; l000 <= 99; l000 += 1)
-               if (i!=k0) 
+               if (i!=k0)
                   result[i][j] += towns[k0][l000]/dist(i, j, k0, l000);
          }
       }
@@ -173,39 +173,39 @@ l2:
          for(k = 0; k <= i-1; k += 1) {
 l3:
             for(l = 0; l <= j-1; l += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l]/dist(i, j, k, l);
             l0 = j;
             l0 = j+1;
 l99998:
             for(l00 = j+1; l00 <= 99; l00 += 1)
-               if (i!=k) 
+               if (i!=k)
                   result[i][j] += towns[k][l00]/dist(i, j, k, l00);
          }
 l99997:
          for(k0 = i; k0 <= i; k0 += 1) {
 l99996:
             for(l1 = 0; l1 <= j-1; l1 += 1)
-               if (i!=k0) 
+               if (i!=k0)
                   result[i][j] += towns[k0][l1]/dist(i, j, k0, l1);
             l0 = j;
             l0 = j+1;
 l99995:
             for(l000 = j+1; l000 <= 99; l000 += 1)
-               if (i!=k0) 
+               if (i!=k0)
                   result[i][j] += towns[k0][l000]/dist(i, j, k0, l000);
          }
 l99994:
          for(k00 = i+1; k00 <= 99; k00 += 1) {
 l99993:
             for(l10 = 0; l10 <= j-1; l10 += 1)
-               if (i!=k00) 
+               if (i!=k00)
                   result[i][j] += towns[k00][l10]/dist(i, j, k00, l10);
             l0 = j;
             l0 = j+1;
 l99992:
             for(l0000 = j+1; l0000 <= 99; l0000 += 1)
-               if (i!=k00) 
+               if (i!=k00)
                   result[i][j] += towns[k00][l0000]/dist(i, j, k00, l0000);
          }
       }

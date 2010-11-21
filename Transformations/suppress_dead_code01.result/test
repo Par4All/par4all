@@ -11,7 +11,7 @@ void suppress_dead_code01(int *x)
    free(p);
    
    /* Not dead code because of control effect */
-   while (1) 
+   while (1)
       ;
    
    /* Not dead code because of memory read-write effects, even if
@@ -37,7 +37,7 @@ void suppress_dead_code01(int *x)
    free(p);
    
    /* Not dead code because of control effect */
-   while (1) 
+   while (1)
       ;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
@@ -69,7 +69,7 @@ void suppress_dead_code01(int *x)
    free(p);
    
    /* Not dead code because of control effect */
-   while (1) 
+   while (1)
       ;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
@@ -95,7 +95,7 @@ void suppress_dead_code01(int *x)
    free(p);
    
    /* Not dead code because of control effect */
-   while (1) 
+   while (1)
       ;
    
    /* Not dead code because of memory read-write effects, even if
