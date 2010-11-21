@@ -109,7 +109,7 @@ l99996:
                
                __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
          __scalar__0 = __scalar__0/(3*3);
-         if (i>=1&&i<=510) 
+         if (i>=1&&i<=510)
             new_image[i][j] = __scalar__0;
       }
 }
@@ -148,7 +148,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i-1][kj+j-1]*kernel[ki][kj];
                __scalar__0 = __scalar__0/9;
-               if (i>=1&&i<=510) 
+               if (i>=1&&i<=510)
                   new_image[i][j] = __scalar__0;
             }
 }
@@ -190,7 +190,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                __scalar__0 = __scalar__0/9;
-               if (i+126*i_t-126>=1&&i+126*i_t-126<=510) 
+               if (i+126*i_t-126>=1&&i+126*i_t-126<=510)
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
 }
@@ -233,7 +233,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                __scalar__0 = __scalar__0/9;
-               if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510) 
+               if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510)
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
 }

@@ -16,6 +16,6 @@ kernel2:
    for(i = 10; i <= 508; i += 1)
       for(j = 20; j <= 518; j += 1)
          // Loop nest P4A end
-         if (i<=508&&j<=518) 
+         if (i<=508&&j<=518)
             p4a_kernel_wrapper_1(save, space, i+1, j+1);
 }
