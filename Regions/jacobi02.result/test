@@ -29,7 +29,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -55,7 +55,7 @@ void get_data(char filename[])
       for(i = 0; i <= nx-1; i += 1) {
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
             space[i][j] = c;
       }
 
@@ -248,7 +248,7 @@ void get_data(char filename[])
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -350,7 +350,7 @@ void get_data(char filename[])
 //    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
@@ -630,7 +630,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -655,7 +655,7 @@ void get_data(char filename[])
          // BEGIN BLOCK
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
             space[i][j] = c;
          // END BLOCK
       }
@@ -951,7 +951,7 @@ void get_data(char filename[])
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -1053,7 +1053,7 @@ void get_data(char filename[])
 //    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
@@ -1158,7 +1158,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -1229,7 +1229,7 @@ void get_data(char filename[])
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
@@ -1360,7 +1360,7 @@ void get_data(char filename[])
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <fp-IN-MAY-{}>
 
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -1430,7 +1430,7 @@ void get_data(char filename[])
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
             space[i][j] = c;
          // END BLOCK
       }
@@ -1541,7 +1541,7 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -1615,7 +1615,7 @@ void get_data(char filename[])
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
 
 //  <space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
@@ -1661,7 +1661,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -1688,7 +1688,7 @@ void get_data(char filename[])
          // BEGIN BLOCK
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
             space[i][j] = c;
          // END BLOCK
       }
