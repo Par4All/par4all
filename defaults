@@ -5,6 +5,7 @@ SAC
 Syntax
 Control
 Preprocessor
+Pyps
 C_syntax
 F95_syntax
 Effects
@@ -49,7 +50,6 @@ Tpips
 TutorialPPoPP2010
 Scalopes
 Expressions
-Pyps
 Properties
 Crough
 Top-level
