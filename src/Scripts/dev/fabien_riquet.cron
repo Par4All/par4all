@@ -1,0 +1,5 @@
+# $Id$
+# check hourly
+@hourly /home/fabien/INT32/pips_check_compile --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
+# force once a day
+25 0 * * * /home/fabien/INT32/pips_check_compile --wait --force --report --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
