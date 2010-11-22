@@ -1,4 +1,4 @@
-# A GNU makefile to run a demo of Par4All on "stars-pm" application 
+# A GNU makefile to run a demo of Par4All on "stars-pm" application
 
 TARGET= stars-pm
 
@@ -11,7 +11,7 @@ endif
 
 # You can set P4A_OPTIONS to pass options to p4a
 CFLAGS+= -O3 -std=c99 -Wall -D_GNU_SOURCE
-LDLIBS+= -lm -lfftw3f 
+LDLIBS+= -lm -lfftw3f
 
 
 # To play with OpenMP parameters:
@@ -64,7 +64,7 @@ demo : display_seq display_openmp display_cuda ;
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.c) $(SOURCES:.c=.p4a.c) $(STUBS:.c=.p4a.cu) $(SOURCES:.c=.p4a.cu) *~ *.database *.build *.o 
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.c) $(SOURCES:.c=.p4a.c) $(STUBS:.c=.p4a.cu) $(SOURCES:.c=.p4a.cu) *~ *.database *.build *.o
 
 run-%: $(TARGET)_%
 	# Run a version and display timing information:
