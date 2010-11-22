@@ -4,4 +4,4 @@
 #
 # riquet is already svn & trac & redmine
 # so just force compilation & validation once a day
-25 2 * * * /home/fabien/INT32/pips_check_compile --force --report --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
+25 2 * * * /home/fabien/32BIT/pips_check_compile --force --report --source /home/fabien/32BIT/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/32BIT/prod /home/fabien/32BIT/validation
