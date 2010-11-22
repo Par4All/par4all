@@ -198,8 +198,12 @@ $prod/pips/src/Scripts/env/sh2csh.pl \
 echo
 echo "### downloading $POLYLIB"
 cd /tmp
-test -f $POLYLIB.tar.gz && warn "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
-wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+if test -f $POLYLIB.tar.gz
+then
+  warn "some /tmp/$POLYLIB.tar.gz file already there. Continue using it?"
+else
+  wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+fi
 
 echo
 echo "### building $POLYLIB"
