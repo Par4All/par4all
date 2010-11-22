@@ -1,5 +1,4 @@
 # $Id$
-# check hourly
-@hourly /home/fabien/INT32/pips_check_compile --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
-# force once a day
-25 0 * * * /home/fabien/INT32/pips_check_compile --wait --force --report --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
+# riquet is already svn & trac & redmine
+# so just force compilation & validation once a day
+25 2 * * * /home/fabien/INT32/pips_check_compile --force --report --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
