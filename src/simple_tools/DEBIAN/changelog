@@ -1,15 +1,19 @@
-2010-11-12  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-		* Par4All 1.0.4 introduces a new P4A Accel runtime.
+		* Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
 
 		* In previous months, PIPS and PyPS has evolved a lot, specially
 		  in the code generation for various accelerators. This version
-		  cope with these evolutions.
+		  try to cope with these evolutions.
+
+		* Added the Stars-pm cosmological N-body simulation program as an
+		  example
 
 		* Now the runtime can deal with subarray transfers between the
-		  host and the accelerator, up to 4D arrays.
+		  host and the accelerator, up to 4D arrays. Well right now the
+		  phases chosen in PIPS do not use them yet.
 
-		* The code generation for CUDA pre-C99 is better/
+		* The code generation for non-C99 CUDA is more robust.
 
 2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
