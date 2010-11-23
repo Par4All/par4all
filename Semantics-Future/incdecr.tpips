@@ -33,7 +33,16 @@ echo
 echo Code after dead_code_elimination
 echo
 
+setproperty ALIASING_ACROSS_TYPES FALSE
+
 apply DEAD_CODE_ELIMINATION[run]
+display PRINTED_FILE[run]
+
+echo
+echo Code after code flattening
+echo
+
+apply FLATTEN_CODE[run]
 display PRINTED_FILE[run]
 
 echo

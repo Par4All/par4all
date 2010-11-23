@@ -122,162 +122,69 @@ void run()
    printf("i = %d\n", i);
 }
 
-//  P() {}
+Code after partial evaluation
 
 void run()
 {
-
-//  P() {}
-
    int s = 0, i = 0;
-
-//  P(i,s) {i==0, s==0}
-
    int c1 = 0, c2 = 0;
-
-//  P(c1,c2,i,s) {c1==0, c2==0, i==0, s==0}
-
    // compteurs pour la correction
    
    while (alea()) {
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
-
       i++;
-
-//  P(c1,c2,i,s) {c1==i-1, c2==0, s==0, 0<=c1}
-
       c1++;
    }
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
-
    s = 1;
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==1, 0<=c1}
-
    while (i>=1) {
-
-//  P(c1,c2,i,s) {c2+i==c1, s==1, i<=c1, 1<=i}
-
       i--;
-
-//  P(c1,c2,i,s) {c2+i==c1-1, s==1, 1<=c1, i+1<=c1, 0<=i}
-
       c2++;
    }
-
-//  P(c1,c2,i,s) {c1==c2, i==0, s==1, 0<=c1}
-
    if (c1!=c2)
-
-//  P() {0==-1}
-
       error();
-
-//  P(c1,c2,i,s) {c1==c2, i==0, s==1, 0<=c1}
-
    printf("i = %d\n", 0);
 }
 
-//  P() {}
+Code after dead_code_elimination
 
 void run()
 {
-
-//  P() {}
-
-   int s = 0, i = 0;
-
-//  P(i,s) {i==0, s==0}
-
-   int c1 = 0, c2 = 0;
-
-//  P(c1,c2,i,s) {c1==0, c2==0, i==0, s==0}
-
+   {
+   }
+   {
+   }
    // compteurs pour la correction
    
-   while (alea()) {
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
-
-      i++;
-
-//  P(c1,c2,i,s) {c1==i-1, c2==0, s==0, 0<=c1}
-
-      c1++;
-   }
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
-
-   s = 1;
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==1, 0<=c1}
-
-   while (i>=1) {
-
-//  P(c1,c2,i,s) {c2+i==c1, s==1, i<=c1, 1<=i}
-
-      i--;
-
-//  P(c1,c2,i,s) {c2+i==c1-1, s==1, 1<=c1, i+1<=c1, 0<=i}
-
-      c2++;
-   }
+   while (alea())
+      ;
    ;
-
-//  P(c1,c2,i,s) {c1==c2, i==0, s==1, 0<=c1}
-
+   ;
+   ;
    printf("i = %d\n", 0);
 }
 
-//  P() {}
+Code after code flattening
 
 void run()
 {
-
-//  P() {}
-
-   int s = 0, i = 0;
-
-//  P(i,s) {i==0, s==0}
-
-   int c1 = 0, c2 = 0;
-
-//  P(c1,c2,i,s) {c1==0, c2==0, i==0, s==0}
-
+   //PIPS generated variable
+   int s_0 = 0, i_0 = 0, c1_0 = 0, c2_0 = 0;
    // compteurs pour la correction
    
-   while (alea()) {
+   while (alea())
+      ;
+   printf("i = %d\n", 0);
+}
 
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
+Code after suppress_dead_code [this last step should be useless]
 
-      i++;
-
-//  P(c1,c2,i,s) {c1==i-1, c2==0, s==0, 0<=c1}
-
-      c1++;
-   }
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==0, 0<=c1}
-
-   s = 1;
-
-//  P(c1,c2,i,s) {c1==i, c2==0, s==1, 0<=c1}
-
-   while (i>=1) {
-
-//  P(c1,c2,i,s) {c2+i==c1, s==1, i<=c1, 1<=i}
-
-      i--;
-
-//  P(c1,c2,i,s) {c2+i==c1-1, s==1, 1<=c1, i+1<=c1, 0<=i}
-
-      c2++;
-   }
-
-//  P(c1,c2,i,s) {c1==c2, i==0, s==1, 0<=c1}
-
+void run()
+{
+   //PIPS generated variable
+   int s_0 = 0, i_0 = 0, c1_0 = 0, c2_0 = 0;
+   // compteurs pour la correction
+   
+   while (alea())
+      ;
    printf("i = %d\n", 0);
    ;
 }
