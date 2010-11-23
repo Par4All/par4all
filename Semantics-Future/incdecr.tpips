@@ -21,11 +21,24 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]
 
+echo
+echo Code after partial evaluation
+echo
+
 apply PARTIAL_EVAL[run]
+activate PRINT_CODE
 display PRINTED_FILE[run]
+
+echo
+echo Code after dead_code_elimination
+echo
 
 apply DEAD_CODE_ELIMINATION[run]
 display PRINTED_FILE[run]
+
+echo
+echo Code after suppress_dead_code [this last step should be useless]
+echo
 
 apply SUPPRESS_DEAD_CODE[run]
 display PRINTED_FILE[run]

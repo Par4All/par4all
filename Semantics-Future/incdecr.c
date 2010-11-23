@@ -1,3 +1,13 @@
+// Test case added by Vivien Maisonneuve.
+//
+// This test case was designed to show that a transition system could
+// not be transformed into an automaton, if only because automata are
+// restricted to regular languages. The langage here is A^kB^k for k
+// in N (hence the tow counters c1 and c2).
+//
+// PIPS wise, the whole code should be reduced to the final printf
+// because the printed value is known statically.
+
 /*#define USE_VARIANT*/
 
 #include <stdlib.h>
