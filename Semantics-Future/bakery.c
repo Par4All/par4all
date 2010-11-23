@@ -1,18 +1,20 @@
-/* While/while encoding by Vivien Maisonneve of the Bakery mutual
- * exclusion algorithm.
- *
- * Version tire de Pugh 1995
- */
+// fonctionne par exemple avec pips r18437
 
-//#define assert(c) if (!(c)) error()
+#include <stdlib.h>
+
+#define USE_ASSERT
+
+#ifdef USE_ASSERT
+#define assert(c) if (!(c)) error()
+#else
 #define assert(c) {}
+#endif
+
 #define check(c) if (!(c)) error()
 
 /*#define NO_LOOP1*/
 /*#define NO_LOOP2*/
 /*#define NO_LOOP3*/
-
-#include <stdlib.h>
 
 void error() {
 	exit(1);
