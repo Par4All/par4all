@@ -1,0 +1,53 @@
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(a,i) {a==1, i==0}
+
+   int i = 0, a = 1;
+
+//  T(a,i) {a#init==1, i#init==0, 1<=a, a<=9i+1}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T(a) {a#init+i==a, 0<=i, i<=9}
+
+      a = a+i;
+
+//  T() {i==10, 10<=a, a<=91}
+
+   printf("%d", a);
+
+//  T(main) {i==10, main==0, 10<=a, a<=91}
+
+   return 0;
+}
+int main()
+{
+   int i = 0, a = 1;
+   //PIPS generated variable
+   int a0;
+   a0 = a;
+   for(i = 0; i <= 9; i += 1) {
+      a = a0;
+      a0 += 1;
+   }
+   a = a0;
+   printf("%d", a);
+   return 0;
+}
+int main()
+{
+   int i = 0, a = 1;
+   //PIPS generated variable
+   int a0;
+   a0 = a;
+   for(i = 0; i <= 9; i += 1)
+      a0 += 1;
+   a = a0;
+   printf("%d", a);
+   return 0;
+}
+

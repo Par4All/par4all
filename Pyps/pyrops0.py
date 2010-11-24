@@ -12,7 +12,7 @@ import shutil,os,pyrops
 #cp = launcher.getObj()
 #w = workspace(["basics0.c"], cpypips = cp)
 
-with pworkspace("basics0.c") as w:
+with pworkspace("basics0.c",deleteOnClose=True) as w:
 	# you can get module object from the modules table
 	foo=w.fun.foo
 	bar=w.fun.bar

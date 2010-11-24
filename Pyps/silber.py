@@ -2,7 +2,7 @@ from __future__ import with_statement # this is to work with python2.5
 from pyps import workspace, module
 from os import system
 
-with workspace("silber.c","include/adds.c",verbose=False) as w:
+with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
 	# print out all functions
 	w.all_functions.display()
 	a_out=w.compile()

@@ -1,6 +1,6 @@
 from pyps import workspace
 
-with workspace(["simdau0.c"]) as w:
+with workspace(["simdau0.c"], deleteOnClose=True) as w:
 	w.props.SAC_SIMD_REGISTER_WIDTH=128
 	w.fun.foo.display()
 	w.fun.foo.simdizer_auto_unroll()

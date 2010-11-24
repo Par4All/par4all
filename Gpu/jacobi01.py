@@ -5,7 +5,7 @@ program = "jacobi01"
 
 # Just in case it existed before:
 workspace.delete(program)
-with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program) as w:
+with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program, deleteOnClose=True) as w:
 	w.activate(module.transformers_inter_full)
 	w.activate(module.interprocedural_summary_precondition)
 	w.activate(module.preconditions_inter_full)
@@ -71,7 +71,7 @@ with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program) as w:
 	#kernels.display()
 	# Add communication around all the call site of the kernels:
 	kernel_launchers.kernel_load_store()
-	kernel_launchers.display()
+	map(lambda m: m.callers.display(),kernel_launchers)
 	
 	kernel_launchers.gpu_loop_nest_annotate()
 	kernel_launchers.display()

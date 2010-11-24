@@ -48,7 +48,6 @@ display PRINTED_FILE[convol]
 
 apply PARTIAL_EVAL[microcode]
 apply LOOP_NORMALIZE[microcode]
-apply SUPPRESS_DEAD_CODE[microcode]
 display PRINTED_FILE[microcode]
 
 

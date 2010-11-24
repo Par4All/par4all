@@ -24,39 +24,121 @@ kernel:
 
 Code after kernelization
 
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <seed[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+
 int foo(int seed[100])
 {
    int a[100];
    int b[100];
    int c[100];
    int i;
+
+//  <a[PHI1]-W-EXACT-{0<=PHI1, PHI1<=99}>
+//  <b[PHI1]-W-EXACT-{0<=PHI1, PHI1<=99}>
+//  <seed[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=99}>
+//  <seed[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=99}>
+
       a[i] = seed[i];
+
+//  <b[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=99}>
+//  <seed[PHI1]-R-EXACT-{PHI1+i==99, 0<=i, i<=99}>
+
       b[i] = seed[99-i];
    }
+
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=99, i==100}>
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1<=99, i==100}>
+//  <c[PHI1]-W-MAY-{0<=PHI1, PHI1<=99, i==100}>
+
    /* compute */
 kernel:   run_kernel(a, b, c);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+
    /* print result */
    for(i = 0; i <= 99; i += 1)
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <c[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+
       printf("%d ", c[i]);
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+
    printf("\n");
 }
+
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <c[PHI1]-W-MAY-{0<=PHI1, PHI1<=99}>
+
 void run_kernel(int a[100], int b[100], int c[100])
 {
    //PIPS generated variable
    int i;
+
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <c[PHI1]-W-MAY-{0<=PHI1, PHI1<=99}>
+
    /* compute */
 kernel:
    for(i = 0; i <= 99; i += 10)
+
+//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+
       kernel(a, b, c, i);
 }
+
+//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+
 void kernel(int a[100], int b[100], int c[100], int i)
 {
    //PIPS generated variable
    int i_1;
+
+//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+
    for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1==i_1, i_1<=99, i<=i_1, i_1<=i+9, 0<=i,
+//    i<=99}>
+//  <b[PHI1]-R-EXACT-{PHI1==i_1, i_1<=99, i<=i_1, i_1<=i+9, 0<=i,
+//    i<=99}>
+//  <c[PHI1]-W-EXACT-{PHI1==i_1, i_1<=99, i<=i_1, i_1<=i+9, 0<=i,
+//    i<=99}>
+
       c[i_1] = a[i_1]+b[i_1];
 }
 int foo(int seed[100])
@@ -79,9 +161,10 @@ int foo(int seed[100])
       P4A_accel_malloc((void **) &c0, sizeof(int)*100);
       P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *a0);
       P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *b0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
 
       /* compute */
-kernel:      run_kernel((*a0), (*b0), (*c0));
+kernel:      run_kernel(*a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
       P4A_accel_free(a0);
       P4A_accel_free(b0);
@@ -115,8 +198,9 @@ int foo(int seed[100])
       P4A_accel_malloc((void **) &c0, sizeof(int)*100);
       P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *a0);
       P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *b0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
       /* compute */
-      run_kernel((*a0), (*b0), (*c0));
+      run_kernel(*a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *c0);
       P4A_accel_free(a0);
       P4A_accel_free(b0);

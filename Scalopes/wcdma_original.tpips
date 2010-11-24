@@ -3,6 +3,7 @@ setenv WKS wcdma_original
 delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty EVAL_SIZEOF TRUE
 
 create $WKS $WKS.c p4a_scmp_stubs.c
 
@@ -10,6 +11,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 setproperty CONSTANT_PATH_EFFECTS=FALSE
 setproperty NO_USER_WARNING TRUE
+setproperty EVAL_SIZEOF TRUE
 
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL

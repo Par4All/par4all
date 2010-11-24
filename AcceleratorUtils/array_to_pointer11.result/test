@@ -60,8 +60,6 @@ void p4a_kernel_launcher_1(size_t size, t_precision *ptr, t_precision val);
 
 
 void init(t_precision val);
-//PIPS generated variable
-void *alloca(unsigned int);
 void init(t_precision val)
 {
    //PIPS generated variable

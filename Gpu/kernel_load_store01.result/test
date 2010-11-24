@@ -64,11 +64,11 @@ void give()
    double array[N];
    {
       //PIPS generated variable
-      double (*array0)[N] = (double (*)[N]) 0;
+      double (*array0)[100] = (double (*)[100]) 0;
       P4A_accel_malloc((void **) &array0, sizeof(double)*100);
 
 
-      change(&j, (*array0));
+      change(&j, *array0);
       P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
       P4A_accel_free(array0);
    }
@@ -117,11 +117,11 @@ void give()
    double array[N];
    {
       //PIPS generated variable
-      double (*array0)[N] = (double (*)[N]) 0;
+      double (*array0)[100] = (double (*)[100]) 0;
       P4A_accel_malloc((void **) &array0, sizeof(double)*100);
 
 
-      change(&j, (*array0));
+      change(&j, *array0);
       P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
       P4A_accel_free(array0);
    }

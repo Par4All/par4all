@@ -92,7 +92,7 @@ int main()
       P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *c0);
 
 
-      P4A_scmp_kernel_0(&a, &b, (*c0));
+      P4A_scmp_kernel_0(&a, &b, *c0);
       P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *c0);
    }
 

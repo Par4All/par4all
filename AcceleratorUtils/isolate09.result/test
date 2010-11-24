@@ -101,9 +101,9 @@ l99997:
 }
 with r-w regions
 
-//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <result[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
 
 void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
 {
@@ -111,38 +111,38 @@ void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
    //PIPS generated variable
    unsigned int i_t, j_t;
 
-//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <result[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3}>
 
 l99998:
    for(i_t = 0; i_t <= 0; i_t += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
+//  <result[PHI1][PHI2]-W-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2,
+//    PHI2<=3, i_t==0}>
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2, PHI2<=3,
 //    i_t==0}>
-//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
-//    i_t==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2, PHI2<=3,
 //    i_t==0}>
 
 l99995:
       for(j_t = 0; j_t <= 0; j_t += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
+//  <result[PHI1][PHI2]-W-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2,
+//    PHI2<=3, i_t==0, j_t==0}>
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2, PHI2<=3,
 //    i_t==0, j_t==0}>
-//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
-//    i_t==0, j_t==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3,
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1<=3, 10i_t<=PHI1, 0<=PHI2, PHI2<=3,
 //    i_t==0, j_t==0}>
 
 l99996:
          for(i = 10*i_t; i <= 3; i += 1)
 
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
+//  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
 //    j_t==0, 0<=i, i<=3}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
 //    j_t==0, 0<=i, i<=3}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=3, i_t==0,
 //    j_t==0, 0<=i, i<=3}>
 
 l99997:
@@ -168,19 +168,19 @@ l99998:
 l99995:
       for(j_t = 0; j_t <= 0; j_t += 1) {
          //PIPS generated variable
-         short (*src10)[4][4] = (short (*)[4][4]) 0, (*src00)[4][4] = (short (*)[4][4]) 0, (*result0)[4][4] = (short (*)[4][4]) 0;
-         P4A_accel_malloc((void **) &result0, sizeof(short)*16);
-         P4A_accel_malloc((void **) &src00, sizeof(short)*16);
-         P4A_accel_malloc((void **) &src10, sizeof(short)*16);
-         P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src0[0][0], *src00);
-         P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src1[0][0], *src10);
+         short (*src10)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0, (*src00)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0, (*result0)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0;
+         P4A_accel_malloc((void **) &result0, sizeof(short)*(-10*i_t+4)*4);
+         P4A_accel_malloc((void **) &src00, sizeof(short)*(-10*i_t+4)*4);
+         P4A_accel_malloc((void **) &src10, sizeof(short)*(-10*i_t+4)*4);
+         P4A_copy_to_accel_2d(sizeof(short), 4, 4, -10*i_t+4, 4, 10*i_t, 0, &src0[0][0], *src00);
+         P4A_copy_to_accel_2d(sizeof(short), 4, 4, -10*i_t+4, 4, 10*i_t, 0, &src1[0][0], *src10);
 
 l99996:
          for(i = 10*i_t; i <= 3; i += 1)
 l99997:
             for(j = 0; j <= 3; j += 1)
-               (*result0)[i-0][j-0] = (40*(*src00)[i-0][j-0]+60*(*src10)[i-0][j-0])/100;
-         P4A_copy_from_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &result[0][0], *result0);
+               (*result0)[i-10*i_t][j-0] = (40*(*src00)[i-10*i_t][j-0]+60*(*src10)[i-10*i_t][j-0])/100;
+         P4A_copy_from_accel_2d(sizeof(short), 4, 4, -10*i_t+4, 4, 10*i_t, 0, &result[0][0], *result0);
          P4A_accel_free(result0);
          P4A_accel_free(src00);
          P4A_accel_free(src10);

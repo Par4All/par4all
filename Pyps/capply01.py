@@ -2,7 +2,7 @@ from __future__ import with_statement # this is to work with python2.5
 # convertion of Semantics/all04.tpips into pyps
 # tests usage of capply
 from pyps import workspace,module
-with workspace('capply01.f') as w:
+with workspace('capply01.f',deleteOnClose=True) as w:
 	print " Initial code with preconditions for ALL04 after cleanup"
 	w.activate(module.transformers_inter_full)
 	w.activate("interprocedural_summary_precondition")

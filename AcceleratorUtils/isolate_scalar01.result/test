@@ -88,7 +88,7 @@ void lonesome_cowboy()
       P4A_accel_malloc((void **) &i0, sizeof(int)*1);
       P4A_copy_to_accel(sizeof(int), &i, i0);
 
-isolate:      (*j0) = (*i0);
+isolate:      *j0 = *i0;
       P4A_copy_from_accel(sizeof(int), &j, j0);
       P4A_accel_free(j0);
       P4A_accel_free(i0);

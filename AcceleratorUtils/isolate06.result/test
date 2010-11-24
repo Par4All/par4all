@@ -97,6 +97,7 @@ void lonesome_cowboy()
       int (*a0)[1][i-2+1] = (int (*)[1][i-2+1]) 0;
       if (i-2>0) {
          P4A_accel_malloc((void **) &a0, sizeof(int)*(i-1));
+         P4A_copy_to_accel_2d(sizeof(int), n, n, 1, i-1, i, 1, &a[0][0], *a0);
 
 isolate:
          for(j = 1; j <= n-1; j += 1)

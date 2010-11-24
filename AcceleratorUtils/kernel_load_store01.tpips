@@ -1,0 +1,18 @@
+setenv WS="kernel_load_store01"
+delete $WS
+create $WS $WS.c include/par4all.c
+
+module alphablending
+display PRINTED_FILE[alphablending]
+make LOOPS[alphablending]
+display PRINTED_FILE[alphablending]
+activate MUST_REGIONS
+setproperty OUTLINE_MODULE_NAME "parteeeeeez"
+setproperty OUTLINE_LABEL "l99999"
+apply OUTLINE[alphablending]
+display PRINTED_FILE[alphablending]
+display PRINTED_FILE[parteeeeeez]
+apply KERNEL_LOAD_STORE[parteeeeeez]
+display PRINTED_FILE[alphablending]
+close
+delete $WS
