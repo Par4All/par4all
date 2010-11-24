@@ -375,16 +375,6 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
     if(sizeofexpression_expression_p(soe)) {
       partial_eval_expression_and_regenerate(&(sizeofexpression_expression(soe)), ps, fx);
     }
-    else if(get_bool_property("EVAL_SIZEOF")) {
-        type t = sizeofexpression_type(soe);
-        int ts = type_memory_size(t);
-        update_expression_syntax(
-                e,
-                make_syntax_call(
-                    make_call(int_to_entity(ts),NIL)
-                    )
-                );
-    }
     ef = eformat_undefined;
     break;
   }
@@ -1641,16 +1631,16 @@ expression generate_monome(int coef, expression expr)
  * partial evaluation of expressions in dimensions and of
  * initialization expression.
  */
-void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
+static void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
 {
   type vt = entity_type(v);
   list dl = variable_dimensions(type_variable(vt));
   expression ie = variable_initial_expression(v);
 
   /* See if the dimensions can be simplified */
-  FOREACH(DIMENSION, d, dl) {
-    partial_eval_expression_and_regenerate(&dimension_lower(d), pre_sc, fx);
-    partial_eval_expression_and_regenerate(&dimension_upper(d), pre_sc, fx);
+  FOREACH(RANGE, r, dl) {
+    partial_eval_expression_and_regenerate(&range_lower(r), pre_sc, fx);
+    partial_eval_expression_and_regenerate(&range_upper(r), pre_sc, fx);
   }
 
   /* See if the initialization expression can be simplified */

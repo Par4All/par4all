@@ -50,7 +50,6 @@
 #include "text-util.h"
 #include "transformations.h"
 #include "transformer.h"
-#include "expressions.h"
 #include "semantics.h"
 #include "parser_private.h"
 #include "preprocessor.h"
@@ -105,32 +104,17 @@ static bool region_to_dimensions(region reg, transformer tr, list *dimensions, l
 }
 
 static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, list * offsets, expression *condition) {
-    pips_assert("effects are regions\n",effect_region_p(eff));
-    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
-        /* let's try with the definition region instead */
-        descriptor d = effect_descriptor(eff);
-        if(descriptor_convex_p(d)) {
-            sc_free(descriptor_convex(d));
-            descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
-            if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) )  {
-                /* there is still a possibility: expand the sizeof */
-                pips_user_warning("failed to compute definition region\n"
-                        "This is certainly due to the presence of sizeof or complex size expression in the dimension, trying to take care of this\n");
-                /* create a fake no-write effect ... unsure this is safe */
-                effects effs = make_effects(NIL);
-                partial_eval_declaration(
-                        reference_variable(region_any_reference(eff)),
-                        predicate_system(transformer_relation(tr)),
-                        effs);
-                free_effects(effs);
-                sc_free(descriptor_convex(d));
-                descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
-                if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) )  {
-                    pips_internal_error("failed to compute dma from regions appropriately\n");
-                }
-            }
-        }
+  pips_assert("effects are regions\n",effect_region_p(eff));
+  if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
+    /* let's try with the definition region instead */
+    descriptor d = effect_descriptor(eff);
+    if(descriptor_convex_p(d)) {
+      sc_free(descriptor_convex(d));
+      descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
     }
+    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
+      pips_internal_error("failed to compute dma from regions appropriately\n");
+  }
 }
 
 static expression entity_to_address(entity e) {
