@@ -83,7 +83,7 @@ static void gather_call_sites_in_block(statement s, list * sites) {
     }
 }
 
-static list callers_to_call_sites(list callers_statement)
+list callers_to_call_sites(list callers_statement)
 {
     list call_sites = NIL;
     FOREACH(STATEMENT,caller_statement,callers_statement)
@@ -92,7 +92,8 @@ static list callers_to_call_sites(list callers_statement)
                 call_domain,gen_true,gather_call_sites,0);
     return call_sites;
 }
-static list callers_to_statements(list callers)
+
+list callers_to_statements(list callers)
 {
     list statements = NIL;
     FOREACH(STRING,caller_name,callers)
@@ -222,7 +223,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
     /* we may have to change the call sites, prepare iterators over call sites arguments here */
     FOREACH(CALL,c,call_sites) {
         list args = call_arguments(c);
-        FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+        FOREACH(PARAMETER,p,module_functional_parameters(m)) {
             if(set_belong_p(linearized_param,p)) {
                 expression * arg = (expression*)REFCAR(args);
                 type type_at_call_site = expression_to_type(*arg);
@@ -443,7 +444,7 @@ static void do_linearize_prepatch(entity m,statement s) {
     FOREACH(ENTITY,e,entity_declarations(m))
         if(entity_variable_p(e)&&formal_parameter_p(e))
             do_linearize_prepatch_type(entity_type(e));
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {
@@ -479,7 +480,7 @@ static void do_linearize_array(entity m, statement s) {
 
     /* pips bonus step: the consistency */
     set linearized_param = set_make(set_pointer);
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {
@@ -674,7 +675,7 @@ static void do_array_to_pointer(entity m, statement s) {
     insert_statements_after_declarations(get_current_module_statement(),inits);
 
     /* pips bonus step: the consistency */
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {

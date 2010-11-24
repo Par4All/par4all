@@ -33,7 +33,7 @@ typedef dg_vertex_label vertex_label;
 
 #define FUNC_TO_ATOMIZE_P(call) (\
         type_functional_p(entity_type(call_function(call))) && \
-	    (gen_length(functional_parameters(type_functional(entity_type(call_function(call))))) != 0) && \
+	    (gen_length(module_functional_parameters(call_function(call))) != 0) && \
         (!ENTITY_DEREFERENCING_P(call_function(call))) && \
         (!ENTITY_POINT_TO_P(call_function(call))) && \
         (!ENTITY_FIELD_P(call_function(call)))\
@@ -45,7 +45,7 @@ typedef dg_vertex_label vertex_label;
 
 
 #define ENTITY_FUNCTION_P(f) (type_functional_p(entity_type(f)) && \
-			    (gen_length(functional_parameters(type_functional(entity_type(f)))) != 0))
+			    (gen_length(module_functional_parameters(f)) != 0))
 
 /* simd_loop_const_elim.c */
 

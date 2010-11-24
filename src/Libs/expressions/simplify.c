@@ -465,7 +465,7 @@ static void simplify_complex_declaration(entity e)
         simplify_complex_entity(c);
     FOREACH(ENTITY,c,code_declarations(value_code(entity_initial(e))))
         simplify_complex_entity(c);
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(e))))
+    FOREACH(PARAMETER,p,module_functional_parameters(e))
     {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))

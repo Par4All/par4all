@@ -700,7 +700,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
 
     /* prepare parameters and body*/
-    functional_parameters(type_functional(entity_type(new_fun)))=formal_parameters;
+    module_functional_parameters(new_fun)=formal_parameters;
 	FOREACH(PARAMETER,p,formal_parameters) {
 		code_declarations(value_code(entity_initial(new_fun))) =
 			gen_nconc(

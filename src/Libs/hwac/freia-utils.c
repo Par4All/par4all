@@ -881,7 +881,7 @@ void freia_substitute_by_helper_call
                                           make_dummy_unknown()),
                            larg_params);
       larg_params = gen_nreverse(larg_params);
-      functional_parameters(type_functional(entity_type(helper))) = larg_params;
+      module_functional_parameters(helper) = larg_params;
 
       // substitute by call to helper
       call c = make_call(helper, lparams);

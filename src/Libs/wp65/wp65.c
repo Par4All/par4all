@@ -248,7 +248,7 @@ statement * pemulator;
     compute_module_name = strdup(COMPUTE_ENGINE_NAME);
     compute_module = make_empty_subroutine(compute_module_name,copy_language(module_language(module)));
 
-    functional_parameters(type_functional(entity_type(compute_module)))
+    module_functional_parameters(compute_module)
 	= CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic_int(4), NIL),
 					 make_mode(is_mode_reference, UU),
 					 make_dummy_unknown()),
@@ -257,7 +257,7 @@ statement * pemulator;
     memory_module_name = strdup(BANK_NAME);
     memory_module = make_empty_subroutine(memory_module_name,copy_language(module_language(module)));
 
-    functional_parameters(type_functional(entity_type(memory_module)))
+    module_functional_parameters(memory_module)
 	= CONS(PARAMETER, 
 	       make_parameter(MakeTypeVariable(make_basic_int(
 							  4), NIL),

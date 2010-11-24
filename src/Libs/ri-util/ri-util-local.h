@@ -1610,6 +1610,9 @@
 #define module_language(e)\
     code_language(value_code(entity_initial((e))))
 
+#define module_functional_parameters(func) \
+        functional_parameters(type_functional(entity_type(func)))
+
 #define call_intrinsic_p(C)                       \
   value_intrinsic_p(entity_initial(call_function(C)))
 

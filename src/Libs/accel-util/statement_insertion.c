@@ -362,7 +362,7 @@ static bool do_array_expansion(statement s, hash_table expanded) {
                 if(formal_parameter_p(e)) {
                     formal f = storage_formal(entity_storage(e));
                     intptr_t i=0,offset = formal_offset(f);
-                    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity())))) {
+                    FOREACH(PARAMETER,p,module_functional_parameters(get_current_module_entity())) {
                         if(i++ == offset) {
                             dummy d = parameter_dummy(p);
                             if(dummy_identifier_p(d))
