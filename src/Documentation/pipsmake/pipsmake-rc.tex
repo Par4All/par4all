@@ -9644,6 +9644,32 @@ induction_substitution > MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+\subsection{Strength Reduction}
+
+\begin{PipsPass}{strength_reduction}
+Reduce the complexity of expression computation by generating 
+induction variables when possible.
+\end{PipsPass}
+E.g.
+\begin{lstlisting}
+for(i=0;i<n;i++)
+  a[i]=2;
+\end{lstlisting}
+Would become
+\begin{lstlisting}
+for(i=0;i<n;i++) {
+  *a=2;
+  a++;
+}
+\end{lstlisting}
+\begin{PipsMake}
+strength_reduction > MODULE.code
+                   > PROGRAM.entities
+    < MODULE.code
+    < MODULE.cumulated_effects
+    < MODULE.transformers
+\end{PipsMake}
+
 
 \subsection{Flatten Code}
 
