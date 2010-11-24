@@ -171,9 +171,9 @@ void lowerbound_of_expression(expression e, transformer tr)
  * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
  * we get dims = ( (0,3), (0,4) )
  * and offsets = ( 0 , 1 )
- * if @p exact is set to false, we are allowed to give an upperbound to the dimensions
+ * if @p exact is set to false, we are allowed to give an upper bound to the dimensions
  *
- * if at least one of the resulting dimension can be 0 (accroding to preconditions)
+ * if at least one of the resulting dimension can be 0 (according to preconditions)
  * @p dimension_may_be_null is set to true
  * 
  * @return false if we were enable to gather enough informations

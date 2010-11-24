@@ -348,14 +348,12 @@ statement effects_to_dma(statement stat,
 
   /* filter out relevant effects depending on operation mode */
   FOREACH(EFFECT,e,rw_effects) {
-
-
     if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
 	&& action_read_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
     else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
 	     && action_write_p(effect_action(e)))
-      effects=CONS(EFFECT,e,effects);
+        effects=CONS(EFFECT,e,effects);
 
     /*Little hack to avoid effects weaknesses*/
     if(get_bool_property("KERNEL_LOAD_STORE_FORCE_LOAD")
@@ -366,6 +364,55 @@ statement effects_to_dma(statement stat,
       }
   }
 
+  /* handle the may approximations here: if the approximation is may,
+   * we have to load the data, otherwise the store may store
+   * irrelevant data
+   */
+  if (dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s)) {
+      /* first step is to check for may-write effects */
+      list may_write_effects = NIL;
+      FOREACH(EFFECT,e,rw_effects) {
+          if(approximation_may_p(effect_approximation(e)) &&
+                      action_write_p(effect_action(e)) ) {
+              effect fake = copy_effect(e);
+              action_tag(effect_action(fake))=is_action_read;
+              may_write_effects=CONS(EFFECT,fake,may_write_effects);
+          }
+      }
+      /* then we will merge these effects with those 
+       * that were already gathered
+       * because we are manipulating sets, it is not very efficient
+       * but there should not be that many effects anyway
+       */
+      FOREACH(EFFECT,e_new,may_write_effects) {
+          bool merged = false; // if we failed to merge e_new in effects, we just add it to the list */
+          for(list iter=effects;!ENDP(iter);POP(iter)){
+              effect * e_origin = (effect*)REFCAR(iter); // get a reference to change it in place if needed
+              if(same_entity_p(
+                          effect_any_entity(*e_origin),
+                          effect_any_entity(e_new))) {
+                  merged=true;
+                  /* use convex union to merge regions */
+                  if(effect_region_p(*e_origin)) {
+                      pips_assert("all effects have the same type",effect_region_p(e_new));
+                      region tmp = regions_must_convex_hull(*e_origin,e_new);
+                      // there should be a free there, but it fails
+                      *e_origin=tmp;
+                  }
+                  /* nothing to do for effects, I guess ...
+                   * because effects induce the transfer of the whole region
+                   */
+                  else {
+                  }
+              }
+          }
+          /* no data was copy-in, add this effect */
+          if(!merged) {
+              effects=CONS(EFFECT,copy_effect(e_new),effects);
+          }
+      }
+      gen_full_free_list(may_write_effects);
+  }
 
   if(effects_on_non_local_variable_p(effects)){
       pips_user_warning("Cannot handle non local variables in isolated statement\n");
