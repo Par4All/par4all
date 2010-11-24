@@ -94,14 +94,22 @@ static void isolate_patch_reference(reference r, isolate_param * p)
                 POP(offsets);
             }
         }
-        syntax snew = make_syntax_subscript(
-                make_subscript(
-                    MakeUnaryCall(
-                        entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                        entity_to_expression(p->new)
-                        ),
-                    indices)
-                );
+        /* build up the replacement */
+        syntax syn = 
+          make_syntax_call(
+              make_call(
+                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                CONS(EXPRESSION,entity_to_expression(p->new),NIL)
+                )
+              );
+
+        /* it is illegal to create a subscript without indices
+         * quoting RK, at the airport back from SC 2010 */
+        syntax snew = ENDP(indices) ?
+          syn:
+          make_syntax_subscript(
+              make_subscript(syntax_to_expression(syn),indices)
+              );
         expression parent = (expression)gen_get_ancestor(expression_domain,r);
         expression_syntax(parent)=syntax_undefined;
         update_expression_syntax(parent,snew);

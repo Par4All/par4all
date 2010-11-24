@@ -1792,7 +1792,13 @@ expression make_phi_expression(int n)
 bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
+  intptr_t val;
+  /* SG: fragile attempt to recover more information when possible */
+  if(expression_integer_value(expr,&val)) {
+    update_expression_syntax(expr,make_syntax_call(make_call(int_to_entity(val),NIL)));
+  }
   normalized nexpr = NORMALIZE_EXPRESSION(expr);
+
   bool must_p = FALSE; /* Do we capture the semantics of the
 			  subscript expression exactly for sure? */
   Psysteme sc = *psc;
