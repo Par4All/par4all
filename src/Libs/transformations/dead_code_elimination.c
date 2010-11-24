@@ -24,11 +24,6 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/*
-  Dead loop elimination.
-  Ronan Keryell, 12/1993 -> 1995.
-  one trip loops fixed, FC 08/01/1998
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,1203 +36,758 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "text-util.h"
-#include "database.h"
 #include "misc.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "properties.h"
-
+#include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "transformer.h"
-#include "semantics.h"
-#include "control.h"
-#include "callgraph.h"
-
+#include "database.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "dg.h"
+/* Instantiation of the dependence graph: */
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+/* Just to be able to use ricedg.h: */
+#include "ray_dte.h"
+#include "sommet.h"
+#include "sg.h"
+#include "polyedre.h"
+/* */
+#include "ricedg.h"
 #include "transformations.h"
 
-/* To avoid calling unspaghettify() if unnecessary: */
-static bool some_unstructured_ifs_have_been_changed;
+static graph dependence_graph;
 
 
-/**************************************************************** STATISTICS */
+static hash_table ordering_to_dg_mapping;
 
-static int dead_code_if_removed;
-static int dead_code_if_replaced_by_its_effect;
-static int dead_code_if_false_branch_removed;
-static int dead_code_if_true_branch_removed;
-static int dead_code_loop_removed;
-static int dead_code_loop_executed_once;
-static int dead_code_statement_removed;
-static int dead_code_unstructured_if_removed;
-static int dead_code_unstructured_if_replaced_by_its_effect;
-static int dead_code_unstructured_if_false_branch_removed;
-static int dead_code_unstructured_if_true_branch_removed;
-static void suppress_dead_code_statement(statement);
+static set the_useful_statements;
+
+/* Define the mapping to store the statements generating something
+   useful for a given statement and the functions used to deal
+   with. It is a mapping from a statement to a *set* of statements,
+   those that generate interesting use-def values.*/
+static hash_table statements_use_def_dependence;
+
+
+/* Define a static stack and related functions to remember the current
+   statement for build_statement_to_statement_father_mapping(): */
+DEFINE_LOCAL_STACK(current_statement, statement)
+
+
+void use_def_elimination_error_handler()
+{
+  error_reset_current_statement_stack();
+}
+
+/* Define the mapping to store the statement owning the statements and the
+   functions used to deal with: */
+GENERIC_LOCAL_FUNCTION(statement_father, persistant_statement_to_statement)
+
 
 static void
-initialize_dead_code_statistics()
+add_statement_to_the_statement_to_statement_father_mapping(statement s)
 {
-    dead_code_if_removed = 0;
-    dead_code_if_replaced_by_its_effect = 0;
-    dead_code_if_false_branch_removed = 0;
-    dead_code_if_true_branch_removed = 0;
-    dead_code_loop_removed = 0;
-    dead_code_loop_executed_once = 0;
-    dead_code_statement_removed = 0;
-    dead_code_unstructured_if_removed = 0;
-    dead_code_unstructured_if_replaced_by_its_effect = 0;
-    dead_code_unstructured_if_false_branch_removed = 0;
-    dead_code_unstructured_if_true_branch_removed = 0;
-    initialize_clean_up_sequences_statistics();
+   /* Pop the current_statement_stack: */
+   current_statement_rewrite(s);
+
+   pips_debug(4, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#zx), father %p\n",
+              s, statement_ordering(s), current_statement_head());
+   
+   /* First add the current father for this statement: */
+   /* Since statement_undefined == hash_undefined_value, we cannot put
+      a statement_undefined in the hash_table... */
+   if (current_statement_head() != statement_undefined)
+      store_statement_father(s, current_statement_head());
 }
+
+
+/* Define the mapping to store the control fathers of the statements
+   and the functions used to deal with: */
+GENERIC_LOCAL_FUNCTION(control_father, persistant_statement_to_control)
+
+
+/* Build a mapping from a statement to its eventual control father. */
+static void
+set_control_statement_father(control c)
+{
+   store_control_father(control_statement(c), c);
+}
+
 
 static void
-display_dead_code_statistics()
+build_statement_to_statement_father_mapping(statement s)
 {
-    if (get_bool_property("DEAD_CODE_DISPLAY_STATISTICS")) {
-	int elimination_count = dead_code_statement_removed
-	    + dead_code_loop_removed
-		+ dead_code_loop_executed_once
-		    + dead_code_if_removed
-			+ dead_code_if_replaced_by_its_effect;
-	elimination_count += dead_code_unstructured_if_removed
-	    + dead_code_unstructured_if_replaced_by_its_effect;
-	
-	if (elimination_count > 0) 
-	{
-	  user_log("* %d dead code part%s %s been discarded. *\n",
-		   elimination_count,
-		   elimination_count > 1 ? "s" : "",
-		   elimination_count > 1 ? "have" : "has");
-	  
-	  user_log("Statements removed (directly dead): %d\n",
-		   dead_code_statement_removed);
-	  
-	  user_log("Loops: loops removed: %d, loops executed only once: %d\n",
-		   dead_code_loop_removed, dead_code_loop_executed_once);
-	  
-	  user_log("Structured tests: \"if\" removed: %d, "
-		   "\"if\" replaced by side effects: %d\n"
-		   "\t(\"then\" removed: %d, "
-		   "\"else\" removed: %d)\n",
-		   dead_code_if_removed, dead_code_if_replaced_by_its_effect,
-		   dead_code_if_true_branch_removed,
-		   dead_code_if_false_branch_removed);
-	  
-	  user_log("Unstructured tests: \"if\" removed: %d, "
-		   "\"if\" replaced by side effects: %d\n"
-		   "\t(unstructured \"then\" removed: %d, "
-		   "unstructured \"else\" removed: %d)\n",
-		   dead_code_unstructured_if_removed,
-		   dead_code_unstructured_if_replaced_by_its_effect,
-		   dead_code_unstructured_if_true_branch_removed,
-		   dead_code_unstructured_if_false_branch_removed);
-	  /* Display also the statistics about clean_up_sequences
-	     that is called in suppress_dead_code: */
-	  display_clean_up_sequences_statistics();
-	}
-    }
-}
+   pips_debug(4, "build_statement_to_statement_father_mapping statement %p (%#zx)\n",
+              s, statement_ordering(s));
 
-/********************************************************************* DEBUG */
+   make_current_statement_stack();
+   /* The first statement has no father: */
+   current_statement_push(statement_undefined);
+   
+   gen_multi_recurse(s, statement_domain,
+                     /* Just push the current statement on the
+                        current_statement_stack: */
+                     current_statement_filter,
+                     add_statement_to_the_statement_to_statement_father_mapping,
+                     /* Build a mapping from a statement to its
+                        eventual control father. */
+                     control_domain, gen_true, set_control_statement_father,
+                     NULL);
 
-static void stdebug(int dl, string msg, statement s)
-{
-  ifdebug(dl) {
-    pips_debug(dl, "statement %p: %s\n", s, msg);
-    if (s) {
-      print_statement(s);
-    }
-  }
-  pips_assert("The statement is consistent",
-	      statement_consistent_p(s));
-}
-
-/* Give an information on the liveness of the 2 if's branches: */
-static dead_test
-dead_test_filter(statement st_true, statement st_false)
-{
-  pips_debug(5, "Begin\n");
-
-  stdebug(9, "dead_test_filter: then branch", st_true);
-  stdebug(9, "dead_test_filter: else branch", st_false);
-
-  ifdebug(8)
-    {
-      transformer pretrue = load_statement_precondition(st_true);
-      transformer prefalse = load_statement_precondition(st_false);
-      fprintf(stderr,"NN true and false branches");
-      sc_fprint(stderr,
-		predicate_system(transformer_relation(pretrue)),
-		(char* (*)(Variable)) entity_local_name);
-      sc_fprint(stderr,
-		predicate_system(transformer_relation(prefalse)),
-		(char* (*)(Variable)) entity_local_name);
-    }
-
-  if (!statement_strongly_feasible_p(st_true)) {
-    pips_debug(5, "End: then_is_dead\n");
-    return then_is_dead;
-  }
-
-  if (!statement_strongly_feasible_p(st_false)) {
-    pips_debug(5, "End: else_is_dead\n");
-    return else_is_dead;
-  }
-
-  pips_debug(5, "End: nothing_about_test\n");
-  return nothing_about_test;
-}
-
-/* Replace an instruction by an empty one. If there is a label on the
-   statement, put it on a continue to be coherent with the PIPS RI. */
-static bool discard_statement_and_save_label_and_comment(statement s)
-{
-
-  /* NN -> Bug found : if we have two loops with the same label
-     such as :
-
-     DO 100 I=1,N
-     DO 100 J=1,M
-     ......
-
-     100 CONTINUE
-
-     and the inner loop is a dead statement, there is an error when
-     compiling the generated file Fortran.  Because the label of the
-     last statement in the inner loop might be used by an outer loop
-     and, in doubt, should be preserved.
-
-     SOLUTION : like in full_loop_unroll()*/
-
-  if (statement_loop_p(s)) {
-    loop l = instruction_loop(statement_instruction(s));
-    entity flbl = find_final_statement_label(loop_body(l));
-
-    if(!entity_empty_label_p(flbl)) {
-
-      instruction block =  make_instruction_block(NIL);
-      statement stmt = make_continue_statement(flbl);
-      instruction_block(block)= gen_nconc(instruction_block(block),
-					  CONS(STATEMENT, stmt, NIL ));
-      free_instruction(statement_instruction(s));
-      /* And put a new empty one: */
-      statement_instruction(s) = block;
-      /* Since the RI need to have no label on instruction block: */
-
-      fix_sequence_statement_attributes(s);
-
-    }
-
-  }
-   /* FI: Why do we want to avoid eliminating declarations? If they are
-   * dead code, they should not be used anywhere? This is only useful
-   * if the elimination decision is taken according to effects...
-   */
-  else if(declaration_statement_p(s)) {
-    ; /* do not modify the declaration statement... in case it has no
-	 memory effect */
-  }
-  /* "this avoids removing declarations" (previous comment)
-   *
-   * FI: If a whole block has no effect, its internal declarations are
-   * useless too. But if it is the body of a function returning a
-   * value, the return statement should be preserved for syntactic
-   * correctness. This is not done here. The main test should be
-   * if(statement_block_p(s)).
-   *
-   * Maybe also, we might want to preserve some comments. See
-   * Transformations/no_effect_statement_00
-   */
-  else if(FALSE && !ENDP(statement_declarations(s))) {
-    if(statement_block_p(s)) {
-      FOREACH(STATEMENT,st,statement_block(s))
-	if(!declaration_statement_p(s))
-	  discard_statement_and_save_label_and_comment(st);
-    }
-  }
-  else {
-    /* Discard the old instruction: */
-    free_instruction(statement_instruction(s));
-    /* And put a new empty one: */
-    statement_instruction(s) = make_instruction_block(NIL);
-
-    /* Since the RI need to have no label on instruction block: */
-    fix_sequence_statement_attributes(s);
-  }
-  return false;
+   free_current_statement_stack();
 }
 
 
-/* Use the precondition to know wether a loop is never executed
- *
- * The accuracy (and, hence, duration) of the test depends on
- * the precondition normalization. There is a trade-off between
- * the time spent in dead code elimination and the time spent
- * in precondition computation.
- */
-static bool
-dead_loop_p(loop l)
-{
-  statement s;
-  bool feasible_p;
-
-  s = loop_body(l);
-  /* feasible_p = statement_feasible_p(s); */
-  feasible_p = statement_strongly_feasible_p(s);
-
-  return !feasible_p;
-}
-
-
-/* Replace a loop statement with the statement inside the loop. */
+/* Build the mapping from each statement to the statements generating
+   something useful for it: */
 static void
-remove_loop_statement(statement s, instruction i, loop l)
+build_statement_to_statement_dependence_mapping(graph dependence_graph)
 {
-  range lr = loop_range(l);
-  expression rl = range_lower(lr);
-  expression rincr = range_increment(lr);
-  expression init_val = copy_expression(rl);
-  expression last_val = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-				       copy_expression(init_val),
-				       copy_expression(rincr));
-  expression index;
-  statement as;
+   statements_use_def_dependence = hash_table_make(hash_pointer, 0);
+   
+   MAP(VERTEX,
+       a_vertex,
+       {
+          statement s1 = vertex_to_statement(a_vertex);
 
-  /* Assume here that index is a scalar variable... :-) */
-  pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
+          debug(7, "build_statement_to_statement_dependence_mapping",
+                "\tSuccessor list: %p for statement ordering %p\n", 
+                vertex_successors(a_vertex),
+                dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
+          MAP(SUCCESSOR, a_successor,
+              {
+                 vertex v2 = successor_vertex(a_successor);
+                 statement s2 = vertex_to_statement(v2);
+                 dg_arc_label an_arc_label = successor_arc_label(a_successor);
+                 pips_debug(7, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
+                            s1, statement_ordering(s1),
+                            s2, statement_ordering(s2));
+                 /* Try to find at least one of the use-def chains between
+                    s and a successor: */
+                 MAP(CONFLICT, a_conflict,
+                     {
+                        statement use;
+                        statement def;
+                        
+                        ifdebug(7)
+                           {
+                              fprintf(stderr, "\t\tfrom ");
+                              print_words(stderr, words_effect(conflict_source(a_conflict)));
+                              fprintf(stderr, " to ");
+                              print_words(stderr, words_effect(conflict_sink(a_conflict)));
+                              fprintf(stderr, "\n");
+                           }
+                    
+                        /* Something is useful for the current statement if
+                           it writes something that is used in the current
+                           statement: */
+                        if (action_write_p(effect_action(conflict_source(a_conflict)))
+                                 && action_read_p(effect_action(conflict_sink(a_conflict)))) {
+                           def = s1;
+                           use = s2;
+                           /* Mark that we will visit the node that defined a
+                              source for this statement, if not already
+                              visited: */
+                           set statements_set =
+                              (set) hash_get(statements_use_def_dependence,
+                                             (char *) use);
+                                       
+                           if (statements_set == (set) HASH_UNDEFINED_VALUE) {
+                              /* It is the first dependence we found
+                                 for s1. Create the set: */
+                              statements_set = set_make(set_pointer);
+                              hash_put(statements_use_def_dependence,
+                                       (char *) use,
+                                       (char *) statements_set);
+                           }
 
-  index = make_factor_expression(1, loop_index(l));
-  statement_instruction(s) =
-      make_instruction_block(
-              make_statement_list(as = make_assign_statement(index, init_val),
-				  loop_body(l),
-				  make_assign_statement(copy_expression(index),
-							last_val))
-			     );
-  statement_label(as) = statement_label(s);
-  statement_label(s) = entity_empty_label();
-  fix_sequence_statement_attributes(s);
+                           /* Mark the fact that s2 create something
+                              useful for s1: */
+                           set_add_element(statements_set,
+                                           statements_set,
+                                           (char *) def);
 
-  stdebug(4, "remove_loop_statement", s);
+                           ifdebug(6)
+                              fprintf(stderr, "\tUse: statement %p (%#zx). Def: statement %p (%#zx).\n",
+                                      use, statement_ordering(use),
+                                      def, statement_ordering(def));
+                           /* One use-def is enough for this variable
+                              couple: */
+                           break;
+                        }
+                        
+                     },
+                        dg_arc_label_conflicts(an_arc_label));
+              },
+                 vertex_successors(a_vertex));
 
-  loop_body(l) = make_empty_statement();
-  free_instruction(i);
+       },
+          graph_vertices(dependence_graph));
 }
 
-/* true if do i = x, x or equivalent.
- */
-static bool loop_executed_once_p(statement s, loop l)
+
+static void
+free_statement_to_statement_dependence_mapping()
 {
-  entity ind;
-  range rg;
-  expression m1, m2, m3;
-  normalized n_m1, n_m2, n_m3;
-  transformer pre;
-  Psysteme precondition_ps;
-  Pvecteur pv3;
-  Pcontrainte pc3;
-  bool m3_negatif = false, m3_positif = false, retour;
-  /* Automatic variables read in a CATCH block need to be declared volatile as
-   * specified by the documentation*/
-  Psysteme volatile ps;
+   HASH_MAP(key, value,
+            {
+               set_free((set) value);
+            },
+            statements_use_def_dependence);
+}
 
-  retour = false;
-  ind = loop_index(l);
-  rg = loop_range(l);
-  m1 = range_lower(rg);
-  m2 = range_upper(rg);
+/* unused */
+#if 0 
+static void
+mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
+                                                        vertex v)
+{
+   if (set_belong_p(s, (char *) v))
+      /* We have already seen this node: */
+      return;
 
-  /* m1 == m2
-   */
-  /* Not necessarily true with side effects: DO i = inc(n), inc(n) */
-  if (expression_equal_p(m1, m2))
-    return true;
+   /* Mark the current vertex as useful: */
+   set_add_element(s, s, (char *) v);
 
-  pre = load_statement_precondition(s);
-  precondition_ps = predicate_system(transformer_relation(pre));
+   pips_debug(6, "mark_this_node_and_its_predecessors_in_the_dg_as_useful: vertex %p marked, statement ordering (%#x).\n",
+              v,      
+              dg_vertex_label_statement(vertex_vertex_label(v)));
   
-  m3 = range_increment(rg);
-  n_m1 = NORMALIZE_EXPRESSION(m1);
-  n_m2 = NORMALIZE_EXPRESSION(m2);
-  n_m3 = NORMALIZE_EXPRESSION(m3);
-
-  if (normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
-  {
-    /* m1 - m2 == 0 redundant ?
-     */
-    Pcontrainte eq = contrainte_make(vect_substract(normalized_linear(n_m1), 
-						    normalized_linear(n_m2)));
-
-    if (eq_redund_with_sc_p(precondition_ps, eq))
-      retour = true;
-    
-    contrainte_free(eq);
-
-    if (retour) return true;
-  }
-  if (normalized_linear_p(n_m3)) { 
-    /* Teste le signe de l'incrément en fonction des préconditions : */
-    pv3 = vect_dup(normalized_linear(n_m3));
-    pc3 = contrainte_make(pv3);
-    ps = sc_dup(precondition_ps);
-    sc_add_ineg(ps, pc3);
-    CATCH(overflow_error) {
-      sc_rm(ps);
-      return false;
-    }
-    TRY {
-      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true); 
-      (void) vect_chg_sgn(pv3);
-      m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
-      UNCATCH(overflow_error);
-    }
-    pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
-	       m3_positif, m3_negatif);
-    
-    /* Vire aussi pv3 & pc3 : */
-    sc_rm(ps);
-  }
-  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) && 
-      normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
-  {
-    /* Si l'incrément a un signe « connu » et différent de 0 et que
-       les bornes sont connues : */
-    Pvecteur pv1, pv2, pv3, pvx, pv;
-    Pcontrainte ca, cb;
-
-    pv1 = normalized_linear(n_m1);
-    pv2 = normalized_linear(n_m2);
-    pv3 = normalized_linear(n_m3);
-    
-    /* pv = m1 - m2, i.e. m1 - m2 <= 0 */
-    pv = vect_substract(pv1, pv2);
-
-    /* pvx = m1 - m2 + m3, i.e. m1 + m3 -m2 <=0 */
-    pvx = vect_add(pv, pv3);
-
-    if (m3_positif) {
-      /* L'incrément est positif. */
-       (void) vect_chg_sgn(pvx);
-      /* m1 - m2 <= 0 && m2 - m1 - m3 <= -1 */
-    }
-
-    if (m3_negatif) {
-      (void) vect_chg_sgn(pv);
-      /* m2 - m1 >= 0 && -m2 + m1 + m3 <= -1 */
-    }
-
-    vect_add_elem(&pvx, TCST, VALUE_ONE);
-
-    ca = contrainte_make(pvx);
-    cb = contrainte_make(pv);
-
-    /* ??? on overflows, should assume false...
-     */
-    retour = ineq_redund_with_sc_p(precondition_ps, ca) &&
-             ineq_redund_with_sc_p(precondition_ps, cb);
-
-    /* Vire du même coup pv et pvx : */
-    contrainte_free(ca), contrainte_free(cb);
-  }
-
-  return retour;
+   MAP(SUCCESSOR, a_successor,
+       {
+          dg_arc_label label = successor_arc_label(a_successor);
+          /* Try to find at least one use-def chain: */
+          MAP(CONFLICT, a_conflict,
+              {
+                 /* Something is useful for the current statement if
+                    it writes something that is used in the current
+                    statement: */
+		  if (effect_read_p(conflict_source(a_conflict))
+                     && effect_write_p(conflict_sink(a_conflict))) {
+                    /* Mark the node that generate something useful
+                       for the current statement as useful: */
+                    mark_this_node_and_its_predecessors_in_the_dg_as_useful(s,
+                                                                            successor_vertex(a_successor));
+                    /* Only needed to mark once: */
+                    break;
+                 }
+              },
+                 dg_arc_label_conflicts(label));
+       },
+          vertex_successors(v));
 }
+#endif
 
-/* Remplace une boucle vide par la seule initialisation de l'indice : */
-static bool remove_dead_loop(statement s, instruction i, loop l) 
-{
-  expression index, rl;
-  range lr;
-  statement as;
-  expression init_val;
-  instruction block =  make_instruction_block(NIL);
-  entity flbl;
 
-  /* On va remplacer la boucle par l'initialisation de l'indice a`
-     sa valeur initiale seulement. */
-
-  init_val = copy_expression(rl = range_lower(lr = loop_range(l)));
-  /*pips_assert("remove_dead_loop", gen_defined_p(init_val));*/
-  /*expression init_val = copy_expression(range_lower(loop_range(l)));*/
-
-  /* Assume here that index is a scalar variable... :-) */
-  pips_assert("remove_dead_loop", entity_scalar_p(loop_index(l)));
-
-  index = make_factor_expression(1, loop_index(l));
-
-  /* NN -> Bug found : if we have two loops with the same label
-     such as :
-
-     DO 100 I=1,N
-        DO 100 J=1,M
-     ......
-
-     100 CONTINUE
-
-     and the inner loop is a dead statement, there is an error when
-     compiling the generated file Fortran.  Because the label of the
-     last statement in the inner loop might be used by an outer loop
-     and, in doubt, should be preserved.
-
-     SOLUTION : like in full_loop_unroll()*/
-
-  /*  *****OLD CODE***************
-      statement_instruction(s) =
-      make_instruction_block(CONS(STATEMENT,
-      as = make_assign_statement(index , init_val),
-      NIL));
-      statement_label(as) = statement_label(s);
-      statement_label(s) = entity_empty_label();
-
-      fix_sequence_statement_attributes(s);*/
-
-  /*  *****NEW CODE***************/
-
-
-  instruction_block(block)=
-    gen_nconc(instruction_block(block),
-	      CONS(STATEMENT,
-		   as = make_assign_statement(index , init_val),
-		   NIL ));
-
-  flbl = find_final_statement_label(loop_body(l));
-
-  if(!entity_empty_label_p(flbl)) {
-    statement stmt = make_continue_statement(flbl);
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));
-  }
-
-  statement_instruction(s) = block;
-  /* Since the RI need to have no label on instruction block: */
-  statement_label(as) = statement_label(s);
-  statement_label(s) = entity_empty_label();
-  fix_sequence_statement_attributes(s);
-
-  stdebug(9, "remove_dead_loop: New value of statement", s);
-
-  free_instruction(i);
-  return false;
-}
-/* Return true if a statement has at least one write effect in the
-   effects list. */
-static bool statement_write_effect_p(statement s)
-{
-  bool write_effect_found = false;
-  list effects_list = load_proper_rw_effects_list(s);
-
-  FOREACH(effect, an_effect, effects_list)
-  {
-    if (action_write_p(effect_action(an_effect))) {
-      write_effect_found = true;
-      break;
-    }
-  };
-
-  return write_effect_found;
-}
-
-
-/* Remove an IF(x) statement (replace s with an empty statement) if x
-   has no write proper effect. If x has a write effect, replace s with a
-   statement as bool_var = x: (he', a french joke !)
-   this_test_is_unstructured_p is a hint for the statistics.
-   true means that you assert that the test is unstructured.
- */
-static void remove_if_statement_according_to_write_effects
-(statement s, bool this_test_is_unstructured_p)
-{
-  instruction i = statement_instruction(s);
-
-  pips_assert("statement is consistent at entry", s);
-
-  if (statement_write_effect_p(s)) {
-    /* There is a write effect, so we cannot discard the IF
-       expression. Keep it in a temporarily variable: */
-    entity temp_var =
-      make_new_scalar_variable(get_current_module_entity(),
-			       MakeBasic(is_basic_logical));
-    /* Create the bool_var = x: */
-    statement_instruction(s) =
-      make_assign_instruction(entity_to_expression(temp_var),
-			      test_condition(instruction_test(i)));
-    test_condition(instruction_test(i)) = expression_undefined;
-
-    if (this_test_is_unstructured_p)
-      dead_code_unstructured_if_replaced_by_its_effect++;
-    else
-      dead_code_if_replaced_by_its_effect++;
-
-    pips_assert("statement is consistent after partial dead code removeal", s);
-  }
-  else {
-    /* There is no write effect, the statement can be discarded: */
-    statement_instruction(s) = make_instruction_block(NIL);
-    fix_sequence_statement_attributes(s);
-
-    if (this_test_is_unstructured_p)
-      dead_code_unstructured_if_removed++;
-    else
-      dead_code_if_removed++;
-
-  pips_debug(8, "let's use some heap\n");
-    pips_assert("statement is consistent after dead code removal", s);
-  }
-
-  pips_debug(8, "let's use some heap\n");
-
-  pips_assert("statement is consistent at exit", s);
-
-  /* Discard the IF: */
-  /* FI: I do not understand why, but this free breaks the
-     unstructured containing s (case "no write effect". */
-  /* For unknown reasons, the preconditions for the true and false
-     branches are recomputed... because they are not reachable from
-     the controls... however, statements are reachable from controls
-     and statements are linked to preconditions... */
-  // free_instruction(i);
-
-  pips_debug(8, "let's use some heap\n");
-  pips_assert("statement is consistent at exit", s);
-}
-
-
-static bool dead_deal_with_test(statement s,
-				test t)
-{
-  statement st_true = test_true(t);
-  statement st_false = test_false(t);
-
-  switch (dead_test_filter(st_true, st_false)) {
-
-  case then_is_dead :
-    /* Delete the test and the useless true : */
-    test_false(t) = statement_undefined;
-    test_true(t) = statement_undefined;
-    remove_if_statement_according_to_write_effects(s,
-						   false /* structured if */);
-    /* Concatenate an eventual IF expression (if write effects) with
-       the false branch: */
-    statement_instruction(s) =
-      make_instruction_block(
-			     make_statement_list(instruction_to_statement(statement_instruction(s)),st_false)
-			     );
-
-    /* Go on the recursion on the remaining branch : */
-    suppress_dead_code_statement(st_false);
-    dead_code_if_true_branch_removed++;
-    return false;
-    break;
-
-  case else_is_dead :
-    /* Delete the test and the useless false : */
-    test_false(t) = statement_undefined;
-    test_true(t) = statement_undefined;
-    remove_if_statement_according_to_write_effects(s,
-						   false /* structured if */);
-    /* Concatenate an eventual IF expression (if write effects) with
-       the false branch: */
-    statement_instruction(s) =
-       make_instruction_block(
-			      make_statement_list(
-						  instruction_to_statement(statement_instruction(s)),st_true));
-    /* Go on the recursion on the remaining branch : */
-    suppress_dead_code_statement(st_true);
-    dead_code_if_false_branch_removed++;
-    return false;
-    break;
-
-  case nothing_about_test :
-    break;
-
-  default :
-    pips_assert("dead_deal_with_test does not understand dead_test_filter()",
-		true);
-  }
-  return true;
-}
-
-
-/* Give an information on the liveness of the 2 unstructured if's
-   branches. Accept the statement that contains the if: */
-static dead_test dead_unstructured_test_filter(statement st)
-{
-    /* In an unstructured test, we need to remove the dead control
-       link according to preconditions. Unfortunately, preconditions
-       are attached to statements and not to control vertice. Hence we
-       need to recompute a precondition on these vertice: */
-    dead_test test_status;
-    transformer pre_true, pre_false;
-    test t = instruction_test(statement_instruction(st));
-    transformer pre = load_statement_precondition(st);
-    expression cond = test_condition(t);
-
-    pips_assert("Preconditions are defined for all statements",
-		!transformer_undefined_p(pre));
-
-    pips_assert("The statement is consistent",
-		statement_consistent_p(st));
-
-    ifdebug(6)
-	sc_fprint(stderr,
-		  predicate_system(transformer_relation(pre)),
-		  (char* (*)(Variable)) entity_local_name);
-
-    /* FI: this is the piece of code which may explain why the
-       instruction cannot be freed in
-       remove_if_statement_according_to_write_effects(). */
-    /* Compute the precondition for each branch: */
-    pre_true =
-	precondition_add_condition_information(transformer_dup(pre),
-					       cond,
-					       transformer_undefined,
-					       true);
-    ifdebug(6)
-	sc_fprint(stderr,
-		  predicate_system(transformer_relation(pre_true)),
-		  (char* (*)(Variable)) entity_local_name);
-
-    pre_false =
-	precondition_add_condition_information(transformer_dup(pre),
-					       cond,
-					       transformer_undefined,
-					       false);
-    ifdebug(6)
-	sc_fprint(stderr,
-		  predicate_system(transformer_relation(pre_false)),
-		  (char* (*)(Variable)) entity_local_name);
-
-    if (transformer_empty_p(pre_true)) {
-	pips_debug(5, "then_is_dead\n");
-	test_status = then_is_dead;
-    }
-    else if (transformer_empty_p(pre_false)) {
-	pips_debug(5, "else_is_dead\n");
-	test_status = else_is_dead;
-    }
-    else {
-	pips_debug(5, "nothing_about_test\n");
-	test_status = nothing_about_test;
-    }
-
-    free_transformer(pre_true);
-    free_transformer(pre_false);
-
-    pips_assert("The statement is consistent",
-		statement_consistent_p(st));
-
-    return test_status;
-}
-
-static void dead_recurse_unstructured(unstructured u)
-{
-  statement st = statement_undefined;
-  //list blocs = NIL;
-  list nodes = NIL;
-
-  control_map_get_blocs(unstructured_control(u),&nodes);
-
-  pips_assert("unstructured is consistent at the beginning",
-	      unstructured_consistent_p(u));
-
-  nodes = gen_nreverse(nodes);
-
-  /* CONTROL_MAP removed for debugging */
-  FOREACH(CONTROL, c, nodes) {
-    int number_of_successors = gen_length(control_successors(c));
-
-    pips_debug(3, "(gen_length(control_successors(c)) = %d)\n",
-	       number_of_successors);
-    st = control_statement(c);
-
-    if (number_of_successors == 0 || number_of_successors == 1) {
-      /* Ok, the statement is not an unstructured if, that
-	 means that we can apply a standard elimination if
-	 necessary. The statement is consistent on return. */
-      suppress_dead_code_statement(st);
-    }
-    else if (number_of_successors == 2
-	     && instruction_test_p(statement_instruction(st))) {
-      /* In an unstructured test, we need to remove the
-	 dead control link according to
-	 preconditions. Unfortunately, preconditions
-	 are attached to statements and not to control
-	 vertice. Hence we need to recompute a
-	 precondition on these vertice: */
-      control true_control = CONTROL(CAR(control_successors(c)));
-      control false_control = CONTROL(CAR(CDR(control_successors(c))));
-
-      switch (dead_unstructured_test_filter(st)) {
-      case then_is_dead :
-
-	pips_assert("unstructured is consistent before then is dead",
-	      unstructured_consistent_p(u));
-	pips_debug(3, "\"Then\" is dead...\n");
-	/* Remove the link to the THEN control
-	   node. Rely on unspaghettify() to remove
-	   down this path later: */
-	gen_remove_once(&control_successors(c), true_control);
-	gen_remove_once(&control_predecessors(true_control), c);
-
-	pips_assert("unstructured is consistent after then_is_dead",
-	      unstructured_consistent_p(u));
-	/* Replace the IF with nothing or its expression: */
-	remove_if_statement_according_to_write_effects
-	  (control_statement(c), true /* unstructured if */);
-
-	pips_assert("unstructured is consistent after then_is_dead",
-	      unstructured_consistent_p(u));
-
-	some_unstructured_ifs_have_been_changed = true;
-	dead_code_unstructured_if_true_branch_removed++;
-
-	pips_assert("unstructured is consistent after then_is_dead",
-	      unstructured_consistent_p(u));
-	break;
-
-      case else_is_dead :
-
-  pips_assert("unstructured is consistent before else_is_dead",
-	      unstructured_consistent_p(u));
-	pips_debug(3, "\"Else\" is dead...\n");
-	/* Remove the link to the ELSE control
-	   node. Rely on unspaghettify() to remove
-	   down this path later: */
-	gen_remove_once(&control_successors(c), false_control);
-	gen_remove_once(&control_predecessors(false_control), c);
-	/* Replace the IF with nothing or its expression: */
-	remove_if_statement_according_to_write_effects
-	  (control_statement(c), true /* unstructured if */);
-
-	some_unstructured_ifs_have_been_changed = true;
-	dead_code_unstructured_if_false_branch_removed++;
-
-  pips_assert("unstructured is consistent after else_is_dead",
-	      unstructured_consistent_p(u));
-	break;
-
-      case nothing_about_test :
-	pips_debug(3, "Nothing about this test...");
-
-	/* same successor in both branches... remove one!
-	 * maybe unspaghettify should also be okay? it seems not.
-	 */
-	if (true_control==false_control)
-	  {
-	    gen_remove_once(&control_successors(c), false_control);
-	    gen_remove_once(&control_predecessors(false_control), c);
-	    /* Replace the IF with nothing or its expression: */
-	    remove_if_statement_according_to_write_effects
-	      (control_statement(c), true /* unstructured if */);
-
-	    some_unstructured_ifs_have_been_changed = true;
-	    dead_code_unstructured_if_false_branch_removed++;
-	  }
-	break;
-
-      default :
-	pips_internal_error("does not understand dead_test_filter()");
-      }
-    }
-    else
-      pips_internal_error("Unknown unstructured type");
-
-    /* Let's hope the unstructured is still consistent */
-    pips_assert("unstructured is consistent after some iterations",
-		unstructured_consistent_p(u));
-  }
-  gen_free_list(nodes);
-
-  pips_assert("unstructured is consistent at the end",
-	      unstructured_consistent_p(u));
-}
-
-
-
-
-/* Essaye de faire le menage des blocs vides recursivement.
-   En particulier, si les 2 branches d'un test sont vides on peut supprimer
-   le test, si le corps d'une boucle est vide on peut supprimer la boucle.
-*/
 static void
-dead_statement_rewrite(statement s)
+iterate_through_the_predecessor_graph(statement s,
+                                      set elements_to_visit)
 {
-   instruction i = statement_instruction(s);
-   tag t = instruction_tag(i);
+  pips_debug(6, "iterate_through_the_predecessor_graph, statement %p (%#zx).\n",
+              s, statement_ordering(s));
 
-   pips_debug(2, "Begin for statement %td (%td, %td)\n",
-	      statement_number(s),
-	      ORDERING_NUMBER(statement_ordering(s)),
-	      ORDERING_STATEMENT(statement_ordering(s)));
-
-   stdebug(2, "dead_statement_rewrite: The current statement st at the beginning",
-	   s);
-
-   switch(t) {
-   case is_instruction_sequence:
-       /* It is now dealt with clean_up_sequences_internal() at the
-          end of the function: */
-       break;
-
-   case is_instruction_loop:
-   case is_instruction_forloop:
-   case is_instruction_whileloop:
-       break;
-
-   case is_instruction_test:
+   /* Mark the current statement as useful: */
+   set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  
+   /* First mark the dependence graph predecessors: */
    {
-       statement st_true, st_false;
-       test te;
-
-       pips_debug(2, "is_instruction_test\n\n");
-       stdebug(9, "dead_statement_rewrite: test", s);
-
-       te = instruction_test(i);
-       st_true = test_true(te);
-       st_false = test_false(te);
-       if (empty_statement_or_continue_p(st_true)
-	   && empty_statement_or_continue_p(st_false)) {
-	 /* Even if there is a label, it is useless since it is not
-	    an unstructured. */
-	 pips_debug(2, "test deletion\n");
-	 stdebug(9, "dead_statement_rewrite: ", s);
-
-	 remove_if_statement_according_to_write_effects
-	   (s, false /* structured if */);
-       }
-       break;
+      set statements_set = (set) hash_get(statements_use_def_dependence,
+                                          (char *) s);
+      if (statements_set != (set) HASH_UNDEFINED_VALUE) {
+         /* There is at least one statement that generates something
+            useful for s: */
+         SET_MAP(element,
+                 {
+                    statement s2 = (statement) element;
+                    
+                    /* Mark that we will visit the node that defined a
+                       source for this statement, if not already
+                       visited: */
+                    set_add_element(elements_to_visit,
+                                    elements_to_visit,
+                                    (char *) s2);
+                    pips_debug(6, "\tstatement %p (%#zx) useful by use-def.\n",
+                                  s2, statement_ordering(s2));
+                 },
+                    statements_set);
+      }
+   }
+   
+   /* Mark the father too for control dependences: */
+   if (bound_statement_father_p(s)) {
+      statement father = load_statement_father(s);
+      set_add_element(elements_to_visit, elements_to_visit, (char *) father);
+      pips_debug(6, "\tstatement %p (%#zx) useful as the statement owner.\n",
+                 father, statement_ordering(father));
    }
 
-   case is_instruction_unstructured:
-     /* Rely on the unspaghettify() at end: */
-     break;
-
-   case is_instruction_call:
-     break;
-
-   case is_instruction_expression:
-     break;
-
-   default:
-       pips_internal_error("Unexpected instruction tag %d", t);
-       break;
-   }
-
-   /* If we have now a sequence, clean it up: */
-   clean_up_sequences_internal(s);
-
-   pips_debug(2, "End for statement %td (%td, %td)\n",
-	      statement_number(s),
-	      ORDERING_NUMBER(statement_ordering(s)),
-	      ORDERING_STATEMENT(statement_ordering(s)));
-   stdebug(2, "dead_statement_rewrite: The current statement st at the end", s);
-}
-
-
-static bool dead_statement_filter(statement s)
-{
-  instruction i;
-  bool retour;
-  effects crwe = load_cumulated_rw_effects(s);
-  list crwl = effects_effects(crwe);
-  transformer pre = load_statement_precondition(s);
-
-  pips_assert("statement s is consistent", statement_consistent_p(s));
-
-  i = statement_instruction(s);
-  pips_debug(2, "Begin for statement %td (%td, %td)\n",
-	     statement_number(s),
-	     ORDERING_NUMBER(statement_ordering(s)),
-	     ORDERING_STATEMENT(statement_ordering(s)));
-  ifdebug(8)
-    {
-      sc_fprint(stderr,
-		predicate_system(transformer_relation(pre)),
-		(char* (*)(Variable)) entity_local_name);
-    }
-
-  stdebug(9, "dead_statement_filter: The current statement", s);
-
-  pips_assert("statement s is consistent", statement_consistent_p(s));
-
-  /* Pour permettre un affichage du code de retour simple : */
-  for(;;) {
-    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
-      /* Well, it is likely some unreachable code that should be
-	 removed later by an unspaghettify: */
-      pips_debug(2, "This statement is likely unreachable. Skip...\n");
-      retour = false;
-      break;
-    }
-
-    /* If a statement has no write effects on the store and if it
-       cannot hides a control effect in a user-defined function*/
-    if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
-	&& !format_statement_p(s) && ! declaration_statement_p(s) ) {
-      pips_debug(2, "Ignored statement %td (%td, %td)\n",
-		 statement_number(s),
-		 ORDERING_NUMBER(statement_ordering(s)),
-		 ORDERING_STATEMENT(statement_ordering(s)));
-      retour = discard_statement_and_save_label_and_comment(s);
-      dead_code_statement_removed++;
-      break;
-    }
-
-    /* Vire deja (presque) tout statement dont la precondition est
-       fausse : */
-    /* FI: This (very CPU expensive) test must be useless
-     * because the control sequence
-     * can only be broken by a test or by a loop or by a test in
-     * an unstructured. These cases already are tested elsewhere.
-     *
-     * Furthermore, feasible statements take longer to test than
-     * dead statement. And they are the majority in a normal piece
-     * of code.
-     *
-     * But STOP statements can also introduce discontinuities...
-     * Well, to please Ronan let's put a fast accurate enough
-     * test for that last case.
-     *
-     * This can also happen when a function is never called, but
-     * analyzed interprocedurally.
-     */
-    if (!statement_weakly_feasible_p(s)) {
-      pips_debug(2, "Dead statement %td (%td, %td)\n",
-		 statement_number(s),
-		 ORDERING_NUMBER(statement_ordering(s)),
-		 ORDERING_STATEMENT(statement_ordering(s)));
-      retour = discard_statement_and_save_label_and_comment(s);
-      dead_code_statement_removed++;
-      break;
-    }
-
-    if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
-      pips_debug(2, "Dead sequence statement %td (%td, %td)\n",
-		 statement_number(s),
-		 ORDERING_NUMBER(statement_ordering(s)),
-		 ORDERING_STATEMENT(statement_ordering(s)));
-      retour = discard_statement_and_save_label_and_comment(s);
-      dead_code_statement_removed++;
-      break;
-    }
-
-    if (instruction_loop_p(i)) {
-      loop l = instruction_loop(i);
-      if (dead_loop_p(l)) {
-	pips_debug(2, "Dead loop %s at statement %td (%td, %td)\n",
-		   label_local_name(loop_label(l)),
-		   statement_number(s),
-		   ORDERING_NUMBER(statement_ordering(s)),
-		   ORDERING_STATEMENT(statement_ordering(s)));
-
-	retour = remove_dead_loop(s, i, l);
-	dead_code_loop_removed++;
-	break;
+   {
+      /* And if the statement is in an unstructured, mark all the
+         controlling unstructured nodes predecessors as useful, that
+         is all the unstructured IF back-reachable. */
+      if (bound_control_father_p(s)) {
+         list blocks = NIL;       
+         control control_father = load_control_father(s);
+         BACKWARD_CONTROL_MAP(pred, {
+            if (gen_length(control_successors(pred)) == 2) {
+               /* pred is an unstructured IF that control control_father: */
+               set_add_element(elements_to_visit,
+                               elements_to_visit,
+                               (char *) control_statement(pred));
+               pips_debug(6, "\tstatement unstructed IF %p (%#zx) useful by control dependence.\n",
+                          control_statement(pred), statement_ordering(control_statement(pred)));
+            }           
+         }, control_father, blocks);
+         gen_free_list(blocks);
       }
-      else if (loop_executed_once_p(s, l)) {
-	/* This piece of code is not ready yet */
-	statement body = loop_body(l);
-	ifdebug(2) {
-	  pips_debug(2,
-		     "loop %s at %td (%td, %td) executed once and only once\n",
-		     label_local_name(loop_label(l)),
-		     statement_number(s),
-		     ORDERING_NUMBER(statement_ordering(s)),
-		     ORDERING_STATEMENT(statement_ordering(s)));
-
-	  stdebug(9, "dead_statement_filter", s);
-	}
-
-	remove_loop_statement(s, i, l);
-	dead_code_loop_executed_once++;
-	stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
-
-	suppress_dead_code_statement(body);
-	retour = false;
-	break;
-      }
-      else {
-	/* Standard loop, proceed downwards */
-	retour = true;
-	break;
-      }
-    }
-
-    /* FI: nothing for while loops, repeat loops and for loops;
-     should always entered while loops be converted into repeat
-     loops? Should while loop body postcondition be used to transform
-     a while loop into a test? */
-
-    if (instruction_test_p(i)) {
-      test t = instruction_test(i);
-      expression c = test_condition(t);
-      (void) simplify_boolean_expression_with_precondition(c, pre);
-      retour = dead_deal_with_test(s, t);
-      break;
-    }
-
-    if (instruction_unstructured_p(i)) {
-      /* Special case for unstructured: */
-      pips_assert("the instruction is consistent", instruction_consistent_p(i));
-      dead_recurse_unstructured(instruction_unstructured(i));
-      pips_assert("the instruction is consistent", instruction_consistent_p(i));
-
-      /* Stop going down since it has just been done in
-       * dead_recurse_unstructured():
-       */
-      retour = false;
-      break;
-    }
-
-    /* Well, else we are going on the inspection... */
-    retour = true;
-    break;
-  }
-
-  pips_assert("statement s is consistent before rewrite",
-	      statement_consistent_p(s));
-
-  if (retour == false) {
-    /* Try to rewrite the code underneath. Useful for tests with
-     * two empty branches
-     */
-    dead_statement_rewrite(s);
-  }
-
-  pips_debug(2, "End for statement %td (%td, %td): %s going down\n",
-	     statement_number(s),
-	     ORDERING_NUMBER(statement_ordering(s)),
-	     ORDERING_STATEMENT(statement_ordering(s)),
-	     retour? "" : "not");
-
-  pips_assert("statement s is consistent at the end",
-	      statement_consistent_p(s));
-
-  return retour;
+   }            
 }
 
-/* Suppress the dead code of the given module: */
-static void suppress_dead_code_statement(statement mod_stmt)
+
+static void
+propagate_the_usefulness_through_the_predecessor_graph()
 {
-  pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
+  pips_debug(5, "Entering propagate_the_usefulness_through_the_predecessor_graph\n");
+   
+   gen_set_closure((void (*)(void *, set)) iterate_through_the_predecessor_graph,
+                   the_useful_statements);
 
-  dead_statement_filter(mod_stmt);
-  gen_recurse(mod_stmt, statement_domain,
-	      dead_statement_filter, dead_statement_rewrite);
-  dead_statement_rewrite(mod_stmt);
-
-  pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
+   pips_debug(5, "Exiting propagate_the_usefulness_through_the_predecessor_graph\n");
 }
-
-
-/*
- * Dead code elimination
- * mod_name : MODule NAME, nom du programme Fortran
- * mod_stmt : MODule STateMenT
- */
-bool suppress_dead_code(string mod_name)
-{
-  statement mod_stmt;
-
-  /* Get the true ressource, not a copy. */
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
-  set_current_module_statement(mod_stmt);
-
-  set_current_module_entity(module_name_to_entity(mod_name));
-
-  /* FI: RK used a false for db_get, i.e. an impur db_get...
-   * I do not know why
-   */
-  set_proper_rw_effects((statement_effects)
-      db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
-
-  set_precondition_map((statement_mapping)
-      db_get_memory_resource(DBR_PRECONDITIONS, mod_name, true));
-
-  set_cumulated_rw_effects((statement_effects)
-      db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
-
-  debug_on("DEAD_CODE_DEBUG_LEVEL");
-
-  ifdebug(1) {
-    pips_debug(1, "Begin for %s\n", mod_name);
-      pips_assert("Statements inconsistants...",
-		  statement_consistent_p(mod_stmt));
-  }
-
-  module_to_value_mappings(get_current_module_entity());
-  initialize_dead_code_statistics();
-  some_unstructured_ifs_have_been_changed = false;
-  suppress_dead_code_statement(mod_stmt);
-  insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
-  display_dead_code_statistics();
-  free_value_mappings();
-  reset_cumulated_rw_effects();
-
-  debug_off();
-
-  /* Reorder the module, because new statements have been generated. */
-  module_reorder(mod_stmt);
-
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
-			 (char *) compute_callees(mod_stmt));
-
-  reset_current_module_statement();
-  reset_current_module_entity();
-  reset_precondition_map();
-  reset_proper_rw_effects();
-  ifdebug(1) {
-      free_value_mappings();
-  }
-
-  pips_debug(1, "End for %s\n", mod_name);
-
-  if (some_unstructured_ifs_have_been_changed)
-     /* Now call the unspaghettify() function to remove some unreachable
-        code after unstructured "if" elimination: */
-     unspaghettify(mod_name);
-
-  remove_useless_label(mod_name);
-
-  ifdebug(1)
-    pips_assert("statement is still consistent...",
-		statement_consistent_p(mod_stmt));
-
-  return true;
-}
-
-
 
 
 /**
- * recursievly remove all labels from a module
- * only labels in unstructured are kept
- * @param module_name module considered
- * 
- * @return true (never fails)
+ * Check if a variable is local to a function
+ * FIXME : should be declared somewhere else
  */
-bool
-remove_useless_label(char* module_name)
+static bool entity_local_variable_p(entity var, entity func) {
+  bool local = false;
+  if(storage_ram_p(entity_storage(var))) {
+    ram r = storage_ram(entity_storage(var));
+    if(same_entity_p(func,ram_function(r))) {
+      local=true;
+    }
+  } else if( storage_formal_p(entity_storage(var))) {
+    /* Formal parameter are local to module... except for Fortran !! */
+    entity module = get_current_module_entity();
+    /* it might be better to check the parameter passing mode itself,
+       via the module type */
+    bool fortran_p = fortran_module_p(module);
+
+    formal r = storage_formal(entity_storage(var));
+    if(!fortran_p && same_entity_p(func,formal_function(r))) {
+      local=true;
+    }
+  }
+  return local;
+}
+
+static void
+use_def_deal_if_useful(statement s)
 {
-   /* Get the module ressource */
-   entity module = module_name_to_entity( module_name );
-   statement module_statement = 
-       (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+   bool this_statement_has_an_io_effect;
+   bool this_statement_writes_a_procedure_argument;
+   bool this_statement_is_a_format;
+   bool this_statement_is_an_unstructured_test = FALSE;
+   bool this_statement_is_a_c_return;
+   bool outside_effect_p = FALSE;
 
-   set_current_module_entity( module );
-   set_current_module_statement( module_statement );
+   ifdebug(5) {
+      int debugLevel = get_debug_level();
+      set_debug_level(0);
+      fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
+              s, statement_ordering(s));
+      print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
+      set_debug_level(debugLevel);
+   }
 
-   gen_recurse(module_statement, statement_domain, gen_true, statement_remove_useless_label);
-   clean_up_sequences(module_statement);
+   if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
+      pips_user_warning("exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
+      return;
+   }
 
+   /* The possible reasons to have useful code: */
+   /* - the statement does an I/O: */
+   this_statement_has_an_io_effect = statement_io_effect_p(s);
+   /* - the statement writes a procedure argument or the return
+      variable of the function, so the value may be used by another
+      procedure: */
+   /* Regions out should be more precise: */
+   this_statement_writes_a_procedure_argument =
+       statement_has_a_formal_argument_write_effect_p(s);
+   
+   /* Avoid to remove formats in a first approach: */
+   this_statement_is_a_format = instruction_format_p(statement_instruction(s));
+
+   /* Unstructured tests are very hard to deal with since they can
+      have major control effects, such as leading to an infinite loop,
+      etc. and it is very hard to cope with... Thus, keep all
+      unstructured tests in this approach since I cannot prove the
+      termination of the program and so on.  */
+   if (bound_control_father_p(s)) {
+       control control_father = load_control_father(s);
+       if (gen_length(control_successors(control_father)) == 2)
+	   /* It is an unstructured test: keep it: */
+	   this_statement_is_an_unstructured_test = TRUE;
+   }
+
+   this_statement_is_a_c_return = return_statement_p(s);
+
+   /* Check if this statement write some other things than a local variable */
+   list effects_list = load_proper_rw_effects_list(s);
+   entity current_func = get_current_module_entity();
+   FOREACH(EFFECT, eff,effects_list) {
+    reference a_reference = effect_any_reference(eff);
+    entity touched = reference_variable(a_reference);
+    if(effect_write_p(eff) && !entity_local_variable_p(touched,current_func)) {
+      outside_effect_p = TRUE;
+      pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
+          s,
+          entity_name(touched),
+          entity_local_name(current_func));
+      break;
+    }
+  }
+
+
+   ifdebug(6) {
+      if (outside_effect_p)
+        pips_debug(6, "Statement %p has an outside effect.\n", s);
+      if (this_statement_has_an_io_effect)
+        pips_debug(6, "Statement %p has an io effect.\n", s);
+      if (this_statement_writes_a_procedure_argument)
+        pips_debug(6,"Statement %p writes an argument of its procedure.\n", s);
+      if (this_statement_is_a_format)
+        pips_debug(6, "Statement %p is a FORMAT.\n", s);
+      if (this_statement_is_an_unstructured_test)
+        pips_debug(6, "Statement %p is an unstructured test.\n", s);
+      if (this_statement_is_a_c_return)
+        pips_debug(6, "Statement %p is a C return.\n", s);
+   }
+   
+   if (this_statement_has_an_io_effect
+       || outside_effect_p
+       || this_statement_writes_a_procedure_argument
+       || this_statement_is_a_format
+       || this_statement_is_an_unstructured_test
+       || this_statement_is_a_c_return)
+      /* Mark this statement as useful: */
+      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+
+   pips_debug(5, "end use_def_deal_if_useful\n");
+}
+
+
+static void remove_this_statement_if_useless(statement s, set entities_to_remove) {
+   if (! set_belong_p(the_useful_statements, (char *) s)) {
+      pips_debug(6, "remove_this_statement_if_useless removes statement %p (%#zx).\n", s, statement_ordering(s));
+
+      // If this is a "declaration statement" keep track of removed declarations
+      if(empty_statement_or_continue_p(s)) {
+        FOREACH(ENTITY,e, statement_declarations(s)) {
+          set_add_element(entities_to_remove,entities_to_remove,e);
+        }
+      }
+
+      // Get rid of declarations
+      gen_free_list(statement_declarations(s));
+      statement_declarations(s) = NIL;
+
+      // Free old instruction
+      free_instruction(statement_instruction(s));
+
+      // Replace statement with a continue, so that we keep label && comments
+      statement_instruction(s) = make_continue_instruction();
+   } else {
+     // Get rid of removed entity in declarations
+     if(statement_declarations(s) != NIL) {
+       SET_FOREACH(entity,e,entities_to_remove) {
+         gen_remove(&statement_declarations(s),e);
+       }
+     }
+   }
+}
+
+
+static void
+remove_all_the_non_marked_statements(statement s)
+{
+   pips_debug(5, "Entering remove_all_the_non_marked_statements\n");
+
+   // Keep track of removed entities
+   set entities_to_remove = set_make(set_pointer);
+
+   gen_context_recurse(s, entities_to_remove, statement_domain,
+               /* Since statements can be nested, only remove in a
+                  bottom-up way: */
+               gen_true,
+               remove_this_statement_if_useless);
+
+   ifdebug(6) {
+     SET_FOREACH(entity,e,entities_to_remove) {
+       pips_debug(6,"Entity '%s' has been totaly removed\n",entity_name(e));
+     }
+   }
+
+   set_free(entities_to_remove);
+
+   pips_debug(5, "Exiting remove_all_the_non_marked_statements\n");
+}
+
+
+static void
+use_def_elimination_on_a_statement(statement s)
+{
+   the_useful_statements = set_make(set_pointer);
+   init_control_father();
+   init_statement_father();
+   
+   /* pips_assert("use_def_elimination_on_a_statement", */
+   ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
+
+   build_statement_to_statement_father_mapping(s);
+   build_statement_to_statement_dependence_mapping(dependence_graph);
+
+   /* Mark as useful the seed statements: */
+   gen_recurse(s, statement_domain,
+	       gen_true,
+	       use_def_deal_if_useful);
+
+   /* Propagate the usefulness through all the predecessor graph: */
+   propagate_the_usefulness_through_the_predecessor_graph();
+
+   remove_all_the_non_marked_statements(s);
+
+   hash_table_free(ordering_to_dg_mapping);
+   free_statement_to_statement_dependence_mapping();
+   close_statement_father();
+   close_control_father();
+   set_free(the_useful_statements);
+}
+
+
+bool dead_code_elimination_on_module(char * module_name)
+{
+   statement module_statement;
+
+   /* Get the true ressource, not a copy. */
+   module_statement =
+      (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+
+   /* Get the data dependence graph: */
+   /* The dg is more precise than the chains, so I (RK) guess I should
+      remove more code with the dg, specially with array sections and
+      so on. */
+   /* FI: it's much too expensive; and how can you gain something
+    * with scalar variables?
+    */
+   /*
+   dependence_graph =
+      (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+      */
+
+   dependence_graph =
+      (graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
+
+   /* The proper effect to detect the I/O operations: */
+   set_proper_rw_effects((statement_effects)
+			 db_get_memory_resource(DBR_PROPER_EFFECTS,
+						module_name,
+						TRUE)); 
+
+   set_current_module_statement(module_statement);
+   set_current_module_entity(module_name_to_entity(module_name));
+
+   set_ordering_to_statement(module_statement);
+
+   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
+
+   use_def_elimination_on_a_statement(module_statement);
+
+   /* Reorder the module, because some statements have been deleted.
+      Well, the order on the remaining statements should be the same,
+      but by reordering the statements, the number are consecutive. Just
+      for pretty print... :-) */
    module_reorder(module_statement);
+
+   pips_debug(2, "done for %s\n", module_name);
+
+   debug_off();
+
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
 
-   reset_current_module_entity();
+   reset_proper_rw_effects();
    reset_current_module_statement();
+   reset_current_module_entity();
+   reset_ordering_to_statement();
 
-   return true;
+   /* Should have worked: */
+   return TRUE;
 }
+
+bool dead_code_elimination(char * module_name)
+{
+  debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
+  return dead_code_elimination_on_module(module_name);
+}
+
+
+/* Obsolete name: it should be called dead_code_eliminiation()
+ *
+ * Maintained for backward compatibility.
+ */
+bool use_def_elimination(char * module_name)
+{
+  debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
+  return dead_code_elimination_on_module(module_name);
+}
+
+/* moved from ri-util/statements.c */
+
+
+/**  @} */
+
+static bool filterout_statement(void *obj) {
+    return !INSTANCE_OF(statement,(gen_chunkp)obj);
+}
+
+/* entities that match the following conditions are not
+ * cleaned from declarations:
+ */
+static bool wipeout_entity(entity e) {
+return
+    entity_not_constant_or_intrinsic_p(e) && // filters out constants and intrinsics
+    !formal_parameter_p(e) &&
+    !storage_return_p(entity_storage(e)) &&
+    !entity_area_p(e)&&
+    !entity_struct_p(e)&&
+    !entity_union_p(e);
+}
+
+/**
+ * remove useless entities from declarations
+ * an entity is flagged useless when no reference is found in stmt
+ * and when it is not used by an entity found in stmt
+ *
+ * @param declarations list of entity to purge
+ * @param stmt statement where entities are used
+ *
+ */
+static void statement_clean_declarations_helper(list declarations, statement stmt)
+{
+    set referenced_entities = get_referenced_entities_filtered(
+            stmt,
+            filterout_statement,
+            wipeout_entity);
+
+    /* look for entity that are used in the statement
+     * SG: we need to work on  a copy of the declarations because of
+     * the RemoveLocalEntityFromDeclarations
+     */
+    list decl_cpy = gen_copy_seq(declarations);
+    FOREACH(ENTITY,e,decl_cpy)
+    {
+        /* filtered referenced entities are always used,
+         * some entity types listed in keep_entity cannot be wiped out*/
+        if(wipeout_entity(e) && !set_belong_p(referenced_entities,e))
+        {
+            /* entities whose declaration have a side effect are always used too */
+            bool has_side_effects_p = false;
+            value v = entity_initial(e);
+            list effects = NIL;
+            if( value_expression_p(v) )
+                effects = gen_nconc(effects,expression_to_proper_effects(value_expression(v)));
+            /* one should check if dimensions do not have side effects either */
+            if(entity_variable_p(e)) {
+                FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
+                {
+                    expression upper = dimension_upper(dim),
+                               lower = dimension_lower(dim);
+                    effects=gen_nconc(effects,expression_to_proper_effects(upper));
+                    effects=gen_nconc(effects,expression_to_proper_effects(lower));
+                }
+            }
+            FOREACH(EFFECT, eff, effects)
+            {
+                if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+            }
+            gen_full_free_list(effects);
+
+            /* do not keep the declaration, and remove it from any declaration_statement */
+            if( !has_side_effects_p ) {
+                RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),stmt);
+            }
+        }
+    }
+    gen_free_list(decl_cpy);
+
+    set_free(referenced_entities);
+}
+
+/**
+ * check if all entities used in s and module are declared in module
+ * does not work as well as expected on c module because it does not fill the statement declaration
+ * @param module module to check
+ * @param s statement where reference can be found
+ */
+static void entity_generate_missing_declarations(entity module, statement s)
+{
+  /* gather referenced entities */
+  set referenced_entities = get_referenced_entities(s);
+
+  /* fill the declarations with missing entities (ohhhhh a nice 0(nÂ²) algorithm*/
+  list new = NIL;
+  SET_FOREACH(entity,e1,referenced_entities) {
+    if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
+      new=CONS(ENTITY,e1,new);
+  }
+
+  set_free(referenced_entities);
+  sort_list_of_entities(new);
+  entity_declarations(module)=gen_nconc(new,entity_declarations(module));
+}
+
+
+/**
+ * remove all the entity declared in s but never referenced
+ * it's a lower version of use-def-elim !
+ *
+ * @param s statement to check
+ */
+void statement_clean_declarations(statement s)
+{
+    if(statement_block_p(s)) {
+        statement_clean_declarations_helper( statement_declarations(s),s);
+    }
+}
+
+/**
+ * remove all entities declared in module but never used in s
+ *
+ * @param module module to check
+ * @param s statement where entites may be used
+ */
+void entity_clean_declarations(entity module,statement s)
+{
+    entity curr = get_current_module_entity();
+    if( ! same_entity_p(curr,module)) {
+        reset_current_module_entity();
+        set_current_module_entity(module);
+    }
+    else
+        curr=entity_undefined;
+
+    statement_clean_declarations_helper(entity_declarations(module),s);
+    if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
+        entity_generate_missing_declarations(module,s);
+
+    if(!entity_undefined_p(curr)){
+        reset_current_module_entity();
+        set_current_module_entity(curr);
+    }
+
+}
+
+/**  @} */

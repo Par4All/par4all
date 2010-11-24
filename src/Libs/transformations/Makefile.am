@@ -19,7 +19,7 @@ libtransformations_la_SOURCES=\
 		privatize.c \
 		array_privatization.c \
 		standardize_structure.c \
-		use_def_elimination.c \
+		simplify_control.c \
 		declarations.c \
 		clone.c \
 		transformation_test.c \
