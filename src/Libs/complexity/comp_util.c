@@ -104,7 +104,7 @@ complexity comp;
 }
 
 void complexity_check_and_warn(s,comp)
-char *s;
+const char *s;
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) )

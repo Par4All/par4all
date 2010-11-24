@@ -532,44 +532,43 @@ list effects_list;
 
     pips_assert("replace_formal_parameters_by_real_ones", entity_module_p(mod));
 
-    MAPL (pe, {
-	entity param = ENTITY(CAR(pe));
-	storage st = entity_storage(param);
+    FOREACH (ENTITY, param,decl) {
+        storage st = entity_storage(param);
 
-	/* print out the entity name for debugging purpose */
-	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    fprintf(stderr,"in REPLACE, entity name is %s\n",
-		    entity_name(param));
-	}
+        /* print out the entity name for debugging purpose */
+        if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+            fprintf(stderr,"in REPLACE, entity name is %s\n",
+                    entity_name(param));
+        }
 
-	if (storage_formal_p(st)) {     
-	    /* if formal parameter... */
-	    param_name = entity_name(param);
-	    param_rank = formal_offset(storage_formal(st));
+        if (storage_formal_p(st)) {     
+            /* if formal parameter... */
+            param_name = entity_name(param);
+            param_rank = formal_offset(storage_formal(st));
 
-	    argument = list_ith_element(args, param_rank);
+            argument = gen_nthcdr(param_rank-1,args);/* minus one because offsets start at 1 not 0 */
 
-	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-		fprintf(stderr,"formal offset=%d, formal name=%s\n",
-			param_rank, param_name);
-	    }
+            if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+                fprintf(stderr,"formal offset=%d, formal name=%s\n",
+                        param_rank, param_name);
+            }
 
-	    carg = expression_to_complexity_polynome(EXPRESSION(CAR(argument)),
-					  precond,
-					  effects_list,
-					  KEEP_SYMBOLS,
-					  EXACT_VALUE);
+            carg = expression_to_complexity_polynome(EXPRESSION(CAR(argument)),
+                    precond,
+                    effects_list,
+                    KEEP_SYMBOLS,
+                    EXACT_VALUE);
 
-	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-		fprintf(stderr,"variable name is %s\n", variable_name((Variable)param) );
-	    }
+            if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+                fprintf(stderr,"variable name is %s\n", variable_name((Variable)param) );
+            }
 
-	    ctemp = complexity_var_subst(cresult, (Variable)param, carg);
-	    complexity_rm(&cresult); 
-	    cresult = complexity_dup(ctemp);
-	    complexity_rm(&carg);
-	}
-    }, decl);
+            ctemp = complexity_var_subst(cresult, (Variable)param, carg);
+            complexity_rm(&cresult); 
+            cresult = complexity_dup(ctemp);
+            complexity_rm(&carg);
+        }
+    }
    
     return (cresult);
 }

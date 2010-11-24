@@ -49,8 +49,10 @@
 #include "misc.h"
 #include "matrice.h"
 #include "semantics.h"
+#include "effects-simple.h"
 #include "effects-generic.h"
 #include "transformer.h"
+#include "conversion.h"
 #include "complexity.h"
 
 hash_table hash_callee_to_complexity = hash_table_undefined;
@@ -294,8 +296,7 @@ list effects_list;
 	comp = loop_to_complexity(instruction_loop(instr), precond, effects_list);
 	break;
     case is_instruction_whileloop:
-      pips_user_warning("Try to convert your code to use do loops only\n");
-      pips_internal_error("Complexity for while loops not implemented yet.");
+    comp = whileloop_to_complexity(instruction_whileloop(instr), precond, effects_list);
 	break;
     case is_instruction_goto:
 	comp = goto_to_complexity(instruction_goto(instr), precond, effects_list);
@@ -692,6 +693,35 @@ complexity goto_to_complexity(statement st __attribute__ ((__unused__)),
 }
 
 /* 5th element of instruction */
+complexity whileloop_to_complexity(whileloop while_instr, transformer precond, list effects_list)
+{
+
+    basic b;
+    complexity cbody = statement_to_complexity(whileloop_body(while_instr), precond, effects_list),
+               ctest = expression_to_complexity(whileloop_condition(while_instr), &b,precond, effects_list);
+
+    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+        fprintf(stderr, "\n");
+        fprintf(stderr, "YYY  body  complexity: ");
+        complexity_fprint(stderr, cbody, FALSE, TRUE);
+        fprintf(stderr, "YYY  test complexity: ");
+        complexity_fprint(stderr, ctest, FALSE, TRUE);
+    }
+
+    complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
+    complexity_add(&cbody,ctest);
+    complexity_mult(&cbody,range);
+
+    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+        fprintf(stderr, "YYY  while total complexity: ");
+        complexity_fprint(stderr, cbody, TRUE, TRUE);
+        fprintf(stderr, "\n");
+    }
+    complexity_check_and_warn(__FUNCTION__, cbody);    
+
+    return cbody;
+}
+
 /* 3rd element of syntax */
 complexity call_to_complexity(call_instr, pbasic, precond, effects_list)
 call call_instr;

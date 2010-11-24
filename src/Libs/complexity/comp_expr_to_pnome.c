@@ -75,6 +75,15 @@ entity e;
  * not only a polynomial but also statistics: guessed, unknown variables, ...
  */
 
+/* builds a new unknown complexity attached to a virtual package */
+complexity make_complexity_unknown(const char * name) {
+    entity package = FindEntity(TOP_LEVEL_MODULE_NAME,COMPLEXITY_PACKAGE_NAME);
+    if(entity_undefined_p(package))
+        package=make_empty_program(COMPLEXITY_PACKAGE_NAME,make_language_fortran());
+    entity var = make_new_scalar_variable_with_prefix(name,package,make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+    return make_single_var_complexity(1.f,var);
+}
+
 
 /* Entry point routine of this file:
  *
@@ -133,11 +142,7 @@ int maximize;
     }
 
     if ( complexity_unknown_p(comp) ) {
-	pips_internal_error("Better unknown value name generation required!");
-	/*
-	return(make_single_var_complexity(1.0,UNKNOWN_RANGE));
-	*/
-	return complexity_undefined;
+    return make_complexity_unknown(UNKNOWN_RANGE_NAME);
     }
 
     /* The following line is merely for debugging */
@@ -774,20 +779,8 @@ Variable var;
 
 	if ( b )
 	    comp = make_single_var_complexity(1.0, (Variable)var);
-	else {
-	    string v_prefix = strdup
-		(concatenate(UNKNOWN_VARIABLE_VALUE_PREFIX,
-			     entity_local_name((entity) var),
-			     "_", 0));
-	    Variable v = (Variable)
-		make_new_scalar_variable_with_prefix
-		    (v_prefix,
-		     get_current_module_entity(),
-		     MakeBasic (is_basic_int));
-        AddEntityToCurrentModule((entity)v);
-	    free(v_prefix);
-	    comp = make_single_var_complexity(1.0, v); 
-	}
+	else 
+	    comp = make_complexity_unknown(UNKNOWN_VARIABLE_NAME);
     }
 
     complexity_scalar_mult(&comp,1.0/VALUE_TO_FLOAT(var_coeff));
