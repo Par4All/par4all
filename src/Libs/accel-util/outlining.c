@@ -797,6 +797,8 @@ outline(char* module_name)
         }
         else  {
             statement statement_to_outline = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),label_name);
+            if(statement_undefined_p(statement_to_outline))
+                pips_user_error("Could not find loop labeled %s\n",label_name);
             if(statement_loop_p(statement_to_outline) && get_bool_property("OUTLINE_LOOP_STATEMENT"))
                 statement_to_outline=loop_body(statement_loop(statement_to_outline));
             statements_to_outline=make_statement_list(statement_to_outline);
