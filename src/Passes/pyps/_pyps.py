@@ -68,7 +68,7 @@ class module:
 		"""module name"""
 		return self._name
 
-	def edit(self,editor=os.environ["EDITOR"]):
+	def edit(self,editor=os.getenv("EDITOR","vi")):
 		"""edits module using given editor
 		   does nothing on compilation units ...
 		"""
