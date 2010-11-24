@@ -2938,6 +2938,15 @@ void update_expression_syntax(expression e, syntax s)
     free_syntax(expression_syntax(e));
     expression_syntax(e)=s;
 }
+/* replace expression @p caller by expression @p field , where @p field is contained by @p caller */
+void local_assign_expression(expression caller, expression field)
+{
+     syntax s = expression_syntax(field) ;
+     expression_syntax(field)=syntax_undefined;
+     free_syntax(expression_syntax(caller));
+     expression_syntax(caller)=s;
+     free_normalized(expression_normalized(caller));
+}
 
 /* generates an expression from a syntax */
 expression syntax_to_expression(syntax s) {
@@ -3352,4 +3361,15 @@ expression replace_expression_content(expression e1, expression e2)
 
   return e1;
 }
+/* @return true if expression @p e is a min or a max */
+bool expression_minmax_p(expression e)
+{
+    if(expression_call_p(e))
+    {
+        entity op = call_function(expression_call(e));
+        return ENTITY_MIN_P(op) || ENTITY_MAX_P(op);
+    }
+    return false;
+}
+
 

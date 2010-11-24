@@ -2924,7 +2924,7 @@ transformer any_expressions_to_transformer(entity v,
   return tf;
 }
 
-/* compute integer bounds @p pmax, @p pmin of expression @p exp under precondtions @p tr
+/* compute integer bounds @p pmax, @p pmin of expression @p exp under preconditions @p tr
  * require value mappings set !
  */
 bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* pmin, intptr_t* pmax)
@@ -2956,6 +2956,53 @@ bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* 
     free_transformer(var_tr);
     free_entity(var);
     return success;
+}
+/* tries hard to simplify expression @p e if it is a min or a max
+ * operator, by evaluating it under preconditions @p tr.
+ * Two approaches are tested:
+ * check bounds of lhs-rhs,
+ * or compare bounds of lhs and rhs
+ */
+void simplify_minmax_expression(expression e,transformer tr)
+{
+    if(expression_minmax_p(e)) {
+        call c =expression_call(e);
+        bool is_max = ENTITY_MAX_P(call_function(c));
+
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        expression diff = make_op_exp(
+                MINUS_OPERATOR_NAME,
+                copy_expression(lhs),
+                copy_expression(rhs)
+                );
+        intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound,diff_lbound,diff_ubound;
+        if(precondition_minmax_of_expression(diff,tr,&diff_lbound,&diff_ubound) &&
+            (diff_lbound>=0 || diff_ubound<=0)) {
+            if(is_max) {
+                if(diff_lbound>=0) local_assign_expression(e,lhs);
+                else local_assign_expression(e,rhs);
+            }
+            else {
+                if(diff_lbound>=0) local_assign_expression(e,rhs);
+                else local_assign_expression(e,lhs);
+            }
+        }
+        else if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
+                precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
+        {
+            if(is_max)
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
+            }
+            else
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
+            }
+        }
+    }
 }
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)

@@ -133,27 +133,6 @@ void isolate_patch_entities(void * where,entity old, entity new,list offsets)
             0);
 }
 
-/* @return true if expression @p e is a min or a max */
-static
-bool expression_minmax_p(expression e)
-{
-    if(expression_call_p(e))
-    {
-        entity op = call_function(expression_call(e));
-        return ENTITY_MIN_P(op) || ENTITY_MAX_P(op);
-    }
-    return false;
-}
-
-/* replace expression @p caller by expression @p field , where @p field is contained by @p caller */
-static void local_assign_expression(expression caller, expression field)
-{
-     syntax s = expression_syntax(field) ;
-     expression_syntax(field)=syntax_undefined;
-     free_syntax(expression_syntax(caller));
-     expression_syntax(caller)=s;
-     free_normalized(expression_normalized(caller));
-}
 
 /* replaces expression @p e by its upper or lower bound under preconditions @p tr
  * @p is_upper is used to choose among lower and upperbound*/
@@ -186,53 +165,6 @@ void lowerbound_of_expression(expression e, transformer tr)
 }
 
 
-/* tries ahrd to simplify expression @p e if it is a min or a max
- * operator, by evaluating it under preconditions @p tr.
- * Two approaches are tested:
- * check bounds of lhs-rhs,
- * or compare bounds of lhs and rhs
- */
-void simplify_minmax_expression(expression e,transformer tr)
-{
-    if(expression_minmax_p(e)) {
-        call c =expression_call(e);
-        bool is_max = ENTITY_MAX_P(call_function(c));
-
-        expression lhs = binary_call_lhs(c);
-        expression rhs = binary_call_rhs(c);
-        expression diff = make_op_exp(
-                MINUS_OPERATOR_NAME,
-                copy_expression(lhs),
-                copy_expression(rhs)
-                );
-        intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound,diff_lbound,diff_ubound;
-        if(precondition_minmax_of_expression(diff,tr,&diff_lbound,&diff_ubound) &&
-            (diff_lbound>=0 || diff_ubound<=0)) {
-            if(is_max) {
-                if(diff_lbound>=0) local_assign_expression(e,lhs);
-                else local_assign_expression(e,rhs);
-            }
-            else {
-                if(diff_lbound>=0) local_assign_expression(e,rhs);
-                else local_assign_expression(e,lhs);
-            }
-        }
-        else if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
-                precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
-        {
-            if(is_max)
-            {
-                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
-                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
-            }
-            else
-            {
-                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
-                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
-            }
-        }
-    }
-}
 
 /** 
  * generate a list of dimensions @p dims and of offsets @p from a region @p r
