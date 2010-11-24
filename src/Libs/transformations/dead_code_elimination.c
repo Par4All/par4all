@@ -507,6 +507,30 @@ static void remove_this_statement_if_useless(statement s, set entities_to_remove
          gen_remove(&statement_declarations(s),e);
        }
      }
+     /*
+      *  Let dive into sequence and really remove the statement, it's a lot
+      *  cleaner than keeping empty statement when there's not label or comment
+      */
+     if(statement_block_p(s)) {
+       pips_debug(0,"Checking sequence\n");
+       list statement_to_remove = NIL;
+       FOREACH(statement,st,statement_block(s)) {
+         if (! set_belong_p(the_useful_statements, (char *) st)
+             && empty_statement_or_continue_without_comment_p(st) ) {
+           pips_debug(0,"Register %p to be removed\n",st);
+           statement_to_remove = CONS(STATEMENT,st,statement_to_remove);
+         }
+       }
+       FOREACH(statement,st,statement_to_remove) {
+         gen_remove_once(&sequence_statements(statement_sequence(s)),st);
+       }
+       gen_free_list(statement_to_remove);
+
+       // If the sequence is empty now, mark as removable :-)
+       if(empty_statement_or_continue_without_comment_p(s)) {
+         set_add_element(the_useful_statements,the_useful_statements,s);
+       }
+     }
    }
 }
 
