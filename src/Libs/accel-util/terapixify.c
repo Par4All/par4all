@@ -569,6 +569,9 @@ bool normalize_microcode( char * module_name)
         gen_context_recurse(get_current_module_statement(),&p,statement_domain,gen_true,terapix_loop_handler);
     }
 
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_remove_extensions);
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_remove_useless_label);
+
 
     /* validate */
     module_reorder(get_current_module_statement());

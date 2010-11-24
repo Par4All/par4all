@@ -3391,3 +3391,35 @@ statement last_statement(statement s)
 /* That's all folks */
 
 /** @} */
+
+/* purge a statement from its extensions */
+void statement_remove_extensions(statement s) {
+    extensions ext = statement_extensions(s);
+    gen_full_free_list(extensions_extension(ext));
+    extensions_extension(ext)=NIL;
+}
+/**
+ * @brief remove the label of a statement if the statement is not
+ * unstructured. labels on fortran loops and Fortran return are also
+ * preserved
+ *
+ * @param s statement considered
+ */
+void statement_remove_useless_label(statement s)
+{
+  instruction i = statement_instruction(s);
+  if(!instruction_unstructured_p(i) &&
+        c_module_p(get_current_module_entity())
+     ) {
+    if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
+      /* SG should free_entity ? */
+      statement_label(s)=entity_empty_label();
+
+      /* OK but guarded by previous test */
+      if( instruction_loop_p(i) )
+	loop_label(instruction_loop(i))=entity_empty_label();
+      if( instruction_whileloop_p(i) )
+	whileloop_label(instruction_whileloop(i))=entity_empty_label();
+    }
+  }
+}
