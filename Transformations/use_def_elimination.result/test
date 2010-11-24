@@ -452,10 +452,6 @@ C  P(B,J) {B==3, J==3}
 
 C  P(B,J) {B==3, J==3}
 
-      CONTINUE                                                          0011
-
-C  P(B,J) {B==3, J==3}
-
 
 c      endif
 
@@ -706,10 +702,6 @@ C  P(J) {J==3}
 
 C  P(B,J) {B==3, J==3}
 
-      CONTINUE                                                          0008
-
-C  P(B,J) {B==3, J==3}
-
 
       DO I = 3, 10                                                      0010
 
@@ -741,10 +733,6 @@ C  P(B,I,J) {B==3, I==11, J==3}
 
 C  P(B,I,J) {B==3, I==11, J==3}
 
-      CONTINUE
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
       RETURN
       END
 
@@ -853,14 +841,6 @@ C  P() {}
 C  P(J) {J==5}
 
       B = J                                                             0007
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0008
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0009
 
 C  P(B,J) {B==5, J==5}
 
@@ -1069,22 +1049,6 @@ C  P(B,J) {B==5, J==5}
 
 200   CONTINUE                                                          0012
 C     END UNSTRUCTURED
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0012
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0013
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0014
-
-C  P(B,J) {B==5, J==5}
-
-      CONTINUE                                                          0015
 
 C  P(B,J) {B==5, J==5}
 
