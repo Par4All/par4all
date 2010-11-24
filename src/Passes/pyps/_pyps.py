@@ -242,6 +242,7 @@ class workspace(object):
 		self.props = workspace.props(self)
 		self.fun = workspace.fun(self)
 		self.cu = workspace.cu(self)
+		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
 		if cppflags != "":
@@ -259,13 +260,13 @@ class workspace(object):
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
-			tmpDirName = pypsutils.nameToTmpDirName(name)
-			try:shutil.rmtree(tmpDirName)
+			self.tmpDirName = pypsutils.nameToTmpDirName(name)
+			try:shutil.rmtree(self.tmpDirName)
 			except OSError:pass
-			os.mkdir(tmpDirName)
+			os.mkdir(self.tmpDirName)
 
 			for f in sources2:
-				newfname = os.path.join(tmpDirName,os.path.basename(f))
+				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
 				sources += [newfname]
 				pypsutils.guardincludes(newfname)
@@ -277,11 +278,7 @@ class workspace(object):
 		try:
 			cpypips.create(name, self._sources)
 		except RuntimeError:
-			try: cpypips.close_workspace(0)
-			except RuntimeError: pass
-			if self.deleteOnClose:
-					cpypips.delete_workspace(name)
-			raise
+			self.close()
 
 		if not verbose:
 			self.props.NO_USER_WARNING = True
@@ -473,6 +470,7 @@ class workspace(object):
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
 		map(shutil.rmtree,self.checkpoints)
+		if self.tmpDirName:shutil.rmtree(self.tmpDirName)
 		try : self.cpypips.close_workspace(0)
 		except RuntimeError: pass
 		if self.deleteOnClose:
