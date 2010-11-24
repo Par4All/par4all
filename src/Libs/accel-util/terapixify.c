@@ -281,6 +281,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
         entity loop_bound = entity_undefined;
         if(terapix_suitable_loop_bound_p(nb_iter))
         {
+            set body_entities = get_referenced_entities(loop_body(l));
             /* generate new entity if needed */
             if(expression_reference_p(nb_iter)) /* use the reference , but we must rename it however !*/
             {
@@ -316,7 +317,8 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             free_expression(range_upper(loop_range(l)));
             range_upper(loop_range(l))=entity_to_expression(loop_bound);
 
-            do_loop_to_while_loop(sl);
+            if(set_belong_p(body_entities,loop_bound))
+                do_loop_to_while_loop(sl);
 
 
             /* save change for futher processing */
