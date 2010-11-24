@@ -611,23 +611,25 @@ list initialization_list_to_statements(entity e) {
                 }
             }
         }
-        /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
-        free_value(entity_initial(e));
-        entity_initial(e) = make_value_expression(
-                MakeUnaryCall(
-                    entity_intrinsic(ALLOCA_FUNCTION_NAME),
-                    make_expression(
-                        make_syntax_sizeofexpression(
-                            make_sizeofexpression_type(
-                                copy_type(entity_type(e))
-                                )
-                            ),
-                        normalized_undefined
+        if(!formal_parameter_p(e)) {
+            /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
+            free_value(entity_initial(e));
+            entity_initial(e) = make_value_expression(
+                    MakeUnaryCall(
+                        entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                        make_expression(
+                            make_syntax_sizeofexpression(
+                                make_sizeofexpression_type(
+                                    copy_type(entity_type(e))
+                                    )
+                                ),
+                            normalized_undefined
+                            )
                         )
-                    )
-                );
-        AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
-               get_current_module_entity());
+                    );
+            AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                    get_current_module_entity());
+        }
     }
     return gen_nreverse(stats);
 }
