@@ -39,6 +39,7 @@
 #include "effects-util.h"
 #include "text.h"
 #include "pipsdbm.h"
+#include "pipsmake.h"
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
@@ -136,6 +137,11 @@ static bool terapix_renamed_local_p(const char* s, const char* prefix)
     }
     return false;
 }
+
+static bool terapix_renamed_entity_p(entity e, const char* prefix) {
+    return terapix_renamed_local_p(entity_local_name(e),prefix);
+}
+
 static bool terapix_renamed_p(const char *s)
 {
     return terapix_renamed_local_p(s,TERAPIX_PTRARG_PREFIX) || 
@@ -171,7 +177,7 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
         free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
         AddEntityToCurrentModule(e);
         expression assigned ;
-        if( ass_prefix && same_string_p(ass_prefix,TERAPIX_IMAGE_PREFIX))
+        if( false && ass_prefix && same_string_p(ass_prefix,TERAPIX_IMAGE_PREFIX))
         {
             basic bt = entity_basic(e);
             type new_type = copy_type(basic_pointer(bt));
@@ -219,6 +225,52 @@ typedef struct {
     size_t *cnt;
 } terapix_loop_handler_param;
 
+/* converts a doloop to a while loop, in place */
+void do_loop_to_while_loop(statement sl) {
+    pips_assert("statement is a loop",statement_loop_p(sl));
+    loop l =statement_loop(sl);
+    range r = loop_range(l);
+
+    /* convert the loop to a while loop :
+     * fst the body
+     */
+    list statements = make_statement_list(
+            copy_statement(loop_body(l)),
+            make_assign_statement(
+                entity_to_expression(loop_index(l)),
+                MakeBinaryCall(
+                    entity_intrinsic(PLUS_OPERATOR_NAME),
+                    entity_to_expression(loop_index(l)),
+                    range_increment(r)
+                    )
+                )
+            );
+    /* then the whileloop */
+    whileloop wl = make_whileloop(
+            MakeBinaryCall(
+                entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                entity_to_expression(loop_index(l)),
+                range_upper(r)
+                ),
+            make_block_statement(statements),
+            entity_empty_label(),
+            make_evaluation_before());
+
+    /* and the prelude */
+    sequence seq = make_sequence(
+            make_statement_list(
+                make_assign_statement(entity_to_expression(loop_index(l)),
+                    range_lower(r)),
+                instruction_to_statement(make_instruction_whileloop(wl))
+                )
+            );
+    range_upper(r)=expression_undefined;
+    range_lower(r)=expression_undefined;
+    range_increment(r)=expression_undefined;
+
+    update_statement_instruction(sl,make_instruction_sequence(seq));
+}
+
 static void
 terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
 {
@@ -250,7 +302,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             }
             else {
                 string new_name;
-                asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%zd",(*p->cnt)++);
+                asprintf(&new_name,"%s" MODULE_SEP_STRING TERAPIX_LOOPARG_PREFIX "%zd",get_current_module_name(),(*p->cnt)++);
                 loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
                 value v = entity_initial(loop_bound);
                 free_constant(value_constant(v));
@@ -261,34 +313,90 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             }
 
             /* patch loop */
-            free_expression(range_lower(loop_range(l)));
-            range_lower(loop_range(l))=int_to_expression(1);
             free_expression(range_upper(loop_range(l)));
             range_upper(loop_range(l))=entity_to_expression(loop_bound);
 
-            /* convert the loop to a while loop */
-            list statements = make_statement_list(
-                    copy_statement(loop_body(l)),
-                    make_assign_statement(entity_to_expression(loop_index(l)),make_op_exp(PLUS_OPERATOR_NAME,entity_to_expression(loop_index(l)),int_to_expression(1)))
-            );
-            whileloop wl = make_whileloop(
-                    MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),entity_to_expression(loop_index(l)),entity_to_expression(loop_bound)),
-                    make_block_statement(statements),
-                    entity_empty_label(),
-                    make_evaluation_before());
-            sequence seq = make_sequence(
-                    make_statement_list(
-                        make_assign_statement(entity_to_expression(loop_index(l)),int_to_expression(1)),
-                        instruction_to_statement(make_instruction_whileloop(wl))
-                        )
-                    );
+            do_loop_to_while_loop(sl);
 
-            update_statement_instruction(sl,make_instruction_sequence(seq));
 
             /* save change for futher processing */
             hash_put(p->ht,loop_bound,nb_iter);
         }
     }
+}
+
+static int compare_formal_parameters(const void *v0, const void * v1) {
+    const entity f0 = *(const entity *)v0,
+          f1=*(const entity *)v1;
+    intptr_t o0 = formal_offset(storage_formal(entity_storage(f0))),
+             o1 = formal_offset(storage_formal(entity_storage(f1)));
+    entity e0 = find_ith_formal_parameter(get_current_module_entity(),o0),
+           e1 = find_ith_formal_parameter(get_current_module_entity(),o1);
+    if(f0==f1) return 0;
+    if(!terapix_renamed_entity_p(e0,TERAPIX_LOOPARG_PREFIX)) {
+        if(terapix_renamed_entity_p(e1,TERAPIX_LOOPARG_PREFIX))
+            return 1;
+        else
+            return o0 > o1 ? -1 : 1 ;
+    }
+    else
+        return o0 > o1 ? -1 : 1 ;
+}
+/* change the parameter order for function @p module
+ * using comparison function @p cmp
+ * both compilation unit and callers are touched
+ * SG: it may be put in ri-util
+ */
+void sort_parameters(entity module, gen_cmp_func_t cmp) {
+    /* retrieve the formal parameters */
+    list fn = module_formal_parameters(module);
+    /* order them */
+    gen_sort_list(fn,cmp);
+    /* update offset */
+    intptr_t offset=0;
+    int reordering[gen_length(fn)];/* holds correspondence between old and new offset */
+    FOREACH(ENTITY,f,fn) {
+        reordering[formal_offset(storage_formal(entity_storage(f)))-1] = offset;
+        formal_offset(storage_formal(entity_storage(f)))=++offset;
+    }
+    /* update parameter list */
+    list parameters = module_functional_parameters(module);
+    list new_parameters = NIL;
+    for(size_t i=0;i<gen_length(fn);i++) {
+        new_parameters=CONS(PARAMETER,PARAMETER(gen_nth((int)reordering[i],parameters)),new_parameters);
+    }
+    new_parameters=gen_nreverse(new_parameters);
+    module_functional_parameters(module)=new_parameters;
+    /* change call sites */
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
+    list callers_statement = callers_to_statements(callers);
+    list call_sites = callers_to_call_sites(callers_statement);
+    /* for each call site , reorder arguments according to table reordering */
+    FOREACH(CALL,c,call_sites) {
+        list args = call_arguments(c);
+        list new_args = NIL;
+        for(size_t i=0;i<gen_length(fn);i++) {
+            new_args=CONS(EXPRESSION,EXPRESSION(gen_nth((int)reordering[i],args)),new_args);
+        }
+        new_args=gen_nreverse(new_args);
+        gen_free_list(args);
+        call_arguments(c)=new_args;
+    }
+    /* tell dbm of the update */
+    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter))
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(citer)),STATEMENT(CAR(siter)));
+    db_touch_resource(DBR_CODE,compilation_unit_of_module(get_current_module_name()));
+
+    /* yes! some people use free in pips ! */
+    gen_free_list(call_sites);
+    gen_free_list(callers_statement);
+
+    gen_free_list(fn);
+    gen_free_list(parameters);
+}
+
+static void normalize_microcode_parameter_orders(entity module) {
+    sort_parameters(module,compare_formal_parameters);
 }
 
 bool normalize_microcode( char * module_name)
@@ -325,43 +433,111 @@ bool normalize_microcode( char * module_name)
     size_t nb_lu = 0;
     size_t nb_ptr = 0;
     size_t nb_re = 0;
-    FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
+    FOREACH(ENTITY,e,entity_declarations(get_current_module_entity()))
     {
         if(!entity_area_p(e))
         {
+            variable v = type_variable(entity_type(e));
+            basic vb = variable_basic(v);
             if(formal_parameter_p(e))
             {
-                variable v = type_variable(entity_type(e));
-                basic vb = variable_basic(v);
                 if( basic_pointer_p(vb) ) /* it's a pointer */
                 {
                     string prefix = NULL;
-                        type t =ultimate_type(basic_pointer(vb));
-                        vb=variable_basic(type_variable(t));
-                        /* because of the way we build data, images are int** and masks are int* */
-                        if( basic_pointer_p(vb) ) {
-                            printf("%s seems an image\n",entity_user_name(e));
-                            prefix = TERAPIX_IMAGE_PREFIX;
-                        }
-                        else {
-                            printf("%s seems a mask\n",entity_user_name(e));
-                            prefix = TERAPIX_MASK_PREFIX;
-                        }
-                        terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
+                    type t =ultimate_type(basic_pointer(vb));
+                    vb=variable_basic(type_variable(t));
+                    if( strstr(entity_user_name(e),get_string_property("GROUP_CONSTANTS_HOLDER")) ) {
+                        printf("%s seems a mask\n",entity_user_name(e));
+                        prefix = TERAPIX_MASK_PREFIX;
+                    }
+                    else {
+                        printf("%s seems an image\n",entity_user_name(e));
+                        prefix = TERAPIX_IMAGE_PREFIX;
+                    }
+                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                 }
                 else if( entity_used_in_loop_bound_p(e) )
                 {
                     printf("%s belongs to a loop bound\n",entity_user_name(e));
                     //terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
                 }
-                else {
-                    printf("parameter %s is not valid\n",entity_user_name(e));
-                    can_terapixify=false;
+                /* a rom array with only one element, outlining and isolate_statement where too smart :) */
+                else if ( strstr(entity_user_name(e),get_string_property("GROUP_CONSTANTS_HOLDER")) &&
+                        entity_scalar_p(e)) {
+
+                    entity_type(e) = make_type_variable(
+                            make_variable(
+                                make_basic_pointer(entity_type(e)),
+                                NIL,
+                                NIL
+                                )
+                            );
+                    expression repl = MakeUnaryCall(
+                            entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                            entity_to_expression(e)
+                            );
+                    replace_entity_by_expression(
+                            get_current_module_statement(),
+                            e,
+                            repl);
+                    free_expression(repl);
+                    /* pips bonus step: the consistency */
+                    intptr_t i=1,
+                             offset = formal_offset(storage_formal(entity_storage(e)));
+                    FOREACH(PARAMETER,p,module_functional_parameters(get_current_module_entity())) {
+                        if(i++==offset) {
+                            dummy d = parameter_dummy(p);
+                            if(dummy_identifier_p(d))
+                            {
+                                entity di = dummy_identifier(d);
+                                entity_type(di) = make_type_variable(
+                                        make_variable(
+                                            make_basic_pointer(entity_type(di)),
+                                            NIL,
+                                            NIL
+                                            )
+                                        );
+                            }
+                            parameter_type(p) = make_type_variable(
+                                    make_variable(
+                                        make_basic_pointer(parameter_type(p)),
+                                        NIL,
+                                        NIL
+                                        )
+                                    );
+                            break;
+                        }
+                    }
+                    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
+                    list callers_statement = callers_to_statements(callers);
+                    list call_sites = callers_to_call_sites(callers_statement);
+                    pips_assert("only one caller here\n",
+                            !ENDP(call_sites) && ENDP(CDR(call_sites)));
+                    list args = call_arguments(CALL(CAR(call_sites)));
+                    for(intptr_t i=1;i<offset;i++) POP(args);
+                    expression *exp = (expression*)REFCAR(args);
+                    *exp=
+                        MakeUnaryCall(
+                                entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                                *exp
+                                );
+
+
+                    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter))
+                        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(citer)),STATEMENT(CAR(siter)));
+                    db_touch_resource(DBR_CODE,compilation_unit_of_module(get_current_module_name()));
+                    gen_free_list(callers_statement);
+
+                    printf("%s seems a mask\n",entity_user_name(e));
+                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ptr);
                 }
             }
-            else {
+            else if( basic_pointer_p(vb) ) /* it's a pointer */
+                terapix_argument_handler(e,NULL,NULL,TERAPIX_IMAGE_PREFIX,&nb_ptr);
+            else if( entity_scalar_p(e))
                 terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
-            }
+            else
+                terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ptr);
         }
     }
 
@@ -377,6 +553,9 @@ bool normalize_microcode( char * module_name)
                 terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
         }
     }
+
+    /* reorder arguments to match terapix conventions */
+    normalize_microcode_parameter_orders(get_current_module_entity());
 
     /* loops in terasm iterate over a given parameter, in the form DO I=1:N 
      * I is hidden to the user and N must be a parameter */

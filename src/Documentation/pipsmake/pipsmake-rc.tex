@@ -6940,11 +6940,15 @@ GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
 \begin{PipsPass}{normalize_microcode}
 Perform various checks on a Terapix microcode to make sure it can be
 synthesized.
+\PipsPropRef{GROUP_CONSTANTS_HOLDER} is used to differentiate mask and image.
 \end{PipsPass}
 \begin{PipsMake}
 normalize_microcode				> MODULE.code
+                                > CALLERS.code
+                                > COMPILATION_UNIT.code
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.callers
         < MODULE.cumulated_effects
 \end{PipsMake}
 \begin{PipsPass}{terapix_remove_divide}
