@@ -425,8 +425,10 @@ static void outliner_extract_loop_bound(statement sloop, hash_table entity_to_ef
         basic b = basic_of_expression(upper);
         if(basic_overloaded_p(b)) { free_basic(b); b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE); }
         entity holder = make_new_scalar_variable(get_current_module_entity(),b);
-        hash_put(entity_to_effective_parameter,holder,upper);
-        range_upper(r)=entity_to_expression(holder);
+        hash_put(entity_to_effective_parameter,holder,
+                MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),upper,int_to_expression(1)));
+        range_upper(r)=
+                MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),entity_to_expression(holder),int_to_expression(1));
     }
 }
 static void convert_pointer_to_array_aux(expression exp,entity e) {
