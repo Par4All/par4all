@@ -815,7 +815,7 @@ entity create_private_integer_variable_for_new_module (string new_name,
     }
   else
     {
-      pips_internal_error("Entity already exist: %s", new_name);
+      pips_internal_error("Entity already exist: %s\n", new_name);
       return NULL;
     }
 }
