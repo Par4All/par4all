@@ -68,6 +68,20 @@ class module:
 		"""module name"""
 		return self._name
 
+	def edit(self,editor=os.environ["EDITOR"]):
+		"""edits module using given editor
+		   does nothing on compilation units ...
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			self.print_code()
+			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+			shutil.copy(printcode_rc,code_rc)
+			pid=Popen([editor,code_rc],stderr=PIPE)
+			if pid.wait() != 0:
+				print sys.stderr > pid.stderr.readlines()
+
 	def run(self,cmd):
 		"""run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
 		   does nothing on compilation unit ...
@@ -130,7 +144,7 @@ class module:
 		return modules([ self._ws[name] for name in callees.split(" ") ] if callees else [])
 
 	def _update_props(self,passe,props):
-		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
+		"""[[internal]] change a property dictionary by appending the pass name to the property when needed """
 		for name,val in props.iteritems():
 			if upper(name) not in self._all_properties:
 				del props[upper(name)]
@@ -163,7 +177,7 @@ class modules:
 
 
 	def display(self,rc="printed_file", activate="print_code", **props):
-		"""display ressource `rc' of each modules under `activate' rule and properties `props'"""
+		"""display resource `rc' of each modules under `activate' rule and properties `props'"""
 		map(lambda m:m.display(rc, activate, **props),self._modules)
 
 
