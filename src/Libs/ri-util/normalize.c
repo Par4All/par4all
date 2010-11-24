@@ -185,7 +185,9 @@ normalized NormalizeReference(reference r)
     Variable v = (Variable) e;
     Value val = VALUE_ONE;
 
-    n = (entity_integer_scalar_p(e)) ?
+    /* SG is there any good reason to exclude pointer arithmetic ?*/
+    n = (entity_integer_scalar_p(e) || 
+            ( entity_pointer_p(e) && ENDP(reference_indices(r))) ) ?
       make_normalized(is_normalized_linear,
 		      vect_new(v, val)) :
       make_normalized(is_normalized_complex, UU);
