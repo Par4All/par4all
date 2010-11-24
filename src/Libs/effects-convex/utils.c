@@ -3010,7 +3010,8 @@ string region_to_string(effect reg __attribute__ ((unused)))
     return strdup("[region_to_string] no longer implemented\n");
 }
 
-region region_hypercube(region reg)
+/* computes the rectangular hull of a region */
+region region_rectangular_hull(region reg)
 {
     region hyper = copy_effect(reg);
     list phis = region_phi_cfc_variables(reg);
