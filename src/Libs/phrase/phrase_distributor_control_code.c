@@ -115,7 +115,7 @@ entity create_parameter_for_new_module (variable var,
     }
   else
     {
-      pips_internal_error("Entity already exist: %s", parameter_name);
+      pips_internal_error("Entity already exist: %s\n", parameter_name);
       return NULL;
     }
 }
