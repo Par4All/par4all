@@ -142,7 +142,11 @@ int maximize;
     }
 
     if ( complexity_unknown_p(comp) ) {
-    return make_complexity_unknown(UNKNOWN_RANGE_NAME);
+	pips_internal_error("Better unknown value name generation required!");
+	/*
+	return(make_single_var_complexity(1.0,UNKNOWN_RANGE));
+	*/
+	return complexity_undefined;
     }
 
     /* The following line is merely for debugging */
