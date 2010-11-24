@@ -79,7 +79,7 @@ static bool not_type_chunk_p(void* obj) {
 /* remove entities that are never referenced by @p st from @p s */
 static void do_group_statement_constant_prune(statement st, set s)
 {
-    set ref = get_referenced_entities_filtered(st,not_type_chunk_p,get_referenced_entities_default_entity_filter);
+    set ref = get_referenced_entities_filtered(st,not_type_chunk_p,entity_not_constant_or_intrinsic_p);
     set_intersection(s,s,ref);
     set_free(ref);
 }

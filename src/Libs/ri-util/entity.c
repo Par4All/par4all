@@ -2628,7 +2628,7 @@ set get_referenced_entities_filtered(void *elem,
 /* default entity filter for get_referenced_entities
  * filters out constants and intrinsics
  */
-bool get_referenced_entities_default_entity_filter(entity e) {
+bool entity_not_constant_or_intrinsic_p(entity e) {
     return !entity_constant_p(e) && ! intrinsic_entity_p(e);
 }
 /**
@@ -2644,7 +2644,7 @@ bool get_referenced_entities_default_entity_filter(entity e) {
 set get_referenced_entities(void* elem)
 {
     return get_referenced_entities_filtered(elem,(bool (*)(void*))gen_true,
-            get_referenced_entities_default_entity_filter);
+            entity_not_constant_or_intrinsic_p);
 
 }
 

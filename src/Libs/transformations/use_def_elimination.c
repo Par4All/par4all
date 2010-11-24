@@ -631,9 +631,12 @@ static bool filterout_statement(void *obj) {
     return !INSTANCE_OF(statement,(gen_chunkp)obj);
 }
 
-static bool keep_entity(entity e) {
+/* entities that match the following conditions are not
+ * cleaned from declarations:
+ */
+static bool wipeout_entity(entity e) {
 return
-    get_referenced_entities_default_entity_filter(e) &&
+    entity_not_constant_or_intrinsic_p(e) && // filters out constants and intrinsics
     !formal_parameter_p(e) &&
     !storage_return_p(entity_storage(e)) &&
     !entity_area_p(e)&&
@@ -655,7 +658,7 @@ static void statement_clean_declarations_helper(list declarations, statement stm
     set referenced_entities = get_referenced_entities_filtered(
             stmt,
             filterout_statement,
-            keep_entity);
+            wipeout_entity);
 
     /* look for entity that are used in the statement
      * SG: we need to work on  a copy of the declarations because of
@@ -664,8 +667,9 @@ static void statement_clean_declarations_helper(list declarations, statement stm
     list decl_cpy = gen_copy_seq(declarations);
     FOREACH(ENTITY,e,decl_cpy)
     {
-        /* filtered referenced entities are always used */
-        if(keep_entity(e) && !set_belong_p(referenced_entities,e))
+        /* filtered referenced entities are always used,
+         * some entity types listed in keep_entity cannot be wiped out*/
+        if(wipeout_entity(e) && !set_belong_p(referenced_entities,e))
         {
             /* entities whose declaration have a side effect are always used too */
             bool has_side_effects_p = false;
