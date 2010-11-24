@@ -36,10 +36,10 @@ Code for "use_def_elim02" after use-def elimination
 int use_def_elim02(int i)
 {
    int j;
-   ;
+
 
    j = i+1;
-   ;
-   ;
+
+
    return j;
 }

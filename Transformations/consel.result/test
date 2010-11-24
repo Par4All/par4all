@@ -113,28 +113,25 @@ C     END BLOCK
 C (0,1)
 C     BEGIN BLOCK
 C (0,2)
-C     BEGIN BLOCK
-C (0,3)
 
       CONTINUE                                                          0007
-C     END BLOCK
-C (0,4)
+C (0,3)
 
       DO I = 1, LEN, BUFFER_SIZE                                        0009
-C (0,5)
+C (0,4)
 C        BEGIN BLOCK
-C (0,6)
+C (0,5)
          MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0010
-C (0,7)
+C (0,6)
          DO J = I, MLEN                                                 0011
-C (0,8)
+C (0,7)
             BUFFER(J-I+1) = MSG(J)                                      0012
          ENDDO
-C (0,9)
+C (0,8)
          PRINT *, (BUFFER(K), K = 1, MLEN-I+1)                          0014
 C        END BLOCK
       ENDDO
-C (0,10)
+C (0,9)
 
       RETURN
 C     END BLOCK
