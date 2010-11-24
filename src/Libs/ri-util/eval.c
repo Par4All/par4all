@@ -29,7 +29,7 @@
 This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the
 expression structure. Lower level functions are called until basic atoms
-are reached. The succes of basic atom evaluation depend on the atom
+are reached. The success of basic atom evaluation depend on the atom
 type:
 
 reference: right now, the evaluation fails because we do not compute
