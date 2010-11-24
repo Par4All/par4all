@@ -1,4 +1,4 @@
-Release notes for Par4All 1.0.4, 2010/11/12
+Release notes for Par4All 1.1, 2010/11/24
 ===========================================
 
 Ronan Keryell, HPC Project.
@@ -105,8 +105,9 @@ location::
 
   sudo mv par4all /usr/local/
 
-You will then need to source one of the following shell scripts which set up
-the environment variables for proper Par4All execution:
+In any case, you will then need to source one of the following shell
+scripts which set up the environment variables for proper Par4All
+execution:
 
   - if you use ``bash``, ``sh``, ``dash``, etc.::
 
