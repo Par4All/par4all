@@ -1609,7 +1609,7 @@ bool controlize_statement(control c_res,
     break;
 #endif
   default:
-    pips_internal_error("Unknown instruction tag %d", instruction_tag(i));
+    pips_internal_error("Unknown instruction tag %d\n", instruction_tag(i));
   }
 
     statement_consistent_p(st);
