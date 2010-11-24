@@ -9273,6 +9273,9 @@ outline.
 The property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
 variables which initial values are not used are passed as parameters or
 not. Normally, this should be addressed by a previous privatization.
+
+Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT} make it possible to outline into a newly created compilation unit, adding all necessary types to this new compilation unit, named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
+
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
 \end{PipsProp}
@@ -9287,6 +9290,9 @@ OUTLINE_SMART_REFERENCE_COMPUTATION FALSE
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_LOOP_BOUND_AS_PARAMETER}
 OUTLINE_LOOP_BOUND_AS_PARAMETER ""
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
+OUTLINE_INDEPENDENT_COMPILATION_UNIT FALSE
 \end{PipsProp}
 
 

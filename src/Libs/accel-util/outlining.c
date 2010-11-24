@@ -707,12 +707,21 @@ statement outliner(string outline_module_name, list statements_to_outline)
 					code_declarations(value_code(entity_initial(new_fun))),
 					CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
 	}
+    /* either use origin's compilation unit or a new one */
+    char * cu_name = string_undefined;
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+    }
+    else {
+        cu_name = compilation_unit_of_module(get_current_module_name());
+    }
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, new_body);
-    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), compilation_unit_of_module(get_current_module_name()) );
+
+
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
     set_bool_property(STAT_ORDER,saved);
 	/* horrible hack to prevent declaration duplication
 	 * signed : Serge Guelton
@@ -765,7 +774,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
  * outlining will be performed using either comment recognition
  * or interactively
  *
- * @param module_name name of the module containg the statements to outline
+ * @param module_name name of the module containing the statements to outline
  */
 bool
 outline(char* module_name)
