@@ -92,8 +92,7 @@ add_statement_to_the_statement_to_statement_father_mapping(statement s)
    /* Pop the current_statement_stack: */
    current_statement_rewrite(s);
 
-   ifdebug(4)
-      fprintf(stderr, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#zx), father %p\n",
+   pips_debug(4, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#zx), father %p\n",
               s, statement_ordering(s), current_statement_head());
    
    /* First add the current father for this statement: */
@@ -120,8 +119,7 @@ set_control_statement_father(control c)
 static void
 build_statement_to_statement_father_mapping(statement s)
 {
-   ifdebug(4)
-      fprintf(stderr, "build_statement_to_statement_father_mapping statement %p (%#zx)\n",
+   pips_debug(4, "build_statement_to_statement_father_mapping statement %p (%#zx)\n",
               s, statement_ordering(s));
 
    make_current_statement_stack();
@@ -253,8 +251,7 @@ mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
    /* Mark the current vertex as useful: */
    set_add_element(s, s, (char *) v);
 
-   if (get_debug_level() >= 6)
-      fprintf(stderr, "mark_this_node_and_its_predecessors_in_the_dg_as_useful: vertex %p marked, statement ordering (%#x).\n",
+   pips_debug(6, "mark_this_node_and_its_predecessors_in_the_dg_as_useful: vertex %p marked, statement ordering (%#x).\n",
               v,      
               dg_vertex_label_statement(vertex_vertex_label(v)));
   
@@ -288,8 +285,7 @@ static void
 iterate_through_the_predecessor_graph(statement s,
                                       set elements_to_visit)
 {
-   ifdebug(6)
-      fprintf(stderr, "iterate_through_the_predecessor_graph, statement %p (%#zx).\n",
+  pips_debug(6, "iterate_through_the_predecessor_graph, statement %p (%#zx).\n",
               s, statement_ordering(s));
 
    /* Mark the current statement as useful: */
@@ -312,8 +308,7 @@ iterate_through_the_predecessor_graph(statement s,
                     set_add_element(elements_to_visit,
                                     elements_to_visit,
                                     (char *) s2);
-                       ifdebug(6)
-                          fprintf(stderr, "\tstatement %p (%#zx) useful by use-def.\n",
+                    pips_debug(6, "\tstatement %p (%#zx) useful by use-def.\n",
                                   s2, statement_ordering(s2));
                  },
                     statements_set);
@@ -324,8 +319,7 @@ iterate_through_the_predecessor_graph(statement s,
    if (bound_statement_father_p(s)) {
       statement father = load_statement_father(s);
       set_add_element(elements_to_visit, elements_to_visit, (char *) father);
-      ifdebug(6)
-         fprintf(stderr, "\tstatement %p (%#zx) useful as the statement owner.\n",
+      pips_debug(6, "\tstatement %p (%#zx) useful as the statement owner.\n",
                  father, statement_ordering(father));
    }
 
@@ -342,8 +336,7 @@ iterate_through_the_predecessor_graph(statement s,
                set_add_element(elements_to_visit,
                                elements_to_visit,
                                (char *) control_statement(pred));
-               ifdebug(6)
-                  fprintf(stderr, "\tstatement unstructed IF %p (%#zx) useful by control dependence.\n",
+               pips_debug(6, "\tstatement unstructed IF %p (%#zx) useful by control dependence.\n",
                           control_statement(pred), statement_ordering(control_statement(pred)));
             }           
          }, control_father, blocks);
@@ -356,14 +349,12 @@ iterate_through_the_predecessor_graph(statement s,
 static void
 propagate_the_usefulness_through_the_predecessor_graph()
 {
-   ifdebug(5)
-      fprintf(stderr, "Entering propagate_the_usefulness_through_the_predecessor_graph\n");
+  pips_debug(5, "Entering propagate_the_usefulness_through_the_predecessor_graph\n");
    
    gen_set_closure((void (*)(void *, set)) iterate_through_the_predecessor_graph,
                    the_useful_statements);
 
-   ifdebug(5)
-      fprintf(stderr, "Exiting propagate_the_usefulness_through_the_predecessor_graph\n");
+   pips_debug(5, "Exiting propagate_the_usefulness_through_the_predecessor_graph\n");
 }
 
 
@@ -463,18 +454,17 @@ use_def_deal_if_useful(statement s)
 
    ifdebug(6) {
       if (outside_effect_p)
-        fprintf(stderr, "Statement %p has an outside effect.\n", s);
+        pips_debug(6, "Statement %p has an outside effect.\n", s);
       if (this_statement_has_an_io_effect)
-        fprintf(stderr, "Statement %p has an io effect.\n", s);
+        pips_debug(6, "Statement %p has an io effect.\n", s);
       if (this_statement_writes_a_procedure_argument)
-         fprintf(stderr,
-                 "Statement %p writes an argument of its procedure.\n", s);
+        pips_debug(6,"Statement %p writes an argument of its procedure.\n", s);
       if (this_statement_is_a_format)
-         fprintf(stderr, "Statement %p is a FORMAT.\n", s);
+        pips_debug(6, "Statement %p is a FORMAT.\n", s);
       if (this_statement_is_an_unstructured_test)
-         fprintf(stderr, "Statement %p is an unstructured test.\n", s);
+        pips_debug(6, "Statement %p is an unstructured test.\n", s);
       if (this_statement_is_a_c_return)
-         fprintf(stderr, "Statement %p is a C return.\n", s);
+        pips_debug(6, "Statement %p is a C return.\n", s);
    }
    
    if (this_statement_has_an_io_effect
@@ -486,22 +476,37 @@ use_def_deal_if_useful(statement s)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
-   ifdebug(5) {
-      fprintf(stderr, "end use_def_deal_if_useful\n");
-   }
+   pips_debug(5, "end use_def_deal_if_useful\n");
 }
 
 
-static void
-remove_this_statement_if_useless(statement s)
-{
+static void remove_this_statement_if_useless(statement s, set entities_to_remove) {
    if (! set_belong_p(the_useful_statements, (char *) s)) {
+      pips_debug(6, "remove_this_statement_if_useless removes statement %p (%#zx).\n", s, statement_ordering(s));
+
+      // If this is a "declaration statement" keep track of removed declarations
+      if(empty_statement_or_continue_p(s)) {
+        FOREACH(ENTITY,e, statement_declarations(s)) {
+          set_add_element(entities_to_remove,entities_to_remove,e);
+        }
+      }
+
+      // Get rid of declarations
+      gen_free_list(statement_declarations(s));
+      statement_declarations(s) = NIL;
+
+      // Free old instruction
       free_instruction(statement_instruction(s));
-      statement_instruction(s) = make_instruction_block(NIL);
-      /* Since the RI need to have no label on instruction block: */
-      fix_sequence_statement_attributes(s);
-      if (get_debug_level() >= 6)
-         fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#zx).\n", s, statement_ordering(s));
+
+      // Replace statement with a continue, so that we keep label && comments
+      statement_instruction(s) = make_continue_instruction();
+   } else {
+     // Get rid of removed entity in declarations
+     if(statement_declarations(s) != NIL) {
+       SET_FOREACH(entity,e,entities_to_remove) {
+         gen_remove(&statement_declarations(s),e);
+       }
+     }
    }
 }
 
@@ -509,17 +514,26 @@ remove_this_statement_if_useless(statement s)
 static void
 remove_all_the_non_marked_statements(statement s)
 {
-   ifdebug(5)
-      fprintf(stderr, "Entering remove_all_the_non_marked_statements\n");
-   
-   gen_recurse(s, statement_domain,
+   pips_debug(5, "Entering remove_all_the_non_marked_statements\n");
+
+   // Keep track of removed entities
+   set entities_to_remove = set_make(set_pointer);
+
+   gen_context_recurse(s, entities_to_remove, statement_domain,
                /* Since statements can be nested, only remove in a
                   bottom-up way: */
                gen_true,
                remove_this_statement_if_useless);
 
-   ifdebug(5)
-      fprintf(stderr, "Exiting remove_all_the_non_marked_statements\n");
+   ifdebug(6) {
+     SET_FOREACH(entity,e,entities_to_remove) {
+       pips_debug(6,"Entity '%s' has been totaly removed\n",entity_name(e));
+     }
+   }
+
+   set_free(entities_to_remove);
+
+   pips_debug(5, "Exiting remove_all_the_non_marked_statements\n");
 }
 
 
@@ -554,11 +568,7 @@ use_def_elimination_on_a_statement(statement s)
 }
 
 
-/* Obsolete name: it should be called dead_code_eliminiation()
- *
- * Maintained for backward compatibility.
- */
-bool use_def_elimination(char * module_name)
+bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
 
@@ -619,7 +629,19 @@ bool use_def_elimination(char * module_name)
 
 bool dead_code_elimination(char * module_name)
 {
-  return use_def_elimination(module_name);
+  debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
+  return dead_code_elimination_on_module(module_name);
+}
+
+
+/* Obsolete name: it should be called dead_code_eliminiation()
+ *
+ * Maintained for backward compatibility.
+ */
+bool use_def_elimination(char * module_name)
+{
+  debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
+  return dead_code_elimination_on_module(module_name);
 }
 
 /* moved from ri-util/statements.c */
