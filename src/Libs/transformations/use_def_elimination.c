@@ -627,6 +627,19 @@ bool dead_code_elimination(char * module_name)
 
 /**  @} */
 
+static bool filterout_statement(void *obj) {
+    return !INSTANCE_OF(statement,(gen_chunkp)obj);
+}
+
+static bool keep_entity(entity e) {
+return
+    get_referenced_entities_default_entity_filter(e) &&
+    !formal_parameter_p(e) &&
+    !storage_return_p(entity_storage(e)) &&
+    !entity_area_p(e)&&
+    !entity_struct_p(e)&&
+    !entity_union_p(e);
+}
 
 /**
  * remove useless entities from declarations
@@ -639,18 +652,20 @@ bool dead_code_elimination(char * module_name)
  */
 static void statement_clean_declarations_helper(list declarations, statement stmt)
 {
-    set referenced_entities = get_referenced_entities(stmt);
-    list decl_cpy = gen_copy_seq(declarations);
+    set referenced_entities = get_referenced_entities_filtered(
+            stmt,
+            filterout_statement,
+            keep_entity);
 
     /* look for entity that are used in the statement
      * SG: we need to work on  a copy of the declarations because of
      * the RemoveLocalEntityFromDeclarations
      */
+    list decl_cpy = gen_copy_seq(declarations);
     FOREACH(ENTITY,e,decl_cpy)
     {
-        /* area and parameters are always used, so are referenced entities */
-        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) || (storage_return_p(entity_storage(e))) || entity_struct_p(e) || entity_union_p(e) );
-        else
+        /* filtered referenced entities are always used */
+        if(keep_entity(e) && !set_belong_p(referenced_entities,e))
         {
             /* entities whose declaration have a side effect are always used too */
             bool has_side_effects_p = false;
@@ -680,8 +695,8 @@ static void statement_clean_declarations_helper(list declarations, statement stm
             }
         }
     }
-
     gen_free_list(decl_cpy);
+
     set_free(referenced_entities);
 }
 
@@ -695,14 +710,6 @@ static void entity_generate_missing_declarations(entity module, statement s)
 {
   /* gather referenced entities */
   set referenced_entities = get_referenced_entities(s);
-  set ref_tmp = set_make(set_pointer);
-  /* gather all entities referenced by referenced entities */
-  SET_FOREACH(entity,e0,referenced_entities) {
-    entity_get_referenced_entities(e0,ref_tmp);
-  }
-
-  referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
-  set_free(ref_tmp);
 
   /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
   list new = NIL;
