@@ -1,2 +1,2 @@
-dist_pkgpython_PYTHON = terapyps.py
+dist_pkgpython_PYTHON = terapyps.py terapyps_asm.py
 

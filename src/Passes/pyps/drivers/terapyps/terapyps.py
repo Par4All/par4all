@@ -1,4 +1,5 @@
 from pyps import module, workspace
+import terapyps_asm
 import pypsutils
 from subprocess import Popen, PIPE
 import os,sys,shutil,tempfile
@@ -60,6 +61,8 @@ def smart_loop_expansion(m,l,sz,debug,center=False):
 	m.invariant_code_motion()
 	m.redundant_load_store_elimination()
 	if debug:m.display()
+
+
 
 
 module.smart_loop_expansion=smart_loop_expansion
@@ -217,6 +220,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 		m.forward_substitute()
 		m.redundant_load_store_elimination()
 		if debug:m.display()
+		m.split_update_operator()
 		m.simd_atomizer(atomize_reference=True,atomize_lhs=True)
 		m.generate_two_addresses_code()
 		w.check(debug)
@@ -231,11 +235,14 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 			m.display()
 			m.callers.display()
 	w.check(debug)
-	#for m in microcodes:
-	#	for asm in w.fun:
-	#		if asm.cu == assembly:
-	#			m.expression_substitution(asm.name)
-	#	if debug:m.display()
+
+	# generate assembly
+	for m in microcodes:
+		for asm in w.fun:
+			if asm.cu == assembly:
+				m.expression_substitution(asm.name)
+		if debug:m.display()
+		terapyps_asm.conv(w.dirname()+m.show("printed_file"),sys.stdout)
 
 module.terapix_code_generation=terapix_code_generation
 
@@ -402,6 +409,10 @@ TYPE OP(pset,SUFF)(TYPE *lhs, TYPE rhs)
 TYPE OP(setp,SUFF)(TYPE lhs, TYPE *rhs)
 {
     return lhs=*rhs;
+}
+TYPE OP(psetp,SUFF)(TYPE *lhs, TYPE *rhs)
+{
+    return *lhs=*rhs;
 }
 TYPE* OP(padd,SUFF)(TYPE *lhs, int rhs)
 {
