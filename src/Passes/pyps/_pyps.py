@@ -211,10 +211,6 @@ class workspace(object):
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
 
-		if not name :
-			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
-		if os.path.exists(".".join([name,"database"])):
-			raise RuntimeError("Cannot create two workspaces with same database")
 
 		self.cpypips = cpypips
 		self.recoverInclude = recoverInclude
@@ -223,6 +219,14 @@ class workspace(object):
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
 		self._sources=[]
+
+		if not name :
+			#  generate a random place in $PWS
+			dirname=tempfile.mktemp(".database","PYPS",dir=".")
+			name=os.path.splitext(os.path.basename(dirname))[0]
+
+		if os.path.exists(".".join([name,"database"])):
+			raise RuntimeError("Cannot create two workspaces with same database")
 
 		# because of the way we recover include, relative paths are changed, which could be a proplem for #includes
 		if recoverInclude: cppflags=pypsutils.patchIncludes(cppflags)
@@ -299,6 +303,8 @@ class workspace(object):
 		return self
 	def __exit__(self,exc_type, exc_val, exc_tb):
 		"""handler for the with keyword"""
+		if exc_type:# we want to keep info on why we aborted
+			self.deleteOnClose=False 
 		self.close()
 		return False
 
@@ -470,12 +476,14 @@ class workspace(object):
 	def close(self):
 		"""force cleaning and deletion of the workspace"""
 		map(shutil.rmtree,self.checkpoints)
-		if self.tmpDirName:shutil.rmtree(self.tmpDirName)
 		try : self.cpypips.close_workspace(0)
 		except RuntimeError: pass
 		if self.deleteOnClose:
 			try : workspace.delete(self._name)
 			except RuntimeError: pass
+		if self.tmpDirName:
+			try : shutil.rmtree(self.tmpDirName)
+			except OSError: pass
 		self.hasBeenClosed = True
 
 	def __getattribute__(self, name):
