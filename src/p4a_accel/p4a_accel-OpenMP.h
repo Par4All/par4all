@@ -22,7 +22,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-struct timeval p4a_time_begin, p4a_time_end;
+extern struct timeval p4a_time_begin, p4a_time_end;
 
 /** This is a global variable used to simulate P4A virtual processor
     coordinates in OpenMP because we need to pass a local variable to a
@@ -68,7 +68,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing by default for OpenMP since it is normal C
 */
-#define P4A_accel_kernel
+#define P4A_accel_kernel void
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
@@ -76,7 +76,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing by default since it is homogeneous programming model
 */
-#define P4A_accel_kernel_wrapper
+#define P4A_accel_kernel_wrapper void
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
