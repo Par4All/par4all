@@ -184,44 +184,6 @@ pips_region_user_name(entity ent)
     return name;
 }
 
-/** @brief weight function for Pvecteur passed as argument to
- *         sc_lexicographic_sort in prettyprint functions involving cell descriptors.
- *
- * The strange argument type is required by qsort(), deep down in the calls.
- * This function is an adaptation of is_inferior_pvarval in semantics
- */
-int
-is_inferior_cell_descriptor_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
-{
-    /* The constant term is given the highest weight to push constant
-       terms at the end of the constraints and to make those easy
-       to compare. If not, constant 0 will be handled differently from
-       other constants. However, it would be nice to give constant terms
-       the lowest weight to print simple constraints first...
-
-       Either I define two comparison functions, or I cheat somewhere else.
-       Let's cheat? */
-    int is_equal = 0;
-
-    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
-      is_equal = 1;
-    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
-      is_equal = 0;
-    else if(term_cst(*pvarval2))
-      is_equal = -1;
-    else if(variable_phi_p((entity) vecteur_var(*pvarval1))
-	    && !variable_phi_p((entity) vecteur_var(*pvarval2)))
-      is_equal = -1;
-    else  if(variable_phi_p((entity) vecteur_var(*pvarval2))
-	    && !variable_phi_p((entity) vecteur_var(*pvarval1)))
-      is_equal = 1;
-    else
-	is_equal =
-	    strcmp(entity_name((entity) vecteur_var(*pvarval1)),
-		   entity_name((entity) vecteur_var(*pvarval2)));
-
-    return is_equal;
-}
 
 
 /********** POINT_TO *************/
@@ -402,148 +364,6 @@ list words_points_to_list(__attribute__((unused))string note, points_to_list s)
 
 /************* POINTER VALUES */
 
-int cell_compare(cell *c1, cell *c2)
-{
-  int c1_pos = 0; /* result */
-  pips_assert("gaps not handled yet (ppv1 first)", !cell_gap_p(*c1));
-  pips_assert("gaps not handled yet (ppv2 first)", !cell_gap_p(*c2));
-
-  reference r1 = cell_reference(*c1);
-  reference r2 = cell_reference(*c2);
-  entity e1 = reference_variable(r1);
-  entity e2 = reference_variable(r2);
-
-  if(same_entity_p(e1, e2))
-    {
-      /* same entity, sort on indices values */
-      list dims1 = reference_indices(r1);
-      list dims2 = reference_indices(r2);
-
-      size_t nb_dims1 = gen_length(dims1);
-      size_t nb_dims2 = gen_length(dims2);
-
-      for(;!ENDP(dims1) && !ENDP(dims2) && c1_pos == 0; POP(dims1), POP(dims2))
-	{
-	  expression e1 = EXPRESSION(CAR(dims1));
-	  expression e2 = EXPRESSION(CAR(dims2));
-
-	  if(unbounded_expression_p(e1))
-	    if(unbounded_expression_p(e2))
-	      c1_pos = 0;
-	    else
-	      c1_pos = 1;
-	  else
-	    if(unbounded_expression_p(e2))
-	      c1_pos = -1;
-	    else
-	      {
-		syntax s1 = expression_syntax(e1);
-		syntax s2 = expression_syntax(e2);
-		if (syntax_reference_p(s1)
-		    && entity_field_p(reference_variable(syntax_reference(s1)))
-		    && syntax_reference_p(s2)
-		    && entity_field_p(reference_variable(syntax_reference(s2))))
-		  {
-		    entity fe1 = reference_variable(syntax_reference(s1));
-		    entity fe2 = reference_variable(syntax_reference(s2));
-		    if (!same_entity_p(fe1, fe2))
-		      c1_pos = strcmp(entity_name(fe1),entity_name(fe2));
-		  }
-		else
-		  {
-		    intptr_t i1 = 0;
-		    intptr_t i2 = 0;
-		    intptr_t diff = 0;
-
-		    int r1 = expression_integer_value(e1, &i1);
-		    int r2 = expression_integer_value(e2, &i2);
-
-		    if (r1 && r2)
-		      {
-			diff = i1 - i2;
-			c1_pos = diff==0? 0 : (diff>0?1:-1);
-		      }
-		  }
-	      }
-	}
-
-      if (c1_pos == 0)
-	c1_pos = (nb_dims1 < nb_dims2) ? -1 : ( (nb_dims1 > nb_dims2) ? 1 : 0);
-    }
-  else
-    {
-      /* not same entity, sort on entity name */
-      /* sort on module name */
-      c1_pos = strcmp(entity_module_name(e1), entity_module_name(e2));
-
-      /* if same module name: sort on entity local name */
-      if (c1_pos == 0)
-	  c1_pos = strcmp(entity_user_name(e1), entity_user_name(e2));
-      /* else: current module comes first, others in lexicographic order */
-      else
-	{
-	  entity module = get_current_module_entity();
-
-	  if (strcmp(module_local_name(module), entity_module_name(e1)) == 0)
-	    c1_pos = -1;
-	  if (strcmp(module_local_name(module), entity_module_name(e2)) == 0)
-	    c1_pos = 1;
-	}
-    }
-
-  return c1_pos;
-}
-
-/* Compares two pointer values for sorting. The first criterion is based on names.
- * Local entities come first; then they are sorted according to the
- * lexicographic order of the module name, and inside each module name class,
- * according to the local name lexicographic order. Then for a given
- * entity name, a read effect comes before a write effect. It is assumed
- * that there is only one effect of each type per entity. bc.
- */
-int
-pointer_value_compare(cell_relation *ppv1, cell_relation *ppv2)
-{
-  int ppv1_pos = 0; /* result */
-  /* compare first references of *ppv1 and *ppv2 */
-
-  cell ppv1_first_c = cell_relation_first_cell(*ppv1);
-  cell ppv2_first_c = cell_relation_first_cell(*ppv2);
-
-  pips_assert("there should not be preference cells in pointer values (ppv1 first) \n",
-	      !cell_preference_p(ppv1_first_c));
-  pips_assert("there should not be preference cells in pointer values (ppv2 first) \n",
-	      !cell_preference_p(ppv2_first_c));
-
-  pips_assert("the first cell must have value_of interpretation (ppv1)\n",
-	      cell_relation_first_value_of_p(*ppv1));
-  pips_assert("the first cell must have value_of interpretation (ppv2)\n",
-	      cell_relation_first_value_of_p(*ppv2));
-
-  ppv1_pos = cell_compare(&ppv1_first_c, &ppv2_first_c);
-
-  if (ppv1_pos == 0)       /* same first cells */
-    {
-      /* put second cells value_of before address_of */
-      bool ppv1_second_value_of_p = cell_relation_second_value_of_p(*ppv1);
-      bool ppv2_second_value_of_p = cell_relation_second_value_of_p(*ppv2);
-
-      ppv1_pos = (ppv1_second_value_of_p ==  ppv2_second_value_of_p) ? 0 :
-	(ppv1_second_value_of_p ? -1 : 1);
-
-      if (ppv1_pos == 0) /* both are value_of or address_of*/
-	{
-	  /* compare second cells */
-	  cell ppv1_second_c = cell_relation_second_cell(*ppv1);
-	  cell ppv2_second_c = cell_relation_second_cell(*ppv2);
-	  ppv1_pos = cell_compare(&ppv1_second_c, &ppv2_second_c);
-
-	}
-    }
-  return(ppv1_pos);
-}
-
-
 list words_pointer_value(cell_relation pv)
 {
   cell first_c = cell_relation_first_cell(pv);
@@ -565,7 +385,7 @@ list words_pointer_value(cell_relation pv)
   reference first_r = cell_reference(first_c);
   reference second_r = cell_reference(second_c);
   approximation ap = cell_relation_approximation(pv);
-  pips_assert("approximation is not must\n", !approximation_must_p(ap));
+  pips_assert("approximation is not must\n", !approximation_exact_p(ap));
 
   w= gen_nconc(w, effect_words_reference(first_r));
   w = CHAIN_SWORD(w," == ");

@@ -803,7 +803,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
       pv_res->l_out = l_in;
       pv_res->result_paths = CONS(EFFECT, make_effect(make_undefined_pointer_value_cell(),
 						      make_action_write_memory(),
-						      make_approximation_must(),
+						      make_approximation_exact(),
 						      make_descriptor_none()),NIL);
       pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 						  make_cell_interpretation_value_of(), NIL);
@@ -824,7 +824,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	    {
 	      pv_res->result_paths = CONS(EFFECT, make_effect(make_null_pointer_value_cell(),
 							     make_action_read_memory(),
-							     make_approximation_must(),
+							     make_approximation_exact(),
 							     make_descriptor_none()), NIL);
 	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 							  make_cell_interpretation_value_of(),
@@ -947,12 +947,12 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 	  /* We should be here only in case of a pointer value rhs, and the value should be 0 */
 	  if (constant_int_p(func_const) && (constant_int(func_const) == 0))
 	    {
-	      /* use approximation_must to be consistent with effects,
+	      /* use approximation_exact to be consistent with effects,
 		 should be approximation_exact */
 	      pv_res->result_paths = CONS(EFFECT,
 					  make_effect(make_null_pointer_value_cell(),
 						      make_action_read_memory(),
-						      make_approximation_must(),
+						      make_approximation_exact(),
 						      make_descriptor_none()),
 					  NIL);
 	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
@@ -971,7 +971,7 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 		      /* not generic here */
 		      effect eff = make_effect(make_cell_reference(make_reference(func, NIL)),
 					       make_action_read_memory(),
-					       make_approximation_must(),
+					       make_approximation_exact(),
 					       make_descriptor_none());
 		      effect_add_dereferencing_dimension(eff);
 		      pv_res->result_paths = CONS(EFFECT, eff, NIL);
@@ -1209,7 +1209,7 @@ void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
       /* First, search for all accessible pointers */
       list l_lhs = generic_effect_generate_all_accessible_paths_effects_with_level
 	(lhs_base_eff, lhs_type, is_action_write, false, 0, true);
-      if(effect_must_p(lhs_base_eff))
+      if(effect_exact_p(lhs_base_eff))
 	effects_to_must_effects(l_lhs); /* to work around the fact that exact effects are must effects */
       pips_debug_effects(2, "l_lhs = ", l_lhs);
 

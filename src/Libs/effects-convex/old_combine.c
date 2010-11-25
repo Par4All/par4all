@@ -573,8 +573,8 @@ effect regions_must_convex_hull(region r1, region r2)
 
 	if (op_statistics_p())
 	  {
-	    if ((app1 == is_approximation_must) &&
-		(app2 == is_approximation_must))
+	    if ((app1 == is_approximation_exact) &&
+		(app2 == is_approximation_exact))
 	      nb_umust_must_must++;
 	    else
 	      if (!((app1 == is_approximation_may)
@@ -607,16 +607,16 @@ effect regions_must_convex_hull(region r1, region r2)
 	  {
 	    switch (app1)
 	      {
-	      case is_approximation_must:
+	      case is_approximation_exact:
 
 		switch (app2)
 		  {
-		  case is_approximation_must: /* U_must(must, must) */
+		  case is_approximation_exact: /* U_must(must, must) */
 		    /* si enveloppe convexe (s1, s2) exacte must sinon may */
 		    if (sc_convex_hull_equals_union_p_ofl(sr,s1,s2))
 		      {
 			pips_debug(8,"exact convex hull\n");
-			appr = is_approximation_must;
+			appr = is_approximation_exact;
 		      }
 		    else
 		      {
@@ -626,20 +626,20 @@ effect regions_must_convex_hull(region r1, region r2)
 		    if (op_statistics_p())
 		      {
 			nb_umust_must_must++;
-			if (appr == is_approximation_must)
+			if (appr == is_approximation_exact)
 			  nb_umust_must_must_must++;
 		      }
 		    break;
 
 		  case is_approximation_may: /* U_must(must,may) */
 		    if(sc_inclusion_p_ofl(s2,s1))
-		      appr = is_approximation_must;
+		      appr = is_approximation_exact;
 		    else
 		      appr = is_approximation_may;
 		    if (op_statistics_p())
 		      {
 			nb_umust_must_may++;
-			if (appr == is_approximation_must)
+			if (appr == is_approximation_exact)
 			  nb_umust_must_may_must++;
 		      }
 		    break;
@@ -649,15 +649,15 @@ effect regions_must_convex_hull(region r1, region r2)
 
 		switch (app2)
 		  {
-		  case is_approximation_must: /* U_must(may,must) */
+		  case is_approximation_exact: /* U_must(may,must) */
 		    if(sc_inclusion_p_ofl(s1,s2))
-		      appr = is_approximation_must;
+		      appr = is_approximation_exact;
 		    else
 		      appr = is_approximation_may;
 		    if (op_statistics_p())
 		      {
 			nb_umust_must_may++;
-			if (appr == is_approximation_must)
+			if (appr == is_approximation_exact)
 			  nb_umust_must_may_must++;
 		      }
 		    break;
@@ -820,7 +820,7 @@ static effect regions_may_convex_hull(region r1, region r2)
 
 	if (op_statistics_p())
 	{
-	    if (approximation_and(app1,app2) == is_approximation_must)
+	    if (approximation_and(app1,app2) == is_approximation_exact)
 		nb_umay_must_must++;
 	}
 
@@ -846,14 +846,14 @@ static effect regions_may_convex_hull(region r1, region r2)
 	}
 	else
 	{
-	    if ((app1 == is_approximation_must) &&
-		(app2 == is_approximation_must))
+	    if ((app1 == is_approximation_exact) &&
+		(app2 == is_approximation_exact))
 	    {
 		/* U_may(must,must) */
 		/* si s1 == s2 (ie repre'sentent le me^me ensemble)
 		 * alors must sinon may */
 		if (sc_equal_p_ofl(s1,s2))
-		    appr = is_approximation_must;
+		    appr = is_approximation_exact;
 		else
 		    appr = is_approximation_may;
 	    }
@@ -868,10 +868,10 @@ static effect regions_may_convex_hull(region r1, region r2)
 
     if (op_statistics_p())
     {
-	if (approximation_and(app1,app2) == is_approximation_must)
+	if (approximation_and(app1,app2) == is_approximation_exact)
 	{
 	    nb_umay_must_must++;
-	    if (appr == is_approximation_must) nb_umay_must++;
+	    if (appr == is_approximation_exact) nb_umay_must++;
 	}
     }
     }
@@ -1127,10 +1127,10 @@ list region_sup_difference(region reg1, region reg2)
 
 	switch (app2)
 	  {
-	  case is_approximation_must :
-	    if (app1 == is_approximation_must)
+	  case is_approximation_exact :
+	    if (app1 == is_approximation_exact)
 	      {
-		app = is_approximation_must;
+		app = is_approximation_exact;
 		if (op_statistics_p()) nb_dsup_pot_must++;
 	      }
 	    else
@@ -1150,9 +1150,9 @@ list region_sup_difference(region reg1, region reg2)
 		UNCATCH(overflow_error);
 	      }
 
-	    if (op_statistics_p() && app == is_approximation_must &&
+	    if (op_statistics_p() && app == is_approximation_exact &&
 		(approximation_tag(effect_approximation(reg1)) ==
-		 is_approximation_must))
+		 is_approximation_exact))
 	      nb_dsup_must++;
 
 	    break;
@@ -1165,12 +1165,12 @@ list region_sup_difference(region reg1, region reg2)
 	    }
 	    TRY
 	      {
-		if (app1 == is_approximation_must)
+		if (app1 == is_approximation_exact)
 		  {
 		    if (op_statistics_p()) nb_dsup_pot_must++;
 		    if (sc_intersection_empty_p_ofl(sc1,sc2))
 		      {
-			app = is_approximation_must;
+			app = is_approximation_exact;
 			if (op_statistics_p()) nb_dsup_must++;
 		      }
 		    else app = is_approximation_may;
@@ -1277,7 +1277,7 @@ list region_inf_difference(region reg1, region reg2)
     if (op_statistics_p())
     {
 	nb_dinf++;
-	if (app == is_approximation_must) nb_dinf_pot_must++;
+	if (app == is_approximation_exact) nb_dinf_pot_must++;
     }
 
     CATCH(overflow_error)
@@ -1298,7 +1298,7 @@ list region_inf_difference(region reg1, region reg2)
     }
 
     if (op_statistics_p() && !ENDP(l_res))
-	if (app == is_approximation_must) nb_dinf_must++;
+	if (app == is_approximation_exact) nb_dinf_must++;
 
     ifdebug(6)
     {
@@ -1398,8 +1398,8 @@ static list disjunction_to_list_of_regions(Pdisjunct disjonction, region reg,
 	    reg_ps = region_dup(reg);
 	    sc_rm(region_system(reg_ps));
 	    region_system_(reg_ps) = newgen_Psysteme(ps);
-	    app = (exact && (app == is_approximation_must))?
-		is_approximation_must : is_approximation_may;
+	    app = (exact && (app == is_approximation_exact))?
+		is_approximation_exact : is_approximation_may;
 	    region_approximation_tag(reg_ps) = app;
 	    l_reg = CONS(EFFECT, reg_ps, l_reg);
 	}

@@ -48,7 +48,7 @@ summary_to_proper_reference(
 {
     effect e = make_simple_effect(r, /* persistent! */
 				  make_action_write_memory(),
-			   make_approximation(is_approximation_must, UU));
+			   make_approximation(is_approximation_exact, UU));
     list /* of effect */ lef, /* of reference */ lref = NIL;
 
     pips_debug(7, "reference to %s\n", entity_name(reference_variable(r)));

@@ -67,9 +67,9 @@ list make_simple_pv_from_simple_effects(effect lhs_eff, effect rhs_eff, cell_int
   tag t = approximation_and(lhs_t, rhs_t);
 
   pips_debug(5,"approximation before converting to store independent cells: %s\n",
-	     t == is_approximation_must ? "must": "may");
+	     t == is_approximation_exact ? "must": "may");
 
-  if (t == is_approximation_must) t = is_approximation_exact;
+  if (t == is_approximation_exact) t = is_approximation_exact;
 
   cell lhs_c = make_cell(is_cell_reference, copy_reference(effect_any_reference(lhs_eff)));
 
@@ -1166,7 +1166,7 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 		  effect eff_alias = make_effect(make_cell_reference(ref),
 						 copy_action(effect_action(eff_intermediary)),
 						 exact_translation_p ?
-						 make_approximation_must()
+						 make_approximation_exact()
 						 : make_approximation_may(), make_descriptor_none());
 		  pips_debug_effect(5, "resulting effect \n", eff_alias);
 		  if (anywhere_effect_p(eff_alias))
@@ -1237,7 +1237,7 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 		  effect eff_alias = make_effect(make_cell_reference(ref),
 						 make_action_write_memory(),
 						 exact_translation_p && exact_preceding_test ?
-						 make_approximation_must()
+						 make_approximation_exact()
 						 : make_approximation_may(), make_descriptor_none());
 		  free_reference(new_ref);
 		  pips_debug_effect(5, "resulting effect \n", eff_alias);

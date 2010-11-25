@@ -945,7 +945,7 @@ fortran_summary_to_proper_effects(entity func,
 				term = "th";
 			    }
 
-			    if (effect_must_p(formal_effect))
+			    if (effect_exact_p(formal_effect))
 				pips_user_warning
 				    ("\nmodule %s called by module %s:\n\twrite"
 				     " effect on non-variable actual"

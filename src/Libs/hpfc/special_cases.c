@@ -426,7 +426,7 @@ statement s;
      {
 	 if (reference_variable(effect_any_reference(e)) == var)
 	 {
-	     if (!approximation_must_p(effect_approximation(e)) ||
+	     if (!approximation_exact_p(effect_approximation(e)) ||
 		 !rectangular_region_p(effect_system(e)))
 	     {
 		 pips_debug(6, "FALSE\n"); return FALSE;

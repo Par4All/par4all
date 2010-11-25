@@ -1251,7 +1251,7 @@ effect make_reference_region(reference ref, action tac)
 		    make_reference(reference_variable(ref), reg_ref_inds),
 		    copy_action(tac),
 		    make_approximation
-		    (linear_p? is_approximation_must : is_approximation_may,
+		    (linear_p? is_approximation_exact : is_approximation_may,
 		     UU),
 		    sc);
   debug_region_consistency(reg);
@@ -1399,7 +1399,7 @@ effect reference_whole_region(reference ref, action tac)
 		      make_reference(reference_variable(ref), reg_ref_inds),
 		      copy_action(tac),
 		      make_approximation
-		      (linear_p? is_approximation_must : is_approximation_may,
+		      (linear_p? is_approximation_exact : is_approximation_may,
 		       UU),
 		    sc);
     debug_region_consistency(reg);

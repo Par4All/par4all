@@ -1191,7 +1191,7 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
   effect init_e = make_effect(make_cell(is_cell_preference,
 					make_preference(make_reference(loop_index(l), NIL))),
 			      make_action_write_memory(),
-			      make_approximation_must(),
+			      make_approximation_exact(),
 			      make_descriptor_none());
   list l_init_e = CONS(EFFECT, init_e, NIL);
   list l_expr_e = expression_to_proper_effects(range_lower(loop_range(l)));

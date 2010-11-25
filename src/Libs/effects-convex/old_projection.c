@@ -1064,7 +1064,7 @@ list l_var;
 	    list ll_var = l_var;
 
 	    for(; !ENDP(ll_var) &&
-		    (region_approximation_tag(reg) == is_approximation_must);
+		    (region_approximation_tag(reg) == is_approximation_exact);
 		ll_var = CDR(ll_var))
 	    {
 		region_exact_projection_along_variable(reg,
@@ -1148,7 +1148,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 	if (op_statistics_p())
 	{
 	    nb_proj_var++;
-	    if (region_approximation_tag(reg) == is_approximation_must)
+	    if (region_approximation_tag(reg) == is_approximation_exact)
 		nb_proj_var_pot_must++;
 	}
 
@@ -1190,7 +1190,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    region_system_(reg) = newgen_Psysteme(sc);
 
 		    if (op_statistics_p() &&
-			(region_approximation_tag(reg)==is_approximation_must))
+			(region_approximation_tag(reg)==is_approximation_exact))
 			nb_proj_var_must++;
 		}
 		else
@@ -1205,7 +1205,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    sc = region_sc_normalize(sc,2);
 		    region_system_(reg)= newgen_Psysteme(sc);
 
-		    if (region_approximation_tag(reg) == is_approximation_must)
+		    if (region_approximation_tag(reg) == is_approximation_exact)
 		    {
 			if (!is_proj_exact)
 			    region_approximation_tag(reg) = is_approximation_may;

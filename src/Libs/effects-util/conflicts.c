@@ -60,7 +60,7 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
   bool conflict_p = FALSE;
 
   /* We enforce must approximation for the two effects */
-  if ( approximation_must_p(ap1) && approximation_must_p(ap2) ) {
+  if ( approximation_exact_p(ap1) && approximation_exact_p(ap2) ) {
     /* We enforce that at least one effect is a write */
     if ( action_write_p(ac1) || action_write_p(ac2) ) {
       cell cell1 = effect_cell(eff1);

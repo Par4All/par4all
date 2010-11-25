@@ -682,7 +682,7 @@ static bool verify_used_before_set_statement_flt(statement s)
 	    approximation app = region_approximation(reg);
 	    ifdebug(3)
 	      fprintf(stderr,"\nFound variable %s in the IN region list\n",entity_name(ent));
-	    if (approximation_must_p(app) && 
+	    if (approximation_exact_p(app) && 
 	       (!variable_in_common_p(current_entity) || 
 	       (variable_in_common_p(current_entity) && 
 		common_variable_in_module_scope_p(current_entity,current_mod))))
@@ -923,7 +923,7 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
 	  }
       }
   },l_layout);
-  if (approximation_must_p(app))
+  if (approximation_exact_p(app))
     {	
       pips_debug(2,"MUST IN at module statement\n");
       user_log("\nCommon variable %s is used before set\n",entity_name(ent));
@@ -1013,7 +1013,7 @@ static void initialize_and_verify_local_variable(entity ent,region reg)
       else
 	{
 	  approximation app = region_approximation(reg);
-	  if (approximation_must_p(app))
+	  if (approximation_exact_p(app))
 	    {	
 	      pips_debug(2,"MUST IN at module statement\n");
 	      user_log("\nLocal variable %s is used before set\n",entity_name(ent));

@@ -939,7 +939,7 @@ hash_table hash_complexity_params;
 	storage s = entity_storage(e);
 
 	if ( !storage_formal_p(s) &&
-	    action_read_p(ac) && approximation_must_p(ap) ) {
+	    action_read_p(ac) && approximation_exact_p(ap) ) {
 	    debug(5,"add_common_variables_to_hash_table",
 		  "%s added\n", module_local_name(e));
 	    hash_put(hash_complexity_params, (char *) module_local_name(e),
@@ -968,7 +968,7 @@ hash_table hash_complexity_params;
 	approximation ap = effect_approximation(obj);
 	entity e = reference_variable(r);
 
-	if ( action_read_p(ac) && approximation_must_p(ap) ) {
+	if ( action_read_p(ac) && approximation_exact_p(ap) ) {
 	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 		fprintf(stderr, "%s deleted\n", module_local_name(e));
 	    }
@@ -988,7 +988,7 @@ char *var_name;
 	    pips_internal_error("unexpected effect undefined");
 
 	if ( action_write_p(effect_action(eff)) 
-	    && approximation_must_p(effect_approximation(eff)) ) {
+	    && approximation_exact_p(effect_approximation(eff)) ) {
 	    reference r = effect_any_reference(eff);
 	    entity e = reference_variable(r);
 /*	    

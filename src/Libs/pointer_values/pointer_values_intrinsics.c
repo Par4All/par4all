@@ -1594,7 +1594,7 @@ static void free_to_post_pv(list l_free_eff, list l_in,
 	    CONS(EFFECT,
 		 make_effect( make_undefined_pointer_value_cell(),
 			      make_action_write_memory(),
-			      make_approximation_must(),
+			      make_approximation_exact(),
 			      make_descriptor_none()),
 		 NIL);
 	  list l_kind = CONS(CELL_INTERPRETATION,
@@ -1634,7 +1634,7 @@ static void free_to_post_pv(list l_free_eff, list l_in,
 	    CONS(EFFECT,
 		 make_effect( make_undefined_pointer_value_cell(),
 			      make_action_write_memory(),
-			      make_approximation_must(),
+			      make_approximation_exact(),
 			      make_descriptor_none()),
 		 NIL);
 	  list l_kind = CONS(CELL_INTERPRETATION,
@@ -1724,7 +1724,7 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 
       effect eff = make_effect(make_cell_reference(make_reference(e, NIL)),
 			       make_action_write_memory(),
-			       make_approximation_must(),
+			       make_approximation_exact(),
 			       make_descriptor_none());
 
       if (!entity_heap_location_p(e))

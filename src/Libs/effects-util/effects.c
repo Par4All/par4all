@@ -876,8 +876,8 @@ bool effect_list_can_be_safely_full_freed_p(list el)
  */
 tag approximation_and(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) && (t2 == is_approximation_must))
-	return(is_approximation_must);
+    if ((t1 == is_approximation_exact) && (t2 == is_approximation_exact))
+	return(is_approximation_exact);
     else
 	return(is_approximation_may);
 }
@@ -891,8 +891,8 @@ tag approximation_and(tag t1, tag t2)
  */
 tag approximation_or(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) || (t2 == is_approximation_must))
-	return(is_approximation_must);
+    if ((t1 == is_approximation_exact) || (t2 == is_approximation_exact))
+	return(is_approximation_exact);
     else
 	return(is_approximation_may);
 }

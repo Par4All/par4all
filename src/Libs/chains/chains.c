@@ -232,7 +232,7 @@ static bool init_one_statement( statement st ) {
  */
 static void kill_effect( set kill, effect e ) {
   if ( action_write_p(effect_action(e))
-      && approximation_must_p(effect_approximation(e)) ) {
+      && approximation_exact_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
           /* We only kill store effect */
           if(!store_effect_p(theEffect)) continue;

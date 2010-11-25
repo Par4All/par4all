@@ -54,7 +54,7 @@
 /* The following define may be replaced by #define ... (TRUE) */
 #define effect_may_or_must_p(my_effect) \
   ((approximation_may_p(effect_approximation(my_effect))) || \
-   (approximation_must_p(effect_approximation(my_effect))) )
+   (approximation_exact_p(effect_approximation(my_effect))) )
 
 #define effect_to_name(the_effect)\
   entity_name(reference_variable(effect_any_reference(the_effect)))

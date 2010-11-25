@@ -299,8 +299,7 @@ Memory effects are not always perfectly known. It is undecidable in
 the general case. Effects can be labelled as \texttt{MAY} if they
 might happen, \texttt{MUST} if they always happen, and \texttt{EXACT}
 if the abstract set used to represent them is equal to the dynamic set
-of effects. For historical reasons, exact effects are labelled
-\texttt{MUST} and must effects are not computed because with
+of effects. In fact, must effects are not computed because with
 polyhedral sets, they are either equal to the exact set or to the
 empty set.
 
@@ -386,9 +385,9 @@ Field \verb/approximation/ is used to specify if all the memory addresses
 of the reference for simple effects, or of the set of array elements
 defined by the \verb/descriptor/ for array regions, are or not
 accessed for sure. For instance, a conditional is going to generate
-may effects, and a sequence, must effects\footnote{Needless to say,
-  reality is much more complex. This oversimplified statement only is
-  written to support some intuition about may and must and exact
+may effects, and a sequence, exact effects\footnote{Needless to say,
+  reality is much more complex. This oversimplified statement is only
+  written to support some intuition about may and exact
   information.}.
 
 Simple effects and regions may reference a global variable which is in
@@ -480,25 +479,16 @@ calculés sont alors de type \texttt{may}.
 \end{comment}
 
 Sometimes, a simple statement, such as an assignment like \texttt{J = 2},
-has a known effect. Here \texttt{J} \verb/must/ be written. Such
-\verb/must/ effects can be used in \emph{use/def chains} analysis to 
-\emph{kill} some scalar variables. A simple effect, proper, cumulated or
-summary, with a \verb/must/ attribute does not mean that the \emph{whole}
-array is read or written, but that at least one of its elements is read
-or written. Such information is not \emph{kill information}. Region
-effects must be used to that effect.
+has a known effect. Here \texttt{J} \emph{is} written. Such
+\verb/exact/ effects can be used in \emph{use/def chains} analysis to
+\emph{kill} some scalar variables.
 
-Must effects may be detected for tests and loops. For instance, a
-variable may be read in both test branches, or a loop range may be
-numerically known.
 
 \begin{comment}
 Dans quelques cas particuliers, comme une affectation simple \texttt{I = 2},
-l'effet est certain (\emph{must}). Il peut alors être utilisé dans
+l'effet est certain (\emph{exact}). Il peut alors être utilisé dans
 le calcul des \emph{use-def chains} pour effectuer un \emph{kill} sur les
-variables scalaires. Un effet \emph{must} sur un tableau ne signifie pas
-que tout le tableau est lu ou écrit mais qu'au moins un de ses
-éléments l'est.
+variables scalaires. 
 \end{comment}
 
 \subsection{Lists of effects}
@@ -627,7 +617,7 @@ handle casts.
 
 
 \domain{Interpreted_cell = cell x cell_interpretation}
-{} 
+{}
 
 \domain{Cell_interpretation = value_of:unit + address_of:unit}
 {}
@@ -658,7 +648,7 @@ between memory locations, but they are not planned for the moment.
 
 \bibitem{Baro91} B. Baron,
 \emph{Construction flexible et cohérente pour la compilation
-interprocédurale}, 
+interprocédurale},
 Rapport interne EMP-CRI-E157, juillet 1991
 
 \bibitem{Bern66} A. J. Bernstein, \emph{Analysis of Programs for
@@ -707,8 +697,8 @@ Rapport Interne CAII TR~E/133
 \end{document}
 \end
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
 %%% ispell-local-dictionary: "american"
-%%% End: 
+%%% End:

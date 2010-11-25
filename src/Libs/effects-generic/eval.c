@@ -302,7 +302,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 			     words_to_string(words_reference(build_ref, NIL)));
 		  l = CONS(EFFECT, make_effect(make_cell(is_cell_reference, build_ref),
 					       make_action_write_memory(),
-					       make_approximation(*exact_p? is_approximation_must : is_approximation_may, UU),
+					       make_approximation(*exact_p? is_approximation_exact : is_approximation_may, UU),
 					       build_desc), l);
 
 		} /* end of else branch of if (entity_abstract_location_p(sink_ent)
