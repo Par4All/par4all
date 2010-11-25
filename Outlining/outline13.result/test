@@ -17,8 +17,6 @@ init_kernel:         imagein_re[i][j] = 2*i;
    return 0;
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
@@ -26,6 +24,8 @@ init_kernel:         imagein_re[i][j] = 2*i;
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -47,13 +47,13 @@ init_kernel:         imagein_re[i][j] = 2*i;
       printf("Line %d:\n");
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -62,8 +62,6 @@ init_kernel:         imagein_re[i][j] = 2*i;
    return 0;
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
@@ -71,6 +69,8 @@ init_kernel:         imagein_re[i][j] = 2*i;
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -92,13 +92,13 @@ init_kernel:         imagein_re[i][j] = 2*i;
       printf("Line %d:\n");
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -108,8 +108,6 @@ init_kernel:         imagein_re[i][j] = 2*i;
 }
 The first loop nest must be parallel:
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
@@ -117,6 +115,8 @@ The first loop nest must be parallel:
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -140,13 +140,13 @@ init_kernel:         imagein_re[i][j] = 2*i;
       printf("Line %d:\n");
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -155,21 +155,21 @@ init_kernel:         imagein_re[i][j] = 2*i;
    return 0;
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <imagein_re0-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 void init_kernel(float *imagein_re0, int i)
 {
 init_kernel:   *imagein_re0 = 2*i;
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -191,13 +191,13 @@ init_kernel:         init_kernel(&imagein_re[i][j], i);
       printf("Line %d:\n");
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");
@@ -207,21 +207,21 @@ init_kernel:         init_kernel(&imagein_re[i][j], i);
 }
 The loop nest of init_kernel should be parallel:
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <imagein_re0-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 void init_kernel(float *imagein_re0, int i)
 {
 init_kernel:   *imagein_re0 = 2*i;
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -243,13 +243,13 @@ init_kernel:         init_kernel(&imagein_re[i][j], i);
       printf("Line %d:\n");
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("%d ", imagein_re[i][j]);
       puts("\n");

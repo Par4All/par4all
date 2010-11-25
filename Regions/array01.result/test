@@ -23,40 +23,40 @@ int main()
 }
 Select the most precise analysis:
 
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
-//    PHI2<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 
 void compute(complex image[64][64])
 {
 
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
-//    PHI2<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
-//    PHI2<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 
 
    for(i = 0; i <= 63; i += 1)
 
-//  <image[PHI1][PHI2].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
-//    i<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
 //    i<=63}>
+//  <image[PHI1][PHI2].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
+//    i<=63}>
 
       for(j = 0; j <= 63; j += 1) {
 
-//  <image[PHI1][PHI2].re-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
-//    0<=j, j<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
+//  <image[PHI1][PHI2].re-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
          // BEGIN BLOCK
@@ -89,32 +89,32 @@ void compute(complex image[64][64])
    // END BLOCK
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <image[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
-//    PHI2<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <image[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main()
 {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-//  <image[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
-//    PHI2<=63}>
 //  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <image[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    // BEGIN BLOCK
 
@@ -128,34 +128,34 @@ int main()
 
    compute(image);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <image[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 
    for(i = 0; i <= 63; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <image[PHI1][PHI2].re-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
 //    i<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <image[PHI1][PHI2].re-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
 
@@ -163,16 +163,16 @@ int main()
    // END BLOCK
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
-//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 
 int main()
 {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
-//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 
    // BEGIN BLOCK
 
@@ -180,28 +180,28 @@ int main()
 
    compute(image);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 //  <image[PHI1][PHI2].re-IN-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63}>
-//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 
 
    for(i = 0; i <= 63; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 //  <image[PHI1][PHI2].re-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
 //    i<=63}>
-//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
 
       for(j = 0; j <= 63; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
 //  <image[PHI1][PHI2].re-IN-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
 
          fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
 

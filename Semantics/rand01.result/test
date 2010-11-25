@@ -28,11 +28,11 @@ int main()
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
    srandom(graine);
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED virgule
+//             <    is written>: virgule _RANDOM_EFFECTS:GEN_SEED
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED entier
+//             <    is written>: entier _RANDOM_EFFECTS:GEN_SEED
    entier = 1+rand();
 }
 

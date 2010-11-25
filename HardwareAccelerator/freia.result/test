@@ -665,8 +665,8 @@ freia_status freia_cipo_inner_gradient(freia_data2d *o, const freia_data2d *i, i
    o->stuff = i->stuff|c1+c2;
    return FREIA_OK;
 }
-//             <    is read   >: global_io_effect n
-//             <    is written>: global_io_effect n[0].stuff
+//             <    is read   >: n global_io_effect
+//             <    is written>: n[0].stuff global_io_effect
 freia_status freia_common_close_input(freia_dataio *n)
 {
 //             <    is read   >: n
@@ -677,8 +677,8 @@ freia_status freia_common_close_input(freia_dataio *n)
    global_io_effect++;
    return FREIA_OK;
 }
-//             <    is read   >: global_io_effect n
-//             <    is written>: global_io_effect n[0].stuff
+//             <    is read   >: n global_io_effect
+//             <    is written>: n[0].stuff global_io_effect
 freia_status freia_common_close_output(freia_dataio *n)
 {
 //             <    is read   >: n
@@ -689,12 +689,12 @@ freia_status freia_common_close_output(freia_dataio *n)
    global_io_effect++;
    return FREIA_OK;
 }
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ x y z
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ img
+//             <    is written>: img _MALLOC_EFFECTS:_MALLOC_
    freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));
 //             <    is read   >: img x y z
 //             <    is written>: img[0].stuff
@@ -702,11 +702,11 @@ freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 //             <    is read   >: img
    return img;
 }
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ img
+//             <    is read   >: img _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 freia_status freia_common_destruct_data(freia_data2d *img)
 {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ img
+//             <    is read   >: img _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(img);
    return FREIA_OK;
@@ -731,10 +731,10 @@ freia_status freia_common_draw_rect(freia_data2d *image, int32_t x1, int32_t y1,
 //             <    is written>: image[0].stuff
    image->stuff += color+x1+y1+x2+y2;
 }
-//             <    is read   >: global_io_effect in n
-//             <    is written>: global_io_effect in[0].stuff 
-//                               in[0].framewidth in[0].frameheight 
-//                               in[0].framebpp
+//             <    is read   >: in n global_io_effect
+//             <    is written>: in[0].framebpp in[0].frameheight 
+//                               in[0].framewidth in[0].stuff 
+//                               global_io_effect
 freia_status freia_common_open_input(freia_dataio *in, uint32_t n)
 {
 //             <    is read   >: in
@@ -754,10 +754,10 @@ freia_status freia_common_open_input(freia_dataio *in, uint32_t n)
    global_io_effect++;
    return FREIA_OK;
 }
-//             <    is read   >: global_io_effect b h n out w
-//             <    is written>: global_io_effect out[0].stuff 
-//                               out[0].framewidth out[0].frameheight 
-//                               out[0].framebpp
+//             <    is read   >: b h n out w global_io_effect
+//             <    is written>: out[0].framebpp out[0].frameheight 
+//                               out[0].framewidth out[0].stuff 
+//                               global_io_effect
 freia_status freia_common_open_output(freia_dataio *out, uint32_t n, uint32_t w, uint32_t h, uint32_t b)
 {
 //             <    is read   >: b out
@@ -777,8 +777,8 @@ freia_status freia_common_open_output(freia_dataio *out, uint32_t n, uint32_t w,
    global_io_effect++;
    return FREIA_OK;
 }
-//             <    is read   >: global_io_effect img in in[0].stuff
-//             <    is written>: global_io_effect img[0].stuff
+//             <    is read   >: img in in[0].stuff global_io_effect
+//             <    is written>: img[0].stuff global_io_effect
 freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
 {
 //             <    is read   >: img in in[0].stuff
@@ -789,9 +789,9 @@ freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
    global_io_effect++;
    return FREIA_OK;
 }
-//             <    is read   >: global_io_effect img img[0].stuff out
-//                               out[0].stuff
-//             <    is written>: global_io_effect out[0].stuff
+//             <    is read   >: img img[0].stuff out out[0].stuff 
+//                               global_io_effect
+//             <    is written>: out[0].stuff global_io_effect
 freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
 {
 //             <    is read   >: img img[0].stuff out out[0].stuff

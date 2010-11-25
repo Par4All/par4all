@@ -79,10 +79,10 @@ Regions for "dotprod"
 
 //  <a-R-EXACT-{}>
 //  <a[PHI1]-W-EXACT-{0<=PHI1, PHI1<=999999}>
-//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 //  <b-R-EXACT-{}>
-//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 //  <c-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 
 void dotprod(int *a, int *b, int *c)
 {
@@ -90,19 +90,19 @@ void dotprod(int *a, int *b, int *c)
 
 //  <a-R-EXACT-{}>
 //  <a[PHI1]-W-EXACT-{0<=PHI1, PHI1<=999999}>
-//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 //  <b-R-EXACT-{}>
-//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 //  <c-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999999}>
 
    for(i = 0; i <= 999999; i += 1)
 
 //  <a-R-EXACT-{}>
 //  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=999999}>
-//  <b[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999999}>
 //  <b-R-EXACT-{}>
-//  <c[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999999}>
+//  <b[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999999}>
 //  <c-R-EXACT-{}>
+//  <c[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999999}>
 
       call16(i, a, b, c);
    

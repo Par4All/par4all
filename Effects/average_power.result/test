@@ -157,15 +157,15 @@ int main(int argc, char *argv[])
 //             <may be written>: pow[*].im pow[*].re
 //             <    is read   >: rg th v
       average_power(th, rg, v, in, pow);
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//                               i pow[*].re pow[*].im
+//             <may be read   >: i pow[*].im pow[*].re stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is read   >: th
 //             <    is written>: i
       for(i = 0; i <= th-1; i += 1)
-//             <may be read   >: stdout[0] pow[*].re pow[*].im
+//             <may be read   >: pow[*].im pow[*].re stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i th
+//             <    is read   >: i stdout th __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("-%f-", pow[i]);
    }
@@ -175,11 +175,11 @@ int main(int argc, char *argv[])
 Regions for "main"
 
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char *argv[])
 {
@@ -196,9 +196,9 @@ int main(int argc, char *argv[])
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
-//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
 //  <in[PHI1][PHI2][PHI3].im-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
+//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
 //    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
@@ -211,9 +211,9 @@ int main(int argc, char *argv[])
       for(i = 0; i <= th-1; i += 1)
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
-//    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
 //  <in[PHI1][PHI2][PHI3].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
+//    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
+//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
 //    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
@@ -226,9 +226,9 @@ int main(int argc, char *argv[])
          for(j = 0; j <= rg-1; j += 1)
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
-//    PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12}>
 //  <in[PHI1][PHI2][PHI3].im-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12}>
+//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
 //    PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13, 0<=j, j<=12}>
 //  <j-R-EXACT-{}>
 //  <k-R-EXACT-{}>
@@ -268,9 +268,9 @@ int main(int argc, char *argv[])
 //  <in[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
 //    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, i==14, j==13, k==12, rg==13,
 //    th==14, v==12}>
-//  <pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
-//    rg==13, th==14, v==12}>
 //  <pow[PHI1].im-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
+//    rg==13, th==14, v==12}>
+//  <pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
 //    rg==13, th==14, v==12}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>
@@ -278,32 +278,32 @@ int main(int argc, char *argv[])
 
       average_power(th, rg, v, in, pow);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <pow[PHI1].re-R-EXACT-{0<=PHI1, PHI1<=13, j==13, k==12, rg==13,
-//    th==14, v==12}>
 //  <pow[PHI1].im-R-EXACT-{0<=PHI1, PHI1<=13, j==13, k==12, rg==13,
+//    th==14, v==12}>
+//  <pow[PHI1].re-R-EXACT-{0<=PHI1, PHI1<=13, j==13, k==12, rg==13,
 //    th==14, v==12}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <th-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       for(i = 0; i <= th-1; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <i-R-EXACT-{}>
-//  <pow[PHI1].re-R-EXACT-{PHI1==i, j==13, k==12, rg==13, th==14,
-//    v==12, 0<=i, i<=13}>
 //  <pow[PHI1].im-R-EXACT-{PHI1==i, j==13, k==12, rg==13, th==14,
+//    v==12, 0<=i, i<=13}>
+//  <pow[PHI1].re-R-EXACT-{PHI1==i, j==13, k==12, rg==13, th==14,
 //    v==12, 0<=i, i<=13}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <th-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("-%f-", pow[i]);
    }
@@ -316,8 +316,8 @@ Regions for "average_power"
 //  <Nrg-R-EXACT-{}>
 //  <Nth-R-EXACT-{}>
 //  <Nv-R-EXACT-{}>
-//  <Pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
 //  <Pow[PHI1].im-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <Pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
 //  <ptrin[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
 //    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
@@ -334,8 +334,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 //  <Nv-R-EXACT-{}>
 //  <PP-R-EXACT-{}>
 //  <PP-W-EXACT-{}>
-//  <Pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
 //  <Pow[PHI1].im-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
+//  <Pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=Nth}>
 //  <ptrin[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1+1<=Nth,
 //    0<=PHI2, PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
 //  <ptrin[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1+1<=Nth,

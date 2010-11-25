@@ -34,7 +34,7 @@ void env04()
 //             <    is declared>: j
    km j;
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
 
    j = (km) 1;
 }
@@ -52,7 +52,7 @@ void env04()
 //             <    is declared>: j
    km j;
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
 
    j = (km) 1;
 }

@@ -7,8 +7,8 @@ void init(mys *m)
 //             <    is read   >: m
 //             <    is written>: m[0].num
    m->num = 5;                                                          /*0015*/
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ m
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ m[0].tab2
+//             <    is read   >: m _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m[0].tab2 _MALLOC_EFFECTS:_MALLOC_
    m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
 //             <    is read   >: m
 //             <    is written>: m[0].tab1[0]
@@ -21,7 +21,7 @@ void init(mys *m)
 //             <    is read   >: i m
 //             <    is written>: m[0].tab1[i]
       (m->tab1)[i] = 1;                                                 /*0021*/
-//             <    is read   >: i m m[0].tab2 m[0].tab1[i]
+//             <    is read   >: i m m[0].tab1[i] m[0].tab2
 //             <    is written>: m[0].tab2[i]
       (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
    }
@@ -35,14 +35,14 @@ void init2(mys *n)
    mys m;                                                               /*0030*/
 //             <may be read   >: n[0].tab1[*]
 //             <may be written>: m.tab1[*]
-//             <    is read   >: n n[0].tab2 n[0].num
+//             <    is read   >: n n[0].num n[0].tab2
 //             <    is written>: m.num m.tab2
 
    m = *n;                                                              /*0032*/
 //             <    is written>: m.num
    m.num = 5;                                                           /*0033*/
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ m.tab2
+//             <    is written>: m.tab2 _MALLOC_EFFECTS:_MALLOC_
    m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
 //             <    is written>: m.tab1[0]
    (m.tab1)[0] = 10;                                                    /*0035*/
@@ -54,7 +54,7 @@ void init2(mys *n)
 //             <    is read   >: i
 //             <    is written>: m.tab1[i]
       (m.tab1)[i] = 1;                                                  /*0039*/
-//             <    is read   >: i m.tab2 m.tab1[i]
+//             <    is read   >: i m.tab1[i] m.tab2
 //             <    is written>: m.tab2[i]
       (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
    }
@@ -66,15 +66,15 @@ void init3(mys **p)
 {
    int i;                                                               /*0047*/
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = malloc(5*sizeof(mys *));                                         /*0048*/
 //             <    is written>: i
    for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i p
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+//             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(mys));                                       /*0051*/
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i p p[i]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p[i][0].tab2
+//             <    is read   >: i p p[i] _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i][0].tab2 _MALLOC_EFFECTS:_MALLOC_
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
    }
 //             <    is read   >: p p[0]
@@ -96,8 +96,8 @@ void init3(mys **p)
 //             <    is read   >: i p p[i]
 //             <    is written>: p[i][0].tab1[0]
       (p[i]->tab1)[0] = 21;                                             /*0062*/
-//             <    is read   >: i p p[i] p[i] p[i][0].tab2 
-//                               p[i][0].tab1[0]
+//             <    is read   >: i p p[i] p[i] p[i][0].tab1[0] 
+//                               p[i][0].tab2
 //             <    is written>: p[i][0].tab2[0]
       (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
    }
@@ -110,11 +110,11 @@ void init4(mys *p[5])
    int i;                                                               /*0069*/
 //             <    is written>: i
    for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(mys));                                       /*0072*/
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i p[i]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p[i][0].tab2
+//             <    is read   >: i p[i] _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i][0].tab2 _MALLOC_EFFECTS:_MALLOC_
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
    }
 //             <    is read   >: p[0]
@@ -137,8 +137,8 @@ void init4(mys *p[5])
 //             <    is read   >: i p[i]
 //             <    is written>: p[i][0].tab1[0]
       (p[i]->tab1)[0] = 21;                                             /*0084*/
-//             <    is read   >: i p[i] p[i] p[i][0].tab2 
-//                               p[i][0].tab1[0]
+//             <    is read   >: i p[i] p[i] p[i][0].tab1[0] 
+//                               p[i][0].tab2
 //             <    is written>: p[i][0].tab2[0]
       (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
    }
@@ -155,10 +155,10 @@ void init(mys *m)
 
    m->num = 5;                                                          /*0015*/
 
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <m-R-EXACT-{}>
 //  <m[PHI1].tab2-W-EXACT-{PHI1==0}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
    m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
 
@@ -185,8 +185,8 @@ void init(mys *m)
 
 //  <i-R-EXACT-{}>
 //  <m-R-EXACT-{}>
-//  <m[PHI1].tab2-R-EXACT-{PHI1==0, 0<=i, i<=4}>
 //  <m[PHI1].tab1[PHI3]-R-EXACT-{PHI1==0, PHI3==i, 0<=i, i<=4}>
+//  <m[PHI1].tab2-R-EXACT-{PHI1==0, 0<=i, i<=4}>
 //  <m[PHI1].tab2[PHI3]-W-EXACT-{PHI1==0, PHI3==i, 0<=i, i<=4}>
 
       (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
@@ -200,13 +200,13 @@ void init2(mys *n)
    int i;                                                               /*0029*/
    mys m;                                                               /*0030*/
 
-//  <m.tab2-W-EXACT-{}>
-//  <m.tab1[PHI2]-W-MAY-{}>
 //  <m.num-W-EXACT-{}>
+//  <m.tab1[PHI2]-W-MAY-{}>
+//  <m.tab2-W-EXACT-{}>
 //  <n-R-EXACT-{}>
-//  <n[PHI1].tab2-R-EXACT-{PHI1==0}>
-//  <n[PHI1].tab1[PHI3]-R-MAY-{PHI1==0}>
 //  <n[PHI1].num-R-EXACT-{PHI1==0}>
+//  <n[PHI1].tab1[PHI3]-R-MAY-{PHI1==0}>
+//  <n[PHI1].tab2-R-EXACT-{PHI1==0}>
 
 
    m = *n;                                                              /*0032*/
@@ -215,9 +215,9 @@ void init2(mys *n)
 
    m.num = 5;                                                           /*0033*/
 
+//  <m.tab2-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <m.tab2-W-EXACT-{}>
 
    m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
 
@@ -240,8 +240,8 @@ void init2(mys *n)
       (m.tab1)[i] = 1;                                                  /*0039*/
 
 //  <i-R-EXACT-{}>
-//  <m.tab2-R-EXACT-{0<=i, i<=4}>
 //  <m.tab1[PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=4}>
+//  <m.tab2-R-EXACT-{0<=i, i<=4}>
 //  <m.tab2[PHI2]-W-EXACT-{PHI2==i, 0<=i, i<=4}>
 
       (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
@@ -254,9 +254,9 @@ void init3(mys **p)
 {
    int i;                                                               /*0047*/
 
+//  <p-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <p-W-EXACT-{}>
 
    p = malloc(5*sizeof(mys *));                                         /*0048*/
 
@@ -264,20 +264,20 @@ void init3(mys **p)
 
    for(i = 0; i <= 4; i += 1) {
 
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=4}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
       p[i] = malloc(sizeof(mys));                                       /*0051*/
 
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=4}>
 //  <p[PHI1][PHI2].tab2-W-EXACT-{PHI1==i, PHI2==0, 0<=i, i<=4}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
    }
@@ -327,10 +327,10 @@ void init3(mys **p)
 //  <i-R-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
-//  <p[PHI1][PHI2].tab2-R-EXACT-{PHI1==i, PHI2==0, 1<=i, i<=4}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
 //  <p[PHI1][PHI2].tab1[PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI4==0,
 //    1<=i, i<=4}>
-//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2].tab2-R-EXACT-{PHI1==i, PHI2==0, 1<=i, i<=4}>
 //  <p[PHI1][PHI2].tab2[PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI4==0,
 //    1<=i, i<=4}>
 
@@ -348,18 +348,18 @@ void init4(mys *p[5])
 
    for(i = 0; i <= 4; i += 1) {
 
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=4}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
       p[i] = malloc(sizeof(mys));                                       /*0072*/
 
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=4}>
 //  <p[PHI1][PHI2].tab2-W-EXACT-{PHI1==i, PHI2==0, 0<=i, i<=4}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
    }
@@ -404,10 +404,10 @@ void init4(mys *p[5])
 
 //  <i-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
-//  <p[PHI1][PHI2].tab2-R-EXACT-{PHI1==i, PHI2==0, 1<=i, i<=4}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
 //  <p[PHI1][PHI2].tab1[PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI4==0,
 //    1<=i, i<=4}>
-//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2].tab2-R-EXACT-{PHI1==i, PHI2==0, 1<=i, i<=4}>
 //  <p[PHI1][PHI2].tab2[PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI4==0,
 //    1<=i, i<=4}>
 

@@ -31,7 +31,7 @@ int FindMax(int amount, ...)
    va_start(vl, amount);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: vl stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout vl __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("\n num=%s \n", vl);
 //             <    is read   >: vl
@@ -78,11 +78,11 @@ int main()
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1] m
+//             <    is written>: m __IO_EFFECTS:LUNS[1]
    m = FindMax(7, 702, 422, 631, 834, 892, 104, 772);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] m
+//             <    is read   >: m stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("The greatest one is: %d\n", m);
    return 0;

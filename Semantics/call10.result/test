@@ -18,7 +18,7 @@ double call10(int i)
 
 Source code with cumulated effects
 
-//             <    is read   >: j i
+//             <    is read   >: i j
 //             <    is written>: j
 double call10(int i)
 {

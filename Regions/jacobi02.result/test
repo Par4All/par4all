@@ -178,8 +178,6 @@ kernel2:
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
@@ -189,6 +187,8 @@ kernel2:
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 void get_data(char filename[])
 {
@@ -196,106 +196,106 @@ void get_data(char filename[])
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       perror("Error loading file");
       exit(0);
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    c = fgetc(fp);
 
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    do {
 
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
@@ -316,33 +316,33 @@ void get_data(char filename[])
 
          space[i][j] = 0;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          c = fgetc(fp);
 
@@ -358,18 +358,16 @@ void get_data(char filename[])
             space[i][j] = c;
       }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    fclose(fp);
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <argv[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
 //  <argv[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=1}>
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -386,29 +384,31 @@ void get_data(char filename[])
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 int main(int argc, char *argv[])
 {
    int t, i;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
 //  <argv[PHI1]-R-MAY-{PHI1==0}>
 //  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
 
 
    if (argc!=2) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <argv[PHI1]-R-EXACT-{PHI1==0}>
 //  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       
       
@@ -416,10 +416,8 @@ int main(int argc, char *argv[])
       exit(0);
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1, argc==2}>
 //  <argv[PHI1]-R-EXACT-{PHI1==1, argc==2}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1, argc==2}>
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 //  <stderr-R-MAY-{}>
@@ -428,6 +426,8 @@ int main(int argc, char *argv[])
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    get_data(argv[1]);
 
@@ -471,13 +471,13 @@ int main(int argc, char *argv[])
 
       compute();
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    write_data("output.pgm");
@@ -485,14 +485,14 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 void write_data(char filename[])
 {
@@ -500,54 +500,54 @@ void write_data(char filename[])
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    if ((fp = fopen(filename, "w"))==(void *) 0) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       perror("Error opening file");
       exit(0);
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Write the PGM header: */
    fprintf(fp, "P5\n%d %d\n255\n", 501, 501);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    for(j = 0; j <= 500; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
 //    j<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       for(i = 0; i <= 500; i += 1) {
 
@@ -556,20 +556,20 @@ void write_data(char filename[])
 
          c = space[i][j];
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          fputc(c, fp);
       }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    fclose(fp);
 }
@@ -858,8 +858,6 @@ kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
@@ -869,12 +867,12 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 void get_data(char filename[])
 {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
@@ -884,121 +882,123 @@ void get_data(char filename[])
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       perror("Error loading file");
       exit(0);
       // END BLOCK
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    c = fgetc(fp);
 
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
    do {
 
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
 
       while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
@@ -1009,43 +1009,43 @@ void get_data(char filename[])
    /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_2(space);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          c = fgetc(fp);
 
@@ -1062,11 +1062,11 @@ void get_data(char filename[])
          // END BLOCK
       }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    fclose(fp);
@@ -1107,105 +1107,105 @@ void get_data(char filename[])
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <filename[PHI1]-R-MAY-{}>
 //  <fp-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
       // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 //  <stderr-R-EXACT-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
       perror("Error loading file");
       exit(0);
       // END BLOCK
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    do {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
@@ -1221,11 +1221,11 @@ void get_data(char filename[])
       for(i = 0; i <= nx-1; i += 1) {
          // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
@@ -1238,11 +1238,11 @@ void get_data(char filename[])
          // END BLOCK
       }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
 //  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    fclose(fp);
@@ -1289,144 +1289,144 @@ kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 //  <stderr-IN-MAY-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
 void get_data(char filename[])
 {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-MAY-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 //  <fp-OUT-EXACT-{}>
 //  <stderr-IN-MAY-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 
       // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 
       perror("Error loading file");
       exit(0);
       // END BLOCK
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <fp-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    do {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <fp-IN-MAY-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
       while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    /* Get ONE carriage return */
    fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
    /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_2(space);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <fp-IN-EXACT-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx, 1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx}>
 //  <fp-IN-EXACT-{}>
+//  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
          // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
          c = fgetc(fp);
          /* Truncate the image if too big: */
@@ -1435,9 +1435,9 @@ void get_data(char filename[])
          // END BLOCK
       }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 
 
    fclose(fp);
@@ -1484,90 +1484,90 @@ kernel2:   p4a_kernel_launcher_1(save, space);
    // END BLOCK
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
 void get_data(char filename[])
 {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp-OUT-EXACT-{}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    if ((fp = fopen(filename, "r"))==(void *) 0) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       perror("Error loading file");
       exit(0);
       // END BLOCK
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    
    /* Get *.pgm file type */
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    c = fgetc(fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    do {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
       while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    
    /* Put back good char */
    ungetc(c, fp);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    /* Get ONE carriage return */
    fgetc(fp);
@@ -1583,31 +1583,31 @@ void get_data(char filename[])
    /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_2(space);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=PHI2, PHI2<=500, PHI2+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, j+1<=ny}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=j, j+1<=ny}>
 //  <space[PHI1][PHI2]-OUT-MAY-{PHI2==j, 0<=PHI1, PHI1<=500,
 //    PHI1+1<=nx, 0<=j, j<=500, j+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, j+1<=ny}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=i, i+1<=nx}>
 //  <space[PHI1][PHI2]-OUT-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500,
 //    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
 
          // BEGIN BLOCK
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
 //  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=i, i+1<=nx}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=i, i+1<=nx}>
 
          c = fgetc(fp);
 

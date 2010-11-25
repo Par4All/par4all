@@ -22,8 +22,8 @@ int main()
 //             <may be written>: __IO_EFFECTS:LUNS[*]
 //             <    is written>: fp
    fp = fopen("file.txt", "rb");
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fp[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] buf[*] fp[0]
+//             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: buf[*] fp[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fp
 //             <    is written>: n
    n = fread(buf, 8, 50, fp);
@@ -36,8 +36,8 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("fread failed");
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fp[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] fp[0]
+//             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fp[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fp
    fclose(fp);
 }

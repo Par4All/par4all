@@ -36,17 +36,17 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       puts("please, enter a name: ");
 //             <may be read   >: stdin[0]
-//             <may be written>: stdin[0] name[*]
+//             <may be written>: name[*] stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
       gets(name);
-//             <may be read   >: __IO_EFFECTS:LUNS[*] name[*] pFile[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] pFile[0]
+//             <may be read   >: name[*] pFile[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: pFile[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: n pFile
       fprintf(pFile, "Name %d %s\n", n, name);
    }
-//             <may be read   >: __IO_EFFECTS:LUNS[*] pFile[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] pFile[0]
+//             <may be read   >: pFile[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: pFile[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: pFile
    fclose(pFile);
 }

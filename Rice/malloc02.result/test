@@ -52,8 +52,8 @@ void malloc02()
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(int));                                       /*0007*/
 //             <    is read   >: i
 //             <    is written>: p[i]
@@ -70,13 +70,13 @@ void malloc02()
 {
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
-//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//             <may be written>: _MALLOC_EFFECTS:_MALLOC_ p[*]
+//             <may be read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: p[*] _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
 //             <may be written>: p[*]
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(int));                                       /*0007*/
 //             <may be written>: p[*]
@@ -97,16 +97,16 @@ void malloc02()
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
+//  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1) {
 
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       p[i] = malloc(sizeof(int));                                       /*0007*/
 

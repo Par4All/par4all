@@ -91,15 +91,15 @@ int main()
       for(n = 0; n <= BlockEnd-1; n += 1) {
          int k, l;
 //             <    is read   >: BlockEnd j n
-//             <    is written>: foo:0`l k
+//             <    is written>: k foo:0`l
          k = foo((j, n));
 //             <    is read   >: BlockEnd k
 //             <    is written>: l
          l = k;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] BlockEnd 
-//                               l
+//             <    is read   >: BlockEnd l stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("%d\n", l);
 //             <    is read   >: BlockEnd j

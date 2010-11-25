@@ -40,9 +40,9 @@ int main()
 //             <may be read   >: stdin[0]
 //             <may be written>: stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
-//             <    is written>: __IO_EFFECTS:LUNS[0] i
+//             <    is written>: i __IO_EFFECTS:LUNS[0]
    scanf("%d", &i);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    buffer = (char *) malloc(i+1);
@@ -52,21 +52,21 @@ int main()
 //             <    is written>: n
 
    for(n = 0; n <= i-1; n += 1)
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED i n
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED buffer[n]
+//             <    is read   >: i n _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: buffer[n] _RANDOM_EFFECTS:GEN_SEED
       buffer[n] = rand()%26+'a';
 //             <    is read   >: i
 //             <    is written>: buffer[i]
    buffer[i] = '\0';
-//             <may be read   >: stdout[0] buffer[*]
+//             <may be read   >: buffer[*] stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("Random string: %s\n", buffer);
 //             <    is read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
-//             <    is written>: _MEMMOVE_EFFECTS:_MEMMOVE_ 
-//                               buffer[0:7-1]
+//             <    is written>: buffer[0:7-1] 
+//                               _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(buffer, "bonjour", 7);
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

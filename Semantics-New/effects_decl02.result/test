@@ -22,8 +22,8 @@ int main()
    i = 5;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i j k l m
-//                               n
+//             <    is read   >: i j k l m n stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
    return 0;
@@ -56,8 +56,8 @@ int main()
    i = 5;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i j k l m
-//                               n
+//             <    is read   >: i j k l m n stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
    return 0;

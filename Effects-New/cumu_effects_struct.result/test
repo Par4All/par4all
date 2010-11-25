@@ -15,9 +15,9 @@ int main()
 {
 //             <    is written>: main:0`result
    int result = 0;
-//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var3 
+//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var1 
 //                               TOP-LEVEL:toto.var2 
-//                               TOP-LEVEL:toto.var1
+//                               TOP-LEVEL:toto.var3
 //             <    is written>: main:0`result
    result = toto.var1+toto.var2+toto.var3+titi;
 //             <    is read   >: main:0`result
@@ -36,16 +36,16 @@ int titi = 4;
 SomeStruct toto = {1, 2, 3};
 
 int main();
-//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var3 
+//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var1 
 //                               TOP-LEVEL:toto.var2 
-//                               TOP-LEVEL:toto.var1
+//                               TOP-LEVEL:toto.var3
 int main()
 {
 //             <    is written>: main:0`result
    int result = 0;
-//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var3 
+//             <    is read   >: TOP-LEVEL:titi TOP-LEVEL:toto.var1 
 //                               TOP-LEVEL:toto.var2 
-//                               TOP-LEVEL:toto.var1
+//                               TOP-LEVEL:toto.var3
 //             <    is written>: main:0`result
    result = toto.var1+toto.var2+toto.var3+titi;
 //             <    is read   >: main:0`result

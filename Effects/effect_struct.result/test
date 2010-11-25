@@ -52,27 +52,27 @@ float main(int argc, char *argv[])
    return imagein[2][1].re;
 }
 
+//  <imagein[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
+//    PHI2<=8}>
 //  <imagein[PHI1][PHI2].re-R-EXACT-{PHI1==2, PHI2==1}>
 //  <imagein[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
-//    PHI2<=8}>
-//  <imagein[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
 //    PHI2<=8}>
 
 float main(int argc, char *argv[])
 {
    int i, j, k;
 
-//  <imagein[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
-//    PHI2<=8}>
 //  <imagein[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
+//    PHI2<=8}>
+//  <imagein[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=8, 0<=PHI2,
 //    PHI2<=8}>
 
 
    for(i = 0; i <= 8; i += 1)
 
-//  <imagein[PHI1][PHI2].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=8, 0<=i,
-//    i<=8}>
 //  <imagein[PHI1][PHI2].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=8, 0<=i,
+//    i<=8}>
+//  <imagein[PHI1][PHI2].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=8, 0<=i,
 //    i<=8}>
 
       for(j = 0; j <= 8; j += 1) {

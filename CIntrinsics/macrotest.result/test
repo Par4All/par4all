@@ -32,7 +32,7 @@ int main()
    if (a^c)
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] a c
+//             <    is read   >: a c stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("a=%d  xor  c=%d = True", a, c);
 //             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]

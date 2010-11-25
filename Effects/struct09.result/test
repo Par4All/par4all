@@ -13,7 +13,7 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ a.p
+//             <    is written>: a.p _MALLOC_EFFECTS:_MALLOC_
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
@@ -39,8 +39,8 @@ int main()
          (b.p)[i] = i*10;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] a.p 
-//                               a.p[i] b.p b.p[i] i
+//             <    is read   >: a.p a.p[i] b.p b.p[i] i stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -68,8 +68,8 @@ int main()
          (d.array)[i] = i*10;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               c.array[i] d.array[i] i
+//             <    is read   >: c.array[i] d.array[i] i stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -78,8 +78,8 @@ int main()
       
       // definition of e
       for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ e.champ[i].p
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: e.champ[i].p _MALLOC_EFFECTS:_MALLOC_
          (e.champ)[i].p = malloc(10*sizeof(int));
 //             <    is written>: j
          for(j = 0; j <= 9; j += 1)
@@ -106,9 +106,9 @@ int main()
             ((f.champ)[i].p)[j] = i*j;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               e.champ[i].p e.champ[i].p[j] 
-//                               f.champ[i].p f.champ[i].p[j] i j
+//             <    is read   >: e.champ[i].p e.champ[i].p[j] 
+//                               f.champ[i].p f.champ[i].p[j] i j 
+//                               stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -142,9 +142,9 @@ int main()
             ((h.champ)[i].array)[j] = i*j;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               g.champ[i].array[j] 
-//                               h.champ[i].array[j] i j
+//             <    is read   >: g.champ[i].array[j] 
+//                               h.champ[i].array[j] i j stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -168,7 +168,7 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ a.p
+//             <    is written>: a.p _MALLOC_EFFECTS:_MALLOC_
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
@@ -192,7 +192,7 @@ int main()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: b.p i
          (b.p)[i] = i*10;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -222,8 +222,8 @@ int main()
          (d.array)[i] = i*10;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               c.array[i] d.array[i] i
+//             <    is read   >: c.array[i] d.array[i] i stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -233,7 +233,7 @@ int main()
       // definition of e
       for(i = 0; i <= 4; i += 1) {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
          (e.champ)[i].p = malloc(10*sizeof(int));
 //             <    is written>: j
@@ -259,7 +259,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             ((f.champ)[i].p)[j] = i*j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -295,9 +295,9 @@ int main()
             ((h.champ)[i].array)[j] = i*j;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               g.champ[i].array[j] 
-//                               h.champ[i].array[j] i j
+//             <    is read   >: g.champ[i].array[j] 
+//                               h.champ[i].array[j] i j stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -333,7 +333,7 @@ int main()
    // just to create a block for prettyprinting
    if (1) {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ a.p
+//             <    is written>: a.p _MALLOC_EFFECTS:_MALLOC_
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
@@ -361,7 +361,7 @@ int main()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: b.p i
          (b.p)[i] = i*10;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -386,18 +386,18 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//                               c.array[*] d.array[*] i
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               d.array[*]
+//             <may be read   >: c.array[*] d.array[*] i stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: d.array[*] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
       for(i = 0; i <= 9; i += 1) {
 //             <may be written>: d.array[*]
 //             <    is read   >: i
          (d.array)[i] = i*10;
-//             <may be read   >: stdout[0] c.array[*] d.array[*]
+//             <may be read   >: c.array[*] d.array[*] stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -410,7 +410,7 @@ int main()
       // definition of e
       for(i = 0; i <= 4; i += 1) {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
          (e.champ)[i].p = malloc(10*sizeof(int));
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
@@ -443,7 +443,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             ((f.champ)[i].p)[j] = i*j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -474,27 +474,27 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//                               g.champ[*].array[*] 
-//                               h.champ[*].array[*] i j
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               h.champ[*].array[*] j
+//             <may be read   >: g.champ[*].array[*] 
+//                               h.champ[*].array[*] i j stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: h.champ[*].array[*] j stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
       for(i = 0; i <= 4; i += 1)
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//                               g.champ[*].array[*] 
-//                               h.champ[*].array[*] i j
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               h.champ[*].array[*]
+//             <may be read   >: g.champ[*].array[*] 
+//                               h.champ[*].array[*] i j stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: h.champ[*].array[*] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: j
          for(j = 0; j <= 9; j += 1) {
 //             <may be written>: h.champ[*].array[*]
 //             <    is read   >: i j
             ((h.champ)[i].array)[j] = i*j;
-//             <may be read   >: stdout[0] g.champ[*].array[*] 
-//                               h.champ[*].array[*]
+//             <may be read   >: g.champ[*].array[*] 
+//                               h.champ[*].array[*] stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i j
+//             <    is read   >: i j stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
             
             
@@ -509,10 +509,10 @@ Printed files with regions
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main()
 {
@@ -525,32 +525,32 @@ int main()
 
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    
    // just to create a block for prettyprinting
    if (1) {
 
+//  <a.p-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <a.p-W-EXACT-{}>
 
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <a.p-R-EXACT-{}>
 //  <i-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
       for(i = 0; i <= 9; i += 1)
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <a.p-R-EXACT-{0<=i, i<=9}>
 //  <i-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
          (a.p)[i] = i;
 
@@ -561,11 +561,11 @@ int main()
       // definition of b, also modifies a
       b = a;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       printf("\nstruct with pointer copy : \n");
 
@@ -576,18 +576,18 @@ int main()
 
       for(i = 0; i <= 9; i += 1) {
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <b.p-R-EXACT-{0<=i, i<=9}>
 //  <i-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
          (b.p)[i] = i*10;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -612,16 +612,14 @@ int main()
       // definition of d, does not modify c
       d = c;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       printf("\nstruct with array copy : \n");
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <c.array[PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
 //  <d.array[PHI2]-R-EXACT-{0<=PHI2, PHI2<=9}>
 //  <d.array[PHI2]-W-EXACT-{0<=PHI2, PHI2<=9}>
@@ -630,6 +628,8 @@ int main()
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       for(i = 0; i <= 9; i += 1) {
 
@@ -638,14 +638,14 @@ int main()
 
          (d.array)[i] = i*10;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <c.array[PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <d.array[PHI2]-R-EXACT-{PHI2==i, 0<=i, i<=9}>
 //  <i-R-EXACT-{}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -660,10 +660,10 @@ int main()
       // definition of e
       for(i = 0; i <= 4; i += 1) {
 
+//  <i-R-EXACT-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <i-R-EXACT-{}>
 
          (e.champ)[i].p = malloc(10*sizeof(int));
 
@@ -685,11 +685,11 @@ int main()
       // definition of f, also modifies e
       f = e;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       printf("\nstruct with array of structs with pointer copy : \n");
 
@@ -712,12 +712,12 @@ int main()
 
             ((f.champ)[i].p)[j] = i*j;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
             
             
@@ -757,16 +757,14 @@ int main()
       // definition of h, does not modify g
       h = g;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       printf("\nstruct with array of structs with array copy : \n");
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <g.champ[PHI2].array[PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
 //    PHI4<=9}>
 //  <h.champ[PHI2].array[PHI4]-R-EXACT-{0<=PHI2, PHI2<=4, 0<=PHI4,
@@ -780,11 +778,11 @@ int main()
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
       for(i = 0; i <= 4; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <g.champ[PHI2].array[PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
 //    0<=i, i<=4}>
 //  <h.champ[PHI2].array[PHI4]-R-EXACT-{PHI2==i, 0<=PHI4, PHI4<=9,
@@ -797,6 +795,8 @@ int main()
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -807,8 +807,6 @@ int main()
 
             ((h.champ)[i].array)[j] = i*j;
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <g.champ[PHI2].array[PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i, i<=4,
 //    0<=j, j<=9}>
 //  <h.champ[PHI2].array[PHI4]-R-EXACT-{PHI2==i, PHI4==j, 0<=i, i<=4,
@@ -818,6 +816,8 @@ int main()
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
             
             

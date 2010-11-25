@@ -16,7 +16,7 @@ void call02(int i, float x)
 
 Source code with cumulated effects
 
-//             <    is read   >: j i x
+//             <    is read   >: i j x
 //             <    is written>: j
 void call02(int i, float x)
 {

@@ -111,8 +111,6 @@ Use-def chains
 		from <j-R-EXACT> to <j-W-EXACT>
 	23 --> 24 with conflicts
 		from <y-W-EXACT> to <y-R-EXACT>
-	23 --> 21 with conflicts
-		from <y-W-EXACT> to <y-W-EXACT>
 	23 --> 20 with conflicts
 		from <y-RE-EXACT> to <y-WE-EXACT>
 	23 --> 16 with conflicts

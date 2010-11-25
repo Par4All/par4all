@@ -3,14 +3,14 @@ Cumulated effects for "static01"
 
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i
-//             <    is written>: __IO_EFFECTS:LUNS[1] i
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
 void static01()
 {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i
-//             <    is written>: __IO_EFFECTS:LUNS[1] i
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
    // BEGIN BLOCK
    static int i = 0;
 //             <    is read   >: i
@@ -19,7 +19,7 @@ void static01()
    i++;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] i
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", i);
    // END BLOCK

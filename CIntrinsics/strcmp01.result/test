@@ -30,9 +30,9 @@ int main()
 //             <may be read   >: stdin stdin[0] stdout stdout[0] 
 //                               __IO_EFFECTS:LUNS[0] 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdin[0] stdout[0] 
+//             <may be written>: stdin[0] stdout[0] szInput[*] 
 //                               __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1] szInput[*]
+//                               __IO_EFFECTS:LUNS[1]
    do {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

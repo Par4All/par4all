@@ -134,8 +134,8 @@ int main()
 
 //  <s.one-R-EXACT-{}>
 //  <s.two[PHI2]-W-MAY-{1<=PHI2}>
-//  <sp[PHI1].one-R-EXACT-{PHI1==0}>
 //  <sp-R-EXACT-{}>
+//  <sp[PHI1].one-R-EXACT-{PHI1==0}>
 //  <sp[PHI1].two[PHI3]-W-MAY-{PHI1==0}>
 
 

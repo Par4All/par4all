@@ -70,8 +70,8 @@ Regions for "call03"
 
 
 //  <pi-R-EXACT-{}>
-//  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <pi-W-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
 //  <q[PHI1].one-W-EXACT-{PHI1==0}>
 //  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
@@ -107,8 +107,8 @@ Regions for "main"
 //  <pi-W-EXACT-{}>
 //  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 //  <q[PHI1].one-W-EXACT-{PHI1==0}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
 int main()
 {
@@ -117,8 +117,8 @@ int main()
 //  <pi-W-EXACT-{}>
 //  <pi[PHI1]-W-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 //  <q[PHI1].one-W-EXACT-{PHI1==0}>
+//  <q[PHI1].two[PHI3]-W-EXACT-{PHI1==0, PHI3==4}>
 
    call03();
 }

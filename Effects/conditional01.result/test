@@ -40,8 +40,8 @@ char * conditional01(int i)
 char * conditional01(int i)
 {
 
-//  <p[PHI1][PHI2]-W-MAY-{}>
 //  <p[PHI1]-W-MAY-{}>
+//  <p[PHI1][PHI2]-W-MAY-{}>
 
    char *p[3] = {"a", "b", "c"};
 

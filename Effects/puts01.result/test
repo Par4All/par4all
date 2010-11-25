@@ -11,9 +11,9 @@ int main()
 {
 //             <    is written>: s
    char *s = "sortie de puts";
-//             <may be read   >: stdout[0] s[*]
+//             <may be read   >: s[*] stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] s
+//             <    is read   >: s stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(s);
 }

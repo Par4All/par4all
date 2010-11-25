@@ -35,7 +35,7 @@ int main()
    printf("debut: str=%s", str);
 //             <    is written>: t
    t = strtok(str, "?");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -43,7 +43,7 @@ int main()
    printf("\nresultat strtok(str,\"?\")= %s", t);
 //             <    is written>: t
    t = strtok((void *) 0, ",");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -51,7 +51,7 @@ int main()
    printf("\nresultat strtok(NULL,\",\")= %s", t);
 //             <    is written>: t
    t = strtok((void *) 0, "#,");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -59,7 +59,7 @@ int main()
    printf("\nresultat strtok(NULL,\"#,\")= %s", t);
 //             <    is written>: t
    t = strtok((void *) 0, "?");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]

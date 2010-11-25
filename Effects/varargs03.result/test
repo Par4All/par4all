@@ -8,10 +8,10 @@ int main()
    char *ch;
    int tab[5];
    int r;
-//             <may be read   >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
-//                               s[0] tab[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*] ch[*] s[0] 
-//                               tab[*]
+//             <may be read   >: ch[*] fmt[*] s[0] tab[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: ch[*] s[0] tab[*] 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: ch fmt s
 //             <    is written>: r
    r = varargs03(s, fmt, ch, tab);
@@ -28,8 +28,8 @@ int varargs03(FILE *stream, const char *fmt, ...)
 //             <    is written>: pa
 
       va_start(pa, fmt);
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fmt[*] stream[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] stream[0]
+//             <may be read   >: fmt[*] stream[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: stream[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fmt pa stream
 //             <    is written>: pa r
       r = vfprintf(stream, fmt, pa);
@@ -54,25 +54,25 @@ int main()
    char *ch;
    int tab[5];
    int r;
-//             <may be read   >: __IO_EFFECTS:LUNS[*] ch[*] fmt[*] 
-//                               s[0] tab[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*] ch[*] s[0] 
-//                               tab[*]
+//             <may be read   >: ch[*] fmt[*] s[0] tab[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: ch[*] s[0] tab[*] 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: ch fmt s
 //             <    is written>: r
    r = varargs03(s, fmt, ch, tab);
 //             <    is read   >: r
    return r;
 }
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fmt fmt[*] 
-//                               stream[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] stream[0]
+//             <may be read   >: fmt fmt[*] stream[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stream[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: stream
 int varargs03(FILE *stream, const char *fmt, ...)
 {
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fmt fmt[*] 
-//                               stream[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] stream[0]
+//             <may be read   >: fmt fmt[*] stream[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stream[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: stream
    if (stream) {
       va_list pa;
@@ -81,8 +81,8 @@ int varargs03(FILE *stream, const char *fmt, ...)
 //             <    is written>: pa
 
       va_start(pa, fmt);
-//             <may be read   >: __IO_EFFECTS:LUNS[*] fmt[*] stream[0]
-//             <may be written>: __IO_EFFECTS:LUNS[*] stream[0]
+//             <may be read   >: fmt[*] stream[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: stream[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fmt pa stream
 //             <    is written>: pa r
       r = vfprintf(stream, fmt, pa);

@@ -66,7 +66,7 @@ int main()
    n = memcmp(str1, str2, len1>len2?len1:len2);
 //             <may be read   >: stdout[0] str1[*] str2[*]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] n
+//             <    is read   >: n stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    if (n>0)
 //             <may be read   >: stdout[0] str1[*] str2[*]

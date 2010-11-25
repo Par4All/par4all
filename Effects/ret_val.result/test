@@ -7,7 +7,7 @@ long long int get_result(int argc, char **argv)
    result = atoll(argv[1]);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] result
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("return value will be %lld\n", result);
 //             <    is read   >: result
@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: __IO_EFFECTS:LUNS[1] argc argv
-//             <    is written>: __IO_EFFECTS:LUNS[1] size
+//             <    is read   >: argc argv __IO_EFFECTS:LUNS[1]
+//             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size
    return size;
@@ -32,7 +32,7 @@ long long int get_result(int argc, char **argv)
    result = atoll(argv[1]);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] result
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("return value will be %lld\n", result);
 //             <    is read   >: result

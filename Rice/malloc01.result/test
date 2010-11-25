@@ -43,7 +43,7 @@ Proper effects
 void malloc01()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
@@ -62,7 +62,7 @@ Cumulated effects
 void malloc01()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
@@ -85,9 +85,9 @@ Regions
 void malloc01()
 {
 
+//  <p-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <p-W-EXACT-{}>
 
    int *p = malloc(10*sizeof(int));
    //int p[10];

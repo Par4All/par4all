@@ -56,8 +56,8 @@ void flatten_code12(void)
    for(i = 0; i <= 3; i += 1) {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] foo
-//             <    is written>: __IO_EFFECTS:LUNS[1] foo
+//             <    is read   >: foo stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: foo __IO_EFFECTS:LUNS[1]
 // (0,4)
       // BEGIN BLOCK
 // (0,5)
@@ -69,7 +69,7 @@ void flatten_code12(void)
       foo++;                                                            /*0016*/
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] foo
+//             <    is read   >: foo stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 // (0,7)
 

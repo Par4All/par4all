@@ -97,11 +97,11 @@ int main()
 
    x += 3;                                                              /*0018*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <p-R-EXACT-{}>
 //  <tab1[PHI1]-R-MAY-{}>
 //  <tab2[PHI1]-R-EXACT-{PHI1==x}>
 //  <x-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
    return 1;                                                            /*0020*/

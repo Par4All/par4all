@@ -38,11 +38,11 @@ int env05()
 //             <    is declared>: j
    km j;                                                                /*0007*/
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
 
    j = (km) 1;                                                          /*0009*/
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
    j = sizeof(km);                                                      /*0010*/
 //             <    is read   >: j
 //             <    is referenced>: j
@@ -62,11 +62,11 @@ int env05()
 //             <    is declared>: j
    km j;                                                                /*0007*/
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
 
    j = (km) 1;                                                          /*0009*/
 //             <    is written>: j
-//             <    is referenced>: km j
+//             <    is referenced>: j km
    j = sizeof(km);                                                      /*0010*/
 //             <    is read   >: j
 //             <    is referenced>: j

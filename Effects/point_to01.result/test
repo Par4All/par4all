@@ -49,7 +49,7 @@ void point_to01()
 //             <    is written>: p[0].d
       p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].d p[0].a
+//             <    is written>: p[0].a p[0].d
       p->d = p->a = 4;
    }
 }
@@ -68,7 +68,7 @@ void point_to01()
 
    p = &c;
 //             <may be read   >: p p[0].a
-//             <may be written>: p[0].a p[0].d p[0].c p[0].b
+//             <may be written>: p[0].a p[0].b p[0].c p[0].d
 
    if (1) {
 //             <    is read   >: p
@@ -84,7 +84,7 @@ void point_to01()
 //             <    is written>: p[0].d
       p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].d p[0].a
+//             <    is written>: p[0].a p[0].d
       p->d = p->a = 4;
    }
 }

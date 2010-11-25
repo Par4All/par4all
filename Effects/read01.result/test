@@ -20,7 +20,7 @@ int main()
 
    nbytes = sizeof(buf);
 //             <may be read   >: __IO_EFFECTS:LUNS[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*] buf[*]
+//             <may be written>: buf[*] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fd nbytes
 //             <    is written>: bytes_read
    bytes_read = read(fd, buf, nbytes);

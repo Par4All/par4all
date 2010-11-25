@@ -110,10 +110,10 @@ int main()
    Cplfloat pt_in[ny][nx];
    float Sigma2;
    Cplfloat pt_out[ny][nx];
-//             <may be read   >: _RANDOM_EFFECTS:GEN_SEED 
-//                               pt_in[*][*].im pt_in[*][*].re
-//             <may be written>: _RANDOM_EFFECTS:GEN_SEED 
-//                               pt_out[*][*].im pt_out[*][*].re
+//             <may be read   >: pt_in[*][*].im pt_in[*][*].re 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: pt_out[*][*].im pt_out[*][*].re 
+//                               _RANDOM_EFFECTS:GEN_SEED
 //             <    is read   >: Sigma2 nx ny
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
@@ -122,8 +122,6 @@ int main()
 PRINT REGIONS for AddNoise
 
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <Sigma2-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
@@ -131,10 +129,12 @@ PRINT REGIONS for AddNoise
 //    PHI2+1<=nx}>
 //  <pt_in[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
 //  <pt_out[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
+//  <pt_out[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//    PHI2+1<=nx}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
@@ -151,8 +151,6 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <A-W-EXACT-{}>
 //  <B-R-EXACT-{}>
 //  <B-W-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <Sigma2-R-EXACT-{}>
 //  <ix-R-EXACT-{}>
 //  <ix-W-EXACT-{}>
@@ -164,15 +162,17 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //    PHI2+1<=nx}>
 //  <pt_in[PHI1][PHI2].re-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
-//  <pt_out[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
-//    PHI2+1<=nx}>
 //  <pt_out[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//    PHI2+1<=nx}>
+//  <pt_out[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
    for(iy = 0; iy <= ny-1; iy += 1)
 
@@ -180,8 +180,6 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <A-W-EXACT-{}>
 //  <B-R-EXACT-{}>
 //  <B-W-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <Sigma2-R-EXACT-{}>
 //  <ix-R-EXACT-{}>
 //  <ix-W-EXACT-{}>
@@ -192,34 +190,36 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //    0<=iy, iy+1<=ny}>
 //  <pt_in[PHI1][PHI2].re-R-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, iy+1<=ny}>
-//  <pt_out[PHI1][PHI2].re-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
-//    0<=iy, iy+1<=ny}>
 //  <pt_out[PHI1][PHI2].im-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//    0<=iy, iy+1<=ny}>
+//  <pt_out[PHI1][PHI2].re-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, iy+1<=ny}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
       for(ix = 0; ix <= nx-1; ix += 1) {
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-MAY-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-MAY-{}>
 //  <nx-R-MAY-{}>
 //  <ny-R-MAY-{}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
 //  <u-W-MAY-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-MAY-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-MAY-{}>
 
 
          while (u==0||u>1)
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <u-W-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
             u = rand()/32768.;
 
@@ -230,11 +230,11 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 
          A = sqrt(-(2.*log(u)));
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
 //  <v-W-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
          v = rand()/32768.;
 
@@ -317,8 +317,6 @@ int main()
    float Sigma2;
    Cplfloat pt_out[ny][nx];
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
-//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <Sigma2-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
@@ -330,6 +328,8 @@ int main()
 //    PHI2+1<=nx, nx==10, ny==10}>
 //  <pt_out[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, nx==10, ny==10}>
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);

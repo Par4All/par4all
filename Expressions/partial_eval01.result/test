@@ -31,10 +31,10 @@ int main()
 //             <    is read   >: i j k size
 //             <    is written>: k loulou[0][i][j]
          loulou[0][i][j] = k++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1] riri[2]
+//             <    is written>: riri[2] __IO_EFFECTS:LUNS[1]
    printf("%d\n", duck(riri, fifi, size, loulou));
    return 0;
 }

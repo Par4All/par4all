@@ -7,14 +7,14 @@ int binary_or01()
    int ret = 1;                                                         /*0014*/
 //             <may be read   >: stderr[0]
 //             <may be written>: stderr[0]
-//             <    is read   >: stderr __IO_EFFECTS:LUNS[2] ret
-//             <    is written>: __IO_EFFECTS:LUNS[2] ret
+//             <    is read   >: ret stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: ret __IO_EFFECTS:LUNS[2]
 
    ret |= foo();                                                        /*0016*/
 //             <may be read   >: stderr[0]
 //             <may be written>: stderr[0]
-//             <    is read   >: stderr __IO_EFFECTS:LUNS[2] ret
-//             <    is written>: __IO_EFFECTS:LUNS[2] ret
+//             <    is read   >: ret stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: ret __IO_EFFECTS:LUNS[2]
 
    ret = ret||foo();                                                    /*0018*/
 }
@@ -31,14 +31,14 @@ int binary_or01()
    int ret = 1;                                                         /*0014*/
 //             <may be read   >: stderr[0]
 //             <may be written>: stderr[0]
-//             <    is read   >: stderr __IO_EFFECTS:LUNS[2] ret
-//             <    is written>: __IO_EFFECTS:LUNS[2] ret
+//             <    is read   >: ret stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: ret __IO_EFFECTS:LUNS[2]
 
    ret |= foo();                                                        /*0016*/
 //             <may be read   >: stderr[0]
 //             <may be written>: stderr[0]
-//             <    is read   >: stderr __IO_EFFECTS:LUNS[2] ret
-//             <    is written>: __IO_EFFECTS:LUNS[2] ret
+//             <    is read   >: ret stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: ret __IO_EFFECTS:LUNS[2]
 
    ret = ret||foo();                                                    /*0018*/
 }

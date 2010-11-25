@@ -6,7 +6,7 @@ s_t make_s(int i, float x)
    // BEGIN BLOCK
    s_t *p;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
 //             <    is read   >: i p
@@ -15,7 +15,7 @@ s_t make_s(int i, float x)
 //             <    is read   >: p x
 //             <    is written>: p[0].reel
    p->reel = x;
-//             <    is read   >: p p[0].reel p[0].entier
+//             <    is read   >: p p[0].entier p[0].reel
    return *p;
    // END BLOCK
 }
@@ -35,7 +35,7 @@ s_t make_s(int i, float x)
    // BEGIN BLOCK
    s_t *p;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
 //             <    is read   >: i p
@@ -44,7 +44,7 @@ s_t make_s(int i, float x)
 //             <    is read   >: p x
 //             <    is written>: p[0].reel
    p->reel = x;
-//             <    is read   >: p p[0].reel p[0].entier
+//             <    is read   >: p p[0].entier p[0].reel
    return *p;
    // END BLOCK
 }
@@ -59,8 +59,8 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ s.entier 
-//                               s.reel
+//             <    is written>: s.entier s.reel 
+//                               _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
 //             <    is written>: s.entier
@@ -68,7 +68,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ j
+//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //             <    is read   >: j
@@ -95,8 +95,8 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ s.entier 
-//                               s.reel
+//             <    is written>: s.entier s.reel 
+//                               _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
 //             <    is written>: s.entier
@@ -104,7 +104,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ j
+//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //             <    is read   >: j
@@ -120,7 +120,7 @@ s_t make_s(int i, float x)
    // BEGIN BLOCK
    s_t *p;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -149,7 +149,7 @@ s_t make_s(int i, float x)
    // BEGIN BLOCK
    s_t *p;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

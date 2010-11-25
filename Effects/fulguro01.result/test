@@ -240,8 +240,8 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 //             <may be written>: datdest[0].array[*]
 //             <    is read   >: data1 data1[0].array data2 
 //                               data2[0].array datdest 
-//                               datdest[0].array datdest[0].spp 
-//                               datdest[0].length
+//                               datdest[0].array datdest[0].length 
+//                               datdest[0].spp
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;

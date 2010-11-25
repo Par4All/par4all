@@ -34,7 +34,7 @@ void point_to04()
 
    p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].d p[0].a
+//             <    is written>: p[0].a p[0].d
    p->d = p->a = 4;
 }
 
@@ -56,7 +56,7 @@ void point_to04()
 
    p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].d p[0].a
+//             <    is written>: p[0].a p[0].d
    p->d = p->a = 4;
 }
 

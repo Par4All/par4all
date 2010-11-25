@@ -87,8 +87,8 @@ int struct03()
    } x[10];
    int i = 0;
 
-//  <x[PHI1].un.first-W-MAY-{0<=PHI1, PHI1<=9}>
 //  <x[PHI1].deux.second-W-MAY-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1].un.first-W-MAY-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1) {

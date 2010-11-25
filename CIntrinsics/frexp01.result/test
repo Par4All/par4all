@@ -30,8 +30,8 @@ int main()
    significand = frexp(x, &exponent);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] exponent 
-//                               0`significand x
+//             <    is read   >: exponent 0`significand stdout x 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%lf * 2^%d = %f\n", significand, exponent, x);
    return 0;

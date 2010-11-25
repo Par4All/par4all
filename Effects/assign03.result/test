@@ -16,7 +16,7 @@ void assign03()
 {
    char *malloc(int);
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    double *p = (double *) malloc(10*sizeof(double));
 //             <    is written>: j
    int j = 2;
@@ -34,7 +34,7 @@ void assign03()
 {
    char *malloc(int);
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    double *p = (double *) malloc(10*sizeof(double));
 //             <    is written>: j
    int j = 2;

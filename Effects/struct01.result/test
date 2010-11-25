@@ -46,8 +46,8 @@ int main()
    x.first = 1;
 //             <    is written>: x.second
    x.second = 2;
-//             <may be read   >: i x.second x.first
-//             <may be written>: y[*].second y[*].first
+//             <may be read   >: i x.first x.second
+//             <may be written>: y[*].first y[*].second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
@@ -116,8 +116,8 @@ int main()
    x.first = 1;
 //             <    is written>: x.second
    x.second = 2;
-//             <may be read   >: i x.second x.first
-//             <may be written>: y[*].second y[*].first
+//             <may be read   >: i x.first x.second
+//             <may be written>: y[*].first y[*].second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
@@ -216,8 +216,8 @@ int main()
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <x.second-R-EXACT-{}>
 //  <x.first-R-EXACT-{}>
+//  <x.second-R-EXACT-{}>
 //  <y[PHI1].first-W-EXACT-{0<=PHI1, PHI1<=9}>
 //  <y[PHI1].second-W-EXACT-{0<=PHI1, PHI1<=9}>
 
@@ -241,8 +241,8 @@ int main()
 //  <i-W-EXACT-{}>
 //  <x.first-R-EXACT-{}>
 //  <x.second-R-EXACT-{}>
-//  <z[PHI1].second-W-EXACT-{0<=PHI1, PHI1<=9}>
 //  <z[PHI1].first-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <z[PHI1].second-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
@@ -250,8 +250,8 @@ int main()
 //  <i-R-EXACT-{}>
 //  <x.first-R-EXACT-{0<=i, i<=9}>
 //  <x.second-R-EXACT-{0<=i, i<=9}>
-//  <z[PHI1].second-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 //  <z[PHI1].first-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <z[PHI1].second-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       z[i] = x;
    return 0;

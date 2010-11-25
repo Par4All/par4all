@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 //             <    is written>: a_d1 a_d2
 
    a_d1 = a_d2 = 5;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
 //             <    is read   >: a_d1
 //             <    is written>: i
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 //             <    is read   >: a_d1 a_d2 i j toto
 //             <    is written>: toto[i+j*a_d1]
          toto[i+j*a_d1] = i+j*a_d2;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    free(toto);
@@ -38,8 +38,8 @@ int main(int argc, char **argv)
    
    
    a_d1 = a_d2 = 10;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ a_d1 a_d2
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
 //             <    is read   >: a_d1
 //             <    is written>: i
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 //             <    is read   >: a_d1 a_d2 i j toto
 //             <    is written>: toto[i+j*a_d1]
          toto[i+j*a_d1] = i+j*a_d2;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ toto
+//             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    free(toto);

@@ -12,7 +12,7 @@ void compute()
 //             <    is read   >: i j
 //             <    is written>: tab2[i][j]
          tab2[i][j] = i*j;
-//             <    is read   >: tab3 i j
+//             <    is read   >: i j tab3
 //             <    is written>: tab3[i][j]
          tab3[i][j] = i*j;
       }
@@ -22,12 +22,12 @@ void compute()
 void compute()
 {
    int i, j;
-//             <may be read   >: tab3 i j
-//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*] j
+//             <may be read   >: i j tab3
+//             <may be written>: j tab1[*][*] tab2[*][*] tab3[*][*]
 //             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//             <may be read   >: tab3 i j
+//             <may be read   >: i j tab3
 //             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
 //             <    is written>: j
       for(j = 1; j <= 62; j += 1) {
@@ -38,7 +38,7 @@ void compute()
 //             <    is read   >: i j
          tab2[i][j] = i*j;
 //             <may be written>: tab3[*][*]
-//             <    is read   >: tab3 i j
+//             <    is read   >: i j tab3
          tab3[i][j] = i*j;
       }
 }

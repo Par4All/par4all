@@ -47,33 +47,33 @@ int main()
 //             <may be read   >: stdin[0]
 //             <may be written>: stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
-//             <    is written>: __IO_EFFECTS:LUNS[0] i
+//             <    is written>: i __IO_EFFECTS:LUNS[0]
    scanf("%d", &i);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: buffer _MALLOC_EFFECTS:_MALLOC_
 
    buffer = (char *) malloc(i+1);
 //             <    is read   >: buffer
    if (buffer==(void *) 0)
       exit(1);
-//             <may be read   >: _RANDOM_EFFECTS:GEN_SEED buffer n
+//             <may be read   >: buffer n _RANDOM_EFFECTS:GEN_SEED
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i
 
    for(n = 0; n <= i-1; n += 1)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED buffer i n
+//             <    is read   >: buffer i n _RANDOM_EFFECTS:GEN_SEED
       buffer[n] = rand()%26+'a';
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: buffer i
    buffer[i] = '\0';
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("Random string: %s\n", buffer);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer
+//             <    is read   >: buffer _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
    

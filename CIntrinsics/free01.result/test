@@ -20,17 +20,17 @@ int main()
 {
    int *buffer1, *buffer2, *buffer3;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer1
+//             <    is written>: buffer1 _MALLOC_EFFECTS:_MALLOC_
    buffer1 = (int *) malloc(100*sizeof(int));
 //             <    is written>: buffer2
    buffer2 = (int *) calloc(100, sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer2
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ buffer3
+//             <    is read   >: buffer2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: buffer3 _MALLOC_EFFECTS:_MALLOC_
    buffer3 = (int *) realloc(buffer2, 500*sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer1
+//             <    is read   >: buffer1 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer1);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ buffer3
+//             <    is read   >: buffer3 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer3);
    return 0;
