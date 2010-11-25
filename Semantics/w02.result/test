@@ -123,9 +123,9 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6}>
       INTEGER I, N
       REAL T(10)
 
+C  <T(PHI1)-R-MAY-{1<=PHI1, PHI1<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6}>
-C  <T(PHI1)-R-MAY-{1<=PHI1, PHI1<=9}>
 
 C (0,1)
 C     BEGIN BLOCK
@@ -135,24 +135,24 @@ C (0,2)
 C (0,3)
       N = 10                                                            0006
 
+C  <T(PHI1)-R-MAY-{1<=PHI1, PHI1<=9, N==10}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6, N==10}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, N==10}>
-C  <T(PHI1)-R-MAY-{1<=PHI1, PHI1<=9, N==10}>
 
 C (0,4)
 
       DO WHILE (I.LT.N)                                                 0008
 
+C  <T(PHI1)-R-EXACT-{PHI1==I, N==10, 1<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, N==10, 1<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, N==10, 1<=I, I<=9}>
-C  <T(PHI1)-R-EXACT-{PHI1==I, N==10, 1<=I, I<=9}>
 
 C (0,5)
 C        BEGIN BLOCK
 
+C  <T(PHI1)-R-EXACT-{PHI1==I, N==10, 1<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, N==10, 1<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, N==10, 1<=I, I<=9}>
-C  <T(PHI1)-R-EXACT-{PHI1==I, N==10, 1<=I, I<=9}>
 
 C (0,6)
          PRINT *, T(I)                                                  0009

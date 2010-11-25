@@ -47,8 +47,8 @@ void for03(int n)
    e1.next = &e2;
 
 //  <e1.next-R-EXACT-{}>
-//  <e1.x[PHI2]-W-EXACT-{0<=PHI2, PHI2<=99}>
 //  <e1.next[PHI2].x[PHI4]-W-EXACT-{PHI2==0, 0<=PHI4, PHI4<=99}>
+//  <e1.x[PHI2]-W-EXACT-{0<=PHI2, PHI2<=99}>
 
 
    for(j = 0; j <= 99; j += 1) {
