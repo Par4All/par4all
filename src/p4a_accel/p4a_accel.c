@@ -17,6 +17,14 @@
 
 #ifdef P4A_ACCEL_OPENMP
 
+/**
+ * global structure used for timing purpose
+ */
+struct timeval p4a_time_begin, p4a_time_end;
+
+
+
+
 /** Stop a timer on the accelerator and get double ms time
 
     @addtogroup P4A_OpenMP_time_measure
