@@ -526,6 +526,7 @@ list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
   range_to_post_pv(r, l_in_cur, &pv_res, ctxt);
   free_pv_results_paths(&pv_res);
   l_in_cur = pv_res.l_out;
+  list l_saved = gen_full_copy_list(l_in_cur);
 
   /* then, the loop body is executed if and only if the upper bound
      is greater than the lower bound, else the loop body is only possibly
@@ -542,8 +543,7 @@ list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
     {
       pips_debug(3, "fix point iteration number %d.\n", i+1);
       list l_iter_in = gen_full_copy_list(l_out);
-      l_in_cur = l_out;
-      l_out = statement_to_post_pv(body, l_in_cur, ctxt);
+      l_out = statement_to_post_pv(body, l_out, ctxt);
 
       /* this iteration may never be executed :*/
       l_out = (*ctxt->pvs_may_union_func)(l_out, gen_full_copy_list(l_iter_in));
@@ -563,7 +563,7 @@ list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
       list l_kind = CONS(CELL_INTERPRETATION,
 			 make_cell_interpretation_address_of(), NIL);
       single_pointer_assignment_to_post_pv(anywhere_eff, l_anywhere, l_kind,
-					   false, pv_res.l_out,
+					   false, l_saved,
 					   &pv_res_failed, ctxt);
       l_out =  pv_res_failed.l_out;
       free_pv_results_paths(&pv_res_failed);
@@ -572,10 +572,12 @@ list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
       gen_full_free_list(l_kind);
 
       /* now update input pointer values of inner loop statements */
-      l_in_cur = l_out;
+      l_in_cur = gen_full_copy_list(l_out);
       list l_tmp = statement_to_post_pv(body, l_in_cur, ctxt);
       gen_full_free_list(l_tmp);
     }
+  else
+    gen_full_free_list(l_saved);
 
   pips_debug_pvs(1, "end with l_out =\n", l_out);
   return (l_out);
@@ -586,6 +588,7 @@ list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   list l_in_cur = NIL;
+  list l_saved = gen_full_copy_list(l_in); /* in case fix point is not reached */
   expression cond = whileloop_condition(l);
   bool before_p = evaluation_before_p(whileloop_evaluation(l));
   statement body = whileloop_body(l);
@@ -643,7 +646,7 @@ list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
       list l_kind = CONS(CELL_INTERPRETATION,
 			 make_cell_interpretation_address_of(), NIL);
       single_pointer_assignment_to_post_pv(anywhere_eff, l_anywhere, l_kind,
-					   false, l_in,
+					   false, l_saved,
 					   &pv_res_failed, ctxt);
       l_out =  pv_res_failed.l_out;
       free_pv_results_paths(&pv_res_failed);
@@ -652,7 +655,7 @@ list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
       gen_full_free_list(l_kind);
 
       /* now update input pointer values of inner loop statements */
-      l_in_cur = l_out;
+      l_in_cur = gen_full_copy_list(l_out);
       if(before_p)
 	{
 	  pv_results pv_res_cond = make_pv_results();
@@ -673,6 +676,8 @@ list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
       else
 	gen_full_free_list(l_tmp);
     }
+  else
+    gen_full_free_list(l_saved);
 
   pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
@@ -1033,8 +1038,20 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
   list l_kill = NIL;
   list l_gen = NIL;
 
-  pips_debug(1, "begin\n");
-
+  pips_debug_effect(1, "begin for lhs_eff =", lhs_eff);
+  pips_debug(1, "and l_rhs_eff:\n");
+  ifdebug(1)
+    {
+      list l_tmp = l_rhs_kind;
+      FOREACH(EFFECT, rhs_eff, l_rhs_eff)
+	{
+	  cell_interpretation ci = CELL_INTERPRETATION(CAR(l_tmp));
+	  pips_debug(1, "%s of:\n", cell_interpretation_value_of_p(ci)?"value": "address");
+	  pips_debug_effect(1, "\t", rhs_eff);
+	  POP(l_tmp);
+	}
+    }
+  pips_debug_pvs(1, "and l_in =", l_in);
   bool anywhere_lhs_p = false;
 
   /* First search for all killed paths */
@@ -1045,6 +1062,7 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
       pips_debug(3, "anywhere lhs\n");
       anywhere_lhs_p = true;
       l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+      l_aliased = l_kill;
     }
   else
     {
@@ -1326,10 +1344,9 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   list l_rhs_eff = rhs_pv_res.result_paths;
   list l_rhs_kind = rhs_pv_res.result_paths_interpretations;
   l_in_cur = rhs_pv_res.l_out;
-  //if (l_in != l_in_cur) gen_full_free_list(l_in); should have been freed in expression_to_post_pv
-
 
   expression_to_post_pv(lhs, l_in_cur, &lhs_pv_res, ctxt);
+  l_in_cur = lhs_pv_res.l_out;
   /* we should test here that lhs_pv_res.result_paths has only one element.
      well is it correct? can a relational operator expression be a lhs ?
   */
