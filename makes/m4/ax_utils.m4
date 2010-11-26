@@ -276,7 +276,10 @@ AC_DEFUN([AX_CHECK_CPROTO],[
 dnl checks for yacc and sets ax_ variables accordingly
 AC_DEFUN([AX_PROG_YACC],[
 	AC_PROG_YACC
-	AS_IF([test "${YACC}" = yacc],[AX_CHECK_PROG([yacc])],[
+	AS_IF([test "${YACC}" = yacc],[
+		unset YACC
+		AX_CHECK_PROG([yacc])
+	],[
 		AX_WITH([yacc])="yes"
 		AX_MSG([yacc])=""
 	])
