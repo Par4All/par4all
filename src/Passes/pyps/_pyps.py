@@ -341,6 +341,10 @@ class workspace(object):
 		"""retrieve workspace database directory"""
 		return self._name+".database/"
 
+	def tmpdirname(self):
+		"""retrieve workspace database directory"""
+		return self.dirname()+"Tmp/"
+
 	def checkpoint(self):
 		"""checkpoints the workspace and returns a workspace id"""
 		self.cpypips.close_workspace(0)
@@ -386,8 +390,10 @@ class workspace(object):
 
 		return saved
 
-	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
+	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep=None, outfile="",extrafiles=[]):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
+		if not rep:
+			rep=self.tmpdirname()+"d.out"
 		otmpfiles=self.save(rep=rep)+extrafiles
 		command=[CC, self.cppflags, CFLAGS]
 		if link:
