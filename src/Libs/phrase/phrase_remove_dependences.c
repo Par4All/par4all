@@ -41,7 +41,6 @@
 
 #include "text-util.h"
 
-#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -406,7 +405,7 @@ static list make_lInitStats(list lInitStats, reference maxOffRef, list lNewEnt,
 				copy_expression(indInit),
 				NULL);
 
-    expression addExp = call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+    expression addExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 						     addArg));
 
     comEngine_replace_reference_in_stat(newStat,
@@ -453,7 +452,7 @@ static list make_lSwitchStats(list lSwitchStats, reference maxOffRef, list lNewE
 			      make_integer_constant_expression(1),
 			      NULL);
 
-  expression addExp = call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+  expression addExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 						   addArg));
 
   comEngine_replace_reference_in_stat(newStat,

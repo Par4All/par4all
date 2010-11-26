@@ -48,7 +48,6 @@ LIB_CFILES =	\
 		partial_redundancy_elimination.c \
 		variable_expansion.c \
 		internalize_parallel_code.c \
-		expression_substitution.c \
 		index_set_splitting.c \
 		for_loop_recovering.c \
 		generate_pragma.c \

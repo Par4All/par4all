@@ -32,33 +32,7 @@
 #include "defines-local.h"
 #include "pipsdbm.h"
 
-/* print_entity_variable(e)
- * 
- * if it is just a variable, the type is printed,
- * otherwise just the entity name is printed
- */
 
-static void print_dimension(dimension d)
-{
-    fprintf(stderr,"dimension :\n");
-    print_expression(dimension_lower(d));
-    print_expression(dimension_upper(d));
-}
-
-void print_entity_variable(entity e)
-{
-    variable v;
-
-    (void) fprintf(stderr,"name: %s\n",entity_name(e));
-    
-    if (!type_variable_p(entity_type(e)))
-	return;
-
-    v = type_variable(entity_type(e));
-
-    fprintf(stderr,"basic %s\n",basic_to_string(variable_basic(v)));
-    gen_map((gen_iter_func_t)print_dimension, variable_dimensions(v));
-}
 
 void print_align(align a)
 {

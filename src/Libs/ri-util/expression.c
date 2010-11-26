@@ -3383,4 +3383,45 @@ bool expression_minmax_p(expression e)
     return false;
 }
 
+/******************* EXPRESSIONS **********************
+ * moved there from c_syntax by SG
+ */
+
+expression MakeSizeofExpression(expression e)
+{
+
+  syntax s = make_syntax_sizeofexpression(make_sizeofexpression_expression(e));
+  expression exp =  make_expression(s,normalized_undefined);
+  return exp; /* exp = sizeof(e)*/
+}
+
+expression MakeSizeofType(type t)
+{
+  syntax s = make_syntax_sizeofexpression(make_sizeofexpression_type(t));
+  expression exp =  make_expression(s,normalized_undefined);
+  return exp;  /* exp = sizeof(t) */
+}
+
+expression MakeCastExpression(type t, expression e)
+{
+  syntax s = make_syntax_cast(make_cast(t,e));
+  expression exp = make_expression(s,normalized_undefined);
+  return exp; /* exp = (t) e */
+}
+
+expression MakeCommaExpression(list l)
+{
+  if (ENDP(l))
+    return expression_undefined;
+  if (gen_length(l)==1)
+    return EXPRESSION(CAR(l));
+  return make_call_expression(CreateIntrinsic(COMMA_OPERATOR_NAME),l);
+}
+
+expression MakeBraceExpression(list l)
+{
+  return make_call_expression(CreateIntrinsic(BRACE_INTRINSIC),l);
+}
+
+
 

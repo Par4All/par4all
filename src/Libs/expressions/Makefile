@@ -27,6 +27,7 @@ LIB_CFILES =	partial_eval.c \
 		optimize.c \
 		sequence_gcm_cse.c \
 		instruction_selection.c \
+		expression_substitution.c \
 		simplify.c
 
 INC_TARGET =    $(TARGET).h

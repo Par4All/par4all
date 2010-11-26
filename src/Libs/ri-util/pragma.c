@@ -30,7 +30,7 @@
 
   A middle term, extensions method could go in another file.
 
-  It is a trivial inplementation based on strings for a proof of concept.
+  It is a trivial implementation based on strings for a proof of concept.
 
   Pierre.Villalon@hpc-project.com
   Ronan.Keryell@hpc-project.com

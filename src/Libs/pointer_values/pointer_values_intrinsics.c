@@ -38,9 +38,7 @@
 #include "text-util.h"
 #include "effects-simple.h"
 #include "effects-generic.h"
-#include "pipsdbm.h"
 #include "misc.h"
-#include "properties.h"
 
 #include "pointer_values.h"
 

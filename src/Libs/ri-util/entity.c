@@ -58,6 +58,33 @@ void print_entity_set(set s)
   }
 }
 
+
+static void print_dimension(dimension d)
+{
+    fprintf(stderr,"dimension :\n");
+    print_expression(dimension_lower(d));
+    print_expression(dimension_upper(d));
+}
+/* print_entity_variable(e)
+ * 
+ * if it is just a variable, the type is printed,
+ * otherwise just the entity name is printed
+ */
+void print_entity_variable(entity e)
+{
+    variable v;
+
+    (void) fprintf(stderr,"name: %s\n",entity_name(e));
+    
+    if (!type_variable_p(entity_type(e)))
+	return;
+
+    v = type_variable(entity_type(e));
+
+    fprintf(stderr,"basic %s\n",basic_to_string(variable_basic(v)));
+    gen_map((gen_iter_func_t)print_dimension, variable_dimensions(v));
+}
+
 bool unbounded_expression_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -1140,6 +1167,21 @@ entity local_name_to_top_level_entity(const char *n)
  */
 entity module_name_to_entity(const char* mn) {
   return local_name_to_top_level_entity(mn);
+}
+/* similar to module_name_to_entity
+ * but generates a warning and a stub if the entity is not found
+ */
+entity module_name_to_runtime_entity(string name)
+{
+    entity e = module_name_to_entity(name); 
+    if ( entity_undefined_p( e ) )
+    {
+        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
+                "Please feed pips with its definition and source\n",name);
+        e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
+    }
+
+    return e;
 }
 
 

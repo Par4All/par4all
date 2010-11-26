@@ -253,44 +253,7 @@ void ResetCurrentCompilationUnitEntity(bool is_compilation_unit_parser)
   reset_current_module_entity();
 }
 
-
-/******************* EXPRESSIONS **********************/
-
-expression MakeSizeofExpression(expression e)
-{
-
-  syntax s = make_syntax_sizeofexpression(make_sizeofexpression_expression(e));
-  expression exp =  make_expression(s,normalized_undefined);
-  return exp; /* exp = sizeof(e)*/
-}
-
-expression MakeSizeofType(type t)
-{
-  syntax s = make_syntax_sizeofexpression(make_sizeofexpression_type(t));
-  expression exp =  make_expression(s,normalized_undefined);
-  return exp;  /* exp = sizeof(t) */
-}
-
-expression MakeCastExpression(type t, expression e)
-{
-  syntax s = make_syntax_cast(make_cast(t,e));
-  expression exp = make_expression(s,normalized_undefined);
-  return exp; /* exp = (t) e */
-}
-
-expression MakeCommaExpression(list l)
-{
-  if (ENDP(l))
-    return expression_undefined;
-  if (gen_length(l)==1)
-    return EXPRESSION(CAR(l));
-  return make_call_expression(CreateIntrinsic(COMMA_OPERATOR_NAME),l);
-}
-
-expression MakeBraceExpression(list l)
-{
-  return make_call_expression(CreateIntrinsic(BRACE_INTRINSIC),l);
-}
+/************* EXPRESSIONS (half moved to ri-util ******************/
 
 /* e is now owned by returend expression and must not be used any longer */
 expression MakeFunctionExpression(expression e, list le)
@@ -666,6 +629,7 @@ expression MakeArrayExpression(expression exp, list lexp)
   }
   return e;
 }
+
 
 /*******************  TYPES *******************/
 

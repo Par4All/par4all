@@ -46,7 +46,6 @@ one process on the HRE
 #include "text-util.h"
 #include "properties.h"
 
-#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -116,7 +115,7 @@ statement make_wait_step_statement()
   statement newStat = statement_undefined;
 
   newStat = call_to_statement(
-			      make_call(get_function_entity(WAIT_FOR_NEXT_STEP),
+			      make_call(module_name_to_runtime_entity(WAIT_FOR_NEXT_STEP),
 					NIL));
 
   return newStat;
@@ -148,7 +147,7 @@ static statement generate_fifo_stat(reference curRef, expression buffIndExp,
 				  entity_to_expression(ind),
 				  NULL);
 
-      buffExp = call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+      buffExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 					     addArg));
     }
 
@@ -184,7 +183,7 @@ static statement generate_fifo_stat(reference curRef, expression buffIndExp,
 		      NULL);
 
   newStat = call_to_statement(
-			      make_call(get_function_entity(name), 
+			      make_call(module_name_to_runtime_entity(name), 
 					arg));
 
   return newStat;

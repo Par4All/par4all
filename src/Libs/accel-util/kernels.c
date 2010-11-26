@@ -54,7 +54,6 @@
 #include "parser_private.h"
 #include "preprocessor.h"
 #include "accel-util.h"
-#include "c_syntax.h"
 
 struct dma_pair {
   entity new_ent;

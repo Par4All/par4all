@@ -161,13 +161,13 @@ static void bounds_of_expression(expression e, transformer tr,bool is_upper)
 }
 
 /* replaces expression @p e by its upperbound under preconditions @p tr*/
-void upperbound_of_expression(expression e, transformer tr)
+static void upperbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,true);
 }
 
 /* replaces expression @p e by its lowerbound under preconditions @p tr*/
-void lowerbound_of_expression(expression e, transformer tr)
+static void lowerbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,false);
 }

@@ -45,7 +45,6 @@ This file contains functions used to generate the MMCDs generation code
 #include "text-util.h"
 #include "properties.h"
 
-#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -372,7 +371,7 @@ static statement make_mmcd_load_store_stat(string name,
 				  NULL);
 
       stepExp =
-	call_to_expression(make_call(get_function_entity(PLUS_C_OPERATOR_NAME),
+	call_to_expression(make_call(entity_intrinsic(PLUS_C_OPERATOR_NAME),
 				     addArg));
     }
   else
@@ -389,7 +388,7 @@ static statement make_mmcd_load_store_stat(string name,
 			   NULL);
 
   statement newStat =
-    call_to_statement(make_call(get_function_entity(name),
+    call_to_statement(make_call(module_name_to_runtime_entity(name),
 				arg));
 
   return newStat;
@@ -439,7 +438,7 @@ static statement generate_mmcd_stat_from_ref(reference curRef, int offset,
 
       // Add the toggle entity and the fifo number
       hreBuff =
-	call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+	call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 				     addArg));
     }
 
@@ -541,7 +540,7 @@ statement make_step_inc_statement(int incNum)
 			      make_integer_constant_expression(incNum),
 			      NULL);
 
-  expression rExp = call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+  expression rExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 						 addArg));
 
   return make_assign_statement(entity_to_expression(gStepEnt), rExp);
@@ -572,7 +571,7 @@ statement make_loop_step_stat(statement stat, entity newOuterInd)
 			     NULL);
 
   expression neExp = 
-    call_to_expression(make_call(get_function_entity(C_GREATER_THAN_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(C_GREATER_THAN_OPERATOR_NAME),
 				 neArg));
 
   test t = make_test(neExp, stepStat, make_empty_statement());
@@ -752,7 +751,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 				  NULL);
 
   expression rgSizeExp1 = 
-    call_to_expression(make_call(get_function_entity(DIVIDE_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(DIVIDE_OPERATOR_NAME),
 				 rgSizeArg1));
 
 
@@ -761,7 +760,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 			       rgSizeExp1,
 			       NULL);
 
-  expression arg2 = call_to_expression(make_call(get_function_entity(MULTIPLY_OPERATOR_NAME),
+  expression arg2 = call_to_expression(make_call(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
 						 arg2Arg));
 
   list leArg = gen_make_list(expression_domain,
@@ -770,7 +769,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 			     NULL);
 
   expression leExp = 
-    call_to_expression(make_call(get_function_entity(C_LESS_OR_EQUAL_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(C_LESS_OR_EQUAL_OPERATOR_NAME),
 				 leArg));
 
   list modArg = gen_make_list(expression_domain,
@@ -779,7 +778,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 			      NULL);
 
   expression modExp =
-    call_to_expression(make_call(get_function_entity(C_MODULO_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(C_MODULO_OPERATOR_NAME),
 				 modArg));
 
   list addArg = gen_make_list(expression_domain,
@@ -788,7 +787,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 			      NULL);
 
   expression addExp =
-    call_to_expression(make_call(get_function_entity(PLUS_C_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(PLUS_C_OPERATOR_NAME),
 				 addArg));
 
   statement trueStat = make_assign_statement(entity_to_expression(transferSize),
@@ -984,7 +983,7 @@ statement make_exec_mmcd()
 
   statement mmcdStat =
     call_to_statement(
-		      make_call(get_function_entity(strdup("GEN_EXEC_MMCD")),
+		      make_call(module_name_to_runtime_entity(strdup("GEN_EXEC_MMCD")),
 				arg));
 
   return mmcdStat;
@@ -1071,7 +1070,7 @@ void process_innerStat1_proc(statement stat, entity oldInd,
 			      entity_to_expression(newInnerInd),
 			      NULL);
 
-  expression arg2 = call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+  expression arg2 = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 						 addArg));
 
   comEngine_replace_reference_in_stat(stat,
@@ -1322,12 +1321,12 @@ statement comEngine_generate_procCode(statement externalized_code,
   
   // Add the start HRE statement
   statement startStat = 
-    call_to_statement(make_call(get_function_entity(strdup(START_HRE)),
+    call_to_statement(make_call(module_name_to_runtime_entity(strdup(START_HRE)),
 				NIL));
 
   // Add the wait HRE statement
   statement waitStat = 
-    call_to_statement(make_call(get_function_entity(strdup(WAIT_FOR_HRE)),
+    call_to_statement(make_call(module_name_to_runtime_entity(strdup(WAIT_FOR_HRE)),
 				NIL));
 
   list lStats = gen_make_list(statement_domain,

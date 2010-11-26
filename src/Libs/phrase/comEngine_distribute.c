@@ -43,13 +43,7 @@
 #include "properties.h"
 #include "prettyprint.h"
 
-#include "dg.h"
 #include "transformer.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
 
 #include "ray_dte.h"
 #include "sommet.h"

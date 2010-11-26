@@ -52,7 +52,6 @@
 #include "effects-simple.h"
 #include "effects-generic.h"
 #include "transformer.h"
-#include "conversion.h"
 #include "complexity.h"
 
 hash_table hash_callee_to_complexity = hash_table_undefined;

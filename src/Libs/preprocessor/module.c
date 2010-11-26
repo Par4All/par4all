@@ -287,7 +287,7 @@ const char* entity_minimal_user_name(entity e)
 
    The implementation is clumsy.
 
-   It would be nice to memoize the informtion as with
+   It would be nice to memoize the information as with
    get_current_module_entity().
 */
 entity module_entity_to_compilation_unit_entity(entity m)

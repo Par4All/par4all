@@ -162,7 +162,7 @@ static basic basic_int_to_signed_basic(basic b)
  * The upper and lower loop bound expressions are assumed side-effects
  * free.
  */
-void do_loop_unroll_with_epilogue(statement loop_statement,
+static void do_loop_unroll_with_epilogue(statement loop_statement,
 				  int rate,
 				  void (*statement_post_processor)(statement))
 {
@@ -410,7 +410,7 @@ void do_loop_unroll_with_epilogue(statement loop_statement,
    to unaligned accesses in the unrolled loop when the arrays accessed
    are aligned and accessed from the first element to the last.
  */
-void do_loop_unroll_with_prologue(statement loop_statement,
+static void do_loop_unroll_with_prologue(statement loop_statement,
 				  int rate,
 				  void (*statement_post_processor)(statement))
 {

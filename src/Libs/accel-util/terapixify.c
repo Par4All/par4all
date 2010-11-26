@@ -47,8 +47,9 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
+#include "expressions.h"
+#include "callgraph.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
 #include "accel-util.h"
 
@@ -225,51 +226,6 @@ typedef struct {
     size_t *cnt;
 } terapix_loop_handler_param;
 
-/* converts a doloop to a while loop, in place */
-void do_loop_to_while_loop(statement sl) {
-    pips_assert("statement is a loop",statement_loop_p(sl));
-    loop l =statement_loop(sl);
-    range r = loop_range(l);
-
-    /* convert the loop to a while loop :
-     * fst the body
-     */
-    list statements = make_statement_list(
-            copy_statement(loop_body(l)),
-            make_assign_statement(
-                entity_to_expression(loop_index(l)),
-                MakeBinaryCall(
-                    entity_intrinsic(PLUS_OPERATOR_NAME),
-                    entity_to_expression(loop_index(l)),
-                    range_increment(r)
-                    )
-                )
-            );
-    /* then the whileloop */
-    whileloop wl = make_whileloop(
-            MakeBinaryCall(
-                entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-                entity_to_expression(loop_index(l)),
-                range_upper(r)
-                ),
-            make_block_statement(statements),
-            entity_empty_label(),
-            make_evaluation_before());
-
-    /* and the prelude */
-    sequence seq = make_sequence(
-            make_statement_list(
-                make_assign_statement(entity_to_expression(loop_index(l)),
-                    range_lower(r)),
-                instruction_to_statement(make_instruction_whileloop(wl))
-                )
-            );
-    range_upper(r)=expression_undefined;
-    range_lower(r)=expression_undefined;
-    range_increment(r)=expression_undefined;
-
-    update_statement_instruction(sl,make_instruction_sequence(seq));
-}
 
 static void
 terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
@@ -343,58 +299,6 @@ static int compare_formal_parameters(const void *v0, const void * v1) {
     }
     else
         return o0 > o1 ? -1 : 1 ;
-}
-/* change the parameter order for function @p module
- * using comparison function @p cmp
- * both compilation unit and callers are touched
- * SG: it may be put in ri-util
- */
-void sort_parameters(entity module, gen_cmp_func_t cmp) {
-    /* retrieve the formal parameters */
-    list fn = module_formal_parameters(module);
-    /* order them */
-    gen_sort_list(fn,cmp);
-    /* update offset */
-    intptr_t offset=0;
-    int reordering[gen_length(fn)];/* holds correspondence between old and new offset */
-    FOREACH(ENTITY,f,fn) {
-        reordering[formal_offset(storage_formal(entity_storage(f)))-1] = offset;
-        formal_offset(storage_formal(entity_storage(f)))=++offset;
-    }
-    /* update parameter list */
-    list parameters = module_functional_parameters(module);
-    list new_parameters = NIL;
-    for(size_t i=0;i<gen_length(fn);i++) {
-        new_parameters=CONS(PARAMETER,PARAMETER(gen_nth((int)reordering[i],parameters)),new_parameters);
-    }
-    new_parameters=gen_nreverse(new_parameters);
-    module_functional_parameters(module)=new_parameters;
-    /* change call sites */
-    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
-    list callers_statement = callers_to_statements(callers);
-    list call_sites = callers_to_call_sites(callers_statement);
-    /* for each call site , reorder arguments according to table reordering */
-    FOREACH(CALL,c,call_sites) {
-        list args = call_arguments(c);
-        list new_args = NIL;
-        for(size_t i=0;i<gen_length(fn);i++) {
-            new_args=CONS(EXPRESSION,EXPRESSION(gen_nth((int)reordering[i],args)),new_args);
-        }
-        new_args=gen_nreverse(new_args);
-        gen_free_list(args);
-        call_arguments(c)=new_args;
-    }
-    /* tell dbm of the update */
-    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter))
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(citer)),STATEMENT(CAR(siter)));
-    db_touch_resource(DBR_CODE,compilation_unit_of_module(get_current_module_name()));
-
-    /* yes! some people use free in pips ! */
-    gen_free_list(call_sites);
-    gen_free_list(callers_statement);
-
-    gen_free_list(fn);
-    gen_free_list(parameters);
 }
 
 static void normalize_microcode_parameter_orders(entity module) {
@@ -512,7 +416,7 @@ bool normalize_microcode( char * module_name)
                     }
                     list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
                     list callers_statement = callers_to_statements(callers);
-                    list call_sites = callers_to_call_sites(callers_statement);
+                    list call_sites = callers_to_call_sites(callers_statement,get_current_module_entity());
                     pips_assert("only one caller here\n",
                             !ENDP(call_sites) && ENDP(CDR(call_sites)));
                     list args = call_arguments(CALL(CAR(call_sites)));

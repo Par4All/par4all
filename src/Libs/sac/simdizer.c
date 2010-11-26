@@ -52,7 +52,6 @@
 #include "callgraph.h"
 
 #include "effects-convex.h"
-#include "atomizer.h"
 
 
 static hash_table matches = NULL;
