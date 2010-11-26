@@ -1411,22 +1411,28 @@ expression make_vecteur_expression(Pvecteur pv)
    * ok, I'm responsible for some of them:-)
    *
    *  (c) FC 24/11/94
+   *  SG: added support for generation of C operator when needed
    */
   Pvecteur
     v_sorted = vect_sort(pv, compare_Pvecteur),
     v = v_sorted;
   expression factor1, factor2;
-  entity op_add, op_sub;
+  entity op_add, op_sub,
+         c_op_add, c_op_sub;
   int coef;
 
   op_add = entity_intrinsic(PLUS_OPERATOR_NAME);
   op_sub = entity_intrinsic(MINUS_OPERATOR_NAME);
+  c_op_add = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+  c_op_sub = entity_intrinsic(MINUS_C_OPERATOR_NAME);
 
   if (VECTEUR_NUL_P(v))
     return make_integer_constant_expression(0);
 
   coef = VALUE_TO_INT(vecteur_val(v));
 
+  entity var = (entity) vecteur_var(v);
+  bool next_op_is_c = var !=TCST && entity_pointer_p(var);
   if (coef==-1) /* let us avoid -1*var, we prefer -var */
     {
       entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
@@ -1439,14 +1445,19 @@ expression make_vecteur_expression(Pvecteur pv)
 
   for (v=v->succ; v!=NULL; v=v->succ)
     {
+      var = (entity) vecteur_var(v);
       coef = VALUE_TO_INT(vecteur_val(v));
       pips_assert("some coefficient", coef!=0);
-      factor2 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
-      factor1 = call_to_expression
-	(make_call(coef>0? op_add: op_sub,
-		   CONS(EXPRESSION, factor1,
-			CONS(EXPRESSION, factor2,
-			     NIL))));
+      factor2 = make_factor_expression(ABS(coef), var);
+      /* choose among C or fortran operator depending on the entity type
+       * this limits the use of +C and -C to pointer arithmetic
+       */
+      entity op =
+          ( next_op_is_c ) ?
+          ( coef> 0 ? c_op_add : c_op_sub ) :
+          ( coef> 0 ? op_add   : op_sub ) ;
+      factor1 = MakeBinaryCall(op,factor1,factor2);
+      next_op_is_c = var !=TCST && entity_pointer_p(var);
     }
 
   vect_rm(v_sorted);

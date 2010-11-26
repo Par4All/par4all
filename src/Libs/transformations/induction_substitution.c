@@ -719,8 +719,6 @@ static void do_strength_reduction_in_loop(loop l) {
     insert_statement(s,
             make_block_statement(ctxt.footer_statements),
             false);
-    // we may have done bad things, such has inserting empty statements
-    clean_up_sequences(loop_body(l));
 
     hash_table_free(ctxt.entity_to_coeff);
     hash_table_free(ctxt.entity_to_entity);
@@ -738,7 +736,16 @@ void do_strength_reduction(entity module, statement module_statement) {
  * It is a lame implementation without much smart things in it:
  * works only for loops, generates a lot of copy ...
  * But it does the job for the simple case I (SG) need in Terapix
- */
+ *
+ *
+ * after a talk with FI, it appears that transformers should be used
+ * to detect induction variable
+ *
+ * deriving the preconditions with respect to induction variable should
+ * also give insightful informations about the strength reduction pattern
+ *
+ * see paper from Robert Paije
+*/
 bool strength_reduction(const char *module_name) {
     /* prelude */
     set_current_module_entity(module_name_to_entity(module_name));
@@ -751,6 +758,8 @@ bool strength_reduction(const char *module_name) {
             );
     /* do the job */
     do_strength_reduction(get_current_module_entity(),get_current_module_statement());
+    // we may have done bad things, such has inserting empty statements
+    clean_up_sequences(get_current_module_statement());
 
     /* some declaration statements may have been added */
     module_reorder(get_current_module_statement());
