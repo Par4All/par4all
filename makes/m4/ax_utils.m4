@@ -133,6 +133,50 @@ AC_DEFUN([AX_CHECK_PROG],
         AC_SUBST(AX_TR_UP([$1]))
     ]
 )
+dnl check for programs
+dnl usage : AX_CHECK_PROGS(progname,alternatives,[action-if-found],[action-if-not-found])
+dnl defines PROGNAME for further use in the makefiles
+dnl checks among progname and alternatives for a valid program
+dnl defines with_progname=(yes|no) and msg_progname
+AC_DEFUN([AX_CHECK_PROGS],
+    [
+        AC_MSG_CHECKING([user given $1])
+        AS_IF(
+            [test "x${AX_TR_UP([$1])}" = x],
+            [
+                AC_MSG_RESULT([none found])
+                AC_PATH_PROG(AX_TR_UP([$1]),[$1],[])
+                AS_IF([test "x${AX_TR_UP([$1])}" = x],
+                    [
+                		AC_PATH_PROGS(AX_TR_UP([$1]),[$2],[])
+                		AS_IF([test "x${AX_TR_UP([$1])}" = x],[
+                        AX_WITH([$1])=no
+                        AX_MSG([$1])="programs $2 not found"
+                        m4_ifval([$3],[$3])
+						],
+						[
+							AX_WITH([$1])=yes
+							m4_ifval([$4],[$4])
+						]
+						)
+
+                    ],
+                    [
+                        AX_WITH([$1])=yes
+                        m4_ifval([$4],[$4])
+                    ]
+                )
+            ],
+            [
+                AC_MSG_RESULT([found, using it])
+                AX_WITH([$1])=yes
+                m4_ifval([$3],[$3])
+            ]
+        )
+        AC_ARG_VAR(AX_TR_UP([$1]),[path to the $1 command, overriding tests])
+        AC_SUBST(AX_TR_UP([$1]))
+    ]
+)
 
 
 dnl check for headers
