@@ -285,9 +285,9 @@ static void perform_substitution_in_expression(expression e, p_substitution subs
             ifdebug(2) {
                 pips_debug(2,"not substituing ");
                 print_reference(subs->ref);
-                pips_debug(2," to ");
+                fputs(" to ",stderr);
                 print_reference(r);
-                pips_debug(2,"\n");
+                fputs("\n",stderr);
             }
         }
     }
@@ -356,10 +356,12 @@ some_conflicts_between(hash_table successors, statement s1, statement s2, p_subs
                     if( ENDP(reference_indices(effect_any_reference(conflict_source(c)))) && 
                             !ENDP(reference_indices(effect_any_reference(conflict_sink(c)))))
                         continue;
-                    pips_debug(2, "conflict found on reference, with") ;
-                    ifdebug(2) { print_reference(effect_any_reference(conflict_sink(c)));}
-                    ifdebug(2) { print_reference(effect_any_reference(conflict_source(c)));}
-                    fprintf(stderr, "\n") ;
+                    ifdebug(2) {
+                        pips_debug(2, "conflict found on reference, with") ;
+                        print_reference(effect_any_reference(conflict_sink(c)));
+                        print_reference(effect_any_reference(conflict_source(c)));
+                        fputs("\n",stderr) ;
+                    }
                     return true;
                 }
             }

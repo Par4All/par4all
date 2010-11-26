@@ -7902,7 +7902,11 @@ partial_redundancy_elimination             > MODULE.code
 \begin{PipsPass}{suppress_dead_code}
 Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
 such as empty loop nests or zero-trip loops, for example after
-strip-mining or partial evaluation. Preconditions are used to find always
+strip-mining or partial evaluation. 
+\end{PipsPass}
+FI says it should be named simplify\_control.
+
+Preconditions are used to find always
 true conditions in tests and to eliminate such tests. In some cases,
 tests cannot be eliminated, but test conditions can be simplified.
 %%
@@ -7942,7 +7946,6 @@ The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
 
 This function was designed and implemented by Ronan K{\sc eryell}.
 
-\end{PipsPass}
 
 \begin{PipsMake}
 alias suppress_dead_code 'Dead Code Elimination'
