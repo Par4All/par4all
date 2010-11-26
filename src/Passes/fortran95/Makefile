@@ -24,6 +24,7 @@ ROOT	= ../../..
 TARGET	= gfc2pips
 
 WGET = wget
+MD5 = md5sum
 
 srcdir = .
 
