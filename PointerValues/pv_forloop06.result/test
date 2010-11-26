@@ -1,0 +1,68 @@
+int main()
+{
+
+// Pointer values: none
+
+   float f;
+
+// Pointer values: none
+
+   int *p, *q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a[10];
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int b[10];
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = &a[0];
+
+// Pointer values:
+// p == &a[0] (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = &b[0];
+
+// Pointer values:
+// p == &a[0] (exact);
+// q == &b[0] (exact);
+
+   f = 0.0;
+
+// Pointer values:
+// p == &a[0] (exact);
+// q == &b[0] (exact);
+
+   while (f<10.5) {
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+      *p++ = 2**q++;
+
+// Pointer values:
+// p == *ANY_MODULE*:*ANYWHERE* (may);
+// p == &q[1] (may);
+// q == *ANY_MODULE*:*ANYWHERE* (may);
+
+      f += 1.0;
+   }
+
+// Pointer values:
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}
