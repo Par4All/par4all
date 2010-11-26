@@ -348,7 +348,7 @@ class workspace(object):
 	def checkpoint(self):
 		"""checkpoints the workspace and returns a workspace id"""
 		self.cpypips.close_workspace(0)
-		chkdir=".{0}.chk{1}".format(self.dirname()[0:-1],len(self.checkpoints))
+		chkdir=".%s.chk%d" % (self.dirname()[0:-1], len(self.checkpoints))
 		shutil.copytree(self.dirname(), chkdir)
 		self.checkpoints.append(chkdir)
 		self.cpypips.open_workspace(self.name)
@@ -370,7 +370,7 @@ class workspace(object):
 			if not os.path.exists(rep):
 				os.makedirs(rep)
 			if not os.path.isdir(rep):
-				raise ValueError("'{0}' is not a directory".format(rep))
+				raise ValueError("'%s' is not a directory" % rep)
 
 		saved=[]
 		for s in os.listdir(self.dirname()+"Src"):
