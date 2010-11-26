@@ -36,7 +36,7 @@ char vcid_directory_menu[] = "$Id$";
 #include <sys/param.h>
 #include <sys/stat.h>
 
-#if defined(__LINUX__) || defined(__BSD__)
+#if __linux__ || __bsdi__ || __NetBSD__ || __OpenBSD__ || __FreeBSD__
 /* Posix version: */
 #define MAXNAMELEN NAME_MAX
 #else
