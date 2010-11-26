@@ -131,7 +131,7 @@ static bool terapix_renamed_local_p(const char* s, const char* prefix)
     string found = strstr(s,prefix);
     if(found)
     {
-        for(found+=strlen(prefix)+1;*found;++found)
+        for(found+=strlen(prefix);*found;++found)
             if(!isdigit(*found)) return false;
         return true;
     }
