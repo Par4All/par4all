@@ -171,7 +171,7 @@ AX_ARG_ENABLE([fortran95],
                           [
                            AX_CHECK_PROG([wget])
                            AX_CHECK_PROG([rsync])
-                           AX_CHECK_PROG([md5sum],,[MD5SUM=:])
+                           AX_CHECK_PROG([md5sum],[MD5SUM=:])
                            AX_DEPENDS([fortran95],[wget rsync])
                           ]
 )
