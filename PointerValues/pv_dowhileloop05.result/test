@@ -44,8 +44,8 @@ int main()
 
 // Pointer values:
 // p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == *ANY_MODULE*:*ANYWHERE* (may);
 // q == &p[1] (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
 
       i++;
    }

@@ -53,9 +53,8 @@ int main()
       *p++ = 2**q++;
 
 // Pointer values:
-// p == *ANY_MODULE*:*ANYWHERE* (may);
-// p == &q[1] (may);
-// q == *ANY_MODULE*:*ANYWHERE* (may);
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
 
       f += 1.0;
    }
