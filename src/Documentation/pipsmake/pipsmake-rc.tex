@@ -6662,6 +6662,13 @@ COMENGINE_SIZE_OF_FIFO 128
 Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory.
 Data transfer are generated using the same DMA as \PipsPassRef{KERNEL_LOAD_STORE}.
 \end{PipsPass}
+
+The algorithm is based on Read and write regions (no in / out yet) to compute
+the data that must be copied and allocated.
+Rectangular hull of regions are used to match allocator and data transfers prototypes.
+If an analysis fails, definition regions are use instead.
+If a sizeof is involved, \PipsPropRef{EVAL_SIZEOF} must be set to true.
+
 \begin{PipsMake}
 isolate_statement > MODULE.code
 	> MODULE.callees
