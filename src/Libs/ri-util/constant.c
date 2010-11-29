@@ -40,6 +40,8 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
+#include "syntax.h"
+#include "c_syntax.h"
 
 int DefaultLengthOfBasic(tag t)
 {
@@ -238,12 +240,20 @@ Character constants are typed as int.
       if(error_number==EINVAL) {
 	pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
 			  name, size, error_string);
-	  pips_internal_error("Integer constant conversion error\n");
+	if(is_fortran)
+      ParserError("make_constant_entity",
+              "Integer constant conversion error\n");
+	else
+	  CParserError("Integer constant conversion error\n");
       }
       else if(error_number==ERANGE) {
 	pips_user_warning("Overflow, Integer constant '%s' cannot be stored in %d bytes\n",
 			  name, size);
-	  pips_internal_error("Integer constant too large for internal representation\n");
+	if(is_fortran)
+	  ParserError("make_constant_entity",
+		      "Integer constant too large for internal representation\n");
+	else
+	  CParserError("Integer constant too large for internal representation\n");
       }
       else if(error_number!=0 && (l == LONG_MAX || l == LONG_MIN)) {
 	pips_internal_error("Conversion error for integer constant string");
