@@ -595,7 +595,7 @@ gen(int what,
 	/* default is a forgotten case, I guess
 	 */
     default:
-	pips_internal_error("invalid tag %d\n", what);
+	pips_internal_error("invalid tag %d", what);
 	ret(statement_undefined); /* to avoid a gcc warning */
     }
 

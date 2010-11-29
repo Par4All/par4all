@@ -13,11 +13,11 @@ Proper effetcs for "strxfrm01"
 
 int main()
 {
-//               <may be written >: s[*]
+//             <may be written>: s[*]
    char s[] = "example";
    char d[10];
-//               <must be read   >: s[0:3-1]
-//               <must be written>: d[0:3-1]
+//             <    is read   >: s[0:3-1]
+//             <    is written>: d[0:3-1]
    strxfrm(d, s, 3);
    return 0;
 }

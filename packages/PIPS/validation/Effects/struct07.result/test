@@ -18,39 +18,39 @@ void struct07()
 
 Cumulated effetcs for "struct07"
 
-//               <may be written >: imageout[*][1][.re]
+//             <may be written>: imageout[*][1].re
 void struct07()
 {
    extern complex imagein[256][256], imageout[256][256];
    int i, j, k, l;
    float z1, z2;
    float x[256][256];
-//               <may be read    >: k z1
-//               <may be written >: imageout[*][1][.re]
-//               <must be written>: k
+//             <may be read   >: k z1
+//             <may be written>: imageout[*][1].re
+//             <    is written>: k
 
    for(k = 0; k <= 255; k += 1)
-//               <may be written >: imageout[*][1][.re]
-//               <must be read   >: k z1
+//             <may be written>: imageout[*][1].re
+//             <    is read   >: k z1
       imageout[k][1].re = z1;
-//               <may be read    >: i j
-//               <may be written >: j x[*][*]
-//               <must be written>: i
+//             <may be read   >: i j
+//             <may be written>: j x[*][*]
+//             <    is written>: i
 
    for(i = 0; i <= 255; i += 1)
-//               <may be read    >: i j
-//               <may be written >: x[*][*]
-//               <must be written>: j
+//             <may be read   >: i j
+//             <may be written>: x[*][*]
+//             <    is written>: j
       for(j = 0; j <= 255; j += 1)
-//               <may be written >: x[*][*]
-//               <must be read   >: i j
+//             <may be written>: x[*][*]
+//             <    is read   >: i j
          x[i][j] = 0.;
 }
 
 Printed files with regions
 
 
-//  <imageout[PHI1][PHI2][.re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
+//  <imageout[PHI1][PHI2].re-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
 
 void struct07()
 {
@@ -59,13 +59,12 @@ void struct07()
    float z1, z2;
    float x[256][256];
 
-//  <imageout[PHI1][PHI2][.re]-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
+//  <imageout[PHI1][PHI2].re-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
 
 
    for(k = 0; k <= 255; k += 1)
 
-//  <imageout[PHI1][PHI2][.re]-W-EXACT-{PHI1==k, PHI2==1, 0<=k,
-//    k<=255}>
+//  <imageout[PHI1][PHI2].re-W-EXACT-{PHI1==k, PHI2==1, 0<=k, k<=255}>
 
       imageout[k][1].re = z1;
 
@@ -92,7 +91,7 @@ Dependence graph for "struct07"
  **************** Effective Dependence Graph ****************
 
 	-1 --> -1 with conflicts
-		from <j-W-MUST> to <j-W-MUST> at levels  1
+		from <j-W-EXACT> to <j-W-EXACT> at levels  1
 
 ****************** End of Dependence Graph ******************
 

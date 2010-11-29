@@ -15,25 +15,25 @@ void getimage(void)
    int i, j;
    unsigned char c;
    FILE *fp;
-//               <must be written>: fp
+//             <    is written>: fp
    
    /* To try to avoid fp privatization */
    fp = (void *) 0;
-//               <must be written>: i
+//             <    is written>: i
    
    /* This loops should not be distributed.  On 2009/05/26, if the main()
         is removed, this bug too... */
    for(i = 0; i <= 63; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 63; j += 1) {
-//               <must be read   >: fp
-//               <must be written>: c
+//             <    is read   >: fp
+//             <    is written>: c
          c = foo(fp);
-//               <must be read   >: c i j
-//               <must be written>: imagein_re[i][j]
+//             <    is read   >: c i j
+//             <    is written>: imagein_re[i][j]
          imagein_re[i][j] = c==0?0.0:1.0;
-//               <must be read   >: i j
-//               <must be written>: imagein_im[i][j]
+//             <    is read   >: i j
+//             <    is written>: imagein_im[i][j]
          imagein_im[i][j] = 0.0;
       }
 }

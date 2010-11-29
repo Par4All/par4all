@@ -5,7 +5,7 @@ launcher_re = re.compile("^p4a_kernel_launcher_.*")
 def launcher_filter(module):
 	return launcher_re.match(module.name)
 
-w = workspace(["jacobi.c","p4a_stubs.c"])
+w = workspace("jacobi.c","p4a_stubs.c",deleteOnClose=True)
 
 w.all.loop_normalize(one_increment=True,lower_bound=0,skip_index_side_effect=True)
 w.all.privatize_module()

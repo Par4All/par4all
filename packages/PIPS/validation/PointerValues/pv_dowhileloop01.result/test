@@ -1,0 +1,29 @@
+int main()
+{
+
+// Pointer values: none
+
+   int i = 0;
+
+// Pointer values: none
+
+   int a[10];
+
+// Pointer values: none
+
+   do {
+
+// Pointer values: none
+
+      a[i] = i;
+
+// Pointer values: none
+
+      i++;
+   }
+   while (i<10);
+
+// Pointer values: none
+
+   return 0;
+}

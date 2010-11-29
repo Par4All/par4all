@@ -2,11 +2,11 @@ void foo(int a, unsigned short b, char x, long int j, long long int i)
 {
    if (a>0) {
       i = 3;
-      if (b==3) 
+      if (b==3)
          x = 5;
    }
    else {
-      if (b<3) 
+      if (b<3)
          x = 6;
       j = 3;
    }
@@ -23,13 +23,13 @@ void foo(int a, unsigned short b, char x, long int j, long long int i)
       I_0 = b==3;
    }
 #pragma PIPS IF_TO_CONVERT
-   if (I_2&&I_0) 
+   if (I_2&&I_0)
       x = 5;
 #pragma PIPS IF_TO_CONVERT
    if (!I_2)
       I_1 = b<3;
 #pragma PIPS IF_TO_CONVERT
-   if (!I_2&&I_1) 
+   if (!I_2&&I_1)
       x = 6;
 #pragma PIPS IF_TO_CONVERT
    if (!I_2)

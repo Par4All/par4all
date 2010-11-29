@@ -15,13 +15,13 @@ Proper effects for "main"
 
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be written>: k
+//             <    is written>: k
    int k = 3;
-//               <must be read   >: i j k
+//             <    is read   >: i j k
 
    call18(i, i, j, k, 0);
 }
@@ -30,13 +30,13 @@ Cumulated effects for "main"
 
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be written>: k
+//             <    is written>: k
    int k = 3;
-//               <must be read   >: i j k
+//             <    is read   >: i j k
 
    call18(i, i, j, k, 0);
 }

@@ -28,14 +28,9 @@ static void do_symbolic_tiling(statement base, list vector)
     list tiled_loops_inner = NIL;
     list prelude = NIL;
     statement sloop=copy_statement(base);
-    FOREACH(STRING,stile_size,vector)
+    FOREACH(EXPRESSION,tile_size,vector)
     {
         loop l = statement_loop(sloop);
-        expression tile_size = string_to_expression(stile_size,get_current_module_entity());
-        if(expression_undefined_p(tile_size)) {
-            pips_user_warning("unable to parse '%s' in current context\n",stile_size);
-            return;
-        }
         list tile_expression_effects = proper_effects_of_expression(tile_size);
         /* check if tile_size is modified by sloop and generate an a temporary variable if needed */
         /* we should also check tile_size has no write effect
@@ -62,12 +57,20 @@ generate_tile:;
                 make_instruction_loop(
                     make_loop(
                         loop_index(l),
-                        make_range(entity_to_expression(index),
-                            binary_intrinsic_expression(MIN_OPERATOR_NAME,
-                                binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-                                    entity_to_expression(index),copy_expression(tile_size)
+                        make_range(
+                            entity_to_expression(index),
+                            binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                                binary_intrinsic_expression(MIN_OPERATOR_NAME,
+                                    binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+                                        entity_to_expression(index),
+                                        copy_expression(tile_size)
+                                        ),
+                                    binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+                                        copy_expression(range_upper(loop_range(l))),
+                                        copy_expression(range_increment(loop_range(l)))
+                                        )
                                     ),
-                                copy_expression(range_upper(loop_range(l)))
+                                int_to_expression(1)
                                 ),
                             copy_expression(range_increment(loop_range(l)))
                             ),
@@ -81,8 +84,16 @@ generate_tile:;
         /* outer loop */
         statement outer = sloop;
         loop_index(l)=index;
-        range_increment(loop_range(l))=tile_size;
-
+        range_increment(loop_range(l))=copy_expression(tile_size);
+        /* will help partial_eval */
+        range_upper(loop_range(l))=
+            binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                    range_upper(loop_range(l)),
+                    binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                        copy_expression(tile_size),
+                        int_to_expression(1)
+                        )
+                    );
         /* save */
         tiled_loops_outer=CONS(STATEMENT,outer,tiled_loops_outer);
         tiled_loops_inner=CONS(STATEMENT,inner,tiled_loops_inner);
@@ -189,16 +200,17 @@ bool symbolic_tiling(const char *module_name)
     statement sloop = find_loop_from_label(get_current_module_statement(),elabel);
     if( !statement_undefined_p(sloop) )
     {
-        list vector = strsplit(get_string_property("SYMBOLIC_TILING_VECTOR"),",");
+        list vector = string_to_expressions(
+                get_string_property("SYMBOLIC_TILING_VECTOR"),",",
+                get_current_module_entity());
         if(ENDP(vector))
-            pips_user_warning("must provide a non empty array\n");
+            pips_user_warning("must provide a non empty array with expressions valid in current context\n");
         else if((result=symbolic_tiling_valid_p(sloop,gen_length(vector)))) {
             do_symbolic_tiling(sloop,vector);
             if(get_bool_property("SYMBOLIC_TILING_NO_MIN"))
                 convert_min_max_to_tests(sloop);/* << this one is here to wait for better preconditions computations */
         }
-        gen_map(free,vector);
-        gen_free_list(vector);
+        gen_full_free_list(vector);
     }
     else pips_user_warning("must provide a valid loop label\n");
 

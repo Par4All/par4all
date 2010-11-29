@@ -120,8 +120,7 @@ reference r1, r2;
 	    ref_subs_in_exp(rhs_exp, r1, r2);
 
 	  }
-	  else pips_error("rhs_subs_in_ins",
-			  "Instruction is not an assign call\n");
+	  else pips_internal_error("Instruction is not an assign call");
 	  
 	  break;
     }
@@ -130,8 +129,7 @@ reference r1, r2;
     case is_instruction_loop :
     case is_instruction_goto :
     case is_instruction_unstructured :
-    default : pips_error("rhs_subs_in_ins",
-			 "Instruction is not an assign call\n");
+    default : pips_internal_error("Instruction is not an assign call");
   }
 }
 
@@ -320,7 +318,7 @@ reference old_r;
     name = (string) strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
 				       SAI, num, (string) NULL));
   else
-    pips_error("build_new_ref", "Bad value for kind\n");
+    pips_internal_error("Bad value for kind");
 
   ent = gen_find_tabulated(name, entity_domain);
   if(ent == entity_undefined) {
@@ -329,7 +327,7 @@ reference old_r;
     if(kind == IS_NEW_ARRAY)
       dims = dims_of_nest(n);
     else
-      pips_error("build_new_ref", "Bad value for kind\n");
+      pips_internal_error("Bad value for kind");
 
     ent = create_entity(name, make_variable(basic_of_reference(old_r), dims));
   }
@@ -379,10 +377,9 @@ fprintf(stdout, "\t\t\t[lhs_subs_in_ins] New ref %s instead of %s\n",
 }
 
 	}
-	else pips_error("lhs_subs_in_ins", "Lhs is not a reference");
+	else pips_internal_error("Lhs is not a reference");
       }
-      else pips_error("lhs_subs_in_ins",
-        	      "Instruction is not an assign call\n");
+      else pips_internal_error("Instruction is not an assign call");
       break;
     }
     case is_instruction_block :
@@ -390,7 +387,7 @@ fprintf(stdout, "\t\t\t[lhs_subs_in_ins] New ref %s instead of %s\n",
     case is_instruction_loop :
     case is_instruction_goto :
     case is_instruction_unstructured :
-    default : pips_error("lhs_subs_in_ins", "Instruction is not an assign call\n");
+    default : pips_internal_error("Instruction is not an assign call");
   }
 }
 
@@ -420,8 +417,8 @@ expression exp;
       }
       break;
     }
-    case is_syntax_range: pips_error("references_of_expression", "Syntax Range");
-    default : pips_error("references_of_expression", "Bad syntax tag");
+    case is_syntax_range: pips_internal_error("Syntax Range");
+    default : pips_internal_error("Bad syntax tag");
   }
   return(refl);
 }
@@ -446,8 +443,7 @@ instruction ins;
 	list args = call_arguments(c);
 
 	if(gen_length(args) != 2)
-	  pips_error("get_rhs_of_instruction",
-		     "Assign call without 2 args\n");
+	  pips_internal_error("Assign call without 2 args");
 
         /* There are two args: lhs = rhs, we want the references of the rhs */
 	rhs_exp = EXPRESSION(CAR(CDR(args)));
@@ -460,8 +456,7 @@ instruction ins;
     case is_instruction_loop :
     case is_instruction_goto :
     case is_instruction_unstructured :
-    default : pips_error("get_rhs_of_instruction",
-			 "Instruction is not an assign call\n");
+    default : pips_internal_error("Instruction is not an assign call");
   }
   return(rhsl);
 }
@@ -631,8 +626,8 @@ reference r1, r2;
       }
       break;
     }
-    case is_syntax_range: pips_error("ref_subs_in_exp", "Syntax Range");
-    default : pips_error("ref_subs_in_exp", "Bad syntax tag");
+    case is_syntax_range: pips_internal_error("Syntax Range");
+    default : pips_internal_error("Bad syntax tag");
   }
 }
 
@@ -665,7 +660,7 @@ fprint_pred(stdout, pred);
 
   if( (and_ent == entity_undefined) || (leq_ent == entity_undefined) ||
       (equ_ent == entity_undefined) ) {
-    pips_error("predicate_to_expression", "There is no entity for operators\n");
+    pips_internal_error("There is no entity for operators");
   }
 
   for(pc = ps->inegalites; pc!=NULL; pc = pc->succ) {
@@ -749,7 +744,7 @@ int how;
   instruction ins = statement_instruction(s);
 
   if(instruction_tag(ins) != is_instruction_block)
-    pips_error("add_test", "Instruction MUST be a block");
+    pips_internal_error("Instruction MUST be a block");
 
   /* We construct the statement "lhs = rhs" */
   assign_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
@@ -769,7 +764,7 @@ int how;
   bl = instruction_block(ins);
   for(l = bl; !ENDP(l); POP(l)) {lll = ll; ll = l;}
   if(ll == NIL) /* This means that "bl" is empty */
-    pips_error("add_test", "Block is empty");
+    pips_internal_error("Block is empty");
 
   /* ... and how. */
   if(how == FIRST) {
@@ -790,7 +785,7 @@ int how;
   else if(how == SECOND) {
     pred_exp = predicate_to_expression(cond);
     if(lll == NIL)
-      pips_error("add_test", "Block has only one instruction");
+      pips_internal_error("Block has only one instruction");
     else {
       instruction ai;
       test te;
@@ -798,13 +793,13 @@ int how;
       new_s = STATEMENT(CAR(lll));
       ai = statement_instruction(new_s);
       if(instruction_tag(ai) != is_instruction_test)
-	pips_error("add_test", "Instruction must be a test");
+	pips_internal_error("Instruction must be a test");
 
       te = instruction_test(ai);
       while(test_false(te) != statement_undefined) {
 	instruction aai = statement_instruction(test_false(te));
 	if(instruction_tag(aai) != is_instruction_test)
-	  pips_error("add_test", "Instruction must be a test");
+	  pips_internal_error("Instruction must be a test");
 	te = instruction_test(aai);
       }
       test_false(te) = make_statement(entity_empty_label(),
@@ -818,7 +813,7 @@ int how;
   }
   else if(how == THIRD) {
     if(lll == NIL)
-      pips_error("add_test", "Block has only one instruction");
+      pips_internal_error("Block has only one instruction");
     else {
       instruction ai;
       test te;
@@ -826,20 +821,20 @@ int how;
       new_s = STATEMENT(CAR(lll));
       ai = statement_instruction(new_s);
       if(instruction_tag(ai) != is_instruction_test)
-	pips_error("add_test", "Instruction must be a test");
+	pips_internal_error("Instruction must be a test");
 
       te = instruction_test(ai);
       while(test_false(te) != statement_undefined) {
 	instruction aai = statement_instruction(test_false(te));
 	if(instruction_tag(aai) != is_instruction_test)
-	  pips_error("add_test", "Instruction must be a test");
+	  pips_internal_error("Instruction must be a test");
 	te = instruction_test(aai);
       }
       test_false(te) = assign_s;
     }
   }
   else /* bad value */
-    pips_error("add_test", "Bad value in how\n");
+    pips_internal_error("Bad value in how");
 }
 
 
@@ -902,7 +897,7 @@ instruction i;
       break;
     }
     case is_instruction_unstructured:
-    default: pips_error("sa_print_ins", "Bad instruction tag\n");
+    default: pips_internal_error("Bad instruction tag");
   }
 }
 
@@ -1187,10 +1182,10 @@ char*   mod_name;
   stco = get_stco_from_current_map(mod_stat);
 
   if ( stco == static_control_undefined) {
-    pips_error("single_assign", "This is an undefined static control !\n");
+    pips_internal_error("This is an undefined static control !");
   }
   if ( !static_control_yes( stco )) {
-    pips_error("single_assign", "This is not a static control program !\n");
+    pips_internal_error("This is not a static control program !");
   }
 
   /* The DFG */

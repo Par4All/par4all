@@ -748,7 +748,7 @@ partial_redundancy_elimination_rwt(statement s,
 	case is_instruction_unstructured:
 	  break;
 	default:
-	  pips_error("", "Unexpected instruction tag %d \n", t );
+	  pips_internal_error("Unexpected instruction tag %d ", t );
 	  break; 
 	}  
     }

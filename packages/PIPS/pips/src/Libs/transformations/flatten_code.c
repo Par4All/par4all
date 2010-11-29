@@ -172,7 +172,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	   int a[] = {1, 2, 3};
 	   int i = a[1];
 	*/
-	pips_internal_error("C89 flattened code not generated yet\n");
+	pips_internal_error("C89 flattened code not generated yet");
       }
       else
 #endif
@@ -439,63 +439,61 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
 
   - replace declaration statements
 */
-static void statement_flatten_declarations(statement s)
+static void statement_flatten_declarations(entity module, statement s)
 {
   /* For the time being, we handle only blocks with declarations */
-  if (statement_block_p(s)) {
-    if( !ENDP(statement_declarations(s) ) ) {
-      list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
-            hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
-            bool renaming_p = FALSE;
+    if (statement_block_p(s)) {
+        list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
+        hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
+        bool renaming_p = FALSE;
 
-            /* Can we find out what the local scope of statement s is? */
-            FOREACH(ENTITY, se, statement_declarations(s)) {
-                string sen  = entity_name(se);
-                string seln = entity_local_name(se);
-                string cs   = local_name_to_scope(seln); /* current scope for s */
-                string mn   = module_name(sen);
-                const char* cmn = entity_user_name(get_current_module_entity());
+        /* Can we find out what the local scope of statement s is? */
+        FOREACH(ENTITY, se, entity_declarations(module)) {
+            string sen  = entity_name(se);
+            string seln = entity_local_name(se);
+            string cs   = local_name_to_scope(seln); /* current scope for s */
+            string mn   = module_name(sen);
+            const char* cmn = entity_user_name(module);
 
-                if(same_string_p(mn, cmn)) {
-                    compute_renamings(s, cs, mn, renamings);
-                    renaming_p = TRUE;
-                    break;
-                }
+            if(same_string_p(mn, cmn)) {
+                compute_renamings(s, cs, mn, renamings);
+                renaming_p = TRUE;
+                break;
             }
+        }
 
-            if(renaming_p) {
-                ifdebug(1)
-                    hash_table_fprintf(stderr,
-                            // The warning will disappear when Fabien
-                            // updates Newgen
-                            //(char * (*)(void *)) entity_local_name,
-                            //(char * (*)(void *)) entity_local_name,
-                            (gen_string_func_t) entity_local_name,
-                            (gen_string_func_t) entity_local_name,
-                            renamings);
+        if(renaming_p) {
+            ifdebug(1)
+                hash_table_fprintf(stderr,
+                        // The warning will disappear when Fabien
+                        // updates Newgen
+                        //(char * (*)(void *)) entity_local_name,
+                        //(char * (*)(void *)) entity_local_name,
+                        (gen_string_func_t) entity_local_name,
+                        (gen_string_func_t) entity_local_name,
+                        renamings);
 
-                //char *(*key_to_string)(void*),
-                //char *(*value_to_string)(void*),
+            //char *(*key_to_string)(void*),
+            //char *(*value_to_string)(void*),
 
-                pips_debug(1, "gen_context_multi_recurse\n");
-                gen_context_multi_recurse( statement_instruction(s), renamings,
-                        reference_domain, gen_true, rename_reference,
-                        loop_domain, gen_true, rename_loop_index,
-                        statement_domain, gen_true, rename_statement_declarations,
-                        NULL );
+            pips_debug(1, "gen_context_multi_recurse\n");
+            gen_context_multi_recurse( statement_instruction(s), renamings,
+                    reference_domain, gen_true, rename_reference,
+                    loop_domain, gen_true, rename_loop_index,
+                    statement_domain, gen_true, rename_statement_declarations,
+                    NULL );
 
-                gen_free_list(declarations), declarations = NIL;
-                hash_table_free(renamings), renamings = NULL;
-            }
-            else {
-                pips_user_warning("Code flattening fails because the statement does"
-                        " not contain any local declaration\n");
-            }
+            gen_free_list(declarations), declarations = NIL;
+            hash_table_free(renamings), renamings = NULL;
+        }
+        else {
+            pips_user_warning("Code flattening fails because the statement does"
+                    " not contain any local declaration\n");
         }
     }
 
     else
-        pips_internal_error("Input assumptions not met.\n");
+        pips_internal_error("Input assumptions not met.");
 }
 
 
@@ -572,7 +570,7 @@ bool flatten_code(string module_name)
   pips_debug(1, "begin\n");
 
   /* Step 1 and 2: flatten declarations and clean up sequences */
-  statement_flatten_declarations(module_stat);
+  statement_flatten_declarations(module,module_stat);
   statement_purge_declarations(module_stat);
     // call sequence flattening as some declarations may have been
     // moved up

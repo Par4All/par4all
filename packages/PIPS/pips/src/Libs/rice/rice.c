@@ -130,7 +130,7 @@ statement rice_statement(statement stat,
       break;
     }
       case is_instruction_goto:
-	pips_internal_error("Unexpected go to instruction in parsed code\n");
+	pips_internal_error("Unexpected go to instruction in parsed code");
 	break;
       case is_instruction_call:
       case is_instruction_expression:
@@ -141,7 +141,7 @@ statement rice_statement(statement stat,
 	  break;
       }
       default:
-	pips_internal_error("default case reached with tag %d\n",
+	pips_internal_error("default case reached with tag %d",
 			    instruction_tag(istat));
     }
 
@@ -316,7 +316,7 @@ do_it(
 	dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
     }
     else {
-	pips_error("do_it", "dg should be undefined\n");
+	pips_internal_error("dg should be undefined");
     }
 
     /* Make sure the dependence graph points towards the code copy */

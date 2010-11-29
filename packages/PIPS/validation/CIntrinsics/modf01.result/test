@@ -13,24 +13,24 @@ int main()
 
 Cumulated effetcs for "modf01"
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
    double param, fractpart, intpart;
-//               <must be written>: param
+//             <    is written>: param
 
    param = 3.14159265;
-//               <must be read   >: param
-//               <must be written>: fractpart
+//             <    is read   >: param
+//             <    is written>: fractpart
    fractpart = modf(param, &intpart);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  fractpart intpart param
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: fractpart intpart param stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%lf = %lf + %lf \n", param, intpart, fractpart);
    return 0;
 }

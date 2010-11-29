@@ -1,0 +1,57 @@
+delete incdecr
+create incdecr incdecr.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[run]
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[run]
+
+echo
+echo Code after partial evaluation
+echo
+
+apply PARTIAL_EVAL[run]
+activate PRINT_CODE
+display PRINTED_FILE[run]
+
+echo
+echo Code after dead_code_elimination
+echo
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+apply DEAD_CODE_ELIMINATION[run]
+display PRINTED_FILE[run]
+
+echo
+echo Code after code flattening
+echo
+
+apply FLATTEN_CODE[run]
+display PRINTED_FILE[run]
+
+echo
+echo Code after suppress_dead_code [this last step should be useless]
+echo
+
+apply SUPPRESS_DEAD_CODE[run]
+display PRINTED_FILE[run]
+
+close
+delete incdecr
+quit

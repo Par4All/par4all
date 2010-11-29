@@ -58,7 +58,6 @@ setproperty STRIP_MINE_FACTOR 128
 apply STRIP_MINE[convol]
 apply LOOP_NORMALIZE[convol]
 apply PARTIAL_EVAL[convol]
-apply SUPPRESS_DEAD_CODE[convol]
 #activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[convol]
 
@@ -72,6 +71,7 @@ setproperty LOOP_LABEL "l200"
 apply FULL_UNROLL[convol]
 
 apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE[convol]
 #apply USE_DEF_ELIMINATION
 display PRINTED_FILE[convol]
 

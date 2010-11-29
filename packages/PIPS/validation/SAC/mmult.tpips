@@ -78,5 +78,5 @@ shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
 shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
 
 close
-#delete $WS
+delete $WS
 quit

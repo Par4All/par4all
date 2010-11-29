@@ -97,8 +97,9 @@ AX_ARG_ENABLE([doc],
 			   AX_LATEX_PACKAGE([listings])
 			   AX_LATEX_PACKAGE([tikz])
 			   AX_LATEX_PACKAGE([hyperref])
+			   AX_LATEX_PACKAGE([breakurl])
 			   AX_LATEX_PACKAGE([epsfig])
-			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz hyperref epsfig])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf listings tikz breakurl hyperref epsfig])
 			  ]
 )
 AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
@@ -170,8 +171,8 @@ AX_ARG_ENABLE([fortran95],
                           [
                            AX_CHECK_PROG([wget])
                            AX_CHECK_PROG([rsync])
-                           AX_CHECK_PROG([md5])
-                           AX_DEPENDS([fortran95],[wget,rsync,md5])
+                           AX_CHECK_PROG([md5sum],[MD5SUM=:])
+                           AX_DEPENDS([fortran95],[wget rsync])
                           ]
 )
 
@@ -273,6 +274,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/memalign/Makefile
 				 src/Passes/pyps/drivers/sacexplore/Makefile
 				 src/Passes/pyps/drivers/p3/Makefile
+				 src/Passes/pyps/drivers/terapyps/Makefile
 				 src/Passes/tpips/Makefile
 
 				 src/Runtimes/Makefile

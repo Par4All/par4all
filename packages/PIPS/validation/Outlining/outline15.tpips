@@ -1,0 +1,27 @@
+setenv WS "outline15"
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "here"
+setproperty OUTLINE_INDEPENDENT_COMPILATION_UNIT TRUE
+apply OUTLINE[$WS]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+shell cc -c $WS.database/Src/$WS.c -o $WS.database/Tmp/$WS.o
+shell cc -c  $WS.database/Src/kernel.c -o $WS.database/Tmp/kernel.o
+
+close
+delete $WS
+quit

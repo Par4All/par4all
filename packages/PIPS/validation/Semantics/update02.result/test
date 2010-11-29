@@ -19,27 +19,27 @@ Proper effects for "update02"
 
 void update02()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
    int j;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    
    //i = (i+= 2);
    j = i += 2;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = i++;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = i--;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = ++i;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = --i;
-//               <must be read   >: j
+//             <    is read   >: j
    foo(j);
 }
 
@@ -47,27 +47,27 @@ Cumulated effects for "update02"
 
 void update02()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
    int j;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    
    //i = (i+= 2);
    j = i += 2;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = i++;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = i--;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = ++i;
-//               <must be read   >: i
-//               <must be written>: i j
+//             <    is read   >: i
+//             <    is written>: i j
    j = --i;
-//               <must be read   >: j
+//             <    is read   >: j
    foo(j);
 }
 

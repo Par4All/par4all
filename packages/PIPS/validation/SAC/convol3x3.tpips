@@ -47,14 +47,15 @@ display PRINTED_FILE
 #setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 #apply ARRAY_TO_POINTER
 #apply PARTIAL_EVAL
+apply FLAG_LOOPS
 #display PRINTED_FILE
 ##apply FLATTEN_CODE
-setproperty LOOP_LABEL "l100"
+setproperty LOOP_LABEL "l99997"
 apply FULL_UNROLL
 apply PARTIAL_EVAL
 display PRINTED_FILE
 
-#setproperty LOOP_LABEL "l200"
+#setproperty LOOP_LABEL "l99996"
 #apply FULL_UNROLL
 #apply PARTIAL_EVAL
 #apply SUPPRESS_DEAD_CODE

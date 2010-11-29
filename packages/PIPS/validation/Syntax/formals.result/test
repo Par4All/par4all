@@ -216,24 +216,24 @@ PRINTED_FILE made for EXTEND.
       SUBROUTINE EXTEND(ISTAT)
       INTEGER ISTAT, NEQUIV
       REAL*4 GATEF, GATVEL, ALVERT
-C               <must be written>: ISTAT
+C             <    is written>: ISTAT
 
       ISTAT = 0                                                         0004
 
 99999 CONTINUE
-C               <must be read   >: GATE1
-C               <must be written>: GATEF
+C             <    is read   >: GATE1
+C             <    is written>: GATEF
       GATEF = GATE1                                                     0007
-C               <must be read   >: GATE2
-C               <must be written>: GATVEL
+C             <    is read   >: GATE2
+C             <    is written>: GATVEL
       GATVEL = GATE2                                                    0008
-C               <must be read   >: NEQQ
-C               <must be written>: NEQUIV
+C             <    is read   >: NEQQ
+C             <    is written>: NEQUIV
       NEQUIV = NEQQ                                                     0009
-C               <must be read   >: ALVNEW
-C               <must be written>: ALVERT
+C             <    is read   >: ALVNEW
+C             <    is written>: ALVERT
       ALVERT = ALVNEW                                                   0010
-C               <must be read   >: IPRT
+C             <    is read   >: IPRT
       IF (IPRT.LT.1) THEN                                               0011
       ENDIF
 
@@ -248,7 +248,7 @@ PRINTED_FILE made for FPTRAK.
 C     Bug with formal parameter lists with ENTRY (CA)
 
       SUBROUTINE FPTRAK(NNEW,ISTAT)                                     
-C               <must be written>: JSTAT
+C             <    is written>: JSTAT
 
       CALL EXTEND(JSTAT)                                                0005
 

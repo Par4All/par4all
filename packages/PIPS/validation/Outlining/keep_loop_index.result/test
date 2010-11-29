@@ -13,7 +13,7 @@ int main()
 {
    int i, j;
    j = 1;
-there:   outlined(2, &j);
+there:   outlined(2+1, &j);
    return j;
 }
 void outlined(int I_0, int *j)
@@ -21,7 +21,7 @@ void outlined(int I_0, int *j)
    //PIPS generated variable
    int i;
 there:
-   for(i = 0; i <= I_0; i += 1)
+   for(i = 0; i <= I_0-1; i += 1)
       *j *= i;
 }
 

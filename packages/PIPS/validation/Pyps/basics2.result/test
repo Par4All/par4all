@@ -19,15 +19,13 @@ void convol_outlined(int n, int i, int a[n][n], int b[n][n], int kernel[3][3])
    int j;
 l99996:
    for(j = 0; j <= n-1; j += 1) {
-      {
-         int k, l;
-         b[i][j] = 0;
+      int k, l;
+      b[i][j] = 0;
 l99997:
-         for(k = 0; k <= 2; k += 1)
+      for(k = 0; k <= 2; k += 1)
 l99998:
-            for(l = 0; l <= 2; l += 1)
-               b[i][j] += a[i+k-1][j+l-1]*kernel[k][l];
-      }
+         for(l = 0; l <= 2; l += 1)
+            b[i][j] += a[i+k-1][j+l-1]*kernel[k][l];
    }
 }
 void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3]);

@@ -867,7 +867,7 @@ static reference include_trans_on_LC_in_ref(re, pc)
     for (l = reference_indices(re); l != NIL; l = CDR(l)) {
       exp = EXPRESSION(CAR(l));
       analyze_expression(&exp, &d);
-      if (d != 1) pips_error("include_trans_in_ref","d != 1");
+      if (d != 1) pips_internal_error("d != 1");
       NORMALIZE_EXPRESSION(exp);
       v = normalized_linear(expression_normalized(exp));
       la = li;
@@ -1190,8 +1190,7 @@ plc          p;
 	ps_b = sc_reverse_constraints(ps_b);
 
 	if(ps_b->nb_eq != gen_length(ciel))
-	  pips_error("prepare_reindexing",
-		     "We are building a non-squared matrix\n");
+	  pips_internal_error("We are building a non-squared matrix");
 
 	/* Now build the matrix of base changement :
          *  t: new indices, i: old indices, n:structure parameters
@@ -2002,7 +2001,7 @@ list l_ind, l_exp;
     }
   }
   else
-    pips_error("substitute_expressions", "Bad syntax tag");
+    pips_internal_error("Bad syntax tag");
 }
 
 /*======================================================================*/
@@ -2028,8 +2027,7 @@ list l_ind, l_exp;
       list args = call_arguments(c);
 
       if(gen_length(args) != 2)
-	pips_error("substitute_loop_indices",
-		   "Assign call without 2 args\n");
+	pips_internal_error("Assign call without 2 args");
 
       /* There are two args: lhs = rhs, we want the references of the rhs */
       rhs_exp = EXPRESSION(CAR(CDR(args)));
@@ -2038,8 +2036,7 @@ list l_ind, l_exp;
     }
   }
   else
-    pips_error("substitute_loop_indices",
-	       "Instruction is not an assign call\n");
+    pips_internal_error("Instruction is not an assign call");
 }
 
 /*======================================================================*/

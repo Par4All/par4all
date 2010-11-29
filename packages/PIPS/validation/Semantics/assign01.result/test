@@ -5,10 +5,10 @@ void assign01()
 {
    int i;                                                               /*0010*/
    int j;                                                               /*0011*/
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = 2+(j = 1)+3;                                                     /*0013*/
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0015*/
 }
@@ -19,10 +19,10 @@ void assign01()
 {
    int i;                                                               /*0010*/
    int j;                                                               /*0011*/
-//               <must be written>: i j
+//             <    is written>: i j
 
    i = 2+(j = 1)+3;                                                     /*0013*/
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0015*/
 }

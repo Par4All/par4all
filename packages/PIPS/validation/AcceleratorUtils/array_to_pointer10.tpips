@@ -16,7 +16,10 @@ display PRINTED_FILE[%ALL]
 #quit
 
 apply UNSPLIT[%ALL]
+close
+
 shell cc -W -Wall -o $WS.out $WS.database/Src/$WS.c
+shell rm $WS.out
 
+delete $WS
 quit
-

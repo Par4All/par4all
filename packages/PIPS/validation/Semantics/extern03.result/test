@@ -21,24 +21,24 @@ int main();
 
 Cumulated effects for "main"
 
-//               <must be read   >: delta delta2
+//             <    is read   >: delta delta2
 int main()
 {
-//               <must be read   >: delta delta2
+//             <    is read   >: delta delta2
    // BEGIN BLOCK
-//               <must be written>: i
+//             <    is written>: i
    float i = 0.;
-//               <must be written>: k
+//             <    is written>: k
    int k = 1;
-//               <must be read   >: delta i
-//               <must be written>: i
+//             <    is read   >: delta i
+//             <    is written>: i
 
    i = i+delta;
-//               <must be read   >: delta i
-//               <must be written>: i
+//             <    is read   >: delta i
+//             <    is written>: i
    i = i+delta;
-//               <must be read   >: delta2 i
-//               <must be written>: i
+//             <    is read   >: delta2 i
+//             <    is written>: i
    i = i+delta2;
    // END BLOCK
 }

@@ -1,6 +1,6 @@
 from __future__ import with_statement # this is to work with python2.5
 from pyps import workspace
-with workspace("loops_loops_loops.c",verbose=False) as w:
+with workspace("loops_loops_loops.c",verbose=False,deleteOnClose=True) as w:
 	m = w.fun.looping
 	
 	print "= first level loops"

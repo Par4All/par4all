@@ -3,31 +3,31 @@ Proper effects
 
 void foo()
 {
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    int j = i;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] j
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d", j);
 }
 
 Cumulated effects 
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: i stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 void foo()
 {
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    int j = i;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] j
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d", j);
 }
 
@@ -35,30 +35,30 @@ Proper effects
 
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    i = 3;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: i stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    foo();
    return 0;
 }
 
 Cumulated effects 
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: i stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: i __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    i = 3;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: i stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    foo();
    return 0;
 }

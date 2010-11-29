@@ -59,7 +59,7 @@
 
 static string continuation = string_undefined;
 #define CONTINUATION (string_undefined_p(continuation)? \
- strdup(concatenate(get_comment_continuation(), "                              ", NULL)) \
+ strdup(concatenate(get_comment_continuation(), "                           ", NULL)) \
  : continuation)
 
 /* new definitions for action interpretation
@@ -72,99 +72,6 @@ static string continuation = string_undefined;
 #define ACTION_declared		"declared"
 #define ACTION_referenced	"referenced"
 
-/* int compare_effect_reference(e1, e2):
- *
- * returns -1 if "e1" is before "e2" in the alphabetic order, else
- * +1. "e1" and "e2" are pointers to effect, we compare the names of their
- * reference's entity. */
-int
-compare_effect_reference(effect * e1, effect * e2)
-{
-  reference r1 = effect_any_reference(*e1);
-  reference r2 = effect_any_reference(*e2);
-  entity v1 = reference_variable(r1);
-  entity v2 = reference_variable(r2);
-  int n1, n2;
-  /* FI: might not be best... entity_unambiguous_user_name()? */
-  string s1 = entity_name_without_scope(v1);
-  string s2 = entity_name_without_scope(v2);
-  int result;
-
-  n1 = (v1==(entity)NULL),
-  n2 = (v2==(entity)NULL);
-  result = (n1 || n2)?  (n2-n1): strcmp(s1,s2);
-  free(s1);
-  free(s2);
-  if(result==0) {
-    list ind1 = reference_indices(r1);
-    list ind2 = reference_indices(r2);
-    list cind1 = list_undefined;
-    list cind2 = list_undefined;
-    int diff = 0;
-
-
-    for(cind1 = ind1, cind2 = ind2;
-	!ENDP(cind1) && !ENDP(cind2) && diff ==0;
-	POP(cind1), POP(cind2)) {
-      expression e1 = EXPRESSION(CAR(cind1));
-      expression e2 = EXPRESSION(CAR(cind2));
-
-      if(unbounded_expression_p(e1))
-	if(unbounded_expression_p(e2))
-	  diff = 0;
-	else
-	  diff = 1;
-      else
-	if(unbounded_expression_p(e2))
-	  diff = -1;
-	else {
-	  intptr_t i1 = 0;
-	  intptr_t i2 = 0;
-
-	  /* FI: This is not enough as effects are not summarized
-	     right away. It may be impossible to find an integer value
-	     for e1 and/or e2. The output is till not deterministic. */
-	  expression_integer_value(e1, &i1);
-	  expression_integer_value(e2, &i2);
-	  diff = i1 - i2;
-	}
-    }
-
-    if (diff == 0)
-      diff = (int) gen_length(cind1) - (int) gen_length(cind2);
-
-    result = diff==0? 0 : (diff>0?1:-1);
-  }
-  return result;
-}
-
-/* int compare_effect_reference_in_common(e1, e2):
- *
- * returns -1 if "e1" is before "e2" in the alphabetic order, else
- * +1. "e1" and "e2" are pointers to effect, we compare the names of their
- * reference's entity with the common name in first if the entity belongs
- * to a common */
-int
-compare_effect_reference_in_common(effect * e1, effect * e2)
-{
-  entity v1, v2;
-  int n1, n2 ,result;
-  string name1, name2;
-  v1 = reference_variable(effect_any_reference(*e1));
-  v2 = reference_variable(effect_any_reference(*e2));
-  n1 = (v1==(entity)NULL),
-  n2 = (v2==(entity)NULL);
-  name1= strdup((entity_in_common_p(v1)) ?
-      (string) entity_and_common_name(v1):
-      entity_name(v1));
-  name2=  strdup((entity_in_common_p(v2)) ?
-      (string) entity_and_common_name(v2):
-      entity_name(v2));
-
-  result =  (n1 || n2)?  (n2-n1): strcmp(name1,name2);
-  free(name1);free(name2);
-  return result;
-}
 
 
 /* Try to factorize code from Alexis Platonoff :
@@ -201,8 +108,8 @@ update_an_effect_type(
  * This function builds the prettyprint in text format of the list of
  * effects given in arguments.
  *
- * These effects are split into four categories : R-MAY, W-MAY, R-MUST and
- * W-MUST. Then, we first build four texts, each containing the
+ * These effects are split into four categories : R-MAY, W-MAY, R-EXACT and
+ * W-EXACT. Then, we first build four texts, each containing the
  * prettyprint of one kind. Finally, we merge all the texts into a single
  * one.
  *
@@ -224,10 +131,10 @@ update_an_effect_type(
  * buffer used in effect_to_string() is too small.
  */
 
-#define may_be		"               <may be "
-#define must_be		"               <must be "
-#define must_end	">:"
-#define may_end		" " must_end
+#define is_may		"             <may be "
+#define is_exact		"             <    is "
+#define exact_end	">:"
+#define may_end		exact_end
 
 static text
 simple_effects_to_text(
@@ -241,54 +148,55 @@ simple_effects_to_text(
      variable declarations and type declarations, this print-out
      ignores the difference. */
   text sefs_text = make_text(NIL), rt, wt, Rt, Wt, dt, Dt, ut, Ut;
-    char r[MAX_LINE_LENGTH], w[MAX_LINE_LENGTH],
-      R[MAX_LINE_LENGTH],  W[MAX_LINE_LENGTH], d[MAX_LINE_LENGTH], D[MAX_LINE_LENGTH], u[MAX_LINE_LENGTH], U[MAX_LINE_LENGTH];
-    bool rb = FALSE, Rb = FALSE,
-      wb = FALSE, Wb = FALSE,
-      db = FALSE, Db = FALSE,
-      ub = FALSE, Ub = FALSE;
-    list ce = list_undefined;
+  char r[MAX_LINE_LENGTH], w[MAX_LINE_LENGTH],
+    R[MAX_LINE_LENGTH],  W[MAX_LINE_LENGTH],
+    d[MAX_LINE_LENGTH], D[MAX_LINE_LENGTH], u[MAX_LINE_LENGTH], U[MAX_LINE_LENGTH];
+  bool rb = FALSE, Rb = FALSE,
+    wb = FALSE, Wb = FALSE,
+    db = FALSE, Db = FALSE,
+    ub = FALSE, Ub = FALSE;
+  list ce = list_undefined;
 
-    if (sefs_list == (list) HASH_UNDEFINED_VALUE ||
-	sefs_list == list_undefined)
+  if (sefs_list == (list) HASH_UNDEFINED_VALUE ||
+      sefs_list == list_undefined)
     {
-	pips_debug(9, "Effects list empty\n");
-	return sefs_text;
+      pips_debug(9, "Effects list empty\n");
+      return sefs_text;
     }
 
-    /* These eight buffers are used to build the current line of prettyprint
+  /* These eight buffers are used to build the current line of prettyprint
      for a given type of effect. */
 
-    r[0] = '\0'; strcat(r, concatenate(get_comment_sentinel(), may_be, ifread, may_end, NULL));
-    R[0] = '\0'; strcat(R, concatenate(get_comment_sentinel(), must_be, ifread, must_end, NULL));
-    w[0] = '\0'; strcat(w, concatenate(get_comment_sentinel(), may_be, ifwrite, may_end, NULL));
-    W[0] = '\0'; strcat(W, concatenate(get_comment_sentinel(), must_be, ifwrite, must_end, NULL));
-    d[0] = '\0'; strcat(d, concatenate(get_comment_sentinel(), may_be, ifdeclared, may_end, NULL));
-    D[0] = '\0'; strcat(D, concatenate(get_comment_sentinel(), must_be, ifdeclared, must_end, NULL));
-    u[0] = '\0'; strcat(u, concatenate(get_comment_sentinel(), may_be, ifreferenced, may_end, NULL));
-    U[0] = '\0'; strcat(U, concatenate(get_comment_sentinel(), must_be, ifreferenced, must_end, NULL));
+  r[0] = '\0'; strcat(r, concatenate(get_comment_sentinel(), is_may, ifread, may_end, NULL));
+  R[0] = '\0'; strcat(R, concatenate(get_comment_sentinel(), is_exact, ifread, exact_end, NULL));
+  w[0] = '\0'; strcat(w, concatenate(get_comment_sentinel(), is_may, ifwrite, may_end, NULL));
+  W[0] = '\0'; strcat(W, concatenate(get_comment_sentinel(), is_exact, ifwrite, exact_end, NULL));
+  d[0] = '\0'; strcat(d, concatenate(get_comment_sentinel(), is_may, ifdeclared, may_end, NULL));
+  D[0] = '\0'; strcat(D, concatenate(get_comment_sentinel(), is_exact, ifdeclared, exact_end, NULL));
+  u[0] = '\0'; strcat(u, concatenate(get_comment_sentinel(), is_may, ifreferenced, may_end, NULL));
+  U[0] = '\0'; strcat(U, concatenate(get_comment_sentinel(), is_exact, ifreferenced, exact_end, NULL));
 
-    /* These eight "texts" are used to build all the text of prettyprint
-       for a given type of effect. Each sentence contains one line. */
-    rt = make_text(NIL);
-    Rt = make_text(NIL);
-    wt = make_text(NIL);
-    Wt = make_text(NIL);
-    dt = make_text(NIL);
-    Dt = make_text(NIL);
-    ut = make_text(NIL);
-    Ut = make_text(NIL);
+  /* These eight "texts" are used to build all the text of prettyprint
+     for a given type of effect. Each sentence contains one line. */
+  rt = make_text(NIL);
+  Rt = make_text(NIL);
+  wt = make_text(NIL);
+  Wt = make_text(NIL);
+  dt = make_text(NIL);
+  Dt = make_text(NIL);
+  ut = make_text(NIL);
+  Ut = make_text(NIL);
 
-    /* We sort the list of effects in lexicographic order */
-     if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES"))
-	 gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference_in_common);
-     else
-	 gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference);
+  /* We sort the list of effects in lexicographic order */
+  if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES"))
+    gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference_in_common);
+  else
+    gen_sort_list(sefs_list, (gen_cmp_func_t)compare_effect_reference);
 
-    /* Walk through all the effects */
-    for(ce = sefs_list; !ENDP(ce); POP(ce))
+  /* Walk through all the effects */
+  for(ce = sefs_list; !ENDP(ce); POP(ce))
     {
-	effect eff = EFFECT(CAR(ce));
+      effect eff = EFFECT(CAR(ce));
       if(store_effect_p(eff)
 	 || !get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
 	reference ref = effect_any_reference(eff);
@@ -307,7 +215,7 @@ simple_effects_to_text(
 
 	/* We now proceed to the addition of this effect to the current line
 	   of prettyprint. First, we select the type of effect : R-MAY, W-MAY,
-	   R-MUST, W-MUST. Then, if this addition results in a line too long,
+	   R-EXACT, W-EXACT. Then, if this addition results in a line too long,
            we save the current line, and begin a new one. */
 	if (action_read_p(ac) && approximation_may_p(ap))
 	  if(store_effect_p(eff))
@@ -330,31 +238,31 @@ simple_effects_to_text(
 	  else
 	    update_an_effect_type(Dt, D, t), Db = TRUE;
 	else
-	    pips_internal_error("unrecognized effect");
+	  pips_internal_error("unrecognized effect");
 
 	free(t);
       }
     }
 
-    close_current_line(r, rt, CONTINUATION);
-    close_current_line(R, Rt, CONTINUATION);
-    close_current_line(w, wt, CONTINUATION);
-    close_current_line(W, Wt, CONTINUATION);
-    close_current_line(d, dt, CONTINUATION);
-    close_current_line(D, Dt, CONTINUATION);
-    close_current_line(u, ut, CONTINUATION);
-    close_current_line(U, Ut, CONTINUATION);
+  close_current_line(r, rt, CONTINUATION);
+  close_current_line(R, Rt, CONTINUATION);
+  close_current_line(w, wt, CONTINUATION);
+  close_current_line(W, Wt, CONTINUATION);
+  close_current_line(d, dt, CONTINUATION);
+  close_current_line(D, Dt, CONTINUATION);
+  close_current_line(u, ut, CONTINUATION);
+  close_current_line(U, Ut, CONTINUATION);
 
-    if (rb) { MERGE_TEXTS(sefs_text, rt); } else free_text(rt);
-    if (wb) { MERGE_TEXTS(sefs_text, wt); } else free_text(wt);
-    if (ub) { MERGE_TEXTS(sefs_text, ut); } else free_text(ut);
-    if (db) { MERGE_TEXTS(sefs_text, dt); } else free_text(dt);
-    if (Rb) { MERGE_TEXTS(sefs_text, Rt); } else free_text(Rt);
-    if (Wb) { MERGE_TEXTS(sefs_text, Wt); } else free_text(Wt);
-    if (Ub) { MERGE_TEXTS(sefs_text, Ut); } else free_text(Ut);
-    if (Db) { MERGE_TEXTS(sefs_text, Dt); } else free_text(Dt);
+  if (rb) { MERGE_TEXTS(sefs_text, rt); } else free_text(rt);
+  if (wb) { MERGE_TEXTS(sefs_text, wt); } else free_text(wt);
+  if (ub) { MERGE_TEXTS(sefs_text, ut); } else free_text(ut);
+  if (db) { MERGE_TEXTS(sefs_text, dt); } else free_text(dt);
+  if (Rb) { MERGE_TEXTS(sefs_text, Rt); } else free_text(Rt);
+  if (Wb) { MERGE_TEXTS(sefs_text, Wt); } else free_text(Wt);
+  if (Ub) { MERGE_TEXTS(sefs_text, Ut); } else free_text(Ut);
+  if (Db) { MERGE_TEXTS(sefs_text, Dt); } else free_text(Dt);
 
-    return sefs_text;
+  return sefs_text;
 }
 
 /* external interfaces
@@ -387,7 +295,7 @@ list words_effect_generic(effect obj, bool approximation_p)
     pc = CHAIN_SWORD(pc,"-");
     pc = CHAIN_SWORD(pc, full_action_to_short_string(ac));
     if(approximation_p)
-      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY>" : "-MUST>" );
+      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY>" : "-EXACT>" );
     return (pc);
 }
 

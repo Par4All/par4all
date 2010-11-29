@@ -195,6 +195,7 @@
       S = 0.
       LU_IB0 = 0
       LU_IND0 = 0
+99999 CONTINUE
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
          F_3 = X(I_2)
@@ -214,6 +215,7 @@
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
+99998    CONTINUE
 
       DOTPRODUCT = S
       END
@@ -224,6 +226,7 @@
       INTEGER I
 
       S = 0.
+99999 CONTINUE
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
          F_3 = X(I_2)
@@ -243,6 +246,7 @@
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
+99998    CONTINUE
 
       DOTPRODUCT = S
       END
@@ -253,6 +257,7 @@
      &, F_0, X(1:N), Y(1:N), S
 
       S = 0.
+99999 CONTINUE
       DO 99998 LU_IND0 = 0, 89, 3
          I_2 = LU_IND0+1
          F_3 = X(I_2)
@@ -272,6 +277,7 @@
          F_10 = Y(I_7)
          F_11 = F_9*F_10
          S = S+F_11
+99998    CONTINUE
 
       DOTPRODUCT = S
       END
@@ -288,6 +294,10 @@ C  P() {N==90}
 
 
       S = 0.
+
+C  P() {N==90}
+
+99999 CONTINUE
 
 C  P() {N==90}
 
@@ -384,6 +394,12 @@ C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
 C    1<=I_2, I_2<=90}
 
          S = S+F_11
+
+C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
+C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0+1, N==90,
+C    1<=I_2, I_2<=90}
+
+99998    CONTINUE
 
 C  P(I_2,I_3,I_4,I_5,I_6,I_7,LU_IND0) {I_2==I_3, I_2==I_4-1,
 C    I_2==I_5-1, I_2==I_6-2, I_2==I_7-2, I_2==LU_IND0-2, N==90,

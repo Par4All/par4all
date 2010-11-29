@@ -831,7 +831,7 @@ static list translate_to_callee_frame(expression e, transformer context)
       return translate_call_to_callee_frame(ca,context);
     }
   default:
-    pips_error("", "Abnormal cases \n");
+    pips_internal_error("Abnormal cases ");
     break;
   }
   return l;

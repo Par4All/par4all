@@ -3,16 +3,16 @@ Source code with proper effects
 
 int call05(int i)
 {
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0005*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: i
+//             <    is read   >: i
 int call05(int i)
 {
-//               <must be read   >: i
+//             <    is read   >: i
    return i;                                                            /*0005*/
 }
 

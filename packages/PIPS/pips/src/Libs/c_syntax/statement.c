@@ -541,7 +541,7 @@ statement MakeCaseStatement(expression e)
 	else if(*(restr+1)=='v') // vertical tab
 	  labc = '\v'; // "VT"
 	else
-	  pips_internal_error("Unexpected case.\n");
+	  pips_internal_error("Unexpected case.");
 	asprintf(&lab,"switch_%d_case_%hhd",i,labc);
       }
     }

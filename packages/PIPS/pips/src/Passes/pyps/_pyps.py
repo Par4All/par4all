@@ -59,9 +59,28 @@ class module:
 		self._ws=ws
 
 	@property
+	def cu(self):
+		"""compilation unit"""
+		return self._ws.cpypips.compilation_unit_of_module(self._name)[:-1]
+
+	@property
 	def name(self):
 		"""module name"""
 		return self._name
+
+	def edit(self,editor=os.getenv("EDITOR","vi")):
+		"""edits module using given editor
+		   does nothing on compilation units ...
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			self.print_code()
+			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+			shutil.copy(printcode_rc,code_rc)
+			pid=Popen([editor,code_rc],stderr=PIPE)
+			if pid.wait() != 0:
+				print sys.stderr > pid.stderr.readlines()
 
 	def run(self,cmd):
 		"""run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
@@ -125,7 +144,7 @@ class module:
 		return modules([ self._ws[name] for name in callees.split(" ") ] if callees else [])
 
 	def _update_props(self,passe,props):
-		"""[[internal]] change a property dictionnary by appending the pass name to the property when needed """
+		"""[[internal]] change a property dictionary by appending the pass name to the property when needed """
 		for name,val in props.iteritems():
 			if upper(name) not in self._all_properties:
 				del props[upper(name)]
@@ -158,7 +177,7 @@ class modules:
 
 
 	def display(self,rc="printed_file", activate="print_code", **props):
-		"""display ressource `rc' of each modules under `activate' rule and properties `props'"""
+		"""display resource `rc' of each modules under `activate' rule and properties `props'"""
 		map(lambda m:m.display(rc, activate, **props),self._modules)
 
 
@@ -192,10 +211,6 @@ class workspace(object):
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
 
-		if not name :
-			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
-		if os.path.exists(".".join([name,"database"])):
-			raise RuntimeError("Cannot create two workspaces with same database")
 
 		self.cpypips = cpypips
 		self.recoverInclude = recoverInclude
@@ -204,6 +219,14 @@ class workspace(object):
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
 		self._sources=[]
+
+		if not name :
+			#  generate a random place in $PWS
+			dirname=tempfile.mktemp(".database","PYPS",dir=".")
+			name=os.path.splitext(os.path.basename(dirname))[0]
+
+		if os.path.exists(".".join([name,"database"])):
+			raise RuntimeError("Cannot create two workspaces with same database")
 
 		# because of the way we recover include, relative paths are changed, which could be a proplem for #includes
 		if recoverInclude: cppflags=pypsutils.patchIncludes(cppflags)
@@ -223,6 +246,7 @@ class workspace(object):
 		self.props = workspace.props(self)
 		self.fun = workspace.fun(self)
 		self.cu = workspace.cu(self)
+		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
 		if cppflags != "":
@@ -240,13 +264,13 @@ class workspace(object):
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
-			tmpDirName = pypsutils.nameToTmpDirName(name)
-			try:shutil.rmtree(tmpDirName)
+			self.tmpDirName = pypsutils.nameToTmpDirName(name)
+			try:shutil.rmtree(self.tmpDirName)
 			except OSError:pass
-			os.mkdir(tmpDirName)
+			os.mkdir(self.tmpDirName)
 
 			for f in sources2:
-				newfname = os.path.join(tmpDirName,os.path.basename(f))
+				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
 				sources += [newfname]
 				pypsutils.guardincludes(newfname)
@@ -258,11 +282,7 @@ class workspace(object):
 		try:
 			cpypips.create(name, self._sources)
 		except RuntimeError:
-			try: cpypips.close_workspace(0)
-			except RuntimeError: pass
-			if self.deleteOnClose:
-					cpypips.delete_workspace(name)
-			raise
+			self.close()
 
 		if not verbose:
 			self.props.NO_USER_WARNING = True
@@ -283,6 +303,8 @@ class workspace(object):
 		return self
 	def __exit__(self,exc_type, exc_val, exc_tb):
 		"""handler for the with keyword"""
+		if exc_type:# we want to keep info on why we aborted
+			self.deleteOnClose=False 
 		self.close()
 		return False
 
@@ -319,10 +341,14 @@ class workspace(object):
 		"""retrieve workspace database directory"""
 		return self._name+".database/"
 
+	def tmpdirname(self):
+		"""retrieve workspace database directory"""
+		return self.dirname()+"Tmp/"
+
 	def checkpoint(self):
 		"""checkpoints the workspace and returns a workspace id"""
 		self.cpypips.close_workspace(0)
-		chkdir=".{0}.chk{1}".format(self.dirname()[0:-1],len(self.checkpoints))
+		chkdir=".%s.chk%d" % (self.dirname()[0:-1], len(self.checkpoints))
 		shutil.copytree(self.dirname(), chkdir)
 		self.checkpoints.append(chkdir)
 		self.cpypips.open_workspace(self.name)
@@ -344,7 +370,7 @@ class workspace(object):
 			if not os.path.exists(rep):
 				os.makedirs(rep)
 			if not os.path.isdir(rep):
-				raise ValueError("'{0}' is not a directory".format(rep))
+				raise ValueError("'%s' is not a directory" % rep)
 
 		saved=[]
 		for s in os.listdir(self.dirname()+"Src"):
@@ -364,8 +390,10 @@ class workspace(object):
 
 		return saved
 
-	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[]):
+	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep=None, outfile="",extrafiles=[]):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
+		if not rep:
+			rep=self.tmpdirname()+"d.out"
 		otmpfiles=self.save(rep=rep)+extrafiles
 		command=[CC, self.cppflags, CFLAGS]
 		if link:
@@ -459,6 +487,9 @@ class workspace(object):
 		if self.deleteOnClose:
 			try : workspace.delete(self._name)
 			except RuntimeError: pass
+		if self.tmpDirName:
+			try : shutil.rmtree(self.tmpDirName)
+			except OSError: pass
 		self.hasBeenClosed = True
 
 	def __getattribute__(self, name):

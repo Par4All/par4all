@@ -86,6 +86,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int i, j;
    //PIPS generated variable
    float __scalar__0;
+   //PIPS generated variable
+   int I_0;
+   I_0 = 5;
 l99997:
    for(i = 0; i <= 511; i += 1)
 l99998:
@@ -93,7 +96,7 @@ l99998:
          new_image[i][j] = image[i][j];
 
 l99993:
-   for(i = 1; i <= 630; i += 1)
+   for(i = 1; i <= 126*I_0; i += 1)
 l99994:
       for(j = 1; j <= 510; j += 1) {
          int ki, kj;
@@ -106,7 +109,7 @@ l99996:
                
                __scalar__0 = __scalar__0+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
          __scalar__0 = __scalar__0/(3*3);
-         if (i>=1&&i<=510) 
+         if (i>=1&&i<=510)
             new_image[i][j] = __scalar__0;
       }
 }
@@ -121,7 +124,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
-   int i_t, j_t;
+   int I_0, i_t, j_t;
+   I_0 = 5;
 l99997:
    for(i = 0; i <= 511; i += 1)
 l99998:
@@ -129,7 +133,7 @@ l99998:
          new_image[i][j] = image[i][j];
 
 l99993:
-   for(i_t = 0; i_t <= 4; i_t += 1)
+   for(i_t = 0; i_t <= I_0-1; i_t += 1)
       for(j_t = 0; j_t <= 101; j_t += 1)
 
          for(i = 126*i_t+1; i <= 126*i_t+126; i += 1)
@@ -144,7 +148,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i-1][kj+j-1]*kernel[ki][kj];
                __scalar__0 = __scalar__0/9;
-               if (i>=1&&i<=510) 
+               if (i>=1&&i<=510)
                   new_image[i][j] = __scalar__0;
             }
 }
@@ -159,7 +163,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
-   int i_t, j_t;
+   int I_0, i_t, j_t;
+   I_0 = 5;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -185,7 +190,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                __scalar__0 = __scalar__0/9;
-               if (i+126*i_t-126>=1&&i+126*i_t-126<=510) 
+               if (i+126*i_t-126>=1&&i+126*i_t-126<=510)
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
 }
@@ -200,7 +205,9 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
-   int i_t, j_t;
+   int I_0, i_t, j_t, I_1;
+   I_1 = 1;
+   I_0 = 5;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -213,7 +220,7 @@ l99990:
       for(j_t = 1; j_t <= 102; j_t += 1)
 
 l99991:
-         for(i = 0; i <= 127; i += 1)
+         for(i = 1; i <= 128*I_1; i += 1)
 l99992:
             for(j = 1; j <= 5; j += 1) {
                int ki, kj;
@@ -226,7 +233,7 @@ l99996:
                      
                      __scalar__0 = __scalar__0+image[ki+i+126*i_t-128][kj+j+5*j_t-7]*kernel[ki-1][kj-1];
                __scalar__0 = __scalar__0/9;
-               if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510) 
+               if (i>=1&&i<=126&&i+126*i_t-126>=1&&i+126*i_t-126<=510)
                   new_image[i+126*i_t-126][j+5*j_t-5] = __scalar__0;
             }
 }
@@ -238,9 +245,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
-   int i_t, j_t;
+   int I_0, i_t, j_t, I_1;
    //PIPS generated variable
    int L_0;
+   I_1 = 1;
+   I_0 = 5;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -253,7 +262,7 @@ l99990:
       for(j_t = 1; j_t <= 102; j_t += 1)
 
 l99991:
-         for(i = 0; i <= 127; i += 1)
+         for(i = 1; i <= 128*I_1; i += 1)
 l99992:
             for(j = 1; j <= 5; j += 1) {
                int ki, kj;
@@ -274,7 +283,7 @@ l99996:
 
 After Double Outlining and load - store generation
 
-void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
+void microcode_launcher(int isi, int isj, int I_1, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int L_0;
@@ -284,7 +293,7 @@ void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj
    int i, j;
 
 l99991:
-   for(i = 0; i <= 127; i += 1)
+   for(i = 1; i <= 128*I_1; i += 1)
 l99992:
       for(j = 1; j <= 5; j += 1) {
          int ki, kj;
@@ -309,9 +318,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    //PIPS generated variable
    float __scalar__0;
    //PIPS generated variable
-   int i_t, j_t;
+   int I_0, i_t, j_t, I_1;
    //PIPS generated variable
    int L_0;
+   I_1 = 1;
+   I_0 = 5;
 l99997:
    for(i = 1; i <= 512; i += 1)
 l99998:
@@ -332,14 +343,14 @@ l99990:
          P4A_copy_to_accel_2d(sizeof(float), isi, isj, isi, isj, 0, 0, &new_image[0][0], *new_image0);
 
 
-l99991:         microcode_launcher(isi, isj, i_t, j_t, (*image0), (*kernel0), (*new_image0));
+l99991:         microcode_launcher(isi, isj, I_1, i_t, j_t, *image0, *kernel0, *new_image0);
          P4A_copy_from_accel_2d(sizeof(float), isi, isj, isi, isj, 0, 0, &new_image[0][0], *new_image0);
          P4A_accel_free(image0);
          P4A_accel_free(kernel0);
          P4A_accel_free(new_image0);
       }
 }
-void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
+void microcode_launcher(int isi, int isj, int I_1, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int L_0;
@@ -349,7 +360,7 @@ void microcode_launcher(int isi, int isj, int i_t, int j_t, float image[isi][isj
    int i, j;
 
 l99991:
-   for(i = 0; i <= 127; i += 1)
+   for(i = 1; i <= 128*I_1; i += 1)
 l99992:      convol_microcode(isi, isj, i, i_t, image, j_t, kernel, new_image);
 }
 void convol_microcode(int isi, int isj, int i, int i_t, float image[isi][isj], int j_t, float kernel[3][3], float new_image[isi][isj])

@@ -884,7 +884,7 @@ char ** Pehrhart_string(Pehrhart p, const char *pname[])
             return NULL;
         }
 
-        for(i=0;i<nb_enum;i++)
+        for(i=0;i<nb_enum;i++,curr++)
         {
             char * generated_string,*iter;
             long pos;

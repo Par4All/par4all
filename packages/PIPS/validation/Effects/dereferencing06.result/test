@@ -15,17 +15,17 @@ Proper effects for "dereferencing06"
 
 void dereferencing06()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <must be read   >: p p[0]
-//               <must be written>: p
+//             <    is read   >: p p[0]
+//             <    is written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
    *p++ = 1;
 }
 
@@ -33,17 +33,17 @@ Cumulated effects for "dereferencing06"
 
 void dereferencing06()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <must be read   >: p p[0]
-//               <must be written>: p
+//             <    is read   >: p p[0]
+//             <    is written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
    *p++ = 1;
 }
 
@@ -60,9 +60,9 @@ void dereferencing06()
 
    double *p = &x;
 
-//  <p[PHI1]-R-EXACT-{PHI1==0}>
 //  <p-R-EXACT-{}>
 //  <p-W-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
 
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
@@ -79,37 +79,37 @@ Proper effects for "dereferencing06"
 
 void dereferencing06()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: p
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p++ = 1;
 }
 
 Cumulated effects for "dereferencing06"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing06()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: p
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p++ = 1;
 }
 
@@ -130,15 +130,15 @@ void dereferencing06()
 
    double *p = &x;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <p-W-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <p-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
    *p++ = 1;
 }

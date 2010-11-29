@@ -109,7 +109,7 @@ extension_to_string(extension e) {
   */
     s = pragma_to_string(extension_pragma(e));
     /*  default:
-    pips_internal_error("Unknown extension type\n");
+    pips_internal_error("Unknown extension type");
     }*/
   return s;
 }

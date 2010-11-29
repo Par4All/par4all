@@ -1,0 +1,1755 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run()
+{
+   
+   //int i0 = 1 + rand();
+
+//  T(i0) {i0==5}
+
+   int i0 = 5;
+
+
+//  T(e,i,ne,uo) {e==0, i==5, i0==5, ne==0, uo==0}
+
+   int e = 0, ne = 0, uo = 0, i = i0;
+
+//  T(e_,i_,ne_,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+   int e_, ne_, uo_, i_;
+
+//  T() {0==-1}
+
+
+   if (i0==1) {
+
+//  T() {0==-1}
+
+      if (ne+uo>=1)
+
+//  T() {0==-1}
+
+         error();
+
+//  T() {0==-1}
+
+      if (alea()) {
+
+//  T() {0==-1}
+
+         if (!(i>=1))
+
+//  T() {0==-1}
+
+            error();
+
+//  T() {0==-1}
+
+         e_ = e;
+
+//  T() {0==-1}
+
+         ne_ = ne;
+
+//  T() {0==-1}
+
+         uo_ = uo;
+
+//  T() {0==-1}
+
+         i_ = i;
+
+//  T() {0==-1}
+
+         e = 0;
+
+//  T() {0==-1}
+
+         ne = e_+ne_;
+
+//  T() {0==-1}
+
+         uo = uo_+1;
+
+//  T() {0==-1}
+
+         i = i_-1;
+
+//  T() {0==-1}
+
+         if (i>=1)
+
+//  T() {0==-1}
+
+            error();
+
+//  T() {0==-1}
+
+         if (i>=1)
+
+//  T() {0==-1}
+
+            error();
+
+//  T() {0==-1}
+
+         if (!(ne+uo>=1))
+
+//  T() {0==-1}
+
+            error();
+
+//  T() {0==-1}
+
+         e_ = e;
+
+//  T() {0==-1}
+
+         ne_ = ne;
+
+//  T() {0==-1}
+
+         uo_ = uo;
+
+//  T() {0==-1}
+
+         i_ = i;
+
+//  T() {0==-1}
+
+         e = e_+1;
+
+//  T() {0==-1}
+
+         ne = 0;
+
+//  T() {0==-1}
+
+         uo = 0;
+
+//  T() {0==-1}
+
+         i = ne_+uo_+i_-1;
+      }
+      else {
+
+//  T() {0==-1}
+
+         if (!(i>=1))
+
+//  T() {0==-1}
+
+            error();
+
+//  T() {0==-1}
+
+         e_ = e;
+
+//  T() {0==-1}
+
+         ne_ = ne;
+
+//  T() {0==-1}
+
+         uo_ = uo;
+
+//  T() {0==-1}
+
+         i_ = i;
+
+//  T() {0==-1}
+
+         e = 1;
+
+//  T() {0==-1}
+
+         ne = 0;
+
+//  T() {0==-1}
+
+         uo = 0;
+
+//  T() {0==-1}
+
+         i = e_+ne_+uo_+i_-1;
+      }
+   }
+   else {
+
+//  T() {e==0, i==5, i0==5, ne==0, uo==0}
+
+      if (ne+uo>=1)
+
+//  T() {0==-1}
+
+
+         error();
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==1, e#init==0, e_==0, i==4,
+//    i#init==5, i0==5, i_+uo_==5, ne==0, ne#init==0, ne_==0, uo==0,
+//    uo#init==0, 0<=i_, i_<=5}
+
+      if (alea()) {
+
+//  T() {e==0, i==5, i0==5, ne==0, uo==0}
+
+         if (!(i>=1))
+
+//  T() {0==-1}
+
+            error();
+
+//  T(e_) {e==0, e_==0, i==5, i0==5, ne==0, uo==0}
+
+         e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==5, i0==5, ne==0, ne_==0, uo==0}
+
+         ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==5, i0==5, ne==0, ne_==0, uo==0, uo_==0}
+
+         uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0, uo==0,
+//    uo_==0}
+
+         i_ = i;
+
+//  T(e) {e==0, e#init==0, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0,
+//    uo==0, uo_==0}
+
+         e = 0;
+
+//  T(ne) {e==0, e_==0, i==5, i0==5, i_==5, ne==0, ne#init==0, ne_==0,
+//    uo==0, uo_==0}
+
+         ne = e_+ne_;
+
+//  T(uo) {e==0, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0, uo==1,
+//    uo#init==0, uo_==0}
+
+         uo = uo_+1;
+
+//  T(i) {e==0, e_==0, i==4, i#init==5, i0==5, i_==5, ne==0, ne_==0,
+//    uo==1, uo_==0}
+
+         i = i_-1;
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==0, e#init==0, e_+ne_==0,
+//    e_#init==0, i==i_-1, i+uo==5, i+uo_==4, i#init==4, i0==5,
+//    i_#init==5, ne==0, ne#init==0, ne_#init==0, uo#init==1,
+//    uo_#init==0, 1<=i, i<=4}
+
+         while (alea()&&i>=1) {
+
+//  T() {i0==5, 1<=i}
+
+            if (!(i>=1))
+
+//  T() {0==-1}
+
+               error();
+
+//  T(e_) {e==e_, i0==5, 1<=i}
+
+            e_ = e;
+
+//  T(ne_) {e==e_, i0==5, ne==ne_, 1<=i}
+
+            ne_ = ne;
+
+//  T(uo_) {e==e_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            uo_ = uo;
+
+//  T(i_) {e==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            i_ = i;
+
+//  T(e) {e==0, e#init==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            e = 0;
+
+//  T(ne) {e==0, e_+ne#init==ne, i==i_, i0==5, ne#init==ne_, uo==uo_,
+//    1<=i}
+
+            ne = e_+ne_;
+
+//  T(uo) {e==0, e_+ne_==ne, i==i_, i0==5, uo==uo#init+1, uo==uo_+1,
+//    1<=i}
+
+            uo = uo_+1;
+
+//  T(i) {e==0, e_+ne_==ne, i==i#init-1, i==i_-1, i0==5, uo==uo_+1,
+//    0<=i}
+
+            i = i_-1;
+         }
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==1, e#init==0, e_==0, e_#init==0,
+//    i==4, i#init==i_, i#init==i_#init-1, i#init+uo#init==5,
+//    i#init+uo_==5, i#init+uo_#init==4, i0==5, ne==0, ne#init==0,
+//    ne_==0, ne_#init==0, uo==0, 0<=i#init, i#init<=4}
+
+         if (i!=0)
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==1, e#init==0, e_==0, e_#init==0,
+//    i==4, i#init==i_, i#init==i_#init-1, i#init+uo#init==5,
+//    i#init+uo_==5, i#init+uo_#init==4, i0==5, ne==0, ne#init==0,
+//    ne_==0, ne_#init==0, uo==0, 1<=i#init, i#init<=4}
+
+            if (alea()) {
+
+//  T() {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==4, i0==5, ne==0,
+//    ne_==0, 1<=i, i<=4}
+
+               if (!(ne+uo>=1))
+
+//  T() {0==-1}
+
+                  error();
+
+//  T(e_) {e==0, e_==0, e_#init==0, i==i_-1, i+uo==5, i+uo_==4, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==4, i0==5, ne==0,
+//    ne_==0, ne_#init==0, 1<=i, i<=4}
+
+               ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==5, i+uo_#init==4,
+//    i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==i_, i==i_#init-1, i+uo==5, i+uo_==5, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==i_, i+uo==5, i+uo_==5, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               e = e_+1;
+
+//  T(ne) {e==1, e_==0, i==i_, i+uo==5, i+uo_==5, i0==5, ne==0,
+//    ne#init==0, ne_==0, 1<=i, i<=4}
+
+               ne = 0;
+
+//  T(uo) {e==1, e_==0, i==i_, i+uo#init==5, i+uo_==5, i0==5, ne==0,
+//    ne_==0, uo==0, 1<=i, i<=4}
+
+               uo = 0;
+
+//  T(i) {e==1, e_==0, i==4, i#init==i_, i#init+uo_==5, i0==5, ne==0,
+//    ne_==0, uo==0, 1<=i#init, i#init<=4}
+
+               i = ne_+uo_+i_-1;
+            }
+            else {
+
+//  T() {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==4, i0==5, ne==0,
+//    ne_==0, 1<=i, i<=4}
+
+               if (!(i>=1))
+
+//  T() {0==-1}
+
+                  error();
+
+//  T(e_) {e==0, e_==0, e_#init==0, i==i_-1, i+uo==5, i+uo_==4, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==4, i0==5, ne==0,
+//    ne_==0, ne_#init==0, 1<=i, i<=4}
+
+               ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==i_-1, i+uo==5, i+uo_==5, i+uo_#init==4,
+//    i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==i_, i==i_#init-1, i+uo==5, i+uo_==5, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==i_, i+uo==5, i+uo_==5, i0==5,
+//    ne==0, ne_==0, 1<=i, i<=4}
+
+               e = 1;
+
+//  T(ne) {e==1, e_==0, i==i_, i+uo==5, i+uo_==5, i0==5, ne==0,
+//    ne#init==0, ne_==0, 1<=i, i<=4}
+
+               ne = 0;
+
+//  T(uo) {e==1, e_==0, i==i_, i+uo#init==5, i+uo_==5, i0==5, ne==0,
+//    ne_==0, uo==0, 1<=i, i<=4}
+
+               uo = 0;
+
+//  T(i) {e==1, e_==0, i==4, i#init==i_, i#init+uo_==5, i0==5, ne==0,
+//    ne_==0, uo==0, 1<=i#init, i#init<=4}
+
+               i = e_+ne_+uo_+i_-1;
+            }
+         else {
+
+//  T() {e==0, e_==0, i==0, i0==5, i_==1, ne==0, ne_==0, uo==5,
+//    uo_==4}
+
+            if (i>=1)
+
+//  T() {0==-1}
+
+               error();
+
+//  T() {e==0, e_==0, i==0, i0==5, i_==1, ne==0, ne_==0, uo==5,
+//    uo_==4}
+
+            if (i>=1)
+
+//  T() {0==-1}
+
+               error();
+
+//  T() {e==0, e_==0, i==0, i0==5, i_==1, ne==0, ne_==0, uo==5,
+//    uo_==4}
+
+            if (!(ne+uo>=1))
+
+//  T() {0==-1}
+
+               error();
+
+//  T(e_) {e==0, e_==0, e_#init==0, i==0, i0==5, i_==1, ne==0, ne_==0,
+//    uo==5, uo_==4}
+
+            e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==0, i0==5, i_==1, ne==0, ne_==0,
+//    ne_#init==0, uo==5, uo_==4}
+
+            ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==0, i0==5, i_==1, ne==0, ne_==0, uo==5,
+//    uo_==5, uo_#init==4}
+
+            uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==0, i0==5, i_==0, i_#init==1, ne==0, ne_==0,
+//    uo==5, uo_==5}
+
+            i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==0, i0==5, i_==0, ne==0, ne_==0,
+//    uo==5, uo_==5}
+
+            e = e_+1;
+
+//  T(ne) {e==1, e_==0, i==0, i0==5, i_==0, ne==0, ne#init==0, ne_==0,
+//    uo==5, uo_==5}
+
+            ne = 0;
+
+//  T(uo) {e==1, e_==0, i==0, i0==5, i_==0, ne==0, ne_==0, uo==0,
+//    uo#init==5, uo_==5}
+
+            uo = 0;
+
+//  T(i) {e==1, e_==0, i==4, i#init==0, i0==5, i_==0, ne==0, ne_==0,
+//    uo==0, uo_==5}
+
+            i = ne_+uo_+i_-1;
+         }
+      }
+      else {
+
+//  T() {e==0, i==5, i0==5, ne==0, uo==0}
+
+         if (!(i>=1))
+
+//  T() {0==-1}
+
+            error();
+
+//  T(e_) {e==0, e_==0, i==5, i0==5, ne==0, uo==0}
+
+         e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==5, i0==5, ne==0, ne_==0, uo==0}
+
+         ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==5, i0==5, ne==0, ne_==0, uo==0, uo_==0}
+
+         uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0, uo==0,
+//    uo_==0}
+
+         i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0,
+//    uo==0, uo_==0}
+
+         e = 1;
+
+//  T(ne) {e==1, e_==0, i==5, i0==5, i_==5, ne==0, ne#init==0, ne_==0,
+//    uo==0, uo_==0}
+
+         ne = 0;
+
+//  T(uo) {e==1, e_==0, i==5, i0==5, i_==5, ne==0, ne_==0, uo==0,
+//    uo#init==0, uo_==0}
+
+         uo = 0;
+
+//  T(i) {e==1, e_==0, i==4, i#init==5, i0==5, i_==5, ne==0, ne_==0,
+//    uo==0, uo_==0}
+
+         i = e_+ne_+uo_+i_-1;
+      }
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e+i+ne+uo==5, e+i+ne+uo==uo#init+5,
+//    e#init==1, e_#init==0, i#init==4, i0==5, i_#init+uo_#init==5,
+//    ne#init==0, ne_#init==0, 0<=i_#init, i_#init<=5}
+
+
+      while (1) {
+
+//  T() {i0==5, ne+uo<=0}
+
+         if (ne+uo>=1)
+
+//  T() {0==-1}
+
+            error();
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_)
+//    {e+i+ne+uo==e#init+i#init+ne#init+uo#init, i0==5, ne+uo<=0}
+
+         while (alea()) {
+
+//  T() {i0==5, 1<=i}
+
+            if (!(i>=1))
+
+//  T() {0==-1}
+
+               error();
+
+//  T(e_) {e==e_, i0==5, 1<=i}
+
+            e_ = e;
+
+//  T(ne_) {e==e_, i0==5, ne==ne_, 1<=i}
+
+            ne_ = ne;
+
+//  T(uo_) {e==e_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            uo_ = uo;
+
+//  T(i_) {e==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            i_ = i;
+
+//  T(e) {e==1, e#init==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            e = 1;
+
+//  T(ne) {e==1, i==i_, i0==5, ne==0, ne#init==ne_, uo==uo_, 1<=i}
+
+            ne = 0;
+
+//  T(uo) {e==1, i==i_, i0==5, ne==0, uo==0, uo#init==uo_, 1<=i}
+
+            uo = 0;
+
+//  T(i) {e==1, e_+i#init+ne_+uo_==i+1, i#init==i_, i0==5, ne==0,
+//    uo==0, 1<=i#init}
+
+            i = e_+ne_+uo_+i_-1;
+         }
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_)
+//    {e+i+ne+uo==e#init+i#init+ne#init+uo#init, i0==5}
+
+         while (alea()) {
+
+//  T() {i0==5, 1<=i}
+
+            if (!(i>=1))
+
+//  T() {0==-1}
+
+               error();
+
+//  T(e_) {e==e_, i0==5, 1<=i}
+
+            e_ = e;
+
+//  T(ne_) {e==e_, i0==5, ne==ne_, 1<=i}
+
+            ne_ = ne;
+
+//  T(uo_) {e==e_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            uo_ = uo;
+
+//  T(i_) {e==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            i_ = i;
+
+//  T(e) {e==0, e#init==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+            e = 0;
+
+//  T(ne) {e==0, e_+ne#init==ne, i==i_, i0==5, ne#init==ne_, uo==uo_,
+//    1<=i}
+
+            ne = e_+ne_;
+
+//  T(uo) {e==0, e_+ne_==ne, i==i_, i0==5, uo==uo#init+1, uo==uo_+1,
+//    1<=i}
+
+            uo = uo_+1;
+
+//  T(i) {e==0, e_+ne_==ne, i==i#init-1, i==i_-1, i0==5, uo==uo_+1,
+//    0<=i}
+
+            i = i_-1;
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==0, e#init==0, e_+ne_==ne,
+//    e_#init+ne_#init==ne#init, i+uo==i#init+uo#init, i==i_-1,
+//    i#init==i_#init-1, i0==5, ne==ne#init, uo==uo_+1,
+//    uo#init==uo_#init+1, 1<=i, i<=i#init, 1<=i#init}
+
+            while (alea()&&i>=1) {
+
+//  T() {i0==5, 1<=i}
+
+               if (!(i>=1))
+
+//  T() {0==-1}
+
+                  error();
+
+//  T(e_) {e==e_, i0==5, 1<=i}
+
+               e_ = e;
+
+//  T(ne_) {e==e_, i0==5, ne==ne_, 1<=i}
+
+               ne_ = ne;
+
+//  T(uo_) {e==e_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+               uo_ = uo;
+
+//  T(i_) {e==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+               i_ = i;
+
+//  T(e) {e==0, e#init==e_, i==i_, i0==5, ne==ne_, uo==uo_, 1<=i}
+
+               e = 0;
+
+//  T(ne) {e==0, e_+ne#init==ne, i==i_, i0==5, ne#init==ne_, uo==uo_,
+//    1<=i}
+
+               ne = e_+ne_;
+
+//  T(uo) {e==0, e_+ne_==ne, i==i_, i0==5, uo==uo#init+1, uo==uo_+1,
+//    1<=i}
+
+               uo = uo_+1;
+
+//  T(i) {e==0, e_+ne_==ne, i==i#init-1, i==i_-1, i0==5, uo==uo_+1,
+//    0<=i}
+
+               i = i_-1;
+            }
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==1, e#init==0, e_==0,
+//    e_#init+i#init+ne_#init+uo#init==i+1, e_#init+ne_#init==ne#init,
+//    i#init==i_, i#init==i_#init-1, i0==5, ne==0, ne#init==ne_,
+//    uo==0, uo#init==uo_, uo#init==uo_#init+1}
+
+            if (i!=0)
+
+//  T(e,e_,i,i_,ne,ne_,uo,uo_) {e==1, e#init==0, e_==0,
+//    e_#init+i#init+ne_#init+uo_==i+1, e_#init+ne_#init==ne#init,
+//    i#init+ne#init+uo#init==i+1, i#init==i_, i#init==i_#init-1,
+//    i0==5, ne==0, ne#init==ne_, uo==0, uo_==uo_#init+1}
+
+               if (alea()) {
+
+//  T() {e==0, e_+ne_==ne, i==i_-1, i0==5, uo==uo_+1, 1<=ne+uo}
+
+                  if (!(ne+uo>=1))
+
+//  T() {0==-1}
+
+                     error();
+
+//  T(e_) {e==0, e_==0, e_#init+ne_==ne, i==i_-1, i0==5, uo==uo_+1,
+//    1<=ne+uo}
+
+                  e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==i_-1, i0==5, ne==ne_, uo==uo_+1, 1<=ne+uo}
+
+                  ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==i_-1, i0==5, ne==ne_, uo==uo_,
+//    uo==uo_#init+1, 1<=ne+uo}
+
+                  uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==i_, i==i_#init-1, i0==5, ne==ne_, uo==uo_,
+//    1<=ne+uo}
+
+                  i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==i_, i0==5, ne==ne_, uo==uo_,
+//    1<=ne+uo}
+
+                  e = e_+1;
+
+//  T(ne) {e==1, e_==0, i==i_, i0==5, ne==0, ne#init==ne_, uo==uo_,
+//    1<=ne#init+uo}
+
+                  ne = 0;
+
+//  T(uo) {e==1, e_==0, i==i_, i0==5, ne==0, uo==0, uo#init==uo_,
+//    1<=ne_+uo#init}
+
+                  uo = 0;
+
+//  T(i) {e==1, e_==0, i#init+ne_+uo_==i+1, i#init==i_, i0==5, ne==0,
+//    uo==0, 1<=ne_+uo_}
+
+                  i = ne_+uo_+i_-1;
+               }
+               else {
+
+//  T() {e==0, e_+ne_==ne, i==i_-1, i0==5, uo==uo_+1, 1<=i}
+
+                  if (!(i>=1))
+
+//  T() {0==-1}
+
+                     error();
+
+//  T(e_) {e==0, e_==0, e_#init+ne_==ne, i==i_-1, i0==5, uo==uo_+1,
+//    1<=i}
+
+                  e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==i_-1, i0==5, ne==ne_, uo==uo_+1, 1<=i}
+
+                  ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==i_-1, i0==5, ne==ne_, uo==uo_,
+//    uo==uo_#init+1, 1<=i}
+
+                  uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==i_, i==i_#init-1, i0==5, ne==ne_, uo==uo_,
+//    1<=i}
+
+                  i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==i_, i0==5, ne==ne_, uo==uo_,
+//    1<=i}
+
+                  e = 1;
+
+//  T(ne) {e==1, e_==0, i==i_, i0==5, ne==0, ne#init==ne_, uo==uo_,
+//    1<=i}
+
+                  ne = 0;
+
+//  T(uo) {e==1, e_==0, i==i_, i0==5, ne==0, uo==0, uo#init==uo_,
+//    1<=i}
+
+                  uo = 0;
+
+//  T(i) {e==1, e_==0, i#init+ne_+uo_==i+1, i#init==i_, i0==5, ne==0,
+//    uo==0, 1<=i#init}
+
+                  i = e_+ne_+uo_+i_-1;
+               }
+            else {
+
+//  T() {e==0, e_+ne_==ne, i==0, i0==5, i_==1, uo==uo_+1}
+
+               if (i>=1)
+
+//  T() {0==-1}
+
+                  error();
+
+//  T() {e==0, e_+ne_==ne, i==0, i0==5, i_==1, uo==uo_+1}
+
+               if (i>=1)
+
+//  T() {0==-1}
+
+                  error();
+
+//  T() {e==0, e_+ne_==ne, i==0, i0==5, i_==1, uo==uo_+1, 1<=ne+uo}
+
+               if (!(ne+uo>=1))
+
+//  T() {0==-1}
+
+                  error();
+
+//  T(e_) {e==0, e_==0, e_#init+ne_==ne, i==0, i0==5, i_==1,
+//    uo==uo_+1, 1<=ne+uo}
+
+               e_ = e;
+
+//  T(ne_) {e==0, e_==0, i==0, i0==5, i_==1, ne==ne_, uo==uo_+1,
+//    1<=ne+uo}
+
+               ne_ = ne;
+
+//  T(uo_) {e==0, e_==0, i==0, i0==5, i_==1, ne==ne_, uo==uo_,
+//    uo==uo_#init+1, 1<=ne+uo}
+
+               uo_ = uo;
+
+//  T(i_) {e==0, e_==0, i==0, i0==5, i_==0, i_#init==1, ne==ne_,
+//    uo==uo_, 1<=ne+uo}
+
+               i_ = i;
+
+//  T(e) {e==1, e#init==0, e_==0, i==0, i0==5, i_==0, ne==ne_,
+//    uo==uo_, 1<=ne+uo}
+
+               e = e_+1;
+
+//  T(ne) {e==1, e_==0, i==0, i0==5, i_==0, ne==0, ne#init==ne_,
+//    uo==uo_, 1<=ne#init+uo}
+
+               ne = 0;
+
+//  T(uo) {e==1, e_==0, i==0, i0==5, i_==0, ne==0, uo==0,
+//    uo#init==uo_, 1<=ne_+uo#init}
+
+               uo = 0;
+
+//  T(i) {e==1, e_==0, ne_+uo_==i+1, i#init==0, i0==5, i_==0, ne==0,
+//    uo==0, 1<=ne_+uo_}
+
+               i = ne_+uo_+i_-1;
+            }
+         }
+      }
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run()
+{
+   
+   //int i0 = 1 + rand();
+
+//  P() {}
+
+   int i0 = 5;
+
+
+//  P(i0) {i0==5}
+
+   int e = 0, ne = 0, uo = 0, i = i0;
+
+//  P(e,i,i0,ne,uo) {e==0, i==5, i0==5, ne==0, uo==0}
+
+   int e_, ne_, uo_, i_;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+
+   if (i0==1) {
+
+//  P() {0==-1}
+
+      if (ne+uo>=1)
+
+//  P() {0==-1}
+
+         error();
+
+//  P() {0==-1}
+
+      if (alea()) {
+
+//  P() {0==-1}
+
+         if (!(i>=1))
+
+//  P() {0==-1}
+
+            error();
+
+//  P() {0==-1}
+
+         e_ = e;
+
+//  P() {0==-1}
+
+         ne_ = ne;
+
+//  P() {0==-1}
+
+         uo_ = uo;
+
+//  P() {0==-1}
+
+         i_ = i;
+
+//  P() {0==-1}
+
+         e = 0;
+
+//  P() {0==-1}
+
+         ne = e_+ne_;
+
+//  P() {0==-1}
+
+         uo = uo_+1;
+
+//  P() {0==-1}
+
+         i = i_-1;
+
+//  P() {0==-1}
+
+         if (i>=1)
+
+//  P() {0==-1}
+
+            error();
+
+//  P() {0==-1}
+
+         if (i>=1)
+
+//  P() {0==-1}
+
+            error();
+
+//  P() {0==-1}
+
+         if (!(ne+uo>=1))
+
+//  P() {0==-1}
+
+            error();
+
+//  P() {0==-1}
+
+         e_ = e;
+
+//  P() {0==-1}
+
+         ne_ = ne;
+
+//  P() {0==-1}
+
+         uo_ = uo;
+
+//  P() {0==-1}
+
+         i_ = i;
+
+//  P() {0==-1}
+
+         e = e_+1;
+
+//  P() {0==-1}
+
+         ne = 0;
+
+//  P() {0==-1}
+
+         uo = 0;
+
+//  P() {0==-1}
+
+         i = ne_+uo_+i_-1;
+      }
+      else {
+
+//  P() {0==-1}
+
+         if (!(i>=1))
+
+//  P() {0==-1}
+
+            error();
+
+//  P() {0==-1}
+
+         e_ = e;
+
+//  P() {0==-1}
+
+         ne_ = ne;
+
+//  P() {0==-1}
+
+         uo_ = uo;
+
+//  P() {0==-1}
+
+         i_ = i;
+
+//  P() {0==-1}
+
+         e = 1;
+
+//  P() {0==-1}
+
+         ne = 0;
+
+//  P() {0==-1}
+
+         uo = 0;
+
+//  P() {0==-1}
+
+         i = e_+ne_+uo_+i_-1;
+      }
+   }
+   else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+      if (ne+uo>=1)
+
+//  P() {0==-1}
+
+
+         error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+      if (alea()) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+         if (!(i>=1))
+
+//  P() {0==-1}
+
+            error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+         e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    uo==0}
+
+         ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    ne_==0, uo==0}
+
+         uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    ne_==0, uo==0, uo_==0}
+
+         i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         e = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         ne = e_+ne_;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         uo = uo_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==1, uo_==0}
+
+         i = i_-1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==4, i0==5, i_==5,
+//    ne==0, ne_==0, uo==1, uo_==0}
+
+         while (alea()&&i>=1) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            if (!(i>=1))
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            e = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            ne = e_+ne_;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            uo = uo_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==6,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            i = i_-1;
+         }
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 0<=i, i<=4}
+
+         if (i!=0)
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+            if (alea()) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               if (!(ne+uo>=1))
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               e = e_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo_==5,
+//    i0==5, ne==0, ne_==0, uo==0, 1<=i, i<=4}
+
+               i = ne_+uo_+i_-1;
+            }
+            else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               if (!(i>=1))
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==4, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               e = 1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==5,
+//    i+uo_==5, i0==5, ne==0, ne_==0, 1<=i, i<=4}
+
+               uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo_==5,
+//    i0==5, ne==0, ne_==0, uo==0, 1<=i, i<=4}
+
+               i = e_+ne_+uo_+i_-1;
+            }
+         else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            if (i>=1)
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            if (i>=1)
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            if (!(ne+uo>=1))
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==4}
+
+            uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==0, ne_==0, uo==5, uo_==5}
+
+            i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==0, uo==5, uo_==5}
+
+            e = e_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==0, uo==5, uo_==5}
+
+            ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==0, uo==5, uo_==5}
+
+            uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==0, uo==0, uo_==5}
+
+            i = ne_+uo_+i_-1;
+         }
+      }
+      else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+         if (!(i>=1))
+
+//  P() {0==-1}
+
+            error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, i==5, i0==5, ne==0, uo==0}
+
+         e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    uo==0}
+
+         ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    ne_==0, uo==0}
+
+         uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, ne==0,
+//    ne_==0, uo==0, uo_==0}
+
+         i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         e = 1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==5, i0==5, i_==5,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+         i = e_+ne_+uo_+i_-1;
+      }
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==4, i0==5,
+//    i_+uo_==5, ne==0, ne_==0, uo==0, 0<=i_, i_<=5}
+
+
+      while (1) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+         if (ne+uo>=1)
+
+//  P() {0==-1}
+
+            error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+         while (alea()) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+            if (!(i>=1))
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+            e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    uo==0}
+
+            ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    ne_==0, uo==0}
+
+            uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    ne_==0, uo==0, uo_==0}
+
+            i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            e = 1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            i = e_+ne_+uo_+i_-1;
+         }
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+         while (alea()) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+            if (!(i>=1))
+
+//  P() {0==-1}
+
+               error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_+i_+ne_+uo_==5, i==4,
+//    i0==5, ne==0, uo==0}
+
+            e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    uo==0}
+
+            ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    ne_==0, uo==0}
+
+            uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, ne==0,
+//    ne_==0, uo==0, uo_==0}
+
+            i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            e = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==1, i==4, i0==5, i_==4,
+//    ne==0, ne_==0, uo==0, uo_==0}
+
+            ne = e_+ne_;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==1, i==4, i0==5, i_==4,
+//    ne==1, ne_==0, uo==0, uo_==0}
+
+            uo = uo_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==1, i==4, i0==5, i_==4,
+//    ne==1, ne_==0, uo==1, uo_==0}
+
+            i = i_-1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==1, i==3, i0==5, i_==4,
+//    ne==1, ne_==0, uo==1, uo_==0}
+
+            while (alea()&&i>=1) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 2e_+1<=i}
+
+               if (!(i>=1))
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 2e_+1<=i, 1<=i}
+
+               e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 1<=i, 3<=i+2ne_, i+ne_<=3, ne_<=1}
+
+               ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               e = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               ne = e_+ne_;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               uo = uo_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==5,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+               i = i_-1;
+            }
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i}
+
+            if (i!=0)
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i, 1<=i}
+
+               if (alea()) {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i, 1<=i}
+
+                  if (!(ne+uo>=1))
+
+//  P() {0==-1}
+
+                     error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i, 1<=i, i<=4}
+
+                  e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 1<=i, i<=4, 3<=i+3ne_, i+ne_<=3, ne_<=1}
+
+                  ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  e = e_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==0, ne_==1, 1<=i, i<=3}
+
+                  uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo_==4,
+//    i0==5, ne==0, ne_==1, uo==0, 1<=i, i<=3}
+
+                  i = ne_+uo_+i_-1;
+               }
+               else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i, 1<=i}
+
+                  if (!(i>=1))
+
+//  P() {0==-1}
+
+                     error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_+ne_==1, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 0<=e_, i<=e_+2, 3e_<=i, 1<=i}
+
+                  e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, 1<=i, 3<=i+3ne_, i+ne_<=3, ne_<=1}
+
+                  ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==3, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_-1, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  e = 1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==1, ne_==1, 1<=i, i<=3}
+
+                  ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo==4,
+//    i+uo_==4, i0==5, ne==0, ne_==1, 1<=i, i<=3}
+
+                  uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==i_, i+uo_==4,
+//    i0==5, ne==0, ne_==1, uo==0, 1<=i, i<=3}
+
+                  i = e_+ne_+uo_+i_-1;
+               }
+            else {
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               if (i>=1)
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               if (i>=1)
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               if (!(ne+uo>=1))
+
+//  P() {0==-1}
+
+                  error();
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               e_ = e;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               ne_ = ne;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==3}
+
+               uo_ = uo;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==1,
+//    ne==1, ne_==1, uo==4, uo_==4}
+
+               i_ = i;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==0, e_==0, i==0, i0==5, i_==0,
+//    ne==1, ne_==1, uo==4, uo_==4}
+
+               e = e_+1;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==1, ne_==1, uo==4, uo_==4}
+
+               ne = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==1, uo==4, uo_==4}
+
+               uo = 0;
+
+//  P(e,e_,i,i0,i_,ne,ne_,uo,uo_) {e==1, e_==0, i==0, i0==5, i_==0,
+//    ne==0, ne_==1, uo==0, uo_==4}
+
+               i = ne_+uo_+i_-1;
+            }
+         }
+      }
+   }
+}

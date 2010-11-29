@@ -162,23 +162,25 @@ echo "### creating pipsrc.sh"
 cat <<EOF > $destination/pipsrc.sh
 # minimum rc file for sh-compatible shells
 
-# default architecture
-export PIPS_ARCH=$PIPS_ARCH
+# default architecture is not necessary
+#export PIPS_ARCH=$PIPS_ARCH
 
 # subversion repositories
 export NEWGEN_SVN=$SVN_CRI/newgen
 export LINEAR_SVN=$SVN_CRI/linear
 export PIPS_SVN=$SVN_CRI/pips
 
-# software roots
-export EXTERN_ROOT=$prod/extern
-export NEWGEN_ROOT=$prod/newgen
-export LINEAR_ROOT=$prod/linear
-# compiling or running pips "basically" does not require PIPS_ROOT
-#export PIPS_ROOT=$prod/pips
+# production directory
+prod=$prod
+
+# software roots are not needed
+#export EXTERN_ROOT=\$prod/extern
+#export NEWGEN_ROOT=\$prod/newgen
+#export LINEAR_ROOT=\$prod/linear
+#export PIPS_ROOT=\$prod/pips
 
 # fix path
-PATH=$prod/pips/bin:$prod/pips/utils:\$NEWGEN_ROOT/bin:\$PATH
+PATH=\$prod/pips/bin:\$prod/pips/utils:\$prod/newgen/bin:\$PATH
 EOF
 
 if [ -n "$PIPS_F77" ]; then
@@ -196,8 +198,12 @@ $prod/pips/src/Scripts/env/sh2csh.pl \
 echo
 echo "### downloading $POLYLIB"
 cd /tmp
-test -f $POLYLIB.tar.gz && warn "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
-wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+if test -f $POLYLIB.tar.gz
+then
+  warn "some /tmp/$POLYLIB.tar.gz file already there. Continue using it?"
+else
+  wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+fi
 
 echo
 echo "### building $POLYLIB"

@@ -148,7 +148,7 @@ debug_off_function(
     if (!same_string_p(current->file, file) ||
 	!same_string_p(current->function, function))
     {
-	pips_internal_error("\ndebug %s (level is %d)\n"
+	pips_internal_error("\ndebug %s (level is %d)"
 			    "[%s] (%s:%d) debug on and\n"
 			    "[%s] (%s:%d) debug off don't match\n",
 			    current->name, current->level,

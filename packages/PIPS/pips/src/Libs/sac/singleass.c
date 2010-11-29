@@ -42,7 +42,6 @@
 
 #include "control.h"
 #include "transformations.h"
-#include "callgraph.h"
 #include "effects-simple.h"
 #include "sac.h"
 #include "ricedg.h"

@@ -303,8 +303,7 @@ list li, lk, lv;
 	    break;
 	}
 	default:
-	    pips_error("generate_one_message",
-		       "access tag not welcomed here (%d)\n", at);
+	    pips_internal_error("access tag not welcomed here (%d)", at);
 	    break;
 	}
     }	    

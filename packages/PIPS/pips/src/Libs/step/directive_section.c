@@ -220,7 +220,7 @@ instruction handle_omp_sections(directive __attribute__ ((unused)) d1, directive
 {
   instruction instr = instruction_undefined;
 
-  pips_error("handle_omp_sections", "compatibily function: should never be called\n");
+  pips_internal_error("compatibily function: should never be called");
 
   return instr;
 }

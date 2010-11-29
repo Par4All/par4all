@@ -71,7 +71,7 @@ l99998:      ;
 
 //  T(HasEqual) {}
 
-      if (line[i]=='=') 
+      if (line[i]=='=')
 
 //  T(HasEqual) {HasEqual==1}
 
@@ -83,7 +83,7 @@ l99998:      ;
 
 //  T(i) {i#init<=i, i<=i#init+1}
 
-      if (line[i]!=' ') 
+      if (line[i]!=' ')
 
 //  T(i) {i==i#init+1}
 
@@ -238,7 +238,7 @@ int main()
 
 //  T() {}
 
-         if (Tr[i]<Trmin) 
+         if (Tr[i]<Trmin)
 
 //  T() {}
 

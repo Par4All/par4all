@@ -34,17 +34,17 @@ int main()
 {
    int a[1000];                                                         /*0003*/
    int j;                                                               /*0004*/
-//               <must be written>: j
+//             <    is written>: j
    
    // A do loop ! Should be parallel.
    for(j = 0; j <= 999; j += 1)
-//               <must be read   >: j
-//               <must be written>: a[j]
+//             <    is read   >: j
+//             <    is written>: a[j]
       a[j] = j;                                                         /*0008*/
-//               <must be written>: j
+//             <    is written>: j
    for(j = 0; j <= 999; j += 1)
-//               <must be read   >: j
-//               <must be written>: a[j]
+//             <    is read   >: j
+//             <    is written>: a[j]
       a[j] = j;                                                         /*0010*/
 
    return 0;                                                            /*0012*/
@@ -56,21 +56,21 @@ int main()
 {
    int a[1000];                                                         /*0003*/
    int j;                                                               /*0004*/
-//               <may be read    >: j
-//               <may be written >: a[*]
-//               <must be written>: j
+//             <may be read   >: j
+//             <may be written>: a[*]
+//             <    is written>: j
    
    // A do loop ! Should be parallel.
    for(j = 0; j <= 999; j += 1)
-//               <may be written >: a[*]
-//               <must be read   >: j
+//             <may be written>: a[*]
+//             <    is read   >: j
       a[j] = j;                                                         /*0008*/
-//               <may be read    >: j
-//               <may be written >: a[*]
-//               <must be written>: j
+//             <may be read   >: j
+//             <may be written>: a[*]
+//             <    is written>: j
    for(j = 0; j <= 999; j += 1)
-//               <may be written >: a[*]
-//               <must be read   >: j
+//             <may be written>: a[*]
+//             <    is read   >: j
       a[j] = j;                                                         /*0010*/
 
    return 0;                                                            /*0012*/

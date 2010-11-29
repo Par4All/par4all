@@ -92,7 +92,7 @@ bool old_reductions(string mod_name)
     debug( 5, "reductions", "\ncommand = %s\n", command ) ;
 
     if( (system( command ) >> 8) != 0 ) {
-	pips_error( "reductions", "Lisp process died unexpectedly\n" ) ;
+	pips_internal_error("Lisp process died unexpectedly" ) ;
     }
     free(command);
     debug_off();

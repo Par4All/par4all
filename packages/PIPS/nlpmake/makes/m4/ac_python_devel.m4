@@ -133,6 +133,7 @@ to something else than an empty string.
 		AC_MSG_RESULT([yes])
 	else
 		AC_MSG_RESULT([no])
+		AX_MSG([python_devel])="cannot import Python module distutils"
 		AC_MSG_WARN([cannot import Python module "distutils".
 Please check your Python installation. The error was:
 $ac_distutils_result])
@@ -175,7 +176,7 @@ $ac_distutils_result])
 
 		PYTHON_LDFLAGS=`$PYTHON -c "from distutils.sysconfig import *; \
 			from string import join; \
-			print '-L' + get_python_lib(0,1), \
+			print '-L' + get_python_lib(0,1)+'/config', \
 		      	'-lpython';"`$py_version
 	fi
 	AC_MSG_RESULT([$PYTHON_LDFLAGS])
@@ -234,6 +235,7 @@ $ac_distutils_result])
 	AX_WITH([python_devel])="$pythonexists"
 
         if test ! "$pythonexists" = "yes"; then
+	   AX_MSG([python_devel])="Could not link test program to Python."
 	   AC_MSG_WARN([
   Could not link test program to Python. Maybe the main Python library has been
   installed in some non-standard library path. If so, pass it to configure,

@@ -61,7 +61,7 @@ display PRINTED_FILE
 shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT07.f
 
 # suppression des calculs de la borne de boucle
-apply USE_DEF_ELIMINATION
+apply DEAD_CODE_ELIMINATION
 display PRINTED_FILE
 shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT08.f
 

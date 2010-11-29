@@ -98,7 +98,7 @@ static void checkReplaceReference(expression e, reference ref)
                                    daCheckCallReplace(syntax_call(s), ref);
                                    break;
         default : 
-                                   pips_error("checkReplaceReference", "unknown tag: %d\n", 
+                                   pips_internal_error("unknown tag: %d", 
                                            (int) syntax_tag(expression_syntax(e)));
     }
 }
@@ -132,7 +132,7 @@ static void daCheckCallReplace(call c, reference ref)
             }
     break;
         default:
-    pips_error("CallReplaceReference", "unknown tag: %d\n", 
+    pips_internal_error("unknown tag: %d", 
             (int) value_tag(vin));
 
     abort();
@@ -173,14 +173,13 @@ static void daExpressionReplaceReference(list e, reference ref, expression next)
                                    }
                                    break;
         case is_syntax_range :
-                                   pips_error("daExpressionReplaceReference", 
-                                           "tag syntax_range not implemented\n");
+                                   pips_internal_error("tag syntax_range not implemented");
                                    break;
         case is_syntax_call :
                                    daCallReplaceReference(syntax_call(s), ref, next);
                                    break;
         default : 
-                                   pips_error("daExpressionReplaceReference", "unknown tag: %d\n", 
+                                   pips_internal_error("unknown tag: %d", 
                                            (int) syntax_tag(expression_syntax(EXPRESSION(CAR(e)))));
     }
 }
@@ -213,7 +212,7 @@ static void daCallReplaceReference(call c, reference ref, expression next)
             }, call_arguments(c));
     break;
         default:
-    pips_error("daCallReplaceReference", "unknown tag: %d\n", 
+    pips_internal_error("unknown tag: %d", 
             (int) value_tag(vin));
 
     abort();

@@ -3,11 +3,11 @@ C     because of the write instruction ...
       PROGRAM FILES
       INTEGER I(10)
       INTEGER J
-C               <must be written>: J
+C             <    is written>: J
 
       DO 10 J = 1, 20                                                   0007
-C               <must be read   >: I(J) J __IO_EFFECTS:LUNS(5)
-C               <must be written>: __IO_EFFECTS:LUNS(5)
+C             <    is read   >: I(J) J __IO_EFFECTS:LUNS(5)
+C             <    is written>: __IO_EFFECTS:LUNS(5)
 c         WRITE (UNIT=5,*) I(J)
          WRITE (5, *) I(J)                                              0009
 10       CONTINUE                                                       0010

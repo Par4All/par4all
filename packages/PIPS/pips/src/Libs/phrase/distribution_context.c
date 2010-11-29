@@ -140,7 +140,7 @@ boolean compute_distribution_context (list l_stats,
       externalized_code = s;
     }
     else {
-      pips_internal_error("Strange externalized code\n");
+      pips_internal_error("Strange externalized code");
     }
 
     /* Register new externalized function */
@@ -320,7 +320,7 @@ list compute_regions_union (list l_in, list l_out)
 	pips_debug(6, "Getting:\n");
 	print_regions(new_regions);
 	if (gen_length(new_regions) > 1) {
-	  pips_internal_error("Regions union must refer to only ONE region !\n");
+	  pips_internal_error("Regions union must refer to only ONE region !");
 	}
 	else {
 	  gen_remove (&l_union, reg_already_present);

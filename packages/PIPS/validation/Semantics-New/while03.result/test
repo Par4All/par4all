@@ -27,7 +27,7 @@ int main()
 //  T(i) {i#init==0, 1<=i, i<=n+1, 0<=n}
 
 
-   while (i++<=n) 
+   while (i++<=n)
 
 //  T() {1<=i, i<=n+1}
 
@@ -66,7 +66,7 @@ int main()
 //  P(i,n) {i==0}
 
 
-   while (i++<=n) 
+   while (i++<=n)
 
 //  P(i,n) {1<=i, i<=n+1}
 

@@ -105,6 +105,107 @@ entity_to_callees(entity mod)
     return rl;
 }
 
+typedef struct {
+    list sites;
+    entity m;
+} gather_call_sites_t;
+
+static void gather_call_sites(call c, gather_call_sites_t *p)
+{
+    if(same_entity_p(call_function(c), p->m))
+        p->sites=CONS(CALL,c,p->sites);
+}
+static void gather_call_sites_in_block(statement s, gather_call_sites_t *p) {
+    if(declaration_statement_p(s)) {
+        FOREACH(ENTITY,e,statement_declarations(s)) {
+            gen_context_recurse(entity_initial(e),p,call_domain,gen_true,gather_call_sites);
+        }
+    }
+}
+
+/** 
+ * given a list @p callers_statement of module statements
+ * returns a list of calls to module @p called_module
+ * 
+ */
+list callers_to_call_sites(list callers_statement, entity called_module)
+{
+    gather_call_sites_t p ={ NIL,called_module };
+    FOREACH(STATEMENT,caller_statement,callers_statement)
+        gen_context_multi_recurse(caller_statement,&p,
+                statement_domain,gen_true,gather_call_sites_in_block,
+                call_domain,gen_true,gather_call_sites,0);
+    return p.sites;
+}
+
+/** 
+ * given a list @p callers of module name calling module @p called module
+ * return a list of their body
+ */
+list callers_to_statements(list callers)
+{
+    list statements = NIL;
+    FOREACH(STRING,caller_name,callers)
+    {
+        statement caller_statement=(statement) db_get_memory_resource(DBR_CODE,caller_name,true);
+        statements=CONS(STATEMENT,caller_statement,statements);
+    }
+    return statements;
+}
+
+/* change the parameter order for function @p module
+ * using comparison function @p cmp
+ * both compilation unit and callers are touched
+ * SG: it may be put in ri-util,  but this would create a dependency from callgraph ...
+ */
+void sort_parameters(entity module, gen_cmp_func_t cmp) {
+    /* retrieve the formal parameters */
+    list fn = module_formal_parameters(module);
+    /* order them */
+    gen_sort_list(fn,cmp);
+    /* update offset */
+    intptr_t offset=0;
+    int reordering[gen_length(fn)];/* holds correspondence between old and new offset */
+    FOREACH(ENTITY,f,fn) {
+        reordering[formal_offset(storage_formal(entity_storage(f)))-1] = offset;
+        formal_offset(storage_formal(entity_storage(f)))=++offset;
+    }
+    /* update parameter list */
+    list parameters = module_functional_parameters(module);
+    list new_parameters = NIL;
+    for(size_t i=0;i<gen_length(fn);i++) {
+        new_parameters=CONS(PARAMETER,PARAMETER(gen_nth((int)reordering[i],parameters)),new_parameters);
+    }
+    new_parameters=gen_nreverse(new_parameters);
+    module_functional_parameters(module)=new_parameters;
+    /* change call sites */
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
+    list callers_statement = callers_to_statements(callers);
+    list call_sites = callers_to_call_sites(callers_statement,module);
+    /* for each call site , reorder arguments according to table reordering */
+    FOREACH(CALL,c,call_sites) {
+        list args = call_arguments(c);
+        list new_args = NIL;
+        for(size_t i=0;i<gen_length(fn);i++) {
+            new_args=CONS(EXPRESSION,EXPRESSION(gen_nth((int)reordering[i],args)),new_args);
+        }
+        new_args=gen_nreverse(new_args);
+        gen_free_list(args);
+        call_arguments(c)=new_args;
+    }
+    /* tell dbm of the update */
+    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter))
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, STRING(CAR(citer)),STATEMENT(CAR(siter)));
+    db_touch_resource(DBR_CODE,compilation_unit_of_module(get_current_module_name()));
+
+    /* yes! some people use free in pips ! */
+    gen_free_list(call_sites);
+    gen_free_list(callers_statement);
+
+    gen_free_list(fn);
+    gen_free_list(parameters);
+}
+
 
 /*
    callgraph_module_name(margin, module, fp)
@@ -147,7 +248,7 @@ callgraph_module_name(
 	MERGE_TEXTS(r,get_text_out_regions(module_name));
 	break;
     default:
-	pips_internal_error("unknown callgraph decoration for module %s\n",
+	pips_internal_error("unknown callgraph decoration for module %s",
 			    module_name);
     }
 
@@ -260,7 +361,7 @@ static void transitive_positions(set vertices,
       list destinations = list_undefined;
 
       if(c == (callees) HASH_UNDEFINED_VALUE) {
-	pips_internal_error("Arcs undefined for module %s\n", source_module);
+	pips_internal_error("Arcs undefined for module %s", source_module);
       }
       else {
 	destinations = callees_callees(c);

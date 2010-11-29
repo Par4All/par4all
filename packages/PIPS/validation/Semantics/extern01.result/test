@@ -1,15 +1,15 @@
 
 Cumulated effects for "main"
 
-//               <must be read   >: delta
+//             <    is read   >: delta
 int main()
 {
-//               <must be read   >: delta
+//             <    is read   >: delta
    // BEGIN BLOCK
-//               <must be written>: i
+//             <    is written>: i
    int i = 0;
-//               <must be read   >: delta i
-//               <must be written>: i
+//             <    is read   >: delta i
+//             <    is written>: i
 
    i = i+delta;
    // END BLOCK

@@ -121,7 +121,7 @@ FORTRAN_FUNCTION TRACK();
 
 /* Define the structs or COMMON BLOCKS */
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     long Mk;
     long Ik;
     long Im;
@@ -131,18 +131,18 @@ COMMON_BLOCK struct {
     long Nruns;
     long Jr;
     long Npfs[47][3][8];
-} ALPHA ;
-#define mk     ALPHA.Mk
-#define ik     ALPHA.Ik
-#define im     ALPHA.Im
-#define ml     ALPHA.Ml
-#define il     ALPHA.Il
-#define mruns  ALPHA.Mruns;
-#define nruns  ALPHA.Nruns;
-#define jr     ALPHA.Jr
-#define npfs   ALPHA.Npfs
+//} ALPHA ;
+#define mk     /*ALPHA.*/Mk
+#define ik     /*ALPHA.*/Ik
+#define im     /*ALPHA.*/Im
+#define ml     /*ALPHA.*/Ml
+#define il     /*ALPHA.*/Il
+#define mruns  /*ALPHA.*/Mruns;
+#define nruns  /*ALPHA.*/Nruns;
+#define jr     /*ALPHA.*/Jr
+#define npfs   /*ALPHA.*/Npfs
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double Tic;
     double Times[47][3][8];
     double See[3][8][3][5];
@@ -150,16 +150,16 @@ COMMON_BLOCK struct {
     double Csums[47][3][8];
     double Fopn[47][3][8];
     double Dos[47][3][8];
-} BETA ;
-#define tic     BETA.Tic
-#define times   BETA.Times
-#define see     BETA.See
-#define terrs   BETA.Terrs
-#define csums   BETA.Csums
-#define fopn    BETA.Fopn
-#define dos     BETA.Dos
+//} BETA ;
+#define tic     /*BETA.*/Tic
+#define times   /*BETA.*/Times
+#define see     /*BETA.*/See
+#define terrs   /*BETA.*/Terrs
+#define csums   /*BETA.*/Csums
+#define fopn    /*BETA.*/Fopn
+#define dos     /*BETA.*/Dos
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     long Ion;
     long J5;
     long K2;
@@ -186,35 +186,35 @@ COMMON_BLOCK struct {
     long N21;
     long Nt1;
     long Nt2;
-} SPACES ;
-#define  ion    SPACES.Ion
-#define  j5     SPACES.J5
-#define  k2     SPACES.K2
-#define  k3     SPACES.K3
-#define  multi  SPACES.MULTI
-#define  laps   SPACES.Laps
-#define  loop   SPACES.Loop
-#define  m      SPACES.M
-#define  kr     SPACES.Kr
-#define  it     SPACES.It
-#define  n13h   SPACES.N13h
-#define  ibuf   SPACES.Ibuf
-#define  npass  SPACES.Npass
-#define  nfail  SPACES.Nfail
-#define  n      SPACES.N
-#define  n1     SPACES.N1
-#define  n2     SPACES.N2
-#define  n13    SPACES.N13
-#define  n213   SPACES.N213
-#define  n813   SPACES.N813
-#define  n14    SPACES.N14
-#define  n16    SPACES.N16
-#define  n416   SPACES.N416
-#define  n21    SPACES.N21
-#define  nt1    SPACES.Nt1
-#define  nt2    SPACES.Nt2
+//} SPACES ;
+#define  ion    /*SPACES.*/Ion
+#define  j5     /*SPACES.*/J5
+#define  k2     /*SPACES.*/K2
+#define  k3     /*SPACES.*/K3
+#define  multi  /*SPACES.*/MULTI
+#define  laps   /*SPACES.*/Laps
+#define  loop   /*SPACES.*/Loop
+#define  m      /*SPACES.*/M
+#define  kr     /*SPACES.*/Kr
+#define  it     /*SPACES.*/It
+#define  n13h   /*SPACES.*/N13h
+#define  ibuf   /*SPACES.*/Ibuf
+#define  npass  /*SPACES.*/Npass
+#define  nfail  /*SPACES.*/Nfail
+#define  n      /*SPACES.*/N
+#define  n1     /*SPACES.*/N1
+#define  n2     /*SPACES.*/N2
+#define  n13    /*SPACES.*/N13
+#define  n213   /*SPACES.*/N213
+#define  n813   /*SPACES.*/N813
+#define  n14    /*SPACES.*/N14
+#define  n16    /*SPACES.*/N16
+#define  n416   /*SPACES.*/N416
+#define  n21    /*SPACES.*/N21
+#define  nt1    /*SPACES.*/Nt1
+#define  nt2    /*SPACES.*/Nt2
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double A11;
     double A12;
     double A13;
@@ -254,48 +254,48 @@ COMMON_BLOCK struct {
     double Xnc;
     double Xnei;
     double Xnm;
-} SPACER ;
-#define  a11     SPACER.A11
-#define  a12     SPACER.A12
-#define  a13     SPACER.A13
-#define  a21     SPACER.A21
-#define  a22     SPACER.A22
-#define  a23     SPACER.A23
-#define  a31     SPACER.A31
-#define  a32     SPACER.A32
-#define  a33     SPACER.A33
-#define  ar      SPACER.Ar
-#define  br      SPACER.Br
-#define  c0      SPACER.C0
-#define  cr      SPACER.Cr
-#define  di      SPACER.Di
-#define  dk      SPACER.Dk
-#define  dm22    SPACER.Dm22
-#define  dm23    SPACER.Dm23
-#define  dm24    SPACER.Dm24
-#define  dm25    SPACER.Dm25
-#define  dm26    SPACER.Dm26
-#define  dm27    SPACER.Dm27
-#define  dm28    SPACER.Dm28
-#define  dn      SPACER.Dn
-#define  e3      SPACER.E3
-#define  e6      SPACER.E6
-#define  expmax  SPACER.Expmax
-#define  flx     SPACER.Flx
-#define  q       SPACER.Q
-#define  qa      SPACER.Qa
-#define  r       SPACER.R
-#define  ri      SPACER.Ri
-#define  s       SPACER.S
-#define  scale   SPACER.Scale
-#define  sig     SPACER.Sig
-#define  stb5    SPACER.Stb5
-#define  t       SPACER.T
-#define  xnc     SPACER.Xnc
-#define  xnei    SPACER.Xnei
-#define  xnm     SPACER.Xnm
+//} SPACER ;
+#define  a11     /*SPACER.*/A11
+#define  a12     /*SPACER.*/A12
+#define  a13     /*SPACER.*/A13
+#define  a21     /*SPACER.*/A21
+#define  a22     /*SPACER.*/A22
+#define  a23     /*SPACER.*/A23
+#define  a31     /*SPACER.*/A31
+#define  a32     /*SPACER.*/A32
+#define  a33     /*SPACER.*/A33
+#define  ar      /*SPACER.*/Ar
+#define  br      /*SPACER.*/Br
+#define  c0      /*SPACER.*/C0
+#define  cr      /*SPACER.*/Cr
+#define  di      /*SPACER.*/Di
+#define  dk      /*SPACER.*/Dk
+#define  dm22    /*SPACER.*/Dm22
+#define  dm23    /*SPACER.*/Dm23
+#define  dm24    /*SPACER.*/Dm24
+#define  dm25    /*SPACER.*/Dm25
+#define  dm26    /*SPACER.*/Dm26
+#define  dm27    /*SPACER.*/Dm27
+#define  dm28    /*SPACER.*/Dm28
+#define  dn      /*SPACER.*/Dn
+#define  e3      /*SPACER.*/E3
+#define  e6      /*SPACER.*/E6
+#define  expmax  /*SPACER.*/Expmax
+#define  flx     /*SPACER.*/Flx
+#define  q       /*SPACER.*/Q
+#define  qa      /*SPACER.*/Qa
+#define  r       /*SPACER.*/R
+#define  ri      /*SPACER.*/Ri
+#define  s       /*SPACER.*/S
+#define  scale   /*SPACER.*/Scale
+#define  sig     /*SPACER.*/Sig
+#define  stb5    /*SPACER.*/Stb5
+#define  t       /*SPACER.*/T
+#define  xnc     /*SPACER.*/Xnc
+#define  xnei    /*SPACER.*/Xnei
+#define  xnm     /*SPACER.*/Xnm
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double Time[47];
     double Csum[47];
     double Ww[47];
@@ -313,50 +313,50 @@ COMMON_BLOCK struct {
     long Iq[7];
     long Npf;
     long Npfs1[47];
-} SPACE0 ;
-#define  time    SPACE0.Time
-#define  csum    SPACE0.Csum
-#define  ww      SPACE0.Ww
-#define  wt      SPACE0.Wt
-#define  ticks   SPACE0.Ticks
-#define  fr      SPACE0.Fr
-#define  terr1   SPACE0.Terr1
-#define  sumw    SPACE0.Sumw
-#define  start   SPACE0.Start
-#define  skale   SPACE0.Skale
-#define  bias    SPACE0.Bias
-#define  ws      SPACE0.Ws
-#define  total   SPACE0.Total
-#define  flopn   SPACE0.Flopn
-#define  iq      SPACE0.Iq
-#define  npf     SPACE0.Npf
-#define  npfs1   SPACE0.Npfs1
+//} SPACE0 ;
+#define  time    /*SPACE0.*/Time
+#define  csum    /*SPACE0.*/Csum
+#define  ww      /*SPACE0.*/Ww
+#define  wt      /*SPACE0.*/Wt
+#define  ticks   /*SPACE0.*/Ticks
+#define  fr      /*SPACE0.*/Fr
+#define  terr1   /*SPACE0.*/Terr1
+#define  sumw    /*SPACE0.*/Sumw
+#define  start   /*SPACE0.*/Start
+#define  skale   /*SPACE0.*/Skale
+#define  bias    /*SPACE0.*/Bias
+#define  ws      /*SPACE0.*/Ws
+#define  total   /*SPACE0.*/Total
+#define  flopn   /*SPACE0.*/Flopn
+#define  iq      /*SPACE0.*/Iq
+#define  npf     /*SPACE0.*/Npf
+#define  npfs1   /*SPACE0.*/Npfs1
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double Wtp[3];
     long Mult[3];
     long Ispan[3][47];
     long Ipass[3][47];
-} SPACEI ;
-#define wtp    SPACEI.Wtp
-#define mult   SPACEI.Mult
-#define ispan  SPACEI.Ispan
-#define ipass  SPACEI.Ipass
+//} SPACEI ;
+#define wtp    /*SPACEI.*/Wtp
+#define mult   /*SPACEI.*/Mult
+#define ispan  /*SPACEI.*/Ispan
+#define ipass  /*SPACEI.*/Ipass
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     long E[96];
     long F[96];
     long Ix[1001];
     long Ir[1001];
     long Zone[300];
-} ISPACE ;
-#define e    ISPACE.E
-#define f    ISPACE.F
-#define ix   ISPACE.Ix
-#define ir   ISPACE.Ir
-#define zone ISPACE.Zone
+//} ISPACE ;
+#define e    /*ISPACE.*/E
+#define f    /*ISPACE.*/F
+#define ix   /*ISPACE.*/Ix
+#define ir   /*ISPACE.*/Ir
+#define zone /*ISPACE.*/Zone
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double U[1001];
     double V[1001];
     double W[1001];
@@ -389,41 +389,41 @@ COMMON_BLOCK struct {
     double D[300];
     double Sa[101];
     double Sb[101];
-} SPACE1 ;
-#define  u    SPACE1.U
-#define  v    SPACE1.V
-#define  w    SPACE1.W
-#define  x    SPACE1.X
-#define  y    SPACE1.Y
-#define  z    SPACE1.Z
-#define  g    SPACE1.G
-#define  du1  SPACE1.Du1
-#define  du2  SPACE1.Du2
-#define  du3  SPACE1.Du3
-#define  grd  SPACE1.Grd
-#define  dex  SPACE1.Dex
-#define  xi   SPACE1.Xi
-#define  ex   SPACE1.Ex
-#define  ex1  SPACE1.Ex1
-#define  dex1 SPACE1.Dex1
-#define  vx   SPACE1.Vx
-#define  xx   SPACE1.Xx
-#define  rx   SPACE1.Rx
-#define  rh   SPACE1.Rh
-#define  vsp  SPACE1.Vsp
-#define  vstp SPACE1.Vstp
-#define  vxne SPACE1.Vxne
-#define  vxnd SPACE1.Vxnd
-#define  ve3  SPACE1.Ve3
-#define  vlr  SPACE1.Vlr
-#define  vlin SPACE1.Vlin
-#define  b5   SPACE1.B5
-#define  plan SPACE1.Plan
-#define  d    SPACE1.D
-#define  sa   SPACE1.Sa
-#define  sb   SPACE1.Sb
+//} SPACE1 ;
+#define  u    /*SPACE1.*/U
+#define  v    /*SPACE1.*/V
+#define  w    /*SPACE1.*/W
+#define  x    /*SPACE1.*/X
+#define  y    /*SPACE1.*/Y
+#define  z    /*SPACE1.*/Z
+#define  g    /*SPACE1.*/G
+#define  du1  /*SPACE1.*/Du1
+#define  du2  /*SPACE1.*/Du2
+#define  du3  /*SPACE1.*/Du3
+#define  grd  /*SPACE1.*/Grd
+#define  dex  /*SPACE1.*/Dex
+#define  xi   /*SPACE1.*/Xi
+#define  ex   /*SPACE1.*/Ex
+#define  ex1  /*SPACE1.*/Ex1
+#define  dex1 /*SPACE1.*/Dex1
+#define  vx   /*SPACE1.*/Vx
+#define  xx   /*SPACE1.*/Xx
+#define  rx   /*SPACE1.*/Rx
+#define  rh   /*SPACE1.*/Rh
+#define  vsp  /*SPACE1.*/Vsp
+#define  vstp /*SPACE1.*/Vstp
+#define  vxne /*SPACE1.*/Vxne
+#define  vxnd /*SPACE1.*/Vxnd
+#define  ve3  /*SPACE1.*/Ve3
+#define  vlr  /*SPACE1.*/Vlr
+#define  vlin /*SPACE1.*/Vlin
+#define  b5   /*SPACE1.*/B5
+#define  plan /*SPACE1.*/Plan
+#define  d    /*SPACE1.*/D
+#define  sa   /*SPACE1.*/Sa
+#define  sb   /*SPACE1.*/Sb
 
-COMMON_BLOCK struct {
+//COMMON_BLOCK struct {
     double P[512][4];
     double Px[101][25];
     double Cx[101][25];
@@ -447,30 +447,30 @@ COMMON_BLOCK struct {
     double U1[2][101][5];
     double U2[2][101][5];
     double U3[2][101][5];
-} SPACE2 ;
-#define  p       SPACE2.P
-#define  px      SPACE2.Px
-#define  cx      SPACE2.Cx
-#define  vy      SPACE2.Vy
-#define  vh      SPACE2.Vh
-#define  vf      SPACE2.Vf
-#define  vg      SPACE2.Vg
-#define  vs      SPACE2.Vs
-#define  za      SPACE2.Za
-#define  zp      SPACE2.Zp
-#define  zq      SPACE2.Zq
-#define  zr      SPACE2.Zr
-#define  zm      SPACE2.Zm
-#define  zb      SPACE2.Zb
-#define  zu      SPACE2.Zu
-#define  zv      SPACE2.Zv
-#define  zz      SPACE2.Zz
-#define  b       SPACE2.B
-#define  c       SPACE2.C
-#define  h       SPACE2.H
-#define  u1      SPACE2.U1
-#define  u2      SPACE2.U2
-#define  u3      SPACE2.U3
+//} SPACE2 ;
+#define  p       /*SPACE2.*/P
+#define  px      /*SPACE2.*/Px
+#define  cx      /*SPACE2.*/Cx
+#define  vy      /*SPACE2.*/Vy
+#define  vh      /*SPACE2.*/Vh
+#define  vf      /*SPACE2.*/Vf
+#define  vg      /*SPACE2.*/Vg
+#define  vs      /*SPACE2.*/Vs
+#define  za      /*SPACE2.*/Za
+#define  zp      /*SPACE2.*/Zp
+#define  zq      /*SPACE2.*/Zq
+#define  zr      /*SPACE2.*/Zr
+#define  zm      /*SPACE2.*/Zm
+#define  zb      /*SPACE2.*/Zb
+#define  zu      /*SPACE2.*/Zu
+#define  zv      /*SPACE2.*/Zv
+#define  zz      /*SPACE2.*/Zz
+#define  b       /*SPACE2.*/B
+#define  c       /*SPACE2.*/C
+#define  h       /*SPACE2.*/H
+#define  u1      /*SPACE2.*/U1
+#define  u2      /*SPACE2.*/U2
+#define  u3      /*SPACE2.*/U3
 
 /* KERNEL routine */
 
@@ -1448,10 +1448,10 @@ int main(int argc, char **argv) {
         double tk[6] = { drand48(),drand48(),drand48(),drand48(),drand48(),drand48() };
     struct timeval t0,t1;
     int i=atoi(argv[1]);
-    //gettimeofday(&t0,0);
+    gettimeofday(&t0,0);
     while(i--)
         KERNEL(tk);
-    //gettimeofday(&t1,0);
+    gettimeofday(&t1,0);
     printf("%ld\n",(t1.tv_sec-t0.tv_sec)*1000000+t1.tv_usec-t0.tv_usec);
     return 0;
 }

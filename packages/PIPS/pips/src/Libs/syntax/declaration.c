@@ -830,8 +830,7 @@ DeclareVariable(
       ParserError("DeclareVariable", "Name conflict\n");
       break;
     default:
-      pips_error("DeclareVariable",
-		 "unexpected entity type tag: %d\n",
+      pips_internal_error("unexpected entity type tag: %d",
 		 type_tag(et));
     }
 
@@ -988,8 +987,7 @@ common_to_size(entity a)
 
     if((size = (size_t) hash_get(common_size_map,(char *) a))
        == (size_t) HASH_UNDEFINED_VALUE) {
-	    pips_error("common_to_size",
-		       "common_size_map uninitialized for common %s\n",
+	    pips_internal_error("common_size_map uninitialized for common %s",
 		       entity_name(a));
     }
 
@@ -1317,7 +1315,7 @@ entity e;
 	    s++;
 
     if (!(IS_UPPER((int)s[0]))) {
-	pips_error("ImplicitType", "[ImplicitType] bad name: %s\n", s);
+	pips_internal_error("[ImplicitType] bad name: %s", s);
 	FatalError("ImplicitType", "\n");
     }
 
@@ -1369,14 +1367,14 @@ implicit_type_p(entity e)
     if (s[0] == '_')
 	    s++;
     if (!(IS_UPPER((int)s[0]))) {
-	pips_internal_error("bad name: %s\n", s);
+	pips_internal_error("bad name: %s", s);
 	FatalError("implicit_type_p", "\n");
     }
     i = (int) (s[0] - 'A');
 
     /* ASSERT */
     if (!type_variable_p(t))
-	pips_internal_error("expecting a variable for %s, got tag %d\n",
+	pips_internal_error("expecting a variable for %s, got tag %d",
 			    entity_name(e), type_tag(t));
 
     b = variable_basic(type_variable(t));
@@ -1390,12 +1388,12 @@ implicit_type_p(entity e)
 	case is_basic_logical: return (size_t)basic_logical(b)==int_implicit[i];
 	case is_basic_complex: return (size_t)basic_complex(b)==int_implicit[i];
 	case is_basic_overloaded:
-	    pips_internal_error("unexpected overloaded basic tag\n");
+	    pips_internal_error("unexpected overloaded basic tag");
 	case is_basic_string: 
 	    return (size_t)constant_int(value_constant(basic_string(b)))==
 		int_implicit[i];
 	default:
-	    pips_internal_error("illegal basic tag\n");
+	    pips_internal_error("illegal basic tag");
 	}
     return FALSE; /* to please gcc */
 }
@@ -1471,7 +1469,7 @@ retype_formal_parameters()
 					 entity_type(r)));
 	    }
 	    else {
-		pips_error("retype_formal_parameters", "Result entity should exist!\n");
+		pips_internal_error("Result entity should exist!");
 	    }
 	}
     }
@@ -1479,7 +1477,7 @@ retype_formal_parameters()
 	/* nothing to be done: subroutine or main */
     }
     else
-	pips_error("retype_formal_parameters", "Unexpected type with tag = %d\n",
+	pips_internal_error("Unexpected type with tag = %d",
 		   type_tag(tr));
 
     pips_assert("Parameter type list should still be empty",
@@ -1683,8 +1681,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 			     entity_module_name(c));
 	    }
 	    else {
-		pips_error("print_common_layout",
-			   "Non-empty area %s should have a size greater than 0\n",
+		pips_internal_error("Non-empty area %s should have a size greater than 0",
 			   entity_module_name(c));
 	    }
 	}
@@ -1702,8 +1699,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 
 		    /* Consistency check between the area layout and the ram section */
 		    if(ram_section(storage_ram(entity_storage(m)))!=c) {
-			pips_error("print_common_layout",
-				   "Variable %s declared in area %s but allocated in area %s\n",
+			pips_internal_error("Variable %s declared in area %s but allocated in area %s",
 				   entity_local_name(m), entity_module_name(c),
 				   entity_module_name(ram_section(storage_ram(entity_storage(m)))));
 		    }

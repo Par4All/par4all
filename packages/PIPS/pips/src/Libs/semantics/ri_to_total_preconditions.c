@@ -269,14 +269,14 @@ call_to_total_precondition(
     break;
   case is_value_symbolic:
   case is_value_constant:
-    pips_internal_error("call to symbolic or constant %s\n", 
+    pips_internal_error("call to symbolic or constant %s", 
 			entity_name(e));
     break;
   case is_value_unknown:
-    pips_internal_error("unknown function %s\n", entity_name(e));
+    pips_internal_error("unknown function %s", entity_name(e));
     break;
   default:
-    pips_internal_error("unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d", tt);
   }
 
   pips_debug(8,"end\n");
@@ -331,8 +331,7 @@ instruction_to_total_precondition(
     //t_pre = forloop_to_total_precondition(t_post, fl, tf, context);
     break;
   case is_instruction_goto:
-    pips_error("instruction_to_total_precondition",
-	       "unexpected goto in semantics analysis");
+    pips_internal_error("unexpected goto in semantics analysis");
     /* never reached: post = pre; */
     break;
   case is_instruction_call:
@@ -344,7 +343,7 @@ instruction_to_total_precondition(
 					      tf);
     break ;
   default:
-    pips_error("instruction_to_total_precondition","unexpected tag %d\n",
+    pips_internal_error("unexpected tag %d",
 	       instruction_tag(i));
   }
   pips_debug(9,"resultat t_pre, %p:\n", t_pre);
@@ -427,7 +426,7 @@ statement_to_total_precondition(
 	      statement_number(s), ORDERING_NUMBER(so),
 	      ORDERING_STATEMENT(so), t_pre);
       print_transformer(t_pre);
-      pips_internal_error("Non-consistent precondition after update\n");
+      pips_internal_error("Non-consistent precondition after update");
     }
 
     t_pre = transformer_filter(t_pre, non_initial_values);
@@ -444,7 +443,7 @@ statement_to_total_precondition(
     pips_debug(8, "for statement %03td (%td,%td), total precondition %p end:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), load_statement_total_precondition(s));
-    pips_internal_error("total precondition already computed\n");
+    pips_internal_error("total precondition already computed");
   }
 
   ifdebug(1) {

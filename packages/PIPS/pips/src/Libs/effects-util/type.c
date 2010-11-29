@@ -288,15 +288,15 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
 		    free_type(new_current_type);
 		  }
 		else
-		  pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity\n");
+		  pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity");
 	      }
 	    else
-	      pips_internal_error("the current basic tag is derived, but corresponding index is not a reference\n");
+	      pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
 	    break;
 	  }      
 	default:
 	  {
-	    pips_internal_error("unexpected basic tag\n");
+	    pips_internal_error("unexpected basic tag");
 	  }
 	}
     }
@@ -342,7 +342,7 @@ type cell_reference_to_type(reference ref)
     }
   else
     {
-      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s\n",
+      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
 			  type_tag(ref_type),
 			  type_to_string(ref_type),
 			  entity_name(reference_variable(ref)));

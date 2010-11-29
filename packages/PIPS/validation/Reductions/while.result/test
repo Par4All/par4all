@@ -4,7 +4,7 @@ int main()
    int m = 0;
 //  while sum[n],
 
-   while (m<10) 
+   while (m<10)
 //  call sum[n],
       n = n+1;
 

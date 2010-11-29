@@ -181,7 +181,7 @@ static int emami_expression_type(expression exp) {
       break;
     default:
       {
-	pips_internal_error("unknown tag %d\n", t);
+	pips_internal_error("unknown tag %d", t);
 	return EMAMI_ERROR;
 	break;
       }
@@ -1589,7 +1589,7 @@ set basic_ptr_to_field_field(set pts_to_set, expression lhs, expression rhs) {
 
 /* one basic case of Emami: < m->x = m > */
 set basic_ptr_to_field_struct(set pts_to_set, expression lhs __attribute__ ((__unused__)), expression rhs __attribute__ ((__unused__))) {
-  pips_internal_error("<case m->x = *y> not implemented yet \n");
+  pips_internal_error("<case m->x = *y> not implemented yet ");
   return pts_to_set;
 }
 
@@ -1599,7 +1599,7 @@ set basic_ptr_to_field_deref(set pts_to_set __attribute__ ((__unused__)),
 			     expression lhs __attribute__ ((__unused__)),
 			     expression rhs __attribute__ ((__unused__)))
 {
-	pips_internal_error("<case m->x = *y> not implemented yet \n");
+	pips_internal_error("<case m->x = *y> not implemented yet ");
     return NULL;
 
 }
@@ -2503,7 +2503,7 @@ set points_to_general_assignment(statement s __attribute__ ((__unused__)), expre
   } else
     pt_cur = points_to_filter_with_effects(pt_cur, el);
   return pt_cur;
-  //pips_internal_error("To be implemented!\n");
+  //pips_internal_error("To be implemented!");
       return NULL;
 }
 
@@ -2815,7 +2815,7 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     pt_out = set_assign(pt_out, pt_in);
     break;
   case is_value_unknown:
-    pips_internal_error("function %s has an unknown value\n",
+    pips_internal_error("function %s has an unknown value",
 			entity_name(e));
     break;
   case is_value_intrinsic: {
@@ -2826,7 +2826,7 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     break;
     
   default:
-    pips_internal_error("unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d", tt);
     break;
   }
   return pt_out;
@@ -3003,7 +3003,7 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
     }
 
     default:
-      pips_internal_error("Unexpected instruction tag %d\n", instruction_tag(
+      pips_internal_error("Unexpected instruction tag %d", instruction_tag(
 									     i));
       break;
     }

@@ -45,7 +45,6 @@ processes on the HRE
 
 #include "text-util.h"
 
-#include "sac.h"
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
@@ -287,7 +286,7 @@ expression get_fifoExp_from_ref(reference curRef, expression buffExp,
 				  NULL);
 
       fifoExp =
-	call_to_expression(make_call(get_function_entity(PLUS_OPERATOR_NAME),
+	call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
 				     addArg));
     }
 
@@ -308,7 +307,7 @@ static statement make_read_write_fifo_stat(string name,
 			       indExp,
 			       NULL);
 
-      expression rExp = call_to_expression(make_call(get_function_entity(name), 
+      expression rExp = call_to_expression(make_call(module_name_to_runtime_entity(name), 
 					    arg));
 
       newStat = make_assign_statement(hreBuffExp, rExp);
@@ -322,7 +321,7 @@ static statement make_read_write_fifo_stat(string name,
 			       NULL);
 
       newStat = call_to_statement(
-				  make_call(get_function_entity(name), 
+				  make_call(module_name_to_runtime_entity(name), 
 					    arg));
     }
 

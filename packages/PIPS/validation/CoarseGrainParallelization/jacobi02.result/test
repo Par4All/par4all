@@ -36,7 +36,7 @@ void get_data(char filename[])
    c = fgetc(fp);
    c = fgetc(fp);
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -64,7 +64,7 @@ void get_data(char filename[])
       for(i = 0; i <= nx-1; i += 1) {
          c = fgetc(fp);
          /* Truncate the image if too big: */
-         if (i<501&&j<501) 
+         if (i<501&&j<501)
             space[i][j] = c;
       }
 

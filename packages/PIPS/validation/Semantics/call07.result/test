@@ -3,18 +3,18 @@ Source code with proper effects
 
 int call07(int i)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    return i++;                                                          /*0005*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: i
+//             <    is read   >: i
 int call07(int i)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    return i++;                                                          /*0005*/
 }
 

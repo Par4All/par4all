@@ -27,7 +27,7 @@ kernel2:
    for(i = 0; i <= 498; i += 1)
       for(j = 0; j <= 498; j += 1)
          // Loop nest P4A end
-         if (i<=498&&j<=498) 
+         if (i<=498&&j<=498)
             p4a_kernel_wrapper_1(save, space, i+1, j+1);
    // Loop nest P4A begin,3D(499,499,499)
 kernel3:
@@ -35,6 +35,6 @@ kernel3:
       for(j = 0; j <= 498; j += 1)
          for(k = 0; k <= 498; k += 1)
             // Loop nest P4A end
-            if (i<=498&&j<=498&&k<=498) 
+            if (i<=498&&j<=498&&k<=498)
                p4a_kernel_wrapper_2(save, space, dest, i+1, j+1, k+1);
 }

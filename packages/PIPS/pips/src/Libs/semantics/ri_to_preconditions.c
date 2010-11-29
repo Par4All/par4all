@@ -347,16 +347,16 @@ static transformer call_to_postcondition(transformer pre,
       post = transformer_apply(tf, pre);
     }
     else {
-      pips_internal_error("call to symbolic or constant %s\n",
+      pips_internal_error("call to symbolic or constant %s",
 			  entity_name(e));
     }
     break;
   }
   case is_value_unknown:
-    pips_internal_error("unknown function %s\n", entity_name(e));
+    pips_internal_error("unknown function %s", entity_name(e));
     break;
   default:
-    pips_internal_error("unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d", tt);
   }
 
   pips_debug(8,"end\n");
@@ -582,8 +582,7 @@ instruction_to_postcondition(
 	break;
     }
       case is_instruction_goto:
-	pips_error("instruction_to_postcondition",
-		   "unexpected goto in semantics analysis");
+	pips_internal_error("unexpected goto in semantics analysis");
 	/* never reached: post = pre; */
 	break;
       case is_instruction_call:
@@ -599,10 +598,10 @@ instruction_to_postcondition(
 	post = expression_to_postcondition(pre, exp, tf);
 	break ;
       case is_instruction_multitest:
-	pips_internal_error("Should have been removed by the controlizer?\n");
+	pips_internal_error("Should have been removed by the controlizer?");
 	break ;
       default:
-	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
     pips_debug(9,"resultat post, %p:\n", post);
     ifdebug(9) (void) print_transformer(post);
@@ -749,7 +748,7 @@ transformer statement_to_postcondition(
 	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)
 	   && !declaration_statement_p(s)) {
 	  // FI: Just to gain some time before dealing with controlizer and declarations updates
-	  //pips_internal_error("Statement %p carries declarations\n");
+	  //pips_internal_error("Statement %p carries declarations");
 	  pips_user_warning("Statement %p with instruction carries declarations\n",
 			    instruction_identification(statement_instruction(s)));
 	}
@@ -839,7 +838,7 @@ transformer statement_to_postcondition(
 			   statement_number(s), ORDERING_NUMBER(so),
 			   ORDERING_STATEMENT(so), pre);
 	    print_transformer(pre);
-	    pips_internal_error("Non-consistent precondition after update\n");
+	    pips_internal_error("Non-consistent precondition after update");
 	}
 
 	/* Do not keep too many initial variables in the
@@ -859,7 +858,7 @@ transformer statement_to_postcondition(
 	pips_debug(8,"precondition already available\n");
 	/* pre = statement_precondition(s); */
 	(void) print_transformer(pre);
-	pips_internal_error("precondition already computed\n");
+	pips_internal_error("precondition already computed");
     }
 
     /* post = instruction_to_postcondition(pre, i, tf); */

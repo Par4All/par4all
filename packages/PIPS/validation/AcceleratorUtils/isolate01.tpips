@@ -4,6 +4,7 @@ delete $WS
 create $WS $WS.c include/par4all.c
 
 module alphablending
+activate MUST_REGIONS
 
 echo original code
 apply PARTIAL_EVAL

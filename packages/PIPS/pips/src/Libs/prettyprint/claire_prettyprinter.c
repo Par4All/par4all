@@ -742,7 +742,7 @@ static string claire_call_from_loopnest(call c, int task_number){
 	}
       }
     }
-    default:pips_internal_error("unhandled case\n");
+    default:pips_internal_error("unhandled case");
     }
     first = FALSE;
   }
@@ -1107,7 +1107,7 @@ bool print_claire_code_with_explicit_motif(string module_name)
 
   if(statement_undefined_p(stat))
     {
-      pips_internal_error("No statement for module %s\n", module_name);
+      pips_internal_error("No statement for module %s", module_name);
     }
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -1907,7 +1907,7 @@ bool print_claire_code(string module_name)
 
   if(statement_undefined_p(stat))
     {
-      pips_internal_error("No statement for module %s\n", module_name);
+      pips_internal_error("No statement for module %s", module_name);
     }
   set_current_module_entity(module);
   set_current_module_statement(stat);

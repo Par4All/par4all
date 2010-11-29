@@ -262,7 +262,11 @@ char* module_loops(const char* module_name, const char* parent_loop)
     seed=get_current_module_statement();
   else {
     entity label = find_label_entity(module_name,parent_loop);
+    if(entity_undefined_p(label))
+        pips_user_error("label '%s' does not exist\n",parent_loop);
     statement stmt = find_loop_from_label(get_current_module_statement(),label);
+    if(statement_undefined_p(stmt))
+        pips_user_error("label '%s' is not on a loop\n",parent_loop);
     seed=loop_body(statement_loop(stmt));
   }
 

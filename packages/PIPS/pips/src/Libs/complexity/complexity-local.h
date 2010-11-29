@@ -33,6 +33,7 @@
  */
 #include "matrice.h"
 
+#define COMPLEXITY_PACKAGE_NAME "COMPLEXITY"
 #define COMPLEXITY_UNDEFINED complexity_undefined
 /*
 #define COMPLEXITY_UNDEFINED_SYMBOL "<Complexity undefined>"
@@ -43,29 +44,17 @@
 #define MAX_CONTROLS_IN_UNSTRUCTURED 100
 
 /* pseudo-variable for unknown variables     */
-/* FI: cannot be used like this with NewGen */
-/*
-#define UNKNOWN_VARIABLE ((Variable) -4)
-*/
+#define UNKNOWN_VARIABLE_NAME "UNKNOWN_VARIABLE"
 
 /* pseudo-variable for default iteration number of a loop */
-/* FI: should not be useful anymore */
-/*
-#define UNKNOWN_RANGE ((Variable) -8)
-*/
+#define UNKNOWN_RANGE_NAME "UNKNOWN_RANGE"
 
 #define TCST_NAME "_TCST_"
 
-/* name of pseudo-var when var's value is unknown */
-/*
-#define UNKNOWN_VARIABLE_NAME "U_" 
-*/
 /* Prefix added to a variable name when its value is unknown but has to
  * be used in a complexity formulae
  */
 #define UNKNOWN_VARIABLE_VALUE_PREFIX "U_"
-
-#define UNKNOWN_RANGE_NAME "U_RANGE_"
 
 /* defined complexity data file names here. LZ 13/03/92 */
 #define COST_DATA "operation index memory trigo transcend overhead"

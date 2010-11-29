@@ -51,20 +51,20 @@
 
 string transformer_to_string(transformer tf)
 {
-    pips_internal_error("not implemenented anymore, tf=%p\n", tf);
+    pips_internal_error("not implemenented anymore, tf=%p", tf);
     return string_undefined;
 }
 
 string precondition_to_string(pre)
 transformer pre;
 {
-    pips_internal_error("not implemenented anymore, pre=%p\n", pre);
+    pips_internal_error("not implemenented anymore, pre=%p", pre);
     return string_undefined;
 }
 
 string arguments_to_string(string s, list args)
 {
-    pips_internal_error("not implemenented anymore, s=\"%s\", args=%p\n", s, args);
+    pips_internal_error("not implemenented anymore, s=\"%s\", args=%p", s, args);
     return string_undefined;
 }
 
@@ -74,7 +74,7 @@ relation_to_string(
     Psysteme ps,
     char * (*variable_name)(entity))
 {
-    pips_internal_error("not implemenented anymore, s=\"%s\", ps=%p, variable_name=%p\n", s, ps, variable_name);
+    pips_internal_error("not implemenented anymore, s=\"%s\", ps=%p, variable_name=%p", s, ps, variable_name);
     return string_undefined;
 }
 

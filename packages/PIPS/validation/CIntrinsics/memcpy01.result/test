@@ -17,14 +17,14 @@ Proper effetcs for "memcpy01"
 
 int main()
 {
-//               <may be written >: str1[*]
+//             <may be written>: str1[*]
    char str1[] = "Sample string";
    char str2[40];
    char str3[40];
-//               <must be read   >: str1[0:strlen(str1)+1-1]
-//               <must be written>: res str2[0:strlen(str1)+1-1]
+//             <    is read   >: str1[0:strlen(str1)+1-1]
+//             <    is written>: res str2[0:strlen(str1)+1-1]
    char *res = memcpy(str2, str1, strlen(str1)+1);
-//               <must be written>: str3[0:16-1]
+//             <    is written>: str3[0:16-1]
    memcpy(str3, "copy successful", 16);
    // printf ("str1: %s\nstr2: %s\nstr3: %s\n",str1,str2,str3);
    //printf("res=%s \n",res);

@@ -39,9 +39,9 @@ function accept_one_file ()
     dir=${dir/.tpips/.result}
     dir=${dir/.py/.result}
 
-    let list_lgt++
 
     if [ -d $dir ]; then
+	let list_lgt++
 	if [ -f $dir/out ]
 	then
 	    cp $dir/out $dir/test
@@ -58,7 +58,10 @@ function accept_one_file ()
 	    Consider runing the validation first" >> $log
 	    let failed++
 	fi
+    elif [ -d $dir.result ]; then
+	accept_one_file $dir.result $2
     else
+	let list_lgt++
 	echo "ERROR: Directory $dir does not exist" >> $log
 	let failed++
     fi

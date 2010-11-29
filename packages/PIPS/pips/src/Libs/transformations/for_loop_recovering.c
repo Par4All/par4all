@@ -228,7 +228,7 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 	     "whileloop of the instruction: %p\n", wl, i,
 	     instruction_whileloop(i));
   if ((statement_instruction(wls) != i) || (instruction_whileloop(i) != wl))
-    pips_internal_error("Cannot get the enclosing statement of the while-loop.\n");
+    pips_internal_error("Cannot get the enclosing statement of the while-loop.");
 
   /* If it is a "do { } while()" do nothing: */
   if (evaluation_after_p(whileloop_evaluation(wl)))

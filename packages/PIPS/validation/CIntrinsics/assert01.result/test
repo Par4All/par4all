@@ -14,23 +14,23 @@ int main()
 
 Cumulated effetcs for "assert01"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
 int main()
 {
    FILE *datafile;
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be written>: datafile
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: datafile
    datafile = fopen("file.dat", "r");
-//               <must be read   >: datafile
+//             <    is read   >: datafile
    datafile?(void) 0:__assert_fail("datafile", "./assert01.c", 10, (const char *) 0);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
 
    fclose(datafile);
 

@@ -25,16 +25,16 @@ Proper effects for "env04"
 
 void env04()
 {
-//               <must be declared>: mile
+//             <    is declared>: mile
    typedef int mile;
-//               <must be referenced>: mile
-//               <must be declared>: km
+//             <    is referenced>: mile
+//             <    is declared>: km
    typedef mile km;
-//               <must be referenced>: km
-//               <must be declared>: j
+//             <    is referenced>: km
+//             <    is declared>: j
    km j;
-//               <must be written>: j
-//               <must be referenced>: km j
+//             <    is written>: j
+//             <    is referenced>: j km
 
    j = (km) 1;
 }
@@ -43,16 +43,16 @@ Cumulated effects for "env04"
 
 void env04()
 {
-//               <must be declared>: mile
+//             <    is declared>: mile
    typedef int mile;
-//               <must be referenced>: mile
-//               <must be declared>: km
+//             <    is referenced>: mile
+//             <    is declared>: km
    typedef mile km;
-//               <must be referenced>: km
-//               <must be declared>: j
+//             <    is referenced>: km
+//             <    is declared>: j
    km j;
-//               <must be written>: j
-//               <must be referenced>: km j
+//             <    is written>: j
+//             <    is referenced>: j km
 
    j = (km) 1;
 }

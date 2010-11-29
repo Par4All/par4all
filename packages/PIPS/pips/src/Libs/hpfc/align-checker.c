@@ -116,7 +116,7 @@ int *pi;
 	break;
     }
     default:
-	pips_internal_error("unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag");
 	break;
     }
     
@@ -172,7 +172,7 @@ int *pi1, *pi2;
 	break;
     }
     default:
-	pips_internal_error("unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag");
 	break;
     }
     
@@ -545,7 +545,7 @@ int *pi;
 	break;
     }
     default:
-	pips_internal_error("unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag");
 	break;
     }
     

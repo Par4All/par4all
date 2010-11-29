@@ -21,10 +21,10 @@ Proper effects for "env01"
 
 void env01()
 {
-//               <must be declared>: j
+//             <    is declared>: j
    int j;
-//               <must be written>: j
-//               <must be referenced>: j
+//             <    is written>: j
+//             <    is referenced>: j
 
    j = 1;
 }
@@ -33,10 +33,10 @@ Cumulated effects for "env01"
 
 void env01()
 {
-//               <must be declared>: j
+//             <    is declared>: j
    int j;
-//               <must be written>: j
-//               <must be referenced>: j
+//             <    is written>: j
+//             <    is referenced>: j
 
    j = 1;
 }

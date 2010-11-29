@@ -839,7 +839,7 @@ static transformer transformer_add_condition_information_updown(
     }
   case is_syntax_range:
     {
-      pips_internal_error("range used as test condition!\n");
+      pips_internal_error("range used as test condition!");
       break;
     }
   case is_syntax_subscript:
@@ -849,7 +849,7 @@ static transformer transformer_add_condition_information_updown(
         break;
     }
   default:
-      pips_internal_error("ill. expr. as test condition\n");
+      pips_internal_error("ill. expr. as test condition");
   }
 
   ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
@@ -1680,6 +1680,11 @@ integer_call_expression_to_transformer(
   if(ENTITY_MIN0_P(f) || ENTITY_MIN_P(f)) {
     tf = min0_to_transformer(e, args, pre, is_internal);
   }
+  else if(ENTITY_C_MIN_P(f)) {
+    args=CDR(args);
+    --arity;
+    tf = min0_to_transformer(e,args,pre,is_internal);
+  }
   else if(ENTITY_MAX0_P(f) || ENTITY_MAX_P(f)) {
     tf = max0_to_transformer(e, args, pre, is_internal);
   }
@@ -1824,7 +1829,7 @@ static transformer logical_constant_to_transformer(entity v,
     ;
   }
   else {
-    pips_internal_error("Unknown logical constant %s\n",
+    pips_internal_error("Unknown logical constant %s",
 	       entity_name(f));
   }
   c = contrainte_make(eq);
@@ -1853,8 +1858,7 @@ static transformer logical_unary_operation_to_transformer(entity v,
     vect_add_elem(&eq, TCST , VALUE_MONE);
   }
   else {
-    pips_error("logical_constant_to_transformer",
-	       "Unknown logical constant %s\n",
+    pips_internal_error("Unknown logical constant %s",
 	       entity_name(op));
   }
   tf = transformer_equality_add(tf, eq);
@@ -1939,7 +1943,7 @@ static transformer logical_binary_operation_to_transformer(entity v,
       vect_add_elem(&eq2, TCST , VALUE_MONE+VALUE_MONE);
     }
     else {
-      pips_internal_error("Unexpected binary logical operator %s\n",
+      pips_internal_error("Unexpected binary logical operator %s",
 			  entity_name(op));
     }
     tf = transformer_inequality_add(tf, eq1);
@@ -2052,7 +2056,7 @@ transformer logical_expression_to_transformer(entity v,
       tf = logical_binary_function_to_transformer(v, syntax_call(srhs), pre, is_internal);
       break;
     default:
-      pips_internal_error("Too many logical arguments, %d, for operator %s\n",
+      pips_internal_error("Too many logical arguments, %d, for operator %s",
 			  gen_length(call_arguments(syntax_call(srhs))),
 			  entity_name(call_function(syntax_call(srhs))));
     }
@@ -2062,10 +2066,10 @@ transformer logical_expression_to_transformer(entity v,
 					  is_internal);
     break;
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
   return tf;
 }
@@ -2090,7 +2094,7 @@ transformer string_expression_to_transformer(entity v,
     case 3:
       break;
     default:
-      pips_internal_error("Too many arguments, %d, for operator %s\n",
+      pips_internal_error("Too many arguments, %d, for operator %s",
 			  gen_length(call_arguments(syntax_call(srhs))),
 			  entity_name(call_function(syntax_call(srhs))));
     }
@@ -2120,10 +2124,10 @@ transformer string_expression_to_transformer(entity v,
     break;
     }
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
 
   return tf;
@@ -2177,6 +2181,11 @@ float_call_expression_to_transformer(
   int arity = gen_length(args);
 
   if(ENTITY_AMIN1_P(op)||ENTITY_DMIN1_P(op)||ENTITY_MIN_P(op)) {
+    tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
+  }
+  if(ENTITY_C_MIN_P(op)) {
+    args=CDR(args);
+    --arity;
     tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
   }
   else if(ENTITY_AMAX1_P(op)||ENTITY_DMAX1_P(op)||ENTITY_MAX_P(op)) {
@@ -2240,10 +2249,10 @@ transformer float_expression_to_transformer(entity v,
       break;
     }
   case is_syntax_range:
-    pips_internal_error("Unexpected tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
   default:
-    pips_internal_error("Illegal tag %d\n", syntax_tag(srhs));
+    pips_internal_error("Illegal tag %d", syntax_tag(srhs));
   }
 
   return tf;
@@ -2356,7 +2365,7 @@ transformer transformer_add_any_relation_information(
 	break;
       }
     case is_basic_overloaded:
-      pips_internal_error("illegal overloaded type for operator %s\n",
+      pips_internal_error("illegal overloaded type for operator %s",
 		 entity_name(op));
       break;
     case is_basic_bit:
@@ -2371,11 +2380,11 @@ transformer transformer_add_any_relation_information(
       /* Nothing to be done wit hsturct and union */
       break;
     case is_basic_typedef:
-      pips_internal_error("typedef should ne converted to concrete types for operator %s\n",
+      pips_internal_error("typedef should ne converted to concrete types for operator %s",
 			entity_name(op));
       break;
     default:
-      pips_internal_error("unknown basic b=%d\n", basic_tag(b1));
+      pips_internal_error("unknown basic b=%d", basic_tag(b1));
     }
   }
 
@@ -2498,7 +2507,7 @@ transformer any_expression_to_transformer(
       if(expression_call_p(expr) && ENTITY_CONTINUE_P(call_function(expression_call(expr))))
 	tf = transformer_identity();
       else
-	pips_internal_error("illegal overloaded type for an expression\n");
+	pips_internal_error("illegal overloaded type for an expression");
       break;
     }
     case is_basic_derived: {
@@ -2509,15 +2518,15 @@ transformer any_expression_to_transformer(
 	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
       }
       else {
-      pips_internal_error("entities of type \"derived\" that are not \"enum\" cannot be analyzed\n");
+      pips_internal_error("entities of type \"derived\" that are not \"enum\" cannot be analyzed");
       }
       break;
     }
     case is_basic_typedef:
-      pips_internal_error("entities of type \"typedef\" cannot be analyzed\n");
+      pips_internal_error("entities of type \"typedef\" cannot be analyzed");
       break;
     default:
-      pips_internal_error("unknown basic b=%d\n", basic_tag(be));
+      pips_internal_error("unknown basic b=%d", basic_tag(be));
     }
   }
   else {
@@ -2609,7 +2618,7 @@ transformer expression_to_transformer(
     }
     else {
       /* Wait till it happpens... */
-      pips_internal_error("This case is not handled yet\n");
+      pips_internal_error("This case is not handled yet");
     }
   }
   else if(analyzable_type_p(et)) {
@@ -2915,7 +2924,7 @@ transformer any_expressions_to_transformer(entity v,
   return tf;
 }
 
-/* compute integer bounds @p pmax, @p pmin of expression @p exp under precondtions @p tr
+/* compute integer bounds @p pmax, @p pmin of expression @p exp under preconditions @p tr
  * require value mappings set !
  */
 bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* pmin, intptr_t* pmax)
@@ -2947,6 +2956,53 @@ bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* 
     free_transformer(var_tr);
     free_entity(var);
     return success;
+}
+/* tries hard to simplify expression @p e if it is a min or a max
+ * operator, by evaluating it under preconditions @p tr.
+ * Two approaches are tested:
+ * check bounds of lhs-rhs,
+ * or compare bounds of lhs and rhs
+ */
+void simplify_minmax_expression(expression e,transformer tr)
+{
+    if(expression_minmax_p(e)) {
+        call c =expression_call(e);
+        bool is_max = ENTITY_MAX_P(call_function(c));
+
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        expression diff = make_op_exp(
+                MINUS_OPERATOR_NAME,
+                copy_expression(lhs),
+                copy_expression(rhs)
+                );
+        intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound,diff_lbound,diff_ubound;
+        if(precondition_minmax_of_expression(diff,tr,&diff_lbound,&diff_ubound) &&
+            (diff_lbound>=0 || diff_ubound<=0)) {
+            if(is_max) {
+                if(diff_lbound>=0) local_assign_expression(e,lhs);
+                else local_assign_expression(e,rhs);
+            }
+            else {
+                if(diff_lbound>=0) local_assign_expression(e,rhs);
+                else local_assign_expression(e,lhs);
+            }
+        }
+        else if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
+                precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
+        {
+            if(is_max)
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
+            }
+            else
+            {
+                if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
+                else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
+            }
+        }
+    }
 }
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)

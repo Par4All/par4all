@@ -223,7 +223,7 @@ char * s;
 
 #else
 
- pips_internal_error("not adgyy{in,parse} compiled in (HAS_ADGYY undef)\n");
+ pips_internal_error("not adgyy{in,parse} compiled in (HAS_ADGYY undef)");
 
 #endif
 
@@ -374,7 +374,7 @@ char * s_ins;
 void new_df_trans_exp()
 {
  if(crt_exp == expression_undefined)
-    pips_error("new_df_trans_exp", "current expression is undefined");
+    pips_internal_error("current expression is undefined");
 
  trans_l = gen_nconc(trans_l, CONS(EXPRESSION, crt_exp, NIL));
  crt_exp = expression_undefined;
@@ -455,7 +455,7 @@ int option;
  if(option == POSITIVE)
    {
     if(crt_exp == expression_undefined)
-       pips_error("save_pred", "current expression is undefined");
+       pips_internal_error("current expression is undefined");
 
     /* "A >= 0" becomes "-A <= 0"*/
     pred_l = CONS(EXPRESSION, negate_expression(crt_exp), pred_l);

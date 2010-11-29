@@ -257,6 +257,7 @@ void
 alphablending (float result[50000], float src[50000], float dest[50000],
 	       float alpha)
 {
+  static const int size = 50000;
   v4sf vec110;
   v4sf vec100;
   v4sf vec80;
@@ -269,7 +270,6 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   v4sf vec10;
   v4sf vec00;
   int lu_ind00;
-  static const int size = 50000;
 
   pdata3[3] = 1;
   pdata3[2] = 1;

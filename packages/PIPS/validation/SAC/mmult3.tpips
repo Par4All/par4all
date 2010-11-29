@@ -1,5 +1,5 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS="mmult"
+setenv WS="mmult3"
 delete $WS
 setenv PIPS_CPP_FLAGS="-DN=3"
 create $WS $WS.c include/SIMD.c

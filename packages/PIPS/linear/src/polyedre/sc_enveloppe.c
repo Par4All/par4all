@@ -448,3 +448,23 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
   
   return sc;
 }
+
+/* take the rectangular bounding box of the systeme @p sc,
+ * by projecting each constraint of the systeme against each of the basis
+ * in @p pb
+ *
+ * SG: this is basically a renaming of sc_projection_on_variables ...
+ */
+Psysteme sc_rectangular_hull(Psysteme sc, Pbase pb) {
+    volatile Psysteme rectangular = SC_UNDEFINED;
+    rectangular = sc_projection_on_variables(sc,pb,pb);
+    CATCH(overflow_error) {
+        ;
+        // it does not matter if we fail ...
+    }
+    TRY {
+        sc_nredund(&rectangular);
+        UNCATCH(overflow_error);
+    }
+    return rectangular;
+}

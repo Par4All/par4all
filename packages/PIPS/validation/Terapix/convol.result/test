@@ -107,13 +107,10 @@ void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l99994:
          for(j = 1; j <= 510; j += 1) {
             int ki, kj;
             new_image[i_1][j] = 0.;
-l99995:
             for(ki = 0; ki <= 2; ki += 1)
-l99996:
                for(kj = 0; kj <= 2; kj += 1)
                   
                   
@@ -136,13 +133,10 @@ void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l99994:
          for(j = 1; j <= 510; j += 1) {
             int ki, kj;
             __scalar__0 = 0.;
-l99995:
             for(ki = 0; ki <= 2; ki += 1)
-l99996:
                for(kj = 0; kj <= 2; kj += 1)
                   
                   
@@ -166,13 +160,10 @@ void microcode(int isi, int isj, int i, float image[isi*isj], float kernel[9], f
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l99994:
          for(j = 1; j <= 510; j += 1) {
             int ki, kj;
             __scalar__0 = 0.;
-l99995:
             for(ki = 0; ki <= 2; ki += 1)
-l99996:
                for(kj = 0; kj <= 2; kj += 1)
                   
                   

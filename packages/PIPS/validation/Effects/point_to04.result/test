@@ -26,15 +26,15 @@ void point_to04()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <must be read   >: p p[0][.a]
-//               <must be written>: p[0][.d]
+//             <    is read   >: p p[0].a
+//             <    is written>: p[0].d
 
    p->d = p->a;
-//               <must be read   >: p
-//               <must be written>: p[0][.d] p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a p[0].d
    p->d = p->a = 4;
 }
 
@@ -48,15 +48,15 @@ void point_to04()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <must be read   >: p p[0][.a]
-//               <must be written>: p[0][.d]
+//             <    is read   >: p p[0].a
+//             <    is written>: p[0].d
 
    p->d = p->a;
-//               <must be read   >: p
-//               <must be written>: p[0][.d] p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a p[0].d
    p->d = p->a = 4;
 }
 
@@ -70,22 +70,22 @@ void point_to04()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    p->d = p->a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    p->d = p->a = 4;
 }
 
 Cumulated effects for "point_to04"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void point_to04()
 {
    struct s {
@@ -94,14 +94,14 @@ void point_to04()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    p->d = p->a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    p->d = p->a = 4;
 }

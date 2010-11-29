@@ -124,17 +124,17 @@ int main(int argc, char **argv)
    printf(">>>> %d <<<<\n", n);
    alpha = 0.7;
    do {
-      if (posix_memalign((void **) &src1, 32, n*sizeof(float))) 
+      if (posix_memalign((void **) &src1, 32, n*sizeof(float)))
          return 3;
    }
    while (0);
    do {
-      if (posix_memalign((void **) &src2, 32, n*sizeof(float))) 
+      if (posix_memalign((void **) &src2, 32, n*sizeof(float)))
          return 3;
    }
    while (0);
    do {
-      if (posix_memalign((void **) &result, 32, n*sizeof(float))) 
+      if (posix_memalign((void **) &result, 32, n*sizeof(float)))
          return 3;
    }
    while (0);

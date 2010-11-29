@@ -5,7 +5,7 @@ import sys, os, shutil
 
 from pyps import workspace
 
-with workspace("effects.c", name="effects") as ws:
+with workspace("effects.c", name="effects",deleteOnClose=True) as ws:
 	ws.props.ABORT_ON_USER_ERROR = True
 
 	print "cumulated effects on only one function"

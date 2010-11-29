@@ -17,7 +17,7 @@ int suppress_dead_code03(int i)
 
 Code with cumulated effects for "suppress_dead_code03"
 
-//               <must be read   >: i
+//             <    is read   >: i
 int suppress_dead_code03(int i)
 {
 // (0,2)
@@ -25,10 +25,10 @@ int suppress_dead_code03(int i)
 // (0,3)
 
    foo(1);                                                              /*0014*/
-//               <must be written>: k
+//             <    is written>: k
 // (0,4)
    k = 3;                                                               /*0015*/
-//               <must be read   >: i
+//             <    is read   >: i
 // (0,5)
 
    return i;                                                            /*0017*/

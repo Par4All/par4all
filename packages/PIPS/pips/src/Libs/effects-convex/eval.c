@@ -103,10 +103,10 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	  */
 	  region reg1 = make_effect(make_cell(is_cell_reference, r1),
 				    make_action_write_memory(),
-				    make_approximation_must(), d1);
+				    make_approximation_exact(), d1);
 	  region reg2 = make_effect(make_cell(is_cell_reference, r2),
 				    make_action_write_memory(),
-				    make_approximation_must(), d2);
+				    make_approximation_exact(), d2);
 
 	  pips_debug_effect(6, "reg1 = \n", reg1);
 	  pips_debug_effect(6, "reg2 = \n", reg1);
@@ -179,7 +179,7 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
 
   effect reg = make_effect(make_cell_reference(make_reference(reference_variable(ref), NIL)),
 			   make_action_write_memory(),
-			   make_approximation_must(),
+			   make_approximation_exact(),
 			   make_descriptor_convex(sc_new()));
 
   FOREACH(EXPRESSION, exp, reference_indices(ref))

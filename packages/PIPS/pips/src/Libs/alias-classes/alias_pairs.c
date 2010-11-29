@@ -208,7 +208,7 @@ approx_convert(region reg)
     }
     else
     {
-	if ( effect_exact_p(reg) || effect_must_p(reg) )
+	if ( effect_exact_p(reg) || effect_exact_p(reg) )
 	    new_reg = convert_exact_to_exact_may(reg);
 	else
 	  {

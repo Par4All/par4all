@@ -1,5 +1,5 @@
 from pyps import *
-with workspace(["detect_red06.c"]) as ws:
+with workspace(["detect_red06.c"],deleteOnClose=True) as ws:
 	m=ws.fun.main
 	m.simd_atomizer()
 	m.display()

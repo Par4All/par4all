@@ -1,15 +1,15 @@
       PROGRAM PAUSE01
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
 C     Check effects for PAUSE so that it is not removed as dead code!
 
       PRINT *, "I'm going to pause!"                                    0005
-C               <must be read   >: __IO_EFFECTS:LUNS(0)
-C               <must be written>: __IO_EFFECTS:LUNS(0)
+C             <    is read   >: __IO_EFFECTS:LUNS(0)
+C             <    is written>: __IO_EFFECTS:LUNS(0)
       PAUSE                                                             0006
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, "I'm done!"                                              0007
 
       END

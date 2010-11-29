@@ -1123,7 +1123,7 @@ bool print_xml_code_with_explicit_motif(string module_name)
 
   if(statement_undefined_p(stat))
     {
-      pips_internal_error("No statement for module %s\n", module_name);
+      pips_internal_error("No statement for module %s", module_name);
     }
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -1866,7 +1866,7 @@ bool print_xml_code(string module_name)
 
   if(statement_undefined_p(stat))
     {
-      pips_internal_error("No statement for module %s\n", module_name);
+      pips_internal_error("No statement for module %s", module_name);
     }
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -3686,7 +3686,7 @@ bool print_xml_application(string module_name)
   set_current_module_entity(module);
   set_current_module_statement(stat);
   if(statement_undefined_p(stat)) {
-      pips_internal_error("No statement for module %s\n", module_name);
+      pips_internal_error("No statement for module %s", module_name);
     }
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS,
@@ -3725,7 +3725,7 @@ bool print_xml_application(string module_name)
       break;
     }
     default:
-      pips_internal_error("unexpected kind of code for xml_prettyprinter\n");
+      pips_internal_error("unexpected kind of code for xml_prettyprinter");
     }
 
   pips_debug(1, "End Xml prettyprinter for %s\n", module_name);

@@ -8,8 +8,8 @@ int struct04()
       int second;
    } x;
    int y[10];
-//               <must be read   >: x[.second]
-//               <must be written>: x[.first]
+//             <    is read   >: x.second
+//             <    is written>: x.first
    
    //  x.first = 1;
    //x.second = 2;

@@ -22,7 +22,7 @@ int main()
 
 //  T(j) {}
 
-      while (k*k>1) 
+      while (k*k>1)
 
 //  T(j) {j==1}
 
@@ -63,7 +63,7 @@ int main()
 
 //  P(i,j,k) {1<=j, j<=2}
 
-      while (k*k>1) 
+      while (k*k>1)
 
 //  P(i,j,k) {1<=j, j<=2}
 

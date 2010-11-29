@@ -201,14 +201,14 @@ propagate(statement s) {
     }
     case is_instruction_multitest:
     {
-      pips_internal_error("Not implemented yet\n"); /* FI: undone by the controlizer? */
+      pips_internal_error("Not implemented yet"); /* FI: undone by the controlizer? */
       break;
     }
     case is_instruction_goto:
-	pips_internal_error("GOTO should have been eliminated by the controlizer\n");
+	pips_internal_error("GOTO should have been eliminated by the controlizer");
 	break;
     default:
-	pips_internal_error("unexpected instruction tag\n");
+	pips_internal_error("unexpected instruction tag");
     }
 
     pips_debug(1, "Continued for statement %p = %d\n", s, continued);

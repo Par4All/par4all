@@ -1,0 +1,39 @@
+int main()
+{
+
+// Pointer values: none
+
+   int i = 0;
+
+// Pointer values: none
+
+   int *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = (int *) malloc(10*sizeof(int));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+
+   do {
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+
+      p[i] = i;
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+
+      i++;
+   }
+   while (i<10);
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+
+   return 0;
+}

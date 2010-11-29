@@ -7,45 +7,42 @@ int main()
 
    a = b = 1;
    c = 0;
-   if (a^c) 
+   if (a^c)
       printf("a=%d  xor  c=%d = True", a, c);
 
-   if (!c) 
+   if (!c)
       printf("\nc=False \n");
 }
 
 Cumulated effetcs for "macrotest"
 
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 int main()
 {
    int a, b, c;
-//               <must be written>: a b
+//             <    is written>: a b
 
    a = b = 1;
-//               <must be written>: c
+//             <    is written>: c
    c = 0;
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: a c
-   if (a^c) 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a c
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: a c
+   if (a^c)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a c stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("a=%d  xor  c=%d = True", a, c);
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: c
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: c
 
-   if (!c) 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+   if (!c)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nc=False \n");
 }

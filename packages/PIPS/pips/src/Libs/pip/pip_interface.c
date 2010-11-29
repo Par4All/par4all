@@ -140,7 +140,7 @@ int i;
 		else ecrit_coeff2( N/d );
 	    }
 	    /* Should not be called here */
-	    else{ pips_error( "integer_sol_edit", "Division 1 in newparm\n");
+	    else{ pips_internal_error("Division 1 in newparm");
 	      }
 	}
 	i++; p++;
@@ -153,7 +153,7 @@ int i;
 	}
 	/* Should not happen here */
 	else{
-	    pips_error( "integer_sol_edit", "Division 2 in newparm\n");
+	    pips_internal_error("Division 2 in newparm");
 	  }
 	i++; p++;
 
@@ -180,7 +180,7 @@ int i;
 		ecrit_coeff1( N/d );
 	    }
 	    /* Should not be called here */
-	    else{ pips_error( "integer_sol_edit", "Division 3 in newparm\n");
+	    else{ pips_internal_error("Division 3 in newparm");
 	      }
 	}
 
@@ -220,8 +220,7 @@ int i;
 		}
 		/* Should not happen here */
 		else{
-		    pips_error( "integer_sol_edit", 
-			       "Division 4 in newparm\n");
+		    pips_internal_error("Division 4 in newparm");
 		  }
 	    }
 	    ecrit_liste_vecteur();
@@ -239,18 +238,18 @@ int i;
 	i++; break;
 
 	/* This should not happen any more */
-    case Form: pips_error("integer_sol_edit", "Form case call\n");
+    case Form: pips_internal_error("Form case call");
 	break;
 
 	/* This case should not happen any more */
-    case Div: 	pips_error("integer_sol_edit", "Div case call\n");
+    case Div: 	pips_internal_error("Div case call");
 	break;
 
 	/* This case should not happen any more */
-    case Val:  pips_error("integer_sol_edit", "Val case call\n");
+    case Val:  pips_internal_error("Val case call");
 	break;
 
-    default  : pips_error("integer_sol_edit", "Undefined kind of quast \n");
+    default  : pips_internal_error("Undefined kind of quast ");
     }
 	
     return(i);
@@ -278,8 +277,7 @@ int i;
 
      /* We have a newparm */
      case New: 
-		pips_error("rational_sol_edit", 
-				"There is a new parameter for a rational compute !\n");
+		pips_internal_error("There is a new parameter for a rational compute !");
 		break;
 
 
@@ -396,19 +394,19 @@ int i;
 
 
      /* This should not happen any more */
-     case Form: pips_error("rational_sol_edit", "Form case call\n");
+     case Form: pips_internal_error("Form case call");
 		break;
 
      /* This case should not happen any more */
-     case Div: 	pips_error("rational_sol_edit", "Div case call\n");
+     case Div: 	pips_internal_error("Div case call");
 		break;
 
      /* This case should not happen any more */
-     case Val:  pips_error("rational_sol_edit", "Val case call\n");
+     case Val:  pips_internal_error("Val case call");
 		break;
 
 
-     default: pips_error("rational_sol_edit", "Undefined kind of quast \n");
+     default: pips_internal_error("Undefined kind of quast ");
 
 	}
 	
@@ -455,7 +453,7 @@ int i;
 			else ecrit_coeff2( N/d );
                     }
 		    /* Should not be called here */
-                    else{ pips_error( "new_sol_edit", "Division 1 in newparm\n");
+                    else{ pips_internal_error("Division 1 in newparm");
 		    }
                 }
                 i++; p++;
@@ -467,7 +465,7 @@ int i;
                 if(d == D){ second_entier =  N/d;
                 }
 		/* Should not happen here */
-                else{ pips_error( "new_sol_edit", "Division 2 in newparm\n");
+                else{ pips_internal_error("Division 2 in newparm");
 		}
                 i++; p++;
 
@@ -498,7 +496,7 @@ int i;
 			ecrit_coeff1( N/d );
 		    }
 		    /* Should not be called here */
-                    else{ pips_error( "new_sol_edit", "Division 3 in newparm\n");
+                    else{ pips_internal_error("Division 3 in newparm");
 		    }
                 }
 
@@ -546,8 +544,7 @@ int i;
 					else ecrit_une_var( N/d );
                        		}
 				/* Should not happen here */
-                    		else{ pips_error( "new_sol_edit", 
-						"Division 4 in newparm\n");
+                    		else{ pips_internal_error("Division 4 in newparm");
 		    		}
                    	}
 			ecrit_liste_vecteur();
@@ -571,19 +568,19 @@ int i;
 
 
      /* This should not happen any more */
-     case Form: pips_error("new_sol_edit", "Form case call\n");
+     case Form: pips_internal_error("Form case call");
                 break;
 
      /* This case should not happen any more */
-     case Div: 	pips_error("new_sol_edit", "Div case call\n");
+     case Div: 	pips_internal_error("Div case call");
                 break;
 
      /* This case should not happen any more */
-     case Val:  pips_error("new_sol_edit", "Val case call\n");
+     case Val:  pips_internal_error("Val case call");
                 break;
 
 
-     default  : pips_error("new_sol_edit", "Undefined kind of quast \n");
+     default  : pips_internal_error("Undefined kind of quast ");
     }
 
 	

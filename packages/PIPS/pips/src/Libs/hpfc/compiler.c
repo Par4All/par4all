@@ -264,7 +264,7 @@ hpf_compile_call(
 		statement sh, sn;
 
 		if (!compile_reduction(stat, &sh, &sn))
-		    pips_internal_error("reduction compilation failed\n");
+		    pips_internal_error("reduction compilation failed");
 
 		lh = CONS(STATEMENT, sh, NIL);
 		ln = CONS(STATEMENT, sn, NIL);
@@ -756,7 +756,7 @@ hpf_compiler(
 	break;
     case is_instruction_goto:
     default:
-	pips_internal_error("unexpected instruction tag\n");
+	pips_internal_error("unexpected instruction tag");
 	break;
     }
 

@@ -114,7 +114,7 @@ static sentence stub_var_decl(parameter p, int n, bool is_fortran)
 							    strdup("..."), NULL)));
   }
   else {
-    pips_internal_error("Unexpected type tag %d.\n", type_tag(t));
+    pips_internal_error("Unexpected type tag %d.", type_tag(t));
   }
   return result;
 }
@@ -293,7 +293,7 @@ static text compilation_unit_text(entity cu, entity module)
       fprintf(stderr, "\n");
     }
 
-    /* Eliminate multiple occurences. The first one must be preserved
+    /* Eliminate multiple occurrences. The first one must be preserved
        to preserve the dependencies. Might be more efficient to CONS
        and then to reverse nsel, or even better to update sel. I keep
        the most intuitive version. */
@@ -354,12 +354,13 @@ static text compilation_unit_text(entity cu, entity module)
 
    Should be checked with different module with the same name... Maybe a
    conflict in WORKSPACE_TMP_SPACE ?
+   if compilation_unit_name is set to string_undefined, a new compilation unit is generated
 */
 bool
 add_new_module_from_text(string module_name,
 			 text code_text,
 			 bool is_fortran,
-					    string compilation_unit_name) {
+			 string compilation_unit_name) {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
@@ -385,13 +386,18 @@ add_new_module_from_text(string module_name,
       set_prettyprint_language_tag(is_language_c);
     }
 
-    // Build the coresponding compilation unit for C code
+    // Build the corresponding compilation unit for C code
     if(string_undefined_p(compilation_unit_name) ) {
       // Function defined in pipsmake
       cun = compilation_unit_of_module(module_name);
 
       if(string_undefined_p(cun)) {
-          cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
+          int count = 0;
+          asprintf(&cun,"%s" FILE_SEP_STRING, module_name);
+          while(!entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun))) {
+              free(cun);
+              asprintf(&cun,"%s%d" FILE_SEP_STRING, module_name, count ++);
+          }
           cu = MakeCompilationUnitEntity(cun);
       }
     }

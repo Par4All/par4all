@@ -11,7 +11,7 @@ int main()
       P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *a0);
 
 
-      myKernel((*a0), (*b0));
+      myKernel(*a0, *b0);
       P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &b[0], *b0);
       P4A_accel_free(a0);
       P4A_accel_free(b0);

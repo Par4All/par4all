@@ -154,13 +154,12 @@ bool assignment_block_or_statement_p(statement s)
     case is_instruction_whileloop:
 	break;
     case is_instruction_goto:
-	pips_error("assignment_block_p", "unexpected GO TO\n");
+	pips_internal_error("unexpected GO TO");
     case is_instruction_call:
 	return assignment_statement_p(s);
     case is_instruction_unstructured:
 	break;
-    default: pips_error("assignment_block_or_statement_p",
-			"ill. instruction tag %d\n", instruction_tag(i));
+    default: pips_internal_error("ill. instruction tag %d", instruction_tag(i));
     }
     return FALSE;
 }
@@ -1890,7 +1889,7 @@ statement_to_label(statement s)
     case is_instruction_expression:
       break;
     default:
-      pips_error("statement_to_label", "Ill. tag %d for instruction",
+      pips_internal_error("Ill. tag %d for instruction",
 		  instruction_tag(i));
     }
   }
@@ -2009,7 +2008,7 @@ statement_does_return(statement s)
     case is_instruction_expression:
       break;
     default:
-	pips_error("statement_does_return", "Ill. tag %d for instruction",
+	pips_internal_error("Ill. tag %d for instruction",
 		   instruction_tag(i));
     }
 
@@ -2406,7 +2405,7 @@ statement add_declaration_statement(statement s, entity e)
     }
     else
     {
-        pips_internal_error("can only add declarations to statement blocks\n");
+        pips_internal_error("can only add declarations to statement blocks");
     }
 
     ifdebug(8) {
@@ -2426,12 +2425,6 @@ statement remove_declaration_statement(statement s, entity e)
     if(statement_block_p(s)) {
         list sl = statement_block(s); //statement list
         list cl = list_undefined; // current statement list
-        list pl = NIL; // previous statement list
-        list nsl = list_undefined; // new statement list
-        string comment = generated_variable_comment(e);
-        statement ds = make_declaration_statement(e,
-                STATEMENT_NUMBER_UNDEFINED,
-                comment);
 
         /* Look for the last declaration: it is pointed to by pl */
         for(cl=sl; !ENDP(cl); POP(cl)) {
@@ -2460,7 +2453,7 @@ statement remove_declaration_statement(statement s, entity e)
     }
     else
     {
-        pips_internal_error("can only add declarations to statement blocks\n");
+        pips_internal_error("can only add declarations to statement blocks");
     }
 
     ifdebug(8) {
@@ -2674,8 +2667,10 @@ bool add_statement_declarations(statement s, list *statement_to_all_included_dec
   return true;
 }
 
-/* Get a list of all variables declared recursively within a statement */
-list statement_to_declarations(statement s)
+/* Get a list of all variables declared recursively within a statement
+ * works for any newgen type, not only statements
+ */
+list statement_to_declarations(void* s)
 {
   list statement_to_all_included_declarations = NIL;
 
@@ -3402,3 +3397,35 @@ statement last_statement(statement s)
 /* That's all folks */
 
 /** @} */
+
+/* purge a statement from its extensions */
+void statement_remove_extensions(statement s) {
+    extensions ext = statement_extensions(s);
+    gen_full_free_list(extensions_extension(ext));
+    extensions_extension(ext)=NIL;
+}
+/**
+ * @brief remove the label of a statement if the statement is not
+ * unstructured. labels on fortran loops and Fortran return are also
+ * preserved
+ *
+ * @param s statement considered
+ */
+void statement_remove_useless_label(statement s)
+{
+  instruction i = statement_instruction(s);
+  if(!instruction_unstructured_p(i) &&
+        c_module_p(get_current_module_entity())
+     ) {
+    if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
+      /* SG should free_entity ? */
+      statement_label(s)=entity_empty_label();
+
+      /* OK but guarded by previous test */
+      if( instruction_loop_p(i) )
+	loop_label(instruction_loop(i))=entity_empty_label();
+      if( instruction_whileloop_p(i) )
+	whileloop_label(instruction_whileloop(i))=entity_empty_label();
+    }
+  }
+}

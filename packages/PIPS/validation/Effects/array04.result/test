@@ -13,47 +13,47 @@ int main()
 
    int (*r)[100][10][3];                                                /*0015*/
    int (*ru)[10][3];                                                    /*0016*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
-//               <must be written>: p
+//             <    is written>: p
 
    p = &t[1][2];                                                        /*0023*/
-//               <must be written>: pu
+//             <    is written>: pu
    pu = t[1][2];                                                        /*0024*/
-//               <must be written>: pu
+//             <    is written>: pu
    pu = &t[1][2][0];                                                    /*0025*/
-//               <must be written>: q
+//             <    is written>: q
 
    q = &t[1];                                                           /*0027*/
-//               <must be written>: qu
+//             <    is written>: qu
    qu = t[1];                                                           /*0028*/
-//               <must be written>: qu
+//             <    is written>: qu
    qu = &t[1][0];                                                       /*0029*/
-//               <must be written>: r
+//             <    is written>: r
 
    r = &t;                                                              /*0031*/
-//               <must be written>: ru
+//             <    is written>: ru
    ru = t;                                                              /*0032*/
-//               <must be written>: ru
+//             <    is written>: ru
    ru = &t[0];                                                          /*0033*/
    return 0;                                                            /*0034*/
 }

@@ -786,6 +786,7 @@
 #define C_CLOSE_FUNCTION_NAME           "close"
 #define C_READ_FUNCTION_NAME            "read"
 #define C_WRITE_FUNCTION_NAME           "write"
+#define USLEEP_FUNCTION_NAME            "usleep"
 
 /*#include<stdio.h> */
 
@@ -949,6 +950,7 @@
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME              "time"
 #define DIFFTIME_FUNCTION_NAME          "difftime"
+#define NANOSLEEP_FUNCTION_NAME         "nanosleep"
 
 
 /* #include <wchar.h> */
@@ -1172,6 +1174,7 @@
 #define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
 #define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
 #define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)
+#define ENTITY_C_MIN_P(e) entity_an_operator_p(e,PIPS_C_MIN)
 #define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
 #define ENTITY_MIN0_P(e) entity_an_operator_p(e, MIN0)
 #define ENTITY_MAX0_P(e) entity_an_operator_p(e, MAX0)
@@ -1608,6 +1611,9 @@
 /* implemented as a macro to allow lhs */
 #define module_language(e)\
     code_language(value_code(entity_initial((e))))
+
+#define module_functional_parameters(func) \
+        functional_parameters(type_functional(entity_type(func)))
 
 #define call_intrinsic_p(C)                       \
   value_intrinsic_p(entity_initial(call_function(C)))

@@ -6,147 +6,147 @@ int main()
    my_list l1, l2, l3, l4;
 
 // Pointer values:
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    my_list *l;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    l1.n = 1;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l2.n = 2;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l3.n = 3;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l4.n = 4;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l1.next = &l2;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == &l2 (exact);
-// l2[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == &l2 (exact);
+// l2.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l2.next = (my_list) NULL;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l3.next = (my_list) NULL;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*UNDEFINED* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
    l4.next = (my_list) NULL;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
 
    l = &l1;
 
 // Pointer values:
 // l == &l1 (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
    l = l->next;
 
 // Pointer values:
-// l == l1[.next] (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l == l1.next (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
    *l = l3;
 
 // Pointer values:
-// l == l1[.next] (exact);
-// l[0][.next] == l3[.next] (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == l3[.next] (exact);
-// l2[.next] == l3[.next] (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l == l1.next (exact);
+// l[0].next == l3.next (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == l3.next (exact);
+// l2.next == l3.next (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
    l = &l4;
 
 // Pointer values:
 // l == &l4 (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == l3[.next] (exact);
-// l2[.next] == l3[.next] (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == l3.next (exact);
+// l2.next == l3.next (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
    l3.next = (my_list) NULL;
 
 // Pointer values:
 // l == &l4 (exact);
-// l1[.next] == &l2 (exact);
-// l1[.next][0][.next] == *ANY_MODULE*:*NULL* (exact);
-// l2[.next] == *ANY_MODULE*:*NULL* (exact);
-// l3[.next] == *ANY_MODULE*:*NULL* (exact);
-// l4[.next] == *ANY_MODULE*:*NULL* (exact);
+// l1.next == &l2 (exact);
+// l1.next[0].next == *ANY_MODULE*:*NULL* (exact);
+// l2.next == *ANY_MODULE*:*NULL* (exact);
+// l3.next == *ANY_MODULE*:*NULL* (exact);
+// l4.next == *ANY_MODULE*:*NULL* (exact);
 
    return 0;
 }

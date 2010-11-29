@@ -6,10 +6,11 @@ int main() {
    b = &c;
  
    while(c > 0){
-     
-     a= b;
+     a = b;
      b = &d;
    }
+
    b = &c;
+
   return 0;
 }

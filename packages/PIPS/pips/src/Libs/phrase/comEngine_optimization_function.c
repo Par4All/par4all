@@ -40,13 +40,6 @@
 
 #include "text-util.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
@@ -60,7 +53,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 #include "comEngine.h"
-#include "hpfc.h"
 #include "phrase.h"
 
 hash_table gLoopToOpt;
@@ -126,7 +118,7 @@ static void opt_loop_interchange_fill_lists(statement stat)
       }
     default:
       {
-	pips_error("opt_loop_interchange_fill_lists", "impossible");
+	pips_internal_error("impossible");
 	break;
       }
     }
@@ -215,7 +207,7 @@ static void move_statements(statement stat, entity ind,
       }
     default:
       {
-	pips_error("move_statements", "impossible");
+	pips_internal_error("impossible");
 	break;
       }
     }

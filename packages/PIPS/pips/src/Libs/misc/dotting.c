@@ -95,7 +95,7 @@ start_dotting(FILE * dotting_file,
    va_end(args);
 /*
   if((int) signal(SIGALRM, print_dot)==-1) {
-  pips_error("start_dotting", "signal error\n");
+  pips_internal_error("signal error");
   exit(1);
   }
   alarm(1);

@@ -13,7 +13,7 @@ unsigned char character01(unsigned char c)
 
 //  T(c) {c#init<=c, c<=c#init+1}
 
-   if (c=='#') 
+   if (c=='#')
 
 //  T(c) {c==36, c#init==35}
 
@@ -40,7 +40,7 @@ unsigned char character01(unsigned char c)
 
 //  P() {}
 
-   if (c=='#') 
+   if (c=='#')
 
 //  P() {c==35}
 

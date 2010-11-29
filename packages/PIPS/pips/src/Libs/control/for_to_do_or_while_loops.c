@@ -383,9 +383,9 @@ expression guess_loop_increment_walker(expression e, entity loop_index, statemen
                             expression rhs_rhs = EXPRESSION(CAR(rhs_args));
                             expression rhs_lhs = EXPRESSION(CAR(CDR(rhs_args)));
                             if( (expression_reference_p(rhs_rhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_rhs)))
-                                    && (!guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_lhs))))) ||
+                                    && (!( expression_reference_p(rhs_lhs) && guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_lhs)))))) ||
                                 (expression_reference_p(rhs_lhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_lhs)))
-                                    && (!guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_rhs)))))
+                                    && (!( expression_reference_p(rhs_rhs) && guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_rhs))))))
                               )
                             {
                                 return e;

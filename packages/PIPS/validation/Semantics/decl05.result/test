@@ -23,12 +23,12 @@ Cumulated effects for "decl05"
 
 void decl05()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    int j = i+1;
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);
 }

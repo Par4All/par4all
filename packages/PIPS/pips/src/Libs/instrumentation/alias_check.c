@@ -615,7 +615,7 @@ static bool dynamic_alias_check_flt(statement s, alias_context_p context)
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		list l_inds = reference_indices(r);
 		expression subval = subscript_value_stride(context->first_entity,l_inds);
@@ -666,7 +666,7 @@ static bool alias_check_scalar_variable_in_module_flt(statement s,
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		insert_test_before_statement(context->flags,context->condition,s,
 					     context->first_entity,context->second_entity,
@@ -709,7 +709,7 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
@@ -785,7 +785,7 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
@@ -1201,7 +1201,7 @@ static bool alias_check_scalar_variable_in_caller_flt(statement s,alias_context_
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		insert_test_before_statement(context->flags,make_true_expression(),s,
 					     context->first_entity,context->second_entity,
@@ -1243,7 +1243,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
@@ -1342,7 +1342,7 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 	if (same_entity_p(e,context->first_entity))
 	  {
 	    approximation rw = effect_approximation(eff);
-	    if (approximation_must_p(rw))
+	    if (approximation_exact_p(rw))
 	      {
 
 		/*TREATED ? CASE READ *,ARRAY */

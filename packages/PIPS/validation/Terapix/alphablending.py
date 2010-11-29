@@ -41,7 +41,7 @@ def microcode_normalizer(ws,module):
 	module.display()
 
 if __name__ == "__main__":
-	w = workspace(["alphablending.c", "include/par4all.c", "include/terasm.c"], cppflags="-I.")
+	w = workspace(["alphablending.c", "include/terapix_runtime.c", "include/terasm.c"], cppflags="-I.", deleteOnClose=True)
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
 	w.props.ARRAY_PRIV_FALSE_DEP_ONLY=False

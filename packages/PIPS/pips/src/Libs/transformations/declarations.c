@@ -78,7 +78,7 @@ static void remove_unread_variable(statement s, entity e)
                     }
                 }
                 else {
-                    pips_internal_error("case unhandled yet\nfell free to contribute :-)\n");
+                    pips_internal_error("case unhandled yet\nfell free to contribute :-)");
                 }
             }
         }

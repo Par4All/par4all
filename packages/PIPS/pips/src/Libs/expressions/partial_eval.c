@@ -194,7 +194,7 @@ effects stmt_to_fx(statement stmt, statement_effects fx_map)
 bool entity_written_p(entity ent, effects fx)
 {
   if(fx==effects_undefined)
-    pips_error("entity_written_p", "effects undefined\n");
+    pips_internal_error("effects undefined");
 
   MAPL(ftl, {
       effect ft = EFFECT(CAR(ftl));
@@ -375,12 +375,22 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
     if(sizeofexpression_expression_p(soe)) {
       partial_eval_expression_and_regenerate(&(sizeofexpression_expression(soe)), ps, fx);
     }
+    else if(get_bool_property("EVAL_SIZEOF")) {
+        type t = sizeofexpression_type(soe);
+        int tms = type_memory_size(t);
+        update_expression_syntax(e,make_syntax_call(
+                    make_call(int_to_entity(tms),NIL)
+                    )
+                );
+    }
     ef = eformat_undefined;
     break;
   }
   case is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
     partial_eval_expression_and_regenerate(&(subscript_array(sub)), ps, fx);
+    for(list iter=subscript_indices(sub);!ENDP(iter);POP(iter))
+        partial_eval_expression_and_regenerate((expression*)REFCAR(iter), ps, fx);
 
     /*
       MAPL(ce, {
@@ -408,7 +418,7 @@ eformat_t partial_eval_syntax(expression e, Psysteme ps, effects fx)
     ef =  eformat_undefined;
     break;
   default:
-    pips_error( "partial_eval_syntax", "case default\n");
+    pips_internal_error("case default");
     abort();
   }
 
@@ -453,7 +463,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 
   if (SC_UNDEFINED_P(ps)) {
     pips_debug(9, "No precondition information\n");
-    pips_error("partial_eval_reference", "Probably corrupted precondition\n");
+    pips_internal_error("Probably corrupted precondition");
     return(eformat_undefined);
   }
 
@@ -650,7 +660,7 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
         ef = eformat_undefined;
     } break;
   default:
-    pips_internal_error("Default case reached.\n");
+    pips_internal_error("Default case reached.");
   }
   return(ef);
 }
@@ -1601,7 +1611,7 @@ void regenerate_call(eformat_t *efp, call ca)
   }
   else {
     /* We are even more in trouble */
-    pips_internal_error("Unexpected case.\n");
+    pips_internal_error("Unexpected case.");
   }
 }
 
@@ -1629,16 +1639,16 @@ expression generate_monome(int coef, expression expr)
  * partial evaluation of expressions in dimensions and of
  * initialization expression.
  */
-static void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
+void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
 {
   type vt = entity_type(v);
   list dl = variable_dimensions(type_variable(vt));
   expression ie = variable_initial_expression(v);
 
   /* See if the dimensions can be simplified */
-  FOREACH(RANGE, r, dl) {
-    partial_eval_expression_and_regenerate(&range_lower(r), pre_sc, fx);
-    partial_eval_expression_and_regenerate(&range_upper(r), pre_sc, fx);
+  FOREACH(DIMENSION, d, dl) {
+    partial_eval_expression_and_regenerate(&dimension_lower(d), pre_sc, fx);
+    partial_eval_expression_and_regenerate(&dimension_upper(d), pre_sc, fx);
   }
 
   /* See if the initialization expression can be simplified */
@@ -1800,7 +1810,7 @@ void partial_eval_statement(statement stmt)
 					   stmt_to_fx(stmt,fx_map));
     break;
   default :
-    pips_internal_error("Bad instruction tag %d\n", instruction_tag(inst));
+    pips_internal_error("Bad instruction tag %d", instruction_tag(inst));
   }
   partial_eval_current_statement=statement_undefined;
 }

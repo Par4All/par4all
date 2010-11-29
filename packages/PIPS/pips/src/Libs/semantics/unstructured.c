@@ -438,8 +438,7 @@ static bool ready_to_be_processed_p(control c,
       ready &= FALSE;
     }
     else {
-      pips_error("ready_to_be_processed_p",
-		 "node pred does not belong to any category: %s",
+      pips_internal_error("node pred does not belong to any category: %s",
 		 statement_identification(control_statement(pred)));
     }
   }, control_predecessors(c));
@@ -884,8 +883,7 @@ static bool process_unreachable_node(control c,
     else if(postcondition_p
 	    && transformer_undefined_p(load_statement_precondition(s))) {
       /* Problem with ELSIP in ARC2D after partial redundancy elimination */
-      /* pips_error("Statement has a postcondition but no precondition:%s",
-	 statement_identification(s)); */
+      /* pips_internal_error(statement_identification(s)); */
       transformer pre = transformer_empty();
       transformer post = statement_to_postcondition(pre, s);
 

@@ -65,7 +65,7 @@ string
 region_sc_to_string(string __attribute__ ((unused)) s,
 		    Psysteme __attribute__ ((unused)) ps)
 {
-    pips_internal_error("implementation dropped\n");
+    pips_internal_error("implementation dropped");
     return string_undefined;
 }
 
@@ -435,50 +435,3 @@ void print_regions_op_statistics(char __attribute__ ((unused)) *mod_name,
 
 
 /***************************************************************** SORTING */
-
-
-/* Compares two effects for sorting. The first criterion is based on names.
- * Local entities come first; then they are sorted according to the
- * lexicographic order of the module name, and inside each module name class,
- * according to the local name lexicographic order. Then for a given
- * entity name, a read effect comes before a write effect. It is assumed
- * that there is only one effect of each type per entity. bc.
- */
-int
-effect_compare(effect *peff1, effect *peff2)
-{
-    entity ent1 = effect_entity(*peff1);
-    entity ent2 = effect_entity(*peff2);
-    int eff1_pos = 0;
-
-    /* same entity case: sort on action */
-    if (same_entity_p(ent1,ent2))
-    {
-	if (effect_read_p(*peff1))
-	    return(-1);
-	else
-	    return(1);
-    }
-
-    /* sort on module name */
-    eff1_pos = strcmp(entity_module_name(ent1), entity_module_name(ent2));
-
-    /* if same module name: sort on entity local name */
-    if (eff1_pos == 0)
-    {
-	eff1_pos = strcmp(entity_user_name(ent1), entity_user_name(ent2));
-    }
-    /* else: current module comes first, others in lexicographic order */
-    else
-    {
-	entity module = get_current_module_entity();
-
-	if (strcmp(module_local_name(module), entity_module_name(ent1)) == 0)
-	    eff1_pos = -1;
-	if (strcmp(module_local_name(module), entity_module_name(ent2)) == 0)
-	    eff1_pos = 1;
-    }
-
-    return(eff1_pos);
-}
-

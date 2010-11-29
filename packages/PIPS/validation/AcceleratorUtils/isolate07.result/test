@@ -71,7 +71,7 @@ void lonesome_cowboy()
    for(i = 1; i <= n-1-1; i += 1)
 isolate:
       for(j = 1; j <= n-1; j += 1)
-         if (j<10&&j>=2) 
+         if (j<10&&j>=2)
             a[i][j] = 1;
    j = 0;
    /* compute trace */
@@ -96,10 +96,11 @@ void lonesome_cowboy()
       //PIPS generated variable
       int (*a0)[1][8] = (int (*)[1][8]) 0;
       P4A_accel_malloc((void **) &a0, sizeof(int)*8);
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 1, 8, i, 2, &a[0][0], *a0);
 
 isolate:
       for(j = 1; j <= n-1; j += 1)
-         if (j<10&&j>=2) 
+         if (j<10&&j>=2)
             (*a0)[i-i][j-2] = 1;
       P4A_copy_from_accel_2d(sizeof(int), n, n, 1, 8, i, 2, &a[0][0], *a0);
       P4A_accel_free(a0);

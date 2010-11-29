@@ -190,11 +190,11 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
 
@@ -217,17 +217,15 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
 
-l99995:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99996:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          dest[j_0*w+i_0] = bytes[j_0*w+i_0];
          current_0 = dest[j_0*w+i_0];
@@ -235,9 +233,7 @@ l99996:
       }
    
    
-l99991:
    for(i_2 = 0; i_2 <= w-1; i_2 += 1)
-l99992:
       for(j_2 = 0; j_2 <= h-1; j_2 += 1) {
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
@@ -247,17 +243,15 @@ l99992:
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
 
-l99995:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99996:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          dest[j_0*w+i_0] = bytes[j_0*w+i_0];
          current_0 = dest[j_0*w+i_0];
@@ -271,17 +265,17 @@ l99996:
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
 
-l99995:
+l99985:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99996:
+l99986:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          ;
          current_0 = bytes[j_0*w+i_0];
@@ -295,17 +289,17 @@ l99996:
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
    //PIPS generated variable
-  w=1024, h=1024, max=255
- int I_0, I_1, I_2, I_3;
-   //PIPS generated variable
+   int I_0, I_1, I_2, I_3;
+   //PIPS generated varw=1024, h=1024, max=255
+iable
    unsigned char I_4, I_5;
    //PIPS generated variable
    int I_6, I_7, I_8;
@@ -341,11 +335,11 @@ expression_substitution(self, pattern='', relax_float_associativity=False, **pro
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
    //PIPS generated variable
@@ -372,11 +366,11 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
    //PIPS generated variable
@@ -390,7 +384,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
-#pragma omp parallel for private(current_0,current_1,j_0,I_3)
+#pragma omp parallel for private(I_3,current_0,current_1,j_0)
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          I_3 = j_0*w+i_0;
@@ -404,11 +398,11 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int j_0, i_0, j_1, i_1;
+   int i_0, j_0, i_1, j_1;
    //PIPS generated variable
    unsigned char current_0;
    //PIPS generated variable
-   int j_2, i_2;
+   int i_2, j_2;
    //PIPS generated variable
    unsigned char current_1;
    //PIPS generated variable
@@ -423,19 +417,21 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    int I_10;
 
 #pragma omp parallel for private(j_0)
-l99989:
+l99983:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99990:      inner(h, w, &i_0, bytes, dest, lut, val);
+l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
    
    
 }
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
+   int I_3;
+   //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
-   int j_0, I_3;
-l99990:
+   int j_0;
+l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
       I_3 = j_0*w+*i_0;
       current_0 = bytes[I_3];
@@ -446,10 +442,12 @@ l99990:
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
+   int I_3;
+   //PIPS generated variable
    unsigned char voltage_0, voltage_1;
    //PIPS generated variable
-   int j_0, I_3;
-l99990:
+   int j_0;
+l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
       I_3 = j_0*w+*i_0;
       voltage_0 = bytes[I_3];
