@@ -165,10 +165,7 @@ int clone02_1(int n, int s)
 # applying use-def elimination...
 int clone02_1(int n, int s)
 {
-   {
-      // PIPS: s is assumed a constant reaching value
-      ;
-   }
+   // PIPS: s is assumed a constant reaching value
    ;
    return 1;
 }
@@ -183,26 +180,17 @@ int clone02(int n, int s)
 }
 int clone02_0(int n, int s)
 {
-   {
-      // PIPS: s is assumed a constant reaching value
-      ;
-   }
+   // PIPS: s is assumed a constant reaching value
    return 0;
 }
 int clone02_1(int n, int s)
 {
-   {
-      // PIPS: s is assumed a constant reaching value
-      ;
-   }
+   // PIPS: s is assumed a constant reaching value
    return 1;
 }
 int clone02_2(int n, int s)
 {
-   {
-      // PIPS: s is assumed a constant reaching value
-      ;
-   }
+   // PIPS: s is assumed a constant reaching value
    return 1;
 }
 int main()
