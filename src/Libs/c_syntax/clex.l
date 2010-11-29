@@ -373,6 +373,15 @@ void init_C_comment()
   }
   make_comments_stack();
 }
+/* compatibility layer for bsd */
+static void bsd_rewrite(char ** pyytext) {
+	if(same_string_p(*pyytext,"__stdinp"))
+		*pyytext="stdin";
+	else if(same_string_p(*pyytext,"__stdoutp"))
+		*pyytext="stdout";
+	else if(same_string_p(*pyytext,"__stderrp"))
+		*pyytext="stderr";
+}
 
 %}
 
@@ -759,6 +768,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 	yylval.string = strdup(yytext);
 	return (t);
 }
+
 "__extension__"         {
                                 pips_user_warning("gcc extension keyword \"__extension__\" is ignored\n");
                         }
@@ -772,7 +782,8 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_user_warning("gcc extension keyword \"__signed__\" is ignored\n");
                         }
 {ident}			{
-                                /* C keywords or identifiers */
+				bsd_rewrite(&yytext);
+                /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
                                 if (t>0)
 				   {
