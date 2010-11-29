@@ -46,14 +46,10 @@ static void simplify_subscript(subscript ss)
         reference new_ref= make_reference(new_entity,subscript_indices(ss));
         /* do the replacement */
         expression parent_expression = (expression) gen_get_ancestor(expression_domain,ss);
-        { /*free stuffs */
-            free_normalized(expression_normalized(parent_expression));
-            subscript_array(ss)=expression_undefined;
-            subscript_indices(ss)=NIL;
-            free_syntax(expression_syntax(parent_expression));
-        }
-        expression_syntax(parent_expression)=make_syntax_reference(new_ref);
-        expression_normalized(parent_expression)=normalized_undefined;
+        /*free stuffs carefully*/
+        subscript_array(ss)=expression_undefined;
+        subscript_indices(ss)=NIL;
+        update_expression_syntax(parent_expression,make_syntax_reference(new_ref));
         /* we must do this now and not before */
         insert_statement(parent_statement,new_statement,true);
     }
@@ -62,6 +58,7 @@ static void simplify_subscript(subscript ss)
 static void do_simplify_subscripts(statement s) {
     gen_recurse(s,
             subscript_domain,gen_true,simplify_subscript);
+    statement_consistent_p(s);
 }
 
 /* atomize subscript expressions so that thay can be reprsetned as references*/

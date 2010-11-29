@@ -568,7 +568,6 @@ typedef struct {
     expression increment;       ///< original loop increment
     list header_statements;     ///< assignments from external to internal var
     list incr_statements;       ///< the internal vars increments
-    list footer_statements;     ///< assignment from internal to external var
 } strength_reduction_context_t;
 
 /* the big stuff is there
@@ -651,13 +650,6 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                             entity_to_expression(other)
                             ),
                         ctxt->header_statements);
-                ctxt->footer_statements=CONS(
-                        STATEMENT,
-                        make_assign_statement(
-                            entity_to_expression(other),
-                            entity_to_expression(already_there)
-                            ),
-                        ctxt->footer_statements);
                 /* compute the value of the new increment */
                 expression new_increment=int_to_expression((int)coeff);
                 ctxt->incr_statements=CONS(
@@ -703,9 +695,9 @@ static void do_strength_reduction_in_loop(loop l) {
         hash_table_make(hash_pointer,HASH_DEFAULT_SIZE),
         loop_index(l),
         range_increment(loop_range(l)),
-        NIL,NIL,NIL
+        NIL,NIL
     };
-    // find all possible & relevnt cases and fill the context
+    // find all possible & relevant cases and fill the context
     gen_context_recurse(loop_body(l),&ctxt,
             expression_domain,do_strength_reduction_gather,gen_null);
     // insert prelude and postlude that take care of the assignment to the iterator
@@ -715,9 +707,6 @@ static void do_strength_reduction_in_loop(loop l) {
             true);
     insert_statement(loop_body(l),
             make_block_statement(ctxt.incr_statements),
-            false);
-    insert_statement(s,
-            make_block_statement(ctxt.footer_statements),
             false);
 
     hash_table_free(ctxt.entity_to_coeff);
