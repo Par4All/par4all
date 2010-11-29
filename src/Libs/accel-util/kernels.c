@@ -47,6 +47,7 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
+#include "expressions.h"
 #include "text-util.h"
 #include "transformations.h"
 #include "transformer.h"
@@ -109,6 +110,11 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
     descriptor d = effect_descriptor(eff);
     if(descriptor_convex_p(d)) {
       sc_free(descriptor_convex(d));
+      entity e = reference_variable(region_any_reference(eff));
+      /* create dummy empty effects */
+      effects dumbo = make_effects(NIL);
+      partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
+      free_effects(dumbo);
       descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
     }
     if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
