@@ -52,8 +52,6 @@ int main()
       a1 += 4;
       a0 += 2;
    }
-   a = a1;
-   a = a0;
    printf("%d", *(a+2));
    return 0;
 }
@@ -72,7 +70,6 @@ int main()
       a1 += 4;
       a0 += 2;
    }
-   a = a0;
    printf("%d", *(a+2));
    return 0;
 }
